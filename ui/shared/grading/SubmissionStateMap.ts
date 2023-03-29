@@ -167,7 +167,11 @@ class SubmissionStateMap {
       this.submissionCellMap[student.id] = {}
       this.submissionMap[student.id] = {}
       _.each(assignments, assignment => {
-        this.setSubmissionCellState(student, assignment, student[`assignment_${assignment.id}`])
+        this.setSubmissionCellState(
+          student,
+          assignment,
+          student[`assignment_${assignment.id}`] as Submission
+        )
       })
     })
   }

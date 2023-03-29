@@ -20,6 +20,9 @@ import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {VideoConferenceModal} from '../VideoConferenceModal'
 import userEvent from '@testing-library/user-event'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 const userList = [
   {displayName: 'Allison Pitler', id: '7', assetCode: '7'},

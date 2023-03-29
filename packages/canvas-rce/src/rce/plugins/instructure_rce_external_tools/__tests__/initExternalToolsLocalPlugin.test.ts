@@ -93,7 +93,6 @@ describe('initExternalToolsLocalPlugin', () => {
         onAction: expect.any(Function),
         tooltip: favButtonConfig.title,
         icon: favButtonConfig.iconId,
-        text: favButtonConfig.title,
       }
     )
   })

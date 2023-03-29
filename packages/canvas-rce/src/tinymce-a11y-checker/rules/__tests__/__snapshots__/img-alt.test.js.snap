@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`linkText returns the proper linkText message 1`] = `"Learn more about using alt text for images"`;
+
+exports[`message returns the proper message 1`] = `"Images should include an alt attribute describing the image content."`;
+
+exports[`why returns the proper why message 1`] = `"Screen readers cannot determine what is displayed in an image without alternative text, which describes the content and meaning of the image."`;

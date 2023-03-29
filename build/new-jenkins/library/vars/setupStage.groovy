@@ -28,11 +28,11 @@ def hasGemOverrides() {
 
 def call() {
   def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
-  checkoutRepo('canvas-lms', refspecToCheckout, 100)
+  checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: refspecToCheckout, depth: 100)
 
   if (env.GERRIT_PROJECT != 'canvas-lms') {
     dir(env.LOCAL_WORKDIR) {
-      checkoutRepo(GERRIT_PROJECT, env.GERRIT_REFSPEC, 2)
+      checkoutFromGit(gerritProjectUrl(), refspec: env.GERRIT_REFSPEC, depth: 2)
     }
 
     // Plugin builds using the dir step above will create this @tmp file, we need to remove it

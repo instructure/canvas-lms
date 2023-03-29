@@ -35,8 +35,10 @@ import * as advancedPreference from './advancedPreference'
 import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 
 import {css} from 'aphrodite'
-import mathml from './mathml'
+import mathml, {MathJaxDirective} from './mathml'
 import styles from './styles'
+
+import RCEGlobals from '../../../RCEGlobals'
 
 // Import the <math-field> container and all
 // the relevant math fonts from mathlive
@@ -296,6 +298,7 @@ export default class EquationEditorModal extends Component {
                 keypress-sound="none"
                 plonk-sound="none"
                 math-mode-space=" "
+                data-testid="math-field"
               />
             </div>
             <div style={{display: this.state.advanced ? null : 'none'}}>
@@ -309,6 +312,7 @@ export default class EquationEditorModal extends Component {
                 value={this.state.workingFormula}
                 onChange={e => this.setState({workingFormula: e.target.value})}
                 ref={this.advancedEditor}
+                data-testid="advanced-editor"
               />
             </div>
             <div className={css(styles.latexToggle)}>
@@ -317,7 +321,15 @@ export default class EquationEditorModal extends Component {
               </Flex>
             </div>
             <div style={{display: this.state.advanced ? null : 'none', marginTop: '1em'}}>
-              <span data-testid="mathml-preview-element" ref={this.previewElement} />
+              <span
+                data-testid="mathml-preview-element"
+                ref={this.previewElement}
+                className={
+                  RCEGlobals.getFeatures()?.explicit_latex_typesetting
+                    ? MathJaxDirective.Process
+                    : null
+                }
+              />
             </div>
           </div>
         </Modal.Body>

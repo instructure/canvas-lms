@@ -29,6 +29,9 @@
     "add_to_do_7def3c37": {
         "message": "Teendő hozzáadása"
     },
+    "additional_considerations_f3801683": {
+        "message": "További szempontok"
+    },
     "address_3159962f": {
         "message": "Cím:"
     },
@@ -1430,6 +1433,9 @@
     "new_opportunities_7d349c4d": {
         "message": "Új lehetőségek"
     },
+    "next_40e12421": {
+        "message": "Következő"
+    },
     "next_month_749b1778": {
         "message": "Következő hónap"
     },
@@ -1688,6 +1694,9 @@
     "preformatted_d0670862": {
         "message": "Előre formázott"
     },
+    "prev_f82cbc48": {
+        "message": "Előző"
+    },
     "preview_53003fd2": {
         "message": "Előnézet"
     },
@@ -1801,9 +1810,6 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Vizuális szövegszerkesztő"
-    },
-    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-        "message": "Rich Text terület. A Rich Content Editor parancsikonjaihoz nyomja meg az ALT+0 billentyűkombinációt."
     },
     "right_angle_bracket_d704e2d6": {
         "message": "Jobb csúcsos zárójel"

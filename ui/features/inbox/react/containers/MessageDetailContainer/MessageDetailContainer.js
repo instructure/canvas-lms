@@ -317,7 +317,7 @@ export const MessageDetailContainer = props => {
     <>
       <MessageDetailHeader
         focusRef={setMessageRef}
-        text={props.conversation.subject}
+        text={props.conversation.subject || I18n.t('(No subject)')}
         onForward={props.onForward}
         onReply={inboxMessageData?.canReply ? props.onReply : null}
         onReplyAll={inboxMessageData?.canReply ? props.onReplyAll : null}

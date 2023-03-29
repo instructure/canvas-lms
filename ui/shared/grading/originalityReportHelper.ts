@@ -19,8 +19,8 @@
 import type {SubmissionOriginalityData, OriginalityData} from '@canvas/grading/grading.d'
 
 export function originalityReportSubmissionKey(submission: {
-  id: string
-  submitted_at: null | string | Date
+  id?: string
+  submitted_at?: null | string | Date
   submittedAt?: null | string | Date
 }): string {
   try {

@@ -128,23 +128,33 @@ export default class MessageStudentsWhoForm extends React.Component {
 
   renderFilter() {
     const options = [
-      {key: 'not-submitted', value: 'not-submitted', label: I18n.t("Haven't submitted yet")},
-      {key: 'not-graded', value: 'not-graded', label: I18n.t("Haven't been graded")},
-      {key: 'less-than', value: 'less-than', label: I18n.t('Scored less than')},
-      {key: 'more-than', value: 'more-than', label: I18n.t('Scored more than')},
+      {
+        id: 'not-submitted',
+        key: 'not-submitted',
+        value: 'not-submitted',
+        label: I18n.t("Haven't submitted yet"),
+      },
+      {
+        id: 'not-graded',
+        key: 'not-graded',
+        value: 'not-graded',
+        label: I18n.t("Haven't been graded"),
+      },
+      {id: 'less-than', key: 'less-than', value: 'less-than', label: I18n.t('Scored less than')},
+      {id: 'more-than', key: 'more-than', value: 'more-than', label: I18n.t('Scored more than')},
     ]
     // not-submitted is only available if the assignment has an online submission
     if (!hasSubmission(this.props.assignment)) options.shift()
     return (
       <FormFieldGroup description="" layout="columns">
         <Select
-          label={<ScreenReaderContent>{I18n.t('Filter Students')}</ScreenReaderContent>}
+          renderLabel={<ScreenReaderContent>{I18n.t('Filter Students')}</ScreenReaderContent>}
           selectedOption={this.props.selectedFilter}
           onChange={this.handleFilterChange}
           data-testid="filter-students"
         >
           {options.map(opt => (
-            <option {...opt} />
+            <Select.Option {...opt} />
           ))}
         </Select>
         {this.renderScoreInput()}
@@ -157,7 +167,7 @@ export default class MessageStudentsWhoForm extends React.Component {
       <FormFieldGroup description={I18n.t('Message students who')}>
         {this.renderFilter()}
         <Select
-          label={I18n.t('To:')}
+          renderLabel={I18n.t('To:')}
           multiple={true}
           selectedOption={this.props.selectedStudents}
           onChange={this.handleStudentsChange}

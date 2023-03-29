@@ -20,6 +20,9 @@ import {fireEvent, render, act} from '@testing-library/react'
 import React from 'react'
 import GroupEditForm from '../GroupEditForm'
 import {focusChange} from './helpers'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 jest.useFakeTimers()
 

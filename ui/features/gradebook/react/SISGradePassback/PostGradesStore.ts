@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -21,7 +20,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import createStore from '@canvas/util/createStore'
 import assignmentUtils from './assignmentUtils'
-import type {Override} from '../../../../api.d'
+import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
 type State = {
   course: {
@@ -35,17 +34,31 @@ type State = {
   sections: {}
 }
 
-type PartialAssignment = {
-  id: string
-  name: string
-  due_at: string
-  needs_grading_count: number
-  overrides: Override[]
-  please_ignore: boolean
-  original_error: boolean
+type PartialAssignment = Pick<
+  AssignmentWithOverride,
+  | 'id'
+  | 'name'
+  | 'due_at'
+  | 'needs_grading_count'
+  | 'overrides'
+  | 'please_ignore'
+  | 'original_error'
+>
+
+function assignmentOverrideOriginalErrorCheck(a: {hadOriginalErrors: boolean}) {
+  return (a.hadOriginalErrors = a.hadOriginalErrors === true)
 }
 
-const PostGradesStore = initialState => {
+const PostGradesStore = (initialState: {
+  course: {
+    id: string
+    sis_id: string | null
+  }
+  selected?: {
+    id: string
+    type: string
+  }
+}) => {
   const store = $.extend(createStore(initialState), {
     reset() {
       const assignments = this.getAssignments()
@@ -85,19 +98,20 @@ const PostGradesStore = initialState => {
     overrideForEveryone(a) {
       const overrides = this.allOverrideIds(a)
       const sections: string[] = _.keys(store.getState().sections)
+      // @ts-ignore
       const section_ids_with_no_overrides = $(sections).not(overrides).get()
 
       const section_for_everyone = _.find(section_ids_with_no_overrides, o => {
-        return initialState.selected.id === o
+        return initialState?.selected?.id === o
       })
       return section_for_everyone
     },
 
-    selectedSISId() {
+    selectedSISId(): string {
       return store.getState().selected.sis_id
     },
 
-    setGradeBookAssignments(gradebookAssignments) {
+    setGradeBookAssignments(gradebookAssignments): void {
       const assignments: PartialAssignment[] = []
       for (const id in gradebookAssignments) {
         const gba = gradebookAssignments[id]
@@ -218,7 +232,7 @@ const PostGradesStore = initialState => {
       store.setState({selected, sectionToShow: section})
     },
 
-    updateAssignment(assignment_id: string, newAttrs) {
+    updateAssignment(assignment_id: string, newAttrs: unknown) {
       const assignments = this.getAssignments()
       const assignment = _.find(assignments, a => a.id === assignment_id)
       $.extend(assignment, newAttrs)
@@ -263,15 +277,11 @@ const PostGradesStore = initialState => {
       }
     },
 
-    assignmentOverrideOrigianlErrorCheck(a) {
-      a.hadOriginalErrors = a.hadOriginalErrors === true
-    },
-
     saveAssignments() {
       const assignments = assignmentUtils.withOriginalErrorsNotIgnored(this.getAssignments())
       const course_id = store.getState().course.id
       _.each(assignments, a => {
-        this.assignmentOverrideOrigianlErrorCheck(a)
+        assignmentOverrideOriginalErrorCheck(a)
         assignmentUtils.saveAssignmentToCanvas(course_id, a)
       })
     },

@@ -169,6 +169,27 @@ describe "Modules API", type: :request do
         ]
       end
 
+      it "shows published attribute to teachers with limited permissions" do
+        @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
+        @course.root_account.role_overrides.create!(permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+        @course.root_account.role_overrides.create!(permission: "manage_course_content_add", role: teacher_role, enabled: false)
+        @user = @teacher
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules",
+                        controller: "context_modules_api", action: "index", format: "json",
+                        course_id: @course.id.to_s)
+        expect(@module1.grants_right?(@user, :update)).to eq false
+        expect(json[0]&.key?("published")).to eq true
+      end
+
+      it "does not show published attribute to students" do
+        student_in_course(course: @course)
+        @user = @student
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules",
+                        controller: "context_modules_api", action: "index", format: "json",
+                        course_id: @course.id.to_s)
+        expect(json[0]&.key?("published")).to eq false
+      end
+
       it "includes items if requested" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
                         controller: "context_modules_api", action: "index", format: "json",

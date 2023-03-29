@@ -190,6 +190,15 @@ describe('ConversationListItem', () => {
 
       expect(onMarkAsUnread).toHaveBeenCalledWith('1')
     })
+
+    it('renders (No subject) when subject is empty', () => {
+      const props = createProps()
+      props.conversation.subject = ''
+
+      const {getByText} = render(<ConversationListItem {...props} />)
+
+      expect(getByText('(No subject)')).toBeTruthy()
+    })
   })
 
   describe('submission comments', () => {

@@ -118,6 +118,7 @@ describe('Course()', () => {
     props = {
       dispatch: jest.fn(),
       onChange: jest.fn(),
+      canvasOrigin: 'https://canvas.instructor.com',
     }
   })
 

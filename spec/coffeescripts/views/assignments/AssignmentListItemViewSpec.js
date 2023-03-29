@@ -129,6 +129,11 @@ const createView = function (model, options) {
   ENV.POST_TO_SIS = options.post_to_sis
   ENV.DIRECT_SHARE_ENABLED = options.directShareEnabled
   ENV.COURSE_ID = options.courseId
+  ENV.FLAGS = {
+    show_additional_speed_grader_link: options.show_additional_speed_grader_link,
+    newquizzes_on_quiz_page: options.newquizzes_on_quiz_page,
+  }
+  ENV.SHOW_SPEED_GRADER_LINK = options.show_additional_speed_grader_link
 
   const view = new AssignmentListItemView({
     model,
@@ -689,6 +694,50 @@ test('renders due date column in appropriate time zone', function () {
   )
 })
 
+test('renders link to speed grader if canManage', () => {
+  const model = buildAssignment({
+    id: 1,
+    title: 'Chicken Noodle',
+  })
+  const view = createView(model, {
+    userIsAdmin: true,
+    canManage: true,
+    show_additional_speed_grader_link: true,
+  })
+  equal(view.$('.speed-grader-link').length, 1)
+})
+
+test('does NOT render link when assignment is unpublished', () => {
+  const model = buildAssignment({
+    id: 1,
+    title: 'Chicken Noodle',
+    published: false,
+  })
+  const view = createView(model, {
+    userIsAdmin: true,
+    canManage: true,
+    show_additional_speed_grader_link: true,
+  })
+  ok(view.$('.speed-grader-link-container').attr('class').includes('hidden'))
+})
+
+test('speed grader link is correct', () => {
+  const model = buildAssignment({
+    id: 11,
+    title: 'Cream of Mushroom',
+  })
+  const view = createView(model, {
+    userIsAdmin: true,
+    canManage: true,
+    show_additional_speed_grader_link: true,
+  })
+  ok(
+    view
+      .$('.speed-grader-link')[0]
+      ?.href.includes('/courses/1/gradebook/speed_grader?assignment_id=11')
+  )
+})
+
 test('can duplicate when assignment can be duplicated', () => {
   const model = buildAssignment({
     id: 1,
@@ -948,7 +997,9 @@ QUnit.module('AssignmentListItemViewSpec - skip to build screen button', functio
         is_quiz_lti_assignment: true,
       })
     )
-
+    ENV.FLAGS = {
+      new_quizzes_skip_to_build_module_button: true,
+    }
     const json = view.toJSON()
     strictEqual(json.canShowBuildLink, true)
   })
@@ -1435,24 +1486,22 @@ test('renders page icon for wiki page', () => {
 })
 
 test('renders solid quiz icon for new quizzes', () => {
-  ENV.FLAGS = {newquizzes_on_quiz_page: true}
   const model = buildAssignment({
     id: 1,
     title: 'Foo',
     is_quiz_lti_assignment: true,
   })
-  const view = createView(model)
+  const view = createView(model, {newquizzes_on_quiz_page: true})
   equal(view.$('i.icon-quiz.icon-Solid').length, 1)
 })
 
 test('renders assignment icon for new quizzes if FF is off', () => {
-  ENV.FLAGS = {newquizzes_on_quiz_page: false}
   const model = buildAssignment({
     id: 1,
     title: 'Foo',
     is_quiz_lti_assignment: true,
   })
-  const view = createView(model)
+  const view = createView(model, {newquizzes_on_quiz_page: false})
   equal(view.$('i.icon-quiz.icon-Solid').length, 0)
   equal(view.$('i.icon-assignment').length, 1)
 })

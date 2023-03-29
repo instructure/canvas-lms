@@ -48,35 +48,25 @@ plannerFormatMessage.setup({
 const globalError = global.console.error
 const ignoredErrors = [
   /\[object Object\]/,
-  /<Provider> does not support changing `store` on the fly/,
   /An update to %s inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
-  /Cannot read property 'activeElement' of undefined/,
-  /Cannot read property 'name' of null/,
   /contextType was defined as an instance property on %s/,
-  /Expected one of Group, Option in Select but found 'option'/,
+  /Functions are not valid as a React child/, // https://instructure.atlassian.net/browse/LS-3837
   /Function components cannot be given refs/,
-  /Invalid prop `children` supplied to `(Option|View)`/,
+  /Invalid prop `children` supplied to `(Option)`/,
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
   /Invariant Violation/,
-  /Prop `children` should be supplied unless/,
-  /Render methods should be a pure function of props and state/,
-  /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
+  /Prop `children` should be supplied unless/, // https://instructure.atlassian.net/browse/FOO-3407
+  /Render methods should be a pure function of props and state/, // https://instructure.atlassian.net/browse/LS-3840
   /The above error occurred in the <.*> component/,
-  /The prop `focusOnInit` is marked as required in `(UrlEntry)`/,
-  /The prop `id` is marked as required in `(ColHeader|FormField|Option)`/,
-  /The prop `renderLabel` is marked as required in `Select`/,
-  /WARNING: heuristic fragment matching going on!/,
-  /Warning: Failed prop type: Expected one of Checkbox in CheckboxGroup but found `View`/,
+  /Warning: Failed prop type: Expected one of Checkbox in CheckboxGroup but found `View`/, // https://instructure.atlassian.net/browse/VICE-3378
   /You seem to have overlapping act\(\) calls/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
-  /\[Text\] .* in version 8.0.0/i,
-  /Error getting \/media_objects\/dummy_media_id\/info/,
-  /Please update the following components: %s/,
+  /Please update the following components: %s/, // https://instructure.atlassian.net/browse/LS-3841
   /value provided is not in a recognized RFC2822 or ISO format/,
 ]
 global.console = {

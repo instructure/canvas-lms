@@ -180,6 +180,7 @@ describe IncomingMail::MessageHandler do
           it "constructs the message correctly" do
             message = double("original message without user", original_message_attributes.merge(context: nil))
             allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
+            allow(subject).to receive(:get_ref_uuid).and_return("TestRef")
 
             email_subject = "Undelivered message"
             body = <<~TEXT.strip_heredoc.strip
@@ -187,6 +188,8 @@ describe IncomingMail::MessageHandler do
 
               Thank you,
               Canvas Support
+
+              Reference: TestRef
             TEXT
 
             message_attributes = {
@@ -244,6 +247,7 @@ describe IncomingMail::MessageHandler do
           it "constructs the message correctly" do
             allow(InstStatsd::Statsd).to receive(:increment)
             allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
+            allow(subject).to receive(:get_ref_uuid).and_return("TestRef")
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::UnknownAddress.new)
 
             email_subject = "Undelivered message"
@@ -252,6 +256,8 @@ describe IncomingMail::MessageHandler do
 
               Thank you,
               Canvas Support
+
+              Reference: TestRef
             TEXT
 
             message_attributes = {

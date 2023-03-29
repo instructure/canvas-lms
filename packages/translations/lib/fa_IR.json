@@ -2,6 +2,9 @@
     "add_8523c19b": {
         "message": "افزودن"
     },
+    "additional_considerations_f3801683": {
+        "message": "ملاحظات اضافی"
+    },
     "address_3159962f": {
         "message": "نشانی:"
     },
@@ -491,6 +494,9 @@
     "new_13daf639": {
         "message": "جدید"
     },
+    "next_40e12421": {
+        "message": "بعدی"
+    },
     "next_month_749b1778": {
         "message": "ماه بعد"
     },
@@ -577,6 +583,9 @@
     },
     "portuguese_9c212cf4": {
         "message": "پرتغالی"
+    },
+    "prev_f82cbc48": {
+        "message": "قبلی"
     },
     "preview_53003fd2": {
         "message": "پیش‌نمایش"

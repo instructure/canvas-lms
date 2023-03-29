@@ -18,18 +18,31 @@
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../../jst/subviews/SelectContentCheckbox.handlebars'
+import ImportBlueprintSettingsView from '../../../../../features/content_migrations/backbone/views/subviews/ImportBlueprintSettingsView.coffee'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 I18n = useI18nScope('select_content_checkbox')
 
 export default class SelectContentCheckbox extends Backbone.View
   template: template
+  importBlueprintSettings: new ImportBlueprintSettingsView
+                           model: @model
+
+  @child 'importBlueprintSettings', '.importBlueprintSettings'
 
   events:
     'click [name=selective_import]' : 'updateModel'
 
+  initialize: () ->
+    super
+    @importBlueprintSettings.model = @model
+
   updateModel: (event) ->
     @model.set 'selective_import', $(event.currentTarget).val() == "true"
+    @importBlueprintSettings.importTypeSelected($(event.currentTarget).val() == "true")
+
+  courseSelected: (course) ->
+    @importBlueprintSettings.courseSelected(course)
 
   # validations this form element. This validates method is a convention used
   # for all sub views.

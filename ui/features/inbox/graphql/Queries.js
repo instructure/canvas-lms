@@ -54,6 +54,54 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
               _id
               id
               name
+              observerEnrollmentsConnection(contextCode: $courseContextCode) {
+                nodes {
+                  associatedUser {
+                    _id
+                    name
+                  }
+                }
+              }
+            }
+            pageInfo {
+              ...PageInfo
+            }
+          }
+        }
+      }
+    }
+  }
+  ${PageInfo.fragment}
+`
+
+export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
+  query GetAddressBookRecipients(
+    $userID: ID!
+    $context: String
+    $search: String
+    $afterUser: String
+    $afterContext: String
+    $courseContextCode: String!
+  ) {
+    legacyNode(_id: $userID, type: User) {
+      ... on User {
+        id
+        recipients(context: $context, search: $search) {
+          sendMessagesAll
+          contextsConnection(first: 20, after: $afterContext) {
+            nodes {
+              id
+              name
+            }
+            pageInfo {
+              ...PageInfo
+            }
+          }
+          usersConnection(first: 20, after: $afterUser) {
+            nodes {
+              _id
+              id
+              name
               commonCoursesConnection {
                 nodes {
                   _id

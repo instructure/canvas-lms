@@ -28,6 +28,8 @@ describe "group navigation" do
     @group_category = @course.group_categories.create!(name: "Group Category")
     @group_1 = @course.groups.create!(group_category: @group_category, name: "group 1")
     @group_2 = @course.groups.create!(group_category: @group_category, name: "group 2")
+    @group_10 = @course.groups.create!(group_category: @group_category, name: "group 10")
+    @group_zed = @course.groups.create!(group_category: @group_category, name: "group zed")
   end
 
   context "as a teacher" do
@@ -39,12 +41,40 @@ describe "group navigation" do
       expect(fj("nav#breadcrumbs:contains('group 2')")).to be_present
     end
 
-    it "able to change groups on non-homepage" do
+    it "is able to change groups from an index page" do
       get "/groups/#{@group_1.id}/users"
 
       force_click("[data-testid='group-selector']")
       fj("li:contains('group 2')").click
       expect(fj("nav#breadcrumbs:contains('group 2')")).to be_present
+    end
+
+    it "is able to change groups from a show page" do
+      @course.discussion_topics.create!(
+        title: "Ghost reporting.",
+        message: "Never know what hit them.",
+        group_category: @group_category
+      )
+
+      group_1_discussion = DiscussionTopic.where(context_id: @group_1.id)[0]
+      get "/groups/#{@group_1.id}/discussion_topics/#{group_1_discussion.id}"
+      force_click("[data-testid='group-selector']")
+
+      fj("li:contains('group 2')").click
+      # these 2 breadcrumbs also verify we did not get a routing error
+      expect(fj("nav#breadcrumbs:contains('group 2')")).to be_present
+      expect(fj("nav#breadcrumbs:contains('Discussions')")).to be_present
+    end
+
+    it "shows only active groups as sorted by name" do
+      @group_zed.workflow_state = "deleted"
+      @group_zed.save!
+
+      get "/groups/#{@group_1.id}"
+      force_click("[data-testid='group-selector']")
+      list_items = ff("[data-testid*='group-id-']").map(&:text)
+      # using eq verifies correct order and expected exclusion of group zed
+      expect(list_items).to eq ["group 1", "group 10", "group 2"]
     end
   end
 end

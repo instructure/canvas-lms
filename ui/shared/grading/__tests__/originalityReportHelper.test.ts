@@ -41,6 +41,7 @@ function submission(overrides = {}): {
     submissionType: 'online_text_entry',
     originalityData: {
       'submission_1_2011-10-05T14:48:00Z': {
+        provider: 'vericite',
         report_url: 'string',
         similarity_score: 0,
         state: 'scored',

@@ -236,8 +236,6 @@ export default function StatusBar(props) {
           tabIndex={tabIndexForBtn('rce-editormessage-btn')}
           onClick={event => {
             event.target.focus()
-            // This helps the RCEWrapper to recognize the event as defaultPrevented in handleExternalClick listener
-            event.preventDefault()
             props.onChangeView(
               props.editorView === PRETTY_HTML_EDITOR_VIEW
                 ? RAW_HTML_EDITOR_VIEW

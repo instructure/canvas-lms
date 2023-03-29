@@ -21,6 +21,9 @@ import stubEnv from '@canvas/stub-env'
 import User from '@canvas/users/backbone/models/User.coffee'
 import UserCollection from '@canvas/users/backbone/collections/UserCollection.coffee'
 import NewStudentGroupModal from '../NewStudentGroupModal'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 describe('NewStudentGroupModal', () => {
   const loadMore = jest.fn()

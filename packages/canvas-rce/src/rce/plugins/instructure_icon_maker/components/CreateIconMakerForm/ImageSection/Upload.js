@@ -80,7 +80,7 @@ export const onSubmit = (dispatch, onChange) => (_editor, _accept, _selectedPane
   dispatch({...actions.SET_CROPPER_OPEN, payload: true})
 }
 
-const Upload = ({editor, dispatch, mountNode, onChange}) => {
+const Upload = ({editor, dispatch, mountNode, onChange, canvasOrigin}) => {
   return (
     <UploadFile
       accept="image/*"
@@ -93,6 +93,7 @@ const Upload = ({editor, dispatch, mountNode, onChange}) => {
       }}
       requireA11yAttributes={false}
       onSubmit={onSubmit(dispatch, onChange)}
+      canvasOrigin={canvasOrigin}
     />
   )
 }
@@ -102,6 +103,7 @@ Upload.propTypes = {
   dispatch: PropTypes.func,
   onChange: PropTypes.func,
   mountNode: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+  canvasOrigin: PropTypes.string.isRequired,
 }
 
 Upload.defaultProps = {

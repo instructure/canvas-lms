@@ -39,7 +39,7 @@ describe GradebookUserIds do
       active_all: true,
       allow_multiple_enrollments: true
     ).user
-    @student1.update!(sortable_name: "Bert")
+    @student1.update!(sortable_name: "Bert", name: "Bert Maclin")
     @student1.pseudonyms.create!(
       account: @student1.account,
       sis_user_id: "Bert_sis",
@@ -51,7 +51,7 @@ describe GradebookUserIds do
       course: @course,
       active_all: true
     ).user
-    @student2.update!(sortable_name: "Ernie")
+    @student2.update!(sortable_name: "Ernie", name: "Ernie Ernie")
     @student2.pseudonyms.create!(
       account: @student2.account,
       sis_user_id: "Ernie_sis",
@@ -63,7 +63,7 @@ describe GradebookUserIds do
       course: @course,
       active_all: true
     ).user
-    @student3.update!(sortable_name: "Carl")
+    @student3.update!(sortable_name: "Carl", name: "Carl Carl")
     @student3.pseudonyms.create!(
       account: @student3.account,
       sis_user_id: "Carl_sis",
@@ -75,7 +75,7 @@ describe GradebookUserIds do
       course: @course,
       active_all: true
     ).user
-    @student4.update!(sortable_name: "carl")
+    @student4.update!(sortable_name: "carl", name: "carl carl")
     @student4.pseudonyms.create!(
       account: @student4.account,
       sis_user_id: "carl_sis",
@@ -325,6 +325,23 @@ describe GradebookUserIds do
             [@student1.id, @student4.id, @student3.id, @concluded_student.id, @student2.id, @fake_student.id]
           )
         end
+      end
+    end
+
+    describe "sorting by student first name" do
+      before(:once) do
+        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "student_firstname"
+      end
+
+      it "sorts by student first name ascending" do
+        expected_user_ids = [@student1.id, @student4.id, @student3.id, @student2.id, @fake_student.id]
+        expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+      end
+
+      it "sorts by student first name descending" do
+        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+        expected_user_ids = [@student2.id, @student3.id, @student4.id, @student1.id, @fake_student.id]
+        expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
       end
     end
 

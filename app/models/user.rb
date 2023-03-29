@@ -34,6 +34,12 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
+  # this has to be before include Context to prevent a circular dependency in Course
+  def self.name_order_by_clause(table = nil)
+    col = table ? "#{table}.name" : "name"
+    best_unicode_collation_key(col)
+  end
+
   self.ignored_columns = %i[type creation_unique_id creation_sis_batch_id creation_email
                             sis_name bio merge_to unread_inbox_items_count visibility account_pronoun_id gender birthdate]
 
@@ -334,6 +340,22 @@ class User < ActiveRecord::Base
 
   def self.order_by_sortable_name(options = {})
     clause = sortable_name_order_by_clause
+    sort_direction = options[:direction] == :descending ? "DESC" : "ASC"
+    scope = order(Arel.sql("#{clause} #{sort_direction}")).order(Arel.sql("#{table_name}.id #{sort_direction}"))
+    if scope.select_values.empty?
+      scope = scope.select(arel_table[Arel.star])
+    end
+    if scope.select_values.present?
+      scope = scope.select(clause)
+    end
+    if scope.group_values.present?
+      scope = scope.group(clause)
+    end
+    scope
+  end
+
+  def self.order_by_name(options = {})
+    clause = name_order_by_clause
     sort_direction = options[:direction] == :descending ? "DESC" : "ASC"
     scope = order(Arel.sql("#{clause} #{sort_direction}")).order(Arel.sql("#{table_name}.id #{sort_direction}"))
     if scope.select_values.empty?
@@ -944,11 +966,13 @@ class User < ActiveRecord::Base
   end
 
   def email
-    value = Rails.cache.fetch(email_cache_key) do
-      email_channel.try(:path) || :none
+    shard.activate do
+      value = Rails.cache.fetch(email_cache_key) do
+        email_channel.try(:path) || :none
+      end
+      # this sillyness is because rails equates falsey as not in the cache
+      value == :none ? nil : value
     end
-    # this sillyness is because rails equates falsey as not in the cache
-    value == :none ? nil : value
   end
 
   def email_cache_key
@@ -2146,6 +2170,12 @@ class User < ActiveRecord::Base
     end
   end
 
+  def participating_student_current_and_unrestricted_concluded_course_ids
+    cached_course_ids("student_current_and_concluded") do |enrollments|
+      enrollments.current_and_concluded.not_inactive_by_date.where(type: %w[StudentEnrollment StudentViewEnrollment])
+    end
+  end
+
   def participating_student_course_ids
     cached_course_ids("participating_student") do |enrollments|
       enrollments.current.active_by_date.where(type: %w[StudentEnrollment StudentViewEnrollment])
@@ -2211,9 +2241,10 @@ class User < ActiveRecord::Base
                              .order("submissions.created_at DESC")
                              .limit(limit).to_a
 
-          submissions += Submission.active.posted.where(user_id: self)
+          submissions += Submission.active.where(user_id: self)
                                    .where(course_id: course_ids)
-                                   .joins(:assignment)
+                                   .where("submissions.posted_at IS NOT NULL OR post_policies.post_manually IS FALSE")
+                                   .joins(:assignment, assignment: [:post_policy])
                                    .where(assignments: { workflow_state: "published" })
                                    .where("last_comment_at > ?", start_at)
                                    .limit(limit).order("last_comment_at").to_a

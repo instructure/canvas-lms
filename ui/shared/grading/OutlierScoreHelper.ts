@@ -20,8 +20,8 @@ import GRADEBOOK_TRANSLATIONS from './GradebookTranslations'
 
 const MULTIPLIER = 1.5
 
-function isNegativePoints(score: number) {
-  return score < 0
+function isNegativePoints(score: number | null) {
+  return typeof score === 'number' && score < 0
 }
 
 export function isUnusuallyHigh(score, pointsPossible) {
@@ -33,11 +33,11 @@ export function isUnusuallyHigh(score, pointsPossible) {
 }
 
 export default class OutlierScoreHelper {
-  score: number
+  score: number | null
 
   pointsPossible: number
 
-  constructor(score: number, pointsPossible: number) {
+  constructor(score: number | null, pointsPossible: number) {
     this.score = score
     this.pointsPossible = pointsPossible
   }

@@ -20,7 +20,7 @@ import tinymce from 'tinymce'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {RceToolWrapper, updateExternalToolMruButtonVisibility} from './RceToolWrapper'
+import {RceToolWrapper} from './RceToolWrapper'
 import formatMessage from '../../../format-message'
 import {ExternalToolSelectionDialog} from './components/ExternalToolSelectionDialog/ExternalToolSelectionDialog'
 import {ensureToolDialogContainerElem} from './dialog-helper'
@@ -81,7 +81,7 @@ function registerFavoriteAppsToolbarButtons(editor: ExternalToolsEditor) {
     .forEach(toolInfo =>
       editor.ui.registry.addButton(
         `instructure_external_button_${toolInfo.id}`,
-        toolInfo.asButton()
+        toolInfo.asToolbarButton()
       )
     )
 }
@@ -106,7 +106,6 @@ function registerAppsToolbarButton(editor: ExternalToolsEditor) {
       ])
     },
     onSetup(_api) {
-      updateExternalToolMruButtonVisibility(externalToolsEnvFor(editor))
       return () => undefined
     },
   })

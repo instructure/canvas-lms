@@ -32,7 +32,7 @@ module SeleniumDriverSetup
     implicit_wait: 0,
     # except finding elements
     finder: CONFIG[:finder_timeout_seconds] || 5,
-    script: CONFIG[:script_timeout_seconds] || 5
+    script: CONFIG[:script_timeout_seconds] || 5,
   }.freeze
 
   # If you have some really slow UI, you can temporarily override
@@ -84,7 +84,7 @@ module SeleniumDriverSetup
       begin
         [
           Thread.new { start_webserver },
-          Thread.new { start_driver }
+          Thread.new { start_driver },
         ].each(&:join)
       rescue Selenium::WebDriver::Error::WebDriverError
         driver.quit if saucelabs_test_run?
@@ -297,8 +297,11 @@ module SeleniumDriverSetup
         options.add_argument("no-sandbox")
         options.add_argument("start-maximized")
         options.add_argument("disable-dev-shm-usage")
+        if ENV["DISABLE_CORS"]
+          options.add_argument("disable-web-security")
+        end
         options.logging_prefs = {
-          browser: "ALL"
+          browser: "ALL",
         }
         # put `auto_open_devtools: true` in your selenium.yml if you want to have
         # the chrome dev tools open by default by selenium
@@ -399,6 +402,7 @@ module SeleniumDriverSetup
     end
 
     ASSET_PATH = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}.freeze
+
     def asset_request?(url)
       url =~ ASSET_PATH
     end

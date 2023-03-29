@@ -38,22 +38,41 @@ export default function processEditorContentItems(
     const ltiEndpoint = event.data?.ltiEndpoint
     const selection = env.editorSelection
 
-    const validItems =
-      event.data?.content_items
-        ?.map(item =>
-          rceLti13ContentItemFromJson(item, {
-            ltiEndpoint: ltiEndpoint ?? null,
-            selection: selection ?? null,
-            containingCanvasLtiToolId: env.containingCanvasLtiToolId,
-            ltiIframeAllowPolicy: env.ltiIframeAllowPolicy,
+    const eventContentItems = event.data?.content_items ?? []
+
+    let unsupportedItemWarningShown = false
+
+    for (const inputItem of eventContentItems) {
+      const parsedItem = rceLti13ContentItemFromJson(inputItem, {
+        ltiEndpoint: ltiEndpoint ?? null,
+        selection: selection ?? null,
+        containingCanvasLtiToolId: env.containingCanvasLtiToolId,
+        ltiIframeAllowPolicy: env.ltiIframeAllowPolicy,
+      })
+
+      if (parsedItem != null) {
+        env.insertCode(parsedItem.toHtmlString())
+      } else {
+        // eslint-disable-next-line no-console
+        console.warn('Unsupported LTI 1.3 Content Item: ', inputItem)
+
+        if (!unsupportedItemWarningShown) {
+          showFlashAlert({
+            message: formatMessage(
+              'Could not insert content: "{itemType}" items are not currently supported in Canvas.',
+              {itemType: inputItem.type ?? 'unknown'}
+            ),
+            type: 'warning',
+            err: null,
           })
-        )
-        ?.flatMap(it => (it != null ? [it] : [])) ?? []
 
-    if (validItems.length > 0) {
-      validItems?.forEach(contentItem => env.insertCode(contentItem.toHtmlString()))
+          unsupportedItemWarningShown = true
+        }
+      }
+    }
 
-      // Remove "unsaved changes" warnings and close modal
+    // Remove "unsaved changes" warnings and close modal
+    if (event.data?.content_items) {
       dialog?.close()
     }
   } catch (e) {

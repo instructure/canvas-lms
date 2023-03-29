@@ -31,7 +31,12 @@ import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Quer
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
 async function mockSubmissionCommentQuery(overrides = {}, variableOverrides = {}) {
-  const variables = {submissionAttempt: 0, submissionId: '1', ...variableOverrides}
+  const variables = {
+    submissionAttempt: 0,
+    submissionId: '1',
+    peerReview: false,
+    ...variableOverrides,
+  }
   const allOverrides = [
     {DateTime: '2010-10-16T23:59:59-06:00'},
     {Node: {__typename: 'Submission'}},
@@ -855,9 +860,10 @@ describe('CommentsTrayBody', () => {
     })
 
     it('renders a message with image if there are no comments', async () => {
-      const mocks = [await mockSubmissionCommentQuery()]
+      const mocks = [await mockSubmissionCommentQuery({}, {peerReview: true})]
       const props = await getDefaultPropsWithReviewerSubmission('assigned')
       props.isPeerReviewEnabled = true
+      props.assignment.rubric = null
       const {getByText, getByTestId} = render(
         <MockedProvider mocks={mocks}>
           <CommentsTrayBody {...props} />
@@ -870,6 +876,23 @@ describe('CommentsTrayBody', () => {
             'Add a comment to complete your peer review. You will only see comments written by you.'
           )
         ).toBeInTheDocument()
+      )
+      expect(getByTestId('svg-placeholder-container')).toBeInTheDocument()
+    })
+
+    it('renders a message that only comments authored by the viewer are visible if there are no comments and a rubric attached', async () => {
+      const mocks = [await mockSubmissionCommentQuery({}, {peerReview: true})]
+      const props = await mockAssignmentAndSubmission()
+      props.isPeerReviewEnabled = true
+      props.assignment.rubric = {id: 123}
+      const {getByText, getByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <CommentsTrayBody {...props} />
+        </MockedProvider>
+      )
+
+      await waitFor(() =>
+        expect(getByText('You will only see comments written by you.')).toBeInTheDocument()
       )
       expect(getByTestId('svg-placeholder-container')).toBeInTheDocument()
     })
@@ -887,7 +910,10 @@ describe('CommentsTrayBody', () => {
     })
 
     it('shows peer review prompt modal with next peer review if user has other assigned reviews', async () => {
-      const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
       const props = await getDefaultPropsWithReviewerSubmission('completed')
       props.isPeerReviewEnabled = true
       const {findByPlaceholderText, getByText, findByText, queryByTestId} = render(
@@ -906,7 +932,10 @@ describe('CommentsTrayBody', () => {
     })
 
     it('shows peer review prompt modal with completed peer review text when no other assigned reviews remaining', async () => {
-      const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
       const props = await getDefaultPropsWithReviewerSubmission('assigned')
       props.isPeerReviewEnabled = true
       props.reviewerSubmission.assignedAssessments[1].workflowState = 'completed'
@@ -926,7 +955,10 @@ describe('CommentsTrayBody', () => {
     })
 
     it('shows peer review prompt modal with unavailable peer review text when only unavailable reviews remaining', async () => {
-      const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
       const props = await getDefaultPropsWithReviewerSubmission('assigned')
       props.isPeerReviewEnabled = true
       props.reviewerSubmission.assignedAssessments[1].assetSubmissionType = null
@@ -948,7 +980,10 @@ describe('CommentsTrayBody', () => {
     })
 
     it('does not show peer review modal if user already completed all peer reviews and leaves a comment', async () => {
-      const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
       const props = await getDefaultPropsWithReviewerSubmission('completed')
       props.isPeerReviewEnabled = true
       props.reviewerSubmission.assignedAssessments[1].workflowState = 'completed'

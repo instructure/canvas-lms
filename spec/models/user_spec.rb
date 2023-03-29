@@ -750,6 +750,12 @@ describe User do
         expect(student.recent_feedback(contexts: [post_policies_course])).not_to include submission
       end
     end
+
+    it "does include recent feedback for auto posted assignment that has last_comment_at but has no posted_at date" do
+      submission = auto_posted_assignment.submissions.find_by!(user: student)
+      submission.update!(last_comment_at: 1.day.ago, posted_at: nil)
+      expect(student.recent_feedback(contexts: [post_policies_course])).not_to be_empty
+    end
   end
 
   describe "#alternate_account_for_course_creation?" do
@@ -2512,6 +2518,50 @@ describe User do
       end
     end
 
+    describe "order_by_name" do
+      let_once :ids do
+        ids = []
+        ids << User.create!(name: "John Johnson")
+        ids << User.create!(name: "Jimmy Johns")
+        ids << User.create!(name: "Jimmy John")
+      end
+
+      context "given pg_collkey extension is present" do
+        before do
+          skip_unless_pg_collkey_present
+        end
+
+        it "sorts lexicographically" do
+          ascending_names = User.order_by_name.where(id: ids).map(&:name)
+          expect(ascending_names).to eq(["Jimmy John", "Jimmy Johns", "John Johnson"])
+        end
+
+        it "sorts support direction toggle" do
+          descending_names = User.order_by_name(direction: :descending)
+                                 .where(id: ids).map(&:name)
+          expect(descending_names).to eq(["John Johnson", "Jimmy Johns", "Jimmy John"])
+        end
+
+        it "sorts support direction toggle with a prior select" do
+          descending_names = User.select([:id, :name]).order_by_name(direction: :descending)
+                                 .where(id: ids).map(&:name)
+          expect(descending_names).to eq(["John Johnson", "Jimmy Johns", "Jimmy John"])
+        end
+
+        it "sorts by the current locale" do
+          I18n.with_locale(:es) do
+            expect(User.name_order_by_clause).to match(/'es'/)
+            expect(User.name_order_by_clause).not_to match(/'root'/)
+          end
+          I18n.with_locale(:en) do
+            # english has no specific sorting rules, so use root
+            expect(User.name_order_by_clause).not_to match(/'es'/)
+            expect(User.name_order_by_clause).to match(/'root'/)
+          end
+        end
+      end
+    end
+
     it "breaks ties with user id" do
       ids = Array.new(5) { User.create!(name: "Abcde").id }.sort
       expect(User.order_by_sortable_name.where(id: ids).map(&:id)).to eq(ids)
@@ -3729,6 +3779,46 @@ describe User do
     it "includes courses for concluded enrollments" do
       user.enrollments.last.conclude
       expect(user.participating_student_current_and_concluded_course_ids).to include(@course.id)
+    end
+  end
+
+  describe "#participating_student_current_and_unrestricted_concluded_course_ids" do
+    let(:user) { User.create! }
+
+    before do
+      # restricts view of this course when it is in the past (it IS in the past)
+      @restricted = Account.default.courses.create!(
+        start_at: 2.months.ago, conclude_at: 1.month.ago,
+        restrict_enrollments_to_course_dates: true,
+        name: "Restricted",
+        restrict_student_past_view: true
+      )
+      # doesnt restrict view of this course when it is in the past (it IS in the past)
+      @unrestricted = Account.default.courses.create!(
+        start_at: 2.months.ago, conclude_at: 1.month.ago,
+        restrict_enrollments_to_course_dates: true,
+        name: "Unrestricted",
+        restrict_student_past_view: false
+      )
+      @restricted.offer!
+      @unrestricted.offer!
+    end
+
+    it "includes unrestricted but not restricted course" do
+      course_with_student course: @restricted, user: user, active_all: true
+      course_with_student course: @unrestricted, user: user, active_all: true
+
+      expect(user.participating_student_current_and_unrestricted_concluded_course_ids).to include(@unrestricted.id)
+      expect(user.participating_student_current_and_unrestricted_concluded_course_ids).not_to include(@restricted.id)
+    end
+
+    it "includes unrestricted concluded and restricted current course" do
+      @restricted.update(conclude_at: nil, restrict_enrollments_to_course_dates: false)
+      course_with_student course: @restricted, user: user, active_all: true
+      course_with_student course: @unrestricted, user: user, active_all: true
+
+      expect(user.participating_student_current_and_unrestricted_concluded_course_ids)
+        .to contain_exactly(@restricted.id, @unrestricted.id)
     end
   end
 

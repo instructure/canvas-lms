@@ -462,7 +462,6 @@ class GradebooksController < ApplicationController
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: root_account.settings[:login_handle_name],
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
-      new_gradebook_development_enabled: new_gradebook_development_enabled?,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       performance_controls: gradebook_performance_controls,
       post_grades_feature: post_grades_feature?,
@@ -576,7 +575,6 @@ class GradebooksController < ApplicationController
       login_handle_name: root_account.settings[:login_handle_name],
       has_modules: @context.has_modules?,
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
-      new_gradebook_development_enabled: new_gradebook_development_enabled?,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       outcome_links_url: api_v1_course_outcome_group_links_url(@context, outcome_style: :full),
       outcome_rollups_url: api_v1_course_outcome_rollups_url(@context, per_page: 100),
@@ -1238,28 +1236,6 @@ class GradebooksController < ApplicationController
     redirect_to polymorphic_url([@context, :gradebook])
   end
 
-  def visible_modules?
-    @visible_modules ||= @context.modules_visible_to(@current_user).any?
-  end
-  helper_method :visible_modules?
-
-  def multiple_sections?
-    @multiple_sections ||= @context.multiple_sections?
-  end
-  helper_method :multiple_sections?
-
-  def multiple_assignment_groups?
-    @multiple_assignment_groups ||= @context.assignment_groups.many?
-  end
-  helper_method :multiple_assignment_groups?
-
-  def student_groups?
-    return @student_groups if defined?(@student_groups)
-
-    @student_groups = @context.groups.any?
-  end
-  helper_method :student_groups?
-
   private
 
   def gradebook_group_categories_json
@@ -1297,16 +1273,6 @@ class GradebooksController < ApplicationController
       params[:version]
     else
       @current_user.preferred_gradebook_version
-    end
-  end
-
-  def new_gradebook_development_enabled?
-    # params[:new_gradebook_development] is a development-only convenience for engineers.
-    # This param should never be used outside of development.
-    if Rails.env.development? && params.include?(:new_gradebook_development)
-      params[:new_gradebook_development] == "true"
-    else
-      !!ENV["GRADEBOOK_DEVELOPMENT"]
     end
   end
 

@@ -89,4 +89,11 @@ ready(() => {
     dateShiftView.$newEndDate.val($(this).val()).trigger('change')
     validateDates()
   })
+
+  if (document.querySelector('.import-blueprint-settings')) {
+    $('[name="selective_import"]').change(function () {
+      const ibs = document.querySelector('.import-blueprint-settings')
+      ibs.style.display = this.value === 'true' ? 'none' : 'block'
+    })
+  }
 })

@@ -31,7 +31,7 @@ export const CreateIconMakerForm = ({
   editing,
   allowNameChange,
   nameRef,
-  rcsConfig,
+  cropperEnabled,
   canvasOrigin,
 }) => {
   return (
@@ -51,7 +51,7 @@ export const CreateIconMakerForm = ({
         settings={settings}
         onChange={dispatch}
         editing={editing}
-        rcsConfig={rcsConfig}
+        cropperEnabled={cropperEnabled}
         canvasOrigin={canvasOrigin}
       />
     </>

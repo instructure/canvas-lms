@@ -1,0 +1,23 @@
+# to use this add docker-compose/mailcatcher.override.yml
+# to your COMPOSE_FILE var in .env
+
+version: '3.2'
+services:
+  mailcatcher:
+    image: instructure/mailcatcher
+    depends_on:
+      - canvas-web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailcatcher-router1.service=mailcatcher-canvas-lms"
+      - "traefik.http.routers.mailcatcher-router1.entrypoints=web"
+      - "traefik.http.services.mailcatcher-canvas-lms.loadbalancer.server.port=8080"
+      - "traefik.tcp.routers.mailcatcher-router2.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.mailcatcher-router2.entrypoints=smtp"
+      - "traefik.tcp.routers.mailcatcher-router2.service=mailcatcher-canvas-lms-smtp"
+      - "traefik.tcp.services.mailcatcher-canvas-lms-smtp.loadbalancer.server.port=1025"
+
+networks:
+  default:
+    external: true
+    name: "inst_shared"

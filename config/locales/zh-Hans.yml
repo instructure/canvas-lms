@@ -194,6 +194,8 @@ zh-Hans:
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "一个文件名为 %{itemName} 已存在此文件夹中。"
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "已存在名称为“%{name}”的文件。是否要替换现有文件？"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "该文件夹中已存在名称为“%{name}”的文件。是否要替换现有文件？"
+  a_filter_preset_with_those_conditions_already_exis_43d3fe4e: 已经存在使用这些条件预设的筛选项。
+  a_filter_with_that_name_already_exists_9bba05bc: 已经存在该名称的筛选项。
   a_front_page_is_required_fd57b80: 需要首页
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "全幅的标志出现在Canvas右侧的控制面板上。理想的尺寸是 360 × 140 像素。可接受的格式：svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: 一台为报告用户创建有趣环境信息的主机中的一个方便键/定值转储
@@ -2252,6 +2254,9 @@ zh-Hans:
       通知的电子邮件地址
   adds_additional_information_and_filtering_for_feat_3e55a058: 添加更多信息并筛选功能标记
   adds_an_account_course_setting_for_a_default_due_t_9903738a: 添加帐户/课程的新作业默认截止时间设置
+  adds_an_account_setting_to_select_the_classic_lato_c2227d6c: |-
+      添加帐户设置，以在Canvas for Elementary帐户中选择经典(Lato)或基本(Balsamiq Sans)
+      字体。
   adds_an_emoji_picker_that_allows_students_and_teac_cf517b1b: 添加表情符号选择器以允许学生和老师在其提交项评论中添加表情符号。
   adds_analytics_link_on_the_user_settings_menu_3a048816: 在用户设置菜单上添加分析链接。
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: 将分析添加到学生的背景卡中。
@@ -2436,6 +2441,7 @@ zh-Hans:
   all_ungraded_artifacts_ec3ba09: 所有未评分的项目
   all_users_associated_with_this_course_6be8d492: 所有关联该课程的用户
   all_users_associated_with_this_institution_d29850be: 所有关联该机构的用户
+  all_version_history_fbf060a0: 所有版本历史记录
   all_versions_student_submission_report_e4def68d: 所有版本学生提交项报告
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "所有权重必须大于或等于 0"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: 允许调整人为选择的提交查阅多个独立的评分。
@@ -2457,6 +2463,7 @@ zh-Hans:
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: 允许每个用户重排序控制面板卡。
   allow_final_grade_override_8cf4336b: 允许最终评分推翻
   allow_final_grade_override_a21a79ee: 允许覆盖最终评分
+  allow_font_selection_in_c4e_accounts_7def31c6: 允许在C4E帐户中选择字体
   allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "允许 Apollo 将 graphQL 查询缓存到用户浏览器上，以获得更快的体验"
   allow_for_key_keyname_b973f769: "允许密钥：%{keyName}"
   allow_gradebook_users_to_view_and_export_student_f_68a8084b: 允许评分册用户在单独的列中查看和导出学生名字和姓氏
@@ -2503,6 +2510,9 @@ zh-Hans:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "准许该工具访问 IMS 姓名和角色配置服务"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: 允许在添加用户时使用未确认的电子邮箱地址
   allow_users_to_comment_45b8f753: 允许用户评论
+  allow_users_to_resize_canvas_studio_embedded_media_99c1a8bb: |-
+      允许用户在RCE中通过新的工作室媒体选项托盘调整
+      Canvas Studio嵌入媒体的大小
   allow_users_to_submit_an_additional_email_at_regis_75b54a9d: 允许用户在注册时提交更多电子邮件地址。
   allowed_attempts_4e229caa: 允许尝试
   allowed_domains_ee7868c8: 允许的域
@@ -11034,6 +11044,7 @@ zh-Hans:
   end_date_e0093ed7: 结束日期
   end_date_for_conference_eaff0807: 会议结束日期
   end_date_from_cdd9d90: 结束日期从：
+  end_date_must_be_after_start_date_2fea5383: 结束日期必须在开始日期后
   end_date_time_must_be_later_than_start_date_time_aecc88f4: 结束日期/时间必须晚于开始日期/时间
   end_date_to_8b17929d: 结束日期到：
   end_date_value_3d3e8906: "结束日期 %{value}"
@@ -12306,6 +12317,7 @@ zh-Hans:
   fill_in_the_blank_answer_d83b83bb: 填写空白答案
   fill_in_the_blank_read_surrounding_text_1a6c73c7: 在空白处填写，阅读周围的文本
   fill_out_rubric_22d4eee5: 填写评价量规
+  fill_out_the_rubric_below_after_reviewing_the_stud_8eeb46c4: 审核学生提交的作业后填写下面的评价量规以完成审核。
   filled_5d8c39e: 填充
   filter_9df28e5b: 筛选条件：
   filter_announcements_by_unread_495eeeb3: 按未读过滤公告
@@ -12582,6 +12594,7 @@ zh-Hans:
   go_to_settings_for_name_812308b5: "为 %{name} 进入设置"
   go_to_statistics_for_name_2ee6b6f3: "为 %{name} 转到统计"
   go_to_subject_2745f0a4: 前往科目
+  go_to_the_new_course_af182b99: 前往新课程
   go_to_topic_af6025fc: 返回主题
   good_284a7a8f: 良好
   good_score_b02f3587: 良好成绩
@@ -15696,12 +15709,12 @@ zh-Hans:
     incoming_message_processor: 
       failure_message: 
         body: |-
-            标题为“%{subject}”的邮件无法送达。该邮件被发送到一个未知的邮箱地址。如果您尝试通过 Canvas 联系某人，可以尝试登录到您的帐户并使用"收件箱"工具向其发送邮件。
+            标题为“%{subject}”的邮件无法送达。该邮件被发送到一个未知的邮箱地址。如果您尝试通过 Canvas 联系某人，可以尝试登录到您的帐户并使用“收件箱”工具向其发送邮件。
             
             谢谢！
             Canvas 支持部门
             
-            参考: %{ref}
+            参考:%{ref}
         subject: "邮件回复失败: %{subject}"
       locked_topic: 
         body: |-
@@ -17897,6 +17910,7 @@ zh-Hans:
           body: "已添加课程 %{name} 的新文件:"
           link: 单击查看
           subject: "添加的新文件: %{title}，%{name}"
+        link: 您可在此处查看
         subject: "添加的新文件: %{title}，%{name}"
         view: 您可在此处进行查看
       sms: 
@@ -17908,20 +17922,20 @@ zh-Hans:
         body: "Canvas 警报 - 新文件: %{title} (%{size})，%{name}:"
     new_files_added: 
       email: 
-        body: "已添加课程 %{name} 的 %{count} 个新文件:"
+        body: "为%{name}添加了%{count}个新文件："
         html: 
           body: "已添加课程 %{name} 的 %{count} 个新文件:"
           see_details: 您可在此处进行查看
-          subject: "为课程 %{name} 添加的 %{count} 个新文件:"
+          subject: "为课程%{name}添加了%{count}个新文件"
         link: 您可在此处进行查看
-        subject: "为课程 %{count} 添加的 %{name} 个新文件:"
+        subject: "为课程%{name}添加了%{count}个新文件"
       sms: 
         body: "添加了 %{name} 的 %{count} 个新文件。"
         link: "更多信息请访问 %{link}"
       summary: 
-        body: "添加了课程 %{name} 的 %{count} 个新文件。"
+        body: "为%{name}添加了%{count}个新文件："
         link: 您可在此处进行查看
-        subject: "添加了课程 %{name} 的 %{count} 个新文件:"
+        subject: "为课程%{name}添加了%{count}个新文件"
       twitter: 
         body: "Canvas 警报 - %{name} 的 %{count} 个新文件"
     new_student_organized_group: 
@@ -18959,6 +18973,7 @@ zh-Hans:
   nav_logo_background_ba33fb7f: 导航标志背景
   nav_text_94206145: 导航文本
   nav_text_active_a924ae88: 导航文本活动
+  navigate_to_speed_grader_for_name_f28cb5b1: "导航到%{name}的Speed Grader"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: 导航允许用户在“课程导航”中查看“人员”链接。
   navigation_icon_45db938e: 导航图标
   navigation_menu_fd782ff8: 导航菜单
@@ -19042,6 +19057,7 @@ zh-Hans:
   new_question_9107c469: 新问题
   new_question_group_d9306280: 新问题小组
   new_quiz_34aacba6: 新测验
+  new_quiz_items_3c850331: 新测验项目
   new_quiz_statistics_desc: 启用某课程的新测验统计页面。
   new_quizzes_account_and_course_level_item_banks_9152fb1: 新测验帐户和课程级项目库
   new_quizzes_assignment_build_button_72b6531a: 新测验作业生成按钮
@@ -19052,10 +19068,12 @@ zh-Hans:
   new_quizzes_description: "此功能改进了 Canvas 的测验体验。启用此标记后，新测验工具将可用。有关完整详情，请参阅 Canvas 社区中的*新测验用户组*。"
   new_quizzes_embedded_module_progression_cd2307b6: 新测验嵌入模块进度
   new_quizzes_importing_c167dce0: "New Quizzes 导入"
+  new_quizzes_included_on_outcome_alignment_summary__4547b0ad: 包含在“结果核对概览”选项卡上的新测验
   new_quizzes_migration_during_course_import_copy_e9dd124e: 在课程导入/复制期间的新测验迁移
   new_quizzes_migration_enabled_by_default_5f9bcc81: 默认启用新测验迁移
   new_quizzes_migration_required_7854aa1a: 要求新测验迁移
   new_quizzes_on_the_quizzes_page_b21f338d: 测验(Quizzes)页面上的新测验
+  new_quizzes_outcome_alignments_are_included_on_the_83447268: 在“结果核对概览”选项卡上包含新测验结果核对，提供课程中每个结果的核对列表。
   new_quizzes_public_api_18d95321: 新测验公开API
   new_quizzes_public_api_quiz_items_16bc741d: "新测验公共 API：测验项目"
   new_quizzes_service_jwt_refresh_ca28ca8: 新测验服务JWT刷新
@@ -19236,6 +19254,7 @@ zh-Hans:
   no_students_with_that_name_found_f6004da2: 找不到该姓名的学生
   no_subject_58b7941c: 无主题
   no_subject_970aad80: 无主题
+  no_subject_a8b6ceeb: (无标题)
   no_submission_fb131a40: 无提交项
   no_submission_for_assignment_a9cb6fe2: "没有 %{assignment} 的提交项"
   no_submission_for_assignmenttitle_243bd1f4: "没有 %{assignmentTitle} 的提交项"
@@ -20540,6 +20559,7 @@ zh-Hans:
   please_select_a_recipient_c9273f8e: 请选择一个收件人。
   please_select_a_user_role_for_this_link_9fb4e655: 请为此链接选择一个用户角色。
   please_select_an_item_30c287ef: 请选择一个项目
+  please_select_at_least_one_filter_aafaa1a7: 请选择至少一个筛选项。
   please_select_one_f931e883: 单选
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "请指定是否启用或禁用 Microsoft Teams 同步。"
   please_try_again_4c3d11b4: 请重试
@@ -22768,6 +22788,8 @@ zh-Hans:
         labels: 
           quiz_instructions: 测验说明
           quiz_score: 得分
+      quiz_edit_header: 
+        speed_grader: 快速评分器™
       quiz_right_side: 
         attempts_left: 
           one: "增加 %{count} 次尝试机会"
@@ -23768,6 +23790,7 @@ zh-Hans:
   restrict_instructors_from_changing_mastery_scales_5af13053: 限制讲师更改掌握程度评分量表
   restrict_instructors_from_changing_proficiency_cal_b4e62c95: 限制讲师更改熟练程度计算方法
   restrict_push_notifications_to_select_types_941d9da3: 限制仅所选类型推送通知
+  restrict_quantitative_data_72411674: 限制定量数据
   restrict_sms_to_select_types_9dd6399c: 仅限短信选择类型
   restrict_student_access: 
     button_text: 
@@ -23792,6 +23815,7 @@ zh-Hans:
   restrict_students_from_viewing_course_before_cours_cca659a4: 禁止学生在课程开始日期之前查看课程
   restrict_students_from_viewing_course_before_term__3c4924f0: 禁止学生在学期开始日期之前查看课程
   restrict_students_from_viewing_future_courses_in_e_67486caf: 限制学生从注册名单中查看未来的课程
+  restrict_view_of_quantitative_data_b6089ee9: 限制查看定量数据
   restricted_access_d3e99a39: 限制访问
   restricted_view_for_teachers_in_lmgb_52c78a62: "LMGB 中的限制教师视图"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: 重新提交到关联的工具进行相似度分析。
@@ -26096,6 +26120,7 @@ zh-Hans:
   start_date_field_for_styleguide_8a8ab1d6: 风格指南的起始栏目
   start_date_for_conference_1936e809: 会议开始日期
   start_date_from_20503757: 开始日期从：
+  start_date_must_be_before_end_date_a00be892: 开始日期必须在结束日期前
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}，从%{start_time}到%{end_time}"
   start_date_time_must_be_before_the_end_date_time_6be0c57f: 开始日期/时间必须早于结束日期/时间
   start_date_to_1e6e6bbe: 开始日期到：
@@ -26217,6 +26242,7 @@ zh-Hans:
   student_feedback_required_in_comments_above_to_rea_2f5dafbf: 要求在上方备注中提供学生反馈才能重新分配。
   student_filters_in_lmgb_13964502: "LMGB 中的学生筛选器"
   student_first_name_aaa42cbc: 学生名字
+  student_first_name_options_82f5685f: 学生名字选项
   student_grades_4cbc59a1: 学生评分
   student_group_75b86a9f: 学生组
   student_group_filter_185fb085: 学习小组筛选条件
@@ -26342,6 +26368,7 @@ zh-Hans:
   students_with_no_submissions_title: 无提交项的学生
   students_without_assessments_eb100e60: 无评估的学生
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} 超出 %{totalStudentsEnrolled} 的学生"
+  studio_media_options_in_rce_1118428b: RCE中的工作室媒体选项
   sub_account_daeadd0: 子帐户
   sub_accounts: 
     alerts: 
@@ -26667,6 +26694,7 @@ zh-Hans:
   suffix_294d5cc4: 后缀
   suggestions_b8b03b9d: 建议：
   sum_of_all_files_in_mb_2b705055: 在MB的所有文件的总和
+  summary_of_report_types_d064d42b: 报告类型概览
   summary_statistics_f74852a5: 汇总统计
   sun_298d7c8b: 星期日
   support: 
@@ -27099,6 +27127,8 @@ zh-Hans:
   the_field_field_is_required_56512820: "“%{field}”字段必填"
   the_field_field_must_have_no_spaces_d1c2fc37: "“%{field}”字段不能含有空格"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "“文件”选项卡是共享演讲幻灯片、示例文档、学习帮助等学生希望下载的任何内容的位置。使用 Canvas 可轻松上传和组织您的文件。我们将向您展示操作方法。"
+  the_first_max_displayed_files_are_listed_49cfd7a0: "列出了前%{max_displayed}的文件。"
+  the_first_max_displayed_files_are_listed_above_cli_324d47b: "上方列出来前%{max_displayed}的文件。点击下方以查看所有文件。"
   the_following_content_is_partner_provided_ed1da756: 以下内容由合作伙伴提供
   the_following_domains_have_automatically_been_adde_2c7a1654: |-
       下列域已经从您的账户内已有的
@@ -27599,6 +27629,7 @@ zh-Hans:
                                   在站点管理员用户启用该功能选项之前，最终用户将无法看到该选项。
                                   在为机构启用该选项之前，请务必完全了解其
                                   功能及对用户的可能影响。
+  this_feature_will_hide_all_quantitative_values_fro_6f006665: 该功能将对用户隐藏所有定量值
   this_field_is_required_fa58c4a: 此字段为必填字段
   this_field_name_is_required_988caebc: "此字段“%{name}”必填。"
   this_field_name_is_required_b9196401: 此字段“name”必填。
@@ -29275,6 +29306,7 @@ zh-Hans:
   use_experimental_features_before_they_are_generall_3dfaddd1: 在生产中全面启用前，先使用试验功能
   use_high_contrast_ui_a5917282: "使用高对比度 UI"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "使用 Content Editor 中的 HTML5 Recorder 代替 Flash"
+  use_improved_placeholders_for_inserted_content_in__433adfaa: 为RCE中插入的内容使用改进的占位符。
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "使用 MathMan 将 LaTeX 转换成 MathML 吗?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "使用 MathMan 将 LaTeX 转换成 SVG 吗?"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
@@ -29284,6 +29316,7 @@ zh-Hans:
             添加文件、讨论、作业、测验和其他学习材料。
             要求完成先修课程后才能进入某个模块或
             下一个模块项目，或使整个模块在指定日期之前保持锁定状态。
+  use_new_and_better_styled_placeholders_for_inserte_d6110d00: 为RCE中插入的图片、视频和文件使用改进的新占位符。
   use_new_folder_tree_in_files_bc0ea09f: 使用新的文件中树状文件
   use_new_folder_tree_in_files_eb5a451b: 在文件中使用新的文件夹系统
   use_new_quizzes_as_the_default_quizzing_engine_rem_73020960: 使用新测验作为默认测验引擎。删除创建经典测验的功能。
@@ -30530,6 +30563,7 @@ zh-Hans:
   you_cannot_set_a_grouped_discussion_as_a_student_a20f363: 您无法将班次讨论设置为学生。
   you_cannot_use_a_number_greater_than_the_number_of_af33e220: 您不能使用大于作业数的数字。
   you_created_an_announcement_in_course_c49e3d70: "您在 %{course} 创建了公告"
+  you_created_this_announcement_42d745a7: 您创建了此公告：
   you_currently_have_no_discussions_with_closed_comm_366a9dab: 已关闭的评论目前没有讨论
   you_currently_have_no_pinned_discussions_6f0078b8: 您目前没有置顶讨论题目
   you_do_not_have_access_to_the_requested_announceme_a774d80a: 您没有对请求的公告的访问权限。
@@ -30723,6 +30757,7 @@ zh-Hans:
   you_will_not_be_able_to_preview_your_changes_f7b868fb: 您将无法预览更改
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "此刻您不会收到任何%{contextType}通知。要启用%{contextType}通知，请使用上面的toggle。"
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: 您此后将无法接收任何课程通知。要启用课程通知，请使用上面的开关。
+  you_will_only_see_comments_written_by_you_f294cb9d: 您仅能看到您自己撰写的评论。
   your_answer_8dad6ea4: 您的答案：
   your_assignment_assignment_name_is_due_on_due_at_9f82e587: "您的作业 %{assignment_name} 将于 %{due_at}到期。"
   your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "您的作业 %{assignment_name} 将于 %{due_at}到期。单击下面的链接访问作业并按时获取："

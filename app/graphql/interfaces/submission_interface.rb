@@ -149,7 +149,7 @@ module Interfaces::SubmissionInterface
   end
   def comments_connection(filter:, sort_order:)
     filter = filter.to_h
-    all_comments, for_attempt = filter.values_at(:all_comments, :for_attempt)
+    all_comments, for_attempt, peer_review = filter.values_at(:all_comments, :for_attempt, :peer_review)
 
     load_association(:assignment).then do
       scope = submission.comments_excluding_drafts_for(current_user)
@@ -159,6 +159,10 @@ module Interfaces::SubmissionInterface
           target_attempt = [nil, 0, 1] # Submission 0 and 1 share comments
         end
         scope = scope.where(attempt: target_attempt)
+
+        if peer_review
+          scope = scope.where(author: current_user)
+        end
       end
       scope = scope.reorder(created_at: sort_order) if sort_order
       scope.select { |comment| comment.grants_right?(current_user, :read) }

@@ -44,6 +44,8 @@ class GradebookUserIds
       sort_by_assignment_group(assignment_id)
     when "total_grade"
       sort_by_total_grade
+    when "student_firstname"
+      sort_by_student_first_name
     else
       sort_by_student_name
     end
@@ -63,6 +65,14 @@ class GradebookUserIds
     students
       .order(Arel.sql("enrollments.type = 'StudentViewEnrollment'"))
       .order_by_sortable_name(direction: @direction.to_sym)
+      .pluck(:id)
+      .uniq
+  end
+
+  def sort_by_student_first_name
+    students
+      .order(Arel.sql("enrollments.type = 'StudentViewEnrollment'"))
+      .order_by_name(direction: @direction.to_sym)
       .pluck(:id)
       .uniq
   end

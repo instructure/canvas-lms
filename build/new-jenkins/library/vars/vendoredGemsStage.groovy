@@ -20,7 +20,7 @@ def setupNode() {
   { ->
     def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
-    checkoutRepo('canvas-lms', refspecToCheckout, 1)
+    checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: refspecToCheckout, depth: 1)
 
     credentials.withStarlordCredentials { ->
       sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')

@@ -29,6 +29,10 @@ ready(() => {
   const gradebookMenuNode = document.querySelector(
     '[data-component="GradebookMenu"]'
   ) as HTMLSpanElement
+  const actionMenuNode = document.querySelector('[data-component="ActionMenu"]') as HTMLSpanElement
+  const enhancedActionMenuNode = document.querySelector(
+    '[data-component="EnhancedActionMenu"]'
+  ) as HTMLSpanElement
   const settingsModalButtonContainer = document.getElementById(
     'gradebook-settings-modal-button-container'
   ) as HTMLSpanElement
@@ -43,16 +47,22 @@ ready(() => {
     'grading-periods-filter-container'
   ) as HTMLElement
   const gradebookGridNode = document.getElementById('gradebook_grid') as HTMLDivElement
+  const gradebookSettingsModalContainer = document.querySelector(
+    "[data-component='GradebookSettingsModal']"
+  ) as HTMLSpanElement
   const flashMessageContainer = document.getElementById('flash_message_holder') as HTMLDivElement
 
   ReactDOM.render(
     <GradebookData
+      actionMenuNode={actionMenuNode}
       applyScoreToUngradedModalNode={applyScoreToUngradedModalNode}
       currentUserId={ENV.current_user_id as string}
+      enhancedActionMenuNode={enhancedActionMenuNode}
       flashMessageContainer={flashMessageContainer}
       gradebookEnv={ENV.GRADEBOOK_OPTIONS as GradebookOptions}
       gradebookGridNode={gradebookGridNode}
       gradebookMenuNode={gradebookMenuNode}
+      gradebookSettingsModalContainer={gradebookSettingsModalContainer}
       gradingPeriodsFilterContainer={gradingPeriodsFilterContainer}
       gridColorNode={gridColorNode}
       locale={ENV.LOCALE}

@@ -91,7 +91,16 @@ function buildBigF(keepCount: number, cannotDrop, sortFn) {
   }
 }
 
-function dropPointed(droppableSubmissionData, cannotDrop, keepHighest, keepLowest) {
+type DroppableSubmission = {
+  total: number
+}
+
+function dropPointed(
+  droppableSubmissionData: DroppableSubmission[],
+  cannotDrop: unknown[],
+  keepHighest: number,
+  keepLowest: number
+) {
   const totals = _.map(droppableSubmissionData, 'total')
   const maxTotal = Math.max(...totals)
 

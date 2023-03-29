@@ -1,0 +1,103 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`data returns the proper object 1`] = `
+Object {
+  "header": "none",
+}
+`;
+
+exports[`form returns the proper object 1`] = `
+Array [
+  Object {
+    "dataKey": "header",
+    "label": "Set table header",
+    "options": Array [
+      Array [
+        "none",
+        "No headers",
+      ],
+      Array [
+        "row",
+        "Header row",
+      ],
+      Array [
+        "col",
+        "Header column",
+      ],
+      Array [
+        "both",
+        "Header row and column",
+      ],
+    ],
+  },
+]
+`;
+
+exports[`linkText returns the proper linkText message 1`] = `"Learn more about table headers"`;
+
+exports[`message returns the proper message 1`] = `"Tables should include at least one header."`;
+
+exports[`update header option === both adds a header row and a header column 1`] = `
+<table>
+  <tr>
+    <th
+      scope="col"
+    />
+    <th
+      scope="col"
+    />
+    <th
+      scope="col"
+    />
+  </tr>
+  <tr>
+    <th
+      scope="row"
+    />
+    <td />
+    <td />
+  </tr>
+</table>
+`;
+
+exports[`update header option === col changes first column to headers with row scope 1`] = `
+<table>
+  <tr>
+    <th
+      scope="row"
+    />
+    <td />
+    <td />
+  </tr>
+  <tr>
+    <th
+      scope="row"
+    />
+    <td />
+    <td />
+  </tr>
+</table>
+`;
+
+exports[`update header option === row changes top row to headers with column scope 1`] = `
+<table>
+  <tr>
+    <th
+      scope="col"
+    />
+    <th
+      scope="col"
+    />
+    <th
+      scope="col"
+    />
+  </tr>
+  <tr>
+    <td />
+    <td />
+    <td />
+  </tr>
+</table>
+`;
+
+exports[`why returns the proper message 1`] = `"Screen readers cannot interpret tables without the proper structure. Table headers provide direction and overview of the content."`;

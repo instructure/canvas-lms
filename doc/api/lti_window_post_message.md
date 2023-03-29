@@ -36,6 +36,13 @@ Most message handlers will respond with a postMessage with a subject that matche
 with `.response` appended. If an error occurs during message handling, the response postMessage will
 contain an `error` property with a `code` and a `message`.
 
+Sample code for receiving the response messages:
+```js
+window.addEventListener('message', function(event) {
+    // Process response
+});
+```
+
 Messages sent by a tool that has been launched from a Canvas mobile app will not receive any response messages.
 
 # Message Types

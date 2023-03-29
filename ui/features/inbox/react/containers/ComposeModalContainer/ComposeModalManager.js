@@ -47,10 +47,13 @@ const ComposeModalManager = props => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const [modalError, setModalError] = useState(null)
 
+  // no-cache policy is required here to decouple the composeModalManager course query from the
+  // MessageListActionContainer course query. Otherwise the filtered courses get cached to both
   const coursesQuery = useQuery(COURSES_QUERY, {
     variables: {
       userID: ENV.current_user_id?.toString(),
     },
+    fetchPolicy: 'no-cache',
     skip: props.isReply || props.isReplyAll || props.isForward,
   })
 
@@ -307,6 +310,15 @@ const ComposeModalManager = props => {
     return <ModalSpinner label={I18n.t('Loading')} message={I18n.t('Loading Compose Modal')} />
   }
 
+  const filteredCourses = () => {
+    const courses = coursesQuery?.data?.legacyNode
+    if (courses) {
+      courses.enrollments = courses?.enrollments.filter(enrollment => !enrollment?.concluded)
+    }
+
+    return courses
+  }
+
   return (
     <ComposeModalContainer
       addConversationMessage={data => {
@@ -328,7 +340,7 @@ const ComposeModalManager = props => {
           },
         })
       }}
-      courses={coursesQuery?.data?.legacyNode}
+      courses={filteredCourses()}
       createConversation={createConversation}
       isReply={props.isReply || props.isReplyAll}
       isForward={props.isForward}

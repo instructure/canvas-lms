@@ -60,6 +60,11 @@ export default function FilterNav({
   const toggleFilter = useStore(state => state.toggleFilter)
   const appliedFilters = useStore(state => state.appliedFilters)
 
+  const assignments = assignmentGroups.flatMap(ag => ag.assignments)
+  const modulesWithGradeableAssignments = modules.filter(m =>
+    assignments.some(a => a.grading_type !== 'not_graded' && a.module_ids.includes(m.id))
+  )
+
   const handleClearFilters = () => {
     applyFilters([])
   }
@@ -124,15 +129,15 @@ export default function FilterNav({
       name: I18n.t('Sections'),
       parentId: 'savedFilterPresets',
       isSelected: appliedFilters.some(c => c.type === 'section'),
-      items: sections.map(a => ({
-        id: a.id,
-        name: a.name,
-        isSelected: appliedFilters.some(c => c.type === 'section' && c.value === a.id),
+      items: sections.map(s => ({
+        id: s.id,
+        name: s.name,
+        isSelected: appliedFilters.some(c => c.type === 'section' && c.value === s.id),
         onToggle: () => {
           const filter: Filter = {
             id: uuid.v4(),
             type: 'section',
-            value: a.id,
+            value: s.id,
             created_at: new Date().toISOString(),
           }
           toggleFilter(filter)
@@ -148,7 +153,7 @@ export default function FilterNav({
       name: I18n.t('Modules'),
       parentId: 'savedFilterPresets',
       isSelected: appliedFilters.some(c => c.type === 'module'),
-      items: modules.map(m => ({
+      items: modulesWithGradeableAssignments.map(m => ({
         id: m.id,
         name: m.name,
         isSelected: appliedFilters.some(c => c.type === 'module' && c.value === m.id),

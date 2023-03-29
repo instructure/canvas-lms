@@ -186,6 +186,8 @@ fi:
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Tässä kansiossa on jo tiedosto nimeltä %{itemName}."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "\\\"%{name}\\\"-niminen tiedosto on jo olemassa. Haluatko korvata olemassa olevan tiedoston?"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Tässä kansiossa on jo tiedosto nimeltä ”%{name}”. Haluatko korvata olemassa olevan tiedoston?"
+  a_filter_preset_with_those_conditions_already_exis_43d3fe4e: "Suodattimen esiasetukset kyseisillä ehdoilla ovat jo olemassa."
+  a_filter_with_that_name_already_exists_9bba05bc: "Samanniminen suodatin on jo olemassa."
   a_front_page_is_required_fd57b80: "Etusivu täytyy olla määritettynä"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Täysikokoinen logo, joka näkyy oikeassa sivupalkissa Canvas-koontinäytöllä. Ihanteellinen koko on 360 x 140 pikseliä. Hyväksytyt muodot: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Kätevä avaimen/arvon vedos joukolle mielenkiintoisia ympäristötietoja raportoivalle käyttäjälle"
@@ -1923,6 +1925,9 @@ fi:
       ovat palautuneet
   adds_additional_information_and_filtering_for_feat_3e55a058: "Lisää lisätiedot ja suodattaa ominaisuuden merkit"
   adds_an_account_course_setting_for_a_default_due_t_9903738a: "Lisää tilin/kurssin asetukset uusien tehtävien oletusmääräajalle"
+  adds_an_account_setting_to_select_the_classic_lato_c2227d6c: |-
+      Lisää tiliasetukset valitaksesi klassisen  (Lato) tai perusfontin (Balsamiq Sans) Canvasissa Elementary-
+      tileille.
   adds_an_emoji_picker_that_allows_students_and_teac_cf517b1b: "Lisää hymiön poimintatoiminto, joka mahdollistaa opiskelijoiden ja opettajien lisäävän hymiöitä lähetystensä kommentteihin."
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Lisää analytiikkalinkin käyttäjän asetusvalikossa."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Lisää analytiikkaa opiskelijan kontekstikorttiin."
@@ -2101,6 +2106,7 @@ fi:
   all_ungraded_artifacts_ec3ba09: "Kaikki artifaktat, joille ei ole annettu arvosanaa."
   all_users_associated_with_this_course_6be8d492: "Kaikki tähän kurssiin liitetyt käyttäjät"
   all_users_associated_with_this_institution_d29850be: "Kaikki tähän organisaatioon liitetyt käyttäjät"
+  all_version_history_fbf060a0: "Koko versiohistoria"
   all_versions_student_submission_report_e4def68d: "Kaikkien opiskelijan palautusten versioiden raportti"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Kaikkien painoarvojen täytyy olla suurempia tai yhtä suuria kuin 0"
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Salli opettajan määrittää sallittujen yritysten määrä tehtävälle käyttöliittymän kautta"
@@ -2119,6 +2125,7 @@ fi:
   allow_creation_only_in_the_manually_created_course_69f37f2e: "Salli luonti vain manuaalisesti luotujen kurssien alatililllä"
   allow_final_grade_override_8cf4336b: "Salli lopullisen arvosanan ohitus"
   allow_final_grade_override_a21a79ee: "Salli lopullisen arvosanan korvaaminen"
+  allow_font_selection_in_c4e_accounts_7def31c6: "Salli fontin valinta C4E-tileillä"
   allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "Salli Apollon tallentaa välimuistiin graphQL-kyselyt käyttäjien selaimeen heidän kokemuksensa nopeuttamiseksi"
   allow_for_key_keyname_b973f769: "Salli avaimelle: %{keyName}"
   allow_gradebook_users_to_view_and_export_student_f_68a8084b: "Salli arvosanakirjan käyttäjien tarkastelevan vientiopiskelijan etu- ja sukunimiä erillisissä sarakkeissa"
@@ -2159,6 +2166,9 @@ fi:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Salli tämän työkalun käyttää IMS-nimiä ja roolin valmistelupalvelua"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Salli vahvistamattomat sähköpostiosoitteet, kun käyttäjiä lisätään"
   allow_users_to_comment_45b8f753: "Salli käyttäjien kommentoida"
+  allow_users_to_resize_canvas_studio_embedded_media_99c1a8bb: |-
+      Salli käyttäjien muuttavan Canvas Studion upotetun median kokoa RCE:ssä
+      uuden Studio Median kuvakkeiden ilmoitusalueella.
   allow_users_to_submit_an_additional_email_at_regis_75b54a9d: "Salli käyttäjien lähettävän ylimääräisen sähköpostiviestin rekisteröinnin yhteydessä."
   allowed_attempts_4e229caa: "Sallitut yritykset"
   allowed_domains_ee7868c8: "Sallitut verkkotunnukset"
@@ -9483,6 +9493,7 @@ fi:
   end_date_e0093ed7: Päättymispäivä
   end_date_for_conference_eaff0807: "Konferenssin päättymispäivä"
   end_date_from_cdd9d90: "Päättymispäivä lähtien:"
+  end_date_must_be_after_start_date_2fea5383: "Päättymispäivän on oltava alkamispäivän jälkeen"
   end_date_time_must_be_later_than_start_date_time_aecc88f4: "Päättymispäivän/-ajan täytyy olla myöhemmin kuin alkamispäivän/-ajan."
   end_date_to_8b17929d: "Päättymispäivä asti:"
   end_date_value_3d3e8906: "Päättymispäivämäärä %{value}"
@@ -10532,6 +10543,7 @@ fi:
   fill_in_the_blank_answer_d83b83bb: "Aukkotehtävän vastaus"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Aukkotehtävä, lue ympäröivä teksti"
   fill_out_rubric_22d4eee5: "Tätä rubriikki"
+  fill_out_the_rubric_below_after_reviewing_the_stud_8eeb46c4: "Suorita tämä arviointi loppuun täyttämällä alla oleva rubriikki sen jälkeen, kun olet tarkastanut opiskelijan palautuksen."
   filled_5d8c39e: Täytetty
   filter_9df28e5b: "Suodatin:"
   filter_assignment_category_63acaed4: "Suodattimen tehtäväluokka"
@@ -10781,6 +10793,7 @@ fi:
   go_to_quoted_reply_6f4661e: "Siirry lainattuun vastaukseen"
   go_to_reply_36fe5f51: "Siirry vastaukseen"
   go_to_subject_2745f0a4: "Siirry aiheeseen"
+  go_to_the_new_course_af182b99: "Siirry uuteen kurssiin"
   go_to_topic_af6025fc: "Siirry aiheeseen"
   good_284a7a8f: Hyvä
   good_score_b02f3587: "Hyvä pistemäärä"
@@ -13256,12 +13269,12 @@ fi:
     incoming_message_processor: 
       failure_message: 
         body: |-
-            Viestiä otsikolla "%{subject}" ei voitu toimittaa.  Viesti lähetettiin tuntemattomaan sähköpostiosoitteeseen.  Jos yrität ottaa yhteyttä johonkuhun Canvasin kautta, voit yrittää kirjautua tilillesi ja lähettää heille viestin Viestit-työkalun kautta.
-                      
-                      Kiitos,
-                      Canvas-tuki
-                      
-            Viitteen: %{ref}
+            Viestiä otsikolla "%{subject}" ei voitu toimittaa.  Viesti lähetettiin tuntemattomaan sähköpostiosoitteeseen.  Jos yrität tavoittaa tiettyä henkilöä Canvasin kautta, voit yrittää kirjautua tilillesi ja lähettää hänelle viestin Viestit-työkalun kautta.
+            
+            Kiitos,
+            Canvas-tuki
+            
+            Viitteen: "%{ref}"
       locked_topic: 
         body: |-
             Viestiä otsikolla "%{subject}" ei voitu toimittaa, koska keskustelun aihe on lukittu. Jos yrität ottaa yhteyttä johonkuhun Canvasin kautta, voit yrittää kirjautua tilillesi ja lähettää heille viestin Viestit-työkalun kautta.
@@ -15177,6 +15190,7 @@ fi:
           body: "Uusi tiedosto on lisätty kurssille %{name}:"
           link: "Tarkastele napsauttamalla"
           subject: "Uusi tiedosto lisätty: %{title}, %{name}"
+        link: "Voit tarkastella sitä täällä"
         subject: "Uusi tiedosto lisätty: %{title}, %{name}"
         view: "Voit tarkastella sitä täällä"
       sms: 
@@ -15187,20 +15201,20 @@ fi:
         body: "Canvasin hälytys - Uusi tiedosto: %{title} (%{size}) kurssilla %{name}:"
     new_files_added: 
       email: 
-        body: "%{count} uutta tiedostoa on lisätty kurssille, %{name}:"
+        body: "%{count} uutta tiedostoa lisätty kurssille %{name}:"
         html: 
           body: "%{count} uutta tiedostoa on lisätty kurssille %{name}:"
           see_details: "Voit tarkastella niitä täällä"
-          subject: "%{count} uutta tiedostoa lisätty kurssille, %{name}:"
+          subject: "%{count} uutta tiedostoa lisätty kurssille, %{name}"
         link: "Voit tarkastella niitä täällä"
-        subject: "%{count} uutta tiedostoa lisätty kurssille %{name}:"
+        subject: "%{count} uutta tiedostoa lisätty kurssille, %{name}"
       sms: 
         body: "%{count} uutta tiedostoa lisätty kurssille %{name}."
         link: "Lisätietoja: %{link}"
       summary: 
-        body: "%{count} uutta tiedostoa lisätty kurssille %{name}."
+        body: "%{count} uutta tiedostoa lisätty kurssille %{name}:"
         link: "Voit tarkastella niitä täällä"
-        subject: "%{count} uutta tiedostoa lisätty kurssille %{name}:"
+        subject: "%{count} uutta tiedostoa lisätty kurssille, %{name}"
       twitter: 
         body: "Canvasin hälytys - %{count} uutta tiedostoa kurssilla %{name}"
     new_student_organized_group: 
@@ -16029,6 +16043,7 @@ fi:
   nav_logo_background_ba33fb7f: "Navigointilogon tausta"
   nav_text_94206145: Navigointiteksti
   nav_text_active_a924ae88: "Navigointiteksti aktiivinen"
+  navigate_to_speed_grader_for_name_f28cb5b1: "Siirry Speed Graderiin kohteelle %{name}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigointi sallii käyttäjän nähdä Henkilöt-linkin kurssin navigoinnissa."
   navigation_menu_fd782ff8: Navigointivalikko
   near_mastery_f25174a4: "Tyydyttävä osaaminen"
@@ -16101,6 +16116,7 @@ fi:
   new_question_9107c469: "Uusi kysymys"
   new_question_group_d9306280: "Uusi kysymysryhmä"
   new_quiz_34aacba6: "Uusi testi"
+  new_quiz_items_3c850331: "Uusia testikohtia"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Uusien kyselyiden tili ja kurssitason kohdepankki"
   new_quizzes_assignment_build_button_72b6531a: "Uusien testitehtävien rakenna-näppäin"
   new_quizzes_banks_migrations_9ab4de4a: "Uusien testien pankkien siirrot"
@@ -16110,10 +16126,12 @@ fi:
   new_quizzes_description: "Tämä ominaisuus tehostaa Canvas-kokemuskeskusteluissa testejä varten. Kun tämä merkki on käytössä, uudet testit -työkalu on saatavissa. Lisätietoja on *Uudet testit -käyttäjäryhmässä* Canvas-yhteisössä."
   new_quizzes_embedded_module_progression_cd2307b6: "Uusien kyselyiden upotettu moduulin edistyminen"
   new_quizzes_importing_c167dce0: "Uusien testien tuonti"
+  new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "Uusia testikohtia lisätty tulosten kohdistamisten yhteenveto-välilehteen"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Uusien testien siirto kurssin tuonnin/kopioinnin aikana"
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Uusien testien siirto otettu käyttöön oletuksena"
   new_quizzes_migration_required_7854aa1a: "Uusien testien tuonti vaaditaan"
   new_quizzes_on_the_quizzes_page_b21f338d: "Uudet testit Testit-sivulla"
+  new_quizzes_outcome_alignments_are_included_on_the_83447268: "Uusien testien tulosten kohdistamiset sisällytetään tulosten linjausten yhteenveto -välilehteen, joka esittää jokaisen kurssin tuloksen linjausten luettelon."
   new_quizzes_public_api_18d95321: "Uusien kyselyiden julkinen sovellusliittymä"
   new_quizzes_public_api_quiz_items_16bc741d: "Uusien kyselyiden julkinen API: Kyselykohteet"
   new_quizzes_service_jwt_refresh_ca28ca8: "Uusien testitulosten JWT-virkistys"
@@ -16282,6 +16300,7 @@ fi:
   no_students_with_that_name_found_f6004da2: "Ei löytynyt opiskelijoita tällä haulla"
   no_subject_58b7941c: "Ei aihetta"
   no_subject_970aad80: "Ei aihetta"
+  no_subject_a8b6ceeb: "(ei aihetta)"
   no_submission_fb131a40: "Ei tehtäväpalautusta"
   no_submission_for_assignment_a9cb6fe2: "Ei lähetyksiä kohteelle %{assignment}"
   no_submission_for_assignmenttitle_243bd1f4: "Ei tehtäväpalautusta kohteelle %{assignmentTitle}"
@@ -17472,6 +17491,7 @@ fi:
   please_select_a_reason_for_reporting_this_reply_51719e8d: "Valitse syy tämän vastauksen raportoimiseen"
   please_select_a_recipient_c9273f8e: "Valitse vastaanottaja."
   please_select_a_user_role_for_this_link_9fb4e655: "Valitse käyttäjärooli tälle linkille."
+  please_select_at_least_one_filter_aafaa1a7: "Valitse vähintään yksi suodatin."
   please_select_one_f931e883: "Valitse yksi"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Määritä, otetaanko Microsoft Teams -synkronisaatio käyttöön vai poistetaanko se käytöstä."
   please_try_again_4c3d11b4: "Yritä uudelleen"
@@ -19392,6 +19412,8 @@ fi:
         labels: 
           quiz_instructions: "Testin ohjeet"
           quiz_score: Pistemäärä
+      quiz_edit_header: 
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "Vielä 1 yritys jäljellä"
@@ -20290,6 +20312,7 @@ fi:
   restrict_instructors_from_changing_mastery_scales_5af13053: "Rajoita ohjaajia vaihtamasta hallinnan asteikkoja"
   restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Rajoita ohjaajia vaihtamasta pätevyyden laskentamenetelmää"
   restrict_push_notifications_to_select_types_941d9da3: "Rajoita tekstiviesti-ilmoituksia valittuihin tyyppeihin"
+  restrict_quantitative_data_72411674: "Rajoita kvantitaavista tietoa"
   restrict_sms_to_select_types_9dd6399c: "Rajoita tekstiviesti-ilmoituksia"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Rajoita opiskelijoiden pääsyä kursseille päättymispäivän jälkeen"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Rajoita opiskelijoiden pääsyä kursseille ennen alkamispäivää"
@@ -20299,6 +20322,7 @@ fi:
   restrict_students_from_viewing_course_before_cours_cca659a4: "Rajoita opiskelijoiden kurssin tarkastelua ennen kurssin alkamispäivää"
   restrict_students_from_viewing_course_before_term__3c4924f0: "Rajoita opiskelijoiden kurssin tarkastelua ennen jakson alkamispäivää"
   restrict_students_from_viewing_future_courses_in_e_67486caf: "Rajoita opiskelijoita tarkastelemasta tulevia kursseja ilmoittautumisluettelossa"
+  restrict_view_of_quantitative_data_b6089ee9: "Rajoita kvantitaavisten tietojen tarkastelua"
   restricted_access_d3e99a39: "Rajoitettu käyttöoikeus"
   restricted_view_for_teachers_in_lmgb_52c78a62: "Opettajien rajoitettu näkymä LMGB:ssä"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Lähetä uudelleen ulkoiseen työkaluun työkaluun plagiarismianalyysiä varten."
@@ -22234,6 +22258,7 @@ fi:
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_for_conference_1936e809: "Konferenssin aloituspäivä"
   start_date_from_20503757: "Aloituspäivämäärä alk.:"
+  start_date_must_be_before_end_date_a00be892: "Kaikkien alkamispäivämäärien täytyy olla ennen päättymisaikaa"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} kohteeseen %{end_time}"
   start_date_time_must_be_before_the_end_date_time_6be0c57f: "Alkamisaika/-päivämäärä täytyy olla ennen päättymispäivää/-aikaa."
   start_date_to_1e6e6bbe: "Aloituspäivämäärä asti:"
@@ -22348,6 +22373,7 @@ fi:
   student_feedback_required_in_comments_above_to_rea_2f5dafbf: "Opiskelijan palaute vaadittiin kommenteissa edellä uudelleen osoitukseen."
   student_filters_in_lmgb_13964502: "Opiskelijasuodattimet LMGB:ssä"
   student_first_name_aaa42cbc: "Opiskelijan etunimi"
+  student_first_name_options_82f5685f: "Opiskelijan etunimen asetukset"
   student_grades_4cbc59a1: "Opiskelijoiden arvosanat"
   student_group_75b86a9f: Opiskelijaryhmä
   student_group_filter_185fb085: "Opiskelijaryhmän suodatin"
@@ -22460,6 +22486,7 @@ fi:
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: "Opiskelijat pystyvät näkemään, että tämän tehtävän arvosanat on piilotettu."
   students_with_no_submissions_title: "Opiskelijat, joilla ei ole tehtäväpalautuksia"
   students_without_assessments_eb100e60: "Opiskelijat, joilla ei ole tehtäviä"
+  studio_media_options_in_rce_1118428b: "Studio Median asetukset RCE:ssä"
   sub_account_daeadd0: Alatili
   sub_accounts: 
     alerts: 
@@ -22755,6 +22782,7 @@ fi:
   suffix_294d5cc4: Jälkiliite
   suggestions_b8b03b9d: "Ehdotuksia:"
   sum_of_all_files_in_mb_2b705055: "kaikki tiedostot yhteensä (Mt)"
+  summary_of_report_types_d064d42b: "Raporttityyppien yhteenveto"
   summary_statistics_f74852a5: Yhteenvetotilastot
   sun_298d7c8b: Su
   support: 
@@ -23164,6 +23192,8 @@ fi:
   the_field_field_is_required_56512820: "”%{field}” kenttä vaaditaan"
   the_field_field_must_have_no_spaces_d1c2fc37: "\"%{field}\"-kentässä ei saa olla välilyöntejä"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Tiedostot-välilehdellä voit jakaa luennon dioja, mallitiedostoja ja opiskeluohjeita  eli materiaaleja, joita opiskelijat voivat ladata itselleen.  Tiedostojen lataaminen ja järjestely on helppoa Canvasin avulla.  Näytämme sinulle miten se tapahtuu."
+  the_first_max_displayed_files_are_listed_49cfd7a0: "Ensimmäiset %{max_displayed} tiedostoa on lueteltu."
+  the_first_max_displayed_files_are_listed_above_cli_324d47b: "Ensimmäiset %{max_displayed} tiedostoa on lueteltu edellä. Napsauta tästä, jos haluat nähdä kaikki tiedostot."
   the_following_content_is_partner_provided_ed1da756: "Seuraava sisältö on kumppanin toimittamaa"
   the_following_domains_have_automatically_been_adde_2c7a1654: |-
       seuraavat verkkotunnukset on lisätty automaattisesti
@@ -23621,6 +23651,7 @@ fi:
                                   Loppukäyttäjät eivät näe sitä ellei sivuston järjestelmänvalvoja ole ottanut sitä käyttöön.
                                   Ennen kuin otat laitoksen käyttöön, varmista, että ymmärrät
                                   täysin toiminnollisuuden ja mahdolliset vaikutukset käyttäjille.
+  this_feature_will_hide_all_quantitative_values_fro_6f006665: "Tämä ominaisuus piilottaa kaikki kvantitaaviset arvot käyttäjiltä"
   this_field_is_required_fa58c4a: "Tämä kenttä vaaditaan"
   this_field_name_is_required_988caebc: "Tämä kenttä ”%{name}” vaaditaan."
   this_field_name_is_required_b9196401: "Tämä kentän ”nimi” vaaditaan."
@@ -25204,6 +25235,7 @@ fi:
   use_experimental_features_before_they_are_generall_3dfaddd1: "Käytä kokeellisia ominaisuuksia ennen kuin ne otetaan yleisesti käyttöön tuotannossa"
   use_high_contrast_ui_a5917282: "Käytä voimakkaan kontrastin käyttöliittymää"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Käytä HTML5-tallenninta sisällön muokkaamisessa Flash-sovelluksen avulla"
+  use_improved_placeholders_for_inserted_content_in__433adfaa: "Käytä parempia paikkamerkkejä RCE:ssä lis’tylle sisällölle."
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Käytetäänkö kohdetta MathMan muuntamaan LaTeX MathML:ksi?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Käytetäänkö kohdetta MathMan muuntamaan LaTeX SVG:ksi?"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
@@ -25213,6 +25245,7 @@ fi:
             Lisää tiedostoja, keskusteluita, tehtäviä, kyselyitä ja muuta oppimismateriaalia.
             Vaadi ennakkoedellytysten suorittamista ennen moduuliin tai seuraavaan
             moduulin kohteeseen siirtymistä tai lukitse koko moduuli määrättyyn päivämäärään asti.
+  use_new_and_better_styled_placeholders_for_inserte_d6110d00: "Käytä uusia ja paremmin tyyliteltyjä paikkamerkkejä RCE:ssä lisätyille kuville, videoille ja tiedostoille."
   use_new_quizzes_as_the_default_quizzing_engine_rem_73020960: "Käytä uusia testejä oletustestauskoneena. Poistaa mahdollisuuden luoda klassisia testejä."
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Käytä kaikkialla rikasta sisältöeditoria kehitetyn sivupalkin kanssa"
   use_parent_account_setting_f25a721f: "Käytä ylätilin tiliasetuksia"
@@ -26336,6 +26369,7 @@ fi:
   you_cannot_set_a_grouped_discussion_as_a_student_a20f363: "Et voi valita ryhmiteltyä keskustelua opiskelijana."
   you_cannot_use_a_number_greater_than_the_number_of_af33e220: "Et voi käyttää numeroa, joka on suurempi kuin tehtävien määrä"
   you_created_an_announcement_in_course_c49e3d70: "Olet luonut ilmoituksen kohteessa %{course}"
+  you_created_this_announcement_42d745a7: "Loit tämän ilmoituksen:"
   you_currently_have_no_discussions_with_closed_comm_366a9dab: "Sinulla ei ole tällä hetkellä keskusteluja, jotka olisi suljettu kommenteilta"
   you_currently_have_no_pinned_discussions_6f0078b8: "Sinulla ei ole tällä hetkellä kiinnitettyjä keskusteluita"
   you_do_not_have_access_to_the_requested_announceme_a774d80a: "Sinulla ei ole pääsyä pyydettyyn ilmoitukseen."
@@ -26516,6 +26550,7 @@ fi:
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Et pysty esikatselemaan muutoksiasi"
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "Et saa %{contextType} ilmoituksia tällä hetkellä. Jos haluat ottaa %{contextType} ilmoitukset käyttöön, vaihda yllä olevan painikkeen valintaa."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Et saa kurssin ilmoituksia tällä kertaa. Jos haluat ottaa kurssin ilmoitukset käyttöön, vaihda yllä olevalla valinnalla."
+  you_will_only_see_comments_written_by_you_f294cb9d: "Näet vain itse kirjoittamasi kommentit."
   your_answer_8dad6ea4: "Vastauksesi:"
   your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Tehtäväsi %{assignment_name} määräaika on %{due_at}."
   your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Tehtäväsi %{assignment_name} määräaika on %{due_at}. Napsauta seuraavaa linkkiä käydäksesi tehtävässäsi ja toimittaaksesi se ajoissa:"

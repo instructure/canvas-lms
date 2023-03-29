@@ -19,10 +19,11 @@ import $ from 'jquery'
 import _ from 'underscore'
 import axios from '@canvas/axios'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import type {CamelizedGradingPeriod, SerializedGradingPeriod} from '../grading.d'
 
 const batchUpdateUrl = (id: string) => $.replaceTags(ENV.GRADING_PERIODS_UPDATE_URL, 'set_id', id)
 
-const serializePeriods = periods => {
+const serializePeriods = (periods: CamelizedGradingPeriod[]) => {
   const serialized = _.map(periods, period => ({
     id: period.id,
     title: period.title,
@@ -35,23 +36,25 @@ const serializePeriods = periods => {
 }
 
 export default {
-  deserializePeriods(periods) {
+  deserializePeriods(periods: SerializedGradingPeriod[]): CamelizedGradingPeriod[] {
     return _.map(periods, period => ({
       id: period.id,
       title: period.title,
       startDate: new Date(period.start_date),
       endDate: new Date(period.end_date),
       closeDate: new Date(period.close_date),
-      isLast: period.is_last,
-      isClosed: period.is_closed,
+      isLast: Boolean(period.is_last),
+      isClosed: Boolean(period.is_closed),
       weight: period.weight,
     }))
   },
 
-  batchUpdate(setId: string, periods) {
+  batchUpdate(setId: string, periods: CamelizedGradingPeriod[]) {
     return new Promise((resolve, reject) =>
       axios
-        .patch(batchUpdateUrl(setId), serializePeriods(periods))
+        .patch<{
+          grading_periods: SerializedGradingPeriod[]
+        }>(batchUpdateUrl(setId), serializePeriods(periods))
         .then(response => resolve(this.deserializePeriods(response.data.grading_periods)))
         .catch(error => reject(error))
     )

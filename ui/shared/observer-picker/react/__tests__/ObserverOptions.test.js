@@ -23,6 +23,9 @@ import getCookie from '@instructure/get-cookie'
 import ObserverOptions from '../ObserverOptions'
 import {OBSERVER_COOKIE_PREFIX} from '../../ObserverGetObservee'
 import {MOCK_OBSERVED_USERS_LIST} from './fixtures'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 const userId = '13'
 const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${userId}`

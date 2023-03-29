@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`form returns the proper object 1`] = `
+Array [
+  Object {
+    "dataKey": "alt",
+    "disabledIf": [Function],
+    "label": "Change alt text",
+  },
+  Object {
+    "checkbox": true,
+    "dataKey": "decorative",
+    "label": "Decorative image",
+  },
+]
+`;
+
+exports[`linkText returns the proper why message 1`] = `"Learn more about using filenames as alt text"`;
+
+exports[`message returns the proper message 1`] = `"Image filenames should not be used as the alt attribute describing the image content."`;
+
+exports[`why returns the proper why message 1`] = `"Screen readers cannot determine what is displayed in an image without alternative text, and filenames are often meaningless strings of numbers and letters that do not describe the context or meaning."`;

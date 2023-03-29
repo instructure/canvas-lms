@@ -525,9 +525,6 @@
   "rho_a0244a36": { "message": "Rho" },
   "rho_variant_415245cd": { "message": "Rho（变体）" },
   "rich_content_editor_2708ef21": { "message": "富内容编辑器" },
-  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-    "message": "富文本区域。按 ALT+0 获取富内容编辑器快捷方式。"
-  },
   "right_angle_bracket_d704e2d6": { "message": "右角括弧" },
   "right_arrow_35e0eddf": { "message": "右箭头" },
   "right_arrow_with_hook_29d92d31": { "message": "右转弯箭头" },

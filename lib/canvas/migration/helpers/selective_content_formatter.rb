@@ -19,6 +19,7 @@
 
 module Canvas::Migration::Helpers
   class SelectiveContentFormatter
+    BLUEPRINT_SETTING_TYPE = -> { I18n.t("Blueprint Settings") }
     COURSE_SETTING_TYPE = -> { I18n.t("lib.canvas.migration.course_settings", "Course Settings") }
     COURSE_SYLLABUS_TYPE = -> { I18n.t("lib.canvas.migration.syllabus_body", "Syllabus Body") }
     COURSE_PACE_TYPE = -> { I18n.t("Course Pace") }
@@ -324,6 +325,10 @@ module Canvas::Migration::Helpers
           content_list << { type: "course_settings", property: "#{property_prefix}[all_course_settings]", title: COURSE_SETTING_TYPE.call }
           content_list << { type: "syllabus_body", property: "#{property_prefix}[all_syllabus_body]", title: COURSE_SYLLABUS_TYPE.call }
           content_list << { type: "course_paces", property: "#{property_prefix}[all_course_paces]", title: COURSE_PACE_TYPE.call } if source.course_paces.primary.not_deleted.any?
+
+          if @migration && @migration.context.root_account.feature_enabled?(:copy_blueprint_settings) && MasterCourses::MasterTemplate.blueprint_eligible?(@migration.context)
+            content_list << { type: "blueprint_settings", property: "#{property_prefix}[all_blueprint_settings]", title: BLUEPRINT_SETTING_TYPE.call }
+          end
 
           SELECTIVE_CONTENT_TYPES.each do |type2, title|
             next if type2 == "groups"

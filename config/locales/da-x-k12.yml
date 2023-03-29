@@ -187,6 +187,8 @@ da-x-k12:
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "En fil med navnet %{itemName} findes allerede i denne mappe."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "En fil med navnet ”%{name}” findes allerede. Vil du udskifte den eksisterende fil?"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "En fil med navnet ”%{name}” findes allerede i denne mappe. Vil du udskifte den eksisterende fil?"
+  a_filter_preset_with_those_conditions_already_exis_43d3fe4e: "Der findes allerede et forudindstillet filter med disse betingelser."
+  a_filter_with_that_name_already_exists_9bba05bc: "Der findes allerede et filter med det navn."
   a_front_page_is_required_fd57b80: "En forside er påkrævet"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Et logo i fuld størrelse, der vises i den højre margentekst på Canvas-oversigten. Ideel størrelse er 360 x 140 pixels. Accepterede formater: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "En praktisk kode/værdi-dump for en lang række interessante oplysninger om miljøet til den rapporterende bruger."
@@ -2083,6 +2085,9 @@ da-x-k12:
       er blevet afvist
   adds_additional_information_and_filtering_for_feat_3e55a058: "Tilføjer yderligere oplysninger og filtrering efter funktionsflag"
   adds_an_account_course_setting_for_a_default_due_t_9903738a: "Tilføjer en konto-/fagindstilling for et standard-afleveringstidspunkt for nye opgaver"
+  adds_an_account_setting_to_select_the_classic_lato_c2227d6c: |-
+      Tilføjer en kontoindstilling til at vælge den klassiske (Lato) eller den elementære (Balsamiq Sans) skrifttype i Canvas til folkeskolen-
+      konti.
   adds_an_emoji_picker_that_allows_students_and_teac_cf517b1b: "Tilføjer en emoji-vælger, der giver eleverne og lærere mulighed for at tilføje emojis til deres afleveringskommentarer."
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Tilføjer analyselink i menuen Brugerindstillinger."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Føjer analyse til en elevs kontekstkort."
@@ -2263,6 +2268,7 @@ da-x-k12:
   all_ungraded_artifacts_ec3ba09: "Alle ikke-bedømte artefakter"
   all_users_associated_with_this_course_6be8d492: "Alle brugere i forbindelse med dette fag"
   all_users_associated_with_this_institution_d29850be: "Alle brugere, der er tilknyttet til denne institution"
+  all_version_history_fbf060a0: "Al versionshistorik"
   all_versions_student_submission_report_e4def68d: "Rapport om alle versioner af elevers afleveringer"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Alle vægtninger skal være større end eller lig med 0"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Giv en moderator tilladelse til at evaluere flere uafhængige vurderinger for de valgte afleveringer"
@@ -2283,6 +2289,7 @@ da-x-k12:
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillad, at oversigt-kort omorganiseres for hver bruger."
   allow_final_grade_override_8cf4336b: "Tillad endelig tilsidesættelse af vurderingen"
   allow_final_grade_override_a21a79ee: "Tillad tilsidesættelse af endelig vurdering"
+  allow_font_selection_in_c4e_accounts_7def31c6: "Tillad skrifttypevalg i Canvas til folkeskolen-konti"
   allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "Lad Apollo gemme graphQL-forespørgsler i en brugers browser for at fremskynde deres oplevelse"
   allow_for_key_keyname_b973f769: "Tillad nøgle: %{keyName}"
   allow_gradebook_users_to_view_and_export_student_f_68a8084b: "Tillad brugere af vurderingoversigten at se og eksportere elevens for- og efternavne i separate kolonner"
@@ -2327,6 +2334,9 @@ da-x-k12:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Giv dette værktøj adgang til IMS Name and Role Provisioning Service"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Tillad ubekræftede e-mailadresser, når du tilføjer brugere"
   allow_users_to_comment_45b8f753: "Tillad brugere at kommentere"
+  allow_users_to_resize_canvas_studio_embedded_media_99c1a8bb: |-
+      Lad brugere ændre størrelsen på Canvas Studio indlejrede medier i RCE via
+      en ny bakke til Studio-medieindstillinger
   allow_users_to_submit_an_additional_email_at_regis_75b54a9d: "Lad brugere registrere en ekstra e-mail ved tilmelding."
   allowed_attempts_4e229caa: "Tilladte forsøg"
   allowed_domains_ee7868c8: "Tilladte domæner"
@@ -6797,9 +6807,9 @@ da-x-k12:
       indent: 
         ? "n"
         : 
-          one: "Indrykning 1. niveau"
+          one: "Indrykning 1 niveau"
           other: "Indrykning %{count} niveauer"
-          zero: "Skal ikke indrykkes"
+          zero: "Brug ikke indrykning"
       labels: 
         indent: Indrykning
         new_tab: "Indlæs i ny fane"
@@ -10013,6 +10023,7 @@ da-x-k12:
   end_date_e0093ed7: Slutdato
   end_date_for_conference_eaff0807: "Slutdato for konference"
   end_date_from_cdd9d90: "Slutdato fra:"
+  end_date_must_be_after_start_date_2fea5383: "Slutdato skal være efter startdato"
   end_date_time_must_be_later_than_start_date_time_aecc88f4: "Slutdato/-tidspunkt skal være senere end startdato/-tidspunkt"
   end_date_to_8b17929d: "Slutdato til:"
   end_date_value_3d3e8906: "Slutdato %{value}"
@@ -11101,6 +11112,7 @@ da-x-k12:
   fill_in_the_blank_answer_d83b83bb: "Udfyld de tomme felter - svar"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Udfyld det tomme felt, læs den omgivende tekst"
   fill_out_rubric_22d4eee5: "Udfyld vurderingskriterie"
+  fill_out_the_rubric_below_after_reviewing_the_stud_8eeb46c4: "Udfyld vurderingskriterierne nedenfor efter at have gennemgået elevernes aflevering for at fuldføre denne vurdering."
   filled_5d8c39e: Udfyldt
   filter_9df28e5b: "Filtrer:"
   filter_announcements_by_unread_495eeeb3: "filtrer beskeder efter ulæste"
@@ -11359,6 +11371,7 @@ da-x-k12:
   go_to_quoted_reply_6f4661e: "Gå til Citeret svar"
   go_to_reply_36fe5f51: "Gå til Svar"
   go_to_subject_2745f0a4: "Gå til emne"
+  go_to_the_new_course_af182b99: "Gå til det nye fag"
   go_to_topic_af6025fc: "Gå til emne"
   good_284a7a8f: God
   good_score_b02f3587: "Godt resultat"
@@ -13872,12 +13885,12 @@ da-x-k12:
     incoming_message_processor: 
       failure_message: 
         body: |-
-            Beskeden ved navn "%{subject}" kunne ikke leveres. Beskeden blev sendt til en ukendt adresse. Hvis du forsøger at kontakte en person gennem Canvas, kan du prøve at logge ind på din konto, og sende dem en meddelelse ved brug af Indbakkeværktøjet.
+            Meddelelsen med titlen "%{subject}" kunne ikke leveres.  Meddelelsen blev sendt til en ukendt postkasseadresse.  Hvis du forsøger at kontakte nogen via Canvas, kan du prøve at logge ind på din konto og sende dem en besked ved hjælp af indbakkeværktøjet.
             
-                      Tak,
-                      Canvas Support
-                      
-            Reference: %{ref}
+            Tak,
+            Canvas Support
+            
+            Reference: "%{ref}"
       locked_topic: 
         body: |-
             Beskeden ved navn "%{subject}" kunne ikke leveres, fordi diskussionsemnet er låst. Hvis du prøver at kontakte en person gennem Canvas, kan du prøve at logge ind på din konto, og sende dem en besked ved brug af indbakkeværktøjet.
@@ -15855,6 +15868,7 @@ da-x-k12:
           body: "Der er blevet føjet en ny fil til faget, %{name}:"
           link: "Klik for at vise"
           subject: "Ny fil tilføjet: %{title}, %{name}"
+        link: "Du kan se den her"
         subject: "Ny fil tilføjet: %{title}, %{name}"
         view: "Du kan se den her"
       sms: 
@@ -15865,20 +15879,20 @@ da-x-k12:
         body: "Canvas-varsling - Ny fil: %{title} (%{size}) for %{name}:"
     new_files_added: 
       email: 
-        body: "%{count} nye filer er blevet føjet til faget, %{name}:"
+        body: "%{count} nye filer er blevet tilføjet for %{name}:"
         html: 
           body: "%{count} nye filer er blevet føjet til faget, %{name}:"
           see_details: "Du kan se dem her"
-          subject: "%{count} nye filer er blevet føjet til faget, %{name}:"
+          subject: "%{count} nye filer er blevet føjet til faget, %{name}"
         link: "Du kan se dem her"
-        subject: "%{count} nye filer er blevet føjet til faget, %{name}:"
+        subject: "%{count} nye filer er blevet føjet til faget, %{name}"
       sms: 
         body: "%{count} nye filer tilføjet for %{name}."
         link: "Yderligere oplysninger på %{link}"
       summary: 
-        body: "%{count} nye filer tilføjet for %{name}."
+        body: "%{count} nye filer er blevet tilføjet for %{name}:"
         link: "Du kan se dem her"
-        subject: "%{count} nye filer er blevet føjet til faget, %{name}:"
+        subject: "%{count} nye filer er blevet føjet til faget, %{name}"
       twitter: 
         body: "Canvas-varsling - %{count} nye filer for %{name}"
     new_student_organized_group: 
@@ -16745,6 +16759,7 @@ da-x-k12:
   nav_logo_background_ba33fb7f: "Nav logo baggrund"
   nav_text_94206145: "Nav tekst"
   nav_text_active_a924ae88: "Nav tekst aktiv"
+  navigate_to_speed_grader_for_name_f28cb5b1: "Naviger til Speed Grader for %{name}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigation gør det muligt for en bruger at få vist linket Deltagere i Fagnavigation."
   navigation_menu_fd782ff8: Navigationsmenu
   near_mastery_f25174a4: "Tæt på opfyldelse af læringsmål"
@@ -16822,6 +16837,7 @@ da-x-k12:
   new_question_9107c469: "Nyt spørgsmål"
   new_question_group_d9306280: "Ny spørgsmålsgruppe"
   new_quiz_34aacba6: "Ny quiz"
+  new_quiz_items_3c850331: "Nyt quiz-element"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "New Quizzes-konto og elementbanker på fagniveau"
   new_quizzes_assignment_build_button_72b6531a: "Generer-knap for opgaver i New Quizzes"
   new_quizzes_banks_migrations_9ab4de4a: "New Quizzes Banker Overførsler"
@@ -16831,10 +16847,12 @@ da-x-k12:
   new_quizzes_description: "Denne funktion forbedrer Canvas-oplevelsen for quizzer. Når dette flag er aktiveret, er værktøjet New Quizzes tilgængeligt. For flere detaljer henvises der til *New Quizzes brugergruppe* i Canvas Community."
   new_quizzes_embedded_module_progression_cd2307b6: "New Quizzes indlejret forløbprogression"
   new_quizzes_importing_c167dce0: "New Quizzes importerer"
+  new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "New Quizzes inkluderet på fanen Oversigt over læringsudbyttejustering"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "New Quizzes-overførsel under fagimport / -kopiering"
   new_quizzes_migration_enabled_by_default_5f9bcc81: "New Quizzes-overførsel aktiveret som standard"
   new_quizzes_migration_required_7854aa1a: "New Quizzes-overførsel påkrævet"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes på siden Quizzer"
+  new_quizzes_outcome_alignments_are_included_on_the_83447268: "New Quizzes læringsudbyttejusteringer er inkluderet på fanen Oversigt over læringsudbyttejustering, der giver en liste over justeringer for hvert læringsudbytte i et fag."
   new_quizzes_public_api_18d95321: "New Quizzes Public API"
   new_quizzes_public_api_quiz_items_16bc741d: "New Quizzes Public API: Quizelementer"
   new_quizzes_service_jwt_refresh_ca28ca8: "New Quizzes-tjeneste JWT opdatering"
@@ -17003,6 +17021,7 @@ da-x-k12:
   no_students_with_that_name_found_f6004da2: "Ingen elever med dette navn blev fundet"
   no_subject_58b7941c: "Intet emne"
   no_subject_970aad80: "Intet emne"
+  no_subject_a8b6ceeb: "(Intet emne)"
   no_submission_fb131a40: "Ingen aflevering"
   no_submission_for_assignment_a9cb6fe2: "Ingen indsendelse for %{assignment}"
   no_submission_for_assignmenttitle_243bd1f4: "Ingen indsendelse for %{assignmentTitle}"
@@ -18218,6 +18237,7 @@ da-x-k12:
   please_select_a_reason_for_reporting_this_reply_51719e8d: "Vælg en årsag til at rapportere dette svar"
   please_select_a_recipient_c9273f8e: "Vælg en modtager."
   please_select_a_user_role_for_this_link_9fb4e655: "Vælg venligst en brugerrole for dette link."
+  please_select_at_least_one_filter_aafaa1a7: "Vælg mindst et filter."
   please_select_one_f931e883: "Vælg venligst en"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Du skal angive, om Microsoft Teams-synkronisering skal aktiveres eller deaktiveres"
   please_try_again_4c3d11b4: "Prøv igen."
@@ -20172,6 +20192,8 @@ da-x-k12:
         labels: 
           quiz_instructions: Quizinstruktioner
           quiz_score: Resultat
+      quiz_edit_header: 
+        speed_grader: SpeedGrader
       quiz_right_side: 
         attempts_left: 
           one: "1 forsøg tilbage"
@@ -21068,6 +21090,7 @@ da-x-k12:
   restrict_instructors_from_changing_mastery_scales_5af13053: "Begræns instruktører fra at ændre skalaen for opfyldelse af læringsmål"
   restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Begræns instruktører fra at ændre metoden til beregning af færdigheder"
   restrict_push_notifications_to_select_types_941d9da3: "Begræns push-meddelelser til udvalgte typer"
+  restrict_quantitative_data_72411674: "Begræns kvantitative data"
   restrict_sms_to_select_types_9dd6399c: "Begræns SMS for udvalgte typer"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Forhindr elever i at skaffe adgang til fag efter slutdatoen"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Forhindr elever i at skaffe adgang til fag før startdatoen"
@@ -21077,6 +21100,7 @@ da-x-k12:
   restrict_students_from_viewing_course_before_cours_cca659a4: "Forhindr eleverne i at vise faget før fagets startdato"
   restrict_students_from_viewing_course_before_term__3c4924f0: "Forhindr eleverne i at vise faget før skoleårets startdato"
   restrict_students_from_viewing_future_courses_in_e_67486caf: "Forhindr elever i at vise fremtidige fag i tilmeldningslisten"
+  restrict_view_of_quantitative_data_b6089ee9: "Begræns visningen af kvantitative data"
   restricted_access_d3e99a39: "Begrænset adgang"
   restricted_view_for_teachers_in_lmgb_52c78a62: "Begrænset visning for lærere i LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Aflever igen til det tilknyttede værktøj for plagiatanalyse."
@@ -23105,6 +23129,7 @@ da-x-k12:
   start_date_field_for_styleguide_8a8ab1d6: "Felt til startdato for skriveregler"
   start_date_for_conference_1936e809: "Konferencens startdato"
   start_date_from_20503757: "Start dato fra:"
+  start_date_must_be_before_end_date_a00be892: "Startdato skal være før slutdato"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} til %{end_time}"
   start_date_time_must_be_before_the_end_date_time_6be0c57f: "Startdato/-tidspunkt skal være før slutdato/-sluttidspunkt"
   start_date_to_1e6e6bbe: "Startdato til:"
@@ -23214,6 +23239,7 @@ da-x-k12:
   student_feedback_required_in_comments_above_to_rea_2f5dafbf: "Der kræves elevfeedback i ovenstående kommentarer for at tildele igen."
   student_filters_in_lmgb_13964502: "Filtre for elever i LMGB"
   student_first_name_aaa42cbc: "Elevens fornavn"
+  student_first_name_options_82f5685f: "Valgmuligheder for elevens fornavn"
   student_grades_4cbc59a1: "Elevernes vurderinger"
   student_group_75b86a9f: Elevgruppe
   student_group_filter_185fb085: Elevgrupper-filter
@@ -23327,6 +23353,7 @@ da-x-k12:
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: "Elever vil kunne se, at vurderingerne for denne opgave er skjult."
   students_with_no_submissions_title: "Elever uden afleveringer"
   students_without_assessments_eb100e60: "Elever uden vurderinger"
+  studio_media_options_in_rce_1118428b: "Studio-medieindstillinger i RCE"
   sub_account_daeadd0: Underkonto
   sub_accounts: 
     alerts: 
@@ -23628,6 +23655,7 @@ da-x-k12:
   suffix_294d5cc4: Suffiks
   suggestions_b8b03b9d: "Forslag:"
   sum_of_all_files_in_mb_2b705055: "summen af alle filer i MB"
+  summary_of_report_types_d064d42b: "Oversigt over rapporttyper"
   summary_statistics_f74852a5: "Oversigt over statistik"
   sun_298d7c8b: Søn
   support: 
@@ -24044,6 +24072,8 @@ da-x-k12:
   the_field_field_is_required_56512820: "Feltet \"%{field}\" er påkrævet"
   the_field_field_must_have_no_spaces_d1c2fc37: "Feltet \"%{field}\" må ikke have mellemrum"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Fanen Filer er stedet til at dele forelæsninger, prøvedokumenter, studiehjælp -- alt som dine elever kunne få brug for at downloade. Med Canvas er det nemt at uploade og organisere dine filer. Vi viser dig hvordan."
+  the_first_max_displayed_files_are_listed_49cfd7a0: "De første %{max_displayed} filer er anført."
+  the_first_max_displayed_files_are_listed_above_cli_324d47b: "De første %{max_displayed} filer er anført ovenfor. Klik nedenfor for at se alle filer."
   the_following_content_is_partner_provided_ed1da756: "Følgende indhold er partnerleveret"
   the_following_domains_have_automatically_been_adde_2c7a1654: |-
       Følgende domæner er automatisk blevet tilføjet til din
@@ -24500,6 +24530,7 @@ da-x-k12:
                                   Slutbrugere vil ikke se det, før det er aktiveret af en webstedsadministratorbruger.
                                   Før du aktiverer en institution, skal du være sikker på, at du fuldt ud forstår
                                   funktionaliteten og mulige påvirkninger for brugerne.
+  this_feature_will_hide_all_quantitative_values_fro_6f006665: "Denne funktion vil skjule alle kvantitative værdier for brugerne"
   this_field_is_required_fa58c4a: "Dette felt er påkrævet"
   this_field_name_is_required_988caebc: "Dette felt \"%{name}\" er påkrævet."
   this_field_name_is_required_b9196401: "Dette felt \"navn\" er påkrævet."
@@ -26106,6 +26137,7 @@ da-x-k12:
   use_default_890939b7: "Brug standard"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Brug eksperimentelle funktioner, før de generelt er blevet aktiveret i produktionen"
   use_high_contrast_ui_a5917282: "Brug grænseflade med høj kontrast"
+  use_improved_placeholders_for_inserted_content_in__433adfaa: "Brug forbedrede pladsholdere til indsat indhold i RCE."
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Benyt MathMan til at konvertere LaTeX til MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Benyt MathMan til at konvertere LaTeX til SVG?"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
@@ -26115,6 +26147,7 @@ da-x-k12:
             Tilføj filer, diskussioner, opgaver, quizzer og andet læringsmateriale.
             Kræv, at forudsætninger skal udfyldes, før der gås videre til næste forløb eller
             forløbelement, eller lås et helt forløb indtil en bestemt dato.
+  use_new_and_better_styled_placeholders_for_inserte_d6110d00: "Brug nye og forbedrede pladsholdere til indsatte billeder, videoer og filer i RCE."
   use_new_folder_tree_in_files_bc0ea09f: "Brug træet Ny mappe i filer"
   use_new_quizzes_as_the_default_quizzing_engine_rem_73020960: "Brug New Quizzes som standard quizprogram. Fjerner muligheden for at bruge Classic Quizzes."
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Brug ny Rich Content Editor med forbedret sidepanel overalt"
@@ -27264,6 +27297,7 @@ da-x-k12:
   you_cannot_set_a_grouped_discussion_as_a_student_a20f363: "Som elev kan du ikke indstille en grupperet diskussion."
   you_cannot_use_a_number_greater_than_the_number_of_af33e220: "Du kan ikke bruge et tal, der er større end antallet af opgaver"
   you_created_an_announcement_in_course_c49e3d70: "Du oprettede en besked i %{course}"
+  you_created_this_announcement_42d745a7: "Du har oprettet denne besked:"
   you_currently_have_no_discussions_with_closed_comm_366a9dab: "Du har i øjeblikket ikke nogen diskussioner med lukkede kommentarer"
   you_currently_have_no_pinned_discussions_6f0078b8: "Du har ingen fastgjorte diskussioner i øjeblikket"
   you_do_not_have_access_to_the_requested_announceme_a774d80a: "Du har ikke adgang til den ønskede besked."
@@ -27447,6 +27481,7 @@ da-x-k12:
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Du vil ikke være i stand til at vise dine ændringer på forhånd"
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "Du modtager ikke nogen %{contextType} meddelelser på dette tidspunkt. For at aktivere %{contextType} meddelelser, kan du skifte ovenfor."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Du modtager ikke fagmeddelelser på nuværende tidspunkt. For at aktivere fagmeddelelser skal du bruge knappen ovenfor."
+  you_will_only_see_comments_written_by_you_f294cb9d: "Du kan kun se kommentarer, som du har skrevet."
   your_answer_8dad6ea4: "Dit svar:"
   your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Din opgave %{assignment_name} skal afleveres den %{due_at}."
   your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Din opgave %{assignment_name} skal afleveres den %{due_at}. Klik på følgende link for at besøge din opgave og få den afleveret i tide:"

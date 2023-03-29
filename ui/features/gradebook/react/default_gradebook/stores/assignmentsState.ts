@@ -22,7 +22,7 @@ import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
 import {maxAssignmentCount, otherGradingPeriodAssignmentIds} from '../Gradebook.utils'
 import type {GradebookStore} from './index'
 import type {GradingPeriodAssignmentMap} from '../gradebook.d'
-import type {AssignmentGroup, SubmissionType} from '../../../../../api.d'
+import type {AssignmentGroup, Assignment, AssignmentMap, SubmissionType} from '../../../../../api.d'
 
 const I18n = useI18nScope('gradebook')
 
@@ -44,6 +44,9 @@ export type AssignmentsState = {
     assignmentGroups: AssignmentGroup[]
     gradingPeriodIds?: string[]
   }
+  assignmentGroups: AssignmentGroup[]
+  assignmentList: Assignment[]
+  assignmentMap: AssignmentMap
 }
 
 type AssignmentLoaderParams = {
@@ -72,6 +75,12 @@ export default (
     gradingPeriodIds: [],
   },
 
+  assignmentGroups: [],
+
+  assignmentList: [],
+
+  assignmentMap: {},
+
   fetchGradingPeriodAssignments: () => {
     const dispatch = get().dispatch
     const courseId = get().courseId
@@ -91,26 +100,30 @@ export default (
       promise = dispatch.getJSON(`/courses/${courseId}/gradebook/grading_period_assignments`)
     }
 
-    return promise
-      .then((data: {grading_period_assignments: GradingPeriodAssignmentMap}) => {
-        set({
-          gradingPeriodAssignments: data.grading_period_assignments,
-          isGradingPeriodAssignmentsLoading: false,
+    return (
+      promise
+        // @ts-expect-error until consumePrefetchedXHR and dispatch.getJSON support generics
+        .then((data: {grading_period_assignments: GradingPeriodAssignmentMap}) => {
+          set({
+            gradingPeriodAssignments: data.grading_period_assignments,
+            isGradingPeriodAssignmentsLoading: false,
+          })
+          return data.grading_period_assignments
         })
-        return data.grading_period_assignments
-      })
-      .catch(() => {
-        set({
-          isGradingPeriodAssignmentsLoading: false,
-          flashMessages: get().flashMessages.concat([
-            {
-              key: 'grading-period-assignments-loading-error',
-              message: I18n.t('There was an error fetching grading period assignments data.'),
-              variant: 'error',
-            },
-          ]),
+        .catch(() => {
+          set({
+            isGradingPeriodAssignmentsLoading: false,
+            flashMessages: get().flashMessages.concat([
+              {
+                key: 'grading-period-assignments-loading-error',
+                message: I18n.t('There was an error fetching grading period assignments data.'),
+                variant: 'error',
+              },
+            ]),
+          })
+          return {}
         })
-      })
+    )
   },
 
   loadAssignmentGroups: (selectedGradingPeriodId?: string) => {
@@ -198,11 +211,20 @@ export default (
       .dispatch.getDepaginated<AssignmentGroup[]>(path, params)
       .then((assignmentGroups: undefined | AssignmentGroup[]) => {
         if (assignmentGroups) {
+          const assignments = assignmentGroups.flatMap(group => group.assignments)
+          const assignmentMap = {
+            ...get().assignmentMap,
+            ...Object.fromEntries(assignments.map(assignment => [assignment.id, assignment])),
+          }
+          const assignmentList = get().assignmentList.concat(assignments)
           set({
             recentlyLoadedAssignmentGroups: {
               assignmentGroups,
               gradingPeriodIds,
             },
+            assignmentMap,
+            assignmentList,
+            assignmentGroups: get().assignmentGroups.concat(assignmentGroups),
           })
         }
         return assignmentGroups

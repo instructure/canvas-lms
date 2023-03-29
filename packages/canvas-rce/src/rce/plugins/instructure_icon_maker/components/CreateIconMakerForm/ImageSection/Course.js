@@ -69,7 +69,7 @@ const dispatchImage = async (dispatch, onChange, dataUrl, dataBlob) => {
   onChange({type: svgActions.SET_EMBED_IMAGE, payload: image})
 }
 
-const Course = ({dispatch, onChange, onLoading, onLoaded}) => {
+const Course = ({dispatch, onChange, onLoading, onLoaded, canvasOrigin}) => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
   const {setUrl, dataUrl, dataLoading, dataBlob} = useDataUrl()
@@ -122,6 +122,7 @@ const Course = ({dispatch, onChange, onLoading, onLoaded}) => {
           setUrl(file.download_url)
           dispatch({...actions.SET_IMAGE_NAME, payload: file.filename})
         }}
+        canvasOrigin={canvasOrigin}
       />
     </View>
   )
@@ -132,6 +133,7 @@ Course.propTypes = {
   onChange: PropTypes.func,
   onLoading: PropTypes.func,
   onLoaded: PropTypes.func,
+  canvasOrigin: PropTypes.string.isRequired,
 }
 
 Course.defaultProps = {

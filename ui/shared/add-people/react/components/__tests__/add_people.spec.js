@@ -19,6 +19,9 @@
 import {mount} from 'enzyme'
 import React from 'react'
 import AddPeople from '../add_people'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 describe('Focus Handling', () => {
   it('sends focus to the modal close button when an api error occurs', () => {

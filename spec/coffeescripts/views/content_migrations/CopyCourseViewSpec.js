@@ -21,18 +21,21 @@ import Backbone from '@canvas/backbone'
 import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration.coffee'
 import CopyCourseView from 'ui/features/content_migrations/backbone/views/CopyCourseView.coffee'
 import DateShiftView from '@canvas/content-migrations/backbone/views/DateShiftView.coffee'
-import ImportBlueprintSettingsView from 'ui/features/content_migrations/backbone/views/subviews/ImportBlueprintSettingsView.coffee'
+import SelectContentCheckboxView from '@canvas/content-migrations/backbone/views/subviews/SelectContentCheckboxView.coffee'
 import assertions from 'helpers/assertions'
 
 QUnit.module('CopyCourseView: Initializer', {
   setup() {
+    this.contentMigration = new ContentMigration()
     this.copyCourseView = new CopyCourseView({
       courseFindSelect: new Backbone.View(),
       dateShift: new DateShiftView({
         collection: new Backbone.Collection(),
-        model: new ContentMigration(),
+        model: this.contentMigration,
       }),
-      importBlueprintSettings: new ImportBlueprintSettingsView({model: new ContentMigration()}),
+      selectContent: new SelectContentCheckboxView({
+        model: this.contentMigration,
+      }),
     })
   },
   teardown() {
@@ -58,40 +61,13 @@ test('after init, calls updateNewDates when @courseFindSelect.triggers "course_c
   ok(sinonSpy.calledWith(course), 'Called updateNewDates with passed in object')
 })
 
-test('does not show import blueprint settings checkbox if dest course is ineligible', function () {
+test('after init, calls SelectContentCheckbox.courseSelected on @courseFindSelect\'s "course_changed" event', function () {
   $('#fixtures').html(this.copyCourseView.render().el)
-  this.copyCourseView.courseFindSelect.trigger('course_changed', {blueprint: true})
-  notOk($('#importBlueprintSettingsCheckbox').is(':visible'))
-})
-
-QUnit.module('CopyCourseView: blueprint eligible course', {
-  setup() {
-    this.contentMigration = new ContentMigration()
-    this.copyCourseView = new CopyCourseView({
-      courseFindSelect: new Backbone.View(),
-      dateShift: new DateShiftView({
-        collection: new Backbone.Collection(),
-        model: this.contentMigration,
-      }),
-      importBlueprintSettings: new ImportBlueprintSettingsView({model: this.contentMigration}),
-      blueprint_eligible: true,
-    })
-  },
-  teardown() {
-    return this.copyCourseView.remove()
-  },
-})
-
-test('does not show import blueprint settings checkbox if selected course is not blueprint', function () {
-  $('#fixtures').html(this.copyCourseView.render().el)
-  this.copyCourseView.courseFindSelect.trigger('course_changed', {blueprint: false})
-  notOk($('#importBlueprintSettingsCheckbox').is(':visible'))
-})
-
-test('has working blueprint settings checkbox if dest course is eligible', function () {
-  $('#fixtures').html(this.copyCourseView.render().el)
-  this.copyCourseView.courseFindSelect.trigger('course_changed', {blueprint: true})
-  ok($('#importBlueprintSettingsCheckbox').is(':visible'))
-  $('#importBlueprintSettingsCheckbox').click()
-  ok(this.contentMigration.get('settings').import_blueprint_settings)
+  const sinonSpy = sandbox.spy(this.copyCourseView.selectContent, 'courseSelected')
+  const course = {
+    start_at: 'foo',
+    end_at: 'bar',
+  }
+  this.copyCourseView.courseFindSelect.trigger('course_changed', course)
+  ok(sinonSpy.calledWith(course), 'Called updateNewDates with passed in object')
 })
