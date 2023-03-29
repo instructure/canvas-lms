@@ -34,10 +34,7 @@ class SisBatchRollBackData < ActiveRecord::Base
                      Enrollment GroupMembership UserObserver AccountUser].freeze
 
   def self.cleanup_expired_data
-    return unless expired_data.exists?
-
-    until expired_data.limit(10_000).delete_all < 10_000
-    end
+    expired_data.in_batches(of: 10_000).delete_all
   end
 
   def self.build_data(sis_batch:, context:, batch_mode_delete: false)

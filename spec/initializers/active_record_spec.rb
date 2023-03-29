@@ -556,7 +556,7 @@ module ActiveRecord
       it "uses 'SKIP LOCKED' lock" do
         Timecop.freeze do
           now = Time.now.utc
-          expect(@relation).to receive(:update_all_locked_in_order).with(updated_at: now, lock_type: :no_key_update_skip_locked)
+          expect(@relation).to receive(:update_all_locked_in_order).with("updated_at" => now, :lock_type => :no_key_update_skip_locked)
           @relation.touch_all_skip_locked
         end
       end

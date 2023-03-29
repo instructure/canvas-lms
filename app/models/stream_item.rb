@@ -474,7 +474,7 @@ class StreamItem < ActiveRecord::Base
       else
         StreamItemCache.invalidate_all_recent_stream_items(user_ids, context_type, context_id)
       end
-      scope.delete_all
+      scope.in_batches(of: 10_000).delete_all
       nil
     end
   end
