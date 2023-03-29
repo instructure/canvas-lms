@@ -349,7 +349,9 @@ class AssetUserAccessLog
           GuardRail.activate(:primary) do
             partition_model.transaction do
               log_message("batch updating (sometimes these queries don't get logged)...")
-              partition_model.connection.execute(update_query)
+              partition_model.connection.with_max_update_limit(log_batch_size) do
+                partition_model.connection.execute(update_query)
+              end
               log_message("...batch update complete")
               # Here we want to write the iteration state into the database
               # so that we don't double count rows later.  The next time the job

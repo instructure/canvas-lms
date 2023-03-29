@@ -1095,7 +1095,10 @@ module UsefulBatchEnumerator
     sum = 0
     if @strategy.nil? && !@relation.in_batches_needs_temp_table?
       loop do
-        current = @relation.limit(@of).delete_all
+        current = nil
+        @relation.connection.with_max_update_limit(@of) do
+          current = @relation.limit(@of).delete_all
+        end
         sum += current
         break unless current == @of
       end
@@ -1104,7 +1107,9 @@ module UsefulBatchEnumerator
 
     strategy = @strategy || @relation.infer_in_batches_strategy
     @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
-      sum += relation.delete_all
+      @relation.connection.with_max_update_limit(@of) do
+        sum += relation.delete_all
+      end
     end
     sum
   end
@@ -1113,7 +1118,10 @@ module UsefulBatchEnumerator
     sum = 0
     if @strategy.nil? && !@relation.in_batches_needs_temp_table? && relation_has_condition_on_updates?(updates)
       loop do
-        current = @relation.limit(@of).update_all(updates)
+        current = nil
+        @relation.connection.with_max_update_limit(@of) do
+          current = @relation.limit(@of).update_all(updates)
+        end
         sum += current
         break unless current == @of
       end
@@ -1122,9 +1130,28 @@ module UsefulBatchEnumerator
 
     strategy = @strategy || @relation.infer_in_batches_strategy
     @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
-      sum += relation.update_all(updates)
+      @relation.connection.with_max_update_limit(@of) do
+        sum += relation.update_all(updates)
+      end
     end
     sum
+  end
+
+  # not implementing relation_has_condition_on_updates logic because this method is not used in places
+  # where that would be useful.  If that changes no reason we couldn't implement it here
+  def update_all_locked_in_order(lock_type: :no_key_update, **updates)
+    sum = 0
+    strategy = @strategy || @relation.infer_in_batches_strategy
+    @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
+      @relation.connection.with_max_update_limit(@of) do
+        sum += relation.update_all_locked_in_order(lock_type: lock_type, **updates)
+      end
+    end
+    sum
+  end
+
+  def touch_all(*names, time: nil)
+    update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time: time))
   end
 
   def destroy_all
@@ -1260,19 +1287,19 @@ ActiveRecord::Relation.class_eval do
     end
   end
 
-  def touch_all
+  def touch_all(*names, time: nil)
     activate do |relation|
-      relation.update_all_locked_in_order(updated_at: Time.now.utc)
+      relation.update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time: time))
     end
   end
 
-  def touch_all_skip_locked
+  def touch_all_skip_locked(*names, time: nil)
     if Setting.get("touch_all_skip_locked_enabled", "true") == "true"
       activate do |relation|
-        relation.update_all_locked_in_order(updated_at: Time.now.utc, lock_type: :no_key_update_skip_locked)
+        relation.update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time: time), lock_type: :no_key_update_skip_locked)
       end
     else
-      touch_all
+      touch_all(*names, time: time)
     end
   end
 

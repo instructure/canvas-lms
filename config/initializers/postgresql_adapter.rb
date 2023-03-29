@@ -254,6 +254,13 @@ module PostgreSQLAdapterExtensions
     end
   end
 
+  def with_max_update_limit(limit)
+    transaction do
+      execute("SET LOCAL inst.max_update_limit = #{limit}")
+      yield
+    end
+  end
+
   def quote(*args)
     value = args.first
     return value if value.is_a?(QuotedValue)

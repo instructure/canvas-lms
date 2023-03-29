@@ -594,7 +594,7 @@ class Assignment < ActiveRecord::Base
   before_destroy :delete_observer_alerts
 
   def delete_observer_alerts
-    until observer_alerts.limit(1_000).delete_all < 1_000; end
+    observer_alerts.in_batches(of: 10_000).delete_all
   end
 
   before_create :set_root_account_id, :set_muted
