@@ -51,6 +51,7 @@ require "rubocop_canvas/cops/migration/boolean_columns"
 require "rubocop_canvas/cops/migration/data_fixup"
 require "rubocop_canvas/cops/migration/predeploy"
 require "rubocop_canvas/cops/migration/id_column"
+require "rubocop_canvas/cops/migration/function_unqualified_table"
 require "rubocop_canvas/cops/migration/root_account_id"
 ## specs
 require "rubocop_canvas/cops/specs/no_before_once_stubs"
