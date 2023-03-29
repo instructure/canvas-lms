@@ -45,6 +45,8 @@ describe AuthenticationMethods::InstAccessToken do
   end
 
   describe ".load_user_and_pseudonym_context" do
+    specs_require_sharding
+
     it "finds the user who created the token" do
       account = Account.default
       user_with_pseudonym(active_all: true)
@@ -55,7 +57,8 @@ describe AuthenticationMethods::InstAccessToken do
     end
 
     it "chooses the local user when a local and shadow user share the same UUID" do
-      user_model(id: (10_000_000_000_000 + (rand * 10_000_000).to_i), uuid: "a-shared-uuid-between-users")
+      user = @shard2.activate { User.create!(name: "some user", uuid: "a-shared-uuid-between-users") }
+      user.save_shadow_record(target_shard: Shard.default)
       account = Account.default
       user_with_pseudonym(active_all: true)
       @user.uuid = "a-shared-uuid-between-users"
