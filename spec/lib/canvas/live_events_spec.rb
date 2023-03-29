@@ -851,6 +851,7 @@ describe Canvas::LiveEvents do
     before do
       course_with_student_submissions
       @assignment = @course.assignments.first
+      @assignment.external_tool_tag = ContentTag.create!(context: @assignment)
     end
 
     it "triggers a live event with assignment details" do
@@ -875,6 +876,47 @@ describe Canvas::LiveEvents do
                    }.compact!)).once
 
       Canvas::LiveEvents.assignment_created(@assignment)
+    end
+
+    context "when the assignment is a duplicate" do
+      let(:dupe_assignment) { @course.assignments.create!(title: "the og") }
+
+      before do
+        @assignment.update!(duplicate_of: dupe_assignment)
+      end
+
+      it "includes duplicate assignment id" do
+        expect_event("assignment_created",
+                     hash_including({
+                                      assignment_id_duplicated_from: dupe_assignment.global_id.to_s,
+                                    })).once
+
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+
+      it "includes duplicate's root account domain" do
+        expect_event("assignment_created",
+                     hash_including({
+                                      domain_duplicated_from: dupe_assignment.root_account.domain,
+                                    })).once
+
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+
+      context "when duplicate has lti_resource_link_id" do
+        before do
+          dupe_assignment.external_tool_tag = ContentTag.create!(context: dupe_assignment)
+        end
+
+        it "is included" do
+          expect_event("assignment_created",
+                       hash_including({
+                                        lti_resource_link_id_duplicated_from: dupe_assignment.lti_resource_link_id,
+                                      })).once
+
+          Canvas::LiveEvents.assignment_created(@assignment)
+        end
+      end
     end
 
     context "when the assignment is created as part of a blueprint sync" do
