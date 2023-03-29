@@ -91,24 +91,20 @@ module I18n
 end
 # rubocop:enable Style/OptionalBooleanParameter
 
-module DontTrustI18nPluralizations
-  def pluralize(locale, entry, count)
-    super
-  rescue I18n::InvalidPluralizationData => e
-    Rails.logger.error("#{e.message} in locale #{locale.inspect}")
-    ""
-  end
-end
-
 Rails.configuration.to_prepare do
   Rails.application.config.i18n.enforce_available_locales = true
   Rails.application.config.i18n.fallbacks = true
 
-  I18n.backend = LazyPresumptuousI18nBackend.new(
-    meta_keys: %w[aliases crowdsourced custom locales],
-    logger: Rails.logger.method(:debug)
+  # create a unique backend class with the behaviors we want
+  backend_class = Class.new(I18n::Backend::MetaLazyLoadable)
+  backend_class.prepend(I18n::Backend::DontTrustPluralizations)
+  backend_class.include(I18n::Backend::CSV)
+  backend_class.include(I18n::Backend::Fallbacks)
+
+  I18n.backend = backend_class.new(
+    meta_keys: %w[aliases community crowdsourced custom locales],
+    lazy_load: true
   )
-  LazyPresumptuousI18nBackend.prepend(DontTrustI18nPluralizations)
 end
 
 module FormatInterpolatedNumbers

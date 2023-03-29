@@ -972,7 +972,7 @@ module I18nStubs
   def lookup(locale, key, scope = [], options = {})
     return super unless @stubs
 
-    ensure_initialized
+    init_translations unless initialized?
     keys = I18n.normalize_keys(locale, key, scope, options[:separator])
     keys.inject(@stubs) { |h, k| h[k] if h.respond_to?(:key) } || super
   end
@@ -983,7 +983,7 @@ module I18nStubs
     super | @stubs.keys.map(&:to_sym)
   end
 end
-LazyPresumptuousI18nBackend.prepend(I18nStubs)
+I18n.backend.class.prepend(I18nStubs)
 
 Dir[Rails.root.join("{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb")].sort.each { |file| require file }
 

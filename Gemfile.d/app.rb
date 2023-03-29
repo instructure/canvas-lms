@@ -75,7 +75,7 @@ gem "graphql-batch", "0.4.3"
 gem "hashery", "2.1.2", require: false
 gem "highline", "2.0.3", require: false
 gem "httparty", "0.18.1"
-gem "i18n", "1.9.1"
+gem "i18n", "~> 1.12"
 gem "i18nliner", "0.2.2", github: "instructure/i18nliner", ref: "ruby3"
 gem "icalendar", "2.7.0", require: false
 gem "diplomat", "2.6.3", require: false
