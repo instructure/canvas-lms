@@ -238,6 +238,7 @@ module Canvas::LiveEvents
 
     event = {
       assignment_id: assignment.global_id,
+      assignment_id_duplicated_from: assignment.duplicate_of&.global_id&.to_s,
       context_id: assignment.global_context_id,
       context_uuid: assignment.context.uuid,
       context_type: assignment.context_type,
@@ -261,6 +262,8 @@ module Canvas::LiveEvents
     actl = assignment.assignment_configuration_tool_lookups.take
     domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
     event[:domain] = domain if domain
+    original_domain = assignment.duplicate_of&.root_account&.domain(ApplicationController.test_cluster_name)
+    event[:domain_duplicated_from] = original_domain if original_domain
     if actl && (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
       context: assignment.course,
       vendor_code: actl.tool_vendor_code,
