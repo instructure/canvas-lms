@@ -68,6 +68,9 @@ Naming/HeredocDelimiterNaming:
     # any you add should describe the format of the data, not describe
     # what the data is for. this allows editors to syntax highlight
     - ^(?!AST|BASE64|CSV|GQL|HTML|JS|MD|PEM|REGEX|RUBY|SQL|SRT|TEXT|XML|YAML|PATTERN).+$
+Naming/FileName:
+  Exclude:
+    - "config/locales/*.rb"
 
 Performance:
   Severity: error
