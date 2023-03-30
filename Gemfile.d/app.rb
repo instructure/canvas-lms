@@ -28,7 +28,7 @@ def gem_override(name, version)
 end
 
 gem "bootsnap", "1.13.0", require: false
-gem "rails", "7.0.3"
+gem "rails", "~> 7.0.4"
 gem "tzinfo", "2.0.4"
 gem_override "switchman", "3.4.1"
 gem "guardrail", "3.0.2"
