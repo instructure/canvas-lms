@@ -44,7 +44,7 @@ x-base-service: &BASE-SERVICE
       - "traefik.enable=true"
 
 services:
-  canvas-web:
+  web:
     <<: *BASE-SERVICE
     environment:
       <<: *BASE-ENV
@@ -57,22 +57,31 @@ services:
       # AR_QUERY_TRACE_TYPE: 'all' # 'all', 'write', or 'read'
       # AR_QUERY_TRACE_LINES: 10
     depends_on:
-      - canvas-postgres
-      - canvas-redis
+      - postgres
+      - redis
     networks:
       default:
         aliases:
+          - canvas-web
           - canvas-web.$INST_DOMAIN
 
-  canvas-jobs:
+  jobs:
     <<: *BASE-SERVICE
     command: bundle exec script/delayed_job run
+    networks:
+      default:
+        aliases:
+          - canvas-jobs
 
-  canvas-webpack:
+  webpack:
     <<: *BASE-SERVICE
     command: yarn run webpack
+    networks:
+      default:
+        aliases:
+          - canvas-webpack
 
-  canvas-postgres:
+  postgres:
     build: ./docker-compose/postgres
     env_file: .env
     environment:
@@ -81,14 +90,22 @@ services:
         - "traefik.enable=true"
     volumes:
       - pg_data:/var/lib/postgresql/data
+    networks:
+      default:
+        aliases:
+          - canvas-postgres
 
-  canvas-redis:
+  redis:
     image: redis:alpine
     env_file: .env
     labels:
         - "traefik.enable=true"
+    networks:
+      default:
+        aliases:
+          - canvas-redis
 
-  canvas-githook-installer:
+  githook-installer:
     build:
       context: .
       dockerfile: 'Dockerfile.githook'
@@ -97,6 +114,10 @@ services:
       - ./.git:/tmp/.git
       - ./hooks:/tmp/hooks
       - ./script:/tmp/script
+    networks:
+      default:
+        aliases:
+          - canvas-githook-installer
 
 networks:
   default:

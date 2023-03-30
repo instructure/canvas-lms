@@ -6,3 +6,4 @@ test:
 
 development:
   domain: <%= ENV.fetch('CANVAS_DEV_DOMAIN', 'canvas.docker') %>
+  files_domain: <%= ENV.fetch('CANVAS_DEV_DOMAIN', 'canvas.docker') %>
