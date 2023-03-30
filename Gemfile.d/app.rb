@@ -40,7 +40,7 @@ gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
 gem "active_model_serializers", "0.9.0alpha1",
     github: "rails-api/active_model_serializers", ref: "61882e1e4127facfe92e49057aec71edbe981829"
 gem "activerecord-pg-extensions", "0.4.4"
-gem "addressable", "2.7.0", require: false
+gem "addressable", "~> 2.8", require: false
 gem "after_transaction_commit", "2.2.2"
 gem "authlogic", "6.4.2"
   gem "scrypt", "3.0.7"

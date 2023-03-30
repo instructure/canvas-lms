@@ -20,6 +20,6 @@
 group :development, :test do
   gem "dress_code", "1.2.1"
   gem "bluecloth", "2.2.0" # for generating api docs
-  gem "yard", "0.9.25"
+  gem "yard", "~> 0.9"
   gem "yard-appendix", "0.1.8"
 end
