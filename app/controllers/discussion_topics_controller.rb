@@ -554,7 +554,7 @@ class DiscussionTopicsController < ApplicationController
 
     categories = []
     if can_set_group_category
-      categories = @context.group_categories
+      categories = @context.group_categories.to_a
       # if discussion has entries and is attached to a deleted group category,
       # add that category to the ENV list so it will be shown on the edit page.
       if @topic.group_category_deleted_with_entries?
