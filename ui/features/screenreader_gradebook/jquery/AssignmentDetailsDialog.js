@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import assignmentDetailsDialogTemplate from '../jst/AssignmentDetailsDialog.handlebars'
-import round from 'round'
+import round from '@canvas/round'
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 

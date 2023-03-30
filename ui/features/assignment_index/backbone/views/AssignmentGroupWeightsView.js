@@ -16,7 +16,7 @@
 
 import $ from 'jquery'
 import I18n from '@canvas/i18n'
-import round from 'round'
+import round from '@canvas/round'
 import Backbone from '@canvas/backbone'
 import AssignmentGroupWeightsTemplate from '../../jst/AssignmentGroupWeights.handlebars'
 import numberHelper from '@canvas/i18n/numberHelper'

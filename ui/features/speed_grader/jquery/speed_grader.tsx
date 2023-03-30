@@ -81,7 +81,7 @@ import {
   makeSubmissionUpdateRequest,
 } from '../SpeedGraderStatusMenuHelpers'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import round from 'round'
+import round from '@canvas/round'
 import _ from 'underscore'
 import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'

@@ -30,7 +30,7 @@ import {LatePolicyCamelized, LatePolicyValidationErrors} from '../gradebook.d'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import NumberHelper from '@canvas/i18n/numberHelper'
 
-import Round from 'round'
+import Round from '@canvas/round'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('gradebook')

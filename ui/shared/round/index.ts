@@ -19,9 +19,9 @@
 import Big from 'big.js'
 
 // rounds a number to 'n' digits
-export default function round(n, digits = 0) {
+export default function round(n: number | string | null, digits = 0) {
   try {
-    return parseFloat(Big(n).round(digits), 10)
+    return parseFloat(Big(n).round(digits))
   } catch (error) {
     return NaN
   }
