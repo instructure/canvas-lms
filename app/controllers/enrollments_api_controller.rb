@@ -448,12 +448,28 @@ class EnrollmentsApiController < ApplicationController
       end
 
       if params[:sis_user_id].present?
-        pseudonyms = @domain_root_account.pseudonyms.where(sis_user_id: params[:sis_user_id])
-        enrollments = if value_to_boolean(params[:created_for_sis_id])
-                        enrollments.where(sis_pseudonym: pseudonyms)
-                      else
-                        enrollments.where(user_id: pseudonyms.pluck(:user_id))
-                      end
+        enrollments =
+          if value_to_boolean(params[:created_for_sis_id])
+            pseudonyms = @domain_root_account.pseudonyms.where(sis_user_id: params[:sis_user_id])
+            enrollments.where(sis_pseudonym: pseudonyms)
+          else
+            user_ids = Set.new
+            filter_params = { include_inactive_enrollments: false }
+            sis_user_ids = Array.wrap(params[:sis_user_id])
+            sis_user_ids.each do |sis_id|
+              sis_id = sis_id.to_s
+              users = UserSearch.for_user_in_context(sis_id,
+                                                     @context,
+                                                     @current_user,
+                                                     filter_params)
+              users.find_each do |user|
+                if user.pseudonyms.shard(user).active.where(sis_user_id: sis_id).exists?
+                  user_ids << user.id
+                end
+              end
+            end
+            enrollments.where(user_id: user_ids)
+          end
       end
 
       if params[:sis_section_id].present?
