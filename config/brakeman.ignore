@@ -1184,6 +1184,29 @@
       "note": ""
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "c041acd84098433ca9432cdcd67d0c95382085a6ed4a7ceb73597d9bd235f62a",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 415,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql((\"(#{col} COLLATE #{Canvas::ICU.choose_pg12_collation(connection.icu_collations)})\" or \"CAST(LOWER(replace(#{col}, '\\\\', '\\\\\\\\')) AS bytea)\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveRecord::Base",
+        "method": "best_unicode_collation_key"
+      },
+      "user_input": "col",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Redirect",
       "warning_code": 18,
       "fingerprint": "c6e825e0dac404ef42cb2c45a2ae0b261e506f3c1ccebeadab67e0c289aaf8d6",
@@ -1449,29 +1472,6 @@
         "method": "perform"
       },
       "user_input": "object_id_string(objects.first)",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "e21673cdfc25cca379c03359be1119e5453a3736d403819b522b7d39c7f3e859",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 427,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql((unless @collkey.key?(Shard.current.database_server.id) then\n  @collkey ||= {}\n  @collkey[Shard.current.database_server.id] = connection.extension(:pg_collkey).schema\nend\nif collation = (Canvas::ICU.choose_pg12_collation(connection.icu_collations) and false) then\n  \"(#{col} COLLATE #{(Canvas::ICU.choose_pg12_collation(connection.icu_collations) and false)})\"\nelse\n  if schema = connection.extension(:pg_collkey).schema then\n    \"#{connection.extension(:pg_collkey).schema}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)\"\n  else\n    \"CAST(LOWER(replace(#{col}, '\\\\', '\\\\\\\\')) AS bytea)\"\n  end\nend))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ActiveRecord::Base",
-        "method": "best_unicode_collation_key"
-      },
-      "user_input": "col",
       "confidence": "Medium",
       "cwe_id": [
         89

@@ -43,20 +43,11 @@ module Lti
 
     # Helpers to be used by implementations
 
-    def collation_key(name)
-      db_sample_collation_key = BookmarkedCollection.best_unicode_collation_key("?").to_s
-      if db_sample_collation_key.include?("collkey") || db_sample_collation_key.include?("COLLATE")
-        Canvas::ICU.collation_key(name)
-      elsif db_sample_collation_key.include?("LOWER")
-        name.downcase
-      else
-        name # probably non-postgres
-      end
-    end
-
     def bookmark_for_name_and_id(name, id)
       name ||= ""
-      [collation_key(name), id, name]
+      # first element is simply so that BookmarkedCollection.merge can sort items
+      # in pure Ruby
+      [Canvas::ICU.collation_key(name), id, name]
     end
 
     def restrict_scope_by_name_and_id_fields(

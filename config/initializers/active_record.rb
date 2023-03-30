@@ -400,30 +400,18 @@ class ActiveRecord::Base
   end
 
   def self.best_unicode_collation_key(col)
-    val = begin
+    val =
       # For PostgreSQL, we can't trust a simple LOWER(column), with any collation, since
       # Postgres just defers to the C library which is different for each platform. The best
-      # choice is the collkey function from pg_collkey which uses ICU to get a full unicode sort.
-      # If that extension isn't around, casting to a bytea sucks for international characters,
+      # choice is to use an ICU collation to get a full unicode sort.
+      # If the collations aren't around, casting to a bytea sucks for international characters,
       # but at least it's consistent, and orders commas before letters so you don't end up with
       # Johnson, Bob sorting before Johns, Jimmy
-      unless @collkey&.key?(Shard.current.database_server.id)
-        @collkey ||= {}
-        @collkey[Shard.current.database_server.id] = connection.extension(:pg_collkey)&.schema
-      end
-      if (collation = Canvas::ICU.choose_pg12_collation(connection.icu_collations) && false)
+      if (collation = Canvas::ICU.choose_pg12_collation(connection.icu_collations))
         "(#{col} COLLATE #{collation})"
-      elsif (schema = @collkey[Shard.current.database_server.id])
-        # The collation level of 3 is the default, but is explicitly specified here and means that
-        # case, accents and base characters are all taken into account when creating a collation key
-        # for a string - more at https://pgxn.org/dist/pg_collkey/0.5.1/
-        # if you change these arguments, you need to rebuild all db indexes that use them,
-        # and you should also match the settings with Canvas::ICU::Collator and natcompare.js
-        "#{schema}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)"
       else
         "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
       end
-    end
     Arel.sql(val)
   end
 

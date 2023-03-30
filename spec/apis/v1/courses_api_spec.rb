@@ -3548,25 +3548,19 @@ describe CoursesController, type: :request do
           expect(json.map { |u| u["login_id"] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
         end
 
-        describe "localized sorting" do
-          before do
-            skip_unless_pg_collkey_present
-          end
+        it "uses course-level locale setting for sorting" do
+          n1 = "bee"
+          @student1.update_attribute(:sortable_name, n1)
+          n2 = "æee"
+          @student2.update_attribute(:sortable_name, n2)
+          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json", { controller: "courses", action: "users", course_id: @course1.id.to_s, format: "json" })
+          names = json.map { |s| s["sortable_name"] }
+          expect(names.index(n1) > names.index(n2)).to be_truthy
 
-          it "uses course-level locale setting for sorting" do
-            n1 = "bee"
-            @student1.update_attribute(:sortable_name, n1)
-            n2 = "æee"
-            @student2.update_attribute(:sortable_name, n2)
-            json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json", { controller: "courses", action: "users", course_id: @course1.id.to_s, format: "json" })
-            names = json.map { |s| s["sortable_name"] }
-            expect(names.index(n1) > names.index(n2)).to be_truthy
-
-            @course1.update_attribute(:locale, "is")
-            json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json", { controller: "courses", action: "users", course_id: @course1.id.to_s, format: "json" })
-            names = json.map { |s| s["sortable_name"] }
-            expect(names.index(n2) > names.index(n1)).to be_truthy
-          end
+          @course1.update_attribute(:locale, "is")
+          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json", { controller: "courses", action: "users", course_id: @course1.id.to_s, format: "json" })
+          names = json.map { |s| s["sortable_name"] }
+          expect(names.index(n2) > names.index(n1)).to be_truthy
         end
 
         describe "as a student" do

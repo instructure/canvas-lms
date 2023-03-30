@@ -72,7 +72,6 @@ describe GroupsController do
     end
 
     it "returns groups in sorted by group category name, then group name for student view" do
-      skip_unless_pg_collkey_present
       user_session(@student)
       category1 = @course.group_categories.create(name: "1")
       category2 = @course.group_categories.create(name: "2")

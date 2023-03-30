@@ -869,7 +869,7 @@ class UsersController < ApplicationController
       [
         c.enrollment_term.default_term? ? CanvasSort::First : CanvasSort::Last, # Default term first
         c.enrollment_term.start_at || CanvasSort::First, # Most recent start_at
-        c.sort_key # Alphabetical
+        Canvas::ICU.collation_key(c.name) # Alphabetical
       ]
     end[0, limit]
 
