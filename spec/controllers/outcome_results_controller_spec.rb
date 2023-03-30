@@ -473,14 +473,37 @@ describe OutcomeResultsController do
 
           it "OS results found - assignments are unique when aligned to two outcomes" do
             outcome2 = @course.created_learning_outcomes.create!(title: "outcome 2")
+            og = @course.root_outcome_group
+            og.add_outcome(outcome2)
             create_result(student.id, @outcome, @assignment, 2, { possible: 5 })
             mocked_results_1 = mock_os_lor_results(student, @outcome, @assignment2, 2)
             mocked_results_2 = mock_os_lor_results(student, outcome2, @assignment2, 2)
             expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(
               [mocked_results_1, mocked_results_2]
             )
-            json = parse_response(get_results({ user_ids: [student], include: ["assignments"] }))
+            json = parse_response(get_results({ user_ids: [student], include: ["assignments"], outcome_ids: [outcome2.id, @outcome.id] }))
             expect(json["outcome_results"].length).to be 3
+            expect(json["linked"]["assignments"].length).to be 2
+          end
+
+          it "OS results found - OS data is filtered correctly" do
+            assignment3 = create_outcome_assignment
+            find_or_create_outcome_submission({ student: student, assignment: assignment3 })
+            outcome2 = @course.created_learning_outcomes.create!(title: "outcome 2")
+            outcome3 = @course.created_learning_outcomes.create!(title: "outcome 3")
+            og = @course.root_outcome_group
+            og.add_outcome(outcome2)
+            og.add_outcome(outcome3)
+            create_result(student.id, @outcome, @assignment, 2, { possible: 5 })
+            mocked_results_1 = mock_os_lor_results(student, @outcome, @assignment2, 2)
+            mocked_results_2 = mock_os_lor_results(student, outcome2, @assignment, 2)
+            mocked_results_3 = mock_os_lor_results(student, outcome3, assignment3, 2)
+            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(
+              [mocked_results_1, mocked_results_2, mocked_results_3]
+            )
+            json = parse_response(get_results({ user_ids: [student], include: ["assignments"], outcome_ids: [@outcome.id] }))
+            # we should get 2 result: 1 from canvas and the other from OS
+            expect(json["outcome_results"].length).to be 2
             expect(json["linked"]["assignments"].length).to be 2
           end
         end

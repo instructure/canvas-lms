@@ -170,6 +170,7 @@ describe('fetchOutcomes', () => {
     rollupsResponse,
     resultsResponses,
     alignmentsResponse,
+    fullResponse = false,
   }) => {
     fetchMock.mock('/api/v1/courses/1/outcome_groups?per_page=100', groupsResponse)
     fetchMock.mock(
@@ -186,11 +187,18 @@ describe('fetchOutcomes', () => {
         ids.push(match[1])
       }
       const results = {outcome_results: [], linked: {assignments: []}}
-      ids.forEach(id => {
-        const response = resultsResponses[id] || {outcome_results: [], linked: {assignments: []}}
-        results.outcome_results.push(...response.outcome_results)
-        results.linked.assignments.push(...response.linked.assignments)
-      })
+      if (fullResponse) {
+        Object.values(resultsResponses).forEach(result => {
+          results.outcome_results.push(...result.outcome_results)
+          results.linked.assignments.push(...result.linked.assignments)
+        })
+      } else {
+        ids.forEach(id => {
+          const response = resultsResponses[id] || {outcome_results: [], linked: {assignments: []}}
+          results.outcome_results.push(...response.outcome_results)
+          results.linked.assignments.push(...response.linked.assignments)
+        })
+      }
       return results
     })
   }
@@ -246,7 +254,25 @@ describe('fetchOutcomes', () => {
       expect(outcomes.find(o => o.id === 12).results).toHaveLength(1)
     })
   })
-
+  it('handles an unexpected outcome result', () => {
+    /* the idea here is to simulate an outcome_results response
+       with elements not currently in the 'outcomeResultsByOutcomeId' variable
+       so that the array adds the inexisting index before pushing the data */
+    const responses = {...defaultResponses(), fullResponse: true}
+    for (let i = 3; i <= 10; i++) {
+      responses.linksResponse.push({
+        outcome_group: {id: i},
+        outcome: {
+          id: i,
+          title: `Outcome ${i}`,
+        },
+      })
+    }
+    mockAll(responses)
+    return fetchOutcomes(1, 2).then(({outcomes}) => {
+      expect(outcomes).toHaveLength(10)
+    })
+  })
   describe('fetchUrl', () => {
     let dispatch
 

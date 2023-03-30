@@ -106,6 +106,7 @@ const fetchOutcomes = (courseId, studentId) => {
         res.outcome_results
           .filter(r => !r.hidden)
           .forEach(r => {
+            outcomeResultsByOutcomeId[r.links.learning_outcome] ??= []
             outcomeResultsByOutcomeId[r.links.learning_outcome].push(r)
           })
         res.linked.assignments.forEach(a => {
