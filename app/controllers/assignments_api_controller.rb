@@ -1392,6 +1392,8 @@ class AssignmentsApiController < ApplicationController
       @assignment.updating_user = @current_user
       # update_api_assignment mutates params so this has to be done here
       opts = assignment_json_opts
+
+      @assignment.skip_downstream_changes! if params[:skip_downstream_changes].present?
       result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context)
       render_create_or_update_result(result, opts)
     end

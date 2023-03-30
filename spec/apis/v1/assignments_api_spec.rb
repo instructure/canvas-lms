@@ -5287,6 +5287,72 @@ describe AssignmentsApiController, type: :request do
         end
       end
     end
+
+    describe "skipping downstream changes" do
+      it "skips the mark downstream changes callback when the skip_downstream_changes param is passed and true" do
+        other_course = Account.default.courses.create!
+        template = MasterCourses::MasterTemplate.set_as_master_course(other_course)
+        original_assmt = other_course.assignments.create!(title: "blah", description: "bloo")
+        tag = template.create_content_tag_for!(original_assmt)
+
+        course_with_teacher(active_all: true)
+        subscription = MasterCourses::ChildSubscription.create!(master_template: template, child_course: @course)
+        @assignment = @course.assignments.create!(
+          name: "something",
+          migration_id: tag.migration_id
+        )
+        child_content_tag = MasterCourses::ChildContentTag.create!(
+          child_subscription: subscription,
+          content: @assignment
+        )
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+                 {
+                   controller: "assignments_api",
+                   action: "update",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   id: @assignment.id.to_s
+                 },
+                 { assignment: { points_possible: 50 }, skip_downstream_changes: true },
+                 {}, { expected_status: 200 })
+
+        expect(@assignment.reload.points_possible).to eq 50
+        expect(child_content_tag.reload.downstream_changes).to be_empty
+      end
+
+      it "marks downstream changes when the skip_downstream_changes is not passed" do
+        other_course = Account.default.courses.create!
+        template = MasterCourses::MasterTemplate.set_as_master_course(other_course)
+        original_assmt = other_course.assignments.create!(title: "blah", description: "bloo")
+        tag = template.create_content_tag_for!(original_assmt)
+
+        course_with_teacher(active_all: true)
+        subscription = MasterCourses::ChildSubscription.create!(master_template: template, child_course: @course)
+        @assignment = @course.assignments.create!(
+          name: "something",
+          migration_id: tag.migration_id
+        )
+        child_content_tag = MasterCourses::ChildContentTag.create!(
+          child_subscription: subscription,
+          content: @assignment
+        )
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+                 {
+                   controller: "assignments_api",
+                   action: "update",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   id: @assignment.id.to_s
+                 },
+                 { assignment: { points_possible: 50 } },
+                 {}, { expected_status: 200 })
+
+        expect(@assignment.reload.points_possible).to eq 50
+        expect(child_content_tag.reload.downstream_changes).not_to be_empty
+      end
+    end
   end
 
   describe "DELETE /courses/:course_id/assignments/:id (#delete)" do
