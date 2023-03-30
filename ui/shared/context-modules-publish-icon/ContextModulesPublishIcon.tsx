@@ -26,7 +26,7 @@ import {Menu} from '@instructure/ui-menu'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -43,13 +43,14 @@ interface Props {
 const ContextModulesPublishIcon: React.FC<Props> = ({courseId, moduleId, published}) => {
   const [isPublished, setIsPublished] = useState(published)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState(null)
 
   const statusIcon = () => {
     const iconStyles = {
       paddingLeft: '0.25rem',
     }
     if (isPublishing) {
-      return <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
+      return <Spinner renderTitle={loadingMessage} size="x-small" />
     } else if (isPublished) {
       return (
         <>
@@ -67,7 +68,11 @@ const ContextModulesPublishIcon: React.FC<Props> = ({courseId, moduleId, publish
     }
   }
 
-  const updateApiCall = (newPublishedState: boolean, skipModuleItems: boolean = false) => {
+  const updateApiCall = (
+    newPublishedState: boolean,
+    skipModuleItems: boolean,
+    successMessage: string
+  ) => {
     if (isPublishing) return
 
     const path = `/api/v1/courses/${courseId}/modules/${moduleId}`
@@ -85,6 +90,11 @@ const ContextModulesPublishIcon: React.FC<Props> = ({courseId, moduleId, publish
     })
       .then(result => {
         setIsPublished(result.json.published)
+        showFlashAlert({
+          message: successMessage,
+          type: 'success',
+          srOnly: true,
+        })
         fetchModuleItemPublishedState()
       })
       .catch(error => showFlashError(I18n.t('There was an error while saving your changes'))(error))
@@ -120,27 +130,30 @@ const ContextModulesPublishIcon: React.FC<Props> = ({courseId, moduleId, publish
   }
 
   const unpublishAll = () => {
-    updateApiCall(false)
+    setLoadingMessage(I18n.t('Unpublishing module and items'))
+    updateApiCall(false, false, I18n.t('Module and items unpublished'))
   }
 
   const publishAll = () => {
-    updateApiCall(true)
+    setLoadingMessage(I18n.t('Publishing module and items'))
+    updateApiCall(true, false, I18n.t('Module and items published'))
   }
 
   const publishModuleOnly = () => {
-    updateApiCall(true, true)
+    setLoadingMessage(I18n.t('Publishing module'))
+    updateApiCall(true, true, I18n.t('Module published'))
   }
 
   return (
     <View textAlign="center">
       <Menu
         placement="bottom"
+        show={isPublishing ? false : undefined}
         trigger={
           <IconButton withBorder={false} screenReaderLabel={I18n.t('Module publish menu')}>
             {statusIcon()}
           </IconButton>
         }
-        disabled={isPublishing}
       >
         <Menu.Item onClick={publishAll}>
           <IconPublishSolid color="success" /> {I18n.t('Publish module and all items')}

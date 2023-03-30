@@ -17,11 +17,10 @@
  */
 
 import React from 'react'
-import {act, render} from '@testing-library/react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
+import {act, render, waitFor} from '@testing-library/react'
+import fetchMock from 'fetch-mock'
 
-jest.mock('@canvas/do-fetch-api-effect')
+import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
 
 const defaultProps = {
   courseId: '1',
@@ -29,24 +28,17 @@ const defaultProps = {
   published: true,
 }
 
-beforeAll(() => {
-  doFetchApi
-    .mockResolvedValue({response: {ok: true}, json: {published: true}})
-    .mockResolvedValueOnce({response: {ok: true}, json: {published: true}})
-    .mockResolvedValueOnce({response: {ok: true}, json: []})
-    .mockResolvedValueOnce({response: {ok: true}, json: {published: true}})
-    .mockResolvedValueOnce({response: {ok: true}, json: []})
-})
-
-beforeEach(() => {
-  doFetchApi.mockClear()
-})
-
-afterEach(() => {
-  jest.clearAllMocks()
-})
+const PUBLISH_URL = '/api/v1/courses/1/modules/1'
 
 describe('ContextModulesPublishIcon', () => {
+  beforeEach(() => {
+    fetchMock.get('/api/v1/courses/1/modules/1/items', 200)
+  })
+
+  afterEach(() => {
+    fetchMock.restore()
+  })
+
   it('renders the menu when clicked', () => {
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
     const menuButton = getByRole('button')
@@ -56,42 +48,42 @@ describe('ContextModulesPublishIcon', () => {
     expect(getByText('Unpublish module and all items')).toBeInTheDocument()
   })
 
-  it('calls publishAll when clicked publish all menu item is clicked', () => {
+  it('calls publishAll when clicked publish all menu item is clicked', async () => {
+    fetchMock.put(PUBLISH_URL, {
+      module: {published: true, skip_content_tags: false},
+    })
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button')
+    const menuButton = getByRole('button', {name: 'Module publish menu'})
     act(() => menuButton.click())
     const publishButton = getByText('Publish module and all items')
     act(() => publishButton.click())
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/courses/1/modules/1',
-      method: 'PUT',
-      body: {module: {published: true, skip_content_tags: false}},
-    })
+    await waitFor(() => expect(getByText('Publishing module and items')).toBeInTheDocument())
+    expect(getByText('Module and items published')).toBeInTheDocument()
   })
 
-  it('calls publishModuleOnly when clicked publish module menu item is clicked', () => {
+  it('calls publishModuleOnly when clicked publish module menu item is clicked', async () => {
+    fetchMock.put(PUBLISH_URL, {
+      module: {published: true, skip_content_tags: true},
+    })
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button')
+    const menuButton = getByRole('button', {name: 'Module publish menu'})
     act(() => menuButton.click())
     const publishButton = getByText('Publish module only')
     act(() => publishButton.click())
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/courses/1/modules/1',
-      method: 'PUT',
-      body: {module: {published: true, skip_content_tags: true}},
-    })
+    await waitFor(() => expect(getByText('Publishing module')).toBeInTheDocument())
+    expect(getByText('Module published')).toBeInTheDocument()
   })
 
-  it('calls unpublishAll when clicked unpublish all items is clicked', () => {
+  it('calls unpublishAll when clicked unpublish all items is clicked', async () => {
+    fetchMock.put(PUBLISH_URL, {
+      module: {published: false, skip_content_tags: false},
+    })
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
-    const menuButton = getByRole('button')
+    const menuButton = getByRole('button', {name: 'Module publish menu'})
     act(() => menuButton.click())
     const publishButton = getByText('Unpublish module and all items')
     act(() => publishButton.click())
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/courses/1/modules/1',
-      method: 'PUT',
-      body: {module: {published: false, skip_content_tags: false}},
-    })
+    await waitFor(() => expect(getByText('Unpublishing module and items')).toBeInTheDocument())
+    expect(getByText('Module and items unpublished')).toBeInTheDocument()
   })
 })
