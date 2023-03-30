@@ -62,15 +62,19 @@ Migration/Tagged:
 
 Naming:
   Severity: error
+Naming/FileName:
+  Exclude:
+    - "**/Gemfile.d/~after.rb"
+    - "**/urn_*.rb"
+    - "**/fixtures/**/*.rb"
+    - "config/locales/*.rb" # names must match locale names
+    - "spec/selenium/a11y_and_i18n/localized-timezone-lists_spec.rb" # matches JS file it tests
 Naming/HeredocDelimiterNaming:
   ForbiddenDelimiters:
     # negative regex - these are the _allowed_ delimiters
     # any you add should describe the format of the data, not describe
     # what the data is for. this allows editors to syntax highlight
     - ^(?!AST|BASE64|CSV|GQL|HTML|JS|MD|PEM|REGEX|RUBY|SQL|SRT|TEXT|XML|YAML|PATTERN).+$
-Naming/FileName:
-  Exclude:
-    - "config/locales/*.rb"
 
 Performance:
   Severity: error
@@ -234,10 +238,6 @@ Naming/ClassAndModuleCamelCase:
   Severity: convention
 Naming/ConstantName:
   Severity: convention
-Naming/FileName:
-  Severity: convention
-  Exclude:
-    - "**/Gemfile.d/~after.rb"
 Naming/MemoizedInstanceVariableName:
   Severity: convention
 Naming/MethodName:
