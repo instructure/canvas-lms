@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import pluralize from 'str-pluralize'
+import pluralize from '@canvas/str-pluralize'
 import {gql} from '@canvas/apollo'
 
 export const ACCOUNT_OUTCOME_PROFICIENCY_QUERY = gql`
