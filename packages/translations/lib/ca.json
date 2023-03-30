@@ -11,8 +11,17 @@
     "accessibility_checker_b3af1f6c": {
         "message": "Verificador d''accessibilitat"
     },
+    "action_to_take_b626a99a": {
+        "message": "Accions que s’han de dur a terme:"
+    },
     "add_8523c19b": {
         "message": "Afegeix"
+    },
+    "add_a_caption_2a915239": {
+        "message": "Afegiu un subtítol"
+    },
+    "add_alt_text_for_the_image_48cd88aa": {
+        "message": "Afegiu text alternatiu per a la imatge"
     },
     "add_another_f4e50d57": {
         "message": "Afegeix-ne un altre"
@@ -29,8 +38,14 @@
     "add_to_do_7def3c37": {
         "message": "Afegeix les tasques pendents"
     },
+    "additional_considerations_f3801683": {
+        "message": "Consideracions addicionals"
+    },
     "address_3159962f": {
         "message": "Adreça:"
+    },
+    "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+        "message": "Els enllaços adjacents amb el mateix URL han de constituir un sol enllaç."
     },
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
@@ -61,6 +76,9 @@
     },
     "alphabetical_55b5b4e0": {
         "message": "Alfabètic"
+    },
+    "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+        "message": "El text d’atribut alternatiu no ha de contenir més de 120 caràcters."
     },
     "alt_text_611fb322": {
         "message": "Text alternatiu"
@@ -272,6 +290,24 @@
     "centered_horizontal_dots_451c5815": {
         "message": "Punts horitzontals centrats"
     },
+    "change_alt_text_92654906": {
+        "message": "Canvieu el text alternatiu"
+    },
+    "change_heading_tag_to_paragraph_a61e3113": {
+        "message": "Canvieu l’etiqueta de capçalera per la de paràgraf"
+    },
+    "change_only_this_heading_s_level_903cc956": {
+        "message": "Canvieu únicament el nivell d’aquesta capçalera"
+    },
+    "change_text_color_1aecb912": {
+        "message": "Canvieu el color del text"
+    },
+    "check_accessibility_3c78211c": {
+        "message": "Comproveu l''accessibilitat"
+    },
+    "checking_for_accessibility_issues_fac18c6d": {
+        "message": "S''estan comprovant els problemes d''accessibilitat"
+    },
     "chi_54a32644": {
         "message": "Ksi"
     },
@@ -323,6 +359,9 @@
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Tanca un menú o un quadre de diàleg També us torna a l''àrea d''editor"
     },
+    "close_accessibility_checker_29d1c51e": {
+        "message": "Tanca el verificador d''accessibilitat"
+    },
     "close_d634289d": {
         "message": "Tanca"
     },
@@ -349,6 +388,12 @@
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Selector de color (s’ha seleccionat el color { colorName })"
+    },
+    "column_e1ae5c64": {
+        "message": "Columna"
+    },
+    "column_group_1c062368": {
+        "message": "Grup de columnes"
     },
     "complex_numbers_a543d004": {
         "message": "Números complexos"
@@ -484,6 +529,9 @@
     },
     "decorative_icon_9a7f3fc3": {
         "message": "Icona decorativa"
+    },
+    "decorative_image_fde98579": {
+        "message": "Imatge decorativa"
     },
     "decorative_type_upper_f2c95e3": {
         "message": "{ TYPE_UPPER } decoratiu"
@@ -655,6 +703,9 @@
     },
     "editor_statusbar_26ac81fc": {
         "message": "Editor de la barra d''estat"
+    },
+    "element_starting_with_start_91bf4c3b": {
+        "message": "L’element comença per { start }"
     },
     "embed_828fac4a": {
         "message": "Integra"
@@ -851,6 +902,9 @@
     "finnish_4df2923d": {
         "message": "Finès"
     },
+    "fix_heading_hierarchy_f60884c4": {
+        "message": "Corregiu la jerarquia de capçaleres"
+    },
     "flat_music_76d5a5c3": {
         "message": "Bemoll (música)"
     },
@@ -865,6 +919,9 @@
     },
     "format_4247a9c5": {
         "message": "Format"
+    },
+    "format_as_a_list_142210c3": {
+        "message": "Utilitzeu un format de llista"
     },
     "formatting_5b143aa8": {
         "message": "S''està formatant"
@@ -977,6 +1034,15 @@
     "hat_ea321e35": {
         "message": "Barret"
     },
+    "header_column_f27433cb": {
+        "message": "Columna de la capçalera"
+    },
+    "header_row_and_column_ec5b9ec": {
+        "message": "Fila i columna de la capçalera"
+    },
+    "header_row_f33eb169": {
+        "message": "Fila de la capçalera"
+    },
     "heading_2_5b84eed2": {
         "message": "Capçalera 2"
     },
@@ -985,6 +1051,15 @@
     },
     "heading_4_b2e74be7": {
         "message": "Capçalera 4"
+    },
+    "heading_levels_should_not_be_skipped_3947c0e0": {
+        "message": "No s’han d’ometre els nivells de les capçaleres"
+    },
+    "heading_starting_with_start_42a3e7f9": {
+        "message": "La capçalera comença per { start }"
+    },
+    "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+        "message": "Les capçaleres no han de contenir més de 120 caràcters."
     },
     "health_icon_8d292eb5": {
         "message": "Icona de salut"
@@ -1006,6 +1081,9 @@
     },
     "hide_title_description_caf092ef": {
         "message": "Amaga la descripció de { title }"
+    },
+    "highlight_an_element_to_activate_the_element_optio_60e1e56b": {
+        "message": "Ressalteu un element per activar la barra d''eines de les opcions d''element"
     },
     "hindi_9bcd4b34": {
         "message": "Hindi"
@@ -1067,6 +1145,9 @@
     "image_c1c98202": {
         "message": "imatge"
     },
+    "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+        "message": "No s’han d’utilitzar els noms de fitxer de les imatges com l’atribut alternatiu que descriu el contingut de les imatges."
+    },
     "image_options_5412d02c": {
         "message": "Opcions d''imatge"
     },
@@ -1076,8 +1157,14 @@
     "image_to_crop_3a34487d": {
         "message": "Imatge que cal retallar"
     },
+    "image_with_filename_file_aacd7180": {
+        "message": "Imatge amb el nom de fitxer { file }"
+    },
     "images_7ce26570": {
         "message": "Imatges"
+    },
+    "images_should_include_an_alt_attribute_describing__b86d6a86": {
+        "message": "Les imatges han d’incloure un atribut alternatiu que en descrigui el contingut."
     },
     "imaginary_portion_of_complex_number_2c733ffa": {
         "message": "Porció imaginària (d’un número complex)"
@@ -1130,6 +1217,9 @@
     "irish_567e109f": {
         "message": "Irlandès"
     },
+    "issue_num_total_f94536cf": {
+        "message": "Problema { num } de { total }"
+    },
     "italian_bd3c792d": {
         "message": "Italià"
     },
@@ -1163,6 +1253,9 @@
     "keyboard_shortcuts_ed1844bd": {
         "message": "Dreceres del teclat"
     },
+    "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+        "message": "Al teclat, podeu utilitzar la tecla Tab per anar als enllaços. Dos enllaços adjacents que dirigeixin a la mateixa destinació poden resultar confusos per als usuaris de teclats."
+    },
     "korean_da812d9": {
         "message": "Coreà"
     },
@@ -1186,6 +1279,39 @@
     },
     "latvian_2bbb6aab": {
         "message": "Letó"
+    },
+    "learn_more_about_adjacent_links_2cb9762c": {
+        "message": "Obteniu més informació sobre els enllaços adjacents"
+    },
+    "learn_more_about_color_contrast_c019dfb9": {
+        "message": "Obteniu més informació sobre el contrast de color"
+    },
+    "learn_more_about_organizing_page_headings_8a7caa2e": {
+        "message": "Obteniu més informació sobre l’organització de les capçaleres de la pàgina"
+    },
+    "learn_more_about_proper_page_heading_structure_d2959f2d": {
+        "message": "Obteniu més informació sobre l’estructura adequada de les capçaleres de la pàgina"
+    },
+    "learn_more_about_table_headers_5f5ee13": {
+        "message": "Obteniu més informació sobre les capçaleres de la taula"
+    },
+    "learn_more_about_using_alt_text_for_images_5698df9a": {
+        "message": "Obteniu més informació sobre l’ús del text alternatiu per a les imatges"
+    },
+    "learn_more_about_using_captions_with_tables_36fe496f": {
+        "message": "Obteniu més informació sobre l’ús de subtítols amb taules"
+    },
+    "learn_more_about_using_filenames_as_alt_text_264286af": {
+        "message": "Obteniu més informació sobre l’ús dels noms de fitxer com a text alternatiu"
+    },
+    "learn_more_about_using_lists_4e6eb860": {
+        "message": "Obteniu més informació sobre l’ús de les llistes"
+    },
+    "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+        "message": "Obteniu més informació sobre l’ús dels atributs d''abast amb taules"
+    },
+    "leave_as_is_4facfe55": {
+        "message": "Deixeu tal com està"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Parèntesi angular esquerre"
@@ -1238,11 +1364,17 @@
     "link_options_a16b758b": {
         "message": "Opcions d''enllaç"
     },
+    "link_with_text_starting_with_start_b3fcbe71": {
+        "message": "L’enllaç conté text que comença per { start }"
+    },
     "links_14b70841": {
         "message": "Enllaços"
     },
     "links_to_an_external_site_de74145d": {
         "message": "Enllaça a un lloc extern."
+    },
+    "lists_should_be_formatted_as_lists_f862de8d": {
+        "message": "Les llistes han de tenir el format de llista."
     },
     "lithuanian_5adcbe24": {
         "message": "Lituà"
@@ -1352,6 +1484,9 @@
     "medium_5a8e9ead": {
         "message": "Mitjà"
     },
+    "merge_links_2478df96": {
+        "message": "Fusiona els enllaços"
+    },
     "mic_a7f3d311": {
         "message": "Micròfon"
     },
@@ -1451,8 +1586,14 @@
     "new_opportunities_7d349c4d": {
         "message": "Oportunitats noves"
     },
+    "next_40e12421": {
+        "message": "Següent"
+    },
     "next_month_749b1778": {
         "message": "El mes que ve"
+    },
+    "no_accessibility_issues_were_detected_f8d3c875": {
+        "message": "No s’ha detectat cap problema d’accessibilitat."
     },
     "no_changes_to_save_d29f6e91": {
         "message": "No hi ha cap canvi per desar."
@@ -1468,6 +1609,9 @@
     },
     "no_grade_3b4d7f3e": {
         "message": "Sense nota"
+    },
+    "no_headers_9bc7dc7f": {
+        "message": "No hi ha cap capçalera"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "No hi ha cap visualització prèvia disponible per a aquest fitxer."
@@ -1607,6 +1751,9 @@
     "paragraph_5e5ad8eb": {
         "message": "Paràgraf"
     },
+    "paragraph_starting_with_start_a59923f8": {
+        "message": "El paràgraf comença per { start }"
+    },
     "parallel_d55d6e38": {
         "message": "Paral·lel"
     },
@@ -1712,6 +1859,9 @@
     "preformatted_d0670862": {
         "message": "Amb format previ"
     },
+    "prev_f82cbc48": {
+        "message": "Anterior"
+    },
     "preview_53003fd2": {
         "message": "Visualització prèvia"
     },
@@ -1799,6 +1949,9 @@
     "reminder_date_4564d12d": {
         "message": "Recordatori: { date }"
     },
+    "remove_heading_style_5fdc8855": {
+        "message": "Suprimeix l''estil de la capçalera"
+    },
     "replace_e61834a7": {
         "message": "Substitueix"
     },
@@ -1825,6 +1978,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Editor de contingut enriquit"
+    },
+    "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
+        "message": "Àrea de text enriquit. Premeu { OSKey }+F8 per accedir a les dreceres de l’editor de contingut enriquit."
     },
     "right_angle_bracket_d704e2d6": {
         "message": "Parèntesi angular dret"
@@ -1871,6 +2027,12 @@
     "rotation_9699c538": {
         "message": "Rotació"
     },
+    "row_fc0944a7": {
+        "message": "Fila"
+    },
+    "row_group_979f5528": {
+        "message": "Grup de files"
+    },
     "russian_1e3e197": {
         "message": "Rus"
     },
@@ -1880,6 +2042,9 @@
     "save_11a80ec3": {
         "message": "Desa"
     },
+    "save_copy_ca63944e": {
+        "message": "Desa la còpia"
+    },
     "save_media_cb9e786e": {
         "message": "Desa l’element multimèdia"
     },
@@ -1888,6 +2053,24 @@
     },
     "science_8d92214a": {
         "message": "Ciència"
+    },
+    "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+        "message": "Els lectors de pantalla no poden determinar què es mostra en una imatge sense text alternatiu, i els noms de fitxer són sovint cadenes sense sentit de números i lletres que no descriuen ni el context ni el significat."
+    },
+    "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+        "message": "Els lectors de pantalla no poden determinar què es mostra en una imatge sense text alternatiu, que és precisament allò que descriu el contingut i el significat de la imatge. El text alternatiu ha de ser senzill i concís."
+    },
+    "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+        "message": "Els lectors de pantalla no poden determinar què es mostra en una imatge sense text alternatiu, que és precisament allò que descriu el contingut i el significat de la imatge."
+    },
+    "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+        "message": "Els lectors de pantalla no poden interpretar taules que no tenen l''estructura adequada. Les capçaleres de la taula proporcionen l''abast de la direcció i del contingut."
+    },
+    "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+        "message": "Els lectors de pantalla no poden interpretar taules que no tenen l''estructura adequada. Els subtítols de la taula en descriuen el context i el significat general."
+    },
+    "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+        "message": "Els lectors de pantalla no poden interpretar taules que no tenen l''estructura adequada. Les capçaleres de la taula proporcionen la direcció i una visió general del contingut."
     },
     "script_l_42a7b254": {
         "message": "Script L"
@@ -1919,11 +2102,20 @@
     "serbian_7187f1f2": {
         "message": "Serbi"
     },
+    "set_header_scope_8c548f40": {
+        "message": "Establiu l’abast de la capçalera"
+    },
     "set_minus_b46e9b88": {
         "message": "Conjunt menys"
     },
+    "set_table_header_cfab13a0": {
+        "message": "Establiu la capçalera de la taula"
+    },
     "sharp_music_ab956814": {
         "message": "Sostingut (música)"
+    },
+    "shift_arrows_4d5785fe": {
+        "message": "SHIFT+fletxes"
     },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "Premeu Maj+O per obrir l''editor de dades HTML processades."
@@ -1936,6 +2128,12 @@
     },
     "show_my_grades_ebd08684": {
         "message": "Mostra Les meves notes"
+    },
+    "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+        "message": "Els usuaris vistos naveguen ràpidament per les pàgines web i hi cerquen capçaleres grans o en negreta. Els usuaris del lector de pantalla es basen en les capçaleres per obtenir-ne el significat contextual. Les capçaleres han de tenir l''estructura adequada."
+    },
+    "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+        "message": "Els usuaris vistos naveguen ràpidament per les pàgines web i hi cerquen capçaleres grans o en negreta. Els usuaris del lector de pantalla es basen en les capçaleres per obtenir-ne el significat contextual. Les capçaleres han de ser concises dins de l''estructura adequada."
     },
     "sigma_5c35e553": {
         "message": "Sigma"
@@ -2123,6 +2321,21 @@
     "tab_arrows_4cf5abfc": {
         "message": "TAB/fletxes"
     },
+    "table_header_starting_with_start_ffcabba6": {
+        "message": "La capçalera de la taula comença per { start }"
+    },
+    "table_starting_with_start_e7232848": {
+        "message": "La taula comença per { start }"
+    },
+    "tables_headers_should_specify_scope_5abf3a8e": {
+        "message": "Les capçaleres de les taules han d’especificar l''abast."
+    },
+    "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+        "message": "Les taules han d’incloure un subtítol en què se’n descrigui el contingut."
+    },
+    "tables_should_include_at_least_one_header_48779eac": {
+        "message": "Les taules han d’incloure una capçalera com a mínim."
+    },
     "tagalog_74906db7": {
         "message": "Tagal"
     },
@@ -2144,6 +2357,12 @@
     "text_color_acf75eb6": {
         "message": "Color del text"
     },
+    "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+        "message": "Si no hi ha suficient contrast entre el fons i el text, pot costar llegir-lo, sobretot a les persones amb deteriorament visual."
+    },
+    "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+        "message": "El text més gran de 18 punts (o en negreta de 14 punts) ha de tenir una relació de contrast de 3:1 com a mínim."
+    },
     "text_optional_384f94f7": {
         "message": "Text (opcional)"
     },
@@ -2152,6 +2371,9 @@
     },
     "text_size_887c2f6": {
         "message": "Mida del text"
+    },
+    "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+        "message": "El text més petit de 18 punts (o en negreta de 14 punts) ha de tenir una relació de contrast de 4:5:1 com a mínim."
     },
     "thai_8f9bc548": {
         "message": "Tailandès"
@@ -2164,6 +2386,9 @@
     },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "La visualització prèvia del document s''està processant actualment. Torneu a provar-ho més endavant."
+    },
+    "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
+        "message": "La primera capçalera d’una pàgina ha de ser una H2."
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "El material és de domini públic"
@@ -2492,14 +2717,23 @@
     "webcam_fe91b20f": {
         "message": "Càmera web"
     },
+    "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
+        "message": "Les pàgines web han de tenir una sola H1, que s’utilitza automàticament per al títol de la pàgina. La primera capçalera del contingut ha de ser una H2."
+    },
     "weekly_schedule_navigation_6b042645": {
         "message": "Navegació per la planificació setmanal"
     },
     "welsh_42ab94b1": {
         "message": "Gal·lès"
     },
+    "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+        "message": "Quan s’utilitza un marcatge que formata visualment els elements com una llista, però no indica la relació de la llista, és possible que els usuaris tinguin dificultats per navegar a través de la informació."
+    },
     "white_87fa64fd": {
         "message": "Blanc"
+    },
+    "why_523b3d8c": {
+        "message": "Per què"
     },
     "width_492fec76": {
         "message": "Amplada"
@@ -2536,6 +2770,9 @@
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Teniu canvis sense desar a la safata del Creador d’icones. Voleu continuar sense desar aquests canvis?"
+    },
+    "you_may_need_to_adjust_additional_headings_to_main_975f0eee": {
+        "message": "Pot ser que hàgiu d’ajustar altres capçaleres per mantenir la jerarquia de la pàgina."
     },
     "you_may_not_upload_an_empty_file_11c31eb2": {
         "message": "No podeu penjar cap fitxer buit."
