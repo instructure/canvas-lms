@@ -720,6 +720,7 @@ export default AssignmentListItemView = (function () {
 
       if (json.submission != null) {
         json.submission.gradingType = json.gradingType
+        json.submission.restrict_quantitative_data = json.restrict_quantitative_data // This is so this variable is accessible on the {{#with submission}} block.
       }
 
       if (json.gradingType === 'not_graded') {

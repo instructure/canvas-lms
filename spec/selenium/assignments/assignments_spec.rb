@@ -669,6 +669,45 @@ describe "assignments" do
             .text).to match "14/15 pts"
       end
 
+      context "with restrict_quantitative_data" do
+        context "turned off" do
+          it "shows submission score and letter grade for students on index page", priority: "2" do
+            @assignment.update(points_possible: 10, grading_type: "letter_grade")
+            @assignment.publish
+            course_with_student_logged_in(active_all: true, course: @course)
+            @assignment.grade_student(@student, grade: 10, grader: @teacher)
+
+            get "/courses/#{@course.id}/assignments"
+            wait_for_ajaximations
+
+            expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "10/10 pts  |  A"
+            expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Score: 10 out of 10 points. Grade: A"
+          end
+        end
+
+        context "turned on" do
+          before do
+            Account.default.enable_feature! :restrict_quantitative_data
+            Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+            Account.default.save!
+            Account.default.reload
+          end
+
+          it "shows only submission letter grade for students on index page", priority: "2" do
+            @assignment.update(points_possible: 10, grading_type: "letter_grade")
+            @assignment.publish
+            course_with_student_logged_in(active_all: true, course: @course)
+            @assignment.grade_student(@student, grade: 10, grader: @teacher)
+
+            get "/courses/#{@course.id}/assignments"
+            wait_for_ajaximations
+
+            expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "A"
+            expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: A"
+          end
+        end
+      end
+
       it "allows publishing from the show page", priority: "1" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 

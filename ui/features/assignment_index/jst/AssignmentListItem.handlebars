@@ -97,20 +97,25 @@
           <div class="ig-details__item assignment-date-due" data-view="date-due">
           </div>
         {{/if}}
-        {{#if pointsPossible}}
-          <div class="ig-details__item js-score">
-            <span class="screenreader-only">
-              {{#t}}{{n pointsPossible}} Points Possible{{/t}}
-            </span>
-            <span class="non-screenreader" aria-hidden="true">
-              {{#t}}{{n pointsPossible}} pts{{/t}}
-            </span>
-          </div>
+        {{#unless restrict_quantitative_data}}
+            {{#if pointsPossible}}
+              <div class="ig-details__item js-score">
+                <span class="screenreader-only">
+                  {{#t}}{{n pointsPossible}} Points Possible{{/t}}
+                </span>
+                <span class="non-screenreader" aria-hidden="true">
+                  {{#t}}{{n pointsPossible}} pts{{/t}}
+                </span>
+              </div>
+            {{else}}
+              <span class="js-score screenreader-only">
+                {{#t}}No Points Possible{{/t}}
+              </span>
+            {{/if}}
         {{else}}
-          <span class="js-score screenreader-only">
-            {{#t}}No Points Possible{{/t}}
-          </span>
-        {{/if}}
+            <div class="ig-details__item js-score">
+            </div>
+        {{/unless}}
         {{#if isMasteryConnectTool}}
           <div class="ig-details__item mc-objectives">{{externalToolData.objectives}}</div>
         {{/if}}

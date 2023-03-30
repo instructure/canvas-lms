@@ -8,27 +8,31 @@
         {{#with submission}}
           {{#if notYetGraded}}
 
-            <span class="score-display">
-            {{#t "empty_points_possible"}}
-            -/{{pointsPossible}} pts
-            {{/t}}
-            </span>
-            &nbsp;&#124;&nbsp;
-            <span class="grade-display">
-            {{#t}}
-              Not Yet Graded
-            {{/t}}
-            </span>
+            {{#unless restrict_quantitative_data}}
+                <span class="score-display">
+                {{#t "empty_points_possible"}}
+                -/{{pointsPossible}} pts
+                {{/t}}
+                </span>
+                &nbsp;&#124;&nbsp;
+                <span class="grade-display">
+                {{#t}}
+                  Not Yet Graded
+                {{/t}}
+                </span>
+            {{/unless}}
 
           {{else}}
-            <span class="score-display">
-                {{#t "score_with_points_possible"}}
-                <b>{{score}}</b>/{{pointsPossible}} pts
-                {{/t}}
-            </span>
-            {{#ifAll gradeDisplay pointsPossible}}
-              &nbsp;&#124;&nbsp;
-            {{/ifAll}}
+            {{#unless restrict_quantitative_data}}
+                <span class="score-display">
+                    {{#t "score_with_points_possible"}}
+                    <b>{{score}}</b>/{{pointsPossible}} pts
+                    {{/t}}
+                </span>
+                {{#ifAll gradeDisplay pointsPossible}}
+                  &nbsp;&#124;&nbsp;
+                {{/ifAll}}
+            {{/unless}}
             {{#if gradeDisplay}}
               <span class="grade-display">
                 <strong>
@@ -41,12 +45,13 @@
         {{/with}}
 
       {{else}}
-
-        <span data-tooltip="" class="score-display" title='{{#t "no_submission"}}No Submission{{/t}}'>
-          {{#t "empty_points_possible"}}
-          -/{{pointsPossible}} pts
-          {{/t}}
-        </span>
+          {{#unless restrict_quantitative_data}}
+            <span data-tooltip="" class="score-display" title='{{#t "no_submission"}}No Submission{{/t}}'>
+              {{#t "empty_points_possible"}}
+              -/{{pointsPossible}} pts
+              {{/t}}
+            </span>
+          {{/unless}}
 
       {{/ifAll}}
     {{/ifAll}}
@@ -67,16 +72,26 @@
         {{#with submission}}
           {{#if notYetGraded}}
 
-            {{#t "assignment_not_yet_graded_screenreader"}}
-              Assignment not yet graded. {{pointsPossible}} points possible.
-            {{/t}}
+            {{#if restrict_quantitative_data}}
+                {{#t "assignment_not_yet_graded_rqd_screenreader"}}
+                    Assignment not yet graded.
+                {{/t}}
+            {{else}}
+                {{#t "assignment_not_yet_graded_screenreader"}}
+                  Assignment not yet graded. {{pointsPossible}} points possible.
+                {{/t}}
+            {{/if}}
 
           {{else}}
 
-            {{#t "score_with_points_possible_screenreader"}}
-              Score: {{score}} out of {{pointsPossible}} points.
-            {{/t}}
-            {{gradeDisplayForScreenreader}}
+            {{#if restrict_quantitative_data}}
+                {{gradeDisplayForScreenreader}}
+            {{else}}
+                {{#t "score_with_points_possible_screenreader"}}
+                  Score: {{score}} out of {{pointsPossible}} points.
+                {{/t}}
+                {{gradeDisplayForScreenreader}}
+            {{/if}}
 
           {{/if}}
 
@@ -84,9 +99,15 @@
 
       {{else}}
 
-        {{#t "no_submission_for_assignment_screenreader"}}
-          No submission for this assignment. {{pointsPossible}} points possible.
-        {{/t}}
+        {{#if restrict_quantitative_data}}
+            {{#t "no_submission_for_assignment_rqd_screenreader"}}
+                No submission for this assignment.
+            {{/t}}
+        {{else}}
+            {{#t "no_submission_for_assignment_screenreader"}}
+              No submission for this assignment. {{pointsPossible}} points possible.
+            {{/t}}
+        {{/if}}
 
       {{/ifAll}}
 
