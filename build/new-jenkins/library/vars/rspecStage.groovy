@@ -34,7 +34,7 @@ def createDistribution(nestedStages) {
   def rspecqEnvVars = baseEnvVars + [
     'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
     'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)',
-    "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
+    "FORCE_FAILURE=${commitMessageFlag('force-failure-rspec').asBooleanInteger()}",
     "RERUNS_RETRY=${commitMessageFlag('rspecq-max-requeues') as Integer}",
     "RSPEC_PROCESSES=${commitMessageFlag('rspecq-processes') as Integer}",
     "RSPECQ_MAX_REQUEUES=${commitMessageFlag('rspecq-max-requeues') as Integer}",
@@ -56,7 +56,7 @@ def createDistribution(nestedStages) {
   extendedStage('RSpecQ Reporter for Rspec')
     .envVars(rspecqEnvVars)
     .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook])
-    .nodeRequirements([label: configuration.nodeLabel()])
+    .nodeRequirements([label: nodeLabel()])
     .timeout(15)
     .queue(nestedStages, this.&runReporter)
 
@@ -64,7 +64,7 @@ def createDistribution(nestedStages) {
     extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
       .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
       .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode() }])
-      .nodeRequirements([label: configuration.nodeLabel()])
+      .nodeRequirements([label: nodeLabel()])
       .timeout(15)
       .queue(nestedStages, this.&runRspecqSuite)
   }

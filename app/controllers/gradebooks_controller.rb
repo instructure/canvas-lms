@@ -106,6 +106,7 @@ class GradebooksController < ApplicationController
       @presenter.assignment_stats
     end
 
+    ActiveRecord::Associations.preload(@presenter.submissions, :visible_submission_comments)
     submissions_json = @presenter.submissions.map do |submission|
       json = {
         assignment_id: submission.assignment_id
@@ -122,6 +123,14 @@ class GradebooksController < ApplicationController
         json[:submission_comments] = submission.visible_submission_comments.map do |comment|
           {
             id: comment.id,
+            attachments: comment.cached_attachments.map do |attachment|
+              {
+                id: attachment.id,
+                display_name: attachment.display_name,
+                mime_class: Attachment.mime_class(attachment.content_type),
+                url: file_download_url(attachment.id)
+              }.as_json
+            end,
             attempt: comment.attempt,
             author_name: comment_author_name_for(comment),
             created_at: comment.created_at,

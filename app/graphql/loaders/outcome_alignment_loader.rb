@@ -27,7 +27,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
   end
 
   def perform(outcomes)
-    if @context.nil? || !outcome_alignment_summary_enabled?(@context)
+    if @context.nil? || !improved_outcomes_management_enabled?(@context)
       fulfill_nil(outcomes)
       return
     end

@@ -108,6 +108,8 @@ export default class PublishButton extends Backbone.View
       @enable()
       @render()
       @setFocusToElement()
+      $sgLink = $("#speed-grader-container-" + @model.attributes.module_type + "-" + @model.attributes.content_id)
+      $sgLink.removeClass("hidden")
 
   unpublish: (event) ->
     @renderUnpublishing()
@@ -117,6 +119,8 @@ export default class PublishButton extends Backbone.View
       @disable()
       @render()
       @setFocusToElement()
+      $sgLink = $("#speed-grader-container-" + @model.attributes.module_type + "-" + @model.attributes.content_id)
+      $sgLink.addClass("hidden")
     .fail (error) =>
       if error.status == 403
         $.flashError @model.disabledMessage()

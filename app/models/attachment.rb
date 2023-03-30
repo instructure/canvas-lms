@@ -585,7 +585,7 @@ class Attachment < ActiveRecord::Base
       # splitting the string, etc.
       #
       # The infer_root_account_id accessor is still present above, but I didn't verify there
-      # isn't any code still accessing the namespace for the account id directly. d
+      # isn't any code still accessing the namespace for the account id directly.
       ns = root_attachment.try(:namespace) if root_attachment_id
       ns ||= Attachment.current_namespace
       ns ||= context.root_account.file_namespace rescue nil
@@ -1262,7 +1262,7 @@ class Attachment < ActiveRecord::Base
     attachment_associations.create(context: context)
   end
 
-  def mime_class
+  def self.valid_content_types_hash
     # NOTE: keep this list in sync with what's in packages/canvas-rce/src/common/mimeClass.js
     {
       "text/html" => "html",
@@ -1323,7 +1323,15 @@ class Attachment < ActiveRecord::Base
       :"video/webm" => "video",
       :"video/avi" => "video",
       "application/x-shockwave-flash" => "flash"
-    }[content_type] || "file"
+    }
+  end
+
+  def self.mime_class(content_type)
+    valid_content_types_hash[content_type] || "file"
+  end
+
+  def mime_class
+    Attachment.mime_class(content_type)
   end
 
   def associated_with_submission?
@@ -2336,7 +2344,7 @@ class Attachment < ActiveRecord::Base
 
       from_attachments.each do |attachment|
         match = to_attachments.detect { |a| attachment.matches_full_display_path?(a.full_display_path) }
-        next if match && match.md5 == attachment.md5
+        next if match && (match.md5&.== attachment.md5)
 
         if to_context.is_a? User
           attachment.user_id = to_context.id

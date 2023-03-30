@@ -73,7 +73,7 @@ export default function BackboneMixin(optionsOrPropName, customChangeOptions) {
       subscribe(this, modelOrCollection(this.props), customChangeOptions)
     },
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
       if (modelOrCollection(this.props) === modelOrCollection(nextProps)) return
       unsubscribe(this, modelOrCollection(this.props))
       subscribe(this, modelOrCollection(nextProps), customChangeOptions)

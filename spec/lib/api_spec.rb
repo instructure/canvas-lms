@@ -264,6 +264,41 @@ describe Api do
       assignment = assignment_model(lti_context_id: "LTI_CTX_ID1")
       expect(@api.api_find(Assignment, "lti_context_id:#{assignment.lti_context_id}")).to eq assignment
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      before :once do
+        @shard1.activate { @cs_user = User.create! }
+        @cs_ps = managed_pseudonym(@cs_user, account: Account.default, sis_user_id: "cross_shard_user")
+      end
+
+      it "finds the shadow record" do
+        user = @api.api_find(User, "sis_user_id:cross_shard_user")
+        expect(user).to eq @cs_user
+        expect(user).to be_shadow_record
+        expect(user).to be_readonly
+      end
+
+      it "finds the primary record if given `writable`" do
+        user = @api.api_find(User, "sis_user_id:cross_shard_user", writable: true)
+        expect(user).to eq @cs_user
+        expect(user).not_to be_shadow_record
+        expect(user).not_to be_readonly
+      end
+
+      it "infers `writable: false` from read-only request method" do
+        expect(@api).to receive(:request).and_return(double(method: "GET"))
+        user = @api.api_find(User, "sis_user_id:cross_shard_user")
+        expect(user).to be_shadow_record
+      end
+
+      it "infers `writable: true` from writable request method" do
+        expect(@api).to receive(:request).and_return(double(method: "POST"))
+        user = @api.api_find(User, "sis_user_id:cross_shard_user")
+        expect(user).not_to be_shadow_record
+      end
+    end
   end
 
   context "api_find_all" do

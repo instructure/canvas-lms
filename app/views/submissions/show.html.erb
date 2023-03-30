@@ -315,9 +315,9 @@
       <iframe id="preview_frame" src="<%= presenter.submission_preview_frame_url %>" allowfullscreen="true" allow="<%= Lti::Launch.iframe_allowances.join('; ') %>" frameborder="0" style="border: 0; width: 100%; height: 300px; display: block;" title="<%= t('Preview') %>"></iframe>
     </div>
     <div class="submission-details-comments" style="word-wrap: break-word; min-width: 1%;">
-      <div style="background-color: #fff;">
+      <div style="background-color: #fff; height: 100%">
         <a href="#" class="comments_link" style="display: none; <%= 'font-weight: bold;' unless submission_comments.empty? %>">Comments <% unless submission_comments.empty? %>(<%= submission_comments.length %>)<% end %></a>
-        <div class="comments">
+        <div class="comments" style="height: 100%">
           <button type="button" class="btn button-secondary cancel_comment_button" style="display: none; float: <%= direction('right') %>; margin-<%= direction('right') %>:0 !important;"><%= image_tag("delete_circle.png", :alt => t('Delete')) %></button>
           <div class="comment_list" aria-live="polite" style="padding: 10px; clear:right;">
             <% unless @submission.user_can_read_grade?(@current_user, session) %>

@@ -26,6 +26,8 @@ import {
   makeCompareAssignmentCustomOrderFn,
   wrapColumnSortFn,
 } from '../Gradebook.sorting'
+import type {GradebookStudent} from '../gradebook.d'
+import type {GridColumn} from '../grid.d'
 
 const assignments = [
   {
@@ -54,7 +56,7 @@ const assignments = [
       assignment_group: {position: 6},
     },
   },
-]
+] as GridColumn[]
 const assignmentsReversed = [...assignments].reverse()
 
 const contextModules = [
@@ -217,8 +219,8 @@ describe('Gradebook#makeCompareAssignmentCustomOrderFn', () => {
     const sortOrder = {customOrder: ['foo', 'bar']}
     const sortFn = makeCompareAssignmentCustomOrderFn(sortOrder)
 
-    const a = {id: 'foo'}
-    const b = {id: 'bar'}
+    const a = {id: 'foo'} as GridColumn
+    const b = {id: 'bar'} as GridColumn
     expect(sortFn(a, b)).toBe(-1)
   })
 
@@ -226,8 +228,8 @@ describe('Gradebook#makeCompareAssignmentCustomOrderFn', () => {
     const sortOrder = {customOrder: ['foo', 'bar']}
     const sortFn = makeCompareAssignmentCustomOrderFn(sortOrder)
 
-    const a = {id: 'foo'}
-    const b = {id: 'NO'}
+    const a = {id: 'foo'} as GridColumn
+    const b = {id: 'NO'} as GridColumn
     expect(sortFn(a, b)).toBe(-1)
   })
 
@@ -235,8 +237,8 @@ describe('Gradebook#makeCompareAssignmentCustomOrderFn', () => {
     const sortOrder = {customOrder: ['foo', 'bar']}
     const sortFn = makeCompareAssignmentCustomOrderFn(sortOrder)
 
-    const a = {id: 'NO'}
-    const b = {id: 'bar'}
+    const a = {id: 'NO'} as GridColumn
+    const b = {id: 'bar'} as GridColumn
     expect(sortFn(a, b)).toBe(1)
   })
 
@@ -244,8 +246,8 @@ describe('Gradebook#makeCompareAssignmentCustomOrderFn', () => {
     const sortOrder = {customOrder: ['5', '11']}
     const sortFn = makeCompareAssignmentCustomOrderFn(sortOrder)
 
-    const a = {id: 'NO', object: {id: '5', position: 1}}
-    const b = {id: 'NOPE', object: {id: '11', position: 2}}
+    const a = {id: 'NO', object: {id: '5', position: 1}} as GridColumn
+    const b = {id: 'NOPE', object: {id: '11', position: 2}} as GridColumn
     expect(sortFn(a, b)).toBe(-1)
   })
 })
@@ -295,38 +297,46 @@ describe('compareAssignmentPointsPossible', () => {
 describe('wrapColumnSortFn', () => {
   it('returns -1 if second argument is of type total_grade', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    expect(sortFn({id: '1'}, {id: '2', type: 'total_grade'})).toBe(-1)
+    expect(sortFn({id: '1'} as GridColumn, {id: '2', type: 'total_grade'} as GridColumn)).toBe(-1)
   })
 
   it('returns 1 if first argument is of type total_grade', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    expect(sortFn({id: '1', type: 'total_grade'}, {id: '2'})).toBe(1)
+    expect(sortFn({id: '1', type: 'total_grade'} as GridColumn, {id: '2'} as GridColumn)).toBe(1)
   })
 
   it('returns 1 if first argument is of type total_grade_override', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    expect(sortFn({id: '1', type: 'total_grade_override'}, {id: '2'})).toBe(1)
+    expect(
+      sortFn({id: '1', type: 'total_grade_override'} as GridColumn, {id: '2'} as GridColumn)
+    ).toBe(1)
   })
 
   it('returns -1 if second argument is of type total_grade_override', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    expect(sortFn({id: '1'}, {id: '2', type: 'total_grade_override'})).toBe(-1)
+    expect(
+      sortFn({id: '1'} as GridColumn, {id: '2', type: 'total_grade_override'} as GridColumn)
+    ).toBe(-1)
   })
 
   it('returns -1 if second argument is an assignment_group and the first is not', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    expect(sortFn({id: '1'}, {id: '2', type: 'assignment_group'})).toBe(-1)
+    expect(sortFn({id: '1'} as GridColumn, {id: '2', type: 'assignment_group'} as GridColumn)).toBe(
+      -1
+    )
   })
 
   it('returns 1 if first arg is an assignment_group and second arg is not', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    expect(sortFn({id: '1', type: 'assignment_group'}, {id: '2'})).toBe(1)
+    expect(sortFn({id: '1', type: 'assignment_group'} as GridColumn, {id: '2'} as GridColumn)).toBe(
+      1
+    )
   })
 
   it('returns difference in object.positions if both args are assignement_groups', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    const a = {id: '1', type: 'assignment_group', object: {position: 10}}
-    const b = {id: '2', type: 'assignment_group', object: {position: 5}}
+    const a = {id: '1', type: 'assignment_group', object: {position: 10}} as GridColumn
+    const b = {id: '2', type: 'assignment_group', object: {position: 5}} as GridColumn
 
     expect(sortFn(a, b)).toBe(5)
   })
@@ -334,15 +344,15 @@ describe('wrapColumnSortFn', () => {
   it('calls wrapped function when either column is not total_grade nor assignment_group', () => {
     const wrappedFn = jest.fn()
     const sortFn = wrapColumnSortFn(wrappedFn)
-    sortFn({id: '1'}, {id: '2'})
+    sortFn({id: '1'} as GridColumn, {id: '2'} as GridColumn)
     expect(wrappedFn).toHaveBeenCalled()
   })
 
   it('calls wrapped function with arguments in given order when no direction is given', () => {
     const wrappedFn = jest.fn()
     const sortFn = wrapColumnSortFn(wrappedFn)
-    const first = {id: '1', field: '1'}
-    const second = {id: '2', field: '2'}
+    const first = {id: '1', field: '1'} as GridColumn
+    const second = {id: '2', field: '2'} as GridColumn
     const expectedArgs = [first, second]
 
     sortFn(first, second)
@@ -354,8 +364,8 @@ describe('wrapColumnSortFn', () => {
   it('calls wrapped function with arguments in given order when direction is ascending', () => {
     const wrappedFn = jest.fn()
     const sortFn = wrapColumnSortFn(wrappedFn, 'ascending')
-    const first = {id: '1', field: '1'}
-    const second = {id: '2', field: '2'}
+    const first = {id: '1', field: '1'} as GridColumn
+    const second = {id: '2', field: '2'} as GridColumn
     const expectedArgs = [first, second]
 
     sortFn(first, second)
@@ -367,8 +377,8 @@ describe('wrapColumnSortFn', () => {
   it('calls wrapped function with arguments in reverse order when direction is descending', () => {
     const wrappedFn = jest.fn()
     const sortFn = wrapColumnSortFn(wrappedFn, 'descending')
-    const first = {id: '1', field: '1'}
-    const second = {id: '2', field: '2'}
+    const first = {id: '1', field: '1'} as GridColumn
+    const second = {id: '2', field: '2'} as GridColumn
     const expectedArgs = [second, first]
 
     sortFn(first, second)
@@ -389,7 +399,7 @@ describe('getDefaultSettingKeyForColumnType', () => {
     const value = 0
     gradebook.gridData.rows[0].someProperty = value
     gradebook.gridData.rows[1].someProperty = value
-    const sortFn = row => row.someProperty
+    const sortFn = (row: GradebookStudent): number | boolean => row.someProperty
     gradebook.sortRowsWithFunction(sortFn)
     const [firstRow, secondRow] = gradebook.gridData.rows
 
@@ -438,16 +448,16 @@ describe('localeSort', () => {
 describe('compareAssignmentNames', () => {
   const firstRecord = {
     object: {name: 'alpha'},
-  }
+  } as GridColumn
   const secondRecord = {
     object: {name: 'omega'},
-  }
+  } as GridColumn
   const thirdRecord = {
     object: {name: 'Alpha'},
-  }
+  } as GridColumn
   const fourthRecord = {
     object: {name: 'Omega'},
-  }
+  } as GridColumn
   it('returns -1 if the name field comes first alphabetically in the first record', function () {
     expect(compareAssignmentNames(firstRecord, secondRecord)).toStrictEqual(-1)
   })

@@ -128,6 +128,7 @@ class DeveloperKeyActionButtons extends React.Component {
     return (
       <Tooltip renderTip={I18n.t('Edit this key')}>
         <IconButton
+          id="edit-developer-key-button"
           withBackground={false}
           withBorder={false}
           screenReaderLabel={I18n.t('Edit key %{developerName}', {developerName})}
@@ -150,6 +151,7 @@ class DeveloperKeyActionButtons extends React.Component {
         {this.renderVisibilityIcon()}
         <Tooltip renderTip={I18n.t('Delete this key')}>
           <IconButton
+            id="delete-developer-key-button"
             withBackground={false}
             withBorder={false}
             screenReaderLabel={I18n.t('Delete key %{developerName}', {developerName})}

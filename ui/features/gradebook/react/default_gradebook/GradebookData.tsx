@@ -29,6 +29,7 @@ import useStore from './stores/index'
 
 type Props = {
   actionMenuNode: HTMLSpanElement
+  anonymousSpeedGraderAlertNode: HTMLSpanElement
   applyScoreToUngradedModalNode: HTMLElement
   currentUserId: string
   enhancedActionMenuNode: HTMLSpanElement
@@ -39,7 +40,6 @@ type Props = {
   gradebookSettingsModalContainer: HTMLSpanElement
   gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
-  hideGrid?: false
   locale: string
   settingsModalButtonContainer: HTMLElement
   viewOptionsMenuNode: HTMLElement
@@ -91,6 +91,8 @@ export default function GradebookData(props: Props) {
   const loadStudentData = useStore(state => state.loadStudentData)
   const isStudentDataLoaded = useStore(state => state.isStudentDataLoaded)
   const isSubmissionDataLoaded = useStore(state => state.isSubmissionDataLoaded)
+  const totalSubmissionsLoaded = useStore(state => state.totalSubmissionsLoaded)
+  const totalStudentsToLoad = useStore(state => state.totalStudentsToLoad)
 
   const sisOverrides = useStore(state => state.sisOverrides)
   const fetchSisOverrides = useStore(state => state.fetchSisOverrides)
@@ -102,6 +104,7 @@ export default function GradebookData(props: Props) {
   const fetchGradingPeriodAssignments = useStore(state => state.fetchGradingPeriodAssignments)
   const loadAssignmentGroups = useStore(state => state.loadAssignmentGroups)
   const recentlyLoadedAssignmentGroups = useStore(state => state.recentlyLoadedAssignmentGroups)
+  const assignmentMap = useStore(state => state.assignmentMap)
 
   const currentGradingPeriodId = findFilterValuesOfType('grading-period', appliedFilters)[0]
   const gradingPeriodSet = props.gradebookEnv.grading_period_set
@@ -189,32 +192,35 @@ export default function GradebookData(props: Props) {
     <Gradebook
       {...props}
       appliedFilters={appliedFilters}
+      assignmentMap={assignmentMap}
       customColumns={customColumns}
-      loadDataForCustomColumn={loadDataForCustomColumn}
-      recentlyLoadedCustomColumnData={recentlyLoadedCustomColumnData}
       fetchFinalGradeOverrides={fetchFinalGradeOverrides}
       fetchGradingPeriodAssignments={fetchGradingPeriodAssignments}
       fetchStudentIds={fetchStudentIds}
       finalGradeOverrides={finalGradeOverrides}
       flashAlerts={flashMessages}
       gradingPeriodAssignments={gradingPeriodAssignments}
-      hideGrid={false}
       isCustomColumnsLoaded={isCustomColumnsLoaded}
       isFiltersLoading={isFiltersLoading}
       isGradingPeriodAssignmentsLoading={isGradingPeriodAssignmentsLoading}
+      isGridLoaded={false}
       isModulesLoading={isModulesLoading}
       isStudentDataLoaded={isStudentDataLoaded}
       isStudentIdsLoading={isStudentIdsLoading}
+      loadDataForCustomColumn={loadDataForCustomColumn}
       isSubmissionDataLoaded={isSubmissionDataLoaded}
       modules={modules}
       postGradesStore={postGradesStore.current}
       recentlyLoadedAssignmentGroups={recentlyLoadedAssignmentGroups}
-      sisOverrides={sisOverrides}
+      recentlyLoadedCustomColumnData={recentlyLoadedCustomColumnData}
       recentlyLoadedStudents={recentlyLoadedStudents}
       recentlyLoadedSubmissions={recentlyLoadedSubmissions}
       reloadStudentData={reloadStudentData}
       reorderCustomColumns={reorderCustomColumns}
+      sisOverrides={sisOverrides}
+      totalSubmissionsLoaded={totalSubmissionsLoaded}
       studentIds={studentIds}
+      totalStudentsToLoad={totalStudentsToLoad}
       updateColumnOrder={updateColumnOrder}
     />
   )

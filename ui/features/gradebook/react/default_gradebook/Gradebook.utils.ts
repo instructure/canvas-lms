@@ -27,39 +27,43 @@ import _ from 'lodash'
 import htmlEscape from 'html-escape'
 import filterTypes from './constants/filterTypes'
 import type {
-  CustomColumn,
   ColumnSizeSettings,
+  CustomColumn,
   Filter,
-  FilterType,
   FilterPreset,
+  FilterType,
   GradebookFilterApiRequest,
   GradebookFilterApiResponse,
+  GradebookStudent,
+  GradebookStudentMap,
   GradingPeriodAssignmentMap,
   PartialFilterPreset,
+  SortRowsSettingKey,
   SubmissionFilterValue,
 } from './gradebook.d'
 import type {
   Assignment,
   AssignmentGroup,
   GradingPeriod,
+  MissingSubmission,
   Module,
   Section,
   Student,
   StudentGroup,
   StudentGroupCategory,
   StudentGroupCategoryMap,
-  StudentMap,
   Submission,
   SubmissionType,
 } from '../../../../api.d'
-import type {GridColumn} from './grid'
+import type {GridColumn, SlickGridKeyboardEvent} from './grid'
 import {columnWidths} from './initialState'
+import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 
 const I18n = useI18nScope('gradebook')
 
 const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
 
-export function compareAssignmentDueDates(assignment1, assignment2) {
+export function compareAssignmentDueDates(assignment1: GridColumn, assignment2: GridColumn) {
   return assignmentHelper.compareByDueDate(assignment1.object, assignment2.object)
 }
 
@@ -72,37 +76,44 @@ export function ensureAssignmentVisibility(assignment: Assignment, submission: S
   }
 }
 
-export function forEachSubmission(students: StudentMap, fn) {
+export function forEachSubmission(
+  students: GradebookStudentMap,
+  fn: (submission: Submission) => void
+) {
   Object.keys(students).forEach(function (studentIdx) {
     const student = students[studentIdx]
     Object.keys(student).forEach(function (key) {
       if (key.match(ASSIGNMENT_KEY_REGEX)) {
-        fn(student[key])
+        const submission = student[key] as Submission
+        fn(submission)
       }
     })
   })
 }
 
-export function getAssignmentGroupPointsPossible(assignmentGroup) {
-  return assignmentGroup.assignments.reduce(function (sum, assignment) {
+export function getAssignmentGroupPointsPossible(assignmentGroup: AssignmentGroup) {
+  return assignmentGroup.assignments.reduce(function (sum: number, assignment) {
     return sum + (assignment.points_possible || 0)
   }, 0)
 }
 
-export function getCourseFeaturesFromOptions(options) {
+export function getCourseFeaturesFromOptions(options: {
+  final_grade_override_enabled: boolean
+  allow_view_ungraded_as_zero: boolean
+}) {
   return {
     finalGradeOverrideEnabled: options.final_grade_override_enabled,
-    allowViewUngradedAsZero: !!options.allow_view_ungraded_as_zero,
+    allowViewUngradedAsZero: Boolean(options.allow_view_ungraded_as_zero),
   }
 }
 
-export function getCourseFromOptions(options) {
+export function getCourseFromOptions(options: {context_id: string}) {
   return {
     id: options.context_id,
   }
 }
 
-export function getGradeAsPercent(grade) {
+export function getGradeAsPercent(grade: {score?: number | null; possible: number}) {
   if (grade.possible > 0) {
     // TODO: use GradeCalculationHelper.divide here
     return (grade.score || 0) / grade.possible
@@ -111,19 +122,30 @@ export function getGradeAsPercent(grade) {
   }
 }
 
-export function getStudentGradeForColumn(student, field: string) {
+export function getStudentGradeForColumn(student: GradebookStudent, field: string) {
   return student[field] || {score: null, possible: 0}
 }
 
-export function htmlDecode(input) {
-  return input && new DOMParser().parseFromString(input, 'text/html').documentElement.textContent
+export function htmlDecode(input?: string): string | null {
+  return input
+    ? new DOMParser().parseFromString(input, 'text/html').documentElement.textContent
+    : null
 }
 
 export function isAdmin() {
   return (ENV.current_user_roles || []).includes('admin')
 }
 
-export function onGridKeyDown(event, obj) {
+export function onGridKeyDown(
+  event: SlickGridKeyboardEvent,
+  obj: {
+    row: number | null
+    cell: number | null
+    grid: {
+      getColumns(): GridColumn[]
+    }
+  }
+) {
   if (obj.row == null || obj.cell == null) {
     return
   }
@@ -141,13 +163,26 @@ export function onGridKeyDown(event, obj) {
   }
 }
 
-export function renderComponent(reactClass, mountPoint, props = {}, children: any = null) {
-  const component = React.createElement(reactClass, props, children)
+export function renderComponent(
+  reactClass: any,
+  mountPoint: Element | null,
+  props = {}
+): HTMLElement | undefined {
+  if (mountPoint == null) {
+    throw new Error('mountPoint is required')
+  }
+  const component = React.createElement(reactClass, props)
   // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(component, mountPoint)
 }
 
-export async function confirmViewUngradedAsZero({currentValue, onAccepted}) {
+export async function confirmViewUngradedAsZero({
+  currentValue,
+  onAccepted,
+}: {
+  currentValue: boolean
+  onAccepted: () => void
+}) {
   const showDialog = () =>
     showConfirmationDialog({
       body: I18n.t(
@@ -182,7 +217,7 @@ export function getColumnTypeForColumnId(columnId: string): string {
   }
 }
 
-export function getDefaultSettingKeyForColumnType(columnType: string) {
+export function getDefaultSettingKeyForColumnType(columnType: string): SortRowsSettingKey {
   if (
     columnType === 'assignment' ||
     columnType === 'assignment_group' ||
@@ -226,7 +261,13 @@ export function findFilterValuesOfType(type: FilterType, appliedFilters: Filter[
 export function findSubmissionFilterValue(appliedFilters: Filter[]) {
   const values = findFilterValuesOfType('submissions', appliedFilters)
   return (
-    values.length && ['has-ungraded-submissions', 'has-submissions'].includes(values[0])
+    values.length &&
+    [
+      'has-ungraded-submissions',
+      'has-submissions',
+      'has-no-submissions',
+      'has-unposted-grades',
+    ].includes(values[0])
       ? values[0]
       : undefined
   ) as SubmissionFilterValue
@@ -299,6 +340,10 @@ export const getLabelForFilter = (
       return I18n.t('Has ungraded submissions')
     } else if (filter.value === 'has-submissions') {
       return I18n.t('Has submissions')
+    } else if (filter.value === 'has-no-submissions') {
+      return I18n.t('Has no submissions')
+    } else if (filter.value === 'has-unposted-grades') {
+      return I18n.t('Has unposted grades')
     } else {
       throw new Error('invalid submissions filter value')
     }
@@ -343,12 +388,12 @@ export function doFiltersMatch(filters1: Filter[], filters2: Filter[]) {
 }
 
 // logic taken from needs_grading_conditions in submission.rb
-export function doesSubmissionNeedGrading(s: Submission) {
+export function doesSubmissionNeedGrading(s: Submission | MissingSubmission) {
   if (s.excused) return false
 
   if (s.workflow_state === 'pending_review') return true
 
-  if (!['submitted', 'graded'].includes(s.workflow_state)) return false
+  if (!['submitted', 'graded'].includes(s.workflow_state || '')) return false
 
   if (!s.grade_matches_current_submission) return true
 
@@ -459,9 +504,9 @@ export function otherGradingPeriodAssignmentIds(
 const createQueryString = ([key, val]: [
   string,
   string | number | boolean | string[] | SubmissionType[]
-]) => {
+]): string => {
   if (Array.isArray(val)) {
-    return val.map(v => createQueryString([`${key}[]`, v])).join('&')
+    return val.map(v => createQueryString([`${key}[]`, String(v)])).join('&')
   }
 
   return `${encodeURIComponent(key)}=${encodeURIComponent(val)}`
@@ -498,7 +543,7 @@ export function escapeStudentContent(student: Student) {
   const unescapedLastName = student.last_name
 
   // TODO: selectively escape fields
-  const escapedStudent = htmlEscape<Student>(student)
+  const escapedStudent: Student = htmlEscape<Student>(student)
   escapedStudent.name = unescapedName
   escapedStudent.sortable_name = unescapedSortableName
   escapedStudent.first_name = unescapedFirstName
@@ -510,4 +555,113 @@ export function escapeStudentContent(student: Student) {
       enrollment.grades.html_url = htmlEscape.unescape(gradesUrl)
     }
   })
+}
+
+export function isGradedOrExcusedSubmissionUnposted(submission: Submission | MissingSubmission) {
+  return (
+    submission.posted_at === null &&
+    ((submission.score !== null && submission.workflow_state === 'graded') || submission.excused)
+  )
+}
+
+export const wasSubmitted = (s: Submission | MissingSubmission) =>
+  Boolean(s.submitted_at) && !['unsubmitted', 'deleted'].includes(s.workflow_state || '')
+
+// filters should run either .some() or .every()
+export const categorizeSubmissionFilters = (appliedFilters: Filter[]) => {
+  const submissionFilters = findFilterValuesOfType('submissions', appliedFilters)
+
+  const filtersNeedingSome = submissionFilters.filter(filter =>
+    ['has-ungraded-submissions', 'has-submissions', 'has-unposted-grades'].includes(filter)
+  )
+
+  const filtersNeedingEvery = submissionFilters.filter(filter =>
+    ['has-no-submissions'].includes(filter)
+  )
+
+  return {filtersNeedingSome, filtersNeedingEvery}
+}
+
+export function filterSubmissionByCategorizedFilters(
+  filters: string[],
+  submission: Submission | MissingSubmission
+) {
+  if (filters.length === 0) {
+    return true
+  }
+
+  return filters.every(filter => {
+    if (filter === 'has-ungraded-submissions') {
+      return doesSubmissionNeedGrading(submission)
+    } else if (filter === 'has-submissions') {
+      return wasSubmitted(submission)
+    } else if (filter === 'has-no-submissions') {
+      return !wasSubmitted(submission)
+    } else if (filter === 'has-unposted-grades') {
+      return isGradedOrExcusedSubmissionUnposted(submission)
+    } else {
+      return false
+    }
+  })
+}
+
+export function filterSubmissionsByCategorizedFilters(
+  filtersNeedingSome: string[],
+  filtersNeedingEvery: string[],
+  submissions: (Submission | MissingSubmission)[]
+) {
+  const hasMatch =
+    submissions.some(submission =>
+      filterSubmissionByCategorizedFilters(filtersNeedingSome, submission)
+    ) &&
+    submissions.every(submission =>
+      filterSubmissionByCategorizedFilters(filtersNeedingEvery, submission)
+    )
+
+  return hasMatch
+}
+
+export const filterStudentBySubmissionFn = (
+  appliedFilters: Filter[],
+  submissionStateMap: SubmissionStateMap,
+  assignmentIds: string[]
+) => {
+  const submissionFilters = findFilterValuesOfType('submissions', appliedFilters)
+
+  return (student: Student) => {
+    if (submissionFilters.length === 0) {
+      return true
+    }
+
+    const submissions = submissionStateMap.getSubmissionsByStudentAndAssignmentIds(
+      student.id,
+      assignmentIds
+    )
+
+    // when sorting rows, we only use .some to determine visiblity
+    return filterSubmissionsByCategorizedFilters(submissionFilters, [], submissions)
+  }
+}
+
+export const filterAssignmentsBySubmissionsFn = (
+  appliedFilters: Filter[],
+  submissionStateMap: SubmissionStateMap
+) => {
+  const {filtersNeedingSome, filtersNeedingEvery} = categorizeSubmissionFilters(appliedFilters)
+
+  return (assignment: Assignment) => {
+    if (filtersNeedingSome.length === 0 && filtersNeedingEvery.length === 0) {
+      return true
+    }
+
+    const submissions = submissionStateMap.getSubmissionsByAssignment(assignment.id)
+
+    const result = filterSubmissionsByCategorizedFilters(
+      filtersNeedingSome,
+      filtersNeedingEvery,
+      submissions
+    )
+
+    return result
+  }
 }

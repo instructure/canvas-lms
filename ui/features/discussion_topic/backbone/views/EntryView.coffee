@@ -32,7 +32,6 @@ import htmlEscape from 'html-escape'
 import {publish} from 'jquery-tinypubsub'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {isRTL} from '@canvas/i18n/rtlHelper'
-import mathml from 'mathml'
 import '@canvas/avatar/jst/_avatar.handlebars'
 import '../../jst/_reply_form.handlebars'
 
@@ -193,7 +192,6 @@ class EntryView extends Backbone.View
       @readMarker ?= new MarkAsReadWatcher this
       # this is throttled so calling it here is okay
       MarkAsReadWatcher.checkForVisibleEntries()
-    mathml.reloadElement(this.$el[0])
     publish 'userContent/change'
 
   filter: @::afterRender

@@ -174,9 +174,15 @@ $(() => {
     const pbv = new PublishButtonView({model, el: $el})
     pbv.render()
 
-    pbv.on('publish', () => $('#moderated_grading_button').show())
+    pbv.on('publish', () => {
+      $('#moderated_grading_button').show()
+      $('#speed-grader-link-container').removeClass('hidden')
+    })
 
-    pbv.on('unpublish', () => $('#moderated_grading_button').hide())
+    pbv.on('unpublish', () => {
+      $('#moderated_grading_button').hide()
+      $('#speed-grader-link-container').addClass('hidden')
+    })
   }
 
   // Add module sequence footer

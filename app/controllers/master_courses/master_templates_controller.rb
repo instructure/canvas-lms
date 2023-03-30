@@ -487,12 +487,18 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                        @course.discussion_topics.only_discussion_topics
                      when "CoursePace"
                        @course.course_paces
+                     when "ContentTag"
+                       # OUT-5483: We only want ContentTags for account-level outcomes that have been deleted from the blueprint course
+                       ContentTag.joins("INNER JOIN #{LearningOutcome.quoted_table_name} ON #{ContentTag.quoted_table_name}.content_id=#{LearningOutcome.quoted_table_name}.id")
+                                 .where("#{ContentTag.quoted_table_name}.context_id=? AND #{ContentTag.quoted_table_name}.context_type=? AND #{ContentTag.quoted_table_name}.content_type=?
+                                  AND #{ContentTag.quoted_table_name}.workflow_state=? AND #{LearningOutcome.quoted_table_name}.context_type=?", @course.id, "Course", "LearningOutcome", "deleted", "Account")
                      else
                        klass.constantize.where(context_id: @course, context_type: "Course")
                      end
 
         remaining_count = max_records - items.size
-        items += item_scope.where("updated_at>?", cutoff_time).order(:id).limit(remaining_count).to_a
+        condition = klass == "ContentTag" ? "#{ContentTag.quoted_table_name}.updated_at>?" : "updated_at>?"
+        items += item_scope.where(condition, cutoff_time).order(:id).limit(remaining_count).to_a
         break if items.size >= max_records
       end
       @template.load_tags!(items) # only load the tags we need
@@ -506,6 +512,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                else
                  :updated
                end
+      asset = asset.is_a?(ContentTag) ? LearningOutcome.find(asset.content_id) : asset
       tag = @template.cached_content_tag_for(asset)
       locked = !!tag&.restrictions&.values&.any?
       changed_asset_json(asset, action, locked)

@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   include Api::V1::WikiPage
   include LegalInformationHelper
   include FullStoryHelper
+  include ObserverEnrollmentsHelper
 
   helper :all
 
@@ -45,6 +46,17 @@ class ApplicationController < ActionController::Base
   # After actions run in REVERSE order defined. Skipped on exception raise
   #   (which is common for 401, 404, 500 responses)
   # Around action yields return (in REVERSE order) after all after actions
+
+  if !Rails.env.production? && Canvas::Plugin.value_to_boolean(ENV["N_PLUS_ONE_DETECTION"])
+    around_action :n_plus_one_detection
+
+    def n_plus_one_detection
+      Prosopite.scan
+      yield
+    ensure
+      Prosopite.finish
+    end
+  end
 
   prepend_before_action :load_user, :load_account
   # make sure authlogic is before load_user
@@ -299,6 +311,7 @@ class ApplicationController < ActionController::Base
         @js_env[:rce_auto_save_max_age_ms] = Setting.get("rce_auto_save_max_age_ms", 1.day.to_i * 1000).to_i
         @js_env[:FEATURES][:new_math_equation_handling] = use_new_math_equation_handling?
         @js_env[:K5_USER] = k5_user?
+        @js_env[:USE_CLASSIC_FONT] = @context.is_a?(Course) ? @context.account.use_classic_font_in_k5? : (k5_user? && use_classic_font?)
         @js_env[:K5_HOMEROOM_COURSE] = @context.is_a?(Course) && @context.elementary_homeroom_course?
         @js_env[:K5_SUBJECT_COURSE] = @context.is_a?(Course) && @context.elementary_subject_course?
         @js_env[:LOCALE_TRANSLATION_FILE] = ::Canvas::Cdn.registry.url_for("javascripts/translations/#{@js_env[:LOCALES].first}.json")
@@ -335,7 +348,7 @@ class ApplicationController < ActionController::Base
     product_tours files_dnd usage_rights_discussion_topics
     granular_permissions_manage_users create_course_subaccount_picker
     lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking buttons_and_icons_root_account
-    extended_submission_state scheduled_page_publication send_usage_metrics
+    extended_submission_state scheduled_page_publication send_usage_metrics rce_transform_loaded_content
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -1016,8 +1029,8 @@ class ApplicationController < ActionController::Base
   # to have their urls scoped to a context in order to be valid.
   # So /courses/5/assignments or groups/1/assignments would be valid, but
   # not /assignments
-  def require_context
-    get_context
+  def require_context(user_scope: nil)
+    get_context(user_scope: user_scope)
     unless @context
       if @context_is_current_user
         store_location
@@ -1060,7 +1073,7 @@ class ApplicationController < ActionController::Base
   # to.  So /courses/5/assignments would have a @context=Course.find(5).
   # Also assigns @context_membership to the membership type of @current_user
   # if @current_user is a member of the context.
-  def get_context(include_deleted: false)
+  def get_context(user_scope: nil)
     GuardRail.activate(:secondary) do
       unless @context
         if params[:course_id] || (request.url.include?("/graphql") && params[:operationName] == "CreateSubmission")
@@ -1089,8 +1102,7 @@ class ApplicationController < ActionController::Base
           @context_enrollment = @context.group_memberships.where(user_id: @current_user).first if @context && @current_user
           @context_membership = @context_enrollment
         elsif params[:user_id] || (is_a?(UsersController) && (params[:user_id] = params[:id]))
-          scope = include_deleted ? User : User.active
-          @context = api_find(scope, params[:user_id])
+          @context = api_find(user_scope || User.active, params[:user_id])
           params[:context_id] = params[:user_id]
           params[:context_type] = "User"
           @context_membership = @context if @context == @current_user
@@ -2043,6 +2055,7 @@ class ApplicationController < ActionController::Base
                       context: @context,
                       return_url: @return_url,
                       expander: variable_expander,
+                      include_storage_target: !in_lti_mobile_webview?,
                       opts: opts.merge(
                         resource_link: @tag.associated_asset_lti_resource_link
                       )
@@ -2081,6 +2094,7 @@ class ApplicationController < ActionController::Base
         @lti_launch.resource_url = @tool.login_or_launch_url(content_tag_uri: @resource_url)
         @lti_launch.link_text = @resource_title
         @lti_launch.analytics_id = @tool.tool_id
+        InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: @tool.lti_version, type: :content_tag_redirect })
 
         @append_template = "context_modules/tool_sequence_footer" if render_external_tool_append_template?
         render Lti::AppUtil.display_template(external_tool_redirect_display_type)
@@ -2660,6 +2674,24 @@ class ApplicationController < ActionController::Base
     params[:mobile] || request.user_agent.to_s =~ /ipod|iphone|ipad|Android/i
   end
 
+  # returns true only if request is (to launch an LTI tool) from a webview inside an iOS or Android app.
+  #   * android: all user agents since Lollipop include `wv)`
+  #       https://developer.chrome.com/docs/multidevice/user-agent/
+  #   * iOS: the embedded Safari view uses the same user agent as standard
+  #       mobile Safari, but will pass platform=mobile for all LTI tool
+  #       launches within that view. It's unfortunate that there isn't the
+  #       same confidence level as Android, so this will have to do
+  # returns false for:
+  #   * non-LTI-related iOS mobile app requests
+  #   * mobile browser requests (iOS Safari, Android Chrome)
+  #   * all non-mobile requests
+  def in_lti_mobile_webview?
+    in_android_app = request.user_agent.to_s =~ /wv\)/i
+    in_ios_app = params[:platform] == "mobile"
+
+    !!(mobile_device? && (in_android_app || in_ios_app))
+  end
+
   def ms_office?
     request.user_agent.to_s.include?("ms-office") ||
       request.user_agent.to_s.match?(%r{Word/\d+\.\d+})
@@ -3028,6 +3060,12 @@ class ApplicationController < ActionController::Base
     K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).k5_user?(check_disabled: check_disabled)
   end
   helper_method :k5_user?
+
+  def use_classic_font?
+    observed_users(@current_user, session) if @current_user&.roles(@domain_root_account)&.include?("observer")
+    K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).use_classic_font?
+  end
+  helper_method :use_classic_font?
 
   def pull_context_course
     assignment_id = params[:variables][:assignmentLid]

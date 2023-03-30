@@ -35,7 +35,7 @@ export default function AssignmentDetails({assignment}) {
         </TruncateText>
       </Heading>
       {(assignment.env.peerReviewModeEnabled || assignment.dueAt) && (
-        <Text size="small" weight="bold" data-test-id="due-date-display">
+        <Text size="small" weight="bold" data-testid="assignment-sub-header">
           {assignment.env.peerReviewModeEnabled &&
             `${I18n.t('Peer:')} ${assignment.env.peerDisplayName}`}
           {assignment.dueAt && (

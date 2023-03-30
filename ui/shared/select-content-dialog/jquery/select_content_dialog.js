@@ -194,6 +194,9 @@ SelectContentDialog.handleContentItemResult = function (result, tool) {
     $('#external_tool_create_iframe_width').val(result.iframe.width)
     $('#external_tool_create_iframe_height').val(result.iframe.height)
   }
+  if (result.window && result.window.targetName == '_blank') {
+    document.querySelector('#external_tool_create_new_tab').checked = true
+  }
 
   $('#context_external_tools_select .domain_message').hide()
 

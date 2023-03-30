@@ -304,6 +304,7 @@ export default [
       {command: '\\Leftarrow', label: formatMessage('Thick Leftward Arrow')},
       {command: '\\leftrightarrow', label: formatMessage('Logical Equivalence (Short)')},
       {command: '\\Leftrightarrow', label: formatMessage('Logical Equivalence (Short And Thick)')},
+      {command: '\\rightleftharpoons', label: formatMessage('Equilibrium')},
     ],
   },
 

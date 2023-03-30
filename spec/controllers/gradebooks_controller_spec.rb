@@ -79,10 +79,12 @@ describe GradebooksController do
         Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
         @assignment.anonymous_peer_reviews = true
         @assignment.save!
+        attachment = attachment_model(context: @assignment)
+        attachment2 = attachment_model(context: @assignment)
         other_student = @course.enroll_user(User.create!(name: "some other user")).user
         submission_to_comment = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
-        comment_1 = submission_to_comment.add_comment(comment: "a student comment", author: @teacher)
-        comment_2 = submission_to_comment.add_comment(comment: "another student comment", author: @teacher)
+        comment_1 = submission_to_comment.add_comment(comment: "a student comment", author: @teacher, attachments: [attachment])
+        comment_2 = submission_to_comment.add_comment(comment: "another student comment", author: @teacher, attachments: [attachment, attachment2])
         comment_3 = submission_to_comment.add_comment(comment: "an anonymous comment", author: other_student)
         comment_1.mark_read!(@student)
 
@@ -98,7 +100,15 @@ describe GradebooksController do
                                                     "attempt" => comment_1["attempt"],
                                                     "author_name" => comment_1["author_name"],
                                                     "display_updated_at" => datetime_string(comment_1["updated_at"]),
-                                                    "is_read" => true
+                                                    "is_read" => true,
+                                                    "attachments" => [
+                                                      {
+                                                        "id" => attachment.id,
+                                                        "display_name" => attachment.display_name,
+                                                        "mime_class" => attachment.mime_class,
+                                                        "url" => file_download_url(attachment)
+                                                      }
+                                                    ]
                                                   })
 
           submission_comment_2 = submission[:submission_comments].second
@@ -107,7 +117,21 @@ describe GradebooksController do
                                                     "attempt" => comment_2["attempt"],
                                                     "author_name" => comment_2["author_name"],
                                                     "display_updated_at" => datetime_string(comment_2["updated_at"]),
-                                                    "is_read" => false
+                                                    "is_read" => false,
+                                                    "attachments" => [
+                                                      {
+                                                        "id" => attachment.id,
+                                                        "display_name" => attachment.display_name,
+                                                        "mime_class" => attachment.mime_class,
+                                                        "url" => file_download_url(attachment)
+                                                      },
+                                                      {
+                                                        "id" => attachment2.id,
+                                                        "display_name" => attachment2.display_name,
+                                                        "mime_class" => attachment2.mime_class,
+                                                        "url" => file_download_url(attachment2)
+                                                      }
+                                                    ]
                                                   })
           submission_comment_3 = submission[:submission_comments].third
           expect(submission_comment_3).to include({
@@ -115,7 +139,8 @@ describe GradebooksController do
                                                     "attempt" => comment_3["attempt"],
                                                     "author_name" => "Anonymous User",
                                                     "display_updated_at" => datetime_string(comment_3["updated_at"]),
-                                                    "is_read" => false
+                                                    "is_read" => false,
+                                                    "attachments" => []
                                                   })
         end
       end

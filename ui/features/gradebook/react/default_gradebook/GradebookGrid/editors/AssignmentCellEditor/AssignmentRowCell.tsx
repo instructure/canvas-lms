@@ -19,6 +19,7 @@
 import React, {Component} from 'react'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {IconButton} from '@instructure/ui-buttons'
+// @ts-ignore
 import {IconExpandStartLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
@@ -58,10 +59,7 @@ type Props = {
     }
   }
 
-  gradingScheme: Array<{
-    name: string
-    value: number
-  }>
+  gradingScheme: [name: string, value: number][]
 
   onGradeSubmission: (submission: Submission, grade: string) => void
 
@@ -103,7 +101,7 @@ export default class AssignmentRowCell extends Component<Props> {
     pendingGradeInfo: null,
   }
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
 
     this.bindContainerRef = ref => {
@@ -132,7 +130,7 @@ export default class AssignmentRowCell extends Component<Props> {
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     const submissionFinishedUpdating =
       prevProps.submissionIsUpdating && !this.props.submissionIsUpdating
 
@@ -147,7 +145,7 @@ export default class AssignmentRowCell extends Component<Props> {
     }
   }
 
-  handleKeyDown = event => {
+  handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const indicatorHasFocus = this.startContainerIndicator === document.activeElement
     const inputHasFocus = this.contentContainer?.contains(document.activeElement)
     const trayButtonHasFocus = this.trayButton === document.activeElement

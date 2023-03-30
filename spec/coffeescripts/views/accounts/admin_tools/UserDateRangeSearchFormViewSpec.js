@@ -90,9 +90,9 @@ test('find with invalid dates is invalid', function () {
 
   this.changeDate('banana', 'banana')
   errors = this.searchForm.datesValidation()
-  strictEqual(Object.keys(errors).length, 2)
+  // The previous end date was valid and is stored so there is no error
+  strictEqual(Object.keys(errors).length, 1)
   strictEqual(errors.messages_start_time[0].message, 'Not a valid date')
-  strictEqual(errors.messages_end_time[0].message, 'Not a valid date')
 })
 
 test('find with start date after end date is invalid', function () {

@@ -158,8 +158,12 @@ QUnit.module('SelectContentDialog: deepLinkingResponseHandler', {
         <input type='text' id='external_tool_create_assignment_id' />
         <input type='text' id='external_tool_create_iframe_width' />
         <input type='text' id='external_tool_create_iframe_height' />
+        <input type='checkbox' id='external_tool_create_new_tab' />
         <div id='context_external_tools_select'>
-          <span class='domain_message'"
+          <span class='domain_message' />
+          <div class='tools'>
+            <div class='tool selected'></div>
+          </div>
         </div>
       </div>
     `)
@@ -170,6 +174,9 @@ QUnit.module('SelectContentDialog: deepLinkingResponseHandler', {
       autoOpen: false,
       modal: true,
     }
+
+    const tool = $('#context_external_tools_select .tools .tool.selected')
+    tool.data('tool', {name: 'mytool', definition_id: 0, placements: {resource_selection: {}}})
 
     $selectContextContentDialog.dialog(options).dialog('open')
     $resourceSelectionDialog.dialog(options).dialog('open')
@@ -199,20 +206,18 @@ const makeDeepLinkingEvent = (additionalContentItemFields = {}) => {
   return {
     data: {
       subject: 'LtiDeepLinkingResponse',
-      content_items: [
-        _.merge(additionalContentItemFields, contentItem)
-      ],
+      content_items: [_.merge(additionalContentItemFields, contentItem)],
       ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking',
-    }
+    },
   }
 }
 const deepLinkingEventWithoutTitle = makeDeepLinkingEvent()
-const deepLinkingEvent = makeDeepLinkingEvent({ title: 'My Tool' })
+const deepLinkingEvent = makeDeepLinkingEvent({title: 'My Tool'})
 
 const assignmentId = '42'
 const deepLinkingEventWithAssignmentId = makeDeepLinkingEvent({
   title: 'My Tool',
-  assignment_id: assignmentId
+  assignment_id: assignmentId,
 })
 
 test('sets the tool url', async () => {
@@ -275,6 +280,15 @@ test('recover assignment id from context external tool item data if given', asyn
 
   const data = SelectContentDialog.extractContextExternalToolItemData()
   equal(data['item[assignment_id]'], assignmentId)
+})
+
+test('checks the new tab checkbox if content item window.targetName is _blank', async () => {
+  await SelectContentDialog.deepLinkingResponseHandler(
+    makeDeepLinkingEvent({window: {targetName: '_blank'}})
+  )
+
+  const data = SelectContentDialog.extractContextExternalToolItemData()
+  equal(data['item[new_tab]'], '1')
 })
 
 test('reset external tool fields', async () => {

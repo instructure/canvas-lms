@@ -364,7 +364,15 @@ export const handlers = [
         id: 'VXNlci05',
         email: 'hmccoy@xavierschool.com',
         favoriteGroupsConnection: {
-          nodes: [Group.mock()],
+          nodes: [
+            Group.mock(),
+            Group.mock({
+              _id: '339',
+              contextName: 'concluded_group',
+              assetString: 'group_339',
+              canMessage: false,
+            }),
+          ],
           __typename: 'GroupConnection',
         },
         favoriteCoursesConnection: {

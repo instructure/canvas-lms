@@ -107,7 +107,12 @@ export default ({
           <View as="div" margin="x-small 0" textAlign="center">
             <img alt={I18n.t('SUCCESS!')} src={successSVG} />
           </View>
-          <View as="div" margin={headerMargin || 'small 0 0'} textAlign="center">
+          <View
+            as="div"
+            margin={headerMargin || 'small 0 0'}
+            textAlign="center"
+            data-testid="peer-review-header-text"
+          >
             {headerTextMap.map(({id, header}) => (
               <View as="div" key={`header-${id}`}>
                 <Text size="large">{header}</Text>
@@ -116,7 +121,13 @@ export default ({
           </View>
           {subHeaderTextMap != null && subHeaderTextMap.length > 0 && (
             <>
-              <View as="div" margin="small 0 0" textAlign="center" {...subHeaderBorder}>
+              <View
+                as="div"
+                margin="small 0 0"
+                data-testid="peer-review-sub-header-text"
+                textAlign="center"
+                {...subHeaderBorder}
+              >
                 {subHeaderTextMap?.map(({props, text, id}) => (
                   <View as="div" key={`subHeader-${id}`}>
                     <Text {...props}>{text}</Text>
@@ -129,13 +140,14 @@ export default ({
       </Modal.Body>
       {peerReviewButtonText && (
         <Modal.Footer style={{display: 'none'}}>
-          <Button onClick={onClose} margin="0 x-small">
+          <Button onClick={onClose} margin="0 x-small" data-testid="peer-review-close-button">
             {I18n.t('Close')}
           </Button>
           <Button
             interaction={peerReviewButtonDisabled ? 'disabled' : 'enabled'}
             onClick={onRedirect}
             variant="primary"
+            data-testid="peer-review-next-button"
           >
             {peerReviewButtonText}
           </Button>

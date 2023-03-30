@@ -45,13 +45,15 @@ describe Lti::IMS::AuthenticationController do
   let(:response_type) { "id_token" }
   let(:scope) { "openid" }
   let(:state) { SecureRandom.uuid }
+  let(:include_storage_target) { true }
   let(:lti_message_hint) do
     Canvas::Security.create_jwt(
       {
         verifier: verifier,
         canvas_domain: redirect_domain,
         context_id: context.global_id,
-        context_type: context.class.to_s
+        context_type: context.class.to_s,
+        include_storage_target: include_storage_target
       },
       1.year.from_now
     )
@@ -247,6 +249,15 @@ describe Lti::IMS::AuthenticationController do
         it "sends the actual lti_storage_target" do
           subject
           expect(assigns.dig(:launch_parameters, :lti_storage_target)).to eq Lti::PlatformStorage::FORWARDING_TARGET
+        end
+      end
+
+      context "when include_storage_target is false" do
+        let(:include_storage_target) { false }
+
+        it "does not send the lti_storage_target" do
+          subject
+          expect(assigns[:launch_parameters].keys).not_to include(:lti_storage_target)
         end
       end
 

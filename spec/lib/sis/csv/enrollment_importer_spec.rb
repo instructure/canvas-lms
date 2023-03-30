@@ -634,6 +634,8 @@ describe SIS::CSV::EnrollmentImporter do
   end
 
   it "only queues up one recache_grade_distribution job per course" do
+    skip unless Object.const_defined?(:CachedGradeDistribution)
+
     Course.create!(account: @account, sis_source_id: "C001", workflow_state: "available")
     user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
     user_with_managed_pseudonym(account: @account, sis_user_id: "U002")

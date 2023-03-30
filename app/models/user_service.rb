@@ -125,12 +125,6 @@ class UserService < ActiveRecord::Base
     opts[:secret] = nil
     opts[:service] = params[:service]
     case opts[:service]
-    when "delicious"
-      opts[:service_domain] = "delicious.com"
-      opts[:protocol] = "http-auth"
-      opts[:service_user_id] = params[:user_name]
-      opts[:service_user_name] = params[:user_name]
-      opts[:password] = params[:password]
     when "diigo"
       opts[:service_domain] = "diigo.com"
       opts[:protocol] = "http-auth"
@@ -164,8 +158,6 @@ class UserService < ActiveRecord::Base
       3
     when CommunicationChannel::TYPE_TWITTER
       4
-    when "delicious"
-      7
     when "diigo"
       8
     else
@@ -179,8 +171,6 @@ class UserService < ActiveRecord::Base
       t "#user_service.descriptions.google_drive", "Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations."
     when CommunicationChannel::TYPE_TWITTER
       t "#user_service.descriptions.twitter", "Twitter is a great resource for out-of-class communication."
-    when "delicious"
-      t "#user_service.descriptions.delicious", "Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Delicious accounts to share links of similar interest."
     when "diigo"
       t "#user_service.descriptions.diigo", "Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Diigo accounts to share links of similar interest."
     when "skype"
@@ -198,8 +188,6 @@ class UserService < ActiveRecord::Base
       "http://calendar.google.com"
     when CommunicationChannel::TYPE_TWITTER
       "http://twitter.com/signup"
-    when "delicious"
-      "http://delicious.com/"
     when "diigo"
       "https://www.diigo.com/sign-up"
     when "skype"
@@ -217,8 +205,6 @@ class UserService < ActiveRecord::Base
       "http://calendar.google.com"
     when CommunicationChannel::TYPE_TWITTER
       "http://www.twitter.com/#{service_user_name}"
-    when "delicious"
-      "http://www.delicious.com/#{service_user_name}"
     when "diigo"
       "http://www.diigo.com/user/#{service_user_name}"
     when "skype"
@@ -232,7 +218,7 @@ class UserService < ActiveRecord::Base
     case type
     when "google_docs", "google_drive"
       "DocumentService"
-    when "delicious", "diigo"
+    when "diigo"
       "BookmarkService"
     else
       "UserService"

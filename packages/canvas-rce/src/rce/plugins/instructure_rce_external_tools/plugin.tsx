@@ -20,7 +20,7 @@ import tinymce from 'tinymce'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {RceToolWrapper} from './RceToolWrapper'
+import {RceToolWrapper, buildToolMenuItems, ExternalToolMenuItem} from './RceToolWrapper'
 import formatMessage from '../../../format-message'
 import {ExternalToolSelectionDialog} from './components/ExternalToolSelectionDialog/ExternalToolSelectionDialog'
 import {ensureToolDialogContainerElem} from './dialog-helper'
@@ -57,17 +57,9 @@ function registerAppsMenu(editor: ExternalToolsEditor) {
     icon: 'lti',
     getSubmenuItems: () => {
       const availableTools = RceToolWrapper.forEditorEnv(externalToolsEnvFor(editor))
+      const toolMenuItems = buildToolMenuItems(availableTools, makeViewAllItem(editor))
 
-      return [
-        ...availableTools.filter(it => it.isMruTool).map(it => it.asMenuItem()),
-        {
-          type: 'menuitem',
-          text: formatMessage('View All'),
-          onAction() {
-            openToolSelectionDialog(editor)
-          },
-        },
-      ]
+      return toolMenuItems
     },
   })
 }
@@ -93,17 +85,8 @@ function registerAppsToolbarButton(editor: ExternalToolsEditor) {
     icon: 'lti',
     fetch: callback => {
       const availableTools = RceToolWrapper.forEditorEnv(externalToolsEnvFor(editor))
-
-      callback([
-        ...availableTools.filter(it => it.isMruTool).map(it => it.asMenuItem()),
-        {
-          type: 'menuitem',
-          text: formatMessage('View All'),
-          onAction() {
-            openToolSelectionDialog(editor)
-          },
-        },
-      ])
+      const toolMenuItems = buildToolMenuItems(availableTools, makeViewAllItem(editor))
+      callback(toolMenuItems)
     },
     onSetup(_api) {
       return () => undefined
@@ -125,4 +108,14 @@ function openToolSelectionDialog(editor: ExternalToolsEditor) {
     <ExternalToolSelectionDialog onDismiss={handleDismiss} ltiButtons={availableTools} />,
     ensureToolDialogContainerElem()
   )
+}
+
+function makeViewAllItem(editor: ExternalToolsEditor): ExternalToolMenuItem {
+  return {
+    type: 'menuitem',
+    text: formatMessage('View All'),
+    onAction() {
+      openToolSelectionDialog(editor)
+    },
+  }
 }

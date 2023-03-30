@@ -221,6 +221,16 @@ describe AccountsController do
       expect(response).to be_successful
       expect(@subaccount.account_users.map(&:user)).to eq [@munda]
     end
+
+    it "allows re-adding an user to a sub account (updating user account association)" do
+      @subaccount = @account.sub_accounts.create!
+      @usr = user_with_pseudonym(account: @subaccount, active_all: 1, username: "usr@instructure.com")
+      @subaccount.account_users.create!(user_id: @usr.id, role_id: admin_role.id).destroy
+      post "add_account_user", params: { account_id: @subaccount.id, role_id: admin_role.id, user_list: "usr@instructure.com" }
+      expect(response).to be_successful
+      expect(@subaccount.account_users.map(&:user)).to be_include(@usr)
+      expect(@usr.user_account_associations.map(&:account)).to be_include(@subaccount)
+    end
   end
 
   describe "remove_account_user" do
@@ -592,18 +602,30 @@ describe AccountsController do
         user_session(@user)
       end
 
-      it "calls the K5::EnablementService if enable_as_k5_account is present in params" do
-        expect(K5::EnablementService).to receive(:set_k5_settings).with(@account, true)
-        post "update", params: toggle_k5_params(@account.id, "true")
+      it "calls K5::EnablementService with correct args if enable_as_k5_account is present in params" do
+        set_k5_settings_double = double("set_k5_settings")
+        expect(K5::EnablementService).to receive(:new).with(@account).and_return(set_k5_settings_double)
+        expect(set_k5_settings_double).to receive(:set_k5_settings).with(true, false)
+        post "update", params: { id: @account.id,
+                                 account: {
+                                   settings: {
+                                     enable_as_k5_account: {
+                                       value: "true"
+                                     },
+                                     use_classic_font_in_k5: {
+                                       value: "false"
+                                     }
+                                   }
+                                 } }
       end
 
-      it "doesn't call the K5::EnablementService or change k5 settings if enable_as_k5_account isn't present in params" do
+      it "doesn't call K5::EnablementService or change k5 settings if enable_as_k5_account isn't present in params" do
         @account.settings[:enable_as_k5_account] = {
           value: true,
           locked: true
         }
         @account.save!
-        expect(K5::EnablementService).not_to receive(:set_k5_settings)
+        expect(K5::EnablementService).not_to receive(:new)
         post "update", params: { id: @account.id,
                                  account: {
                                    settings: {
@@ -618,7 +640,7 @@ describe AccountsController do
         post "update", params: toggle_k5_params(@account.id, false)
         service = K5::UserService.new(@user, @account.root_account, nil)
         enable_cache(:redis_cache_store) do
-          expect(service).to receive(:uncached_k5_user?).twice
+          expect(service).to receive(:user_has_association?).twice
           service.send(:k5_user?)
           post "update", params: toggle_k5_params(@account.id, true)
           run_jobs

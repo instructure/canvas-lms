@@ -1531,6 +1531,7 @@ class CoursesController < ApplicationController
                COURSE_DATES: { start_at: @context.start_at, end_at: @context.conclude_at },
                RESTRICT_STUDENT_PAST_VIEW_LOCKED: @context.account.restrict_student_past_view[:locked],
                RESTRICT_STUDENT_FUTURE_VIEW_LOCKED: @context.account.restrict_student_future_view[:locked],
+               RESTRICT_QUANTITATIVE_DATA: @context.account.restrict_quantitative_data[:locked],
                PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS: @context.root_account.settings[:prevent_course_availability_editing_by_teachers],
                MANUAL_MSFT_SYNC_COOLDOWN: MicrosoftSync::Group.manual_sync_cooldown,
                MSFT_SYNC_ENABLED: !!@context.root_account.settings[:microsoft_sync_enabled],
@@ -1697,6 +1698,7 @@ class CoursesController < ApplicationController
       :usage_rights_required,
       :restrict_student_past_view,
       :restrict_student_future_view,
+      :restrict_quantitative_data,
       :show_announcements_on_home_page,
       :syllabus_course_summary,
       :home_page_announcement_limit,
@@ -2296,6 +2298,8 @@ class CoursesController < ApplicationController
         if @current_user && (@show_recent_feedback = @context.user_is_student?(@current_user))
           @recent_feedback = @current_user.recent_feedback(contexts: @contexts) || []
         end
+
+        flash[:notice] = t("notices.updated", "Course was successfully updated.") if params[:for_reload]
 
         can_see_admin_tools = @context.grants_any_right?(
           @current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
@@ -3018,6 +3022,7 @@ class CoursesController < ApplicationController
         return render_unauthorized_action
       end
 
+      term_id_param_was_sent = params[:course][:term_id] || params[:course][:enrollment_term_id]
       term_id = params[:course].delete(:term_id)
       enrollment_term_id = params[:course].delete(:enrollment_term_id) || term_id
       if enrollment_term_id && @course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
@@ -3201,7 +3206,8 @@ class CoursesController < ApplicationController
       return render_unauthorized_action if course_availability_changed && !@course.grants_right?(@current_user, :edit_course_availability)
 
       # Republish course paces if the course dates have been changed
-      if @course.account.feature_enabled?(:course_paces) && course_availability_changed
+      term_changed = (@course.enrollment_term_id != enrollment_term_id) && term_id_param_was_sent
+      if @course.account.feature_enabled?(:course_paces) && (course_availability_changed || term_changed)
         @course.course_paces.find_each(&:create_publish_progress)
       end
       disable_conditional_release if changes[:conditional_release]&.last == false
@@ -4045,7 +4051,7 @@ class CoursesController < ApplicationController
       :show_total_grade_as_points, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view,
       :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed,
       :abstract_course, :storage_quota, :storage_quota_mb, :restrict_enrollments_to_course_dates, :use_rights_required,
-      :restrict_student_past_view, :restrict_student_future_view, :grading_standard, :grading_standard_enabled,
+      :restrict_student_past_view, :restrict_student_future_view, :restrict_quantitative_data, :grading_standard, :grading_standard_enabled,
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :hide_sections_on_course_users_page, :lock_all_announcements, :public_syllabus,
       :quiz_engine_selected, :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
       :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,

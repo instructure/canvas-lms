@@ -67,11 +67,19 @@ module Lti::IMS::Concerns
       }
     end
 
+    # the window property in a deep linking response can contain
+    # link-specific options. If a targetName is present, it can
+    # be used to determine whether the link should default to
+    # being opened in a new tab or not
+    def open_in_new_tab?(content_item)
+      content_item.dig(:window, :targetName) == "_blank"
+    end
+
     def build_module_item(content_item)
       {
         type: "context_external_tool",
         id: tool.id,
-        new_tab: 0,
+        new_tab: open_in_new_tab?(content_item) ? 1 : 0,
         indent: 0,
         url: content_item[:url],
         title: content_item[:title],
@@ -111,7 +119,7 @@ module Lti::IMS::Concerns
             external_tool_tag_attributes: {
               content_type: "ContextExternalTool",
               content_id: tool.id,
-              new_tab: 0,
+              new_tab: open_in_new_tab?(content_item) ? 1 : 0,
               url: content_item[:url]
             }
           }

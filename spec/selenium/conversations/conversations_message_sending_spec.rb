@@ -206,6 +206,8 @@ describe "conversations new" do
 
               get "/conversations"
               move_to_click(".icon-compose")
+              # Groups belonging to concluded courses should not be shown
+              expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.groups.first.name}')")
               expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
             end
           end
@@ -346,7 +348,10 @@ describe "conversations new" do
             get "/conversations"
             f("button[data-testid='compose']").click
             f("input[placeholder='Select Course']").click
-            expect(f("body")).to contain_jqcss("span:contains('#{@group.name}')")
+
+            # Groups that are a part of a concluded course should not be visible
+            expect(@group.context).to eq(@course)
+            expect(f("body")).to_not contain_jqcss("span:contains('#{@group.name}')")
             expect(f("body")).to_not contain_jqcss("li:contains('#{@course.name}')")
           end
 

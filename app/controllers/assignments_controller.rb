@@ -418,6 +418,8 @@ class AssignmentsController < ApplicationController
         user_has_google_drive
 
         @can_direct_share = @context.grants_right?(@current_user, session, :direct_share)
+        @can_link_to_speed_grader = Account.site_admin.feature_enabled?(:additional_speedgrader_links) && @assignment.can_view_speed_grader?(@current_user)
+
         @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
@@ -791,6 +793,7 @@ class AssignmentsController < ApplicationController
       hash[:SELECTED_CONFIG_TOOL_ID] = selected_tool ? selected_tool.id : nil
       hash[:SELECTED_CONFIG_TOOL_TYPE] = selected_tool ? selected_tool.class.to_s : nil
       hash[:REPORT_VISIBILITY_SETTING] = @assignment.turnitin_settings[:originality_report_visibility]
+      hash[:SHOW_SPEED_GRADER_LINK] = Account.site_admin.feature_enabled?(:additional_speedgrader_links) && @assignment.published? && @assignment.can_view_speed_grader?(@current_user)
 
       if @context.grading_periods?
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
@@ -821,6 +824,7 @@ class AssignmentsController < ApplicationController
       end
 
       hash[:USAGE_RIGHTS_REQUIRED] = @context.try(:usage_rights_required?)
+      hash[:restrict_quantitative_data] = @context.is_a?(Course) ? @context.restrict_quantitative_data?(@current_user) : false
 
       js_env(hash)
       conditional_release_js_env(@assignment)

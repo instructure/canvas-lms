@@ -179,19 +179,13 @@ QUnit.module('Gradebook#rowFilter', contextHooks => {
       gradebook = createGradebook()
     })
 
-    test('ignores the userFilterTerm', () => {
-      gradebook.userFilterTerm = 'charlie Xi'
-      gradebook.filteredStudentIds = ['2']
-      strictEqual(gradebook.rowFilter(student), false)
-    })
-
     test('returns true when filtered students include the student', () => {
-      gradebook.filteredStudentIds = ['1']
+      gradebook.searchFilteredStudentIds = ['1']
       strictEqual(gradebook.rowFilter(student), true)
     })
 
     test('returns false when filtered students do not include the student', () => {
-      gradebook.filteredStudentIds = ['2']
+      gradebook.searchFilteredStudentIds = ['2']
       strictEqual(gradebook.rowFilter(student), false)
     })
 
@@ -200,7 +194,7 @@ QUnit.module('Gradebook#rowFilter', contextHooks => {
     })
 
     test('returns true when not filtering students (originally filtered and then cleared filters)', () => {
-      gradebook.filteredStudentIds = []
+      gradebook.searchFilteredStudentIds = []
       strictEqual(gradebook.rowFilter(student), true)
     })
   })

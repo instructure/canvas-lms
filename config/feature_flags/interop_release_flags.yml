@@ -156,3 +156,8 @@ dev_key_oidc_alert:
       state: allowed_on
     ci:
       state: allowed_on
+lti_dynamic_registration:
+  state: hidden
+  display_name: LTI Dynamic Registration
+  description: Enables administrators to register LTI tools with Dynamic Registration
+  applies_to: RootAccount

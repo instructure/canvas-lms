@@ -35,7 +35,7 @@ import * as advancedPreference from './advancedPreference'
 import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 
 import {css} from 'aphrodite'
-import mathml, {MathJaxDirective} from './mathml'
+import Mathml, {MathJaxDirective} from '../../../../enhance-user-content/mathml'
 import styles from './styles'
 
 import RCEGlobals from '../../../RCEGlobals'
@@ -47,6 +47,11 @@ import {insertTextIntoLatexTextarea} from './latexTextareaUtil'
 
 export default class EquationEditorModal extends Component {
   static debounceRate = 1000
+
+  constructor(props) {
+    super(props)
+    this.mathml = new Mathml(RCEGlobals.getFeatures(), RCEGlobals.getConfig())
+  }
 
   state = {
     advanced: this.props.openAdvanced || !!this.props.originalLatex.advancedOnly,
@@ -130,7 +135,7 @@ export default class EquationEditorModal extends Component {
     () => {
       if (this.previewElement.current) {
         this.previewElement.current.innerHTML = String.raw`\(${this.state.workingFormula}\)`
-        mathml.processNewMathInElem(this.previewElement.current)
+        this.mathml.processNewMathInElem(this.previewElement.current)
       }
     },
     EquationEditorModal.debounceRate,

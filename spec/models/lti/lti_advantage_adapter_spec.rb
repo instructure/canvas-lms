@@ -41,6 +41,7 @@ describe Lti::LtiAdvantageAdapter do
       expander_opts
     )
   end
+  let(:include_storage_target) { true }
   let(:adapter) do
     Lti::LtiAdvantageAdapter.new(
       tool: tool,
@@ -48,6 +49,7 @@ describe Lti::LtiAdvantageAdapter do
       context: course,
       return_url: return_url,
       expander: expander,
+      include_storage_target: include_storage_target,
       opts: opts
     )
   end
@@ -125,39 +127,51 @@ describe Lti::LtiAdvantageAdapter do
       expect(params["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
     end
 
-    context "when lti_platform_storage flag is disabled" do
-      before do
-        Account.site_admin.disable_feature! :lti_platform_storage
-      end
-
-      it "creates a login message" do
-        expect(login_message.keys).to match_array %w[
-          iss
-          login_hint
-          target_link_uri
-          lti_message_hint
-          canvas_region
-          client_id
-          lti_storage_target
-        ]
-      end
+    it "creates a login message" do
+      expect(login_message.keys).to match_array %w[
+        iss
+        login_hint
+        target_link_uri
+        lti_message_hint
+        canvas_region
+        client_id
+        deployment_id
+        lti_storage_target
+      ]
     end
 
-    context "when lti_platform_storage flag is enabled" do
-      before do
-        Account.site_admin.enable_feature! :lti_platform_storage
+    context "lti_storage_target parameter" do
+      context "when include_storage_target parameter is not provided" do
+        let(:adapter) do
+          Lti::LtiAdvantageAdapter.new(
+            tool: tool,
+            user: user,
+            context: course,
+            return_url: return_url,
+            expander: expander,
+            opts: opts
+          )
+        end
+
+        it "is included" do
+          expect(login_message.keys).to include("lti_storage_target")
+        end
       end
 
-      it "creates a login message" do
-        expect(login_message.keys).to match_array %w[
-          iss
-          login_hint
-          target_link_uri
-          lti_message_hint
-          canvas_region
-          client_id
-          lti_storage_target
-        ]
+      context "when include_storage_target parameter is true" do
+        let(:include_storage_target) { true }
+
+        it "is included" do
+          expect(login_message.keys).to include("lti_storage_target")
+        end
+      end
+
+      context "when include_storage_target parameter is false" do
+        let(:include_storage_target) { false }
+
+        it "is not included" do
+          expect(login_message.keys).not_to include("lti_storage_target")
+        end
       end
     end
 
@@ -205,6 +219,10 @@ describe Lti::LtiAdvantageAdapter do
 
     it "sets the client_id to the developer key global id" do
       expect(login_message["client_id"]).to eq tool.global_developer_key_id
+    end
+
+    it "includes the deployment_id" do
+      expect(login_message["deployment_id"]).to eq tool.deployment_id
     end
 
     context "when the user has a past lti context id" do

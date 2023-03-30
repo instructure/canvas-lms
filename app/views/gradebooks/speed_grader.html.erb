@@ -181,10 +181,10 @@
                   <span class="turnitin_score_container"></span>
                   <a class="display_name no-hover" href="<%= preview_url %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
                   <span id="react_pill_container"></span>
-                  <a class="submission-file-delete icon-trash" href="/api/v1/files/{{attachmentId}}?replace=1" style="display:none;">
+                  <a role="button" class="submission-file-delete icon-trash" href="/api/v1/files/{{attachmentId}}?replace=1" style="display:none;">
                     <span class="screenreader-only"><%= t("Delete this file") %></span>
                   </a>
-                  <a class="submission-file-download icon-download" href="<%= download_url %>" download>
+                  <a role="button" class="submission-file-download icon-download" href="<%= download_url %>" download>
                     <span class="screenreader-only"><%= t("Download this file") %></span>
                   </a>
                 </div>

@@ -87,6 +87,7 @@ export interface ExternalToolsEnv {
   isA2StudentView: boolean
   maxMruTools: number
   canvasOrigin: string
+  studioMediaOptionsEnabled: boolean
   containingCanvasLtiToolId: string | null
   editorSelection: string | null
   editorContent: string | null
@@ -167,6 +168,10 @@ export function externalToolsEnvFor(
 
     get canvasOrigin() {
       return props()?.canvasOrigin ?? window.location.origin
+    },
+
+    get studioMediaOptionsEnabled() {
+      return props()?.features?.rce_show_studio_media_options ?? false
     },
 
     /**

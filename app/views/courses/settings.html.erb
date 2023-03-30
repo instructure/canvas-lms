@@ -332,6 +332,15 @@
           <%= f.hidden_field :restrict_student_future_view %>
         </div>
       </div>
+      <% if @context.root_account.feature_enabled?(:restrict_quantitative_data) %>
+      <div class="form-row course-quantitative-data-row">
+        <div class="form-label"><label for="restrict_quantitative_data_options"><%= f.blabel :restrict_quantitative_data, :en => "Quantitative Data Options" %></label></div>
+        <div class="nobr">
+          <div id="restrict_quantitative_data_options_container"></div>
+          <%= f.hidden_field :restrict_quantitative_data %>
+        </div>
+      </div>
+      <% end %>
       <% if @context.root_account.feature_enabled?(:default_due_time) %>
       <div class="form-row language-row">
         <div class="form-label"><%= f.blabel :default_due_time, en: "Default due time" %></div>

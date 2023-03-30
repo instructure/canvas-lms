@@ -195,3 +195,30 @@ additional_speedgrader_links:
       state: allowed_on # enable for local development
     test:
       state: allowed_on # enable for the deployed 'test' environment
+new_quiz_deleted_workflow_restore_pending_review_state:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: New Quiz deleted user restore pending review state on enroll
+  description: When set, determines if the workflow state of a new quiz should be
+    set as graded or pending_review if a user had a previous pending_review new quiz but
+    had been re-enrolled in the course.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
+    test:
+      state: allowed_on # enable for the deployed 'test' environment
+individual_gradebook_enhancements:
+  state: allowed
+  applies_to: RootAccount
+  display_name: Individual Gradebook Enhancements
+  description: This feature introduces performance and maintenance enhancements 
+    to Individual Gradebook
+  environments:
+    ci:
+      state: on # enable for automated testings builds and local testing
+    development:
+      state: on # enable for local development
+    test:
+      state: on # enable for the deployed 'test' environment

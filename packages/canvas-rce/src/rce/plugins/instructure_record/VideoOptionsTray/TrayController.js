@@ -145,7 +145,7 @@ export default class TrayController {
 
   _dismissTray() {
     if (this.$videoContainer) {
-      this._editor.selection.select(this.$videoContainer)
+      this._editor?.selection?.select(this.$videoContainer)
     }
     this._shouldOpen = false
     this._renderTray()

@@ -21,6 +21,7 @@
 final static JS_BUILD_IMAGE_STAGE = 'Javascript (Build Image)'
 final static LINTERS_BUILD_IMAGE_STAGE = 'Linters (Build Image)'
 final static RUN_MIGRATIONS_STAGE = 'Run Migrations'
+final static BUILD_DOCKER_IMAGE_STAGE = 'Build Docker Image'
 
 def buildParameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
@@ -45,8 +46,7 @@ commitMessageFlag.setEnabled(env.GERRIT_EVENT_TYPE != 'change-merged')
 library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
-commitMessageFlag.setDefaultValues(commitMessageFlagDefaults())
-configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
+commitMessageFlag.setDefaultValues(commitMessageFlagDefaults() + commitMessageFlagPrivateDefaults())
 protectedNode.setReportUnhandledExceptions(!env.JOB_NAME.endsWith('Jenkinsfile'))
 
 def getSummaryUrl() {
@@ -69,10 +69,8 @@ def getLocalWorkDir() {
   return env.GERRIT_PROJECT == 'canvas-lms' ? '.' : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
-// return false if the current patchset tag doesn't match the
-// mainline publishable tag. i.e. ignore pg-9.5 builds
 def isPatchsetPublishable() {
-  env.PATCHSET_TAG == env.PUBLISHABLE_TAG
+  env.PUBLISH_PATCHSET_IMAGE == "1"
 }
 
 def isPatchsetRetriggered() {
@@ -256,9 +254,6 @@ pipeline {
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PATCHSET_TAG = imageTag.patchset()
 
-    // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
-    PUBLISHABLE_TAG = imageTag.publishableTag()
-
     // e.g. canvas-lms:master when not on another branch
     MERGE_TAG = imageTag.mergeTag()
 
@@ -342,7 +337,7 @@ pipeline {
                   submitGerritReview("", "Build Started ${RUN_DISPLAY_URL}")
                 }
 
-                if (configuration.skipCi()) {
+                if (commitMessageFlag("skip-ci") as Boolean) {
                   currentBuild.result = 'NOT_BUILT'
                   submitGerritReview('--label Lint-Review=-2', 'Build not executed due to [skip-ci] flag')
                   error '[skip-ci] flag enabled: skipping the build'
@@ -362,7 +357,7 @@ pipeline {
               }
 
               // Ensure that all build flags are compatible.
-              if (commitMessageFlag('change-merged') as Boolean && configuration.isValueDefault('build-registry-path')) {
+              if (commitMessageFlag('change-merged') as Boolean && configuration.buildRegistryPath() == configuration.buildRegistryPathDefault()) {
                 error 'Manually triggering the change-merged build path must be combined with a custom build-registry-path'
                 return
               }
@@ -401,7 +396,7 @@ pipeline {
                   buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
                 }
 
-                extendedStage('Builder').nodeRequirements(label: configuration.nodeLabel(), podTemplate: null).obeysAllowStages(false).reportTimings(false).queue(rootStages) {
+                extendedStage('Builder').nodeRequirements(label: nodeLabel(), podTemplate: null).obeysAllowStages(false).reportTimings(false).queue(rootStages) {
                   extendedStage('Setup')
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
@@ -431,7 +426,7 @@ pipeline {
                     .timeout(20)
                     .execute(buildDockerImageStage.&premergeCacheImage)
 
-                  extendedStage('Build Docker Image')
+                  extendedStage(BUILD_DOCKER_IMAGE_STAGE)
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .timeout(20)
@@ -535,7 +530,7 @@ pipeline {
                       sh 'build/new-jenkins/consumer-smoke-test.sh'
                     }
 
-                    def shouldRunJS = configuration.isChangeMerged() ||
+                    def shouldRunJS = configuration.isChangeMerged() || commitMessageFlag('force-failure-js') as Boolean ||
                       (!configuration.isChangeMerged() && (filesChangedStage.hasGraphqlFiles(buildConfig) || filesChangedStage.hasJsFiles(buildConfig)))
 
                     extendedStage(JS_BUILD_IMAGE_STAGE)
@@ -556,24 +551,23 @@ pipeline {
                   }
                 }
 
-                extendedStage('ARM64 Builder')
+                extendedStage('ARM64 Builder - Container')
                   .hooks(buildSummaryReportHooks.call())
                   .nodeRequirements(label: 'docker-arm64')
                   .required(configuration.isChangeMerged())
                   .queue(rootStages) {
-                    setupStage()
-                    // Rebase is fortunately not needed - since this only runs in post-merge
-                    buildDockerImageStage.patchsetImage('', '-arm64')
+                    extendedStage('ARM64 Builder').execute {
+                      setupStage()
+                      // Rebase is fortunately not needed - since this only runs in post-merge
+                      buildDockerImageStage.patchsetImage('', '-arm64')
+                    }
 
-                    // Wait for the AMD64 manifest to be available - then augment it with this ARM64 one
-                    sh """#!/bin/bash -ex
-                    while ! docker manifest inspect $PATCHSET_TAG; do
-                      sleep 10
-                    done
-
-                    docker manifest create --amend $PATCHSET_TAG $PATCHSET_TAG $PATCHSET_TAG-arm64
-                    docker manifest push $PATCHSET_TAG
-                    """
+                    extendedStage('Augment Manifest').waitsFor(BUILD_DOCKER_IMAGE_STAGE, 'Builder').execute {
+                      sh """#!/bin/bash -ex
+                      docker manifest create --amend $PATCHSET_TAG $PATCHSET_TAG $PATCHSET_TAG-arm64
+                      docker manifest push $PATCHSET_TAG
+                      """
+                    }
                   }
 
                 extendedStage("${filesChangedStage.STAGE_NAME} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(filesChangedStage.STAGE_NAME, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
@@ -601,13 +595,13 @@ pipeline {
 
                 extendedStage('Linters (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(LINTERS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
                   extendedStage('Linters - Dependency Check')
-                    .nodeRequirements(label: configuration.nodeLabel(), podTemplate: dependencyCheckStage.nodeRequirementsTemplate(), container: 'dependency-check')
+                    .nodeRequirements(label: nodeLabel(), podTemplate: dependencyCheckStage.nodeRequirementsTemplate(), container: 'dependency-check')
                     .required(configuration.isChangeMerged())
                     .execute(dependencyCheckStage.queueTestStage())
 
                   extendedStage('Linters')
                     .hooks([onNodeReleasing: lintersStage.tearDownNode()])
-                    .nodeRequirements(label: configuration.nodeLabel(), podTemplate: lintersStage.nodeRequirementsTemplate())
+                    .nodeRequirements(label: nodeLabel(), podTemplate: lintersStage.nodeRequirementsTemplate())
                     .required(!configuration.isChangeMerged() && env.GERRIT_CHANGE_ID != '0')
                     .execute {
                       def nestedStages = [:]
@@ -640,7 +634,7 @@ pipeline {
 
                   extendedStage('Flakey Spec Catcher')
                     .hooks(buildSummaryReportHooks.call())
-                    .required(!configuration.isChangeMerged() && filesChangedStage.hasSpecFiles(buildConfig) || configuration.forceFailureFSC() == '1')
+                    .required(!configuration.isChangeMerged() && filesChangedStage.hasSpecFiles(buildConfig) || commitMessageFlag('force-failure-fsc') as Boolean)
                     .queue(nestedStages, jobName: '/Canvas/test-suites/flakey-spec-catcher', buildParameters: buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),

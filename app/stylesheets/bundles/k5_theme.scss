@@ -16,25 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// K5 font-related overrides belong in k5_font.scss (so that they can be selectively
+// included, depending on the account's K5 font setting).
+
 @import "base/environment";
-
-.ic-app-header__main-navigation,
-.ic-app-nav-toggle-and-crumbs,
-.ic-app-crumbs,
-.ic-app-course-menu,
-.ui-dialog,
-[role="dialog"],
-#main {
-  font-family: "Balsamiq Sans", $ic-font-family;
-
-  & h1, h2, h3, h4, h5, h6 {
-    font-family: "Balsamiq Sans", $ic-font-family;
-  }
-
-  & input, button, select, textarea {
-    font-family: "Balsamiq Sans", $ic-font-family;
-  }
-}
 
 // Balsamiq Sans is slightly bigger than Lato Extended, which causes the
 // publish/unpublish buttons to wrap. This trims their horizontal padding

@@ -103,8 +103,10 @@ export const defaultGradebookEnv = {
 
 export const defaultGradebookProps: GradebookProps = {
   actionMenuNode: document.createElement('span'),
+  anonymousSpeedGraderAlertNode: document.createElement('span'),
   appliedFilters: [],
   applyScoreToUngradedModalNode: document.createElement('div'),
+  assignmentMap: {},
   colors: {
     dropped: 'test',
     excused: 'test',
@@ -127,9 +129,9 @@ export const defaultGradebookProps: GradebookProps = {
   gradingPeriodsFilterContainer: document.createElement('div'),
   gradebookSettingsModalContainer: document.createElement('span'),
   gridColorNode: document.createElement('div'),
-  hideGrid: true,
   isFiltersLoading: false,
   isGradingPeriodAssignmentsLoading: false,
+  isGridLoaded: false,
   isModulesLoading: false,
   isStudentIdsLoading: false,
   locale: 'en',

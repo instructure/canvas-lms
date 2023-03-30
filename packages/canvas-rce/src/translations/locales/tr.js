@@ -26,6 +26,7 @@ const locale = {
   "add_cc_subtitles_55f0394e": { "message": "Alt yazı ekle" },
   "add_image_60b2de07": { "message": "Görsel Ekle" },
   "aleph_f4ffd155": { "message": "Aleph" },
+  "align_11050992": { "message": "Hizala" },
   "alignment_and_lists_5cebcb69": { "message": "Eşleştirme ve Listeler" },
   "all_4321c3a1": { "message": "Tümü" },
   "all_apps_a50dea49": { "message": "Tüm Uygulamalar" },
@@ -47,6 +48,9 @@ const locale = {
   "announcements_a4b8ed4a": { "message": "Duyurular" },
   "apply_781a2546": { "message": "Uygula" },
   "apps_54d24a47": { "message": "Uygulamalar" },
+  "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+    "message": "İptal etmek istediğinize emin misiniz? Yaptığınız değişiklikler kaydedilmeyebilir."
+  },
   "arrows_464a3e54": { "message": "Oklar" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Genişleme oranı korumalıdır"
@@ -60,8 +64,15 @@ const locale = {
   "bottom_15a2a9be": { "message": "Alt" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "İptal" },
+  "changes_you_made_may_not_be_saved_4e8db973": {
+    "message": "Yaptığınız değişiklikler kaydedilmemiş olabilir."
+  },
+  "characters_9d897d1c": { "message": "Karakterler" },
   "choose_caption_file_9c45bc4e": { "message": "Alt yazı dosyasını seçin" },
   "choose_usage_rights_33683854": { "message": "Kullanıcı haklarını seçin..." },
+  "circle_unordered_list_9e3a0763": {
+    "message": "sıralanmamış listeyi yuvarlak içine al"
+  },
   "clear_2084585f": { "message": "Temizle" },
   "clear_selected_file_82388e50": { "message": "Seçili dosyayı temizle" },
   "click_to_embed_imagename_c41ea8df": {
@@ -100,6 +111,7 @@ const locale = {
   "custom_6979cd81": { "message": "Özelleştir" },
   "cyan_c1d5f68a": { "message": "Cam göbeği" },
   "date_added_ed5ad465": { "message": "Eklendiği Tarih" },
+  "decrease_indent_d9cf469d": { "message": "İçerden başlatma sınırını azalt" },
   "deep_purple_bb3e2907": { "message": "Koyu Mor" },
   "delimiters_4db4840d": { "message": "Ayıraçlar" },
   "description_436c48d7": { "message": "Açıklama" },
@@ -110,6 +122,7 @@ const locale = {
   "display_options_315aba85": { "message": "Gösterim Seçenekleri" },
   "documents_81393201": { "message": "Belgeler" },
   "done_54e3d4b6": { "message": "Tamam" },
+  "down_5831a426": { "message": "Aşağı" },
   "drag_a_file_here_1bf656d5": { "message": "Buraya bir Dosya Sürükleyin" },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Sürükleyip bırakın ya da bilgisayarınıza gözatın"
@@ -118,6 +131,9 @@ const locale = {
   "edit_c5fbea07": { "message": "Düzenle" },
   "edit_link_7f53bebb": { "message": "Bağlantıyı Düzenle" },
   "embed_828fac4a": { "message": "Göm" },
+  "embed_content_from_external_tool_3397ad2d": {
+    "message": "Harici Araçtan içerik Ekle"
+  },
   "embed_image_1080badc": { "message": "Görsel Ekle" },
   "external_tools_6e77821": { "message": "Harici Araçlar" },
   "extra_large_b6cdf1ff": { "message": "Ekstra Büyük" },
@@ -138,6 +154,7 @@ const locale = {
   "heading_4_b2e74be7": { "message": "Başlık 4" },
   "height_69b03e15": { "message": "Yükseklik" },
   "home_351838cd": { "message": "Ana Sayfa" },
+  "html_editor_fb2ab713": { "message": "HTML Düzenleyici" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Bu dosyayı kullanmak için iznim var."
   },
@@ -147,9 +164,11 @@ const locale = {
   "image_options_5412d02c": { "message": "Görsel Seçenekleri" },
   "image_options_tray_90a46006": { "message": "Görsel Seçenekleri Yan Menüsü" },
   "images_7ce26570": { "message": "Görseller" },
+  "increase_indent_6af90f7c": { "message": "İçerden başlat" },
   "indigo_2035fc55": { "message": "Indigo" },
   "insert_593145ef": { "message": "Ekle" },
   "insert_link_6dc23cae": { "message": "Bağlantı Ekle" },
+  "insert_math_equation_57c6e767": { "message": "Matematik Denklemi Ekle" },
   "invalid_file_c11ba11": { "message": "Geçersiz Dosya" },
   "invalid_file_type_881cc9b2": { "message": "Geçersiz dosya türü" },
   "invalid_url_cbde79f": { "message": "Geçersiz bağlantı" },
@@ -237,10 +256,15 @@ const locale = {
   },
   "unpublished_dfd8801": { "message": "yayınlanmadı" },
   "untitled_16aa4f2b": { "message": "Başlıksız" },
+  "up_c553575d": { "message": "Yukarı" },
+  "upload_document_253f0478": { "message": "Belge Yükle" },
   "upload_file_fd2361b8": { "message": "Dosya Yükle" },
   "upload_image_6120b609": { "message": "Görsel Yükle" },
   "upload_media_ce31135a": { "message": "Medya Dosyası Yükle" },
   "uploading_19e8a4e7": { "message": "Yükleniyor" },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "Büyük harf alfabetik sıralı liste"
+  },
   "url_22a5f3b8": { "message": "URL" },
   "usage_right_ff96f3e2": { "message": "Kullanım Şartları:" },
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {

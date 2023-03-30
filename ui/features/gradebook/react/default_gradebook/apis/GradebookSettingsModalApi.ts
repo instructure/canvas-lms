@@ -27,7 +27,7 @@ export const DEFAULT_LATE_POLICY_DATA: LatePolicyCamelized = {
   lateSubmissionMinimumPercentEnabled: false,
   lateSubmissionMinimumPercent: 0,
   missingSubmissionDeductionEnabled: false,
-  missingSubmissionDeduction: 0,
+  missingSubmissionDeduction: 100,
   newRecord: true,
 } as const
 

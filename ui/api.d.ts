@@ -254,7 +254,11 @@ export type AssignmentGroup = Readonly<{
   integration_data: unknown
   name: string
   position: number
-  rules: unknown
+  rules: {
+    drop_lowest?: number
+    drop_highest?: number
+    never_drop?: string[]
+  }
   sis_source_id: null | string
 }>
 
@@ -302,6 +306,7 @@ export type Attachment = {
   submitter_id: string
   updated_at: string
   upload_status: string
+  url?: string
   view_inline_ping_url?: string
   viewed_at: string
   word_count: number
@@ -364,10 +369,11 @@ export type WorkflowState =
   | 'deleted'
   | 'graded'
   | 'not_graded'
+  | 'pending_review'
   | 'published'
   | 'settings_only'
-  | 'pending_review'
   | 'submitted'
+  | 'unpublished'
   | 'unsubmitted'
   | 'untaken'
 
@@ -434,6 +440,15 @@ export type Submission = Readonly<{
   updated_at: string
   final_provisional_grade?: string
 }
+
+export type MissingSubmission = {
+  assignment_id: string
+  user_id: string
+  excused: boolean
+  late: boolean
+  missing: boolean
+  seconds_late: number
+} & Partial<Submission>
 
 export type AssignmentUserSubmissionMap = {
   [assignmentId: string]: {

@@ -22,6 +22,7 @@ class ContentMigration < ActiveRecord::Base
   include Workflow
   include TextHelper
   include Rails.application.routes.url_helpers
+  include CanvasOutcomesHelper
 
   belongs_to :context, polymorphic: [:course, :account, :group, { context_user: "User" }]
   validate :valid_date_shift_options
@@ -750,6 +751,9 @@ class ContentMigration < ActiveRecord::Base
         if skip_item
           Rails.logger.debug("skipping deletion sync for #{content.asset_string} due to downstream changes #{child_tag.downstream_changes}")
           add_skipped_item(child_tag)
+        elsif content_is_an_outcome_and_has_results?(content, context)
+          Rails.logger.debug { "skipping deletion sync for #{content.asset_string} due to there are Learning Outcomes Results" }
+          add_skipped_item(child_tag)
         else
           Rails.logger.debug("syncing deletion of #{content.asset_string} from master course")
           content.skip_downstream_changes! if content.respond_to?(:skip_downstream_changes!)
@@ -757,6 +761,19 @@ class ContentMigration < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def content_is_an_outcome_and_has_results?(content, context)
+    outcome = nil
+    if content.is_a?(LearningOutcome)
+      outcome = content
+    elsif content.is_a?(ContentTag) && content.content_type == "LearningOutcome"
+      outcome = LearningOutcome.find_by(id: content.content_id, context_type: "Account")
+    end
+    return false if outcome.nil?
+    return true if outcome.learning_outcome_results.where("workflow_state <> 'deleted' AND context_type='Course' AND context_code='course_#{context.id}'").count > 0
+
+    outcome_has_authoritative_results?(outcome, context)
   end
 
   def check_cross_institution

@@ -122,7 +122,7 @@ module Outcomes
     end
 
     def filter_outcomes(relation, filter)
-      if %w[WITH_ALIGNMENTS NO_ALIGNMENTS].include?(filter) && outcome_alignment_summary_enabled?(@context)
+      if %w[WITH_ALIGNMENTS NO_ALIGNMENTS].include?(filter) && improved_outcomes_management_enabled?(@context)
         outcomes_with_alignments_in_context = ContentTag
                                               .not_deleted
                                               .where(

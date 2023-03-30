@@ -32,6 +32,9 @@ const locale = {
   "announcements_a4b8ed4a": { "message": "اطلاعیه ها" },
   "apply_781a2546": { "message": "اعمال" },
   "apps_54d24a47": { "message": "برنامه ها" },
+  "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+    "message": "آیا مطمئن هستید که می خواهید لغو شود؟ تغییرات انجام شده ممکن است ذخیره نشوند."
+  },
   "arrows_464a3e54": { "message": "پیکان ها" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "نسبت ابعاد حفظ خواهد شد"
@@ -46,6 +49,10 @@ const locale = {
   "brick_f2656265": { "message": "آجر" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "لغو" },
+  "changes_you_made_may_not_be_saved_4e8db973": {
+    "message": "تغییرات انجام شده ممکن است ذخیره نشوند."
+  },
+  "characters_9d897d1c": { "message": "نویسه ها" },
   "choose_usage_rights_33683854": { "message": "انتخاب حقوق استفاده..." },
   "clear_2084585f": { "message": "پاک کردن" },
   "clear_selected_file_82388e50": { "message": "پاک کردن فایل انتخاب شده" },
@@ -61,6 +68,7 @@ const locale = {
   "content_1440204b": { "message": "محتوا" },
   "content_type_2cf90d95": { "message": "نوع محتوا" },
   "copyright_holder_66ee111": { "message": "دارنده حق نشر:" },
+  "count_40eced3b": { "message": "تعداد" },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n  other {}\n}"
   },
@@ -71,6 +79,7 @@ const locale = {
   "current_volume_level_c55ab825": { "message": "سطح حجم فعلی" },
   "custom_6979cd81": { "message": "سفارشی" },
   "cyan_c1d5f68a": { "message": "آبی تیره" },
+  "decrease_indent_d9cf469d": { "message": "کاهش تورفتگی" },
   "deep_purple_bb3e2907": { "message": "ارغوانی پر رنگ" },
   "delimiters_4db4840d": { "message": "جداکننده ها" },
   "description_436c48d7": { "message": "شرح" },
@@ -85,6 +94,9 @@ const locale = {
   "due_multiple_dates_cc0ee3f5": { "message": "مهلت: چند تاریخ" },
   "edit_c5fbea07": { "message": "ویرایش" },
   "embed_828fac4a": { "message": "قراردادن" },
+  "embed_content_from_external_tool_3397ad2d": {
+    "message": "درج محتوا از ابزار بیرونی"
+  },
   "embed_image_1080badc": { "message": "درج تصویر" },
   "external_tools_6e77821": { "message": "ابزارهای بیرونی" },
   "file_name_8fd421ff": { "message": "نام فایل" },
@@ -101,6 +113,7 @@ const locale = {
   "group_files_82e5dcdb": { "message": "فایل های گروه" },
   "group_navigation_99f191a": { "message": "پیمایش گروه" },
   "home_351838cd": { "message": "صفحه اصلی" },
+  "html_editor_fb2ab713": { "message": "ویرایشگر HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "مجوز استفاده از این فایل را به دست آورده ام."
   },
@@ -110,9 +123,11 @@ const locale = {
   "image_8ad06": { "message": "تصویر" },
   "image_c1c98202": { "message": "تصویر" },
   "images_7ce26570": { "message": "تصاویر" },
+  "increase_indent_6af90f7c": { "message": "افزایش تورفتگی" },
   "indigo_2035fc55": { "message": "Indigo" },
   "insert_593145ef": { "message": "درج" },
   "insert_link_6dc23cae": { "message": "درج پیوند" },
+  "insert_math_equation_57c6e767": { "message": "درج معادله ریاضی" },
   "invalid_file_type_881cc9b2": { "message": "نوع فایل معتبر نیست" },
   "invalid_url_cbde79f": { "message": "نشانی اینترنتی معتبر نیست" },
   "keyboard_shortcuts_ed1844bd": { "message": "میانبرهای صفحه کلید" },
@@ -124,6 +139,7 @@ const locale = {
   },
   "loading_25990131": { "message": "در حال بارگذاری..." },
   "loading_bde52856": { "message": "در حال بارگذاری" },
+  "loading_external_tool_d839042c": { "message": "بارگذاری ابزار خارجی" },
   "loading_failed_b3524381": { "message": "Loading failed..." },
   "loading_folders_d8b5869e": { "message": "بارگیری پوشه ها" },
   "locked_762f138b": { "message": "قفل شده" },
@@ -192,6 +208,9 @@ const locale = {
   "the_document_preview_is_currently_being_processed__7d9ea135": {
     "message": "پیش نمایش سند در حال پردازش است. لطفا بعدا دوباره تلاش کنید."
   },
+  "the_following_content_is_partner_provided_ed1da756": {
+    "message": "محتوای زیر توسط شریک فراهم شده است"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "مطلب در دامنه عمومی است"
   },
@@ -223,9 +242,11 @@ const locale = {
   },
   "user_files_78e21703": { "message": "فایل های کاربر" },
   "video_player_b371005": { "message": "پخش کننده فیلم" },
+  "view_all_e13bf0a6": { "message": "مشاهده همه" },
   "view_ba339f93": { "message": "مشاهده" },
   "webcam_fe91b20f": { "message": "دوربین" },
   "wiki_home_9cd54d0": { "message": "صفحه اصلی ویکی" },
+  "word_count_c77fe3a6": { "message": "تعداد کلمه" },
   "yes_dde87d5": { "message": "بله" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "وب کم شما ممکن است در حال استفاده باشد."

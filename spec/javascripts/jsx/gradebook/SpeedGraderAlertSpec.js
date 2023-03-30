@@ -92,32 +92,3 @@ QUnit.module('Gradebook#showAnonymousSpeedGraderAlertForURL', hooks => {
     AnonymousSpeedGraderAlert.prototype.open.restore()
   })
 })
-
-QUnit.module('Gradebook#hideAnonymousSpeedGraderAlert', hooks => {
-  let gradebook
-
-  hooks.beforeEach(() => {
-    setFixtureHtml($fixtures)
-
-    sinon.stub(ReactDOM, 'unmountComponentAtNode')
-  })
-
-  hooks.afterEach(() => {
-    ReactDOM.unmountComponentAtNode.restore()
-
-    $fixtures.innerHTML = ''
-  })
-
-  test('unmounts the component at the alert mount point', () => {
-    const clock = sinon.useFakeTimers()
-    gradebook = createGradebook()
-    gradebook.hideAnonymousSpeedGraderAlert()
-
-    // allow the component to unmount (which is handled via a delayed call)
-    clock.tick(0)
-
-    const mountPoint = ReactDOM.unmountComponentAtNode.firstCall.args[0]
-    strictEqual(mountPoint.dataset.component, 'AnonymousSpeedGraderAlert')
-    clock.restore()
-  })
-})

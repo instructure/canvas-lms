@@ -54,16 +54,31 @@ describe('TimeLateInput', () => {
     }
   })
 
-  it('displays "Day(s)" as the text next to the input when the late policy interval is "day"', () => {
+  it('displays "Days" as the text next to the input when the late policy interval is "day"', () => {
     const {getByText} = renderComponent()
-    const numberInputText = getByText(/day\(s\)/i)
+    const numberInputText = getByText('Days')
     expect(numberInputText).toBeInTheDocument()
   })
 
-  it('displays "Hour(s) as the text next to the input when the late policy interval is "hour"', () => {
+  it('displays "Day" as the text next to the input when set to be late 1 day', () => {
+    props.secondsLate = 60 * 60 * 24
+    const {getByText} = renderComponent()
+    const numberInputText = getByText('Day')
+    expect(numberInputText).toBeInTheDocument()
+  })
+
+  it('displays "Hours as the text next to the input when the late policy interval is "hour"', () => {
     props.lateSubmissionInterval = 'hour'
     const {getByText} = renderComponent()
-    const numberInputText = getByText(/hour\(s\)/i)
+    const numberInputText = getByText('Hours')
+    expect(numberInputText).toBeInTheDocument()
+  })
+
+  it('displays "Hour" as the text next to the input when set to be late 1 hour', () => {
+    props.secondsLate = 60 * 60
+    props.lateSubmissionInterval = 'hour'
+    const {getByText} = renderComponent()
+    const numberInputText = getByText('Hour')
     expect(numberInputText).toBeInTheDocument()
   })
 

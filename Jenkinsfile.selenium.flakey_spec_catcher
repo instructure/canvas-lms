@@ -19,6 +19,7 @@
  */
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 @groovy.transform.Field
 def partitions = []
@@ -46,6 +47,10 @@ def getLocalWorkDir() {
   }
 
   return env.GERRIT_PROJECT == 'canvas-lms' ? '.' : "gems/plugins/${env.GERRIT_PROJECT}"
+}
+
+def getMaxNodes() {
+  return commitMessageFlag('fsc-max-nodes').asType(Integer) ?: 10
 }
 
 def setupNode() {
@@ -186,7 +191,7 @@ pipeline {
     IS_PLUGIN = isPlugin()
     DOCKER_WORKDIR = getDockerWorkDir()
     LOCAL_WORKDIR = getLocalWorkDir()
-    FORCE_FAILURE = configuration.forceFailureFSC()
+    FORCE_FAILURE = commitMessageFlag('force-failure-fsc').asBooleanInteger()
     // fsc errors when running specs from gems.
     // until we figure out how to run them, we should ignore them
     FSC_IGNORE_FILES = 'gems/.*/spec/,spec/contracts/,engines/.*/spec/,spec/selenium/performance/'
@@ -197,7 +202,7 @@ pipeline {
     // Assumption: non-selenium tests take 500ms / test
     // Assumption: selenium tests take 500ms * SELENIUM_RATIO / test
     FSC_REPEAT_FACTOR = 10
-    MAX_NODES = configuration.getString('fsc-max-nodes', '10')
+    MAX_NODES = getMaxNodes()
     RSPEC_PROCESSES = 3
     SELENIUM_RATIO = 20
     TESTS_PER_NODE = 200
@@ -207,7 +212,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements(label: configuration.nodeLabel()).obeysAllowStages(false).execute {
+          extendedStage('Runner').nodeRequirements(label: nodeLabel()).obeysAllowStages(false).execute {
             def postBuildHandler = [
               onStageEnded: { stageName, stageConfig, result ->
                 cleanupFn(stageConfig.status())
@@ -250,7 +255,7 @@ pipeline {
                   def nodeNumber = (index).toString().padLeft(2, '0')
 
                   stages["flakey set $nodeNumber"] = {
-                    protectedNode(configuration.nodeLabel()) {
+                    protectedNode(nodeLabel()) {
                       withEnv([
                         "FSC_TESTS=${partitions[index].join(',')}",
                         "NODE_NUMBER=$nodeNumber"

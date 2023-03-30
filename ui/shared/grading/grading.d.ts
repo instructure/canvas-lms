@@ -20,10 +20,8 @@ import type {
   Enrollment,
   GradingType,
   LatePolicyStatus,
-  Override,
   Submission,
   SubmissionType,
-  UserDueDateMap,
   WorkflowState,
 } from '../../api.d'
 
@@ -67,42 +65,22 @@ export type CamelizedStudent = {
   totalGrade: number
 }
 
-// TODO: remove the need for this
-export type SubmissionCommentCamelized = {
-  allowedAttempts: number
-  anonymizeStudents: boolean
-  anonymousGrading: boolean
-  assignmentGroupId: string
-  assignmentGroupPosition: number
-  assignmentId: string
-  assignmentVisibility: string[]
-  courseId: string
-  dueDate: string | null
-  effectiveDueDates: UserDueDateMap
-  gradesPublished: boolean
-  gradingStandardId: string | null
-  gradingType: GradingType
-  hidden: boolean
-  htmlUrl: string
-  id: string
-  inClosedGradingPeriod: boolean
-  moderatedGrading: boolean
-  moduleIds: string[]
-  muted: boolean
-  name: string
-  omitFromFinalGrade: boolean
-  onlyVisibleToOverrides: boolean
-  overrides: Override[]
-  pointsPossible: number
-  position: number
-  postManually: boolean
-  published: boolean
-  submissionTypes: string
-  userId: string
+export type SubmissionData = {
+  id?: string
+  dropped: boolean | undefined
+  enteredGrade?: string | null
+  enteredScore?: number | null
+  excused: boolean
+  extended: boolean
+  grade: string | null
+  late: boolean
+  missing: boolean
+  resubmitted: boolean
+  score: number | null
 }
 
 // TODO: remove the need for this
-export type SubmissionCamelized = {
+export type CamelizedSubmission = {
   anonymousId: string
   assignmentId: string
   assignmentVisible?: boolean
@@ -235,7 +213,7 @@ export type SubmissionOriginalityDataMap = {
 
 export type SimilarityType = 'vericite' | 'turnitin' | 'originality_report'
 
-export type CamelizedSubmissionWithOriginalityReport = SubmissionCamelized & {
+export type CamelizedSubmissionWithOriginalityReport = CamelizedSubmission & {
   attachments: Array<{id: string}>
   hasOriginalityReport: boolean
   turnitinData?: SubmissionOriginalityDataMap
@@ -266,29 +244,60 @@ export type GradeInput = {
 
 export type GradeResult = {
   enteredAs: null | GradeType
-  late_policy_status: null | LatePolicyStatus
   excused: boolean
   grade: null | string
+  late_policy_status: null | LatePolicyStatus
   score: null | number
   valid: boolean
 }
 
+export type AssignmentGroupGradeMap = {
+  [assignmentGroupId: string]: AssignmentGroupGrade
+}
+
+export type StudentGrade = {
+  score: number
+  possible: number
+  submission: Submission
+  drop?: boolean
+}
+
+export type AggregateGrade = {
+  score: number
+  possible: number
+  submission_count: number
+  submissions: StudentGrade[]
+}
+
 export type AssignmentGroupGrade = {
   assignmentGroupId: string
-  assignmentGroupWeight: any
-  current: {
-    score: number
-    possible: number
-    submission_count: any
-    submissions: any
-  }
+  assignmentGroupWeight: number
+  current: AggregateGrade
+  final: AggregateGrade
+  scoreUnit: 'points' | 'percentage'
+}
+
+export type GradingPeriodGrade = {
+  gradingPeriodId: string
+  gradingPeriodWeight: number
+  assignmentGroups: AssignmentGroupGradeMap
+  scoreUnit: 'points' | 'percentage'
   final: {
     score: number
     possible: number
-    submission_count: any
-    submissions: any
+    submission_count?: number
+    submissions?: Submission[]
   }
-  scoreUnit: string
+  current: {
+    score: number
+    possible: number
+    submission_count?: number
+    submissions?: Submission[]
+  }
+}
+
+export type GradingPeriodGradeMap = {
+  [gradingPeriodId: string]: GradingPeriodGrade
 }
 
 export type FormatGradeOptions = {

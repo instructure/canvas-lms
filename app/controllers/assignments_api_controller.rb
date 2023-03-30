@@ -781,6 +781,7 @@ class AssignmentsApiController < ApplicationController
     if course_copy_retry?
       new_assignment.context = target_course
       new_assignment.assignment_group = target_assignment.assignment_group
+      set_assignment_asset_map(new_assignment) if new_assignment.quiz_lti?
     else
       new_assignment.asset_map = Assignment::DUPLICATED_IN_CONTEXT
     end
@@ -1550,5 +1551,15 @@ class AssignmentsApiController < ApplicationController
 
   def use_quiz_json?
     params[:result_type] == "Quiz" && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+  end
+
+  def set_assignment_asset_map(assignment)
+    content_migration = ContentMigration.where(migration_type: "master_course_import",
+                                               child_subscription_id: MasterCourses::ChildSubscription.where(
+                                                 master_template_id: MasterCourses::MasterContentTag.where(
+                                                   content: assignment.duplicate_of
+                                                 ).select(:master_template_id)
+                                               ).select(:id)).first
+    assignment.asset_map = content_migration&.asset_map_url
   end
 end

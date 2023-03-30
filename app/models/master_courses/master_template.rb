@@ -286,7 +286,16 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
                      klass.constantize.where(context_id: course, context_type: "Course", workflow_state: "deleted")
                    end
       item_scope = item_scope.where("updated_at>?", last_export_started_at).select(:id)
-      deleted_mig_ids = content_tags.where(content_type: klass, content_id: item_scope).pluck(:migration_id)
+      deleted_mig_ids = []
+      # If the klass is ContentTag, we iterate through each ContentTag since the content_type could differ between ContentTags
+      if klass == "ContentTag"
+        contents = item_scope.pluck(:content_type, :content_id).select do |content_type, content_id|
+          content_type == "LearningOutcome" && LearningOutcome.find(content_id).context_type == "Account"
+        end
+        deleted_mig_ids = contents.map { |content_type, content_id| content_tags.where(content_type: content_type, content_id: content_id).pluck(:migration_id) }.flatten
+      else
+        deleted_mig_ids = content_tags.where(content_type: klass, content_id: item_scope).pluck(:migration_id)
+      end
       deletions_by_type[klass] = deleted_mig_ids if deleted_mig_ids.any?
     end
     deletions_by_type
