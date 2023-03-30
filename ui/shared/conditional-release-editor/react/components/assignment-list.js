@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {List} from 'immutable'
-import shortid from 'shortid'
+import shortid from '@canvas/shortid'
 import classNames from 'classnames'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
