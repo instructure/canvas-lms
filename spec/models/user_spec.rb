@@ -2483,38 +2483,33 @@ describe User do
       ids << User.create!(name: "john john")
     end
 
-    context "given pg_collkey extension is present" do
-      before do
-        skip_unless_pg_collkey_present
-      end
+    it "sorts lexicographically" do
+      ascending_sortable_names = User.order_by_sortable_name.where(id: ids).map(&:sortable_name)
+      expect(ascending_sortable_names).to eq(["john, john", "John, John", "Johnson, John"])
+    end
 
-      it "sorts lexicographically" do
-        ascending_sortable_names = User.order_by_sortable_name.where(id: ids).map(&:sortable_name)
-        expect(ascending_sortable_names).to eq(["john, john", "John, John", "Johnson, John"])
-      end
+    it "sorts support direction toggle" do
+      descending_sortable_names = User.order_by_sortable_name(direction: :descending)
+                                      .where(id: ids).map(&:sortable_name)
+      expect(descending_sortable_names).to eq(["Johnson, John", "John, John", "john, john"])
+    end
 
-      it "sorts support direction toggle" do
-        descending_sortable_names = User.order_by_sortable_name(direction: :descending)
-                                        .where(id: ids).map(&:sortable_name)
-        expect(descending_sortable_names).to eq(["Johnson, John", "John, John", "john, john"])
-      end
+    it "sorts support direction toggle with a prior select" do
+      descending_sortable_names = User.select([:id, :sortable_name]).order_by_sortable_name(direction: :descending)
+                                      .where(id: ids).map(&:sortable_name)
+      expect(descending_sortable_names).to eq ["Johnson, John", "John, John", "john, john"]
+    end
 
-      it "sorts support direction toggle with a prior select" do
-        descending_sortable_names = User.select([:id, :sortable_name]).order_by_sortable_name(direction: :descending)
-                                        .where(id: ids).map(&:sortable_name)
-        expect(descending_sortable_names).to eq ["Johnson, John", "John, John", "john, john"]
+    it "sorts by the current locale" do
+      I18n.with_locale(:es) do
+        expect(User.sortable_name_order_by_clause).to match(/es-u-kn-true/)
+        expect(User.sortable_name_order_by_clause).not_to match(/und-u-kn-true/)
       end
-
-      it "sorts by the current locale" do
-        I18n.with_locale(:es) do
-          expect(User.sortable_name_order_by_clause).to match(/'es'/)
-          expect(User.sortable_name_order_by_clause).not_to match(/'root'/)
-        end
-        I18n.with_locale(:en) do
-          # english has no specific sorting rules, so use root
-          expect(User.sortable_name_order_by_clause).not_to match(/'es'/)
-          expect(User.sortable_name_order_by_clause).to match(/'root'/)
-        end
+      I18n.with_locale(:en) do
+        # english has no specific sorting rules, so use root
+        expect(User.sortable_name_order_by_clause).not_to match(/en-u-kn-true/)
+        expect(User.sortable_name_order_by_clause).not_to match(/es-u-kn-true/)
+        expect(User.sortable_name_order_by_clause).to match(/und-u-kn-true/)
       end
     end
 
@@ -2526,38 +2521,33 @@ describe User do
         ids << User.create!(name: "Jimmy John")
       end
 
-      context "given pg_collkey extension is present" do
-        before do
-          skip_unless_pg_collkey_present
-        end
+      it "sorts lexicographically" do
+        ascending_names = User.order_by_name.where(id: ids).map(&:name)
+        expect(ascending_names).to eq(["Jimmy John", "Jimmy Johns", "John Johnson"])
+      end
 
-        it "sorts lexicographically" do
-          ascending_names = User.order_by_name.where(id: ids).map(&:name)
-          expect(ascending_names).to eq(["Jimmy John", "Jimmy Johns", "John Johnson"])
-        end
+      it "sorts support direction toggle" do
+        descending_names = User.order_by_name(direction: :descending)
+                               .where(id: ids).map(&:name)
+        expect(descending_names).to eq(["John Johnson", "Jimmy Johns", "Jimmy John"])
+      end
 
-        it "sorts support direction toggle" do
-          descending_names = User.order_by_name(direction: :descending)
-                                 .where(id: ids).map(&:name)
-          expect(descending_names).to eq(["John Johnson", "Jimmy Johns", "Jimmy John"])
-        end
+      it "sorts support direction toggle with a prior select" do
+        descending_names = User.select([:id, :name]).order_by_name(direction: :descending)
+                               .where(id: ids).map(&:name)
+        expect(descending_names).to eq(["John Johnson", "Jimmy Johns", "Jimmy John"])
+      end
 
-        it "sorts support direction toggle with a prior select" do
-          descending_names = User.select([:id, :name]).order_by_name(direction: :descending)
-                                 .where(id: ids).map(&:name)
-          expect(descending_names).to eq(["John Johnson", "Jimmy Johns", "Jimmy John"])
+      it "sorts by the current locale" do
+        I18n.with_locale(:es) do
+          expect(User.name_order_by_clause).to match(/es-u-kn-true/)
+          expect(User.name_order_by_clause).not_to match(/und-u-kn-true/)
         end
-
-        it "sorts by the current locale" do
-          I18n.with_locale(:es) do
-            expect(User.name_order_by_clause).to match(/'es'/)
-            expect(User.name_order_by_clause).not_to match(/'root'/)
-          end
-          I18n.with_locale(:en) do
-            # english has no specific sorting rules, so use root
-            expect(User.name_order_by_clause).not_to match(/'es'/)
-            expect(User.name_order_by_clause).to match(/'root'/)
-          end
+        I18n.with_locale(:en) do
+          # english has no specific sorting rules, so use root
+          expect(User.name_order_by_clause).not_to match(/en-u-kn-true/)
+          expect(User.name_order_by_clause).not_to match(/es-u-kn-true/)
+          expect(User.name_order_by_clause).to match(/und-u-kn-true/)
         end
       end
     end

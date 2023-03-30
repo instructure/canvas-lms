@@ -436,7 +436,6 @@ RSpec.configure do |config|
   config.include Factories
   config.include RequestHelper, type: :request
   config.include Onceler::BasicHelpers
-  config.include PGCollkeyHelper
   config.include ActionDispatch::TestProcess::FixtureFile
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
