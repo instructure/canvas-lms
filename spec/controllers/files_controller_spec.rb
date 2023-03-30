@@ -1169,6 +1169,28 @@ describe FilesController do
       expect(json["upload_params"]["x-amz-credential"]).to start_with("stub_id")
     end
 
+    # This test verifies that an attachment on a graded discussion will not affect the files quota
+    it "allows going over quota for graded discussions submissions" do
+      s3_storage!
+      user_session(@student)
+      @assignment = @course.assignments.create!(title: "discussion assignment", submission_types: "discussion_topic")
+      Setting.set("user_default_quota", -1)
+      post "create_pending", params: { attachment: {
+        context_code: @assignment.context_code,
+        asset_string: @assignment.asset_string,
+        intent: "submit",
+        filename: "bob.txt"
+      }, format: :json }
+      expect(response).to be_successful
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment].id).not_to be_nil
+      json = json_parse
+      expect(json).not_to be_nil
+      expect(json["upload_url"]).not_to be_nil
+      expect(json["upload_params"]).to be_present
+      expect(json["upload_params"]["x-amz-credential"]).to start_with("stub_id")
+    end
+
     it "associates assignment submission for a group assignment with the group" do
       user_session(@student)
       category = group_category
