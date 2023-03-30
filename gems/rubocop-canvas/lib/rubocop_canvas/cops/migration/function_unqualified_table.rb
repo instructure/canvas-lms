@@ -29,7 +29,8 @@ module RuboCop
         TEXT
 
         def create_or_replace_function?(string)
-          string.match(/create (or replace )?function/i)
+          @execute_string += string
+          @execute_string.match(/(create|replace)\s+function/i)
         end
 
         def_node_search :create_function?, <<~PATTERN
@@ -43,6 +44,7 @@ module RuboCop
         RESTRICT_ON_SEND = [:execute].freeze
 
         def on_send(node)
+          @execute_string = ""
           return if @current_def == :down
 
           qualified_name = qualified_name(node).first
