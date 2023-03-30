@@ -83,7 +83,7 @@
         <ul class="pill">
           <% count = context_module.requirement_count %>
           <% completion_label = count == 1 ? t("Complete One Item") : t("Complete All Items") %>
-          <li aria-label="<%= completion_label %>" data-requirement-count="<%= count %>" tabindex="0">
+          <li aria-label="<%= completion_label %>" data-requirement-count="<%= count %>">
             <%= completion_label %>
           </li>
         </ul>

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment.scss";
-@import "components/empty-state.scss";
+@import 'base/environment.scss';
+@import 'components/empty-state.scss';
 
 .context_module .items {
   min-height: 10px; /* sortable on empty */
@@ -32,7 +32,7 @@
     }
 
     .conditional_options_count {
-      background: #1897D8;
+      background: #1897d8;
       float: direction(right);
       padding: 2px 15px;
       border-radius: 12px;
@@ -46,7 +46,8 @@
   display: block !important;
 }
 
-.collapse_module_link, .expand_module_link {
+.collapse_module_link,
+.expand_module_link {
   cursor: pointer;
 }
 
@@ -106,6 +107,7 @@
     display: flex;
     align-items: center;
     flex: 0 0 auto;
+    margin-inline-end: 8px; /* instui focus ring offset is 5px */
 
     ul {
       display: flex;
@@ -119,7 +121,7 @@
     display: flex;
     align-self: center;
     margin-inline-start: auto;
-    
+
     .completion_status {
       margin: 0 16px;
       width: 16px;
@@ -154,10 +156,13 @@
   margin-bottom: 0;
 }
 
-.sortable-handle a, .draggable-handle a {
+.sortable-handle a,
+.draggable-handle a {
   color: #b4b7ba;
 }
-.context_module .links a, .context_module .reorder_module_link, .context_module .move_item_link {
+.context_module .links a,
+.context_module .reorder_module_link,
+.context_module .move_item_link {
   opacity: 1;
 }
 
@@ -176,7 +181,7 @@
   /* shared with assignments, dry it up */
   color: #b4b7ba;
   margin: direction-sides(0 4px 0 -15px);
-  padding: direction-sides(0 0px 0 10px )!important;
+  padding: direction-sides(0 0px 0 10px) !important;
 }
 
 .sortable-handle,
@@ -203,7 +208,6 @@ input.move-module-label-spacer {
   display: inline-block;
   width: 60px;
   margin-#{direction(left)}: 20px;
-
 }
 
 .move-module-select-spacer {
@@ -231,7 +235,7 @@ input.move-module-label-spacer {
 }
 
 .prereq-req-item-delete {
-  padding-top: calc((38px - 20px) / 2 );
+  padding-top: calc((38px - 20px) / 2);
   position: absolute;
   #{direction(right)}: 5px;
 }
@@ -250,8 +254,8 @@ input.move-module-label-spacer {
 }
 
 #add_context_module_form {
- padding: 10px 40px 0;
- overflow: visible;
+  padding: 10px 40px 0;
+  overflow: visible;
 }
 
 .ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix {
@@ -267,12 +271,12 @@ input.move-module-label-spacer {
   width: 48px;
 }
 .for-nvda {
-  position:absolute;
-  #{direction(left)}:-10000px;
-  top:auto;
-  width:1px;
-  height:1px;
-  overflow:hidden;
+  position: absolute;
+  #{direction(left)}: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 
 .require-sequential {
