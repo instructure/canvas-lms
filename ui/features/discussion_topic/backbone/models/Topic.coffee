@@ -26,7 +26,7 @@ import Backbone from '@canvas/backbone'
 import {asJson, getPrefetchedXHR} from '@instructure/js-utils'
 import BackoffPoller from '@canvas/backoff-poller'
 import walk from '../../array-walk'
-import erase from 'array-erase'
+import erase from '@canvas/array-erase'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 I18n = useI18nScope('discussions')
