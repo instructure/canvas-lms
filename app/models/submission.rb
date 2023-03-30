@@ -2825,7 +2825,8 @@ class Submission < ActiveRecord::Base
     effective_attempt = (attempt == 0) ? nil : attempt
 
     rubric_assessments.each_with_object([]) do |assessment, assessments_for_attempt|
-      if assessment.artifact_attempt == effective_attempt
+      #  Adding the new or condition to handle the case where the teacher grade a assignment before the student has submitted an attempt.
+      if assessment.artifact_attempt == effective_attempt || (assessment.score.present? && effective_attempt == 1)
         assessments_for_attempt << assessment
       else
         version = assessment.versions.find { |v| v.model.artifact_attempt == effective_attempt }
