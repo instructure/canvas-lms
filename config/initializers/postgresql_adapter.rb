@@ -301,7 +301,7 @@ module PostgreSQLAdapterExtensions
       WHERE
         collprovider='i' AND
         NOT collisdeterministic AND
-        collcollate LIKE '%-u-kn-true'
+        collname LIKE '%-u-kn-true'
     SQL
   end
 
