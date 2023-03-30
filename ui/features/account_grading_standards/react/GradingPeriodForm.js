@@ -25,7 +25,7 @@ import {Button} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
 import numberHelper from '@canvas/i18n/numberHelper'
-import round from 'round'
+import round from '@canvas/round'
 
 const I18n = useI18nScope('gradingPeriodForm')
 

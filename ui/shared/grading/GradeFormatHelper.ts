@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import round from 'round'
+import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {scoreToPercentage} from './GradeCalculationHelper'
 import {scoreToGrade} from './GradingSchemeHelper'

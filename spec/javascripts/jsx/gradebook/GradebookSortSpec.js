@@ -17,7 +17,7 @@
  */
 
 import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
-import round from 'round'
+import round from '@canvas/round'
 
 QUnit.module('sortByStudentColumn', {
   setup() {

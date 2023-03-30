@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import round from 'round'
+import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import _ from 'underscore'
 import DialogFormView, {getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView.coffee'

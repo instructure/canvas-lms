@@ -24,7 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {NumberInput} from '@instructure/ui-number-input'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import round from 'round'
+import round from '@canvas/round'
 import NumberHelper from '@canvas/i18n/numberHelper'
 
 const I18n = useI18nScope('speed_grader')

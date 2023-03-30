@@ -19,7 +19,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import round from 'round'
+import round from '@canvas/round'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'

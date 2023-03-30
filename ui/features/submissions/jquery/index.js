@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import round from 'round'
+import round from '@canvas/round'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import isNumber from 'lodash/isNumber'
