@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useRef} from 'react'
 import {bool, func, number} from 'prop-types'
-import shortid from 'shortid'
+import shortid from '@canvas/shortid'
 import {FormField} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
 
