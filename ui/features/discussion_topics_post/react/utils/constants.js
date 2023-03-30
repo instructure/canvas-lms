@@ -52,6 +52,8 @@ const discussionManagerUtilityContext = {
   setUserSplitScreenPreference: () => {},
   highlightEntryId: '',
   setHighlightEntryId: () => {},
+  isGradedDiscussion: false,
+  setIsGradedDiscussion: () => {},
 }
 
 export const DiscussionManagerUtilityContext = React.createContext(discussionManagerUtilityContext)

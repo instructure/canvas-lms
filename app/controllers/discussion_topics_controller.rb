@@ -796,6 +796,7 @@ class DiscussionTopicsController < ApplicationController
                  GRADED_RUBRICS_URL: (@topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil),
                  CONTEXT_RUBRICS_URL: can_do(@topic.assignment, @current_user, :update) ? context_url(@topic.assignment.context, :context_rubrics_url) : "",
                  ATTACHMENTS_FOLDER_ID: @current_user.nil? ? Folder.unfiled_folder(@context).id : Folder.unfiled_folder(@current_user).id,
+                 ASSIGNMENT: @topic.assignment ? @topic.assignment.asset_string : nil,
                  preferences: {
                    discussions_splitscreen_view: @current_user&.discussions_splitscreen_view? || false
                  }
