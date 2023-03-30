@@ -103,7 +103,7 @@ Rails.configuration.to_prepare do
 
   I18n.backend = backend_class.new(
     meta_keys: %w[aliases community crowdsourced custom locales],
-    lazy_load: true
+    lazy_load: !Rails.application.config.eager_load
   )
 end
 
