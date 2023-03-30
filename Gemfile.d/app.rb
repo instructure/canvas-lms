@@ -44,14 +44,12 @@ gem "addressable", "2.7.0", require: false
 gem "after_transaction_commit", "2.2.2"
 gem "authlogic", "6.4.2"
   gem "scrypt", "3.0.7"
-gem "aws-sdk-core", "3.168.4", require: false
-gem "aws-sdk-dynamodb", "1.80.0"
-gem "aws-sdk-kinesis", "1.43.0", require: false
-gem "aws-sdk-s3", "1.117.2", require: false
-gem "aws-sdk-sns", "1.57.0", require: false
-gem "aws-sdk-sqs", "1.52.1", require: false
-gem "aws-sdk-kms", "1.61.0", require: false
-gem "aws-sigv4", "1.5.2", require: false
+gem "aws-sdk-dynamodb", "~> 1.83"
+gem "aws-sdk-kinesis", "~> 1.45", require: false
+gem "aws-sdk-kms", "~> 1.63", require: false
+gem "aws-sdk-s3", "~> 1.119", require: false
+gem "aws-sdk-sns", "~> 1.60", require: false
+gem "aws-sdk-sqs", "~> 1.53", require: false
 gem "barby", "0.6.8", require: false
   gem "rqrcode", "1.2.0", require: false
   gem "chunky_png", "1.4.0", require: false
