@@ -345,12 +345,14 @@ module Api::V1::Submission
         hash["external_tool_url"] = attempt.external_tool_url
       end
 
-      hash["url"] =
-        retrieve_course_external_tools_url(
-          context.id,
-          assignment_id: assignment.id,
-          url: attempt.external_tool_url
-        )
+      if json_fields.include?("url")
+        hash["url"] =
+          retrieve_course_external_tools_url(
+            context.id,
+            assignment_id: assignment.id,
+            url: attempt.external_tool_url
+          )
+      end
     end
 
     hash

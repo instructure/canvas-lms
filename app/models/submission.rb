@@ -1291,7 +1291,12 @@ class Submission < ActiveRecord::Base
   # End Plagiarism functions
 
   def external_tool_url
-    URI::DEFAULT_PARSER.escape(url) if url && submission_type == "basic_lti_launch"
+    return unless submission_type == "basic_lti_launch"
+
+    external_url = url
+    return unless external_url
+
+    URI::DEFAULT_PARSER.escape(external_url)
   end
 
   def clear_user_submissions_cache

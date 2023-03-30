@@ -416,7 +416,7 @@ export type Submission = Readonly<{
   seconds_late: number
   similarityInfo: null | SimilarityScore
   submission_type: SubmissionType
-  url: null | string
+  url?: null | string
   user_id: string
   versioned_attachments?: any
   word_count: null | number

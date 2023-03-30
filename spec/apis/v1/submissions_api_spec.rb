@@ -5860,6 +5860,12 @@ describe "Submissions API", type: :request do
           submission_json = api_call_as_user(teacher, :get, path, params, body_params)
           expect(submission_json.first).not_to have_key "external_tool_url"
         end
+
+        it "optionally excludes the url" do
+          body_params = { exclude_response_fields: ["url"] }
+          submission_json = api_call_as_user(teacher, :get, path, params, body_params)
+          expect(submission_json.first).not_to have_key "url"
+        end
       end
 
       describe "submission_status" do

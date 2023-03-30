@@ -46,7 +46,7 @@ export function reportCatch(error) {
 }
 
 export const submissionsParams = {
-  exclude_response_fields: ['preview_url', 'external_tool_url'],
+  exclude_response_fields: ['preview_url', 'external_tool_url', 'url'],
   grouped: 1,
   response_fields: [
     'assignment_id',
@@ -71,7 +71,6 @@ export const submissionsParams = {
     'seconds_late',
     'submission_type',
     'submitted_at',
-    'url',
     'user_id',
     'workflow_state',
   ],
