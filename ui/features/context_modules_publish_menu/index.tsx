@@ -17,6 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ContextModulesPublishMenu from '@canvas/context-modules-publish-menu/ContextModulesPublishMenu'
@@ -25,11 +26,12 @@ import ready from '@instructure/ready'
 ready(() => {
   const menuElement = document.getElementById('context-modules-publish-menu')
   if (menuElement) {
+    const $menuElement = $(menuElement)
     ReactDOM.render(
       <ContextModulesPublishMenu
-        courseId={menuElement.dataset.courseId}
-        runningProgressId={menuElement.dataset.progressId}
-        disabled={menuElement.dataset.disabled === 'true'}
+        courseId={$menuElement.data('courseId')}
+        runningProgressId={$menuElement.data('progressId')}
+        disabled={$menuElement.data('disabled')}
       />,
       menuElement
     )

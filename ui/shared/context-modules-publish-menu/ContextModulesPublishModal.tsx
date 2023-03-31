@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -26,125 +25,42 @@ import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
+
+import {ProgressResult} from '@canvas/context-modules/utils/publishAllModulesHelper'
 
 const I18n = useI18nScope('context_modules_publish_menu')
 
 interface Props {
   readonly isOpen: boolean
+  readonly onCancel: () => void
   readonly onClose: () => void
   readonly onPublish: () => void
-  readonly onPublishComplete: () => void
+  readonly isCanceling: boolean
+  readonly isPublishing: boolean
   readonly progressId: string | null
+  readonly progressCurrent?: ProgressResult
   readonly title: string
 }
 export const PUBLISH_STATUS_POLLING_MS = 1000
 
 const ContextModulesPublishModal: React.FC<Props> = ({
   isOpen,
+  onCancel,
   onClose,
   onPublish,
-  onPublishComplete,
+  isCanceling,
+  isPublishing,
   progressId,
+  progressCurrent,
   title,
 }) => {
-  const [isPublishing, setIsPublishing] = useState(false)
-  const [isCanceling, setIsCanceling] = useState(false)
-  const [progress, setProgress] = useState(null)
-  const [progressCurrent, setProgressCurrent] = useState(0)
-
-  useEffect(() => {
-    if (progressId) {
-      const interval = setInterval(pollProgress, PUBLISH_STATUS_POLLING_MS)
-      return function cleanup() {
-        clearInterval(interval)
-      }
-    }
-  })
-
-  const pollProgress = () => {
-    if (!progressId) return
-    if (
-      progress &&
-      (progress.workflow_state === 'completed' || progress.workflow_state === 'failed')
-    )
-      return
-
-    const pollingLoop = () => {
-      doFetchApi({
-        path: `/api/v1/progress/${progressId}`,
-      })
-        .then(result => {
-          return result
-        })
-        .then(result => {
-          setProgress(result.json)
-          setProgressCurrent(result.json.completion)
-          if (result.json.workflow_state === 'completed') {
-            handlePublishComplete()
-          } else if (result.json.workflow_state === 'failed') {
-            showFlashError(I18n.t('Your publishing job has failed.'))
-            handlePublishComplete()
-          }
-        })
-        .catch(error => {
-          showFlashError(I18n.t('There was an error while saving your changes'))(error)
-          setIsPublishing(false)
-        })
-    }
-    return pollingLoop()
-  }
-
-  const handleCancel = () => {
-    setIsCanceling(true)
-    if (!progressId) return
-    if (
-      progress &&
-      (progress.workflow_state === 'completed' || progress.workflow_state === 'failed')
-    )
-      return
-
-    doFetchApi({
-      path: `/api/v1/progress/${progressId}/cancel`,
-      method: 'POST',
-    })
-      .then(result => {
-        return result
-      })
-      .then(_result => {
-        setProgress(null)
-        window.location.reload() // We reload the page to get the current state of all the module items
-      })
-      .catch(error => {
-        showFlashError(I18n.t('There was an error while saving your changes'))(error)
-        setIsPublishing(false)
-        setIsCanceling(false)
-      })
-  }
-
   const handlePublish = () => {
     if (isPublishing) {
-      handleCancel()
+      onCancel()
     } else {
-      setIsPublishing(true)
       onPublish()
     }
-  }
-
-  const handlePublishComplete = () => {
-    // Remove progress id if one was loaded with page
-    const publishMenu = document.getElementById('context-modules-publish-menu')
-    if (publishMenu) {
-      publishMenu.dataset.progressId = ''
-    }
-    onPublishComplete()
-    setProgress(null)
-    setProgressCurrent(0)
-    setIsPublishing(false)
-    setIsCanceling(false)
-    onClose()
   }
 
   const progressBar = () => {
@@ -164,7 +80,7 @@ const ContextModulesPublishModal: React.FC<Props> = ({
             return <Text size="small">{Math.round((valueNow / valueMax) * 100)}%</Text>
           }}
           valueMax={100}
-          valueNow={progressCurrent}
+          valueNow={progressCurrent?.completion || 0}
         />
       </View>
     )

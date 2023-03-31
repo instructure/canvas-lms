@@ -133,16 +133,30 @@ export function initPublishButton($el, data) {
     }
 
     const props = {
-      model: file,
       togglePublishClassOn: $el.parents('.ig-row')[0],
       userCanEditFilesForContext: ENV.MODULE_FILE_PERMISSIONS.manage_files_edit,
       usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required,
       fileName: file.displayName(),
     }
 
-    const Cloud = <PublishCloud {...props} />
-    ReactDOM.render(Cloud, $el[0])
-    return {model: file} // Pretending this is a backbone view
+    const fileFauxView = {
+      render: () => {
+        const model = $el.data('view').model
+        ReactDOM.render(
+          <PublishCloud {...props} model={model} disabled={model.get('disabled')} />,
+          $el[0]
+        )
+        // to look disable, we need to add the class here
+        $el[0].classList[model.get('disabled') ? 'add' : 'remove']('disabled')
+      },
+      model: file,
+    }
+    file.view = fileFauxView
+    $el.data('view', fileFauxView)
+
+    fileFauxView.render()
+
+    return fileFauxView // Pretending this is a backbone view
   }
 
   const model = new PublishableModuleItem({
@@ -329,7 +343,7 @@ export function updateModuleItem(moduleItems, attrs, model) {
   if (Array.isArray(itemContentKeys)) {
     items = itemContentKeys
       .map(key => moduleItems[key])
-      .filter(item => item !== undefined)
+      .filter(mitem => mitem !== undefined)
       .flat(1)
   } else {
     items = moduleItems[itemContentKeys]
@@ -339,12 +353,14 @@ export function updateModuleItem(moduleItems, attrs, model) {
     for (i = 0; i < items.length; i++) {
       item = items[i]
       parsedAttrs = item.model.parse(attrs)
-      if (parsedAttrs.type === 'File') {
-        item.model.set({locked: !parsedAttrs.published})
+      const published =
+        'published' in parsedAttrs ? parsedAttrs.published : item.model.get('published')
+      if (parsedAttrs.type === 'File' || model.attributes.type === 'file') {
+        item.model.set({locked: !published, disabled: parsedAttrs.bulkPublishInFlight})
       } else {
-        item.model.set({published: parsedAttrs.published})
-        item.model.view.render()
+        item.model.set({published, bulkPublishInFlight: parsedAttrs.bulkPublishInFlight})
       }
+      item.model.view.render()
     }
   }
 }

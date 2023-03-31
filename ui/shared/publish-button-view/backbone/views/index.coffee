@@ -185,6 +185,9 @@ export default class PublishButton extends Backbone.View
       @renderDelayedPublish()
     else
       @renderPublish()
+
+    if @model.get('bulkPublishInFlight')
+      @disable()
     @
 
   renderPublish: ->

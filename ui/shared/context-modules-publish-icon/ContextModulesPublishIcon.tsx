@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import React, {useState} from 'react'
+import React from 'react'
 
 import {IconMiniArrowDownLine, IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
@@ -26,32 +24,36 @@ import {Menu} from '@instructure/ui-menu'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
-import {showFlashError, showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {publishModule, unpublishModule} from '@canvas/context-modules/utils/publishOneModuleHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
-
-import {initPublishButton} from '@canvas/context-modules/jquery/utils'
 
 const I18n = useI18nScope('context_modules_publish_icon')
 
 interface Props {
-  readonly courseId: string
-  readonly moduleId: string
-  readonly published: Boolean
+  readonly courseId: string | number
+  readonly moduleId: string | number
+  readonly published: boolean
+  readonly isPublishing: boolean
+  readonly loadingMessage?: string
 }
 
-const ContextModulesPublishIcon: React.FC<Props> = ({courseId, moduleId, published}) => {
-  const [isPublished, setIsPublished] = useState(published)
-  const [isPublishing, setIsPublishing] = useState(false)
-  const [loadingMessage, setLoadingMessage] = useState(null)
+// TODO: remove and replace MenuItem with Menu.Item below when on v8
+const {Item: MenuItem} = Menu as any
 
+const ContextModulesPublishIcon: React.FC<Props> = ({
+  courseId,
+  moduleId,
+  published,
+  isPublishing,
+  loadingMessage,
+}) => {
   const statusIcon = () => {
     const iconStyles = {
       paddingLeft: '0.25rem',
     }
     if (isPublishing) {
-      return <Spinner renderTitle={loadingMessage} size="x-small" />
-    } else if (isPublished) {
+      return <Spinner renderTitle={() => loadingMessage} size="x-small" />
+    } else if (published) {
       return (
         <>
           <IconPublishSolid size="x-small" color="success" style={iconStyles} />
@@ -68,80 +70,19 @@ const ContextModulesPublishIcon: React.FC<Props> = ({courseId, moduleId, publish
     }
   }
 
-  const updateApiCall = (
-    newPublishedState: boolean,
-    skipModuleItems: boolean,
-    successMessage: string
-  ) => {
-    if (isPublishing) return
-
-    const path = `/api/v1/courses/${courseId}/modules/${moduleId}`
-
-    setIsPublishing(true)
-    return doFetchApi({
-      path,
-      method: 'PUT',
-      body: {
-        module: {
-          published: newPublishedState,
-          skip_content_tags: skipModuleItems,
-        },
-      },
-    })
-      .then(result => {
-        setIsPublished(result.json.published)
-        showFlashAlert({
-          message: successMessage,
-          type: 'success',
-          srOnly: true,
-        })
-        fetchModuleItemPublishedState()
-      })
-      .catch(error => showFlashError(I18n.t('There was an error while saving your changes'))(error))
-      .finally(() => setIsPublishing(false))
-  }
-
-  const fetchModuleItemPublishedState = (nextLink?: string) => {
-    doFetchApi({
-      path: nextLink || `/api/v1/courses/${courseId}/modules/${moduleId}/items`,
-      method: 'GET',
-    })
-      .then(({json, link}) => {
-        json.forEach((item: any) => {
-          updateModuleItemPublishedState(item.id, item.published)
-        })
-        if (link?.next) {
-          fetchModuleItemPublishedState(link.next.url)
-        }
-      })
-      .catch(error => showFlashError(I18n.t('There was an error while saving your changes'))(error))
-  }
-
-  const updateModuleItemPublishedState = (itemId: string, isPublished: boolean) => {
-    const itemRow = document.querySelector(`#context_module_item_${itemId}`) as HTMLElement | null
-    if (itemRow) {
-      itemRow.querySelector('.ig-row')?.classList.toggle('ig-published', isPublished)
-      const publishIcon = $(itemRow.querySelector('.publish-icon'))
-      if (publishIcon) {
-        publishIcon.data('published', isPublished)
-        initPublishButton(publishIcon)
-      }
-    }
-  }
-
   const unpublishAll = () => {
-    setLoadingMessage(I18n.t('Unpublishing module and items'))
-    updateApiCall(false, false, I18n.t('Module and items unpublished'))
+    if (isPublishing) return
+    unpublishModule(courseId, moduleId)
   }
 
   const publishAll = () => {
-    setLoadingMessage(I18n.t('Publishing module and items'))
-    updateApiCall(true, false, I18n.t('Module and items published'))
+    if (isPublishing) return
+    publishModule(courseId, moduleId, false)
   }
 
   const publishModuleOnly = () => {
-    setLoadingMessage(I18n.t('Publishing module'))
-    updateApiCall(true, true, I18n.t('Module published'))
+    if (isPublishing) return
+    publishModule(courseId, moduleId, true)
   }
 
   return (
@@ -155,15 +96,15 @@ const ContextModulesPublishIcon: React.FC<Props> = ({courseId, moduleId, publish
           </IconButton>
         }
       >
-        <Menu.Item onClick={publishAll}>
+        <MenuItem onClick={publishAll}>
           <IconPublishSolid color="success" /> {I18n.t('Publish module and all items')}
-        </Menu.Item>
-        <Menu.Item onClick={publishModuleOnly}>
+        </MenuItem>
+        <MenuItem onClick={publishModuleOnly}>
           <IconPublishSolid color="success" /> {I18n.t('Publish module only')}
-        </Menu.Item>
-        <Menu.Item onClick={unpublishAll}>
+        </MenuItem>
+        <MenuItem onClick={unpublishAll}>
           <IconUnpublishedLine /> {I18n.t('Unpublish module and all items')}
-        </Menu.Item>
+        </MenuItem>
       </Menu>
     </View>
   )

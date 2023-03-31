@@ -18,27 +18,42 @@
 
 import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
-
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {updateModuleItem} from '@canvas/context-modules/jquery/utils'
 import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
+import {makeModuleWithItems} from '@canvas/context-modules/__tests__/testHelpers'
+
+jest.mock('@canvas/do-fetch-api-effect')
+jest.mock('@canvas/context-modules/jquery/utils', () => {
+  const originalModule = jest.requireActual('@canvas/context-modules/jquery/utils')
+  return {
+    __esmodule: true,
+    ...originalModule,
+    updateModuleItem: jest.fn(),
+  }
+})
 
 const defaultProps = {
   courseId: '1',
   moduleId: '1',
   published: true,
+  isPublishing: false,
 }
 
 const PUBLISH_URL = '/api/v1/courses/1/modules/1'
 
+beforeEach(() => {
+  doFetchApi.mockResolvedValue({response: {ok: true}, json: {published: true}})
+  makeModuleWithItems(1)
+})
+
+afterEach(() => {
+  jest.clearAllMocks()
+  doFetchApi.mockReset()
+  document.body.innerHTML = ''
+})
+
 describe('ContextModulesPublishIcon', () => {
-  beforeEach(() => {
-    fetchMock.get('/api/v1/courses/1/modules/1/items', 200)
-  })
-
-  afterEach(() => {
-    fetchMock.restore()
-  })
-
   it('renders the menu when clicked', () => {
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
     const menuButton = getByRole('button')
@@ -49,41 +64,158 @@ describe('ContextModulesPublishIcon', () => {
   })
 
   it('calls publishAll when clicked publish all menu item is clicked', async () => {
-    fetchMock.put(PUBLISH_URL, {
-      module: {published: true, skip_content_tags: false},
-    })
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
     const menuButton = getByRole('button', {name: 'Module publish menu'})
     act(() => menuButton.click())
     const publishButton = getByText('Publish module and all items')
     act(() => publishButton.click())
     await waitFor(() => expect(getByText('Publishing module and items')).toBeInTheDocument())
+    expect(doFetchApi).toHaveBeenCalledWith(
+      expect.objectContaining({
+        method: 'PUT',
+        path: PUBLISH_URL,
+        body: {module: {published: true, skip_content_tags: false}},
+      })
+    )
     expect(getByText('Module and items published')).toBeInTheDocument()
   })
 
   it('calls publishModuleOnly when clicked publish module menu item is clicked', async () => {
-    fetchMock.put(PUBLISH_URL, {
-      module: {published: true, skip_content_tags: true},
-    })
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
     const menuButton = getByRole('button', {name: 'Module publish menu'})
     act(() => menuButton.click())
     const publishButton = getByText('Publish module only')
     act(() => publishButton.click())
     await waitFor(() => expect(getByText('Publishing module')).toBeInTheDocument())
+    expect(doFetchApi).toHaveBeenCalledWith(
+      expect.objectContaining({
+        method: 'PUT',
+        path: PUBLISH_URL,
+        body: {module: {published: true, skip_content_tags: true}},
+      })
+    )
     expect(getByText('Module published')).toBeInTheDocument()
   })
 
   it('calls unpublishAll when clicked unpublish all items is clicked', async () => {
-    fetchMock.put(PUBLISH_URL, {
-      module: {published: false, skip_content_tags: false},
-    })
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
     const menuButton = getByRole('button', {name: 'Module publish menu'})
     act(() => menuButton.click())
     const publishButton = getByText('Unpublish module and all items')
     act(() => publishButton.click())
     await waitFor(() => expect(getByText('Unpublishing module and items')).toBeInTheDocument())
+    expect(doFetchApi).toHaveBeenCalledWith(
+      expect.objectContaining({
+        method: 'PUT',
+        path: PUBLISH_URL,
+        body: {module: {published: false, skip_content_tags: false}},
+      })
+    )
     expect(getByText('Module and items unpublished')).toBeInTheDocument()
+  })
+
+  it('calls updateModuleItem when publishing', async () => {
+    const fetchPromise = new Promise(resolve => {
+      const {getByRole, getByText} = render(
+        <ContextModulesPublishIcon {...defaultProps} published={false} />
+      )
+      const menuButton = getByRole('button')
+      act(() => menuButton.click())
+      const publishButton = getByText('Publish module and all items')
+      act(() => publishButton.click())
+      waitFor(() => {
+        expect(updateModuleItem).toHaveBeenCalledWith(
+          expect.objectContaining({assignment_17: expect.any(Object)}),
+          {bulkPublishInFlight: true},
+          expect.any(Object)
+        )
+        expect(updateModuleItem).toHaveBeenCalledWith(
+          expect.objectContaining({assignment_19: expect.any(Object)}),
+          {bulkPublishInFlight: true},
+          expect.any(Object)
+        )
+      })
+      resolve({response: {ok: true}, json: {published: true}})
+    })
+    doFetchApi.mockReturnValue(fetchPromise)
+    await fetchPromise
+    waitFor(() => {
+      expect(updateModuleItem).toHaveBeenCalledWith(
+        expect.objectContaining({assignment_17: expect.any(Object)}),
+        {bulkPublishInFlight: false, published: true},
+        expect.any(Object)
+      )
+      expect(updateModuleItem).toHaveBeenCalledWith(
+        expect.objectContaining({assignment_19: expect.any(Object)}),
+        {bulkPublishInFlight: false, published: true},
+        expect.any(Object)
+      )
+    })
+  })
+
+  it('calls updateModuleItem when unpublishing', async () => {
+    const fetchPromise = new Promise(resolve => {
+      const {getByRole, getByText} = render(
+        <ContextModulesPublishIcon {...defaultProps} published={true} />
+      )
+      const menuButton = getByRole('button')
+      act(() => menuButton.click())
+      const publishButton = getByText('Unpublish module and all items')
+      act(() => publishButton.click())
+      waitFor(() => {
+        expect(updateModuleItem).toHaveBeenCalledWith(
+          expect.objectContaining({assignment_17: expect.any(Object)}),
+          {bulkPublishInFlight: true},
+          expect.any(Object)
+        )
+        expect(updateModuleItem).toHaveBeenCalledWith(
+          expect.objectContaining({assignment_19: expect.any(Object)}),
+          {bulkPublishInFlight: true},
+          expect.any(Object)
+        )
+      })
+      resolve({response: {ok: true}, json: {published: false}})
+    })
+    doFetchApi.mockReturnValue(fetchPromise)
+    await fetchPromise
+    waitFor(() => {
+      expect(updateModuleItem).toHaveBeenCalledWith(
+        expect.objectContaining({assignment_17: expect.any(Object)}),
+        {bulkPublishInFlight: false, published: false},
+        expect.any(Object)
+      )
+      expect(updateModuleItem).toHaveBeenCalledWith(
+        expect.objectContaining({assignment_19: expect.any(Object)}),
+        {bulkPublishInFlight: false, published: false},
+        expect.any(Object)
+      )
+    })
+  })
+
+  it('disables the Publish All menu button when publishing or unpublishing', async () => {
+    // ts is inferring what window.modules should look like. I don't care about anything else.
+    // @ts-expect-error
+    window.modules = {
+      updatePublishMenuDisabledState: jest.fn(),
+    }
+
+    const fetchPromise = new Promise(resolve => {
+      const {getByRole, getByText} = render(
+        <ContextModulesPublishIcon {...defaultProps} published={true} />
+      )
+      const menuButton = getByRole('button')
+      act(() => menuButton.click())
+      const publishButton = getByText('Unpublish module and all items')
+      act(() => publishButton.click())
+      waitFor(() => {
+        expect(window.modules.updatePublishMenuDisabledState).toHaveBeenCalledWith(true)
+      })
+      resolve({response: {ok: true}, json: {published: false}})
+    })
+    doFetchApi.mockReturnValue(fetchPromise)
+    await fetchPromise
+    waitFor(() => {
+      expect(window.modules.updatePublishMenuDisabledState).toHaveBeenCalledWith(false)
+    })
   })
 })
