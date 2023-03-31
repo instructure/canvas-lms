@@ -29,6 +29,7 @@ ready(() => {
       <ContextModulesPublishMenu
         courseId={menuElement.dataset.courseId}
         runningProgressId={menuElement.dataset.progressId}
+        disabled={menuElement.dataset.disabled === 'true'}
       />,
       menuElement
     )

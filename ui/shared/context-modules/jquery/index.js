@@ -70,6 +70,7 @@ import {
   updateProgressionState,
 } from './utils'
 import ContextModulesPublishIcon from '@canvas/context-modules-publish-icon/ContextModulesPublishIcon'
+import ContextModulesPublishMenu from '@canvas/context-modules-publish-menu/ContextModulesPublishMenu'
 
 const I18n = useI18nScope('context_modulespublic')
 
@@ -846,6 +847,23 @@ const newPillMessage = function ($module, requirement_count) {
   }
 }
 
+const updatePublishMenuDisabledState = function (disabled) {
+  // Update the top level publish menu to reflect the new module
+  const publishMenu = document.getElementById('context-modules-publish-menu')
+  if (publishMenu) {
+    publishMenu.dataset.disabled = String(disabled)
+    ReactDOM.unmountComponentAtNode(publishMenu)
+    ReactDOM.render(
+      <ContextModulesPublishMenu
+        courseId={publishMenu.dataset.courseId}
+        runningProgressId={publishMenu.dataset.progressId}
+        disabled={publishMenu.dataset.disabled === 'true'}
+      />,
+      publishMenu
+    )
+  }
+}
+
 modules.initModuleManagement = function (duplicate) {
   const moduleItems = {}
 
@@ -1044,6 +1062,7 @@ modules.initModuleManagement = function (duplicate) {
             />,
             publishMenu
           )
+          updatePublishMenuDisabledState(false)
         }
       }
       relock_modules_dialog.renderIfNeeded(data.context_module)
@@ -1349,6 +1368,9 @@ modules.initModuleManagement = function (duplicate) {
             const $contextModules = $('#context_modules .context_module')
             if (!$contextModules.length) {
               $('#expand_collapse_all').hide()
+              if (window.ENV?.FEATURES?.module_publish_menu) {
+                updatePublishMenuDisabledState(true)
+              }
             }
           })
           $.flashMessage(

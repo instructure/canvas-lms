@@ -45,14 +45,16 @@ const I18n = useI18nScope('context_modules_publish_menu')
 interface Props {
   readonly courseId: string
   readonly runningProgressId: string | null
+  readonly disabled: boolean
 }
 
-const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId}) => {
+const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId, disabled}) => {
   const [isPublishing, setIsPublishing] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [shouldPublishModules, setShouldPublishModules] = useState(false)
   const [shouldSkipModuleItems, setShouldSkipModuleItems] = useState(false)
   const [progressId, setProgressId] = useState(runningProgressId)
+  const [isDisabled] = useState(disabled)
 
   useEffect(() => {
     if (progressId) {
@@ -209,7 +211,7 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
             {I18n.t('Publish All')} <IconMiniArrowDownLine size="x-small" />
           </Button>
         }
-        disabled={isPublishing}
+        disabled={isPublishing || isDisabled}
       >
         <Menu.Item onClick={publishAll}>
           <IconPublishSolid color="success" /> {I18n.t('Publish all modules and items')}
