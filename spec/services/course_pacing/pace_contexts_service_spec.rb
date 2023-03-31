@@ -51,13 +51,15 @@ describe CoursePacing::PaceContextsService do
     context "for type 'student_enrollment'" do
       let(:student) { user_model(name: "Foo Bar") }
       let(:student_two) { user_model(name: "Bar Foo") }
+      let(:student_three) { user_model(name: "Bar") }
       let(:fake_student) { user_model(name: "Fake Student") }
       let!(:enrollment) { course.enroll_student(student, enrollment_state: "active") }
       let!(:enrollment_two) { course.enroll_student(student_two, enrollment_state: "active") }
+      let!(:enrollment_three) { course.enroll_student(student_three) }
       let!(:fake_enrollment) { course.enroll_user(fake_student, "StudentViewEnrollment") }
 
       it "returns an array of the student enrollments" do
-        expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two]
+        expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two, enrollment_three]
         expect(subject.contexts_of_type("student_enrollment")).not_to include fake_enrollment
       end
 
@@ -66,6 +68,15 @@ describe CoursePacing::PaceContextsService do
         filtered_contexts = subject.contexts_of_type("student_enrollment", params: params)
         expect(filtered_contexts).to match_array [enrollment_two]
         expect(filtered_contexts).not_to include enrollment
+      end
+
+      it "returns active and invited enrollments for unpublished courses" do
+        enrollment_three.update! workflow_state: "invited"
+        enrollment_two.update! workflow_state: "creation_pending"
+
+        expect(course).to be_unpublished
+        expect(enrollment_three.reload.state).to eql(:invited)
+        expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two, enrollment_three]
       end
 
       context "when a user has multiple enrollment sources in a course" do
@@ -78,7 +89,7 @@ describe CoursePacing::PaceContextsService do
         end
 
         it "returns only the most recently created enrollment" do
-          expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two]
+          expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two, enrollment_three]
         end
       end
     end
