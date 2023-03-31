@@ -30,6 +30,7 @@ class MediaObject < ActiveRecord::Base
 
   validates :media_id, :workflow_state, presence: true
   has_many :media_tracks, -> { order(:locale) }, dependent: :destroy
+  before_create :create_attachment
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
   serialize :data
@@ -258,7 +259,7 @@ class MediaObject < ActiveRecord::Base
     end
     self.total_size = [max_size || 0, assets.sum { |a| (a[:size] || 0).to_i }].max
     save
-    ensure_attachment
+    ensure_attachment_media_info
     data
   end
 
@@ -324,29 +325,38 @@ class MediaObject < ActiveRecord::Base
     retrieve_details
   end
 
-  def ensure_attachment
+  def create_attachment
     return if attachment_id || Attachment.find_by(media_entry_id: media_id)
     return unless %w[Account Course Group User].include?(context_type)
 
+    self.attachment = Folder.media_folder(context).attachments
+                            .create(
+                              context: context,
+                              display_name: guaranteed_title,
+                              filename: guaranteed_title,
+                              content_type: media_type,
+                              media_entry_id: media_id,
+                              # in case teachers don't mean for this to be visible to students in the files section
+                              file_state: "hidden",
+                              workflow_state: "pending_upload"
+                            )
+  end
+
+  def ensure_attachment_media_info
+    create_attachment
+    return unless attachment_id && attachment.workflow_state == "pending_upload"
+
+    file_state = attachment.file_state
     sources = media_sources
     return unless sources.present?
-
-    attachment = build_attachment({
-                                    "context" => context,
-                                    "display_name" => title,
-                                    "filename" => title,
-                                    "content_type" => media_type,
-                                    "media_entry_id" => media_id,
-                                    "workflow_state" => "processed",
-                                    "folder_id" => Folder.media_folder(context).id
-                                  })
 
     url = self.data[:download_url]
     url = sources.find { |s| s[:isOriginal] == "1" }&.dig(:url) if url.blank?
     url = sources.min_by { |a| a[:bitrate].to_i }&.dig(:url) if url.blank?
 
     attachment.clone_url(url, :rename, false) # no check_quota because the bits are in kaltura
-    attachment.file_state = "hidden" # in case teachers don't mean for this to be visible to students in the files section
+    attachment.file_state = file_state
+    attachment.workflow_state = "processed"
     attachment.save!
   end
 

@@ -42,7 +42,7 @@ describe CC::CCHelper do
   describe CC::CCHelper::HtmlContentExporter do
     before :once do
       course_with_teacher
-      @obj = @course.media_objects.create!(media_id: "abcde")
+      @obj = @course.media_objects.create!(media_id: "abcde", title: "some_media.mp4")
     end
 
     before do
@@ -122,7 +122,7 @@ describe CC::CCHelper do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
       translated = @exporter.html_content(html)
-      expect(translated).to include %(<source src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4" data-media-id="abcde" data-media-type="video">)
+      expect(translated).to include %(<source src="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media-id="abcde" data-media-type="video">)
       expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq "one"
     end
