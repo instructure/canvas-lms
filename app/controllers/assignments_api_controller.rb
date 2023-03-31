@@ -1560,6 +1560,6 @@ class AssignmentsApiController < ApplicationController
                                                    content: assignment.duplicate_of
                                                  ).select(:master_template_id)
                                                ).select(:id)).first
-    assignment.asset_map = content_migration&.asset_map_url
+    assignment.resource_map = content_migration&.asset_map_url
   end
 end

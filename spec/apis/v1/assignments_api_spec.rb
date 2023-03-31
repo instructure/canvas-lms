@@ -1783,20 +1783,20 @@ describe AssignmentsApiController, type: :request do
         subject
       end
 
-      it 'sets the assignment "asset_map" to a value indicating a map is needed when past imports exist' do
+      it 'sets the assignment "resource_map" to a value indicating a map is needed when past imports exist' do
         allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(true)
         master_template = MasterCourses::MasterTemplate.create!(course: @course)
         MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: new_course)
-        expect_any_instance_of(Assignment).to receive(:asset_map=)
+        expect_any_instance_of(Assignment).to receive(:resource_map=)
 
         subject
       end
 
-      it 'does not set the "asset_map" when the assignment is not a quiz_lti' do
+      it 'does not set the "resource_map" when the assignment is not a quiz_lti' do
         allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(false)
         master_template = MasterCourses::MasterTemplate.create!(course: @course)
         MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: new_course)
-        expect_any_instance_of(Assignment).not_to receive(:asset_map=)
+        expect_any_instance_of(Assignment).not_to receive(:resource_map=)
 
         subject
       end
