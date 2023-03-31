@@ -22,6 +22,7 @@ import fetchMock from 'fetch-mock'
 import store from '../../stores/index'
 import type {FilterNavProps} from '../FilterNav'
 import type {FilterPreset, Filter} from '../../gradebook.d'
+import type {Assignment} from '../../../../../../api.d'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
@@ -86,7 +87,11 @@ const defaultProps: FilterNavProps = {
       name: 'Assignment Group 4',
       position: 1,
       group_weight: 0,
-      assignments: [],
+      assignments: [
+        {
+          module_ids: ['1'],
+        } as Assignment,
+      ],
     },
     {
       id: '5',
@@ -339,11 +344,13 @@ describe('Filter dropdown', () => {
   })
 
   it('Clicking filter activates condition', async () => {
-    const {getByText, getByTestId, queryByTestId} = render(<FilterNav {...defaultProps} />)
+    const {getByText, getByTestId, queryByTestId, getByRole} = render(
+      <FilterNav {...defaultProps} />
+    )
     expect(queryByTestId('applied-filter-tag')).toBeNull()
     userEvent.click(getByText('Apply Filters'))
-    userEvent.click(getByText('Sections'))
-    userEvent.click(getByText('Section 7'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
     expect(getByTestId('applied-filter-tag')).toBeVisible()
   })
 })
