@@ -25,7 +25,7 @@ export default class {
 
   static contentMessageTypes = ['ContentItemSelectionRequest', 'LtiDeepLinkingRequest']
 
-  static isContentMessage(placement, placements = {}) {
+  static isContentMessage(placement: {message_type: string}, placements = {}) {
     const message_type = placement && placement.message_type
 
     return (
@@ -34,7 +34,13 @@ export default class {
     )
   }
 
-  static errorForUrlItem(item, expectedType = 'LtiLinkItem') {
+  static errorForUrlItem(
+    item: {
+      '@type'?: string
+      url?: string
+    },
+    expectedType = 'LtiLinkItem'
+  ) {
     if (item['@type'] !== expectedType) {
       return I18n.t('Error: The tool returned an invalid content type "%{contentType}"', {
         contentType: item['@type'],

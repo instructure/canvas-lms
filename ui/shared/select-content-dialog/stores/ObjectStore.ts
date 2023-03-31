@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
-import createStore from '@canvas/util/createStore'
+import _ from '@instructure/lodash-underscore'
+import createStore, {CanvasStore} from '@canvas/util/createStore'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import '@canvas/rails-flash-notifications'
 
@@ -31,6 +31,19 @@ const initialStoreState = {
 }
 
 class ObjectStore {
+  store: CanvasStore<{
+    links: {
+      next?: string
+    }
+    items: []
+    isLoading: boolean
+    hasLoaded: boolean
+    isLoaded: boolean
+    hasMore: boolean
+  }>
+
+  apiEndpoint: string
+
   /**
    * apiEndpoint should be the endpoint for this resource.
    * Options is an object containing additional options for the store:
@@ -39,7 +52,7 @@ class ObjectStore {
    *
    * Other options will be to query parameters
    */
-  constructor(apiEndpoint, options) {
+  constructor(apiEndpoint: string, options: any) {
     // We clone the initialStoreState so it doesn't hang onto a bad reference.
     this.store = createStore(_.clone(initialStoreState))
     if (options) {
@@ -55,8 +68,8 @@ class ObjectStore {
    * options is an optional object.  Currently this allows for the following:
    *   - fetchAll: true - this will continually fetch all pages of the resource
    */
-  fetch(options) {
-    const url = this.store.getState().links.next || this.apiEndpoint
+  fetch(options: any) {
+    const url = this.store.getState().links?.next || this.apiEndpoint
     this.store.setState({isLoading: true})
     $.ajax({
       url,
@@ -84,20 +97,20 @@ class ObjectStore {
   /**
    * Adds a change listener
    */
-  addChangeListener(callback) {
+  addChangeListener(callback: () => void) {
     this.store.addChangeListener(callback)
   }
 
   /**
    * Removes a change listener
    */
-  removeChangeListener(callback) {
+  removeChangeListener(callback: () => void) {
     this.store.removeChangeListener(callback)
   }
 
-  _fetchSuccessHandler(options, items, status, xhr) {
+  _fetchSuccessHandler(options: any, items: any, status: any, xhr: any) {
     const links = parseLinkHeader(xhr)
-    items = this.store.getState().items.concat(items)
+    items = this.store.getState().items?.concat(items)
 
     this.store.setState({
       links,

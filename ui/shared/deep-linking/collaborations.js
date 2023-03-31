@@ -51,7 +51,7 @@ export function onExternalContentReady(e, data) {
  */
 export const handleDeepLinking = async event => {
   try {
-    const item = await processSingleContentItem(event)
+    const item = processSingleContentItem(event)
     onExternalContentReady(event, {
       service_id: item.service_id,
       contentItems: [item],

@@ -15,31 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import HtmlFragmentContentItem from '../HtmlFragmentContentItem'
-
-const json = {
-  title: 'Title',
-  text: 'some text',
-  invalidProp: 'banana',
-  html: '<a href="test.com">link</a><p><strong>bold</strong></p>',
+export type HtmlFragmentContentItem = {
+  type: 'html'
+  html: string
+  title?: string
+  errors?: Record<string, string>
 }
 
-const htmlContentItem = overrides => {
-  const mergedJson = {...json, ...overrides}
-  return new HtmlFragmentContentItem(mergedJson)
+export const htmlFragmentContentItem = (options: {html: string}): HtmlFragmentContentItem => ({
+  type: 'html',
+  html: options.html,
+})
+
+export const htmlFragmentContentItemToHtmlString = (item: HtmlFragmentContentItem) => {
+  // TinyMCE takes care of sanitizing this HTML string.
+  // If using a target other than TinyMCE be sure to sanitize.
+  return item.html
 }
-
-describe('constructor', () => {
-  it('sets the "type"', () => {
-    expect(htmlContentItem().type).toEqual('html')
-  })
-})
-
-describe('toHtmlString', () => {
-  it('returns the "html"', () => {
-    expect(htmlContentItem().toHtmlString()).toEqual(
-      '<a href="test.com">link</a><p><strong>bold</strong></p>'
-    )
-  })
-})

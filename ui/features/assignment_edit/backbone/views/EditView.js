@@ -56,6 +56,7 @@ import '@canvas/util/toJSON'
 import '@canvas/rails-flash-notifications'
 import '../../../../boot/initializers/activateTooltips'
 import {AnnotatedDocumentSelector} from '../../react/EditAssignment'
+import {selectContentDialog} from '@canvas/select-content-dialog'
 
 const I18n = useI18nScope('assignment_editview')
 
@@ -587,7 +588,7 @@ EditView.prototype.handleAssignmentSelectionSubmit = function (data) {
 }
 
 EditView.prototype.showExternalToolsDialog = function () {
-  return INST.selectContentDialog({
+  return selectContentDialog({
     dialog_title: I18n.t('select_external_tool_dialog_title', 'Configure External Tool'),
     select_button_text: I18n.t('buttons.select_url', 'Select'),
     no_name_input: true,

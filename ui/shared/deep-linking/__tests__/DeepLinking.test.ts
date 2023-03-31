@@ -16,21 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isValidDeepLinkingEvent, handleDeepLinking} from '../DeepLinking'
+import {isValidDeepLinkingEvent, handleDeepLinking, DeepLinkEvent} from '../DeepLinking'
 
 describe('isValidDeepLinkingEvent', () => {
-  let data, event, env, parameters
+  let data: {
+      subject: 'LtiDeepLinkingResponse'
+    },
+    event: DeepLinkEvent,
+    env: {
+      DEEP_LINKING_POST_MESSAGE_ORIGIN: string
+    }
 
   beforeEach(() => {
     event = {
       data: {subject: 'LtiDeepLinkingResponse', placement: 'not_editor_button'},
       origin: 'canvas.instructure.com',
-    }
+    } as unknown as DeepLinkEvent
     env = {DEEP_LINKING_POST_MESSAGE_ORIGIN: 'canvas.instructure.com'}
-    parameters = [event, env]
   })
 
-  const subject = () => isValidDeepLinkingEvent(...parameters)
+  const subject = () => isValidDeepLinkingEvent(event, env)
 
   it('return true', () => {
     expect(subject()).toEqual(true)
@@ -38,8 +43,7 @@ describe('isValidDeepLinkingEvent', () => {
 
   describe('when the message origin is incorrect', () => {
     beforeEach(() => {
-      event = {data, origin: 'wrong.origin.com'}
-      parameters = [event, env]
+      event = {data, origin: 'wrong.origin.com'} as unknown as DeepLinkEvent
     })
 
     it('return false', () => {
@@ -49,8 +53,7 @@ describe('isValidDeepLinkingEvent', () => {
 
   describe('when the event data is not present', () => {
     beforeEach(() => {
-      event = {origin: 'canvas.instructure.com'}
-      parameters = [event, env]
+      event = {origin: 'canvas.instructure.com'} as unknown as DeepLinkEvent
     })
 
     it('return false', () => {
@@ -60,8 +63,10 @@ describe('isValidDeepLinkingEvent', () => {
 
   describe('when the subject is incorrect', () => {
     beforeEach(() => {
-      event = {data: {subject: 'WrongMessageType'}, origin: 'canvas.instructure.com'}
-      parameters = [event, env]
+      event = {
+        data: {subject: 'WrongMessageType'},
+        origin: 'canvas.instructure.com',
+      } as unknown as DeepLinkEvent
     })
 
     it('return false', () => {
@@ -74,8 +79,7 @@ describe('isValidDeepLinkingEvent', () => {
       event = {
         data: {subject: 'LtiDeepLinkingResponse', placement: 'editor_button'},
         origin: 'canvas.instructure.com',
-      }
-      parameters = [event, env]
+      } as unknown as DeepLinkEvent
     })
 
     it('return false', () => {
@@ -93,29 +97,29 @@ describe('handleDeepLinking', () => {
     },
   ]
 
-  const event = overrides => ({
-    origin: 'http://www.test.com',
-    data: {subject: 'LtiDeepLinkingResponse', content_items},
-    ...overrides,
-  })
+  const event = (overrides: {}): DeepLinkEvent =>
+    ({
+      origin: 'http://www.test.com',
+      data: {subject: 'LtiDeepLinkingResponse', content_items},
+      ...overrides,
+    } as unknown as DeepLinkEvent)
 
-  let env
+  let env: typeof window.ENV
 
   beforeAll(() => {
     env = window.ENV
-
-    window.ENV = {
+    ;(window.ENV as any) = {
       DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://www.test.com',
     }
   })
 
   afterAll(() => {
-    window.ENV = env
+    ;(window.ENV as any) = env
   })
 
   it('passes event to callback', async () => {
     const callback = jest.fn()
-    const ev = event()
+    const ev = event({})
     await handleDeepLinking(callback)(ev)
 
     expect(callback).toHaveBeenCalledWith(ev)

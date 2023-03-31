@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import processEditorContentItems from '../processEditorContentItems'
+import {send as rceSend} from '@canvas/rce/RceCommandShim'
 
-import ContentItemProcessor from '../../ContentItemProcessor'
-import processEditorContentItems, {processHandler} from '../processEditorContentItems'
-import {send} from '@canvas/rce/RceCommandShim'
+const send = rceSend as unknown as {mockClear: () => void; mock: {calls: Array<Array<unknown>>}}
 
 jest.mock('@canvas/rce/RceCommandShim', () => ({
   send: jest.fn(),
@@ -30,27 +30,25 @@ describe('processEditorContentItems', () => {
     url: 'http://www.test.com',
     title: 'link title',
     text: 'link text',
-  }
+  } as const
   const resourceLinkContentItem = {
     type: 'ltiResourceLink',
     url: 'http://www.test.com',
     title: 'link title',
     text: 'link text',
-  }
+  } as const
   const imageContentItem = {
     type: 'image',
     url: 'http://www.test.com/image',
     width: 100,
     height: 200,
-  }
+  } as const
   const htmlFragmentItem = {
     type: 'html',
     html: '<a href="www.html.com">test</a>',
-  }
-  const invalidContentItem = {type: 'banana'}
+  } as const
   const contentItems = [
     linkContentItem,
-    invalidContentItem,
     resourceLinkContentItem,
     imageContentItem,
     htmlFragmentItem,
@@ -64,26 +62,24 @@ describe('processEditorContentItems', () => {
   }
 
   describe('static', () => {
-    it('closes the dialog', async () => {
+    it('closes the dialog', () => {
+      jest.spyOn(window, 'requestAnimationFrame').mockImplementation(cb => {
+        cb(0)
+        return 0
+      })
       const ev = {data: {content_items: contentItems, subject: 'LtiDeepLinkingResponse'}}
       const dialog = {close: jest.fn()}
-      await processEditorContentItems(ev, editor, dialog)
+      processEditorContentItems(ev, editor, dialog)
       expect(dialog.close).toHaveBeenCalled()
-    })
-
-    it('ignores non deep linking event types', async () => {
-      const ev = {data: {subject: 'OtherMessage'}}
-      const dialog = {close: jest.fn()}
-      await processEditorContentItems(ev, editor, dialog)
-      expect(dialog.close).not.toHaveBeenCalled()
     })
   })
 
   describe('when there is no editor selection', () => {
+    const dialog = {close: jest.fn()}
     beforeEach(() => {
+      const event = {data: {content_items: contentItems, ltiEndpoint: 'test'}}
       send.mockClear()
-      const processor = new ContentItemProcessor(contentItems, {}, {}, 'test', processHandler)
-      processor.process(editor)
+      processEditorContentItems(event, editor, dialog)
     })
 
     it('creates content for a link content item', () => {
@@ -110,10 +106,11 @@ describe('processEditorContentItems', () => {
   })
 
   describe('when there is an editor selection', () => {
+    const dialog = {close: jest.fn()}
     beforeEach(() => {
+      const event = {data: {content_items: contentItems, ltiEndpoint: 'test'}}
       send.mockClear()
-      const processor = new ContentItemProcessor(contentItems, {}, {}, 'test', processHandler)
-      processor.process(editorWithSelection)
+      processEditorContentItems(event, editorWithSelection, dialog)
     })
 
     it('creates content for a link content item', () => {

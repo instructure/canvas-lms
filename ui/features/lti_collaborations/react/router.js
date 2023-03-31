@@ -36,16 +36,17 @@ const attachListeners = () => {
       return
     }
 
-    processSingleContentItem(event)
-      .then(item =>
-        store.dispatch(
-          actions.externalContentReady({
-            service_id: item.service_id,
-            contentItems: [item],
-          })
-        )
+    try {
+      const item = processSingleContentItem(event)
+      store.dispatch(
+        actions.externalContentReady({
+          service_id: item.service_id,
+          contentItems: [item],
+        })
       )
-      .catch(() => store.dispatch(actions.externalContentRetrievalFailed))
+    } catch {
+      store.dispatch(actions.externalContentRetrievalFailed)
+    }
   })
 
   // called by LTI 1.1 content item handler

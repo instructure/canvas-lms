@@ -16,13 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export type DeepLinkEvent = MessageEvent<{
+  subject: 'LtiDeepLinkingResponse'
+}>
+
+export type DeepLinkCallback = (e: DeepLinkEvent) => Promise<void>
+
 const deepLinkingResponseMessageType = 'LtiDeepLinkingResponse'
 
-// Checks to see if a postMessage event is valid for
-// deep linking content item processing
-// the RCE handles deep linking separately in
-// ui/shared/tinymce-external-tools/react/components/ExternalToolDialog.js#handleDeepLinking
-export function isValidDeepLinkingEvent(event, env) {
+/**
+ *Checks to see if a postMessage event is valid for
+ * deep linking content item processing
+ * the RCE handles deep linking separately in
+ * ui/shared/tinymce-external-tools/react/components/ExternalToolDialog.js#handleDeepLinking
+ * @param event
+ * @param env
+ * @returns
+ */
+export function isValidDeepLinkingEvent(
+  event: MessageEvent,
+  env: {DEEP_LINKING_POST_MESSAGE_ORIGIN: string}
+): event is MessageEvent<{subject: 'LtiDeepLinkingResponse'}> {
   return !!(
     event.origin === env.DEEP_LINKING_POST_MESSAGE_ORIGIN &&
     event.data?.subject === deepLinkingResponseMessageType &&
@@ -30,12 +44,21 @@ export function isValidDeepLinkingEvent(event, env) {
   )
 }
 
-export const addDeepLinkingListener = cb => {
-  window.removeEventListener('message', handleDeepLinking)
-  window.addEventListener('message', handleDeepLinking(cb))
+/**
+ * Registers a new listener for DeepLinking messages
+ * coming from an embedded tool
+ * @param cb the handler which will be called on a DeepLinking message
+ * @returns a function which will remove the event listener
+ */
+export const addDeepLinkingListener = (cb: DeepLinkCallback) => {
+  const handler = handleDeepLinking(cb)
+  window.addEventListener('message', handler)
+  return () => {
+    window.removeEventListener('message', handler)
+  }
 }
 
-export const handleDeepLinking = cb => async event => {
+export const handleDeepLinking = (cb: DeepLinkCallback) => async (event: MessageEvent) => {
   // Don't attempt to process invalid messages
   if (!isValidDeepLinkingEvent(event, ENV)) {
     return

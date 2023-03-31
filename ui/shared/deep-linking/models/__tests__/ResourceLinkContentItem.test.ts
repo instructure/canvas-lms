@@ -16,28 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ResourceLinkContentItem from '../ResourceLinkContentItem'
+import {
+  ResourceLinkContentItem,
+  resourceLinkContentItem,
+  resourceLinkContentItemToHtmlString,
+} from '../ResourceLinkContentItem'
 
 const endpoint = 'http://test.canvas.com/accounts/1/external_tools/retrieve'
 const title = 'Tool Title'
 const lookup_uuid = '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
+const url = 'http://example.com'
 const json = {
   title,
+  url,
   lookup_uuid,
 }
 
-const resourceLinkContentItem = (overrides, launchEndpoint) => {
-  const mergedJson = {...json, ...overrides}
-  return new ResourceLinkContentItem(mergedJson, launchEndpoint)
-}
-
-describe('constructor', () => {
-  it('sets the url to the canvas launch endpoint', () => {
-    expect(resourceLinkContentItem({}, endpoint).url).toEqual(
-      `${endpoint}?display=borderless&resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2`
-    )
+const overrideResourceLinkContentItem = (overrides: Partial<ResourceLinkContentItem>) =>
+  resourceLinkContentItem({
+    ...json,
+    ...overrides,
   })
-})
 
 describe('when the iframe property is specified', () => {
   const iframe = {
@@ -47,8 +46,10 @@ describe('when the iframe property is specified', () => {
   }
 
   it('returns markup for an iframe', () => {
-    expect(resourceLinkContentItem({iframe}).toHtmlString()).toEqual(
-      '<iframe src="undefined?display=borderless&amp;resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2" title="Tool Title" allowfullscreen="true" allow="" style="width: 500px; height: 200px;"></iframe>'
+    expect(
+      resourceLinkContentItemToHtmlString(overrideResourceLinkContentItem({iframe}), endpoint)
+    ).toEqual(
+      '<iframe src="http://test.canvas.com/accounts/1/external_tools/retrieve?display=borderless&amp;resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2" title="Tool Title" allowfullscreen="true" allow="" style="width: 500px; height: 200px;"></iframe>'
     )
   })
 })

@@ -16,55 +16,48 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ImageContentItem from '../ImageContentItem'
+import {imageContentItem, imageContentItemToHtmlString, ImageContentItem} from '../ImageContentItem'
 
-const json = {
+const json = imageContentItem({
   url: 'https://www.test.com/image',
   title: 'Title',
   text: 'some text',
-  invalidProp: 'banana',
-}
+})
 
-const imageContentItem = overrides => {
-  const mergedJson = {...json, ...overrides}
-  return new ImageContentItem(mergedJson)
-}
-
-describe('constructor', () => {
-  it('sets the type', () => {
-    expect(imageContentItem().type).toEqual('image')
-  })
+const overrideImageContentItem = (overrides: Partial<ImageContentItem>) => ({
+  ...json,
+  ...overrides,
 })
 
 describe('toHtmlString', () => {
   it('creates an image tag', () => {
-    expect(imageContentItem().toHtmlString()).toEqual(
+    expect(imageContentItemToHtmlString(json)).toEqual(
       '<img src="https://www.test.com/image" alt="some text">'
     )
   })
 
   describe('when width and height are given', () => {
-    const contentItem = imageContentItem({
+    const contentItem = overrideImageContentItem({
       width: 100,
       height: 200,
     })
 
     it('sets the width and height', () => {
-      expect(contentItem.toHtmlString()).toEqual(
+      expect(imageContentItemToHtmlString(contentItem)).toEqual(
         '<img src="https://www.test.com/image" alt="some text" width="100" height="200">'
       )
     })
   })
 
   describe('when a thumbnail is provided', () => {
-    const contentItem = imageContentItem({
+    const contentItem = overrideImageContentItem({
       thumbnail: 'http://www.test.com/thumbnail',
       width: 100,
       height: 200,
     })
 
     it('creates a link to the image using the thumbnail', () => {
-      expect(contentItem.toHtmlString()).toEqual(
+      expect(imageContentItemToHtmlString(contentItem)).toEqual(
         '<a href="https://www.test.com/image" title="Title" target="_blank"><img src="http://www.test.com/thumbnail" alt="some text"></a>'
       )
     })
