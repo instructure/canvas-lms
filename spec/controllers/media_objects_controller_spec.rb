@@ -699,6 +699,35 @@ describe MediaObjectsController do
       json = JSON.parse(response.body)
       expect(json["title"]).to eq("new title")
     end
+
+    context "adheres to attachment permissions" do
+      before :once do
+        attachment_model(context: @course)
+      end
+
+      it "allows teacher to update MediaObject" do
+        user_session(@teacher)
+        @attachment.update(content_type: "video", media_entry_id: "maybe")
+
+        expect(@attachment.grants_right?(@teacher, :update)).to eql(true)
+
+        MediaObject.create!(user_id: @teacher, media_id: "maybe")
+        put "update_media_object", params: { attachment_id: @attachment.id, user_entered_title: "new title" }
+        assert_status(200)
+      end
+
+      it "disallows access for unauthorized user" do
+        user_model
+        user_session(@user)
+        @attachment.update(content_type: "video", media_entry_id: "maybe")
+
+        expect(@attachment.grants_right?(@user, :update)).to eql(false)
+
+        MediaObject.create!(user_id: @teacher, media_id: "maybe")
+        put "update_media_object", params: { attachment_id: @attachment.id, user_entered_title: "new title" }
+        assert_status(401)
+      end
+    end
   end
 
   describe "GET /media_objects_iframe/:id" do
@@ -740,6 +769,13 @@ describe MediaObjectsController do
       assert_recognizes(
         { controller: "media_objects", action: "create_media_object" },
         { path: "media_objects", method: :post }
+      )
+    end
+
+    it "matches the create_media_attachment route" do
+      assert_recognizes(
+        { controller: "media_objects", action: "create_media_object" },
+        { path: "media_attachments", method: :post }
       )
     end
 

@@ -503,6 +503,7 @@ CanvasRails::Application.routes.draw do
   post "media_objects/:media_object_id/media_tracks" => "media_tracks#create", :as => :create_media_tracks
   delete "media_objects/:media_object_id/media_tracks/:media_track_id" => "media_tracks#destroy", :as => :delete_media_tracks
 
+  post "media_attachments" => "media_objects#create_media_object", :as => :create_media_attachment
   get "media_attachments/:attachment_id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_attachment_thumbnail
   get "media_attachments/:attachment_id/info" => "media_objects#show", :as => :media_attachment_info
   get "media_attachments_iframe/:attachment_id" => "media_objects#iframe_media_player", :as => :media_attachment_iframe
@@ -2369,11 +2370,10 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :media_objects) do
-      post "media_objects", action: "create_media_object", as: :create_media_object
-    end
-
-    scope(controller: :media_objects) do
       put "media_objects/:media_object_id", action: "update_media_object", as: :update_media_object
+      post "media_objects", action: "create_media_object", as: :create_media_object
+      put "media_attachments/:attachment_id", action: "update_media_object", as: :update_media_attachment
+      post "media_attachments", action: "create_media_object", as: :create_media_attachment
     end
 
     scope(controller: :media_tracks) do

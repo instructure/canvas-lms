@@ -179,19 +179,33 @@ class MediaObjectsController < ApplicationController
 
       return render_unauthorized_action unless @media_object.user_id == @current_user.id
 
-      if params[:user_entered_title].blank?
-        return(
-          render json: { message: "The user_entered_title parameter must have a value" },
-                 status: :bad_request
-        )
+    elsif params[:attachment_id]
+      attachment = Attachment.find(params[:attachment_id])
+
+      return render_unauthorized_action unless attachment
+      return render_unauthorized_action unless attachment.media_entry_id
+
+      if params[:verifier]
+        verifier_checker = Attachments::Verification.new(attachment)
+        return render_unauthorized_action unless verifier_checker.valid_verifier_for_permission?(params[:verifier], :update, session)
+      else
+        return render_unauthorized_action unless attachment.grants_right?(@current_user, session, :update)
       end
 
-      extend TextHelper
-      @media_object.user_entered_title =
-        CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
-      @media_object.save!
-      render json: media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
+      @media_id = attachment.media_entry_id
+      @media_object = MediaObject.by_media_id(@media_id).take
     end
+    if params[:user_entered_title].blank?
+      return(
+        render json: { message: "The user_entered_title parameter must have a value" },
+               status: :bad_request
+      )
+    end
+    extend TextHelper
+    @media_object.user_entered_title =
+      CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
+    @media_object.save!
+    render json: media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
   end
 
   def create_media_object
