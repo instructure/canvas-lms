@@ -1074,10 +1074,15 @@ module RCENextPage
   end
 
   def possibly_hidden_toolbar_button(selector)
-    f(selector)
-  rescue Selenium::WebDriver::Error::NoSuchElementError
-    more_toolbar_button.click
-    f(selector)
+    element = f(selector)
+    if !element.displayed? || !element.enabled?
+      more_toolbar_button.click
+
+      # Wait for the toolbar opening animation to finish
+      # Toolbar buttons can't be interacted with until it's done
+      wait_for_no_such_element { f(".tox-toolbar__overflow--growing") }
+    end
+    element
   end
 
   def toolbar_button(button_label)
