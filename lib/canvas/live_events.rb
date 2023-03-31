@@ -457,7 +457,9 @@ module Canvas::LiveEvents
     data = {
       enrollment_id: enrollment.global_id,
       course_id: enrollment.global_course_id,
+      course_uuid: enrollment.course.uuid,
       user_id: enrollment.global_user_id,
+      user_uuid: enrollment.user.uuid,
       user_name: enrollment.user_name,
       type: enrollment.type,
       created_at: enrollment.created_at,
