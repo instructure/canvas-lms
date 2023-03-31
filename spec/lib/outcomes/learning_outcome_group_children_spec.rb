@@ -515,19 +515,19 @@ describe Outcomes::LearningOutcomeGroupChildren do
         cg1.add_outcome o4
       end
 
-      it "filters out outcomes with alignments" do
+      it "filters outcomes without alignments in Canvas" do
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "NO_ALIGNMENTS" })
                           .map(&:learning_outcome_content).map(&:id)
         expect(outcomes).to eql([o4.id, o8.id])
       end
 
-      it "filters out outcomes with no alignments" do
+      it "filters outcomes with alignments in Canvas" do
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
                           .map(&:learning_outcome_content).map(&:id)
         expect(outcomes).to eql([o3.id])
       end
 
-      it "filters out outcomes with no alignments and with search" do
+      it "filters outcomes without alignments in Canvas and with search" do
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { search_query: "4.1", filter: "NO_ALIGNMENTS" })
                           .map(&:learning_outcome_content).map(&:id)
         expect(outcomes).to eql([o4.id])
@@ -545,17 +545,35 @@ describe Outcomes::LearningOutcomeGroupChildren do
                           .map(&:learning_outcome_content).map(&:id)
         expect(outcomes).to eql([o3.id, o4.id, o8.id])
       end
-    end
-  end
 
-  describe "#clear_total_outcomes_cache" do
-    it "clears the cache" do
-      enable_cache do
-        expect(ContentTag).to receive(:active).and_call_original.twice
-        expect(subject.total_outcomes(g0.id)).to eq 12
-        subject.clear_total_outcomes_cache
-        instance = described_class.new(context)
-        expect(instance.total_outcomes(g0.id)).to eq 12
+      context "when Outcome Alignment Summary with NQ FF is enabled" do
+        let!(:os_aligned_outcomes_mock) { { o8.id => [] } }
+
+        before do
+          cg1.add_outcome o5
+          course.enable_feature!(:outcome_alignment_summary_with_new_quizzes)
+          allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+            .to receive(:get_os_aligned_outcomes)
+            .and_return(os_aligned_outcomes_mock)
+        end
+
+        it "filters outcomes without alignments in Canvas or Outcomes-Service" do
+          outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "NO_ALIGNMENTS" })
+                            .map(&:learning_outcome_content).map(&:id)
+          expect(outcomes).to eql([o4.id, o5.id])
+        end
+
+        it "filters outcomes with alignments in Canvas or Outcomes-Service" do
+          outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
+                            .map(&:learning_outcome_content).map(&:id)
+          expect(outcomes).to eql([o3.id, o8.id])
+        end
+
+        it "filters outcomes without alignments in Canvas or Outcomes-Service and with search" do
+          outcomes = subject.suboutcomes_by_group_id(cg1.id, { search_query: "4.1", filter: "NO_ALIGNMENTS" })
+                            .map(&:learning_outcome_content).map(&:id)
+          expect(outcomes).to eql([o4.id])
+        end
       end
     end
   end

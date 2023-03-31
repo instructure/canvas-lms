@@ -95,5 +95,17 @@ describe OutcomesFeaturesHelper do
         expect(improved_outcomes_management_enabled?(@global_outcome.context)).to eq nil
       end
     end
+
+    describe "#outcome_alignment_summary_with_new_quizzes_enabled?" do
+      it "returns true when outcome_alignment_summary_with_new_quizzes FF is enabled" do
+        @context.enable_feature!(:outcome_alignment_summary_with_new_quizzes)
+        expect(outcome_alignment_summary_with_new_quizzes_enabled?(@course_outcome.context)).to eq true
+      end
+
+      it "returns false when outcome_alignment_summary_with_new_quizzes FF is disabled" do
+        @context.disable_feature!(:outcome_alignment_summary_with_new_quizzes)
+        expect(outcome_alignment_summary_with_new_quizzes_enabled?(@course_outcome.context)).to eq false
+      end
+    end
   end
 end

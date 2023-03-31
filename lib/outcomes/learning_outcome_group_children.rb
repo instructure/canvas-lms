@@ -21,6 +21,7 @@
 module Outcomes
   class LearningOutcomeGroupChildren
     include OutcomesFeaturesHelper
+    include OutcomesServiceAlignmentsHelper
     attr_reader :context
 
     SHORT_DESCRIPTION = "coalesce(learning_outcomes.short_description, '')"
@@ -132,6 +133,16 @@ module Outcomes
                                               )
                                               .map(&:learning_outcome_id)
                                               .uniq
+
+        if outcome_alignment_summary_with_new_quizzes_enabled?(@context)
+          outcomes_with_alignments_in_os = get_os_aligned_outcomes(@context)
+
+          if outcomes_with_alignments_in_os
+            outcomes_with_alignments_in_context
+              .concat(outcomes_with_alignments_in_os.keys.map(&:to_i))
+              .uniq
+          end
+        end
 
         return relation.where(content_id: outcomes_with_alignments_in_context) if filter == "WITH_ALIGNMENTS"
         return relation.where.not(content_id: outcomes_with_alignments_in_context) if filter == "NO_ALIGNMENTS"
