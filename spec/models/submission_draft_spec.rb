@@ -30,6 +30,65 @@ RSpec.describe SubmissionDraft do
     @media_object = factory_with_protected_attributes(MediaObject, media_id: "m-123456", title: "CreedThoughts")
   end
 
+  describe "cross-shard attachments" do
+    specs_require_sharding
+
+    before do
+      @shard1.activate { @cross_shard_attachment = attachment_model }
+      @shard2.activate do
+        @same_shard_attachment = attachment_model
+        account = Account.create!
+        course_with_student(account: account, active_all: true)
+        assignment = assignment_model(course: @course)
+        submission = submission_model(assignment: assignment, user: @student)
+        @draft = submission.submission_drafts.create!(submission_attempt: 1)
+      end
+    end
+
+    it "attachments association returns attachments that live cross-shard" do
+      @shard2.activate do
+        @draft.attachments << @cross_shard_attachment
+        expect(@draft.reload.attachments).to include @cross_shard_attachment
+      end
+    end
+
+    it "cleans up cross-shard submission_draft_attachments when the draft is destroyed" do
+      @shard2.activate do
+        @draft.attachments << @cross_shard_attachment
+        @draft.destroy
+      end
+
+      @shard1.activate do
+        expect(SubmissionDraftAttachment.where(submission_draft: @draft)).to be_empty
+      end
+    end
+
+    it "attachments association returns attachments that live on the same shard" do
+      @shard2.activate do
+        @draft.attachments << @same_shard_attachment
+        expect(@draft.reload.attachments).to include @same_shard_attachment
+      end
+    end
+
+    context "finding cross-shard attachments using the attachments association and a where query" do
+      it "returns attachments using the 'attachments.id' form in the where query" do
+        @shard2.activate do
+          @draft.attachments << @cross_shard_attachment
+          attachments = @draft.reload.attachments.where("attachments.id": @cross_shard_attachment)
+          expect(attachments).to include @cross_shard_attachment
+        end
+      end
+
+      it "returns attachments using AR association syntax in the where query" do
+        @shard2.activate do
+          @draft.attachments << @cross_shard_attachment
+          attachments = @draft.reload.attachments.where(attachments: { id: @cross_shard_attachment })
+          expect(attachments).to include @cross_shard_attachment
+        end
+      end
+    end
+  end
+
   describe "attachments" do
     before(:once) do
       @attachment1 = attachment_model
