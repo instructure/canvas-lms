@@ -62,20 +62,34 @@ describe('ContextModulesPublishModal', () => {
     expect(onPublish).toHaveBeenCalled()
   })
 
-  it('has a disabled cancel button if not publishing', () => {
-    const {getByRole} = render(<ContextModulesPublishModal {...defaultProps} />)
-    const cancelButton = getByRole('button', {name: 'Cancel'})
-    expect(cancelButton).toBeDisabled()
+  it('has a close button', () => {
+    const onClose = jest.fn()
+    const {getByTestId} = render(<ContextModulesPublishModal {...defaultProps} onClose={onClose} />)
+    const closeButton = getByTestId('close-button')
+    act(() => closeButton.click())
+    expect(onClose).toHaveBeenCalled()
   })
 
-  it('has an enabled cancel button if there is a progressId', () => {
+  it('changes the publish button to stop button if there is a progressId', () => {
     const onPublish = jest.fn()
-    const {getByRole} = render(
+    const {getByTestId} = render(
       <ContextModulesPublishModal {...defaultProps} onPublish={onPublish} />
     )
-    const publishButton = getByRole('button', {name: 'Continue'})
+    const publishButton = getByTestId('publish-button')
+    expect(publishButton.textContent).toBe('Continue')
     act(() => publishButton.click())
-    const cancelButton = getByRole('button', {name: 'Cancel'})
-    expect(cancelButton).not.toBeDisabled()
+    expect(onPublish).toHaveBeenCalled()
+    expect(publishButton.textContent).toBe('Stop')
+  })
+
+  it('disables the stop button if canceling', () => {
+    const {getByTestId} = render(<ContextModulesPublishModal {...defaultProps} />)
+    const publishButton = getByTestId('publish-button')
+    act(() => publishButton.click())
+    expect(publishButton.textContent).toBe('Stop')
+    expect(publishButton).not.toBeDisabled()
+    act(() => publishButton.click())
+    expect(publishButton.textContent).toBe('Stop')
+    expect(publishButton).toBeDisabled()
   })
 })
