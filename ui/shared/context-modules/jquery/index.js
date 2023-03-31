@@ -71,6 +71,7 @@ import {
 import ContextModulesPublishMenu from '../react/ContextModulesPublishMenu'
 import {renderContextModulesPublishIcon} from '../utils/publishOneModuleHelper'
 import {underscoreString} from '@canvas/convert-case'
+import {selectContentDialog} from '@canvas/select-content-dialog'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -1712,25 +1713,24 @@ modules.initModuleManagement = function (duplicate) {
       })
       return
     }
-    if (INST && INST.selectContentDialog) {
-      const id = $(this).parents('.context_module').find('.header').attr('id')
-      const name = $(this).parents('.context_module').find('.name').attr('title')
-      const options = {for_modules: true, context_module_id: id}
-      const midSizeModal = window.matchMedia('(min-width: 500px)').matches
-      const fullSizeModal = window.matchMedia('(min-width: 770px)').matches
-      const responsiveWidth = fullSizeModal ? 770 : midSizeModal ? 500 : 320
-      options.select_button_text = I18n.t('buttons.add_item', 'Add Item')
-      options.holder_name = name
-      options.height = 550
-      options.width = responsiveWidth
-      options.dialog_title = I18n.t('titles.add_item', 'Add Item to %{module}', {module: name})
-      options.close = function () {
-        $trigger.focus()
-      }
 
-      options.submit = generate_submit(id)
-      INST.selectContentDialog(options)
+    const id = $(this).parents('.context_module').find('.header').attr('id')
+    const name = $(this).parents('.context_module').find('.name').attr('title')
+    const options = {for_modules: true, context_module_id: id}
+    const midSizeModal = window.matchMedia('(min-width: 500px)').matches
+    const fullSizeModal = window.matchMedia('(min-width: 770px)').matches
+    const responsiveWidth = fullSizeModal ? 770 : midSizeModal ? 500 : 320
+    options.select_button_text = I18n.t('buttons.add_item', 'Add Item')
+    options.holder_name = name
+    options.height = 550
+    options.width = responsiveWidth
+    options.dialog_title = I18n.t('titles.add_item', 'Add Item to %{module}', {module: name})
+    options.close = function () {
+      $trigger.focus()
     }
+
+    options.submit = generate_submit(id)
+    selectContentDialog(options)
   })
 
   function generate_submit(id, focusLink = true) {

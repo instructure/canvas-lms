@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type DeepLinkResponse = {
-  content_items: ContentItem[]
-  msg: string
-  log: string
-  errormsg: string
-  errorlog: string
-  ltiEndpoint: string
-  reloadpage: boolean
-}
+import {
+  htmlFragmentContentItem,
+  htmlFragmentContentItemToHtmlString,
+} from '../HtmlFragmentContentItem'
 
-export type ContentItem = {
-  title: string
-  errors: object
-  // there are other fields not included here as defined in the spec:
-  // https://www.imsglobal.org/spec/lti-dl/v2p0#content-item-types
-}
+const json = htmlFragmentContentItem({
+  html: '<a href="test.com">link</a><p><strong>bold</strong></p>',
+})
+
+describe('htmlFragmentContentItemToHtmlString', () => {
+  it('returns the "html"', () => {
+    expect(htmlFragmentContentItemToHtmlString(json)).toEqual(
+      '<a href="test.com">link</a><p><strong>bold</strong></p>'
+    )
+  })
+})

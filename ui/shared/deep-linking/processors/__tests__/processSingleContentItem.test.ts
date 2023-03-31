@@ -16,23 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 import $ from 'jquery'
 import processSingleContentItem from '../processSingleContentItem'
+
+jest.mock('jquery', () => ({
+  flashError: jest.fn(),
+  flashMessage: jest.fn(),
+}))
 
 const content_items = [
   {
     type: 'link',
     title: 'title',
     url: 'http://www.tool.com',
-  },
+  } as const,
   {
     type: 'ltiResourceLink',
     title: 'LTI Link',
     url: 'http://www.tool.com/lti',
-  },
+  } as const,
 ]
 
-const data = overrides => ({
+const data = (overrides: Partial<DeepLinkResponse>) => ({
   content_items,
   msg: 'message',
   log: 'log',
@@ -44,33 +50,22 @@ const data = overrides => ({
 })
 
 describe('processSingleContentItem', () => {
-  const oldFlashError = $.flashError
-  const oldFlashMessage = $.flashMessage
-
-  const flashErrorMock = jest.fn()
-  const flashMessageMock = jest.fn()
-
   beforeEach(() => {
-    $.flashError = flashErrorMock
-    $.flashMessage = flashMessageMock
+    ;($.flashError as unknown as {mockClear: () => void}).mockClear()
+    ;($.flashMessage as unknown as {mockClear: () => void}).mockClear()
   })
 
-  afterEach(() => {
-    $.flashError = oldFlashError
-    $.flashMessage = oldFlashMessage
-  })
+  afterEach(() => {})
 
   it('extracts the first content item', () => {
-    return processSingleContentItem({data: data()}).then(result => {
-      expect(result).toEqual(content_items[0])
-    })
+    const result = processSingleContentItem({data: data({})})
+    expect(result).toEqual(content_items[0])
   })
 
   describe('when no content items are provided', () => {
     it('returns "undefined"', () => {
-      return processSingleContentItem({data: data({content_items: []})}).then(result => {
-        expect(result).toBeUndefined()
-      })
+      const result = processSingleContentItem({data: data({content_items: []})})
+      expect(result).toBeUndefined()
     })
   })
 })

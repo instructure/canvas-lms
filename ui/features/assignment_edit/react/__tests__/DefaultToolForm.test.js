@@ -20,7 +20,7 @@ import axios from '@canvas/axios'
 import React from 'react'
 import {mount} from 'enzyme'
 import DefaultToolForm from '../DefaultToolForm'
-import SelectContentDialog from '@canvas/select-content-dialog'
+import * as SelectContentDialog from '@canvas/select-content-dialog'
 
 const newProps = (overrides = {}) => ({
   ...{

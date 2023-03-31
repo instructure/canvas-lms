@@ -32,6 +32,9 @@ export default class FileSelectBox extends React.Component {
     contextString: string.isRequired,
   }
 
+  /**
+   * @type {{folders: any[]}}
+   */
   state = {
     folders: [],
   }

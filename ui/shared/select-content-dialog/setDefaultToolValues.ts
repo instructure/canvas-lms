@@ -18,7 +18,13 @@
 
 import $ from 'jquery'
 
-export default function setDefaultToolValues(result, tool) {
+export default function setDefaultToolValues(
+  result: {url: string},
+  tool: {
+    definition_type: string
+    definition_id: string
+  }
+) {
   $('#assignment_external_tool_tag_attributes_content_type').val(tool.definition_type)
   $('#assignment_external_tool_tag_attributes_content_id').val(tool.definition_id)
   $('#assignment_external_tool_tag_attributes_url').val(result.url)
