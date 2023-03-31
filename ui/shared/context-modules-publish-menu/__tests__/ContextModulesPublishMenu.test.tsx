@@ -25,19 +25,8 @@ import ContextModulesPublishMenu from '../ContextModulesPublishMenu'
 
 const defaultProps = {
   courseId: '1',
+  disabled: false,
 }
-
-// beforeAll(() => {
-//   doFetchApi.mockResolvedValue({response: {ok: true}, json: {completed: []}})
-// })
-
-// beforeEach(() => {
-//   doFetchApi.mockClear()
-// })
-
-// afterEach(() => {
-//   jest.clearAllMocks()
-// })
 
 describe('ContextModulesPublishMenu', () => {
   it('renders the menu when clicked', () => {
@@ -77,5 +66,11 @@ describe('ContextModulesPublishMenu', () => {
     act(() => publishButton.click())
     const modalTitle = getByRole('heading', {name: 'Unpublish all modules and items'})
     expect(modalTitle).toBeInTheDocument()
+  })
+
+  it('is disabled when disabled prop is true', () => {
+    const {getByRole} = render(<ContextModulesPublishMenu {...defaultProps} disabled={true} />)
+    const menuButton = getByRole('button')
+    expect(menuButton).toBeDisabled()
   })
 })
