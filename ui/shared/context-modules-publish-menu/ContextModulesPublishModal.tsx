@@ -53,6 +53,7 @@ const ContextModulesPublishModal: React.FC<Props> = ({
   title,
 }) => {
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isCanceling, setIsCanceling] = useState(false)
   const [progress, setProgress] = useState(null)
   const [progressCurrent, setProgressCurrent] = useState(0)
 
@@ -99,7 +100,7 @@ const ContextModulesPublishModal: React.FC<Props> = ({
   }
 
   const handleCancel = () => {
-    setIsPublishing(false)
+    setIsCanceling(true)
     if (!progressId) return
     if (
       progress &&
@@ -121,12 +122,17 @@ const ContextModulesPublishModal: React.FC<Props> = ({
       .catch(error => {
         showFlashError(I18n.t('There was an error while saving your changes'))(error)
         setIsPublishing(false)
+        setIsCanceling(false)
       })
   }
 
   const handlePublish = () => {
-    setIsPublishing(true)
-    onPublish()
+    if (isPublishing) {
+      handleCancel()
+    } else {
+      setIsPublishing(true)
+      onPublish()
+    }
   }
 
   const handlePublishComplete = () => {
@@ -139,6 +145,7 @@ const ContextModulesPublishModal: React.FC<Props> = ({
     setProgress(null)
     setProgressCurrent(0)
     setIsPublishing(false)
+    setIsCanceling(false)
     onClose()
   }
 
@@ -186,24 +193,23 @@ const ContextModulesPublishModal: React.FC<Props> = ({
         <View as="div">
           <Text>
             {I18n.t(
-              'This process could take a few minutes. Hitting cancel will stop the process, but items that have already been processed will not be reverted to their previous state.'
+              'This process could take a few minutes. Hitting stop will stop the process, but items that have already been processed will not be reverted to their previous state.'
             )}
           </Text>
         </View>
         {progressBar()}
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={handleCancel} disabled={!isPublishing} margin="0 x-small 0 0">
-          {I18n.t('Cancel')}
+        <Button data-testid="close-button" onClick={onClose} margin="0 x-small 0 0">
+          {I18n.t('Close')}
         </Button>
         <Button
-          onClick={() => {
-            handlePublish()
-          }}
+          data-testid="publish-button"
+          onClick={handlePublish}
           color="primary"
-          disabled={isPublishing}
+          disabled={isCanceling}
         >
-          {I18n.t('Continue')}
+          {isPublishing ? I18n.t('Stop') : I18n.t('Continue')}
         </Button>
       </Modal.Footer>
     </Modal>
