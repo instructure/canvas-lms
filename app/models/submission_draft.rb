@@ -21,8 +21,8 @@
 class SubmissionDraft < ActiveRecord::Base
   belongs_to :submission, inverse_of: :submission_drafts
   belongs_to :media_object, primary_key: :media_id
-  has_many :submission_draft_attachments, inverse_of: :submission_draft, dependent: :delete_all
-  has_many :attachments, through: :submission_draft_attachments
+  has_many :submission_draft_attachments, inverse_of: :submission_draft, dependent: :destroy
+  has_many :attachments, through: :submission_draft_attachments, multishard: true
 
   validates :submission, presence: true
   validates :submission_attempt, numericality: { only_integer: true }
@@ -135,5 +135,9 @@ class SubmissionDraft < ActiveRecord::Base
     end
 
     false
+  end
+
+  def associated_shards
+    submission_draft_attachments.map(&:attachment_shard).uniq
   end
 end
