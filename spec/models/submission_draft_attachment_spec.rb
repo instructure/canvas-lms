@@ -86,7 +86,7 @@ describe SubmissionDraftAttachment do
   context "sharding" do
     specs_require_sharding
 
-    before(:once) do
+    before do
       @shard1.activate { @attachment1 = attachment_model(context: course_factory(account: Account.create!)) }
       @shard2.activate { @attachment2 = attachment_model(context: course_factory(account: Account.create!)) }
       @shard1.activate do
