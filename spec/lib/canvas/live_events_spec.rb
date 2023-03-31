@@ -142,6 +142,12 @@ describe Canvas::LiveEvents do
                    ))
       Canvas::LiveEvents.enrollment_updated(enrollment)
     end
+
+    it "includes course_uuid and user_uuid" do
+      enrollment = course_with_student
+      expect_event("enrollment_updated", hash_including(course_uuid: @course.uuid, user_uuid: @user.uuid))
+      Canvas::LiveEvents.enrollment_updated(enrollment)
+    end
   end
 
   describe ".group_category_created" do
