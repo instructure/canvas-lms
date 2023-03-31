@@ -117,7 +117,10 @@ function renderAttemptsAndAvailability({assignment, submission}) {
   )
 }
 
-function renderContentBaseOnAvailability({assignment, submission}, alertContext) {
+function renderContentBaseOnAvailability(
+  {assignment, submission, reviewerSubmission},
+  alertContext
+) {
   if (assignment.env.modulePrereq) {
     return <MissingPrereqs moduleUrl={assignment.env.moduleUrl} />
   } else if (assignment.env.unlockDate) {
@@ -161,7 +164,11 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
           </Suspense>
         )}
         {assignment.expectsSubmission ? (
-          <ContentTabs assignment={assignment} submission={submission} />
+          <ContentTabs
+            assignment={assignment}
+            submission={submission}
+            reviewerSubmission={reviewerSubmission}
+          />
         ) : (
           <SubmissionlessFooter onMarkAsDoneError={onMarkAsDoneError} />
         )}
