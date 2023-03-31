@@ -19,9 +19,12 @@
 #
 
 describe MediaObject do
+  before :once do
+    course_factory
+  end
+
   context "loading with legacy support" do
     it "loads by either media_id or old_media_id" do
-      course_factory
       mo = factory_with_protected_attributes(MediaObject, media_id: "0_abcdefgh", old_media_id: "1_01234567", context: @course)
 
       expect(MediaObject.by_media_id("0_abcdefgh").first).to eq mo
@@ -29,7 +32,6 @@ describe MediaObject do
     end
 
     it "does not find an arbitrary MediaObject when given a nil id" do
-      course_factory
       factory_with_protected_attributes(MediaObject, media_id: "0_abcdefgh", context: @course)
       expect(MediaObject.by_media_id(nil).first).to be_nil
     end
@@ -41,7 +43,6 @@ describe MediaObject do
 
   describe ".build_media_objects" do
     it "deletes attachments created temporarily for import" do
-      course_factory
       folder = Folder.assert_path(CC::CCHelper::MEDIA_OBJECTS_FOLDER, @course)
       @a1 = attachment_model(folder: folder, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
       @a2 = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
@@ -57,7 +58,6 @@ describe MediaObject do
     end
 
     it "builds media objects from attachment_id" do
-      course_factory
       @a1 = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
       @a3 = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
       @a4 = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
@@ -205,6 +205,24 @@ describe MediaObject do
     end
   end
 
+  describe ".create_attachment" do
+    before :once do
+      @media_object = MediaObject.create!(
+        context: @course,
+        title: "uploaded_video.mp4",
+        media_id: "m-somejunkhere",
+        media_type: "video"
+      )
+    end
+
+    it "creates the corresponding attachment" do
+      att = @media_object.attachment
+      expect(att).to be_hidden
+      expect(att.folder.name).to eq "Uploaded Media"
+      expect(att[:media_entry_id]).to eql @media_object[:media_id]
+    end
+  end
+
   describe ".process_retrieved_details" do
     before :once do
       @mock_entry = {
@@ -216,21 +234,11 @@ describe MediaObject do
       @media_type = "video"
       @assets = []
 
-      course_factory
       @media_object = MediaObject.create!(
         context: @course,
         title: "uploaded_video.mp4",
         media_id: "m-somejunkhere",
         media_type: "video"
-      )
-    end
-
-    before do
-      mock_kaltura = double("CanvasKaltura::ClientV3")
-      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
-      allow(mock_kaltura).to receive(:media_sources).and_return(
-        [{ height: "240", bitrate: "382", isOriginal: "0", width: "336", content_type: "video/mp4",
-           containerFormat: "isom", url: "https://kaltura.example.com/some/url", size: "204", fileExt: "mp4" }]
       )
     end
 
@@ -266,42 +274,46 @@ describe MediaObject do
     end
 
     it "ensures retrieve_details adds '/' to media_type" do
-      mo = media_object
+      mo = @media_object
       mo.retrieve_details
       expect(mo.media_type).to eql "video/*"
     end
 
     it "doesn't add '/' to media_type if blank" do
       allow(@mock_kaltura).to receive(:mediaTypeToSymbol).and_return("")
-      mo = media_object
+      mo = @media_object
       mo.retrieve_details
       expect(mo.media_type).to eql("")
     end
 
-    it "doesn't create the attachment until media_sources exist" do
-      allow(@mock_kaltura).to receive(:media_sources).and_return([])
-      mo = media_object
-      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
-      att = Attachment.where(media_entry_id: mo[:media_id])
-      expect(att).to be_empty
+    it "doesn't create an attachment if is one" do
+      expect { @media_object.process_retrieved_details(@mock_entry, @media_type, @assets) }.not_to change { Attachment.count }
     end
 
-    it "creates the corresponding attachment" do
-      mo = @media_object
-      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
-      att = Attachment.find(mo[:attachment_id])
-      expect(att).to be_hidden
+    it "does create an attachment if there isn't one and there should be" do
+      @media_object.attachment.update(media_entry_id: "maybe")
+      @media_object.update(attachment_id: nil)
+      @media_object.process_retrieved_details(@mock_entry, @media_type, @assets)
+      att = @media_object.reload.attachment
       expect(att.folder.name).to eq "Uploaded Media"
-      expect(att[:media_entry_id]).to eql mo[:media_id]
+      expect(att[:media_entry_id]).to eql @media_object[:media_id]
+    end
+
+    it "doesn't mark the attachment as processed until media_sources exist" do
+      allow(@mock_kaltura).to receive(:media_sources).and_return([])
+      @media_object.process_retrieved_details(@mock_entry, @media_type, @assets)
+      expect(@media_object.attachment.workflow_state).to eq("pending_upload")
+    end
+
+    it "marks the attachment as processed when media_sources exist" do
+      @media_object.process_retrieved_details(@mock_entry, @media_type, @assets)
+      expect(@media_object.attachment.workflow_state).to eq("processed")
     end
 
     it "doesn't recreate deleted attachments" do
-      mo = @media_object
-      att = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"), media_entry_id: mo.media_id)
-      att.destroy
-      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
-      expect(Attachment.count).to eq 1
-      expect(Attachment.find_by(media_entry_id: mo.media_id).file_state).to eq "deleted"
+      @media_object.attachment.destroy
+      expect { @media_object.reload.process_retrieved_details(@mock_entry, @media_type, @assets) }.not_to change { Attachment.count }
+      expect(Attachment.find_by(media_entry_id: @media_object.media_id).file_state).to eq "deleted"
     end
   end
 
