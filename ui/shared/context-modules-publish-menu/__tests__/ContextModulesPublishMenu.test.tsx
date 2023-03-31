@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -21,11 +20,10 @@ import React from 'react'
 import {act, render} from '@testing-library/react'
 import ContextModulesPublishMenu from '../ContextModulesPublishMenu'
 
-// jest.mock('@canvas/do-fetch-api-effect')
-
 const defaultProps = {
   courseId: '1',
   disabled: false,
+  runningProgressId: null,
 }
 
 describe('ContextModulesPublishMenu', () => {

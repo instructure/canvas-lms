@@ -31,6 +31,9 @@ const defaultProps = {
   progressId: null,
   publishItems: false,
   title: 'Test Title',
+  onCancel: () => {},
+  isCanceling: false,
+  isPublishing: false,
 }
 
 beforeAll(() => {
@@ -75,25 +78,19 @@ describe('ContextModulesPublishModal', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
-  it('changes the publish button to stop button if there is a progressId', () => {
-    const onPublish = jest.fn()
-    const {getByTestId} = render(
-      <ContextModulesPublishModal {...defaultProps} onPublish={onPublish} />
-    )
+  it('changes the publish button to stop button if is publishing', () => {
+    const {getByTestId, rerender} = render(<ContextModulesPublishModal {...defaultProps} />)
     const publishButton = getByTestId('publish-button')
     expect(publishButton.textContent).toBe('Continue')
-    act(() => publishButton.click())
-    expect(onPublish).toHaveBeenCalled()
+    rerender(<ContextModulesPublishModal {...defaultProps} isPublishing={true} />)
     expect(publishButton.textContent).toBe('Stop')
   })
 
   it('disables the stop button if canceling', () => {
-    const {getByTestId} = render(<ContextModulesPublishModal {...defaultProps} />)
+    const {getByTestId} = render(
+      <ContextModulesPublishModal {...defaultProps} isPublishing={true} isCanceling={true} />
+    )
     const publishButton = getByTestId('publish-button')
-    act(() => publishButton.click())
-    expect(publishButton.textContent).toBe('Stop')
-    expect(publishButton).not.toBeDisabled()
-    act(() => publishButton.click())
     expect(publishButton.textContent).toBe('Stop')
     expect(publishButton).toBeDisabled()
   })

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import React, {useEffect, useState} from 'react'
-import ReactDOM from 'react-dom'
+import React, {useCallback, useEffect, useState} from 'react'
 
 import {
   IconMiniArrowDownLine,
@@ -32,38 +29,48 @@ import {Menu} from '@instructure/ui-menu'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {initPublishButton} from '@canvas/context-modules/jquery/utils'
-import ContextModulesPublishIcon from '@canvas/context-modules-publish-icon/ContextModulesPublishIcon'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+import {
+  batchUpdateAllModulesApiCall,
+  cancelBatchUpdate,
+  fetchAllItemPublishedStates,
+  monitorProgress,
+  updateModulePendingPublishedStates,
+  ProgressResult,
+} from '@canvas/context-modules/utils/publishAllModulesHelper'
+import {disableContextModulesPublishMenu} from '@canvas/context-modules/utils/publishOneModuleHelper'
 import ContextModulesPublishModal from './ContextModulesPublishModal'
 
 const I18n = useI18nScope('context_modules_publish_menu')
 
 interface Props {
-  readonly courseId: string
+  readonly courseId: string | number
   readonly runningProgressId: string | null
   readonly disabled: boolean
 }
 
+// TODO: remove and replace MenuItem with Menu.Item below when on v8
+const {Item: MenuItem} = Menu as any
+
 const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId, disabled}) => {
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isCanceling, setIsCanceling] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [shouldPublishModules, setShouldPublishModules] = useState(false)
+  const [shouldPublishModules, setShouldPublishModules] = useState<boolean | undefined>(undefined)
   const [shouldSkipModuleItems, setShouldSkipModuleItems] = useState(false)
   const [progressId, setProgressId] = useState(runningProgressId)
-  const [isDisabled] = useState(disabled)
+  const [currentProgress, setCurrentProgress] = useState<ProgressResult | undefined>(undefined)
+
+  const updateCurrentProgress_cb = useCallback(updateCurrentProgress, [shouldPublishModules])
 
   useEffect(() => {
     if (progressId) {
-      setIsPublishing(true)
-      setIsModalOpen(true)
-    } else {
-      setIsPublishing(false)
+      monitorProgress(progressId, updateCurrentProgress_cb)
     }
-  }, [progressId])
+  }, [progressId, updateCurrentProgress_cb])
 
   const statusIcon = () => {
     if (isPublishing) {
@@ -73,106 +80,68 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
     }
   }
 
-  const moduleIds = (): Array<Number> => {
-    const ids = new Set<Number>()
-    const dataModules = document.querySelectorAll(
-      '.context_module[data-module-id]'
-    ) as NodeListOf<HTMLElement> // eslint-disable-line no-undef
-    dataModules.forEach(el => {
-      if (el.id === undefined) return
-
-      const id = parseInt(el.id.replace(/\D/g, ''), 10)
-      ids.add(id)
-    })
-
-    return [...ids.values()].filter(Number)
+  function updateCurrentProgress(progress) {
+    if (progress.workflow_state === 'completed') {
+      onPublishComplete()
+    } else if (progress.workflow_state === 'failed') {
+      showFlashAlert({
+        message: I18n.t('Your publishing job has failed.'),
+        err: undefined,
+        type: 'error',
+      })
+      onPublishComplete()
+    } else {
+      setCurrentProgress(progress)
+    }
   }
 
-  const batchUpdateApiCall = () => {
+  const onCancelComplete = (error = undefined) => {
+    setIsCanceling(false)
+    setIsPublishing(false)
+    if (error) {
+      showFlashAlert({
+        message: I18n.t('There was an error while saving your changes'),
+        err: error,
+        type: 'error',
+      })
+    } else {
+      window.location.reload()
+    }
+  }
+
+  const handleCancel = () => {
+    cancelBatchUpdate(currentProgress, onCancelComplete)
+    setIsCanceling(true)
+    setCurrentProgress(undefined)
+  }
+
+  function handlePublish() {
     if (isPublishing) return
-
-    const path = `/api/v1/courses/${courseId}/modules`
-
-    const event = shouldPublishModules ? 'publish' : 'unpublish'
-    const async = true
-
     setIsPublishing(true)
-    return doFetchApi({
-      path,
-      method: 'PUT',
-      body: {
-        module_ids: moduleIds(),
-        event,
-        skip_content_tags: shouldSkipModuleItems,
-        async,
-      },
-    })
-      .then(result => {
-        return result
-      })
-      .then(result => {
-        if (result.json.progress) {
-          setProgressId(result.json.progress.progress.id)
-        }
-      })
-      .catch(error => showFlashError(I18n.t('There was an error while saving your changes'))(error))
+    updateModulePendingPublishedStates(undefined, true)
+    // the error is handled w/in the call
+    // eslint-disable-next-line promise/catch-or-return
+    batchUpdateAllModulesApiCall(courseId, shouldPublishModules, shouldSkipModuleItems).then(
+      result => {
+        setProgressId(result.json.progress.progress.id)
+        setCurrentProgress(result.json.progress.progress)
+      }
+    )
   }
 
   const onPublishComplete = () => {
-    updateModuleStates()
+    fetchAllItemPublishedStates(courseId)
+    disableContextModulesPublishMenu(false)
+    updateModulePendingPublishedStates(shouldPublishModules, false)
     setIsPublishing(false)
     setProgressId(null)
-    showFlashSuccess(I18n.t('Modules updated'))()
-  }
-
-  const updateModuleStates = (nextLink?: string) => {
-    doFetchApi({
-      path: nextLink || `/api/v1/courses/${courseId}/modules?include[]=items`,
-      method: 'GET',
+    setCurrentProgress(undefined)
+    setIsModalOpen(false)
+    showFlashAlert({
+      message: I18n.t('Modules updated'),
+      type: 'success',
+      err: null,
     })
-      .then(({json, link}) => {
-        json.forEach((module: any) => {
-          updateModulePublishedState(module.published, module.id)
-          module.items.forEach((item: any) => {
-            updateModuleItemPublishedState(item.id, item.published)
-          })
-        })
-        if (link?.next) {
-          updateModuleStates(link.next.url)
-        }
-      })
-      .catch(error => showFlashError(I18n.t('There was an error while saving your changes'))(error))
-  }
-
-  const updateModulePublishedState = (isPublished: boolean, moduleId: Number) => {
-    const publishIcon = document.querySelector(
-      `#context_module_${moduleId} .module-publish-icon`
-    ) as HTMLElement | null
-    if (publishIcon) {
-      // Update the new state of the module then we unmount the component to render the newly changed state
-      publishIcon.dataset.published = isPublished.toString()
-      ReactDOM.unmountComponentAtNode(publishIcon)
-      ReactDOM.render(
-        <ContextModulesPublishIcon
-          courseId={publishIcon.dataset.courseId}
-          moduleId={publishIcon.dataset.moduleId}
-          published={publishIcon.dataset.published === 'true'}
-        />,
-        publishIcon
-      )
-    }
-  }
-
-  const updateModuleItemPublishedState = (itemId: Number, isPublished: boolean) => {
-    const itemRow = document.querySelector(`#context_module_item_${itemId}`) as HTMLElement | null
-    if (itemRow) {
-      itemRow.querySelector('.ig-row')?.classList.toggle('ig-published', isPublished)
-      const publishIcon = $(itemRow.querySelector('.publish-icon'))
-      if (publishIcon) {
-        publishIcon.data('published', isPublished)
-        initPublishButton(publishIcon)
-      }
-    }
   }
 
   const unpublishAll = () => {
@@ -214,24 +183,28 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
             {I18n.t('Publish All')} <IconMiniArrowDownLine size="x-small" />
           </Button>
         }
-        disabled={isPublishing || isDisabled}
+        show={isPublishing ? false : undefined}
+        disabled={disabled}
       >
-        <Menu.Item onClick={publishAll}>
+        <MenuItem onClick={publishAll}>
           <IconPublishSolid color="success" /> {I18n.t('Publish all modules and items')}
-        </Menu.Item>
-        <Menu.Item onClick={publishModuleOnly}>
+        </MenuItem>
+        <MenuItem onClick={publishModuleOnly}>
           <IconPublishSolid color="success" /> {I18n.t('Publish modules only')}
-        </Menu.Item>
-        <Menu.Item onClick={unpublishAll}>
+        </MenuItem>
+        <MenuItem onClick={unpublishAll}>
           <IconUnpublishedLine /> {I18n.t('Unpublish all modules and items')}
-        </Menu.Item>
+        </MenuItem>
       </Menu>
       <ContextModulesPublishModal
         isOpen={isModalOpen}
+        onCancel={handleCancel}
         onClose={() => setIsModalOpen(false)}
-        onPublish={batchUpdateApiCall}
-        onPublishComplete={onPublishComplete}
+        onPublish={handlePublish}
+        isCanceling={isCanceling}
+        isPublishing={isPublishing}
         progressId={progressId}
+        progressCurrent={currentProgress}
         title={modalTitle()}
       />
     </View>

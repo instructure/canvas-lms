@@ -71,6 +71,7 @@ PublishCloud.render = function () {
             fileName,
             restricted: this.getRestrictedText(),
           })}
+          disabled={this.props.disabled}
         >
           <i className="icon-calendar-month icon-line" />
         </button>
@@ -90,6 +91,7 @@ PublishCloud.render = function () {
               fileName,
             }
           )}
+          disabled={this.props.disabled}
         >
           <i className="icon-off icon-line" />
         </button>
@@ -104,6 +106,7 @@ PublishCloud.render = function () {
           className="btn-link published-status published"
           title={I18n.t('Published')}
           aria-label={I18n.t('%{fileName} is Published - Click to modify', {fileName})}
+          disabled={this.props.disabled}
         >
           <i className="icon-publish icon-Solid" />
         </button>
@@ -118,6 +121,7 @@ PublishCloud.render = function () {
           className="btn-link published-status unpublished"
           title={I18n.t('Unpublished')}
           aria-label={I18n.t('%{fileName} is Unpublished - Click to modify', {fileName})}
+          disabled={this.props.disabled}
         >
           <i className="icon-unpublish" />
         </button>
@@ -135,6 +139,7 @@ PublishCloud.render = function () {
           fileName,
           restricted: this.getRestrictedText(),
         })}
+        disabled={this.props.disabled}
       >
         <i className="icon-calendar-day" />
       </div>
