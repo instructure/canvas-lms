@@ -74,6 +74,7 @@ import contentCSSBinding from 'tinymce/skins/ui/oxide/content.css'
 import {rceWrapperPropTypes} from './RCEWrapperProps'
 import {removePlaceholder} from '../util/loadingPlaceholder'
 import {transformRceContentForEditing} from './transformContent'
+import {IconMoreSolid} from '@instructure/ui-icons/es/svg'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -84,17 +85,10 @@ const DEFAULT_RCE_HEIGHT = '400px'
 const skinCSS = skinCSSBinding.template().replace(/tinymce__oxide--/g, '')
 const contentCSS = contentCSSBinding.template().replace(/tinymce__oxide--/g, '')
 
-// If we ever get our jest tests configured so they can handle importing real esModules,
-// we can move this to plugins/instructure-ui-icons/plugin.ts like the rest.
 function addKebabIcon(editor) {
-  editor.ui.registry.addIcon(
-    'more-drawer',
-    `
-    <svg viewBox="0 0 1920 1920">
-      <path d="M1129.412 1637.647c0 93.448-75.964 169.412-169.412 169.412-93.448 0-169.412-75.964-169.412-169.412 0-93.447 75.964-169.412 169.412-169.412 93.448 0 169.412 75.965 169.412 169.412zm0-677.647c0 93.448-75.964 169.412-169.412 169.412-93.448 0-169.412-75.964-169.412-169.412 0-93.448 75.964-169.412 169.412-169.412 93.448 0 169.412 75.964 169.412 169.412zm0-677.647c0 93.447-75.964 169.412-169.412 169.412-93.448 0-169.412-75.965-169.412-169.412 0-93.448 75.964-169.412 169.412-169.412 93.448 0 169.412 75.964 169.412 169.412z" stroke="none" stroke-width="1" fill-rule="evenodd"/>
-    </svg>
-  `
-  )
+  // This has to be done here instead of of in plugins/instructure-ui-icons/plugin.ts
+  // presumably because the toolbar gets created before that plugin is loaded?
+  editor.ui.registry.addIcon('more-drawer', IconMoreSolid.src)
 }
 
 // Get oxide the default skin injected into the DOM before the overrides loaded by themeable
@@ -116,6 +110,7 @@ function injectTinySkin() {
       #quiz_edit_wrapper .rce-wrapper input[readonly] {font-weight: normal; padding-left: .75rem;}
     `)
   )
+
   const beforeMe =
     document.head.querySelector('style[data-glamor]') || // find instui's themeable stylesheet
     document.head.querySelector('style') || // find any stylesheet
@@ -968,7 +963,6 @@ class RCEWrapper extends React.Component {
     const ifr = this.iframe
     ifr && ifr.parentElement.classList.add('active')
 
-    this._forceCloseFloatingToolbar()
     this.handleFocus(event)
   }
 
@@ -1007,7 +1001,6 @@ class RCEWrapper extends React.Component {
       event.stopPropagation()
       this.openKBShortcutModal()
     } else if (event.code === 'Escape') {
-      this._forceCloseFloatingToolbar()
       bridge.hideTrays()
     } else if (['n', 'N', 'd', 'D'].indexOf(event.key) !== -1) {
       // Prevent key events from bubbling up on touch screen device
@@ -1024,7 +1017,6 @@ class RCEWrapper extends React.Component {
   }
 
   handleExternalClick = () => {
-    this._forceCloseFloatingToolbar()
     debounce(this.checkAccessibility, 1000)()
   }
 
@@ -1075,7 +1067,6 @@ class RCEWrapper extends React.Component {
 
     // Probably should do this in tinymce.scss, but we only want it in new rce
     textarea.style.resize = 'none'
-    editor.on('ExecCommand', this._forceCloseFloatingToolbar)
     editor.on('keydown', this.handleKey)
     editor.on('FullscreenStateChanged', this._onFullscreenChange)
     // This propagates click events on the editor out of the iframe to the parent
@@ -1189,20 +1180,6 @@ class RCEWrapper extends React.Component {
         isForward: this.editor.selection.isForward(),
       }
     })
-  }
-
-  _forceCloseFloatingToolbar = () => {
-    if (this._elementRef.current) {
-      const moreButton = this._elementRef.current.querySelector(
-        '.tox-toolbar-overlord .tox-toolbar__group:last-child button:last-child'
-      )
-      if (moreButton?.getAttribute('aria-owns')) {
-        // the floating toolbar is open
-        moreButton.click() // close the floating toolbar
-        const editor = this.mceInstance() // return focus to the editor
-        editor?.focus()
-      }
-    }
   }
 
   announcing = 0
@@ -1680,7 +1657,7 @@ class RCEWrapper extends React.Component {
 
       contextmenu: '', // show the browser's native context menu
 
-      toolbar_mode: 'floating',
+      toolbar_mode: 'sliding',
       toolbar_sticky: true,
 
       // In regards to the ability to disable plugins:
@@ -1818,24 +1795,6 @@ class RCEWrapper extends React.Component {
       )
     }
 
-    // .tox-tinymce-aux is where tinymce puts the floating toolbar when
-    // the user clicks the More... button
-    // Tinymce doesn't fire onFocus when the user clicks More... from somewhere
-    // outside, so we'll handle that here by watching for the floating toolbar
-    // to come and go.
-    const portals = document.querySelectorAll('.tox-tinymce-aux')
-    // my portal will be the last one in the doc because tinyumce appends them
-    const tinymce_floating_toolbar_portal = portals[portals.length - 1]
-    if (tinymce_floating_toolbar_portal) {
-      this.mutationObserver = new MutationObserver((mutationList, _observer) => {
-        mutationList.forEach(mutation => {
-          if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-            this.handleFocusEditor(new Event('focus', {target: mutation.target}))
-          }
-        })
-      })
-      this.mutationObserver.observe(tinymce_floating_toolbar_portal, {childList: true})
-    }
     bridge.renderEditor(this)
   }
 

@@ -430,33 +430,6 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
       end
     end
 
-    describe "floating toolbar" do
-      before do
-        create_wiki_page_with_text("hello")
-        visit_existing_wiki_edit(@course, "hello")
-        driver.manage.window.resize_to(1_000, 800)
-      end
-
-      it "closes on executing any command" do
-        more_toolbar_button.click
-        expect(overflow_toolbar).to be_displayed
-        click_lists_toolbar_menubutton
-        click_bullet_list_toolbar_menuitem
-        expect(f("body")).not_to contain_css(overflow_toolbar_selector)
-      end
-
-      it "closes on losing focus" do
-        in_frame rce_page_body_ifr_id do
-          f("#tinymce").send_keys("") # focus
-        end
-        more_toolbar_button.click
-        wait_for_animations
-        expect(overflow_toolbar).to be_displayed
-        f("#title").click
-        expect(f("body")).not_to contain_css(overflow_toolbar_selector)
-      end
-    end
-
     context "in a narrow window" do
       before do
         rce_wysiwyg_state_setup(@course)
@@ -465,11 +438,9 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
 
       it "list button in overflow menu should indicate active when appropriate" do
         click_lists_toolbar_quickaction
-        more_toolbar_button.click
         expect(lists_toolbar_splitbutton).to contain_css(".tox-tbtn--enabled")
 
         click_lists_toolbar_quickaction
-        more_toolbar_button.click
         expect(lists_toolbar_splitbutton).not_to contain_css(".tox-tbtn--enabled")
       end
 
