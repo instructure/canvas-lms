@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import pluralize from '@canvas/str-pluralize'
+import pluralize from '@canvas/util/stringPluralize'
 import {gql} from '@canvas/apollo'
 
 export const groupFields = `
