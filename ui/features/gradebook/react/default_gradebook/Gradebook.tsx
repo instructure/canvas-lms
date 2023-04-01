@@ -20,7 +20,7 @@ import $ from 'jquery'
 import type JQuery from 'jquery'
 import {deferPromise} from 'defer-promise'
 import _ from 'underscore'
-import {intersection, isEqual} from 'lodash'
+import {intersection, isEqual, map, pick} from 'lodash'
 import tz from '@canvas/timezone'
 import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
@@ -880,7 +880,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       student.initialized = true
       this.calculateStudentGrade(student)
     }
-    const studentIds: string[] = _.pluck(students, 'id')
+    const studentIds: string[] = map(students, 'id')
     this.setAssignmentVisibility(studentIds)
     return studentIds
   }
@@ -942,7 +942,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
       const assignment = this.getAssignment(assignmentId)
       assignmentStudentVisibility[assignmentId] = assignment.only_visible_to_overrides
-        ? (_.pick(allStudentsById, ...assignment.assignment_visibility) as StudentMap)
+        ? (pick(allStudentsById, ...assignment.assignment_visibility) as StudentMap)
         : allStudentsById
     }
 
@@ -955,7 +955,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   visibleStudentsThatCanSeeAssignment = (assignmentId: string): StudentMap => {
     const allStudentIds = this.courseContent.students.listStudentIds()
 
-    const visibleStudentsIgnoringSearch: StudentMap = _.pick(
+    const visibleStudentsIgnoringSearch: StudentMap = pick(
       this.studentsThatCanSeeAssignment(assignmentId),
       allStudentIds
     )
@@ -1298,6 +1298,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     for (const studentSubmissionGroup of student_submission_groups) {
       changedStudentIds.push(studentSubmissionGroup.user_id)
       const student = this.student(studentSubmissionGroup.user_id)
+      if (!student) {
+        continue
+      }
       for (const submission of studentSubmissionGroup.submissions) {
         submission.posted_at = tz.parse(submission.posted_at)
         ensureAssignmentVisibility(this.getAssignment(submission.assignment_id), submission)
@@ -1323,6 +1326,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     submission: Partial<Submission> & Pick<Submission, 'user_id' | 'assignment_id'>
   ) => {
     const student = this.student(submission.user_id)
+    if (!student) {
+      return
+    }
     submission.submitted_at = tz.parse(submission.submitted_at)
     submission.excused = Boolean(submission.excused)
     submission.hidden = Boolean(submission.hidden)
@@ -1339,7 +1345,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
     const name = `assignment_${submission.assignment_id}`
     const cell = student[name] || (student[name] = {})
-    return _.extend(cell, submission)
+    Object.assign(cell, submission)
   }
 
   // this is used after the CurveGradesDialog submit xhr comes back.  it does not use the api
@@ -2894,7 +2900,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       }
     }
     this.gridData.rows.sort(respectorOfPersonsSort())
-    this.courseContent.students.setStudentIds(_.map(this.gridData.rows, 'id'))
+    this.courseContent.students.setStudentIds(map(this.gridData.rows, 'id'))
     this.gradebookGrid?.invalidate()
   }
 
@@ -3968,7 +3974,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   getAssignmentGroupToShow = (): string => {
     const groupId = this.getFilterColumnsBySetting('assignmentGroupId') || '0'
-    if (_.pluck(this.assignmentGroups, 'id').indexOf(groupId) >= 0) {
+    if (map(this.assignmentGroups, 'id').indexOf(groupId) >= 0) {
       return groupId
     } else {
       return '0'
@@ -4209,9 +4215,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   setStudentGroups = (studentGroupCategories: StudentGroupCategory[]) => {
     this.studentGroupCategoriesById = _.indexBy(studentGroupCategories, 'id')
-    const studentGroupList: StudentGroup[] = _.flatten(
-      _.pluck(studentGroupCategories, 'groups')
-    ).map(htmlEscape)
+    const studentGroupList: StudentGroup[] = _.flatten(map(studentGroupCategories, 'groups')).map(
+      htmlEscape
+    )
     this.studentGroups = _.indexBy(studentGroupList, 'id')
     this.studentGroupsEnabled = studentGroupList.length > 0
   }
