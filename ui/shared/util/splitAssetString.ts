@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import pluralize from '@canvas/str-pluralize'
+import pluralize from './stringPluralize'
 
 export default function splitAssetString(assetString = '', toPlural = true) {
   const match = assetString.match(/(.*)_(\d+)$/)

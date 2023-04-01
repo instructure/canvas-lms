@@ -269,7 +269,6 @@ module.exports = {
           path.resolve(canvasDir, 'packages/html-escape'),
           path.resolve(canvasDir, 'packages/persistent-array'),
           path.resolve(canvasDir, 'packages/slickgrid'),
-          path.resolve(canvasDir, 'packages/str-pluralize'),
           path.resolve(canvasDir, 'packages/with-breakpoints'),
           path.resolve(canvasDir, 'spec/javascripts/jsx'),
           path.resolve(canvasDir, 'spec/coffeescripts'),
