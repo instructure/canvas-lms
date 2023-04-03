@@ -32,7 +32,7 @@ describe RuboCop::Cop::Migration::IdColumn do
         end
       RUBY
       expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to eq "Use `:bigint` for id columns"
+      expect(cop.messages.first).to eq "Migration/IdColumn: Use `:bigint` for id columns"
       expect(cop.offenses.first.severity.name).to eq(:warning)
     end
 
@@ -88,7 +88,7 @@ describe RuboCop::Cop::Migration::IdColumn do
         end
       RUBY
       expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to eq "Use `:bigint` for id columns"
+      expect(cop.messages.first).to eq "Migration/IdColumn: Use `:bigint` for id columns"
       expect(cop.offenses.first.severity.name).to eq(:warning)
     end
 

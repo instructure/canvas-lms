@@ -43,7 +43,7 @@ describe RuboCop::Cop::Migration::FunctionUnqualifiedTable do
 
       expect(cop.offenses.size).to eq 1
       expect(cop.messages.first).to eq <<~'TEXT'.tr("\n", " ")
-        Use unqualified table names in function creation to be compatible with beta/test refresh.
+        Migration/FunctionUnqualifiedTable: Use unqualified table names in function creation to be compatible with beta/test refresh.
         (ie: `folders` and not `#{Folder.quoted_table_name}`))
       TEXT
       expect(cop.offenses.first.severity.name).to eq(:error)
@@ -95,7 +95,7 @@ describe RuboCop::Cop::Migration::FunctionUnqualifiedTable do
 
       expect(cop.offenses.size).to eq 1
       expect(cop.messages.first).to eq <<~'TEXT'.tr("\n", " ")
-        Use unqualified table names in function creation to be compatible with beta/test refresh.
+        Migration/FunctionUnqualifiedTable: Use unqualified table names in function creation to be compatible with beta/test refresh.
         (ie: `folders` and not `#{Folder.quoted_table_name}`))
       TEXT
       expect(cop.offenses.first.severity.name).to eq(:error)
@@ -123,7 +123,7 @@ describe RuboCop::Cop::Migration::FunctionUnqualifiedTable do
 
       expect(cop.offenses.size).to eq 1
       expect(cop.messages.first).to eq <<~'TEXT'.tr("\n", " ")
-        Use unqualified table names in function creation to be compatible with beta/test refresh.
+        Migration/FunctionUnqualifiedTable: Use unqualified table names in function creation to be compatible with beta/test refresh.
         (ie: `folders` and not `#{Folder.quoted_table_name}`))
       TEXT
       expect(cop.offenses.first.severity.name).to eq(:error)
@@ -151,7 +151,7 @@ describe RuboCop::Cop::Migration::FunctionUnqualifiedTable do
 
       expect(cop.offenses.size).to eq 1
       expect(cop.messages.first).to eq <<~'TEXT'.tr("\n", " ")
-        Use unqualified table names in function creation to be compatible with beta/test refresh.
+        Migration/FunctionUnqualifiedTable: Use unqualified table names in function creation to be compatible with beta/test refresh.
         (ie: `folders` and not `#{Folder.quoted_table_name}`))
       TEXT
       expect(cop.offenses.first.severity.name).to eq(:error)
