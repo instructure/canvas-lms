@@ -244,7 +244,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
     })
   })
 
-  describe('Studio Options Tray', () => {
+  describe('Studio Media Options Tray', () => {
     beforeEach(() => {
       props.studioOptions = {
         resizable: true,
@@ -252,14 +252,14 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       }
     })
 
-    it('is labeled with "Canvas Studio Options Tray"', () => {
+    it('is labeled correctly', () => {
       const {getByLabelText} = render(<VideoOptionsTray {...props} />)
-      expect(getByLabelText('Canvas Studio Options Tray')).toBeInTheDocument()
+      expect(getByLabelText('Studio Media Options Tray')).toBeInTheDocument()
     })
 
-    it('the heading says "Canvas Studio Options"', () => {
+    it('has the correct heading', () => {
       const {getByText} = render(<VideoOptionsTray {...props} />)
-      expect(getByText('Canvas Studio Options')).toBeInTheDocument()
+      expect(getByText('Studio Media Options')).toBeInTheDocument()
     })
 
     it('has a "Media Title" field', () => {

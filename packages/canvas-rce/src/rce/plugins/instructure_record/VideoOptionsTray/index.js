@@ -160,7 +160,7 @@ export default function VideoOptionsTray({
           data-mce-component={true}
           label={
             isStudio
-              ? formatMessage('Canvas Studio Options Tray')
+              ? formatMessage('Studio Media Options Tray')
               : formatMessage('Video Options Tray')
           }
           mountNode={instuiPopupMountNode}
@@ -180,7 +180,7 @@ export default function VideoOptionsTray({
                 <Flex.Item shouldGrow={true} shouldShrink={true}>
                   <Heading as="h2">
                     {isStudio
-                      ? formatMessage('Canvas Studio Options')
+                      ? formatMessage('Studio Media Options')
                       : formatMessage('Video Options')}
                   </Heading>
                 </Flex.Item>
