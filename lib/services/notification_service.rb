@@ -69,7 +69,10 @@ module Services
       end
 
       def config
-        ConfigFile.load("notification_service").merge(Rails.application.credentials.notification_service_creds).dup || {}
+        config_file = ConfigFile.load("notification_service") || {}
+        creds = Rails.application.credentials.notification_service_creds || {}
+
+        config_file.merge(creds).dup
       end
     end
   end
