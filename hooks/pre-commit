@@ -64,6 +64,11 @@ if [ $(pwd -P) = $CANVAS ]; then
       fi
     fi
   done || exit 1
+
+  if git diff --cached --name-only | grep -q Gemfile.lock; then
+    echo "Checking lockfiles..."
+    script/sync_lockfiles.rb
+  fi
 fi
 
 $CANVAS/script/rlint ${RLINT_ARGUMENTS:- --auto-correct-all}
