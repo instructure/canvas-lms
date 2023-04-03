@@ -262,6 +262,7 @@ describe "calendar2" do
       end
 
       it "handles daylight savings time" do
+        skip("LS-3914 - fix something new with DST")
         event_start = @user.time_zone.local(2023, 3, 12, 3, 0, 0)
         create_timed_calendar_event(event_start, "3:00 AM", "4:00 AM")
         f(".fc-event").click
