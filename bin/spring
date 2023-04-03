@@ -9,7 +9,7 @@ unless defined?(Spring)
   require "bundler"
 
   ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
-  lockfile_name = Dir.glob(Bundler.default_lockfile.dirname + "Gemfile.rails*.lock").first
+  lockfile_name = Dir.glob(Bundler.default_lockfile.dirname + "Gemfile.rails*.lock*").first
 
   raise "no valid lockfile found" unless lockfile_name
 

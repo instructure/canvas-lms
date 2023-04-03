@@ -1,0 +1,87 @@
+PATH
+  remote: ../canvas_http
+  specs:
+    canvas_http (1.0.0)
+      multipart
+
+PATH
+  remote: ../canvas_slug
+  specs:
+    canvas_slug (0.0.1)
+      swearjar (~> 1.4)
+
+PATH
+  remote: ../canvas_sort
+  specs:
+    canvas_sort (1.0.0)
+
+PATH
+  remote: ../multipart
+  specs:
+    multipart (0.0.1)
+      canvas_slug
+      mime-types (~> 3.2)
+
+PATH
+  remote: .
+  specs:
+    canvas_kaltura (1.0.0)
+      canvas_http
+      canvas_slug
+      canvas_sort
+      multipart
+      nokogiri
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    addressable (2.8.1)
+      public_suffix (>= 2.0.2, < 6.0)
+    crack (0.4.5)
+      rexml
+    diff-lcs (1.5.0)
+    hashdiff (1.0.1)
+    mime-types (3.3.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2023.0218.1)
+    nokogiri (1.13.8-arm64-darwin)
+      racc (~> 1.4)
+    public_suffix (5.0.1)
+    racc (1.6.2)
+    rake (13.0.6)
+    rexml (3.2.5)
+    rspec (3.12.0)
+      rspec-core (~> 3.5.0)
+      rspec-expectations (~> 3.5.0)
+      rspec-mocks (~> 3.5.0)
+    rspec-core (3.12.1)
+      rspec-support (~> 3.5.0)
+    rspec-expectations (3.12.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.5.0)
+    rspec-mocks (3.12.5)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.5.0)
+    rspec-support (3.12.0)
+    swearjar (1.4.0)
+    webmock (3.18.1)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff
+
+PLATFORMS
+  arm64-darwin-21
+
+DEPENDENCIES
+  bundler (~> 2.2)
+  canvas_http!
+  canvas_kaltura!
+  canvas_slug!
+  canvas_sort!
+  multipart!
+  rake
+  rspec (~> 3.5.0)
+  webmock (= 2.3.1)
+
+BUNDLED WITH
+   2.4.10

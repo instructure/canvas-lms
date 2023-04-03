@@ -1,0 +1,68 @@
+PATH
+  remote: .
+  specs:
+    lti_outbound (0.0.1)
+      activesupport
+      i18n
+      oauth
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activesupport (7.0.4.3)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+    concurrent-ruby (1.2.2)
+    diff-lcs (1.5.0)
+    docile (1.4.0)
+    hashie (4.1.0)
+    i18n (1.12.0)
+      concurrent-ruby (~> 1.0)
+    json (2.6.3)
+    minitest (5.18.0)
+    oauth (0.5.4)
+      oauth-tty (~> 1.0, >= 1.0.1)
+      snaky_hash (~> 2.0)
+      version_gem (~> 1.1)
+    oauth-tty (1.0.5)
+      version_gem (~> 1.1, >= 1.1.1)
+    rake (13.0.6)
+    rspec (3.12.0)
+      rspec-core (~> 3.5.0)
+      rspec-expectations (~> 3.5.0)
+      rspec-mocks (~> 3.5.0)
+    rspec-core (3.12.1)
+      rspec-support (~> 3.5.0)
+    rspec-expectations (3.12.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.5.0)
+    rspec-mocks (3.12.5)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.5.0)
+    rspec-support (3.12.0)
+    simplecov (0.22.0)
+      docile (~> 1.1.0)
+      json (>= 1.8, < 3)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.12.3)
+    snaky_hash (2.0.1)
+      hashie
+      version_gem (~> 1.1, >= 1.1.1)
+    tzinfo (2.0.4)
+      concurrent-ruby (~> 1.0)
+    version_gem (1.1.2)
+
+PLATFORMS
+  arm64-darwin-21
+
+DEPENDENCIES
+  bundler (~> 2.2)
+  lti_outbound!
+  rake
+  rspec (~> 3.5.0)
+  simplecov (= 0.14.1)
+
+BUNDLED WITH
+   2.4.10
