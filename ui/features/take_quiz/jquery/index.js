@@ -403,6 +403,7 @@ const quizSubmission = (function () {
       quizSubmission.dialogged = true
       quizSubmission.countDown = new Date(now.getTime() + 10000)
 
+      $.screenReaderFlashMessage(I18n.t('times_up', "Time's up! Submitting results in 10 seconds"))
       $('#times_up_dialog')
         .show()
         .dialog({
@@ -476,6 +477,12 @@ const quizSubmission = (function () {
       times.push(I18n.t('minutes_count', 'Minute', {count: min}))
       times.push(I18n.t('seconds_count', 'Second', {count: sec}))
 
+      // the first time we set the time limit on the page, announce it via screenreader
+      if (quizSubmission.hasTimeLimit && !$timeRunningFunc().text()) {
+        $.screenReaderFlashMessage(
+          I18n.t('time_remaining', 'You have %{time} remaining', {time: times.join(', ')})
+        )
+      }
       $timeRunningFunc().text(times.join(', '))
     },
 
