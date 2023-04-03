@@ -355,7 +355,7 @@ class User < ActiveRecord::Base
   end
 
   def self.order_by_name(options = {})
-    clause = name_order_by_clause
+    clause = name_order_by_clause(options[:table])
     sort_direction = options[:direction] == :descending ? "DESC" : "ASC"
     scope = order(Arel.sql("#{clause} #{sort_direction}")).order(Arel.sql("#{table_name}.id #{sort_direction}"))
     if scope.select_values.empty?
