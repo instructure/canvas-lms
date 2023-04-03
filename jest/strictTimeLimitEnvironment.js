@@ -23,6 +23,11 @@ const ABSOLUTE_TIMEOUT = 7500
 
 class StrictTimeLimitEnvironment extends BaseEnvironment {
   async handleTestEvent(event, state) {
+    if (process.env.DISABLE_JEST_TIMEOUT_LIMIT === 'true') {
+      // Mostly for IDE debuggers that need to change the time limit to allow breakpoints
+      return
+    }
+
     if (state.testTimeout > CUSTOM_TIMEOUT_LIMIT) {
       throw new Error(`Custom timeouts cannot exceed the ${CUSTOM_TIMEOUT_LIMIT}ms limit!`)
     } else if ((event.test?.duration || 0) > ABSOLUTE_TIMEOUT) {
