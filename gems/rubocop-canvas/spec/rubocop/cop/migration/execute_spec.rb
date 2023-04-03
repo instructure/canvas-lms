@@ -29,7 +29,7 @@ describe RuboCop::Cop::Migration::Execute do
       end
     RUBY
     expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to eq "Raw SQL in migrations must be approved by a migration reviewer"
+    expect(cop.messages.first).to eq "Migration/Execute: Raw SQL in migrations must be approved by a migration reviewer"
     expect(cop.offenses.first.severity.name).to eq(:convention)
   end
 
@@ -42,7 +42,7 @@ describe RuboCop::Cop::Migration::Execute do
       end
     RUBY
     expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to eq "Raw SQL in migrations must be approved by a migration reviewer"
+    expect(cop.messages.first).to eq "Migration/Execute: Raw SQL in migrations must be approved by a migration reviewer"
     expect(cop.offenses.first.severity.name).to eq(:convention)
   end
 

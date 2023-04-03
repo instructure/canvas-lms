@@ -30,7 +30,7 @@ describe RuboCop::Cop::Migration::DataFixup do
       end
     RUBY
     expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to eq "Data fixups should be done in postdeploy migrations"
+    expect(cop.messages.first).to eq "Migration/DataFixup: Data fixups should be done in postdeploy migrations"
     expect(cop.offenses.first.severity.name).to eq(:convention)
   end
 
