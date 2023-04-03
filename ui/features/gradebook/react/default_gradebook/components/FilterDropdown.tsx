@@ -24,6 +24,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {IconArrowOpenEndLine, IconArrowOpenStartLine, IconFilterLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {FilterDrilldownData, FilterDrilldownMenuItem} from '../gradebook.d'
 
@@ -36,6 +37,21 @@ type Props = {
   onOpenTray: () => void
   dataMap: FilterDrilldownData
   filterItems: FilterDrilldownData
+}
+
+const TruncateWithTooltip = ({children}: {children: React.ReactNode}) => {
+  const [isTruncated, setIsTruncated] = useState(false)
+  return isTruncated ? (
+    <Tooltip as="div" placement="end" renderTip={children}>
+      <TruncateText position="middle" onUpdate={setIsTruncated}>
+        {children}
+      </TruncateText>
+    </Tooltip>
+  ) : (
+    <TruncateText onUpdate={setIsTruncated} position="middle">
+      {children}
+    </TruncateText>
+  )
 }
 
 const FilterDropdown = ({
@@ -253,7 +269,7 @@ const FilterDropdown = ({
                 {items.map(a => {
                   return (
                     <MenuItem key={a.id} as="div">
-                      <TruncateText position="middle">{a.name}</TruncateText>
+                      <TruncateWithTooltip>{a.name}</TruncateWithTooltip>
                     </MenuItem>
                   )
                 })}
