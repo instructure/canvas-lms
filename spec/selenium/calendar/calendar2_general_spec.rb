@@ -261,12 +261,28 @@ describe "calendar2" do
         expect(f(".event-details-timestring").text).to include override_start.strftime("%b %e")
       end
 
-      it "handles daylight savings time" do
-        skip("LS-3914 - fix something new with DST")
-        event_start = @user.time_zone.local(2023, 3, 12, 3, 0, 0)
-        create_timed_calendar_event(event_start, "3:00 AM", "4:00 AM")
-        f(".fc-event").click
-        expect(f(".event-details-timestring").text).to eq("Mar 12, 3am - 4am")
+      it "handles events created on daylight savings time days" do
+        late_march = @user.time_zone.local(2021, 3, 28, 3, 0, 0)
+        new_date = @user.time_zone.local(2021, 3, 14, 3, 0, 0)
+        start_time = "3:00 AM"
+        end_time = "4:00 AM"
+        Timecop.freeze(late_march) do
+          get "/calendar2#view_name=month&view_start=2021-03-01"
+          find_middle_day.click
+          replace_content(edit_calendar_event_form_title, "Timed Event")
+          replace_content(edit_calendar_event_form_date, format_date_for_view(new_date, :medium))
+          edit_calendar_event_start_input.click
+          replace_content(edit_calendar_event_start_input, start_time)
+          edit_calendar_event_start_input.send_keys :return
+          edit_calendar_event_end_input.click
+          replace_content(edit_calendar_event_end_input, end_time)
+          edit_calendar_event_end_input.send_keys :return
+          edit_calendar_event_form_submit_button.click
+          wait_for_ajaximations
+          refresh_page
+          f(".fc-event").click
+          expect(f(".event-details-timestring").text).to eq("Mar 14, 2021, 3am - 4am")
+        end
       end
     end
 
