@@ -212,6 +212,11 @@ describe GradebookUserIds do
         }
       end
 
+      it "does not blow up when sorting by first name" do
+        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "student_firstname"
+        expect { gradebook_user_ids.user_ids }.not_to raise_error
+      end
+
       it "only returns students in the selected group" do
         expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id)
       end
