@@ -933,6 +933,22 @@ describe "assignments" do
 
         expect(get_options("#assignment_grading_type").map(&:text)).to eq all_options
       end
+
+      it "shows points for teachers" do
+        @assignment = @course.assignments.create({ name: "Test Assignment" })
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+        expect(ff("div .control-label").map(&:text)).to include "Points"
+      end
+
+      it "shows points for students" do
+        course_with_student_logged_in(active_all: true, course: @course)
+
+        @assignment = @course.assignments.create({ name: "Test Assignment" })
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+        expect(ff("div .title").map(&:text)).to include "Points"
+      end
     end
 
     context "turned on" do
@@ -956,6 +972,22 @@ describe "assignments" do
         wait_for_ajaximations
 
         expect(get_options("#assignment_grading_type").map(&:text)).to eq qualitative_options
+      end
+
+      it "does not show points for teachers" do
+        @assignment = @course.assignments.create({ name: "Test Assignment" })
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+        expect(ff("div .control-label").map(&:text)).not_to include "Points"
+      end
+
+      it "does not show points for students" do
+        course_with_student_logged_in(active_all: true, course: @course)
+
+        @assignment = @course.assignments.create({ name: "Test Assignment" })
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        wait_for_ajaximations
+        expect(ff("div .title").map(&:text)).not_to include "Points"
       end
     end
   end
