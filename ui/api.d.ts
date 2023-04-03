@@ -206,7 +206,7 @@ export type Assignment = Readonly<{
   lti_context_id: string
   max_name_length: number
   moderated_grading: boolean
-  module_ids: string[]
+  module_ids?: string[]
   module_positions: number[]
   muted: boolean
   name: string
