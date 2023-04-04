@@ -39,7 +39,7 @@ module Types
     field :can_unlink, Boolean, null: true
     def can_unlink
       if learning_outcome_link?
-        can_manage = object.context_type == "LearningOutcomeGroup" ? can_manage_global_outcomes : can_manage_context_outcomes
+        can_manage = (object.context_type == "LearningOutcomeGroup") ? can_manage_global_outcomes : can_manage_context_outcomes
         can_manage && object.can_destroy?
       end
     end

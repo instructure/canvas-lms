@@ -648,10 +648,10 @@ module AccountReports
           row << g.sis_source_id
           row << g.group_category_id unless @sis_format
           row << g.gc_sis_id
-          row << (g.context_type == "Account" ? g.context_id : nil) unless @sis_format
-          row << (g.context_type == "Account" ? g.account_sis_id : nil)
-          row << (g.context_type == "Course" ? g.context_id : nil) unless @sis_format
-          row << (g.context_type == "Course" ? g.course_sis_id : nil)
+          row << ((g.context_type == "Account") ? g.context_id : nil) unless @sis_format
+          row << ((g.context_type == "Account") ? g.account_sis_id : nil)
+          row << ((g.context_type == "Course") ? g.context_id : nil) unless @sis_format
+          row << ((g.context_type == "Course") ? g.course_sis_id : nil)
           row << g.name
           row << g.workflow_state
           row << g.sis_batch_id? unless @sis_format

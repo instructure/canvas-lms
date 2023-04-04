@@ -147,7 +147,7 @@ class MediaObjectsController < ApplicationController
       url = api_v1_media_objects_url
     end
 
-    order_dir = params[:order] == "desc" ? "desc" : "asc"
+    order_dir = (params[:order] == "desc") ? "desc" : "asc"
     order_by = params[:sort] || "title"
     if order_by == "title"
       order_by = MediaObject.best_unicode_collation_key("COALESCE(user_entered_title, title)")

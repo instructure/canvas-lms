@@ -530,7 +530,7 @@ class PseudonymsController < ApplicationController
     if params[:pseudonym].key?(:password) && !@pseudonym.passwordable?
       @pseudonym.errors.add(:password, "password can only be set for Canvas authentication")
       respond_to do |format|
-        format.html { render(params[:action] == "edit" ? :edit : :new) }
+        format.html { render((params[:action] == "edit") ? :edit : :new) }
         format.json { render json: @pseudonym.errors, status: :bad_request }
       end
       return false
@@ -547,7 +547,7 @@ class PseudonymsController < ApplicationController
     if params[:pseudonym].key?(:workflow_state) && !%w[active suspended].include?(params[:pseudonym][:workflow_state])
       @pseudonym.errors.add(:workflow_state, "invalid workflow_state")
       respond_to do |format|
-        format.html { render(params[:action] == "edit" ? :edit : :new) }
+        format.html { render((params[:action] == "edit") ? :edit : :new) }
         format.json { render json: @pseudonym.errors, status: :bad_request }
       end
       return false

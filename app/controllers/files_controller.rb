@@ -327,7 +327,7 @@ class FilesController < ApplicationController
                          Attachment.display_name_order_by_clause("attachments")
                        end
         order_clause += " DESC" if params[:order] == "desc"
-        scope = scope.order(Arel.sql(order_clause)).order(id: params[:order] == "desc" ? :desc : :asc)
+        scope = scope.order(Arel.sql(order_clause)).order(id: (params[:order] == "desc") ? :desc : :asc)
 
         if params[:content_types].present?
           scope = scope.by_content_types(Array(params[:content_types]))
@@ -403,7 +403,7 @@ class FilesController < ApplicationController
 
         {
           asset_string: context.asset_string,
-          name: context == @current_user ? t("my_files", "My Files") : context.name,
+          name: (context == @current_user) ? t("my_files", "My Files") : context.name,
           usage_rights_required: tool_context.respond_to?(:usage_rights_required?) && tool_context.usage_rights_required?,
           permissions: {
             manage_files_add: context.grants_right?(@current_user, session, :manage_files_add),

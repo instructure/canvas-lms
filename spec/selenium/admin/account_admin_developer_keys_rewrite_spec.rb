@@ -274,11 +274,11 @@ describe "Developer Keys" do
         before do
           stub_const("ApiScopeMapper", Class.new do
             def self.lookup_resource(controller, _action)
-              controller == :assignment_groups_api ? :assignment_groups : controller
+              (controller == :assignment_groups_api) ? :assignment_groups : controller
             end
 
             def self.name_for_resource(resource)
-              resource == :assignment_groups ? "Assignment Groups" : resource.to_s
+              (resource == :assignment_groups) ? "Assignment Groups" : resource.to_s
             end
           end)
 

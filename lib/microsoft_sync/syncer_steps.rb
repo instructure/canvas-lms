@@ -126,7 +126,7 @@ module MicrosoftSync
 
     def step_initial(job_type, _job_state_data)
       StateMachineJob::NextStep.new(
-        job_type.to_s == "partial" ? :step_partial_sync : :step_full_sync_prerequisites
+        (job_type.to_s == "partial") ? :step_partial_sync : :step_full_sync_prerequisites
       )
     end
 

@@ -201,7 +201,7 @@ describe Folder do
       @course.folders.create!(name: "locked 3", lock_at: 1.day.ago, unlock_at: 1.day.from_now)
     ]
     expect(@course.folders.map(&:id).sort).to eq (not_locked + locked).map(&:id).sort
-    expect(@course.folders.not_locked.map(&:id).sort).to eq (not_locked).map(&:id).sort
+    expect(@course.folders.not_locked.map(&:id).sort).to eq not_locked.map(&:id).sort
   end
 
   it "does not create multiple root folders for a course" do

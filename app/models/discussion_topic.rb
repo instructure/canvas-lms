@@ -577,7 +577,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     update_or_create_participant(current_user: current_user,
                                  new_state: new_state,
-                                 new_count: new_state == "unread" ? default_unread_count : 0)
+                                 new_count: (new_state == "unread") ? default_unread_count : 0)
   end
   protected :update_participants_read_state
 

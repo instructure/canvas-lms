@@ -2620,7 +2620,7 @@ class Assignment < ActiveRecord::Base
         scope = scope.where(assessor_id: user.id)
       end
     end
-    scope.to_a.sort_by { |a| [a.assessment_type == "grading" ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
+    scope.to_a.sort_by { |a| [(a.assessment_type == "grading") ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
   end
 
   # Takes a zipped file full of assignment comments/annotated assignments
@@ -2801,7 +2801,7 @@ class Assignment < ActiveRecord::Base
     candidates_for_review.sort_by do |c|
       [
         # prefer those who need reviews done
-        assessor_id_map[c.id].count < peer_review_count ? CanvasSort::First : CanvasSort::Last,
+        (assessor_id_map[c.id].count < peer_review_count) ? CanvasSort::First : CanvasSort::Last,
         # then prefer those who are not reviewing this submission
         assessor_id_map[current_submission.id].include?(c.id) ? CanvasSort::Last : CanvasSort::First,
         # then prefer those who need the most reviews done (that way we don't run the risk of

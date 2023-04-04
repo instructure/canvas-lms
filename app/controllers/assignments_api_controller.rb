@@ -1470,7 +1470,7 @@ class AssignmentsApiController < ApplicationController
     if [:created, :ok].include?(result)
       render json: assignment_json(@assignment, @current_user, session, opts), status: result
     else
-      status = result == :forbidden ? :forbidden : :bad_request
+      status = (result == :forbidden) ? :forbidden : :bad_request
       errors = @assignment.errors.as_json[:errors]
       errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
       render json: { errors: errors }, status: status
@@ -1486,7 +1486,7 @@ class AssignmentsApiController < ApplicationController
   def require_user_visibility
     return render_unauthorized_action unless @current_user.present?
 
-    @user = params[:user_id] == "self" ? @current_user : api_find(User, params[:user_id])
+    @user = (params[:user_id] == "self") ? @current_user : api_find(User, params[:user_id])
     # teacher, ta
     return if @context.grants_right?(@current_user, :view_all_grades) && @context.students_visible_to(@current_user).include?(@user)
 

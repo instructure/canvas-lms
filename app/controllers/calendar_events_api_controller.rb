@@ -920,7 +920,7 @@ class CalendarEventsApiController < ApplicationController
     end
 
     all_events = find_which_series_events(target_event: target_event, which: "all", for_update: true)
-    events = which == "following" ? all_events.where("start_at >= ?", target_event.start_at) : all_events
+    events = (which == "following") ? all_events.where("start_at >= ?", target_event.start_at) : all_events
     if events.blank?
       # i don't believe we can get here, but cya
       render json: { message: t("No events were found to update") }, status: :bad_request
@@ -1293,7 +1293,7 @@ class CalendarEventsApiController < ApplicationController
       updated_section_ids = []
       timetable_data.each do |section_id, timetables|
         timetable_data[section_id] = Array(timetables)
-        section = section_id == "all" ? nil : api_find(@context.active_course_sections, section_id)
+        section = (section_id == "all") ? nil : api_find(@context.active_course_sections, section_id)
         updated_section_ids << section.id if section
 
         builder = Courses::TimetableEventBuilder.new(course: @context, course_section: section)
@@ -1453,7 +1453,7 @@ class CalendarEventsApiController < ApplicationController
       @end_date = @start_date.end_of_day if @end_date < @start_date
     end
 
-    @type ||= params[:type] == "assignment" ? :assignment : :event
+    @type ||= (params[:type] == "assignment") ? :assignment : :event
 
     @context ||= user
     include_accounts = Account.site_admin.feature_enabled?(:account_calendar_events)

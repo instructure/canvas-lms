@@ -333,7 +333,7 @@ class AssignmentGroup < ActiveRecord::Base
     score_ids = Score.where(
       assignment_group_id: self,
       enrollment_id: student_enrollments,
-      workflow_state: new_workflow_state == :active ? :deleted : :active
+      workflow_state: (new_workflow_state == :active) ? :deleted : :active
     ).pluck(:id)
 
     score_ids.each_slice(1000) do |score_ids_batch|

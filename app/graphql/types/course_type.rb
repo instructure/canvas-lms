@@ -253,7 +253,7 @@ module Types
       end
 
       (order_by || []).each do |order|
-        direction = order[:direction] == "descending" ? "DESC NULLS LAST" : "ASC"
+        direction = (order[:direction] == "descending") ? "DESC NULLS LAST" : "ASC"
         submissions = submissions.order("#{order[:field]} #{direction}")
       end
 

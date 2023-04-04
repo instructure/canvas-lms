@@ -67,7 +67,7 @@ class GradingPeriodGroup < ActiveRecord::Base
     return course_group if course_group.present?
 
     account_group = context.enrollment_term.grading_period_group
-    account_group.nil? || account_group.deleted? ? nil : account_group
+    (account_group.nil? || account_group.deleted?) ? nil : account_group
   end
 
   def recompute_scores_for_each_term(update_all_grading_period_scores, term_ids: nil)

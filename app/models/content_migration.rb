@@ -1181,7 +1181,7 @@ class ContentMigration < ActiveRecord::Base
           end
         else
           master_template.master_content_tags
-                         .where(content_type: asset_type == "Announcement" ? "DiscussionTopic" : asset_type,
+                         .where(content_type: (asset_type == "Announcement") ? "DiscussionTopic" : asset_type,
                                 migration_id: mig_id_to_dest_id.keys)
                          .pluck(:content_id, :migration_id)
                          .each do |src_id, mig_id|

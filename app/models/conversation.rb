@@ -699,7 +699,7 @@ class Conversation < ActiveRecord::Base
     # look up participants across all shards
     shards = conversations.map(&:associated_shards).flatten.uniq
     Shard.with_each_shard(shards) do
-      guard_rail_env = conversations.any? { |c| c.updated_at && c.updated_at > 10.seconds.ago } ? :primary : :secondary
+      guard_rail_env = (conversations.any? { |c| c.updated_at && c.updated_at > 10.seconds.ago }) ? :primary : :secondary
       user_map = GuardRail.activate(guard_rail_env) do
         User.select("users.id, users.updated_at, users.short_name, users.name, users.avatar_image_url, users.pronouns, users.avatar_image_source, last_authored_at, conversation_id")
             .joins(:all_conversations)

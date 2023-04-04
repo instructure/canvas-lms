@@ -97,10 +97,10 @@ class SisPseudonym
 
     if include_deleted
       if user.all_pseudonyms_loaded?
-        return pick_user_pseudonym(user.all_pseudonyms, type == :trusted ? root_account.trusted_account_ids : nil)
+        return pick_user_pseudonym(user.all_pseudonyms, (type == :trusted) ? root_account.trusted_account_ids : nil)
       end
     elsif user.all_active_pseudonyms_loaded?
-      return pick_user_pseudonym(user.all_active_pseudonyms, type == :trusted ? root_account.trusted_account_ids : nil)
+      return pick_user_pseudonym(user.all_active_pseudonyms, (type == :trusted) ? root_account.trusted_account_ids : nil)
     end
 
     trusted_account_ids = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) } if type == :trusted

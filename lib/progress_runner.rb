@@ -112,7 +112,7 @@ class ProgressRunner
     @errors.each do |message, elements|
       @progress.message += "\n" + @error_message.call(message, elements)
     end
-    @completed_count > 0 ? @progress.complete! : @progress.fail!
+    (@completed_count > 0) ? @progress.complete! : @progress.fail!
     @progress.save
   end
 end

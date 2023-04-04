@@ -117,7 +117,7 @@ module SpeedGrader
 
       unless assignment.anonymize_students?
         # Ensure that any test students are sorted last
-        students = students.sort_by { |r| r.preferences[:fake_student] == true ? 1 : 0 }
+        students = students.sort_by { |r| (r.preferences[:fake_student] == true) ? 1 : 0 }
       end
 
       enrollments =

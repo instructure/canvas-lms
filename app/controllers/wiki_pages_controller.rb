@@ -78,7 +78,7 @@ class WikiPagesController < ApplicationController
     GuardRail.activate(:secondary) do
       if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
         log_asset_access(["pages", @context], "pages", "other")
-        js_env((ConditionalRelease::Service.env_for(@context)))
+        js_env(ConditionalRelease::Service.env_for(@context))
         wiki_pages_js_env(@context)
         set_tutorial_js_env
         @padless = true

@@ -679,7 +679,7 @@ class RoleOverridesController < ApplicationController
         end
 
         target_permissions.each do |permission|
-          perm_override = value_to_boolean(permission_updates[:explicit]) && override.nil? ? permission[:currently] : override
+          perm_override = (value_to_boolean(permission_updates[:explicit]) && override.nil?) ? permission[:currently] : override
           RoleOverride.manage_role_override(
             context, role, permission[:name].to_s, override: perm_override, locked: locked,
                                                    applies_to_self: applies_to_self, applies_to_descendants: applies_to_descendants

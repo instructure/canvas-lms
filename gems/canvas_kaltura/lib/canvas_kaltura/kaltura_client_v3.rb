@@ -148,10 +148,10 @@ module CanvasKaltura
       suspicious_bitrate_threshold = original_source ? original_source[:bitrate].to_i * 5 : 0
 
       sources = sources.sort_by do |a|
-        [a[:hasWarnings] || a[:isOriginal] != "0" ? CanvasSort::Last : CanvasSort::First,
-         a[:isOriginal] == "0" ? CanvasSort::First : CanvasSort::Last,
+        [(a[:hasWarnings] || a[:isOriginal] != "0") ? CanvasSort::Last : CanvasSort::First,
+         (a[:isOriginal] == "0") ? CanvasSort::First : CanvasSort::Last,
          PREFERENCE.index(a[:fileExt]) || (PREFERENCE.size + 1),
-         a[:bitrate].to_i < suspicious_bitrate_threshold ? CanvasSort::First : CanvasSort::Last,
+         (a[:bitrate].to_i < suspicious_bitrate_threshold) ? CanvasSort::First : CanvasSort::Last,
          0 - a[:bitrate].to_i]
       end
 
@@ -179,7 +179,7 @@ module CanvasKaltura
 
     def startSession(type = SessionType::USER, userId = nil)
       partnerId = @partnerId
-      secret = type == SessionType::USER ? @user_secret : @secret
+      secret = (type == SessionType::USER) ? @user_secret : @secret
       result = getRequest(:session, :start,
                           secret: secret,
                           partnerId: partnerId,

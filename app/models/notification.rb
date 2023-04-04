@@ -294,7 +294,7 @@ class Notification < Switchman::UnshardedRecord
         res << n if n.category && n.dashboard?
       end
     end
-    res.sort_by { |n| n.category == "Other" ? CanvasSort::Last : n.category }
+    res.sort_by { |n| (n.category == "Other") ? CanvasSort::Last : n.category }
   end
 
   # Return a hash with information for a related user option if one exists.

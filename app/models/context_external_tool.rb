@@ -547,7 +547,7 @@ class ContextExternalTool < ActiveRecord::Base
     return unless (config_type == "by_url" && config_url) || (config_type == "by_xml" && config_xml)
 
     @config_errors = []
-    error_field = config_type == "by_xml" ? "config_xml" : "config_url"
+    error_field = (config_type == "by_xml") ? "config_xml" : "config_url"
     converter = CC::Importer::BLTIConverter.new
     tool_hash = if config_type == "by_url"
                   uri = Addressable::URI.parse(config_url)

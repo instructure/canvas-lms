@@ -731,7 +731,7 @@ describe Account do
 
     hash.each do |k, v|
       v[:account].update_attribute(:settings, { no_enrollments_can_create_courses: false })
-      admin, user = account_with_admin_and_restricted_user(v[:account], (k == :site_admin ? @sa_role : @root_role))
+      admin, user = account_with_admin_and_restricted_user(v[:account], ((k == :site_admin) ? @sa_role : @root_role))
       hash[k][:admin] = admin
       hash[k][:user] = user
     end
@@ -779,8 +779,8 @@ describe Account do
       next unless k == :site_admin || k == :root
 
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
-      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
+      expect(account.check_policy(hash[:sub][:admin])).to match_array((k == :site_admin) ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
+      expect(account.check_policy(hash[:sub][:user])).to match_array((k == :site_admin) ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
@@ -794,7 +794,7 @@ describe Account do
     some_access = [:read_reports] + limited_access
     hash.each do |k, v|
       account = v[:account]
-      account.role_overrides.create!(permission: "read_reports", role: (k == :site_admin ? @sa_role : @root_role), enabled: true)
+      account.role_overrides.create!(permission: "read_reports", role: ((k == :site_admin) ? @sa_role : @root_role), enabled: true)
       account.role_overrides.create!(permission: "reset_any_mfa", role: @sa_role, enabled: true)
       # clear caches
       account.tap do |a|
@@ -810,7 +810,7 @@ describe Account do
       admin_privileges += [:read_global_outcomes] if k == :site_admin
       admin_privileges += [:manage_privacy_settings] if k == :root
       user_array = some_access + [:reset_any_mfa] +
-                   (k == :site_admin ? [:read_global_outcomes] : [])
+                   ((k == :site_admin) ? [:read_global_outcomes] : [])
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
       expect(account.check_policy(hash[:site_admin][:user])).to match_array user_array
     end
@@ -831,8 +831,8 @@ describe Account do
       next unless k == :site_admin || k == :root
 
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
-      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
+      expect(account.check_policy(hash[:sub][:admin])).to match_array((k == :site_admin) ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
+      expect(account.check_policy(hash[:sub][:user])).to match_array((k == :site_admin) ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root

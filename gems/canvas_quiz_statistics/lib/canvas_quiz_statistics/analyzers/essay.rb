@@ -128,7 +128,7 @@ module CanvasQuizStatistics::Analyzers
 
       graded_responses = []
       ungraded_responses = []
-      responses.each { |r| r[:correct] == "defined" ? graded_responses << r : ungraded_responses << r }
+      responses.each { |r| (r[:correct] == "defined") ? graded_responses << r : ungraded_responses << r }
       ranked_responses_by_score = graded_responses.sort_by { |h| h[:points] }
 
       previous_floor = ranked_responses_by_score.length

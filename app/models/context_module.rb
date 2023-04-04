@@ -786,7 +786,7 @@ class ContextModule < ActiveRecord::Base
       item = item.submittable_object if item.is_a?(Assignment) && item.submittable_object
       next if tags.any? { |tag| tag.content_type == item.class_name && tag.content_id == item.id }
 
-      state = item.respond_to?(:published?) && !item.published? ? "unpublished" : "active"
+      state = (item.respond_to?(:published?) && !item.published?) ? "unpublished" : "active"
       new_tags << content_tags.create!(context: context, title: Context.asset_name(item), content: item,
                                        tag_type: "context_module", indent: 0,
                                        position: next_pos, workflow_state: state)
@@ -796,8 +796,8 @@ class ContextModule < ActiveRecord::Base
     return unless start_pos
 
     tag_ids_to_move = {}
-    tags_before = start_pos < 2 ? [] : tags[0..start_pos - 2]
-    tags_after = start_pos > tags.length ? [] : tags[start_pos - 1..]
+    tags_before = (start_pos < 2) ? [] : tags[0..start_pos - 2]
+    tags_after = (start_pos > tags.length) ? [] : tags[start_pos - 1..]
     (tags_before + new_tags + tags_after).each_with_index do |item, index|
       index_change = index + 1 - item.position
       if index_change != 0

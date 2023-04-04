@@ -407,7 +407,7 @@ class DiscussionTopicsController < ApplicationController
                             when Course
                               context_url(@context, :context_settings_url, anchor: "tab-features")
                             when Group
-                              (@context.context&.is_a? Course) || (@context.context&.is_a? Account) ? context_url(@context.context, :context_settings_url, anchor: "tab-features") : nil
+                              ((@context.context&.is_a? Course) || (@context.context&.is_a? Account)) ? context_url(@context.context, :context_settings_url, anchor: "tab-features") : nil
                             else
                               nil
                             end
@@ -504,7 +504,7 @@ class DiscussionTopicsController < ApplicationController
       js_env({ is_announcement: params[:is_announcement] })
       js_bundle :discussion_topic_edit_v2
       css_bundle :discussions_index, :learning_outcomes
-      render html: "", layout: params[:embed] == "true" ? "mobile_embed" : true
+      render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
       return
     end
     edit
@@ -661,7 +661,7 @@ class DiscussionTopicsController < ApplicationController
 
     set_master_course_js_env_data(@topic, @context)
     conditional_release_js_env(@topic.assignment)
-    render :edit, layout: params[:embed] == "true" ? "mobile_embed" : true
+    render :edit, layout: (params[:embed] == "true") ? "mobile_embed" : true
   end
 
   def show
@@ -816,7 +816,7 @@ class DiscussionTopicsController < ApplicationController
 
       js_bundle :discussion_topics_post
       css_bundle :discussions_index, :learning_outcomes
-      render html: "", layout: params[:embed] == "true" ? "mobile_embed" : true
+      render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
       return
     end
 
@@ -1369,7 +1369,7 @@ class DiscussionTopicsController < ApplicationController
     only_pinning = discussion_topic_hash.except(*%w[pinned]).blank?
 
     # allow pinning/unpinning if a subtopic and we can update the root
-    topic_to_check = only_pinning && @topic.root_topic ? @topic.root_topic : @topic
+    topic_to_check = (only_pinning && @topic.root_topic) ? @topic.root_topic : @topic
     return unless authorized_action(topic_to_check, @current_user, (is_new ? :create : :update))
 
     process_podcast_parameters(discussion_topic_hash)
@@ -1732,7 +1732,7 @@ class DiscussionTopicsController < ApplicationController
 
       unless hash[:assignment].nil?
         if params[:due_at]
-          hash[:assignment][:due_at] = params[:due_at].empty? || params[:due_at] == "null" ? nil : params[:due_at]
+          hash[:assignment][:due_at] = (params[:due_at].empty? || params[:due_at] == "null") ? nil : params[:due_at]
         end
         hash[:assignment][:points_possible] = params[:points_possible] if params[:points_possible]
         hash[:assignment][:assignment_group_id] = params[:assignment_group_id] if params[:assignment_group_id]

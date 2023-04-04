@@ -42,7 +42,7 @@ module Api
 
   def api_find_all(collection, ids, account: nil)
     if collection.table_name == User.table_name && @current_user
-      ids = ids.map { |id| id == "self" ? @current_user.id : id }
+      ids = ids.map { |id| (id == "self") ? @current_user.id : id }
     end
     if collection.table_name == Account.table_name
       ids = ids.map do |id|
@@ -72,9 +72,9 @@ module Api
                             .where("(start_at<=? OR start_at IS NULL) AND (end_at >=? OR end_at IS NULL) AND NOT (start_at IS NULL AND end_at IS NULL)", Time.now.utc, Time.now.utc)
                             .limit(2)
                             .to_a
-            current_term = current_terms.length == 1 ? current_terms.first : :nil
+            current_term = (current_terms.length == 1) ? current_terms.first : :nil
           end
-          current_term == :nil ? nil : current_term
+          (current_term == :nil) ? nil : current_term
         else
           id
         end

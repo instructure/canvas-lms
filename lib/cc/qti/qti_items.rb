@@ -174,7 +174,7 @@ module CC
       end
 
       def multiple_choice_response_str(node, question)
-        card = question["question_type"] == "multiple_answers_question" ? "Multiple" : "Single"
+        card = (question["question_type"] == "multiple_answers_question") ? "Multiple" : "Single"
         node.response_lid(
           ident: "response1",
           rcardinality: card

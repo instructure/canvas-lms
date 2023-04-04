@@ -1340,7 +1340,7 @@ ActiveRecord::Relation.class_eval do
       end.join(" UNION ALL ")
       return unscoped.where("#{table}.#{connection.quote_column_name(primary_key)} IN (#{sub_query})") unless from
 
-      sub_query = +"(#{sub_query}) #{from == true ? table : from}"
+      sub_query = +"(#{sub_query}) #{(from == true) ? table : from}"
       unscoped.from(sub_query)
     end
   end

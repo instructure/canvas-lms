@@ -101,7 +101,7 @@ module AttachmentFu # :nodoc:
       options[:thumbnails]       ||= {}
       options[:thumbnail_class]  ||= self
       options[:s3_access]        ||= "public-read"
-      options[:content_type] = [options[:content_type]].flatten.collect! { |t| t == :image ? AttachmentFu.content_types : t }.flatten unless options[:content_type].nil?
+      options[:content_type] = [options[:content_type]].flatten.collect! { |t| (t == :image) ? AttachmentFu.content_types : t }.flatten unless options[:content_type].nil?
 
       unless options[:thumbnails].is_a?(Hash)
         raise ArgumentError, ":thumbnails option should be a hash: e.g. :thumbnails => { :foo => '50x50' }"
@@ -120,7 +120,7 @@ module AttachmentFu # :nodoc:
       attachment_options[:storage]     ||= parent_options[:storage]
       attachment_options[:path_prefix] ||= attachment_options[:file_system_path]
       if attachment_options[:path_prefix].nil?
-        attachment_options[:path_prefix] = attachment_options[:storage] == :s3 ? table_name : File.join("public", table_name)
+        attachment_options[:path_prefix] = (attachment_options[:storage] == :s3) ? table_name : File.join("public", table_name)
       end
       attachment_options[:path_prefix] = attachment_options[:path_prefix][1..] if options[:path_prefix].first == "/"
 

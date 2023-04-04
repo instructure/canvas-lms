@@ -696,7 +696,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def quiz_lti
-    @quiz_lti ||= has_attribute?(:content_type) && content_type == "Assignment" ? content&.quiz_lti? : false
+    @quiz_lti ||= (has_attribute?(:content_type) && content_type == "Assignment") ? content&.quiz_lti? : false
   end
 
   def to_json(options = {})
@@ -710,7 +710,7 @@ class ContentTag < ActiveRecord::Base
   def clear_total_outcomes_cache
     return unless tag_type == "learning_outcome_association" && associated_asset_type == "LearningOutcomeGroup"
 
-    clear_context = context_type == "LearningOutcomeGroup" ? nil : context
+    clear_context = (context_type == "LearningOutcomeGroup") ? nil : context
     Outcomes::LearningOutcomeGroupChildren.new(clear_context).clear_total_outcomes_cache
   end
 

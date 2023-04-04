@@ -166,7 +166,7 @@ module UserLearningObjectScopes
     scope = scope.not_ignored_by(self, purpose) unless include_ignored
     scope = scope.for_course(shard_course_ids) if ["Assignment", "Quizzes::Quiz"].include?(object_type)
     if object_type == "Assignment"
-      scope = participation_type == :student ? scope.published : scope.active
+      scope = (participation_type == :student) ? scope.published : scope.active
       scope = scope.expecting_submission unless include_ungraded
     end
     [scope, shard_course_ids, shard_group_ids]

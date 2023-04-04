@@ -2038,7 +2038,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :outcome_groups_api) do
       %w[global account course].each do |context|
-        prefix = (context == "global" ? context : "#{context}s/:#{context}_id")
+        prefix = ((context == "global") ? context : "#{context}s/:#{context}_id")
         unless context == "global"
           get "#{prefix}/outcome_groups", action: :index, as: "#{context}_outcome_groups"
           get "#{prefix}/outcome_group_links", action: :link_index, as: "#{context}_outcome_group_links"

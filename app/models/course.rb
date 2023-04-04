@@ -340,7 +340,7 @@ class Course < ActiveRecord::Base
   ].freeze
 
   def [](attr)
-    attr.to_s == "asset_string" ? asset_string : super
+    (attr.to_s == "asset_string") ? asset_string : super
   end
 
   def events_for(user)
@@ -3207,7 +3207,7 @@ class Course < ActiveRecord::Base
 
     GuardRail.activate(:secondary) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
-      tabs = elementary_subject_course? && !course_subject_tabs ? [] : tab_configuration.compact
+      tabs = (elementary_subject_course? && !course_subject_tabs) ? [] : tab_configuration.compact
       home_tab = default_tabs.find { |t| t[:id] == TAB_HOME }
       settings_tab = default_tabs.find { |t| t[:id] == TAB_SETTINGS }
       external_tabs = if opts[:include_external]
@@ -4243,7 +4243,7 @@ class Course < ActiveRecord::Base
     return unless publishing?
 
     publish_time = ((updated_at - created_at) * 1000).round
-    statsd_bucket = account.feature_enabled?(:course_paces) && enable_course_paces? ? "paced" : "unpaced"
+    statsd_bucket = (account.feature_enabled?(:course_paces) && enable_course_paces?) ? "paced" : "unpaced"
     InstStatsd::Statsd.timing("course.#{statsd_bucket}.create_to_publish_time", publish_time)
   end
 

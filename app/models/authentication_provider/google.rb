@@ -84,7 +84,7 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
   def authorize_options
     result = { scope: scope_for_options }
     if hosted_domain
-      result[:hd] = hosted_domains.length == 1 ? hosted_domain : "*"
+      result[:hd] = (hosted_domains.length == 1) ? hosted_domain : "*"
     end
     result
   end

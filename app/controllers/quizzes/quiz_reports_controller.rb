@@ -260,7 +260,7 @@ class Quizzes::QuizReportsController < ApplicationController
                                         }).as_json
     end
 
-    serialized_set.length == 1 ? serialized_set[0] : serialized_set
+    (serialized_set.length == 1) ? serialized_set[0] : serialized_set
   end
 
   def serialize_jsonapi(stats, includes)

@@ -97,7 +97,7 @@ module SearchHelper
             name: group.name,
             type: :group,
             state: group.active? ? :active : :inactive,
-            parent: group.context_type == "Course" ? { course: group.context_id } : nil,
+            parent: (group.context_type == "Course") ? { course: group.context_id } : nil,
             context_name: (group_context || group.context).name,
             category: group.category
           }.tap do |hash|
@@ -134,7 +134,7 @@ module SearchHelper
         end
       when CourseSection
         visibility = context.course.enrollment_visibility_level_for(@current_user, context.course.section_visibilities_for(@current_user), require_message_permission: true)
-        sections = visibility == :restricted ? [] : [context]
+        sections = (visibility == :restricted) ? [] : [context]
         add_courses.call [context.course], :current
         add_sections.call context.course.sections_visible_to(@current_user, sections)
       else

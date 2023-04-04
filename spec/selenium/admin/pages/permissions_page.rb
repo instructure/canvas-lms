@@ -173,7 +173,7 @@ class PermissionsIndex
     # ---------------------- Actions ----------------------
     def choose_tab(tab_name)
       name = tab_name.to_s.downcase
-      tab = name == "account" ? account_roles_tab : course_roles_tab
+      tab = (name == "account") ? account_roles_tab : course_roles_tab
       tab.click
     end
 

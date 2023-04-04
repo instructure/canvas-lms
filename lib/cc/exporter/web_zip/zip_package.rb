@@ -93,7 +93,7 @@ module CC::Exporter::WebZip
 
     def filter_for_export_safe_items(item_list, type)
       item_list.select do |export_item|
-        ident = type == :attachments ? export_item[:local_path].sub("media", "") : export_item[:identifier]
+        ident = (type == :attachments) ? export_item[:local_path].sub("media", "") : export_item[:identifier]
         next true if @linked_items.include?(ident)
 
         next unless [:quizzes, :discussion_topics].include?(type)
@@ -157,7 +157,7 @@ module CC::Exporter::WebZip
 
     def format_linked_objects(canvas_objects)
       canvas_objects.map do |lo|
-        key, canvas_key = lo[:type] == "Attachment" ? [:content, :local_path] : [:exportId, :identifier]
+        key, canvas_key = (lo[:type] == "Attachment") ? [:content, :local_path] : [:exportId, :identifier]
         lo[key] = lo.delete(canvas_key)
         lo
       end
@@ -267,7 +267,7 @@ module CC::Exporter::WebZip
       return "locked" if modul.locked_for?(user, deep_check_if_needed: true)
 
       status = current_progress&.dig(modul.id, :status) || "unlocked"
-      status == "locked" ? "unlocked" : status
+      (status == "locked") ? "unlocked" : status
     end
 
     def item_completed?(item)
@@ -402,7 +402,7 @@ module CC::Exporter::WebZip
       type_export_hash = {}
       assignment_export_hash = {}
       course.send(type).each do |item|
-        tag = (type == :wiki_pages ? item.url : create_key(item))
+        tag = ((type == :wiki_pages) ? item.url : create_key(item))
         type_export_hash[tag] = item
         next unless (type == :discussion_topics || type == :quizzes) && item.assignment
 

@@ -94,7 +94,7 @@ module Lti
       def tool_setting_json(tool_setting, bubble)
         if %w[all distinct].include?(bubble)
           graph = []
-          distinct = bubble == "distinct" ? [] : nil
+          distinct = (bubble == "distinct") ? [] : nil
           while tool_setting
             graph << collect_tool_settings(tool_setting, distinct)
             distinct |= graph.last.custom.keys if distinct

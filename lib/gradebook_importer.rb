@@ -647,7 +647,7 @@ class GradebookImporter
       nil
     end
 
-    field_counts[";"] > field_counts[","] ? :semicolon : :comma
+    (field_counts[";"] > field_counts[","]) ? :semicolon : :comma
   end
 
   def semicolon_delimited?(csv_file)

@@ -649,7 +649,7 @@ class AccountsController < ApplicationController
             end
 
     if params[:sort] && params[:order]
-      order += (params[:order] == "desc" ? " DESC, id DESC" : ", id")
+      order += ((params[:order] == "desc") ? " DESC, id DESC" : ", id")
     end
 
     opts = { include_crosslisted_courses: value_to_boolean(params[:include_crosslisted_courses]) }
@@ -1727,7 +1727,7 @@ class AccountsController < ApplicationController
   end
 
   def format_avatar_count(count = 0)
-    count > 99 ? "99+" : count
+    (count > 99) ? "99+" : count
   end
   private :format_avatar_count
 

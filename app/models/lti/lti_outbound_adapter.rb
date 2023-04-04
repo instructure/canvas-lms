@@ -124,7 +124,7 @@ module Lti
     def launch_url(post_only: false)
       raise("Called launch_url before calling prepare_tool_launch") unless @tool_launch
 
-      post_only && !disable_post_only? ? @tool_launch.url.split("?").first : @tool_launch.url
+      (post_only && !disable_post_only?) ? @tool_launch.url.split("?").first : @tool_launch.url
     end
 
     # this is the lis_result_sourcedid field in the launch, and the

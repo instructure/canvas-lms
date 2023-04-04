@@ -1182,7 +1182,7 @@ class Attachment < ActiveRecord::Base
         recipient_keys = (to_list || []).compact.map(&:asset_string)
         next if recipient_keys.empty?
 
-        notification = BroadcastPolicy.notification_finder.by_name(count.to_i > 1 ? "New Files Added" : "New File Added")
+        notification = BroadcastPolicy.notification_finder.by_name((count.to_i > 1) ? "New Files Added" : "New File Added")
         data = { count: count, display_names: display_name }
         DelayedNotification.delay_if_production(priority: 30).process(record, notification, recipient_keys, data)
       end
@@ -1479,7 +1479,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def hidden=(val)
-    self.file_state = (val == true || val == "1" ? "hidden" : "available")
+    self.file_state = ((val == true || val == "1") ? "hidden" : "available")
   end
 
   def context_module_action(user, action)
@@ -1909,7 +1909,7 @@ class Attachment < ActiveRecord::Base
       Canvadocs::ServerError,
       Canvadocs::HeavyLoadError
     ]
-    error_level = warnable_errors.any? { |kls| e.is_a?(kls) } ? :warn : :error
+    error_level = (warnable_errors.any? { |kls| e.is_a?(kls) }) ? :warn : :error
     update_attribute(:workflow_state, "errored")
     error_data = { type: :canvadocs, attachment_id: id, annotatable: opts[:wants_annotation] }
     Canvas::Errors.capture(e, error_data, error_level)
@@ -2068,7 +2068,7 @@ class Attachment < ActiveRecord::Base
 
     addition = attempts || 1
     dir = File.dirname(filename)
-    dir = dir == "." ? "" : "#{dir}/"
+    dir = (dir == ".") ? "" : "#{dir}/"
     extname = filename[/(\.[A-Za-z][A-Za-z0-9]*)*(\.[A-Za-z0-9]*)$/] || ""
     basename = File.basename(filename, extname)
 

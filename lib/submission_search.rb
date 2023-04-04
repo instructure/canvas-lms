@@ -103,7 +103,7 @@ class SubmissionSearch
     order_bys = Array(@options[:order_by])
     order_bys.each do |order_field_direction|
       field = order_field_direction[:field]
-      direction = order_field_direction[:direction] == "descending" ? "DESC NULLS LAST" : "ASC"
+      direction = (order_field_direction[:direction] == "descending") ? "DESC NULLS LAST" : "ASC"
       search_scope =
         case field
         when "username"
