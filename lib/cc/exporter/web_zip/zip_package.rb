@@ -475,7 +475,7 @@ module CC::Exporter::WebZip
     end
 
     def cleanup_files
-      File.delete(@course_data_filename) if File.exist?(@course_data_filename)
+      FileUtils.rm_f(@course_data_filename)
     end
   end
 end

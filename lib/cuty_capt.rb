@@ -161,13 +161,13 @@ class CutyCapt
     if success
       logger.info("Capture took #{Time.now.to_i - start.to_i} seconds")
     else
-      File.unlink(img_file) if File.exist?(img_file)
+      FileUtils.rm_f(img_file)
       return nil
     end
 
     if block_given?
       yield img_file
-      File.unlink(img_file) if File.exist?(img_file)
+      FileUtils.rm_f(img_file)
       return nil
     end
 
