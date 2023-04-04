@@ -28,7 +28,7 @@ class BookmarkedCollection::CompositeProxy < BookmarkedCollection::Proxy
     @depth = collections.map { |(_, coll)| coll.depth }.max + 1
     @collections = collections.map do |(label, coll)|
       adjustment = @depth - 1 - coll.depth
-      adjustment.times.inject(coll) { |c, _i| BookmarkedCollection.concat([label, c]) }
+      adjustment.times.inject(coll) { |c, _i| BookmarkedCollection.concat([label, c]) } # rubocop:disable Style/ConcatArrayLiterals
     end
   end
 

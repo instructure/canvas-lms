@@ -2054,7 +2054,7 @@ class UsersController < ApplicationController
 
     update_email = @user.grants_right?(@current_user, :manage_user_details) && user_params[:email]
     managed_attributes = []
-    managed_attributes.concat %i[name short_name sortable_name] if @user.grants_right?(@current_user, :rename)
+    managed_attributes.push(:name, :short_name, :sortable_name) if @user.grants_right?(@current_user, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
     managed_attributes << :email if update_email
 
@@ -2071,7 +2071,7 @@ class UsersController < ApplicationController
     end
 
     if @user.grants_right?(@current_user, :manage_user_details)
-      managed_attributes.concat(%i[time_zone locale event])
+      managed_attributes.push(:time_zone, :locale, :event)
     end
 
     if @user.grants_right?(@current_user, :update_avatar)

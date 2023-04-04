@@ -63,27 +63,27 @@ module ConditionalRelease
       end
 
       def rule_keys_for_create
-        base_rule_keys.concat [
+        base_rule_keys.push(
           scoring_ranges: scoring_range_keys_for_create
-        ]
+        )
       end
 
       def rule_keys_for_update
-        base_rule_keys.concat [
+        base_rule_keys.push(
           scoring_ranges: scoring_range_keys_for_nested_update
-        ]
+        )
       end
 
       def scoring_range_keys_for_create
-        base_scoring_range_keys.concat [
+        base_scoring_range_keys.push(
           assignment_sets: assignment_set_keys_for_create
-        ]
+        )
       end
 
       def scoring_range_keys_for_update
-        base_scoring_range_keys.concat [
+        base_scoring_range_keys.push(
           assignment_sets: assignment_set_keys_for_nested_update
-        ]
+        )
       end
 
       def scoring_range_keys_for_nested_update
@@ -105,9 +105,9 @@ module ConditionalRelease
       end
 
       def assignment_set_keys_for_nested_update
-        nested_update_keys.concat [
+        nested_update_keys.push(
           assignment_set_associations: assignment_set_association_keys_for_nested_update
-        ]
+        )
       end
     end
   end
