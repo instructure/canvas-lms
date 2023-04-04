@@ -424,7 +424,7 @@ describe "Screenreader Gradebook" do
       basic_point_setup 3
 
       grades = [12, 10, 11]
-      (0..2).each { |num| @curve_assignment.grade_student(@students[num], grade: grades[num], grader: @teacher) }
+      3.times { |num| @curve_assignment.grade_student(@students[num], grade: grades[num], grader: @teacher) }
 
       SRGB.visit(@course.id)
       SRGB.select_assignment(@curve_assignment)
@@ -443,7 +443,7 @@ describe "Screenreader Gradebook" do
       assignment_score = SRGB.assignment_scores.text.split
       # assignment avg score, high score, low score
       scores_as_string = %w[13 20 8]
-      (0..2).each { |num| expect(assignment_score[num + 1]).to eq(scores_as_string[num]) }
+      3.times { |num| expect(assignment_score[num + 1]).to eq(scores_as_string[num]) }
     end
   end
 end

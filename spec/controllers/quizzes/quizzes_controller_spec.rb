@@ -1008,11 +1008,11 @@ describe Quizzes::QuizzesController do
       end
 
       before do
-        (0..2).each do |i|
+        3.times do |i|
           @course.enroll_student(students[i])
         end
 
-        (0..1).each do |i|
+        2.times do |i|
           quizzes[i].assignment_overrides.create!(
             set: sections[i]
           )

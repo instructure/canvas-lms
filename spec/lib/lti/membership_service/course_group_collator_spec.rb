@@ -25,7 +25,7 @@ module Lti::MembershipService
         course_with_teacher
         @group_category = @course.group_categories.create!(name: "Membership")
 
-        (0..100).each do |n|
+        101.times do |n|
           @course.groups.create!(name: "Group #{n}", group_category: @group_category)
         end
       end
