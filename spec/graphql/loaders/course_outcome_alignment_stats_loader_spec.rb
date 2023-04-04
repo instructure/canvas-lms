@@ -19,6 +19,17 @@
 #
 
 describe Loaders::CourseOutcomeAlignmentStatsLoader do
+  def mock_os_aligned_outcomes(outcomes, associated_asset_id)
+    (outcomes || []).map do |o|
+      [o.id.to_s, [{
+        artifact_type: "quizzes.quiz",
+        artifact_id: "1",
+        associated_asset_type: "canvas.assignment.quizzes",
+        associated_asset_id: associated_asset_id.to_s
+      }]]
+    end.to_h
+  end
+
   context "with only direct alignments" do
     before :once do
       outcome_alignment_stats_model
@@ -53,6 +64,60 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
           expect(stats[:total_artifacts]).to eq 4
           expect(stats[:aligned_artifacts]).to eq 2
           expect(stats[:artifact_alignments]).to eq 2
+        end
+      end
+    end
+
+    context "when Outcome Alignment Summary with New Quizzes FF is enabled" do
+      before do
+        @course.enable_feature!(:outcome_alignment_summary_with_new_quizzes)
+        @new_quiz = @course.assignments.create!(title: "new quiz - aligned in OS", submission_types: "external_tool")
+        allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+          .to receive(:get_os_aligned_outcomes)
+          .and_return(mock_os_aligned_outcomes([@outcome2], @new_quiz.id))
+      end
+
+      it "returns alignments stats for outcome alignments in both Canvas and Outcomes-Service" do
+        GraphQL::Batch.batch do
+          Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+            expect(stats).not_to be_nil
+            expect(stats[:total_outcomes]).to eq 2
+            expect(stats[:aligned_outcomes]).to eq 2
+            expect(stats[:total_alignments]).to eq 4
+            expect(stats[:total_artifacts]).to eq 5
+            expect(stats[:aligned_artifacts]).to eq 3
+            expect(stats[:artifact_alignments]).to eq 3
+          end
+        end
+      end
+
+      it "returns correct alignments stats even if outcome is deleted in Canvas but not synched to OS" do
+        @outcome2.destroy
+        GraphQL::Batch.batch do
+          Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+            expect(stats).not_to be_nil
+            expect(stats[:total_outcomes]).to eq 1
+            expect(stats[:aligned_outcomes]).to eq 1
+            expect(stats[:total_alignments]).to eq 3
+            expect(stats[:total_artifacts]).to eq 5
+            expect(stats[:aligned_artifacts]).to eq 2
+            expect(stats[:artifact_alignments]).to eq 2
+          end
+        end
+      end
+
+      it "returns correct alignments stats even if new quiz is deleted in Canvas but not synched to OS" do
+        @new_quiz.destroy
+        GraphQL::Batch.batch do
+          Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+            expect(stats).not_to be_nil
+            expect(stats[:total_outcomes]).to eq 2
+            expect(stats[:aligned_outcomes]).to eq 1
+            expect(stats[:total_alignments]).to eq 3
+            expect(stats[:total_artifacts]).to eq 4
+            expect(stats[:aligned_artifacts]).to eq 2
+            expect(stats[:artifact_alignments]).to eq 2
+          end
         end
       end
     end
