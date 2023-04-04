@@ -387,7 +387,7 @@
     "lint:js:packages": "eslint packages --cache --ext '.js,.ts,.tsx'",
     "lint:style": "stylelint  './app/**/*.{css,scss}' './packages/**/*.{css,scss}'",
     "lint:xss": "node ./script/xsslint.js",
-    "postinstall": "yarn dedupe-yarn; test -n \"$DISABLE_POSTINSTALL\" || (yarn build:packages && ./script/install_hooks && ./script/fix_inst_esm.js)",
+    "postinstall": "yarn dedupe-yarn; test -n \"$DISABLE_POSTINSTALL\" || (yarn build:packages && ./script/install_hooks)",
     "webpack:analyze": "NODE_ENV=production NODE_OPTIONS=\"--max_old_space_size=8096\" SKIP_SOURCEMAPS=1 WEBPACK_ANALYSIS=1 WEBPACK_PEDANTIC=0 webpack",
     "webpack": "gulp rev 1> /dev/null & NODE_OPTIONS=\"--max_old_space_size=5120\" webpack --progress --color --watch",
     "webpack-development": "NODE_OPTIONS=\"--max_old_space_size=5120\" webpack --color",
