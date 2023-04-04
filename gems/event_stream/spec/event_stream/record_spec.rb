@@ -25,7 +25,7 @@ require "securerandom"
 describe EventStream::Failure do
   describe "Record" do
     let(:event_record) do
-      Class.new(::EventStream::Record) do
+      Class.new(EventStream::Record) do
         class << self
           def name
             "EventRecord"

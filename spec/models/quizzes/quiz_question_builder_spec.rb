@@ -56,7 +56,7 @@ describe Quizzes::QuizQuestionBuilder do
                                                                      {
                                                                        id: 1,
                                                                        name: "some question",
-                                                                       question_type: ::Quizzes::QuizQuestion::Q_MULTIPLE_DROPDOWNS,
+                                                                       question_type: Quizzes::QuizQuestion::Q_MULTIPLE_DROPDOWNS,
                                                                        question_text: "Hello in Chinese is [blank]",
                                                                        answers: [{
                                                                          id: rand(1..999),

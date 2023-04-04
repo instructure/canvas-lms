@@ -173,7 +173,7 @@ describe SisBatch do
     expect(atts.count).to eq 1
 
     atts.first.open do |file|
-      @row = ::CSV.new(file, headers: true).first.to_h
+      @row = CSV.new(file, headers: true).first.to_h
     end
     expect(@row).to eq({ "user_id" => "user_1", "login_id" => "user_1", "status" => "active" })
   end

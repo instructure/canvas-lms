@@ -5,11 +5,11 @@ namespace :ci do
   task prepare_test_shards: :environment do
     raise "need to set RAILS_ENV=test" unless Rails.env.test?
 
-    ::Switchman::TestHelper.recreate_persistent_test_shards
+    Switchman::TestHelper.recreate_persistent_test_shards
   end
 
   task :disable_structure_dump do
-    ::Rake::Task["db:structure:dump"].instance_variable_set(:@already_invoked, true)
+    Rake::Task["db:structure:dump"].instance_variable_set(:@already_invoked, true)
   end
 
   task reset_database: :environment do

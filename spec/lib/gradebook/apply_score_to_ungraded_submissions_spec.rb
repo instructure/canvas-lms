@@ -56,7 +56,7 @@ describe Gradebook::ApplyScoreToUngradedSubmissions do
     it "returns a Progress object" do
       options = build_options(percent: "100")
 
-      progress = ::Gradebook::ApplyScoreToUngradedSubmissions.queue_apply_score(
+      progress = Gradebook::ApplyScoreToUngradedSubmissions.queue_apply_score(
         course: course,
         grader: teacher,
         options: options

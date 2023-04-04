@@ -1588,7 +1588,7 @@ describe FilesController do
           )
         end
         let(:progress) do
-          ::Progress
+          Progress
             .new(context: assignment, user: user, tag: :test)
             .tap(&:start)
             .tap(&:save!)
@@ -1639,7 +1639,7 @@ describe FilesController do
 
         context "with Progress tagged as :upload_via_url" do
           let(:progress) do
-            ::Progress
+            Progress
               .new(context: assignment, user: user, tag: :upload_via_url)
               .tap(&:start)
               .tap(&:save!)

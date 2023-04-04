@@ -2056,12 +2056,12 @@ describe Account do
       end
 
       it "errors if infrastructure fails and we can't see the account" do
-        expect { Account.find_cached(nonsense_id) }.to raise_error(::Canvas::AccountCacheError)
+        expect { Account.find_cached(nonsense_id) }.to raise_error(Canvas::AccountCacheError)
       end
 
       it "includes the account id in the error message" do
         Account.find_cached(nonsense_id)
-      rescue ::Canvas::AccountCacheError => e
+      rescue Canvas::AccountCacheError => e
         expect(e.message).to eq("Couldn't find Account with 'id'=#{nonsense_id}")
       end
     end

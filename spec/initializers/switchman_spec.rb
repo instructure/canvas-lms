@@ -102,12 +102,12 @@ describe Switchman::Shard do
 
     context "with a positive timezone" do
       before do
-        @old_zone = ::Time.zone
-        ::Time.zone = ActiveSupport::TimeZone["Melbourne"]
+        @old_zone = Time.zone
+        Time.zone = ActiveSupport::TimeZone["Melbourne"]
       end
 
       after do
-        ::Time.zone = @old_zone
+        Time.zone = @old_zone
       end
 
       it "Returns a window on the correct day" do

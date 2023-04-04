@@ -51,7 +51,7 @@ describe BookmarkedCollection::Proxy do
       value = 1
       bookmark1 = 1
       bookmark2 = "bookmark:W1td" # base64 of '[[]' which should fail to parse
-      bookmark3 = "bookmark:#{::JSONToken.encode(value)}"
+      bookmark3 = "bookmark:#{JSONToken.encode(value)}"
       expect(@proxy.paginate(page: bookmark1, per_page: 5).current_bookmark).to be_nil
       expect(@proxy.paginate(page: bookmark2, per_page: 5).current_bookmark).to be_nil
       expect(@proxy.paginate(page: bookmark3, per_page: 5).current_bookmark).to eq value

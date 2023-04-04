@@ -814,7 +814,7 @@ describe GradebooksController do
 
       describe "score to ungraded" do
         before do
-          options = ::Gradebook::ApplyScoreToUngradedSubmissions::Options.new(
+          options = Gradebook::ApplyScoreToUngradedSubmissions::Options.new(
             percent: 50,
             excused: false,
             mark_as_missing: false,

@@ -82,7 +82,7 @@ describe "Canvadoc" do
 
     it "uses targeted exception for timeouts" do
       allow(Canvas).to receive(:timeout_protection).and_return(nil)
-      expect { @doc.upload }.to raise_error(::Canvadoc::UploadTimeout)
+      expect { @doc.upload }.to raise_error(Canvadoc::UploadTimeout)
     end
   end
 

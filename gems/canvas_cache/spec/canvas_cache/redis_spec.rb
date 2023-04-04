@@ -355,7 +355,7 @@ describe CanvasCache::Redis do
           messages << message
         end.at_least(:once)
         CanvasCache::Redis.handle_redis_failure({ "failure" => "val" }, "local_fake_redis") do
-          raise ::Redis::InheritedError, "intentional failure"
+          raise Redis::InheritedError, "intentional failure"
         end
         # we don't log the second message under spring, cause reasons; we only
         # care about the primary message anyway
