@@ -76,8 +76,8 @@ describe AcademicBenchmark::Converter do
          "label" => nil,
          "statement" =>
          { "descr" =>
-           "Locating on a map major battle sites of the American Revolution," \
-           " including the battles of Lexington and Concord, Bunker Hill, Saratoga, and Yorktown" },
+           "Locating on a map major battle sites of the American Revolution, " \
+           "including the battles of Lexington and Concord, Bunker Hill, Saratoga, and Yorktown" },
          "disciplines" => { "subjects" => [{ "code" => "SOC" }] },
          "utilizations" => [{ "type" => "alignable" }] },
       "type" => "standards",

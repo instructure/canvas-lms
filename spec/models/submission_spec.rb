@@ -517,8 +517,8 @@ describe Submission do
           }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
         end
 
-        it "changes if an individual override is added for the student, even when the due date is earlier" \
-           " than an existing override that applies to the student for the assignment" do
+        it "changes if an individual override is added for the student, even when the due date is earlier " \
+           "than an existing override that applies to the student for the assignment" do
           section = @course.course_sections.create!(name: "My Awesome Section")
           student_in_section(section, user: @student)
           @assignment.assignment_overrides.create!(
@@ -537,8 +537,8 @@ describe Submission do
           }.from(10.minutes.ago(@now)).to(15.minutes.ago(@now))
         end
 
-        it "does not change if a non-individual-override is added for the student and the due date" \
-           " is earlier than an existing override that applies to the student for the assignment" do
+        it "does not change if a non-individual-override is added for the student and the due date " \
+           "is earlier than an existing override that applies to the student for the assignment" do
           category = @course.group_categories.create!(name: "New Group Category")
           group = @course.groups.create!(group_category: category)
           group.add_user(@student, "active")
@@ -848,8 +848,8 @@ describe Submission do
       end
     end
 
-    it "returns seconds_late_override if the submission has a late_policy_status of 'late'" \
-       " and a seconds_late_override" do
+    it "returns seconds_late_override if the submission has a late_policy_status of 'late' " \
+       "and a seconds_late_override" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late", seconds_late_override: 90.minutes)
@@ -857,8 +857,8 @@ describe Submission do
       end
     end
 
-    it "is not adjusted if the student resubmits and the submission has a late_policy_status of 'late'" \
-       " and a seconds_late_override" do
+    it "is not adjusted if the student resubmits and the submission has a late_policy_status of 'late' " \
+       "and a seconds_late_override" do
       Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
       submission.update!(late_policy_status: "late", seconds_late_override: 90.minutes)
       Timecop.freeze(40.minutes.from_now(@date)) do
@@ -882,8 +882,8 @@ describe Submission do
       end
     end
 
-    it "is zero if it was turned in late but the teacher sets the late_policy_status to 'late'" \
-       " and sets seconds_late_override to zero" do
+    it "is zero if it was turned in late but the teacher sets the late_policy_status to 'late' " \
+       "and sets seconds_late_override to zero" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late", seconds_late_override: 0)

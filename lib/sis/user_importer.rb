@@ -544,8 +544,8 @@ module SIS
       def generate_readable_error_message(options)
         response = ERRORS_TO_REASONS.fetch(options[:message]) { DEFAULT_REASON }
         reason = format(response, options)
-        "Could not save the user with user_id: '#{options[:user_id]}'." \
-          " #{reason}"
+        "Could not save the user with user_id: '#{options[:user_id]}'. " \
+          "#{reason}"
       end
     end
   end

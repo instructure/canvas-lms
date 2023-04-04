@@ -108,8 +108,8 @@ describe "Speedgrader" do
           Speedgrader.visit(@course.id, @quiz.assignment_id)
           Speedgrader.wait_for_grade_input
         end
-        Rails.logger.debug "SpeedGrader for course #{@course.id} and assignment"\
-                           " #{@quiz.assignment_id} loaded in #{page_load_time.real} seconds"
+        Rails.logger.debug "SpeedGrader for course #{@course.id} and assignment " \
+                           "#{@quiz.assignment_id} loaded in #{page_load_time.real} seconds"
         expect(page_load_time.real).to be > 0.0
       end
 

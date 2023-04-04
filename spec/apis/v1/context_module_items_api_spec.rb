@@ -94,7 +94,7 @@ describe "Module Items API", type: :request do
       quiz.publish!
       module_with_page.add_item(id: quiz.id, type: "quiz")
       json = api_call(
-        :get, "/api/v1/courses/#{@course.id}/"\
+        :get, "/api/v1/courses/#{@course.id}/" \
               "module_item_sequence?asset_type=Assignment&asset_id=#{assignment.id}",
         controller: "context_module_items_api",
         action: "item_sequence",
@@ -1353,7 +1353,7 @@ describe "Module Items API", type: :request do
           quiz.publish!
           quiz_tag = module_with_page.add_item(id: quiz.id, type: "quiz")
           json = api_call(
-            :get, "/api/v1/courses/#{@course.id}/"\
+            :get, "/api/v1/courses/#{@course.id}/" \
                   "module_item_sequence?asset_type=Assignment&asset_id=#{assignment.id}",
             controller: "context_module_items_api",
             action: "item_sequence",
@@ -1379,7 +1379,7 @@ describe "Module Items API", type: :request do
           quiz.publish!
           quiz_tag = module_with_page.add_item(id: quiz.id, type: "quiz")
           json = api_call(
-            :get, "/api/v1/courses/#{@course.id}/"\
+            :get, "/api/v1/courses/#{@course.id}/" \
                   "module_item_sequence?asset_type=Assignment&asset_id=#{assignment.id}",
             controller: "context_module_items_api",
             action: "item_sequence",
@@ -1412,7 +1412,7 @@ describe "Module Items API", type: :request do
           quiz.publish!
           module_with_page.add_item(id: quiz.id, type: "quiz")
           json = api_call(
-            :get, "/api/v1/courses/#{@course.id}/"\
+            :get, "/api/v1/courses/#{@course.id}/" \
                   "module_item_sequence?asset_type=Assignment&asset_id=#{assignment.id}",
             controller: "context_module_items_api",
             action: "item_sequence",

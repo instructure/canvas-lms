@@ -40,9 +40,9 @@ module Services
         from_name: "notifications@instructure.com",
         subject: "Submission upload failed: #{assignment.name}",
         to: user.email,
-        body: "Your file, #{attachment.display_name}, failed to upload to your "\
-              "Canvas assignment, #{assignment.name}. Please re-submit to "\
-              "the assignment or contact your instructor if you are no "\
+        body: "Your file, #{attachment.display_name}, failed to upload to your " \
+              "Canvas assignment, #{assignment.name}. Please re-submit to " \
+              "the assignment or contact your instructor if you are no " \
               "longer able to do so."
       )
     end

@@ -176,9 +176,9 @@ module Services
     def failure_email
       display_name = @attachment.display_name
       assignment_name = @progress.context.name
-      body = "Your file, #{display_name}, failed to upload to your "\
-             "Canvas assignment, #{assignment_name}. Please re-submit to "\
-             "the assignment or contact your instructor if you are no "\
+      body = "Your file, #{display_name}, failed to upload to your " \
+             "Canvas assignment, #{assignment_name}. Please re-submit to " \
+             "the assignment or contact your instructor if you are no " \
              "longer able to do so."
 
       message = OpenStruct.new(

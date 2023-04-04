@@ -185,7 +185,7 @@ describe ContextExternalTool do
         it { is_expected.to match_array [no_permission_required_tool, permission_required_tool] }
       end
 
-      context "when the current user does not have the required permission" do\
+      context "when the current user does not have the required permission" do \
         it { is_expected.to match_array [no_permission_required_tool] }
       end
     end

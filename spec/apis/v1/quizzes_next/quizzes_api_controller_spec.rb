@@ -172,9 +172,9 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           subject
           link_header = response.headers["Link"]
           expect(link_header).to eq(
-            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=1&per_page=2>; rel=\"current\","\
-            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=2&per_page=2>; rel=\"next\","\
-            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=1&per_page=2>; rel=\"first\","\
+            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=1&per_page=2>; rel=\"current\"," \
+            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=2&per_page=2>; rel=\"next\"," \
+            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=1&per_page=2>; rel=\"first\"," \
             "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=4&per_page=2>; rel=\"last\""
           )
         end

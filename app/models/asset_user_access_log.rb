@@ -161,9 +161,7 @@ class AssetUserAccessLog
       # us to a state where we can make claims about how far into the postgres partitions
       # we've advanced, and so is allowed to zero this state out after it updates the
       # global postgres state above for this shard "max_log_ids".
-      temp_root_account_max_log_ids: {
-
-      }
+      temp_root_account_max_log_ids: {}
     }
     output_metadatum = CanvasMetadatum.get(METADATUM_KEY, default_metadatum)
     # make sure if we have prior storage without this key that

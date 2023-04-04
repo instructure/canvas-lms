@@ -47,9 +47,9 @@ module RuboCop
 
         def error_msg(method)
           alternative = SUSPECT_METHOD_NAMES[method]
-          "Prefer `#{alternative}` instead of `#{method}`; `#{method}`"\
-            " should only be used if you are doing jquery-fake-css selectors"\
-            " (e.g. `:visible`)"
+          "Prefer `#{alternative}` instead of `#{method}`; `#{method}` " \
+            "should only be used if you are doing jquery-fake-css selectors " \
+            "(e.g. `:visible`)"
         end
 
         def autocorrect(node)

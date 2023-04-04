@@ -1642,7 +1642,7 @@ class DiscussionTopic < ActiveRecord::Base
       case elem
       when Attachment
         item.guid.content = link + "/#{elem.uuid}"
-        url = "http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}"\
+        url = "http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}" \
               "/files/#{elem.id}/download#{elem.extension}?verifier=#{elem.uuid}"
         item.enclosure = RSS::Rss::Channel::Item::Enclosure.new(url, elem.size, elem.content_type)
       when MediaObject
@@ -1652,7 +1652,7 @@ class DiscussionTopic < ActiveRecord::Base
         content_type = "audio/mpeg" if elem.media_type == "audio"
         size = details[:size].to_i.kilobytes
         ext = details[:extension] || details[:fileExt]
-        url = "http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}"\
+        url = "http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}" \
               "/media_download.#{ext}?type=#{ext}&entryId=#{elem.media_id}&redirect=1"
         item.enclosure = RSS::Rss::Channel::Item::Enclosure.new(url, size, content_type)
       end

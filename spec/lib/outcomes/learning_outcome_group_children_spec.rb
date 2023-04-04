@@ -335,29 +335,29 @@ describe Outcomes::LearningOutcomeGroupChildren do
           context: context,
           outcome_group: g1,
           title: "LA.1.1.1",
-          description: "continue to apply phonic knowledge and skills as the route to decode words until "\
+          description: "continue to apply phonic knowledge and skills as the route to decode words until " \
                        "automatic decoding has become embedded and reading is fluent"
         )
         outcome_model(
           context: context,
           outcome_group: g1,
           title: "LA.2.2.1.2",
-          description: "Explain anticipated meaning, recognize relationships, and draw conclusions; self-correct"\
-                       " understanding using a variety of strategies [including rereading for story sense]."
+          description: "Explain anticipated meaning, recognize relationships, and draw conclusions; self-correct " \
+                       "understanding using a variety of strategies [including rereading for story sense]."
         )
         outcome_model(
           context: context,
           outcome_group: g1,
           title: "FO.3",
-          description: "apply their growing knowledge of root words, prefixes and suffixes (etymology and morphology)"\
-                       " as listed in English Appendix 1, both to read aloud and to understand the meaning of new wor"\
+          description: "apply their growing knowledge of root words, prefixes and suffixes (etymology and morphology) " \
+                       "as listed in English Appendix 1, both to read aloud and to understand the meaning of new wor" \
                        "ds they meet"
         )
         outcome_model(
           context: context,
           outcome_group: g1,
           title: "HT.ML.1.1",
-          description: "<p>Pellentesque&nbsp;habitant morbi tristique senectus et netus et malesuada fames ac turpis e"\
+          description: "<p>Pellentesque&nbsp;habitant morbi tristique senectus et netus et malesuada fames ac turpis e" \
                        "gestas.</p>"
         )
         outcome_model(
