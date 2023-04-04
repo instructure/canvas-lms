@@ -214,11 +214,11 @@ describe ContextExternalTool do
       expect(tool.login_or_launch_url).to eq tool.url
     end
 
-    context "when a content_tag_uri is specified" do
-      let(:content_tag_uri) { "https://www.test.com/tool-launch" }
+    context "when a preferred_launch_url is specified" do
+      let(:preferred_launch_url) { "https://www.test.com/tool-launch" }
 
-      it "returns the content tag uri" do
-        expect(tool.login_or_launch_url(content_tag_uri: content_tag_uri)).to eq content_tag_uri
+      it "returns the preferred_launch_url" do
+        expect(tool.login_or_launch_url(preferred_launch_url: preferred_launch_url)).to eq preferred_launch_url
       end
     end
 
@@ -253,6 +253,480 @@ describe ContextExternalTool do
         expect(tool.login_or_launch_url).to eq oidc_initiation_url
       end
     end
+  end
+
+  describe "#launch_url" do
+    let_once(:tool) do
+      ContextExternalTool.create!(
+        context: @course,
+        consumer_key: "key",
+        shared_secret: "secret",
+        name: "test tool",
+        url: "http://www.tool.com/launch"
+      )
+    end
+
+    it "returns the launch url" do
+      expect(tool.launch_url).to eq tool.url
+    end
+
+    context "when a preferred_launch_url is specified" do
+      let(:preferred_launch_url) { "https://www.test.com/tool-launch" }
+
+      it "returns the preferred_launch_url" do
+        expect(tool.launch_url(preferred_launch_url: preferred_launch_url)).to eq preferred_launch_url
+      end
+    end
+
+    context "when the extension url is present" do
+      let(:placement_url) { "http://www.test.com/editor_button" }
+
+      before do
+        tool.editor_button = {
+          "url" => placement_url,
+          "text" => "LTI 1.3 twoa",
+          "enabled" => true,
+          "icon_url" => "https://static.thenounproject.com/png/131630-200.png",
+          "message_type" => "LtiDeepLinkingRequest",
+          "canvas_icon_class" => "icon-lti"
+        }
+      end
+
+      it "returns the extension url" do
+        expect(tool.launch_url(extension_type: :editor_button)).to eq placement_url
+      end
+    end
+
+    context "with a lti_1_3 tool" do
+      before do
+        tool.lti_version = "1.3"
+      end
+
+      context "when the extension target_link_uri is present" do
+        let(:placement_url) { "http://www.test.com/editor_button" }
+
+        before do
+          tool.editor_button = {
+            "target_link_uri" => placement_url,
+            "text" => "LTI 1.3 twoa",
+            "enabled" => true,
+            "icon_url" => "https://static.thenounproject.com/png/131630-200.png",
+            "message_type" => "LtiDeepLinkingRequest",
+            "canvas_icon_class" => "icon-lti"
+          }
+        end
+
+        it "returns the extension target_link_uri" do
+          expect(tool.launch_url(extension_type: :editor_button)).to eq placement_url
+        end
+      end
+
+      it "returns the launch url" do
+        expect(tool.launch_url).to eq tool.url
+      end
+    end
+
+    context "with environment-specific url overrides" do
+      let(:override_url) { "http://www.test-beta.net/launch" }
+
+      before do
+        allow(tool).to receive(:url_with_environment_overrides).and_return(override_url)
+      end
+
+      it "returns the override url" do
+        expect(tool.launch_url).to eq override_url
+      end
+
+      context "when the extension url is present" do
+        let(:placement_url) { "http://www.test.com/editor_button" }
+        let(:override_url) { "http://www.test-beta.net/editor_button" }
+
+        before do
+          tool.editor_button = {
+            "url" => placement_url,
+            "text" => "LTI 1.3 twoa",
+            "enabled" => true,
+            "icon_url" => "https://static.thenounproject.com/png/131630-200.png",
+            "message_type" => "LtiDeepLinkingRequest",
+            "canvas_icon_class" => "icon-lti"
+          }
+        end
+
+        it "returns the extension url" do
+          expect(tool.launch_url(extension_type: :editor_button)).to eq override_url
+        end
+      end
+    end
+  end
+
+  describe "#url_with_environment_overrides" do
+    subject { tool.url_with_environment_overrides(url, include_launch_url: include_launch_url) }
+
+    let(:url) { "http://www.tool.com/launch" }
+    let(:include_launch_url) { false }
+
+    let_once(:tool) do
+      ContextExternalTool.create!(
+        context: @course,
+        consumer_key: "key",
+        shared_secret: "secret",
+        name: "test tool",
+        url: url
+      )
+    end
+
+    before do
+      allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+      allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+      allow(tool).to receive(:use_environment_overrides?).and_return(true)
+    end
+
+    context "when prechecks do not pass" do
+      before do
+        allow(tool).to receive(:use_environment_overrides?).and_return(false)
+      end
+
+      it "does not override url" do
+        expect(subject).to eq url
+      end
+    end
+
+    context "when launch_url override is configured" do
+      let(:override_url) { "http://www.test.com/override" }
+      let(:include_launch_url) { true }
+
+      before do
+        tool.settings[:environments] = {
+          launch_url: override_url
+        }
+      end
+
+      it "returns the launch_url override" do
+        expect(subject).to eq override_url
+      end
+
+      context "with base_url query string" do
+        let(:url) { super() + "?hello=world" }
+
+        it "includes the query string in returned url" do
+          expect(subject).to eq override_url + "?hello=world"
+        end
+      end
+
+      context "with launch_url query string" do
+        let(:override_url) { super() + "?hello=world" }
+
+        it "includes the query string in returned url" do
+          expect(subject).to eq override_url
+        end
+      end
+
+      context "with query strings on both urls" do
+        let(:url) { super() + "?hello=world&test=this" }
+        let(:override_url) { super() + "?hello=there" }
+
+        it "merges both query strings in returned url" do
+          expect(subject).to eq override_url + "&test=this"
+        end
+      end
+    end
+
+    context "when env_launch_url override is configured" do
+      let(:override_url) { "http://www.test.com/override" }
+      let(:beta_url) { "#{override_url}/beta" }
+      let(:include_launch_url) { true }
+
+      before do
+        tool.settings[:environments] = {
+          launch_url: override_url,
+          beta_launch_url: beta_url
+        }
+      end
+
+      it "prefers env_launch_url over launch_url" do
+        expect(subject).to eq beta_url
+      end
+    end
+
+    context "when domain override is configured" do
+      let(:override_url) { "http://www.test-change.net/launch" }
+      let(:override_domain) { "www.test-change.net" }
+
+      before do
+        tool.settings[:environments] = {
+          domain: override_domain
+        }
+      end
+
+      it "replaces the domain of launch_url with override" do
+        expect(subject).to eq override_url
+      end
+
+      context "when domain includes protocol" do
+        let(:override_domain) { "http://www.test-change.net" }
+
+        it "replaces the domain with override" do
+          expect(subject).to eq override_url
+        end
+      end
+
+      context "when domain includes trailing slash" do
+        let(:override_domain) { "www.test-change.net/" }
+
+        it "replaces the domain with override" do
+          expect(subject).to eq override_url
+        end
+      end
+    end
+
+    context "when env_domain override is configured" do
+      let(:override_url) { "http://www.test-change.beta.net/launch" }
+      let(:override_domain) { "www.test-change.net" }
+      let(:beta_domain) { "www.test-change.beta.net" }
+
+      before do
+        tool.settings[:environments] = {
+          domain: override_domain,
+          beta_domain: beta_domain
+        }
+      end
+
+      it "replaces the domain of launch_url with override" do
+        expect(subject).to eq override_url
+      end
+    end
+
+    context "when both domain and launch_url override are configured" do
+      let(:override_url) { "http://www.test-change.beta.net/launch" }
+      let(:override_domain) { "www.test-change.net" }
+
+      before do
+        tool.settings[:environments] = {
+          domain: override_domain,
+          launch_url: override_url
+        }
+      end
+
+      it "prefers domain override" do
+        expect(subject).to eq "http://www.test-change.net/launch"
+      end
+
+      context "when include_launch_url is true" do
+        let(:include_launch_url) { true }
+
+        it "prefers url override over domain" do
+          expect(subject).to eq override_url
+        end
+      end
+    end
+
+    # TODO: implement this behavior, both old and new don't account for it yet
+    # context "when domain contains port" do
+    #   let(:override_url) { "http://www.test-change.net:3001/launch" }
+    #   let(:override_domain) { "www.test-change.net:3001" }
+    #   let(:domain_with_port) { "localhost:3000" }
+    #   let(:url) { "http://#{domain_with_port}/launch" }
+
+    #   before do
+    #     tool.domain = domain_with_port
+    #     tool.url = url
+    #     tool.settings[:environments] = {
+    #       domain: override_domain
+    #     }
+    #     tool.save!
+    #   end
+
+    #   it "accounts for port when replacing" do
+    #     expect(subject).to eq override_url
+    #   end
+    # end
+  end
+
+  describe "#domain_with_environment_overrides" do
+    subject { tool.domain_with_environment_overrides }
+
+    let(:domain) { "example.com" }
+    let(:override_domain) { "beta.example.com" }
+
+    let_once(:tool) do
+      ContextExternalTool.create!(
+        context: @course,
+        consumer_key: "key",
+        shared_secret: "secret",
+        name: "test tool",
+        domain: domain
+      )
+    end
+
+    before do
+      tool.settings[:environments] = { domain: override_domain }
+      allow(tool).to receive(:use_environment_overrides?).and_return(true)
+    end
+
+    context "when prechecks do not pass" do
+      before do
+        allow(tool).to receive(:use_environment_overrides?).and_return(false)
+      end
+
+      it "returns base domain" do
+        expect(subject).to eq domain
+      end
+    end
+
+    context "when there is no environment override for domain" do
+      before do
+        tool.settings[:environments] = { launch_url: "https://example.com/test-launch" }
+      end
+
+      it "returns base domain" do
+        expect(subject).to eq domain
+      end
+    end
+
+    it "returns override domain" do
+      expect(subject).to eq override_domain
+    end
+  end
+
+  describe "#environment_overrides_for" do
+    subject { tool.environment_overrides_for(key) }
+
+    let(:key) { nil }
+    let(:domain) { "test.example.com" }
+    let(:beta_domain) { "beta.example.com" }
+    let(:launch_url) { "https://example.com/test-launch" }
+    let(:beta_launch_url) { "https://example.com/beta-launch" }
+
+    let_once(:tool) do
+      ContextExternalTool.create!(
+        context: @course,
+        consumer_key: "key",
+        shared_secret: "secret",
+        name: "test tool",
+        domain: "example.com"
+      )
+    end
+
+    before do
+      tool.settings[:environments] = {}
+      allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+      allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+    end
+
+    context "when key isn't valid" do
+      let(:key) { :wrong }
+
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "when tool doesn't have override for key" do
+      let(:key) { "domain" }
+
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+
+    context "domain override" do
+      let(:key) { :domain }
+
+      before do
+        tool.settings[:environments][:domain] = domain
+      end
+
+      it "returns base domain override" do
+        expect(subject).to eq domain
+      end
+
+      context "with env-specific override" do
+        before do
+          tool.settings[:environments][:beta_domain] = beta_domain
+        end
+
+        it "returns env-specific domain" do
+          expect(subject).to eq beta_domain
+        end
+      end
+    end
+
+    context "launch_url override" do
+      let(:key) { :launch_url }
+
+      before do
+        tool.settings[:environments][:launch_url] = launch_url
+      end
+
+      it "returns base launch_url override" do
+        expect(subject).to eq launch_url
+      end
+
+      context "with env-specific override" do
+        before do
+          tool.settings[:environments][:beta_launch_url] = beta_launch_url
+        end
+
+        it "returns env-specific launch_url" do
+          expect(subject).to eq beta_launch_url
+        end
+      end
+    end
+  end
+
+  describe "#use_environment_overrides?" do
+    subject { tool.use_environment_overrides? }
+
+    let_once(:tool) do
+      ContextExternalTool.create!(
+        context: @course,
+        consumer_key: "key",
+        shared_secret: "secret",
+        name: "test tool",
+        domain: "example.com"
+      )
+    end
+
+    before do
+      tool.settings[:environments] = { domain: "beta.example.com" }
+      allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+      allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+      Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+    end
+
+    context "in standard Canvas" do
+      before do
+        allow(ApplicationController).to receive(:test_cluster?).and_return(false)
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context "with a lti_1_3 tool" do
+      before do
+        tool.lti_version = "1.3"
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context "when feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature! :dynamic_lti_environment_overrides
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context "when tool does not have overrides configured" do
+      before do
+        tool.settings.delete :environments
+      end
+
+      it { is_expected.to be false }
+    end
+
+    it { is_expected.to be true }
   end
 
   describe "#deployment_id" do
@@ -1491,14 +1965,68 @@ describe ContextExternalTool do
   end
 
   describe "#extension_setting" do
-    it "returns the top level extension setting if no placement is given" do
+    let(:tool) do
       tool = @course.context_external_tools.new(name: "bob",
                                                 consumer_key: "bob",
                                                 shared_secret: "bob")
       tool.url = "http://www.example.com/basic_lti"
       tool.settings[:windowTarget] = "_blank"
       tool.save!
+      tool
+    end
+
+    it "returns the top level extension setting if no placement is given" do
       expect(tool.extension_setting(nil, :windowTarget)).to eq "_blank"
+    end
+
+    context "with environment-specific overrides" do
+      let(:override_url) { "http://www.example.com/icon/override" }
+      let(:launch_url) { "http://www.example.com/launch/course_navigation" }
+
+      before do
+        allow(tool).to receive(:url_with_environment_overrides).and_return(override_url)
+        tool.course_navigation = {
+          url: launch_url,
+          icon_url: "http://www.example.com/icon/course_navigation"
+        }
+      end
+
+      it "returns override for icon_url" do
+        expect(tool.extension_setting(:course_navigation, :icon_url)).to eq override_url
+      end
+
+      it "returns actual url for other properties" do
+        expect(tool.extension_setting(:course_navigation, :url)).to eq launch_url
+      end
+    end
+  end
+
+  describe "#icon_url" do
+    let(:icon_url) { "http://wwww.example.com/icon/lti" }
+    let(:tool) do
+      tool = @course.context_external_tools.new(name: "bob",
+                                                consumer_key: "bob",
+                                                shared_secret: "bob")
+      tool.url = "http://www.example.com/basic_lti"
+      tool.settings[:icon_url] = icon_url
+      tool.save!
+      tool
+    end
+
+    it "returns settings.icon_url" do
+      expect(tool.icon_url).to eq tool.settings[:icon_url]
+    end
+
+    context "with environment-specific overrides" do
+      let(:override_url) { "http://www.example.com/icon/override" }
+
+      before do
+        allow(tool).to receive(:url_with_environment_overrides).and_return(override_url)
+      end
+
+      it "returns override for icon_url" do
+        expect(tool.icon_url).to eq override_url
+      end
     end
   end
 

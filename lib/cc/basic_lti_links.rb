@@ -65,7 +65,7 @@ module CC
         elsif tool.url&.include?("https://")
           blti_node.blti :secure_launch_url, tool.url
         end
-        blti_node.blti(:icon, tool.settings[:icon_url]) if tool.settings[:icon_url]
+        blti_node.blti(:icon, tool.icon_url) if tool.icon_url
 
         blti_node.blti :vendor do |v_node|
           v_node.lticp :code, "unknown"

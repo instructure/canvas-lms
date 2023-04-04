@@ -1405,6 +1405,32 @@ RSpec.describe ApplicationController do
           end
         end
 
+        context "with environment-specific overrides" do
+          let(:override_url) { "http://www.example-beta.com/basic_lti" }
+
+          before do
+            allow(controller).to receive(:named_context_url).and_return(tool.url)
+            allow(controller).to receive(:render)
+            allow(controller).to receive_messages(js_env: [])
+            controller.instance_variable_set(:@context, course)
+            allow(content_tag).to receive(:id).and_return(42)
+
+            allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+            allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+            Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+
+            tool.settings[:environments] = {
+              launch_url: override_url
+            }
+            tool.save!
+          end
+
+          it "uses override for launch_url" do
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:lti_launch].resource_url).to eq override_url
+          end
+        end
+
         it "returns the full path for the redirect url" do
           expect(controller).to receive(:named_context_url).with(course, :context_url, { include_host: true })
           expect(controller).to receive(:named_context_url).with(

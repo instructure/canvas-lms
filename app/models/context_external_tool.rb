@@ -283,8 +283,14 @@ class ContextExternalTool < ActiveRecord::Base
 
   def extension_setting(type, property = nil)
     val = calculate_extension_setting(type, property)
-    # make sure it's a valid url
-    val = nil if val && property == :icon_url && (URI.parse(val) rescue nil).nil?
+    if property == :icon_url
+      # make sure it's a valid url
+      return nil if val && (URI.parse(val) rescue nil).nil?
+
+      # account for beta and test overrides
+      return url_with_environment_overrides(val)
+    end
+
     val
   end
 
@@ -615,7 +621,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def icon_url
-    settings[:icon_url]
+    url_with_environment_overrides(settings[:icon_url])
   end
 
   def canvas_icon_class=(i_url)
@@ -662,16 +668,95 @@ class ContextExternalTool < ActiveRecord::Base
     extension_setting(extension_type, :display_type) || "in_context"
   end
 
-  def login_or_launch_url(extension_type: nil, content_tag_uri: nil)
+  def login_or_launch_url(extension_type: nil, preferred_launch_url: nil)
     (use_1_3? && developer_key&.oidc_initiation_url) ||
-      launch_url(extension_type: extension_type, content_tag_uri: content_tag_uri)
+      launch_url(extension_type: extension_type, preferred_launch_url: preferred_launch_url)
   end
 
-  def launch_url(extension_type: nil, content_tag_uri: nil)
-    content_tag_uri ||
-      (use_1_3? && extension_setting(extension_type, :target_link_uri)) ||
-      extension_setting(extension_type, :url) ||
-      url
+  def launch_url(extension_type: nil, preferred_launch_url: nil)
+    launch_url = preferred_launch_url ||
+                 (use_1_3? && extension_setting(extension_type, :target_link_uri)) ||
+                 extension_setting(extension_type, :url) ||
+                 url
+
+    url_with_environment_overrides(launch_url, include_launch_url: true)
+  end
+
+  # Modifies url based on `environments` overrides.
+  # Only valid for 1.1 tools, and only in beta or test Instructure-hosted Canvas.
+  # Only valid for tools that define overrides in the `environments` configuration
+  # (see doc/api/file.tools_xml.md#test_env_settings for details).
+  # Replaces the old behavior of rewriting tool urls/domain in the database during
+  # a beta refresh.
+  # launch_url overrides are only considered when include_launch_url: true is
+  # provided, and are preferred over domain overrides. Query strings from the
+  # base_url and launch_url override will be merged together.
+  def url_with_environment_overrides(base_url, include_launch_url: false)
+    return base_url unless use_environment_overrides?
+
+    override_url = environment_overrides_for(:launch_url)
+    if override_url && include_launch_url
+      base_query = Addressable::URI.parse(base_url)&.query_values
+      return override_url if base_query.nil?
+
+      override_uri = Addressable::URI.parse(override_url)
+      override_uri.query_values = base_query.merge(override_uri&.query_values || {})
+      return override_uri.to_s
+    end
+
+    override_domain = environment_overrides_for(:domain)
+    if override_domain
+      base_uri = Addressable::URI.parse(base_url)
+      return base_url if base_uri.nil?
+      return base_url unless base_uri.host
+
+      begin
+        base_uri.host = override_domain.chomp("/") # ignore trailing slash
+      rescue Addressable::URI::InvalidURIError
+        # account for domains with "http(s)://"
+        override_uri = Addressable::URI.parse(override_domain)
+        base_uri.host = override_uri.host
+      end
+
+      return base_uri.to_s
+    end
+
+    base_url
+  end
+
+  # Modifies domain based on `environments` overrides.
+  # Only valid for 1.1 tools, and only in beta or test Instructure-hosted Canvas.
+  # Only valid for tools that define overrides in the `environments` configuration
+  # (see doc/api/file.tools_xml.md#test_env_settings for details).
+  # Replaces the old behavior of rewriting tool domain in the database during
+  # a beta refresh.
+  def domain_with_environment_overrides
+    return domain unless use_environment_overrides?
+
+    override_domain = environment_overrides_for(:domain)
+    return override_domain if override_domain
+
+    domain
+  end
+
+  # Retrieve `environments` overrides for either :domain or :launch_url.
+  # Prefers environment-specific overrides (eg `beta_domain`) over general
+  # overrides (eg `domain`).
+  def environment_overrides_for(key)
+    return nil unless [:domain, :launch_url].include?(key.to_sym)
+
+    env = ApplicationController.test_cluster_name
+    settings.dig(:environments, "#{env}_#{key}").presence ||
+      settings.dig(:environments, key).presence
+  end
+
+  def use_environment_overrides?
+    return false if use_1_3?
+    return false unless ApplicationController.test_cluster?
+    return false unless Account.site_admin.feature_enabled?(:dynamic_lti_environment_overrides)
+    return false if settings[:environments].blank?
+
+    true
   end
 
   def extension_default_value(type, property)

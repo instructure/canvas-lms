@@ -2029,7 +2029,7 @@ class ApplicationController < ActionController::Base
         end
 
         opts = {
-          launch_url: @tool.login_or_launch_url(content_tag_uri: @resource_url),
+          launch_url: @tool.login_or_launch_url(preferred_launch_url: @resource_url),
           link_code: @opaque_id,
           overrides: { "resource_link_title" => @resource_title },
           domain: HostUrl.context_host(@domain_root_account, request.host),
@@ -2091,7 +2091,7 @@ class ApplicationController < ActionController::Base
           @lti_launch.params = adapter.generate_post_payload
         end
 
-        @lti_launch.resource_url = @tool.login_or_launch_url(content_tag_uri: @resource_url)
+        @lti_launch.resource_url = @tool.login_or_launch_url(preferred_launch_url: @resource_url)
         @lti_launch.link_text = @resource_title
         @lti_launch.analytics_id = @tool.tool_id
         InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: @tool.lti_version, type: :content_tag_redirect })
