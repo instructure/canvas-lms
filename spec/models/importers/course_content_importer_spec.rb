@@ -32,7 +32,7 @@ describe Course do
       # TODO: pull this out into smaller tests... right now I'm using
       # the whole example JSON from Bracken because the formatting is
       # somewhat in flux
-      json = File.open(File.join(IMPORT_JSON_DIR, "import_from_migration.json")).read
+      json = File.read(File.join(IMPORT_JSON_DIR, "import_from_migration.json"))
       data = JSON.parse(json).with_indifferent_access
       data["all_files_export"] = {
         "file_path" => File.join(IMPORT_JSON_DIR, "import_from_migration_small.zip")
@@ -217,7 +217,7 @@ describe Course do
     end
 
     def setup_import(import_course, filename, migration)
-      json = File.open(File.join(IMPORT_JSON_DIR, filename)).read
+      json = File.read(File.join(IMPORT_JSON_DIR, filename))
       data = JSON.parse(json).with_indifferent_access
       Importers::CourseContentImporter.import_content(
         import_course,
@@ -299,7 +299,7 @@ describe Course do
       @course.reload
 
       expect(DueDateCacher).to receive(:recompute_course).once
-      json = File.open(File.join(IMPORT_JSON_DIR, "assignment.json")).read
+      json = File.read(File.join(IMPORT_JSON_DIR, "assignment.json"))
       @data = { "assignments" => JSON.parse(json) }.with_indifferent_access
       Importers::CourseContentImporter.import_content(
         @course, @data, migration.migration_settings[:migration_ids_to_import], migration
@@ -543,7 +543,7 @@ describe Course do
     it "logs content migration in audit logs" do
       course_factory
 
-      json = File.open(File.join(IMPORT_JSON_DIR, "assessments.json")).read
+      json = File.read(File.join(IMPORT_JSON_DIR, "assessments.json"))
       data = JSON.parse(json).with_indifferent_access
 
       params = { "copy" => { "quizzes" => { "i7ed12d5eade40d9ee8ecb5300b8e02b2" => true } } }
@@ -567,7 +567,7 @@ describe Course do
       @module = @course.context_modules.create! name: "test"
       @module.add_item(type: "context_module_sub_header", title: "blah")
       @params = { "copy" => { "assignments" => { "1865116198002" => true } } }
-      json = File.open(File.join(IMPORT_JSON_DIR, "import_from_migration.json")).read
+      json = File.read(File.join(IMPORT_JSON_DIR, "import_from_migration.json"))
       @data = JSON.parse(json).with_indifferent_access
     end
 
@@ -626,7 +626,7 @@ describe Course do
         assignments: { "1865116014002" => true },
         quizzes: { "1865116160002" => true }
       } }.with_indifferent_access
-      json = File.open(File.join(IMPORT_JSON_DIR, "import_from_migration.json")).read
+      json = File.read(File.join(IMPORT_JSON_DIR, "import_from_migration.json"))
       @data = JSON.parse(json).with_indifferent_access
       @migration = @course.content_migrations.build
       @migration.migration_settings[:migration_ids_to_import] = @params

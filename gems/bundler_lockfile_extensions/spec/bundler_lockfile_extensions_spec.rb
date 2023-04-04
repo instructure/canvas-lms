@@ -221,8 +221,7 @@ describe "BundlerLockfileExtensions" do
 
   def create_local_gem(dir, name, content)
     FileUtils.mkdir_p("#{dir}/#{name}")
-    File.open("#{dir}/#{name}/#{name}.gemspec", "w") do |f|
-      f.write(<<-RUBY)
+    File.write("#{dir}/#{name}/#{name}.gemspec", <<-RUBY)
       Gem::Specification.new do |spec|
         spec.name          = "#{name}"
         spec.version       = "0.0.1"
@@ -231,8 +230,7 @@ describe "BundlerLockfileExtensions" do
 
         #{content}
       end
-      RUBY
-    end
+    RUBY
   end
 
   def with_gemfile(content)
