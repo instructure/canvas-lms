@@ -271,19 +271,17 @@ end
 # a redirect at the old name so people's old bookmarks don't 404
 def serialize_redirect(filename)
   path = File.join(options[:serializer].basepath, filename)
-  File.open(path, "wb") do |file|
-    file.write <<~HTML
-      <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-      <html>
-      <head>
-      <title>#{options[:page_title]}</title>
-      <meta http-equiv="REFRESH" content="0;url=file.#{filename}"></HEAD>
-      <BODY>
-      This page has moved. You will be redirected automatically, or you can <a href="file.#{filename}">click here</a> to go to the new page.
-      </BODY>
-      </HTML>
-    HTML
-  end
+  File.binwrite(path, <<~HTML)
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+    <html>
+    <head>
+    <title>#{options[:page_title]}</title>
+    <meta http-equiv="REFRESH" content="0;url=file.#{filename}"></HEAD>
+    <BODY>
+    This page has moved. You will be redirected automatically, or you can <a href="file.#{filename}">click here</a> to go to the new page.
+    </BODY>
+    </HTML>
+  HTML
 end
 
 def extract_page_title_from_markdown(file)

@@ -568,9 +568,7 @@ class SubmissionsController < SubmissionsBaseController
 
     Dir.mktmpdir do |dirname|
       path = File.join(dirname, filename)
-      File.open(path, "wb") do |f|
-        f.write(document_response.body)
-      end
+      File.binwrite(path, document_response.body)
       store_google_doc_attachment(attachment, Rack::Test::UploadedFile.new(path, content_type, true))
       attachment.save!
     end
