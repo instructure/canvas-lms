@@ -717,7 +717,7 @@ class SisBatch < ActiveRecord::Base
       "workflow_state" => workflow_state,
       "data" => self.data,
       "batch_mode" => batch_mode,
-      "batch_mode_term_id" => batch_mode_term ? batch_mode_term.id : nil,
+      "batch_mode_term_id" => batch_mode_term&.id,
       "multi_term_batch_mode" => options[:multi_term_batch_mode],
       "override_sis_stickiness" => options[:override_sis_stickiness],
       "add_sis_stickiness" => options[:add_sis_stickiness],

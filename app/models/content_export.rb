@@ -410,7 +410,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   def error_message
-    settings[:errors] ? settings[:errors].last : nil
+    settings[:errors]&.last
   end
 
   def error_messages

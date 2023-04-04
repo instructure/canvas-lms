@@ -1444,7 +1444,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def user_name
-    user ? user.name : nil
+    user&.name
   end
 
   def available_from_for(user)
