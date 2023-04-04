@@ -36,8 +36,8 @@ describe "Exportable" do
       @epub_export = klass.new.convert_to_epub
       expect(File.exist?(@epub_export.first) && File.exist?(@epub_export.last)).to be true
       sleep 0.1 # Wait just enough so we don't delete a parallel test's file
-      File.delete(@epub_export.first) if File.exist?(@epub_export.first)
-      File.delete(@epub_export.last) if File.exist?(@epub_export.last)
+      FileUtils.rm_f(@epub_export.first)
+      FileUtils.rm_f(@epub_export.last)
       expect(@epub_export.last).to include("unicode-filename-test")
     end
   end

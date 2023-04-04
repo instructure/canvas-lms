@@ -1692,7 +1692,7 @@ class Attachment < ActiveRecord::Base
     elsif Attachment.s3_storage? && s3object.exists?
       s3object.copy_to(bucket.object(purgatory_filename))
     elsif Attachment.local_storage?
-      FileUtils.mkdir(local_purgatory_directory) unless File.exist?(local_purgatory_directory)
+      FileUtils.mkdir_p(local_purgatory_directory)
       FileUtils.cp full_filename, local_purgatory_file
     end
     if (p = Purgatory.find_by(attachment_id: self))
@@ -1767,8 +1767,8 @@ class Attachment < ActiveRecord::Base
       self.instfs_uuid = nil
     elsif Attachment.s3_storage?
       s3object.delete unless ApplicationController.test_cluster?
-    elsif File.exist?(full_filename)
-      FileUtils.rm full_filename
+    else
+      FileUtils.rm_f(full_filename)
     end
   end
 

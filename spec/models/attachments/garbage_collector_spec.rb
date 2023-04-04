@@ -36,7 +36,7 @@ describe Attachments::GarbageCollector do
     end
 
     it "destroys content and deletes objects" do
-      expect(FileUtils).to receive(:rm).with(att.full_filename)
+      expect(FileUtils).to receive(:rm_f).with(att.full_filename)
 
       gc.delete_content
       expect(att.reload).to be_deleted
@@ -53,7 +53,7 @@ describe Attachments::GarbageCollector do
         uploaded_data: stub_file_data("folder.zip", "hi", "application/zip")
       )
       expect(att2.root_attachment_id).to eq att.id
-      expect(FileUtils).to receive(:rm).with(att.full_filename)
+      expect(FileUtils).to receive(:rm_f).with(att.full_filename)
 
       gc.delete_content
       expect(att.reload).to be_deleted
