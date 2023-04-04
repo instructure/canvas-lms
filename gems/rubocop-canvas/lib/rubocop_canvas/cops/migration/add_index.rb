@@ -72,9 +72,9 @@ module RuboCop
         def on_send(node)
           return if @current_def == :down
 
-          if (table_arg = add_index(node)) && !@new_tables.include?(table_arg.value.to_s)
+          if (table_arg = add_index(node)) && !@new_tables.include?(table_arg.indifferent)
             check_add_index(node)
-          elsif (table_arg = add_reference(node)) && !@new_tables.include?(table_arg.value.to_s)
+          elsif (table_arg = add_reference(node)) && !@new_tables.include?(table_arg.indifferent)
             check_add_reference(node)
           end
         end
@@ -83,7 +83,7 @@ module RuboCop
           return if @current_def == :down
 
           # it'd be weird to call `create_table` and `change_table` in the same migration, but ¯\_(ツ)_/¯
-          if (table_arg = change_table(node)) && !@new_tables.include?(table_arg.value.to_s)
+          if (table_arg = change_table(node)) && !@new_tables.include?(table_arg.indifferent)
             check_change_table(node)
           end
         end

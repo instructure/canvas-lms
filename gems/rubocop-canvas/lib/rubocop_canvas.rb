@@ -28,6 +28,7 @@ require "rubocop_canvas/helpers/file_meta"
 require "rubocop_canvas/helpers/migration_tags"
 require "rubocop_canvas/helpers/new_tables"
 require "rubocop_canvas/helpers/current_def"
+require "rubocop_canvas/helpers/indifferent"
 require "rubocop_canvas/helpers/non_transactional"
 
 # cops
@@ -79,6 +80,9 @@ module RuboCop
         config = ConfigLoader.merge_with_default(config, path)
 
         ConfigLoader.instance_variable_set(:@default_configuration, config)
+
+        AST::Node.include(Indifferent)
+        AST::SymbolNode.include(IndifferentSymbol)
       end
     end
   end

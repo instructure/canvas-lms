@@ -98,6 +98,22 @@ describe RuboCop::Cop::Migration::AddIndex do
       RUBY
       expect(cop.offenses.size).to eq 0
     end
+
+    it "handles non-constant table names" do
+      inspect_source(<<~RUBY)
+        class TestMigration < ActiveRecord::Migration
+          def up
+            with_each_partition do |partition|
+              add_index partition, :account_id, algorithm: :concurrently
+              add_index partition, :submission_id, algorithm: :concurrently
+              add_index partition, :student_id, algorithm: :concurrently
+              add_index partition, :grader_id, algorithm: :concurrently
+            end
+          end
+        end
+      RUBY
+      expect(cop.offenses.size).to eq 1
+    end
   end
 
   context "add_reference" do
