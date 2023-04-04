@@ -216,7 +216,7 @@ class Quizzes::TakeQuizPresenter
   def resolve_answers(dataset = submission_data)
     # get all the question status-entries and group them by the question id
     answers = dataset.keys.group_by do |k|
-      k =~ /question_(\d+)/ ? $1.to_i : :irrelevant
+      (k =~ /question_(\d+)/) ? $1.to_i : :irrelevant
     end
 
     # remove any non-question keys we've collected

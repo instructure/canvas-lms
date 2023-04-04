@@ -1438,7 +1438,7 @@ describe Lti::IMS::NamesAndRolesController do
   end
 
   def page_count(total_items, page_size)
-    (total_items / page_size) + (total_items % page_size > 0 ? 1 : 0)
+    (total_items / page_size) + ((total_items % page_size > 0) ? 1 : 0)
   end
 
   def response_links

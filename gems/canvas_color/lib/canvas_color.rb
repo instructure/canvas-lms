@@ -44,7 +44,7 @@ module CanvasColor
     attr_reader :r, :g, :b, :a
 
     # Table for conversion to hex
-    HEXVAL = (("0".."9").to_a).concat(("A".."F").to_a).freeze
+    HEXVAL = ("0".."9").to_a.concat(("A".."F").to_a).freeze
     # Default value for #darken, #lighten etc.
     BRIGHTNESS_DEFAULT = 0.2
 

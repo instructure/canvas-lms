@@ -113,7 +113,7 @@ describe "Pace Contexts API" do
           json = JSON.parse(response.body)
           course.course_sections.each do |section|
             context_json = json["pace_contexts"].detect { |pc| pc["item_id"] == section.id }
-            expected_pace_type = section.course_paces.count > 0 ? "Section" : "Course"
+            expected_pace_type = (section.course_paces.count > 0) ? "Section" : "Course"
             expect(context_json["applied_pace"]["type"]).to eq expected_pace_type
           end
         end

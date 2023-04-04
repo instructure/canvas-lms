@@ -356,7 +356,7 @@ module BasicLTI
         # than the ltitool before the tool finished pushing it. We've seen this need with NewQuizzes
         LtiResponse.ensure_score_update_possible(submission: existing_submission, prioritize_non_tool_grade: prioritize_non_tool_grade?) do
           if assignment.grading_type == "pass_fail" && (raw_score || new_score)
-            submission_hash[:grade] = ((raw_score || new_score) > 0 ? "pass" : "fail")
+            submission_hash[:grade] = (((raw_score || new_score) > 0) ? "pass" : "fail")
             submission_hash[:grader_id] = -tool.id
           elsif raw_score
             submission_hash[:grade] = raw_score

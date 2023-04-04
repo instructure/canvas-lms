@@ -583,7 +583,7 @@ class FoldersController < ApplicationController
         @attachment = @source_file.clone_for(@context, @attachment, force_copy: true)
         if @attachment.save
           # default to rename on race condition (if a file happened to be created after the check above, and on_duplicate was not given)
-          @attachment.handle_duplicates(on_duplicate == "overwrite" ? :overwrite : :rename, duplicate_options)
+          @attachment.handle_duplicates((on_duplicate == "overwrite") ? :overwrite : :rename, duplicate_options)
           render json: attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
         else
           render json: @attachment.errors

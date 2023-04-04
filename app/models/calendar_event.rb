@@ -541,7 +541,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def user
-    read_attribute(:user) || (context_type == "User" ? context : nil)
+    read_attribute(:user) || ((context_type == "User") ? context : nil)
   end
 
   def appointment_group?
@@ -557,7 +557,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def account
-    context_type == "Account" ? context : nil
+    (context_type == "Account") ? context : nil
   end
 
   class ReservationError < StandardError; end

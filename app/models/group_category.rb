@@ -430,7 +430,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def create_group_member_count=(num)
-    @create_group_member_count = num && num > 0 ? num : nil
+    @create_group_member_count = (num && num > 0) ? num : nil
   end
 
   def set_root_account_id

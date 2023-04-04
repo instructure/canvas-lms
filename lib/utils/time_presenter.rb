@@ -54,7 +54,7 @@ module Utils
     end
 
     def format
-      time.min == 0 ? :tiny_on_the_hour : :tiny
+      (time.min == 0) ? :tiny_on_the_hour : :tiny
     end
   end
 end

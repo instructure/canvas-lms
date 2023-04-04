@@ -98,7 +98,7 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
   def variance(respondent_ids = :all)
     @variance ||= {}
     @variance[respondent_ids] ||= begin
-      scores = (respondent_ids == :all ? @respondent_scores : @respondent_scores.slice(*respondent_ids)).values
+      scores = ((respondent_ids == :all) ? @respondent_scores : @respondent_scores.slice(*respondent_ids)).values
       SimpleStats.variance(scores)
     end
   end

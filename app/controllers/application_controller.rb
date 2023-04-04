@@ -676,7 +676,7 @@ class ApplicationController < ActionController::Base
   end
 
   def user_url(*opts)
-    opts[0] == @current_user ? user_profile_url(@current_user) : super
+    (opts[0] == @current_user) ? user_profile_url(@current_user) : super
   end
 
   protected
@@ -1913,7 +1913,7 @@ class ApplicationController < ActionController::Base
   # Retrieving wiki pages needs to search either using the id or
   # the page title.
   def get_wiki_page
-    GuardRail.activate(params[:action] == "edit" ? :primary : :secondary) do
+    GuardRail.activate((params[:action] == "edit") ? :primary : :secondary) do
       @wiki = @context.wiki
 
       @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
@@ -1937,7 +1937,7 @@ class ApplicationController < ActionController::Base
   end
 
   def content_tag_redirect(context, tag, error_redirect_symbol, tag_type = nil)
-    url_params = tag.tag_type == "context_module" ? { module_item_id: tag.id } : {}
+    url_params = (tag.tag_type == "context_module") ? { module_item_id: tag.id } : {}
     if tag.content_type == "Assignment"
       use_edit_url = params[:build].nil? &&
                      Account.site_admin.feature_enabled?(:new_quizzes_modules_support) &&

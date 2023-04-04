@@ -240,7 +240,7 @@ class GradebookUserIds
   end
 
   def sort_direction
-    @direction == "ascending" ? :asc : :desc
+    (@direction == "ascending") ? :asc : :desc
   end
 
   def grading_period_id

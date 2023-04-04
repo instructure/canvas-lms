@@ -173,7 +173,7 @@ describe "outcomes" do
     context "actions" do
       it "does not render an HTML-escaped title in outcome directory while editing", priority: "2" do
         title = "escape & me <<->> if you dare"
-        @context = who_to_login == "teacher" ? @course : account
+        @context = (who_to_login == "teacher") ? @course : account
         outcome_model
         get outcome_url
         wait_for_ajaximations

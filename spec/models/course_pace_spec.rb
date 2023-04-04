@@ -195,7 +195,7 @@ describe CoursePace do
 
   context "publish" do
     def fancy_midnight_rounded_to_last_second(date)
-      (CanvasTime.fancy_midnight(date.to_datetime).to_time).in_time_zone("UTC")
+      CanvasTime.fancy_midnight(date.to_datetime).to_time.in_time_zone("UTC")
     end
 
     before :once do
@@ -862,7 +862,7 @@ describe CoursePace do
 
     it "creates a course in a subaccount with its own calendar events and counts all the account calendar events" do
       allow(InstStatsd::Statsd).to receive(:count)
-      @subaccount1 = Account.find((@course.root_account.id)).sub_accounts.create!
+      @subaccount1 = Account.find(@course.root_account.id).sub_accounts.create!
       @subaccount1.enable_feature!(:course_paces)
       @course1 = course_factory(account: @subaccount1, active_all: true)
       @course1.enable_course_paces = true

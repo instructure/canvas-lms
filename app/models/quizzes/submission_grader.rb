@@ -134,7 +134,7 @@ module Quizzes
     private
 
     def versioned_submission(submission, attempt)
-      submission.attempt == attempt ? submission : submission.versions.sort_by(&:created_at).map(&:model).reverse.detect { |s| s.attempt == attempt }
+      (submission.attempt == attempt) ? submission : submission.versions.sort_by(&:created_at).map(&:model).reverse.detect { |s| s.attempt == attempt }
     end
 
     def kept_score_updating?(original_score, original_workflow_state)

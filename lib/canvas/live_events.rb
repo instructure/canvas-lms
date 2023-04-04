@@ -1087,7 +1087,7 @@ module Canvas::LiveEvents
 
   def self.blueprint_restrictions_updated_data(master_content_tag)
     lti_resource_link_id =
-      master_content_tag.content_type == "Assignment" ? master_content_tag.content.lti_resource_link_id : nil
+      (master_content_tag.content_type == "Assignment") ? master_content_tag.content.lti_resource_link_id : nil
 
     {
       canvas_assignment_id: master_content_tag.content_id,

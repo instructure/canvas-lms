@@ -306,7 +306,7 @@ class CommunicationChannelsController < ApplicationController
             @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
           end
         end
-        @merge_opportunities.sort_by! { |a| [a.first == @current_user ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
+        @merge_opportunities.sort_by! { |a| [(a.first == @current_user) ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
       else
         @merge_opportunities = []
       end
@@ -599,7 +599,7 @@ class CommunicationChannelsController < ApplicationController
   protected
 
   def account
-    @account ||= params[:account_id] == "self" ? @domain_root_account : Account.find(params[:account_id])
+    @account ||= (params[:account_id] == "self") ? @domain_root_account : Account.find(params[:account_id])
   end
 
   def bulk_action_args

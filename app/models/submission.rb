@@ -853,7 +853,7 @@ class Submission < ActiveRecord::Base
     return unless grants_right?(user, :view_turnitin_report)
 
     version_sub = if attempt.present?
-                    attempt.to_i == self.attempt ? self : versions.find { |v| v.model&.attempt == attempt.to_i }&.model
+                    (attempt.to_i == self.attempt) ? self : versions.find { |v| v.model&.attempt == attempt.to_i }&.model
                   end
     requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string) unless asset_string == self.asset_string
     scope = association(:originality_reports).loaded? ? versioned_originality_reports : originality_reports
@@ -1615,9 +1615,9 @@ class Submission < ActiveRecord::Base
   private :score_missing
 
   def score_late_or_none(late_policy, points_possible, grading_type)
-    raw_score = score_changed? || @regraded ? score : entered_score
+    raw_score = (score_changed? || @regraded) ? score : entered_score
     deducted = late_points_deducted(raw_score, late_policy, points_possible, grading_type)
-    new_score = raw_score && (deducted > raw_score ? [0.0, raw_score].min : raw_score - deducted)
+    new_score = raw_score && ((deducted > raw_score) ? [0.0, raw_score].min : raw_score - deducted)
     self.points_deducted = late? ? deducted : nil
     self.score = new_score
   end
@@ -2002,7 +2002,7 @@ class Submission < ActiveRecord::Base
     # one student from sneakily getting access to files in another user's comments,
     # since they're all being held on the assignment for now.
     attachments ||= []
-    old_ids = (Array(attachment_ids || "").join(",")).split(",").map(&:to_i)
+    old_ids = Array(attachment_ids || "").join(",").split(",").map(&:to_i)
     write_attribute(:attachment_ids, attachments.select { |a| (a && a.id && old_ids.include?(a.id)) || (a.recently_created? && a.context == assignment) || a.context != assignment }.map(&:id).join(","))
   end
 
@@ -2475,7 +2475,7 @@ class Submission < ActiveRecord::Base
   end
 
   def to_atom(opts = {})
-    author_name = assignment.present? && assignment.context.present? ? assignment.context.name : t("atom_no_author", "No Author")
+    author_name = (assignment.present? && assignment.context.present?) ? assignment.context.name : t("atom_no_author", "No Author")
     Atom::Entry.new do |entry|
       entry.title     = "#{user.name} -- #{assignment.title}#{", " + assignment.context.name if opts[:include_context]}"
       entry.updated   = updated_at
@@ -2810,7 +2810,7 @@ class Submission < ActiveRecord::Base
 
     filtered_assessments.sort_by do |a|
       [
-        a.assessment_type == "grading" ? CanvasSort::First : CanvasSort::Last,
+        (a.assessment_type == "grading") ? CanvasSort::First : CanvasSort::Last,
         Canvas::ICU.collation_key(a.assessor_name)
       ]
     end
@@ -2822,7 +2822,7 @@ class Submission < ActiveRecord::Base
     # If the requested attempt is 0, no attempt has actually been submitted.
     # The submission's attempt will be nil (not 0), so we do actually want to
     # find assessments with a nil artifact_attempt.
-    effective_attempt = attempt == 0 ? nil : attempt
+    effective_attempt = (attempt == 0) ? nil : attempt
 
     rubric_assessments.each_with_object([]) do |assessment, assessments_for_attempt|
       if assessment.artifact_attempt == effective_attempt
@@ -3100,6 +3100,6 @@ class Submission < ActiveRecord::Base
     InstStatsd::Statsd.gauge("submission.manually_graded.grading_time",
                              time,
                              Setting.get("submission_grading_timing_sample_rate", "1.0").to_f,
-                             tags: { quiz_type: submission_type == "online_quiz" ? "classic_quiz" : "new_quiz" })
+                             tags: { quiz_type: (submission_type == "online_quiz") ? "classic_quiz" : "new_quiz" })
   end
 end

@@ -543,7 +543,7 @@ module DataFixup::PopulateRootAccountIdOnModels
     return columns if columns.is_a?(String)
 
     names = Array(columns).map { |column| "#{assoc.klass.table_name}.#{column}" }
-    names.count == 1 ? names.first : "COALESCE(#{names.join(", ")})"
+    (names.count == 1) ? names.first : "COALESCE(#{names.join(", ")})"
   end
 
   def self.fill_cross_shard_associations(table, scope, reflection, column)

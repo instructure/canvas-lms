@@ -26,7 +26,7 @@ module GoogleDrive
       @document_id = @entry["id"]
       @preferred_extensions = preferred_extensions
       parent = @entry["parents"].empty? ? nil : @entry["parents"][0]
-      @folder = (parent.nil? || parent["isRoot"] ? nil : parent["id"])
+      @folder = ((parent.nil? || parent["isRoot"]) ? nil : parent["id"])
     end
 
     def alternate_url

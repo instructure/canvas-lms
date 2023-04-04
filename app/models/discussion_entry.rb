@@ -540,7 +540,7 @@ class DiscussionEntry < ActiveRecord::Base
       StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
       if entry_participant.present?
         discussion_topic.update_or_create_participant(
-          opts.merge(current_user: current_user, offset: (new_state == "unread" ? 1 : -1))
+          opts.merge(current_user: current_user, offset: ((new_state == "unread") ? 1 : -1))
         )
       end
       entry_participant

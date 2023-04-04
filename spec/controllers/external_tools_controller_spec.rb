@@ -1532,7 +1532,7 @@ describe ExternalToolsController do
 
       include_context "lti_1_3_spec_helper"
 
-      let(:tool_id) { response.status == 200 ? JSON.parse(response.body)["id"] : -1 }
+      let(:tool_id) { (response.status == 200) ? JSON.parse(response.body)["id"] : -1 }
       let(:tool_configuration) { Lti::ToolConfiguration.create! settings: settings, developer_key: developer_key }
       let(:developer_key) { DeveloperKey.create!(account: account) }
       let_once(:user) { account_admin_user(account: account) }

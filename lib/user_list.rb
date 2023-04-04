@@ -271,10 +271,10 @@ class UserList
       number = sms[:address].gsub(/[^\d\w]/, "")
       sms[:address] = "(#{number[0, 3]}) #{number[3, 3]}-#{number[6, 4]}"
     end
-    sms_account_ids = @search_method == :closed ? all_account_ids : [@root_account]
+    sms_account_ids = (@search_method == :closed) ? all_account_ids : [@root_account]
     unless smses.empty?
       Shard.partition_by_shard(sms_account_ids) do |account_ids|
-        sms_scope = @search_method == :closed ? Pseudonym.where(account_id: account_ids) : Pseudonym
+        sms_scope = (@search_method == :closed) ? Pseudonym.where(account_id: account_ids) : Pseudonym
         sms_scope.active
                  .select("path AS address, users.name AS name, communication_channels.user_id AS user_id")
                  .joins(user: :communication_channels)
@@ -309,12 +309,12 @@ class UserList
       address.delete :id
       # Only allow addresses that we found a user, or that we can implicitly create the user
       if address[:user_id].present?
-        (@addresses.find { |a| a[:user_id] == address[:user_id] && a[:shard] == address[:shard] } ? @duplicate_addresses : @addresses) << address
+        ((@addresses.find { |a| a[:user_id] == address[:user_id] && a[:shard] == address[:shard] }) ? @duplicate_addresses : @addresses) << address
       elsif address[:type] == :email && @search_method == :open
-        (@addresses.find { |a| a[:address].casecmp?(address[:address]) } ? @duplicate_addresses : @addresses) << address
+        ((@addresses.find { |a| a[:address].casecmp?(address[:address]) }) ? @duplicate_addresses : @addresses) << address
       elsif @search_method == :preferred && (address[:details] == :non_unique || address[:type] == :email)
         address.delete :user_id
-        (@addresses.find { |a| a[:address].casecmp?(address[:address]) } ? @duplicate_addresses : @addresses) << address
+        ((@addresses.find { |a| a[:address].casecmp?(address[:address]) }) ? @duplicate_addresses : @addresses) << address
       else
         @errors << { address: address[:address], type: address[:type], details: (address[:details] || :not_found) }
       end

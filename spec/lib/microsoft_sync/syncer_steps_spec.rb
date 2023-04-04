@@ -198,7 +198,7 @@ describe MicrosoftSync::SyncerSteps do
         MicrosoftSync::SyncerSteps::MaxMemberEnrollmentsReached
       end
     end
-    let(:max_default) { owners_or_members == "owners" ? 100 : 25_000 }
+    let(:max_default) { (owners_or_members == "owners") ? 100 : 25_000 }
     let(:err_msg) do
       "Microsoft 365 allows a maximum of #{(max || max_default).to_s(:delimited)} " \
         "#{owners_or_members} in a team."

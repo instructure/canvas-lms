@@ -87,7 +87,7 @@ module ApplicationHelper
   end
 
   def count_if_any(count = nil)
-    count && count > 0 ? "(#{count})" : ""
+    (count && count > 0) ? "(#{count})" : ""
   end
 
   # Used to generate context_specific urls, as in:
@@ -621,7 +621,7 @@ module ApplicationHelper
         folders_as_options(child_folders, opts.merge({ depth: opts[:depth] + 1 }))
       end
     end
-    opts[:depth] == 0 ? raw(opts[:options_so_far].join("\n")) : nil
+    (opts[:depth] == 0) ? raw(opts[:options_so_far].join("\n")) : nil
   end
 
   # this little helper just allows you to do <% ot(...) %> and have it output the same as <%= t(...) %>. The upside though, is you can interpolate whole blocks of HTML, like:

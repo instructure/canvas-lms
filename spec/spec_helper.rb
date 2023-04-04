@@ -251,7 +251,7 @@ module ReadOnlySecondaryStub
 
   def switch_role!(env)
     if readonly_user_exists? && readonly_user_can_read?
-      ActiveRecord::Base.connection.execute(env == :secondary ? "SET ROLE canvas_readonly_user" : "RESET ROLE")
+      ActiveRecord::Base.connection.execute((env == :secondary) ? "SET ROLE canvas_readonly_user" : "RESET ROLE")
     else
       puts "The database #{test_db_name} is not setup with a secondary/readonly_user to fix run the following."
       puts "psql -c 'ALTER USER #{datbase_username} CREATEDB CREATEROLE' -d #{test_db_name}"

@@ -129,7 +129,7 @@ module Qti
             max = -1 if /unlimited/i.match?(max)
             max = max.to_i
             # -1 means no limit in instructure, 0 means no limit in QTI
-            @quiz[:allowed_attempts] = max >= 1 ? max : -1
+            @quiz[:allowed_attempts] = (max >= 1) ? max : -1
           end
           if (show = control["showSolution"])
             @quiz[:show_correct_answers] = show.casecmp?("true")
@@ -194,7 +194,7 @@ module Qti
         if (val = get_bool_val(section, "sourcebank_is_external"))
           group[:question_bank_is_external] = val
         end
-        group[:migration_id] = section["identifier"] && section["identifier"] != "" ? section["identifier"] : unique_local_id
+        group[:migration_id] = (section["identifier"] && section["identifier"] != "") ? section["identifier"] : unique_local_id
         questions_list = group[:questions]
       end
       if section["visible"] && section["visible"] =~ /true/i && (title = section["title"])

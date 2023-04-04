@@ -275,7 +275,7 @@ module Calendar2Common
     @date = @user.time_zone.now.beginning_of_day
     new_date = @date
     new_date =
-      new_date.to_date.mday == "15" ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
+      (new_date.to_date.mday == "15") ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
     create_timed_calendar_event(new_date, start_time, end_time)
     event_title_on_calendar.click
     expect(
@@ -302,7 +302,7 @@ module Calendar2Common
     @date = @user.time_zone.now.beginning_of_day
     new_date = @date
     new_date =
-      new_date.to_date.mday == "15" ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
+      (new_date.to_date.mday == "15") ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
     input_timed_calendar_event_fields(new_date, start_time, end_time)
     expect_new_page_load { edit_calendar_event_form_more_options.click }
     expect(more_options_date_field.property("value")).to eq(

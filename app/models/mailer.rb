@@ -40,8 +40,8 @@ class Mailer < ActionMailer::Base
     mail(params) do |format|
       [:body, :html_body].each do |attr|
         if m.send(attr)
-          body = m.send(attr).bytesize > Message.maximum_text_length ? Message.unavailable_message : m.send(attr)
-          attr == :body ? format.text { render plain: body } : format.html { render plain: body }
+          body = (m.send(attr).bytesize > Message.maximum_text_length) ? Message.unavailable_message : m.send(attr)
+          (attr == :body) ? format.text { render plain: body } : format.html { render plain: body }
         end
       end
     end

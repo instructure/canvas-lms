@@ -67,7 +67,7 @@ class ContentParticipationCount < ActiveRecord::Base
       unread_count = participant.unread_count(refresh: false) + offset.to_i
     end
 
-    participant.unread_count = unread_count > 0 ? unread_count : 0
+    participant.unread_count = (unread_count > 0) ? unread_count : 0
   end
   private_class_method :set_unread_count
 

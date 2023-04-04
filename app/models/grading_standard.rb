@@ -127,7 +127,7 @@ class GradingStandard < ActiveRecord::Base
     # assign the highest grade whose min cutoff is less than the score
     # if score is less than all scheme cutoffs, assign the lowest grade
     score = BigDecimal(score.to_s) # Cast this to a BigDecimal too or comparisons get wonky
-    ordered_scheme.max_by { |_, lower_bound| score >= lower_bound * 100.0.to_d ? lower_bound : -lower_bound }[0]
+    ordered_scheme.max_by { |_, lower_bound| (score >= lower_bound * 100.0.to_d) ? lower_bound : -lower_bound }[0]
   end
 
   def data=(new_val)

@@ -1289,7 +1289,7 @@ class GradebooksController < ApplicationController
   def requested_gradebook_view
     return nil if params[:view].blank?
 
-    params[:view] == "learning_mastery" ? "learning_mastery" : "gradebook"
+    (params[:view] == "learning_mastery") ? "learning_mastery" : "gradebook"
   end
 
   def preferred_gradebook_view

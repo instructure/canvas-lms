@@ -167,7 +167,7 @@ class MessageableUser < User
       sharded_ids.each do |id|
         # a context id of 0 indicates admin visibility without an actual shared
         # context; don't "globalize" it
-        global_id = id == 0 ? id : Shard.global_id_for(id)
+        global_id = (id == 0) ? id : Shard.global_id_for(id)
         id = global_id unless Shard.current == target_shard
         local_common_contexts[id] = common_contexts[global_id]
       end

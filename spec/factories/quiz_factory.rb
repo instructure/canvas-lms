@@ -474,7 +474,7 @@ module Factories
   end
 
   def question_data(reset = false, data = {})
-    @qdc = reset || !@qdc ? 1 : @qdc + 1
+    @qdc = (reset || !@qdc) ? 1 : @qdc + 1
     {
       :name => "question #{@qdc}", :points_possible => 1, "question_type" => "multiple_choice_question", "answers" =>
       [{ "answer_text" => "1", "answer_weight" => "100" }, { "answer_text" => "2" }, { "answer_text" => "3" }, { "answer_text" => "4" }]

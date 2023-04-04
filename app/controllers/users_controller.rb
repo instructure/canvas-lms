@@ -1327,7 +1327,7 @@ class UsersController < ApplicationController
 
       @context ||= @user
 
-      add_crumb(t("crumbs.profile", "%{user}'s profile", user: @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user))
+      add_crumb(t("crumbs.profile", "%{user}'s profile", user: @user.short_name), (@user == @current_user) ? user_profile_path(@current_user) : user_path(@user))
 
       @group_memberships = @user.cached_current_group_memberships_by_date
 
@@ -2152,14 +2152,14 @@ class UsersController < ApplicationController
         next if p.active? && event == "unsuspend"
         next if p.suspended? && event == "suspend"
 
-        p.update!(workflow_state: event == "suspend" ? "suspended" : "active")
+        p.update!(workflow_state: (event == "suspend") ? "suspended" : "active")
       end
     end
 
     respond_to do |format|
       if @user.update(user_params)
         if admin_avatar_update
-          avatar_state = old_avatar_state == :locked ? old_avatar_state : "approved"
+          avatar_state = (old_avatar_state == :locked) ? old_avatar_state : "approved"
           @user.avatar_state = user_params[:avatar_image][:state] || avatar_state
         end
         @user.profile.save if @user.profile.changed?
@@ -2879,7 +2879,7 @@ class UsersController < ApplicationController
   def generate_grading_period_id(period_id)
     # nil and '' will get converted to 0 in the .to_i call
     id = period_id.to_i
-    id == 0 ? nil : id
+    (id == 0) ? nil : id
   end
 
   def render_new_user_tutorial_statuses(user)

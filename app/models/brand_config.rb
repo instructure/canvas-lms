@@ -126,7 +126,7 @@ class BrandConfig < ActiveRecord::Base
   def clone_with_new_parent(new_parent)
     attrs = attributes.with_indifferent_access.slice(*BrandConfig::ATTRS_TO_INCLUDE_IN_MD5)
     attrs[:parent_md5] = if new_parent
-                           new_parent.shard.id == shard.id ? new_parent.md5 : "#{new_parent.shard.id}~#{new_parent.md5}"
+                           (new_parent.shard.id == shard.id) ? new_parent.md5 : "#{new_parent.shard.id}~#{new_parent.md5}"
                          else
                            nil
                          end

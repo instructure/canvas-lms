@@ -115,7 +115,7 @@ module HtmlTextHelper
                    rescue URI::Error
                      # do nothing, let href pass through as is
                    end
-                   href == subtext ? subtext : "[#{subtext}] (#{href})"
+                   (href == subtext) ? subtext : "[#{subtext}] (#{href})"
                  end
                else
                  subtext
@@ -157,7 +157,7 @@ module HtmlTextHelper
     line_width = options.fetch(:line_width, 80)
 
     text.split("\n").collect do |line|
-      line.length > line_width ? line.gsub(/(.{1,#{line_width}})(\s+|$)/, "\\1\n").strip : line
+      (line.length > line_width) ? line.gsub(/(.{1,#{line_width}})(\s+|$)/, "\\1\n").strip : line
     end * "\n"
   end
 

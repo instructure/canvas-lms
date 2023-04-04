@@ -1314,7 +1314,7 @@ describe LearningOutcome do
             context: account,
             title: "outcome_#{i}",
             calculation_method: "highest",
-            workflow_state: i == 0 ? "deleted" : "active"
+            workflow_state: (i == 0) ? "deleted" : "active"
           )
         end
         outcome_ids = account.created_learning_outcomes.pluck(:id)

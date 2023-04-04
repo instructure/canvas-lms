@@ -35,8 +35,8 @@ module SIS
         messages = []
         count = SIS::CourseImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv, index, count) do |row|
-            start_date = (row.key? "start_date") ? nil : "not_present"
-            end_date = (row.key? "end_date") ? nil : "not_present"
+            start_date = row.key?("start_date") ? nil : "not_present"
+            end_date = row.key?("end_date") ? nil : "not_present"
             begin
               start_date = Time.zone.parse(row["start_date"]) if row["start_date"].present?
               end_date = Time.zone.parse(row["end_date"]) if row["end_date"].present?
@@ -56,7 +56,7 @@ module SIS
         end
         errors = []
         messages.each do |message|
-          errors << ((message.is_a? SisBatchError) ? message : SisBatch.build_error(csv, message, sis_batch: @batch))
+          errors << (message.is_a?(SisBatchError) ? message : SisBatch.build_error(csv, message, sis_batch: @batch))
         end
         SisBatch.bulk_insert_sis_errors(errors)
         count

@@ -89,7 +89,7 @@ class DockerfileWriter
 
       path.sub("/usr/src/app/", "")
     end
-    paths.sort_by { |path| [path[0] == "/" ? 1 : 0, path] }
+    paths.sort_by { |path| [(path[0] == "/") ? 1 : 0, path] }
   end
 
   def docker_compose_config

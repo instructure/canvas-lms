@@ -88,8 +88,8 @@ module SpecTimeLimit
 
     def commit_files
       @commit_files ||=
-        (`git diff-tree --no-commit-id --name-only -r HEAD | grep -E '_spec\.rb$'`
-        ).split("\n")
+        `git diff-tree --no-commit-id --name-only -r HEAD | grep -E '_spec\.rb$'`
+        .split("\n")
     end
   end
 end

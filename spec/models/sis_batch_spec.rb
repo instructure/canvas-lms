@@ -240,7 +240,7 @@ describe SisBatch do
         # a boolean.
         allow_any_instance_of(SIS::CSV::ImportRefactored).to receive(:should_stop_import?) do
           v = response_values.shift
-          v == :raise ? raise("PC_LOAD_LETTER") : v
+          (v == :raise) ? raise("PC_LOAD_LETTER") : v
         end
       end
 

@@ -29,7 +29,7 @@ class Quizzes::QuizQuestion::MultipleChoiceQuestion < Quizzes::QuizQuestion::Bas
     return 0 unless answer
 
     user_answer.answer_id = answer[:id] || answer[:answer_id]
-    answer[:weight] == 100 ? 1 : 0
+    (answer[:weight] == 100) ? 1 : 0
   end
 end
 

@@ -104,7 +104,7 @@ module SIS
         group.name = name if name.present? && !group.stuck_sis_fields.include?(:name)
         group.context = context
         group.sis_batch_id = @batch.id
-        group.workflow_state = status == "deleted" ? "deleted" : "available"
+        group.workflow_state = (status == "deleted") ? "deleted" : "available"
 
         if group.save
           data = SisBatchRollBackData.build_data(sis_batch: @batch, context: group)

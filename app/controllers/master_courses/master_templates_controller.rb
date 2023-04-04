@@ -497,7 +497,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                      end
 
         remaining_count = max_records - items.size
-        condition = klass == "ContentTag" ? "#{ContentTag.quoted_table_name}.updated_at>?" : "updated_at>?"
+        condition = (klass == "ContentTag") ? "#{ContentTag.quoted_table_name}.updated_at>?" : "updated_at>?"
         items += item_scope.where(condition, cutoff_time).order(:id).limit(remaining_count).to_a
         break if items.size >= max_records
       end

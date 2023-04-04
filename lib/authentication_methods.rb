@@ -104,7 +104,7 @@ module AuthenticationMethods
     return unless @access_token
 
     developer_key = @access_token.developer_key
-    request_method = request.method.casecmp("HEAD") == 0 ? "GET" : request.method.upcase
+    request_method = (request.method.casecmp("HEAD") == 0) ? "GET" : request.method.upcase
 
     if developer_key.try(:require_scopes)
       scope_patterns = @access_token.url_scopes_for_method(request_method).concat(AccessToken.always_allowed_scopes)

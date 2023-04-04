@@ -366,7 +366,7 @@ class ConferencesController < ApplicationController
           end
           user_ids = member_ids
           @conference.add_initiator(@current_user)
-          user_ids.count > WebConference.max_invitees_sync_size ? @conference.delay.invite_users_from_context(user_ids) : @conference.invite_users_from_context(user_ids)
+          (user_ids.count > WebConference.max_invitees_sync_size) ? @conference.delay.invite_users_from_context(user_ids) : @conference.invite_users_from_context(user_ids)
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json do

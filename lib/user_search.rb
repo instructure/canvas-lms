@@ -82,7 +82,7 @@ module UserSearch
       when "last_login"
         users_scope.select("users.*").order(Arel.sql("last_login#{order}"))
       when "username"
-        users_scope.select("users.*").order_by_sortable_name(direction: options[:order] == "desc" ? :descending : :ascending)
+        users_scope.select("users.*").order_by_sortable_name(direction: (options[:order] == "desc") ? :descending : :ascending)
       when "email"
         users_scope = users_scope.select("users.*, (SELECT path FROM #{CommunicationChannel.quoted_table_name}
                           WHERE communication_channels.user_id = users.id AND
@@ -93,7 +93,7 @@ module UserSearch
                           AS email")
         users_scope.order(Arel.sql("email#{order}"))
       when "sis_id", "integration_id"
-        column = options[:sort] == "sis_id" ? "sis_user_id" : "integration_id"
+        column = (options[:sort] == "sis_id") ? "sis_user_id" : "integration_id"
         users_scope = users_scope.select(User.send(:sanitize_sql, [
                                                      "users.*, (SELECT #{column} FROM #{Pseudonym.quoted_table_name}
           WHERE pseudonyms.user_id = users.id AND

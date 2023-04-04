@@ -2609,12 +2609,12 @@ describe Submission do
           OriginalityReport.create!(attachment: attachment,
                                     submission: submission,
                                     workflow_state: preferred_state,
-                                    originality_score: preferred_state == "scored" ? 1 : nil)
+                                    originality_score: (preferred_state == "scored") ? 1 : nil)
         end
         let(:other_report) do
           OriginalityReport.create!(attachment: attachment,
                                     submission: submission, workflow_state: other_state,
-                                    originality_score: other_state == "scored" ? 2 : nil)
+                                    originality_score: (other_state == "scored") ? 2 : nil)
         end
 
         before do
@@ -3013,14 +3013,14 @@ describe Submission do
           let(:preferred_report) do
             OriginalityReport.create!(attachment: attachment,
                                       submission: submission,
-                                      originality_score: preferred_state == "scored" ? 1 : nil,
+                                      originality_score: (preferred_state == "scored") ? 1 : nil,
                                       workflow_state: preferred_state,
                                       originality_report_url: preferred_url)
           end
           let(:other_report) do
             OriginalityReport.create!(attachment: attachment,
                                       submission: submission,
-                                      originality_score: other_state == "scored" ? 2 : nil,
+                                      originality_score: (other_state == "scored") ? 2 : nil,
                                       workflow_state: other_state,
                                       originality_report_url: other_url)
           end

@@ -279,7 +279,7 @@ module CC
                 meta_field(meta_node, "qmd_scoretype", "Percentage")
               end
               meta_field(meta_node, "qmd_timelimit", quiz.time_limit) if quiz.time_limit
-              allowed = quiz.allowed_attempts == -1 ? "unlimited" : quiz.allowed_attempts
+              allowed = (quiz.allowed_attempts == -1) ? "unlimited" : quiz.allowed_attempts
               meta_field(meta_node, "cc_maxattempts", allowed)
             end # meta_node
 

@@ -30,7 +30,7 @@ class CommunicationChannel
       @account, @pattern, @path_type, @with_invalid_paths = account, pattern, path_type, with_invalid_paths
       @after = Time.zone.parse(after) if after
       @before = Time.zone.parse(before) if before
-      @order = order&.downcase == "desc" ? :desc : :asc
+      @order = (order&.downcase == "desc") ? :desc : :asc
     end
 
     def matching_channels(for_report: false)

@@ -126,8 +126,8 @@ describe CoursePacesController, type: :controller do
       expect(response).to be_successful
       expect(assigns[:js_bundles].flatten).to include(:course_paces)
       js_env = controller.js_env
-      expect(js_env[:BLACKOUT_DATES]).to eq((@course.blackout_dates).as_json(include_root: false))
-      expect(js_env[:CALENDAR_EVENT_BLACKOUT_DATES]).to eq((@calendar_event_blackout_dates).as_json(include_root: false))
+      expect(js_env[:BLACKOUT_DATES]).to eq(@course.blackout_dates.as_json(include_root: false))
+      expect(js_env[:CALENDAR_EVENT_BLACKOUT_DATES]).to eq(@calendar_event_blackout_dates.as_json(include_root: false))
       expect(js_env[:COURSE]).to match(hash_including({
                                                         id: @course.id,
                                                         name: @course.name,

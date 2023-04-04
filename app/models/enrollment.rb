@@ -900,7 +900,7 @@ class Enrollment < ActiveRecord::Base
   def can_be_concluded_by(user, context, session)
     can_remove = [StudentEnrollment].include?(self.class) &&
                  context.grants_right?(user, session, :manage_students) &&
-                 context.id == ((context.is_a? Course) ? course_id : course_section_id)
+                 context.id == (context.is_a?(Course) ? course_id : course_section_id)
     can_remove || context.grants_right?(user, session, manage_admin_users_perm)
   end
 

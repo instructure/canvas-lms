@@ -74,7 +74,7 @@ module BasicLTI
         last = attempt.last
         first = attempt.first
         last[:submitted_at] = first[:submitted_at]
-        last[:score].blank? && last[:workflow_state] != "graded" ? nil : last
+        (last[:score].blank? && last[:workflow_state] != "graded") ? nil : last
       end
       @_grade_history = attempts.compact
     end
