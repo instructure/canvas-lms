@@ -205,7 +205,7 @@ module Importers
 
         item.body = description
         allow_save = false if description.blank?
-      elsif hash[:page_type] == "module_toc"
+      # elsif hash[:page_type] == "module_toc"
       elsif hash[:topics]
         item.title = t("title_for_topics_category", "%{category} Topics", category: hash[:category_name])
         description = (hash[:category_description]).to_s

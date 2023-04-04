@@ -24,9 +24,9 @@ module I18n
         data = ::CSV.read(filename, headers: true)
         csv_locales = data.headers - ["key"]
         basename = File.basename(filename, ".*")
-        locale_data = csv_locales.to_h do |locale|
-          [locale, { basename =>
-              data.to_h { |row| [row["key"].to_sym, row[locale]] } }]
+        locale_data = csv_locales.index_with do |locale|
+          { basename =>
+              data.to_h { |row| [row["key"].to_sym, row[locale]] } }
         end
         [locale_data, false]
       end

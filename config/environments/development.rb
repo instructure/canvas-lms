@@ -21,7 +21,7 @@ class HostUrlContainer
   mattr_accessor :host_url
   def self.===(host)
     # rubocop:disable Style/CaseEquality
-    host_url.===(host)
+    host_url === (host)
     # rubocop:enable Style/CaseEquality
   end
 end

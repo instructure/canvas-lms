@@ -56,7 +56,7 @@ module MicrosoftSync
     STATSD_NAME = "microsoft_sync.syncer_steps"
     STATSD_NAME_SKIPPED_BATCHES = "#{STATSD_NAME}.skipped_batches"
     STATSD_NAME_SKIPPED_TOTAL = "#{STATSD_NAME}.skipped_total"
-    STATSD_NAME_DELETED_MAPPINGS_FOR_MISSING_USERS = \
+    STATSD_NAME_DELETED_MAPPINGS_FOR_MISSING_USERS =
       "#{STATSD_NAME}.deleted_mappings_for_missing_users"
 
     # Can happen when User disables sync on account-level when jobs are running:

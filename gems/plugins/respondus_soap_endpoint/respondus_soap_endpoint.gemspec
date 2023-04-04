@@ -12,7 +12,6 @@ Gem::Specification.new do |s|
   s.summary     = "SOAP Endpoint for Respondus QTI uploads"
 
   s.files = Dir["{app,config,db,lib}/**/*"]
-  s.test_files = Dir["spec_canvas/**/*"]
 
   s.add_dependency "rails",             ">= 3.2"
   s.add_dependency "soap4r-middleware", "0.8.7"

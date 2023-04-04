@@ -21,7 +21,6 @@ require_relative "./shared_constants"
 require_relative "./shared_linter_examples"
 # pp required for to make fakefs happy, see:
 # github.com/fakefs/fakefs#fakefs-----typeerror-superclass-mismatch-for-class-file
-require "pp"
 require "fakefs/safe"
 require "timecop"
 

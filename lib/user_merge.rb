@@ -458,9 +458,9 @@ class UserMerge
       target_cc.destroy_permanently!
       if from_user.shard != target_user.shard
         User.clone_communication_channel(source_cc, target_user, max_position)
+      # elsif (to_retire = source_cc) # rubocop:disable Layout/CommentIndentation
+        # retired, retired
       end
-    elsif (to_retire = source_cc)
-      # retired, retired
     end
     to_retire
   end

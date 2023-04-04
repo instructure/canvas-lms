@@ -458,9 +458,9 @@ class DiscussionTopicsController < ApplicationController
       end
 
       InstStatsd::Statsd.increment("discussion_topic.index.visit")
-      InstStatsd::Statsd.count("discussion_topic.index.visit.pinned", @topics&.select { |dt| dt.pinned }&.count)
+      InstStatsd::Statsd.count("discussion_topic.index.visit.pinned", @topics&.select(&:pinned)&.count)
       InstStatsd::Statsd.count("discussion_topic.index.visit.discussions", @topics&.length)
-      InstStatsd::Statsd.count("discussion_topic.index.visit.closed_for_comments", @topics&.select { |dt| dt.locked }&.count)
+      InstStatsd::Statsd.count("discussion_topic.index.visit.closed_for_comments", @topics&.select(&:locked)&.count)
 
       format.json do
         log_api_asset_access(["topics", @context], "topics", "other")

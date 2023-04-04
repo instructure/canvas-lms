@@ -34,7 +34,7 @@ module RollupScoreAggregatorHelper
   private
 
   def present_scores
-    score_sets.pluck(:score).reject(&:nil?)
+    score_sets.pluck(:score).compact
   end
 
   def latest_result
