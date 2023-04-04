@@ -49,6 +49,7 @@ import checkNode from '../node-checker'
 import formatMessage from '../../../../format-message'
 import {clearIndicators} from '../utils/indicate'
 import {getTrayHeight} from '../../shared/trayUtils'
+import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 
 // safari still doesn't support the standard api
 const FS_CHANGEEVENT = document.exitFullscreen ? 'fullscreenchange' : 'webkitfullscreenchange'
@@ -489,6 +490,7 @@ export default class Checker extends React.Component {
       case !!f.options:
         return (
           <SimpleSelect
+            mountNode={instuiPopupMountNode}
             disabled={disabled}
             onChange={(e, option) => {
               this.updateFormState({
