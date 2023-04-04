@@ -5048,7 +5048,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             id="gradebook-student-search"
             style={{
               flex: 1,
-              paddingRight: '12px',
+              paddingInlineEnd: '12px',
             }}
           >
             <MultiSelectSearchInput
