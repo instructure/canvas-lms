@@ -2372,7 +2372,7 @@ describe ExternalToolsController do
         expect(response).to be_successful
 
         expect(url.path).to eq("#{course_external_tools_path(@course)}/#{tool.id}")
-        expect(url.query).to match(/^display=borderless&session_token=[0-9a-zA-Z_\-]+$/)
+        expect(url.query).to match(/^display=borderless&session_token=[0-9a-zA-Z_-]+$/)
         expect(session_token.pseudonym_id).to eq(login_pseudonym.global_id)
       end
 

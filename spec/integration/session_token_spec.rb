@@ -31,7 +31,7 @@ describe "session token", type: :request do
         params: { access_token: access_token }
     expect(response).to be_successful
     json = JSON.parse(response.body)
-    expect(json["session_url"]).to match %r{^https://www.example.com/courses\?session_token=[0-9a-zA-Z_\-]+$}
+    expect(json["session_url"]).to match %r{^https://www.example.com/courses\?session_token=[0-9a-zA-Z_-]+$}
 
     get json["session_url"]
     expect(response).to be_redirect
