@@ -61,7 +61,7 @@ describe "viewing a quiz with variable due dates on the quiz show page" do
     end
 
     it "shows the availability dates for Section B", priority: "2" do
-      validate_quiz_show_page("Available #{format_time_for_view(@unlock_at_b)} "\
+      validate_quiz_show_page("Available #{format_time_for_view(@unlock_at_b)} " \
                               "- #{format_time_for_view(@lock_at_b)}")
     end
 

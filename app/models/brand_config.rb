@@ -31,8 +31,8 @@ class BrandConfig < ActiveRecord::Base
 
   before_validation :generate_md5
   before_update do
-    raise "BrandConfigs are a key-value mapping of config variables and an md5 digest "\
-          "of those variables, so they are immutable. You do not update them, you just "\
+    raise "BrandConfigs are a key-value mapping of config variables and an md5 digest " \
+          "of those variables, so they are immutable. You do not update them, you just " \
           "save a new one and it will generate the new md5 for you"
   end
 

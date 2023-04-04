@@ -539,8 +539,8 @@ describe "accounts/settings" do
 
     def expect_threshold_to_be(value)
       expect(response).to have_tag(
-        "select#account_settings_smart_alerts_threshold" \
-        "  option[value=\"#{value}\"][selected]"
+        "select#account_settings_smart_alerts_threshold  " \
+        "option[value=\"#{value}\"][selected]"
       )
     end
 

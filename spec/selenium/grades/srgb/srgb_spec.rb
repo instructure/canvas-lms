@@ -198,7 +198,7 @@ describe "Screenreader Gradebook" do
   end
 
   it "displays/removes warning message for resubmitted assignments", priority: "1" do
-    skip "Skipped because this spec fails if not run in foreground\n"\
+    skip "Skipped because this spec fails if not run in foreground\n" \
          "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     assignment = basic_percent_setup
     user_session @students[0]
@@ -221,7 +221,7 @@ describe "Screenreader Gradebook" do
   end
 
   it "grades match default gradebook grades", priority: "1" do
-    skip "Skipped because this spec fails if not run in foreground\n"\
+    skip "Skipped because this spec fails if not run in foreground\n" \
          "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     a1 = basic_percent_setup
     a2 = @course.assignments.create!(

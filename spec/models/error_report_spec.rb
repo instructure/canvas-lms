@@ -102,7 +102,7 @@ describe ErrorReport do
     report.assign_data(Canvas::Errors::Info.useful_http_env_stuff_from_request(req))
     expect(report.data["QUERY_STRING"]).to eq "?access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
 
-    expected_uri = "https://www.instructure.example.com?"\
+    expected_uri = "https://www.instructure.example.com?" \
                    "access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
     expect(report.data["REQUEST_URI"]).to eq(expected_uri)
     expect(report.data["path_parameters"]).to eq({ api_key: "[FILTERED]" }.inspect)

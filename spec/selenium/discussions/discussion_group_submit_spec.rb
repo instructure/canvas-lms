@@ -63,9 +63,9 @@ describe "discussion assignments" do
 
     it "creates a group discussion ungraded", priority: "1" do
       expect_new_page_load { submit_form(".form-actions") }
-      expect(f("#discussion_container").text).to include("Since this is a group discussion,"\
-                                                         " each group has its own conversation for this topic."\
-                                                         " Here are the ones you have access to:\nsome group")
+      expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
+                                                         "each group has its own conversation for this topic. " \
+                                                         "Here are the ones you have access to:\nsome group")
     end
 
     it "creates a group discussion graded", priority: "1" do
@@ -74,9 +74,9 @@ describe "discussion assignments" do
       click_option("#assignment_group_id", "Assignment Group")
       expect_new_page_load { submit_form(".form-actions") }
       expect(f("#discussion_container").text).to include("This is a graded discussion: 10 points possible")
-      expect(f("#discussion_container").text).to include("Since this is a group discussion,"\
-                                                         " each group has its own conversation for this topic."\
-                                                         " Here are the ones you have access to:\nsome group")
+      expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
+                                                         "each group has its own conversation for this topic. " \
+                                                         "Here are the ones you have access to:\nsome group")
     end
   end
 

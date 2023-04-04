@@ -250,8 +250,8 @@ describe OriginalityReport do
 
     it "creates an LTI launch URL if a lti_link is present" do
       report.update(lti_link: lti_link)
-      expected_url = "/courses/"\
-                     "#{submission.assignment.course.id}/assignments/"\
+      expected_url = "/courses/" \
+                     "#{submission.assignment.course.id}/assignments/" \
                      "#{submission.assignment.id}/lti/resource/#{lti_link.resource_link_id}?display=borderless"
       expect(report.report_launch_path).to eq expected_url
     end

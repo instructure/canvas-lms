@@ -270,14 +270,14 @@ module SIS
       def fail_with_error!(e, csv: nil)
         return @batch if @batch.workflow_state == "aborted"
 
-        message = "Importing CSV for account: "\
+        message = "Importing CSV for account: " \
                   "#{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e}"
         err_id = Canvas::Errors.capture(e, {
                                           type: :sis_import,
                                           message: message,
                                           during_tests: false
                                         })[:error_report]
-        error_message = I18n.t("Error while importing CSV. Please contact support. "\
+        error_message = I18n.t("Error while importing CSV. Please contact support. " \
                                "(Error report %{number})", number: err_id.to_s)
         @batch.shard.activate do
           SisBatch.add_error(csv, error_message, sis_batch: @batch, failure: true, backtrace: e.try(:backtrace))

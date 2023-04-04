@@ -25,8 +25,8 @@ module CanvasErrors
     let(:job) do
       double(
         id: 42,
-        source: "controller:discussion_topics_api,action:add_entry,"\
-                "hostname:app010001063068-vpc.us-east-1.canvas.insops.net,"\
+        source: "controller:discussion_topics_api,action:add_entry," \
+                "hostname:app010001063068-vpc.us-east-1.canvas.insops.net," \
                 "pid:8949,context_id:c5ec694d-1c0d-4744-a97a-cae44c477837",
         attempts: 1,
         strand: "thing",

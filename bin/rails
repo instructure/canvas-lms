@@ -11,6 +11,6 @@ end
 require 'pathname'
 expanded_path = Pathname.new(__FILE__).realpath
 
-APP_PATH = File.expand_path('../../config/application',  expanded_path)
+APP_PATH = File.expand_path('../../config/application', expanded_path)
 require_relative '../config/boot'
 require 'rails/commands'

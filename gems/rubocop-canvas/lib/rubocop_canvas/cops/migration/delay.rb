@@ -23,9 +23,9 @@ module RuboCop
       class Delay < Cop
         include RuboCop::Canvas::MigrationTags
 
-        PREDEPLOY_MSG = "`delay` cannot be used in a"\
-                        " predeploy migration, since job servers won't"\
-                        " have the new code yet"
+        PREDEPLOY_MSG = "`delay` cannot be used in a " \
+                        "predeploy migration, since job servers won't " \
+                        "have the new code yet"
 
         def on_send(node)
           super
