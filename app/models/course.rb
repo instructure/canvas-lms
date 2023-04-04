@@ -857,11 +857,12 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def associated_accounts
-    Rails.cache.fetch_with_batched_keys("associated_accounts", batch_object: self, batched_keys: :account_associations) do
+  def associated_accounts(include_crosslisted_courses: true)
+    key = "associated_accounts#{include_crosslisted_courses && "_xlisted"}"
+    Rails.cache.fetch_with_batched_keys(key, batch_object: self, batched_keys: :account_associations) do
       GuardRail.activate(:primary) do
         accounts = if association(:course_account_associations).loaded?
-                     course_account_associations.map(&:account).uniq
+                     course_account_associations.filter { |caa| include_crosslisted_courses ? true : caa.course_section_id.nil? }.map(&:account).uniq
                    else
                      shard.activate do
                        Account.find_by_sql(<<~SQL.squish)
@@ -869,6 +870,7 @@ class Course < ActiveRecord::Base
                            SELECT account_id, MIN(depth)
                            FROM #{CourseAccountAssociation.quoted_table_name}
                            WHERE course_id=#{id}
+                           #{"AND course_section_id IS NULL" unless include_crosslisted_courses}
                            GROUP BY account_id
                          )
                          SELECT accounts.*
@@ -2053,7 +2055,7 @@ class Course < ActiveRecord::Base
   end
 
   def account_users_for(user)
-    @associated_account_ids ||= (associated_accounts + root_account.account_chain(include_site_admin: true))
+    @associated_account_ids ||= (associated_accounts(include_crosslisted_courses: false) + root_account.account_chain(include_site_admin: true))
                                 .uniq.filter_map { |a| a.active? ? a.id : nil }
     Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
       if account_chain_ids == [Account.site_admin.id]
