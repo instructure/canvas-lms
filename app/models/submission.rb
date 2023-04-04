@@ -2291,7 +2291,7 @@ class Submission < ActiveRecord::Base
   end
 
   def provisional_grade_id
-    @provisional_grade_filter ? @provisional_grade_filter.id : nil
+    @provisional_grade_filter&.id
   end
 
   def submission_comments(*args)

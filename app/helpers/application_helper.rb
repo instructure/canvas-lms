@@ -96,7 +96,7 @@ module ApplicationHelper
   def context_url(context, *opts)
     @context_url_lookup ||= {}
     context_name = url_helper_context_from_object(context)
-    lookup = [context ? context.id : nil, context_name, *opts]
+    lookup = [context&.id, context_name, *opts]
     return @context_url_lookup[lookup] if @context_url_lookup[lookup]
 
     res = nil

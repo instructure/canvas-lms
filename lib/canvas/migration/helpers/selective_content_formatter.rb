@@ -74,7 +74,7 @@ module Canvas::Migration::Helpers
         att = @migration.overview_attachment.open
         data = JSON.parse(att.read)
         data = separate_announcements(data)
-        data["attachments"] ||= data["file_map"] ? data["file_map"].values : nil
+        data["attachments"] ||= data["file_map"]&.values
         data["quizzes"] ||= data["assessments"]
         data["context_modules"] ||= data["modules"]
         data["wiki_pages"] ||= data["wikis"]

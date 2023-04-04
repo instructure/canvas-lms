@@ -264,7 +264,7 @@ module AssignmentOverrideApplicator
 
           model_version <= assignment_or_quiz.version_number
         end
-        override_version ? override_version.model : nil
+        override_version&.model
       else
         override
       end

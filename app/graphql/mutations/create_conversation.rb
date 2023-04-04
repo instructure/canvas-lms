@@ -45,8 +45,8 @@ class Mutations::CreateConversation < Mutations::BaseMutation
 
     context = input[:context_code] ? Context.find_by_asset_string(input[:context_code]) : nil
     validate_context(context, recipients) if context
-    context_type = context ? context.class.name : nil
-    context_id = context ? context.id : nil
+    context_type = context&.class&.name
+    context_id = context&.id
     shard = context ? context.shard : Shard.current
 
     # TODO: Refactor this, it doesnt work anymore. recipient =~ /\A(course_\d+)(?:_([a-z]+))?$/  returns nil
