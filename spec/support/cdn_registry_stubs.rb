@@ -20,9 +20,9 @@
 
 RSpec.shared_context "cdn registry stubs" do
   before do
-    allow(::Canvas::Cdn).to receive(:registry).and_return(
-      ::Canvas::Cdn::Registry.new(
-        cache: ::Canvas::Cdn::Registry::StaticCache.new(
+    allow(Canvas::Cdn).to receive(:registry).and_return(
+      Canvas::Cdn::Registry.new(
+        cache: Canvas::Cdn::Registry::StaticCache.new(
           gulp: {
             "fonts/lato/extended/Lato-Regular.woff2" => "mock_revved_url",
             "images/apple-touch-icon.png" => "images/apple-touch-icon-1234.png"

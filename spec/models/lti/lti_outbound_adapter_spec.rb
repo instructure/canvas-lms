@@ -221,7 +221,7 @@ describe Lti::LtiOutboundAdapter do
       allow(tool_launch).to receive_messages(url: "wat;no-way")
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
       adapter.prepare_tool_launch(return_url, variable_expander)
-      expect { adapter.generate_post_payload }.to raise_error(::Lti::Errors::InvalidLaunchUrlError)
+      expect { adapter.generate_post_payload }.to raise_error(Lti::Errors::InvalidLaunchUrlError)
     end
 
     it "does not copy query params to the post body if oauth_compliant tool setting is enabled" do

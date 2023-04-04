@@ -48,23 +48,23 @@ describe "Jobs V2 API", type: :request do
 
     describe "queued jobs" do
       before :once do
-        ::Kernel.delay(run_at: 1.hour.ago).pp
-        ::Kernel.delay(run_at: 2.hours.ago).p
+        Kernel.delay(run_at: 1.hour.ago).pp
+        Kernel.delay(run_at: 2.hours.ago).p
         @queued_job_id = Delayed::Job.last.id
 
         # fake a held job to make sure it does appear
-        ::Kernel.delay(run_at: 1.day.ago).pp
-        Delayed::Job.last.update locked_by: ::Delayed::Backend::Base::ON_HOLD_LOCKED_BY
+        Kernel.delay(run_at: 1.day.ago).pp
+        Delayed::Job.last.update locked_by: Delayed::Backend::Base::ON_HOLD_LOCKED_BY
         @held_job_id = Delayed::Job.last.id
 
         # fake a running job to be sure it doesn't appear
-        ::Kernel.delay(run_at: 3.hours.ago).puts
+        Kernel.delay(run_at: 3.hours.ago).puts
         Delayed::Job.last.update locked_by: "foo", locked_at: 1.hour.ago
       end
 
       it "scopes the query to the current account" do
-        ::Kernel.delay(run_at: 1.hour.ago, account_id: Account.default).pp
-        ::Kernel.delay(run_at: 1.hour.ago, account_id: Account.default).pp
+        Kernel.delay(run_at: 1.hour.ago, account_id: Account.default).pp
+        Kernel.delay(run_at: 1.hour.ago, account_id: Account.default).pp
 
         json = api_call(:get, "/api/v1/jobs2/queued",
                         { controller: "jobs_v2", action: "list", format: "json", bucket: "queued", scope: "account" })
@@ -76,15 +76,15 @@ describe "Jobs V2 API", type: :request do
 
         before do
           @shard1.activate do
-            ::Kernel.delay(run_at: 1.hour.ago).pp
-            ::Kernel.delay(run_at: 1.hour.ago).pp
+            Kernel.delay(run_at: 1.hour.ago).pp
+            Kernel.delay(run_at: 1.hour.ago).pp
 
             @a1 = Account.create!
           end
 
           Shard.default.activate do
-            ::Kernel.delay(run_at: 1.hour.ago).pp
-            ::Kernel.delay(run_at: 1.hour.ago).pp
+            Kernel.delay(run_at: 1.hour.ago).pp
+            Kernel.delay(run_at: 1.hour.ago).pp
           end
         end
 
@@ -127,7 +127,7 @@ describe "Jobs V2 API", type: :request do
         end
 
         it "sorts by count" do
-          ::Kernel.delay(run_at: 2.days.ago).puts
+          Kernel.delay(run_at: 2.days.ago).puts
           json = api_call(:get, "/api/v1/jobs2/queued/by_tag?order=count",
                           { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "tag", order: "count" },
                           {}, {}, expected_status: 200)
@@ -151,9 +151,9 @@ describe "Jobs V2 API", type: :request do
 
       describe "by_strand" do
         before :once do
-          ::Kernel.delay(strand: "foo", run_at: 1.hour.ago).puts
-          ::Kernel.delay(strand: "bar", run_at: 2.hours.ago).puts
-          ::Kernel.delay(strand: "bar", run_at: 30.minutes.ago).p
+          Kernel.delay(strand: "foo", run_at: 1.hour.ago).puts
+          Kernel.delay(strand: "bar", run_at: 2.hours.ago).puts
+          Kernel.delay(strand: "bar", run_at: 30.minutes.ago).p
         end
 
         it "groups by strand" do
@@ -197,7 +197,7 @@ describe "Jobs V2 API", type: :request do
           end
 
           it "returns status 'blocked' if a strand blocker exists" do
-            Delayed::Job.create!(payload_object: ::Delayed::PerformableMethod.new(Kernel, :sleep, args: [0]),
+            Delayed::Job.create!(payload_object: Delayed::PerformableMethod.new(Kernel, :sleep, args: [0]),
                                  source: "JobsMigrator::StrandBlocker",
                                  strand: "bar",
                                  next_in_strand: false)
@@ -222,8 +222,8 @@ describe "Jobs V2 API", type: :request do
 
       describe "by_singleton" do
         before :once do
-          ::Kernel.delay(singleton: "foobar2000", run_at: 1.hour.ago).puts
-          ::Kernel.delay(singleton: "zombo20001", run_at: 22.hours.ago).puts
+          Kernel.delay(singleton: "foobar2000", run_at: 1.hour.ago).puts
+          Kernel.delay(singleton: "zombo20001", run_at: 22.hours.ago).puts
         end
 
         it "groups by singleton" do
@@ -267,10 +267,10 @@ describe "Jobs V2 API", type: :request do
           end
 
           it "returns status 'blocked' if a blocker exists" do
-            Delayed::Job.create!(payload_object: ::Delayed::PerformableMethod.new(Kernel, :sleep, args: [0]),
+            Delayed::Job.create!(payload_object: Delayed::PerformableMethod.new(Kernel, :sleep, args: [0]),
                                  source: "JobsMigrator::StrandBlocker",
                                  singleton: "zombo20001",
-                                 locked_by: ::Delayed::Backend::Base::ON_HOLD_BLOCKER,
+                                 locked_by: Delayed::Backend::Base::ON_HOLD_BLOCKER,
                                  next_in_strand: false)
             json = api_call(:put, "/api/v1/jobs2/unstuck",
                             { controller: "jobs_v2", action: "unstuck", format: "json", singleton: "zombo20001" })
@@ -336,17 +336,17 @@ describe "Jobs V2 API", type: :request do
     describe "running jobs" do
       before :once do
         # fake some running jobs
-        ::Kernel.delay.pp
+        Kernel.delay.pp
         Delayed::Job.last.update locked_at: 1.hour.ago, locked_by: "me"
-        ::Kernel.delay.pp
+        Kernel.delay.pp
         Delayed::Job.last.update locked_at: 2.hours.ago, locked_by: "me"
 
-        ::Kernel.delay.p
+        Kernel.delay.p
         Delayed::Job.last.update locked_at: 30.minutes.ago, locked_by: "foo"
 
         # and a fake held job, to ensure it doesn't appear here
-        ::Kernel.delay.puts
-        Delayed::Job.last.update locked_by: ::Delayed::Backend::Base::ON_HOLD_LOCKED_BY
+        Kernel.delay.puts
+        Delayed::Job.last.update locked_by: Delayed::Backend::Base::ON_HOLD_LOCKED_BY
       end
 
       it "groups by tag" do
@@ -403,11 +403,11 @@ describe "Jobs V2 API", type: :request do
       it "orders running jobs by strand_singleton" do
         Delayed::Job.where(tag: "Kernel.p").update_all(strand: "barfood")
 
-        ::Kernel.delay(strand: "foo", singleton: "singletonB").pp
+        Kernel.delay(strand: "foo", singleton: "singletonB").pp
         Delayed::Job.last.update locked_at: 1.hour.ago, locked_by: "me"
-        ::Kernel.delay(strand: "foo", singleton: "singletonA").pp
+        Kernel.delay(strand: "foo", singleton: "singletonA").pp
         Delayed::Job.last.update locked_at: 1.hour.ago, locked_by: "me"
-        ::Kernel.delay(strand: "foo", singleton: "singletonC").pp
+        Kernel.delay(strand: "foo", singleton: "singletonC").pp
         Delayed::Job.last.update locked_at: 1.hour.ago, locked_by: "me"
 
         json = api_call(:get, "/api/v1/jobs2/running",
@@ -435,8 +435,8 @@ describe "Jobs V2 API", type: :request do
 
     describe "future" do
       before :once do
-        ::Kernel.delay(run_at: 1.hour.from_now).pp
-        ::Kernel.delay(run_at: 1.day.from_now).p
+        Kernel.delay(run_at: 1.hour.from_now).pp
+        Kernel.delay(run_at: 1.day.from_now).p
       end
 
       it "groups by tag" do
@@ -454,9 +454,9 @@ describe "Jobs V2 API", type: :request do
 
       describe "by_strand" do
         before :once do
-          ::Kernel.delay(run_at: 1.hour.from_now, strand: "foo").puts
-          ::Kernel.delay(run_at: 2.hours.from_now, strand: "foo").puts
-          ::Kernel.delay(run_at: 1.day.from_now, strand: "bar").puts
+          Kernel.delay(run_at: 1.hour.from_now, strand: "foo").puts
+          Kernel.delay(run_at: 2.hours.from_now, strand: "foo").puts
+          Kernel.delay(run_at: 1.day.from_now, strand: "bar").puts
         end
 
         it "groups by strand" do
@@ -518,12 +518,12 @@ describe "Jobs V2 API", type: :request do
     describe "failed" do
       before :once do
         Timecop.travel(1.day.ago) do
-          ::Kernel.delay.raise "uh oh"
+          Kernel.delay.raise "uh oh"
           run_jobs
         end
 
         Timecop.travel(1.hour.ago) do
-          ::Kernel.delay.raise "oops"
+          Kernel.delay.raise "oops"
           run_jobs
         end
       end
@@ -585,7 +585,7 @@ describe "Jobs V2 API", type: :request do
 
     describe "manage" do
       before :once do
-        2.times { ::Kernel.delay(n_strand: "foobar").p }
+        2.times { Kernel.delay(n_strand: "foobar").p }
       end
 
       it "updates max_concurrent and priority" do
@@ -611,7 +611,7 @@ describe "Jobs V2 API", type: :request do
 
     describe "requeue" do
       before :once do
-        ::Kernel.delay.raise "uh oh"
+        Kernel.delay.raise "uh oh"
         run_jobs
       end
 
@@ -642,9 +642,9 @@ describe "Jobs V2 API", type: :request do
 
     context "throttling" do
       before :once do
-        3.times { ::Kernel.delay(shard_id: 101).print }
-        2.times { ::Kernel.delay(shard_id: 101).printf }
-        ::Kernel.delay(shard_id: 102).printf
+        3.times { Kernel.delay(shard_id: 101).print }
+        2.times { Kernel.delay(shard_id: 101).printf }
+        Kernel.delay(shard_id: 102).printf
       end
 
       describe "throttle_check" do
@@ -703,8 +703,8 @@ describe "Jobs V2 API", type: :request do
       end
 
       before do
-        if ::Switchman::Shard.instance_variable_defined?(:@jobs_scope_empty)
-          ::Switchman::Shard.remove_instance_variable(:@jobs_scope_empty)
+        if Switchman::Shard.instance_variable_defined?(:@jobs_scope_empty)
+          Switchman::Shard.remove_instance_variable(:@jobs_scope_empty)
         end
         allow(HostUrl).to receive(:default_host).and_return("www.example.com")
       end

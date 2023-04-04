@@ -817,7 +817,7 @@ describe Message do
         queued.deliver
         raise "#deliver should have failed because this message does not exist"
       rescue Delayed::RetriableError => e
-        expect(e.cause.is_a?(::Message::QueuedNotFound)).to be_truthy
+        expect(e.cause.is_a?(Message::QueuedNotFound)).to be_truthy
       end
     end
   end

@@ -20,10 +20,10 @@
 
 require File.expand_path(File.dirname(__FILE__) + "/../../../spec_helper.rb")
 
-describe ::Canvas::Cdn::Registry do
+describe Canvas::Cdn::Registry do
   subject do
     described_class.new(
-      cache: ::Canvas::Cdn::Registry::StaticCache.new(
+      cache: Canvas::Cdn::Registry::StaticCache.new(
         gulp: @gulp_manifest || {},
         webpack: @webpack_manifest || {}
       )

@@ -35,7 +35,7 @@ describe "analytics in Canvas" do
     end
 
     it "with Analytics 1 enabled, displays the account analytics nav menu item" do
-      skip unless defined? ::Analytics
+      skip unless defined? Analytics
       # enable Analytics 1
       @admin.account.update(allowed_services: "+analytics")
       visit_admin_settings_tab(@admin.account.id)
@@ -114,7 +114,7 @@ describe "analytics in Canvas" do
         end
 
         it "displays Analytics 1 link in manage user menu" do
-          skip unless defined? ::Analytics
+          skip unless defined? Analytics
           visit_course_people_page(@course.id)
           manage_user_link(@student.name).click
 
