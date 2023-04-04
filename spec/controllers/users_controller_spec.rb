@@ -88,6 +88,26 @@ describe UsersController do
       expect(controller.js_env[:context_asset_string]).to eq "user_#{user.id}"
     end
 
+    context "with environment-specific overrides" do
+      let(:override_url) { "http://www.example-beta.com/basic_lti" }
+
+      before do
+        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+
+        tool.settings[:environments] = {
+          launch_url: override_url
+        }
+        tool.save!
+      end
+
+      it "uses override for launch_url and includes original query parameters" do
+        get :external_tool, params: { id: tool.id, user_id: user.id }
+        expect(assigns[:lti_launch].resource_url).to eq override_url + "?first=john&last=smith"
+      end
+    end
+
     context "using LTI 1.3 when specified" do
       include_context "lti_1_3_spec_helper"
 

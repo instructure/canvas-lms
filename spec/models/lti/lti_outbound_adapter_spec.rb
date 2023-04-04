@@ -205,6 +205,48 @@ describe Lti::LtiOutboundAdapter do
     end
   end
 
+  describe "#default_launch_url" do
+    subject { adapter.send :default_launch_url, placement }
+
+    let(:placement) { nil }
+
+    it "returns tool url" do
+      expect(subject).to eq tool.url
+    end
+
+    context "with placement provided" do
+      let(:placement) { :course_navigation }
+      let(:placement_url) { "https://example.com/course_navigation" }
+
+      before do
+        tool.course_navigation = { url: placement_url }
+      end
+
+      it "returns tool url for that placement" do
+        expect(subject).to eq placement_url
+      end
+    end
+
+    context "with environment-specific overrides" do
+      let(:override_url) { "http://www.example-beta.com/basic_lti" }
+      let(:url) { "http://www.example.com/basic_lti" }
+
+      before do
+        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+
+        tool.settings[:environments] = {
+          launch_url: override_url
+        }
+      end
+
+      it "uses override for launch_url and includes query parameters" do
+        expect(subject).to eq override_url + "?firstname=rory"
+      end
+    end
+  end
+
   describe "#generate_post_payload" do
     it "calls generate on the tool launch" do
       tool_launch = double("tool launch")

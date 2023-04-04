@@ -161,3 +161,16 @@ lti_dynamic_registration:
   display_name: LTI Dynamic Registration
   description: Enables administrators to register LTI tools with Dynamic Registration
   applies_to: RootAccount
+dynamic_lti_environment_overrides:
+  state: hidden
+  display_name: Dynamic LTI 1.1 Environment-specific override URLs
+  description: |-
+    Replaces the existing 'update_external_tools' beta refresh task (that overwrites
+    all URLs in a tool with beta-specific launch URLs) with a dynamic lookup of the
+    correct launch URL.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

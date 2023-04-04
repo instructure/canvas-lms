@@ -35,8 +35,11 @@ module Api::V1::ExternalTools
     json = api_json(tool, user, session,
                     only: only,
                     methods: methods)
+    json["url"] = tool.url_with_environment_overrides(tool.url, include_launch_url: true)
+    json["domain"] = tool.domain_with_environment_overrides
     json["is_rce_favorite"] = tool.is_rce_favorite_in_context?(context) if tool.can_be_rce_favorite?
-    json.merge!(tool.settings.with_indifferent_access.slice("selection_width", "selection_height", "icon_url", "prefer_sis_email"))
+    json.merge!(tool.settings.with_indifferent_access.slice("selection_width", "selection_height", "prefer_sis_email"))
+    json["icon_url"] = tool.icon_url if tool.icon_url
     json["not_selectable"] = tool.not_selectable
     json["version"] = tool.use_1_3? ? "1.3" : "1.1"
     json["developer_key_id"] = tool.developer_key_id if tool.developer_key_id
@@ -47,6 +50,10 @@ module Api::V1::ExternalTools
       json[type]["label"] = tool.label_for(type, I18n.locale)
       json[type].delete "labels"
       json.delete "labels"
+
+      if json[type]["url"]
+        json[type]["url"] = tool.url_with_environment_overrides(json[type]["url"])
+      end
 
       %i[selection_width selection_height icon_url].each do |key|
         value = tool.extension_setting type, key

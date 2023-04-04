@@ -301,6 +301,121 @@ describe ExternalToolsController, type: :request do
       paginate_call(@account)
     end
 
+    describe "with environment-specific overrides" do
+      subject do
+        api_call(:get, "/api/v1/accounts/#{@account.id}/external_tools/#{tool.id}.json",
+                 { controller: "external_tools", action: "show", format: "json",
+                   account_id: @account.id.to_s, external_tool_id: tool.id.to_s })
+      end
+
+      let(:icon_url) { "https://www.example.com/lti/icon" }
+      let(:tool) do
+        t = tool_with_everything(@account)
+        t.icon_url = icon_url
+        t.domain = "www.example.com"
+        t.settings[:editor_button][:icon_url] = icon_url
+        t.save!
+        t
+      end
+      let(:expected_json) do
+        json = example_json(tool)
+        json["icon_url"] = icon_url
+        json["editor_button"]["icon_url"] = icon_url
+        json
+      end
+
+      before do
+        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        allow(Setting).to receive(:set).with("allow_tc_access_").and_return("true")
+      end
+
+      context "with feature flag enabled" do
+        before do
+          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+        end
+
+        let(:domain) { "www.example-beta.com" }
+
+        def expect_domain_override(url)
+          expect(url).to include(domain)
+        end
+
+        def expect_no_override(url)
+          expect(url).not_to include(domain)
+        end
+
+        context "with domain override" do
+          let(:override_icon_url) { "https://www.example-beta.com/lti/icon" }
+          let(:tool) do
+            t = super()
+            t.settings[:environments] = {
+              domain: domain
+            }
+            t.save!
+            t
+          end
+
+          it "overrides base icon_url" do
+            expect_domain_override(subject["icon_url"])
+          end
+
+          it "overrides placement icon_url" do
+            expect_domain_override(subject.dig("editor_button", "icon_url"))
+          end
+
+          it "overrides placement url" do
+            expect_domain_override(subject.dig("editor_button", "url"))
+          end
+
+          it "overrides url" do
+            expect_domain_override(subject["url"])
+          end
+
+          it "overrides domain" do
+            expect_domain_override(subject["domain"])
+          end
+        end
+
+        context "with launch_url override" do
+          let(:override_url) { "https://www.example-beta.com/lti/launch" }
+          let(:tool) do
+            t = super()
+            t.settings[:environments] = {
+              launch_url: override_url
+            }
+            t.save!
+            t
+          end
+
+          it "overrides url" do
+            expect(subject["url"]).to eq override_url
+          end
+
+          it "does not override placement url" do
+            expect_no_override(subject.dig("editor_button", "url"))
+          end
+
+          it "does not override placement icon_url" do
+            expect_no_override(subject.dig("editor_button", "icon_url"))
+          end
+
+          it "does not override icon url" do
+            expect_no_override(subject["icon_url"])
+          end
+
+          it "does not override domain" do
+            expect_no_override(subject["domain"])
+          end
+        end
+      end
+
+      # context "with feature flag disabled" do
+      #   see instructure_misc_plugin/spec_canvas/lib/api/v1/external_tools_api_spec.rb
+      #   (since existing environment overrides are defined there as part of beta refresh)
+      # end
+    end
+
     if Canvas.redis_enabled?
       describe "sessionless launch" do
         let(:tool) { tool_with_everything(@account) }

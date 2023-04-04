@@ -643,6 +643,7 @@ class ExternalToolsController < ApplicationController
     }
 
     opts = default_opts.merge(opts)
+    opts[:launch_url] = tool.url_with_environment_overrides(opts[:launch_url])
 
     assignment = api_find(@context.assignments.active, params[:assignment_id]) if params[:assignment_id]
 
@@ -728,7 +729,7 @@ class ExternalToolsController < ApplicationController
       media_types.to_unsafe_h,
       params["export_type"]
     )
-    launch_url = opts[:launch_url] || tool.extension_setting(placement, :url)
+    launch_url = tool.launch_url(extension_type: placement, preferred_launch_url: opts[:launch_url])
     params = Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user)
                                              .merge({
                                                       # required params
@@ -774,7 +775,7 @@ class ExternalToolsController < ApplicationController
 
     opts = {
       post_only: @tool.settings["post_only"].present?,
-      launch_url: opts[:launch_url] || tool.extension_setting(placement, :url),
+      launch_url: tool.launch_url(extension_type: placement, preferred_launch_url: opts[:launch_url]),
       content_item_id: opts[:content_item_id],
       assignment: assignment,
       parent_frame_context: opts[:parent_frame_context]
@@ -1466,7 +1467,7 @@ class ExternalToolsController < ApplicationController
     else
       # generate the launch
       opts = {
-        launch_url: launch_url,
+        launch_url: @tool.url_with_environment_overrides(launch_url),
         resource_type: launch_type
       }
       if module_item || assignment

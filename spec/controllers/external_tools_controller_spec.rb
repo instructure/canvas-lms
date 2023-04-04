@@ -281,6 +281,40 @@ describe ExternalToolsController do
         expect(response).to be_redirect
         expect(flash[:error]).to match(/find valid settings/)
       end
+
+      context "with environment-specific overrides" do
+        let(:override_url) { "http://www.example-beta.com/basic_lti" }
+        let(:domain) { "www.example-beta.com" }
+
+        before do
+          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+
+          tool.course_navigation = { enabled: true }
+          tool.settings[:environments] = {
+            domain: domain
+          }
+          tool.save!
+        end
+
+        it "uses override for resource_url" do
+          get :show, params: { course_id: @course.id, id: tool.id }
+
+          expect(assigns[:lti_launch].resource_url).to eq override_url
+        end
+
+        context "when launch_url is passed in params" do
+          let(:launch_url) { "https://www.example.com/other_lti_launch" }
+          let(:override_launch_url) { "https://www.example-beta.com/other_lti_launch" }
+
+          it "uses overridden launch_url for resource_url" do
+            get :show, params: { course_id: @course.id, id: tool.id, launch_url: launch_url }
+
+            expect(assigns[:lti_launch].resource_url).to eq override_launch_url
+          end
+        end
+      end
     end
 
     context "ContentItemSelectionResponse" do
@@ -487,6 +521,52 @@ describe ExternalToolsController do
         get :show, params: { course_id: @course.id, id: @tool.id, pages: [0] }
         expect(response).to be_redirect
         expect(flash[:error]).to match(/error generating the tool launch/)
+      end
+
+      context "when launch_url is passed in params" do
+        let(:launch_url) { "https://www.example.com/other_lti_launch" }
+
+        it "uses provided launch_url" do
+          user_session(@teacher)
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_url: launch_url }
+
+          expect(assigns[:lti_launch].resource_url).to eq launch_url
+        end
+      end
+
+      context "with environment-specific overrides" do
+        let(:override_url) { "http://www.example-beta.com/basic_lti" }
+        let(:domain) { "www.example-beta.com" }
+
+        before do
+          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+
+          @tool.settings[:environments] = {
+            domain: domain
+          }
+          @tool.save!
+        end
+
+        it "uses override for resource_url" do
+          user_session(@teacher)
+          get :show, params: { course_id: @course.id, id: @tool.id }
+
+          expect(assigns[:lti_launch].resource_url).to eq override_url
+        end
+
+        context "when launch_url is passed in params" do
+          let(:launch_url) { "https://www.example.com/other_lti_launch" }
+          let(:override_launch_url) { "https://www.example-beta.com/other_lti_launch" }
+
+          it "uses overridden launch_url for resource_url" do
+            user_session(@teacher)
+            get :show, params: { course_id: @course.id, id: @tool.id, launch_url: launch_url }
+
+            expect(assigns[:lti_launch].resource_url).to eq override_launch_url
+          end
+        end
       end
     end
 
@@ -696,6 +776,41 @@ describe ExternalToolsController do
 
         get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "migration_selection" }
         expect(assigns[:lti_launch].params["first"]).to be_nil
+      end
+
+      context "with environment-specific overrides" do
+        let(:override_url) { "http://www.example-beta.com/basic_lti" }
+        let(:domain) { "www.example-beta.com" }
+
+        before do
+          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+
+          @tool.settings[:environments] = {
+            domain: domain
+          }
+          @tool.save!
+        end
+
+        it "uses override for resource_url" do
+          user_session(@teacher)
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "migration_selection" }
+
+          expect(assigns[:lti_launch].resource_url).to eq override_url
+        end
+
+        context "when launch_url is passed in params" do
+          let(:launch_url) { "https://www.example.com/other_lti_launch" }
+          let(:override_launch_url) { "https://www.example-beta.com/other_lti_launch" }
+
+          it "uses overridden launch_url for resource_url" do
+            user_session(@teacher)
+            get :show, params: { course_id: @course.id, id: @tool.id, launch_url: launch_url, launch_type: "migration_selection" }
+
+            expect(assigns[:lti_launch].resource_url).to eq override_launch_url
+          end
+        end
       end
     end
   end
@@ -2244,6 +2359,50 @@ describe ExternalToolsController do
       expect(tool_settings["custom_canvas_user_id"]).to eq @user.id.to_s
       expect(tool_settings["resource_link_id"]).to eq opaque_id(@assignment.external_tool_tag)
       expect(tool_settings["resource_link_title"]).to eq "tool assignment"
+    end
+
+    context "when url is provided in params" do
+      let(:provided_url) { "https://www.example.com/sessionless_launch" }
+
+      it "uses it for launch_url" do
+        get :generate_sessionless_launch, params: { course_id: @course.id, id: tool.id, url: provided_url }
+        expect(response).to be_successful
+        expect(launch_settings["launch_url"]).to eq provided_url
+      end
+    end
+
+    context "with environment-specific overrides" do
+      let(:override_url) { "http://www.example-beta.com/basic_lti" }
+      let(:domain) { "www.example-beta.com" }
+
+      before do
+        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+        user_session(account_admin_user)
+
+        tool.settings[:environments] = {
+          domain: domain
+        }
+        tool.save!
+      end
+
+      it "uses override for resource_url" do
+        get :generate_sessionless_launch, params: { course_id: @course.id, id: tool.id }
+        expect(response).to be_successful
+        expect(launch_settings["launch_url"]).to eq override_url
+      end
+
+      context "when launch_url is passed in params" do
+        let(:launch_url) { "https://www.example.com/other_lti_launch" }
+        let(:override_launch_url) { "https://www.example-beta.com/other_lti_launch" }
+
+        it "uses overridden launch_url for resource_url" do
+          get :generate_sessionless_launch, params: { course_id: @course.id, id: tool.id, url: launch_url }
+          expect(response).to be_successful
+          expect(launch_settings["launch_url"]).to eq override_launch_url
+        end
+      end
     end
 
     it "passes whitelisted `platform` query param to lti launch body" do
