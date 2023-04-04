@@ -887,6 +887,8 @@ describe ContentMigrationsController, type: :request do
       @src = course_factory active_all: true
       @ann = @src.announcements.create! title: "ann", message: "ohai"
       @assign = @src.assignments.create! name: "assign"
+      @shell_assign = @src.assignments.create!
+      @assign_topic = @src.discussion_topics.create! message: "assigned", assignment_id: @shell_assign.id
       @mod = @src.context_modules.create! name: "mod"
       @tag = @mod.add_item type: "sub_header", title: "blah"
       @page = @src.wiki_pages.create! title: "der page"
@@ -901,10 +903,12 @@ describe ContentMigrationsController, type: :request do
     def test_asset_id_mapping(json)
       expect(@dst.announcements.find(json["announcements"][@ann.id.to_s]).title).to eq "ann"
       expect(@dst.assignments.find(json["assignments"][@assign.id.to_s]).name).to eq "assign"
+      expect(@dst.assignments.find(json["assignments"][@shell_assign.id.to_s]).description).to eq "assigned"
       expect(@dst.context_modules.find(json["modules"][@mod.id.to_s]).name).to eq "mod"
       expect(@dst.context_module_tags.find(json["module_items"][@tag.id.to_s]).title).to eq "blah"
       expect(@dst.wiki_pages.find(json["pages"][@page.id.to_s]).title).to eq "der page"
       expect(@dst.discussion_topics.find(json["discussion_topics"][@topic.id.to_s]).message).to eq "some topic"
+      expect(@dst.discussion_topics.find(json["discussion_topics"][@assign_topic.id.to_s]).message).to eq "assigned"
       expect(@dst.quizzes.find(json["quizzes"][@quiz.id.to_s]).title).to eq "a quiz"
       expect(@dst.attachments.find(json["files"][@file.id.to_s]).filename).to eq "teh_file.txt"
     end
