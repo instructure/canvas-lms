@@ -273,7 +273,7 @@ module DynamicSettings
     end
 
     def populate_cache(subtree, ttl)
-      cache.write_set(subtree.map { |st| [CACHE_KEY_PREFIX + st[:key], st[:value]] }.to_h, ttl: ttl)
+      cache.write_set(subtree.to_h { |st| [CACHE_KEY_PREFIX + st[:key], st[:value]] }, ttl: ttl)
     end
   end
 end

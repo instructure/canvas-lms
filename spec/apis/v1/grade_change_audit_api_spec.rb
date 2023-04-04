@@ -76,7 +76,7 @@ describe "GradeChangeAudit API", type: :request do
     sorted_contexts = contexts.select { |key, _| expected_contexts.include?(key) }
                               .sort_by { |key, _| expected_contexts.index(key) }
 
-    arguments = sorted_contexts.map { |key, value| ["#{key}_id".to_sym, value.id] }.to_h
+    arguments = sorted_contexts.to_h { |key, value| ["#{key}_id".to_sym, value.id] }
     arguments.merge!({
                        controller: :grade_change_audit_api,
                        action: :for_course_and_other_parameters,

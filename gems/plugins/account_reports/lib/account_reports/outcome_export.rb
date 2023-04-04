@@ -137,7 +137,7 @@ module AccountReports
     def export_outcomes(csv, headers, include_ratings)
       I18n.locale = account.default_locale if account.default_locale.present?
       outcomes = outcome_scope
-      friendly_descriptions = resolve_friendly_descriptions(account, nil, outcomes.map(&:id)).map { |description| [description.learning_outcome_id, description.description] }.to_h
+      friendly_descriptions = resolve_friendly_descriptions(account, nil, outcomes.map(&:id)).to_h { |description| [description.learning_outcome_id, description.description] }
       outcomes.find_each do |row|
         outcome_model = row.learning_outcome_content
         outcome = row.attributes.dup

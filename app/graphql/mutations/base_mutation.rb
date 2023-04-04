@@ -99,7 +99,7 @@ class Mutations::BaseMutation < GraphQL::Schema::Mutation
   # `override_keys` is a hash where the key is the field at the table and the value
   # is the alias of the field; the keys and values need to be set as symbols.
   def errors_for(model, override_keys = {})
-    input_fields = self.class.arguments.values.map { |a| [a.keyword, a.name] }.to_h
+    input_fields = self.class.arguments.values.to_h { |a| [a.keyword, a.name] }
 
     {
       errors: model.errors.entries.map do |attribute, message|

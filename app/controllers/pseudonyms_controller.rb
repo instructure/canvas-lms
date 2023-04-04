@@ -175,7 +175,7 @@ class PseudonymsController < ApplicationController
       end
       @password_pseudonyms = @cc.user.pseudonyms.active_only.select { |p| p.account.canvas_authentication? }
       js_env PASSWORD_POLICY: @domain_root_account.password_policy,
-             PASSWORD_POLICIES: @password_pseudonyms.map { |p| [p.id, p.account.password_policy] }.to_h
+             PASSWORD_POLICIES: @password_pseudonyms.to_h { |p| [p.id, p.account.password_policy] }
     end
   end
 

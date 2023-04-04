@@ -895,7 +895,7 @@ module Api::V1::Assignment
     has_observed_users = include_params.include?("observed_users")
 
     subs_list = if submissions_for_user
-                  assignment_ids = assignments.map(&:id).to_set
+                  assignment_ids = assignments.to_set(&:id)
                   submissions_for_user.select do |s|
                     assignment_ids.include?(s.assignment_id)
                   end

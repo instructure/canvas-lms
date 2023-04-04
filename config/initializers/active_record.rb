@@ -650,12 +650,12 @@ class ActiveRecord::Base
     hashed_objects = []
     excluded_columns << objects.first.class.primary_key if excluded_columns.delete("primary_key")
     objects.each do |object|
-      hashed_objects << object.attributes.except(excluded_columns.join(",")).map do |(name, value)|
+      hashed_objects << object.attributes.except(excluded_columns.join(",")).to_h do |name, value|
         if (type = object.class.attribute_types[name]).is_a?(ActiveRecord::Type::Serialized)
           value = type.serialize(value)
         end
         [name, value]
-      end.to_h
+      end
     end
     objects.first.class.bulk_insert(hashed_objects)
   end

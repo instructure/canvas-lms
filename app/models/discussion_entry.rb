@@ -149,7 +149,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   def self.rating_sums(entry_ids)
     sums = where(id: entry_ids).where("COALESCE(rating_sum, 0) != 0")
-    sums.map { |x| [x.id, x.rating_sum] }.to_h
+    sums.to_h { |x| [x.id, x.rating_sum] }
   end
 
   def set_depth

@@ -149,9 +149,9 @@ describe GroupsController do
       users_json = parsed_json.first["users"]
       expect(users_json).not_to be_nil
       expect(users_json.length).to eq 2
-      ids_json = users_json.map { |u| u["id"] }.to_set
+      ids_json = users_json.to_set { |u| u["id"] }
       expect(ids_json).to eq [student1.id, student2.id].to_set
-      names_json = users_json.map { |u| u["name"] }.to_set
+      names_json = users_json.to_set { |u| u["name"] }
       expect(names_json).to eq [student1.name, student2.name].to_set
       expect(response).to be_successful
     end
