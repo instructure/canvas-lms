@@ -1581,7 +1581,7 @@ describe Attachment do
     it "escapes all non-alphanumeric characters in the utf-8 filename" do
       attachment = attachment_with_context(@course, display_name: '"This file[0] \'{has}\' \# awesome `^<> chars 100%,|<-pipe"')
       allow(attachment).to receive(:authenticated_s3_url)
-      expect(attachment).to receive(:authenticated_s3_url).with(include(response_content_disposition: %(attachment; filename="\\\"This file[0] '{has}' \\# awesome `^<> chars 100%,|<-pipe\\\""; filename*=UTF-8''%22This%20file%5B0%5D%20%27%7Bhas%7D%27%20%5C%23%20awesome%20%60%5E%3C%3E%20chars%20100%25%2C%7C%3C%2Dpipe%22)))
+      expect(attachment).to receive(:authenticated_s3_url).with(include(response_content_disposition: %(attachment; filename="\\"This file[0] '{has}' \\# awesome `^<> chars 100%,|<-pipe\\""; filename*=UTF-8''%22This%20file%5B0%5D%20%27%7Bhas%7D%27%20%5C%23%20awesome%20%60%5E%3C%3E%20chars%20100%25%2C%7C%3C%2Dpipe%22)))
       attachment.public_download_url
     end
   end

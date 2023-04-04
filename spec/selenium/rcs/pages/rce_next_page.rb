@@ -195,7 +195,7 @@ module RCENextPage
 
   def rce_validate_wiki_style_attrib(type, value, selectors)
     in_frame rce_page_body_ifr_id do
-      expect(f("#tinymce #{selectors}").attribute("style")).to match("#{type}: #{value}\;")
+      expect(f("#tinymce #{selectors}").attribute("style")).to match("#{type}: #{value};")
     end
   end
 

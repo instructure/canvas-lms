@@ -100,7 +100,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
   enable_forgery_protection do
     route_params = params_from_with_nesting(method, path)
     route_params.each do |key, value|
-      raise "Expected value of params[\'#{key}\'] to equal #{value}, actual: #{params[key]}" unless params[key].to_s == value.to_s
+      raise "Expected value of params['#{key}'] to equal #{value}, actual: #{params[key]}" unless params[key].to_s == value.to_s
     end
     if @use_basic_auth
       user_session(@user)

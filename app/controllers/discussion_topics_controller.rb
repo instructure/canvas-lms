@@ -804,7 +804,7 @@ class DiscussionTopicsController < ApplicationController
                apollo_caching: @current_user &&
                  Account.site_admin.feature_enabled?(:apollo_caching),
                discussion_cache_key: @current_user &&
-                 Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_\=HUpgraqe;njalkhpvoiulkimmaqewg")
+                 Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg")
              })
 
       unless @locked
