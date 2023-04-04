@@ -18,21 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module RuboCop::Canvas
-  module NewTables
-    extend RuboCop::NodePattern::Macros
-
-    # usage example:
-    #
-    # def on_class(node)
-    #   @new_tables = new_tables(node)
-    # end
-
-    def new_tables(class_node)
-      new_tables_impl(class_node).map(&:indifferent)
+  # Adds #indifferent to RuboCop::AST::Node, which
+  # will convert a SymbolNode to a StringNode, and
+  # return `self` for all other types
+  module Indifferent
+    def indifferent
+      self
     end
+  end
 
-    def_node_search :new_tables_impl, <<~PATTERN
-      (send nil? :create_table $_ ...)
-    PATTERN
+  module IndifferentSymbol
+    def indifferent
+      RuboCop::AST::StrNode.new(:str, [value.to_s])
+    end
   end
 end
