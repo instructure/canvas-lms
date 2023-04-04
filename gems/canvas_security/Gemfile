@@ -4,9 +4,11 @@ source "https://rubygems.org"
 
 gemspec
 
+# rubocop:disable Gemspec/DevelopmentDependencies
 path ".." do
   gem "canvas_cache"
   gem "canvas_errors"
   gem "config_file"
   gem "dynamic_settings"
 end
+# rubocop:enable Gemspec/DevelopmentDependencies

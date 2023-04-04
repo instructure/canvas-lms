@@ -445,7 +445,7 @@ class ActiveRecord::Base
   end
 
   def self.rank_hash(ary)
-    ary.each_with_index.each_with_object(Hash.new(ary.size + 1)) do |(values, i), hash|
+    ary.each_with_index.with_object(Hash.new(ary.size + 1)) do |(values, i), hash|
       Array(values).each { |value| hash[value] = i + 1 }
     end
   end

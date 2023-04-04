@@ -11,7 +11,6 @@ Gem::Specification.new do |spec|
   spec.summary       = "Account Level Reports"
 
   spec.files = Dir["{app,config,db,lib}/**/*"]
-  spec.test_files = Dir["spec_canvas/**/*"]
 
   spec.add_dependency "rails", ">= 3.2"
 end

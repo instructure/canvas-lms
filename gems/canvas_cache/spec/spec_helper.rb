@@ -77,6 +77,7 @@ RSpec.shared_context "caching_helpers", shared_context: :metadata do
       attr_reader :captured_message_stack
 
       def initialize
+        super(nil)
         @captured_message_stack = []
       end
 

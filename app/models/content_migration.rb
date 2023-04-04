@@ -1154,7 +1154,7 @@ class ContentMigration < ActiveRecord::Base
 
       key = Context.api_type_name(klass)
       context.shard.activate do
-        scope = (klass.column_names.include? "assignment_id") ? klass.select(:id, :assignment_id, :migration_id) : klass.select(:id, :migration_id)
+        scope = klass.column_names.include?("assignment_id") ? klass.select(:id, :assignment_id, :migration_id) : klass.select(:id, :migration_id)
         scope = scope.where(context: context).where.not(migration_id: nil)
         scope = scope.only_discussion_topics if asset_type == "DiscussionTopic"
       end

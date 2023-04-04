@@ -193,7 +193,7 @@ class Rubric < ActiveRecord::Base
   # I know.
   def destroy_for(context, current_user: nil)
     ras = rubric_associations.where(context_id: context, context_type: context.class.to_s)
-    if context.class.to_s == "Course"
+    if context.instance_of?(Course)
       # if rubric is removed at the course level, we want to destroy any
       # assignment associations found in the context of the course
       ras.each do |association|

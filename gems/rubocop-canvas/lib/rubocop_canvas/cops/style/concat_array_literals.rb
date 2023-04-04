@@ -22,7 +22,7 @@ module RuboCop
     module Style
       module ConcatArrayLiteralsWithIgnoredReceivers
         def on_send(node)
-          return if node.receiver.type == :const && node.receiver.short_name == :BookmarkedCollection
+          return if node.receiver&.type == :const && node.receiver.short_name == :BookmarkedCollection
 
           super
         end

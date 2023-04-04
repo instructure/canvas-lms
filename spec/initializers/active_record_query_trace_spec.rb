@@ -47,7 +47,7 @@ describe "#configure!" do
   context "when Rails ENV is production" do
     before do
       allow(ENV).to receive(:[]).with("AR_QUERY_TRACE").and_return("true")
-      allow(Rails).to receive(:env) { "production".inquiry }
+      allow(Rails).to receive(:env) { "production".inquiry } # rubocop:disable Rails/Inquiry
     end
 
     it "does not enable AR query trace" do
@@ -57,7 +57,7 @@ describe "#configure!" do
 
   context "when Rails ENV is development" do
     before do
-      allow(Rails).to receive(:env) { "development".inquiry }
+      allow(Rails).to receive(:env) { "development".inquiry } # rubocop:disable Rails/Inquiry
     end
 
     context "and AR_QUERY_TRACE is falsy" do

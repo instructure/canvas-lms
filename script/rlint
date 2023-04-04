@@ -54,7 +54,6 @@ OptionParser.new do |opts|
     linter_options[:comment_post_processing] = proc do |comments|
       grouped_comments = comments.group_by { |comment| comment[:rule] }
 
-      require "pp"
       pp grouped_comments.transform_values(&:length).to_a.sort_by(&:last).reverse.to_h
       exit 0
     end

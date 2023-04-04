@@ -1582,7 +1582,7 @@ class Assignment < ActiveRecord::Base
     # the time zone that was active during editing
     time_zone = tz || (ActiveSupport::TimeZone.new(time_zone_edited) rescue nil) || Time.zone
     self.all_day, self.all_day_date = Assignment.all_day_interpretation(
-      due_at: due_at ? due_at.in_time_zone(time_zone) : nil,
+      due_at: due_at&.in_time_zone(time_zone),
       due_at_was: due_at_was,
       all_day_was: all_day_was,
       all_day_date_was: all_day_date_was

@@ -622,9 +622,7 @@ class AssignmentsController < ApplicationController
       set_tutorial_js_env
 
       log_asset_access(["syllabus", @context], "syllabus", "other")
-      respond_to do |format|
-        format.html
-      end
+      respond_to(&:html)
     end
   end
 

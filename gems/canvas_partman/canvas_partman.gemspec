@@ -9,7 +9,6 @@ Gem::Specification.new do |spec|
   spec.email         = ["ahmad@instructure.com"]
   spec.summary       = "PostgreSQL partitioning manager and helper."
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w[Gemfile LICENSE.txt README.md]
-  spec.test_files    = spec.files.grep(/spec/)
   spec.require_paths = ["lib"]
   spec.license       = "AGPL"
 

@@ -574,8 +574,8 @@ describe Api do
     end
 
     it "handles user uuid" do
-      expect(Api.sis_parse_id("uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0")).to \
-        eq ["uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
+      expect(Api.sis_parse_id("uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"))
+        .to eq ["uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
       expect(Api.sis_parse_ids(["uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"], @lookups)).to \
         eq({ "users.uuid" => { ids: ["tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"] } })
     end

@@ -383,7 +383,7 @@ module Api
     action = "#{controller.params[:controller]}##{controller.params[:action]}"
     per_page_requested = controller.params[:per_page] || options[:default] || per_page(action)
     max = options[:max] || max_per_page(action)
-    [[per_page_requested.to_i, 1].max, max.to_i].min
+    per_page_requested.to_i.clamp(1, max.to_i)
   end
 
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination

@@ -84,7 +84,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def is_assignment?
-    assignment.class.to_s == "Assignment"
+    assignment.instance_of?(Assignment)
   end
 
   def has_no_group_weight?
