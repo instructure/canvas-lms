@@ -22,7 +22,6 @@ RUN --mount=target=/tmp/src \
     | tee /tmp/dst/ruby-runner.tar | md5sum > /tmp/dst/ruby-runner.tar.md5 && \
   \
   tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
-    script/fix_inst_esm.js \
     package.json \
     yarn.lock \
     gems/plugins/**/package.json \

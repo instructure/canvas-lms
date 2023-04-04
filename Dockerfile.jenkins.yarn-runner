@@ -5,5 +5,4 @@ RUN --mount=type=bind,from=local/cache-helper,source=/tmp/dst,target=/cache-help
 
 RUN set -eux; \
   (DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile --network-concurrency 1) \
-  && yarn cache clean \
-  && ./script/fix_inst_esm.js
+  && yarn cache clean
