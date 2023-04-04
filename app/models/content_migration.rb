@@ -1136,7 +1136,7 @@ class ContentMigration < ActiveRecord::Base
     "!/blueprint/blueprint_subscriptions/#{child_subscription_id}/#{id}"
   end
 
-  ASSET_ID_MAP_TYPES = %w[Announcement Assignment Attachment ContentTag ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
+  ASSET_ID_MAP_TYPES = %w[Assignment Announcement Attachment ContentTag ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
 
   def asset_id_mapping
     return nil unless (imported? || importing?) && source_course
@@ -1147,15 +1147,24 @@ class ContentMigration < ActiveRecord::Base
     global_ids = master_template.present? || use_global_identifiers?
 
     ASSET_ID_MAP_TYPES.each do |asset_type|
+      mig_id_to_dest_id = {}
+      scope = nil
       klass = asset_type.constantize
       next unless klass.column_names.include? "migration_id"
 
       key = Context.api_type_name(klass)
-      mig_id_to_dest_id = context.shard.activate do
-        scope = klass.where(context: context).where.not(migration_id: nil)
+      context.shard.activate do
+        scope = (klass.column_names.include? "assignment_id") ? klass.select(:id, :assignment_id, :migration_id) : klass.select(:id, :migration_id)
+        scope = scope.where(context: context).where.not(migration_id: nil)
         scope = scope.only_discussion_topics if asset_type == "DiscussionTopic"
-        scope.pluck(:migration_id, :id).to_h
       end
+
+      scope.each do |o|
+        mig_id_to_dest_id[o.migration_id.to_s] = {}
+        mig_id_to_dest_id[o.migration_id.to_s][:id] = o.id
+        mig_id_to_dest_id[o.migration_id.to_s][:shell_id] = o.assignment_id if (o.class.column_names.include? "assignment_id") && o.assignment_id
+      end
+
       next if mig_id_to_dest_id.empty?
 
       mapping[key] ||= {}
@@ -1168,8 +1177,7 @@ class ContentMigration < ActiveRecord::Base
           src_ids.each do |src_id|
             global_asset_string = klass.asset_string(Shard.global_id_for(src_id, source_course.shard))
             mig_id = master_template.migration_id_for(global_asset_string)
-            dest_id = mig_id_to_dest_id[mig_id]
-            mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+            mapping[key][src_id.to_s] = mig_id_to_dest_id[mig_id][:id].to_s if mig_id_to_dest_id[mig_id]
           end
         else
           master_template.master_content_tags
@@ -1177,8 +1185,10 @@ class ContentMigration < ActiveRecord::Base
                                 migration_id: mig_id_to_dest_id.keys)
                          .pluck(:content_id, :migration_id)
                          .each do |src_id, mig_id|
-            dest_id = mig_id_to_dest_id[mig_id]
-            mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+            if mig_id_to_dest_id[mig_id]
+              mapping[key][src_id.to_s] = mig_id_to_dest_id[mig_id][:id].to_s if mig_id_to_dest_id[mig_id][:id]
+              mapping["assignments"][klass.find(src_id.to_s).assignment_id] = mig_id_to_dest_id[mig_id][:shell_id].to_s if mig_id_to_dest_id[mig_id][:shell_id]
+            end
           end
         end
       else
@@ -1189,8 +1199,7 @@ class ContentMigration < ActiveRecord::Base
           src_ids.each do |src_id|
             asset_string = klass.asset_string(src_id)
             mig_id = CC::CCHelper.create_key(asset_string, global: global_ids)
-            dest_id = mig_id_to_dest_id[mig_id]
-            mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+            mapping[key][src_id.to_s] = mig_id_to_dest_id[mig_id][:id].to_s if mig_id_to_dest_id[mig_id]
           end
         end
       end
