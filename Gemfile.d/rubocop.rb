@@ -18,12 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # these gems are separate from test.rb so that we can treat it as a dedicated
-# Gemfile for script/rlint, and it will run very quickly
+# Gemfile for script/rlint, and it will run very quickly. as such, they still
+# need to be pinned to explicit versions
 
-gem "parallel", "1.22.0", require: false # dependency of rubocop and canvas
+gem "parallel", "1.22.1", require: false # dependency of rubocop and canvas
   gem "ruby-progressbar", "1.11.0", require: false # used to show progress of S3Uploader
 
-gem "regexp_parser", "1.8.2", require: false # dependency of rubocop and several other gems
+gem "regexp_parser", "2.7.0", require: false # dependency of rubocop and several other gems
 
 group :test do
   gem "gergich", "2.1.1", require: false
