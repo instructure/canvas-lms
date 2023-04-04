@@ -1021,9 +1021,9 @@ class EnrollmentsApiController < ApplicationController
 
   def enrollment_states_for_state_param
     states = Array(params[:state]).uniq
-    states.concat(%w[active invited]) if states.delete "current_and_invited"
-    states.concat(%w[active invited creation_pending pending_active pending_invited]) if states.delete "current_and_future"
-    states.concat(%w[active completed]) if states.delete "current_and_concluded"
+    states.push("active", "invited") if states.delete "current_and_invited"
+    states.push("active", "invited", "creation_pending", "pending_active", "pending_invited") if states.delete "current_and_future"
+    states.push("active", "completed") if states.delete "current_and_concluded"
     states.uniq
   end
 

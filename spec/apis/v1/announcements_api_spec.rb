@@ -97,7 +97,7 @@ describe "Announcements API", type: :request do
                                             start_date: start_date, end_date: end_date))
 
       all_anns = @anns.map { |e| [e["context_code"], e["id"]] }
-      all_anns.concat([["course_#{@course1.id}", @ann1.id], ["course_#{@course2.id}", @ann2.id]])
+      all_anns.push(["course_#{@course1.id}", @ann1.id], ["course_#{@course2.id}", @ann2.id])
       expect(json.length).to eq 7
       expect(json.map { |e| [e["context_code"], e["id"]] }).to match_array all_anns
     end

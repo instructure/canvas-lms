@@ -215,7 +215,7 @@ class MessageableUser < User
 
         if pager.include_bookmark
           condition[0] << "OR #{User.sortable_name_order_by_clause} = ? AND users.id = ?"
-          condition.concat([name, id])
+          condition.push(name, id)
         end
 
         scope.where(condition)

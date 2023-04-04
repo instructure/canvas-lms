@@ -269,7 +269,7 @@ module DynamicSettings
       else
         key_array << cluster
       end
-      key_array.concat([prefix, key]).compact.join("/")
+      key_array.push(prefix, key).compact.join("/")
     end
 
     def populate_cache(subtree, ttl)
