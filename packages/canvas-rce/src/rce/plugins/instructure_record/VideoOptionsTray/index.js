@@ -239,6 +239,7 @@ export default function VideoOptionsTray({
                         <View as="div" padding="small small xx-small small">
                           <SimpleSelect
                             id={`${id}-size`}
+                            mountNode={instuiPopupMountNode}
                             disabled={displayAs !== 'embed'}
                             renderLabel={formatMessage('Size')}
                             messages={messagesForSize}
