@@ -324,12 +324,6 @@ class MediaObject < ActiveRecord::Base
     retrieve_details
   end
 
-  def destroy_without_destroying_attachment
-    self.workflow_state = "deleted"
-    self.attachment_id = nil
-    save!
-  end
-
   def ensure_attachment
     return if attachment_id || Attachment.find_by(media_entry_id: media_id)
     return unless %w[Account Course Group User].include?(context_type)
