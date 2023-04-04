@@ -1342,7 +1342,7 @@ class DiscussionTopic < ActiveRecord::Base
   def participants(include_observers = false)
     participants = context.participants(include_observers: include_observers, by_date: true)
     participants_in_section = users_with_section_visibility(participants.compact)
-    if user && !participants_in_section.map(&:id).to_set.include?(user.id)
+    if user && !participants_in_section.to_set(&:id).include?(user.id)
       participants_in_section += [user]
     end
     participants_in_section

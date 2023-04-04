@@ -83,7 +83,7 @@ module ActiveRecord
             scope = new_scope
 
             # build the conditions hash, using literal values or the attribute if it's self
-            conditions = scope.map { |k, v| [k, v == self ? k : v.inspect] }.to_h
+            conditions = scope.to_h { |k, v| [k, v == self ? k : v.inspect] }
             conditions = conditions.map { |c, v| "#{c}: #{v}" }.join(", ")
             # build the in_scope method, matching literals or requiring a foreign keys
             # to be non-nil

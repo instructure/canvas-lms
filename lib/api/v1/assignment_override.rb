@@ -293,7 +293,7 @@ module Api::V1::AssignmentOverride
       defunct_student_ids = if override.new_record?
                               Set.new
                             else
-                              override.assignment_override_students.map(&:user_id).to_set
+                              override.assignment_override_students.to_set(&:user_id)
                             end
 
       override.changed_student_ids = Set.new

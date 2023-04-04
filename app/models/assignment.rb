@@ -1282,7 +1282,7 @@ class Assignment < ActiveRecord::Base
     p.to do |assignment|
       # everyone who is _not_ covered by an assignment override affecting due_at
       # (the AssignmentOverride records will take care of notifying those users)
-      excluded_ids = participants_with_overridden_due_at.map(&:id).to_set
+      excluded_ids = participants_with_overridden_due_at.to_set(&:id)
       BroadcastPolicies::AssignmentParticipants.new(assignment, excluded_ids).to
     end
     p.whenever do |assignment|
@@ -2330,9 +2330,9 @@ class Assignment < ActiveRecord::Base
 
     # move the following 2 lines out of the trnx
     # make the trnx simpler. The trnx will have fewer locks and rollbacks.
-    homework_lti_user_id_hash = students.map do |student|
+    homework_lti_user_id_hash = students.to_h do |student|
       [student.global_id, Lti::Asset.opaque_identifier_for(student)]
-    end.to_h
+    end
     submissions = find_or_create_submissions(students, Submission.preload(:grading_period)).sort_by(&:id)
 
     transaction do
@@ -2510,21 +2510,21 @@ class Assignment < ActiveRecord::Base
     return visible_students_for_speed_grader(user: user, includes: includes, group_id: group_id, section_id: section_id) unless grade_as_group?
 
     submissions = self.submissions.to_a
-    user_ids_with_submissions = submissions.select(&:has_submission?).map(&:user_id).to_set
+    user_ids_with_submissions = submissions.select(&:has_submission?).to_set(&:user_id)
     user_ids_with_turnitin_data = if turnitin_enabled?
-                                    submissions.reject { |s| s.turnitin_data.blank? }.map(&:user_id).to_set
+                                    submissions.reject { |s| s.turnitin_data.blank? }.to_set(&:user_id)
                                   else
                                     []
                                   end
     user_ids_with_vericite_data = if vericite_enabled?
                                     submissions
                                       .reject { |s| s.turnitin_data.blank? }
-                                      .map(&:user_id).to_set
+                                      .to_set(&:user_id)
                                   else
                                     []
                                   end
     # this only includes users with a submission who are unexcused
-    user_ids_who_arent_excused = submissions.reject(&:excused?).map(&:user_id).to_set
+    user_ids_who_arent_excused = submissions.reject(&:excused?).to_set(&:user_id)
 
     enrollment_state =
       context.all_accepted_student_enrollments.pluck(:user_id, :workflow_state).to_h
@@ -2533,7 +2533,7 @@ class Assignment < ActiveRecord::Base
     enrollment_priority = { "active" => 1, "inactive" => 2 }
     enrollment_priority.default = 100
 
-    visible_student_ids = visible_students_for_speed_grader(user: user, includes: includes).map(&:id).to_set
+    visible_student_ids = visible_students_for_speed_grader(user: user, includes: includes).to_set(&:id)
 
     reps_and_others = groups_and_ungrouped(user, includes: includes).filter_map do |group_name, group_info|
       group_students = group_info[:users]
@@ -2790,7 +2790,7 @@ class Assignment < ActiveRecord::Base
     { student_ids: student_ids,
       submissions: submissions,
       submission_ids: Set.new(submissions.pluck(:id)),
-      assessor_id_map: submissions.map { |s| [s.id, s.assessment_requests.map(&:assessor_asset_id)] }.to_h }
+      assessor_id_map: submissions.to_h { |s| [s.id, s.assessment_requests.map(&:assessor_asset_id)] } }
   end
 
   def sorted_review_candidates(peer_review_params, current_submission, candidate_set)

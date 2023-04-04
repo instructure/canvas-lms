@@ -51,9 +51,9 @@ module Api::V1::RubricAssessment
   end
 
   def indexed_rubric_assessment_json(rubric_assessment)
-    rubric_assessment.data.map do |r|
+    rubric_assessment.data.to_h do |r|
       [r[:criterion_id], { rating_id: r[:id] }.merge(r.slice(:comments, :points))]
-    end.to_h
+    end
   end
 
   def full_rubric_assessment_json_for_submissions(rubric_assessment, user, session)

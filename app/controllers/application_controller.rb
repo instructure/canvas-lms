@@ -2806,12 +2806,12 @@ class ApplicationController < ActionController::Base
       permissions[:manage_assignments_delete] = permissions[:manage_assignments]
       permissions[:manage] = permissions[:manage_assignments]
     end
-    permissions[:by_assignment_id] = @context.assignments.map do |assignment|
+    permissions[:by_assignment_id] = @context.assignments.to_h do |assignment|
       [assignment.id, {
         update: assignment.user_can_update?(@current_user, session),
         delete: assignment.grants_right?(@current_user, :delete)
       }]
-    end.to_h
+    end
 
     current_user_has_been_observer_in_this_course = @context.user_has_been_observer?(@current_user)
 

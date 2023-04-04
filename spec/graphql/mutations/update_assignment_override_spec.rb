@@ -89,7 +89,7 @@ describe Mutations::UpdateAssignment do
   #
 
   def assert_adhoc_override(result_override, student_ids, assignment_id = @assignment_id)
-    expect(result_override["set"]["students"].map { |s| s["_id"].to_i }.to_set).to eq student_ids.to_set
+    expect(result_override["set"]["students"].to_set { |s| s["_id"].to_i }).to eq student_ids.to_set
     override = Assignment.find(assignment_id).assignment_overrides.detect { |e| e.id.to_s == result_override["_id"] }
     expect(override).to_not be_nil
     override_set = override.set

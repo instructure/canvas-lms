@@ -74,7 +74,7 @@ describe OutcomesServiceAlignmentsHelper do
   end
 
   def mock_minified_aligned_outcomes_response(response)
-    (response[:outcomes] || []).map { |o| [o[:external_id], o[:alignments]] }.to_h
+    (response[:outcomes] || []).to_h { |o| [o[:external_id], o[:alignments]] }
   end
 
   around do |example|

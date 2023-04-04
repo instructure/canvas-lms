@@ -2748,7 +2748,7 @@ describe DiscussionTopic do
       @topic.save!
       new_topic = @topic.duplicate
       expect(new_topic.discussion_topic_section_visibilities.length).to eq 2
-      new_course_sections = new_topic.discussion_topic_section_visibilities.map(&:course_section_id).to_set
+      new_course_sections = new_topic.discussion_topic_section_visibilities.to_set(&:course_section_id)
       expect(new_course_sections).to eq [@course_section1.id, @course_section2.id].to_set
       expect(new_topic).to be_valid
     end
@@ -2782,7 +2782,7 @@ describe DiscussionTopic do
       topic = @course.discussion_topics.create!(title: "foo", message: "bar",
                                                 workflow_state: "published")
       users = topic.users_with_permissions(@all_users)
-      expect(users.map(&:id).to_set).to eq(@all_users.map(&:id).to_set)
+      expect(users.to_set(&:id)).to eq(@all_users.to_set(&:id))
     end
 
     it "specific topic limits properly" do
@@ -2791,7 +2791,7 @@ describe DiscussionTopic do
       add_section_to_topic(topic, @section2)
       topic.save!
       users = topic.users_with_permissions(@all_users)
-      expect(users.map(&:id).to_set).to eq([@teacher.id, @student2.id].to_set)
+      expect(users.to_set(&:id)).to eq([@teacher.id, @student2.id].to_set)
     end
   end
 
@@ -2818,7 +2818,7 @@ describe DiscussionTopic do
       users = topic.users_with_permissions(@all_users)
 
       expect(users.count).to eq(2)
-      expect(users.map(&:id).to_set).to eq([@teacher.id, @student2.id].to_set)
+      expect(users.to_set(&:id)).to eq([@teacher.id, @student2.id].to_set)
     end
   end
 

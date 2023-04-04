@@ -175,9 +175,9 @@ module ActionView::TestCase::Behavior
     if is_a?(RSpec::Rails::HelperExampleGroup)
       # the original implementation. we can't call super because
       # we replaced the whole original method
-      return _user_defined_ivars.map do |ivar|
+      return _user_defined_ivars.to_h do |ivar|
         [ivar[1..].to_sym, instance_variable_get(ivar)]
-      end.to_h
+      end
     end
     {}
   end
@@ -370,7 +370,7 @@ module RSpec::Matchers::Helpers
   # allows for matchers to use symbols and literals even though URIs are always strings.
   # i.e. `and_query({assignment_id: @assignment.id})`
   def self.cast_to_strings(expected:)
-    expected.map { |k, v| [k.to_s, v.to_s] }.to_h
+    expected.to_h { |k, v| [k.to_s, v.to_s] }
   end
 end
 

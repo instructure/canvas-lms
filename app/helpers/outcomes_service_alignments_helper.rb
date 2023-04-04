@@ -51,7 +51,7 @@ module OutcomesServiceAlignmentsHelper
 
       # minify response to reduce cache size
       # needs to be updated after OUT-5473 and OUT-5474 are merged
-      (resp_body[:outcomes] || []).map { |o| [o[:external_id], o[:alignments] || []] }.to_h
+      (resp_body[:outcomes] || []).to_h { |o| [o[:external_id], o[:alignments] || []] }
     end
   end
 
