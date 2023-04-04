@@ -26,15 +26,20 @@ describe OutcomesServiceAlignmentsHelper do
 
   before(:once) do
     course_model
-    @outcome = outcome_model(context: @course, title: "outcome aligned in OS")
+    @outcome1 = outcome_model(context: @course, title: "outcome 1 aligned in OS")
+    @outcome2 = outcome_model(context: @course, title: "outcome 2 aligned in OS")
+    @new_quiz1 = @course.assignments.create!(title: "new quiz 1 - aligned in OS", submission_types: "external_tool")
+    @new_quiz2 = @course.assignments.create!(title: "new quiz 2 - aligned in OS", submission_types: "external_tool")
   end
 
   let(:account) { @course.account }
-  let(:response_with_outcomes) { mock_aligned_outcomes_response([@outcome]) }
-  let(:response_no_outcomes) { mock_aligned_outcomes_response([]) }
+  let(:response_with_outcomes) { mock_aligned_outcomes_response([@outcome1, @outcome2], [@new_quiz1, @new_quiz2]) }
+  let(:response_no_outcomes) { mock_aligned_outcomes_response([], []) }
   let(:minified_response_with_outcomes) { mock_minified_aligned_outcomes_response(response_with_outcomes) }
   let(:minified_response_no_outcomes) { mock_minified_aligned_outcomes_response(response_no_outcomes) }
   let(:cache_key) { [:os_aligned_outcomes, :account_uuid, account.uuid, :context_uuid, @course.uuid, :context_id, @course.id] }
+  let(:minified_response_with_active_outcomes) { mock_minified_aligned_outcomes_response(mock_aligned_outcomes_response([@outcome1], [@new_quiz1, @new_quiz2])) }
+  let(:minified_response_with_active_quizzes) { mock_minified_aligned_outcomes_response(mock_aligned_outcomes_response([@outcome1, @outcome2], [@new_quiz1])) }
 
   def stub_get_aligned_outcomes(context)
     stub_request(:get, "http://domain/api/alignments?context_uuid=#{context.uuid}&context_id=#{context.id}")
@@ -48,12 +53,28 @@ describe OutcomesServiceAlignmentsHelper do
             })
   end
 
-  def mock_aligned_outcomes_response(outcomes = nil)
-    [[:outcomes, (outcomes || []).map.with_index { |o, idx| { id: idx + 1, external_id: o.id, title: o.short_description } }]].to_h
+  def mock_aligned_outcomes_response(outcomes, quizzes)
+    [[:outcomes, (outcomes || [])
+      .map
+      .with_index do |o, idx|
+                   {
+                     id: idx + 1,
+                     external_id: o.id.to_s,
+                     title: o.short_description,
+                     alignments: (quizzes || []).map.with_index do |q, ind|
+                                   {
+                                     artifact_type: "quizzes.quiz",
+                                     artifact_id: (ind + 1).to_s,
+                                     associated_asset_type: "canvas.assignment.quizzes",
+                                     associated_asset_id: q.id.to_s
+                                   }
+                                 end
+                   }
+                 end]].to_h
   end
 
   def mock_minified_aligned_outcomes_response(response)
-    (response[:outcomes] || []).map { |o| [o[:external_id], []] }.to_h
+    (response[:outcomes] || []).map { |o| [o[:external_id], o[:alignments]] }.to_h
   end
 
   around do |example|
@@ -113,6 +134,33 @@ describe OutcomesServiceAlignmentsHelper do
           subject.get_os_aligned_outcomes(@course)
           expect(Rails.cache.fetch(cache_key)).to eq minified_response_with_outcomes
         end
+      end
+    end
+  end
+
+  describe "#get_active_os_alignments" do
+    before do
+      allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+        .to receive(:get_os_aligned_outcomes)
+        .and_return(minified_response_with_outcomes)
+    end
+
+    it "calls #get_os_aligned_outcomes with context" do
+      expect(subject).to receive(:get_os_aligned_outcomes).with(@course)
+      subject.get_active_os_alignments(@course)
+    end
+
+    context "when outcome is deleted in Canvas but not synched to Outcomes-Service" do
+      it "returns only active outcomes in Canvas with alingments to new quizzes" do
+        @outcome2.destroy
+        expect(subject.get_active_os_alignments(@course)).to eq minified_response_with_active_outcomes
+      end
+    end
+
+    context "when new quiz is deleted in Canvas but not synched to Outcomes-Service" do
+      it "returns only outcomes with alignments to new quizzes that are active in Canvas" do
+        @new_quiz2.destroy
+        expect(subject.get_active_os_alignments(@course)).to eq minified_response_with_active_quizzes
       end
     end
   end
