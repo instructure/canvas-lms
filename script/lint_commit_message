@@ -142,7 +142,7 @@ if only_affects_specs
   exit
 end
 
-flag_name = (commit_message =~ /^flag\s{0,3}=\s{0,3}([a-zA-Z][\w\-]+)\s{0,3}$/)
+flag_name = (commit_message =~ /^flag\s{0,3}=\s{0,3}([a-zA-Z][\w-]+)\s{0,3}$/)
 unless flag_name
   comment "warn", nil, "ლ(ಠ益ಠლ) y u no add release flag? https://instructure.atlassian.net/wiki/spaces/CE/pages/603586589/Commit+Message+Release+Flags"
 end

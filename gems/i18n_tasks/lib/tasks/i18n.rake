@@ -116,7 +116,7 @@ namespace :i18n do
 
   # TODO: remove once we're sure all places that called i18n:generate are now
   # calling i18n:extract (e.g. caturday)
-  desc 'Alias for i18n:extract'
+  desc "Alias for i18n:extract"
   task generate: [:extract]
 
   desc "generate JavaScript translation files"
@@ -163,7 +163,7 @@ namespace :i18n do
     end
 
     t = Time.now
-    translations = YAML.safe_load(open(source_translations_file))
+    translations = YAML.safe_load(File.open(source_translations_file))
 
     I18n.extend I18nTasks::Lolcalize
     lolz_translations = {}
@@ -251,7 +251,7 @@ namespace :i18n do
       loop do
         puts "Enter local branch containing current en translations (default master):"
         current_branch = $stdin.gets.strip
-        break if current_branch.blank? || current_branch !~ /[^a-z0-9_.\-]/
+        break if current_branch.blank? || current_branch !~ /[^a-z0-9_.-]/
       end
       current_branch = nil if current_branch.blank?
 
