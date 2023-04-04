@@ -132,7 +132,8 @@ describe CourseSection, "moving to new course" do
 
     cs.crosslist_to_course(course2)
     expect(course1.reload.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id].sort
-    expect(course2.reload.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id, sub_account2.id].sort
+    expect(course2.reload.associated_accounts(include_crosslisted_courses: false).map(&:id).sort).to eq [root_account.id, sub_account2.id].sort
+    expect(course2.reload.associated_accounts(include_crosslisted_courses: true).map(&:id).sort).to eq [root_account.id, sub_account1.id, sub_account2.id].sort
     expect(course3.reload.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account3.id].sort
     u.reload
     expect(u.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id, sub_account2.id].sort
@@ -141,7 +142,8 @@ describe CourseSection, "moving to new course" do
     expect(cs.nonxlist_course_id).to eq course1.id
     expect(course1.reload.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id].sort
     expect(course2.reload.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account2.id].sort
-    expect(course3.reload.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id, sub_account3.id].sort
+    expect(course3.reload.associated_accounts(include_crosslisted_courses: false).map(&:id).sort).to eq [root_account.id, sub_account3.id].sort
+    expect(course3.reload.associated_accounts(include_crosslisted_courses: true).map(&:id).sort).to eq [root_account.id, sub_account1.id, sub_account3.id].sort
     u.reload
     expect(u.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id, sub_account3.id].sort
 
