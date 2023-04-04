@@ -89,7 +89,7 @@ gem "inst-jobs-statsd", "2.2.0"
 # the json gem is installed, it will always use that one even before bundler
 # gets activated. Updating the gem in it's own commit will make this easier.
 gem "json", "~> 2.6.1"
-gem "json_schemer", "0.2.16", github: "robotdana/json_schemer", ref: "0d2ac359a87964f74c07a14cafeb98cfcae4e29f"
+gem "json_schemer", "~> 0.2"
 gem "json-jwt", "1.13.0", require: false
 gem "link_header", "0.0.8"
 gem "mail", "2.7.1", require: false
