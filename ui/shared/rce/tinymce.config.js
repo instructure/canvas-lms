@@ -61,8 +61,8 @@ export default class EditorConfig {
     return {
       body_class:
         window.ENV.FEATURES?.canvas_k6_theme ||
-        window.ENV.K5_SUBJECT_COURSE ||
-        window.ENV.K5_HOMEROOM_COURSE
+        ((window.ENV.K5_SUBJECT_COURSE || window.ENV.K5_HOMEROOM_COURSE) &&
+          !window.ENV.USE_CLASSIC_FONT)
           ? 'elementary-theme'
           : 'default-theme',
       selector: `#${this.idAttribute}`,
