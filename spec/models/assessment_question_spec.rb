@@ -133,7 +133,7 @@ describe AssessmentQuestion do
       expect(matches.length).to eq ary.length
       matches.each_with_index do |match, index|
         a = ary[index]
-        expect(match).to eq "/assessment_questions/#{@question.id}/files/#{a.id}/download\?verifier=#{a.uuid}"
+        expect(match).to eq "/assessment_questions/#{@question.id}/files/#{a.id}/download?verifier=#{a.uuid}"
       end
     end
 

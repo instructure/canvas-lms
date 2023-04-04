@@ -196,7 +196,7 @@ describe "assignments sync to sis" do
       let(:settings_enable) { { sis_require_assignment_due_date: { value: true } } }
       let(:expected_date) { format_date_for_view(Time.zone.now - 1.month) }
       let(:assignment_id) { @assignment.id }
-      let(:assignment_entry) { f("\#assignment_#{assignment_id}") }
+      let(:assignment_entry) { f("#assignment_#{assignment_id}") }
       let(:post_to_sis_button) { f(".post-to-sis-status", assignment_entry) }
       let(:due_date_error) { f("#flash_message_holder") }
       let(:sis_state_text) { f(".icon-post-to-sis", post_to_sis_button).attribute(:alt) }

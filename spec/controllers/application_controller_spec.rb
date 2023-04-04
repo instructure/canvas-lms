@@ -1707,7 +1707,7 @@ RSpec.describe ApplicationController do
       end
 
       it "doesn't return an invalid icon_url" do
-        totallyavalidurl = %{');\"></i>nothing to see here</button><img src=x onerror="alert(document.cookie);alert(document.domain);" />}
+        totallyavalidurl = %{');"></i>nothing to see here</button><img src=x onerror="alert(document.cookie);alert(document.domain);" />}
         @tool.settings[:editor_button][:icon_url] = totallyavalidurl
         @tool.save!
         hash = controller.external_tool_display_hash(@tool, :editor_button)

@@ -118,7 +118,7 @@ module WikiAndTinyCommon
   # only handles by #id's
   def validate_wiki_style_attrib(type, value, selectors)
     in_frame wiki_page_body_ifr_id do
-      expect(f("#tinymce #{selectors}").attribute("style")).to match("#{type}: #{value}\;")
+      expect(f("#tinymce #{selectors}").attribute("style")).to match("#{type}: #{value};")
     end
   end
 

@@ -71,7 +71,7 @@ describe "admin_tools" do
 
   def change_log_type(log_type)
     wait_for_ajaximations
-    click_option("#loggingType", "\#logging#{log_type}", :value)
+    click_option("#loggingType", "#logging#{log_type}", :value)
     wait_for_ajaximations
   end
 

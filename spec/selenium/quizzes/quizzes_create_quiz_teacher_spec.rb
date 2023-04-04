@@ -184,7 +184,7 @@ describe "creating a quiz" do
 
     describe "upon save" do
       let(:title) { "My Title" }
-      let(:error_text) { "\'Please add a due date\'" }
+      let(:error_text) { "'Please add a due date'" }
       let(:error) { fj(".error_box div:contains(#{error_text})") }
       let(:due_date_input_fields) { ff(".DueDateInput") }
       let(:save_button) { f(".save_quiz_button") }
