@@ -334,7 +334,7 @@ describe LtiApiController, type: :request do
       # source_id is a string consisting of 5 parts which are random in these tests.
       # [@tool.id, @context.id, assignment.id, @user.id, some_hash]
       # We simply test for their presence in the headers.
-      (0...4).each do |i|
+      4.times do |i|
         expect(source_id_parts[i]).not_to be_empty
       end
       expect(header_keys["sa"]).to eql submission_time

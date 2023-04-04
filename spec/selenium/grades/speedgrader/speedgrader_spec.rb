@@ -807,7 +807,7 @@ describe "Speedgrader" do
       seed_groups 1, 1
       scores = [5, 7, 10]
 
-      (0..2).each do |i|
+      3.times do |i|
         @testgroup[0].add_user @students[i]
       end
 
@@ -956,7 +956,7 @@ describe "Speedgrader" do
 
     it "list all students", priority: "1" do
       Speedgrader.click_students_dropdown
-      (0..2).each { |num| expect(Speedgrader.student_dropdown_menu).to include_text(@students[num].name) }
+      3.times { |num| expect(Speedgrader.student_dropdown_menu).to include_text(@students[num].name) }
     end
 
     it "list alias when hide student name is selected", priority: "2" do
@@ -988,7 +988,7 @@ describe "Speedgrader" do
         student_options = Speedgrader.student_dropdown_menu.find_elements(tag_name: "li")
 
         graded = %w[resubmitted graded not_submitted]
-        (0..2).each { |num| expect(student_options[num]).to have_class(graded[num]) }
+        3.times { |num| expect(student_options[num]).to have_class(graded[num]) }
       end
     end
   end

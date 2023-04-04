@@ -288,7 +288,7 @@ describe Types::SubmissionType do
       @comment0 = @submission.add_comment(author: @teacher, comment: "test1", attempt: 0)
       @commentNil = @submission.add_comment(author: @teacher, comment: "test1", attempt: nil)
 
-      (0..1).each do |i|
+      2.times do |i|
         expect(
           submission_type.resolve("commentsConnection(filter: {forAttempt: #{i}}) { nodes { _id }}")
         ).to eq [@comment1.id.to_s, @comment0.id.to_s, @commentNil.id.to_s]
