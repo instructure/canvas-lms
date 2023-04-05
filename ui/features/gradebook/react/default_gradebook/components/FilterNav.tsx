@@ -62,7 +62,7 @@ export default function FilterNav({
 
   const assignments = assignmentGroups.flatMap(ag => ag.assignments)
   const modulesWithGradeableAssignments = modules.filter(m =>
-    assignments.some(a => a.grading_type !== 'not_graded' && a.module_ids.includes(m.id))
+    assignments.some(a => a.grading_type !== 'not_graded' && (a.module_ids || []).includes(m.id))
   )
 
   const handleClearFilters = () => {
