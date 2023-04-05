@@ -84,34 +84,39 @@ const ContextModulesPublishIcon: React.FC<Props> = ({courseId, moduleId, publish
       },
     })
       .then(result => {
-        return result
-      })
-      .then(result => {
         setIsPublished(result.json.published)
-        if (!skipModuleItems) {
-          updateModuleItemPublishedStates(result.json.published)
-        }
+        fetchModuleItemPublishedState()
       })
       .catch(error => showFlashError(I18n.t('There was an error while saving your changes'))(error))
       .finally(() => setIsPublishing(false))
   }
 
-  const updateModuleItemPublishedStates = (isPublished: boolean) => {
-    document.querySelectorAll(`#context_module_content_${moduleId} .ig-row`).forEach(element => {
-      if (isPublished) {
-        element.classList.add('ig-published')
-      } else {
-        element.classList.remove('ig-published')
-      }
+  const fetchModuleItemPublishedState = (nextLink?: string) => {
+    doFetchApi({
+      path: nextLink || `/api/v1/courses/${courseId}/modules/${moduleId}/items`,
+      method: 'GET',
     })
+      .then(({json, link}) => {
+        json.forEach((item: any) => {
+          updateModuleItemPublishedState(item.id, item.published)
+        })
+        if (link?.next) {
+          fetchModuleItemPublishedState(link.next.url)
+        }
+      })
+      .catch(error => showFlashError(I18n.t('There was an error while saving your changes'))(error))
+  }
 
-    document
-      .querySelectorAll(`#context_module_content_${moduleId} .publish-icon`)
-      .forEach(element => {
-        const publishIcon = $(element)
+  const updateModuleItemPublishedState = (itemId: string, isPublished: boolean) => {
+    const itemRow = document.querySelector(`#context_module_item_${itemId}`) as HTMLElement | null
+    if (itemRow) {
+      itemRow.querySelector('.ig-row')?.classList.toggle('ig-published', isPublished)
+      const publishIcon = $(itemRow.querySelector('.publish-icon'))
+      if (publishIcon) {
         publishIcon.data('published', isPublished)
         initPublishButton(publishIcon)
-      })
+      }
+    }
   }
 
   const unpublishAll = () => {

@@ -36,9 +36,8 @@ interface Props {
   readonly isOpen: boolean
   readonly onClose: () => void
   readonly onPublish: () => void
-  readonly onPublishComplete: (publish: boolean) => void
+  readonly onPublishComplete: () => void
   readonly progressId: string | null
-  readonly publishItems: boolean
   readonly title: string
 }
 export const PUBLISH_STATUS_POLLING_MS = 1000
@@ -49,7 +48,6 @@ const ContextModulesPublishModal: React.FC<Props> = ({
   onPublish,
   onPublishComplete,
   progressId,
-  publishItems,
   title,
 }) => {
   const [isPublishing, setIsPublishing] = useState(false)
@@ -141,7 +139,7 @@ const ContextModulesPublishModal: React.FC<Props> = ({
     if (publishMenu) {
       publishMenu.dataset.progressId = ''
     }
-    onPublishComplete(publishItems)
+    onPublishComplete()
     setProgress(null)
     setProgressCurrent(0)
     setIsPublishing(false)

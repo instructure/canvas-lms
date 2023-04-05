@@ -118,58 +118,61 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
       .catch(error => showFlashError(I18n.t('There was an error while saving your changes'))(error))
   }
 
-  const onPublishComplete = (isPublished: boolean) => {
-    updateModulePublishedStates(isPublished, moduleIds())
-    if (!shouldSkipModuleItems) {
-      updateModuleItemPublishedStates(isPublished, moduleIds())
-    }
+  const onPublishComplete = () => {
+    updateModuleStates()
     setIsPublishing(false)
     setProgressId(null)
     showFlashSuccess(I18n.t('Modules updated'))()
   }
 
-  const updateModulePublishedStates = (isPublished: boolean, completedModuleIds: Array<Number>) => {
-    completedModuleIds.forEach(moduleId => {
-      const publishIcon = document.querySelector(
-        `#context_module_${moduleId} .module-publish-icon`
-      ) as HTMLElement | null
-      if (publishIcon) {
-        // Update the new state of the module then we unmount the component to render the newly changed state
-        publishIcon.dataset.published = isPublished.toString()
-        ReactDOM.unmountComponentAtNode(publishIcon)
-        ReactDOM.render(
-          <ContextModulesPublishIcon
-            courseId={publishIcon.dataset.courseId}
-            moduleId={publishIcon.dataset.moduleId}
-            published={publishIcon.dataset.published === 'true'}
-          />,
-          publishIcon
-        )
-      }
+  const updateModuleStates = (nextLink?: string) => {
+    doFetchApi({
+      path: nextLink || `/api/v1/courses/${courseId}/modules?include[]=items`,
+      method: 'GET',
     })
-  }
-
-  const updateModuleItemPublishedStates = (
-    isPublished: boolean,
-    completedModuleIds: Array<Number>
-  ) => {
-    completedModuleIds.forEach(moduleId => {
-      document.querySelectorAll(`#context_module_content_${moduleId} .ig-row`).forEach(element => {
-        if (isPublished) {
-          element.classList.add('ig-published')
-        } else {
-          element.classList.remove('ig-published')
+      .then(({json, link}) => {
+        json.forEach((module: any) => {
+          updateModulePublishedState(module.published, module.id)
+          module.items.forEach((item: any) => {
+            updateModuleItemPublishedState(item.id, item.published)
+          })
+        })
+        if (link?.next) {
+          updateModuleStates(link.next.url)
         }
       })
+      .catch(error => showFlashError(I18n.t('There was an error while saving your changes'))(error))
+  }
 
-      document
-        .querySelectorAll(`#context_module_content_${moduleId} .publish-icon`)
-        .forEach(element => {
-          const publishIcon = $(element)
-          publishIcon.data('published', isPublished)
-          initPublishButton(publishIcon)
-        })
-    })
+  const updateModulePublishedState = (isPublished: boolean, moduleId: Number) => {
+    const publishIcon = document.querySelector(
+      `#context_module_${moduleId} .module-publish-icon`
+    ) as HTMLElement | null
+    if (publishIcon) {
+      // Update the new state of the module then we unmount the component to render the newly changed state
+      publishIcon.dataset.published = isPublished.toString()
+      ReactDOM.unmountComponentAtNode(publishIcon)
+      ReactDOM.render(
+        <ContextModulesPublishIcon
+          courseId={publishIcon.dataset.courseId}
+          moduleId={publishIcon.dataset.moduleId}
+          published={publishIcon.dataset.published === 'true'}
+        />,
+        publishIcon
+      )
+    }
+  }
+
+  const updateModuleItemPublishedState = (itemId: Number, isPublished: boolean) => {
+    const itemRow = document.querySelector(`#context_module_item_${itemId}`) as HTMLElement | null
+    if (itemRow) {
+      itemRow.querySelector('.ig-row')?.classList.toggle('ig-published', isPublished)
+      const publishIcon = $(itemRow.querySelector('.publish-icon'))
+      if (publishIcon) {
+        publishIcon.data('published', isPublished)
+        initPublishButton(publishIcon)
+      }
+    }
   }
 
   const unpublishAll = () => {
@@ -229,7 +232,6 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
         onPublish={batchUpdateApiCall}
         onPublishComplete={onPublishComplete}
         progressId={progressId}
-        publishItems={shouldPublishModules}
         title={modalTitle()}
       />
     </View>
