@@ -30,7 +30,11 @@ const I18n = useI18nScope('assignments_2_student_points_display')
 
 export default function PointsDisplay(props) {
   const ungradedVisualString = () => {
-    if (props.gradingType === 'points' && props.pointsPossible != null) {
+    if (
+      !ENV.restrict_quantitative_data &&
+      props.gradingType === 'points' &&
+      props.pointsPossible != null
+    ) {
       const formattedPoints = numberFormat._format(props.pointsPossible, {
         precision: 2,
         strip_insignificant_zeros: true,
@@ -49,7 +53,11 @@ export default function PointsDisplay(props) {
   }
 
   const ungradedScreenreaderString = () => {
-    if (props.gradingType === 'points' && props.pointsPossible != null) {
+    if (
+      !ENV.restrict_quantitative_data &&
+      props.gradingType === 'points' &&
+      props.pointsPossible != null
+    ) {
       const formattedPoints = numberFormat._format(props.pointsPossible, {
         precision: 2,
         strip_insignificant_zeros: true,
@@ -74,11 +82,16 @@ export default function PointsDisplay(props) {
     const formattedGrade = GradeFormatHelper.formatGrade(props.receivedGrade, {
       gradingType: props.gradingType,
       pointsPossible: props.pointsPossible,
+      score: props.receivedScore || null,
       defaultValue: forScreenReader ? ungradedScreenreaderString() : ungradedVisualString(),
       formatType: 'points_out_of_fraction',
     })
 
-    if (props.gradingType === 'points' && props.receivedGrade != null) {
+    if (
+      !ENV.restrict_quantitative_data &&
+      props.gradingType === 'points' &&
+      props.receivedGrade != null
+    ) {
       return I18n.t('%{formattedGrade} *Points*', {
         formattedGrade,
         wrappers: [forScreenReader ? '$1' : '<span class="points-text">$1</span>'],
@@ -111,6 +124,7 @@ PointsDisplay.propTypes = {
   gradingType: PropTypes.string.isRequired,
   pointsPossible: PropTypes.number,
   receivedGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  receivedScore: PropTypes.number,
 }
 
 PointsDisplay.defaultProps = {

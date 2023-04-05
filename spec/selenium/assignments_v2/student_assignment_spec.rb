@@ -33,6 +33,134 @@ describe "as a student" do
       @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
     end
 
+    context "assignment details with restrict_quantitative_data truthy" do
+      before :once do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+      end
+
+      context "not submitted" do
+        it "does not show points possible for points grading_type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "points"
+          )
+
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+
+          expect(f("body")).not_to contain_jqcss("span:contains('#{assignment.points_possible}'))")
+        end
+      end
+
+      context "graded" do
+        it "shows grade as letter_grade for points grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "points"
+          )
+
+          assignment.grade_student(@student, grade: "9", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          expect(f("span.selected-submission-grade").text).to include("A-")
+          expect(f("span.selected-submission-grade").text).not_to include("9")
+          expect(f("span[data-testid='grade-display']").text).to include("A-")
+          expect(f("span[data-testid='grade-display']").text).not_to include("9")
+        end
+
+        it "shows grade as letter_grade for percent grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "percent"
+          )
+
+          assignment.grade_student(@student, grade: "9", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          # making sure 9 does not show implicitly makes sure 90% does not show as well
+          expect(f("span.selected-submission-grade").text).to include("A-")
+          expect(f("span.selected-submission-grade").text).not_to include("9")
+          expect(f("span[data-testid='grade-display']").text).to include("A-")
+          expect(f("span[data-testid='grade-display']").text).not_to include("9")
+        end
+
+        it "shows grade as letter_grade for gpa_scale grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "gpa_scale"
+          )
+
+          assignment.grade_student(@student, grade: "9", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          # making sure 9 does not show implicitly makes sure 90% does not show as well
+          expect(f("span.selected-submission-grade").text).to include("A-")
+          expect(f("span[data-testid='grade-display']").text).to include("A-")
+        end
+
+        it "still shows grade as letter_grade for letter_grade grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "letter_grade"
+          )
+
+          assignment.grade_student(@student, grade: "9", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          # making sure 9 does not show implicitly makes sure 90% does not show as well
+          expect(f("span.selected-submission-grade").text).to include("A-")
+          expect(f("span[data-testid='grade-display']").text).to include("A-")
+        end
+
+        it "still shows grade as complete/incomplete for pass_fail grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "pass_fail"
+          )
+
+          assignment.grade_student(@student, grade: "pass", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          # making sure 9 does not show implicitly makes sure 90% does not show as well
+          expect(f("span.selected-submission-grade").text).to include("Complete")
+          expect(f("span[data-testid='grade-display']").text).to include("Complete")
+        end
+      end
+    end
+
     context "assignment details" do
       before(:once) do
         @assignment = @course.assignments.create!(

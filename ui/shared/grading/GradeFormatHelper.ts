@@ -28,6 +28,7 @@ const I18n = useI18nScope('sharedGradeFormatHelper')
 const POINTS = 'points'
 const PERCENT = 'percent'
 const PASS_FAIL = 'pass_fail'
+const GPA_SCALE = 'gpa_scale'
 const POINTS_OUT_OF_FRACTION = 'points_out_of_fraction'
 
 const PASS_GRADES = ['complete', 'pass']
@@ -162,6 +163,11 @@ const GradeFormatHelper = {
    *    - points_out_of_fraction: if grading type is points and this format type is present the grade will
    *      show its out of score. {grade}/{pointsPossible} i.e. 5/10 1/15
    *  defaultValue - If present will be the return value when the grade is undefined, null, or empty string.
+   *  score {number} - If present, will be used along with ENV.restrict_quantitative_data and the pointsPossbile option.
+   *    score is used to convert quantitative grades into their letter grade equivalent, without score and pointsPossbile,
+   *    quantitative grades will stay as is
+   *  pointsPossible {number} - If present, used in points our of fraction formatting, and also used in conjunction
+   *    with score to turn quantitative grading types into letter grade
    *
    * @return {string} Given grade rounded to two decimal places and formatted with I18n
    * if it is a point or percent grade.
@@ -183,15 +189,35 @@ const GradeFormatHelper = {
       if (isPassFail(parsedGrade, options.gradingType)) {
         parsedGrade = normalizeCompleteIncompleteGrade(parsedGrade)
         formattedGrade = parsedGrade === 'complete' ? I18n.t('complete') : I18n.t('incomplete')
+      } else if (ENV.restrict_quantitative_data && options.score && options.pointsPossible) {
+        // at this stage, gradingType is either points or mercent, or the passed grade is a number
+        formattedGrade = formatGradingSchemeGrade(options.score, null, {
+          gradingScheme: ENV.grading_scheme,
+          pointsPossible: options.pointsPossible,
+        })
       } else {
         const roundedGrade = round(parsedGrade, options.precision || 2)
         formattedGrade = I18n.n(roundedGrade, {percentage: isPercent(grade, options.gradingType)})
       }
     }
-    if (options.gradingType === POINTS && options.formatType === POINTS_OUT_OF_FRACTION) {
+    if (
+      !ENV.restrict_quantitative_data &&
+      options.gradingType === POINTS &&
+      options.formatType === POINTS_OUT_OF_FRACTION
+    ) {
       formattedGrade = formatPointsOutOf(grade, options.pointsPossible)
     }
-
+    if (
+      ENV.restrict_quantitative_data &&
+      options.score &&
+      options.pointsPossible &&
+      options.gradingType === GPA_SCALE
+    ) {
+      formattedGrade = formatGradingSchemeGrade(options.score, null, {
+        gradingScheme: ENV.grading_scheme,
+        pointsPossible: options.pointsPossible,
+      })
+    }
     return formattedGrade
   },
 

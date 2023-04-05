@@ -145,7 +145,9 @@ class AssignmentsController < ApplicationController
              peer_review_mode_enabled: submission.present? && peer_review_mode_enabled,
              peer_review_available: peer_review_available,
              peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission&.user&.name,
-             originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2)
+             originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2),
+             restrict_quantitative_data: @assignment.restrict_quantitative_data?(@current_user),
+             grading_scheme: @context.grading_standard_or_default.data
            })
 
     if peer_review_mode_enabled

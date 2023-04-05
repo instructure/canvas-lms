@@ -310,6 +310,7 @@ export type FormatGradeOptions = {
   delocalize?: boolean
   precision?: number
   pointsPossible?: number
+  score?: number
 }
 
 export type GradingStandard = [string, number]
