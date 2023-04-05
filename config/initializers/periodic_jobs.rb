@@ -191,6 +191,6 @@ Rails.configuration.after_initialize do
   end
 
   Delayed::Periodic.cron 'Alert long running jobs', '* * * * *' do
-    Delayed::Job.alert_long_running_jobs
+    MonitoringService.alert_long_running_jobs
   end
 end
