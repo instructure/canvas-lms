@@ -117,6 +117,7 @@ class Header extends React.Component {
             gradingStatus={submission.gradingStatus}
             gradingType={assignment.gradingType}
             receivedGrade={submission.grade}
+            receivedScore={submission.score}
             pointsPossible={assignment.pointsPossible}
           />
         )
@@ -154,12 +155,12 @@ class Header extends React.Component {
       return null
     }
     const attemptGrade = submission.gradingStatus !== 'needs_grading' ? submission.grade : null
-
     const formattedGrade = GradeFormatHelper.formatGrade(attemptGrade, {
       defaultValue: I18n.t('N/A'),
       formatType: 'points_out_of_fraction',
       gradingType: assignment.gradingType,
       pointsPossible: assignment.pointsPossible,
+      score: ENV.restrict_quantitative_data && submission.score ? submission.score : null,
     })
 
     const textProps =
