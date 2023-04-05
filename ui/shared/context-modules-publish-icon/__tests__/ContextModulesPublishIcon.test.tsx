@@ -30,7 +30,12 @@ const defaultProps = {
 }
 
 beforeAll(() => {
-  doFetchApi.mockResolvedValue({response: {ok: true}, json: {published: true}})
+  doFetchApi
+    .mockResolvedValue({response: {ok: true}, json: {published: true}})
+    .mockResolvedValueOnce({response: {ok: true}, json: {published: true}})
+    .mockResolvedValueOnce({response: {ok: true}, json: []})
+    .mockResolvedValueOnce({response: {ok: true}, json: {published: true}})
+    .mockResolvedValueOnce({response: {ok: true}, json: []})
 })
 
 beforeEach(() => {
