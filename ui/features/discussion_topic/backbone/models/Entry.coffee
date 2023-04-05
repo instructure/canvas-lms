@@ -23,10 +23,14 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
-import stripTags from 'strip-tags'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 I18n = useI18nScope('discussions')
+
+stripTags = (str) ->
+  div = document.createElement('div')
+  div.innerHTML = str
+  div.textContent or div.innerText or ''
 
 ##
 # Model representing an entry in discussion topic

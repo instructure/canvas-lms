@@ -24,10 +24,14 @@ import ParticipantCollection from '../collections/ParticipantCollection.coffee'
 import DiscussionEntriesCollection from '../collections/DiscussionEntriesCollection.coffee'
 import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
-import stripTags from 'strip-tags'
 import axios from '@canvas/axios'
 
 I18n = useI18nScope('discussion_topics')
+
+stripTags = (str) ->
+  div = document.createElement('div')
+  div.innerHTML = str
+  div.textContent or div.innerText or ''
 
 export default class DiscussionTopic extends Backbone.Model
   resourceName: 'discussion_topics'
