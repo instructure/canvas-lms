@@ -92,3 +92,11 @@ rce_transform_loaded_content:
       state: allowed_on
     ci:
       state: allowed_on
+
+media_links_use_attachment_id:
+  state: hidden
+  display_name: Use Attachment IDs in Media Links
+  description: |-
+    Use attachment ids in media links so that users are always pointed to the correct instance of media 
+    instead of the original
+  applies_to: SiteAdmin
