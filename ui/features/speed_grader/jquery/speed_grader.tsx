@@ -835,7 +835,7 @@ function initCommentBox() {
       )
   })
 
-  $('#media_recorder_container a').live('click', hideMediaRecorderContainer)
+  $(document).on('click', '#media_recorder_container a', hideMediaRecorderContainer)
 
   // handle speech to text for browsers that can (right now only chrome)
   function browserSupportsSpeech() {

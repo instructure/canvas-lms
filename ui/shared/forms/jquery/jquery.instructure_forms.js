@@ -406,7 +406,7 @@ $.ajaxJSONFiles = function (url, submit_type, formData, files, success, error, o
 
 $.handlesHTML5Files = !!(window.File && window.FileReader && window.FileList && XMLHttpRequest)
 if ($.handlesHTML5Files) {
-  $("input[type='file']").live('change', function (_event) {
+  $(document).on('change', "input[type='file']", function (_event) {
     const file_list = this.files
     if (file_list) {
       $(this).data('file_list', file_list)

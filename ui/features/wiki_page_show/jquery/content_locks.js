@@ -27,7 +27,7 @@ import 'jqueryui/dialog'
 const I18n = useI18nScope('content_locks')
 
 $(document).ready(function () {
-  $('.content_lock_icon').live('click', function (event) {
+  $(document).on('click', '.content_lock_icon', function (event) {
     if ($(this).data('lock_reason')) {
       event.preventDefault()
       const data = $(this).data('lock_reason')
