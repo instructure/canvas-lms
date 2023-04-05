@@ -31,9 +31,20 @@ describe RequestThrottle do
   let(:request_header_token) { request_user_2.merge({ "REMOTE_ADDR" => "4.3.2.1", "HTTP_AUTHORIZATION" => "Bearer #{token2.full_token}" }) }
   let(:request_logged_out) { base_req.merge({ "REMOTE_ADDR" => "1.2.3.4", "rack.session.options" => { id: "sess1" } }) }
   let(:request_no_session) { base_req.merge({ "REMOTE_ADDR" => "1.2.3.4" }) }
-  let(:request_sasu) { request_no_session.merge({ "USER_AGENT" => "inst-service1/1t34F67e  	  (  region: us-east-1; host:p.8A67n5d30a9; env:	pRod)	" }) }
-  let(:request_sasu_query_token) { request_sasu.merge({ "QUERY_STRING" => "access_token=#{token_sasu.full_token}", "rack.input" => StringIO.new("") }) }
-  let(:request_sasu_header_token) { request_sasu.merge({ "HTTP_AUTHORIZATION" => "Bearer #{token_sasu.full_token}", "rack.input" => StringIO.new("") }) }
+  let(:request_sasu_query_token) do
+    request_no_session.merge({
+                               "USER_AGENT" => "inst-service1/1t34F67e (region: us-east-1; host:p.8A67n5d30a9; env: pRod)",
+                               "QUERY_STRING" => "access_token=#{token_sasu.full_token}",
+                               "rack.input" => StringIO.new("")
+                             })
+  end
+  let(:request_sasu_header_token) do
+    request_no_session.merge({
+                               "USER_AGENT" => "inst-service-ninety-nine/1234567890ABCDEF",
+                               "HTTP_AUTHORIZATION" => "Bearer #{token_sasu.full_token}",
+                               "rack.input" => StringIO.new("")
+                             })
+  end
   let(:inner_app) { ->(_env) { response } }
   let(:throttler) { RequestThrottle.new(inner_app) }
   let(:rate_limit_exceeded) { throttler.rate_limit_exceeded }
