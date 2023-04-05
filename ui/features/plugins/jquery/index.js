@@ -23,7 +23,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 const I18n = useI18nScope('plugins')
 /* showIf */
 
-$('form.edit_plugin_setting').live('submit', function () {
+$(document).on('submit', 'form.edit_plugin_setting', function () {
   $(this)
     .find('button')
     .attr('disabled', true)

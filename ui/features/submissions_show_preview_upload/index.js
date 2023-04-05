@@ -40,7 +40,7 @@ $(document).ready(() => {
     return false
   })
 
-  $('.modal_preview_link').live('click', function () {
+  $(document).on('click', '.modal_preview_link', function () {
     // overflow:hidden is because of some weird thing where the google doc preview gets double scrollbars
     $('<div style="padding:0; overflow:hidden;">')
       .dialog({

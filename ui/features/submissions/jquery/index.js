@@ -469,7 +469,7 @@ export function setup() {
         }
       )
     })
-    $('#media_recorder_container a').live('click', _event => {
+    $(document).on('click', '#media_recorder_container a', _event => {
       $('#add_comment_form').show()
       $('#media_media_recording').hide()
     })

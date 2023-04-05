@@ -164,7 +164,7 @@ $(document).ready(function () {
       )
     }
   })
-  $('.last_error_details_link').live('click', event => {
+  $(document).on('click', '.last_error_details_link', event => {
     event.preventDefault()
     event.stopPropagation()
     $('#instructure_ajax_error_box').show()

@@ -30,7 +30,7 @@ const toggleButton = (el, check) =>
 const checkButton = el => toggleButton(el, true)
 const uncheckButton = el => toggleButton(el, false)
 
-$('.license_help_link').live('click', function (event) {
+$(document).on('click', '.license_help_link', function (event) {
   event.preventDefault()
   let $dialog = $('#license_help_dialog')
   const $select = $(this).prev('select')
