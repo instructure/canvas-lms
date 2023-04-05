@@ -1102,7 +1102,27 @@ class RCEWrapper extends React.Component {
 
     this.checkAccessibility()
 
+    this.fixToolbarKeyboardNavigation()
+
     this.props.onInitted?.(editor)
+  }
+
+  /**
+   * Fix keyboard navigation in the expanded toolbar
+   *
+   * NOTE: This is a workaround for https://github.com/tinymce/tinymce/issues/8618
+   *       and should be removed once that issue is resolved and the tinymce dependency is updated to include it.
+   */
+  fixToolbarKeyboardNavigation = () => {
+    // The keyboard navigation config in tinymce for the expanded toolbar is incorrectly configured,
+    // and stops at [data-alloy-tabstop] elements.
+    // It should be configured to stop on .tox-toolbar__group elements.
+    // This workaround removes attribute, thusly causing navigation to work correctly again.
+    // For the correct solution, Keying.config should have { selector: '.tox-toolbar__group' }
+    // in https://github.com/tinymce/tinymce/blob/develop/modules/alloy/src/main/ts/ephox/alloy/ui/schema/SplitSlidingToolbarSchema.ts
+    this._elementRef.current
+      ?.querySelectorAll('.tox-toolbar-overlord button[data-alloy-tabstop]')
+      .forEach(it => it.removeAttribute('data-alloy-tabstop'))
   }
 
   /**
