@@ -517,7 +517,7 @@ class RCEWrapper extends React.Component {
   }
 
   insertImagePlaceholder(fileMetaProps) {
-    if (RCEGlobals.getFeatures().rce_improved_placeholders) {
+    if (this.props.features?.rce_improved_placeholders) {
       return import('../util/loadingPlaceholder').then(
         async ({placeholderInfoFor, insertPlaceholder}) =>
           insertPlaceholder(this.mceInstance(), await placeholderInfoFor(fileMetaProps))
@@ -619,7 +619,7 @@ class RCEWrapper extends React.Component {
   }
 
   removePlaceholders(name) {
-    if (RCEGlobals.getFeatures().rce_improved_placeholders) {
+    if (this.props.features?.rce_improved_placeholders) {
       // Note that this needs to be done synchronously, or the image inserting code doesn't work
       removePlaceholder(this.mceInstance(), encodeURIComponent(name))
     } else {
@@ -1494,8 +1494,6 @@ class RCEWrapper extends React.Component {
 
     const setupCallback = options.setup
 
-    const rceFeatures = RCEGlobals.getFeatures()
-
     const isOnCanvasDomain = window.origin === this.props.canvasOrigin
 
     const canvasPlugins = rcsExists
@@ -1504,17 +1502,25 @@ class RCEWrapper extends React.Component {
           'instructure_image',
           'instructure_documents',
           'instructure_equation',
-          !isOnCanvasDomain || rceFeatures.rce_new_external_tool_dialog_in_canvas
+          !isOnCanvasDomain || this.props.features?.rce_new_external_tool_dialog_in_canvas
             ? 'instructure_rce_external_tools'
             : 'instructure_external_tools',
           'a11y_checker',
         ]
       : ['instructure_links']
+
     if (rcsExists && !this.props.instRecordDisabled) {
       canvasPlugins.splice(2, 0, 'instructure_record')
     }
+
+    if (this.props.features?.rce_show_studio_media_options) {
+      canvasPlugins.push('instructure_studio_media_options')
+    }
+
     const pastePlugins =
-      rcsExists && rceFeatures.rce_better_paste ? ['instructure_paste', 'paste'] : ['paste']
+      rcsExists && this.props.features?.rce_better_paste
+        ? ['instructure_paste', 'paste']
+        : ['paste']
 
     if (
       rcsExists &&
