@@ -76,7 +76,9 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                         </View>
                       }
                     >
-                      <Pill margin="0 x-small">{I18n.t('Hidden')}</Pill>
+                      <Pill margin="0 x-small" theme={{maxWidth: 'none'}}>
+                        {I18n.t('Hidden')}
+                      </Pill>
                     </Tooltip>
                   )}
                   {feature.shadow && (
@@ -90,7 +92,7 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                         </View>
                       }
                     >
-                      <Pill color="alert" margin="0 x-small">
+                      <Pill color="alert" margin="0 x-small" theme={{maxWidth: 'none'}}>
                         {I18n.t('Shadow')}
                       </Pill>
                     </Tooltip>
@@ -101,7 +103,7 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                         'Feature preview — opting in includes ongoing updates outside the regular release schedule'
                       )}
                     >
-                      <Pill color="info" margin="0 0 0 x-small">
+                      <Pill color="info" margin="0 0 0 x-small" theme={{maxWidth: 'none'}}>
                         {I18n.t('Feature Preview')}
                       </Pill>
                     </Tooltip>
