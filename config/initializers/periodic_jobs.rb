@@ -190,7 +190,7 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(MissingPolicyApplicator, :apply_missing_deductions)
   end
 
-  Delayed::Periodic.cron 'Alert long running jobs', '* * * * *' do
+  Delayed::Periodic.cron 'Alert long running jobs', '0 * * * *' do
     MonitoringService.alert_long_running_jobs
   end
 end
