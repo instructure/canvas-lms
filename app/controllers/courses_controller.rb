@@ -3196,9 +3196,16 @@ class CoursesController < ApplicationController
       end
 
       changes = changed_settings(@course.changes, @course.settings, old_settings)
-      course_availability_changed = (changes.keys & %w[start_at conclude_at restrict_enrollments_to_course_dates]).present?
-
-      return render_unauthorized_action if course_availability_changed && !@course.grants_right?(@current_user, :edit_course_availability)
+      changes.delete(:start_at) if changes.dig(:start_at, 0)&.to_s == changes.dig(:start_at, 1)&.to_s
+      changes.delete(:conclude_at) if changes.dig(:conclude_at, 0)&.to_s == changes.dig(:conclude_at, 1)&.to_s
+      availability_changes = changes.keys & %w[start_at conclude_at restrict_enrollments_to_course_dates]
+      course_availability_changed = availability_changes.present?
+      # allow dates to be dropped if using term dates, even if update is done by someone without permission
+      unless @course.restrict_enrollments_to_course_dates
+        availability_changes -= ["start_at"] if @course.start_at.nil?
+        availability_changes -= ["conclude_at"] if @course.conclude_at.nil?
+      end
+      return render_unauthorized_action if availability_changes.present? && !@course.grants_right?(@current_user, :edit_course_availability)
 
       # Republish course paces if the course dates have been changed
       if @course.account.feature_enabled?(:course_paces) && course_availability_changed
