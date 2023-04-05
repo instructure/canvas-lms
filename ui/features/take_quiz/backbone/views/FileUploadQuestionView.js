@@ -68,7 +68,7 @@ export default class FileUploadQuestion extends View {
     // input file element, get the file element, and submit a form.
     // For now, remove the input rendered in ERB-land, and the template is
     // responsible for rendering a fallback to a regular input type=file
-    const isIE = !!$.browser.msie
+    const isIE = false
     this.$fileUploadBox.html(template({...this.model.present(), isIE}))
     this.$fileUpload = this.$('.file-upload')
     return this

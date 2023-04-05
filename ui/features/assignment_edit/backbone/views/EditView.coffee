@@ -17,7 +17,6 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
 import _ from 'underscore'

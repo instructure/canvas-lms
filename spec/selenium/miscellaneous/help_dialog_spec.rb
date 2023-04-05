@@ -34,6 +34,7 @@ describe "help dialog" do
     it "no longer shows a browser warning for IE" do
       Setting.set("show_feedback_link", "true")
       get("/login")
+      driver.execute_script("window.INST = window.INST || {}")
       driver.execute_script("window.INST.browser = {ie: true, version: 8}")
       f("#footer .help_dialog_trigger").click
       wait_for_ajaximations

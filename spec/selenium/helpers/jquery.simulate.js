@@ -25,6 +25,11 @@
  *
  */
 
+function isOpera() {
+  const ua = window.navigator.userAgent
+  return ua.indexOf('OPR/') !== -1 || ua.indexOf('Opera/') !== -1 || ua.indexOf('OPT/') !== -1
+}
+
 ;(function( $ ) {
 
 $.fn.extend({
@@ -134,7 +139,7 @@ $.extend( $.simulate.prototype, {
 			evt = document.createEventObject();
 			$.extend( evt, e );
 		}
-		if ( $.browser.msie || $.browser.opera ) {
+		if ( isOpera() ) {
 			evt.keyCode = (e.charCode > 0) ? e.charCode : e.keyCode;
 			evt.charCode = undefined;
 		}
@@ -155,7 +160,7 @@ $.extend( $.simulate.prototype, {
 			center = this.findCenter(this.target),
 			options = this.options,
 			x = Math.floor( center.x ),
-			y = Math.floor( center.y ), 
+			y = Math.floor( center.y ),
 			dx = options.dx || 0,
 			dy = options.dy || 0,
 			target = this.target,

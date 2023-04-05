@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
@@ -25,6 +24,8 @@ import '@canvas/datetime' /* datetimeString */
 import 'jqueryui/dialog'
 
 const I18n = useI18nScope('content_locks')
+
+if (!('INST' in window)) window.INST = {}
 
 $(document).ready(function () {
   $(document).on('click', '.content_lock_icon', function (event) {

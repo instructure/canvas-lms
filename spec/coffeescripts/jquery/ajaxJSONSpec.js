@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'browser-sniffer'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import sinon from 'sinon'
+
+if (!('INST' in window)) window.INST = {}
 
 let storedInstEnv = null
 

@@ -30,6 +30,7 @@ import React from 'react'
 import {GroupNavigationSelector} from '../../shared/group-navigation-selector'
 
 // modules that do their own thing on every page that simply need to be required
+import './addBrowserClasses'
 import '@canvas/media-comments'
 import './activateReminderControls'
 import './expandAdminLinkMenusOnClick'

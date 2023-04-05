@@ -83,7 +83,6 @@ import {
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import round from '@canvas/round'
 import _ from 'underscore'
-import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'
@@ -132,6 +131,9 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jquery-selectmenu'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/util/jquery/fixDialogButtons'
+
+// @ts-expect-error
+if (!('INST' in window)) window.INST = {}
 
 const I18n = useI18nScope('speed_grader')
 
@@ -1159,6 +1161,7 @@ $.extend(INST, {
   refreshQuizSubmissionSnapshot(data) {
     snapshotCache[`${data.user_id}_${data.version_number}`] = data
     if (data.last_question_touched) {
+      // @ts-expect-error
       INST.lastQuestionTouched = data.last_question_touched
     }
   },
@@ -1779,6 +1782,7 @@ EG = {
 
     // On the switch to a new student, clear the state of the last
     // question touched on the previous student.
+    // @ts-expect-error
     INST.lastQuestionTouched = null
 
     if (

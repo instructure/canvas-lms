@@ -24,7 +24,6 @@ import {reorderElements, renderTray} from '@canvas/move-item-tray'
 import LockIconView from '@canvas/lock-icon'
 import MasterCourseModuleLock from '../backbone/models/MasterCourseModuleLock'
 import ModuleFileDrop from '@canvas/context-module-file-drop'
-import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Helper from './context_modules_helper'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
@@ -71,6 +70,8 @@ import {
 } from './utils'
 import ContextModulesPublishIcon from '@canvas/context-modules-publish-icon/ContextModulesPublishIcon'
 import ContextModulesPublishMenu from '@canvas/context-modules-publish-menu/ContextModulesPublishMenu'
+
+if (!('INST' in window)) window.INST = {}
 
 const I18n = useI18nScope('context_modulespublic')
 

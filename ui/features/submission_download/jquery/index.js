@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
@@ -27,6 +26,8 @@ import 'jqueryui/progressbar'
 const I18n = useI18nScope('submissions')
 
 const MAX_RETRIES = 3
+
+if (!('INST' in window)) window.INST = {}
 
 INST.downloadSubmissions = function (url, onClose) {
   let retryCount = 0
