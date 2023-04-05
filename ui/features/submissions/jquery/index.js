@@ -279,7 +279,7 @@ export function setup() {
           !formData['submission[comment]'] &&
           $("#add_comment_form input[type='file']").length > 0
         ) {
-          formData['submission[comment]'] = I18n.t('see_attached_files', 'See attached files')
+          formData['submission[comment]'] = I18n.t('see_attached_files', 'Please see attached files')
         }
       }
       if (!formData['submission[comment]'] && !formData['submission[media_comment_id]']) {
