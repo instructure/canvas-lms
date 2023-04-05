@@ -3286,6 +3286,35 @@ describe CoursesController do
           expect(response).to be_redirect
           expect(@course.reload.name).to eq "cool new course"
         end
+
+        it "allows teachers to update settings even if course dates have been set but restrict_enrollments_to_course_dates is false" do
+          # in this case, the controller automatically drops the course dates, and this shouldn't be restricted by permissions
+          start_at = 6.weeks.ago.beginning_of_day
+          conclude_at = 3.weeks.from_now.beginning_of_day
+          @course.update!(start_at: start_at, conclude_at: conclude_at)
+          user_session(@teacher)
+          put "update", params: { id: @course.id, course: { name: "cool new course", start_at: start_at, conclude_at: conclude_at } }
+          expect(response).to be_redirect
+          expect(@course.reload.name).to eq "cool new course"
+        end
+
+        it "does not allow teachers to set course dates to nil if restrict_enrollments_to_course_dates is true" do
+          start_at = 6.weeks.ago.beginning_of_day
+          conclude_at = 3.weeks.from_now.beginning_of_day
+          @course.update!(start_at: start_at, conclude_at: conclude_at, restrict_enrollments_to_course_dates: true)
+          user_session(@teacher)
+          put "update", params: { id: @course.id, course: { start_at: nil, conclude_at: nil } }
+          expect(response).to be_unauthorized
+        end
+
+        it "does not allow teachers to change course dates if restrict_enrollments_to_course_dates is true" do
+          start_at = 6.weeks.ago.beginning_of_day
+          conclude_at = 3.weeks.from_now.beginning_of_day
+          @course.update!(start_at: start_at, conclude_at: conclude_at, restrict_enrollments_to_course_dates: true)
+          user_session(@teacher)
+          put "update", params: { id: @course.id, course: { start_at: start_at + 1.day } }
+          expect(response).to be_unauthorized
+        end
       end
     end
   end
