@@ -2233,7 +2233,7 @@ class Submission < ActiveRecord::Base
       if opts[:media_comment_id]
         opts[:comment] = ""
       elsif opts[:attachments].try(:length)
-        opts[:comment] = t("attached_files_comment", "See attached files.")
+        opts[:comment] = t("attached_files_comment", "Please see attached files.")
       end
     end
     if opts[:provisional]
