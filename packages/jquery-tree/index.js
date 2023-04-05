@@ -23,6 +23,11 @@ import htmlEscape from 'html-escape'
 import 'jqueryui/draggable'
 import 'jqueryui/droppable'
 
+function isOpera() {
+  const ua = window.navigator.userAgent
+  return ua.indexOf('OPR/') !== -1 || ua.indexOf('Opera/') !== -1 || ua.indexOf('OPT/') !== -1
+}
+
 $.fn.instTree = function(options) {
   return $(this).each(function() {
     let binded = false
@@ -88,8 +93,6 @@ $.fn.instTree = function(options) {
         .filter(':not(.node)')
         .addClass('leaf')
 
-      it.IeSetStyles()
-
       it.Clean()
 
       it.AddSigns()
@@ -108,7 +111,7 @@ $.fn.instTree = function(options) {
       tree = $(obj)
 
       tree.find('span.text').draggable({
-        cursor: $.browser.msie ? 'default' : 'move',
+        cursor: 'move',
         distance: 3,
         helper() {
           return $('<div id="instTree-drag"><span>' + $(this).html() + '</span></div>')
@@ -127,23 +130,12 @@ $.fn.instTree = function(options) {
         const li = $(this).parent('li')
         const dd = $('div#instTree-drag')
 
-        if ($.browser.msie) {
-          tree.find('li.separator').removeClass('dd-hover')
-        }
-
-        if ($.browser.opera) {
+        if (isOpera()) {
           dd.css('margin-top', '10px')
         }
 
         if (li.is('.leaf')) {
           dd.addClass('leaf')
-
-          if ($.browser.msie) {
-            dd.css(
-              'background',
-              '#C3E1FF url(' + it.opts.imgFolder + 'leaf-drag.gif) left 3px no-repeat'
-            )
-          }
         } // if (li.is('.leaf'))
         else if (li.is('.node')) {
           dd.addClass('node')
@@ -335,12 +327,6 @@ $.fn.instTree = function(options) {
 
       $.fn.instTree.InitInstTree(obj)
     } // SaveInput
-    it.IeSetStyles = function() {
-      if ($.browser.msie) {
-        tree.find('li.node:not(.open) > ul').hide()
-        tree.find('li.node.open > ul').css('margin-bottom', '1px')
-      }
-    } // IeSetStyles
     it.Clean = function() {
       tree.find('li:not(.separator)').each(function() {
         $(this).removeClass('last')
@@ -549,22 +535,6 @@ $.fn.instTree = function(options) {
         })
       }
       // if (opts.autoclose)
-      if ($.browser.msie) {
-        node
-          .children('ul')
-          .show()
-          .css({
-            'margin-bottom': '1px',
-            visibility: 'visible'
-          })
-
-        node
-          .children('ul')
-          .find('li.node:not(.open) > ul')
-          .each(function() {
-            $(this).css('visibility', 'hidden')
-          })
-      } // if ($.browser.msie)
       const sign = node.find('span.sign:last')
 
       sign.removeClass('plus').addClass('minus')
@@ -581,10 +551,6 @@ $.fn.instTree = function(options) {
     it.CollapseNode = function(node) {
       node.removeClass('open')
       node.attr('aria-expanded', false)
-
-      if ($.browser.msie) {
-        node.children('ul').hide()
-      }
 
       const sign = node.find('span.sign:last')
 

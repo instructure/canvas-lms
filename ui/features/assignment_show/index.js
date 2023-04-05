@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
@@ -39,6 +38,8 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import ready from '@instructure/ready'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+
+if (!('INST' in window)) window.INST = {}
 
 const I18n = useI18nScope('assignment')
 

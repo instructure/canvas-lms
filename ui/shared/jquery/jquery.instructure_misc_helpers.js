@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
+
+if (!('INST' in window)) window.INST = {}
 
 const I18n = useI18nScope('instructure')
 

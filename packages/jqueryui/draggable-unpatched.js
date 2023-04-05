@@ -75,7 +75,7 @@ $.widget("ui.draggable", $.ui.mouse, {
 		this.handle = this._getHandle(event);
 		if (!this.handle)
 			return false;
-		
+
 		$(o.iframeFix === true ? "iframe" : o.iframeFix).each(function() {
 			$('<div class="ui-draggable-iframeFix" style="background: #fff;"></div>')
 			.css({
@@ -159,12 +159,12 @@ $.widget("ui.draggable", $.ui.mouse, {
 		if ($.ui.ddmanager && !o.dropBehaviour)
 			$.ui.ddmanager.prepareOffsets(this, event);
 
-		
+
 		this._mouseDrag(event, true); //Execute the drag once - this causes the helper not to be visible before getting its correct position
-		
+
 		//If the ddmanager is used for droppables, inform the manager that dragging has started (see #5003)
 		if ( $.ui.ddmanager ) $.ui.ddmanager.dragStart(this, event);
-		
+
 		return true;
 	},
 
@@ -203,7 +203,7 @@ $.widget("ui.draggable", $.ui.mouse, {
 			dropped = this.dropped;
 			this.dropped = false;
 		}
-		
+
 		//if the original element is no longer in the DOM don't bother to continue (see #8269)
 		var element = this.element[0], elementInDom = false;
 		while ( element && (element = element.parentNode) ) {
@@ -229,30 +229,30 @@ $.widget("ui.draggable", $.ui.mouse, {
 
 		return false;
 	},
-	
+
 	_mouseUp: function(event) {
 		if (this.options.iframeFix === true) {
-			$("div.ui-draggable-iframeFix").each(function() { 
-				this.parentNode.removeChild(this); 
+			$("div.ui-draggable-iframeFix").each(function() {
+				this.parentNode.removeChild(this);
 			}); //Remove frame helpers
 		}
-		
+
 		//If the ddmanager is used for droppables, inform the manager that dragging has stopped (see #5003)
 		if( $.ui.ddmanager ) $.ui.ddmanager.dragStop(this, event);
-		
+
 		return $.ui.mouse.prototype._mouseUp.call(this, event);
 	},
-	
+
 	cancel: function() {
-		
+
 		if(this.helper.is(".ui-draggable-dragging")) {
 			this._mouseUp({});
 		} else {
 			this._clear();
 		}
-		
+
 		return this;
-		
+
 	},
 
 	_getHandle: function(event) {
@@ -320,8 +320,7 @@ $.widget("ui.draggable", $.ui.mouse, {
 			po.top += this.scrollParent.scrollTop();
 		}
 
-		if((this.offsetParent[0] == document.body) //This needs to be actually done for all browsers, since pageX/pageY includes this information
-		|| (this.offsetParent[0].tagName && this.offsetParent[0].tagName.toLowerCase() == 'html' && $.browser.msie)) //Ugly IE fix
+		if(this.offsetParent[0] == document.body) //This needs to be actually done for all browsers, since pageX/pageY includes this information
 			po = { top: 0, left: 0 };
 
 		return {
@@ -573,12 +572,12 @@ $.ui.plugin.add("draggable", "connectToSortable", {
 		};
 
 		$.each(inst.sortables, function(i) {
-			
+
 			//Copy over some variables to allow calling the sortable's native _intersectsWith
 			this.instance.positionAbs = inst.positionAbs;
 			this.instance.helperProportions = inst.helperProportions;
 			this.instance.offset.click = inst.offset.click;
-			
+
 			if(this.instance._intersectsWith(this.instance.containerCache)) {
 
 				//If it intersects, we use a little isOver variable and set it once, so our move-in stuff gets fired only once
@@ -621,13 +620,13 @@ $.ui.plugin.add("draggable", "connectToSortable", {
 
 					this.instance.isOver = 0;
 					this.instance.cancelHelperRemoval = true;
-					
+
 					//Prevent reverting on this forced stop
 					this.instance.options.revert = false;
-					
+
 					// The out event needs to be triggered independently
 					this.instance._trigger('out', event, this.instance._uiHash(this.instance));
-					
+
 					this.instance._mouseStop(event, true);
 					this.instance.options.helper = this.instance.options._helper;
 
@@ -797,7 +796,7 @@ $.ui.plugin.add("draggable", "stack", {
 			return (parseInt($(a).css("zIndex"),10) || 0) - (parseInt($(b).css("zIndex"),10) || 0);
 		});
 		if (!group.length) { return; }
-		
+
 		var min = parseInt(group[0].style.zIndex) || 0;
 		$(group).each(function(i) {
 			this.style.zIndex = min + i;

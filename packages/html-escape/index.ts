@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-import INST from 'browser-sniffer'
+// @ts-expect-error
+if (!('INST' in window)) window.INST = {}
 
 class SafeString {
   'string': string
@@ -70,6 +70,7 @@ export default function escape<T>(strOrObject: string | SafeString | Object) {
 escape.SafeString = SafeString
 
 // tinymce plugins use this and they need it global :(
+// @ts-expect-error
 INST.htmlEscape = escape
 
 const UNESCAPE_ENTITIES = Object.keys(ENTITIES).reduce((map, key) => {

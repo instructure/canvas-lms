@@ -44,7 +44,6 @@ import MissingDateDialog from '@canvas/due-dates/backbone/views/MissingDateDialo
 import MultipleChoiceToggle from './MultipleChoiceToggle'
 import EditorToggle from '@canvas/editor-toggle'
 import * as TextHelper from '@canvas/util/TextHelper'
-import INST from 'browser-sniffer' // safari sniffing for VO workarounds
 import QuizFormulaSolution from '../quiz_formula_solution'
 import addAriaDescription from './quiz_labels'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
