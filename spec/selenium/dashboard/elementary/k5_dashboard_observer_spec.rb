@@ -135,7 +135,6 @@ describe "observer k5 dashboard" do
     end
 
     it "selects a student from the dropdown list" do
-      skip("LS-3282 07/15/2022")
       get "/"
 
       click_observed_student_option("My1 Student")
