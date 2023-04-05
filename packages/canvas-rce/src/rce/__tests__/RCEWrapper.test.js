@@ -30,7 +30,6 @@ import RCEWrapper, {
   mergeToolbar,
   parsePluginsToExclude,
 } from '../RCEWrapper'
-import RCEGlobals from '../RCEGlobals'
 import {jsdomInnerText} from '../../util/__tests__/jsdomInnerText'
 
 const textareaId = 'myUniqId'
@@ -301,11 +300,12 @@ describe('RCEWrapper', () => {
 
     describe('insertImagePlaceholder (new)', () => {
       // Full testing of placehodlers can be found in loadingPlaceholder.test.ts
-      it('can insert a placeholder', async () => {
-        jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
-          rce_improved_placeholders: true,
-        })
 
+      beforeEach(() => {
+        rce.props.features.rce_improved_placeholders = true
+      })
+
+      it('can insert a placeholder', async () => {
         const square =
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
         const props = {
@@ -885,35 +885,40 @@ describe('RCEWrapper', () => {
       expect(options.plugins.indexOf('instructure_record')).toEqual(-1)
     })
 
+    it('includes instructure_studio_media_options in plugins if feature enabled', () => {
+      const wrapper = createBasicElement({features: {rce_show_studio_media_options: true}})
+      const options = wrapper.wrapOptions({})
+      expect(options.plugins).toContain('instructure_studio_media_options')
+    })
+
+    it('does not include instructure_studio_media_options in plugins if feature disabled', () => {
+      const wrapper = createBasicElement({features: {rce_show_studio_media_options: false}})
+      const options = wrapper.wrapOptions({})
+      expect(options.plugins).not.toContain('instructure_studio_media_options')
+    })
+
     it('instructure_rce_external_tools if enabled and rcs available', () => {
-      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures')
-
-      try {
-        for (const rcsAvailable in [true, false]) {
-          for (const flagEnabled in [true, false]) {
-            for (const onCanvasDomain in [true, false]) {
-              getFeaturesSpy.mockImplementation(() => ({
+      for (const rcsAvailable in [true, false]) {
+        for (const flagEnabled in [true, false]) {
+          for (const onCanvasDomain in [true, false]) {
+            const enabledPlugins = createBasicElement({
+              canvasOrigin: onCanvasDomain ? window.location.origin : 'https://nq.com',
+              trayProps: {
+                ...trayProps().trayProps,
+                ...(rcsAvailable ? {} : {jwt: null}),
+              },
+              features: {
                 rce_new_external_tool_dialog_in_canvas: flagEnabled,
-              }))
+              },
+            }).wrapOptions().plugins
 
-              const enabledPlugins = createBasicElement({
-                canvasOrigin: onCanvasDomain ? window.location.origin : 'https://nq.com',
-                trayProps: {
-                  ...trayProps().trayProps,
-                  ...(rcsAvailable ? {} : {jwt: null}),
-                },
-              }).wrapOptions().plugins
-
-              if (rcsAvailable && (flagEnabled || !onCanvasDomain)) {
-                expect(enabledPlugins).toContain('instructure_rce_external_tools')
-              } else {
-                expect(enabledPlugins).not.toContain('instructure_rce_external_tools')
-              }
+            if (rcsAvailable && (flagEnabled || !onCanvasDomain)) {
+              expect(enabledPlugins).toContain('instructure_rce_external_tools')
+            } else {
+              expect(enabledPlugins).not.toContain('instructure_rce_external_tools')
             }
           }
         }
-      } finally {
-        getFeaturesSpy.mockClear()
       }
     })
   })

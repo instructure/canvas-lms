@@ -55,6 +55,7 @@ import './plugins/instructure_icon_maker/plugin'
 import './plugins/instructure_wordcount/plugin'
 import './plugins/instructure_paste/plugin'
 import './plugins/instructure_fullscreen/plugin'
+import './plugins/instructure_studio_media_options/plugin'
 
 import './plugins/tinymce-a11y-checker/plugin'
 
