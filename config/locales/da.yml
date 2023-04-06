@@ -8495,7 +8495,7 @@ da:
     titles: 
       link_to_students: "Link til studerende"
       move_course: "Flyt fag"
-      reset_course_content_dialog_help: "Gendan fagets indhold"
+      reset_course_content_dialog_help: "Nulstil kursus"
       section_enrollments: Sektionstilmeldinger
   course_settings_course_details_1b1576b8: "Fagindstillinger (Fagdetaljer)"
   course_settings_course_details_tab_allows_user_to__2eb67ad2: "Fagindstillinger (fanen Fagoplysninger): Gør det muligt for en bruger at få adgang til fanen Navigation i Fagindstillinger. Gør det muligt for en bruger at få adgang til knapperne Visning for studerende (test studerende), Kopiér dette fag, Nulstil fagindhold og Slet fag permanent. Gør det muligt for en bruger at redigere fagbillede, navn, fagkode, tidszone, underkonto, semester og andre valgmuligheder på fanen Fagoplysninger."
@@ -8973,7 +8973,7 @@ da:
       wiki_editing_roles_change_existing: "Ændr sider, som kan redigeres på nuværende tidspunkt af \"%{current_setting}\" til \"%{new_setting}\"."
     settings_sidebar: 
       buttons: 
-        reset: "Gendan fagets indhold"
+        reset: "Nulstil kursus"
         unconclude: "Annuller fagets afslutning"
       headers: 
         course_status: "Fagets status"
@@ -8989,7 +8989,7 @@ da:
         export_content: "Eksportér fagindhold"
         import: "Importer fag-indhold"
         new_badge: Ny
-        reset: "Gendan fagets indhold"
+        reset: "Nulstil kursus"
         stats: "Fagets statistik"
         student_view: "Visning for studerende"
       role: 
@@ -13249,10 +13249,10 @@ da:
         speech_recognition: Talegenkendelse
       keycode_descriptions: 
         change_grade: "Ændr karakter"
-        leave_comment: "Efterlad kommentar"
+        leave_comment: "Tilføj en kommentar"
         next_student: "Næste studerende"
         previous_student: "Forrige studerende"
-        use_rubric: "Brug rubrik"
+        use_rubric: "Vis rubrik"
       keycodes: 
         change_grade: g
         leave_comment: c
