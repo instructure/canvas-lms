@@ -46,10 +46,15 @@ afterEach(() => {
 })
 
 describe('ContextModulesPublishModal', () => {
-  it('renders the title', () => {
-    const {getByRole} = render(<ContextModulesPublishModal {...defaultProps} />)
+  it('renders the title and warning text', () => {
+    const {getByRole, getByText} = render(<ContextModulesPublishModal {...defaultProps} />)
     const modalTitle = getByRole('heading', {name: 'Test Title'})
     expect(modalTitle).toBeInTheDocument()
+    expect(
+      getByText(
+        'This process could take a few minutes. Click the Stop button to discontinue processing. Items that have already been processed will not be reverted to their previous state.'
+      )
+    ).toBeInTheDocument()
   })
 
   it('calls onPublish when the publish button is clicked', () => {
