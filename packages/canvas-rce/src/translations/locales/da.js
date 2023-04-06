@@ -645,7 +645,7 @@ const locale = {
     "message": "{ p } er ikke en gyldig protokol. Den skal være ftp, http, https, mailto, skype, tel eller kan udelades"
   },
   "pages_e5414c2c": { "message": "Sider" },
-  "paragraph_5e5ad8eb": { "message": "Paragraf" },
+  "paragraph_5e5ad8eb": { "message": "Afsnit" },
   "paragraph_starting_with_start_a59923f8": {
     "message": "Paragraf begynder med { start }"
   },
