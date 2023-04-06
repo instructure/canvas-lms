@@ -193,7 +193,7 @@ const ContextModulesPublishModal: React.FC<Props> = ({
         <View as="div">
           <Text>
             {I18n.t(
-              'This process could take a few minutes. Hitting stop will stop the process, but items that have already been processed will not be reverted to their previous state.'
+              'This process could take a few minutes. Click the Stop button to discontinue processing. Items that have already been processed will not be reverted to their previous state.'
             )}
           </Text>
         </View>
