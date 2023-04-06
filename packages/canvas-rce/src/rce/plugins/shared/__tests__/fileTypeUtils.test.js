@@ -26,6 +26,7 @@ import {
   getIWorkType,
   mediaPlayerURLFromFile,
 } from '../fileTypeUtils'
+import RCEGlobals from '../../../RCEGlobals'
 
 describe('fileTypeUtils', () => {
   describe('isImage', () => {
@@ -154,6 +155,32 @@ describe('fileTypeUtils', () => {
       }
       const url = mediaPlayerURLFromFile(file)
       expect(url).toBe('/media_objects_iframe?mediahref=/path/to/file&verifier=xyzzy&type=video')
+    })
+
+    describe('when media_attachments feature flag on', () => {
+      RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
+
+      afterAll(() => {
+        RCEGlobals.getFeatures.mockRestore()
+      })
+
+      it('uses attachment route if feature flag on', () => {
+        const file = {
+          id: '123',
+          type: 'video/mov',
+        }
+        const url = mediaPlayerURLFromFile(file)
+        expect(url).toBe('/media_attachments_iframe/123?type=video')
+      })
+
+      it('uses media_object route if no attachmentId exists', () => {
+        const file = {
+          media_entry_id: 'm-media_id',
+          type: 'video/mov',
+        }
+        const url = mediaPlayerURLFromFile(file)
+        expect(url).toBe('/media_objects_iframe/m-media_id?type=video')
+      })
     })
   })
 })
