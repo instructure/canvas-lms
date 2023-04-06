@@ -18,6 +18,7 @@
 
 import * as contentInsertion from '../contentInsertion'
 import {videoFromTray, videoFromUpload, audioFromTray, audioFromUpload} from './contentHelpers'
+import RCEGlobals from '../RCEGlobals'
 
 describe('contentInsertion', () => {
   let editor, node
@@ -577,6 +578,83 @@ describe('contentInsertion', () => {
         'mceInsertContent',
         false,
         '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=/url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+        {skip_focus: true}
+      )
+      expect(result).toEqual('the inserted iframe')
+    })
+  })
+
+  describe('insertVideo with attachment', () => {
+    beforeEach(() => {
+      RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
+      // this is what's returned from editor.selection.getEnd()
+      node = {
+        querySelector: () => 'the inserted iframe',
+      }
+    })
+
+    afterAll(() => {
+      RCEGlobals.getFeatures.mockRestore()
+    })
+
+    it('inserts video from the course content tray with attachmentId', () => {
+      jest.spyOn(editor, 'insertContent')
+      const video = videoFromTray()
+      const result = contentInsertion.insertVideo(editor, video, canvasOrigin)
+      expect(editor.execCommand).toHaveBeenCalledWith(
+        'mceInsertContent',
+        false,
+        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_attachments_iframe/17?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
+        {skip_focus: true}
+      )
+      expect(result).toEqual('the inserted iframe')
+    })
+
+    it('inserts video from upload into iframe with attachmentId', () => {
+      jest.spyOn(editor, 'insertContent')
+      const video = videoFromUpload()
+      const result = contentInsertion.insertVideo(editor, video, canvasOrigin)
+      expect(editor.execCommand).toHaveBeenCalledWith(
+        'mceInsertContent',
+        false,
+        '<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="/media_attachments_iframe/maybe?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>',
+        {skip_focus: true}
+      )
+      expect(result).toEqual('the inserted iframe')
+    })
+  })
+  describe('insertAudio with attachment', () => {
+    beforeEach(() => {
+      RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
+      // this is what's returned from editor.selection.getEnd()
+      node = {
+        querySelector: () => 'the inserted iframe',
+      }
+    })
+
+    afterAll(() => {
+      RCEGlobals.getFeatures.mockRestore()
+    })
+
+    it('inserts audio from upload into iframe with attachmentId', () => {
+      const audio = audioFromUpload()
+      const result = contentInsertion.insertAudio(editor, audio, canvasOrigin)
+      expect(editor.execCommand).toHaveBeenCalledWith(
+        'mceInsertContent',
+        false,
+        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/media_attachments_iframe/maybe?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+        {skip_focus: true}
+      )
+      expect(result).toEqual('the inserted iframe')
+    })
+
+    it('inserts audio from the course content tray with attachmentId', () => {
+      const audio = audioFromTray()
+      const result = contentInsertion.insertAudio(editor, audio, canvasOrigin)
+      expect(editor.execCommand).toHaveBeenCalledWith(
+        'mceInsertContent',
+        false,
+        '<iframe data-media-id="29" data-media-type="audio" src="/media_attachments_iframe/29?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
         {skip_focus: true}
       )
       expect(result).toEqual('the inserted iframe')

@@ -21,7 +21,7 @@ import {Editor} from '@tinymce/tinymce-react'
 import _ from 'lodash'
 import {StoreProvider} from './plugins/shared/StoreContext'
 
-import themeable from '@instructure/ui-themeable'
+import themeable from '@instructure/ui-themeable' // eslint-disable-line  @typescript-eslint/no-unused-vars
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
@@ -54,7 +54,7 @@ import CanvasContentTray from './plugins/shared/CanvasContentTray'
 import StatusBar, {PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW, WYSIWYG_VIEW} from './StatusBar'
 import {VIEW_CHANGE} from './customEvents'
 import ShowOnFocusButton from './ShowOnFocusButton'
-import theme from '../skins/theme'
+import theme from '../skins/theme' // eslint-disable-line  @typescript-eslint/no-unused-vars
 import {isAudio, isImage, isVideo} from './plugins/shared/fileTypeUtils'
 import KeyboardShortcutModal from './KeyboardShortcutModal'
 import AlertMessageArea from './AlertMessageArea'
@@ -328,6 +328,7 @@ class RCEWrapper extends React.Component {
       explicit_latex_typesetting = false,
       rce_show_studio_media_options = false,
       rce_transform_loaded_content = false,
+      media_links_use_attachment_id = false,
     } = this.props.features
 
     return {
@@ -339,6 +340,7 @@ class RCEWrapper extends React.Component {
       explicit_latex_typesetting,
       rce_show_studio_media_options,
       rce_transform_loaded_content,
+      media_links_use_attachment_id,
     }
   }
 

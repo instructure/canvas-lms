@@ -230,6 +230,7 @@ export function mediaUploadComplete(error, uploadData) {
         media_id: mediaObject.media_object.media_id,
         type: uploadedFile.type,
         title: uploadedFile.title || uploadedFile.name,
+        id: mediaObject.media_object.attachment_id,
       }
       dispatch(removePlaceholdersFor(uploadedFile.name))
       embedUploadResult(embedData, 'media')
