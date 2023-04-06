@@ -79,10 +79,19 @@ export default function PointsDisplay(props) {
       return I18n.t('Excused')
     }
 
+    if (
+      ENV.restrict_quantitative_data &&
+      GradeFormatHelper.QUANTITATIVE_GRADING_TYPES.includes(props.gradingType) &&
+      props.pointsPossible === 0 &&
+      props.receivedScore <= 0
+    ) {
+      return null
+    }
+
     const formattedGrade = GradeFormatHelper.formatGrade(props.receivedGrade, {
       gradingType: props.gradingType,
       pointsPossible: props.pointsPossible,
-      score: props.receivedScore || null,
+      score: props.receivedScore != null ? props.receivedScore : null,
       defaultValue: forScreenReader ? ungradedScreenreaderString() : ungradedVisualString(),
       formatType: 'points_out_of_fraction',
     })

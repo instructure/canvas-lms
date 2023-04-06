@@ -35,6 +35,8 @@ const PASS_GRADES = ['complete', 'pass']
 const FAIL_GRADES = ['incomplete', 'fail']
 
 const UNGRADED = '–'
+const QUANTITATIVE_GRADING_TYPES = [POINTS, PERCENT, GPA_SCALE]
+const QUALITATIVE_GRADING_TYPES = ['pass_fail', 'letter_grade']
 
 function isPassFail(grade, gradeType: null | string = null) {
   if (gradeType) {
@@ -114,6 +116,9 @@ function formatPercentageGrade(score, options) {
 }
 
 function formatGradingSchemeGrade(score, grade, options) {
+  if (ENV.restrict_quantitative_data && options.pointsPossible === 0 && score >= 0) {
+    return scoreToGrade(100, options.gradingScheme)
+  }
   if (options.pointsPossible) {
     const percent = scoreToPercentage(score, options.pointsPossible)
     return scoreToGrade(percent, options.gradingScheme)
@@ -189,7 +194,11 @@ const GradeFormatHelper = {
       if (isPassFail(parsedGrade, options.gradingType)) {
         parsedGrade = normalizeCompleteIncompleteGrade(parsedGrade)
         formattedGrade = parsedGrade === 'complete' ? I18n.t('complete') : I18n.t('incomplete')
-      } else if (ENV.restrict_quantitative_data && options.score && options.pointsPossible) {
+      } else if (
+        ENV.restrict_quantitative_data &&
+        options.score != null &&
+        options.pointsPossible != null
+      ) {
         // at this stage, gradingType is either points or mercent, or the passed grade is a number
         formattedGrade = formatGradingSchemeGrade(options.score, null, {
           gradingScheme: ENV.grading_scheme,
@@ -209,9 +218,21 @@ const GradeFormatHelper = {
     }
     if (
       ENV.restrict_quantitative_data &&
-      options.score &&
-      options.pointsPossible &&
+      options.score != null &&
+      options.pointsPossible != null &&
       options.gradingType === GPA_SCALE
+    ) {
+      formattedGrade = formatGradingSchemeGrade(options.score, null, {
+        gradingScheme: ENV.grading_scheme,
+        pointsPossible: options.pointsPossible,
+      })
+    }
+
+    if (
+      ENV.restrict_quantitative_data &&
+      options.score != null &&
+      options.pointsPossible === 0 &&
+      options.gradingType === 'letter_grade'
     ) {
       formattedGrade = formatGradingSchemeGrade(options.score, null, {
         gradingScheme: ENV.grading_scheme,
@@ -298,6 +319,8 @@ const GradeFormatHelper = {
   },
 
   UNGRADED,
+  QUANTITATIVE_GRADING_TYPES,
+  QUALITATIVE_GRADING_TYPES,
 }
 
 export default GradeFormatHelper
