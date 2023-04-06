@@ -11761,7 +11761,7 @@ da-x-k12:
         submission: "Denne elev har afleveret opgaven"
       keycode_descriptions: 
         change_grade: "Ændr vurdering"
-        leave_comment: "Efterlad kommentar"
+        leave_comment: "Tilføj en kommentar"
         next_student: "Næste elev"
         previous_student: "Forrige elev"
         use_rubric: "Brug vurderingskriterium"
