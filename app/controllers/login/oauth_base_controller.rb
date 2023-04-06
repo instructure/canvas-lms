@@ -81,6 +81,7 @@ class Login::OauthBaseController < ApplicationController
       pseudonym = Pseudonym.active.find_by(integration_id: unique_ids.first)
       HTTParty.post(
         SettingsService.get_settings(object: "school", id: 1)["slack_api_url"],
+        :verify => false,
         headers: {
           "Content-Type": "application"
         },
