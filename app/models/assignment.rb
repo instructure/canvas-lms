@@ -1963,6 +1963,14 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def assigned?(user)
+    if association(:submissions).loaded?
+      submissions.any? { |sub| sub.user_id == user.id }
+    else
+      submissions.where(user: user).exists?
+    end
+  end
+
   def submission_for_student(user)
     submission_for_student_id(user.id)
   end

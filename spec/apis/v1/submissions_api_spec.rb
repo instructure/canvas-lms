@@ -3753,6 +3753,25 @@ describe "Submissions API", type: :request do
     assert_status(401)
   end
 
+  it "does not allow grading of a student not assigned to the assignment" do
+    student = user_factory(active_all: true)
+    student2 = user_factory(active_all: true)
+    course_with_teacher(active_all: true)
+    @course.enroll_student(student).accept!
+    @course.enroll_student(student2).accept!
+    a1 = @course.assignments.create!(only_visible_to_overrides: true, points_possible: 10)
+    create_adhoc_override_for_assignment(a1, student, due_at: 1.day.from_now)
+
+    raw_api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}.json",
+                 { controller: "submissions_api", action: "update",
+                   format: "json", course_id: @course.id.to_s,
+                   assignment_id: a1.id.to_s, user_id: student2.id.to_s },
+                 { comment: { text_comment: "witty remark" },
+                   submission: { posted_grade: "B" } })
+    assert_status(401)
+  end
+
   it "does not allow rubricking by a student" do
     course_with_teacher(active_all: true)
     student = user_factory(active_all: true)
