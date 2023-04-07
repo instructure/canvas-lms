@@ -16,36 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const glob = require('glob')
-const path = require('path')
 const fs = require('fs')
-const {canvasDir} = require('#params')
+const {getAppFeatureBundles, getPluginBundles} = require('./webpack.utils')
 const momentLocaleBundles = require('./momentBundles')
 
-const entries = {}
-
-const bundlesPattern = path.join(canvasDir, 'ui/features/*/index.{js,ts,tsx}')
-const pluginBundlesPattern = `${canvasDir}/gems/plugins/*/app/{jsx,coffeescripts}/bundles/**/*.{coffee,js}`
-const bundleNameRegexp = /\/(coffeescripts|jsx)\/bundles\/(.*).(coffee|js)/
-const fileNameRegexp = /\/([^/]+)\.(coffee|js)/
-const pluginNameRegexp = /plugins\/([^/]+)\/app/
-
-const appBundles = glob.sync(bundlesPattern, [])
-const pluginBundles = glob.sync(pluginBundlesPattern, [])
-
-appBundles.forEach(entryFilepath => {
-  const entryName = path.basename(path.dirname(entryFilepath))
-  entries[entryName] = entryFilepath
-})
-
-pluginBundles.forEach(entryFilepath => {
-  const relativePath = entryFilepath.replace(/.*\/gems\/plugins/, '../gems/plugins')
-  const pluginName = pluginNameRegexp.exec(entryFilepath)[1]
-  const fileName = fileNameRegexp.exec(entryFilepath)[1]
-  const bundleName = `${pluginName}-${fileName}`
-  entries[bundleName] = relativePath
-})
-
+// generates file with functions that dynamically import each feature and plugin bundle
+// TODO: use proper separate webpack entries
 fs.writeFileSync(
   './node_modules/bundles-generated.js',
   `
@@ -70,7 +46,7 @@ if (typeof ENV !== 'undefined' && ENV.MOMENT_LOCALE && ENV.MOMENT_LOCALE !== 'en
 
 export default function loadBundle(bundleName) {
   switch (bundleName) {
-    ${Object.entries(entries)
+    ${[...getAppFeatureBundles(), ...getPluginBundles()]
       .map(
         ([entryName, entryBundlePath]) => `
       case "${entryName}": return import(/* webpackChunkName: "${entryName}" */ "${entryBundlePath}");
@@ -84,5 +60,3 @@ export default function loadBundle(bundleName) {
 }
 `
 )
-
-module.exports = entries

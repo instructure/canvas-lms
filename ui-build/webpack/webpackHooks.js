@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 const exec = require('child_process').exec
+
 module.exports = class WebpackHooks {
   apply(compiler) {
     const isEnabled = JSON.parse(process.env.ENABLE_CANVAS_WEBPACK_HOOKS || 'false')
