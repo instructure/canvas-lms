@@ -110,7 +110,7 @@ export default function RubricTab(props) {
             </div>
           )}
 
-          {displayedAssessment !== null && (
+          {props.rubric && (
             <RubricComponent
               customRatings={props.proficiencyRatings}
               rubric={props.rubric}
