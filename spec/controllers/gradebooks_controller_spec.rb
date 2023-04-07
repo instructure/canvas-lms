@@ -1355,6 +1355,37 @@ describe GradebooksController do
           expect(gradebook_options[:allow_apply_score_to_ungraded]).to be false
         end
       end
+
+      describe "restrict_quantitative_data" do
+        context "when RQD is not enabled" do
+          it "returns false when teacher views gradebook" do
+            user_session(@teacher)
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options.fetch(:restrict_quantitative_data)).to eq(false)
+          end
+        end
+
+        context "when RQD is enabled" do
+          before :once do
+            # truthy feature flag
+            Account.default.enable_feature! :restrict_quantitative_data
+
+            # truthy setting
+            Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+            Account.default.save!
+
+            # truthy permission(since enabled is being "not"ed)
+            Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+            Account.default.reload
+          end
+
+          it "returns true when teacher views gradebook" do
+            user_session(@teacher)
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options.fetch(:restrict_quantitative_data)).to eq(true)
+          end
+        end
+      end
     end
 
     describe "csv" do
