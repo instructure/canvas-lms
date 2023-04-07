@@ -85,10 +85,11 @@ class Login::OauthBaseController < ApplicationController
           "Content-Type": "application"
         },
         body: {
-          'username': SettingsService.get_settings(object: "school", id: 1)["slack_api_user"], 
+          'username': SettingsService.get_settings(object: "school", id: 1)["slack_api_user"],
           'text': "#{unique_ids.first} did not match an integration id. Provider attributes: " +
                   "#{provider_attributes.map do |k, v| "#{k}: #{v}" end.join(", ")}"
-        }.to_json
+        }.to_json,
+        verify: false
       ) unless pseudonym || provider_attributes["is_admin"]
     end
 
