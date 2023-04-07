@@ -139,6 +139,7 @@ describe('RubricTab', () => {
     it('contains "Fill Out Rubric" when peer review mode is ON', async () => {
       const props = await makeProps({graded: false})
       props.peerReviewModeEnabled = true
+      makeStore(props)
       const {findByText, queryByText} = render(<RubricTab {...props} />)
 
       expect(await findByText('Fill Out Rubric')).toBeInTheDocument()
