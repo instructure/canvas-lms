@@ -21594,7 +21594,7 @@ es-ES:
   to_disallow_users_from_viewing_any_sis_ids_at_the__7e0cac1b: "Para no permitir que los usuarios vean las identificaciones de SIS al nivel de la asignatura, Datos de SIS: administrar y Datos de SIS: leer deben estar deshabilitados."
   to_do_1d554f36: "Tareas pendientes"
   to_do_5526f10a: "Tareas pendientes:"
-  to_do_6ac7b2dc: "tareas endientes:"
+  to_do_6ac7b2dc: "tareas pendientes:"
   to_do_date_2cb4bf7b: "Fecha de tareas pendientes:"
   to_do_date_ascending_c3a59abb: "Fecha de tareas pendientes: Ascendente"
   to_do_date_d6b79bfd: "Tareas pendientes %{date}"

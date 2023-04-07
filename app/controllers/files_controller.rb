@@ -1100,9 +1100,7 @@ class FilesController < ApplicationController
     @attachment = Attachment.where(id: params[:id], uuid: params[:uuid]).first
     return head :bad_request unless @attachment.try(:file_state) == "deleted"
     return unless validate_on_duplicate(params)
-
-    quota_exempt = @attachment.verify_quota_exemption_key(params[:quota_exemption])
-    return unless quota_exempt || check_quota_after_attachment
+    return unless quota_exempt? || check_quota_after_attachment
 
     if Attachment.s3_storage?
       return head(:bad_request) unless @attachment.state == :unattached
@@ -1521,6 +1519,11 @@ class FilesController < ApplicationController
   end
 
   private
+
+  def quota_exempt?
+    @attachment.verify_quota_exemption_key(params[:quota_exemption]) ||
+      !!@attachment.folder&.for_submissions?
+  end
 
   def attachment_or_replacement(context, id)
     # NOTE: Attachment#find has special logic to find overwriting files; see FindInContextAssociation

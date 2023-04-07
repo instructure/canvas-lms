@@ -3243,12 +3243,18 @@ class User < ActiveRecord::Base
   end
 
   def submittable_attachments
-    attachments.active.or(
-      Attachment.active.where(
-        context_type: "Group",
-        context_id: current_group_memberships.active.select(:group_id)
-      )
+    user_attachments = attachments.active
+    group_attachments = Attachment.active.where(
+      context_type: "Group",
+      context_id: current_group_memberships.active.select(:group_id)
     )
+
+    if block_given?
+      user_attachments = yield(user_attachments)
+      group_attachments = yield(group_attachments)
+    end
+
+    user_attachments.or(group_attachments)
   end
 
   def authenticate_one_time_password(code)

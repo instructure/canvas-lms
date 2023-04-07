@@ -851,7 +851,12 @@ class GroupsController < ApplicationController
   def create_file
     @attachment = Attachment.new(context: @context)
     if authorized_action(@attachment, @current_user, :create)
-      api_attachment_preflight(@context, request, check_quota: true, submit_assignment: value_to_boolean(params[:submit_assignment]))
+      submit_assignment = value_to_boolean(params[:submit_assignment])
+      opts = { check_quota: true, submit_assignment: submit_assignment }
+      if submit_assignment && @context.respond_to?(:submissions_folder)
+        opts[:folder] = @context.submissions_folder
+      end
+      api_attachment_preflight(@context, request, opts)
     end
   end
 

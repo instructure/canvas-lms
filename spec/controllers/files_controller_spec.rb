@@ -761,6 +761,40 @@ describe FilesController do
     end
   end
 
+  describe "GET 'api_create_success'" do
+    before do
+      category = group_category
+      @group = category.groups.create(context: @course)
+      @group.add_user(@student)
+      user_session(@student)
+    end
+
+    it "treats attachments that live in the special 'submissions' folder as quota exempt" do
+      attachment = Attachment.create!(
+        context: @group,
+        uploaded_data: StringIO.new("my file"),
+        folder: @group.submissions_folder,
+        filename: "my-great-file.txt",
+        file_state: "deleted"
+      )
+      attachment.update_attribute(:size, 51.megabytes)
+      get "api_create_success", params: { id: attachment.id, uuid: attachment.uuid }, format: "json"
+      expect(response).to be_successful
+    end
+
+    it "does not give quota exemption to files not in the special 'submissions' folder" do
+      attachment = Attachment.create!(
+        context: @group,
+        uploaded_data: StringIO.new("my file"),
+        filename: "my-great-file.txt",
+        file_state: "deleted"
+      )
+      attachment.update_attribute(:size, 51.megabytes)
+      get "api_create_success", params: { id: attachment.id, uuid: attachment.uuid }, format: "json"
+      expect(json_parse.fetch("message")).to eq "file size exceeds quota limits"
+    end
+  end
+
   describe "GET 'show_relative'" do
     before(:once) do
       course_file
