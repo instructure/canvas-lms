@@ -502,7 +502,7 @@ class GradeCalculator
         score_rows = group_score_rows
         if @grading_period.nil? && score_rows.any?
           dropped_rows = group_dropped_rows
-          save_assignment_group_scores(score_rows.join(","), dropped_rows.join(","))
+          save_assignment_group_scores(score_rows, dropped_rows)
         end
       end
     end
@@ -677,61 +677,65 @@ class GradeCalculator
   end
 
   def save_assignment_group_scores(score_values, dropped_values)
-    # Update existing assignment group Scores or create them if needed.
-    Score.connection.execute("
-      INSERT INTO #{Score.quoted_table_name} (
-        enrollment_id, assignment_group_id,
-        #{assignment_group_columns_to_insert_or_update[:value_names].join(", ")},
-        course_score, root_account_id, created_at, updated_at
-      )
-        SELECT
-          val.enrollment_id AS enrollment_id,
-          val.assignment_group_id as assignment_group_id,
-          #{assignment_group_columns_to_insert_or_update[:insert_columns].join(", ")},
-          FALSE AS course_score,
-          #{@course.root_account_id} AS root_account_id,
-          #{updated_at} AS created_at,
-          #{updated_at} AS updated_at
-        FROM (VALUES #{score_values}) val
-          (
-            enrollment_id,
-            assignment_group_id,
-            #{assignment_group_columns_to_insert_or_update[:value_names].join(", ")}
-          )
-        ORDER BY assignment_group_id, enrollment_id
-      ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL
-      DO UPDATE SET
-        #{assignment_group_columns_to_insert_or_update[:update_columns].join(", ")},
-        updated_at = excluded.updated_at,
-        root_account_id = #{@course.root_account_id},
-        workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
-    ")
+    Score.connection.with_max_update_limit(score_values.length) do
+      # Update existing assignment group Scores or create them if needed.
+      Score.connection.execute("
+        INSERT INTO #{Score.quoted_table_name} (
+          enrollment_id, assignment_group_id,
+          #{assignment_group_columns_to_insert_or_update[:value_names].join(", ")},
+          course_score, root_account_id, created_at, updated_at
+        )
+          SELECT
+            val.enrollment_id AS enrollment_id,
+            val.assignment_group_id as assignment_group_id,
+            #{assignment_group_columns_to_insert_or_update[:insert_columns].join(", ")},
+            FALSE AS course_score,
+            #{@course.root_account_id} AS root_account_id,
+            #{updated_at} AS created_at,
+            #{updated_at} AS updated_at
+          FROM (VALUES #{score_values.join(",")}) val
+            (
+              enrollment_id,
+              assignment_group_id,
+              #{assignment_group_columns_to_insert_or_update[:value_names].join(", ")}
+            )
+          ORDER BY assignment_group_id, enrollment_id
+        ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL
+        DO UPDATE SET
+          #{assignment_group_columns_to_insert_or_update[:update_columns].join(", ")},
+          updated_at = excluded.updated_at,
+          root_account_id = #{@course.root_account_id},
+          workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
+      ")
+    end
 
     # We only save score metadata for posted grades. This means, if we're
     # calculating unposted grades (which means @ignore_muted is false),
     # we don't want to update the score metadata. TODO: start storing the
     # score metadata for unposted grades.
     if @ignore_muted
-      ScoreMetadata.connection.execute("
-        INSERT INTO #{ScoreMetadata.quoted_table_name}
-          (score_id, calculation_details, created_at, updated_at)
-          SELECT
-            scores.id AS score_id,
-            CAST(val.calculation_details as json) AS calculation_details,
-            #{updated_at} AS created_at,
-            #{updated_at} AS updated_at
-          FROM (VALUES #{dropped_values}) val
-            (enrollment_id, assignment_group_id, calculation_details)
-          LEFT OUTER JOIN #{Score.quoted_table_name} scores ON
-            scores.enrollment_id = val.enrollment_id AND
-            scores.assignment_group_id = val.assignment_group_id
-          ORDER BY score_id
-        ON CONFLICT (score_id)
-        DO UPDATE SET
-          calculation_details = excluded.calculation_details,
-          updated_at = excluded.updated_at
-        ;
-      ")
+      Score.connection.with_max_update_limit(dropped_values.length) do
+        ScoreMetadata.connection.execute("
+          INSERT INTO #{ScoreMetadata.quoted_table_name}
+            (score_id, calculation_details, created_at, updated_at)
+            SELECT
+              scores.id AS score_id,
+              CAST(val.calculation_details as json) AS calculation_details,
+              #{updated_at} AS created_at,
+              #{updated_at} AS updated_at
+            FROM (VALUES #{dropped_values.join(",")}) val
+              (enrollment_id, assignment_group_id, calculation_details)
+            LEFT OUTER JOIN #{Score.quoted_table_name} scores ON
+              scores.enrollment_id = val.enrollment_id AND
+              scores.assignment_group_id = val.assignment_group_id
+            ORDER BY score_id
+          ON CONFLICT (score_id)
+          DO UPDATE SET
+            calculation_details = excluded.calculation_details,
+            updated_at = excluded.updated_at
+          ;
+        ")
+      end
     end
   rescue ActiveRecord::Deadlocked => e
     Canvas::Errors.capture_exception(:grade_calculator, e, :warn)

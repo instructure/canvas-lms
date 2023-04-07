@@ -321,29 +321,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "21d0ae73645443aa868f42d8f6a640b31ac3b483c58786bfe76dc0a9864fa455",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/grade_calculator.rb",
-      "line": 684,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Score.connection.execute(\"\\n      INSERT INTO #{Score.quoted_table_name} (\\n        enrollment_id, assignment_group_id,\\n        #{assignment_group_columns_to_insert_or_update[:value_names].join(\", \")},\\n        course_score, root_account_id, created_at, updated_at\\n      )\\n        SELECT\\n          val.enrollment_id AS enrollment_id,\\n          val.assignment_group_id as assignment_group_id,\\n          #{assignment_group_columns_to_insert_or_update[:insert_columns].join(\", \")},\\n          FALSE AS course_score,\\n          #{(course or Course.find(course)).root_account_id} AS root_account_id,\\n          #{updated_at} AS created_at,\\n          #{updated_at} AS updated_at\\n        FROM (VALUES #{score_values}) val\\n          (\\n            enrollment_id,\\n            assignment_group_id,\\n            #{assignment_group_columns_to_insert_or_update[:value_names].join(\", \")}\\n          )\\n        ORDER BY assignment_group_id, enrollment_id\\n      ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL\\n      DO UPDATE SET\\n        #{assignment_group_columns_to_insert_or_update[:update_columns].join(\", \")},\\n        updated_at = excluded.updated_at,\\n        root_account_id = #{(course or Course.find(course)).root_account_id},\\n        workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\n    \")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "GradeCalculator",
-        "method": "save_assignment_group_scores"
-      },
-      "user_input": "assignment_group_columns_to_insert_or_update[:value_names].join(\", \")",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "21efc518929f57de2536d97d99f07d9a7425712d11c77234a089eb24a8de39b6",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -473,6 +450,29 @@
         "method": "for_masquerading_user"
       },
       "user_input": "like_condition(\"?\", \"'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'\", false)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "3f0726fdb6a581c21efeb69e929d380edbf480b9410ad8a58cedaa3d66673596",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/grade_calculator.rb",
+      "line": 724,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ScoreMetadata.connection.execute(\"\\n          INSERT INTO #{ScoreMetadata.quoted_table_name}\\n            (score_id, calculation_details, created_at, updated_at)\\n            SELECT\\n              scores.id AS score_id,\\n              CAST(val.calculation_details as json) AS calculation_details,\\n              #{updated_at} AS created_at,\\n              #{updated_at} AS updated_at\\n            FROM (VALUES #{dropped_values.join(\",\")}) val\\n              (enrollment_id, assignment_group_id, calculation_details)\\n            LEFT OUTER JOIN #{Score.quoted_table_name} scores ON\\n              scores.enrollment_id = val.enrollment_id AND\\n              scores.assignment_group_id = val.assignment_group_id\\n            ORDER BY score_id\\n          ON CONFLICT (score_id)\\n          DO UPDATE SET\\n            calculation_details = excluded.calculation_details,\\n            updated_at = excluded.updated_at\\n          ;\\n        \")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradeCalculator",
+        "method": "save_assignment_group_scores"
+      },
+      "user_input": "updated_at",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -767,29 +767,6 @@
       "confidence": "Medium",
       "cwe_id": [
         22
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "75559f0034b6f8abb456a8ea6eb2b44350e53207bfbeb46330a44494e55516a0",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/grade_calculator.rb",
-      "line": 721,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "ScoreMetadata.connection.execute(\"\\n        INSERT INTO #{ScoreMetadata.quoted_table_name}\\n          (score_id, calculation_details, created_at, updated_at)\\n          SELECT\\n            scores.id AS score_id,\\n            CAST(val.calculation_details as json) AS calculation_details,\\n            #{updated_at} AS created_at,\\n            #{updated_at} AS updated_at\\n          FROM (VALUES #{dropped_values}) val\\n            (enrollment_id, assignment_group_id, calculation_details)\\n          LEFT OUTER JOIN #{Score.quoted_table_name} scores ON\\n            scores.enrollment_id = val.enrollment_id AND\\n            scores.assignment_group_id = val.assignment_group_id\\n          ORDER BY score_id\\n        ON CONFLICT (score_id)\\n        DO UPDATE SET\\n          calculation_details = excluded.calculation_details,\\n          updated_at = excluded.updated_at\\n        ;\\n      \")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "GradeCalculator",
-        "method": "save_assignment_group_scores"
-      },
-      "user_input": "updated_at",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
       ],
       "note": ""
     },
@@ -1269,6 +1246,29 @@
         "method": "save_course_and_grading_period_scores"
       },
       "user_input": "columns_to_insert_or_update[:columns].join(\", \")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "ceace5f886c43ebf68ea786a6db672f2d12d24a19024d5249481953636bb15be",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/grade_calculator.rb",
+      "line": 685,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Score.connection.execute(\"\\n        INSERT INTO #{Score.quoted_table_name} (\\n          enrollment_id, assignment_group_id,\\n          #{assignment_group_columns_to_insert_or_update[:value_names].join(\", \")},\\n          course_score, root_account_id, created_at, updated_at\\n        )\\n          SELECT\\n            val.enrollment_id AS enrollment_id,\\n            val.assignment_group_id as assignment_group_id,\\n            #{assignment_group_columns_to_insert_or_update[:insert_columns].join(\", \")},\\n            FALSE AS course_score,\\n            #{(course or Course.find(course)).root_account_id} AS root_account_id,\\n            #{updated_at} AS created_at,\\n            #{updated_at} AS updated_at\\n          FROM (VALUES #{score_values.join(\",\")}) val\\n            (\\n              enrollment_id,\\n              assignment_group_id,\\n              #{assignment_group_columns_to_insert_or_update[:value_names].join(\", \")}\\n            )\\n          ORDER BY assignment_group_id, enrollment_id\\n        ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL\\n        DO UPDATE SET\\n          #{assignment_group_columns_to_insert_or_update[:update_columns].join(\", \")},\\n          updated_at = excluded.updated_at,\\n          root_account_id = #{(course or Course.find(course)).root_account_id},\\n          workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\n      \")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradeCalculator",
+        "method": "save_assignment_group_scores"
+      },
+      "user_input": "assignment_group_columns_to_insert_or_update[:value_names].join(\", \")",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -1771,6 +1771,6 @@
       "note": ""
     }
   ],
-  "updated": "2023-04-10 12:20:28 -0500",
+  "updated": "2023-04-10 13:22:04 -0500",
   "brakeman_version": "5.4.1"
 }

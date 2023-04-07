@@ -4106,7 +4106,7 @@ class Assignment < ActiveRecord::Base
 
   def mark_module_progressions_outdated
     progressions = ContextModuleProgression.for_course(context).where(current: true)
-    progressions.update_all(current: false)
+    progressions.in_batches(of: 10_000).update_all(current: false)
     User.where(id: progressions.pluck(:user_id)).touch_all
   end
 end
