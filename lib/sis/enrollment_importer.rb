@@ -42,6 +42,7 @@ module SIS
           Enrollment.where.not(sis_batch_id: nil)
                     .joins("INNER JOIN #{Enrollment.quoted_table_name} AS se ON enrollments.associated_user_id=se.user_id AND enrollments.course_section_id=se.course_section_id")
                     .where(se: { id: shard_enrollment_ids })
+                    .in_batches(of: 10_000)
                     .update_all(sis_batch_id: @batch.id)
         end
       end

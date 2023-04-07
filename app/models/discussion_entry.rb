@@ -452,7 +452,7 @@ class DiscussionEntry < ActiveRecord::Base
             group_memberships.group_id IN (?)", group_ids))
       end
       scope = scope.where("user_id<>?", user) if user
-      scope.update_all("unread_entry_count = unread_entry_count + 1")
+      scope.in_batches(of: 10_000).update_all("unread_entry_count = unread_entry_count + 1")
 
       if user
         update_or_create_participant(current_user: user, new_state: "read")
@@ -483,7 +483,7 @@ class DiscussionEntry < ActiveRecord::Base
     # takes care of clearing the cache
     self.class.connection.after_transaction_commit do
       if root_entry_id.present? && (discussion_topic.for_assignment? || discussion_topic.todo_date.present?)
-        User.where(id: discussion_topic.discussion_topic_participants.select(:user_id)).touch_all
+        User.where(id: discussion_topic.discussion_topic_participants.select(:user_id)).in_batches(of: 10_000).touch_all
       end
     end
   end
