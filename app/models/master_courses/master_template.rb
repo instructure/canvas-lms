@@ -279,9 +279,11 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     MasterCourses::CONTENT_TYPES_FOR_DELETIONS.each do |klass|
       item_scope = case klass
                    when "Attachment"
-                     course.attachments.where(file_state: "deleted")
+                     course.attachments.deleted
                    when "CoursePace"
                      course.course_paces.where(workflow_state: "deleted")
+                   when "MediaTrack"
+                     MediaTrack.where(attachment: course.attachments.deleted)
                    else
                      klass.constantize.where(context_id: course, context_type: "Course", workflow_state: "deleted")
                    end

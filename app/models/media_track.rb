@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class MediaTrack < ActiveRecord::Base
+  include MasterCourses::Restrictor
+
   belongs_to :user
   belongs_to :media_object, touch: true
   belongs_to :attachment
-  before_validation :add_attachment_id
+  before_validation :set_media_and_attachment
   before_save :convert_srt_to_wvtt
   validates :media_object_id, presence: true
   validates :kind, inclusion: { in: %w[subtitles captions descriptions chapters metadata] }
@@ -34,8 +36,13 @@ class MediaTrack < ActiveRecord::Base
     message: -> { t("TTML tracks are not allowed because they are susceptible to xss attacks") }
   }
 
-  def add_attachment_id
+  def is_child_content?
+    attachment&.is_child_content?
+  end
+
+  def set_media_and_attachment
     self.attachment_id ||= media_object.attachment_id
+    self.media_object_id ||= attachment.media_object_by_media_id
   end
 
   def webvtt_content

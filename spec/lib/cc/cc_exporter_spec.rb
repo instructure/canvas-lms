@@ -619,31 +619,58 @@ describe "Common Cartridge exporting" do
       run_export
     end
 
-    it "exports media tracks" do
-      stub_kaltura
-      allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:startSession)
-      allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:flavorAssetGetPlaylistUrl).and_return("http://www.example.com/blah.flv")
-      stub_request(:get, "http://www.example.com/blah.flv").to_return(body: "", status: 200)
-      allow(CC::CCHelper).to receive(:media_object_info).and_return({ asset: { id: 1, status: "2" }, path: "blah.flv" })
-      obj = @course.media_objects.create! media_id: "0_deadbeef"
-      obj.attachment = Attachment.create!(context_id: obj.context_id, context_type: obj.context_type, filename: "", content_type: "unknown/unknown")
-      obj.save!
-      track = obj.media_tracks.create! kind: "subtitles", locale: "tlh", content: "Hab SoSlI' Quch!", attachment: obj.attachment
-      page = @course.wiki_pages.create!(title: "wiki", body: "ohai")
-      page.body = '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>'
-      page.save!
-      @ce.export_type = ContentExport::COMMON_CARTRIDGE
-      @ce.save!
-      run_export
-      mo_node_key = CC::CCHelper.create_key(obj.attachment, global: true)
-      key = CC::CCHelper.create_key(track.content, global: true)
-      file_node = @manifest_doc.at_css("resource[identifier='#{key}'] file[href$='/blah.flv.tlh.subtitles']")
-      expect(file_node).to be_present
-      expect(@zip_file.read(file_node["href"])).to eql(track.content)
-      track_doc = Nokogiri::XML(@zip_file.read("course_settings/media_tracks.xml"))
-      expect(track_doc.at_css("media_tracks media[identifierref=#{mo_node_key}]")).to be_present
-      expect(track_doc.at_css("media_tracks media track[locale=tlh][kind=subtitles][identifierref=#{key}]")).to be_present
-      expect(ccc_schema.validate(track_doc)).to be_empty
+    context "media_links_use_attachment_id feature enabled" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return true
+      end
+
+      it "exports media tracks" do
+        stub_kaltura
+        kaltura_session = double("kaltura_session")
+        allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(kaltura_session)
+        allow(kaltura_session).to receive(:flavorAssetGetOriginalAsset).and_return({ id: 1, status: "2", fileExt: "flv" })
+        obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+        track = obj.media_tracks.create! kind: "subtitles", locale: "tlh", content: "Hab SoSlI' Quch!", attachment: obj.attachment
+        page = @course.wiki_pages.create!(title: "wiki", body: "ohai")
+        page.body = '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>'
+        page.save!
+        @ce.export_type = ContentExport::COMMON_CARTRIDGE
+        @ce.save!
+        run_export
+        mo_node_key = CC::CCHelper.create_key(obj.attachment, global: true)
+        key = CC::CCHelper.create_key(track.content, global: true)
+        track_doc = Nokogiri::XML(@zip_file.read("course_settings/media_tracks.xml"))
+        expect(track_doc.at_css("media_tracks media[identifierref=#{mo_node_key}]")).to be_present
+        expect(track_doc.at_css("media_tracks media track[locale=tlh][kind=subtitles][identifierref=#{key}]")).to be_present
+        expect(track_doc.at_css("media_tracks media track").text).to eq track.content
+        expect(ccc_schema.validate(track_doc)).to be_empty
+      end
+
+      it "exports media tracks when there's no attachment associated with the media object (and also get tracks from the original media object if there isn't one for that locale on the attachment)" do
+        stub_kaltura
+        kaltura_session = double("kaltura_session")
+        allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(kaltura_session)
+        allow(kaltura_session).to receive(:flavorAssetGetPlaylistUrl).and_return("http://www.example.com/blah.flv")
+        stub_request(:get, "http://www.example.com/blah.flv").to_return(body: "", status: 200)
+        allow(kaltura_session).to receive(:flavorAssetGetOriginalAsset).and_return({ id: 1, status: "2", fileExt: "flv" })
+        stub_request(:get, "http://www.example.com/blah.flv").to_return(body: "", status: 200)
+        expect_any_instance_of(MediaObject).to receive(:create_attachment).and_call_original
+        obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+        track = obj.media_tracks.create! kind: "subtitles", locale: "tlh", content: "Hab SoSlI' Quch!"
+        page = @course.wiki_pages.create!(title: "wiki", body: "ohai")
+        page.body = '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>'
+        page.save!
+        @ce.export_type = ContentExport::COMMON_CARTRIDGE
+        @ce.save!
+        run_export
+        mo_node_key = CC::CCHelper.create_key(obj.reload.attachment, global: true)
+        key = CC::CCHelper.create_key(track.content, global: true)
+        track_doc = Nokogiri::XML(@zip_file.read("course_settings/media_tracks.xml"))
+        expect(track_doc.at_css("media_tracks media[identifierref=#{mo_node_key}]")).to be_present
+        expect(track_doc.at_css("media_tracks media track[locale=tlh][kind=subtitles][identifierref=#{key}]")).to be_present
+        expect(track_doc.at_css("media_tracks media track").text).to eq track.content
+        expect(ccc_schema.validate(track_doc)).to be_empty
+      end
     end
 
     it "exports CC 1.3 assignments" do

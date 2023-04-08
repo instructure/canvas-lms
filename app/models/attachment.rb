@@ -1599,7 +1599,7 @@ class Attachment < ActiveRecord::Base
   end
 
   scope :visible, -> { where(["attachments.file_state in (?, ?)", "available", "public"]) }
-  scope :not_deleted, -> { where("attachments.file_state<>'deleted'") }
+  scope :not_deleted, -> { where.not(file_state: "deleted") }
 
   scope :not_hidden, -> { where("attachments.file_state<>'hidden'") }
   scope :uncategorized, -> { where(category: UNCATEGORIZED) }

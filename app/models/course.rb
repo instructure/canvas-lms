@@ -2692,7 +2692,7 @@ class Course < ActiveRecord::Base
     ce = options[:content_export]
     cm = options[:content_migration]
 
-    attachments = course.attachments.where("file_state <> 'deleted'").to_a
+    attachments = course.attachments.not_deleted.to_a
     total = attachments.count + 1
 
     Attachment.skip_media_object_creation do
