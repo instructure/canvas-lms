@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Sticky from 'jquery-sticky'
+import Sticky from '@canvas/jquery-sticky'
 
 QUnit.module('jQuery sticky plugin')
 

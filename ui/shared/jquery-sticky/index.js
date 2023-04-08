@@ -74,8 +74,8 @@ export default class Sticky {
   }
 }
 
-$.fn.sticky = function() {
-  return this.each(function() {
+$.fn.sticky = function () {
+  return this.each(function () {
     new Sticky($(this))
   })
 }

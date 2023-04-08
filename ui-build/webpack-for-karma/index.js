@@ -61,7 +61,6 @@ module.exports = {
         include: [
           path.join(canvasDir, 'ui'),
           path.join(canvasDir, 'packages/jquery-kyle-menu'),
-          path.join(canvasDir, 'packages/jquery-sticky'),
           path.join(canvasDir, 'packages/jquery-popover'),
           path.join(canvasDir, 'packages/jquery-selectmenu'),
           path.join(canvasDir, 'packages/defer-promise'),
