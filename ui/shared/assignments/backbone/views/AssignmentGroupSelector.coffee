@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import AssignmentGroupCreateDialog from './AssignmentGroupCreateDialog.coffee'
+import AssignmentGroupCreateDialog from './AssignmentGroupCreateDialog'
 import template from '../../jst/AssignmentGroupSelector.handlebars'
 
 I18n = useI18nScope('assignment_group_selector')

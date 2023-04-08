@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import ready from '@instructure/ready'
-import CollaborationsPage from './backbone/views/CollaborationsPage.coffee'
+import CollaborationsPage from './backbone/views/CollaborationsPage'
 import './jquery/index'
 // eslint-disable-next-line import/extensions
 import '../../boot/initializers/activateKeyClicks.js'

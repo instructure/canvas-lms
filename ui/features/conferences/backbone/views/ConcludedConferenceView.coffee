@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import ConferenceView from './ConferenceView.coffee'
+import ConferenceView from './ConferenceView'
 import template from '../../jst/concludedConference.handlebars'
 
 export default class ConcludedConferenceView extends ConferenceView

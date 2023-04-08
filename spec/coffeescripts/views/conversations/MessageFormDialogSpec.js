@@ -22,7 +22,7 @@ import fakeENV from 'helpers/fakeENV'
 import MessageFormDialog from 'ui/features/conversations/backbone/views/MessageFormDialog'
 import FavoriteCourseCollection from 'ui/features/conversations/backbone/collections/FavoriteCourseCollection'
 import CourseCollection from 'ui/features/conversations/backbone/collections/CourseCollection'
-import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection.coffee'
+import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection'
 
 const recipients = [
   {

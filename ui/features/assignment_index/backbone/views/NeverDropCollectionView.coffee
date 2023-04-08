@@ -17,7 +17,7 @@
 
 import _ from 'underscore'
 import CollectionView from '@canvas/backbone-collection-view'
-import NeverDropView from './NeverDropView.coffee'
+import NeverDropView from './NeverDropView'
 import template from '../../jst/NeverDropCollection.handlebars'
 
 export default class NeverDropCollectionView extends CollectionView

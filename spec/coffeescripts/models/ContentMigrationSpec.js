@@ -17,8 +17,8 @@
  */
 
 import Backbone from '@canvas/backbone'
-import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration.coffee'
-import DaySubstitutionCollection from '@canvas/day-substitution/backbone/collections/DaySubstitutionCollection.coffee'
+import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration'
+import DaySubstitutionCollection from '@canvas/day-substitution/backbone/collections/DaySubstitutionCollection'
 
 QUnit.module('ContentMigration', {
   setup() {

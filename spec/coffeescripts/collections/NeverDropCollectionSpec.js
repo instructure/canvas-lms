@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import NeverDropCollection from 'ui/features/assignment_index/backbone/collections/NeverDropCollection.coffee'
+import NeverDropCollection from 'ui/features/assignment_index/backbone/collections/NeverDropCollection'
 
 class AssignmentStub extends Backbone.Model {
   name() {

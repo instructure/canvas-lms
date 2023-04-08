@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@canvas/backbone'
-import CollaboratorPickerView from './CollaboratorPickerView.coffee'
+import CollaboratorPickerView from './CollaboratorPickerView'
 
 I18n = useI18nScope('collaborations')
 

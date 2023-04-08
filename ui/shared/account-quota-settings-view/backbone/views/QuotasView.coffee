@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
+import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import htmlEscape from 'html-escape'
 import template from '../../jst/Quotas.handlebars'
 import '@canvas/rails-flash-notifications'

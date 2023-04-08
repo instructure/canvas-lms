@@ -17,9 +17,9 @@
  */
 
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
-import Course from '@canvas/courses/backbone/models/Course.coffee'
-import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
-import AssignmentSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSettingsView.coffee'
+import Course from '@canvas/courses/backbone/models/Course'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
+import AssignmentSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSettingsView'
 import AssignmentGroupWeightsView from 'ui/features/assignment_index/backbone/views/AssignmentGroupWeightsView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'

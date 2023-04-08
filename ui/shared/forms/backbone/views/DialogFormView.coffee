@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import ValidatedFormView from './ValidatedFormView.coffee'
+import ValidatedFormView from './ValidatedFormView'
 import preventDefault from 'prevent-default'
 import wrapper from '../../jst/DialogFormWrapper.handlebars'
 import 'jqueryui/dialog'

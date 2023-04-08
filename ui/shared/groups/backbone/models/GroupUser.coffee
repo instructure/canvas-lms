@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import User from '@canvas/users/backbone/models/User.coffee'
+import User from '@canvas/users/backbone/models/User'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 export default class GroupUser extends User

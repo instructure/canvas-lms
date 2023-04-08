@@ -18,7 +18,7 @@
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/calendarHeader.handlebars'
-import CalendarNavigator from './CalendarNavigator.coffee'
+import CalendarNavigator from './CalendarNavigator'
 import {publish, subscribe} from 'jquery-tinypubsub'
 
 export default class CalendarHeader extends Backbone.View

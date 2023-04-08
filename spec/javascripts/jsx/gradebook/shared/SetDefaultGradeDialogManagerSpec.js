@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 
-import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog.coffee'
+import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog'
 import SetDefaultGradeDialogManager from 'ui/features/gradebook/react/shared/SetDefaultGradeDialogManager'
 import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents'
 

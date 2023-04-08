@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import '@canvas/jquery/jquery.ajaxJSON'
 
-import OutcomeGradebookView from '../backbone/views/OutcomeGradebookView.coffee'
+import OutcomeGradebookView from '../backbone/views/OutcomeGradebookView'
 import GradebookMenu from '@canvas/gradebook-menu'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
 

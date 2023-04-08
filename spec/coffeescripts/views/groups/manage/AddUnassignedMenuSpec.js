@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GroupUserCollection from '@canvas/groups/backbone/collections/GroupUserCollection.coffee'
-import GroupUser from '@canvas/groups/backbone/models/GroupUser.coffee'
-import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
-import Group from '@canvas/groups/backbone/models/Group.coffee'
+import GroupUserCollection from '@canvas/groups/backbone/collections/GroupUserCollection'
+import GroupUser from '@canvas/groups/backbone/models/GroupUser'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
+import Group from '@canvas/groups/backbone/models/Group'
 import AddUnassignedMenu from 'ui/features/manage_groups/backbone/views/AddUnassignedMenu'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'

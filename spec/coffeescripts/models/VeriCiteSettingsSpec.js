@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import VeriCiteSettings from '@canvas/assignments/VeriCiteSettings.coffee'
+import VeriCiteSettings from '@canvas/assignments/VeriCiteSettings'
 
 QUnit.module('VeriCiteSettings')
 

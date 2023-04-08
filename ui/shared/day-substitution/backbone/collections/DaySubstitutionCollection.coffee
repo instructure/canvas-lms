@@ -17,7 +17,7 @@
 
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
-import DaySubstitution from '../models/DaySubstitution.coffee'
+import DaySubstitution from '../models/DaySubstitution'
 
 export default class DaySubstitutionCollection extends Backbone.Collection
   model: DaySubstitution

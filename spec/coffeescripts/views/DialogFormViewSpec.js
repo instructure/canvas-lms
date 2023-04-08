@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
+import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import assert from 'helpers/assertions'
 import {closeDialog} from 'helpers/util'
 import 'helpers/jquery.simulate'

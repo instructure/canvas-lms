@@ -22,7 +22,7 @@ import ReactDOM from 'react-dom'
 import customPropTypes from '@canvas/files/react/modules/customPropTypes'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import BBTreeBrowserView from '../legacy/modules/BBTreeBrowserView'
-import RootFoldersFinder from '../../RootFoldersFinder.coffee'
+import RootFoldersFinder from '../../RootFoldersFinder'
 
 const I18n = useI18nScope('react_files')
 

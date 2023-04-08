@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CheckboxCollection from 'ui/features/content_migrations/backbone/collections/ContentCheckboxCollection.coffee'
-import CheckboxModel from 'ui/features/content_migrations/backbone/models/ContentCheckbox.coffee'
+import CheckboxCollection from 'ui/features/content_migrations/backbone/collections/ContentCheckboxCollection'
+import CheckboxModel from 'ui/features/content_migrations/backbone/models/ContentCheckbox'
 
 QUnit.module('ContentCheckboxCollectionSpec')
 const createCheckboxCollection = function (properties) {

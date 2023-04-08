@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import LockButtonView from './Button.coffee'
+import LockButtonView from './Button'
 
 export default class LockIconView extends LockButtonView
   lockClass: 'lock-icon-lock'

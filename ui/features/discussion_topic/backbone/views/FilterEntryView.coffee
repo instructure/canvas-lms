@@ -17,7 +17,7 @@
 
 import {View} from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import EntryView from './EntryView.coffee'
+import EntryView from './EntryView'
 import template from '../../jst/results_entry.handlebars'
 
 I18n = useI18nScope('discussions')

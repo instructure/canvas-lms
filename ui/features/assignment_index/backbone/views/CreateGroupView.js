@@ -20,13 +20,13 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import numberHelper from '@canvas/i18n/numberHelper'
-import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
-import NeverDropCollection from '../collections/NeverDropCollection.coffee'
-import NeverDropCollectionView from './NeverDropCollectionView.coffee'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
+import NeverDropCollection from '../collections/NeverDropCollection'
+import NeverDropCollectionView from './NeverDropCollectionView'
 import DialogFormView, {
   isSmallTablet,
   getResponsiveWidth,
-} from '@canvas/forms/backbone/views/DialogFormView.coffee'
+} from '@canvas/forms/backbone/views/DialogFormView'
 import template from '../../jst/CreateGroup.handlebars'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'

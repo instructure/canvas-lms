@@ -17,7 +17,7 @@
  */
 
 import FileUploadQuestionView from '../backbone/views/FileUploadQuestionView'
-import File from '@canvas/files/backbone/models/File.coffee'
+import File from '@canvas/files/backbone/models/File'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'

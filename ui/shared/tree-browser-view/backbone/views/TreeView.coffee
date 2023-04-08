@@ -18,8 +18,8 @@
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import _ from 'underscore'
-import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
-import TreeItemView from './TreeItemView.coffee'
+import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
+import TreeItemView from './TreeItemView'
 import collectionTemplate from '../../jst/TreeCollection.handlebars'
 import htmlEscape from 'html-escape'
 

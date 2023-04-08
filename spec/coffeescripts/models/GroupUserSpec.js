@@ -17,9 +17,9 @@
  */
 
 import Backbone from '@canvas/backbone'
-import Group from '@canvas/groups/backbone/models/Group.coffee'
-import GroupUser from '@canvas/groups/backbone/models/GroupUser.coffee'
-import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
+import Group from '@canvas/groups/backbone/models/Group'
+import GroupUser from '@canvas/groups/backbone/models/GroupUser'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
 import $ from 'jquery'
 
 QUnit.module('GroupUser', {

@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import TimeBlockList from 'ui/features/calendar/jquery/TimeBlockList'
 import TimeBlockRow from 'ui/features/calendar/jquery/TimeBlockRow'
 import tz from '@canvas/timezone'

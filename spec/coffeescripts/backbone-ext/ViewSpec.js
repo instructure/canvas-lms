@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import mixing from '@canvas/backbone/mixin.coffee'
+import mixing from '@canvas/backbone/mixin'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('View', {

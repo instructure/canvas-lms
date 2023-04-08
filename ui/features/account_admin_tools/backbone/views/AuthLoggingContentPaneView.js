@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
+import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import InputFilterView from '@canvas/backbone-input-filter-view'
 import UserView from './UserView'
 import UserDateRangeSearchFormView from './UserDateRangeSearchFormView'

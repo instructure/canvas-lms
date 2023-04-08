@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import ModuleItemCollection from '../collections/ModuleItemCollection.coffee'
+import ModuleItemCollection from '../collections/ModuleItemCollection'
 
 export default class Module extends Backbone.Model
   resourceName: 'modules'

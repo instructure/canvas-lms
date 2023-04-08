@@ -192,7 +192,11 @@ module.exports = {
     'react/jsx-filename-extension': ['error', {extensions: ['.js', 'ts', 'tsx']}],
     'eslint-comments/no-unused-disable': 'error',
     'jest/no-disabled-tests': 'off',
-    'import/extensions': ['error', 'ignorePackages', {js: 'never', ts: 'never', tsx: 'never'}],
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {js: 'never', ts: 'never', tsx: 'never', coffee: 'never'},
+    ],
     'import/no-commonjs': 'off', // This is overridden where it counts
     'import/no-extraneous-dependencies': ['error', {devDependencies: true}],
     'lodash/callback-binding': 'error',
@@ -234,7 +238,7 @@ module.exports = {
   settings: {
     'import/resolver': {
       node: {
-        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.d.ts'], // add Typescript extensions
+        extensions: ['.js', '.jsx', '.json', '.coffee', '.ts', '.tsx', '.d.ts'], // add Typescript and CoffeeScript extensions
       },
     },
     react: {

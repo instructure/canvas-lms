@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import ProgressModel from '@canvas/content-migrations/backbone/models/ContentMigrationProgress.coffee'
-import IssuesCollection from '../collections/ContentMigrationIssueCollection.coffee'
+import ProgressModel from '@canvas/content-migrations/backbone/models/ContentMigrationProgress'
+import IssuesCollection from '../collections/ContentMigrationIssueCollection'
 
 # Summary
 #   Represents a model that is progressing through its

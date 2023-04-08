@@ -23,9 +23,9 @@ import _ from 'underscore'
 import OutcomesDirectoryView from './OutcomesDirectoryView'
 import AccountDirectoryView from './AccountDirectoryView'
 import StateStandardsDirectoryView from './StateStandardsDirectoryView'
-import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup.coffee'
-import OutcomeCollection from '@canvas/outcomes/backbone/collections/OutcomeCollection.coffee'
-import OutcomeGroupCollection from '../collections/OutcomeGroupCollection.coffee'
+import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
+import OutcomeCollection from '@canvas/outcomes/backbone/collections/OutcomeCollection'
+import OutcomeGroupCollection from '../collections/OutcomeGroupCollection'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
 const I18n = useI18nScope('outcomesFindDirectoryVew')

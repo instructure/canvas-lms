@@ -22,7 +22,7 @@ import {View} from '@canvas/backbone'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 import template from '../../jst/EntryCollectionView.handlebars'
 import entryStatsTemplate from '../../jst/entryStats.handlebars'
-import EntryView from './EntryView.coffee'
+import EntryView from './EntryView'
 import 'jquery-scroll-into-view'
 
 I18n = useI18nScope('discussions')

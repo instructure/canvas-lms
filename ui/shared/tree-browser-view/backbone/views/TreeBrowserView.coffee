@@ -19,7 +19,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
 import template from '../../jst/TreeBrowser.handlebars'
-import TreeView from './TreeView.coffee'
+import TreeView from './TreeView'
 
 I18n = useI18nScope('treeBrowser')
 

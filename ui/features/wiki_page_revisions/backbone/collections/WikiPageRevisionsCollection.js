@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision'
 
 const revisionOptions = ['parentModel']

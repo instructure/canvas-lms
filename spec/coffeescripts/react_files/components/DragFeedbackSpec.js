@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import {mount} from 'enzyme'
-import File from '@canvas/files/backbone/models/File.coffee'
+import File from '@canvas/files/backbone/models/File'
 import DragFeedback from 'ui/features/files/react/components/DragFeedback'
 
 QUnit.module('DragFeedback')

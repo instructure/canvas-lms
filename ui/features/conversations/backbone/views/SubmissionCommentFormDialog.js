@@ -22,7 +22,7 @@ import '@canvas/backbone'
 import DialogBaseView from '@canvas/dialog-base-view'
 import template from '../../jst/SubmissionCommentFormDialog.handlebars'
 import composeTitleBarTemplate from '../../jst/composeTitleBar.handlebars'
-import Message from '../models/Message.coffee'
+import Message from '../models/Message'
 import 'jquery.elastic'
 
 const I18n = useI18nScope('conversation_dialog')

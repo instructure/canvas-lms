@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
-import DialogFormView, {isSmallTablet, getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
+import DialogFormView, {isSmallTablet, getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView'
 import DateValidator from '@canvas/datetime/DateValidator'
 import template from '../../jst/CreateAssignment.handlebars'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'

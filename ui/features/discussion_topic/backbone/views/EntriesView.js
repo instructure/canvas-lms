@@ -19,7 +19,7 @@ import _ from 'underscore'
 import $ from 'jquery'
 import pageNavTemplate from '../../jst/pageNav.handlebars'
 import Backbone from '@canvas/backbone'
-import EntryCollectionView from './EntryCollectionView.coffee'
+import EntryCollectionView from './EntryCollectionView'
 import 'jquery-scroll-into-view'
 import '../../underscore.flattenObjects'
 

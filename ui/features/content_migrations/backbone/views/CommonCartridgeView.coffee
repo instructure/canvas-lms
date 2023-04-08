@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import template from '../../jst/CommonCartridge.handlebars'
-import MigrationView from '@canvas/content-migrations/backbone/views/MigrationView.coffee'
+import MigrationView from '@canvas/content-migrations/backbone/views/MigrationView'
 
 export default class CommonCartridge extends MigrationView
   template: template

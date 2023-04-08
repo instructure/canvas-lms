@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 
 export default class SyllabusAppointmentGroupsCollection extends PaginatedCollection {
   initialize(context_codes, scope = 'reservable') {

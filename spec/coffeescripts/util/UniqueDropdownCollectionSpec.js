@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UniqueDropdownCollection from 'ui/features/assignment_index/backbone/collections/UniqueDropdownCollection.coffee'
+import UniqueDropdownCollection from 'ui/features/assignment_index/backbone/collections/UniqueDropdownCollection'
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
 

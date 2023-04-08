@@ -56,7 +56,7 @@ import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Menu} from '@instructure/ui-menu'
 
-import DiscussionModel from '@canvas/discussions/backbone/models/DiscussionTopic.coffee'
+import DiscussionModel from '@canvas/discussions/backbone/models/DiscussionTopic'
 import LockIconView from '@canvas/lock-icon'
 
 import actions from '../actions'

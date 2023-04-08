@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ModuleCollection from '@canvas/modules/backbone/collections/ModuleCollection.coffee'
+import ModuleCollection from '@canvas/modules/backbone/collections/ModuleCollection'
 
 QUnit.module('ModuleCollection')
 

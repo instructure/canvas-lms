@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import SisButtonView from '@canvas/sis/backbone/views/SisButtonView.coffee'
+import SisButtonView from '@canvas/sis/backbone/views/SisButtonView'
 import Backbone from '@canvas/backbone'
 
 class AssignmentStub extends Backbone.Model {

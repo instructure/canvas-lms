@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import _ from 'underscore'
-import DialogFormView, {getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView.coffee'
+import DialogFormView, {getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import assignmentSettingsTemplate from '../../jst/AssignmentSettings.handlebars'
 

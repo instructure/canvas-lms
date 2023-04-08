@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import OutcomeContentBase from '@canvas/outcome-content-view/backbone/views/OutcomeContentBase'
-import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup.coffee'
+import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
 import OutcomeGroupView from '@canvas/outcome-content-view/backbone/views/OutcomeGroupView'
 import fixtures from 'helpers/fixtures'
 

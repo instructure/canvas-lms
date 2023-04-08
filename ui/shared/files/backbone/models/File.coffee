@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import FilesystemObject from './FilesystemObject.coffee'
+import FilesystemObject from './FilesystemObject'
 import {uploadFile} from '@canvas/upload-file'
 import '@canvas/jquery/jquery.ajaxJSON'
 

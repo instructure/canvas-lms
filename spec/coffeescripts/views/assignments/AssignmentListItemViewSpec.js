@@ -19,7 +19,7 @@
 import {getByText, queryByText, findByText, waitForToBeRemoved} from '@testing-library/dom'
 import fetchMock from 'fetch-mock'
 import Backbone from '@canvas/backbone'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import Submission from '@canvas/assignments/backbone/models/Submission'
 import AssignmentListItemView from 'ui/features/assignment_index/backbone/views/AssignmentListItemView'
 import $ from 'jquery'

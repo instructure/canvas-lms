@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import CheckboxModel from '../models/ContentCheckbox.coffee'
+import CheckboxModel from '../models/ContentCheckbox'
 
 export default class ContentCheckboxCollection extends Backbone.Collection
   @optionProperty 'courseID'

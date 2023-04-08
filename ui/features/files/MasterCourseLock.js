@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import axios from '@canvas/axios'
 import classnames from 'classnames'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject.coffee'
+import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('MasterCourseLock')

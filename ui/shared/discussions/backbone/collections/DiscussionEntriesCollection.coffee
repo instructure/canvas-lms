@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import DiscussionEntry from '../models/DiscussionEntry.coffee'
+import DiscussionEntry from '../models/DiscussionEntry'
 
 export default class DiscussionEntryCollection extends Backbone.Collection
 
