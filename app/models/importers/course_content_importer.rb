@@ -118,10 +118,12 @@ module Importers
               migration.add_error(error_message, error_report_id: er)
             end
           end
-          if migration.canvas_import?
-            migration.update_import_progress(30)
-            Importers::MediaTrackImporter.process_migration(data[:media_tracks], migration)
-          end
+        end
+
+        if (!migration.for_course_copy? || Account.site_admin.feature_enabled?(:media_links_use_attachment_id)) &&
+           (migration.canvas_import? || migration.for_master_course_import?)
+          migration.update_import_progress(30)
+          Importers::MediaTrackImporter.process_migration(data[:media_tracks], migration)
         end
 
         migration.update_import_progress(35)

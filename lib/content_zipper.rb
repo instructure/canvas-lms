@@ -238,11 +238,7 @@ class ContentZipper
     end
   end
 
-  # The callback should accept two arguments, the attachment/folder and the folder names
-  def zip_folder(folder, zipfile, folder_names, opts = {}, &block)
-    if block && (folder.hidden? || folder.locked)
-      yield(folder, folder_names)
-    end
+  def folder_attachments_for_export(folder, opts)
     # @user = nil either means that
     # 1. this is part of a public course, and is being downloaded by somebody
     # not logged in - OR -
@@ -256,11 +252,20 @@ class ContentZipper
       end
 
     attachments = attachments.select { |a| opts[:exporter].export_object?(a) } if opts[:exporter]
-    attachments.select { |a| !@check_user || a.grants_right?(@user, :download) }.each do |attachment|
+    attachments = attachments.select { |a| !@check_user || a.grants_right?(@user, :download) }
+    attachments.reject do |attachment|
       # exclude files in hidden folders unless they're referenced in rich content (or the user is an admin)
-      next if @check_user && folder.hidden? &&
-              !folder.grants_right?(@user, :read_contents) && !opts[:referenced_files]&.key?(attachment.id)
+      @check_user && folder.hidden? &&
+        !folder.grants_right?(@user, :read_contents) && !opts[:referenced_files]&.key?(attachment.id)
+    end
+  end
 
+  # The callback should accept two arguments, the attachment/folder and the folder names
+  def zip_folder(folder, zipfile, folder_names, opts = {}, &block)
+    if block && (folder.hidden? || folder.locked)
+      yield(folder, folder_names)
+    end
+    folder_attachments_for_export(folder, opts).each do |attachment|
       attachment.display_name = Attachment.shorten_filename(attachment.display_name)
       # Preventing further unwanted filename alterations during the rest of the process,
       # namely, in the block further below. Also, we want to avoid accidental saving of the file

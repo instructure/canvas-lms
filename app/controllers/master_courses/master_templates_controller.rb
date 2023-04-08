@@ -497,6 +497,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                                         "LearningOutcome",
                                         "deleted",
                                         "Account")
+                     when "MediaTrack"
+                       MediaTrack.where(attachment: @course.attachments)
                      else
                        klass.constantize.where(context_id: @course, context_type: "Course")
                      end
