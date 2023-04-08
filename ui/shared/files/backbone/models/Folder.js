@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import FilesystemObject from './FilesystemObject'
-import identityMapMixin from 'backbone-identity-map'
+import identityMapMixin from '../../util/backboneIdentityMap'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import FilesCollection from '../collections/FilesCollection'
 import natcompare from '@canvas/util/natcompare'
