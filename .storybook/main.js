@@ -61,7 +61,6 @@ module.exports = {
           path.resolve(canvasDir, 'packages/defer-promise'),
           path.resolve(canvasDir, 'packages/convert-case'),
           path.resolve(canvasDir, 'packages/html-escape'),
-          path.resolve(canvasDir, 'packages/persistent-array'),
           path.resolve(canvasDir, 'packages/slickgrid'),
           path.resolve(canvasDir, 'packages/with-breakpoints'),
           path.resolve(canvasDir, 'spec/javascripts/jsx'),

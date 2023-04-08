@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,8 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import debounce from 'lodash/debounce.js'
-import type { PersistentArrayParameters } from './types'
+import {debounce} from 'lodash'
+
+export type PersistentArray<T> = Array<T>
+export type PersistentArrayParameters = {
+  // Where to store the value in localStorage. If a value is found at that key,
+  // it will be used as the initial value for the array.
+  key: string
+
+  // Milliseconds to wait before persisting any batched writes. APIs that
+  // accept single elements, like push and pop, batch their writes to
+  // localStorage.
+  throttle: number
+
+  // Maximum number of elements the array should contain. If a call to #push()
+  // would cause the array to exceed this boundary, a value will be shifted
+  // from the front first.
+  //
+  // Defaults to Infinity.
+  size: number
+
+  // A hook to transform the value to make it more suitable for saving by the
+  // transform parameter. This only applies to the saved value and not for the
+  // one stored in memory.
+  //
+  // Don't mutate it!!!
+  transform: <T>(array: Array<T>) => Array<T>
+}
 
 // A special Array that persists its value to localStorage whenever you push to,
 // pop from, or splice it.
@@ -25,7 +50,7 @@ export default function createPersistentArray({
   key,
   throttle = 1000,
   size = Infinity,
-  transform = x => x
+  transform = x => x,
 }: PersistentArrayParameters) {
   const value = JSON.parse(localStorage.getItem(key) || '[]')
   const save = () => localStorage.setItem(key, JSON.stringify(transform(value)))
@@ -33,7 +58,7 @@ export default function createPersistentArray({
     if (value.length >= size) {
       value.shift()
     }
-  };
+  }
 
   const saveInBatch = debounce(save, Math.max(0, throttle))
 
@@ -57,9 +82,10 @@ export default function createPersistentArray({
       enumerable: false,
       configurable: false,
       value() {
+        // @ts-expect-error
         saveImpl()
         return Array.prototype[method].apply(this, arguments)
-      }
+      },
     })
   }
 
@@ -67,10 +93,13 @@ export default function createPersistentArray({
     value() {
       saveInBatch.cancel()
       saveASAP.cancel()
-    }
+    },
   })
 
   return value
 }
 
-const pipe = (...f) => x => f.reduce((acc, fx) => fx(acc), x)
+const pipe =
+  (...f) =>
+  x =>
+    f.reduce((acc, fx) => fx(acc), x)
