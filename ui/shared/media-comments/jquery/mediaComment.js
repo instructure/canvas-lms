@@ -23,7 +23,7 @@ import mejs from '@canvas/mediaelement'
 import MediaElementKeyActionHandler from './MediaElementKeyActionHandler'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
-import sanitizeUrl from 'sanitize-url'
+import sanitizeUrl from '@canvas/util/sanitizeUrl'
 
 const I18n = useI18nScope('jquery_media_comments')
 
