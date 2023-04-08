@@ -18,9 +18,8 @@
 
 /**
  * Replaces bad urls with harmless urls in cases where bad urls might cause harm
- * @param {string} url
  */
-export default function sanitizeUrl(url) {
+export default function sanitizeUrl(url: string): string {
   const defaultUrl = 'about:blank'
   try {
     const parsedUrl = new URL(url, window.location.origin)

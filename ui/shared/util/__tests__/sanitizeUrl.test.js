@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sanitizeUrl from '../index'
+import sanitizeUrl from '../sanitizeUrl'
 
 it('replaces javascript: scheme urls with about:blank', () => {
   // eslint-disable-next-line no-script-url
