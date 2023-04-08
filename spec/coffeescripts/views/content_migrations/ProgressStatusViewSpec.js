@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import ProgressStatusView from 'ui/features/content_migrations/backbone/views/ProgressStatusView.coffee'
-import ProgressingModel from 'ui/features/content_migrations/backbone/models/ProgressingContentMigration.coffee'
+import ProgressStatusView from 'ui/features/content_migrations/backbone/views/ProgressStatusView'
+import ProgressingModel from 'ui/features/content_migrations/backbone/models/ProgressingContentMigration'
 import assertions from 'helpers/assertions'
 
 QUnit.module('ProgressStatusViewSpec', {

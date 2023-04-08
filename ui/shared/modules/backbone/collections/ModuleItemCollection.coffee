@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
-import ModuleItem from '../models/ModuleItem.coffee'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
+import ModuleItem from '../models/ModuleItem'
 
 export default class ModuleItemCollection extends PaginatedCollection
   model: ModuleItem

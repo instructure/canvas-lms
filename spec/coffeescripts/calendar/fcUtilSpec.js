@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import tz from '@canvas/timezone'
 import tzInTest from '@canvas/timezone/specHelpers'
 import timezone from 'timezone'

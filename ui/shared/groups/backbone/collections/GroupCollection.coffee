@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
-import GroupUserCollection from './GroupUserCollection.coffee'
-import Group from '../models/Group.coffee'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
+import GroupUserCollection from './GroupUserCollection'
+import Group from '../models/Group'
 import natcompare from '@canvas/util/natcompare'
 
 export default class GroupCollection extends PaginatedCollection

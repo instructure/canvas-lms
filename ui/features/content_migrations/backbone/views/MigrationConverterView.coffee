@@ -18,7 +18,7 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import template from '../../jst/MigrationConverter.handlebars'
-import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
+import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import 'jquery-tinypubsub'
 import '@canvas/jquery/jquery.disableWhileLoading'

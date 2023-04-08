@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import User from '@canvas/users/backbone/models/User.coffee'
-import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym.coffee'
+import User from '@canvas/users/backbone/models/User'
+import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
 import ObserverPairingCode from './backbone/models/ObserverPairingCodeModel'
 import flatten from 'obj-flatten'
 

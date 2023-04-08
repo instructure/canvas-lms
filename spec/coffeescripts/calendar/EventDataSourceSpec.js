@@ -17,7 +17,7 @@
  */
 
 import EventDataSource from '@canvas/calendar/jquery/EventDataSource'
-import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import tz from '@canvas/timezone'
 import denver from 'timezone/America/Denver'
 

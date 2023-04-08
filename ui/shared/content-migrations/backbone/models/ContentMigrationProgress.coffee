@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import ProgressModel from '@canvas/progress/backbone/models/Progress.coffee'
+import ProgressModel from '@canvas/progress/backbone/models/Progress'
 
 export default class ContentMigrationProgress extends ProgressModel
   defaults: 

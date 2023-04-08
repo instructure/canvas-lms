@@ -17,8 +17,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
-import GroupUser from '../models/GroupUser.coffee'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
+import GroupUser from '../models/GroupUser'
 import h from 'html-escape'
 
 I18n = useI18nScope('GroupUserCollection')

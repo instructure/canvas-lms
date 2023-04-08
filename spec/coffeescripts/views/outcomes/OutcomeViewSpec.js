@@ -20,7 +20,7 @@ import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 
 import OutcomeContentBase from '@canvas/outcome-content-view/backbone/views/OutcomeContentBase'
-import Outcome from '@canvas/outcomes/backbone/models/Outcome.coffee'
+import Outcome from '@canvas/outcomes/backbone/models/Outcome'
 import OutcomeView from '@canvas/outcome-content-view/backbone/views/OutcomeView'
 import I18nStubber from 'helpers/I18nStubber'
 

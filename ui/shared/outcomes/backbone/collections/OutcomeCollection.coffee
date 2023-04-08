@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
-import Outcome from '../models/Outcome.coffee'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
+import Outcome from '../models/Outcome'
 
 export default class OutcomeCollection extends PaginatedCollection
   model: Outcome

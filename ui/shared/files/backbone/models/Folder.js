@@ -16,9 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import FilesystemObject from './FilesystemObject.coffee'
+import FilesystemObject from './FilesystemObject'
 import identityMapMixin from 'backbone-identity-map'
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import FilesCollection from '../collections/FilesCollection'
 import natcompare from '@canvas/util/natcompare'
 import urlHelper from 'url-encoding'

@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'

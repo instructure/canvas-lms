@@ -17,7 +17,7 @@
 
 import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
+import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import template from '../../jst/groupCategoryEdit.handlebars'
 import h from 'html-escape'

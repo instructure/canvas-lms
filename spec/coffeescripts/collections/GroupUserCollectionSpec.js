@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GroupUserCollection from '@canvas/groups/backbone/collections/GroupUserCollection.coffee'
-import UnassignedGroupUserCollection from '@canvas/groups/backbone/collections/UnassignedGroupUserCollection.coffee'
-import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
-import GroupUser from '@canvas/groups/backbone/models/GroupUser.coffee'
-import Group from '@canvas/groups/backbone/models/Group.coffee'
+import GroupUserCollection from '@canvas/groups/backbone/collections/GroupUserCollection'
+import UnassignedGroupUserCollection from '@canvas/groups/backbone/collections/UnassignedGroupUserCollection'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
+import GroupUser from '@canvas/groups/backbone/models/GroupUser'
+import Group from '@canvas/groups/backbone/models/Group'
 import Backbone from '@canvas/backbone'
 
 let source = null

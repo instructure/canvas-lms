@@ -17,7 +17,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
-import Participant from '../models/Participant.coffee'
+import Participant from '../models/Participant'
 
 I18n = useI18nScope('discussions')
 

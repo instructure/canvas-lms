@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import PaginatedView from '@canvas/pagination/backbone/views/PaginatedView.coffee'
-import RecentStudentView from './RecentStudentView.coffee'
+import PaginatedView from '@canvas/pagination/backbone/views/PaginatedView'
+import RecentStudentView from './RecentStudentView'
 
 export default class RecentStudentCollectionView extends PaginatedView
 

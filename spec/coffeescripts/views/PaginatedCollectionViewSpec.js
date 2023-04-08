@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
-import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
+import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import fakePage from 'helpers/getFakePage'
 import fakeENV from 'helpers/fakeENV'
 

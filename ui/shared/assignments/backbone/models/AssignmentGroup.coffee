@@ -18,7 +18,7 @@
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
-import AssignmentCollection from '../collections/AssignmentCollection.coffee'
+import AssignmentCollection from '../collections/AssignmentCollection'
 
 isAdmin = ->
   _.includes(ENV.current_user_roles, 'admin')

@@ -18,7 +18,7 @@
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import template from '../../jst/group.handlebars'
-import GroupCategoryCloneView from './GroupCategoryCloneView.coffee'
+import GroupCategoryCloneView from './GroupCategoryCloneView'
 import groupHasSubmissions from '../../groupHasSubmissions'
 
 export default class GroupView extends View {

@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import EditAssignmentDetails from 'ui/features/calendar/backbone/views/EditAssignmentDetails'
-import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import timezone from 'timezone'
 import tzInTest from '@canvas/timezone/specHelpers'
 import detroit from 'timezone/America/Detroit'

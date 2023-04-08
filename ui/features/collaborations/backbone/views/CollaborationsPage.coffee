@@ -19,8 +19,8 @@
 import $ from 'jquery'
 import {each, reject} from 'underscore'
 import {View} from '@canvas/backbone'
-import CollaborationView from './CollaborationView.coffee'
-import CollaborationFormView from './CollaborationFormView.coffee'
+import CollaborationView from './CollaborationView'
+import CollaborationFormView from './CollaborationFormView'
 
 export default class CollaborationsPage extends View
   events:

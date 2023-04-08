@@ -27,7 +27,7 @@ import ModuleFileDrop from '@canvas/context-module-file-drop'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Helper from './context_modules_helper'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
-import ContextModulesView from '../backbone/views/context_modules.coffee' /* handles the publish/unpublish state */
+import ContextModulesView from '../backbone/views/context_modules' /* handles the publish/unpublish state */
 import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
 import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
 import vddTooltipView from '../jst/_vddTooltip.handlebars'

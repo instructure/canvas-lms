@@ -17,8 +17,8 @@
 #
 
 import _ from 'underscore'
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
-import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup.coffee'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
+import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
 
 export default class OutcomeGroupCollection extends PaginatedCollection
   model: OutcomeGroup

@@ -18,7 +18,7 @@
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../../jst/subviews/SelectContentCheckbox.handlebars'
-import ImportBlueprintSettingsView from '../../../../../features/content_migrations/backbone/views/subviews/ImportBlueprintSettingsView.coffee'
+import ImportBlueprintSettingsView from '../../../../../features/content_migrations/backbone/views/subviews/ImportBlueprintSettingsView'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 I18n = useI18nScope('select_content_checkbox')

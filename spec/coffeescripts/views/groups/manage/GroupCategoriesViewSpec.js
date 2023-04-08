@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import GroupCategoriesView from 'ui/features/manage_groups/backbone/views/GroupCategoriesView'
 import GroupCategoryCollection from '@canvas/groups/backbone/collections/GroupCategoryCollection'
-import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
 import fakeENV from 'helpers/fakeENV'
 
 let clock = null

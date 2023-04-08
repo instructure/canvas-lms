@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import DiscussionTopic from './DiscussionTopic.coffee'
+import DiscussionTopic from './DiscussionTopic'
 import _ from 'underscore'
 
 export default class Announcement extends DiscussionTopic

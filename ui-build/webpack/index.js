@@ -198,7 +198,7 @@ module.exports = {
 
     modules: [path.resolve(canvasDir, 'public/javascripts'), 'node_modules'],
 
-    extensions: ['.js', '.ts', '.tsx'],
+    extensions: ['.js', '.ts', '.tsx', '.coffee'],
   },
 
   module: {

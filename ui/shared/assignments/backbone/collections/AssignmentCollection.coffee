@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import Assignment from '../models/Assignment.coffee'
+import Assignment from '../models/Assignment'
 
 export default class AssignmentCollection extends Backbone.Collection
 

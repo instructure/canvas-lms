@@ -17,10 +17,10 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
+import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import DateRangeSearchView from './DateRangeSearchView'
 import AutocompleteView from './AutocompleteView'
-import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin.coffee'
+import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import GradeChangeLoggingItemView from './GradeChangeLoggingItemView'
 import GradeChangeLoggingCollection from '../collections/GradeChangeLoggingCollection'
 import template from '../../jst/gradeChangeLoggingContent.handlebars'

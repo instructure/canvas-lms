@@ -19,7 +19,7 @@
 import Calendar from 'ui/features/calendar/jquery/index'
 import CalendarEvent from '@canvas/calendar/jquery/CommonEvent/CalendarEvent'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import moment from 'moment'
 import tz from '@canvas/timezone'
 import tzInTest from '@canvas/timezone/specHelpers'

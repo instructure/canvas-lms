@@ -17,7 +17,7 @@
 
 import Backbone from 'backbone'
 import _ from 'underscore'
-import mixin from './mixin.coffee'
+import mixin from './mixin'
 import DefaultUrlMixin from './DefaultUrlMixin'
 
 export default class Backbone.Collection extends Backbone.Collection

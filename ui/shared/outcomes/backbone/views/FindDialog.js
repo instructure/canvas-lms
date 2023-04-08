@@ -18,8 +18,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import OutcomeGroup from '../models/OutcomeGroup.coffee'
-import Progress from '@canvas/progress/backbone/models/Progress.coffee'
+import OutcomeGroup from '../models/OutcomeGroup'
+import Progress from '@canvas/progress/backbone/models/Progress'
 import DialogBaseView from '@canvas/dialog-base-view'
 import SidebarView from '@canvas/outcome-sidebar-view'
 import ContentView from '@canvas/outcome-content-view'
