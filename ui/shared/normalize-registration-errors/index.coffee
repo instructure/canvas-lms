@@ -18,7 +18,7 @@
 import User from '@canvas/users/backbone/models/User'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
 import ObserverPairingCode from './backbone/models/ObserverPairingCodeModel'
-import flatten from 'obj-flatten'
+import flatten from './obj-flatten'
 
 # normalize errors we get from POST /user (user creation API)
 export default registrationErrors = (errors, passwordPolicy = ENV.PASSWORD_POLICY) ->

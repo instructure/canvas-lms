@@ -16,7 +16,18 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 // turns {foo: {bar: 1}} into {'foo[bar]': 1}
-export default function flatten(obj, options = {}, result = {}, prefix) {
+export default function flatten(
+  obj: {
+    [key: string]: any
+  },
+  options: {
+    arrays?: boolean
+  } = {},
+  result: {
+    [key: string]: any
+  } = {},
+  prefix: string = ''
+) {
   for (let key in obj) {
     const value = obj[key]
     key = prefix ? `${prefix}[${key}]` : key
