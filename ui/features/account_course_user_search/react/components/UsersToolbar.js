@@ -27,7 +27,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
 
 const I18n = useI18nScope('account_course_user_search')

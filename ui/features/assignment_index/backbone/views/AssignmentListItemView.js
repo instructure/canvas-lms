@@ -31,7 +31,7 @@ import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnV
 import DateAvailableColumnView from '@canvas/assignments/backbone/views/DateAvailableColumnView'
 import CreateAssignmentView from './CreateAssignmentView'
 import SisButtonView from '@canvas/sis/backbone/views/SisButtonView'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 import template from '../../jst/AssignmentListItem.handlebars'
 import scoreTemplate from '../../jst/_assignmentListItemScore.handlebars'
 import round from '@canvas/round'

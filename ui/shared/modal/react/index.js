@@ -19,7 +19,7 @@
 import React from 'react'
 import $ from 'jquery'
 import _ from 'underscore'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 import ReactModal from '@canvas/react-modal'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ModalContent from './content'

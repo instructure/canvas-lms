@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import ValidatedFormView from './ValidatedFormView'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 import wrapper from '../../jst/DialogFormWrapper.handlebars'
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'

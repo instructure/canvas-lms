@@ -30,7 +30,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import CoursesStore from '../store/CoursesStore'
 import AccountsTreeStore from '../store/AccountsTreeStore'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 import {flatten} from 'lodash'
 
 const I18n = useI18nScope('account_course_user_search')
