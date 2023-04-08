@@ -29,7 +29,7 @@ import MasterCourseLock from '../../MasterCourseLock'
 import FilesystemObjectThumbnail from '@canvas/files/react/components/FilesystemObjectThumbnail'
 import UsageRightsIndicator from '@canvas/files/react/components/UsageRightsIndicator'
 import Folder from '@canvas/files/backbone/models/Folder'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 

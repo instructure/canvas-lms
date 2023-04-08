@@ -25,7 +25,6 @@ import helpDialogTemplate from './jst/helpDialog.handlebars'
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
-import preventDefault from 'prevent-default'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.disableWhileLoading'
@@ -53,7 +52,10 @@ const helpDialog = {
       a[href="#create_ticket"],
       a[href="#help-dialog-options"]`,
       'click',
-      preventDefault(({currentTarget}) => helpDialog.switchTo($(currentTarget).attr('href')))
+      event => {
+        if (event) event.preventDefault()
+        helpDialog.switchTo($(event.currentTarget).attr('href'))
+      }
     )
 
     helpDialog.helpLinksDfd = $.getJSON('/help_links').done(links => {
@@ -197,7 +199,10 @@ const helpDialog = {
   },
 
   initTriggers() {
-    $('.help_dialog_trigger').click(preventDefault(helpDialog.open))
+    $('.help_dialog_trigger').click(event => {
+      event.preventDefault()
+      helpDialog.open()
+    })
   },
 }
 export default helpDialog

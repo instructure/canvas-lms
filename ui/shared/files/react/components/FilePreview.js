@@ -23,7 +23,7 @@ import classnames from 'classnames'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 import FilePreviewInfoPanel from './FilePreviewInfoPanel'
 import CollectionHandler from '../../util/collectionHandler'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 
 import _ from 'underscore'
 import PropTypes from 'prop-types'

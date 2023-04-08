@@ -20,7 +20,6 @@
 
 import React from 'react'
 
-import preventDefault from 'prevent-default'
 import {LiveAnnouncer, LiveMessage} from 'react-aria-live'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -420,7 +419,12 @@ export default class Checker extends React.Component {
                       </GridRow>
                     </Grid>
                   </View>
-                  <form onSubmit={preventDefault(() => this.fixIssue())}>
+                  <form
+                    onSubmit={event => {
+                      event.preventDefault()
+                      this.fixIssue()
+                    }}
+                  >
                     <Text as="div">{this.errorMessage()}</Text>
                     {rule.form().map(f => (
                       <View as="div" key={f.dataKey} margin="medium 0 0">

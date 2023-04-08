@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 import signupDialog from '@canvas/signup-dialog'
 import loginForm from '../jst/login.handlebars'
 import authenticity_token from '@canvas/authenticity-token'

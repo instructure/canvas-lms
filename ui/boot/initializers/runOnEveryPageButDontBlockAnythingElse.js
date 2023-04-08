@@ -23,7 +23,6 @@
 // the critical code to display a page will be executed sooner
 
 import $ from 'jquery'
-import preventDefault from 'prevent-default'
 import {isolate} from '@canvas/sentry'
 import ReactDOM from 'react-dom'
 import React from 'react'
@@ -55,9 +54,7 @@ if (document.querySelector('#group-switch-mount-point')) {
 
 // preventDefault so we dont change the hash
 // this will make nested apps that use the hash happy
-$('#skip_navigation_link').on(
-  'click',
-  preventDefault(function () {
-    $($(this).attr('href')).attr('tabindex', -1).focus()
-  })
-)
+$('#skip_navigation_link').on('click', function (event) {
+  event.preventDefault()
+  $($(this).attr('href')).attr('tabindex', -1).focus()
+})

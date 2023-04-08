@@ -17,7 +17,6 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import preventDefault from 'prevent-default'
 import htmlEscape from 'html-escape'
 import '@canvas/media-comments/jquery/mediaComment'
 
@@ -75,54 +74,50 @@ const resizeContainingTd = $link => {
   $closestTd.css('width', `${minTdWidth}px`)
 }
 
-$(document).on(
-  'click',
-  'a.instructure_inline_media_comment',
-  preventDefault(function () {
-    if (!INST.kalturaSettings) {
-      alert(I18n.t('alerts.kaltura_disabled', 'Kaltura has been disabled for this Canvas site'))
-      return
-    }
+$(document).on('click', 'a.instructure_inline_media_comment', function (event) {
+  event.preventDefault()
+  if (!INST.kalturaSettings) {
+    alert(I18n.t('alerts.kaltura_disabled', 'Kaltura has been disabled for this Canvas site'))
+    return
+  }
 
-    const $link = $(this)
+  const $link = $(this)
 
-    let mediaType = 'video'
-    const id = inlineMediaComment.getMediaCommentId($link)
-    const $holder = inlineMediaComment.buildCommentHolder($link)
+  let mediaType = 'video'
+  const id = inlineMediaComment.getMediaCommentId($link)
+  const $holder = inlineMediaComment.buildCommentHolder($link)
 
-    if (shouldResizeTd($link)) {
-      resizeContainingTd($link)
-    }
+  if (shouldResizeTd($link)) {
+    resizeContainingTd($link)
+  }
 
-    $link.after($holder)
-    $link.hide()
+  $link.after($holder)
+  $link.hide()
 
-    if (
-      $link.data('media_comment_type') === 'audio' ||
-      $link.is('.audio_playback, .audio_comment, .instructure_audio_link')
-    ) {
-      mediaType = 'audio'
-    }
+  if (
+    $link.data('media_comment_type') === 'audio' ||
+    $link.is('.audio_playback, .audio_comment, .instructure_audio_link')
+  ) {
+    mediaType = 'audio'
+  }
 
-    $holder
-      .children('div')
-      .mediaComment('show_inline', id, mediaType, $link.data('download') || $link.attr('href'))
+  $holder
+    .children('div')
+    .mediaComment('show_inline', id, mediaType, $link.data('download') || $link.attr('href'))
 
-    const $minimizer = inlineMediaComment.buildMinimizerLink()
+  const $minimizer = inlineMediaComment.buildMinimizerLink()
 
-    $minimizer.appendTo($holder).click(
-      preventDefault(() => {
-        const $closestTd = $link.closest('td')
-        $link.show().focus()
-        $closestTd.css('width', $closestTd.data('orig-width'))
-        inlineMediaComment.collapseComment($holder)
-      })
-    )
-
-    $holder.find('.innerholder').css('outline', 'none')
-    $holder.find('.innerholder').on('focus', initialFocusInnerhold)
+  $minimizer.appendTo($holder).click(event => {
+    event.preventDefault()
+    const $closestTd = $link.closest('td')
+    $link.show().focus()
+    $closestTd.css('width', $closestTd.data('orig-width'))
+    inlineMediaComment.collapseComment($holder)
   })
-)
+
+  $holder.find('.innerholder').css('outline', 'none')
+  $holder.find('.innerholder').on('focus', initialFocusInnerhold)
+})
 
 export default inlineMediaComment
 

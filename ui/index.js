@@ -26,7 +26,6 @@ import ready from '@instructure/ready'
 import Backbone from '@canvas/backbone'
 import splitAssetString from '@canvas/util/splitAssetString'
 import {Mathml} from '@instructure/canvas-rce'
-import preventDefault from 'prevent-default'
 import loadBundle from 'bundles-generated'
 import {isolate} from '@canvas/sentry'
 import {Capabilities as C, up} from '@canvas/engine'
@@ -186,13 +185,10 @@ function doRandomThingsToDOM() {
   })
 
   // Backbone routes
-  $('body').on(
-    'click',
-    '[data-pushstate]',
-    preventDefault(function () {
-      Backbone.history.navigate($(this).attr('href'), true)
-    })
-  )
+  $('body').on('click', '[data-pushstate]', function (event) {
+    if (event) event.preventDefault()
+    Backbone.history.navigate($(this).attr('href'), true)
+  })
 }
 
 async function loadNewUserTutorials() {

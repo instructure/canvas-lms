@@ -198,7 +198,6 @@
     "moxios": "^0.4",
     "nyc": "^13",
     "prettier": "^2.2.1",
-    "prevent-default": "^1.0.0",
     "proxyquire": "1.7.4",
     "shelljs": "^0.8.3",
     "sinon": "^7",
