@@ -263,7 +263,6 @@ module.exports = {
           path.resolve(canvasDir, 'packages/jquery-kyle-menu'),
           path.resolve(canvasDir, 'packages/jquery-popover'),
           path.resolve(canvasDir, 'packages/jquery-selectmenu'),
-          path.resolve(canvasDir, 'packages/jquery-sticky'),
           path.resolve(canvasDir, 'packages/defer-promise'),
           path.resolve(canvasDir, 'packages/convert-case'),
           path.resolve(canvasDir, 'packages/html-escape'),
@@ -495,7 +494,6 @@ if (process.env.CRYSTALBALL_MAP === '1') {
     include: [
       path.resolve(canvasDir, 'ui'),
       path.resolve(canvasDir, 'packages/jquery-kyle-menu'),
-      path.resolve(canvasDir, 'packages/jquery-sticky'),
       path.resolve(canvasDir, 'packages/jquery-popover'),
       path.resolve(canvasDir, 'packages/jquery-selectmenu'),
       path.resolve(canvasDir, 'packages/persistent-array'),

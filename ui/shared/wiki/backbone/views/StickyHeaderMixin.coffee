@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import 'jquery-sticky'
+import '@canvas/jquery-sticky'
 
 # Remember, you must define a toolbar with data attribute 'data-sticky'
 # for this to work. Also don't forget to create your own styles for the
