@@ -514,7 +514,7 @@ describe "calendar2" do
       it "preserves correct time when editing an event in a different DST window" do
         @user.time_zone = "America/Denver"
         @user.save!
-        now = DateTime.current.beginning_of_hour
+        now = DateTime.current.noon
         # by creating an event at t+3, t+6, and t+9 months, we guarantee that at least 1 of those
         # events will be in a different DST state than now
         [now + 3.months, now + 6.months, now + 9.months].each do |start_at|
