@@ -37,8 +37,8 @@ function createAssignmentProp() {
   }
 }
 
-function createStudentsProp() {
-  return [
+function createGetStudentsProp() {
+  return _assignmentId => [
     {
       id: '11',
       name: 'Clark Kent',
@@ -74,7 +74,7 @@ QUnit.module('SetDefaultGradeDialogManager#isDialogEnabled')
 test('returns true when submissions are loaded', () => {
   const manager = new SetDefaultGradeDialogManager(
     createAssignmentProp(),
-    createStudentsProp(),
+    createGetStudentsProp(),
     'contextId',
     true,
     'selectedSection',
@@ -88,7 +88,7 @@ test('returns true when submissions are loaded', () => {
 test('returns false when submissions are not loaded', () => {
   const manager = new SetDefaultGradeDialogManager(
     createAssignmentProp(),
-    createStudentsProp(),
+    createGetStudentsProp(),
     'contextId',
     true,
     'selectedSection',
@@ -102,7 +102,7 @@ test('returns false when submissions are not loaded', () => {
 test('returns false when grades are not published', () => {
   const manager = new SetDefaultGradeDialogManager(
     {...createAssignmentProp(), grades_published: false},
-    createStudentsProp(),
+    createGetStudentsProp(),
     'contextId',
     true,
     'selectedSection',
@@ -123,7 +123,7 @@ QUnit.module('SetDefaultGradeDialogManager#showDialog', {
 
     return new SetDefaultGradeDialogManager(
       assignment,
-      createStudentsProp(),
+      createGetStudentsProp(),
       'contextId',
       true,
       'selectedSection',

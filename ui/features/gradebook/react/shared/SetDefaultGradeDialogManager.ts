@@ -37,11 +37,11 @@ class SetDefaultGradeDialogManager {
 
   selectedSection: string | null
 
-  students: StudentMap
+  getStudents: (assignmentId: string) => StudentMap
 
   constructor(
     assignment: Assignment,
-    students: StudentMap,
+    getStudents: (assignmentId: string) => StudentMap,
     contextId: string,
     missingShortcutEnabled: boolean,
     selectedSection: string | null,
@@ -49,7 +49,7 @@ class SetDefaultGradeDialogManager {
     submissionsLoaded = false
   ) {
     this.assignment = assignment
-    this.students = students
+    this.getStudents = getStudents
     this.contextId = contextId
     this.missingShortcutEnabled = missingShortcutEnabled
     this.selectedSection = selectedSection
@@ -62,7 +62,7 @@ class SetDefaultGradeDialogManager {
   getSetDefaultGradeDialogOptions() {
     return {
       assignment: this.assignment,
-      students: this.students,
+      students: this.getStudents(this.assignment.id),
       context_id: this.contextId,
       missing_shortcut_enabled: this.missingShortcutEnabled,
       selected_section: this.selectedSection,
