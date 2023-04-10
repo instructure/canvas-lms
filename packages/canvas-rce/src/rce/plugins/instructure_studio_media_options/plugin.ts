@@ -17,7 +17,7 @@
  */
 
 import tinymce, {Editor} from 'tinymce'
-import {isStudioEmbeddedMedia} from '../shared/StudioLtiSupportUtils'
+import {isStudioEmbeddedMedia, handleBeforeObjectSelected} from '../shared/StudioLtiSupportUtils'
 import VideoTrayController from '../instructure_record/VideoOptionsTray/TrayController'
 import formatMessage from '../../../format-message'
 
@@ -38,6 +38,8 @@ tinymce.PluginManager.add('instructure_studio_media_options', function (ed: Edit
     predicate: isStudioEmbeddedMedia,
     scope: 'node',
   })
+
+  ed.on('BeforeObjectSelected', handleBeforeObjectSelected)
 
   ed.on('remove', editor => {
     studioTrayController.hideTrayForEditor(editor)

@@ -23,7 +23,10 @@ import {
   studioAttributesFrom,
   StudioContentItemCustomJson,
   StudioMediaOptionsAttributes,
+  handleBeforeObjectSelected,
 } from '../StudioLtiSupportUtils'
+import {EditorEvent, Events} from 'tinymce'
+import {createDeepMockProxy} from '../../../../util/__tests__/deepMockProxy'
 
 describe('studioAttributesFrom', () => {
   it('uses the default values for missing attributes', () => {
@@ -171,5 +174,30 @@ describe('parseStudioOptions', () => {
       resizable: true,
       convertibleToLink: true,
     })
+  })
+})
+
+describe('handleBeforeObjectSelected', () => {
+  it('does not set data-mce-resize if resize attribute is true', () => {
+    const node = document.createElement('span')
+    node.setAttribute('data-mce-p-data-studio-resizable', 'true')
+    const event = createDeepMockProxy<EditorEvent<Events.ObjectSelectedEvent>>({}, {target: node})
+    handleBeforeObjectSelected(event)
+    expect(node).not.toHaveAttribute('data-mce-resize')
+  })
+
+  it('does not set data-mce-resize if resize attribute is missing', () => {
+    const node = document.createElement('span')
+    const event = createDeepMockProxy<EditorEvent<Events.ObjectSelectedEvent>>({}, {target: node})
+    handleBeforeObjectSelected(event)
+    expect(node).not.toHaveAttribute('data-mce-resize')
+  })
+
+  it('sets data-mce-resize if resize attribute is false', () => {
+    const node = document.createElement('span')
+    node.setAttribute('data-mce-p-data-studio-resizable', 'false')
+    const event = createDeepMockProxy<EditorEvent<Events.ObjectSelectedEvent>>({}, {target: node})
+    handleBeforeObjectSelected(event)
+    expect(node.getAttribute('data-mce-resize')).toEqual('false')
   })
 })
