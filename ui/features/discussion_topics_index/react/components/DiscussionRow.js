@@ -528,6 +528,28 @@ class DiscussionRow extends Component {
       )
     }
 
+    if (
+      ENV.show_additional_speed_grader_links &&
+      this.props.discussion.assignment &&
+      this.props.discussion.published
+    ) {
+      const courseId = this.props.discussion.assignment.course_id
+      const assignmentId = this.props.discussion.assignment.id
+      menuList.push(
+        this.createMenuItem(
+          'speed-grader-link',
+          <a
+            href={`courses/${courseId}/gradebook/speed_grader?assignment_id=${assignmentId}`}
+            className="icon-speed-grader"
+            style={{color: 'inherit', textDecoration: 'none'}}
+          >
+            {I18n.t('SpeedGrader')}
+          </a>,
+          I18n.t('Navigate to speed grader for %{title} assignment', {title: discussionTitle})
+        )
+      )
+    }
+
     if (this.props.onMoveDiscussion && !this.isInaccessibleDueToAnonymity()) {
       menuList.push(
         this.createMenuItem(
