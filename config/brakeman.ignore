@@ -30,7 +30,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/grade_change_audit_api_controller.rb",
-      "line": 464,
+      "line": 460,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Score.active.joins(:enrollment).preload(:enrollment).where(:course_score => true).where(\"(enrollments.course_id, enrollments.user_id) IN (#{events.reject(&:in_grading_period?).map do\n key = key_from_ids(event.context_id, event.student_id).join(\",\")\n\"(#{key_from_ids(event.context_id, event.student_id).join(\",\")})\"\n end.join(\", \")})\")",
       "render_path": null,
@@ -49,41 +49,24 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "048aa319dfb0b3ab6ef403f0a578884c6b6c7eaf62ed315083f22cc0f740b35b",
+      "fingerprint": "03b292cdba7408f58e10ebcf7ef130b27150143a1594c3148a76e0d23f667778",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "lib/score_statistics_generator.rb",
-      "line": 53,
+      "file": "app/models/account.rb",
+      "line": 1041,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "ScoreStatistic.connection.select_all(\"WITH want_assignments AS (\\n  SELECT a.id, a.created_at\\n  FROM #{Assignment.quoted_table_name} a\\n  WHERE a.context_id = #{course_id} AND a.context_type = 'Course' AND a.workflow_state = 'published'\\n), interesting_submissions AS (\\n  SELECT s.assignment_id, s.user_id, s.score, a.created_at\\n  FROM #{Submission.quoted_table_name} s\\n  JOIN want_assignments a ON s.assignment_id = a.id\\n  WHERE\\n    s.excused IS NOT true\\n    AND s.score IS NOT NULL\\n    AND s.workflow_state = 'graded'\\n), want_users AS (\\n  SELECT e.user_id\\n  FROM #{Enrollment.quoted_table_name} e\\n  WHERE e.type = 'StudentEnrollment' AND e.course_id = #{course_id} AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')\\n)\\nSELECT\\n  s.assignment_id AS id,\\n  MAX(s.score) AS max,\\n  MIN(s.score) AS min,\\n  AVG(s.score) AS avg,\\n  COUNT(*) AS count\\nFROM\\n  interesting_submissions s\\nWHERE\\n  s.user_id IN (SELECT user_id FROM want_users)\\nGROUP BY s.assignment_id\\nORDER BY MIN(s.created_at)\\n\")",
+      "code": "Account.connection.select_values(\"WITH RECURSIVE t AS (\\n  SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id.parent_account_id).first}\\n  UNION\\n  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id\\n)\\nSELECT id FROM t\\n\".squish)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "ScoreStatisticsGenerator",
-        "method": "s(:self).update_assignment_score_statistics"
+        "class": "Account",
+        "method": "Account.account_chain_ids"
       },
-      "user_input": "course_id",
+      "user_input": "Shard.local_id_for(starting_account_id.parent_account_id).first",
       "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "062ab81b8ec3415929ef0be9788a806bd2cfed07953945c5bb3ce5c38854375c",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/user.rb",
-      "line": 348,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "self.all.select(\"users.*\").select(\"MIN(#{Enrollment.type_rank_sql(:student)}) AS enrollment_rank\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "User",
-        "method": "User.by_top_enrollment"
-      },
-      "user_input": "Enrollment.type_rank_sql(:student)",
-      "confidence": "High",
+      "cwe_id": [
+        89
+      ],
       "note": ""
     },
     {
@@ -107,7 +90,7 @@
       "cwe_id": [
         89
       ],
-      "note": "values in inner join are known and safe"
+      "note": ""
     },
     {
       "warning_type": "SQL Injection",
@@ -135,21 +118,20 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "1086c770014840a3614b0b3305186dc1021045a449f75afbaba15a1b2ea22e96",
+      "fingerprint": "0fa6de183523f46dcea89ac2032d6c127bfd096819b358a808be5e8572198071",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "lib/data_fixup/populate_root_account_ids_on_users.rb",
-      "line": 83,
+      "file": "config/initializers/active_record.rb",
+      "line": 1037,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "User.where(:id => user_id).update_all(\"root_account_ids=(#{\"SELECT ARRAY(SELECT DISTINCT e FROM unnest(array_cat(root_account_ids, ('{#{root_accounts_for_user[(1..-1)].split(\",\").map(&:to_i).map do\n Shard.relative_id_for(id, Shard.current, Shard.lookup((User.where(\"id>?\", Shard::IDS_PER_SHARD).minimum(:id) / Shard::IDS_PER_SHARD)))\n end.join(\",\")}}'))) AS a(e) ORDER BY e)\"})\")",
+      "code": "connection.execute(\"CREATE INDEX \\\"temp_primary_key\\\" ON #{connection.quote_local_table_name(\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, order).to_sql.hash.abs.to_s(36)}\"[(-63..)])}(#{connection.quote_column_name(primary_key)})\")",
       "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DataFixup::PopulateRootAccountIdsOnUsers",
-        "method": "s(:self).populate_table"
-      },
-      "user_input": "User.where(\"id>?\", Shard::IDS_PER_SHARD).minimum(:id)",
-      "confidence": "High",
+      "location": null,
+      "user_input": "connection.quote_local_table_name(\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, order).to_sql.hash.abs.to_s(36)}\"[(-63..)])",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
       "note": ""
     },
     {
@@ -159,7 +141,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/grade_change_audit_api_controller.rb",
-      "line": 452,
+      "line": 448,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Score.active.joins(:enrollment).preload(:enrollment).where(\"(enrollments.course_id, enrollments.user_id, scores.grading_period_id) IN (#{events.select(&:in_grading_period?).map do\n key = key_from_ids(event.context_id, event.student_id, event.grading_period_id).join(\",\")\n\"(#{key_from_ids(event.context_id, event.student_id, event.grading_period_id).join(\",\")})\"\n end.join(\", \")})\")",
       "render_path": null,
@@ -201,13 +183,36 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "16cb0e15894ecc9156a55994a0cd67facab9c9f754d975f57bf0514ef03497d3",
+      "fingerprint": "150dbd548bbe1af48137626584625d719f51d50fa8c2649e855bf22a18195be6",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/importers/assignment_importer.rb",
+      "line": 38,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Assignment.connection.execute(\"UPDATE #{Assignment.quoted_table_name} SET position=CASE #{\"#{\" WHEN migration_id=#{Assignment.connection.quote(m[\"assignment_id\"])} THEN #{(((migration.context.assignments.pluck(:position).compact.max or 0) + idx) + 1)} \"}\"} ELSE NULL END WHERE context_id=#{migration.context.id} AND context_type=#{Assignment.connection.quote(migration.context.class.to_s)} AND migration_id IN (#{(data[\"assignments\"] or []).filter_map do\n m[\"assignment_id\"]\n end.map do\n Assignment.connection.quote(id)\n end.join(\",\")})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Importers::AssignmentImporter",
+        "method": "Importers::AssignmentImporter.process_migration"
+      },
+      "user_input": "(((migration.context.assignments.pluck(:position).compact.max or 0) + idx) + 1)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "153c5b9ef21c2c0ca896a1ce86c3ce4dcad71a765837172fc389459b99cbc543",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/graphql/types/course_type.rb",
-      "line": 225,
+      "line": 257,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.active.joins(:assignment).where(:user_id => ((course.apply_enrollment_visibility(course.all_student_enrollments, current_user).pluck(:user_id) or ([current_user.id] or [])) & student_ids.map(&:to_i)), :assignment_id => course.assignments.published, :workflow_state => ((filter[:states] or DEFAULT_SUBMISSION_STATES))).where(\"submitted_at > ?\", filter[:submitted_since]).where(\"graded_at > ?\", filter[:graded_since]).where(\"submissions.updated_at > ?\", filter[:updated_since]).order(\"#{order[:field]} #{(\"DESC NULLS LAST\" or \"ASC\")}\")",
+      "code": "Submission.active.joins(:assignment).where(:user_id => ((course.apply_enrollment_visibility(course.all_student_enrollments, current_user).pluck(:user_id) or if course.grants_right?(current_user, session, :read_grades) then\n  [current_user.id]\nelse\n  []\nend) & student_ids.map(&:to_i)), :assignment_id => course.assignments.published, :workflow_state => ((filter[:states] or DEFAULT_SUBMISSION_STATES))).where(\"submitted_at > ?\", filter[:submitted_since]).where(\"graded_at > ?\", filter[:graded_since]).where(\"submissions.updated_at > ?\", filter[:updated_since]).order(\"#{order[:field]} #{(\"DESC NULLS LAST\" or \"ASC\")}\")",
       "render_path": null,
       "location": {
         "type": "method",
@@ -216,26 +221,29 @@
       },
       "user_input": "order[:field]",
       "confidence": "Medium",
-      "note": "order[:field] is a closed set of possibilities defined in this file"
+      "cwe_id": [
+        89
+      ],
+      "note": ""
     },
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "1b10613dd15b63274e7b0fb7bfd5d229d36e2a66a07100f09eb15a4725f0df4a",
+      "fingerprint": "1af6d779fa538c578b2cb63fed80210c1fe06ea6f651a21fd0be4edda89f990d",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "app/controllers/assignments_api_controller.rb",
-      "line": 861,
+      "file": "app/models/discussion_entry_draft.rb",
+      "line": 69,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"user_due_date, #{Assignment.best_unicode_collation_key(\"assignments.title\")}, assignment_groups.position, assignments.position, assignments.id\")",
+      "code": "connection.select_values(\"  INSERT INTO #{quoted_table_name}\\n              (#{\"user_id,discussion_topic_id,discussion_entry_id,root_entry_id,parent_id,attachment_id,message,include_reply_preview,updated_at,created_at\"})\\n       VALUES (#{[user.id, topic.id, entry.id, (parent.root_entry_id or parent.id), parent.id, attachment.id, message, reply_preview].map do\n connection.quote(iv)\n end.join(\",\")},NOW(),NOW())\\n  ON CONFLICT #{((\"(discussion_topic_id, user_id) WHERE root_entry_id IS NULL AND discussion_entry_id IS NULL\" or \"(root_entry_id, user_id) WHERE discussion_entry_id IS NULL\") or \"(discussion_entry_id, user_id)\")}\\nDO UPDATE SET #{\"#{[\"message\", \"include_reply_preview\", \"parent_id\", \"attachment\"].zip([message, reply_preview, parent.id, attachment.id].map do\n connection.quote(uv)\n end).map do\n a.join(\"=\")\n end.join(\",\")},updated_at=NOW()\"}\\n    RETURNING id\\n\".squish)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "AssignmentsApiController",
-        "method": "get_assignments"
+        "class": "DiscussionEntryDraft",
+        "method": "DiscussionEntryDraft.upsert_draft"
       },
-      "user_input": "Assignment.best_unicode_collation_key(\"assignments.title\")",
-      "confidence": "High",
+      "user_input": "[user.id, topic.id, entry.id, (parent.root_entry_id or parent.id), parent.id, attachment.id, message, reply_preview].map do\n connection.quote(iv)\n end.join(\",\")",
+      "confidence": "Medium",
       "cwe_id": [
         89
       ],
@@ -261,6 +269,29 @@
       "confidence": "Medium",
       "cwe_id": [
         470
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "1db30095dcb8b5fc6a3a6d09fb527ae0d7b586ab9b32b8c76cf2da64ef69b1b0",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/score_statistics_generator.rb",
+      "line": 117,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ScoreStatistic.connection.execute(\"INSERT INTO #{ScoreStatistic.quoted_table_name}\\n  (assignment_id, maximum, minimum, mean, lower_q, median, upper_q, count, created_at, updated_at, root_account_id)\\nVALUES #{bulk_slice.join(\",\")}\\nON CONFLICT (assignment_id)\\nDO UPDATE SET\\n   minimum = excluded.minimum,\\n   maximum = excluded.maximum,\\n   mean = excluded.mean,\\n   lower_q = excluded.lower_q,\\n   median = excluded.median,\\n   upper_q = excluded.upper_q,\\n   count = excluded.count,\\n   updated_at = excluded.updated_at,\\n   root_account_id = #{root_account_id}\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ScoreStatisticsGenerator",
+        "method": "s(:self).update_assignment_score_statistics"
+      },
+      "user_input": "bulk_slice.join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
       ],
       "note": ""
     },
@@ -334,26 +365,6 @@
       "note": ""
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "233c6deb92fd272c8b319e749dd9a31fb5e48ae92b7847be7cb042cfafdd76b7",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/messageable_user.rb",
-      "line": 221,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "scope.where([\"#{User.sortable_name_order_by_clause} > ? OR\\n#{User.sortable_name_order_by_clause} = ? AND users.id > ?\\n\", MessageableUser.connection.escape_bytea(name), MessageableUser.connection.escape_bytea(name), Shard.relative_id_for(id, Shard.current, scope.shard_value)])",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "MessageableUser::MessageableUser::Bookmarker",
-        "method": "s(:self).restrict_scope"
-      },
-      "user_input": "User.sortable_name_order_by_clause",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "2734ed0a9a2d2604962cd8232b217636b6aaeaf45f43369a4876197a03387cbc",
@@ -377,96 +388,13 @@
       "note": ""
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "27707fea91eb9f4909d3ecda0ab5deadbf9ffc980a7d0e5876ccc7ce8d4ecb33",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 521,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"#{column} IS#{\" NOT\" unless (first_or_last == :last)} NULL, #{column} #{direction.to_s.upcase}\".strip)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ActiveRecord::Base",
-        "method": "nulls"
-      },
-      "user_input": "column",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "Remote Code Execution",
-      "warning_code": 24,
-      "fingerprint": "2887b918400cce2b4b71a393a03e681e95ad26fc0c99ebe5b9393a66315b1bdb",
-      "check_name": "UnsafeReflection",
-      "message": "Unsafe reflection method `constantize` called on model attribute",
-      "file": "gems/plugins/account_reports/spec_canvas/report_spec_helper.rb",
-      "line": 28,
-      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
-      "code": "ErrorReport.last.category.constantize",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ReportSpecHelper",
-        "method": "read_report"
-      },
-      "user_input": "ErrorReport.last.category",
-      "confidence": "Medium",
-      "cwe_id": [
-        470
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "2af8751396bfed9b357d4fdc61db83ca662dfd78ab00bb8141cb9211703f793e",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/api/v1/assignment_group.rb",
-      "line": 132,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "ActiveRecord::Base.connection.select_all(\"      SELECT DISTINCT ON (assignment_id) assignment_id, user_id\\n      FROM #{Submission.quoted_table_name}\\n      WHERE\\n        assignment_id IN (#{assignments.pluck(:id).join(\",\")}) AND\\n        grading_period_id IN (#{GradingPeriodGroup.for_course(context).grading_periods.closed.pluck(:id).join(\",\")}) AND\\n        workflow_state <> 'deleted'\\n\\n      UNION\\n\\n      SELECT DISTINCT ON (assignment_id) assignment_id, user_id\\n      FROM #{Submission.quoted_table_name}\\n      WHERE\\n        assignment_id IN (#{assignments.pluck(:id).join(\",\")}) AND\\n        grading_period_id IS NULL AND NOW() > '#{GradingPeriodGroup.for_course(context).grading_periods.order(:end_date => :desc).first.close_date}'::timestamptz AND\\n        workflow_state <> 'deleted'\\n\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Api::V1::AssignmentGroup",
-        "method": "in_closed_grading_period_hash"
-      },
-      "user_input": "assignments.pluck(:id).join(\",\")",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "2ce26e430fd610fdc0aa93466acf40a41df644710027fc60dc84e9baf5dced5b",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/data_fixup/copy_built_in_roles_by_root_account.rb",
-      "line": 61,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "AccountNotificationRole.where(:id => ((min_id..max_id)), :role_id => Role.where(:workflow_state => \"built_in\", :root_account_id => nil).pluck(:id)).joins(:role).joins(:account_notification => :account).joins(\"INNER JOIN #{Role.quoted_table_name} AS new_roles\\nON new_roles.base_role_type=roles.base_role_type\\nAND new_roles.workflow_state='built_in'\\nAND new_roles.root_account_id=#{Account.resolved_root_account_id_sql}\\n\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DataFixup::CopyBuiltInRolesByRootAccount",
-        "method": "s(:self).run"
-      },
-      "user_input": "Account.resolved_root_account_id_sql",
-      "confidence": "High",
-      "note": ""
-    },
-    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 114,
       "fingerprint": "2f29324268f96b4e21c0299738b67bc86028ddc1940f69cbf50c623cc3a4b87e",
       "check_name": "JSONEntityEscape",
       "message": "HTML entities in JSON are not escaped by default",
       "file": "config/environments/production.rb",
-      "line": 749,
+      "line": 751,
       "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
       "code": "ActiveSupport.escape_html_entities_in_json = false",
       "render_path": null,
@@ -485,40 +413,43 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "35a758f59effc295ad586a96edf4b8faea974e08bee9d46fff2d0d08e285e1e5",
+      "fingerprint": "34265f36dd8188fc6fb9da9025880ca88fd44f0d60fbb4a421c43e26b209f59f",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 502,
+      "file": "lib/api/v1/assignment_group.rb",
+      "line": 137,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "find_by_sql((((+\"\" << \"SELECT NULL AS #{column.to_s} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column.to_s} IS NULL) UNION ALL (\") << \"WITH RECURSIVE t AS (\\n  SELECT MIN(#{column.to_s}) AS #{column.to_s} FROM #{quoted_table_name}\\n  UNION ALL\\n  SELECT (SELECT MIN(#{column.to_s}) FROM #{quoted_table_name} WHERE #{column.to_s} > t.#{column.to_s})\\n  FROM t\\n  WHERE t.#{column.to_s} IS NOT NULL\\n)\\nSELECT #{column.to_s} FROM t WHERE #{column.to_s} IS NOT NULL\\n\") << \")\"))",
+      "code": "ActiveRecord::Base.connection.select_all(\"SELECT DISTINCT ON (assignment_id) assignment_id, user_id\\nFROM #{Submission.quoted_table_name}\\nWHERE\\n  assignment_id IN (#{assignments.pluck(:id).join(\",\")}) AND\\n  grading_period_id IN (#{GradingPeriodGroup.for_course(context).grading_periods.closed.pluck(:id).join(\",\")}) AND\\n  workflow_state <> 'deleted'\\n\\nUNION\\n\\nSELECT DISTINCT ON (assignment_id) assignment_id, user_id\\nFROM #{Submission.quoted_table_name}\\nWHERE\\n  assignment_id IN (#{assignments.pluck(:id).join(\",\")}) AND\\n  grading_period_id IS NULL AND NOW() > '#{GradingPeriodGroup.for_course(context).grading_periods.order(:end_date => :desc).first.close_date}'::timestamptz AND\\n  workflow_state <> 'deleted'\\n\".squish)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "ActiveRecord::Base",
-        "method": "distinct_values"
+        "class": "Api::V1::AssignmentGroup",
+        "method": "in_closed_grading_period_hash"
       },
-      "user_input": "column",
+      "user_input": "assignments.pluck(:id).join(\",\")",
       "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
       "note": ""
     },
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "3776abfd979c8834f3ec52fa7e9fbdc374df1042a90fce68eb4ec435af42d119",
+      "fingerprint": "364b9e86d24b93b583e663f2f5a9385bfb80852531582ad3398147d31a98d498",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "app/controllers/assignments_api_controller.rb",
-      "line": 859,
+      "file": "lib/data_fixup/populate_root_account_ids_on_users.rb",
+      "line": 83,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"latest_due_date, #{Assignment.best_unicode_collation_key(\"assignments.title\")}, assignment_groups.position, assignments.position, assignments.id\")",
+      "code": "User.where(:id => user_id).update_all(\"root_account_ids=(#{\"SELECT ARRAY(SELECT DISTINCT e FROM unnest(array_cat(root_account_ids, ('{#{root_accounts_for_user[(1..)].split(\",\").map(&:to_i).map do\n Shard.relative_id_for(id, Shard.current, Shard.lookup((User.where(\"id>?\", Shard::IDS_PER_SHARD).minimum(:id) / Shard::IDS_PER_SHARD)))\n end.join(\",\")}}'))) AS a(e) ORDER BY e)\"})\")",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "AssignmentsApiController",
-        "method": "get_assignments"
+        "class": "DataFixup::PopulateRootAccountIdsOnUsers",
+        "method": "s(:self).populate_table"
       },
-      "user_input": "Assignment.best_unicode_collation_key(\"assignments.title\")",
+      "user_input": "User.where(\"id>?\", Shard::IDS_PER_SHARD).minimum(:id)",
       "confidence": "High",
       "cwe_id": [
         89
@@ -543,6 +474,29 @@
       },
       "user_input": "like_condition(\"?\", \"'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'\", false)",
       "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "3fe85d762b5dadf542bdf07dad8af575fd7bd343bc58020d5c04a339ed5eb2b9",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/effective_due_dates.rb",
+      "line": 206,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.select_all(\"/* fetch the assignment itself */\\nWITH models AS (\\n  SELECT *\\n  FROM #{Assignment.quoted_table_name}\\n  WHERE\\n    id IN (#{(([context.active_assignments] or assignment_collection).first.except(:order).select(:id).to_sql or Assignment.where(:id => ([context.active_assignments] or assignment_collection).first.except(:order).select(:id).to_sql).pluck(:id)).join(\",\")}) AND\\n    workflow_state <> 'deleted' AND\\n    context_id = #{context.id} AND context_type = 'Course'\\n),\\n\\n/* fetch all overrides for this assignment */\\noverrides AS (\\n  SELECT\\n    o.id,\\n    o.assignment_id,\\n    o.set_type,\\n    o.set_id,\\n    o.due_at_overridden,\\n    CASE WHEN o.due_at_overridden IS TRUE THEN o.due_at ELSE a.due_at END AS due_at\\n  FROM\\n    models a\\n  INNER JOIN #{AssignmentOverride.quoted_table_name} o ON o.assignment_id = a.id\\n  WHERE\\n    o.workflow_state = 'active'\\n),\\n\\n/* fetch all students affected by adhoc overrides */\\noverride_adhoc_students AS (\\n  SELECT\\n    os.user_id AS student_id,\\n    TRUE as active_in_section,\\n    o.assignment_id,\\n    o.id AS override_id,\\n    date_trunc('minute', o.due_at) AS trunc_due_at,\\n    o.due_at,\\n    o.set_type AS override_type,\\n    o.due_at_overridden,\\n    1 AS priority\\n  FROM\\n    overrides o\\n  INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} os ON os.assignment_override_id = o.id AND\\n    os.workflow_state = 'active'\\n  WHERE\\n    o.set_type = 'ADHOC'\\n    #{filter_students_sql(\"os\")}\\n),\\n\\n/* fetch all students affected by group overrides */\\noverride_groups_students AS (\\n  SELECT\\n    gm.user_id AS student_id,\\n    TRUE as active_in_section,\\n    o.assignment_id,\\n    o.id AS override_id,\\n    date_trunc('minute', o.due_at) AS trunc_due_at,\\n    o.due_at,\\n    o.set_type AS override_type,\\n    o.due_at_overridden,\\n    2 AS priority\\n  FROM\\n    overrides o\\n  INNER JOIN #{Group.quoted_table_name} g ON g.id = o.set_id\\n  INNER JOIN #{GroupMembership.quoted_table_name} gm ON gm.group_id = g.id\\n  WHERE\\n    o.set_type = 'Group' AND\\n    g.workflow_state <> 'deleted' AND\\n    gm.workflow_state = 'accepted'\\n    #{filter_students_sql(\"gm\")}\\n),\\n\\n/* fetch all students affected by section overrides */\\noverride_sections_students AS (\\n  SELECT\\n    e.user_id AS student_id,\\n    #{active_in_section_sql} AS active_in_section,\\n    o.assignment_id,\\n    o.id AS override_id,\\n    date_trunc('minute', o.due_at) AS trunc_due_at,\\n    o.due_at,\\n    o.set_type AS override_type,\\n    o.due_at_overridden,\\n    2 AS priority\\n  FROM\\n    overrides o\\n  INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = o.set_id\\n  INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_section_id = s.id\\n  WHERE\\n    o.set_type = 'CourseSection' AND\\n    s.workflow_state <> 'deleted' AND\\n    e.workflow_state NOT IN ('rejected', 'deleted') AND\\n    e.type IN ('StudentEnrollment', 'StudentViewEnrollment')\\n    #{filter_students_sql(\"e\")}\\n),\\n\\n/* fetch all students who have an 'Everyone Else'\\n  due date applied to them from the assignment */\\noverride_everyonelse_students AS (\\n  SELECT\\n    e.user_id AS student_id,\\n    TRUE as active_in_section,\\n    a.id as assignment_id,\\n    NULL::integer AS override_id,\\n    date_trunc('minute', a.due_at) AS trunc_due_at,\\n    a.due_at,\\n    'Everyone Else'::varchar AS override_type,\\n    FALSE AS due_at_overridden,\\n    3 AS priority\\n  FROM\\n    models a\\n  INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = a.context_id\\n  WHERE\\n    e.workflow_state NOT IN ('rejected', 'deleted') AND\\n    e.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND\\n    a.only_visible_to_overrides IS NOT TRUE\\n    #{filter_students_sql(\"e\")}\\n),\\n\\n/* join all these students together into a single table */\\noverride_all_students AS (\\n  SELECT * FROM override_adhoc_students\\n  UNION ALL\\n  SELECT * FROM override_groups_students\\n  UNION ALL\\n  SELECT * FROM override_sections_students\\n  UNION ALL\\n  SELECT * FROM override_everyonelse_students\\n),\\n\\n/* and pick the latest override date as the effective due date */\\ncalculated_overrides AS (\\n  SELECT DISTINCT ON (student_id, assignment_id)\\n    *\\n  FROM override_all_students\\n  ORDER BY student_id ASC, assignment_id ASC, active_in_section DESC, due_at_overridden DESC, priority ASC, due_at DESC NULLS FIRST\\n),\\n\\n/* now find all grading periods, including both\\n   legacy course periods and newer account-level periods */\\ncourse_and_account_grading_periods AS (\\n    SELECT DISTINCT ON (gp.id)\\n      gp.id,\\n      date_trunc('minute', gp.start_date) AS start_date,\\n      date_trunc('minute', gp.end_date) AS end_date,\\n      date_trunc('minute', gp.close_date) AS close_date,\\n      gpg.course_id,\\n      gpg.account_id\\n    FROM\\n      models a\\n    INNER JOIN #{Course.quoted_table_name} c ON c.id = a.context_id\\n    INNER JOIN #{EnrollmentTerm.quoted_table_name} term ON c.enrollment_term_id = term.id\\n    LEFT OUTER JOIN #{GradingPeriodGroup.quoted_table_name} gpg ON\\n        gpg.course_id = c.id OR gpg.id = term.grading_period_group_id\\n    LEFT OUTER JOIN #{GradingPeriod.quoted_table_name} gp ON gp.grading_period_group_id = gpg.id\\n    WHERE\\n      gpg.workflow_state = 'active' AND\\n      gp.workflow_state = 'active'\\n),\\n\\n/* then filter down to the grading periods we care about:\\n   if legacy periods exist, only return those. Otherwise,\\n   return the account-level periods. */\\napplied_grading_periods AS (\\n  SELECT *\\n  FROM course_and_account_grading_periods\\n  WHERE\\n    EXISTS (\\n      SELECT 1 FROM course_and_account_grading_periods WHERE course_id IS NOT NULL\\n    ) AND course_id IS NOT NULL\\n  UNION ALL\\n  SELECT *\\n  FROM course_and_account_grading_periods\\n  WHERE\\n    NOT EXISTS (\\n      SELECT 1 FROM course_and_account_grading_periods WHERE course_id IS NOT NULL\\n    ) AND account_id IS NOT NULL\\n),\\n\\n/* infinite due dates are put in the last grading period.\\n   better to fetch it once since we'll likely reference it multiple times below */\\nlast_period AS (\\n  SELECT id, close_date FROM applied_grading_periods ORDER BY end_date DESC LIMIT 1\\n)\\n\\n/* finally bring it all together! */\\nSELECT\\n  overrides.assignment_id,\\n  overrides.student_id,\\n  overrides.due_at,\\n  overrides.override_type,\\n  overrides.override_id,\\n  CASE\\n    /* check whether or not this due date falls in a closed grading period */\\n    WHEN overrides.due_at IS NOT NULL AND '#{Time.zone.now.iso8601}'::timestamptz >= periods.close_date THEN TRUE\\n    /* when no explicit due date is provided, we treat it as if it's in the latest grading period */\\n    WHEN overrides.due_at IS NULL AND\\n        overrides.override_type <> 'Submission' AND\\n        '#{Time.zone.now.iso8601}'::timestamptz >= (SELECT close_date FROM last_period) THEN TRUE\\n    ELSE FALSE\\n  END AS closed,\\n  CASE\\n    /* if infinite due date, put it in the last grading period */\\n    WHEN overrides.due_at IS NULL AND\\n        overrides.override_type <> 'Submission' THEN (SELECT id FROM last_period)\\n    /* otherwise, put it in whatever grading period id we found for it */\\n    ELSE periods.id\\n  END AS grading_period_id\\nFROM calculated_overrides overrides\\n/* match the effective due date with its grading period */\\nLEFT OUTER JOIN applied_grading_periods periods ON\\n    periods.start_date < overrides.trunc_due_at AND overrides.trunc_due_at <= periods.end_date\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "EffectiveDueDates",
+        "method": "query"
+      },
+      "user_input": "Assignment.where(:id => ([context.active_assignments] or assignment_collection).first.except(:order).select(:id).to_sql).pluck(:id)",
+      "confidence": "High",
       "cwe_id": [
         89
       ],
@@ -574,57 +528,21 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "4b312d5a4ecbd76ab744f06c5cf297477fa9bf39dd2c4a6ecf403c251b8bf874",
+      "fingerprint": "4a61f864c1ece2dda2f4ec6a12a7226b3d028c9da0e27e0fb276f3faebb41c2d",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 838,
+      "file": "app/controllers/lti/ims/providers/memberships_provider.rb",
+      "line": 81,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.execute(\"DECLARE #{\"#{table_name}_in_batches_cursor_#{apply_limits(clone, start, finish).except(:select).select(primary_key).to_sql.hash.abs.to_s(36)}\"} CURSOR FOR #{apply_limits(clone, start, finish).except(:select).select(primary_key).to_sql}\")",
-      "render_path": null,
-      "location": null,
-      "user_input": "apply_limits(clone, start, finish).except(:select).select(primary_key).to_sql.hash.abs",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "4c67646bec3e639823b3189c3db1aa66b8d4b2cf68851d3057f1b957e10da651",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/due_date_cacher.rb",
-      "line": 434,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.connection.execute(\"UPDATE #{Submission.quoted_table_name}\\n  SET\\n    cached_due_date = vals.due_date::timestamptz,\\n    grading_period_id = vals.grading_period_id::integer,\\n    workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (\\n      #{\"CASE\\nWHEN grade IS NOT NULL OR excused IS TRUE THEN\\n  'graded'\\nWHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL THEN\\n  'pending_review'\\nWHEN submission_type IS NOT NULL AND submitted_at IS NOT NULL THEN\\n  'submitted'\\nELSE\\n  'unsubmitted'\\nEND\\n\"}\\n    )),\\n    anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),\\n    cached_quiz_lti = vals.cached_quiz_lti,\\n    updated_at = now() AT TIME ZONE 'UTC'\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  WHERE submissions.user_id = vals.student_id AND\\n        submissions.assignment_id = vals.assignment_id AND\\n        (\\n          (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR\\n          (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR\\n          (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),\\n            (#{\"CASE\\nWHEN grade IS NOT NULL OR excused IS TRUE THEN\\n  'graded'\\nWHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL THEN\\n  'pending_review'\\nWHEN submission_type IS NOT NULL AND submitted_at IS NOT NULL THEN\\n  'submitted'\\nELSE\\n  'unsubmitted'\\nEND\\n\"})\\n          )) OR\\n          (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id)) OR\\n          (submissions.cached_quiz_lti IS DISTINCT FROM vals.cached_quiz_lti)\\n        );\\nINSERT INTO #{Submission.quoted_table_name}\\n  (assignment_id, user_id, workflow_state, created_at, updated_at, course_id,\\n  cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  SELECT\\n    assignments.id, vals.student_id, 'unsubmitted',\\n    now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',\\n    assignments.context_id, vals.due_date::timestamptz, vals.grading_period_id::integer,\\n    vals.anonymous_id,\\n    vals.cached_quiz_lti,\\n    vals.root_account_id\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  INNER JOIN #{Assignment.quoted_table_name} assignments\\n    ON assignments.id = vals.assignment_id\\n  LEFT OUTER JOIN #{Submission.quoted_table_name} submissions\\n    ON submissions.assignment_id = assignments.id\\n    AND submissions.user_id = vals.student_id\\n  WHERE submissions.id IS NULL;\\n\")",
+      "code": "Submission.active.for_assignment(assignment).where(\"#{outer_user_id_column} = submissions.user_id\")",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "DueDateCacher",
-        "method": "perform_submission_upsert"
+        "class": "Lti::IMS::Providers::MembershipsProvider",
+        "method": "correlated_assignment_submissions"
       },
-      "user_input": "batch_values.join(\",\")",
+      "user_input": "outer_user_id_column",
       "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "4faeb853ee26547af65f8bfbebb21f30758e9eb1366cd0da5ab8c5c4a475d9df",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/controllers/assignments_api_controller.rb",
-      "line": 855,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"#{Assignment.best_unicode_collation_key(\"assignments.title\")}, assignment_groups.position, assignments.position, assignments.id\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "AssignmentsApiController",
-        "method": "get_assignments"
-      },
-      "user_input": "Assignment.best_unicode_collation_key(\"assignments.title\")",
-      "confidence": "High",
       "cwe_id": [
         89
       ],
@@ -633,41 +551,82 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "509d814a7e78909f05090e6c2c5a463b09806410b4c30b4699f9e8f867054153",
+      "fingerprint": "4afbde61f179b09eb9c908ae134870827d8f6ea07937947e28249549f35e6be6",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "app/models/account.rb",
-      "line": 990,
+      "file": "config/initializers/active_record.rb",
+      "line": 869,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Account.connection.select_values(\"WITH RECURSIVE t AS (\\n  SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id.parent_account_id).first}\\n  UNION\\n  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id\\n)\\nSELECT id FROM t\\n\")",
+      "code": "connection.execute(\"DECLARE #{\"#{table_name}_in_batches_cursor_#{apply_limits(clone, start, finish, order).except(:select).select(primary_key).to_sql.hash.abs.to_s(36)}\"} CURSOR FOR #{apply_limits(clone, start, finish, order).except(:select).select(primary_key).to_sql}\")",
       "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Account",
-        "method": "Account.account_chain_ids"
-      },
-      "user_input": "Shard.local_id_for(starting_account_id.parent_account_id).first",
+      "location": null,
+      "user_input": "apply_limits(clone, start, finish, order).except(:select).select(primary_key).to_sql.hash.abs",
       "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
       "note": ""
     },
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "51d6d3178f4c3f59ab68bc3a703d086c21291e4ee1004e1fae5964745938a403",
+      "fingerprint": "57bf50dbd2610462dcf2668cee33bc98fa95715b7017fa3ce22202b03a026ef4",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "app/models/enrollment.rb",
-      "line": 176,
+      "file": "app/models/discussion_entry_participant.rb",
+      "line": 164,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.where(:user_id => user_id).where(\"assignment_id=assignments.id\").where(\"#{Submission.needs_grading_conditions} OR\\n            (workflow_state = 'deleted' AND submission_type IS NOT NULL AND\\n            (score IS NULL OR NOT grade_matches_current_submission OR\\n            (submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL)))\")",
+      "code": "connection.exec_insert(\"  INSERT INTO #{quoted_table_name}\\n              (#{\"discussion_entry_id,user_id,root_account_id,workflow_state,read_at,forced_read_state,rating,report_type\"})\\n       VALUES #{[entry_or_topic].map do\n row_values(batch_entry, user.id, entry_or_topic.root_account_id, (new_state or \"unread\"), [connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL)])\n end.map do\n \"(#{row.join(\",\")})\"\n end.join(\",\")}\\n  ON CONFLICT (discussion_entry_id,user_id)\\nDO UPDATE SET #{[\"forced_read_state\", \"rating\", \"report_type\", \"workflow_state\", \"read_at\"].zip([connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL), connection.quote(new_state), connection.quote((Time.now or nil))]).map do\n a.join(\"=\")\n end.join(\",\")}\\n        WHERE #{\"(#{quoted_table_name}.#{[\"forced_read_state\", \"rating\", \"report_type\", \"workflow_state\", \"read_at\"].join(\",#{quoted_table_name}.\")})\\n                     IS DISTINCT FROM (#{\"#{connection.quote(forced)},#{connection.quote(rating)},#{connection.quote(:BRAKEMAN_SAFE_LITERAL)},#{connection.quote(new_state)},#{connection.quote((Time.now or nil))}\"})\"}\\n\".squish)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "Enrollment",
-        "method": "clear_needs_grading_count_cache"
+        "class": "DiscussionEntryParticipant",
+        "method": "DiscussionEntryParticipant.upsert_for_entries"
       },
-      "user_input": "Submission.needs_grading_conditions",
-      "confidence": "High",
+      "user_input": "[entry_or_topic].map do\n row_values(batch_entry, user.id, entry_or_topic.root_account_id, (new_state or \"unread\"), [connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL)])\n end.map do\n \"(#{row.join(\",\")})\"\n end.join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "607e0b2fd3ad558c69c74279b0a3ac040cc53f92514027776a793e77145d0e37",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 1071,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"DROP TABLE #{\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, order).to_sql.hash.abs.to_s(36)}\"[(-63..)]}\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, order).to_sql.hash.abs.to_s(36)}\"[(-63..)]",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "60d79b3e448515aa6141cbfe88c51b91d1cdafc7a766af6c38780307b594f07a",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/account.rb",
+      "line": 1015,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Account.find_by_sql(\"WITH RECURSIVE t AS (\\n  SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id.parent_account_id).first}\\n  UNION\\n  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id\\n)\\nSELECT * FROM t\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Account",
+        "method": "Account.account_chain"
+      },
+      "user_input": "Shard.local_id_for(starting_account_id.parent_account_id).first",
+      "confidence": "Medium",
       "cwe_id": [
         89
       ],
@@ -676,152 +635,138 @@
     {
       "warning_type": "Redirect",
       "warning_code": 18,
-      "fingerprint": "57397a59f2a195c10c91474fb61c04742605d45f85dfc538af87055372191d67",
+      "fingerprint": "6322041803bb86407678ba10c0e91454344241b40723b2861d925bccf68b240d",
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
-      "file": "app/controllers/canvadoc_sessions_controller.rb",
-      "line": 134,
-      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
-      "code": "redirect_to(Attachment.find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"attachment_id\"]).canvadoc.session_url({ :preferred_plugins => ([\"pdfjs\", \"box_view\", \"crocodoc\"]), :enable_annotations => extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"enable_annotations\"], :use_cloudfront => Account.site_admin.feature_enabled?(:use_cloudfront_for_docviewer), :enrollment_type => extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"enrollment_type\"], :disable_annotation_notifications => ((extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"disable_annotation_notifications\"] or false)), :canvas_base_url => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.course.root_account.domain, :user_id => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).id, :submission_user_ids => (if Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).group_id then\n  Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).group.users.pluck(:id)\nelse\n  [Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).user_id]\nend), :course_id => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.context_id, :assignment_id => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.id, :submission_id => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).id, :post_manually => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.post_manually?, :posted_at => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).posted_at, :assignment_name => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.name, :audit_url => submission_docviewer_audit_events_url(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]), :anonymous_instructor_annotations => ((true or false)), :annotation_context => extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"annotation_context\"], :read_only => ((not Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).canvadocs_annotation_contexts.find_by(:launch_id => extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"annotation_context\"]).grants_right?((((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])), :readwrite))) }.merge((Canvadocs.user_session_params((((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])), :submission => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"])) or Canvadocs.user_session_params((((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])), :attachment => Attachment.find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"attachment_id\"]))))))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "CanvadocSessionsController",
-        "method": "show"
-      },
-      "user_input": "Attachment.find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"attachment_id\"]).canvadoc.session_url({ :preferred_plugins => ([\"pdfjs\", \"box_view\", \"crocodoc\"]), :enable_annotations => extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"enable_annotations\"], :use_cloudfront => Account.site_admin.feature_enabled?(:use_cloudfront_for_docviewer), :enrollment_type => extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"enrollment_type\"], :disable_annotation_notifications => ((extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"disable_annotation_notifications\"] or false)), :canvas_base_url => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.course.root_account.domain, :user_id => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).id, :submission_user_ids => (if Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).group_id then\n  Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).group.users.pluck(:id)\nelse\n  [Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).user_id]\nend), :course_id => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.context_id, :assignment_id => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.id, :submission_id => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).id, :post_manually => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.post_manually?, :posted_at => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).posted_at, :assignment_name => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.name, :audit_url => submission_docviewer_audit_events_url(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]), :anonymous_instructor_annotations => ((true or false)), :annotation_context => extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"annotation_context\"], :read_only => ((not Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).canvadocs_annotation_contexts.find_by(:launch_id => extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"annotation_context\"]).grants_right?((((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])), :readwrite))) }.merge((Canvadocs.user_session_params((((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])), :submission => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"])) or Canvadocs.user_session_params((((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])), :attachment => Attachment.find(extract_blob(params[:hmac], params[:blob], \"user_id\" => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first) and ((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user) or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"attachment_id\"])))))",
-      "confidence": "High",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "596653631ef96aa94d15829ede5c50718351c7b9279fbd2bf9b0a139cf06eb31",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/data_fixup/reclaim_instfs_attachments.rb",
-      "line": 99,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "scope.where(\"#{Account.resolved_root_account_id_sql} IN (?)\", root_accounts.map(&:id))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DataFixup::ReclaimInstfsAttachments",
-        "method": "s(:self).instfs_attachments_for_root_accounts"
-      },
-      "user_input": "Account.resolved_root_account_id_sql",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Mass Assignment",
-      "warning_code": 70,
-      "fingerprint": "5976651f66acf7863fe628cb40ae2a2ebb217d3319177e8609b0f2168f91582d",
-      "check_name": "MassAssignment",
-      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
-      "file": "app/controllers/gradebook_settings_controller.rb",
-      "line": 69,
-      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
-      "code": "params.require(:gradebook_settings).permit({ :filter_columns_by => ([:context_module_id, :grading_period_id, :assignment_group_id, :submissions]), :filter_rows_by => ([:section_id, :student_group_id]), :selected_view_options_filters => ([]) }, :enter_grades_as, :hide_assignment_group_totals, :hide_total, :show_concluded_enrollments, :show_inactive_enrollments, :show_unpublished_assignments, :show_separate_first_last_names, :student_column_display_as, :student_column_secondary_info, :sort_rows_by_column_id, :sort_rows_by_setting_key, :sort_rows_by_direction, :view_ungraded_as_zero, :colors => ([:late, :missing, :resubmitted, :dropped, :excused, :extended])).permit!",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "GradebookSettingsController",
-        "method": "gradebook_settings_params"
-      },
-      "user_input": null,
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "5e52e4ee5c1ebad034509e60cd081ee7efab6b30fc41db4f01a3a6f872be7462",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/account.rb",
-      "line": 1012,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Account.connection.select_values(\"WITH RECURSIVE t AS (\\n  SELECT * FROM #{Account.quoted_table_name} WHERE id IN (#{sliced_acc_ids.join(\", \")})\\n  UNION\\n  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id\\n)\\nSELECT id FROM t\\n\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Account",
-        "method": "Account.multi_account_chain_ids"
-      },
-      "user_input": "sliced_acc_ids.join(\", \")",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "6c187af95302423b293a6ee5fcc3233c199e0f82d858931c478515c5f2d22cad",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/controllers/outcome_results_controller.rb",
-      "line": 794,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql((User.sortable_name_order_by_clause(User.quoted_table_name) or \"#{User.sortable_name_order_by_clause(User.quoted_table_name)} DESC\"))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "OutcomeResultsController",
-        "method": "apply_sort_order"
-      },
-      "user_input": "User.sortable_name_order_by_clause(User.quoted_table_name)",
-      "confidence": "High",
-      "cwe_id": [
-        89
-      ],
-      "note": "No user input is passed in"
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "6c7dde08a0537e5a69ebd2bca05afd976d613743e229f81125540f5ac78c7f81",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/data_fixup/populate_root_account_ids_on_learning_outcomes.rb",
-      "line": 54,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "LearningOutcome.where(:id => ((batch_min..batch_max))).where(\"root_account_ids IS NULL OR root_account_ids = ?\", \"{}\").joins(:account).update_all(\"root_account_ids=ARRAY[#{Account.resolved_root_account_id_sql}]\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DataFixup::PopulateRootAccountIdsOnLearningOutcomes",
-        "method": "s(:self).populate"
-      },
-      "user_input": "Account.resolved_root_account_id_sql",
-      "confidence": "High",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "6db9911a91c84a4b00b6de3ab8e145484f50f33c6702139317ea9d21b4264a03",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
       "file": "app/controllers/users_controller.rb",
-      "line": 2835,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "course.submissions.where.not(:assignments => ({ :workflow_state => \"deleted\" })).eager_load(:assignment).where(\"user_id IN (?) AND #{Submission.needs_grading_conditions}\", student_enrollments.map(&:user_id))",
+      "line": 2218,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(MediaSourceFetcher.new(CanvasKaltura::ClientV3.new).fetch_preferred_source_url(:media_id => params[:entryId], :file_extension => ((params[:type] or params[:format])), :media_type => params[:media_type]))",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "UsersController",
-        "method": "teacher_activity_report"
+        "method": "media_download"
       },
-      "user_input": "Submission.needs_grading_conditions",
+      "user_input": "MediaSourceFetcher.new(CanvasKaltura::ClientV3.new).fetch_preferred_source_url(:media_id => params[:entryId], :file_extension => ((params[:type] or params[:format])), :media_type => params[:media_type])",
+      "confidence": "High",
+      "cwe_id": [
+        601
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "689b10c1f76b6025687096dd27fac6c2d7d2bb1490dfc65565cb82f00ce0f7f3",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/microsoft_sync/partial_sync_change.rb",
+      "line": 46,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "where(\"(#{columns.map do\n connection.quote_column_name(col)\n end.join(\",\")}) IN (#{values_arrays.map do\n ((\"(\" + arr.map do\n connection.quote(val)\n end.join(\",\")) + \")\")\n end.join(\",\")})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "MicrosoftSync::PartialSyncChange",
+        "method": null
+      },
+      "user_input": "columns.map do\n connection.quote_column_name(col)\n end.join(\",\")",
       "confidence": "Medium",
       "cwe_id": [
         89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SSL Verification Bypass",
+      "warning_code": 71,
+      "fingerprint": "71766e29dc8e6273a59497da6001858b23b05989c9330c94ac2b960c406119c0",
+      "check_name": "SSLVerify",
+      "message": "SSL certificate verification was bypassed",
+      "file": "gems/canvas_kaltura/lib/canvas_kaltura/kaltura_client_v3.rb",
+      "line": 391,
+      "link": "https://brakemanscanner.org/docs/warning_types/ssl_verification_bypass/",
+      "code": "Net::HTTP.new(\"www.kaltura.com\", (if (CanvasKaltura::ClientV3.config[\"protocol\"] != \"http\") then\n  Net::HTTP.https_default_port\nelse\n  Net::HTTP.http_default_port\nend)).verify_mode = OpenSSL::SSL::VERIFY_NONE",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "CanvasKaltura::ClientV3",
+        "method": "sendRequest"
+      },
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        295
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "717fe8c412477ae1bd601e83543d17b5e1a9590f8830eaa5d44f55db7362c1e1",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/data_fixup/populate_root_account_id_on_asset_user_accesses.rb",
+      "line": 29,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "AssetUserAccess.where(:id => ((min..max)), :context_type => \"User\").where(\"asset_code NOT LIKE ALL (ARRAY[#{[*[\"attachment\", \"calendar_event\", \"group\", \"course\"], \"user\"].map do\n \"'%#{t}%'\"\n end.join(\",\")}])\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DataFixup::PopulateRootAccountIdOnAssetUserAccesses",
+        "method": "s(:self).populate"
+      },
+      "user_input": "[*[\"attachment\", \"calendar_event\", \"group\", \"course\"], \"user\"].map do\n \"'%#{t}%'\"\n end.join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "71b088629b59eb0c66dd0aab5736ecda1061b31aeaaf58fbc71dae0114d91fa5",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/courses_controller.rb",
+      "line": 3363,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to((params[:continue_to] or course_url(@course)))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "CoursesController",
+        "method": "render_update_success"
+      },
+      "user_input": "params[:continue_to]",
+      "confidence": "High",
+      "cwe_id": [
+        601
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "74a55118935cb7380eac981c319e00702be0820eba0d660b45435563caceb4ac",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/files_controller.rb",
+      "line": 1515,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(Thumbnail.where(:id => params[:id], :uuid => params[:uuid]).first.full_filename, :content_type => Thumbnail.where(:id => params[:id], :uuid => params[:uuid]).first.content_type)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "FilesController",
+        "method": "show_thumbnail"
+      },
+      "user_input": "Thumbnail.where(:id => params[:id], :uuid => params[:uuid]).first.full_filename",
+      "confidence": "Medium",
+      "cwe_id": [
+        22
       ],
       "note": ""
     },
@@ -895,49 +840,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "78b44fda25df90708f28d0f2c95bfffb48dfb1d609937747cda30fb34461903e",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/graphql/graphql_postgres_timeout.rb",
-      "line": 32,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "ActiveRecord::Base.connection.execute(\"SET statement_timeout = #{Integer(Setting.get(\"graphql_statement_timeout\", \"60_000\"))}\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "GraphQLPostgresTimeout",
-        "method": "s(:self).wrap"
-      },
-      "user_input": "Setting.get(\"graphql_statement_timeout\", \"60_000\")",
-      "confidence": "High",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "799a44268d5cfe1ff43bcd239e02e4dc5fc10545c370095aaed3ec7e9975df6e",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/controllers/lti/ims/providers/memberships_provider.rb",
-      "line": 81,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.active.for_assignment(assignment).where(\"#{outer_user_id_column} = submissions.user_id\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Lti::IMS::Providers::MembershipsProvider",
-        "method": "correlated_assignment_submissions"
-      },
-      "user_input": "outer_user_id_column",
-      "confidence": "Medium",
-      "note": "No user input is passed in"
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "7a508e1af8899d8b5e2727fdf138717ab1ca1ec71ab4f8544f1acd5fc9078f71",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -956,26 +858,6 @@
       "cwe_id": [
         89
       ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "7abc21a22f955b8d5b6d47f5332873d49efbc8f4eba5e341055efa175ee14977",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "gems/plugins/simply_versioned/lib/simply_versioned/version.rb",
-      "line": 97,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "self.connection.select_rows(\"SELECT (SELECT max (vo.number) FROM #{Version.quoted_table_name} vo WHERE vo.versionable_id = v.versionable_id AND vo.versionable_type = v.versionable_type)\\n            AS maximum_number, v.versionable_type, v.versionable_id FROM (VALUES #{sliced_objs.map do\n \"(#{o.id}, '#{o.class.base_class.name}')\"\n end.join(\",\")}) AS v (versionable_id, versionable_type)\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Version",
-        "method": "Version.preload_version_number"
-      },
-      "user_input": "sliced_objs.map do\n \"(#{o.id}, '#{o.class.base_class.name}')\"\n end.join(\",\")",
-      "confidence": "Medium",
       "note": ""
     },
     {
@@ -1000,22 +882,6 @@
         89
       ],
       "note": "DueDateCacher.infer_submission_workflow_state_sql is safe"
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "81514c737b5457d2e4c4073402b332ef084d687b5c9cd891518a9392cd92e50b",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 848,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.select_values(\"FETCH FORWARD #{of} FROM #{\"#{table_name}_in_batches_cursor_#{apply_limits(clone, start, finish).except(:select).select(primary_key).to_sql.hash.abs.to_s(36)}\"}\")",
-      "render_path": null,
-      "location": null,
-      "user_input": "of",
-      "confidence": "Medium",
-      "note": ""
     },
     {
       "warning_type": "Command Injection",
@@ -1043,46 +909,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "8338cbe3c3812437b3387b3d7b90a4795bd5ee5a5620cb8586be9ef53f6b7758",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/active_support/cache/safe_redis_race_condition.rb",
-      "line": 50,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "lock(\"lock:#{key}\", options)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ActiveSupport::Cache::SafeRedisRaceCondition",
-        "method": "handle_expired_entry"
-      },
-      "user_input": "key",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "8338cbe3c3812437b3387b3d7b90a4795bd5ee5a5620cb8586be9ef53f6b7758",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/active_support/cache/safe_redis_race_condition.rb",
-      "line": 62,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "lock(\"lock:#{key}\", options)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ActiveSupport::Cache::SafeRedisRaceCondition",
-        "method": "handle_expired_entry"
-      },
-      "user_input": "key",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "871762919d635836a40277367e84b1427e48755b97056fc79f826168f35ffcbc",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -1104,43 +930,46 @@
       "note": ""
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "900c2723d5ca97db73fcbbdfa93ee42aff78549a2f141f25026fca7bc05784e0",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/score_statistics_generator.rb",
-      "line": 113,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "ScoreStatistic.connection.execute(\"INSERT INTO #{ScoreStatistic.quoted_table_name}\\n  (assignment_id, maximum, minimum, mean, lower_q, median, upper_q, count, created_at, updated_at, root_account_id)\\nVALUES #{bulk_slice.join(\",\")}\\nON CONFLICT (assignment_id)\\nDO UPDATE SET\\n   minimum = excluded.minimum,\\n   maximum = excluded.maximum,\\n   mean = excluded.mean,\\n   lower_q = excluded.lower_q,\\n   median = excluded.median,\\n   upper_q = excluded.upper_q,\\n   count = excluded.count,\\n   updated_at = excluded.updated_at,\\n   root_account_id = #{root_account_id}\\n\".squish)",
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "89637035fa3c2dd610d49b418965783e6e3c841d0939c727f3361785cf319ef6",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/users_controller.rb",
+      "line": 2408,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(User.avatar_fallback_url(Shard.shard_for(Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id]))).activate do\n Rails.cache.fetch(Cacher.avatar_cache_key(Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id])), ((request.env[\"canvas.domain_root_account\"] or LoadAccount.default_domain_root_account).settings[:avatars] or \"enabled\"))) do\n user = User.where(:id => Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id]))).first\nif User.where(:id => Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id]))).first then\n  User.where(:id => Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id]))).first.avatar_url(nil, ((request.env[\"canvas.domain_root_account\"] or LoadAccount.default_domain_root_account).settings[:avatars] or \"enabled\"))\nelse\n  \"/images/messages/avatar-50.png\"\nend\n end\n end, request))",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "ScoreStatisticsGenerator",
-        "method": "s(:self).update_assignment_score_statistics"
+        "class": "UsersController",
+        "method": "avatar_image"
       },
-      "user_input": "bulk_slice.join(\",\")",
-      "confidence": "Medium",
+      "user_input": "User.avatar_fallback_url(Shard.shard_for(Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id]))).activate do\n Rails.cache.fetch(Cacher.avatar_cache_key(Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id])), ((request.env[\"canvas.domain_root_account\"] or LoadAccount.default_domain_root_account).settings[:avatars] or \"enabled\"))) do\n user = User.where(:id => Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id]))).first\nif User.where(:id => Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id]))).first then\n  User.where(:id => Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id]))).first.avatar_url(nil, ((request.env[\"canvas.domain_root_account\"] or LoadAccount.default_domain_root_account).settings[:avatars] or \"enabled\"))\nelse\n  \"/images/messages/avatar-50.png\"\nend\n end\n end, request)",
+      "confidence": "High",
+      "cwe_id": [
+        601
+      ],
       "note": ""
     },
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "91d4c856e15750b2bc532dd5e213b913f10f751e1ff23378523c44d8e130de3d",
+      "fingerprint": "96ad8f781198eb407e8e108f14a4aa2c4d98bf212125ff66f6cde643bc5bf029",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "gems/plugins/account_reports/lib/account_reports/sis_exporter.rb",
-      "line": 968,
+      "file": "app/models/master_courses/folder_helper.rb",
+      "line": 49,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "AccountUser.select(\"account_users.*,\\n                  a.sis_source_id AS account_sis_id,\\n                  r.name AS role_name,\\n                  u.name AS user_name\").joins(\"INNER JOIN #{Account.quoted_table_name} a ON account_users.account_id=a.id\\n                 INNER JOIN #{User.quoted_table_name} u ON account_users.user_id=u.id\\n                 INNER JOIN #{Role.quoted_table_name} r ON account_users.role_id=r.id\").where(\"account_users.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})\\n                 OR account_users.account_id= :account_id\", :account_id => account.id)",
+      "code": "Folder.connection.select_values(\"WITH RECURSIVE t AS (\\n  SELECT id, parent_folder_id FROM #{Folder.quoted_table_name} WHERE id IN (#{(Set.new << folder_id).to_a.sort.join(\",\")})\\n  UNION\\n  SELECT folders.id, folders.parent_folder_id FROM #{Folder.quoted_table_name} INNER JOIN t ON folders.id=t.parent_folder_id\\n)\\nSELECT DISTINCT id FROM t\\n\".squish)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "AccountReports::SisExporter",
-        "method": "admins"
+        "class": "MasterCourses::FolderHelper",
+        "method": "MasterCourses::FolderHelper.locked_folder_ids_for_course"
       },
-      "user_input": "Account.sub_account_ids_recursive_sql(account.id)",
-      "confidence": "High",
+      "user_input": "(Set.new << folder_id).to_a.sort.join(\",\")",
+      "confidence": "Medium",
       "cwe_id": [
         89
       ],
@@ -1153,7 +982,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/accounts_controller.rb",
-      "line": 1197,
+      "line": 1185,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "AccountReport.from(\"unnest('{#{AccountReport.available_reports.keys.join(\",\")}}'::text[]) report_types (name),\\n                LATERAL (#{@account.account_reports.active.where(\"report_type=name\").most_recent.to_sql}) account_reports \")",
       "render_path": null,
@@ -1239,84 +1068,72 @@
       "note": ""
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "a2175691417074dac6b528cf37d57f8f7ae4b3e8232bf1da9fd970f6b0410dcd",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/effective_due_dates.rb",
-      "line": 194,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "ActiveRecord::Base.connection.select_all(\"          -- fetch the assignment itself\\n          WITH models AS (\\n            SELECT *\\n            FROM #{Assignment.quoted_table_name}\\n            WHERE\\n              id IN (#{([context.active_assignments] or assignment_collection).first.except(:order).select(:id).to_sql.join(\",\")}) AND\\n              workflow_state <> 'deleted' AND\\n              context_id = #{context.id} AND context_type = 'Course'\\n          ),\\n\\n          -- fetch all overrides for this assignment\\n          overrides AS (\\n            SELECT\\n              o.id,\\n              o.assignment_id,\\n              o.set_type,\\n              o.set_id,\\n              o.due_at_overridden,\\n              CASE WHEN o.due_at_overridden IS TRUE THEN o.due_at ELSE a.due_at END AS due_at\\n            FROM\\n              models a\\n            INNER JOIN #{AssignmentOverride.quoted_table_name} o ON o.assignment_id = a.id\\n            WHERE\\n              o.workflow_state = 'active'\\n          ),\\n\\n          -- fetch all students affected by adhoc overrides\\n          override_adhoc_students AS (\\n            SELECT\\n              os.user_id AS student_id,\\n              o.assignment_id,\\n              o.id AS override_id,\\n              date_trunc('minute', o.due_at) AS trunc_due_at,\\n              o.due_at,\\n              o.set_type AS override_type,\\n              o.due_at_overridden,\\n              1 AS priority\\n            FROM\\n              overrides o\\n            INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} os ON os.assignment_override_id = o.id AND\\n              os.workflow_state = 'active'\\n            WHERE\\n              o.set_type = 'ADHOC'\\n              #{filter_students_sql(\"os\")}\\n          ),\\n\\n          -- fetch all students affected by group overrides\\n          override_groups_students AS (\\n            SELECT\\n              gm.user_id AS student_id,\\n              o.assignment_id,\\n              o.id AS override_id,\\n              date_trunc('minute', o.due_at) AS trunc_due_at,\\n              o.due_at,\\n              o.set_type AS override_type,\\n              o.due_at_overridden,\\n              1 AS priority\\n            FROM\\n              overrides o\\n            INNER JOIN #{Group.quoted_table_name} g ON g.id = o.set_id\\n            INNER JOIN #{GroupMembership.quoted_table_name} gm ON gm.group_id = g.id\\n            WHERE\\n              o.set_type = 'Group' AND\\n              g.workflow_state <> 'deleted' AND\\n              gm.workflow_state = 'accepted'\\n              #{filter_students_sql(\"gm\")}\\n          ),\\n\\n          -- fetch all students affected by section overrides\\n          override_sections_students AS (\\n            SELECT\\n              e.user_id AS student_id,\\n              o.assignment_id,\\n              o.id AS override_id,\\n              date_trunc('minute', o.due_at) AS trunc_due_at,\\n              o.due_at,\\n              o.set_type AS override_type,\\n              o.due_at_overridden,\\n              1 AS priority\\n            FROM\\n              overrides o\\n            INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = o.set_id\\n            INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_section_id = s.id\\n            WHERE\\n              o.set_type = 'CourseSection' AND\\n              s.workflow_state <> 'deleted' AND\\n              e.workflow_state NOT IN ('rejected', 'deleted', 'inactive') AND\\n              e.type IN ('StudentEnrollment', 'StudentViewEnrollment')\\n              #{filter_students_sql(\"e\")}\\n          ),\\n\\n          -- fetch all students who have an 'Everyone Else'\\n          -- due date applied to them from the assignment\\n          override_everyonelse_students AS (\\n            SELECT\\n              e.user_id AS student_id,\\n              a.id as assignment_id,\\n              NULL::integer AS override_id,\\n              date_trunc('minute', a.due_at) AS trunc_due_at,\\n              a.due_at,\\n              'Everyone Else'::varchar AS override_type,\\n              FALSE AS due_at_overridden,\\n              2 AS priority\\n            FROM\\n              models a\\n            INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = a.context_id\\n            WHERE\\n              e.workflow_state NOT IN ('rejected', 'deleted') AND\\n              e.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND\\n              a.only_visible_to_overrides IS NOT TRUE\\n              #{filter_students_sql(\"e\")}\\n          ),\\n\\n          -- join all these students together into a single table\\n          override_all_students AS (\\n            SELECT * FROM override_adhoc_students\\n            UNION ALL\\n            SELECT * FROM override_groups_students\\n            UNION ALL\\n            SELECT * FROM override_sections_students\\n            UNION ALL\\n            SELECT * FROM override_everyonelse_students\\n          ),\\n\\n          -- and pick the latest override date as the effective due date\\n          calculated_overrides AS (\\n            SELECT DISTINCT ON (student_id, assignment_id)\\n              *\\n            FROM override_all_students\\n            ORDER BY student_id ASC, assignment_id ASC, priority ASC, due_at_overridden DESC, due_at DESC NULLS FIRST\\n          ),\\n\\n          -- now find all grading periods, including both\\n          -- legacy course periods and newer account-level periods\\n          course_and_account_grading_periods AS (\\n              SELECT DISTINCT ON (gp.id)\\n                gp.id,\\n                date_trunc('minute', gp.start_date) AS start_date,\\n                date_trunc('minute', gp.end_date) AS end_date,\\n                date_trunc('minute', gp.close_date) AS close_date,\\n                gpg.course_id,\\n                gpg.account_id\\n              FROM\\n                models a\\n              INNER JOIN #{Course.quoted_table_name} c ON c.id = a.context_id\\n              INNER JOIN #{EnrollmentTerm.quoted_table_name} term ON c.enrollment_term_id = term.id\\n              LEFT OUTER JOIN #{GradingPeriodGroup.quoted_table_name} gpg ON\\n                  gpg.course_id = c.id OR gpg.id = term.grading_period_group_id\\n              LEFT OUTER JOIN #{GradingPeriod.quoted_table_name} gp ON gp.grading_period_group_id = gpg.id\\n              WHERE\\n                gpg.workflow_state = 'active' AND\\n                gp.workflow_state = 'active'\\n          ),\\n\\n          -- then filter down to the grading periods we care about:\\n          -- if legacy periods exist, only return those. Otherwise,\\n          -- return the account-level periods.\\n          applied_grading_periods AS (\\n            SELECT *\\n            FROM course_and_account_grading_periods\\n            WHERE\\n              EXISTS (\\n                SELECT 1 FROM course_and_account_grading_periods WHERE course_id IS NOT NULL\\n              ) AND course_id IS NOT NULL\\n            UNION ALL\\n            SELECT *\\n            FROM course_and_account_grading_periods\\n            WHERE\\n              NOT EXISTS (\\n                SELECT 1 FROM course_and_account_grading_periods WHERE course_id IS NOT NULL\\n              ) AND account_id IS NOT NULL\\n          ),\\n\\n          -- infinite due dates are put in the last grading period.\\n          -- better to fetch it once since we'll likely reference it multiple times below\\n          last_period AS (\\n            SELECT id, close_date FROM applied_grading_periods ORDER BY end_date DESC LIMIT 1\\n          )\\n\\n          -- finally bring it all together!\\n          SELECT\\n            overrides.assignment_id,\\n            overrides.student_id,\\n            overrides.due_at,\\n            overrides.override_type,\\n            overrides.override_id,\\n            CASE\\n              -- check whether or not this due date falls in a closed grading period\\n              WHEN overrides.due_at IS NOT NULL AND '#{Time.zone.now.iso8601}'::timestamptz >= periods.close_date THEN TRUE\\n              -- when no explicit due date is provided, we treat it as if it's in the latest grading period\\n              WHEN overrides.due_at IS NULL AND\\n                  overrides.override_type <> 'Submission' AND\\n                  '#{Time.zone.now.iso8601}'::timestamptz >= (SELECT close_date FROM last_period) THEN TRUE\\n              ELSE FALSE\\n            END AS closed,\\n            CASE\\n              -- if infinite due date, put it in the last grading period\\n              WHEN overrides.due_at IS NULL AND\\n                  overrides.override_type <> 'Submission' THEN (SELECT id FROM last_period)\\n              -- otherwise, put it in whatever grading period id we found for it\\n              ELSE periods.id\\n            END AS grading_period_id\\n          FROM calculated_overrides overrides\\n          -- match the effective due date with its grading period\\n          LEFT OUTER JOIN applied_grading_periods periods ON\\n              periods.start_date < overrides.trunc_due_at AND overrides.trunc_due_at <= periods.end_date\\n\")",
+      "warning_type": "Remote Code Execution",
+      "warning_code": 24,
+      "fingerprint": "a10a5c57e907f73230c60579e08bc331c9d035418e0d8aafa82892c516b2a439",
+      "check_name": "UnsafeReflection",
+      "message": "Unsafe reflection method `const_get` called with parameter value",
+      "file": "app/controllers/application_controller.rb",
+      "line": 1396,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "Object.const_get((params[:feed_code].split(\"_\", 2) or [\"group_membership\", params[:feed_code].split(\"_\", 3)[-1]])[0].classify, false)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "EffectiveDueDates",
-        "method": "query"
+        "class": "ApplicationController",
+        "method": "get_feed_context"
       },
-      "user_input": "([context.active_assignments] or assignment_collection).first.except(:order).select(:id).to_sql.join(\",\")",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "a24eb960bc19ce612f38bed5022568261cf9a01c07a5347c200a5d71536556bc",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/account_notification.rb",
-      "line": 233,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "AccountNotification.where(\"account_id IN (?) AND start_at <=? AND end_at >=?\", slice_account_ids, (Time.now.utc or Time.now.utc.end_of_day), (Time.now.utc or Time.now.utc.end_of_day).beginning_of_day).order(\"start_at DESC\").preload({ :account => :root_account }, :account_notification_roles => :role).joins(:account).where(\"domain_specific=? OR #{Account.resolved_root_account_id_sql}=?\", false, root_account.id)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "AccountNotification",
-        "method": "AccountNotification.for_account"
-      },
-      "user_input": "Account.resolved_root_account_id_sql",
+      "user_input": "params[:feed_code].split(\"_\", 2)",
       "confidence": "High",
       "cwe_id": [
-        89
+        470
       ],
       "note": ""
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "a7c54d7aabe9ba605ec006106ba7687b01f3d543d69f955909302caeb8382c1e",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 1040,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.execute(\"DROP TABLE #{\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish).to_sql.hash.abs.to_s(36)}\"[(-63..-1)]}\")",
-      "render_path": null,
-      "location": null,
-      "user_input": "\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish).to_sql.hash.abs.to_s(36)}\"[(-63..-1)]",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "a9c106436f1f0f796335bb0952b9b05bf45319797fa4d093e95207eff71ce990",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/submission_search.rb",
-      "line": 111,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"#{User.sortable_name_order_by_clause(\"users\")} #{(\"DESC NULLS LAST\" or \"ASC\")}\")",
+      "warning_type": "Denial of Service",
+      "warning_code": 76,
+      "fingerprint": "a2a6a8e4413742bb617c0d22e1f1a7e475dd474d5812ed9391965b471b5958be",
+      "check_name": "RegexDoS",
+      "message": "Model attribute used in regular expression",
+      "file": "app/models/course.rb",
+      "line": 2661,
+      "link": "https://brakemanscanner.org/docs/warning_types/denial_of_service/",
+      "code": "/\\A#{(Folder.root_folders(self).first.name + \"/\")}/",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "SubmissionSearch",
-        "method": "add_order_bys"
+        "class": "Course",
+        "method": "copy_attachments_from_course"
       },
-      "user_input": "User.sortable_name_order_by_clause(\"users\")",
+      "user_input": "(Folder.root_folders(self).first.name + \"/\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        20,
+        185
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SSL Verification Bypass",
+      "warning_code": 71,
+      "fingerprint": "a997ca9b5d865d0cf4c905da9b9bc38b2b7239b3a1a14203fed6f66810ac03b2",
+      "check_name": "SSLVerify",
+      "message": "SSL certificate verification was bypassed",
+      "file": "gems/canvas_http/lib/canvas_http.rb",
+      "line": 114,
+      "link": "https://brakemanscanner.org/docs/warning_types/ssl_verification_bypass/",
+      "code": "CanvasHttp.connection_for_uri(uri).verify_mode = OpenSSL::SSL::VERIFY_NONE",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "CanvasHttp",
+        "method": "s(:self).request"
+      },
+      "user_input": null,
       "confidence": "High",
       "cwe_id": [
-        89
+        295
       ],
       "note": ""
     },
@@ -1327,7 +1144,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/accounts_controller.rb",
-      "line": 1192,
+      "line": 1180,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "AccountReport.from(\"unnest('{#{AccountReport.available_reports.keys.join(\",\")}}'::text[]) report_types (name),\\n                LATERAL (#{@account.account_reports.active.where(\"report_type=name\").most_recent.complete.to_sql}) account_reports \")",
       "render_path": null,
@@ -1344,70 +1161,27 @@
       "note": ""
     },
     {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "b257d87ee5c0d939c2ff19f8701aed3f20770c75e85c6ed9922956144b45d629",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "gems/plugins/qti_exporter/lib/qti/converter.rb",
-      "line": 98,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`#{Qti.get_conversion_command(Dir.mktmpdir(\"qti_2_1\"), @package_root.root_path)}`",
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "b4bda6b6d94b643b15299eded526f9e3f9dfc51f70eda595793d94901233d46a",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/crocodoc_sessions_controller.rb",
+      "line": 52,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Attachment.find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"crocodoc\")[\"attachment_id\"]).crocodoc_document.session_url(:user => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id]))), :annotations => ((value_to_boolean(params[:annotations]) or true)), :enable_annotations => extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"crocodoc\")[\"enable_annotations\"], :moderated_grading_allow_list => extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"crocodoc\")[\"moderated_grading_allow_list\"]))",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "Qti::Converter",
-        "method": "run_qti_converter"
+        "class": "CrocodocSessionsController",
+        "method": "show"
       },
-      "user_input": "Qti.get_conversion_command(Dir.mktmpdir(\"qti_2_1\"), @package_root.root_path)",
-      "confidence": "Medium",
-      "cwe_id": [
-        77
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "b301f09e1b31d56ea2fe657639f7ef7485dc1a77426adcc2346e68b853f70819",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/user.rb",
-      "line": 1959,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Course.active.select(\"courses.*, enrollments.type AS primary_enrollment,\\n                  #{Enrollment.type_rank_sql} AS primary_enrollment_rank,\\n                  enrollments.workflow_state AS primary_enrollment_state,\\n                  enrollments.created_at AS primary_enrollment_date\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "User",
-        "method": "courses_with_primary_enrollment"
-      },
-      "user_input": "Enrollment.type_rank_sql",
+      "user_input": "Attachment.find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"crocodoc\")[\"attachment_id\"]).crocodoc_document.session_url(:user => (((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id]))), :annotations => ((value_to_boolean(params[:annotations]) or true)), :enable_annotations => extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"crocodoc\")[\"enable_annotations\"], :moderated_grading_allow_list => extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"crocodoc\")[\"moderated_grading_allow_list\"])",
       "confidence": "High",
       "cwe_id": [
-        89
+        601
       ],
       "note": ""
-    },
-    {
-      "warning_type": "Remote Code Execution",
-      "warning_code": 24,
-      "fingerprint": "b5ba030e599093d2a5047494736d8a61807935ee92704d7f289da07646c862e4",
-      "check_name": "UnsafeReflection",
-      "message": "Unsafe reflection method `const_get` called with parameter value",
-      "file": "app/controllers/files_controller.rb",
-      "line": 894,
-      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
-      "code": "Object.const_get(params[:context_type])",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "FilesController",
-        "method": "api_capture"
-      },
-      "user_input": "params[:context_type]",
-      "confidence": "High",
-      "note": "Value is allowed"
     },
     {
       "warning_type": "SQL Injection",
@@ -1433,25 +1207,25 @@
       "note": ""
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "bfc5aa37d94de3fb455b8e59b7711d52a2b537fc8f4b183c459ad3dcb41aecea",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/course.rb",
-      "line": 862,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key(\"name\")}\")",
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "c6e825e0dac404ef42cb2c45a2ae0b261e506f3c1ccebeadab67e0c289aaf8d6",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/quizzes/quiz_submissions_controller.rb",
+      "line": 114,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to((params[:next_question_path] or course_quiz_take_path(@context, require_quiz)))",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "Course",
-        "method": null
+        "class": "Quizzes::QuizSubmissionsController",
+        "method": "backup"
       },
-      "user_input": "best_unicode_collation_key(\"name\")",
-      "confidence": "Medium",
+      "user_input": "params[:next_question_path]",
+      "confidence": "High",
       "cwe_id": [
-        89
+        601
       ],
       "note": ""
     },
@@ -1479,62 +1253,26 @@
       "note": ""
     },
     {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "cc5a72dd9261fe1cb32c539c0643976134aeb37ed032c358399d403f3d3225c9",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "gems/plugins/qti_exporter/lib/qti.rb",
-      "line": 92,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`#{Qti.get_conversion_command(File.join(dirname, \"qti_2_1\"), dirname)}`",
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "c901e8d9c6d87ae7cd343307e2fdd0dd945d986073fd4f5a95d229f787f2c3aa",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/grade_calculator.rb",
+      "line": 581,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Score.connection.execute(\"INSERT INTO #{Score.quoted_table_name}\\n    (\\n      enrollment_id, grading_period_id,\\n      #{columns_to_insert_or_update[:columns].join(\", \")},\\n      course_score, root_account_id, created_at, updated_at\\n    )\\n    SELECT\\n      enrollments.id as enrollment_id,\\n      #{(opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period].id or \"NULL\")} as grading_period_id,\\n      #{columns_to_insert_or_update[:insert_values].join(\", \")},\\n      #{if opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period] then\n  \"FALSE\"\nelse\n  \"TRUE\"\nend} AS course_score,\\n      #{(course or Course.find(course)).root_account_id} AS root_account_id,\\n      #{updated_at} as created_at,\\n      #{updated_at} as updated_at\\n    FROM #{Enrollment.quoted_table_name} enrollments\\n    WHERE\\n      enrollments.id IN (#{joined_enrollment_ids})\\n    ORDER BY enrollment_id\\nON CONFLICT #{(\"(enrollment_id, grading_period_id) WHERE grading_period_id IS NOT NULL\" or \"(enrollment_id) WHERE course_score\")}\\nDO UPDATE SET\\n    #{columns_to_insert_or_update[:update_values].join(\", \")},\\n    updated_at = excluded.updated_at,\\n    root_account_id = #{(course or Course.find(course)).root_account_id},\\n    /* if workflow_state was previously deleted for some reason, update it to active */\\n    workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\n\".squish)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "Qti",
-        "method": "s(:self).convert_xml"
+        "class": "GradeCalculator",
+        "method": "save_course_and_grading_period_scores"
       },
-      "user_input": "Qti.get_conversion_command(File.join(dirname, \"qti_2_1\"), dirname)",
+      "user_input": "columns_to_insert_or_update[:columns].join(\", \")",
       "confidence": "Medium",
       "cwe_id": [
-        77
+        89
       ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "cd7537cc78c1ff7dacdfdb9318a6ae971bfcf9dca4785ffcf4a099b84dc0c0b8",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/assignments/needs_grading_count_query.rb",
-      "line": 144,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "joined_submissions.where(\"submissions.assignment_id = ?\\n  AND e.course_id = ?\\n  AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')\\n  AND e.workflow_state = 'active'\\n  AND #{Submission.needs_grading_conditions}\\n\", assignment, course)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Assignments::NeedsGradingCountQuery",
-        "method": "all_submissions"
-      },
-      "user_input": "Submission.needs_grading_conditions",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "ce13d83a3a4c6b0fa37a16693db492fa88bb2470633f7c47228b9f5c19664cea",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 1009,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.execute(\"ALTER TABLE #{\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish).to_sql.hash.abs.to_s(36)}\"[(-63..-1)]} ADD temp_primary_key SERIAL PRIMARY KEY\")",
-      "render_path": null,
-      "location": null,
-      "user_input": "\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish).to_sql.hash.abs.to_s(36)}\"[(-63..-1)]",
-      "confidence": "Medium",
       "note": ""
     },
     {
@@ -1586,26 +1324,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "cf9f78f247f3cb3e3eb9fb107b2c2e812cd6ac068864e06dc5be6795224eff01",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/grade_calculator.rb",
-      "line": 583,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Score.connection.execute(\"\\n      INSERT INTO #{Score.quoted_table_name}\\n          (\\n            enrollment_id, grading_period_id,\\n            #{columns_to_insert_or_update[:columns].join(\", \")},\\n            course_score, root_account_id, created_at, updated_at\\n          )\\n          SELECT\\n            enrollments.id as enrollment_id,\\n            #{(opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period].id or \"NULL\")} as grading_period_id,\\n            #{columns_to_insert_or_update[:insert_values].join(\", \")},\\n            #{if opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period] then\n  \"FALSE\"\nelse\n  \"TRUE\"\nend} AS course_score,\\n            #{(course or Course.find(course)).root_account_id} AS root_account_id,\\n            #{updated_at} as created_at,\\n            #{updated_at} as updated_at\\n          FROM #{Enrollment.quoted_table_name} enrollments\\n          WHERE\\n            enrollments.id IN (#{joined_enrollment_ids})\\n          ORDER BY enrollment_id\\n      ON CONFLICT #{(\"(enrollment_id, grading_period_id) WHERE grading_period_id IS NOT NULL\" or \"(enrollment_id) WHERE course_score\")}\\n      DO UPDATE SET\\n          #{columns_to_insert_or_update[:update_values].join(\", \")},\\n          updated_at = excluded.updated_at,\\n          root_account_id = #{(course or Course.find(course)).root_account_id},\\n          -- if workflow_state was previously deleted for some reason, update it to active\\n          workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\n    \")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "GradeCalculator",
-        "method": "save_course_and_grading_period_scores"
-      },
-      "user_input": "columns_to_insert_or_update[:columns].join(\", \")",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "d20c023657e21d01d9b4c16ff26d7b5cc8ba74da73000106494ccb868ee7ba61",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -1629,20 +1347,20 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "d727f7352be9b4271b8dd951a884b5a33b768a4d05c4d17108a122ec1f0b5888",
+      "fingerprint": "d3e4717a8916952af677959ee1c92875143eb4e024d3f9816f3d3bd48fc0b620",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "gems/plugins/account_reports/lib/account_reports/course_reports.rb",
-      "line": 80,
+      "file": "lib/score_statistics_generator.rb",
+      "line": 61,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "c.attachments.active.sum(\"COALESCE(CASE when size < #{Attachment.minimum_size_for_quota} THEN #{Attachment.minimum_size_for_quota} ELSE size END, 0)\")",
+      "code": "ScoreStatistic.connection.select_all(\"WITH want_assignments AS (\\n  SELECT a.id, a.created_at\\n  FROM #{Assignment.quoted_table_name} a\\n  WHERE a.context_id = #{course_id} AND a.context_type = 'Course' AND a.workflow_state = 'published'\\n), interesting_submissions AS (\\n  SELECT s.assignment_id, s.user_id, s.score, a.created_at\\n  FROM #{Submission.quoted_table_name} s\\n  JOIN want_assignments a ON s.assignment_id = a.id\\n  WHERE\\n    s.excused IS NOT true\\n    AND s.score IS NOT NULL\\n    AND s.workflow_state = 'graded'\\n), want_users AS (\\n  SELECT e.user_id\\n  FROM #{Enrollment.quoted_table_name} e\\n  WHERE e.type = 'StudentEnrollment' AND e.course_id = #{course_id} AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')\\n)\\nSELECT\\n  s.assignment_id AS id,\\n  MAX(s.score) AS max,\\n  MIN(s.score) AS min,\\n  AVG(s.score) AS avg,\\n  percentile_cont(0.25) WITHIN GROUP (ORDER BY s.score) AS lower_q,\\n  percentile_cont(0.5) WITHIN GROUP (ORDER BY s.score) AS median,\\n  percentile_cont(0.75) WITHIN GROUP (ORDER BY s.score) AS upper_q,\\n  COUNT(*) AS count\\nFROM\\n  interesting_submissions s\\nWHERE\\n  s.user_id IN (SELECT user_id FROM want_users)\\nGROUP BY s.assignment_id\\nORDER BY MIN(s.created_at)\\n\".squish)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "AccountReports::CourseReports",
-        "method": "course_storage"
+        "class": "ScoreStatisticsGenerator",
+        "method": "s(:self).update_assignment_score_statistics"
       },
-      "user_input": "Attachment.minimum_size_for_quota",
+      "user_input": "course_id",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -1670,42 +1388,6 @@
       "cwe_id": [
         89
       ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "da343c69cfabbf445c24a84fe8d24eea75e1b55d910c5365b8e4234e521d2b58",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 444,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql((if (ActiveRecord::Base.configurations[Rails.env][\"adapter\"] == \"postgresql\") then\n  unless @collkey.key?(Shard.current.database_server.id) then\n    @collkey ||= {}\n    @collkey[Shard.current.database_server.id] = connection.extension(:pg_collkey).schema\n  end\n  if collation = (Canvas::ICU.choose_pg12_collation(connection.icu_collations) and false) then\n    \"(#{col} COLLATE #{(Canvas::ICU.choose_pg12_collation(connection.icu_collations) and false)})\"\n  else\n    if schema = connection.extension(:pg_collkey).schema then\n      \"#{connection.extension(:pg_collkey).schema}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)\"\n    else\n      \"CAST(LOWER(replace(#{col}, '\\\\', '\\\\\\\\')) AS bytea)\"\n    end\n  end\nelse\n  col\nend))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ActiveRecord::Base",
-        "method": "best_unicode_collation_key"
-      },
-      "user_input": "col",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "da367762458bbc31e1a84e7b7c2f27927875d2e9c0e94e39d51d27c1a5ef10d3",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 1006,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.execute(\"CREATE INDEX \\\"temp_primary_key\\\" ON #{connection.quote_local_table_name(\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish).to_sql.hash.abs.to_s(36)}\"[(-63..-1)])}(#{connection.quote_column_name(primary_key)})\")",
-      "render_path": null,
-      "location": null,
-      "user_input": "connection.quote_local_table_name(\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish).to_sql.hash.abs.to_s(36)}\"[(-63..-1)])",
-      "confidence": "Medium",
       "note": ""
     },
     {
@@ -1753,21 +1435,24 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "e04fdc661f4e9d3c39ceee04418bf9d017f9c6a72da9a479639ad44f8b958c94",
+      "fingerprint": "e14633487d1c9c006defc492141952dfb9a5dc8cd263a9da35e73b41306153fe",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "app/models/account.rb",
-      "line": 965,
+      "file": "app/graphql/loaders/discussion_entry_counts_loader.rb",
+      "line": 43,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Account.find_by_sql(\"WITH RECURSIVE t AS (\\n  SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id.parent_account_id).first}\\n  UNION\\n  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id\\n)\\nSELECT * FROM t\\n\")",
+      "code": "DiscussionEntry.joins(DiscussionEntry.participant_join_sql(current_user)).where(:discussion_entries => object_specific_hash(objects)).group(\"discussion_entries.#{object_id_string(objects.first)}\")",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "Account",
-        "method": "Account.account_chain"
+        "class": "Loaders::DiscussionEntryCountsLoader",
+        "method": "perform"
       },
-      "user_input": "Shard.local_id_for(starting_account_id.parent_account_id).first",
+      "user_input": "object_id_string(objects.first)",
       "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
       "note": ""
     },
     {
@@ -1819,21 +1504,82 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "ed48c3f339ecd5816f93b93f09cef84c3e41d00c47adbda021e021add96242d6",
+      "fingerprint": "e3b2099bf1c9f935f1d66828bd81ce828a52f1659f5d4b75fff19d2b80f43948",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "gems/plugins/account_reports/lib/account_reports/sis_exporter.rb",
-      "line": 717,
+      "file": "app/models/sis_batch.rb",
+      "line": 281,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "GroupCategory.joins(\"LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id\\n                   AND group_categories.context_type = 'Course'\").joins(\"LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id\\n                   AND group_categories.context_type = 'Account'\").where(\"a.id IN (#{Account.sub_account_ids_recursive_sql(account.id)}) OR a.id=? OR EXISTS (?)\", account, CourseAccountAssociation.where(\"course_id=c.id\").where(:account_id => account))",
+      "code": "SisBatch.connection.select_value(\"UPDATE #{SisBatch.quoted_table_name} SET progress=#{val} WHERE id=#{id} RETURNING workflow_state\\n\".squish)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "AccountReports::SisExporter",
-        "method": "group_categories"
+        "class": "SisBatch",
+        "method": "fast_update_progress"
       },
-      "user_input": "Account.sub_account_ids_recursive_sql(account.id)",
-      "confidence": "High",
+      "user_input": "val",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "e8084034967915a4632d5b9349056626b64a9fe11b8d3866aad2bcb9b600b5d9",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/due_date_cacher.rb",
+      "line": 485,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.connection.execute(\"UPDATE #{Submission.quoted_table_name}\\n  SET\\n    cached_due_date = vals.due_date::timestamptz,\\n    grading_period_id = vals.grading_period_id::integer,\\n    workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (\\n      #{self.class.infer_submission_workflow_state_sql}\\n    )),\\n    anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),\\n    cached_quiz_lti = vals.cached_quiz_lti,\\n    updated_at = now() AT TIME ZONE 'UTC'\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  WHERE submissions.user_id = vals.student_id AND\\n        submissions.assignment_id = vals.assignment_id AND\\n        (\\n          (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR\\n          (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR\\n          (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),\\n            (#{self.class.infer_submission_workflow_state_sql})\\n          )) OR\\n          (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id)) OR\\n          (submissions.cached_quiz_lti IS DISTINCT FROM vals.cached_quiz_lti)\\n        );\\nINSERT INTO #{Submission.quoted_table_name}\\n  (assignment_id, user_id, workflow_state, created_at, updated_at, course_id,\\n  cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  SELECT\\n    assignments.id, vals.student_id, 'unsubmitted',\\n    now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',\\n    assignments.context_id, vals.due_date::timestamptz, vals.grading_period_id::integer,\\n    vals.anonymous_id,\\n    vals.cached_quiz_lti,\\n    vals.root_account_id\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  INNER JOIN #{Assignment.quoted_table_name} assignments\\n    ON assignments.id = vals.assignment_id\\n  LEFT OUTER JOIN #{Submission.quoted_table_name} submissions\\n    ON submissions.assignment_id = assignments.id\\n    AND submissions.user_id = vals.student_id\\n  WHERE submissions.id IS NULL;\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DueDateCacher",
+        "method": "perform_submission_upsert"
+      },
+      "user_input": "self.class.infer_submission_workflow_state_sql",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "ebd1e0364dd1ddaee4778f4a5febc04517ff68e46110191b79ccdad8be96ee69",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 1040,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"ALTER TABLE #{\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, order).to_sql.hash.abs.to_s(36)}\"[(-63..)]} ADD temp_primary_key SERIAL PRIMARY KEY\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, order).to_sql.hash.abs.to_s(36)}\"[(-63..)]",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "ec99a7da7f724717d99dc78a5912e54af9681b11832d9e305f3ccf78a9a62299",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 879,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.select_values(\"FETCH FORWARD #{of} FROM #{\"#{table_name}_in_batches_cursor_#{apply_limits(clone, start, finish, order).except(:select).select(primary_key).to_sql.hash.abs.to_s(36)}\"}\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "of",
+      "confidence": "Medium",
       "cwe_id": [
         89
       ],
@@ -1846,7 +1592,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "config/initializers/active_record.rb",
-      "line": 1563,
+      "line": 1590,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "connection.select_value(\"SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'\")",
       "render_path": null,
@@ -1886,69 +1632,145 @@
       "note": ""
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "f2fc169c8452accc4bc52f6844fdc66f6728daa4a4401b68a03cf94c606d7dea",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/sis_batch.rb",
-      "line": 279,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "SisBatch.connection.select_value(\"UPDATE #{SisBatch.quoted_table_name} SET progress=#{val} WHERE id=#{self.id} RETURNING workflow_state\\n\")",
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "f18c6627c65a531716401e8792725bca3c11c11129d387a2aa86074a6c409cd5",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/canvadoc_sessions_controller.rb",
+      "line": 152,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Attachment.find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"attachment_id\"]).canvadoc.session_url({ :preferred_plugins => ([\"pdfjs\", \"box_view\", \"crocodoc\"]), :enable_annotations => extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"enable_annotations\"], :use_cloudfront => true, :send_usage_metrics => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).account.feature_enabled?(:send_usage_metrics), :disable_annotation_notifications => ((extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"disable_annotation_notifications\"] or false)), :enrollment_type => ((extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"enrollment_type\"] or user_type(Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.context, ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id]))))), :canvas_base_url => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.course.root_account.domain, :user_id => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).id, :submission_user_ids => (if Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).group_id then\n  Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).group.users.pluck(:id)\nelse\n  [Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).user_id]\nend), :course_id => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.context_id, :assignment_id => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.id, :submission_id => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).id, :post_manually => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.post_manually?, :posted_at => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).posted_at, :assignment_name => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.name, :audit_url => submission_docviewer_audit_events_url(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]), :anonymous_instructor_annotations => ((true or false)), :annotation_context => extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"annotation_context\"], :read_only => ((not Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).canvadocs_annotation_contexts.find_by(:launch_id => extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"annotation_context\"]).grants_right?(((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])), :annotate))) }.merge((Canvadocs.user_session_params(((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])), :submission => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]), :attempt => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).canvadocs_annotation_contexts.find_by(:launch_id => extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"annotation_context\"]).submission_attempt) or Canvadocs.user_session_params(((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])), :attachment => Attachment.find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"attachment_id\"]))))))",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "SisBatch",
-        "method": "fast_update_progress"
+        "class": "CanvadocSessionsController",
+        "method": "show"
       },
-      "user_input": "val",
-      "confidence": "Medium",
+      "user_input": "Attachment.find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"attachment_id\"]).canvadoc.session_url({ :preferred_plugins => ([\"pdfjs\", \"box_view\", \"crocodoc\"]), :enable_annotations => extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"enable_annotations\"], :use_cloudfront => true, :send_usage_metrics => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).account.feature_enabled?(:send_usage_metrics), :disable_annotation_notifications => ((extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"disable_annotation_notifications\"] or false)), :enrollment_type => ((extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"enrollment_type\"] or user_type(Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.context, ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id]))))), :canvas_base_url => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.course.root_account.domain, :user_id => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).id, :submission_user_ids => (if Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).group_id then\n  Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).group.users.pluck(:id)\nelse\n  [Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).user_id]\nend), :course_id => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.context_id, :assignment_id => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.id, :submission_id => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).id, :post_manually => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.post_manually?, :posted_at => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).posted_at, :assignment_name => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).assignment.name, :audit_url => submission_docviewer_audit_events_url(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]), :anonymous_instructor_annotations => ((true or false)), :annotation_context => extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"annotation_context\"], :read_only => ((not Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).canvadocs_annotation_contexts.find_by(:launch_id => extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"annotation_context\"]).grants_right?(((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])), :annotate))) }.merge((Canvadocs.user_session_params(((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])), :submission => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]), :attempt => Submission.preload(:assignment).find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"submission_id\"]).canvadocs_annotation_contexts.find_by(:launch_id => extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"annotation_context\"]).submission_attempt) or Canvadocs.user_session_params(((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])), :attachment => Attachment.find(extract_blob(params[:hmac], params[:blob], \"user_id\" => ((((nil or PseudonymSession.find_with_validation.record) or Pseudonym.where(:id => (@policy_pseudonym_id)).first).user or nil) or api_find(User, session[:become_user_id])).global_id, \"type\" => \"canvadoc\")[\"attachment_id\"])))))",
+      "confidence": "High",
+      "cwe_id": [
+        601
+      ],
       "note": ""
     },
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "f376bb26f5f4a866aa2143116b7514c050c517143f442c55e4805c3be1649615",
+      "fingerprint": "f96846e71cf53aa7d47526eed20c2ca02e451bff985db00ef3e055729cafa938",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "app/models/developer_key_account_binding.rb",
-      "line": 73,
+      "file": "app/controllers/user_observees_controller.rb",
+      "line": 343,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "DeveloperKeyAccountBinding.joins(\"JOIN unnest('#{\"{#{account_ids.join(\",\")}}\"}'::int8[]) WITH ordinality AS i (id, ord) ON i.id=account_id\")",
+      "code": "UserAccountAssociation.joins(:account).where(:accounts => ({ :parent_account_id => nil })).where(:user_id => users.map(&:id)).group(:account_id).having(\"count(*) = #{users.map(&:id).length}\")",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "DeveloperKeyAccountBinding",
-        "method": "DeveloperKeyAccountBinding.find_in_account_priority"
+        "class": "UserObserveesController",
+        "method": "common_root_accounts_for"
       },
-      "user_input": "account_ids.join(\",\")",
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "f59b869b789f2caae26c23664cb7cbc2ef3fe560c29848a9ae1580b506f301af",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "gems/plugins/qti_exporter/lib/qti.rb",
-      "line": 33,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "`#{PYTHON_MIGRATION_EXECUTABLE} --version 2>&1`",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Qti",
-        "method": null
-      },
-      "user_input": "PYTHON_MIGRATION_EXECUTABLE",
+      "user_input": "users.map(&:id).length",
       "confidence": "Medium",
       "cwe_id": [
-        77
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "fb7c5e3bf261ced366e1de5d90ecd0b3410ce8ba46fc18b3e5062fce721175c4",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/base/active_support/cache/safe_redis_race_condition.rb",
+      "line": 49,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "lock(\"lock:#{key}\", options)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveSupport::Cache::SafeRedisRaceCondition",
+        "method": "handle_expired_entry"
+      },
+      "user_input": "key",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "fb7c5e3bf261ced366e1de5d90ecd0b3410ce8ba46fc18b3e5062fce721175c4",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/base/active_support/cache/safe_redis_race_condition.rb",
+      "line": 58,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "lock(\"lock:#{key}\", options)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveSupport::Cache::SafeRedisRaceCondition",
+        "method": "handle_expired_entry"
+      },
+      "user_input": "key",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Denial of Service",
+      "warning_code": 76,
+      "fingerprint": "fc7f2d79b7dc9e8e7ebbde4dedf94b1f749eb741946118259145b5843d75e98a",
+      "check_name": "RegexDoS",
+      "message": "Model attribute used in regular expression",
+      "file": "app/models/content_migration.rb",
+      "line": 599,
+      "link": "https://brakemanscanner.org/docs/warning_types/denial_of_service/",
+      "code": "/\\A#{(Folder.root_folders(context).first.name + \"/\")}/",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ContentMigration",
+        "method": "import_content"
+      },
+      "user_input": "(Folder.root_folders(context).first.name + \"/\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        20,
+        185
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "fe51dc8ef7eaef41744c62633219ae140f5a2df7c95adc6f7ef126e84860b034",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/gradebook_settings_controller.rb",
+      "line": 71,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:gradebook_settings).permit({ :filter_columns_by => ([:context_module_id, :grading_period_id, :assignment_group_id, :submissions, :start_date, :end_date]), :filter_rows_by => ([:section_id, :student_group_id]), :selected_view_options_filters => ([]) }, :enter_grades_as, :hide_assignment_group_totals, :hide_total, :show_concluded_enrollments, :show_inactive_enrollments, :show_unpublished_assignments, :show_separate_first_last_names, :student_column_display_as, :student_column_secondary_info, :sort_rows_by_column_id, :sort_rows_by_setting_key, :sort_rows_by_direction, :view_ungraded_as_zero, :colors => ([:late, :missing, :resubmitted, :dropped, :excused, :extended])).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradebookSettingsController",
+        "method": "gradebook_settings_params"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [
+        915
       ],
       "note": ""
     }
   ],
-  "updated": "2023-03-08 19:10:17 +0000",
-  "brakeman_version": "5.4.0"
+  "updated": "2023-04-10 12:20:28 -0500",
+  "brakeman_version": "5.4.1"
 }

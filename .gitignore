@@ -18,6 +18,7 @@
 /app/views/info/styleguide.html.erb
 /config/*.yml
 /config/credentials.yml.enc
+!/config/brakeman.yml
 !/config/credentials.test.yml
 !/config/crystalball.yml
 /config/environments/*-local.rb
