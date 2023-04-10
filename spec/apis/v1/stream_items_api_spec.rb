@@ -323,6 +323,8 @@ describe UsersController, type: :request do
     @sender = User.create!(name: "sender")
     @conversation = Conversation.initiate([@user, @sender], false)
     @message = @conversation.add_message(@sender, "hello")
+    # should use the conversation participant's read state for the conversation
+    read_state = @conversation.conversation_participants.find_by(user_id: @user).read?
 
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { controller: "users", action: "activity_stream", format: "json" }).first
@@ -330,7 +332,7 @@ describe UsersController, type: :request do
                          "id" => StreamItem.last.id,
                          "conversation_id" => @conversation.id,
                          "type" => "Conversation",
-                         "read_state" => StreamItemInstance.last.read?,
+                         "read_state" => read_state,
                          "created_at" => StreamItem.last.created_at.as_json,
                          "updated_at" => StreamItem.last.updated_at.as_json,
                          "title" => nil,
@@ -350,6 +352,57 @@ describe UsersController, type: :request do
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { controller: "users", action: "activity_stream", format: "json" }).first
     expect(json["latest_messages"]).to be_blank
+  end
+
+  it "uses the conversation participant's read state for the conversation" do
+    @sender = User.create!(name: "sender")
+    @conversation = Conversation.initiate([@user, @sender], false)
+    @message = @conversation.add_message(@sender, "hello")
+    conversation_participant = @conversation.conversation_participants.find_by(user_id: @user)
+
+    conversation_participant.update(workflow_state: "unread")
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { controller: "users", action: "activity_stream", format: "json" }).first
+    expect(json).to eq({
+                         "id" => StreamItem.last.id,
+                         "conversation_id" => @conversation.id,
+                         "type" => "Conversation",
+                         "read_state" => false,
+                         "created_at" => StreamItem.last.created_at.as_json,
+                         "updated_at" => StreamItem.last.updated_at.as_json,
+                         "title" => nil,
+                         "message" => nil,
+                         "private" => false,
+                         "html_url" => "http://www.example.com/conversations/#{@conversation.id}",
+                         "participant_count" => 2,
+                         "latest_messages" => [
+                           { "id" => @message.id, "created_at" => @message.created_at.as_json,
+                             "author_id" => @sender.id, "message" => "hello",
+                             "participating_user_ids" => [@user.id, @sender.id] }
+                         ]
+                       })
+
+    conversation_participant.update(workflow_state: "read")
+    json = api_call(:get, "/api/v1/users/activity_stream.json",
+                    { controller: "users", action: "activity_stream", format: "json" }).first
+    expect(json).to eq({
+                         "id" => StreamItem.last.id,
+                         "conversation_id" => @conversation.id,
+                         "type" => "Conversation",
+                         "read_state" => true,
+                         "created_at" => StreamItem.last.created_at.as_json,
+                         "updated_at" => StreamItem.last.updated_at.as_json,
+                         "title" => nil,
+                         "message" => nil,
+                         "private" => false,
+                         "html_url" => "http://www.example.com/conversations/#{@conversation.id}",
+                         "participant_count" => 2,
+                         "latest_messages" => [
+                           { "id" => @message.id, "created_at" => @message.created_at.as_json,
+                             "author_id" => @sender.id, "message" => "hello",
+                             "participating_user_ids" => [@user.id, @sender.id] }
+                         ]
+                       })
   end
 
   it "formats Message" do
