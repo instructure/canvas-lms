@@ -825,8 +825,6 @@ GEM
       term-ansicolor (~> 1.7)
       thor (>= 0.20, < 2.0)
     parallel (1.22.0)
-    parallel_tests (4.2.0)
-      parallel
     parser (3.2.0.0)
       ast (~> 2.4.1)
     parslet (2.0.0)
@@ -1323,7 +1321,6 @@ DEPENDENCIES
   pact_broker-client (~> 1.66)
   paginated_collection!
   parallel (= 1.22.0)
-  parallel_tests (~> 4.2)
   pdf-reader (= 2.5.0)
   pg (= 1.4.5)
   pg_query (= 2.2.0)
