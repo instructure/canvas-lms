@@ -5,11 +5,11 @@ require_relative "./linter"
 
 linter_options = {
   linter_name: "brakeman",
-  file_regex: /\.rb$/,
+  file_regex: %r{^config/brakeman.yml$|\.rb$},
   format: "brakeman",
-  command: "bundle exec brakeman --rails7 --quiet --format json --confidence-level 2 -i config/brakeman.ignore",
+  command: "bundle exec brakeman -c config/brakeman.yml --quiet --format json",
   append_files_to_command: false,
-  severe_anywhere: false
+  severe_anywhere: true
 }
 
 brakeman = Linter.new(linter_options)
