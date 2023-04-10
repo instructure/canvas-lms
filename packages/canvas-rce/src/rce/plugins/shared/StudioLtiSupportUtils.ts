@@ -17,6 +17,7 @@
  */
 
 import {bool, shape, InferType} from 'prop-types'
+import {EditorEvent, Events} from 'tinymce'
 
 /**
  * Interface for content item's 'custom' field, specifically for what is expected to come from Studio
@@ -84,5 +85,19 @@ export function parseStudioOptions(element: Element | null): ParsedStudioOptions
     resizable: tinymceIframeShim?.getAttribute('data-mce-p-data-studio-resizable') === 'true',
     convertibleToLink:
       tinymceIframeShim?.getAttribute('data-mce-p-data-studio-convertible-to-link') === 'true',
+  }
+}
+
+/**
+ * Tinymce adds an overlay when you click on an iframe inside the editor. It will by default
+ * add resize handles to the corners of the overlay. The code that adds these handles won't
+ * if the overlay has `data-mce-resize='false'` on it. Here, we force that behavior when the
+ * underlying iframe has a `data-studio-resizable='false'`
+ */
+export function handleBeforeObjectSelected(e: EditorEvent<Events.ObjectSelectedEvent>): void {
+  const targetElement = e.target as Element
+
+  if (targetElement.getAttribute('data-mce-p-data-studio-resizable') === 'false') {
+    targetElement.setAttribute('data-mce-resize', 'false')
   }
 }
