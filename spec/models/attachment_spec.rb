@@ -592,6 +592,28 @@ describe Attachment do
     end
   end
 
+  context "media_tracks_include_originals" do
+    before :once do
+      @course = course_factory
+      teacher_in_course
+      @media_object = media_object
+      attachment_model(filename: "foo.mp4", content_type: "video", media_entry_id: @media_object.media_id)
+    end
+
+    it "returns original media object media tracks" do
+      track = @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher)
+      expect(@attachment.media_tracks_include_originals).to include track
+    end
+
+    it "returns attachment media tracks if both attachment and media object have media tracks in the same locale" do
+      en_track = @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher)
+      fr_track = @media_object.media_tracks.create!(kind: "subtitles", locale: "fr", content: "fr subs", user_id: @teacher)
+      fra_track = @attachment.media_tracks.create!(kind: "subtitles", locale: "fr", content: "fr new", user_id: @teacher, media_object: @media_object)
+      expect(@attachment.media_tracks_include_originals).to match [en_track, fra_track]
+      expect(@attachment.media_tracks_include_originals).not_to include fr_track
+    end
+  end
+
   context "destroy" do
     let(:a) { attachment_model(uploaded_data: default_uploaded_data) }
 

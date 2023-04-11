@@ -80,6 +80,7 @@ class Attachment < ActiveRecord::Base
   has_one :account_report, inverse_of: :attachment
   has_one :group_and_membership_importer, inverse_of: :attachment
   has_one :media_object
+  belongs_to :media_object_by_media_id, class_name: "MediaObject", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :attachments_by_media_id
   has_many :media_tracks
   has_many :submission_draft_attachments, inverse_of: :attachment
   has_many :submissions, -> { active }
@@ -308,6 +309,11 @@ class Attachment < ActiveRecord::Base
     rescue IOError => e
       logger.error("Error inferring encoding for attachment #{global_id}: #{e.message}")
     end
+  end
+
+  def media_tracks_include_originals
+    media_object_scope = MediaObject.where(media_id: media_entry_id).select("media_objects.id")
+    media_tracks.union(MediaTrack.where(media_object: media_object_scope).where.not(locale: media_tracks.select(:locale)))
   end
 
   # this is here becase attachment_fu looks to make sure that parent_id is nil before it will create a thumbnail of something.
