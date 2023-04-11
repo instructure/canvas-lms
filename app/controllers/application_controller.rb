@@ -2542,7 +2542,7 @@ class ApplicationController < ActionController::Base
   # ensure that the bundle you are requiring isn't simply a dependency of some
   # other bundle.
   #
-  # Bundles are defined in ui/features/<bundle>.coffee
+  # Bundles are defined in ui/features/<bundle>.js
   #
   # usage: js_bundle :gradebook
   #
