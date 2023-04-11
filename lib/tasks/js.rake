@@ -25,7 +25,7 @@ namespace :js do
     # needed for post-installation steps (like wsrun)
     #
     #  see https://classic.yarnpkg.com/en/docs/cli/install#toc-yarn-install-production-true-false
-    yarnopts = "--frozen-lockfile --pure-lockfile --production=false"
+    yarnopts = "--frozen-lockfile --production=false"
 
     system "yarn install #{yarnopts} || yarn install #{yarnopts} --network-concurrency 1"
     unless $?.success?

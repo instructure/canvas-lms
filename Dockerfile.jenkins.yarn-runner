@@ -4,5 +4,5 @@ RUN --mount=type=bind,from=local/cache-helper,source=/tmp/dst,target=/cache-help
   tar --no-same-owner -xf /cache-helper/yarn-runner.tar -C ${APP_HOME}
 
 RUN set -eux; \
-  (DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile --network-concurrency 1) \
+  (DISABLE_POSTINSTALL=1 yarn install --ignore-optional || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --network-concurrency 1) \
   && yarn cache clean
