@@ -275,7 +275,7 @@ describe K5::UserService do
     it "caches the eligibility computation at the request level" do
       RequestCache.enable do
         service = K5::UserService.new(@student1, @root_account, nil)
-        expect(service).to receive(:currently_observing?).once
+        expect(service).to receive(:currently_observing?).twice # once for use_classic_font?; once for k5_user?
         service.send(:use_classic_font?)
         service.send(:use_classic_font?)
       end
@@ -294,6 +294,13 @@ describe K5::UserService do
       toggle_classic_font_setting(@root_account)
       service = K5::UserService.new(nil, @root_account, nil)
       expect(service.send(:use_classic_font?)).to be false
+    end
+
+    it "returns false if not a k5_user" do
+      toggle_classic_font_setting(@k5_account)
+      service = K5::UserService.new(@student1, @root_account, nil)
+      allow(service).to receive(:k5_user?).and_return(false)
+      expect(service.send(:use_classic_font?)).to eq false
     end
 
     it "returns false if the user is not associated with a classic font k5 account" do

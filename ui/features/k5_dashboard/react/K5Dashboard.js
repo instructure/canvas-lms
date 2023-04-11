@@ -225,8 +225,8 @@ const K5Dashboard = ({
   const handleChangeObservedUser = id => {
     if (id !== observedUserId) {
       fetchShowK5Dashboard(id)
-        .then(isK5User => {
-          if (isK5User) {
+        .then(response => {
+          if (response.show_k5_dashboard && response.use_classic_font === ENV.USE_CLASSIC_FONT) {
             updateDashboardForObserverCallback(id)
           } else {
             window.location.reload()

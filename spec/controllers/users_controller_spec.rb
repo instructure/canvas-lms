@@ -3071,5 +3071,12 @@ describe UsersController do
       get "show_k5_dashboard", format: "json"
       expect(json_parse["show_k5_dashboard"]).to be_truthy
     end
+
+    it "returns value of use_classic_font?" do
+      user_session(@user)
+      allow(controller).to receive(:use_classic_font?).and_return(false)
+      get "show_k5_dashboard", format: "json"
+      expect(json_parse["use_classic_font"]).to be_falsey
+    end
   end
 end
