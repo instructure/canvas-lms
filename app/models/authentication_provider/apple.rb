@@ -48,7 +48,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_params
-    super - open_id_connect_params
+    [*(super - open_id_connect_params), :login_attribute].freeze
   end
 
   def self.recognized_federated_attributes
