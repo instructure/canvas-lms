@@ -465,6 +465,7 @@ es-ES:
     titles: 
       configure_report: "Configurar el informe"
       open_registration_delegated_warning_dialog: "Un proveedor externo de identidad está activo"
+      rqd_help: "Restringir datos cuantitativos"
       what_are_quiz_ip_filters: "¿Qué son los filtros de IP para pruebas?"
   account_settings_fe083453: "Configuraciones de cuenta"
   account_sis_id_2e4a461: "Identificación del SIS de la cuenta"
@@ -1252,6 +1253,8 @@ es-ES:
         megabytes: megabytes
         megabytes_tooltip: megabytes
         update_button: Actualizar
+      rqd_help_message: "Cuando se selecciona esta opción, se restringe la visualización del usuario de los datos cuantitativos (numéricos) para las notas y se limitan las opciones de creación de actividades para los profesores. Los usuarios verán solo datos cualitativos como notas mediante letra y comentarios. El administrador puede personalizar aún más esta opción estableciendo los permisos para los roles de usuario."
+      rqd_screenreader: "Sobre restringir datos cuantitativos"
       select: 
         mfa: 
           disabled: Deshabilitado
@@ -1806,7 +1809,7 @@ es-ES:
       notas o comentarios de rúbrica no leídos en el documento
   adjusting_due_dates_a5918b9c: "Ajustando las fechas de entrega..."
   admin_4d3ba42f: Administrador
-  admin_analytics_description: "Si se habilita la opción, se visualizan las analíticas de administrador para mostrar resúmenes generales de las asignaturas y los estudiantes. Obtén más información y danos tu opinión apuntándote al *nuevo grupo de usuarios de analíticas* en la comunidad Canvas."
+  admin_analytics_description: "Habilita Analytics a nivel de la cuenta. Los cuadros de mando de administrador de Analytics proporcionan datos sobre el uso de Canvas, el grado de éxito del curso de Canvas y la participación de los estudiantes. Puedes obtener más información en el *centro del administrador de Analytics* en la comunidad Canvas."
   admin_analytics_eacba735: "Analíticas de administrador"
   admin_csv_f8d1b3eb: "Administrar CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Exportar administradores para varios períodos de evaluación"
@@ -3285,6 +3288,7 @@ es-ES:
       no_points: Ninguno
       no_submission: Nada
       points: Puntos
+      speed_grader: SpeedGrader™
       submission_types: "Tipos de archivo"
       submitting: Submitting
       turnitin: Turnitin
@@ -4453,6 +4457,7 @@ es-ES:
   canvas_files_889a274f: "Archivos Canvas"
   canvas_for_elementary_analytics_15dc1e07: "Análisis básicos de Canvas"
   canvas_for_elementary_e6f5a06f: "Canvas para escuela primaria"
+  canvas_for_elementary_font_selection_5d1f2271: "Selección de fuente para escuela primaria de Canvas"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas para escuela primaria: tiene varios anuncios en el aula"
   canvas_for_elementary_parent_support_74a2356e: "Canvas para escuela primaria: Ayuda para padres"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -4562,6 +4567,7 @@ es-ES:
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Marca para omitir añadir un usuario para %{loginid}"
   check_your_spelling_or_try_fewer_letters_70769a90: "Comprueba haberlo escrito correctamente o inténtalo con menos letras."
   checked_883b93fd: marcado
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Si seleccionas Añadir al calendario, se invitará a todos los miembros de la asignatura."
   cheerful_panda_holding_a_map_17ba47ee: "Un panda alegre sosteniendo un mapa"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "La subasignatura debe pertenecer a la misma cuenta principal que la asignatura principal"
   child_s_username_dde3aa9: "Nombre de usuario de tu hijo"
@@ -5657,8 +5663,8 @@ es-ES:
       indent: 
         ? "n"
         : 
-          one: "Añadir sangría 1 nivel"
-          other: "Añadir sangría %{count} niveles"
+          one: "Añadir sangría 1 nivel"
+          other: "Añadir sangría %{count} niveles"
           zero: "No colocar sangría"
       labels: 
         indent: Sangría
@@ -6795,6 +6801,7 @@ es-ES:
         open_enrollment: "Añadir un enlace para “Unirse a esta asignatura” a la página de inicio de la asignatura"
         pace_plans: "Pace Plans"
         participation_id: Participación
+        restrict_quantitative_data: "Opciones de datos cuantitativos"
         root_account: "Usuario principal"
         root_account_id: "Usuario principal"
         show_announcements_on_home_page: "Mostrar anuncios recientes en la página de inicio de la asignatura"
@@ -8336,6 +8343,7 @@ es-ES:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Habilita un mensaje rediseñado de estudiantes que... diálogo que permite enviar mensajes a los observadores, además de a los estudiantes."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Permite el acceso a la API pública de nuevos exámenes: API de los ítems del examen."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Permite el acceso a la API pública de nuevos exámenes mediante Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Habilita a los administradores para registrar herramientas de LTI mediante registro dinámico"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Habilita que se muestren los informes de plagio y las puntuaciones de similitud en la bandeja de entregas del nuevo libro de notas."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Habilita que se apliquen fechas importantes a las actividades, eventos de calendario y otros."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Habilita al modal avisar al usuario cuando un comentario del borrador se ha dejado sin publicar en SpeedGrader."
@@ -9865,6 +9873,7 @@ es-ES:
   grades_view_all_grades_8bf9f8d3: "Notas: ver todas las notas"
   grades_view_audit_trail_cc4c1fcc: "Notas: ver informe de auditoría"
   grades_view_change_logs_6bc1b959: "Notas: ver registros de cambios"
+  grades_view_quantitative_feedback_90a4ffc7: "Notas: ver el resultado cuantitativo"
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Las notas se han enviado correctamente al libro de notas."
   grades_will_be_hidden_by_default_any_grades_that_h_53a7fb03: "\n\
       \x20         Las notas se ocultarán de forma predeterminada. Todas las notas que ya se hayan publicado seguirán pudiéndose ver.\n\
@@ -10274,11 +10283,17 @@ es-ES:
   handle_pasting_of_files_especially_images_7c19b19c: "Gestionar el pegado de los archivos, especialmente las imágenes."
   handler_7912052f: Gestor
   has_been_automatically_selected_based_upon_where_t_61f805c5: "se ha seleccionado automáticamente en función del lugar en el que la instancia de Canvas de esta cuenta está ubicada. En algunos casos puede ser una región diferente."
+  has_no_submissions_2826a7a2: "No tiene entregas"
+  has_no_submissions_63de50ad: "No tiene entregas"
   has_not_submitted_2350bc24: "No se ha entregado"
   has_similarity_score_d5f332b4: "Tiene puntuación de similitud"
   has_submissions_6c12ef4c: "Tiene entregas"
+  has_submissions_ea8e609b: "Tiene entregas"
   has_syllabus_body_6f250277: has_syllabus_body
   has_ungraded_submissions_2bff87df: "Tiene entregas sin evaluar"
+  has_ungraded_submissions_b79f5803: "Tiene entregas sin evaluar"
+  has_unposted_grades_3567391e: "Tiene notas sin publicar"
+  has_unposted_grades_ba0e02b6: "Tiene notas sin publicar"
   have_a_question_about_canvas_ask_it_here_5781cce: "¿Tienes alguna pregunta sobre Canvas? Pregunta aquí."
   have_not_been_graded_df2a5fd2: "No se ha evaluado"
   have_not_yet_submitted_57e6a58b: "No se ha entregado todavía"
@@ -10773,6 +10788,7 @@ es-ES:
   if_this_setting_is_disabled_and_discussions_view_i_8a068652: "Si esta configuración está deshabilitada, y Foros de discusión: ver está habilitado, el usuario aún puede ajustar las configuraciones de bloqueo del contenido en foros de discusión individuales en una asignatura Blueprint principal."
   if_true_will_used_the_serialized_submission_for_su_f2bed2e0: "Si se cumple, se utilizará la entrega serializada para la submitted_at fecha"
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Si se habilita Usuarios: administrar detalles de inicio de sesión o Estadísticas: ver, el usuario podrá generar la actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar deshabilitados."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "Si vas a definir un límite para los miembros del grupo, tiene que ser mayor de 1."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Si modificas el número de puntos posibles de la actividad, deberás evaluarla de nuevo."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Si modificas el número de puntos posibles de la actividad, deberás evaluar de nuevo cualquier otra entrega."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Si no seleccionas los derechos de uso en este momento, se cancelará la publicación de este archivo después de cargarlo."
@@ -10944,6 +10960,7 @@ es-ES:
   individual_2033c005: Individual
   individual_assignment_grade_posting_d8322b99: "Publicación de la nota de una actividad individual"
   individual_gradebook_c7de9821: "Libro de notas individual..."
+  individual_gradebook_enhancements_de33aa3d: "Mejoras en el libro de notas individual"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "No se pueden modificar los valores de cálculo de la competencia individual."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "No se pueden modificar los puntos de dominio de la competencia individual."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Calificación individual de la competencia y opciones del método de cálculo"
@@ -11334,6 +11351,7 @@ es-ES:
     lock_module_until: "Bloquear hasta"
   language_6b3e2c7c: Idioma
   languages_835813f0: Idiomas
+  large_balsamiq_font_5fe45fae: "Fuente Balsamiq grande"
   large_course_db3d58b: "asignatura grande:"
   last_7_days_bd411f1f: "Últimos 7 días"
   last_activity_a983e541: "Última actividad"
@@ -11715,6 +11733,7 @@ es-ES:
   loading_features_d26820f6: "Cargando funcionalidades"
   loading_folders_d8b5869e: "Cargando carpetas"
   loading_gradebook_b0b75cd3: "Cargando libro de notas"
+  loading_gradebook_submissions_d2ba017f: "Cargando libro de notas entregado"
   loading_grades_446fc226: "Cargando notas…"
   loading_grades_for_coursename_26784c2d: "Cargando notas para %{courseName}"
   loading_grading_periods_c635d96: "Cargando períodos de evaluación..."
@@ -11928,6 +11947,7 @@ es-ES:
   lti_deep_linking_line_items_5e0079f7: "Ítems de línea de enlace profundo de LTI"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Ítems de la línea de enlace profundo de LTI en la página de edición de actividades."
   lti_delete_ee5f1bef: "LTI: eliminar"
+  lti_dynamic_registration_8592edb0: "Registro dinámico en LTI"
   lti_edit_83a27850: "LTI: editar"
   lti_key_14ad02b1: "Clave LTI"
   lti_launch_af082dc3: "Lanzamiento de LTI:"
@@ -14275,6 +14295,7 @@ es-ES:
   new_question_9107c469: "Nueva pregunta"
   new_question_group_d9306280: "Nuevo banco de preguntas"
   new_quiz_34aacba6: "Nueva prueba"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "La restauración del usuario eliminado en Nuevo examen está pendiente de revisión de su estado durante la inscripción"
   new_quiz_items_3c850331: "Nuevos ítems del examen"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Nueva cuenta de pruebas y bancos de ítems a nivel de la cuenta"
   new_quizzes_assignment_build_button_72b6531a: "Botón crear nueva actividad de prueba"
@@ -16498,6 +16519,7 @@ es-ES:
   qti_img_matching_question: "La pregunta importada correspondiente contiene imágenes en ambos lados. Esta opción no es compatible"
   qti_img_matching_question_distractors: "La pregunta importada correspondiente contiene imágenes dentro de las opciones y no se ha podido corregir porque también contiene distractores"
   qti_name: "Conversor de QTI"
+  quantitative_data_options_4f071510: "Opciones de datos cuantitativos"
   question_9121487: Pregunta
   question_answered: Contestado
   question_bank: 
@@ -17844,6 +17866,7 @@ es-ES:
         email: "Correo electrónico"
         name: Nombre
   registration_url_60e0eaaa: "URL de registro"
+  regular_lato_font_7f3cf24c: "Fuente Lato normal"
   regular_style_checkbox_ee3d71c1: "Casilla de verificación estilo regular"
   reinforce_student_understanding_304d18a6: "Refuerza la comprensión de los estudiantes"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Relájate y tómate un descanso. Todavía no hay nada que hacer."
@@ -19702,6 +19725,13 @@ es-ES:
       aria_stop: "Haga clic en “Detener” para finalizar la grabación."
     edit_view_rubric: "Ver rúbrica"
     group: Grupo
+    late_input: 
+      days: 
+        one: Día
+        other: Días
+      hours: 
+        one: Hora
+        other: Horas
     mic_blocked_message: "El permiso para usar el micrófono está bloqueado. Para realizar cambios, visita chrome://settings/content/microphone"
     no_submission_time: "ningún tiempo de entrega"
     nodetect_message: "No se ha detectado ninguna voz. Quizás debas ajustar las configuraciones de tu micrófono."
@@ -21046,6 +21076,7 @@ es-ES:
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       Esta marca de funcionalidad permite utilizar la página actualizada
       para crear/editar foros de discusión
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Esta característica introduce mejoras de rendimiento y mantenimiento en el libro de notas individual"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Esta funcionalidad hace que cuando se envían varios archivos juntos mediante
       una herramienta de terceros a través de la API del servicio de actividades y calificaciones, se
@@ -21825,6 +21856,10 @@ es-ES:
   totals_be24703: Totales
   track_student_performance_and_activity_a92a2a8b: "Monitorizar el rendimiento y la actividad del estudiante"
   transferred_student_enrollments_90dc27d3: "Inscripciones del estudiante transferidas"
+  transform_rce_content_on_load_1f521086: "Transformar el contenido del editor de contenido enriquecido durante la carga"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Transforma las URL absolutas en relativas y elimina los atributos extraños del contenido del editor de contenido enriquecido durante la carga.
+      Es una opción necesaria para que el editor de contenido enriquecido funcione completamente en Nuevos exámenes.
   travel_places_f461329c: "Viajes y lugares"
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad y Tobago (+1)"
   trophy: 
@@ -22747,6 +22782,8 @@ es-ES:
       resubmit_to_vericite: "Reenviar a VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite puntuación de similitud: más información"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Puntuación de similitud: consultar el informe detallado."
+  verify_ldap_tls_certificates_70241d8e: "Verificar los certificados TLS en LDAP"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Verificar los certificados TLS presentados por los proveedores de autentificación LDAP."
   version_versionnumber_updatedat_9f5b7a5b: "Versión %{versionNumber} %{updatedAt}"
   video_78335c71: vídeo
   video_b9f27375: Vídeo
@@ -22984,6 +23021,7 @@ es-ES:
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "Cuando se publiquen las notas de las actividades anónimas, las notas se publicarán para todos los integrantes de la asignatura. Se eliminará el anonimato."
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: "Cuando la ejecución del alcance se deshabilite, los autentificadores tendrán acceso a todos los puntos finales para el usuario autorizado."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Cuando se selecciona, la sección de la asignatura se encuentra en un estado de solo lectura fuera de estas fechas."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Si se activa esta opción, se determina si el estado del flujo de trabajo de un examen nuevo debe establecerse como evaluado o pending_review si el usuario tenía un nuevo examen pending_review anterior, pero se ha vuelto a inscribir en la asignatura."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Cuando se habilita este aviso, la navegación de la asignatura seguirá colapsada o expandida
       cuando se navegue entre páginas en función de cómo la estableció el usuario, en vez
