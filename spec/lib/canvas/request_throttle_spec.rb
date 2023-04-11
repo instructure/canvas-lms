@@ -43,6 +43,8 @@ describe RequestThrottle do
     [200, { "Content-Type" => "text/plain" }, ["Hello"]]
   end
 
+  before { RequestThrottle.reload! }
+
   after { RequestThrottle.reload! }
 
   def strip_variable_headers(response)
