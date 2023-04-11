@@ -465,6 +465,7 @@ th:
     titles: 
       configure_report: กำหนดค่ารายงาน
       open_registration_delegated_warning_dialog: เปิดใช้งานผู้ให้บริการระบุตัวตนจากภายนอกแล้ว
+      rqd_help: จำกัดข้อมูลเชิงปริมาณ
       what_are_quiz_ip_filters: "ตัวกรอง IP แบบทดสอบคืออะไร"
   account_settings_fe083453: ค่าทางบัญชี
   account_sis_id_2e4a461: "SIS ID บัญชี"
@@ -1252,6 +1253,8 @@ th:
         megabytes: เมกะไบต์
         megabytes_tooltip: เมกะไบต์
         update_button: อัพเดต
+      rqd_help_message: "หลังจากเลือก ค่านี้จะจำกัดผู้ใช้ในการดูข้อมูลเกรดเชิงปริมาณ (ตัวเลข) และจำกัดตัวเลือกในการจัดทำภารกิจสำหรับผู้สอน ผู้ใช้จะเห็นเฉพาะข้อมูลเชิงปริมาณ ซึ่งประกอบไปด้วยเกรดและความเห็นที่เป็นตัวอักษร ผู้ดูแลสามารถปรับค่าปรับตั้งเพิ่มเติมโดยการแก้ไขสิทธิอนุญาตสำหรับบทบาทผู้ใช้"
+      rqd_screenreader: เกี่ยวกับการจำกัดข้อมูลเชิงปริมาณ
       select: 
         mfa: 
           disabled: ปิดใช้งานแล้ว
@@ -1804,7 +1807,7 @@ th:
       เอกสารที่ยังไม่ได้อ่านหรือความเห็นเกี่ยวกับเกณฑ์การให้คะแนนที่มีอยู่
   adjusting_due_dates_a5918b9c: การปรับวันครบกำหนด...
   admin_4d3ba42f: ผู้ดูแลระบบ
-  admin_analytics_description: "กำลังเปิดใช้งานการแสดงข้อมูลวิเคราะห์ของผู้ดูแลระบบเพื่อแสดงรายละเอียดเบื้องต้นเกี่ยวกับบทเรียนและผู้เรียน เรียนรู้เพิ่มเติมและให้ข้อเสนอแนะโดยเข้าร่วม*กลุ่มผู้ใช้ข้อมูลวิเคราะห์ใหม่*ในกลุ่มของ Canvas"
+  admin_analytics_description: "เปิดใช้งานข้อมูลวิเคราะห์ (Analytics) ในระดับบัญชีผู้ใช้ แผงข้อมูลวิเคราะห์สำหรับผู้ดูแลระบบ (Admin Analytics) ระบุรายละเอียดการใช้งาน Canvas ผลสัมฤทธิ์ของบทเรียน Canvas และการมีส่วนร่วมของผู้เรียน ดูรายละเอียดเพิ่มเติมเกี่ยวกับ *ศูนย์ข้อมูลวิเคราะห์สำหรับผู้ดูแลระบบ (Admin Analytics Hub)* จากกลุ่มใน Canvas"
   admin_analytics_eacba735: ข้อมูลวิเคราะห์ของผู้ดูแลระบบ
   admin_csv_f8d1b3eb: "CSV ผู้ดูแลระบบ"
   admin_export_for_multiple_grading_periods_8a0c5ac1: การส่งออกของผู้ดูแลระบบสำหรับระยะเวลาการให้เกรดแบบหลายช่วง
@@ -3246,6 +3249,7 @@ th:
       no_points: ไม่มี
       no_submission: ไม่มีอะไร
       points: คะแนน
+      speed_grader: SpeedGrader™
       submission_types: ประเภทไฟล์
       submitting: กำลังจัดส่ง
       turnitin: Turnitin
@@ -4414,6 +4418,7 @@ th:
   canvas_files_889a274f: "ไฟล์ Canvas"
   canvas_for_elementary_analytics_15dc1e07: "ข้อมูลวิเคราะห์สำหรับ Canvas ระดับประถม"
   canvas_for_elementary_e6f5a06f: "Canvas ระดับประถม"
+  canvas_for_elementary_font_selection_5d1f2271: "การเลือกแบบอักษรสำหรับ Canvas ระดับประถม"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas ระดับประถม: มีประกาศหลายอย่างในโฮมรูม"
   canvas_for_elementary_parent_support_74a2356e: "Canvas ระดับประถม: การสนับสนุนจากพ่อแม่ผู้ปกครอง"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -4523,6 +4528,7 @@ th:
   check_to_skip_adding_a_user_for_loginid_5fa643da: "ทำเครื่องหมายเพื่อข้ามการเพิ่มผู้ใช้สำหรับ %{loginid}"
   check_your_spelling_or_try_fewer_letters_70769a90: ตรวจสอบตัวสะกดหรือลองลดจำนวนอักขระลง
   checked_883b93fd: ตรวจสอบแล้ว
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "การเลือก เพิ่มไปยังปฏิทิน (Add to Calendar) จะเป็นการเชิญสมาชิกในบทเรียนทั้งหมด"
   cheerful_panda_holding_a_map_17ba47ee: แพนด้าอารมณ์ดีกำลังถือแผนที่
   child_course_must_belong_to_the_same_root_account__66ed7b8e: บทเรียนเชื่อมโยงจะต้องเป็นของบัญชีรากเดียวกับบทเรียนหลัก
   child_s_username_dde3aa9: ชื่อผู้ใช้ของผู้เยาว์
@@ -6746,6 +6752,7 @@ th:
         open_enrollment: "เพิ่มลิงค์ “เข้าร่วมบทเรียนนี้” ไปยังหน้าหลักบทเรียน"
         pace_plans: "Pace Plans"
         participation_id: การเข้าร่วม
+        restrict_quantitative_data: ตัวเลือกข้อมูลเชิงปริมาณ
         root_account: บัญชีราก
         root_account_id: บัญชีราก
         show_announcements_on_home_page: แสดงประกาศล่าสุดในหน้าหลักบทเรียน
@@ -8264,6 +8271,7 @@ th:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "เปิดใช้งาน ส่งข้อความถึงผู้เรียนที่... รูปแบบใหม่เพื่อให้สามารถส่งข้อความถึงผู้สังเกตการณ์นอกเหนือจากผู้เรียน"
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "เปิดใช้งานสิทธิ์สืบค้น API สาธารณะสำหรับแบบทดสอบใหม่ (New Quizzes Public API) API รายการแบบทดสอบ"
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "เปิดใช้งานสิทธิ์สืบค้น API สาธารณะสำหรับแบบทดสอบใหม่ (New Quizzes Public API) ผ่าน Canvas"
+  enables_administrators_to_register_lti_tools_with__b16d560f: "เปิดใช้งานสิทธิ์ผู้ดูแลระบบเพื่อลงทะเบียนเครื่องมือ LTI ที่สามารถลงทะเบียนแบบไดนามิค (Dynamic Registration)"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: เปิดใช้งานการจัดแสดงรายงานการคัดลอกผลงานคะแนนความใกล้เคียงในถาดรายการจัดส่งสมุดบันทึกเกรดใหม่
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "เปิดใช้งานวันที่สำคัญที่จะปรับใช้กับภารกิจ กิจกรรมในปฏิทินและรายการอื่น ๆ"
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "เปิดใช้งานรูปแบบเพื่อเตือนผู้ใช้เมื่อความเห็นฉบับร่างไม่ได้ถูกโพสต์ใน SpeedGrader"
@@ -9791,6 +9799,7 @@ th:
   grades_view_all_grades_8bf9f8d3: "เกรด - ดูเกรดทั้งหมด"
   grades_view_audit_trail_cc4c1fcc: "เกรด - ดูเส้นทางการตรวจสอบ"
   grades_view_change_logs_6bc1b959: "เกรด - ดูบันทึกประวัติการเปลี่ยนแปลง"
+  grades_view_quantitative_feedback_90a4ffc7: "เกรด - ดูผลตอบรับเชิงปริมาณ"
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: เผยแพร่เกรดเสร็จสิ้นไปยังสมุดบันทึกเกรด
   grades_will_be_hidden_by_default_any_grades_that_h_53a7fb03: "\n\
       \x20         เกรดจะถูกซ่อนเป็นค่าเริ่มต้น เกรดที่ถูกโพสต์แล้วจะยังคงแสดงผลอยู่\n\
@@ -10198,11 +10207,17 @@ th:
   handle_pasting_of_files_especially_images_7c19b19c: "จัดการการวางไฟล์ โดยเฉพาะภาพ"
   handler_7912052f: ชุดคำสั่ง
   has_been_automatically_selected_based_upon_where_t_61f805c5: "ถูกเลือกอัตโนมัติตามตำแหน่งของส่วนทำรายการใน Canvas ของบัญชีผู้ใช้ ในบางกรณีอาจเป็นพื้นที่อื่น"
+  has_no_submissions_2826a7a2: ไม่มีผลงานจัดส่ง
+  has_no_submissions_63de50ad: ไม่มีผลงานจัดส่ง
   has_not_submitted_2350bc24: ยังไม่ได้จัดส่ง
   has_similarity_score_d5f332b4: มีคะแนนความใกล้เคียง
   has_submissions_6c12ef4c: มีผลงานจัดส่ง
+  has_submissions_ea8e609b: มีผลงานจัดส่ง
   has_syllabus_body_6f250277: has_syllabus_body
   has_ungraded_submissions_2bff87df: มีผลงานจัดส่งที่ไม่ได้ให้เกรด
+  has_ungraded_submissions_b79f5803: มีผลงานจัดส่งที่ไม่ได้ให้เกรด
+  has_unposted_grades_3567391e: มีเกรดที่ยังไม่ได้เผยแพร่
+  has_unposted_grades_ba0e02b6: มีเกรดที่ยังไม่ได้เผยแพร่
   have_a_question_about_canvas_ask_it_here_5781cce: "มีคำถามเกี่ยวกับ Canvas หรือไม่ สอบถามได้ที่นี่"
   have_not_been_graded_df2a5fd2: ยังไม่ได้ให้เกรด
   have_not_yet_submitted_57e6a58b: ยังไม่ได้จัดส่ง
@@ -10694,6 +10709,7 @@ th:
   if_this_setting_is_disabled_and_discussions_view_i_8a068652: "หากปิดการตั้งค่านี้ไว้ และเปิดใช้งาน การพูดคุย - ดู ไว้ ผู้ใช้ยังสามารถปรับค่าปรับตั้งการล็อคเนื้อหาในส่วนการพูดคุยแยกเฉพาะได้จากบทเรียนหลักที่เป็นพิมพ์เขียว"
   if_true_will_used_the_serialized_submission_for_su_f2bed2e0: "หากเป็นจริง ผลงานจัดส่งแบบเรียงลำดับจะถูกใช้สำหรับวันที่ submitted_at"
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "หากเปิดใช้งาน ผู้ใช้ - จัดการรายละเอียดล็อกอิน หรือ สถิติ - ดู ไว้ ผู้ใช้จะสามารถจัดทำรายการล็อกอิน/ล็อกเอาท์ได้จาก เครื่องมือดูแลระบบ ซ่อนตัวเลือกในการล็อกอิน/ล็อกเอาท์ใน เครื่องมือสำหรับผู้ดูแลระบบ โดยจะต้องปิดใช้งานสิทธิ์อนุญาตทั้งสองอย่างนี้ไว้"
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "หากคุณต้องการระบุรายละเอียดสมาชิกในกลุ่มแบบจำกัด ค่าจะต้องมากกว่า 1"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "หากต้องการปรับคะแนนภารกิจ คุณจะต้องปรับเกรดภารกิจดังกล่าว"
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "หากต้องการแก้ไขคะแนนภารกิจ คุณจะต้องปรับเกรดผลงานจัดส่งต่าง ๆ"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "หากคุณไม่เลือกสิทธิ์การใช้งาน ไฟล์นี้จะถูกเลิกเผยแพร่หลังจากอัพโหลดแล้ว"
@@ -10864,6 +10880,7 @@ th:
   individual_2033c005: รายบุคคล
   individual_assignment_grade_posting_d8322b99: การแจ้งเกรดภารกิจแยกเฉพาะ
   individual_gradebook_c7de9821: สมุดบันทึกเกรดแยกเฉพาะ
+  individual_gradebook_enhancements_de33aa3d: การปรับปรุงสมุดบันทึกเกรดแยกเฉพาะ
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: ไม่สามารถแก้ไขค่าการคำนวณผลลัพธ์แยกเฉพาะได้
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: ไม่สามารถแก้ไขคะแนนความเชี่ยวชาญสำหรับผลลัพธ์แยกเฉพาะได้
   individual_outcome_rating_and_calculation_method_o_f0eae85f: คะแนนผลลัพธ์แยกเฉพาะและตัวเลือกวิธีการคำนวณ
@@ -11253,6 +11270,7 @@ th:
     lock_module_until: ล็อคจนถึง
   language_6b3e2c7c: ภาษา
   languages_835813f0: ภาษา
+  large_balsamiq_font_5fe45fae: แบบอักษรบาลซามิคขนาดใหญ่
   large_course_db3d58b: "บทเรียนขนาดใหญ่:"
   last_7_days_bd411f1f: "7 วันที่ผ่านมา"
   last_activity_a983e541: กิจกรรมล่าสุด
@@ -11633,6 +11651,7 @@ th:
   loading_features_d26820f6: กำลังโหลดคุณสมบัติ
   loading_folders_d8b5869e: กำลังโหลดโฟลเดอร์
   loading_gradebook_b0b75cd3: กำลังโหลดสมุดบันทึกเกรด
+  loading_gradebook_submissions_d2ba017f: กำลังโหลดผลงานจัดส่งสมุดบันทึกเกรด
   loading_grades_446fc226: กำลังโหลดเกรด...
   loading_grades_for_coursename_26784c2d: "กำลังโหลดเกรดสำหรับ %{courseName}"
   loading_grading_periods_c635d96: กำลังโหลดระยะเวลาการให้เกรด...
@@ -11845,6 +11864,7 @@ th:
   lti_deep_linking_line_items_5e0079f7: "รายการบรรทัด LTI แบบ Deep Linking"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "รายการบรรทัด LTI แบบ Deep Linking (LTI Deep Linking Line Item) ในหน้าแก้ไขภารกิจ (Assignment)"
   lti_delete_ee5f1bef: "LTI - ลบ"
+  lti_dynamic_registration_8592edb0: "การลงทะเบียน LTI แบบไดนามิค"
   lti_edit_83a27850: "LTI - แก้ไข"
   lti_key_14ad02b1: "คีย์ LTI"
   lti_launch_af082dc3: "เรียกใช้ LTI:"
@@ -14192,6 +14212,7 @@ th:
   new_question_9107c469: คำถามใหม่
   new_question_group_d9306280: กลุ่มคำถามใหม่
   new_quiz_34aacba6: แบบทดสอบใหม่
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "แบบทดสอบใหม่ ผู้ใช้ที่ถูกลบ รอการกู้คืน พิจารณาสถานะการลงทะเบียน"
   new_quiz_items_3c850331: รายการแบบทดสอบใหม่
   new_quizzes_account_and_course_level_item_banks_9152fb1: บัญชีแบบทดสอบและแถวรายการระดับบทเรียนใหม่
   new_quizzes_assignment_build_button_72b6531a: ปุ่มจัดทำภารกิจใหม่สำหรับแบบทดสอบ
@@ -16407,6 +16428,7 @@ th:
   qti_img_matching_question: "คำถามเทียบเคียงที่นำเข้ามีภาพทั้งสองด้าน ซึ่งไม่รองรับ"
   qti_img_matching_question_distractors: "คำถามเทียบเคียงที่นำเข้ามีภาพภายในตัวเลือก และไม่สามารถแก้ไขได้เนื่องจากมีตัวลวงด้วย"
   qti_name: "ตัวแปลง QTI"
+  quantitative_data_options_4f071510: ตัวเลือกข้อมูลเชิงปริมาณ
   question_9121487: คำถาม
   question_answered: ตอบแล้ว
   question_bank: 
@@ -17752,6 +17774,7 @@ th:
         email: อีเมล
         name: ชื่อ
   registration_url_60e0eaaa: "URL การลงทะเบียน"
+  regular_lato_font_7f3cf24c: แบบอักษรลาโต้แบบปกติ
   regular_style_checkbox_ee3d71c1: ช่องทำเครื่องหมายรูปแบบทั่วไป
   reinforce_student_understanding_304d18a6: ส่งเสริมความเข้าใจของผู้เรียน
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "อย่าเครียด พักสักครู่ ยังไม่มีอะไรให้ทำ"
@@ -19609,6 +19632,13 @@ th:
       aria_stop: "กด “หยุด” เพื่อสิ้นสุดการบันทึก"
     edit_view_rubric: ดูเกณฑ์การให้คะแนน
     group: กลุ่ม
+    late_input: 
+      days: 
+        one: วัน
+        other: วัน
+      hours: 
+        one: ชั่วโมง
+        other: ชั่วโมง
     mic_blocked_message: "สิทธิ์อนุญาตสำหรับใช้ไมโครโฟนถูกบล็อคไว้ แก้ไขโดยไปที่ chrome://settings/content/microphone"
     no_submission_time: ไม่มีเวลาสำหรับผลงานจัดส่ง
     nodetect_message: "ไม่พบคำพูดใด ๆ คุณอาจต้องปรับค่าปรับตั้งไมโครโฟนของคุณ"
@@ -20940,6 +20970,7 @@ th:
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       หมายเหตุกำกับคุณสมบัตินี้จะช่วยให้สามารถใช้ฟังก์ชั่น
       จัดทำส่วนการพูดคุย/แก้ไขเพจเวอร์ชั่นอัพเดต
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "คุณสมบัตินี้ประกอบไปด้วยส่วนการปรับปรุงประสิทธิภาพในการใช้งานและการดูแลรักษาสำหรับสมุดบันทึกเกรด (Gradebook) แยกรายการ"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       คุณสมบัตินี้มีไว้เพื่อเวลาที่มีการจัดส่งหลาย ๆ ไฟล์พร้อมกันผ่าน
       เครื่องมือจากภายนอกโดยใช้ API ภารกิจและบริการเกี่ยวกับเกรดจะมี
@@ -21699,6 +21730,10 @@ th:
   traditional_gradebook_d7ad59c6: สมุดบันทึกเกรดแบบดั้งเดิม...
   traditional_gradebook_d90461dc: สมุดบันทึกเกรดแบบดั้งเดิม
   transferred_student_enrollments_90dc27d3: การลงทะเบียนของผู้เรียนที่โอน
+  transform_rce_content_on_load_1f521086: "ปรับเปลี่ยนเนื้อหา RCE เมื่อโหลด"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      ปรับเปลี่ยน URL สัมบูรณ์เป็น RUL สัมพัทธ์และลบคุณลักษณะส่วนเกินจากเนื้อหา RCE เมื่อโหลด
+      จำเป็นเพื่อให้ RCE ทำงานได้อย่างสมบูรณ์แบบในแบบทดสอบใหม่ (New Quizzes)
   travel_places_f461329c: การเดินทางและสถานที่
   trinidad_and_tobago_1_fc2d8d1c: "ตรินิแดดและโตเบโก (+1)"
   truncated_56b1a661: ตัดทอนแล้ว
@@ -22565,6 +22600,8 @@ th:
       resubmit_to_vericite: "จัดส่งไปยัง VeriCite ใหม่"
   vericite_similarity_score_more_information_7df9ea5c: "คะแนนความใกล้เคียง VeriCite -- ข้อมูลเพิ่มเติม"
   vericite_similarity_score_see_detailed_report_390ab687: "คะแนนความใกล้เคียง VeriCite - ดูรายงานอย่างละเอียด"
+  verify_ldap_tls_certificates_70241d8e: "ตรวจสอบเอกสารรับรอง LDAP TLS"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "ตรวจสอบเอกสารรับรอง TLS ที่นำเสนอโดยผู้ให้บริการตรวจรับรอง LDAP"
   version_versionnumber_updatedat_9f5b7a5b: "เวอร์ชั่น %{versionNumber} %{updatedAt}"
   video_78335c71: วีดีโอ
   video_b9f27375: วิดีโอ
@@ -22800,6 +22837,7 @@ th:
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "ขณะแจ้งเกรดสำหรับภารกิจที่ไม่เปิดเผยตัว เกรดจะถูกแจ้งสำหรับทุกคนในบทเรียน ค่าการไม่เปิดเผยตัวตนจะถูกยกเลิก"
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: "หากปิดใช้งานการกำหนดขอบเขตไว้ ชุดข้อมูลจะสามารถเข้าถึงปลายทางทั้งหมดสำหรับผู้ใช้ที่ให้อนุญาต"
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "เมื่อเลือก กลุ่มย่อยบทเรียนจะอยู่ในสถานะอ่านอย่างเดียวภายนอกกรอบวันที่เหล่านี้"
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "เมื่อมีการกำหนดค่า จะมีการพิจารณาว่าสถานะกระบวนงานของแบบทดสอบใหม่ควรกำหนดเป็นให้เกรดแล้วหรือ pending_review หากผู้ใช้เคยมีแบบทดสอบใหม่ pending_review แต่ถูกลบทะเบียนเข้าสู่บทเรียนใหม่"
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       หากเปิดใช้งานหมายเหตุกำกับนี้ไว้ ส่วนการสืบค้นเนื้อหาบทเรียนจะถูกย่อหรือขยายค้างตามเดิม
       เมื่อสืบค้นเนื้อหาระหว่างเพจต่าง ๆ ขึ้นอยู่กับการปรับตั้งครั้งล่าสุดโดยผู้ใช้ แทน
