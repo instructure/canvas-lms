@@ -638,6 +638,7 @@ ja:
     titles: 
       configure_report: レポートの設定
       open_registration_delegated_warning_dialog: "外部 ID プロバイダーが有効です"
+      rqd_help: 定量的なデータを制限する
       what_are_quiz_ip_filters: "小テスト IP フィルタとは何ですか?"
     user: ユーザ
   account_settings_fe083453: アカウント設定
@@ -1626,6 +1627,8 @@ ja:
         update_button: 更新
       report_last_run_never: 一切なし
       report_running: レポートを実行しています。*完了すると、電子メールが送信されます。*
+      rqd_help_message: この設定を選択すると、ユーザーによる定量的（数値）評定データの閲覧が制限され、教員による課題作成オプションが制限されます。ユーザーは、文字による評定とコメントを含む質的データのみを見ることができます。管理者は、ユーザーロールの権限を調整することで、この設定をさらにカスタマイズすることができます。
+      rqd_screenreader: 量的データの制限について
       select: 
         mfa: 
           disabled: 無効
@@ -2269,7 +2272,7 @@ ja:
   adjust_final_grade_fa45e7e0: 最終成績を調整する
   adjusting_due_dates_a5918b9c: 期限日を調整中...
   admin_4d3ba42f: 管理者
-  admin_analytics_description: "有効にすると、Admin Analyticsが表示され、コースと受講者の概要が表示されます。詳細については、Canvasコミュニティの*New Analyticsユーザーグループ*に参加して、フィードバックしてください。"
+  admin_analytics_description: アカウントレベルで「分析」を有効にします。「アドミ分析」ダッシュボードは、Canvasの使用状況、Canvasコースの成功、および受講者のエンゲージメントに関する詳細を提供しています。詳しくは、Canvasコミュニティの*アドミ分析ハブ*でご確認ください。
   admin_analytics_eacba735: "Admin Analytics（管理者向けアナリティクス）"
   admin_csv_f8d1b3eb: "管理 CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: 複数の採点期間の管理者エクスポート
@@ -4457,6 +4460,7 @@ ja:
       no_points: なし
       no_submission: なし
       points: 点数
+      speed_grader: SpeedGrader™
       submission_types: "ファイル タイプ"
       submitting: 提出しています
       turnitin: Turnitin
@@ -5997,6 +6001,7 @@ ja:
   canvas_for_elementary_analytics_15dc1e07: "エレメンタリーアナリティクス用 Canvas"
   canvas_for_elementary_beta_28bc5181: エレメンタリー用キャンバス（ベータ版）
   canvas_for_elementary_e6f5a06f: 初級用Canvas
+  canvas_for_elementary_font_selection_5d1f2271: "Canvas for Elementary フォントの選択"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "初級用Canvas: ホームルームでの多数のアナウンス"
   canvas_for_elementary_parent_support_74a2356e: "初級用Canvas:保護者サポート"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -6134,6 +6139,7 @@ ja:
   check_your_spelling_or_try_fewer_letters_70769a90: スペルを確認するか、文字数を減らしてみてください。
   checkbox_examples_dc790142: チェックボックスの例
   checked_883b93fd: チェック済み
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: 「カレンダーに追加」をチェックすると、すべてのコースメンバーが招待されます。
   cheerful_panda_holding_a_map_17ba47ee: 地図を持つ元気なパンダ
   child_course_must_belong_to_the_same_root_account__66ed7b8e: チャイルドコースは、マスターコースト同じルートアカウントに属さなければなりません
   child_s_username_dde3aa9: 子どものユーザ名
@@ -8912,6 +8918,7 @@ ja:
         participation_id: 参加
         public_syllabus: このコースのシラバスを一般公開する
         restrict_enrollments_to_course_dates: 受講者は、これらの日付の間だけコースに参加することができます
+        restrict_quantitative_data: 定量データオプション
         restrict_student_future_view: 開始日の前に受講生がこのコースを閲覧することを制限する
         restrict_student_past_view: 終了日の後に受講生のこのコースを閲覧することを制限する
         root_account: "ルート アカウント"
@@ -11029,6 +11036,7 @@ ja:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: 再設計された「次のような受講者にメッセージを送信する...」ダイアログを有効にして、受講者に加えてオブザーバーにもメッセージを送信することができるようになりました。
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: 新規小テストパブリックAPIへのアクセスを可能にします。小テスト項目API。
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: Canvasから新規小テストパブリックAPIにアクセスできるようにします。
+  enables_administrators_to_register_lti_tools_with__b16d560f: "管理者がLTIツールをDynamic Registrationで登録できるようにする"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: 新しい評定表提出トレイで、盗作レポートと類似性スコアの表示を有効にします。
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: 重要な日付を割り当てて、カレンダーイベントなどに適用できるようにします。
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: SpeedGrader　でドラフトコメントが未投稿のままになっている場合、ユーザーに警告するモーダルを有効にします。
@@ -13390,6 +13398,7 @@ ja:
   grades_view_audit_trail_cc4c1fcc: "評定 - 監査記録を表示"
   grades_view_audit_trail_db7364b1: "成績 - 監査記録を表示"
   grades_view_change_logs_6bc1b959: "評定 - 変更履歴を表示"
+  grades_view_quantitative_feedback_90a4ffc7: 成績　-　定量的なフィードバックを見る
   grades_visible_to_students_1584fa83: 受講生に見える成績
   grades_were_successfully_published_to_the_gradeboo_79203993: 成績は正常にグレードブックに掲載されました。
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: 評定は評定帳に正常にリリースされました。
@@ -14099,12 +14108,18 @@ ja:
       event: "%{date} おいて%{time}"
   handler_7912052f: ハンドラ
   has_been_automatically_selected_based_upon_where_t_61f805c5: "は、このアカウントの Canvas インスタンスが存在する地域に基づいて自動的に選択されています。場合によっては、異なる地域となることもあります。"
+  has_no_submissions_2826a7a2: 提出物がありません
+  has_no_submissions_63de50ad: 提出物がありません
   has_not_submitted_2350bc24: 未提出
   has_similarity_score_d5f332b4: 類似スコアあり
   has_submissions_6c12ef4c: 提出物があります
+  has_submissions_ea8e609b: 提出物があります
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Turnitin スコアがあります"
   has_ungraded_submissions_2bff87df: 未採点の提出物がある
+  has_ungraded_submissions_b79f5803: 未評定の提出物があります
+  has_unposted_grades_3567391e: 未提出の評定があります
+  has_unposted_grades_ba0e02b6: 未提出の評定があります
   have_a_question_about_canvas_ask_it_here_5781cce: Canvasについてご質問がありますか？ここで質問してください。
   have_not_been_graded_df2a5fd2: 未採点
   have_not_yet_submitted_57e6a58b: 未提出
@@ -14760,6 +14775,7 @@ ja:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "ユーザー - ログインの詳細の管理または統計 - 表示が有効になっている場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "ユーザー - ログインの詳細の管理または統計 - 表示が有効になっている場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "ユーザー - ログインの詳細の管理または統計 - 表示が有効になっている場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: グループメンバーの制限を定義する場合は、1より大きくする必要があります。
   if_you_change_an_assignment_s_points_possible_exis_505e6015: 課題の配点を変更する場合、既存の成績は自動的に調整されます。
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 課題の配点を変更する場合は、課題を再評価する必要があります。
   if_you_change_an_assignment_s_points_possible_you__dba531cb: 課題の配点を変更する場合は、すべての提出物を再評価する必要があります。
@@ -14984,6 +15000,7 @@ ja:
   individual_2033c005: 個人
   individual_assignment_grade_posting_d8322b99: 個別の課題評定掲示
   individual_gradebook_c7de9821: 個別の評定表...
+  individual_gradebook_enhancements_de33aa3d: 個人成績表の機能強化
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: 個々のアウトカムの計算値は変更できません。
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: 個々のアウトカム習熟度ポイントは変更できません。
   individual_outcome_rating_and_calculation_method_o_f0eae85f: 個々のアウトカムの評価と計算方法のオプション
@@ -15480,6 +15497,7 @@ ja:
     lock_module_until: ロック終了時刻
   language_6b3e2c7c: 言語
   languages_835813f0: 言語
+  large_balsamiq_font_5fe45fae: "Large Balsamiqフォント"
   large_course_db3d58b: "大コース:"
   last_7_days_bd411f1f: 過去7日
   last_activity_a983e541: 直近活動日
@@ -15909,6 +15927,7 @@ ja:
   loading_features_d26820f6: 機能を読み込んでいます
   loading_folders_d8b5869e: フォルダを読み込み中...
   loading_gradebook_b0b75cd3: 評定表を読み込む
+  loading_gradebook_submissions_d2ba017f: 成績表の提出を読み込み中
   loading_graders_f6a76142: 採点者の読み込み
   loading_grades_446fc226: 評定読み込み中...
   loading_grades_for_coursename_26784c2d: "%{courseName}の評定を読み込み中"
@@ -16170,6 +16189,7 @@ ja:
   lti_deep_linking_line_items_5e0079f7: "LTI ディープリンキングライン項目"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: 課題編集ページでのLTIディープリンクラインアイテム
   lti_delete_ee5f1bef: "LTI - 削除"
+  lti_dynamic_registration_8592edb0: "LTI ダイナミックレジストレーション"
   lti_edit_83a27850: "LTI - 編集"
   lti_key_14ad02b1: "LTI キー"
   lti_launch_af082dc3: "LTI の起動"
@@ -19074,6 +19094,7 @@ ja:
   new_question_9107c469: 新しい問題
   new_question_group_d9306280: 新しい問題グループ
   new_quiz_34aacba6: 新しい小テスト
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: 新規クイズを削除されたユーザーは登録時のレビュー保留状態を復元する
   new_quiz_items_3c850331: 新しい小テスト項目
   new_quiz_statistics_desc: コースの新しいクイズ統計ページを有効にします。
   new_quizzes_account_and_course_level_item_banks_9152fb1: 新しい小テストアカウントとコースレベルのアイテムバンク
@@ -21781,6 +21802,7 @@ ja:
   qti_img_matching_question: インポートされた一致問題は両側に画像を含んでいますが、この形式はサポートされていません
   qti_img_matching_question_distractors: インポートされた一致問題は選択肢内に画像を含んでおり、さらにデストラクタも含んでいるため修正できませんでした
   qti_name: "QTI コンバータ"
+  quantitative_data_options_4f071510: 定量データオプション
   question_9121487: 質問
   question_answered: 解答済み
   question_bank: 
@@ -23533,6 +23555,7 @@ ja:
         name: 名前
     welcome_to_canvas: "Canvas へようこそ!"
   registration_url_60e0eaaa: "登録 URL"
+  regular_lato_font_7f3cf24c: "Regular Lato フォント"
   regular_style_checkbox_ee3d71c1: 通常スタイルのチェックボックス
   reinforce_student_understanding_304d18a6: 受講者の理解を深める
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: リラックスして休憩してください。まだ何もすることはありません。
@@ -26030,6 +26053,13 @@ ja:
       aria_stop: 録音を終了するには、「停止」をクリックします。
     edit_view_rubric: ルーブリックを見る
     group: グループ
+    late_input: 
+      days: 
+        one: 日にち
+        other: 日にち
+      hours: 
+        one: 時間
+        other: 時間
     mic_blocked_message: "マイクの使用許可がブロックされています。変更するには、 chrome://settings/content/microphone に移動してください"
     mute_assignment: 課題をミュートにする
     no_submission_time: 提出の時間がない
@@ -27641,6 +27671,7 @@ ja:
       この機能フラグは、更新された
       ディスカッション作成/編集ページが使用できるようにします。
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "この機能フラグは、通常右から左にかかれる言語（アラビア語、ヘブライ語、ペルシア語など）を話すアカウントのユーザーが、作業中に RTL レイアウトを表示できるようにするためにアカウントを有効にすることができます。 機能が「準備完了」になると、この機能フラグは消え、それらの言語のどれかを話す人にはいつでも RTL インターフェイスが表示されます。"
+  this_feature_introduces_performance_and_maintenanc_50c325aa: この機能は、個人の成績表のパフォーマンスとメンテナンスの強化を導入するものです。
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       この機能は、サードパーティツールから「課題と評定サービス API」を経由して複数
       のファイルが一緒に提出された場合、複数の別々の提出物を作成するのではなく、
@@ -28814,6 +28845,10 @@ ja:
   traditional_gradebook_d7ad59c6: 伝統的な成績表...
   traditional_gradebook_d90461dc: 伝統的な成績表
   transferred_student_enrollments_90dc27d3: 転送された受講者の登録
+  transform_rce_content_on_load_1f521086: 読み込み時のRCEコンテンツの変換
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      絶対URLを相対URLに変換し、読み込み時にRCEコンテンツから余計な属性を削除します。
+      新規小テストでRCEが完全に機能するために必要です。
   travel_places_f461329c: "旅行 & 場所"
   treat_ungraded_as_0_d38c2b41: "未採点を 0 として処理"
   tree_browser: 
@@ -29936,6 +29971,8 @@ ja:
       resubmit_to_vericite: ～へ再提出VeriCite
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite 類似スコア -- 詳細情報類似スコア -- 詳細"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite類似スコア - 詳細レポートを参照"
+  verify_ldap_tls_certificates_70241d8e: "LDAP TLS証明書を検証する"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: LDAP認証プロバイダによって提示されたTLS証明書を検証します。
   version_versionnumber_updatedat_9f5b7a5b: "バージョン %{versionNumber} %{updatedAt}"
   video_78335c71: ビデオ
   video_b9f27375: ビデオ
@@ -30215,6 +30252,7 @@ ja:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: これを選択すると、コースはこれらの日付以外では読み取り専用状態になります。
   when_selected_the_course_is_inaccessible_outside_c_af595406: 選択すると、コースはコースの日付外ではアクセスできなくなります。コースの日付が空白の場合、これら開始日と終了日が期間の日付に適用されます。
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: このセクションを選択すると、コースセクションはこれらの日付以外では読み取り専用状態になります。
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: 設定されている場合、新しい小テストのワークフロー状態が評定済みとして設定されるべきか、pending_reviewまたはユーザが以前に新しい小テストを行ったがコースに再登録された場合pending_reviewに決定されます。
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       このフラグが有効な場合、コースナビゲーションはページ間を移動する際、
       ほとんどのページでデフォルトの展開ではなく、折りたたまれた状態か展開された状態かは
