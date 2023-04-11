@@ -357,6 +357,60 @@ class AccountsController < ApplicationController
     render json: @all_accounts.map { |a| account_json(a, @current_user, session, [], false) }
   end
 
+  # @API Get accounts that users can create courses in
+  # A paginated list of accounts where the current user has permission to create
+  # courses.
+  #
+  # @returns [Account]
+  def course_creation_accounts
+    return render json: [] unless @current_user
+
+    accounts = @current_user.adminable_accounts || []
+    accounts = accounts.select { |a| a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :manage_courses_add) }
+    sub_accounts = []
+    # Load and handle ids from now on to avoid excessive memory usage
+    accounts.each { |a| sub_accounts.concat Account.active.sub_account_ids_recursive(a.id) }
+    accounts = accounts.pluck(:id)
+    accounts.push(sub_accounts).flatten!
+
+    @current_user.course_creating_student_enrollment_accounts.each do |a|
+      accounts << a.root_account.manually_created_courses_account.id if a.root_account.students_can_create_courses?
+
+      next unless a.root_account.students_can_create_courses_anywhere? ||
+                  @current_user.active_k5_enrollments?(root_account: a.root_account) ||
+                  a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :create_courses)
+
+      accounts << a.id
+    end
+
+    @current_user.course_creating_teacher_enrollment_accounts.each do |a|
+      accounts << a.root_account.manually_created_courses_account.id if a.root_account.teachers_can_create_courses?
+
+      next unless a.root_account.teachers_can_create_courses_anywhere? ||
+                  @current_user.active_k5_enrollments?(root_account: a.root_account) ||
+                  a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :create_courses)
+
+      accounts << a.id
+    end
+
+    user_enrollments = @current_user.enrollments.active.pluck(:root_account_id)
+    @current_user.root_account_ids.each do |id|
+      next if user_enrollments.include? id
+
+      a = Account.find(id)
+      accounts << a.manually_created_courses_account.id if a.no_enrollments_can_create_courses?
+    end
+
+    accounts = Api.paginate(accounts.uniq, self, api_v1_course_creation_accounts_url)
+    # Fetch actual accounts now, after pagination, in a single transaction
+    account_active_records = Account.where(id: accounts)
+    accounts_json = accounts.map do |a|
+      a = account_active_records.find { |ar| ar.id == a }
+      account_json(a, @current_user, session, [], false)
+    end
+    render json: accounts_json
+  end
+
   # @API List accounts for course admins
   # A paginated list of accounts that the current user can view through their
   # admin course enrollments. (Teacher, TA, or designer enrollments).

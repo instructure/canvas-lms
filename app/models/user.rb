@@ -2009,6 +2009,28 @@ class User < ActiveRecord::Base
     end
   end
 
+  def course_creating_teacher_enrollment_accounts
+    Rails.cache.fetch_with_batched_keys("course_creating_teacher_enrollment_accounts", batch_object: self, batched_keys: :enrollments) do
+      Account.where(id: Course.select(:account_id).where(id: enrollments.active.shard(in_region_associated_shards)
+               .select(:course_id)
+               .where(type: %w[TeacherEnrollment DesignerEnrollment])
+               .joins(:root_account)
+               .where("accounts.settings LIKE ?", "%teachers_can_create_courses: true%")
+               .map(&:course_id)).map(&:account_id))
+    end
+  end
+
+  def course_creating_student_enrollment_accounts
+    Rails.cache.fetch_with_batched_keys("course_creating_student_enrollment_accounts", batch_object: self, batched_keys: :enrollments) do
+      Account.where(id: Course.select(:account_id).where(id: enrollments.active.shard(in_region_associated_shards)
+               .select(:course_id)
+               .where(type: %w[StudentEnrollment ObserverEnrollment])
+               .joins(:root_account)
+               .where("accounts.settings LIKE ?", "%students_can_create_courses: true%")
+               .map(&:course_id)).map(&:account_id))
+    end
+  end
+
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
     cache_key = [association, enrollment_uuid, options].cache_key
     @courses_with_primary_enrollment ||= {}
@@ -2080,9 +2102,12 @@ class User < ActiveRecord::Base
     cached_active_emails.map { |email| Enrollment.cached_temporary_invitations(email).dup.reject { |e| e.user_id == id } }.flatten
   end
 
-  def active_k5_enrollments?
-    account_ids =
-      enrollments.shard(in_region_associated_shards).current.active_by_date.distinct.pluck(:account_id)
+  def active_k5_enrollments?(root_account: false)
+    account_ids = if  root_account
+                    enrollments.current.active_by_date.where(root_account:).distinct.pluck(:account_id)
+                  else
+                    enrollments.shard(in_region_associated_shards).current.active_by_date.distinct.pluck(:account_id)
+                  end
     Account.where(id: account_ids).any?(&:enable_as_k5_account?)
   end
 

@@ -1990,6 +1990,106 @@ describe AccountsController do
     end
   end
 
+  describe("course_creation_accounts") do
+    context "sharding" do
+      specs_require_sharding
+
+      before { @user = user_factory(active_all: true) }
+
+      it "succesfully returns empty result sets" do
+        user_session @user
+        get "course_creation_accounts"
+        expect(response).to be_successful
+        expect(json_parse(response.body)).to eq([])
+      end
+
+      it "returns properly paginated results" do
+        4.times do |count|
+          Account.create!(name: "Account #{count}", parent_account: Account.default).account_users.create!(user: @user)
+        end
+        user_session @user
+        get "course_creation_accounts", params: { per_page: 2 }
+        expect(response).to be_successful
+        expect(json_parse(response.body).pluck("name")).to match_array(["Account 0", "Account 1"])
+        get "course_creation_accounts", params: { per_page: 2, page: 2 }
+        expect(json_parse(response.body).pluck("name")).to match_array(["Account 2", "Account 3"])
+      end
+
+      it "works for no_enrollments_can_create_courses account" do
+        acc = Account.create!(name: "No enrollments")
+        acc.update(settings: { no_enrollments_can_create_courses: true })
+        usr = User.create!(root_account_ids: [acc.id])
+        user_session usr
+        get "course_creation_accounts"
+        expect(response).to be_successful
+        expect(json_parse(response.body).pluck("name")).to match_array(["Manually-Created Courses"])
+        course_with_student(user: usr, active_all: true, account: Account.last)
+        get "course_creation_accounts"
+        expect(response).to be_successful
+        expect(json_parse(response.body).pluck("name")).to be_empty
+      end
+
+      it "works fetching account associations across shards" do
+        # sub account admin with creation rights
+        Account.create!(name: "Sub Account", parent_account: Account.default).account_users.create!(user: @user)
+
+        # sub sub account with no explicit creation rights
+        Account.create!(name: "Sub Sub Account", parent_account: Account.last)
+
+        # sub account admin with explicit lack of creation rights
+        Account.create!(name: "Strange Account", parent_account: Account.default)
+        Account.last.role_overrides.create! [{ role: admin_role, permission: "manage_courses_add", enabled: false }, { role: admin_role, permission: "manage_courses", enabled: false }]
+        Account.last.account_users.create!(user: @user)
+
+        @shard2.activate do
+          # alternative shard teacher enrollments with creation rights
+          # MCC should appear only once for both of these
+          Account.create!(name: "Teacher Creator #2").update(settings: { teachers_can_create_courses: true, students_can_create_courses: true })
+          course_with_teacher(user: @user, active_all: true, account: Account.last)
+          course_with_student(user: @user, active_all: true, account: Account.last)
+
+          # alternative shard student enrollment with creation rights
+          Account.create!(name: "Student Creator #2").update(settings: { students_can_create_courses: true })
+          course_with_student(user: @user, active_all: true, account: Account.last)
+
+          # alternative shard teacher enrollment with no creation rights
+          Account.create!(name: "Teacher Whatever #2").update(settings: { students_can_create_courses: true })
+          course_with_teacher(user: @user, active_all: true, account: Account.last)
+
+          # alternative shard student enrollment with no creation rights
+          Account.create!(name: "Student Whatever #2").update(settings: { teachers_can_create_courses: true })
+          course_with_student(user: @user, active_all: true, account: Account.last)
+        end
+
+        Account.all.each do |acc|
+          next if acc == Account.default || acc.root_account_id > 0
+
+          acc.trust_links.create!(managing_account: Account.default)
+          Account.default.trust_links.create!(managing_account: acc)
+        end
+
+        user_session @user
+        get "course_creation_accounts"
+        expect(response).to be_successful
+        accounts = json_parse(response.body)
+        expect(accounts.pluck("name")).to match_array(["Manually-Created Courses", "Manually-Created Courses", "Student Creator #2", "Sub Account", "Sub Sub Account", "Teacher Creator #2"])
+        expect(accounts.pluck("name").length).to eq(accounts.pluck("id").uniq.length) # No, those are not actual duplicates
+      end
+
+      it "does not mix up an admin's student creation rights with actual admin rights" do
+        Account.default.update(settings: { students_can_create_courses: true })
+        Account.default.role_overrides.create! [{ role: admin_role, permission: "manage_courses_add", enabled: false }, { role: admin_role, permission: "manage_courses", enabled: false }]
+        Account.default.account_users.create!(user: @user)
+        course_with_student(user: @user, active_all: true, account: Account.default)
+        Account.create!(name: "Sub Account (shouldn't show up)", parent_account: Account.default)
+        user_session @user
+        get "course_creation_accounts"
+        expect(response).to be_successful
+        expect(json_parse(response.body).pluck("name")).to match_array(["Default Account", "Manually-Created Courses"])
+      end
+    end
+  end
+
   describe "account_calendar_settings" do
     before :once do
       @account = Account.default
