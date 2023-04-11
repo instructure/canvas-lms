@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2023 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,23 +16,17 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class BookmarkedCollection::CompositeProxy < BookmarkedCollection::Proxy
-  attr_reader :collections
+module RuboCop
+  module Cop
+    module Style
+      module ConcatArrayLiteralsWithIgnoredReceivers
+        def on_send(node)
+          return if node.receiver.type == :const && node.receiver.short_name == :BookmarkedCollection
 
-  def initialize(collections)
-    super(nil, nil)
-
-    @labels = collections.map(&:first)
-    @depth = collections.map { |(_, coll)| coll.depth }.max + 1
-    @collections = collections.map do |(label, coll)|
-      adjustment = @depth - 1 - coll.depth
-      adjustment.times.inject(coll) { |c, _i| BookmarkedCollection.concat([label, c]) }
+          super
+        end
+      end
     end
-  end
-
-  def new_pager
-    BookmarkedCollection::CompositeCollection.new(@depth, @labels)
   end
 end
