@@ -25,9 +25,8 @@ class MediaTrack < ActiveRecord::Base
   before_save :convert_srt_to_wvtt
   validates :media_object_id, presence: true
   validates :kind, inclusion: { in: %w[subtitles captions descriptions chapters metadata] }
-  validates :locale, format: { with: /\A[A-Za-z-]+\z/ }
   validates :content, presence: true
-  validates :locale, uniqueness: { scope: :attachment_id }, unless: proc { |mt| mt.attachment_id.blank? }
+  validates :locale, format: { with: /\A[A-Za-z-]+\z/ }, uniqueness: { scope: :attachment_id, unless: ->(mt) { mt.attachment_id.blank? } }
 
   RE_LOOKS_LIKE_TTML = /<tt\s+xml/i.freeze
   validates :content, format: {
@@ -36,7 +35,7 @@ class MediaTrack < ActiveRecord::Base
   }
 
   def add_attachment_id
-    self.attachment_id = media_object.attachment_id
+    self.attachment_id ||= media_object.attachment_id
   end
 
   def webvtt_content
