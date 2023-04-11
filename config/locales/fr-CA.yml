@@ -625,6 +625,7 @@ fr-CA:
     titles: 
       configure_report: "Configurer le rapport"
       open_registration_delegated_warning_dialog: "Un fournisseur d'identités externe est activé"
+      rqd_help: "Restreindre les données quantitatives"
       what_are_quiz_ip_filters: "Que sont les filtres IP de questionnaire?"
     user: Utilisateur
   account_settings_fe083453: "Paramètres du compte"
@@ -1566,6 +1567,8 @@ fr-CA:
         update_button: "Mettre à jour"
       report_last_run_never: Jamais
       report_running: "Le rapport est en cours d’exécution.*Vous recevrez un courriel lorsque l’opération sera terminée.*"
+      rqd_help_message: "Lorsqu’il est sélectionné, ce paramètre restreint la vue de l’utilisateur des données de notation quantitatives (numériques) et limite les options de création de tâches pour les enseignants. Les utilisateurs ne verront que des données qualitatives, qui incluent des notations par lettres et des commentaires. L’administrateur peut personnaliser davantage ce paramètre en ajustant les autorisations pour les rôles d’utilisateur."
+      rqd_screenreader: "À propos de la restriction des données quantitatives"
       select: 
         mfa: 
           disabled: Désactivé
@@ -2199,7 +2202,7 @@ fr-CA:
   adjust_final_grade_fa45e7e0: "Ajuster la note finale"
   adjusting_due_dates_a5918b9c: "Ajustement des dates d’échéance..."
   admin_4d3ba42f: Admin
-  admin_analytics_description: "L’activation de cette fonction permet à « Admin Analytics » d’afficher des aperçus des cours et des étudiants. Apprenez-en plus et donnez votre avis en rejoignant le *groupe d’utilisateurs de New Analytics* dans la communauté Canvas."
+  admin_analytics_description: "Active les analyses au niveau du compte. Les tableaux de bord Admin Analytics fournissent des détails sur l’utilisation de Canvas, la réussite des cours Canvas et l’engagement des étudiants. En savoir plus dans le *portail Admin Analytics* dans la communauté Canvas."
   admin_analytics_eacba735: "Admin Analytics"
   admin_csv_f8d1b3eb: "Admin CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Exportation de l’administrateur pour des périodes de notation multiples"
@@ -2391,7 +2394,7 @@ fr-CA:
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Permettre aux cartes du tableau de bord d’être triées pour chaque utilisateur."
   allow_final_grade_override_8cf4336b: "Autoriser le surclassement de la note finale"
   allow_final_grade_override_a21a79ee: "Autoriser le surclassement de la note finale"
-  allow_font_selection_in_c4e_accounts_7def31c6: "Autoriser la sélection de polices dans les comptes C4E"
+  allow_font_selection_in_c4e_accounts_7def31c6: "Autoriser la sélection de polices dans les comptes C4E"
   allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "Permettre à Apollo de mettre en cache les requêtes graphQL sur un navigateur d’utilisateur pour accélérer leur expérience"
   allow_for_key_keyname_b973f769: "Prévoyez une clé : %{keyName}"
   allow_gradebook_users_to_view_and_export_student_f_68a8084b: "Permettre aux utilisateurs du carnet de notes de visualiser et d’exporter les noms et prénoms des étudiants dans des colonnes séparées"
@@ -4276,6 +4279,7 @@ fr-CA:
       no_points: Aucun
       no_submission: Aucune
       points: Points
+      speed_grader: SpeedGrader™
       submission_types: "Types de fichiers"
       submitting: "Envoi en cours"
       turnitin: Turnitin
@@ -5756,6 +5760,7 @@ fr-CA:
   canvas_for_elementary_analytics_15dc1e07: "Analyse de Canvas for Elementary"
   canvas_for_elementary_beta_28bc5181: "Canvas for Elementary (Bêta)"
   canvas_for_elementary_e6f5a06f: "Canvas for Elementary"
+  canvas_for_elementary_font_selection_5d1f2271: "Sélection de polices pour Canvas for Elementary"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas for Elementary : de nombreuses annonces en salle d’accueil"
   canvas_for_elementary_parent_support_74a2356e: "Canvas for Elementary : Soutien aux parents"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -5891,6 +5896,7 @@ fr-CA:
   check_your_spelling_or_try_fewer_letters_70769a90: "Vérifiez votre orthographe ou essayez de réduire le nombre de lettres."
   checkbox_examples_dc790142: "Exemples de cases à cocher"
   checked_883b93fd: coché
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Cocher « Ajouter au calendrier » invitera tous les membres du cours."
   cheerful_panda_holding_a_map_17ba47ee: "Panda joyeux tenant une carte"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Le cours dépendant doit appartenir au même compte racine que le cours maître"
   child_s_username_dde3aa9: "Nom d'utilisateur de votre enfant"
@@ -7093,7 +7099,7 @@ fr-CA:
       indent: 
         ? "n"
         : 
-          one: "Retrait 1 niveau"
+          one: "Retrait 1 niveau"
           other: "Retrait %{count} niveaux"
           zero: "Pas de retrait"
       labels: 
@@ -8507,6 +8513,7 @@ fr-CA:
         pace_plans: "Plans PACE"
         participation_id: Participation
         restrict_enrollments_to_course_dates: "Les étudiants ne peuvent participer au cours qu’entre ces dates"
+        restrict_quantitative_data: "Options de données quantitatives"
         restrict_student_future_view: "Empêcher les étudiants de voir ce cours avant la date de début"
         restrict_student_past_view: "Empêcher les étudiants de voir ce cours après la date de fin"
         root_account: "Compte racine"
@@ -10505,6 +10512,7 @@ fr-CA:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Active une nouvelle boîte de dialogue « Envoyer un message aux étudiants qui... » afin de permettre d'envoyer des messages aux observateurs en plus des étudiants."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Permet d’accéder à l’API publique des nouveaux questionnaires : API des éléments de questionnaire."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Permet l’accès à l’API publique des nouveaux questionnaires par le biais de Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Permet aux administrateurs d’enregistrer les outils LTI avec l’enregistrement dynamique"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Permet d'afficher les rapports de plagiat et les scores de similarité dans le bac d’envoi du nouveau carnet de notes."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Permet d’appliquer des dates importantes aux affectations, aux événements du calendrier et autres."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Permet au modal d’avertir l’utilisateur lorsqu’une ébauche de commentaire n’est pas publiée dans SpeedGrader."
@@ -12591,6 +12599,7 @@ fr-CA:
   grades_view_audit_trail_cc4c1fcc: "Notes - voir la piste d'audit"
   grades_view_audit_trail_db7364b1: "Notation - Voir la piste d'audit"
   grades_view_change_logs_6bc1b959: "Notation - voir les journaux des modifications"
+  grades_view_quantitative_feedback_90a4ffc7: "Notations — afficher les rétroactions quantitatives"
   grades_visible_to_students_1584fa83: "Notes visibles aux étudiants"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Les notes ont été publiées avec succès au carnet de notes."
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Les notes ont été publiées avec succès au Carnet de notes."
@@ -13262,11 +13271,17 @@ fr-CA:
       event: "%{date} à %{time}"
   handler_7912052f: Gestionnaire
   has_been_automatically_selected_based_upon_where_t_61f805c5: "a été automatiquement sélectionné en fonction de l’endroit où réside l’instance Canvas de ce compte. Dans certains cas, il peut s’agir d’une région différente."
+  has_no_submissions_2826a7a2: "N’a aucun envoi"
+  has_no_submissions_63de50ad: "N’a aucun envoi"
   has_not_submitted_2350bc24: "N’a pas envoyé"
   has_similarity_score_d5f332b4: "Possède un score de similarité"
   has_submissions_6c12ef4c: "Comporte des envois"
+  has_submissions_ea8e609b: "A des envois"
   has_syllabus_body_6f250277: has_syllabus_body
   has_ungraded_submissions_2bff87df: "Comporte des envois non notés"
+  has_ungraded_submissions_b79f5803: "A des envois non notés"
+  has_unposted_grades_3567391e: "A des notes non publiées"
+  has_unposted_grades_ba0e02b6: "A des notes non publiées"
   have_a_question_about_canvas_ask_it_here_5781cce: "Vous avez une question sur Canvas? Demandez-la ici."
   have_not_been_graded_df2a5fd2: "N'ont pas été notés"
   have_not_yet_submitted_57e6a58b: "N'ont pas encore soumis"
@@ -13907,6 +13922,7 @@ fr-CA:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Si « Utilisateurs - Gérer les détails de connexion » ou « Statistiques - voir »​est activé, un utilisateur sera en mesure de générer l'activité de connexion/déconnexion dans les Outils d'administration. Pour masquer l'option de l’activité de connexion/déconnexion dans les Outils d'administration, ces autorisations doivent être désactivées."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Si « Utilisateurs — Gérer les détails de connexion » ou « Statistiques — voir » ​est activé, un utilisateur sera en mesure de générer l’activité de connexion/déconnexion dans les Outils d’administration. Pour masquer l’option de l’activité de connexion/déconnexion dans les Outils d’administration, ces autorisations doivent être désactivées."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Si « Utilisateurs — Gérer les détails de connexion » ou « Statistiques — voir » ​est activé, un utilisateur sera en mesure de générer l’activité de connexion/déconnexion dans les Outils d’administration. Pour masquer l’option de l’activité de connexion/déconnexion dans les Outils d’administration, ces autorisations doivent être désactivées."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "Si vous allez définir une limite de membres de groupe, elle doit être supérieure à 1."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Si vous changez le nombre de points possibles d'une tâche, vous devrez le renoter."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Si vous changez le nombre de points possibles d'une tâche, vous devrez renoter chacune de ses envois."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Si vous ne sélectionnez pas les droits d’utilisation maintenant, ce fichier restera non publié une fois transmis."
@@ -14118,6 +14134,7 @@ fr-CA:
   individual_2033c005: Individuel
   individual_assignment_grade_posting_d8322b99: "Publication de la note de la tâche individuelle"
   individual_gradebook_c7de9821: "Carnet de notes individuel…"
+  individual_gradebook_enhancements_de33aa3d: "Améliorations du carnet de notes individuel"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Les valeurs de calcul du résultat individuel ne peuvent pas être modifiées."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Les points de maîtrise du résultat individuels ne peuvent pas être modifiés."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Options de notation et de méthode de calcul des résultats individuels"
@@ -14600,6 +14617,7 @@ fr-CA:
     lock_module_until: "Verrouiller jusqu'à"
   language_6b3e2c7c: Langue
   languages_835813f0: Langues
+  large_balsamiq_font_5fe45fae: "Grande police Balsamiq"
   large_course_db3d58b: "Grand cours:"
   last_7_days_bd411f1f: "Les 7 derniers jours"
   last_activity_a983e541: "Dernière activité"
@@ -14844,7 +14862,7 @@ fr-CA:
     incoming_message_processor: 
       failure_message: 
         body: |-
-            Impossible de remettre le message intitulé « %{subject} ».  Il a été envoyé à une adresse de messagerie inconnue.  Si vous voulez contacter quelqu’un via Canvas, vous pouvez essayer de vous connecter à votre compte et de lui envoyer un message à l’aide de l’outil Boîte de réception.
+            Impossible de remettre le message intitulé « %{subject} ».  Il a été envoyé à une adresse de messagerie inconnue.  Si vous voulez contacter quelqu’un via Canvas, vous pouvez essayer de vous connecter à votre compte et de lui envoyer un message à l’aide de l’outil Boîte de réception.
             
             Merci,
             L’assistance technique Canvas
@@ -15020,6 +15038,7 @@ fr-CA:
   loading_features_d26820f6: "Chargement des fonctionnalités"
   loading_folders_d8b5869e: "Chargement des dossiers"
   loading_gradebook_b0b75cd3: "Chargement du carnet de notes"
+  loading_gradebook_submissions_d2ba017f: "Chargement des envois du carnet de notes"
   loading_graders_f6a76142: "Chargement des correcteurs"
   loading_grades_446fc226: "Notes en cours de chargement..."
   loading_grades_for_coursename_26784c2d: "Chargement des notes pour %{courseName}"
@@ -15255,6 +15274,7 @@ fr-CA:
   lti_deep_linking_line_items_5e0079f7: "Postes de liaison profonde LTI"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Éléments de liaison profonde LTI sur la page de modification des tâches"
   lti_delete_ee5f1bef: "LTI - supprimer"
+  lti_dynamic_registration_8592edb0: "Inscription dynamique LTI"
   lti_edit_83a27850: "LTI - modifier"
   lti_key_14ad02b1: "Clé LTI"
   lti_launch_af082dc3: "Lancement de LTI :"
@@ -16864,7 +16884,7 @@ fr-CA:
         body: "Alerte Canvas - Nouveau fichier : %{title} (%{size}) pour %{name} :"
     new_files_added: 
       email: 
-        body: "%{count} nouveaux fichiers ajoutés pour %{name} :"
+        body: "%{count} nouveaux fichiers ajoutés pour %{name} :"
         html: 
           body: "%{count} nouveaux fichiers ont été ajoutés au cours %{name} :"
           see_details: "Vous pouvez les voir ici"
@@ -16875,7 +16895,7 @@ fr-CA:
         body: "%{count} nouveaux fichiers ont été ajoutés au cours %{name}."
         link: "Informations complémentaires sur %{link}"
       summary: 
-        body: "%{count} nouveaux fichiers ajoutés pour %{name} :"
+        body: "%{count} nouveaux fichiers ajoutés pour %{name} :"
         link: "Vous pouvez les voir ici"
         subject: "%{count} nouveaux fichiers ajoutés au cours, %{name}"
       twitter: 
@@ -17853,6 +17873,7 @@ fr-CA:
   new_question_9107c469: "Nouvelle question"
   new_question_group_d9306280: "Nouveau groupe de questions"
   new_quiz_34aacba6: "Nouveau questionnaire"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "Nouveau questionnaire supprimé, restauration par utilisateur en attente d’examen lors de l’inscription"
   new_quiz_items_3c850331: "Nouveaux éléments de questionnaire"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Nouveau compte de questionnaires et nouvelles banques d’éléments de niveau de cours"
   new_quizzes_assignment_build_button_72b6531a: "Bouton de Génération des tâches des nouveaux questionnaires"
@@ -20464,6 +20485,7 @@ fr-CA:
   qti_img_matching_question: "La question correspondante importée contient des images des deux côtés, ce qui n’est pas pris en charge"
   qti_img_matching_question_distractors: "La question correspondante importée contient des images à l’intérieur des choix, ce qui ne peut pas être rectifié car elle contient aussi des distracteurs"
   qti_name: "Convertisseur QTI"
+  quantitative_data_options_4f071510: "Options de données quantitatives"
   question_9121487: Question
   question_answered: "Réponse donnée"
   question_bank: 
@@ -21980,6 +22002,7 @@ fr-CA:
         name: Nom
     welcome_to_canvas: "Bienvenue à Canvas!"
   registration_url_60e0eaaa: "URL d’inscription"
+  regular_lato_font_7f3cf24c: "Police Lato régulière"
   regular_style_checkbox_ee3d71c1: "Case à cocher de style standard"
   reinforce_student_understanding_304d18a6: "Renforcer la compréhension des étudiants"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Détendez-vous et faites une pause. Il n’y a encore rien à faire."
@@ -24317,6 +24340,13 @@ fr-CA:
       aria_stop: "Cliquez sur Arrêter pour mettre fin à l’enregistrement."
     edit_view_rubric: "Voir la rubrique"
     group: Groupe
+    late_input: 
+      days: 
+        one: Jour
+        other: Jours
+      hours: 
+        one: Heure
+        other: Heures
     mic_blocked_message: "Impossible d'autoriser l'utilisation du microphone. Pour changer ce paramètre, accédez à chrome://settings/content/microphone"
     mute_assignment: "Couper le son de la tâche"
     no_submission_time: "aucune heure d’envoi"
@@ -25877,6 +25907,7 @@ fr-CA:
       Cet indicateur de fonctionnalité permet d’utiliser la page de
       création/modification de discussion mise à jour
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Cet indicateur de fonctionnalité est quelque chose qu'un compte peut activer s'il veut autoriser les utilisateurs de leur compte qui parlent des langues qui sont normalement écrites de droite à gauche (par exemple : arabe, hébreux, farsi) de voir la disposition RTL (droite à gauche) tandis que nous travaillons sur celle-ci. Dès que la fonctionnalité est « prête », ce fanion disparaîtra et quiconque parle l'une de ces langues verra toujours l'interface RTL."
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Cette fonctionnalité introduit des améliorations de performances et de maintenance dans le carnet de notes individuel"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Cette fonctionnalité fait en sorte que lorsque plusieurs fichiers sont envoyés ensemble par
       un outil tiers par le biais de l’API du service des tâches et des notes, ils seront
@@ -27037,6 +27068,10 @@ fr-CA:
   traditional_gradebook_d7ad59c6: "Carnet de notes traditionnel…"
   traditional_gradebook_d90461dc: "Carnet de notes traditionnel"
   transferred_student_enrollments_90dc27d3: "Inscriptions d’étudiant transféré"
+  transform_rce_content_on_load_1f521086: "Transformer le contenu RCE au chargement"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Transforme les URL absolues en URL relatives et supprime les attributs superflus du contenu RCE lors du chargement.
+      Nécessaire pour que le RCE fonctionne pleinement dans les nouveaux questionnaires.
   travel_places_f461329c: "Voyages et lieux"
   treat_ungraded_as_0_d38c2b41: "Considérer les tâches non notés comme ayant la note 0"
   tree_browser: 
@@ -28109,6 +28144,8 @@ fr-CA:
       resubmit_to_vericite: "Resoumis à VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite score de similarité – plus d'informations"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Score de similarité – Voir rapport détaillé"
+  verify_ldap_tls_certificates_70241d8e: "Vérifier les certificats LDAP TLS"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Vérifier les certificats TLS présentés par les fournisseurs d’authentification LDAP."
   version_versionnumber_updatedat_9f5b7a5b: "Version %{versionNumber} %{updatedAt}"
   video_78335c71: vidéo
   video_b9f27375: Vidéo
@@ -28388,6 +28425,7 @@ fr-CA:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Lorsque cette option est sélectionnée, le cours est dans l'état lecture seule en dehors de ces dates."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Lorsque cette option est sélectionnée, le cours est inaccessible en dehors des dates de cours. Si les dates du cours sont vides, ces dates de début et de fin s'appliquent aux dates du trimestre."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Lorsque cette option est sélectionnée, la section du cours est à l'état lecture seule en dehors de ces dates."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Lorsqu’il est défini, détermine si l’état du flux de travail d’un nouveau questionnaire doit être défini comme noté ou pending_review si un utilisateur avait un précédent nouveau questionnaire pending_review, mais avait été réinscrit au cours."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Lorsque cet indicateur est activé, la navigation dans le cours reste réduite ou étendue
       lors de la navigation entre les pages, en fonction de la dernière configuration de l'utilisateur,
@@ -28763,7 +28801,7 @@ fr-CA:
   you_cannot_set_a_grouped_discussion_as_a_student_a20f363: "Vous ne pouvez pas définir une discussion groupée en tant qu'étudiant."
   you_cannot_use_a_number_greater_than_the_number_of_af33e220: "Vous ne pouvez pas utiliser une valeur supérieure au nombre de tâches"
   you_created_an_announcement_in_course_c49e3d70: "Vous avez créé une annonce dans %{course}"
-  you_created_this_announcement_42d745a7: "Vous avez créé cette annonce :"
+  you_created_this_announcement_42d745a7: "Vous avez créé cette annonce :"
   you_currently_have_no_discussions_with_closed_comm_366a9dab: "Vous n'avez actuellement aucune discussion avec des commentaires fermés"
   you_currently_have_no_pinned_discussions_6f0078b8: "Vous n’avez actuellement aucune discussion épinglée"
   you_do_not_have_access_to_the_requested_announceme_a774d80a: "Vous n'avez pas accès à l’annonce sélectionnée."
