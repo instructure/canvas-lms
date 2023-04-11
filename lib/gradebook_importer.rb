@@ -312,11 +312,11 @@ class GradebookImporter
       students.each do |student|
         submission = gradebook_importer_assignments.fetch(student.id)[idx]
         if submission["grade"].present? && (submission["grade"].to_s.casecmp("EX") != 0)
-          gradebook_importer_assignments.fetch(student.id)[idx]["grade"] = assignment.score_to_grade(submission["grade"], \
+          gradebook_importer_assignments.fetch(student.id)[idx]["grade"] = assignment.score_to_grade(submission["grade"],
                                                                                                      submission["grade"])
         end
         if submission["original_grade"].present? && (submission["original_grade"] != "EX")
-          gradebook_importer_assignments.fetch(student.id)[idx]["original_grade"] = assignment.score_to_grade(submission["original_grade"],\
+          gradebook_importer_assignments.fetch(student.id)[idx]["original_grade"] = assignment.score_to_grade(submission["original_grade"],
                                                                                                               submission["original_grade"])
         end
         if submission["grade"].to_s.casecmp("EX") == 0

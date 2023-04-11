@@ -71,8 +71,8 @@ module Importers
       if hash[:source_outcome_group_id]
         source_group = LearningOutcomeGroup.active.find_by(id: hash[:source_outcome_group_id])
 
-        if source_group && \
-           item.title == source_group.title && \
+        if source_group &&
+           item.title == source_group.title &&
            context&.associated_accounts&.include?(source_group.context)
           item.source_outcome_group = source_group
         end

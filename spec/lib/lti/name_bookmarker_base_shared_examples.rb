@@ -68,9 +68,9 @@ RSpec.shared_context "name_bookmarker_base_shared_examples" do
 
       shared_examples_for "a bookmark that bases the first value on some form of the name" do
         before do
-          allow(BookmarkedCollection).to \
-            receive(:best_unicode_collation_key).with("?")
-                                                .and_return(Arel.sql(best_unicode_collation_key_for_questionmark))
+          allow(BookmarkedCollection).to receive(:best_unicode_collation_key)
+            .with("?")
+            .and_return(Arel.sql(best_unicode_collation_key_for_questionmark))
         end
 
         it "uses the expected value in the first key in the bookmark" do

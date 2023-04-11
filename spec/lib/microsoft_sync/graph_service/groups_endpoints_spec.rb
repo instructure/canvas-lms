@@ -355,9 +355,9 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
                     ignored_type: :add_duplicate, endpoint_name: "group_add_users"
 
     it "passes along the quota used to run_batch" do
-      expect(endpoints.http).to \
-        receive(:run_batch).with(anything, anything, hash_including(quota: [4, 4]))
-                           .and_call_original
+      expect(endpoints.http).to receive(:run_batch)
+        .with(anything, anything, hash_including(quota: [4, 4]))
+        .and_call_original
       subject
     end
 
@@ -429,9 +429,9 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
                     ignored_type: :remove_missing, endpoint_name: "group_remove_users"
 
     it "passes along the quota used to run_batch" do
-      expect(endpoints.http).to \
-        receive(:run_batch).with(anything, anything, hash_including(quota: [4, 4]))
-                           .and_call_original
+      expect(endpoints.http).to receive(:run_batch)
+        .with(anything, anything, hash_including(quota: [4, 4]))
+        .and_call_original
       subject
     end
 

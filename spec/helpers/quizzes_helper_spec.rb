@@ -172,15 +172,12 @@ describe QuizzesHelper do
     end
 
     it "is wrapped by a span when a CSS class, id, or style is given" do
-      expect(score_out_of_points_possible(1.5, 3, class: "score_value")).to eq( \
-        '<span class="score_value">1.5</span> out of 3'
-      )
-      expect(score_out_of_points_possible(1.5, 3, id: "score")).to eq( \
-        '<span id="score">1.5</span> out of 3'
-      )
-      expect(score_out_of_points_possible(1.5, 3, style: "width:100%")).to eq( \
-        '<span style="width:100%">1.5</span> out of 3'
-      )
+      expect(score_out_of_points_possible(1.5, 3, class: "score_value"))
+        .to eq('<span class="score_value">1.5</span> out of 3')
+      expect(score_out_of_points_possible(1.5, 3, id: "score"))
+        .to eq('<span id="score">1.5</span> out of 3')
+      expect(score_out_of_points_possible(1.5, 3, style: "width:100%"))
+        .to eq('<span style="width:100%">1.5</span> out of 3')
     end
   end
 

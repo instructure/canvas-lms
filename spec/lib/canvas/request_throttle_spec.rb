@@ -132,8 +132,9 @@ describe RequestThrottle do
       )
 
       mock_token = instance_double(Lti::IMS::AdvantageAccessToken, client_id: "10000000000007")
-      expect(Lti::IMS::AdvantageAccessTokenRequestHelper).to \
-        receive(:token).with(request).and_return(mock_token)
+      expect(Lti::IMS::AdvantageAccessTokenRequestHelper).to receive(:token)
+        .with(request)
+        .and_return(mock_token)
       expect(Account.default.shard).to receive(:database_server_id).and_return "cluster123"
 
       result = throttler.client_identifier(request)

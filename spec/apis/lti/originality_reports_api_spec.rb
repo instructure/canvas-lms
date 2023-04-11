@@ -1080,8 +1080,8 @@ module Lti
         end
 
         it "calls OriginalityReport.copy_to_group_submissions_later! when creating" do
-          expect_any_instance_of(OriginalityReport).to \
-            receive(:copy_to_group_submissions_later!) do |instance|
+          expect_any_instance_of(OriginalityReport)
+            .to receive(:copy_to_group_submissions_later!) do |instance|
             expect(instance.submission_id).to eq(submission_one.id)
             expect(instance.originality_score).to eq(originality_score)
           end
@@ -1093,8 +1093,8 @@ module Lti
           post_to_endpoint
           created_report_id = JSON.parse(response.body)["id"]
 
-          expect_any_instance_of(OriginalityReport).to \
-            receive(:copy_to_group_submissions_later!).at_least(:once) do |instance|
+          expect_any_instance_of(OriginalityReport)
+            .to receive(:copy_to_group_submissions_later!).at_least(:once) do |instance|
             expect(instance.id).to eq(created_report_id)
           end
           post_to_endpoint

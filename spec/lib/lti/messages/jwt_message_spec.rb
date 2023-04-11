@@ -669,10 +669,8 @@ describe Lti::Messages::JwtMessage do
 
     before do
       course.account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-      allow_any_instance_of(Account).to \
-        receive(:domain).and_return("canonical_domain")
-      allow(controller).to \
-        receive(:lti_line_item_index_url)
+      allow_any_instance_of(Account).to receive(:domain).and_return("canonical_domain")
+      allow(controller).to receive(:lti_line_item_index_url)
         .with({ host: "canonical_domain", course_id: course.id })
         .and_return("lti_line_item_index_url")
     end

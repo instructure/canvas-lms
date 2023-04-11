@@ -32,8 +32,9 @@ describe MicrosoftSync::GraphServiceHelpers do
   end
 
   before do
-    allow(MicrosoftSync::GraphService).to \
-      receive(:new).with("mytenant123", { extra_tag: "abc" }).and_return(graph_service)
+    allow(MicrosoftSync::GraphService).to receive(:new)
+      .with("mytenant123", { extra_tag: "abc" })
+      .and_return(graph_service)
   end
 
   describe "#list_education_classes_for_course" do
@@ -167,8 +168,8 @@ describe MicrosoftSync::GraphServiceHelpers do
       before { course_model(public_description: "a" * 1025) }
 
       it "truncates the description" do
-        expect(graph_service.education_classes).to \
-          receive(:create).with(hash_including(description: ("a" * 1021) + "..."))
+        expect(graph_service.education_classes).to receive(:create)
+          .with(hash_including(description: ("a" * 1021) + "..."))
         subject.create_education_class(@course)
       end
     end
@@ -177,8 +178,8 @@ describe MicrosoftSync::GraphServiceHelpers do
       before { course_model(public_description: "a" * 1024) }
 
       it "does not truncate the description" do
-        expect(graph_service.education_classes).to \
-          receive(:create).with(hash_including(description: "a" * 1024))
+        expect(graph_service.education_classes).to receive(:create)
+          .with(hash_including(description: "a" * 1024))
         subject.create_education_class(@course)
       end
     end
@@ -242,8 +243,7 @@ describe MicrosoftSync::GraphServiceHelpers do
     let(:expected_remote_attr) { "mailNickname" }
 
     before do
-      allow(subject.graph_service.users).to \
-        receive(:list)
+      allow(subject.graph_service.users).to receive(:list)
         .with(select: ["id", expected_remote_attr], filter: { expected_remote_attr => requested })
         .and_return([
                       { "id" => "789", expected_remote_attr => "D" },
@@ -266,8 +266,7 @@ describe MicrosoftSync::GraphServiceHelpers do
       let(:requested) { %w[c d] }
 
       it "raises an error" do
-        expect { subject.users_uluvs_to_aads(expected_remote_attr, %w[c D]) }.to \
-          raise_error do |err|
+        expect { subject.users_uluvs_to_aads(expected_remote_attr, %w[c D]) }.to raise_error do |err|
           expect(err.message).to eq(
             '/users returned users with unexpected mailNickname values ["a", "b"], ' \
             'asked for ["c", "d"]'
@@ -292,8 +291,8 @@ describe MicrosoftSync::GraphServiceHelpers do
 
     context "when passed in more than 15" do
       it "raises ArgumentError" do
-        expect { subject.users_uluvs_to_aads(expected_remote_attr, (1..16).map(&:to_s)) }.to \
-          raise_error(ArgumentError, "Can't look up 16 ULUVs at once")
+        expect { subject.users_uluvs_to_aads(expected_remote_attr, (1..16).map(&:to_s)) }
+          .to raise_error(ArgumentError, "Can't look up 16 ULUVs at once")
       end
     end
 
@@ -301,8 +300,8 @@ describe MicrosoftSync::GraphServiceHelpers do
       let(:expected_remote_attr) { "userPrincipalName" }
 
       it "defaults to userPrincipalName" do
-        expect(subject.users_uluvs_to_aads(nil, %w[a b c d])).to \
-          eq("a" => "123", "b" => "456", "d" => "789")
+        expect(subject.users_uluvs_to_aads(nil, %w[a b c d]))
+          .to eq("a" => "123", "b" => "456", "d" => "789")
       end
     end
   end

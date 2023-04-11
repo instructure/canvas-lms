@@ -1062,7 +1062,7 @@ class AssignmentsController < ApplicationController
   end
 
   def on_quizzes_page?
-    @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) && \
+    @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
       @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present?
   end
 

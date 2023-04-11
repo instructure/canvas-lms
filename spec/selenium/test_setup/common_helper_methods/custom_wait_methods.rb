@@ -114,10 +114,11 @@ module CustomWaitMethods
 
   # NOTE: for "$.timers" see https://github.com/jquery/jquery/blob/6c2c7362fb18d3df7c2a7b13715c2763645acfcb/src/effects.js#L638
   ANIMATION_COUNT_SCRIPT = "return (typeof($) !== 'undefined' && $.timers) ? $.timers.length : 0"
-  ANIMATION_ELEMENTS_SCRIPT =
-    "return $.timers.map(t => (" \
-    " t.elem.tagName + (t.elem.id?'#'+t.elem.id:'') + (t.elem.className?'.'+t.elem.className.replaceAll(' ','.'):'')" \
-    "))"
+  ANIMATION_ELEMENTS_SCRIPT = <<~JS
+    return $.timers.map(t => (
+     t.elem.tagName + (t.elem.id?'#'+t.elem.id:'') + (t.elem.className?'.'+t.elem.className.replaceAll(' ','.'):'')
+    ))
+  JS
   def wait_for_animations(bridge = nil)
     bridge = driver if bridge.nil?
 

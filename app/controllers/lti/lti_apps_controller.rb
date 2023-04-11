@@ -81,8 +81,8 @@ module Lti
       # the context of an account, not a course, so a student would normally not
       # have any account-level permissions. So instead, just ensure that the user
       # is associated with the current account (not sure how it could be otherwise?)
-      return true if context.is_a?(Account) && \
-                     placements == ["global_navigation"] && \
+      return true if context.is_a?(Account) &&
+                     placements == ["global_navigation"] &&
                      user_in_account?(user, context)
 
       authorized_action(context, user, :read)

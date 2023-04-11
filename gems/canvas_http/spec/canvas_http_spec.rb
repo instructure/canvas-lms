@@ -257,8 +257,8 @@ describe "CanvasHttp" do
 
       context "if the total response body is larger than the max length" do
         it "raises a ResponseTooLargeError" do
-          expect { CanvasHttp.read_body_max_length(mock_response, 99) }.to \
-            raise_error(CanvasHttp::ResponseTooLargeError)
+          expect { CanvasHttp.read_body_max_length(mock_response, 99) }
+            .to raise_error(CanvasHttp::ResponseTooLargeError)
         end
       end
 

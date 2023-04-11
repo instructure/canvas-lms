@@ -148,13 +148,15 @@ class LearningOutcomeResult < ActiveRecord::Base
       .joins("LEFT JOIN #{Assignment.quoted_table_name} sa ON sa.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'Assignment'")
       .joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id = learning_outcome_results.user_id AND submissions.assignment_id in (ra.id, qa.id, sa.id)")
       .joins("LEFT JOIN #{PostPolicy.quoted_table_name} pc on pc.assignment_id  in (ra.id, qa.id, sa.id)")
-      .where("(ra.id IS NULL AND qa.id IS NULL AND sa.id IS NULL)"\
-             " OR submissions.posted_at IS NOT NULL"\
-             " OR ra.grading_type = 'not_graded'"\
-             " OR qa.grading_type = 'not_graded'"\
-             " OR sa.grading_type = 'not_graded'"\
-             " OR pc.id IS NULL"\
-             " OR (pc.id IS NOT NULL AND pc.post_manually = False)")
+      .where(<<~SQL.squish)
+        (ra.id IS NULL AND qa.id IS NULL AND sa.id IS NULL)
+              OR submissions.posted_at IS NOT NULL
+              OR ra.grading_type = 'not_graded'
+              OR qa.grading_type = 'not_graded'
+              OR sa.grading_type = 'not_graded'
+              OR pc.id IS NULL
+              OR (pc.id IS NOT NULL AND pc.post_manually = False)
+      SQL
   }
 
   private

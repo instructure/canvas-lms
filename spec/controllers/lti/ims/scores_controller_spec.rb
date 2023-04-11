@@ -563,8 +563,8 @@ module Lti::IMS
                   course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
                   allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
                   send_request
-                  expect(actual_progress_url).to \
-                    start_with("http://canonical.host/api/lti/courses/#{context_id}/progress/")
+                  expect(actual_progress_url)
+                    .to start_with("http://canonical.host/api/lti/courses/#{context_id}/progress/")
                 end
               end
 
@@ -573,8 +573,8 @@ module Lti::IMS
                   course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
                   allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
                   send_request
-                  expect(actual_progress_url).to \
-                    start_with("http://test.host/api/lti/courses/#{context_id}/progress/")
+                  expect(actual_progress_url)
+                    .to start_with("http://test.host/api/lti/courses/#{context_id}/progress/")
                 end
               end
 

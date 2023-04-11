@@ -161,8 +161,8 @@ module MicrosoftSync
         it "raises an error" do
           subject.send(:run, nil, nil)
           subject.direct_enqueue_run(10.minutes.from_now, :step_initial, nil)
-          expect { subject.run_synchronously }.to \
-            raise_error(described_class::InternalError, /A job is waiting to be retried/)
+          expect { subject.run_synchronously }
+            .to raise_error(described_class::InternalError, /A job is waiting to be retried/)
         end
       end
 
@@ -299,30 +299,31 @@ module MicrosoftSync
           end
 
           it "re-raises the error and sets the record state to errored" do
-            expect { subject.send(:run, :step_initial, nil) }.to \
-              raise_error(Errors::PublicError, "foo")
+            expect { subject.send(:run, :step_initial, nil) }
+              .to raise_error(Errors::PublicError, "foo")
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq("errored")
           end
 
           it "captures error data and the current_state in the last_error field" do
-            expect { subject.send(:run, :step_initial, nil) }.to raise_error(Errors::PublicError)
-            expect(state_record.last_error).to \
-              eq(Errors.serialize(Errors::PublicError.new("foo"), step: "step_initial"))
+            expect { subject.send(:run, :step_initial, nil) }
+              .to raise_error(Errors::PublicError)
+            expect(state_record.last_error)
+              .to eq(Errors.serialize(Errors::PublicError.new("foo"), step: "step_initial"))
           end
 
           it "doesn't run the stash block on the last failure" do
             expect(steps_object.steps_run.count(:stash)).to eq(4)
             steps_object.steps_run.clear
-            expect { subject.send(:run, :step_initial, nil) }.to \
-              raise_error(Errors::PublicError, "foo")
+            expect { subject.send(:run, :step_initial, nil) }
+              .to raise_error(Errors::PublicError, "foo")
             expect(steps_object.steps_run.count(:stash)).to eq(0)
           end
 
           it 'increments the "final_retry" statsd counter' do
             allow(InstStatsd::Statsd).to receive(:increment).and_call_original
-            expect { subject.send(:run, :step_initial, nil) }.to \
-              raise_error(Errors::PublicError)
+            expect { subject.send(:run, :step_initial, nil) }
+              .to raise_error(Errors::PublicError)
             expect(InstStatsd::Statsd).to have_received(:increment).with(
               "microsoft_sync.smj.final_retry",
               tags: { microsoft_sync_step: "step_initial", category: "MicrosoftSync__Errors__PublicError" }
@@ -333,13 +334,11 @@ module MicrosoftSync
             expect(Canvas::Errors).to receive(:capture) do |error, options, level|
               expect(error).to be_a(described_class::RetriesExhaustedError)
               expect(error.cause).to be_a(MicrosoftSync::Errors::PublicError)
-              expect(options).to \
-                eq(tags: { type: "microsoft_sync_smj" })
+              expect(options).to eq(tags: { type: "microsoft_sync_smj" })
               expect(level).to eq(:error)
               { error_report: 456 }
             end
-            expect { subject.send(:run, :step_initial, nil) }.to \
-              raise_error(Errors::PublicError)
+            expect { subject.send(:run, :step_initial, nil) }.to raise_error(Errors::PublicError)
             expect(state_record.last_error_report_id).to eq(456)
           end
         end
@@ -362,8 +361,8 @@ module MicrosoftSync
               subject.send(:run, :step_initial, nil)
               expect(state_record.reload.job_state).to eq(nil)
               expect(state_record.workflow_state).to eq("errored")
-              expect(state_record.last_error).to \
-                eq(Errors.serialize(Errors::GracefulCancelError.new("foo"), step: "step_initial"))
+              expect(state_record.last_error)
+                .to eq(Errors.serialize(Errors::GracefulCancelError.new("foo"), step: "step_initial"))
             end
 
             it 'increments a "canceled" statsd metric' do
@@ -405,8 +404,8 @@ module MicrosoftSync
             expect { subject.send(:run, :step_second, nil) }.to raise_error(Errors::PublicError, "foo")
             expect(state_record.reload.job_state).to eq(nil)
             expect(state_record.workflow_state).to eq("errored")
-            expect(state_record.last_error).to \
-              eq(Errors.serialize(Errors::PublicError.new("foo"), step: "step_second"))
+            expect(state_record.last_error)
+              .to eq(Errors.serialize(Errors::PublicError.new("foo"), step: "step_second"))
           end
 
           context "when delay is an array of integers" do
@@ -511,8 +510,8 @@ module MicrosoftSync
 
         before do
           subject.send(:run, nil, nil)
-          allow(steps_object).to receive(:step_initial).and_return \
-            described_class::DelayedNextStep.new(:step_second, delay_amount, "abc123")
+          allow(steps_object).to receive(:step_initial)
+            .and_return(described_class::DelayedNextStep.new(:step_second, delay_amount, "abc123"))
           steps_object.steps_run.clear
         end
 
@@ -817,8 +816,8 @@ module MicrosoftSync
                   subject.direct_enqueue_run(2.minutes.from_now, nil, mem_state1)
                   expect(state_record.job_state[:step]).to eq(:step_initial)
                   expect(steps_object).not_to receive(:step_initial)
-                  expect { subject.send(:run, nil, mem_state1) }.to_not \
-                    change { state_record.reload.attributes }
+                  expect { subject.send(:run, nil, mem_state1) }
+                    .to_not change { state_record.reload.attributes }
                 end
               end
 

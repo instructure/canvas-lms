@@ -125,9 +125,9 @@ module AssignmentUtil
     private
 
     def seen_assignment_recently?(student, since: 3.days.ago)
-      AssetUserAccess \
-        .where(user_id: student.id, asset_code: "assignment_#{assignment.id}") \
-        .where(AssetUserAccess.arel_table[:last_access].gteq(since)) \
+      AssetUserAccess
+        .where(user_id: student.id, asset_code: "assignment_#{assignment.id}")
+        .where(AssetUserAccess.arel_table[:last_access].gteq(since))
         .exists?
     end
 

@@ -764,8 +764,8 @@ describe CommunicationChannel do
     context "when destroying a communication channel" do
       it "flags old mappings when destroying a communication channel" do
         cc = communication_channel_model
-        expect(MicrosoftSync::UserMapping).to \
-          receive(:flag_as_needs_updating_if_using_email).with(cc.user)
+        expect(MicrosoftSync::UserMapping).to receive(:flag_as_needs_updating_if_using_email)
+          .with(cc.user)
         cc.destroy_permanently!
       end
     end
@@ -774,8 +774,9 @@ describe CommunicationChannel do
       let!(:cc) { communication_channel_model(path_type: described_class::TYPE_EMAIL) }
 
       it "flags old mappings if path/path_type/position/workflow_state is changed" do
-        expect(MicrosoftSync::UserMapping).to \
-          receive(:flag_as_needs_updating_if_using_email).with(cc.user).exactly(5).times
+        expect(MicrosoftSync::UserMapping).to receive(:flag_as_needs_updating_if_using_email)
+          .with(cc.user)
+          .exactly(5).times
         cc.update!(path: "foo" + cc.path)
         cc.update!(position: cc.position + 1)
         expect(cc.workflow_state).to_not eq("active")

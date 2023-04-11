@@ -522,7 +522,7 @@ module QuizzesHelper
 
   def score_out_of_points_possible(score, points_possible, options = {})
     options.reverse_merge!({ precision: 2 })
-    score_html = \
+    score_html =
       if options[:id] || options[:class] || options[:style]
         content_tag("span",
                     render_score(score, options[:precision]),

@@ -55,8 +55,8 @@ describe MicrosoftSync::MembershipDiff do
       end
 
       it "indicates #{enrollment_type} users to be added as members" do
-        expect(additions_all_members.select { |user| user.start_with?("student") }).to \
-          eq(%w[student3 student4])
+        expect(additions_all_members.select { |user| user.start_with?("student") })
+          .to eq(%w[student3 student4])
       end
     end
   end
@@ -69,13 +69,13 @@ describe MicrosoftSync::MembershipDiff do
 
     describe "#additions_in_slices_of" do
       it "indicates #{enrollment_type} users to be added as owners" do
-        expect(additions_all_owners.select { |user| user.start_with?("teacher") }).to \
-          eq(%w[teacher5])
+        expect(additions_all_owners.select { |user| user.start_with?("teacher") })
+          .to eq(%w[teacher5])
       end
 
       it "indicates #{enrollment_type} users to be added as members" do
-        expect(additions_all_members.select { |user| user.start_with?("teacher") }).to \
-          eq(%w[teacher5])
+        expect(additions_all_members.select { |user| user.start_with?("teacher") })
+          .to eq(%w[teacher5])
       end
     end
   end
@@ -105,8 +105,8 @@ describe MicrosoftSync::MembershipDiff do
 
     it "yields owners first" do
       expect(additions_all_owners).to eq(%w[teacher4 teacher5 teacher6])
-      expect((additions[0][:owners] + additions[1][:owners]).sort).to \
-        eq(%w[teacher4 teacher5 teacher6])
+      expect((additions[0][:owners] + additions[1][:owners]).sort)
+        .to eq(%w[teacher4 teacher5 teacher6])
     end
 
     it "yields members" do
@@ -171,8 +171,8 @@ describe MicrosoftSync::MembershipDiff do
 
     it "yields owners first" do
       expect(removals_all_owners).to eq(%w[teacher1 teacher2 teacher3])
-      expect((removals[0][:owners] + removals[1][:owners]).sort).to \
-        eq(%w[teacher1 teacher2 teacher3])
+      expect((removals[0][:owners] + removals[1][:owners]).sort)
+        .to eq(%w[teacher1 teacher2 teacher3])
     end
 
     it "yields members" do

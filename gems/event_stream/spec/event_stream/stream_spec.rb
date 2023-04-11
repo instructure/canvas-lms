@@ -180,7 +180,7 @@ describe EventStream::Stream do
       ar_type = Class.new do
         def self.connection
           self
-        end\
+        end
 
         def self.shard
           self

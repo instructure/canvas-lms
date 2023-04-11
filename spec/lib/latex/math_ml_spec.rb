@@ -30,7 +30,7 @@ describe Latex::MathMl do
       <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline">
         <msqrt>
           <mrow>
-            <mn>25</mn>\
+            <mn>25</mn>
           </mrow>
         </msqrt>
         <mo>+</mo>

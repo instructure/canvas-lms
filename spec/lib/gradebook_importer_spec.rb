@@ -642,11 +642,10 @@ describe GradebookImporter do
   it "does not create assignments for unposted columns" do
     course_model
     @assignment1 = @course.assignments.create!(name: "Assignment 1", points_possible: 10)
-    importer_with_rows(
-      "Student,ID,Section,Assignment 1,Current Points,Final Points,Unposted Current Score," \
-      "Unposted Final Score,Unposted Final Grade",
-      "Points Possible,,,20,,,,,"
-    )
+    importer_with_rows(<<~CSV)
+      Student,ID,Section,Assignment 1,Current Points,Final Points,Unposted Current Score,Unposted Final Score,Unposted Final Grade
+      Points Possible,,,20,,,,,
+    CSV
     expect(@gi.assignments).to eq [@assignment1]
     expect(@gi.missing_assignments).to be_empty
   end
