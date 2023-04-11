@@ -653,6 +653,7 @@ ru:
     titles: 
       configure_report: "Настроить отчет"
       open_registration_delegated_warning_dialog: "Провайдер внешней идентификации включен"
+      rqd_help: "Ограничьте Количественные Данные"
       what_are_quiz_ip_filters: "Что такое IP-фильтры Quiz?"
     user: Пользователь
   account_settings_fe083453: "Настройки учетных записей"
@@ -1647,6 +1648,8 @@ ru:
         update_button: Обновить
       report_last_run_never: Никогда
       report_running: "Выполняется отчет.*По завершении вы получите сообщение электронной почты.*"
+      rqd_help_message: "При выборе этого параметра пользователь будет ограничен в просмотре количественных (числовых) данных оценок и ограничены возможности создания заданий для преподавателей. Пользователи будут видеть только качественные данные, которые включают оценки в буквенном виде и комментарии. Администратор может дополнительно настроить этот параметр, задавая разрешения для ролей пользователей."
+      rqd_screenreader: "Об ограничении количественных данных"
       select: 
         mfa: 
           disabled: Отключено
@@ -2298,7 +2301,7 @@ ru:
   adjust_final_grade_fa45e7e0: "Скорректировать итоговую оценку успеваемости"
   adjusting_due_dates_a5918b9c: "Установка дат сдачи..."
   admin_4d3ba42f: Админ
-  admin_analytics_description: "Включение дисплеев Аналитика администратора для отображения обзоров курсов и студентов. Узнать больше и предоставить отзыв путем присоединения *группы пользователей Новая аналитика* в сообществе Canvas."
+  admin_analytics_description: "Включает аналитику на уровне учетной записи. Информационные панели Admin Analytics (Аналитика Администратора) предоставляют подробную информацию об использовании Canvas, о результатах курсов Canvas и вовлеченности учащихся. Более подробная информация содержится в *Admin Analytics Hub* (Центр Аналитики Администратора) в сообществе Canvas."
   admin_analytics_eacba735: "Аналитика Администратора"
   admin_csv_f8d1b3eb: "CSV администратора"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Экспорт администратором для нескольких периодов выставления оценок"
@@ -4546,6 +4549,7 @@ ru:
       no_points: Нет
       no_submission: Ничего
       points: Баллы
+      speed_grader: SpeedGrader™
       submission_types: "Типы файлов"
       submitting: Отправка
       turnitin: Turnitin
@@ -6083,6 +6087,7 @@ ru:
   canvas_for_elementary_analytics_15dc1e07: "Аналитика Canvas for Elementary"
   canvas_for_elementary_beta_28bc5181: "Canvas for Elementary (бета-версия)"
   canvas_for_elementary_e6f5a06f: "Canvas для Elementary"
+  canvas_for_elementary_font_selection_5d1f2271: "Canvas для выбора элементарного шрифта"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas для Elementary: много объявлений в «домашней комнате»"
   canvas_for_elementary_parent_support_74a2356e: "Canvas для Elementary: Родительская поддержка"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -6220,6 +6225,7 @@ ru:
   check_your_spelling_or_try_fewer_letters_70769a90: "Проверьте написание или сократите число букв."
   checkbox_examples_dc790142: "Примеры полей отметки"
   checked_883b93fd: проверено
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "При установке флажка Добавить в календарь будут приглашены все участники курса."
   cheerful_panda_holding_a_map_17ba47ee: "Веселая панда держит карту"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Дочерний курс должен принадлежат той же учётной записи с правами администратора, что и основной курс"
   child_s_username_dde3aa9: "Детское имя пользователя"
@@ -9154,6 +9160,7 @@ ru:
         participation_id: Участие
         public_syllabus: "Сделать программу обучения для данного курса общедоступной"
         restrict_enrollments_to_course_dates: "Учащиеся могут участвовать в курсе только в промежутке между этими датами"
+        restrict_quantitative_data: "Варианты количественных данных"
         restrict_student_future_view: "Ограничить просмотр данного курса для учащихся до даты начала"
         restrict_student_past_view: "Ограничить просмотр данного курса для учащихся после даты окончания"
         root_account: "Корневая учетная запись"
@@ -11330,6 +11337,7 @@ ru:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Включает измененное диалоговое окно «Отправить сообщения учащимся, которые...», которое позволяет отправлять сообщения наблюдателям в дополнение к учащимся."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Активирует доступ к API новых тестов с открытым доступом: API новых тестов."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Активирует доступ к API новых тестов с открытым доступом через Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Позволяет администраторам выполнять динамическую регистрацию инструментов LTI"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Позволяет показывать отчеты о плагиате и оценки сходства в лотке отправки нового журнала оценок."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Позволяет применять важные даты к заданиям, событиям календаря и другим элементам."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Позволяет диалоговому окну предупреждать пользователя о том, что черновой комментарий остался неопубликованным в SpeedGrader."
@@ -13781,6 +13789,7 @@ ru:
   grades_view_audit_trail_cc4c1fcc: "Оценки - просмотреть журнал проверки"
   grades_view_audit_trail_db7364b1: "Оценки - Просмотреть журнал проверки"
   grades_view_change_logs_6bc1b959: "Оценки - просмотреть журналы регистрации изменений"
+  grades_view_quantitative_feedback_90a4ffc7: "Оценки - просмотр количественной обратной связи"
   grades_visible_to_students_1584fa83: "Оценки, доступные для просмотра студентами"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Оценки были успешно опубликованы в журнале успеваемости."
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Оценки были успешно опубликованы в журнале оценок."
@@ -14497,12 +14506,18 @@ ru:
       event: "%{date} в %{time}"
   handler_7912052f: Обработчик
   has_been_automatically_selected_based_upon_where_t_61f805c5: "автоматически выбран на основании того, где находится экземпляр Canvas этой учетной записи. В некоторых случаях это может быть другой регион."
+  has_no_submissions_2826a7a2: "Не имеет отправок"
+  has_no_submissions_63de50ad: "Не Имеет Отправок"
   has_not_submitted_2350bc24: "Не отправил"
   has_similarity_score_d5f332b4: "Имеет коэффициент сходства"
   has_submissions_6c12ef4c: "Имеет отправки"
+  has_submissions_ea8e609b: "Имеет Отправки"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Имеется оценка Turnitin"
   has_ungraded_submissions_2bff87df: "Имеет неоцененные отправки"
+  has_ungraded_submissions_b79f5803: "Имеет Отправки без Оценок"
+  has_unposted_grades_3567391e: "Имеет неопубликованные оценки"
+  has_unposted_grades_ba0e02b6: "Имеет Неопубликованные Оценки"
   have_a_question_about_canvas_ask_it_here_5781cce: "Есть вопрос по Canvas? Задайте его здесь."
   have_not_been_graded_df2a5fd2: "Не оценивались"
   have_not_yet_submitted_57e6a58b: "Еще не были сданы"
@@ -15172,6 +15187,7 @@ ru:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Если включен параметр «Пользователи - управление регистрационными данными» или «Статистика - просмотр», пользователь сможет генерировать активность входа / выхода из системы в средствах администрирования. Чтобы скрыть параметр активности входа / выхода из системы в средствах администрирования, оба этих разрешения должны быть отключены."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Если включен параметр «Пользователи - управление регистрационными данными» или «Статистика - просмотр», пользователь сможет генерировать активность входа / выхода из системы в средствах администрирования. Чтобы скрыть параметр активности входа / выхода из системы в средствах администрирования, оба этих разрешения должны быть отключены."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Если включен параметр «Пользователи - управление регистрационными данными» или «Статистика - просмотр», пользователь сможет генерировать активность входа / выхода из системы в средствах администрирования. Чтобы скрыть параметр активности входа / выхода из системы в средствах администрирования, оба этих разрешения должны быть отключены."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "Если вы собираетесь определить максимальное число участников группы, оно должно быть больше 1."
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "При изменении возмлжных баллов задания, существующие классы будут автоматически изменены."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "В случае изменения возможных баллов за задание, вы должны повторно оценить это задание."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "В случае изменения возможных баллов за задание, вы должны повторно оценить любые отправки."
@@ -15397,6 +15413,7 @@ ru:
   individual_2033c005: Лицо
   individual_assignment_grade_posting_d8322b99: "Публикация оценок за индивидуальные задания"
   individual_gradebook_c7de9821: "Индивидуальный журнал успеваемости…"
+  individual_gradebook_enhancements_de33aa3d: "Улучшения индивидуального журнала успеваемости"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Невозможно изменить значения расчетов индивидуальных результатов."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Нельзя изменить баллы за усвоение навыков при индивидуальном оценивании результатов."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Варианты оценки индивидуальных результатов и метода расчета"
@@ -15907,6 +15924,7 @@ ru:
     lock_module_until: "Заблокировать до"
   language_6b3e2c7c: Язык
   languages_835813f0: Языки
+  large_balsamiq_font_5fe45fae: "Шрифт Large Balsamiq"
   large_course_db3d58b: "Большой курс:"
   last_7_days_bd411f1f: "Последние 7 дней"
   last_activity_a983e541: "Последняя активность"
@@ -16346,6 +16364,7 @@ ru:
   loading_features_d26820f6: "Загрузка функций"
   loading_folders_d8b5869e: "Загрузка папок"
   loading_gradebook_b0b75cd3: "Загрузка журнала успеваемости"
+  loading_gradebook_submissions_d2ba017f: "Загрузка отправок журнала успеваемости"
   loading_graders_f6a76142: "Загрузка оценщиков"
   loading_grades_446fc226: "Загрузка оценок..."
   loading_grades_for_coursename_26784c2d: "Загрузка оценок для %{courseName}"
@@ -16607,6 +16626,7 @@ ru:
   lti_deep_linking_line_items_5e0079f7: "Элементы строки создания глубинных ссылок LTI"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Элементы строки установки внешних ссылок LTI на странице редактирования заданий"
   lti_delete_ee5f1bef: "LTI - удалить"
+  lti_dynamic_registration_8592edb0: "Регистрация LTI Dynamic"
   lti_edit_83a27850: "LTI - редактировать"
   lti_key_14ad02b1: "Ключ LTI"
   lti_launch_af082dc3: "Пуск LTI:"
@@ -19554,6 +19574,7 @@ ru:
   new_question_9107c469: "Новый вопрос"
   new_question_group_d9306280: "Новая группа вопросов"
   new_quiz_34aacba6: "Новое тестирование"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "Удаленный пользователь нового теста в статусе ожидания восстановления при зачислении"
   new_quiz_items_3c850331: "Новые элементы теста"
   new_quiz_statistics_desc: "Включить страницу статистики новой контрольной работы для курса."
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Новая учетная запись тестов и банки позиций на уровне курсов"
@@ -22280,6 +22301,7 @@ ru:
   qti_img_matching_question: "Импортированный соответствующий вопрос содержит изображения с обеих сторон, что не поддерживается"
   qti_img_matching_question_distractors: "Импортированный соответствующий вопрос содержит изображения внутри вариантов ответа и не может быть исправлен, поскольку также содержит дистракторы"
   qti_name: "Конвертер QTI"
+  quantitative_data_options_4f071510: "Варианты количественных данных"
   question_9121487: Вопрос
   question_answered: "Получен ответ"
   question_bank: 
@@ -24129,6 +24151,7 @@ ru:
         name: Имя
     welcome_to_canvas: "Вас приветствует Canvas!"
   registration_url_60e0eaaa: "URL-адрес регистрации"
+  regular_lato_font_7f3cf24c: "Шрифт Regular Lato"
   regular_style_checkbox_ee3d71c1: "Обычная флаговая кнопка"
   reinforce_student_understanding_304d18a6: "Закрепление усвоения информации учащимися"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Расслабьтесь и сделайте перерыв. На данный момент никаких заданий нет."
@@ -26684,6 +26707,17 @@ ru:
       aria_stop: "Нажмите «Стоп» для завершения записи."
     edit_view_rubric: "Просмотр рубрики"
     group: Группа
+    late_input: 
+      days: 
+        few: Дней
+        many: Дней
+        one: День
+        other: Дней
+      hours: 
+        few: Часы
+        many: Часы
+        one: Час
+        other: Часы
     mic_blocked_message: "Разрешение на использование микрофона заблокировано. Для изменения перейдите в раздел настроек chrome://settings/content/microphone"
     mute_assignment: "Отключить звук задания"
     no_submission_time: "нет времени передачи"
@@ -28335,6 +28369,7 @@ ru:
       Флажок этой функции разблокирует использование обновленной
       страницы создания/редактирования обсуждения
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Флажок этой функции означает, что учетная запись может активироваться, если необходимо разрешить пользователям учетных записей, говорящих на языках со стандартным направлением письма справа налево (напр., арабский, иврит, фарси) просматривать компоновку языков реального времени RTL в то время, пока мы работаем над ней. После того, как функция \"готова\", флажок этой функции убирается и любой, кто говорит на этих языках, будет всегда видеть интерфейс языков реального времени RTL."
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Эта функция вносит улучшения в производительность и обслуживание Индивидуального журнала успеваемости"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Эта функция заключается в том, что при отправке нескольких файлов вместе
       с помощью инструмента третьей стороны через API заданий и службу выставления оценок они будут
@@ -29514,6 +29549,10 @@ ru:
   traditional_gradebook_d7ad59c6: "Стандартный журнал успеваемости…"
   traditional_gradebook_d90461dc: "Стандартный журнал успеваемости"
   transferred_student_enrollments_90dc27d3: "Зачисления переведенных студентов"
+  transform_rce_content_on_load_1f521086: "Преобразование содержимого RCE при загрузке"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Преобразует абсолютные URL в относительные и удаляет лишние атрибуты из содержимого RCE при загрузке.
+      Необходим для полноценной работы RCE в новых тестах.
   travel_places_f461329c: "Путешествия и места"
   treat_ungraded_as_0_d38c2b41: "Считать неоцененные как 0"
   tree_browser: 
@@ -29828,7 +29867,7 @@ ru:
   unpin_discussion_title_8c2a0942: "Открепить обсуждение %{title}"
   unpin_of_discussion_title_failed_852116d4: "Не удалось открепить обсуждение %{title}"
   unpin_of_discussion_title_succeeded_ce315adb: "Обсуждение успешно %{title} откреплено"
-  unposted_8d9932ec: Неопубликовано
+  unposted_8d9932ec: "Не опубликовано"
   unposted_current_grade_aa1ea11c: "неопубликованная текущая оценка"
   unposted_current_score_c1dd3879: "неопубликованная текущая оценка"
   unposted_final_grade_aa5facd6: "неопубликованная итоговая оценка"
@@ -30658,6 +30697,8 @@ ru:
       resubmit_to_vericite: "Повторно отправить в VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "Оценка сходства VeriCite -- более подробная информация"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Коэффициент сходства - См. подробный отчет"
+  verify_ldap_tls_certificates_70241d8e: "Верификация сертификатов LDAP TLS"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Верификация сертификатов TLS, предоставленных провайдерами аутентификации LDAP."
   version_versionnumber_updatedat_9f5b7a5b: "Версия %{versionNumber} %{updatedAt}"
   video_78335c71: видео
   video_b9f27375: Видео
@@ -30948,6 +30989,7 @@ ru:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Если выбран этот вариант, курс доступен только для чтения вне этих дат."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Если выбран этот вариант, курс недоступен вне дат курса. Если даты курса не заполнены, эти даты начала и окончания применяются к датам семестра."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Если выбран этот вариант, раздел курса доступен только для чтения вне этих дат."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Если задано, определяет, должно ли состояние рабочего процесса нового теста быть установлено как оцененное или pending_review, если у пользователя был предыдущий pending_review новый тест, но он был повторно включен в курс."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Когда этот флажок установлен, навигация по курсу будет оставаться свернутой или развернутой
       при переходе между страницами в зависимости от того, как она была установлена пользователем в последний раз, вместо того,
