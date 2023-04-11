@@ -109,6 +109,17 @@ describe "reply attachment" do
       wait_for_ajaximations
     end
 
+    it "can add a mention from the mentions menu" do
+      Discussion.visit(@course, @topic)
+      f("button[data-testid='discussion-topic-reply']").click
+      wait_for_ajaximations
+      type_in_tiny "textarea", "@"
+      ff("[data-testid='mention-dropdown-item']")[0].click
+      f("button[data-testid='DiscussionEdit-submit'").click
+      wait_for_ajaximations
+      expect(f(".mceNonEditable.mention")).to be_displayed
+    end
+
     it "replies to the discussion with attachment" do
       file_attachment = "graded.png"
       entry_text = "new entry"
