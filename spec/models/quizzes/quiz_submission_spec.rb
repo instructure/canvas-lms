@@ -965,7 +965,7 @@ describe Quizzes::QuizSubmission do
       let(:submission) { @quiz.quiz_submissions.build }
 
       before do
-        allow(submission).to receive(:temporary_data).and_return \
+        allow(submission).to receive(:temporary_data).and_return(
           "question_1" => "A",
           "question_2" => "",
           "question_3_123456abcdefghijklmnopqrstuvwxyz" => "A",
@@ -988,6 +988,7 @@ describe Quizzes::QuizSubmission do
           "question_9_answer_123" => "0",
           "question_9_answer_234" => "1",
           "question_9_answer_345" => "1"
+        )
       end
 
       context "on a single answer question" do

@@ -85,8 +85,9 @@ module QuizQuestionsCommon
   end
 
   def it_should_show_cant_go_back_warning
-    expect(f("body")).to include_text \
+    expect(f("body")).to include_text(
       "Once you have submitted an answer, you will not be able to change it later"
+    )
   end
 
   def accept_cant_go_back_warning

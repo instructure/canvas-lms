@@ -53,11 +53,13 @@ describe LinkedIn::Connection do
 
     describe "#get_service_user_info" do
       it "returns service user info" do
-        token_response_body = "<html><id>#1</id>"\
-                              "<first-name>john</first-name>"\
-                              "<last-name>doe</last-name>"\
-                              "<public-profile-url>http://example.com/linkedin</public-profile-url>"\
-                              "</html>"
+        token_response_body = <<~HTML
+          <html><id>#1</id>
+          <first-name>john</first-name>
+          <last-name>doe</last-name>
+          <public-profile-url>http://example.com/linkedin</public-profile-url>
+          </html>
+        HTML
         mock_access_token = double
         expect(mock_access_token).to receive(:get)
           .with("/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)")

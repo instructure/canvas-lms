@@ -116,8 +116,8 @@ describe Lti::IMS::AdvantageAccessTokenRequestHelper do
     it "returns false if the route references a non-existent controller" do
       # probably wouldn't happen, but it does in the specs, and if it happens I
       # don't want to blow up here in this method
-      expect(Rails.application.routes).to \
-        receive(:recognize_path).and_return(controller: "oops_this_controller_doesnt/really_exist")
+      expect(Rails.application.routes).to receive(:recognize_path)
+        .and_return(controller: "oops_this_controller_doesnt/really_exist")
       expect(result_for_path("api/lti/security/jwks")).to eq(false)
     end
 

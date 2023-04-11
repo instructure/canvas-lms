@@ -535,8 +535,7 @@ describe "Importing assignments" do
           end
 
           it "creates the line items with the same Lti::ResourceLink" do
-            expect(assignment.line_items.pluck(:lti_resource_link_id)).to \
-              eq(created_resource_link_ids * 3)
+            expect(assignment.line_items.pluck(:lti_resource_link_id)).to eq(created_resource_link_ids * 3)
           end
         end
 
@@ -560,13 +559,13 @@ describe "Importing assignments" do
           end
 
           it "creates all line items" do
-            expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first)).to \
-              eq(expected_created_line_items_fields)
+            expect(assignment.line_items.pluck(:label, :coupled, :score_maximum)
+            .sort_by(&:first)).to eq(expected_created_line_items_fields)
           end
 
           it "creates the line items with the same Lti::ResourceLink" do
-            expect(assignment.line_items.pluck(:lti_resource_link_id)).to \
-              eq(created_resource_link_ids * 4)
+            expect(assignment.line_items.pluck(:lti_resource_link_id))
+              .to eq(created_resource_link_ids * 4)
           end
 
           context "when the same line items are imported again in an additional run" do
@@ -576,8 +575,8 @@ describe "Importing assignments" do
                 Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
                 Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
               end.to_not change { Assignment.count }
-              expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first)).to \
-                eq(expected_created_line_items_fields)
+              expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first))
+                .to eq(expected_created_line_items_fields)
             end
           end
         end

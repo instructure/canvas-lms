@@ -23,16 +23,20 @@ require "nokogiri"
 describe CC::CCHelper do
   context "map_linked_objects" do
     it "finds linked canvas items in exported html content" do
-      content = '<a href="$CANVAS_OBJECT_REFERENCE$/assignments/123456789">Link</a>' \
-                '<img src="$IMS-CC-FILEBASE$/media/folder%201/file.jpg" />'
+      content = <<~HTML
+        <a href="$CANVAS_OBJECT_REFERENCE$/assignments/123456789">Link</a>
+        <img src="$IMS-CC-FILEBASE$/media/folder%201/file.jpg" />
+      HTML
       linked_objects = CC::CCHelper.map_linked_objects(content)
       expect(linked_objects[0]).to eq({ identifier: "123456789", type: "assignments" })
       expect(linked_objects[1]).to eq({ local_path: "/media/folder 1/file.jpg", type: "Attachment" })
     end
 
     it "finds linked canvas items in exported html content with old escapes" do
-      content = '<a href="%24CANVAS_OBJECT_REFERENCE%24/assignments/123456789">Link</a>' \
-                '<img src="%24IMS-CC-FILEBASE%24/media/folder%201/file.jpg" />'
+      content = <<~HTML
+        <a href="%24CANVAS_OBJECT_REFERENCE%24/assignments/123456789">Link</a>
+        '<img src="%24IMS-CC-FILEBASE%24/media/folder%201/file.jpg" />
+      HTML
       linked_objects = CC::CCHelper.map_linked_objects(content)
       expect(linked_objects[0]).to eq({ identifier: "123456789", type: "assignments" })
       expect(linked_objects[1]).to eq({ local_path: "/media/folder 1/file.jpg", type: "Attachment" })

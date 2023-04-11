@@ -390,12 +390,10 @@ describe OriginalityReport do
 
     it "uses the updated_at of the original report so an old report doesn't look new" do
       originality_report.copy_to_group_submissions!
-      expect(submission_two.originality_reports.first.updated_at).to \
-        eq(originality_report.updated_at)
+      expect(submission_two.originality_reports.first.updated_at).to eq(originality_report.updated_at)
       originality_report.touch
       originality_report.copy_to_group_submissions!
-      expect(submission_two.originality_reports.first.updated_at).to \
-        eq(originality_report.updated_at)
+      expect(submission_two.originality_reports.first.updated_at).to eq(originality_report.updated_at)
     end
 
     context "with sharding" do
