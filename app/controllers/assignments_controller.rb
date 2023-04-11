@@ -84,7 +84,8 @@ class AssignmentsController < ApplicationController
             new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
             new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
             show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
-          }
+          },
+          grading_scheme: @context.grading_standard_or_default.data
         }
 
         set_default_tool_env!(@context, hash)
