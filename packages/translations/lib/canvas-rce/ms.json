@@ -17,6 +17,7 @@
     "message": "Pautan berhampiran dengan URL yang sama sepatutnya dijadikan pautan tunggal."
   },
   "aleph_f4ffd155": { "message": "Aleph" },
+  "align_11050992": { "message": "Jajarkan" },
   "alignment_and_lists_5cebcb69": { "message": "Penjajaran dan Senarai" },
   "all_4321c3a1": { "message": "Semua" },
   "all_apps_a50dea49": { "message": "Semua Apl" },
@@ -47,6 +48,9 @@
   "approaches_the_limit_893aeec9": { "message": "Hampir Mencapai Had" },
   "approximately_e7965800": { "message": "Anggaran" },
   "apps_54d24a47": { "message": "Aplikasi" },
+  "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+    "message": "Adakah anda pasti anda ingin membatalkan? Perubahan yang anda lakukan mungkin belum disimpan."
+  },
   "arrows_464a3e54": { "message": "Anak panah" },
   "art_icon_8e1daad": { "message": "Ikon Seni" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
@@ -84,6 +88,7 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Batal" },
   "cap_product_3a5265a6": { "message": "Hadkan Produk" },
+  "center_align_e68d9997": { "message": "Jajar ke Tengah" },
   "centered_dot_64d5e378": { "message": "Titik di Tengah" },
   "centered_horizontal_dots_451c5815": {
     "message": "Titik Mendatar di Tengah"
@@ -96,6 +101,11 @@
     "message": "Ubah tahap pengepala ini sahaja"
   },
   "change_text_color_1aecb912": { "message": "Ubah warna teks" },
+  "changes_you_made_may_not_be_saved_4e8db973": {
+    "message": "Perubahan yang anda lakukan mungkin belum disimpan."
+  },
+  "characters_9d897d1c": { "message": "Aksara" },
+  "characters_no_spaces_485e5367": { "message": "Aksara (tiada jarak)" },
   "check_accessibility_3c78211c": { "message": "Semak Kebolehcapaian" },
   "checking_for_accessibility_issues_fac18c6d": {
     "message": "Menyemak isu kebolehcapaian"
@@ -104,6 +114,9 @@
   "choose_caption_file_9c45bc4e": { "message": "Pilih fail kapsyen " },
   "choose_usage_rights_33683854": { "message": "Pilih hak penggunaan..." },
   "circle_484abe63": { "message": "Bulatan" },
+  "circle_unordered_list_9e3a0763": {
+    "message": "Bulatan senarai tidak tersusun"
+  },
   "clear_2084585f": { "message": "Kosongkan" },
   "clear_image_3213fe62": { "message": "Kosongkan imej" },
   "clear_selected_file_82388e50": { "message": "Kosongkan fail yang dipilih" },
@@ -161,6 +174,10 @@
   "content_type_2cf90d95": { "message": "Jenis Kandungan" },
   "coproduct_e7838082": { "message": "Produk Bersama" },
   "copyright_holder_66ee111": { "message": "Pemegang Hak Cipta:" },
+  "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
+    "message": "Tidak dapat menyisipkan kandungan: \"{ itemType }\" item tidak disokong dalam Canvas buat masa ini."
+  },
+  "count_40eced3b": { "message": "Kira" },
   "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
     "message": "{ count, plural,\n     =0 {0 perkataan}\n    one {1 perkataan}\n  other {# perkataan}\n}"
   },
@@ -171,10 +188,12 @@
   "course_files_62deb8f8": { "message": "Fail Kursus" },
   "course_files_a31f97fc": { "message": "Fail kursus" },
   "course_images_f8511d04": { "message": "Imej Kursus" },
+  "course_link_b369426": { "message": "Pautan Kursus" },
   "course_links_b56959b9": { "message": "Pautan Kursus" },
   "course_media_ec759ad": { "message": "Media Kursus" },
   "course_navigation_dd035109": { "message": "Navigasi Kursus" },
   "create_icon_110d6463": { "message": "Cipta Ikon" },
+  "create_icon_maker_icon_c716bffe": { "message": "Cipta Ikon Pembuat Ikon" },
   "creative_commons_license_725584ae": { "message": "Lesen Creative Commons:" },
   "crop_image_41bf940c": { "message": "Pangkas imej" },
   "crop_image_807ebb08": { "message": "Pangkas Imej" },
@@ -188,7 +207,14 @@
   "decorative_icon_9a7f3fc3": { "message": "Ikon Hiasan" },
   "decorative_image_fde98579": { "message": "Imej hiasan" },
   "decorative_type_upper_f2c95e3": { "message": "{ TYPE_UPPER } Hiasan" },
+  "decrease_indent_d9cf469d": { "message": "Kurangkan Engsot" },
   "deep_purple_bb3e2907": { "message": "Ungu Gelap" },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "Senarai tidak tersusun berbulet lalai"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "Senarai tersusun berbulet lalai"
+  },
   "definite_integral_fe7ffed1": { "message": "Kamiran Tentu" },
   "degree_symbol_4a823d5f": { "message": "Simbol Darjah" },
   "delimiters_4db4840d": { "message": "Pembatas" },
@@ -215,9 +241,11 @@
     "message": "Paparkan Pautan Teks (Dibuka dalam tab baharu)"
   },
   "division_sign_72190870": { "message": "Papan Tanda Bahagian" },
+  "document_678cd7bf": { "message": "Dokumen" },
   "documents_81393201": { "message": "Dokumen" },
   "done_54e3d4b6": { "message": "Siap" },
   "double_dagger_faf78681": { "message": "Simbol Anotasi" },
+  "down_5831a426": { "message": "Bawah" },
   "down_and_left_diagonal_arrow_40ef602c": { "message": "Panah Barat Daya" },
   "down_and_right_diagonal_arrow_6ea0f460": { "message": "Panah Tenggara" },
   "download_filename_2baae924": { "message": "Muat turun { filename }" },
@@ -241,6 +269,7 @@
   },
   "edit_c5fbea07": { "message": "Edit" },
   "edit_course_link_5a5c3c59": { "message": "Edit Pautan Kursus" },
+  "edit_equation_f5279959": { "message": "Edit Persamaan" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Edit Ikon Pembuat Ikon Sedia Ada"
   },
@@ -252,6 +281,9 @@
   },
   "embed_828fac4a": { "message": "Benamkan" },
   "embed_code_314f1bd5": { "message": "Benamkan Kod" },
+  "embed_content_from_external_tool_3397ad2d": {
+    "message": "Benamkan kandungan daripada Alat Luar"
+  },
   "embed_image_1080badc": { "message": "Imej Terbenam" },
   "embed_video_a97a64af": { "message": "Video Terbenam" },
   "embedded_content_aaeb4d3d": { "message": "kandungan terbenam" },
@@ -268,7 +300,9 @@
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Varian)" },
   "equals_sign_c51bdc58": { "message": "Tanda Sama Dengan" },
+  "equation_1c5ac93c": { "message": "Persamaan" },
   "equation_editor_39fbc3f1": { "message": "Editor Persamaan" },
+  "equilibrium_6ff3040b": { "message": "Keseimbangan" },
   "equivalence_class_7b0f11c0": { "message": "Kelas Kesetaraan" },
   "equivalent_identity_654b3ce5": { "message": "Kesetaraan (Identiti)" },
   "eta_b8828f99": { "message": "Eta" },
@@ -280,6 +314,8 @@
   "expand_to_see_types_f5d29352": {
     "message": "Kembangkan untuk melihat { types }"
   },
+  "external_link_d3f9e62a": { "message": "Pautan Luar" },
+  "external_tool_frame_70b32473": { "message": "Bingkai alat luar" },
   "external_tools_6e77821": { "message": "Alat Luar" },
   "extra_large_b6cdf1ff": { "message": "Amat Besar" },
   "extra_small_9ae33252": { "message": "Amat Kecil" },
@@ -287,6 +323,9 @@
   "f_function_fe422d65": { "message": "F (fungsi)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Gagal mendapatkan kandungan fail"
+  },
+  "failed_to_retrieve_content_from_external_tool_5899c213": {
+    "message": "Gagal mengambil kandungan daripada alat luar"
   },
   "file_name_8fd421ff": { "message": "Nama fail" },
   "file_storage_quota_exceeded_b7846cd1": {
@@ -346,6 +385,7 @@
   "group_files_82e5dcdb": { "message": "Fail Kumpulan" },
   "group_images_98e0ac17": { "message": "Imej Kumpulan" },
   "group_isomorphism_45b1458c": { "message": "Isomorfisme Kumpulan" },
+  "group_link_63e626b3": { "message": "Pautan Kumpulan" },
   "group_links_9493129e": { "message": "Pautan Kumpulan" },
   "group_media_2f3d128a": { "message": "Media Kumpulan" },
   "group_navigation_99f191a": { "message": "Navigasi Kumpulan" },
@@ -379,6 +419,7 @@
   },
   "home_351838cd": { "message": "Laman Utama" },
   "html_code_editor_fd967a44": { "message": "editor kod html" },
+  "html_editor_fb2ab713": { "message": "Editor HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Saya telah mendapatkan keizinan untuk menggunakan fail ini."
   },
@@ -394,6 +435,9 @@
   "icon_size_9353edea": { "message": "Saiz Ikon" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
     "message": "Jika pautan ditinggalkan kosong, teks akan dipaparkan sebagai nama pautan kursus"
+  },
+  "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
+    "message": "Jika Hak Penggunaan disyaratkan, fail ini tidak akan terbit sehingga didayakan dalam halaman Fail."
   },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Jika anda tidak memilih hak penggunaan sekarang, fail ini tidak akan diterbitkan selepas ia dimuat naik."
@@ -417,12 +461,16 @@
     "message": "Bahagian Khayalan (Nombor Kompleks)"
   },
   "in_element_of_19ca2f33": { "message": "Dalam (Element untuk)" },
+  "increase_indent_6af90f7c": { "message": "Tambah Engsot" },
   "indefinite_integral_6623307e": { "message": "Kamiran Tidak Tentu" },
   "indigo_2035fc55": { "message": "Biru Nila" },
   "inference_fed5c960": { "message": "Inferens" },
   "infinity_7a10f206": { "message": "Infiniti" },
   "insert_593145ef": { "message": "Sisipkan" },
   "insert_link_6dc23cae": { "message": "Sisipkan Pautan" },
+  "insert_math_equation_57c6e767": {
+    "message": "Sisipkan Persamaan Matematik"
+  },
   "integers_336344e1": { "message": "Integer" },
   "intersection_cd4590e4": { "message": "Persilangan" },
   "invalid_entry_f7d2a0f5": { "message": "Masukan tidak sah." },
@@ -472,6 +520,8 @@
     "message": "Ketahui lebih lanjut tentang menggunakan atribut skop dengan jadual"
   },
   "leave_as_is_4facfe55": { "message": "Biarkan seperti adanya" },
+  "left_3ea9d375": { "message": "Kiri" },
+  "left_align_43d95491": { "message": "Jajar ke Kiri" },
   "left_angle_bracket_c87a6d07": { "message": "Tanda Kurung Sudut Kiri" },
   "left_arrow_4fde1a64": { "message": "Panah Kiri" },
   "left_arrow_with_hook_5bfcad93": { "message": "Panah Cangkuk Kiri" },
@@ -509,9 +559,13 @@
   "loading_closed_captions_subtitles_failed_95ceef47": {
     "message": "memuatkan kapsyen/sari kata tertutup gagal."
   },
+  "loading_external_tool_d839042c": { "message": "Memuatkan Alat Luar" },
   "loading_failed_b3524381": { "message": "Pemuatan gagal..." },
   "loading_failed_e6a9d8ef": { "message": "Pemuatan gagal." },
   "loading_folders_d8b5869e": { "message": "Memuatkan folder" },
+  "loading_placeholder_for_filename_792ef5e8": {
+    "message": "Memuatkan ruang letak untuk { fileName }"
+  },
   "loading_please_wait_d276220a": {
     "message": "Sedang memuatkan, sila tunggu"
   },
@@ -547,6 +601,9 @@
   "misc_3b692ea7": { "message": "Lain-lain" },
   "miscellaneous_e9818229": { "message": "Lain-lain" },
   "modules_c4325335": { "message": "Modul" },
+  "moving_image_to_crop_directionword_6f66cde2": {
+    "message": "Mengalih imej untuk memangkas { directionWord }"
+  },
   "mu_37223b8b": { "message": "Mu" },
   "multi_color_image_63d7372f": { "message": "Imej Pelbagai Warna" },
   "multiplication_sign_15f95c22": { "message": "Tanda Darab" },
@@ -611,6 +668,9 @@
   "operators_a2ef9a93": { "message": "Operator" },
   "or_9b70ccaa": { "message": "Atau" },
   "orange_81386a62": { "message": "Oren" },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "Senarai Tersusun dan Tidak Tersusun"
+  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Pintasan editor lain boleh ditemui di"
   },
@@ -683,11 +743,13 @@
     "message": "Bahagian Sebenar (Nombor Kompleks)"
   },
   "record_7c9448b": { "message": "Rakam" },
+  "record_upload_media_5fdce166": { "message": "Rakam/Muat Naik Media" },
   "recording_98da6bda": { "message": "Merakam" },
   "red_8258edf3": { "message": "Merah" },
   "relationships_6602af70": { "message": "Hubungan" },
   "religion_icon_246e0be1": { "message": "Ikon Agama" },
   "remove_heading_style_5fdc8855": { "message": "Alih keluar gaya tajuk" },
+  "remove_link_d1f2f4d0": { "message": "Alih Keluar Pautan" },
   "replace_e61834a7": { "message": "Gantikan" },
   "reset_95a81614": { "message": "Tetap Semula" },
   "resize_ec83d538": { "message": "Saiz Semula" },
@@ -703,6 +765,8 @@
   "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
     "message": "Kawasan Teks Beraneka. Tekan { OSKey }+F8 untuk pintasan Editor Kandungan Beraneka"
   },
+  "right_71ffdc4d": { "message": "Kanan" },
+  "right_align_39e7a32a": { "message": "Jajar ke Kanan" },
   "right_angle_bracket_d704e2d6": { "message": "Tanda Kurung Sudut Kiri" },
   "right_arrow_35e0eddf": { "message": "Anak Panah ke Kanan" },
   "right_arrow_with_hook_29d92d31": { "message": "Panah Cangkuk Kanan" },
@@ -731,6 +795,9 @@
   "save_11a80ec3": { "message": "Simpan" },
   "save_copy_ca63944e": { "message": "Simpan Salinan" },
   "save_media_cb9e786e": { "message": "Simpan Media" },
+  "saved_icon_maker_icons_df86e2a1": {
+    "message": "Ikon Pembuat Ikon Disimpan"
+  },
   "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
     "message": "Pembaca skrin tidak boleh menentukan apa yang dipaparkan dalam imej tanpa teks alternatif dan nama fail selalunya merupakan rentetan nombor dan huruf tidak bermakna yang tidak menerangkan konteks atau makna."
   },
@@ -756,6 +823,7 @@
   "select_language_7c93a900": { "message": "Pilih Bahasa" },
   "select_video_source_1b5c9dbe": { "message": "Pilih sumber video" },
   "selected_linkfilename_c093b1f2": { "message": "{ linkFileName } dipilih" },
+  "selection_b52c4c5e": { "message": "Pilihan" },
   "set_header_scope_8c548f40": { "message": "Tetapkan skop pengepala" },
   "set_minus_b46e9b88": { "message": "Tetapkan Tolak" },
   "set_table_header_cfab13a0": { "message": "Tetapkan pengepala jadual" },
@@ -765,6 +833,13 @@
     "message": "Shift+O untuk membuka editor HTML rapi."
   },
   "shortcut_911d6255": { "message": "Pintasan" },
+  "show_audio_options_b489926b": { "message": "Tunjuk pilihan audio" },
+  "show_image_options_1e2ecc6b": { "message": "Tunjuk pilihan imej" },
+  "show_link_options_545338fd": { "message": "Tunjuk pilihan pautan" },
+  "show_studio_media_options_a0c748c6": {
+    "message": "Tunjuk pilihan media Studio"
+  },
+  "show_video_options_6ed3721a": { "message": "Tunjuk pilihan video" },
   "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
     "message": "Pengguna yang menggunakan penglihatan untuk memperoleh maklumat menyemak imbas halaman web dengan pantas untuk mencari tajuk yang besar dan tebal. Pengguna pembaca skrin bergantung pada pengepala untuk memperoleh pemahaman kontekstual. Pengepala sepatutnya menggunakan struktur yang betul."
   },
@@ -797,6 +872,9 @@
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Sesuatu tidak kena semasa berkongsi skrin anda."
   },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Maaf, kami tidak menyokong berbilang fail."
+  },
   "sort_by_e75f9e3e": { "message": "Isih Mengikut" },
   "spades_suit_b37020c2": { "message": "Penyodok (Sut)" },
   "square_511eb3b3": { "message": "Segi empat" },
@@ -808,10 +886,14 @@
   "square_subset_strict_7044e84f": { "message": "Subset Kuasa Dua (Wajar)" },
   "square_superset_3be8dae1": { "message": "Superset Kuasa Dua" },
   "square_superset_strict_fa4262e4": { "message": "Subset Kuasa Dua (Wajar)" },
+  "square_unordered_list_b15ce93b": {
+    "message": "senarai tidak tersusun segi empat sama"
+  },
   "star_8d156e09": { "message": "Bintangkan" },
   "start_over_f7552aa9": { "message": "Mulakan Semula" },
   "start_recording_9a65141a": { "message": "Mulakan Rakaman" },
   "steel_blue_14296f08": { "message": "Biru Keluli" },
+  "studio_media_options_ee504361": { "message": "Pilihan Media Studio" },
   "styles_2aa721ef": { "message": "Gaya" },
   "submit_a3cc6859": { "message": "Serahkan" },
   "subscript_59744f96": { "message": "Subskrip" },
@@ -821,6 +903,9 @@
   "succeeds_equal_158e8c3a": { "message": "Berjaya Sama Dengan" },
   "sum_b0842d31": { "message": "Jumlah" },
   "superscript_8cb349a2": { "message": "Superskrip" },
+  "superscript_and_subscript_37f94a50": {
+    "message": "Superskrip dan Subskrip"
+  },
   "superset_c4db8a7a": { "message": "Superset" },
   "superset_strict_c77dd6d2": { "message": "Superset (Wajar)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
@@ -880,6 +965,9 @@
   "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
     "message": "Pengepala pertama pada halaman sepatutnya bersaiz H2."
   },
+  "the_following_content_is_partner_provided_ed1da756": {
+    "message": "Kandungan berikut disediakan oleh rakan kongsi"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Bahan berada dalam domain awam"
   },
@@ -888,6 +976,9 @@
   },
   "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
     "message": "Bahan ini tertakluk pada pengecualian - cth. penggunaan adil, hak untuk kuota atau lain-lain hak bawah undang-undang hak cipta yang terpakai"
+  },
+  "the_preceding_content_is_partner_provided_d753928c": {
+    "message": "Kandungan sebelumnya disediakan oleh rakan kongsi"
   },
   "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
     "message": "Editor HTML rapi tidak dapat diakses dengan papan kekunci. Tekan Shift+O untuk membuka editor HTML rapm"
@@ -933,16 +1024,25 @@
   "type_control_f9_to_access_table_options_text_92141329": {
     "message": "taip Control 9 untuk mengakses pilihan jadual. { text }"
   },
+  "unable_to_determine_resource_selection_url_7867e060": {
+    "message": "Tidak dapat menentukan url pilihan sumber"
+  },
   "union_e6b57a53": { "message": "Kesatuan" },
   "unpublished_dfd8801": { "message": "dinyahterbitkan" },
   "untitled_16aa4f2b": { "message": "Tidak bertajuk" },
   "untitled_efdc2d7d": { "message": "tidak bertajuk" },
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "Panah Barat Laut" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "Panah Timur Laut" },
+  "up_c553575d": { "message": "Ke atas" },
+  "upload_document_253f0478": { "message": "Muat Naik Dokumen" },
   "upload_file_fd2361b8": { "message": "Muat Naik Fail" },
   "upload_image_6120b609": { "message": "Muat Naik Imej" },
   "upload_media_ce31135a": { "message": "Muat Naik Media" },
+  "upload_record_media_e4207d72": { "message": "Muat Naik/Rakam Media" },
   "uploading_19e8a4e7": { "message": "Sedang memuat naik" },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "senarai tersusun mengikut abjad huruf besar"
+  },
   "uppercase_delta_d4f4bc41": { "message": "Delta Huruf Besar" },
   "uppercase_gamma_86f492e9": { "message": "Gama Huruf Besar" },
   "uppercase_lambda_c78d8ed4": { "message": "Lambda Huruf Besar" },
@@ -950,6 +1050,9 @@
   "uppercase_phi_caa36724": { "message": "Fi Huruf Besar" },
   "uppercase_pi_fcc70f5e": { "message": "Pi Huruf Besar" },
   "uppercase_psi_6395acbe": { "message": "Psi Huruf Besar" },
+  "uppercase_roman_numeral_ordered_list_853f292b": {
+    "message": "senarai tersusun nombor Rumi huruf besar"
+  },
   "uppercase_sigma_dbb70e92": { "message": "Sigma Huruf Besar" },
   "uppercase_theta_49afc891": { "message": "Teta Huruf Besar" },
   "uppercase_upsilon_8c1e623e": { "message": "Upsilon Huruf Besar" },
@@ -1011,6 +1114,7 @@
   "video_player_for_title_ffd9fbc4": {
     "message": "Pemain video untuk { title }"
   },
+  "view_all_e13bf0a6": { "message": "Lihat Semua" },
   "view_ba339f93": { "message": "Lihat" },
   "view_description_30446afc": { "message": "Lihat penerangan" },
   "view_keyboard_shortcuts_34d1be0b": {
@@ -1047,6 +1151,8 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height } piksel" },
   "wiki_home_9cd54d0": { "message": "Laman Utama Wiki" },
+  "word_count_c77fe3a6": { "message": "Bilangan Perkataan" },
+  "words_b448b7d5": { "message": "Perkataan" },
   "wreath_product_200b38ef": { "message": "Produk Lingkaran Bunga" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Ya" },

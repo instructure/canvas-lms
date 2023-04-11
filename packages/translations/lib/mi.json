@@ -56,6 +56,9 @@
     "aleph_f4ffd155": {
         "message": "Arepa"
     },
+    "align_11050992": {
+        "message": "Whakarārangi"
+    },
     "alignment_and_lists_5cebcb69": {
         "message": "Whakahurihuri me ngā Rārangi"
     },
@@ -133,6 +136,9 @@
     },
     "arabic_c5c87acd": {
         "message": "Ārapi"
+    },
+    "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+        "message": "E pono ana koe ki te whakakore? Kaore pea e tiakina ngā huringa i mahia e koe."
     },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "E pono ana koe kei te hiahia koe kia mukua tenei mahere tūemi?"
@@ -284,6 +290,9 @@
     "catalan_16f6b78f": {
         "message": "Catalan"
     },
+    "center_align_e68d9997": {
+        "message": "Tiaro Pokapū"
+    },
     "centered_dot_64d5e378": {
         "message": "Pokapū Ira"
     },
@@ -301,6 +310,15 @@
     },
     "change_text_color_1aecb912": {
         "message": "Huria te tae o te kuputuhi"
+    },
+    "changes_you_made_may_not_be_saved_4e8db973": {
+        "message": "Kaore pea e tiakina ngā huringa i mahia e koe."
+    },
+    "characters_9d897d1c": {
+        "message": "Nga pūāhua"
+    },
+    "characters_no_spaces_485e5367": {
+        "message": "Pūāhua (karekau he mokowā)"
     },
     "check_accessibility_3c78211c": {
         "message": "Āta titiro te whakaurutanga"
@@ -328,6 +346,9 @@
     },
     "circle_484abe63": {
         "message": "Porohita"
+    },
+    "circle_unordered_list_9e3a0763": {
+        "message": "Porohitatia te rārangi kore"
     },
     "clear_2084585f": {
         "message": "Ūkui"
@@ -425,6 +446,12 @@
     "copyright_holder_66ee111": {
         "message": "Kaimau Manatārua:"
     },
+    "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
+        "message": "Kāore e taea te kōkuhu ihirangi: \"{ itemType }\" kaore i te tautokohia nga huānga e Canvas."
+    },
+    "count_40eced3b": {
+        "message": "Tatau"
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 ngā kupu}\n    one {1 kupu}\n  other {# ngā kupu}\n}"
     },
@@ -458,6 +485,9 @@
     "course_images_f8511d04": {
         "message": "Ngā Akoranga Āhua"
     },
+    "course_link_b369426": {
+        "message": "Hononga Akoranga"
+    },
     "course_links_b56959b9": {
         "message": "Ngā Akoranga Hononga"
     },
@@ -472,6 +502,9 @@
     },
     "create_icon_110d6463": {
         "message": "Waihanga Tohu"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "Waihangahia Tohu Kaihanga Tohu"
     },
     "creative_commons_license_725584ae": {
         "message": "Auaha ngā Raihana Noa:"
@@ -536,8 +569,17 @@
     "decorative_type_upper_f2c95e3": {
         "message": "Whakapaipai { TYPE_UPPER }"
     },
+    "decrease_indent_d9cf469d": {
+        "message": "Nuku Whakaiti"
+    },
     "deep_purple_bb3e2907": {
         "message": "Hohonu Waiporoporo"
+    },
+    "default_bulleted_unordered_list_47079da8": {
+        "message": "Taunoa whakanuia rārangi kore"
+    },
+    "default_numerical_ordered_list_48dd3548": {
+        "message": "Taunoa tātai kua rārangitia"
     },
     "definite_integral_fe7ffed1": {
         "message": "Tūturu Tautoko"
@@ -632,6 +674,9 @@
     "division_sign_72190870": {
         "message": "Waitohu wehewehe"
     },
+    "document_678cd7bf": {
+        "message": "Tuhinga"
+    },
     "documents_81393201": {
         "message": "Ngā tuhinga"
     },
@@ -640,6 +685,9 @@
     },
     "double_dagger_faf78681": {
         "message": "Matarua"
+    },
+    "down_5831a426": {
+        "message": "Raro"
     },
     "down_and_left_diagonal_arrow_40ef602c": {
         "message": "Pere Hauroki Raro Me Mauī"
@@ -689,6 +737,9 @@
     "edit_course_link_5a5c3c59": {
         "message": "Whakatika Hononga Akoranga"
     },
+    "edit_equation_f5279959": {
+        "message": "Whakatika Tatauranga"
+    },
     "edit_existing_icon_maker_icon_5d0ebb3f": {
         "message": "Whakatika Kei te noho Tohu Kaihanga Tohu"
     },
@@ -712,6 +763,9 @@
     },
     "embed_code_314f1bd5": {
         "message": "Waehere tāmau"
+    },
+    "embed_content_from_external_tool_3397ad2d": {
+        "message": "Whakauru ihirangi mai i te Taputapu o waho"
     },
     "embed_image_1080badc": {
         "message": "Tāmau Āhua"
@@ -767,8 +821,14 @@
     "equals_sign_c51bdc58": {
         "message": "Waitohu Ōrite"
     },
+    "equation_1c5ac93c": {
+        "message": "Whārite"
+    },
     "equation_editor_39fbc3f1": {
         "message": "Whārite Etita"
+    },
+    "equilibrium_6ff3040b": {
+        "message": "Te toenga"
     },
     "equivalence_class_7b0f11c0": {
         "message": "Karaehe Taurite"
@@ -815,6 +875,12 @@
     "extended_9a58dcb6": {
         "message": "Whakaroa"
     },
+    "external_link_d3f9e62a": {
+        "message": "Hononga a Waho"
+    },
+    "external_tool_frame_70b32473": {
+        "message": "Anga taputapu o waho"
+    },
     "external_tools_6e77821": {
         "message": "Taputapu o waho"
     },
@@ -859,6 +925,9 @@
     },
     "failed_to_load_opportunities_52ab6404": {
         "message": "I rahua i te wā uta"
+    },
+    "failed_to_retrieve_content_from_external_tool_5899c213": {
+        "message": "I rahua te tiki ihirangi mai i tetahi taputapu o waho"
     },
     "failed_to_save_to_do_ddc7503b": {
         "message": "I rahua ki te whakaora hei mahi"
@@ -1016,6 +1085,9 @@
     "group_isomorphism_45b1458c": {
         "message": "Rōpū Isomorphism"
     },
+    "group_link_63e626b3": {
+        "message": "Hononga Rōpū"
+    },
     "group_links_9493129e": {
         "message": "Ngā Hono Ropu"
     },
@@ -1094,6 +1166,9 @@
     "html_code_editor_fd967a44": {
         "message": "html waehere editor"
     },
+    "html_editor_fb2ab713": {
+        "message": "Editor HTML"
+    },
     "hungarian_fc7d30c9": {
         "message": "Hungarian"
     },
@@ -1136,6 +1211,9 @@
     "if_left_empty_link_text_will_display_as_course_lin_61087540": {
         "message": "Ki te waiho te hono kau, ka whakaatu te kuputuhi hei ingoa hono akoranga"
     },
+    "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
+        "message": "Mena ka hiahiatia nga motika whakamahi, karekau te konae e whakaputa kia taea ra ano ki te wharangi Kōnae."
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Ki te kore koe e tīpako ngā mōtika whakamahi ināianei, kaore e whakaputaina tēnei kōnae i muri o ''te tukuake."
     },
@@ -1172,6 +1250,9 @@
     "in_element_of_19ca2f33": {
         "message": "Kei roto (Huahanga o)"
     },
+    "increase_indent_6af90f7c": {
+        "message": "Nuku Whakanui"
+    },
     "indefinite_integral_6623307e": {
         "message": "Noa Tautoko"
     },
@@ -1192,6 +1273,9 @@
     },
     "insert_link_6dc23cae": {
         "message": "Whakauru hono"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Whakauru Math Whārite"
     },
     "integers_336344e1": {
         "message": "Tauoti"
@@ -1313,6 +1397,12 @@
     "leave_as_is_4facfe55": {
         "message": "Waiho ki tēnei"
     },
+    "left_3ea9d375": {
+        "message": "maui"
+    },
+    "left_align_43d95491": {
+        "message": "Tiaro Mauī"
+    },
     "left_angle_bracket_c87a6d07": {
         "message": "Taiapa Koki Mauī"
     },
@@ -1403,6 +1493,9 @@
     "loading_closed_captions_subtitles_failed_95ceef47": {
         "message": "utaina ana katia tapanga/kupu hauraro i rahua."
     },
+    "loading_external_tool_d839042c": {
+        "message": "Uta ana Taputapu Waho"
+    },
     "loading_failed_b3524381": {
         "message": "I rahua te uta ..."
     },
@@ -1417,6 +1510,9 @@
     },
     "loading_past_items_ca499e75": {
         "message": "E uta ana ngā tūemi o muri"
+    },
+    "loading_placeholder_for_filename_792ef5e8": {
+        "message": "E uta ana i te waahi mo { fileName }"
     },
     "loading_planner_items_947a813d": {
         "message": "Uta ana mahere tūemi"
@@ -1522,6 +1618,9 @@
     },
     "modules_c4325335": {
         "message": "Kōwae"
+    },
+    "moving_image_to_crop_directionword_6f66cde2": {
+        "message": "Te neke atahanga ki te tapahi { directionWord }"
     },
     "mu_37223b8b": {
         "message": "Mu"
@@ -1730,6 +1829,9 @@
     "orange_81386a62": {
         "message": "Ārani"
     },
+    "ordered_and_unordered_lists_cfadfc38": {
+        "message": "Rārangi kua rārangitia me te kore rārangi"
+    },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Ētahi atu etita pokatata i kitea ai"
     },
@@ -1931,6 +2033,9 @@
     "record_7c9448b": {
         "message": "Tāhopu"
     },
+    "record_upload_media_5fdce166": {
+        "message": "Tāhopu/Kaweake Pāpāho"
+    },
     "recording_98da6bda": {
         "message": "Hopukanga"
     },
@@ -1951,6 +2056,9 @@
     },
     "remove_heading_style_5fdc8855": {
         "message": "Tango pane kāhua"
+    },
+    "remove_link_d1f2f4d0": {
+        "message": "Tango Hononga"
     },
     "replace_e61834a7": {
         "message": "Whakakapi"
@@ -1981,6 +2089,12 @@
     },
     "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
         "message": "Horahanga Kupu Taunaki. Perehi { OSKey }+F8 mo nga pokatata o te Kaiwhakatika Ihirangi Taonga."
+    },
+    "right_71ffdc4d": {
+        "message": "Matau"
+    },
+    "right_align_39e7a32a": {
+        "message": "Tiaro Matau"
     },
     "right_angle_bracket_d704e2d6": {
         "message": "Taiapa Koki Matau"
@@ -2048,6 +2162,9 @@
     "save_media_cb9e786e": {
         "message": "Tiaki Pāpāho"
     },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "Kua tiakina Tohu Kaihanga Tohu"
+    },
     "schedule_preview_3bcda153": {
         "message": "Pūwhakarite Arokite"
     },
@@ -2099,6 +2216,9 @@
     "selected_linkfilename_c093b1f2": {
         "message": "Tīpakohia { linkFileName }"
     },
+    "selection_b52c4c5e": {
+        "message": "Tīpakonga"
+    },
     "serbian_7187f1f2": {
         "message": "Serbian"
     },
@@ -2126,8 +2246,23 @@
     "show_all_ae37d610": {
         "message": "Whakātu katoa"
     },
+    "show_audio_options_b489926b": {
+        "message": "Whakaatutia ororongo kōwhiringa"
+    },
+    "show_image_options_1e2ecc6b": {
+        "message": "Whakātu wāhanga āhua"
+    },
+    "show_link_options_545338fd": {
+        "message": "Whakātu Hono Kōwhiringa"
+    },
     "show_my_grades_ebd08684": {
         "message": "Whakātuhia aku Kōeke"
+    },
+    "show_studio_media_options_a0c748c6": {
+        "message": "Tirohia nga Kōwhiringa Media Studio"
+    },
+    "show_video_options_6ed3721a": {
+        "message": "Whakātu ataata kōwhiringa"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Ngā kaiwhakamahi e āhei ana ki te tiro pūtirotiro tere i te ngā whārangi tukutuku, me te rapu i ngā pane nui, maia rānei. Ka whakawhirinaki ngā kaiwhakamahi pānui mata ki ngā pane mo te māramatanga o te horopaki. Me whakamahi ngā pane i te hanganga tika."
@@ -2186,6 +2321,9 @@
     "something_went_wrong_while_sharing_your_screen_8de579e5": {
         "message": "He hapa i te wā e tuari ana i tō mata."
     },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "Aroha mai, kaore matou e tautoko i nga konae maha."
+    },
     "sort_by_e75f9e3e": {
         "message": "Wehewehe e"
     },
@@ -2222,6 +2360,9 @@
     "square_superset_strict_fa4262e4": {
         "message": "Huinga Tuatoru Tapawha (Paua)"
     },
+    "square_unordered_list_b15ce93b": {
+        "message": "Tapawhā rārangi kore"
+    },
     "star_8d156e09": {
         "message": "Whetū"
     },
@@ -2248,6 +2389,9 @@
     },
     "student_to_do_c018c835": {
         "message": "Hei Mahi a te Tauira"
+    },
+    "studio_media_options_ee504361": {
+        "message": "kōwhiringa pāpāho studio"
     },
     "styles_2aa721ef": {
         "message": "Ngā Kāhua"
@@ -2281,6 +2425,9 @@
     },
     "superscript_8cb349a2": {
         "message": "Tuhinga nui"
+    },
+    "superscript_and_subscript_37f94a50": {
+        "message": "Tuhituhi me te Tuhituhi"
     },
     "superset_c4db8a7a": {
         "message": "Hupiripiri"
@@ -2390,6 +2537,9 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Ko te pane tuatahi o te wharangi me H2."
     },
+    "the_following_content_is_partner_provided_ed1da756": {
+        "message": "Ko ngā kōrero e whai ake nei he hoa mahi"
+    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Ko te rauemi kei roto i te rohe tūmatanui"
     },
@@ -2398,6 +2548,9 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "He kaupapa ngā rauemi ki te rerekētanga - hei tauira whakamahi tika, te tika ki te whakahoke, ētahi atu rānei i raro i ngā manatārua ture e hāngai ana"
+    },
+    "the_preceding_content_is_partner_provided_d753928c": {
+        "message": "Ko te tuhinga o mua he hoa mahi"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Te ataahua HTML kaore i te papa patopato whakauru. Pēhi Neke O ki te huaki mata html etita."
@@ -2525,6 +2678,9 @@
     "ukrainian_945b00b7": {
         "message": "Ukrainian"
     },
+    "unable_to_determine_resource_selection_url_7867e060": {
+        "message": "Kaore e taea te whakatau url whiriwhiri rauemi"
+    },
     "unable_to_mark_as_complete_8141856d": {
         "message": "Kaore e taea te tohu kua oti."
     },
@@ -2546,6 +2702,12 @@
     "up_and_right_diagonal_arrow_935b902e": {
         "message": "Ki runga Na Matau Hauroki Pere"
     },
+    "up_c553575d": {
+        "message": "Ake"
+    },
+    "upload_document_253f0478": {
+        "message": "Tikiake Tuhinga"
+    },
     "upload_file_fd2361b8": {
         "message": "Tukuake kōnae"
     },
@@ -2555,8 +2717,14 @@
     "upload_media_ce31135a": {
         "message": "Tukuatu pāpāho"
     },
+    "upload_record_media_e4207d72": {
+        "message": "Tukuatu/Tāhopu Pāpāpho"
+    },
     "uploading_19e8a4e7": {
         "message": "E tikiake ana"
+    },
+    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+        "message": "Wakapū teitei rārangi kua rārangitia"
     },
     "uppercase_delta_d4f4bc41": {
         "message": "Pūmatua Delta"
@@ -2578,6 +2746,9 @@
     },
     "uppercase_psi_6395acbe": {
         "message": "Pūmatua Psi"
+    },
+    "uppercase_roman_numeral_ordered_list_853f292b": {
+        "message": "Roman tātai teitei kua rārangitia"
     },
     "uppercase_sigma_dbb70e92": {
         "message": "Pūmatua Sigma"
@@ -2681,6 +2852,9 @@
     "vietnamese_e7a76583": {
         "message": "Vietnamese"
     },
+    "view_all_e13bf0a6": {
+        "message": "Titiro ki te Katoa"
+    },
     "view_ba339f93": {
         "message": "Tirohia"
     },
@@ -2746,6 +2920,12 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki Kainga"
+    },
+    "word_count_c77fe3a6": {
+        "message": "Kupu Kaute"
+    },
+    "words_b448b7d5": {
+        "message": "Kupu"
     },
     "wreath_product_200b38ef": {
         "message": "Te karaehe Hua"
