@@ -68,6 +68,8 @@ require "rubocop_canvas/cops/specs/no_wait_for_no_such_element"
 require "rubocop_canvas/cops/specs/prefer_f_over_fj"
 require "rubocop_canvas/cops/specs/scope_helper_modules"
 require "rubocop_canvas/cops/specs/scope_includes"
+## style
+require "rubocop_canvas/cops/style/concat_array_literals"
 
 module RuboCop
   module Canvas
@@ -84,6 +86,9 @@ module RuboCop
 
         AST::Node.include(Indifferent)
         AST::SymbolNode.include(IndifferentSymbol)
+        if defined?(Cop::Style::ConcatArrayLiterals)
+          Cop::Style::ConcatArrayLiterals.prepend(Cop::Style::ConcatArrayLiteralsWithIgnoredReceivers)
+        end
       end
     end
   end

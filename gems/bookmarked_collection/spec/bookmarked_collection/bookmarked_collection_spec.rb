@@ -228,7 +228,7 @@ describe "BookmarkedCollection" do
 
       @created_collection = BookmarkedCollection.wrap(id_bookmarker, @created_scope)
       @deleted_collection = BookmarkedCollection.wrap(id_bookmarker, @deleted_scope)
-      @collection = BookmarkedCollection.concat( # rubocop:disable Style/ConcatArrayLiterals
+      @collection = BookmarkedCollection.concat(
         ["created", @created_collection],
         ["deleted", @deleted_collection]
       )
@@ -281,7 +281,7 @@ describe "BookmarkedCollection" do
         pager
       end
 
-      @collection = BookmarkedCollection.concat( # rubocop:disable Style/ConcatArrayLiterals
+      @collection = BookmarkedCollection.concat(
         ["created", created_collection],
         ["deleted", @deleted_collection]
       )
@@ -300,7 +300,7 @@ describe "BookmarkedCollection" do
         pager
       end
 
-      @collection = BookmarkedCollection.concat( # rubocop:disable Style/ConcatArrayLiterals
+      @collection = BookmarkedCollection.concat(
         ["created", created_collection],
         ["deleted", @deleted_collection]
       )
@@ -344,7 +344,7 @@ describe "BookmarkedCollection" do
         ["deleted", @deleted_collection]
       )
 
-      @collection = BookmarkedCollection.concat( # rubocop:disable Style/ConcatArrayLiterals
+      @collection = BookmarkedCollection.concat(
         ["users", @user_collection],
         ["courses", @course_collection]
       )
@@ -388,12 +388,12 @@ describe "BookmarkedCollection" do
       @created_collection = BookmarkedCollection.wrap(id_bookmarker, @created_scope)
       @deleted_collection = BookmarkedCollection.wrap(id_bookmarker, @deleted_scope)
 
-      @course_collection = BookmarkedCollection.concat( # rubocop:disable Style/ConcatArrayLiterals
+      @course_collection = BookmarkedCollection.concat(
         ["created", @created_collection],
         ["deleted", @deleted_collection]
       )
 
-      @collection = BookmarkedCollection.concat( # rubocop:disable Style/ConcatArrayLiterals
+      @collection = BookmarkedCollection.concat(
         ["users", @user_collection],
         ["courses", @course_collection]
       )
@@ -412,7 +412,7 @@ describe "BookmarkedCollection" do
       @created_collection = BookmarkedCollection.wrap(name_bookmarker, @created_scope)
       @deleted_collection = BookmarkedCollection.wrap(name_bookmarker, @deleted_scope)
 
-      @course_collection = BookmarkedCollection.concat( # rubocop:disable Style/ConcatArrayLiterals
+      @course_collection = BookmarkedCollection.concat(
         ["created", @created_collection],
         ["deleted", @deleted_collection]
       )
