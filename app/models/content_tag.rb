@@ -743,7 +743,7 @@ class ContentTag < ActiveRecord::Base
 
   def trigger_publish!
     enable_publish_at = context.root_account.feature_enabled?(:scheduled_page_publication)
-    if unpublished?
+    if unpublished? && (!content.respond_to?(:can_publish?) || content&.can_publish?)
       if content_type == "Attachment"
         content.set_publish_state_for_usage_rights
         content.save!
@@ -757,7 +757,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def trigger_unpublish!
-    if published?
+    if published? && (!content.respond_to?(:can_unpublish?) || content&.can_unpublish?)
       if content_type == "Attachment"
         content.locked = true
         content.save!

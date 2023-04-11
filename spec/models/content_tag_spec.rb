@@ -977,6 +977,15 @@ describe ContentTag do
       expect(tag.reload.published?).to eq(true)
       expect(@attachment.reload.published?).to eq(true)
     end
+
+    it "respects the content's can_publish? method" do
+      course_factory
+      tag = ContentTag.create!(context: @course, content: assignment_model, workflow_state: "unpublished")
+      allow(tag.content).to receive(:can_publish?).and_return(false)
+      expect(tag.published?).to eq(false)
+      tag.trigger_publish!
+      expect(tag.reload.published?).to eq(false)
+    end
   end
 
   describe "#trigger_unpublish!" do
@@ -988,14 +997,13 @@ describe ContentTag do
       expect(tag.reload.published?).to eq(false)
     end
 
-    it "unpublishes the tag and locks the attachment content" do
+    it "respects the content's can_unpublish? method" do
       course_factory
-      tag = ContentTag.create!(context: @course, content: attachment_model, workflow_state: "published")
+      tag = ContentTag.create!(context: @course, content: assignment_model, workflow_state: "published")
+      allow(tag.content).to receive(:can_unpublish?).and_return(false)
       expect(tag.published?).to eq(true)
-      expect(@attachment.published?).to eq(true)
       tag.trigger_unpublish!
-      expect(tag.reload.published?).to eq(false)
-      expect(@attachment.reload.published?).to eq(false)
+      expect(tag.reload.published?).to eq(true)
     end
   end
 end
