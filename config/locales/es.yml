@@ -638,6 +638,7 @@ es:
     titles: 
       configure_report: "Configurar el reporte"
       open_registration_delegated_warning_dialog: "Un proveedor externo de identidad está activo"
+      rqd_help: "Restringir datos cuantitativos"
       what_are_quiz_ip_filters: "¿Qué son los filtros de IP para exámenes?"
     user: Usuario
   account_settings_fe083453: "Configuraciones de cuenta"
@@ -1626,6 +1627,8 @@ es:
         update_button: Actualizar
       report_last_run_never: Nunca
       report_running: "El informe se está procesando.*Recibirá un correo electrónico cuando esté listo.*"
+      rqd_help_message: "Cuando se selecciona esta configuración, se restringe la visualización del usuario de los datos de calificación cuantitativos (numéricos) y se limitan las opciones de creación de tareas para los profesores. Los usuarios solo verán los datos cualitativos, que incluyen las calificaciones por letra y los comentarios. El administrador puede personalizar aún más esta configuración ajustando los permisos para los roles de usuarios."
+      rqd_screenreader: "Acerca de restringir datos cuantitativos"
       select: 
         mfa: 
           disabled: Deshabilitado
@@ -2269,7 +2272,7 @@ es:
   adjust_final_grade_fa45e7e0: "Ajustar nota final"
   adjusting_due_dates_a5918b9c: "Ajustando las fechas de entrega..."
   admin_4d3ba42f: Admin
-  admin_analytics_description: "Al habilitar se muestran las analíticas del administrador para mostrar descripciones generales de los cursos y estudiantes. Obtenga más información y proporcione sus comentarios al unirse al *grupo de usuarios de nuevas analíticas* en la comunidad Canvas."
+  admin_analytics_description: "Habilita las analíticas a nivel de la cuenta. Los tableros de analíticas del administrador brindan detalles sobre el uso de Canvas, el éxito de los cursos de Canvas y la participación de los estudiantes. Obtenga más información en el *Centro de analíticas del administrador* en la comunidad Canvas."
   admin_analytics_eacba735: "Analíticas del administrador"
   admin_csv_f8d1b3eb: "Administrar CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Exportar administrador para varios períodos de calificaciones"
@@ -4458,6 +4461,7 @@ es:
       no_points: Ninguno
       no_submission: Nada
       points: Puntos
+      speed_grader: SpeedGrader™
       submission_types: "Tipos de archivo"
       submitting: Presentando
       turnitin: Turnitin
@@ -5994,6 +5998,7 @@ es:
   canvas_for_elementary_analytics_15dc1e07: "Canvas para analíticas elementales"
   canvas_for_elementary_beta_28bc5181: "Canvas para Primaria (beta)"
   canvas_for_elementary_e6f5a06f: "Canvas para escuela primaria"
+  canvas_for_elementary_font_selection_5d1f2271: "Selección de fuente de Canvas para escuelas primarias"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas para escuela primaria: tiene varios anuncios en el aula"
   canvas_for_elementary_parent_support_74a2356e: "Canvas para escuela primaria: Ayuda para padres"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -6131,6 +6136,7 @@ es:
   check_your_spelling_or_try_fewer_letters_70769a90: "Revise su ortografía o pruebe con menos letras."
   checkbox_examples_dc790142: "Ejemplos de casilla de verificación"
   checked_883b93fd: marcado
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Seleccionar la casilla de verificación de Agregar al calendario (Add to Calendar) invitará a todos los miembros del curso."
   cheerful_panda_holding_a_map_17ba47ee: "Un panda alegre sosteniendo un mapa"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "El curso hijo debe pertenecer a la misma cuenta raíz que el curso principal"
   child_s_username_dde3aa9: "Nombre de usuario de su hijo"
@@ -7393,8 +7399,8 @@ es:
       indent: 
         ? "n"
         : 
-          one: "Agregar sangría en 1 nivel"
-          other: "Agregar sangría %{count} niveles"
+          one: "Agregar sangría en 1 nivel"
+          other: "Agregar sangría %{count} niveles"
           zero: "Sin sangría"
       labels: 
         indent: Sangría
@@ -8916,6 +8922,7 @@ es:
         participation_id: Participación
         public_syllabus: "Hacer que el programa de estudios de este curso sea visible públicamente"
         restrict_enrollments_to_course_dates: "Los estudiantes solo pueden participar del curso entre estas fechas"
+        restrict_quantitative_data: "Opciones de datos cuantitativos"
         restrict_student_future_view: "Restringir que los estudiantes vean este curso antes de la fecha de inicio"
         restrict_student_past_view: "Restringir que los estudiantes vean este curso después de la fecha de finalización"
         root_account: "Cuenta raíz"
@@ -11033,6 +11040,7 @@ es:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Habilita un diálogo rediseñado para Enviar mensaje a estudiantes que... que permite observadores de mensajes además de estudiantes."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Habilitar el acceso al API público de Nuevos exámenes: API de los ítems del examen"
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Permite el acceso a la API pública de Nuevos Exámenes a través de Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Permite que los administradores registren las herramientas de LTI con un registro dinámico"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Habilita que se muestren los reportes de plagio y los puntajes de similitud en la bandeja de entregas del Nuevo libro de calificaciones."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Permite que se apliquen fechas importantes a las tareas, eventos de calendario y otros."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Habilita el modal para advertir al usuario cuándo un borrador de comentario se deja sin publicar en SpeedGrader."
@@ -13391,6 +13399,7 @@ es:
   grades_view_audit_trail_cc4c1fcc: "Calificaciones: ver informe de auditoría"
   grades_view_audit_trail_db7364b1: "Calificaciones - Ver informe de auditoría"
   grades_view_change_logs_6bc1b959: "Calificaciones: ver registros de cambios"
+  grades_view_quantitative_feedback_90a4ffc7: "Calificaciones - ver los comentarios cuantitativos"
   grades_visible_to_students_1584fa83: "Calificaciones visibles para los alumnos"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Las calificaciones se publicaron de manera exitosa en el libro de calificaciones."
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Las calificaciones se enviaron correctamente al libro de calificaciones."
@@ -14102,12 +14111,18 @@ es:
       event: "%{date} en %{time}"
   handler_7912052f: Gestor
   has_been_automatically_selected_based_upon_where_t_61f805c5: "se ha seleccionado automáticamente en función de dónde reside la instancia de Canvas de esta cuenta. En algunos casos, puede ser una región diferente."
+  has_no_submissions_2826a7a2: "No hay entregas"
+  has_no_submissions_63de50ad: "No hay entregas"
   has_not_submitted_2350bc24: "No se entregó"
   has_similarity_score_d5f332b4: "Tiene calificación de similitud"
   has_submissions_6c12ef4c: "Tiene entregas"
+  has_submissions_ea8e609b: "Hay entregas"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Tiene un puntaje de Turnitin"
   has_ungraded_submissions_2bff87df: "Tiene entregas sin calificar"
+  has_ungraded_submissions_b79f5803: "Hay entregas sin calificar"
+  has_unposted_grades_3567391e: "Hay calificaciones sin publicar"
+  has_unposted_grades_ba0e02b6: "Hay calificaciones sin publicar"
   have_a_question_about_canvas_ask_it_here_5781cce: "¿Tiene una pregunta sobre Canvas? Hágala aquí."
   have_not_been_graded_df2a5fd2: "No se han calificado"
   have_not_yet_submitted_57e6a58b: "No se han entregado todavía"
@@ -14761,6 +14776,7 @@ es:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Si Usuarios: administrar detalles de inicio de sesión o Estadísticas: ver están habilitados, un usuario podrá generar actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar desactivados."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Si se habilita Usuarios: administrar detalles de inicio de sesión (Users - manage login details) o Estadísticas: ver (Statistics - view), un usuario podrá generar la actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar deshabilitados."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Si se habilita Usuarios: administrar detalles de inicio de sesión (Users - manage login details) o Estadísticas: ver (Statistics - view), el usuario podrá generar la actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar deshabilitados."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "Si definirá un límite para los miembros de un grupo, este deberá ser mayor a 1."
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "Si modifica el número de puntos posibles de la tarea, las calificaciones existentes serán automáticamente escaladas."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Si modifica el número de puntos posibles de la tarea, deberá calificarla de nuevo."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Si modifica el número de puntos posibles de la tarea, deberá calificar de nuevo cualquier otra entrega."
@@ -14985,6 +15001,7 @@ es:
   individual_2033c005: Individual
   individual_assignment_grade_posting_d8322b99: "Publicación de la calificación de una tarea individual"
   individual_gradebook_c7de9821: "Libro de calificaciones individual…"
+  individual_gradebook_enhancements_de33aa3d: "Mejoras al Libro de calificaciones individual"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "No se pueden modificar los valores de cálculo de la competencia individual."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "No se pueden modificar los puntos de dominio de la competencia individual."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Clasificación de resultados individuales y opciones de métodos de cálculo"
@@ -15481,6 +15498,7 @@ es:
     lock_module_until: "Bloquear hasta"
   language_6b3e2c7c: Idioma
   languages_835813f0: Idiomas
+  large_balsamiq_font_5fe45fae: "Fuente Balsamiq grande"
   large_course_db3d58b: "Curso grande:"
   last_7_days_bd411f1f: "Últimos 7 días"
   last_activity_a983e541: "Última actividad"
@@ -15910,6 +15928,7 @@ es:
   loading_features_d26820f6: "Cargando funciones"
   loading_folders_d8b5869e: "Cargando carpetas"
   loading_gradebook_b0b75cd3: "Cargado libro de calificaciones"
+  loading_gradebook_submissions_d2ba017f: "Cargando las entregas del Libro de calificaciones"
   loading_graders_f6a76142: "Cargando calificadores"
   loading_grades_446fc226: "Cargando calificaciones…"
   loading_grades_for_coursename_26784c2d: "Cargando calificaciones para %{courseName}"
@@ -16171,6 +16190,7 @@ es:
   lti_deep_linking_line_items_5e0079f7: "Elementos de línea de enlace profundo de LTI"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Elementos de línea de enlace profundo de LTI en la página de edición de tareas"
   lti_delete_ee5f1bef: "LTI: eliminar"
+  lti_dynamic_registration_8592edb0: "Registro dinámico de LTI"
   lti_edit_83a27850: "LTI: editar"
   lti_key_14ad02b1: "Clave LTI"
   lti_launch_af082dc3: "Lanzar LTI:"
@@ -19077,6 +19097,7 @@ es:
   new_question_9107c469: "Nueva pregunta"
   new_question_group_d9306280: "Nuevo grupo de preguntas"
   new_quiz_34aacba6: "Nuevo examen"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "Restauración del usuario eliminado del nuevo examen con revisión pendiente sobre el estado de la inscripción"
   new_quiz_items_3c850331: "Nuevos ítems de examen"
   new_quiz_statistics_desc: "Habilitar la nueva página de estadísticas de evaluaciones para un curso,"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Nueva cuenta de exámenes y bancos de ítems a nivel de la cuenta"
@@ -21786,6 +21807,7 @@ es:
   qti_img_matching_question: "La pregunta importada correspondiente contiene imágenes en ambos lados. Esta opción no es compatible"
   qti_img_matching_question_distractors: "La pregunta importada correspondiente contiene imágenes dentro de las opciones y no se pudo corregir porque también contiene distractores"
   qti_name: "Conversor de QTI"
+  quantitative_data_options_4f071510: "Opciones de datos cuantitativos"
   question_9121487: Pregunta
   question_answered: Contestado
   question_bank: 
@@ -23538,6 +23560,7 @@ es:
         name: Nombre
     welcome_to_canvas: "¡Bienvenido a Canvas!"
   registration_url_60e0eaaa: "URL de registro"
+  regular_lato_font_7f3cf24c: "Fuente Lato regular"
   regular_style_checkbox_ee3d71c1: "Casilla de verificación estilo regular"
   reinforce_student_understanding_304d18a6: "Refuerce la comprensión de los estudiantes"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Relájese y tómese un descanso. Todavía no hay nada que hacer."
@@ -26032,6 +26055,13 @@ es:
       aria_stop: "Haga clic en \"Detener\" para finalizar la grabación."
     edit_view_rubric: "Ver rúbrica"
     group: Grupo
+    late_input: 
+      days: 
+        one: Día
+        other: Días
+      hours: 
+        one: Hora
+        other: Horas
     mic_blocked_message: "El permiso para usar el micrófono está bloqueado. Para realizar cambios, visite chrome://settings/content/microphone"
     mute_assignment: "Silenciar tarea"
     no_submission_time: "ningún tiempo de entrega"
@@ -27638,6 +27668,7 @@ es:
       Con esta marca de funcionalidad, se habilita el uso de la página de creación/edición
       de foros de discusión actualizada.
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Este marcador de función se puede activar si se desea permitir a los usuarios de la cuenta que hablan idiomas que normalmente se escriben de derecha a izquierda (por ejemplo: árabe, hebreo, farsi) ver el diseño de RTL mientras trabajamos en él. Una vez que la función esté \"lista\", este marcador de función desaparecerá y cualquiera que hable uno de esos idiomas siempre verá la interfaz de RTL."
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Esta funcionalidad introduce mejoras al rendimiento y al mantenimiento del Libro de calificaciones individual"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Esta funcionalidad hace que cuando se entreguen varios archivos juntos mediante una herramienta de
       terceros a través de la API de Tareas y Servicio de Calificaciones, se agruparán
@@ -28810,6 +28841,10 @@ es:
   traditional_gradebook_d7ad59c6: "Libro de calificaciones tradicional…"
   traditional_gradebook_d90461dc: "Libro de calificaciones tradicional"
   transferred_student_enrollments_90dc27d3: "Inscripciones de estudiantes transferidos"
+  transform_rce_content_on_load_1f521086: "Transformar el contenido del RCE en funcionamiento"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Transforma las URL absolutas en URL relativas y elimina los atributos externos del contenido del RCE en funcionamiento.
+      Es necesario para que el RCE funcione por completo en los exámenes nuevos.
   travel_places_f461329c: "Viajes y lugares"
   treat_ungraded_as_0_d38c2b41: "Considerar lo no calificado como 0"
   tree_browser: 
@@ -29931,6 +29966,8 @@ es:
       resubmit_to_vericite: "Reenviar a VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite calificación de similitud: más información"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Puntaje de similitud: consultar el reporte detallado."
+  verify_ldap_tls_certificates_70241d8e: "Verificar los certificados de TLS de LDAP."
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Verificar los certificados de TLS presentados por los proveedores de autenticación de LDAP."
   version_versionnumber_updatedat_9f5b7a5b: "Versión %{versionNumber} %{updatedAt}"
   video_78335c71: video
   video_b9f27375: Video
@@ -30210,6 +30247,7 @@ es:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Cuando se selecciona, el curso se encuentra en un estado de solo lectura fuera de estas fechas."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Cuando se selecciona, el curso es inaccesible fuera de las fechas del curso. Si las fechas del curso están en blanco, estas fechas de inicio y finalización se aplican a las fechas de los períodos."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Cuando se selecciona, la sección del curso se encuentra en un estado de solo lectura fuera de estas fechas."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Cuando se establece, determina si el estado del flujo de trabajo de un nuevo examen debe establecerse como calificado o pending_review si un usuario tuvo un examen pending_review nuevo previo, pero lo volvieron a inscribir en el curso."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Cuando se activa esta marca, la navegación del curso permanecerá colapsada o expandida
       mientras se navega entre páginas, según cómo la configuró el usuario la última vez, en lugar
