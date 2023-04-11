@@ -205,6 +205,17 @@ export const onMouseDown = e => {
 }
 
 /**
+ * Closes the menu when the editor loses focus
+ * @param Event e
+ */
+export const onWindowMouseDown = e => {
+  const editor = e.editor || tinymce.activeEditor
+  const element = e.target?.closest(`#${MENTION_MENU_ID}`)
+  if (element) return
+  onMentionsExit(editor)
+}
+
+/**
  * Sets the ARIA Active Descendant attribute
  * of the mentions marker to the given value
  *
@@ -258,7 +269,6 @@ export const onMentionsExit = (ed, setMention = false) => {
     }
 
     menuMountElem.remove()
-
     return ReactDom.unmountComponentAtNode(menuMountElem)
   }
 }
