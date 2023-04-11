@@ -654,4 +654,33 @@ describe Types::AssignmentType do
       end
     end
   end
+
+  describe "restrictQuantitativeData" do
+    it "returns false when restrictQuantitativeData is off" do
+      expect(
+        assignment_type.resolve("restrictQuantitativeData")
+      ).to eq false
+    end
+
+    context "when RQD is enabled" do
+      before :once do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+      end
+
+      it "returns false when restrictQuantitativeData is off" do
+        expect(
+          assignment_type.resolve("restrictQuantitativeData")
+        ).to eq true
+      end
+    end
+  end
 end
