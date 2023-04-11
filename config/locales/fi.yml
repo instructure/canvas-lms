@@ -499,6 +499,7 @@ fi:
     titles: 
       configure_report: "Konfiguroi raportti"
       open_registration_delegated_warning_dialog: "Ulkoinen tunnistuspalvelun tarjoaja on käytössä"
+      rqd_help: "Rajoita kvantitaavista tietoa"
       what_are_quiz_ip_filters: "Mitä ovat testin IP-suodattimet?"
     user: Käyttäjä
   account_settings_fe083453: "Tilin asetukset"
@@ -1343,6 +1344,8 @@ fi:
         update_button: Päivitä
       report_last_run_never: "Ei koskaan"
       report_running: "Raporttia ajetaan.*Saat sähköpostiviestin, kun se on valmis.*"
+      rqd_help_message: "Kun tämä asetus on valittu, se rajoittaa kvantitaavisen (numeerisen) arvosanojen antotietojen käyttäjänäkymän ja rajoittaa opettajien tehtävien luontivaihtoehtoja. Käyttäjät näkevät vain laadulliset tiedot, jotka sisältävät kirjaimin annetut arvosanat ja kommentit. Järjestelmäkäyttäjä voi mukauttaa tätä asetuksta edelleen säätämällä käyttäjäroolien käyttäjäoikeuksia-"
+      rqd_screenreader: "Tietoja kvantitaavisten tietojen rajoittamisesta"
       select: 
         mfa: 
           disabled: "Poistettu käytöstä"
@@ -1939,7 +1942,7 @@ fi:
       asiakirjahuomautuksia tai rubriikkikommentteja
   adjusting_due_dates_a5918b9c: "Määräpäiviä muokataan"
   admin_4d3ba42f: Pääkäyttäjä
-  admin_analytics_description: "Ottaa käyttöön pääkäyttäjän analyysit kurssien ja opiskelijoiden yhteenvedon näyttämiseksi Lue lisää ja anna palautetta liittymällä *Uusi analyysi -käyttäjäryhmään* Canvas-yhteisössä."
+  admin_analytics_description: "Ottaa käyttöön tilitason analyysit Järjestelmäkäyttäjän analyysikoontonäytöt antavat tietoja Canvasin käytöstä, Canvas-kurssimenestyksestä ja opiskelijan osallistumisesta. Lue lisää *järjestelmäkäyttäjän analyysikeskuksessa * Canvas-yhteisössä."
   admin_analytics_eacba735: "Pääkäyttäjän analyysi"
   admin_csv_f8d1b3eb: "Pääkäyttäjän CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Pääkäyttäjän vienti useille arvosanan antojaksoille"
@@ -3896,6 +3899,7 @@ fi:
       no_points: "Ei mitään"
       no_submission: "Ei mitään"
       points: Pisteet
+      speed_grader: SpeedGrader™
       submission_types: Tiedostotyypit
       submitting: Lähetetään
       turnitin: Turnitin
@@ -5231,6 +5235,7 @@ fi:
   canvas_for_elementary_analytics_15dc1e07: "Canvas Elementary -sovellukselle (beta)"
   canvas_for_elementary_beta_28bc5181: "Canvas for Elementary (beta)"
   canvas_for_elementary_e6f5a06f: "Canvas for Elementary"
+  canvas_for_elementary_font_selection_5d1f2271: "Canvas Elementary-fontin valintaa varten"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas for Elementary: useita ilmoituksia homeroomissa"
   canvas_for_elementary_parent_support_74a2356e: "Canvas for Elementary: Vanhemman tuki"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -5357,6 +5362,7 @@ fi:
   check_your_spelling_or_try_fewer_letters_70769a90: "Tarkista oikeinkirjoituksesi tai yritä vähentää kirjaimia."
   checkbox_examples_dc790142: "Tarkistusruudun esimerkit"
   checked_883b93fd: tarkastettu
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Kun Lisää kalenteriin -vaihtoehto on merkitty, kaikki kurssin jäsenet kutsutaan."
   cheerful_panda_holding_a_map_17ba47ee: "Iloinen panda kartan kanssa"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Alikurssin täytyy kuulua samaan juuritiliin kuin master-kurssin"
   child_s_username_dde3aa9: "Lapsen käyttäjätunnus"
@@ -7719,6 +7725,7 @@ fi:
         pace_plans: Sivusuunnitelmat
         participation_id: Osallistuminen
         restrict_enrollments_to_course_dates: "Opiskelijat voivat osallistua kurssille vain näiden päivämäärien välillä"
+        restrict_quantitative_data: "Kvantitaavisten tietojen asetukset"
         restrict_student_future_view: "Rajoita kurssin näkyvyyttä opiskelijoille ennen kurssin aloituspäivää"
         restrict_student_past_view: "Rajoita kurssin näkyvyyttä opiskelijoille kurssin päättymispäivän jälkeen"
         root_account: Juuritili
@@ -9469,6 +9476,7 @@ fi:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Ottaa käyttöön uudelleen osoitetun viestin opiskelijoille, jotka....valintaruutu, jonka avulla havainnoitsijoille voidaan lähettää viestejä opiskelijoiden lisäksi."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Mahdollistaa käyttöoikeuden uusien kyselyiden julkiseen API:in: Kyselykohteiden API."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Mahdollistaa käyttöoikeuden uusien kyselyiden julkiseen sovellusliittymään Canvasin kautta."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Mahdollistaa järjestelmäkäyttäjien LTI-työkalujen rekisteröimisen dynaamisen rekisteöritymisen kanssa"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Ottaa käyttöön plagiointiraportit ja samankaltaisuuden pisteet uuden arvosanakirjan tehtäväpalautuspaneelissa."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Mahdollistaa tärkeiden päivämäärien soveltamisen tehtäviin, kalenteritapahtumiin ja muihin."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Ottaa käyttöön modaalin, jolla varoitetaan käyttäjää, kun luonnoskommentti jätetään lähettämättä SpeeGraderissä."
@@ -11270,6 +11278,7 @@ fi:
   grades_view_all_grades_8bf9f8d3: "Arvosanat - näytä kaikki arvosanat"
   grades_view_audit_trail_cc4c1fcc: "Arvosanat - valvontaketjun tarkastelu"
   grades_view_change_logs_6bc1b959: "Arvosanat - näytä muutoslokit"
+  grades_view_quantitative_feedback_90a4ffc7: "Arvosanat -tarkastele kvantitaavista palautetta"
   grades_visible_to_students_1584fa83: "Arvosanat näkyvissä opiskelijoille"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Arvosanat julkaistiin onnistuneesti arvosanakirjaan."
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Arvosanat julkaistiin onnistuneesti arvosanakirjaan."
@@ -11756,11 +11765,17 @@ fi:
       event: "%{date} kohteessa %{time}"
   handler_7912052f: Käsittelijä
   has_been_automatically_selected_based_upon_where_t_61f805c5: "on valittu automaattisesti sen perusteella, missä tämän tilin Canvas-esiintymä on. Joissakin tapauksissa se voi olla eri alue."
+  has_no_submissions_2826a7a2: "Ei ole tehtäväpalautuksia"
+  has_no_submissions_63de50ad: "Ei ole tehtäväpalautuksia"
   has_not_submitted_2350bc24: "Ei ole lähetetty"
   has_similarity_score_d5f332b4: "Omaa samankaltaisuuden pisteet"
   has_submissions_6c12ef4c: "On lähetyksiä"
+  has_submissions_ea8e609b: "On tehtäväpalautuksia"
   has_syllabus_body_6f250277: has_syllabus_body
   has_ungraded_submissions_2bff87df: "On arvostelemattomia lähetyksiä"
+  has_ungraded_submissions_b79f5803: "On tehtäväpalautuksia, joille ei ole annettu arvosanaa"
+  has_unposted_grades_3567391e: "On lähettämättömiä arvosanoja"
+  has_unposted_grades_ba0e02b6: "On lähettämättömiä arvosanoja"
   have_a_question_about_canvas_ask_it_here_5781cce: "Onko sinulla kysyttävää Canvasista? Kysy täällä."
   have_not_been_graded_df2a5fd2: "Ei ole annettu arvosanaa"
   have_not_yet_submitted_57e6a58b: "Ei ole vielä palautettu"
@@ -12379,6 +12394,7 @@ fi:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Jos Käyttäjät - hallitse sisäänkirjautumistietoja tai Tilastot - tarkastele on käytössä, käyttäjä pystyy luomaan sisään-/uloskirjautumisaktiviteetin pääkäyttäjän työkaluissa. Jos haluat kätkeä sisään-/uloskirjautumisasetuksen pääkäyttäjän työkaluissa, molemmat näistä käyttöoikeuksista täytyy poistaa käytöstä."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Jos Käyttäjät - hallitse sisäänkirjautumistietoja tai Tilastot - tarkastele on käytössä, käyttäjä pystyy luomaan sisään-/uloskirjautumisaktiviteetin pääkäyttäjän työkaluissa. Jos haluat kätkeä sisään-/uloskirjautumisasetuksen pääkäyttäjän työkaluissa, molemmat näistä käyttöoikeuksista täytyy poistaa käytöstä."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Jos Käyttäjät - hallitse sisäänkirjautumistietoja tai Tilastot - tarkastele -valinta on käytössä, käyttäjä pystyy luomaan sisään-/uloskirjautumisaktiviteetin pääkäyttäjän työkaluissa. Jos haluat piilottaa sisään-/uloskirjautumisasetuksen pääkäyttäjän työkaluissa, molemmat näistä käyttöoikeuksista täytyy poistaa käytöstä."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "Jos aiot määrittää rajoitetun ryhmän jäseniä, tämän täytyy olla suurempi kuin 1."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Jos muutat tehtävästä saatavissa olevaa pistemäärää, tehtävä täytyy arvioida uudelleen."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Jos vaihdat tehtävän mahdollista pistemäärää, kaikki tehtäväpalautukset täytyy arvioida uudelleen."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Jos et valitse käyttöoikeuksia nyt, tiedoston julkaisu peruutetaan latauksen jälkeen."
@@ -12578,6 +12594,7 @@ fi:
   individual_2033c005: Yksilöllinen
   individual_assignment_grade_posting_d8322b99: "Yksittäisen tehtävän arvosanan lähetys"
   individual_gradebook_c7de9821: "Yksilöllinen arvosanakirja…"
+  individual_gradebook_enhancements_de33aa3d: "Yksilölliset arvosanakirjan parannukset"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Yksilöllisiä tuloksen laskenta-arvoja ei voida muokata."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Yksilöllisiä tuloksen hallintapisteitä ei voida muokata."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Yksittäinen tulosten arvostelun ja laskentamenetelmän asetukset"
@@ -13042,6 +13059,7 @@ fi:
     lock_module_until: "Lukitse tiettyyn päivään asti"
   language_6b3e2c7c: Kieli
   languages_835813f0: Kielet
+  large_balsamiq_font_5fe45fae: "Suuri Balsamiq-fontti"
   large_course_db3d58b: "Suuri kurssi:"
   last_7_days_bd411f1f: "Viimeiset 7 päivää"
   last_activity_a983e541: "Viimeisin aktiviteetti"
@@ -13439,6 +13457,7 @@ fi:
   loading_features_d26820f6: "Ominaisuuksia ladataan"
   loading_folders_d8b5869e: "Ladataan kansioita"
   loading_gradebook_b0b75cd3: "Arvosanakirjaa ladataan"
+  loading_gradebook_submissions_d2ba017f: "Arvosanakirjojen lähetyksiä ladataan"
   loading_graders_f6a76142: "Arvioijia ladataan"
   loading_grades_446fc226: "Arvosanoja ladataan..."
   loading_grades_for_coursename_26784c2d: "Arvosanoja ladataan kohteelle %{courseName}"
@@ -13665,6 +13684,7 @@ fi:
   lti_deep_linking_line_items_5e0079f7: "LTI-syvälinkityksen rivikohteet"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "LTI syvälinkityksen rivikohteet tehtävien muokkaussivulla"
   lti_delete_ee5f1bef: "LTI - poista"
+  lti_dynamic_registration_8592edb0: "Dynaaminen LTI-rekisteörinti"
   lti_edit_83a27850: "LTI - muokkaa"
   lti_key_14ad02b1: LTI-avain
   lti_launch_af082dc3: "LTI-käynnistys:"
@@ -16116,6 +16136,7 @@ fi:
   new_question_9107c469: "Uusi kysymys"
   new_question_group_d9306280: "Uusi kysymysryhmä"
   new_quiz_34aacba6: "Uusi testi"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "Uuden testin poistetun käyttäjän palautus odottaa tarkastelutilaa ilmoittautumisessa"
   new_quiz_items_3c850331: "Uusia testikohtia"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Uusien kyselyiden tili ja kurssitason kohdepankki"
   new_quizzes_assignment_build_button_72b6531a: "Uusien testitehtävien rakenna-näppäin"
@@ -18557,6 +18578,7 @@ fi:
   qti_img_matching_question: "Tuodussa yhdistämiskysymyksessä on kuvat molemmilla puolilla, mikä ei ole sallittua"
   qti_img_matching_question_distractors: "Tuodussa yhdistämiskysymyksessä on kuvia valintojen sisällä, eikä sitä voitu korjata, sillä se sisältää myös vääriä vastausvaihtoehtoja"
   qti_name: QTI-muunnin
+  quantitative_data_options_4f071510: "Kvantitaavisten tietojen asetukset"
   question_9121487: Kysymys
   question_answered: Vastattu
   question_bank: 
@@ -20047,6 +20069,7 @@ fi:
         name: Nimi
     welcome_to_canvas: "Tervetuloa Canvasiin!"
   registration_url_60e0eaaa: Rekisteröinti-URL
+  regular_lato_font_7f3cf24c: "Säännöllinen Lato-fontti"
   regular_style_checkbox_ee3d71c1: "Tavallisen tyylinen tarkistusruutu"
   reinforce_student_understanding_304d18a6: "Vahvista opiskelijan ymmärrystä"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Rentoudu ja pidä tauko. Ei ole vielä mitään tehtävää."
@@ -22148,6 +22171,13 @@ fi:
       aria_stop: "Lopeta nauhoitus napauttamalla \"Pysäytä\"."
     edit_view_rubric: "Näytä arviointitaulukko"
     group: Ryhmä
+    late_input: 
+      days: 
+        one: Päivä
+        other: Päivää
+      hours: 
+        one: Tunti
+        other: Tunnit
     mic_blocked_message: "Käyttöoikeus mikrofoniin on estetty. Voit muuttaa asetuksia selaimen mikrofoniasetuksissa (esim. Chrome-selaimessa chrome://settings/content/microphone)"
     mute_assignment: "Mykistä tehtävä"
     no_submission_time: "ei palautusaikaa"
@@ -23636,6 +23666,7 @@ fi:
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       Tämän ominaisuuden merkki mahdollistaa päivitetyn
       keskustelun luonti-/muokkaussivun käytön
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Tämä ominaisuus esittää suorituskyvyn ja ylläpidon parannukset yksilöllisen arvosanakirjaan"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Tämän ominaisuuden ansiosta useat tiedostot ryhmitetään yhtenä tehtäväpalautuksena sen sijasta,
       että luotaisiin useita erillisiä tehtäväpalautuksia, kun tiedostot palautetaan kolmannen
@@ -24752,6 +24783,10 @@ fi:
   traditional_gradebook_d7ad59c6: "Perinteinen arvosanakirja…"
   traditional_gradebook_d90461dc: "Perinteinen arvosanakirja"
   transferred_student_enrollments_90dc27d3: "Siirretyt opiskelijan ilmoittautumiset"
+  transform_rce_content_on_load_1f521086: "Siirrä RCE-sisältö latauksessa"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Siirtää absoluuttiset URL-linkt relatiivisiin URL-linkkeihin ja poistaa vieraat määritteet RCE-sisällöstä latauksen yhteydessä.
+      Tarvitaan RCE:n toimimiseksi täysin uusissa testeissä.
   travel_places_f461329c: "Matka ja paikat"
   treat_ungraded_as_0_d38c2b41: "Kohtele arvostelemattomia arvolla 0"
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad ja Tobago (+1)"
@@ -25758,6 +25793,8 @@ fi:
       resubmit_to_vericite: "Lähetä uudelleen VeriCiteen"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite samankaltaisuuden pisteet -- lisätietoja"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Samankaltaisuuden pisteet - Katso yksityiskohtainen raportti"
+  verify_ldap_tls_certificates_70241d8e: "Vahvista LDAP TLS -sertifikaatit"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "TLS-sertifikaattien vahvistus esitetty LDAP-todennustarjoajien toimesta."
   version_versionnumber_updatedat_9f5b7a5b: "Versio %{versionNumber} %{updatedAt}"
   video_78335c71: video
   video_b9f27375: Video
@@ -26015,6 +26052,7 @@ fi:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Kun valittu, kurssi on Vain luku -tilassa näiden päivämäärien ulkopuolella."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Kun valittu, kurssiin ei ole pääsyä kurssin päivämäärien ulkopuolella. Jos kurssin päivämäärät ovat tyhjät, nämä alkamis- ja päättymispäivämäärät koskevat lukukauden päivämääriä."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Kun valittu, kurssin osio on Vain luku -tilassa näiden päivämäärien ulkopuolella."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Tämän määrityksen avulla valitaan, pitääkö uuden testin työnkululle määrittää arvosana annetuksi vai pending_review osallistuiko käyttäjä edelliseen pending_review uuteen kyselyyn, mutta hänet oli rekisteröity kurssille uudelleen."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Kun tämä merkki on käytössä, kursin navigointi pysyy kutistettuna tai laajennettuna
       , kun sivujen välillä siirrytään, riippuen siitä, kuinka käyttäjä määritti tämän, sen sijaan
