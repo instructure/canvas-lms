@@ -68,7 +68,7 @@ describe('DashboardHeader', () => {
     })
 
     beforeEach(() => {
-      fetchMock.get(SHOW_K5_DASHBOARD_ROUTE, JSON.stringify(showK5DashboardResponse(false)))
+      fetchMock.get(SHOW_K5_DASHBOARD_ROUTE, JSON.stringify(showK5DashboardResponse(false, false)))
     })
 
     afterEach(async () => {

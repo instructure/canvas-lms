@@ -2804,7 +2804,7 @@ class UsersController < ApplicationController
     # reload @current_user to make sure we get a current value for their :elementary_dashboard_disabled preference
     @current_user.reload
     observed_users(@current_user, session) if @current_user.roles(@domain_root_account).include?("observer")
-    render json: { show_k5_dashboard: k5_user? }
+    render json: { show_k5_dashboard: k5_user?, use_classic_font: use_classic_font? }
   end
 
   protected
