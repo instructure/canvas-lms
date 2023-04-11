@@ -485,6 +485,7 @@ sl:
     titles: 
       configure_report: "Konfiguriraj poročilo"
       open_registration_delegated_warning_dialog: "Omogočen je zunanji ponudnik identitet."
+      rqd_help: "Omejitev kvantitativnih podatkov"
       what_are_quiz_ip_filters: "Kateri so IP-filtri za kvize?"
     user: Uporabnik
   account_settings_fe083453: "Nastavitve računa"
@@ -1326,6 +1327,8 @@ sl:
         update_button: Posodobi
       report_last_run_never: Nikoli
       report_running: "Poročilo je v pripravi.*Ko bo končano, boste prejeli e-pošto.*"
+      rqd_help_message: "Če je ta nastavitev izbrana, bo omejila uporabniški pogled kvantitativnih (številskih) podatkov o ocenjevanju in omejila možnosti ustvarjanja nalog s strani izvajalcev. Uporabniki bodo videli le kvalitativne podatke, ki vključujejo črkovne ocene in komentarje. Skrbnik lahko to nastavitev dodatno prilagodi, tako da prilagodi dovoljenja za uporabniške vloge."
+      rqd_screenreader: "O omejitvi kvantitativnih podatkov"
       select: 
         mfa: 
           disabled: Onemogočeno
@@ -1902,7 +1905,7 @@ sl:
       opombe k dokumentom ali ocenjevalnim vodnikom.
   adjusting_due_dates_a5918b9c: "Prilagajanje rokov ..."
   admin_4d3ba42f: Skrbnik
-  admin_analytics_description: "Če to funkcijo omogočite, bo prikazana Skrbniška analitika in prikaz pregledov predmetov in študentov. Če se pridružite pridružite *uporabniški skupini Nova analitika* v skupnosti Canvas, boste lahko pridobili več informacij in podali svoje povratne informacije."
+  admin_analytics_description: "Omogoča analitiko na ravni računa. Nadzorne plošče skrbniške analitike zagotavljajo podrobnosti o uporabi sistema Canvas, uspešnosti predmeta Canvas in zavzetost študentov. Več o tem v *središču skrbniške analitike* v Canvas Community."
   admin_analytics_eacba735: "Skrbniška analitika"
   admin_csv_f8d1b3eb: "Skrbniška datoteka CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Skrbniški izvoz za več ocenjevalnih obdobij"
@@ -3644,6 +3647,7 @@ sl:
       no_points: Brez
       no_submission: Nič
       points: Točke
+      speed_grader: SpeedGrader™
       submission_types: "Vrste datotek"
       submitting: "Pošiljanje ..."
       turnitin: "Orodje Turnitin"
@@ -4941,6 +4945,7 @@ sl:
   canvas_files_889a274f: "Datoteke Canvas"
   canvas_for_elementary_analytics_15dc1e07: "Sistem Canvas za Elementary Analytics"
   canvas_for_elementary_e6f5a06f: "Canvas for Elementary"
+  canvas_for_elementary_font_selection_5d1f2271: "Izbira pisave za Canvas for Elementary"
   canvas_for_elementary_parent_support_74a2356e: "Canvas for Elementary: podpora za starše"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_group_membership_id_3b8c7607: canvas_group_membership_id
@@ -5051,6 +5056,7 @@ sl:
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Preverite, da preskočite dodajanje uporabnika za %{loginid}"
   check_your_spelling_or_try_fewer_letters_70769a90: "Preverite črkovanje ali poskusite z manj črkami."
   checked_883b93fd: preverjeno
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Če potrdite možnost Dodaj v koledar, boste povabili vse člane predmeta."
   cheerful_panda_holding_a_map_17ba47ee: "Vesela panda z zemljevidom"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Podrejeni predmet mora pripadati istemu glavnemu računu kot glavni predmet."
   child_s_username_dde3aa9: "Uporabniško ime otroka"
@@ -7373,6 +7379,7 @@ sl:
         pace_plans: "Različne hitrosti napredovanja"
         participation_id: Sodelovanje
         restrict_enrollments_to_course_dates: "Študenti lahko sodelujejo pri predmetu le v obdobju med tema datumoma."
+        restrict_quantitative_data: "Možnosti kvantitativnih podatkov"
         restrict_student_future_view: "Omeji študentom ogled predmeta pred datumom začetka"
         restrict_student_past_view: "Omeji študentom ogled predmeta po datumu konca"
         root_account: "Glavni račun"
@@ -9032,6 +9039,7 @@ sl:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Omogoča preoblikovano pogovorno okno »Pošlji sporočilo študentom, ki ...«, ki poleg pošiljanja sporočil študentom omogoča tudi pošiljanje sporočil skritim bralcem."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Omogoča dostop do javnega API za nove kvize: API za elemente kviza."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Omogoča dostop do javnega API za nove kvize prek sistema Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Skrbnikom omogoča registracijo orodij LTI s funkcijo dinamične registracije"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Omogoča prikaz poročil o plagiatorstvu in rezultate podobnosti v pladnju za oddajo"
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Omogočajo uporabo pomembnih datumov za naloge, koledarske dogodke in drugo."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Omogoča modalno okno z opozorilom za uporabnika, kadar ta osnutek komentarja v SpeedGrader pusti neobjavljen."
@@ -10727,6 +10735,7 @@ sl:
   grades_view_all_grades_8bf9f8d3: "Ocene – ogled vseh ocen"
   grades_view_audit_trail_cc4c1fcc: "Ocene – ogled revizijske sledi"
   grades_view_change_logs_6bc1b959: "Ocene – ogled dnevnikov sprememb"
+  grades_view_quantitative_feedback_90a4ffc7: "Ocene – oglejte si kvantitativne povratne informacije"
   grades_visible_to_students_1584fa83: "Ocene, vidne študentom"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Ocene so uspešno objavljene v redovalnici."
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Ocene so uspešno objavljene v redovalnici."
@@ -11185,11 +11194,17 @@ sl:
       event: "%{date} ob %{time}"
   handler_7912052f: "Rutina za obravnavo"
   has_been_automatically_selected_based_upon_where_t_61f805c5: "je bil samodejno izbran glede na to, kje se nahaja primerek Canvas tega računa. V nekaterih primerih je to lahko druga regija."
+  has_no_submissions_2826a7a2: "Nima oddaj"
+  has_no_submissions_63de50ad: "Nima oddaj"
   has_not_submitted_2350bc24: "Ni oddal(a)"
   has_similarity_score_d5f332b4: "Rezultat ujemanja je"
   has_submissions_6c12ef4c: "Ima oddaje"
+  has_submissions_ea8e609b: "Ima oddaje"
   has_syllabus_body_6f250277: has_syllabus_body
   has_ungraded_submissions_2bff87df: "Ima neocenjene oddaje"
+  has_ungraded_submissions_b79f5803: "Ima neocenjene oddaje"
+  has_unposted_grades_3567391e: "Ima neobjavljene ocene"
+  has_unposted_grades_ba0e02b6: "Ima neobjavljene ocene"
   have_a_question_about_canvas_ask_it_here_5781cce: "Ali imate kakšno vprašanje o sistemu Canvas? Tukaj ga lahko zastavite."
   have_not_been_graded_df2a5fd2: "Niso bili ocenjeni"
   have_not_yet_submitted_57e6a58b: "Še niso oddali"
@@ -11717,6 +11732,7 @@ sl:
   if_true_will_used_the_serialized_submission_for_su_f2bed2e0: "Če je to omogočeno, bo za datum submitted_at uporabljena serijska oddaja"
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Če je omogočeno dovoljenje »Uporabniki – urejaj podrobnosti o prijavi« ali »Statistični pregled – ogled«, bo uporabnik lahko generiral aktivnost prijave/odjave v skrbniških orodjih. Če želite skriti možnost aktivnosti prijave/odjave v skrbniških orodjih, je treba onemogočiti obe dovoljenji."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Če je omogočeno dovoljenje »Uporabniki – uredi podrobnosti o prijavi« ali »Statistični pregled – ogled«, bo uporabnik lahko generiral aktivnost prijave/odjave v skrbniških orodjih. Če želite skriti možnost aktivnosti prijave/odjave v skrbniških orodjih, je treba onemogočiti obe dovoljenji."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "Če opredelite omejitev članov skupine, mora ta biti večja od 1."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Če spremenite možne točke pri nalogi, morate nalogo znova oceniti."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Če spremenite možne točke pri nalogi, morate morebitne oddaje znova oceniti."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Če ne izberete pravic uporabe zdaj, ta datoteka po nalaganju ne bo objavljena."
@@ -11889,6 +11905,7 @@ sl:
   individual_2033c005: Posamezno
   individual_assignment_grade_posting_d8322b99: "Objava posamezne ocene naloge"
   individual_gradebook_c7de9821: "Posamezna redovalnica ..."
+  individual_gradebook_enhancements_de33aa3d: "Posamezne izboljšave redovalnice"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Izračuna vrednosti posameznih učnih izidov ni mogoče spremeniti."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Posameznih točk doseganja učnih ciljev ni mogoče spremeniti."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Možnosti ocene posameznega učnega izida in metode izračuna"
@@ -12344,6 +12361,7 @@ sl:
     lock_module_until: "Zakleni do"
   language_6b3e2c7c: Jezik
   languages_835813f0: Jeziki
+  large_balsamiq_font_5fe45fae: "Pisava Large Balsamiq"
   large_course_db3d58b: "Veliki predmeti:"
   last_7_days_bd411f1f: "Zadnji 7 dni"
   last_activity_a983e541: "Zadnja aktivnost"
@@ -12731,6 +12749,7 @@ sl:
   loading_features_d26820f6: "Nalaganje funkcionalnosti"
   loading_folders_d8b5869e: "Nalaganje map"
   loading_gradebook_b0b75cd3: "Nalaganje redovalnice"
+  loading_gradebook_submissions_d2ba017f: "Nalaganje oddaj redovalnice"
   loading_graders_f6a76142: "Nalaganje ocenjevalcev"
   loading_grades_446fc226: "Nalaganje ocen ..."
   loading_grades_for_coursename_26784c2d: "Nalaganje ocen za %{courseName}"
@@ -12954,6 +12973,7 @@ sl:
   lti_deep_linking_line_items_5e0079f7: "Elementi linije globokih povezav LTI"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Vrstični elementi globokih povezav LTI na strani za urejanje nalog"
   lti_delete_ee5f1bef: "LTI – odstrani"
+  lti_dynamic_registration_8592edb0: "Dinamična registracija LTI"
   lti_edit_83a27850: "LTI – uredi"
   lti_key_14ad02b1: "Ključ LTI"
   lti_launch_af082dc3: "Zagon LTI:"
@@ -15440,6 +15460,7 @@ sl:
   new_question_9107c469: "Novo vprašanje"
   new_question_group_d9306280: "Nova skupina vprašanj"
   new_quiz_34aacba6: "Nov kviz"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "Nov kviz je ob vpisu izbrisal čakajoče stanje obnovitve uporabnika"
   new_quiz_items_3c850331: "Elementi novega kviza"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Zbirke novih računov kvizov in elementov na ravni predmeta"
   new_quizzes_assignment_build_button_72b6531a: "Gumb za izdelavo novih kvizov in nalog"
@@ -17813,6 +17834,7 @@ sl:
   qti_img_matching_question: "Uvoženo ujemajoče se vprašanje vsebuje slike na obeh straneh, kar ni podprto."
   qti_img_matching_question_distractors: "Uvoženo ujemajoče se vprašanje vsebuje slike znotraj izbir in ga ni mogoče fiksirati, ker vsebuje tudi motilce."
   qti_name: "Pretvornik specifikacij QTI"
+  quantitative_data_options_4f071510: "Možnosti kvantitativnih podatkov"
   question_9121487: Vprašanje
   question_answered: Odgovorjeno
   question_bank: 
@@ -19293,6 +19315,7 @@ sl:
         name: Ime
     welcome_to_canvas: "Dobrodošli v sistem Canvas."
   registration_url_60e0eaaa: "Naslov URL za registracijo"
+  regular_lato_font_7f3cf24c: "Pisava Regular Lato"
   regular_style_checkbox_ee3d71c1: "Običajno potrditveno polje"
   reinforce_student_understanding_304d18a6: "Študentom pomagajte do razumevanja"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Sprostite se in si oddahnite. Zaenkrat vam ni treba storiti ničesar."
@@ -21344,6 +21367,13 @@ sl:
       aria_stop: "Za konec snemanja pritisnite »Zaustavi«."
     edit_view_rubric: "Ogled ocenjevalnega vodnika"
     group: Skupina
+    late_input: 
+      days: 
+        one: Dan
+        other: Dnevi
+      hours: 
+        one: Ura
+        other: ur
     mic_blocked_message: "Dovoljenje za uporabo mikrofona je blokirano. Če ga želite spremeniti, pojdite na chrome://settings/content/microphone"
     no_submission_time: "brez časa oddaje"
     nodetect_message: "Ni zaznanega govora. Morda boste morali prilagoditi nastavitve mikrofona."
@@ -22719,6 +22749,7 @@ sl:
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       Ta zastavica funkcije omogoča uporabo posodobljene
       strani za ustvarjanje/urejanje razprave
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Ta funkcija uvaja izboljšave delovanja in vzdrževanja za redovalnico posameznika"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Ta funkcija omogoča, da bodo v primeru pošiljanja več datotek skupaj s strani
       orodje tretje osebe prek API za storitev za naloge in ocenjevanje,
@@ -23647,6 +23678,10 @@ sl:
   track_individual_student_and_class_progress_c13cf2d1: "Sledi posameznemu študentu in napredku razreda"
   track_student_performance_and_activity_a92a2a8b: "Sledi uspehu in dejavnosti študenta"
   transferred_student_enrollments_90dc27d3: "Preneseni vpisi študentov"
+  transform_rce_content_on_load_1f521086: "Pretvori vsebino RCE ob nalaganju"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Pretvori absolutne naslove URL v relativne in odstrani dodatne atribute iz vsebine RCE ob nalaganju.
+      Potrebno za polno delovanje RCE v novih kvizih.
   travel_places_f461329c: "Potovanja in kraji"
   treat_ungraded_as_0_d38c2b41: "Neocenjene obravnavaj kot 0"
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad in Tobago (+1)"
@@ -24567,6 +24602,8 @@ sl:
       resubmit_to_vericite: "Ponovno pošlji na VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "Rezultat ujemanja je VeriCite – več informacij"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite rezultat ujemanja – glejte podrobno poročilo"
+  verify_ldap_tls_certificates_70241d8e: "Preverite potrdila LDAP TLS"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Preverite potrdila TLS, ki jih predložijo ponudniki preverjanja pristnosti LDAP."
   version_versionnumber_updatedat_9f5b7a5b: "Različica %{versionNumber} %{updatedAt}"
   video_78335c71: video
   video_b9f27375: Videoposnetek
@@ -24811,6 +24848,7 @@ sl:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Izbrani predmet je zunaj teh datumov dostopen v načinu »samo za branje«."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Izbrani predmet je zunaj teh datumov nedostopen. Če so datumi predmeta prazni, sta za datum semestra uveljavljena ta začetni in končni datum."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Izbrana sekcija predmeta je zunaj teh datumov dostopen v načinu »samo za branje«."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Ko je ta nastavitev aktivna, določa, ali mora biti stanje delovnega toka novega kviza nastavljeno kot ocenjeno ali pending_review ali je uporabnik predhodno opravljal pending_review novi kviz, vendar je bil ponovno vpisan v ta predmet."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Ko je ta zastavica omogočena, bo meni okna za prikaz predmeta med pomikanjem po straneh
       ostal strnjen ali razširjen, odvisno od tega, katero nastavitev je nazadnje sprejel uporabnik
