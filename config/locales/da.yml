@@ -638,6 +638,7 @@ da:
     titles: 
       configure_report: "Konfigurer rapport"
       open_registration_delegated_warning_dialog: "En ekstern identitetsudbyder er aktiveret"
+      rqd_help: "Begræns kvantitative data"
       what_are_quiz_ip_filters: "Hvad er IP-filtre for test?"
     user: Bruger
   account_settings_fe083453: Kontoindstillinger
@@ -1625,6 +1626,8 @@ da:
         update_button: Opdatering
       report_last_run_never: Aldrig
       report_running: "Rapporten kører. *Du modtager en e-mail, når den er færdig.*"
+      rqd_help_message: "Når valgt, begrænser denne indstilling brugerens visning af kvantitative (numeriske) karakterdata og begrænser mulighederne for opgaveoprettelse for lærere. Brugere vil kun se kvalitative data, der inkluderer bogstavkarakterer og kommentarer. Admin kan tilpasse denne indstilling yderligere ved at justere tilladelser for brugerroller."
+      rqd_screenreader: "Om begrænsning af kvantitative data"
       select: 
         mfa: 
           disabled: Deaktiveret
@@ -2268,7 +2271,7 @@ da:
   adjust_final_grade_fa45e7e0: "Juster endelig karakter"
   adjusting_due_dates_a5918b9c: "Justerer afleveringsdatoer ..."
   admin_4d3ba42f: Administrator
-  admin_analytics_description: "Aktivering viser Admin-analyse for at give oversigter over fag og studerende. Lær mere, og giv feedback ved at deltage i *New Analytics-brugergruppen* i Canvas Community."
+  admin_analytics_description: "Aktiverer Analytics på kontoniveau. Admin Analytics-oversigter giver detaljer om Canvas-brug, Canvas-fagets succes og de studerendes engagement. Lær mere i *Admin Analytics Hub* i Canvas Community."
   admin_analytics_eacba735: Admin-analyse
   admin_csv_f8d1b3eb: "Admin CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Admin-eksport for flere karakterperioder"
@@ -4457,6 +4460,7 @@ da:
       no_points: Ingen
       no_submission: Intet
       points: Point
+      speed_grader: SpeedGrader™
       submission_types: Filtyper
       submitting: Afleverer
       turnitin: Turnitin
@@ -5992,6 +5996,7 @@ da:
   canvas_for_elementary_analytics_15dc1e07: "Canvas til folkeskolen - analyse"
   canvas_for_elementary_beta_28bc5181: "Canvas til folkeskolen (beta)"
   canvas_for_elementary_e6f5a06f: "Canvas til folkeskolen"
+  canvas_for_elementary_font_selection_5d1f2271: "Valg af skrifttype i Canvas til folkeskolen"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas til folkeskolen: mange beskeder i klasseværelset"
   canvas_for_elementary_parent_support_74a2356e: "Canvas til folkeskolen: Forældresupport"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -6129,6 +6134,7 @@ da:
   check_your_spelling_or_try_fewer_letters_70769a90: "Kontroller din stavning, eller prøv med færre bogstaver."
   checkbox_examples_dc790142: "Eksempler på afkrydsningsfelter"
   checked_883b93fd: afkrydset
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Hvis du markerer Tilføj til kalender, inviteres alle fagmedlemmer."
   cheerful_panda_holding_a_map_17ba47ee: "Sød panda med et kort"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Underordnede fag skal tilhøre den samme rodkonto som hovedfag"
   child_s_username_dde3aa9: "Barnets brugernavn"
@@ -8911,6 +8917,7 @@ da:
         participation_id: Deltagelse
         public_syllabus: "Gør denne kursusbeskrivelse synlig for alle"
         restrict_enrollments_to_course_dates: "Studerende kan kun deltage i faget mellem disse datoer"
+        restrict_quantitative_data: "Indstillinger for kvantitative data"
         restrict_student_future_view: "Begræns de studerende fra at se dette fag før startdatoen"
         restrict_student_past_view: "Begræns de studerende fra at se dette fag efter slutdatoen"
         root_account: Rodkonto
@@ -11029,6 +11036,7 @@ da:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Aktiverer en nydesignet dialogboks med besked til studerende, der giver mulighed for også at sende beskeder til observatører."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Giver adgang til New Quizzes Public API: Quiz Items API."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Giver adgang til New Quizzes Public API via Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Gør det muligt for administratorer at registrere LTI-værktøjer med dynamisk registrering"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Aktiverer visning af plagieringsrapporter og lighedsresultater i den nye afleveringsbakke i karakteroversigten."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Gør det muligt at anvende vigtige datoer til opgaver, kalenderbegivenheder og andet."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Gør det muligt for modal at advare brugeren, når et kommentarudkast ikke bliver indsendt i SpeedGrader."
@@ -13392,6 +13400,7 @@ da:
   grades_view_audit_trail_cc4c1fcc: "Karakterer - vis revisionsspor"
   grades_view_audit_trail_db7364b1: "Karakterer - vis revisionsspor"
   grades_view_change_logs_6bc1b959: "Karakterer - vis ændringslogge"
+  grades_view_quantitative_feedback_90a4ffc7: "Karakterer – se kvantitativ feedback"
   grades_visible_to_students_1584fa83: "Karakterer synlige for studerende"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Karakterer blev opført i karakteroversigten."
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Karakterer blev frigivet til karakteroversigten."
@@ -14106,12 +14115,18 @@ da:
       event: "%{date} ved %{time}"
   handler_7912052f: Handler
   has_been_automatically_selected_based_upon_where_t_61f805c5: "Er valgt automatisk ud fra dér, hvor kontoens Canvas-opsætning befinder sig. Det kan i nogle tilfælde være en anden region."
+  has_no_submissions_2826a7a2: "Har ingen afleveringer"
+  has_no_submissions_63de50ad: "Har ingen afleveringer"
   has_not_submitted_2350bc24: "Har ikke indsendt"
   has_similarity_score_d5f332b4: "Har originalitetsscore"
   has_submissions_6c12ef4c: "Har afleveringer"
+  has_submissions_ea8e609b: "Har afleveringer"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Har Turnitin-score"
   has_ungraded_submissions_2bff87df: "Har ikke-bedømte afleveringer"
+  has_ungraded_submissions_b79f5803: "Har ikke-bedømte afleveringer"
+  has_unposted_grades_3567391e: "Har uopslåede karakterer"
+  has_unposted_grades_ba0e02b6: "Har uopslåede karakterer"
   have_a_question_about_canvas_ask_it_here_5781cce: "Har du et spørgsmål om Canvas? Spørg om det her."
   have_not_been_graded_df2a5fd2: "Er ikke blevet bedømt"
   have_not_yet_submitted_57e6a58b: "Er ikke blevet indsendt"
@@ -14767,6 +14782,7 @@ da:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Hvis Brugere - administrér loginoplysninger eller Statistik - vis er aktiveret, kan en bruger generere login-/logoutaktivitet i Administratorværktøjer. For at skjule valgmuligheden login-/logoutaktivitet i Administratorværktøjer skal begge af disse tilladelser være deaktiveret."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Hvis Brugere - administrer loginoplysninger eller Statistik - vis er aktiveret, kan en bruger generere login-/logoutaktivitet i Administratorværktøjer. For at skjule valgmuligheden login-/logoutaktivitet i Administratorværktøjer skal begge af disse tilladelser være deaktiveret."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Hvis brugere - administrer loginoplysninger eller Statistik - vis er aktiveret, kan brugeren generere login- / logout-aktivitet i Admin-værktøjer. For at skjule valgmuligheden login-/logoutaktivitet i Administratorværktøjer skal begge af disse tilladelser være deaktiveret."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "Hvis du skal definere en grænse for gruppemedlemmer, skal den være større end 1."
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "Hvis du ændrer en opgaves mulige points, vil eksisterende karakterer automatisk blive skaleret."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Hvis du ændrer en opgaves mulige point, skal du bedømme opgaven igen."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Hvis du ændrer en opgaves mulige point, skal du bedømme enhver aflevering igen."
@@ -14992,6 +15008,7 @@ da:
   individual_2033c005: Individuel
   individual_assignment_grade_posting_d8322b99: "Slå opgavekarakterer op individuelt"
   individual_gradebook_c7de9821: "Individuel karakteroversigt …"
+  individual_gradebook_enhancements_de33aa3d: "Individuelle forbedringer af karakteroversigten"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Individuelle beregningsværdier for læringsudbytter kan ikke ændres."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Individuelle point for opfyldelse af læringsmål for læringsudbytter kan ikke ændres."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Indstillinger for individuel læringsudbyttevurdering og beregningsmetode"
@@ -15488,6 +15505,7 @@ da:
     lock_module_until: "Lås indtil"
   language_6b3e2c7c: Sprog
   languages_835813f0: Sprog
+  large_balsamiq_font_5fe45fae: "Stor Balsamiq-skrifttype"
   large_course_db3d58b: "Stort fag:"
   last_7_days_bd411f1f: "Sidste 7 dage"
   last_activity_a983e541: "Sidste aktivitet"
@@ -15917,6 +15935,7 @@ da:
   loading_features_d26820f6: "Indlæser funktioner"
   loading_folders_d8b5869e: "Indlæser mapper"
   loading_gradebook_b0b75cd3: "Indlæser karakteroversigt"
+  loading_gradebook_submissions_d2ba017f: "Indlæser karakteroversigt-afleveringer"
   loading_graders_f6a76142: "Eksaminatorer indlæses"
   loading_grades_446fc226: "Indlæser karakterer ..."
   loading_grades_for_coursename_26784c2d: "Indlæser karakterer for %{courseName}"
@@ -16178,6 +16197,7 @@ da:
   lti_deep_linking_line_items_5e0079f7: "LTI Deep Linking linjeelementer"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "LTI dyblinkning-linjeelementer på opgaveredigeringssiden"
   lti_delete_ee5f1bef: "LTI - slet"
+  lti_dynamic_registration_8592edb0: "LTI dynamisk registrering"
   lti_edit_83a27850: "LTI - rediger"
   lti_key_14ad02b1: LTI-nøgle
   lti_launch_af082dc3: "LTI-lancering:"
@@ -19082,6 +19102,7 @@ da:
   new_question_9107c469: "Nyt spørgsmål"
   new_question_group_d9306280: "Ny spørgsmålsgruppe"
   new_quiz_34aacba6: "Ny test"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "Ny test gendannelse af slettet bruger afventer gennemgang ved tilmelding"
   new_quiz_items_3c850331: "Nyt test-element"
   new_quiz_statistics_desc: "Aktiver ny quiz statistikside for et kursus."
   new_quizzes_account_and_course_level_item_banks_9152fb1: "New Quizzes-konto og elementbanker på fagniveau"
@@ -21790,6 +21811,7 @@ da:
   qti_img_matching_question: "Importeret matchende spørgsmål indeholder billeder på begge sider, hvilket ikke understøttes"
   qti_img_matching_question_distractors: "Importeret matchende spørgsmål indeholder billeder inden i valgmulighederne og kunne ikke rettes, fordi det også indeholder distraktorer"
   qti_name: QTI-konverter
+  quantitative_data_options_4f071510: "Indstillinger for kvantitative data"
   question_9121487: Spørgsmål
   question_answered: Besvaret
   question_bank: 
@@ -23542,6 +23564,7 @@ da:
         name: Navn
     welcome_to_canvas: "Velkommen til Canvas!"
   registration_url_60e0eaaa: Registrerings-URL
+  regular_lato_font_7f3cf24c: "Almindelig Lato-skrifttype"
   regular_style_checkbox_ee3d71c1: "Afkrydsningsfelt i regulær stil"
   reinforce_student_understanding_304d18a6: "Styrk de studerendes forståelse"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Slap af, og tag en pause. Der er ikke noget at tage fat i endnu."
@@ -26044,6 +26067,13 @@ da:
       aria_stop: "Tryk på \"Stop\" for at afslutte optagelsen."
     edit_view_rubric: "Vis rubrik"
     group: Gruppe
+    late_input: 
+      days: 
+        one: Dag
+        other: Dage
+      hours: 
+        one: Time
+        other: Timer
     mic_blocked_message: "Tilladelse til at bruge mikrofon er blokeret. For at ændre skal du gå til chrome://settings/content/microphone"
     mute_assignment: "Tilbagehold opgave"
     no_submission_time: "ingen afleveringstid"
@@ -27653,6 +27683,7 @@ da:
       Dette funktionsflag muliggør brugen af den opdaterede
       side til at oprette/redigere diskussioner
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Dette funktionsflag er noget, en konto kan tænde, hvis de vil tillade brugerne af deres konto at bruge sprog, der normalt skrives fra højre til venstre (fx: arabisk, hebraisk, persisk) for at se højre-til-venstre-layoutet, mens vi arbejder på det. Når funktionen er \"klar\", vil dette funktionsflag gå væk, og alle, der taler et af disse sprog, vil altid se højre-til-venstre-grænsefladen."
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Denne funktion introducerer ydeevne- og vedligeholdelsesforbedringer til Individuel karakteroversigt"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Denne funktion gør, at når flere filer sendes sammen af
       et tredjepartsværktøj via Assignments and Grade Service API, vil de være
@@ -28826,6 +28857,10 @@ da:
   traditional_gradebook_d7ad59c6: "Traditionel karakteroversigt …"
   traditional_gradebook_d90461dc: "Traditionel karakteroversigt"
   transferred_student_enrollments_90dc27d3: "Overførte tilmeldte studerende"
+  transform_rce_content_on_load_1f521086: "Transformer RCE-indhold ved indlæsning"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Transformerer absolutte URL'er til relative URL'er og fjerner irrelevante attributter fra RCE-indhold ved indlæsning.
+      Nødvendigt for at RCE kan fungere fuldt ud i New Quizzes.
   travel_places_f461329c: "Rejser og steder"
   treat_ungraded_as_0_d38c2b41: "Tildel 0 til ikke bedømte"
   tree_browser: 
@@ -29947,6 +29982,8 @@ da:
       resubmit_to_vericite: "Aflever igen til VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite originalitetsscore -- mere information"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Originalitetsscore - Se detaljeret rapport"
+  verify_ldap_tls_certificates_70241d8e: "Bekræft LDAP TLS-certifikater"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Bekræft TLS-certifikater præsenteret af LDAP-godkendelsesudbydere."
   version_versionnumber_updatedat_9f5b7a5b: "Version %{versionNumber} %{updatedAt}"
   video_78335c71: video
   video_b9f27375: Video
@@ -30231,6 +30268,7 @@ da:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Når valgt, er faget i skrivebeskyttet tilstand uden for disse datoer."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Når valgt, er faget utilgængeligt uden for fagdatoer. Hvis fagdatoer er tomme, gælder disse start- og slutdatoer for semestersdatoerne."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Når valgt, er fagafsnittet i skrivebeskyttet tilstand uden for disse datoer."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Når indstillet, bestemmer det, om arbejdsprocestilstanden for en ny test skal indstilles som karakter, eller pending_review om en bruger havde en tidligere pending_review ny test, men var blevet tilmeldt faget igen."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Når dette flag er aktiveret, forbliver fagnavigationen skjult eller udvidet,
       når du navigerer mellem sider, afhængigt af hvordan det sidst blev indstillet af brugeren,
