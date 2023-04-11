@@ -462,6 +462,7 @@ vi:
     titles: 
       configure_report: "Cấu Hình Báo Cáo"
       open_registration_delegated_warning_dialog: "Nhà Cung Cấp Nhận Dạng Ngoài được Kích Hoạt"
+      rqd_help: "Hạn Chế Dữ Liệu Định Lượng"
       what_are_quiz_ip_filters: "Bộ Lọc IP Kiểm Tra là gì?"
   account_settings_fe083453: "Cài Đặt Tài Khoản"
   account_sis_id_2e4a461: "id sis tài khoản"
@@ -1249,6 +1250,8 @@ vi:
         megabytes: megabyte
         megabytes_tooltip: megabyte
         update_button: "Cập nhật"
+      rqd_help_message: "Khi được chọn, cài đặt này sẽ hạn chế người dùng xem dữ liệu chấm điểm định lượng (bằng số) và giới hạn các tùy chọn tạo bài tập cho giáo viên. Người dùng sẽ chỉ nhìn thấy dữ liệu định tính, bao gồm điểm bằng chữ và các bình luận. Quản trị viên có thể tùy chỉnh thêm cài đặt này bằng cách điều chỉnh các cho phép đối với vai trò người dùng."
+      rqd_screenreader: "Về hạn chế dữ liệu định lượng"
       select: 
         mfa: 
           disabled: "Đã vô hiệu hóa"
@@ -1801,7 +1804,7 @@ vi:
       tài liệu chưa đọc hoặc nhận xét đánh giá theo tiêu chí tồn tại
   adjusting_due_dates_a5918b9c: "Điều chỉnh các ngày đến hạn..."
   admin_4d3ba42f: "Quản trị viên"
-  admin_analytics_description: "Bật hiển thị Phân Tích Quản Trị để hiển thị tổng quan về khóa học và sinh viên. Tìm hiểu thêm và đưa ra phản hồi bằng cách tham gia vào *nhóm người dùng Phân Tích Mới* trong cộng đồng Canvas."
+  admin_analytics_description: "Bật Phân Tích ở cấp độ tài khoản. Bảng điều khiển Phân Tích của Quản Trị Viên cung cấp thông tin chi tiết về việc sử dụng Canvas, sự thành công của khóa học Canvas và sự tham gia của sinh viên. Tìm hiểu thêm về *Trung Tâm Phân Tích của Quản Trị Viên* ở cộng đồng Canvas."
   admin_analytics_eacba735: "Phân Tích Quản Trị"
   admin_csv_f8d1b3eb: "CSV quản trị viên"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Xuất Quản Trị cho Nhiều Khoảng Thời Gian Chấm Điểm"
@@ -3241,6 +3244,7 @@ vi:
       no_points: "Không có"
       no_submission: Không
       points: "Điểm Thành Phần"
+      speed_grader: SpeedGrader™
       submission_types: "Các Loại Tệp"
       submitting: Nộp
       turnitin: "Phần mềm Turnitin"
@@ -4408,6 +4412,7 @@ vi:
   canvas_files_889a274f: "Tập Tin Canvas"
   canvas_for_elementary_analytics_15dc1e07: "Canvas cho Các Phân Tích Tiểu Học"
   canvas_for_elementary_e6f5a06f: "Canvas cho Tiểu Học"
+  canvas_for_elementary_font_selection_5d1f2271: "Lựa Chọn Phông Chữ của Canvas cho Tiểu Học"
   canvas_for_elementary_parent_support_74a2356e: "Canvas cho Tiểu Học: Hỗ Trợ Phụ Huynh"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_group_membership_id_3b8c7607: canvas_group_membership_id
@@ -4513,6 +4518,7 @@ vi:
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Chọn để bỏ qua việc thêm người dùng cho %{loginid}"
   check_your_spelling_or_try_fewer_letters_70769a90: "Kiểm tra chính tả hoặc thử viết ít chữ cái hơn."
   checked_883b93fd: "đã kiểm tra"
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Nếu đánh dấu Thêm vào Lịch thì sẽ mời tất cả các thành viên của khóa học."
   cheerful_panda_holding_a_map_17ba47ee: "Gấu trúc vui vẻ cầm bản đồ"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Khóa học được nhân bản phải thuộc cùng một tài khoản gốc với khóa học chính"
   child_s_username_dde3aa9: "Tên Người Dùng Nhân Bản"
@@ -6732,6 +6738,7 @@ vi:
         open_enrollment: "Thêm liên kết \"Tham Gia Khóa Học này\" vào trang chủ khóa học"
         pace_plans: "Kế Hoạch Tốc Độ"
         participation_id: "Tham Gia"
+        restrict_quantitative_data: "Các Tùy Chọn Dữ Liệu Định Lượng"
         root_account: "Tài Khoản Gốc"
         root_account_id: "Tài Khoản Gốc"
         show_announcements_on_home_page: "Hiển thị các thông báo chung gần đây trên trang chủ của Khóa Học"
@@ -8232,6 +8239,7 @@ vi:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Bật hộp thoại Nhắn Tin cho Sinh Viên... được thiết kế lại, cho phép nhắn tin cho những người quan sát ngoài sinh viên."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Cho phép truy cập API Công Cộng Câu Hỏi Kiểm Tra Mới: API Mục Câu Hỏi Kiểm Tra."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Cho phép truy cập vào API Công Khai Các Câu Hỏi Kiểm Tra Mới thông qua Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Cho phép các quản trị viên đăng ký các công cụ LTI bằng Đăng Ký Động"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Bật hiển thị báo cáo đạo văn và điểm số tương tự trong khay nộp Sổ Điểm Mới."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Cho phép áp dụng các ngày quan trọng cho bài tập, sự kiện lịch và những ngày khác."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Bật phương thức để cảnh báo người dùng khi bình luận nháp chưa được đăng trong SpeedGrader."
@@ -9757,6 +9765,7 @@ vi:
   grades_view_all_grades_8bf9f8d3: "Điểm - xem tất cả các điểm"
   grades_view_audit_trail_cc4c1fcc: "Điểm - xem quá trình kiểm tra"
   grades_view_change_logs_6bc1b959: "Điểm - xem nhật ký thay đổi"
+  grades_view_quantitative_feedback_90a4ffc7: "Điểm - xem ý kiến phản hồi định lượng"
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Điểm đã được công bố thành công vào sổ điểm."
   grades_will_be_hidden_by_default_any_grades_that_h_53a7fb03: "\n\
       \x20         Các điểm sẽ bị ẩn theo mặc định. Bất kỳ điểm nào đã được đăng sẽ vẫn hiển thị.\n\
@@ -10163,11 +10172,17 @@ vi:
   handle_pasting_of_files_especially_images_7c19b19c: "Xử lý việc dán các tập tin, đặc biệt là hình ảnh."
   handler_7912052f: "Người xử lý"
   has_been_automatically_selected_based_upon_where_t_61f805c5: "đã được tự động chọn dựa trên vị trí của phiên bản Canvas của tài khoản này. Trong một số trường hợp, có thể là một vùng khác."
+  has_no_submissions_2826a7a2: "Không có bài nộp"
+  has_no_submissions_63de50ad: "Không Có Bài Nộp"
   has_not_submitted_2350bc24: "Chưa nộp"
   has_similarity_score_d5f332b4: "Có điểm số tương tự"
   has_submissions_6c12ef4c: "Có các bài nộp"
+  has_submissions_ea8e609b: "Có Bài Nộp"
   has_syllabus_body_6f250277: has_syllabus_body
   has_ungraded_submissions_2bff87df: "Có bài nộp chưa được chấm điểm"
+  has_ungraded_submissions_b79f5803: "Có Bài Nộp Chưa Chấm Điểm"
+  has_unposted_grades_3567391e: "Có điểm chưa được đăng"
+  has_unposted_grades_ba0e02b6: "Có Điểm Chưa Được Đăng"
   have_a_question_about_canvas_ask_it_here_5781cce: "Bạn có thắc mắc gì về Canvas không? Hỏi ở đây."
   have_not_been_graded_df2a5fd2: "Chưa được chấm điểm"
   have_not_yet_submitted_57e6a58b: "Chưa nộp"
@@ -10654,6 +10669,7 @@ vi:
   if_this_setting_is_disabled_and_discussions_view_i_8a068652: "Nếu cài đặt này bị tắt và Thảo Luận - chế độ xem được bật, người dùng vẫn có thể điều chỉnh cài đặt khóa nội dung trên các cuộc thảo luận riêng lẻ trong khóa học thành thạo về Bản Vẽ Thiết Kế."
   if_true_will_used_the_serialized_submission_for_su_f2bed2e0: "Nếu đúng, sẽ sử dụng bài nộp tuần tự cho ngày submitted_at"
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Nếu Người Dùng - quản lý chi tiết đăng nhập hoặc Thống Kê - chế độ xem được bật, người dùng sẽ có thể tạo hoạt động đăng nhập/đăng xuất trong Công Cụ Quản Trị. Để ẩn tùy chọn hoạt động đăng nhập/đăng xuất trong Công Cụ Quản Trị Viên, cần phải tắt cả hai quyền này."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "Nếu bạn định xác định giới hạn thành viên nhóm thì giới hạn đó phải lớn hơn 1."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Nếu bạn thay đổi điểm cao nhất có thể đạt được của một bài tập, bạn phải chấm điểm lại bài tập đó."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Nếu bạn thay đổi điểm cao nhất có thể đạt được của bài tập, bạn phải chấm điểm lại mọi bài nộp."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Nếu bạn không chọn quyền sử dụng ngay bây giờ, tệp này sẽ bị hủy công bố sau khi được tải lên."
@@ -10822,6 +10838,7 @@ vi:
   individual_2033c005: "Cá nhân"
   individual_assignment_grade_posting_d8322b99: "Đăng Điểm Bài Tập Cá Nhân"
   individual_gradebook_c7de9821: "Sổ Điểm Cá Nhân…"
+  individual_gradebook_enhancements_de33aa3d: "Cải Tiến Sổ Điểm Cá Nhân"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Không thể sửa đổi các giá trị tính toán kết quả riêng lẻ."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Không thể sửa đổi điểm thành thạo kết quả cá nhân."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Xếp Hạng Kết Quả Cá Nhân và Các Tùy Chọn Phương Pháp Tính Toán"
@@ -11211,6 +11228,7 @@ vi:
     lock_module_until: "Khóa đến khi"
   language_6b3e2c7c: "Ngôn ngữ"
   languages_835813f0: "Các ngôn ngữ"
+  large_balsamiq_font_5fe45fae: "Phông Chữ Balsamiq Lớn"
   large_course_db3d58b: "Khóa Học Lớn:"
   last_7_days_bd411f1f: "7 Ngày Qua"
   last_activity_a983e541: "Hoạt Động Cuối"
@@ -11591,6 +11609,7 @@ vi:
   loading_features_d26820f6: "Đang tải các tính năng"
   loading_folders_d8b5869e: "Đang tải các thư mục"
   loading_gradebook_b0b75cd3: "Đang Tải Sổ Điểm"
+  loading_gradebook_submissions_d2ba017f: "Đang tải bài nộp Sổ Điểm"
   loading_grades_446fc226: "Đang tải các điểm..."
   loading_grades_for_coursename_26784c2d: "Đang tải các điểm cho %{courseName}"
   loading_grading_periods_c635d96: "Đang tải các thời gian phân loại điểm..."
@@ -11803,6 +11822,7 @@ vi:
   lti_deep_linking_line_items_5e0079f7: "Các Mục Hàng Liên Kết Sâu LTI"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Mục Dòng Liên Kết Sâu LTI trên trang chỉnh sửa Bài Tập"
   lti_delete_ee5f1bef: "LTI - xóa"
+  lti_dynamic_registration_8592edb0: "Đăng Ký Động LTI"
   lti_edit_83a27850: "LTI - chỉnh sửa"
   lti_key_14ad02b1: "Khóa LTI"
   lti_launch_af082dc3: "Khởi Chạy LTI:"
@@ -14149,6 +14169,7 @@ vi:
   new_question_9107c469: "Câu Hỏi Mới"
   new_question_group_d9306280: "Nhóm Câu Hỏi Mới"
   new_quiz_34aacba6: "Câu Hỏi Kiểm Tra Mới"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "Bài Kiểm Tra Mới đã xóa người dùng khôi phục trạng thái đang chờ xem xét khi ghi danh"
   new_quiz_items_3c850331: "Mục Kiểm Tra Mới"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Tài Khoản Câu Hỏi Kiểm Tra và Ngân Hàng Câu Hỏi Mục Cấp Độ Khóa Học Mới"
   new_quizzes_assignment_build_button_72b6531a: "Nút Xây Dựng Bài Tập Câu Hỏi Kiểm Tra Mới"
@@ -16356,6 +16377,7 @@ vi:
   qti_img_matching_question: "Câu hỏi trùng khớp đã nhập chứa hình ảnh ở cả hai bên, không được hỗ trợ"
   qti_img_matching_question_distractors: "Câu hỏi trùng khớp đã nhập chứa hình ảnh bên trong các lựa chọn và không thể sửa được vì cũng chứa các yếu tố gây phân tâm"
   qti_name: "Trình Chuyển Đổi QTI"
+  quantitative_data_options_4f071510: "Các Tùy Chọn Dữ Liệu Định Lượng"
   question_9121487: "Câu hỏi"
   question_answered: "Đã trả lời"
   question_bank: 
@@ -17699,6 +17721,7 @@ vi:
         email: Email
         name: Tên
   registration_url_60e0eaaa: "URL Đăng Ký"
+  regular_lato_font_7f3cf24c: "Phông Chữ Lato Thông Thường"
   regular_style_checkbox_ee3d71c1: "Hộp kiểm kiểu thông thường"
   reinforce_student_understanding_304d18a6: "Củng cố sự hiểu biết của sinh viên"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Thư giãn và nghỉ ngơi. Vẫn chưa có gì để làm."
@@ -19553,6 +19576,13 @@ vi:
       aria_stop: "Nhấn “Dừng” để kết thúc ghi."
     edit_view_rubric: "Xem Bảng Đánh Giá Theo Tiêu Chí"
     group: Nhóm
+    late_input: 
+      days: 
+        one: Ngày
+        other: Ngày
+      hours: 
+        one: Giờ
+        other: Giờ
     mic_blocked_message: "Quyền sử dụng micro bị chặn. Để thay đổi, hay truy cập vào chrome://settings/content/microphone"
     no_submission_time: "không có thời gian nộp"
     nodetect_message: "Không phát hiện được giọng nói nào. Bạn có thể cần điều chỉnh cài đặt micro của mình."
@@ -20878,6 +20908,7 @@ vi:
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       Cờ tính năng này cho phép sử dụng trang
       tạo/chỉnh sửa thảo luận đã cập nhật
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Tính năng này giới thiệu các cải tiến về hiệu suất và lưu giữ cho Sổ Điểm Cá Nhân"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Khi nhiều tập tin được nộp cùng nhau bằng
       một công cụ của bên thứ ba thông qua API Dịch Vụ Bài Tập và Lớp, đặc tính này sẽ khiến chúng được
@@ -21594,6 +21625,10 @@ vi:
   totals_be24703: "Tổng cộng"
   track_student_performance_and_activity_a92a2a8b: "Theo dõi hiệu suất và hoạt động của sinh viên"
   transferred_student_enrollments_90dc27d3: "Lần Chuyển Ghi Danh của Sinh Viên"
+  transform_rce_content_on_load_1f521086: "Chuyển Đổi Nội Dung RCE khi Tải"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Chuyển đổi URL tuyệt đối thành URL tương đối và xóa các thuộc tính không liên quan khỏi nội dung RCE khi tải.
+      RCE cần phải hoạt động đầy đủ trong Các Bài Kiểm Tra Mới.
   travel_places_f461329c: "Du Lịch & Địa Điểm"
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad và Tobago (+1)"
   truncated_56b1a661: "Lược Bớt"
@@ -22459,6 +22494,8 @@ vi:
       resubmit_to_vericite: "Nộp lại cho VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite điểm tương đồng - thêm thông tin"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Điểm Số Tương Đồng - Xem báo cáo chi tiết"
+  verify_ldap_tls_certificates_70241d8e: "Xác minh chứng chỉ TLS của LDAP"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Xác minh chứng chỉ TLS do nhà cung cấp xác thực LDAP cung cấp."
   version_versionnumber_updatedat_9f5b7a5b: "Phiên Bản %{versionNumber} %{updatedAt}"
   video_78335c71: video
   video_b9f27375: Video
@@ -22693,6 +22730,7 @@ vi:
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "Khi đăng tải điểm của các bài tập ẩn danh, điểm sẽ được hiển thị với tất cả mọi người trong khóa học. Chế độ ẩn danh sẽ được gỡ bỏ."
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: "Khi chế độ thực thi phạm vi được tắt, các thẻ cho phép người dùng được cấp quyền truy cập đến tất cả các điểm cuối có sẵn."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Khi được chọn, phần khóa học sẽ ở trạng thái chỉ đọc ngoài những ngày này."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Khi cài đặt, hãy xác định xem trạng thái quy trình làm việc của bài kiểm tra mới nên được cài đặt là đã chấm điểm hay pending_review nếu một người dùng có bài kiểm tra pending_review trước đây nhưng đã được ghi danh lại vào khóa học."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Khi cờ này được bật, phần điều hướng khóa học vẫn sẽ được thu gọn hoặc mở rộng
       khi đang điều hướng giữa các trang, tùy thuộc vào lần cuối mà người dùng đặt, thay vào

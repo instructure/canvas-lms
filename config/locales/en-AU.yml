@@ -639,6 +639,7 @@ en-AU:
     titles: 
       configure_report: "Configure Report"
       open_registration_delegated_warning_dialog: "An External Identity Provider is Enabled"
+      rqd_help: "Restrict Quantitative Data"
       what_are_quiz_ip_filters: "What are Quiz IP Filters?"
     user: User
   account_settings_fe083453: "Account Settings"
@@ -1627,6 +1628,8 @@ en-AU:
         update_button: Update
       report_last_run_never: Never
       report_running: "The report is running.*You'll receive an email when it is done.*"
+      rqd_help_message: "When selected, this setting will restrict user view of quantitative (numeric) grading data and limit assignment creation options for teachers. Users will only see qualitative data, which includes letter grades and comments. Admin can customise this setting further by adjusting permissions for user roles."
+      rqd_screenreader: "About restricting quantitative data"
       select: 
         mfa: 
           disabled: Disabled
@@ -2270,7 +2273,7 @@ en-AU:
   adjust_final_grade_fa45e7e0: "Adjust Final Grade"
   adjusting_due_dates_a5918b9c: "Adjusting due dates..."
   admin_4d3ba42f: Admin
-  admin_analytics_description: "Enabling displays Admin Analytics to show overviews of courses and students. Learn more and give feedback by joining the *New Analytics user group* in the Canvas community."
+  admin_analytics_description: "Enables Analytics at the account-level. Admin Analytics dashboards provide details on Canvas usage, Canvas course success, and student engagement. Learn more in the *Admin Analytics Hub* in the Canvas community."
   admin_analytics_eacba735: "Admin Analytics"
   admin_csv_f8d1b3eb: "Admin CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Admin Export for Multiple Marking Periods"
@@ -4466,6 +4469,7 @@ en-AU:
       no_points: None
       no_submission: Nothing
       points: Points
+      speed_grader: SpeedGrader™
       submission_types: "File Types"
       submitting: Submitting
       turnitin: Turnitin
@@ -6004,6 +6008,7 @@ en-AU:
   canvas_for_elementary_analytics_15dc1e07: "Canvas for Elementary Analytics"
   canvas_for_elementary_beta_28bc5181: "Canvas for Elementary (beta)"
   canvas_for_elementary_e6f5a06f: "Canvas for Elementary"
+  canvas_for_elementary_font_selection_5d1f2271: "Canvas for Elementary Font Selection"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas for Elementary: many announcements in homeroom"
   canvas_for_elementary_parent_support_74a2356e: "Canvas for Elementary: Parent Support"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -6141,6 +6146,7 @@ en-AU:
   check_your_spelling_or_try_fewer_letters_70769a90: "Check your spelling or try fewer letters."
   checkbox_examples_dc790142: "Checkbox examples"
   checked_883b93fd: checked
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Checking Add to Calendar will invite all course members."
   cheerful_panda_holding_a_map_17ba47ee: "Cheerful panda holding a map"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Child course must belong to the same root account as master course"
   child_s_username_dde3aa9: "Child's Username"
@@ -8928,6 +8934,7 @@ en-AU:
         participation_id: Participation
         public_syllabus: "Make the syllabus for this course publicly visible"
         restrict_enrollments_to_course_dates: "Students can only participate in the course between these dates"
+        restrict_quantitative_data: "Quantitative Data Options"
         restrict_student_future_view: "Restrict students from viewing this course before start date"
         restrict_student_past_view: "Restrict students from viewing this course after end date"
         root_account: "Root Account"
@@ -11051,6 +11058,7 @@ en-AU:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Enables a redesigned Message Students Who... dialog that allows for messaging observers in addition to students."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Enables access to the New Quizzes Public API: Quiz Items API."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Enables access to the New Quizzes Public API through Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Enables administrators to register LTI tools with Dynamic Registration"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Enables display of plagiarism reports and similarity scores in the New Markbook submission tray."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Enables important dates to be applied to assignments, calendar events, and others."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Enables modal to warn user when a draft comment is left unposted in SpeedGrader."
@@ -13414,6 +13422,7 @@ en-AU:
   grades_view_audit_trail_cc4c1fcc: "Marks - view audit trail"
   grades_view_audit_trail_db7364b1: "Grades - View audit trail"
   grades_view_change_logs_6bc1b959: "Marks - view change logs"
+  grades_view_quantitative_feedback_90a4ffc7: "Grades - view quantitative feedback"
   grades_visible_to_students_1584fa83: "Grades Visible to Students"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Grades were successfully published to the gradebook."
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Marks were successfully released to the markbook."
@@ -14129,12 +14138,18 @@ en-AU:
       event: "%{date} at %{time}"
   handler_7912052f: Handler
   has_been_automatically_selected_based_upon_where_t_61f805c5: "has been automatically selected based upon where this account's Canvas instance resides. In some cases it can be a different region."
+  has_no_submissions_2826a7a2: "Has no submissions"
+  has_no_submissions_63de50ad: "Has No Submissions"
   has_not_submitted_2350bc24: "Has not submitted"
   has_similarity_score_d5f332b4: "Has similarity score"
   has_submissions_6c12ef4c: "Has submissions"
+  has_submissions_ea8e609b: "Has Submissions"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Has Turnitin score"
   has_ungraded_submissions_2bff87df: "Has unmarked submissions"
+  has_ungraded_submissions_b79f5803: "Has Ungraded Submissions"
+  has_unposted_grades_3567391e: "Has unposted grades"
+  has_unposted_grades_ba0e02b6: "Has Unposted Grades"
   have_a_question_about_canvas_ask_it_here_5781cce: "Have a question about Canvas? Ask it here."
   have_not_been_graded_df2a5fd2: "Have not been marked"
   have_not_yet_submitted_57e6a58b: "Have not yet submitted"
@@ -14792,6 +14807,7 @@ en-AU:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "If Users - manage login details or Statistics - view​ is enabled, a user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "If Users - manage login details or Statistics - view is enabled, a user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "If Users - manage login details or Statistics - view is enabled, the user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "If you are going to define a limit of group members, it must be greater than 1."
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "If you change an assignment's points possible, existing grades will be automatically scaled."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "If you change an assignment's points possible, you must re-mark the assignment."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "If you change an assignment's points possible, you must re-mark any submissions."
@@ -15017,6 +15033,7 @@ en-AU:
   individual_2033c005: Individual
   individual_assignment_grade_posting_d8322b99: "Individual Assignment Mark Posting"
   individual_gradebook_c7de9821: "Individual Markbook…"
+  individual_gradebook_enhancements_de33aa3d: "Individual Gradebook Enhancements"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Individual outcome calculation values cannot be modified."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Individual outcome mastery points cannot be modified."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Individual Outcome Rating and Calculation Method Options"
@@ -15530,6 +15547,7 @@ en-AU:
     lock_module_until: "Lock until"
   language_6b3e2c7c: Language
   languages_835813f0: Languages
+  large_balsamiq_font_5fe45fae: "Large Balsamiq Font"
   large_course_db3d58b: "Large Course:"
   last_7_days_bd411f1f: "Last 7 Days"
   last_activity_a983e541: "Last Activity"
@@ -15959,6 +15977,7 @@ en-AU:
   loading_features_d26820f6: "Loading features"
   loading_folders_d8b5869e: "Loading folders"
   loading_gradebook_b0b75cd3: "Loading Markbook"
+  loading_gradebook_submissions_d2ba017f: "Loading Gradebook submissions"
   loading_graders_f6a76142: "Loading Graders"
   loading_grades_446fc226: "Loading marks..."
   loading_grades_for_coursename_26784c2d: "Loading marks for %{courseName}"
@@ -16220,6 +16239,7 @@ en-AU:
   lti_deep_linking_line_items_5e0079f7: "LTI Deep Linking Line Items"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "LTI Deep Linking Line Items on Assignment edit page"
   lti_delete_ee5f1bef: "LTI - delete"
+  lti_dynamic_registration_8592edb0: "LTI Dynamic Registration"
   lti_edit_83a27850: "LTI - edit"
   lti_key_14ad02b1: "LTI Key"
   lti_launch_af082dc3: "LTI Launch:"
@@ -19125,6 +19145,7 @@ en-AU:
   new_question_9107c469: "New Question"
   new_question_group_d9306280: "New Question Group"
   new_quiz_34aacba6: "New Quiz"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "New Quiz deleted user restore pending review state on enrol"
   new_quiz_items_3c850331: "New Quiz Items"
   new_quiz_statistics_desc: "Enable the new quiz statistics page for a course."
   new_quizzes_account_and_course_level_item_banks_9152fb1: "New Quizzes Account and Course Level Item Banks"
@@ -21844,6 +21865,7 @@ en-AU:
   qti_img_matching_question: "Imported matching question contains images on both sides, which is unsupported"
   qti_img_matching_question_distractors: "Imported matching question contains images inside the choices, and could not be fixed because it also contains distractors"
   qti_name: "QTI Converter"
+  quantitative_data_options_4f071510: "Quantitative Data Options"
   question_9121487: Question
   question_answered: Answered
   question_bank: 
@@ -23597,6 +23619,7 @@ en-AU:
         name: Name
     welcome_to_canvas: "Welcome to Canvas!"
   registration_url_60e0eaaa: "Registration URL"
+  regular_lato_font_7f3cf24c: "Regular Lato Font"
   regular_style_checkbox_ee3d71c1: "Regular-style tickbox"
   reinforce_student_understanding_304d18a6: "Reinforce student understanding"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Relax and take a break. There's nothing to do yet."
@@ -26106,6 +26129,13 @@ en-AU:
       aria_stop: "Hit \"Stop\" to end recording."
     edit_view_rubric: "View Rubric"
     group: Group
+    late_input: 
+      days: 
+        one: Day
+        other: Days
+      hours: 
+        one: Hour
+        other: Hours
     mic_blocked_message: "Permission to use microphone is blocked. To change, go to chrome://settings/content/microphone"
     mute_assignment: "Mute Assignment"
     no_submission_time: "no submission time"
@@ -27723,6 +27753,7 @@ en-AU:
       This feature flag enables the use of the updated
       discussion create/edit page
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "This feature flag is something an account can turn on if they want to allow the users of their account that speak languages that are normally written in Right to Left (eg: Arabic, Hebrew, Farsi) to see the RTL layout while we are working on it. once the feature is \"ready\" this feature flag will go away and anyone that speaks one of those languages will always see the RTL interface."
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "This feature introduces performance and maintenance enhancements to Individual Gradebook"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       This feature makes it so that when multiple files are submitted together by
       a third party tool via the Assignments and Mark Service API they will be
@@ -28896,6 +28927,10 @@ en-AU:
   traditional_gradebook_d7ad59c6: "Traditional Gradebook…"
   traditional_gradebook_d90461dc: "Traditional Gradebook"
   transferred_student_enrollments_90dc27d3: "Transferred Student Enrolments"
+  transform_rce_content_on_load_1f521086: "Transform RCE Content on Load"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Transforms absolute URLs to relative URLs and removes extraneous attributes from RCE content on load.
+      Needed for the RCE to function fully in New Quizzes.
   travel_places_f461329c: "Travel & Places"
   treat_ungraded_as_0_d38c2b41: "Treat Ungraded as 0"
   tree_browser: 
@@ -30020,6 +30055,8 @@ en-AU:
       resubmit_to_vericite: "Resubmit to VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite similarity score -- more information"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Similarity Score - See detailed report"
+  verify_ldap_tls_certificates_70241d8e: "Verify LDAP TLS certificates"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Verify TLS certificates presented by LDAP authentication providers."
   version_versionnumber_updatedat_9f5b7a5b: "Version %{versionNumber} %{updatedAt}"
   video_78335c71: video
   video_b9f27375: Video
@@ -30304,6 +30341,7 @@ en-AU:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "When selected, the course is in a read-only state outside these dates."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "When selected, the course is inaccessible outside course dates. If the course dates are blank, these start and end dates apply to the term dates."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "When selected, the course section is in a read-only state outside these dates."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "When set, determines if the workflow state of a new quiz should be set as graded or pending_review if a user had a previous pending_review new quiz but had been re-enrolled in the course."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       When this flag is enabled, the course navigation will remain collapsed or expanded
       when navigating between pages depending on how it was last set by the user, instead
