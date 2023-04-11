@@ -33,6 +33,19 @@ describe RuboCop::Cop::Migration::Execute do
     expect(cop.offenses.first.severity.name).to eq(:convention)
   end
 
+  it "flags calls to execute with interpolation" do
+    inspect_source(<<~RUBY)
+      class TestMigration < ActiveRecord::Migration
+        def up
+          execute("DROP TABLE \#{table}")
+        end
+      end
+    RUBY
+    expect(cop.offenses.size).to eq 1
+    expect(cop.messages.first).to eq "Migration/Execute: Raw SQL in migrations must be approved by a migration reviewer"
+    expect(cop.offenses.first.severity.name).to eq(:convention)
+  end
+
   it "flags calls to connection.execute" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
