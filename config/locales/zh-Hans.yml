@@ -638,6 +638,7 @@ zh-Hans:
     titles: 
       configure_report: 配置报告
       open_registration_delegated_warning_dialog: 已启用外部身份提供程序
+      rqd_help: 限制定量数据
       what_are_quiz_ip_filters: "什么是测验 IP 过滤器?"
     user: 用户
   account_settings_fe083453: 帐户设置
@@ -1626,6 +1627,8 @@ zh-Hans:
         update_button: 更新
       report_last_run_never: 从不
       report_running: 报告正在运行。*完成时您会收到电子邮件。*
+      rqd_help_message: 选中后，此设置将限制用户查看定量（数字）评分数据，并限制教师的作业创建选项。用户只能看到定性数据，包括字母评级和评语。管理员可以通过调整用户角色权限来进一步自定义此设置。
+      rqd_screenreader: 关于限制定量数据
       select: 
         mfa: 
           disabled: 已禁用
@@ -2269,7 +2272,7 @@ zh-Hans:
   adjust_final_grade_fa45e7e0: 调整最终成绩
   adjusting_due_dates_a5918b9c: 正在调整到期日期...
   admin_4d3ba42f: 管理员
-  admin_analytics_description: 正在启用显示管理员分析工具以显示课程和学生概况。通过加入Canvas社区中的*新分析工具用户组*了解更多信息并给予反馈。
+  admin_analytics_description: "启用帐户级别分析。管理员分析控制面板提供有关 Canvas 使用情况、Canvas 课程通过率和学生参与度的详细信息。在 Canvas 社区的*管理分析中心*了解更多信息。"
   admin_analytics_eacba735: 管理员分析工具
   admin_csv_f8d1b3eb: "管理员 CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: 多个评分周期的管理员导出
@@ -4453,6 +4456,7 @@ zh-Hans:
       no_points: 无
       no_submission: 无任何内容
       points: 得分
+      speed_grader: SpeedGrader™
       submission_types: 文件类型
       submitting: 提交
       turnitin: Turnitin
@@ -5988,6 +5992,7 @@ zh-Hans:
   canvas_for_elementary_analytics_15dc1e07: "Canvas for Elementary Analytics"
   canvas_for_elementary_beta_28bc5181: "Canvas for Elementary（测试版）"
   canvas_for_elementary_e6f5a06f: "Canvas for Elementary"
+  canvas_for_elementary_font_selection_5d1f2271: "Canvas 基本字体选择"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas for Elementary：教室中的多个公告"
   canvas_for_elementary_parent_support_74a2356e: "Canvas for Elementary：父级支持"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -6125,6 +6130,7 @@ zh-Hans:
   check_your_spelling_or_try_fewer_letters_70769a90: 请检查拼写或尝试输入更少字母。
   checkbox_examples_dc790142: 复选框示例
   checked_883b93fd: 已勾选
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: 选中“添加到日历”将邀请所有课程成员。
   cheerful_panda_holding_a_map_17ba47ee: 熊猫高兴地拿着地图
   child_course_must_belong_to_the_same_root_account__66ed7b8e: 子课程必须属于与主课程相同的母账户
   child_s_username_dde3aa9: 孩子的用户名
@@ -8903,6 +8909,7 @@ zh-Hans:
         participation_id: 参与
         public_syllabus: 使该课程的大纲公开可见
         restrict_enrollments_to_course_dates: 学生仅可以在这些日期期间参加课程
+        restrict_quantitative_data: 定量数据选项
         restrict_student_future_view: 限制学生在开始日期前查看此课程
         restrict_student_past_view: 限制学生在结束日期后查看此课程
         root_account: 母帐户
@@ -11018,6 +11025,7 @@ zh-Hans:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: 启用重新设计的“给...的学生发送消息”对话框，以便除了学生之外，还能给观察员发送消息。
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "允许访问新测验公共 API：测验项目 API。"
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: 启用“通过Canvas访问新测验公开API”。
+  enables_administrators_to_register_lti_tools_with__b16d560f: "使管理员能够使用动态注册来注册 LTI 工具"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: 允许在新评分册提交项托盘中显示抄袭报告和相似度评分。
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: 启用对作业、日历事件和其他应用重要日期。
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "SpeedGrader 中有未发布的草稿评论时启用警告用户的模态。"
@@ -13379,6 +13387,7 @@ zh-Hans:
   grades_view_audit_trail_cc4c1fcc: "评分 - 查看审计轨迹"
   grades_view_audit_trail_db7364b1: "评分 - 查看审核痕迹"
   grades_view_change_logs_6bc1b959: "评分 - 查看更改日志"
+  grades_view_quantitative_feedback_90a4ffc7: "评分 - 查看定量反馈"
   grades_visible_to_students_1584fa83: 学生可以看到的评分
   grades_were_successfully_published_to_the_gradeboo_79203993: 评分已成功发布到成绩单。
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: 评分已成功发布到评分册。
@@ -14086,12 +14095,18 @@ zh-Hans:
       event: "%{date} 时间%{time}"
   handler_7912052f: 处理程序
   has_been_automatically_selected_based_upon_where_t_61f805c5: "已根据此帐户的 Canvas 实例所驻留的位置自动选择。在有些情况下，它可能是不同的地区。"
+  has_no_submissions_2826a7a2: 无提交项
+  has_no_submissions_63de50ad: 无提交项
   has_not_submitted_2350bc24: 尚未提交
   has_similarity_score_d5f332b4: 有匹配得分
   has_submissions_6c12ef4c: 具有提交项
+  has_submissions_ea8e609b: 有提交项
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "有 Turnitin 的得分"
   has_ungraded_submissions_2bff87df: 具有未评分的提交项
+  has_ungraded_submissions_b79f5803: 有未评分的提交项
+  has_unposted_grades_3567391e: 有未发布的评分
+  has_unposted_grades_ba0e02b6: 有未发布的评分
   have_a_question_about_canvas_ask_it_here_5781cce: 对Canvas有疑问吗？请在此处提出。
   have_not_been_graded_df2a5fd2: 尚未评分
   have_not_yet_submitted_57e6a58b: 尚未提交
@@ -14746,6 +14761,7 @@ zh-Hans:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "如果启用了“用户 - 管理登录详细信息”或“统计信息 - 查看”，则用户将能够在管理员工具中生成登录/注销活动。要隐藏管理员工具中的登录/注销活动选项，需要禁用这两个权限。"
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "如果启用了“用户 (Users) - 管理登录详细信息”或“统计信息 (Statistics) - 查看”，则用户将能够在管理员工具 (Admin Tools) 中生成登录/注销活动。要隐藏管理员工具中的登录/注销活动选项，需要禁用这两个权限。"
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "若启用用户 - 管理登录资料”或“统计 - 查看”，则用户可以在管理员工具里生成登录/注销活动选项。要隐藏管理员工具中的登录/注销活动选项，需要禁用这两个权限。"
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "如果要定义限制组成员，数量必须大于 1。"
   if_you_change_an_assignment_s_points_possible_exis_505e6015: 如果您更改作业的分值，现存的成绩将自动地缩放。
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 如果您可能改变一个作业的分值，您必须要重新评改此作业。
   if_you_change_an_assignment_s_points_possible_you__dba531cb: 如果您可能改变一个作业的分值，那么您必须要重新评改所有提交的作业。
@@ -14970,6 +14986,7 @@ zh-Hans:
   individual_2033c005: 个人
   individual_assignment_grade_posting_d8322b99: 正在发布个别作业评分
   individual_gradebook_c7de9821: 个人评分册...
+  individual_gradebook_enhancements_de33aa3d: 个人评分册增强功能
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: 无法修改单个结果计算值。
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: 无法修改单个结果掌握程度分数。
   individual_outcome_rating_and_calculation_method_o_f0eae85f: 个别结果等级和计算方法选项
@@ -15463,6 +15480,7 @@ zh-Hans:
     lock_module_until: 锁定直到
   language_6b3e2c7c: 语言
   languages_835813f0: 语言
+  large_balsamiq_font_5fe45fae: "大号 Balsamiq 字体"
   large_course_db3d58b: 大型课程：
   last_7_days_bd411f1f: "过去的 7 天"
   last_activity_a983e541: 上一个活动
@@ -15892,6 +15910,7 @@ zh-Hans:
   loading_features_d26820f6: 正在加载功能
   loading_folders_d8b5869e: 正在加载文件夹
   loading_gradebook_b0b75cd3: 加载评分册
+  loading_gradebook_submissions_d2ba017f: 正在加载评分册提交项
   loading_graders_f6a76142: 正在加载评分人
   loading_grades_446fc226: 正在加载评分...
   loading_grades_for_coursename_26784c2d: "正在加载 %{courseName} 的评分"
@@ -16153,6 +16172,7 @@ zh-Hans:
   lti_deep_linking_line_items_5e0079f7: "LTI 深度链接行项目"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "“作业编辑”页面上的 LTI 深层链接行项目"
   lti_delete_ee5f1bef: "LTI - 删除"
+  lti_dynamic_registration_8592edb0: "LTI 动态注册"
   lti_edit_83a27850: "LTI - 编辑"
   lti_key_14ad02b1: "LTI 密钥"
   lti_launch_af082dc3: "LTI 启动："
@@ -19057,6 +19077,7 @@ zh-Hans:
   new_question_9107c469: 新问题
   new_question_group_d9306280: 新问题小组
   new_quiz_34aacba6: 新测验
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: 新测验删除了用户在注册时恢复待审核状态
   new_quiz_items_3c850331: 新测验项目
   new_quiz_statistics_desc: 启用某课程的新测验统计页面。
   new_quizzes_account_and_course_level_item_banks_9152fb1: 新测验帐户和课程级项目库
@@ -21763,6 +21784,7 @@ zh-Hans:
   qti_img_matching_question_distractors: 导入的匹配问题在选项内包含图像，并且无法修复，因为它还包含干扰选项
   qti_name: "QTI 转换器"
   qualified_locale: zh-CN
+  quantitative_data_options_4f071510: 定量数据选项
   question_9121487: 问题
   question_answered: 已回答
   question_bank: 
@@ -23515,6 +23537,7 @@ zh-Hans:
         name: 姓名
     welcome_to_canvas: "欢迎使用 Canvas！"
   registration_url_60e0eaaa: "注册 URL"
+  regular_lato_font_7f3cf24c: "常规 Lato 字体"
   regular_style_checkbox_ee3d71c1: 常规式的复选框
   reinforce_student_understanding_304d18a6: 加深学生的理解
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: 放松休息一下。目前没有要做的事。
@@ -26006,6 +26029,13 @@ zh-Hans:
       aria_stop: 点击“停止”可停止录音。
     edit_view_rubric: 查看评分标准说明
     group: 小组
+    late_input: 
+      days: 
+        one: 天
+        other: 天
+      hours: 
+        one: 小时数
+        other: 小时数
     mic_blocked_message: "使用麦克风的权限被阻止。如需更改，请前往 chrome://settings/content/microphone"
     mute_assignment: 屏蔽作业
     no_submission_time: 无提交时间
@@ -27614,6 +27644,7 @@ zh-Hans:
       此功能标记支持使用更新的
       讨论创建/编辑页面
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "帐户启用此功能标记后，其帐户中使用的语言的正常书写方式为从右至左（例如：阿拉伯语、希伯来语、波斯语）的用户可以看到我们正在使用的 RTL 布局。一旦此功能处于“就绪”状态，此功能标记将消失，且使用以上任何一种语言的任何人将始终能够看到 RTL 界面。"
+  this_feature_introduces_performance_and_maintenanc_50c325aa: 此功能为个人评分册引入了性能和维护增强功能
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       通过该功能，当第三方工具通过作业和
       评分服务API提交多个文件时，
@@ -28786,6 +28817,10 @@ zh-Hans:
   traditional_gradebook_d7ad59c6: 传统评分册...
   traditional_gradebook_d90461dc: 传统评分册
   transferred_student_enrollments_90dc27d3: 转移的学生注册
+  transform_rce_content_on_load_1f521086: "加载时转换 RCE 内容"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      将绝对 URL 转换为相对 URL，并在加载时从 RCE 内容中删除无关属性。
+      必须执行此操作，才能在新测验中使用 RCE 的完整功能。
   travel_places_f461329c: 旅行和地点
   treat_ungraded_as_0_d38c2b41: 把无评分的作业处理为0分
   tree_browser: 
@@ -29902,6 +29937,8 @@ zh-Hans:
       resubmit_to_vericite: 重新提交至VeriCite
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite 相似度评分 - 更多信息"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite相似性分数 - 查看详细报告"
+  verify_ldap_tls_certificates_70241d8e: "验证 LDAP TLS 证书"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "验证 LDAP 身份验证提供程序提供的 TLS 证书。"
   version_versionnumber_updatedat_9f5b7a5b: "版本 %{versionNumber} %{updatedAt}"
   video_78335c71: 视频
   video_b9f27375: 视频
@@ -30179,6 +30216,7 @@ zh-Hans:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: 选择后，课程在超出这些日期时为只读状态。
   when_selected_the_course_is_inaccessible_outside_c_af595406: 选择后，课程在超出课程日期时不可获取。如果课程日期为空，则这些开始日期和结束日期适用于学期日期。
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: 选择后，课程班次在超出这些日期时为只读状态。
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: 设置后，确定新测验的工作流程状态是否应设置为已评分或pending_review用户之前是否有pending_review新测验但重新注册了课程。
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       启用此标记后，在页面之间进行导航时，
       课程导航将根据用户上一次的设置保持折叠或展开，
