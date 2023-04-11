@@ -40,6 +40,7 @@ const locale = {
     "message": "Nebenstehende Links mit dem gleichen URL sollten ein einziger Link sein."
   },
   "aleph_f4ffd155": { "message": "Aleph" },
+  "align_11050992": { "message": "Ausrichten" },
   "alignment_and_lists_5cebcb69": { "message": "Ausrichtung und Listen" },
   "all_4321c3a1": { "message": "Alle" },
   "all_apps_a50dea49": { "message": "Alle Apps" },
@@ -70,6 +71,9 @@ const locale = {
   "approaches_the_limit_893aeec9": { "message": "Nähert sich dem Grenzwert" },
   "approximately_e7965800": { "message": "Ungefähr" },
   "apps_54d24a47": { "message": "Apps" },
+  "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+    "message": "Möchten Sie wirklich abbrechen? Vorgenommene Änderungen werden nicht gespeichert."
+  },
   "arrows_464a3e54": { "message": "Pfeile" },
   "art_icon_8e1daad": { "message": "Kunstsymbol" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
@@ -105,6 +109,7 @@ const locale = {
   "c_2001_acme_inc_283f7f80": { "message": "© 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Abbrechen" },
   "cap_product_3a5265a6": { "message": "Cap-Produkt" },
+  "center_align_e68d9997": { "message": "Mittig ausrichten" },
   "centered_dot_64d5e378": { "message": "Zentrierter Punkt" },
   "centered_horizontal_dots_451c5815": {
     "message": "Zentrierte horizontale Punkte"
@@ -117,6 +122,11 @@ const locale = {
     "message": "Nur die Ebene dieser Überschrift ändern"
   },
   "change_text_color_1aecb912": { "message": "Textfarbe ändern" },
+  "changes_you_made_may_not_be_saved_4e8db973": {
+    "message": "Vorgenommene Änderungen werden nicht gespeichert."
+  },
+  "characters_9d897d1c": { "message": "Zeichen" },
+  "characters_no_spaces_485e5367": { "message": "Zeichen (ohne Leerzeichen)" },
   "check_accessibility_3c78211c": { "message": "Zugänglichkeit prüfen" },
   "checking_for_accessibility_issues_fac18c6d": {
     "message": "Zugangsprobleme werden überprüft"
@@ -127,6 +137,9 @@ const locale = {
     "message": "Nutzungsrechte auswählen ...."
   },
   "circle_484abe63": { "message": "Kreis" },
+  "circle_unordered_list_9e3a0763": {
+    "message": "Ungeordnete Liste einkreisen"
+  },
   "clear_2084585f": { "message": "Löschen" },
   "clear_image_3213fe62": { "message": "Bild löschen" },
   "clear_selected_file_82388e50": { "message": "Ausgewählte Datei löschen" },
@@ -176,6 +189,10 @@ const locale = {
   "content_type_2cf90d95": { "message": "Inhalt-Typ" },
   "coproduct_e7838082": { "message": "Koprodukt" },
   "copyright_holder_66ee111": { "message": "Urheberrechtsinhaber:" },
+  "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
+    "message": "Inhalt konnte nicht eingefügt werden: { itemType }-Elemente werden derzeit in Canvas nicht unterstützt."
+  },
+  "count_40eced3b": { "message": "Anzahl" },
   "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
     "message": "{ count, plural,\n     =0 {0 Worte}\n    one {1 Wort}\n  other {# Worte}\n}"
   },
@@ -186,10 +203,14 @@ const locale = {
   "course_files_62deb8f8": { "message": "Kursdateien" },
   "course_files_a31f97fc": { "message": "Kursdateien" },
   "course_images_f8511d04": { "message": "Kursbilder" },
+  "course_link_b369426": { "message": "Link zum Kurs" },
   "course_links_b56959b9": { "message": "Kurs-Links" },
   "course_media_ec759ad": { "message": "Kursmedien" },
   "course_navigation_dd035109": { "message": "Kursnavigation" },
   "create_icon_110d6463": { "message": "Symbol „Erstellen“" },
+  "create_icon_maker_icon_c716bffe": {
+    "message": "Icon Maker erstellen-Symbol"
+  },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-Lizenz:"
   },
@@ -205,7 +226,14 @@ const locale = {
   "decorative_icon_9a7f3fc3": { "message": "Dekoratives Symbol" },
   "decorative_image_fde98579": { "message": "Dekoratives Bild" },
   "decorative_type_upper_f2c95e3": { "message": "Dekorativer { TYPE_UPPER }" },
+  "decrease_indent_d9cf469d": { "message": "Einzug verkleinern" },
   "deep_purple_bb3e2907": { "message": "Dunkelviolett" },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "Ungeordnete Liste standardmäßig mit Aufzählungszeichen"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "Standardmäßig numerisch sortierte Liste"
+  },
   "definite_integral_fe7ffed1": { "message": "Bestimmtes Integral" },
   "degree_symbol_4a823d5f": { "message": "Gradsymbol" },
   "delimiters_4db4840d": { "message": "Trennzeichen" },
@@ -232,9 +260,11 @@ const locale = {
     "message": "Text-Link anzeigen (wird in einem neuen Tab geöffnet)"
   },
   "division_sign_72190870": { "message": "Divisionszeichen" },
+  "document_678cd7bf": { "message": "Dokument" },
   "documents_81393201": { "message": "Dokumente" },
   "done_54e3d4b6": { "message": "Fertig" },
   "double_dagger_faf78681": { "message": "Doppelkreuz" },
+  "down_5831a426": { "message": "Nach unten" },
   "down_and_left_diagonal_arrow_40ef602c": {
     "message": "Diagonaler Pfeil nach unten links"
   },
@@ -260,6 +290,7 @@ const locale = {
   },
   "edit_c5fbea07": { "message": "Ändern" },
   "edit_course_link_5a5c3c59": { "message": "Link zum Bearbeiten des Kurses" },
+  "edit_equation_f5279959": { "message": "Gleichung bearbeiten" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Vorhandenes Icon Maker-Symbol bearbeiten"
   },
@@ -271,6 +302,9 @@ const locale = {
   },
   "embed_828fac4a": { "message": "Einbetten" },
   "embed_code_314f1bd5": { "message": "Code einbetten" },
+  "embed_content_from_external_tool_3397ad2d": {
+    "message": "Content aus externem Tool einbetten"
+  },
   "embed_image_1080badc": { "message": "Bild einbetten" },
   "embed_video_a97a64af": { "message": "Video einbetten" },
   "embedded_content_aaeb4d3d": { "message": "Eingebettete Inhalte" },
@@ -287,7 +321,9 @@ const locale = {
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Variante)" },
   "equals_sign_c51bdc58": { "message": "Gleichheitszeichen" },
+  "equation_1c5ac93c": { "message": "Gleichung" },
   "equation_editor_39fbc3f1": { "message": "Formel-Editor" },
+  "equilibrium_6ff3040b": { "message": "Equilibrium" },
   "equivalence_class_7b0f11c0": { "message": "Äquivalenzklasse" },
   "equivalent_identity_654b3ce5": { "message": "Äquivalent (Identität)" },
   "eta_b8828f99": { "message": "Eta" },
@@ -297,6 +333,8 @@ const locale = {
     "message": "Vorschau standardmäßig erweitern"
   },
   "expand_to_see_types_f5d29352": { "message": "{ types } erweitern" },
+  "external_link_d3f9e62a": { "message": "Externer Link" },
+  "external_tool_frame_70b32473": { "message": "Rahmen für externe Werkzeuge" },
   "external_tools_6e77821": { "message": "Externe Tools" },
   "extra_large_b6cdf1ff": { "message": "Extra groß" },
   "extra_small_9ae33252": { "message": "Extra klein" },
@@ -304,6 +342,9 @@ const locale = {
   "f_function_fe422d65": { "message": "F (Funktion)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Abruf der Dateiinhalte fehlgeschlagen"
+  },
+  "failed_to_retrieve_content_from_external_tool_5899c213": {
+    "message": "Inhalt konnte nicht von externem Tool abgerufen werden"
   },
   "file_name_8fd421ff": { "message": "Dateiname" },
   "file_storage_quota_exceeded_b7846cd1": {
@@ -363,6 +404,7 @@ const locale = {
   "group_files_82e5dcdb": { "message": "Gruppendateien" },
   "group_images_98e0ac17": { "message": "Gruppenbilder" },
   "group_isomorphism_45b1458c": { "message": "Gruppenisomorphismus" },
+  "group_link_63e626b3": { "message": "Gruppenverknüpfung" },
   "group_links_9493129e": { "message": "Gruppen-Links" },
   "group_media_2f3d128a": { "message": "Gruppenmedien" },
   "group_navigation_99f191a": { "message": "Gruppennavigation" },
@@ -398,6 +440,7 @@ const locale = {
   },
   "home_351838cd": { "message": "Start" },
   "html_code_editor_fd967a44": { "message": "HTML-Code-Editor" },
+  "html_editor_fb2ab713": { "message": "HTML-Editor" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Ich habe die Berechtigung zur Nutzung dieser Datei erhalten."
   },
@@ -415,6 +458,9 @@ const locale = {
   "icon_size_9353edea": { "message": "Symbolgröße" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
     "message": "Wenn der Link leer bleibt, wird der Text als Name für den Kurs-Link angezeigt"
+  },
+  "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
+    "message": "Wenn Nutzungsrechte erforderlich sind, wird die Datei erst veröffentlicht, wenn sie auf der Seite Dateien aktiviert wurde."
   },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Wenn Sie jetzt keine Nutzungsrechte auswählen, wird diese Datei nach dem Hochladen nicht veröffentlicht."
@@ -438,12 +484,14 @@ const locale = {
     "message": "Imaginärer Teil (einer komplexen Zahl)"
   },
   "in_element_of_19ca2f33": { "message": "In (Element von)" },
+  "increase_indent_6af90f7c": { "message": "Einzug vergrößern" },
   "indefinite_integral_6623307e": { "message": "Unbestimmtes Integral" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Schlussfolgerung" },
   "infinity_7a10f206": { "message": "Unendlichkeit" },
   "insert_593145ef": { "message": "Einfügen" },
   "insert_link_6dc23cae": { "message": "Link einfügen" },
+  "insert_math_equation_57c6e767": { "message": "Math. Gleichung einfügen" },
   "integers_336344e1": { "message": "Ganze Zahlen" },
   "intersection_cd4590e4": { "message": "Schnittfläche" },
   "invalid_entry_f7d2a0f5": { "message": "Ungültiger Eintrag." },
@@ -493,6 +541,8 @@ const locale = {
     "message": "Weitere Informationen zur Verwendung von Bereichsattributen bei Tabellen"
   },
   "leave_as_is_4facfe55": { "message": "Lassen, wie es ist" },
+  "left_3ea9d375": { "message": "Links" },
+  "left_align_43d95491": { "message": "Linksbündig" },
   "left_angle_bracket_c87a6d07": { "message": "Spitze Klammer links" },
   "left_arrow_4fde1a64": { "message": "Pfeil nach links" },
   "left_arrow_with_hook_5bfcad93": { "message": "Pfeil nach links mit Haken" },
@@ -532,9 +582,13 @@ const locale = {
   "loading_closed_captions_subtitles_failed_95ceef47": {
     "message": "Das Laden von Untertitel ist fehlgeschlagen."
   },
+  "loading_external_tool_d839042c": { "message": "Externes Tool wird geladen" },
   "loading_failed_b3524381": { "message": "Ladevorgang fehlgeschlagen" },
   "loading_failed_e6a9d8ef": { "message": "Ladevorgang fehlgeschlagen" },
   "loading_folders_d8b5869e": { "message": "Ordner werden geladen" },
+  "loading_placeholder_for_filename_792ef5e8": {
+    "message": "Laden des Platzhalters für { fileName }"
+  },
   "loading_please_wait_d276220a": { "message": "Ladevorgang, bitte warten" },
   "loading_preview_9f077aa1": { "message": "Vorschau wird geladen" },
   "locked_762f138b": { "message": "Gesperrt" },
@@ -568,6 +622,9 @@ const locale = {
   "misc_3b692ea7": { "message": "Sonstige" },
   "miscellaneous_e9818229": { "message": "Verschiedenes" },
   "modules_c4325335": { "message": "Module" },
+  "moving_image_to_crop_directionword_6f66cde2": {
+    "message": "Bild zum Zuschneiden von { directionWord } verschieben "
+  },
   "mu_37223b8b": { "message": "My" },
   "multi_color_image_63d7372f": { "message": "Mehrfarbiges Bild" },
   "multiplication_sign_15f95c22": { "message": "Multiplikationszeichen" },
@@ -636,6 +693,9 @@ const locale = {
   "operators_a2ef9a93": { "message": "Operatoren" },
   "or_9b70ccaa": { "message": "Oder" },
   "orange_81386a62": { "message": "Orange" },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "Geordnete und ungeordnete Listen"
+  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Weitere Editor-Tastenkombinationen finden Sie unter"
   },
@@ -712,11 +772,13 @@ const locale = {
     "message": "Reeller Teil (einer komplexen Zahl)"
   },
   "record_7c9448b": { "message": "Aufnehmen" },
+  "record_upload_media_5fdce166": { "message": "Medien aufzeichnen/hochladen" },
   "recording_98da6bda": { "message": "Aufzeichnung" },
   "red_8258edf3": { "message": "Rot" },
   "relationships_6602af70": { "message": "Beziehungen" },
   "religion_icon_246e0be1": { "message": "Religionssymbol" },
   "remove_heading_style_5fdc8855": { "message": "Überschriftsstil entfernen" },
+  "remove_link_d1f2f4d0": { "message": "Link entfernen" },
   "replace_e61834a7": { "message": "Ersetzen" },
   "reset_95a81614": { "message": "Zurücksetzen" },
   "resize_ec83d538": { "message": "Größe ändern" },
@@ -732,6 +794,8 @@ const locale = {
   "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
     "message": "Rich-Text-Bereich. Drücken Sie { OSKey }+F8 für Tastenkombinationen im Rich Content Editor."
   },
+  "right_71ffdc4d": { "message": "Rechts" },
+  "right_align_39e7a32a": { "message": "Rechtsbündig" },
   "right_angle_bracket_d704e2d6": { "message": "Eckige Klammer links" },
   "right_arrow_35e0eddf": { "message": "Pfeil nach rechts" },
   "right_arrow_with_hook_29d92d31": {
@@ -762,6 +826,9 @@ const locale = {
   "save_11a80ec3": { "message": "Speichern" },
   "save_copy_ca63944e": { "message": "Kopie speichern" },
   "save_media_cb9e786e": { "message": "Medien speichern" },
+  "saved_icon_maker_icons_df86e2a1": {
+    "message": "Icon Maker-Symbole gespeichert"
+  },
   "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
     "message": "Ohne alternativen Text kann ein Bildschirmbetrachter nicht bestimmen, was auf einem Bild gezeigt wird, zumal die Dateinamen oft sinnlose Zeichenfolgen aus Zahlen und Buchstaben sind, die weder den Kontext noch die Bedeutung erläutern."
   },
@@ -789,6 +856,7 @@ const locale = {
   "selected_linkfilename_c093b1f2": {
     "message": "Ausgewählter { linkFileName }"
   },
+  "selection_b52c4c5e": { "message": "Auswahl" },
   "set_header_scope_8c548f40": {
     "message": "Den Anwendungsbereich der Überschrift festlegen"
   },
@@ -800,6 +868,13 @@ const locale = {
     "message": "Shift-O, um den Pretty HTML-Editor zu öffnen."
   },
   "shortcut_911d6255": { "message": "Shortcut" },
+  "show_audio_options_b489926b": { "message": "Audiooptionen anzeigen" },
+  "show_image_options_1e2ecc6b": { "message": "Bildoptionen anzeigen" },
+  "show_link_options_545338fd": { "message": "Link-Optionen anzeigen" },
+  "show_studio_media_options_a0c748c6": {
+    "message": "Studio-Medienoptionen anzeigen"
+  },
+  "show_video_options_6ed3721a": { "message": "Videooptionen anzeigen" },
   "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
     "message": "Sehende Benutzer*innen durchsuchen Webseiten schnell nach groß- oder fettgedruckten Überschriften. Benutzer*innen von Bildschirmbetrachtern sind für ein kontextbezogenes Verständnis auf Überschriften angewiesen. Überschriften sollten die entsprechende Struktur verwenden."
   },
@@ -830,6 +905,9 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Beim Teilen Ihres Bildschirms trat ein Fehler auf."
   },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Leider unterstützen wir nicht mehrere Dateien."
+  },
   "sort_by_e75f9e3e": { "message": "Sortieren nach" },
   "spades_suit_b37020c2": { "message": "Pik (Spielkartenfarbe)" },
   "square_511eb3b3": { "message": "Viereck" },
@@ -845,10 +923,14 @@ const locale = {
   "square_superset_strict_fa4262e4": {
     "message": "Quadratische Obermenge (Streng)"
   },
+  "square_unordered_list_b15ce93b": {
+    "message": "Ungeordnete Liste abgleichen"
+  },
   "star_8d156e09": { "message": "Stern" },
   "start_over_f7552aa9": { "message": "Nochmal beginnen" },
   "start_recording_9a65141a": { "message": "Aufzeichnung starten" },
   "steel_blue_14296f08": { "message": "Stahlblau" },
+  "studio_media_options_ee504361": { "message": "Studio-Medienoptionen" },
   "styles_2aa721ef": { "message": "Styles" },
   "submit_a3cc6859": { "message": "Abgeben" },
   "subscript_59744f96": { "message": "Abonnieren" },
@@ -858,6 +940,9 @@ const locale = {
   "succeeds_equal_158e8c3a": { "message": "Folgt Gleich" },
   "sum_b0842d31": { "message": "Summe" },
   "superscript_8cb349a2": { "message": "Hochgestellt" },
+  "superscript_and_subscript_37f94a50": {
+    "message": "Hochgestellt und Tiefgestellt"
+  },
   "superset_c4db8a7a": { "message": "Obermenge" },
   "superset_strict_c77dd6d2": { "message": "Obermenge (Streng)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
@@ -921,6 +1006,9 @@ const locale = {
   "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
     "message": "Die erste Überschrift auf einer Seite sollte eine H2-Überschrift sein."
   },
+  "the_following_content_is_partner_provided_ed1da756": {
+    "message": "Der folgende Inhalt stammt von einem Partner."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Das Material ist gemeinfrei."
   },
@@ -929,6 +1017,9 @@ const locale = {
   },
   "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
     "message": "Das Material unterliegt einer Ausnahme – z. B. Fair Use, das Recht zum Zitieren oder anderen nach geltendem Urheberrecht."
+  },
+  "the_preceding_content_is_partner_provided_d753928c": {
+    "message": "Der vorhergehende Inhalt stammt von einem Partner."
   },
   "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
     "message": "Der Pretty HTML-Editor ist nicht über die Tastatur zugänglich. Shift-O, um den Editor für reines HTML zu öffnen."
@@ -976,6 +1067,9 @@ const locale = {
   "type_control_f9_to_access_table_options_text_92141329": {
     "message": "Geben Sie <Strg>+F9 ein, um auf die Tabellenoptionen zuzugreifen. { text }"
   },
+  "unable_to_determine_resource_selection_url_7867e060": {
+    "message": "URL für Ressourcenauswahl kann nicht bestimmt werden"
+  },
   "union_e6b57a53": { "message": "Union" },
   "unpublished_dfd8801": { "message": "nicht veröffentlicht" },
   "untitled_16aa4f2b": { "message": "Ohne Titel" },
@@ -986,10 +1080,16 @@ const locale = {
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Diagonaler Pfeil nach oben rechts"
   },
+  "up_c553575d": { "message": "Nach oben" },
+  "upload_document_253f0478": { "message": "Dokument hochladen" },
   "upload_file_fd2361b8": { "message": "Datei hochladen" },
   "upload_image_6120b609": { "message": "Bild hochladen" },
   "upload_media_ce31135a": { "message": "Medien hochladen" },
+  "upload_record_media_e4207d72": { "message": "Medien hochladen/aufzeichnen" },
   "uploading_19e8a4e7": { "message": "Wird hochgeladen" },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "Alphabetisch geordnete Liste in Großbuchstaben"
+  },
   "uppercase_delta_d4f4bc41": { "message": "Delta In Großbuchstaben" },
   "uppercase_gamma_86f492e9": { "message": "Gamma großgeschrieben" },
   "uppercase_lambda_c78d8ed4": { "message": "Lambda großgeschrieben" },
@@ -997,6 +1097,9 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "Phi großgeschrieben" },
   "uppercase_pi_fcc70f5e": { "message": "Pi großgeschrieben" },
   "uppercase_psi_6395acbe": { "message": "Psi großgeschrieben" },
+  "uppercase_roman_numeral_ordered_list_853f292b": {
+    "message": "Nach römischen Zahlen geordnete Liste in Großbuchstaben"
+  },
   "uppercase_sigma_dbb70e92": { "message": "Sigma großgeschrieben" },
   "uppercase_theta_49afc891": { "message": "Theta großgeschrieben" },
   "uppercase_upsilon_8c1e623e": { "message": "Ypsilon großgeschrieben" },
@@ -1058,6 +1161,7 @@ const locale = {
   "video_player_b371005": { "message": "Videoplayer" },
   "video_player_for_9e7d373b": { "message": "Videoplayer für " },
   "video_player_for_title_ffd9fbc4": { "message": "Videoplayer für { title }" },
+  "view_all_e13bf0a6": { "message": "Alle anzeigen" },
   "view_ba339f93": { "message": "Anzeigen" },
   "view_description_30446afc": { "message": "Beschreibung anzeigen" },
   "view_keyboard_shortcuts_34d1be0b": {
@@ -1094,6 +1198,8 @@ const locale = {
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height } px" },
   "wiki_home_9cd54d0": { "message": "Wiki-Startseite" },
+  "word_count_c77fe3a6": { "message": "Wortzahl" },
+  "words_b448b7d5": { "message": "Wörter" },
   "wreath_product_200b38ef": { "message": "Kranzprodukt" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Ja" },
