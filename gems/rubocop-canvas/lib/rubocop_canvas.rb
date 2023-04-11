@@ -29,6 +29,7 @@ require "rubocop_canvas/helpers/migration_tags"
 require "rubocop_canvas/helpers/new_tables"
 require "rubocop_canvas/helpers/current_def"
 require "rubocop_canvas/helpers/indifferent"
+require "rubocop_canvas/helpers/legacy_migrations"
 require "rubocop_canvas/helpers/non_transactional"
 
 # cops
