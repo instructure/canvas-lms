@@ -85,11 +85,14 @@ export function DiscussionDetails({...props}) {
                   courseId={props.courseId}
                 />
               </Flex.Item>
-              <Flex.Item padding="xx-small" shouldShrink={true} align="end" overflowY="hidden">
-                <Text weight="normal" size={responsiveProps.textSize}>
-                  {responsiveProps.text}
-                </Text>
-              </Flex.Item>
+              {(!props.discussionTopic.assignment.restrictQuantitativeData ||
+                props.discussionTopic.permissions.readAsAdmin) && (
+                <Flex.Item padding="xx-small" shouldShrink={true} align="end" overflowY="hidden">
+                  <Text weight="normal" size={responsiveProps.textSize}>
+                    {responsiveProps.text}
+                  </Text>
+                </Flex.Item>
+              )}
             </Flex>
           ) : (
             <Flex data-testid="non-graded-discussion-info">
