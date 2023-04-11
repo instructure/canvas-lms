@@ -485,6 +485,7 @@ ca:
     titles: 
       configure_report: "Configura l'informe"
       open_registration_delegated_warning_dialog: "S'ha habilitat un proveïdor d'identitats extern"
+      rqd_help: "Restricció de les dades quantitatives"
       what_are_quiz_ip_filters: "Què són els filtres d'IP de prova?"
     user: Usuari
   account_settings_fe083453: "Configuració de l'usuari"
@@ -1317,6 +1318,8 @@ ca:
         megabytes: megabytes
         megabytes_tooltip: megabytes
         update_button: Actualitza
+      rqd_help_message: "Un cop seleccionada aquesta configuració, l’usuari tindrà restringida la visualització de les dades de qualificació quantitatives (numèriques) i els professors tindran limitades les opcions de creació d'activitats. Els usuaris només veuran les dades qualitatives, que inclouen qualificacions amb lletra i comentaris. L’administrador pot ajustar els permisos per als rols de l’usuari per tal de personalitzar aquest paràmetre encara més."
+      rqd_screenreader: "Quant a la funció de restricció de les dades quantitatives"
       select: 
         mfa: 
           disabled: Desactivat
@@ -1904,7 +1907,7 @@ ca:
       anotacions al document o comentaris a la rúbrica sense llegir
   adjusting_due_dates_a5918b9c: "S’estan ajustant les dates de venciment…"
   admin_4d3ba42f: Administrador
-  admin_analytics_description: "En fer l'activació, es mostra l’analítica d’administrador perquè es visualitzin les vistes generals de les assignatures i dels estudiants. Per obtenir més informació i fer suggeriments, participeu en el *grup de nous usuaris d’analítica* a la comunitat del Canvas."
+  admin_analytics_description: "Activa l’analítica al compte. Els panells de control d'analítica d’administrador proporcionen informació sobre l’ús i l’èxit de les assignatures del Canvas, així com sobre la interacció dels estudiants. Obteniu més informació sobre el *Centre d’analítica d’administrador* a Canvas Community."
   admin_analytics_eacba735: "Analítica d’administrador"
   admin_csv_f8d1b3eb: "CSV d'administradors"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Exportació d’administrador per a diversos períodes de qualificació"
@@ -3600,6 +3603,7 @@ ca:
       no_points: Cap
       no_submission: Res
       points: Punts
+      speed_grader: SpeedGrader™
       submission_types: "Tipus de fitxers"
       submitting: "S'està entregant"
       turnitin: Turnitin
@@ -4833,6 +4837,7 @@ ca:
   canvas_for_elementary_analytics_15dc1e07: "Canvas per a Analítica per a l’educació primària"
   canvas_for_elementary_beta_28bc5181: "Canvas per a l'educació primària (beta)"
   canvas_for_elementary_e6f5a06f: "Canvas per a l'educació primària"
+  canvas_for_elementary_font_selection_5d1f2271: "Selecció de la font del Canvas per a l'educació primària"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas per a l'educació primària: molts anuncis a la tutoria"
   canvas_for_elementary_parent_support_74a2356e: "Canvas per a l'educació primària: suport parental"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -4956,6 +4961,7 @@ ca:
   check_your_spelling_or_try_fewer_letters_70769a90: "Reviseu el que heu escrit o proveu menys lletres."
   checkbox_examples_dc790142: "Exemples de casella de selecció"
   checked_883b93fd: comprovat
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Si es marca la casella Afegeix-ho al calendari, tots els membres de l'assignatura seran convidats."
   cheerful_panda_holding_a_map_17ba47ee: "Ós panda alegre sostenint un mapa"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "L'assignatura secundària ha de pertànyer al mateix usuari arrel que l'assignatura principal"
   child_s_username_dde3aa9: "Nom d'usuari de l'infant"
@@ -7252,6 +7258,7 @@ ca:
         pace_plans: "Plans de ritme"
         participation_id: Participació
         restrict_enrollments_to_course_dates: "Els estudiants només poden participar al curs entre aquestes dates"
+        restrict_quantitative_data: "Opcions de les dades quantitatives"
         restrict_student_future_view: "Restringeix els estudiants per visualitzar aquest curs abans de la data d'inici"
         restrict_student_past_view: "Restringeix els estudiants per visualitzar aquest curs després de la data de finalització"
         root_account: "Usuari arrel"
@@ -8907,6 +8914,7 @@ ca:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Activa una nova presentació del missatge “Estudiants que…” que permet enviar missatges als observadors i també als estudiants."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Activa l’accés a l’API pública de Proves noves: API d’Elements de la prova."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Activa l’accés a l’API pública de Proves noves a través del Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Permet als administradors registrar eines d’LTI amb el registre dinàmic"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Habilita la visualització d'informes de plagi i puntuacions de similitud a la safata d'entrega de Llibre de notes nou."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Permet que s’apliquin dates importants a activitats, esdeveniments del calendari i altres activitats."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Habilita la funció que la configuració modal adverteixi l’usuari quan es deixa sense publicar un esborrany de comentari a SpeedGrader."
@@ -10547,6 +10555,7 @@ ca:
   grades_view_all_grades_8bf9f8d3: "Notes - visualitza totes les notes"
   grades_view_audit_trail_cc4c1fcc: "Notes - visualitza la pista d'auditoria"
   grades_view_change_logs_6bc1b959: "Notes - visualitza els registres de canvis"
+  grades_view_quantitative_feedback_90a4ffc7: "Notes: consulteu els comentaris quantitatius"
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Les notes s'ha alliberat correctament al llibre de notes."
   grades_will_be_hidden_by_default_any_grades_that_h_53a7fb03: "\n\
       \x20         Les notes estaran amagades per defecte. Les notes que ja s'han publicat romandran visibles.\n\
@@ -10981,11 +10990,17 @@ ca:
   handle_pasting_of_files_especially_images_7c19b19c: "Controleu com s’enganxen els fitxers, especialment les imatges."
   handler_7912052f: Controlador
   has_been_automatically_selected_based_upon_where_t_61f805c5: "s’ha seleccionat automàticament en funció de la ubicació d’instal·lació de la instància del Canvas d'aquest usuari. En alguns casos, pot ser una regió diferent."
+  has_no_submissions_2826a7a2: "No té cap entrega"
+  has_no_submissions_63de50ad: "No té cap entrega"
   has_not_submitted_2350bc24: "No ha entregat"
   has_similarity_score_d5f332b4: "Té una puntuació de similitud"
   has_submissions_6c12ef4c: "Té entregues"
+  has_submissions_ea8e609b: "Té entregues"
   has_syllabus_body_6f250277: has_syllabus_body
   has_ungraded_submissions_2bff87df: "Té entregues sense qualificar"
+  has_ungraded_submissions_b79f5803: "Té entregues sense qualificar"
+  has_unposted_grades_3567391e: "Té notes sense publicar"
+  has_unposted_grades_ba0e02b6: "Té notes sense publicar"
   have_a_question_about_canvas_ask_it_here_5781cce: "Tens alguna pregunta sobre el Canvas? Fes-la aquí."
   have_not_been_graded_df2a5fd2: "No s’ha qualificat"
   have_not_yet_submitted_57e6a58b: "Encara no s’ha entregat"
@@ -11563,6 +11578,7 @@ ca:
   if_this_setting_is_disabled_and_discussions_view_i_8a068652: "Si s’inhabilita aquest paràmetre i s’habilita Fòrums - visualitza, l’usuari encara podrà ajustar la configuració de bloqueig del contingut als fòrums individuals d’una assignatura plantilla principal."
   if_true_will_used_the_serialized_submission_for_su_f2bed2e0: "Si és veritable, es farà servir l’entrega serialitzada per a la data submitted_at"
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Si s'habilita Usuaris - administra els detalls d'inici de sessió o Estadístiques - visualitza, l'usuari podrà generar activitat d'inici/tancament de sessió a les Eines d'administrador. Per amagar l'opció d'activitat d'inici/tancament de sessió a les eines d'administrador, s'han d'inhabilitar ambdós permisos."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "Si voleu definir un límit per als membres del grup, el valor ha de ser superior a 1."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Si canvieu els punts possibles d'una activitat, heu de requalificar l'activitat."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Si canvieu els punts possibles d'una activitat, heu de requalificar totes les entregues."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Si no seleccioneu els drets d'ús ara, s'anul·larà la publicació d'aquest fitxer un cop s'hagi carregat."
@@ -11744,6 +11760,7 @@ ca:
   individual_2033c005: Individual
   individual_assignment_grade_posting_d8322b99: "Publicació de notes d'activitats individuals"
   individual_gradebook_c7de9821: "Llibre de notes individual…"
+  individual_gradebook_enhancements_de33aa3d: "Millores del llibre de qualificacions individual"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "No es poden modificar valors de càlcul dels resultats individuals."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "No es poden modificar punts de domini dels resultats individuals."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Opcions de classificació de resultats individuals i mètodes de càlcul"
@@ -12151,6 +12168,7 @@ ca:
     lock_module_until: "Bloqueja fins al"
   language_6b3e2c7c: Idioma
   languages_835813f0: Idiomes
+  large_balsamiq_font_5fe45fae: "Font Balsamiq gran"
   large_course_db3d58b: "Assignatura gran:"
   last_7_days_bd411f1f: "Els darrers 7 dies"
   last_activity_a983e541: "Darrera activitat"
@@ -12541,6 +12559,7 @@ ca:
   loading_features_d26820f6: "S'estan carregant les característiques"
   loading_folders_d8b5869e: "S'estan carregant les carpetes"
   loading_gradebook_b0b75cd3: "S’està carregant el llibre de qualificacions"
+  loading_gradebook_submissions_d2ba017f: "S’estan carregant les entregues del llibre de qualificacions"
   loading_graders_f6a76142: "S'estan carregant els qualificadors"
   loading_grades_446fc226: "S'estan carregant les notes..."
   loading_grades_for_coursename_26784c2d: "S'estan carregant les notes de %{courseName}"
@@ -12760,6 +12779,7 @@ ca:
   lti_deep_linking_line_items_5e0079f7: "Elements de línia d’enllaç profund d’LTI, interoperabilitat d’eines d’aprenentatge"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Elements de línia d’enllaç profund d’LTI, interoperabilitat d’eines d’aprenentatge, a la pàgina d’edició d'activitats"
   lti_delete_ee5f1bef: "LTI, interoperabilitat d'eines d'aprenentatge: suprimeix"
+  lti_dynamic_registration_8592edb0: "Registre dinàmic d’LTI"
   lti_edit_83a27850: "LTI, interoperabilitat d'eines d'aprenentatge: edita"
   lti_key_14ad02b1: "Clau d'LTI"
   lti_launch_af082dc3: "Llançament d’LTI"
@@ -14232,20 +14252,20 @@ ca:
         body: "Avís del Canvas - Fitxer nou: %{title} (%{size}) per a %{name}:"
     new_files_added: 
       email: 
-        body: "S'han afegit %{count} fitxers nous per a %{name}:"
+        body: "S'han afegit %{count} fitxers nous per a %{name}:"
         html: 
           body: "S'han afegit %{count} fitxers nous per a l'assignatura, %{name}:"
           see_details: "Els podeu veure aquí"
-          subject: "S'han afegit %{count} fitxers nous per a l'assignatura %{name}"
+          subject: "S'han afegit %{count} fitxers nous per a l'assignatura %{name}"
         link: "Els podeu veure aquí"
-        subject: "S'han afegit %{count} fitxers nous per a l'assignatura %{name}"
+        subject: "S'han afegit %{count} fitxers nous per a l'assignatura %{name}"
       sms: 
         body: "S'han afegit %{count} fitxers nous per a %{name}."
         link: "Més informació a %{link}"
       summary: 
-        body: "S'han afegit %{count} fitxers nous per a %{name}:"
+        body: "S'han afegit %{count} fitxers nous per a %{name}:"
         link: "Els podeu veure aquí"
-        subject: "S'han afegit %{count} fitxers nous per a l'assignatura %{name}"
+        subject: "S'han afegit %{count} fitxers nous per a l'assignatura %{name}"
       twitter: 
         body: "Avís del Canvas - %{count} fitxers nous per a %{name}"
     new_student_organized_group: 
@@ -15134,6 +15154,7 @@ ca:
   new_question_9107c469: "Pregunta nova"
   new_question_group_d9306280: "Grup de preguntes nou"
   new_quiz_34aacba6: "Prova nova"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "L’usuari suprimit de la prova nova restaura l’estat pendent de revisió en inscriure-s’hi"
   new_quiz_items_3c850331: "Elements de la prova nova"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Usuari de proves i bancs d'elements de nivell d'assignatura nous"
   new_quizzes_assignment_build_button_72b6531a: "Botó de compilació de noves activitats de proves"
@@ -17458,6 +17479,7 @@ ca:
   qti_img_matching_question: "La pregunta coincident importada conté imatges a ambdues bandes, la qual cosa no s'admet"
   qti_img_matching_question_distractors: "La pregunta coincident importada conté imatges dins les eleccions i no s'ha pogut corregir perquè també conté distractors"
   qti_name: "Convertidor QTI"
+  quantitative_data_options_4f071510: "Opcions de les dades quantitatives"
   question_9121487: Pregunta
   question_answered: Respost
   question_bank: 
@@ -18810,6 +18832,7 @@ ca:
         email: "Correu electrònic"
         name: Nom
   registration_url_60e0eaaa: "URL de registre"
+  regular_lato_font_7f3cf24c: "Font Lato normal"
   regular_style_checkbox_ee3d71c1: "Casella de selecció d'estil normal"
   reinforce_student_understanding_304d18a6: "Reforceu la comprensió dels estudiants"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Relaxeu-vos i feu una pausa. Encara no hi ha cap tasca pendent."
@@ -20738,6 +20761,13 @@ ca:
       aria_stop: "Premeu \"Atura\" per finalitzar l'enregistrament."
     edit_view_rubric: "Visualitza la rúbrica"
     group: Grup
+    late_input: 
+      days: 
+        one: Dia
+        other: Dies
+      hours: 
+        one: Hora
+        other: Hores
     mic_blocked_message: "El permís per utilitzar el micròfon està bloquejat. Per canviar-ho, aneu a chrome://settings/content/microphone"
     no_submission_time: "no hi ha cap hora d'entrega"
     nodetect_message: "No s'ha detectat cap veu. Pot ser que hàgiu d'ajustar la configuració del micròfon."
@@ -21750,8 +21780,8 @@ ca:
   the_field_field_is_required_56512820: "El camp \"%{field}\" és obligatori"
   the_field_field_must_have_no_spaces_d1c2fc37: "El camp \"%{field}\" no pot tenir espais"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "La pestanya Fitxers és el lloc per compartir les diapositives de les classes, documents d'exemple, ajudes per estudiar, és a dir qualsevol cosa que els vostres estudiants puguin voler baixar.  Carregar i organitzar els vostres fitxers és fàcil amb el Canvas.  Us mostrarem com fer-ho."
-  the_first_max_displayed_files_are_listed_49cfd7a0: "Els primers %{max_displayed} fitxers estan inclosos a la llista."
-  the_first_max_displayed_files_are_listed_above_cli_324d47b: "Els primers %{max_displayed} fitxers estan inclosos a la llista de més amunt. Feu clic a sota per mostrar tots els fitxers."
+  the_first_max_displayed_files_are_listed_49cfd7a0: "Els primers %{max_displayed} fitxers estan inclosos a la llista."
+  the_first_max_displayed_files_are_listed_above_cli_324d47b: "Els primers %{max_displayed} fitxers estan inclosos a la llista de més amunt. Feu clic a sota per mostrar tots els fitxers."
   the_following_content_is_partner_provided_ed1da756: "El contingut següent està proporcionat per proveïdors"
   the_following_domains_have_automatically_been_allo_cea27372: |-
       Els dominis següents s'han autoritzat automàticament des de les eines ja existents al vostre usuari.
@@ -22177,6 +22207,7 @@ ca:
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       La marca d’aquesta característica opcional permet utilitzar la
       pàgina Crea/edita el fòrum actualitzada
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Aquesta característica opcional introdueix millores de rendiment i manteniment al Llibre de qualificacions individual"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Aquesta característica opcional actua de manera que quan
       una eina de tercers envia diversos fitxers conjuntament a través de l’API del Servei d’assignatures i notes, els fitxers
@@ -23111,6 +23142,10 @@ ca:
   traditional_gradebook_d7ad59c6: "Llibre de qualificacions tradicional…"
   traditional_gradebook_d90461dc: "Llibre de qualificacions tradicional"
   transferred_student_enrollments_90dc27d3: "Inscripcions d’estudiants transferides"
+  transform_rce_content_on_load_1f521086: "Transformació del contingut de l’RCE en carregar-lo"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Transforma els URL absoluts en relatius i suprimeix els atributs externs del contingut de l’RCE en carregar-lo.
+      L’RCE necessita aquesta opció per funcionar plenament a Proves noves.
   travel_places_f461329c: "Viatges i llocs"
   trinidad_and_tobago_1_fc2d8d1c: "Trinitat i Tobago (+1)"
   trophy: 
@@ -23396,7 +23431,7 @@ ca:
   unpin_discussion_title_8c2a0942: "Desancora el fòrum %{title}"
   unpin_of_discussion_title_failed_852116d4: "No s'ha pogut desancorar el fòrum %{title}"
   unpin_of_discussion_title_succeeded_ce315adb: "El fòrum %{title} s'ha desancorat correctament"
-  unposted_8d9932ec: "No publicat"
+  unposted_8d9932ec: "Sense publicar"
   unposted_current_grade_aa1ea11c: "nota actual no publicada"
   unposted_current_score_c1dd3879: "puntuació actual no publicada"
   unposted_final_grade_aa5facd6: "nota final no publicada"
@@ -24073,6 +24108,8 @@ ca:
       resubmit_to_vericite: "Torna a entregar al VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "Puntuació de similitud VeriCite -- més informació"
   vericite_similarity_score_see_detailed_report_390ab687: "Puntuació de similitud del VeriCite - Mostra l'informe detallat"
+  verify_ldap_tls_certificates_70241d8e: "Verifiqueu els certificats TLS d’LDAP"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Verifiqueu els certificats TLS que presenten els proveïdors d'autenticació d’LDAP."
   version_versionnumber_updatedat_9f5b7a5b: "Versió %{versionNumber} %{updatedAt}"
   video_78335c71: vídeo
   video_b9f27375: Vídeo
@@ -24319,6 +24356,7 @@ ca:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Si se selecciona, el curs tindrà l'estat de només lectura fora d'aquestes dates."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Si se selecciona, el curs serà inaccessible fora de les dates del curs. Si les dates del curs estan en blanc, aquestes dates d'inici i fi s'aplicaran a les dates del període acadèmic."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Si se selecciona, la secció de l'assignatura tindrà l'estat de només lectura fora d'aquestes dates."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Un cop establert, determina si l'estat del flux de treball d’una prova nova s’ha d'establir com a qualificat o pending_review en cas que un usuari tingués una prova nova pending_review anterior, però s’hagi tornat a inscriure en l'assignatura."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Quan aquesta marca està habilitada, la navegació del curs romandrà contreta o desplegada
       quan es navegui entre pàgines en funció de la darrera configuració de l’usuari, en lloc
