@@ -635,6 +635,7 @@ de:
     titles: 
       configure_report: "Bericht konfigurieren"
       open_registration_delegated_warning_dialog: "Ein externer Identitätsanbieter ist aktiviert"
+      rqd_help: "Quantitative Daten einschränken"
       what_are_quiz_ip_filters: "Was sind Quiz-IP-Filter?"
     user: Benutzer
   account_settings_fe083453: Kontoeinstellungen
@@ -1599,6 +1600,8 @@ de:
         update_button: Aktualisieren
       report_last_run_never: Nie
       report_running: "Der Bericht wird erstellt.*Sie erhalten eine E-Mailbenachrichtigung, sobald der Bericht verfügbar ist.*"
+      rqd_help_message: "Wenn diese Einstellung aktiviert ist, schränkt sie die Ansicht der quantitativen (numerischen) Bewertungsdaten ein und begrenzt die Optionen zur Erstellung von Aufgaben für Lehrende. Die Benutzer\\*innen sehen nur qualitative Daten, d. h. Buchstabenbewertungen und Kommentare. Administrator\\*innen können diese Einstellung weiter anpassen, indem sie die Berechtigungen für Benutzerrollen anpassen."
+      rqd_screenreader: "Über die Einschränkung quantitativer Daten"
       select: 
         mfa: 
           disabled: Deaktiviert
@@ -2242,7 +2245,7 @@ de:
   adjust_final_grade_fa45e7e0: "Gesamtnote anpassen"
   adjusting_due_dates_a5918b9c: "Anpassen von Fälligkeitsdaten..."
   admin_4d3ba42f: Admin
-  admin_analytics_description: "Durch die Aktivierung wird Admin Analytics mit Übersichten über Kurse und Studierende angezeigt. Erfahren Sie mehr und geben Sie Feedback, indem Sie die *Benutzergruppe „New Analytics“* in der Canvas-Community beitreten."
+  admin_analytics_description: "Ermöglicht Analytics auf Kontoebene. Admin-Dashboards für Analytics liefern Details zur Canvas-Nutzung, zum Erfolg von Canvas-Kursen und zum Engagement der Studierenden. Weitere Informationen finden Sie im *Admin Analytics Hub* in der Canvas-Community."
   admin_analytics_eacba735: "Admin Analytics"
   admin_csv_f8d1b3eb: "Admin CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Admin-Export für mehrere Benotungszeiträume"
@@ -4423,6 +4426,7 @@ de:
       no_points: Keine
       no_submission: Nichts
       points: Punkte
+      speed_grader: SpeedGrader™
       submission_types: Dateitypen
       submitting: "Wird eingereicht"
       turnitin: Turnitin
@@ -5955,6 +5959,7 @@ de:
   canvas_for_elementary_analytics_15dc1e07: "Canvas for Elementary Analytics"
   canvas_for_elementary_beta_28bc5181: "Canvas für Elementary (Beta)"
   canvas_for_elementary_e6f5a06f: "Canvas für den Primarbereich"
+  canvas_for_elementary_font_selection_5d1f2271: "Auswahl der Schriftart für Canvas für Grundschüler"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas for Elementary: viele Ankündigungen in der Organisationstunde"
   canvas_for_elementary_parent_support_74a2356e: "Canvas for Elementary: Parent-Support"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -6092,6 +6097,7 @@ de:
   check_your_spelling_or_try_fewer_letters_70769a90: "Überprüfen Sie Ihre Rechtschreibung, oder versuchen Sie es mit weniger Buchstaben."
   checkbox_examples_dc790142: Beispiel-Kontrollkästchen
   checked_883b93fd: markiert
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Wenn Sie die Option „Zum Kalender hinzufügen“ aktivieren, werden alle Kursmitglieder eingeladen."
   cheerful_panda_holding_a_map_17ba47ee: "Fröhlicher Panda hält eine Karte"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Der abhängige Kurs muss demselben Root-Konto angehören wie der Hauptkurs."
   child_s_username_dde3aa9: "Benutzername des Kindes"
@@ -7342,7 +7348,7 @@ de:
         ? "n"
         : 
           one: "1 Ebene einrücken"
-          other: "Einrücken um %{count} Stufen"
+          other: "Einrücken um %{count} Stufen"
           zero: "Nicht einrücken"
       labels: 
         indent: Einrücken
@@ -8860,6 +8866,7 @@ de:
         participation_id: Teilnahme
         public_syllabus: "Syllabus für diesen Kurse öffentlich sichtbar machen"
         restrict_enrollments_to_course_dates: "Die Studenten können nur innerhalb dieses Zeitraums am Kurs teilnehmen."
+        restrict_quantitative_data: "Optionen für quantitative Daten"
         restrict_student_future_view: "Unterbinden Sie, dass Studenten diesen Kurs vor dem Startdatum sehen."
         restrict_student_past_view: "Unterbinden Sie, dass Studenten diesen Kurs nach dem Enddatum sehen."
         root_account: Root-Konto
@@ -10976,6 +10983,7 @@ de:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Ermöglicht einen neugestalteten Dialog „Studierende benachrichtigen, die ...“, der es ermöglicht, zusätzlich zu den Studierende auch Beobachter\\*innen zu benachrichtigen."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Ermöglicht den Zugriff auf die öffentliche API für neue Quizze: Quizelement-API."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Ermöglicht den Zugriff auf die Öffentliche API für Neue Quizze über Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Ermöglicht Administratoren die Registrierung von LTI-Tools mit dynamischer Registrierung"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Ermöglicht die Anzeige von Plagiatsberichten und Ähnlichkeitsbewertungen in der Abgabe-Ablage des neuen Notenbuchs."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Ermöglicht, dass wichtige Daten in Aufgaben, Kalendereinträge und anderes übernommen werden."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Ermöglicht Modal, den/die Benutzer\\*in zu warnen, wenn ein Kommentarentwurf in SpeedGrader nicht veröffentlicht wird."
@@ -13329,6 +13337,7 @@ de:
   grades_view_audit_trail_cc4c1fcc: "Noten – Prüfpfad anzeigen"
   grades_view_audit_trail_db7364b1: "Noten – Prüfpfad anzeigen"
   grades_view_change_logs_6bc1b959: "Noten – Änderungsprotokolle anzeigen"
+  grades_view_quantitative_feedback_90a4ffc7: "Noten – Anzeige des quantitativen Feedbacks"
   grades_visible_to_students_1584fa83: "Noten für Studenten sichtbar"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Noten wurden im Notenbuch veröffentlicht."
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Die Noten wurden im Notenbuch veröffentlicht."
@@ -14034,12 +14043,18 @@ de:
       event: "%{date} um %{time}"
   handler_7912052f: Handler
   has_been_automatically_selected_based_upon_where_t_61f805c5: "wurde abhängig davon, wo sich die Canvas-Instanz dieses Kontos befindet, automatisch ausgewählt. In einigen Fällen kann es eine andere Region sein."
+  has_no_submissions_2826a7a2: "Hat keine Abgaben"
+  has_no_submissions_63de50ad: "Hat keine Abgaben"
   has_not_submitted_2350bc24: "Wurde nicht abgegeben"
   has_similarity_score_d5f332b4: "Hat Ähnlichkeitswert"
   has_submissions_6c12ef4c: "Hat Abgaben"
+  has_submissions_ea8e609b: "Hat Abgaben"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Hat einen Turnitin-Score"
   has_ungraded_submissions_2bff87df: "Hat unbenotete Abgaben"
+  has_ungraded_submissions_b79f5803: "Hat unbenotete Abgaben"
+  has_unposted_grades_3567391e: "Hat unveröffentlichte Noten"
+  has_unposted_grades_ba0e02b6: "Hat unveröffentlichte Noten"
   have_a_question_about_canvas_ask_it_here_5781cce: "Haben Sie eine Frage zu Canvas? Stellen Sie sie hier."
   have_not_been_graded_df2a5fd2: "Wurden nicht bewertet"
   have_not_yet_submitted_57e6a58b: "Wurden noch nicht abgegeben"
@@ -14696,6 +14711,7 @@ de:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Falls „Benutzer – Anmeldedetails verwalten“ oder „Statistik – anzeigen“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Falls „Benutzer – Anmeldedetails verwalten“ oder „Statistik – anzeigen“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Falls „Benutzer\\*innen – Anmeldedetails verwalten“ oder „Statistik – anzeigen“ aktiviert ist, kann der/die Benutzer\\*in in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "Wenn Sie einen Grenzwert für Gruppenmitglieder festlegen, muss dieser größer als 1 sein."
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "Wenn Sie die möglichen Punkte für eine Aufgabe ändern, werden bestehende Noten automatisch skaliert."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Wenn Sie die möglichen Punkte für eine Aufgabe ändern, müssen Sie die Aufgabe neu benoten."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Wenn Sie die möglichen Punkte für eine Aufgabe ändern, müssen Sie jede Abgabe neu benoten."
@@ -14920,6 +14936,7 @@ de:
   individual_2033c005: Einzeln
   individual_assignment_grade_posting_d8322b99: "Individuelle Notenvergabe für Aufgaben"
   individual_gradebook_c7de9821: "Individuelles Notenbuch ..."
+  individual_gradebook_enhancements_de33aa3d: "Individuelle Erweiterungen für Notenbuch"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Einzelne Lernergebnisberechnungswerte können nicht geändert werden."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Einzelne Lernergebnis-Punkte können nicht geändert werden."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Bewertung der einzelnen Ergebnisse und Optionen der Berechnungsmethode"
@@ -15416,6 +15433,7 @@ de:
     lock_module_until: "Sperren bis"
   language_6b3e2c7c: Sprache
   languages_835813f0: Sprachen
+  large_balsamiq_font_5fe45fae: "Große Balsamiq-Schriftart"
   large_course_db3d58b: "Großer Kurs:"
   last_7_days_bd411f1f: "Die letzten 7 Tage"
   last_activity_a983e541: "Letzte Aktivität"
@@ -15843,6 +15861,7 @@ de:
   loading_features_d26820f6: "Funktionen laden"
   loading_folders_d8b5869e: "Ordner werden geladen"
   loading_gradebook_b0b75cd3: "Notenbuch wird geladen"
+  loading_gradebook_submissions_d2ba017f: "Notenbucheinträge werden geladen"
   loading_graders_f6a76142: "Benoter laden"
   loading_grades_446fc226: "Noten werden geladen ..."
   loading_grades_for_coursename_26784c2d: "Noten für %{courseName} werden geladen"
@@ -16101,6 +16120,7 @@ de:
   lti_deep_linking_line_items_5e0079f7: "LTI-Deep Linking-Positionen"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "LTI-Deep-Linking Positionen auf der Seite zur Aufgabenbearbeitung"
   lti_delete_ee5f1bef: "LTI – löschen"
+  lti_dynamic_registration_8592edb0: "Dynamische LTI-Registrierung"
   lti_edit_83a27850: "LTI – bearbeiten"
   lti_key_14ad02b1: "LTI Key"
   lti_launch_af082dc3: "LTI-Start:"
@@ -19003,6 +19023,7 @@ de:
   new_question_9107c469: "Neue Frage"
   new_question_group_d9306280: "Neue Fragengruppe"
   new_quiz_34aacba6: "Neues Quiz"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "Neues Quiz – gelöschter Benutzer – Wiederherstellung des Status der ausstehenden Überprüfung bei der Anmeldung"
   new_quiz_items_3c850331: "Neue Quiz-Elemente"
   new_quiz_statistics_desc: "Aktiviert die neue Seite mit Quizstatistiken für einen Kurs."
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Neue Objektpools auf Quizzes-Konto- und Kursebene"
@@ -21696,6 +21717,7 @@ de:
   qti_img_matching_question: "Die importierte passende Frage enthält auf beiden Seiten Bilder. Dies wird nicht unterstützt."
   qti_img_matching_question_distractors: "Die importierte passende Frage enthält Bilder im Rahmen der Auswahlmöglichkeiten und konnte nicht korrigiert werden, da sie außerdem falsche Antworten enthält."
   qti_name: "QTI Converter"
+  quantitative_data_options_4f071510: "Optionen für quantitative Daten"
   question_9121487: Frage
   question_answered: Beantwortet
   question_bank: 
@@ -23447,6 +23469,7 @@ de:
         name: Name
     welcome_to_canvas: "Willkommen bei Canvas!"
   registration_url_60e0eaaa: Registrierungs-URL
+  regular_lato_font_7f3cf24c: "Reguläre Lato-Schrift"
   regular_style_checkbox_ee3d71c1: Standardkontrollkästchen
   reinforce_student_understanding_304d18a6: "Vertiefen Sie das Verständnis der Studierenden"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Entspannen Sie sich und machen Sie eine Pause. Es gibt noch nichts zu tun."
@@ -25943,6 +25966,13 @@ de:
       aria_stop: "Zum Beenden der Aufzeichnung auf „Stopp“ klicken."
     edit_view_rubric: "Bewertungsschema anzeigen"
     group: Gruppe
+    late_input: 
+      days: 
+        one: Tag
+        other: Tage
+      hours: 
+        one: Stunde
+        other: Stunden
     mic_blocked_message: "Die Erlaubnis zur Mikrofonbenutzung wird gesperrt. Um dies zu ändern, gehen Sie nach chrome://settings/content/microphone"
     mute_assignment: "Aufgabe stummschalten"
     no_submission_time: "Keine Abgabezeit"
@@ -27548,6 +27578,7 @@ de:
       Dieses Funktions-Flag ermöglicht die Verwendung der aktualisierten
       Seite zum Erstellen/Bearbeiten von Diskussionen.
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Dieses Funktions-Flag kann für ein Konto aktiviert werden, wenn Sie möchten, dass Benutzer dieses Kontos, die eine Sprache sprechen, die von rechts nach links geschrieben wird (z. B. Arabisch, Hebräisch, Farsi), das RTL-Layout sehen, während wir daran arbeiten. Sobald die Funktion „fertig“ ist, verschwindet dieses Funktions-Flag, und jeder, der eine dieser Sprachen spricht, kann die RTL-Schnittstelle sehen."
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Diese Funktion führt Leistungs- und Wartungsverbesserungen für das individuelle Notenbuch ein"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Mit dieser Funktion werden mehrere Dateien, die von einem
       Drittanbieter-Tool über die Aufgaben- und Notenservice-API übermittelt werden, in
@@ -28721,6 +28752,10 @@ de:
   traditional_gradebook_d7ad59c6: "Traditionelles Notenbuch ..."
   traditional_gradebook_d90461dc: "Traditionelles Notenbuch"
   transferred_student_enrollments_90dc27d3: "Transferierte Studierendeneinschreibungen"
+  transform_rce_content_on_load_1f521086: "RCE-Inhalt beim Laden transformieren"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Transformiert absolute URLs in relative URLs und entfernt überflüssige Attribute aus RCE-Inhalten beim Laden,
+      damit RCE in neuen Quizzen vollständig funktioniert.
   travel_places_f461329c: "Reisen und Orte"
   treat_ungraded_as_0_d38c2b41: "Nicht benotete als 0 behandeln"
   tree_browser: 
@@ -29839,6 +29874,8 @@ de:
       resubmit_to_vericite: "Erneut bei VeriCite einreichen"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite-Similarity-Score – weitere Informationen"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Similarity-Score – detaillierten Bericht anzeigen"
+  verify_ldap_tls_certificates_70241d8e: "LDAP-TLS-Zertifikate verifizieren"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Überprüft TLS-Zertifikate, die von LDAP-Authentifizierungsanbietern vorgelegt werden."
   version_versionnumber_updatedat_9f5b7a5b: "Version %{versionNumber} %{updatedAt}"
   video_78335c71: Video
   video_b9f27375: Video
@@ -30118,6 +30155,7 @@ de:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Wenn diese Option aktiviert wird, ist der Kurs außerhalb dieser Termine schreibgeschützt."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Wenn diese Option aktiviert wird, ist der Kurs außerhalb der Kursdaten unzugänglich. Falls die Kursdaten leer sind, gelten diese Start- und Endtermine als Semestertermine."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Wenn diese Option aktiviert wird, ist der Kursabschnitt außerhalb dieser Termine schreibgeschützt."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Wenn eingestellt, wird bestimmt, ob der Workflow-Status eines neuen Quiz als benotet gesetzt werden soll pending_review oder ob ein Benutzer ein vorheriges pending_review neues Quiz hatte, aber wieder in den Kurs eingeschrieben wurde."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Wenn diese Flag aktiviert ist, bleibt die Kursnavigation beim Navigieren zwischen den Seiten
       reduziert oder erweitert, je nachdem, was zuletzt vom Benutzer festgelegt wurde,
