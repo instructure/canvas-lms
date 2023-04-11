@@ -1105,6 +1105,8 @@ describe UsersController do
     end
     let(:json) { json_parse(response.body) }
     let(:grade) { json.fetch("grade") }
+    let(:restrict_quantitative_data) { json.fetch("restrict_quantitative_data") }
+    let(:grading_scheme) { json.fetch("grading_scheme") }
 
     before(:once) do
       assignment_1 = assignment_model(course: course, due_at: Time.zone.now, points_possible: 10)
@@ -1130,6 +1132,25 @@ describe UsersController do
         it "returns okay" do
           get_grades!(all_grading_periods_id)
           expect(response).to be_ok
+          expect(restrict_quantitative_data).to eq false
+          expect(grading_scheme).to eq course.grading_standard_or_default.data
+        end
+
+        it "returns restrict_quantitative_data as true when student is restricted for the course context" do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+
+          # truthy permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+          Account.default.reload
+
+          get_grades!(all_grading_periods_id)
+          expect(restrict_quantitative_data).to eq true
+          expect(grading_scheme).to eq course.grading_standard_or_default.data
         end
 
         context "when Final Grade Override is enabled and allowed" do
@@ -1216,6 +1237,30 @@ describe UsersController do
         student_enrollment.scores.find_by!(course_score: true).update!(override_score: 89.2)
         get_grades!(grading_period.id)
         expect(grade).to eq 40.0
+      end
+
+      it "shows restrict_quantitative_data as falsey by default" do
+        user_session(teacher)
+        get_grades!(grading_period.id)
+        expect(restrict_quantitative_data).to eq false
+        expect(grading_scheme).to eq course.grading_standard_or_default.data
+      end
+
+      it "shows restrict_quantitative_data as true when teacher is restricted" do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+        user_session(teacher)
+        get_grades!(grading_period.id)
+        expect(restrict_quantitative_data).to eq true
+        expect(grading_scheme).to eq course.grading_standard_or_default.data
       end
     end
 
@@ -1310,6 +1355,28 @@ describe UsersController do
         it "returns okay" do
           get_grades!(all_grading_periods_id)
           expect(response).to be_ok
+        end
+
+        it "shows restrict_quantitative_data as falsey by default" do
+          get_grades!(grading_period.id)
+          expect(restrict_quantitative_data).to eq false
+          expect(grading_scheme).to eq course.grading_standard_or_default.data
+        end
+
+        it "shows restrict_quantitative_data as true when teacher is restricted" do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+
+          # truthy permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: observer_role, enabled: false, permission: "restrict_quantitative_data")
+          Account.default.reload
+          get_grades!(grading_period.id)
+          expect(restrict_quantitative_data).to eq true
+          expect(grading_scheme).to eq course.grading_standard_or_default.data
         end
 
         context "when Final Grade Override is enabled and allowed" do

@@ -2339,8 +2339,8 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def score_to_grade(score)
-    return nil unless grading_standard_enabled? && score
+  def score_to_grade(score, user: nil)
+    return nil unless (grading_standard_enabled? || restrict_quantitative_data?(user)) && score
 
     if grading_standard
       grading_standard.score_to_grade(score)

@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 const I18n = useI18nScope('user_grades')
@@ -48,7 +49,9 @@ $(document).ready(function () {
         if (totals.hide_final_grades) {
           gradeToShow = '--'
         } else if (totals.grade || totals.grade === 0) {
-          gradeToShow = totals.grade + '%'
+          gradeToShow = totals.restrict_quantitative_data
+            ? scoreToGrade(totals.grade, totals.grading_scheme)
+            : totals.grade + '%'
         } else {
           gradeToShow = I18n.t('no grade')
         }

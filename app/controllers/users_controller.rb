@@ -256,9 +256,13 @@ class UsersController < ApplicationController
     if enrollment.course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
       grade_data[:unposted_grade] = enrollment.unposted_current_score(opts)
       grade_data[:grade] = enrollment.computed_current_score(opts)
+      # since this page is read_only, and enrollment.computed_current_score(opts) is a percentage value,
+      # we can convert this into letter-grade
     else
       grade_data[:grade] = enrollment.effective_current_score(opts)
     end
+    grade_data[:restrict_quantitative_data] = enrollment.course.restrict_quantitative_data?(@current_user)
+    grade_data[:grading_scheme] = enrollment.course.grading_standard_or_default.data
 
     render json: grade_data
   end
