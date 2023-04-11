@@ -638,6 +638,7 @@ nl:
     titles: 
       configure_report: "Rapport configureren"
       open_registration_delegated_warning_dialog: "Een externe ID-provider is ingeschakeld"
+      rqd_help: "Kwantitatieve gegevens beperken"
       what_are_quiz_ip_filters: "Wat zijn Toets IP-filters?"
     user: Gebruiker
   account_settings_fe083453: Accountinstellingen
@@ -1626,6 +1627,8 @@ nl:
         update_button: Bijwerken
       report_last_run_never: Nooit
       report_running: "Het rapport wordt uitgevoerd.*Je ontvangt een e-mailbericht wanneer het proces is voltooid.*"
+      rqd_help_message: "Met deze instelling wordt de weergave voor gebruikers van kwantitatieve (numerieke) beoordelingsgegevens beperkt en wordt voor docenten het aantal opties voor het maken van opdrachten beperkt. Gebruikers krijgen alleen kwalitatieve gegevens te zien, zoals letterscores en opmerkingen. De beheerder kan deze instelling verder aanpassen door de machtigingen voor gebruikersrollen aan te passen."
+      rqd_screenreader: "Over het beperken van kwantitatieve gegevens"
       select: 
         mfa: 
           disabled: Uitgeschakeld
@@ -2269,7 +2272,7 @@ nl:
   adjust_final_grade_fa45e7e0: "Eindcijfer corrigeren"
   adjusting_due_dates_a5918b9c: "Inleverdatums aanpassen..."
   admin_4d3ba42f: Beheer
-  admin_analytics_description: "Hiermee kan Admin Analytics overzichten van cursussen en cursisten laten zien. Bekijk meer informatie en geef feedback door deel te nemen aan de *gebruikersgroep New Analytics* in de Canvas-community."
+  admin_analytics_description: "Schakelt Analytics op accountniveau in. Admin Analytics-dashboards bieden details over het gebruik van Canvas, het succes van Canavas-cursussen en de betrokkenheid van studenten. Je vindt meer informatie hierover in de *Admin Analytics Hub* van de Canvas Community."
   admin_analytics_eacba735: "Admin Analytics"
   admin_csv_f8d1b3eb: Beheer-CSV
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Beheerdersexport voor meerdere beoordelingsperioden"
@@ -4459,6 +4462,7 @@ nl:
       no_points: Geen
       no_submission: Niets
       points: Punten
+      speed_grader: SpeedGrader™
       submission_types: Bestandstypen
       submitting: "Type inzending"
       turnitin: Turnitin
@@ -5991,6 +5995,7 @@ nl:
   canvas_for_elementary_analytics_15dc1e07: "Analyse van Canvas voor Elementair"
   canvas_for_elementary_beta_28bc5181: "Canvas voor Elementair (beta)"
   canvas_for_elementary_e6f5a06f: "Canvas voor Elementair"
+  canvas_for_elementary_font_selection_5d1f2271: "Lettertypeselectie voor Canvas for Elementary"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas voor Elementair: veel aankondingingen in de huisklas"
   canvas_for_elementary_parent_support_74a2356e: "Canvas voor Elementair: Oudersondersteuning"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -6128,6 +6133,7 @@ nl:
   check_your_spelling_or_try_fewer_letters_70769a90: "Controleer de spelling of gebruik minder letters."
   checkbox_examples_dc790142: "Voorbeelden van selectievakje"
   checked_883b93fd: ingeschakeld
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Door het selectievakje Toevoegen aan kalender in te schakelen worden alle cursusdeelnemers uitgenodigd."
   cheerful_panda_holding_a_map_17ba47ee: "Vrolijke panda die een kaart vasthoudt"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Onderliggende cursus moet deel uitmaken van dezelfde hoofdaccount als de hoofdcursus"
   child_s_username_dde3aa9: "Gebruikersnaam van kind"
@@ -8908,6 +8914,7 @@ nl:
         participation_id: Deelname
         public_syllabus: "De syllabus voor deze cursus voor iedereen zichtbaar maken"
         restrict_enrollments_to_course_dates: "Cursisten kunnen alleen tussen deze datums aan de cursus deelnemen"
+        restrict_quantitative_data: "Opties voor kwantitatieve gegevens"
         restrict_student_future_view: "Geef cursisten geen toegang tot deze cursus vóór de startdatum"
         restrict_student_past_view: "Geef cursisten geen toegang tot deze cursus na de einddatum"
         root_account: Hoofdaccount
@@ -11025,6 +11032,7 @@ nl:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Schakelt een nieuw ontworpen dialoogvenster Cursisten berichten die... in waarmee naar waarnemers in aanvulling op cursisten berichten kunnen worden gestuurd."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Biedt toegang tot de Openbare API van Nieuwe toetsen: Quiz Items API."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Biedt toegang tot de Openbare API van Nieuwe toetsen via Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Hiermee kunnen beheerders LTI-tools registreren met dynamische registratie"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Hiermee kunnen plagiaatrapporten en vergelijkbaarheidsscores in het inleveringsvak voor Nieuwe cijferlijst worden weergegeven."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Zorgt ervoor dat belangrijke datums worden toegepast op opdrachten, kalenderevenementen en dergelijke."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Schakelt modaal in om gebruiker te waarschuwen wanneer een conceptopmerking niet is gepost in SpeedGrader."
@@ -13388,6 +13396,7 @@ nl:
   grades_view_audit_trail_cc4c1fcc: "Cijfers - audittraject weergeven"
   grades_view_audit_trail_db7364b1: "Cijfers - audittraject weergeven"
   grades_view_change_logs_6bc1b959: "Cijfers - wijzigingslogboeken weergeven"
+  grades_view_quantitative_feedback_90a4ffc7: "Beoordelingen - bekijk kwantitatieve feedback"
   grades_visible_to_students_1584fa83: "Cijfers zichtbaar voor cursisten"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Cijfers zijn gepubliceerd in de Cijferlijst."
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Cijfers zijn vrijgegeven in de cijferlijst."
@@ -14094,12 +14103,18 @@ nl:
       event: "%{date} om %{time}"
   handler_7912052f: Handler
   has_been_automatically_selected_based_upon_where_t_61f805c5: "is automatisch geselecteerd gebaseerd op waar het Canvas-exemplaar van dit account zich bevindt. In sommige gevallen kan dit een andere regio zijn."
+  has_no_submissions_2826a7a2: "Heeft geen inleveringen"
+  has_no_submissions_63de50ad: "Heeft geen inleveringen"
   has_not_submitted_2350bc24: "Is niet ingeleverd"
   has_similarity_score_d5f332b4: "Heeft vergelijkbaarheidsscore"
   has_submissions_6c12ef4c: "Heeft inleveringen"
+  has_submissions_ea8e609b: "Heeft inleveringen"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Heeft Turnitin-score"
   has_ungraded_submissions_2bff87df: "Heeft niet-beoordeelde inleveringen"
+  has_ungraded_submissions_b79f5803: "Heeft niet-beoordeelde inleveringen"
+  has_unposted_grades_3567391e: "Heeft niet-geposte beoordelingen"
+  has_unposted_grades_ba0e02b6: "Heeft niet-geposte beoordelingen"
   have_a_question_about_canvas_ask_it_here_5781cce: "Heb je een vraag over Canvas? Stel dan hier je vraag."
   have_not_been_graded_df2a5fd2: "Zijn niet beoordeeld"
   have_not_yet_submitted_57e6a58b: "Hebben nog niet ingeleverd"
@@ -14756,6 +14771,7 @@ nl:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Als Gebruikers - aanmeldingsdetails of Statistieken - weergeven is ingeschakeld, kan een gebruiker aanmeldings-/afmeldingsactiviteiten genereren in Beheertools. Om de optie voor aanmeldings-/afmeldingsactiviteiten in Beheertools te verbergen, moeten beide machtigingen worden uitgeschakeld."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Als Gebruikers - aanmeldingsdetails beheren of Statistieken - weergeven is ingeschakeld, kan een gebruiker aanmeldings-/afmeldingsactiviteiten genereren in Beheertools. Om de optie voor aanmeldings-/afmeldingsactiviteiten in Beheertools te verbergen, moeten beide machtigingen worden uitgeschakeld."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Als Gebruikers - aanmeldingsdetails beheren of Statistieken - weergeven is ingeschakeld, kan de gebruiker aanmeldings-/afmeldingsactiviteiten genereren in Beheertools. Om de optie voor aanmeldings-/afmeldingsactiviteiten in Beheertools te verbergen, moeten beide machtigingen worden uitgeschakeld."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "Als je het aantal groepsleden wilt beperken, moet je een aantal groter dan 1 invoeren."
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "Als je het aantal mogelijke punten voor een opdracht verandert, dan worden de bestaande cijfers automatisch geschaald."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Als je het aantal mogelijke punten voor een opdracht verandert dan moet je de opdracht opnieuw beoordelen."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Als je het aantal mogelijke punten voor een opdracht verandert dan moet je de opdracht opnieuw beoordelen."
@@ -14981,6 +14997,7 @@ nl:
   individual_2033c005: Individu
   individual_assignment_grade_posting_d8322b99: "Plaatsen van cijfers voor individuele opdrachten"
   individual_gradebook_c7de9821: "Individuele Cijferlijst..."
+  individual_gradebook_enhancements_de33aa3d: "Verbeteringen voor individuele cijferlijsten"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Berekeningswaarden van individuele leerdoelen kunnen niet worden gewijzigd."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Punten voor vakbeheersing van individuele leerdoelen kunnen niet worden gewijzigd."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Beoordeling van afzonderlijke leerdoelen en opties voor berekeningsmethoden"
@@ -15474,6 +15491,7 @@ nl:
     lock_module_until: "Vergrendelen tot"
   language_6b3e2c7c: Taal
   languages_835813f0: Talen
+  large_balsamiq_font_5fe45fae: "Groot Balsamiq-lettertype"
   large_course_db3d58b: "Grote cursus:"
   last_7_days_bd411f1f: "Afgelopen 7 dagen"
   last_activity_a983e541: "Laatste activiteit"
@@ -15903,6 +15921,7 @@ nl:
   loading_features_d26820f6: "Functies laden"
   loading_folders_d8b5869e: "Mappen worden geladen"
   loading_gradebook_b0b75cd3: "Cijferlijst wordt geladen"
+  loading_gradebook_submissions_d2ba017f: "Cijferlijstinleveringen laden"
   loading_graders_f6a76142: "Revisoren laden"
   loading_grades_446fc226: "Cijfers laden..."
   loading_grades_for_coursename_26784c2d: "Cijfers voor %{courseName} worden geladen"
@@ -16164,6 +16183,7 @@ nl:
   lti_deep_linking_line_items_5e0079f7: "LTI Deep Linking-regelitems"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "LTI Deep Linking-regelitems op pagina Opdracht bewerken"
   lti_delete_ee5f1bef: "LTI - verwijderen"
+  lti_dynamic_registration_8592edb0: "Dynamische LTI-registratie"
   lti_edit_83a27850: "LTI - bewerken"
   lti_key_14ad02b1: LTI-sleutel
   lti_launch_af082dc3: "LTI starten:"
@@ -19068,6 +19088,7 @@ nl:
   new_question_9107c469: "Nieuwe vraag"
   new_question_group_d9306280: "Nieuwe vraaggroep"
   new_quiz_34aacba6: "Nieuwe toets"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "Herstellen van verwijderde gebruiker in Nieuwe toetsen in afwachting van reviewstatus bij inschrijving"
   new_quiz_items_3c850331: "Nieuwe toetsitems"
   new_quiz_statistics_desc: "De nieuwe pagina met statistieken van de toets voor een cursus inschakelen."
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Account van Nieuwe toetsen en itembanken op cursusniveau"
@@ -21778,6 +21799,7 @@ nl:
   qti_img_matching_question: "Geïmporteerde overeenkomstige vraag bevat afbeelding aan beide zijden, die niet ondersteund wordt"
   qti_img_matching_question_distractors: "Geïmporteerde overeenkomstige vraag bevat afbeeldingen binnen de keuzes, en kan niet opgelost worden omdat ze ook onjuiste opties bevat"
   qti_name: "QTI Converter"
+  quantitative_data_options_4f071510: "Opties voor kwantitatieve gegevens"
   question_9121487: Vraag
   question_answered: Beantwoord
   question_bank: 
@@ -23530,6 +23552,7 @@ nl:
         name: Naam
     welcome_to_canvas: "Welkom op Canvas!"
   registration_url_60e0eaaa: "Registratie URL"
+  regular_lato_font_7f3cf24c: "Regular Lato-lettertype"
   regular_style_checkbox_ee3d71c1: "Gewone stijl selectievakje"
   reinforce_student_understanding_304d18a6: "Versterk het begrip van cursisten"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Relax en neem een pauze. Er is nog niets te doen."
@@ -26031,6 +26054,13 @@ nl:
       aria_stop: "\"Stop\" aanraken om opnemen te beëindigen."
     edit_view_rubric: "Rubriek weergeven"
     group: Groep
+    late_input: 
+      days: 
+        one: Dag
+        other: Dagen
+      hours: 
+        one: Uur
+        other: Uur
     mic_blocked_message: "De toestemming om de microfoon te gebruiken, is geblokkeerd. Om dit te wijzigen, ga naar chrome://settings/content/microphone"
     mute_assignment: "Opdracht verbergen"
     no_submission_time: "geen inzendingstijd"
@@ -27640,6 +27670,7 @@ nl:
       Deze functietag schakelt het gebruik in van de bijgewerkte
       pagina Discussie maken/bewerken
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Deze functievlag kan door een accountbeheerder worden ingeschakeld als gebruikers van dat account die talen spreken die van rechts naar links worden geschreven (zoals Arabisch, Hebreeuws, Farsi), de RNL-lay-out wil laten zien terwijl wij erin aan het werken zijn. Zodra de functie \"klaar\" is, verdwijnt de functievlag en iedereen die een van deze talen spreekt, krijgt dan altijd de RNL-interface te zien."
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Deze functie introduceert verbeteringen in prestaties en onderhoud voor individuele cijferlijsten"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Deze functie zorgt ervoor dat wanneer meerdere bestanden samen worden ingeleverd met
       een tool van derden via de Assignments and Grade Service API, die bestanden
@@ -28813,6 +28844,10 @@ nl:
   traditional_gradebook_d7ad59c6: "Traditionele Cijferlijst..."
   traditional_gradebook_d90461dc: "Traditionele Cijferlijst"
   transferred_student_enrollments_90dc27d3: "Inschrijvingen van overgeplaatste cursisten"
+  transform_rce_content_on_load_1f521086: "RCE-inhoud omzetten bij laden"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Zet absolute URL's om in relatieve URL's en verwijdert tijdens het laden irrelevante kenmerken uit de RCE-inhoud.
+      Dit is vereist voor het volledig functioneren van de RCE in Nieuwe toetsen.
   travel_places_f461329c: "Reizen & Plaatsen"
   treat_ungraded_as_0_d38c2b41: "Opdrachten die niet beoordeeld zijn behandelen als een 0"
   tree_browser: 
@@ -29121,7 +29156,7 @@ nl:
   unpin_discussion_title_8c2a0942: "Vastzetten van discussie ongedaan maken %{title}"
   unpin_of_discussion_title_failed_852116d4: "Vastzetten van discussie %{title} ongedaan maken is mislukt"
   unpin_of_discussion_title_succeeded_ce315adb: "Vastzetten van discussie %{title} ongedaan maken is gelukt"
-  unposted_8d9932ec: Niet-gepubliceerd
+  unposted_8d9932ec: Niet-gepost
   unposted_current_grade_aa1ea11c: "niet-gepost huidig cijfer"
   unposted_current_score_c1dd3879: "niet-gepubliceerde huidige score"
   unposted_final_grade_aa5facd6: "niet-gepost eindcijfer"
@@ -29931,6 +29966,8 @@ nl:
       resubmit_to_vericite: "Opnieuw inleveren bij VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite vergelijkbaarheidsscore -- meer informatie"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Vergelijkbaarheidsscore - Zie rapport met details"
+  verify_ldap_tls_certificates_70241d8e: "LDAP TLS-certificaten verifiëren"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Verifieer TLS-certificaten die worden verstrekt door providers van LDAP-verificatie."
   version_versionnumber_updatedat_9f5b7a5b: "Versie %{versionNumber} %{updatedAt}"
   video_78335c71: video
   video_b9f27375: "Video "
@@ -30215,6 +30252,7 @@ nl:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Wanneer dit is geselecteerd, heeft de cursus de status alleen-lezen buiten deze datums."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Wanneer dit is geselecteerd, kan de cursus niet buiten de cursusdatums worden geopend. Als de cursusdatums niet zijn ingevuld, hebben deze start- en einddatum betrekking op periodedatums."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Wanneer dit is geselecteerd, heeft de cursussectie de status alleen-lezen buiten deze datums."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Met deze functie wordt vastgesteld of de workflowstatus van een nieuwe toets moet worden ingesteld als beoordeeld of als pending_review als een gebruiker al eerder een pending_review nieuwe toets had maar opnieuw voor de cursus is ingeschreven."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Wanneer deze vlag is ingeschakeld, zal de cursusnavigatie samengevouwen of uitgevouwen blijven
       wanneer tussen pagina's wordt genavigeerd, afhankelijk van hoe het de laatste keer door de gebruiker is ingesteld, in plaats
