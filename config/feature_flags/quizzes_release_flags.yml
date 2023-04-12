@@ -83,3 +83,11 @@ new_quizzes_exports:
   display_name: New Quizzes Export Support
   description: Support exporting New Quizzes in QTI format
   applies_to: SiteAdmin
+new_quizzes_migrate_without_content_rewrite:
+  state: hidden
+  display_name: New Quizzes Migrate Without Content Rewrite
+  description: Migrating a single classic quiz will leave HTML rich content fields as-is.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on

@@ -322,6 +322,10 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
+  def disable_content_rewriting?
+    quizzes_next? && NewQuizzesFeaturesHelper.disable_content_rewriting?(context)
+  end
+
   def export_quizzes2
     mark_exporting
     begin
