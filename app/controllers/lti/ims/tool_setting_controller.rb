@@ -208,9 +208,9 @@ module Lti
 
       def render_bad_request
         render json: {
-          status: I18n.t("lib.auth.api.bad_request_status", "bad_request"),
-          errors: [{ message: I18n.t("lib.auth.api.bad_request_message", "bad_request") }]
-        },
+                 status: I18n.t("lib.auth.api.bad_request_status", "bad_request"),
+                 errors: [{ message: I18n.t("lib.auth.api.bad_request_message", "bad_request") }]
+               },
                status: :bad_request
       end
     end

@@ -31,10 +31,10 @@ describe MasterCourses::MasterTemplatesController do
   describe "GET 'unsynced_changes'" do
     def get_unsynced_changes(params)
       get "unsynced_changes", params: {
-        course_id: @course.id,
-        template_id: @template.id,
-        **params
-      },
+                                course_id: @course.id,
+                                template_id: @template.id,
+                                **params
+                              },
                               format: "json"
     end
 

@@ -603,8 +603,8 @@ class RoleOverridesController < ApplicationController
     unless @role && !@role.deleted?
       if api_request?
         render json: {
-          message: "role not found"
-        },
+                 message: "role not found"
+               },
                status: :not_found
       else
         redirect_to named_context_url(@context, :context_permissions_url,
