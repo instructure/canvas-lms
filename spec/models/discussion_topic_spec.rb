@@ -1179,9 +1179,9 @@ describe DiscussionTopic do
 
       expect do
         topic.update!(course_sections: [section1])
-      end.to change { student1.stream_item_instances.count }.by(0).and change {
+      end.to change {
         student2.stream_item_instances.count
-      }.from(1).to(0)
+      }.from(1).to(0).and not_change(student1.stream_item_instances, :count)
     end
 
     it "removes stream items from users if updated to a delayed post in the future" do
