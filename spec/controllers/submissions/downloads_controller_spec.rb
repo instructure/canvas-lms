@@ -79,11 +79,11 @@ describe Submissions::DownloadsController do
       it "renders as json" do
         request.accept = Mime[:json].to_s
         get :show, params: {
-          course_id: @context.id,
-          assignment_id: @assignment.id,
-          id: @student.id,
-          download: @submission.attachment_id
-        },
+                     course_id: @context.id,
+                     assignment_id: @assignment.id,
+                     id: @student.id,
+                     download: @submission.attachment_id
+                   },
                    format: :json
         expect(JSON.parse(response.body)["attachment"]["id"]).to eq @submission.attachment_id
       end

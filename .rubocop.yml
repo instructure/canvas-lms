@@ -11,12 +11,18 @@ require:
 AllCops:
   TargetRubyVersion: 2.7
   NewCops: enable
+  Exclude:
+   - node_modules/**/*
 
 Bundler:
   Severity: error
 
 Gemspec:
   Severity: error
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec
+Gemspec/RequireMFA:
+  Enabled: false # gems hosted in this repo aren't meant to be published separately
 Gemspec/RequiredRubyVersion:
   # all the gemspecs in this repo are non-published gems
   # the root Gemfile enforces the Ruby version, and we purposely
@@ -30,7 +36,7 @@ Layout:
 Lint:
   Severity: error
 Lint/AmbiguousBlockAssociation:
-  IgnoredMethods:
+  AllowedMethods:
     - change
     - not_change
     - raise_error
@@ -164,13 +170,15 @@ Style:
 Style/Alias:
   EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
 Style/BlockDelimiters:
-  IgnoredMethods: []
+  AllowedMethods: []
 Style/Documentation:
   Enabled: false # most things don't need to be documented
 Style/DoubleNegation:
   Enabled: false # we use double negation, even outside of return context, to get an actual true/false for various API results
 Style/EmptyElse:
   EnforcedStyle: empty # explicit nil indicates programmer intent
+Style/FetchEnvVar:
+  Enabled: false # ENV vars are generally all optional, and it's expected to return nil
 Style/FloatDivision:
   Enabled: false # inherently dangerous cop because the args may not even be integers, and only upside is maybe saving 4 characters
 Style/FormatStringToken:
@@ -186,6 +194,8 @@ Style/MultilineBlockChain:
   Enabled: false # this is common when building up a large API result
 Style/NumericPredicate:
   Enabled: false # `> 0` can be easier to read than `.positive?`
+Style/OpenStructUse:
+  Severity: warning # unfortunately, legacy code uses it a lot;
 Style/ParallelAssignment:
   Enabled: false # most uses are legitimate deconstruction or value swapping
 Style/PercentQLiterals:
