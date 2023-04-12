@@ -480,6 +480,8 @@ RSpec.configure do |config|
     TermsOfService.skip_automatic_terms_creation = true
     LiveEvents.clear_context!
     $spec_api_tokens = {}
+
+    remove_user_session
   end
 
   Notification.after_create do
