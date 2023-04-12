@@ -110,7 +110,10 @@ describe('Weekly PlannerApp', () => {
   it('displays the whole week if there are any items', () => {
     const opts = getDefaultValues()
     let days = [opts.thisWeek.weekStart.clone().add(1, 'day')]
-    days = days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d, uniqueId: '1'}]])
+    days = days.map(d => [
+      d.format('YYYY-MM-DD'),
+      [{dateBucketMoment: d, uniqueId: '1', title: ''}],
+    ])
     const {container, queryAllByText} = render(<PlannerApp {...getDefaultValues({days})} />)
     expect(container.querySelectorAll('.planner-day').length).toEqual(7)
     const d = opts.thisWeek.weekStart.clone()
