@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Dir[File.join(File.dirname(__FILE__), "../gems/plugins/*")].each do |plugin_dir|
+  next unless File.directory?(plugin_dir)
+
   gem(File.basename(plugin_dir), path: plugin_dir)
 end
 
