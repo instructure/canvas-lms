@@ -16,32 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {Component, useEffect, useState} from 'react'
 import ReactDOM from 'react-dom'
-import {arrayOf, bool, func, object, oneOf, oneOfType, string} from 'prop-types'
 import {px} from '@instructure/ui-utils'
 import indicatorRegion from '../../../indicatorRegion'
-import {isImage, isAudioOrVideo} from '../fileTypeUtils'
+import {isAudioOrVideo, isImage} from '../fileTypeUtils'
 import indicate from '../../../../common/indicate'
 
 import {StoreProvider} from '../StoreContext'
 
 import Bridge from '../../../../bridge'
 import UploadFileModal from './UploadFileModal'
+import RCEWrapper from '../../../RCEWrapper'
+import {Editor} from 'tinymce'
+
+export const UploadFilePanelIds = ['COMPUTER', 'URL'] as const
+export type UploadFilePanelId = (typeof UploadFilePanelIds)[number]
 
 /**
  * Handles uploading data based on what type of data is submitted.
  */
 export const handleSubmit = (
-  editor,
-  accept,
-  selectedPanel,
+  editor: Editor,
+  accept: string,
+  selectedPanel: UploadFilePanelId,
   uploadData,
   storeProps,
   source,
-  afterInsert = () => {}
+  afterInsert: Function = () => undefined
 ) => {
-  Bridge.focusEditor(editor.rceWrapper) // necessary since it blurred when the modal opened
+  Bridge.focusEditor(RCEWrapper.getByEditor(editor)) // necessary since it blurred when the modal opened
   const {altText, isDecorativeImage, displayAs} = uploadData?.imageOptions || {}
   switch (selectedPanel) {
     case 'COMPUTER': {
@@ -74,7 +78,7 @@ export const handleSubmit = (
         editorHtml = editor.dom.createHTML('img', {
           src: fileUrl,
           alt: altText,
-          role: isDecorativeImage ? 'presentation' : undefined,
+          ...(isDecorativeImage ? {role: 'presentation'} : null),
         })
       } else {
         editorHtml = editor.dom.createHTML('a', {href: fileUrl}, altText || fileUrl)
@@ -90,6 +94,19 @@ export const handleSubmit = (
   afterInsert()
 }
 
+export interface UploadFileProps {
+  onSubmit?: Function
+  onDismiss: Function
+  accept?: string[] | string
+  editor: Editor
+  label: string
+  panels?: UploadFilePanelId[]
+  requireA11yAttributes?: boolean
+  trayProps?: object
+  canvasOrigin?: string
+  preselectedFile?: File // a JS File
+}
+
 export function UploadFile({
   accept,
   editor,
@@ -101,11 +118,11 @@ export function UploadFile({
   canvasOrigin,
   onSubmit = handleSubmit,
   preselectedFile = undefined,
-}) {
-  const [modalBodyWidth, setModalBodyWidth] = useState(undefined)
-  const [modalBodyHeight, setModalBodyHeight] = useState(undefined)
+}: UploadFileProps) {
+  const [modalBodyWidth, setModalBodyWidth] = useState(undefined as number | undefined)
+  const [modalBodyHeight, setModalBodyHeight] = useState(undefined as number | undefined)
   const [theFile] = useState(preselectedFile)
-  const bodyRef = React.useRef()
+  const bodyRef = React.useRef<Component>()
 
   trayProps = trayProps || Bridge.trayProps.get(editor)
 
@@ -116,8 +133,8 @@ export function UploadFile({
   useEffect(() => {
     if (bodyRef.current) {
       // eslint-disable-next-line react/no-find-dom-node
-      const thebody = ReactDOM.findDOMNode(bodyRef.current)
-      const sz = thebody.getBoundingClientRect()
+      const thebody = ReactDOM.findDOMNode(bodyRef.current) as Element
+      const sz = thebody?.getBoundingClientRect()
       sz.height -= px('3rem') // leave room for the tabs
       setModalBodyWidth(sz.width)
       setModalBodyHeight(sz.height)
@@ -129,6 +146,7 @@ export function UploadFile({
       {contentProps => (
         <UploadFileModal
           ref={bodyRef}
+          // @ts-ignore
           preselectedFile={theFile}
           editor={editor}
           trayProps={trayProps}
@@ -146,17 +164,4 @@ export function UploadFile({
       )}
     </StoreProvider>
   )
-}
-
-UploadFile.propTypes = {
-  onSubmit: func,
-  onDismiss: func.isRequired,
-  accept: oneOfType([arrayOf(string), string]),
-  editor: object.isRequired,
-  label: string.isRequired,
-  panels: arrayOf(oneOf(['COMPUTER', 'URL'])),
-  requireA11yAttributes: bool,
-  trayProps: object,
-  canvasOrigin: string,
-  preselectedFile: object, // a JS File
 }

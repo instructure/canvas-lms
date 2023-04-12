@@ -82,7 +82,7 @@ const rceMock = createDeepMockProxy<RCEWrapper>(
         contextId: '1',
         contextType: 'course',
       },
-    },
+    }, // satisfies Partial<RCEWrapperProps> as any,
   }
 )
 
@@ -148,7 +148,7 @@ describe('getFilterResults', () => {
 describe('ExternalToolDialog', () => {
   beforeAll(() => {
     jest.spyOn(RCEWrapper, 'getByEditor').mockImplementation(e => {
-      if (e === editorMock) return rceMock
+      if (e === (editorMock as any)) return rceMock
       else {
         throw new Error('Wrong editor requested')
       }
@@ -394,7 +394,7 @@ describe('ExternalToolDialog', () => {
       beforeAll(() => {
         rceMock.props.externalToolsConfig = {
           isA2StudentView: true,
-        }
+        } // satisfies RCEWrapperProps['externalToolsConfig'] as any
       })
 
       it('does not insert content items into the editor', async () => {

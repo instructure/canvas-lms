@@ -72,7 +72,7 @@ import styles from '../skins/skin-delta.css'
 import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
 import contentCSSBinding from 'tinymce/skins/ui/oxide/content.css'
 import {rceWrapperPropTypes} from './RCEWrapperProps'
-import {removePlaceholder} from '../util/loadingPlaceholder'
+import {insertPlaceholder, placeholderInfoFor, removePlaceholder} from '../util/loadingPlaceholder'
 import {transformRceContentForEditing} from './transformContent'
 import {IconMoreSolid} from '@instructure/ui-icons/es/svg'
 
@@ -506,23 +506,37 @@ class RCEWrapper extends React.Component {
     const element = contentInsertion.insertImage(editor, image, this.getCanvasUrl())
 
     // Removes TinyMCE's caret &nbsp; text if exists.
-    if (element?.nextSibling?.data?.trim() === '') {
+    if (element?.nextSibling?.data?.startsWith('\xA0' /* nbsp */)) {
+      element.nextSibling.splitText(1)
       element.nextSibling.remove()
     }
 
-    if (element && element.complete) {
-      this.contentInserted(element)
-    } else if (element) {
-      element.onload = () => this.contentInserted(element)
-      element.onerror = () => this.checkImageLoadError(element)
+    return {
+      imageElem: element,
+      loadingPromise: new Promise((resolve, reject) => {
+        if (element && element.complete) {
+          this.contentInserted(element)
+          resolve()
+        } else if (element) {
+          element.onload = () => {
+            this.contentInserted(element)
+            resolve()
+          }
+          element.onerror = e => {
+            this.checkImageLoadError(element)
+            reject(e)
+          }
+        }
+      }),
     }
   }
 
   insertImagePlaceholder(fileMetaProps) {
     if (this.props.features?.rce_improved_placeholders) {
-      return import('../util/loadingPlaceholder').then(
-        async ({placeholderInfoFor, insertPlaceholder}) =>
-          insertPlaceholder(this.mceInstance(), await placeholderInfoFor(fileMetaProps))
+      return insertPlaceholder(
+        this.mceInstance(),
+        fileMetaProps.name,
+        placeholderInfoFor(fileMetaProps)
       )
     }
 
@@ -622,8 +636,7 @@ class RCEWrapper extends React.Component {
 
   removePlaceholders(name) {
     if (this.props.features?.rce_improved_placeholders) {
-      // Note that this needs to be done synchronously, or the image inserting code doesn't work
-      removePlaceholder(this.mceInstance(), encodeURIComponent(name))
+      removePlaceholder(this.mceInstance(), name)
     } else {
       const placeholder = this.mceInstance().dom.doc.querySelector(
         `[data-placeholder-for="${encodeURIComponent(name)}"]`

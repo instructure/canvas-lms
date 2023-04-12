@@ -25,6 +25,7 @@ import formatMessage from '../format-message'
 import {trimmedOrNull} from './string-util'
 import {Editor} from 'tinymce'
 import {assertNever} from './assertNever'
+import {isTextNode} from './elem-util'
 
 /**
  * Determines what type of placeholder is appropriate for a given file information.
@@ -36,7 +37,6 @@ export async function placeholderInfoFor(
   const ariaLabel = formatMessage('Loading placeholder for {fileName}', {
     fileName: fileMetaProps.name ?? 'unknown filename',
   })
-  const dataPlaceholderFor = encodeURIComponent(trimmedOrNull(fileMetaProps.name) ?? 'unknown-name')
 
   if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
     const imageUrl =
@@ -50,7 +50,6 @@ export async function placeholderInfoFor(
           type: 'block',
           visibleLabel,
           ariaLabel,
-          dataPlaceholderFor,
           width: image.width + 'px',
           height: image.height + 'px',
           vAlign: 'middle',
@@ -64,7 +63,6 @@ export async function placeholderInfoFor(
       type: 'block',
       visibleLabel,
       ariaLabel,
-      dataPlaceholderFor,
       width: VIDEO_SIZE_DEFAULT.width,
       height: VIDEO_SIZE_DEFAULT.height,
       vAlign: 'bottom',
@@ -74,19 +72,18 @@ export async function placeholderInfoFor(
       type: 'block',
       visibleLabel,
       ariaLabel,
-      dataPlaceholderFor,
       width: AUDIO_PLAYER_SIZE.width,
       height: AUDIO_PLAYER_SIZE.height,
       vAlign: 'bottom',
     }
   } else {
-    return {type: 'inline', visibleLabel, ariaLabel, dataPlaceholderFor}
+    return {type: 'inline', visibleLabel, ariaLabel}
   }
 }
 
-export function removePlaceholder(editor: Editor, dataPlaceholderFor: string) {
+export function removePlaceholder(editor: Editor, unencodedName: string) {
   const placeholderElem = editor.dom.doc.querySelector(
-    `[data-placeholder-for="${dataPlaceholderFor}"]`
+    `[data-placeholder-for="${encodeURIComponent(unencodedName)}"]`
   ) as HTMLDivElement
 
   // Fail gracefully
@@ -109,7 +106,8 @@ export function removePlaceholder(editor: Editor, dataPlaceholderFor: string) {
  */
 export async function insertPlaceholder(
   editor: Editor,
-  placeholderInfo: PlaceholderInfo
+  unencodedName: string,
+  placeholderInfoPromise: Promise<PlaceholderInfo>
 ): Promise<HTMLElement> {
   const placeholderId = `placeholder-${placeholderIdCounter++}`
 
@@ -118,21 +116,38 @@ export async function insertPlaceholder(
     editor.execCommand(
       'mceInsertContent',
       false,
-      `
-          <div
+      `<span
             aria-label="${formatMessage('Loading')}"
-            data-placeholder-for="${placeholderInfo.dataPlaceholderFor}"
+            data-placeholder-for="${encodeURIComponent(unencodedName)}"
             id="${placeholderId}"
-            style="user-select: none; pointer-events: none; user-focus: none;"
-          >&nbsp;</div>
-        `
+            class="mceNonEditable"
+            style="user-select: none; pointer-events: none; user-focus: none; display: inline-flex;"
+          ></span>&nbsp;`
+      // Without the trailing &nbsp;, tinymce will place the cursor inside the placeholder, which we don't want.
     )
   )
 
   const placeholderElem = editor.dom.doc.querySelector(`#${placeholderId}`) as HTMLDivElement
-  if (!placeholderElem) {
+  if (placeholderElem) {
+    editor.undoManager.ignore(() => {
+      // Remove the trailing space
+      const nextNode = placeholderElem.nextSibling
+      placeholderElem.contentEditable = 'false'
+      if (isTextNode(nextNode) && nextNode?.data?.startsWith('\xA0' /* nbsp */)) {
+        // Split out the non-breaking-space which only counts as length 1 for splitText
+        nextNode.splitText(1)
+
+        // Remove the now split text node
+        if (placeholderElem.nextSibling) {
+          editor.dom.remove(placeholderElem.nextSibling)
+        }
+      }
+    })
+  } else {
     throw new Error('Failed to find placeholder element after inserting it into the editor.')
   }
+
+  const placeholderInfo = await placeholderInfoPromise
 
   // Fully initialize the placeholder. Done separately from inserting to avoid TinyMCE mangling the HTML
   editor.undoManager.ignore(() => {
@@ -167,6 +182,13 @@ export async function insertPlaceholder(
     Object.assign(labelElem.style, {
       color: '#2D3B45',
       zIndex: '1000',
+
+      /* Restrict text to one line */
+      display: 'inline-block',
+      maxWidth: 'calc(100% - 10px)',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
     } as CSSStyleDeclaration)
     labelElem.appendChild(editor.dom.doc.createTextNode(placeholderInfo.visibleLabel))
 
@@ -260,7 +282,6 @@ export interface PlaceHoldableThingInfo {
  * Style of placeholder to be inserted into the editor.
  */
 export type PlaceholderInfo = {
-  dataPlaceholderFor: string
   visibleLabel: string
   ariaLabel: string
 } & (
@@ -298,7 +319,7 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
   })()
 
   return `
-  <div class="Spinner-root Spinner-default Spinner-${size}" role="presentation">
+  <span class="Spinner-root Spinner-default Spinner-${size}" role="presentation">
 		<svg class="Spinner-circle"
 		     role="img"
 		     focusable="false"
@@ -365,7 +386,7 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
 				}
 				.Spinner-x-small .Spinner-circleSpin {
 					stroke-dasharray: 3em;
-					transform-origin: calc(var(--Spinner-xSmallSize) / 2) calc(var(--Spinner-xSmallSize) / 2);
+					transform-origin: 50% 50%;
 				}
 
 				.Spinner-small {
@@ -380,7 +401,7 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
 				.Spinner-small .Spinner-circleTrack,
 				.Spinner-small .Spinner-circleSpin {
 					stroke-dasharray: 6em;
-					transform-origin: calc(var(--Spinner-smallSize) / 2) calc(var(--Spinner-smallSize) / 2);
+					transform-origin: 50% 50%;
 				}
 
 				.Spinner-medium {
@@ -396,7 +417,7 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
 				}
 				.Spinner-medium .Spinner-circleSpin {
 					stroke-dasharray: 10.5em;
-					transform-origin: calc(var(--Spinner-mediumSize) / 2) calc(var(--Spinner-mediumSize) / 2);
+					transform-origin: 50% 50%;
 				}
 
 				.Spinner-large {
@@ -412,7 +433,7 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
 				}
 				.Spinner-large .Spinner-circleSpin {
 					stroke-dasharray: 14em;
-					transform-origin: calc(var(--Spinner-largeSize) / 2) calc(var(--Spinner-largeSize) / 2);
+					transform-origin: 50% 50%;
 				}
 
 				.Spinner-circle {
@@ -460,6 +481,6 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
 				<circle class="Spinner-circleSpin" cx="50%" cy="50%" r="${radius}"></circle>
 			</g>
 		</svg>
-  </div>
+  </span>
 `
 }
