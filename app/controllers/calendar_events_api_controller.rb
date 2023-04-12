@@ -1117,7 +1117,7 @@ class CalendarEventsApiController < ApplicationController
       get_all_pertinent_contexts
       GuardRail.activate(:secondary) do
         @contexts.each do |context|
-          @assignments = context.assignments.active.to_a if context.respond_to?("assignments")
+          @assignments = context.assignments.active.to_a if context.respond_to?(:assignments)
           # no overrides to apply without a current user
           @events.concat context.calendar_events.active.to_a
           @events.concat @assignments || []

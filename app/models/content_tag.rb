@@ -329,11 +329,11 @@ class ContentTag < ActiveRecord::Base
     return unless asset_context_matches?
 
     # Assignment proxies name= and name to title= and title, which breaks the asset_safe_title logic
-    if content.respond_to?("name=") && content.respond_to?("name") && !content.is_a?(Assignment)
+    if content.respond_to?(:name=) && content.respond_to?(:name) && !content.is_a?(Assignment)
       content.name = asset_safe_title("name")
-    elsif content.respond_to?("title=")
+    elsif content.respond_to?(:title=)
       content.title = asset_safe_title("title")
-    elsif content.respond_to?("display_name=")
+    elsif content.respond_to?(:display_name=)
       content.display_name = asset_safe_title("display_name")
     end
     if content.changed?

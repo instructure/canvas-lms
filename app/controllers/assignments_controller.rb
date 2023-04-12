@@ -38,7 +38,7 @@ class AssignmentsController < ApplicationController
   add_crumb(
     proc { t "#crumbs.assignments", "Assignments" },
     except: %i[destroy syllabus index new edit]
-  ) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
+  ) { |c| c.send :course_assignments_path, c.instance_variable_get(:@context) }
   before_action(except: [:new, :edit]) { |c| c.active_tab = "assignments" }
   before_action(only: [:new, :edit]) { |c| setup_active_tab(c) }
   before_action :normalize_title_param, only: [:new, :edit]

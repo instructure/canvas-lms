@@ -56,7 +56,7 @@ module SimplyVersioned
         # INSTRUCTURE: Added to allow model instances pulled out
         # of versions to still know their version number
         obj.simply_versioned_version_model = true
-        obj.send("force_version_number", number)
+        obj.send(:force_version_number, number)
         obj
       end
     end

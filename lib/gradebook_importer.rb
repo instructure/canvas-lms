@@ -380,7 +380,7 @@ class GradebookImporter
 
     update_column_count row
 
-    return false unless /Section/.match?(last_student_info_column(row))
+    return false unless last_student_info_column(row).include?("Section")
 
     true
   end

@@ -111,7 +111,7 @@ describe "threaded discussions" do
       )
       user_session(@student)
       Discussion.visit(@course, @topic)
-      student_enrollment.send("conclude")
+      student_enrollment.send(:conclude)
       Discussion.visit(@course, @topic)
       wait_for_ajaximations
 
@@ -131,7 +131,7 @@ describe "threaded discussions" do
       )
       user_session(@student)
       Discussion.visit(@course, @topic)
-      student_enrollment.send("conclude")
+      student_enrollment.send(:conclude)
       Discussion.visit(@course, @topic)
       wait_for_ajaximations
 
@@ -940,7 +940,7 @@ describe "threaded discussions" do
           user: @student,
           message: "new threaded reply from student"
         )
-        student_enrollment.send("conclude")
+        student_enrollment.send(:conclude)
         user_session(@student)
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       end

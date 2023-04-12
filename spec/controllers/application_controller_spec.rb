@@ -1904,7 +1904,7 @@ RSpec.describe ApplicationController do
 
   describe "#discard_flash_if_xhr" do
     subject(:discard) do
-      flash.instance_variable_get("@discard")
+      flash.instance_variable_get(:@discard)
     end
 
     before do

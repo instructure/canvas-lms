@@ -39,7 +39,7 @@ class GradebooksController < ApplicationController
 
   batch_jobs_in_actions only: :update_submission, batch: { priority: Delayed::LOW_PRIORITY }
 
-  add_crumb(proc { t "#crumbs.grades", "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
+  add_crumb(proc { t "#crumbs.grades", "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_grades_url }
   before_action { |c| c.active_tab = "grades" }
 
   MAX_POST_GRADES_TOOLS = 10

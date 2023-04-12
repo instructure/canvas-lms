@@ -2635,7 +2635,7 @@ describe ExternalToolsController do
   end
 
   def opaque_id(asset)
-    if asset.respond_to?("lti_context_id")
+    if asset.respond_to?(:lti_context_id)
       Lti::Asset.global_context_id_for(asset)
     else
       Lti::Asset.context_id_for(asset)

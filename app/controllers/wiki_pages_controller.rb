@@ -33,8 +33,8 @@ class WikiPagesController < ApplicationController
   include K5Mode
 
   add_crumb(proc { t "#crumbs.wiki_pages", "Pages" }) do |c|
-    context = c.instance_variable_get("@context")
-    current_user = c.instance_variable_get("@current_user")
+    context = c.instance_variable_get(:@context)
+    current_user = c.instance_variable_get(:@current_user)
     if context.grants_right?(current_user, :read)
       c.send :polymorphic_path, [context, :wiki_pages]
     end

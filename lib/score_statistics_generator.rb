@@ -156,7 +156,7 @@ class ScoreStatisticsGenerator
 
     # This is a safeguard to avoid blowing up due to database storage which is set to be a decimal with a precision of 8
     # and a scale of 2. And really, what are you even doing awarding 1,000,000% or over in a course?
-    return if average > 999_999.99.to_d || average < -999_999.99.to_d
+    return if average > BigDecimal("999_999.99") || average < BigDecimal("-999_999.99")
 
     connection = CourseScoreStatistic.connection
     now = connection.quote(Time.now.utc)

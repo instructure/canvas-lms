@@ -252,7 +252,7 @@ module Outcomes
 
     def lang
       # lang can be nil, so we check with instance_variable_defined? method
-      unless instance_variable_defined?("@lang")
+      unless instance_variable_defined?(:@lang)
         account = context&.root_account || LoadAccount.default_domain_root_account
         @lang = MAP_CANVAS_POSTGRES_LOCALES[account.default_locale || "en"]
       end

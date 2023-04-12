@@ -525,6 +525,6 @@ class ProfileController < ApplicationController
 end
 
 def instructure_misc_plugin_available?
-  Object.const_defined?("InstructureMiscPlugin")
+  Object.const_defined?(:InstructureMiscPlugin)
 end
 private :instructure_misc_plugin_available?

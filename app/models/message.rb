@@ -255,7 +255,7 @@ class Message < ActiveRecord::Base
       tap do
         @table = klass.arel_table_from_key_values(attrs)
         @predicate_builder = predicate_builder.dup
-        @predicate_builder.instance_variable_set("@table", ActiveRecord::TableMetadata.new(klass, @table))
+        @predicate_builder.instance_variable_set(:@table, ActiveRecord::TableMetadata.new(klass, @table))
       end
     end
   }

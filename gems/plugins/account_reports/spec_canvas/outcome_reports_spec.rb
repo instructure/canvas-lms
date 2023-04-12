@@ -79,7 +79,7 @@ describe "Outcome Reports" do
         learning_outcome_id: @outcome.id
       }
     ]
-    @rubric.instance_variable_set("@alignments_changed", true)
+    @rubric.instance_variable_set(:@alignments_changed, true)
     @rubric.save!
     @a = @rubric.associate_with(@assignment, @course1, purpose: "grading")
     @assignment.reload
