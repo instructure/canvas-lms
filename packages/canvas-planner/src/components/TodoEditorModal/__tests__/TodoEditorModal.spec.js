@@ -32,7 +32,7 @@ const defaultProps = (options = {}) => ({
   locale: 'en',
   timeZone: 'America/Denver',
   courses: [],
-  ...options
+  ...options,
 })
 
 const simpleTodoItem = (opts = {}) => ({
@@ -42,7 +42,7 @@ const simpleTodoItem = (opts = {}) => ({
   context: {id: null},
   time: '11:00',
   details: '',
-  ...opts
+  ...opts,
 })
 
 const successFn = jest.fn()
@@ -69,8 +69,8 @@ it('shows the editor modal when todoItem is set', () => {
 it('calls onClose when the x is clicked ', () => {
   const mockOnClose = jest.fn()
   const newProps = {...defaultProps({onClose: mockOnClose, todoItem: simpleTodoItem()})}
-  const {getByRole} = render(<TodoEditorModal {...newProps} />)
-  const closeButton = getByRole('button', {name: 'Close'})
+  const {getByTestId} = render(<TodoEditorModal {...newProps} />)
+  const closeButton = getByTestId('close-editor-modal').querySelector('button')
   fireEvent.click(closeButton)
 
   expect(mockOnClose).toHaveBeenCalled()
@@ -84,13 +84,13 @@ it('updates the planner item and then closes the editor when Save is clicked ', 
     ...defaultProps({
       onClose: mockOnClose,
       savePlannerItem: mockSave,
-      todoItem
-    })
+      todoItem,
+    }),
   }
-  const {getByRole} = render(<TodoEditorModal {...newProps} />)
-  const title = getByRole('textbox', {name: 'Title'})
-  const date = getByRole('textbox', {name: 'Date'})
-  const details = getByRole('textbox', {name: 'Details'})
+  const {getByTestId, getByLabelText} = render(<TodoEditorModal {...newProps} />)
+  const title = getByTestId('title')
+  const date = getByLabelText('Date')
+  const details = getByTestId('details')
 
   userEvent.clear(date)
   userEvent.type(date, 'May 30,2021')
@@ -98,14 +98,14 @@ it('updates the planner item and then closes the editor when Save is clicked ', 
   userEvent.type(title, 'Updated Todo')
   fireEvent.change(details, {target: {value: 'These are the todo details'}})
 
-  const saveButton = getByRole('button', {name: 'Save'})
+  const saveButton = getByTestId('save')
   fireEvent.click(saveButton)
 
   expect(mockSave).toHaveBeenCalledWith({
     ...todoItem,
     title: 'Updated Todo',
     date: moment('2021-05-30T06:00:00Z').toISOString(),
-    details: 'These are the todo details'
+    details: 'These are the todo details',
   })
 
   await waitFor(() => {
@@ -122,11 +122,11 @@ it('deletes the planner item and then closes the editor when Delete is clicked '
     ...defaultProps({
       onClose: mockOnClose,
       deletePlannerItem: mockDelete,
-      todoItem
-    })
+      todoItem,
+    }),
   }
-  const {getByRole} = render(<TodoEditorModal {...newProps} />)
-  const deleteButton = getByRole('button', {name: 'Delete'})
+  const {getByTestId} = render(<TodoEditorModal {...newProps} />)
+  const deleteButton = getByTestId('delete')
   fireEvent.click(deleteButton)
 
   expect(confirmSpy).toHaveBeenCalled()
@@ -142,11 +142,11 @@ it('shows an error if To-do update fails', async () => {
   const newProps = {
     ...defaultProps({
       savePlannerItem: mockSave,
-      todoItem
-    })
+      todoItem,
+    }),
   }
-  const {getByRole} = render(<TodoEditorModal {...newProps} />)
-  const saveButton = getByRole('button', {name: 'Save'})
+  const {getByTestId} = render(<TodoEditorModal {...newProps} />)
+  const saveButton = getByTestId('save')
   fireEvent.click(saveButton)
 
   await waitFor(() => expect(errorFn).toHaveBeenCalledWith('Failed saving changes on todo.'))
@@ -159,11 +159,11 @@ it('shows an error if To-do deletion fails', async () => {
   const newProps = {
     ...defaultProps({
       deletePlannerItem: mockDelete,
-      todoItem
-    })
+      todoItem,
+    }),
   }
-  const {getByRole} = render(<TodoEditorModal {...newProps} />)
-  const deleteButton = getByRole('button', {name: 'Delete'})
+  const {getByTestId} = render(<TodoEditorModal {...newProps} />)
+  const deleteButton = getByTestId('delete')
   fireEvent.click(deleteButton)
 
   await waitFor(() => expect(errorFn).toHaveBeenCalledWith('Failed to delete todo.'))
