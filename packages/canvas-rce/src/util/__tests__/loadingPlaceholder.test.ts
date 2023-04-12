@@ -51,7 +51,6 @@ describe('placeholderInfoFor', () => {
       ariaLabel: 'Loading placeholder for square.png',
       visibleLabel: 'square.png',
       backgroundImageUrl: squareImageDataUri,
-      dataPlaceholderFor: 'square.png',
       width: '1234px',
       height: '5678px',
       vAlign: 'middle',
@@ -76,7 +75,6 @@ describe('placeholderInfoFor', () => {
       ariaLabel: 'Loading placeholder for square.png',
       visibleLabel: 'square.png',
       backgroundImageUrl: 'http://example.com/whatever',
-      dataPlaceholderFor: 'square.png',
       width: '1234px',
       height: '5678px',
       vAlign: 'middle',
@@ -101,7 +99,6 @@ describe('placeholderInfoFor', () => {
       ariaLabel: 'Loading placeholder for square.png',
       visibleLabel: 'square.png',
       backgroundImageUrl: 'http://example.com/whatever',
-      dataPlaceholderFor: 'square.png',
       width: '1234px',
       height: '5678px',
       vAlign: 'middle',
@@ -124,7 +121,6 @@ describe('placeholderInfoFor', () => {
       type: 'inline',
       ariaLabel: 'Loading placeholder for square.png',
       visibleLabel: 'square.png',
-      dataPlaceholderFor: 'square.png',
     })
   })
 
@@ -141,7 +137,6 @@ describe('placeholderInfoFor', () => {
       type: 'block',
       ariaLabel: 'Loading placeholder for video.mp4',
       visibleLabel: 'video.mp4',
-      dataPlaceholderFor: 'video.mp4',
       width: VIDEO_SIZE_DEFAULT.width,
       height: VIDEO_SIZE_DEFAULT.height,
       vAlign: 'bottom',
@@ -161,7 +156,6 @@ describe('placeholderInfoFor', () => {
       type: 'block',
       visibleLabel: 'audio.mp3',
       ariaLabel: 'Loading placeholder for audio.mp3',
-      dataPlaceholderFor: 'audio.mp3',
       width: AUDIO_PLAYER_SIZE.width,
       height: AUDIO_PLAYER_SIZE.height,
       vAlign: 'bottom',
@@ -181,24 +175,6 @@ describe('placeholderInfoFor', () => {
       type: 'inline',
       visibleLabel: 'file.txt',
       ariaLabel: 'Loading placeholder for file.txt',
-      dataPlaceholderFor: 'file.txt',
-    })
-  })
-
-  // -------------------------------------------------------------------------------------------------------------------
-
-  it('should url escape names for dataPlaceholderFor to avoid double-quoting', async () => {
-    expect(
-      await placeholderInfoFor({
-        name: 'filename "with quotes".txt',
-        domObject: {},
-        contentType: 'text/plain',
-      })
-    ).toEqual({
-      type: 'inline',
-      visibleLabel: 'filename "with quotes".txt',
-      ariaLabel: 'Loading placeholder for filename "with quotes".txt',
-      dataPlaceholderFor: 'filename%20%22with%20quotes%22.txt',
     })
   })
 })
@@ -210,12 +186,15 @@ describe('insertPlaceholder', () => {
   // -------------------------------------------------------------------------------------------------------------------
 
   it('should insert inline placeholders', async () => {
-    await insertPlaceholder(editor, {
-      type: 'inline',
-      visibleLabel: 'test-file.txt',
-      ariaLabel: 'Loading placeholder for test-file.txt',
-      dataPlaceholderFor: 'test-file.txt',
-    })
+    await insertPlaceholder(
+      editor,
+      'test-file.txt',
+      Promise.resolve({
+        type: 'inline',
+        visibleLabel: 'test-file.txt',
+        ariaLabel: 'Loading placeholder for test-file.txt',
+      })
+    )
 
     const placeholderElem = editor.dom.doc.querySelector(
       '*[data-placeholder-for=test-file\\.txt]'
@@ -227,15 +206,18 @@ describe('insertPlaceholder', () => {
   // -------------------------------------------------------------------------------------------------------------------
 
   it('should insert block placeholders', async () => {
-    await insertPlaceholder(editor, {
-      type: 'block',
-      visibleLabel: 'test-file.png',
-      ariaLabel: 'Loading placeholder for test-file.png',
-      dataPlaceholderFor: 'test-file.png',
-      width: '123px',
-      height: '456px',
-      vAlign: 'middle',
-    })
+    await insertPlaceholder(
+      editor,
+      'test-file.png',
+      Promise.resolve({
+        type: 'block',
+        visibleLabel: 'test-file.png',
+        ariaLabel: 'Loading placeholder for test-file.png',
+        width: '123px',
+        height: '456px',
+        vAlign: 'middle',
+      })
+    )
 
     const placeholderElem = editor.dom.doc.querySelector(
       '*[data-placeholder-for=test-file\\.png]'
@@ -257,7 +239,7 @@ describe('removePlaceholder', () => {
   // -------------------------------------------------------------------------------------------------------------------
 
   it('should remove placeholders', async () => {
-    const info = await placeholderInfoFor({
+    const info = placeholderInfoFor({
       name: 'test.txt',
       domObject: {
         preview: squareImageDataUri,
@@ -265,17 +247,17 @@ describe('removePlaceholder', () => {
       contentType: 'plain/text',
     })
 
-    await insertPlaceholder(editor, info)
+    await insertPlaceholder(editor, 'test.txt', info)
 
     expect(editor.dom.doc.querySelector('*[data-placeholder-for=test\\.txt]')).not.toBeNull()
 
-    removePlaceholder(editor, info.dataPlaceholderFor)
+    removePlaceholder(editor, 'test.txt')
 
     expect(editor.dom.doc.querySelector('*[data-placeholder-for=square\\.png]')).toBeNull()
   })
 
   it('should revoke data uris', async () => {
-    const info = await placeholderInfoFor({
+    const info = placeholderInfoFor({
       name: 'square.png',
       domObject: {
         preview: squareImageDataUri,
@@ -283,11 +265,11 @@ describe('removePlaceholder', () => {
       contentType: 'image/png',
     })
 
-    await insertPlaceholder(editor, info)
+    await insertPlaceholder(editor, 'square.png', info)
 
     expect(editor.dom.doc.querySelector('*[data-placeholder-for=square\\.png]')).not.toBeNull()
 
-    removePlaceholder(editor, info.dataPlaceholderFor)
+    removePlaceholder(editor, 'square.png')
 
     expect(editor.dom.doc.querySelector('*[data-placeholder-for=square\\.png]')).toBeNull()
 
