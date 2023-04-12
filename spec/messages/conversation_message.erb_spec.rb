@@ -55,13 +55,13 @@ message")
     it "renders correct footer if replys are enabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
       msg = generate_message(:conversation_created, :email, @message)
-      expect(msg.body.include?("replying directly to this email")).to eq true
+      expect(msg.body.include?("replying directly to this email")).to be true
     end
 
     it "renders correct footer if replys are disabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = false
       msg = generate_message(:conversation_created, :email, @message)
-      expect(msg.body.include?("replying directly to this email")).to eq false
+      expect(msg.body.include?("replying directly to this email")).to be false
     end
   end
 end

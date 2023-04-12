@@ -27,7 +27,7 @@ describe ObserverPairingCode do
 
   it "can pass validations" do
     code = ObserverPairingCode.create(user: @student, expires_at: 1.day.from_now, code: SecureRandom.hex(3))
-    expect(code.valid?).to eq true
+    expect(code.valid?).to be true
   end
 
   it "can be generated from a user" do

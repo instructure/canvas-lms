@@ -102,7 +102,7 @@ describe "profile communication settings" do
       wait_for_ajaximations
       # test data stored
       @user.reload
-      expect(@user.preferences[:send_scores_in_emails]).to eq true
+      expect(@user.preferences[:send_scores_in_emails]).to be true
     end
 
     it "only displays immediately and off for sns channels" do

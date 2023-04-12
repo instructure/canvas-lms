@@ -127,8 +127,8 @@ describe Account do
       end
 
       it "returns a OutcomeProficiency default at the root level if no proficiency exists" do
-        expect(@root_account.outcome_proficiency).to eq nil
-        expect(@subaccount.outcome_proficiency).to eq nil
+        expect(@root_account.outcome_proficiency).to be_nil
+        expect(@subaccount.outcome_proficiency).to be_nil
         expect(@subaccount.resolved_outcome_proficiency).to eq OutcomeProficiency.find_or_create_default!(@root_account)
         expect(@root_account.resolved_outcome_proficiency).to eq OutcomeProficiency.find_or_create_default!(@root_account)
       end
@@ -137,8 +137,8 @@ describe Account do
     context "with the account_level_mastery_scales FF disabled" do
       it "can be nil" do
         @root_account.disable_feature!(:account_level_mastery_scales)
-        expect(@root_account.resolved_outcome_proficiency).to eq nil
-        expect(@subaccount.resolved_outcome_proficiency).to eq nil
+        expect(@root_account.resolved_outcome_proficiency).to be_nil
+        expect(@subaccount.resolved_outcome_proficiency).to be_nil
       end
     end
   end
@@ -152,7 +152,7 @@ describe Account do
     it "retrieves parent account's outcome calculation method" do
       method = OutcomeCalculationMethod.create! context: @root_account, calculation_method: :highest
       expect(@root_account.outcome_calculation_method).to eq method
-      expect(@subaccount.outcome_calculation_method).to eq nil
+      expect(@subaccount.outcome_calculation_method).to be_nil
       expect(@root_account.resolved_outcome_calculation_method).to eq method
       expect(@subaccount.resolved_outcome_calculation_method).to eq method
     end
@@ -223,8 +223,8 @@ describe Account do
       end
 
       it "returns a OutcomeCalculationMethod default if no method exists" do
-        expect(@root_account.outcome_calculation_method).to eq nil
-        expect(@subaccount.outcome_calculation_method).to eq nil
+        expect(@root_account.outcome_calculation_method).to be_nil
+        expect(@subaccount.outcome_calculation_method).to be_nil
         expect(@root_account.resolved_outcome_calculation_method).to eq OutcomeCalculationMethod.find_or_create_default!(@root_account)
         expect(@subaccount.resolved_outcome_calculation_method).to eq OutcomeCalculationMethod.find_or_create_default!(@root_account)
       end
@@ -233,8 +233,8 @@ describe Account do
     context "with the account_level_mastery_scales FF disabled" do
       it "can be nil" do
         @root_account.disable_feature!(:account_level_mastery_scales)
-        expect(@root_account.resolved_outcome_calculation_method).to eq nil
-        expect(@subaccount.resolved_outcome_calculation_method).to eq nil
+        expect(@root_account.resolved_outcome_calculation_method).to be_nil
+        expect(@subaccount.resolved_outcome_calculation_method).to be_nil
       end
     end
   end
@@ -580,13 +580,13 @@ describe Account do
     it "filters non-hash hash settings" do
       a = Account.new
       a.settings = { "sis_default_grade_export" => "string" }.with_indifferent_access
-      expect(a.settings[:error_reporting]).to eql(nil)
+      expect(a.settings[:error_reporting]).to be_nil
 
       a.settings = { "sis_default_grade_export" => {
         "value" => true
       } }.with_indifferent_access
       expect(a.settings[:sis_default_grade_export]).to be_is_a(Hash)
-      expect(a.settings[:sis_default_grade_export][:value]).to eql true
+      expect(a.settings[:sis_default_grade_export][:value]).to be true
     end
   end
 
@@ -851,7 +851,7 @@ describe Account do
       @enrollment.accept!
 
       @shard1.activate do
-        expect(@course.grants_right?(@user, :read_sis)).to eq true
+        expect(@course.grants_right?(@user, :read_sis)).to be true
       end
     end
 
@@ -906,8 +906,8 @@ describe Account do
     manual = a.manually_created_courses_account
     user_factory
 
-    expect(a.grants_right?(@user, :create_courses)).to eq false
-    expect(manual.grants_right?(@user, :create_courses)).to eq false
+    expect(a.grants_right?(@user, :create_courses)).to be false
+    expect(manual.grants_right?(@user, :create_courses)).to be false
   end
 
   it "does not allow create courses for student view students" do
@@ -919,8 +919,8 @@ describe Account do
     course = manual.courses.create!
     user = course.student_view_student
 
-    expect(a.grants_right?(user, :create_courses)).to eq false
-    expect(manual.grants_right?(user, :create_courses)).to eq false
+    expect(a.grants_right?(user, :create_courses)).to be false
+    expect(manual.grants_right?(user, :create_courses)).to be false
   end
 
   it "does not allow create courses for student view students (granular permissions)" do
@@ -933,8 +933,8 @@ describe Account do
     course = manual.courses.create!
     user = course.student_view_student
 
-    expect(a.grants_right?(user, :create_courses)).to eq false
-    expect(manual.grants_right?(user, :create_courses)).to eq false
+    expect(a.grants_right?(user, :create_courses)).to be false
+    expect(manual.grants_right?(user, :create_courses)).to be false
   end
 
   it "returns sub-accounts as options correctly" do
@@ -1114,7 +1114,7 @@ describe Account do
       tool = @account.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
       tool.user_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
-      expect(tool.has_placement?(:account_navigation)).to eq false
+      expect(tool.has_placement?(:account_navigation)).to be false
       tabs = @account.tabs_available(nil)
       expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
     end
@@ -1136,7 +1136,7 @@ describe Account do
       tool1, tool2 = tools
       tool2.destroy
 
-      tools.each { |t| expect(t.has_placement?(:account_navigation)).to eq true }
+      tools.each { |t| expect(t.has_placement?(:account_navigation)).to be true }
 
       tabs = @account.tabs_available
       tab_ids = tabs.pluck(:id)
@@ -1152,7 +1152,7 @@ describe Account do
       tool = @account.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
       tool.account_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
-      expect(tool.has_placement?(:account_navigation)).to eq true
+      expect(tool.has_placement?(:account_navigation)).to be true
       tabs = @account.tabs_available(nil)
       expect(tabs.pluck(:id)).to be_include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
@@ -1166,7 +1166,7 @@ describe Account do
       tool = @account.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
       tool.account_navigation = { url: "http://www.example.com", text: "Example URL", visibility: "admins" }
       tool.save!
-      expect(tool.has_placement?(:account_navigation)).to eq true
+      expect(tool.has_placement?(:account_navigation)).to be true
       tabs = @account.tabs_available(@teacher)
       expect(tabs.pluck(:id)).to_not be_include(tool.asset_string)
 
@@ -1443,12 +1443,12 @@ describe Account do
 
     it "is false for LDAP" do
       account.authentication_providers.create!(auth_type: "ldap")
-      expect(account.delegated_authentication?).to eq false
+      expect(account.delegated_authentication?).to be false
     end
 
     it "is true for CAS" do
       account.authentication_providers.create!(auth_type: "cas")
-      expect(account.delegated_authentication?).to eq true
+      expect(account.delegated_authentication?).to be true
     end
   end
 
@@ -1740,9 +1740,9 @@ describe Account do
 
   it "sets allow_sis_import if root_account" do
     account = Account.create!
-    expect(account.allow_sis_import).to eq true
+    expect(account.allow_sis_import).to be true
     sub = account.sub_accounts.create!
-    expect(sub.allow_sis_import).to eq false
+    expect(sub.allow_sis_import).to be false
   end
 
   describe "#ensure_defaults" do
@@ -2016,28 +2016,28 @@ describe Account do
   context "require terms of use" do
     describe "#terms_required?" do
       it "returns true by default" do
-        expect(account_model.terms_required?).to eq true
+        expect(account_model.terms_required?).to be true
       end
 
       it "returns false by default for new accounts" do
         TermsOfService.skip_automatic_terms_creation = false
-        expect(account_model.terms_required?).to eq false
+        expect(account_model.terms_required?).to be false
       end
 
       it "returns false if Setting is false" do
         Setting.set(:terms_required, "false")
-        expect(account_model.terms_required?).to eq false
+        expect(account_model.terms_required?).to be false
       end
 
       it "returns false if account setting is false" do
         account = account_model(settings: { account_terms_required: false })
-        expect(account.terms_required?).to eq false
+        expect(account.terms_required?).to be false
       end
 
       it "consults root account setting" do
         parent_account = account_model(settings: { account_terms_required: false })
         child_account = Account.create!(parent_account: parent_account)
-        expect(child_account.terms_required?).to eq false
+        expect(child_account.terms_required?).to be false
       end
     end
   end
@@ -2072,7 +2072,7 @@ describe Account do
           @shard1.activate do
             a = Account.create!
             Account.find_cached(a.id) # set the cache
-            expect(Account.invalidate_cache(a.id)).to eq true
+            expect(Account.invalidate_cache(a.id)).to be true
           end
         end
       end
@@ -2117,7 +2117,7 @@ describe Account do
     non_cached.settings[:blah] = true
     non_cached.save!
 
-    expect(Account.default.settings[:blah]).to eq true
+    expect(Account.default.settings[:blah]).to be true
   end
 
   it_behaves_like "a learning outcome context"

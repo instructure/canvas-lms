@@ -84,7 +84,7 @@ if Qti.migration_executable
         expect(hash[:answers][1][:text]).to eq "Google Picasa"
         expect(hash[:answers][2][:html]).to eq "Facebook"
         expect(hash[:answers][2][:text]).to eq "Facebook alert(0xFACE)" # no script tags
-        expect(hash[:answers][3][:html]).to eq nil
+        expect(hash[:answers][3][:html]).to be_nil
         expect(hash[:answers][3][:text]).to eq "Twitter" # we've stripped off extraneous whitespace
       end
 

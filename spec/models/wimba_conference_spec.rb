@@ -91,20 +91,20 @@ describe WimbaConference do
     conference.initiate_conference
     expect(conference.admin_join_url(@user)).not_to be_nil
 
-    expect(conference.conference_status).to eql(:active)
+    expect(conference.conference_status).to be(:active)
     expect(conference.participant_join_url(@user)).not_to be_nil
   end
 
   it "is closed if it has not been initiated" do
     conference = WimbaConference.create!(title: "my conference", user: @user, context: course_factory)
-    expect(conference.conference_status).to eql(:closed)
+    expect(conference.conference_status).to be(:closed)
     expect(conference.participant_join_url(@user)).to be_nil
   end
 
   it "is closed if no admins have joined" do
     conference = WimbaConference.create!(title: "my conference", user: @user, context: course_factory)
     conference.initiate_conference
-    expect(conference.conference_status).to eql(:closed)
+    expect(conference.conference_status).to be(:closed)
     expect(conference.participant_join_url(@user)).to be_nil
   end
 

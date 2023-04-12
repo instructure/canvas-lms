@@ -52,8 +52,8 @@ describe Api::V1::Collaboration do
     expect(json["description"]).to eq @collaboration.description
     expect(json["type"]).to eq @collaboration.type
 
-    expect(json["data"]).to eq nil
-    expect(json["deleted_at"]).to eq nil
+    expect(json["data"]).to be_nil
+    expect(json["deleted_at"]).to be_nil
   end
 
   it "includes the owning users name" do

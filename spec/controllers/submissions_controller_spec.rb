@@ -266,7 +266,7 @@ describe SubmissionsController do
       expect(assigns[:submission].assignment_id).to eql(@assignment.id)
       expect(assigns[:submission].submission_type).to eql("online_upload")
       expect(assigns[:submission].attachments).not_to be_empty
-      expect(assigns[:submission].attachments.length).to eql(2)
+      expect(assigns[:submission].attachments.length).to be(2)
       expect(assigns[:submission].attachments.map(&:display_name)).to be_include("doc.doc")
       expect(assigns[:submission].attachments.map(&:display_name)).to be_include("txt.txt")
     end
@@ -543,7 +543,7 @@ describe SubmissionsController do
 
         subs = @assignment.submissions
         expect(subs.size).to eq 2
-        expect(subs.to_a.sum { |s| s.submission_comments.size }).to eql 1
+        expect(subs.to_a.sum { |s| s.submission_comments.size }).to be 1
       end
 
       it "does not send a comment to the entire group when false" do
@@ -561,7 +561,7 @@ describe SubmissionsController do
 
         subs = @assignment.submissions
         expect(subs.size).to eq 2
-        expect(subs.to_a.sum { |s| s.submission_comments.size }).to eql 1
+        expect(subs.to_a.sum { |s| s.submission_comments.size }).to be 1
       end
 
       it "sends a comment to the entire group if requested" do
@@ -579,7 +579,7 @@ describe SubmissionsController do
 
         subs = @assignment.submissions
         expect(subs.size).to eq 2
-        expect(subs.to_a.sum { |s| s.submission_comments.size }).to eql 2
+        expect(subs.to_a.sum { |s| s.submission_comments.size }).to be 2
       end
 
       it "succeeds when commenting to the group from a student using PUT" do
@@ -916,10 +916,10 @@ describe SubmissionsController do
       request.accept = Mime[:json].to_s
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, id: @student.id }, format: :json
       expect(body["id"]).to eq @submission.id
-      expect(body["score"]).to be nil
-      expect(body["grade"]).to be nil
-      expect(body["published_grade"]).to be nil
-      expect(body["published_score"]).to be nil
+      expect(body["score"]).to be_nil
+      expect(body["grade"]).to be_nil
+      expect(body["published_grade"]).to be_nil
+      expect(body["published_score"]).to be_nil
     end
 
     it "renders json without scores for students with an unposted submission for a quiz" do
@@ -936,7 +936,7 @@ describe SubmissionsController do
       request.accept = Mime[:json].to_s
       get :show, params: { course_id: @context.id, assignment_id: quiz.assignment.id, id: @student.id }, format: :json
       expect(body["id"]).to eq quiz_submission.submission.id
-      expect(body["body"]).to be nil
+      expect(body["body"]).to be_nil
     end
 
     it "renders the page for submitting student who can access the course" do
@@ -1163,7 +1163,7 @@ describe SubmissionsController do
         unauthorized_user = User.create
         user_session(unauthorized_user)
         get "originality_report", params: { course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id, asset_string: attachment.asset_string }
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
 
       it "shows an error if no URL is present for the OriginalityReport" do

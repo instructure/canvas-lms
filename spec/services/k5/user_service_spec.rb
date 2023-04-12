@@ -65,8 +65,8 @@ describe K5::UserService do
       RequestCache.enable do
         service = K5::UserService.new(@student1, @root_account, nil)
         expect(service).to receive(:k5_disabled?).once
-        expect(service.send(:k5_user?)).to eq true
-        expect(service.send(:k5_user?)).to eq true
+        expect(service.send(:k5_user?)).to be true
+        expect(service.send(:k5_user?)).to be true
       end
     end
 
@@ -80,13 +80,13 @@ describe K5::UserService do
       course_factory(account: sub)
       student_in_course(active_all: true)
       service = K5::UserService.new(@student, @root_account, nil)
-      expect(service.send(:k5_user?)).to eq true
+      expect(service.send(:k5_user?)).to be true
     end
 
     it "returns false if all k5 enrollments are concluded" do
       @student1.enrollments.where(course_id: @course.id).take.complete
       service = K5::UserService.new(@student1, @root_account, nil)
-      expect(service.send(:k5_user?)).to eq false
+      expect(service.send(:k5_user?)).to be false
     end
 
     it "returns false if not associated with a k5 account" do
@@ -105,7 +105,7 @@ describe K5::UserService do
     it "returns true for an admin without enrollments" do
       account_admin_user(account: @k5_account)
       service = K5::UserService.new(@admin, @root_account, nil)
-      expect(service.send(:k5_user?)).to eq true
+      expect(service.send(:k5_user?)).to be true
     end
 
     it "ignores the disabled preference if check_disabled = false" do
@@ -235,7 +235,7 @@ describe K5::UserService do
           @course2 = course_factory(account: subaccount)
           @course2.enroll_student(@student1)
           service = K5::UserService.new(@student1, @root_account, nil)
-          expect(service.send(:k5_user?)).to eq true
+          expect(service.send(:k5_user?)).to be true
         end
       end
 
@@ -244,7 +244,7 @@ describe K5::UserService do
         @shard2.activate do
           account_admin_user(user: admin, account: @k5_account)
           service = K5::UserService.new(admin, @root_account, nil)
-          expect(service.send(:k5_user?)).to eq true
+          expect(service.send(:k5_user?)).to be true
         end
       end
 
@@ -286,38 +286,38 @@ describe K5::UserService do
       toggle_classic_font_setting(@root_account)
       Account.site_admin.disable_feature! :k5_font_selection
       service = K5::UserService.new(@student1, @root_account, nil)
-      expect(service.send(:use_classic_font?)).to eq false
+      expect(service.send(:use_classic_font?)).to be false
     end
 
     it "returns false if no user is provided" do
       toggle_k5_setting(@root_account)
       toggle_classic_font_setting(@root_account)
       service = K5::UserService.new(nil, @root_account, nil)
-      expect(service.send(:use_classic_font?)).to eq false
+      expect(service.send(:use_classic_font?)).to be false
     end
 
     it "returns false if the user is not associated with a classic font k5 account" do
       service = K5::UserService.new(@student1, @root_account, nil)
-      expect(service.send(:use_classic_font?)).to eq false
+      expect(service.send(:use_classic_font?)).to be false
     end
 
     it "returns true if the user is enrolled in a course in a classic font account" do
       toggle_classic_font_setting(@k5_account)
       service = K5::UserService.new(@student1, @root_account, nil)
-      expect(service.send(:use_classic_font?)).to eq true
+      expect(service.send(:use_classic_font?)).to be true
     end
 
     it "returns true if the user is enrolled in a course that's in a subaccount of a classic font account" do
       toggle_k5_setting(@root_account)
       toggle_classic_font_setting(@root_account)
       service = K5::UserService.new(@student1, @root_account, nil)
-      expect(service.send(:use_classic_font?)).to eq true
+      expect(service.send(:use_classic_font?)).to be true
     end
 
     it "returns false if an account is marked as a classic font account but its not a k5 account" do
       toggle_classic_font_setting(@root_account)
       service = K5::UserService.new(@student1, @root_account, nil)
-      expect(service.send(:use_classic_font?)).to eq false
+      expect(service.send(:use_classic_font?)).to be false
     end
 
     describe "as an observer" do

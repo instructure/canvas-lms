@@ -235,7 +235,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
     end
 
     it "returns nil if no target_group_id provided" do
-      expect(subject.not_imported_outcomes(g2.id)).to eq nil
+      expect(subject.not_imported_outcomes(g2.id)).to be_nil
     end
   end
 

@@ -126,7 +126,7 @@ describe Types::AssignmentType do
 
     it "is not returned if the association is soft-deleted" do
       @rubric_association.destroy!
-      expect(assignment_type.resolve("rubricAssociation { _id }")).to eq nil
+      expect(assignment_type.resolve("rubricAssociation { _id }")).to be_nil
     end
   end
 
@@ -231,14 +231,14 @@ describe Types::AssignmentType do
   end
 
   it "returns nil when allowed_attempts is unset" do
-    expect(assignment_type.resolve("allowedAttempts")).to eq nil
+    expect(assignment_type.resolve("allowedAttempts")).to be_nil
   end
 
   it "returns nil when allowed_attempts is an invalid non-positive value" do
     assignment.update allowed_attempts: 0
-    expect(assignment_type.resolve("allowedAttempts")).to eq nil
+    expect(assignment_type.resolve("allowedAttempts")).to be_nil
     assignment.update allowed_attempts: -1
-    expect(assignment_type.resolve("allowedAttempts")).to eq nil
+    expect(assignment_type.resolve("allowedAttempts")).to be_nil
   end
 
   it "returns allowed_attempts value set on the assignment" do
@@ -615,18 +615,18 @@ describe Types::AssignmentType do
     it "works when lock_info is false" do
       expect(
         assignment_type.resolve("lockInfo { isLocked }")
-      ).to eq false
+      ).to be false
 
       %i[lockAt unlockAt canView].each do |field|
         expect(
           assignment_type.resolve("lockInfo { #{field} }")
-        ).to eq nil
+        ).to be_nil
       end
     end
 
     it "works when lock_info is a hash" do
       assignment.update! unlock_at: 1.month.from_now
-      expect(assignment_type.resolve("lockInfo { isLocked }")).to eq true
+      expect(assignment_type.resolve("lockInfo { isLocked }")).to be true
     end
   end
 
@@ -650,7 +650,7 @@ describe Types::AssignmentType do
 
       it "returns null in place of the PostPolicy" do
         resolver = GraphQLTypeTester.new(assignment, context)
-        expect(resolver.resolve("postPolicy {_id}")).to be nil
+        expect(resolver.resolve("postPolicy {_id}")).to be_nil
       end
     end
   end
@@ -659,7 +659,7 @@ describe Types::AssignmentType do
     it "returns false when restrictQuantitativeData is off" do
       expect(
         assignment_type.resolve("restrictQuantitativeData")
-      ).to eq false
+      ).to be false
     end
 
     context "when RQD is enabled" do
@@ -679,7 +679,7 @@ describe Types::AssignmentType do
       it "returns false when restrictQuantitativeData is off" do
         expect(
           assignment_type.resolve("restrictQuantitativeData")
-        ).to eq true
+        ).to be true
       end
     end
   end

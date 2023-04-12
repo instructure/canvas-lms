@@ -19,7 +19,7 @@
 
 require_relative "../lti_1_3_spec_helper"
 
-RSpec.describe DeveloperKeyAccountBinding, type: :model do
+RSpec.describe DeveloperKeyAccountBinding do
   include_context "lti_1_3_spec_helper"
 
   let(:account) { account_model }
@@ -54,17 +54,17 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
     describe "workflow state" do
       it 'allows "off"' do
         dev_key_binding.workflow_state = "off"
-        expect(dev_key_binding.valid?).to eq true
+        expect(dev_key_binding.valid?).to be true
       end
 
       it 'allows "allow"' do
         dev_key_binding.workflow_state = "allow"
-        expect(dev_key_binding.valid?).to eq true
+        expect(dev_key_binding.valid?).to be true
       end
 
       it 'allows "on"' do
         dev_key_binding.workflow_state = "on"
-        expect(dev_key_binding.valid?).to eq true
+        expect(dev_key_binding.valid?).to be true
       end
 
       it "does not allow invalid workflow states" do
@@ -195,7 +195,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
     end
 
     it "returns nil if the devleoper key is a non-site admin key" do
-      expect(DeveloperKeyAccountBinding.find_site_admin_cached(root_account_key)).to eq nil
+      expect(DeveloperKeyAccountBinding.find_site_admin_cached(root_account_key)).to be_nil
     end
   end
 

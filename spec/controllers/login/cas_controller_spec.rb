@@ -55,7 +55,7 @@ describe Login::CasController do
     session[:login_aac] = Account.default.authentication_providers.first.id
 
     post :destroy, params: { logoutRequest: request_text }
-    expect(response.status).to eq 200
+    expect(response).to have_http_status :ok
   end
 
   it "doesn't allow deleted users to login" do
@@ -240,7 +240,7 @@ describe Login::CasController do
     expect(response).to redirect_to(login_url)
     expect(flash[:delegated_message]).to_not be_blank
     expect(Time.now.utc - start).to be < 1
-    expect(session[:sentinel]).to eq true
+    expect(session[:sentinel]).to be true
   end
 
   it "sets a cookie for site admin login" do

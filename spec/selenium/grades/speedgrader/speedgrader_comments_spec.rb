@@ -52,7 +52,7 @@ describe.skip "speed grader EVAL-2664" do
         driver.navigate.refresh
         alert_shown = alert_present?
         dismiss_alert
-        expect(alert_shown).to eq(true)
+        expect(alert_shown).to be(true)
       end
     end
 

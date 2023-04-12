@@ -20,7 +20,7 @@
 
 require_relative "../spec_helper"
 
-describe GradebookFilter, type: :model do
+describe GradebookFilter do
   describe "associations" do
     it { is_expected.to belong_to(:user).required }
     it { is_expected.to belong_to(:course).required }

@@ -78,12 +78,12 @@ describe UnzipAttachment do
         @course.reload
 
         attachment_group_1 = @course.attachments.where(display_name: "first_entry.txt").to_a
-        expect(attachment_group_1.size).to eql(2)
+        expect(attachment_group_1.size).to be(2)
         expect(first_attachment.reload.file_state).to eq "deleted"
-        expect(attachment_group_1.any? { |a| a.file_state == "available" }).to eql(true)
+        expect(attachment_group_1.any? { |a| a.file_state == "available" }).to be(true)
 
         attachment_group_2 = @course.attachments.where(display_name: "second_entry.txt").to_a
-        expect(attachment_group_2.size).to eql(1)
+        expect(attachment_group_2.size).to be(1)
         expect(attachment_group_2.first.file_state).to eq "available"
       end
 
@@ -178,19 +178,19 @@ describe UnzipAttachment do
         expect { unzipper.process }.to raise_error(Attachment::OverQuotaError)
         # a and b should have been attached
         # but we should have bailed once c ate the remaining quota
-        expect(@course.attachments.count).to eql 2
+        expect(@course.attachments.count).to be 2
       end
 
       it "doesn't interfere when the quota is 0 (unlimited)" do
         allow(Attachment).to receive(:get_quota).and_return({ quota: 0, quota_used: 0 })
         expect { unzipper.process }.not_to raise_error
-        expect(@course.attachments.count).to eql 4
+        expect(@course.attachments.count).to be 4
       end
 
       it "lets incorrect central directory size slide if the quota isn't exceeded" do
         allow(Attachment).to receive(:get_quota).and_return({ quota: 15_000, quota_used: 0 })
         expect { unzipper.process }.not_to raise_error
-        expect(@course.attachments.count).to eql 4
+        expect(@course.attachments.count).to be 4
       end
     end
   end

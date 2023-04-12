@@ -534,7 +534,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
     stats = q.statistics
 
-    expect(stats[:questions].first.last[:user_ids].first).to eq nil
+    expect(stats[:questions].first.last[:user_ids].first).to be_nil
   end
 
   it "does not count student view submissions" do

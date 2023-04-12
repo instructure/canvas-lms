@@ -344,14 +344,14 @@ describe Api::V1::Course do
       let(:json) { @test_api.course_json(@course1, @me, {}, [], []) }
 
       it "returns blueprint status" do
-        expect(json["blueprint"]).to eq false
+        expect(json["blueprint"]).to be false
       end
 
       it "returns blueprint restrictions" do
         template = MasterCourses::MasterTemplate.set_as_master_course(@course1)
         template.update_attribute(:default_restrictions, { content: true })
-        expect(json["blueprint"]).to eq true
-        expect(json["blueprint_restrictions"]["content"]).to eq true
+        expect(json["blueprint"]).to be true
+        expect(json["blueprint_restrictions"]["content"]).to be true
       end
 
       it "returns blueprint restrictions by type" do
@@ -359,9 +359,9 @@ describe Api::V1::Course do
         template.update(use_default_restrictions_by_type: true,
                         default_restrictions_by_type: { "Assignment" => { points: true },
                                                         "Quizzes::Quiz" => { content: true } })
-        expect(json["blueprint"]).to eq true
-        expect(json["blueprint_restrictions_by_object_type"]["assignment"]["points"]).to eq true
-        expect(json["blueprint_restrictions_by_object_type"]["quiz"]["content"]).to eq true
+        expect(json["blueprint"]).to be true
+        expect(json["blueprint_restrictions_by_object_type"]["assignment"]["points"]).to be true
+        expect(json["blueprint_restrictions_by_object_type"]["quiz"]["content"]).to be true
       end
     end
 
@@ -1404,7 +1404,7 @@ describe CoursesController, type: :request do
           expect(@course.self_enrollment).to be_truthy
           expect(@course.restrict_enrollments_to_course_dates).to be_truthy
           expect(@course.workflow_state).to eq "available"
-          expect(@course.apply_group_weights?).to eq true
+          expect(@course.apply_group_weights?).to be true
           expect(@course.default_view).to eq "syllabus"
           expect(@course.course_format).to eq "on_campus"
           expect(@course.time_zone.tzinfo.name).to eq "Pacific/Honolulu"
@@ -1581,7 +1581,7 @@ describe CoursesController, type: :request do
           @standard = sub_account2.grading_standards.create!(title: "sub account standard", standard_data: { a: { name: "A", value: "95" }, b: { name: "B", value: "80" }, f: { name: "F", value: "" } })
           api_call(:put, @path, @params, course: { grading_standard_id: @standard.id })
           c2.reload
-          expect(c2.grading_standard).to eq nil
+          expect(c2.grading_standard).to be_nil
         end
 
         it "does not delete existing grading standard when invalid standard provided" do
@@ -1605,7 +1605,7 @@ describe CoursesController, type: :request do
           @course.save!
           api_call(:put, @path, @params, course: { grading_standard_id: nil })
           @course.reload
-          expect(@course.grading_standard).to eq nil
+          expect(@course.grading_standard).to be_nil
         end
 
         it "does not remove a grading standard if no value is passed" do
@@ -1719,14 +1719,14 @@ describe CoursesController, type: :request do
           @course.save!
           api_call_as_user(@designer, :put, @path, @params, course: { grading_standard_id: @standard.id, apply_assignment_group_weights: true })
           @course.reload
-          expect(@course.apply_group_weights?).to eq true
+          expect(@course.apply_group_weights?).to be true
           expect(@course.grading_standard).to eq @standard
         end
 
         it "does not require :manage_grades rights if the grading standard isn't changing (null)" do
           api_call_as_user(@designer, :put, @path, @params, course: { grading_standard_id: nil, apply_assignment_group_weights: true })
           @course.reload
-          expect(@course.apply_group_weights?).to eq true
+          expect(@course.apply_group_weights?).to be true
           expect(@course.grading_standard).to be_nil
         end
       end
@@ -3909,7 +3909,7 @@ describe CoursesController, type: :request do
         @course1.root_account.enable_feature!(:course_templates)
         json = api_call(:get, "/api/v1/courses/#{@course1.id}.json",
                         { controller: "courses", action: "show", id: @course1.to_param, format: "json" })
-        expect(json["template"]).to eq false
+        expect(json["template"]).to be false
       end
 
       context "include[]=sections" do
@@ -4198,26 +4198,26 @@ describe CoursesController, type: :request do
                                "conditional_release" => false
                              })
           @course.reload
-          expect(@course.allow_final_grade_override?).to eq true
-          expect(@course.allow_student_discussion_topics).to eq false
-          expect(@course.allow_student_forum_attachments).to eq true
-          expect(@course.allow_student_discussion_editing).to eq false
-          expect(@course.allow_student_organized_groups).to eq false
-          expect(@course.allow_student_discussion_reporting).to eq false
-          expect(@course.allow_student_anonymous_discussion_topics).to eq true
+          expect(@course.allow_final_grade_override?).to be true
+          expect(@course.allow_student_discussion_topics).to be false
+          expect(@course.allow_student_forum_attachments).to be true
+          expect(@course.allow_student_discussion_editing).to be false
+          expect(@course.allow_student_organized_groups).to be false
+          expect(@course.allow_student_discussion_reporting).to be false
+          expect(@course.allow_student_anonymous_discussion_topics).to be true
           expect(@course.course_color).to eq "#AABBCC"
           expect(@course.friendly_name).to eq "drama"
-          expect(@course.hide_distribution_graphs).to eq true
+          expect(@course.hide_distribution_graphs).to be true
           expect(@course.hide_sections_on_course_users_page).to be true
-          expect(@course.hide_final_grades).to eq true
-          expect(@course.usage_rights_required).to eq true
-          expect(@course.lock_all_announcements).to eq true
-          expect(@course.show_announcements_on_home_page).to eq false
-          expect(@course.syllabus_course_summary?).to eq false
-          expect(@course.home_page_announcement_limit).to be nil
-          expect(@course.homeroom_course?).to eq true
+          expect(@course.hide_final_grades).to be true
+          expect(@course.usage_rights_required).to be true
+          expect(@course.lock_all_announcements).to be true
+          expect(@course.show_announcements_on_home_page).to be false
+          expect(@course.syllabus_course_summary?).to be false
+          expect(@course.home_page_announcement_limit).to be_nil
+          expect(@course.homeroom_course?).to be true
           expect(@course.default_due_time).to eq "09:00:00"
-          expect(@course.conditional_release?).to eq false
+          expect(@course.conditional_release?).to be false
         end
 
         it "does not enable conditional_release unless the account allows it" do
@@ -4230,8 +4230,8 @@ describe CoursesController, type: :request do
                             course_id: @course.to_param,
                             format: "json"
                           }, { conditional_release: true })
-          expect(json["conditional_release"]).to eq false
-          expect(@course.reload.conditional_release?).to eq false
+          expect(json["conditional_release"]).to be false
+          expect(@course.reload.conditional_release?).to be false
 
           account.settings[:conditional_release] = { value: false, locked: false }
           account.save!
@@ -4241,8 +4241,8 @@ describe CoursesController, type: :request do
                             course_id: @course.to_param,
                             format: "json"
                           }, { conditional_release: true })
-          expect(json["conditional_release"]).to eq true
-          expect(@course.reload.conditional_release?).to eq true
+          expect(json["conditional_release"]).to be true
+          expect(@course.reload.conditional_release?).to be true
         end
       end
 
@@ -4301,7 +4301,7 @@ describe CoursesController, type: :request do
                    { allow_student_discussion_topics: false },
                    {},
                    expected_status: 401)
-          expect(@course.reload.allow_student_discussion_topics).to eq true
+          expect(@course.reload.allow_student_discussion_topics).to be true
         end
       end
     end
@@ -4626,7 +4626,7 @@ describe CoursesController, type: :request do
       run_except_copy(:course_settings)
       check_counts 1
       @copy_to.reload
-      expect(@copy_to.syllabus_body).to eq nil
+      expect(@copy_to.syllabus_body).to be_nil
     end
 
     it "skips copy wiki pages" do

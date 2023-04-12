@@ -24,7 +24,7 @@ describe CanvasQuizStatistics::Util do
     it "does nothing on anything but a Hash" do
       expect(described_class.deep_symbolize_keys(5)).to eq(5)
       expect(described_class.deep_symbolize_keys([])).to eq([])
-      expect(described_class.deep_symbolize_keys(nil)).to eq(nil)
+      expect(described_class.deep_symbolize_keys(nil)).to be_nil
     end
 
     it "symbolizes top-level keys" do

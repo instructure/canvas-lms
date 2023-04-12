@@ -65,8 +65,8 @@ describe ContextModule do
 
       it "does not publish Attachment module items if usage rights are missing" do
         @module.publish_items!
-        expect(@tag.published?).to eql(false)
-        expect(@file.published?).to eql(false)
+        expect(@tag.published?).to be(false)
+        expect(@file.published?).to be(false)
       end
 
       it "publishes Attachment module items if usage rights are present" do
@@ -74,16 +74,16 @@ describe ContextModule do
         @file.save!
 
         @module.reload.publish_items!
-        expect(@tag.reload.published?).to eql(true)
-        expect(@file.reload.published?).to eql(true)
+        expect(@tag.reload.published?).to be(true)
+        expect(@file.reload.published?).to be(true)
       end
     end
 
     context "without file usage rights required" do
       it "publishes Attachment module items" do
         @module.publish_items!
-        expect(@tag.reload.published?).to eql(true)
-        expect(@file.reload.published?).to eql(true)
+        expect(@tag.reload.published?).to be(true)
+        expect(@file.reload.published?).to be(true)
       end
     end
 
@@ -186,7 +186,7 @@ describe ContextModule do
 
     expect(new_module.content_tags[3].title).to eq("Instructure")
     expect(new_module.content_tags[3].url).to eq("http://www.instructure.com")
-    expect(new_module.content_tags[3].new_tab).to eq(true)
+    expect(new_module.content_tags[3].new_tab).to be(true)
     expect(new_module.unlock_at).to be_nil
     expect(new_module.prerequisites).to eq []
   end
@@ -201,7 +201,7 @@ describe ContextModule do
       course_module
       @module.require_sequential_progress = true
       @module.save!
-      expect(@module.available_for?(nil)).to eql(true)
+      expect(@module.available_for?(nil)).to be(true)
     end
 
     it "uses provided progression in opts" do
@@ -290,7 +290,7 @@ describe ContextModule do
       expect(@module2.prerequisites).to be_is_a(Array)
       expect(@module2.prerequisites).not_to be_empty
       expect(@module2.prerequisites[0][:id]).to eql(@module.id)
-      expect(@module2.prerequisites.length).to eql(1)
+      expect(@module2.prerequisites.length).to be(1)
     end
 
     it "removes itself as a requirement when deleted" do
@@ -942,7 +942,7 @@ describe ContextModule do
       @course.enroll_student(@user).accept!
 
       expect(@module.evaluate_for(@user)).to be_unlocked
-      expect(@assignment.locked_for?(@user)).to eql(false)
+      expect(@assignment.locked_for?(@user)).to be(false)
 
       @assignment.submit_homework @user, submission_type: "online_text_entry", body: "stuff"
 
@@ -978,8 +978,8 @@ describe ContextModule do
       @course.enroll_student(@user).accept!
 
       expect(@module.evaluate_for(@user)).to be_unlocked
-      expect(@assignment.locked_for?(@user)).to eql(false)
-      expect(@assignment2.locked_for?(@user)).to eql(false)
+      expect(@assignment.locked_for?(@user)).to be(false)
+      expect(@assignment2.locked_for?(@user)).to be(false)
 
       @module2 = @course.context_modules.create!(name: "another module")
       @module2.prerequisites = "module_#{@module.id}"
@@ -1611,7 +1611,7 @@ describe ContextModule do
       course = Course.create!
       cm = course.context_modules.create!
       user = User.create!
-      expect(cm.find_or_create_progression(user)).to eq nil
+      expect(cm.find_or_create_progression(user)).to be_nil
     end
   end
 
@@ -1739,7 +1739,7 @@ describe ContextModule do
       mod2.save!
 
       mod2.publish!
-      expect(mod2.relock_warning?).to eq true
+      expect(mod2.relock_warning?).to be true
     end
 
     it "is true when publishing a module that has an unlock_at date" do
@@ -1749,7 +1749,7 @@ describe ContextModule do
       mod1.save!
 
       mod1.publish!
-      expect(mod1.relock_warning?).to eq true
+      expect(mod1.relock_warning?).to be true
     end
   end
 
@@ -1777,9 +1777,9 @@ describe ContextModule do
     m = @course.context_modules.create!
     m.workflow_state = "unpublished"
     m.save!
-    expect(m.grants_right?(@teacher, :read)).to eq true
-    expect(m.grants_right?(@teacher, :read_as_admin)).to eq true
-    expect(m.grants_right?(@teacher, :manage_content)).to eq false
+    expect(m.grants_right?(@teacher, :read)).to be true
+    expect(m.grants_right?(@teacher, :read_as_admin)).to be true
+    expect(m.grants_right?(@teacher, :manage_content)).to be false
   end
 
   it "allows teachers with concluded enrollments to :read unpublished modules (granular permissions)" do
@@ -1788,11 +1788,11 @@ describe ContextModule do
     m = @course.context_modules.create!
     m.workflow_state = "unpublished"
     m.save!
-    expect(m.grants_right?(@teacher, :read)).to eq true
-    expect(m.grants_right?(@teacher, :read_as_admin)).to eq true
-    expect(m.grants_right?(@teacher, :manage_course_content_add)).to eq false
-    expect(m.grants_right?(@teacher, :manage_course_content_edit)).to eq false
-    expect(m.grants_right?(@teacher, :manage_course_content_delete)).to eq false
+    expect(m.grants_right?(@teacher, :read)).to be true
+    expect(m.grants_right?(@teacher, :read_as_admin)).to be true
+    expect(m.grants_right?(@teacher, :manage_course_content_add)).to be false
+    expect(m.grants_right?(@teacher, :manage_course_content_edit)).to be false
+    expect(m.grants_right?(@teacher, :manage_course_content_delete)).to be false
   end
 
   it "only loads visibility and progression information once when calculating prerequisites" do

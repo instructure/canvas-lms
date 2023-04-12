@@ -59,13 +59,13 @@ describe "course catalog" do
   end
 
   it "lists indexed courses" do
-    expect(course_elements.size).to eql 1
+    expect(course_elements.size).to be 1
   end
 
   it "works without course catalog" do
     Account.default.settings[:enable_course_catalog] = false
     Account.default.save!
-    expect(course_elements.size).to eql 1
+    expect(course_elements.size).to be 1
   end
 
   it "lists a next button when >12 courses are in the index and public", priority: "1" do

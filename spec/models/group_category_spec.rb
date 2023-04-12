@@ -169,7 +169,7 @@ describe GroupCategory do
       category = GroupCategory.create(name: "foo", course: @course)
       category.destroy
       category.reload
-      expect(category.deleted_at?).to eq true
+      expect(category.deleted_at?).to be true
     end
 
     it "destroys dependent groups" do

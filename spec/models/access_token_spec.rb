@@ -23,7 +23,7 @@ describe AccessToken do
     shared_examples "#authenticate" do
       it "new access tokens shouldnt have an expiration" do
         at = AccessToken.create!(user: user_model, developer_key: @dk)
-        expect(at.permanent_expires_at).to eq nil
+        expect(at.permanent_expires_at).to be_nil
       end
 
       it "authenticates valid token" do
@@ -37,7 +37,7 @@ describe AccessToken do
           developer_key: @dk,
           permanent_expires_at: 2.hours.ago
         )
-        expect(AccessToken.authenticate(at.full_token)).to be nil
+        expect(AccessToken.authenticate(at.full_token)).to be_nil
       end
     end
 
@@ -91,7 +91,7 @@ describe AccessToken do
 
         it_behaves_like "contexts with a provided access token"
 
-        it { is_expected.to eq nil }
+        it { is_expected.to be_nil }
       end
 
       context "and the token is using an old hash" do
@@ -162,38 +162,38 @@ describe AccessToken do
 
     it "is not usable without proper fields" do
       token = AccessToken.new
-      expect(token.usable?).to eq false
+      expect(token.usable?).to be false
     end
 
     it "is usable" do
-      expect(@at.usable?).to eq true
+      expect(@at.usable?).to be true
     end
 
     it "is usable without dev key" do
       @at.developer_key_id = nil
-      expect(@at.usable?).to eq true
+      expect(@at.usable?).to be true
     end
 
     it "is not usable if expired" do
       @at.update!(permanent_expires_at: 2.hours.ago)
-      expect(@at.usable?).to eq false
+      expect(@at.usable?).to be false
     end
 
     it "is not usable if it needs refreshed" do
       @at.update!(expires_at: 2.hours.ago)
-      expect(@at.usable?).to eq false
+      expect(@at.usable?).to be false
     end
 
     it "is usable if it needs refreshed but dev key doesn't require it" do
       dk = DeveloperKey.create!
       dk.update!(auto_expire_tokens: false)
       @at.update!(developer_key: dk, expires_at: 2.hours.ago)
-      expect(@at.usable?).to eq true
+      expect(@at.usable?).to be true
     end
 
     it "is usable if it needs refreshed, but requesting with a refresh_token" do
       @at.update!(expires_at: 2.hours.ago)
-      expect(@at.usable?(:crypted_refresh_token)).to eq true
+      expect(@at.usable?(:crypted_refresh_token)).to be true
     end
 
     it "is not usable if dev key isn't active" do
@@ -202,7 +202,7 @@ describe AccessToken do
       @at.developer_key = dk
       @at.save
 
-      expect(@at.reload.usable?).to eq false
+      expect(@at.reload.usable?).to be false
     end
 
     it "is not usable if dev key isn't active, even if we request with a refresh token" do
@@ -211,7 +211,7 @@ describe AccessToken do
       @at.developer_key = dk
       @at.save
 
-      expect(@at.reload.usable?(:crypted_refresh_token)).to eq false
+      expect(@at.reload.usable?(:crypted_refresh_token)).to be false
     end
   end
 
@@ -258,20 +258,20 @@ describe AccessToken do
     end
 
     it "matches named scopes" do
-      expect(token.scoped_to?(["https://canvas.instructure.com/login/oauth2/auth/user_profile", "accounts"])).to eq true
+      expect(token.scoped_to?(["https://canvas.instructure.com/login/oauth2/auth/user_profile", "accounts"])).to be true
     end
 
     it "does not partially match scopes" do
-      expect(token.scoped_to?(["user", "accounts"])).to eq false
-      expect(token.scoped_to?(["profile", "accounts"])).to eq false
+      expect(token.scoped_to?(["user", "accounts"])).to be false
+      expect(token.scoped_to?(["profile", "accounts"])).to be false
     end
 
     it "does not match if token has more scopes then requested" do
-      expect(token.scoped_to?(%w[user_profile accounts courses])).to eq false
+      expect(token.scoped_to?(%w[user_profile accounts courses])).to be false
     end
 
     it "does not match if token has less scopes then requested" do
-      expect(token.scoped_to?(["user_profile"])).to eq false
+      expect(token.scoped_to?(["user_profile"])).to be false
     end
 
     it "does not validate scopes if the workflow state is deleted" do
@@ -348,7 +348,7 @@ describe AccessToken do
     end
 
     it "account should be nil" do
-      expect(@at_without_account.account).to be nil
+      expect(@at_without_account.account).to be_nil
     end
 
     it "foreign account should not be authorized" do
@@ -375,17 +375,17 @@ describe AccessToken do
 
         it "authorizes if the binding state is on" do
           binding.update!(workflow_state: "on")
-          expect(access_token.authorized_for_account?(account)).to eq true
+          expect(access_token.authorized_for_account?(account)).to be true
         end
 
         it "does not authorize if the binding state is off" do
           binding.update!(workflow_state: "off")
-          expect(access_token.authorized_for_account?(account)).to eq false
+          expect(access_token.authorized_for_account?(account)).to be false
         end
 
         it "does not authorize if the binding state is allow" do
           binding.update!(workflow_state: "allow")
-          expect(access_token.authorized_for_account?(account)).to eq false
+          expect(access_token.authorized_for_account?(account)).to be false
         end
       end
 
@@ -419,7 +419,7 @@ describe AccessToken do
             site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin).update!(
               workflow_state: "off"
             )
-            expect(access_token.authorized_for_account?(root_account)).to eq false
+            expect(access_token.authorized_for_account?(root_account)).to be false
           end
         end
 
@@ -444,7 +444,7 @@ describe AccessToken do
             site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin).update!(
               workflow_state: "off"
             )
-            expect(access_token.authorized_for_account?(sub_account)).to eq false
+            expect(access_token.authorized_for_account?(sub_account)).to be false
           end
         end
       end

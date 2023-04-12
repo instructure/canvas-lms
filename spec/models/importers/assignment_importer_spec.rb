@@ -33,7 +33,7 @@ describe "Importing assignments" do
       data[:assignments_to_import] = {}
       expect do
         expect(Importers::AssignmentImporter.import_from_migration(data, context, migration)).to be_nil
-      end.to change(Assignment, :count).by(0)
+      end.not_to change(Assignment, :count)
 
       data[:assignments_to_import][data[:migration_id]] = true
       expect do
@@ -193,7 +193,7 @@ describe "Importing assignments" do
     }
     Importers::AssignmentImporter.import_from_migration(nameless_assignment_hash, @course, migration)
     assignment = @course.assignments.where(migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6").first
-    expect(assignment.turnitin_enabled).to eq true
+    expect(assignment.turnitin_enabled).to be true
     settings = assignment.turnitin_settings
     expect(settings["originality_report_visibility"]).to eq("after_due_date")
     expect(settings["exclude_value"]).to eq("5")
@@ -495,7 +495,7 @@ describe "Importing assignments" do
 
           it "does not create an Lti::ResourceLink" do
             expect(created_resource_link_ids).to eq([])
-            expect(assignment.line_items.take.lti_resource_link_id).to eq(nil)
+            expect(assignment.line_items.take.lti_resource_link_id).to be_nil
           end
 
           context "without an explicit client_id" do

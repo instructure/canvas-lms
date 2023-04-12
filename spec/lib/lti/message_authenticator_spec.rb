@@ -110,7 +110,7 @@ module Lti
         it "validates the message" do
           message_authenticator = MessageAuthenticator.new(launch_url, signed_params)
           Timecop.freeze(Time.at(signed_params[:oauth_timestamp].to_i)) do
-            expect(message_authenticator.valid?).to eq true
+            expect(message_authenticator.valid?).to be true
           end
         end
       end
@@ -165,7 +165,7 @@ module Lti
           message_authenticator = MessageAuthenticator.new(launch_url, signed_params)
           Timecop.freeze(Time.at(signed_params[:oauth_timestamp].to_i)) do
             expect { message_authenticator.valid? }.not_to raise_error
-            expect(message_authenticator.valid?).to eq false
+            expect(message_authenticator.valid?).to be false
           end
         end
       end

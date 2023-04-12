@@ -164,7 +164,7 @@ describe AssignmentGroup do
 
   it "has a state machine" do
     assignment_group_model
-    expect(@ag.state).to eql(:available)
+    expect(@ag.state).to be(:available)
   end
 
   it "returns never_drop list as ints" do
@@ -204,7 +204,7 @@ describe AssignmentGroup do
     @ag.validate_rules = true
     @ag.reload
     @course.assignments.create!(title: "test", assignment_group: @ag)
-    expect(@ag.validate).to eql(false)
+    expect(@ag.validate).to be(false)
     expect(@ag.errors.full_messages).to eql(["Rules Drop rules must be a positive number"])
   end
 
@@ -214,7 +214,7 @@ describe AssignmentGroup do
     @ag.validate_rules = true
     @ag.reload
     @course.assignments.create!(title: "test", assignment_group: @ag)
-    expect(@ag.validate).to eql(false)
+    expect(@ag.validate).to be(false)
     expect(@ag.errors.full_messages).to eql(["Rules Drop rules must be a positive number"])
   end
 
@@ -224,7 +224,7 @@ describe AssignmentGroup do
     @ag.validate_rules = true
     @ag.reload
     @course.assignments.create!(title: "test", assignment_group: @ag)
-    expect(@ag.validate).to eql(false)
+    expect(@ag.validate).to be(false)
     expect(@ag.errors.full_messages).to eql(["Rules Drop rules cannot be higher than the number of assignments"])
   end
 
@@ -234,7 +234,7 @@ describe AssignmentGroup do
     @ag.validate_rules = true
     @ag.reload
     @course.assignments.create!(title: "test", assignment_group: @ag)
-    expect(@ag.validate).to eql(true)
+    expect(@ag.validate).to be(true)
   end
 
   it "validate is true when ndrop_highest is greater than number of assignments" do
@@ -243,7 +243,7 @@ describe AssignmentGroup do
     @ag.validate_rules = true
     @ag.reload
     @course.assignments.create!(title: "test", assignment_group: @ag)
-    expect(@ag.validate).to eql(false)
+    expect(@ag.validate).to be(false)
     expect(@ag.errors.full_messages).to eql(["Rules Drop rules cannot be higher than the number of assignments"])
   end
 
@@ -263,14 +263,14 @@ describe AssignmentGroup do
     rules = "drop_highest:25\n"
     assignment_group_model rules: rules
     result = @ag.rules_hash
-    expect(result["drop_highest"]).to eql(25)
+    expect(result["drop_highest"]).to be(25)
   end
 
   it "returns rules that aren't never_drops as ints when `strigify_json_ids` is true" do
     rules = "drop_lowest:2\n"
     assignment_group_model rules: rules
     result = @ag.rules_hash({ stringify_json_ids: true })
-    expect(result["drop_lowest"]).to eql(2)
+    expect(result["drop_lowest"]).to be(2)
   end
 
   describe "#grants_right?" do
@@ -329,11 +329,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is false for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(false)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(false)
         end
       end
 
@@ -343,11 +343,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -357,11 +357,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -371,11 +371,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -385,11 +385,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -403,11 +403,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is false for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(false)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(false)
         end
       end
 
@@ -420,11 +420,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -435,11 +435,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -449,11 +449,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is false for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(false)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(false)
         end
       end
 
@@ -463,11 +463,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -477,11 +477,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -491,11 +491,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -505,11 +505,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -523,11 +523,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is false for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(false)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(false)
         end
       end
 
@@ -540,11 +540,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -555,11 +555,11 @@ describe AssignmentGroup do
         end
 
         it "is true for admins" do
-          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@assignment_group.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
     end
@@ -571,7 +571,7 @@ describe AssignmentGroup do
       edd = EffectiveDueDates.for_course(@ag.context, @ag.published_assignments)
       expect(EffectiveDueDates).to receive(:for_course).with(@ag.context, @ag.published_assignments).and_return(edd)
       expect(edd).to receive(:any_in_closed_grading_period?).and_return(true)
-      expect(@ag.any_assignment_in_closed_grading_period?).to eq(true)
+      expect(@ag.any_assignment_in_closed_grading_period?).to be(true)
     end
   end
 

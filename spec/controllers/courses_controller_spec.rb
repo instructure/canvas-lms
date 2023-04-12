@@ -158,7 +158,7 @@ describe CoursesController do
         get_index
         expect(response).to be_successful
         current_ens = assigns[:current_enrollments]
-        expect(current_ens.count).to eql(2)
+        expect(current_ens.count).to be(2)
 
         student_e = current_ens.detect(&:student?)
         teacher_e = current_ens.detect(&:teacher?)
@@ -1661,7 +1661,7 @@ describe CoursesController do
           @user.enrollments.destroy_all
 
           get "show", params: { id: @course1.id }
-          expect(response.status).to eq 401
+          expect(response).to have_http_status :unauthorized
         end
       end
     end
@@ -2324,7 +2324,7 @@ describe CoursesController do
     it "returns an error if syllabus_body content is nested too deeply" do
       stub_const("CanvasSanitize::SANITIZE", { parser_options: { max_tree_depth: 1 } })
       put "create", params: { account_id: @account.id, course: { syllabus_body: "<div><span>deeeeeeep</span></div>" }, format: :json }
-      expect(response.status).to eq 400
+      expect(response).to have_http_status :bad_request
       json = JSON.parse response.body
       expect(json["errors"].keys).to include "unparsable_content"
     end
@@ -2450,7 +2450,7 @@ describe CoursesController do
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { event: "complete" } }
       expect(assigns[:course]).not_to be_nil
-      expect(assigns[:course].state).to eql(:completed)
+      expect(assigns[:course].state).to be(:completed)
     end
 
     it "logs published event on update" do
@@ -2639,7 +2639,7 @@ describe CoursesController do
       expect(Auditors::Course).not_to receive(:record_restored)
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { event: "undelete" }, format: :json }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "undeletes a course" do
@@ -2656,7 +2656,7 @@ describe CoursesController do
     it "returns an error if a bad event is given" do
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { event: "boogie" }, format: :json }
-      expect(response.status).to eq 400
+      expect(response).to have_http_status :bad_request
       json = JSON.parse response.body
       expect(json["errors"].keys).to include "workflow_state"
     end
@@ -3009,14 +3009,14 @@ describe CoursesController do
       it "does not allow a course with students to be set as a master course" do
         student_in_course
         put "update", params: { id: @course.id, course: { blueprint: "1" } }, format: "json"
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(response.body).to include "Cannot have a blueprint course with students"
       end
 
       it "does not allow a course with observers to be set as a master course" do
         observer_in_course
         put "update", params: { id: @course.id, course: { blueprint: "1" } }, format: "json"
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(response.body).to include "Cannot have a blueprint course with observers"
       end
 
@@ -3026,7 +3026,7 @@ describe CoursesController do
         template = MasterCourses::MasterTemplate.set_as_master_course(c1)
         template.add_child_course!(c2)
         put "update", params: { id: c2.id, course: { blueprint: "1" } }, format: "json"
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(response.body).to include "Course is already associated"
       end
 
@@ -3203,7 +3203,7 @@ describe CoursesController do
       user_session(@teacher)
       stub_const("CanvasSanitize::SANITIZE", { parser_options: { max_tree_depth: 1 } })
       put "update", params: { id: @course.id, course: { syllabus_body: "<div><span>deeeeeeep</span></div>" }, format: :json }
-      expect(response.status).to eq 400
+      expect(response).to have_http_status :bad_request
       json = JSON.parse response.body
       expect(json["errors"].keys).to include "unparsable_content"
     end
@@ -3231,7 +3231,7 @@ describe CoursesController do
         @course.reload
         expect(@course.start_at).to eq start_at
         expect(@course.conclude_at).to eq conclude_at
-        expect(@course.restrict_enrollments_to_course_dates).to eq true
+        expect(@course.restrict_enrollments_to_course_dates).to be true
       end
 
       context "when prevent_course_availability_editing_by_teachers is enabled" do
@@ -3267,7 +3267,7 @@ describe CoursesController do
           expect(response).to be_redirect
           @course.reload
           expect(@course.start_at).to eq start_at
-          expect(@course.restrict_enrollments_to_course_dates).to eq true
+          expect(@course.restrict_enrollments_to_course_dates).to be true
         end
 
         it "allows teachers to update other course settings" do

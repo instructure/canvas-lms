@@ -577,7 +577,7 @@ describe AccountsController do
       put "update", params: { id: @account.id, "account[name]": new_account_name, override_sis_stickiness: false }, format: "json"
       @account.reload
 
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
       expect(@account.name).to eq name
     end
 

@@ -61,10 +61,10 @@ describe "course settings/blueprint" do
       wait_for_animations
       expect(blueprint_settings_options).to be_displayed
 
-      expect(content_checkbox_state).to eq true # checked by default
-      expect(points_checkbox_state).to eq false
-      expect(due_dates_checkbox_state).to eq false
-      expect(availability_dates_checkbox_state).to eq false
+      expect(content_checkbox_state).to be true # checked by default
+      expect(points_checkbox_state).to be false
+      expect(due_dates_checkbox_state).to be false
+      expect(availability_dates_checkbox_state).to be false
       expect_new_page_load { submit_form("#course_form") }
       expect(MasterCourses::MasterTemplate.full_template_for(@course).default_restrictions).to eq(
         { content: true, points: false, due_dates: false, availability_dates: false }
@@ -81,10 +81,10 @@ describe "course settings/blueprint" do
 
       expect(blueprint_settings_options).to be_displayed
 
-      expect(content_checkbox_state).to eq false
-      expect(points_checkbox_state).to eq true
-      expect(due_dates_checkbox_state).to eq true
-      expect(availability_dates_checkbox_state).to eq true
+      expect(content_checkbox_state).to be false
+      expect(points_checkbox_state).to be true
+      expect(due_dates_checkbox_state).to be true
+      expect(availability_dates_checkbox_state).to be true
 
       expect(MasterCourses::MasterTemplate.full_template_for(@course).default_restrictions).to eq(
         { content: false, points: true, due_dates: true, availability_dates: true }
@@ -100,10 +100,10 @@ describe "course settings/blueprint" do
 
       expect(blueprint_settings_options).to be_displayed
 
-      expect(content_checkbox_state).to eq true
-      expect(points_checkbox_state).to eq false
-      expect(due_dates_checkbox_state).to eq true
-      expect(availability_dates_checkbox_state).to eq false
+      expect(content_checkbox_state).to be true
+      expect(points_checkbox_state).to be false
+      expect(due_dates_checkbox_state).to be true
+      expect(availability_dates_checkbox_state).to be false
 
       f(".bcs_check-box").find_element(:xpath, "../div").click
       wait_for_animations

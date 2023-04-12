@@ -346,8 +346,8 @@ describe GradeSummaryPresenter do
       p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
       submission = p.submissions.find { |s| s[:assignment_id] == assignment.id }
       expect(submission.submission_comments.length).to eq 2
-      expect(submission.submission_comments[0].read?(@student)).to eq true
-      expect(submission.submission_comments[1].read?(@student)).to eq false
+      expect(submission.submission_comments[0].read?(@student)).to be true
+      expect(submission.submission_comments[1].read?(@student)).to be false
     end
   end
 

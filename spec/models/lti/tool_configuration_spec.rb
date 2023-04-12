@@ -46,7 +46,7 @@ module Lti
           tool_configuration.disabled_placements = ["account_navigation"]
         end
 
-        it { is_expected.to eq true }
+        it { is_expected.to be true }
       end
 
       context "with non-matching schema" do
@@ -60,7 +60,7 @@ module Lti
           tool_configuration.developer_key = developer_key
         end
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
 
         it "is contains a message about missing target_link_uri" do
           tool_configuration.valid?
@@ -73,7 +73,7 @@ module Lti
           described_class.create! settings: settings, developer_key: developer_key
         end
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
 
       context 'when "settings" is blank' do
@@ -82,13 +82,13 @@ module Lti
           tool_configuration.settings = nil
         end
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
 
       context 'when "developer_key_id" is blank' do
         before { tool_configuration.settings = { foo: "bar" } }
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
 
       context "when the settings are invalid" do
@@ -102,20 +102,20 @@ module Lti
             settings["extensions"].first["settings"]["placements"].first.delete("target_link_uri")
           end
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
 
         context "when name is blank" do
           before { settings.delete("title") }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
       context 'when "disabled_placements" contains invalid placements' do
         before { tool_configuration.disabled_placements = ["invalid_placement", "account_navigation"] }
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
 
       context "when extensions have non-Canvas platform" do
@@ -129,7 +129,7 @@ module Lti
           tool_configuration.developer_key = developer_key
         end
 
-        it { is_expected.to eq true }
+        it { is_expected.to be true }
       end
 
       context "when public_jwk is not present" do
@@ -144,7 +144,7 @@ module Lti
           tool_configuration.developer_key = developer_key
         end
 
-        it { is_expected.to eq true }
+        it { is_expected.to be true }
       end
 
       context "when public_jwk_url is not present" do
@@ -159,7 +159,7 @@ module Lti
           tool_configuration.developer_key = developer_key
         end
 
-        it { is_expected.to eq true }
+        it { is_expected.to be true }
       end
 
       context "when public_jwk_url and public_jwk are not present" do
@@ -174,7 +174,7 @@ module Lti
           tool_configuration.developer_key = developer_key
         end
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
     end
 

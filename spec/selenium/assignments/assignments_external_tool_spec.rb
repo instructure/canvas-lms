@@ -202,7 +202,7 @@ describe "external tool assignments" do
       close_button_selector = "//span[@aria-label = 'Launch External Tool']//button[//*[text() = 'Close']]"
       close_button = fxpath(close_button_selector)
       close_button.click
-      expect(element_exists?(close_button_selector, true)).to eq(false)
+      expect(element_exists?(close_button_selector, true)).to be(false)
     end
   end
 end

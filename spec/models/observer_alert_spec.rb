@@ -35,7 +35,7 @@ describe ObserverAlert do
                                    context: @assignment, alert_type: "assignment_missing", action_date: Time.zone.now,
                                    title: "Assignment missing")
 
-      expect(alert.valid?).to eq true
+      expect(alert.valid?).to be true
       expect(alert.user_id).not_to be_nil
       expect(alert.observer_id).not_to be_nil
       expect(alert.observer_alert_threshold).not_to be_nil
@@ -45,14 +45,14 @@ describe ObserverAlert do
       alert = ObserverAlert.create(student: user_model, observer: @observer, observer_alert_threshold: @threshold,
                                    context: @assignment, alert_type: "assignment_missing", action_date: Time.zone.now, title: "Assignment missing")
 
-      expect(alert.valid?).to eq false
+      expect(alert.valid?).to be false
     end
 
     it "wont allow random alert_type" do
       alert = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @threshold,
                                    context: @assignment, alert_type: "jigglypuff", action_date: Time.zone.now, title: "Assignment missing")
 
-      expect(alert.valid?).to eq false
+      expect(alert.valid?).to be false
     end
   end
 

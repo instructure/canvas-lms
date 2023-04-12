@@ -106,7 +106,7 @@ describe LearningOutcomeGroup do
     it "returns non-empty array" do
       group = @course.learning_outcome_groups.create!(title: "groupage")
 
-      expect(group.parent_ids).to be_a_kind_of(Array)
+      expect(group.parent_ids).to be_a(Array)
       expect(group.parent_ids).not_to be_empty
     end
 

@@ -71,18 +71,18 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     expect(@root_entry.discussion_topic.unread_count(@student)).to eq 0
     result = run_mutation(discussion_entry_id: @root_entry.id, read: false)
     expect(@root_entry.discussion_topic.unread_count(@student)).to eq 3
-    expect(result["errors"]).to be nil
-    expect(@root_entry.reload.read?(@student)).to eq false
+    expect(result["errors"]).to be_nil
+    expect(@root_entry.reload.read?(@student)).to be false
     expect(@root_entry.find_existing_participant(@student).forced_read_state).to be true
-    expect(@parent_entry.reload.read?(@student)).to eq false
+    expect(@parent_entry.reload.read?(@student)).to be false
     expect(@parent_entry.find_existing_participant(@student).forced_read_state).to be true
-    expect(@child_entry.reload.read?(@student)).to eq false
+    expect(@child_entry.reload.read?(@student)).to be false
     expect(@child_entry.find_existing_participant(@student).forced_read_state).to be true
     result = run_mutation(discussion_entry_id: @root_entry.id, read: true)
     expect(@root_entry.discussion_topic.unread_count(@student)).to eq 0
-    expect(result["errors"]).to be nil
-    expect(@root_entry.reload.read?(@student)).to eq true
-    expect(@parent_entry.reload.read?(@student)).to eq true
-    expect(@child_entry.reload.read?(@student)).to eq true
+    expect(result["errors"]).to be_nil
+    expect(@root_entry.reload.read?(@student)).to be true
+    expect(@parent_entry.reload.read?(@student)).to be true
+    expect(@child_entry.reload.read?(@student)).to be true
   end
 end

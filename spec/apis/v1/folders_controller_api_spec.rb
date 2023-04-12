@@ -62,7 +62,7 @@ describe "Folders API", type: :request do
         course_with_student(course: @course)
         json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options, {})
 
-        expect(json.any? { |f| f[:id] == @f5.id }).to eq false
+        expect(json.any? { |f| f[:id] == @f5.id }).to be false
       end
 
       it "does not list locked folders if not authed" do
@@ -108,9 +108,9 @@ describe "Folders API", type: :request do
 
       it "indicates submissions folders" do
         json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options.merge(id: @root.to_param))
-        expect(json.detect { |f| f["id"] == @normal_folder.id }["for_submissions"]).to eq false
-        expect(json.detect { |f| f["id"] == @student.submissions_folder.id }["for_submissions"]).to eq true
-        expect(json.detect { |f| f["id"] == @student.submissions_folder.id }["can_upload"]).to eq false
+        expect(json.detect { |f| f["id"] == @normal_folder.id }["for_submissions"]).to be false
+        expect(json.detect { |f| f["id"] == @student.submissions_folder.id }["for_submissions"]).to be true
+        expect(json.detect { |f| f["id"] == @student.submissions_folder.id }["can_upload"]).to be false
       end
     end
   end
@@ -140,8 +140,8 @@ describe "Folders API", type: :request do
 
     it "has url to list file and folder listings" do
       json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(action: "show"), {})
-      expect(json["files_url"].ends_with?("/api/v1/folders/#{@root.id}/files")).to eq true
-      expect(json["folders_url"].ends_with?("/api/v1/folders/#{@root.id}/folders")).to eq true
+      expect(json["files_url"].ends_with?("/api/v1/folders/#{@root.id}/files")).to be true
+      expect(json["folders_url"].ends_with?("/api/v1/folders/#{@root.id}/folders")).to be true
     end
 
     it "returns unauthorized error if requestor is not permitted to view folder" do
@@ -165,13 +165,13 @@ describe "Folders API", type: :request do
 
     it "returns correct locked values" do
       json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(action: "show"), {})
-      expect(json["locked_for_user"]).to eq false
-      expect(json["locked"]).to eq false
+      expect(json["locked_for_user"]).to be false
+      expect(json["locked"]).to be false
 
       locked = @root.sub_folders.create!(name: "locked", context: @course, position: 4, locked: true)
       json = api_call(:get, @folders_path + "/#{locked.id}", @folders_path_options.merge(action: "show", id: locked.id.to_param), {})
-      expect(json["locked"]).to eq true
-      expect(json["locked_for_user"]).to eq false
+      expect(json["locked"]).to be true
+      expect(json["locked_for_user"]).to be false
 
       student_in_course(course: @course, active_all: true)
       json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options, {})
@@ -278,7 +278,7 @@ describe "Folders API", type: :request do
       expect(@course.folders.where(name: "Uploaded Media").first).to be_nil
       folder = @user.folders.where(name: "Uploaded Media").first
       expect(json["id"]).to eq folder.id
-      expect(json["can_upload"]).to eq true
+      expect(json["can_upload"]).to be true
     end
 
     it "creates a media folder for a group" do
@@ -390,7 +390,7 @@ describe "Folders API", type: :request do
       expect(unfiled.sub_folders.count).to eq 1
       f1 = unfiled.sub_folders.first
       expect(f1.name).to eq "f1"
-      expect(f1.hidden).to eq true
+      expect(f1.hidden).to be true
     end
 
     it "creates by folder id" do
@@ -404,7 +404,7 @@ describe "Folders API", type: :request do
       @f1.reload
       sub1 = @f1.sub_folders.first
       expect(sub1.name).to eq "sub1"
-      expect(sub1.locked).to eq true
+      expect(sub1.locked).to be true
     end
 
     it "creates by folder id in the path" do
@@ -418,7 +418,7 @@ describe "Folders API", type: :request do
       @f1.reload
       sub1 = @f1.sub_folders.first
       expect(sub1.name).to eq "sub1"
-      expect(sub1.locked).to eq true
+      expect(sub1.locked).to be true
     end
 
     it "errors with invalid folder id" do

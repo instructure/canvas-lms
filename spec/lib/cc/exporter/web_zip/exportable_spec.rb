@@ -140,7 +140,7 @@ describe "Exportable" do
           expect(contents["files"][0]["type"]).to eq("file")
           expect(contents["files"][0]["name"]).not_to be_nil
           expect(contents["files"][0]["size"]).not_to be_nil
-          expect(contents["files"][0]["files"]).to eq(nil)
+          expect(contents["files"][0]["files"]).to be_nil
         end
       end
 

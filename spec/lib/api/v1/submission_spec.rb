@@ -554,7 +554,7 @@ describe Api::V1::Submission do
 
         it "is not included if the caller does not have permission to see the user's grade" do
           submission_json = fake_controller.submission_json(submission_for_quiz, quiz_assignment, user, session, course, [field], params)
-          expect(submission_json.fetch(field)).to be nil
+          expect(submission_json.fetch(field)).to be_nil
         end
       end
     end

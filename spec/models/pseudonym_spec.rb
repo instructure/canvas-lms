@@ -111,18 +111,18 @@ describe Pseudonym do
     user_model
     account1 = account_model
     account_model
-    expect(@user.user_account_associations.length).to eql(0)
+    expect(@user.user_account_associations.length).to be(0)
 
     pseudonym_model(user: @user, account: account1)
     @user.reload
-    expect(@user.user_account_associations.length).to eql(1)
+    expect(@user.user_account_associations.length).to be(1)
     expect(@user.user_account_associations.first.account).to eql(account1)
 
     account2 = account_model
     @pseudonym.account = account2
     @pseudonym.save
     @user.reload
-    expect(@user.user_account_associations.length).to eql(1)
+    expect(@user.user_account_associations.length).to be(1)
     expect(@user.user_account_associations.first.account).to eql(account2)
 
     @pseudonym.destroy
@@ -133,7 +133,7 @@ describe Pseudonym do
   describe "#destroy" do
     it "allows deleting pseudonyms" do
       user_with_pseudonym(active_all: true)
-      expect(@pseudonym.destroy).to eql(true)
+      expect(@pseudonym.destroy).to be(true)
       expect(@pseudonym).to be_deleted
     end
 
@@ -159,7 +159,7 @@ describe Pseudonym do
     @pseudonym.sis_user_id = "something_cool"
     @pseudonym.save!
     @pseudonym.account.authentication_providers.create!(auth_type: "ldap")
-    expect(@pseudonym.destroy).to eql(true)
+    expect(@pseudonym.destroy).to be(true)
     expect(@pseudonym).to be_deleted
   end
 
@@ -225,7 +225,7 @@ describe Pseudonym do
     it "doesn't even check LDAP for a Canvas pseudonym" do
       @pseudonym.update_attribute(:authentication_provider, @pseudonym.account.canvas_authentication_provider)
       expect_any_instantiation_of(@aac).not_to receive(:ldap_bind_result)
-      expect(@pseudonym.ldap_bind_result("stuff")).to eq nil
+      expect(@pseudonym.ldap_bind_result("stuff")).to be_nil
     end
   end
 

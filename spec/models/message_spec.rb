@@ -136,8 +136,8 @@ describe Message do
       presenter = Utils::DatetimeRangePresenter.new(due_at, nil, :event, ActiveSupport::TimeZone.new("Pretoria"))
       due_at_string = presenter.as_string(shorten_midnight: false)
 
-      expect(msg.body.include?(due_at_string)).to eq true
-      expect(msg.html_body.include?(due_at_string)).to eq true
+      expect(msg.body.include?(due_at_string)).to be true
+      expect(msg.html_body.include?(due_at_string)).to be true
       Time.zone = original_time_zone
     end
 
@@ -349,7 +349,7 @@ describe Message do
       message_model(dispatch_at: Time.now, workflow_state: "staged", to: "somebody", updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: "email")
       expect(Mailer).to receive(:create_message).and_raise("450 recipient address rejected")
       expect(ErrorReport).not_to receive(:log_exception)
-      expect(@message.deliver).to eq false
+      expect(@message.deliver).to be false
     end
 
     it "completes delivery without a user" do
@@ -694,7 +694,7 @@ describe Message do
       account.save!
       message = Message.create!(context: convo_message)
       expect(message.author_short_name).to eq user.short_name
-      expect(message.author_email_address).to eq nil
+      expect(message.author_email_address).to be_nil
       expect(message.author_avatar_url).to match "http://localhost/images/messages/avatar-50.png"
     end
 

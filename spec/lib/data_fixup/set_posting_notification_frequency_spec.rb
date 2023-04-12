@@ -131,7 +131,7 @@ describe DataFixup::SetPostingNotificationFrequency do
         grading_notification_policies.update_all(frequency: "immediately")
         policy_for_notification(submission_posted_notification).destroy!
         DataFixup::SetPostingNotificationFrequency.run
-        expect(policy_for_notification(submission_posted_notification)).to be nil
+        expect(policy_for_notification(submission_posted_notification)).to be_nil
       end
     end
 
@@ -227,7 +227,7 @@ describe DataFixup::SetPostingNotificationFrequency do
         grading_notification_policies.update_all(frequency: "immediately")
         policy_for_notification(submissions_posted_notification).destroy!
         DataFixup::SetPostingNotificationFrequency.run
-        expect(policy_for_notification(submissions_posted_notification)).to be nil
+        expect(policy_for_notification(submissions_posted_notification)).to be_nil
       end
     end
 

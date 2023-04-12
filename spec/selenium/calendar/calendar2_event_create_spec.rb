@@ -400,7 +400,7 @@ describe "calendar2" do
           event_content.find_element(:css, ".event-details-timestring").text
         ).to eq format_date_for_view(new_date, "%b %d")
         @event.reload
-        expect(@event.all_day).to eq true
+        expect(@event.all_day).to be true
       end
 
       it "can create timed events in calendar" do

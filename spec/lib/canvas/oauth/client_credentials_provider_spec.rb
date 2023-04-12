@@ -109,7 +109,7 @@ module Canvas::OAuth
 
         it do
           expected_url_called(url, :get, stubbed_response)
-          expect(subject).to eq true
+          expect(subject).to be true
         end
       end
 
@@ -120,7 +120,7 @@ module Canvas::OAuth
 
         it do
           expected_url_called(url, :get, stubbed_response)
-          expect(subject).to eq true
+          expect(subject).to be true
         end
       end
 
@@ -133,7 +133,7 @@ module Canvas::OAuth
 
         it do
           expected_url_called(url, :get, stubbed_response)
-          expect(subject).to eq false
+          expect(subject).to be false
         end
       end
 
@@ -152,7 +152,7 @@ module Canvas::OAuth
 
         it do
           expected_url_called(url, :get, stubbed_response)
-          expect(subject).to eq false
+          expect(subject).to be false
         end
       end
 
@@ -275,7 +275,7 @@ module Canvas::OAuth
         it "is true when when validated twice" do
           enable_cache do
             subject
-            expect(subject).to eq true
+            expect(subject).to be true
           end
         end
       end

@@ -376,7 +376,7 @@ describe CanvadocSessionsController do
     it "sends disable_annotation_notifications as false by default" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |_, **opts|
-        expect(opts[:disable_annotation_notifications]).to eq false
+        expect(opts[:disable_annotation_notifications]).to be false
       end
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
@@ -385,7 +385,7 @@ describe CanvadocSessionsController do
       @blob[:disable_annotation_notifications] = true
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |_, **opts|
-        expect(opts[:disable_annotation_notifications]).to eq true
+        expect(opts[:disable_annotation_notifications]).to be true
       end
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
@@ -662,9 +662,9 @@ describe CanvadocSessionsController do
 
       it "marks unread annotations read" do
         @student.mark_submission_annotations_unread!(@submission)
-        expect(@student.unread_submission_annotations?(@submission)).to eq true
+        expect(@student.unread_submission_annotations?(@submission)).to be true
         get :show, params: { blob: blob.to_json, hmac: hmac }
-        expect(@student.unread_submission_annotations?(@submission)).to eq false
+        expect(@student.unread_submission_annotations?(@submission)).to be false
       end
 
       it "passes use_cloudfront as true" do

@@ -27,7 +27,7 @@ describe Lti::PlatformStorage do
         Account.site_admin.disable_feature! :lti_platform_storage
       end
 
-      it { is_expected.to eq false }
+      it { is_expected.to be false }
     end
 
     context "when flag is enabled" do
@@ -35,7 +35,7 @@ describe Lti::PlatformStorage do
         Account.site_admin.enable_feature! :lti_platform_storage
       end
 
-      it { is_expected.to eq true }
+      it { is_expected.to be true }
     end
   end
 

@@ -49,7 +49,7 @@ describe "reply attachment" do
       wait_for_ajaximations
       begin
         tinymce = f(".tox-tinymce")
-        expect(tinymce.enabled?).to eq true
+        expect(tinymce.enabled?).to be true
       rescue Selenium::WebDriver::Error::NoSuchElementError
         expect("tinymce not loaded").to eq "loaded"
       end

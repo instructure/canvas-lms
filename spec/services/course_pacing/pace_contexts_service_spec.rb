@@ -75,7 +75,7 @@ describe CoursePacing::PaceContextsService do
         enrollment_two.update! workflow_state: "creation_pending"
 
         expect(course).to be_unpublished
-        expect(enrollment_three.reload.state).to eql(:invited)
+        expect(enrollment_three.reload.state).to be(:invited)
         expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two, enrollment_three]
       end
 

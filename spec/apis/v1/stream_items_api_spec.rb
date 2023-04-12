@@ -222,8 +222,8 @@ describe UsersController, type: :request do
     @topic.reply_from(user: @teacher, text: "hai")
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { controller: "users", action: "activity_stream", format: "json" })
-    expect(json.first["require_initial_post"]).to eq true
-    expect(json.first["user_has_posted"]).to eq false
+    expect(json.first["require_initial_post"]).to be true
+    expect(json.first["user_has_posted"]).to be false
     expect(json.first["root_discussion_entries"]).to eq []
   end
 
@@ -236,8 +236,8 @@ describe UsersController, type: :request do
     @topic.reply_from(user: @student, text: "hai")
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { controller: "users", action: "activity_stream", format: "json" })
-    expect(json.first["require_initial_post"]).to eq true
-    expect(json.first["user_has_posted"]).to eq true
+    expect(json.first["require_initial_post"]).to be true
+    expect(json.first["user_has_posted"]).to be true
     expect(json.first["root_discussion_entries"]).to eq [
       {
         "user" => { "user_id" => @student.id, "user_name" => "User" },
@@ -788,7 +788,7 @@ describe UsersController, type: :request do
     expect(json[0]["id"]).to eq StreamItem.last.id
     expect(json[0]["title"]).to eq "Peer Review for #{assignment.title}"
     expect(json[0]["type"]).to eq "AssessmentRequest"
-    expect(json[0]["message"]).to eq nil
+    expect(json[0]["message"]).to be_nil
     expect(json[0]["context_type"]).to eq "Course"
     expect(json[0]["course_id"]).to eq @course.id
     expect(json[0]["assessment_request_id"]).to eq assessment_request.id

@@ -288,7 +288,7 @@ describe MicrosoftSync::UserMapping do
       expect do
         described_class.flag_as_needs_updating_if_using_email(@enrollment.user)
       end.to change { @um1.reload.needs_updating }.from(false).to(true)
-      expect(@um2.needs_updating).to eq(false)
+      expect(@um2.needs_updating).to be(false)
     end
 
     it "doesn't set needs_updating if the root account doesn't use email login attribute" do
@@ -304,7 +304,7 @@ describe MicrosoftSync::UserMapping do
         root_account: account_model(root_account_id: nil), user: @enrollment.user
       )
       described_class.flag_as_needs_updating_if_using_email(@enrollment.user)
-      expect(um.reload.needs_updating).to eq(false)
+      expect(um.reload.needs_updating).to be(false)
     end
   end
 

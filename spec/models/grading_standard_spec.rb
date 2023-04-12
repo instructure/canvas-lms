@@ -222,12 +222,12 @@ describe GradingStandard do
 
     it "returns a score in the proper range for letter grades" do
       score = @gs.grade_to_score("B")
-      expect(score).to eql(86.0)
+      expect(score).to eq 86.0
     end
 
     it "returns nil when no grade matches" do
       score = @gs.grade_to_score("Z")
-      expect(score).to eql(nil)
+      expect(score).to be_nil
     end
 
     it "does not return more than 3 decimal digits" do
@@ -256,12 +256,12 @@ describe GradingStandard do
 
     it "matches alphabetical keys regardless of case" do
       idx = @gs.place_in_scheme("m")
-      expect(idx).to eql(11)
+      expect(idx).to be(11)
     end
 
     it "matches numeric keys" do
       idx = @gs.place_in_scheme(4)
-      expect(idx).to eql(0)
+      expect(idx).to be(0)
     end
 
     it "does not confuse letters and zeros" do
@@ -348,15 +348,15 @@ describe GradingStandard do
         end
 
         it "is able to manage root-account level grading standards" do
-          expect(@root_account_standard.grants_right?(@admin, :manage)).to eq(true)
+          expect(@root_account_standard.grants_right?(@admin, :manage)).to be(true)
         end
 
         it "is able to manage sub-account level grading standards" do
-          expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
+          expect(@sub_account_standard.grants_right?(@admin, :manage)).to be(true)
         end
 
         it "is able to manage course level grading standards" do
-          expect(@course_standard.grants_right?(@admin, :manage)).to eq(true)
+          expect(@course_standard.grants_right?(@admin, :manage)).to be(true)
         end
       end
 
@@ -366,29 +366,29 @@ describe GradingStandard do
         end
 
         it "is not able to manage root-account level grading standards" do
-          expect(@root_account_standard.grants_right?(@admin, :manage)).to eq(false)
+          expect(@root_account_standard.grants_right?(@admin, :manage)).to be(false)
         end
 
         it "is able to manage sub-account level grading standards" do
-          expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
+          expect(@sub_account_standard.grants_right?(@admin, :manage)).to be(true)
         end
 
         it "is not able to manage course level grading standards, when the course is under the root-account" do
-          expect(@course_standard.grants_right?(@admin, :manage)).to eq(false)
+          expect(@course_standard.grants_right?(@admin, :manage)).to be(false)
         end
       end
 
       context "teacher" do
         it "is not able to manage root-account level grading standards" do
-          expect(@root_account_standard.grants_right?(@teacher, :manage)).to eq(false)
+          expect(@root_account_standard.grants_right?(@teacher, :manage)).to be(false)
         end
 
         it "is not able to manage sub-account level grading standards" do
-          expect(@sub_account_standard.grants_right?(@teacher, :manage)).to eq(false)
+          expect(@sub_account_standard.grants_right?(@teacher, :manage)).to be(false)
         end
 
         it "is able to manage course level grading standards" do
-          expect(@course_standard.grants_right?(@teacher, :manage)).to eq(true)
+          expect(@course_standard.grants_right?(@teacher, :manage)).to be(true)
         end
       end
     end
@@ -410,15 +410,15 @@ describe GradingStandard do
         end
 
         it "is able to manage root-account level grading standards" do
-          expect(@root_account_standard.grants_right?(@admin, :manage)).to eq(true)
+          expect(@root_account_standard.grants_right?(@admin, :manage)).to be(true)
         end
 
         it "is able to manage sub-account level grading standards" do
-          expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
+          expect(@sub_account_standard.grants_right?(@admin, :manage)).to be(true)
         end
 
         it "is able to manage course level grading standards" do
-          expect(@course_standard.grants_right?(@admin, :manage)).to eq(true)
+          expect(@course_standard.grants_right?(@admin, :manage)).to be(true)
         end
       end
 
@@ -428,29 +428,29 @@ describe GradingStandard do
         end
 
         it "is not able to manage root-account level grading standards" do
-          expect(@root_account_standard.grants_right?(@admin, :manage)).to eq(false)
+          expect(@root_account_standard.grants_right?(@admin, :manage)).to be(false)
         end
 
         it "is able to manage sub-account level grading standards" do
-          expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
+          expect(@sub_account_standard.grants_right?(@admin, :manage)).to be(true)
         end
 
         it "is able to manage course level grading standards, when the course is under the sub-account" do
-          expect(@course_standard.grants_right?(@admin, :manage)).to eq(true)
+          expect(@course_standard.grants_right?(@admin, :manage)).to be(true)
         end
       end
 
       context "teacher" do
         it "is not able to manage root-account level grading standards" do
-          expect(@root_account_standard.grants_right?(@teacher, :manage)).to eq(false)
+          expect(@root_account_standard.grants_right?(@teacher, :manage)).to be(false)
         end
 
         it "is not able to manage sub-account level grading standards" do
-          expect(@sub_account_standard.grants_right?(@teacher, :manage)).to eq(false)
+          expect(@sub_account_standard.grants_right?(@teacher, :manage)).to be(false)
         end
 
         it "is able to manage course level grading standards" do
-          expect(@course_standard.grants_right?(@teacher, :manage)).to eq(true)
+          expect(@course_standard.grants_right?(@teacher, :manage)).to be(true)
         end
       end
     end

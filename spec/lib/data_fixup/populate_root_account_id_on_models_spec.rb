@@ -83,7 +83,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     it "populates root_account_id on AssessmentQuestion" do
       aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
       aq.update_columns(root_account_id: nil)
-      expect(aq.reload.root_account_id).to eq nil
+      expect(aq.reload.root_account_id).to be_nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(aq.reload.root_account_id).to eq @course.root_account_id
     end
@@ -91,14 +91,14 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     it "populates root_account_id on AssessmentQuestionBank" do
       aqb = AssessmentQuestionBank.create!(context: @course)
       aqb.update_columns(root_account_id: nil)
-      expect(aqb.reload.root_account_id).to eq nil
+      expect(aqb.reload.root_account_id).to be_nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(aqb.reload.root_account_id).to eq @course.root_account_id
 
       account = account_model(root_account: account_model)
       aqb = AssessmentQuestionBank.create!(context: account)
       aqb.update_columns(root_account_id: nil)
-      expect(aqb.reload.root_account_id).to eq nil
+      expect(aqb.reload.root_account_id).to be_nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(aqb.reload.root_account_id).to eq account.root_account_id
     end
@@ -106,7 +106,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     it "populates the root_account_id on AssignmentGroup" do
       ag = @course.assignment_groups.create!(name: "AssignmentGroup!")
       ag.update_columns(root_account_id: nil)
-      expect(ag.root_account_id).to be nil
+      expect(ag.root_account_id).to be_nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(ag.reload.root_account_id).to eq @course.root_account_id
     end
@@ -116,12 +116,12 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       @course.enroll_student(@user)
       override1 = create_adhoc_override_for_assignment(@assignment, @user)
       override1.update_columns(root_account_id: nil)
-      expect(override1.attributes["root_account_id"]).to be nil
+      expect(override1.attributes["root_account_id"]).to be_nil
 
       quiz_model(course: @course)
       override2 = create_adhoc_override_for_assignment(@quiz, @user)
       override2.update_columns(root_account_id: nil)
-      expect(override2.attributes["root_account_id"]).to be nil
+      expect(override2.attributes["root_account_id"]).to be_nil
 
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(override1.reload.attributes["root_account_id"]).to eq @course.root_account_id
@@ -134,13 +134,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       create_adhoc_override_for_assignment(@assignment, @user)
       @override_student.update_columns(root_account_id: nil)
       os1 = @override_student
-      expect(os1.root_account_id).to be nil
+      expect(os1.root_account_id).to be_nil
 
       quiz_model(course: @course)
       create_adhoc_override_for_assignment(@quiz, @user)
       @override_student.update_columns(root_account_id: nil)
       os2 = @override_student
-      expect(os2.root_account_id).to be nil
+      expect(os2.root_account_id).to be_nil
 
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(os1.reload.root_account_id).to eq @course.root_account_id
@@ -305,21 +305,21 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       it "populates the root_account_id" do
         cm = @course.content_migrations.create!(user: @user)
         cm.update_columns(root_account_id: nil)
-        expect(cm.root_account_id).to be nil
+        expect(cm.root_account_id).to be_nil
         DataFixup::PopulateRootAccountIdOnModels.run
         expect(cm.reload.root_account_id).to eq @course.root_account_id
 
         account = account_model(root_account: account_model)
         cm = account.content_migrations.create!(user: @user)
         cm.update_columns(root_account_id: nil)
-        expect(cm.root_account_id).to be nil
+        expect(cm.root_account_id).to be_nil
         DataFixup::PopulateRootAccountIdOnModels.run
         expect(cm.reload.root_account_id).to eq account.root_account_id
 
         group_model
         cm = @group.content_migrations.create!(user: @user)
         cm.update_columns(root_account_id: nil)
-        expect(cm.root_account_id).to be nil
+        expect(cm.root_account_id).to be_nil
         DataFixup::PopulateRootAccountIdOnModels.run
         expect(cm.reload.root_account_id).to eq @group.root_account_id
       end
@@ -339,10 +339,10 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           @shard2.activate do
             cm = ContentMigration.create(context: account_model)
             cm.update_columns(context_id: account.global_id, root_account_id: nil)
-            expect(cm.reload.root_account_id).to eq nil
+            expect(cm.reload.root_account_id).to be_nil
             expect(cm.shard.id).to_not eq(cm.context.shard.id)
             DataFixup::PopulateRootAccountIdOnModels.run
-            expect(cm.reload.root_account_id).to eq nil
+            expect(cm.reload.root_account_id).to be_nil
           end
         end
       end
@@ -368,7 +368,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       ce = @course.content_exports.create!
       cs = ce.received_content_shares.create!(user: user_model, read_state: "read", name: "test")
       cs.update_columns(root_account_id: nil)
-      expect(cs.root_account_id).to be nil
+      expect(cs.root_account_id).to be_nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(cs.reload.root_account_id).to eq @course.root_account_id
 
@@ -376,13 +376,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       ce = @group.content_exports.create!
       cs = ce.received_content_shares.create!(user: user_model, read_state: "read", name: "test")
       cs.update_columns(root_account_id: nil)
-      expect(cs.root_account_id).to be nil
+      expect(cs.root_account_id).to be_nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(cs.reload.root_account_id).to eq @group.root_account_id
     end
 
     it "populates the root_account_id on ContextModule" do
-      expect(@cm.root_account_id).to be nil
+      expect(@cm.root_account_id).to be_nil
       DataFixup::PopulateRootAccountIdOnModels.run
       expect(@cm.reload.root_account_id).to eq @course.root_account_id
     end
@@ -1014,7 +1014,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       cm2.update_columns(root_account_id: nil)
 
       DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(ContextModule, { course: :root_account_id }, cm2.id, cm2.id)
-      expect(@cm.reload.root_account_id).to be nil
+      expect(@cm.reload.root_account_id).to be_nil
       expect(cm2.reload.root_account_id).to eq @course.root_account_id
     end
 

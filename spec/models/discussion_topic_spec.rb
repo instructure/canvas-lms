@@ -218,13 +218,13 @@ describe DiscussionTopic do
 
   it "requires a valid discussion_type" do
     @topic = @course.discussion_topics.build(message: "test", discussion_type: "gesundheit")
-    expect(@topic.save).to eq false
+    expect(@topic.save).to be false
     expect(@topic.errors.detect { |e| e.first.to_s == "discussion_type" }).to be_present
   end
 
   it "updates the assignment it is associated with" do
     a = @course.assignments.create!(title: "some assignment", points_possible: 5)
-    expect(a.points_possible).to eql(5.0)
+    expect(a.points_possible).to be(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
     t = @course.discussion_topics.build(assignment: a, title: "some topic", message: "a little bit of content")
     t.save
@@ -237,7 +237,7 @@ describe DiscussionTopic do
 
   it "deletes the assignment if the topic is no longer graded" do
     a = @course.assignments.create!(title: "some assignment", points_possible: 5)
-    expect(a.points_possible).to eql(5.0)
+    expect(a.points_possible).to be(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
     t = @course.discussion_topics.build(assignment: a, title: "some topic", message: "a little bit of content")
     t.save
@@ -248,8 +248,8 @@ describe DiscussionTopic do
     t.assignment = nil
     t.save
     t.reload
-    expect(t.assignment_id).to eql(nil)
-    expect(t.assignment).to eql(nil)
+    expect(t.assignment_id).to be_nil
+    expect(t.assignment).to be_nil
     a.reload
     expect(a).to be_deleted
   end
@@ -901,10 +901,10 @@ describe DiscussionTopic do
       @sub_topic = @group.discussion_topics.build(title: "sub topic", message: "not ok to be edited", user: @first_user)
       @sub_topic.root_topic_id = @parent_topic.id
       @sub_topic.save!
-      expect(@group_topic.grants_right?(@second_user, :update)).to eql(false)
-      expect(@sub_topic.grants_right?(@second_user, :update)).to eql(false)
-      expect(@group_topic.grants_right?(@teacher, :update)).to eql(true)
-      expect(@sub_topic.grants_right?(@teacher, :update)).to eql(false) # the changes just get undone anyway by refresh_subtopics
+      expect(@group_topic.grants_right?(@second_user, :update)).to be(false)
+      expect(@sub_topic.grants_right?(@second_user, :update)).to be(false)
+      expect(@group_topic.grants_right?(@teacher, :update)).to be(true)
+      expect(@sub_topic.grants_right?(@teacher, :update)).to be(false) # the changes just get undone anyway by refresh_subtopics
     end
   end
 
@@ -1218,14 +1218,14 @@ describe DiscussionTopic do
 
     it "does not send stream items to students if the topic isn't published" do
       topic = nil
-      expect { topic = @course.discussion_topics.create!(title: "secret topic", user: @teacher, workflow_state: "unpublished") }.to change { @student.stream_item_instances.count }.by(0)
-      expect { topic.discussion_entries.create! }.to change { @student.stream_item_instances.count }.by(0)
+      expect { topic = @course.discussion_topics.create!(title: "secret topic", user: @teacher, workflow_state: "unpublished") }.not_to change { @student.stream_item_instances.count }
+      expect { topic.discussion_entries.create! }.not_to change { @student.stream_item_instances.count }
     end
 
     it "does not send stream items to students if the topic is not available yet" do
       topic = nil
-      expect { topic = @course.discussion_topics.create!(title: "secret topic", user: @teacher, delayed_post_at: 1.week.from_now) }.to change { @student.stream_item_instances.count }.by(0)
-      expect { topic.discussion_entries.create! }.to change { @student.stream_item_instances.count }.by(0)
+      expect { topic = @course.discussion_topics.create!(title: "secret topic", user: @teacher, delayed_post_at: 1.week.from_now) }.not_to change { @student.stream_item_instances.count }
+      expect { topic.discussion_entries.create! }.not_to change { @student.stream_item_instances.count }
     end
 
     it "sends stream items to students for graded discussions" do
@@ -1262,7 +1262,7 @@ describe DiscussionTopic do
     end
 
     it "allows admins to see posts without posting" do
-      expect(@topic.user_can_see_posts?(@teacher)).to eq true
+      expect(@topic.user_can_see_posts?(@teacher)).to be true
     end
 
     it "allows course admins to see posts in concluded group topics without posting" do
@@ -1271,24 +1271,24 @@ describe DiscussionTopic do
       @topic.update_attribute(:group_category, group_category)
       subtopic = @topic.child_topics.first
       @course.complete!
-      expect(subtopic.user_can_see_posts?(@teacher)).to eq true
+      expect(subtopic.user_can_see_posts?(@teacher)).to be true
     end
 
     it "only allows active admins to see posts without posting" do
       @ta_enrollment = course_with_ta(course: @course, active_enrollment: true)
       # TA should be able to see
-      expect(@topic.user_can_see_posts?(@ta)).to eq true
+      expect(@topic.user_can_see_posts?(@ta)).to be true
       # Remove user as TA and enroll as student, should not be able to see
       @ta_enrollment.destroy
       # enroll as a student.
       course_with_student(course: @course, user: @ta, active_enrollment: true)
       @topic.reload
       @topic.clear_permissions_cache(@ta)
-      expect(@topic.user_can_see_posts?(@ta)).to eq false
+      expect(@topic.user_can_see_posts?(@ta)).to be false
     end
 
     it "does not allow student who hasn't posted to see" do
-      expect(@topic.user_can_see_posts?(@student)).to eq false
+      expect(@topic.user_can_see_posts?(@student)).to be false
     end
 
     it "does not allow participation in deleted discussions" do
@@ -1305,7 +1305,7 @@ describe DiscussionTopic do
 
     it "allows student who has posted to see" do
       @topic.reply_from(user: @student, text: "hai")
-      expect(@topic.user_can_see_posts?(@student)).to eq true
+      expect(@topic.user_can_see_posts?(@student)).to be true
     end
 
     it "works the same for group discussions" do
@@ -1703,8 +1703,8 @@ describe DiscussionTopic do
       expect(@topic.discussion_entries.active).to be_empty
       @submission.reload
       expect(@submission.workflow_state).to eq "unsubmitted"
-      expect(@submission.submission_type).to eq nil
-      expect(@submission.submitted_at).to eq nil
+      expect(@submission.submission_type).to be_nil
+      expect(@submission.submitted_at).to be_nil
     end
 
     it "has new submission date after deletion and re-submission" do
@@ -2029,7 +2029,7 @@ describe DiscussionTopic do
       group_discussion.user = @teacher
       group_discussion.save!
       group_discussion.change_read_state("read", @teacher) # quick way to make a participant
-      expect(group_discussion.discussion_topic_participants.where(user_id: @teacher.id).first.subscribed).to eq false
+      expect(group_discussion.discussion_topic_participants.where(user_id: @teacher.id).first.subscribed).to be false
     end
   end
 
@@ -2275,7 +2275,7 @@ describe DiscussionTopic do
 
     it "returns entry for valid arguments" do
       val = @topic.reply_from(user: @teacher, text: "entry 1")
-      expect(val).to be_a_kind_of DiscussionEntry
+      expect(val).to be_a DiscussionEntry
     end
 
     it "raises InvalidParticipant for invalid participants" do
@@ -2341,16 +2341,16 @@ describe DiscussionTopic do
     it "only section specific topics can have sections" do
       announcement = basic_announcement_model(course: @course)
       add_section_to_topic(announcement, @section)
-      expect(announcement.valid?).to eq true
+      expect(announcement.valid?).to be true
       announcement.is_section_specific = false
-      expect(announcement.valid?).to eq false
+      expect(announcement.valid?).to be false
       announcement.discussion_topic_section_visibilities.first.destroy
-      expect(announcement.valid?).to eq true
+      expect(announcement.valid?).to be true
     end
 
     it "section specific topics must have sections" do
       @announcement.is_section_specific = true
-      expect(@announcement.valid?).to eq false
+      expect(@announcement.valid?).to be false
       errors = @announcement.errors[:is_section_specific]
       expect(errors).to eq ["Section specific topics must have sections"]
     end
@@ -2389,30 +2389,30 @@ describe DiscussionTopic do
       @group.add_user(@student)
       announcement = basic_announcement_model(course: @group)
       add_section_to_topic(announcement, @section)
-      expect(announcement.valid?).to eq false
+      expect(announcement.valid?).to be false
       errors = announcement.errors[:is_section_specific]
       # NOTE: the feature flag validation will also fail here, but we still want this
       # validation to trigger too.
-      expect(errors.include?("Only course announcements and discussions can be section-specific")).to eq true
+      expect(errors.include?("Only course announcements and discussions can be section-specific")).to be true
     end
 
     it "allows discussions to be section-specific if the feature is enabled" do
       topic = DiscussionTopic.create!(title: "some title", context: @course,
                                       user: @teacher)
       add_section_to_topic(topic, @section)
-      expect(topic.valid?).to eq true
+      expect(topic.valid?).to be true
     end
 
     it "does not allow graded discussions to be section-specific" do
       group_discussion_assignment
       add_section_to_topic(@topic, @section)
-      expect(@topic.valid?).to eq false
+      expect(@topic.valid?).to be false
     end
 
     it "does not allow course grouped discussions to be section-specific" do
       group_discussion_topic_model
       add_section_to_topic(@group_topic, @section)
-      expect(@group_topic.valid?).to eq false
+      expect(@group_topic.valid?).to be false
     end
 
     it "does not include deleted sections" do
@@ -2552,7 +2552,7 @@ describe DiscussionTopic do
 
       it "does not create stream items for unpublished modules" do
         @topic.unpublish!
-        expect { @topic.publish! }.to change { @student.stream_item_instances.count }.by 0
+        expect { @topic.publish! }.not_to change { @student.stream_item_instances.count }
       end
 
       it "removes stream items from published topic when added to an unpublished module" do
@@ -2826,7 +2826,7 @@ describe DiscussionTopic do
     it "checks permissions on the course level for group level discussions" do
       group = @course.groups.create!
       topic = group.discussion_topics.create!(allow_rating: true, only_graders_can_rate: true)
-      expect(topic.grants_right?(@teacher, :rate)).to eq true
+      expect(topic.grants_right?(@teacher, :rate)).to be true
     end
   end
 
@@ -2842,7 +2842,7 @@ describe DiscussionTopic do
 
     context "anonymous_state is nil" do
       it "returns false" do
-        expect(discussion.anonymous?).to eq false
+        expect(discussion.anonymous?).to be false
       end
     end
 
@@ -2852,7 +2852,7 @@ describe DiscussionTopic do
       end
 
       it "returns true" do
-        expect(discussion.anonymous?).to eq true
+        expect(discussion.anonymous?).to be true
       end
     end
   end

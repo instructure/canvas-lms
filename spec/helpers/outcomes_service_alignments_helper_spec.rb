@@ -92,11 +92,11 @@ describe OutcomesServiceAlignmentsHelper do
 
     context "without context" do
       it "returns nil when context is nil" do
-        expect(subject.get_os_aligned_outcomes(nil)).to eq nil
+        expect(subject.get_os_aligned_outcomes(nil)).to be_nil
       end
 
       it "returns nil when context is empty" do
-        expect(subject.get_os_aligned_outcomes("")).to eq nil
+        expect(subject.get_os_aligned_outcomes("")).to be_nil
       end
     end
 

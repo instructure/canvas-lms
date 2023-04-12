@@ -64,7 +64,7 @@ describe LiveAssessments::ResultsController, type: :request do
         results.each do |r|
           expect(r.assessor).to eq teacher
           expect(r.assessment).to eq assessment
-          expect(r.passed).to eq true
+          expect(r.passed).to be true
           expect(r.assessed_at.to_i).to eq assessed_at.to_i
         end
         expect(results.map(&:user)).to eq [student, another_student]
@@ -108,7 +108,7 @@ describe LiveAssessments::ResultsController, type: :request do
         results.each do |r|
           expect(r["links"]["assessor"]).to eq teacher.id.to_s
           expect(r["links"]["assessment"]).to eq assessment.id.to_s
-          expect(r["passed"]).to eq true
+          expect(r["passed"]).to be true
           expect(Time.parse(r["assessed_at"]).to_i).to eq assessed_at.to_i
         end
         expect(results.map { |h| h["links"]["user"] }).to eq [student.id.to_s, another_student.id.to_s]
@@ -125,7 +125,7 @@ describe LiveAssessments::ResultsController, type: :request do
         results.each do |r|
           expect(r["links"]["assessor"]).to eq teacher.id.to_s
           expect(r["links"]["assessment"]).to eq assessment.id.to_s
-          expect(r["passed"]).to eq true
+          expect(r["passed"]).to be true
           expect(Time.parse(r["assessed_at"]).to_i).to eq assessed_at.to_i
         end
         expect(results.map { |h| h["links"]["user"] }).to eq [another_student.id.to_s]

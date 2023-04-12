@@ -101,7 +101,7 @@ describe "creating a quiz" do
         .to eq "You must have a student or section selected"
     end
 
-    it "saves and publishes a new quiz", :xbrowser, priority: "1", custom_timeout: 30 do
+    it "saves and publishes a new quiz", :xbrowser, custom_timeout: 30, priority: "1" do
       @quiz = course_quiz
       open_quiz_edit_form
 

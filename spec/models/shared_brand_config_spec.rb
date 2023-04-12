@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe SharedBrandConfig, type: :model do
+describe SharedBrandConfig do
   describe "policy" do
     subject { Account.default.shared_brand_configs.new }
 

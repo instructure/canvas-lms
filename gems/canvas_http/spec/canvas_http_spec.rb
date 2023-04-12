@@ -281,12 +281,12 @@ describe "CanvasHttp" do
     end
 
     it "checks for insecure hosts" do
-      expect(CanvasHttp.insecure_host?("example.com")).to eq false
-      expect(CanvasHttp.insecure_host?("localhost")).to eq true
-      expect(CanvasHttp.insecure_host?("127.0.0.1")).to eq true
-      expect(CanvasHttp.insecure_host?("42.42.42.42")).to eq true
-      expect(CanvasHttp.insecure_host?("42.42.1.1")).to eq true
-      expect(CanvasHttp.insecure_host?("42.1.1.1")).to eq false
+      expect(CanvasHttp.insecure_host?("example.com")).to be false
+      expect(CanvasHttp.insecure_host?("localhost")).to be true
+      expect(CanvasHttp.insecure_host?("127.0.0.1")).to be true
+      expect(CanvasHttp.insecure_host?("42.42.42.42")).to be true
+      expect(CanvasHttp.insecure_host?("42.42.1.1")).to be true
+      expect(CanvasHttp.insecure_host?("42.1.1.1")).to be false
     end
 
     it "raises an error when URL is not resolveable" do
@@ -319,13 +319,13 @@ describe "CanvasHttp" do
       http = CanvasHttp.connection_for_uri(URI.parse("http://example.com:1234/x/y/z"))
       expect(http.address).to eq("example.com")
       expect(http.port).to eq(1234)
-      expect(http.use_ssl?).to eq(false)
+      expect(http.use_ssl?).to be(false)
     end
 
     it "returns an https connection" do
       http = CanvasHttp.connection_for_uri(URI.parse("https://example.com"))
       expect(http.address).to eq("example.com")
-      expect(http.use_ssl?).to eq(true)
+      expect(http.use_ssl?).to be(true)
     end
   end
 

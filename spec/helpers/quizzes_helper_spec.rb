@@ -75,7 +75,7 @@ describe QuizzesHelper do
       question = { id: 1 }
       @stored_params = {}
       @attachments = {}
-      expect(attachment_id_for(question)).to eq nil
+      expect(attachment_id_for(question)).to be_nil
     end
   end
 
@@ -466,7 +466,7 @@ describe QuizzesHelper do
       quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
-      expect(message).to eq nil
+      expect(message).to be_nil
     end
 
     it 'provides a useful message, and an availability date, when "show at" is set' do

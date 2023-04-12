@@ -41,7 +41,7 @@ describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
     thread.join
 
     expect(Time.now.utc - start).to be < 1.0
-    expect(aborted).to eq true
+    expect(aborted).to be true
   end
 
   it "differentiates between unique and non-unique indexes" do

@@ -44,7 +44,7 @@ describe ReleaseNote do
     id = note.id
 
     note = ReleaseNote.find(id)
-    expect(note.id).not_to be nil
+    expect(note.id).not_to be_nil
     expect(note.id).to eq(id)
     expect(note.target_roles).to eq(["student", "ta"])
     expect(note.show_ats).to eq({ "prod" => show_at })
@@ -66,7 +66,7 @@ describe ReleaseNote do
     id = note.id
 
     note = ReleaseNote.find(id)
-    expect(note["en"]).not_to be nil
+    expect(note["en"]).not_to be_nil
     expect(note["en"][:title]).to eq("a title")
     expect(note["en"][:description]).to eq("a description")
     expect(note["en"][:url]).to eq("https://example.com")

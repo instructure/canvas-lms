@@ -19,7 +19,7 @@
 #
 
 describe "Submissions::ShowHelper" do
-  describe "included in a controller", type: :controller do
+  describe "included in a controller" do
     controller do
       include Submissions::ShowHelper
 

@@ -220,13 +220,13 @@ describe ConversationParticipant do
       Account.site_admin.account_users.create!(user: @admin_user)
       allow(Account.site_admin).to receive(:grants_right?).with(@admin_user, :become_user).and_return(false)
       convos = @target_user.conversations.for_masquerading_user(@admin_user, @target_user)
-      expect(convos.size).to eql 4
+      expect(convos.size).to be 4
       expect(convos).to eq @target_user.conversations.to_a
     end
 
     it "limits others to their associated root accounts" do
       convos = @target_user.conversations.for_masquerading_user(@admin_user, @target_user)
-      expect(convos.size).to eql 2
+      expect(convos.size).to be 2
       expect(convos.sort_by(&:id)).to eql [@c1, @c2]
     end
   end
@@ -328,8 +328,8 @@ describe ConversationParticipant do
 
         expect(c.reload.user_id).to eql @user2.id
         expect(c.participants.map(&:id)).not_to include(@user1.id)
-        expect(@user1.reload.unread_conversations_count).to eql 0
-        expect(@user2.reload.unread_conversations_count).to eql 1
+        expect(@user1.reload.unread_conversations_count).to be 0
+        expect(@user2.reload.unread_conversations_count).to be 1
       end
     end
 
@@ -338,18 +338,18 @@ describe ConversationParticipant do
       c.add_message("hello")
       c.update_attribute(:workflow_state, "unread")
       rconvo = c.conversation
-      expect(rconvo.participants.size).to eql 4
+      expect(rconvo.participants.size).to be 4
 
       c.move_to_user @user2
 
       expect { c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
       rconvo.reload
-      expect(rconvo.participants.size).to eql 3
+      expect(rconvo.participants.size).to be 3
       expect(rconvo.participants.map(&:id)).not_to include(@user1.id)
       expect(rconvo.participants.map(&:id)).to include(@user2.id)
-      expect(@user1.reload.unread_conversations_count).to eql 0
-      expect(@user2.reload.unread_conversations_count).to eql 1
+      expect(@user1.reload.unread_conversations_count).to be 0
+      expect(@user2.reload.unread_conversations_count).to be 1
     end
 
     it "moves a private conversation to the new user" do
@@ -363,10 +363,10 @@ describe ConversationParticipant do
 
       expect(c.reload.user_id).to eql @user2.id
       rconvo.reload
-      expect(rconvo.participants.size).to eql 2
+      expect(rconvo.participants.size).to be 2
       expect(rconvo.private_hash).not_to eql old_hash
-      expect(@user1.reload.unread_conversations_count).to eql 0
-      expect(@user2.reload.unread_conversations_count).to eql 1
+      expect(@user1.reload.unread_conversations_count).to be 0
+      expect(@user2.reload.unread_conversations_count).to be 1
     end
 
     it "merges a private conversation into the existing private conversation" do
@@ -382,14 +382,14 @@ describe ConversationParticipant do
       expect { c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
       expect { Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
-      expect(c2.reload.messages.size).to eql 2
+      expect(c2.reload.messages.size).to be 2
       expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
-      expect(c2.message_count).to eql 2
+      expect(c2.message_count).to be 2
       expect(c2.user_id).to eql @user2.id
-      expect(c2.conversation.participants.size).to eql 2
-      expect(@user1.reload.unread_conversations_count).to eql 0
-      expect(@user2.reload.unread_conversations_count).to eql 1
-      expect(other_guy.reload.unread_conversations_count).to eql 1
+      expect(c2.conversation.participants.size).to be 2
+      expect(@user1.reload.unread_conversations_count).to be 0
+      expect(@user2.reload.unread_conversations_count).to be 1
+      expect(other_guy.reload.unread_conversations_count).to be 1
     end
 
     it "changes a private conversation between the two users into a monologue" do
@@ -404,10 +404,10 @@ describe ConversationParticipant do
 
       expect { c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
       rconvo.reload
-      expect(rconvo.participants.size).to eql 1
+      expect(rconvo.participants.size).to be 1
       expect(rconvo.private_hash).not_to eql old_hash
-      expect(@user1.reload.unread_conversations_count).to eql 0
-      expect(@user2.reload.unread_conversations_count).to eql 1
+      expect(@user1.reload.unread_conversations_count).to be 0
+      expect(@user2.reload.unread_conversations_count).to be 1
     end
 
     it "merges a private conversations between the two users into the existing monologue" do
@@ -423,13 +423,13 @@ describe ConversationParticipant do
       expect { c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
       expect { Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
-      expect(c2.reload.messages.size).to eql 2
+      expect(c2.reload.messages.size).to be 2
       expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
-      expect(c2.message_count).to eql 2
+      expect(c2.message_count).to be 2
       expect(c2.user_id).to eql @user2.id
-      expect(c2.conversation.participants.size).to eql 1
-      expect(@user1.reload.unread_conversations_count).to eql 0
-      expect(@user2.reload.unread_conversations_count).to eql 1
+      expect(c2.conversation.participants.size).to be 1
+      expect(@user1.reload.unread_conversations_count).to be 0
+      expect(@user2.reload.unread_conversations_count).to be 1
     end
 
     it "merges a monologue into the existing monologue" do
@@ -444,13 +444,13 @@ describe ConversationParticipant do
       expect { c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
       expect { Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
-      expect(c2.reload.messages.size).to eql 2
+      expect(c2.reload.messages.size).to be 2
       expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
-      expect(c2.message_count).to eql 2
+      expect(c2.message_count).to be 2
       expect(c2.user_id).to eql @user2.id
-      expect(c2.conversation.participants.size).to eql 1
-      expect(@user1.reload.unread_conversations_count).to eql 0
-      expect(@user2.reload.unread_conversations_count).to eql 1
+      expect(c2.conversation.participants.size).to be 1
+      expect(@user1.reload.unread_conversations_count).to be 0
+      expect(@user2.reload.unread_conversations_count).to be 1
     end
 
     it "is not adversely affected by an outer scope" do
@@ -469,14 +469,14 @@ describe ConversationParticipant do
       expect { c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
       expect { Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
-      expect(c2.reload.messages.size).to eql 2
+      expect(c2.reload.messages.size).to be 2
       expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
-      expect(c2.message_count).to eql 2
+      expect(c2.message_count).to be 2
       expect(c2.user_id).to eql @user2.id
-      expect(c2.conversation.participants.size).to eql 2
-      expect(@user1.reload.unread_conversations_count).to eql 0
-      expect(@user2.reload.unread_conversations_count).to eql 1
-      expect(other_guy.reload.unread_conversations_count).to eql 1
+      expect(c2.conversation.participants.size).to be 2
+      expect(@user1.reload.unread_conversations_count).to be 0
+      expect(@user2.reload.unread_conversations_count).to be 1
+      expect(other_guy.reload.unread_conversations_count).to be 1
     end
 
     context "sharding" do
@@ -509,13 +509,13 @@ describe ConversationParticipant do
           @c1.update_attribute(:root_account_ids, [@a1.id, @a1.global_id].sort.join(","))
 
           convos = @target_user.conversations.for_masquerading_user(@admin_user, @target_user)
-          expect(convos.size).to eql 1
+          expect(convos.size).to be 1
           expect(convos.sort_by(&:id)).to eql [@c1]
 
           @cross_shard_admin = @shard1.activate { user_factory }
           @a1.account_users.create!(user: @cross_shard_admin)
           convos = @target_user.conversations.for_masquerading_user(@cross_shard_admin, @target_user)
-          expect(convos.size).to eql 1
+          expect(convos.size).to be 1
         end
       end
     end

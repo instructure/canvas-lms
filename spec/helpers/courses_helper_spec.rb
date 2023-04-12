@@ -251,7 +251,7 @@ describe CoursesHelper do
 
           tabs = controller.sortable_tabs
           tool_tab = tabs.find { |t| Lti::ExternalToolTab.tool_for_tab(t) == tool }
-          expect(tool_tab).to eq(nil)
+          expect(tool_tab).to be_nil
         end
       end
     end

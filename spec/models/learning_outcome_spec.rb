@@ -366,7 +366,7 @@ describe LearningOutcome do
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, purpose: "grading")
       @assignment.reload
-      expect(@assignment.learning_outcome_alignments.count).to eql(1)
+      expect(@assignment.learning_outcome_alignments.count).to be(1)
       expect(@assignment.rubric_association).not_to be_nil
       @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher).first
       @assessment = @a.assess({
@@ -384,12 +384,12 @@ describe LearningOutcome do
       expect(@outcome.learning_outcome_results).not_to be_empty
       @result = @outcome.learning_outcome_results.first
       expect(@result.user_id).to eql(@user.id)
-      expect(@result.score).to eql(2.0)
-      expect(@result.possible).to eql(3.0)
-      expect(@result.original_score).to eql(2.0)
-      expect(@result.original_possible).to eql(3.0)
-      expect(@result.mastery).to eql(false)
-      expect(@result.versions.length).to eql(1)
+      expect(@result.score).to be(2.0)
+      expect(@result.possible).to be(3.0)
+      expect(@result.original_score).to be(2.0)
+      expect(@result.original_possible).to be(3.0)
+      expect(@result.mastery).to be(false)
+      expect(@result.versions.length).to be(1)
       n = @result.version_number
       @assessment = @a.assess({
                                 user: @user,
@@ -404,12 +404,12 @@ describe LearningOutcome do
                                 }
                               })
       @result.reload
-      expect(@result.versions.length).to eql(2)
+      expect(@result.versions.length).to be(2)
       expect(@result.version_number).to be > n
-      expect(@result.score).to eql(3.0)
-      expect(@result.possible).to eql(3.0)
-      expect(@result.original_score).to eql(2.0)
-      expect(@result.mastery).to eql(true)
+      expect(@result.score).to be(3.0)
+      expect(@result.possible).to be(3.0)
+      expect(@result.original_score).to be(2.0)
+      expect(@result.mastery).to be(true)
     end
 
     it "overrides non-rubric-based alignments with rubric-based alignments for the same assignment" do
@@ -450,7 +450,7 @@ describe LearningOutcome do
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, purpose: "grading")
       @assignment.reload
-      expect(@assignment.learning_outcome_alignments.count).to eql(1)
+      expect(@assignment.learning_outcome_alignments.count).to be(1)
       expect(@assignment.learning_outcome_alignments.first).to eql(@alignment)
       expect(@assignment.learning_outcome_alignments.first).to have_rubric_association
       @alignment.reload
@@ -472,15 +472,15 @@ describe LearningOutcome do
                               })
       @outcome.reload
       expect(@outcome.learning_outcome_results).not_to be_empty
-      expect(@outcome.learning_outcome_results.length).to eql(1)
+      expect(@outcome.learning_outcome_results.length).to be(1)
       @result = @outcome.learning_outcome_results.find { |r| r.artifact_type == "RubricAssessment" }
       expect(@result).not_to be_nil
       expect(@result.user_id).to eql(@user.id)
-      expect(@result.score).to eql(2.0)
-      expect(@result.possible).to eql(3.0)
-      expect(@result.original_score).to eql(2.0)
-      expect(@result.original_possible).to eql(3.0)
-      expect(@result.mastery).to eql(false)
+      expect(@result.score).to be(2.0)
+      expect(@result.possible).to be(3.0)
+      expect(@result.original_score).to be(2.0)
+      expect(@result.original_possible).to be(3.0)
+      expect(@result.mastery).to be(false)
     end
 
     it "does not override rubric-based alignments with non-rubric-based alignments for the same assignment" do
@@ -517,7 +517,7 @@ describe LearningOutcome do
       @e = @course.enroll_student(@user)
       @a = @rubric.associate_with(@assignment, @course, purpose: "grading")
       @assignment.reload
-      expect(@assignment.learning_outcome_alignments.count).to eql(1)
+      expect(@assignment.learning_outcome_alignments.count).to be(1)
       @alignment = @assignment.learning_outcome_alignments.first
       expect(@alignment.learning_outcome).not_to be_deleted
       expect(@alignment).to have_rubric_association
@@ -536,15 +536,15 @@ describe LearningOutcome do
                                 }
                               })
       expect(@outcome.learning_outcome_results).not_to be_empty
-      expect(@outcome.learning_outcome_results.length).to eql(1)
+      expect(@outcome.learning_outcome_results.length).to be(1)
       @result = @outcome.learning_outcome_results.find { |r| r.artifact_type == "RubricAssessment" }
       expect(@result).not_to be_nil
       expect(@result.user_id).to eql(@user.id)
-      expect(@result.score).to eql(2.0)
-      expect(@result.possible).to eql(3.0)
-      expect(@result.original_score).to eql(2.0)
-      expect(@result.original_possible).to eql(3.0)
-      expect(@result.mastery).to eql(false)
+      expect(@result.score).to be(2.0)
+      expect(@result.possible).to be(3.0)
+      expect(@result.original_score).to be(2.0)
+      expect(@result.original_possible).to be(3.0)
+      expect(@result.mastery).to be(false)
     end
 
     it "does not let you set the calculation_method to nil if it has been set to something else" do

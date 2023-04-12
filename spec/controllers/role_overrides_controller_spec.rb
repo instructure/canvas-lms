@@ -115,7 +115,7 @@ describe RoleOverridesController do
       override = RoleOverride.last
       expect(override.permission).to eq @permission
       expect(override.role_id).to eq @role.id
-      expect(override.enabled).to eq true
+      expect(override.enabled).to be true
     end
 
     it "returns an error if the updated permission is invalid" do
@@ -175,7 +175,7 @@ describe RoleOverridesController do
         override = RoleOverride.last
         expect(override.permission).to eq @granular_permissions[0]
         expect(override.role_id).to eq @role.id
-        expect(override.enabled).to eq true
+        expect(override.enabled).to be true
       end
 
       it "does not allow locking an individual permissions that belongs to a group" do
@@ -214,8 +214,8 @@ describe RoleOverridesController do
         overrides = RoleOverride.where(permission: "restrict_quantitative_data")
         expect(overrides.length).to eq 1
         expect(overrides[0].permission).to eq "restrict_quantitative_data"
-        expect(overrides[0].enabled).to eq true
-        expect(overrides[0].locked).to eq true
+        expect(overrides[0].enabled).to be true
+        expect(overrides[0].locked).to be true
         expect(overrides[0].role_id).to eq @role.id
       end
     end
@@ -313,8 +313,8 @@ describe RoleOverridesController do
         post_with_settings(override: "unchecked")
         override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
         expect(override).not_to be_nil
-        expect(override.enabled).to eq false
-        expect(override.locked).to eq false
+        expect(override.enabled).to be false
+        expect(override.locked).to be false
         override.destroy
       end
 
@@ -322,8 +322,8 @@ describe RoleOverridesController do
         post_with_settings(locked: "true")
         override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
         expect(override).not_to be_nil
-        expect(override.enabled).to eq true
-        expect(override.locked).to eq true
+        expect(override.enabled).to be true
+        expect(override.locked).to be true
       end
     end
   end
@@ -342,7 +342,7 @@ describe RoleOverridesController do
         context "for an admin" do
           it "is true" do
             get "check_account_permission", params: { account_id: @account.id, permission: "manage_catalog" }
-            expect(json["granted"]).to eq(true)
+            expect(json["granted"]).to be(true)
           end
         end
 
@@ -350,7 +350,7 @@ describe RoleOverridesController do
           it "is false" do
             user_session(user_factory(account: @account))
             get "check_account_permission", params: { account_id: @account.id, permission: "manage_catalog" }
-            expect(json["granted"]).to eq(false)
+            expect(json["granted"]).to be(false)
           end
         end
       end
@@ -359,7 +359,7 @@ describe RoleOverridesController do
         context "for an admin" do
           it "is false" do
             get "check_account_permission", params: { account_id: @account.id, permission: "manage_catalog" }
-            expect(json["granted"]).to eq(false)
+            expect(json["granted"]).to be(false)
           end
         end
       end
@@ -384,7 +384,7 @@ describe RoleOverridesController do
       it "does not load the manage_developer_keys role on sub account" do
         get "index", params: { account_id: @account.id }
         expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first[:permissions].keys).to_not include(:manage_developer_keys)
-        expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys }).to eq false
+        expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys }).to be false
       end
 
       context "in root_account" do
@@ -393,7 +393,7 @@ describe RoleOverridesController do
         it "does load the manage_developer_keys role on root account" do
           get "index", params: { account_id: @account.id }
           expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first[:permissions].keys).to include(:manage_developer_keys)
-          expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys }).to eq true
+          expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys }).to be true
         end
       end
 

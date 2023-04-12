@@ -52,7 +52,7 @@ describe "Canvadoc" do
 
     it "returns nil if no secret found in DynamicSettings" do
       allow(DynamicSettings).to receive(:find).with(service: "canvadoc", default_ttl: 5.minutes).and_return({})
-      expect(Canvadoc.jwt_secret).to eq nil
+      expect(Canvadoc.jwt_secret).to be_nil
     end
   end
 

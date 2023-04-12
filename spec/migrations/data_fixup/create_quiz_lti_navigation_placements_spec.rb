@@ -108,7 +108,7 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
     it "does not create navigation placements for tools that are not Quiz LTI" do
       some_tool = ContextExternalTool.find_by(tool_id: "Some tool")
 
-      expect(some_tool.quiz_lti?).to eq false
+      expect(some_tool.quiz_lti?).to be false
       expect do
         DataFixup::CreateQuizLtiNavigationPlacements.run
         some_tool.reload

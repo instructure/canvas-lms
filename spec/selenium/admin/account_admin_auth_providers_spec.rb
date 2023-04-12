@@ -82,7 +82,7 @@ describe "account authentication" do
         config = ldap_aac.active.last.reload
         expect(ldap_aac.active.count).to eq 1
         expect(config.auth_host).to eq ""
-        expect(config.auth_port).to eq nil
+        expect(config.auth_port).to be_nil
         expect(config.auth_over_tls).to eq "simple_tls"
         expect(config.auth_base).to eq ""
         expect(config.auth_filter).to eq ""
@@ -135,7 +135,7 @@ describe "account authentication" do
         expect(config.certificate_fingerprint).to eq "abc123"
         expect(config.login_attribute).to eq "NameID"
         expect(config.identifier_format).to eq "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
-        expect(config.requested_authn_context).to eq nil
+        expect(config.requested_authn_context).to be_nil
         expect(config.parent_registration).to be_falsey
       end
 
@@ -159,7 +159,7 @@ describe "account authentication" do
         expect(config.certificate_fingerprint).to eq ""
         expect(config.login_attribute).to eq "NameID"
         expect(config.identifier_format).to eq "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
-        expect(config.requested_authn_context).to eq nil
+        expect(config.requested_authn_context).to be_nil
         expect(config.parent_registration).to be_falsey
       end
 
@@ -219,10 +219,10 @@ describe "account authentication" do
             wait_for_ajaximations
 
             aac = Account.default.authentication_providers.active.last
-            expect(aac.debugging?).to eq false
+            expect(aac.debugging?).to be false
 
             aac.class.debugging_keys.map(&:keys).flatten.each do |key|
-              expect(aac.debug_get(key)).to eq nil
+              expect(aac.debug_get(key)).to be_nil
             end
           end
         end
@@ -270,7 +270,7 @@ describe "account authentication" do
           expect(ap.federated_attributes).to eq({ "locale" => { "attribute" => "provider_locale",
                                                                 "provisioning_only" => true } })
           expect(f("input[name='authentication_provider[federated_attributes][locale][attribute]']").attribute("value")).to eq "provider_locale"
-          expect(is_checked("input[name='authentication_provider[federated_attributes][locale][provisioning_only]']:visible")).to eq true
+          expect(is_checked("input[name='authentication_provider[federated_attributes][locale][provisioning_only]']:visible")).to be true
         end
 
         it "hides provisioning only when jit provisioning is disabled" do
@@ -295,10 +295,10 @@ describe "account authentication" do
           provisioning_only = "input[name='authentication_provider[federated_attributes][locale][provisioning_only]']"
           expect(f(provisioning_only)).to be_displayed
           f(provisioning_only).click
-          expect(is_checked("input[name='authentication_provider[federated_attributes][locale][provisioning_only]']:visible")).to eq true
+          expect(is_checked("input[name='authentication_provider[federated_attributes][locale][provisioning_only]']:visible")).to be true
           f(".jit_provisioning_checkbox").click
           f(".jit_provisioning_checkbox").click
-          expect(is_checked("input[name='authentication_provider[federated_attributes][locale][provisioning_only]']:visible")).to eq false
+          expect(is_checked("input[name='authentication_provider[federated_attributes][locale][provisioning_only]']:visible")).to be false
         end
 
         it "hides the add attributes button when all are added" do
@@ -339,7 +339,7 @@ describe "account authentication" do
             fj(".remove_federated_attribute:visible").click
           end
           available = ff("#edit_saml_#{ap.id} .federated_attributes_select option")
-          expect(available.any? { |attr| attr.text =~ /attribute/i }).to eq false
+          expect(available.any? { |attr| attr.text =~ /attribute/i }).to be false
         end
       end
     end

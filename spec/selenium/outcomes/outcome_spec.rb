@@ -254,7 +254,7 @@ describe "outcomes" do
         individual_outcome_kabob_menu(0).click
         click_remove_outcome_button
         click_confirm_remove_button
-        expect(no_outcomes_billboard.present?).to eq(true)
+        expect(no_outcomes_billboard.present?).to be(true)
       end
 
       it "moves an outcome into a newly created outcome group as a teacher" do
@@ -379,7 +379,7 @@ describe "outcomes" do
           ratings = outcome.data[:rubric_criterion][:ratings]
           mastery_points = outcome.data[:rubric_criterion][:mastery_points]
           points_possible = outcome.data[:rubric_criterion][:points_possible]
-          expect(outcome.nil?).to eq(false)
+          expect(outcome.nil?).to be(false)
           expect(ratings.length).to eq(5)
           expect(ratings[0][:description]).to eq("Exceeds Mastery")
           expect(ratings[0][:points]).to eq(4)

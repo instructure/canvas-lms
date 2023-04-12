@@ -59,9 +59,9 @@ describe GroupCategoriesController do
       expect(response).to be_successful
       expect(assigns[:group_category]).not_to be_nil
       groups = assigns[:group_category].groups
-      expect(groups.length).to eql(2)
-      expect(groups[0].users.length).to eql(3)
-      expect(groups[1].users.length).to eql(3)
+      expect(groups.length).to be(2)
+      expect(groups[0].users.length).to be(3)
+      expect(groups[1].users.length).to be(3)
     end
 
     it "gives the new groups the right group_category" do
@@ -247,10 +247,10 @@ describe GroupCategoriesController do
       delete "destroy", params: { course_id: @course.id, id: category1.id }
       expect(response).to be_successful
       @course.reload
-      expect(@course.all_group_categories.length).to eql(2)
-      expect(@course.group_categories.length).to eql(1)
-      expect(@course.groups.length).to eql(2)
-      expect(@course.groups.active.length).to eql(1)
+      expect(@course.all_group_categories.length).to be(2)
+      expect(@course.group_categories.length).to be(1)
+      expect(@course.groups.length).to be(2)
+      expect(@course.groups.active.length).to be(1)
     end
 
     it "deletes the category and groups (granular permissions)" do
@@ -263,10 +263,10 @@ describe GroupCategoriesController do
       delete "destroy", params: { course_id: @course.id, id: category1.id }
       expect(response).to be_successful
       @course.reload
-      expect(@course.all_group_categories.length).to eql(2)
-      expect(@course.group_categories.length).to eql(1)
-      expect(@course.groups.length).to eql(2)
-      expect(@course.groups.active.length).to eql(1)
+      expect(@course.all_group_categories.length).to be(2)
+      expect(@course.group_categories.length).to be(1)
+      expect(@course.groups.length).to be(2)
+      expect(@course.groups.active.length).to be(1)
     end
 
     it "does not delete the category/groups if :manage_groups_delete is not enabled (granular permissions)" do

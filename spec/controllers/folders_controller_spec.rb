@@ -47,13 +47,13 @@ describe FoldersController do
 
       get "show", params: { course_id: @course.id, id: @folder.id }, format: "json"
       json = json_parse
-      expect(json["files"].count).to eql(1)
+      expect(json["files"].count).to be(1)
 
       file.hidden = true
       file.save!
       get "show", params: { course_id: @course.id, id: @folder.id }, format: "json"
       json = json_parse
-      expect(json["files"].count).to eql(0)
+      expect(json["files"].count).to be(0)
     end
   end
 

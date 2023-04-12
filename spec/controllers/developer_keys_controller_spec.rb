@@ -96,7 +96,7 @@ describe DeveloperKeysController do
 
         it 'includes the "includes parameter" release flag' do
           get "index", params: { account_id: Account.site_admin.id }
-          expect(assigns.dig(:js_env, :includesFeatureFlagEnabled)).to eq false
+          expect(assigns.dig(:js_env, :includesFeatureFlagEnabled)).to be false
         end
 
         describe "js bundles" do
@@ -216,7 +216,7 @@ describe DeveloperKeysController do
         json_data = JSON.parse(response.body)
         expect(response).to be_successful
         key = DeveloperKey.find(json_data["id"])
-        expect(key.account).to be nil
+        expect(key.account).to be_nil
       end
 
       it "cannot create keys for a subaccount" do
@@ -269,7 +269,7 @@ describe DeveloperKeysController do
 
         it 'allows setting "allow_includes"' do
           post "create", params: { account_id: root_account.id, developer_key: { scopes: valid_scopes, allow_includes: true } }
-          expect(DeveloperKey.find(json_parse["id"]).allow_includes).to eq true
+          expect(DeveloperKey.find(json_parse["id"]).allow_includes).to be true
         end
 
         it "allows setting scopes" do
@@ -359,7 +359,7 @@ describe DeveloperKeysController do
 
         it 'allows setting "allow_includes"' do
           put "update", params: { id: developer_key.id, developer_key: { scopes: valid_scopes, allow_includes: false } }
-          expect(developer_key.reload.allow_includes).to eq false
+          expect(developer_key.reload.allow_includes).to be false
         end
 
         it "allows setting scopes for site admin keys" do

@@ -44,16 +44,16 @@ describe "Quizzes2 Exporter" do
     end
 
     it "creates a Quizzes2 assignment group if it doesn't exist" do
-      expect(@course.assignment_groups.where(name: Exporters::Quizzes2Exporter::GROUP_NAME).exists?).to eq false
+      expect(@course.assignment_groups.where(name: Exporters::Quizzes2Exporter::GROUP_NAME).exists?).to be false
       @quizzes2.export
-      expect(@course.assignment_groups.where(name: Exporters::Quizzes2Exporter::GROUP_NAME).exists?).to eq true
+      expect(@course.assignment_groups.where(name: Exporters::Quizzes2Exporter::GROUP_NAME).exists?).to be true
     end
 
     it "creates a Quizzes2 assignment group if it was previously deleted" do
       old_group = @course.assignment_groups.create(name: Exporters::Quizzes2Exporter::GROUP_NAME)
       old_group.destroy
       @quizzes2.export
-      expect(@course.assignment_groups.where(name: Exporters::Quizzes2Exporter::GROUP_NAME).exists?).to eq true
+      expect(@course.assignment_groups.where(name: Exporters::Quizzes2Exporter::GROUP_NAME).exists?).to be true
     end
 
     it "does not create a new Quizzes2 assignment group if one exists" do

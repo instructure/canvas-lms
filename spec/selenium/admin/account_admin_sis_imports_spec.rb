@@ -139,7 +139,7 @@ describe "sis imports ui" do
     expect(f(".progress_bar_holder .progress_message")).to be_displayed
     SisBatch.last.process_without_send_later
     expect(f(".sis_messages .sis_error_message")).to include_text "The import failed with these messages:"
-    expect(SisBatch.last.batch_mode).to eq true
+    expect(SisBatch.last.batch_mode).to be true
     expect(SisBatch.last.options).to eq({
                                           skip_deletes: false,
                                           override_sis_stickiness: true,

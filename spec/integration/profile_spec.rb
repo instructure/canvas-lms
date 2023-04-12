@@ -60,6 +60,6 @@ describe ProfileController do
     enter_student_view
 
     get "/profile/settings"
-    expect(response.status).to eq 401
+    expect(response).to have_http_status :unauthorized
   end
 end

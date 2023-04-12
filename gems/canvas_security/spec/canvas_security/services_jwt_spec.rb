@@ -167,7 +167,7 @@ module CanvasSecurity
           it "doesn't include the masq key if there is no real user" do
             jwt = ServicesJwt.for_user(host, user, real_user: nil)
             decrypted_token_body = translate_token.call(jwt)
-            expect(decrypted_token_body.key?(:masq_sub)).to eq(false)
+            expect(decrypted_token_body.key?(:masq_sub)).to be(false)
           end
 
           it "includes workflows if given" do

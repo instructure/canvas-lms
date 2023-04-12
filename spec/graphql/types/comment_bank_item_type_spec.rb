@@ -37,6 +37,6 @@ describe Types::CommentBankItemType do
   end
 
   it "requires read permission on record" do
-    expect(item_type.resolve("_id", current_user: user_model)).to eq nil
+    expect(item_type.resolve("_id", current_user: user_model)).to be_nil
   end
 end

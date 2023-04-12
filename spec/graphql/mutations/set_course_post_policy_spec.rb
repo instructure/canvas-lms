@@ -149,7 +149,7 @@ describe Mutations::SetCoursePostPolicy do
 
     it "does not return data for the related post policy" do
       result = execute_query(mutation_str(course_id: course.id, post_manually: true), context)
-      expect(result.dig("data", "setCoursePostPolicy")).to be nil
+      expect(result.dig("data", "setCoursePostPolicy")).to be_nil
     end
   end
 end

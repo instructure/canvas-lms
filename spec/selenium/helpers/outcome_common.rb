@@ -28,7 +28,7 @@ module OutcomeCommon
     button = f(".btn-primary")
     keep_trying_until do
       button.click
-      expect(driver.switch_to.alert).not_to be nil
+      expect(driver.switch_to.alert).not_to be_nil
       true
     end
     driver.switch_to.alert.accept

@@ -218,7 +218,7 @@ describe ContentMigration do
       run_course_copy
 
       q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
-      expect(q2.quiz_data.size).to eql(2)
+      expect(q2.quiz_data.size).to be(2)
       ans_count = 0
       q2.quiz_data.each do |qd|
         qd["answers"].each do |ans|
@@ -226,7 +226,7 @@ describe ContentMigration do
           ans_count += 1
         end
       end
-      expect(ans_count).to eql(4)
+      expect(ans_count).to be(4)
     end
 
     it "makes true-false question answers consistent" do
@@ -347,7 +347,7 @@ describe ContentMigration do
       g = q.quiz_groups[1]
       expect(g.assessment_question_bank_id).to eq bank2.id
       g = q.quiz_groups[2]
-      expect(g.assessment_question_bank_id).to eq nil
+      expect(g.assessment_question_bank_id).to be_nil
     end
 
     it "omits deleted questions in banks" do
@@ -1163,9 +1163,9 @@ describe ContentMigration do
         to_quiz_plain = @copy_to.quizzes.where(migration_id: mig_id(@quiz_plain)).first
         to_quiz_assigned = @copy_to.quizzes.where(migration_id: mig_id(@quiz_assigned)).first
         expect(to_quiz_assigned.assignment_overrides.count).to eq 0
-        expect(to_quiz_assigned.only_visible_to_overrides).to eq false
+        expect(to_quiz_assigned.only_visible_to_overrides).to be false
         expect(to_quiz_plain.assignment_overrides.count).to eq 1
-        expect(to_quiz_plain.only_visible_to_overrides).to eq true
+        expect(to_quiz_plain.only_visible_to_overrides).to be true
       end
     end
 

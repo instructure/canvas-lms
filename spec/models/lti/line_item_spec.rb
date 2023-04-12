@@ -20,7 +20,7 @@
 
 require_relative "../../spec_helper"
 
-RSpec.describe Lti::LineItem, type: :model do
+RSpec.describe Lti::LineItem do
   context "when validating" do
     let(:line_item) { line_item_model }
 
@@ -62,7 +62,7 @@ RSpec.describe Lti::LineItem, type: :model do
       line_item_two = line_item_model(assignment: assignment)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
 
-      expect(line_item_one.assignment_line_item?).to eq true
+      expect(line_item_one.assignment_line_item?).to be true
     end
 
     it "returns false if the line item is not the first in the assignment" do
@@ -70,7 +70,7 @@ RSpec.describe Lti::LineItem, type: :model do
       line_item_two = line_item_model(assignment: assignment)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
 
-      expect(line_item_two.assignment_line_item?).to eq false
+      expect(line_item_two.assignment_line_item?).to be false
     end
   end
 

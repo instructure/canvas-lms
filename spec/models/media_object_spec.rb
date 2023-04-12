@@ -151,8 +151,8 @@ describe MediaObject do
         mo.user = nil
         mo.save!
 
-        expect(mo.grants_right?(@teacher, :add_captions)).to eq true
-        expect(mo.grants_right?(@teacher, :delete_captions)).to eq true
+        expect(mo.grants_right?(@teacher, :add_captions)).to be true
+        expect(mo.grants_right?(@teacher, :delete_captions)).to be true
       end
 
       it "does not allow course non-admin users to add_captions to userless objects" do
@@ -162,8 +162,8 @@ describe MediaObject do
         mo.user = nil
         mo.save!
 
-        expect(mo.grants_right?(@student, :add_captions)).to eq false
-        expect(mo.grants_right?(@student, :delete_captions)).to eq false
+        expect(mo.grants_right?(@student, :add_captions)).to be false
+        expect(mo.grants_right?(@student, :delete_captions)).to be false
       end
 
       it "allows course non-admin users to add_captions to objects belonging to them" do
@@ -173,8 +173,8 @@ describe MediaObject do
         mo.user = @student
         mo.save!
 
-        expect(mo.grants_right?(@student, :add_captions)).to eq true
-        expect(mo.grants_right?(@student, :delete_captions)).to eq true
+        expect(mo.grants_right?(@student, :add_captions)).to be true
+        expect(mo.grants_right?(@student, :delete_captions)).to be true
       end
 
       it "does not allow course non-admin users to add_captions to objects not belonging to them" do
@@ -185,8 +185,8 @@ describe MediaObject do
         mo.user = @user
         mo.save!
 
-        expect(mo.grants_right?(@student, :add_captions)).to eq false
-        expect(mo.grants_right?(@student, :delete_captions)).to eq false
+        expect(mo.grants_right?(@student, :add_captions)).to be false
+        expect(mo.grants_right?(@student, :delete_captions)).to be false
       end
     end
   end

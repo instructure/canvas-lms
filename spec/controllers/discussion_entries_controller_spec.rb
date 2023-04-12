@@ -177,7 +177,7 @@ describe DiscussionEntriesController do
       @entry.user = @student
       @entry.save!
       expect(@entry.user).to eql(@student)
-      expect(@entry.editor).to eql(nil)
+      expect(@entry.editor).to be_nil
       put "update", params: { course_id: @course.id, id: @entry.id, discussion_entry: { message: "new message" } }
       expect(response).to be_redirect
       expect(assigns[:entry].editor).to eql(@teacher)
@@ -228,7 +228,7 @@ describe DiscussionEntriesController do
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
-      expect(rss.items.length).to eql(0)
+      expect(rss.items.length).to be(0)
     end
 
     it "leaves out deleted media comments" do
@@ -240,7 +240,7 @@ describe DiscussionEntriesController do
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
-      expect(rss.items.length).to eql(0)
+      expect(rss.items.length).to be(0)
     end
 
     it "includes media comments generated with rce enhancements" do
@@ -252,7 +252,7 @@ describe DiscussionEntriesController do
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
-      expect(rss.items.length).to eql(1)
+      expect(rss.items.length).to be(1)
       expected_url = "courses/#{@course.id}/media_download.mp4?type=mp4&entryId=#{@mo1.media_id}&redirect=1"
       expect(rss.items.first.enclosure.url).to end_with(expected_url)
     end
@@ -271,7 +271,7 @@ describe DiscussionEntriesController do
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
-      expect(rss.items.length).to eql(1)
+      expect(rss.items.length).to be(1)
       expected_url = "courses/#{@course.id}/files/#{@a.id}/download.mp4?verifier=#{@a.uuid}"
       expect(rss.items.first.enclosure.url).to end_with(expected_url)
     end
@@ -286,7 +286,7 @@ describe DiscussionEntriesController do
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
-      expect(rss.items.length).to eql(1)
+      expect(rss.items.length).to be(1)
       expected_url = "courses/#{@course.id}/media_download.mp4?type=mp4&entryId=#{@mo1.media_id}&redirect=1"
       expect(rss.items.first.enclosure.url).to end_with(expected_url)
       expect(assigns[:discussion_entries]).not_to be_empty
@@ -308,7 +308,7 @@ describe DiscussionEntriesController do
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
-      expect(rss.items.length).to eql(1)
+      expect(rss.items.length).to be(1)
       expected_url = "users/#{@student.id}/media_download.mp4?type=mp4&entryId=#{@student_mo1.media_id}&redirect=1"
       expect(rss.items.first.enclosure.url).to end_with(expected_url)
       expect(assigns[:discussion_entries]).not_to be_empty
@@ -331,7 +331,7 @@ describe DiscussionEntriesController do
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
-      expect(rss.items.length).to eql(0)
+      expect(rss.items.length).to be(0)
       expect(assigns[:discussion_entries]).not_to be_empty
       expect(assigns[:discussion_entries][0]).to eql(@entry)
     end
@@ -348,7 +348,7 @@ describe DiscussionEntriesController do
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
-      expect(rss.items.length).to eql(0)
+      expect(rss.items.length).to be(0)
       expect(assigns[:discussion_entries]).to be_empty
     end
 
@@ -367,7 +367,7 @@ describe DiscussionEntriesController do
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
-      expect(rss.items.length).to eql(0)
+      expect(rss.items.length).to be(0)
       expect(assigns[:discussion_entries]).to be_empty
     end
 
@@ -382,7 +382,7 @@ describe DiscussionEntriesController do
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
-      expect(rss.items.length).to eql(1)
+      expect(rss.items.length).to be(1)
       expect(assigns[:discussion_entries]).not_to be_empty
       expect(assigns[:discussion_entries][0]).to eql(@entry)
     end
@@ -395,7 +395,7 @@ describe DiscussionEntriesController do
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
-      expect(rss.items.length).to eql(0)
+      expect(rss.items.length).to be(0)
     end
 
     it "does not error if data is missing and kaltura is unresponsive" do
@@ -417,13 +417,13 @@ describe DiscussionEntriesController do
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
-      expect(rss.items.length).to eql(0)
+      expect(rss.items.length).to be(0)
     end
 
     it "respects podcast_has_student_posts for course discussions" do
       @topic.update(podcast_enabled: true, podcast_has_student_posts: false)
       get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
-      expect(assigns[:discussion_entries].length).to eql 0
+      expect(assigns[:discussion_entries].length).to be 0
     end
 
     it "always returns student entries for group discussions" do
@@ -434,7 +434,7 @@ describe DiscussionEntriesController do
 
       @topic.update(podcast_enabled: true, podcast_has_student_posts: false)
       get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: membership.feed_code }, format: "rss"
-      expect(assigns[:discussion_entries].length).to eql 1
+      expect(assigns[:discussion_entries].length).to be 1
     end
   end
 end

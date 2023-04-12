@@ -449,7 +449,7 @@ module ActiveRecord
       let(:scope) { User.active }
 
       it "uses FOR UPDATE on a normal exclusive lock" do
-        expect(scope.lock(true).lock_value).to eq true
+        expect(scope.lock(true).lock_value).to be true
       end
 
       it "substitutes 'FOR NO KEY UPDATE' if specified" do

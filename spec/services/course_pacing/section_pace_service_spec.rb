@@ -58,7 +58,7 @@ describe CoursePacing::SectionPaceService do
       before { section.course.course_paces.primary.destroy_all }
 
       it "returns nil" do
-        expect(CoursePacing::SectionPaceService.template_pace_for(section)).to eq nil
+        expect(CoursePacing::SectionPaceService.template_pace_for(section)).to be_nil
       end
     end
 
@@ -109,7 +109,7 @@ describe CoursePacing::SectionPaceService do
         allow(section_pace).to receive(:update).and_return false
         expect(
           CoursePacing::SectionPaceService.update_pace(section_pace, update_params)
-        ).to eq false
+        ).to be false
       end
     end
   end

@@ -114,7 +114,7 @@ describe EportfolioCategoriesController do
           user_session(@user)
           get :show, params: { eportfolio_id: @portfolio.id, category_name: @category.slug }
 
-          expect(response.status).to eq(200)
+          expect(response).to have_http_status(:ok)
         end
       end
 
@@ -144,7 +144,7 @@ describe EportfolioCategoriesController do
           user_session(@admin)
           get :show, params: { eportfolio_id: @portfolio.id, category_name: @category.slug }
 
-          expect(response.status).to eq(200)
+          expect(response).to have_http_status(:ok)
         end
 
         it "is unauthorized when the eportfolio is spam and the admin does not have :moderate_user_content permissions" do

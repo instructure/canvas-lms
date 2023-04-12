@@ -904,14 +904,14 @@ describe "Files API", type: :request do
     it "does not list locked file if not authed" do
       course_with_student_logged_in(course: @course)
       json = api_call(:get, @files_path, @files_path_options, {})
-      expect(json.any? { |f| f[:id] == @a2.id }).to eq false
+      expect(json.any? { |f| f[:id] == @a2.id }).to be false
     end
 
     it "does not list hidden files if not authed" do
       course_with_student_logged_in(course: @course)
       json = api_call(:get, @files_path, @files_path_options, {})
 
-      expect(json.any? { |f| f[:id] == @a3.id }).to eq false
+      expect(json.any? { |f| f[:id] == @a3.id }).to be false
     end
 
     it "does not list locked folder if not authed" do

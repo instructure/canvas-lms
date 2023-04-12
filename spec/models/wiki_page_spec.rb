@@ -112,7 +112,7 @@ describe WikiPage do
     course_with_teacher(active_all: true)
 
     new_front_page = @course.wiki_pages.create!(title: "asdf")
-    expect(new_front_page.set_as_front_page!).to eq true
+    expect(new_front_page.set_as_front_page!).to be true
 
     @course.wiki.reload
     expect(@course.wiki.front_page).to eq new_front_page
@@ -218,11 +218,11 @@ describe WikiPage do
 
     it "does not allow students to read" do
       student_in_course(course: @course, active_all: true)
-      expect(@page.can_read_page?(@student)).to eq false
+      expect(@page.can_read_page?(@student)).to be false
     end
 
     it "allows teachers to read" do
-      expect(@page.can_read_page?(@teacher)).to eq true
+      expect(@page.can_read_page?(@teacher)).to be true
     end
 
     context "allows account admins to read" do
@@ -232,7 +232,7 @@ describe WikiPage do
           role = custom_account_role("CustomAccountUser", account: account)
           RoleOverride.manage_role_override(account, role, perm, override: true)
           admin = account_admin_user(account: account, role: role, active_all: true)
-          expect(@page.can_read_page?(admin)).to eq true
+          expect(@page.can_read_page?(admin)).to be true
         end
       end
     end
@@ -426,7 +426,7 @@ describe WikiPage do
         let(:editing_roles) { "teachers" }
 
         it "returns false for a teacher" do
-          expect(subject).to eq false
+          expect(subject).to be false
         end
       end
 
@@ -434,7 +434,7 @@ describe WikiPage do
         let(:editing_roles) { "teachers,students" }
 
         it "returns false for a teacher" do
-          expect(subject).to eq false
+          expect(subject).to be false
         end
       end
 
@@ -442,7 +442,7 @@ describe WikiPage do
         let(:editing_roles) { "teachers,students,public" }
 
         it "returns false for a teacher" do
-          expect(subject).to eq false
+          expect(subject).to be false
         end
       end
     end
@@ -469,7 +469,7 @@ describe WikiPage do
       context "when the current user is a teacher in the group's course" do
         let(:current_user) { teacher }
 
-        it { is_expected.to eq true }
+        it { is_expected.to be true }
       end
 
       context "when the current user is a concluded teacher" do
@@ -477,7 +477,7 @@ describe WikiPage do
 
         let(:current_user) { teacher }
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
     end
   end

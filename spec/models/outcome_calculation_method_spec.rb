@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe OutcomeCalculationMethod, type: :model do
+describe OutcomeCalculationMethod do
   subject { OutcomeCalculationMethod.create!(creation_params) }
 
   let_once(:account) { account_model }
@@ -118,7 +118,7 @@ describe OutcomeCalculationMethod, type: :model do
       calculation_method = OutcomeCalculationMethod.find_or_create_default!(account)
       expect(calculation_method.calculation_method).to eq "highest"
       expect(calculation_method.workflow_state).to eq "active"
-      expect(calculation_method.calculation_int).to eq nil
+      expect(calculation_method.calculation_int).to be_nil
       expect(calculation_method.context).to eq account
     end
 

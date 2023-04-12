@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe BlackoutDatesController, type: :controller do
+describe BlackoutDatesController do
   before :once do
     course_with_teacher(active_all: true)
 

@@ -406,24 +406,24 @@ describe Attachment do
     end
 
     it "defaults to pending_upload" do
-      expect(@attachment.state).to eql(:pending_upload)
+      expect(@attachment.state).to be(:pending_upload)
     end
 
     it "is able to take a processing object and complete its process" do
       attachment_model(workflow_state: "processing")
       @attachment.process!
-      expect(@attachment.state).to eql(:processed)
+      expect(@attachment.state).to be(:processed)
     end
 
     it "is able to take a new object and bypass upload with process" do
       @attachment.process!
-      expect(@attachment.state).to eql(:processed)
+      expect(@attachment.state).to be(:processed)
     end
 
     it "is able to recycle a processed object and re-upload it" do
       attachment_model(workflow_state: "processed")
       @attachment.recycle
-      expect(@attachment.state).to eql(:pending_upload)
+      expect(@attachment.state).to be(:pending_upload)
     end
   end
 
@@ -906,7 +906,7 @@ describe Attachment do
     it "does not split unicode characters when truncating" do
       a = attachment_model(filename: "\u2603" * 300)
       expect(a.display_name).to eql("\u2603" * 255)
-      expect(a.filename.length).to eql(252)
+      expect(a.filename.length).to be(252)
       expect(a.unencoded_filename).to be_valid_encoding
       expect(a.unencoded_filename).to eql("\u2603" * 28)
     end
@@ -1034,7 +1034,7 @@ describe Attachment do
       expect(b.id).not_to be_nil
       expect(b.filename).to eq a.filename
       b.save
-      expect(b.root_attachment_id).to eq nil
+      expect(b.root_attachment_id).to be_nil
       expect(b.namespace).to eq courseb.root_account.file_namespace
 
       new_a = b.clone_for(coursea, nil, overwrite: true)
@@ -1105,51 +1105,51 @@ describe Attachment do
     it "does not allow unauthorized users to read files" do
       a = attachment_model(context: course_model, visibility_level: "context")
       @course.update_attribute(:is_public, false)
-      expect(a.grants_right?(user, :read)).to eql(false)
+      expect(a.grants_right?(user, :read)).to be(false)
     end
 
     it "disallows anonymous access for unpublished public contexts" do
       a = attachment_model(context: course_model, visibility_level: "public")
-      expect(a.grants_right?(user, :read)).to eql(false)
+      expect(a.grants_right?(user, :read)).to be(false)
     end
 
     it "allows anonymous access for public contexts" do
       a = attachment_model(context: course_model, visibility_level: "public")
       @course.offer
-      expect(a.grants_right?(user, :read)).to eql(true)
+      expect(a.grants_right?(user, :read)).to be(true)
     end
 
     it "allows students to read files" do
       a = attachment
       a.reload
-      expect(a.grants_right?(student, :read)).to eql(true)
+      expect(a.grants_right?(student, :read)).to be(true)
     end
 
     it "allows students to download files" do
       a = attachment
       a.reload
-      expect(a.grants_right?(student, :download)).to eql(true)
+      expect(a.grants_right?(student, :download)).to be(true)
     end
 
     it "allows students to read (but not download) locked files" do
       a = attachment
       a.update_attribute(:locked, true)
       a.reload
-      expect(a.grants_right?(student, :read)).to eql(true)
-      expect(a.grants_right?(student, :download)).to eql(false)
+      expect(a.grants_right?(student, :read)).to be(true)
+      expect(a.grants_right?(student, :download)).to be(false)
     end
 
     it "allows user access based on 'file_access_user_id' and 'file_access_expiration' in the session" do
       a = attachment
-      expect(a.grants_right?(nil, :read)).to eql(false)
-      expect(a.grants_right?(nil, :download)).to eql(false)
+      expect(a.grants_right?(nil, :read)).to be(false)
+      expect(a.grants_right?(nil, :download)).to be(false)
       mock_session = ActionController::TestSession.new({
                                                          "file_access_user_id" => student.id,
                                                          "file_access_expiration" => 1.hour.from_now.to_i,
                                                          "permissions_key" => SecureRandom.uuid
                                                        })
-      expect(a.grants_right?(nil, mock_session, :read)).to eql(true)
-      expect(a.grants_right?(nil, mock_session, :download)).to eql(true)
+      expect(a.grants_right?(nil, mock_session, :read)).to be(true)
+      expect(a.grants_right?(nil, mock_session, :download)).to be(true)
     end
 
     it "denies user access based on 'file_access_user_id' correctly" do
@@ -1160,8 +1160,8 @@ describe Attachment do
                                                          "file_access_expiration" => 1.hour.from_now.to_i,
                                                          "permissions_key" => SecureRandom.uuid
                                                        })
-      expect(a.grants_right?(nil, mock_session, :read)).to eql(false)
-      expect(a.grants_right?(nil, mock_session, :download)).to eql(false)
+      expect(a.grants_right?(nil, mock_session, :read)).to be(false)
+      expect(a.grants_right?(nil, mock_session, :download)).to be(false)
     end
 
     it "allows user access to anyone if the course is public to auth users (with 'file_access_user_id' and 'file_access_expiration' in the session)" do
@@ -1172,32 +1172,32 @@ describe Attachment do
                                                        })
 
       a = attachment_model(context: course)
-      expect(a.grants_right?(nil, mock_session, :read)).to eql(false)
-      expect(a.grants_right?(nil, mock_session, :download)).to eql(false)
+      expect(a.grants_right?(nil, mock_session, :read)).to be(false)
+      expect(a.grants_right?(nil, mock_session, :download)).to be(false)
 
       course.is_public_to_auth_users = true
       course.save!
       a.reload
       AdheresToPolicy::Cache.clear
 
-      expect(a.grants_right?(nil, :read)).to eql(false)
-      expect(a.grants_right?(nil, :download)).to eql(false)
-      expect(a.grants_right?(nil, mock_session, :read)).to eql(true)
-      expect(a.grants_right?(nil, mock_session, :download)).to eql(true)
+      expect(a.grants_right?(nil, :read)).to be(false)
+      expect(a.grants_right?(nil, :download)).to be(false)
+      expect(a.grants_right?(nil, mock_session, :read)).to be(true)
+      expect(a.grants_right?(nil, mock_session, :download)).to be(true)
     end
 
     it "does not allow user access based on incorrect 'file_access_user_id' in the session" do
       a = attachment
-      expect(a.grants_right?(nil, :read)).to eql(false)
-      expect(a.grants_right?(nil, :download)).to eql(false)
-      expect(a.grants_right?(nil, ActionController::TestSession.new({ "file_access_user_id" => 0, "file_access_expiration" => 1.hour.from_now.to_i }), :read)).to eql(false)
+      expect(a.grants_right?(nil, :read)).to be(false)
+      expect(a.grants_right?(nil, :download)).to be(false)
+      expect(a.grants_right?(nil, ActionController::TestSession.new({ "file_access_user_id" => 0, "file_access_expiration" => 1.hour.from_now.to_i }), :read)).to be(false)
     end
 
     it "does not allow user access based on incorrect 'file_access_expiration' in the session" do
       a = attachment
-      expect(a.grants_right?(nil, :read)).to eql(false)
-      expect(a.grants_right?(nil, :download)).to eql(false)
-      expect(a.grants_right?(nil, ActionController::TestSession.new({ "file_access_user_id" => student.id, "file_access_expiration" => 1.minute.ago.to_i }), :read)).to eql(false)
+      expect(a.grants_right?(nil, :read)).to be(false)
+      expect(a.grants_right?(nil, :download)).to be(false)
+      expect(a.grants_right?(nil, ActionController::TestSession.new({ "file_access_user_id" => student.id, "file_access_expiration" => 1.minute.ago.to_i }), :read)).to be(false)
     end
 
     it "allows students to download a file on an assessment question if it's part of a quiz they can read" do
@@ -1215,8 +1215,8 @@ describe Attachment do
       quiz = @course.quizzes.create!
       AssessmentQuestion.find_or_create_quiz_questions([@aquestion1], quiz.id, nil)
       quiz.publish!
-      expect(aq_att1.grants_right?(student, :download)).to eq true
-      expect(aq_att2.grants_right?(student, :download)).to eq false
+      expect(aq_att1.grants_right?(student, :download)).to be true
+      expect(aq_att2.grants_right?(student, :download)).to be false
     end
 
     context "group assignment" do
@@ -1255,13 +1255,13 @@ describe Attachment do
       end
 
       it "does allow read attachments for users in the same group" do
-        expect(@attachment.grants_right?(@user_1, :read)).to eql(true)
-        expect(@attachment.grants_right?(@user_2, :read)).to eql(true)
+        expect(@attachment.grants_right?(@user_1, :read)).to be(true)
+        expect(@attachment.grants_right?(@user_2, :read)).to be(true)
       end
 
       it "does not allow read attachments for users in another group" do
-        expect(@attachment.grants_right?(@user_3, :read)).to eql(false)
-        expect(@attachment.grants_right?(@user_4, :read)).to eql(false)
+        expect(@attachment.grants_right?(@user_3, :read)).to be(false)
+        expect(@attachment.grants_right?(@user_4, :read)).to be(false)
       end
     end
   end
@@ -1416,7 +1416,7 @@ describe Attachment do
       @a1.update_attribute(:locked, true)
       @a.update_attribute(:display_name, "a1")
       @a.handle_duplicates(:overwrite)
-      expect(@a.reload.locked).to eq true
+      expect(@a.reload.locked).to be true
     end
 
     it "preserves lock dates" do
@@ -1741,7 +1741,7 @@ describe Attachment do
       attachment_model(uploaded_data: stub_png_data("blank.txt", "can't read me"))
       allow(@attachment).to receive(:open).and_raise(IOError)
       @attachment.infer_encoding
-      expect(@attachment.encoding).to eq nil
+      expect(@attachment.encoding).to be_nil
 
       # work across split bytes
       allow(Attachment).to receive(:read_file_chunk_size).and_return(1)
@@ -1819,7 +1819,7 @@ describe Attachment do
       expect(@old_object).to receive(:exists?).and_return(true)
       @root.make_childless(@child)
       expect(@root.reload.children).to eq []
-      expect(@child.reload.root_attachment_id).to eq nil
+      expect(@child.reload.root_attachment_id).to be_nil
       expect(@child.read_attribute(:filename)).to eq @root.filename
     end
   end
@@ -1938,7 +1938,7 @@ describe Attachment do
 
     it "generates the thumbnail on the fly" do
       thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
-      expect(thumb).to eq nil
+      expect(thumb).to be_nil
 
       expect(@attachment).to receive(:create_or_update_thumbnail).with(anything, sz, sz) {
         @attachment.thumbnails.create!(thumbnail: "640x>", uploaded_data: stub_png_data)
@@ -2300,7 +2300,7 @@ describe Attachment do
             expect(data).to eq "test response body"
             callback = true
           end
-          expect(callback).to eq true
+          expect(callback).to be true
         end
 
         it "streams to a tempfile without a block given" do
@@ -2388,7 +2388,7 @@ describe Attachment do
           expect(d).to eq "test"
           callback = true
         end
-        expect(callback).to eq true
+        expect(callback).to be true
       end
 
       it "streams to a tempfile without a block given" do
@@ -2774,15 +2774,15 @@ describe Attachment do
     enable_cache do
       course_with_student active_all: true
       attachment_model uploaded_data: default_uploaded_data, unlock_at: 30.seconds.from_now, lock_at: 35.seconds.from_now
-      expect(@attachment.grants_right?(@student, :download)).to eq false # prime cache
+      expect(@attachment.grants_right?(@student, :download)).to be false # prime cache
       Timecop.freeze(@attachment.unlock_at + 1.second) do
         run_jobs
-        expect(Attachment.find(@attachment.id).grants_right?(@student, :download)).to eq true
+        expect(Attachment.find(@attachment.id).grants_right?(@student, :download)).to be true
       end
 
       Timecop.freeze(@attachment.lock_at + 1.second) do
         run_jobs
-        expect(Attachment.find(@attachment.id).grants_right?(@student, :download)).to eq false
+        expect(Attachment.find(@attachment.id).grants_right?(@student, :download)).to be false
       end
     end
   end

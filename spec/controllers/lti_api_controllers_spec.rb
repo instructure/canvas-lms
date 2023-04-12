@@ -378,7 +378,7 @@ describe LtiApiController, type: :request do
 
       verify_xml(response)
       submission = @assignment.submissions.where(user_id: @student).first
-      expect(submission.score).to eq nil
+      expect(submission.score).to be_nil
       expect(submission.body).to eq "oioi"
     end
 

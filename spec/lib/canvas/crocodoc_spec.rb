@@ -21,14 +21,14 @@
 describe Canvas::Crocodoc do
   describe ".enabled?" do
     it "returns true when there crocodoc is configured" do
-      expect(Canvas::Crocodoc.enabled?).to eq false
+      expect(Canvas::Crocodoc.enabled?).to be false
 
       PluginSetting.create! name: "crocodoc", settings: { api_key: "abc123" }
-      expect(Canvas::Crocodoc.enabled?).to eq true
+      expect(Canvas::Crocodoc.enabled?).to be true
 
       ps = PluginSetting.where(name: "crocodoc").first
       ps.update_attribute :disabled, true
-      expect(Canvas::Crocodoc.enabled?).to eq false
+      expect(Canvas::Crocodoc.enabled?).to be false
     end
   end
 end

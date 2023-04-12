@@ -301,10 +301,10 @@ describe DiscussionEntry do
       @sub_topic.root_topic_id = @parent_topic.id
       @sub_topic.save!
       @sub_entry = @sub_topic.discussion_entries.create!(message: "entry", user: @first_user)
-      expect(@group_entry.grants_right?(@first_user, :update)).to eql(true)
-      expect(@group_entry.grants_right?(@second_user, :update)).to eql(false)
-      expect(@sub_entry.grants_right?(@first_user, :update)).to eql(true)
-      expect(@sub_entry.grants_right?(@second_user, :update)).to eql(false)
+      expect(@group_entry.grants_right?(@first_user, :update)).to be(true)
+      expect(@group_entry.grants_right?(@second_user, :update)).to be(false)
+      expect(@sub_entry.grants_right?(@first_user, :update)).to be(true)
+      expect(@sub_entry.grants_right?(@second_user, :update)).to be(false)
     end
   end
 
@@ -363,7 +363,7 @@ describe DiscussionEntry do
       @topic.saved_by = :migration
       @topic.last_reply_at = nil
       @topic.save!
-      expect(@topic.last_reply_at).to eq nil
+      expect(@topic.last_reply_at).to be_nil
 
       @entry.update_topic
       @topic.reload
@@ -884,7 +884,7 @@ describe DiscussionEntry do
         end
 
         it "returns false for their own posts" do
-          expect(entry.grants_right?(user, :reply)).to eq false
+          expect(entry.grants_right?(user, :reply)).to be false
         end
       end
     end
@@ -896,7 +896,7 @@ describe DiscussionEntry do
         end
 
         it "returns false for their own posts" do
-          expect(entry.grants_right?(user, :update)).to eq false
+          expect(entry.grants_right?(user, :update)).to be false
         end
       end
     end
@@ -908,7 +908,7 @@ describe DiscussionEntry do
         end
 
         it "returns false for their own posts" do
-          expect(entry.grants_right?(user, :delete)).to eq false
+          expect(entry.grants_right?(user, :delete)).to be false
         end
       end
     end

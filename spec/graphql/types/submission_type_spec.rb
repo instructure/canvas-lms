@@ -32,7 +32,7 @@ describe Types::SubmissionType do
 
   it "works" do
     expect(submission_type.resolve("user { _id }")).to eq @student.id.to_s
-    expect(submission_type.resolve("excused")).to eq false
+    expect(submission_type.resolve("excused")).to be false
     expect(submission_type.resolve("assignment { _id }")).to eq @assignment.id.to_s
   end
 
@@ -44,9 +44,9 @@ describe Types::SubmissionType do
   describe "posted" do
     it "returns the posted status of the submission" do
       @submission.update!(posted_at: nil)
-      expect(submission_type.resolve("posted")).to eq false
+      expect(submission_type.resolve("posted")).to be false
       @submission.update!(posted_at: Time.zone.now)
-      expect(submission_type.resolve("posted")).to eq true
+      expect(submission_type.resolve("posted")).to be true
     end
   end
 
@@ -180,7 +180,7 @@ describe Types::SubmissionType do
 
       context "when the quiz is not posted" do
         it "returns nil for users who cannot read the grade" do
-          expect(submission_type_for_student.resolve("body")).to be nil
+          expect(submission_type_for_student.resolve("body")).to be_nil
         end
 
         it "returns a value for users who can read the grade" do
@@ -306,7 +306,7 @@ describe Types::SubmissionType do
       other_course_student = student_in_course(course: course_factory).user
       expect(
         submission_type.resolve("commentsConnection { nodes { _id }}", current_user: other_course_student)
-      ).to be nil
+      ).to be_nil
     end
 
     context "grants_rights check" do
@@ -486,7 +486,7 @@ describe Types::SubmissionType do
     let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
 
     it "returns late" do
-      expect(submission_type.resolve("late")).to eq true
+      expect(submission_type.resolve("late")).to be true
     end
   end
 
@@ -504,7 +504,7 @@ describe Types::SubmissionType do
     let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
 
     it "returns missing" do
-      expect(submission_type.resolve("missing")).to eq true
+      expect(submission_type.resolve("missing")).to be true
     end
   end
 
@@ -519,7 +519,7 @@ describe Types::SubmissionType do
     let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
 
     it "returns gradeMatchesCurrentSubmission" do
-      expect(submission_type.resolve("gradeMatchesCurrentSubmission")).to eq false
+      expect(submission_type.resolve("gradeMatchesCurrentSubmission")).to be false
     end
   end
 

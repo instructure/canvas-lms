@@ -69,7 +69,7 @@ describe GradingPeriodsController, type: :request do
       it "doesn't return deleted grading periods" do
         @grading_period.destroy
         get_show(true)
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 
@@ -100,7 +100,7 @@ describe GradingPeriodsController, type: :request do
       it "doesn't update deleted grading periods" do
         @grading_period.destroy
         put_update({ weight: 80 }, true)
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 

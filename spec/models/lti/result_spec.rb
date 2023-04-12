@@ -20,7 +20,7 @@
 
 require_relative "../../spec_helper"
 
-RSpec.describe Lti::Result, type: :model do
+RSpec.describe Lti::Result do
   let_once(:assignment) { assignment_model(points_possible: 5) }
 
   context "when validating" do
@@ -291,8 +291,8 @@ RSpec.describe Lti::Result, type: :model do
 
     context "when result maximum is null" do
       it "sets and result maxmium to the assignment's points_possible, and sets the score" do
-        expect(assignment.points_possible).to_not eq(nil)
-        expect(result.result_maximum).to eq(nil)
+        expect(assignment.points_possible).to_not be_nil
+        expect(result.result_maximum).to be_nil
         Lti::Result.update_score_for_submission(result.submission, 123)
         result.reload
         expect(result.result_maximum).to eq(assignment.points_possible)

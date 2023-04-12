@@ -581,14 +581,14 @@ describe MasterCourses::MasterMigration do
         quiz.touch # re-sync
       end
       run_master_migration
-      expect(quiz_to.quiz_questions.active.exists?).to eq false # didn't recreate the question
+      expect(quiz_to.quiz_questions.active.exists?).to be false # didn't recreate the question
 
       Timecop.freeze(4.minutes.from_now) do
         @template.content_tag_for(quiz).update_attribute(:restrictions, { content: true })
       end
       run_master_migration
 
-      expect(quiz_to.quiz_questions.active.exists?).to eq true # new question but it has the same content
+      expect(quiz_to.quiz_questions.active.exists?).to be true # new question but it has the same content
       expect(qq_to.reload).to be_deleted # original doesn't get restored because it just made a new question instead /shrug
     end
 
@@ -1784,7 +1784,7 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       copied_quiz = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
-      expect(copied_quiz.only_visible_to_overrides).to eq false
+      expect(copied_quiz.only_visible_to_overrides).to be false
     end
 
     it "allows a minion course's change of the graded status of a discussion topic to stick" do
@@ -1897,13 +1897,13 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       expect(@copy_to.reload.grading_standard.data).to eq gs.data
-      expect(@copy_to.grading_standard_enabled).to eq true
+      expect(@copy_to.grading_standard_enabled).to be true
 
       @copy_from.update_attribute(:grading_standard_enabled, false)
       run_master_migration(copy_settings: true)
 
       expect(@copy_to.reload.grading_standard).to be_nil
-      expect(@copy_to.grading_standard_enabled).to eq false
+      expect(@copy_to.grading_standard_enabled).to be false
     end
 
     it "copies front wiki pages" do
@@ -1958,7 +1958,7 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration
 
-      expect(@page_copy.reload.is_front_page?).to eq true
+      expect(@page_copy.reload.is_front_page?).to be true
       expect(@copy_to.reload.default_view).to eq "wiki"
     end
 
@@ -1991,7 +1991,7 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration
 
-      expect(@copy_to.wiki.reload.front_page_url).to be nil # should leave alone
+      expect(@copy_to.wiki.reload.front_page_url).to be_nil # should leave alone
     end
 
     it "does not overwrite syllabus body if already present or changed" do
@@ -2071,7 +2071,7 @@ describe MasterCourses::MasterMigration do
 
       copied_att = @copy_to.attachments.where(migration_id: att_tag.migration_id).first
       expect(copied_att.full_path).to eq "course files/parent RENAMED/child/file.txt"
-      expect(@copy_to.folders.where(name: "parent RENAMED").first.locked).to eq true
+      expect(@copy_to.folders.where(name: "parent RENAMED").first.locked).to be true
     end
 
     it "deals with a deleted folder being changed upstream" do
@@ -2210,7 +2210,7 @@ describe MasterCourses::MasterMigration do
         topic.update_attribute(:group_category_id, nil)
         run_master_migration
       end
-      expect(topic_to1.reload.group_category).to eq nil
+      expect(topic_to1.reload.group_category).to be_nil
       expect(topic_to2.reload.group_category).to be_present # has a reply so can't be unset
 
       result2 = @migration.migration_results.where(child_subscription_id: sub2).first
@@ -2244,7 +2244,7 @@ describe MasterCourses::MasterMigration do
         @ra.destroy # unlink the rubric
         run_master_migration
       end
-      expect(assignment_to.reload.rubric).to eq nil
+      expect(assignment_to.reload.rubric).to be_nil
 
       # create another rubric - it should leave alone
       other_rubric = outcome_with_rubric(course: @copy_to)
@@ -2767,7 +2767,7 @@ describe MasterCourses::MasterMigration do
       mod2_to.reload
       expect(mod2_to.completion_requirements).to eq([{ id: tag_to.id, type: "must_submit" }])
       expect(mod2_to.prerequisites).to eq([{ id: mod1_to.id, type: "context_module", name: "module1" }])
-      expect(mod2_to.require_sequential_progress).to eq true
+      expect(mod2_to.require_sequential_progress).to be true
       expect(mod2_to.requirement_count).to eq 1
     end
 
@@ -2874,7 +2874,7 @@ describe MasterCourses::MasterMigration do
         ag.update_attribute(:rules, "never_drop:#{a.id}\n")
       end
       run_master_migration
-      expect(ag_to.reload.rules).to eq nil # set to empty if there are no dropping rules
+      expect(ag_to.reload.rules).to be_nil # set to empty if there are no dropping rules
     end
 
     it "doesn't clear external tool config on exception" do

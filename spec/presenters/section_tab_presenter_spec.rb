@@ -45,15 +45,15 @@ describe SectionTabPresenter do
 
   describe "#target?" do
     it "returns true if the tab has a target attribute" do
-      expect(SectionTabPresenter.new(tab.merge(target: "_blank"), course).target?).to eq true
+      expect(SectionTabPresenter.new(tab.merge(target: "_blank"), course).target?).to be true
     end
 
     it "returns false if the tab does not contain a target" do
-      expect(SectionTabPresenter.new(tab, course).target?).to eq false
+      expect(SectionTabPresenter.new(tab, course).target?).to be false
     end
 
     it "returns false if the tab target is nil" do
-      expect(SectionTabPresenter.new(tab.merge(target: nil), course).target?).to eq false
+      expect(SectionTabPresenter.new(tab.merge(target: nil), course).target?).to be false
     end
   end
 

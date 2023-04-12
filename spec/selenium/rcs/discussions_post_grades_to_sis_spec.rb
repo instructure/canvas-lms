@@ -99,7 +99,7 @@ describe "sync grades to sis" do
       expect(f(".assignments-to-post-count").text).to include("You are ready to sync 1 assignment")
     end
 
-    it "asks for due dates in gradebook if due date is not given", priority: "1", ignore_js_errors: true do
+    it "asks for due dates in gradebook if due date is not given", ignore_js_errors: true, priority: "1" do
       @course.discussion_topics.create!(user: @admin,
                                         title: "Sync to SIS discussion",
                                         message: "Discussion topic message",

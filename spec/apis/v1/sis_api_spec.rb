@@ -69,7 +69,7 @@ describe SisApiController, type: :request do
 
       it "requires :bulk_sis_grade_export feature to be enabled or post_grades tool to be installed" do
         get "/api/sis/accounts/#{context.id}/assignments", params: { account_id: context.id }
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(json_parse).to include("code" => "not_enabled")
       end
 
@@ -189,7 +189,7 @@ describe SisApiController, type: :request do
 
       it "requires the course to be published" do
         get "/api/sis/courses/#{@course.id}/assignments", params: { course_id: @course.id }
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(json_parse).to include("code" => "unpublished_course")
       end
     end

@@ -1372,7 +1372,7 @@ describe AssignmentOverrideApplicator do
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
       expect(@overridden_assignment.overridden_for_user.id).to eq @student.id
       @unoverridden_assignment = @overridden_assignment.without_overrides
-      expect(@unoverridden_assignment.overridden_for_user).to eq nil
+      expect(@unoverridden_assignment.overridden_for_user).to be_nil
     end
   end
 

@@ -47,7 +47,7 @@ describe AuthenticationProvider do
 
     it "enables canvas_authentication if deleting the last aac" do
       account.authentication_providers.destroy_all
-      expect(account.reload.canvas_authentication?).to eq true
+      expect(account.reload.canvas_authentication?).to be true
     end
   end
 

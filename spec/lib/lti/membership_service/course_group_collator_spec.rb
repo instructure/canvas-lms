@@ -104,13 +104,13 @@ module Lti::MembershipService
         describe "#next_page?" do
           it "returns true when there is an additional page of results" do
             collator = CourseGroupCollator.new(@course, page: 1)
-            expect(collator.next_page?).to eq(true)
+            expect(collator.next_page?).to be(true)
           end
 
           it "returns false when there are no more pages" do
             collator = CourseGroupCollator.new(@course, page: 11)
             collator.memberships
-            expect(collator.next_page?).to eq(false)
+            expect(collator.next_page?).to be(false)
           end
         end
       end

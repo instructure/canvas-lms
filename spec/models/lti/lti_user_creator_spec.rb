@@ -66,13 +66,13 @@ describe Lti::LtiUserCreator do
       it "does not have a login_id" do
         lti_user = user_creator.convert
 
-        expect(lti_user.login_id).to eq nil
+        expect(lti_user.login_id).to be_nil
       end
 
       it "does not have a sis_user_id" do
         lti_user = user_creator.convert
 
-        expect(lti_user.sis_source_id).to eq nil
+        expect(lti_user.sis_source_id).to be_nil
       end
     end
 
@@ -238,7 +238,7 @@ describe Lti::LtiUserCreator do
         it "returns true if the user has any currently active course enrollments" do
           student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
 
-          expect(course_user_creator.convert.currently_active_in_course).to eq true
+          expect(course_user_creator.convert.currently_active_in_course).to be true
         end
 
         it "returns false if the user has current enrollments that are all inactive" do
@@ -247,12 +247,12 @@ describe Lti::LtiUserCreator do
           enrollment.end_at = 2.days.ago
           enrollment.save
 
-          expect(course_user_creator.convert.currently_active_in_course).to eq false
+          expect(course_user_creator.convert.currently_active_in_course).to be false
         end
 
         it "returns nil if the context is not a course" do
           account_admin_user(user: canvas_user, account: canvas_course.account)
-          expect(account_user_creator.convert.currently_active_in_course).to eq nil
+          expect(account_user_creator.convert.currently_active_in_course).to be_nil
         end
       end
 

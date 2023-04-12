@@ -102,7 +102,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
 
       expect(CanvasHttp).to receive(:get).with("url", { "If-None-Match" => "MyETag" }).and_yield(response)
 
-      expect(subject.send(:refresh_if_necessary, 1, "url")).to eq false
+      expect(subject.send(:refresh_if_necessary, 1, "url")).to be false
     end
 
     it "sets the ETag if provided" do

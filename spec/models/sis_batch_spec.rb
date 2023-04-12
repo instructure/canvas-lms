@@ -87,11 +87,11 @@ describe SisBatch do
                                 c1,u1,student,deleted,)])
     expect(submission.reload.workflow_state).to eq "deleted"
     expect(enrollment.reload.workflow_state).to eq "deleted"
-    expect(enrollment.scores.exists?).to eq false
+    expect(enrollment.scores.exists?).to be false
     batch.restore_states_for_batch
     expect(submission.reload.workflow_state).to eq "submitted"
     expect(enrollment.reload.workflow_state).to eq "active"
-    expect(enrollment.scores.exists?).to eq true
+    expect(enrollment.scores.exists?).to be true
   end
 
   it "logs stats" do
@@ -202,7 +202,7 @@ describe SisBatch do
     expect(batch.workflow_state).to eq "created"
     expect(batch).not_to be_new_record
     expect(batch.changed?).to be_falsey
-    expect(batch.options[:override_sis_stickiness]).to eq true
+    expect(batch.options[:override_sis_stickiness]).to be true
   end
 
   describe "parallel imports" do
@@ -378,8 +378,8 @@ test_1,TC 101,Test Course 101,,term1,deleted
           expect(Delayed::Job.where(tag: "SisBatch.process_all_for_account",
                                     singleton: SisBatch.strand_for_account(@account)).count).to eq 1
           SisBatch.process_all_for_account(@account)
-          expect(batch1.reload.data[:silliness_complete]).to eq true
-          expect(batch2.reload.data[:silliness_complete]).to eq true
+          expect(batch1.reload.data[:silliness_complete]).to be true
+          expect(batch2.reload.data[:silliness_complete]).to be true
         end
       ensure
         SisBatch.valid_import_types.delete("silly_sis_batch")
@@ -922,8 +922,8 @@ test_4,TC 104,Test Course 104,,term1,active
 )
                                ], diffing_data_set_identifier: "default", diffing_remaster: true)
       expect(batch.diffing_data_set_identifier).to eq "default"
-      expect(batch.data[:diffed_against_sis_batch_id]).to eq nil
-      expect(batch.generated_diff).to eq nil
+      expect(batch.data[:diffed_against_sis_batch_id]).to be_nil
+      expect(batch.generated_diff).to be_nil
     end
 
     it "diffs against the most previous successful batch in the same chain" do
@@ -987,7 +987,7 @@ test_4,TC 104,Test Course 104,,term1,active
         test_4,TC 104,Test Course 104b,,term1,active
       )
                             ], diffing_data_set_identifier: "default", change_threshold: 1)
-      expect(b2.diffing_threshold_exceeded).to eq false
+      expect(b2.diffing_threshold_exceeded).to be false
 
       # whoops left out the whole file, don't delete everything.
       b3 = process_csv_data([
@@ -996,7 +996,7 @@ test_4,TC 104,Test Course 104,,term1,active
                             ], diffing_data_set_identifier: "default", change_threshold: 1)
       expect(b3).to be_imported_with_messages
       expect(b3.processing_warnings.first.last).to include("Diffing not performed")
-      expect(b3.diffing_threshold_exceeded).to eq true
+      expect(b3.diffing_threshold_exceeded).to be true
 
       # no change threshold, _should_ delete everything maybe?
       b4 = process_csv_data([
@@ -1112,7 +1112,7 @@ test_1,test_a,course
 )
                             ])
       expect(course1.reload.sis_batch_id).to eq b1.id
-      expect(b1.sis_batch_errors.exists?).to eq false
+      expect(b1.sis_batch_errors.exists?).to be false
     end
 
     it "sets batch_ids on admins" do
@@ -1124,7 +1124,7 @@ U001,,AccountAdmin,active
 )
                             ])
       expect(a1.reload.sis_batch_id).to eq b1.id
-      expect(b1.sis_batch_errors.exists?).to eq false
+      expect(b1.sis_batch_errors.exists?).to be false
     end
 
     it "does not allow removing import admin with sis import" do
@@ -1270,7 +1270,7 @@ test_1,u1,student,active)
           run_jobs
           expect(batch.reload).to be_restored
           expect(@e1.reload).to be_active
-          expect(@e1.updated_at == old_time).to eq false
+          expect(@e1.updated_at == old_time).to be false
           expect(@e2.reload).to be_active
           expect(@c1.reload).to be_created
           expect(@c2.reload).to be_created
@@ -1305,7 +1305,7 @@ test_1,u1,student,active)
           run_jobs
           expect(batch.reload).to be_restored
           expect(@e1.reload).to be_active
-          expect(@e1.updated_at == old_time).to eq false
+          expect(@e1.updated_at == old_time).to be false
           expect(@e2.reload).to be_active
           expect(@c1.reload).to be_created
           expect(@c2.reload).to be_created
@@ -1340,7 +1340,7 @@ test_1,u1,student,active)
           run_jobs
           expect(batch.reload).to be_restored
           expect(@e1.reload).to be_active
-          expect(@e1.updated_at == old_time).to eq false
+          expect(@e1.updated_at == old_time).to be false
           expect(@e2.reload).to be_active
           expect(@c1.reload).to be_created
           expect(@c2.reload).to be_created

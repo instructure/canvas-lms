@@ -136,14 +136,14 @@ module Lti
         invalid_report_url = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}originality_report/#{@report.id + 1}"
         get invalid_report_url
 
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
 
       it "checks that the specified submission exists" do
         invalid_report_url = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id + 1}originality_report/#{@report.id}"
         get invalid_report_url
 
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
 
       it "requires the plagiarism feature flag" do
@@ -157,7 +157,7 @@ module Lti
         attachment.save!
 
         post @endpoints[:show], params: { originality_report: { file_id: attachment.id, originality_score: 0.4 } }, headers: request_headers
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
 
       it "verifies that the specified submission includes the attachment" do
@@ -167,7 +167,7 @@ module Lti
         sub.save!
         endpoint = "/api/lti/assignments/#{@assignment.id}/submissions/#{sub.id}/originality_report/#{@report.id}"
         get endpoint, params: { originality_report: { originality_report_lti_url: "http://www.lti-test.com" } }
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
 
       context "show by attachment id" do
@@ -226,13 +226,13 @@ module Lti
         it "checks that the specified originality report exists" do
           invalid_report_url = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}originality_report/#{@report.id + 1}"
           get invalid_report_url
-          expect(response.status).to eq 404
+          expect(response).to have_http_status :not_found
         end
 
         it "checks that the specified submission exists" do
           invalid_report_url = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id + 1}originality_report/#{@report.id}"
           get invalid_report_url
-          expect(response.status).to eq 404
+          expect(response).to have_http_status :not_found
         end
 
         it "requires the plagiarism feature flag" do
@@ -245,7 +245,7 @@ module Lti
           attachment.context = @course
           attachment.save!
           post @endpoints[:alt_show], params: { originality_report: { file_id: attachment.id, originality_score: 0.4 } }, headers: request_headers
-          expect(response.status).to eq 404
+          expect(response).to have_http_status :not_found
         end
 
         it "verifies that the specified submission includes the attachment" do
@@ -255,7 +255,7 @@ module Lti
           sub.save!
           endpoint = "/api/lti/assignments/#{@assignment.id}/submissions/#{sub.id}/originality_report/#{@report.id}"
           get endpoint, params: { originality_report: { originality_report_lti_url: "http://www.lti-test.com" } }
-          expect(response.status).to eq 401
+          expect(response).to have_http_status :unauthorized
         end
       end
     end
@@ -283,13 +283,13 @@ module Lti
       it "checks that the OriginalityReport exists" do
         invalid_report_url = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id + 1}"
         put invalid_report_url, params: { originality_report: { originality_score: 0.3 } }, headers: request_headers
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
 
       it "checks that the Submission exists" do
         invalid_report_url = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id + 1}/originality_report/#{@report.id}"
         put invalid_report_url, params: { originality_report: { originality_score: 0.3 } }, headers: request_headers
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
 
       it "updates originality score" do
@@ -301,7 +301,7 @@ module Lti
 
       it "does not update originality score if out of range" do
         put @endpoints[:update], params: { originality_report: { originality_score: 150 } }, headers: request_headers
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(JSON.parse(response.body)["errors"]).to have_key "originality_score"
       end
 
@@ -411,7 +411,7 @@ module Lti
         @submission.attachments = []
         @submission.save!
         put @endpoints[:update], params: { originality_report: { originality_report_lti_url: "http://www.lti-test.com" } }, headers: request_headers
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
 
       it "verifies that the specified submission includes the attachment" do
@@ -421,7 +421,7 @@ module Lti
         sub.save!
         endpoint = "/api/lti/assignments/#{@assignment.id}/submissions/#{sub.id}/originality_report/#{@report.id}"
         put endpoint, params: { originality_report: { originality_report_lti_url: "http://www.lti-test.com" } }
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
 
       it "sets the resource type code for the associated tool setting" do
@@ -487,13 +487,13 @@ module Lti
         it "checks that the OriginalityReport exists" do
           invalid_report_url = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id + 1}"
           put invalid_report_url, params: { originality_report: { originality_score: 0.3 } }, headers: request_headers
-          expect(response.status).to eq 404
+          expect(response).to have_http_status :not_found
         end
 
         it "checks that the Submission exists" do
           invalid_report_url = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id + 1}/originality_report/#{@report.id}"
           put invalid_report_url, params: { originality_report: { originality_score: 0.3 } }, headers: request_headers
-          expect(response.status).to eq 404
+          expect(response).to have_http_status :not_found
         end
 
         it "updates originality score" do
@@ -505,7 +505,7 @@ module Lti
 
         it "does not update originality score if out of range" do
           put @endpoints[:update_alt], params: { originality_report: { originality_score: 150 } }, headers: request_headers
-          expect(response.status).to eq 400
+          expect(response).to have_http_status :bad_request
           expect(JSON.parse(response.body)["errors"]).to have_key "originality_score"
         end
 
@@ -553,7 +553,7 @@ module Lti
           @submission.attachments = []
           @submission.save!
           put @endpoints[:update_alt], params: { originality_report: { originality_report_lti_url: "http://www.lti-test.com" } }, headers: request_headers
-          expect(response.status).to eq 404
+          expect(response).to have_http_status :not_found
         end
 
         it "verifies that the specified submission includes the attachment" do
@@ -563,7 +563,7 @@ module Lti
           sub.save!
           endpoint = "/api/lti/assignments/#{@assignment.id}/submissions/#{sub.id}/originality_report/#{@report.id}"
           put endpoint, params: { originality_report: { originality_report_lti_url: "http://www.lti-test.com" } }
-          expect(response.status).to eq 401
+          expect(response).to have_http_status :unauthorized
         end
 
         it "sets the resource type code for the associated tool setting" do
@@ -656,13 +656,13 @@ module Lti
 
       it "checks for required params" do
         post @endpoints[:create], headers: request_headers
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
 
         post @endpoints[:create], params: { originality_report: {} }, headers: request_headers
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
 
         post @endpoints[:create], params: { originality_report: { originality_score: 0.5 } }, headers: request_headers
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
 
       it "checks that the specified assignment exists" do
@@ -689,7 +689,7 @@ module Lti
         attachment.save!
 
         post @endpoints[:create], params: { originality_report: { file_id: attachment.id, originality_score: 0.4 } }, headers: request_headers
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
 
       it "verifies that the specified submission includes the attachment" do
@@ -699,7 +699,7 @@ module Lti
         sub.save!
         endpoint = "/api/lti/assignments/#{@assignment.id}/submissions/#{sub.id}/originality_report"
         post endpoint, params: { originality_report: { file_id: @attachment.id, originality_score: 0.4 } }
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
 
       it "does not require an attachment if submission type includes online text entry" do
@@ -813,7 +813,7 @@ module Lti
                },
                headers: request_headers
 
-          expect(response.status).to eq 201
+          expect(response).to have_http_status :created
         end
       end
 

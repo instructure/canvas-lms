@@ -33,7 +33,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Essay do
   include_examples "Answer Serializers"
 
   it "returns nil when un-answered" do
-    expect(subject.deserialize({})).to eq nil
+    expect(subject.deserialize({})).to be_nil
   end
 
   context "validations" do

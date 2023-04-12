@@ -128,7 +128,7 @@ describe Mutations::SetAssignmentPostPolicy do
 
     it "does not return data for the related post policy" do
       result = execute_query(mutation_str(assignment_id: assignment.id, post_manually: true), context)
-      expect(result.dig("data", "setAssignmentPostPolicy")).to be nil
+      expect(result.dig("data", "setAssignmentPostPolicy")).to be_nil
     end
   end
 end

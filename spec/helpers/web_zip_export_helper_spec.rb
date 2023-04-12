@@ -28,29 +28,29 @@ describe WebZipExportHelper do
 
   describe "#course_allow_web_export_download?" do
     it "returns setting" do
-      expect(course_allow_web_export_download?).to eq false
+      expect(course_allow_web_export_download?).to be false
       account = @context.account
       account.settings[:enable_offline_web_export] = true
       account.save!
       @context.reload
-      expect(course_allow_web_export_download?).to eq true
+      expect(course_allow_web_export_download?).to be true
     end
   end
 
   describe "#allow_web_export_for_course_user?" do
     it "returns true for admins" do
       @current_user = account_admin_user
-      expect(allow_web_export_for_course_user?).to eq true
+      expect(allow_web_export_for_course_user?).to be true
     end
 
     it "returns true for current course users" do
       @current_user = @student
-      expect(allow_web_export_for_course_user?).to eq true
+      expect(allow_web_export_for_course_user?).to be true
     end
 
     it "returns false for anonymous users" do
       @current_user = nil
-      expect(allow_web_export_for_course_user?).to eq false
+      expect(allow_web_export_for_course_user?).to be false
     end
 
     it "returns false for concluded users without access to the course" do
@@ -60,7 +60,7 @@ describe WebZipExportHelper do
       @context.restrict_student_past_view = true
       @context.restrict_enrollments_to_course_dates = true
       @context.save!
-      expect(allow_web_export_for_course_user?).to eq false
+      expect(allow_web_export_for_course_user?).to be false
     end
   end
 
@@ -71,7 +71,7 @@ describe WebZipExportHelper do
       account.save!
 
       @current_user = @student
-      expect(allow_web_export_download?).to eq true
+      expect(allow_web_export_download?).to be true
     end
   end
 end

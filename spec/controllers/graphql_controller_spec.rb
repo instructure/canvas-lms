@@ -42,7 +42,7 @@ describe GraphQLController do
       allow(Rails.env).to receive(:production?).and_return(true)
       user_session(@student)
       get :graphiql
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "works in production for site admins" do
@@ -50,13 +50,13 @@ describe GraphQLController do
       site_admin_user(active_all: true)
       user_session(@user)
       get :graphiql
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "works" do
       user_session(@student)
       get :graphiql
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
   end
 

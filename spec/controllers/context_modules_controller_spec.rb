@@ -65,7 +65,7 @@ describe ContextModulesController do
       new_quizzes_assignment(course: @course, title: "B")
       get "index", params: { course_id: @course.id }
       combined_active_quizzes_includes_both_types = controller.instance_variable_get(:@combined_active_quizzes_includes_both_types)
-      expect(combined_active_quizzes_includes_both_types).to eq true
+      expect(combined_active_quizzes_includes_both_types).to be true
     end
 
     it "@combined_active_quizzes_includes_both_types should return false when only classic quizzes are included" do
@@ -74,7 +74,7 @@ describe ContextModulesController do
       @course.quizzes.create!(title: "C")
       get "index", params: { course_id: @course.id }
       combined_active_quizzes_includes_both_types = controller.instance_variable_get(:@combined_active_quizzes_includes_both_types)
-      expect(combined_active_quizzes_includes_both_types).to eq false
+      expect(combined_active_quizzes_includes_both_types).to be false
     end
 
     it "@combined_active_quizzes_includes_both_types should return false when only new quizzes are included" do
@@ -82,7 +82,7 @@ describe ContextModulesController do
       new_quizzes_assignment(course: @course, title: "B")
       get "index", params: { course_id: @course.id }
       combined_active_quizzes_includes_both_types = controller.instance_variable_get(:@combined_active_quizzes_includes_both_types)
-      expect(combined_active_quizzes_includes_both_types).to eq false
+      expect(combined_active_quizzes_includes_both_types).to be false
     end
 
     it "touches modules if necessary" do
@@ -136,7 +136,7 @@ describe ContextModulesController do
 
       it "is true if account setting is on" do
         get "index", params: { course_id: @course.id }
-        expect(controller.js_env[:DEFAULT_POST_TO_SIS]).to eq true
+        expect(controller.js_env[:DEFAULT_POST_TO_SIS]).to be true
       end
 
       it "is false if a due date is required" do
@@ -145,7 +145,7 @@ describe ContextModulesController do
           a.save!
         end
         get "index", params: { course_id: @course.id }
-        expect(controller.js_env[:DEFAULT_POST_TO_SIS]).to eq false
+        expect(controller.js_env[:DEFAULT_POST_TO_SIS]).to be false
       end
     end
 
@@ -218,13 +218,13 @@ describe ContextModulesController do
     it "publishes modules" do
       put "update", params: { course_id: @course.id, id: @m1.id, publish: "1" }
       @m1.reload
-      expect(@m1.active?).to eq true
+      expect(@m1.active?).to be true
     end
 
     it "unpublishes modules" do
       put "update", params: { course_id: @course.id, id: @m2.id, unpublish: "1" }
       @m2.reload
-      expect(@m2.unpublished?).to eq true
+      expect(@m2.unpublished?).to be true
     end
 
     it "updates the name" do
@@ -383,7 +383,7 @@ describe ContextModulesController do
 
         get "item_redirect", params: { course_id: @course.id, id: tag1.id }
         expect(response).to be_redirect
-        expect(assigns[:tool]).to eq nil
+        expect(assigns[:tool]).to be_nil
       end
     end
 
@@ -889,7 +889,7 @@ describe ContextModulesController do
         @assign.save!
         get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
         json = json_parse(response.body)
-        expect(json[@tag.id.to_s]["points_possible"].to_i).to eql 456
+        expect(json[@tag.id.to_s]["points_possible"].to_i).to be 456
       end
     end
 

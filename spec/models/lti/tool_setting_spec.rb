@@ -43,13 +43,13 @@ module Lti
       subject.tool_proxy = tool_proxy
       subject.context = account
       subject.resource_link_id = "123456"
-      expect(subject.save).to eq true
+      expect(subject.save).to be true
     end
 
     it "fails if there is a resource_link_id and no context" do
       subject.tool_proxy = tool_proxy
       subject.resource_link_id = "123456"
-      expect(subject.save).to eq false
+      expect(subject.save).to be false
       expect(subject.errors.first).to eq [:context, "can't be blank"]
     end
 

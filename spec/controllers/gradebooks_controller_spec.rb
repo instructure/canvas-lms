@@ -49,7 +49,7 @@ describe GradebooksController do
         @assignment.ensure_post_policy(post_manually: true)
         get "grade_summary", params: { course_id: @course.id, id: @student.id }
         expect(assigns[:js_env][:assignment_groups].first[:assignments].size).to eq 1
-        expect(assigns[:js_env][:assignment_groups].first[:assignments].first[:muted]).to eq true
+        expect(assigns[:js_env][:assignment_groups].first[:assignments].first[:muted]).to be true
       end
 
       it "does not include score, excused, or workflow_state of unposted submissions" do
@@ -92,7 +92,7 @@ describe GradebooksController do
         submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
         aggregate_failures do
           expect(submission[:score]).to be 10.0
-          expect(submission[:submission_comments].length).to eql 3
+          expect(submission[:submission_comments].length).to be 3
 
           submission_comment_1 = submission[:submission_comments].first
           expect(submission_comment_1).to include({
@@ -154,7 +154,7 @@ describe GradebooksController do
         submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
         aggregate_failures do
           expect(submission[:score]).to be 10.0
-          expect(submission[:submission_comments]).to eql nil
+          expect(submission[:submission_comments]).to be_nil
         end
       end
     end
@@ -169,7 +169,7 @@ describe GradebooksController do
         @assignment.ensure_post_policy(post_manually: true)
         get "grade_summary", params: { course_id: @course.id, id: @student.id }
         expect(assigns[:js_env][:assignment_groups].first[:assignments].size).to eq 1
-        expect(assigns[:js_env][:assignment_groups].first[:assignments].first[:muted]).to eq true
+        expect(assigns[:js_env][:assignment_groups].first[:assignments].first[:muted]).to be true
       end
 
       it "does not include score, excused, or workflow_state of unposted submissions" do
@@ -563,7 +563,7 @@ describe GradebooksController do
         user_session(@student)
         all_grading_periods_id = 0
         get "grade_summary", params: { course_id: @course.id, id: @student.id, grading_period_id: all_grading_periods_id }
-        expect(assigns[:exclude_total]).to eq true
+        expect(assigns[:exclude_total]).to be true
       end
 
       it "assigns grading period values for grade calculator to ENV" do
@@ -577,7 +577,7 @@ describe GradebooksController do
       it "displays totals if any grading period other than 'All Grading Periods' is selected" do
         user_session(@student)
         get "grade_summary", params: { course_id: @course.id, id: @student.id, grading_period_id: @grading_periods.first.id }
-        expect(assigns[:exclude_total]).to eq false
+        expect(assigns[:exclude_total]).to be false
       end
 
       it "includes the grading period group (as 'set') in the ENV" do
@@ -736,14 +736,14 @@ describe GradebooksController do
           @course.enable_feature!(:outcome_service_results_to_canvas)
           get "grade_summary", params: { course_id: @course.id, id: @student.id }
           js_env = assigns[:js_env]
-          expect(js_env[:outcome_service_results_to_canvas]).to eq true
+          expect(js_env[:outcome_service_results_to_canvas]).to be true
         end
 
         it "is set to false if outcome_service_results_to_canvas feature flag is disabled" do
           @course.disable_feature!(:outcome_service_results_to_canvas)
           get "grade_summary", params: { course_id: @course.id, id: @student.id }
           js_env = assigns[:js_env]
-          expect(js_env[:outcome_service_results_to_canvas]).to eq false
+          expect(js_env[:outcome_service_results_to_canvas]).to be false
         end
       end
     end
@@ -763,14 +763,14 @@ describe GradebooksController do
           @course.enable_feature!(:enhanced_gradebook_filters)
           user_session(@teacher)
           get :show, params: { course_id: @course.id }
-          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:enhanced_gradebook_filters]).to eq(true)
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:enhanced_gradebook_filters]).to be(true)
         end
 
         it "sets enhanced_gradebook_filters in js_env as false if disabled" do
           @course.disable_feature!(:enhanced_gradebook_filters)
           user_session(@teacher)
           get :show, params: { course_id: @course.id }
-          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:enhanced_gradebook_filters]).to eq(false)
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:enhanced_gradebook_filters]).to be(false)
         end
       end
 
@@ -831,7 +831,7 @@ describe GradebooksController do
           it "sets gradebook_score_to_ungraded_progress in js_env as null" do
             user_session(@teacher)
             get :show, params: { course_id: @course.id }
-            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_score_to_ungraded_progress]).to eq(nil)
+            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_score_to_ungraded_progress]).to be_nil
           end
         end
 
@@ -845,7 +845,7 @@ describe GradebooksController do
 
             user_session(@teacher)
             get :show, params: { course_id: @course.id }
-            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_score_to_ungraded_progress]).to eq(nil)
+            expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_score_to_ungraded_progress]).to be_nil
           end
 
           it "sets gradebook_score_to_ungraded_progress object in js_env if the last progress has workflow state queued" do
@@ -977,19 +977,19 @@ describe GradebooksController do
 
           it "sets allow_final_grade_override to true when final grade override is allowed" do
             get :show, params: { course_id: @course.id }
-            expect(allow_final_grade_override).to eq true
+            expect(allow_final_grade_override).to be true
           end
 
           it "sets allow_final_grade_override to false when final grade override is not allowed" do
             @course.update!(allow_final_grade_override: false)
             get :show, params: { course_id: @course.id }
-            expect(allow_final_grade_override).to eq false
+            expect(allow_final_grade_override).to be false
           end
 
           it "sets allow_final_grade_override to false when 'Final Grade Override' is not enabled" do
             @course.disable_feature!(:final_grades_override)
             get :show, params: { course_id: @course.id }
-            expect(allow_final_grade_override).to eq false
+            expect(allow_final_grade_override).to be false
           end
         end
       end
@@ -1361,7 +1361,7 @@ describe GradebooksController do
           it "returns false when teacher views gradebook" do
             user_session(@teacher)
             get :show, params: { course_id: @course.id }
-            expect(gradebook_options.fetch(:restrict_quantitative_data)).to eq(false)
+            expect(gradebook_options.fetch(:restrict_quantitative_data)).to be(false)
           end
         end
 
@@ -1382,7 +1382,7 @@ describe GradebooksController do
           it "returns true when teacher views gradebook" do
             user_session(@teacher)
             get :show, params: { course_id: @course.id }
-            expect(gradebook_options.fetch(:restrict_quantitative_data)).to eq(true)
+            expect(gradebook_options.fetch(:restrict_quantitative_data)).to be(true)
           end
         end
       end
@@ -1489,7 +1489,7 @@ describe GradebooksController do
 
       it "is enabled for teachers" do
         get :show, params: { course_id: @course.id }
-        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq true
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be true
       end
     end
 
@@ -1768,14 +1768,14 @@ describe GradebooksController do
             @course.root_account.disable_feature! :improved_lmgb
             get :show, params: { course_id: @course.id }
             gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
-            expect(gradebook_env[:IMPROVED_LMGB]).to eq false
+            expect(gradebook_env[:IMPROVED_LMGB]).to be false
           end
 
           it "is true if the feature flag is on" do
             @course.root_account.enable_feature! :improved_lmgb
             get :show, params: { course_id: @course.id }
             gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
-            expect(gradebook_env[:IMPROVED_LMGB]).to eq true
+            expect(gradebook_env[:IMPROVED_LMGB]).to be true
           end
         end
 
@@ -1784,14 +1784,14 @@ describe GradebooksController do
             @course.enable_feature!(:outcome_service_results_to_canvas)
             get :show, params: { course_id: @course.id }
             js_env = assigns[:js_env]
-            expect(js_env[:outcome_service_results_to_canvas]).to eq true
+            expect(js_env[:outcome_service_results_to_canvas]).to be true
           end
 
           it "is set to false if outcome_service_results_to_canvas feature flag is disabled" do
             @course.disable_feature!(:outcome_service_results_to_canvas)
             get :show, params: { course_id: @course.id }
             js_env = assigns[:js_env]
-            expect(js_env[:outcome_service_results_to_canvas]).to eq false
+            expect(js_env[:outcome_service_results_to_canvas]).to be false
           end
         end
 
@@ -1800,14 +1800,14 @@ describe GradebooksController do
             @course.root_account.enable_feature!(:outcome_average_calculation)
             get :show, params: { course_id: @course.id }
             js_env = assigns[:js_env]
-            expect(js_env[:OUTCOME_AVERAGE_CALCULATION]).to eq true
+            expect(js_env[:OUTCOME_AVERAGE_CALCULATION]).to be true
           end
 
           it "is set to false if outcome_average_calculation ff is disabled" do
             @course.root_account.disable_feature!(:outcome_average_calculation)
             get :show, params: { course_id: @course.id }
             js_env = assigns[:js_env]
-            expect(js_env[:OUTCOME_AVERAGE_CALCULATION]).to eq false
+            expect(js_env[:OUTCOME_AVERAGE_CALCULATION]).to be false
           end
         end
       end
@@ -2019,12 +2019,12 @@ describe GradebooksController do
         it "is set to true if outcome_gradebook is enabled for the course" do
           @course.enable_feature!(:outcome_gradebook)
           get "history", params: { course_id: @course.id }
-          expect(assigns[:js_env][:OUTCOME_GRADEBOOK_ENABLED]).to eq true
+          expect(assigns[:js_env][:OUTCOME_GRADEBOOK_ENABLED]).to be true
         end
 
         it "is set to false if outcome_gradebook is not enabled for the course" do
           get "history", params: { course_id: @course.id }
-          expect(assigns[:js_env][:OUTCOME_GRADEBOOK_ENABLED]).to eq false
+          expect(assigns[:js_env][:OUTCOME_GRADEBOOK_ENABLED]).to be false
         end
       end
     end
@@ -2345,7 +2345,7 @@ describe GradebooksController do
         expect(response).to be_redirect
         expect(assigns[:assignment]).to eql(@assignment)
         expect(assigns[:submissions]).not_to be_nil
-        expect(assigns[:submissions].length).to eql(1)
+        expect(assigns[:submissions].length).to be(1)
         expect(assigns[:submissions][0].submission_comments).not_to be_nil
         expect(assigns[:submissions][0].submission_comments[0].comment).to eql("some comment")
       end
@@ -2361,10 +2361,10 @@ describe GradebooksController do
         expect(response).to be_redirect
         expect(assigns[:assignment]).to eql(@assignment)
         expect(assigns[:submissions]).not_to be_nil
-        expect(assigns[:submissions].length).to eql(1)
+        expect(assigns[:submissions].length).to be(1)
         expect(assigns[:submissions][0].submission_comments).not_to be_nil
         expect(assigns[:submissions][0].submission_comments[0].comment).to eql("some comment")
-        expect(assigns[:submissions][0].submission_comments[0].attachments.length).to eql(1)
+        expect(assigns[:submissions][0].submission_comments[0].attachments.length).to be(1)
         expect(assigns[:submissions][0].submission_comments[0].attachments[0].display_name).to eql("doc.doc")
       end
 
@@ -2425,7 +2425,7 @@ describe GradebooksController do
         end
 
         it "allows media comments for submissions" do
-          expect(@media_comment).not_to be nil
+          expect(@media_comment).not_to be_nil
           expect(@media_comment.media_comment_id).to eql "asdfqwerty"
         end
 
@@ -2526,7 +2526,7 @@ describe GradebooksController do
         # confirm the response JSON shows provisional information
         json = JSON.parse response.body
         expect(json.first.fetch("submission").fetch("score")).to eq 100
-        expect(json.first.fetch("submission").fetch("grade_matches_current_submission")).to eq true
+        expect(json.first.fetch("submission").fetch("grade_matches_current_submission")).to be true
         expect(json.first.fetch("submission").fetch("submission_comments").first.fetch("submission_comment").fetch("comment")).to eq "provisional!"
       end
 
@@ -2602,7 +2602,7 @@ describe GradebooksController do
 
         submission.reload
         pg = submission.provisional_grade(@teacher)
-        expect(pg.graded_anonymously).to eq true
+        expect(pg.graded_anonymously).to be true
 
         submission = @assignment.submit_homework(@student, body: "hello")
         post "update_submission",
@@ -2617,7 +2617,7 @@ describe GradebooksController do
 
         submission.reload
         pg = submission.provisional_grade(@teacher)
-        expect(pg.graded_anonymously).to eq false
+        expect(pg.graded_anonymously).to be false
       end
 
       it "doesn't create a provisional grade when the student has one already" do
@@ -2670,14 +2670,14 @@ describe GradebooksController do
         # confirm "provisional" grades/comments were written
         pg = submission.provisional_grade(@teacher, final: true)
         expect(pg.score).to eq 100
-        expect(pg.final).to eq true
+        expect(pg.final).to be true
         expect(pg.submission_comments.first.comment).to eq "provisional!"
 
         # confirm the response JSON shows provisional information
         json = JSON.parse response.body
         expect(json[0]["submission"]["score"]).to eq 100
         expect(json[0]["submission"]["provisional_grade_id"]).to eq pg.id
-        expect(json[0]["submission"]["grade_matches_current_submission"]).to eq true
+        expect(json[0]["submission"]["grade_matches_current_submission"]).to be true
         expect(json[0]["submission"]["submission_comments"].first["submission_comment"]["comment"]).to eq "provisional!"
       end
 
@@ -2957,7 +2957,7 @@ describe GradebooksController do
               @teacher.reload
 
               saved_group_id = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_id")
-              expect(saved_group_id).to be nil
+              expect(saved_group_id).to be_nil
             end
 
             it "does not set selected_student_group" do
@@ -3040,13 +3040,13 @@ describe GradebooksController do
     describe "reassignment" do
       it "allows teacher reassignment" do
         get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
-        expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq true
+        expect(controller.instance_variable_get(:@can_reassign_submissions)).to be true
       end
 
       it "does not allow student reassignment" do
         user_session(@student)
         get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
-        expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq nil
+        expect(controller.instance_variable_get(:@can_reassign_submissions)).to be_nil
       end
 
       context "with moderated grading" do
@@ -3061,13 +3061,13 @@ describe GradebooksController do
         it "does not allow non-final grader to reassign" do
           user_session(@ta)
           get "speed_grader", params: { course_id: @course, assignment_id: @mod_assignment.id }
-          expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq false
+          expect(controller.instance_variable_get(:@can_reassign_submissions)).to be false
         end
 
         it "allows final grader to reassign" do
           user_session(@teacher)
           get "speed_grader", params: { course_id: @course, assignment_id: @mod_assignment.id }
-          expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq true
+          expect(controller.instance_variable_get(:@can_reassign_submissions)).to be true
         end
       end
     end
@@ -3117,13 +3117,13 @@ describe GradebooksController do
         it 'clears the selected section for the course if passed the value "all"' do
           post "speed_grader_settings", params: { course_id: @course.id, selected_section_id: "all" }
 
-          expect(course_settings.dig("filter_rows_by", "section_id")).to be nil
+          expect(course_settings.dig("filter_rows_by", "section_id")).to be_nil
         end
 
         it "clears the selected section if passed an invalid value" do
           post "speed_grader_settings", params: { course_id: @course.id, selected_section_id: "hahahaha" }
 
-          expect(course_settings.dig("filter_rows_by", "section_id")).to be nil
+          expect(course_settings.dig("filter_rows_by", "section_id")).to be_nil
         end
 
         it "clears the selected section if passed a non-active section in the course" do
@@ -3132,14 +3132,14 @@ describe GradebooksController do
 
           post "speed_grader_settings", params: { course_id: @course.id, selected_section_id: deleted_section.id }
 
-          expect(course_settings.dig("filter_rows_by", "section_id")).to be nil
+          expect(course_settings.dig("filter_rows_by", "section_id")).to be_nil
         end
 
         it "clears the selected section if passed a section ID not in the course" do
           section_in_other_course = Course.create!.course_sections.create!
           post "speed_grader_settings", params: { course_id: @course.id, selected_section_id: section_in_other_course.id }
 
-          expect(course_settings.dig("filter_rows_by", "section_id")).to be nil
+          expect(course_settings.dig("filter_rows_by", "section_id")).to be_nil
         end
       end
     end
@@ -3270,14 +3270,14 @@ describe GradebooksController do
       context = object_double(@course, feature_enabled?: false)
       @controller.instance_variable_set(:@context, context)
 
-      expect(@controller.post_grades_feature?).to eq(false)
+      expect(@controller.post_grades_feature?).to be(false)
     end
 
     it "returns false when context does not allow grade publishing by user" do
       context = object_double(@course, feature_enabled?: true, allows_grade_publishing_by: false)
       @controller.instance_variable_set(:@context, context)
 
-      expect(@controller.post_grades_feature?).to eq(false)
+      expect(@controller.post_grades_feature?).to be(false)
     end
 
     it "returns false when #can_do is false" do
@@ -3285,7 +3285,7 @@ describe GradebooksController do
       @controller.instance_variable_set(:@context, context)
       allow(@controller).to receive(:can_do).and_return(false)
 
-      expect(@controller.post_grades_feature?).to eq(false)
+      expect(@controller.post_grades_feature?).to be(false)
     end
 
     it "returns true when all conditions are met" do
@@ -3293,7 +3293,7 @@ describe GradebooksController do
       @controller.instance_variable_set(:@context, context)
       allow(@controller).to receive(:can_do).and_return(true)
 
-      expect(@controller.post_grades_feature?).to eq(true)
+      expect(@controller.post_grades_feature?).to be(true)
     end
   end
 
@@ -3432,7 +3432,7 @@ describe GradebooksController do
       progress = Progress.find(returned_id)
 
       aggregate_failures do
-        expect(progress).not_to be nil
+        expect(progress).not_to be_nil
         expect(progress.tag).to eq "override_grade_update"
       end
     end

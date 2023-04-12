@@ -55,12 +55,12 @@ describe Types::ConversationType do
   context "conversation properties" do
     it "is_private returns true when conversation is private" do
       result = not_private_conversation_type.resolve("isPrivate")
-      expect(result).to eq(false)
+      expect(result).to be(false)
     end
 
     it "is_private returns false when conversation is not private" do
       result = private_conversation_type.resolve("isPrivate")
-      expect(result).to eq(true)
+      expect(result).to be(true)
     end
   end
 
@@ -75,12 +75,12 @@ describe Types::ConversationType do
 
       it "returns false when conversation is between students" do
         result = conversation_students_type.resolve("canReply")
-        expect(result).to eq(false)
+        expect(result).to be(false)
       end
 
       it "returns true when conversation is between teacher and student" do
         result = conversation_type.resolve("canReply")
-        expect(result).to eq(true)
+        expect(result).to be(true)
       end
     end
 
@@ -92,12 +92,12 @@ describe Types::ConversationType do
 
       it "returns true when conversation is between students" do
         result = conversation_students_type.resolve("canReply")
-        expect(result).to eq(true)
+        expect(result).to be(true)
       end
 
       it "returns true when conversation is between teacher and student" do
         result = conversation_type.resolve("canReply")
-        expect(result).to eq(true)
+        expect(result).to be(true)
       end
     end
   end

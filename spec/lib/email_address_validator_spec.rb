@@ -20,13 +20,13 @@
 describe "EmailAddressValidator" do
   it "accepts good addresses with domains" do
     ["user@example.com", '"non\@triv"/ial@example.com'].each do |addr|
-      expect(EmailAddressValidator.valid?(addr)).to eq true
+      expect(EmailAddressValidator.valid?(addr)).to be true
     end
   end
 
   it "rejects bad, local, or multiple addresses" do
     ["None", "@example.com", "user@", "user1@example.com, user2@example.com"].each do |addr|
-      expect(EmailAddressValidator.valid?(addr)).to eq false
+      expect(EmailAddressValidator.valid?(addr)).to be false
     end
   end
 end

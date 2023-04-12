@@ -130,15 +130,15 @@ describe K5::EnablementService do
       it "does nothing if k5 isn't enabled on the account" do
         K5::EnablementService.new(@root_account).set_k5_settings(false, true)
         @root_account.save!
-        expect(@root_account.reload.use_classic_font_in_k5?).to eq false
+        expect(@root_account.reload.use_classic_font_in_k5?).to be false
       end
 
       it "sets classic font on an account" do
         toggle_k5_setting(@root_account)
         K5::EnablementService.new(@root_account).set_k5_settings(true, true)
         @root_account.save!
-        expect(@root_account.settings[:use_classic_font_in_k5][:value]).to eq true
-        expect(@root_account.settings[:use_classic_font_in_k5][:locked]).to eq true
+        expect(@root_account.settings[:use_classic_font_in_k5][:value]).to be true
+        expect(@root_account.settings[:use_classic_font_in_k5][:locked]).to be true
         expect(@root_account.settings[:k5_classic_font_accounts]).to eq [@root_account.id]
       end
 
@@ -151,8 +151,8 @@ describe K5::EnablementService do
         @root_account.save!
         K5::EnablementService.new(@root_account).set_k5_settings(true, false)
         @root_account.save!
-        expect(@root_account.settings[:use_classic_font_in_k5][:value]).to eq false
-        expect(@root_account.settings[:use_classic_font_in_k5][:locked]).to eq true
+        expect(@root_account.settings[:use_classic_font_in_k5][:value]).to be false
+        expect(@root_account.settings[:use_classic_font_in_k5][:locked]).to be true
         expect(@root_account.settings[:k5_classic_font_accounts]).to eq []
       end
 
@@ -161,9 +161,9 @@ describe K5::EnablementService do
         K5::EnablementService.new(@subaccount).set_k5_settings(true, true)
         @subaccount.save!
         @root_account.reload
-        expect(@root_account.use_classic_font_in_k5?).to eq false
-        expect(@subaccount.settings[:use_classic_font_in_k5][:value]).to eq true
-        expect(@subaccount.settings[:use_classic_font_in_k5][:locked]).to eq true
+        expect(@root_account.use_classic_font_in_k5?).to be false
+        expect(@subaccount.settings[:use_classic_font_in_k5][:value]).to be true
+        expect(@subaccount.settings[:use_classic_font_in_k5][:locked]).to be true
         expect(@root_account.settings[:k5_classic_font_accounts]).to eq [@subaccount.id]
       end
 
@@ -175,8 +175,8 @@ describe K5::EnablementService do
         @subaccount.save!
         K5::EnablementService.new(subaccount2).set_k5_settings(true, false)
         subaccount2.save!
-        expect(@subaccount.reload.use_classic_font_in_k5?).to eq true
-        expect(subaccount2.reload.use_classic_font_in_k5?).to eq false
+        expect(@subaccount.reload.use_classic_font_in_k5?).to be true
+        expect(subaccount2.reload.use_classic_font_in_k5?).to be false
         expect(@root_account.reload.settings[:k5_classic_font_accounts]).to eq [@subaccount.id]
       end
 
@@ -209,10 +209,10 @@ describe K5::EnablementService do
         @subaccount.reload
         expect(@root_account.settings[:k5_accounts]).to eq [@subaccount.id, @root_account.id]
         expect(@root_account.settings[:k5_classic_font_accounts]).to eq ["fake_account_id"]
-        expect(@subaccount.settings[:enable_as_k5_account][:value]).to eq true
-        expect(@root_account.settings[:enable_as_k5_account][:value]).to eq true
+        expect(@subaccount.settings[:enable_as_k5_account][:value]).to be true
+        expect(@root_account.settings[:enable_as_k5_account][:value]).to be true
         expect(@subaccount.settings[:use_classic_font_in_k5]).to be_nil
-        expect(@root_account.settings[:use_classic_font_in_k5][:value]).to eq false
+        expect(@root_account.settings[:use_classic_font_in_k5][:value]).to be false
       end
     end
   end

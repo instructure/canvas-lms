@@ -43,7 +43,7 @@ describe ObserverPairingCodesApiController, type: :request do
     it "students can create pairing codes for themselves" do
       json = api_call_as_user(@student, :post, @path, @params)
       expect(json["user_id"]).to eq @student.id
-      expect(json["expires_at"] >= 6.days.from_now && json["expires_at"] <= 7.days.from_now).to eq true
+      expect(json["expires_at"] >= 6.days.from_now && json["expires_at"] <= 7.days.from_now).to be true
       expect(json["workflow_state"]).to eq "active"
       expect(json["code"].length).to eq 6
     end
@@ -60,7 +60,7 @@ describe ObserverPairingCodesApiController, type: :request do
       teacher = teacher_in_course(course: @course, active_all: true).user
       json = api_call_as_user(teacher, :post, @path, @params)
       expect(response.code).to eq "401"
-      expect(json["code"]).to eq nil
+      expect(json["code"]).to be_nil
     end
 
     it "works for teachers in courses that are not published yet" do
@@ -91,7 +91,7 @@ describe ObserverPairingCodesApiController, type: :request do
       admin = account_admin_user(account: Account.default)
       json = api_call_as_user(admin, :post, @path, @params)
       expect(response.code).to eq "200"
-      expect(json["code"]).not_to be nil
+      expect(json["code"]).not_to be_nil
     end
 
     it "errors if current_user isnt the student or a teacher/admin" do
@@ -112,7 +112,7 @@ describe ObserverPairingCodesApiController, type: :request do
       it "sub_account admin can generate code" do
         json = api_call_as_user(@sub_admin, :post, @path, @params)
         expect(response.code).to eq "200"
-        expect(json["code"]).not_to be nil
+        expect(json["code"]).not_to be_nil
       end
 
       it "sub_account admin cant generate code for students in other sub accounts" do

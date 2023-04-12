@@ -87,8 +87,8 @@ describe "Canvas Cartridge importing" do
         }
       }
     }
-    expect(@migration.import_object?("assignment_group", CC::CCHelper.create_key(ag3))).to eq false
-    expect(@migration.import_object?("assignment_group", CC::CCHelper.create_key(ag4))).to eq false
+    expect(@migration.import_object?("assignment_group", CC::CCHelper.create_key(ag3))).to be false
+    expect(@migration.import_object?("assignment_group", CC::CCHelper.create_key(ag4))).to be false
 
     # import json into new course
     @copy_to.assignment_group_no_drop_assignments = {}
@@ -176,7 +176,7 @@ describe "Canvas Cartridge importing" do
     expect(t1.name).to eq tool1.name
     expect(t1.description).to eq tool1.description
     expect(t1.workflow_state).to eq tool1.workflow_state
-    expect(t1.domain).to eq nil
+    expect(t1.domain).to be_nil
     expect(t1.consumer_key).to eq "fake"
     expect(t1.shared_secret).to eq "fake"
     expect(t1.tool_id).to eq "test_tool"
@@ -214,7 +214,7 @@ describe "Canvas Cartridge importing" do
 
     t2 = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(tool2)).first
     expect(t2.domain).to eq tool2.domain
-    expect(t2.url).to eq nil
+    expect(t2.url).to be_nil
     expect(t2.name).to eq tool2.name
     expect(t2.description).to eq tool2.description
     expect(t2.workflow_state).to eq tool2.workflow_state
@@ -266,11 +266,11 @@ describe "Canvas Cartridge importing" do
     tag = mod1_2.content_tags.first
     expect(tag.content_id).to eq tool_to.id
     expect(tag.content_type).to eq "ContextExternalTool"
-    expect(tag.new_tab).to eq true
+    expect(tag.new_tab).to be true
     expect(tag.url).to eq "http://example.com.ims/lti"
     tag = mod1_2.content_tags.last
     expect(tag.content_id).to eq tool_to.id
-    expect(tag.new_tab).not_to eq true
+    expect(tag.new_tab).not_to be true
     expect(tag.content_type).to eq "ContextExternalTool"
     expect(tag.url).to eq "http://example.com.ims/lti"
   end
@@ -836,7 +836,7 @@ describe "Canvas Cartridge importing" do
     expect(page_2.editing_roles).to eq page.editing_roles
     expect(page_2.notify_of_update).to eq page.notify_of_update
     expect(page_2.body).to eq (body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id]).gsub(%r{png" />}, 'png">')
-    expect(page_2.unpublished?).to eq true
+    expect(page_2.unpublished?).to be true
   end
 
   it "imports migrate inline external tool URLs in wiki pages" do
@@ -926,8 +926,8 @@ describe "Canvas Cartridge importing" do
     expect(asmnt_2.peer_reviews).to eq asmnt.peer_reviews
     expect(asmnt_2.anonymous_peer_reviews).to eq asmnt.peer_reviews
     expect(asmnt_2.peer_review_count).to eq asmnt.peer_review_count
-    expect(asmnt_2.freeze_on_copy).to eq true
-    expect(asmnt_2.copied).to eq true
+    expect(asmnt_2.freeze_on_copy).to be true
+    expect(asmnt_2.copied).to be true
   end
 
   it "imports external tool assignments" do
@@ -1343,7 +1343,7 @@ describe "Canvas Cartridge importing" do
       expect(migration.migration_issues.count).to eq 1
       warning = migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
-      expect(warning.description.start_with?("Missing links found in imported content")).to eq true
+      expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/question_banks/#{bank.id}#question_#{question.id}_question_text"
       expect(warning.error_message).to include("question_text")
     end
@@ -1377,7 +1377,7 @@ describe "Canvas Cartridge importing" do
       expect(migration.migration_issues.count).to eq 1
       warning = migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
-      expect(warning.description.start_with?("Missing links found in imported content")).to eq true
+      expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/assignments/#{a.id}"
       expect(warning.error_message).to include("description")
     end
@@ -1411,7 +1411,7 @@ describe "Canvas Cartridge importing" do
       expect(migration.migration_issues.count).to eq 1
       warning = migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
-      expect(warning.description.start_with?("Missing links found in imported content")).to eq true
+      expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/calendar_events/#{event.id}"
     end
 
@@ -1429,7 +1429,7 @@ describe "Canvas Cartridge importing" do
       expect(migration.migration_issues.count).to eq 1
       warning = migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
-      expect(warning.description.start_with?("Missing links found in imported content")).to eq true
+      expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/assignments/syllabus"
     end
 
@@ -1467,12 +1467,12 @@ describe "Canvas Cartridge importing" do
       warnings = migration.migration_issues.sort_by(&:fix_issue_html_url)
       warning1 = warnings[0]
       expect(warning1.issue_type).to eq "warning"
-      expect(warning1.description.start_with?("Missing links found in imported content")).to eq true
+      expect(warning1.description.start_with?("Missing links found in imported content")).to be true
       expect(warning1.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/announcements/#{topic1.id}"
 
       warning2 = warnings[1]
       expect(warning2.issue_type).to eq "warning"
-      expect(warning2.description.start_with?("Missing links found in imported content")).to eq true
+      expect(warning2.description.start_with?("Missing links found in imported content")).to be true
       expect(warning2.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/discussion_topics/#{topic2.id}"
     end
 
@@ -1515,7 +1515,7 @@ describe "Canvas Cartridge importing" do
       expect(migration.migration_issues.count).to eq 1
       warning = migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
-      expect(warning.description.start_with?("Missing links found in imported content")).to eq true
+      expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/quizzes/#{quiz.id}"
     end
 
@@ -1566,7 +1566,7 @@ describe "Canvas Cartridge importing" do
       expect(migration.migration_issues.count).to eq 1
       warning = migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
-      expect(warning.description.start_with?("Missing links found in imported content")).to eq true
+      expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/quizzes/#{quiz.id}/edit"
     end
 
@@ -1591,7 +1591,7 @@ describe "Canvas Cartridge importing" do
       expect(migration.migration_issues.count).to eq 1
       warning = migration.migration_issues.first
       expect(warning.issue_type).to eq "warning"
-      expect(warning.description.start_with?("Missing links found in imported content")).to eq true
+      expect(warning.description.start_with?("Missing links found in imported content")).to be true
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/pages/#{wiki.url}"
       expect(warning.error_message).to include("body")
     end
@@ -1665,14 +1665,14 @@ describe "matching question reordering" do
       mi.description ==
         "Imported matching question contains images on both sides, which is unsupported"
     end
-    expect(mi1.fix_issue_html_url.include?("question_#{broken1.id}_question_text")).to eq true
+    expect(mi1.fix_issue_html_url.include?("question_#{broken1.id}_question_text")).to be true
 
     broken2 = @course.assessment_questions.where(migration_id: "m22b544d870a086de6e59b79e6dd9186be_quiz_question").first
     mi2 = @migration.migration_issues.detect do |mi|
       mi.description ==
         "Imported matching question contains images inside the choices, and could not be fixed because it also contains distractors"
     end
-    expect(mi2.fix_issue_html_url.include?("question_#{broken2.id}_question_text")).to eq true
+    expect(mi2.fix_issue_html_url.include?("question_#{broken2.id}_question_text")).to be true
 
     fixed = @course.assessment_questions.where(migration_id: "m21e0c78d05b78dc312bbc0dc77b963781_quiz_question").first
     fixed.question_data[:answers].each do |answer|

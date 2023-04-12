@@ -82,7 +82,7 @@ describe SupportHelpers::Crocodoc::CrocodocFixer do
       expect(shardattachment).to receive(:submit_to_crocodoc).and_return(true)
 
       fixer.resubmit_attachment(shardattachment)
-      expect(fixer.attempted_resubmit).to eql(1)
+      expect(fixer.attempted_resubmit).to be(1)
     end
   end
 

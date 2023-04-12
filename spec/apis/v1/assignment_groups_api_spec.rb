@@ -244,7 +244,7 @@ describe AssignmentGroupsController, type: :request do
       }
     )
 
-    expect(json.first["assignments"].first["grades_published"]).to eq(true)
+    expect(json.first["assignments"].first["grades_published"]).to be(true)
   end
 
   context "exclude response fields" do
@@ -791,7 +791,7 @@ describe AssignmentGroupsApiController, type: :request do
                        course_id: @course.id.to_s
                      },
                      params)
-      end.to change(AssignmentGroup, :count).by(0)
+      end.not_to change(AssignmentGroup, :count)
     end
 
     it "responds with a 400 when invalid integration_data is included" do

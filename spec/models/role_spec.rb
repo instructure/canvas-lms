@@ -343,7 +343,7 @@ describe Role do
 
                 # the opposite (add <-> delete) permission should always be false
                 value = roles.find { |r| r[:name] == role_names[test_role] }[opposite_role_key_to_test]
-                expect(value).to eq false
+                expect(value).to be false
               end
             end
           end

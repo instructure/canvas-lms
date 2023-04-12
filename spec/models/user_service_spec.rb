@@ -24,9 +24,9 @@ describe UserService do
   end
 
   it "has a useful workflow" do
-    expect(@user_service.state).to eql(:active)
+    expect(@user_service.state).to be(:active)
     @user_service.failed_request
-    expect(@user_service.state).to eql(:failed)
+    expect(@user_service.state).to be(:failed)
   end
 
   it "has a named scope for type" do

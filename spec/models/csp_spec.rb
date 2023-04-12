@@ -33,13 +33,13 @@ describe Csp do
     end
 
     it "is not enabled by default" do
-      @accounts.each { |a| expect(a.csp_enabled?).to eq false }
+      @accounts.each { |a| expect(a.csp_enabled?).to be false }
     end
 
     it "inherits settings" do
       @root.enable_csp!
       @accounts.each do |a|
-        expect(a.csp_enabled?).to eq true
+        expect(a.csp_enabled?).to be true
         expect(a.csp_account_id).to eq @root.global_id
       end
     end
@@ -47,7 +47,7 @@ describe Csp do
     it "overrides inherited settings if explicitly set down the chain" do
       @root.enable_csp!
       @sub1.disable_csp!
-      expect(@sub2.csp_enabled?).to eq false
+      expect(@sub2.csp_enabled?).to be false
     end
 
     it "does not override inherited settings if explicitly set down the chain but locked" do
@@ -55,7 +55,7 @@ describe Csp do
       @sub1.disable_csp!
       @root.lock_csp!
       @accounts.each do |a|
-        expect(a.csp_enabled?).to eq true
+        expect(a.csp_enabled?).to be true
         expect(a.csp_account_id).to eq @root.global_id
       end
     end
@@ -70,9 +70,9 @@ describe Csp do
 
     it "invalidates caches on changes" do
       enable_cache do
-        expect(@sub2.csp_enabled?).to eq false
+        expect(@sub2.csp_enabled?).to be false
         @root.enable_csp!
-        expect(Account.find(@sub2.id).csp_enabled?).to eq true
+        expect(Account.find(@sub2.id).csp_enabled?).to be true
       end
     end
 
@@ -81,9 +81,9 @@ describe Csp do
       @sub1.disable_csp!
       @root.lock_csp!
       enable_cache do
-        expect(@sub2.csp_enabled?).to eq true
+        expect(@sub2.csp_enabled?).to be true
         @root.unlock_csp!
-        expect(Account.find(@sub2.id).csp_enabled?).to eq false
+        expect(Account.find(@sub2.id).csp_enabled?).to be false
       end
     end
   end
@@ -96,19 +96,19 @@ describe Csp do
     end
 
     it "bies disabled by default" do
-      expect(@course.csp_enabled?).to eq false
+      expect(@course.csp_enabled?).to be false
     end
 
     it "inherits from account" do
       @root.enable_csp!
-      expect(@course.reload.csp_enabled?).to eq true
+      expect(@course.reload.csp_enabled?).to be true
     end
 
     it "is disabled if set on course" do
       @root.enable_csp!
       @course.csp_disabled = true
       @course.save!
-      expect(@course.reload.csp_enabled?).to eq false
+      expect(@course.reload.csp_enabled?).to be false
     end
 
     it "does not allow overriding if locked by account" do
@@ -116,8 +116,8 @@ describe Csp do
       @course.csp_disabled = true
       @course.save!
       @root.lock_csp!
-      expect(@course.reload.csp_enabled?).to eq true
-      expect(@course.csp_locked?).to eq true
+      expect(@course.reload.csp_enabled?).to be true
+      expect(@course.csp_locked?).to be true
     end
   end
 

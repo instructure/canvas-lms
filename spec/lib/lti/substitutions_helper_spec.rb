@@ -678,12 +678,12 @@ module Lti
 
         it "returns section restricted if all enrollments are restricted" do
           [@e1, @e2].each { |e| e.update_attribute(:limit_privileges_to_course_section, true) }
-          expect(subject.section_restricted).to eq true
+          expect(subject.section_restricted).to be true
         end
 
         it "does not return section restricted if only one is" do
           @e1.update_attribute(:limit_privileges_to_course_section, true)
-          expect(subject.section_restricted).to eq false
+          expect(subject.section_restricted).to be false
         end
 
         it "returns all canvas section sis ids" do
@@ -829,7 +829,7 @@ module Lti
         end
 
         it "returns nil if there isn't an sis email" do
-          expect(substitution_helper.sis_email).to eq nil
+          expect(substitution_helper.sis_email).to be_nil
         end
       end
     end

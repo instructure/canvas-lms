@@ -25,14 +25,14 @@ describe Canvas do
       expect(Timeout).to receive(:timeout).with(2).and_yield
       ran = false
       Canvas.timeout_protection("spec") { ran = true }
-      expect(ran).to eq true
+      expect(ran).to be true
 
       # service-specific timeout
       Setting.set("service_spec_timeout", "1")
       expect(Timeout).to receive(:timeout).with(1).and_yield
       ran = false
       Canvas.timeout_protection("spec") { ran = true }
-      expect(ran).to eq true
+      expect(ran).to be true
     end
 
     it "raises on timeout if raise_on_timeout option is specified" do
@@ -60,7 +60,7 @@ describe Canvas do
         ran = false
         # third time, won't call timeout
         Canvas.timeout_protection("spec") { ran = true }
-        expect(ran).to eq false
+        expect(ran).to be false
         # verify the redis key has a ttl
         key = "service:timeouts:spec:error_count"
         expect(Canvas.redis.get(key)).to eq "2"
@@ -69,7 +69,7 @@ describe Canvas do
         Canvas.redis.del(key)
         expect(Timeout).to receive(:timeout).with(15).and_yield
         Canvas.timeout_protection("spec") { ran = true }
-        expect(ran).to eq true
+        expect(ran).to be true
       end
 
       it "raises on cutoff if raise_on_timeout option is specified" do
@@ -102,7 +102,7 @@ describe Canvas do
         expect(Timeout).to receive(:timeout).with(15).and_yield
         ran = false
         Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true }
-        expect(ran).to eq true
+        expect(ran).to be true
       end
 
       it "skips calling the block after X failures" do
@@ -116,7 +116,7 @@ describe Canvas do
         # third time, won't call timeout
         expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true } }
           .to raise_error(Timeout::Error)
-        expect(ran).to eq false
+        expect(ran).to be false
         # verify the redis key has a ttl
         key = "service:timeouts:spec:error_count"
         expect(Canvas.redis.get(key)).to eq "2"
@@ -125,7 +125,7 @@ describe Canvas do
         Canvas.redis.del(key)
         expect(Timeout).to receive(:timeout).with(15).and_yield
         Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true }
-        expect(ran).to eq true
+        expect(ran).to be true
       end
 
       it "raises TimeoutCutoff when the cutoff is reached" do
@@ -159,7 +159,7 @@ describe Canvas do
         expect(Timeout).to receive(:timeout).with(15).and_yield
         ran = false
         Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true }
-        expect(ran).to eq true
+        expect(ran).to be true
       end
 
       it "increments the counter when the block is called" do

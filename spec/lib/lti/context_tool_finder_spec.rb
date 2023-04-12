@@ -153,7 +153,7 @@ describe Lti::ContextToolFinder do
     end
 
     it "returns nil if context is nil" do
-      expect(described_class.all_tools_for(nil)).to eq(nil)
+      expect(described_class.all_tools_for(nil)).to be_nil
     end
 
     it_behaves_like "a method creating a scope for all tools for a context" do

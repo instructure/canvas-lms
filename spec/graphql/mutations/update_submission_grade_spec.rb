@@ -74,7 +74,7 @@ RSpec.describe Mutations::UpdateSubmissionGrade do
 
   it "updates grade to 12" do
     result = run_mutation({ submission_id: @submission.id, score: 12 })
-    expect(result.dig("data", "updateSubmissionGrade", "errors")).to be nil
+    expect(result.dig("data", "updateSubmissionGrade", "errors")).to be_nil
     expect(result.dig("data", "updateSubmissionGrade", "submission")).to include({ _id: @submission.id.to_s })
     @submission.reload
     expect(@submission.score).to eq 12
@@ -83,10 +83,10 @@ RSpec.describe Mutations::UpdateSubmissionGrade do
   it "user should not have access to grade" do
     result = run_mutation({ submission_id: @submission.id, score: 12 }, @student)
     errors = result.dig("data", "updateSubmissionGrade", "errors")
-    expect(result.dig("data", "updateSubmissionGrade", "submission")).to be nil
-    expect(errors).not_to be nil
+    expect(result.dig("data", "updateSubmissionGrade", "submission")).to be_nil
+    expect(errors).not_to be_nil
     @submission.reload
-    expect(@submission.score).to eq nil
+    expect(@submission.score).to be_nil
     expect(errors[0][:message]).to eq "Not authorized to score Submission"
   end
 end

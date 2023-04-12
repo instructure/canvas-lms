@@ -181,11 +181,11 @@ describe AcademicBenchmark::Converter do
 
       it "sets course outcomes based on authority guid data" do
         expect(course = converter.export).to be_truthy
-        expect(course["learning_outcomes"].count).to eql 1
+        expect(course["learning_outcomes"].count).to be 1
         authority = course["learning_outcomes"].first
         expect(authority["type"]).to eql "learning_outcome_group"
         expect(authority["title"]).to eql "Alabama State Department of Education"
-        expect(authority["outcomes"].count).to eql 1
+        expect(authority["outcomes"].count).to be 1
         publication = authority["outcomes"].first
         expect(publication["type"]).to eql "learning_outcome_group"
         expect(publication["title"]).to eql "Course of Study"
@@ -205,9 +205,9 @@ describe AcademicBenchmark::Converter do
         outcome = group111["outcomes"].first
         expect(outcome["type"]).to eql "learning_outcome"
         expect(outcome["title"]).to eql "SOC.5.8.5"
-        expect(outcome["mastery_points"]).to eql 6
-        expect(outcome["points_possible"]).to eql 10
-        expect(outcome["ratings"].length).to eql 2
+        expect(outcome["mastery_points"]).to be 6
+        expect(outcome["points_possible"]).to be 10
+        expect(outcome["ratings"].length).to be 2
       end
 
       context "document without adoption year" do
@@ -225,9 +225,9 @@ describe AcademicBenchmark::Converter do
 
         it "does not append adoption year" do
           expect(course = converter.export).to be_truthy
-          expect(course["learning_outcomes"].count).to eql 1
+          expect(course["learning_outcomes"].count).to be 1
           authority = course["learning_outcomes"].first
-          expect(authority["outcomes"].count).to eql 1
+          expect(authority["outcomes"].count).to be 1
           publication = authority["outcomes"][0]
           expect(publication["outcomes"].count).to eq 1
           expect(publication["outcomes"][0]["title"]).to eq "Social Studies"

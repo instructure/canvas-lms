@@ -33,7 +33,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::ShortAnswer do
   include_examples "Answer Serializers"
 
   it "returns nil when un-answered" do
-    expect(subject.deserialize({})).to eq nil
+    expect(subject.deserialize({})).to be_nil
   end
 
   it "gracefully sanitizes its text" do

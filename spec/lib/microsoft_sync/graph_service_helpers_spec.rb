@@ -192,7 +192,7 @@ describe MicrosoftSync::GraphServiceHelpers do
       course_model(public_description: "classic", name: "algebra", sis_source_id: "ALG-101")
       # force generation of lti context id (normally done lazily)
       lti_context_id = Lti::Asset.opaque_identifier_for(@course)
-      expect(lti_context_id).to_not eq(nil)
+      expect(lti_context_id).to_not be_nil
       expect(graph_service.groups).to receive(:update).with(
         "msgroupid",
         microsoft_EducationClassLmsExt: {

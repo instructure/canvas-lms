@@ -46,19 +46,19 @@ describe "acts_as_list" do
     it "inserts in the position correctly" do
       expect(@modules.map(&:position)).to eq [1, 2, 3]
 
-      expect(@module_1.insert_at(3)).to eq true
+      expect(@module_1.insert_at(3)).to be true
       @modules.each(&:reload)
       expect(@modules.map(&:position)).to eq [3, 1, 2]
 
-      expect(@module_2.insert_at(2)).to eq true
+      expect(@module_2.insert_at(2)).to be true
       @modules.each(&:reload)
       expect(@modules.map(&:position)).to eq [3, 2, 1]
 
-      expect(@module_3.insert_at(3)).to eq true
+      expect(@module_3.insert_at(3)).to be true
       @modules.each(&:reload)
       expect(@modules.map(&:position)).to eq [2, 1, 3]
 
-      expect(@module_1.insert_at(1)).to eq true
+      expect(@module_1.insert_at(1)).to be true
       @modules.each(&:reload)
       expect(@modules.map(&:position)).to eq [1, 2, 3]
     end

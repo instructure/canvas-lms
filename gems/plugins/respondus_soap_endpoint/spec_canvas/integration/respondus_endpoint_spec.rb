@@ -265,7 +265,7 @@ Implemented for: Canvas LMS)
     # import root folder should've been created and marked as hidden
     folder = Folder.assert_path(RespondusSoapEndpoint::RespondusAPIPort::ATTACHMENT_FOLDER_NAME,
                                 @course)
-    expect(folder.hidden?).to eq true
+    expect(folder.hidden?).to be true
   end
 
   describe "polling publish" do
@@ -322,7 +322,7 @@ Implemented for: Canvas LMS)
         ["fileName", "import.zip"], ["fileData", "\x0"]
       )
       expect(status).to eq "Invalid file data"
-      expect(item_id).to eq nil
+      expect(item_id).to be_nil
     end
   end
 end

@@ -78,7 +78,7 @@ describe "Enrollment::BatchStateUpdater" do
 
       Enrollment::BatchStateUpdater.remove_group_memberships([@enrollment.id], [@course], [@user.id])
 
-      expect(group.reload.leader_id).to eq nil
+      expect(group.reload.leader_id).to be_nil
     end
   end
 

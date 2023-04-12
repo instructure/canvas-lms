@@ -65,7 +65,7 @@ describe ProfileController do
         student_in_course(user: @user, active_all: true)
 
         get "show", params: { user_id: @user.id }
-        expect(assigns(:user_data)[:common_contexts].size).to eql(2)
+        expect(assigns(:user_data)[:common_contexts].size).to be(2)
         expect(assigns(:user_data)[:common_contexts][0]["id"]).to eql(@course.id)
         expect(assigns(:user_data)[:common_contexts][0]["roles"]).to eql(["Student"])
         expect(assigns(:user_data)[:common_contexts][1]["id"]).to eql(group.id)
@@ -106,7 +106,7 @@ describe ProfileController do
 
       it "allows changing pronouns" do
         user_session(@user, @pseudonym)
-        expect(@user.pronouns).to eq nil
+        expect(@user.pronouns).to be_nil
         put "update", params: { user: { pronouns: "  He/Him " } }, format: "json"
         expect(response).to be_successful
         @user.reload
@@ -122,16 +122,16 @@ describe ProfileController do
         put "update", params: { user: { pronouns: "" } }, format: "json"
         expect(response).to be_successful
         @user.reload
-        expect(@user.pronouns).to eq nil
+        expect(@user.pronouns).to be_nil
       end
 
       it "does not allow setting pronouns not on the approved list" do
         user_session(@user, @pseudonym)
-        expect(@user.pronouns).to eq nil
+        expect(@user.pronouns).to be_nil
         put "update", params: { user: { pronouns: "Pro/Noun" } }, format: "json"
         expect(response).to be_successful
         @user.reload
-        expect(@user.pronouns).to eq nil
+        expect(@user.pronouns).to be_nil
       end
 
       it "does not allow setting pronouns if the setting is disabled" do
@@ -141,7 +141,7 @@ describe ProfileController do
         put "update", params: { user: { pronouns: "Pro/Noun" } }, format: "json"
         expect(response).to be_successful
         @user.reload
-        expect(@user.pronouns).to eq nil
+        expect(@user.pronouns).to be_nil
       end
     end
 

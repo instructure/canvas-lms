@@ -181,8 +181,8 @@ describe CoursePace do
     it "returns an initialized duplicate of the course pace" do
       duplicate_course_pace = @course_pace.duplicate
       expect(duplicate_course_pace.class).to eq(CoursePace)
-      expect(duplicate_course_pace.persisted?).to eq(false)
-      expect(duplicate_course_pace.id).to eq(nil)
+      expect(duplicate_course_pace.persisted?).to be(false)
+      expect(duplicate_course_pace.id).to be_nil
     end
 
     it "supports passing in options" do
@@ -226,16 +226,16 @@ describe CoursePace do
     end
 
     it "creates an override for students" do
-      expect(@assignment.due_at).to eq(nil)
-      expect(@unpublished_assignment.due_at).to eq(nil)
-      expect(@course_pace.publish).to eq(true)
+      expect(@assignment.due_at).to be_nil
+      expect(@unpublished_assignment.due_at).to be_nil
+      expect(@course_pace.publish).to be(true)
       expect(AssignmentOverride.count).to eq(2)
     end
 
     it "creates assignment overrides for the course pace user" do
       @course_pace.update(user_id: @student)
       expect(AssignmentOverride.count).to eq(0)
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       expect(AssignmentOverride.count).to eq(2)
       @course.assignments.each do |assignment|
         assignment_override = assignment.assignment_overrides.first
@@ -247,7 +247,7 @@ describe CoursePace do
     it "creates assignment overrides based on the enrollment start_at" do
       @student_enrollment.update(start_at: "2021-09-10")
       expect(AssignmentOverride.count).to eq(0)
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       expect(AssignmentOverride.count).to eq(2)
       @course.assignments.each do |assignment|
         assignment_override = assignment.assignment_overrides.first
@@ -259,7 +259,7 @@ describe CoursePace do
     it "creates assignment overrides based on the enrollment created_at when start_at is nil" do
       @student_enrollment.reload.update!(start_at: nil, created_at: "2021-09-17")
       expect(AssignmentOverride.count).to eq(0)
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       expect(AssignmentOverride.count).to eq(2)
       @course.assignments.each do |assignment|
         assignment_override = assignment.assignment_overrides.first
@@ -286,7 +286,7 @@ describe CoursePace do
       assignment_override = @assignment.assignment_overrides.first
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-05"))
       expect(assignment_override.assignment_override_students.pluck(:user_id)).to eq([@student.id, student2.id])
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       expect(@assignment.assignment_overrides.count).to eq(2)
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-05"))
       expect(assignment_override.assignment_override_students.pluck(:user_id)).to eq([student2.id])
@@ -316,7 +316,7 @@ describe CoursePace do
       StudentEnrollment.create!(user: student2, course: @course, start_at: @course_pace.start_date)
       assignment_override2.assignment_override_students << AssignmentOverrideStudent.new(user_id: student2, no_enrollment: false)
       expect(@assignment.assignment_overrides.active.count).to eq(2)
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
       # We need to round to the last whole second to ensure the due_at is the same
@@ -327,7 +327,7 @@ describe CoursePace do
     it "creates assignment overrides for the course pace course section" do
       @course_pace.update(course_section: @course_section)
       expect(@assignment.assignment_overrides.count).to eq(0)
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       expect(@assignment.assignment_overrides.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.first
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second(@course.start_at.to_s))
@@ -386,12 +386,12 @@ describe CoursePace do
       topic_tag = @module.add_item type: "discussion_topic", id: topic.id
       @course_pace.course_pace_module_items.create! module_item: topic_tag
       expect(topic.assignment.assignment_overrides.count).to eq 0
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       expect(topic.assignment.assignment_overrides.count).to eq 1
     end
 
     it "does not change overrides for students that have course paces if the course pace is published" do
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second(@course.start_at.to_s))
@@ -399,19 +399,19 @@ describe CoursePace do
       student_course_pace = @course.course_paces.create! user: @student, workflow_state: "active"
       @course.student_enrollments.find_by(user: @student).update(start_at: "2021-09-06")
       student_course_pace.course_pace_module_items.create! module_item: @tag
-      expect(student_course_pace.publish).to eq(true)
+      expect(student_course_pace.publish).to be(true)
       assignment_override.reload
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
       # Republish course pace and verify dates have not changed on student specific override
       @course_pace.instance_variable_set(:@student_enrollments, nil)
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       assignment_override.reload
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
     end
 
     it "does not change overrides for sections that have course paces if the course pace is published" do
       @student_enrollment.reload.update(start_at: nil, created_at: Time.at(0))
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second(@course.start_at.to_s))
@@ -419,19 +419,19 @@ describe CoursePace do
       @course_section.update(start_at: Date.parse("2021-09-06").in_time_zone(@course.time_zone), restrict_enrollments_to_section_dates: true)
       section_course_pace = @course.course_paces.create! course_section: @course_section, workflow_state: "active"
       section_course_pace.course_pace_module_items.create! module_item: @tag
-      expect(section_course_pace.publish).to eq(true)
+      expect(section_course_pace.publish).to be(true)
       assignment_override.reload
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
       # Republish course pace and verify dates have not changed on student specific override
       @course_pace.instance_variable_set(:@student_enrollments, nil)
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       assignment_override.reload
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
     end
 
     it "does not change overrides for students that have course paces if the course section course pace is published" do
       @course_pace.update(course_section: @course_section)
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second(@course.start_at.to_s))
@@ -439,12 +439,12 @@ describe CoursePace do
       @course.student_enrollments.find_by(user: @student).update(start_at: "2021-09-06")
       student_course_pace = @course.course_paces.create! user: @student, workflow_state: "active"
       student_course_pace.course_pace_module_items.create! module_item: @tag
-      expect(student_course_pace.publish).to eq(true)
+      expect(student_course_pace.publish).to be(true)
       assignment_override.reload
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
       # Republish course pace and verify dates have not changed on student specific override
       @course_pace.instance_variable_set(:@student_enrollments, nil)
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       assignment_override.reload
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
     end
@@ -452,14 +452,14 @@ describe CoursePace do
     it "logs if the assignment being updated has been completed" do
       @assignment.submit_homework(@student, body: "Test")
       allow(InstStatsd::Statsd).to receive(:increment).and_call_original
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.submitted_assignment_date_change")
     end
 
     it "compresses to hard end dates" do
       @course_pace.course_pace_module_items.update(duration: 900)
       expect(AssignmentOverride.count).to eq(0)
-      expect(@course_pace.publish).to eq(true)
+      expect(@course_pace.publish).to be(true)
       expect(AssignmentOverride.count).to eq(2)
       expect(AssignmentOverride.last.due_at).to eq(fancy_midnight_rounded_to_last_second(@course_pace.end_date.to_s))
       expect(@course_pace.course_pace_module_items.reload.pluck(:duration)).to eq([900, 900])

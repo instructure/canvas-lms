@@ -78,7 +78,7 @@ describe CoursePacing::StudentEnrollmentPaceService do
           before { course_pace.destroy! }
 
           it "returns nil" do
-            expect(CoursePacing::StudentEnrollmentPaceService.template_pace_for(student_enrollment)).to eq nil
+            expect(CoursePacing::StudentEnrollmentPaceService.template_pace_for(student_enrollment)).to be_nil
           end
         end
       end
@@ -95,7 +95,7 @@ describe CoursePacing::StudentEnrollmentPaceService do
         before { course_pace.destroy! }
 
         it "returns nil" do
-          expect(CoursePacing::StudentEnrollmentPaceService.template_pace_for(student_enrollment)).to eq nil
+          expect(CoursePacing::StudentEnrollmentPaceService.template_pace_for(student_enrollment)).to be_nil
         end
       end
     end
@@ -139,7 +139,7 @@ describe CoursePacing::StudentEnrollmentPaceService do
         allow(pace).to receive(:update).and_return false
         expect(
           CoursePacing::StudentEnrollmentPaceService.update_pace(pace, update_params)
-        ).to eq false
+        ).to be false
       end
     end
   end
@@ -170,13 +170,13 @@ describe CoursePacing::StudentEnrollmentPaceService do
     it "returns false for enrollments other than the student's most recent" do
       expect(
         CoursePacing::StudentEnrollmentPaceService.valid_context?(@first_student_enrollment)
-      ).to eq false
+      ).to be false
     end
 
     it "returns true for the most recent student enrollment" do
       expect(
         CoursePacing::StudentEnrollmentPaceService.valid_context?(@last_student_enrollment)
-      ).to eq true
+      ).to be true
     end
   end
 end

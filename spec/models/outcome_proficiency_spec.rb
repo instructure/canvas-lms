@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe OutcomeProficiency, type: :model do
+describe OutcomeProficiency do
   describe "associations" do
     it { is_expected.to have_many(:outcome_proficiency_ratings).dependent(:destroy).order("points DESC, id ASC").inverse_of(:outcome_proficiency) }
     it { is_expected.to belong_to(:context).required }

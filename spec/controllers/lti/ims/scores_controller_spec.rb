@@ -132,7 +132,7 @@ module Lti::IMS
 
             it "updates result" do
               result
-              expect { send_request }.to change(Lti::Result, :count).by(0)
+              expect { send_request }.not_to change(Lti::Result, :count)
               expect(result.reload.result_score).to eq 5.0
             end
           end

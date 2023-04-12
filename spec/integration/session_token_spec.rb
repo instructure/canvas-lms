@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe "session token", type: :request do
+describe "session token" do
   before do
     user_with_pseudonym
     enable_default_developer_key!
@@ -50,7 +50,7 @@ describe "session token", type: :request do
 
     follow_redirect!
     expect(response).to be_successful
-    expect(session[:used_remember_me_token]).to eq true
+    expect(session[:used_remember_me_token]).to be true
   end
 
   it "rejects bad tokens" do

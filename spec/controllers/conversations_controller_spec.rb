@@ -124,7 +124,7 @@ describe ConversationsController do
 
       get "index", params: { scope: "sent" }, format: "json"
       expect(response).to be_successful
-      expect(assigns[:conversations_json].size).to eql 3
+      expect(assigns[:conversations_json].size).to be 3
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.sent.pages_loaded.legacy")
     end
 
@@ -137,7 +137,7 @@ describe ConversationsController do
 
       get "index", params: { scope: "starred" }, format: "json"
       expect(response).to be_successful
-      expect(assigns[:conversations_json].size).to eql 3
+      expect(assigns[:conversations_json].size).to be 3
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.starred.pages_loaded.legacy")
     end
 
@@ -150,7 +150,7 @@ describe ConversationsController do
 
       get "index", params: { scope: "unread" }, format: "json"
       expect(response).to be_successful
-      expect(assigns[:conversations_json].size).to eql 1
+      expect(assigns[:conversations_json].size).to be 1
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.unread.pages_loaded.legacy")
     end
 
@@ -163,7 +163,7 @@ describe ConversationsController do
 
       get "index", params: { scope: "archived" }, format: "json"
       expect(response).to be_successful
-      expect(assigns[:conversations_json].size).to eql 1
+      expect(assigns[:conversations_json].size).to be 1
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.archived.pages_loaded.legacy")
     end
 
@@ -176,7 +176,7 @@ describe ConversationsController do
       get "index", params: { scope: "inbox" }, format: "json"
       expect(response).to be_successful
       puts assigns[:conversations_json]
-      expect(assigns[:conversations_json].size).to eql 3
+      expect(assigns[:conversations_json].size).to be 3
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.inbox.pages_loaded.legacy")
     end
 
@@ -192,7 +192,7 @@ describe ConversationsController do
 
       get "index", params: { filter: @other_course.asset_string }, format: "json"
       expect(response).to be_successful
-      expect(assigns[:conversations_json].size).to eql 1
+      expect(assigns[:conversations_json].size).to be 1
       expect(assigns[:conversations_json][0][:id]).to eq @c2.conversation_id
     end
 
@@ -236,7 +236,7 @@ describe ConversationsController do
 
       get "index", params: { filter: @user.asset_string, include_all_conversation_ids: 1 }, format: "json"
       expect(response).to be_successful
-      expect(assigns[:conversations_json].size).to eql 2
+      expect(assigns[:conversations_json].size).to be 2
     end
 
     it "does not allow student view student to load inbox" do
@@ -268,14 +268,14 @@ describe ConversationsController do
       it "filters conversations" do
         get "index", format: "json"
         expect(response).to be_successful
-        expect(assigns[:conversations_json].size).to eql 1
+        expect(assigns[:conversations_json].size).to be 1
       end
 
       it "filters conversations when returning ids" do
         get "index", params: { include_all_conversation_ids: true }, format: "json"
         expect(response).to be_successful
-        expect(assigns[:conversations_json][:conversations].size).to eql 1
-        expect(assigns[:conversations_json][:conversation_ids].size).to eql 1
+        expect(assigns[:conversations_json][:conversations].size).to be 1
+        expect(assigns[:conversations_json][:conversation_ids].size).to be 1
       end
 
       it "recomputes inbox count" do
@@ -654,7 +654,7 @@ describe ConversationsController do
       post "create", params: { recipients: [new_user1.id.to_s, new_user2.id.to_s], body: "later", subject: "farewell" }
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.size).to eql 2
+      expect(json.size).to be 2
       json.each do |c|
         expect(c["subject"]).not_to be_nil
       end
@@ -691,7 +691,7 @@ describe ConversationsController do
       it "fails" do
         user_session(@student)
         post "create", params: { recipients: [User.create.id.to_s], body: "foo" }
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
       end
 
       context "as a siteadmin user with send_messages grants" do
@@ -700,7 +700,7 @@ describe ConversationsController do
           user_session(site_admin_user)
           post "create", params: { recipients: [User.create.id.to_s], body: "foo" }
           expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.account_context.legacy")
-          expect(response.status).to eq 201
+          expect(response).to have_http_status :created
         end
       end
     end

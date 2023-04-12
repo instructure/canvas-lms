@@ -513,7 +513,7 @@ describe PermissionsHelper do
           @cs_course = course_factory(active_all: true, account: @another_account)
         end
         site_admin_user(active_all: true)
-        expect(@user.precalculate_permissions_for_courses([@cs_course], [:read_forum])).to eq nil
+        expect(@user.precalculate_permissions_for_courses([@cs_course], [:read_forum])).to be_nil
       end
     end
   end

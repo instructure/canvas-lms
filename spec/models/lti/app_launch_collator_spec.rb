@@ -231,8 +231,8 @@ module Lti
         expect(definitions.count).to eq 2
         external_tool = definitions.find { |d| d[:definition_type] == "ContextExternalTool" }
         message_handler = definitions.find { |d| d[:definition_type] == "Lti::MessageHandler" }
-        expect(message_handler).to_not be nil
-        expect(external_tool).to_not be nil
+        expect(message_handler).to_not be_nil
+        expect(external_tool).to_not be_nil
       end
 
       context "pagination" do

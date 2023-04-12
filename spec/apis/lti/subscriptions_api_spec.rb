@@ -105,7 +105,7 @@ module Lti
         tool_proxy[:raw_data]["enabled_capability"] = %w[vnd.instructure.webhooks.assignment.attachment_created]
         tool_proxy.save!
         post create_endpoint, params: { subscription: subscription }, headers: request_headers
-        expect(response.status).to eq 500
+        expect(response).to have_http_status :internal_server_error
       end
 
       it "gives useful message if the subscription service is not configured" do
@@ -145,7 +145,7 @@ module Lti
         allow(subscription_service).to receive_messages(available?: false)
         allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
         delete delete_endpoint, headers: request_headers
-        expect(response.status).to eq 500
+        expect(response).to have_http_status :internal_server_error
       end
 
       it "gives useful message if the subscription service is not configured" do
@@ -183,7 +183,7 @@ module Lti
         allow(subscription_service).to receive_messages(available?: false)
         allow(subscription_service).to receive_messages(tool_proxy_subscription: ok_response)
         get show_endpoint, headers: request_headers
-        expect(response.status).to eq 500
+        expect(response).to have_http_status :internal_server_error
       end
 
       it "gives useful message if the subscription service is not configured" do
@@ -250,7 +250,7 @@ module Lti
       it "gives 500 if the subscription service is not configured" do
         allow(subscription_service).to receive_messages(available?: false)
         put update_endpoint, params: { subscription: subscription }, headers: request_headers
-        expect(response.status).to eq 500
+        expect(response).to have_http_status :internal_server_error
       end
 
       it "gives useful message if the subscription service is not configured" do
@@ -316,7 +316,7 @@ module Lti
         allow(subscription_service).to receive_messages(available?: false)
         allow(subscription_service).to receive_messages(tool_proxy_subscriptions: ok_response)
         get index_endpoint, headers: request_headers
-        expect(response.status).to eq 500
+        expect(response).to have_http_status :internal_server_error
       end
 
       it "gives useful message if the subscription service is not configured" do

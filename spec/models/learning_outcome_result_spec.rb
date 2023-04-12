@@ -379,7 +379,7 @@ describe LearningOutcomeResult do
     it "returns nil if no explicit assignment or artifact exists" do
       lor = create_and_associate_lor(nil)
 
-      expect(lor.assignment).to eq(nil)
+      expect(lor.assignment).to be_nil
     end
   end
 

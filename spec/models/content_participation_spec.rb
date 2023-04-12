@@ -55,7 +55,7 @@ describe ContentParticipation do
                                                 user: @student,
                                                 workflow_state: "unread",
                                               })
-      end.to change(ContentParticipation, :count).by 0
+      end.not_to change(ContentParticipation, :count)
 
       cp = ContentParticipation.where(user_id: @student).first
       expect(cp.workflow_state).to eq "unread"
@@ -318,7 +318,7 @@ describe ContentParticipation do
 
         expect do
           ContentParticipation.participate(content: @content, user: @student, content_item: "rubric", workflow_state: "read")
-        end.to change(ContentParticipationCount, :count).by 0
+        end.not_to change(ContentParticipationCount, :count)
 
         cpc = ContentParticipationCount.where(user_id: @student).first
         expect(cpc.unread_count).to eq 1

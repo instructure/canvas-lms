@@ -361,21 +361,21 @@ describe BigBlueButtonConference do
         recording_id = nil
         allow(@bbb).to receive(:send_request)
         response = @bbb.delete_recording(recording_id)
-        expect(response[:deleted]).to eq false
+        expect(response[:deleted]).to be false
       end
 
       it "doesn't delete the recording if record_id is not found" do
         recording_id = ""
         allow(@bbb).to receive(:send_request).and_return({ returncode: "SUCCESS", deleted: "false" })
         response = @bbb.delete_recording(recording_id)
-        expect(response[:deleted]).to eq false
+        expect(response[:deleted]).to be false
       end
 
       it "does delete the recording if record_id is found" do
         recording_id = "abc123-xyz"
         allow(@bbb).to receive(:send_request).and_return({ returncode: "SUCCESS", deleted: "true" })
         response = @bbb.delete_recording(recording_id)
-        expect(response[:deleted]).to eq true
+        expect(response[:deleted]).to be true
       end
     end
 

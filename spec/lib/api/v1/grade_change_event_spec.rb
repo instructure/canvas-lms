@@ -97,8 +97,8 @@ describe Api::V1::GradeChangeEvent do
     expect(event[:event_type]).to eq @event.event_type
     expect(event[:grade_before]).to eq @previous_grade
     expect(event[:grade_after]).to eq @submission.grade
-    expect(event[:excused_before]).to eq false
-    expect(event[:excused_after]).to eq false
+    expect(event[:excused_before]).to be false
+    expect(event[:excused_after]).to be false
     expect(event[:version_number]).to eq @submission.version_number
     expect(event[:graded_anonymously]).to eq @submission.graded_anonymously
     expect(event[:points_possible_before]).to eq @event.points_possible_before
@@ -121,9 +121,9 @@ describe Api::V1::GradeChangeEvent do
 
     event = subject.grade_change_event_json(@event, @student, @session)
     expect(event[:grade_before]).to eq @submission.grade
-    expect(event[:grade_after]).to eq nil
-    expect(event[:excused_before]).to eq false
-    expect(event[:excused_after]).to eq true
+    expect(event[:grade_after]).to be_nil
+    expect(event[:excused_before]).to be false
+    expect(event[:excused_after]).to be true
   end
 
   it "formats formerly excused submissions" do
@@ -133,10 +133,10 @@ describe Api::V1::GradeChangeEvent do
     @event = Auditors::GradeChange.record(submission: @unexcused)
 
     event = subject.grade_change_event_json(@event, @student, @session)
-    expect(event[:grade_before]).to eq nil
-    expect(event[:grade_after]).to eq nil
-    expect(event[:excused_before]).to eq true
-    expect(event[:excused_after]).to eq false
+    expect(event[:grade_before]).to be_nil
+    expect(event[:grade_after]).to be_nil
+    expect(event[:excused_before]).to be true
+    expect(event[:excused_after]).to be false
   end
 
   it "is formatted as an array of grade change event hashes" do
@@ -160,10 +160,10 @@ describe Api::V1::GradeChangeEvent do
 
     expect(json_hash[:linked].keys.sort).to eq %i[assignments courses page_views users]
     linked = json_hash[:linked]
-    expect(linked[:assignments].size).to eql(1)
-    expect(linked[:courses].size).to eql(1)
-    expect(linked[:users].size).to eql(2)
-    expect(linked[:page_views].size).to eql(1)
+    expect(linked[:assignments].size).to be(1)
+    expect(linked[:courses].size).to be(1)
+    expect(linked[:users].size).to be(2)
+    expect(linked[:page_views].size).to be(1)
   end
 
   it "handles an empty result set" do
@@ -217,7 +217,7 @@ describe Api::V1::GradeChangeEvent do
           )
           event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
           event_json = subject.grade_change_event_json(event, @user, @session)
-          expect(event_json[:grade_before]).to be nil
+          expect(event_json[:grade_before]).to be_nil
         end
 
         it "is returned as the grade value if grade_before is present" do
@@ -256,7 +256,7 @@ describe Api::V1::GradeChangeEvent do
           )
           event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
           event_json = subject.grade_change_event_json(event, @user, @session)
-          expect(event_json[:grade_after]).to be nil
+          expect(event_json[:grade_after]).to be_nil
         end
 
         it "is returned as the grade value if grade_after is present" do

@@ -33,7 +33,7 @@ describe BroadcastPolicy::SingletonMethods do
         whenever { true }
       end
 
-      expect(subject.broadcast_policy_list).not_to be(nil)
+      expect(subject.broadcast_policy_list).not_to be_nil
     end
 
     it "appends to an existing policy list" do

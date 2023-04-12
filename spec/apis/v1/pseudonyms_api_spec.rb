@@ -59,7 +59,7 @@ describe PseudonymsController, type: :request do
         json = api_call(:get, @account_path, @account_path_options, {
                           user: { id: @student.id }
                         })
-        expect(json.count).to eql 2
+        expect(json.count).to be 2
       end
 
       it "paginates results" do
@@ -67,7 +67,7 @@ describe PseudonymsController, type: :request do
         json = api_call(:get, "#{@account_path}?per_page=1", @account_path_options.merge({ per_page: "1" }), {
                           user: { id: @student.id }
                         })
-        expect(json.count).to eql 1
+        expect(json.count).to be 1
         headers = response.headers["Link"].split(",")
         expect(headers[0]).to match(/page=1&per_page=1/) # current page
         expect(headers[1]).to match(/page=2&per_page=1/) # next page
@@ -81,7 +81,7 @@ describe PseudonymsController, type: :request do
         @student.pseudonyms.create!(unique_id: "two@example.com", account: new_account)
 
         json = api_call(:get, @user_path, @user_path_options)
-        expect(json.count).to eql 2
+        expect(json.count).to be 2
       end
 
       it "does not included deleted pseudonyms" do
@@ -90,7 +90,7 @@ describe PseudonymsController, type: :request do
         to_delete.destroy
 
         json = api_call(:get, @user_path, @user_path_options)
-        expect(json.count).to eql 2
+        expect(json.count).to be 2
         expect(json.map { |j| j["id"] }.include?(to_delete.id)).to be_falsey
       end
 
@@ -443,7 +443,7 @@ describe PseudonymsController, type: :request do
 
         it "is able to delete a pseudonym" do
           json = api_call(:delete, @path, @path_options)
-          expect(@student.pseudonyms.active.count).to eql 1
+          expect(@student.pseudonyms.active.count).to be 1
           expect(json).to eq({
                                "unique_id" => "student@example.com",
                                "sis_user_id" => nil,

@@ -356,7 +356,7 @@ describe "Student reports" do
       parameter = {}
       parameter["start_at"] = 3.days.ago
       report = run_report(@type, { params: parameter })
-      expect(report.parameters["extra_text"].include?("Start At:")).to eq true
+      expect(report.parameters["extra_text"].include?("Start At:")).to be true
       parsed = parse_report(report, { order: [1, 5] })
       expect(parsed).to eq_stringified_array [
         [@user1.id, "user_sis_id_01", @user1.sortable_name, @section1.id, @section1.sis_source_id,

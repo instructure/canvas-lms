@@ -1683,7 +1683,7 @@ describe AssignmentsApiController, type: :request do
       audit_event = AnonymousOrModerationEvent.find_by!(assignment_id: new_assignment)
       aggregate_failures do
         expect(audit_event.event_type).to eq "assignment_created"
-        expect(audit_event.payload["anonymous_grading"]).to eq true
+        expect(audit_event.payload["anonymous_grading"]).to be true
       end
     end
 
@@ -1711,7 +1711,7 @@ describe AssignmentsApiController, type: :request do
       audit_event = AnonymousOrModerationEvent.find_by!(assignment_id: new_assignment)
       aggregate_failures do
         expect(audit_event.event_type).to eq "assignment_created"
-        expect(audit_event.payload["anonymous_grading"]).to eq true
+        expect(audit_event.payload["anonymous_grading"]).to be true
       end
     end
 
@@ -1940,7 +1940,7 @@ describe AssignmentsApiController, type: :request do
       group = @course.assignment_groups.create!({ name: "first group" })
       group_category = @course.group_categories.create!(name: "foo")
       json = api_create_assignment_in_course(@course, create_assignment_json(group, group_category))
-      expect(json["post_to_sis"]).to eq true
+      expect(json["post_to_sis"]).to be true
     end
 
     it "serializes post_to_sis when false" do
@@ -1950,7 +1950,7 @@ describe AssignmentsApiController, type: :request do
       group = @course.assignment_groups.create!({ name: "first group" })
       group_category = @course.group_categories.create!(name: "foo")
       json = api_create_assignment_in_course(@course, create_assignment_json(group, group_category))
-      expect(json["post_to_sis"]).to eq false
+      expect(json["post_to_sis"]).to be false
     end
 
     it "accepts a value for post_to_sis" do
@@ -1960,7 +1960,7 @@ describe AssignmentsApiController, type: :request do
       json = api_create_assignment_in_course(@course, { "post_to_sis" => true })
 
       assignment = Assignment.find(json["id"])
-      expect(assignment.post_to_sis).to eq true
+      expect(assignment.post_to_sis).to be true
     end
 
     it "does not overwrite post_to_sis with default if missing in update params" do
@@ -1969,7 +1969,7 @@ describe AssignmentsApiController, type: :request do
       a.save!
       json = api_create_assignment_in_course(@course, { "name" => "some assignment" })
       @assignment = Assignment.find(json["id"])
-      expect(@assignment.post_to_sis).to eq true
+      expect(@assignment.post_to_sis).to be true
       a.settings[:sis_default_grade_export] = { locked: false, value: false }
       a.save!
 
@@ -1984,7 +1984,7 @@ describe AssignmentsApiController, type: :request do
                },
                { assignment: { points_possible: 10 } })
       @assignment.reload
-      expect(@assignment.post_to_sis).to eq true
+      expect(@assignment.post_to_sis).to be true
     end
 
     it "returns unauthorized for users who do not have permission" do
@@ -2028,16 +2028,16 @@ describe AssignmentsApiController, type: :request do
       expect(@json["description"]).to eq "assignment description"
       expect(@json["lock_at"]).to eq @assignment.lock_at.iso8601
       expect(@json["unlock_at"]).to eq @assignment.unlock_at.iso8601
-      expect(@json["automatic_peer_reviews"]).to eq true
-      expect(@json["peer_reviews"]).to eq true
+      expect(@json["automatic_peer_reviews"]).to be true
+      expect(@json["peer_reviews"]).to be true
       expect(@json["peer_review_count"]).to eq 2
       expect(@json["peer_reviews_assign_at"]).to eq(
         @assignment.peer_reviews_assign_at.iso8601
       )
       expect(@json["position"]).to eq 1
       expect(@json["group_category_id"]).to eq @group_category.id
-      expect(@json["turnitin_enabled"]).to eq true
-      expect(@json["vericite_enabled"]).to eq true
+      expect(@json["turnitin_enabled"]).to be true
+      expect(@json["vericite_enabled"]).to be true
       expect(@json["turnitin_settings"]).to eq({
                                                  "originality_report_visibility" => "immediate",
                                                  "s_paper_check" => true,
@@ -3175,7 +3175,7 @@ describe AssignmentsApiController, type: :request do
         it "allows a nil due date when the last grading period is closed" do
           call_create({ due_at: nil }, 201)
           json = JSON.parse response.body
-          expect(json["due_at"]).to eql nil
+          expect(json["due_at"]).to be_nil
         end
 
         it "allows setting an override due date in a closed grading period" do
@@ -3194,7 +3194,7 @@ describe AssignmentsApiController, type: :request do
           call_create(params, 201)
           json = JSON.parse response.body
           assignment = Assignment.find(json["id"])
-          expect(assignment.assignment_overrides.first.due_at).to eql nil
+          expect(assignment.assignment_overrides.first.due_at).to be_nil
         end
       end
     end
@@ -3850,7 +3850,7 @@ describe AssignmentsApiController, type: :request do
         },
         { assignment: { grader_names_visible_to_final_grader: false } }
       )
-      expect(json_parse(response.body)["grader_names_visible_to_final_grader"]).to eq false
+      expect(json_parse(response.body)["grader_names_visible_to_final_grader"]).to be false
     end
 
     it "does not allow updating an assignment title to longer than 255 characters" do
@@ -4030,7 +4030,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "updates the group_category_id" do
-        expect(@json["group_category_id"]).to eq nil
+        expect(@json["group_category_id"]).to be_nil
       end
 
       it "returns the html_url, which is a URL to the assignment" do
@@ -4038,7 +4038,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "updates the peer reviews info" do
-        expect(@assignment.peer_reviews).to eq false
+        expect(@assignment.peer_reviews).to be false
         expect(@json).not_to have_key("peer_review_count")
         expect(@json).not_to have_key("peer_reviews_assign_at")
       end
@@ -4696,7 +4696,7 @@ describe AssignmentsApiController, type: :request do
           { assignment: { grading_standard_id: sub_account_standard.id } }
         )
         assignment2.reload
-        expect(assignment2.grading_standard).to eq nil
+        expect(assignment2.grading_standard).to be_nil
       end
 
       it "does not delete grading standard if invalid standard provided" do
@@ -4738,7 +4738,7 @@ describe AssignmentsApiController, type: :request do
           { assignment: { grading_standard_id: nil } }
         )
         @assignment.reload
-        expect(@assignment.grading_standard).to eq nil
+        expect(@assignment.grading_standard).to be_nil
       end
     end
 
@@ -4829,31 +4829,31 @@ describe AssignmentsApiController, type: :request do
         it "allows disabling only_visible_to_overrides when due in an open grading period" do
           @assignment = create_assignment(due_at: 3.days.from_now, only_visible_to_overrides: true)
           call_update({ only_visible_to_overrides: false }, 200)
-          expect(@assignment.reload.only_visible_to_overrides).to eql false
+          expect(@assignment.reload.only_visible_to_overrides).to be false
         end
 
         it "allows enabling only_visible_to_overrides when due in an open grading period" do
           @assignment = create_assignment(due_at: 3.days.from_now, only_visible_to_overrides: false)
           call_update({ only_visible_to_overrides: true }, 200)
-          expect(@assignment.reload.only_visible_to_overrides).to eql true
+          expect(@assignment.reload.only_visible_to_overrides).to be true
         end
 
         it "allows disabling post_to_sis when due in a closed grading period" do
           @assignment = create_assignment(due_at: 3.days.ago, post_to_sis: true)
           call_update({ post_to_sis: false }, 200)
-          expect(@assignment.reload.post_to_sis).to eq(false)
+          expect(@assignment.reload.post_to_sis).to be(false)
         end
 
         it "allows enabling post_to_sis when due in a closed grading period" do
           @assignment = create_assignment(due_at: 3.days.ago, post_to_sis: false)
           call_update({ post_to_sis: true }, 200)
-          expect(@assignment.reload.post_to_sis).to eq(true)
+          expect(@assignment.reload.post_to_sis).to be(true)
         end
 
         it "does not allow disabling only_visible_to_overrides when due in a closed grading period" do
           @assignment = create_assignment(due_at: 3.days.ago, only_visible_to_overrides: true)
           call_update({ only_visible_to_overrides: false }, 403)
-          expect(@assignment.reload.only_visible_to_overrides).to eql true
+          expect(@assignment.reload.only_visible_to_overrides).to be true
           json = JSON.parse response.body
           expect(json["errors"].keys).to include "due_at"
         end
@@ -4861,7 +4861,7 @@ describe AssignmentsApiController, type: :request do
         it "does not allow enabling only_visible_to_overrides when due in a closed grading period" do
           @assignment = create_assignment(due_at: 3.days.ago, only_visible_to_overrides: false)
           call_update({ only_visible_to_overrides: true }, 403)
-          expect(@assignment.reload.only_visible_to_overrides).to eql false
+          expect(@assignment.reload.only_visible_to_overrides).to be false
           json = JSON.parse response.body
           expect(json["errors"].keys).to include "only_visible_to_overrides"
         end
@@ -4870,7 +4870,7 @@ describe AssignmentsApiController, type: :request do
           due_date = 3.days.from_now.iso8601
           @assignment = create_assignment(due_at: 3.days.ago, only_visible_to_overrides: true)
           call_update({ due_at: due_date, only_visible_to_overrides: false }, 200)
-          expect(@assignment.reload.only_visible_to_overrides).to eql false
+          expect(@assignment.reload.only_visible_to_overrides).to be false
           expect(@assignment.due_at).to eq due_date
         end
 
@@ -5016,13 +5016,13 @@ describe AssignmentsApiController, type: :request do
         it "allows disabling only_visible_to_overrides when due in a closed grading period" do
           @assignment = create_assignment(due_at: 3.days.ago, only_visible_to_overrides: true)
           call_update({ only_visible_to_overrides: false }, 200)
-          expect(@assignment.reload.only_visible_to_overrides).to eql false
+          expect(@assignment.reload.only_visible_to_overrides).to be false
         end
 
         it "allows enabling only_visible_to_overrides when due in a closed grading period" do
           @assignment = create_assignment(due_at: 3.days.ago, only_visible_to_overrides: false)
           call_update({ only_visible_to_overrides: true }, 200)
-          expect(@assignment.reload.only_visible_to_overrides).to eql true
+          expect(@assignment.reload.only_visible_to_overrides).to be true
         end
 
         it "allows changing the due date on an assignment due in a closed grading period" do
@@ -5042,7 +5042,7 @@ describe AssignmentsApiController, type: :request do
         it "allows unsetting the due date when the last grading period is closed" do
           @assignment = create_assignment(due_at: 3.days.from_now)
           call_update({ due_at: nil }, 200)
-          expect(@assignment.reload.due_at).to eq nil
+          expect(@assignment.reload.due_at).to be_nil
         end
 
         it "allows changing the due date on an assignment with an override due in a closed grading period" do
@@ -5086,7 +5086,7 @@ describe AssignmentsApiController, type: :request do
           override = override_for_date(3.days.from_now)
           override_params = [{ id: override.id, due_at: nil }]
           call_update({ assignment_overrides: override_params }, 200)
-          expect(override.reload.due_at).to eq nil
+          expect(override.reload.due_at).to be_nil
         end
 
         it "allows deleting by omission an override due in a closed grading period" do
@@ -5534,12 +5534,12 @@ describe AssignmentsApiController, type: :request do
         @user = @teacher
         @assignment = @course.assignments.create!(title: "Test Assignment", description: "foo")
         json = api_get_assignment_in_course(@assignment, @course)
-        expect(json["has_overrides"]).to eq false
+        expect(json["has_overrides"]).to be false
 
         @section = @course.course_sections.create! name: "afternoon delight"
         create_override_for_assignment
         json = api_get_assignment_in_course(@assignment, @course)
-        expect(json["has_overrides"]).to eq true
+        expect(json["has_overrides"]).to be true
 
         @user = @student # don't show has_overrides to students
         json = api_get_assignment_in_course(@assignment, @course)
@@ -5647,7 +5647,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           it "tells the consumer that the assignment is frozen" do
-            expect(@json["frozen"]).to eq true
+            expect(@json["frozen"]).to be true
           end
 
           it "returns an list of frozen attributes" do
@@ -5682,7 +5682,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           it "tells the consumer that the assignment is not frozen" do
-            expect(@json["frozen"]).to eq false
+            expect(@json["frozen"]).to be false
           end
 
           it "gives the consumer an empty list for frozen attributes" do
@@ -5690,7 +5690,7 @@ describe AssignmentsApiController, type: :request do
           end
 
           it "tells the consumer that the assignment will not be frozen when copied" do
-            expect(@json["freeze_on_copy"]).to eq false
+            expect(@json["freeze_on_copy"]).to be false
           end
         end
 
@@ -5706,7 +5706,7 @@ describe AssignmentsApiController, type: :request do
 
           it "has quiz information" do
             expect(@json["quiz_id"]).to eq @quiz.id
-            expect(@json["anonymous_submissions"]).to eq false
+            expect(@json["anonymous_submissions"]).to be false
             expect(@json["name"]).to eq @quiz.title
             expect(@json["submission_types"]).to include "online_quiz"
           end
@@ -5828,7 +5828,7 @@ describe AssignmentsApiController, type: :request do
         json = api_get_assignment_in_course(@assignment, @course)
         expect(response).to be_successful
         expect(json["id"]).to eq @assignment.id
-        expect(json["unpublishable"]).to eq true
+        expect(json["unpublishable"]).to be true
 
         # Returns "unpublishable => false" when student submissions
         student_in_course(active_all: true, course: @course)
@@ -5836,7 +5836,7 @@ describe AssignmentsApiController, type: :request do
         @user = @teacher
         json = api_get_assignment_in_course(@assignment, @course)
         expect(response).to be_successful
-        expect(json["unpublishable"]).to eq false
+        expect(json["unpublishable"]).to be false
       end
     end
 
@@ -5898,10 +5898,10 @@ describe AssignmentsApiController, type: :request do
 
       it "assignment_visibility includes the correct user_ids" do
         json = visibility_api_request @assignment1
-        expect(json["assignment_visibility"].include?(@student1.id.to_s)).to eq true
+        expect(json["assignment_visibility"].include?(@student1.id.to_s)).to be true
         json = visibility_api_request @assignment2
-        expect(json["assignment_visibility"].include?(@student2.id.to_s)).to eq true
-        expect(json["assignment_visibility"].include?(@student3.id.to_s)).to eq true
+        expect(json["assignment_visibility"].include?(@student2.id.to_s)).to be true
+        expect(json["assignment_visibility"].include?(@student3.id.to_s)).to be true
       end
 
       context "as a student" do
@@ -6185,7 +6185,7 @@ describe AssignmentsApiController, type: :request do
     it "does not update sis_source_id when lacking permission" do
       params = ActionController::Parameters.new({ "sis_assignment_id" => "BLAH" })
       update_from_params(@assignment, params, @user)
-      expect(@assignment.sis_source_id).to eq nil
+      expect(@assignment.sis_source_id).to be_nil
     end
 
     it "updates sis_source_id with permission" do
@@ -6860,50 +6860,50 @@ describe AssignmentsApiController, type: :request do
       it "sets can_edit on each date if requested" do
         json = api_get_assignments_index_from_course(@course, include: %w[all_dates can_edit])
         a0_json = json.detect { |a| a["id"] == @a0.id }
-        expect(a0_json["can_edit"]).to eq true
+        expect(a0_json["can_edit"]).to be true
         expect(a0_json["all_dates"].map { |d| d["can_edit"] }).to eq [true]
         expect(a0_json["all_dates"].map { |d| d["in_closed_grading_period"] }).to eq [false]
 
         a1_json = json.detect { |a| a["id"] == @a1.id }
-        expect(a1_json["can_edit"]).to eq true
+        expect(a1_json["can_edit"]).to be true
         expect(a1_json["all_dates"].map { |d| d["can_edit"] }).to eq [false]
         expect(a1_json["all_dates"].map { |d| d["in_closed_grading_period"] }).to eq [true]
 
         a2_json = json.detect { |a| a["id"] == @a2.id }
-        expect(a2_json["can_edit"]).to eq true
+        expect(a2_json["can_edit"]).to be true
 
         ao0_json = a2_json["all_dates"].detect { |ao| ao["id"] == @ao0.id }
-        expect(ao0_json["can_edit"]).to eq false
-        expect(ao0_json["in_closed_grading_period"]).to eq true
+        expect(ao0_json["can_edit"]).to be false
+        expect(ao0_json["in_closed_grading_period"]).to be true
 
         ao1_json = a2_json["all_dates"].detect { |ao| ao["id"] == @ao1.id }
-        expect(ao1_json["can_edit"]).to eq true
-        expect(ao1_json["in_closed_grading_period"]).to eq false
+        expect(ao1_json["can_edit"]).to be true
+        expect(ao1_json["in_closed_grading_period"]).to be false
       end
 
       it "allows account admins to edit whatever they want" do
         account_admin_user
         json = api_get_assignments_index_from_course(@course, include: %w[all_dates can_edit])
         a0_json = json.detect { |a| a["id"] == @a0.id }
-        expect(a0_json["can_edit"]).to eq true
+        expect(a0_json["can_edit"]).to be true
         expect(a0_json["all_dates"].map { |d| d["can_edit"] }).to eq [true]
         expect(a0_json["all_dates"].map { |d| d["in_closed_grading_period"] }).to eq [false]
 
         a1_json = json.detect { |a| a["id"] == @a1.id }
-        expect(a1_json["can_edit"]).to eq true
+        expect(a1_json["can_edit"]).to be true
         expect(a1_json["all_dates"].map { |d| d["can_edit"] }).to eq [true]
         expect(a1_json["all_dates"].map { |d| d["in_closed_grading_period"] }).to eq [true]
 
         a2_json = json.detect { |a| a["id"] == @a2.id }
-        expect(a2_json["can_edit"]).to eq true
+        expect(a2_json["can_edit"]).to be true
 
         ao0_json = a2_json["all_dates"].detect { |ao| ao["id"] == @ao0.id }
-        expect(ao0_json["can_edit"]).to eq true
-        expect(ao0_json["in_closed_grading_period"]).to eq true
+        expect(ao0_json["can_edit"]).to be true
+        expect(ao0_json["in_closed_grading_period"]).to be true
 
         ao1_json = a2_json["all_dates"].detect { |ao| ao["id"] == @ao1.id }
-        expect(ao1_json["can_edit"]).to eq true
-        expect(ao1_json["in_closed_grading_period"]).to eq false
+        expect(ao1_json["can_edit"]).to be true
+        expect(ao1_json["in_closed_grading_period"]).to be false
       end
     end
 
@@ -6927,11 +6927,11 @@ describe AssignmentsApiController, type: :request do
         json = api_get_assignments_index_from_course(@course, include: %w[all_dates can_edit])
 
         a0_json = json.detect { |a| a["id"] == @a0.id }
-        expect(a0_json["can_edit"]).to eq false
+        expect(a0_json["can_edit"]).to be false
         expect(a0_json["all_dates"].map { |d| d["can_edit"] }).to eq [false]
 
         a1_json = json.detect { |a| a["id"] == @a1.id }
-        expect(a1_json["can_edit"]).to eq true
+        expect(a1_json["can_edit"]).to be true
         expect(a1_json["all_dates"].map { |d| d["can_edit"] }).to eq [true]
       end
     end

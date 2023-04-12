@@ -21,6 +21,6 @@
 describe Auditors::ActiveRecord::Partitioner do
   it "does not crash when ensuring partitions are present" do
     Auditors::ActiveRecord::Partitioner.process
-    expect(Auditors::ActiveRecord::Partitioner.processed?).to eq(true)
+    expect(Auditors::ActiveRecord::Partitioner.processed?).to be(true)
   end
 end

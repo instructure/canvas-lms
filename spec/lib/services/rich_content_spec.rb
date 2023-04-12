@@ -67,7 +67,7 @@ module Services
       it "does not allow file uploading without context" do
         user = double("user", global_id: "global id")
         env = described_class.env_for(user: user)
-        expect(env[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(false)
+        expect(env[:RICH_CONTENT_CAN_UPLOAD_FILES]).to be(false)
       end
 
       it "lets context decide if uploading is ok" do
@@ -76,8 +76,8 @@ module Services
         context2 = double("forbidden_context", grants_right?: false)
         env1 = described_class.env_for(user: user, context: context1)
         env2 = described_class.env_for(user: user, context: context2)
-        expect(env1[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(true)
-        expect(env2[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(false)
+        expect(env1[:RICH_CONTENT_CAN_UPLOAD_FILES]).to be(true)
+        expect(env2[:RICH_CONTENT_CAN_UPLOAD_FILES]).to be(false)
       end
 
       it "does not raise when encyption/signing secrets are nil" do

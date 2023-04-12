@@ -59,7 +59,7 @@ describe CalendarEventsController do
       user_session(@teacher)
       make_request.call(conference_params)
       expect(response.status).to be < 400
-      expect(get_event.call.web_conference).not_to be nil
+      expect(get_event.call.web_conference).not_to be_nil
     end
 
     it "does not error on bad conference params" do
