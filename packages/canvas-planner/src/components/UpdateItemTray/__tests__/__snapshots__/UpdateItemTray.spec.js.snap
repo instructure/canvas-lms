@@ -34,6 +34,7 @@ exports[`renders the item to update if provided 1`] = `
       vAlign="middle"
     >
       <TextInput
+        data-testid="title"
         display="block"
         inputContainerRef={[Function]}
         inputRef={[Function]}
@@ -116,6 +117,7 @@ exports[`renders the item to update if provided 1`] = `
       </SimpleSelect>
       <TextArea
         autoGrow={false}
+        data-testid="details"
         disabled={false}
         height="10rem"
         inline={false}
@@ -149,6 +151,7 @@ exports[`renders the item to update if provided 1`] = `
         as="button"
         color="primary-inverse"
         cursor="pointer"
+        data-testid="delete"
         display="inline-block"
         elementRef={[Function]}
         margin="0 x-small 0 0"
@@ -164,6 +167,7 @@ exports[`renders the item to update if provided 1`] = `
         as="button"
         color="primary"
         cursor="pointer"
+        data-testid="save"
         display="inline-block"
         elementRef={[Function]}
         interaction="enabled"
@@ -215,6 +219,7 @@ exports[`updates state when new note is passed in 1`] = `
       vAlign="middle"
     >
       <TextInput
+        data-testid="title"
         display="block"
         inputContainerRef={[Function]}
         inputRef={[Function]}
@@ -305,6 +310,7 @@ exports[`updates state when new note is passed in 1`] = `
       </SimpleSelect>
       <TextArea
         autoGrow={false}
+        data-testid="details"
         disabled={false}
         height="10rem"
         inline={false}
@@ -338,6 +344,7 @@ exports[`updates state when new note is passed in 1`] = `
         as="button"
         color="primary-inverse"
         cursor="pointer"
+        data-testid="delete"
         display="inline-block"
         elementRef={[Function]}
         margin="0 x-small 0 0"
@@ -353,6 +360,7 @@ exports[`updates state when new note is passed in 1`] = `
         as="button"
         color="primary"
         cursor="pointer"
+        data-testid="save"
         display="inline-block"
         elementRef={[Function]}
         interaction="enabled"
@@ -404,6 +412,7 @@ exports[`updates state when new note is passed in 2`] = `
       vAlign="middle"
     >
       <TextInput
+        data-testid="title"
         display="block"
         inputContainerRef={[Function]}
         inputRef={[Function]}
@@ -494,6 +503,7 @@ exports[`updates state when new note is passed in 2`] = `
       </SimpleSelect>
       <TextArea
         autoGrow={false}
+        data-testid="details"
         disabled={false}
         height="10rem"
         inline={false}
@@ -527,6 +537,7 @@ exports[`updates state when new note is passed in 2`] = `
         as="button"
         color="primary-inverse"
         cursor="pointer"
+        data-testid="delete"
         display="inline-block"
         elementRef={[Function]}
         margin="0 x-small 0 0"
@@ -542,6 +553,7 @@ exports[`updates state when new note is passed in 2`] = `
         as="button"
         color="primary"
         cursor="pointer"
+        data-testid="save"
         display="inline-block"
         elementRef={[Function]}
         interaction="enabled"
