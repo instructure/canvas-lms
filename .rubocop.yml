@@ -17,6 +17,9 @@ AllCops:
 Bundler:
   Severity: error
 
+Capybara:
+  Enabled: false # we don't use capybara (it's automatically included by rubocop-rspec until they hit 3.0)
+
 Gemspec:
   Severity: error
 Gemspec/DevelopmentDependencies:
@@ -129,14 +132,20 @@ RSpec:
   Severity: error
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain
+RSpec/ContainExactly:
+  Enabled: false # prefers match_array in some cases, which is an alias, and we don't have a strong preference either way
 RSpec/DescribedClass:
   Enabled: false # we haven't used it, and it seems antithetical to RSpec/NamedSubject
 RSpec/ExampleLength:
+  Enabled: false # this is a Metrics-style cop
+RSpec/ExampleWording:
   Enabled: false # this is a Metrics-style cop
 RSpec/ExpectInHook:
   Enabled: false # follows RSpec/MultipleExpectations
 RSpec/InstanceVariable:
   Enabled: false # legacy code
+RSpec/MatchArray:
+  Enabled: false # prefers contain_exactly in some cases, which is an alias, and we don't have a strong preference either way
 RSpec/MessageSpies:
   Enabled: false # we don't use spies
 RSpec/MultipleExpectations:
@@ -145,10 +154,15 @@ RSpec/MultipleMemoizedHelpers:
   Enabled: false # complicated setup is sometimes necessary
 RSpec/NestedGroups:
   Enabled: false # legacy code
+RSpec/NoExpectationExample:
+  Enabled: false # we have many examples that simply "assert" that nothing is raised
 RSpec/SubjectStub:
   Enabled: false # yes, canvas is big and complicated sometimes
 RSpec/StubbedMock:
   Enabled: false # this style goes along with spies
+
+RSpec/Capybara:
+  Enabled: false # we don't use capybara
 
 RSpec/Rails:
   Severity: error
@@ -333,16 +347,17 @@ Rake/Desc:
 Rake/MethodDefinitionInTask:
   Severity: convention
 
-RSpec/Capybara/FeatureMethods:
-  Severity: convention
+RSpec/FactoryBot/ConsistentParenthesesStyle:
   AutoCorrect: false
+RSpec/FactoryBot/CreateList:
+  AutoCorrect: false
+RSpec/FactoryBot/SyntaxMethods:
+  AutoCorrect: false
+
 RSpec/AroundBlock:
   Severity: convention
 RSpec/Be:
   Severity: convention
-RSpec/BeEql:
-  Enabled: false
-  AutoCorrect: false
 RSpec/BeforeAfterAll:
   Severity: convention
 RSpec/ContextMethod:
@@ -391,6 +406,8 @@ RSpec/NotToNot:
   AutoCorrect: false
 RSpec/OverwritingSetup:
   Severity: convention
+RSpec/PendingWithoutReason:
+  Severity: convention
 RSpec/PredicateMatcher:
   Enabled: false
   AutoCorrect: false
@@ -412,6 +429,8 @@ RSpec/SubjectDeclaration:
   Severity: convention
 RSpec/VariableName:
   Severity: convention
+RSpec/VerifiedDoubleReference:
+  Enabled: false
 RSpec/VerifiedDoubles:
   Enabled: false
 

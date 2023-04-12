@@ -35,5 +35,5 @@ group :test do
   gem "rubocop-performance", "1.17.1", require: false
   gem "rubocop-rails", "2.12.4", require: false
   gem "rubocop-rake", "0.6.0", require: false
-  gem "rubocop-rspec", "2.6.0", require: false
+  gem "rubocop-rspec", "2.19.0", require: false
 end
