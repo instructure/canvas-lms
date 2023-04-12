@@ -63,6 +63,6 @@ module Factories
   end
 
   def remove_user_session
-    @session_stubbed = false
+    @session_stubbed = false if @session_stubbed
   end
 end
