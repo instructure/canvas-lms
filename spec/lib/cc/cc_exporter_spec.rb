@@ -1092,4 +1092,27 @@ describe "Common Cartridge exporting" do
       end
     end
   end
+
+  describe "#disable_content_rewriting" do
+    subject { cc_exporter.disable_content_rewriting }
+
+    let(:content_export) { ContentExport.new(context: course_model) }
+    let(:cc_exporter) { CC::CCExporter.new(content_export) }
+
+    context "ContentExport disable_content_rewriting is true" do
+      before do
+        allow(content_export).to receive(:disable_content_rewriting?).and_return true
+      end
+
+      it { is_expected.to be true }
+    end
+
+    context "ContentExport disable_content_rewriting is false" do
+      before do
+        allow(content_export).to receive(:disable_content_rewriting?).and_return false
+      end
+
+      it { is_expected.to be false }
+    end
+  end
 end

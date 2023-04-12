@@ -403,4 +403,54 @@ describe ContentExport do
       export.create_key(a)
     end
   end
+
+  describe "#disable_content_rewriting?" do
+    subject { content_export.disable_content_rewriting? }
+
+    def create_content_export(opts = {})
+      course = course_model
+      allow(course).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+      ContentExport.new({ context: course }.merge(opts))
+    end
+
+    context "quizzes_next export" do
+      let(:content_export) { create_content_export(export_type: ContentExport::QUIZZES2, settings: { quizzes2: {} }) }
+
+      context "content rewrite is enabled" do
+        before do
+          allow(NewQuizzesFeaturesHelper).to receive(:disable_content_rewriting?).and_return false
+        end
+
+        it { is_expected.to be false }
+      end
+
+      context "content rewrite is disabled" do
+        before do
+          allow(NewQuizzesFeaturesHelper).to receive(:disable_content_rewriting?).and_return true
+        end
+
+        it { is_expected.to be true }
+      end
+    end
+
+    context "non-quizzes_next export" do
+      let(:content_export) { create_content_export(export_type: ContentExport::COURSE_COPY) }
+
+      context "content rewrite is enabled" do
+        before do
+          allow(NewQuizzesFeaturesHelper).to receive(:disable_content_rewriting?).and_return false
+        end
+
+        it { is_expected.to be false }
+      end
+
+      context "content rewrite is disabled" do
+        before do
+          allow(NewQuizzesFeaturesHelper).to receive(:disable_content_rewriting?).and_return true
+        end
+
+        it { is_expected.to be false }
+      end
+    end
+  end
 end
