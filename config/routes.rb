@@ -515,12 +515,15 @@ CanvasRails::Application.routes.draw do
   get "media_objects_iframe" => "media_objects#iframe_media_player", :as => :media_object_iframe_href
   get "media_objects/:media_object_id/media_tracks/:id" => "media_tracks#show", :as => :show_media_tracks
   post "media_objects/:media_object_id/media_tracks" => "media_tracks#create", :as => :create_media_tracks
-  delete "media_objects/:media_object_id/media_tracks/:media_track_id" => "media_tracks#destroy", :as => :delete_media_tracks
+  delete "media_objects/:media_object_id/media_tracks/:id" => "media_tracks#destroy", :as => :delete_media_tracks
 
   post "media_attachments" => "media_objects#create_media_object", :as => :create_media_attachment
   get "media_attachments/:attachment_id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_attachment_thumbnail
   get "media_attachments/:attachment_id/info" => "media_objects#show", :as => :media_attachment_info
   get "media_attachments_iframe/:attachment_id" => "media_objects#iframe_media_player", :as => :media_attachment_iframe
+  get "media_attachments/:attachment_id/media_tracks/:id" => "media_tracks#show", :as => :show_media_attachment_tracks
+  post "media_attachments/:attachment_id/media_tracks" => "media_tracks#create", :as => :create_media_attachment_tracks
+  delete "media_attachments/:attachment_id/media_tracks/:id" => "media_tracks#destroy", :as => :delete_media_attachment_tracks
 
   get "external_content/success/:service" => "external_content#success", :as => :external_content_success
   get "external_content/success/:service/:id" => "external_content#success", :as => :external_content_update
@@ -2427,6 +2430,9 @@ CanvasRails::Application.routes.draw do
     scope(controller: :media_tracks) do
       get "media_objects/:media_object_id/media_tracks", action: "index", as: :list_media_tracks
       put "media_objects/:media_object_id/media_tracks", action: "update", as: :update_media_tracks
+
+      get "media_attachments/:attachment_id/media_tracks", action: "index", as: :list_media_attachment_tracks
+      put "media_attachments/:attachment_id/media_tracks", action: "update", as: :update_media_attachment_tracks
     end
 
     scope(controller: "conditional_release/rules") do
