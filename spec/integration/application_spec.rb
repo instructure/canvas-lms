@@ -203,7 +203,7 @@ describe "site-wide" do
         user_session(@admin, @admin.pseudonyms.first)
         post "/users/#{@student.id}/masquerade"
 
-        expect(response.status).to eq 422
+        expect(response).to have_http_status :unprocessable_entity
       end
     end
   end

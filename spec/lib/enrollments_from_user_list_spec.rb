@@ -52,7 +52,7 @@ describe EnrollmentsFromUserList do
     it "processes repeat addresses without creating new users" do
       @el = UserList.new(list_to_parse_with_repeats)
       enrollments = EnrollmentsFromUserList.process(@el, @course)
-      expect(enrollments.length).to eql(3)
+      expect(enrollments.length).to be(3)
     end
 
     it "respects the section option when a user is already enrolled in another section" do

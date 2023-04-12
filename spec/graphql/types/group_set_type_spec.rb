@@ -91,11 +91,11 @@ describe Types::GroupSetType do
 
     it "returns null if the student doesn't belong to any group" do
       @membership.destroy
-      expect(student.resolve("currentGroup { _id }")).to eq nil
+      expect(student.resolve("currentGroup { _id }")).to be_nil
     end
 
     it "returns null if the current user has a teacher enrollment" do
-      expect(teacher.resolve("currentGroup { _id }")).to eq nil
+      expect(teacher.resolve("currentGroup { _id }")).to be_nil
     end
   end
 end

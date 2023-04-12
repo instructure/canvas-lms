@@ -33,7 +33,7 @@ describe Lti::Asset do
     end
 
     it "creates lti_context_id for asset" do
-      expect(@course.lti_context_id).to eq nil
+      expect(@course.lti_context_id).to be_nil
       context_id = described_class.opaque_identifier_for(@course)
       @course.reload
       expect(@course.lti_context_id).to eq context_id

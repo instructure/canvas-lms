@@ -53,13 +53,13 @@ RSpec.describe Mutations::UpdateIsolatedViewDeeplyNestedAlert do
 
   it "changes isolatedViewDeeplyNestedAlert to TRUE" do
     result = run_mutation({ isolated_view_deeply_nested_alert: true })
-    expect(result["errors"]).to be nil
+    expect(result["errors"]).to be_nil
     expect(@teacher.should_show_deeply_nested_alert?).to be true
   end
 
   it "changes isolatedViewDeeplyNestedAlert to FALSE" do
     result = run_mutation({ isolated_view_deeply_nested_alert: false })
-    expect(result["errors"]).to be nil
+    expect(result["errors"]).to be_nil
     expect(@teacher.should_show_deeply_nested_alert?).to be false
   end
 end

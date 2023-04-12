@@ -107,20 +107,20 @@ describe RequestThrottle do
     it "ignores non-ID tools" do
       request_grade_passback = base_req.merge("REQUEST_METHOD" => "POST", "PATH_INFO" => "/api/lti/v1/tools/garbage/grade_passback")
       expect(ContextExternalTool).not_to receive(:find_by)
-      expect(throttler.client_identifier(req(request_grade_passback))).to eq nil
+      expect(throttler.client_identifier(req(request_grade_passback))).to be_nil
     end
 
     it "ignores non-existent tools" do
       request_grade_passback = base_req.merge("REQUEST_METHOD" => "POST", "PATH_INFO" => "/api/lti/v1/tools/5/grade_passback")
       expect(ContextExternalTool).to receive(:find_by).once.with(id: "5")
-      expect(throttler.client_identifier(req(request_grade_passback))).to eq nil
+      expect(throttler.client_identifier(req(request_grade_passback))).to be_nil
     end
 
     it "ignores non-POST to tools" do
       tool = ContextExternalTool.create!(domain: "domain", context: Account.default, consumer_key: "key", shared_secret: "secret", name: "tool")
       request_grade_passback = base_req.merge("REQUEST_METHOD" => "GET", "PATH_INFO" => "/api/lti/v1/tools/#{tool.id}/grade_passback")
       expect(ContextExternalTool).not_to receive(:find_by)
-      expect(throttler.client_identifier(req(request_grade_passback))).to eq nil
+      expect(throttler.client_identifier(req(request_grade_passback))).to be_nil
     end
 
     it "uses client_id+cluster for LTI Advantage endpoints" do
@@ -189,7 +189,7 @@ describe RequestThrottle do
 
     it "still gets blocked if throttling disabled" do
       Setting.set("request_throttle.enabled", "false")
-      expect(RequestThrottle.enabled?).to eq(false)
+      expect(RequestThrottle.enabled?).to be(false)
       set_blocklist("user:2")
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
       expect(throttler.call(request_user_2)).to eq rate_limit_exceeded
@@ -355,23 +355,23 @@ describe RequestThrottle do
         it "compares to the hwm setting" do
           bucket = RequestThrottle::LeakyBucket.new("test", 5.0)
           Setting.set("request_throttle.hwm", "6.0")
-          expect(bucket.full?).to eq false
+          expect(bucket.full?).to be false
           Setting.set("request_throttle.hwm", "4.0")
-          expect(bucket.full?).to eq true
+          expect(bucket.full?).to be true
         end
 
         it "compares to a customized hwm setting if set" do
           bucket = RequestThrottle::LeakyBucket.new("test", 5.0)
           Setting.set("request_throttle.hwm", "4.0")
-          expect(bucket.full?).to eq true
+          expect(bucket.full?).to be true
           Setting.set("request_throttle.custom_settings",
                       { test: { hwm: "6.0" } }.to_json)
           RequestThrottle::LeakyBucket.reload!
-          expect(bucket.full?).to eq false
+          expect(bucket.full?).to be false
           Setting.set("request_throttle.custom_settings",
                       { other: { hwm: "6.0" } }.to_json)
           RequestThrottle::LeakyBucket.reload!
-          expect(bucket.full?).to eq true
+          expect(bucket.full?).to be true
         end
       end
 

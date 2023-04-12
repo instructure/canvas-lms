@@ -1374,7 +1374,7 @@ describe Lti::IMS::NamesAndRolesController do
 
   def expect_empty_members_array
     expect(json[:members]).to be_empty
-    expect(json[:members]).to be_a_kind_of(Array)
+    expect(json[:members]).to be_a(Array)
   end
 
   def expect_member_count(count)

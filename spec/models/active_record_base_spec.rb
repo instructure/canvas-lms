@@ -111,7 +111,7 @@ describe ActiveRecord::Base do
       it "preloads" do
         Account.default.courses.create!
         a = do_batches(Account.where(id: Account.default).preload(:courses)).flatten.first
-        expect(a.courses.loaded?).to eq true
+        expect(a.courses.loaded?).to be true
       end
 
       it "handles pluck" do
@@ -207,7 +207,7 @@ describe ActiveRecord::Base do
     it "generates appropriate rank hashes" do
       hash = ActiveRecord::Base.rank_hash(["a", ["b", "c"], ["d"]])
       expect(hash).to eq({ "a" => 1, "b" => 2, "c" => 2, "d" => 3 })
-      expect(hash["e"]).to eql 4
+      expect(hash["e"]).to be 4
     end
   end
 
@@ -244,8 +244,8 @@ describe ActiveRecord::Base do
           Submission.create!(user: @user, assignment: @assignment)
         end
       end.to raise_error(ActiveRecord::RecordNotUnique)
-      expect(Submission.count).to eql 1
-      expect(tries).to eql 2
+      expect(Submission.count).to be 1
+      expect(tries).to be 2
       expect(User.count).to eql @orig_user_count
     end
 
@@ -259,8 +259,8 @@ describe ActiveRecord::Base do
           Submission.create!(user: @user, assignment: @assignment)
         end
       end.to raise_error(ActiveRecord::RecordNotUnique)
-      expect(tries).to eql 3
-      expect(Submission.count).to eql 1
+      expect(tries).to be 3
+      expect(Submission.count).to be 1
     end
 
     it "does not cause outer transactions to roll back if the second attempt succeeds" do
@@ -275,7 +275,7 @@ describe ActiveRecord::Base do
         end
         User.create!
       end
-      expect(Submission.count).to eql 1
+      expect(Submission.count).to be 1
       expect(User.count).to eql @orig_user_count + 3
     end
 
@@ -287,7 +287,7 @@ describe ActiveRecord::Base do
           User.connection.execute "this is not valid sql"
         end
       end.to raise_error(ActiveRecord::StatementInvalid)
-      expect(tries).to eql 1
+      expect(tries).to be 1
     end
 
     it "does not eat any other exceptions" do
@@ -298,7 +298,7 @@ describe ActiveRecord::Base do
           raise "oh crap"
         end
       end.to raise_error("oh crap")
-      expect(tries).to eql 1
+      expect(tries).to be 1
     end
   end
 
@@ -374,7 +374,7 @@ describe ActiveRecord::Base do
     end
 
     it "does not raise an error if there are no records" do
-      expect { Course.bulk_insert [] }.to change(Course, :count).by(0)
+      expect { Course.bulk_insert [] }.not_to change(Course, :count)
     end
 
     it "works through bulk insert objects" do
@@ -487,7 +487,7 @@ describe ActiveRecord::Base do
       u = User.create!
       expect(ActiveRecord::Base.find_by_asset_string(u.asset_string)).to eq u
       expect(ActiveRecord::Base.find_by_asset_string(u.asset_string, ["User"])).to eq u
-      expect(ActiveRecord::Base.find_by_asset_string(u.asset_string, ["Course"])).to eq nil
+      expect(ActiveRecord::Base.find_by_asset_string(u.asset_string, ["Course"])).to be_nil
     end
   end
 
@@ -802,10 +802,10 @@ describe ActiveRecord::Base do
       si = StreamItem.new
       si.asset_type = "Submission"
       si.data = {}
-      expect(si.valid?).to eq true
+      expect(si.valid?).to be true
 
       si.context_type = "User"
-      expect(si.valid?).to eq false
+      expect(si.valid?).to be false
     end
 
     it "doesn't allow mismatched assignment" do
@@ -828,7 +828,7 @@ describe ActiveRecord::Base do
     it "returns nil for the specific type if it's not that type" do
       si = StreamItem.new
       si.discussion_topic = DiscussionTopic.new
-      expect(si.conversation).to eq nil
+      expect(si.conversation).to be_nil
     end
 
     it "doesn't ignores specific type if we're setting nil" do
@@ -838,7 +838,7 @@ describe ActiveRecord::Base do
       si.conversation = nil
       expect(si.asset).to eq dt
       si.discussion_topic = nil
-      expect(si.asset).to eq nil
+      expect(si.asset).to be_nil
     end
 
     it "prefixes specific associations" do

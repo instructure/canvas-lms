@@ -301,7 +301,7 @@ module MicrosoftSync
           it "re-raises the error and sets the record state to errored" do
             expect { subject.send(:run, :step_initial, nil) }
               .to raise_error(Errors::PublicError, "foo")
-            expect(state_record.reload.job_state).to eq(nil)
+            expect(state_record.reload.job_state).to be_nil
             expect(state_record.workflow_state).to eq("errored")
           end
 
@@ -359,7 +359,7 @@ module MicrosoftSync
 
             it "sets the record state but does not bubble up the error" do
               subject.send(:run, :step_initial, nil)
-              expect(state_record.reload.job_state).to eq(nil)
+              expect(state_record.reload.job_state).to be_nil
               expect(state_record.workflow_state).to eq("errored")
               expect(state_record.last_error)
                 .to eq(Errors.serialize(Errors::GracefulCancelError.new("foo"), step: "step_initial"))
@@ -402,7 +402,7 @@ module MicrosoftSync
 
           it "counts retries per-step" do
             expect { subject.send(:run, :step_second, nil) }.to raise_error(Errors::PublicError, "foo")
-            expect(state_record.reload.job_state).to eq(nil)
+            expect(state_record.reload.job_state).to be_nil
             expect(state_record.workflow_state).to eq("errored")
             expect(state_record.last_error)
               .to eq(Errors.serialize(Errors::PublicError.new("foo"), step: "step_second"))
@@ -564,7 +564,7 @@ module MicrosoftSync
           it "bubbles up the error, sets the record state to errored, and calls after_failure" do
             expect { subject.send(:run, :step_initial, nil) }.to raise_error(error)
 
-            expect(state_record.reload.job_state).to eq(nil)
+            expect(state_record.reload.job_state).to be_nil
             expect(state_record.workflow_state).to eq("errored")
             expect(state_record.last_error).to eq(Errors.serialize(error, step: "step_second"))
             expect(steps_object.steps_run.last).to eq([:after_failure])
@@ -604,7 +604,7 @@ module MicrosoftSync
             # nothing enqueued
             expect(steps_object.steps_run).to eq([[:after_failure]])
 
-            expect(state_record.reload.job_state).to eq(nil)
+            expect(state_record.reload.job_state).to be_nil
             expect(state_record.workflow_state).to eq("errored")
             expect(state_record.last_error).to eq(Errors.serialize(error, step: "step_initial"))
           end
@@ -692,7 +692,7 @@ module MicrosoftSync
 
           it "doesn't update the job_state/workflow_state" do
             expect(state_record.reload.workflow_state).to eq("deleted")
-            expect(state_record.job_state).to eq(nil)
+            expect(state_record.job_state).to be_nil
           end
 
           it "doesn't retry the job or run the stash block" do
@@ -735,7 +735,7 @@ module MicrosoftSync
               expect(state_record.job_state[:step]).to eq(:step_initial)
               expect(state_record.job_state[:retries_by_step]["step_initial"]).to eq(2)
               expect(steps_object).to receive(:step_initial) do
-                expect(state_record.job_state).to eq(nil)
+                expect(state_record.job_state).to be_nil
                 expect(state_record.workflow_state).to eq("running")
                 described_class::Retry.new(error: StandardError.new)
               end

@@ -65,12 +65,12 @@ describe UserPreferenceValue do
   end
 
   it "does not migrate all existing preferences automatically on save unless to a migrated preference" do
-    expect(preexisting_user.needs_preference_migration?).to eq true
+    expect(preexisting_user.needs_preference_migration?).to be true
     preexisting_user.save!
 
-    expect(preexisting_user.reload.needs_preference_migration?).to eq true
+    expect(preexisting_user.reload.needs_preference_migration?).to be true
     preexisting_user.set_preference(regular_key, "new_value")
-    expect(preexisting_user.reload.needs_preference_migration?).to eq false
+    expect(preexisting_user.reload.needs_preference_migration?).to be false
 
     rows = preexisting_user.user_preference_values.to_a.index_by { |v| [v.key, v.sub_key] }
     expect(rows.count).to eq 3
@@ -98,20 +98,20 @@ describe UserPreferenceValue do
 
   it "does not have to query to load preferences if the values are empty for a sub key" do
     migrated_user.clear_all_preferences_for(subbed_key)
-    expect(migrated_user.preference_row_exists?(subbed_key, :a)).to eq false
+    expect(migrated_user.preference_row_exists?(subbed_key, :a)).to be false
     expect(migrated_user.user_preference_values.where(key: subbed_key)).not_to be_any
     expect(migrated_user.preferences[subbed_key]).to eq({})
 
     reloaded_user = User.find(migrated_user.id)
     expect(reloaded_user).to_not receive(:user_preference_values)
-    expect(reloaded_user.get_preference(subbed_key, :a)).to eq nil
+    expect(reloaded_user.get_preference(subbed_key, :a)).to be_nil
   end
 
   it "removes an individual preference value" do
     migrated_user.set_preference(subbed_key, :b, nil)
     expect(migrated_user.get_preference(subbed_key, :b)).to be_nil
-    expect(migrated_user.preference_row_exists?(subbed_key, :a)).to eq true
-    expect(migrated_user.preference_row_exists?(subbed_key, :b)).to eq false
+    expect(migrated_user.preference_row_exists?(subbed_key, :a)).to be true
+    expect(migrated_user.preference_row_exists?(subbed_key, :b)).to be false
     expect(migrated_user.user_preference_values.where(key: subbed_key).pluck(:sub_key)).to eq(["a"])
     expect(migrated_user.preferences[subbed_key]).to eq(UserPreferenceValue::EXTERNAL)
   end

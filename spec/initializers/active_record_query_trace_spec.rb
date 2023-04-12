@@ -40,7 +40,7 @@ describe "#configure!" do
     before { allow(ENV).to receive(:[]).with("AR_QUERY_TRACE").and_return("true") }
 
     it "enables AR query trace" do
-      expect(subject.enabled).to eq true
+      expect(subject.enabled).to be true
     end
   end
 
@@ -51,7 +51,7 @@ describe "#configure!" do
     end
 
     it "does not enable AR query trace" do
-      expect(subject.enabled).to eq false
+      expect(subject.enabled).to be false
     end
   end
 
@@ -66,7 +66,7 @@ describe "#configure!" do
       end
 
       it "disables AR query trace" do
-        expect(subject.enabled).to eq false
+        expect(subject.enabled).to be false
       end
     end
 
@@ -76,7 +76,7 @@ describe "#configure!" do
       end
 
       it "enables AR query trace" do
-        expect(subject.enabled).to eq true
+        expect(subject.enabled).to be true
       end
 
       it 'defaults "lines" to 10' do

@@ -138,7 +138,7 @@ describe "ActsAsUrl" do
     expect("something-something").to eq @blank.url
 
     @blank2 = Blankument.new
-    expect(@blank2.only_when_blank).to eq(true)
+    expect(@blank2.only_when_blank).to be(true)
   end
 
   it "should_mass_initialize_urls" do

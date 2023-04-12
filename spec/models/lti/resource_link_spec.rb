@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.describe Lti::ResourceLink, type: :model do
+RSpec.describe Lti::ResourceLink do
   let(:tool) { external_tool_1_3_model }
   let(:course) { Course.create!(name: "Course") }
   let(:assignment) { Assignment.create!(course: course, name: "Assignment") }
@@ -149,7 +149,7 @@ RSpec.describe Lti::ResourceLink, type: :model do
 
     shared_examples_for "creating a new resource link" do
       it "returns a new resource link" do
-        expect(subject.id).to eq(nil)
+        expect(subject.id).to be_nil
         expect(subject.original_context_external_tool).to eq(tool)
         expect(subject.custom).to eq("a" => "b")
         expect(subject.context).to eq(context)

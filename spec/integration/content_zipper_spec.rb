@@ -33,7 +33,7 @@ describe ContentZipper do
     expect(a).to be_to_be_zipped
 
     # a second query should just return status
-    expect(&block).to change(Delayed::Job, :count).by(0)
+    expect(&block).not_to change(Delayed::Job, :count)
     expect(response).to be_successful
     expect(json_parse["attachment"]["id"]).to eq a.id
   end

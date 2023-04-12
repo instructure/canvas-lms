@@ -61,7 +61,7 @@ describe FeatureFlags do
       expect(t_sub_account.feature_enabled?(:default_on_feature)).to be_truthy
       expect(t_sub_account.feature_enabled?(:account_feature)).to be_truthy
       Account.ensure_dummy_root_account
-      expect(Account.find(0).feature_enabled?(:account_feature)).to eq false
+      expect(Account.find(0).feature_enabled?(:account_feature)).to be false
     end
 
     it "logs feature enablement" do

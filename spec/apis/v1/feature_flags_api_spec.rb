@@ -134,10 +134,10 @@ describe "Feature Flags API", type: :request do
     it "paginates" do
       json = api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features?per_page=3",
                               { controller: "feature_flags", action: "index", format: "json", account_id: t_root_account.to_param, per_page: "3" })
-      expect(json.size).to eql 3
+      expect(json.size).to be 3
       json += api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features?per_page=3&page=2",
                                { controller: "feature_flags", action: "index", format: "json", account_id: t_root_account.to_param, per_page: "3", page: "2" })
-      expect(json.size).to eql 5
+      expect(json.size).to be 5
       expect(json.map { |f| f["feature"] }.sort).to match_array %w[account_feature course_feature root_account_feature root_opt_in_feature compact_live_event_payloads]
     end
 
@@ -159,14 +159,14 @@ describe "Feature Flags API", type: :request do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_site_admin.id}/features",
                                 { controller: "feature_flags", action: "index", format: "json", account_id: t_site_admin.id.to_s })
         expect(json.map { |f| f["feature"] }).to match_array %w[account_feature course_feature hidden_feature hidden_user_feature root_account_feature root_opt_in_feature user_feature compact_live_event_payloads]
-        expect(json.find { |f| f["feature"] == "hidden_feature" }["feature_flag"]["hidden"]).to eq true
+        expect(json.find { |f| f["feature"] == "hidden_feature" }["feature_flag"]["hidden"]).to be true
       end
 
       it "shows hidden features on root accounts to a site admin user" do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_root_account.id}/features",
                                 { controller: "feature_flags", action: "index", format: "json", account_id: t_root_account.to_param })
         expect(json.map { |f| f["feature"] }).to match_array %w[account_feature course_feature hidden_feature root_account_feature root_opt_in_feature compact_live_event_payloads]
-        expect(json.find { |f| f["feature"] == "hidden_feature" }["feature_flag"]["hidden"]).to eq true
+        expect(json.find { |f| f["feature"] == "hidden_feature" }["feature_flag"]["hidden"]).to be true
       end
 
       it "shows un-hidden features to non-site-admins on root accounts" do
@@ -182,7 +182,7 @@ describe "Feature Flags API", type: :request do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_root_account.id}/features",
                                 { controller: "feature_flags", action: "index", format: "json", account_id: t_root_account.to_param })
         feature = json.find { |f| f["feature"] == "hidden_feature" }
-        expect(feature["feature_flag"]["hidden"]).to eq true
+        expect(feature["feature_flag"]["hidden"]).to be true
         expect(feature["feature_flag"]["state"]).to eq "allowed"
       end
 
@@ -192,7 +192,7 @@ describe "Feature Flags API", type: :request do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_sub_account.id}/features",
                                 { controller: "feature_flags", action: "index", format: "json", account_id: t_sub_account.to_param })
         feature = json.find { |f| f["feature"] == "hidden_feature" }
-        expect(feature["feature_flag"]["hidden"]).to eq false
+        expect(feature["feature_flag"]["hidden"]).to be false
         expect(feature["feature_flag"]["state"]).to eq "on"
       end
 
@@ -201,7 +201,7 @@ describe "Feature Flags API", type: :request do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_sub_account.id}/features",
                                 { controller: "feature_flags", action: "index", format: "json", account_id: t_sub_account.to_param })
         feature = json.find { |f| f["feature"] == "hidden_feature" }
-        expect(feature["feature_flag"]["hidden"]).to eq false
+        expect(feature["feature_flag"]["hidden"]).to be false
         expect(feature["feature_flag"]["state"]).to eq "allowed"
       end
     end
@@ -216,7 +216,7 @@ describe "Feature Flags API", type: :request do
                                 { controller: "feature_flags", action: "index", format: "json", account_id: t_root_account.to_param })
         feature = json.find { |f| f["feature"] == "shadow_feature" }
         expect(feature).to have_key("shadow")
-        expect(feature["shadow"]).to eq true
+        expect(feature["shadow"]).to be true
       end
 
       it "does not show shadow feature at all to a non-site-admin user" do
@@ -285,13 +285,13 @@ describe "Feature Flags API", type: :request do
       allow_any_instantiation_of(t_root_account).to receive(:lookup_feature_flag) do |feature, opts|
         if feature.to_s == "root_account_feature"
           @checked = true
-          expect(opts[:skip_cache]).to eq true
+          expect(opts[:skip_cache]).to be true
         end
         original.call(feature, *opts)
       end
       api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features/flags/root_account_feature",
                        { controller: "feature_flags", action: "show", format: "json", account_id: t_root_account.to_param, feature: "root_account_feature" })
-      expect(@checked).to eq true # should actually check the expectation
+      expect(@checked).to be true # should actually check the expectation
     end
 
     it "returns the correct format" do
@@ -440,20 +440,20 @@ describe "Feature Flags API", type: :request do
       it "creates a site admin feature flag" do
         api_call_as_user(site_admin_user, :put, "/api/v1/accounts/#{t_site_admin.id}/features/flags/hidden_feature",
                          { controller: "feature_flags", action: "update", format: "json", account_id: t_site_admin.id.to_s, feature: "hidden_feature" })
-        expect(t_site_admin.feature_flags.where(feature: "hidden_feature").count).to eql 1
+        expect(t_site_admin.feature_flags.where(feature: "hidden_feature").count).to be 1
       end
 
       it "creates a root account feature flag with site admin privileges" do
         api_call_as_user(site_admin_user, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/hidden_feature",
                          { controller: "feature_flags", action: "update", format: "json", account_id: t_root_account.to_param, feature: "hidden_feature" })
-        expect(t_root_account.feature_flags.where(feature: "hidden_feature").count).to eql 1
+        expect(t_root_account.feature_flags.where(feature: "hidden_feature").count).to be 1
       end
 
       it "creates a user feature flag with site admin priveleges" do
         site_admin_user
         api_call_as_user(@admin, :put, "/api/v1/users/#{@admin.id}/features/flags/hidden_user_feature",
                          { controller: "feature_flags", action: "update", format: "json", user_id: @admin.to_param, feature: "hidden_user_feature", state: "on" })
-        expect(@admin.feature_flags.where(feature: "hidden_user_feature").count).to eql 1
+        expect(@admin.feature_flags.where(feature: "hidden_user_feature").count).to be 1
       end
 
       context "AccountManager" do
@@ -488,7 +488,7 @@ describe "Feature Flags API", type: :request do
         it "creates a root account feature flag" do
           api_call_as_user(@site_admin_member, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/hidden_feature",
                            { controller: "feature_flags", action: "update", format: "json", account_id: t_root_account.to_param, feature: "hidden_feature" })
-          expect(t_root_account.feature_flags.where(feature: "hidden_feature").count).to eql 1
+          expect(t_root_account.feature_flags.where(feature: "hidden_feature").count).to be 1
         end
 
         it "can unhide a hidden feature in a subaccount" do

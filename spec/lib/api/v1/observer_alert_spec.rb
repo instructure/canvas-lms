@@ -100,13 +100,13 @@ describe "Api::V1::ObserverAlert" do
         asg = assignment_model(course: @course)
         alert = observer_alert_model(observer: user, course: @course, active_all: true, alert_type: "assignment_grade_high", context: asg)
         json = api.observer_alert_json(alert, user, session)
-        expect(json["locked_for_user"]).to eq false
+        expect(json["locked_for_user"]).to be false
       end
 
       it "for course" do
         alert = observer_alert_model(observer: user, course: @course, active_all: true, alert_type: "course_grade_high", context: @course)
         json = api.observer_alert_json(alert, user, session)
-        expect(json["locked_for_user"]).to eq false
+        expect(json["locked_for_user"]).to be false
       end
 
       it "for invisible course" do
@@ -114,7 +114,7 @@ describe "Api::V1::ObserverAlert" do
 
         @course.destroy
         json = api.observer_alert_json(alert, user, session)
-        expect(json["locked_for_user"]).to eq true
+        expect(json["locked_for_user"]).to be true
       end
 
       it "for deleted assignment" do
@@ -123,7 +123,7 @@ describe "Api::V1::ObserverAlert" do
 
         assignment.destroy!
         json = api.observer_alert_json(alert, user, session)
-        expect(json["locked_for_user"]).to eq true
+        expect(json["locked_for_user"]).to be true
       end
     end
   end

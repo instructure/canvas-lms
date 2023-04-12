@@ -20,7 +20,7 @@
 
 require_relative "../spec_helper"
 
-describe CommentBankItem, type: :model do
+describe CommentBankItem do
   let(:course) { course_model }
   let(:user) { user_model }
   let(:comment) { "comment" }

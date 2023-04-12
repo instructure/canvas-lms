@@ -171,8 +171,8 @@ describe MissingPolicyApplicator do
 
       submission = @course.submissions.first
 
-      expect(submission.score).to be nil
-      expect(submission.grade).to be nil
+      expect(submission.score).to be_nil
+      expect(submission.grade).to be_nil
     end
 
     it "does not apply deductions to assignments that went missing over 24 hours ago" do
@@ -184,8 +184,8 @@ describe MissingPolicyApplicator do
       applicator.apply_missing_deductions
       submission.reload
 
-      expect(submission.score).to be nil
-      expect(submission.grade).to be nil
+      expect(submission.score).to be_nil
+      expect(submission.grade).to be_nil
     end
 
     it "does not apply deductions to assignments in a course without a LatePolicy" do
@@ -194,8 +194,8 @@ describe MissingPolicyApplicator do
 
       submission = @course.submissions.first
 
-      expect(submission.score).to be nil
-      expect(submission.grade).to be nil
+      expect(submission.score).to be_nil
+      expect(submission.grade).to be_nil
     end
 
     it "assigns a score of zero to Complete / Incomplete assignments" do
@@ -217,8 +217,8 @@ describe MissingPolicyApplicator do
 
       submission = @course.submissions.first
 
-      expect(submission.score).to be nil
-      expect(submission.grade).to be nil
+      expect(submission.score).to be_nil
+      expect(submission.grade).to be_nil
     end
 
     it "does not apply deductions to assignments expecting on paper submissions if the due date is past" do
@@ -228,8 +228,8 @@ describe MissingPolicyApplicator do
 
       submission = @course.submissions.first
 
-      expect(submission.score).to be nil
-      expect(submission.grade).to be nil
+      expect(submission.score).to be_nil
+      expect(submission.grade).to be_nil
     end
 
     it "applies deductions to assignments expecting on paper submissions if the " \
@@ -251,8 +251,8 @@ describe MissingPolicyApplicator do
 
       submission = @course.submissions.first
 
-      expect(submission.score).to be nil
-      expect(submission.grade).to be nil
+      expect(submission.score).to be_nil
+      expect(submission.grade).to be_nil
     end
 
     it "does not change the score on missing submissions for concluded students" do

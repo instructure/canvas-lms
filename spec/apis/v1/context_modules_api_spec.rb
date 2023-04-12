@@ -177,8 +177,8 @@ describe "Modules API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules",
                         controller: "context_modules_api", action: "index", format: "json",
                         course_id: @course.id.to_s)
-        expect(@module1.grants_right?(@user, :update)).to eq false
-        expect(json[0]&.key?("published")).to eq true
+        expect(@module1.grants_right?(@user, :update)).to be false
+        expect(json[0]&.key?("published")).to be true
       end
 
       it "does not show published attribute to students" do
@@ -187,7 +187,7 @@ describe "Modules API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules",
                         controller: "context_modules_api", action: "index", format: "json",
                         course_id: @course.id.to_s)
-        expect(json[0]&.key?("published")).to eq false
+        expect(json[0]&.key?("published")).to be false
       end
 
       it "includes items if requested" do
@@ -426,9 +426,9 @@ describe "Modules API", type: :request do
         expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w[active active unpublished active]
 
         @wiki_page_tag.reload
-        expect(@wiki_page_tag.active?).to eq true
+        expect(@wiki_page_tag.active?).to be true
         @wiki_page.reload
-        expect(@wiki_page.active?).to eq true
+        expect(@wiki_page.active?).to be true
       end
 
       it "unpublishes modules" do
@@ -512,45 +512,45 @@ describe "Modules API", type: :request do
           expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w[active active unpublished active]
 
           @wiki_page_tag.reload
-          expect(@wiki_page_tag.active?).to eq false
+          expect(@wiki_page_tag.active?).to be false
           @wiki_page.reload
-          expect(@wiki_page.active?).to eq false
+          expect(@wiki_page.active?).to be false
         end
 
         it "unpublishes module content tags by default" do
           @wiki_page_tag.publish!
           @wiki_page.publish!
           @wiki_page_tag.reload
-          expect(@wiki_page_tag.active?).to eq true
+          expect(@wiki_page_tag.active?).to be true
           @wiki_page.reload
-          expect(@wiki_page.active?).to eq true
+          expect(@wiki_page.active?).to be true
 
           json = api_call(:put, @path, @path_opts, { event: "unpublish", module_ids: @ids_to_update })
           expect(json["completed"].sort).to eq @ids_to_update
           expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w[active unpublished unpublished unpublished]
 
           @wiki_page_tag.reload
-          expect(@wiki_page_tag.active?).to eq false
+          expect(@wiki_page_tag.active?).to be false
           @wiki_page.reload
-          expect(@wiki_page.active?).to eq false
+          expect(@wiki_page.active?).to be false
         end
 
         it "does not unpublish module content tags if skip_content_tags is true" do
           @wiki_page_tag.publish!
           @wiki_page.publish!
           @wiki_page_tag.reload
-          expect(@wiki_page_tag.active?).to eq true
+          expect(@wiki_page_tag.active?).to be true
           @wiki_page.reload
-          expect(@wiki_page.active?).to eq true
+          expect(@wiki_page.active?).to be true
 
           json = api_call(:put, @path, @path_opts, { event: "unpublish", module_ids: @ids_to_update, skip_content_tags: true })
           expect(json["completed"].sort).to eq @ids_to_update
           expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w[active unpublished unpublished unpublished]
 
           @wiki_page_tag.reload
-          expect(@wiki_page_tag.active?).to eq true
+          expect(@wiki_page_tag.active?).to be true
           @wiki_page.reload
-          expect(@wiki_page.active?).to eq true
+          expect(@wiki_page.active?).to be true
         end
       end
 
@@ -564,17 +564,17 @@ describe "Modules API", type: :request do
           expect(json["completed"].sort).to eq @ids_to_update
           expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w[active active unpublished active]
 
-          expect(@wiki_page_tag.reload.active?).to eq true
-          expect(@wiki_page.reload.active?).to eq true
+          expect(@wiki_page_tag.reload.active?).to be true
+          expect(@wiki_page.reload.active?).to be true
         end
 
         it "starts a background job if async is passed" do
           json = api_call(:put, @path, @path_opts, { event: "publish", module_ids: @ids_to_update, async: true })
-          expect(json["completed"]).to eq nil
+          expect(json["completed"]).to be_nil
           expect(json["progress"]).to be_present
 
-          expect(@wiki_page_tag.reload.active?).not_to eq true
-          expect(@wiki_page.reload.active?).not_to eq true
+          expect(@wiki_page_tag.reload.active?).not_to be true
+          expect(@wiki_page.reload.active?).not_to be true
           progress = Progress.last
           expect(progress).to be_queued
           expect(progress.tag).to eq "context_module_batch_update"
@@ -608,12 +608,12 @@ describe "Modules API", type: :request do
         expect(json["id"]).to eq @module1.id
         expect(json["name"]).to eq "new name"
         expect(json["unlock_at"]).to eq unlock_at.as_json
-        expect(json["require_sequential_progress"]).to eq true
+        expect(json["require_sequential_progress"]).to be true
 
         @module1.reload
         expect(@module1.name).to eq "new name"
         expect(@module1.unlock_at.as_json).to eq unlock_at.as_json
-        expect(@module1.require_sequential_progress).to eq true
+        expect(@module1.require_sequential_progress).to be true
       end
 
       it "updates the position" do
@@ -645,14 +645,14 @@ describe "Modules API", type: :request do
                         { controller: "context_modules_api", action: "update", format: "json",
                           course_id: @course.id.to_s, id: @module1.id.to_s },
                         { module: { published: "1" } })
-        expect(json["published"]).to eq true
+        expect(json["published"]).to be true
         @module1.reload
-        expect(@module1.active?).to eq true
+        expect(@module1.active?).to be true
 
         @wiki_page_tag.reload
-        expect(@wiki_page_tag.active?).to eq true
+        expect(@wiki_page_tag.active?).to be true
         @wiki_page.reload
-        expect(@wiki_page.active?).to eq true
+        expect(@wiki_page.active?).to be true
       end
 
       it "publishes module tag items even if the tag itself is already published" do
@@ -665,7 +665,7 @@ describe "Modules API", type: :request do
                  { module: { published: "1" } })
 
         @wiki_page.reload
-        expect(@wiki_page.active?).to eq true
+        expect(@wiki_page.active?).to be true
       end
 
       it "unpublishes modules" do
@@ -673,9 +673,9 @@ describe "Modules API", type: :request do
                         { controller: "context_modules_api", action: "update", format: "json",
                           course_id: @course.id.to_s, id: @module2.id.to_s },
                         { module: { published: "0" } })
-        expect(json["published"]).to eq false
+        expect(json["published"]).to be false
         @module2.reload
-        expect(@module2.unpublished?).to eq true
+        expect(@module2.unpublished?).to be true
       end
 
       it "sets prerequisites" do
@@ -726,58 +726,58 @@ describe "Modules API", type: :request do
                           { controller: "context_modules_api", action: "update", format: "json",
                             course_id: @course.id.to_s, id: @module1.id.to_s },
                           { module: { published: "1", skip_content_tags: "true" } })
-          expect(json["published"]).to eq true
+          expect(json["published"]).to be true
           @module1.reload
-          expect(@module1.active?).to eq true
+          expect(@module1.active?).to be true
 
           @wiki_page_tag.reload
-          expect(@wiki_page_tag.active?).to eq false
+          expect(@wiki_page_tag.active?).to be false
           @wiki_page.reload
-          expect(@wiki_page.active?).to eq false
+          expect(@wiki_page.active?).to be false
         end
 
         it "unpublishes module content tags by default" do
           @wiki_page_tag.publish!
           @wiki_page.publish!
           @wiki_page_tag.reload
-          expect(@wiki_page_tag.active?).to eq true
+          expect(@wiki_page_tag.active?).to be true
           @wiki_page.reload
-          expect(@wiki_page.active?).to eq true
+          expect(@wiki_page.active?).to be true
 
           json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                           { controller: "context_modules_api", action: "update", format: "json",
                             course_id: @course.id.to_s, id: @module1.id.to_s },
                           { module: { published: "0" } })
-          expect(json["published"]).to eq false
+          expect(json["published"]).to be false
           @module1.reload
-          expect(@module1.unpublished?).to eq true
+          expect(@module1.unpublished?).to be true
 
           @wiki_page_tag.reload
-          expect(@wiki_page_tag.active?).to eq false
+          expect(@wiki_page_tag.active?).to be false
           @wiki_page.reload
-          expect(@wiki_page.active?).to eq false
+          expect(@wiki_page.active?).to be false
         end
 
         it "does not unpublish module content tags if skip_content_tags is true" do
           @wiki_page_tag.publish!
           @wiki_page.publish!
           @wiki_page_tag.reload
-          expect(@wiki_page_tag.active?).to eq true
+          expect(@wiki_page_tag.active?).to be true
           @wiki_page.reload
-          expect(@wiki_page.active?).to eq true
+          expect(@wiki_page.active?).to be true
 
           json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                           { controller: "context_modules_api", action: "update", format: "json",
                             course_id: @course.id.to_s, id: @module1.id.to_s },
                           { module: { published: "0", skip_content_tags: "true" } })
-          expect(json["published"]).to eq false
+          expect(json["published"]).to be false
           @module1.reload
-          expect(@module1.unpublished?).to eq true
+          expect(@module1.unpublished?).to be true
 
           @wiki_page_tag.reload
-          expect(@wiki_page_tag.active?).to eq true
+          expect(@wiki_page_tag.active?).to be true
           @wiki_page.reload
-          expect(@wiki_page.active?).to eq true
+          expect(@wiki_page.active?).to be true
         end
       end
     end
@@ -799,12 +799,12 @@ describe "Modules API", type: :request do
 
         expect(json["name"]).to eq "new name"
         expect(json["unlock_at"]).to eq unlock_at.as_json
-        expect(json["require_sequential_progress"]).to eq true
+        expect(json["require_sequential_progress"]).to be true
 
         new_module = @course.context_modules.find(json["id"])
         expect(new_module.name).to eq "new name"
         expect(new_module.unlock_at.as_json).to eq unlock_at.as_json
-        expect(new_module.require_sequential_progress).to eq true
+        expect(new_module.require_sequential_progress).to be true
       end
 
       it "requires a name" do
@@ -883,14 +883,14 @@ describe "Modules API", type: :request do
       h = json.find { |m| m["id"] == @module1.id }
       expect(h["state"]).to eq "completed"
       expect(h["completed_at"]).not_to be_nil
-      expect(h["items"].find { |i| i["id"] == @assignment_tag.id }["completion_requirement"]["completed"]).to eq true
+      expect(h["items"].find { |i| i["id"] == @assignment_tag.id }["completion_requirement"]["completed"]).to be true
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items&student_id=#{student.id}",
                       controller: "context_modules_api", action: "show", format: "json",
                       course_id: @course.id.to_s, id: @module1.id.to_s, student_id: student.id.to_s, include: ["items"])
       expect(json["state"]).to eq "completed"
       expect(json["completed_at"]).not_to be_nil
-      expect(json["items"].find { |i| i["id"] == @assignment_tag.id }["completion_requirement"]["completed"]).to eq true
+      expect(json["items"].find { |i| i["id"] == @assignment_tag.id }["completion_requirement"]["completed"]).to be true
     end
   end
 

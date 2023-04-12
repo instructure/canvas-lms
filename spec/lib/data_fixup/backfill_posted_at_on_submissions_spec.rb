@@ -39,7 +39,7 @@ describe DataFixup::BackfillPostedAtOnSubmissions do
   it "does not set the posted_at date if graded_at is nil" do
     do_backfill
 
-    expect(submission.posted_at).to be nil
+    expect(submission.posted_at).to be_nil
   end
 
   it "does not change the posted_at date if it is already non-nil" do

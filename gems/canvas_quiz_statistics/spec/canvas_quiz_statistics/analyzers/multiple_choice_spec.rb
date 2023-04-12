@@ -89,10 +89,10 @@ describe CanvasQuizStatistics::Analyzers::MultipleChoice do
 
     describe "[:correct]" do
       it "is true for those with a weight of 100" do
-        expect(subject.run([])[:answers][0][:correct]).to eq(true)
-        expect(subject.run([])[:answers][1][:correct]).to eq(false)
-        expect(subject.run([])[:answers][2][:correct]).to eq(false)
-        expect(subject.run([])[:answers][3][:correct]).to eq(false)
+        expect(subject.run([])[:answers][0][:correct]).to be(true)
+        expect(subject.run([])[:answers][1][:correct]).to be(false)
+        expect(subject.run([])[:answers][2][:correct]).to be(false)
+        expect(subject.run([])[:answers][3][:correct]).to be(false)
       end
     end
 

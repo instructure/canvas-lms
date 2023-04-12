@@ -215,7 +215,7 @@ describe ContentParticipationCount do
       Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       student2 = User.create!
       @submission = @assignment.update_submission(@student, { commenter: student2, comment: "good!" }).first
-      expect(@submission.reload.posted_at).to be nil
+      expect(@submission.reload.posted_at).to be_nil
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 1
     end
 

@@ -155,9 +155,9 @@ describe RubricAssociationsController do
         it "does not duplicate the rubric" do
           expect do
             post "create", params: { course_id: @course.id, rubric_association: { rubric_id: @rubric.id } }
-          end.to change {
+          end.not_to change {
             Rubric.count
-          }.by(0)
+          }
           expect(assigns[:rubric]).to eq @rubric
         end
       end

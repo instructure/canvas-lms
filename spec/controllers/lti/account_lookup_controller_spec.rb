@@ -77,7 +77,7 @@ describe Lti::AccountLookupController do
       end
 
       it "returns a 404" do
-        expect(Shard.find_by(id: 198_765)).to eq(nil)
+        expect(Shard.find_by(id: 198_765)).to be_nil
         send_request
         expect(response.code).to eq("404")
       end

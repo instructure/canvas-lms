@@ -66,9 +66,9 @@ describe GroupsController do
       get "index", params: { course_id: @course.id }
       expect(response).to be_successful
       expect(assigns[:groups]).not_to be_empty
-      expect(assigns[:groups].length).to eql(3)
+      expect(assigns[:groups].length).to be(3)
       expect(assigns[:groups] - [g1, g2, g3]).to be_empty
-      expect(assigns[:categories].length).to eql(2)
+      expect(assigns[:categories].length).to be(2)
     end
 
     it "returns groups in sorted by group category name, then group name for student view" do
@@ -90,7 +90,7 @@ describe GroupsController do
       get "index", params: { course_id: @course.id, per_page: 50 }, format: "json"
       expect(response).to be_successful
       expect(assigns[:paginated_groups]).not_to be_empty
-      expect(assigns[:paginated_groups].length).to eql(9)
+      expect(assigns[:paginated_groups].length).to be(9)
       # Check group category ordering
       expect(assigns[:paginated_groups][0].group_category.name).to eql("1")
       expect(assigns[:paginated_groups][1].group_category.name).to eql("1")
@@ -128,7 +128,7 @@ describe GroupsController do
       category1 = @course.group_categories.create(name: "category 1")
       @course.groups.create(name: "some group", group_category: category1)
       get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "don't filter out inactive students if json and param set" do
@@ -192,8 +192,8 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups].length).to eql(1)
+          expect(json_parse(response.body).length).to be(1)
+          expect(assigns[:groups].length).to be(1)
           expect(assigns[:groups][0].id).to eql(group_with_section_restricted_user.id)
         end
 
@@ -214,8 +214,8 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(2)
-          expect(assigns[:groups].length).to eql(2)
+          expect(json_parse(response.body).length).to be(2)
+          expect(assigns[:groups].length).to be(2)
           expect(assigns[:groups].map(&:id).sort).to eql(@group_category.groups.map(&:id).sort)
         end
       end
@@ -242,8 +242,8 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(2)
-          expect(assigns[:groups].length).to eql(2)
+          expect(json_parse(response.body).length).to be(2)
+          expect(assigns[:groups].length).to be(2)
           expect(assigns[:groups].map(&:id).sort).to eql(@group_category_non_restricted.groups.map(&:id).sort)
         end
       end
@@ -273,8 +273,8 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(2)
-          expect(assigns[:groups].length).to eql(2)
+          expect(json_parse(response.body).length).to be(2)
+          expect(assigns[:groups].length).to be(2)
           expect(assigns[:groups].map(&:id).sort).to eql(@group_category.groups.map(&:id).sort)
         end
 
@@ -288,8 +288,8 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups].length).to eql(1)
+          expect(json_parse(response.body).length).to be(1)
+          expect(assigns[:groups].length).to be(1)
           expect(assigns[:groups][0].id).to eql(group_with_user_in_different_section.id)
         end
 
@@ -305,8 +305,8 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups].length).to eql(1)
+          expect(json_parse(response.body).length).to be(1)
+          expect(assigns[:groups].length).to be(1)
           expect(assigns[:groups][0].id).to eql(group_with_section_restricted_user_2.id)
         end
 
@@ -325,8 +325,8 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups].length).to eql(1)
+          expect(json_parse(response.body).length).to be(1)
+          expect(assigns[:groups].length).to be(1)
           expect(assigns[:groups][0].id).to eql(group_with_section_restricted_user.id)
         end
       end

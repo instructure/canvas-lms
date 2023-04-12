@@ -28,15 +28,15 @@ describe CyoeHelper do
   describe "cyoeable item" do
     it "returns false if an item is not a quiz or assignment" do
       topic = fake_item_class.new(1, "DiscussionTopic", false)
-      expect(helper.cyoe_able?(topic)).to eq false
+      expect(helper.cyoe_able?(topic)).to be false
     end
 
     context "graded" do
       it "returns true for quizzes and assignments" do
         quiz = fake_item_class.new(1, "Quizzes::Quiz", true, fake_content_class.new(true))
         assignment = fake_item_class.new(1, "Assignment", true, fake_content_class.new(true, true))
-        expect(helper.cyoe_able?(quiz)).to eq true
-        expect(helper.cyoe_able?(assignment)).to eq true
+        expect(helper.cyoe_able?(quiz)).to be true
+        expect(helper.cyoe_able?(assignment)).to be true
       end
     end
 
@@ -44,8 +44,8 @@ describe CyoeHelper do
       it "does not return true for quizzes or assignments" do
         quiz = fake_item_class.new(1, "Quizzes::Quiz", false)
         assignment = fake_item_class.new(1, "Assignment", false)
-        expect(helper.cyoe_able?(quiz)).to eq false
-        expect(helper.cyoe_able?(assignment)).to eq false
+        expect(helper.cyoe_able?(quiz)).to be false
+        expect(helper.cyoe_able?(assignment)).to be false
       end
     end
   end

@@ -32,11 +32,11 @@ describe Lti::DeepLinkingData do
     end
 
     it "is valid" do
-      expect(subject.valid?).to eq true
+      expect(subject.valid?).to be true
     end
 
     it "does not have any errors" do
-      expect(subject.errors).to eq nil
+      expect(subject.errors).to be_nil
     end
 
     context "when jwt is absent" do

@@ -265,7 +265,7 @@ describe LtiOutbound::ToolLaunch do
       expect(hash["custom_bob"]).to eql("bob")
       expect(hash["custom_fred"]).to eql("fred")
       expect(hash["custom_john"]).to eql("john")
-      expect(hash["custom___taa____"]).to eql(123)
+      expect(hash["custom___taa____"]).to be(123)
       expect(hash).to_not have_key '@$TAA$#$#'
       expect(hash).to_not have_key "john"
     end
@@ -329,9 +329,9 @@ describe LtiOutbound::ToolLaunch do
     it "includes email if email_only" do
       tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
       hash = tool_launch.generate
-      expect(hash["lis_person_name_given"]).to eq nil
-      expect(hash["lis_person_name_family"]).to eq nil
-      expect(hash["lis_person_name_full"]).to eq nil
+      expect(hash["lis_person_name_given"]).to be_nil
+      expect(hash["lis_person_name_family"]).to be_nil
+      expect(hash["lis_person_name_full"]).to be_nil
       expect(hash["lis_person_contact_email_primary"]).to eq "nobody@example.com"
     end
 
@@ -449,7 +449,7 @@ describe LtiOutbound::ToolLaunch do
 
       hash = tool_launch.generate
 
-      expect(hash["ext_content_file_extensions"]).to eq nil
+      expect(hash["ext_content_file_extensions"]).to be_nil
     end
   end
 end

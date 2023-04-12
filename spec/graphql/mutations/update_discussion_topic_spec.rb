@@ -64,7 +64,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(@topic.published?).to be false
 
     result = run_mutation({ id: @topic.id, published: true })
-    expect(result["errors"]).to be nil
+    expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
     @topic.reload
     expect(@topic.published?).to be true
@@ -75,7 +75,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(@topic.published?).to be true
 
     result = run_mutation({ id: @topic.id, published: false })
-    expect(result["errors"]).to be nil
+    expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be false
     @topic.reload
     expect(@topic.published?).to be false
@@ -85,7 +85,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(@topic.locked).to be false
 
     result = run_mutation(id: @topic.id, locked: true)
-    expect(result["errors"]).to be nil
+    expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "locked")).to be true
     expect(@topic.reload.locked).to be true
   end
@@ -95,7 +95,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(@topic.locked).to be true
 
     result = run_mutation(id: @topic.id, locked: false)
-    expect(result["errors"]).to be nil
+    expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "locked")).to be false
     expect(@topic.reload.locked).to be false
   end

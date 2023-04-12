@@ -83,7 +83,7 @@ describe ContentExportsApiController, type: :request do
       json = api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/content_exports",
                               { controller: "content_exports_api", action: "index", format: "json", course_id: t_course.to_param })
 
-      expect(json.size).to eql 3
+      expect(json.size).to be 3
       expect(json[0]["id"]).to eql @pending.id
       expect(json[0]["workflow_state"]).to eql "created"
       expect(json[0]["export_type"]).to eql "qti"
@@ -114,10 +114,10 @@ describe ContentExportsApiController, type: :request do
       exports = (1..5).map { pending_export }
       json = api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/content_exports?per_page=3",
                               { controller: "content_exports_api", action: "index", format: "json", course_id: t_course.to_param, per_page: "3" })
-      expect(json.size).to eql 3
+      expect(json.size).to be 3
       json += api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/content_exports?per_page=3&page=2",
                                { controller: "content_exports_api", action: "index", format: "json", course_id: t_course.to_param, per_page: "3", page: "2" })
-      expect(json.size).to eql 5
+      expect(json.size).to be 5
       expect(json.map { |el| el["id"] }).to eql exports.map(&:id).sort.reverse
     end
 
@@ -692,7 +692,7 @@ describe ContentExportsApiController, type: :request do
                                   export_type: "quizzes2"
                                 })
         expect(json["message"]).to eq "quiz_id required and must be a valid ID"
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
       end
 
       it "verifies quiz_id param is a number" do
@@ -707,7 +707,7 @@ describe ContentExportsApiController, type: :request do
         }
         json = api_call_as_user(t_teacher, :post, ce_url, params)
         expect(json["message"]).to eq "quiz_id required and must be a valid ID"
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
       end
     end
 
@@ -724,7 +724,7 @@ describe ContentExportsApiController, type: :request do
         }
         json = api_call_as_user(t_teacher, :post, ce_url, params)
         expect(json["message"]).to eq "Quiz could not be found"
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
       end
     end
 

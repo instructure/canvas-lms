@@ -45,24 +45,24 @@ describe "simply_versioned" do
       expect(woozel).not_to be_versioned
       woozel.save!
       expect(woozel).to be_versioned
-      expect(woozel.versions.length).to eql(1)
+      expect(woozel.versions.length).to be(1)
       expect(woozel.versions.current.model.name).to eql("Eeyore")
     end
 
     it "keeps the last version up to date for each save" do
       expect(woozel).to be_versioned
-      expect(woozel.versions.length).to eql(1)
+      expect(woozel.versions.length).to be(1)
       expect(woozel.versions.current.model.name).to eql("Eeyore")
       woozel.name = "Piglet"
       woozel.save!
-      expect(woozel.versions.length).to eql(1)
+      expect(woozel.versions.length).to be(1)
       expect(woozel.versions.current.model.name).to eql("Piglet")
     end
 
     it "creates a new version when asked to" do
       woozel.name = "Piglet"
       woozel.with_versioning(explicit: true, &:save!)
-      expect(woozel.versions.length).to eql(2)
+      expect(woozel.versions.length).to be(2)
       expect(woozel.versions.first.model.name).to eql("Eeyore")
       expect(woozel.versions.current.model.name).to eql("Piglet")
     end
@@ -70,21 +70,21 @@ describe "simply_versioned" do
     it "does not create a new version when not explicitly asked to" do
       woozel.name = "Piglet"
       woozel.with_versioning(&:save!)
-      expect(woozel.versions.length).to eql(1)
+      expect(woozel.versions.length).to be(1)
       expect(woozel.versions.current.model.name).to eql("Piglet")
     end
 
     it "does not update the last version when not versioning" do
       woozel.name = "Piglet"
       woozel.without_versioning(&:save!)
-      expect(woozel.versions.length).to eql(1)
+      expect(woozel.versions.length).to be(1)
       expect(woozel.versions.current.model.name).to eql("Eeyore")
     end
 
     it "does not reload one versionable association from the database" do
       woozel.name = "Piglet"
       woozel.with_versioning(&:save!)
-      expect(woozel.versions.loaded?).to eq false
+      expect(woozel.versions.loaded?).to be false
       first = woozel.versions.first
       expect(Woozel.connection).not_to receive(:select_all)
       expect(first.versionable).to eq woozel
@@ -93,7 +93,7 @@ describe "simply_versioned" do
     it "does not reload any versionable associations from the database" do
       woozel.name = "Piglet"
       woozel.with_versioning(&:save!)
-      expect(woozel.versions.loaded?).to eq false
+      expect(woozel.versions.loaded?).to be false
       all = woozel.versions.to_a
       expect(Woozel.connection).not_to receive(:select_all)
       all.each do |version|
@@ -106,13 +106,13 @@ describe "simply_versioned" do
     let(:woozel) { Woozel.create!(name: "Eeyore") }
 
     it "assigns the model for the version" do
-      expect(woozel.versions.length).to eql(1)
+      expect(woozel.versions.length).to be(1)
       expect(woozel.versions.current.model.name).to eql("Eeyore")
 
       woozel.name = "Piglet"
       woozel.with_versioning(explicit: true, &:save!)
 
-      expect(woozel.versions.length).to eql(2)
+      expect(woozel.versions.length).to be(2)
 
       first_version = woozel.versions.first
       first_model   = first_version.model

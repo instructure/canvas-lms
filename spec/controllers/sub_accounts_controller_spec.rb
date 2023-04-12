@@ -57,9 +57,9 @@ describe SubAccountsController do
       account_admin_user(active_all: true)
       user_session(@user)
       post "create", params: { account_id: root_account.id, account: { sis_account_id: "C001", name: "sub account 1" } }
-      expect(response.status).to eq(200)
+      expect(response).to have_http_status(:ok)
       post "create", params: { account_id: root_account.id, account: { sis_account_id: "C001", name: "sub account 2" } }
-      expect(response.status).to eq(400)
+      expect(response).to have_http_status(:bad_request)
       expect(JSON.parse(response.body)).to have_key("errors")
     end
   end
@@ -160,7 +160,7 @@ describe SubAccountsController do
         admin = account_admin_user_with_role_changes(role_changes: { manage_account_settings: false, manage_courses: true }, account: @root_account, role: Role.get_built_in_role("AccountMembership", root_account_id: @root_account))
         user_session(admin)
         get "index", params: { term: "sub-account", account_id: @root_account.id }
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
       end
 
       it "accepts :manage_courses_admin permission if term query param is provided (granular permissions)" do
@@ -176,13 +176,13 @@ describe SubAccountsController do
           )
         user_session(admin)
         get "index", params: { term: "sub-account", account_id: @root_account.id }
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
       end
 
       it "requires account credentials" do
         course_with_teacher_logged_in(active_all: true)
         get "index", params: { account_id: @root_account.id }
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -198,13 +198,13 @@ describe SubAccountsController do
       lame_admin = account_admin_user_with_role_changes(role_changes: { manage_account_settings: false, manage_courses: true }, account: @root_account, role: Role.get_built_in_role("AccountMembership", root_account_id: @root_account))
       user_session(lame_admin)
       delete "destroy", params: { account_id: @root_account, id: @sub_account }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "deletes a sub-account" do
       user_session(@user)
       delete "destroy", params: { account_id: @root_account, id: @sub_account }
-      expect(response.status).to eq(200)
+      expect(response).to have_http_status(:ok)
       expect(@sub_account.reload).to be_deleted
     end
 
@@ -213,7 +213,7 @@ describe SubAccountsController do
       @sub_account.courses.first.destroy
       user_session(@user)
       delete "destroy", params: { account_id: @root_account, id: @sub_account }
-      expect(response.status).to eq(200)
+      expect(response).to have_http_status(:ok)
       expect(@sub_account.reload).to be_deleted
     end
 
@@ -221,7 +221,7 @@ describe SubAccountsController do
       @sub_account.courses.create!
       user_session(@user)
       delete "destroy", params: { account_id: @root_account, id: @sub_account }
-      expect(response.status).to eq(409)
+      expect(response).to have_http_status(:conflict)
       expect(@sub_account.reload).not_to be_deleted
     end
 
@@ -230,7 +230,7 @@ describe SubAccountsController do
       @sub_sub_account.courses.create!
       user_session(@user)
       delete "destroy", params: { account_id: @root_account, id: @sub_account }
-      expect(response.status).to eq(409)
+      expect(response).to have_http_status(:conflict)
       expect(@sub_account.reload).not_to be_deleted
     end
 
@@ -238,7 +238,7 @@ describe SubAccountsController do
       @sub_sub_account = @sub_account.sub_accounts.create!
       user_session(@user)
       delete "destroy", params: { account_id: @root_account, id: @sub_account }
-      expect(response.status).to eq(409)
+      expect(response).to have_http_status(:conflict)
       expect(@sub_account.reload).not_to be_deleted
     end
   end
@@ -258,7 +258,7 @@ describe SubAccountsController do
       names = %w[script bank cow program means]
       names.each { |name| Account.create!(name: name, parent_account: @sub_account) }
       get "show", params: { account_id: @root_account, id: @sub_account }
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
       json = JSON.parse(response.body)
       expect(json["account"]["sub_accounts"].map { |sub| sub["account"]["name"] }).to eq names.sort
     end

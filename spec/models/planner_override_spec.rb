@@ -133,7 +133,7 @@ describe PlannerOverride do
 
       it "returns nil for other workflow_state" do
         a = mock_asset.new("terrified")
-        expect(PlannerOverride.plannable_workflow_state(a)).to eq nil
+        expect(PlannerOverride.plannable_workflow_state(a)).to be_nil
       end
     end
   end

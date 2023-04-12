@@ -171,11 +171,11 @@ describe ConversationsController, type: :request do
     it "paginates and return proper pagination headers" do
       students = create_users_in_course(@course, 7, return_type: :record)
       students.each { |s| conversation(s) }
-      expect(@user.conversations.size).to eql 7
+      expect(@user.conversations.size).to be 7
       json = api_call(:get, "/api/v1/conversations.json?scope=default&per_page=3",
                       { controller: "conversations", action: "index", format: "json", scope: "default", per_page: "3" })
 
-      expect(json.size).to eql 3
+      expect(json.size).to be 3
       links = response.headers["Link"].split(",")
       expect(links.all? { |l| l.include?("api/v1/conversations") }).to be_truthy
       expect(links.all? { |l| l.scan(/scope=default/).size == 1 }).to be_truthy
@@ -186,7 +186,7 @@ describe ConversationsController, type: :request do
       # get the last page
       json = api_call(:get, "/api/v1/conversations.json?scope=default&page=3&per_page=3",
                       { controller: "conversations", action: "index", format: "json", scope: "default", page: "3", per_page: "3" })
-      expect(json.size).to eql 1
+      expect(json.size).to be 1
       links = response.headers["Link"].split(",")
       expect(links.all? { |l| l.include?("api/v1/conversations") }).to be_truthy
       expect(links.all? { |l| l.scan(/scope=default/).size == 1 }).to be_truthy
@@ -414,7 +414,7 @@ describe ConversationsController, type: :request do
 
         json = api_call(:get, "/api/v1/conversations.json?scope=sent",
                         { controller: "conversations", action: "index", format: "json", scope: "sent" })
-        expect(json.size).to eql 3
+        expect(json.size).to be 3
         expect(json[0]["id"]).to eql @c3.conversation_id
         expect(json[0]["last_message_at"]).to eql expected_times[2].to_json[1, 20]
         expect(json[0]["last_message"]).to eql "test"
@@ -452,7 +452,7 @@ describe ConversationsController, type: :request do
 
         json = api_call(:get, "/api/v1/conversations.json?scope=sent",
                         { controller: "conversations", action: "index", format: "json", scope: "sent" })
-        expect(json.size).to eql 2
+        expect(json.size).to be 2
         expect(json.map { |c| c["id"] }.sort).to eql [@c1.conversation_id, @c3.conversation_id]
       end
     end
@@ -468,7 +468,7 @@ describe ConversationsController, type: :request do
 
       json = api_call(:get, "/api/v1/conversations.json",
                       { controller: "conversations", action: "index", format: "json" })
-      expect(json.size).to eql 1
+      expect(json.size).to be 1
       expect(json.first["id"]).to eql @c1.conversation_id
       expect(json.first["audience_contexts"]).to eql({ "groups" => {}, "courses" => { @course.id.to_s => [] } })
     end
@@ -503,9 +503,9 @@ describe ConversationsController, type: :request do
                       { controller: "conversations", action: "mark_all_as_read", format: "json" })
       expect(json).to eql({})
 
-      expect(@me.conversations.unread.size).to eql 0
-      expect(@me.conversations.default.size).to eql 2
-      expect(@me.conversations.archived.size).to eql 1
+      expect(@me.conversations.unread.size).to be 0
+      expect(@me.conversations.default.size).to be 2
+      expect(@me.conversations.archived.size).to be 1
     end
 
     context "create" do
@@ -880,25 +880,25 @@ describe ConversationsController, type: :request do
           json = api_call(:post, "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@bob.id, @joe.id, @billy.id], body: "test" })
-          expect(json.size).to eql 3
+          expect(json.size).to be 3
           expect(json.map { |c| c["id"] }.sort).to eql @me.all_conversations.map(&:conversation_id).sort
 
           batch = ConversationBatch.first
           expect(batch).not_to be_nil
           expect(batch).to be_sent
 
-          expect(@me.all_conversations.size).to eql(3)
-          expect(@me.conversations.size).to eql(1) # just the initial conversation with bob is visible to @me
-          expect(@bob.conversations.size).to eql(1)
-          expect(@billy.conversations.size).to eql(1)
-          expect(@joe.conversations.size).to eql(1)
+          expect(@me.all_conversations.size).to be(3)
+          expect(@me.conversations.size).to be(1) # just the initial conversation with bob is visible to @me
+          expect(@bob.conversations.size).to be(1)
+          expect(@billy.conversations.size).to be(1)
+          expect(@joe.conversations.size).to be(1)
         end
 
         it "sets the context on new synchronous bulk private conversations" do
           json = api_call(:post, "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@bob.id, @joe.id, @billy.id], body: "test", context_code: "course_#{@course.id}" })
-          expect(json.size).to eql 3
+          expect(json.size).to be 3
 
           batch = ConversationBatch.first
           expect(batch).not_to be_nil
@@ -927,11 +927,11 @@ describe ConversationsController, type: :request do
           expect(batch).to be_created
           batch.deliver
 
-          expect(@me.all_conversations.size).to eql(3)
-          expect(@me.conversations.size).to eql(1) # just the initial conversation with bob is visible to @me
-          expect(@bob.conversations.size).to eql(1)
-          expect(@billy.conversations.size).to eql(1)
-          expect(@joe.conversations.size).to eql(1)
+          expect(@me.all_conversations.size).to be(3)
+          expect(@me.conversations.size).to be(1) # just the initial conversation with bob is visible to @me
+          expect(@bob.conversations.size).to be(1)
+          expect(@billy.conversations.size).to be(1)
+          expect(@joe.conversations.size).to be(1)
         end
 
         it "sets the context on new asynchronous bulk private conversations" do
@@ -1104,7 +1104,7 @@ describe ConversationsController, type: :request do
         json = api_call(:post, "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id, @joe.id], body: "test", subject: "dinner" })
-        expect(json.size).to eql 2
+        expect(json.size).to be 2
         json.each do |c|
           expect(c["subject"]).to eql "dinner"
         end
@@ -1153,7 +1153,7 @@ describe ConversationsController, type: :request do
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id, @joe.id], body: "test",
                           group_conversation: "true", bulk_message: "true" })
-        expect(json.size).to eql 2
+        expect(json.size).to be 2
       end
 
       it "sends bulk group messages with a single recipient" do
@@ -1161,7 +1161,7 @@ describe ConversationsController, type: :request do
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id], body: "test",
                           group_conversation: "true", bulk_message: "true" })
-        expect(json.size).to eql 1
+        expect(json.size).to be 1
       end
 
       context "cross-shard creation" do
@@ -1355,7 +1355,7 @@ describe ConversationsController, type: :request do
       json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
                       { controller: "conversations", action: "show", id: conversation.conversation_id.to_s, format: "json" })
 
-      expect(json["cannot_reply"]).to eq true
+      expect(json["cannot_reply"]).to be true
     end
 
     context "as an observer" do
@@ -1391,7 +1391,7 @@ describe ConversationsController, type: :request do
             format: "json" }
         )
 
-        expect(json["cannot_reply"]).to eq true
+        expect(json["cannot_reply"]).to be true
       end
     end
 
@@ -1819,7 +1819,7 @@ describe ConversationsController, type: :request do
     it "creates a media object if it doesn't exist" do
       conversation = conversation(@bob)
 
-      expect(MediaObject.count).to eql 0
+      expect(MediaObject.count).to be 0
       json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
                       { controller: "conversations", action: "add_message", id: conversation.conversation_id.to_s, format: "json" },
                       { body: "another", media_comment_id: "asdf", media_comment_type: "audio" })
@@ -1828,7 +1828,7 @@ describe ConversationsController, type: :request do
       expect(mjson).to be_present
       expect(mjson["media_id"]).to eql "asdf"
       expect(mjson["media_type"]).to eql "audio"
-      expect(MediaObject.count).to eql 1
+      expect(MediaObject.count).to be 1
     end
 
     it "adds recipients to the conversation" do
@@ -2083,7 +2083,7 @@ describe ConversationsController, type: :request do
                       action: "batches",
                       format: "json")
 
-      expect(json.size).to eql 1 # batch2 already ran, batch3 belongs to someone else
+      expect(json.size).to be 1 # batch2 already ran, batch3 belongs to someone else
       expect(json[0]["id"]).to eql batch1.id
     end
   end
@@ -2112,7 +2112,7 @@ describe ConversationsController, type: :request do
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
       expect(c1.reload).to be_read
       expect(c2.reload).to be_read
-      expect(@me.reload.unread_conversations_count).to eql(0)
+      expect(@me.reload.unread_conversations_count).to be(0)
     end
 
     it "marks conversations as unread" do
@@ -2124,7 +2124,7 @@ describe ConversationsController, type: :request do
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
       expect(c1.reload).to be_unread
       expect(c2.reload).to be_unread
-      expect(@me.reload.unread_conversations_count).to eql(2)
+      expect(@me.reload.unread_conversations_count).to be(2)
     end
 
     it "marks conversations as starred" do
@@ -2138,7 +2138,7 @@ describe ConversationsController, type: :request do
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
       expect(c1.reload.starred).to be_truthy
       expect(c2.reload.starred).to be_truthy
-      expect(@me.reload.unread_conversations_count).to eql(1)
+      expect(@me.reload.unread_conversations_count).to be(1)
     end
 
     it "marks conversations as unstarred" do
@@ -2152,7 +2152,7 @@ describe ConversationsController, type: :request do
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
       expect(c1.reload.starred).to be_falsey
       expect(c2.reload.starred).to be_falsey
-      expect(@me.reload.unread_conversations_count).to eql(1)
+      expect(@me.reload.unread_conversations_count).to be(1)
     end
 
     # it "should mark conversations as subscribed"
@@ -2161,7 +2161,7 @@ describe ConversationsController, type: :request do
       conversations = %w[archived read unread].map do |state|
         conversation(@me, @bob, workflow_state: state)
       end
-      expect(@me.reload.unread_conversations_count).to eql(1)
+      expect(@me.reload.unread_conversations_count).to be(1)
 
       conversation_ids = conversations.map { |c| c.conversation.id }
       allow(InstStatsd::Statsd).to receive(:count)
@@ -2176,7 +2176,7 @@ describe ConversationsController, type: :request do
       end
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.archived.legacy", 3)
       expect(InstStatsd::Statsd).not_to have_received(:count).with("inbox.conversation.archived.react")
-      expect(@me.reload.unread_conversations_count).to eql(0)
+      expect(@me.reload.unread_conversations_count).to be(0)
     end
 
     it "unarchives conversations by marking as read" do
@@ -2220,7 +2220,7 @@ describe ConversationsController, type: :request do
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
       expect(c1.reload.messages).to be_empty
       expect(c2.reload.messages).to be_empty
-      expect(@me.reload.unread_conversations_count).to eql(0)
+      expect(@me.reload.unread_conversations_count).to be(0)
     end
 
     describe "immediate failures" do
@@ -2269,10 +2269,10 @@ describe ConversationsController, type: :request do
         progress = Progress.find(json["id"])
         expect(progress).to be_present
         expect(progress).to be_queued
-        expect(progress.completion).to eql(0.0)
+        expect(progress.completion).to be(0.0)
         run_jobs
         expect(progress.reload).to be_completed
-        expect(progress.completion).to eql(100.0)
+        expect(progress.completion).to be(100.0)
       end
 
       describe "progress failures" do
@@ -2286,7 +2286,7 @@ describe ConversationsController, type: :request do
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress).to be_completed
-          expect(progress.completion).to eql(100.0)
+          expect(progress.completion).to be(100.0)
           expect(c1.reload).to be_read
           expect(c2.reload).to be_read
           expect(c3.reload).to be_unread
@@ -2305,7 +2305,7 @@ describe ConversationsController, type: :request do
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress).to be_failed
-          expect(progress.completion).to eql(100.0)
+          expect(progress.completion).to be(100.0)
           expect(c1.reload).to be_unread
           expect(progress.message).to include "not participating"
           expect(progress.message).to include "0 conversations processed"
@@ -2332,7 +2332,7 @@ describe ConversationsController, type: :request do
     it "requires site_admin with manage_students permissions" do
       cp = conversation(@me, @bob, @billy, @jane, @joe, @tommy, sender: @me)
       conv = cp.conversation
-      expect(@joe.conversations.size).to eql 1
+      expect(@joe.conversations.size).to be 1
 
       account_admin_user_with_role_changes(account: Account.site_admin, role_changes: { manage_students: false })
       raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
@@ -2353,8 +2353,8 @@ describe ConversationsController, type: :request do
                    {})
       assert_status(401)
 
-      expect(@me.all_conversations.size).to eql 1
-      expect(@joe.conversations.size).to eql 1
+      expect(@me.all_conversations.size).to be 1
+      expect(@joe.conversations.size).to be 1
     end
 
     it "fails if conversation doesn't exist" do
@@ -2370,8 +2370,8 @@ describe ConversationsController, type: :request do
       cp = conversation(*users)
       conv = cp.conversation
       users.each do |user|
-        expect(user.all_conversations.size).to eql 1
-        expect(user.stream_item_instances.size).to eql 1 unless user.id == @me.id
+        expect(user.all_conversations.size).to be 1
+        expect(user.stream_item_instances.size).to be 1 unless user.id == @me.id
       end
 
       site_admin_user
@@ -2382,14 +2382,14 @@ describe ConversationsController, type: :request do
       expect(json).to eql({})
 
       users.each do |user|
-        expect(user.reload.all_conversations.size).to eql 0
-        expect(user.stream_item_instances.size).to eql 0
+        expect(user.reload.all_conversations.size).to be 0
+        expect(user.stream_item_instances.size).to be 0
       end
-      expect(ConversationParticipant.count).to eql 0
-      expect(ConversationMessageParticipant.count).to eql 0
+      expect(ConversationParticipant.count).to be 0
+      expect(ConversationMessageParticipant.count).to be 0
       # should leave the conversation and its message in the database
-      expect(Conversation.count).to eql 1
-      expect(ConversationMessage.count).to eql 1
+      expect(Conversation.count).to be 1
+      expect(ConversationMessage.count).to be 1
     end
 
     context "sharding" do
@@ -2402,8 +2402,8 @@ describe ConversationsController, type: :request do
         cp = conversation(*users)
         conv = cp.conversation
         users.each do |user|
-          expect(user.all_conversations.size).to eql 1
-          expect(user.stream_item_instances.size).to eql 1 unless user.id == @me.id
+          expect(user.all_conversations.size).to be 1
+          expect(user.stream_item_instances.size).to be 1 unless user.id == @me.id
         end
 
         site_admin_user
@@ -2416,14 +2416,14 @@ describe ConversationsController, type: :request do
         end
 
         users.each do |user|
-          expect(user.reload.all_conversations.size).to eql 0
-          expect(user.stream_item_instances.size).to eql 0
+          expect(user.reload.all_conversations.size).to be 0
+          expect(user.stream_item_instances.size).to be 0
         end
-        expect(ConversationParticipant.count).to eql 0
-        expect(ConversationMessageParticipant.count).to eql 0
+        expect(ConversationParticipant.count).to be 0
+        expect(ConversationMessageParticipant.count).to be 0
         # should leave the conversation and its message in the database
-        expect(Conversation.count).to eql 1
-        expect(ConversationMessage.count).to eql 1
+        expect(Conversation.count).to be 1
+        expect(ConversationMessage.count).to be 1
       end
     end
   end
@@ -2454,7 +2454,7 @@ describe ConversationsController, type: :request do
                       { controller: "conversations", action: "deleted_index", format: "json",
                         user_id: @bob.id })
 
-      expect(json.count).to eql 1
+      expect(json.count).to be 1
       expect(json[0]).to include(
         "attachments",
         "body",
@@ -2488,7 +2488,7 @@ describe ConversationsController, type: :request do
                       { controller: "conversations", action: "deleted_index", format: "json",
                         user_id: [@bob.id, @billy.id] })
 
-      expect(json.count).to eql 2
+      expect(json.count).to be 2
     end
 
     it "will only get the provided conversation id" do
@@ -2496,29 +2496,29 @@ describe ConversationsController, type: :request do
                       { controller: "conversations", action: "deleted_index", format: "json",
                         user_id: [@bob.id, @billy.id], conversation_id: @c1.conversation_id })
 
-      expect(json.count).to eql 1
+      expect(json.count).to be 1
     end
 
     it "can filter based on the deletion date" do
       json = api_call(:get, "/api/v1/conversations/deleted",
                       { controller: "conversations", action: "deleted_index", format: "json",
                         user_id: @bob.id, deleted_before: 1.hour.from_now })
-      expect(json.count).to eql 1
+      expect(json.count).to be 1
 
       json = api_call(:get, "/api/v1/conversations/deleted",
                       { controller: "conversations", action: "deleted_index", format: "json",
                         user_id: @bob.id, deleted_before: 1.hour.ago })
-      expect(json.count).to eql 0
+      expect(json.count).to be 0
 
       json = api_call(:get, "/api/v1/conversations/deleted",
                       { controller: "conversations", action: "deleted_index", format: "json",
                         user_id: @bob.id, deleted_after: 1.hour.ago })
-      expect(json.count).to eql 1
+      expect(json.count).to be 1
 
       json = api_call(:get, "/api/v1/conversations/deleted",
                       { controller: "conversations", action: "deleted_index", format: "json",
                         user_id: @bob.id, deleted_after: 1.hour.from_now })
-      expect(json.count).to eql 0
+      expect(json.count).to be 0
     end
   end
 
@@ -2544,7 +2544,7 @@ describe ConversationsController, type: :request do
                    { controller: "conversations", action: "restore_message", format: "json",
                      user_id: @bob.id, conversation_id: @c1.conversation_id })
 
-      expect(response.status).to eql 400
+      expect(response).to have_http_status :bad_request
     end
 
     it "returns an error when the user_id is not provided" do
@@ -2554,7 +2554,7 @@ describe ConversationsController, type: :request do
                    { controller: "conversations", action: "restore_message", format: "json",
                      conversation_id: @c1.conversation_id, conversation_message_id: message.id })
 
-      expect(response.status).to eql 400
+      expect(response).to have_http_status :bad_request
     end
 
     it "returns an error when the conversation_id is not provided" do
@@ -2564,7 +2564,7 @@ describe ConversationsController, type: :request do
                    { controller: "conversations", action: "restore_message", format: "json",
                      user_id: @bob.id, conversation_message_id: message.id })
 
-      expect(response.status).to eql 400
+      expect(response).to have_http_status :bad_request
     end
 
     it "restores the message" do
@@ -2574,16 +2574,16 @@ describe ConversationsController, type: :request do
                { controller: "conversations", action: "restore_message", format: "json",
                  user_id: @bob.id, message_id: message.id, conversation_id: @c1.conversation_id })
 
-      expect(response.status).to eql 200
+      expect(response).to have_http_status :ok
 
       cmp = ConversationMessageParticipant.where(user_id: @bob.id).where(conversation_message_id: message.id).first
       expect(cmp.workflow_state).to eql "active"
-      expect(cmp.deleted_at).to eql nil
+      expect(cmp.deleted_at).to be_nil
     end
 
     it "updates the message count and last_message_at on the conversation" do
-      expect(@c1.message_count).to eql 0
-      expect(@c1.last_message_at).to eql nil
+      expect(@c1.message_count).to be 0
+      expect(@c1.last_message_at).to be_nil
 
       message = @c1.all_messages.first
 
@@ -2591,10 +2591,10 @@ describe ConversationsController, type: :request do
                { controller: "conversations", action: "restore_message", format: "json",
                  user_id: @bob.id, message_id: message.id, conversation_id: @c1.conversation_id })
 
-      expect(response.status).to eql 200
+      expect(response).to have_http_status :ok
 
       @c1.reload
-      expect(@c1.message_count).to eql 1
+      expect(@c1.message_count).to be 1
       expect(@c1.last_message_at).to eql message.created_at
     end
   end

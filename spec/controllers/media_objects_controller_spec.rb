@@ -98,7 +98,7 @@ describe MediaObjectsController do
         user_session(@student)
         @attachment.update(content_type: "video", media_entry_id: "maybe")
 
-        expect(@attachment.grants_right?(@student, :read)).to eql(true)
+        expect(@attachment.grants_right?(@student, :read)).to be(true)
 
         MediaObject.create!(user_id: @teacher, media_id: "maybe")
         get "show", params: { attachment_id: @attachment.id }
@@ -110,7 +110,7 @@ describe MediaObjectsController do
         user_session(@user)
         @attachment.update(content_type: "video", media_entry_id: "maybe")
 
-        expect(@attachment.grants_right?(@user, :read)).to eql(false)
+        expect(@attachment.grants_right?(@user, :read)).to be(false)
 
         MediaObject.create!(user_id: @teacher, media_id: "maybe")
         get "show", params: { attachment_id: @attachment.id }
@@ -709,7 +709,7 @@ describe MediaObjectsController do
         user_session(@teacher)
         @attachment.update(content_type: "video", media_entry_id: "maybe")
 
-        expect(@attachment.grants_right?(@teacher, :update)).to eql(true)
+        expect(@attachment.grants_right?(@teacher, :update)).to be(true)
 
         MediaObject.create!(user_id: @teacher, media_id: "maybe")
         put "update_media_object", params: { attachment_id: @attachment.id, user_entered_title: "new title" }
@@ -721,7 +721,7 @@ describe MediaObjectsController do
         user_session(@user)
         @attachment.update(content_type: "video", media_entry_id: "maybe")
 
-        expect(@attachment.grants_right?(@user, :update)).to eql(false)
+        expect(@attachment.grants_right?(@user, :update)).to be(false)
 
         MediaObject.create!(user_id: @teacher, media_id: "maybe")
         put "update_media_object", params: { attachment_id: @attachment.id, user_entered_title: "new title" }

@@ -40,7 +40,7 @@ describe "Pace Contexts API" do
     context "when the course type is specified" do
       it "returns an array containing only the course" do
         get api_v1_pace_contexts_path(course.id), params: { type: "course", format: :json }
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         json = JSON.parse(response.body)
         expect(json["pace_contexts"].length).to eq 1
 
@@ -63,16 +63,16 @@ describe "Pace Contexts API" do
 
         it "returns nil for the applied_pace" do
           get api_v1_pace_contexts_path(course.id), params: { type: "course", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
-          expect(json["pace_contexts"][0]["applied_pace"]).to eq nil
+          expect(json["pace_contexts"][0]["applied_pace"]).to be_nil
         end
       end
 
       it "successfully calls the pace_context api when granular perms on" do
         Account.root_accounts.first.enable_feature!(:granular_permissions_manage_course_content)
         get api_v1_pace_contexts_path(course.id), params: { type: "course", format: :json }
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
       end
     end
 
@@ -81,7 +81,7 @@ describe "Pace Contexts API" do
 
       it "returns an array containing the sections" do
         get api_v1_pace_contexts_path(course.id), params: { type: "section", format: :json }
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         json = JSON.parse(response.body)
         course.course_sections.each do |section|
           context_json = json["pace_contexts"].detect { |pc| pc["item_id"] == section.id }
@@ -92,13 +92,13 @@ describe "Pace Contexts API" do
 
       it "paginates results" do
         get api_v1_pace_contexts_path(course.id), params: { type: "section", per_page: 1, format: :json }
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         json = JSON.parse(response.body)
         expect(json["pace_contexts"].count).to eq 1
         expect(json["pace_contexts"][0]["item_id"]).to eq course.default_section.id
 
         get api_v1_pace_contexts_path(course.id), params: { type: "section", per_page: 1, page: 2, format: :json }
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         json = JSON.parse(response.body)
         expect(json["pace_contexts"].count).to eq 1
         expect(json["pace_contexts"][0]["item_id"]).to eq section_one.id
@@ -109,7 +109,7 @@ describe "Pace Contexts API" do
 
         it "specifies the correct applied_pace" do
           get api_v1_pace_contexts_path(course.id), params: { type: "section", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           course.course_sections.each do |section|
             context_json = json["pace_contexts"].detect { |pc| pc["item_id"] == section.id }
@@ -124,7 +124,7 @@ describe "Pace Contexts API" do
 
         it "returns nil for the applied_pace" do
           get api_v1_pace_contexts_path(course.id), params: { type: "section", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].map { |pc| pc["applied_pace"] }).to match_array [nil, nil]
         end
@@ -139,7 +139,7 @@ describe "Pace Contexts API" do
 
       it "returns an array containing the student enrollments" do
         get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", format: :json }
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         json = JSON.parse(response.body)
         course.student_enrollments.each do |se|
           context_json = json["pace_contexts"].detect { |pc| pc["item_id"] == se.id }
@@ -150,13 +150,13 @@ describe "Pace Contexts API" do
 
       it "paginates results" do
         get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", per_page: 1, format: :json }
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         json = JSON.parse(response.body)
         expect(json["pace_contexts"].count).to eq 1
         expect(json["pace_contexts"][0]["item_id"]).to eq enrollment.id
 
         get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", per_page: 1, page: 2, format: :json }
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         json = JSON.parse(response.body)
         expect(json["pace_contexts"].count).to eq 1
         expect(json["pace_contexts"][0]["item_id"]).to eq enrollment_two.id
@@ -175,7 +175,7 @@ describe "Pace Contexts API" do
 
         it "returns only the newest enrollment for each student" do
           get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].length).to eq 2
           [enrollment, enrollment_two].each do |e|
@@ -196,7 +196,7 @@ describe "Pace Contexts API" do
 
         it "specifies the correct applied_pace" do
           get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           context_json = json["pace_contexts"].detect { |pc| pc["item_id"] == enrollment.id }
           expect(context_json["applied_pace"]["type"]).to eq "StudentEnrollment"
@@ -211,7 +211,7 @@ describe "Pace Contexts API" do
 
         it "returns nil for the applied_pace" do
           get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].map { |pc| pc["applied_pace"] }).to match_array [nil, nil]
         end
@@ -221,14 +221,14 @@ describe "Pace Contexts API" do
     context "when an invalid type is specified" do
       it "returns a 400" do
         get api_v1_pace_contexts_path(course.id), params: { type: "foobar", format: :json }
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
       end
     end
 
     context "when no type is specified" do
       it "returns a 400" do
         get api_v1_pace_contexts_path(course.id), params: { format: :json }
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
       end
     end
 
@@ -237,7 +237,7 @@ describe "Pace Contexts API" do
 
       it "returns a 401" do
         get api_v1_pace_contexts_path(course.id), params: { format: :json }
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
     end
 
@@ -248,14 +248,14 @@ describe "Pace Contexts API" do
 
       it "returns a 404" do
         get api_v1_pace_contexts_path(course.id), params: { format: :json }
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 
     context "when the specified course does not exist" do
       it "returns a 404" do
         get api_v1_pace_contexts_path(Course.maximum(:id).next), params: { format: :json }
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 
@@ -264,7 +264,7 @@ describe "Pace Contexts API" do
 
       it "returns a 404" do
         get api_v1_pace_contexts_path(course.id), params: { format: :json }
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 
@@ -277,21 +277,21 @@ describe "Pace Contexts API" do
 
         it "orders the results in descending order with desc specified" do
           get api_v1_pace_contexts_path(course.id), params: { type: "section", order: "desc", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("item_id")).to eq [section_three.id, section_two.id, section_one.id, default_section.id]
         end
 
         it "orders the results in ascending order with asc specified" do
           get api_v1_pace_contexts_path(course.id), params: { type: "section", order: "asc", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("item_id")).to eq [default_section.id, section_one.id, section_two.id, section_three.id]
         end
 
         it "orders the results in ascending order by default" do
           get api_v1_pace_contexts_path(course.id), params: { type: "section", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("item_id")).to eq [default_section.id, section_one.id, section_two.id, section_three.id]
         end
@@ -303,21 +303,21 @@ describe "Pace Contexts API" do
 
         it "orders the results in descending order with desc specified" do
           get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", order: "desc", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("item_id")).to eq [second_student_enrollment.id, first_student_enrollment.id]
         end
 
         it "orders the results in ascending order with asc specified" do
           get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", order: "asc", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("item_id")).to eq [first_student_enrollment.id, second_student_enrollment.id]
         end
 
         it "orders the results in ascending order by default" do
           get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("item_id")).to eq [first_student_enrollment.id, second_student_enrollment.id]
         end
@@ -334,14 +334,14 @@ describe "Pace Contexts API" do
 
         it "sorts by the section name" do
           get api_v1_pace_contexts_path(course.id), params: { type: "section", sort: "name", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("name")).to eq ["Section A", "Section B", "Section C", "Unnamed Course"]
         end
 
         it "sorts by the section name and respects descending order" do
           get api_v1_pace_contexts_path(course.id), params: { type: "section", sort: "name", order: "desc", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("name")).to eq ["Unnamed Course", "Section C", "Section B", "Section A"]
         end
@@ -357,14 +357,14 @@ describe "Pace Contexts API" do
 
         it "sorts by the sortable user name" do
           get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", sort: "name", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("name")).to eq ["Foo Bar", "Bar Foo"]
         end
 
         it "sorts by the sortable user name and respects descending order" do
           get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", sort: "name", order: "desc", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("name")).to eq ["Bar Foo", "Foo Bar"]
         end
@@ -381,7 +381,7 @@ describe "Pace Contexts API" do
 
         it "filters by the section name" do
           get api_v1_pace_contexts_path(course.id), params: { type: "section", search_term: "a", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("name")).to eq ["Unnamed Course", "Section A"]
         end
@@ -397,7 +397,7 @@ describe "Pace Contexts API" do
 
         it "filters by the user name" do
           get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", search_term: "bAr", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("name")).to eq ["Student Bar"]
         end
@@ -414,7 +414,7 @@ describe "Pace Contexts API" do
 
         it "filters by context ids" do
           get api_v1_pace_contexts_path(course.id), params: { type: "section", contexts: "[#{@section_a.id}, #{@section_c.id}]", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
 
           expect(json["pace_contexts"].count).to eq 2
@@ -434,7 +434,7 @@ describe "Pace Contexts API" do
 
         it "filters by context ids" do
           get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", contexts: "[#{@student_1_enrollment.id}, #{@student_3_enrollment.id}]", format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
 
           expect(json["pace_contexts"].count).to eq 2

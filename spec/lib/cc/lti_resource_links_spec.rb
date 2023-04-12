@@ -118,7 +118,7 @@ describe CC::LtiResourceLinks do
       let(:resource_link_url) { nil }
 
       it "does not include the resource_link_url property" do
-        expect(find_extension(subject, "resource_link_url")).to eq nil
+        expect(find_extension(subject, "resource_link_url")).to be_nil
       end
     end
 

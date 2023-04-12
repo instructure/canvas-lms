@@ -379,7 +379,7 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
         equation_editor_done_button.click
         save_button.click
         wait_for_ajaximations
-        expect(math_rendering_exists?).to eq true
+        expect(math_rendering_exists?).to be true
       end
 
       it "renders inline LaTeX in the equation editor" do
@@ -418,7 +418,7 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
         @assignment = @course.assignments.create!(name: title)
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/"
         wait_for_ajaximations
-        expect(mathjax_element_exists_in_title?).to eq true
+        expect(mathjax_element_exists_in_title?).to be true
       end
 
       it "renders math equations for inline math with $$" do
@@ -426,7 +426,7 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
         @assignment = @course.assignments.create!(name: title)
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/"
         wait_for_ajaximations
-        expect(mathjax_element_exists_in_title?).to eq true
+        expect(mathjax_element_exists_in_title?).to be true
       end
     end
 

@@ -202,7 +202,7 @@ describe "AuthenticationAudit API", type: :request do
       end
 
       it "is formatted as an array of page_view objects" do
-        expect(@json.size).to eql(1)
+        expect(@json.size).to be(1)
       end
     end
   end

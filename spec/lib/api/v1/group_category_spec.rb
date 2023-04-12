@@ -67,20 +67,20 @@ describe "Api::V1::GroupCategory" do
       it "sets protected with the category value" do
         allow(category).to receive_messages(protected?: true)
         json = CategoryHarness.new.group_category_json(category, nil, nil)
-        expect(json["protected"]).to eq(true)
+        expect(json["protected"]).to be(true)
       end
 
       it 'passes through "allows_multiple_memberships"' do
         allow(category).to receive_messages(allows_multiple_memberships?: false)
         json = CategoryHarness.new.group_category_json(category, nil, nil)
-        expect(json["allows_multiple_memberships"]).to eq(false)
+        expect(json["allows_multiple_memberships"]).to be(false)
       end
 
       it 'checks the user against the category to set "is_member"' do
         user = User.new
         expect(category).to receive(:is_member?).with(user).and_return(true)
         json = CategoryHarness.new.group_category_json(category, user, nil)
-        expect(json["is_member"]).to eq(true)
+        expect(json["is_member"]).to be(true)
       end
     end
 

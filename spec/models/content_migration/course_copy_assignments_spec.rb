@@ -210,7 +210,7 @@ describe ContentMigration do
           expect(@assignment[attr]).to eq new_assignment[attr]
         end
       end
-      expect(new_assignment.muted).to eq true
+      expect(new_assignment.muted).to be true
       expect(new_assignment.only_visible_to_overrides).to be_falsey
     end
 
@@ -316,7 +316,7 @@ describe ContentMigration do
 
       new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       [:moderated_grading, :anonymous_grading].each do |attr|
-        expect(new_assignment.send(attr)).to eq false
+        expect(new_assignment.send(attr)).to be false
       end
 
       @copy_to.enable_feature!(:moderated_grading)
@@ -695,7 +695,7 @@ describe ContentMigration do
 
         run_course_copy(["Couldn't find account grading standard for the course."])
 
-        expect(@copy_to.grading_standard).to eq nil
+        expect(@copy_to.grading_standard).to be_nil
       end
 
       it "does not copy deleted grading standards" do
@@ -726,7 +726,7 @@ describe ContentMigration do
         @cm.copy_options = { "everything" => "0", "all_course_settings" => "1" }
         @cm.save!
         run_course_copy
-        expect(@copy_to.grading_standards.count).to eql 1 # no dupes
+        expect(@copy_to.grading_standards.count).to be 1 # no dupes
         expect(@copy_to.grading_standard.title).to eql gs.title
       end
 
@@ -749,7 +749,7 @@ describe ContentMigration do
         @cm.save!
         run_export_and_import
         expect(@cm.warnings).to be_empty
-        expect(@copy_to.grading_standards.count).to eql 1 # no dupes
+        expect(@copy_to.grading_standards.count).to be 1 # no dupes
         expect(@copy_to.grading_standard.title).to eql gs.title
       end
 
@@ -784,7 +784,7 @@ describe ContentMigration do
         run_export_and_import do |export|
           export.selected_content = { "assignments" => { mig_id(assign) => "1" } }
         end
-        expect(@copy_to.assignments.count).to eql 1
+        expect(@copy_to.assignments.count).to be 1
         expect(@copy_to.assignments.first.grading_standard).to be_nil
         expect(unrelated_grading_standard.reload.title).not_to eql gs.title
       end
@@ -838,8 +838,8 @@ describe ContentMigration do
         to_override = @copy_to.assignments.first.assignment_overrides.first
         expect(to_override.title).to eq "Tag 1"
         expect(to_override.due_at).to eq due_at
-        expect(to_override.due_at_overridden).to eq true
-        expect(to_override.unlock_at_overridden).to eq false
+        expect(to_override.due_at_overridden).to be true
+        expect(to_override.unlock_at_overridden).to be false
       end
 
       it "preserves only_visible_to_overrides for page assignments" do
@@ -852,9 +852,9 @@ describe ContentMigration do
         a2.build_wiki_page(title: a2.title, context: a2.context).save!
         run_course_copy
         a1_to = @copy_to.assignments.where(migration_id: mig_id(a1)).take
-        expect(a1_to.only_visible_to_overrides).to eq true
+        expect(a1_to.only_visible_to_overrides).to be true
         a2_to = @copy_to.assignments.where(migration_id: mig_id(a2)).take
-        expect(a2_to.only_visible_to_overrides).to eq false
+        expect(a2_to.only_visible_to_overrides).to be false
       end
 
       it "ignores page assignments if mastery paths is not enabled in destination" do
@@ -862,8 +862,8 @@ describe ContentMigration do
         a1.build_wiki_page(title: a1.title, context: a1.context).save!
         run_course_copy
         page_to = @copy_to.wiki_pages.where(migration_id: mig_id(a1.wiki_page)).take
-        expect(page_to.assignment).to eq nil
-        expect(@copy_to.assignments.where(migration_id: mig_id(a1)).exists?).to eq false
+        expect(page_to.assignment).to be_nil
+        expect(@copy_to.assignments.where(migration_id: mig_id(a1)).exists?).to be false
       end
     end
 
@@ -1052,7 +1052,7 @@ describe ContentMigration do
         run_course_copy(["The Sync to SIS setting could not be enabled for the assignment \"#{@assignment.title}\" without a due date."])
 
         a_to = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
-        expect(a_to.post_to_sis).to eq false
+        expect(a_to.post_to_sis).to be false
         expect(a_to).to be_valid
       end
 
@@ -1068,7 +1068,7 @@ describe ContentMigration do
 
         topic_to = @copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first
         expect(topic_to).to be_valid
-        expect(topic_to.assignment.post_to_sis).to eq false
+        expect(topic_to.assignment.post_to_sis).to be false
       end
 
       it "is able to copy post_to_sis" do
@@ -1080,7 +1080,7 @@ describe ContentMigration do
         run_course_copy
 
         a_to = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
-        expect(a_to.post_to_sis).to eq true
+        expect(a_to.post_to_sis).to be true
         expect(a_to).to be_valid
       end
     end

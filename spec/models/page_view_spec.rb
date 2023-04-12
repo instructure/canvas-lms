@@ -158,7 +158,7 @@ describe PageView do
         user.pseudonyms.create!(account: other_root, unique_id: "bob")
         expect(user.associated_accounts).to be_include(other_root)
         viewer4 = account_admin_user(account: other_root)
-        expect(user.grants_right?(viewer4, :view_statistics)).to eq true
+        expect(user.grants_right?(viewer4, :view_statistics)).to be true
 
         expect(user.page_views(viewer: viewer1).paginate(per_page: 2)).to eq []
         expect(user.page_views(viewer: viewer2).paginate(per_page: 2)).to eq [@page_view]
@@ -418,7 +418,7 @@ describe PageView do
       end
 
       it "returns nothing with unknown request id" do
-        expect(PageView.find_all_by_id(["unknown", "unknown"]).size).to eql(0)
+        expect(PageView.find_all_by_id(["unknown", "unknown"]).size).to be(0)
       end
     end
 
@@ -433,7 +433,7 @@ describe PageView do
       end
 
       it "returns nothing with unknown request id" do
-        expect(PageView.find_all_by_id(["unknown", "unknown"]).size).to eql(0)
+        expect(PageView.find_all_by_id(["unknown", "unknown"]).size).to be(0)
       end
     end
   end
@@ -601,7 +601,7 @@ describe PageView do
     it "do_update still updates fields" do
       pv = PageView.new
       pv.do_update("interaction_seconds" => 5)
-      expect(pv.is_update).to eq true
+      expect(pv.is_update).to be true
       expect(pv.interaction_seconds).to eq 5
     end
 

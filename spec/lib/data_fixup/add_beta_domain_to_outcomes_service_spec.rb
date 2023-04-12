@@ -23,9 +23,9 @@ describe DataFixup::AddBetaDomainToOutcomesService do
   end
 
   it "does not set beta_domain in settings of a non-provisioned account" do
-    expect(@account.settings[:provision]).to eq(nil)
+    expect(@account.settings[:provision]).to be_nil
     DataFixup::AddBetaDomainToOutcomesService.run
-    expect(Account.find(@account.id).settings[:provision]).to eq(nil)
+    expect(Account.find(@account.id).settings[:provision]).to be_nil
   end
 
   describe "provisioned accounts" do
@@ -37,7 +37,7 @@ describe DataFixup::AddBetaDomainToOutcomesService do
       } }
       @account.save!
       allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
-      expect(@account.settings[:provision]["outcomes"][:beta_domain]).to eq(nil)
+      expect(@account.settings[:provision]["outcomes"][:beta_domain]).to be_nil
       DataFixup::AddBetaDomainToOutcomesService.run
       expect(Account.find(@account.id).settings[:provision]["outcomes"][:beta_domain]).to eq("test.outcomes-iad-beta.instructure.com")
     end
@@ -50,7 +50,7 @@ describe DataFixup::AddBetaDomainToOutcomesService do
       } }
       @account.save!
       allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
-      expect(@account.settings[:provision]["outcomes"][:beta_domain]).to eq(nil)
+      expect(@account.settings[:provision]["outcomes"][:beta_domain]).to be_nil
       DataFixup::AddBetaDomainToOutcomesService.run
       expect(Account.find(@account.id).settings[:provision]["outcomes"][:beta_domain]).to eq("test-prod.instructure.com.outcomes-iad-beta.instructure.com")
     end
@@ -59,9 +59,9 @@ describe DataFixup::AddBetaDomainToOutcomesService do
       @account.settings[:provision] = {}
       @account.save!
       allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
-      expect(@account.settings[:provision]["outcomes"]).to eq(nil)
+      expect(@account.settings[:provision]["outcomes"]).to be_nil
       DataFixup::AddBetaDomainToOutcomesService.run
-      expect(Account.find(@account.id).settings[:provision]["outcomes"]).to eq(nil)
+      expect(Account.find(@account.id).settings[:provision]["outcomes"]).to be_nil
     end
   end
 end

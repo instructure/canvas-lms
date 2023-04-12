@@ -194,7 +194,7 @@ RSpec.describe Mutations::CreateConversation do
 
     result = run_mutation(recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string)
 
-    expect(result.dig("data", "createConversation", "conversations")).to be nil
+    expect(result.dig("data", "createConversation", "conversations")).to be_nil
     expect(
       result.dig("data", "createConversation", "errors", 0, "message")
     ).to eq "Unable to send messages to users in #{@course.name}"
@@ -206,7 +206,7 @@ RSpec.describe Mutations::CreateConversation do
 
     result = run_mutation({ recipients: [teacher2.id.to_s], body: "yo", context_code: @course.asset_string }, @teacher)
 
-    expect(result.dig("data", "createConversation", "conversations")).to be nil
+    expect(result.dig("data", "createConversation", "conversations")).to be_nil
     expect(
       result.dig("data", "createConversation", "errors", 0, "message")
     ).to eq "Unable to send messages to users in #{@course.name}"
@@ -217,7 +217,7 @@ RSpec.describe Mutations::CreateConversation do
     @course.save
     result = run_mutation(recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string)
 
-    expect(result.dig("data", "createConversation", "conversations")).to be nil
+    expect(result.dig("data", "createConversation", "conversations")).to be_nil
     expect(
       result.dig("data", "createConversation", "errors", 0, "message")
     ).to eq "Course concluded, unable to send messages"
@@ -229,7 +229,7 @@ RSpec.describe Mutations::CreateConversation do
     @course.save
     result = run_mutation({ recipients: [teacher2.id.to_s], body: "yo", context_code: @course.asset_string }, @teacher)
 
-    expect(result.dig("data", "createConversation", "conversations")).to be nil
+    expect(result.dig("data", "createConversation", "conversations")).to be_nil
     expect(
       result.dig("data", "createConversation", "errors", 0, "message")
     ).to eq "Course concluded, unable to send messages"
@@ -389,7 +389,7 @@ RSpec.describe Mutations::CreateConversation do
       @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
       result = run_mutation(recipients: [@new_user2.id.to_s], body: "ooo eee", group_conversation: true, context_code: @course.asset_string)
 
-      expect(result.dig("data", "createConversation", "conversations")).to be nil
+      expect(result.dig("data", "createConversation", "conversations")).to be_nil
       expect(
         result.dig("data", "createConversation", "errors", 0, "message")
       ).to eql "Invalid recipients"
@@ -419,7 +419,7 @@ RSpec.describe Mutations::CreateConversation do
     it "fails for normal users" do
       result = run_mutation(recipients: [User.create.id.to_s], body: "foo")
 
-      expect(result.dig("data", "createConversation", "conversations")).to be nil
+      expect(result.dig("data", "createConversation", "conversations")).to be_nil
       expect(
         result.dig("data", "createConversation", "errors", 0, "message")
       ).to eql "Invalid recipients"

@@ -120,7 +120,7 @@ describe "Developer Keys" do
       fj("table[data-automation='devKeyAdminTable'] tbody tr button:has(svg[name='IconTrash'])").click
       accept_alert
       wait_for_ajaximations
-      expect(element_exists?("table[data-automation='devKeyAdminTable'] tbody tr")).to eq(false)
+      expect(element_exists?("table[data-automation='devKeyAdminTable'] tbody tr")).to be(false)
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
     end
 
@@ -148,7 +148,7 @@ describe "Developer Keys" do
       site_admin_logged_in
       get "/accounts/site_admin/developer_keys"
       expect(f("table[data-automation='devKeyAdminTable'] tbody tr")).to contain_css("svg[name='IconOff']")
-      expect(site_admin_developer_key.reload.visible).to eq false
+      expect(site_admin_developer_key.reload.visible).to be false
     end
 
     it "renders the key visible" do
@@ -157,7 +157,7 @@ describe "Developer Keys" do
       get "/accounts/site_admin/developer_keys"
       fj("table[data-automation='devKeyAdminTable'] button:has(svg[name='IconOff'])").click
       expect(f("table[data-automation='devKeyAdminTable'] tr")).not_to contain_css("svg[name='IconOff']")
-      expect(site_admin_developer_key.reload.visible).to eq true
+      expect(site_admin_developer_key.reload.visible).to be true
     end
 
     context "Account Binding" do
@@ -323,7 +323,7 @@ describe "Developer Keys" do
         expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconCheck']")
         find_button("Save").click
         wait_for_ajaximations
-        expect(DeveloperKey.last.require_scopes).to eq true
+        expect(DeveloperKey.last.require_scopes).to be true
       end
 
       it "allows filtering by scope group name" do
@@ -403,16 +403,16 @@ describe "Developer Keys" do
         find_button("Save").click
         wait_for_dev_key_modal_to_close
         click_edit_icon
-        expect(all_endpoints_readonly_checkbox_selected?).to eq true
+        expect(all_endpoints_readonly_checkbox_selected?).to be true
       end
 
       it "keeps all endpoints read only checkbox checked if check/unchecking another http method" do
         expand_scope_group_by_filter("Assignment Groups", Account.default.id)
         click_select_all_readonly_checkbox
         click_scope_checkbox
-        expect(f("[data-automation='toggle-scope-group'] input[type='checkbox']").selected?).to eq false
+        expect(f("[data-automation='toggle-scope-group'] input[type='checkbox']").selected?).to be false
         click_scope_checkbox
-        expect(all_endpoints_readonly_checkbox_selected?).to eq true
+        expect(all_endpoints_readonly_checkbox_selected?).to be true
       end
 
       it "opens the developer key modal when open modal anchor is present" do

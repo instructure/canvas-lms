@@ -262,7 +262,7 @@ describe "Screenreader Gradebook grading" do
       SRGB.select_assignment(assignment)
 
       expect(SRGB.grading_enabled?).to be false
-      expect(Submission.not_placeholder.where(assignment_id: assignment.id, user_id: @student.id).first).to eq nil
+      expect(Submission.not_placeholder.where(assignment_id: assignment.id, user_id: @student.id).first).to be_nil
     end
   end
 

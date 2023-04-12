@@ -88,13 +88,13 @@ describe LtiOutbound::LTIUser do
     it "returns true when current roles includes observer role" do
       subject.current_roles = [learner_role, observer_role]
 
-      expect(subject.observer?).to eq true
+      expect(subject.observer?).to be true
     end
 
     it "returns false when current roles do not include observer role" do
       subject.current_roles = [teacher_role]
 
-      expect(subject.observer?).to eq false
+      expect(subject.observer?).to be false
     end
   end
 
@@ -102,13 +102,13 @@ describe LtiOutbound::LTIUser do
     it "returns true when current roles includes learner role" do
       subject.current_roles = [teacher_role, learner_role]
 
-      expect(subject.learner?).to eq true
+      expect(subject.learner?).to be true
     end
 
     it "returns false when current roles do not include learner role" do
       subject.current_roles = [teacher_role]
 
-      expect(subject.learner?).to eq false
+      expect(subject.learner?).to be false
     end
   end
 
@@ -125,7 +125,7 @@ describe LtiOutbound::LTIUser do
 
     it "returns nil if currently_active_in_course is nil" do
       subject.currently_active_in_course = nil
-      expect(subject.enrollment_state).to eq nil
+      expect(subject.enrollment_state).to be_nil
     end
   end
 end

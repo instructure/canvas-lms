@@ -110,11 +110,11 @@ describe Types::MutationLogType do
              .dig("data", "auditLogs", "mutationLogs")
 
     cursor = result.dig("pageInfo", "endCursor")
-    expect(result.dig("pageInfo", "hasNextPage")).to eq true
+    expect(result.dig("pageInfo", "hasNextPage")).to be true
 
     result = audit_log_query({ assetString: @asset_string, after: cursor }, current_user: @admin)
              .dig("data", "auditLogs", "mutationLogs")
-    expect(result.dig("pageInfo", "hasNextPage")).to eq false
+    expect(result.dig("pageInfo", "hasNextPage")).to be false
     expect(result["nodes"].size).to eq 1
   end
 

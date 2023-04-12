@@ -102,7 +102,7 @@ describe Quizzes::QuizzesController do
 
       get "index", params: { course_id: @course.id }
 
-      expect(controller.js_env[:QUIZZES][:assignment].length).to eql 1
+      expect(controller.js_env[:QUIZZES][:assignment].length).to be 1
       controller.js_env[:QUIZZES][:assignment].map do |quiz|
         expect(quiz[:published]).to be_truthy
       end
@@ -121,14 +121,14 @@ describe Quizzes::QuizzesController do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(true)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(true)
+      expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to be(true)
     end
 
     it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is false when AssignmentUtil.sis_integration_settings_enabled? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(false)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(false)
+      expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to be(false)
     end
 
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
@@ -215,7 +215,7 @@ describe Quizzes::QuizzesController do
       @course.root_account.save!
       @course.enable_feature!(:quizzes_next)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:migrate_quiz_enabled]).to eq(false)
+      expect(assigns[:js_env][:FLAGS][:migrate_quiz_enabled]).to be(false)
     end
 
     it "js_env migrate_quiz_enabled is true when quizzes_next is enabled and quiz LTI apps present" do
@@ -230,35 +230,35 @@ describe Quizzes::QuizzesController do
                                             shared_secret: "secret",
                                             tool_id: "Quizzes 2")
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:migrate_quiz_enabled]).to eq(true)
+      expect(assigns[:js_env][:FLAGS][:migrate_quiz_enabled]).to be(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     context "DIRECT_SHARE_ENABLED" do
@@ -269,7 +269,7 @@ describe Quizzes::QuizzesController do
       it "js_env DIRECT_SHARE_ENABLED is true when user can manage" do
         user_session(@teacher)
         get "index", params: { course_id: @course.id }
-        expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to eq(true)
+        expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to be(true)
       end
 
       describe "with manage_content permission disabled" do
@@ -280,7 +280,7 @@ describe Quizzes::QuizzesController do
         it "js_env DIRECT_SHARE_ENABLED is false if the course is active" do
           user_session(@teacher)
           get "index", params: { course_id: @course.id }
-          expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to eq(false)
+          expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to be(false)
         end
 
         describe "when the course is concluded" do
@@ -292,14 +292,14 @@ describe Quizzes::QuizzesController do
             user_session(@teacher)
 
             get "index", params: { course_id: @course.id }
-            expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to eq(true)
+            expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to be(true)
           end
 
           it "js_env DIRECT_SHARE_ENABLED is false when user can't manage" do
             user_session(@student)
 
             get "index", params: { course_id: @course.id }
-            expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to eq(false)
+            expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to be(false)
           end
         end
       end
@@ -378,7 +378,7 @@ describe Quizzes::QuizzesController do
             expect(controller.js_env[:QUIZZES][:options].count).to eq(4)
 
             controller.js_env[:QUIZZES][:options].each do |_, assignment_options|
-              expect(assignment_options[:can_unpublish]).to eq true
+              expect(assignment_options[:can_unpublish]).to be true
             end
           end
 
@@ -393,7 +393,7 @@ describe Quizzes::QuizzesController do
             expect(controller.js_env[:QUIZZES][:options].count).to eq(4)
 
             controller.js_env[:QUIZZES][:options].each do |_, assignment_options|
-              expect(assignment_options[:can_unpublish]).to eq false
+              expect(assignment_options[:can_unpublish]).to be false
             end
           end
 
@@ -405,7 +405,7 @@ describe Quizzes::QuizzesController do
 
             controller.js_env[:QUIZZES][:assignment].select { |a| a[:quiz_type] == "quizzes.next" }
                       .each do |assignment|
-                        expect(assignment["is_master_course_master_content"]).to eq true
+                        expect(assignment["is_master_course_master_content"]).to be true
                       end
           end
         end
@@ -489,28 +489,28 @@ describe Quizzes::QuizzesController do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get "edit", params: { course_id: @course.id, id: @quiz.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get "edit", params: { course_id: @course.id, id: @quiz.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get "edit", params: { course_id: @course.id, id: @quiz.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get "edit", params: { course_id: @course.id, id: @quiz.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
@@ -536,7 +536,7 @@ describe Quizzes::QuizzesController do
         allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
         user_session(@teacher)
         get "edit", params: { course_id: @course.id, id: @quiz.id }
-        expect(assigns[:js_env][:dummy]).to be nil
+        expect(assigns[:js_env][:dummy]).to be_nil
       end
     end
   end
@@ -557,7 +557,7 @@ describe Quizzes::QuizzesController do
       expect(assigns[:quiz]).not_to be_nil
       expect(assigns[:quiz]).to eql(@quiz)
       expect(assigns[:question_count]).to eql(@quiz.question_count)
-      expect(assigns[:just_graded]).to eql(false)
+      expect(assigns[:just_graded]).to be(false)
       expect(assigns[:stored_params]).not_to be_nil
     end
 
@@ -578,14 +578,14 @@ describe Quizzes::QuizzesController do
       user_session @teacher
       get "show", params: { course_id: @course.id, id: @quiz.id }
       expect(assigns[:submitted_student_count]).to eq 2
-      expect(assigns[:any_submissions_pending_review]).to eq true
+      expect(assigns[:any_submissions_pending_review]).to be true
 
       controller.js_env.clear
 
       user_session @ta1
       get "show", params: { course_id: @course.id, id: @quiz.id }
       expect(assigns[:submitted_student_count]).to eq 1
-      expect(assigns[:any_submissions_pending_review]).to eq false
+      expect(assigns[:any_submissions_pending_review]).to be false
     end
 
     it "allows forcing authentication on public quiz pages" do
@@ -702,7 +702,7 @@ describe Quizzes::QuizzesController do
       get "show", params: { course_id: @course.id, id: @quiz.id }
 
       expect(response).to be_successful
-      expect(submission.reload.has_seen_results).to eq true
+      expect(submission.reload.has_seen_results).to be true
     end
 
     it "does not attempt to lock results if there is a settings only submission" do
@@ -880,7 +880,7 @@ describe Quizzes::QuizzesController do
 
         get "managed_quiz_data", params: { course_id: @course.id, quiz_id: @quiz.id }
 
-        expect(assigns[:submissions_from_users][@quiz_submission.user_id]).to eq nil
+        expect(assigns[:submissions_from_users][@quiz_submission.user_id]).to be_nil
         expect(assigns[:submitted_students]).to eq []
 
         create_section_override_for_quiz(@quiz, { course_section: @user1.enrollments.first.course_section })
@@ -1643,7 +1643,7 @@ describe Quizzes::QuizzesController do
         it "does not allow setting the due date in a closed grading period" do
           call_create(due_at: 3.days.ago.iso8601)
           assert_forbidden
-          expect(@course.quizzes.count).to eql 0
+          expect(@course.quizzes.count).to be 0
           json = JSON.parse(response.body)
           expect(json["errors"].keys).to include "due_at"
         end
@@ -1659,7 +1659,7 @@ describe Quizzes::QuizzesController do
         it "does not allow a nil due date when the last grading period is closed" do
           call_create(due_at: nil)
           assert_forbidden
-          expect(@course.quizzes.count).to eql 0
+          expect(@course.quizzes.count).to be 0
           json = JSON.parse(response.body)
           expect(json["errors"].keys).to include "due_at"
         end
@@ -1683,7 +1683,7 @@ describe Quizzes::QuizzesController do
           override_params = [{ due_at: 3.days.ago.iso8601, course_section_id: section_id }]
           call_create(due_at: 7.days.from_now.iso8601, assignment_overrides: override_params)
           assert_forbidden
-          expect(@course.quizzes.count).to eql 0
+          expect(@course.quizzes.count).to be 0
           json = JSON.parse(response.body)
           expect(json["errors"].keys).to include "due_at"
         end
@@ -1693,7 +1693,7 @@ describe Quizzes::QuizzesController do
           request.content_type = "application/json"
           call_create(due_at: 7.days.from_now.iso8601, assignment_overrides: override_params)
           assert_forbidden
-          expect(@course.quizzes.count).to eql 0
+          expect(@course.quizzes.count).to be 0
           json = JSON.parse(response.body)
           expect(json["errors"].keys).to include "due_at"
         end
@@ -1719,13 +1719,13 @@ describe Quizzes::QuizzesController do
 
         it "allows a nil due date when the last grading period is closed" do
           call_create(due_at: nil)
-          expect(@course.quizzes.last.due_at).to eq nil
+          expect(@course.quizzes.last.due_at).to be_nil
         end
 
         it "allows a nil override due date when the last grading period is closed" do
           override_params = [{ due_at: nil, course_section_id: section_id }]
           call_create(due_at: 7.days.from_now.iso8601, assignment_overrides: override_params)
-          expect(@course.quizzes.last.assignment_overrides.first.due_at).to eq nil
+          expect(@course.quizzes.last.assignment_overrides.first.due_at).to be_nil
         end
       end
     end
@@ -1757,7 +1757,7 @@ describe Quizzes::QuizzesController do
         }
       }
       expect(assigns[:quiz]).not_to be_nil
-      expect(assigns[:quiz].points_possible).to be nil
+      expect(assigns[:quiz].points_possible).to be_nil
       expect(response).to be_successful
     end
   end
@@ -1813,7 +1813,7 @@ describe Quizzes::QuizzesController do
         user_session(@teacher)
         course_quiz
         post "update", params: { course_id: @course.id, id: @quiz.id, quiz: { title: "some quiz" }, post_to_sis: "1" }
-        expect(assigns[:quiz].assignment.post_to_sis).to eq true
+        expect(assigns[:quiz].assignment.post_to_sis).to be true
       end
 
       it "doesn't blow up for surveys" do
@@ -1924,7 +1924,7 @@ describe Quizzes::QuizzesController do
     it "locks and unlock without removing assignment" do
       user_session(@teacher)
       a = @course.assignments.create!(title: "some assignment", points_possible: 5)
-      expect(a.points_possible).to eql(5.0)
+      expect(a.points_possible).to be(5.0)
       expect(a.submission_types).not_to eql("online_quiz")
       @quiz = @course.quizzes.build(assignment_id: a.id, title: "some quiz", points_possible: 10)
       @quiz.workflow_state = "available"
@@ -2305,19 +2305,19 @@ describe Quizzes::QuizzesController do
         it "allows disabling only_visible_to_overrides when due in an open grading period" do
           @quiz = create_quiz(due_at: 3.days.from_now, only_visible_to_overrides: true)
           call_update(only_visible_to_overrides: false)
-          expect(@quiz.reload.only_visible_to_overrides).to eql false
+          expect(@quiz.reload.only_visible_to_overrides).to be false
         end
 
         it "allows enabling only_visible_to_overrides when due in an open grading period" do
           @quiz = create_quiz(due_at: 3.days.from_now, only_visible_to_overrides: false)
           call_update(only_visible_to_overrides: true)
-          expect(@quiz.reload.only_visible_to_overrides).to eql true
+          expect(@quiz.reload.only_visible_to_overrides).to be true
         end
 
         it "does not allow disabling only_visible_to_overrides when due in a closed grading period" do
           @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: true)
           call_update(only_visible_to_overrides: false)
-          expect(@quiz.reload.only_visible_to_overrides).to eql true
+          expect(@quiz.reload.only_visible_to_overrides).to be true
           expect(response).to be_redirect
           expect(flash[:error]).to match(/due date/)
         end
@@ -2325,7 +2325,7 @@ describe Quizzes::QuizzesController do
         it "does not allow enabling only_visible_to_overrides when due in a closed grading period" do
           @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: false)
           call_update(only_visible_to_overrides: true)
-          expect(@quiz.reload.only_visible_to_overrides).to eql false
+          expect(@quiz.reload.only_visible_to_overrides).to be false
           expect(response).to be_redirect
           expect(flash[:error]).to match(/only visible to overrides/)
         end
@@ -2334,7 +2334,7 @@ describe Quizzes::QuizzesController do
           due_date = 3.days.from_now.iso8601
           @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: true)
           call_update(due_at: due_date, only_visible_to_overrides: false)
-          expect(@quiz.reload.only_visible_to_overrides).to eql false
+          expect(@quiz.reload.only_visible_to_overrides).to be false
           expect(@quiz.due_at).to eq due_date
         end
 
@@ -2482,13 +2482,13 @@ describe Quizzes::QuizzesController do
         it "does not allow disabling only_visible_to_overrides when due in a closed grading period" do
           @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: true)
           call_update(only_visible_to_overrides: false)
-          expect(@quiz.reload.only_visible_to_overrides).to eql false
+          expect(@quiz.reload.only_visible_to_overrides).to be false
         end
 
         it "does not allow enabling only_visible_to_overrides when due in a closed grading period" do
           @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: false)
           call_update(only_visible_to_overrides: true)
-          expect(@quiz.reload.only_visible_to_overrides).to eql true
+          expect(@quiz.reload.only_visible_to_overrides).to be true
         end
 
         it "allows changing the due date on a quiz due in a closed grading period" do
@@ -2508,7 +2508,7 @@ describe Quizzes::QuizzesController do
         it "allows unsetting the due date when the last grading period is closed" do
           @quiz = create_quiz(due_at: 3.days.from_now)
           call_update(due_at: nil)
-          expect(@quiz.reload.due_at).to eq nil
+          expect(@quiz.reload.due_at).to be_nil
         end
 
         it "allows changing the due date on a quiz with an override due in a closed grading period" do
@@ -2552,7 +2552,7 @@ describe Quizzes::QuizzesController do
           override = override_for_date(3.days.from_now)
           override_params = [{ id: override.id, due_at: nil }]
           call_update(assignment_overrides: override_params)
-          expect(override.reload.due_at).to eq nil
+          expect(override.reload.due_at).to be_nil
         end
 
         it "allows deleting by omission an override due in a closed grading period" do
@@ -2736,7 +2736,7 @@ describe Quizzes::QuizzesController do
       expect(response).to be_successful
 
       expect(response).to render_template("quizzes/submission_html")
-      expect(submission.reload.has_seen_results).to eq true
+      expect(submission.reload.has_seen_results).to be true
     end
   end
 
@@ -2893,12 +2893,12 @@ describe Quizzes::QuizzesController do
 
     it "returns false when locked" do
       allow(@quiz).to receive(:locked_for?).and_return(true)
-      expect(return_value).to eq false
+      expect(return_value).to be false
     end
 
     it "returns false when unauthorized" do
       allow(@quiz).to receive(:grants_right?).and_return(false)
-      expect(return_value).to eq false
+      expect(return_value).to be false
     end
 
     it "is false with wrong access code" do
@@ -2907,14 +2907,14 @@ describe Quizzes::QuizzesController do
                                                       access_code: "Don't trust me. *tips hat*",
                                                       take: 1
                                                     })
-      expect(return_value).to eq false
+      expect(return_value).to be false
     end
 
     it "false with wrong IP address" do
       allow(@quiz).to receive(:ip_filter).and_return(true)
       allow(@quiz).to receive(:valid_ip?).and_return(false)
       allow(subject).to receive(:params).and_return({ take: 1 })
-      expect(return_value).to eq false
+      expect(return_value).to be false
     end
   end
 end

@@ -139,8 +139,8 @@ describe "Outcome Reports" do
       end
 
       it "has empty parent_guids if parent is root outcome group" do
-        expect(report[0]["parent_guids"]).to eq nil
-        expect(report[1]["parent_guids"]).to eq nil
+        expect(report[0]["parent_guids"]).to be_nil
+        expect(report[1]["parent_guids"]).to be_nil
       end
 
       it "includes parent of outcome groups" do
@@ -215,10 +215,10 @@ describe "Outcome Reports" do
         expect(outcome["object_type"]).to eq "outcome"
         expect(outcome["title"]).to eq @root_outcome_1.title
         expect(outcome["description"]).to eq @root_outcome_1.description
-        expect(outcome["friendly_description"]).to eq nil
+        expect(outcome["friendly_description"]).to be_nil
         expect(outcome["display_name"]).to eq @root_outcome_1.display_name
         expect(outcome["calculation_method"]).to eq "highest"
-        expect(outcome["calculation_int"]).to eq nil
+        expect(outcome["calculation_int"]).to be_nil
         expect(outcome["workflow_state"]).to eq @root_outcome_1.workflow_state
         expect(outcome["mastery_points"]).to eq "3.0"
 

@@ -20,7 +20,7 @@
 
 module Lti
   module IMS::Concerns
-    describe GradebookServices, type: :controller do
+    describe GradebookServices do
       controller(ApplicationController) do
         include Lti::IMS::Concerns::GradebookServices
         before_action :prepare_line_item_for_ags!, :verify_user_in_context, :verify_line_item_in_context

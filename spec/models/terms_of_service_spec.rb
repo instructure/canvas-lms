@@ -41,7 +41,7 @@ describe TermsOfService do
     tos = TermsOfService.create!(terms_type: "default",
                                  terms_of_service_content: @terms_of_service_content,
                                  account: ac2)
-    expect(tos.passive).to eq true
+    expect(tos.passive).to be true
   end
 
   it "creates a Terms of Service defaulting sets correct options" do
@@ -58,7 +58,7 @@ describe TermsOfService do
       ac2 = account_model
       expect(ac2.terms_of_service.terms_type).to eq TermsOfService.term_options_for_account(ac2)[:terms_type]
       sub = ac2.sub_accounts.create!
-      expect(sub.terms_of_service).to be nil
+      expect(sub.terms_of_service).to be_nil
     end
   end
 end

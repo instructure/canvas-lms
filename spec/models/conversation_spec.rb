@@ -159,7 +159,7 @@ describe Conversation do
       cmp = convo.conversation.conversation_messages.last.conversation_message_participants.where(user_id: new_guy.id).last
 
       expect(cmp.root_account_ids).to eq(convo.root_account_ids)
-      expect(cmp.root_account_ids).not_to be(nil)
+      expect(cmp.root_account_ids).not_to be_nil
     end
 
     it "only adds participants to messages the existing user has participants on" do
@@ -236,32 +236,32 @@ describe Conversation do
 
       it "increments when adding messages" do
         Conversation.initiate([@sender, @recipient], false).add_message(@sender, "test")
-        expect(@sender.conversations.first.message_count).to eql 1
-        expect(@recipient.conversations.first.message_count).to eql 1
+        expect(@sender.conversations.first.message_count).to be 1
+        expect(@recipient.conversations.first.message_count).to be 1
       end
 
       it "decrements when removing messages" do
         root_convo = Conversation.initiate([@sender, @recipient], false)
         root_convo.add_message(@sender, "test")
         msg = root_convo.add_message(@sender, "test2")
-        expect(@sender.conversations.first.message_count).to eql 2
-        expect(@recipient.conversations.first.message_count).to eql 2
+        expect(@sender.conversations.first.message_count).to be 2
+        expect(@recipient.conversations.first.message_count).to be 2
 
         @sender.conversations.first.remove_messages(msg)
-        expect(@sender.conversations.first.reload.message_count).to eql 1
-        expect(@recipient.conversations.first.reload.message_count).to eql 2
+        expect(@sender.conversations.first.reload.message_count).to be 1
+        expect(@recipient.conversations.first.reload.message_count).to be 2
       end
 
       it "decrements when deleting messages" do
         root_convo = Conversation.initiate([@sender, @recipient], false)
         root_convo.add_message(@sender, "test")
         msg = root_convo.add_message(@sender, "test2")
-        expect(@sender.conversations.first.message_count).to eql 2
-        expect(@recipient.conversations.first.message_count).to eql 2
+        expect(@sender.conversations.first.message_count).to be 2
+        expect(@recipient.conversations.first.message_count).to be 2
 
         @sender.conversations.first.delete_messages(msg)
-        expect(@sender.conversations.first.reload.message_count).to eql 1
-        expect(@recipient.conversations.first.reload.message_count).to eql 2
+        expect(@sender.conversations.first.reload.message_count).to be 1
+        expect(@recipient.conversations.first.reload.message_count).to be 2
       end
     end
 
@@ -286,35 +286,35 @@ describe Conversation do
 
       it "increments for recipients when sending the first message in a conversation" do
         root_convo = Conversation.initiate([@sender, @recipient], false)
-        expect(ConversationParticipant.unread.size).to eql 0 # only once the first message is added
+        expect(ConversationParticipant.unread.size).to be 0 # only once the first message is added
         root_convo.add_message(@sender, "test")
-        expect(@sender.reload.unread_conversations_count).to eql 0
-        expect(@sender.conversations.unread.size).to eql 0
-        expect(@recipient.reload.unread_conversations_count).to eql 1
-        expect(@recipient.conversations.unread.size).to eql 1
+        expect(@sender.reload.unread_conversations_count).to be 0
+        expect(@sender.conversations.unread.size).to be 0
+        expect(@recipient.reload.unread_conversations_count).to be 1
+        expect(@recipient.conversations.unread.size).to be 1
       end
 
       it "increments for subscribed recipients when adding a message to a read conversation" do
         root_convo = Conversation.initiate([@sender, @unread_guy, @subscribed_guy, @unsubscribed_guy], false)
         root_convo.add_message(@sender, "test")
 
-        expect(@unread_guy.reload.unread_conversations_count).to eql 1
-        expect(@unread_guy.conversations.unread.size).to eql 1
+        expect(@unread_guy.reload.unread_conversations_count).to be 1
+        expect(@unread_guy.conversations.unread.size).to be 1
         @subscribed_guy.conversations.first.update_attribute(:workflow_state, "read")
-        expect(@subscribed_guy.reload.unread_conversations_count).to eql 0
-        expect(@subscribed_guy.conversations.unread.size).to eql 0
+        expect(@subscribed_guy.reload.unread_conversations_count).to be 0
+        expect(@subscribed_guy.conversations.unread.size).to be 0
         @unsubscribed_guy.conversations.first.update(subscribed: false)
-        expect(@unsubscribed_guy.reload.unread_conversations_count).to eql 0
-        expect(@unsubscribed_guy.conversations.unread.size).to eql 0
+        expect(@unsubscribed_guy.reload.unread_conversations_count).to be 0
+        expect(@unsubscribed_guy.conversations.unread.size).to be 0
 
         root_convo.add_message(@sender, "test2")
 
-        expect(@unread_guy.reload.unread_conversations_count).to eql 1
-        expect(@unread_guy.conversations.unread.size).to eql 1
-        expect(@subscribed_guy.reload.unread_conversations_count).to eql 1
-        expect(@subscribed_guy.conversations.unread.size).to eql 1
-        expect(@unsubscribed_guy.reload.unread_conversations_count).to eql 0
-        expect(@unsubscribed_guy.conversations.unread.size).to eql 0
+        expect(@unread_guy.reload.unread_conversations_count).to be 1
+        expect(@unread_guy.conversations.unread.size).to be 1
+        expect(@subscribed_guy.reload.unread_conversations_count).to be 1
+        expect(@subscribed_guy.conversations.unread.size).to be 1
+        expect(@unsubscribed_guy.reload.unread_conversations_count).to be 0
+        expect(@unsubscribed_guy.conversations.unread.size).to be 0
       end
 
       it "increments only for message participants" do
@@ -322,35 +322,35 @@ describe Conversation do
         root_convo.add_message(@sender, "test")
 
         @subscribed_guy.conversations.first.update_attribute(:workflow_state, "read")
-        expect(@subscribed_guy.reload.unread_conversations_count).to eql 0
-        expect(@subscribed_guy.conversations.unread.size).to eql 0
+        expect(@subscribed_guy.reload.unread_conversations_count).to be 0
+        expect(@subscribed_guy.conversations.unread.size).to be 0
 
         root_convo.add_message(@sender, "test2", only_users: [@recipient])
 
-        expect(@subscribed_guy.reload.unread_conversations_count).to eql 0
-        expect(@subscribed_guy.conversations.unread.size).to eql 0
+        expect(@subscribed_guy.reload.unread_conversations_count).to be 0
+        expect(@subscribed_guy.conversations.unread.size).to be 0
       end
 
       it "decrements when deleting an unread conversation" do
         root_convo = Conversation.initiate([@sender, @unread_guy], false)
         root_convo.add_message(@sender, "test")
 
-        expect(@unread_guy.reload.unread_conversations_count).to eql 1
-        expect(@unread_guy.conversations.unread.size).to eql 1
+        expect(@unread_guy.reload.unread_conversations_count).to be 1
+        expect(@unread_guy.conversations.unread.size).to be 1
         @unread_guy.conversations.first.remove_messages(:all)
-        expect(@unread_guy.reload.unread_conversations_count).to eql 0
-        expect(@unread_guy.conversations.unread.size).to eql 0
+        expect(@unread_guy.reload.unread_conversations_count).to be 0
+        expect(@unread_guy.conversations.unread.size).to be 0
       end
 
       it "decrements when marking as read" do
         root_convo = Conversation.initiate([@sender, @unread_guy], false)
         root_convo.add_message(@sender, "test")
 
-        expect(@unread_guy.reload.unread_conversations_count).to eql 1
-        expect(@unread_guy.conversations.unread.size).to eql 1
+        expect(@unread_guy.reload.unread_conversations_count).to be 1
+        expect(@unread_guy.conversations.unread.size).to be 1
         @unread_guy.conversations.first.update_attribute(:workflow_state, "read")
-        expect(@unread_guy.reload.unread_conversations_count).to eql 0
-        expect(@unread_guy.conversations.unread.size).to eql 0
+        expect(@unread_guy.reload.unread_conversations_count).to be 0
+        expect(@unread_guy.conversations.unread.size).to be 0
       end
 
       it "indecrements when marking as unread" do
@@ -358,11 +358,11 @@ describe Conversation do
         root_convo.add_message(@sender, "test")
         @unread_guy.conversations.first.update_attribute(:workflow_state, "read")
 
-        expect(@unread_guy.reload.unread_conversations_count).to eql 0
-        expect(@unread_guy.conversations.unread.size).to eql 0
+        expect(@unread_guy.reload.unread_conversations_count).to be 0
+        expect(@unread_guy.conversations.unread.size).to be 0
         @unread_guy.conversations.first.update_attribute(:workflow_state, "unread")
-        expect(@unread_guy.reload.unread_conversations_count).to eql 1
-        expect(@unread_guy.conversations.unread.size).to eql 1
+        expect(@unread_guy.reload.unread_conversations_count).to be 1
+        expect(@unread_guy.conversations.unread.size).to be 1
       end
     end
 
@@ -380,15 +380,15 @@ describe Conversation do
       root_convo = Conversation.initiate([sender, archive_guy, subscription_guy], false)
       root_convo.add_message(sender, "test")
 
-      expect(subscription_guy.reload.unread_conversations_count).to eql 1
-      expect(subscription_guy.conversations.unread.size).to eql 1
+      expect(subscription_guy.reload.unread_conversations_count).to be 1
+      expect(subscription_guy.conversations.unread.size).to be 1
 
       subscription_guy.conversations.first.update(subscribed: false)
-      expect(subscription_guy.reload.unread_conversations_count).to eql 0
-      expect(subscription_guy.conversations.unread.size).to eql 0
+      expect(subscription_guy.reload.unread_conversations_count).to be 0
+      expect(subscription_guy.conversations.unread.size).to be 0
 
       archive_guy.conversations.first.update(workflow_state: "archived", subscribed: false)
-      expect(archive_guy.conversations.archived.size).to eql 1
+      expect(archive_guy.conversations.archived.size).to be 1
     end
 
     it "mark-as-unreads when re-subscribing iff there are newer messages" do
@@ -399,12 +399,12 @@ describe Conversation do
       root_convo.add_message(sender, "test")
 
       flip_flopper_guy.conversations.first.update(subscribed: false)
-      expect(flip_flopper_guy.reload.unread_conversations_count).to eql 0
-      expect(flip_flopper_guy.conversations.unread.size).to eql 0
+      expect(flip_flopper_guy.reload.unread_conversations_count).to be 0
+      expect(flip_flopper_guy.conversations.unread.size).to be 0
       # no new messages in the interim, he should stay "marked-as-read"
       flip_flopper_guy.conversations.first.update(subscribed: true)
-      expect(flip_flopper_guy.reload.unread_conversations_count).to eql 0
-      expect(flip_flopper_guy.conversations.unread.size).to eql 0
+      expect(flip_flopper_guy.reload.unread_conversations_count).to be 0
+      expect(flip_flopper_guy.conversations.unread.size).to be 0
 
       subscription_guy.conversations.first.update(subscribed: false)
       archive_guy.conversations.first.update(workflow_state: "archived", subscribed: false)
@@ -416,12 +416,12 @@ describe Conversation do
       subscription_guy.conversations.first.update(subscribed: true)
       archive_guy.conversations.first.update(subscribed: true)
 
-      expect(subscription_guy.reload.unread_conversations_count).to eql 1
-      expect(subscription_guy.conversations.unread.size).to eql 1
+      expect(subscription_guy.reload.unread_conversations_count).to be 1
+      expect(subscription_guy.conversations.unread.size).to be 1
       expect(subscription_guy.conversations.first.last_message_at.to_i).to eql last_message_at.to_i
 
-      expect(archive_guy.reload.unread_conversations_count).to eql 1
-      expect(archive_guy.conversations.unread.size).to eql 1
+      expect(archive_guy.reload.unread_conversations_count).to be 1
+      expect(archive_guy.conversations.unread.size).to be 1
       expect(subscription_guy.conversations.first.last_message_at.to_i).to eql last_message_at.to_i
     end
 
@@ -430,16 +430,16 @@ describe Conversation do
       root_convo = Conversation.initiate([sender, user_factory, subscription_guy], false)
       root_convo.add_message(sender, "test")
 
-      expect(subscription_guy.reload.unread_conversations_count).to eql 1
-      expect(subscription_guy.conversations.unread.size).to eql 1
+      expect(subscription_guy.reload.unread_conversations_count).to be 1
+      expect(subscription_guy.conversations.unread.size).to be 1
 
       subscription_guy.conversations.first.subscribed = false
-      expect(subscription_guy.reload.unread_conversations_count).to eql 1
-      expect(subscription_guy.conversations.unread.size).to eql 1
+      expect(subscription_guy.reload.unread_conversations_count).to be 1
+      expect(subscription_guy.conversations.unread.size).to be 1
 
       subscription_guy.conversations.first.subscribed = true
-      expect(subscription_guy.reload.unread_conversations_count).to eql 1
-      expect(subscription_guy.conversations.unread.size).to eql 1
+      expect(subscription_guy.reload.unread_conversations_count).to be 1
+      expect(subscription_guy.conversations.unread.size).to be 1
     end
   end
 
@@ -580,7 +580,7 @@ describe Conversation do
         course2 = @course
         other_section = course2.course_sections.create
         course2.enroll_student(u1, allow_multiple_enrollments: true, section: other_section)
-        expect(u1.enrollments.size).to eql 3
+        expect(u1.enrollments.size).to be 3
 
         conversation = Conversation.initiate([u1, u2], true)
 
@@ -1087,7 +1087,7 @@ describe Conversation do
       cmp_root_account_ids = conversation.reload.conversation_message_participants.first.root_account_ids
 
       expect(cmp_root_account_ids).to eq(conversation.root_account_ids)
-      expect(cmp_root_account_ids).not_to be(nil)
+      expect(cmp_root_account_ids).not_to be_nil
     end
 
     context "sharding" do

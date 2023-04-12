@@ -21,7 +21,7 @@
 require "spec_helper"
 require_relative "../views_helper"
 
-describe "gradebooks/show_submissions_upload", type: :view do
+describe "gradebooks/show_submissions_upload" do
   let(:assignment) { @course.assignments.create!(title: "Example Assignment") }
   let(:presenter) { Submission::UploadPresenter.for(@course, assignment) }
   let(:progress) { presenter.progress }

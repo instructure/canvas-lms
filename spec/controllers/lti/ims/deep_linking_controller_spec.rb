@@ -505,7 +505,7 @@ module Lti
 
                   it "sets new_tab true on module item" do
                     subject
-                    expect(context_module.content_tags.last.new_tab).to eq true
+                    expect(context_module.content_tags.last.new_tab).to be true
                   end
                 end
 
@@ -596,7 +596,7 @@ module Lti
 
                 it "does not pass launch dimensions" do
                   expect(subject).to be_successful
-                  expect(context_module.content_tags[0][:link_settings]).to be(nil)
+                  expect(context_module.content_tags[0][:link_settings]).to be_nil
                 end
 
                 it "ignores line items from tool" do
@@ -623,9 +623,9 @@ module Lti
                     expect(context_module.content_tags[0][:link_settings]["selection_height"]).to be(842)
 
                     expect(context_module.content_tags[1][:link_settings]["selection_width"]).to be(642)
-                    expect(context_module.content_tags[1][:link_settings]["selection_height"]).to be(nil)
+                    expect(context_module.content_tags[1][:link_settings]["selection_height"]).to be_nil
 
-                    expect(context_module.content_tags[2][:link_settings]["selection_width"]).to be(nil)
+                    expect(context_module.content_tags[2][:link_settings]["selection_width"]).to be_nil
                     expect(context_module.content_tags[2][:link_settings]["selection_height"]).to be(842)
                   end
                 end

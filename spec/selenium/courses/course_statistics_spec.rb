@@ -53,9 +53,9 @@ describe "course statistics" do
     expect(users[2]).to include_text "unknown"
 
     links = ff(".item_list li a")
-    expect(links[0]["href"].end_with?("/courses/#{@course.id}/users/#{@student2.id}")).to eq true
-    expect(links[1]["href"].end_with?("/courses/#{@course.id}/users/#{@student3.id}")).to eq true
-    expect(links[2]["href"].end_with?("/courses/#{@course.id}/users/#{@student1.id}")).to eq true
+    expect(links[0]["href"].end_with?("/courses/#{@course.id}/users/#{@student2.id}")).to be true
+    expect(links[1]["href"].end_with?("/courses/#{@course.id}/users/#{@student3.id}")).to be true
+    expect(links[2]["href"].end_with?("/courses/#{@course.id}/users/#{@student1.id}")).to be true
   end
 
   it "shows a deduped count" do

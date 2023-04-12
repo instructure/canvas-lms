@@ -67,7 +67,7 @@ describe ExternalToolsController do
       user_session(@teacher)
       get :jwt_token, params: { course_id: teacher_course.id, tool_id: @tool.id }
 
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
     end
 
     it "returns the correct JWT token when given using the tool_launch_url param" do
@@ -84,19 +84,19 @@ describe ExternalToolsController do
     it "sets status code to 404 if the requested tool id does not exist" do
       user_session(@teacher)
       get :jwt_token, params: { course_id: @course.id, tool_id: 999_999 }
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
     end
 
     it "sets status code to 404 if no query params are provided" do
       user_session(@teacher)
       get :jwt_token, params: { course_id: @course.id }
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
     end
 
     it "sets status code to 404 if the requested tool_launch_url does not exist" do
       user_session(@teacher)
       get :jwt_token, params: { course_id: @course.id, tool_launch_url: "http://www.nothere.com/doesnt_exist" }
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
     end
   end
 
@@ -533,7 +533,7 @@ describe ExternalToolsController do
         expect(response).to be_successful
 
         lti_launch = assigns[:lti_launch]
-        expect(lti_launch.params["accept_copy_advice"]).to eq nil
+        expect(lti_launch.params["accept_copy_advice"]).to be_nil
         expect(lti_launch.params["accept_presentation_document_targets"]).to eq "frame,window"
         expect(lti_launch.params["accept_media_types"]).to eq "application/vnd.ims.lti.v1.ltilink"
       end
@@ -546,7 +546,7 @@ describe ExternalToolsController do
         expect(response).to be_successful
 
         lti_launch = assigns[:lti_launch]
-        expect(lti_launch.params["accept_copy_advice"]).to eq nil
+        expect(lti_launch.params["accept_copy_advice"]).to be_nil
         expect(lti_launch.params["accept_presentation_document_targets"]).to eq "window"
         expect(lti_launch.params["accept_media_types"]).to eq "application/vnd.ims.lti.v1.ltilink"
       end
@@ -672,7 +672,7 @@ describe ExternalToolsController do
         expect(response).to be_successful
 
         lti_launch = assigns[:lti_launch]
-        expect(lti_launch.params["accept_copy_advice"]).to eq nil
+        expect(lti_launch.params["accept_copy_advice"]).to be_nil
         expect(lti_launch.params["accept_presentation_document_targets"]).to eq "embed,frame,iframe,window"
         expect(lti_launch.params["accept_media_types"]).to eq "image/*,text/html,application/vnd.ims.lti.v1.ltilink,*/*"
       end
@@ -904,7 +904,7 @@ describe ExternalToolsController do
             placement: "student_context_card",
             student_id: @student.id,
           }
-          expect(response.status).to eq(200)
+          expect(response).to have_http_status(:ok)
           expect(assigns[:lti_launch].resource_url).to eq lti_1_3_tool.url
         end
       end
@@ -1735,7 +1735,7 @@ describe ExternalToolsController do
         }
       }, format: "json"
       expect(response).to be_successful
-      expect(assigns[:tool].is_rce_favorite).to eq true
+      expect(assigns[:tool].is_rce_favorite).to be true
     end
 
     it "sets the oauth_compliant setting" do
@@ -2102,7 +2102,7 @@ describe ExternalToolsController do
       put :update, params: { course_id: @course.id, external_tool_id: @tool.id, external_tool: { allow_membership_service_access: true } }, format: "json"
 
       expect(response).to be_successful
-      expect(@tool.reload.allow_membership_service_access).to eq true
+      expect(@tool.reload.allow_membership_service_access).to be true
     end
 
     it "does not update allow_membership_service_access if the feature flag is not set" do
@@ -2122,7 +2122,7 @@ describe ExternalToolsController do
       @tool.save!
       put :update, params: { account_id: @course.root_account.id, external_tool_id: @tool.id, external_tool: { is_rce_favorite: true } }, format: "json"
       expect(response).to be_successful
-      expect(assigns[:tool].is_rce_favorite).to eq true
+      expect(assigns[:tool].is_rce_favorite).to be true
     end
 
     it "updates placement properties if the enabled key is set to false" do
@@ -2162,7 +2162,7 @@ describe ExternalToolsController do
           },
           format: "json"
       expect(response).to be_successful
-      expect(@tool.reload.editor_button).to eq nil
+      expect(@tool.reload.editor_button).to be_nil
     end
   end
 
@@ -2679,7 +2679,7 @@ describe ExternalToolsController do
       get :all_visible_nav_tools, params: { course_id: @course1.id }
 
       message = json_parse(response.body)["message"]
-      expect(response.status).to be 400
+      expect(response).to have_http_status :bad_request
       expect(message).to eq "Missing context_codes"
     end
 
@@ -2687,7 +2687,7 @@ describe ExternalToolsController do
       user_session(@teacher)
       get :visible_course_nav_tools, params: { course_id: "definitely_not_a_course" }
 
-      expect(response.status).to be 404
+      expect(response).to have_http_status :not_found
     end
 
     it "returns a 400 response if any context_codes besides courses are provided" do
@@ -2695,7 +2695,7 @@ describe ExternalToolsController do
       get :all_visible_nav_tools, params: { context_codes: ["account_#{@course.account.id}"] }
 
       message = json_parse(response.body)["message"]
-      expect(response.status).to be 400
+      expect(response).to have_http_status :bad_request
       expect(message).to eq "Invalid context_codes; only `course` codes are supported"
     end
 

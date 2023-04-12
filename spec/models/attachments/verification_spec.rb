@@ -73,8 +73,8 @@ describe Attachments::Verification do
     end
 
     it "verifies a legacy verifier for read and download" do
-      expect(v.valid_verifier_for_permission?(attachment.uuid, :read)).to eq(true)
-      expect(v.valid_verifier_for_permission?(attachment.uuid, :download)).to eq(true)
+      expect(v.valid_verifier_for_permission?(attachment.uuid, :read)).to be(true)
+      expect(v.valid_verifier_for_permission?(attachment.uuid, :download)).to be(true)
       expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.legacy_verifier_success").twice
     end
 
@@ -82,28 +82,28 @@ describe Attachments::Verification do
       clone = attachment.clone_for(course_factory)
       clone.save!
       v2 = Attachments::Verification.new(clone)
-      expect(v2.valid_verifier_for_permission?(attachment.uuid, :read)).to eq true
-      expect(v2.valid_verifier_for_permission?(attachment.uuid, :download)).to eq true
+      expect(v2.valid_verifier_for_permission?(attachment.uuid, :read)).to be true
+      expect(v2.valid_verifier_for_permission?(attachment.uuid, :download)).to be true
       expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.related_verifier_success").twice
       expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
     it "returns false on an invalid verifier" do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_raise(CanvasSecurity::InvalidToken)
-      expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
+      expect(v.valid_verifier_for_permission?("token", :read)).to be(false)
       expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_invalid")
     end
 
     it "returns false on a verifier that is not of type String" do
       unsupported_verifier = 1
-      expect(v.valid_verifier_for_permission?(unsupported_verifier, :read)).to eq(false)
+      expect(v.valid_verifier_for_permission?(unsupported_verifier, :read)).to be(false)
     end
 
     it "returns false on token id mismatch" do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_return({
                                                                                 id: attachment.global_id + 1
                                                                               })
-      expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
+      expect(v.valid_verifier_for_permission?("token", :read)).to be(false)
       expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_id_mismatch")
     end
 
@@ -114,8 +114,8 @@ describe Attachments::Verification do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_return({
                                                                                 id: att2.global_id, user_id: student.global_id
                                                                               }).twice
-      expect(v2.valid_verifier_for_permission?("token", :read)).to eq(true)
-      expect(v2.valid_verifier_for_permission?("token", :download)).to eq(false)
+      expect(v2.valid_verifier_for_permission?("token", :read)).to be(true)
+      expect(v2.valid_verifier_for_permission?("token", :download)).to be(false)
       expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_success").twice
       expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
     end
@@ -126,14 +126,14 @@ describe Attachments::Verification do
       v2 = Attachments::Verification.new(att2)
       other_user = user_model
       token = v2.verifier_for_user(other_user, context: eportfolio.asset_string, permission_map_id: :r_rd)
-      expect(v2.valid_verifier_for_permission?(token, :read)).to eq(true)
-      expect(v2.valid_verifier_for_permission?(token, :download)).to eq(true)
+      expect(v2.valid_verifier_for_permission?(token, :read)).to be(true)
+      expect(v2.valid_verifier_for_permission?(token, :download)).to be(true)
       # revoke :read on the eportfolio, and the verifier should no longer work
       Timecop.travel(2.seconds) do # allow the eportfolio's updated_at to change to invalidate the permissions cache
         eportfolio.public = false
         eportfolio.save!
-        expect(v2.valid_verifier_for_permission?(token, :read)).to eq(false)
-        expect(v2.valid_verifier_for_permission?(token, :download)).to eq(false)
+        expect(v2.valid_verifier_for_permission?(token, :read)).to be(false)
+        expect(v2.valid_verifier_for_permission?(token, :download)).to be(false)
       end
     end
 
@@ -143,12 +143,12 @@ describe Attachments::Verification do
       v2 = Attachments::Verification.new(att2)
       other_user = user_model
       token = v2.verifier_for_user(other_user, context: eportfolio.asset_string, permission_map_id: :r_rd)
-      expect(v2.valid_verifier_for_permission?(token, :read)).to eq(false)
-      expect(v2.valid_verifier_for_permission?(token, :download)).to eq(false)
+      expect(v2.valid_verifier_for_permission?(token, :read)).to be(false)
+      expect(v2.valid_verifier_for_permission?(token, :download)).to be(false)
 
       mock_session = { eportfolio_ids: [eportfolio.id], permissions_key: SecureRandom.uuid }
-      expect(v2.valid_verifier_for_permission?(token, :read, mock_session)).to eq(true)
-      expect(v2.valid_verifier_for_permission?(token, :download, mock_session)).to eq(true)
+      expect(v2.valid_verifier_for_permission?(token, :read, mock_session)).to be(true)
+      expect(v2.valid_verifier_for_permission?(token, :download, mock_session)).to be(true)
     end
 
     it "supports custom permissions checks on nil (public) user" do
@@ -157,11 +157,11 @@ describe Attachments::Verification do
       v2 = Attachments::Verification.new(att2)
       token = v2.verifier_for_user(nil, context: eportfolio.asset_string, permission_map_id: :r_rd)
 
-      expect(v2.valid_verifier_for_permission?(token, :read)).to eq(false)
-      expect(v2.valid_verifier_for_permission?(token, :download)).to eq(false)
+      expect(v2.valid_verifier_for_permission?(token, :read)).to be(false)
+      expect(v2.valid_verifier_for_permission?(token, :download)).to be(false)
       mock_session = { eportfolio_ids: [eportfolio.id], permissions_key: SecureRandom.uuid }
-      expect(v2.valid_verifier_for_permission?(token, :read, mock_session)).to eq(true)
-      expect(v2.valid_verifier_for_permission?(token, :download, mock_session)).to eq(true)
+      expect(v2.valid_verifier_for_permission?(token, :read, mock_session)).to be(true)
+      expect(v2.valid_verifier_for_permission?(token, :download, mock_session)).to be(true)
     end
   end
 end

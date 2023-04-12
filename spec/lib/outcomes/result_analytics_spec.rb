@@ -85,7 +85,7 @@ describe Outcomes::ResultAnalytics do
     it "returns nil if session user is a student and there are more than 1 users sent in the opts" do
       opts = { context: @course, users: @students, outcomes: @outcomes, assignments: [@assignment] }
       results = ra.find_outcomes_service_outcome_results(opts)
-      expect(results).to eq nil
+      expect(results).to be_nil
     end
 
     describe "#handle_outcomes_service_results" do
@@ -95,7 +95,7 @@ describe Outcomes::ResultAnalytics do
           "No Outcome Service outcome results found for context: #{@course.uuid}"
         ).once
         results = ra.handle_outcomes_service_results(nil, @course, @students, @outcomes, [@assignment])
-        expect(results).to eq nil
+        expect(results).to be_nil
       end
 
       it "logs warning and returns nil if results are empty" do
@@ -104,7 +104,7 @@ describe Outcomes::ResultAnalytics do
           "No Outcome Service outcome results found for context: #{@course.uuid}"
         ).once
         results = ra.handle_outcomes_service_results({}, @course, @students, @outcomes, [@assignment])
-        expect(results).to eq nil
+        expect(results).to be_nil
       end
 
       it "calls resolve_outcome_results" do

@@ -58,11 +58,11 @@ describe "execute and update" do
   it "returns the result from execute" do
     expect(db.execute("select count(*) from page_views").fetch["count"]).to eq 0
     expect(db.select_value("select count(*) from page_views")).to eq 0
-    expect(db.execute("insert into page_views (request_id, user_id) values (?, ?)", "test", 0)).to eq nil
+    expect(db.execute("insert into page_views (request_id, user_id) values (?, ?)", "test", 0)).to be_nil
   end
 
   it "returns nothing from update" do
-    expect(db.update("select count(*) from page_views")).to eq nil
-    expect(db.update("insert into page_views (request_id, user_id) values (?, ?)", "test", 0)).to eq nil
+    expect(db.update("select count(*) from page_views")).to be_nil
+    expect(db.update("insert into page_views (request_id, user_id) values (?, ?)", "test", 0)).to be_nil
   end
 end

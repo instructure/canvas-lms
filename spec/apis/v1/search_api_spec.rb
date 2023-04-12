@@ -322,7 +322,7 @@ describe SearchController, type: :request do
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&per_page=3",
                         { controller: "search", action: "recipients", format: "json", search: "cletus", per_page: "3" })
-        expect(json.size).to eql 3
+        expect(json.size).to be 3
         expect(response.headers["Link"]).not_to be_nil
       end
 
@@ -331,7 +331,7 @@ describe SearchController, type: :request do
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=3",
                         { controller: "search", action: "recipients", format: "json", search: "cletus", type: "user", per_page: "3" })
-        expect(json.size).to eql 3
+        expect(json.size).to be 3
         links = Api.parse_pagination_links(response.headers["Link"])
         links.each do |l|
           expect(l[:uri].to_s).to match(%r{api/v1/search/recipients})
@@ -346,7 +346,7 @@ describe SearchController, type: :request do
                                         action: "recipients",
                                         format: "json"
                                       })
-        expect(json.size).to eql 1
+        expect(json.size).to be 1
         links = Api.parse_pagination_links(response.headers["Link"])
         links.each do |l|
           expect(l[:uri].to_s).to match(%r{api/v1/search/recipients})
@@ -361,7 +361,7 @@ describe SearchController, type: :request do
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=ofcourse&type=context&per_page=3",
                         { controller: "search", action: "recipients", format: "json", search: "ofcourse", type: "context", per_page: "3" })
-        expect(json.size).to eql 3
+        expect(json.size).to be 3
         links = Api.parse_pagination_links(response.headers["Link"])
         links.each do |l|
           expect(l[:uri].to_s).to match(%r{api/v1/search/recipients})
@@ -376,7 +376,7 @@ describe SearchController, type: :request do
                                         action: "recipients",
                                         format: "json"
                                       })
-        expect(json.size).to eql 1
+        expect(json.size).to be 1
         links = Api.parse_pagination_links(response.headers["Link"])
         links.each do |l|
           expect(l[:uri].to_s).to match(%r{api/v1/search/recipients})
@@ -391,7 +391,7 @@ describe SearchController, type: :request do
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=-1",
                         { controller: "search", action: "recipients", format: "json", search: "cletus", type: "user", per_page: "-1" })
-        expect(json.size).to eql 10
+        expect(json.size).to be 10
         links = Api.parse_pagination_links(response.headers["Link"])
         links.each do |l|
           expect(l[:uri].to_s).to match(%r{api/v1/search/recipients})
@@ -406,7 +406,7 @@ describe SearchController, type: :request do
                                         action: "recipients",
                                         format: "json"
                                       })
-        expect(json.size).to eql 1
+        expect(json.size).to be 1
         links = Api.parse_pagination_links(response.headers["Link"])
         links.each do |l|
           expect(l[:uri].to_s).to match(%r{api/v1/search/recipients})
@@ -427,7 +427,7 @@ describe SearchController, type: :request do
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=term&per_page=4",
                         { controller: "search", action: "recipients", format: "json", search: "term", per_page: "4" })
-        expect(json.size).to eql 4
+        expect(json.size).to be 4
         expect(json.map { |item| item["id"] }).to eq course_ids[0...4]
         links = Api.parse_pagination_links(response.headers["Link"])
         links.each do |l|
@@ -442,7 +442,7 @@ describe SearchController, type: :request do
                                         action: "recipients",
                                         format: "json"
                                       })
-        expect(json.size).to eql 4
+        expect(json.size).to be 4
         expect(json.map { |item| item["id"] }).to eq course_ids[4...6] + user_ids[0...2]
         links = Api.parse_pagination_links(response.headers["Link"])
         links.each do |l|
@@ -457,7 +457,7 @@ describe SearchController, type: :request do
                                         action: "recipients",
                                         format: "json"
                                       })
-        expect(json.size).to eql 4
+        expect(json.size).to be 4
         expect(json.map { |item| item["id"] }).to eq user_ids[2...6]
         links = Api.parse_pagination_links(response.headers["Link"])
         links.each do |l|

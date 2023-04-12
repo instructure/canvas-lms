@@ -43,6 +43,6 @@ describe DataFixup::MigrateHomeroomSettingsToColumns do
 
   it "cleans strings that aren't ints" do
     DataFixup::MigrateHomeroomSettingsToColumns.run
-    expect(@c3.reload.linked_homeroom_course).to eq(nil)
+    expect(@c3.reload.linked_homeroom_course).to be_nil
   end
 end

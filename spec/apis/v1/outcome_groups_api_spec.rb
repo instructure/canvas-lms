@@ -1014,7 +1014,7 @@ describe "Outcome Groups API", type: :request do
                       id: @group.id.to_s,
                       format: "json",
                       per_page: "2")
-      expect(json.size).to eql 2
+      expect(json.size).to be 2
       expect(response.headers["Link"]).to match(%r{<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=2.*>; rel="next",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=1.*>; rel="first",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=3.*>; rel="last"})
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes?per_page=2&page=3",
@@ -1025,7 +1025,7 @@ describe "Outcome Groups API", type: :request do
                       format: "json",
                       per_page: "2",
                       page: "3")
-      expect(json.size).to eql 1
+      expect(json.size).to be 1
       expect(response.headers["Link"]).to match(%r{<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=2.*>; rel="prev",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=1.*>; rel="first",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes\?.*page=3.*>; rel="last"})
     end
 
@@ -1808,7 +1808,7 @@ describe "Outcome Groups API", type: :request do
                       id: @group.id.to_s,
                       format: "json",
                       per_page: "2")
-      expect(json.size).to eql 2
+      expect(json.size).to be 2
       expect(response.headers["Link"]).to match(%r{<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=2.*>; rel="next",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=1.*>; rel="first",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=3.*>; rel="last"})
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups?per_page=2&page=3",
@@ -1819,7 +1819,7 @@ describe "Outcome Groups API", type: :request do
                       format: "json",
                       per_page: "2",
                       page: "3")
-      expect(json.size).to eql 1
+      expect(json.size).to be 1
       expect(response.headers["Link"]).to match(%r{<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=2.*>; rel="prev",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=1.*>; rel="first",<.*/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups\?.*page=3.*>; rel="last"})
     end
   end

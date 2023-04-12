@@ -340,7 +340,7 @@ describe SisImportsApiController, type: :request do
                       multi_term_batch_mode: "1",
                       change_threshold: 7, })
     batch = SisBatch.find(json["id"])
-    expect(json["multi_term_batch_mode"]).to eq true
+    expect(json["multi_term_batch_mode"]).to be true
     expect(batch.options[:multi_term_batch_mode]).to be_truthy
   end
 
@@ -400,8 +400,8 @@ describe SisImportsApiController, type: :request do
     expect(json["change_threshold"]).to eq 7
     expect(batch.diffing_data_set_identifier).to eq "my-users-data"
     expect(batch.diff_row_count_threshold).to eq 4
-    expect(batch.diffing_remaster).to eq false
-    expect(json["diffing_remaster"]).to eq false
+    expect(batch.diffing_remaster).to be false
+    expect(json["diffing_remaster"]).to be false
   end
 
   it "enables diffing mode with remaster enabled" do
@@ -423,8 +423,8 @@ describe SisImportsApiController, type: :request do
     expect(json["change_threshold"]).to eq 6
     expect(batch.diffing_data_set_identifier).to eq "my-users-data"
     expect(batch.diff_row_count_threshold).to eq 3
-    expect(batch.diffing_remaster).to eq true
-    expect(json["diffing_remaster"]).to eq true
+    expect(batch.diffing_remaster).to be true
+    expect(json["diffing_remaster"]).to be true
   end
 
   it "allows for other diffing_drop_status" do
@@ -470,7 +470,7 @@ describe SisImportsApiController, type: :request do
                         attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                         batch_mode: "1" }, {}, expected_status: 400)
       expect(json["message"]).to eq "Batch mode specified, but the given batch_mode_term_id cannot be found."
-    end.to change(SisBatch, :count).by(0)
+    end.not_to change(SisBatch, :count)
   end
 
   it "enables sis stickiness options" do

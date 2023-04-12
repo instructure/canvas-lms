@@ -54,7 +54,7 @@ describe OverrideListPresenter do
     context "assignment or user not present?" do
       it "stores the assignment as nil if assignment not present?" do
         presenter = OverrideListPresenter.new nil, user
-        expect(presenter.assignment).to eq nil
+        expect(presenter.assignment).to be_nil
         expect(presenter.user).to eq user
       end
     end
@@ -123,14 +123,14 @@ describe OverrideListPresenter do
   describe "#multiple_due_dates?" do
     it "returns the result of assignment.multiple_due_dates_apply_to?(user)" do
       expect(assignment).to receive(:has_active_overrides?).and_return true
-      expect(presenter.multiple_due_dates?).to eq true
+      expect(presenter.multiple_due_dates?).to be true
       expect(assignment).to receive(:has_active_overrides?).and_return false
-      expect(presenter.multiple_due_dates?).to eq false
+      expect(presenter.multiple_due_dates?).to be false
     end
 
     it "returns false if its assignment is nil" do
       presenter = OverrideListPresenter.new nil, user
-      expect(presenter.multiple_due_dates?).to eq false
+      expect(presenter.multiple_due_dates?).to be false
     end
   end
 

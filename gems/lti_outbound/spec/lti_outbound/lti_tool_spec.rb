@@ -29,45 +29,45 @@ describe LtiOutbound::LTITool do
   describe "#include_name?" do
     it "returns true IFF the privacy level is public or name only" do
       subject.privacy_level = :something
-      expect(subject.include_name?).to eq false
+      expect(subject.include_name?).to be false
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
-      expect(subject.include_name?).to eq true
+      expect(subject.include_name?).to be true
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_NAME_ONLY
-      expect(subject.include_name?).to eq true
+      expect(subject.include_name?).to be true
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
-      expect(subject.include_name?).to eq false
+      expect(subject.include_name?).to be false
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
-      expect(subject.include_name?).to eq false
+      expect(subject.include_name?).to be false
     end
   end
 
   describe "#include_email?" do
     it "returns true IFF the privacy level is public or email only" do
       subject.privacy_level = :something
-      expect(subject.include_email?).to eq false
+      expect(subject.include_email?).to be false
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
-      expect(subject.include_email?).to eq true
+      expect(subject.include_email?).to be true
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_NAME_ONLY
-      expect(subject.include_email?).to eq false
+      expect(subject.include_email?).to be false
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
-      expect(subject.include_email?).to eq true
+      expect(subject.include_email?).to be true
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
-      expect(subject.include_email?).to eq false
+      expect(subject.include_email?).to be false
     end
   end
 
   describe "#public?" do
     it "returns true IFF the privacy level is public" do
       subject.privacy_level = :something
-      expect(subject.public?).to eq false
+      expect(subject.public?).to be false
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
-      expect(subject.public?).to eq true
+      expect(subject.public?).to be true
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_NAME_ONLY
-      expect(subject.public?).to eq false
+      expect(subject.public?).to be false
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
-      expect(subject.public?).to eq false
+      expect(subject.public?).to be false
       subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
-      expect(subject.public?).to eq false
+      expect(subject.public?).to be false
     end
   end
 

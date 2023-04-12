@@ -97,7 +97,7 @@ describe DiscussionEntryParticipant do
 
         @entry.change_read_state("unread", student_2)
         participant_2.reload
-        expect(participant_2.read_at).to be(nil)
+        expect(participant_2.read_at).to be_nil
       ensure
         Timecop.return
         Timecop.safe_mode = true

@@ -67,7 +67,7 @@ module Lti
           tcp = ToolConsumerProfile.cached_find_by_developer_key(dev_key.id)
           tcp.services = ToolConsumerProfile::RESTRICTED_SERVICES
           tcp.save!
-          expect(MultiCache.fetch(ToolConsumerProfile.cache_key(dev_key.id))).to eq nil
+          expect(MultiCache.fetch(ToolConsumerProfile.cache_key(dev_key.id))).to be_nil
         end
       end
     end

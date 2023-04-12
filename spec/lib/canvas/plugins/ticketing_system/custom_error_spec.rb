@@ -95,7 +95,7 @@ module Canvas::Plugins::TicketingSystem
 
       it "defaults to a blank string" do
         report.data = nil
-        expect(delegate.user_roles).to be(nil)
+        expect(delegate.user_roles).to be_nil
       end
     end
 
@@ -107,7 +107,7 @@ module Canvas::Plugins::TicketingSystem
 
       it "is nil if no account" do
         report.account = nil
-        expect(delegate.account_domain_value).to be(nil)
+        expect(delegate.account_domain_value).to be_nil
       end
     end
 
@@ -125,7 +125,7 @@ module Canvas::Plugins::TicketingSystem
 
     describe "#become_user_id_uri" do
       it "is nil if there's no url or user" do
-        expect(delegate.become_user_id_uri).to be(nil)
+        expect(delegate.become_user_id_uri).to be_nil
       end
 
       it "transforms the url into one that targets the user for reproduction" do
@@ -145,7 +145,7 @@ module Canvas::Plugins::TicketingSystem
 
     describe "#pretty_http_env" do
       it "is nil if theres no http_env" do
-        expect(delegate.pretty_http_env).to eq(nil)
+        expect(delegate.pretty_http_env).to be_nil
       end
 
       it "maps an env hash to a json string" do

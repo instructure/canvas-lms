@@ -55,7 +55,7 @@ describe Loaders::AssetStringLoader do
   it "fulfills with nil if target is not found" do
     GraphQL::Batch.batch do
       Loaders::AssetStringLoader.load("random_1").then do |target|
-        expect(target).to eq nil
+        expect(target).to be_nil
       end
     end
   end

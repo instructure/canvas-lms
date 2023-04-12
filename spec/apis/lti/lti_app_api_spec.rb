@@ -62,7 +62,7 @@ module Lti
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s })
 
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         expect(json.count).to eq 0
       end
 
@@ -74,7 +74,7 @@ module Lti
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s, placements: %w[resource_selection] })
 
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         expect(json.count).to eq 0
       end
 
@@ -86,7 +86,7 @@ module Lti
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s, placements: %w[resource_selection] })
 
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         expect(json.count).to eq 1
         expect(json.detect { |j| j["definition_type"] == resource_tool.class.name && j["definition_id"] == resource_tool.id }).not_to be_nil
       end
@@ -99,7 +99,7 @@ module Lti
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s, placements: %w[resource_selection] })
 
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         expect(json.count).to eq 1
         expect(json.detect { |j| j["definition_type"] == resource_tool.class.name && j["definition_id"] == resource_tool.id }).not_to be_nil
       end
@@ -110,7 +110,7 @@ module Lti
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s, placements: %w[resource_selection] })
 
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         expect(json.count).to eq 1
         expect(json.detect { |j| j["definition_type"] == resource_tool.class.name && j["definition_id"] == resource_tool.id }).not_to be_nil
       end
@@ -123,7 +123,7 @@ module Lti
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s, placements: %w[resource_selection] })
 
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         expect(json.count).to eq 1
         expect(json.detect { |j| j["definition_type"] == resource_tool.class.name && j["definition_id"] == resource_tool.id }).not_to be_nil
       end
@@ -131,7 +131,7 @@ module Lti
       it "cannot get the definition of public stuff at the account level" do
         api_call(:get, "/api/v1/accounts/self/lti_apps/launch_definitions",
                  { controller: "lti/lti_apps", action: "launch_definitions", format: "json", account_id: "self", placements: %w[global_navigation] })
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
 
       it "public can not get definition for tool with members visibility" do
@@ -142,7 +142,7 @@ module Lti
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s, placements: %w[resource_selection] })
 
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         expect(json.count).to eq 0
       end
 
@@ -159,7 +159,7 @@ module Lti
                         { controller: "lti/lti_apps", action: "launch_definitions", account_id: account.id.to_param, format: "json" },
                         placements: ["global_navigation"])
 
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         expect(json.count).to eq 1
         expect(json.first["definition_id"]).to eq tool.id
         # expect(json.detect {|j| j.key?('name') && j.key?('domain')}).not_to be_nil
@@ -182,7 +182,7 @@ module Lti
                         { controller: "lti/lti_apps", action: "launch_definitions", account_id: account.id.to_param, format: "json" },
                         placements: ["global_navigation"])
 
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         expect(json.count).to eq 1
         expect(json.first["definition_id"]).to eq tool.id
       end

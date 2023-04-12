@@ -342,7 +342,7 @@ describe "context modules" do
         wait_for_ajaximations
 
         # non-empty module should not have a DnD area
-        expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
+        expect(find_with_jquery('.module_dnd input[type="file"]')).to be_nil
       end
 
       it "adds multiple file items to a module" do
@@ -525,7 +525,7 @@ describe "context modules" do
         wait_for_ajaximations
 
         # non-empty module should not have a DnD area
-        expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
+        expect(find_with_jquery('.module_dnd input[type="file"]')).to be_nil
       end
 
       it "creating a new module should display a drag and drop area" do

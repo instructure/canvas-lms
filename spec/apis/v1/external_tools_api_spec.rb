@@ -50,7 +50,7 @@ describe ExternalToolsController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/external_tools/#{et.id}.json",
                       { controller: "external_tools", action: "show", format: "json",
                         course_id: @course.id.to_s, external_tool_id: et.id.to_s })
-      expect(json["allow_membership_service_access"]).to eq true
+      expect(json["allow_membership_service_access"]).to be true
     end
 
     it "returns 404 for not found tool" do
@@ -418,22 +418,22 @@ describe ExternalToolsController, type: :request do
         @root_tool.update_attribute(:is_rce_favorite, true)
         tool2 = create_editor_tool(Account.default)
         add_favorite_tool(Account.default, tool2)
-        expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to eq true
-        expect(tool2.is_rce_favorite_in_context?(Account.default)).to eq true
+        expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to be true
+        expect(tool2.is_rce_favorite_in_context?(Account.default)).to be true
       end
 
       it "can add a root account tool as a favorite for a sub-account" do
         add_favorite_tool(@sub_account, @root_tool)
-        expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to eq true
-        expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to eq false # didn't affect parent account
+        expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to be true
+        expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to be false # didn't affect parent account
       end
 
       it "adds to existing favorites for a sub-account inherited from a root account" do
         add_favorite_tool(Account.default, @root_tool)
         add_favorite_tool(@sub_account, @sub_tool)
 
-        expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to eq true # now saved directly on sub-account
-        expect(@sub_tool.is_rce_favorite_in_context?(@sub_account)).to eq true
+        expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to be true # now saved directly on sub-account
+        expect(@sub_tool.is_rce_favorite_in_context?(@sub_account)).to be true
       end
     end
 

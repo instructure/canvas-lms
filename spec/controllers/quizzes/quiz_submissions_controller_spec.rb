@@ -236,8 +236,8 @@ describe Quizzes::QuizSubmissionsController do
         )
         user_session(@teacher)
         quiz = course_quiz true
-        expect(quiz.grants_right?(@teacher, :grade)).to eq false
-        expect(quiz.grants_right?(@teacher, :review_grades)).to eq true
+        expect(quiz.grants_right?(@teacher, :grade)).to be false
+        expect(quiz.grants_right?(@teacher, :review_grades)).to be true
         expect(ContentZipper).to receive(:delay).and_return(ContentZipper)
         expect(ContentZipper).to receive(:process_attachment)
         get "index", params: { quiz_id: quiz.id, zip: "1", course_id: @course }
@@ -265,7 +265,7 @@ describe Quizzes::QuizSubmissionsController do
         expect(response).to be_successful
         json = JSON.parse(response.body)
         expect(json).to have_key("has_seen_results")
-        expect(json["has_seen_results"]).to eq false
+        expect(json["has_seen_results"]).to be false
       end
 
       it "requires a valid user id" do

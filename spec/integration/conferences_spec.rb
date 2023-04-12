@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe ConferencesController, type: :request do
+describe ConferencesController do
   before do
     allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", { domain: "wimba.test" })])
   end

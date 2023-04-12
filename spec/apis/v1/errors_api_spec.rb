@@ -42,7 +42,7 @@ describe ErrorsController, type: :request do
           comments: "My Description"
         }
       }
-      expect(json["logged"]).to eq(true)
+      expect(json["logged"]).to be(true)
       expect(ErrorReport.last.email).to eq("TestErrorsEmail@example.com")
     end
 
@@ -58,7 +58,7 @@ describe ErrorsController, type: :request do
           }
         }
       }
-      expect(json["logged"]).to eq(true)
+      expect(json["logged"]).to be(true)
       report = ErrorReport.last
       expect(report.http_env["foo"]).to eq("bar")
       expect(report.http_env["meta"]).to eq("data")

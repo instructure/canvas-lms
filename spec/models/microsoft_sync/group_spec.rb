@@ -119,7 +119,7 @@ describe MicrosoftSync::Group do
         described_class.where(id: subject.id).update_all(workflow_state: "deleted")
       end
 
-      it { expect(run_method!).to eq(false) }
+      it { expect(run_method!).to be(false) }
 
       it 'updates the workflow_state on the object to match the "deleted" in the DB' do
         expect { run_method! }.to change { subject.workflow_state }.from("pending").to("deleted")
@@ -143,7 +143,7 @@ describe MicrosoftSync::Group do
     end
 
     context "when state is not deleted" do
-      it { expect(run_method!).to eq(true) }
+      it { expect(run_method!).to be(true) }
 
       it "updates the workflow_state on the object" do
         expect { run_method! }.to change { subject.workflow_state }.from("pending").to("errored")

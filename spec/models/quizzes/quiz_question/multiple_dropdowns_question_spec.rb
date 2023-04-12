@@ -52,8 +52,8 @@ describe Quizzes::QuizQuestion::MultipleDropdownsQuestion do
 
     it "returns nil values when answer not detected" do
       answer = question.find_chosen_answer("test_group", "0")
-      expect(answer[:id]).to be nil
-      expect(answer[:blank_id]).to be nil
+      expect(answer[:id]).to be_nil
+      expect(answer[:blank_id]).to be_nil
     end
   end
 end

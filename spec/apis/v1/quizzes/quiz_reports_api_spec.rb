@@ -69,22 +69,22 @@ describe Quizzes::QuizReportsController, type: :request do
 
         describe "the `includes_all_versions` flag" do
           it "enables it" do
-            expect(student_analysis(includes_all_versions: true)["includes_all_versions"]).to eq true
+            expect(student_analysis(includes_all_versions: true)["includes_all_versions"]).to be true
           end
 
           it "defaults to false" do
-            expect(student_analysis["includes_all_versions"]).to eq false
+            expect(student_analysis["includes_all_versions"]).to be false
           end
         end
 
         describe "includes_sis_ids" do
           it "includes sis ids for users with access" do
-            expect(student_analysis["includes_sis_ids"]).to eq true
+            expect(student_analysis["includes_sis_ids"]).to be true
           end
 
           it "does not include sis ids for users without access" do
             ta_in_course(active_all: true)
-            expect(student_analysis["includes_sis_ids"]).to eq false
+            expect(student_analysis["includes_sis_ids"]).to be false
           end
         end
       end
@@ -247,17 +247,17 @@ describe Quizzes::QuizReportsController, type: :request do
       report.generate_csv
       api_abort
       assert_status(204)
-      expect(report.reload.csv_attachment).to eq nil
+      expect(report.reload.csv_attachment).to be_nil
     end
 
     it "works when the report is queued for generation" do
       report.generate_csv_in_background
-      expect(report.reload.generating_csv?).to eq true
+      expect(report.reload.generating_csv?).to be true
 
       api_abort
 
       assert_status(204)
-      expect(report.reload.generating_csv?).to eq false
+      expect(report.reload.generating_csv?).to be false
     end
 
     it "works when the report failed to generate" do

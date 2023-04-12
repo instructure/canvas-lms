@@ -223,7 +223,7 @@ describe "Api::V1::Assignment" do
 
       it "optionally includes 'grades_published' for moderated assignments" do
         json = api.assignment_json(assignment, user, session, { include_grades_published: true })
-        expect(json["grades_published"]).to eq(true)
+        expect(json["grades_published"]).to be(true)
       end
 
       it "excludes 'grades_published' by default" do
@@ -342,11 +342,11 @@ describe "Api::V1::Assignment" do
         context_module = ContextModule.create!(context: course, workflow_state: "unpublished")
         context_module.content_tags.create!(content: assignment, context: course, tag_type: "context_module")
 
-        expect(context_module.published?).to eq false
-        expect(assignment.published?).to eq true
+        expect(context_module.published?).to be false
+        expect(assignment.published?).to be true
         json = api.assignment_json(assignment, student, session, { include_can_submit: true })
         expect(json).to have_key "can_submit"
-        expect(json[:can_submit]).to eq false
+        expect(json[:can_submit]).to be false
       end
     end
 
@@ -370,12 +370,12 @@ describe "Api::V1::Assignment" do
 
       it "includes ignore_for_scoring when it is on the rubric" do
         json = api.assignment_json(assignment, user, session)
-        expect(json["rubric"][0]["ignore_for_scoring"]).to eq true
+        expect(json["rubric"][0]["ignore_for_scoring"]).to be true
       end
 
       it "includes hide_score_total setting in rubric_settings" do
         json = api.assignment_json(assignment, user, session)
-        expect(json["rubric_settings"]["hide_score_total"]).to eq false
+        expect(json["rubric_settings"]["hide_score_total"]).to be false
       end
 
       it "returns true for hide_score_total if set to true on the rubric association" do
@@ -383,12 +383,12 @@ describe "Api::V1::Assignment" do
         ra.hide_score_total = true
         ra.save!
         json = api.assignment_json(assignment, user, session)
-        expect(json["rubric_settings"]["hide_score_total"]).to eq true
+        expect(json["rubric_settings"]["hide_score_total"]).to be true
       end
 
       it "includes hide_points setting in rubric_settings" do
         json = api.assignment_json(assignment, user, session)
-        expect(json["rubric_settings"]["hide_points"]).to eq false
+        expect(json["rubric_settings"]["hide_points"]).to be false
       end
 
       it "returns true for hide_points if set to true on the rubric association" do
@@ -396,7 +396,7 @@ describe "Api::V1::Assignment" do
         ra.hide_points = true
         ra.save!
         json = api.assignment_json(assignment, user, session)
-        expect(json["rubric_settings"]["hide_points"]).to eq true
+        expect(json["rubric_settings"]["hide_points"]).to be true
       end
 
       it "excludes rubric when exclude_response_fields contains 'rubric'" do
@@ -696,13 +696,13 @@ describe "Api::V1::Assignment" do
       end
 
       it "allows updating the submission_types field" do
-        expect(assignment.external_tool?).to eq false
+        expect(assignment.external_tool?).to be false
 
         response = api.update_api_assignment(assignment, assignment_update_params, user)
 
         expect(response).to eq :ok
-        expect(assignment.external_tool?).to eq true
-        expect(assignment.peer_reviews).to eq false
+        expect(assignment.external_tool?).to be true
+        expect(assignment.peer_reviews).to be false
       end
     end
 

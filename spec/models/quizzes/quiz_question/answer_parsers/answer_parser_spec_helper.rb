@@ -39,7 +39,7 @@ shared_examples_for "All answer parsers" do
   end
 
   it "formats the answers" do
-    expect(@answer_data).to be_kind_of(Quizzes::QuizQuestion::AnswerGroup)
+    expect(@answer_data).to be_a(Quizzes::QuizQuestion::AnswerGroup)
     raw_answers.each do |raw|
       expect(@answer_data.answers).to have_answer raw[:answer_text]
     end
@@ -47,7 +47,7 @@ shared_examples_for "All answer parsers" do
 
   it "provides IDs for the answers" do
     ids = @answer_data.answers.pluck(:id)
-    ids.each { |id| expect(id).to be_kind_of(Integer) }
+    ids.each { |id| expect(id).to be_a(Integer) }
   end
 
   it "sanitizes answer comments" do

@@ -353,7 +353,7 @@ describe "Submissions API", type: :request do
                         format: "json", section_id: @section.id.to_s,
                         assignment_id: @a1.id.to_s },
                       { include: %w[visibility], student_ids: [@student1.id] })
-      expect(json[0]["assignment_visible"]).to eq true
+      expect(json[0]["assignment_visible"]).to be true
     end
 
     it "posts to submissions" do
@@ -391,8 +391,8 @@ describe "Submissions API", type: :request do
                         format: "json", section_id: @section.id.to_s,
                         assignment_id: @a1.id.to_s, user_id: @student1.id.to_s },
                       { submission: { posted_grade: "75%" }, include: %w[visibility] })
-      expect(json["assignment_visible"]).to eq true
-      expect(json["all_submissions"][0]["assignment_visible"]).to eq true
+      expect(json["assignment_visible"]).to be true
+      expect(json["all_submissions"][0]["assignment_visible"]).to be true
     end
 
     it "is able to handle an update without visibility when DA is on" do
@@ -2262,7 +2262,7 @@ describe "Submissions API", type: :request do
         expect(json["anonymous_id"]).to eq submission.anonymous_id
         expect(json.dig("submission_history", 0)).not_to have_key "user_id"
         expect(json.dig("submission_history", 0, "anonymous_id")).to eq submission.anonymous_id
-        expect(json.dig("submission_comments", 0, "author_id")).to be nil
+        expect(json.dig("submission_comments", 0, "author_id")).to be_nil
         expect(json.dig("submission_comments", 0, "author_name")).to eq "Anonymous User"
       end
     end
@@ -2338,7 +2338,7 @@ describe "Submissions API", type: :request do
 
           it "returns assignment_visible false" do
             json = call_to_submissions_show(as_student: false, includes: ["visibility"])
-            expect(json["assignment_visible"]).to eq(false)
+            expect(json["assignment_visible"]).to be(false)
           end
         end
       end
@@ -3044,7 +3044,7 @@ describe "Submissions API", type: :request do
         expect(json["anonymous_id"]).to eq submission.anonymous_id
         expect(json.dig("all_submissions", 0)).not_to have_key "user_id"
         expect(json.dig("all_submissions", 0, "anonymous_id")).to eq submission.anonymous_id
-        expect(json.dig("submission_comments", 0, "author_id")).to be nil
+        expect(json.dig("submission_comments", 0, "author_id")).to be_nil
         expect(json.dig("submission_comments", 0, "author_name")).to eq "Anonymous User"
       end
     end
@@ -3131,7 +3131,7 @@ describe "Submissions API", type: :request do
 
       submission = @assignment.submission_for_student(@student)
       expect(submission).to be_excused
-      expect(json["excused"]).to eq true
+      expect(json["excused"]).to be true
     end
 
     it "can unexcuse assignments" do
@@ -3155,7 +3155,7 @@ describe "Submissions API", type: :request do
       )
 
       expect(submission.reload).not_to be_excused
-      expect(json["excused"]).to eq false
+      expect(json["excused"]).to be false
     end
 
     it "sets the submission grader to the current user when setting late_policy_status" do
@@ -4233,7 +4233,7 @@ describe "Submissions API", type: :request do
 
     expect(Submission.count).to eq 2
     Submission.all.each do |submission|
-      expect(submission.submission_comments.size).to eql 1
+      expect(submission.submission_comments.size).to be 1
       expect(submission.submission_comments.first.comment).to eql "ohai!"
     end
   end
@@ -5115,7 +5115,7 @@ describe "Submissions API", type: :request do
       api_call_as_user(@student, :put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/document_annotations/read",
                        { course_id: @course.to_param, assignment_id: @assignment.to_param, user_id: @student.to_param,
                          action: "mark_document_annotations_read", controller: "submissions_api", format: "json" })
-      expect(@user.reload.unread_submission_annotations?(@submission)).to eq false
+      expect(@user.reload.unread_submission_annotations?(@submission)).to be false
     end
 
     it "doesn't allow you to mark someone else's document annotations read" do
@@ -5193,7 +5193,7 @@ describe "Submissions API", type: :request do
       api_call_as_user(@student, :put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/rubric_assessments/read",
                        { course_id: @course.to_param, assignment_id: @assignment.to_param, user_id: @student.to_param,
                          action: "mark_rubric_assessments_read", controller: "submissions_api", format: "json" })
-      expect(@user.reload.unread_rubric_assessments?(@submission)).to eq false
+      expect(@user.reload.unread_rubric_assessments?(@submission)).to be false
     end
 
     it "doesn't allow you to mark someone else's rubric comments read" do

@@ -88,7 +88,7 @@ describe Mutations::CreateOutcomeProficiency do
     expect(ratings.length).to eq 1
     expect(ratings[0]["color"]).to eq "FFFFFF"
     expect(ratings[0]["description"]).to eq "white"
-    expect(ratings[0]["mastery"]).to eq true
+    expect(ratings[0]["mastery"]).to be true
     expect(ratings[0]["points"]).to eq 1.0
   end
 

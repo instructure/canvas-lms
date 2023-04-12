@@ -45,7 +45,7 @@ describe CoursePacing::CoursePaceService do
 
   describe ".template_pace_for" do
     it "returns nil" do
-      expect(CoursePacing::CoursePaceService.template_pace_for(course)).to eq nil
+      expect(CoursePacing::CoursePaceService.template_pace_for(course)).to be_nil
     end
   end
 
@@ -89,7 +89,7 @@ describe CoursePacing::CoursePaceService do
         allow(course_pace).to receive(:update).and_return false
         expect(
           CoursePacing::CoursePaceService.update_pace(course_pace, update_params)
-        ).to eq false
+        ).to be false
       end
     end
   end

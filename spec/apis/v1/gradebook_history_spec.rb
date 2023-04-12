@@ -174,7 +174,7 @@ describe Api::V1::GradebookHistory do
     it "does preloads originality reports" do
       submission.reload
       harness.versions_json(course, versions, api_context)
-      expect(versions.first.model.association(:originality_reports).loaded?).to eq true
+      expect(versions.first.model.association(:originality_reports).loaded?).to be true
     end
 
     it "handles versions without an associated 'versionable' object" do
@@ -240,7 +240,7 @@ describe Api::V1::GradebookHistory do
       expect(submissions.first[:versions][0][:grade]).to eq "80"
       expect(submissions.first[:versions][0][:previous_grade]).to eq "90"
       expect(submissions.first[:versions][1][:grade]).to eq "90"
-      expect(submissions.first[:versions][1][:previous_grade]).to eq nil
+      expect(submissions.first[:versions][1][:previous_grade]).to be_nil
     end
   end
 

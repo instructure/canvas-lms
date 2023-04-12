@@ -872,7 +872,7 @@ describe ApplicationHelper do
     end
 
     it "returns nil if not set" do
-      expect(file_access_user).to be nil
+      expect(file_access_user).to be_nil
     end
   end
 
@@ -916,7 +916,7 @@ describe ApplicationHelper do
       end
 
       it "returns nil if neither set" do
-        expect(file_access_real_user).to be nil
+        expect(file_access_real_user).to be_nil
       end
     end
   end
@@ -935,7 +935,7 @@ describe ApplicationHelper do
       end
 
       it "returns nil without @access_token set" do
-        expect(file_access_developer_key).to be nil
+        expect(file_access_developer_key).to be_nil
       end
     end
 
@@ -951,7 +951,7 @@ describe ApplicationHelper do
       end
 
       it "returns nil if developer key in session not set" do
-        expect(file_access_developer_key).to eql nil
+        expect(file_access_developer_key).to be_nil
       end
     end
   end
@@ -979,7 +979,7 @@ describe ApplicationHelper do
       end
 
       it "returns nil if root account in session not set" do
-        expect(file_access_root_account).to eql nil
+        expect(file_access_root_account).to be_nil
       end
     end
   end
@@ -1013,7 +1013,7 @@ describe ApplicationHelper do
       end
 
       it "returns nil if no host in the session" do
-        expect(file_access_oauth_host).to eql nil
+        expect(file_access_oauth_host).to be_nil
       end
     end
   end
@@ -1066,9 +1066,9 @@ describe ApplicationHelper do
       let(:request) { double("request", host_with_port: current_host) }
 
       it "creates a public authenticator" do
-        expect(file_authenticator.user).to be nil
-        expect(file_authenticator.acting_as).to be nil
-        expect(file_authenticator.oauth_host).to be nil
+        expect(file_authenticator.user).to be_nil
+        expect(file_authenticator.acting_as).to be_nil
+        expect(file_authenticator.oauth_host).to be_nil
       end
     end
 
@@ -1126,9 +1126,9 @@ describe ApplicationHelper do
 
       it "creates a public authenticator" do
         authenticator = file_authenticator
-        expect(authenticator.user).to be nil
-        expect(authenticator.acting_as).to be nil
-        expect(authenticator.oauth_host).to be nil
+        expect(authenticator.user).to be_nil
+        expect(authenticator.acting_as).to be_nil
+        expect(authenticator.oauth_host).to be_nil
       end
     end
   end

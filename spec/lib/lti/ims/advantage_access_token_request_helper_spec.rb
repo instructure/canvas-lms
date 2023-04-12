@@ -37,7 +37,7 @@ describe Lti::IMS::AdvantageAccessTokenRequestHelper do
       end
 
       specify ".token_error() returns nil" do
-        expect(described_class.token_error(request)).to eq(nil)
+        expect(described_class.token_error(request)).to be_nil
       end
 
       it "uses the oauth url for request.host_with_port, and the default grant host, as possible audience values" do
@@ -58,7 +58,7 @@ describe Lti::IMS::AdvantageAccessTokenRequestHelper do
       end
 
       specify ".token() returns nil" do
-        expect(described_class.token(request)).to eq(nil)
+        expect(described_class.token(request)).to be_nil
       end
 
       specify ".token_error() returns an error" do
@@ -82,11 +82,11 @@ describe Lti::IMS::AdvantageAccessTokenRequestHelper do
     before { allow(AuthenticationMethods).to receive(:access_token).and_return(nil) }
 
     specify ".token() returns nil" do
-      expect(described_class.token(request)).to eq(nil)
+      expect(described_class.token(request)).to be_nil
     end
 
     specify ".token_error() returns nil" do
-      expect(described_class.token_error(request)).to eq(nil)
+      expect(described_class.token_error(request)).to be_nil
     end
   end
 
@@ -97,20 +97,20 @@ describe Lti::IMS::AdvantageAccessTokenRequestHelper do
     end
 
     it "returns true if the route's controller includes the LtiServices concern" do
-      expect(result_for_path("api/lti/courses/123/line_items")).to eq(true)
+      expect(result_for_path("api/lti/courses/123/line_items")).to be(true)
       # Account lookup controller:
-      expect(result_for_path("api/lti/accounts/123")).to eq(true)
+      expect(result_for_path("api/lti/accounts/123")).to be(true)
     end
 
     it "returns false if given a route for a controller that doesn't include LtiServices" do
-      expect(result_for_path("api/courses/123")).to eq(false)
-      expect(result_for_path("api/lti/assignments/1/files/2/originality_report")).to eq(false)
-      expect(result_for_path("api/lti/security/jwks")).to eq(false)
+      expect(result_for_path("api/courses/123")).to be(false)
+      expect(result_for_path("api/lti/assignments/1/files/2/originality_report")).to be(false)
+      expect(result_for_path("api/lti/security/jwks")).to be(false)
     end
 
     it "returns false if given a bad route" do
-      expect(result_for_path("blablablanonsense-route-doesnexist")).to eq(false)
-      expect(result_for_path("api/lti/blablabla-wombat123")).to eq(false)
+      expect(result_for_path("blablablanonsense-route-doesnexist")).to be(false)
+      expect(result_for_path("api/lti/blablabla-wombat123")).to be(false)
     end
 
     it "returns false if the route references a non-existent controller" do
@@ -118,7 +118,7 @@ describe Lti::IMS::AdvantageAccessTokenRequestHelper do
       # don't want to blow up here in this method
       expect(Rails.application.routes).to receive(:recognize_path)
         .and_return(controller: "oops_this_controller_doesnt/really_exist")
-      expect(result_for_path("api/lti/security/jwks")).to eq(false)
+      expect(result_for_path("api/lti/security/jwks")).to be(false)
     end
 
     specify "there are no routes for controllers which include the LtiServices concern that don't start with /api/lti" do

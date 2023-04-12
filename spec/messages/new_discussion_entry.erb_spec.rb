@@ -43,13 +43,13 @@ describe "new_discussion_entry" do
     it "renders correct footer if replys are enabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
       msg = generate_message(notification_name, path_type, asset)
-      expect(msg.body.include?("replying to this message")).to eq true
+      expect(msg.body.include?("replying to this message")).to be true
     end
 
     it "renders correct footer if replys are disabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = false
       msg = generate_message(notification_name, path_type, asset)
-      expect(msg.body.include?("replying to this message")).to eq false
+      expect(msg.body.include?("replying to this message")).to be false
     end
 
     context "fully anonymous topic" do

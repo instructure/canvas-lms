@@ -44,7 +44,7 @@ describe "submission_comment" do
       it "nevers render reply to footer" do
         IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
         msg = generate_message(notification_name, path_type, asset)
-        expect(msg.body.include?("by responding to this message")).to eq false
+        expect(msg.body.include?("by responding to this message")).to be false
       end
     end
 

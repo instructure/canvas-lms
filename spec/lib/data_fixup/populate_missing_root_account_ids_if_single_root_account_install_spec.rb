@@ -28,7 +28,7 @@ describe DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall do
 
       it "does not call populate_missing_root_account_ids" do
         # Ensure there are no courses on site admin (that case is tested separately, below)
-        expect(Course.where(root_account_id: Account.site_admin.id).take).to eq(nil)
+        expect(Course.where(root_account_id: Account.site_admin.id).take).to be_nil
         expect(described_class).to_not receive(:populate_missing_root_account_ids)
           .with(Account.default.id)
         described_class.run
@@ -49,7 +49,7 @@ describe DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall do
 
       context "there are no courses on the site admin account" do
         it "calls populate_missing_root_account_ids" do
-          expect(Course.where(root_account_id: Account.site_admin.id).take).to eq(nil)
+          expect(Course.where(root_account_id: Account.site_admin.id).take).to be_nil
           expect(described_class).to receive(:populate_missing_root_account_ids)
             .with(Account.default.id)
           described_class.run

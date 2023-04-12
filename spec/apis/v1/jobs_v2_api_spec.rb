@@ -184,9 +184,9 @@ describe "Jobs V2 API", type: :request do
             json = api_call(:get, "/api/v1/jobs2/queued/by_strand",
                             { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "strand", order: "info" })
             expect(json[0]["strand"]).to eq "bar"
-            expect(json[0]["orphaned"]).to eq true
+            expect(json[0]["orphaned"]).to be true
             expect(json[1]["strand"]).to eq "foo"
-            expect(json[1]["orphaned"]).to eq false
+            expect(json[1]["orphaned"]).to be false
           end
 
           it "unstucks orphaned strands" do
@@ -254,9 +254,9 @@ describe "Jobs V2 API", type: :request do
             json = api_call(:get, "/api/v1/jobs2/queued/by_singleton",
                             { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "singleton", order: "info" })
             expect(json[0]["singleton"]).to eq "zombo20001"
-            expect(json[0]["orphaned"]).to eq true
+            expect(json[0]["orphaned"]).to be true
             expect(json[1]["singleton"]).to eq "foobar2000"
-            expect(json[1]["orphaned"]).to eq false
+            expect(json[1]["orphaned"]).to be false
           end
 
           it "unstucks orphaned singletons" do

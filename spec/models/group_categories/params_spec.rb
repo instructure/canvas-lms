@@ -79,7 +79,7 @@ module GroupCategories
       it "is nil with auto_leading disabled from form submission of an existing record" do
         raw_args = { auto_leader: "first", enable_auto_leader: "0" }
         params = build_params(raw_args)
-        expect(params.auto_leader).to be(nil)
+        expect(params.auto_leader).to be_nil
       end
 
       it "passes through valid values when auto leading is enabled" do
@@ -116,7 +116,7 @@ module GroupCategories
 
         it "nils out the param if disabled from the form" do
           params = build_params(enable_auto_leader: false, auto_leader_type: "FIRST", auto_leader: "random")
-          expect(params.auto_leader).to be(nil)
+          expect(params.auto_leader).to be_nil
         end
 
         it "uses the form value if form is enabled" do

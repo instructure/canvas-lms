@@ -53,7 +53,7 @@ RSpec.shared_examples "a submission redo_submission action" do |controller|
     user_session(@teacher)
     put :redo_submission, params: @params
     assert_status 204
-    expect(@submission.reload.redo_request).to eq true
+    expect(@submission.reload.redo_request).to be true
   end
 
   it "allows on assignments with a lock date in the future and proper permissions" do
@@ -69,7 +69,7 @@ RSpec.shared_examples "a submission redo_submission action" do |controller|
     user_session(@teacher)
     put :redo_submission, params: @params
     assert_status 204
-    expect(@submission.reload.redo_request).to eq true
+    expect(@submission.reload.redo_request).to be true
   end
 
   it "does not allow on assignments with a lock date in the future and improper permissions" do
@@ -100,6 +100,6 @@ RSpec.shared_examples "a submission redo_submission action" do |controller|
     user_session(@teacher)
     put :redo_submission, params: @params
     assert_status 422
-    expect(@submission.reload.redo_request).to eq false
+    expect(@submission.reload.redo_request).to be false
   end
 end

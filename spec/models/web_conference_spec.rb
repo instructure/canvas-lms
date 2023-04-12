@@ -153,7 +153,7 @@ describe WebConference do
       conference.add_attendee(@user)
       allow(conference).to receive(:conference_status).and_return(:closed)
       expect(conference.ended_at).to be_nil
-      expect(conference.active?(true)).to eql(false)
+      expect(conference.active?(true)).to be(false)
       expect(conference.ended_at).to be_nil
     end
 
@@ -164,7 +164,7 @@ describe WebConference do
       conference.end_at = 20.minutes.ago
       conference.save!
       expect(conference.ended_at).to be_nil
-      expect(conference.active?(true)).to eql(false)
+      expect(conference.active?(true)).to be(false)
       expect(conference.ended_at).not_to be_nil
       expect(conference.ended_at).to be < Time.zone.now
     end
@@ -176,8 +176,8 @@ describe WebConference do
       conference.start_at = 30.minutes.ago
       conference.end_at = 20.minutes.ago
       conference.save!
-      expect(conference.active?(true)).to eql(false)
-      expect(conference.conference_status).to eql(:active)
+      expect(conference.active?(true)).to be(false)
+      expect(conference.conference_status).to be(:active)
       expect(conference.ended_at).not_to be_nil
       expect(conference.ended_at).to be < Time.zone.now
     end
@@ -384,7 +384,7 @@ describe WebConference do
       event = calendar_event_model web_conference: conference
       conference.web_conference_participants.scope.delete_all
       conference.destroy!
-      expect(event.reload.web_conference).to be nil
+      expect(event.reload.web_conference).to be_nil
     end
   end
 

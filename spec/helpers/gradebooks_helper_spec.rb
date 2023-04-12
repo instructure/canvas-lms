@@ -62,33 +62,33 @@ describe GradebooksHelper do
 
   describe "#anonymous_survey?" do
     it "requires a quiz" do
-      expect(helper.anonymous_survey?(assignment)).to eq false
+      expect(helper.anonymous_survey?(assignment)).to be false
     end
 
     it "is falsy with just a survey" do
       quiz.survey = true
-      expect(helper.anonymous_survey?(assignment)).to eq false
+      expect(helper.anonymous_survey?(assignment)).to be false
     end
 
     it "is falsy with just anonymous_submissions" do
       quiz.anonymous_submissions = true
-      expect(helper.anonymous_survey?(assignment)).to eq false
+      expect(helper.anonymous_survey?(assignment)).to be false
     end
 
     it "is truthy with an anonymous survey" do
       anonymous_survey
-      expect(helper.anonymous_survey?(assignment)).to eq true
+      expect(helper.anonymous_survey?(assignment)).to be true
     end
   end
 
   describe "#force_anonymous_grading?" do
     it "returns false by default" do
-      expect(helper.force_anonymous_grading?(assignment_model)).to eq false
+      expect(helper.force_anonymous_grading?(assignment_model)).to be false
     end
 
     it "returns true if anonymous quiz" do
       anonymous_survey
-      expect(helper.force_anonymous_grading?(assignment)).to eq true
+      expect(helper.force_anonymous_grading?(assignment)).to be true
     end
 
     it "returns true for an anonymously-graded assignment" do
@@ -100,7 +100,7 @@ describe GradebooksHelper do
     it "returns false for a non-anonymously-graded assignment" do
       assignment = assignment_model
       allow(assignment).to receive(:anonymize_students?).and_return(false)
-      expect(helper.force_anonymous_grading?(assignment)).to eq false
+      expect(helper.force_anonymous_grading?(assignment)).to be false
     end
   end
 

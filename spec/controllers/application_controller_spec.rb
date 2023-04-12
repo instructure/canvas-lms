@@ -437,13 +437,13 @@ RSpec.describe ApplicationController do
         end
 
         it "is false by default" do
-          expect(@controller.js_env[:comment_library_suggestions_enabled]).to eq false
+          expect(@controller.js_env[:comment_library_suggestions_enabled]).to be false
         end
 
         it "is true if user enables suggestions" do
           @user.preferences[:comment_library_suggestions_enabled] = true
           @user.save!
-          expect(@controller.js_env[:comment_library_suggestions_enabled]).to eq true
+          expect(@controller.js_env[:comment_library_suggestions_enabled]).to be true
         end
       end
 
@@ -1702,7 +1702,7 @@ RSpec.describe ApplicationController do
           hash = controller.external_tool_display_hash(@tool, setting)
           expect(hash[:base_url]).to eq "http://test.host/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=#{setting}"
           expect(hash[:icon_url]).to eq "http://example.com/icon.png?#{setting}"
-          expect(hash[:canvas_icon_class]).to be nil
+          expect(hash[:canvas_icon_class]).to be_nil
         end
       end
 
@@ -1790,7 +1790,7 @@ RSpec.describe ApplicationController do
   describe "#ms_office?" do
     it "detects Word 2011 for mac" do
       controller.request.user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X) Word/14.57.0"
-      expect(controller.send(:ms_office?)).to eq true
+      expect(controller.send(:ms_office?)).to be true
     end
   end
 
@@ -2485,7 +2485,7 @@ RSpec.describe ApplicationController do
             "/courses/1/modules",
           ].each do |path|
             allow(controller).to receive(:request).and_return(double({ path: path }))
-            expect(controller.send(:should_show_migration_limitation_message)).to eq(true)
+            expect(controller.send(:should_show_migration_limitation_message)).to be(true)
           end
         end
 
@@ -2495,7 +2495,7 @@ RSpec.describe ApplicationController do
             "/courses/1/assignments/1"
           ].each do |path|
             allow(controller).to receive(:request).and_return(double({ path: path }))
-            expect(controller.send(:should_show_migration_limitation_message)).to eq(false)
+            expect(controller.send(:should_show_migration_limitation_message)).to be(false)
           end
         end
       end
@@ -2511,7 +2511,7 @@ RSpec.describe ApplicationController do
             "/courses/1/assignments/1"
           ].each do |path|
             allow(controller).to receive(:request).and_return(double({ path: path }))
-            expect(controller.send(:should_show_migration_limitation_message)).to eq(false)
+            expect(controller.send(:should_show_migration_limitation_message)).to be(false)
           end
         end
       end
@@ -2540,7 +2540,7 @@ RSpec.describe ApplicationController do
           "/courses/1/assignments/1"
         ].each do |path|
           allow(controller).to receive(:request).and_return(double({ path: path }))
-          expect(controller.send(:should_show_migration_limitation_message)).to eq(false)
+          expect(controller.send(:should_show_migration_limitation_message)).to be(false)
         end
       end
     end

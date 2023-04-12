@@ -346,8 +346,8 @@ describe UsersController do
       get "manageable_courses", params: { user_id: @teacher.id }
       expect(response).to be_successful
       courses = json_parse
-      expect(courses.find { |c| c["id"] == @course1.id }["blueprint"]).to eq true
-      expect(courses.find { |c| c["id"] == @course2.id }["blueprint"]).to eq false
+      expect(courses.find { |c| c["id"] == @course1.id }["blueprint"]).to be true
+      expect(courses.find { |c| c["id"] == @course2.id }["blueprint"]).to be false
     end
 
     context "query matching" do
@@ -2139,7 +2139,7 @@ describe UsersController do
       @teacher.destroy
 
       get "show", params: { id: @teacher.id }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
       expect(response).not_to render_template("users/show")
     end
 
@@ -2151,7 +2151,7 @@ describe UsersController do
       @teacher.destroy
 
       get "show", params: { id: @teacher.id }
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
       expect(response).to render_template("users/show")
     end
 
@@ -2177,7 +2177,7 @@ describe UsersController do
       user_factory(active_all: true)
       user_session(@user)
       get "show", params: { id: defunct_user.id }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "401s if the user exists but you don't have permission" do
@@ -2185,14 +2185,14 @@ describe UsersController do
       user_factory(active_all: true)
       user_session(@user)
       get "show", params: { id: user2.id }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "renders for an admin" do
       account_admin_user(active_all: true)
       user_session(@user)
       get "show", params: { id: @user.id }
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
   end
 
@@ -2203,7 +2203,7 @@ describe UsersController do
       user_session(@user)
       put "update", params: { id: other_user.id }, format: "json"
       expect(response.body).not_to include "secret"
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "overwrites stuck sis fields" do
@@ -2211,7 +2211,7 @@ describe UsersController do
       user_session(@user)
       put "update", params: { id: @user.id, "user[sortable_name]": "overwritten@example.com" }, format: "json"
       expect(response.body).to include "overwritten@example.com"
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "doesn't overwrite stuck sis fields" do
@@ -2219,7 +2219,7 @@ describe UsersController do
       user_session(@user)
       put "update", params: { id: @user.id, "user[sortable_name]": "overwritten@example.com", override_sis_stickiness: false }, format: "json"
       expect(response.body).not_to include "overwritten@example.com"
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
   end
 
@@ -2924,21 +2924,21 @@ describe UsersController do
 
     it "rejects unauthenticated users" do
       delete "terminate_sessions", params: { id: user.id }, format: :json
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "rejects one person from terminating someone else" do
       user_session(user2)
 
       delete "terminate_sessions", params: { id: user.id }, format: :json
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "allows admin to terminate sessions" do
       user_session(admin)
 
       delete "terminate_sessions", params: { id: user.id }, format: :json
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
 
       expect(user.reload.last_logged_out).not_to be_nil
       expect(user.access_tokens.take.permanent_expires_at).to be <= Time.zone.now

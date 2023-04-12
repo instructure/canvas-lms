@@ -175,7 +175,7 @@ describe Login::CanvasController do
     post "create", params: { pseudonym_session: { unique_id: " jtfrd@instructure.com ", password: "qwertyuiop" },
                              authenticity_token: "42" }
     assert_status(400)
-    expect(session[:sentinel]).to eq true
+    expect(session[:sentinel]).to be true
     expect(response).to render_template(:new)
     expect(flash[:error]).to be_a(Hash)
     expect(flash[:error][:html]).to match(/invalid authenticity token/i)

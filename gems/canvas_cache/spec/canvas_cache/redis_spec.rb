@@ -74,24 +74,24 @@ describe CanvasCache::Redis do
 
     describe "locking" do
       it "succeeds if the lock isn't taken" do
-        expect(CanvasCache::Redis.lock("test1")).to eq true
-        expect(CanvasCache::Redis.lock("test2")).to eq true
+        expect(CanvasCache::Redis.lock("test1")).to be true
+        expect(CanvasCache::Redis.lock("test2")).to be true
       end
 
       it "fails if the lock is taken" do
-        expect(CanvasCache::Redis.lock("test1")).to eq true
-        expect(CanvasCache::Redis.lock("test1")).to eq false
-        expect(CanvasCache::Redis.unlock("test1")).to eq true
-        expect(CanvasCache::Redis.lock("test1")).to eq true
+        expect(CanvasCache::Redis.lock("test1")).to be true
+        expect(CanvasCache::Redis.lock("test1")).to be false
+        expect(CanvasCache::Redis.unlock("test1")).to be true
+        expect(CanvasCache::Redis.lock("test1")).to be true
       end
 
       it "lives forever if no expire time is given" do
-        expect(CanvasCache::Redis.lock("test1")).to eq true
+        expect(CanvasCache::Redis.lock("test1")).to be true
         expect(CanvasCache::Redis.redis.ttl(CanvasCache::Redis.lock_key("test1"))).to eq(-1)
       end
 
       it "sets the expire time if given" do
-        expect(CanvasCache::Redis.lock("test1", 15)).to eq true
+        expect(CanvasCache::Redis.lock("test1", 15)).to be true
         ttl = CanvasCache::Redis.redis.ttl(CanvasCache::Redis.lock_key("test1"))
         expect(ttl).to be > 0
         expect(ttl).to be <= 15
@@ -109,12 +109,12 @@ describe CanvasCache::Redis do
 
       it "protects against errnos" do
         expect(redis_client._client).to receive(:write).and_raise(Errno::ETIMEDOUT).once
-        expect(redis_client.set("blah", "blah")).to eq nil
+        expect(redis_client.set("blah", "blah")).to be_nil
       end
 
       it "protects against max # of client errors" do
         expect(redis_client._client).to receive(:write).and_raise(Redis::CommandError.new("ERR max number of clients reached")).once
-        expect(redis_client.set("blah", "blah")).to eq nil
+        expect(redis_client.set("blah", "blah")).to be_nil
       end
 
       it "passes through other command errors" do
@@ -136,21 +136,21 @@ describe CanvasCache::Redis do
 
         it "does not fail cache.read" do
           override_cache(cache) do
-            expect(Rails.cache.read("blah")).to eq nil
+            expect(Rails.cache.read("blah")).to be_nil
           end
         end
 
         it "does not call redis again after an error" do
           override_cache(cache) do
-            expect(Rails.cache.read("blah")).to eq nil
+            expect(Rails.cache.read("blah")).to be_nil
             # call again, the .once means that if it hits Redis::Client again it'll fail
-            expect(Rails.cache.read("blah")).to eq nil
+            expect(Rails.cache.read("blah")).to be_nil
           end
         end
 
         it "does not fail cache.write" do
           override_cache(cache) do
-            expect(Rails.cache.write("blah", "someval")).to eq nil
+            expect(Rails.cache.write("blah", "someval")).to be_nil
           end
         end
 
@@ -201,7 +201,7 @@ describe CanvasCache::Redis do
 
         it "does not fail raw redis commands" do
           expect(redis_client._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
-          expect(redis_client.setnx("my_key", 5)).to eq nil
+          expect(redis_client.setnx("my_key", 5)).to be_nil
         end
 
         it "returns a non-nil structure for mget" do
@@ -211,10 +211,10 @@ describe CanvasCache::Redis do
 
         it "distinguishes between failure and not exists for set nx" do
           redis_client.del("my_key")
-          expect(redis_client.set("my_key", 5, nx: true)).to eq true
-          expect(redis_client.set("my_key", 5, nx: true)).to eq false
+          expect(redis_client.set("my_key", 5, nx: true)).to be true
+          expect(redis_client.set("my_key", 5, nx: true)).to be false
           expect(redis_client._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
-          expect(redis_client.set("my_key", 5, nx: true)).to eq nil
+          expect(redis_client.set("my_key", 5, nx: true)).to be_nil
         end
       end
     end

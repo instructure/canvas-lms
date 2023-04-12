@@ -784,7 +784,7 @@ describe GradebookImporter do
         ",#{@student.id},,test 1,test 2,test 3,10"
       )
       col = @gi.upload.gradebook.fetch("custom_columns").find { |custom_column| custom_column.fetch("title") == "CustomColumn3" }
-      expect(col).to eq nil
+      expect(col).to be_nil
     end
 
     it "excludes hidden custom columns" do
@@ -794,7 +794,7 @@ describe GradebookImporter do
         ",#{@student.id},,test 1,test 2,test 3,10"
       )
       col = @gi.upload.gradebook.fetch("custom_columns").find { |custom_column| custom_column.fetch("title") == "CustomColumn3" }
-      expect(col).to eq nil
+      expect(col).to be_nil
     end
 
     GradebookImporter::GRADEBOOK_IMPORTER_RESERVED_NAMES.each do |reserved_column|
@@ -809,7 +809,7 @@ describe GradebookImporter do
           ",#{@student.id},,test 1,test 2,test 3,10"
         )
         col = @gi.upload.gradebook.fetch("custom_columns").find { |custom_column| custom_column.fetch("title") == reserved_column }
-        expect(col).to eq nil
+        expect(col).to be_nil
       end
     end
 
@@ -1603,7 +1603,7 @@ describe GradebookImporter do
         expect(output[:students].length).to eq 1
         expect(output[:students].first.dig(:override_scores, 0, :current_score)).to eq "50.54"
         expect(output[:students].first.dig(:override_scores, 0, :new_score)).to eq "60"
-        expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to eq nil
+        expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to be_nil
       end
     end
 
@@ -1617,9 +1617,9 @@ describe GradebookImporter do
 
       aggregate_failures do
         expect(output[:students].length).to eq 1
-        expect(output[:students].first.dig(:override_scores, 0, :current_score)).to eq nil
+        expect(output[:students].first.dig(:override_scores, 0, :current_score)).to be_nil
         expect(output[:students].first.dig(:override_scores, 0, :new_score)).to eq "70"
-        expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to eq nil
+        expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to be_nil
       end
     end
 
@@ -1634,8 +1634,8 @@ describe GradebookImporter do
       aggregate_failures do
         expect(output[:students].length).to eq 1
         expect(output[:students].first.dig(:override_scores, 0, :current_score)).to eq "50.54"
-        expect(output[:students].first.dig(:override_scores, 0, :new_score)).to eq nil
-        expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to eq nil
+        expect(output[:students].first.dig(:override_scores, 0, :new_score)).to be_nil
+        expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to be_nil
       end
     end
 
@@ -1679,11 +1679,11 @@ describe GradebookImporter do
 
         expect(output[:students].first.dig(:override_scores, 0, :current_score)).to eq "50.54"
         expect(output[:students].first.dig(:override_scores, 0, :new_score)).to eq "50.54"
-        expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to eq nil
+        expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to be_nil
 
-        expect(output[:students].second.dig(:override_scores, 0, :current_score)).to eq nil
+        expect(output[:students].second.dig(:override_scores, 0, :current_score)).to be_nil
         expect(output[:students].second.dig(:override_scores, 0, :new_score)).to eq "60"
-        expect(output[:students].second.dig(:override_scores, 0, :grading_period_id)).to eq nil
+        expect(output[:students].second.dig(:override_scores, 0, :grading_period_id)).to be_nil
       end
     end
 
@@ -1794,7 +1794,7 @@ describe GradebookImporter do
           expect(first_period_change[:new_score]).to eq "70"
 
           second_period_change = overrides.detect { |override| override[:grading_period_id] == second_grading_period.id }
-          expect(second_period_change[:current_score]).to eq nil
+          expect(second_period_change[:current_score]).to be_nil
           expect(second_period_change[:new_score]).to eq "60"
         end
       end
@@ -1829,11 +1829,11 @@ describe GradebookImporter do
           expect(student2_overrides.length).to eq 2
 
           student2_course_change = student2_overrides.detect { |override| override[:grading_period_id].nil? }
-          expect(student2_course_change[:current_score]).to eq nil
-          expect(student2_course_change[:new_score]).to eq nil
+          expect(student2_course_change[:current_score]).to be_nil
+          expect(student2_course_change[:new_score]).to be_nil
 
           student2_gp_change = student2_overrides.detect { |override| override[:grading_period_id] == first_grading_period.id }
-          expect(student2_gp_change[:current_score]).to eq nil
+          expect(student2_gp_change[:current_score]).to be_nil
           expect(student2_gp_change[:new_score]).to eq "70"
         end
       end
@@ -1869,7 +1869,7 @@ describe GradebookImporter do
           expect(output[:students].length).to eq 1
           expect(output[:students].first.dig(:override_scores, 0, :current_score)).to eq "50.54"
           expect(output[:students].first.dig(:override_scores, 0, :new_score)).to eq "50"
-          expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to eq nil
+          expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to be_nil
         end
       end
     end
@@ -1896,7 +1896,7 @@ describe GradebookImporter do
         expect(student_without_override_data[:submissions].length).to eq 1
         expect(student_without_override_data.dig(:submissions, 0, "grade")).to eq "40"
         expect(student_without_override_data[:override_scores].length).to eq 1
-        expect(student_without_override_data.dig(:override_scores, 0, :new_score)).to eq nil
+        expect(student_without_override_data.dig(:override_scores, 0, :new_score)).to be_nil
       end
     end
 
@@ -1936,7 +1936,7 @@ describe GradebookImporter do
           )
 
           output = importer.as_json
-          expect(output[:override_scores][:includes_course_scores]).to eq true
+          expect(output[:override_scores][:includes_course_scores]).to be true
         end
 
         it "sets 'includes_course_scores' to false if no course-level override scores have changed" do
@@ -1947,7 +1947,7 @@ describe GradebookImporter do
           )
 
           output = importer.as_json
-          expect(output[:override_scores][:includes_course_scores]).to eq false
+          expect(output[:override_scores][:includes_course_scores]).to be false
         end
 
         it "includes JSON for all grading periods with changes" do
@@ -1991,14 +1991,14 @@ describe GradebookImporter do
 
           aggregate_failures do
             expect(changed_record[:override_scores].length).to eq 1
-            expect(changed_record[:override_scores].first[:current_score]).to eq nil
+            expect(changed_record[:override_scores].first[:current_score]).to be_nil
             expect(changed_record[:override_scores].first[:new_score]).to eq "80.23"
-            expect(changed_record[:override_scores].first[:grading_period_id]).to eq nil
+            expect(changed_record[:override_scores].first[:grading_period_id]).to be_nil
 
             expect(unchanged_record[:override_scores].length).to eq 1
             expect(unchanged_record[:override_scores].first[:current_score]).to eq "50.54"
             expect(unchanged_record[:override_scores].first[:new_score]).to eq "50.54"
-            expect(unchanged_record[:override_scores].first[:grading_period_id]).to eq nil
+            expect(unchanged_record[:override_scores].first[:grading_period_id]).to be_nil
           end
         end
 
@@ -2027,13 +2027,13 @@ describe GradebookImporter do
 
           aggregate_failures do
             expect(changed_record[:override_scores].length).to eq 1
-            expect(changed_record[:override_scores].first[:current_score]).to eq nil
+            expect(changed_record[:override_scores].first[:current_score]).to be_nil
             expect(changed_record[:override_scores].first[:new_score]).to eq "90"
             expect(changed_record[:override_scores].first[:grading_period_id]).to eq grading_period_2.id
 
             expect(unchanged_record[:override_scores].length).to eq 1
-            expect(unchanged_record[:override_scores].first[:current_score]).to eq nil
-            expect(unchanged_record[:override_scores].first[:new_score]).to eq nil
+            expect(unchanged_record[:override_scores].first[:current_score]).to be_nil
+            expect(unchanged_record[:override_scores].first[:new_score]).to be_nil
             expect(unchanged_record[:override_scores].first[:grading_period_id]).to eq grading_period_2.id
           end
         end

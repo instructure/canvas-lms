@@ -591,14 +591,14 @@ describe FilesController do
         get "show", params: { course_id: @course.id, id: @file.id, inline: 1 }
         expect(json_parse).to eq({ "ok" => true })
         @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
       it "marks files as viewed for module progressions if the file is downloaded" do
         file_in_a_module
         get "show", params: { course_id: @course.id, id: @file.id, download: 1 }
         @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
       it "marks files as viewed for module progressions if the file data is requested and is canvadocable" do
@@ -606,7 +606,7 @@ describe FilesController do
         allow_any_instance_of(Attachment).to receive(:canvadocable?).and_return true
         get "show", params: { course_id: @course.id, id: @file.id }, format: :json
         @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
       it "marks media files viewed when rendering html with file_preview" do
@@ -614,7 +614,7 @@ describe FilesController do
         file_in_a_module
         get "show", params: { course_id: @course.id, id: @file.id }, format: :html
         @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
       it "redirects to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
@@ -646,7 +646,7 @@ describe FilesController do
         unowned_file.destroy
 
         get "show", params: { course_id: @course.id, id: unowned_file.id }
-        expect(response.status).to eq(404)
+        expect(response).to have_http_status(:not_found)
         expect(assigns(:not_found_message)).to eq("This file has been deleted")
       end
 
@@ -658,7 +658,7 @@ describe FilesController do
 
         remove_user_session
         get "show", params: { course_id: @course.id, id: unowned_file.id }
-        expect(response.status).to eq(404)
+        expect(response).to have_http_status(:not_found)
         expect(assigns(:not_found_message)).to eq("This file has been deleted")
       end
 
@@ -1017,13 +1017,13 @@ describe FilesController do
       it "does not move a file into a submissions folder" do
         user_session(@student)
         put "update", params: { user_id: @student.id, id: @file.id, attachment: { folder_id: @sub_folder.id } }, format: "json"
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
 
       it "does not move a file out of a submissions folder" do
         user_session(@student)
         put "update", params: { user_id: @student.id, id: @sub_file.id, attachment: { folder_id: @root_folder.id } }, format: "json"
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
     end
 
@@ -1085,7 +1085,7 @@ describe FilesController do
     it "refuses to delete a file in a submissions folder" do
       file = @student.attachments.create! display_name: "blah", uploaded_data: default_uploaded_data, folder: @student.submissions_folder
       delete "destroy", params: { user_id: @student.id, id: file.id }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     context "file that has been submitted" do
@@ -1280,7 +1280,7 @@ describe FilesController do
         filename: "test.txt",
         folder_id: @student.submissions_folder.id
       } }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "creates a file in the submissions folder if intent=='submit'" do

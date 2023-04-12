@@ -105,7 +105,7 @@ describe "Standard Common Cartridge importing" do
 
     it "marks teacher role webcontent as locked and hidden" do
       att = @course.attachments.where(migration_id: "Resource5").first
-      expect(att.locked?).to eq true
+      expect(att.locked?).to be true
     end
   end
 

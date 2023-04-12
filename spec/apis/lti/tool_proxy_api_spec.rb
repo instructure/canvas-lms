@@ -142,7 +142,7 @@ module Lti
             tp.reload
 
             assert_status(200)
-            expect(tp.update_payload).to be nil
+            expect(tp.update_payload).to be_nil
             expect(tp.product_version).to eq "10.3"
             assert_requested :put, "http://awesome.dev/face.html"
           end
@@ -245,7 +245,7 @@ module Lti
             tp.reload
 
             assert_status(200)
-            expect(tp.update_payload).to be nil
+            expect(tp.update_payload).to be_nil
             expect(tp.product_version).to eq "1.0beta"
             assert_requested :delete, "http://awesome.dev/face.html"
           end

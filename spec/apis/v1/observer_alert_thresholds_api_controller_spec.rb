@@ -198,7 +198,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
                  controller: "observer_alert_thresholds_api", action: "create", format: "json" }
       json = api_call_as_user(@observer, :post, @path, params)
       expect(response.code).to eq "200"
-      expect(json["something_sneaky"]).to eq nil
+      expect(json["something_sneaky"]).to be_nil
     end
 
     it "updates if threshold already exists" do

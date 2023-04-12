@@ -103,7 +103,7 @@ describe MicrosoftSync::SyncerSteps do
     it "is defined" do
       # expand once we start using this (will be soon, when we stash
       # in-progress paginated results when getting group members)
-      expect(syncer_steps.after_failure).to eq(nil)
+      expect(syncer_steps.after_failure).to be_nil
     end
   end
 

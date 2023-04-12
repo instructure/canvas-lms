@@ -263,7 +263,7 @@ describe "Pages API", type: :request do
                        url_or_id: page.url },
                      { wiki_page: { student_planner_checkbox: false } })
             page.reload
-            expect(page.todo_date).to eq nil
+            expect(page.todo_date).to be_nil
           end
 
           it "unsets page todo_date only if explicitly asked for" do
@@ -537,7 +537,7 @@ describe "Pages API", type: :request do
                         { wiki_page: { title: "New Wiki Front Page!", published: true } })
         expect(json["url"]).to eq front_page_url
         page = @course.wiki_pages.where(url: front_page_url).first!
-        expect(page.published?).to eq(true)
+        expect(page.published?).to be(true)
       end
 
       it "errors when creating front page with published set to false using PUT", priority: "3" do
@@ -604,7 +604,7 @@ describe "Pages API", type: :request do
         wiki.reload
         expect(wiki.get_front_page_url).to eq page.url
 
-        expect(json["front_page"]).to eq true
+        expect(json["front_page"]).to be true
       end
 
       it "creates a new page in published state", priority: "1" do
@@ -644,7 +644,7 @@ describe "Pages API", type: :request do
                         { wiki_page: { published: false, publish_at: 1.day.from_now.beginning_of_day.iso8601, title: "New Wiki Page!", body: "hello new page" } })
         page = @course.wiki_pages.where(url: json["url"]).first!
         expect(page).to be_unpublished
-        expect(json["published"]).to eq false
+        expect(json["published"]).to be false
         expect(json["publish_at"]).to eq page.publish_at.iso8601
       end
 
@@ -692,7 +692,7 @@ describe "Pages API", type: :request do
           expect(page.assignment).not_to be_nil
           expect(page.assignment.title).to eq "Assignable Page"
           expect(page.assignment.submission_types).to eq "wiki_page"
-          expect(page.assignment.only_visible_to_overrides).to eq true
+          expect(page.assignment.only_visible_to_overrides).to be true
         end
       end
     end
@@ -735,7 +735,7 @@ describe "Pages API", type: :request do
 
       it "sets as front page", priority: "3" do
         wiki = @course.wiki
-        expect(wiki.unset_front_page!).to eq true
+        expect(wiki.unset_front_page!).to be true
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                         { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
@@ -749,7 +749,7 @@ describe "Pages API", type: :request do
         wiki.reload
         expect(wiki.front_page).to eq no_longer_hidden_page
 
-        expect(json["front_page"]).to eq true
+        expect(json["front_page"]).to be true
       end
 
       it "un-sets as front page" do
@@ -770,7 +770,7 @@ describe "Pages API", type: :request do
         wiki.reload
         expect(wiki.has_front_page?).to be_falsey
 
-        expect(json["front_page"]).to eq false
+        expect(json["front_page"]).to be false
       end
 
       it "does not change the front page unless set differently" do
@@ -885,7 +885,7 @@ describe "Pages API", type: :request do
                           { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param, url_or_id: @unpublished_page.url },
                           { wiki_page: { "publish_at" => 1.day.from_now.beginning_of_day.iso8601 } })
           expect(@unpublished_page.reload).to be_unpublished
-          expect(json["published"]).to eq false
+          expect(json["published"]).to be false
           expect(json["publish_at"]).to eq @unpublished_page.publish_at.iso8601
         end
       end
@@ -975,7 +975,7 @@ describe "Pages API", type: :request do
                                          assignment: { only_visible_to_overrides: true } } })
           page = @course.wiki_pages.where(url: json["url"]).first!
           expect(page.assignment.title).to eq "Changin' the Title"
-          expect(page.assignment.only_visible_to_overrides).to eq true
+          expect(page.assignment.only_visible_to_overrides).to be true
         end
 
         it "destroys and restore a linked assignment" do
@@ -1012,7 +1012,7 @@ describe "Pages API", type: :request do
                                        assignment: { only_visible_to_overrides: true } } })
         page = @course.wiki_pages.where(url: json["url"]).first!
         expect(page.assignment.title).to eq "Content Page Assignment"
-        expect(page.assignment.only_visible_to_overrides).to eq false
+        expect(page.assignment.only_visible_to_overrides).to be false
       end
 
       it "does not destroy linked assignment" do
@@ -1049,7 +1049,7 @@ describe "Pages API", type: :request do
 
         wiki = @course.wiki
         wiki.reload
-        expect(wiki.has_front_page?).to eq true
+        expect(wiki.has_front_page?).to be true
       end
     end
 

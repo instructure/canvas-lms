@@ -119,7 +119,7 @@ describe SIS::CSV::SectionImporter do
     )
     section.reload
     expect(section).to be_active
-    expect(section.default_section).to eq false
+    expect(section.default_section).to be false
   end
 
   it "creates rollback data" do

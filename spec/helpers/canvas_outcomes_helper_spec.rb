@@ -186,27 +186,27 @@ describe CanvasOutcomesHelper do
 
     context "without outcome ids" do
       it "returns nil when outcome ids is nil" do
-        expect(subject.get_outcome_alignments(@course, nil)).to eq nil
+        expect(subject.get_outcome_alignments(@course, nil)).to be_nil
       end
 
       it "returns nil when outcome ids is empty" do
-        expect(subject.get_outcome_alignments(@course, "")).to eq nil
+        expect(subject.get_outcome_alignments(@course, "")).to be_nil
       end
     end
 
     context "without context" do
       it "returns nil when context is nil" do
-        expect(subject.get_outcome_alignments(nil, "123")).to eq nil
+        expect(subject.get_outcome_alignments(nil, "123")).to be_nil
       end
 
       it "returns nil when context is empty" do
-        expect(subject.get_outcome_alignments("", "123")).to eq nil
+        expect(subject.get_outcome_alignments("", "123")).to be_nil
       end
     end
 
     context "without outcome_service_results_to_canvas feature flag enabled" do
       it "returns nil" do
-        expect(subject.get_outcome_alignments(@course, "123")).to eq nil
+        expect(subject.get_outcome_alignments(@course, "123")).to be_nil
       end
     end
 
@@ -310,13 +310,13 @@ describe CanvasOutcomesHelper do
 
     context "without account outcome settings" do
       it "returns nil with no provision settings" do
-        expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq nil
+        expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to be_nil
       end
 
       it "returns nil with no outcome provision settings" do
         account.settings[:provision] = {}
         account.save!
-        expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq nil
+        expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to be_nil
       end
     end
 
@@ -329,41 +329,41 @@ describe CanvasOutcomesHelper do
 
       context "without assignment ids" do
         it "returns nil when assignment ids is nil" do
-          expect(subject.get_lmgb_results(account, nil, "assign.type", "1", one_user_uuid)).to eq nil
+          expect(subject.get_lmgb_results(account, nil, "assign.type", "1", one_user_uuid)).to be_nil
         end
 
         it "returns nil when assignment ids is empty" do
-          expect(subject.get_lmgb_results(account, "", "assign.type", "1", one_user_uuid)).to eq nil
+          expect(subject.get_lmgb_results(account, "", "assign.type", "1", one_user_uuid)).to be_nil
         end
       end
 
       context "without assignment type" do
         it "returns nil when assignment type is nil" do
-          expect(subject.get_lmgb_results(account, "1", nil, "1", one_user_uuid)).to eq nil
+          expect(subject.get_lmgb_results(account, "1", nil, "1", one_user_uuid)).to be_nil
         end
 
         it "returns nil when assignment type is empty" do
-          expect(subject.get_lmgb_results(account, "1", "", "1", one_user_uuid)).to eq nil
+          expect(subject.get_lmgb_results(account, "1", "", "1", one_user_uuid)).to be_nil
         end
       end
 
       context "without outcome ids" do
         it "returns nil when outcome ids is nil" do
-          expect(subject.get_lmgb_results(account, "1", "assign.type", nil, one_user_uuid)).to eq nil
+          expect(subject.get_lmgb_results(account, "1", "assign.type", nil, one_user_uuid)).to be_nil
         end
 
         it "returns nil when outcome ids is empty" do
-          expect(subject.get_lmgb_results(account, "1", "assign.type", "", one_user_uuid)).to eq nil
+          expect(subject.get_lmgb_results(account, "1", "assign.type", "", one_user_uuid)).to be_nil
         end
       end
 
       context "without user uuids" do
         it "returns nil when user uuids is nil" do
-          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", nil)).to eq nil
+          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", nil)).to be_nil
         end
 
         it "returns nil when user uuids is empty" do
-          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", "")).to eq nil
+          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", "")).to be_nil
         end
       end
 
@@ -467,14 +467,14 @@ describe CanvasOutcomesHelper do
               a = new_quizzes_assignment(course: @course, title: "New Quiz")
               outcome = outcome_model(context: @course)
               stub_get_lmgb_results("associated_asset_id_list=#{a.id}&associated_asset_type=canvas.assignment.quizzes&external_outcome_id_list=#{outcome.id}&per_page=1&page=1").to_return(status: 200, body: get_response(1), headers: { "Per-Page" => 1, "Total" => 201 })
-              expect(subject.outcome_has_authoritative_results?(outcome, @course)).to eq true
+              expect(subject.outcome_has_authoritative_results?(outcome, @course)).to be true
             end
 
             it "there are no authoritative results" do
               a = new_quizzes_assignment(course: @course, title: "New Quiz")
               outcome = outcome_model(context: @course)
               stub_get_lmgb_results("associated_asset_id_list=#{a.id}&associated_asset_type=canvas.assignment.quizzes&external_outcome_id_list=#{outcome.id}&per_page=1&page=1").to_return(status: 200, body: '{"results":[]}', headers: { "Per-Page" => 1, "Total" => 0 })
-              expect(subject.outcome_has_authoritative_results?(outcome, @course)).to eq false
+              expect(subject.outcome_has_authoritative_results?(outcome, @course)).to be false
             end
           end
         end
@@ -485,7 +485,7 @@ describe CanvasOutcomesHelper do
           end
 
           it "returns nil when FF is off" do
-            expect(subject.get_lmgb_results(@course, "1", "assign.type", "1", one_user_uuid)).to eq nil
+            expect(subject.get_lmgb_results(@course, "1", "assign.type", "1", one_user_uuid)).to be_nil
           end
         end
       end
@@ -505,7 +505,7 @@ describe CanvasOutcomesHelper do
 
       context "with outcome_service_results_to_canvas FF off" do
         it "returns nil when FF is off" do
-          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq nil
+          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to be_nil
         end
       end
 

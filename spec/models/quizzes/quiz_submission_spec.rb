@@ -28,35 +28,35 @@ describe Quizzes::QuizSubmission do
       it "validates numericality of extra time" do
         qs = Quizzes::QuizSubmission.new
         qs.extra_time = "asdf"
-        expect(qs.valid?).to eq false
+        expect(qs.valid?).to be false
         expect(Array(qs.errors[:extra_time])).to eq ["is not a number"]
       end
 
       it "validates extra time is not too long" do
         qs = Quizzes::QuizSubmission.new
         qs.extra_time = 10_081
-        expect(qs.valid?).to eq false
+        expect(qs.valid?).to be false
         expect(Array(qs.errors[:extra_time])).to eq ["must be less than or equal to 10,080"]
       end
 
       it "validates numericality of extra attempts" do
         qs = Quizzes::QuizSubmission.new
         qs.extra_attempts = "asdf"
-        expect(qs.valid?).to eq false
+        expect(qs.valid?).to be false
         expect(Array(qs.errors[:extra_attempts])).to eq ["is not a number"]
       end
 
       it "validates extra attempts is not too long" do
         qs = Quizzes::QuizSubmission.new
         qs.extra_attempts = 1001
-        expect(qs.valid?).to eq false
+        expect(qs.valid?).to be false
         expect(Array(qs.errors[:extra_attempts])).to eq ["must be less than or equal to 1,000"]
       end
 
       it "validates quiz points possible is not too long" do
         qs = Quizzes::QuizSubmission.new
         qs.quiz = Quizzes::Quiz.new(points_possible: 2_000_000_001)
-        expect(qs.valid?).to eq false
+        expect(qs.valid?).to be false
         expect(Array(qs.errors[:quiz_points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
       end
     end
@@ -111,13 +111,13 @@ describe Quizzes::QuizSubmission do
       Quizzes::Quiz.where(id: @quiz).update_all(points_possible: 1.1)
       @quiz.reload
       q = @quiz.quiz_submissions.create!
-      expect(q.reload.quiz_points_possible).to eql 1.1
+      expect(q.reload.quiz_points_possible).to be 1.1
 
       Quizzes::Quiz.where(id: @quiz).update_all(points_possible: 1.9)
-      expect(q.reload.quiz_points_possible).to eql 1.1
+      expect(q.reload.quiz_points_possible).to be 1.1
 
       q.save!
-      expect(q.reload.quiz_points_possible).to eql 1.9
+      expect(q.reload.quiz_points_possible).to be 1.9
     end
 
     it "does not lose time" do
@@ -160,7 +160,7 @@ describe Quizzes::QuizSubmission do
         v = qs.versions.current.model
         expect(v.score).to eq 45
         expect(v.fudge_points).to eq(-5)
-        expect(qs.submission.unread?(@student)).to eq true
+        expect(qs.submission.unread?(@student)).to be true
       end
 
       context "on a graded_survey" do
@@ -346,16 +346,16 @@ describe Quizzes::QuizSubmission do
       q.save!
 
       expect(q.workflow_state).to eql("complete")
-      expect(q.state).to eql(:complete)
+      expect(q.state).to be(:complete)
       q.write_attribute(:submission_data, [])
       res = false
       begin
         res = Quizzes::SubmissionGrader.new(q).grade_submission
-        expect(0).to eql(1)
+        expect(0).to be(1)
       rescue => e
         expect(e.to_s).to match(Regexp.new("Can't grade an already-submitted submission"))
       end
-      expect(res).to eql(false)
+      expect(res).to be(false)
     end
 
     context "explicitly setting grade" do
@@ -486,30 +486,30 @@ describe Quizzes::QuizSubmission do
       s.score = 5.0
       s.attempt = 1
       s.with_versioning(true, &:save!)
-      expect(s.score).to eql(5.0)
-      expect(s.kept_score).to eql(5.0)
+      expect(s.score).to be(5.0)
+      expect(s.kept_score).to be(5.0)
 
       s.score = 4.0
       s.attempt = 2
       s.with_versioning(true, &:save!)
-      expect(s.version_number).to eql(2)
-      expect(s.kept_score).to eql(4.0)
+      expect(s.version_number).to be(2)
+      expect(s.kept_score).to be(4.0)
 
       q.update!(scoring_policy: "keep_highest")
       s.reload
       s.score = 3.0
       s.attempt = 3
       s.with_versioning(true, &:save!)
-      expect(s.kept_score).to eql(5.0)
+      expect(s.kept_score).to be(5.0)
 
       q.update!(scoring_policy: "keep_average")
       s.reload
       s.with_versioning(true, &:save!)
-      expect(s.kept_score).to eql(4.0)
+      expect(s.kept_score).to be(4.0)
 
       q.update!(scoring_policy: "keep_highest")
       s.update_scores(submission_version_number: 2, fudge_points: 6.0)
-      expect(s.kept_score).to eql(6.0)
+      expect(s.kept_score).to be(6.0)
     end
 
     it "calculates average score to a precision of 2" do
@@ -523,29 +523,29 @@ describe Quizzes::QuizSubmission do
       s.score = 4.0
       s.attempt = 2
       s.with_versioning(true, &:save!)
-      expect(s.version_number).to eql(2)
+      expect(s.version_number).to be(2)
 
       s.score = 5.0
       s.attempt = 3
       s.with_versioning(true, &:save!)
-      expect(s.version_number).to eql(3)
+      expect(s.version_number).to be(3)
 
       s.score = 6.0
       s.attempt = 4
       s.with_versioning(true, &:save!)
-      expect(s.version_number).to eql(4)
-      expect(s.kept_score).to eql(4.25)
+      expect(s.version_number).to be(4)
+      expect(s.kept_score).to be(4.25)
 
       s.score = 7.0
       s.attempt = 5
       s.with_versioning(true, &:save!)
-      expect(s.version_number).to eql(5)
+      expect(s.version_number).to be(5)
 
       s.score = 8.0
       s.attempt = 6
       s.with_versioning(true, &:save!)
-      expect(s.version_number).to eql(6)
-      expect(s.kept_score).to eql(5.33)
+      expect(s.version_number).to be(6)
+      expect(s.kept_score).to be(5.33)
     end
 
     it "calculates highest score based on most recent version of an attempt" do
@@ -556,24 +556,24 @@ describe Quizzes::QuizSubmission do
       s.score = 5.0
       s.attempt = 1
       s.with_versioning(true, &:save!)
-      expect(s.version_number).to eql(1)
-      expect(s.score).to eql(5.0)
-      expect(s.kept_score).to eql(5.0)
+      expect(s.version_number).to be(1)
+      expect(s.score).to be(5.0)
+      expect(s.kept_score).to be(5.0)
 
       # regrade
       s.score_before_regrade = 5.0
       s.score = 4.0
       s.attempt = 1
       s.with_versioning(true, &:save!)
-      expect(s.version_number).to eql(2)
-      expect(s.kept_score).to eql(4.0)
+      expect(s.version_number).to be(2)
+      expect(s.kept_score).to be(4.0)
 
       # new attempt
       s.score = 3.0
       s.attempt = 2
       s.with_versioning(true, &:save!)
-      expect(s.version_number).to eql(3)
-      expect(s.kept_score).to eql(4.0)
+      expect(s.version_number).to be(3)
+      expect(s.kept_score).to be(4.0)
     end
 
     describe "with an essay question" do
@@ -613,7 +613,7 @@ describe Quizzes::QuizSubmission do
 
       it "recomputes grades when a quiz submission is graded (even if the score doesn't change)" do
         enrollment = @quiz_submission.user.enrollments.first
-        expect(enrollment.computed_current_score).to eq nil
+        expect(enrollment.computed_current_score).to be_nil
         grade_question(0)
         enrollment.reload
         expect(enrollment.computed_current_score).to eq 0
@@ -906,8 +906,8 @@ describe Quizzes::QuizSubmission do
         course_quiz(course: @course)
         student_in_course(course: @course)
         qs = @quiz.generate_submission(@student)
-        expect(qs.grants_right?(@teacher, :update_scores)).to eq true
-        expect(qs.grants_right?(@teacher, :add_attempts)).to eq true
+        expect(qs.grants_right?(@teacher, :update_scores)).to be true
+        expect(qs.grants_right?(@teacher, :add_attempts)).to be true
       end
 
       it "does not take events from an anonymous user" do
@@ -1236,21 +1236,21 @@ describe Quizzes::QuizSubmission do
         submission.score = 5.0
         submission.attempt = 1
         submission.with_versioning(true, &:save!)
-        expect(submission.version_number).to eql(1)
-        expect(submission.score).to eql(5.0)
+        expect(submission.version_number).to be(1)
+        expect(submission.score).to be(5.0)
 
         # regrade
         submission.score_before_regrade = 5.0
         submission.score = 4.0
         submission.attempt = 1
         submission.with_versioning(true, &:save!)
-        expect(submission.version_number).to eql(2)
+        expect(submission.version_number).to be(2)
 
         # new attempt
         submission.score = 3.0
         submission.attempt = 2
         submission.with_versioning(true, &:save!)
-        expect(submission.version_number).to eql(3)
+        expect(submission.version_number).to be(3)
 
         attempts = submission.attempts
         expect(attempts).to be_a(Quizzes::QuizSubmissionHistory)
@@ -1945,7 +1945,7 @@ describe Quizzes::QuizSubmission do
     end
 
     it "functions without valid submission" do
-      expect(quiz_submission.excused?).to eq nil
+      expect(quiz_submission.excused?).to be_nil
     end
   end
 

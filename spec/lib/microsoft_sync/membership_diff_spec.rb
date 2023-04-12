@@ -221,13 +221,13 @@ describe MicrosoftSync::MembershipDiff do
     it "when the members size is less than or equal to the max enrollment members" do
       set_local_members "student", (min..half), member_enrollment_type
       set_local_members "teacher", (half...max), owner_enrollment_type
-      expect(subject.max_enrollment_members_reached?).to eq false
+      expect(subject.max_enrollment_members_reached?).to be false
     end
 
     it "when the members size is greater than to the max enrollment members" do
       set_local_members "student", (min..half), member_enrollment_type
       set_local_members "teacher", (half..max), owner_enrollment_type
-      expect(subject.max_enrollment_members_reached?).to eq true
+      expect(subject.max_enrollment_members_reached?).to be true
     end
   end
 
@@ -236,12 +236,12 @@ describe MicrosoftSync::MembershipDiff do
 
     it "when the owners size is less than or equal to the max enrollment owners" do
       set_local_members "teacher", (1...max), owner_enrollment_type
-      expect(subject.max_enrollment_owners_reached?).to eq false
+      expect(subject.max_enrollment_owners_reached?).to be false
     end
 
     it "when the owners size is greater than to the max enrollment owners" do
       set_local_members "teacher", (0..max), owner_enrollment_type
-      expect(subject.max_enrollment_owners_reached?).to eq true
+      expect(subject.max_enrollment_owners_reached?).to be true
     end
   end
 end

@@ -42,7 +42,7 @@ describe Lti::Security do
           nonce: nonce,
           timestamp: timestamp
         )
-        expect(header.valid?(signature: signed_params["oauth_signature"])).to eq true
+        expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
       end
 
       it "doesn't copy query params" do
@@ -152,7 +152,7 @@ describe Lti::Security do
         nonce: nonce,
         timestamp: timestamp
       )
-      expect(header.valid?(signature: signed_params["oauth_signature"])).to eq true
+      expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
     end
 
     it "handles whitespace in URLs" do
@@ -171,7 +171,7 @@ describe Lti::Security do
         nonce: nonce,
         timestamp: timestamp
       )
-      expect(header.valid?(signature: signed_params["oauth_signature"])).to eq true
+      expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
     end
 
     it "generates the signature for urls with query params in an incorrect way that we are aware of and saddened by" do
@@ -193,7 +193,7 @@ describe Lti::Security do
         nonce: nonce,
         timestamp: timestamp
       )
-      expect(header.valid?(signature: signed_params["oauth_signature"])).to eq true
+      expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
     end
 
     it "generates the signature correctly for a non standard port" do
@@ -212,7 +212,7 @@ describe Lti::Security do
         nonce: nonce,
         timestamp: timestamp
       )
-      expect(header.valid?(signature: signed_params["oauth_signature"])).to eq true
+      expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
     end
 
     it "logs the oauth base string" do

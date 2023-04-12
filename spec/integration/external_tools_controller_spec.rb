@@ -130,7 +130,7 @@ describe ExternalToolsController do
   end
 
   describe "POST 'create_tool_with_verification'" do
-    context "form post", type: :request do
+    context "form post" do
       include WebMock::API
 
       let(:config_response) { double(body: valid_tool_config) }

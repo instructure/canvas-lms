@@ -65,9 +65,9 @@ describe Api::V1::DiscussionTopics do
       root_topics = @test_api.get_root_topic_data(@group_topic.child_topics, [:delayed_post_at, :lock_at])
       expect(root_topics.length).to eq 1
       # Key by the root, not the child topic
-      expect(root_topics[@group_topic.child_topics.first.id]).to eq nil
+      expect(root_topics[@group_topic.child_topics.first.id]).to be_nil
       root_topic = root_topics[@group_topic.id]
-      expect(root_topic).not_to eq nil
+      expect(root_topic).not_to be_nil
       expect(root_topic[:id]).to eq @group_topic.id
       expect(root_topic[:delayed_post_at]).to eq @delayed_post_time
       expect(root_topic[:lock_at]).to eq @lock_at_time
@@ -80,7 +80,7 @@ describe Api::V1::DiscussionTopics do
         { root_topic_fields: root_topic_fields }, nil
       )
       expect(json[:delayed_post_at]).to eq @delayed_post_time
-      expect(json[:lock_at]).to be nil  # We didn't ask for it, so don't fill it
+      expect(json[:lock_at]).to be_nil  # We didn't ask for it, so don't fill it
       expect(json[:id]).to eq @group_topic.child_topics.first.id
     end
 
@@ -92,7 +92,7 @@ describe Api::V1::DiscussionTopics do
         { root_topic_fields: root_topic_fields }, root_topics
       )
       expect(json[:delayed_post_at]).to eq @delayed_post_time
-      expect(json[:lock_at]).to be nil  # We didn't ask for it, so don't fill it
+      expect(json[:lock_at]).to be_nil  # We didn't ask for it, so don't fill it
       expect(json[:id]).to eq @group_topic.child_topics.first.id
     end
 
@@ -102,8 +102,8 @@ describe Api::V1::DiscussionTopics do
         @group_topic.child_topics.first, @course, @user, {},
         { root_topic_fields: root_topic_fields }
       )
-      expect(json[:delayed_post_at]).to be nil
-      expect(json[:lock_at]).to be nil  # We didn't ask for it, so don't fill it
+      expect(json[:delayed_post_at]).to be_nil
+      expect(json[:lock_at]).to be_nil  # We didn't ask for it, so don't fill it
       expect(json[:id]).to eq @group_topic.child_topics.first.id
     end
   end
@@ -133,7 +133,7 @@ describe Api::V1::DiscussionTopics do
       @course.save!
       expect(
         @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)[:in_paced_course]
-      ).to be nil
+      ).to be_nil
     end
   end
 
@@ -148,15 +148,15 @@ describe Api::V1::DiscussionTopics do
 
   it "sets can_post_attachments" do
     data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
-    expect(data[:permissions][:attach]).to eq true # teachers can always attach
+    expect(data[:permissions][:attach]).to be true # teachers can always attach
 
     data = @test_api.discussion_topic_api_json(@topic, @topic.context, @student, nil)
-    expect(data[:permissions][:attach]).to eq true # students can attach by default
+    expect(data[:permissions][:attach]).to be true # students can attach by default
 
     @topic.context.update_attribute(:allow_student_forum_attachments, true)
     AdheresToPolicy::Cache.clear
     data = @test_api.discussion_topic_api_json(@topic, @topic.context, @student, nil)
-    expect(data[:permissions][:attach]).to eq true
+    expect(data[:permissions][:attach]).to be true
   end
 
   it "includes assignment" do
@@ -357,14 +357,14 @@ describe DiscussionTopicsController, type: :request do
       @topic = @course.discussion_topics.order(:id).last
       expect(@topic.title).to eq "test title"
       expect(@topic.message).to eq "test <b>message</b>"
-      expect(@topic.threaded?).to eq true
-      expect(@topic.post_delayed?).to eq true
+      expect(@topic.threaded?).to be true
+      expect(@topic.post_delayed?).to be true
       expect(@topic.published?).to be_truthy
       expect(@topic.delayed_post_at.to_i).to eq post_at.to_i
       expect(@topic.lock_at.to_i).to eq lock_at.to_i
-      expect(@topic.podcast_enabled?).to eq true
-      expect(@topic.podcast_has_student_posts?).to eq true
-      expect(@topic.require_initial_post?).to eq true
+      expect(@topic.podcast_enabled?).to be true
+      expect(@topic.podcast_has_student_posts?).to be true
+      expect(@topic.require_initial_post?).to be true
       expect(@topic.todo_date).to eq todo_date
     end
 
@@ -784,7 +784,7 @@ describe DiscussionTopicsController, type: :request do
 
         json_topic = json.find { |t| t["group_category_id"] }
 
-        expect(json_topic).not_to be nil
+        expect(json_topic).not_to be_nil
         expect(json_topic["group_category_id"]).to eq group_topic.group_category_id
         expect(json_topic["group_topic_children"]).to eq(
           group_topic.child_topics.map { |topic| { "id" => topic.id, "group_id" => topic.context_id } }
@@ -857,7 +857,7 @@ describe DiscussionTopicsController, type: :request do
                              only_announcements: 1,
                              per_page: 2,
                            })
-          expect(!response.headers["Link"].split(",").last.include?("&page=2&")).to eq(true)
+          expect(!response.headers["Link"].split(",").last.include?("&page=2&")).to be(true)
         end
 
         it "teacher should be able to see section specific announcements" do
@@ -873,7 +873,7 @@ describe DiscussionTopicsController, type: :request do
 
           expect(json.count).to eq(1)
           expect(json[0]["id"]).to eq(@announcement.id)
-          expect(json[0]["is_section_specific"]).to eq(true)
+          expect(json[0]["is_section_specific"]).to be(true)
         end
 
         it "teacher should be able to see section specific announcements and include sections" do
@@ -890,7 +890,7 @@ describe DiscussionTopicsController, type: :request do
 
           expect(json.count).to eq(1)
           expect(json[0]["id"]).to eq(@announcement.id)
-          expect(json[0]["is_section_specific"]).to eq(true)
+          expect(json[0]["is_section_specific"]).to be(true)
           expect(json[0]["sections"].count).to eq(1)
           expect(json[0]["sections"][0]["id"]).to eq(@section.id)
         end
@@ -909,7 +909,7 @@ describe DiscussionTopicsController, type: :request do
 
           expect(json.count).to eq(1)
           expect(json[0]["id"]).to eq(@announcement.id)
-          expect(json[0]["is_section_specific"]).to eq(true)
+          expect(json[0]["is_section_specific"]).to be(true)
           expect(json[0]["sections"].count).to eq(1)
           expect(json[0]["sections"][0]["id"]).to eq(@section.id)
           expect(json[0]["sections"][0]["user_count"]).to eq(1)
@@ -928,7 +928,7 @@ describe DiscussionTopicsController, type: :request do
 
           expect(json.count).to eq(1)
           expect(json[0]["id"]).to eq(@announcement.id)
-          expect(json[0]["is_section_specific"]).to eq(true)
+          expect(json[0]["is_section_specific"]).to be(true)
         end
 
         it "student not in section should not be able to see section specific announcements" do
@@ -971,7 +971,7 @@ describe DiscussionTopicsController, type: :request do
                 only_announcements: 1
               }
             )
-            expect(!!response.headers["Link"].split(",").last.include?("&page=2&")).to eq false
+            expect(!!response.headers["Link"].split(",").last.include?("&page=2&")).to be false
             expect(json.count).to eq 1
             expect(json.first["id"]).to eq @announcement2.id
           end
@@ -1047,7 +1047,7 @@ describe DiscussionTopicsController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{group_topic.id}",
                         { controller: "discussion_topics_api", action: "show", format: "json", course_id: @course.id.to_s, topic_id: group_topic.id.to_s })
 
-        expect(json).not_to be nil
+        expect(json).not_to be_nil
         expect(json["group_category_id"]).to eq group_topic.group_category_id
         expect(json["group_topic_children"]).to eq(
           group_topic.child_topics.map { |topic| { "id" => topic.id, "group_id" => topic.context_id } }
@@ -1184,13 +1184,13 @@ describe DiscussionTopicsController, type: :request do
         @topic.reload
         expect(@topic.title).to eq "test title"
         expect(@topic.message).to eq "test <b>message</b>"
-        expect(@topic.threaded?).to eq true
-        expect(@topic.post_delayed?).to eq true
+        expect(@topic.threaded?).to be true
+        expect(@topic.post_delayed?).to be true
         expect(@topic.delayed_post_at.to_i).to eq post_at.to_i
         expect(@topic.lock_at.to_i).to eq lock_at.to_i
-        expect(@topic.podcast_enabled?).to eq true
-        expect(@topic.podcast_has_student_posts?).to eq true
-        expect(@topic.require_initial_post?).to eq true
+        expect(@topic.podcast_enabled?).to be true
+        expect(@topic.podcast_has_student_posts?).to be true
+        expect(@topic.require_initial_post?).to be true
       end
 
       it "returns section count if section specific" do
@@ -2913,7 +2913,7 @@ describe DiscussionTopicsController, type: :request do
                         { ids: @sub1.id })
         expect(json.size).to eq 1
         expect(json.first["id"]).to eq @sub1.id
-        expect(json.first["deleted"]).to eq true
+        expect(json.first["deleted"]).to be true
         expect(json.first["read_state"]).to eq "read"
         expect(json.first["parent_id"]).to eq @entry.id
         expect(json.first["updated_at"]).to eq @sub1.updated_at.as_json
@@ -2982,7 +2982,7 @@ describe DiscussionTopicsController, type: :request do
       expect(v0["id"]).to eq @root1.id
       expect(v0["user_id"]).to eq @student.id
       expect(v0["message"]).to eq "root1"
-      expect(v0["parent_id"]).to be nil
+      expect(v0["parent_id"]).to be_nil
       expect(v0["created_at"]).to eq @root1.created_at.as_json
       expect(v0["updated_at"]).to eq @root1.updated_at.as_json
 
@@ -3042,7 +3042,7 @@ describe DiscussionTopicsController, type: :request do
       expect(v1["id"]).to eq @root2.id
       expect(v1["user_id"]).to eq @student.id
       expect(v1["message"]).to eq "root2"
-      expect(v1["parent_id"]).to be nil
+      expect(v1["parent_id"]).to be_nil
       expect(v1["created_at"]).to eq @root2.created_at.as_json
       expect(v1["updated_at"]).to eq @root2.updated_at.as_json
 
@@ -3635,7 +3635,7 @@ describe DiscussionTopicsController, type: :request do
                                              action: "entries", format: "json", course_id: @course.id.to_s,
                                              topic_id: @topic.id.to_s)
           end
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
         end
       end
     end

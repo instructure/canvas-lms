@@ -83,14 +83,14 @@ describe CourseForMenuPresenter do
       Favorite.create!(user: user, context: course)
       cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h
-      expect(h[:isFavorited]).to eq true
+      expect(h[:isFavorited]).to be true
     end
 
     it "sets isFavorited to false if course is unfavorited" do
       course.enroll_student(user)
       cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h
-      expect(h[:isFavorited]).to eq false
+      expect(h[:isFavorited]).to be false
     end
 
     it "sets the published value" do
@@ -129,7 +129,7 @@ describe CourseForMenuPresenter do
       it "sets `isHomeroom` to `true`" do
         cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
-        expect(h[:isHomeroom]).to eq true
+        expect(h[:isHomeroom]).to be true
       end
     end
 
@@ -162,7 +162,7 @@ describe CourseForMenuPresenter do
       it "returns nil when no position is set" do
         cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
-        expect(h[:position]).to eq nil
+        expect(h[:position]).to be_nil
       end
     end
 

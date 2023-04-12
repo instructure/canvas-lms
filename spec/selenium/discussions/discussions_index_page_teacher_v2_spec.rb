@@ -223,7 +223,7 @@ describe "discussions index" do
       DiscussionsIndex.submit_discussion_settings
       wait_for_stale_element(".discussion-settings-v2-spinner-container")
       @course.reload
-      expect(@course.allow_student_discussion_topics).to eq false
+      expect(@course.allow_student_discussion_topics).to be false
     end
   end
 end

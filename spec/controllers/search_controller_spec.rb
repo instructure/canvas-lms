@@ -310,7 +310,7 @@ describe SearchController do
       ra.settings[:enable_course_catalog] = false
       ra.save!
       get "all_courses", format: :json
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
   end
 end

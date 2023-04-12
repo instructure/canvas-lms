@@ -106,7 +106,7 @@ describe UserObservationLink do
     UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
 
     enrollments = observer.observer_enrollments.order(:course_id)
-    expect(enrollments.size).to eql 2
+    expect(enrollments.size).to be 2
     expect(enrollments.map(&:course_id)).to eql [c1.id, c2.id]
     expect(enrollments.map(&:workflow_state)).to eql ["active", "active"]
     observer.destroy
@@ -192,7 +192,7 @@ describe UserObservationLink do
     end
 
     enrollments = observer.observer_enrollments
-    expect(enrollments.size).to eql 1
+    expect(enrollments.size).to be 1
     expect(enrollments.map(&:course_id)).to eql [c2.id]
   end
 

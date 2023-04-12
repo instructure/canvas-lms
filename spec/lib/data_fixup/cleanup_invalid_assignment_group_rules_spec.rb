@@ -39,7 +39,7 @@ describe DataFixup::CleanupInvalidAssignmentGroupRules do
     expect do
       DataFixup::CleanupInvalidAssignmentGroupRules.run
     end.to_not change { @assignment_group_model1.reload.rules }
-    expect(@assignment_group_model2.reload.rules).to eql(nil)
-    expect(@assignment_group_model3.reload.rules).to eql(nil)
+    expect(@assignment_group_model2.reload.rules).to be_nil
+    expect(@assignment_group_model3.reload.rules).to be_nil
   end
 end

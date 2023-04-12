@@ -129,7 +129,7 @@ describe "settings tabs" do
         submit_form("#add_notification_form")
         wait_for_ajax_requests
         notification = AccountNotification.last
-        expect(notification.send_message).to eq true
+        expect(notification.send_message).to be true
         job = Delayed::Job.where(tag: "AccountNotification#broadcast_messages").last
         expect(job.run_at.to_i).to eq notification.start_at.to_i
       end
@@ -158,7 +158,7 @@ describe "settings tabs" do
         f("#edit_notification_form_#{notification.id}").submit
         wait_for_ajax_requests
         notification.reload
-        expect(notification.send_message).to eq true
+        expect(notification.send_message).to be true
         job = Delayed::Job.where(tag: "AccountNotification#broadcast_messages").last
         expect(job.run_at.to_i).to eq notification.start_at.to_i
       end

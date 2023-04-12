@@ -107,7 +107,7 @@ describe TokensController do
         token.developer_key = DeveloperKey.default
         token.save!
         expect(token.user_id).to eq @user.id
-        expect(token.manually_created?).to eq true
+        expect(token.manually_created?).to be true
         get "show", params: { id: token.id }
         expect(response).to be_successful
         expect(assigns[:token]).to eq token
@@ -118,7 +118,7 @@ describe TokensController do
         key = DeveloperKey.create!
         token = @user.access_tokens.create!(developer_key: key)
         expect(token.user_id).to eq @user.id
-        expect(token.manually_created?).to eq false
+        expect(token.manually_created?).to be false
         get "show", params: { id: token.id }
         expect(response).to be_successful
         expect(assigns[:token]).to eq token
@@ -138,7 +138,7 @@ describe TokensController do
         token.developer_key = DeveloperKey.default
         token.save!
         expect(token.user_id).to eq @user.id
-        expect(token.manually_created?).to eq true
+        expect(token.manually_created?).to be true
         put "update", params: { id: token.id, access_token: { purpose: "new purpose" } }
         expect(response).to be_successful
         expect(assigns[:token]).to eq token
@@ -151,7 +151,7 @@ describe TokensController do
         token.developer_key = DeveloperKey.default
         token.save!
         expect(token.user_id).to eq @user.id
-        expect(token.manually_created?).to eq true
+        expect(token.manually_created?).to be true
         put "update", params: { id: token.id, access_token: { regenerate: "1" } }
         expect(response).to be_successful
         expect(assigns[:token]).to eq token
@@ -164,7 +164,7 @@ describe TokensController do
         token.developer_key = DeveloperKey.default
         token.save!
         expect(token.user_id).to eq @user.id
-        expect(token.manually_created?).to eq true
+        expect(token.manually_created?).to be true
         Account.site_admin.account_users.create!(user: @user)
         session[:become_user_id] = user_with_pseudonym.id
         put "update", params: { id: token.id, access_token: { regenerate: "1" } }
@@ -175,7 +175,7 @@ describe TokensController do
         key = DeveloperKey.create!
         token = @user.access_tokens.create!(developer_key: key)
         expect(token.user_id).to eq @user.id
-        expect(token.manually_created?).to eq false
+        expect(token.manually_created?).to be false
         put "update", params: { id: token.id, access_token: { regenerate: "1" } }
         expect(response).to be_successful
         expect(assigns[:token]).to eq token

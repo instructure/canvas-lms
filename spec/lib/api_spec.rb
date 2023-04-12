@@ -1158,7 +1158,7 @@ describe Api do
       allow(controller).to receive(:request).and_return double(headers: {
                                                                  "Accept" => "application/vnd.api+json"
                                                                })
-      expect(controller.accepts_jsonapi?).to eq true
+      expect(controller.accepts_jsonapi?).to be true
     end
 
     it "returns false when application/vnd.api+json not in the Accept header" do
@@ -1166,7 +1166,7 @@ describe Api do
       allow(controller).to receive(:request).and_return double(headers: {
                                                                  "Accept" => "application/json"
                                                                })
-      expect(controller.accepts_jsonapi?).to eq false
+      expect(controller.accepts_jsonapi?).to be false
     end
   end
 

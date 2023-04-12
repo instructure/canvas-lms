@@ -20,7 +20,7 @@
 
 require_relative "../../lti_1_3_spec_helper"
 
-RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
+RSpec.describe Lti::ToolConfigurationsApiController do
   subject { response }
 
   include_context "lti_1_3_spec_helper"

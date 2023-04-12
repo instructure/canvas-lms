@@ -88,7 +88,7 @@ describe Lti::ExternalToolTab do
   end
 
   it "sets the external value to true" do
-    expect(subject.tabs.first[:external]).to eq true
+    expect(subject.tabs.first[:external]).to be true
   end
 
   it "sets the args to the context_id and tool_id" do
@@ -133,11 +133,11 @@ describe Lti::ExternalToolTab do
 
   describe "#tool_id_for_tab" do
     it "returns nil when given nil" do
-      expect(described_class.tool_id_for_tab(nil)).to eq(nil)
+      expect(described_class.tool_id_for_tab(nil)).to be_nil
     end
 
     it "returns nil when given a hash that is not a tab" do
-      expect(described_class.tool_id_for_tab({ abc: 123 })).to eq(nil)
+      expect(described_class.tool_id_for_tab({ abc: 123 })).to be_nil
     end
 
     it "returns nil when given a tab that is not a tool tab" do
@@ -145,7 +145,7 @@ describe Lti::ExternalToolTab do
         described_class.tool_id_for_tab(
           { label: "foo", href: "http://google.com", id: "something", args: [tool.id, tool.id] }
         )
-      ).to eq(nil)
+      ).to be_nil
     end
 
     it "returns the id of the tool in the tab when given a tool tab" do
@@ -160,7 +160,7 @@ describe Lti::ExternalToolTab do
       tool = external_tool_model
       tab = described_class.new(course_model, nil, [tool]).tabs.first
       tab[:args][1] = ContextExternalTool.last.id + 999
-      expect(described_class.tool_for_tab(tab)).to eq(nil)
+      expect(described_class.tool_for_tab(tab)).to be_nil
     end
 
     it "returns the tool when given a tool tab with a valid tool" do
@@ -218,7 +218,7 @@ describe Lti::ExternalToolTab do
     end
 
     it "sets hidden" do
-      expect(subject.tabs.first[:hidden]).to eq true
+      expect(subject.tabs.first[:hidden]).to be true
     end
 
     it "sets the target if windowTarget is set on the tool" do

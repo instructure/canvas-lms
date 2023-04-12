@@ -37,6 +37,6 @@ describe Assignment::GradeError do
 
   it "defaults to a nil error code" do
     error = Assignment::GradeError.new
-    expect(error.error_code).to be nil
+    expect(error.error_code).to be_nil
   end
 end

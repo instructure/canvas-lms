@@ -95,24 +95,24 @@ describe CanvasHttp::CircuitBreaker do
 
   it "trips only after exceeding threshold" do
     domain = "dead.host.com"
-    expect(CanvasHttp::CircuitBreaker.tripped?(domain)).to eq(false)
+    expect(CanvasHttp::CircuitBreaker.tripped?(domain)).to be(false)
     CanvasHttp::CircuitBreaker::DEFAULT_THRESHOLD.times do
       CanvasHttp::CircuitBreaker.trip_if_necessary(domain)
     end
-    expect(CanvasHttp::CircuitBreaker.tripped?(domain)).to eq(false)
+    expect(CanvasHttp::CircuitBreaker.tripped?(domain)).to be(false)
     CanvasHttp::CircuitBreaker.trip_if_necessary(domain)
-    expect(CanvasHttp::CircuitBreaker.tripped?(domain)).to eq(true)
+    expect(CanvasHttp::CircuitBreaker.tripped?(domain)).to be(true)
   end
 
   it "goes away after interval" do
     domain = "dead.host.com"
-    expect(CanvasHttp::CircuitBreaker.tripped?(domain)).to eq(false)
+    expect(CanvasHttp::CircuitBreaker.tripped?(domain)).to be(false)
     (CanvasHttp::CircuitBreaker::DEFAULT_THRESHOLD * 2).times do
       CanvasHttp::CircuitBreaker.trip_if_necessary(domain)
     end
-    expect(CanvasHttp::CircuitBreaker.tripped?(domain)).to eq(true)
+    expect(CanvasHttp::CircuitBreaker.tripped?(domain)).to be(true)
     test_redis.pass_time!(CanvasHttp::CircuitBreaker::DEFAULT_INTERVAL)
-    expect(CanvasHttp::CircuitBreaker.tripped?(domain)).to eq(false)
+    expect(CanvasHttp::CircuitBreaker.tripped?(domain)).to be(false)
   end
 
   it "uses default values if the configuration block is broken" do

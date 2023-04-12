@@ -686,7 +686,7 @@ describe "API Authentication", type: :request do
       @pseudonym.update!(workflow_state: "suspended")
 
       get "/api/v1/courses?access_token=#{@token.full_token}"
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "allows passing the access token in the authorization header" do

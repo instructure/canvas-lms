@@ -242,7 +242,7 @@ describe "Account Notification API", type: :request do
       notification = AccountNotification.last
       roles = notification.account_notification_roles
       expect(roles.count).to eq 1
-      expect(roles.first.role_id).to eq nil
+      expect(roles.first.role_id).to be_nil
       expect(json["roles"]).to eq ["NilEnrollment"]
       expect(json["role_ids"]).to eq [nil]
     end

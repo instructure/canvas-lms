@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe CoursePacesController, type: :controller do
+describe CoursePacesController do
   let(:valid_update_params) do
     {
       hard_end_dates: true,
@@ -409,19 +409,19 @@ describe CoursePacesController, type: :controller do
         expect(response).to be_successful
         expect(@course.course_paces.not_deleted.count).to eq(0)
         json_response = JSON.parse(response.body)
-        expect(json_response["course_pace"]["id"]).to eq(nil)
-        expect(json_response["course_pace"]["published_at"]).to eq(nil)
+        expect(json_response["course_pace"]["id"]).to be_nil
+        expect(json_response["course_pace"]["published_at"]).to be_nil
         expect(json_response["course_pace"]["modules"].count).to eq(2)
         m1 = json_response["course_pace"]["modules"].first
         expect(m1["items"].count).to eq(1)
         expect(m1["items"].first["duration"]).to eq(0)
-        expect(m1["items"].first["published"]).to eq(true)
+        expect(m1["items"].first["published"]).to be(true)
         m2 = json_response["course_pace"]["modules"].second
         expect(m2["items"].count).to eq(2)
         expect(m2["items"].first["duration"]).to eq(0)
-        expect(m2["items"].first["published"]).to eq(true)
+        expect(m2["items"].first["published"]).to be(true)
         expect(m2["items"].second["duration"]).to eq(0)
-        expect(m2["items"].second["published"]).to eq(true)
+        expect(m2["items"].second["published"]).to be(true)
       end
 
       it "starts the progress' delayed job and returns the progress object if queued" do
@@ -441,8 +441,8 @@ describe CoursePacesController, type: :controller do
       it "returns a draft course pace" do
         get :new, params: { course_id: @course.id, course_section_id: @course_section.id }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(nil)
-        expect(JSON.parse(response.body)["course_pace"]["published_at"]).to eq(nil)
+        expect(JSON.parse(response.body)["course_pace"]["id"]).to be_nil
+        expect(JSON.parse(response.body)["course_pace"]["published_at"]).to be_nil
       end
 
       it "returns a published section pace if one already exists" do
@@ -470,20 +470,20 @@ describe CoursePacesController, type: :controller do
         expect(response).to be_successful
         expect(@course.course_paces.unpublished.for_section(@course_section).count).to eq(0)
         json_response = JSON.parse(response.body)
-        expect(json_response["course_pace"]["id"]).to eq(nil)
-        expect(json_response["course_pace"]["published_at"]).to eq(nil)
+        expect(json_response["course_pace"]["id"]).to be_nil
+        expect(json_response["course_pace"]["published_at"]).to be_nil
         expect(json_response["course_pace"]["course_section_id"]).to eq(@course_section.id)
         expect(json_response["course_pace"]["modules"].count).to eq(2)
         m1 = json_response["course_pace"]["modules"].first
         expect(m1["items"].count).to eq(1)
         expect(m1["items"].first["duration"]).to eq(0)
-        expect(m1["items"].first["published"]).to eq(true)
+        expect(m1["items"].first["published"]).to be(true)
         m2 = json_response["course_pace"]["modules"].second
         expect(m2["items"].count).to eq(2)
         expect(m2["items"].first["duration"]).to eq(2)
-        expect(m2["items"].first["published"]).to eq(true)
+        expect(m2["items"].first["published"]).to be(true)
         expect(m2["items"].second["duration"]).to eq(4)
-        expect(m2["items"].second["published"]).to eq(true)
+        expect(m2["items"].second["published"]).to be(true)
       end
     end
 
@@ -491,8 +491,8 @@ describe CoursePacesController, type: :controller do
       it "returns a draft course pace" do
         get :new, params: { course_id: @course.id, enrollment_id: @student_enrollment.id }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(nil)
-        expect(JSON.parse(response.body)["course_pace"]["published_at"]).to eq(nil)
+        expect(JSON.parse(response.body)["course_pace"]["id"]).to be_nil
+        expect(JSON.parse(response.body)["course_pace"]["published_at"]).to be_nil
         expect(JSON.parse(response.body)["course_pace"]["user_id"]).to eq(@student.id)
       end
 
@@ -522,20 +522,20 @@ describe CoursePacesController, type: :controller do
         get :new, params: { course_id: @course.id, enrollment_id: @student_enrollment.id }
         expect(response).to be_successful
         json_response = JSON.parse(response.body)
-        expect(json_response["course_pace"]["id"]).to eq(nil)
-        expect(json_response["course_pace"]["published_at"]).to eq(nil)
-        expect(json_response["course_pace"]["section_id"]).to eq(nil)
+        expect(json_response["course_pace"]["id"]).to be_nil
+        expect(json_response["course_pace"]["published_at"]).to be_nil
+        expect(json_response["course_pace"]["section_id"]).to be_nil
         expect(json_response["course_pace"]["user_id"]).to eq(@student.id)
         m1 = json_response["course_pace"]["modules"].first
         expect(m1["items"].count).to eq(1)
         expect(m1["items"].first["duration"]).to eq(0)
-        expect(m1["items"].first["published"]).to eq(true)
+        expect(m1["items"].first["published"]).to be(true)
         m2 = json_response["course_pace"]["modules"].second
         expect(m2["items"].count).to eq(2)
         expect(m2["items"].first["duration"]).to eq(0)
-        expect(m2["items"].first["published"]).to eq(true)
+        expect(m2["items"].first["published"]).to be(true)
         expect(m2["items"].second["duration"]).to eq(0)
-        expect(m2["items"].second["published"]).to eq(true)
+        expect(m2["items"].second["published"]).to be(true)
       end
 
       it "returns an instantiated course pace if one is not already available" do
@@ -544,20 +544,20 @@ describe CoursePacesController, type: :controller do
         expect(response).to be_successful
         expect(@course.course_paces.unpublished.for_user(@student).count).to eq(0)
         json_response = JSON.parse(response.body)
-        expect(json_response["course_pace"]["id"]).to eq(nil)
-        expect(json_response["course_pace"]["published_at"]).to eq(nil)
+        expect(json_response["course_pace"]["id"]).to be_nil
+        expect(json_response["course_pace"]["published_at"]).to be_nil
         expect(json_response["course_pace"]["user_id"]).to eq(@student.id)
         expect(json_response["course_pace"]["modules"].count).to eq(2)
         m1 = json_response["course_pace"]["modules"].first
         expect(m1["items"].count).to eq(1)
         expect(m1["items"].first["duration"]).to eq(0)
-        expect(m1["items"].first["published"]).to eq(true)
+        expect(m1["items"].first["published"]).to be(true)
         m2 = json_response["course_pace"]["modules"].second
         expect(m2["items"].count).to eq(2)
         expect(m2["items"].first["duration"]).to eq(2)
-        expect(m2["items"].first["published"]).to eq(true)
+        expect(m2["items"].first["published"]).to be(true)
         expect(m2["items"].second["duration"]).to eq(4)
-        expect(m2["items"].second["published"]).to eq(true)
+        expect(m2["items"].second["published"]).to be(true)
       end
 
       context "when the user is on another shard" do

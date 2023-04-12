@@ -24,26 +24,26 @@ module ActiveSupport::Callbacks::Suspension
   describe Registry do
     context "#any_registered?" do
       it "is false when nothing has been registered" do
-        expect(Registry.new.any_registered?(:find)).to eq false
+        expect(Registry.new.any_registered?(:find)).to be false
       end
 
       it "is true when a suspension has been registered" do
         registry = Registry.new
         registry.update([], [:find], [])
-        expect(registry.any_registered?(:find)).to eq true
+        expect(registry.any_registered?(:find)).to be true
       end
 
       it "is still false when a suspension has been registered, then removed" do
         registry = Registry.new
         delta = registry.update([], [:find], [])
         registry.revert(delta)
-        expect(registry.any_registered?(:find)).to eq false
+        expect(registry.any_registered?(:find)).to be false
       end
 
       it "is true when a global suspension has been registered" do
         registry = Registry.new
         registry.update([], [], [])
-        expect(registry.any_registered?(:find)).to eq true
+        expect(registry.any_registered?(:find)).to be true
       end
     end
   end

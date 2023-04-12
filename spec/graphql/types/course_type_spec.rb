@@ -35,7 +35,7 @@ describe Types::CourseType do
   it "works" do
     expect(course_type.resolve("_id")).to eq course.id.to_s
     expect(course_type.resolve("name")).to eq course.name
-    expect(course_type.resolve("courseNickname")).to eq nil
+    expect(course_type.resolve("courseNickname")).to be_nil
   end
 
   it "works for root_outcome_group" do
@@ -706,7 +706,7 @@ describe Types::CourseType do
       it "returns null if there is no course-specific PostPolicy" do
         course.default_post_policy.destroy
         resolver = GraphQLTypeTester.new(course, context)
-        expect(resolver.resolve("postPolicy { _id }")).to be nil
+        expect(resolver.resolve("postPolicy { _id }")).to be_nil
       end
     end
 
@@ -716,7 +716,7 @@ describe Types::CourseType do
       it "returns null in place of the PostPolicy" do
         course.default_post_policy.update!(post_manually: true)
         resolver = GraphQLTypeTester.new(course, context)
-        expect(resolver.resolve("postPolicy { _id }")).to be nil
+        expect(resolver.resolve("postPolicy { _id }")).to be_nil
       end
     end
   end
@@ -750,7 +750,7 @@ describe Types::CourseType do
 
       it "returns null in place of the PostPolicy" do
         resolver = GraphQLTypeTester.new(course, context)
-        expect(resolver.resolve("assignmentPostPolicies { nodes { _id } }")).to be nil
+        expect(resolver.resolve("assignmentPostPolicies { nodes { _id } }")).to be_nil
       end
     end
   end

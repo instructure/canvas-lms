@@ -391,17 +391,17 @@ describe DeveloperKey do
           developer_key.account_binding_for(account).update!(workflow_state: "on")
         end
 
-        it { is_expected.to eq true }
+        it { is_expected.to be true }
       end
 
       context "when the key is not usable" do
         before { developer_key.update!(workflow_state: "deleted") }
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
 
       context "when the binding is not on" do
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
     end
 
@@ -466,8 +466,8 @@ describe DeveloperKey do
 
   describe "sets a default value" do
     it "when visible is not specified" do
-      expect(developer_key_not_saved.valid?).to eq(true)
-      expect(developer_key_not_saved.visible).to eq(false)
+      expect(developer_key_not_saved.valid?).to be(true)
+      expect(developer_key_not_saved.visible).to be(false)
     end
 
     it "is false for site admin generated keys" do
@@ -478,7 +478,7 @@ describe DeveloperKey do
         account_id: nil
       )
 
-      expect(key.visible).to eq(false)
+      expect(key.visible).to be(false)
     end
 
     it "is true for non site admin generated keys" do
@@ -489,7 +489,7 @@ describe DeveloperKey do
         account_id: account.id
       )
 
-      expect(key.visible).to eq(true)
+      expect(key.visible).to be(true)
     end
   end
 
@@ -504,19 +504,19 @@ describe DeveloperKey do
       context 'when the kty is not "RSA"' do
         before { developer_key_saved.public_jwk["kty"] = "foo" }
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
 
       context 'when the alg is not "RS256"' do
         before { developer_key_saved.public_jwk["alg"] = "foo" }
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
 
       context "when required claims are missing" do
         before { developer_key_saved.update public_jwk: { foo: "bar" } }
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
     end
 
@@ -582,13 +582,13 @@ describe DeveloperKey do
             developer_key_not_saved
           end
 
-          it { is_expected.to eq true }
+          it { is_expected.to be true }
         end
 
         context "when a public jwk is not set" do
           let(:key) { developer_key_not_saved }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
 
         context "when a key requires scopes but has no public jwk" do
@@ -600,7 +600,7 @@ describe DeveloperKey do
             developer_key_not_saved
           end
 
-          it { is_expected.to eq true }
+          it { is_expected.to be true }
         end
       end
 
@@ -1128,21 +1128,21 @@ describe DeveloperKey do
     it "does not allow subdomains when it matches in redirect_uris" do
       developer_key_not_saved.redirect_uris << "http://example.com/a/b"
 
-      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/a/b")).to eq true
+      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/a/b")).to be true
 
       # other paths on the same domain are NOT ok
-      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/other")).to eq false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/other")).to be false
       # sub-domains are not ok either
-      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to eq false
-      expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/a/b")).to eq false
-      expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/other")).to eq false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to be false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/a/b")).to be false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/other")).to be false
     end
 
     it "requires scheme to match on lenient matches" do
       developer_key_not_saved.redirect_uri = "http://example.com/a/b"
 
-      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to eq true
-      expect(developer_key_not_saved.redirect_domain_matches?("intents://www.example.com/a/b")).to eq false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to be true
+      expect(developer_key_not_saved.redirect_domain_matches?("intents://www.example.com/a/b")).to be false
     end
   end
 

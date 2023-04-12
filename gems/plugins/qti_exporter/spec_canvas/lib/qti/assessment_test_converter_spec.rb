@@ -50,9 +50,9 @@ describe Qti::AssessmentTestConverter do
     assess = Qti::AssessmentTestConverter
     expect(assess.parse_pick_count(test_section(" 1"))).to eq 1
     expect(assess.parse_pick_count(test_section("0"))).to eq 0
-    expect(assess.parse_pick_count(test_section("-5"))).to eq nil
-    expect(assess.parse_pick_count(test_section(""))).to eq nil
-    expect(assess.parse_pick_count(test_section("puppies"))).to eq nil
-    expect(assess.parse_pick_count(test_section(nil))).to eq nil
+    expect(assess.parse_pick_count(test_section("-5"))).to be_nil
+    expect(assess.parse_pick_count(test_section(""))).to be_nil
+    expect(assess.parse_pick_count(test_section("puppies"))).to be_nil
+    expect(assess.parse_pick_count(test_section(nil))).to be_nil
   end
 end

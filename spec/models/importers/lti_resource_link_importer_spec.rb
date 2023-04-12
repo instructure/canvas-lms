@@ -30,7 +30,7 @@ describe Importers::LtiResourceLinkImporter do
     let(:hash) { { lti_resource_links: nil } }
 
     it "does not import lti resource links" do
-      expect(subject).to eq false
+      expect(subject).to be false
     end
   end
 
@@ -72,7 +72,7 @@ describe Importers::LtiResourceLinkImporter do
       it "update the custom params" do
         expect(resource_link.custom).to be_nil
 
-        expect(subject).to eq true
+        expect(subject).to be true
 
         resource_link.reload
 
@@ -83,7 +83,7 @@ describe Importers::LtiResourceLinkImporter do
     context "when the Lti::ResourceLink.context_type is a Course" do
       context "and the resource link was not recorded" do
         it "create the new resource link" do
-          expect(subject).to eq true
+          expect(subject).to be true
 
           expect(destination_course.lti_resource_links.size).to eq 1
           expect(destination_course.lti_resource_links.first.lookup_uuid).to eq lookup_uuid
@@ -101,7 +101,7 @@ describe Importers::LtiResourceLinkImporter do
         end
 
         it "update the custom params" do
-          expect(subject).to eq true
+          expect(subject).to be true
 
           expect(destination_course.lti_resource_links.size).to eq 1
           expect(destination_course.lti_resource_links.first.lookup_uuid).to eq lookup_uuid

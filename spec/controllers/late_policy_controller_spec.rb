@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.describe LatePolicyController, type: :controller do
+RSpec.describe LatePolicyController do
   let(:valid_attributes) do
     {
       missing_submission_deduction_enabled: true,

@@ -38,11 +38,11 @@ describe SIS::CSV::UserImporter do
     expect(user.name).to eql("User Uno")
     expect(user.short_name).to eql("User Uno")
 
-    expect(user.pseudonyms.count).to eql(1)
+    expect(user.pseudonyms.count).to be(1)
     pseudonym = user.pseudonyms.first
     expect(pseudonym.unique_id).to eql("user1")
 
-    expect(user.communication_channels.count).to eql(1)
+    expect(user.communication_channels.count).to be(1)
     cc = user.communication_channels.first
     expect(cc.path).to eql("user@example.com")
 
@@ -55,11 +55,11 @@ describe SIS::CSV::UserImporter do
     expect(user.name).to eql("User Uno 2")
     expect(user.short_name).to eql("User Uno 2")
 
-    expect(user.pseudonyms.count).to eql(1)
+    expect(user.pseudonyms.count).to be(1)
     pseudonym = user.pseudonyms.first
     expect(pseudonym.unique_id).to eql("user1")
 
-    expect(user.communication_channels.count).to eql(1)
+    expect(user.communication_channels.count).to be(1)
 
     user.name = "My Awesome Name"
     user.save
@@ -84,11 +84,11 @@ describe SIS::CSV::UserImporter do
     expect(user.name).to eql("User Uno")
     expect(user.short_name).to eql("The Uno")
 
-    expect(user.pseudonyms.count).to eql(1)
+    expect(user.pseudonyms.count).to be(1)
     pseudonym = user.pseudonyms.first
     expect(pseudonym.unique_id).to eql("user1")
 
-    expect(user.communication_channels.count).to eql(1)
+    expect(user.communication_channels.count).to be(1)
     cc = user.communication_channels.first
     expect(cc.path).to eql("user@example.com")
 
@@ -102,11 +102,11 @@ describe SIS::CSV::UserImporter do
     expect(user.name).to eql("User Dos")
     expect(user.short_name).to eql("The Dos")
 
-    expect(user.pseudonyms.count).to eql(1)
+    expect(user.pseudonyms.count).to be(1)
     pseudonym = user.pseudonyms.first
     expect(pseudonym.unique_id).to eql("user2")
 
-    expect(user.communication_channels.count).to eql(1)
+    expect(user.communication_channels.count).to be(1)
     cc = user.communication_channels.first
     expect(cc.path).to eql("user2@example.com")
   end
@@ -120,11 +120,11 @@ describe SIS::CSV::UserImporter do
     expect(user.account).to eql(@account)
     expect(user.name).to eql("User Uno")
 
-    expect(user.pseudonyms.count).to eql(1)
+    expect(user.pseudonyms.count).to be(1)
     pseudonym = user.pseudonyms.first
     expect(pseudonym.unique_id).to eql("user1")
 
-    expect(user.communication_channels.count).to eql(1)
+    expect(user.communication_channels.count).to be(1)
     cc = user.communication_channels.first
     expect(cc.path).to eql("user@example.com")
 
@@ -137,11 +137,11 @@ describe SIS::CSV::UserImporter do
     expect(user.account).to eql(@account)
     expect(user.name).to eql("User Dos")
 
-    expect(user.pseudonyms.count).to eql(1)
+    expect(user.pseudonyms.count).to be(1)
     pseudonym = user.pseudonyms.first
     expect(pseudonym.unique_id).to eql("user2")
 
-    expect(user.communication_channels.count).to eql(1)
+    expect(user.communication_channels.count).to be(1)
     cc = user.communication_channels.first
     expect(cc.path).to eql("user2@example.com")
   end
@@ -156,11 +156,11 @@ describe SIS::CSV::UserImporter do
     expect(user.name).to eql("User Uno")
     expect(user.sortable_name).to eql("One, User")
 
-    expect(user.pseudonyms.count).to eql(1)
+    expect(user.pseudonyms.count).to be(1)
     pseudonym = user.pseudonyms.first
     expect(pseudonym.unique_id).to eql("user1")
 
-    expect(user.communication_channels.count).to eql(1)
+    expect(user.communication_channels.count).to be(1)
     cc = user.communication_channels.first
     expect(cc.path).to eql("user@example.com")
 
@@ -174,11 +174,11 @@ describe SIS::CSV::UserImporter do
     expect(user.name).to eql("User Dos")
     expect(user.sortable_name).to eql("Two, User")
 
-    expect(user.pseudonyms.count).to eql(1)
+    expect(user.pseudonyms.count).to be(1)
     pseudonym = user.pseudonyms.first
     expect(pseudonym.unique_id).to eql("user2")
 
-    expect(user.communication_channels.count).to eql(1)
+    expect(user.communication_channels.count).to be(1)
     cc = user.communication_channels.first
     expect(cc.path).to eql("user2@example.com")
   end
@@ -1760,7 +1760,7 @@ describe SIS::CSV::UserImporter do
     )
     expect(importer.errors.length).to eq 1
     expect(importer.errors.last.last).to eq "unrecognized authentication provider google for user_1, skipping"
-    expect(@account.pseudonyms.active.where(sis_user_id: "user_1").first).to eq nil
+    expect(@account.pseudonyms.active.where(sis_user_id: "user_1").first).to be_nil
   end
 
   it "allows UTF-8 in usernames" do
@@ -1773,7 +1773,7 @@ describe SIS::CSV::UserImporter do
     expect(user.name).to eql("User Unö")
     expect(user.short_name).to eql("User Unö")
 
-    expect(user.pseudonyms.count).to eql(1)
+    expect(user.pseudonyms.count).to be(1)
     pseudonym = user.pseudonyms.first
     expect(pseudonym.unique_id).to eql("user1ö")
     expect(pseudonym.sis_user_id).to eql("user_1ö")

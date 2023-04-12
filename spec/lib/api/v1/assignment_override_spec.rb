@@ -40,9 +40,9 @@ describe Api::V1::AssignmentOverride do
       allow(subject).to receive(:api_find_all).and_return []
       assignment = double(context: double(all_students: []))
       result = subject.interpret_assignment_override_data(assignment, override, "ADHOC")
-      expect(result.first[:due_at]).to eq nil
-      expect(result.first[:unlock_at]).to eq nil
-      expect(result.first[:lock_at]).to eq nil
+      expect(result.first[:due_at]).to be_nil
+      expect(result.first[:unlock_at]).to be_nil
+      expect(result.first[:lock_at]).to be_nil
     end
 
     context "sharding" do

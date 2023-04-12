@@ -60,9 +60,7 @@ describe "quiz taking" do
   end
 
   it "allows to take the quiz as long as there are attempts left",
-     :xbrowser,
-     priority: "1",
-     custom_timeout: 30 do
+     :xbrowser, custom_timeout: 30, priority: "1" do
     @quiz.allowed_attempts = 2
     @quiz.save!
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"

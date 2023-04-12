@@ -165,7 +165,7 @@ describe EventStream::Stream do
         read_consistency_level "ALL"
       end
 
-      expect(stream.database).to be nil
+      expect(stream.database).to be_nil
       expect(stream.available?).to be false
     end
   end

@@ -46,13 +46,13 @@ describe ContentMigration do
       expect(@copy_to.attachments.count).to eq 1
       att_to = @copy_to.attachments.where(migration_id: mig_id(att)).first
       expect(att_to.file_state).to eq "available"
-      expect(att_to.root_attachment_id).to eq nil # should be root
+      expect(att_to.root_attachment_id).to be_nil # should be root
       expect(att_to.open.read).to eq "ohai" # should have copied content over
       expect(att_to.namespace).to eq "account_#{@copy_to.root_account.id}"
       expect(@copy_to.wiki_pages.where(migration_id: mig_id(wiki)).first.workflow_state).to eq "active"
       rub2 = @copy_to.rubrics.where(migration_id: mig_id(rub1)).first
       expect(rub2.workflow_state).to eq "active"
-      expect(rub2.rubric_associations.first.bookmarked).to eq true
+      expect(rub2.rubric_associations.first.bookmarked).to be true
       expect(@copy_to.created_learning_outcomes.where(migration_id: mig_id(lo)).first.workflow_state).to eq "active"
       expect(@copy_to.quizzes.where(migration_id: mig_id(quiz)).first.workflow_state).to eq "unpublished" if Qti.qti_enabled?
       expect(@copy_to.context_external_tools.where(migration_id: mig_id(tool)).first.workflow_state).to eq "public"
@@ -71,7 +71,7 @@ describe ContentMigration do
       run_course_copy
 
       expect(@copy_from.content_exports.last).to eq @cm.content_export
-      expect(@cm.content_export.global_identifiers?).to eq false
+      expect(@cm.content_export.global_identifiers?).to be false
 
       dt_to = @copy_to.discussion_topics.first
       expect(dt_to.migration_id).to eq CC::CCHelper.create_key("discussion_topic_#{dt.local_id}", global: false)

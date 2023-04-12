@@ -173,7 +173,7 @@ describe AssignmentsHelper do
 
   describe "#i18n_grade" do
     it "returns nil when passed a nil grade and a grading_type of pass_fail" do
-      expect(i18n_grade(nil, "pass_fail")).to be nil
+      expect(i18n_grade(nil, "pass_fail")).to be_nil
     end
   end
 

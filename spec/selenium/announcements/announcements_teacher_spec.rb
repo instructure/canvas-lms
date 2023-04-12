@@ -169,7 +169,7 @@ describe "announcements" do
       expect(ann.title).to eq("First Announcement")
       # the delayed post at should be far enough in the future to make this
       # not flaky
-      expect(ann.delayed_post_at > Time.zone.now).to eq true
+      expect(ann.delayed_post_at > Time.zone.now).to be true
       expect(ann.attachment).to be_locked
     end
 
@@ -251,7 +251,7 @@ describe "announcements" do
       f("#require_initial_post").click
       expect_new_page_load { submit_form(".form-actions") }
       announcement = Announcement.where(title: "title").first
-      expect(announcement.require_initial_post).to eq(true)
+      expect(announcement.require_initial_post).to be(true)
     end
 
     context "in a homeroom course" do

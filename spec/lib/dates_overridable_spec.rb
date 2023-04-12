@@ -232,14 +232,14 @@ shared_examples_for "an object whose dates are overridable" do
       before { override }
 
       it "returns true" do
-        expect(overridable.reload.has_active_overrides?).to eq true
+        expect(overridable.reload.has_active_overrides?).to be true
       end
     end
 
     context "when it has deleted overrides" do
       it "returns false" do
         override.destroy
-        expect(overridable.reload.has_active_overrides?).to eq false
+        expect(overridable.reload.has_active_overrides?).to be false
       end
     end
   end
@@ -384,8 +384,8 @@ shared_examples_for "an object whose dates are overridable" do
       expect(a.due_date_hash[:due_at]).to eq due
       expect(a.due_date_hash[:lock_at]).to eq due
       expect(a.due_date_hash[:unlock_at]).to eq due
-      expect(a.due_date_hash[:all_day]).to eq false
-      expect(a.due_date_hash[:all_day_date]).to eq nil
+      expect(a.due_date_hash[:all_day]).to be false
+      expect(a.due_date_hash[:all_day_date]).to be_nil
     end
   end
 
@@ -418,13 +418,13 @@ shared_examples_for "an object whose dates are overridable" do
     context "when the object has been overridden" do
       context "and it has multiple due dates" do
         it "returns true" do
-          expect(overridable.overridden_for(@teacher).multiple_due_dates?).to eq true
+          expect(overridable.overridden_for(@teacher).multiple_due_dates?).to be true
         end
       end
 
       context "and it has one due date" do
         it "returns false" do
-          expect(overridable.overridden_for(@student).multiple_due_dates?).to eq false
+          expect(overridable.overridden_for(@student).multiple_due_dates?).to be false
         end
       end
     end
@@ -437,7 +437,7 @@ shared_examples_for "an object whose dates are overridable" do
 
     context "when the object has been overridden for a guest" do
       it "returns false" do
-        expect(overridable.overridden_for(nil).multiple_due_dates?).to eq false
+        expect(overridable.overridden_for(nil).multiple_due_dates?).to be false
       end
     end
   end

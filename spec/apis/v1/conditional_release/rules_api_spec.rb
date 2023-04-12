@@ -334,11 +334,11 @@ module ConditionalRelease
 
         rule.reload
         changed_assoc = rule.assignment_set_associations.where(assignment_id: changed_assignment.id).take
-        expect(changed_assoc).not_to be nil
+        expect(changed_assoc).not_to be_nil
         new_assoc = rule.assignment_set_associations.where(assignment_id: new_assignment.id).take
-        expect(new_assoc).not_to be nil
+        expect(new_assoc).not_to be_nil
         deleted_assoc = rule.assignment_set_associations.where(assignment_id: deleted_assignment_id).take
-        expect(deleted_assoc).to be nil
+        expect(deleted_assoc).to be_nil
         expect(rule.assignment_set_associations.count).to be 4
 
         verify_positions_for rule
@@ -391,7 +391,7 @@ module ConditionalRelease
       it "deletes a rule" do
         api_call(:delete, @url, @base_params, {}, {}, { expected_status: 200 })
         expect(@rule.reload.deleted_at).to be_present
-        expect(Rule.active.where(id: @rule.id).exists?).to eq false
+        expect(Rule.active.where(id: @rule.id).exists?).to be false
       end
 
       it "fails for non-existent rule" do

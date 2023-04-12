@@ -108,7 +108,7 @@ describe "EportfoliosApi", type: :request do
         expect(json["id"]).to eq @active_eportfolio.id
         expect(json["user_id"]).to eq @eportfolio_user.id
         expect(json["name"]).to eq "Fruitcake"
-        expect(json["public"]).to eq false
+        expect(json["public"]).to be false
         expect(json["created_at"]).to eq @active_eportfolio.created_at.iso8601
         expect(json["updated_at"]).to eq @active_eportfolio.updated_at.iso8601
         expect(json["workflow_state"]).to eq "active"
@@ -139,7 +139,7 @@ describe "EportfoliosApi", type: :request do
         expect(json["id"]).to eq @active_eportfolio.id
         expect(json["user_id"]).to eq @eportfolio_user.id
         expect(json["name"]).to eq "Fruitcake"
-        expect(json["public"]).to eq false
+        expect(json["public"]).to be false
         expect(json["created_at"]).to eq @active_eportfolio.created_at.iso8601
         expect(json["updated_at"]).to eq @active_eportfolio.updated_at.iso8601
         expect(json["workflow_state"]).to eq "active"

@@ -29,8 +29,8 @@ describe Wiki do
       @course.default_view = "wiki"
       @wiki.unset_front_page!
 
-      expect(@wiki.has_front_page?).to eq false
-      expect(@wiki.front_page_url).to eq nil
+      expect(@wiki.has_front_page?).to be false
+      expect(@wiki.front_page_url).to be_nil
       expect(@wiki.course.default_view).to eq @wiki.course.default_home_page
     end
   end
@@ -39,9 +39,9 @@ describe Wiki do
     it "sets front_page_url" do
       @wiki.unset_front_page!
       new_url = "ponies4ever"
-      expect(@wiki.set_front_page_url!(new_url)).to eq true
+      expect(@wiki.set_front_page_url!(new_url)).to be true
 
-      expect(@wiki.has_front_page?).to eq true
+      expect(@wiki.has_front_page?).to be true
       expect(@wiki.front_page_url).to eq new_url
     end
   end
@@ -52,7 +52,7 @@ describe Wiki do
       @wiki.set_front_page_url!(new_url)
 
       page = @wiki.front_page
-      expect(page.new_record?).to eq true
+      expect(page.new_record?).to be true
       expect(page.url).to eq new_url
     end
 

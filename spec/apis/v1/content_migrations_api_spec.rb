@@ -220,7 +220,7 @@ describe ContentMigrationsController, type: :request do
       @migration.save!
 
       json = api_call(:get, @migration_url, @params)
-      expect(json["settings"]).to eq nil
+      expect(json["settings"]).to be_nil
     end
 
     it "marks as failed if stuck in pre_processing" do
@@ -512,7 +512,7 @@ describe ContentMigrationsController, type: :request do
       it "sets attachment pre-flight data" do
         json = api_call(:post, @migration_url, @params, @post_params)
         expect(json["pre_attachment"]).not_to be_nil
-        expect(json["pre_attachment"]["upload_params"]["key"].end_with?("test.zip")).to eq true
+        expect(json["pre_attachment"]["upload_params"]["key"].end_with?("test.zip")).to be true
       end
 
       it "does not queue migration with pre_attachent on create" do
@@ -598,7 +598,7 @@ describe ContentMigrationsController, type: :request do
       it "verifies the content export exists" do
         post_params = { migration_type: "common_cartridge_importer", settings: { content_export_id: 0 } }
         json = api_call(:post, @migration_url, @params, post_params)
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(json["message"]).to eq "invalid content export"
         expect(ContentMigration.last).to be_pre_process_error
       end
@@ -610,7 +610,7 @@ describe ContentMigrationsController, type: :request do
         @user = me
         post_params = { migration_type: "common_cartridge_importer", settings: { content_export_id: export.id } }
         json = api_call(:post, @migration_url, @params, post_params)
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(json["message"]).to eq "invalid content export"
         expect(ContentMigration.last).to be_pre_process_error
       end
@@ -619,7 +619,7 @@ describe ContentMigrationsController, type: :request do
         export = stub_export(@course, @user, "exporting", false)
         post_params = { migration_type: "common_cartridge_importer", settings: { content_export_id: export.id } }
         json = api_call(:post, @migration_url, @params, post_params)
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(json["message"]).to eq "content export is incomplete"
         expect(ContentMigration.last).to be_pre_process_error
       end

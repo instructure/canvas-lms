@@ -421,10 +421,10 @@ RSpec.shared_examples "a submission update action" do |controller|
         @params = { course_id: @course.id, assignment_id: @assignment.id, submission: { student_entered_score: "2" } }.merge(@resource_pair)
         put :update, params: @params, format: :json
         expect(body["id"]).to eq @submission.id
-        expect(body["score"]).to be nil
-        expect(body["grade"]).to be nil
-        expect(body["published_grade"]).to be nil
-        expect(body["published_score"]).to be nil
+        expect(body["score"]).to be_nil
+        expect(body["grade"]).to be_nil
+        expect(body["published_grade"]).to be_nil
+        expect(body["published_score"]).to be_nil
       end
 
       context "when assignment has anonymous peer reviewers" do
@@ -686,7 +686,7 @@ RSpec.shared_examples "a submission update action" do |controller|
           )
           user_session(admin)
           put :update, params: @params, format: :json
-          expect(response.status).to eq 400
+          expect(response).to have_http_status :bad_request
         end
       end
     end

@@ -45,7 +45,7 @@ describe "course copy" do
     @course.save!
     get "/courses/#{@course.id}/copy"
     expect_new_page_load { f('button[type="submit"]').click }
-    expect(f("div.progressStatus").text.include?("Queued")).to eq(true)
+    expect(f("div.progressStatus").text.include?("Queued")).to be(true)
     run_jobs
     wait_for_ajaximations
     wait_for_migration_to_complete
@@ -170,7 +170,7 @@ describe "course copy" do
 
     # this test requires jobs to run in the middle of it and course_copys
     # need to check a lot of things, a longer timeout is reasonable.
-    it "shifts the dates a week later", priority: "2", custom_timeout: 30 do
+    it "shifts the dates a week later", custom_timeout: 30, priority: "2" do
       event = @course.calendar_events.create! title: "Monday Event", start_at: @date_to_use
 
       get "/courses/#{@course.id}/copy"

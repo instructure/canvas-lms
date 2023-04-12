@@ -135,7 +135,7 @@ module BroadcastPolicies
             )
           end
 
-          it { is_expected.to eq true }
+          it { is_expected.to be true }
         end
 
         context "and the submissions does not transition from 'unsubmitted' -> 'submitted'" do
@@ -148,7 +148,7 @@ module BroadcastPolicies
             )
           end
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
     end
@@ -183,7 +183,7 @@ module BroadcastPolicies
         context "when no changes were made to the URL" do
           before { allow(submission).to receive(:saved_change_to_url?).and_return(false) }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
 
         context "when a change was made to the URL" do
@@ -205,7 +205,7 @@ module BroadcastPolicies
               )
             end
 
-            it { is_expected.to eq false }
+            it { is_expected.to be false }
           end
 
           context "and the submission is a re-submission" do
@@ -224,7 +224,7 @@ module BroadcastPolicies
                 )
               end
 
-              it { is_expected.to eq false }
+              it { is_expected.to be false }
             end
 
             context "and the URL has not been used in submission history" do
@@ -236,7 +236,7 @@ module BroadcastPolicies
                 )
               end
 
-              it { is_expected.to eq true }
+              it { is_expected.to be true }
             end
           end
         end

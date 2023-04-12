@@ -62,21 +62,21 @@ describe ContextModuleProgression do
       mp2.workflow_state = "locked"
       mp2.save!
 
-      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to eq true
+      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to be true
     end
 
     it "is satisfied if no prereqs" do
-      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module3)).to eq true
+      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module3)).to be true
     end
 
     it "is satisfied if prereq is unpublished" do
-      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to eq true
+      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to be true
     end
 
     it "is satisfied if prereq's prereq is unpublished" do
       @module3.prerequisites = "module_#{@module2.id}"
       @module3.save!
-      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module3)).to eq true
+      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module3)).to be true
     end
 
     it "is satisfied if dependent on both a published and unpublished module" do
@@ -86,7 +86,7 @@ describe ContextModuleProgression do
       @module3.reload
       expect(@module3.prerequisites.count).to eq 2
 
-      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module3)).to eq true
+      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module3)).to be true
     end
 
     it "skips incorrect prereq hashes" do
@@ -99,10 +99,10 @@ describe ContextModuleProgression do
 
     it "updates when publishing or unpublishing" do
       @module.publish
-      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to eq false
+      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to be false
       @module.unpublish
       @module2.reload
-      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to eq true
+      expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to be true
     end
   end
 

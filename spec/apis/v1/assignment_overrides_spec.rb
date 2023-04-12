@@ -1262,7 +1262,7 @@ describe AssignmentOverridesController, type: :request do
                                    args_for(@b, @b1, due_at: Time.zone.now.to_s),
                                    args_for(@a, @a1, title: new_title)
                                  ], expected_status: 400)
-        expect(json["errors"][0]).to be nil
+        expect(json["errors"][0]).to be_nil
         expect(json["errors"][1].to_s).to match(/too_long/)
         expect(@a1.reload.title).to eq old_title
         expect(@b1.reload.due_at).to eq old_due_at

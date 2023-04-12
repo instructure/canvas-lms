@@ -41,17 +41,17 @@ describe RubricsController do
 
       it "includes managed_outcomes permission" do
         get "index", params: { course_id: @course.id }
-        expect(assigns[:js_env][:PERMISSIONS][:manage_outcomes]).to eq true
+        expect(assigns[:js_env][:PERMISSIONS][:manage_outcomes]).to be true
       end
 
       it "includes manage_rubrics permission" do
         get "index", params: { course_id: @course.id }
-        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq true
+        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to be true
       end
 
       it "returns non_scoring_rubrics if enabled" do
         get "index", params: { course_id: @course.id }
-        expect(assigns[:js_env][:NON_SCORING_RUBRICS]).to eq true
+        expect(assigns[:js_env][:NON_SCORING_RUBRICS]).to be true
       end
     end
 
@@ -68,7 +68,7 @@ describe RubricsController do
 
       it "does not allow the teacher to manage_rubrics" do
         get "index", params: { course_id: @course.id }
-        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq false
+        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to be false
       end
     end
   end
@@ -99,7 +99,7 @@ describe RubricsController do
                                                      association_id: association.id } }
       expect(assigns[:rubric]).not_to be_nil
       expect(assigns[:rubric]).not_to be_new_record
-      expect(assigns[:rubric].rubric_associations.length).to eql(1)
+      expect(assigns[:rubric].rubric_associations.length).to be(1)
       expect(response).to be_successful
     end
 
@@ -114,7 +114,7 @@ describe RubricsController do
                                                      association_id: association.id } }
       expect(assigns[:rubric]).not_to be_nil
       expect(assigns[:rubric]).not_to be_new_record
-      expect(assigns[:rubric].rubric_associations.length).to eql(1)
+      expect(assigns[:rubric].rubric_associations.length).to be(1)
       expect(response).to be_successful
     end
 
@@ -430,9 +430,9 @@ describe RubricsController do
       }
       put "update", params: update_params
       @rubric_association.reload
-      expect(@rubric_association.hide_points).to eq true
-      expect(@rubric_association.hide_score_total).to eq false
-      expect(@rubric_association.hide_outcome_results).to eq true
+      expect(@rubric_association.hide_points).to be true
+      expect(@rubric_association.hide_score_total).to be false
+      expect(@rubric_association.hide_outcome_results).to be true
     end
 
     it "adds an outcome association if one is linked" do
@@ -742,7 +742,7 @@ describe RubricsController do
       association.destroy
       delete "destroy", params: { course_id: @course.id, id: @rubric.id }
 
-      expect(response.status).to eq 500
+      expect(response).to have_http_status :internal_server_error
     end
 
     it "deletes the rubric if the rubric is only associated with a course" do
@@ -856,7 +856,7 @@ describe RubricsController do
 
       it "allows the teacher to manage_rubrics" do
         get "show", params: { id: @r.id, course_id: @course.id }
-        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq true
+        expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to be true
       end
 
       describe "after a course has concluded" do
@@ -869,7 +869,7 @@ describe RubricsController do
 
         it "does not allow the teacher to manage_rubrics" do
           get "show", params: { id: @r.id, course_id: @course.id }
-          expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to eq false
+          expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to be false
         end
       end
     end

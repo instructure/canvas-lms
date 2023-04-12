@@ -188,13 +188,13 @@ describe QuizzesNext::QuizSerializer do
     it "when enabled, quiz is 'in_paced_course'" do
       context.enable_course_paces = true
       result = quiz_serializer.as_json
-      expect(result[:in_paced_course]).to eq(true)
+      expect(result[:in_paced_course]).to be(true)
     end
 
     it "when disabled, quiz is not 'in_paced_course'" do
       context.enable_course_paces = false
       result = quiz_serializer.as_json
-      expect(result[:in_paced_course]).to eq(false)
+      expect(result[:in_paced_course]).to be(false)
     end
   end
 

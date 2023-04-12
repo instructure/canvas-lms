@@ -167,7 +167,7 @@ describe DeveloperKeysController, type: :request do
 
           site_admin_key_json = json_parse.find { |d| d["id"] == sa_key.global_id }
           expect(Account.find(site_admin_key_json.dig("developer_key_account_binding", "account_id"))).to eq Account.site_admin
-          expect(site_admin_key_json.dig("developer_key_account_binding", "account_owns_binding")).to eq true
+          expect(site_admin_key_json.dig("developer_key_account_binding", "account_owns_binding")).to be true
         end
       end
 
@@ -185,7 +185,7 @@ describe DeveloperKeysController, type: :request do
           site_admin_key_json = json_parse.find { |d| d["id"] == sa_key.global_id }
 
           expect(Account.find(site_admin_key_json.dig("developer_key_account_binding", "account_id"))).to eq Account.site_admin
-          expect(site_admin_key_json.dig("developer_key_account_binding", "account_owns_binding")).to eq false
+          expect(site_admin_key_json.dig("developer_key_account_binding", "account_owns_binding")).to be false
         end
       end
     end

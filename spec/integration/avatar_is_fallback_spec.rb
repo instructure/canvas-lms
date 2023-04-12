@@ -44,7 +44,7 @@ describe UsersController do
       it "is true when there is no real avatar image" do
         get "/"
         expect(assigns(:js_env)[:current_user][:avatar_image_url]).to include User.default_avatar_fallback
-        expect(assigns(:js_env)[:current_user][:avatar_is_fallback]).to eq true
+        expect(assigns(:js_env)[:current_user][:avatar_is_fallback]).to be true
       end
 
       it "is false when there is a real avatar image" do
@@ -52,7 +52,7 @@ describe UsersController do
         @user.save!
         get "/"
         expect(assigns(:js_env)[:current_user][:avatar_image_url]).to eq @user.avatar_image_url
-        expect(assigns(:js_env)[:current_user][:avatar_is_fallback]).to eq false
+        expect(assigns(:js_env)[:current_user][:avatar_is_fallback]).to be false
       end
     end
   end

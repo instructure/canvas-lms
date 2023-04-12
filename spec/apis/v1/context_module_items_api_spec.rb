@@ -499,10 +499,10 @@ describe "Module Items API", type: :request do
         it "with new_tab" do
           api_call_body_params[:module_item][:new_tab] = "true"
 
-          expect(subject["new_tab"]).to eq true
+          expect(subject["new_tab"]).to be true
 
           tag = @module1.content_tags.where(id: subject["id"]).first
-          expect(tag.new_tab).to eq true
+          expect(tag.new_tab).to be true
         end
 
         it "with iframe launch dimension settings" do
@@ -637,10 +637,10 @@ describe "Module Items API", type: :request do
                           course_id: @course.id.to_s, module_id: @module1.id.to_s, id: external_tool_tag.id.to_s },
                         { module_item: { new_tab: "true" } })
 
-        expect(json["new_tab"]).to eq true
+        expect(json["new_tab"]).to be true
 
         external_tool_tag.reload
-        expect(external_tool_tag.new_tab).to eq true
+        expect(external_tool_tag.new_tab).to be true
       end
 
       it "updates the url for an external url item" do
@@ -754,7 +754,7 @@ describe "Module Items API", type: :request do
                         { controller: "context_module_items_api", action: "update", format: "json",
                           course_id: @course.id.to_s, module_id: @module1.id.to_s, id: @assignment_tag.id.to_s },
                         { module_item: { published: "1" } })
-        expect(json["published"]).to eq true
+        expect(json["published"]).to be true
 
         @assignment_tag.reload
         expect(@assignment_tag.workflow_state).to eq "active"
@@ -765,7 +765,7 @@ describe "Module Items API", type: :request do
                         { controller: "context_module_items_api", action: "update", format: "json",
                           course_id: @course.id.to_s, module_id: @module1.id.to_s, id: @assignment_tag.id.to_s },
                         { module_item: { published: "0" } }, {}, { expected_status: 200 })
-        expect(json["published"]).to eq false
+        expect(json["published"]).to be false
         expect(@assignment_tag.reload).to be_unpublished
         expect(@assignment.reload).to be_unpublished
       end
@@ -877,13 +877,13 @@ describe "Module Items API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?student_id=#{student.id}",
                       controller: "context_module_items_api", action: "index", format: "json",
                       course_id: @course.id.to_s, student_id: student.id.to_s, module_id: @module1.id.to_s)
-      expect(json.find { |m| m["id"] == @assignment_tag.id }["completion_requirement"]["completed"]).to eq true
+      expect(json.find { |m| m["id"] == @assignment_tag.id }["completion_requirement"]["completed"]).to be true
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?student_id=#{student.id}",
                       controller: "context_module_items_api", action: "show", format: "json",
                       course_id: @course.id.to_s, module_id: @module1.id.to_s,
                       id: @assignment_tag.id.to_s, student_id: student.id.to_s)
-      expect(json["completion_requirement"]["completed"]).to eq true
+      expect(json["completion_requirement"]["completed"]).to be true
     end
 
     describe "GET 'module_item_sequence'" do
@@ -911,11 +911,11 @@ describe "Module Items API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Assignment&asset_id=#{@assignment.id}",
                         controller: "context_module_items_api", action: "item_sequence", format: "json",
                         course_id: @course.to_param, asset_type: "Assignment", asset_id: @assignment.to_param)
-        expect(json["items"].size).to eql 1
+        expect(json["items"].size).to be 1
         expect(json["items"][0]["prev"]).to be_nil
         expect(json["items"][0]["current"]["id"]).to eq @assignment_tag.id
         expect(json["items"][0]["next"]["id"]).to eq @quiz_tag.id
-        expect(json["modules"].size).to eql 1
+        expect(json["modules"].size).to be 1
         expect(json["modules"][0]["id"]).to eq @module1.id
       end
 
@@ -923,7 +923,7 @@ describe "Module Items API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=ModuleItem&asset_id=#{@external_url_tag.id}",
                         controller: "context_module_items_api", action: "item_sequence", format: "json",
                         course_id: @course.to_param, asset_type: "ModuleItem", asset_id: @external_url_tag.to_param)
-        expect(json["items"].size).to eql 1
+        expect(json["items"].size).to be 1
         expect(json["items"][0]["prev"]["id"]).to eq @topic_tag.id
         expect(json["items"][0]["current"]["id"]).to eq @external_url_tag.id
         expect(json["items"][0]["next"]["id"]).to eq @wiki_page_tag.id
@@ -962,7 +962,7 @@ describe "Module Items API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Page&asset_id=#{@wiki_page.url}",
                         controller: "context_module_items_api", action: "item_sequence", format: "json",
                         course_id: @course.to_param, asset_type: "Page", asset_id: @wiki_page.to_param)
-        expect(json["items"].size).to eql 1
+        expect(json["items"].size).to be 1
         expect(json["items"][0]["prev"]["id"]).to eq @external_url_tag.id
         expect(json["items"][0]["current"]["id"]).to eq @wiki_page_tag.id
         expect(json["items"][0]["next"]["id"]).to eq @attachment_tag.id
@@ -974,8 +974,8 @@ describe "Module Items API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Page&asset_id=#{@wiki_page.url}",
                         controller: "context_module_items_api", action: "item_sequence", format: "json",
                         course_id: @course.to_param, asset_type: "Page", asset_id: @wiki_page.to_param)
-        expect(json["items"].size).to eql 0
-        expect(json["modules"].size).to eql 0
+        expect(json["items"].size).to be 0
+        expect(json["modules"].size).to be 0
       end
 
       it "skips a deleted module" do
@@ -984,7 +984,7 @@ describe "Module Items API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=ModuleItem&asset_id=#{@external_url_tag.id}",
                         controller: "context_module_items_api", action: "item_sequence", format: "json",
                         course_id: @course.to_param, asset_type: "ModuleItem", asset_id: @external_url_tag.to_param)
-        expect(json["items"].size).to eql 1
+        expect(json["items"].size).to be 1
         expect(json["items"][0]["next"]["id"]).to eql new_tag.id
         expect(json["modules"].map { |mod| mod["id"] }.sort).to eq [@module1.id, @module3.id].sort
       end
@@ -994,7 +994,7 @@ describe "Module Items API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Assignment&asset_id=#{@assignment.id}",
                         controller: "context_module_items_api", action: "item_sequence", format: "json",
                         course_id: @course.to_param, asset_type: "Assignment", asset_id: @assignment.to_param)
-        expect(json["items"].size).to eql 1
+        expect(json["items"].size).to be 1
         expect(json["items"][0]["current"]["id"]).to eq @assignment_tag.id
         expect(json["items"][0]["next"]["id"]).to eq @topic_tag.id
       end
@@ -1006,7 +1006,7 @@ describe "Module Items API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=quiz&asset_id=#{other_quiz.id}",
                         controller: "context_module_items_api", action: "item_sequence", format: "json",
                         course_id: @course.to_param, asset_type: "quiz", asset_id: other_quiz.to_param)
-        expect(json["items"].size).to eql 1
+        expect(json["items"].size).to be 1
         expect(json["items"][0]["current"]["id"]).to eql wacky_tag.id
       end
 
@@ -1017,7 +1017,7 @@ describe "Module Items API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=discussioN&asset_id=#{other_topic.id}",
                         controller: "context_module_items_api", action: "item_sequence", format: "json",
                         course_id: @course.to_param, asset_type: "discussioN", asset_id: other_topic.to_param)
-        expect(json["items"].size).to eql 1
+        expect(json["items"].size).to be 1
         expect(json["items"][0]["current"]["id"]).to eql wacky_tag.id
       end
 
@@ -1026,7 +1026,7 @@ describe "Module Items API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=quiz&asset_id=#{@quiz.id}",
                         controller: "context_module_items_api", action: "item_sequence", format: "json",
                         course_id: @course.to_param, asset_type: "quiz", asset_id: @quiz.to_param)
-        expect(json["items"].size).to eql 1
+        expect(json["items"].size).to be 1
         expect(json["items"][0]["prev"]["id"]).to eql @assignment_tag.id
         expect(json["items"][0]["next"]["id"]).to eql @topic_tag.id
       end
@@ -1036,7 +1036,7 @@ describe "Module Items API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=discussion&asset_id=#{@topic.id}",
                         controller: "context_module_items_api", action: "item_sequence", format: "json",
                         course_id: @course.to_param, asset_type: "discussion", asset_id: @topic.to_param)
-        expect(json["items"].size).to eql 1
+        expect(json["items"].size).to be 1
         expect(json["items"][0]["prev"]["id"]).to eql @quiz_tag.id
         expect(json["items"][0]["next"]["id"]).to eql @external_url_tag.id
       end
@@ -1050,7 +1050,7 @@ describe "Module Items API", type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Quiz&asset_id=#{@quiz.id}",
                           controller: "context_module_items_api", action: "item_sequence", format: "json",
                           course_id: @course.to_param, asset_type: "Quiz", asset_id: @quiz.to_param)
-          expect(json["items"].size).to eql 2
+          expect(json["items"].size).to be 2
           expect(json["items"][0]["prev"]["id"]).to eq @assignment_tag.id
           expect(json["items"][0]["current"]["id"]).to eq @quiz_tag.id
           expect(json["items"][0]["next"]["id"]).to eq @topic_tag.id
@@ -1068,7 +1068,7 @@ describe "Module Items API", type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Assignment&asset_id=#{@assignment.id}",
                           controller: "context_module_items_api", action: "item_sequence", format: "json",
                           course_id: @course.to_param, asset_type: "Assignment", asset_id: @assignment.to_param)
-          expect(json["items"].size).to eql 10
+          expect(json["items"].size).to be 10
           expect(json["items"][9]["current"]["module_id"]).to eq modules[8].id
         end
 
@@ -1076,7 +1076,7 @@ describe "Module Items API", type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=ModuleItem&asset_id=#{@quiz_tag.id}",
                           controller: "context_module_items_api", action: "item_sequence", format: "json",
                           course_id: @course.to_param, asset_type: "ModuleItem", asset_id: @quiz_tag.to_param)
-          expect(json["items"].size).to eql 1
+          expect(json["items"].size).to be 1
           expect(json["items"][0]["prev"]["id"]).to eq @assignment_tag.id
           expect(json["items"][0]["current"]["id"]).to eq @quiz_tag.id
           expect(json["items"][0]["next"]["id"]).to eq @topic_tag.id
@@ -1267,7 +1267,7 @@ describe "Module Items API", type: :request do
       end
 
       it "includes lock information" do
-        expect(assignment_details["locked_for_user"]).to eq true
+        expect(assignment_details["locked_for_user"]).to be true
         expect(assignment_details).to include "lock_explanation"
         expect(assignment_details).to include "lock_info"
         expect(assignment_details["lock_info"]).to include(
@@ -1277,7 +1277,7 @@ describe "Module Items API", type: :request do
       end
 
       it "includes lock information for contentless tags" do
-        expect(external_url_details["locked_for_user"]).to eq true
+        expect(external_url_details["locked_for_user"]).to be true
         expect(external_url_details).to include "lock_explanation"
         expect(external_url_details).to include "lock_info"
         expect(external_url_details["lock_info"]).to include(
@@ -1478,7 +1478,7 @@ describe "Module Items API", type: :request do
       end
 
       it "includes lock information" do
-        expect(assignment_details["locked_for_user"]).to eq true
+        expect(assignment_details["locked_for_user"]).to be true
         expect(assignment_details).to include "lock_explanation"
         expect(assignment_details).to include "lock_info"
         expect(assignment_details["lock_info"]).to include(

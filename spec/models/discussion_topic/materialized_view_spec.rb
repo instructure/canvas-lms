@@ -42,7 +42,7 @@ describe DiscussionTopic::MaterializedView do
 
     it "returns nil and schedule a job if no view" do
       DiscussionTopic::MaterializedView.for(@topic).destroy
-      expect(DiscussionTopic::MaterializedView.materialized_view_for(@topic)).to eq nil
+      expect(DiscussionTopic::MaterializedView.materialized_view_for(@topic)).to be_nil
       expect(Delayed::Job.where(singleton: "materialized_discussion:#{@topic.id}").count).to eq 1
     end
 
@@ -91,7 +91,7 @@ describe DiscussionTopic::MaterializedView do
     expect(json.map { |e| e["id"] }).to eq [@root1.id.to_s, @root2.id.to_s]
     expect(json.map { |e| e["parent_id"] }).to eq [nil, nil]
     deleted = json[0]["replies"][0]
-    expect(deleted["deleted"]).to eq true
+    expect(deleted["deleted"]).to be true
     expect(deleted["user_id"]).to be_nil
     expect(deleted["message"]).to be_nil
     expect(json[0]["replies"][1]["replies"][0]["attachment"]["url"]).to eq "https://placeholder.invalid/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"

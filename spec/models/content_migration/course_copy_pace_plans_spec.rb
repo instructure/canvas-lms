@@ -41,8 +41,8 @@ describe ContentMigration do
       expect(course_pace_to.start_date).to eq course_pace.start_date
       expect(course_pace_to.end_date).to eq course_pace.end_date
       expect(course_pace_to.published_at.to_i).to eq course_pace.published_at.to_i
-      expect(course_pace_to.exclude_weekends).to eq false
-      expect(course_pace_to.hard_end_dates).to eq true
+      expect(course_pace_to.exclude_weekends).to be false
+      expect(course_pace_to.hard_end_dates).to be true
     end
 
     context "module items" do

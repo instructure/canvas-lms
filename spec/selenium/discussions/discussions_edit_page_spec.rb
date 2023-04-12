@@ -113,7 +113,7 @@ describe "discussions" do
           f("#assignment_peer_reviews").click
 
           expect_new_page_load { f(".form-actions button[type=submit]").click }
-          expect(topic.reload.assignment.peer_reviews).to eq true
+          expect(topic.reload.assignment.peer_reviews).to be true
         end
 
         it "allows editing the due dates", priority: "1" do
@@ -364,7 +364,7 @@ describe "discussions" do
           topic.save!
 
           get url
-          expect(element_exists?("#usage_rights_control i.icon-files-copyright")).to eq(true)
+          expect(element_exists?("#usage_rights_control i.icon-files-copyright")).to be(true)
         end
       end
 

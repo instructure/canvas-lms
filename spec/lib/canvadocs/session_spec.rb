@@ -39,7 +39,7 @@ describe Canvadocs::Session do
       observer_enrollment.update!(associated_user_id: student.id)
       assignment.update!(submission_types: "online_upload")
       @submission = submission_model(user: student, course: course, assignment: assignment)
-      expect(observing?(observer)).to eq true
+      expect(observing?(observer)).to be true
     end
 
     it "returns false if the user is not an observer" do
@@ -56,7 +56,7 @@ describe Canvadocs::Session do
       )
       assignment.update!(submission_types: "online_upload")
       @submission = submission_model(user: student, course: course, assignment: assignment)
-      expect(observing?(not_observer)).to eq false
+      expect(observing?(not_observer)).to be false
     end
   end
 
@@ -75,7 +75,7 @@ describe Canvadocs::Session do
       )
       assignment.update!(submission_types: "online_upload")
       @submission = submission_model(user: student, course: course, assignment: assignment)
-      expect(managing?(teacher)).to eq true
+      expect(managing?(teacher)).to be true
     end
 
     it "returns false if the user does not have a TeacherEnrollment" do
@@ -92,7 +92,7 @@ describe Canvadocs::Session do
       )
       assignment.update!(submission_types: "online_upload")
       @submission = submission_model(user: student, course: course, assignment: assignment)
-      expect(managing?(not_teacher)).to eq false
+      expect(managing?(not_teacher)).to be false
     end
   end
 

@@ -74,12 +74,12 @@ describe Types::GradesType do
 
     it "resolves the overrideGrade field to nil when grading standards are not enabled" do
       course.update!(grading_standard_id: nil)
-      expect(resolve_grades_field("overrideGrade")).to be nil
+      expect(resolve_grades_field("overrideGrade")).to be_nil
     end
 
     it "resolves the overrideGrade field to nil when an override score is not present" do
       score.update!(override_score: nil)
-      expect(resolve_grades_field("overrideGrade")).to be nil
+      expect(resolve_grades_field("overrideGrade")).to be_nil
     end
 
     it "resolves the unpostedCurrentScore field to the corresponding Score's unposted_current_score" do

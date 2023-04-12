@@ -70,7 +70,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     let(:with_params) { { body: { abc: { def: "ghi" } } } }
     let(:response) { { status: 204, body: "" } }
 
-    it { is_expected.to eq(nil) }
+    it { is_expected.to be_nil }
 
     it_behaves_like "a graph service endpoint"
     it_behaves_like "an endpoint that uses up quota", [1, 1]
@@ -105,14 +105,14 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
 
     it_behaves_like "a graph service endpoint"
 
-    it { is_expected.to eq(nil) }
+    it { is_expected.to be_nil }
 
     context "when members is not given" do
       subject { endpoints.add_users_ignore_duplicates("msgroupid", owners: owners) }
 
       let(:req_body) { super().slice("owners@odata.bind") }
 
-      it { is_expected.to eq(nil) }
+      it { is_expected.to be_nil }
     end
 
     context "when owners is not given" do
@@ -120,7 +120,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
 
       let(:req_body) { super().slice("members@odata.bind") }
 
-      it { is_expected.to eq(nil) }
+      it { is_expected.to be_nil }
     end
 
     context "when members and owners are not given" do
@@ -140,7 +140,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
         }
       end
 
-      it { is_expected.to eq(nil) }
+      it { is_expected.to be_nil }
 
       # Microsoft told us write quota is about one per three users...
       it_behaves_like "an endpoint that uses up quota", [1, 7]

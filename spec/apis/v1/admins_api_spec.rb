@@ -210,17 +210,17 @@ describe "Admins API", type: :request do
 
       it "still works using the deprecated role param" do
         api_call(:delete, @path + "?role=CustomAdmin", @path_opts.merge(role: "CustomAdmin"))
-        expect(@account.account_users.active.where(user_id: @new_user, role_id: @role.id).exists?).to eq false
+        expect(@account.account_users.active.where(user_id: @new_user, role_id: @role.id).exists?).to be false
       end
 
       it "404s if the membership type doesn't exist" do
         api_call(:delete, @path + "?role=Blah", @path_opts.merge(role: "Blah"), {}, {}, expected_status: 404)
-        expect(@account.account_users.where(user_id: @new_user, role_id: @role.id).exists?).to eq true
+        expect(@account.account_users.where(user_id: @new_user, role_id: @role.id).exists?).to be true
       end
 
       it "404s if the membership type isn't specified" do
         api_call(:delete, @path, @path_opts, {}, {}, expected_status: 404)
-        expect(@account.account_users.where(user_id: @new_user, role_id: @role.id).exists?).to eq true
+        expect(@account.account_users.where(user_id: @new_user, role_id: @role.id).exists?).to be true
       end
     end
 
