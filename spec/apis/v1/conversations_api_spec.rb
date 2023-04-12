@@ -161,7 +161,7 @@ describe ConversationsController, type: :request do
                       { controller: "conversations", action: "index", format: "json" },
                       {},
                       { "Accept" => "application/json+canvas-string-ids" })
-      audiences = json.map { |j| j["audience"] }
+      audiences = json.pluck("audience")
       expect(audiences).to eq [
         [@billy.id.to_s, @bob.id.to_s],
         [@bob.id.to_s],
@@ -252,7 +252,7 @@ describe ConversationsController, type: :request do
         it "prefers the context but fall back to the first context tag" do
           json = api_call(:get, "/api/v1/conversations.json",
                           { controller: "conversations", action: "index", format: "json" })
-          expect(json.map { |c| c["context_name"] }).to eql([nil, "the other course", "the course"])
+          expect(json.pluck("context_name")).to eql([nil, "the other course", "the course"])
         end
       end
 
@@ -283,7 +283,7 @@ describe ConversationsController, type: :request do
         json = api_call(:get, "/api/v1/conversations.json?filter=#{filter}",
                         { controller: "conversations", action: "index", format: "json", filter: filter })
         expect(json.size).to eq @conversations.size
-        expect(json.map { |item| item["id"] }.sort).to eq @conversations.map(&:conversation_id).sort
+        expect(json.pluck("id").sort).to eq @conversations.map(&:conversation_id).sort
       end
 
       context "tag context on default shard" do
@@ -453,7 +453,7 @@ describe ConversationsController, type: :request do
         json = api_call(:get, "/api/v1/conversations.json?scope=sent",
                         { controller: "conversations", action: "index", format: "json", scope: "sent" })
         expect(json.size).to be 2
-        expect(json.map { |c| c["id"] }.sort).to eql [@c1.conversation_id, @c3.conversation_id]
+        expect(json.pluck("id").sort).to eql [@c1.conversation_id, @c3.conversation_id]
       end
     end
 
@@ -481,7 +481,7 @@ describe ConversationsController, type: :request do
       json = api_call(:get, "/api/v1/conversations.json?scope=starred",
                       { controller: "conversations", action: "index", format: "json", scope: "starred" })
       expect(json.size).to eq 3
-      expect(json.map { |c| c["id"] }.sort).to eq [@c1, @c2, @c3].map(&:conversation_id).sort
+      expect(json.pluck("id").sort).to eq [@c1, @c2, @c3].map(&:conversation_id).sort
     end
 
     it "does not include unstarred conversations in starred scope regardless of if read or archived" do
@@ -653,7 +653,7 @@ describe ConversationsController, type: :request do
         json2 = api_call(:post, "/api/v1/conversations",
                          { controller: "conversations", action: "create", format: "json" },
                          { recipients: [@bob.id, @billy.id], body: "test", context_code: "course_#{course1.id}" })
-        expect(json2.map { |r| r["id"] }).to include(conv1.id) # should reuse the conversation
+        expect(json2.pluck("id")).to include(conv1.id) # should reuse the conversation
       end
 
       describe "context is an account for admins validation" do
@@ -881,7 +881,7 @@ describe ConversationsController, type: :request do
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@bob.id, @joe.id, @billy.id], body: "test" })
           expect(json.size).to be 3
-          expect(json.map { |c| c["id"] }.sort).to eql @me.all_conversations.map(&:conversation_id).sort
+          expect(json.pluck("id").sort).to eql @me.all_conversations.map(&:conversation_id).sort
 
           batch = ConversationBatch.first
           expect(batch).not_to be_nil

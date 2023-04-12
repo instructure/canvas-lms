@@ -183,7 +183,7 @@ describe IncomingMail::MessageHandler do
             allow(subject).to receive(:get_ref_uuid).and_return("TestRef")
 
             email_subject = "Undelivered message"
-            body = <<~TEXT.strip_heredoc.strip
+            body = <<~TEXT.strip
               The message titled "some subject" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
               Thank you,
@@ -217,7 +217,7 @@ describe IncomingMail::MessageHandler do
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::ReplyToLockedTopic.new)
 
             email_subject = "Undelivered message"
-            body = <<~TEXT.strip_heredoc.strip
+            body = <<~TEXT.strip
               The message titled "some subject" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
               Thank you,
@@ -251,7 +251,7 @@ describe IncomingMail::MessageHandler do
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::UnknownAddress.new)
 
             email_subject = "Undelivered message"
-            body = <<~TEXT.strip_heredoc.strip
+            body = <<~TEXT.strip
               The message titled "some subject" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
               Thank you,

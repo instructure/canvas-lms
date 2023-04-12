@@ -1112,7 +1112,7 @@ class ConversationsController < ApplicationController
     audience_contexts = contexts_for(audience, conversation.local_context_tags) # will be 0, 1, or 2 contexts
     audience_context_names = [:courses, :groups].inject([]) do |ary, context_key|
       ary + audience_contexts[context_key].keys.map { |k| @contexts[context_key][k] && @contexts[context_key][k][:name] }
-    end.reject(&:blank?)
+    end.compact_blank
 
     content += "<hr />"
     content += "<div>#{ERB::Util.h(t("conversation_context", "From a conversation with"))} "

@@ -85,7 +85,7 @@ describe CommunicationChannelsController do
       }
       expect(response).not_to be_successful
       expect(
-        JSON.parse(response.body)["errors"]["type"]
+        response.parsed_body["errors"]["type"]
       ).to eq "Maximum number of communication channels reached"
     end
 
@@ -907,7 +907,7 @@ describe CommunicationChannelsController do
 
           # also test JSON format
           get "bouncing_channel_report", params: { account_id: Account.default.id, format: :json }
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json).to eq [
             ["User ID", "Name", "Communication channel ID", "Type", "Path", "Date of most recent bounce", "Bounce reason"],
             channel_csv(c2),
@@ -978,7 +978,7 @@ describe CommunicationChannelsController do
           @user.communication_channels.create!(path: "one@example.com", path_type: "email") do |cc|
             cc.workflow_state = "active"
             cc.bounce_count = 1
-            cc.last_bounce_at = Time.zone.now - 1.day
+            cc.last_bounce_at = 1.day.ago
           end
           c2 = @user.communication_channels.create!(path: "two@example.com", path_type: "email") do |cc|
             cc.workflow_state = "active"
@@ -988,12 +988,12 @@ describe CommunicationChannelsController do
           @user.communication_channels.create!(path: "three@example.com", path_type: "email") do |cc|
             cc.workflow_state = "active"
             cc.bounce_count = 1
-            cc.last_bounce_at = Time.zone.now + 1.day
+            cc.last_bounce_at = 1.day.from_now
           end
 
           get "bouncing_channel_report", params: { account_id: Account.default.id,
-                                                   before: Time.zone.now + 1.hour,
-                                                   after: Time.zone.now - 1.hour }
+                                                   before: 1.hour.from_now,
+                                                   after: 1.hour.ago }
 
           expect(included_channels).to eq([c2])
         end
@@ -1087,7 +1087,7 @@ describe CommunicationChannelsController do
           c1 = @user.communication_channels.create!(path: "one@example.com", path_type: "email") do |cc|
             cc.workflow_state = "active"
             cc.bounce_count = 1
-            cc.last_bounce_at = Time.zone.now - 1.day
+            cc.last_bounce_at = 1.day.ago
           end
           c2 = @user.communication_channels.create!(path: "two@example.com", path_type: "email") do |cc|
             cc.workflow_state = "active"
@@ -1097,12 +1097,12 @@ describe CommunicationChannelsController do
           c3 = @user.communication_channels.create!(path: "three@example.com", path_type: "email") do |cc|
             cc.workflow_state = "active"
             cc.bounce_count = 1
-            cc.last_bounce_at = Time.zone.now + 1.day
+            cc.last_bounce_at = 1.day.from_now
           end
 
           post "bulk_reset_bounce_counts", params: { account_id: Account.default.id,
-                                                     before: Time.zone.now + 1.hour,
-                                                     after: Time.zone.now - 1.hour }
+                                                     before: 1.hour.from_now,
+                                                     after: 1.hour.ago }
 
           run_jobs
           expect(c1.reload.bounce_count).to eq(1)

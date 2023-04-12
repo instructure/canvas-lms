@@ -395,7 +395,7 @@ module PlannerPageObject
     wait_for(method: nil, timeout: 1) { todo_tray_course_selector.displayed? }
   end
 
-  def graded_discussion_in_the_past(due = Time.zone.now - 2.days, title = "Graded discussion past")
+  def graded_discussion_in_the_past(due = 2.days.ago, title = "Graded discussion past")
     assignment = @course.assignments.create!(name: "assignment 1",
                                              due_at: due)
     discussion = @course.discussion_topics.create!(user: @teacher,
@@ -408,7 +408,7 @@ module PlannerPageObject
 
   def graded_discussion_in_the_future
     assignment = @course.assignments.create!(name: "assignment 2",
-                                             due_at: Time.zone.now + 2.days)
+                                             due_at: 2.days.from_now)
     discussion = @course.discussion_topics.create!(user: @teacher,
                                                    title: "Graded discussion future",
                                                    message: "Discussion topic message",
@@ -436,9 +436,9 @@ module PlannerPageObject
 
   def new_activities_in_the_past
     old = graded_discussion_in_the_past
-    older = graded_discussion_in_the_past(Time.zone.now - 4.days, "older")
-    oldest = graded_discussion_in_the_past(Time.zone.now - 6.days, "oldest")
-    ancient = graded_discussion_in_the_past(Time.zone.now - 8.days, "ancient")
+    older = graded_discussion_in_the_past(4.days.ago, "older")
+    oldest = graded_discussion_in_the_past(6.days.ago, "oldest")
+    ancient = graded_discussion_in_the_past(8.days.ago, "ancient")
     [old, older, oldest, ancient]
   end
 

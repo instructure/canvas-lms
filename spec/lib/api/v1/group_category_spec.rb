@@ -96,7 +96,7 @@ describe "Api::V1::GroupCategory" do
       context "when 'groups' is specified as an include key" do
         it "are included if active" do
           json = CategoryHarness.new.group_category_json(category, user, nil, { include: ["groups"] })
-          json_group_ids = json["groups"].map { |group| group["id"] }
+          json_group_ids = json["groups"].pluck("id")
 
           expect(json_group_ids).to match_array(category.groups.pluck(:id))
         end
@@ -105,7 +105,7 @@ describe "Api::V1::GroupCategory" do
           category.groups.second.destroy!
 
           json = CategoryHarness.new.group_category_json(category, user, nil, { include: ["groups"] })
-          json_group_ids = json["groups"].map { |group| group["id"] }
+          json_group_ids = json["groups"].pluck("id")
 
           expect(json_group_ids).to contain_exactly(category.groups.first.id)
         end

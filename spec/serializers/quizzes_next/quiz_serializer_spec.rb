@@ -29,7 +29,7 @@ describe QuizzesNext::QuizSerializer do
     original_context.assignments.create(
       title: "some assignment 1",
       assignment_group: group,
-      due_at: Time.zone.now + 1.week,
+      due_at: 1.week.from_now,
       workflow_state: "published"
     )
   end
@@ -43,7 +43,7 @@ describe QuizzesNext::QuizSerializer do
     context.assignments.create(
       title: "some assignment",
       assignment_group: group,
-      due_at: Time.zone.now + 1.week,
+      due_at: 1.week.from_now,
       workflow_state: "published",
       duplicate_of: original_assignment,
       settings: {
@@ -173,7 +173,7 @@ describe QuizzesNext::QuizSerializer do
       context.assignments.create(
         title: "some assignment",
         assignment_group: group,
-        due_at: Time.zone.now + 1.week,
+        due_at: 1.week.from_now,
         workflow_state: "published",
         migrate_from_id: quiz.id
       )

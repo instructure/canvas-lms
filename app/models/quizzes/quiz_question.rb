@@ -127,7 +127,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     end
 
     unless data.is_a?(Quizzes::QuizQuestion::QuestionData)
-      data = Quizzes::QuizQuestion::QuestionData.new(data || HashWithIndifferentAccess.new)
+      data = Quizzes::QuizQuestion::QuestionData.new(data || ActiveSupport::HashWithIndifferentAccess.new)
     end
 
     unless data[:id].present? && !id
@@ -191,7 +191,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     attributes.except("id", "quiz_id", "quiz_group_id", "question_data").each do |key, val|
       dup.send("#{key}=", val)
     end
-    data = question_data || HashWithIndifferentAccess.new
+    data = question_data || ActiveSupport::HashWithIndifferentAccess.new
     data.delete(:id)
     # if options[:old_context] && options[:new_context]
     #   data = Quizzes::QuizQuestion.migrate_question_hash(data, options)
@@ -207,7 +207,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   # be futzing with questions and groups and not affect
   # the quiz, as students see it.
   def data
-    res = (question_data || assessment_question.question_data) rescue Quizzes::QuizQuestion::QuestionData.new(HashWithIndifferentAccess.new)
+    res = (question_data || assessment_question.question_data) rescue Quizzes::QuizQuestion::QuestionData.new(ActiveSupport::HashWithIndifferentAccess.new)
     res[:assessment_question_id] = assessment_question_id
     res[:question_name] = t("#quizzes.quiz_question.defaults.question_name", "Question") if res[:question_name].blank?
     res[:id] = id

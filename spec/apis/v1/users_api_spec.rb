@@ -1078,7 +1078,7 @@ describe "Users API", type: :request do
                       { enrollment_type: "student" })
 
       expect(json.count).to eq 1
-      expect(json.map { |user| user["name"] }).to eq [@student.name]
+      expect(json.pluck("name")).to eq [@student.name]
     end
 
     it "doesn't kersplode when filtering by role and sorting" do
@@ -1087,13 +1087,13 @@ describe "Users API", type: :request do
                       { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
                       { role_filter_id: student_role.id.to_s, sort: "sis_id" })
 
-      expect(json.map { |r| r["id"] }).to eq [@student.id]
+      expect(json.pluck("id")).to eq [@student.id]
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
                       { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
                       { role_filter_id: student_role.id.to_s, sort: "email" })
 
-      expect(json.map { |r| r["id"] }).to eq [@student.id]
+      expect(json.pluck("id")).to eq [@student.id]
     end
 
     context "includes ui_invoked" do
@@ -2974,7 +2974,7 @@ describe "Users API", type: :request do
     it "does not return assignments that don't expect a submission" do
       ungraded = @course.assignments.create! due_at: 2.days.from_now, workflow_state: "published", submission_types: "not_graded"
       json = api_call(:get, @path, @params)
-      expect(json.map { |a| a["id"] }).not_to include ungraded.id
+      expect(json.pluck("id")).not_to include ungraded.id
     end
 
     it "shows assignments past their due dates because of overrides" do
@@ -3000,13 +3000,13 @@ describe "Users API", type: :request do
       a = @course.assignments.create!(due_at: 2.days.ago, workflow_state: "published", submission_types: "online_text_entry")
       a.destroy
       json = api_call(:get, @path, @params)
-      expect(json.map { |i| i["id"] }).not_to be_include a.id
+      expect(json.pluck("id")).not_to be_include a.id
     end
 
     it "does not show unpublished assignments" do
       a = @course.assignments.create!(due_at: 2.days.ago, workflow_state: "unpublished", submission_types: "online_text_entry")
       json = api_call(:get, @path, @params)
-      expect(json.map { |i| i["id"] }).not_to be_include a.id
+      expect(json.pluck("id")).not_to be_include a.id
     end
 
     context "current_grading_period filter" do
@@ -3109,7 +3109,7 @@ describe "Users API", type: :request do
           expect(response).to be_successful
           expect(json.length).to be 4
           assignments = ["Assignment", "Assignment", "Assignment in current period", "Assignment in current period (Shard 2)"]
-          expect(json.map { |assignment| assignment["name"] }.sort).to eq assignments.sort
+          expect(json.pluck("name").sort).to eq assignments.sort
         end
       end
     end
@@ -3172,7 +3172,7 @@ describe "Users API", type: :request do
         json = api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [course1.id, course2.id]))
         p json
         expect(json.length).to be(3)
-        assignment_names = json.map { |a| a["name"] }
+        assignment_names = json.pluck("name")
         expect(assignment_names).to include("A2")
         expect(assignment_names).not_to include("A3")
       end
@@ -3304,7 +3304,7 @@ describe "Users API", type: :request do
                                 format: "json"
                               })
       expect(json.count).to eq 3
-      expect(json.map { |s| s["id"] }).to eq [@most_recent_submission.id, @next_submission.id, @last_submission.id]
+      expect(json.pluck("id")).to eq [@most_recent_submission.id, @next_submission.id, @last_submission.id]
     end
 
     it "only gets the users submissions for active enrollments when only_current_enrollments=true" do
@@ -3317,7 +3317,7 @@ describe "Users API", type: :request do
                                 only_current_enrollments: true
                               })
       expect(json.count).to eq 2
-      expect(json.map { |s| s["id"] }).to eq [@next_submission.id, @last_submission.id]
+      expect(json.pluck("id")).to eq [@next_submission.id, @last_submission.id]
     end
 
     it "only gets the users submissions for published assignments when only_published_assignments=true" do
@@ -3333,7 +3333,7 @@ describe "Users API", type: :request do
                                 only_published_assignments: true,
                               })
       expect(json.count).to eq 2
-      expect(json.map { |s| s["id"] }).to eq [@next_submission.id, @last_submission.id]
+      expect(json.pluck("id")).to eq [@next_submission.id, @last_submission.id]
     end
 
     it "paginates" do

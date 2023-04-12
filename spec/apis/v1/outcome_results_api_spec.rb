@@ -616,7 +616,7 @@ describe "Outcome Results API", type: :request do
           json = JSON.parse(response.body)
           expect(json["linked"]).to be_present
           expect(json["linked"]["outcome_groups"]).to be_present
-          group_titles = json["linked"]["outcome_groups"].map { |g| g["id"] }.sort
+          group_titles = json["linked"]["outcome_groups"].pluck("id").sort
           expected_titles = [root_group, child_group, grandchild_group].map(&:id).sort
           expect(group_titles).to eq expected_titles
         end
@@ -710,7 +710,7 @@ describe "Outcome Results API", type: :request do
                  controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, outcome_ids: outcome_ids.join(","), include: ["outcomes"])
         json = JSON.parse(response.body)
         expect(json["linked"]["outcomes"].size).to eq outcome_ids.length
-        expect(json["linked"]["outcomes"].map { |x| x["id"] }.sort).to eq outcome_ids
+        expect(json["linked"]["outcomes"].pluck("id").sort).to eq outcome_ids
         rollup = json["rollups"][0]
         expect(rollup["scores"].size).to eq outcome_ids.length
       end
@@ -721,7 +721,7 @@ describe "Outcome Results API", type: :request do
                  controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, outcome_group_id: @outcome_group.id, include: ["outcomes"])
         json = JSON.parse(response.body)
         expect(json["linked"]["outcomes"].size).to eq outcome_ids.length
-        expect(json["linked"]["outcomes"].map { |x| x["id"] }.sort).to eq outcome_ids
+        expect(json["linked"]["outcomes"].pluck("id").sort).to eq outcome_ids
         rollup = json["rollups"][0]
         expect(rollup["scores"].size).to eq outcome_ids.length
       end

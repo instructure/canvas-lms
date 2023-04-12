@@ -60,7 +60,7 @@ class Quizzes::QuizQuestion::QuestionData
 
   def self.generate(fields = {})
     fields = Quizzes::QuizQuestion::RawFields.new(fields)
-    question = Quizzes::QuizQuestion::QuestionData.new(HashWithIndifferentAccess.new)
+    question = Quizzes::QuizQuestion::QuestionData.new(ActiveSupport::HashWithIndifferentAccess.new)
     question.allows_partial_credit! if fields.fetch_any(:allow_partial_credit, true)
 
     # general fields

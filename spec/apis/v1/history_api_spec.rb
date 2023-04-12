@@ -88,7 +88,7 @@ describe HistoryController, type: :request do
         AssetUserAccess.where(asset_code: "pages:#{@group.asset_string}").delete_all
         json = api_call(:get, "/api/v1/users/self/history", controller: "history", action: "index",
                                                             format: "json", user_id: "self")
-        expect(json.map { |item| item["asset_name"] }).to eq(["Course People", "Assign 1"])
+        expect(json.pluck("asset_name")).to eq(["Course People", "Assign 1"])
       end
 
       it "gracefully handles a pv4 timeout" do
@@ -155,14 +155,14 @@ describe HistoryController, type: :request do
         json = api_call(:get, "/api/v1/users/self/history?as_user_id=#{@student.id}",
                         controller: "history", action: "index", format: "json", user_id: "self",
                         as_user_id: @student.to_param)
-        expect(json.map { |e| e["asset_name"] }).to match_array(["Group Pages", "Course People", "Assign 1"])
+        expect(json.pluck("asset_name")).to match_array(["Group Pages", "Course People", "Assign 1"])
       end
 
       it "does not show the target user the masquerader's actions" do
         @user = @student
         json = api_call(:get, "/api/v1/users/self/history", controller: "history", action: "index",
                                                             format: "json", user_id: "self")
-        expect(json.map { |e| e["asset_name"] }).to match_array(["Group Pages", "Course People", "Assign 1"])
+        expect(json.pluck("asset_name")).to match_array(["Group Pages", "Course People", "Assign 1"])
       end
     end
 
@@ -179,7 +179,7 @@ describe HistoryController, type: :request do
         json = api_call(:get, "/api/v1/users/self/history", controller: "history", action: "index",
                                                             format: "json", user_id: "self")
 
-        asset_codes = json.map { |e| e["asset_code"] }
+        asset_codes = json.pluck("asset_code")
         expect(asset_codes).not_to include a1.asset_string
         expect(asset_codes).to include a2.asset_string
       end
@@ -196,7 +196,7 @@ describe HistoryController, type: :request do
         json = api_call(:get, "/api/v1/users/self/history", controller: "history", action: "index",
                                                             format: "json", user_id: "self")
 
-        asset_codes = json.map { |e| e["asset_code"] }
+        asset_codes = json.pluck("asset_code")
         expect(asset_codes).not_to include "modules:#{@course.asset_string}"
         expect(asset_codes).to include "modules:#{other_course.asset_string}"
       end
@@ -214,7 +214,7 @@ describe HistoryController, type: :request do
         json = api_call(:get, "/api/v1/users/self/history", controller: "history", action: "index",
                                                             format: "json", user_id: "self")
 
-        asset_codes = json.map { |e| e["asset_code"] }
+        asset_codes = json.pluck("asset_code")
         expect(asset_codes).not_to include page1.asset_string
         expect(asset_codes).to include page2.asset_string
       end

@@ -109,7 +109,7 @@ describe MediaTracksController do
       tracks["af"] = @mo.media_tracks.create!(kind: "subtitles", locale: "af", content: "af subs", user_id: @teacher.id)
       get "index", params: { media_object_id: @mo.media_id, include: ["content"] }
       expect(response).to be_successful
-      parsed = JSON.parse(response.body)
+      parsed = response.parsed_body
       expect(parsed.length).to be(2)
       parsed.each do |t|
         expect(t["content"]).to eql tracks[t["locale"]]["content"]
@@ -136,7 +136,7 @@ describe MediaTracksController do
           body: JSON.generate([{ locale: "en", content: "new en" }, { locale: "es", content: "es subs" }, { locale: "br" }]),
           format: :json
       expect(response).to be_successful
-      parsed = JSON.parse(response.body)
+      parsed = response.parsed_body
       expect(parsed.length).to be(3)
       expect(parsed.any? { |t| t["locale"] == "en" && t["content"] == "new en" }).to be
       expect(parsed.any? { |t| t["locale"] == "es" && t["content"] == "es subs" }).to be

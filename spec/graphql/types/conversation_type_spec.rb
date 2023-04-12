@@ -135,14 +135,14 @@ describe Types::ConversationType do
     end
 
     it "returns conversation messages before a given date" do
-      @conversation.conversation.conversation_messages[0].update!(created_at: Time.zone.now - 5.days)
-      result = conversation_type.resolve(%|conversationMessagesConnection(createdBefore: "#{(Time.zone.now - 1.day).iso8601}") { nodes { body } }|)
+      @conversation.conversation.conversation_messages[0].update!(created_at: 5.days.ago)
+      result = conversation_type.resolve(%|conversationMessagesConnection(createdBefore: "#{1.day.ago.iso8601}") { nodes { body } }|)
       expect(result).to include(@conversation.conversation.conversation_messages[0].body)
       expect(result).not_to include(@conversation.conversation.conversation_messages[1].body)
     end
 
     it "ignores nanoseconds when comparing time" do
-      float_time = (Time.zone.now - 1.day).to_f.floor
+      float_time = 1.day.ago.to_f.floor
       @conversation.conversation.conversation_messages[0].update!(created_at: Time.zone.at(float_time + 0.5))
       result = conversation_type.resolve(%|conversationMessagesConnection(createdBefore: "#{Time.zone.at(float_time).iso8601}") { nodes { body } }|)
       expect(result).to include(@conversation.conversation.conversation_messages[0].body)

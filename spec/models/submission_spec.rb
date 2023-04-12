@@ -473,12 +473,12 @@ describe Submission do
       # create an invited user, so that the submission is not automatically
       # created by the DueDateCacher
       student_in_course(active_all: true)
-      @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
+      @assignment.update_attribute(:due_at, 1.day.ago)
 
       override = @assignment.assignment_overrides.build
       override.title = "Some Title"
       override.set = @course.default_section
-      override.override_due_at(Time.zone.now + 1.day)
+      override.override_due_at(1.day.from_now)
       override.save!
 
       submission = @assignment.submissions.find_by!(user: @user)
@@ -2627,7 +2627,7 @@ describe Submission do
             let(:other_state) { state }
 
             it "chooses the more up-to-date report" do
-              preferred_report.update!(updated_at: Time.zone.now + 1.minute)
+              preferred_report.update!(updated_at: 1.minute.from_now)
               other_report.update!(updated_at: Time.zone.now)
               report_data = submission.originality_data[attachment.asset_string]
               expect(report_data[:similarity_score]).to eq preferred_report.originality_score
@@ -2646,7 +2646,7 @@ describe Submission do
 
           it "uses the preferred report even if the other report was updated later" do
             preferred_report.update(updated_at: Time.zone.now)
-            other_report.update(updated_at: Time.zone.now + 1.minute)
+            other_report.update(updated_at: 1.minute.from_now)
 
             report_data = submission.originality_data[attachment.asset_string]
             expect(report_data[:similarity_score]).to eq preferred_report.originality_score
@@ -3035,7 +3035,7 @@ describe Submission do
               let(:other_state) { state }
 
               it "chooses the more up-to-date report's URL" do
-                preferred_report.update(updated_at: Time.zone.now + 1.minute)
+                preferred_report.update(updated_at: 1.minute.from_now)
                 other_report.update(updated_at: Time.zone.now)
                 expect(submission.originality_report_url(attachment.asset_string,
                                                          test_teacher)).to eq preferred_url
@@ -3053,7 +3053,7 @@ describe Submission do
 
             it "chooses the preferred report's URL even when the other report is newer" do
               preferred_report.update(updated_at: Time.zone.now)
-              other_report.update(updated_at: Time.zone.now + 1.minute)
+              other_report.update(updated_at: 1.minute.from_now)
               expect(submission.originality_report_url(attachment.asset_string,
                                                        test_teacher)).to eq preferred_url
             end
@@ -3862,14 +3862,14 @@ describe Submission do
       submission_spec_model(user: u2)
       @submission2 = @submission
 
-      @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
+      @assignment.update_attribute(:due_at, 1.day.ago)
       @submission1.reload
       @submission2.reload
     end
 
     it "updates when an assignment's due date is changed" do
       expect(@submission1).to be_past_due
-      @assignment.reload.update_attribute(:due_at, Time.zone.now + 1.day)
+      @assignment.reload.update_attribute(:due_at, 1.day.from_now)
       expect(@submission1.reload).not_to be_past_due
     end
 
@@ -3878,7 +3878,7 @@ describe Submission do
       expect(@submission2).to be_past_due
 
       assignment_override_model assignment: @assignment,
-                                due_at: Time.zone.now + 1.day,
+                                due_at: 1.day.from_now,
                                 set: @course_section
       expect(@submission1.reload).to be_past_due
       expect(@submission2.reload).not_to be_past_due

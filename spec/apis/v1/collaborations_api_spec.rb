@@ -201,7 +201,7 @@ describe CollaborationsController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/potential_collaborators",
                       { controller: "collaborations", action: "potential_collaborators",
                         format: "json", course_id: @course.to_param })
-      expect(json.map { |user| user["id"] }).to match_array(@course.users.pluck(:id))
+      expect(json.pluck("id")).to match_array(@course.users.pluck(:id))
     end
 
     it "returns course members for a user who has limit_privileges_to_course_section enabled" do
@@ -217,7 +217,7 @@ describe CollaborationsController, type: :request do
                       { controller: "collaborations", action: "potential_collaborators",
                         format: "json", course_id: @course.to_param })
 
-      users_map = json.map { |user| user["id"] }
+      users_map = json.pluck("id")
 
       expect(users_map.count).to eq 2
       expect(users_map).to match_array(second_section.users.pluck(:id))
@@ -234,7 +234,7 @@ describe CollaborationsController, type: :request do
       json = api_call(:get, "/api/v1/groups/#{@group.id}/potential_collaborators",
                       { controller: "collaborations", action: "potential_collaborators",
                         format: "json", group_id: @group.to_param })
-      expect(json.map { |user| user["id"] }).to match_array(@course.admins.pluck(:id) + @group.users.pluck(:id))
+      expect(json.pluck("id")).to match_array(@course.admins.pluck(:id) + @group.users.pluck(:id))
     end
   end
 end

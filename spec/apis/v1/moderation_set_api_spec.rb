@@ -144,7 +144,7 @@ describe "Moderated Grades API", type: :request do
       json = api_call(:post, create_url, create_params, student_ids: [@student1.id, @student2.id])
       expect(response).to be_successful
       expect(json.size).to eq 2
-      json_student_ids = json.map { |user| user["id"] }
+      json_student_ids = json.pluck("id")
 
       expect(json_student_ids).to match_array([@student1.id, @student2.id])
     end

@@ -44,7 +44,7 @@ describe "Student Enrollment Paces API" do
       Progress.create!(context: student_pace, tag: "course_pace_publish")
       get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
       expect(response).to have_http_status :ok
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["pace"]["id"]).to eq student_pace.id
     end
 
@@ -58,7 +58,7 @@ describe "Student Enrollment Paces API" do
         it "falls back to the section pace" do
           get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
           expect(response).to have_http_status :ok
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json["pace"]["id"]).to be_nil
           expect(json["pace"]["workflow_state"]).to eq "unpublished"
         end
@@ -70,7 +70,7 @@ describe "Student Enrollment Paces API" do
         it "falls back to the course pace" do
           get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
           expect(response).to have_http_status :ok
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json["pace"]["id"]).to be_nil
           expect(json["pace"]["workflow_state"]).to eq "unpublished"
         end
@@ -91,7 +91,7 @@ describe "Student Enrollment Paces API" do
         it "falls back to the course pace" do
           get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
           expect(response).to have_http_status :ok
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json["pace"]["id"]).to be_nil
           expect(json["pace"]["workflow_state"]).to eq "unpublished"
         end
@@ -120,7 +120,7 @@ describe "Student Enrollment Paces API" do
         .and change { Progress.count }.by(1)
       expect(Progress.last.queued?).to be_truthy
       expect(response).to have_http_status :created
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["pace"]["student"]["name"]).to eq student.name
       expect(json["progress"]["context_id"]).to eq(CoursePace.last.id)
       expect(json["progress"]["tag"]).to eq("course_pace_publish")
@@ -136,7 +136,7 @@ describe "Student Enrollment Paces API" do
           student_enrollment.course_paces.reload.count
         }
         expect(response).to have_http_status :created
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["pace"]["id"]).to eq student_pace.id
         expect(json["progress"]["context_id"]).to eq(CoursePace.last.id)
         expect(json["progress"]["tag"]).to eq("course_pace_publish")

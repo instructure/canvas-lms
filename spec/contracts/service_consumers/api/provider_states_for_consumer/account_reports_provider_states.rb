@@ -32,7 +32,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         @report.start_at = Time.zone.now
         @report.end_at = (Time.zone.now + rand(60 * 60 * 4)).to_datetime
         @report.report_type = "student_assignment_outcome_map_csv"
-        @report.parameters = HashWithIndifferentAccess["param" => "test", "error" => "failed"]
+        @report.parameters = ActiveSupport::HashWithIndifferentAccess["param" => "test", "error" => "failed"]
         folder = Folder.assert_path("test", @account_admin.account)
         @report.attachment = Attachment.create!(
           folder: folder, context: @account_admin.account, filename: "test.txt", uploaded_data: StringIO.new("test file")
@@ -52,7 +52,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         @report.start_at = Time.zone.now
         @report.end_at = (Time.zone.now + rand(60 * 60 * 4)).to_datetime
         @report.report_type = "student_assignment_outcome_map_csv"
-        @report.parameters = HashWithIndifferentAccess["purple" => "test", "lovely" => "ears"]
+        @report.parameters = ActiveSupport::HashWithIndifferentAccess["purple" => "test", "lovely" => "ears"]
         folder = Folder.assert_path("test", @account_admin.account)
         @report.attachment = Attachment.create!(folder: folder, context: @account_admin.account, filename: "test.txt", uploaded_data: StringIO.new("test file"))
         @report.save!

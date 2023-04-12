@@ -209,7 +209,7 @@ describe ConferencesController do
       user_session(@teacher)
       post "create", params: { course_id: @course.id, web_conference: { title: long_str, conference_type: "Wimba" } }, format: "json"
       expect(response).to have_http_status :bad_request
-      res_body = JSON.parse(response.body)
+      res_body = response.parsed_body
       expect(res_body["errors"]["title"][0]["message"]).to eq "too_long"
     end
 
@@ -335,7 +335,7 @@ describe ConferencesController do
         },
       }
       post :update, params: params, format: :json
-      body = JSON.parse(response.body)
+      body = response.parsed_body
       expect(body["user_ids"]).to include(@teacher.id)
       expect(body["user_ids"]).to include(@student.id)
     end
@@ -355,7 +355,7 @@ describe ConferencesController do
       }
       user_session(@teacher)
       post :update, params: params, format: :json
-      body = JSON.parse(response.body)
+      body = response.parsed_body
       expect(body["user_ids"]).to include(@teacher.id)
       expect(body["user_ids"]).to include(@student.id)
       expect(body["user_ids"]).to include(@student2.id)

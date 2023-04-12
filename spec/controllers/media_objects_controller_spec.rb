@@ -696,7 +696,7 @@ describe MediaObjectsController do
           params: { media_object_id: "the-video", user_entered_title: "new title" }
 
       assert_status(200)
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["title"]).to eq("new title")
     end
 
@@ -839,7 +839,7 @@ describe MediaObjectsController do
              context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title"
            }
       @media_object = @user.reload.media_objects.last
-      expect(JSON.parse(response.body)["embedded_iframe_url"]).to eq media_object_iframe_url(
+      expect(response.parsed_body["embedded_iframe_url"]).to eq media_object_iframe_url(
         @media_object.media_id
       )
     end

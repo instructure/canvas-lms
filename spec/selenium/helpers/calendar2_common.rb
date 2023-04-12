@@ -134,7 +134,7 @@ module Calendar2Common
       @course.assignments.create!(
         title: "assignment",
         points_possible: 10,
-        due_at: Time.zone.now + 5.minutes,
+        due_at: 5.minutes.from_now,
         submission_types: "online_text_entry",
         only_visible_to_overrides: true
       )

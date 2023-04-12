@@ -181,7 +181,7 @@ module GradingStandards
       add_grading_period_link.click
       replace_content(period_title_input, title)
       replace_content(start_date_input, format_date_for_view(Time.zone.now, :medium))
-      replace_content(end_date_input, format_date_for_view(Time.zone.now + 1.month, :medium))
+      replace_content(end_date_input, format_date_for_view(1.month.from_now, :medium))
       save_period_button.click
     end
 

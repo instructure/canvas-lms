@@ -31,7 +31,7 @@ describe CanvasTime do
     end
 
     it "returns the given date if the date is not at 12:00 am" do
-      time = Time.zone.now - 1.second
+      time = 1.second.ago
       expect(CanvasTime.fancy_midnight(time)).to eq(time)
     end
 

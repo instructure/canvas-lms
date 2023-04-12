@@ -106,7 +106,7 @@ describe Api::V1::GradebookHistory do
     it "puts an assignment list under each grader" do
       graders = @days.find { |d| d[:date] == yesterday.to_date.as_json }[:graders]
       grader2_assignments = graders.find { |g| g[:id] == @grader2.id }[:assignments]
-      ids = grader2_assignments.map { |assignment| assignment["id"] }
+      ids = grader2_assignments.pluck("id")
       expect(ids).to include(@assignment1.id)
       expect(ids).to include(@assignment2.id)
     end

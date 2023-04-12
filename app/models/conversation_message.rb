@@ -21,7 +21,7 @@
 require "atom"
 
 class ConversationMessage < ActiveRecord::Base
-  self.ignored_columns = %i[root_account_id]
+  self.ignored_columns += %i[root_account_id]
 
   include HtmlTextHelper
   include ConversationHelper

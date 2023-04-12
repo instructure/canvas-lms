@@ -38,7 +38,7 @@ describe "student planner" do
     before :once do
       @assignment = @course.assignments.create({
                                                  name: "Assignment 1",
-                                                 due_at: Time.zone.now + 1.day,
+                                                 due_at: 1.day.from_now,
                                                  submission_types: "online_text_entry"
                                                })
     end
@@ -100,11 +100,11 @@ describe "student planner" do
     end
 
     it "shows missing tag for an assignment with missing submissions.", priority: "1" do
-      @assignment.due_at = Time.zone.now - 2.weeks
+      @assignment.due_at = 2.weeks.ago
       @assignment.save!
       @course.assignments.create({
                                    name: "Assignment 2",
-                                   due_at: Time.zone.now + 1.day,
+                                   due_at: 1.day.from_now,
                                    submission_types: "online_text_entry"
                                  })
 

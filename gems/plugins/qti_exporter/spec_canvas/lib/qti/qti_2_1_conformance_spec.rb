@@ -55,8 +55,8 @@ if Qti.migration_executable
       expect(q.question_data["question_type"]).to eq "multiple_choice_question"
       expect(q.question_data["answers"].count).to eq 2
       answers = q.question_data["answers"].sort_by { |h| h["migration_id"] }
-      expect(answers.map { |a| a["text"] }.sort).to eq ["False", "True"]
-      expect(answers.map { |a| a["weight"] }.sort).to eq [0, 100]
+      expect(answers.pluck("text").sort).to eq ["False", "True"]
+      expect(answers.pluck("weight").sort).to eq [0, 100]
     end
 
     it "imports VE_IP_02" do
@@ -79,7 +79,7 @@ if Qti.migration_executable
       expect(q.question_data["question_type"]).to eq "multiple_choice_question"
       answers = q.question_data["answers"].sort_by { |h| h["migration_id"] }
       expect(answers.count).to eq 5
-      expect(answers.map { |h| h["weight"] }).to eq [0, 0, 0, 100, 0]
+      expect(answers.pluck("weight")).to eq [0, 0, 0, 100, 0]
     end
 
     it "imports VE_IP_03" do
@@ -100,8 +100,8 @@ if Qti.migration_executable
       expect(q.question_data["question_type"]).to eq "multiple_answers_question"
       answers = q.question_data["answers"].sort_by { |h| h["migration_id"] }
       expect(answers.count).to eq 5
-      expect(answers.map { |h| h["weight"] }).to eq [100, 100, 0, 100, 0]
-      expect(answers.map { |h| h["text"] }).to eq [
+      expect(answers.pluck("weight")).to eq [100, 100, 0, 100, 0]
+      expect(answers.pluck("text")).to eq [
         "The majority of students voted for Red.",
         "Twice as many students voted for Red a voted for Blue.",
         "Two percent of students voted for Yellow.",
@@ -170,8 +170,8 @@ if Qti.migration_executable
       matches = q.question_data["matches"]
       expect(matches.count).to eq 3
 
-      expect(answers.map { |h| h["text"] }).to eq %w[Capulet Demetrius Lysander Prospero]
-      expect(answers.map { |h| h["right"] }).to eq [
+      expect(answers.pluck("text")).to eq %w[Capulet Demetrius Lysander Prospero]
+      expect(answers.pluck("right")).to eq [
         "Romeo and Juliet",
         "A Midsummer-Night's Dream",
         "A Midsummer-Night's Dream",

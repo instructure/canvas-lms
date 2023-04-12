@@ -85,7 +85,7 @@ describe UserObserveesController, type: :request do
     json = raw_index_call(opts)
     return nil if opts[:expected_status]
 
-    json.map { |o| o["id"] }.sort
+    json.pluck("id").sort
   end
 
   def raw_index_call(opts = {})
@@ -113,7 +113,7 @@ describe UserObserveesController, type: :request do
     json = raw_observers_call(opts)
     return nil if opts[:expected_status]
 
-    json.map { |o| o["id"] }.sort
+    json.pluck("id").sort
   end
 
   def raw_observers_call(opts = {})
@@ -315,8 +315,8 @@ describe UserObserveesController, type: :request do
       add_linked_observer(student, parent)
       opts = { avatars: true }
       json = raw_index_call(opts)
-      expect(json.map { |o| o["id"] }).to eq [student.id]
-      expect(json.map { |o| o["avatar_url"] }).to eq ["http://www.example.com/relative/canvas/path"]
+      expect(json.pluck("id")).to eq [student.id]
+      expect(json.pluck("avatar_url")).to eq ["http://www.example.com/relative/canvas/path"]
     end
 
     it "returns avatar if avatar service enabled on account when called from shard with avatars disabled" do
@@ -333,8 +333,8 @@ describe UserObserveesController, type: :request do
       parent.account.set_service_availability(:avatars, false)
       opts = { avatars: true }
       json = raw_index_call(opts)
-      expect(json.map { |o| o["id"] }).to eq [student.id]
-      expect(json.map { |o| o["avatar_url"] }).to eq ["http://www.example.com/relative/canvas/path"]
+      expect(json.pluck("id")).to eq [student.id]
+      expect(json.pluck("avatar_url")).to eq ["http://www.example.com/relative/canvas/path"]
     end
 
     it "only returns linked root accounts the admin has rights for" do

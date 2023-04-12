@@ -309,7 +309,7 @@ describe GradingPeriodsController do
             set_id: group.id,
             grading_periods: period_params
           }
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json).not_to have_key("meta")
           expect(json.fetch("grading_periods").count).to be 11
         end
@@ -431,7 +431,7 @@ describe GradingPeriodsController do
           request.content_type = "application/json"
           patch :batch_update, params: { course_id: course.id, grading_periods: [] }
           expect(response).to be_ok
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json["grading_periods"]).to be_empty
           expect(json).not_to include("errors")
         end
@@ -440,7 +440,7 @@ describe GradingPeriodsController do
           period = period_helper.create_with_group_for_course(course)
           patch :batch_update, params: { course_id: course.id, grading_periods: [{ id: period.id, title: "" }] }
           expect(response).not_to be_ok
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json["errors"]).to be_present
           expect(json).not_to have_key("grading_periods")
         end
@@ -573,7 +573,7 @@ describe GradingPeriodsController do
             period_1_params.merge(id: period_1.id, title: "Updated Title")
           ] }
           expect(response.status).to eql(Rack::Utils.status_code(:not_found))
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json["errors"]).to be_present
           expect(json).not_to have_key("grading_periods")
         end

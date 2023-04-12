@@ -127,7 +127,7 @@ describe "Outcome Reports" do
           @root_group_1.update! vendor_guid: "lion"
         end
 
-        let(:guids) { report.map { |row| row["vendor_guid"] } }
+        let(:guids) { report.pluck("vendor_guid") }
 
         it "defaults to vendor_guid" do
           expect(guids).to include("lion")

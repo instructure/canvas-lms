@@ -72,7 +72,7 @@ describe RubricAssessmentsController do
       submission.submission_comments.create!(author: @student, comment: "A Comment")
 
       put "update", params: { course_id: @course.id, rubric_association_id: @rubric_association.id, id: @rubric_assessment.id, rubric_assessment: { user_id: @user.to_param, assessment_type: "no_reason" } }
-      response_json = JSON.parse(response.body)
+      response_json = response.parsed_body
       expect(response_json.dig("artifact", "submission_comments").first).to have_key("anonymous_id")
       expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_id")
       expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_name")
@@ -88,7 +88,7 @@ describe RubricAssessmentsController do
       submission.submission_comments.create!(author: @student, comment: "A Comment")
 
       put "update", params: { provisional: true, course_id: @course.id, rubric_association_id: @rubric_association.id, id: @rubric_assessment.id, rubric_assessment: { user_id: @user.to_param, assessment_type: "no_reason" } }
-      response_json = JSON.parse(response.body)
+      response_json = response.parsed_body
       expect(response_json.dig("artifact", "submission_comments").first).to have_key("anonymous_id")
       expect(response_json.dig("artifact", "submission_comments").first["anonymous_id"]).to eq(submission.anonymous_id)
       expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_id")
@@ -262,7 +262,7 @@ describe RubricAssessmentsController do
           user_session(interloper)
           put(:update, params: update_params(assessor: interloper))
 
-          response_json = JSON.parse(response.body)
+          response_json = response.parsed_body
           expect(response_json.dig("errors", "error_code")).to eq "MAX_GRADERS_REACHED"
         end
       end

@@ -246,7 +246,7 @@ module Api::V1::AssignmentOverride
     if for_update
       overrides = grouped.map do |assignment_id, overrides_data|
         assignment = assignments.find { |a| a.id.to_s == assignment_id.to_s }
-        find_assignment_overrides(assignment, overrides_data.map { |o| o["id"] }) if assignment
+        find_assignment_overrides(assignment, overrides_data.pluck("id")) if assignment
       end.flatten.compact
     end
 

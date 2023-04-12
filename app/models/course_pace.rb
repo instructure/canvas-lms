@@ -68,7 +68,7 @@ class CoursePace < ActiveRecord::Base
     can :read
   end
 
-  self.ignored_columns = %i[start_date]
+  self.ignored_columns += %i[start_date]
 
   def asset_name
     I18n.t("Course Pace")

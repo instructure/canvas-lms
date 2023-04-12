@@ -38,7 +38,7 @@ describe Lti::IMS::ResultsController do
   end
   let(:context) { course }
   let(:unknown_context_id) { (Course.maximum(:id) || 0) + 1 }
-  let(:json) { JSON.parse(response.body) }
+  let(:json) { response.parsed_body }
   let(:params_overrides) do
     {
       course_id: context_id,
@@ -123,7 +123,7 @@ describe Lti::IMS::ResultsController do
 
         it "returns the user result" do
           send_request
-          expect(json.map { |res| res["userId"] }).to eq [result.user.lti_id]
+          expect(json.pluck("userId")).to eq [result.user.lti_id]
         end
       end
 

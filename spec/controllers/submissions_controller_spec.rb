@@ -840,7 +840,7 @@ describe SubmissionsController do
       @submission.update!(score: 10)
     end
 
-    let(:body) { JSON.parse(response.body)["submission"] }
+    let(:body) { response.parsed_body["submission"] }
 
     it "redirects to login when logged out" do
       remove_user_session

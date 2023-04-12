@@ -106,7 +106,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
     it "allows teachers to see unsubmitted students with ?submitted=false" do
       json = get_submitted_users(submitted: false)
       expect(response).to be_successful
-      user_ids = json["users"].map { |h| h["id"] }
+      user_ids = json["users"].pluck("id")
       expect(user_ids).not_to include @student1.id.to_s
       expect(user_ids).to include @student2.id.to_s
     end
@@ -114,7 +114,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
     it "allows teachers to see all students for quiz when submitted parameter not passed" do
       json = get_submitted_users
       expect(response).to be_successful
-      user_ids = json["users"].map { |h| h["id"] }
+      user_ids = json["users"].pluck("id")
       expect(user_ids).to include @student1.id.to_s
       expect(user_ids).to include @student2.id.to_s
     end
@@ -133,14 +133,14 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
 
         json = get_submitted_users(submitted: false)
         expect(response).to be_successful
-        user_ids = json["users"].map { |h| h["id"] }
+        user_ids = json["users"].pluck("id")
         expect(user_ids).not_to include @student2.id.to_s
 
         create_section_override_for_quiz(@quiz, { course_section: @student2.enrollments.current.first.course_section })
 
         json = get_submitted_users(submitted: false)
         expect(response).to be_successful
-        user_ids = json["users"].map { |h| h["id"] }
+        user_ids = json["users"].pluck("id")
         expect(user_ids).to include @student2.id.to_s
       end
     end

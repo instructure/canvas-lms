@@ -34,7 +34,7 @@ RSpec.describe AnonymousSubmissionsController do
       @assignment.unmute!
     end
 
-    let(:body) { JSON.parse(response.body)["submission"] }
+    let(:body) { response.parsed_body["submission"] }
 
     it "renders show template" do
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }
@@ -102,7 +102,7 @@ RSpec.describe AnonymousSubmissionsController do
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
 
       # render_user_not_found attempts to render the passed-in ID param and ignores anonymous_id
-      expect(JSON.parse(response.body)["errors"]).to eq "The specified user () is not a student in this course"
+      expect(response.parsed_body["errors"]).to eq "The specified user () is not a student in this course"
     end
 
     it "renders json without scores for students whose grades have not posted" do

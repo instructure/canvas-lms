@@ -261,7 +261,7 @@ describe "calendar2" do
           context: section1,
           title: "Section Event",
           start_at: Time.zone.now,
-          end_at: Time.zone.now + 1.hour,
+          end_at: 1.hour.from_now,
           effective_context_code: @course.asset_string
         )
         get "/calendar2"

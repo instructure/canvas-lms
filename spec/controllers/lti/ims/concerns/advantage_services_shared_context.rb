@@ -47,7 +47,7 @@ shared_context "advantage services context" do
   let(:unknown_context_id) { raise "Override in spec" }
   let(:action) { raise "Override in spec" }
   let(:params_overrides) { {} }
-  let(:json) { JSON.parse(response.body).with_indifferent_access }
+  let(:json) { response.parsed_body.with_indifferent_access }
   let(:scope_to_remove) { raise "Override in spec" }
   let(:http_success_status) { :ok }
   let(:expected_mime_type) { described_class::MIME_TYPE }

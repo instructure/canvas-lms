@@ -181,7 +181,7 @@ describe TabsController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
                       { controller: "tabs", action: "index", course_id: @course.to_param, format: "json" },
                       {}, {}, { expected_status: 200 })
-      expect(json.map { |tab| tab["id"] }).to include "home"
+      expect(json.pluck("id")).to include "home"
     end
 
     it "includes external tools" do
@@ -234,7 +234,7 @@ describe TabsController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
                       { controller: "tabs", action: "index", course_id: @course.to_param, format: "json" },
                       { include: ["external"] })
-      expect(json.map { |el| el["id"] }).to include "collaborations"
+      expect(json.pluck("id")).to include "collaborations"
     end
 
     it "includes webconferences tab if configured" do
@@ -243,7 +243,7 @@ describe TabsController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
                       { controller: "tabs", action: "index", course_id: @course.to_param, format: "json" },
                       { include: ["external"] })
-      expect(json.map { |el| el["id"] }).to include "conferences"
+      expect(json.pluck("id")).to include "conferences"
     end
 
     it "lists navigation tabs for a group" do

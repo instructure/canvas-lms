@@ -116,7 +116,7 @@ describe "Announcements API", type: :request do
       json = api_call_as_user(@teacher, :get, "/api/v1/announcements",
                               @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
                                             start_date: start_date, end_date: end_date))
-      expect(json.map { |thing| thing["id"] }).to eq [@ann2.id]
+      expect(json.pluck("id")).to eq [@ann2.id]
     end
 
     it "paginates" do
@@ -136,7 +136,7 @@ describe "Announcements API", type: :request do
                               @params.merge(context_codes: ["course_#{@course1.id}"]))
       expect(json.length).to eq 6
       expect(json[0]["context_code"]).to eq "course_#{@course1.id}"
-      expect(json.map { |thing| thing["id"] }).to eq @anns.map(&:id).reverse << @ann1.id
+      expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
     end
 
     describe "active_only" do
@@ -147,7 +147,7 @@ describe "Announcements API", type: :request do
                                 @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
                                               start_date: start_date, end_date: end_date, active_only: true))
         expect(json.length).to eq 6
-        expect(json.map { |thing| thing["id"] }).to eq @anns.map(&:id).reverse << @ann1.id
+        expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
       end
 
       it "includes 'active' announcements with past `delayed_post_at`" do
@@ -159,7 +159,7 @@ describe "Announcements API", type: :request do
                                 @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
                                               start_date: start_date, end_date: end_date, active_only: true))
         expect(json.length).to eq 6
-        expect(json.map { |thing| thing["id"] }).to eq @anns.map(&:id).reverse << @ann1.id
+        expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
       end
 
       it "excludes courses not in the context_ids list" do
@@ -194,7 +194,7 @@ describe "Announcements API", type: :request do
                                               start_date => start_date, :end_date => end_date, :latest_only => true))
 
         expect(json.length).to be 3
-        expect(json.map { |a| a["id"] }).to include(@anns.last[:id], @ann2[:id], @ann3[:id])
+        expect(json.pluck("id")).to include(@anns.last[:id], @ann2[:id], @ann3[:id])
       end
 
       it "excludes courses not in the context_ids list" do
@@ -203,7 +203,7 @@ describe "Announcements API", type: :request do
                                               start_date => start_date, :end_date => end_date, :latest_only => true))
 
         expect(json.length).to be 2
-        expect(json.map { |a| a["id"] }).to include(@anns.last[:id], @ann3[:id])
+        expect(json.pluck("id")).to include(@anns.last[:id], @ann3[:id])
       end
 
       it "works properly in conjunction with the active_only param" do
@@ -212,7 +212,7 @@ describe "Announcements API", type: :request do
                                               start_date => start_date, :end_date => end_date, :active_only => true, :latest_only => true))
 
         expect(json.length).to be 2
-        expect(json.map { |a| a["id"] }).to include(@anns.last[:id], @ann3[:id])
+        expect(json.pluck("id")).to include(@anns.last[:id], @ann3[:id])
       end
     end
   end
@@ -225,7 +225,7 @@ describe "Announcements API", type: :request do
                               @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
                                             start_date: start_date, end_date: end_date))
       expect(json.length).to eq 6
-      expect(json.map { |thing| thing["id"] }).to eq @anns.map(&:id).reverse << @ann1.id
+      expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
     end
 
     it "excludes 'active' announcements with future `delayed_post_at`" do
@@ -236,7 +236,7 @@ describe "Announcements API", type: :request do
                               @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
                                             start_date: start_date, end_date: end_date))
       expect(json.length).to eq 6
-      expect(json.map { |thing| thing["id"] }).to eq @anns.map(&:id).reverse << @ann1.id
+      expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
     end
 
     it "includes 'active' announcements with past `delayed_post_at`" do
@@ -248,7 +248,7 @@ describe "Announcements API", type: :request do
                               @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
                                             start_date: start_date, end_date: end_date))
       expect(json.length).to eq 6
-      expect(json.map { |thing| thing["id"] }).to eq @anns.map(&:id).reverse << @ann1.id
+      expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
     end
 
     it "excludes courses not in the context_ids list" do

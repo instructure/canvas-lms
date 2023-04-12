@@ -1020,7 +1020,7 @@ describe DiscussionTopicsController do
         mod.save!
         expect(@topic.read_state(@student)).to eq "unread"
         get "index", params: { course_id: @course.id, exclude_context_module_locked_topics: true }, format: "json"
-        expect(response.parsed_body.map { |t| t["id"] }).to_not include @topic.id
+        expect(response.parsed_body.pluck("id")).to_not include @topic.id
       end
     end
 
@@ -1434,7 +1434,7 @@ describe DiscussionTopicsController do
       user_session(@teacher)
       todo_date = 1.day.from_now.in_time_zone("America/New_York")
       post "create", params: { course_id: @course.id, todo_date: todo_date, title: "Discussion 1" }, format: "json"
-      expect(JSON.parse(response.body)["todo_date"]).to eq todo_date.in_time_zone("UTC").iso8601
+      expect(response.parsed_body["todo_date"]).to eq todo_date.in_time_zone("UTC").iso8601
     end
 
     it "updates a topic with a todo date" do
@@ -1797,7 +1797,7 @@ describe DiscussionTopicsController do
       obj_params = topic_params(@course).merge(assignment_params(@course))
       user_session(@teacher)
       post "create", params: obj_params, format: :json
-      json = JSON.parse response.body
+      json = response.parsed_body
       topic = DiscussionTopic.find(json["id"])
       expect(topic).to be_unpublished
       expect(topic.assignment).to be_unpublished
@@ -1811,7 +1811,7 @@ describe DiscussionTopicsController do
       obj_params = topic_params(@course, published: true).merge(assignment_params(@course, only_visible_to_overrides: true, assignment_overrides: [{ course_section_id: new_section.id }]))
       user_session(@teacher)
       post "create", params: obj_params, format: :json
-      json = JSON.parse response.body
+      json = response.parsed_body
       topic = DiscussionTopic.find(json["id"])
       expect(topic).to be_published
       expect(topic.assignment).to be_published
@@ -1825,7 +1825,7 @@ describe DiscussionTopicsController do
       obj_params = topic_params(@course, published: true)
       user_session(@teacher)
       post "create", params: obj_params, format: :json
-      json = JSON.parse response.body
+      json = response.parsed_body
       topic = DiscussionTopic.find(json["id"])
       expect(topic).to be_published
       expect(@student.email_channel.messages.map(&:context)).to include(topic)
@@ -1838,7 +1838,7 @@ describe DiscussionTopicsController do
       user_session(@teacher)
       post "create", params: obj_params, format: :json
 
-      json = JSON.parse response.body
+      json = response.parsed_body
       topic = DiscussionTopic.find(json["id"])
       expect(@student.email_channel.messages).to be_empty
 
@@ -1864,7 +1864,7 @@ describe DiscussionTopicsController do
       obj_params[:assignment][:anonymous_peer_reviews] = true
       user_session(@teacher)
       post "create", params: obj_params, format: :json
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["assignment"]["anonymous_peer_reviews"]).to be_falsey
     end
 
@@ -2146,7 +2146,7 @@ describe DiscussionTopicsController do
 
     it "sets workflow to post_delayed when delayed_post_at and lock_at are in the future" do
       put(:update, params: { course_id: @course.id, topic_id: @topic.id,
-                             title: "Updated topic", delayed_post_at: Time.zone.now + 5.days })
+                             title: "Updated topic", delayed_post_at: 5.days.from_now })
       expect(@topic.reload).to be_post_delayed
     end
 
@@ -2172,7 +2172,7 @@ describe DiscussionTopicsController do
       attachment_model context: @course, uploaded_data: data, folder: Folder.unfiled_folder(@course)
       put "update", params: { course_id: @course.id, topic_id: @topic.id, attachment: data }, format: "json"
       expect(response).to be_successful
-      json = JSON.parse(response.body)
+      json = JSON.parse(response.body) # rubocop:disable Rails/ResponseParsedBody
       new_file = Attachment.find(json["attachments"][0]["id"])
       expect(new_file.display_name).to match(/txt-[0-9]+\.txt/)
       expect(json["attachments"][0]["display_name"]).to eq new_file.display_name

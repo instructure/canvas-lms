@@ -76,7 +76,7 @@ describe "blueprint courses quizzes" do
 
   context "in the associated course" do
     before :once do
-      due_date = format_date_for_view(Time.zone.now - 1.month)
+      due_date = format_date_for_view(1.month.ago)
       @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @original_quiz = @copy_from.quizzes.create!(title: "blah", description: "bloo", due_at: due_date)
@@ -211,7 +211,7 @@ describe "blueprint courses quizzes" do
 
   context "question groups in associated course" do
     before :once do
-      due_date = format_date_for_view(Time.zone.now - 1.month)
+      due_date = format_date_for_view(1.month.ago)
       @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @original_quiz = @copy_from.quizzes.create!(title: "blah", description: "bloo", due_at: due_date)

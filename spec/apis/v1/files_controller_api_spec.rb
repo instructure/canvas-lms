@@ -579,9 +579,9 @@ describe "Files API", type: :request do
 
     it "lists files in alphabetical order" do
       json = api_call(:get, @files_path, @files_path_options, {})
-      res = json.map { |f| f["display_name"] }
+      res = json.pluck("display_name")
       expect(res).to eq %w[atest3.txt mtest2.txt ztest.txt]
-      json.map { |f| f["url"] }.each { |url| expect(url).to include "verifier=" }
+      json.pluck("url").each { |url| expect(url).to include "verifier=" }
     end
 
     it "omits verifiers using session auth" do
@@ -589,7 +589,7 @@ describe "Files API", type: :request do
       get @files_path
       expect(response).to be_successful
       json = json_parse
-      json.map { |f| f["url"] }.each { |url| expect(url).not_to include "verifier=" }
+      json.pluck("url").each { |url| expect(url).not_to include "verifier=" }
     end
 
     it "does not omit verifiers using session auth if params[:use_verifiers] is given" do
@@ -597,12 +597,12 @@ describe "Files API", type: :request do
       get @files_path + "?use_verifiers=1"
       expect(response).to be_successful
       json = json_parse
-      json.map { |f| f["url"] }.each { |url| expect(url).to include "verifier=" }
+      json.pluck("url").each { |url| expect(url).to include "verifier=" }
     end
 
     it "lists files in saved order if flag set" do
       json = api_call(:get, @files_path + "?sort_by=position", @files_path_options.merge(sort_by: "position"), {})
-      res = json.map { |f| f["display_name"] }
+      res = json.pluck("display_name")
       expect(res).to eq %w[ztest.txt atest3.txt mtest2.txt]
     end
 
@@ -662,7 +662,7 @@ describe "Files API", type: :request do
 
     it "only returns names if requested" do
       json = api_call(:get, @files_path, @files_path_options, { only: ["names"] })
-      res = json.map { |f| f["display_name"] }
+      res = json.pluck("display_name")
       expect(res).to eq %w[atest3.txt mtest2.txt ztest.txt]
       expect(json.any? { |f| f["url"] }).to be_falsey
     end
@@ -675,14 +675,14 @@ describe "Files API", type: :request do
 
       it "matches one content-type" do
         json = api_call(:get, @files_path + "?content_types=image", @files_path_options.merge(content_types: "image"), {})
-        res = json.map { |f| f["display_name"] }
+        res = json.pluck("display_name")
         expect(res).to eq %w[thing.gif thing.png]
       end
 
       it "matches multiple content-types" do
         json = api_call(:get, @files_path + "?content_types[]=text&content_types[]=image/gif",
                         @files_path_options.merge(content_types: ["text", "image/gif"]))
-        res = json.map { |f| f["display_name"] }
+        res = json.pluck("display_name")
         expect(res).to eq %w[atest3.txt mtest2.txt thing.gif ztest.txt]
       end
     end
@@ -693,13 +693,13 @@ describe "Files API", type: :request do
       2.times { |i| Attachment.create!(filename: "second#{i}.txt", display_name: "second#{i}.txt", uploaded_data: StringIO.new("file"), folder: @f1, context: @course) }
 
       json = api_call(:get, @files_path + "?search_term=fir", @files_path_options.merge(search_term: "fir"), {})
-      expect(json.map { |h| h["id"] }.sort).to eq atts.map(&:id).sort
+      expect(json.pluck("id").sort).to eq atts.map(&:id).sort
     end
 
     it "includes user if requested" do
       @a1.update_attribute(:user, @user)
       json = api_call(:get, @files_path + "?include[]=user", @files_path_options.merge(include: ["user"]))
-      expect(json.map { |f| f["user"] }).to eql [
+      expect(json.pluck("user")).to eql [
         {},
         {},
         {
@@ -717,7 +717,7 @@ describe "Files API", type: :request do
       @a1.usage_rights = @course.usage_rights.create! legal_copyright: "(C) 2014 Initech", use_justification: "used_by_permission"
       @a1.save!
       json = api_call(:get, @files_path + "?include[]=usage_rights", @files_path_options.merge(include: ["usage_rights"]))
-      expect(json.map { |f| f["usage_rights"] }).to eql [
+      expect(json.pluck("usage_rights")).to eql [
         nil,
         nil,
         {
@@ -766,7 +766,7 @@ describe "Files API", type: :request do
       before { file }
 
       it "includes user even for user files" do
-        expect(subject.map { |f| f["user"] }).to eql [
+        expect(subject.pluck("user")).to eql [
           {
             "id" => user.id,
             "anonymous_id" => user.id.to_s(36),
@@ -820,7 +820,7 @@ describe "Files API", type: :request do
     context "with a 'category' query parameter" do
       subject do
         Attachment.find(
-          api_call(:get, @files_path, @files_path_options, {}).map { |a| a["id"] }
+          api_call(:get, @files_path, @files_path_options, {}).pluck("id")
         )
       end
 
@@ -840,20 +840,20 @@ describe "Files API", type: :request do
 
     it "returns file category with the response" do
       json = api_call(:get, @files_path, @files_path_options, {})
-      res = json.map { |f| f["category"] }
+      res = json.pluck("category")
       expect(res).to eq %w[uncategorized uncategorized uncategorized]
     end
 
     describe "sort" do
       it "lists files in alphabetical order" do
         json = api_call(:get, @files_path, @files_path_options, {})
-        res = json.map { |f| f["display_name"] }
+        res = json.pluck("display_name")
         expect(res).to eq %w[atest3.txt mtest2.txt ztest.txt]
       end
 
       it "lists files in saved order if flag set" do
         json = api_call(:get, @files_path + "?sort_by=position", @files_path_options.merge(sort_by: "position"), {})
-        res = json.map { |f| f["display_name"] }
+        res = json.pluck("display_name")
         expect(res).to eq %w[ztest.txt atest3.txt mtest2.txt]
       end
 
@@ -867,7 +867,7 @@ describe "Files API", type: :request do
         Timecop.freeze(2.hours.ago) { @a2.touch }
         Timecop.freeze(1.hour.ago) { @a1.touch }
         json = api_call(:get, @files_path + "?sort=updated_at", @files_path_options.merge(sort: "updated_at"))
-        res = json.map { |f| f["display_name"] }
+        res = json.pluck("display_name")
         expect(res).to eq %w[mtest2.txt ztest.txt atest3.txt]
       end
 
@@ -950,14 +950,14 @@ describe "Files API", type: :request do
 
       it "matches one content-type" do
         json = api_call(:get, @files_path + "?content_types=image", @files_path_options.merge(content_types: "image"), {})
-        res = json.map { |f| f["display_name"] }
+        res = json.pluck("display_name")
         expect(res).to eq %w[thing.gif thing.png]
       end
 
       it "matches multiple content-types" do
         json = api_call(:get, @files_path + "?content_types[]=text&content_types[]=image/gif",
                         @files_path_options.merge(content_types: ["text", "image/gif"]))
-        res = json.map { |f| f["display_name"] }
+        res = json.pluck("display_name")
         expect(res).to eq %w[atest3.txt mtest2.txt thing.gif ztest.txt]
       end
     end
@@ -968,7 +968,7 @@ describe "Files API", type: :request do
       2.times { |i| Attachment.create!(filename: "second#{i}.txt", display_name: "second#{i}.txt", uploaded_data: StringIO.new("file"), folder: @root, context: @course) }
 
       json = api_call(:get, @files_path + "?search_term=fir", @files_path_options.merge(search_term: "fir"), {})
-      expect(json.map { |h| h["id"] }.sort).to eq atts.map(&:id).sort
+      expect(json.pluck("id").sort).to eq atts.map(&:id).sort
     end
 
     describe "hidden folders" do
@@ -983,7 +983,7 @@ describe "Files API", type: :request do
       context "as teacher" do
         it "includes files in subfolders of hidden folders" do
           json = api_call(:get, @files_path, @files_path_options)
-          expect(json.map { |entry| entry["id"] }).to include @teh_file.id
+          expect(json.pluck("id")).to include @teh_file.id
         end
       end
 
@@ -994,7 +994,7 @@ describe "Files API", type: :request do
 
         it "excludes files in subfolders of hidden folders" do
           json = api_call(:get, @files_path, @files_path_options)
-          expect(json.map { |entry| entry["id"] }).not_to include @teh_file.id
+          expect(json.pluck("id")).not_to include @teh_file.id
         end
       end
     end
@@ -1006,7 +1006,7 @@ describe "Files API", type: :request do
       attachment_model display_name: "foo", content_type: "text/plain", context: @group, folder: Folder.root_folders(@group).first
       account_admin_user
       json = api_call(:get, "/api/v1/groups/#{@group.id}/files", { controller: "files", action: "api_index", format: "json", group_id: @group.to_param })
-      expect(json.map { |r| r["id"] }).to eql [@attachment.id]
+      expect(json.pluck("id")).to eql [@attachment.id]
       expect(response.headers["Link"]).to include "/api/v1/groups/#{@group.id}/files"
     end
 
@@ -1014,7 +1014,7 @@ describe "Files API", type: :request do
       user_model
       attachment_model display_name: "foo", content_type: "text/plain", context: @user, folder: Folder.root_folders(@user).first
       json = api_call(:get, "/api/v1/users/#{@user.id}/files", { controller: "files", action: "api_index", format: "json", user_id: @user.to_param })
-      expect(json.map { |r| r["id"] }).to eql [@attachment.id]
+      expect(json.pluck("id")).to eql [@attachment.id]
       expect(response.headers["Link"]).to include "/api/v1/users/#{@user.id}/files"
     end
   end

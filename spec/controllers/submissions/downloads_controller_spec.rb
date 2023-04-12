@@ -85,7 +85,7 @@ describe Submissions::DownloadsController do
                      download: @submission.attachment_id
                    },
                    format: :json
-        expect(JSON.parse(response.body)["attachment"]["id"]).to eq @submission.attachment_id
+        expect(response.parsed_body["attachment"]["id"]).to eq @submission.attachment_id
       end
     end
 

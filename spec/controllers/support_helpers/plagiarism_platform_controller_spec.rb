@@ -102,9 +102,7 @@ describe SupportHelpers::PlagiarismPlatformController do
       shared_examples_for "bad requests" do
         it "does not modify the tool proxies" do
           expect(
-            updated_tool_services.first.map do |s|
-              s["service"]
-            end
+            updated_tool_services.first.pluck("service")
           ).not_to include service_name
         end
       end

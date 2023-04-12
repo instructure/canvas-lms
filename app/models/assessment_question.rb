@@ -77,7 +77,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def infer_defaults
-    self.question_data ||= HashWithIndifferentAccess.new
+    self.question_data ||= ActiveSupport::HashWithIndifferentAccess.new
     if self.question_data.is_a?(Hash)
       if self.question_data[:question_name].try(:strip).blank?
         self.question_data[:question_name] = t :default_question_name, "Question"
@@ -163,7 +163,7 @@ class AssessmentQuestion < ActiveRecord::Base
     deep_translate = lambda do |obj|
       case obj
       when Hash
-        obj.each_with_object(HashWithIndifferentAccess.new) do |(k, v), h|
+        obj.each_with_object(ActiveSupport::HashWithIndifferentAccess.new) do |(k, v), h|
           h[k] = deep_translate.call(v)
         end
       when Array
@@ -188,7 +188,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def data
-    res = self.question_data || HashWithIndifferentAccess.new
+    res = self.question_data || ActiveSupport::HashWithIndifferentAccess.new
     res[:assessment_question_id] = id
     res[:question_name] = t :default_question_name, "Question" if res[:question_name].blank?
     # TODO: there's a potential id conflict here, where if a quiz

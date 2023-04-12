@@ -33,7 +33,7 @@ describe AssignmentGroupsController do
   describe "GET index" do
     let(:assignments_ids) do
       json_response = json_parse(response.body)
-      json_response.first["assignments"].map { |assignment| assignment["id"] }
+      json_response.first["assignments"].pluck("id")
     end
 
     describe "filtering by grading period and overrides" do

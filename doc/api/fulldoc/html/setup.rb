@@ -23,7 +23,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "api_scopes"))
 require "controller_list_view"
 require "api_scope_mapping_writer"
 
-Dir.glob(Rails.root.join("doc/api/data_services/*.rb")).sort.each { |file| require file }
+Rails.root.glob("doc/api/data_services/*.rb").sort.each { |file| require file }
 
 include Helpers::ModuleHelper
 include Helpers::FilterHelper

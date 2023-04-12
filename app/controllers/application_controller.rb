@@ -2755,7 +2755,7 @@ class ApplicationController < ActionController::Base
         instance_name = instance_symbol.to_s
         obj = instance_variable_get("@#{instance_name}")
         policy = obj.check_policy(@current_user, session) unless obj.nil? || !obj.respond_to?(:check_policy)
-        hash["#{instance_name.upcase}_RIGHTS".to_sym] = HashWithIndifferentAccess[policy.map { |right| [right, true] }] unless policy.nil?
+        hash["#{instance_name.upcase}_RIGHTS".to_sym] = ActiveSupport::HashWithIndifferentAccess[policy.map { |right| [right, true] }] unless policy.nil?
       end
 
       js_env hash
@@ -2823,7 +2823,7 @@ class ApplicationController < ActionController::Base
                      (permissions[:manage] || current_user_has_been_observer_in_this_course) && "all_dates",
                      permissions[:manage] && "module_ids",
                      peer_reviews_for_a2_enabled? && "assessment_requests"
-                   ].reject(&:blank?),
+                   ].compact_blank,
                    exclude_response_fields: ["description", "rubric"],
                    exclude_assignment_submission_types: ["wiki_page"],
                    override_assignment_dates: !permissions[:manage],

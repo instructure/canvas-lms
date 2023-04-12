@@ -379,10 +379,10 @@ class UserObserveesController < ApplicationController
     user_rows = Array(user_rows)
     ra_id_map = {}
     if ["observers", "show_observer"].include?(params[:action])
-      scope = student.as_student_observation_links.where(observer: user_rows.map { |r| r["id"] })
+      scope = student.as_student_observation_links.where(observer: user_rows.pluck("id"))
       column = :observer_id
     else
-      scope = observer.as_observer_observation_links.where(student: user_rows.map { |r| r["id"] })
+      scope = observer.as_observer_observation_links.where(student: user_rows.pluck("id"))
       column = :user_id
     end
 

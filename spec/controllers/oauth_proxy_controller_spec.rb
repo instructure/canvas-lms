@@ -43,7 +43,7 @@ describe OAuthProxyController do
 
   it "handles redirect urls with an existing query" do
     get :redirect_proxy, params: { state: Canvas::Security.create_jwt({ redirect_uri: "http://example.com/test?foo=bar" }) }
-    keys = URI.decode_www_form(URI.parse(response.location).query).map { |a| a[0] }
+    keys = URI.decode_www_form(URI.parse(response.location).query).pluck(0)
     expect(keys).to eq %w[foo state]
   end
 end

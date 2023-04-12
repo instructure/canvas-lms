@@ -40,7 +40,7 @@ namespace :i18n do
   js_index_file = Rails.root.join("config/locales/generated/en-js-index.json").to_s
 
   # Directory to contain the auto-generated translation files for the frontend.
-  js_translation_files_dir = Rails.root.join("public/javascripts/translations").to_s
+  js_translation_files_dir = Rails.public_path.join("javascripts/translations").to_s
 
   # like the top-level :environment, but just the i18n-y stuff we need.
   # also it's faster and doesn't require a db \o/

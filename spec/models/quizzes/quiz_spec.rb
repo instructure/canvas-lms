@@ -965,8 +965,8 @@ describe Quizzes::Quiz do
 
       original = quiz.quiz_questions.map { |q| q.question_data["question_text"] }
 
-      selected1 = quiz.generate_submission(u1).questions.map { |q| q["question_text"] }
-      selected2 = quiz.generate_submission(u2).questions.map { |q| q["question_text"] }
+      selected1 = quiz.generate_submission(u1).questions.pluck("question_text")
+      selected2 = quiz.generate_submission(u2).questions.pluck("question_text")
 
       # make sure at least one is shuffled
       is_shuffled1 = (original != selected1)

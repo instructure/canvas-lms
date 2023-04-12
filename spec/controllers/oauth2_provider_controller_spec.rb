@@ -436,7 +436,7 @@ describe OAuth2ProviderController do
         it { is_expected.to have_http_status(:ok) }
 
         it "outputs the token json if everything checks out" do
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json.keys.sort).to match_array(success_token_keys)
           expect(json["token_type"]).to eq "Bearer"
         end
@@ -510,7 +510,7 @@ describe OAuth2ProviderController do
         expect(redis).to receive(:del).with(valid_code_redis_key).at_least(:once)
         post :token, params: base_params.merge(code: valid_code)
         expect(response).to be_successful
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json.keys.sort).to match_array %w[access_token refresh_token user expires_in token_type canvas_region]
         expect(json.dig("user", "effective_locale")).to eq "zh-Hant"
       end
@@ -546,7 +546,7 @@ describe OAuth2ProviderController do
 
       it "generates a new access_token" do
         post :token, params: base_params.merge(refresh_token: refresh_token)
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["access_token"]).to_not eq old_token.full_token
       end
 
@@ -559,13 +559,13 @@ describe OAuth2ProviderController do
       it "is able to regenerate access_token multiple times" do
         post :token, params: base_params.merge(refresh_token: refresh_token)
         expect(response).to be_successful
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["access_token"]).to_not eq old_token.full_token
 
         access_token = json["access_token"]
         post :token, params: base_params.merge(refresh_token: refresh_token)
         expect(response).to be_successful
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["access_token"]).to_not eq access_token
       end
     end
@@ -807,7 +807,7 @@ describe OAuth2ProviderController do
 
     it "deletes the token" do
       delete :destroy, params: { access_token: token.full_token }
-      expect(JSON.parse(response.body)).to eq({})
+      expect(response.parsed_body).to eq({})
       expect(AccessToken.not_deleted.exists?(token.id)).to be(false)
     end
 
@@ -829,12 +829,12 @@ describe OAuth2ProviderController do
 
       it "includes forward URL when possible" do
         delete :destroy, params: { access_token: token.full_token, expire_sessions: true }, session: session
-        expect(JSON.parse(response.body)).to eq({ "forward_url" => "somewhere" })
+        expect(response.parsed_body).to eq({ "forward_url" => "somewhere" })
       end
 
       it "does not include forward URL when not ending sessions" do
         delete :destroy, params: { access_token: token.full_token }, session: session
-        expect(JSON.parse(response.body)).to eq({})
+        expect(response.parsed_body).to eq({})
       end
     end
   end

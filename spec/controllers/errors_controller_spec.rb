@@ -78,7 +78,7 @@ describe ErrorsController do
     it "does not return nil.id if report creation failed" do
       expect(ErrorReport).to receive(:where).once.and_raise("failed!")
       post "create", params: { error: { id: 1 } }, format: "json"
-      expect(JSON.parse(response.body)).to eq({ "logged" => true, "id" => nil })
+      expect(response.parsed_body).to eq({ "logged" => true, "id" => nil })
     end
 
     it "does not record the user as nil.id if report creation failed" do

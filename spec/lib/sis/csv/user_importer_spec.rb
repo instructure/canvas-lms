@@ -1076,7 +1076,7 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,active",
       "user_2,user1,User,Dos,user2@example.com,active"
     )
-    expect(importer.errors.map { |x| x[1] }).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's user_id requested login information, skipping"]
+    expect(importer.errors.pluck(1)).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's user_id requested login information, skipping"]
     expect(Pseudonym.by_unique_id("user1").first).not_to be_nil
     expect(Pseudonym.by_unique_id("user2").first).to be_nil
   end
@@ -1087,7 +1087,7 @@ describe SIS::CSV::UserImporter do
       "u,'long_string_for_user_login_should_throw_an_error_and_be_caught_and_be_returned_to_import_and_not_sent_to_sentry',U U,u@example.com,active"
     )
     expect(Canvas::Errors).not_to receive(:capture_exception)
-    expect(importer.errors.map { |x| x[1] }).to eq ["Could not save the user with user_id: 'u'. Unknown reason: unique_id is too long (maximum is 100 characters)"]
+    expect(importer.errors.pluck(1)).to eq ["Could not save the user with user_id: 'u'. Unknown reason: unique_id is too long (maximum is 100 characters)"]
   end
 
   it "does not confirm an email communication channel that has an invalid email" do

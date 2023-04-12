@@ -207,7 +207,7 @@ describe "speed grader" do
         Speedgrader.submit_settings_form
       end
 
-      list_items = ff("#students_selectmenu option").map { |i| i["value"] }
+      list_items = ff("#students_selectmenu option").pluck("value")
       expect(list_items).to contain_exactly(@student1.id.to_s, @student3.id.to_s, @student2.id.to_s)
     end
 
@@ -227,7 +227,7 @@ describe "speed grader" do
         Speedgrader.submit_settings_form
       end
 
-      list_items = ff("#students_selectmenu option").map { |i| i["value"] }
+      list_items = ff("#students_selectmenu option").pluck("value")
 
       expect(list_items).to contain_exactly(@student2.id.to_s, @student1.id.to_s, @student3.id.to_s)
     end

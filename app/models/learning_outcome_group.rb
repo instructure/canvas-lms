@@ -24,7 +24,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   extend RootAccountResolver
 
   restrict_columns :state, [:workflow_state]
-  self.ignored_columns = %i[migration_id_2 vendor_guid_2]
+  self.ignored_columns += %i[migration_id_2 vendor_guid_2]
 
   belongs_to :learning_outcome_group
   belongs_to :source_outcome_group, class_name: "LearningOutcomeGroup", inverse_of: :destination_outcome_groups

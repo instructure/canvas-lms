@@ -158,7 +158,7 @@ describe LoginController do
         allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(true)
 
         get "session_token", format: :json
-        expect(JSON.parse(response.body)["requires_terms_acceptance"]).to be(true)
+        expect(response.parsed_body["requires_terms_acceptance"]).to be(true)
       end
     end
 
@@ -169,7 +169,7 @@ describe LoginController do
         allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(false)
 
         get "session_token", format: :json
-        expect(JSON.parse(response.body)["requires_terms_acceptance"]).to be(false)
+        expect(response.parsed_body["requires_terms_acceptance"]).to be(false)
       end
     end
   end

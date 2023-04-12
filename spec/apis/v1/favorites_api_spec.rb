@@ -33,7 +33,7 @@ describe "Favorites API", type: :request do
       expect(json[0]["name"]).to eql @courses[0].name
       expect(json[0]["course_code"]).to eql @courses[0].course_code
       expect(json[0]["enrollments"][0]["type"]).to eql "student"
-      expect(json.collect { |row| row["id"] }.sort).to eql(@user.menu_courses.pluck(:id).sort)
+      expect(json.pluck("id").sort).to eql(@user.menu_courses.pluck(:id).sort)
 
       expect(@user.favorites.size).to be_zero
     end
@@ -102,7 +102,7 @@ describe "Favorites API", type: :request do
       expect(json[0]["name"]).to eql @courses[0].name
       expect(json[0]["course_code"]).to eql @courses[0].course_code
       expect(json[0]["enrollments"][0]["type"]).to eql "student"
-      expect(json.collect { |row| row["id"] }.sort).to eql(@user.favorites.by("Course").pluck(:context_id).sort)
+      expect(json.pluck("id").sort).to eql(@user.favorites.by("Course").pluck(:context_id).sort)
     end
 
     it "adds a course to favorites" do

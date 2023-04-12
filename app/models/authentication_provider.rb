@@ -406,7 +406,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
     return if self.class.recognized_federated_attributes.nil?
 
-    bad_values = federated_attributes.values.map { |v| v["attribute"] } - self.class.recognized_federated_attributes
+    bad_values = federated_attributes.values.pluck("attribute") - self.class.recognized_federated_attributes
     unless bad_values.empty?
       errors.add(:federated_attributes, "#{bad_values.join(", ")} is not a valid attribute")
     end

@@ -36,7 +36,7 @@ class Assignment < ActiveRecord::Base
   include DuplicatingObjects
   include LockedFor
 
-  self.ignored_columns = %i[context_code]
+  self.ignored_columns += %i[context_code]
 
   GRADING_TYPES = OpenStruct.new(
     {
@@ -1690,7 +1690,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def touch_on_unlock_if_necessary
-    if unlock_at && Time.zone.now < unlock_at && (Time.zone.now + 1.hour) > unlock_at
+    if unlock_at && Time.zone.now < unlock_at && 1.hour.from_now > unlock_at
       GuardRail.activate(:primary) do
         # Because of assignemnt overrides, an assignment can have the same global id but
         # a different unlock_at time, so include that in the singleton key so that different

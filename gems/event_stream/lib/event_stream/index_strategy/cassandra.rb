@@ -170,7 +170,7 @@ module EventStream::IndexStrategy
 
     def history(key, pager, options)
       pager = ids_only_history(key, pager, options)
-      ids = pager.map { |row| row[index.id_column] }
+      ids = pager.pluck(index.id_column)
       fetch_strategy = options.fetch(:fetch_strategy, :batch)
       events = event_stream.fetch(ids, strategy: fetch_strategy)
       pager.replace(events.sort_by { |event| ids.index(event.id) })

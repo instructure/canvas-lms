@@ -174,7 +174,7 @@ describe "content migrations", :non_parallel do
     it "shows each form" do
       visit_page
 
-      migration_types = ff("#chooseMigrationConverter option").map { |op| op["value"] } - ["none"]
+      migration_types = ff("#chooseMigrationConverter option").pluck("value") - ["none"]
       migration_types.each do |type|
         select_migration_type(type)
 
@@ -684,7 +684,7 @@ describe "content migrations", :non_parallel do
       other_tool
       visit_page
       migration_type_options = ff("#chooseMigrationConverter option")
-      migration_type_values = migration_type_options.map { |op| op["value"] }
+      migration_type_values = migration_type_options.pluck("value")
       migration_type_texts = migration_type_options.map(&:text)
       expect(migration_type_values).to include(import_tool.asset_string)
       expect(migration_type_texts).to include(import_tool.label_for(:migration_selection))

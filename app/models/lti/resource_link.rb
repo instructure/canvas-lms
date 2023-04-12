@@ -21,7 +21,7 @@
 class Lti::ResourceLink < ApplicationRecord
   include Canvas::SoftDeletable
 
-  self.ignored_columns = %i[lookup_id resource_link_id]
+  self.ignored_columns += %i[lookup_id resource_link_id]
 
   validates :context_external_tool_id, :context_id, :context_type, :lookup_uuid,
             :resource_link_uuid, presence: true

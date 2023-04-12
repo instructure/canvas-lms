@@ -2009,7 +2009,7 @@ describe Attachment do
 
       @student_ended = user_model
       @student_ended.register!
-      @section_ended = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
+      @section_ended = @course.course_sections.create!(end_at: 1.day.ago)
       @course.enroll_student(@student_ended, section: @section_ended).accept
       cc_ended = communication_channel(@student_ended, { username: "default2@example.com", active_cc: true })
 

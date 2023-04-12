@@ -122,7 +122,7 @@ describe "student planner" do
     before :once do
       @quiz = quiz_model(course: @course)
       @quiz.generate_quiz_data
-      @quiz.due_at = Time.zone.now + 2.days
+      @quiz.due_at = 2.days.from_now
       @quiz.save!
     end
 
@@ -339,7 +339,7 @@ describe "student planner" do
     it "groups the to-do item with other course items", priority: "1" do
       @assignment = @course.assignments.create({
                                                  name: "Assignment 1",
-                                                 due_at: Time.zone.now + 1.day,
+                                                 due_at: 1.day.from_now,
                                                  submission_types: "online_text_entry"
                                                })
       @student1.planner_notes.create!(todo_date: 1.day.from_now, title: "Title Text", course_id: @course.id)
@@ -390,7 +390,7 @@ describe "student planner" do
     end
 
     it "updates the sidebar when clicking on mutiple to-do items", priority: "1" do
-      student_to_do2 = @student1.planner_notes.create!(todo_date: Time.zone.now + 5.minutes,
+      student_to_do2 = @student1.planner_notes.create!(todo_date: 5.minutes.from_now,
                                                        title: "Student to do 2")
       view_todo_item
       modal = todo_sidebar_modal(@student_to_do.title)
@@ -446,7 +446,7 @@ describe "student planner" do
   end
 
   it "shows and navigates to wiki pages with todo dates from student planner", priority: "1" do
-    page = @course.wiki_pages.create!(title: "Page1", todo_date: Time.zone.now + 2.days)
+    page = @course.wiki_pages.create!(title: "Page1", todo_date: 2.days.from_now)
     go_to_list_view
     validate_object_displayed(@course.name, "Page")
     validate_link_to_url(page, "pages")
@@ -457,7 +457,7 @@ describe "student planner" do
       @assignment_opportunity = @course.assignments.create!(name: "assignmentThatHasToBeDoneNow",
                                                             description: "This will take a long time",
                                                             submission_types: "online_text_entry",
-                                                            due_at: Time.zone.now - 2.days)
+                                                            due_at: 2.days.ago)
     end
 
     it "closes the opportunities dropdown.", priority: "1" do

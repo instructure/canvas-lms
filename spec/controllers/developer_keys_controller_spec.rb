@@ -79,7 +79,7 @@ describe DeveloperKeysController do
 
           get "index", params: { account_id: Account.site_admin.id }, format: :json
 
-          expect(json_parse.map { |dk| dk["id"] }).to match_array [site_admin_key.global_id]
+          expect(json_parse.pluck("id")).to match_array [site_admin_key.global_id]
         end
 
         it "includes valid LTI scopes in js env" do
@@ -213,7 +213,7 @@ describe DeveloperKeysController do
       it "returns the newly created key" do
         post "create", params: create_params
 
-        json_data = JSON.parse(response.body)
+        json_data = response.parsed_body
         expect(response).to be_successful
         key = DeveloperKey.find(json_data["id"])
         expect(key.account).to be_nil
