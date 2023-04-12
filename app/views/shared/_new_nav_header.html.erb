@@ -86,7 +86,7 @@
     <ul id="menu" class="ic-app-header__menu-list">
       <% if @current_user %>
         <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/profile') %>">
-          <button id="global_nav_profile_link" class="ic-app-header__menu-list-link">
+          <a id="global_nav_profile_link" role="button" href="/profile/settings" class="ic-app-header__menu-list-link">
             <div class="menu-item-icon-container">
               <div aria-hidden="true" class="fs-exclude ic-avatar <% if @real_current_user && @real_current_user != @current_user %>ic-avatar--fake-student<% end %>">
                 <img src="<%= @current_user.try { |usr| avatar_image_attrs(usr).first } %>" alt="<%= @current_user.short_name %>" />
@@ -96,7 +96,7 @@
             <div class="menu-item__text">
               <%= t('Account') %>
             </div>
-          </button>
+          </a>
         </li>
       <% else %>
         <li class="menu-item ic-app-header__menu-list-item">
@@ -112,14 +112,14 @@
       <% end %>
       <% if @current_user && @current_user.adminable_accounts.present? %>
         <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/accounts') %>">
-          <button id="global_nav_accounts_link" class="ic-app-header__menu-list-link">
+          <a id="global_nav_accounts_link" role="button" href="/accounts" class="ic-app-header__menu-list-link">
             <div class="menu-item-icon-container" aria-hidden="true">
               <%= render(partial: "shared/svg/svg_icon_accounts_new_styles", formats: [:svg]) %>
             </div>
             <div class="menu-item__text">
               <%= t('Admin') %>
             </div>
-          </button>
+          </a>
         </li>
       <% end %>
       <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if current_page?(dashboard_url) %>">
@@ -134,26 +134,26 @@
       </li>
       <% if @current_user %>
         <li class="menu-item ic-app-header__menu-list-item <%= 'ic-app-header__menu-list-item--active' if active_path?('/courses') %>">
-          <button id="global_nav_courses_link" class="ic-app-header__menu-list-link">
+          <a id="global_nav_courses_link" role="button" href="/courses" class="ic-app-header__menu-list-link">
             <div class="menu-item-icon-container" aria-hidden="true">
               <%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_courses_new_styles", formats: [:svg]) %>
             </div>
             <div class="menu-item__text">
               <%= courses_title %>
             </div>
-          </button>
+          </a>
         </li>
       <% end %>
       <% if @current_user && @current_user.current_active_groups? %>
         <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/groups') %>">
-          <button id="global_nav_groups_link" class="ic-app-header__menu-list-link">
+          <a id="global_nav_groups_link" role="button" href="/groups" class="ic-app-header__menu-list-link">
             <div class="menu-item-icon-container" aria-hidden="true">
               <%= render(partial: "shared/svg/svg_icon_groups_new_styles", formats: [:svg]) %>
             </div>
             <div class="menu-item__text">
               <%= t('Groups') %>
             </div>
-          </button>
+          </a>
         </li>
       <% end %>
       <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/calendar') %>">
@@ -179,14 +179,14 @@
       </li>
       <% if PageView.page_views_enabled? %>
         <li class="menu-item ic-app-header__menu-list-item" <%= ' ic-app-header__menu-list-item--active' if active_path?('/history') %>>
-          <button id="global_nav_history_link" class="ic-app-header__menu-list-link">
+          <a id="global_nav_history_link" role="button" href="#" class="ic-app-header__menu-list-link">
             <div class="menu-item-icon-container" aria-hidden="true">
               <%= render(partial: "shared/svg/svg_icon_history", formats: [:svg]) %>
             </div>
             <div class="menu-item__text">
               <%= t('History') %>
             </div>
-          </button>
+          </a>
         </li>
       <% end %>
       <% unless @current_user.nil? %>
@@ -216,8 +216,10 @@
   <div class="ic-app-header__secondary-navigation">
     <ul class="ic-app-header__menu-list">
       <li class="menu-item ic-app-header__menu-list-item">
-        <button
+        <a
           id="primaryNavToggle"
+          role="button"
+          href="#"
           class="ic-app-header__menu-list-link ic-app-header__menu-list-link--nav-toggle"
           aria-label="<% if @current_user.try(:collapse_global_nav?) %><%= t('Expand global navigation') %>
                 <% else %><%= t('Minimize global navigation') %><% end %>"
@@ -227,7 +229,7 @@
           <div class="menu-item-icon-container" aria-hidden="true">
             <%= render(partial: "shared/svg/svg_icon_navtoggle", formats: [:svg]) %>
           </div>
-        </button>
+        </a>
       </li>
     </ul>
   </div>
