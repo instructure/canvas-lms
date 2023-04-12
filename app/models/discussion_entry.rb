@@ -565,7 +565,8 @@ class DiscussionEntry < ActiveRecord::Base
       lock!
       old_rating = rating(current_user)
       if new_rating == old_rating
-        return true
+        entry_participant = true
+        raise ActiveRecord::Rollback
       end
 
       entry_participant = update_or_create_participant(current_user: current_user, rating: new_rating).first

@@ -52,7 +52,7 @@ class Enrollment < ActiveRecord::Base
   validates :limit_privileges_to_course_section, inclusion: { in: [true, false] }
   validates :associated_user_id, inclusion: { in: [nil],
                                               unless: ->(enrollment) { enrollment.type == "ObserverEnrollment" },
-                                              message: "only ObserverEnrollments may have an associated_user_id" }
+                                              message: -> { t("only ObserverEnrollments may have an associated_user_id") } }
   validate :cant_observe_self, if: ->(enrollment) { enrollment.type == "ObserverEnrollment" }
 
   validate :valid_role?

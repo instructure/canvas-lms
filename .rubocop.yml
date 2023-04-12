@@ -119,10 +119,18 @@ Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
 Rails/HelperInstanceVariable:
   Enabled: false # legacy code
+Rails/I18nLocaleTexts:
+  Exclude:
+    - spec/**/*.rb
+    - "**/spec_canvas/**/*.rb"
 Rails/NegateInclude:
   Enabled: false # exclude? isn't as intuitive as !include?
 Rails/Present:
   UnlessBlank: false # allow `unless foo.blank?`
+Rails/RedundantPresenceValidationOnBelongsTo:
+  Enabled: false # we do _not_ have config.active_record.belongs_to_required_by_default set
+                 # even though it's been a default since Rails 5.0, we don't have a
+                 # config.load_defaults line
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
 Rails/WhereExists:
@@ -275,11 +283,20 @@ Naming/VariableName:
 Naming/VariableNumber:
   Enabled: false
 
+Rails/ActionControllerFlashBeforeRender:
+  Severity: convention
+  AutoCorrect: false
+Rails/ActionOrder:
+  Severity: convention
+  AutoCorrect: false
 Rails/ActiveRecordCallbacksOrder:
   Severity: convention
   AutoCorrect: false
 Rails/ActiveRecordOverride:
   Severity: convention
+Rails/ActiveSupportOnLoad:
+  Severity: convention
+  AutoCorrect: false
 Rails/ApplicationMailer:
   Severity: convention
   AutoCorrect: false
@@ -292,6 +309,10 @@ Rails/CreateTableWithTimestamps:
   Severity: convention
 Rails/Date:
   Enabled: false
+  AutoCorrect: false
+Rails/DeprecatedActiveModelErrorsMethods:
+  AutoCorrect: false
+Rails/DuplicateAssociation:
   AutoCorrect: false
 Rails/EagerEvaluationLogMessage:
   Severity: convention

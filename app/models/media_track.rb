@@ -32,7 +32,7 @@ class MediaTrack < ActiveRecord::Base
   RE_LOOKS_LIKE_TTML = /<tt\s+xml/i.freeze
   validates :content, format: {
     without: RE_LOOKS_LIKE_TTML,
-    message: "TTML tracks are not allowed because they are susceptible to xss attacks"
+    message: -> { t("TTML tracks are not allowed because they are susceptible to xss attacks") }
   }
 
   def add_attachment_id
