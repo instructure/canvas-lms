@@ -303,4 +303,45 @@ describe Loaders::OutcomeAlignmentLoader do
       end
     end
   end
+
+  context "when outcome is aligned to a question bank and a question from the bank has a workflow state of" do
+    it "active, the outcome alignments includes the alignment to the quiz" do
+      @bank = AssessmentQuestionBank.find(@bank.id)
+      GraphQL::Batch.batch do
+        Loaders::OutcomeAlignmentLoader.for(
+          @course
+        ).load(@outcome).then do |alignments|
+          expect(alignments.pluck(:title).include?(@quiz2.title)).to be true
+        end
+      end
+    end
+
+    it "independently_edited, the outcome alignments includes the alignment to the quiz" do
+      @bank.assessment_questions.each do |q|
+        q.workflow_state = "independently_edited"
+        q.save!
+      end
+      GraphQL::Batch.batch do
+        Loaders::OutcomeAlignmentLoader.for(
+          @course
+        ).load(@outcome).then do |alignments|
+          expect(alignments.pluck(:title).include?(@quiz2.title)).to be true
+        end
+      end
+    end
+
+    it "deleted, the outcome alignments does not include the alignment to the quiz" do
+      @bank.assessment_questions.each do |q|
+        q.workflow_state = "deleted"
+        q.save!
+      end
+      GraphQL::Batch.batch do
+        Loaders::OutcomeAlignmentLoader.for(
+          @course
+        ).load(@outcome).then do |alignments|
+          expect(alignments.pluck(:title).include?(@quiz2.title)).to be false
+        end
+      end
+    end
+  end
 end
