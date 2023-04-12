@@ -130,32 +130,9 @@ export default function CanvasMediaPlayer(props) {
         window.frameElement || playerParent,
         props.resizeContainer
       )
-      if (shouldPostReloadMessage()) {
-        window.postMessage(
-          {subject: 'reload_media', media_object_id: props.media_id},
-          window.location.origin
-        )
-      }
     },
-    [props.type, props.resizeContainer, props.media_id, boundingBox]
+    [props.type, props.resizeContainer, boundingBox]
   )
-
-  // should be false when in canvas proper, but true when in an LTI like New Quizzes
-  const shouldPostReloadMessage = () => {
-    const player = window.document.body.querySelector('video')
-    let playerWidth = parseInt(player?.style?.width, 10)
-    let playerHeight = parseInt(player?.style?.height, 10)
-    if (Number.isNaN(playerWidth)) playerWidth = 0
-    if (Number.isNaN(playerHeight)) playerHeight = 0
-
-    const playerParent = containerRef.current
-    const playerIframe = playerParent?.parentElement?.parentElement
-    const hasSizeDifference =
-      playerIframe?.clientWidth !== playerWidth || playerIframe?.clientHeight !== playerHeight
-    if (hasSizeDifference) return true
-
-    return false
-  }
 
   const fetchSources = useCallback(
     async function () {
