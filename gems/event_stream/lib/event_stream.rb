@@ -41,7 +41,7 @@ module EventStream
   end
 
   def self.get_index_ids(index, rows)
-    @get_index_ids_lookup ||= ->(index2, rows2) { rows2.map { |row| row[index2.id_column] } }
+    @get_index_ids_lookup ||= ->(index2, rows2) { rows2.pluck(index2.id_column) }
     @get_index_ids_lookup.call(index, rows)
   end
 

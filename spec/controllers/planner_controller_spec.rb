@@ -34,7 +34,7 @@ describe PlannerController do
     @course.assignments.create(
       title: "some assignment #{@course.assignments.count}",
       assignment_group: @group,
-      due_at: Time.zone.now + 1.week
+      due_at: 1.week.from_now
     )
   end
 
@@ -150,7 +150,7 @@ describe PlannerController do
 
         get :index
         json = json_parse(response.body)
-        event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.map { |thing| thing["plannable_id"] }
+        event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.pluck("plannable_id")
 
         my_event_id = @course.default_section.calendar_events.where(parent_calendar_event_id: event).pluck(:id).first
         expect(event_ids).not_to include event.id
@@ -160,7 +160,7 @@ describe PlannerController do
 
         get :index
         json = json_parse(response.body)
-        event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.map { |thing| thing["plannable_id"] }
+        event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.pluck("plannable_id")
         expect(event_ids).to include event.id
         expect(event_ids).not_to include my_event_id
       end
@@ -181,7 +181,7 @@ describe PlannerController do
 
         get :index
         response_json = json_parse(response.body)
-        expect(response_json.select { |i| i["plannable_type"] == "announcement" }.map { |i| i["plannable_id"] }).to eq [a1.id]
+        expect(response_json.select { |i| i["plannable_type"] == "announcement" }.pluck("plannable_id")).to eq [a1.id]
       end
 
       it "shows planner overrides created on quizzes" do
@@ -555,19 +555,19 @@ describe PlannerController do
           get :index
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 5
-          expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, @page.id, @assignment5.id, @assignment.id, @assignment2.id]
+          expect(response_json.pluck("plannable_id")).to eq [@assignment3.id, @page.id, @assignment5.id, @assignment.id, @assignment2.id]
 
           get :index, params: { per_page: 2 }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment3.id, @page.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@assignment3.id, @page.id]
 
           link = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }
           expect(link[:uri].path).to include "/api/v1/planner/items"
           get :index, params: { per_page: 2, page: link["page"] }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment5.id, @assignment.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@assignment5.id, @assignment.id]
 
           link = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }
           get :index, params: { per_page: 2, page: link["page"] }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@assignment2.id]
         end
 
         it "behaves consistently with different object types on the same datetime" do
@@ -597,11 +597,11 @@ describe PlannerController do
           @assignment2.update_attribute(:due_at, time)
 
           get :index, params: { per_page: 1 }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@assignment.id]
 
           next_page = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }["page"]
           get :index, params: { per_page: 1, page: next_page }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@assignment2.id]
         end
 
         it "returns results in reverse order by date if requested" do
@@ -612,14 +612,14 @@ describe PlannerController do
           get :index, params: { order: :desc }
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 4
-          expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment2.id, @assignment.id, @page.id, @assignment3.id]
+          expect(response_json.pluck("plannable_id")).to eq [@assignment2.id, @assignment.id, @page.id, @assignment3.id]
 
           get :index, params: { order: :desc, per_page: 2 }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id, @assignment.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@assignment2.id, @assignment.id]
 
           next_page = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }["page"]
           get :index, params: { order: :desc, per_page: 2, page: next_page }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@page.id, @assignment3.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@page.id, @assignment3.id]
         end
 
         it "does not try to compare missing dates" do
@@ -633,7 +633,7 @@ describe PlannerController do
           get :index
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 3
-          expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, @assignment.id, @assignment2.id]
+          expect(response_json.pluck("plannable_id")).to eq [@assignment3.id, @assignment.id, @assignment2.id]
         end
 
         it "orders with unread items as well" do
@@ -655,7 +655,7 @@ describe PlannerController do
           get :index, params: { filter: "new_activity" }
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 4
-          expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, dt.id, graded_topic.id, @assignment.id]
+          expect(response_json.pluck("plannable_id")).to eq [@assignment3.id, dt.id, graded_topic.id, @assignment.id]
         end
 
         context "with assignment overrides" do
@@ -678,7 +678,7 @@ describe PlannerController do
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 4
-            expect(response_json.map { |i| i["plannable_id"] }).to eq([@planner_note1.id, assignment1.id, @planner_note2.id, assignment2.id])
+            expect(response_json.pluck("plannable_id")).to eq([@planner_note1.id, assignment1.id, @planner_note2.id, assignment2.id])
           end
 
           it "orders assignments with overridden due dates correctly" do
@@ -693,7 +693,7 @@ describe PlannerController do
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 4
-            expect(response_json.map { |i| i["plannable_id"] }).to eq([assignment1.id, @planner_note1.id, assignment2.id, @planner_note2.id])
+            expect(response_json.pluck("plannable_id")).to eq([assignment1.id, @planner_note1.id, assignment2.id, @planner_note2.id])
           end
 
           it "orders ungraded quizzes with overridden due dates correctly" do
@@ -707,7 +707,7 @@ describe PlannerController do
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 4
-            expect(response_json.map { |i| i["plannable_id"] }).to eq([quiz1.id, @planner_note1.id, quiz2.id, @planner_note2.id])
+            expect(response_json.pluck("plannable_id")).to eq([quiz1.id, @planner_note1.id, quiz2.id, @planner_note2.id])
           end
 
           it "orders graded discussions with overridden due dates correctly" do
@@ -741,7 +741,7 @@ describe PlannerController do
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 4
-            expect(response_json.map { |i| i["plannable_id"] }).to eq([page1.id, @planner_note1.id, @page.id, @planner_note2.id])
+            expect(response_json.pluck("plannable_id")).to eq([page1.id, @planner_note1.id, @page.id, @planner_note2.id])
           end
         end
       end
@@ -798,7 +798,7 @@ describe PlannerController do
 
           get :index
           response_json = json_parse(response.body)
-          expect(response_json.map { |i| i["plannable_id"] }).to eq [announcement.id, @assignment.id, @assignment2.id]
+          expect(response_json.pluck("plannable_id")).to eq [announcement.id, @assignment.id, @assignment2.id]
         end
 
         it "queries the correct shard-relative context codes for calendar events" do
@@ -856,9 +856,9 @@ describe PlannerController do
 
           get :index, params: { context_codes: [@original_course.asset_string, @group.asset_string, @cs_student.asset_string] }
           json = json_parse(response.body)
-          expect(json.map { |h| h["plannable_id"] }).to match_array([
-                                                                      @planner_note.id, @group_assignment.id, @original_topic.id, @original_page.id
-                                                                    ])
+          expect(json.pluck("plannable_id")).to match_array([
+                                                              @planner_note.id, @group_assignment.id, @original_topic.id, @original_page.id
+                                                            ])
         end
       end
 
@@ -873,7 +873,7 @@ describe PlannerController do
           links = Api.parse_pagination_links(page.headers["Link"])
           response_json = json_parse(page.body)
           expect(response_json.length).to eq 5
-          ids = response_json.map { |i| i["plannable_id"] }
+          ids = response_json.pluck("plannable_id")
           expected_ids = []
           5.times { |i| expected_ids << @assignments[i].id }
           expect(ids).to eq expected_ids
@@ -895,7 +895,7 @@ describe PlannerController do
           get :index, params: { per_page: 2 }
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 2
-          expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignments[0].id, @assignments[1].id]
+          expect(response_json.pluck("plannable_id")).to eq [@assignments[0].id, @assignments[1].id]
         end
 
         it "paginates results in correct order" do
@@ -1090,7 +1090,7 @@ describe PlannerController do
                                   end_date: 1.week.from_now.to_date.to_s }
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 1
-            expect(response_json.map { |i| i["plannable_id"] }).to include dt.id
+            expect(response_json.pluck("plannable_id")).to include dt.id
           end
         end
 

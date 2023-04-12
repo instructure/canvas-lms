@@ -41,7 +41,7 @@ module DataFixup
              and matview.c != entries.c;"
         )
 
-        topic_ids = result.map { |d| d["topic"] }
+        topic_ids = result.pluck("topic")
       end
 
       GuardRail.activate(:primary) do

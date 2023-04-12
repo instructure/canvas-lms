@@ -172,12 +172,12 @@ describe "threaded discussions" do
       @enrollment.save!
 
       # Reset discussion created_at time to two minutes ago
-      @topic.update_attribute(:posted_at, Time.zone.now - 2.minutes)
+      @topic.update_attribute(:posted_at, 2.minutes.ago)
 
       # Create reply message and reset created_at to one minute ago
       @topic.reply_from(user: @student, html: "New test reply")
       reply = DiscussionEntry.last
-      reply.update_attribute(:created_at, Time.zone.now - 1.minute)
+      reply.update_attribute(:created_at, 1.minute.ago)
 
       # Navigate to discussion URL
       Discussion.visit(@course, @topic)

@@ -117,11 +117,11 @@ describe UsersController, type: :request do
       end
       json = api_call(:get, "/api/v1/users/self/activity_stream",
                       { controller: "users", action: "activity_stream", format: "json" })
-      expect(json.map { |r| r["discussion_topic_id"] }).to match_array([@dt1.id, @dt2.id])
+      expect(json.pluck("discussion_topic_id")).to match_array([@dt1.id, @dt2.id])
 
       json = api_call(:get, "/api/v1/users/self/activity_stream?only_active_courses=1",
                       { controller: "users", action: "activity_stream", format: "json", only_active_courses: "1" })
-      expect(json.map { |r| r["discussion_topic_id"] }).to eq([@dt1.id])
+      expect(json.pluck("discussion_topic_id")).to eq([@dt1.id])
     end
 
     it "filters the activity stream summary to currently active courses if requested" do

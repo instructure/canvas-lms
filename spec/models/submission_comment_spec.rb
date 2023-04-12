@@ -98,7 +98,7 @@ RSpec.describe SubmissionComment do
   describe "notifications" do
     before(:once) do
       @student_ended = user_model
-      @section_ended = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
+      @section_ended = @course.course_sections.create!(end_at: 1.day.ago)
 
       Notification.create!(name: "Submission Comment", category: "TestImmediately")
       Notification.create!(name: "Submission Comment For Teacher")

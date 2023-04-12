@@ -109,7 +109,7 @@ module Canvas
         expect(described_class.read("test/path")).to eq({ foo: "bar" })
         expect(@stub).to have_been_requested.times(1)
         # does not use the cache
-        Timecop.travel(Time.zone.now + 3600.seconds) do
+        Timecop.travel(3600.seconds.from_now) do
           expect(described_class.read("test/path")).to eq({ foo: "bar" })
           expect(@stub).to have_been_requested.times(2)
         end
@@ -120,7 +120,7 @@ module Canvas
         expect(@stub).to have_been_requested.times(1)
         # restub to return an error now
         stub_request(:get, "#{addr}/v1/test/path").to_return(status: 500, body: "error")
-        Timecop.travel(Time.zone.now + 3600.seconds) do
+        Timecop.travel(3600.seconds.from_now) do
           expect(described_class.read("test/path")).to eq({ foo: "bar" })
         end
       end

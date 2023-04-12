@@ -861,7 +861,7 @@ describe "Outcomes API", type: :request do
                         course_id: @course.id.to_s,
                         student_id: @student.id.to_s,
                         format: "json")
-        expect(json.map { |j| j["assignment_id"] }.sort).to eq([])
+        expect(json.pluck("assignment_id").sort).to eq([])
       end
 
       it "allows teacher to return aligned assignments for a student" do
@@ -872,7 +872,7 @@ describe "Outcomes API", type: :request do
                         course_id: @course.id.to_s,
                         student_id: @student.id.to_s,
                         format: "json")
-        expect(json.map { |j| j["assignment_id"] }.sort).to eq([@assignment.id, @quiz.assignment_id].sort)
+        expect(json.pluck("assignment_id").sort).to eq([@assignment.id, @quiz.assignment_id].sort)
       end
     end
 
@@ -952,7 +952,7 @@ describe "Outcomes API", type: :request do
                         course_id: @course.id.to_s,
                         student_id: @student.id.to_s,
                         format: "json")
-        expect(json.map { |j| j["learning_outcome_id"] }.uniq).to eq([@outcome.id])
+        expect(json.pluck("learning_outcome_id").uniq).to eq([@outcome.id])
       end
 
       it "does not return assignments that a student does not have visibility for" do

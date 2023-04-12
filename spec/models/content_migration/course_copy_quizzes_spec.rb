@@ -247,8 +247,8 @@ describe ContentMigration do
       run_course_copy
 
       q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
-      expect(q2.quiz_data.first["answers"].map { |a| a["text"] }).to eq ["True", "False"]
-      expect(q2.quiz_data.first["answers"].map { |a| a["weight"] }).to eq [100, 0]
+      expect(q2.quiz_data.first["answers"].pluck("text")).to eq ["True", "False"]
+      expect(q2.quiz_data.first["answers"].pluck("weight")).to eq [100, 0]
     end
 
     it "imports invalid true-false questions as multiple choice" do
@@ -270,7 +270,7 @@ describe ContentMigration do
 
       q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
       expect(q2.quiz_data.first["question_type"]).to eq "multiple_choice_question"
-      expect(q2.quiz_data.first["answers"].map { |a| a["text"] }).to eq ["foo", "tr00"]
+      expect(q2.quiz_data.first["answers"].pluck("text")).to eq ["foo", "tr00"]
     end
 
     it "escapes html characters in text answers" do
@@ -291,7 +291,7 @@ describe ContentMigration do
       run_course_copy
 
       q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
-      expect(q2.quiz_data.first["answers"].map { |a| a["text"] }).to eq ["<p>foo</p>", "<div/>tr00"]
+      expect(q2.quiz_data.first["answers"].pluck("text")).to eq ["<p>foo</p>", "<div/>tr00"]
     end
 
     it "copies quizzes as published if they were published before" do

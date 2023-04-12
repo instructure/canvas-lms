@@ -975,7 +975,7 @@ describe "Submissions API", type: :request do
                       format: "json", course_id: @course.id.to_s,
                       assignment_id: @quiz.assignment.id.to_s },
                     { include: %w[submission_history] })
-    submission_dates = json.first["submission_history"].map { |hash| hash["submitted_at"] }
+    submission_dates = json.first["submission_history"].pluck("submitted_at")
     expect(submission_dates.first).not_to eq(submission_dates.last)
   end
 
@@ -1808,7 +1808,7 @@ describe "Submissions API", type: :request do
                         format: "json", course_id: @course.to_param },
                       { student_ids: [@student1.to_param],
                         order: "graded_at", order_direction: "descending" })
-      expect(json.map { |a| a["assignment_id"] }).to eq [@a2.id, @a1.id, @a3.id]
+      expect(json.pluck("assignment_id")).to eq [@a2.id, @a1.id, @a3.id]
     end
 
     it "errors when asking for assignments in other courses" do
@@ -2167,7 +2167,7 @@ describe "Submissions API", type: :request do
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
                       { controller: "submissions_api", action: "for_students", format: "json", course_id: @course.to_param },
                       { student_ids: "all", grouped: true, per_page: 2, page: 1 })
-      expect(json.map { |u| u["user_id"] }).to eq [@student1.id, @student2.id]
+      expect(json.pluck("user_id")).to eq [@student1.id, @student2.id]
     end
 
     it "does not duplicate a student with multiple enrollments when paging" do
@@ -2175,12 +2175,12 @@ describe "Submissions API", type: :request do
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
                       { controller: "submissions_api", action: "for_students", format: "json", course_id: @course.to_param },
                       { student_ids: "all", grouped: true, per_page: 1, page: 1 })
-      expect(json.map { |u| u["user_id"] }).to eq [@student1.id]
+      expect(json.pluck("user_id")).to eq [@student1.id]
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
                       { controller: "submissions_api", action: "for_students", format: "json", course_id: @course.to_param },
                       { student_ids: "all", grouped: true, per_page: 1, page: 2 })
-      expect(json.map { |u| u["user_id"] }).to eq [@student2.id]
+      expect(json.pluck("user_id")).to eq [@student2.id]
     end
 
     it "prefers an active enrollment when a student has more than one" do
@@ -2199,7 +2199,7 @@ describe "Submissions API", type: :request do
                       "/api/v1/sections/#{@section2.id}/students/submissions.json",
                       { controller: "submissions_api", action: "for_students", format: "json", section_id: @section2.to_param },
                       { student_ids: "all", grouped: true })
-      expect(json.map { |u| u["user_id"] }).to eq [@student1.id]
+      expect(json.pluck("user_id")).to eq [@student1.id]
     end
 
     it "rejects an out-of-context user" do
@@ -2451,7 +2451,7 @@ describe "Submissions API", type: :request do
                       { student_ids: [@student1.to_param, @student2.to_param], grouped: "1" })
 
       expect(json.size).to eq 2
-      expect(json.map { |u| u["submissions"] }.flatten.size).to eq 4
+      expect(json.pluck("submissions").flatten.size).to eq 4
 
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
@@ -2478,7 +2478,7 @@ describe "Submissions API", type: :request do
                          format: "json", course_id: @course.to_param },
                        { student_ids: ["all"], grouped: "1", per_page: "1", page: 2 })
       expect(json2.size).to eq 1
-      expect((json + json2).map { |r| r["user_id"] }).to match_array([@student1.id, @student2.id])
+      expect((json + json2).pluck("user_id")).to match_array([@student1.id, @student2.id])
     end
 
     describe "current and final scores" do
@@ -2946,7 +2946,7 @@ describe "Submissions API", type: :request do
                           student_ids: [@student1.to_param, @student2.to_param],
                           grouped: "1" })
         expect(json.size).to eq 2
-        expect(json.map { |entry| entry["user_id"] }.sort).to eq [@student1.id, @student2.id]
+        expect(json.pluck("user_id").sort).to eq [@student1.id, @student2.id]
       end
 
       it "does not allow an observer to view non-observed students' submissions" do
@@ -4388,7 +4388,7 @@ describe "Submissions API", type: :request do
                     { controller: "submissions_api", action: "index",
                       format: "json", course_id: @course.id.to_s,
                       assignment_id: @assignment.id.to_s })
-    expect(json.map { |u| u["user_id"] }).to eq [s1.user_id]
+    expect(json.pluck("user_id")).to eq [s1.user_id]
 
     # try querying the other section directly
     json = api_call(:get,
@@ -4612,8 +4612,8 @@ describe "Submissions API", type: :request do
         json = do_submit(submission_type: "online_upload", file_ids: [a1.id, a2.id])
         sub_a1 = Attachment.where(root_attachment_id: a1).first
         sub_a2 = Attachment.where(root_attachment_id: a2).first
-        expect(json["attachments"].map { |a| a["url"] }).to eq [file_download_url(sub_a1, verifier: sub_a1.uuid, download: "1", download_frd: "1"),
-                                                                file_download_url(sub_a2, verifier: sub_a2.uuid, download: "1", download_frd: "1")]
+        expect(json["attachments"].pluck("url")).to eq [file_download_url(sub_a1, verifier: sub_a1.uuid, download: "1", download_frd: "1"),
+                                                        file_download_url(sub_a2, verifier: sub_a2.uuid, download: "1", download_frd: "1")]
       end
 
       it "creates a media comment submission" do
@@ -4631,7 +4631,7 @@ describe "Submissions API", type: :request do
         a1 = attachment_model(context: @user, folder: @user.submissions_folder)
         a2 = attachment_model(context: @user)
         json = do_submit(submission_type: "online_upload", file_ids: [a1.id, a2.id])
-        submission_attachment_ids = json["attachments"].map { |a| a["id"] }
+        submission_attachment_ids = json["attachments"].pluck("id")
         expect(submission_attachment_ids.size).to eq 2
         expect(submission_attachment_ids.delete(a1.id)).not_to be_nil
         copy = Attachment.find(submission_attachment_ids.last)
@@ -5565,23 +5565,23 @@ describe "Submissions API", type: :request do
 
     it "lists students with and without submissions" do
       json = api_call_as_user(@ta, :get, @path, @params)
-      expect(json.map { |el| el["id"] }).to match_array([@student1.id, @student2.id])
+      expect(json.pluck("id")).to match_array([@student1.id, @student2.id])
     end
 
     it "anonymizes student ids if anonymously grading" do
       allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
       params = @params.merge(allow_new_anonymous_id: true)
       json = api_call_as_user(@ta, :get, @path, params)
-      expect(json.map { |el| el["anonymous_id"] }).to match_array([
-                                                                    @assignment.submission_for_student(@student1).anonymous_id, @assignment.submission_for_student(@student2).anonymous_id
-                                                                  ])
+      expect(json.pluck("anonymous_id")).to match_array([
+                                                          @assignment.submission_for_student(@student1).anonymous_id, @assignment.submission_for_student(@student2).anonymous_id
+                                                        ])
     end
 
     it "returns default avatars if anonymously grading" do
       allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
       params = @params.merge(allow_new_anonymous_id: true)
       json = api_call_as_user(@ta, :get, @path, params)
-      expect(json.map { |el| el["avatar_image_url"] }).to match_array([User.default_avatar_fallback, User.default_avatar_fallback])
+      expect(json.pluck("avatar_image_url")).to match_array([User.default_avatar_fallback, User.default_avatar_fallback])
     end
 
     it "does not return identifiable attributes if anonymously grading" do
@@ -5589,10 +5589,10 @@ describe "Submissions API", type: :request do
       # This is a workaround until mobile supports new anonymous grading
       params = @params.merge(allow_new_anonymous_id: true)
       json = api_call_as_user(@ta, :get, @path, params)
-      anon_names = json.sort_by { |sub| sub["anonymous_id"] }.map { |el| el["display_name"] }
-      expect(json.map { |el| el["id"] }).to match_array([nil, nil])
+      anon_names = json.sort_by { |sub| sub["anonymous_id"] }.pluck("display_name")
+      expect(json.pluck("id")).to match_array([nil, nil])
       expect(anon_names).to match_array(["Student 1", "Student 2"])
-      expect(json.map { |el| el["html_url"] }).to match_array([nil, nil])
+      expect(json.pluck("html_url")).to match_array([nil, nil])
     end
 
     it "paginates" do
@@ -5731,7 +5731,7 @@ describe "Submissions API", type: :request do
     it "lists students" do
       json = api_call_as_user(@ta, :get, @path, @params)
 
-      expect(json.map { |el| el["id"] }).to match_array([@student1.id, @student2.id])
+      expect(json.pluck("id")).to match_array([@student1.id, @student2.id])
       expect(json[0]["assignment_ids"]).to match_array(@assignment_ids)
       expect(json[1]["assignment_ids"]).to match_array(@assignment_ids)
     end

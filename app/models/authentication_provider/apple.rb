@@ -101,7 +101,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
 
   def scope
     result = []
-    requested_attributes = [login_attribute] + federated_attributes.values.map { |v| v["attribute"] }
+    requested_attributes = [login_attribute] + federated_attributes.values.pluck("attribute")
     result << "name" unless (requested_attributes & ["firstName", "lastName"]).empty?
     result << "email" if requested_attributes.include?("email")
     result.join(" ")

@@ -99,7 +99,7 @@ describe SearchController, type: :request do
 
       json = api_call(:get, "/api/v1/search/recipients.json?context=group_#{@group.id}",
                       { controller: "search", action: "recipients", format: "json", context: "group_#{@group.id}" })
-      expect(json.map { |h| h["id"] }).to match_array([@joe.id, @me.id, @bob.id])
+      expect(json.pluck("id")).to match_array([@joe.id, @me.id, @bob.id])
     end
 
     it "returns recipients for a given section" do
@@ -428,7 +428,7 @@ describe SearchController, type: :request do
         json = api_call(:get, "/api/v1/search/recipients.json?search=term&per_page=4",
                         { controller: "search", action: "recipients", format: "json", search: "term", per_page: "4" })
         expect(json.size).to be 4
-        expect(json.map { |item| item["id"] }).to eq course_ids[0...4]
+        expect(json.pluck("id")).to eq course_ids[0...4]
         links = Api.parse_pagination_links(response.headers["Link"])
         links.each do |l|
           expect(l[:uri].to_s).to match(%r{api/v1/search/recipients})
@@ -443,7 +443,7 @@ describe SearchController, type: :request do
                                         format: "json"
                                       })
         expect(json.size).to be 4
-        expect(json.map { |item| item["id"] }).to eq course_ids[4...6] + user_ids[0...2]
+        expect(json.pluck("id")).to eq course_ids[4...6] + user_ids[0...2]
         links = Api.parse_pagination_links(response.headers["Link"])
         links.each do |l|
           expect(l[:uri].to_s).to match(%r{api/v1/search/recipients})
@@ -458,7 +458,7 @@ describe SearchController, type: :request do
                                         format: "json"
                                       })
         expect(json.size).to be 4
-        expect(json.map { |item| item["id"] }).to eq user_ids[2...6]
+        expect(json.pluck("id")).to eq user_ids[2...6]
         links = Api.parse_pagination_links(response.headers["Link"])
         links.each do |l|
           expect(l[:uri].to_s).to match(%r{api/v1/search/recipients})
@@ -481,7 +481,7 @@ describe SearchController, type: :request do
 
         json = api_call(:get, "/api/v1/search/recipients.json?type=context&search=Context&include_inactive=1",
                         { controller: "search", action: "recipients", format: "json", type: "context", search: "Context", include_inactive: "1" })
-        expect(json.map { |item| item["id"] }).to eq [course2.asset_string, course1.asset_string]
+        expect(json.pluck("id")).to eq [course2.asset_string, course1.asset_string]
       end
 
       it "sorts contexts by type second when searching" do
@@ -489,7 +489,7 @@ describe SearchController, type: :request do
         @group.update_attribute(:name, "Context Alpha")
         json = api_call(:get, "/api/v1/search/recipients.json?type=context&search=Context",
                         { controller: "search", action: "recipients", format: "json", type: "context", search: "Context" })
-        expect(json.map { |item| item["id"] }).to eq [@course.asset_string, @group.asset_string]
+        expect(json.pluck("id")).to eq [@course.asset_string, @group.asset_string]
       end
 
       it "sorts contexts by name third when searching" do
@@ -503,7 +503,7 @@ describe SearchController, type: :request do
 
         json = api_call(:get, "/api/v1/search/recipients.json?type=context&search=Context",
                         { controller: "search", action: "recipients", format: "json", type: "context", search: "Context" })
-        expect(json.map { |item| item["id"] }).to eq [course2.asset_string, course1.asset_string]
+        expect(json.pluck("id")).to eq [course2.asset_string, course1.asset_string]
       end
     end
 
@@ -514,13 +514,13 @@ describe SearchController, type: :request do
         skip("investigate cause for failures beginning 05/05/21 FOO-1950")
         json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
                         { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}_groups", synthetic_contexts: "1" })
-        expect(json.map { |r| r["id"] }).to eq ["group_#{@group.id}"]
+        expect(json.pluck("id")).to eq ["group_#{@group.id}"]
 
         Timecop.freeze(1.minute.from_now) do
           group2 = @course.groups.create(name: "whee new group", group_category: @group.group_category)
           json2 = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
                            { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}_groups", synthetic_contexts: "1" })
-          expect(json2.map { |r| r["id"] }).to match_array ["group_#{@group.id}", "group_#{group2.id}"]
+          expect(json2.pluck("id")).to match_array ["group_#{@group.id}", "group_#{group2.id}"]
 
           new_student = User.create!
           @course.enroll_student(new_student, enrollment_state: "active")
@@ -529,7 +529,7 @@ describe SearchController, type: :request do
           # show group members too
           json3 = api_call(:get, "/api/v1/search/recipients.json?context=group_#{group2.id}",
                            { controller: "search", action: "recipients", format: "json", context: "group_#{group2.id}" })
-          expect(json3.map { |r| r["id"] }).to eq [new_student.id]
+          expect(json3.pluck("id")).to eq [new_student.id]
         end
       end
     end
@@ -559,7 +559,7 @@ describe SearchController, type: :request do
 
         json = api_call(:get, "/api/v1/search/recipients.json?type=group&search=group",
                         { controller: "search", action: "recipients", format: "json", type: "group", search: "group" })
-        ids = json.map { |item| item["id"] }
+        ids = json.pluck("id")
         expect(ids).to include(group1.asset_string)
         expect(ids).to include(group2.asset_string)
       end

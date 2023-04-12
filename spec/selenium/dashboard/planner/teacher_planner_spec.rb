@@ -34,7 +34,7 @@ describe "teacher planner" do
     before do
       @assignment1 = @course.assignments.create({
                                                   name: "Teacher Assignment",
-                                                  due_at: Time.zone.now - 1.day,
+                                                  due_at: 1.day.ago,
                                                   submission_types: "online_text_entry"
                                                 })
       @submission = @assignment1.submit_homework(@student1, body: "here is my submission")

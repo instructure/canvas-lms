@@ -58,7 +58,7 @@ module ConversationsHelper
 
     invalid_recipients = get_invalid_recipients(context, recipients, current_user)
     unless invalid_recipients.to_a.empty?
-      invalid_recipients = invalid_recipients.map { |rec| rec[1] }
+      invalid_recipients = invalid_recipients.pluck(1)
       raise ConversationsHelper::Error.new(message: I18n.t("The following recipients have no active enrollment in the course, %{invalid_recipients}, unable to send messages", invalid_recipients: invalid_recipients), status: :unauthorized, attribute: "recipients")
     end
 

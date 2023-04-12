@@ -41,14 +41,14 @@ describe "Folders API", type: :request do
 
       it "lists folders in alphabetical order" do
         json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options, {})
-        res = json.map { |f| f["name"] }
+        res = json.pluck("name")
         expect(res).to eq %w[11folder aafolder folder1 folder2 zzfolder]
       end
 
       it "lists folders in saved order if flag set" do
         json = api_call(:get, @folders_path + "/#{@root.id}/folders?sort_by=position", @folders_path_options.merge(action: "api_index", sort_by: "position"), {})
 
-        res = json.map { |f| f["name"] }
+        res = json.pluck("name")
         expect(res).to eq %w[folder1 folder2 11folder zzfolder aafolder]
       end
 
@@ -664,7 +664,7 @@ describe "Folders API", type: :request do
       it "operates on an empty path" do
         student_in_course
         json = api_call(:get, @request_path, @params_hash)
-        expect(json.map { |folder| folder["id"] }).to eql [@root_folder.id]
+        expect(json.pluck("id")).to eql [@root_folder.id]
       end
 
       describe "with full_path" do
@@ -679,7 +679,7 @@ describe "Folders API", type: :request do
         it "returns a list of path components" do
           teacher_in_course
           json = api_call(:get, @request_path, @params_hash)
-          expect(json.map { |folder| folder["id"] }).to eql [@root_folder.id, @folder.id, @sub_folder.id]
+          expect(json.pluck("id")).to eql [@root_folder.id, @folder.id, @sub_folder.id]
         end
 
         it "404s on an invalid path" do
@@ -704,13 +704,13 @@ describe "Folders API", type: :request do
 
       it "accepts an empty path" do
         json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/by_path/", @params_hash)
-        expect(json.map { |folder| folder["id"] }).to eql [@root_folder.id]
+        expect(json.pluck("id")).to eql [@root_folder.id]
       end
 
       it "accepts a non-empty path" do
         @folder = @group.folders.create! parent_folder: @root_folder, name: "some folder"
         json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/by_path/#{URI::DEFAULT_PARSER.escape(@folder.name)}", @params_hash.merge(full_path: @folder.name))
-        expect(json.map { |folder| folder["id"] }).to eql [@root_folder.id, @folder.id]
+        expect(json.pluck("id")).to eql [@root_folder.id, @folder.id]
       end
     end
 
@@ -723,13 +723,13 @@ describe "Folders API", type: :request do
 
       it "accepts an empty path" do
         json = api_call(:get, "/api/v1/users/#{@user.id}/folders/by_path/", @params_hash)
-        expect(json.map { |folder| folder["id"] }).to eql [@root_folder.id]
+        expect(json.pluck("id")).to eql [@root_folder.id]
       end
 
       it "accepts a non-empty path" do
         @folder = @user.folders.create! parent_folder: @root_folder, name: "some folder"
         json = api_call(:get, "/api/v1/users/#{@user.id}/folders/by_path/#{URI::DEFAULT_PARSER.escape(@folder.name)}", @params_hash.merge(full_path: @folder.name))
-        expect(json.map { |folder| folder["id"] }).to eql [@root_folder.id, @folder.id]
+        expect(json.pluck("id")).to eql [@root_folder.id, @folder.id]
       end
     end
   end
@@ -971,7 +971,7 @@ describe "Folders API", type: :request do
         @user = @teacher
         json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
                         { controller: "folders", action: "list_all_folders", format: "json", course_id: @course.id.to_param })
-        res = json.map { |f| f["name"] }
+        res = json.pluck("name")
         expect(res).to eq ["course files", "folder1", "folder1", "folder1", "folder1", "folder2", "folder2.1", "folder2.1.1", "folderhidden", "folderlocked"]
       end
 
@@ -979,7 +979,7 @@ describe "Folders API", type: :request do
         @user = @student
         json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
                         { controller: "folders", action: "list_all_folders", format: "json", course_id: @course.id.to_param })
-        res = json.map { |f| f["name"] }
+        res = json.pluck("name")
         expect(res).to eq ["course files", "folder1", "folder1", "folder1", "folder1", "folder2", "folder2.1", "folder2.1.1"]
       end
 
@@ -1019,7 +1019,7 @@ describe "Folders API", type: :request do
           folders.push(*api_call(:get, "/api/v1/courses/#{@course.id}/folders",
                                  { controller: "folders", action: "list_all_folders", format: "json", course_id: @course.id.to_param, per_page: 3, page: i + 1 }))
         end
-        res = folders.map { |f| f["full_name"] }
+        res = folders.pluck("full_name")
         expect(res.size).to eq res.uniq.size
       end
     end
@@ -1030,7 +1030,7 @@ describe "Folders API", type: :request do
         make_folders_in_context @group
         json = api_call(:get, "/api/v1/groups/#{@group.id}/folders",
                         { controller: "folders", action: "list_all_folders", format: "json", group_id: @group.id.to_param })
-        res = json.map { |f| f["name"] }
+        res = json.pluck("name")
         expect(res).to eq %w[files folder1 folder2 folder2.1 folder2.1.1 folderhidden folderlocked]
       end
     end
@@ -1041,7 +1041,7 @@ describe "Folders API", type: :request do
         make_folders_in_context @user
         json = api_call(:get, "/api/v1/users/#{@user.id}/folders",
                         { controller: "folders", action: "list_all_folders", format: "json", user_id: @user.id.to_param })
-        res = json.map { |f| f["name"] }
+        res = json.pluck("name")
         expect(res).to eq ["folder1", "folder2", "folder2.1", "folder2.1.1", "folderhidden", "folderlocked", "my files"]
       end
     end

@@ -73,35 +73,35 @@ describe AccountNotification do
   describe "current announcements" do
     it "returns true if time matches end_at" do
       Timecop.freeze do
-        @announcement.update(start_at: Time.zone.now - 1.minute)
+        @announcement.update(start_at: 1.minute.ago)
         @announcement.update(end_at: Time.zone.now)
         expect(@announcement.current).to be true
       end
     end
 
     it "returns true if announcement is current" do
-      @announcement.update(start_at: Time.zone.now - 1.minute)
-      @announcement.update(end_at: Time.zone.now + 1.minute)
+      @announcement.update(start_at: 1.minute.ago)
+      @announcement.update(end_at: 1.minute.from_now)
       expect(@announcement.current).to be true
     end
 
     it "returns false if announcement is past" do
-      @announcement.update(start_at: Time.zone.now - 2.minutes)
-      @announcement.update(end_at: Time.zone.now - 1.minute)
+      @announcement.update(start_at: 2.minutes.ago)
+      @announcement.update(end_at: 1.minute.ago)
       expect(@announcement.current).to be false
     end
   end
 
   describe "past announcements" do
     it "returns true if announcement is past" do
-      @announcement.update(start_at: Time.zone.now - 2.minutes)
-      @announcement.update(end_at: Time.zone.now - 1.minute)
+      @announcement.update(start_at: 2.minutes.ago)
+      @announcement.update(end_at: 1.minute.ago)
       expect(@announcement.past).to be true
     end
 
     it "returns false if announcement is current" do
-      @announcement.update(start_at: Time.zone.now - 1.minute)
-      @announcement.update(end_at: Time.zone.now + 1.minute)
+      @announcement.update(start_at: 1.minute.ago)
+      @announcement.update(end_at: 1.minute.from_now)
       expect(@announcement.past).to be false
     end
   end

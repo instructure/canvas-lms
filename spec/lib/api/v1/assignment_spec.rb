@@ -470,12 +470,12 @@ describe "Api::V1::Assignment" do
 
     it "#turnitin_settings_hash returns a Hash with indifferent access" do
       turnitin_hash = assignment.turnitin_settings_hash(test_params)
-      expect(turnitin_hash).to be_instance_of(HashWithIndifferentAccess)
+      expect(turnitin_hash).to be_instance_of(ActiveSupport::HashWithIndifferentAccess)
     end
 
     it "#vericite_settings_hash returns a Hash with indifferent access" do
       vericite_hash = assignment.vericite_settings_hash(test_params)
-      expect(vericite_hash).to be_instance_of(HashWithIndifferentAccess)
+      expect(vericite_hash).to be_instance_of(ActiveSupport::HashWithIndifferentAccess)
     end
   end
 

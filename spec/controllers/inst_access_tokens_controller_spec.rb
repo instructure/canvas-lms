@@ -35,7 +35,7 @@ describe InstAccessTokensController do
       before { user_session(user) }
 
       let(:deserialized_token) do
-        token = JSON.parse(response.body)["token"]
+        token = response.parsed_body["token"]
         decrypt_and_deserialize_token(token)
       end
 

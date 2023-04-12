@@ -60,7 +60,7 @@ describe UsersController, type: :request do
         json = api_call(:get, "/api/v1/users/self/upcoming_events",
                         controller: "users", action: "upcoming_events",
                         format: "json")
-        expect(json.map { |e| e["title"] }).to eq ["Upcoming Event"]
+        expect(json.pluck("title")).to eq ["Upcoming Event"]
       end
     end
 
@@ -81,7 +81,7 @@ describe UsersController, type: :request do
         json = api_call(:get, "/api/v1/users/self/upcoming_events",
                         controller: "users", action: "upcoming_events",
                         format: "json")
-        expect(json.map { |e| e["title"] }).to eq [
+        expect(json.pluck("title")).to eq [
           "Upcoming Course Event",
           "Upcoming Assignment"
         ]
@@ -92,7 +92,7 @@ describe UsersController, type: :request do
         json = api_call(:get, "/api/v1/users/self/upcoming_events",
                         controller: "users", action: "upcoming_events",
                         format: "json")
-        expect(json.map { |e| e["title"] }).to eq [
+        expect(json.pluck("title")).to eq [
           "Upcoming Course Event",
           "Upcoming Assignment"
         ]

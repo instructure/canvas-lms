@@ -99,7 +99,7 @@ describe CalendarEventsApiController, type: :request do
                       })
       expect(json.size).to be 3
       expect(json.first.keys).to match_array expected_fields
-      expect(json.map { |event| event["title"] }).to eq %w[first second third]
+      expect(json.pluck("title")).to eq %w[first second third]
     end
 
     it "defaults to today's events for the current user if no parameters are specified" do
@@ -185,21 +185,21 @@ describe CalendarEventsApiController, type: :request do
                         context_codes: ["course_#{@course.id}"], all_events: 1, per_page: "10"
                       })
       expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="last"})
-      expect(json.map { |a| a["id"] }).to eql ids[0...10]
+      expect(json.pluck("id")).to eql ids[0...10]
 
       json = api_call(:get, "/api/v1/calendar_events?all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=2", {
                         controller: "calendar_events_api", action: "index", format: "json",
                         context_codes: ["course_#{@course.id}"], all_events: 1, per_page: "10", page: "2"
                       })
       expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="next",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="last"})
-      expect(json.map { |a| a["id"] }).to eql ids[10...20]
+      expect(json.pluck("id")).to eql ids[10...20]
 
       json = api_call(:get, "/api/v1/calendar_events?all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=3", {
                         controller: "calendar_events_api", action: "index", format: "json",
                         context_codes: ["course_#{@course.id}"], all_events: 1, per_page: "10", page: "3"
                       })
       expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events\?.*page=2.*>; rel="prev",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="last"})
-      expect(json.map { |a| a["id"] }).to eql ids[20...25]
+      expect(json.pluck("id")).to eql ids[20...25]
     end
 
     it "ignores invalid end_dates" do
@@ -266,7 +266,7 @@ describe CalendarEventsApiController, type: :request do
                         controller: "calendar_events_api", action: "index", format: "json",
                         appointment_group_ids: ag_id_list, start_date: "2012-01-01", end_date: "2012-01-02", per_page: "25"
                       })
-      expect(json.map { |e| e["appointment_group_id"] }).to match_array(ags.map(&:id))
+      expect(json.pluck("appointment_group_id")).to match_array(ags.map(&:id))
       expect(response.headers["Link"]).to include "appointment_group_ids="
     end
 
@@ -685,7 +685,7 @@ describe CalendarEventsApiController, type: :request do
                                     controller: "calendar_events_api", action: "index", format: "json",
                                     context_codes: [@ag.asset_string], start_date: "2012-01-01", end_date: "2012-01-31"
                                   })
-          expect(json.map { |event| event["available_slots"] }).to eq([0, 0])
+          expect(json.pluck("available_slots")).to eq([0, 0])
         end
       end
 
@@ -1537,7 +1537,7 @@ describe CalendarEventsApiController, type: :request do
 
         it "updates all events in the series" do
           orig_events = [@event_series.except("duplicates")]
-          orig_events += @event_series["duplicates"].map { |e| e["calendar_event"] }
+          orig_events += @event_series["duplicates"].pluck("calendar_event")
           target_event = @event_series["duplicates"][0]["calendar_event"]
           target_event_id = target_event["id"]
           new_title = "a new title"
@@ -1558,7 +1558,7 @@ describe CalendarEventsApiController, type: :request do
 
         it "updates an event and all following" do
           orig_events = [@event_series.except("duplicates")]
-          orig_events += @event_series["duplicates"].map { |e| e["calendar_event"] }
+          orig_events += @event_series["duplicates"].pluck("calendar_event")
           target_event = @event_series["duplicates"][0]["calendar_event"]
           target_event_id = target_event["id"]
           series_uuid = target_event["series_uuid"]
@@ -1606,7 +1606,7 @@ describe CalendarEventsApiController, type: :request do
 
         it "extends the series when updating the rrule" do
           orig_events = [@event_series.except("duplicates")]
-          orig_events += @event_series["duplicates"].map { |e| e["calendar_event"] }
+          orig_events += @event_series["duplicates"].pluck("calendar_event")
           target_event = @event_series["duplicates"][0]["calendar_event"]
           target_event_id = target_event["id"]
           rrule = "FREQ=WEEKLY;INTERVAL=1;COUNT=4"
@@ -1636,7 +1636,7 @@ describe CalendarEventsApiController, type: :request do
 
         it "truncates the series when updating the rrule" do
           orig_events = [@event_series.except("duplicates")]
-          orig_events += @event_series["duplicates"].map { |e| e["calendar_event"] }
+          orig_events += @event_series["duplicates"].pluck("calendar_event")
           target_event = orig_events[0]
           target_event_id = target_event["id"]
           rrule = "FREQ=WEEKLY;INTERVAL=1;COUNT=2"
@@ -1871,7 +1871,7 @@ describe CalendarEventsApiController, type: :request do
         it "includes children of hidden events for teachers" do
           json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events/#{event.id}",
                                   { controller: "calendar_events_api", action: "show", id: event.to_param, format: "json" })
-          expect(json["child_events"].map { |e| e["id"] }).to match_array(event.child_events.map(&:id))
+          expect(json["child_events"].pluck("id")).to match_array(event.child_events.map(&:id))
         end
 
         it "omits children of hidden events for students" do
@@ -2141,7 +2141,7 @@ describe CalendarEventsApiController, type: :request do
                       })
       expect(json.size).to be 3
       expect(json.first.keys).to match_array expected_fields
-      expect(json.map { |event| event["title"] }).to eq %w[1 2 3]
+      expect(json.pluck("title")).to eq %w[1 2 3]
     end
 
     it "does not return the description if the assignment is locked" do
@@ -2167,21 +2167,21 @@ describe CalendarEventsApiController, type: :request do
                         context_codes: ["course_#{@course.id}"], all_events: 1, per_page: "10"
                       })
       expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
-      expect(json.map { |a| a["id"] }).to eql(ids[0...10].map { |id| "assignment_#{id}" })
+      expect(json.pluck("id")).to eql(ids[0...10].map { |id| "assignment_#{id}" })
 
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=2", {
                         controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
                         context_codes: ["course_#{@course.id}"], all_events: 1, per_page: "10", page: "2"
                       })
       expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="prev",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
-      expect(json.map { |a| a["id"] }).to eql(ids[10...20].map { |id| "assignment_#{id}" })
+      expect(json.pluck("id")).to eql(ids[10...20].map { |id| "assignment_#{id}" })
 
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=3", {
                         controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
                         context_codes: ["course_#{@course.id}"], all_events: 1, per_page: "10", page: "3"
                       })
       expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="prev",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
-      expect(json.map { |a| a["id"] }).to eql(ids[20...25].map { |id| "assignment_#{id}" })
+      expect(json.pluck("id")).to eql(ids[20...25].map { |id| "assignment_#{id}" })
     end
 
     it "ignores invalid end_dates" do
@@ -2301,7 +2301,7 @@ describe CalendarEventsApiController, type: :request do
                                   controller: "calendar_events_api", action: "index", format: "json",
                                   type: "assignment", all_events: "1", context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"])
 
-          expect(json.map { |a| a["title"] }).to match_array [
+          expect(json.pluck("title")).to match_array [
             "published assignment 1",
             "published assignment 2",
             "unpublished assignment 1",
@@ -2325,7 +2325,7 @@ describe CalendarEventsApiController, type: :request do
                                   controller: "calendar_events_api", action: "index", format: "json",
                                   type: "assignment", all_events: "1", context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"])
 
-          expect(json.map { |a| a["title"] }).to match_array [
+          expect(json.pluck("title")).to match_array [
             "published assignment 1",
             "published assignment 2",
             "unpublished assignment 1",
@@ -2346,7 +2346,7 @@ describe CalendarEventsApiController, type: :request do
                                   controller: "calendar_events_api", action: "index", format: "json",
                                   type: "assignment", all_events: "1", context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"])
 
-          expect(json.map { |a| a["title"] }).to match_array [
+          expect(json.pluck("title")).to match_array [
             "published assignment 1",
             "published assignment 2",
           ]
@@ -3193,7 +3193,7 @@ describe CalendarEventsApiController, type: :request do
                         controller: "calendar_events_api", action: "index", format: "json",
                         context_codes: [@c0.asset_string, @c1.global_asset_string], all_events: 1, important_dates: 1)
         expect(json.size).to eq 2
-        expect(json.map { |e| e["id"] }).to match_array([@e0.id, @e1.id])
+        expect(json.pluck("id")).to match_array([@e0.id, @e1.id])
       end
     end
 

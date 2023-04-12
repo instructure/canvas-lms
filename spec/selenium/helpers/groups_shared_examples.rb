@@ -33,7 +33,7 @@ shared_examples "home_page" do |context|
   it "displays a coming up section with relevant events", priority: pick_priority(context, student: "1", teacher: "2") do
     # Create an event to have something in the Coming up Section
     event = @testgroup[0].calendar_events.create!(title: "ohai",
-                                                  start_at: Time.zone.now + 1.day)
+                                                  start_at: 1.day.from_now)
     get url
 
     expect(".coming_up").to be_present

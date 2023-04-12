@@ -30,7 +30,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         course = Pact::Canvas.base_state.course
         course.assignments.create({
                                     name: "Assignment 1",
-                                    due_at: Time.zone.now + 1.day,
+                                    due_at: 1.day.from_now,
                                     submission_types: "online_text_entry"
                                   })
       end
@@ -66,7 +66,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         student = Pact::Canvas.base_state.students.first
         assignment = course.assignments.create({
                                                  name: "Assignment Override",
-                                                 due_at: Time.zone.now + 1.day,
+                                                 due_at: 1.day.from_now,
                                                  submission_types: "online_text_entry"
                                                })
 

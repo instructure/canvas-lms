@@ -64,9 +64,9 @@ describe AssignmentsApiController, type: :request do
     override.title = "I am overridden and being returned in the API!"
     override.set = @section
     override.set_type = "CourseSection"
-    override.due_at = Time.zone.now + 2.days
-    override.unlock_at = Time.zone.now + 1.day
-    override.lock_at = Time.zone.now + 3.days
+    override.due_at = 2.days.from_now
+    override.unlock_at = 1.day.from_now
+    override.lock_at = 3.days.from_now
     override.due_at_overridden = true
     override.lock_at_overridden = true
     override.unlock_at_overridden = true
@@ -147,7 +147,7 @@ describe AssignmentsApiController, type: :request do
                           per_page: "2",
                           page: page.to_s
                         })
-        assignment_ids.concat(json.map { |a| a["id"] })
+        assignment_ids.concat(json.pluck("id"))
         break if json.length == 1
 
         page += 1
@@ -194,7 +194,7 @@ describe AssignmentsApiController, type: :request do
         # the API returns the assignments sorted by
         # [assignment_groups.position, assignments.position]
         json = api_get_assignments_index_from_course(@course)
-        order = json.map { |a| a["name"] }
+        order = json.pluck("name")
         expect(order).to eq %w[assignment2
                                assignment1
                                assignment6
@@ -208,14 +208,14 @@ describe AssignmentsApiController, type: :request do
       it "only returns post_to_sis assignments" do
         Assignment.where(assignment_group_id: [@group1, @group2]).update_all(post_to_sis: true)
         json = api_get_assignments_index_from_course(@course, post_to_sis: true)
-        post_to_sis = json.map { |a| a["name"] }
+        post_to_sis = json.pluck("name")
         expect(post_to_sis).to eq %w[assignment2 assignment1 assignment6 assignment3 assignment5]
       end
 
       it "only returns assignments that do not have post_to_sis" do
         Assignment.where(assignment_group_id: [@group1, @group2]).update_all(post_to_sis: true)
         json = api_get_assignments_index_from_course(@course, post_to_sis: false)
-        post_to_sis = json.map { |a| a["name"] }
+        post_to_sis = json.pluck("name")
         expect(post_to_sis).to eq %w[assignment8 assignment7 assignment4]
       end
 
@@ -238,7 +238,7 @@ describe AssignmentsApiController, type: :request do
         # the API returns the assignments sorted by
         # [assignment_groups.position, assignments.position]
         json = api_get_assignments_index_from_course(@course, order_by: "name")
-        order = json.map { |a| a["name"] }
+        order = json.pluck("name")
         expect(order).to eq %w[assignment1
                                assignment2
                                assignment3
@@ -301,7 +301,7 @@ describe AssignmentsApiController, type: :request do
 
             json = api_get_assignments_index_from_course(@cs_course, order_by: "due_at")
 
-            expect(json.map { |a| a["name"] }).to eq %w[assignment1]
+            expect(json.pluck("name")).to eq %w[assignment1]
           end
 
           it "returns assignments in the contexts' shard as a student" do
@@ -311,7 +311,7 @@ describe AssignmentsApiController, type: :request do
 
             json = api_get_assignments_index_from_course(@cs_course, order_by: "due_at")
 
-            expect(json.map { |a| a["name"] }).to eq %w[assignment1]
+            expect(json.pluck("name")).to eq %w[assignment1]
           end
 
           it "returns user assignments in the contexts' shard as a teacher" do
@@ -321,7 +321,7 @@ describe AssignmentsApiController, type: :request do
 
             json = api_get_assignments_user_index(@user, @cs_course, @user, order_by: "due_at")
 
-            expect(json.map { |a| a["name"] }).to eq %w[assignment1]
+            expect(json.pluck("name")).to eq %w[assignment1]
           end
 
           it "returns user assignments in the contexts' shard as a student" do
@@ -331,27 +331,27 @@ describe AssignmentsApiController, type: :request do
 
             json = api_get_assignments_user_index(@user, @cs_course, @user, order_by: "due_at")
 
-            expect(json.map { |a| a["name"] }).to eq %w[assignment1]
+            expect(json.pluck("name")).to eq %w[assignment1]
           end
         end
 
         it "sorts the returned list of assignments by latest due date for teachers (nulls last)" do
           json = api_get_assignments_user_index(@teacher, @course, @teacher, order_by: "due_at")
           order = %w[assignment1 assignment7 assignment2 assignment5 assignment4 assignment3 assignment6 assignment8]
-          expect(json.map { |a| a["name"] }).to eq order
-          expect(json.sort_by { |a| [a["due_at"] || CanvasSort::Last, a["name"]] }.map { |a| a["name"] }).to eq order
+          expect(json.pluck("name")).to eq order
+          expect(json.sort_by { |a| [a["due_at"] || CanvasSort::Last, a["name"]] }.pluck("name")).to eq order
         end
 
         it "sorts the returned list of assignments by overridden due date for students (nulls last)" do
           json = api_get_assignments_user_index(@student1, @course, @teacher, order_by: "due_at")
           order = %w[assignment1 assignment7 assignment2 assignment3 assignment5 assignment4 assignment6 assignment8]
-          expect(json.map { |a| a["name"] }).to eq order
-          expect(json.sort_by { |a| [a["due_at"] || CanvasSort::Last, a["name"]] }.map { |a| a["name"] }).to eq order
+          expect(json.pluck("name")).to eq order
+          expect(json.sort_by { |a| [a["due_at"] || CanvasSort::Last, a["name"]] }.pluck("name")).to eq order
 
           json = api_get_assignments_user_index(@student2, @course, @teacher, order_by: "due_at")
           order = %w[assignment3 assignment1 assignment4 assignment7 assignment2 assignment5 assignment6 assignment8]
-          expect(json.map { |a| a["name"] }).to eq order
-          expect(json.sort_by { |a| [a["due_at"] || CanvasSort::Last, a["name"]] }.map { |a| a["name"] }).to eq order
+          expect(json.pluck("name")).to eq order
+          expect(json.sort_by { |a| [a["due_at"] || CanvasSort::Last, a["name"]] }.pluck("name")).to eq order
         end
       end
 
@@ -365,7 +365,7 @@ describe AssignmentsApiController, type: :request do
                           course_id: @course.to_param,
                           assignment_group_id: @group2.to_param
                         })
-        expect(json.map { |a| a["name"] }).to match_array(%w[assignment1 assignment2 assignment6])
+        expect(json.pluck("name")).to match_array(%w[assignment1 assignment2 assignment6])
       end
     end
 
@@ -383,7 +383,7 @@ describe AssignmentsApiController, type: :request do
                         course_id: @course.id.to_s,
                         search_term: "fir"
                       })
-      expect(json.map { |h| h["id"] }.sort).to eq ids.sort
+      expect(json.pluck("id").sort).to eq ids.sort
     end
 
     it "allows filtering based on assignment_ids[] parameter" do
@@ -403,7 +403,7 @@ describe AssignmentsApiController, type: :request do
                       })
 
       expect(json.length).to eq 3
-      expect(json.map { |h| h["id"] }.map(&:to_s).sort).to eq some_ids.sort
+      expect(json.pluck("id").map(&:to_s).sort).to eq some_ids.sort
     end
 
     it "fails if given an assignment_id that does not exist" do
@@ -651,7 +651,7 @@ describe AssignmentsApiController, type: :request do
 
       def assert_call_gets_assignments(bucket, assignments)
         assignments_json = assignment_index_bucketed_api_call(bucket)
-        expect(assignments_json.map { |a| a["id"] }.sort).to eq assignments.map(&:id).sort
+        expect(assignments_json.pluck("id").sort).to eq assignments.map(&:id).sort
         if assignments_json.any?
           expect(assignments_json.first["bucket"]).to eq bucket
         end
@@ -1391,9 +1391,9 @@ describe AssignmentsApiController, type: :request do
       @assignment = @course.assignments.create!(
         title: "Test Assignment",
         description: "public stuff",
-        due_at: Time.zone.now + 1.day,
+        due_at: 1.day.from_now,
         unlock_at: Time.zone.now,
-        lock_at: Time.zone.now + 2.days
+        lock_at: 2.days.from_now
       )
       @section = @course.course_sections.create! name: "afternoon delight"
       @course.enroll_user(@student, "StudentEnrollment",
@@ -1528,7 +1528,7 @@ describe AssignmentsApiController, type: :request do
       assignment = @course.assignments.create(
         title: "some assignment",
         assignment_group: @group,
-        due_at: Time.zone.now + 1.week
+        due_at: 1.week.from_now
       )
       api_call_as_user(@student, :post,
                        "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
@@ -1546,7 +1546,7 @@ describe AssignmentsApiController, type: :request do
       assignment = @course.assignments.create(
         title: "some assignment",
         assignment_group: @group,
-        due_at: Time.zone.now + 1.week
+        due_at: 1.week.from_now
       )
       assignment.save!
       assignment.insert_at(1)
@@ -1737,7 +1737,7 @@ describe AssignmentsApiController, type: :request do
         @course.assignments.create!(
           title: "some assignment",
           assignment_group: @group,
-          due_at: Time.zone.now + 1.week
+          due_at: 1.week.from_now
         )
       end
 
@@ -1771,7 +1771,7 @@ describe AssignmentsApiController, type: :request do
         @course.assignments.create!(
           title: "some assignment",
           assignment_group: @group,
-          due_at: Time.zone.now + 1.week
+          due_at: 1.week.from_now
         )
       end
 
@@ -1807,7 +1807,7 @@ describe AssignmentsApiController, type: :request do
         @course.assignments.create(
           title: "some assignment",
           assignment_group: @group,
-          due_at: Time.zone.now + 1.week,
+          due_at: 1.week.from_now,
           submission_types: "external_tool"
         )
       end
@@ -4311,7 +4311,7 @@ describe AssignmentsApiController, type: :request do
         it "works when :assignment_overrides key is nil" do
           student_in_course(course: @course, active_all: true)
           @assignment = @course.assignments.create!
-          Assignment.where(id: @assignment).update_all(created_at: Time.zone.now - 1.day)
+          Assignment.where(id: @assignment).update_all(created_at: 1.day.ago)
           @section_due_at = 7.days.from_now
           @params = {
             "name" => "Assignment With Overrides",
@@ -4398,7 +4398,7 @@ describe AssignmentsApiController, type: :request do
                                                              frequency: "immediately")
         @assignment = @course.assignments.create!
         @assignment.unmute!
-        Assignment.where(id: @assignment).update_all(created_at: Time.zone.now - 1.day)
+        Assignment.where(id: @assignment).update_all(created_at: 1.day.ago)
         @adhoc_due_at = 5.days.from_now
         @section_due_at = 7.days.from_now
         @params = {
@@ -5510,9 +5510,9 @@ describe AssignmentsApiController, type: :request do
         @assignment = @course.assignments.create!(
           title: "Test Assignment",
           description: "public stuff",
-          due_at: Time.zone.now + 1.day,
+          due_at: 1.day.from_now,
           unlock_at: Time.zone.now,
-          lock_at: Time.zone.now + 2.days
+          lock_at: 2.days.from_now
         )
         @section = @course.course_sections.create! name: "afternoon delight"
         @course.enroll_user(@student, "StudentEnrollment",
@@ -6861,13 +6861,13 @@ describe AssignmentsApiController, type: :request do
         json = api_get_assignments_index_from_course(@course, include: %w[all_dates can_edit])
         a0_json = json.detect { |a| a["id"] == @a0.id }
         expect(a0_json["can_edit"]).to be true
-        expect(a0_json["all_dates"].map { |d| d["can_edit"] }).to eq [true]
-        expect(a0_json["all_dates"].map { |d| d["in_closed_grading_period"] }).to eq [false]
+        expect(a0_json["all_dates"].pluck("can_edit")).to eq [true]
+        expect(a0_json["all_dates"].pluck("in_closed_grading_period")).to eq [false]
 
         a1_json = json.detect { |a| a["id"] == @a1.id }
         expect(a1_json["can_edit"]).to be true
-        expect(a1_json["all_dates"].map { |d| d["can_edit"] }).to eq [false]
-        expect(a1_json["all_dates"].map { |d| d["in_closed_grading_period"] }).to eq [true]
+        expect(a1_json["all_dates"].pluck("can_edit")).to eq [false]
+        expect(a1_json["all_dates"].pluck("in_closed_grading_period")).to eq [true]
 
         a2_json = json.detect { |a| a["id"] == @a2.id }
         expect(a2_json["can_edit"]).to be true
@@ -6886,13 +6886,13 @@ describe AssignmentsApiController, type: :request do
         json = api_get_assignments_index_from_course(@course, include: %w[all_dates can_edit])
         a0_json = json.detect { |a| a["id"] == @a0.id }
         expect(a0_json["can_edit"]).to be true
-        expect(a0_json["all_dates"].map { |d| d["can_edit"] }).to eq [true]
-        expect(a0_json["all_dates"].map { |d| d["in_closed_grading_period"] }).to eq [false]
+        expect(a0_json["all_dates"].pluck("can_edit")).to eq [true]
+        expect(a0_json["all_dates"].pluck("in_closed_grading_period")).to eq [false]
 
         a1_json = json.detect { |a| a["id"] == @a1.id }
         expect(a1_json["can_edit"]).to be true
-        expect(a1_json["all_dates"].map { |d| d["can_edit"] }).to eq [true]
-        expect(a1_json["all_dates"].map { |d| d["in_closed_grading_period"] }).to eq [true]
+        expect(a1_json["all_dates"].pluck("can_edit")).to eq [true]
+        expect(a1_json["all_dates"].pluck("in_closed_grading_period")).to eq [true]
 
         a2_json = json.detect { |a| a["id"] == @a2.id }
         expect(a2_json["can_edit"]).to be true
@@ -6928,11 +6928,11 @@ describe AssignmentsApiController, type: :request do
 
         a0_json = json.detect { |a| a["id"] == @a0.id }
         expect(a0_json["can_edit"]).to be false
-        expect(a0_json["all_dates"].map { |d| d["can_edit"] }).to eq [false]
+        expect(a0_json["all_dates"].pluck("can_edit")).to eq [false]
 
         a1_json = json.detect { |a| a["id"] == @a1.id }
         expect(a1_json["can_edit"]).to be true
-        expect(a1_json["all_dates"].map { |d| d["can_edit"] }).to eq [true]
+        expect(a1_json["all_dates"].pluck("can_edit")).to eq [true]
       end
     end
   end

@@ -83,7 +83,7 @@ RSpec.describe "Api::V1::Outcome" do
             LearningOutcome.find(outcome["id"]).updateable_rubrics?
           )
           expect(outcome["ratings"].length).to eq 3
-          expect(outcome["ratings"].map { |r| r["percent"] }).to eq [30, 40, 30]
+          expect(outcome["ratings"].pluck("percent")).to eq [30, 40, 30]
         end
       end
 

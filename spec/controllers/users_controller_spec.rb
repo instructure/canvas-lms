@@ -269,7 +269,7 @@ describe UsersController do
       expect(response).to be_successful
 
       courses = json_parse
-      expect(courses.map { |c| c["id"] }).to eq [course2.id]
+      expect(courses.pluck("id")).to eq [course2.id]
     end
 
     it "does not include future teacher term courses in manageable courses" do
@@ -296,7 +296,7 @@ describe UsersController do
       expect(response).to be_successful
 
       courses = json_parse
-      expect(courses.map { |c| c["label"] }).to eq %w[a B c d]
+      expect(courses.pluck("label")).to eq %w[a B c d]
     end
 
     it "sorts the results of manageable_courses by term with default term first then alphabetically" do
@@ -317,7 +317,7 @@ describe UsersController do
       expect(response).to be_successful
 
       courses = json_parse
-      expect(courses.map { |c| c["label"] }).to eq %w[E c d a b]
+      expect(courses.pluck("label")).to eq %w[E c d a b]
     end
 
     it "does not include courses for which the user doesnt have the appropriate rights" do
@@ -330,11 +330,11 @@ describe UsersController do
 
       get "manageable_courses", params: { user_id: @admin.id }
       expect(response).to be_successful
-      expect(json_parse.map { |c| c["label"] }).to eq %w[A B]
+      expect(json_parse.pluck("label")).to eq %w[A B]
 
       get "manageable_courses", params: { user_id: @admin.id, enforce_manage_grant_requirement: true }
       expect(response).to be_successful
-      expect(json_parse.map { |c| c["label"] }).to eq %w[A]
+      expect(json_parse.pluck("label")).to eq %w[A]
     end
 
     it "includes blueprint" do
@@ -360,7 +360,7 @@ describe UsersController do
         get "manageable_courses", params: { user_id: @teacher.id, term: @course.id }
         expect(response).to be_successful
         courses = json_parse
-        expect(courses.map { |c| c["id"] }).to eq [@course.id]
+        expect(courses.pluck("id")).to eq [@course.id]
       end
 
       it "matches query to course code" do
@@ -371,7 +371,7 @@ describe UsersController do
         get "manageable_courses", params: { user_id: @teacher.id, term: course_code }
         expect(response).to be_successful
         courses = json_parse
-        expect(courses.map { |c| c["course_code"] }).to eq [course_code]
+        expect(courses.pluck("course_code")).to eq [course_code]
       end
     end
 
@@ -394,7 +394,7 @@ describe UsersController do
         get "manageable_courses", params: { user_id: @teacher.id, term: "MyCourse" }
         expect(response).to be_successful
         courses = json_parse
-        expect(courses.map { |c| c["id"] }).to eq [@course.id]
+        expect(courses.pluck("id")).to eq [@course.id]
       end
 
       it "does not include soft or hard concluded courses for admins" do
@@ -404,7 +404,7 @@ describe UsersController do
         get "manageable_courses", params: { user_id: @admin.id, term: "MyCourse" }
         expect(response).to be_successful
         courses = json_parse
-        expect(courses.map { |c| c["id"] }).to eq [@course.id]
+        expect(courses.pluck("id")).to eq [@course.id]
       end
 
       it "includes concluded courses for teachers when passing include = 'concluded'" do
@@ -412,7 +412,7 @@ describe UsersController do
         expect(response).to be_successful
         courses = json_parse
 
-        expect(courses.map { |c| c["course_code"] }.sort).to eq %w[MyCourse1 MyCourse2 MyCourse3 MyOldCourse].sort
+        expect(courses.pluck("course_code").sort).to eq %w[MyCourse1 MyCourse2 MyCourse3 MyOldCourse].sort
       end
 
       it "includes concluded courses for admins when passing include = 'concluded'" do
@@ -423,7 +423,7 @@ describe UsersController do
         expect(response).to be_successful
         courses = json_parse
 
-        expect(courses.map { |c| c["course_code"] }.sort).to eq %w[MyCourse1 MyCourse2 MyCourse3 MyOldCourse].sort
+        expect(courses.pluck("course_code").sort).to eq %w[MyCourse1 MyCourse2 MyCourse3 MyOldCourse].sort
       end
 
       it "includes courses with overridden dates as not concluded for teachers if the course period is active" do
@@ -436,7 +436,7 @@ describe UsersController do
         get "manageable_courses", params: { user_id: @teacher.id }
         expect(response).to be_successful
         courses = json_parse
-        expect(courses.map { |c| c["course_code"] }).to include("MyOldCourse")
+        expect(courses.pluck("course_code")).to include("MyOldCourse")
       end
 
       it "includes courses with overridden dates as not concluded for admins if the course period is active" do
@@ -452,7 +452,7 @@ describe UsersController do
         get "manageable_courses", params: { user_id: @admin.id }
         expect(response).to be_successful
         courses = json_parse
-        expect(courses.map { |c| c["course_code"] }).to include("MyOldCourse")
+        expect(courses.pluck("course_code")).to include("MyOldCourse")
       end
     end
 
@@ -469,7 +469,7 @@ describe UsersController do
 
         get "manageable_courses", params: { user_id: @teacher.id }
         # should sort the cross-shard course before the current shard one
-        expect(json_parse.map { |c| c["label"] }).to eq [@cs_course.name, @course.name]
+        expect(json_parse.pluck("label")).to eq [@cs_course.name, @course.name]
       end
     end
   end
@@ -645,7 +645,7 @@ describe UsersController do
 
       it "marks user as having accepted the terms of use if specified" do
         post "create", params: { pseudonym: { unique_id: "jacob@instructure.com" }, user: { name: "Jacob Fugal", terms_of_use: "1" } }
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         accepted_terms = json["user"]["user"]["preferences"]["accepted_terms"]
         expect(response).to be_successful
         expect(accepted_terms).to be_present
@@ -702,7 +702,7 @@ describe UsersController do
         p = u.pseudonyms.create!(unique_id: "jacob@instructure.com")
         post "create", params: { pseudonym: { unique_id: "jacob@instructure.com" }, user: { name: "Jacob Fugal", terms_of_use: "1" } }
         assert_status(400)
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["errors"]["pseudonym"]["unique_id"]).to be_present
         expect(Pseudonym.by_unique_id("jacob@instructure.com")).to eq [p]
       end
@@ -749,7 +749,7 @@ describe UsersController do
         Account.default.create_terms_of_service!(terms_type: "default", passive: false)
         post "create", params: { pseudonym: { unique_id: "jacob@instructure.com" }, user: { name: "Jacob Fugal" } }
         assert_status(400)
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["errors"]["user"]["terms_of_use"]).to be_present
       end
 
@@ -771,21 +771,21 @@ describe UsersController do
       it "requires email pseudonyms by default" do
         post "create", params: { pseudonym: { unique_id: "jacob" }, user: { name: "Jacob Fugal", terms_of_use: "1" } }
         assert_status(400)
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["errors"]["pseudonym"]["unique_id"]).to be_present
       end
 
       it "requires email pseudonyms if not self enrolling" do
         post "create", params: { pseudonym: { unique_id: "jacob" }, user: { name: "Jacob Fugal", terms_of_use: "1" }, pseudonym_type: "username" }
         assert_status(400)
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["errors"]["pseudonym"]["unique_id"]).to be_present
       end
 
       it "validates the self enrollment code" do
         post "create", params: { pseudonym: { unique_id: "jacob@instructure.com", password: "asdfasdf", password_confirmation: "asdfasdf" }, user: { name: "Jacob Fugal", terms_of_use: "1", self_enrollment_code: "omg ... not valid", initial_enrollment_type: "student" }, self_enrollment: "1" }
         assert_status(400)
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["errors"]["user"]["self_enrollment_code"]).to be_present
       end
 
@@ -829,7 +829,7 @@ describe UsersController do
         it "requires a password if self enrolling with a non-email pseudonym" do
           post "create", params: { pseudonym: { unique_id: "jacob" }, user: { name: "Jacob Fugal", terms_of_use: "1", self_enrollment_code: @course.self_enrollment_code, initial_enrollment_type: "student" }, pseudonym_type: "username", self_enrollment: "1" }
           assert_status(400)
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json["errors"]["pseudonym"]["password"]).to be_present
           expect(json["errors"]["pseudonym"]["password_confirmation"]).to be_present
         end
@@ -947,7 +947,7 @@ describe UsersController do
         it "strips whitespace from the unique_id" do
           post "create", params: { account_id: account.id, pseudonym: { unique_id: "spaceman@example.com " }, user: { name: "Spaceman" } }, format: "json"
           expect(response).to be_successful
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           p = Pseudonym.find(json["pseudonym"]["pseudonym"]["id"])
           expect(p.unique_id).to eq "spaceman@example.com"
           expect(p.user.email).to eq "spaceman@example.com"
@@ -1132,7 +1132,7 @@ describe UsersController do
         it "returns okay" do
           get_grades!(all_grading_periods_id)
           expect(response).to be_ok
-          expect(restrict_quantitative_data).to eq false
+          expect(restrict_quantitative_data).to be false
           expect(grading_scheme).to eq course.grading_standard_or_default.data
         end
 
@@ -1149,7 +1149,7 @@ describe UsersController do
           Account.default.reload
 
           get_grades!(all_grading_periods_id)
-          expect(restrict_quantitative_data).to eq true
+          expect(restrict_quantitative_data).to be true
           expect(grading_scheme).to eq course.grading_standard_or_default.data
         end
 
@@ -1242,7 +1242,7 @@ describe UsersController do
       it "shows restrict_quantitative_data as falsey by default" do
         user_session(teacher)
         get_grades!(grading_period.id)
-        expect(restrict_quantitative_data).to eq false
+        expect(restrict_quantitative_data).to be false
         expect(grading_scheme).to eq course.grading_standard_or_default.data
       end
 
@@ -1259,7 +1259,7 @@ describe UsersController do
         Account.default.reload
         user_session(teacher)
         get_grades!(grading_period.id)
-        expect(restrict_quantitative_data).to eq true
+        expect(restrict_quantitative_data).to be true
         expect(grading_scheme).to eq course.grading_standard_or_default.data
       end
     end
@@ -1359,7 +1359,7 @@ describe UsersController do
 
         it "shows restrict_quantitative_data as falsey by default" do
           get_grades!(grading_period.id)
-          expect(restrict_quantitative_data).to eq false
+          expect(restrict_quantitative_data).to be false
           expect(grading_scheme).to eq course.grading_standard_or_default.data
         end
 
@@ -1375,7 +1375,7 @@ describe UsersController do
           Account.default.role_overrides.create!(role: observer_role, enabled: false, permission: "restrict_quantitative_data")
           Account.default.reload
           get_grades!(grading_period.id)
-          expect(restrict_quantitative_data).to eq true
+          expect(restrict_quantitative_data).to be true
           expect(grading_scheme).to eq course.grading_standard_or_default.data
         end
 
@@ -2495,7 +2495,7 @@ describe UsersController do
 
       expect(@user.reload.preferences[:hide_dashcard_color_overlays]).to be_truthy
       expect(response).to be_successful
-      expect(JSON.parse(response.body)).to be_empty
+      expect(response.parsed_body).to be_empty
     end
   end
 
@@ -2563,14 +2563,14 @@ describe UsersController do
 
       post "invite_users", params: { course_id: @course.id, users: user_list }
       expect(response).to be_successful
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["invited_users"].count).to eq 2
 
       new_user1 = User.where(name: "example1@example.com").first
       new_user2 = User.where(name: "Hurp Durp").first
       expect([new_user1, new_user2].map(&:root_account_ids)).to match_array([[@course.root_account_id], [@course.root_account_id]])
-      expect(json["invited_users"].map { |u| u["id"] }).to match_array([new_user1.id, new_user2.id])
-      expect(json["invited_users"].map { |u| u["user_token"] }).to match_array([new_user1.token, new_user2.token])
+      expect(json["invited_users"].pluck("id")).to match_array([new_user1.id, new_user2.id])
+      expect(json["invited_users"].pluck("user_token")).to match_array([new_user1.token, new_user2.token])
     end
 
     it "checks for pre-existing users" do
@@ -2584,7 +2584,7 @@ describe UsersController do
       post "invite_users", params: { course_id: @course.id, users: user_list }
       expect(response).to be_successful
 
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["invited_users"]).to be_empty
       expect(json["errored_users"].count).to eq 1
       expect(json["errored_users"].first["existing_users"].first["user_id"]).to eq existing_user.id
@@ -2605,7 +2605,7 @@ describe UsersController do
       post "invite_users", params: { course_id: @course.id, users: user_list }
       expect(response).to be_successful
 
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["invited_users"]).to be_empty
       expect(json["errored_users"].count).to eq 1
       expect(json["errored_users"].first["errors"].first["message"]).to include(unconfirmed_email_message)
@@ -2975,7 +2975,7 @@ describe UsersController do
       user_session(@user)
       get "pandata_events_token"
       assert_status(400)
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["message"]).to eq "Access token required"
     end
   end

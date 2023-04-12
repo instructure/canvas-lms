@@ -74,7 +74,7 @@ class AuthenticationProvider::Facebook < AuthenticationProvider::OAuth2
   def me(token)
     # abusing AccessToken#options as a useful place to cache this response
     token.options[:me] ||= begin
-      attributes = ([login_attribute] + federated_attributes.values.map { |v| v["attribute"] }).uniq
+      attributes = ([login_attribute] + federated_attributes.values.pluck("attribute")).uniq
       token.get("me?fields=#{attributes.join(",")}").parsed
     end
   end

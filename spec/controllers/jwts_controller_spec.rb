@@ -224,7 +224,7 @@ describe JwtsController do
           .with("testjwt", "testhost", other_user, real_user: real_user, symmetric: true)
           .and_return("refreshedjwt")
         post "refresh", params: { jwt: "testjwt", as_user_id: other_user.id }, format: "json"
-        token = JSON.parse(response.body)["token"]
+        token = response.parsed_body["token"]
         expect(token).to eq("refreshedjwt")
       end
 
@@ -236,7 +236,7 @@ describe JwtsController do
           symmetric: true
         )
         post "refresh", params: { jwt: original_jwt }
-        refreshed_jwt = JSON.parse(response.body)["token"]
+        refreshed_jwt = response.parsed_body["token"]
         expect(refreshed_jwt).to_not eq(original_jwt)
       end
 

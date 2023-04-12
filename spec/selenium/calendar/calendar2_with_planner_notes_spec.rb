@@ -255,7 +255,7 @@ describe "calendar2" do
       f(".fc-week td").click # click the first day of the month
       wait_for_ajax_requests
       f('li[aria-controls="edit_planner_note_form_holder"]').click # the My To Do tab
-      context_codes = ff("#planner_note_context option").map { |el| el["value"] }
+      context_codes = ff("#planner_note_context option").pluck("value")
       expect(context_codes).to match_array([@user.asset_string, @course2.asset_string])
     end
   end

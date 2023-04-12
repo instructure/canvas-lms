@@ -39,7 +39,7 @@ describe CommMessagesApiController, type: :request do
           expect(json.size).to be 2
           expect(EmailAddressValidator.valid?(json.first["from"])).to be_truthy
           expect(json.first["from_name"]).to eq "Instructure Canvas"
-          expect(json.map { |m| m["body"] }.sort).to eql ["account message", "site admin message"]
+          expect(json.pluck("body").sort).to eql ["account message", "site admin message"]
         end
 
         it "requires a valid user_id parameter" do
@@ -57,12 +57,12 @@ describe CommMessagesApiController, type: :request do
 
         it "uses start_time and end_time parameters to limit results" do
           m = Message.new(user: @test_user, body: "account message", root_account_id: Account.default.id)
-          m.write_attribute(:created_at, Time.zone.now + 1.day)
+          m.write_attribute(:created_at, 1.day.from_now)
           m.save!
           m2 = Message.create!(user: @test_user, body: "account message", root_account_id: Account.default.id)
 
-          start_time = (Time.zone.now - 1.hour).iso8601
-          end_time = (Time.zone.now + 1.hour).iso8601
+          start_time = 1.hour.ago.iso8601
+          end_time = 1.hour.from_now.iso8601
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}&start_time=#{start_time}&end_time=#{end_time}", {
                             controller: "comm_messages_api", action: "index", format: "json",
                             user_id: @test_user.to_param, start_time: start_time, end_time: end_time
@@ -140,7 +140,7 @@ describe CommMessagesApiController, type: :request do
                             user_id: @test_user.to_param
                           })
           expect(json.size).to be 1
-          expect(json.map { |m| m["body"] }.sort).to eql ["account message"]
+          expect(json.pluck("body").sort).to eql ["account message"]
         end
       end
 

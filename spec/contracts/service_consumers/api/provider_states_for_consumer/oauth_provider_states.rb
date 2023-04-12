@@ -35,7 +35,7 @@ module LtiProviderStateHelper
       "iss" => "test",
       "aud" => "http://example.org/login/oauth2/token",
       "sub" => "test",
-      "exp" => (Time.zone.now + 10.minutes).to_i,
+      "exp" => 10.minutes.from_now.to_i,
       "iat" => Time.zone.now.to_i,
       "jti" => "test",
     }

@@ -117,7 +117,7 @@ module CC
               else
                 meta_field(qm_node, "question_type", question["question_type"])
                 meta_field(qm_node, "points_possible", question["points_possible"])
-                meta_field(qm_node, "original_answer_ids", question["answers"].map { |a| a["id"] }.join(","))
+                meta_field(qm_node, "original_answer_ids", question["answers"].pluck("id").join(","))
                 if question[:is_quiz_question]
                   meta_field(qm_node, "assessment_question_identifierref", aq_mig_id(question))
                 end

@@ -238,7 +238,7 @@ describe CoursePacesController do
     it "renders the specified course pace" do
       get :api_show, params: { course_id: @course.id, id: @course_pace.id }
       expect(response).to be_successful
-      expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(@course_pace.id)
+      expect(response.parsed_body["course_pace"]["id"]).to eq(@course_pace.id)
     end
 
     it "renders the latest progress object associated with publishing" do
@@ -247,7 +247,7 @@ describe CoursePacesController do
 
       get :api_show, params: { course_id: @course.id, id: @course_pace.id }
       expect(response).to be_successful
-      expect(JSON.parse(response.body)["progress"]["workflow_state"]).to eq("running")
+      expect(response.parsed_body["progress"]["workflow_state"]).to eq("running")
     end
 
     it "renders a nil progress object if the most recent progress was completed" do
@@ -256,7 +256,7 @@ describe CoursePacesController do
 
       get :api_show, params: { course_id: @course.id, id: @course_pace.id }
       expect(response).to be_successful
-      expect(JSON.parse(response.body)["progress"]).to be_nil
+      expect(response.parsed_body["progress"]).to be_nil
     end
 
     # the show api returns all the paces with their assignable module items
@@ -269,13 +269,13 @@ describe CoursePacesController do
         @mod1.add_item id: a.id, type: "assignment"
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
-        pace = JSON.parse(response.body)["course_pace"]
+        pace = response.parsed_body["course_pace"]
         expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this assn" }.present?).to be_truthy
 
         a.destroy!
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
-        pace = JSON.parse(response.body)["course_pace"]
+        pace = response.parsed_body["course_pace"]
         expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this assn" }.present?).to be_falsey
       end
 
@@ -286,13 +286,13 @@ describe CoursePacesController do
         @mod1.add_item(type: "quiz", id: q.id)
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
-        pace = JSON.parse(response.body)["course_pace"]
+        pace = response.parsed_body["course_pace"]
         expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this quiz" }.present?).to be_truthy
 
         q.destroy!
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
-        pace = JSON.parse(response.body)["course_pace"]
+        pace = response.parsed_body["course_pace"]
         expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this quiz" }.present?).to be_falsey
       end
 
@@ -303,13 +303,13 @@ describe CoursePacesController do
         @mod1.add_item id: d.id, type: "DiscussionTopic"
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
-        pace = JSON.parse(response.body)["course_pace"]
+        pace = response.parsed_body["course_pace"]
         expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this disc" }.present?).to be_truthy
 
         d.destroy!
 
         get :api_show, params: { course_id: @course.id, id: @course_pace.id }
-        pace = JSON.parse(response.body)["course_pace"]
+        pace = response.parsed_body["course_pace"]
         expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this disc" }.present?).to be_falsey
       end
     end
@@ -328,7 +328,7 @@ describe CoursePacesController do
         @course_pace.course_pace_module_items.joins(:module_item).find_by(content_tags: { content_id: @a2.id }).duration
       ).to eq(valid_update_params[:course_pace_module_items_attributes][1][:duration])
 
-      response_body = JSON.parse(response.body)
+      response_body = response.parsed_body
       expect(response_body["course_pace"]["id"]).to eq(@course_pace.id)
 
       # Course pace's publish should be queued
@@ -354,7 +354,7 @@ describe CoursePacesController do
 
       course_pace = CoursePace.last
 
-      response_body = JSON.parse(response.body)
+      response_body = response.parsed_body
       expect(response_body["course_pace"]["id"]).to eq(course_pace.id)
 
       expect(course_pace.end_date.to_date.to_s).to eq(valid_update_params[:end_date])
@@ -379,8 +379,8 @@ describe CoursePacesController do
       it "returns a created course pace if one already exists" do
         get :new, params: { course_id: @course.id }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(@course_pace.id)
-        expect(JSON.parse(response.body)["course_pace"]["published_at"]).not_to be_nil
+        expect(response.parsed_body["course_pace"]["id"]).to eq(@course_pace.id)
+        expect(response.parsed_body["course_pace"]["published_at"]).not_to be_nil
       end
 
       it "returns a published course pace if one already exists" do
@@ -388,8 +388,8 @@ describe CoursePacesController do
         course_pace_model(course: @course, workflow_state: "unpublished", published_at: nil)
         get :new, params: { course_id: @course.id }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(published_course_pace.id)
-        expect(JSON.parse(response.body)["course_pace"]["published_at"]).not_to be_nil
+        expect(response.parsed_body["course_pace"]["id"]).to eq(published_course_pace.id)
+        expect(response.parsed_body["course_pace"]["published_at"]).not_to be_nil
       end
 
       it "ignores module items with no assignments for the pace scaffold" do
@@ -399,7 +399,7 @@ describe CoursePacesController do
 
         get :new, params: { course_id: @course.id }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["course_pace"]["modules"].second["items"].count).to eq(2)
+        expect(response.parsed_body["course_pace"]["modules"].second["items"].count).to eq(2)
       end
 
       it "returns an instantiated course pace if one is not already available" do
@@ -408,7 +408,7 @@ describe CoursePacesController do
         get :new, params: { course_id: @course.id }
         expect(response).to be_successful
         expect(@course.course_paces.not_deleted.count).to eq(0)
-        json_response = JSON.parse(response.body)
+        json_response = response.parsed_body
         expect(json_response["course_pace"]["id"]).to be_nil
         expect(json_response["course_pace"]["published_at"]).to be_nil
         expect(json_response["course_pace"]["modules"].count).to eq(2)
@@ -430,7 +430,7 @@ describe CoursePacesController do
         original_run_at = delayed_job.run_at
         get :new, params: { course_id: @course.id }
         expect(response).to be_successful
-        json_response = JSON.parse(response.body)
+        json_response = response.parsed_body
         expect(json_response["progress"]["workflow_state"]).to eq "queued"
         expect(json_response["progress"]["context_id"]).to eq @course_pace.id
         expect(delayed_job.reload.run_at).to be < original_run_at
@@ -441,8 +441,8 @@ describe CoursePacesController do
       it "returns a draft course pace" do
         get :new, params: { course_id: @course.id, course_section_id: @course_section.id }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["course_pace"]["id"]).to be_nil
-        expect(JSON.parse(response.body)["course_pace"]["published_at"]).to be_nil
+        expect(response.parsed_body["course_pace"]["id"]).to be_nil
+        expect(response.parsed_body["course_pace"]["published_at"]).to be_nil
       end
 
       it "returns a published section pace if one already exists" do
@@ -450,8 +450,8 @@ describe CoursePacesController do
         publised_section_pace = section_pace_model(section: @course_section)
         get :new, params: { course_id: @course.id, course_section_id: @course_section.id }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(publised_section_pace.id)
-        expect(JSON.parse(response.body)["course_pace"]["published_at"]).not_to be_nil
+        expect(response.parsed_body["course_pace"]["id"]).to eq(publised_section_pace.id)
+        expect(response.parsed_body["course_pace"]["published_at"]).not_to be_nil
       end
 
       it "ignores module items with no assignments for the pace scaffold" do
@@ -461,7 +461,7 @@ describe CoursePacesController do
 
         get :new, params: { course_id: @course.id, course_section_id: @course_section.id }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["course_pace"]["modules"].second["items"].count).to eq(2)
+        expect(response.parsed_body["course_pace"]["modules"].second["items"].count).to eq(2)
       end
 
       it "returns an instantiated course pace if one is not already available" do
@@ -469,7 +469,7 @@ describe CoursePacesController do
         get :new, params: { course_id: @course.id, course_section_id: @course_section.id }
         expect(response).to be_successful
         expect(@course.course_paces.unpublished.for_section(@course_section).count).to eq(0)
-        json_response = JSON.parse(response.body)
+        json_response = response.parsed_body
         expect(json_response["course_pace"]["id"]).to be_nil
         expect(json_response["course_pace"]["published_at"]).to be_nil
         expect(json_response["course_pace"]["course_section_id"]).to eq(@course_section.id)
@@ -491,9 +491,9 @@ describe CoursePacesController do
       it "returns a draft course pace" do
         get :new, params: { course_id: @course.id, enrollment_id: @student_enrollment.id }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["course_pace"]["id"]).to be_nil
-        expect(JSON.parse(response.body)["course_pace"]["published_at"]).to be_nil
-        expect(JSON.parse(response.body)["course_pace"]["user_id"]).to eq(@student.id)
+        expect(response.parsed_body["course_pace"]["id"]).to be_nil
+        expect(response.parsed_body["course_pace"]["published_at"]).to be_nil
+        expect(response.parsed_body["course_pace"]["user_id"]).to eq(@student.id)
       end
 
       it "returns a published student pace if one already exists" do
@@ -501,8 +501,8 @@ describe CoursePacesController do
         publised_section_pace = student_enrollment_pace_model(student_enrollment: @student_enrollment)
         get :new, params: { course_id: @course.id, enrollment_id: @student_enrollment.id }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(publised_section_pace.id)
-        expect(JSON.parse(response.body)["course_pace"]["published_at"]).not_to be_nil
+        expect(response.parsed_body["course_pace"]["id"]).to eq(publised_section_pace.id)
+        expect(response.parsed_body["course_pace"]["published_at"]).not_to be_nil
       end
 
       it "ignores module items with no assignments for the pace scaffold" do
@@ -512,7 +512,7 @@ describe CoursePacesController do
 
         get :new, params: { course_id: @course.id, enrollment_id: @course.student_enrollments.first.id }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["course_pace"]["modules"].second["items"].count).to eq(2)
+        expect(response.parsed_body["course_pace"]["modules"].second["items"].count).to eq(2)
       end
 
       it "returns an instantiated section pace if one is already published and the user is in that section" do
@@ -521,7 +521,7 @@ describe CoursePacesController do
         course_section_pace.publish
         get :new, params: { course_id: @course.id, enrollment_id: @student_enrollment.id }
         expect(response).to be_successful
-        json_response = JSON.parse(response.body)
+        json_response = response.parsed_body
         expect(json_response["course_pace"]["id"]).to be_nil
         expect(json_response["course_pace"]["published_at"]).to be_nil
         expect(json_response["course_pace"]["section_id"]).to be_nil
@@ -543,7 +543,7 @@ describe CoursePacesController do
         get :new, params: { course_id: @course.id, enrollment_id: @student_enrollment.id }
         expect(response).to be_successful
         expect(@course.course_paces.unpublished.for_user(@student).count).to eq(0)
-        json_response = JSON.parse(response.body)
+        json_response = response.parsed_body
         expect(json_response["course_pace"]["id"]).to be_nil
         expect(json_response["course_pace"]["published_at"]).to be_nil
         expect(json_response["course_pace"]["user_id"]).to eq(@student.id)
@@ -583,7 +583,7 @@ describe CoursePacesController do
     it "starts a new background job to publish the course pace" do
       post :publish, params: { course_id: @course.id, id: @course_pace.id }
       expect(response).to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       expect(json_response["context_type"]).to eq("CoursePace")
       expect(json_response["workflow_state"]).to eq("queued")
     end
@@ -594,7 +594,7 @@ describe CoursePacesController do
       course_pace_params = @valid_params.merge(end_date: @course_pace.start_date + 5.days)
       post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
       expect(response).to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       expect(json_response.values).to eq(%w[2021-09-30 2021-10-05])
     end
 
@@ -602,7 +602,7 @@ describe CoursePacesController do
       course_pace_params = @valid_params.merge(start_date: "2021-11-01", end_date: "2021-11-05")
       post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
       expect(response).to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       expect(json_response.values).to eq(%w[2021-11-01 2021-11-05])
     end
 
@@ -631,7 +631,7 @@ describe CoursePacesController do
 
       post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
       expect(response).to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       expect(json_response.values).to eq(%w[2021-12-28 2021-12-29 2021-12-31])
     end
 
@@ -671,7 +671,7 @@ describe CoursePacesController do
 
       post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
       expect(response).to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       expect(json_response.values).to eq(%w[2021-12-22 2021-12-28 2022-01-05 2022-01-12])
     end
 
@@ -679,7 +679,7 @@ describe CoursePacesController do
       course_pace_params = @valid_params.merge(start_date: "2022-01-27", end_date: "2022-01-20")
       post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
       expect(response).not_to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       expect(json_response["errors"]).to eq("End date cannot be before start date")
     end
 
@@ -687,7 +687,7 @@ describe CoursePacesController do
       course_pace_params = @valid_params.merge(start_date: "2022-01-27", end_date: nil)
       post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
       expect(response).to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       expect(json_response.values).to eq(%w[2022-01-28 2022-02-11])
     end
 
@@ -713,7 +713,7 @@ describe CoursePacesController do
       )
       post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
       expect(response).to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       expect(json_response.keys).to eq(course_pace_module_items_attributes.map { |i| i[:module_item_id].to_s })
     end
 
@@ -728,7 +728,7 @@ describe CoursePacesController do
         }
       ] }
       expect(response).to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       # skip the weekend, then due dates are mon and tues
       expect(json_response.values).to eq(%w[2021-10-04 2021-10-05])
     end
@@ -756,7 +756,7 @@ describe CoursePacesController do
       it "does not allow deleting the published default course pace" do
         delete :destroy, params: { course_id: @course.id, id: @course_pace.id }
         expect(response).not_to be_successful
-        json_response = JSON.parse(response.body)
+        json_response = response.parsed_body
         expect(@course_pace.reload.deleted?).not_to be(true)
         expect(json_response["errors"]).to eq("You cannot delete the default course pace.")
       end

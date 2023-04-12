@@ -447,7 +447,7 @@ class Rubric < ActiveRecord::Base
     when Array
       criteria.map { |criterion| Rubric.normalize(criterion) }
     when Hash
-      h = criteria.reject { |_k, v| v.blank? }.stringify_keys
+      h = criteria.compact_blank.stringify_keys
       h.delete("title") if h["title"] == h["description"]
       h.each do |k, v|
         h[k] = Rubric.normalize(v) if v.is_a?(Hash) || v.is_a?(Array)

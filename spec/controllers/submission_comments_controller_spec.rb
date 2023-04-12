@@ -208,7 +208,7 @@ RSpec.describe SubmissionCommentsController do
         :update,
         params: @test_params.merge(submission_comment: { comment: updated_comment })
       )
-      comment = JSON.parse(response.body).dig("submission_comment", "comment")
+      comment = response.parsed_body.dig("submission_comment", "comment")
       expect(comment).to eq updated_comment
     end
 
@@ -218,20 +218,20 @@ RSpec.describe SubmissionCommentsController do
         :update,
         params: @test_params.merge(submission_comment: { comment: updated_comment })
       )
-      edited_at = JSON.parse(response.body).dig("submission_comment", "edited_at")
+      edited_at = response.parsed_body.dig("submission_comment", "edited_at")
       expect(edited_at).to be_present
     end
 
     it "returns strings for numeric values when passed the json+canvas-string-ids header" do
       request.headers["HTTP_ACCEPT"] = "application/json+canvas-string-ids"
       patch :update, params: @test_params
-      id = JSON.parse(response.body).dig("submission_comment", "id")
+      id = response.parsed_body.dig("submission_comment", "id")
       expect(id).to be_a String
     end
 
     it "does not set the edited_at if the comment is not updated" do
       patch :update, params: @test_params
-      edited_at = JSON.parse(response.body).dig("submission_comment", "edited_at")
+      edited_at = response.parsed_body.dig("submission_comment", "edited_at")
       expect(edited_at).to be_nil
     end
 

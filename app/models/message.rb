@@ -616,7 +616,7 @@ class Message < ActiveRecord::Base
       # they can only change it if they are registered in the first place
       # do not show this for emails telling users to register
       if footer_message.present? && !notification&.registration?
-        self.body = <<~TEXT.strip_heredoc
+        self.body = <<~TEXT
           #{body}
 
 

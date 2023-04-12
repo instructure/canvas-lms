@@ -21,7 +21,7 @@
 class OutcomeProficiency < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
-  self.ignored_columns = %i[account_id]
+  self.ignored_columns += %i[account_id]
 
   def self.emit_live_events_on_any_update?
     true

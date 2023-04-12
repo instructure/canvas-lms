@@ -199,9 +199,9 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
         @quiz_submission = @quiz.generate_submission(@student)
         @quiz_submission.complete!(create_answers({ correct: false }))
         json = api_index
-        expect(json["quiz_submission_questions"].map { |q| q["correct"] }.all?).to be_falsey
+        expect(json["quiz_submission_questions"].pluck("correct").all?).to be_falsey
         json = api_index({}, { quiz_submission_attempt: 2 })
-        expect(json["quiz_submission_questions"].map { |q| q["correct"] }.all?).to be_truthy
+        expect(json["quiz_submission_questions"].pluck("correct").all?).to be_truthy
       end
 
       it "returns unauthorized when results are hidden in quiz settings" do

@@ -637,7 +637,7 @@ describe CoursesController, type: :request do
       c4 = course_with_student(user: @student, course_name: "xyz", active_all: true).course
       @student.set_preference(:course_nicknames, c4.id, "ghi")
       json = api_call(:get, "/api/v1/courses.json", controller: "courses", action: "index", format: "json")
-      expect(json.map { |course| course["name"] }).to eq %w[abc def ghi jkl]
+      expect(json.pluck("name")).to eq %w[abc def ghi jkl]
     end
 
     it "excludes master courses if requested" do
@@ -646,11 +646,11 @@ describe CoursesController, type: :request do
       c2 = course_with_teacher(user: @teacher, active_all: true).course
 
       json = api_call(:get, "/api/v1/courses.json", controller: "courses", action: "index", format: "json")
-      expect(json.map { |course| course["id"] }).to match_array([c1.id, c2.id])
+      expect(json.pluck("id")).to match_array([c1.id, c2.id])
 
       json = api_call(:get, "/api/v1/courses.json?exclude_blueprint_courses=1",
                       controller: "courses", action: "index", format: "json", exclude_blueprint_courses: "1")
-      expect(json.map { |course| course["id"] }).to eq([c2.id])
+      expect(json.pluck("id")).to eq([c2.id])
     end
 
     it "includes tabs (and precalculate stuff in theory) if requested" do
@@ -771,7 +771,7 @@ describe CoursesController, type: :request do
         json = api_call_as_user(@teacher, :get, "/api/v1/users/self/courses?homeroom=true",
                                 user_id: "self", controller: "courses", action: "user_index", homeroom: "true",
                                 format: "json")
-        expect(json.map { |c| c["name"] }).to eq(["homeroom frd"])
+        expect(json.pluck("name")).to eq(["homeroom frd"])
       end
     end
 
@@ -2789,7 +2789,7 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["available"] })
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course1.id, @course2.id].sort
-        json.collect { |c| c["workflow_state"] }.each do |s|
+        json.pluck("workflow_state").each do |s|
           expect(%w[available]).to include(s)
         end
       end
@@ -2799,7 +2799,7 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["unpublished"] })
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course3.id, @course4.id].sort
-        json.collect { |c| c["workflow_state"] }.each do |s|
+        json.pluck("workflow_state").each do |s|
           expect(%w[unpublished]).to include(s)
         end
       end
@@ -2809,7 +2809,7 @@ describe CoursesController, type: :request do
                         { controller: "courses", action: "index", format: "json" },
                         { state: ["unpublished", "available"] })
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@course1.id, @course2.id, @course3.id, @course4.id].sort
-        json.collect { |c| c["workflow_state"] }.each do |s|
+        json.pluck("workflow_state").each do |s|
           expect(%w[available unpublished]).to include(s)
         end
       end
@@ -2821,7 +2821,7 @@ describe CoursesController, type: :request do
         expect(json.collect { |c| c["id"].to_i }).to eq [@course3.id]
         expect(json[0]["enrollments"]).to eq [{ "type" => "teacher", "role" => "SuperTeacher", "role_id" => @role.id, "user_id" => @me.id,
                                                 "enrollment_state" => "invited", "limit_privileges_to_course_section" => false }]
-        json.collect { |c| c["workflow_state"] }.each do |s|
+        json.pluck("workflow_state").each do |s|
           expect(%w[unpublished]).to include(s)
         end
       end
@@ -2905,28 +2905,28 @@ describe CoursesController, type: :request do
       it "does not filter by default" do
         json = api_call(:get, "/api/v1/courses.json",
                         { controller: "courses", action: "index", format: "json" })
-        expect(json.map { |c| c["id"] }).to match_array [@course1.id, @course2.id]
+        expect(json.pluck("id")).to match_array [@course1.id, @course2.id]
       end
 
       it "accepts current_domain_only=true" do
         json = api_call(:get, "/api/v1/courses.json?current_domain_only=true",
                         { controller: "courses", action: "index", format: "json",
                           current_domain_only: "true" })
-        expect(json.map { |c| c["id"] }).to eql [@course1.id]
+        expect(json.pluck("id")).to eql [@course1.id]
       end
 
       it "accepts root_account_id=self" do
         json = api_call(:get, "/api/v1/courses.json?root_account_id=self",
                         { controller: "courses", action: "index", format: "json",
                           root_account_id: "self" })
-        expect(json.map { |c| c["id"] }).to eql [@course1.id]
+        expect(json.pluck("id")).to eql [@course1.id]
       end
 
       it "accepts root_account_id=id" do
         json = api_call(:get, "/api/v1/courses.json?root_account_id=#{@course2.root_account.id}",
                         { controller: "courses", action: "index", format: "json",
                           root_account_id: @course2.root_account.to_param })
-        expect(json.map { |c| c["id"] }).to eql [@course2.id]
+        expect(json.pluck("id")).to eql [@course2.id]
       end
 
       it "returns an empty result if the given root account does not exist" do
@@ -2959,7 +2959,7 @@ describe CoursesController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
                         { controller: "courses", action: "students", course_id: @course2.id.to_s, format: "json" })
         %w[sis_user_id unique_id].each do |attribute|
-          expect(json.map { |u| u[attribute] }).to eq [nil, nil]
+          expect(json.pluck(attribute)).to eq [nil, nil]
         end
       end
 
@@ -2972,8 +2972,8 @@ describe CoursesController, type: :request do
         @user = @me
         json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
                         { controller: "courses", action: "students", course_id: @course2.id.to_s, format: "json" })
-        expect(json.map { |u| u["sis_user_id"] }.sort).to eq ["user1", "user2"].sort
-        expect(json.map { |u| u["login_id"] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
+        expect(json.pluck("sis_user_id").sort).to eq ["user1", "user2"].sort
+        expect(json.pluck("login_id").sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
       end
 
       it "includes user sis id and login id if can manage_students in the course" do
@@ -2988,8 +2988,8 @@ describe CoursesController, type: :request do
         @user = @me
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/students.json",
                         { controller: "courses", action: "students", course_id: @course1.to_param, format: "json" })
-        expect(json.map { |u| u["sis_user_id"] }.sort).to eq ["user2", "user3"].sort
-        expect(json.map { |u| u["login_id"] }.sort).to eq ["nobody2@example.com", "nobody3@example.com"].sort
+        expect(json.pluck("sis_user_id").sort).to eq ["user2", "user3"].sort
+        expect(json.pluck("login_id").sort).to eq ["nobody2@example.com", "nobody3@example.com"].sort
       end
 
       it "includes user sis id and login id if site admin" do
@@ -3001,8 +3001,8 @@ describe CoursesController, type: :request do
         @user = @me
         json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
                         { controller: "courses", action: "students", course_id: @course2.id.to_s, format: "json" })
-        expect(json.map { |u| u["sis_user_id"] }.sort).to eq ["user1", "user2"].sort
-        expect(json.map { |u| u["login_id"] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
+        expect(json.pluck("sis_user_id").sort).to eq ["user1", "user2"].sort
+        expect(json.pluck("login_id").sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
       end
 
       it "allows specifying course sis id" do
@@ -3271,7 +3271,7 @@ describe CoursesController, type: :request do
           @student1.pseudonym.update!(sis_user_id: "student1")
           @student2.pseudonym.update!(sis_user_id: "student2")
           json = api_call_as_user(@admin, :get, api_url, api_route)
-          expect(json.map { |record| record["sis_user_id"] }).to include "student1", "student2"
+          expect(json.pluck("sis_user_id")).to include "student1", "student2"
         end
 
         it "returns a list of users filtered by id if user_ids is given" do
@@ -3293,7 +3293,7 @@ describe CoursesController, type: :request do
           @course1.student_view_student
           json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                           { controller: "courses", action: "users", course_id: @course1.id.to_s, format: "json" })
-          expect(json.map { |s| s["name"] }).not_to include("Test Student")
+          expect(json.pluck("name")).not_to include("Test Student")
         end
 
         context "inactive enrollments" do
@@ -3307,15 +3307,15 @@ describe CoursesController, type: :request do
           it "excludes users with inactive enrollments for students" do
             student_in_course(course: @course1, active_all: true, user: user_with_pseudonym)
             json = api_call(:get, api_url, api_route)
-            expect(json.map { |s| s["id"] }).not_to include(@inactive_user.id)
+            expect(json.pluck("id")).not_to include(@inactive_user.id)
           end
 
           it "includes users with inactive enrollments for teachers" do
             @user = @course1.teachers.first
             json = api_call(:get, api_url, api_route, include: ["enrollments"], include_inactive: true)
-            expect(json.map { |s| s["id"] }).to include(@inactive_user.id)
+            expect(json.pluck("id")).to include(@inactive_user.id)
             user_json = json.detect { |s| s["id"] == @inactive_user.id }
-            expect(user_json["enrollments"].map { |e| e["id"] }).to eq [@inactive_enroll.id]
+            expect(user_json["enrollments"].pluck("id")).to eq [@inactive_enroll.id]
             expect(user_json["enrollments"].first["enrollment_state"]).to eq "inactive"
           end
 
@@ -3333,7 +3333,7 @@ describe CoursesController, type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                           { controller: "courses", action: "users", course_id: @course1.id.to_s, format: "json" },
                           include: ["test_student"])
-          expect(json.map { |s| s["name"] }).to include("Test Student")
+          expect(json.pluck("name")).to include("Test Student")
         end
 
         it "returns a list of users with emails (unless unconfirmed)" do
@@ -3365,7 +3365,7 @@ describe CoursesController, type: :request do
           # helper
           check_json = lambda do |user, *enrollments|
             j = json.find { |x| x["id"] == user.id }
-            expect(j.delete("enrollments").map { |e| e["id"] }.sort)
+            expect(j.delete("enrollments").pluck("id").sort)
               .to eq enrollments.map(&:id)
             expect(j).to eq api_json_response(user, only: user_api_fields)
           end
@@ -3380,7 +3380,7 @@ describe CoursesController, type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                           { controller: "courses", action: "users", course_id: @course1.id.to_s, format: "json" },
                           include: ["enrollments"])
-          enroll_ids = json.find { |x| x["id"] == @student1.id }["enrollments"].map { |e| e["id"] }.sort
+          enroll_ids = json.find { |x| x["id"] == @student1.id }["enrollments"].pluck("id").sort
           expect(enroll_ids).to eq [@student1_enroll.id]
         end
 
@@ -3388,8 +3388,8 @@ describe CoursesController, type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                           { controller: "courses", action: "users", course_id: @course1.id.to_s, format: "json" },
                           enrollment_type: "student")
-          expect(json.map { |x| x["id"] }.sort).to eq api_json_response([@student1, @student2],
-                                                                        only: user_api_fields).map { |x| x["id"] }.sort
+          expect(json.pluck("id").sort).to eq api_json_response([@student1, @student2],
+                                                                only: user_api_fields).pluck("id").sort
         end
 
         it "accepts an array of enrollment_types" do
@@ -3397,7 +3397,7 @@ describe CoursesController, type: :request do
                           { controller: "courses", action: "users", course_id: @course1.to_param, format: "json" },
                           enrollment_type: %w[student student_view teacher], include: ["enrollments"])
 
-          expect(json.map { |u| u["enrollments"].map { |e| e["type"] } }.flatten.uniq.sort).to eq %w[StudentEnrollment StudentViewEnrollment TeacherEnrollment]
+          expect(json.map { |u| u["enrollments"].pluck("type") }.flatten.uniq.sort).to eq %w[StudentEnrollment StudentViewEnrollment TeacherEnrollment]
         end
 
         describe "enrollment_role" do
@@ -3499,7 +3499,7 @@ describe CoursesController, type: :request do
                           enrollment_type: "student")
           expect(json.length).to eq 2
           %w[sis_user_id unique_id].each do |attribute|
-            expect(json.map { |u| u[attribute] }).to eq [nil, nil]
+            expect(json.pluck(attribute)).to eq [nil, nil]
           end
         end
 
@@ -3513,8 +3513,8 @@ describe CoursesController, type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course2.id}/users.json",
                           { controller: "courses", action: "users", course_id: @course2.id.to_s, format: "json" },
                           enrollment_type: "student")
-          expect(json.map { |u| u["sis_user_id"] }.sort).to eq ["user1", "user2"].sort
-          expect(json.map { |u| u["login_id"] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
+          expect(json.pluck("sis_user_id").sort).to eq ["user1", "user2"].sort
+          expect(json.pluck("login_id").sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
         end
 
         it "includes user sis id and login id if can manage_students in the course" do
@@ -3544,8 +3544,8 @@ describe CoursesController, type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course2.id}/users.json",
                           { controller: "courses", action: "users", course_id: @course2.id.to_s, format: "json" },
                           enrollment_type: "student")
-          expect(json.map { |u| u["sis_user_id"] }.sort).to eq ["user1", "user2"].sort
-          expect(json.map { |u| u["login_id"] }.sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
+          expect(json.pluck("sis_user_id").sort).to eq ["user1", "user2"].sort
+          expect(json.pluck("login_id").sort).to eq ["nobody@example.com", "nobody2@example.com"].sort
         end
 
         it "uses course-level locale setting for sorting" do
@@ -3554,12 +3554,12 @@ describe CoursesController, type: :request do
           n2 = "æee"
           @student2.update_attribute(:sortable_name, n2)
           json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json", { controller: "courses", action: "users", course_id: @course1.id.to_s, format: "json" })
-          names = json.map { |s| s["sortable_name"] }
+          names = json.pluck("sortable_name")
           expect(names.index(n1) > names.index(n2)).to be_truthy
 
           @course1.update_attribute(:locale, "is")
           json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json", { controller: "courses", action: "users", course_id: @course1.id.to_s, format: "json" })
-          names = json.map { |s| s["sortable_name"] }
+          names = json.pluck("sortable_name")
           expect(names.index(n2) > names.index(n1)).to be_truthy
         end
 
@@ -3645,7 +3645,7 @@ describe CoursesController, type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                           { controller: "courses", action: "users", course_id: @course1.id.to_s, format: "json" },
                           { enrollment_type: "student", page: 1, per_page: 5 })
-          expect(json.map { |x| x["id"] }.uniq.length).to eq 5
+          expect(json.pluck("id").uniq.length).to eq 5
 
           link_header = response.headers["Link"].split(",")
           expect(link_header[0]).to match(/page=1&per_page=5/) # current page
@@ -3662,8 +3662,8 @@ describe CoursesController, type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                           { controller: "courses", action: "users", course_id: @course1.id.to_s, format: "json" },
                           { enrollment_type: "student", user_id: @target.id, page: 1, per_page: 1 })
-          expect(json.map { |x| x["id"] }.length).to eq 1
-          expect(json.map { |x| x["id"] }).to eq [@target.id]
+          expect(json.pluck("id").length).to eq 1
+          expect(json.pluck("id")).to eq [@target.id]
         end
 
         it "includes custom links if requested" do
@@ -3691,7 +3691,7 @@ describe CoursesController, type: :request do
                                                                "tool_id" => ContextExternalTool::ANALYTICS_2
                                                              })
             ta_json = json.find { |u| u["id"] == @ta.id }
-            expect(ta_json["custom_links"].map { |l| l["tool_id"] }).not_to include ContextExternalTool::ANALYTICS_2
+            expect(ta_json["custom_links"].pluck("tool_id")).not_to include ContextExternalTool::ANALYTICS_2
           end
 
           it "respects tool permissions" do
@@ -3699,7 +3699,7 @@ describe CoursesController, type: :request do
                                     { controller: "courses", action: "users", course_id: @course1.id.to_s,
                                       format: "json", include: %w[custom_links] })
             student2_json = json.find { |u| u["id"] == @student2.id }
-            expect(student2_json["custom_links"].map { |l| l["tool_id"] }).not_to include ContextExternalTool::ANALYTICS_2
+            expect(student2_json["custom_links"].pluck("tool_id")).not_to include ContextExternalTool::ANALYTICS_2
           end
         end
       end
@@ -3728,7 +3728,7 @@ describe CoursesController, type: :request do
         enrollments2 = json.find { |u| u["id"] == observer2.id }["enrollments"]
         expect(enrollments2.map { |e| e["observed_user"]["id"] }.sort).to eq [@student2.id]
 
-        expect(enrollments2.first["observed_user"]["enrollments"].map { |e| e["id"] }).to eq [@student2.enrollments.first.id]
+        expect(enrollments2.first["observed_user"]["enrollments"].pluck("id")).to eq [@student2.enrollments.first.id]
       end
     end
 
@@ -3750,7 +3750,7 @@ describe CoursesController, type: :request do
         @course2.enroll_student(student2)
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users/#{student2.id}.json?include[]=enrollments",
                         { controller: "courses", action: "user", course_id: @course1.id.to_s, id: student2.id.to_s, include: ["enrollments"], format: "json" })
-        course_ids = json["enrollments"].map { |e| e["course_id"] }
+        course_ids = json["enrollments"].pluck("course_id")
         expect(course_ids).to eq [@course1.id]
       end
     end
@@ -3902,7 +3902,7 @@ describe CoursesController, type: :request do
           pages files syllabus outcomes quizzes modules settings
           rubrics
         ]
-        expect(json["tabs"].map { |tab| tab["id"] }).to match_array(expected_tabs)
+        expect(json["tabs"].pluck("id")).to match_array(expected_tabs)
       end
 
       it "includes template when feature enabled" do
@@ -4334,7 +4334,7 @@ describe CoursesController, type: :request do
         @user = @teacher
         json = api_call(:get, "/api/v1/courses/#{@course.id}/recent_students",
                         { controller: "courses", action: "recent_students", course_id: @course.to_param, format: "json" })
-        expect(json.map { |el| el["id"] }).to eq [@student2.id, @student3.id, @student1.id]
+        expect(json.pluck("id")).to eq [@student2.id, @student3.id, @student1.id]
       end
     end
 

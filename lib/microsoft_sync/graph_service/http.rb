@@ -216,7 +216,7 @@ module MicrosoftSync
 
         failed = (grouped[:error] || []) + (grouped[:throttled] || [])
         if failed.present?
-          codes = failed.map { |resp| resp["status"] }
+          codes = failed.pluck("status")
           bodies = failed.map { |resp| resp["body"].to_s.truncate(500) }
           msg = "Batch of #{failed.count}: codes #{codes}, bodies #{bodies.inspect}"
 

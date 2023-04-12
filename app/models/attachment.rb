@@ -25,9 +25,9 @@ require "crocodoc"
 class Attachment < ActiveRecord::Base
   class UniqueRenameFailure < StandardError; end
 
-  self.ignored_columns = %i[last_lock_at last_unlock_at enrollment_id cached_s3_url s3_url_cached_at
-                            scribd_account_id scribd_user scribd_mime_type_id submitted_to_scribd_at scribd_doc scribd_attempts
-                            cached_scribd_thumbnail last_inline_view local_filename]
+  self.ignored_columns += %i[last_lock_at last_unlock_at enrollment_id cached_s3_url s3_url_cached_at
+                             scribd_account_id scribd_user scribd_mime_type_id submitted_to_scribd_at scribd_doc scribd_attempts
+                             cached_scribd_thumbnail last_inline_view local_filename]
 
   def self.display_name_order_by_clause(table = nil)
     col = table ? "#{table}.display_name" : "display_name"
@@ -1660,7 +1660,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.file_removed_path
-    Rails.root.join("public/file_removed/file_removed.pdf")
+    Rails.public_path.join("file_removed/file_removed.pdf")
   end
 
   # find the file_removed file on instfs (or upload it)

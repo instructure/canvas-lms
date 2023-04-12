@@ -809,7 +809,7 @@ describe GroupsController do
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
-      expect(data["users"].map { |u| u["user_id"] }.sort)
+      expect(data["users"].pluck("user_id").sort)
         .to eq [u1, u2, u3].map(&:id).sort
     end
 
@@ -836,21 +836,21 @@ describe GroupsController do
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
-      expect(data["users"].map { |u| u["user_id"] }.sort)
+      expect(data["users"].pluck("user_id").sort)
         .to eq [u2, u3].map(&:id).sort
 
       get "unassigned_members", params: { course_id: @course.id, category_id: group2.group_category.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
-      expect(data["users"].map { |u| u["user_id"] }.sort)
+      expect(data["users"].pluck("user_id").sort)
         .to eq [u1, u3].map(&:id).sort
 
       get "unassigned_members", params: { course_id: @course.id, category_id: group3.group_category.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
-      expect(data["users"].map { |u| u["user_id"] }).to eq [u1.id]
+      expect(data["users"].pluck("user_id")).to eq [u1.id]
     end
 
     it "includes the users' sections when available" do

@@ -327,7 +327,7 @@ class ContextModule < ActiveRecord::Base
     # TODO: remove the unused argument; it's not sent anymore, but it was sent through a delayed job
     # so compatibility was maintained when sender was updated to not send it
     positions = ContextModule.module_positions(context).to_a.sort_by { |a| a[1] }
-    downstream_ids = positions.select { |a| a[1] > (position || 0) }.map { |a| a[0] }
+    downstream_ids = positions.select { |a| a[1] > (position || 0) }.pluck(0)
     downstreams = downstream_ids.empty? ? [] : context.context_modules.not_deleted.where(id: downstream_ids)
     downstreams.each(&:save_without_touching_context)
   end

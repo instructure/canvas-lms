@@ -74,7 +74,7 @@ describe DocviewerAuditEventsController do
       assignment = Assignment.create!(course: @course, name: "anonymous", anonymous_grading: true)
       @submission = assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment])
       post :create, format: :json, params: default_params.merge(token: "wrong token")
-      expect(JSON.parse(response.body).fetch("message")).to eq "JWT signature invalid"
+      expect(response.parsed_body.fetch("message")).to eq "JWT signature invalid"
     end
 
     it "renders status bad_request if param values are missing" do
@@ -95,7 +95,7 @@ describe DocviewerAuditEventsController do
       assignment = Assignment.create!(course: @course, name: "non-moderated and non-anonymous")
       @submission = assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment])
       post :create, format: :json, params: default_params
-      expect(JSON.parse(response.body).fetch("message")).to eq "Assignment is neither anonymous nor moderated"
+      expect(response.parsed_body.fetch("message")).to eq "Assignment is neither anonymous nor moderated"
     end
 
     it "renders status unprocessable_entity if passed an invalid event type" do
@@ -210,7 +210,7 @@ describe DocviewerAuditEventsController do
         @submission = assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment])
         assignment.grade_student(@student, grade: 10, grader: @first_ta, provisional: true)
         post :create, format: :json, params: default_params.merge(canvas_user_id: @second_ta.id)
-        expect(JSON.parse(response.body).fetch("message")).to eq "Reached maximum number of graders for assignment"
+        expect(response.parsed_body.fetch("message")).to eq "Reached maximum number of graders for assignment"
       end
     end
 
@@ -396,7 +396,7 @@ describe DocviewerAuditEventsController do
     @submission = assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment])
     post :create, format: :json, params: default_params
     event = AnonymousOrModerationEvent.find_by!(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission)
-    expect(JSON.parse(response.body).fetch("anonymous_or_moderation_event").fetch("id")).to eq event.id
+    expect(response.parsed_body.fetch("anonymous_or_moderation_event").fetch("id")).to eq event.id
   end
 
   it "is okay if related_annotation_id is not passed" do

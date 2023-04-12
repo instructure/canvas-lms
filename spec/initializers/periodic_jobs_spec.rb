@@ -81,7 +81,7 @@ describe "PeriodicJobs" do
       # Picked because it doesn't have DST
       Shard.current.database_server.config[:timezone] = "America/Phoenix"
       Timecop.freeze do
-        expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(Time.zone.now + 7.hours)
+        expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(7.hours.from_now)
       end
     ensure
       Shard.current.database_server.config[:timezone] = old_tz
@@ -92,7 +92,7 @@ describe "PeriodicJobs" do
       # Picked because it doesn't have DST
       Shard.current.database_server.config[:timezone] = "Africa/Nairobi"
       Timecop.freeze do
-        expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(Time.zone.now + 21.hours)
+        expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(21.hours.from_now)
       end
     ensure
       Shard.current.database_server.config[:timezone] = old_tz

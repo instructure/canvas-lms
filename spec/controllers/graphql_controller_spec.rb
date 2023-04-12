@@ -72,14 +72,14 @@ describe GraphQLController do
 
     it "works" do
       post :execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
-      expect(JSON.parse(response.body)["errors"]).to be_blank
-      expect(JSON.parse(response.body)["data"]).not_to be_blank
+      expect(response.parsed_body["errors"]).to be_blank
+      expect(response.parsed_body["data"]).not_to be_blank
     end
 
     it "does not handle Apollo Federation queries" do
       post :execute, params: federation_query_params, format: :json
-      expect(JSON.parse(response.body)["errors"]).not_to be_blank
-      expect(JSON.parse(response.body)["data"]).to be_blank
+      expect(response.parsed_body["errors"]).not_to be_blank
+      expect(response.parsed_body["data"]).to be_blank
     end
 
     it "logs a page view for CreateSubmission" do
@@ -204,22 +204,22 @@ describe GraphQLController do
       it "handles standard queries" do
         request.headers["Authorization"] = "Bearer #{token.to_unencrypted_token_string}"
         post :subgraph_execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
-        expect(JSON.parse(response.body)["errors"]).to be_blank
-        expect(JSON.parse(response.body)["data"]).not_to be_blank
+        expect(response.parsed_body["errors"]).to be_blank
+        expect(response.parsed_body["data"]).not_to be_blank
       end
 
       it "handles Apollo Federation queries" do
         request.headers["Authorization"] = "Bearer #{token.to_unencrypted_token_string}"
         post :subgraph_execute, params: federation_query_params, format: :json
-        expect(JSON.parse(response.body)["errors"]).to be_blank
+        expect(response.parsed_body["errors"]).to be_blank
       end
     end
 
     describe "without authentication" do
       it "services subgraph introspection queries" do
         post :subgraph_execute, params: { query: "query FederationSubgraphIntrospection { _service { sdl } }" }, format: :json
-        expect(JSON.parse(response.body)["errors"]).to be_blank
-        expect(JSON.parse(response.body)["data"]).not_to be_blank
+        expect(response.parsed_body["errors"]).to be_blank
+        expect(response.parsed_body["data"]).not_to be_blank
       end
 
       it "rejects other queries" do
@@ -236,8 +236,8 @@ describe GraphQLController do
           receive(:feature_enabled?).with(:disable_graphql_authentication).and_return(true)
         )
         post :execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
-        expect(JSON.parse(response.body)["errors"]).to be_blank
-        expect(JSON.parse(response.body)["data"]).not_to be_blank
+        expect(response.parsed_body["errors"]).to be_blank
+        expect(response.parsed_body["data"]).not_to be_blank
       end
     end
   end

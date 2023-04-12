@@ -203,8 +203,8 @@ class AccountCalendarsApiController < ApplicationController
     allowed_account_ids = [account.id] + Account.sub_account_ids_recursive(account.id)
     return render_unauthorized_action unless (account_ids - allowed_account_ids).empty?
 
-    account_ids_to_enable = data.select { |c| value_to_boolean(c["visible"]) }.map { |c| c["id"] }
-    account_ids_to_disable = data.reject { |c| value_to_boolean(c["visible"]) }.map { |c| c["id"] }
+    account_ids_to_enable = data.select { |c| value_to_boolean(c["visible"]) }.pluck("id")
+    account_ids_to_disable = data.reject { |c| value_to_boolean(c["visible"]) }.pluck("id")
     return render json: { errors: t("Unexpected value") }, status: :bad_request unless account_ids_to_enable.length + account_ids_to_disable.length == data.length && account_ids_to_enable.intersection(account_ids_to_disable).empty?
 
     updated_accounts = Account.active.where(id: account_ids_to_enable).update_all(account_calendar_visible: true)

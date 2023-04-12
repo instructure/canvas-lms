@@ -60,8 +60,8 @@ module Lti
           end
 
           it "update public jwk was successful" do
-            expect(JSON.parse(response.body)["public_jwk"]).to_not eq old_public_jwk
-            expect(JSON.parse(response.body)["public_jwk"]).to eq new_public_jwk
+            expect(response.parsed_body["public_jwk"]).to_not eq old_public_jwk
+            expect(response.parsed_body["public_jwk"]).to eq new_public_jwk
             expect(developer_key.reload.public_jwk).to eq new_public_jwk
           end
 
@@ -100,7 +100,7 @@ module Lti
           end
 
           it "update public jwk was not successful" do
-            expect(JSON.parse(response.body)["public_jwk"]).to eq old_public_jwk
+            expect(response.parsed_body["public_jwk"]).to eq old_public_jwk
           end
 
           it "return 400 unathorized http status" do

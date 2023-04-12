@@ -647,7 +647,7 @@ describe DiscussionTopicsController, type: :request do
                         { controller: "discussion_topics", action: "index", format: "json", course_id: @course.id.to_s,
                           search_term: "topic" })
 
-        expect(json.map { |h| h["id"] }.sort).to eq ids.sort
+        expect(json.pluck("id").sort).to eq ids.sort
       end
 
       it "orders topics by descending position by default" do
@@ -661,7 +661,7 @@ describe DiscussionTopicsController, type: :request do
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
                         { controller: "discussion_topics", action: "index", format: "json", course_id: @course.id.to_s })
-        expect(json.map { |j| j["id"] }).to eq topics.map(&:id)
+        expect(json.pluck("id")).to eq topics.map(&:id)
       end
 
       it "orders topics by descending last_reply_at when order_by parameter is specified" do
@@ -669,7 +669,7 @@ describe DiscussionTopicsController, type: :request do
         @topic3 = create_topic(@course, title: "Topic 3", message: "<p>content here</p>")
 
         topics = [@topic3, @topic, @topic2]
-        topic_reply_date = Time.zone.now - 1.day
+        topic_reply_date = 1.day.ago
         topics.each do |topic|
           topic.last_reply_at = topic_reply_date
           topic.save!
@@ -681,7 +681,7 @@ describe DiscussionTopicsController, type: :request do
         topics.unshift(@topic4)
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?order_by=recent_activity",
                         { controller: "discussion_topics", action: "index", format: "json", course_id: @course.id.to_s, order_by: "recent_activity" })
-        expect(json.map { |j| j["id"] }).to eq topics.map(&:id)
+        expect(json.pluck("id")).to eq topics.map(&:id)
       end
 
       it "orders topics by title when order_by parameter is specified" do
@@ -689,7 +689,7 @@ describe DiscussionTopicsController, type: :request do
         @topic3 = create_topic(@course, title: "Topic 3", message: "<p>content here</p>")
 
         topics = [@topic, @topic2, @topic3]
-        topic_reply_date = Time.zone.now - 1.day
+        topic_reply_date = 1.day.ago
         topics.each do |topic|
           topic.last_reply_at = topic_reply_date
           topic.save!
@@ -700,7 +700,7 @@ describe DiscussionTopicsController, type: :request do
         topics << @topic4
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?order_by=title",
                         { controller: "discussion_topics", action: "index", format: "json", course_id: @course.id.to_s, order_by: "title" })
-        expect(json.map { |j| j["id"] }).to eq topics.map(&:id)
+        expect(json.pluck("id")).to eq topics.map(&:id)
       end
 
       it "raises error when trying to lock before Due Date" do
@@ -991,7 +991,7 @@ describe DiscussionTopicsController, type: :request do
                 }
               )
               expect(json.count).to eq 2
-              expect(json.map { |i| i["id"] }).to match_array [@announcement.id, @announcement2.id]
+              expect(json.pluck("id")).to match_array [@announcement.id, @announcement2.id]
             end
           end
         end
@@ -2194,7 +2194,7 @@ describe DiscussionTopicsController, type: :request do
           course_id: @course.id.to_s, topic_id: @topic.id.to_s, per_page: "3" }
       )
       expect(json.length).to eq 3
-      expect(json.map { |e| e["id"] }).to eq entries.last(3).reverse.map(&:id)
+      expect(json.pluck("id")).to eq entries.last(3).reverse.map(&:id)
       links = response.headers["Link"].split(",")
       expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries} }).to be_truthy
       expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2&per_page=3>/)
@@ -2208,7 +2208,7 @@ describe DiscussionTopicsController, type: :request do
           course_id: @course.id.to_s, topic_id: @topic.id.to_s, page: "3", per_page: "3" }
       )
       expect(json.length).to eq 2
-      expect(json.map { |e| e["id"] }).to eq [entries.first, @entry].map(&:id)
+      expect(json.pluck("id")).to eq [entries.first, @entry].map(&:id)
       links = response.headers["Link"].split(",")
       expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries} }).to be_truthy
       expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=3>/)
@@ -2230,7 +2230,7 @@ describe DiscussionTopicsController, type: :request do
       expect(json.length).to eq 1
       reply_json = json.first["recent_replies"]
       expect(reply_json.length).to eq 10
-      expect(reply_json.map { |e| e["id"] }).to eq replies.last(10).reverse.map(&:id)
+      expect(reply_json.pluck("id")).to eq replies.last(10).reverse.map(&:id)
       expect(json.first["has_more_replies"]).to be_truthy
     end
   end
@@ -2290,7 +2290,7 @@ describe DiscussionTopicsController, type: :request do
           course_id: @course.id.to_s, topic_id: @topic.id.to_s, entry_id: @entry.id.to_s, per_page: "3" }
       )
       expect(json.length).to eq 3
-      expect(json.map { |e| e["id"] }).to eq replies.last(3).reverse.map(&:id)
+      expect(json.pluck("id")).to eq replies.last(3).reverse.map(&:id)
       links = response.headers["Link"].split(",")
       expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies} }).to be_truthy
       expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2&per_page=3>/)
@@ -2304,7 +2304,7 @@ describe DiscussionTopicsController, type: :request do
           course_id: @course.id.to_s, topic_id: @topic.id.to_s, entry_id: @entry.id.to_s, page: "3", per_page: "3" }
       )
       expect(json.length).to eq 2
-      expect(json.map { |e| e["id"] }).to eq [replies.first, @reply].map(&:id)
+      expect(json.pluck("id")).to eq [replies.first, @reply].map(&:id)
       links = response.headers["Link"].split(",")
       expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies} }).to be_truthy
       expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=3>/)
@@ -2853,14 +2853,14 @@ describe DiscussionTopicsController, type: :request do
         expect(json[0]["id"]).to eq @entry2.id
         e1 = json[1]
         expect(e1["id"]).to eq @entry.id
-        expect(e1["recent_replies"].map { |r| r["id"] }).to eq [@side2.id, @sub3.id, @sub2.id, @sub1.id]
-        expect(e1["recent_replies"].map { |r| r["parent_id"] }).to eq [@entry.id, @sub2.id, @sub1.id, @entry.id]
+        expect(e1["recent_replies"].pluck("id")).to eq [@side2.id, @sub3.id, @sub2.id, @sub1.id]
+        expect(e1["recent_replies"].pluck("parent_id")).to eq [@entry.id, @sub2.id, @sub1.id, @entry.id]
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies",
                         { controller: "discussion_topics_api", action: "replies", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s, entry_id: @entry.id.to_s })
         expect(json.size).to eq 4
-        expect(json.map { |r| r["id"] }).to eq [@side2.id, @sub3.id, @sub2.id, @sub1.id]
-        expect(json.map { |r| r["parent_id"] }).to eq [@entry.id, @sub2.id, @sub1.id, @entry.id]
+        expect(json.pluck("id")).to eq [@side2.id, @sub3.id, @sub2.id, @sub1.id]
+        expect(json.pluck("parent_id")).to eq [@entry.id, @sub2.id, @sub1.id, @entry.id]
       end
 
       it "allows posting a reply to a sub-entry" do
@@ -2874,8 +2874,8 @@ describe DiscussionTopicsController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies",
                         { controller: "discussion_topics_api", action: "replies", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s, entry_id: @entry.id.to_s })
         expect(json.size).to eq 5
-        expect(json.map { |r| r["id"] }).to eq [@sub4.id, @side2.id, @sub3.id, @sub2.id, @sub1.id]
-        expect(json.map { |r| r["parent_id"] }).to eq [@sub2.id, @entry.id, @sub2.id, @sub1.id, @entry.id]
+        expect(json.pluck("id")).to eq [@sub4.id, @side2.id, @sub3.id, @sub2.id, @sub1.id]
+        expect(json.pluck("parent_id")).to eq [@sub2.id, @entry.id, @sub2.id, @sub1.id, @entry.id]
       end
 
       it "sets and return editor_id if editing another user's post" do
@@ -2902,7 +2902,7 @@ describe DiscussionTopicsController, type: :request do
                         { ids: entries.map(&:id) })
         expect(json.size).to eq 2
         # response order is by id
-        expect(json.map { |e| e["id"] }).to eq [@sub1.id, @side2.id]
+        expect(json.pluck("id")).to eq [@sub1.id, @side2.id]
         expect(response["Link"]).to match(/next/)
       end
 
@@ -2937,7 +2937,7 @@ describe DiscussionTopicsController, type: :request do
       @all_entries.each(&:reload)
 
       # materialized view jobs are now delayed
-      Timecop.travel(Time.zone.now + 20.seconds) do
+      Timecop.travel(20.seconds.from_now) do
         run_jobs
       end
 
@@ -3060,7 +3060,7 @@ describe DiscussionTopicsController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
                       { controller: "discussion_topics_api", action: "view", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s, include_new_entries: "1", include_context_card_info: "1" })
       participants = json["participants"]
-      expect(participants.map { |p| p["course_id"] }).to eq [@course.to_param, @course.to_param]
+      expect(participants.pluck("course_id")).to eq [@course.to_param, @course.to_param]
       expect(participants.find { |p| !p["is_student"] }["id"]).to eq @teacher.id
       expect(participants.find { |p| p["is_student"] }["id"]).to eq @student.id
     end
@@ -3133,7 +3133,7 @@ describe DiscussionTopicsController, type: :request do
       expect(json["unread_entries"].size).to eq 2
       expect(json["unread_entries"].sort).to eq [@reply1.id, @reply2.id]
 
-      expect(json["participants"].map { |h| h["id"] }.sort).to eq [@teacher.id, @student.id]
+      expect(json["participants"].pluck("id").sort).to eq [@teacher.id, @student.id]
 
       expect(json["view"]).to eq [
         "id" => @root1.id,
@@ -3586,7 +3586,7 @@ describe DiscussionTopicsController, type: :request do
       {}
     )
 
-    expect(json.map { |j| j["id"] }).to eq(ann_ids_ordered_by_posted_at)
+    expect(json.pluck("id")).to eq(ann_ids_ordered_by_posted_at)
   end
 
   context "cross-sharding" do

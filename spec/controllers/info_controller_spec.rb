@@ -33,7 +33,7 @@ describe InfoController do
       allow(Canvas).to receive(:revision).and_return("Test Proc")
       get "health_check"
       expect(response).to be_successful
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json).to have_key("installation_uuid")
       json.delete("installation_uuid")
       expect(json).to eq({
@@ -89,7 +89,7 @@ describe InfoController do
     it "responds with 200 if all system components are alive and serving" do
       get "readiness"
       expect(response).to be_successful
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["status"]).to eq 200
     end
 
@@ -97,7 +97,7 @@ describe InfoController do
       allow(Delayed::Job.connection).to receive(:active?).and_return(false)
       get "readiness"
       expect(response.code).to eq "503"
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["status"]).to eq 503
     end
 
@@ -111,7 +111,7 @@ describe InfoController do
       it "responds with 503" do
         get "readiness"
         expect(response.code).to eq "503"
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["status"]).to eq 503
       end
     end
@@ -121,7 +121,7 @@ describe InfoController do
       expect(Canvas::Errors).to receive(:capture_exception).once
       get "readiness"
       expect(response.code).to eq "503"
-      components = JSON.parse(response.body)["components"]
+      components = response.parsed_body["components"]
       ha_cache = components.find { |c| c["name"] == "ha_cache" }
       expect(ha_cache["status"]).to eq 503
     end
@@ -133,18 +133,18 @@ describe InfoController do
         .with(:readiness_health_check, "Timeout::Error", :warn)
       get "readiness"
       expect(response.code).to eq "503"
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["status"]).to eq 503
     end
 
     it "returns all dependent system components in json response" do
       get "readiness"
       expect(response).to be_successful
-      components = JSON.parse(response.body)["components"]
-      expect(components.map { |c| c["name"] }).to eq %w[
+      components = response.parsed_body["components"]
+      expect(components.pluck("name")).to eq %w[
         common_css common_js consul filesystem jobs postgresql ha_cache rev_manifest vault
       ]
-      expect(components.map { |c| c["status"] }).to eq [200, 200, 200, 200, 200, 200, 200, 200, 200]
+      expect(components.pluck("status")).to eq [200, 200, 200, 200, 200, 200, 200, 200, 200]
     end
   end
 
@@ -176,7 +176,7 @@ describe InfoController do
     it "renders readiness check within json response" do
       get "deep"
       expect(response).to be_successful
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json).to have_key("readiness")
       expect(json["readiness"]["components"].count).to be > 0
     end
@@ -195,7 +195,7 @@ describe InfoController do
       allow(Delayed::Job.connection).to receive(:active?).and_return(false)
       get "deep"
       expect(response.code).to eq "503"
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["status"]).to eq 503
     end
 
@@ -203,7 +203,7 @@ describe InfoController do
       allow(Shard.connection).to receive(:active?).and_return(false)
       get "deep"
       expect(response.code).to eq "503"
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["status"]).to eq 503
     end
 
@@ -216,7 +216,7 @@ describe InfoController do
         .with(:deep_health_check, "Timeout::Error", :warn)
       get "deep"
       expect(response.code).to eq "200"
-      secondary = JSON.parse(response.body)["secondary"]
+      secondary = response.parsed_body["secondary"]
       canvadocs = secondary.find { |c| c["name"] == "canvadocs" }
       expect(canvadocs["status"]).to eq 503
     end
@@ -228,14 +228,14 @@ describe InfoController do
         .with(:deep_health_check, "Timeout::Error", :warn)
       get "deep"
       expect(response.code).to eq "503"
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["status"]).to eq 503
     end
 
     it "returns critical dependencies in json response" do
       get "deep"
       expect(response).to be_successful
-      critical = JSON.parse(response.body)["critical"]
+      critical = response.parsed_body["critical"]
       critical.each do |dep|
         expect(dep["name"]).to be_truthy
         expect(dep["status"]).to eq 200
@@ -245,7 +245,7 @@ describe InfoController do
     it "returns secondary dependencies in json response" do
       get "deep"
       expect(response).to be_successful
-      secondary = JSON.parse(response.body)["secondary"]
+      secondary = response.parsed_body["secondary"]
       secondary.each do |dep|
         expect(dep["name"]).to be_truthy
         expect(dep["status"]).to eq 200
@@ -257,7 +257,7 @@ describe InfoController do
       allow(PageView).to receive(:pv4?).and_return(false)
       get "deep"
       expect(response).to be_successful
-      secondary = JSON.parse(response.body)["secondary"]
+      secondary = response.parsed_body["secondary"]
       expect(secondary).to eq []
     end
   end

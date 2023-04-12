@@ -56,7 +56,7 @@ describe CanvasSchema do
 
   it "does not expose Apollo Federation special types" do
     result = CanvasSchema.execute(entities_query, variables: variables, context: gql_context)
-    error_messages = result["errors"].map { |e| e["message"] }
+    error_messages = result["errors"].pluck("message")
     expect(error_messages).to include("Field '_entities' doesn't exist on type 'Query'")
     expect(result["data"]).to be_nil
   end

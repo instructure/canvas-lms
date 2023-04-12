@@ -1782,9 +1782,7 @@ ActiveRecord::Migration::CommandRecorder.prepend(ExistenceInversions)
 ActiveRecord::Associations::CollectionAssociation.class_eval do
   # CollectionAssociation implements uniq for :uniq option, in its
   # own special way. re-implement, but as a relation
-  def distinct
-    scope.distinct
-  end
+  delegate :distinct, to: :scope
 end
 
 module MatchWithDiscard

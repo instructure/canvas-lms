@@ -60,7 +60,7 @@ describe SubAccountsController do
       expect(response).to have_http_status(:ok)
       post "create", params: { account_id: root_account.id, account: { sis_account_id: "C001", name: "sub account 2" } }
       expect(response).to have_http_status(:bad_request)
-      expect(JSON.parse(response.body)).to have_key("errors")
+      expect(response.parsed_body).to have_key("errors")
     end
   end
 
@@ -146,7 +146,7 @@ describe SubAccountsController do
       get "index", params: { account_id: root_account.id, term: "Acc", include_self: "1" }, format: :json
       res = json_parse
       expect(res.count).to eq 2
-      expect(res.map { |r| r["id"] }).to match_array [root_account.id, sub_account.id]
+      expect(res.pluck("id")).to match_array [root_account.id, sub_account.id]
     end
 
     describe "permissions" do
@@ -259,7 +259,7 @@ describe SubAccountsController do
       names.each { |name| Account.create!(name: name, parent_account: @sub_account) }
       get "show", params: { account_id: @root_account, id: @sub_account }
       expect(response).to have_http_status :ok
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["account"]["sub_accounts"].map { |sub| sub["account"]["name"] }).to eq names.sort
     end
   end

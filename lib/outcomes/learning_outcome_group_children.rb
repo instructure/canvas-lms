@@ -106,7 +106,7 @@ module Outcomes
       # cache this in the class since this won't change so much
       @supported_languages ||= ContentTag.connection.execute(
         "SELECT cfgname FROM pg_ts_config"
-      ).to_a.map { |r| r["cfgname"] }
+      ).to_a.pluck("cfgname")
     end
 
     private
@@ -178,7 +178,7 @@ module Outcomes
               SQL
             end
 
-      search_query_tokens = ContentTag.connection.execute(sql).to_a.map { |r| r["token"] }.uniq
+      search_query_tokens = ContentTag.connection.execute(sql).to_a.pluck("token").uniq
 
       short_description_query = ContentTag.sanitize_sql_array(["#{SHORT_DESCRIPTION} ~* ANY(array[?])",
                                                                search_query_tokens])
@@ -214,7 +214,7 @@ module Outcomes
         SELECT id FROM levels
       SQL
 
-      LearningOutcomeGroup.connection.execute(sql).as_json.map { |r| r["id"] }
+      LearningOutcomeGroup.connection.execute(sql).as_json.pluck("id")
     end
 
     def context_timestamp_cache

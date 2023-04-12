@@ -359,13 +359,13 @@ describe "Module Items API", type: :request do
                       course_id: @course.id.to_s, module_id: module3.id.to_s, per_page: "2")
       expect(response.headers["Link"]).to be_present
       expect(json.size).to eq 2
-      ids = json.collect { |tag| tag["id"] }
+      ids = json.pluck("id")
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{module3.id}/items?per_page=2&page=2",
                       controller: "context_module_items_api", action: "index", format: "json",
                       course_id: @course.id.to_s, module_id: module3.id.to_s, page: "2", per_page: "2")
       expect(json.size).to eq 2
-      ids += json.collect { |tag| tag["id"] }
+      ids += json.pluck("id")
 
       expect(ids).to eq module3.content_tags.sort_by(&:position).collect(&:id)
     end
@@ -379,7 +379,7 @@ describe "Module Items API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{module3.id}/items?search_term=spec",
                       controller: "context_module_items_api", action: "index", format: "json",
                       course_id: @course.id.to_s, module_id: module3.id.to_s, search_term: "spec")
-      expect(json.map { |mod| mod["id"] }.sort).to eq tags.map(&:id).sort
+      expect(json.pluck("id").sort).to eq tags.map(&:id).sort
     end
 
     describe "POST 'create'" do
@@ -927,7 +927,7 @@ describe "Module Items API", type: :request do
         expect(json["items"][0]["prev"]["id"]).to eq @topic_tag.id
         expect(json["items"][0]["current"]["id"]).to eq @external_url_tag.id
         expect(json["items"][0]["next"]["id"]).to eq @wiki_page_tag.id
-        expect(json["modules"].map { |mod| mod["id"] }.sort).to eq [@module1.id, @module2.id].sort
+        expect(json["modules"].pluck("id").sort).to eq [@module1.id, @module2.id].sort
       end
 
       context "section specific discussions" do
@@ -966,7 +966,7 @@ describe "Module Items API", type: :request do
         expect(json["items"][0]["prev"]["id"]).to eq @external_url_tag.id
         expect(json["items"][0]["current"]["id"]).to eq @wiki_page_tag.id
         expect(json["items"][0]["next"]["id"]).to eq @attachment_tag.id
-        expect(json["modules"].map { |mod| mod["id"] }.sort).to eq [@module1.id, @module2.id].sort
+        expect(json["modules"].pluck("id").sort).to eq [@module1.id, @module2.id].sort
 
         @wiki_page.workflow_state = "deleted"
         @wiki_page.save!
@@ -986,7 +986,7 @@ describe "Module Items API", type: :request do
                         course_id: @course.to_param, asset_type: "ModuleItem", asset_id: @external_url_tag.to_param)
         expect(json["items"].size).to be 1
         expect(json["items"][0]["next"]["id"]).to eql new_tag.id
-        expect(json["modules"].map { |mod| mod["id"] }.sort).to eq [@module1.id, @module3.id].sort
+        expect(json["modules"].pluck("id").sort).to eq [@module1.id, @module3.id].sort
       end
 
       it "skips a deleted item" do
@@ -1133,7 +1133,7 @@ describe "Module Items API", type: :request do
           cyoe_returns assignment_ids
           json = call_select_mastery_path @assignment_tag, 100, @student.id
           expect(json["assignments"].length).to eq 3
-          expect(json["assignments"].map { |a| a["id"] }).to eq assignment_ids
+          expect(json["assignments"].pluck("id")).to eq assignment_ids
           expect(json["items"]).to eq []
         end
 
@@ -1147,14 +1147,14 @@ describe "Module Items API", type: :request do
           json = call_select_mastery_path @assignment_tag, 100, @student.id
           items = json["items"]
           expect(items.length).to eq 2
-          expect(items.map { |item| item["id"] }).to match_array [@quiz_tag.id, @graded_topic_tag.id]
+          expect(items.pluck("id")).to match_array [@quiz_tag.id, @graded_topic_tag.id]
         end
 
         it "returns assignments in the same order as cyoe" do
           assignment_ids = create_assignments([@course.id], 5)
           cyoe_returns assignment_ids.reverse
           json = call_select_mastery_path @assignment_tag, 100, @student.id
-          expect(json["assignments"].map { |a| a["id"] }).to eq assignment_ids.reverse
+          expect(json["assignments"].pluck("id")).to eq assignment_ids.reverse
           expect(json["items"]).to eq []
         end
 
@@ -1163,7 +1163,7 @@ describe "Module Items API", type: :request do
           Assignment.find(assignment_ids.last).unpublish!
           cyoe_returns assignment_ids
           json = call_select_mastery_path @assignment_tag, 100, @student.id
-          expect(json["assignments"].map { |a| a["id"] }).to eq assignment_ids[0..-2]
+          expect(json["assignments"].pluck("id")).to eq assignment_ids[0..-2]
         end
       end
     end
@@ -1175,9 +1175,9 @@ describe "Module Items API", type: :request do
     end
 
     def override_assignment
-      @due_at = Time.zone.now + 2.days
-      @unlock_at = Time.zone.now + 1.day
-      @lock_at = Time.zone.now + 3.days
+      @due_at = 2.days.from_now
+      @unlock_at = 1.day.from_now
+      @lock_at = 3.days.from_now
       @override = assignment_override_model(assignment: @assignment, due_at: @due_at, unlock_at: @unlock_at, lock_at: @lock_at)
       @override_student = @override.assignment_override_students.build
       @override_student.user = @student
@@ -1193,7 +1193,7 @@ describe "Module Items API", type: :request do
                       controller: "context_module_items_api", action: "index", format: "json",
                       course_id: @course.id.to_s, module_id: @module1.id.to_s)
 
-      expect(json.map { |item| item["id"] }.sort).to eq @module1.content_tags.active.map(&:id).sort
+      expect(json.pluck("id").sort).to eq @module1.content_tags.active.map(&:id).sort
 
       # also for locked modules that have completion requirements
       @assignment2 = @course.assignments.create!(name: "pls submit", submission_types: ["online_text_entry"])
@@ -1207,7 +1207,7 @@ describe "Module Items API", type: :request do
                       controller: "context_module_items_api", action: "index", format: "json",
                       course_id: @course.id.to_s, module_id: @module2.id.to_s)
 
-      expect(json.map { |item| item["id"] }.sort).to eq @module2.content_tags.map(&:id).sort
+      expect(json.pluck("id").sort).to eq @module2.content_tags.map(&:id).sort
     end
 
     context "differentiated_assignments" do
@@ -1227,7 +1227,7 @@ describe "Module Items API", type: :request do
                             controller: "context_module_items_api", action: "index", format: "json",
                             course_id: @course.id.to_s, module_id: @module1.id.to_s)
 
-            expect(json.map { |item| item["id"] }.sort).to eq @module1.content_tags.map(&:id).sort
+            expect(json.pluck("id").sort).to eq @module1.content_tags.map(&:id).sort
           end
         end
 
@@ -1237,7 +1237,7 @@ describe "Module Items API", type: :request do
                             controller: "context_module_items_api", action: "index", format: "json",
                             course_id: @course.id.to_s, module_id: @module1.id.to_s)
 
-            expect(json.map { |item| item["id"] }.sort).not_to eq @module1.content_tags.map(&:id).sort
+            expect(json.pluck("id").sort).not_to eq @module1.content_tags.map(&:id).sort
           end
         end
       end
@@ -1708,13 +1708,13 @@ describe "Module Items API", type: :request do
                           controller: "context_module_items_api", action: "item_sequence", format: "json",
                           course_id: @course.to_param, asset_type: "File", asset_id: @attachment.to_param)
           expect(json["items"][0]["next"]["id"]).to eq @new_assignment_2_tag.id
-          expect(json["modules"].map { |item| item["id"] }.sort).to eq [@module2.id, @module4.id].sort
+          expect(json["modules"].pluck("id").sort).to eq [@module2.id, @module4.id].sort
 
           json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Assignment&asset_id=#{@new_assignment_2.id}",
                           controller: "context_module_items_api", action: "item_sequence", format: "json",
                           course_id: @course.to_param, asset_type: "Assignment", asset_id: @new_assignment_2.to_param)
           expect(json["items"][0]["prev"]["id"]).to eq @attachment_tag.id
-          expect(json["modules"].map { |item| item["id"] }.sort).to eq [@module2.id, @module4.id].sort
+          expect(json["modules"].pluck("id").sort).to eq [@module2.id, @module4.id].sort
         end
       end
     end

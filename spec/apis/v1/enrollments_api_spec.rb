@@ -1008,14 +1008,14 @@ describe EnrollmentsApiController, type: :request do
 
           course_with_student user: @student, enrollment_state: "invited", active_course: true
           json = api_call_as_user @student, :get, @user_path, @user_params.merge(state: %w[invited active])
-          expect(json.map { |e| e["course_id"] }).to match_array [course0.id, @course.id]
+          expect(json.pluck("course_id")).to match_array [course0.id, @course.id]
 
           @course.start_at = 1.month.ago
           @course.conclude_at = 1.week.ago
           @course.restrict_enrollments_to_course_dates = true
           @course.save!
           json = api_call_as_user @student, :get, @user_path, @user_params.merge(state: %w[invited active])
-          expect(json.map { |e| e["course_id"] }).to match_array [course0.id]
+          expect(json.pluck("course_id")).to match_array [course0.id]
         end
 
         describe "grade summary" do
@@ -1246,7 +1246,7 @@ describe EnrollmentsApiController, type: :request do
           it "filters by a single sis_account_id" do
             @params[:sis_account_id] = "1234"
             json = api_call(:get, @path, @params)
-            student_ids = json.map { |e| e["user_id"] }
+            student_ids = json.pluck("user_id")
             expect(json.length).to eq(2)
             expect(json.first["sis_account_id"]).to eq(@subaccount.sis_source_id)
             expect(student_ids).to match_array([@teacher.id, @student.id])
@@ -1255,7 +1255,7 @@ describe EnrollmentsApiController, type: :request do
           it "filters by a list of sis_account_ids" do
             @params[:sis_account_id] = ["1234", "5678"]
             json = api_call(:get, @path, @params)
-            student_ids = json.map { |e| e["user_id"] }
+            student_ids = json.pluck("user_id")
             expect(json.length).to eq(2)
             expect(json.first["sis_account_id"]).to eq(@subaccount.sis_source_id)
             expect(student_ids).to match_array([@teacher.id, @student.id])
@@ -1314,7 +1314,7 @@ describe EnrollmentsApiController, type: :request do
           it "filters by a single sis_section_id" do
             @params[:sis_section_id] = "SIS123"
             json = api_call(:get, @path, @params)
-            json_user_ids = json.map { |user| user["user_id"] }
+            json_user_ids = json.pluck("user_id")
             section_user_ids = @course.course_sections.first.enrollments.map(&:user_id)
             expect(json.length).to eq(@course.course_sections.first.enrollments.length)
             expect(json_user_ids).to match_array(section_user_ids)
@@ -1324,7 +1324,7 @@ describe EnrollmentsApiController, type: :request do
             @params[:sis_section_id] = ["SIS123", "SIS456"]
             json = api_call(:get, @path, @params)
             expect(json.length).to eq(@course.course_sections.first.enrollments.length)
-            json_user_ids = json.map { |user| user["user_id"] }
+            json_user_ids = json.pluck("user_id")
             section_user_ids = @course.course_sections.first.enrollments.map(&:user_id)
             expect(json_user_ids).to match_array(section_user_ids)
           end
@@ -1345,7 +1345,7 @@ describe EnrollmentsApiController, type: :request do
             @params[:sis_course_id] = "SIS123"
             json = api_call(:get, @path, @params)
             expect(json.length).to eq(@course.enrollments.length)
-            json_user_ids = json.map { |user| user["user_id"] }
+            json_user_ids = json.pluck("user_id")
             course_user_ids = @course.enrollments.map(&:user_id)
             expect(json_user_ids).to match_array(course_user_ids)
           end
@@ -1354,7 +1354,7 @@ describe EnrollmentsApiController, type: :request do
             @params[:sis_course_id] = ["SIS123", "LULZ"]
             json = api_call(:get, @path, @params)
             expect(json.length).to eq(@course.enrollments.length)
-            json_user_ids = json.map { |user| user["user_id"] }
+            json_user_ids = json.pluck("user_id")
             course_user_ids = @course.enrollments.map(&:user_id)
             expect(json_user_ids).to match_array(course_user_ids)
           end
@@ -1404,7 +1404,7 @@ describe EnrollmentsApiController, type: :request do
       it "shows last_activity_at and total_activity_time for student enrollment" do
         enrollment = @course.student_enrollments.first
         recent_activity = Enrollment::RecentActivity.new(enrollment)
-        recent_activity.record!(Time.zone.now - 5.minutes)
+        recent_activity.record!(5.minutes.ago)
         recent_activity.record!(Time.zone.now)
         json = api_call(:get, @user_path, @user_params)
         enrollments = @student.enrollments.current.eager_load(:user).order("users.sortable_name ASC")
@@ -1470,12 +1470,12 @@ describe EnrollmentsApiController, type: :request do
 
         # without a state[] filter
         json = api_call(:get, @user_path, @user_params)
-        expect(json.map { |e| e["id"] }).to include enrollment.id
+        expect(json.pluck("id")).to include enrollment.id
 
         # with a state[] filter
         json = api_call(:get, "#{@user_path}?state[]=active",
                         @user_params.merge(state: %w[active]))
-        expect(json.map { |e| e["id"] }).to include enrollment.id
+        expect(json.pluck("id")).to include enrollment.id
       end
 
       it "does not return enrollments from other accounts" do
@@ -1925,12 +1925,12 @@ describe EnrollmentsApiController, type: :request do
 
         # Request w/o a state[] filter.
         json = api_call(:get, @user_path, @user_params)
-        expect(json.map { |e| e["id"] }).not_to include enrollment.id
+        expect(json.pluck("id")).not_to include enrollment.id
 
         # Request w/ a state[] filter.
         json = api_call(:get, @user_path,
                         @user_params.merge(state: %w[active], type: %w[StudentEnrollment]))
-        expect(json.map { |e| e["id"] }).not_to include enrollment.id
+        expect(json.pluck("id")).not_to include enrollment.id
       end
 
       it "shows enrollments for courses that aren't published if state[]=current_and_future" do
@@ -1941,7 +1941,7 @@ describe EnrollmentsApiController, type: :request do
 
         json = api_call(:get, @user_path,
                         @user_params.merge(state: %w[current_and_future], type: %w[StudentEnrollment]))
-        expect(json.map { |e| e["id"] }).to include enrollment.id
+        expect(json.pluck("id")).to include enrollment.id
       end
 
       it "shows enrollments for courses with future start dates if state[]=current_and_future" do
@@ -1953,7 +1953,7 @@ describe EnrollmentsApiController, type: :request do
 
         json = api_call(:get, @user_path,
                         @user_params.merge(state: %w[current_and_future], type: %w[StudentEnrollment]))
-        expect(json.map { |e| e["id"] }).to include enrollment.id
+        expect(json.pluck("id")).to include enrollment.id
       end
 
       it "accepts multiple state[] filters" do
@@ -1979,7 +1979,7 @@ describe EnrollmentsApiController, type: :request do
         enrollment2.course.offer!
 
         json = api_call(:get, "/api/v1/users/self/enrollments", @user_params.merge(user_id: "self"))
-        expect(json.map { |el| el["id"] }).to match_array([enrollment2.id])
+        expect(json.pluck("id")).to match_array([enrollment2.id])
       end
 
       it "does not include the users' sis and login ids" do
@@ -2306,7 +2306,7 @@ describe EnrollmentsApiController, type: :request do
 
           json = api_call(:get, @path, @params)
 
-          enrollment_ids = json.collect { |e| e["id"] }
+          enrollment_ids = json.pluck("id")
           expect(enrollment_ids.sort).to eq(@course.enrollments.map(&:id).sort)
           expect(json.length).to eq 2
         end
@@ -2324,7 +2324,7 @@ describe EnrollmentsApiController, type: :request do
           @params[:course_id] = @cs_course.id
           json = api_call(:get, "/api/v1/courses/#{@cs_course.id}/enrollments", @params)
 
-          enrollment_ids = json.collect { |e| e["id"] }
+          enrollment_ids = json.pluck("id")
           expect(enrollment_ids.sort).to eq(@cs_course.enrollments.map(&:id).sort)
           expect(json.length).to eq 2
         end
@@ -2358,7 +2358,7 @@ describe EnrollmentsApiController, type: :request do
           json = api_call_as_user(@observer, :get, "/api/v1/users/#{@student.id}/enrollments",
                                   { controller: "enrollments_api", action: "index", user_id: @student.to_param,
                                     format: "json" })
-          courses = json.map { |el| el["course_id"] }
+          courses = json.pluck("course_id")
           expect(courses).to include @course.id
           expect(courses).to include @other_course.id
         end
@@ -2524,13 +2524,13 @@ describe EnrollmentsApiController, type: :request do
       it "excludes users with inactive enrollments for students" do
         student_in_course(course: @course, active_all: true, user: user_with_pseudonym)
         json = api_call(:get, @path, @params)
-        expect(json.map { |e| e["id"] }).not_to include(@inactive_enroll.id)
+        expect(json.pluck("id")).not_to include(@inactive_enroll.id)
       end
 
       it "includes users with inactive enrollments for teachers" do
         teacher_in_course(course: @course, active_all: true, user: user_with_pseudonym)
         json = api_call(:get, @path, @params)
-        expect(json.map { |e| e["id"] }).to include(@inactive_enroll.id)
+        expect(json.pluck("id")).to include(@inactive_enroll.id)
         enroll_json = json.detect { |e| e["id"] == @inactive_enroll.id }
         expect(enroll_json["user_id"]).to eq @inactive_user.id
         expect(enroll_json["enrollment_state"]).to eq "inactive"

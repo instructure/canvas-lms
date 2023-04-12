@@ -217,7 +217,7 @@ describe "Student reports" do
 
       parameters = {}
       parameters["start_at"] = @start_at.to_s
-      parameters["end_at"] = @end_at.to_s(:db)
+      parameters["end_at"] = @end_at.to_fs(:db)
       parameters["enrollment_term"] = @term1.id
       parsed = read_report(@type, { params: parameters, order: 1 })
 

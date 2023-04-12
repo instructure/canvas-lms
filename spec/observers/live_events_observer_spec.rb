@@ -113,8 +113,8 @@ describe LiveEventsObserver do
 
     {
       display_name: "some_other_attachment_name_now",
-      lock_at: Time.zone.now + 10.days,
-      unlock_at: Time.zone.now + 10.days,
+      lock_at: 10.days.from_now,
+      unlock_at: 10.days.from_now,
     }.each do |key, val|
       context "if #{key} changes" do
         it "posts attachment_updated events" do

@@ -76,7 +76,7 @@ describe "Accounts API", type: :request do
 
       json = api_call(:get, "/api/v1/accounts.json",
                       { controller: "accounts", action: "index", format: "json" })
-      expect(json.map { |a| a["id"] }).to match_array([@a1.id, @a2.id])
+      expect(json.pluck("id")).to match_array([@a1.id, @a2.id])
     end
 
     it "doesn't include deleted accounts" do
@@ -182,8 +182,8 @@ describe "Accounts API", type: :request do
                       "/api/v1/accounts/#{@a1.id}/sub_accounts",
                       { controller: "accounts", action: "sub_accounts",
                         account_id: @a1.id.to_s, format: "json" })
-      expect(json.map { |j| j["name"] }).to eq ["subby", "implicit-access",
-                                                "Account 1", "Account 2"]
+      expect(json.pluck("name")).to eq ["subby", "implicit-access",
+                                        "Account 1", "Account 2"]
     end
 
     it "adds sub account" do
@@ -223,9 +223,9 @@ describe "Accounts API", type: :request do
                         { controller: "accounts", action: "sub_accounts",
                           account_id: @a1.id.to_s, recursive: "1", format: "json" })
 
-        expect(json.map { |j| j["name"] }.sort).to eq ["subby", "implicit-access",
-                                                       "Account 1", "Account 1.1", "Account 1.2", "Account 1.2.1",
-                                                       "Account 2", "Account 2.1", "Account 2.2", "Account 2.3"].sort
+        expect(json.pluck("name").sort).to eq ["subby", "implicit-access",
+                                               "Account 1", "Account 1.1", "Account 1.2", "Account 1.2.1",
+                                               "Account 2", "Account 2.1", "Account 2.2", "Account 2.3"].sort
       end
 
       it "ignores deleted accounts" do
@@ -239,9 +239,9 @@ describe "Accounts API", type: :request do
                         { controller: "accounts", action: "sub_accounts",
                           account_id: @a1.id.to_s, recursive: "1", format: "json" })
 
-        expect(json.map { |j| j["name"] }.sort).to eq ["subby", "implicit-access",
-                                                       "Account 1", "Account 1.1", "Account 1.2", "Account 1.2.1",
-                                                       "Account 2", "Account 2.1", "Account 2.2", "Account 2.3"].sort
+        expect(json.pluck("name").sort).to eq ["subby", "implicit-access",
+                                               "Account 1", "Account 1.1", "Account 1.2", "Account 1.2.1",
+                                               "Account 2", "Account 2.1", "Account 2.2", "Account 2.3"].sort
       end
     end
   end
@@ -1073,7 +1073,7 @@ describe "Accounts API", type: :request do
                       { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                         format: "json", include: ["teachers"], teacher_limit: "1" })
       [@c1, @c2].each do |c|
-        expect(json.detect { |h| h["id"] == c.id }["teachers"].map { |t| t["id"] }).to eq [@teacher.id]
+        expect(json.detect { |h| h["id"] == c.id }["teachers"].pluck("id")).to eq [@teacher.id]
       end
     end
 
@@ -1085,7 +1085,7 @@ describe "Accounts API", type: :request do
       json = api_call_as_user(account_admin_user(account: @a1), :get, "/api/v1/accounts/#{@a1.id}/courses?homeroom=1",
                               controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                               format: "json", homeroom: "1")
-      expect(json.map { |c| c["name"] }).to match_array(["c2"])
+      expect(json.pluck("name")).to match_array(["c2"])
     end
 
     describe "sort" do
@@ -1220,21 +1220,21 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
                         { controller: "accounts", action: "courses_api",
                           format: "json", account_id: @a1.to_param })
-        expect(json.collect { |row| row["name"] }).to eql ["c1", "c2"]
+        expect(json.pluck("name")).to eql ["c1", "c2"]
       end
 
       it "filters on courses with enrollments" do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?with_enrollments=1",
                         { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                           format: "json", with_enrollments: "1" })
-        expect(json.collect { |row| row["name"] }).to eql ["c1"]
+        expect(json.pluck("name")).to eql ["c1"]
       end
 
       it "filters on courses without enrollments" do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?with_enrollments=0",
                         { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                           format: "json", with_enrollments: "0" })
-        expect(json.collect { |row| row["name"] }).to eql ["c2"]
+        expect(json.pluck("name")).to eql ["c2"]
       end
     end
 
@@ -1252,14 +1252,14 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json" })
-        expect(json.collect { |row| row["name"] }).to eql ["c1", "c2"]
+        expect(json.pluck("name")).to eql ["c1", "c2"]
       end
 
       it "filters courses on published state" do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?published=true",
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json", published: "true" })
-        expect(json.collect { |row| row["name"] }).to eql ["c1"]
+        expect(json.pluck("name")).to eql ["c1"]
       end
 
       it "filters courses on non-published state" do
@@ -1267,7 +1267,7 @@ describe "Accounts API", type: :request do
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json",
                           published: "false" })
-        expect(json.collect { |row| row["name"] }).to eql ["c2"]
+        expect(json.pluck("name")).to eql ["c2"]
       end
     end
 
@@ -1302,21 +1302,21 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json" })
-        expect(json.collect { |row| row["name"] }).to eql %w[c1 c2 c3 c4 c5]
+        expect(json.pluck("name")).to eql %w[c1 c2 c3 c4 c5]
       end
 
       it "filters courses on completed state" do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?completed=yes",
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json", completed: "yes" })
-        expect(json.collect { |row| row["name"] }).to eql %w[c2 c3 c4]
+        expect(json.pluck("name")).to eql %w[c2 c3 c4]
       end
 
       it "filters courses on non-completed state" do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?completed=no",
                         { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                           format: "json", completed: "no" })
-        expect(json.collect { |row| row["name"] }).to eql %w[c1 c5]
+        expect(json.pluck("name")).to eql %w[c1 c5]
       end
 
       it "filters and sort without asploding" do
@@ -1324,7 +1324,7 @@ describe "Accounts API", type: :request do
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json", completed: "yes",
                           sort: "course_name", order: "desc" })
-        expect(json.collect { |row| row["name"] }).to eql %w[c4 c3 c2]
+        expect(json.pluck("name")).to eql %w[c4 c3 c2]
       end
     end
 
@@ -1353,7 +1353,7 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json" })
-        expect(json.collect { |row| row["name"] }).to eql %w[c1 c2 c3 c4]
+        expect(json.pluck("name")).to eql %w[c1 c2 c3 c4]
       end
 
       it "filters inclusively and include null values" do
@@ -1361,7 +1361,7 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?starts_before=#{date.iso8601}",
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json", starts_before: date.iso8601 })
-        expect(json.collect { |row| row["name"] }).to eql %w[c2 c3 c4]
+        expect(json.pluck("name")).to eql %w[c2 c3 c4]
       end
 
       it "filters and sort without asploding" do
@@ -1370,7 +1370,7 @@ describe "Accounts API", type: :request do
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json", starts_before: date.iso8601,
                           sort: "course_name", order: "desc" })
-        expect(json.collect { |row| row["name"] }).to eql %w[c4 c3 c2]
+        expect(json.pluck("name")).to eql %w[c4 c3 c2]
       end
     end
 
@@ -1399,7 +1399,7 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json" })
-        expect(json.collect { |row| row["name"] }).to eql %w[c1 c2 c3 c4]
+        expect(json.pluck("name")).to eql %w[c1 c2 c3 c4]
       end
 
       it "filters inclusively and include null values" do
@@ -1407,7 +1407,7 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?ends_after=#{date.iso8601}",
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json", ends_after: date.iso8601 })
-        expect(json.collect { |row| row["name"] }).to eql %w[c2 c3 c4]
+        expect(json.pluck("name")).to eql %w[c2 c3 c4]
       end
 
       it "filters and sort without asploding" do
@@ -1416,7 +1416,7 @@ describe "Accounts API", type: :request do
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json", ends_after: date.iso8601,
                           sort: "course_name", order: "desc" })
-        expect(json.collect { |row| row["name"] }).to eql %w[c4 c3 c2]
+        expect(json.pluck("name")).to eql %w[c4 c3 c2]
       end
     end
 
@@ -1439,7 +1439,7 @@ describe "Accounts API", type: :request do
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json" },
                         {}, {}, { domain_root_account: @a1 })
-        expect(json.collect { |row| row["name"] }).to eql %w[c1a c1b c2 c3]
+        expect(json.pluck("name")).to eql %w[c1a c1b c2 c3]
       end
 
       it "filters courses by teacher enrollments" do
@@ -1447,7 +1447,7 @@ describe "Accounts API", type: :request do
                         { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                           format: "json", by_teachers: ["sis_user_id:a_sis_id", @t3.id.to_s] },
                         {}, {}, { domain_root_account: @a1 })
-        expect(json.collect { |row| row["name"] }).to eql %w[c1a c1b c3]
+        expect(json.pluck("name")).to eql %w[c1a c1b c3]
       end
 
       it "does not break with an empty result set" do
@@ -1480,7 +1480,7 @@ describe "Accounts API", type: :request do
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json" },
                         {}, {}, { domain_root_account: @a1 })
-        expect(json.collect { |row| row["name"] }).to eql ["in sub1", "in sub1a", "in sub1b", "in sub2", "in top level"]
+        expect(json.pluck("name")).to eql ["in sub1", "in sub1a", "in sub1b", "in sub2", "in top level"]
       end
 
       it "includes descendants of the specified subaccount" do
@@ -1488,7 +1488,7 @@ describe "Accounts API", type: :request do
                         { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                           format: "json", by_subaccounts: ["sis_account_id:sub1"] },
                         {}, {}, { domain_root_account: @a1 })
-        expect(json.collect { |row| row["name"] }).to eql ["in sub1", "in sub1a", "in sub1b"]
+        expect(json.pluck("name")).to eql ["in sub1", "in sub1a", "in sub1b"]
       end
 
       it "works with multiple subaccounts specified" do
@@ -1497,7 +1497,7 @@ describe "Accounts API", type: :request do
                           account_id: @a1.to_param, format: "json",
                           by_subaccounts: ["sis_account_id:sub1a", "sis_account_id:sub1b"] },
                         {}, {}, { domain_root_account: @a1 })
-        expect(json.collect { |row| row["name"] }).to eql ["in sub1a", "in sub1b"]
+        expect(json.pluck("name")).to eql ["in sub1a", "in sub1b"]
       end
 
       it "works with a numeric ID" do
@@ -1505,7 +1505,7 @@ describe "Accounts API", type: :request do
                         { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                           format: "json", by_subaccounts: [@sub2.id.to_s] },
                         {}, {}, { domain_root_account: @a1 })
-        expect(json.collect { |row| row["name"] }).to eql ["in sub2"]
+        expect(json.pluck("name")).to eql ["in sub2"]
       end
 
       it "does not break with an empty result set" do
@@ -1607,28 +1607,28 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a.id}/courses?blueprint=true",
                         { controller: "accounts", action: "courses_api", account_id: @a.to_param,
                           format: "json", blueprint: true })
-        expect(json.map { |c| c["name"] }).to match_array %w[MasterCourse]
+        expect(json.pluck("name")).to match_array %w[MasterCourse]
       end
 
       it "filters out blueprint courses" do
         json = api_call(:get, "/api/v1/accounts/#{@a.id}/courses?blueprint=false",
                         { controller: "accounts", action: "courses_api", account_id: @a.to_param,
                           format: "json", blueprint: false })
-        expect(json.map { |c| c["name"] }).to match_array %w[ChildCourse OtherCourse]
+        expect(json.pluck("name")).to match_array %w[ChildCourse OtherCourse]
       end
 
       it "filters in associated courses" do
         json = api_call(:get, "/api/v1/accounts/#{@a.id}/courses?blueprint_associated=true",
                         { controller: "accounts", action: "courses_api", account_id: @a.to_param,
                           format: "json", blueprint_associated: true })
-        expect(json.map { |c| c["name"] }).to match_array %w[ChildCourse]
+        expect(json.pluck("name")).to match_array %w[ChildCourse]
       end
 
       it "filters out associated courses" do
         json = api_call(:get, "/api/v1/accounts/#{@a.id}/courses?blueprint_associated=false",
                         { controller: "accounts", action: "courses_api", account_id: @a.to_param,
                           format: "json", blueprint_associated: false })
-        expect(json.map { |c| c["name"] }).to match_array %w[MasterCourse OtherCourse]
+        expect(json.pluck("name")).to match_array %w[MasterCourse OtherCourse]
       end
     end
   end

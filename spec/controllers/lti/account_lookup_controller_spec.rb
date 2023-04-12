@@ -46,7 +46,7 @@ describe Lti::AccountLookupController do
       it "returns id, uuid, and other fields on account" do
         send_request
         acct = Account.root_accounts.first
-        body = JSON.parse(response.body)
+        body = response.parsed_body
         expect(body).to include(
           "id" => acct.id,
           "uuid" => acct.uuid,
@@ -91,7 +91,7 @@ describe Lti::AccountLookupController do
       it "returns id, uuid, and other fields on account" do
         send_request
         acct = Account.root_accounts.first
-        body = JSON.parse(response.body)
+        body = response.parsed_body
         expect(body).to include(
           "id" => acct.id,
           "uuid" => acct.uuid,

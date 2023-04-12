@@ -35,7 +35,7 @@ describe PlannerOverridesController do
     @course.assignments.create(
       title: "some assignment #{@course.assignments.count}",
       assignment_group: @group,
-      due_at: Time.zone.now + 1.week
+      due_at: 1.week.from_now
     )
   end
 

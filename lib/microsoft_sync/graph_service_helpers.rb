@@ -132,7 +132,7 @@ module MicrosoftSync
         graph_service.groups.send(
           method, group_id, select: ["id"], top: GET_GROUP_USERS_BATCH_SIZE
         ) do |users|
-          aad_ids.concat(users.map { |user| user["id"] })
+          aad_ids.concat(users.pluck("id"))
         end
       end
     end

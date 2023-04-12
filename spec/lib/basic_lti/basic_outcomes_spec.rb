@@ -834,7 +834,7 @@ describe BasicLTI::BasicOutcomes do
       stub_request(:get, "http://example.com/download").to_return(status: 500)
       Timecop.freeze do
         run_jobs
-        expect(Delayed::Job.find_by(strand: "file_download/example.com/failed").run_at).to be > Time.zone.now + 5.seconds
+        expect(Delayed::Job.find_by(strand: "file_download/example.com/failed").run_at).to be > 5.seconds.from_now
       end
       expect(submission.reload.versions.count).to eq 1
       expect(submission.attachments.count).to eq 0

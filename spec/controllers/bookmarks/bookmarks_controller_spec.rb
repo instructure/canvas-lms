@@ -135,7 +135,7 @@ describe Bookmarks::BookmarksController do
           post "create", params: { name: "chem 101", url: "/courses/2" }, format: "json"
 
           expect(response).to be_successful
-          @json = JSON.parse(response.body)
+          @json = response.parsed_body
         end
         bookmark = Bookmarks::Bookmark.find(@json["id"])
         expect(bookmark.user_id).to eq @user.id

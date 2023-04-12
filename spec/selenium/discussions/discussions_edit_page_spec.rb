@@ -120,9 +120,9 @@ describe "discussions" do
           get url
           wait_for_tiny(f("textarea[name=message]"))
 
-          due_at = Time.zone.now + 3.days
-          unlock_at = Time.zone.now + 2.days
-          lock_at = Time.zone.now + 4.days
+          due_at = 3.days.from_now
+          unlock_at = 2.days.from_now
+          lock_at = 4.days.from_now
 
           # set due_at, lock_at, unlock_at
           replace_content(f(".date_field[data-date-type='due_at']"), format_date_for_view(due_at), tab_out: true)
@@ -230,14 +230,14 @@ describe "discussions" do
 
       it "shows correct date when saving" do
         Timecop.freeze do
-          topic.lock_at = Time.zone.now - 5.days
+          topic.lock_at = 5.days.ago
           topic.save!
           teacher.time_zone = "Hawaii"
           teacher.save!
           get url
           f(".form-actions button[type=submit]").click
           get url
-          expect(topic.reload.lock_at).to eq (Time.zone.now - 5.days).beginning_of_minute
+          expect(topic.reload.lock_at).to eq 5.days.ago.beginning_of_minute
         end
       end
 
@@ -282,8 +282,8 @@ describe "discussions" do
           get url
           wait_for_tiny(f("textarea[name=message]"))
 
-          delayed_post_at = Time.zone.now - 10.days
-          lock_at = Time.zone.now - 5.days
+          delayed_post_at = 10.days.ago
+          lock_at = 5.days.ago
 
           replace_content(f('input[type=text][name="delayed_post_at"]'), format_date_for_view(delayed_post_at), tab_out: true)
           replace_content(f('input[type=text][name="lock_at"]'), format_date_for_view(lock_at), tab_out: true)
@@ -307,7 +307,7 @@ describe "discussions" do
           get url
           wait_for_tiny(f("textarea[name=message]"))
 
-          delayed_post_at = Time.zone.now - 5.days
+          delayed_post_at = 5.days.ago
 
           replace_content(f('input[type=text][name="delayed_post_at"]'), format_date_for_view(delayed_post_at), tab_out: true)
 

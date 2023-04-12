@@ -342,7 +342,7 @@ describe OutcomeResultsController do
                                user_ids: [@student.id],
                                outcome_ids: [@outcome.id] },
                      format: "json"
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["outcome_results"].length).to eq 1
       end
 
@@ -372,7 +372,7 @@ describe OutcomeResultsController do
                                user_ids: [@student.id],
                                outcome_ids: [@outcome.id] },
                      format: "json"
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["outcome_results"].length).to eq 1
       end
 
@@ -529,7 +529,7 @@ describe OutcomeResultsController do
 
     it "includes rating percents" do
       json = parse_response(get_rollups(rating_percents: true, include: ["outcomes"]))
-      expect(json["linked"]["outcomes"][0]["ratings"].map { |r| r["percent"] }).to eq [50, 50]
+      expect(json["linked"]["outcomes"][0]["ratings"].pluck("percent")).to eq [50, 50]
     end
 
     context "with outcome_service_results_to_canvas FF" do
@@ -984,8 +984,8 @@ describe OutcomeResultsController do
           outcome_proficiency_model(@course)
           json = parse_response(get_rollups(rating_percents: true, include: ["outcomes"]))
           ratings = json["linked"]["outcomes"][0]["ratings"]
-          expect(ratings.map { |r| r["percent"] }).to eq [50, 50]
-          expect(ratings.map { |r| r["points"] }).to eq [10, 0]
+          expect(ratings.pluck("percent")).to eq [50, 50]
+          expect(ratings.pluck("points")).to eq [10, 0]
         end
       end
 
@@ -1006,8 +1006,8 @@ describe OutcomeResultsController do
           create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
           json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", add_defaults: true, per_page: 1, page: 1, include: ["outcomes"]))
           ratings = json["linked"]["outcomes"][0]["ratings"]
-          expect(ratings.map { |r| r["mastery"] }).to eq [true, false]
-          expect(ratings.map { |r| r["color"] }).to eq ["0B874B", "555555"]
+          expect(ratings.pluck("mastery")).to eq [true, false]
+          expect(ratings.pluck("color")).to eq ["0B874B", "555555"]
         end
 
         it "does not contain mastery and color information if \"add_defaults\" parameter is not provided" do
@@ -1015,8 +1015,8 @@ describe OutcomeResultsController do
           create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
           json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 1, page: 1, include: ["outcomes"]))
           ratings = json["linked"]["outcomes"][0]["ratings"]
-          expect(ratings.map { |r| r["mastery"] }).to eq [nil, nil]
-          expect(ratings.map { |r| r["color"] }).to eq [nil, nil]
+          expect(ratings.pluck("mastery")).to eq [nil, nil]
+          expect(ratings.pluck("color")).to eq [nil, nil]
         end
       end
     end
@@ -1446,17 +1446,17 @@ describe OutcomeResultsController do
             context "should paginate by user, rather than by enrollment" do
               it "returns student1 on first page" do
                 expect_students_in_pagination(1, [@student1], include: ["users"])
-                expect(json["linked"]["users"].map { |u| u["id"] }).to eq [@student1.id.to_s]
+                expect(json["linked"]["users"].pluck("id")).to eq [@student1.id.to_s]
               end
 
               it "returns student2 on second page" do
                 expect_students_in_pagination(2, [@student2, @student2, @student2], include: ["users"])
-                expect(json["linked"]["users"].map { |u| u["id"] }).to eq [@student2.id.to_s]
+                expect(json["linked"]["users"].pluck("id")).to eq [@student2.id.to_s]
               end
 
               it "returns student3 on third page" do
                 expect_students_in_pagination(3, [@student3, @student3], include: ["users"])
-                expect(json["linked"]["users"].map { |u| u["id"] }).to eq [@student3.id.to_s]
+                expect(json["linked"]["users"].pluck("id")).to eq [@student3.id.to_s]
               end
 
               it "return no student in fourth page" do

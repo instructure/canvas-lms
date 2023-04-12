@@ -315,7 +315,7 @@ describe "calendar2" do
     end
 
     it "only considers active enrollments for upcoming events list", priority: "2" do
-      make_event(title: "Test Event", start: Time.zone.now + 1.day, context: @course)
+      make_event(title: "Test Event", start: 1.day.from_now, context: @course)
       get "/"
       expect(f(".coming_up").text).to include("Test Event")
       term = EnrollmentTerm.find(@course.enrollment_term_id)

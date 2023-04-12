@@ -42,7 +42,7 @@ describe Lti::TokenController do
       )
     end
     let(:root_account) { Account.create!(name: "root account") }
-    let(:parsed_body) { JSON.parse(response.body) }
+    let(:parsed_body) { response.parsed_body }
     let(:decoded_jwt) { JSON::JWT.decode parsed_body["access_token"], :skip_verification }
     let(:params) { {} }
 

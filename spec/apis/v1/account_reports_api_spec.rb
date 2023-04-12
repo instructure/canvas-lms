@@ -31,7 +31,7 @@ describe "Account Reports API", type: :request do
     @report.start_at = DateTime.now
     @report.end_at = (Time.now + rand(60 * 60 * 4)).to_datetime
     @report.report_type = "student_assignment_outcome_map_csv"
-    @report.parameters = HashWithIndifferentAccess["param" => "test", "error" => "failed"]
+    @report.parameters = ActiveSupport::HashWithIndifferentAccess["param" => "test", "error" => "failed"]
 
     folder = Folder.assert_path("test", @admin.account)
     @report.attachment = Attachment.create!(folder: folder, context: @admin.account, filename: "test.txt", uploaded_data: StringIO.new("test file"))
@@ -101,7 +101,7 @@ describe "Account Reports API", type: :request do
       report2.user = @admin
       report2.progress = rand(100)
       report2.report_type = "student_assignment_outcome_map_csv"
-      report2.parameters = HashWithIndifferentAccess["param" => "test", "error" => "failed"]
+      report2.parameters = ActiveSupport::HashWithIndifferentAccess["param" => "test", "error" => "failed"]
 
       folder = Folder.assert_path("test", @admin.account)
       report2.attachment = Attachment.create!(folder: folder, context: @admin.account, filename: "test.txt",

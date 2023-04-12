@@ -250,7 +250,7 @@ describe "Group Categories API", type: :request do
         role = custom_student_role("CustomStudent", account: @course.account)
         @course.enroll_user(custom_student, "StudentEnrollment", role: role)
         json = api_call_as_user(teacher, :get, api_url, api_route)
-        expect(json.map { |u| u["id"] }).to be_include custom_student.id
+        expect(json.pluck("id")).to be_include custom_student.id
       end
     end
 

@@ -2281,7 +2281,7 @@ describe CoursesController do
         }
       }, format: :json
 
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["is_public"]).to be true
       expect(json["public_syllabus"]).to be true
       expect(json["is_public_to_auth_users"]).to be true
@@ -2296,7 +2296,7 @@ describe CoursesController do
         }
       }, format: :json
 
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(Course.find(json["id"]).grade_passback_setting).to eq "nightly_sync"
     end
 
@@ -2314,7 +2314,7 @@ describe CoursesController do
         }
       }, format: :json
 
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["is_public"]).to be false
       expect(json["public_syllabus"]).to be false
       expect(json["is_public_to_auth_users"]).to be false
@@ -2325,7 +2325,7 @@ describe CoursesController do
       stub_const("CanvasSanitize::SANITIZE", { parser_options: { max_tree_depth: 1 } })
       put "create", params: { account_id: @account.id, course: { syllabus_body: "<div><span>deeeeeeep</span></div>" }, format: :json }
       expect(response).to have_http_status :bad_request
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["errors"].keys).to include "unparsable_content"
     end
   end
@@ -2382,7 +2382,7 @@ describe CoursesController do
            },
            format: :json
 
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["is_public"]).to be true
       expect(json["public_syllabus"]).to be true
       expect(json["is_public_to_auth_users"]).to be true
@@ -2406,7 +2406,7 @@ describe CoursesController do
            },
            format: :json
 
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["is_public"]).to be false
       expect(json["public_syllabus"]).to be false
       expect(json["is_public_to_auth_users"]).to be false
@@ -2516,7 +2516,7 @@ describe CoursesController do
       expect(Auditors::Course).to receive(:record_concluded).once
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { event: "conclude" }, format: :json }
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["course"]["workflow_state"]).to eq "completed"
       @course.reload
       expect(@course.workflow_state).to eq "completed"
@@ -2532,7 +2532,7 @@ describe CoursesController do
       expect(Auditors::Course).to receive(:record_concluded).once
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { event: "conclude" }, format: :json }
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["course"]["workflow_state"]).to eq "completed"
       @course.reload
       expect(@course.workflow_state).to eq "completed"
@@ -2557,7 +2557,7 @@ describe CoursesController do
       expect(Auditors::Course).to receive(:record_published).once
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { event: "offer" }, format: :json }
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["course"]["workflow_state"]).to eq "available"
       @course.reload
       expect(@course.workflow_state).to eq "available"
@@ -2574,7 +2574,7 @@ describe CoursesController do
       expect(Auditors::Course).to receive(:record_published).once
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { event: "offer" }, format: :json }
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["course"]["workflow_state"]).to eq "available"
       @course.reload
       expect(@course.workflow_state).to eq "available"
@@ -2599,7 +2599,7 @@ describe CoursesController do
       user_session(@teacher)
       expect(Auditors::Course).to receive(:record_deleted).once
       put "update", params: { id: @course.id, course: { event: "delete" }, format: :json }
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["course"]["workflow_state"]).to eq "deleted"
       @course.reload
       expect(@course.workflow_state).to eq "deleted"
@@ -2615,7 +2615,7 @@ describe CoursesController do
       user_session(@teacher)
       expect(Auditors::Course).to receive(:record_deleted).once
       put "update", params: { id: @course.id, course: { event: "delete" }, format: :json }
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["course"]["workflow_state"]).to eq "deleted"
       @course.reload
       expect(@course.workflow_state).to eq "deleted"
@@ -2647,7 +2647,7 @@ describe CoursesController do
       expect(Auditors::Course).to receive(:record_restored).once
       user_session(account_admin_user)
       put "update", params: { id: @course.id, course: { event: "undelete" }, format: :json }
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["course"]["workflow_state"]).to eq "claimed"
       @course.reload
       expect(@course.workflow_state).to eq "claimed"
@@ -2657,7 +2657,7 @@ describe CoursesController do
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { event: "boogie" }, format: :json }
       expect(response).to have_http_status :bad_request
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["errors"].keys).to include "workflow_state"
     end
 
@@ -3204,7 +3204,7 @@ describe CoursesController do
       stub_const("CanvasSanitize::SANITIZE", { parser_options: { max_tree_depth: 1 } })
       put "update", params: { id: @course.id, course: { syllabus_body: "<div><span>deeeeeeep</span></div>" }, format: :json }
       expect(response).to have_http_status :bad_request
-      json = JSON.parse response.body
+      json = response.parsed_body
       expect(json["errors"].keys).to include "unparsable_content"
     end
 
@@ -4186,7 +4186,7 @@ describe CoursesController do
       course_with_observer(name: "course observer")
       get "content_share_users", params: { course_id: @search_context.id, search_term: "course" }
       json = json_parse(response.body)
-      expect(json.map { |user| user["name"] }).to eq(["course designer", "course ta", "course teacher"])
+      expect(json.pluck("name")).to eq(["course designer", "course ta", "course teacher"])
     end
 
     it "does not return users with only deleted enrollments or deleted courses" do
@@ -4195,13 +4195,13 @@ describe CoursesController do
       course_with_teacher(name: "course teacher").destroy
       get "content_share_users", params: { course_id: @search_context.id, search_term: "course" }
       json = json_parse(response.body)
-      expect(json.map { |user| user["name"] }).not_to include("course teacher")
+      expect(json.pluck("name")).not_to include("course teacher")
 
       course_with_ta(name: "course ta")
       @course.destroy
       get "content_share_users", params: { course_id: @search_context.id, search_term: "course" }
       json = json_parse(response.body)
-      expect(json.map { |user| user["name"] }).not_to include("course ta")
+      expect(json.pluck("name")).not_to include("course ta")
     end
 
     it "search for root and sub-account admins" do
@@ -4215,7 +4215,7 @@ describe CoursesController do
 
       get "content_share_users", params: { course_id: @search_context.id, search_term: "admin" }
       json = json_parse(response.body)
-      expect(json.map { |user| user["name"] }).to eq(["account admin", "sub-account admin"])
+      expect(json.pluck("name")).to eq(["account admin", "sub-account admin"])
     end
 
     it "does not return users with deleted admin accounts" do
@@ -4229,7 +4229,7 @@ describe CoursesController do
 
       get "content_share_users", params: { course_id: @course.id, search_term: "admin" }
       json = json_parse(response.body)
-      expect(json.map { |user| user["name"] }).not_to include("account admin", "sub-account admin")
+      expect(json.pluck("name")).not_to include("account admin", "sub-account admin")
     end
 
     it "returns the searching user" do
@@ -4238,7 +4238,7 @@ describe CoursesController do
       course_with_teacher(name: "course teacher")
       get "content_share_users", params: { course_id: @search_context.id, search_term: "teacher" }
       json = json_parse(response.body)
-      expect(json.map { |user| user["name"] }).to match_array(["course teacher", "search teacher"])
+      expect(json.pluck("name")).to match_array(["course teacher", "search teacher"])
     end
 
     it 'does not return admin roles that do not have the "manage_content" permission' do
@@ -4249,12 +4249,12 @@ describe CoursesController do
 
       get "content_share_users", params: { course_id: @course.id, search_term: "less privileged" }
       json = json_parse(response.body)
-      expect(json.map { |user| user["name"] }).not_to include("less privileged account admin")
+      expect(json.pluck("name")).not_to include("less privileged account admin")
 
       role.role_overrides.create!(enabled: true, permission: "manage_content", context: @course.root_account)
       get "content_share_users", params: { course_id: @course.id, search_term: "less privileged" }
       json = json_parse(response.body)
-      expect(json.map { |user| user["name"] }).to include("less privileged account admin")
+      expect(json.pluck("name")).to include("less privileged account admin")
     end
 
     it "does not return users from other root accounts" do
@@ -4268,7 +4268,7 @@ describe CoursesController do
 
       get "content_share_users", params: { course_id: a1_course.id, search_term: "account 2" }
       json = json_parse(response.body)
-      expect(json.map { |user| user["name"] }).not_to include("account 2 admin", "account 2 teacher")
+      expect(json.pluck("name")).not_to include("account 2 admin", "account 2 teacher")
     end
 
     it "still works for teachers whose course is concluded by term" do

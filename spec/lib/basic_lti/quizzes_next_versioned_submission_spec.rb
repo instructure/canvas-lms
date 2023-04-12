@@ -570,12 +570,12 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         )
         gp = GradingPeriod.create(
           weight: 40.0,
-          start_date: Time.zone.now - 10.days,
-          end_date: Time.zone.now - 1.day,
+          start_date: 10.days.ago,
+          end_date: 1.day.ago,
           title: "some title",
           workflow_state: "active",
           grading_period_group_id: gpg.id,
-          close_date: Time.zone.now - 1.day
+          close_date: 1.day.ago
         )
 
         submission.grading_period_id = gp.id

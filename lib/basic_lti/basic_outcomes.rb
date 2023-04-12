@@ -377,7 +377,7 @@ module BasicLTI
         submitted_at = xml_submitted_at.present? ? Time.zone.parse(xml_submitted_at) : nil
         if xml_submitted_at.present? && submitted_at.nil?
           report_failure(:timestamp_not_parseable, I18n.t("Invalid timestamp - timestamp not parseable"))
-        elsif submitted_at.present? && submitted_at > Time.zone.now + 1.minute
+        elsif submitted_at.present? && submitted_at > 1.minute.from_now
           report_failure(:timestamp_in_future, I18n.t("Invalid timestamp - timestamp in future"))
         end
         submission_hash[:submitted_at] = submitted_at || Time.zone.now

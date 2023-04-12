@@ -100,7 +100,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
       json = api_call(:get, @url, @params)
       expect(json.count).to eq 2
-      expect(json.map { |c| c["id"] }).to match_array([child_course1.id, child_course2.id])
+      expect(json.pluck("id")).to match_array([child_course1.id, child_course2.id])
       course1_json = json.detect { |c| c["id"] == child_course1.id }
       expect(course1_json["name"]).to eq child_course1.name
       expect(course1_json["course_code"]).to eq child_course1.course_code

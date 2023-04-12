@@ -60,7 +60,7 @@ describe "User Profile API", type: :request do
   it "returns another user's avatars, if allowed" do
     json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
                     controller: "profile", action: "profile_pics", user_id: @student.to_param, format: "json")
-    expect(json.map { |j| j["type"] }.sort).to eql ["gravatar", "no_pic"]
+    expect(json.pluck("type").sort).to eql ["gravatar", "no_pic"]
   end
 
   it "returns user info for users with no pseudonym" do
@@ -178,7 +178,7 @@ describe "User Profile API", type: :request do
     @student.register
     json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
                     controller: "profile", action: "profile_pics", user_id: @student.to_param, format: "json")
-    expect(json.map { |j| j["type"] }.sort).to eql ["gravatar", "no_pic"]
+    expect(json.pluck("type").sort).to eql ["gravatar", "no_pic"]
   end
 
   it "does not return disallowed profiles" do

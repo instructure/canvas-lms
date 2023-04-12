@@ -255,7 +255,7 @@ describe "Outcome Groups API", type: :request do
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups",
                       controller: "outcome_groups_api", action: "index", account_id: @account.id, format: "json")
       expected_ids = [@account.root_outcome_group, @child_group].map(&:id).sort
-      expect(json.map { |j| j["id"] }.sort).to eq expected_ids
+      expect(json.pluck("id").sort).to eq expected_ids
     end
   end
 
@@ -1793,7 +1793,7 @@ describe "Outcome Groups API", type: :request do
                       account_id: @account.id.to_s,
                       id: @group.id.to_s,
                       format: "json")
-      expect(json.map { |link| link["id"] }).to eq(
+      expect(json.pluck("id")).to eq(
         [1, 0, 2].map { |i| @subgroups[i].id }
       )
     end

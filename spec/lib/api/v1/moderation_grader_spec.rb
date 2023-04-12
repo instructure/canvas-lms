@@ -65,19 +65,19 @@ describe "Api::V1::ModerationGrader" do
 
       it "excludes the final grader" do
         assignment.moderation_graders.create!(anonymous_id: "teach", user: teacher)
-        expect(json.map { |grader| grader["user_id"] }).not_to include(teacher.id)
+        expect(json.pluck("user_id")).not_to include(teacher.id)
       end
 
       it "includes user_id on graders" do
-        expect(json.map { |grader| grader["user_id"] }).to match_array([grader_1.id, grader_2.id])
+        expect(json.pluck("user_id")).to match_array([grader_1.id, grader_2.id])
       end
 
       it "includes ids on graders" do
-        expect(json.map { |grader| grader["id"] }).to match_array(assignment.moderation_graders.map(&:id))
+        expect(json.pluck("id")).to match_array(assignment.moderation_graders.map(&:id))
       end
 
       it "includes grader_name on graders" do
-        expect(json.map { |grader| grader["grader_name"] }).to match_array([grader_1, grader_2].map(&:short_name))
+        expect(json.pluck("grader_name")).to match_array([grader_1, grader_2].map(&:short_name))
       end
     end
 
@@ -92,16 +92,16 @@ describe "Api::V1::ModerationGrader" do
 
       it "excludes the final grader" do
         assignment.moderation_graders.create!(anonymous_id: "teach", user: teacher)
-        expect(json.map { |grader| grader["anonymous_id"] }).not_to include("teach")
+        expect(json.pluck("anonymous_id")).not_to include("teach")
       end
 
       it "includes anonymous_id on graders" do
         anonymous_ids = assignment.moderation_graders.pluck(:anonymous_id)
-        expect(json.map { |grader| grader["anonymous_id"] }).to match_array(anonymous_ids)
+        expect(json.pluck("anonymous_id")).to match_array(anonymous_ids)
       end
 
       it "includes ids on graders" do
-        expect(json.map { |grader| grader["id"] }).to match_array(assignment.moderation_graders.map(&:id))
+        expect(json.pluck("id")).to match_array(assignment.moderation_graders.map(&:id))
       end
 
       it "excludes grader_name from graders" do

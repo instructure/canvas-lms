@@ -99,7 +99,7 @@ describe "Provisional Grades API", type: :request do
 
     it "returns json including the id of each selected provisional grade" do
       json = bulk_select(grades[0..1])
-      ids = json.map { |grade| grade["selected_provisional_grade_id"] }
+      ids = json.pluck("selected_provisional_grade_id")
       expect(ids).to match_array(grades[0..1].map(&:id))
     end
 
@@ -119,7 +119,7 @@ describe "Provisional Grades API", type: :request do
     it "includes the anonymous ids for submissions when the user cannot view student identities" do
       assignment.update!(anonymous_grading: true)
       json = bulk_select(grades[0..1])
-      ids = json.map { |grade| grade["anonymous_id"] }
+      ids = json.pluck("anonymous_id")
       expect(ids).to match_array(submissions[0..1].map(&:anonymous_id))
     end
 
@@ -138,7 +138,7 @@ describe "Provisional Grades API", type: :request do
 
       it "excludes the already-selected provisional grade from the returned json" do
         json = bulk_select(grades[0..1])
-        ids = json.map { |grade| grade["selected_provisional_grade_id"] }
+        ids = json.pluck("selected_provisional_grade_id")
         expect(ids).to match_array([grades[1].id])
       end
 
@@ -165,7 +165,7 @@ describe "Provisional Grades API", type: :request do
 
       it "excludes the unrelated provisional grade from the returned json" do
         json = bulk_select(grades[0..1] + [other_grade])
-        ids = json.map { |grade| grade["selected_provisional_grade_id"] }
+        ids = json.pluck("selected_provisional_grade_id")
         expect(ids).to match_array(grades[0..1].map(&:id))
       end
     end
@@ -174,7 +174,7 @@ describe "Provisional Grades API", type: :request do
       invalid_id = ModeratedGrading::ProvisionalGrade.maximum(:id).next # ensure the id is not used
       invalid_grade = ModeratedGrading::ProvisionalGrade.new(id: invalid_id)
       json = bulk_select(grades[0..1] + [invalid_grade])
-      ids = json.map { |grade| grade["selected_provisional_grade_id"] }
+      ids = json.pluck("selected_provisional_grade_id")
       expect(ids).to match_array(grades[0..1].map(&:id))
     end
 

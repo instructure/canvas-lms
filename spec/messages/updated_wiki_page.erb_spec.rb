@@ -38,7 +38,7 @@ describe "updated_wiki_page" do
       page.reload
 
       context_module.update(
-        unlock_at: Time.zone.now + 3.days
+        unlock_at: 3.days.from_now
       )
 
       page.update(
@@ -58,7 +58,7 @@ describe "updated_wiki_page" do
       page.reload
 
       context_module.update(
-        unlock_at: Time.zone.now - 3.days
+        unlock_at: 3.days.ago
       )
 
       page.update(

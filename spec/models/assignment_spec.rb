@@ -1484,14 +1484,14 @@ describe Assignment do
     it "duplicates the assignment" do
       assignment = wiki_page_assignment_model({ title: "Wiki Assignment" })
       rubric = @course.rubrics.create! { |r| r.user = @teacher }
-      rubric_association_params = HashWithIndifferentAccess.new({
-                                                                  hide_score_total: "0",
-                                                                  purpose: "grading",
-                                                                  skip_updating_points_possible: false,
-                                                                  update_if_existing: true,
-                                                                  use_for_grading: "1",
-                                                                  association_object: assignment
-                                                                })
+      rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({
+                                                                                 hide_score_total: "0",
+                                                                                 purpose: "grading",
+                                                                                 skip_updating_points_possible: false,
+                                                                                 update_if_existing: true,
+                                                                                 use_for_grading: "1",
+                                                                                 association_object: assignment
+                                                                               })
 
       rubric_assoc = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params)
       assignment.rubric_association = rubric_assoc
@@ -2886,7 +2886,7 @@ describe Assignment do
     @assignment.grade_student(@user, grade: 1, grader: @teacher)
     @submission = @assignment.submissions.first
     original_graded_at = @submission.graded_at
-    new_time = Time.zone.now + 1.hour
+    new_time = 1.hour.from_now
     allow(Time).to receive(:now).and_return(new_time)
     @assignment.grade_student(@user, grade: 2, grader: @teacher)
     @submission.reload
@@ -4085,7 +4085,7 @@ describe Assignment do
       assignment.due_at = "Sep 4 2008 12:00am"
       assignment.infer_times
 
-      expect(assignment.due_at.to_s(:time)).to eq "23:59"
+      expect(assignment.due_at.to_fs(:time)).to eq "23:59"
     end
 
     it "does not adjust due_at when it has not been modified" do
@@ -4114,7 +4114,7 @@ describe Assignment do
       assignment.lock_at = "Sep 4 2008 12:00am"
       assignment.infer_times
 
-      expect(assignment.lock_at.to_s(:time)).to eq "23:59"
+      expect(assignment.lock_at.to_fs(:time)).to eq "23:59"
     end
 
     it "does not adjust lock_at when it has not been modified" do
@@ -10867,14 +10867,14 @@ describe Assignment do
     before(:once) do
       @assignment = @course.assignments.create!(assignment_valid_attributes)
       rubric = @course.rubrics.create! { |r| r.user = @teacher }
-      rubric_association_params = HashWithIndifferentAccess.new({
-                                                                  hide_score_total: "0",
-                                                                  purpose: "grading",
-                                                                  skip_updating_points_possible: false,
-                                                                  update_if_existing: true,
-                                                                  use_for_grading: "1",
-                                                                  association_object: @assignment
-                                                                })
+      rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({
+                                                                                 hide_score_total: "0",
+                                                                                 purpose: "grading",
+                                                                                 skip_updating_points_possible: false,
+                                                                                 update_if_existing: true,
+                                                                                 use_for_grading: "1",
+                                                                                 association_object: @assignment
+                                                                               })
       @association = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params)
       @assignment.update!(rubric_association: @association)
     end

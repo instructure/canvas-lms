@@ -186,7 +186,7 @@ class Collaboration < ActiveRecord::Base
         name = plugin.name
       end
 
-      HashWithIndifferentAccess.new({ "name" => name, "type" => type })
+      ActiveSupport::HashWithIndifferentAccess.new({ "name" => name, "type" => type })
     end
   end
 

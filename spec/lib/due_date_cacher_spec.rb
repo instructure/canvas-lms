@@ -1288,7 +1288,7 @@ describe DueDateCacher do
     let(:student) { User.create! }
 
     let(:original_due_at) { Time.zone.now }
-    let(:due_at) { Time.zone.now + 1.day }
+    let(:due_at) { 1.day.from_now }
 
     # Remove seconds, following the lead of EffectiveDueDates
     let(:original_due_at_formatted) { original_due_at.change(usec: 0).iso8601 }
