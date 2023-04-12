@@ -44,6 +44,55 @@ describe "submissions" do
       user_session(@student)
     end
 
+    it "does not show score if RDQ" do
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # enable RQD for course
+      @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+      @course.save!
+
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+
+      first_period_assignment = @course.assignments.create!(
+        due_at: @due_date,
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+
+      first_period_assignment.grade_student(@student, grade: 8, grader: @teacher)
+
+      get "/courses/#{@course.id}/assignments/#{first_period_assignment.id}/submissions/#{@student.id}"
+
+      expect(f(".entered_grade")).to include_text "B-"
+    end
+
+    it "show score if not RDQ" do
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # disable RQD for course
+      @course.settings = @course.settings.merge(restrict_quantitative_data: false)
+      @course.save!
+
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher)
+
+      first_period_assignment = @course.assignments.create!(
+        due_at: @due_date,
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+
+      first_period_assignment.grade_student(@student, grade: 8, grader: @teacher)
+
+      get "/courses/#{@course.id}/assignments/#{first_period_assignment.id}/submissions/#{@student.id}"
+
+      expect(f(".entered_grade")).to include_text "8"
+      expect(f(".grade-values")).to include_text "Grade: 8 / 10"
+    end
+
     it "lets a student submit a text entry", :xbrowser, priority: "1" do
       @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"

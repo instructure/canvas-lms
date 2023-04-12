@@ -16,6 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 <%
+  should_restrict_quantitative_data = @assignment.restrict_quantitative_data?(@current_user)
+  # this is superficial and should be fine, since this is only showing data, not saving data
+  entered_grade = @submission.entered_grade
+  if should_restrict_quantitative_data
+    current_grading_type = @assignment.grading_type
+    @assignment.grading_type = "letter_grade"
+    entered_grade = @assignment.score_to_grade(given_grade = @submission.entered_grade)
+    @assignment.grading_type = current_grading_type
+  end
+
   presenter = Submission::ShowPresenter.new(
     submission: @submission,
     current_user: @current_user,
@@ -50,9 +60,10 @@
     :SUBMISSION => {
       assignment_id: @assignment.id,
       # don't leak grades if submission is not posted
+      points_possible: @assignment.points_possible, # score below is useless without points possible
       submission: if @submission.user_can_read_grade?(@current_user, session)
         @submission.attributes.merge(
-          entered_grade: @submission.entered_grade,
+          entered_grade: entered_grade,
           entered_score: @submission.entered_score
         )
       else
@@ -95,12 +106,12 @@
                     <% if @submission.excused? %>
                       <%= t "Excused" %>
                     <% else %>
-                      <%= i18n_grade(round_if_whole(@submission.entered_grade), @submission.grading_type) %>
+                        <%= i18n_grade(round_if_whole(entered_grade), @submission.grading_type) %>
                     <% end %>
                   </span>
                 <% end %>
-                <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible %>
-                  <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
+                <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible && !should_restrict_quantitative_data %>
+                    <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
                 <% end %>
               </td>
             </tr>
