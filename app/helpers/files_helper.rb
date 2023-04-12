@@ -37,7 +37,9 @@ module FilesHelper
     if @attachment.present?
       access_allowed(@attachment, @current_user, access_type)
     else
-      render_unauthorized_action unless @media_object.present?
+      media_object_exists = @media_object.present?
+      render_unauthorized_action unless media_object_exists
+      media_object_exists
     end
   end
 
