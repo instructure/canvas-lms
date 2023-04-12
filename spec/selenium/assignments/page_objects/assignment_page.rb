@@ -59,7 +59,7 @@ class AssignmentPage
     end
 
     def speedgrader_link
-      f("a.icon-speed-grader")
+      f("#speed_grader_link_mount_point a.icon-speed-grader")
     end
 
     def manage_assignment_button

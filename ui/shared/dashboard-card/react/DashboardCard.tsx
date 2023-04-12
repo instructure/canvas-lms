@@ -238,7 +238,7 @@ export const DashboardCard = ({
       const screenReaderLabel = `${link.label} - ${nicknameInfo.nickname}`
       return (
         <DashboardCardAction
-          unreadCount={unreadCount(link.icon, course.stream)}
+          unreadCount={unreadCount(link.icon, course?.stream)}
           iconClass={link.icon}
           linkClass={link.css_class}
           path={link.path}

@@ -102,6 +102,20 @@ describe('MessageListActionContainer', () => {
       expect(await queryByText('Concluded Courses')).toBeInTheDocument()
     })
 
+    it('should render concluded courses', async () => {
+      const {findByTestId, queryByText} = setup()
+      const courseDropdown = await findByTestId('course-select')
+      fireEvent.click(courseDropdown)
+      expect(await queryByText('Fighting Magneto 202')).toBeInTheDocument()
+    })
+
+    it('should render concluded groups in list action container', async () => {
+      const {findByTestId, queryByText} = setup()
+      const courseDropdown = await findByTestId('course-select')
+      fireEvent.click(courseDropdown)
+      expect(await queryByText('concluded_group')).toBeInTheDocument()
+    })
+
     it('should call onCourseFilterSelect when course selected', async () => {
       const mock = jest.fn()
 

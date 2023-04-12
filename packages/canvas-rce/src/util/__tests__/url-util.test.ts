@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {addQueryParamsToUrl, parseUrlOrNull, relativeHttpUrlForHostname} from '../url-util'
+import {
+  addQueryParamsToUrl,
+  parseUrlOrNull,
+  relativeHttpUrlForHostname,
+  relativizeUrl,
+} from '../url-util'
 
 describe('parseUrlOrNull', () => {
   it('should parse a valid url', () => {
@@ -40,29 +45,99 @@ describe('parseUrlOrNull', () => {
   })
 })
 
+describe('relativizeUrl', () => {
+  it('should relativize urls', () => {
+    // Note: these tests are not exhaustive, but are a sanity check
+    //       all the hard work is done by the uri-js library, which we will trust.
+    expect(relativizeUrl('http://canvas.com/some/path')).toEqual('/some/path')
+    expect(relativizeUrl('http://user:pass@test.com:2345/123?x=y#z')).toEqual('/123?x=y#z')
+    expect(relativizeUrl('/123?x=y#z')).toEqual('/123?x=y#z')
+  })
+})
+
 describe('relativeHttpUrlForHostname', () => {
+  it('should ignore non-http(s) origins', () => {
+    ;['/', 'canvas.com', 'ttp://test.com', '/test.com', 'ftp://test.com', '%@#$^#'].forEach(
+      invalidOrigin => {
+        expect(relativeHttpUrlForHostname('http://test.com/123', invalidOrigin)).toEqual(
+          'http://test.com/123'
+        )
+      }
+    )
+  })
+
   it('should not remove query parameters or other parts of the URL', () => {
     expect(
       relativeHttpUrlForHostname('http://test.com/123?foo=bar&baz=qux#hash', 'http://test.com')
     ).toEqual('/123?foo=bar&baz=qux#hash')
 
     expect(
-      relativeHttpUrlForHostname('http://test.com:123/123?foo=bar&baz=qux#hash', 'http://test.com')
+      relativeHttpUrlForHostname('http://test.com:80/123?foo=bar&baz=qux#hash', 'http://test.com')
     ).toEqual('/123?foo=bar&baz=qux#hash')
   })
 
-  it('should only relativize urls when appropriate', () => {
+  it('should ignore basic auth in urls', () => {
+    expect(
+      relativeHttpUrlForHostname(
+        'http://user:pass@test.com:80/123?foo=bar&baz=qux#hash',
+        'http://test.com'
+      )
+    ).toEqual('/123?foo=bar&baz=qux#hash')
+  })
+
+  it('should only relativize urls when appropriate (sanity checks)', () => {
+    expect(
+      relativeHttpUrlForHostname('https://canvas.com/some/path', 'https://nowhere.com')
+    ).toEqual('https://canvas.com/some/path')
+
+    expect(
+      relativeHttpUrlForHostname('https://canvas.com:443/some/path', 'https://nowhere.com')
+    ).toEqual('https://canvas.com:443/some/path')
+
+    expect(
+      relativeHttpUrlForHostname('https://canvas.com:80/some/path', 'https://nowhere.com')
+    ).toEqual('https://canvas.com:80/some/path')
+
+    expect(
+      relativeHttpUrlForHostname('https://canvas.com/some/path', 'https://canvas.com')
+    ).toEqual('/some/path')
+
+    expect(
+      relativeHttpUrlForHostname('https://canvas.com:443/some/path', 'https://canvas.com:80')
+    ).toEqual('/some/path')
+
+    expect(
+      relativeHttpUrlForHostname('https://canvas.com:80/some/path', 'https://canvas.com')
+    ).toEqual('/some/path')
+
+    expect(
+      relativeHttpUrlForHostname('https://canvas.com:3000/some/path', 'https://canvas.com')
+    ).toEqual('https://canvas.com:3000/some/path')
+
+    expect(
+      relativeHttpUrlForHostname('https://canvas.com/some/path', 'https://canvas.com:3000')
+    ).toEqual('https://canvas.com/some/path')
+  })
+
+  it('should only relativize urls when appropriate (permutations)', () => {
     const canvasOrigins = [
-      {value: 'HTTP://CANVAS.COM', shouldTransform: true},
-      {value: 'HTTPS://CANVAS.COM', shouldTransform: true},
-      {value: 'http://canvas.com', shouldTransform: true},
-      {value: 'https://canvas.com', shouldTransform: true},
-      {value: 'http://canvas.com:80', shouldTransform: true},
-      {value: 'https://canvas.com:443', shouldTransform: true},
-      {value: 'http://canvas.com:443', shouldTransform: true},
-      {value: 'https://canvas.com:80', shouldTransform: true},
-      {value: 'http://canvas.com:1234', shouldTransform: true},
-    ]
+      {value: 'HTTP://CANVAS.COM', shouldTransform: () => true},
+      {value: 'HTTPS://CANVAS.COM', shouldTransform: () => true},
+      {value: 'http://canvas.com', shouldTransform: () => true},
+      {value: 'https://canvas.com', shouldTransform: () => true},
+      {value: 'http://canvas.com:80', shouldTransform: () => true},
+      {value: 'https://canvas.com:443', shouldTransform: () => true},
+      {value: 'http://canvas.com:443', shouldTransform: () => true},
+      {value: 'https://canvas.com:80', shouldTransform: () => true},
+      {
+        value: 'http://canvas.com:1234',
+        shouldTransform: () => true,
+      },
+      {
+        value: 'https://canvas.com:1234',
+        shouldTransform: () => true,
+      },
+    ] as Array<{value: string; shouldTransform(url: string): boolean}>
 
     const urlOrigins = [
       {value: 'HTTP://CANVAS.COM', shouldTransform: true},
@@ -83,11 +158,16 @@ describe('relativeHttpUrlForHostname', () => {
       {value: 'https://other.canvas.com', shouldTransform: false},
       {value: 'https://google.com', shouldTransform: false},
       {value: 'http://nowhere.com', shouldTransform: false},
-    ]
+    ] as const
 
     const paths = [
       {value: '/other-page', shouldTransform: true},
+      {value: '/other-page#somehash', shouldTransform: true},
+      {value: '/other-page?x=y&z=', shouldTransform: true},
+      {value: '/other-page?x=y&z=#someHash', shouldTransform: true},
       {value: '/avocado.jpg', shouldTransform: true},
+
+      // Ensure malformed urls are not transformed
       {value: '!@#$%^', shouldTransform: false},
     ]
 
@@ -97,13 +177,31 @@ describe('relativeHttpUrlForHostname', () => {
       {value: 'embed', shouldTransform: true, selfClosing: true},
     ]
 
+    function comparisonPortForUrl(urlStr: string): string | null {
+      const url = parseUrlOrNull(urlStr)
+      if (url?.port === '80' || url?.port === '443') return null
+      if (url?.port != null && url.port.length) return url.port
+      return null
+    }
+
     canvasOrigins.forEach(canvasOrigin => {
       urlOrigins.forEach(urlOrigin => {
-        paths.forEach(path => {
-          elements.forEach(element => {
-            const shouldTransform = [canvasOrigin, urlOrigin, path, element].every(
-              it => it.shouldTransform
-            )
+        elements.forEach(element => {
+          paths.forEach(path => {
+            const canvasOriginShouldTransform = canvasOrigin.shouldTransform(urlOrigin.value)
+            const urlOriginShouldTransform = urlOrigin.shouldTransform
+            const pathShouldTransform = path.shouldTransform
+            const elementShouldTransform = element.shouldTransform
+
+            const portShouldTransform =
+              comparisonPortForUrl(canvasOrigin.value) === comparisonPortForUrl(urlOrigin.value)
+
+            const shouldTransform =
+              portShouldTransform &&
+              canvasOriginShouldTransform &&
+              urlOriginShouldTransform &&
+              pathShouldTransform &&
+              elementShouldTransform
 
             const absoluteUrl = `${urlOrigin.value}${path.value}`
             const relativeUrl = path.value
@@ -111,7 +209,24 @@ describe('relativeHttpUrlForHostname', () => {
             const transformedUrl = relativeHttpUrlForHostname(absoluteUrl, canvasOrigin.value)
             const expectedUrl = shouldTransform ? relativeUrl : absoluteUrl
 
-            expect(transformedUrl).toEqual(expectedUrl)
+            if (transformedUrl !== expectedUrl) {
+              throw new Error(
+                `\ncanvasOrigin: ${canvasOrigin.value} (${canvasOriginShouldTransform})
+                | urlOrigin: ${urlOrigin.value} (${urlOriginShouldTransform})
+                | path: ${path.value} (${pathShouldTransform})
+                | element: ${element.value} (${elementShouldTransform})
+                | portShouldTransform: ${portShouldTransform} (${comparisonPortForUrl(
+                  canvasOrigin.value
+                )} === ${comparisonPortForUrl(urlOrigin.value)})
+                | 
+                | shouldTransform: ${shouldTransform}
+                | 
+                | absoluteUrl: ${absoluteUrl}
+                | relativeUrl: ${relativeUrl}
+                | transformedUrl: ${transformedUrl}
+                | expectedUrl: ${expectedUrl}`.replace(/^\s*\| /gm, '')
+              )
+            }
           })
         })
       })

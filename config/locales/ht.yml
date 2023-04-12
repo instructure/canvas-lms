@@ -621,6 +621,7 @@ ht:
     titles: 
       configure_report: "Konfigire Rapò"
       open_registration_delegated_warning_dialog: "Yon Founisè Idantite Ekstèn Aktive"
+      rqd_help: "Limite Done Kantitatif yo"
       what_are_quiz_ip_filters: "Kisa Filtè IP quiz yo ye?"
     user: Itilizatè
   account_settings_fe083453: "Konfigirasyon Kont"
@@ -1556,6 +1557,8 @@ ht:
         update_button: Aktyalize
       report_last_run_never: Jamè
       report_running: "Rapò a ap egzekite. *W ap resevwa yon imèl kou li fini.*"
+      rqd_help_message: "Lè li seleksyone, paramèt sa a limite afichaj done kantitatif (nimerik) notasyon an, epi li limite opsyon kreyasyon devwa pou pwofesè yo. Itilizatè yo ap sèlman wè done kalitatif yo, ki se nòt ak kòmantè. Admin ka pèsonalize paramèt sa a plis, l ap ajiste otorizasyon yo pou wòl itilizatè yo."
+      rqd_screenreader: "Osijè de done kantitatif limite yo"
       select: 
         mfa: 
           disabled: Dezaktive
@@ -2188,7 +2191,7 @@ ht:
   adjust_final_grade_fa45e7e0: "Ajiste Nòt Final"
   adjusting_due_dates_a5918b9c: "Ajisteman delè..."
   admin_4d3ba42f: Admin
-  admin_analytics_description: "Aktivasyon fonksyon sa a ap pèmèt Admin Analitics yo montre apèsi kou yo ak elèv yo. Antre nan *gwoup itilizatè Nouvo Analitics* nan kominote Canvas la pou w ka aprann plis epi di kisa w panse."
+  admin_analytics_description: "Aktive Analytics onivo kont lan. Tablodbò Admin Analytics la bay detay sou itilizasyon Canvas, siksè kou Cancas la ak angajman etidyan yo. Aprann plis sou *Sant Analytics Admin* nan nan kominote Canvas la."
   admin_analytics_eacba735: "Admin Analitics"
   admin_csv_f8d1b3eb: "Admin CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Ekspòtasyon Administratif pou Peryòd Notasyon Miltip"
@@ -4259,6 +4262,7 @@ ht:
       no_points: Okenn
       no_submission: Anyen
       points: Pwen
+      speed_grader: SpeedGrader™
       submission_types: "Tip Fichye"
       submitting: Soumisyon...
       turnitin: Turnitin
@@ -5738,6 +5742,7 @@ ht:
   canvas_for_elementary_analytics_15dc1e07: "Canvas pou Analiz Elemantè"
   canvas_for_elementary_beta_28bc5181: "Canvas pou Elemantè (beta)"
   canvas_for_elementary_e6f5a06f: "Canvas pou Elemantè"
+  canvas_for_elementary_font_selection_5d1f2271: "Canvas pou Seleksyon Ekriti Elemantè"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas pou Elemantè: plizyè anons nan sal klas"
   canvas_for_elementary_parent_support_74a2356e: "Canvas pou Elemantè: Sipò Paran"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -5873,6 +5878,7 @@ ht:
   check_your_spelling_or_try_fewer_letters_70769a90: "Verifye òtograf ou oswa eseye diminye kantite lèt yo."
   checkbox_examples_dc790142: "Egzanp kasye pou koche"
   checked_883b93fd: Tcheke
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Si w koche kazye Ajoute nan Kalandriye a, tout manm fòmasyon an ap envite."
   cheerful_panda_holding_a_map_17ba47ee: "Yon panda kontan ki gen yon kat"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Kou timoun nan dwe nan menm kont root ak kou prensipal la"
   child_s_username_dde3aa9: "Non itilizatè Timoun nan"
@@ -8494,6 +8500,7 @@ ht:
         pace_plans: "Plan Kadans"
         participation_id: Patisipasyon
         restrict_enrollments_to_course_dates: "Elèv yo ka patisipe nan kou a sèlman nan dat sa yo"
+        restrict_quantitative_data: "Opsyon Done Kantitatif"
         restrict_student_future_view: "Limite elèv yo pou yo pa wè kou sa a anvan li kòmanse."
         restrict_student_past_view: "Limite elèv yo pou yo pa wè kou sa a aprè li fini."
         root_account: "Kont Root"
@@ -10487,6 +10494,7 @@ ht:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Aktive yon nouvo bwat dyalòg Ekri Elèv ki... ki pèmèt voye mesaj bay obsèvatè yo anplis de elèv yo."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Otorize aksè a API Piblik Nouvo Quiz yo: API Atik Quiz"
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Otorize aksè a API piblik nouvo quiz yo atravè Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "Pèmèt  administratè yo anrejistre Zouti LTI gras a Anrejistreman Dimanik la."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Pèmèt afiche rapò plajya ak nòt similarite nan plato soumisyon nouvo Bilten an."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Pèmèt aplike dat ki enpòtan nan devwa yo, aktivite nan kalandriye yo ak lòt ankò."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Aktive yon modal pou avèti itilizatè a lè yon pwojè kòmantè pa pibliye nan SpeedGrader."
@@ -12466,6 +12474,7 @@ ht:
   grades_view_audit_trail_cc4c1fcc: "Nòt - afiche pis odit"
   grades_view_audit_trail_db7364b1: "Nòt - Afiche pis verifikasyon"
   grades_view_change_logs_6bc1b959: "Nòt - afiche jounal chanjman"
+  grades_view_quantitative_feedback_90a4ffc7: "Klas - afiche fidbak kantitatif"
   grades_visible_to_students_1584fa83: "Nòt Vizib pou Elèv"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Nòt yo te rive pibliye nan Gradebook."
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Nòt yo relache avèk siksè nan bilten an."
@@ -13034,11 +13043,17 @@ ht:
       event: "%{date} nan %{time}"
   handler_7912052f: Kondiktè
   has_been_automatically_selected_based_upon_where_t_61f805c5: "te seleksyone otomatikman an fonksyon de kote enstans Canvas kont sa a ye a. Nan sèten ka, li kapab nan yon lòt rejyon."
+  has_no_submissions_2826a7a2: "Pa gen soumisyon"
+  has_no_submissions_63de50ad: "Pa Gen Soumisyon"
   has_not_submitted_2350bc24: "Pa t soumèt"
   has_similarity_score_d5f332b4: "Gen nòt similarite"
   has_submissions_6c12ef4c: "Gen devwa"
+  has_submissions_ea8e609b: "Gen Soumisyon"
   has_syllabus_body_6f250277: has_syllabus_body
   has_ungraded_submissions_2bff87df: "Gen devwa ki pa gen nòt"
+  has_ungraded_submissions_b79f5803: "Gen Soumisyon ki pa Evalye"
+  has_unposted_grades_3567391e: "Gen nòt ki pa poste"
+  has_unposted_grades_ba0e02b6: "Gen Nòt ki pa Poste"
   have_a_question_about_canvas_ask_it_here_5781cce: "Ou gen yon kesyon sou Canvas? Poze li la a."
   have_not_been_graded_df2a5fd2: "Pa t evalye"
   have_not_yet_submitted_57e6a58b: "Poko soumèt"
@@ -13680,6 +13695,7 @@ ht:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Si Itilizatè - jere detay koneksyon oswa Estatistik - afiche aktive, yon itilizatè ap kapab jenere aktivite koneksyon/dekoneksyon nan Zouti Admin. Pou kache opsyon aktivite koneksyon/dekoneksyon an nan Zouti Admin, tou de pèmisyon sa yo dwe dezaktive."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Si Itilizatè - jere detay koneksyon oswa Estatistik - afiche aktive, yon itilizatè ap kapab jenere aktivite koneksyon/dekoneksyon nan Zouti Admin. Pou kache opsyon aktivite koneksyon/dekoneksyon an nan Zouti Admin, tou de pèmisyon sa yo dwe dezaktive."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Si Itilizatè - jere detay koneksyon oswa Estatistik - afiche aktive, yon itilizatè ap kapab jenere aktivite koneksyon/dekoneksyon nan Zouti Admin. Pou kache opsyon aktivite koneksyon/dekoneksyon an nan Zouti Admin, tou de pèmisyon sa yo dwe dezaktive."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "Si w ap defini yon limit nan manm gwoup yo, li dwe plis pase 1."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Si w chanje pwen posib yon sesyon, ou dwe reklase sesyon an."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Si w chanje pwen posib yon sesyon, ou dwe reklase tout sesyon yo."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Si w pa seleksyone dwa itilizasyon yo kounye a, fichye sa a ap pibliye aprè li fin transfere."
@@ -13891,6 +13907,7 @@ ht:
   individual_2033c005: Pèsonèl
   individual_assignment_grade_posting_d8322b99: "Piblikasyon Nòt Sesyon Endividyèl"
   individual_gradebook_c7de9821: "Bilten Endividyèl..."
+  individual_gradebook_enhancements_de33aa3d: "Amelyorasyon Kanè Endividyèl"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Valè kalkil rezilta pèsonèl yo pa kapab chanje."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Pwen metriz rezilta pèsonèl yo pa kapab chanje."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Opsyon Notasyon ak Metòd Kalkil rezila Endividyèl"
@@ -14375,6 +14392,7 @@ ht:
     lock_module_until: "Bloke jiskaske"
   language_6b3e2c7c: Langaj
   languages_835813f0: Lang
+  large_balsamiq_font_5fe45fae: "Gwo lèt Balsamiq"
   large_course_db3d58b: "Gwo Kou:"
   last_7_days_bd411f1f: "7 Dènye Jou yo"
   last_activity_a983e541: "Dènye Aktivite"
@@ -14794,6 +14812,7 @@ ht:
   loading_features_d26820f6: "chajman fonksyonalite"
   loading_folders_d8b5869e: "Chajman dosye"
   loading_gradebook_b0b75cd3: "Chajman Bilten"
+  loading_gradebook_submissions_d2ba017f: "Chajman soumisyon Bilten"
   loading_graders_f6a76142: "Chajman Evalyatè"
   loading_grades_446fc226: "Chajman nòt..."
   loading_grades_for_coursename_26784c2d: "Chanjman nòt pou %{courseName}"
@@ -15031,6 +15050,7 @@ ht:
   lti_deep_linking_line_items_5e0079f7: "Pòs Lyezon Pwofon LTI"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Eleman Lyezon Pwofon sou paj edisyon Devwa yo"
   lti_delete_ee5f1bef: "LTI - elimine"
+  lti_dynamic_registration_8592edb0: "Enskripsyon Dinamik LTI"
   lti_edit_83a27850: "LTI- modifye"
   lti_key_14ad02b1: "Kle LTI"
   lti_launch_af082dc3: "Lansman LTI:"
@@ -17629,6 +17649,7 @@ ht:
   new_question_9107c469: "Nouvo Kesyon"
   new_question_group_d9306280: "Nouvo Gwoup Kesyon"
   new_quiz_34aacba6: "Nouvo Quiz"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "Nouvo Quiz Itilizatè elimine retabli eta egzamen ankou pandan enskripsyon"
   new_quiz_items_3c850331: "Eleman Nouvo Quiz"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Nouvo Kont Quiz ak Bank Eleman Nivo Kou"
   new_quizzes_assignment_build_button_72b6531a: "Bouton Kreyasyon Nouvo Quiz"
@@ -20225,6 +20246,7 @@ ht:
   qti_img_matching_question: "Kesyon korespondan enpòte a gen imaj de bò ki pa sipòte."
   qti_img_matching_question_distractors: "Kesyon korespondan enpòte a gen imaj nan chwa yo, e pa kapab fikse paske li gen distraktè tou"
   qti_name: "Konvètisè QTI"
+  quantitative_data_options_4f071510: "Opsyon Done Kantitatif"
   question_9121487: Kesyon
   question_answered: Reponn
   question_bank: 
@@ -21741,6 +21763,7 @@ ht:
         name: Non
     welcome_to_canvas: "Byenvini nan Canvas!"
   registration_url_60e0eaaa: "URL Anrejistreman"
+  regular_lato_font_7f3cf24c: "Lèt lato Regilye"
   regular_style_checkbox_ee3d71c1: "Kazye estil regilye"
   reinforce_student_understanding_304d18a6: "Ranfòse konpreyansyon elèv"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Rilaks epi pran yon ti poz. Poko gen anyen pou fè."
@@ -24044,6 +24067,13 @@ ht:
       aria_stop: "Peze \"stop\" pou fini anrejistreman an."
     edit_view_rubric: "Afiche Ribrik"
     group: Gwoup
+    late_input: 
+      days: 
+        one: Jou
+        other: Jou
+      hours: 
+        one: Èdtan
+        other: Èdtan
     mic_blocked_message: "Pèmisyon pou ka itilize kmikwo sa a bloke. Pou ka chanje, ale sou chrome://settings/content/microphone"
     mute_assignment: "Silans Sesyon"
     no_submission_time: "pa gen tan soumisyon"
@@ -25602,6 +25632,7 @@ ht:
       Drapo fonksyonalite sa a pèmèt itilize
       paj kreyasyon/modifikasyon diskizyon aktyalize a.
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "Endikatè fonksyonalite sa a se yon bagay yon kont ka aktive si yo vle pèmèt itilizatè sa yo ki gen kont ki pale lang ki nòmalman ekri soti Adwat pou ale Agoch (pa egzanp,  rb, Ebre, Fasi) pou yo ka wè mizanpaj RTL la pandan n ap travay sou li. Depi fonksyon sa a \"pare\" endikatè fonksyonalite sa a ap disparèt epi tout moun ki pale yonn nan lang sa yo ap toujou wè entèfas RTL la."
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Fonksyonalite sa a pote amelyorasyon nan kesyon pèfòmans ak mentnans nan Bilten Endividyèl la"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       Fonksyon sa a garanti lè yon zouti endepandan soumèt plizyè fichye
       ansanm atravè devwa yo e Sèvis API Nòt yo,
@@ -26763,6 +26794,10 @@ ht:
   traditional_gradebook_d7ad59c6: "Bilten Tradisyonèl..."
   traditional_gradebook_d90461dc: "Bilten Tradisyonèl"
   transferred_student_enrollments_90dc27d3: "Transfere Enskripsyon Elèv"
+  transform_rce_content_on_load_1f521086: "Transfòme Kontni RCE ki an chaj la"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      Transfòme URL absoli yo an URL relatif epi elimine atribi endezirab nan kontni RCE a nan chajman.
+      Nesesè pou RCE a fonksyone totalman nan Nouvo Quiz yo.
   travel_places_f461329c: "Vwayaj ak Plas"
   treat_ungraded_as_0_d38c2b41: "Trete San Klase kòm 0"
   tree_browser: 
@@ -27839,6 +27874,8 @@ ht:
       resubmit_to_vericite: "Re soumèt a VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite Endis similarite - plis enfòmasyon"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Nòt Similarite - Gade rapò detaye"
+  verify_ldap_tls_certificates_70241d8e: "Verifye sètifika LDAP ak TLS yo"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Verifye sètifika TLS ki te prezante pa founisè otantifikasyon LDAP yo."
   version_versionnumber_updatedat_9f5b7a5b: "Vèsyon %{versionNumber} %{updatedAt}"
   video_78335c71: videyo
   video_b9f27375: Videyo
@@ -28112,6 +28149,7 @@ ht:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Depi l fin seleksyone, kou a an mòd lekti sèlman deyò dat sa yo."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Depi l fin seleksyone, kou a pa aksesib an deyò dat kou yo. Si dat kou a vid, dat kòmansman a fen an ap aplike a peryòd validite a."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Depi l fin seleksyone, seksyon kou a an mòd lekti sèlman deyò dat sa yo."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Lè w defini, li detèmine si eta flux travay yon nouvo quiz dwe defini kòm note oswa kòm pending_review si yon itilizatè te gen yon ansyen pending_review nouvo quiz men li te re enskri nan kou a."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Lè endikatè sa a aktive, navigasyon kou a ap rete elaji oswa ratresi
       lè w ap navige nan paj yo an fonksyon de jan itilizatè a te defini yo dènye fwa a, olye yo

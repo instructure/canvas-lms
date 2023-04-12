@@ -57,63 +57,31 @@ const locale = {
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "حدث خطأ أثناء تحميل الوسائط."
   },
-  "and_7fcc2911": {
-    "message": "و"
-  },
-  "angle_c5b4ec50": {
-    "message": "زاوية"
-  },
-  "announcement_list_da155734": {
-    "message": "قائمة الإعلانات"
-  },
-  "announcements_a4b8ed4a": {
-    "message": "الإعلانات"
-  },
-  "apply_781a2546": {
-    "message": "تطبيق"
-  },
+  "and_7fcc2911": { "message": "و" },
+  "angle_c5b4ec50": { "message": "زاوية" },
+  "announcement_list_da155734": { "message": "قائمة الإعلانات" },
+  "announcements_a4b8ed4a": { "message": "الإعلانات" },
+  "apply_781a2546": { "message": "تطبيق" },
   "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
     "message": "تطبيق التغييرات على كافة مثيلات أيقونة صانع الأيقونات هذه في المساق"
   },
-  "approaches_the_limit_893aeec9": {
-    "message": "يقترب من الحد"
-  },
-  "approximately_e7965800": {
-    "message": "تقريبًا"
-  },
-  "apps_54d24a47": {
-    "message": "التطبيق"
-  },
-  "arrows_464a3e54": {
-    "message": "الأسهم"
-  },
-  "art_icon_8e1daad": {
-    "message": "أيقونة الفنون"
-  },
+  "approaches_the_limit_893aeec9": { "message": "يقترب من الحد" },
+  "approximately_e7965800": { "message": "تقريبًا" },
+  "apps_54d24a47": { "message": "التطبيق" },
+  "arrows_464a3e54": { "message": "الأسهم" },
+  "art_icon_8e1daad": { "message": "أيقونة الفنون" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "سيتم الاحتفاظ بنسبة العرض إلى الارتفاع"
   },
-  "assignments_1e02582c": {
-    "message": "المهام"
-  },
-  "asterisk_82255584": {
-    "message": "نجمة"
-  },
-  "attributes_963ba262": {
-    "message": "السمات"
-  },
+  "assignments_1e02582c": { "message": "المهام" },
+  "asterisk_82255584": { "message": "نجمة" },
+  "attributes_963ba262": { "message": "السمات" },
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "تسجيل الصوت والفيديو غير مدعوم، يرجى استخدام مستعرض مختلف."
   },
-  "audio_options_feb58e2c": {
-    "message": "خيارات الصوت"
-  },
-  "audio_options_tray_33a90711": {
-    "message": "علبة خيارات الصوت"
-  },
-  "audio_player_for_title_20cc70d": {
-    "message": "مشغل الصوت لـ { title }"
-  },
+  "audio_options_feb58e2c": { "message": "خيارات الصوت" },
+  "audio_options_tray_33a90711": { "message": "علبة خيارات الصوت" },
+  "audio_player_for_title_20cc70d": { "message": "مشغل الصوت لـ { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "المحتوى المحفوظ تلقائياً موجود. هل ترغب في تحميل المحتوى المحفوظ تلقائياً بدلاً من ذلك؟"
   },
@@ -165,15 +133,11 @@ const locale = {
   "click_to_embed_imagename_c41ea8df": {
     "message": "انقر لتضمين { imageName }"
   },
-  "click_to_hide_preview_3c707763": {
-    "message": "انقر لإخفاء المعاينة"
-  },
+  "click_to_hide_preview_3c707763": { "message": "انقر لإخفاء المعاينة" },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "انقر لإدراج ارتباط إلى المحرر."
   },
-  "click_to_show_preview_faa27051": {
-    "message": "انقر لإظهار المعاينة"
-  },
+  "click_to_show_preview_faa27051": { "message": "انقر لإظهار المعاينة" },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "إغلاق قائمة أو مربع حوار. يعيدك أيضًا إلى مساحة المحرر"
   },
@@ -187,18 +151,10 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": {
     "message": "تسميات توضيحية مغلقة/ترجمات مباشرة"
   },
-  "clubs_suit_c1ffedff": {
-    "message": "Clubs (Suit)"
-  },
-  "collaborations_5c56c15f": {
-    "message": "الأعمال الجماعية"
-  },
-  "collapse_to_hide_types_1ab46d2e": {
-    "message": "الطي لإخفاء { types }"
-  },
-  "color_picker_6b359edf": {
-    "message": "أداة انتقاء اللون"
-  },
+  "clubs_suit_c1ffedff": { "message": "Clubs (Suit)" },
+  "collaborations_5c56c15f": { "message": "الأعمال الجماعية" },
+  "collapse_to_hide_types_1ab46d2e": { "message": "الطي لإخفاء { types }" },
+  "color_picker_6b359edf": { "message": "أداة انتقاء اللون" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "أداة انتقاء اللون (تم تحديد { colorName })"
   },
@@ -212,18 +168,10 @@ const locale = {
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "لا يزال يتم تحميل المحتوى، إذا استمرت مشكلة عدم تضمين المحتوى بشكل سليم."
   },
-  "content_subtype_5ce35e88": {
-    "message": "النوع الفرعي للمحتوى"
-  },
-  "content_type_2cf90d95": {
-    "message": "نوع المحتوى"
-  },
-  "coproduct_e7838082": {
-    "message": "منتج مشترك"
-  },
-  "copyright_holder_66ee111": {
-    "message": "مالك حق النشر:"
-  },
+  "content_subtype_5ce35e88": { "message": "النوع الفرعي للمحتوى" },
+  "content_type_2cf90d95": { "message": "نوع المحتوى" },
+  "coproduct_e7838082": { "message": "منتج مشترك" },
+  "copyright_holder_66ee111": { "message": "مالك حق النشر:" },
   "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
     "message": "{ count, plural,\n     =0 {0 كلمات}\n    one {1 كلمة}\n  other {# من الكلمات}\n}"
   },
@@ -277,36 +225,20 @@ const locale = {
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "عرض ارتباط النص (يفتح في علامة تبويب جديدة)"
   },
-  "division_sign_72190870": {
-    "message": "علامة القسمة"
-  },
-  "documents_81393201": {
-    "message": "المستندات"
-  },
-  "done_54e3d4b6": {
-    "message": "تم"
-  },
-  "double_dagger_faf78681": {
-    "message": "Double Dagger"
-  },
+  "division_sign_72190870": { "message": "علامة القسمة" },
+  "documents_81393201": { "message": "المستندات" },
+  "done_54e3d4b6": { "message": "تم" },
+  "double_dagger_faf78681": { "message": "Double Dagger" },
   "down_and_left_diagonal_arrow_40ef602c": {
     "message": "سهم قطري لأسفل ويسار"
   },
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "سهم قطري لأسفل ويمين"
   },
-  "download_filename_2baae924": {
-    "message": "تنزيل { filename }"
-  },
-  "downward_arrow_cca52012": {
-    "message": "سهم لأسفل"
-  },
-  "downward_pointing_triangle_2a12a601": {
-    "message": "مثلث يشير لأسفل"
-  },
-  "drag_a_file_here_1bf656d5": {
-    "message": "إفلات ملف هنا"
-  },
+  "download_filename_2baae924": { "message": "تنزيل { filename }" },
+  "downward_arrow_cca52012": { "message": "سهم لأسفل" },
+  "downward_pointing_triangle_2a12a601": { "message": "مثلث يشير لأسفل" },
+  "drag_a_file_here_1bf656d5": { "message": "إفلات ملف هنا" },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "اسحب وأفلت أو انقر لاستعراض الكمبيوتر الخاص بك"
   },
@@ -316,18 +248,12 @@ const locale = {
   "due_multiple_dates_cc0ee3f5": {
     "message": "تاريخ الاستحقاق: تواريخ متعددة"
   },
-  "due_when_7eed10c6": {
-    "message": "تاريخ الاستحقاق: { when }"
-  },
+  "due_when_7eed10c6": { "message": "تاريخ الاستحقاق: { when }" },
   "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
     "message": "تحرير نصًا بديلًا لمثيل الأيقونة هذا"
   },
-  "edit_c5fbea07": {
-    "message": "تحرير"
-  },
-  "edit_course_link_5a5c3c59": {
-    "message": "تحرير ارتباط المساق"
-  },
+  "edit_c5fbea07": { "message": "تحرير" },
+  "edit_course_link_5a5c3c59": { "message": "تحرير ارتباط المساق" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "تحرير أيقونة صانع الأيقونات"
   },
@@ -352,69 +278,33 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "أدخل 3 أحرف على الأقل للبحث"
   },
-  "epsilon_54bb8afa": {
-    "message": "Epsilon"
-  },
-  "epsilon_variant_d31f1e77": {
-    "message": "Epsilon (متغير)"
-  },
-  "equals_sign_c51bdc58": {
-    "message": "علامة يساوي"
-  },
-  "equation_editor_39fbc3f1": {
-    "message": "محرر المعادلات"
-  },
-  "equivalence_class_7b0f11c0": {
-    "message": "فئة تكافؤ"
-  },
-  "equivalent_identity_654b3ce5": {
-    "message": "مكافئ (هوية)"
-  },
-  "eta_b8828f99": {
-    "message": "Eta"
-  },
-  "exists_2e62bdaa": {
-    "message": "موجود"
-  },
-  "exit_fullscreen_b7eb0aa4": {
-    "message": "الخروج من عرض ملء الشاشة"
-  },
+  "epsilon_54bb8afa": { "message": "Epsilon" },
+  "epsilon_variant_d31f1e77": { "message": "Epsilon (متغير)" },
+  "equals_sign_c51bdc58": { "message": "علامة يساوي" },
+  "equation_editor_39fbc3f1": { "message": "محرر المعادلات" },
+  "equivalence_class_7b0f11c0": { "message": "فئة تكافؤ" },
+  "equivalent_identity_654b3ce5": { "message": "مكافئ (هوية)" },
+  "eta_b8828f99": { "message": "Eta" },
+  "exists_2e62bdaa": { "message": "موجود" },
+  "exit_fullscreen_b7eb0aa4": { "message": "الخروج من عرض ملء الشاشة" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "توسيع المعاينة افتراضيًا"
   },
-  "expand_to_see_types_f5d29352": {
-    "message": "التوسيع لرؤية { types }"
-  },
-  "external_tools_6e77821": {
-    "message": "الأدوات الخارجية"
-  },
-  "extra_large_b6cdf1ff": {
-    "message": "كبير جداً"
-  },
-  "extra_small_9ae33252": {
-    "message": "صغير للغاية"
-  },
-  "extracurricular_icon_67c8ca42": {
-    "message": "أيقونة الأنشطة غير الصفية"
-  },
-  "f_function_fe422d65": {
-    "message": "F (دالة)"
-  },
+  "expand_to_see_types_f5d29352": { "message": "التوسيع لرؤية { types }" },
+  "external_tools_6e77821": { "message": "الأدوات الخارجية" },
+  "extra_large_b6cdf1ff": { "message": "كبير جداً" },
+  "extra_small_9ae33252": { "message": "صغير للغاية" },
+  "extracurricular_icon_67c8ca42": { "message": "أيقونة الأنشطة غير الصفية" },
+  "f_function_fe422d65": { "message": "F (دالة)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "تعذر الحصول على محتويات الملف"
   },
-  "file_name_8fd421ff": {
-    "message": "اسم الملف"
-  },
+  "file_name_8fd421ff": { "message": "اسم الملف" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "تم تجاوز حصة تخزين الملفات"
   },
-  "file_url_c12b64be": {
-    "message": "عنوان URL للملف"
-  },
-  "filename_file_icon_602eb5de": {
-    "message": "أيقونة الملف { filename }"
-  },
+  "file_url_c12b64be": { "message": "عنوان URL للملف" },
+  "filename_file_icon_602eb5de": { "message": "أيقونة الملف { filename }" },
   "filename_image_preview_6cef8f26": {
     "message": "معاينة الصورة { filename }"
   },
@@ -439,18 +329,10 @@ const locale = {
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "تم العثور على { count, plural,\n     =0 {# من النتائج}\n    one {# نتيجة}\n  other {# من النتائج}\n}"
   },
-  "fraction_41bac7af": {
-    "message": "كسر"
-  },
-  "fullscreen_873bf53f": {
-    "message": "ملء الشاشة"
-  },
-  "gamma_1767928": {
-    "message": "Gamma"
-  },
-  "generating_preview_45b53be0": {
-    "message": "جارٍ إنشاء المعاينة..."
-  },
+  "fraction_41bac7af": { "message": "كسر" },
+  "fullscreen_873bf53f": { "message": "ملء الشاشة" },
+  "gamma_1767928": { "message": "Gamma" },
+  "generating_preview_45b53be0": { "message": "جارٍ إنشاء المعاينة..." },
   "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
     "message": "الصور بتنسيق GIF/PNG أكبر من { size } كيلوبايت غير مدعومة حاليًا."
   },
@@ -505,36 +387,16 @@ const locale = {
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "لقد حصلت على إذن لاستخدام هذا الملف."
   },
-  "i_hold_the_copyright_71ee91b1": {
-    "message": "أمتلك حق النشر"
-  },
-  "icon_215a1dc6": {
-    "message": "الأيقونة"
-  },
-  "icon_8168b2f8": {
-    "message": "الأيقونة"
-  },
-  "icon_color_b86dd6d6": {
-    "message": "لون الأيقونة"
-  },
-  "icon_maker_icons_cc560f7e": {
-    "message": "أيقونات صانع الأيقونات"
-  },
-  "icon_options_7e32746e": {
-    "message": "خيارات الأيقونة"
-  },
-  "icon_options_tray_2b407977": {
-    "message": "علبة خيارات الأيقونة"
-  },
-  "icon_preview_1782a1d9": {
-    "message": "معاينة الأيقونة"
-  },
-  "icon_shape_30b61e7": {
-    "message": "شكل الأيقونة"
-  },
-  "icon_size_9353edea": {
-    "message": "حجم الأيقونة"
-  },
+  "i_hold_the_copyright_71ee91b1": { "message": "أمتلك حق النشر" },
+  "icon_215a1dc6": { "message": "الأيقونة" },
+  "icon_8168b2f8": { "message": "الأيقونة" },
+  "icon_color_b86dd6d6": { "message": "لون الأيقونة" },
+  "icon_maker_icons_cc560f7e": { "message": "أيقونات صانع الأيقونات" },
+  "icon_options_7e32746e": { "message": "خيارات الأيقونة" },
+  "icon_options_tray_2b407977": { "message": "علبة خيارات الأيقونة" },
+  "icon_preview_1782a1d9": { "message": "معاينة الأيقونة" },
+  "icon_shape_30b61e7": { "message": "شكل الأيقونة" },
+  "icon_size_9353edea": { "message": "حجم الأيقونة" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
     "message": "إذا ترك الارتباط فارغًا، سيُعرض النص كاسم ارتباط المساق"
   },
@@ -623,18 +485,12 @@ const locale = {
   "left_downard_harpoon_arrow_1d7b3d2e": {
     "message": "Left Downard Harpoon Arrow"
   },
-  "left_floor_29ac2274": {
-    "message": "Left Floor"
-  },
-  "left_to_right_e9b4fd06": {
-    "message": "‏‏من اليسار إلى اليمين"
-  },
+  "left_floor_29ac2274": { "message": "Left Floor" },
+  "left_to_right_e9b4fd06": { "message": "‏‏من اليسار إلى اليمين" },
   "left_upward_harpoon_arrow_3a562a96": {
     "message": "Left Upward Harpoon Arrow"
   },
-  "leftward_arrow_1e4765de": {
-    "message": "Leftward Arrow"
-  },
+  "leftward_arrow_1e4765de": { "message": "Leftward Arrow" },
   "leftward_pointing_triangle_d14532ce": {
     "message": "Leftward Pointing Triangle"
   },
@@ -660,51 +516,23 @@ const locale = {
   "loading_closed_captions_subtitles_failed_95ceef47": {
     "message": "تعذر تحميل التسميات التوضيحية/العناوين الفرعية."
   },
-  "loading_failed_b3524381": {
-    "message": "فشل التحميل..."
-  },
-  "loading_failed_e6a9d8ef": {
-    "message": "فشل التحميل."
-  },
-  "loading_folders_d8b5869e": {
-    "message": "جارٍ تحميل المجلدات"
-  },
-  "loading_please_wait_d276220a": {
-    "message": "جارٍ التحميل، يرجى الانتظار"
-  },
-  "loading_preview_9f077aa1": {
-    "message": "جارٍ تحميل المعاينة"
-  },
-  "locked_762f138b": {
-    "message": "مؤمّن"
-  },
-  "logical_equivalence_76fca396": {
-    "message": "تكافؤ منطقي"
-  },
-  "logical_equivalence_short_8efd7b4f": {
-    "message": "تكافؤ منطقي (قصير)"
-  },
+  "loading_failed_b3524381": { "message": "فشل التحميل..." },
+  "loading_failed_e6a9d8ef": { "message": "فشل التحميل." },
+  "loading_folders_d8b5869e": { "message": "جارٍ تحميل المجلدات" },
+  "loading_please_wait_d276220a": { "message": "جارٍ التحميل، يرجى الانتظار" },
+  "loading_preview_9f077aa1": { "message": "جارٍ تحميل المعاينة" },
+  "locked_762f138b": { "message": "مؤمّن" },
+  "logical_equivalence_76fca396": { "message": "تكافؤ منطقي" },
+  "logical_equivalence_short_8efd7b4f": { "message": "تكافؤ منطقي (قصير)" },
   "logical_equivalence_short_and_thick_1e1f654d": {
     "message": "تكافؤ منطقي (قصير وسميك)"
   },
-  "logical_equivalence_thick_662dd3f2": {
-    "message": "تكافؤ منطقي (سميك)"
-  },
-  "low_horizontal_dots_cc08498e": {
-    "message": "نقاط أفقية منخفضة"
-  },
-  "magenta_4a65993c": {
-    "message": "ماجنتا"
-  },
-  "maps_to_e5ef7382": {
-    "message": "Maps To"
-  },
-  "math_icon_ad4e9d03": {
-    "message": "أيقونة الرياضيات"
-  },
-  "media_af190855": {
-    "message": "الوسائط"
-  },
+  "logical_equivalence_thick_662dd3f2": { "message": "تكافؤ منطقي (سميك)" },
+  "low_horizontal_dots_cc08498e": { "message": "نقاط أفقية منخفضة" },
+  "magenta_4a65993c": { "message": "ماجنتا" },
+  "maps_to_e5ef7382": { "message": "Maps To" },
+  "math_icon_ad4e9d03": { "message": "أيقونة الرياضيات" },
+  "media_af190855": { "message": "الوسائط" },
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "جارٍ معالجة ملف الوسائط. الرجاء إعادة المحاولة لاحقًا."
   },
@@ -730,27 +558,13 @@ const locale = {
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "يجب أن تكون { width } x { height } بكسل على الأقل."
   },
-  "my_files_2f621040": {
-    "message": "ملفاتي"
-  },
-  "n_th_root_9991a6e4": {
-    "message": "N-th Root"
-  },
-  "nabla_1e216d25": {
-    "message": "Nabla"
-  },
-  "name_1aed4a1b": {
-    "message": "الاسم"
-  },
-  "name_color_ceec76ff": {
-    "message": "{ name } ({ color })"
-  },
-  "natural_music_54a70258": {
-    "message": "Natural (موسيقى)"
-  },
-  "natural_numbers_3da07060": {
-    "message": "الأرقام الطبيعية"
-  },
+  "my_files_2f621040": { "message": "ملفاتي" },
+  "n_th_root_9991a6e4": { "message": "N-th Root" },
+  "nabla_1e216d25": { "message": "Nabla" },
+  "name_1aed4a1b": { "message": "الاسم" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
+  "natural_music_54a70258": { "message": "Natural (موسيقى)" },
+  "natural_numbers_3da07060": { "message": "الأرقام الطبيعية" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "تنقل من خلال القائمة أو شريط الأدوات"
   },
@@ -767,84 +581,42 @@ const locale = {
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "لا توجد معاينة متوفرة لهذا الملف."
   },
-  "no_results_940393cf": {
-    "message": "لا توجد نتائج."
-  },
+  "no_results_940393cf": { "message": "لا توجد نتائج." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "لم يتم العثور على نتائج لـ { filterTerm }"
   },
-  "no_video_1ed00b26": {
-    "message": "لا يوجد مقطع فيديو"
-  },
-  "none_3b5e34d2": {
-    "message": "بلا"
-  },
-  "none_selected_b93d56d2": {
-    "message": "لم يتم تحديد شيء"
-  },
-  "not_equal_6e2980e6": {
-    "message": "لا يساوي"
-  },
+  "no_video_1ed00b26": { "message": "لا يوجد مقطع فيديو" },
+  "none_3b5e34d2": { "message": "بلا" },
+  "none_selected_b93d56d2": { "message": "لم يتم تحديد شيء" },
+  "not_equal_6e2980e6": { "message": "لا يساوي" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Not In (Not An Element Of)"
   },
-  "not_negation_1418ebb8": {
-    "message": "Not (نفي)"
-  },
-  "not_subset_dc2b5e84": {
-    "message": "Not Subset"
-  },
-  "not_subset_strict_23d282bf": {
-    "message": "Not Subset (Strict)"
-  },
-  "not_superset_5556b913": {
-    "message": "Not Superset"
-  },
-  "not_superset_strict_24e06f36": {
-    "message": "Not Superset (Strict)"
-  },
-  "nu_1c0f6848": {
-    "message": "Nu"
-  },
-  "octagon_e48be9f": {
-    "message": "ثماني"
-  },
-  "olive_6a3e4d6b": {
-    "message": "زيتي"
-  },
-  "omega_8f2c3463": {
-    "message": "Omega"
-  },
+  "not_negation_1418ebb8": { "message": "Not (نفي)" },
+  "not_subset_dc2b5e84": { "message": "Not Subset" },
+  "not_subset_strict_23d282bf": { "message": "Not Subset (Strict)" },
+  "not_superset_5556b913": { "message": "Not Superset" },
+  "not_superset_strict_24e06f36": { "message": "Not Superset (Strict)" },
+  "nu_1c0f6848": { "message": "Nu" },
+  "octagon_e48be9f": { "message": "ثماني" },
+  "olive_6a3e4d6b": { "message": "زيتي" },
+  "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "يجب إضافة أحد الأنماط التالية لحفظ الأيقونة: لون الأيقونة، حجم الإطار، نص الأيقونة، الصورة"
   },
-  "open_circle_e9bd069": {
-    "message": "دائرة مفتوحة"
-  },
+  "open_circle_e9bd069": { "message": "دائرة مفتوحة" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "افتح مربع حوار اختصارات لوحة المفاتيح هذا"
   },
-  "open_title_application_fd624fc5": {
-    "message": "فتح تطبيق { title }"
-  },
-  "operators_a2ef9a93": {
-    "message": "المشغلون"
-  },
-  "or_9b70ccaa": {
-    "message": "أو"
-  },
-  "orange_81386a62": {
-    "message": "برتقالي"
-  },
+  "open_title_application_fd624fc5": { "message": "فتح تطبيق { title }" },
+  "operators_a2ef9a93": { "message": "المشغلون" },
+  "or_9b70ccaa": { "message": "أو" },
+  "orange_81386a62": { "message": "برتقالي" },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "يمكن العثور على اختصارات أخرى للمحرر على"
   },
-  "outline_color_3ef2cea7": {
-    "message": "لون المخطط التفصيلي"
-  },
-  "outline_size_a6059a21": {
-    "message": "حجم المخطط التفصيلي"
-  },
+  "outline_color_3ef2cea7": { "message": "لون المخطط التفصيلي" },
+  "outline_size_a6059a21": { "message": "حجم المخطط التفصيلي" },
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } ليس بروتوكولاً صالحًا الذي يجب أن يكون ftp وhttp وhttps وmailto وskype وإلا سيتم حذفه"
   },
@@ -863,39 +635,17 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "يجب أن تكون النسبة المئوية رقمًا"
   },
-  "performing_arts_icon_f3497486": {
-    "message": "أيقونة الفنون التعبيرية"
-  },
-  "perpendicular_7c48ede4": {
-    "message": "عمودي"
-  },
-  "phi_4ac33b6d": {
-    "message": "Phi"
-  },
-  "phi_variant_c9bb3ac5": {
-    "message": "Phi (متغير)"
-  },
-  "physical_education_icon_d7dffd3e": {
-    "message": "أيقونة التربية البدنية"
-  },
-  "pi_dc4f0bd8": {
-    "message": "Pi"
-  },
-  "pi_variant_10f5f520": {
-    "message": "Pi (متغير)"
-  },
-  "pink_68ad45cb": {
-    "message": "وردي"
-  },
-  "pixels_52ece7d1": {
-    "message": "بكسل"
-  },
-  "play_1a47eaa7": {
-    "message": "تشغيل"
-  },
-  "play_media_comment_35257210": {
-    "message": "تشغيل تعليق الوسائط."
-  },
+  "performing_arts_icon_f3497486": { "message": "أيقونة الفنون التعبيرية" },
+  "perpendicular_7c48ede4": { "message": "عمودي" },
+  "phi_4ac33b6d": { "message": "Phi" },
+  "phi_variant_c9bb3ac5": { "message": "Phi (متغير)" },
+  "physical_education_icon_d7dffd3e": { "message": "أيقونة التربية البدنية" },
+  "pi_dc4f0bd8": { "message": "Pi" },
+  "pi_variant_10f5f520": { "message": "Pi (متغير)" },
+  "pink_68ad45cb": { "message": "وردي" },
+  "pixels_52ece7d1": { "message": "بكسل" },
+  "play_1a47eaa7": { "message": "تشغيل" },
+  "play_media_comment_35257210": { "message": "تشغيل تعليق الوسائط." },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "تشغيل تعليق الوسائط بواسطة { name } من { createdAt }."
   },
@@ -921,33 +671,15 @@ const locale = {
   "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
     "message": "يجب أن يكون البروتوكول ftp وhttp وhttps وmailto وskype وإلا سيتم حذفه"
   },
-  "psi_e3f5f0f7": {
-    "message": "Psi"
-  },
-  "published_c944a23d": {
-    "message": "تم النشر"
-  },
-  "published_when_302d8e23": {
-    "message": "تاريخ النشر: { when }"
-  },
-  "pumpkin_904428d5": {
-    "message": "يقطين"
-  },
-  "purple_7678a9fc": {
-    "message": "أرجواني"
-  },
-  "quaternions_877024e0": {
-    "message": "الرباعيات"
-  },
-  "quizzes_7e598f57": {
-    "message": "الاختبارات الموجزة"
-  },
-  "rational_numbers_80ddaa4a": {
-    "message": "أعداد جذرية"
-  },
-  "real_numbers_7c99df94": {
-    "message": "أعداد حقيقية"
-  },
+  "psi_e3f5f0f7": { "message": "Psi" },
+  "published_c944a23d": { "message": "تم النشر" },
+  "published_when_302d8e23": { "message": "تاريخ النشر: { when }" },
+  "pumpkin_904428d5": { "message": "يقطين" },
+  "purple_7678a9fc": { "message": "أرجواني" },
+  "quaternions_877024e0": { "message": "الرباعيات" },
+  "quizzes_7e598f57": { "message": "الاختبارات الموجزة" },
+  "rational_numbers_80ddaa4a": { "message": "أعداد جذرية" },
+  "real_numbers_7c99df94": { "message": "أعداد حقيقية" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "الجزء الحقيقي (من العدد المركب)"
   },
@@ -978,12 +710,8 @@ const locale = {
   "right_downward_harpoon_arrow_d71b114f": {
     "message": "Right Downward Harpoon Arrow"
   },
-  "right_floor_5392d5cf": {
-    "message": "Right Floor"
-  },
-  "right_to_left_9cfb092a": {
-    "message": "من اليمين إلى اليسار"
-  },
+  "right_floor_5392d5cf": { "message": "Right Floor" },
+  "right_to_left_9cfb092a": { "message": "من اليمين إلى اليسار" },
   "right_upward_harpoon_arrow_f5a34c73": {
     "message": "Right Upward Harpoon Arrow"
   },
@@ -1048,15 +776,9 @@ const locale = {
   "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
     "message": "حجم ملف التسمية التوضيحية يتجاوز الحد الأقصى المسموح به من { max } كيلوبايت."
   },
-  "small_b070434a": {
-    "message": "صغير"
-  },
-  "solid_circle_9f061dfc": {
-    "message": "Solid Circle"
-  },
-  "something_went_wrong_89195131": {
-    "message": "حدث خطأ ما."
-  },
+  "small_b070434a": { "message": "صغير" },
+  "solid_circle_9f061dfc": { "message": "Solid Circle" },
+  "something_went_wrong_89195131": { "message": "حدث خطأ ما." },
   "something_went_wrong_accessing_your_webcam_6643b87e": {
     "message": "حدث خطأ ما أثناء الوصول إلى كاميرا الويب الخاصة بك."
   },
@@ -1066,90 +788,36 @@ const locale = {
   "something_went_wrong_check_your_connection_reload__c7868286": {
     "message": "حدث خطأ ما. تحقق من الاتصال وأعد تحميل الصفحة وأعد المحاولة."
   },
-  "something_went_wrong_d238c551": {
-    "message": "حدث خطأ ما"
-  },
+  "something_went_wrong_d238c551": { "message": "حدث خطأ ما" },
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "حدث خطأ ما أثناء مشاركة شاشتك."
   },
-  "sort_by_e75f9e3e": {
-    "message": "الفزر حسب"
-  },
-  "spades_suit_b37020c2": {
-    "message": "Spades (Suit)"
-  },
-  "square_511eb3b3": {
-    "message": "مربع"
-  },
-  "square_cap_9ec88646": {
-    "message": "Square Cap"
-  },
-  "square_cup_b0665113": {
-    "message": "Square Cup"
-  },
-  "square_root_e8bcbc60": {
-    "message": "Square Root"
-  },
-  "square_root_symbol_d0898a53": {
-    "message": "Square Root Symbol"
-  },
-  "square_subset_17be67cb": {
-    "message": "Square Subset"
-  },
-  "square_subset_strict_7044e84f": {
-    "message": "Square Subset (Strict)"
-  },
-  "square_superset_3be8dae1": {
-    "message": "Square Superset"
-  },
-  "square_superset_strict_fa4262e4": {
-    "message": "Square Superset (Strict)"
-  },
-  "star_8d156e09": {
-    "message": "نجمة"
-  },
-  "start_over_f7552aa9": {
-    "message": "البدء مرة أخرى"
-  },
-  "start_recording_9a65141a": {
-    "message": "بدء التسجيل"
-  },
-  "steel_blue_14296f08": {
-    "message": "أزرق فولاذي"
-  },
-  "styles_2aa721ef": {
-    "message": "الأنماط"
-  },
-  "submit_a3cc6859": {
-    "message": "إرسال"
-  },
-  "subscript_59744f96": {
-    "message": "منخفض"
-  },
-  "subset_19c1a92f": {
-    "message": "Subset"
-  },
-  "subset_strict_8d8948d6": {
-    "message": "Subset (Strict)"
-  },
-  "succeeds_9cc31be9": {
-    "message": "Succeeds"
-  },
-  "succeeds_equal_158e8c3a": {
-    "message": "Succeeds Equal"
-  },
-  "sum_b0842d31": {
-    "message": "Sum"
-  },
-  "superscript_8cb349a2": {
-    "message": "مرتفع"
-  },
-  "superset_c4db8a7a": {
-    "message": "Superset"
-  },
-  "superset_strict_c77dd6d2": {
-    "message": "Superset (Strict)"
-  },
+  "sort_by_e75f9e3e": { "message": "الفزر حسب" },
+  "spades_suit_b37020c2": { "message": "Spades (Suit)" },
+  "square_511eb3b3": { "message": "مربع" },
+  "square_cap_9ec88646": { "message": "Square Cap" },
+  "square_cup_b0665113": { "message": "Square Cup" },
+  "square_root_e8bcbc60": { "message": "Square Root" },
+  "square_root_symbol_d0898a53": { "message": "Square Root Symbol" },
+  "square_subset_17be67cb": { "message": "Square Subset" },
+  "square_subset_strict_7044e84f": { "message": "Square Subset (Strict)" },
+  "square_superset_3be8dae1": { "message": "Square Superset" },
+  "square_superset_strict_fa4262e4": { "message": "Square Superset (Strict)" },
+  "star_8d156e09": { "message": "نجمة" },
+  "start_over_f7552aa9": { "message": "البدء مرة أخرى" },
+  "start_recording_9a65141a": { "message": "بدء التسجيل" },
+  "steel_blue_14296f08": { "message": "أزرق فولاذي" },
+  "styles_2aa721ef": { "message": "الأنماط" },
+  "submit_a3cc6859": { "message": "إرسال" },
+  "subscript_59744f96": { "message": "منخفض" },
+  "subset_19c1a92f": { "message": "Subset" },
+  "subset_strict_8d8948d6": { "message": "Subset (Strict)" },
+  "succeeds_9cc31be9": { "message": "Succeeds" },
+  "succeeds_equal_158e8c3a": { "message": "Succeeds Equal" },
+  "sum_b0842d31": { "message": "Sum" },
+  "superscript_8cb349a2": { "message": "مرتفع" },
+  "superset_c4db8a7a": { "message": "Superset" },
+  "superset_strict_c77dd6d2": { "message": "Superset (Strict)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "أنواع الملفات المدعومة: SRT أو WebVTT"
   },
@@ -1159,9 +827,7 @@ const locale = {
   "switch_to_raw_html_editor_f970ae1a": {
     "message": "التبديل إلي محرر HTML البسيط"
   },
-  "switch_to_the_html_editor_146dfffd": {
-    "message": "التبديل إلي محرر html"
-  },
+  "switch_to_the_html_editor_146dfffd": { "message": "التبديل إلي محرر html" },
   "switch_to_the_rich_text_editor_63c1ecf6": {
     "message": "التبديل إلى محرر النص المنسق"
   },
@@ -1219,33 +885,15 @@ const locale = {
   "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
     "message": "محرر HTML الأنيق لا يمكن الوصول إليه من خلال لوحة المفاتيح. اضغط على Shift-O لفتح محرر HTML البسيط."
   },
-  "therefore_d860e024": {
-    "message": "Therefore"
-  },
-  "theta_ce2d2350": {
-    "message": "Theta"
-  },
-  "theta_variant_fff6da6f": {
-    "message": "Theta (Variant)"
-  },
-  "thick_downward_arrow_b85add4c": {
-    "message": "Thick Downward Arrow"
-  },
-  "thick_left_arrow_d5f3e925": {
-    "message": "Thick Left Arrow"
-  },
-  "thick_leftward_arrow_6ab89880": {
-    "message": "Thick Leftward Arrow"
-  },
-  "thick_right_arrow_3ed5e8f7": {
-    "message": "Thick Right Arrow"
-  },
-  "thick_rightward_arrow_a2e1839e": {
-    "message": "Thick Rightward Arrow"
-  },
-  "thick_upward_arrow_acd20328": {
-    "message": "Thick Upward Arrow"
-  },
+  "therefore_d860e024": { "message": "Therefore" },
+  "theta_ce2d2350": { "message": "Theta" },
+  "theta_variant_fff6da6f": { "message": "Theta (Variant)" },
+  "thick_downward_arrow_b85add4c": { "message": "Thick Downward Arrow" },
+  "thick_left_arrow_d5f3e925": { "message": "Thick Left Arrow" },
+  "thick_leftward_arrow_6ab89880": { "message": "Thick Leftward Arrow" },
+  "thick_right_arrow_3ed5e8f7": { "message": "Thick Right Arrow" },
+  "thick_rightward_arrow_a2e1839e": { "message": "Thick Rightward Arrow" },
+  "thick_upward_arrow_acd20328": { "message": "Thick Upward Arrow" },
   "this_document_cannot_be_displayed_within_canvas_7aba77be": {
     "message": "لا يمكن عرض هذا المستند في Canvas."
   },
@@ -1258,39 +906,17 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "بالرغم من أن مقطع الفيديو الخاص بك سيشتمل على العنوان الصحيح في المستعرض، لم نتمكن من تحديثه في قاعدة البيانات."
   },
-  "timebar_a4d18443": {
-    "message": "Timebar"
-  },
-  "title_ee03d132": {
-    "message": "العنوان"
-  },
-  "to_be_posted_when_d24bf7dc": {
-    "message": "المقرر نشره: { when }"
-  },
-  "to_do_when_2783d78f": {
-    "message": "قائمة مهام: { when }"
-  },
-  "toggle_summary_group_413df9ac": {
-    "message": "تبديل مجموعة { summary }"
-  },
-  "toggle_tooltip_d3b7cb86": {
-    "message": "تبديل تلميح الأداة"
-  },
-  "tools_2fcf772e": {
-    "message": "الأدوات"
-  },
-  "top_66e0adb6": {
-    "message": "Top"
-  },
-  "tray_839df38a": {
-    "message": "العلبة"
-  },
-  "triangle_6072304e": {
-    "message": "مثلث"
-  },
-  "turnstile_yields_f9e76df1": {
-    "message": "Turnstile (Yields)"
-  },
+  "timebar_a4d18443": { "message": "Timebar" },
+  "title_ee03d132": { "message": "العنوان" },
+  "to_be_posted_when_d24bf7dc": { "message": "المقرر نشره: { when }" },
+  "to_do_when_2783d78f": { "message": "قائمة مهام: { when }" },
+  "toggle_summary_group_413df9ac": { "message": "تبديل مجموعة { summary }" },
+  "toggle_tooltip_d3b7cb86": { "message": "تبديل تلميح الأداة" },
+  "tools_2fcf772e": { "message": "الأدوات" },
+  "top_66e0adb6": { "message": "Top" },
+  "tray_839df38a": { "message": "العلبة" },
+  "triangle_6072304e": { "message": "مثلث" },
+  "turnstile_yields_f9e76df1": { "message": "Turnstile (Yields)" },
   "type_control_f9_to_access_image_options_text_a47e319f": {
     "message": "اضغط على Control F9 للوصول إلى اختيارات الصورة. { text }"
   },
@@ -1300,93 +926,43 @@ const locale = {
   "type_control_f9_to_access_table_options_text_92141329": {
     "message": "اضغط Control F9 للوصول إلى اختيارات الجدول. { text }"
   },
-  "union_e6b57a53": {
-    "message": "Union"
-  },
-  "unpublished_dfd8801": {
-    "message": "غير منشور"
-  },
-  "untitled_16aa4f2b": {
-    "message": "بدون عنوان"
-  },
-  "untitled_efdc2d7d": {
-    "message": "بدون عنوان"
-  },
+  "union_e6b57a53": { "message": "Union" },
+  "unpublished_dfd8801": { "message": "غير منشور" },
+  "untitled_16aa4f2b": { "message": "بدون عنوان" },
+  "untitled_efdc2d7d": { "message": "بدون عنوان" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Up And Left Diagonal Arrow"
   },
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Up And Right Diagonal Arrow"
   },
-  "upload_file_fd2361b8": {
-    "message": "تحميل ملف"
-  },
-  "upload_image_6120b609": {
-    "message": "تحميل صورة"
-  },
-  "upload_media_ce31135a": {
-    "message": "تحميل الوسائط"
-  },
-  "uploading_19e8a4e7": {
-    "message": "جارٍ التحميل"
-  },
-  "uppercase_delta_d4f4bc41": {
-    "message": "Uppercase Delta"
-  },
-  "uppercase_gamma_86f492e9": {
-    "message": "Uppercase Gamma"
-  },
-  "uppercase_lambda_c78d8ed4": {
-    "message": "Uppercase Lambda"
-  },
-  "uppercase_omega_8aedfa2": {
-    "message": "Uppercase Omega"
-  },
-  "uppercase_phi_caa36724": {
-    "message": "Uppercase Phi"
-  },
-  "uppercase_pi_fcc70f5e": {
-    "message": "Uppercase Pi"
-  },
-  "uppercase_psi_6395acbe": {
-    "message": "Uppercase Psi"
-  },
-  "uppercase_sigma_dbb70e92": {
-    "message": "Uppercase Sigma"
-  },
-  "uppercase_theta_49afc891": {
-    "message": "Uppercase Theta"
-  },
-  "uppercase_upsilon_8c1e623e": {
-    "message": "Uppercase Upsilon"
-  },
-  "uppercase_xi_341e8556": {
-    "message": "Uppercase Xi"
-  },
-  "upsilon_33651634": {
-    "message": "Upsilon"
-  },
+  "upload_file_fd2361b8": { "message": "تحميل ملف" },
+  "upload_image_6120b609": { "message": "تحميل صورة" },
+  "upload_media_ce31135a": { "message": "تحميل الوسائط" },
+  "uploading_19e8a4e7": { "message": "جارٍ التحميل" },
+  "uppercase_delta_d4f4bc41": { "message": "Uppercase Delta" },
+  "uppercase_gamma_86f492e9": { "message": "Uppercase Gamma" },
+  "uppercase_lambda_c78d8ed4": { "message": "Uppercase Lambda" },
+  "uppercase_omega_8aedfa2": { "message": "Uppercase Omega" },
+  "uppercase_phi_caa36724": { "message": "Uppercase Phi" },
+  "uppercase_pi_fcc70f5e": { "message": "Uppercase Pi" },
+  "uppercase_psi_6395acbe": { "message": "Uppercase Psi" },
+  "uppercase_sigma_dbb70e92": { "message": "Uppercase Sigma" },
+  "uppercase_theta_49afc891": { "message": "Uppercase Theta" },
+  "uppercase_upsilon_8c1e623e": { "message": "Uppercase Upsilon" },
+  "uppercase_xi_341e8556": { "message": "Uppercase Xi" },
+  "upsilon_33651634": { "message": "Upsilon" },
   "upward_and_downward_pointing_arrow_fa90a918": {
     "message": "Upward And Downward Pointing Arrow"
   },
   "upward_and_downward_pointing_arrow_thick_d420fdef": {
     "message": "Upward And Downward Pointing Arrow (Thick)"
   },
-  "upward_arrow_9992cb2d": {
-    "message": "Upward Arrow"
-  },
-  "upward_pointing_triangle_d078d7cb": {
-    "message": "مثلث يشير لأعلى"
-  },
-  "url_22a5f3b8": {
-    "message": "URL"
-  },
-  "usage_right_ff96f3e2": {
-    "message": "حق الاستخدام:"
-  },
-  "usage_rights_required_5fe4dd68": {
-    "message": "حقوق الاستخدام (مطلوبة)"
-  },
+  "upward_arrow_9992cb2d": { "message": "Upward Arrow" },
+  "upward_pointing_triangle_d078d7cb": { "message": "مثلث يشير لأعلى" },
+  "url_22a5f3b8": { "message": "URL" },
+  "usage_right_ff96f3e2": { "message": "حق الاستخدام:" },
+  "usage_rights_required_5fe4dd68": { "message": "حقوق الاستخدام (مطلوبة)" },
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "استخدم مفاتيح الأسهم للتنقل بين الخيارات."
   },
@@ -1414,54 +990,26 @@ const locale = {
   "used_by_screen_readers_to_describe_the_video_37ebad25": {
     "message": "يستخدم بواسطة أدوات قراءة الشاشة لوصف الفيديو"
   },
-  "user_documents_c206e61f": {
-    "message": "مستندات المستخدم"
-  },
-  "user_files_78e21703": {
-    "message": "ملفات المستخدمين"
-  },
-  "user_images_b6490852": {
-    "message": "صور المستخدمين"
-  },
-  "user_media_14fbf656": {
-    "message": "وسائط المستخدم"
-  },
-  "vector_notation_cf6086ab": {
-    "message": "الخط المتجه (رمز)"
-  },
+  "user_documents_c206e61f": { "message": "مستندات المستخدم" },
+  "user_files_78e21703": { "message": "ملفات المستخدمين" },
+  "user_images_b6490852": { "message": "صور المستخدمين" },
+  "user_media_14fbf656": { "message": "وسائط المستخدم" },
+  "vector_notation_cf6086ab": { "message": "الخط المتجه (رمز)" },
   "vertical_bar_set_builder_notation_4300495f": {
     "message": "شريط رأسي (Set Builder Notation)"
   },
-  "vertical_dots_bfb21f14": {
-    "message": "نقاط رأسية"
-  },
-  "video_options_24ef6e5d": {
-    "message": "خيارات الفيديو"
-  },
-  "video_options_tray_3b9809a5": {
-    "message": "علبة خيارات الفيديو"
-  },
-  "video_player_b371005": {
-    "message": "مشغل الفيديو"
-  },
-  "video_player_for_9e7d373b": {
-    "message": "مشغل الفيديو لـ "
-  },
-  "video_player_for_title_ffd9fbc4": {
-    "message": "مشغل الفيديو لـ { title }"
-  },
-  "view_ba339f93": {
-    "message": "عرض"
-  },
-  "view_description_30446afc": {
-    "message": "عرض الوصف"
-  },
+  "vertical_dots_bfb21f14": { "message": "نقاط رأسية" },
+  "video_options_24ef6e5d": { "message": "خيارات الفيديو" },
+  "video_options_tray_3b9809a5": { "message": "علبة خيارات الفيديو" },
+  "video_player_b371005": { "message": "مشغل الفيديو" },
+  "video_player_for_9e7d373b": { "message": "مشغل الفيديو لـ " },
+  "video_player_for_title_ffd9fbc4": { "message": "مشغل الفيديو لـ { title }" },
+  "view_ba339f93": { "message": "عرض" },
+  "view_description_30446afc": { "message": "عرض الوصف" },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "عرض اختصارات لوحة المفاتيح"
   },
-  "view_title_description_67940918": {
-    "message": "عرض وصف { title }"
-  },
+  "view_title_description_67940918": { "message": "عرض وصف { title }" },
   "view_word_and_character_counts_a743dd0c": {
     "message": "عرض عدد الكلمات والأحرف"
   },
@@ -1488,21 +1036,11 @@ const locale = {
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "يجب أن يكون العرض والارتفاع أرقاماً"
   },
-  "width_x_height_px_ff3ccb93": {
-    "message": "{ width } x { height } بكسل"
-  },
-  "wiki_home_9cd54d0": {
-    "message": "الصفحة الرئيسية لـ Wiki"
-  },
-  "wreath_product_200b38ef": {
-    "message": "Wreath Product"
-  },
-  "xi_149681d0": {
-    "message": "Xi"
-  },
-  "yes_dde87d5": {
-    "message": "نعم"
-  },
+  "width_x_height_px_ff3ccb93": { "message": "{ width } x { height } بكسل" },
+  "wiki_home_9cd54d0": { "message": "الصفحة الرئيسية لـ Wiki" },
+  "wreath_product_200b38ef": { "message": "Wreath Product" },
+  "xi_149681d0": { "message": "Xi" },
+  "yes_dde87d5": { "message": "نعم" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "لديك تغييرات غير محفوظة في علبة صانع الأيقونات. هل ترغب في المتابعة بدون حفظ هذه التغييرات؟"
   },
@@ -1527,18 +1065,10 @@ const locale = {
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "قد تكون كاميرا الويب الخاصة بك قيد الاستخدام بالفعل."
   },
-  "zeta_5ef24f0e": {
-    "message": "Zeta"
-  },
-  "zoom_f3e54d69": {
-    "message": "Zoom"
-  },
-  "zoom_in_image_bb97d4f": {
-    "message": "تكبير الصورة"
-  },
-  "zoom_out_image_d0a0a2ec": {
-    "message": "تصغير الصورة"
-  }
+  "zeta_5ef24f0e": { "message": "Zeta" },
+  "zoom_f3e54d69": { "message": "Zoom" },
+  "zoom_in_image_bb97d4f": { "message": "تكبير الصورة" },
+  "zoom_out_image_d0a0a2ec": { "message": "تصغير الصورة" }
 }
 
 

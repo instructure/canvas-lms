@@ -259,11 +259,18 @@ describe FilesController do
       end
     end
 
-    it "authenticates via course if given an assignment id" do
-      user_session(@teacher)
-      assignment = @course.assignments.create!(name: "an assignment")
-      get "show", params: { assignment_id: assignment.id, id: @file.id }, format: :json
-      expect(response).to be_ok
+    it "doesn't allow an assignment_id to bypass other auth checks" do
+      assignment1 = @course.assignments.create!(name: "an assignment")
+
+      attachment_model(context: @teacher, uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4"))
+
+      user_session(@student)
+
+      get "show", params: { id: @attachment.id }, format: :json
+      expect(response).not_to be_ok
+
+      get "show", params: { assignment_id: assignment1.id, id: @attachment.id }, format: :json
+      expect(response).not_to be_ok
     end
 
     describe "with verifiers" do
@@ -469,6 +476,79 @@ describe FilesController do
             expect(location.path).to eq "/files/#{file.id}/download"
             expect(query["download_frd"]).to eq ["1"]
             expect(query["sf_verifier"]).to be_present
+          end
+        end
+      end
+    end
+
+    context "after user merge" do
+      before :once do
+        @merge_user_1 = student_in_course(name: "Merge User 1", active_all: true).user
+        @merge_user_2 = student_in_course(name: "Merge User 2", active_all: true).user
+
+        @user_1_file = attachment_model(context: @merge_user_1, md5: "hi")
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "finds file in merged-to user's context" do
+        UserMerge.from(@merge_user_1).into(@merge_user_2)
+        UserMerge.from(@merge_user_2).into(@student)
+        run_jobs
+
+        get "show", params: { user_id: @merge_user_1.id, id: @user_1_file.id, verifier: @user_1_file.uuid }
+        expect(response).to be_successful
+        expect(@user_1_file.reload.context_type).to eq "User"
+        expect(@user_1_file.context_id).to eq @student.id
+      end
+
+      it "finds file in merged-from user's context when merged-to user already had the file" do
+        @user_2_file = attachment_model(context: @merge_user_2, md5: "hi")
+
+        UserMerge.from(@merge_user_1).into(@merge_user_2)
+        UserMerge.from(@merge_user_2).into(@student)
+        run_jobs
+
+        get "show", params: { user_id: @merge_user_1.id, id: @user_1_file.id, verifier: @user_1_file.uuid }
+        expect(response).to be_successful
+        expect(@user_1_file.reload.context_type).to eq "User"
+        expect(@user_1_file.context_id).to eq @merge_user_1.id
+      end
+
+      context "with sharding" do
+        specs_require_sharding
+
+        it "finds file in intermediate user's context if merge has happened cross-shard" do
+          @shard1.activate do
+            account = Account.create!
+            course_with_student(account: account)
+          end
+          UserMerge.from(@merge_user_1).into(@merge_user_2)
+          UserMerge.from(@merge_user_2).into(@student)
+          run_jobs
+
+          get "show", params: { user_id: @merge_user_1.id, id: @user_1_file.id, verifier: @user_1_file.uuid }
+          expect(response).to be_successful
+          expect(@user_1_file.reload.context_type).to eq "User"
+          expect(@user_1_file.context_id).to eq @merge_user_2.id
+        end
+
+        it "finds files correctly when given a non-native user ID" do
+          @shard1.activate do
+            account = Account.create!
+            course_with_student(account: account)
+          end
+          UserMerge.from(@merge_user_1).into(@merge_user_2)
+          UserMerge.from(@merge_user_2).into(@student)
+          run_jobs
+
+          @shard1.activate do
+            get "show", params: { user_id: @merge_user_1.id, id: @user_1_file.id, verifier: @user_1_file.uuid }
+            expect(response).to be_successful
+            expect(@user_1_file.reload.context_type).to eq "User"
+            expect(@user_1_file.context_id).to eq @merge_user_2.id
           end
         end
       end
@@ -681,6 +761,40 @@ describe FilesController do
     end
   end
 
+  describe "GET 'api_create_success'" do
+    before do
+      category = group_category
+      @group = category.groups.create(context: @course)
+      @group.add_user(@student)
+      user_session(@student)
+    end
+
+    it "treats attachments that live in the special 'submissions' folder as quota exempt" do
+      attachment = Attachment.create!(
+        context: @group,
+        uploaded_data: StringIO.new("my file"),
+        folder: @group.submissions_folder,
+        filename: "my-great-file.txt",
+        file_state: "deleted"
+      )
+      attachment.update_attribute(:size, 51.megabytes)
+      get "api_create_success", params: { id: attachment.id, uuid: attachment.uuid }, format: "json"
+      expect(response).to be_successful
+    end
+
+    it "does not give quota exemption to files not in the special 'submissions' folder" do
+      attachment = Attachment.create!(
+        context: @group,
+        uploaded_data: StringIO.new("my file"),
+        filename: "my-great-file.txt",
+        file_state: "deleted"
+      )
+      attachment.update_attribute(:size, 51.megabytes)
+      get "api_create_success", params: { id: attachment.id, uuid: attachment.uuid }, format: "json"
+      expect(json_parse.fetch("message")).to eq "file size exceeds quota limits"
+    end
+  end
+
   describe "GET 'show_relative'" do
     before(:once) do
       course_file
@@ -798,6 +912,33 @@ describe FilesController do
       it "renders unauthorized if the file doesn't exist" do
         get "show_relative", params: { course_id: @course.id, file_path: "course files/nope" }
         assert_unauthorized
+      end
+    end
+
+    context "after user merge" do
+      before :once do
+        @merge_user_1 = student_in_course(name: "Merge User 1", active_all: true).user
+        @user_1_file = attachment_model(context: @merge_user_1, md5: "hi")
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      context "with sharding" do
+        specs_require_sharding
+
+        it "allows access to files from a user who was merged into another user (happens with cross-shard merge)" do
+          @shard1.activate do
+            account = Account.create!
+            course_with_student(account: account)
+          end
+          UserMerge.from(@merge_user_1).into(@student)
+          run_jobs
+
+          get "show_relative", params: { user_id: @merge_user_1.id, file_id: @user_1_file.id, file_path: @user_1_file.full_path, verifier: @user_1_file.uuid }
+          expect(response).to be_redirect
+        end
       end
     end
 

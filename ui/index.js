@@ -25,7 +25,7 @@ import $ from 'jquery'
 import ready from '@instructure/ready'
 import Backbone from '@canvas/backbone'
 import splitAssetString from '@canvas/util/splitAssetString'
-import mathml from 'mathml'
+import {Mathml} from '@instructure/canvas-rce'
 import preventDefault from 'prevent-default'
 import loadBundle from 'bundles-generated'
 import {isolate} from '@canvas/sentry'
@@ -97,6 +97,9 @@ function afterDocumentReady() {
 }
 
 function setupMathML() {
+  const features = {new_math_equation_handling: Boolean(ENV?.FEATURES?.new_math_equation_handling)}
+  const config = {locale: ENV?.locale || 'en'}
+
   // LS-1662: there are math equations on the page that
   // we don't see, so remain invisible and aren't
   // typeset my MathJax. Let's trick Canvas into knowing
@@ -114,6 +117,7 @@ function setupMathML() {
     // so that the code that actually renders the user_content runs first,
     // because it has to be rendered before we can check if isMathMLOnPage
     setTimeout(() => {
+      const mathml = new Mathml(features, config)
       if (mathml.isMathOnPage()) mathml.loadMathJax(undefined)
     }, 5)
     return
@@ -126,8 +130,8 @@ function setupMathML() {
   setTimeout(() => {
     processedBodyMath = true
     window.dispatchEvent(
-      new CustomEvent(mathml.processNewMathEventName, {
-        detail: {target: document.body},
+      new CustomEvent(Mathml.processNewMathEventName, {
+        detail: {target: document.body, features, config},
       })
     )
   }, 0)
@@ -140,8 +144,8 @@ function setupMathML() {
         for (let n = 0; n < addedNodes.length; ++n) {
           const node = addedNodes[n]
           if (node.nodeType !== Node.ELEMENT_NODE) continue
-          const processNewMathEvent = new CustomEvent(mathml.processNewMathEventName, {
-            detail: {target: node},
+          const processNewMathEvent = new CustomEvent(Mathml.processNewMathEventName, {
+            detail: {target: node, features, config},
           })
           window.dispatchEvent(processNewMathEvent)
         }

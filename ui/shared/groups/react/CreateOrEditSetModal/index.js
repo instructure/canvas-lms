@@ -190,9 +190,13 @@ export const CreateOrEditSetModal = ({
     }
 
     if (st.selfSignup) {
+      const groupLimitIsInvalid = st.groupLimit.length > 0 && isInvalidNumber(st.groupLimit)
       if (isInvalidNumber(st.createGroupCount)) structureError(I18n.t('Group count is invalid'))
-      else if (st.groupLimit.length > 0 && isInvalidNumber(st.groupLimit))
-        structureError(I18n.t('Group limit size is invalid'))
+      else if (groupLimitIsInvalid) structureError(I18n.t('Group limit size is invalid'))
+      else if (!groupLimitIsInvalid && parseInt(st.groupLimit, 10) < 2)
+        structureError(
+          I18n.t('If you are going to define a limit group members, it must be greater than 1.')
+        )
     } else {
       switch (st.splitGroups) {
         case SPLIT.byGroupCount:

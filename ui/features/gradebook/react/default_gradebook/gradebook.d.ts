@@ -29,9 +29,12 @@ import type {
   ModuleMap,
   Section,
   Student,
+  StudentGrade,
   StudentGroupCategoryMap,
   StudentMap,
 } from '../api.d'
+
+export type SortDirection = 'ascending' | 'descending'
 
 export type CourseSettingsType = {
   filter_speed_grader_by_student_group: boolean
@@ -46,7 +49,7 @@ export type GradebookSettings = {
     context_module_id: string | null
     end_date: string | null
     start_date: string | null
-    submissions: 'has-ungraded-submissions' | 'has-submissions' | null
+    submissions: SubmissionFilterValue | null
   }
   filter_rows_by: {
     section_id: string | null
@@ -60,8 +63,8 @@ export type GradebookSettings = {
   show_separate_first_last_names: 'false' | 'true'
   show_unpublished_assignments: 'false' | 'true'
   sort_rows_by_column_id: string
-  sort_rows_by_direction: 'ascending' | 'descending'
-  sort_rows_by_setting_key: string
+  sort_rows_by_direction: SortDirection
+  sort_rows_by_setting_key: SortRowsSettingKey
   student_column_display_as: 'last_first' | 'first_last'
   student_column_secondary_info: string
   view_ungraded_as_zero: 'false' | 'true'
@@ -164,7 +167,7 @@ export type GradebookOptions = {
 export type GradebookViewOptions = {
   columnSortSettings: {
     criterion: string
-    direction: 'ascending' | 'descending'
+    direction: SortDirection
   }
   hideTotal: boolean
   showNotes: boolean
@@ -232,11 +235,13 @@ export type ContentLoadStates = {
 }
 
 export type PendingGradeInfo = {
-  userId: string
-  assignmentId: string
+  assignmentId?: string
+  enteredAs?: string | null
   excused: boolean
+  grade: string | null
+  score: number | null
+  userId?: string
   valid: boolean
-  grade?: string
 }
 
 export type InitialActionStates = {
@@ -250,14 +255,15 @@ export type FlashAlertType = {
 }
 
 export type FilterType =
-  | 'section'
-  | 'module'
   | 'assignment-group'
-  | 'grading-period'
-  | 'student-group'
-  | 'start-date'
   | 'end-date'
+  | 'grading-period'
+  | 'module'
+  | 'section'
+  | 'start-date'
+  | 'student-group'
   | 'submissions'
+  | 'unposted'
 
 export type Filter = {
   id: string
@@ -266,7 +272,11 @@ export type Filter = {
   created_at: string
 }
 
-export type SubmissionFilterValue = 'has-ungraded-submissions' | 'has-submissions' | undefined
+export type SubmissionFilterValue =
+  | 'has-ungraded-submissions'
+  | 'has-submissions'
+  | 'has-no-submissions'
+  | 'has-unposted-grades'
 
 export type FilterPreset = {
   id: string
@@ -327,7 +337,7 @@ export type Lti = {
 
 export type ColumnOrderSettings = {
   customOrder?: string[]
-  direction?: 'ascending' | 'descending'
+  direction?: SortDirection
   freezeTotalGrade?: boolean | 'true'
   sortType: string
 }
@@ -349,12 +359,6 @@ export type FlashMessage = {
 
 export type AssignmentStudentMap = {
   [assignmentId: string]: StudentMap
-}
-
-export type StudentGrade = {
-  score: number
-  possible: number
-  submissions: any
 }
 
 // TODO: store student grades in separate map so that the
@@ -427,3 +431,16 @@ export type ProgressCamelized = {
   progressId: string
   workflowState: string
 }
+
+export type SortRowsSettingKey =
+  | 'excused'
+  | 'grade'
+  | 'integration_id'
+  | 'late'
+  | 'login_id'
+  | 'missing'
+  | 'name'
+  | 'sis_user_id'
+  | 'sortable_name'
+  | 'student_firstname'
+  | 'unposted'

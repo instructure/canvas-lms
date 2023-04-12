@@ -7,7 +7,7 @@
   "module": "es/index.js",
   "sideEffects": false,
   "scripts": {
-    "i18n:extract": "format-message extract \"src*/**/*.js\" -g underscored_crc32 -o locales/en.json",
+    "i18n:extract": "format-message extract \"src*/**/*.[jt]s*\" -g underscored_crc32 -o locales/en.json",
     "installTranslations": "scripts/installTranslations.js",
     "commitTranslations": "scripts/commitTranslations.sh",
     "test": "jest --color --runInBand",

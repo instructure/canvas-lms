@@ -138,7 +138,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
     },
     getCurrentlyShownStudents,
 
-    onHeaderKeyDown: event => {
+    onHeaderKeyDown: (event: React.KeyboardEvent) => {
       gradebook.handleHeaderKeyDown(event, columnId)
     },
     onMenuDismiss() {
@@ -196,6 +196,12 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
       },
       onSortByMissing: () => {
         gradebook.setSortRowsBySetting(columnId, 'missing', 'ascending')
+      },
+      onSortByExcused: () => {
+        gradebook.setSortRowsBySetting(columnId, 'excused', 'ascending')
+      },
+      onSortByUnposted: () => {
+        gradebook.setSortRowsBySetting(columnId, 'unposted', 'ascending')
       },
       settingKey: sortRowsBySetting.settingKey,
     },

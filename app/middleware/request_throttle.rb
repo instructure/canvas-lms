@@ -151,6 +151,7 @@ class RequestThrottle
   def client_identifiers(request)
     request.env["canvas.request_throttle.user_id"] ||= [
       tag_identifier("lti_advantage", lti_advantage_client_id_and_cluster(request)),
+      tag_identifier("service_user_key", site_admin_service_user_key(request)),
       (token_string = AuthenticationMethods.access_token(request, :GET).presence) && "token:#{AccessToken.hashed_token(token_string)}",
       tag_identifier("user", AuthenticationMethods.user_id(request).presence),
       tag_identifier("session", session_id(request).presence),
@@ -189,6 +190,26 @@ class RequestThrottle
 
   def session_id(request)
     request.env["rack.session.options"].try(:[], :id)
+  end
+
+  def site_admin_service_user_key(request)
+    # We only want to allow this approvelist method for requests using the correct User-Agent
+    # Example: `inst-service-name/2d0c1jk2 (region: us-east-1; host: 1de983c20j1ak2; env: production)`
+    regexp = %r{^
+      inst-[a-z0-9_-]+?/[a-z0-9_-]+?\s*?
+      \(\s*?
+        region:\s*?[a-z0-9_-]+?;\s*?
+        host:\s*?[a-z0-9._-]+?;\s*?
+        env:\s*?[a-z0-9_-]+?\s*?
+      \)\s*?
+      $}xi.freeze
+    return unless regexp.match?(request.user_agent)
+
+    return unless (token_string = AuthenticationMethods.access_token(request))
+
+    return unless AccessToken.site_admin?(token_string)
+
+    AccessToken.authenticate(token_string).global_developer_key_id
   end
 
   def self.blocklist

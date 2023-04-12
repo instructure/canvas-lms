@@ -56,12 +56,30 @@ export const AddressBookContainer = props => {
     return () => clearInterval(interval)
   }, [inputValue, searchTerm, setSearchTerm])
 
+  const skipAddressBookRecipientsQuery = () => {
+    // if menu is closed, or if both your search term is empty
+    // or your search has nosubmenu or context to use
+    const latestFilterHistoryItem = filterHistory[filterHistory.length - 1]
+    if (
+      !isMenuOpen ||
+      (!searchTerm &&
+        !(
+          latestFilterHistoryItem?.subMenuSelection ||
+          latestFilterHistoryItem?.context?.contextID ||
+          props.courseContextCode
+        ))
+    ) {
+      return true
+    }
+    return false
+  }
+
   const addressBookRecipientsQuery = useQuery(
     props.includeCommonCourses
       ? ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES
       : ADDRESS_BOOK_RECIPIENTS,
     {
-      skip: !isMenuOpen,
+      skip: skipAddressBookRecipientsQuery(),
       variables: {
         context:
           filterHistory[filterHistory.length - 1]?.context?.contextID ||

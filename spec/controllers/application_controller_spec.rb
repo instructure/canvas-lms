@@ -1125,6 +1125,7 @@ RSpec.describe ApplicationController do
                   lti_message_hint
                   canvas_region
                   client_id
+                  deployment_id
                   lti_storage_target
                 ]
               end
@@ -2448,6 +2449,12 @@ RSpec.describe ApplicationController do
       expect(K5::UserService).to receive(:new).with(@user, @account, nil).and_call_original
       expect_any_instance_of(K5::UserService).to receive(:k5_disabled?).once
       @controller.send(:k5_disabled?)
+    end
+
+    it "use_classic_font? calls K5::UserService with correct arguments" do
+      expect(K5::UserService).to receive(:new).with(@user, @account, nil).and_call_original
+      expect_any_instance_of(K5::UserService).to receive(:use_classic_font?).once
+      @controller.send(:use_classic_font?)
     end
   end
 

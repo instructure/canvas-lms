@@ -57,123 +57,55 @@ const locale = {
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "Er is een fout opgetreden bij het uploaden van je media."
   },
-  "and_7fcc2911": {
-    "message": "En"
-  },
-  "angle_c5b4ec50": {
-    "message": "Hoek"
-  },
-  "announcement_list_da155734": {
-    "message": "Lijst met aankondiging"
-  },
-  "announcements_a4b8ed4a": {
-    "message": "Aankondigingen"
-  },
-  "apply_781a2546": {
-    "message": "Toepassen"
-  },
+  "and_7fcc2911": { "message": "En" },
+  "angle_c5b4ec50": { "message": "Hoek" },
+  "announcement_list_da155734": { "message": "Lijst met aankondiging" },
+  "announcements_a4b8ed4a": { "message": "Aankondigingen" },
+  "apply_781a2546": { "message": "Toepassen" },
   "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
     "message": "Wijzigingen toepassen op alle exemplaren van dit pictogrammaker-pictogram in de cursus"
   },
-  "approaches_the_limit_893aeec9": {
-    "message": "Benadert de limiet"
-  },
-  "approximately_e7965800": {
-    "message": "Ongeveer"
-  },
-  "apps_54d24a47": {
-    "message": "Apps"
-  },
-  "arrows_464a3e54": {
-    "message": "Pijlen"
-  },
-  "art_icon_8e1daad": {
-    "message": "Kunstpictogram"
-  },
+  "approaches_the_limit_893aeec9": { "message": "Benadert de limiet" },
+  "approximately_e7965800": { "message": "Ongeveer" },
+  "apps_54d24a47": { "message": "Apps" },
+  "arrows_464a3e54": { "message": "Pijlen" },
+  "art_icon_8e1daad": { "message": "Kunstpictogram" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Beeldverhouding blijft behouden"
   },
-  "assignments_1e02582c": {
-    "message": "Opdrachten"
-  },
-  "asterisk_82255584": {
-    "message": "Asterisk"
-  },
-  "attributes_963ba262": {
-    "message": "Kenmerken"
-  },
+  "assignments_1e02582c": { "message": "Opdrachten" },
+  "asterisk_82255584": { "message": "Asterisk" },
+  "attributes_963ba262": { "message": "Kenmerken" },
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Audio- en video-opname wordt niet ondersteund; gebruik een andere browser."
   },
-  "audio_options_feb58e2c": {
-    "message": "Audio-opties"
-  },
-  "audio_options_tray_33a90711": {
-    "message": "Gebied met audio-opties"
-  },
+  "audio_options_feb58e2c": { "message": "Audio-opties" },
+  "audio_options_tray_33a90711": { "message": "Gebied met audio-opties" },
   "audio_player_for_title_20cc70d": {
     "message": "Audio-speler voor { title }"
   },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Er is automatisch opgeslagen inhoud aanwezig. Wil je liever  de automatisch opgeslagen inhoud laden?"
   },
-  "available_folders_694d0436": {
-    "message": "Beschikbare mappen"
-  },
-  "backslash_b2d5442d": {
-    "message": "Backslash"
-  },
-  "bar_ec63ed6": {
-    "message": "Balk"
-  },
-  "basic_554cdc0a": {
-    "message": "Basis"
-  },
-  "because_501841b": {
-    "message": "Omdat"
-  },
-  "below_81d4dceb": {
-    "message": "Hieronder"
-  },
-  "beta_cb5f307e": {
-    "message": "Bèta"
-  },
-  "big_circle_16b2e604": {
-    "message": "Grote cirkel"
-  },
-  "binomial_coefficient_ea5b9bb7": {
-    "message": "Binomiaal coëfficiënt"
-  },
-  "black_4cb01371": {
-    "message": "Zwart"
-  },
-  "blue_daf8fea9": {
-    "message": "Blauw"
-  },
-  "bottom_15a2a9be": {
-    "message": "Onder"
-  },
-  "bottom_third_5f5fec1d": {
-    "message": "Derde van beneden"
-  },
-  "bowtie_5f9629e4": {
-    "message": "Bowtie"
-  },
-  "brick_f2656265": {
-    "message": "Steenrood"
-  },
-  "c_2001_acme_inc_283f7f80": {
-    "message": "(c) 2001 Acme Inc."
-  },
-  "cancel_caeb1e68": {
-    "message": "Annuleren"
-  },
-  "cap_product_3a5265a6": {
-    "message": "Cap-product"
-  },
-  "centered_dot_64d5e378": {
-    "message": "Gecentreerde punt"
-  },
+  "available_folders_694d0436": { "message": "Beschikbare mappen" },
+  "backslash_b2d5442d": { "message": "Backslash" },
+  "bar_ec63ed6": { "message": "Balk" },
+  "basic_554cdc0a": { "message": "Basis" },
+  "because_501841b": { "message": "Omdat" },
+  "below_81d4dceb": { "message": "Hieronder" },
+  "beta_cb5f307e": { "message": "Bèta" },
+  "big_circle_16b2e604": { "message": "Grote cirkel" },
+  "binomial_coefficient_ea5b9bb7": { "message": "Binomiaal coëfficiënt" },
+  "black_4cb01371": { "message": "Zwart" },
+  "blue_daf8fea9": { "message": "Blauw" },
+  "bottom_15a2a9be": { "message": "Onder" },
+  "bottom_third_5f5fec1d": { "message": "Derde van beneden" },
+  "bowtie_5f9629e4": { "message": "Bowtie" },
+  "brick_f2656265": { "message": "Steenrood" },
+  "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Annuleren" },
+  "cap_product_3a5265a6": { "message": "Cap-product" },
+  "centered_dot_64d5e378": { "message": "Gecentreerde punt" },
   "centered_horizontal_dots_451c5815": {
     "message": "Gecentreerde horizontale punten"
   },
@@ -213,9 +145,7 @@ const locale = {
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Klik om een koppeling in te voegen in de editor."
   },
-  "click_to_show_preview_faa27051": {
-    "message": "Klik om voorbeeld te tonen"
-  },
+  "click_to_show_preview_faa27051": { "message": "Klik om voorbeeld te tonen" },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Sluit een menu of dialoogvenster. Hierdoor keert u bovendien terug naar het editorgebied"
   },
@@ -229,18 +159,12 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": {
     "message": "Bijschriften/ondertiteling"
   },
-  "clubs_suit_c1ffedff": {
-    "message": "Klaveren (speelkaart)"
-  },
-  "collaborations_5c56c15f": {
-    "message": "Samenwerkingen"
-  },
+  "clubs_suit_c1ffedff": { "message": "Klaveren (speelkaart)" },
+  "collaborations_5c56c15f": { "message": "Samenwerkingen" },
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Inklappen om te verbergen { types }"
   },
-  "color_picker_6b359edf": {
-    "message": "Kleurenkiezer"
-  },
+  "color_picker_6b359edf": { "message": "Kleurenkiezer" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Kleurenkiezer ({ colorName } geselecteerd)"
   },
@@ -254,48 +178,24 @@ const locale = {
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Inhoud wordt nog steeds gedownload. Als je doorgaat, wordt deze niet goed ingesloten."
   },
-  "content_subtype_5ce35e88": {
-    "message": "Inhoud-subtype"
-  },
-  "content_type_2cf90d95": {
-    "message": "Inhoudtype"
-  },
-  "coproduct_e7838082": {
-    "message": "Coproduct"
-  },
-  "copyright_holder_66ee111": {
-    "message": "Houder van auteursrecht:"
-  },
+  "content_subtype_5ce35e88": { "message": "Inhoud-subtype" },
+  "content_type_2cf90d95": { "message": "Inhoudtype" },
+  "coproduct_e7838082": { "message": "Coproduct" },
+  "copyright_holder_66ee111": { "message": "Houder van auteursrecht:" },
   "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
     "message": "{ count, plural,\n     =0 {0 woorden}\n    one {1 woord}\n  other {# woorden}\n}"
   },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {# item geladen}\n  other {# items geladen}\n}"
   },
-  "course_documents_104d76e0": {
-    "message": "Cursusdocumenten"
-  },
-  "course_files_62deb8f8": {
-    "message": "Cursusbestanden"
-  },
-  "course_files_a31f97fc": {
-    "message": "Cursusbestanden"
-  },
-  "course_images_f8511d04": {
-    "message": "Cursusafbeeldingen"
-  },
-  "course_links_b56959b9": {
-    "message": "Cursuslinks"
-  },
-  "course_media_ec759ad": {
-    "message": "Cursusmedia"
-  },
-  "course_navigation_dd035109": {
-    "message": "Cursusnavigatie"
-  },
-  "create_icon_110d6463": {
-    "message": "Pictogram maken"
-  },
+  "course_documents_104d76e0": { "message": "Cursusdocumenten" },
+  "course_files_62deb8f8": { "message": "Cursusbestanden" },
+  "course_files_a31f97fc": { "message": "Cursusbestanden" },
+  "course_images_f8511d04": { "message": "Cursusafbeeldingen" },
+  "course_links_b56959b9": { "message": "Cursuslinks" },
+  "course_media_ec759ad": { "message": "Cursusmedia" },
+  "course_navigation_dd035109": { "message": "Cursusnavigatie" },
+  "create_icon_110d6463": { "message": "Pictogram maken" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-licentie:"
   },
@@ -337,57 +237,35 @@ const locale = {
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Tekstkoppeling weergeven (Opent in een nieuw tabblad)"
   },
-  "division_sign_72190870": {
-    "message": "Deelteken"
-  },
-  "documents_81393201": {
-    "message": "Documenten"
-  },
-  "done_54e3d4b6": {
-    "message": "Gereed"
-  },
-  "double_dagger_faf78681": {
-    "message": "Double Dagger"
-  },
+  "division_sign_72190870": { "message": "Deelteken" },
+  "documents_81393201": { "message": "Documenten" },
+  "done_54e3d4b6": { "message": "Gereed" },
+  "double_dagger_faf78681": { "message": "Double Dagger" },
   "down_and_left_diagonal_arrow_40ef602c": {
     "message": "Pijl omlaag en links diagonaal"
   },
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Pijl omlaag en rechts diagonaal"
   },
-  "download_filename_2baae924": {
-    "message": "{ filename } downloaden"
-  },
-  "downward_arrow_cca52012": {
-    "message": "Pijl met punt omlaag"
-  },
+  "download_filename_2baae924": { "message": "{ filename } downloaden" },
+  "downward_arrow_cca52012": { "message": "Pijl met punt omlaag" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Driehoek met punt omlaag"
   },
-  "drag_a_file_here_1bf656d5": {
-    "message": "Sleep een bestand hierheen"
-  },
+  "drag_a_file_here_1bf656d5": { "message": "Sleep een bestand hierheen" },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Slepen en neerzetten of klikken om je computer te doorzoeken"
   },
   "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
     "message": "Sleep de handgreep. Gebruik de pijltoetsen-omhoog en -omlaag om de grootte te wijzigen"
   },
-  "due_multiple_dates_cc0ee3f5": {
-    "message": "Inleverdatum: Meerdere datums"
-  },
-  "due_when_7eed10c6": {
-    "message": "Inleverdatum: { when }"
-  },
+  "due_multiple_dates_cc0ee3f5": { "message": "Inleverdatum: Meerdere datums" },
+  "due_when_7eed10c6": { "message": "Inleverdatum: { when }" },
   "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
     "message": "Bewerk de alt-tekst voor deze pictograminstantie"
   },
-  "edit_c5fbea07": {
-    "message": "Bewerken"
-  },
-  "edit_course_link_5a5c3c59": {
-    "message": "Cursuslink bewerken"
-  },
+  "edit_c5fbea07": { "message": "Bewerken" },
+  "edit_course_link_5a5c3c59": { "message": "Cursuslink bewerken" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Bestaand Icon Maker-pictogram bewerken"
   },
@@ -412,66 +290,34 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Voer minimaal 3 tekens in om te gaan zoeken"
   },
-  "epsilon_54bb8afa": {
-    "message": "Epsilon"
-  },
-  "epsilon_variant_d31f1e77": {
-    "message": "Epsilon (variant)"
-  },
-  "equals_sign_c51bdc58": {
-    "message": "Gelijkteken"
-  },
-  "equation_editor_39fbc3f1": {
-    "message": "Vergelijkingseditor"
-  },
-  "equivalence_class_7b0f11c0": {
-    "message": "Equivalentieklasse"
-  },
-  "equivalent_identity_654b3ce5": {
-    "message": "Equivalent (identiteit)"
-  },
-  "eta_b8828f99": {
-    "message": "Eta"
-  },
-  "exists_2e62bdaa": {
-    "message": "Bestaat"
-  },
-  "exit_fullscreen_b7eb0aa4": {
-    "message": "Volledig scherm sluiten"
-  },
+  "epsilon_54bb8afa": { "message": "Epsilon" },
+  "epsilon_variant_d31f1e77": { "message": "Epsilon (variant)" },
+  "equals_sign_c51bdc58": { "message": "Gelijkteken" },
+  "equation_editor_39fbc3f1": { "message": "Vergelijkingseditor" },
+  "equivalence_class_7b0f11c0": { "message": "Equivalentieklasse" },
+  "equivalent_identity_654b3ce5": { "message": "Equivalent (identiteit)" },
+  "eta_b8828f99": { "message": "Eta" },
+  "exists_2e62bdaa": { "message": "Bestaat" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Volledig scherm sluiten" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Uitvouwvoorbeeld is standaard"
   },
   "expand_to_see_types_f5d29352": {
     "message": "Uitklappen om te bekijken { types }"
   },
-  "external_tools_6e77821": {
-    "message": "Externe tools"
-  },
-  "extra_large_b6cdf1ff": {
-    "message": "Extra groot"
-  },
-  "extra_small_9ae33252": {
-    "message": "Extra klein"
-  },
-  "extracurricular_icon_67c8ca42": {
-    "message": "Extracurriculair-pictogram"
-  },
-  "f_function_fe422d65": {
-    "message": "F (functie)"
-  },
+  "external_tools_6e77821": { "message": "Externe tools" },
+  "extra_large_b6cdf1ff": { "message": "Extra groot" },
+  "extra_small_9ae33252": { "message": "Extra klein" },
+  "extracurricular_icon_67c8ca42": { "message": "Extracurriculair-pictogram" },
+  "f_function_fe422d65": { "message": "F (functie)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Kan geen bestandsinhoud ophalen"
   },
-  "file_name_8fd421ff": {
-    "message": "Bestandsnaam"
-  },
+  "file_name_8fd421ff": { "message": "Bestandsnaam" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Opslagquota voor bestanden overschreden"
   },
-  "file_url_c12b64be": {
-    "message": "Bestands-URL"
-  },
+  "file_url_c12b64be": { "message": "Bestands-URL" },
   "filename_file_icon_602eb5de": {
     "message": "{ filename } bestandspictogram"
   },
@@ -503,15 +349,9 @@ const locale = {
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "{ count, plural,\n     =0 {# resultaten}\n    one {# resultaat}\n  other {# resultaten}\n} gevonden"
   },
-  "fraction_41bac7af": {
-    "message": "Fractie"
-  },
-  "fullscreen_873bf53f": {
-    "message": "Volledig scherm"
-  },
-  "gamma_1767928": {
-    "message": "Gamma"
-  },
+  "fraction_41bac7af": { "message": "Fractie" },
+  "fullscreen_873bf53f": { "message": "Volledig scherm" },
+  "gamma_1767928": { "message": "Gamma" },
   "generating_preview_45b53be0": {
     "message": "Bezig met genereren van voorbeeld..."
   },
@@ -571,36 +411,16 @@ const locale = {
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Ik heb toestemming gekregen om dit bestand te gebruiken."
   },
-  "i_hold_the_copyright_71ee91b1": {
-    "message": "Ik heb het auteursrecht"
-  },
-  "icon_215a1dc6": {
-    "message": "Pictogram"
-  },
-  "icon_8168b2f8": {
-    "message": "pictogram"
-  },
-  "icon_color_b86dd6d6": {
-    "message": "Pictogramkleur"
-  },
-  "icon_maker_icons_cc560f7e": {
-    "message": "Pictogrammaker-pictogrammen"
-  },
-  "icon_options_7e32746e": {
-    "message": "Pictogramopties"
-  },
-  "icon_options_tray_2b407977": {
-    "message": "Houder met pictogramopties"
-  },
-  "icon_preview_1782a1d9": {
-    "message": "Pictogramvoorbeeld"
-  },
-  "icon_shape_30b61e7": {
-    "message": "Pictogramvorm"
-  },
-  "icon_size_9353edea": {
-    "message": "Pictogramgrootte"
-  },
+  "i_hold_the_copyright_71ee91b1": { "message": "Ik heb het auteursrecht" },
+  "icon_215a1dc6": { "message": "Pictogram" },
+  "icon_8168b2f8": { "message": "pictogram" },
+  "icon_color_b86dd6d6": { "message": "Pictogramkleur" },
+  "icon_maker_icons_cc560f7e": { "message": "Pictogrammaker-pictogrammen" },
+  "icon_options_7e32746e": { "message": "Pictogramopties" },
+  "icon_options_tray_2b407977": { "message": "Houder met pictogramopties" },
+  "icon_preview_1782a1d9": { "message": "Pictogramvoorbeeld" },
+  "icon_shape_30b61e7": { "message": "Pictogramvorm" },
+  "icon_size_9353edea": { "message": "Pictogramgrootte" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
     "message": "Als de link leeg wordt gelaten, wordt de naam van de cursuslink als tekst weergegeven"
   },
@@ -689,18 +509,12 @@ const locale = {
   "left_downard_harpoon_arrow_1d7b3d2e": {
     "message": "Harpoenpijl links omlaag wijzend"
   },
-  "left_floor_29ac2274": {
-    "message": "Linker ondergrens"
-  },
-  "left_to_right_e9b4fd06": {
-    "message": "Links-rechts"
-  },
+  "left_floor_29ac2274": { "message": "Linker ondergrens" },
+  "left_to_right_e9b4fd06": { "message": "Links-rechts" },
   "left_upward_harpoon_arrow_3a562a96": {
     "message": "Harpoenpijl links omhoog wijzend"
   },
-  "leftward_arrow_1e4765de": {
-    "message": "Pijl wijzend naar links"
-  },
+  "leftward_arrow_1e4765de": { "message": "Pijl wijzend naar links" },
   "leftward_pointing_triangle_d14532ce": {
     "message": "Driehoek met punt naar links"
   },
@@ -726,27 +540,15 @@ const locale = {
   "loading_closed_captions_subtitles_failed_95ceef47": {
     "message": "laden van bijschriften/ondertiteling is mislukt."
   },
-  "loading_failed_b3524381": {
-    "message": "Laden mislukt..."
-  },
-  "loading_failed_e6a9d8ef": {
-    "message": "Laden mislukt."
-  },
-  "loading_folders_d8b5869e": {
-    "message": "Mappen worden geladen"
-  },
+  "loading_failed_b3524381": { "message": "Laden mislukt..." },
+  "loading_failed_e6a9d8ef": { "message": "Laden mislukt." },
+  "loading_folders_d8b5869e": { "message": "Mappen worden geladen" },
   "loading_please_wait_d276220a": {
     "message": "Bezig met laden, even wachten"
   },
-  "loading_preview_9f077aa1": {
-    "message": "Voorbeeld laden"
-  },
-  "locked_762f138b": {
-    "message": "Vergrendeld"
-  },
-  "logical_equivalence_76fca396": {
-    "message": "Logische equivalentie"
-  },
+  "loading_preview_9f077aa1": { "message": "Voorbeeld laden" },
+  "locked_762f138b": { "message": "Vergrendeld" },
+  "logical_equivalence_76fca396": { "message": "Logische equivalentie" },
   "logical_equivalence_short_8efd7b4f": {
     "message": "Logische equivalentie (kort)"
   },
@@ -756,21 +558,11 @@ const locale = {
   "logical_equivalence_thick_662dd3f2": {
     "message": "Logische equivalentie (dik)"
   },
-  "low_horizontal_dots_cc08498e": {
-    "message": "Lage horizontale punten"
-  },
-  "magenta_4a65993c": {
-    "message": "Magenta"
-  },
-  "maps_to_e5ef7382": {
-    "message": "Wijst toe aan"
-  },
-  "math_icon_ad4e9d03": {
-    "message": "Wiskundepictogram"
-  },
-  "media_af190855": {
-    "message": "Media"
-  },
+  "low_horizontal_dots_cc08498e": { "message": "Lage horizontale punten" },
+  "magenta_4a65993c": { "message": "Magenta" },
+  "maps_to_e5ef7382": { "message": "Wijst toe aan" },
+  "math_icon_ad4e9d03": { "message": "Wiskundepictogram" },
+  "media_af190855": { "message": "Media" },
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Verwerken van mediabestand. Probeer het later opnieuw."
   },
@@ -782,63 +574,29 @@ const locale = {
   "minimize_file_preview_da911944": {
     "message": "Voorbeeld van bestand minimaliseren"
   },
-  "minimize_video_20aa554b": {
-    "message": "Video minimaliseren"
-  },
-  "minus_fd961e2e": {
-    "message": "Min"
-  },
-  "minus_plus_3461f637": {
-    "message": "Min/Plus"
-  },
-  "misc_3b692ea7": {
-    "message": "Diversen"
-  },
-  "miscellaneous_e9818229": {
-    "message": "Diversen"
-  },
-  "modules_c4325335": {
-    "message": "Modules"
-  },
-  "mu_37223b8b": {
-    "message": "Mu"
-  },
-  "multi_color_image_63d7372f": {
-    "message": "Veelkleurige afbeelding"
-  },
-  "multiplication_sign_15f95c22": {
-    "message": "Vermenigvuldigingsteken"
-  },
-  "music_icon_4db5c972": {
-    "message": "Muziekpictogram"
-  },
+  "minimize_video_20aa554b": { "message": "Video minimaliseren" },
+  "minus_fd961e2e": { "message": "Min" },
+  "minus_plus_3461f637": { "message": "Min/Plus" },
+  "misc_3b692ea7": { "message": "Diversen" },
+  "miscellaneous_e9818229": { "message": "Diversen" },
+  "modules_c4325335": { "message": "Modules" },
+  "mu_37223b8b": { "message": "Mu" },
+  "multi_color_image_63d7372f": { "message": "Veelkleurige afbeelding" },
+  "multiplication_sign_15f95c22": { "message": "Vermenigvuldigingsteken" },
+  "music_icon_4db5c972": { "message": "Muziekpictogram" },
   "must_be_at_least_percentage_22e373b6": {
     "message": "Moet ten minste { percentage }% zijn"
   },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Moet minstens { width } x { height }px zijn"
   },
-  "my_files_2f621040": {
-    "message": "Mijn bestanden"
-  },
-  "n_th_root_9991a6e4": {
-    "message": "N-de wortel"
-  },
-  "nabla_1e216d25": {
-    "message": "Nabla"
-  },
-  "name_1aed4a1b": {
-    "message": "Naam"
-  },
-  "name_color_ceec76ff": {
-    "message": "{ name } ({ color })"
-  },
-  "natural_music_54a70258": {
-    "message": "Natuurlijk (muziek)"
-  },
-  "natural_numbers_3da07060": {
-    "message": "Natuurlijke getallen"
-  },
+  "my_files_2f621040": { "message": "Mijn bestanden" },
+  "n_th_root_9991a6e4": { "message": "N-de wortel" },
+  "nabla_1e216d25": { "message": "Nabla" },
+  "name_1aed4a1b": { "message": "Naam" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
+  "natural_music_54a70258": { "message": "Natuurlijk (muziek)" },
+  "natural_numbers_3da07060": { "message": "Natuurlijke getallen" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigeer door het menu of de werkbalk"
   },
@@ -857,84 +615,44 @@ const locale = {
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Er is geen voorbeeld voor dit bestand beschikbaar."
   },
-  "no_results_940393cf": {
-    "message": "Geen resultaten."
-  },
+  "no_results_940393cf": { "message": "Geen resultaten." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Geen resultaten gevonden voor { filterTerm }"
   },
-  "no_video_1ed00b26": {
-    "message": "Geen video"
-  },
-  "none_3b5e34d2": {
-    "message": "Geen"
-  },
-  "none_selected_b93d56d2": {
-    "message": "Geen geselecteerd"
-  },
-  "not_equal_6e2980e6": {
-    "message": "Niet gelijk"
-  },
+  "no_video_1ed00b26": { "message": "Geen video" },
+  "none_3b5e34d2": { "message": "Geen" },
+  "none_selected_b93d56d2": { "message": "Geen geselecteerd" },
+  "not_equal_6e2980e6": { "message": "Niet gelijk" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Niet in (geen element van)"
   },
-  "not_negation_1418ebb8": {
-    "message": "Niet (ontkenning)"
-  },
-  "not_subset_dc2b5e84": {
-    "message": "Geen subset"
-  },
-  "not_subset_strict_23d282bf": {
-    "message": "Geen subset (strikt)"
-  },
-  "not_superset_5556b913": {
-    "message": "Geen superset"
-  },
-  "not_superset_strict_24e06f36": {
-    "message": "Geen superset (strikt)"
-  },
-  "nu_1c0f6848": {
-    "message": "Nu"
-  },
-  "octagon_e48be9f": {
-    "message": "Achthoek"
-  },
-  "olive_6a3e4d6b": {
-    "message": "Olijfkleurig"
-  },
-  "omega_8f2c3463": {
-    "message": "Omega"
-  },
+  "not_negation_1418ebb8": { "message": "Niet (ontkenning)" },
+  "not_subset_dc2b5e84": { "message": "Geen subset" },
+  "not_subset_strict_23d282bf": { "message": "Geen subset (strikt)" },
+  "not_superset_5556b913": { "message": "Geen superset" },
+  "not_superset_strict_24e06f36": { "message": "Geen superset (strikt)" },
+  "nu_1c0f6848": { "message": "Nu" },
+  "octagon_e48be9f": { "message": "Achthoek" },
+  "olive_6a3e4d6b": { "message": "Olijfkleurig" },
+  "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Een van de volgende stijlen moet worden toegevoegd om een pictogram op te slaan: Pictogramkleur, omtrekgrootte, pictogramtekst of afbeelding"
   },
-  "open_circle_e9bd069": {
-    "message": "Open cirkel"
-  },
+  "open_circle_e9bd069": { "message": "Open cirkel" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Open dit dialoogvenster met sneltoetsen"
   },
   "open_title_application_fd624fc5": {
     "message": "{ title } applicatie openen"
   },
-  "operators_a2ef9a93": {
-    "message": "Operators"
-  },
-  "or_9b70ccaa": {
-    "message": "Of"
-  },
-  "orange_81386a62": {
-    "message": "Oranje"
-  },
+  "operators_a2ef9a93": { "message": "Operators" },
+  "or_9b70ccaa": { "message": "Of" },
+  "orange_81386a62": { "message": "Oranje" },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Andere editorsnelkoppelingen zijn te vinden op"
   },
-  "outline_color_3ef2cea7": {
-    "message": "Omtrekkleur"
-  },
-  "outline_size_a6059a21": {
-    "message": "Omtrtekgrootte"
-  },
+  "outline_color_3ef2cea7": { "message": "Omtrekkleur" },
+  "outline_size_a6059a21": { "message": "Omtrtekgrootte" },
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } is geen geldig protocol; dat moet ftp, http, https, mailto, skype of tel zijn, of het kan worden weggelaten"
   },
@@ -956,36 +674,18 @@ const locale = {
   "performing_arts_icon_f3497486": {
     "message": "Pictogram voor uitvoerende kunsten"
   },
-  "perpendicular_7c48ede4": {
-    "message": "Loodlijn"
-  },
-  "phi_4ac33b6d": {
-    "message": "Phi"
-  },
-  "phi_variant_c9bb3ac5": {
-    "message": "Phi (variant)"
-  },
+  "perpendicular_7c48ede4": { "message": "Loodlijn" },
+  "phi_4ac33b6d": { "message": "Phi" },
+  "phi_variant_c9bb3ac5": { "message": "Phi (variant)" },
   "physical_education_icon_d7dffd3e": {
     "message": "Pictogram voor lichamelijke opvoeding"
   },
-  "pi_dc4f0bd8": {
-    "message": "Pi"
-  },
-  "pi_variant_10f5f520": {
-    "message": "Pi (variant)"
-  },
-  "pink_68ad45cb": {
-    "message": "Roze"
-  },
-  "pixels_52ece7d1": {
-    "message": "Pixels"
-  },
-  "play_1a47eaa7": {
-    "message": "Afspelen"
-  },
-  "play_media_comment_35257210": {
-    "message": "Media-opmerking afspelen."
-  },
+  "pi_dc4f0bd8": { "message": "Pi" },
+  "pi_variant_10f5f520": { "message": "Pi (variant)" },
+  "pink_68ad45cb": { "message": "Roze" },
+  "pixels_52ece7d1": { "message": "Pixels" },
+  "play_1a47eaa7": { "message": "Afspelen" },
+  "play_media_comment_35257210": { "message": "Media-opmerking afspelen." },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Media-opmerking van { name } afspelen die gemaakt is op { createdAt }."
   },
@@ -1011,33 +711,15 @@ const locale = {
   "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
     "message": "Protocol moet ftp, http, https, mailto, skype of tel zijn, of het kan worden weggelaten"
   },
-  "psi_e3f5f0f7": {
-    "message": "Psi"
-  },
-  "published_c944a23d": {
-    "message": "gepubliceerd"
-  },
-  "published_when_302d8e23": {
-    "message": "Gepubliceerd: { when }"
-  },
-  "pumpkin_904428d5": {
-    "message": "Pompoen"
-  },
-  "purple_7678a9fc": {
-    "message": "Paars"
-  },
-  "quaternions_877024e0": {
-    "message": "Quaternionen"
-  },
-  "quizzes_7e598f57": {
-    "message": "Toetsen"
-  },
-  "rational_numbers_80ddaa4a": {
-    "message": "Rationele getallen"
-  },
-  "real_numbers_7c99df94": {
-    "message": "Reële getallen"
-  },
+  "psi_e3f5f0f7": { "message": "Psi" },
+  "published_c944a23d": { "message": "gepubliceerd" },
+  "published_when_302d8e23": { "message": "Gepubliceerd: { when }" },
+  "pumpkin_904428d5": { "message": "Pompoen" },
+  "purple_7678a9fc": { "message": "Paars" },
+  "quaternions_877024e0": { "message": "Quaternionen" },
+  "quizzes_7e598f57": { "message": "Toetsen" },
+  "rational_numbers_80ddaa4a": { "message": "Rationele getallen" },
+  "real_numbers_7c99df94": { "message": "Reële getallen" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Reëel deel (van complex getal)"
   },
@@ -1070,18 +752,12 @@ const locale = {
   "right_downward_harpoon_arrow_d71b114f": {
     "message": "Harpoenpijl rechts omlaag wijzend"
   },
-  "right_floor_5392d5cf": {
-    "message": "Ondergrens rechts"
-  },
-  "right_to_left_9cfb092a": {
-    "message": "Rechts-links"
-  },
+  "right_floor_5392d5cf": { "message": "Ondergrens rechts" },
+  "right_to_left_9cfb092a": { "message": "Rechts-links" },
   "right_upward_harpoon_arrow_f5a34c73": {
     "message": "Harpoenpijl rechts omhoog wijzend"
   },
-  "rightward_arrow_32932107": {
-    "message": "Pijl wijzend naar rechts"
-  },
+  "rightward_arrow_32932107": { "message": "Pijl wijzend naar rechts" },
   "rightward_pointing_triangle_60330f5c": {
     "message": "Driehoek met punt naar rechts"
   },
@@ -1144,21 +820,13 @@ const locale = {
   "single_color_image_color_95fa9a87": {
     "message": "Enkelkleurige afbeeldingskleur"
   },
-  "size_b30e1077": {
-    "message": "Grootte"
-  },
+  "size_b30e1077": { "message": "Grootte" },
   "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
     "message": "Ondertitelingsbestand is groter dan de maximaal toegestane { max } kb bestandsgrootte."
   },
-  "small_b070434a": {
-    "message": "Klein"
-  },
-  "solid_circle_9f061dfc": {
-    "message": "Dichte cirkel"
-  },
-  "something_went_wrong_89195131": {
-    "message": "Er is iets misgegaan."
-  },
+  "small_b070434a": { "message": "Klein" },
+  "solid_circle_9f061dfc": { "message": "Dichte cirkel" },
+  "something_went_wrong_89195131": { "message": "Er is iets misgegaan." },
   "something_went_wrong_accessing_your_webcam_6643b87e": {
     "message": "Er is iets misgegaan met de toegang tot je webcam."
   },
@@ -1168,90 +836,40 @@ const locale = {
   "something_went_wrong_check_your_connection_reload__c7868286": {
     "message": "Er is iets misgegaan. Controleer je verbinding, laad de pagina opnieuw en probeer het nog eens."
   },
-  "something_went_wrong_d238c551": {
-    "message": "Er is iets misgegaan"
-  },
+  "something_went_wrong_d238c551": { "message": "Er is iets misgegaan" },
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Er is iets fout gegaan bij het delen van je scherm."
   },
-  "sort_by_e75f9e3e": {
-    "message": "Sorteren op"
-  },
-  "spades_suit_b37020c2": {
-    "message": "Schoppen (speelkaart)"
-  },
-  "square_511eb3b3": {
-    "message": "Vierkant"
-  },
-  "square_cap_9ec88646": {
-    "message": "Doorsnede"
-  },
-  "square_cup_b0665113": {
-    "message": "Vereniging"
-  },
-  "square_root_e8bcbc60": {
-    "message": "Vierkantswortel"
-  },
-  "square_root_symbol_d0898a53": {
-    "message": "Symbool van vierkantswortel"
-  },
-  "square_subset_17be67cb": {
-    "message": "Subset van vierkantswortel"
-  },
+  "sort_by_e75f9e3e": { "message": "Sorteren op" },
+  "spades_suit_b37020c2": { "message": "Schoppen (speelkaart)" },
+  "square_511eb3b3": { "message": "Vierkant" },
+  "square_cap_9ec88646": { "message": "Doorsnede" },
+  "square_cup_b0665113": { "message": "Vereniging" },
+  "square_root_e8bcbc60": { "message": "Vierkantswortel" },
+  "square_root_symbol_d0898a53": { "message": "Symbool van vierkantswortel" },
+  "square_subset_17be67cb": { "message": "Subset van vierkantswortel" },
   "square_subset_strict_7044e84f": {
     "message": "Subset van vierkantswortel (strikt)"
   },
-  "square_superset_3be8dae1": {
-    "message": "Superset van vierkantswortel"
-  },
+  "square_superset_3be8dae1": { "message": "Superset van vierkantswortel" },
   "square_superset_strict_fa4262e4": {
     "message": "Superset van vierkantswortel (strikt)"
   },
-  "star_8d156e09": {
-    "message": "Ster"
-  },
-  "start_over_f7552aa9": {
-    "message": "Opnieuw starten"
-  },
-  "start_recording_9a65141a": {
-    "message": "Opname starten"
-  },
-  "steel_blue_14296f08": {
-    "message": "Staalblauw"
-  },
-  "styles_2aa721ef": {
-    "message": "Stijlen"
-  },
-  "submit_a3cc6859": {
-    "message": "Inleveren"
-  },
-  "subscript_59744f96": {
-    "message": "Subscript"
-  },
-  "subset_19c1a92f": {
-    "message": "Subset"
-  },
-  "subset_strict_8d8948d6": {
-    "message": "Subset (strikt)"
-  },
-  "succeeds_9cc31be9": {
-    "message": "Volgt op"
-  },
-  "succeeds_equal_158e8c3a": {
-    "message": "Volgt op gelijk"
-  },
-  "sum_b0842d31": {
-    "message": "Som"
-  },
-  "superscript_8cb349a2": {
-    "message": "Superscript"
-  },
-  "superset_c4db8a7a": {
-    "message": "Superset"
-  },
-  "superset_strict_c77dd6d2": {
-    "message": "Superset (strikt)"
-  },
+  "star_8d156e09": { "message": "Ster" },
+  "start_over_f7552aa9": { "message": "Opnieuw starten" },
+  "start_recording_9a65141a": { "message": "Opname starten" },
+  "steel_blue_14296f08": { "message": "Staalblauw" },
+  "styles_2aa721ef": { "message": "Stijlen" },
+  "submit_a3cc6859": { "message": "Inleveren" },
+  "subscript_59744f96": { "message": "Subscript" },
+  "subset_19c1a92f": { "message": "Subset" },
+  "subset_strict_8d8948d6": { "message": "Subset (strikt)" },
+  "succeeds_9cc31be9": { "message": "Volgt op" },
+  "succeeds_equal_158e8c3a": { "message": "Volgt op gelijk" },
+  "sum_b0842d31": { "message": "Som" },
+  "superscript_8cb349a2": { "message": "Superscript" },
+  "superset_c4db8a7a": { "message": "Superset" },
+  "superset_strict_c77dd6d2": { "message": "Superset (strikt)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Ondersteunde bestandstypen: SRT of WebVTT"
   },
@@ -1321,33 +939,19 @@ const locale = {
   "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
     "message": "De pretty HTML-editor is niet toetsenbordtoegankelijk. Druk op Shift O om de raw HTML-editor te openen."
   },
-  "therefore_d860e024": {
-    "message": "Ergo"
-  },
-  "theta_ce2d2350": {
-    "message": "Theta"
-  },
-  "theta_variant_fff6da6f": {
-    "message": "Theta (variant)"
-  },
-  "thick_downward_arrow_b85add4c": {
-    "message": "Dikke pijl met punt omlaag"
-  },
-  "thick_left_arrow_d5f3e925": {
-    "message": "Dikke pijl-links"
-  },
+  "therefore_d860e024": { "message": "Ergo" },
+  "theta_ce2d2350": { "message": "Theta" },
+  "theta_variant_fff6da6f": { "message": "Theta (variant)" },
+  "thick_downward_arrow_b85add4c": { "message": "Dikke pijl met punt omlaag" },
+  "thick_left_arrow_d5f3e925": { "message": "Dikke pijl-links" },
   "thick_leftward_arrow_6ab89880": {
     "message": "Dikke pijl wijzend naar links"
   },
-  "thick_right_arrow_3ed5e8f7": {
-    "message": "Dikke pijl-rechts"
-  },
+  "thick_right_arrow_3ed5e8f7": { "message": "Dikke pijl-rechts" },
   "thick_rightward_arrow_a2e1839e": {
     "message": "Dikke pijl wijzend naar rechts"
   },
-  "thick_upward_arrow_acd20328": {
-    "message": "Dikke pijl met punt omhoog"
-  },
+  "thick_upward_arrow_acd20328": { "message": "Dikke pijl met punt omhoog" },
   "this_document_cannot_be_displayed_within_canvas_7aba77be": {
     "message": "Dit document kan niet in Canvas weergegeven worden."
   },
@@ -1360,39 +964,19 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Ook al krijgt je video de juiste titel in de browser, de video kon niet worden bijgewerkt in de database."
   },
-  "timebar_a4d18443": {
-    "message": "Tijdbalk"
-  },
-  "title_ee03d132": {
-    "message": "Titel"
-  },
-  "to_be_posted_when_d24bf7dc": {
-    "message": "Nog te plaatsen: { when }"
-  },
-  "to_do_when_2783d78f": {
-    "message": "To-do: { when }"
-  },
+  "timebar_a4d18443": { "message": "Tijdbalk" },
+  "title_ee03d132": { "message": "Titel" },
+  "to_be_posted_when_d24bf7dc": { "message": "Nog te plaatsen: { when }" },
+  "to_do_when_2783d78f": { "message": "To-do: { when }" },
   "toggle_summary_group_413df9ac": {
     "message": "{ summary } groep omschakelen"
   },
-  "toggle_tooltip_d3b7cb86": {
-    "message": "ToolTip wisselen"
-  },
-  "tools_2fcf772e": {
-    "message": "Tools"
-  },
-  "top_66e0adb6": {
-    "message": "Boven"
-  },
-  "tray_839df38a": {
-    "message": "Houder"
-  },
-  "triangle_6072304e": {
-    "message": "Driehoek"
-  },
-  "turnstile_yields_f9e76df1": {
-    "message": "Tourniquet (conclusie volgt)"
-  },
+  "toggle_tooltip_d3b7cb86": { "message": "ToolTip wisselen" },
+  "tools_2fcf772e": { "message": "Tools" },
+  "top_66e0adb6": { "message": "Boven" },
+  "tray_839df38a": { "message": "Houder" },
+  "triangle_6072304e": { "message": "Driehoek" },
+  "turnstile_yields_f9e76df1": { "message": "Tourniquet (conclusie volgt)" },
   "type_control_f9_to_access_image_options_text_a47e319f": {
     "message": "typ Ctrl+F9 om opties voor afbeeldingen te openen. { text }"
   },
@@ -1402,93 +986,45 @@ const locale = {
   "type_control_f9_to_access_table_options_text_92141329": {
     "message": "typ Ctrl+F9 om opties voor tabellen te openen. { text }"
   },
-  "union_e6b57a53": {
-    "message": "Vereniging"
-  },
-  "unpublished_dfd8801": {
-    "message": "niet-gepubliceerd"
-  },
-  "untitled_16aa4f2b": {
-    "message": "Zonder titel"
-  },
-  "untitled_efdc2d7d": {
-    "message": "zonder titel"
-  },
+  "union_e6b57a53": { "message": "Vereniging" },
+  "unpublished_dfd8801": { "message": "niet-gepubliceerd" },
+  "untitled_16aa4f2b": { "message": "Zonder titel" },
+  "untitled_efdc2d7d": { "message": "zonder titel" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Pijl omhoog en links diagonaal"
   },
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Pijl omhoog en rechts diagonaal"
   },
-  "upload_file_fd2361b8": {
-    "message": "Bestand uploaden"
-  },
-  "upload_image_6120b609": {
-    "message": "Afbeelding uploaden"
-  },
-  "upload_media_ce31135a": {
-    "message": "Media uploaden"
-  },
-  "uploading_19e8a4e7": {
-    "message": "Bezig met uploaden"
-  },
-  "uppercase_delta_d4f4bc41": {
-    "message": "Delta in kapitalen"
-  },
-  "uppercase_gamma_86f492e9": {
-    "message": "Gamma in kapitalen"
-  },
-  "uppercase_lambda_c78d8ed4": {
-    "message": "Lambda in kapitalen"
-  },
-  "uppercase_omega_8aedfa2": {
-    "message": "Omega in kapitalen"
-  },
-  "uppercase_phi_caa36724": {
-    "message": "Phi in kapitalen"
-  },
-  "uppercase_pi_fcc70f5e": {
-    "message": "Pi in kapitalen"
-  },
-  "uppercase_psi_6395acbe": {
-    "message": "Psi in kapitalen"
-  },
-  "uppercase_sigma_dbb70e92": {
-    "message": "Sigma in kapitalen"
-  },
-  "uppercase_theta_49afc891": {
-    "message": "Theta in kapitalen"
-  },
-  "uppercase_upsilon_8c1e623e": {
-    "message": "Ypsilon in kapitalen"
-  },
-  "uppercase_xi_341e8556": {
-    "message": "Xi in kapitalen"
-  },
-  "upsilon_33651634": {
-    "message": "Ypsilon"
-  },
+  "upload_file_fd2361b8": { "message": "Bestand uploaden" },
+  "upload_image_6120b609": { "message": "Afbeelding uploaden" },
+  "upload_media_ce31135a": { "message": "Media uploaden" },
+  "uploading_19e8a4e7": { "message": "Bezig met uploaden" },
+  "uppercase_delta_d4f4bc41": { "message": "Delta in kapitalen" },
+  "uppercase_gamma_86f492e9": { "message": "Gamma in kapitalen" },
+  "uppercase_lambda_c78d8ed4": { "message": "Lambda in kapitalen" },
+  "uppercase_omega_8aedfa2": { "message": "Omega in kapitalen" },
+  "uppercase_phi_caa36724": { "message": "Phi in kapitalen" },
+  "uppercase_pi_fcc70f5e": { "message": "Pi in kapitalen" },
+  "uppercase_psi_6395acbe": { "message": "Psi in kapitalen" },
+  "uppercase_sigma_dbb70e92": { "message": "Sigma in kapitalen" },
+  "uppercase_theta_49afc891": { "message": "Theta in kapitalen" },
+  "uppercase_upsilon_8c1e623e": { "message": "Ypsilon in kapitalen" },
+  "uppercase_xi_341e8556": { "message": "Xi in kapitalen" },
+  "upsilon_33651634": { "message": "Ypsilon" },
   "upward_and_downward_pointing_arrow_fa90a918": {
     "message": "Pijl met punt omhoog en omlaag"
   },
   "upward_and_downward_pointing_arrow_thick_d420fdef": {
     "message": "Pijl met punt omhoog en omlaag (dik)"
   },
-  "upward_arrow_9992cb2d": {
-    "message": "Omhoog wijzende pijl"
-  },
+  "upward_arrow_9992cb2d": { "message": "Omhoog wijzende pijl" },
   "upward_pointing_triangle_d078d7cb": {
     "message": "Driehoek met punt omhoog"
   },
-  "url_22a5f3b8": {
-    "message": "URL"
-  },
-  "usage_right_ff96f3e2": {
-    "message": "Gebruiksrecht:"
-  },
-  "usage_rights_required_5fe4dd68": {
-    "message": "Gebruiksrechten (vereist)"
-  },
+  "url_22a5f3b8": { "message": "URL" },
+  "usage_right_ff96f3e2": { "message": "Gebruiksrecht:" },
+  "usage_rights_required_5fe4dd68": { "message": "Gebruiksrechten (vereist)" },
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "Gebruik de pijltoetsen om door opties te navigeren."
   },
@@ -1516,51 +1052,25 @@ const locale = {
   "used_by_screen_readers_to_describe_the_video_37ebad25": {
     "message": "Gebruikt door schermlezers om de video te beschrijven"
   },
-  "user_documents_c206e61f": {
-    "message": "Gebruikersdocumenten"
-  },
-  "user_files_78e21703": {
-    "message": "Gebruikersbestanden"
-  },
-  "user_images_b6490852": {
-    "message": "Gebruikersafbeeldingen"
-  },
-  "user_media_14fbf656": {
-    "message": "Gebruikersmedia"
-  },
-  "vector_notation_cf6086ab": {
-    "message": "Vector (notatie)"
-  },
+  "user_documents_c206e61f": { "message": "Gebruikersdocumenten" },
+  "user_files_78e21703": { "message": "Gebruikersbestanden" },
+  "user_images_b6490852": { "message": "Gebruikersafbeeldingen" },
+  "user_media_14fbf656": { "message": "Gebruikersmedia" },
+  "vector_notation_cf6086ab": { "message": "Vector (notatie)" },
   "vertical_bar_set_builder_notation_4300495f": {
     "message": "Verticale streep (kardinaliteit)"
   },
-  "vertical_dots_bfb21f14": {
-    "message": "Verticale punten"
-  },
-  "video_options_24ef6e5d": {
-    "message": "Video-opties"
-  },
-  "video_options_tray_3b9809a5": {
-    "message": "Gebied met video-opties"
-  },
-  "video_player_b371005": {
-    "message": "Videospeler"
-  },
-  "video_player_for_9e7d373b": {
-    "message": "Videospeler voor "
-  },
+  "vertical_dots_bfb21f14": { "message": "Verticale punten" },
+  "video_options_24ef6e5d": { "message": "Video-opties" },
+  "video_options_tray_3b9809a5": { "message": "Gebied met video-opties" },
+  "video_player_b371005": { "message": "Videospeler" },
+  "video_player_for_9e7d373b": { "message": "Videospeler voor " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Videospeler voor { title }"
   },
-  "view_ba339f93": {
-    "message": "Bekijken"
-  },
-  "view_description_30446afc": {
-    "message": "Beschrijving bekijken"
-  },
-  "view_keyboard_shortcuts_34d1be0b": {
-    "message": "Sneltoetsen bekijken"
-  },
+  "view_ba339f93": { "message": "Bekijken" },
+  "view_description_30446afc": { "message": "Beschrijving bekijken" },
+  "view_keyboard_shortcuts_34d1be0b": { "message": "Sneltoetsen bekijken" },
   "view_title_description_67940918": {
     "message": "{ title } beschrijving bekijken"
   },
@@ -1590,21 +1100,11 @@ const locale = {
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Breedte en hoogte moeten getallen zijn"
   },
-  "width_x_height_px_ff3ccb93": {
-    "message": "{ width } x { height }px"
-  },
-  "wiki_home_9cd54d0": {
-    "message": "Wiki Home"
-  },
-  "wreath_product_200b38ef": {
-    "message": "Kransproduct"
-  },
-  "xi_149681d0": {
-    "message": "Xi"
-  },
-  "yes_dde87d5": {
-    "message": "Ja"
-  },
+  "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
+  "wiki_home_9cd54d0": { "message": "Wiki Home" },
+  "wreath_product_200b38ef": { "message": "Kransproduct" },
+  "xi_149681d0": { "message": "Xi" },
+  "yes_dde87d5": { "message": "Ja" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Je hebt niet-opgeslagen wijzigingen in het menu Pictogrammenmaker. Wil je doorgaan zonder deze wijzigingen op te slaan?"
   },
@@ -1629,18 +1129,10 @@ const locale = {
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Mogelijk is je webcam al in gebruik."
   },
-  "zeta_5ef24f0e": {
-    "message": "Zeta"
-  },
-  "zoom_f3e54d69": {
-    "message": "Zoom"
-  },
-  "zoom_in_image_bb97d4f": {
-    "message": "Afbeelding inzoomen"
-  },
-  "zoom_out_image_d0a0a2ec": {
-    "message": "Afbeelding uitzoomen"
-  }
+  "zeta_5ef24f0e": { "message": "Zeta" },
+  "zoom_f3e54d69": { "message": "Zoom" },
+  "zoom_in_image_bb97d4f": { "message": "Afbeelding inzoomen" },
+  "zoom_out_image_d0a0a2ec": { "message": "Afbeelding uitzoomen" }
 }
 
 

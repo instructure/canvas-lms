@@ -326,11 +326,6 @@ describe "admin settings tab" do
       check_box_verifier("#account_services_skype", { allowed_services: :skype })
     end
 
-    it "unclicks and then click on delicious" do
-      check_box_verifier("#account_services_delicious", { allowed_services: :delicious }, false)
-      check_box_verifier("#account_services_delicious", { allowed_services: :delicious })
-    end
-
     it "unclicks and click on google docs previews" do
       check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews }, false)
       check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews })

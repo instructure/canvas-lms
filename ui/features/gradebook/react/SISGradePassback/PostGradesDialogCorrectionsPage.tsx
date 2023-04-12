@@ -45,7 +45,10 @@ class PostGradesDialogCorrectionsPage extends React.Component<Props> {
   }
 
   ignoreErrors = () => {
-    const assignments = assignmentUtils.withErrors(this.props.store.getAssignments())
+    // TODO: fix this as Array<AssignmentWithOverride> cast
+    const assignments = assignmentUtils.withErrors(
+      this.props.store.getAssignments() as Array<AssignmentWithOverride>
+    )
     _.each(assignments, a => this.props.store.updateAssignment(a.id, {please_ignore: true}))
   }
 

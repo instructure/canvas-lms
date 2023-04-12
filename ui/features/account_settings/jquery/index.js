@@ -307,6 +307,13 @@ $(document).ready(function () {
       width: 400,
     })
   })
+  $('.rqd_help_btn').click(event => {
+    event.preventDefault()
+    $('#rqd_dialog').dialog({
+      title: I18n.t('titles.rqd_help', 'Restrict Quantitative Data'),
+      width: 400,
+    })
+  })
 
   $('.open_registration_delegated_warning_link').click(event => {
     event.preventDefault()

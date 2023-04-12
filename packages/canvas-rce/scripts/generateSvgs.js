@@ -34,7 +34,7 @@ const fs = require('fs')
 const mathjax = require('mathjax')
 
 const buttons =
-  require('../lib/rce/plugins/instructure_equation/EquationEditorToolbar/buttons.js').default
+  require('../lib/rce/plugins/instructure_equation/EquationEditorToolbar/buttons').default
 
 const OUTPUT_PATH = 'src/rce/plugins/instructure_equation/MathIcon/svgs.js'
 const SVGS_TEMPLATE = `/*
@@ -55,6 +55,10 @@ const SVGS_TEMPLATE = `/*
 * with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+
+/***** This is an auto-generated file. Please do not modify manually *****/
+/************ If you need to update, run 'yarn generate-svgs' ************/
+
 export default __SVG__CONTENT__`
 
 const svgs = {}
@@ -64,8 +68,8 @@ let latexToSvg = () => {}
 
 const setupOptions = {
   loader: {
-    load: ['input/tex', 'output/svg']
-  }
+    load: ['input/tex', 'output/svg'],
+  },
 }
 
 const generateSvg = async latex => {
@@ -89,8 +93,9 @@ const convertSection = section => {
   return Promise.all(commandPromises)
 }
 
-const sectionPromises = buttons.map(async section => await convertSection(section))
+const sectionPromises = buttons.map(async section => convertSection(section))
 
+// eslint-disable-next-line promise/catch-or-return
 Promise.all(sectionPromises).then(() => {
   const finalOutput = SVGS_TEMPLATE.replace('__SVG__CONTENT__', JSON.stringify(svgs, null, 2))
   fs.writeFileSync(OUTPUT_PATH, finalOutput, {flag: 'w'})

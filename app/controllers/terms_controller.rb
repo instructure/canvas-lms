@@ -154,7 +154,7 @@ class TermsController < ApplicationController
         @term.set_overrides(@context, overrides)
         # Republish any courses with course paces that may be affected
         if @term.root_account.feature_enabled?(:course_paces) && (@term.saved_changes.keys & %w[start_at end_at]).present?
-          @term.courses.where("restrict_enrollments_to_course_dates IS FALSE AND settings LIKE ?", "%enable_course_paces: true%").find_each do |course|
+          @term.courses.where("restrict_enrollments_to_course_dates IS NOT TRUE AND settings LIKE ?", "%enable_course_paces: true%").find_each do |course|
             course.course_paces.find_each(&:create_publish_progress)
           end
         end

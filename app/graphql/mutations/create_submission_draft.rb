@@ -129,21 +129,42 @@ def find_submission(submission_id)
 end
 
 def get_and_verify_attachments!(file_ids)
-  attachments = current_user.submittable_attachments.active.where(id: file_ids)
-
-  unless file_ids.size == attachments.size
-    attachment_ids = attachments.map(&:id)
-    raise SubmissionError, I18n.t(
-      "No attachments found for the following ids: %{ids}",
-      { ids: file_ids - attachment_ids.map(&:to_s) }
-    )
+  submittable_attachments = current_user.submittable_attachments do |scope|
+    scope.left_joins(:replaced_attachments)
   end
+
+  attachments = submittable_attachments.where(id: file_ids).or(
+    # table alias for self-referencing relations is <relation_name>_<table_name>
+    submittable_attachments.where(replaced_attachments_attachments: { id: file_ids })
+  )
+
+  validate_file_ids!(file_ids, attachments)
+  attachments = attachments.to_a.uniq
 
   attachments.each do |attachment|
     verify_authorized_action!(attachment, :read)
   end
 
   attachments
+end
+
+def validate_file_ids!(file_ids, attachments)
+  current_and_replaced_ids =
+    attachments
+    .pluck(:id, "replaced_attachments_attachments.id")
+    .each_with_object(Set.new) do |(id, replaced_id), ids|
+      ids << id.to_s
+      ids << replaced_id.to_s if replaced_id
+    end
+
+  file_ids.each do |file_id|
+    next if current_and_replaced_ids.include?(file_id)
+
+    raise SubmissionError, I18n.t(
+      "No attachments found for the following ids: %{ids}",
+      { ids: file_ids - current_and_replaced_ids.to_a }
+    )
+  end
 end
 
 # TODO: move this into the model

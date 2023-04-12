@@ -666,6 +666,7 @@ ar:
     titles: 
       configure_report: "تكوين التقرير"
       open_registration_delegated_warning_dialog: "تم تمكين موفر الهوية الخارجي"
+      rqd_help: "تقييد البيانات الكمية"
       what_are_quiz_ip_filters: "ما المقصود بعوامل تصفية IP للاختبار؟"
     user: مستخدم
   account_settings_fe083453: "إعدادات الحساب"
@@ -1666,6 +1667,8 @@ ar:
         update_button: تحديث
       report_last_run_never: مطلقًا
       report_running: "جارٍ إجراء التقرير *ستستلم بريدًا إلكترونيًا عند إتمام ذلك.*"
+      rqd_help_message: "عند تحديد هذا الإعداد، سيقيّد المستخدم من عرض بيانات الدرجات الكمية (الرقمية) وتحديد خيارات إنشاء المهام للمعلمين. لن يرى المستخدمون إلا البيانات النوعية، والتي تشمل الدرجات بالأحرف والتعليقات. يمكن للمسؤول إجراء المزيد من تخصيص هذا الإعداد من خلال تعديل الأذونات لأدوار المستخدمين."
+      rqd_screenreader: "نبذة عن تقييد البيانات الكمية"
       select: 
         mfa: 
           disabled: معطل
@@ -2325,7 +2328,7 @@ ar:
   adjust_final_grade_fa45e7e0: "تعديل التقدير النهائي"
   adjusting_due_dates_a5918b9c: "جارٍ تعديل تواريخ الاستحقاق..."
   admin_4d3ba42f: المسؤول
-  admin_analytics_description: "سيؤدي تمكين عرض تحليلات المسؤول إلى إظهار نظرات عامة للمساقات والطلاب. اعرف المزيد وقدم ملاحظات للانضمام إلى *مجموعة جديدة لمستخدمي التحليلات* في مجتمع Canvas."
+  admin_analytics_description: "لتمكين التحليلات على مستوى الحساب. توفر لوحات معلومات تحليلات المسؤول تفاصيل حول استخدام Canvas ونجاح مساق Canvas وتفاعل الطلاب. اعرف المزيد في *مركز تحليلات المسؤول* في مجتمع Canvas."
   admin_analytics_eacba735: "تحليلات المسؤول"
   admin_csv_f8d1b3eb: "ملف CSV مسؤول"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "تصدير المسؤول لفترات التقييم المتعددة"
@@ -4617,6 +4620,7 @@ ar:
       no_points: بلا
       no_submission: "لا شيء"
       points: النقاط
+      speed_grader: SpeedGrader™
       submission_types: "أنواع الملفات"
       submitting: "جارٍ الإرسال"
       turnitin: Turnitin
@@ -6160,6 +6164,7 @@ ar:
   canvas_for_elementary_analytics_15dc1e07: "تحليلات Canvas للمدارس الابتدائية"
   canvas_for_elementary_beta_28bc5181: "Canvas للمدارس الابتدائية (الإصدار التجريبي)"
   canvas_for_elementary_e6f5a06f: "Canvas للمدارس الابتدائية"
+  canvas_for_elementary_font_selection_5d1f2271: "Canvas لتحديد خط المدارس الابتدائية"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas للمدارس الابتدائية: العديد من الإعلانات في جلسة التسجيل"
   canvas_for_elementary_parent_support_74a2356e: "Canvas للمدارس الابتدائية: دعم أولياء الأمور"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -6297,6 +6302,7 @@ ar:
   check_your_spelling_or_try_fewer_letters_70769a90: "تحقق من التهجئة أو جرب بأحرف أقل."
   checkbox_examples_dc790142: "أمثلة خانة الاختيار"
   checked_883b93fd: "تم التحقق"
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "سيؤدي التحقق من إضافة إلى التقويم إلى دعوة كل أعضاء المساق."
   cheerful_panda_holding_a_map_17ba47ee: "باندا سعيدة تحمل خريطة"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "يجب أن ينتمي المساق الفرعي إلى نفس الحساب الرئيسي كمساق أصلي"
   child_s_username_dde3aa9: "اسم مستخدم الطفل"
@@ -9382,6 +9388,7 @@ ar:
         participation_id: المشاركة
         public_syllabus: "جعل مناهج هذا المساق ظاهرة للجميع"
         restrict_enrollments_to_course_dates: "بإمكان الطلاب المشاركة فقط في المساق خلال هذه التواريخ"
+        restrict_quantitative_data: "خيارات البيانات الكمية"
         restrict_student_future_view: "منع الطلاب من عرض هذا المساق قبل تاريخ البدء"
         restrict_student_past_view: "منع الطلاب من عرض هذا المساق بعد تاريخ الانتهاء"
         root_account: "حساب جذري"
@@ -11616,6 +11623,7 @@ ar:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "لتمكين مربع حوار معاد تصميمه \"إرسال رسائل للطلاب الذين...\" الذي يسمح بمراسلة المراقبين بالإضافة إلى الطلاب."
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "لتمكين الوصول إلى واجهة برمجة التطبيقات العامة للاختبارات الموجزة الجديدة: واجهة برمجة تطبيقات عناصر الاختبار الموجز."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "لتمكين الوصول إلى واجهة برمجة التطبيقات العامة للاختبارات الموجزة الجديدة من خلال Canvas."
+  enables_administrators_to_register_lti_tools_with__b16d560f: "لتمكين المسؤولين من تسجيل أدوات LTI من خلال التسجيل الديناميكي"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "يمكّن من عرض تقارير الانتحال وتشابه الدرجات في درج إرسال دفتر الدرجات الجديد."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "لتمكين التواريخ المهمة المقرر تطبيقها على المهام وأحداث التقويم وغير ذلك."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "لتمكين مربع الحوار لتحذير المستخدم عند ترك مسودة تعليق دون نشر في SpeedGrader."
@@ -14155,6 +14163,7 @@ ar:
   grades_view_audit_trail_cc4c1fcc: "الدرجات - عرض مسار المراجعة"
   grades_view_audit_trail_db7364b1: "الدرجات - عرض مسار المراجعة"
   grades_view_change_logs_6bc1b959: "الدرجات - عرض سجلات التغيير"
+  grades_view_quantitative_feedback_90a4ffc7: "الدرجات - عرض الملاحظات الكمية"
   grades_visible_to_students_1584fa83: "الدرجات المرئية للطلاب"
   grades_were_successfully_published_to_the_gradeboo_79203993: "تم نشر الدرجات بنجاح في دفتر الدرجات."
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "تم نشر الدرجات بنجاح في دفتر الدرجات."
@@ -14881,12 +14890,18 @@ ar:
       event: "%{date} في %{time}"
   handler_7912052f: المعرف
   has_been_automatically_selected_based_upon_where_t_61f805c5: "تم تحديدها تلقائيًا بناءً على مكان وجود مثيل Canvas لهذا الحساب. في بعض الحالات، قد تكون منطقة مختلفة."
+  has_no_submissions_2826a7a2: "لا يحتوي على إرسالات"
+  has_no_submissions_63de50ad: "لا يحتوي على إرسالات"
   has_not_submitted_2350bc24: "لم يرسل"
   has_similarity_score_d5f332b4: "به درجة تشابه"
   has_submissions_6c12ef4c: "يحتوي على إرسالات"
+  has_submissions_ea8e609b: "يحتوي على إرسالات"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "لديه نتائج في Turnitin"
   has_ungraded_submissions_2bff87df: "يحتوي على إرسالات غير مقيّمة"
+  has_ungraded_submissions_b79f5803: "يحتوي على إرسالات غير مقيّمة"
+  has_unposted_grades_3567391e: "يحتوي على درجات غير منشورة"
+  has_unposted_grades_ba0e02b6: "يحتوي على درجات غير منشورة"
   have_a_question_about_canvas_ask_it_here_5781cce: "هل لديك سؤال حول Canvas؟ ضعه هنا."
   have_not_been_graded_df2a5fd2: "لم يتم تقييمها"
   have_not_yet_submitted_57e6a58b: "لم يتم إرسالها بعد"
@@ -15567,6 +15582,7 @@ ar:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "في حالة تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول أو الإحصائيات - عرض، فسيتمكن المستخدمون من إنشاء نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول. لإخفاء خيار نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول، فيجب تعطيل كل من هذين الإذنين."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "في حالة تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول أو الإحصائيات - عرض، فسيتمكن المستخدمون من إنشاء نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول. لإخفاء خيار نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول، فيجب تعطيل كل من هذين الإذنين."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "في حالة تمكين المستخدمون - إدارة تفاصيل تسجيل الدخول أو الإحصائيات - عرض، فسيتمكن المستخدم من إنشاء نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول. لإخفاء خيار نشاط تسجيل الدخول/تسجيل الخروج في أدوات المسؤول، فيجب تعطيل كل من هذين الإذنين."
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "إذا كنت ستحدد أعضاء مجموعة محددين، فيجب أن يزيدوا عن 1."
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "عند تغيير النقاط الممكنة لمهمة ما، سيُعاد حساب معدل الدرجات الموجودة تلقائيا."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "عند تغيير النقاط الممكنة لمهمة، يجب إعادة تقييم المهمة."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "عند تغيير النقاط الممكنة لمهمة، يجب إعادة تقييم جميع الإرسالات."
@@ -15791,6 +15807,7 @@ ar:
   individual_2033c005: الفردي
   individual_assignment_grade_posting_d8322b99: "نشر درجة المهمة كل على حدة"
   individual_gradebook_c7de9821: "دفتر درجات فردي..."
+  individual_gradebook_enhancements_de33aa3d: "تعزيزات دفتر الدرجات الفردي"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "لا يمكن تعديل قيم حساب المخرجات الفردية."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "لا يمكن تعديل نقاط إجادة المخرجات الفردية."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "الخيارات الفردية لأساليب تقييم وحساب المخرجات"
@@ -16287,6 +16304,7 @@ ar:
     lock_module_until: "التأمين حتى"
   language_6b3e2c7c: اللغة
   languages_835813f0: اللغات
+  large_balsamiq_font_5fe45fae: "خط Balsamiq كبير"
   large_course_db3d58b: "مساق كبير:"
   last_7_days_bd411f1f: "آخر 7 أيام"
   last_activity_a983e541: "تاريخ آخر نشاط"
@@ -16733,6 +16751,7 @@ ar:
   loading_features_d26820f6: "جار تحميل الميزات"
   loading_folders_d8b5869e: "جارٍ تحميل المجلدات"
   loading_gradebook_b0b75cd3: "جارٍ تحميل دفتر الدرجات"
+  loading_gradebook_submissions_d2ba017f: "جارٍ تحميل إرسالات دفتر الدرجات"
   loading_graders_f6a76142: "جارٍ تحميل القائمين بالتقييم"
   loading_grades_446fc226: "جارٍ تحميل التقديرات..."
   loading_grades_for_coursename_26784c2d: "جارٍ تحميل تقديرات %{courseName}"
@@ -16994,6 +17013,7 @@ ar:
   lti_deep_linking_line_items_5e0079f7: "عناصر بنود الارتباط الداخلي في LTI"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "عناصر بنود الارتباط الداخلي في LTI في صفحة  تحرير المهام"
   lti_delete_ee5f1bef: "LTI - حذف"
+  lti_dynamic_registration_8592edb0: "التسجيل الديناميكي لـ LTI"
   lti_edit_83a27850: "LTI - تحرير"
   lti_key_14ad02b1: "مفتاح LTI"
   lti_launch_af082dc3: "تشغيل LTI:"
@@ -19982,6 +20002,7 @@ ar:
   new_question_9107c469: "سؤال جديد"
   new_question_group_d9306280: "مجموعة أسئلة جديدة"
   new_quiz_34aacba6: "اختبار جديد"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "تم حذف الاختبار الجديد، استعادة المستخدم بانتظار حالة المراجعة عند التسجيل"
   new_quiz_items_3c850331: "عناصر الاختبار الموجز الجديدة"
   new_quiz_statistics_desc: "تمكين صفحة إحصائيات الاختبار الجديد لمساق."
   new_quizzes_account_and_course_level_item_banks_9152fb1: "حساب الاختبارات الموجزة الجديدة وبنوك عناصر مستوى المساق"
@@ -22710,6 +22731,7 @@ ar:
   qti_img_matching_question: "يشتمل سؤال المطابقة الذي تم استيراده على صور في كلا الجانبين، وهذا غير مدعوم"
   qti_img_matching_question_distractors: "يشتمل سؤال المطابقة الذي تم استيراده على صور ضمن الخيارات، ولا يمكن إصلاح ذلك لأنه يشتمل على عناصر تشتيت أيضًا"
   qti_name: "محول QTI"
+  quantitative_data_options_4f071510: "خيارات البيانات الكمية"
   question_9121487: السؤال
   question_answered: "تمت الإجابة"
   question_bank: 
@@ -24654,6 +24676,7 @@ ar:
         name: الاسم
     welcome_to_canvas: "مرحبًا بك في Canvas!"
   registration_url_60e0eaaa: "عنوان URL للتسجيل"
+  regular_lato_font_7f3cf24c: "خط Lato العادي"
   regular_style_checkbox_ee3d71c1: "خانة اختيار النمط العادي"
   reinforce_student_understanding_304d18a6: "عزّز فهم الطالب"
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "استرخ وخذ راحة. لا شيء مطلوب عمله حتى الآن."
@@ -27256,6 +27279,21 @@ ar:
       aria_stop: "اضغط على \"إيقاف\" لإنهاء التسجيل."
     edit_view_rubric: "عرض مقياس تقييم"
     group: المجموعة
+    late_input: 
+      days: 
+        few: أيام
+        many: أيام
+        one: يوم
+        other: أيام
+        two: أيام
+        zero: أيام
+      hours: 
+        few: ساعات
+        many: ساعات
+        one: ساعة
+        other: ساعات
+        two: ساعات
+        zero: ساعات
     mic_blocked_message: "تم حظر الإذن لاستخدام الميكروفون. للتغيير، اذهب إلى chrome://settings/content/microphone"
     mute_assignment: "حجب المهمة"
     no_submission_time: "لا يوجد وقت للإرسال"
@@ -28939,6 +28977,7 @@ ar:
       يمكّن علامة الميزة هذه استخدام صفحة إنشاء/تحرير
       النقاش المحدّثة.
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "علامة الميزة تلك هي شيء يمكن لمالك الحساب تشغيلها إذا كان يريد السماح لمستخدمي الحساب الذين يتحدثون بلغات تكتب في العادة من اليمين لليسار (على سبيل المثال: العربية، العبرية، الفارسية) لرؤية المخطط من اليمين لليسار عند العمل عليه. وبمجرد أن تكون الميزة \"جاهزة\" ستظهر هذه العلامة وسيتمكن أي شخص يتحدث أيًا من تلك اللغات من رؤية واجهة من اليمين لليسار باستمرار."
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "تقدم هذه الميزة تحسينات على الأداء والصيانة لدفتر الدرجات الفردي"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       تقوم هذه الميزة بهذا عند إرسال عدة ملفات معًا بواسطة
       أداة خارجية عبر واجهة برمجة تطبيقات خدمة المهام والتقديرات، وسيتم
@@ -30124,6 +30163,10 @@ ar:
   traditional_gradebook_d7ad59c6: "دفتر الدرجات التقليدي..."
   traditional_gradebook_d90461dc: "دفتر الدرجات التقليدي"
   transferred_student_enrollments_90dc27d3: "تسجيلات الطلاب المنقولة"
+  transform_rce_content_on_load_1f521086: "تحويل محتوى RCE على الحمل"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      يحوّل عناوين URL المطلقة إلى عناوين URL نسبية ويزيل السمات الغريبة من محتوى محرر RCE من على الحمل.
+      مطلوب لكي يعمل محرر RCE بشكل كامل في الاختبارات الجديدة.
   travel_places_f461329c: "السفر والأماكن"
   treat_ungraded_as_0_d38c2b41: "اعتبار درجة المهام التي لم يتم تقييمها كـ 0"
   tree_browser: 
@@ -31295,6 +31338,8 @@ ar:
       resubmit_to_vericite: "إعادة الإرسال إلى VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite درجة التشابه -- مزيد من المعلومات"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite درجة التشابه  - انظر التقرير التفصيلي"
+  verify_ldap_tls_certificates_70241d8e: "التحقق من شهادات LDAP TLS"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "تحقق من شهادات TLS المقدمة بواسطة مزودي مصادقة LDAP."
   version_versionnumber_updatedat_9f5b7a5b: "الإصدار %{versionNumber} %{updatedAt}"
   video_78335c71: فيديو
   video_b9f27375: فيديو
@@ -31591,6 +31636,7 @@ ar:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "عند التحديد، يكون المساق في حالة قراءة فقط خارج هذه التواريخ."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "عند التحديد، يكون المساق غير قابل للوصول خارج تواريخ المساق. إذا كانت تواريخ المساق فارغة، تنطبق تواريخ البدء والانتهاء هذه على تواريخ الفصل الدراسي."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "عند التحديد، يكون قسم المساق في حالة قراءة فقط خارج هذه التواريخ."
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "عند تعيينها، تحدد إذا كان ينبغي تعيين حالة سير عمل الاختبار الجديد باعتباره تم تقييمه أو pending_review إذا كان المستخدم لديه اختبار جديد pending_review سابق ولكن أعيد تسجيله في المساق."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       عند تمكين هذه العلامة، سيبقى تنقل المساق مطويًا أو موسعًا
       عند التنقل بين الصفحات حسب آخر تعيين من المستخدم

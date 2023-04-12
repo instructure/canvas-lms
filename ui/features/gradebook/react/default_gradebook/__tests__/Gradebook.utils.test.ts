@@ -28,6 +28,7 @@ import {
   getDefaultSettingKeyForColumnType,
   getGradeAsPercent,
   getStudentGradeForColumn,
+  isGradedOrExcusedSubmissionUnposted,
   maxAssignmentCount,
   onGridKeyDown,
   otherGradingPeriodAssignmentIds,
@@ -37,6 +38,7 @@ import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
 import {createGradebook} from './GradebookSpecHelper'
 import {fireEvent, screen, waitFor} from '@testing-library/dom'
 import type {FilterPreset} from '../gradebook.d'
+import type {SlickGridKeyboardEvent} from '../grid.d'
 import type {Submission} from '../../../../../api.d'
 
 const unsubmittedSubmission: Submission = {
@@ -110,6 +112,11 @@ const gradedSubmission: Submission = {
   workflow_state: 'graded',
 }
 
+const gradedPostedSubmission: Submission = {
+  ...gradedSubmission,
+  posted_at: new Date(),
+}
+
 describe('getGradeAsPercent', () => {
   it('returns a percent for a grade with points possible', () => {
     const percent = getGradeAsPercent({score: 5, possible: 10})
@@ -148,8 +155,8 @@ describe('getStudentGradeForColumn', () => {
 })
 
 describe('onGridKeyDown', () => {
-  let grid
-  let columns
+  let grid: any
+  let columns: any
 
   beforeEach(() => {
     columns = [
@@ -164,37 +171,40 @@ describe('onGridKeyDown', () => {
   })
 
   it('skips SlickGrid default behavior when pressing "enter" on a "student" cell', () => {
-    const event = {which: 13, originalEvent: {skipSlickGridDefaults: undefined}}
+    const event = {
+      which: 13,
+      originalEvent: {skipSlickGridDefaults: undefined},
+    } as any
     onGridKeyDown(event, {grid, cell: 0, row: 0}) // 0 is the index of the 'student' column
     expect(event.originalEvent.skipSlickGridDefaults).toStrictEqual(true)
   })
 
   it('does not skip SlickGrid default behavior when pressing other keys on a "student" cell', function () {
-    const event = {which: 27, originalEvent: {}}
+    const event = {which: 27, originalEvent: {}} as SlickGridKeyboardEvent
     onGridKeyDown(event, {grid, cell: 0, row: 0}) // 0 is the index of the 'student' column
     // skipSlickGridDefaults is not applied
     expect('skipSlickGridDefaults' in event.originalEvent).toBeFalsy()
   })
 
   it('does not skip SlickGrid default behavior when pressing "enter" on other cells', function () {
-    const event = {which: 27, originalEvent: {}}
+    const event = {which: 27, originalEvent: {}} as SlickGridKeyboardEvent
     onGridKeyDown(event, {grid, cell: 1, row: 0}) // 1 is the index of the 'assignment' column
     // skipSlickGridDefaults is not applied
     expect('skipSlickGridDefaults' in event.originalEvent).toBeFalsy()
   })
 
   it('does not skip SlickGrid default behavior when pressing "enter" off the grid', function () {
-    const event = {which: 27, originalEvent: {}}
-    onGridKeyDown(event, {grid, cell: undefined, row: undefined})
+    const event = {which: 27, originalEvent: {}} as SlickGridKeyboardEvent
+    onGridKeyDown(event, {grid, cell: null, row: null})
     // skipSlickGridDefaults is not applied
     expect('skipSlickGridDefaults' in event.originalEvent).toBeFalsy()
   })
 })
 
 describe('confirmViewUngradedAsZero', () => {
-  let onAccepted
+  let onAccepted: () => void
 
-  const confirm = currentValue => {
+  const confirm = (currentValue: boolean) => {
     document.body.innerHTML = '<div id="confirmation_dialog_holder" />'
     confirmViewUngradedAsZero({currentValue, onAccepted})
   }
@@ -300,7 +310,7 @@ describe('getDefaultSettingKeyForColumnType', () => {
     const value = 0
     gradebook.gridData.rows[0].someProperty = value
     gradebook.gridData.rows[1].someProperty = value
-    const sortFn = row => row.someProperty
+    const sortFn = (row: any) => row.someProperty
     gradebook.sortRowsWithFunction(sortFn)
     const [firstRow, secondRow] = gradebook.gridData.rows
 
@@ -502,5 +512,19 @@ describe('otherGradingPeriodAssignmentIds', () => {
       otherGradingPeriodIds: ['2'],
       otherAssignmentIds: ['3', '4', '5', '6', '7', '8', '9', '10'],
     })
+  })
+})
+
+describe('isGradedOrExcusedSubmissionUnposted', () => {
+  it('returns true if submission is graded or excused but not posted', () => {
+    expect(isGradedOrExcusedSubmissionUnposted(gradedSubmission)).toStrictEqual(true)
+  })
+
+  it('returns false if submission is graded or excused and posted', () => {
+    expect(isGradedOrExcusedSubmissionUnposted(gradedPostedSubmission)).toStrictEqual(false)
+  })
+
+  it('returns false if submission is ungraded', () => {
+    expect(isGradedOrExcusedSubmissionUnposted(ungradedSubmission)).toStrictEqual(false)
   })
 })

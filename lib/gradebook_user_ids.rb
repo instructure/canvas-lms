@@ -38,7 +38,18 @@ class GradebookUserIds
       sort_by_student_field
     when /assignment_\d+$/
       assignment_id = @column[/\d+$/]
-      send("sort_by_assignment_#{@sort_by}", assignment_id)
+      case @sort_by
+      when "grade"
+        sort_by_assignment_grade(assignment_id)
+      when "missing"
+        sort_by_assignment_missing(assignment_id)
+      when "late"
+        sort_by_assignment_late(assignment_id)
+      when "excused"
+        sort_by_assignment_excused(assignment_id)
+      when "unposted"
+        sort_by_assignment_unposted(assignment_id)
+      end
     when /^assignment_group_\d+$/
       assignment_id = @column[/\d+$/]
       sort_by_assignment_group(assignment_id)
@@ -114,6 +125,14 @@ class GradebookUserIds
 
   def sort_by_assignment_missing(assignment_id)
     sort_user_ids(Submission.missing.where(assignment_id: assignment_id))
+  end
+
+  def sort_by_assignment_excused(assignment_id)
+    sort_user_ids(Submission.excused.where(assignment_id: assignment_id))
+  end
+
+  def sort_by_assignment_unposted(assignment_id)
+    sort_user_ids(Submission.graded.unposted.where(assignment_id: assignment_id))
   end
 
   def sort_by_assignment_late(assignment_id)

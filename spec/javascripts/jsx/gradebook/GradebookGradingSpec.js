@@ -52,26 +52,9 @@ test('sets assignment visibility for the given students', function () {
   deepEqual(studentIds, ['1101', '1102'], 'both students were updated')
 })
 
-test('invalidates student rows for the given students', function () {
-  this.gradebook.setupGrading(this.students)
-  strictEqual(
-    this.gradebook.invalidateRowsForStudentIds.callCount,
-    1,
-    'invalidateRowsForStudentIds was called once'
-  )
-  const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args
-  deepEqual(studentIds, ['1101', '1102'], 'both students were updated')
-})
-
-test('invalidates student rows after setting assignment visibility', function () {
-  this.gradebook.invalidateRowsForStudentIds.callsFake(() => {
-    strictEqual(
-      this.gradebook.setAssignmentVisibility.callCount,
-      1,
-      'setAssignmentVisibility was already called'
-    )
-  })
-  this.gradebook.setupGrading(this.students)
+test('returns student IDs for the given students', function () {
+  const studentIds = this.gradebook.setupGrading(this.students)
+  deepEqual(studentIds, ['1101', '1102'])
 })
 
 QUnit.module('resetGrading')

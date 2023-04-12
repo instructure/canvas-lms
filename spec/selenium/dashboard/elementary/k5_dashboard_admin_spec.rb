@@ -41,8 +41,7 @@ describe "admin k5 dashboard" do
   context "homeroom dashboard standard" do
     it "provides the homeroom dashboard tabs on dashboard" do
       get "/"
-
-      expect(retrieve_welcome_text).to match(/Welcome,/)
+      expect(welcome_title).to be_present
       expect(homeroom_tab).to be_displayed
       expect(schedule_tab).to be_displayed
       expect(grades_tab).to be_displayed

@@ -28,6 +28,12 @@ import '@testing-library/jest-dom/extend-expect'
 
 const originalState = store.getState()
 
+const defaultRules = {
+  drop_lowest: 0,
+  drop_highest: 0,
+  never_drop: [],
+}
+
 const defaultAssignmentGroupProps = {
   rules: {},
   sis_source_id: null,
@@ -89,7 +95,7 @@ const defaultProps: FilterNavProps = {
       group_weight: 0,
       assignments: [],
       integration_data: null,
-      rules: null,
+      rules: defaultRules,
       sis_source_id: null,
     },
     {
@@ -99,7 +105,7 @@ const defaultProps: FilterNavProps = {
       group_weight: 0,
       assignments: [],
       integration_data: null,
-      rules: null,
+      rules: defaultRules,
       sis_source_id: null,
     },
   ],

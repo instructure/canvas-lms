@@ -127,6 +127,19 @@ describe "assignments" do
       end
     end
 
+    it "shows speed grader link when published" do
+      @assignment = @course.assignments.create({ name: "Test Moderated Assignment" })
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f("#speed-grader-link-container")).to be_present
+    end
+
+    it "hides speed grader link when unpublished" do
+      @assignment = @course.assignments.create({ name: "Test Moderated Assignment" })
+      @assignment.unpublish
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f("#speed-grader-link-container").attribute("class")).to include("hidden")
+    end
+
     it "edits an assignment", priority: "1" do
       assignment_name = "first test assignment"
       due_date = Time.now.utc + 2.days
@@ -855,6 +868,56 @@ describe "assignments" do
       wait_for_ajaximations
 
       expect(f("#assignment_group_id")).not_to include_text(@new_group)
+    end
+  end
+
+  context "with restrict_quantitative_data" do
+    all_options = ["Percentage", "Complete/Incomplete", "Points", "Letter Grade", "GPA Scale", "Not Graded"]
+    qualitative_options = ["Complete/Incomplete", "Letter Grade", "Not Graded"]
+
+    before do
+      course_with_teacher_logged_in
+    end
+
+    context "turned off" do
+      it "show all options on create" do
+        get "/courses/#{@course.id}/assignments/new"
+        wait_for_ajaximations
+
+        expect(get_options("#assignment_grading_type").map(&:text)).to eq all_options
+      end
+
+      it "show all options on edit" do
+        @assignment = @course.assignments.create({ name: "Test Assignment" })
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+
+        expect(get_options("#assignment_grading_type").map(&:text)).to eq all_options
+      end
+    end
+
+    context "turned on" do
+      before do
+        Account.default.enable_feature! :restrict_quantitative_data
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+        Account.default.reload
+      end
+
+      it "show only qualitative options on create" do
+        get "/courses/#{@course.id}/assignments/new"
+        wait_for_ajaximations
+
+        expect(get_options("#assignment_grading_type").map(&:text)).to eq qualitative_options
+      end
+
+      it "show only qualitative options on edit" do
+        @assignment = @course.assignments.create({ name: "Test Assignment" })
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+
+        expect(get_options("#assignment_grading_type").map(&:text)).to eq qualitative_options
+      end
     end
   end
 end

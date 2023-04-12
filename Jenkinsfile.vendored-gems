@@ -44,7 +44,7 @@ pipeline {
             onNodeAcquired: vendoredGemsStage.setupNode(),
           ]
 
-          extendedStage('Runner').hooks(stageHooks).nodeRequirements(label: configuration.nodeLabel()).obeysAllowStages(false).execute {
+          extendedStage('Runner').hooks(stageHooks).nodeRequirements(label: nodeLabel()).obeysAllowStages(false).execute {
             extendedStage('Vendored Gems').obeysAllowStages(false).timeout(10).execute {
               sh 'build/new-jenkins/test-gems.sh'
             }

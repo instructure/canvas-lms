@@ -7,6 +7,7 @@ ARG RUBY=2.7
 FROM instructure/ruby-passenger:$RUBY
 LABEL maintainer="Instructure"
 
+ARG RUBY
 ARG POSTGRES_CLIENT=14
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV development

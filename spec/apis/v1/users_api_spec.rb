@@ -2148,6 +2148,46 @@ describe "Users API", type: :request do
       end
     end
 
+    context "sharding" do
+      specs_require_sharding
+
+      before :once do
+        @account0 = Account.default
+        @cs_user = nil
+        @shard1.activate do
+          @account1 = account_model
+          @account1.trust_links.create!(managing_account: @account0)
+          @cs_user = User.create!
+        end
+        @cs_ps = managed_pseudonym(@cs_user, account: @account0, sis_user_id: "cross_shard_user")
+        site_admin_user
+      end
+
+      it "set up the cross-shard pseudonym properly" do
+        expect(@cs_ps.user_id).to eq @cs_user.global_id
+      end
+
+      it "updates a cross-shard user via global id" do
+        json = api_call(:put, "/api/v1/users/#{@cs_user.global_id}", @path_options.merge(id: @cs_user.global_id.to_s),
+                        { user: { name: "Santonio Holmes" } })
+
+        expect(json["id"]).to eq @cs_user.global_id
+        expect(json["name"]).to eq "Santonio Holmes"
+        expect(@cs_ps.reload.user_id).to eq @cs_user.global_id
+        expect(@cs_user.reload.name).to eq "Santonio Holmes"
+      end
+
+      it "updates a cross-shard user via sis_user_id (without breaking their pseudonym)" do
+        json = api_call(:put, "/api/v1/users/sis_user_id:cross_shard_user", @path_options.merge(id: "sis_user_id:cross_shard_user"),
+                        { user: { name: "Lavender Gooms" } })
+
+        expect(json["id"]).to eq @cs_user.global_id
+        expect(json["name"]).to eq "Lavender Gooms"
+        expect(@cs_ps.reload.user_id).to eq @cs_user.global_id
+        expect(@cs_user.reload.name).to eq "Lavender Gooms"
+      end
+    end
+
     context "an unauthorized user" do
       it "receives a 401" do
         user_factory

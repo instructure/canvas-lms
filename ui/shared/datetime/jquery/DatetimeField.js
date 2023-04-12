@@ -266,6 +266,7 @@ export default class DatetimeField {
       this.invalid = this.datetime === null
       this.$field.data('inputdate', null)
     } else {
+      const previousDate = this.datetime
       if (val) {
         this.setFormattedDatetime(val, TIME_FORMAT_OPTIONS)
       }
@@ -273,6 +274,10 @@ export default class DatetimeField {
       this.datetime = tz.parse(value)
       this.blank = !value
       this.invalid = !this.blank && this.datetime === null
+      // If the date is invalid, revert to the previous date
+      if (this.invalid) {
+        this.datetime = previousDate
+      }
     }
     if (this.datetime && !this.showDate && this.implicitDate) {
       this.datetime = tz.mergeTimeAndDate(this.datetime, this.implicitDate)

@@ -59,63 +59,31 @@ const locale = {
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "An error occurred uploading your media."
   },
-  "and_7fcc2911": {
-    "message": "And"
-  },
-  "angle_c5b4ec50": {
-    "message": "Angle"
-  },
-  "announcement_list_da155734": {
-    "message": "Announcement List"
-  },
-  "announcements_a4b8ed4a": {
-    "message": "Announcements"
-  },
-  "apply_781a2546": {
-    "message": "Apply"
-  },
+  "and_7fcc2911": { "message": "And" },
+  "angle_c5b4ec50": { "message": "Angle" },
+  "announcement_list_da155734": { "message": "Announcement List" },
+  "announcements_a4b8ed4a": { "message": "Announcements" },
+  "apply_781a2546": { "message": "Apply" },
   "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
     "message": "Apply changes to all instances of this Icon Maker Icon in the Course"
   },
-  "approaches_the_limit_893aeec9": {
-    "message": "Approaches the Limit"
-  },
-  "approximately_e7965800": {
-    "message": "Approximately"
-  },
-  "apps_54d24a47": {
-    "message": "Apps"
-  },
-  "arrows_464a3e54": {
-    "message": "Arrows"
-  },
-  "art_icon_8e1daad": {
-    "message": "Art Icon"
-  },
+  "approaches_the_limit_893aeec9": { "message": "Approaches the Limit" },
+  "approximately_e7965800": { "message": "Approximately" },
+  "apps_54d24a47": { "message": "Apps" },
+  "arrows_464a3e54": { "message": "Arrows" },
+  "art_icon_8e1daad": { "message": "Art Icon" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Aspect ratio will be preserved"
   },
-  "assignments_1e02582c": {
-    "message": "Assignments"
-  },
-  "asterisk_82255584": {
-    "message": "Asterisk"
-  },
-  "attributes_963ba262": {
-    "message": "Attributes"
-  },
+  "assignments_1e02582c": { "message": "Assignments" },
+  "asterisk_82255584": { "message": "Asterisk" },
+  "attributes_963ba262": { "message": "Attributes" },
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Audio and video recording not supported; please use a different browser."
   },
-  "audio_options_feb58e2c": {
-    "message": "Audio Options"
-  },
-  "audio_options_tray_33a90711": {
-    "message": "Audio Options Tray"
-  },
-  "audio_player_for_title_20cc70d": {
-    "message": "Audio player for { title }"
-  },
+  "audio_options_feb58e2c": { "message": "Audio Options" },
+  "audio_options_tray_33a90711": { "message": "Audio Options Tray" },
+  "audio_player_for_title_20cc70d": { "message": "Audio player for { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Auto-saved content exists. Would you like to load the auto-saved content instead?"
   },
@@ -167,15 +135,11 @@ const locale = {
   "click_to_embed_imagename_c41ea8df": {
     "message": "Click to embed { imageName }"
   },
-  "click_to_hide_preview_3c707763": {
-    "message": "Click to hide preview"
-  },
+  "click_to_hide_preview_3c707763": { "message": "Click to hide preview" },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Click to insert a link into the editor."
   },
-  "click_to_show_preview_faa27051": {
-    "message": "Click to show preview"
-  },
+  "click_to_show_preview_faa27051": { "message": "Click to show preview" },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Close a menu or dialogue. Also returns you to the editor area"
   },
@@ -189,18 +153,12 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": {
     "message": "Closed Captions/Subtitles"
   },
-  "clubs_suit_c1ffedff": {
-    "message": "Clubs (Suit)"
-  },
-  "collaborations_5c56c15f": {
-    "message": "Collaborations"
-  },
+  "clubs_suit_c1ffedff": { "message": "Clubs (Suit)" },
+  "collaborations_5c56c15f": { "message": "Collaborations" },
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Collapse to hide { types }"
   },
-  "color_picker_6b359edf": {
-    "message": "Colour Picker"
-  },
+  "color_picker_6b359edf": { "message": "Colour Picker" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Colour Picker ({ colorName } selected)"
   },
@@ -214,48 +172,24 @@ const locale = {
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Content is still being uploaded, if you continue it will not be embedded properly."
   },
-  "content_subtype_5ce35e88": {
-    "message": "Content subtype"
-  },
-  "content_type_2cf90d95": {
-    "message": "Content type"
-  },
-  "coproduct_e7838082": {
-    "message": "Coproduct"
-  },
-  "copyright_holder_66ee111": {
-    "message": "Copyright holder:"
-  },
+  "content_subtype_5ce35e88": { "message": "Content subtype" },
+  "content_type_2cf90d95": { "message": "Content type" },
+  "coproduct_e7838082": { "message": "Coproduct" },
+  "copyright_holder_66ee111": { "message": "Copyright holder:" },
   "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
     "message": "{ count, plural,\n     =0 {0 words}\n    one {1 word}\n  other {# words}\n}"
   },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {# item loaded}\n  other {# items loaded}\n}"
   },
-  "course_documents_104d76e0": {
-    "message": "Course Documents"
-  },
-  "course_files_62deb8f8": {
-    "message": "Course files"
-  },
-  "course_files_a31f97fc": {
-    "message": "Course files"
-  },
-  "course_images_f8511d04": {
-    "message": "Course Images"
-  },
-  "course_links_b56959b9": {
-    "message": "Course Links"
-  },
-  "course_media_ec759ad": {
-    "message": "Course Media"
-  },
-  "course_navigation_dd035109": {
-    "message": "Course navigation"
-  },
-  "create_icon_110d6463": {
-    "message": "Create Icon"
-  },
+  "course_documents_104d76e0": { "message": "Course Documents" },
+  "course_files_62deb8f8": { "message": "Course files" },
+  "course_files_a31f97fc": { "message": "Course files" },
+  "course_images_f8511d04": { "message": "Course Images" },
+  "course_links_b56959b9": { "message": "Course Links" },
+  "course_media_ec759ad": { "message": "Course Media" },
+  "course_navigation_dd035109": { "message": "Course navigation" },
+  "create_icon_110d6463": { "message": "Create Icon" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons Licence:"
   },
@@ -297,57 +231,35 @@ const locale = {
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Display Text Link (Opens in a new tab)"
   },
-  "division_sign_72190870": {
-    "message": "Division Sign"
-  },
-  "documents_81393201": {
-    "message": "Documents"
-  },
-  "done_54e3d4b6": {
-    "message": "Done"
-  },
-  "double_dagger_faf78681": {
-    "message": "Double Dagger"
-  },
+  "division_sign_72190870": { "message": "Division Sign" },
+  "documents_81393201": { "message": "Documents" },
+  "done_54e3d4b6": { "message": "Done" },
+  "double_dagger_faf78681": { "message": "Double Dagger" },
   "down_and_left_diagonal_arrow_40ef602c": {
     "message": "Down And Left Diagonal Arrow"
   },
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Down And Right Diagonal Arrow"
   },
-  "download_filename_2baae924": {
-    "message": "Download { filename }"
-  },
-  "downward_arrow_cca52012": {
-    "message": "Downward Arrow"
-  },
+  "download_filename_2baae924": { "message": "Download { filename }" },
+  "downward_arrow_cca52012": { "message": "Downward Arrow" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Downward Pointing Triangle"
   },
-  "drag_a_file_here_1bf656d5": {
-    "message": "Drag a file here"
-  },
+  "drag_a_file_here_1bf656d5": { "message": "Drag a file here" },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Drag and drop, or click to browse your computer"
   },
   "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
     "message": "Drag handle. Use up and down arrows to resize"
   },
-  "due_multiple_dates_cc0ee3f5": {
-    "message": "Due: Multiple dates"
-  },
-  "due_when_7eed10c6": {
-    "message": "Due: { when }"
-  },
+  "due_multiple_dates_cc0ee3f5": { "message": "Due: Multiple dates" },
+  "due_when_7eed10c6": { "message": "Due: { when }" },
   "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
     "message": "Edit alt text for this icon instance"
   },
-  "edit_c5fbea07": {
-    "message": "Edit"
-  },
-  "edit_course_link_5a5c3c59": {
-    "message": "Edit Course Link"
-  },
+  "edit_c5fbea07": { "message": "Edit" },
+  "edit_course_link_5a5c3c59": { "message": "Edit Course Link" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Edit Existing Icon Maker Icon"
   },
@@ -372,69 +284,33 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Enter at least 3 characters to search"
   },
-  "epsilon_54bb8afa": {
-    "message": "Epsilon"
-  },
-  "epsilon_variant_d31f1e77": {
-    "message": "Epsilon (Variant)"
-  },
-  "equals_sign_c51bdc58": {
-    "message": "Equals Sign"
-  },
-  "equation_editor_39fbc3f1": {
-    "message": "Equation Editor"
-  },
-  "equivalence_class_7b0f11c0": {
-    "message": "Equivalence Class"
-  },
-  "equivalent_identity_654b3ce5": {
-    "message": "Equivalent (Identity)"
-  },
-  "eta_b8828f99": {
-    "message": "Eta"
-  },
-  "exists_2e62bdaa": {
-    "message": "Exists"
-  },
-  "exit_fullscreen_b7eb0aa4": {
-    "message": "Exit Fullscreen"
-  },
+  "epsilon_54bb8afa": { "message": "Epsilon" },
+  "epsilon_variant_d31f1e77": { "message": "Epsilon (Variant)" },
+  "equals_sign_c51bdc58": { "message": "Equals Sign" },
+  "equation_editor_39fbc3f1": { "message": "Equation Editor" },
+  "equivalence_class_7b0f11c0": { "message": "Equivalence Class" },
+  "equivalent_identity_654b3ce5": { "message": "Equivalent (Identity)" },
+  "eta_b8828f99": { "message": "Eta" },
+  "exists_2e62bdaa": { "message": "Exists" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Exit Fullscreen" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Expand preview by Default"
   },
-  "expand_to_see_types_f5d29352": {
-    "message": "Expand to see { types }"
-  },
-  "external_tools_6e77821": {
-    "message": "External tools"
-  },
-  "extra_large_b6cdf1ff": {
-    "message": "Extra Large"
-  },
-  "extra_small_9ae33252": {
-    "message": "Extra Small"
-  },
-  "extracurricular_icon_67c8ca42": {
-    "message": "Extracurricular Icon"
-  },
-  "f_function_fe422d65": {
-    "message": "F (function)"
-  },
+  "expand_to_see_types_f5d29352": { "message": "Expand to see { types }" },
+  "external_tools_6e77821": { "message": "External tools" },
+  "extra_large_b6cdf1ff": { "message": "Extra Large" },
+  "extra_small_9ae33252": { "message": "Extra Small" },
+  "extracurricular_icon_67c8ca42": { "message": "Extracurricular Icon" },
+  "f_function_fe422d65": { "message": "F (function)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Failed getting file contents"
   },
-  "file_name_8fd421ff": {
-    "message": "File name"
-  },
+  "file_name_8fd421ff": { "message": "File name" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "File storage quota exceeded"
   },
-  "file_url_c12b64be": {
-    "message": "File URL"
-  },
-  "filename_file_icon_602eb5de": {
-    "message": "{ filename } file icon"
-  },
+  "file_url_c12b64be": { "message": "File URL" },
+  "filename_file_icon_602eb5de": { "message": "{ filename } file icon" },
   "filename_image_preview_6cef8f26": {
     "message": "{ filename } image preview"
   },
@@ -459,18 +335,10 @@ const locale = {
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Found { count, plural,\n     =0 {# results}\n    one {# result}\n  other {# results}\n}"
   },
-  "fraction_41bac7af": {
-    "message": "Fraction"
-  },
-  "fullscreen_873bf53f": {
-    "message": "Fullscreen"
-  },
-  "gamma_1767928": {
-    "message": "Gamma"
-  },
-  "generating_preview_45b53be0": {
-    "message": "Generating preview..."
-  },
+  "fraction_41bac7af": { "message": "Fraction" },
+  "fullscreen_873bf53f": { "message": "Fullscreen" },
+  "gamma_1767928": { "message": "Gamma" },
+  "generating_preview_45b53be0": { "message": "Generating preview..." },
   "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
     "message": "GIF/PNG format images larger than { size } KB are not currently supported."
   },
@@ -527,36 +395,16 @@ const locale = {
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "I have obtained permission to use this file."
   },
-  "i_hold_the_copyright_71ee91b1": {
-    "message": "I hold the copyright"
-  },
-  "icon_215a1dc6": {
-    "message": "Icon"
-  },
-  "icon_8168b2f8": {
-    "message": "icon"
-  },
-  "icon_color_b86dd6d6": {
-    "message": "Icon Colour"
-  },
-  "icon_maker_icons_cc560f7e": {
-    "message": "Icon Maker Icons"
-  },
-  "icon_options_7e32746e": {
-    "message": "Icon Options"
-  },
-  "icon_options_tray_2b407977": {
-    "message": "Icon Options Tray"
-  },
-  "icon_preview_1782a1d9": {
-    "message": "Icon Preview"
-  },
-  "icon_shape_30b61e7": {
-    "message": "Icon Shape"
-  },
-  "icon_size_9353edea": {
-    "message": "Icon Size"
-  },
+  "i_hold_the_copyright_71ee91b1": { "message": "I hold the copyright" },
+  "icon_215a1dc6": { "message": "Icon" },
+  "icon_8168b2f8": { "message": "icon" },
+  "icon_color_b86dd6d6": { "message": "Icon Colour" },
+  "icon_maker_icons_cc560f7e": { "message": "Icon Maker Icons" },
+  "icon_options_7e32746e": { "message": "Icon Options" },
+  "icon_options_tray_2b407977": { "message": "Icon Options Tray" },
+  "icon_preview_1782a1d9": { "message": "Icon Preview" },
+  "icon_shape_30b61e7": { "message": "Icon Shape" },
+  "icon_size_9353edea": { "message": "Icon Size" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
     "message": "If left empty link, text will display as course link name"
   },
@@ -645,18 +493,12 @@ const locale = {
   "left_downard_harpoon_arrow_1d7b3d2e": {
     "message": "Left Downward Harpoon Arrow"
   },
-  "left_floor_29ac2274": {
-    "message": "Left Floor"
-  },
-  "left_to_right_e9b4fd06": {
-    "message": "Left-to-Right"
-  },
+  "left_floor_29ac2274": { "message": "Left Floor" },
+  "left_to_right_e9b4fd06": { "message": "Left-to-Right" },
   "left_upward_harpoon_arrow_3a562a96": {
     "message": "Left Upward Harpoon Arrow"
   },
-  "leftward_arrow_1e4765de": {
-    "message": "Leftward Arrow"
-  },
+  "leftward_arrow_1e4765de": { "message": "Leftward Arrow" },
   "leftward_pointing_triangle_d14532ce": {
     "message": "Leftward Pointing Triangle"
   },
@@ -682,27 +524,13 @@ const locale = {
   "loading_closed_captions_subtitles_failed_95ceef47": {
     "message": "loading closed captions/subtitles failed."
   },
-  "loading_failed_b3524381": {
-    "message": "Loading failed..."
-  },
-  "loading_failed_e6a9d8ef": {
-    "message": "Loading failed."
-  },
-  "loading_folders_d8b5869e": {
-    "message": "Loading folders"
-  },
-  "loading_please_wait_d276220a": {
-    "message": "Loading, please wait"
-  },
-  "loading_preview_9f077aa1": {
-    "message": "Loading preview"
-  },
-  "locked_762f138b": {
-    "message": "Locked"
-  },
-  "logical_equivalence_76fca396": {
-    "message": "Logical Equivalence"
-  },
+  "loading_failed_b3524381": { "message": "Loading failed..." },
+  "loading_failed_e6a9d8ef": { "message": "Loading failed." },
+  "loading_folders_d8b5869e": { "message": "Loading folders" },
+  "loading_please_wait_d276220a": { "message": "Loading, please wait" },
+  "loading_preview_9f077aa1": { "message": "Loading preview" },
+  "locked_762f138b": { "message": "Locked" },
+  "logical_equivalence_76fca396": { "message": "Logical Equivalence" },
   "logical_equivalence_short_8efd7b4f": {
     "message": "Logical Equivalence (Short)"
   },
@@ -712,21 +540,11 @@ const locale = {
   "logical_equivalence_thick_662dd3f2": {
     "message": "Logical Equivalence (Thick)"
   },
-  "low_horizontal_dots_cc08498e": {
-    "message": "Low Horizontal Dots"
-  },
-  "magenta_4a65993c": {
-    "message": "Magenta"
-  },
-  "maps_to_e5ef7382": {
-    "message": "Maps To"
-  },
-  "math_icon_ad4e9d03": {
-    "message": "Math Icon"
-  },
-  "media_af190855": {
-    "message": "Media"
-  },
+  "low_horizontal_dots_cc08498e": { "message": "Low Horizontal Dots" },
+  "magenta_4a65993c": { "message": "Magenta" },
+  "maps_to_e5ef7382": { "message": "Maps To" },
+  "math_icon_ad4e9d03": { "message": "Math Icon" },
+  "media_af190855": { "message": "Media" },
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Media file is processing. Please try again later."
   },
@@ -752,27 +570,13 @@ const locale = {
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Must be at least { width } x { height }px"
   },
-  "my_files_2f621040": {
-    "message": "My files"
-  },
-  "n_th_root_9991a6e4": {
-    "message": "N-th Root"
-  },
-  "nabla_1e216d25": {
-    "message": "Nabla"
-  },
-  "name_1aed4a1b": {
-    "message": "Name"
-  },
-  "name_color_ceec76ff": {
-    "message": "{ name } ({ color })"
-  },
-  "natural_music_54a70258": {
-    "message": "Natural (Music)"
-  },
-  "natural_numbers_3da07060": {
-    "message": "Natural Numbers"
-  },
+  "my_files_2f621040": { "message": "My files" },
+  "n_th_root_9991a6e4": { "message": "N-th Root" },
+  "nabla_1e216d25": { "message": "Nabla" },
+  "name_1aed4a1b": { "message": "Name" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
+  "natural_music_54a70258": { "message": "Natural (Music)" },
+  "natural_numbers_3da07060": { "message": "Natural Numbers" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
   },
@@ -789,84 +593,44 @@ const locale = {
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "No preview is available for this file."
   },
-  "no_results_940393cf": {
-    "message": "No results."
-  },
+  "no_results_940393cf": { "message": "No results." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No results found for { filterTerm }"
   },
-  "no_video_1ed00b26": {
-    "message": "No Video"
-  },
-  "none_3b5e34d2": {
-    "message": "None"
-  },
-  "none_selected_b93d56d2": {
-    "message": "None Selected"
-  },
-  "not_equal_6e2980e6": {
-    "message": "Not Equal"
-  },
+  "no_video_1ed00b26": { "message": "No Video" },
+  "none_3b5e34d2": { "message": "None" },
+  "none_selected_b93d56d2": { "message": "None Selected" },
+  "not_equal_6e2980e6": { "message": "Not Equal" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Not In (Not An Element Of)"
   },
-  "not_negation_1418ebb8": {
-    "message": "Not (Negation)"
-  },
-  "not_subset_dc2b5e84": {
-    "message": "Not Subset"
-  },
-  "not_subset_strict_23d282bf": {
-    "message": "Not Subset (Strict)"
-  },
-  "not_superset_5556b913": {
-    "message": "Not Superset"
-  },
-  "not_superset_strict_24e06f36": {
-    "message": "Not Superset (Strict)"
-  },
-  "nu_1c0f6848": {
-    "message": "Nu"
-  },
-  "octagon_e48be9f": {
-    "message": "Octagon"
-  },
-  "olive_6a3e4d6b": {
-    "message": "Olive"
-  },
-  "omega_8f2c3463": {
-    "message": "Omega"
-  },
+  "not_negation_1418ebb8": { "message": "Not (Negation)" },
+  "not_subset_dc2b5e84": { "message": "Not Subset" },
+  "not_subset_strict_23d282bf": { "message": "Not Subset (Strict)" },
+  "not_superset_5556b913": { "message": "Not Superset" },
+  "not_superset_strict_24e06f36": { "message": "Not Superset (Strict)" },
+  "nu_1c0f6848": { "message": "Nu" },
+  "octagon_e48be9f": { "message": "Octagon" },
+  "olive_6a3e4d6b": { "message": "Olive" },
+  "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "One of the following styles must be added to save an icon: Icon Colour, Outline Size, Icon Text, or Image"
   },
-  "open_circle_e9bd069": {
-    "message": "Open Circle"
-  },
+  "open_circle_e9bd069": { "message": "Open Circle" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Open this keyboard shortcuts dialogue"
   },
   "open_title_application_fd624fc5": {
     "message": "Open { title } application"
   },
-  "operators_a2ef9a93": {
-    "message": "Operators"
-  },
-  "or_9b70ccaa": {
-    "message": "Or"
-  },
-  "orange_81386a62": {
-    "message": "Orange"
-  },
+  "operators_a2ef9a93": { "message": "Operators" },
+  "or_9b70ccaa": { "message": "Or" },
+  "orange_81386a62": { "message": "Orange" },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Other editor shortcuts may be found at"
   },
-  "outline_color_3ef2cea7": {
-    "message": "Outline Colour"
-  },
-  "outline_size_a6059a21": {
-    "message": "Outline Size"
-  },
+  "outline_color_3ef2cea7": { "message": "Outline Colour" },
+  "outline_size_a6059a21": { "message": "Outline Size" },
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } is not a valid protocol which must be ftp, http, https, mailto, skype, tel or may be omitted"
   },
@@ -885,39 +649,17 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "Percentage must be a number"
   },
-  "performing_arts_icon_f3497486": {
-    "message": "Performing Arts Icon"
-  },
-  "perpendicular_7c48ede4": {
-    "message": "Perpendicular"
-  },
-  "phi_4ac33b6d": {
-    "message": "Phi"
-  },
-  "phi_variant_c9bb3ac5": {
-    "message": "Phi (Variant)"
-  },
-  "physical_education_icon_d7dffd3e": {
-    "message": "Physical Education Icon"
-  },
-  "pi_dc4f0bd8": {
-    "message": "Pi"
-  },
-  "pi_variant_10f5f520": {
-    "message": "Pi (Variant)"
-  },
-  "pink_68ad45cb": {
-    "message": "Pink"
-  },
-  "pixels_52ece7d1": {
-    "message": "Pixels"
-  },
-  "play_1a47eaa7": {
-    "message": "Play"
-  },
-  "play_media_comment_35257210": {
-    "message": "Play media comment."
-  },
+  "performing_arts_icon_f3497486": { "message": "Performing Arts Icon" },
+  "perpendicular_7c48ede4": { "message": "Perpendicular" },
+  "phi_4ac33b6d": { "message": "Phi" },
+  "phi_variant_c9bb3ac5": { "message": "Phi (Variant)" },
+  "physical_education_icon_d7dffd3e": { "message": "Physical Education Icon" },
+  "pi_dc4f0bd8": { "message": "Pi" },
+  "pi_variant_10f5f520": { "message": "Pi (Variant)" },
+  "pink_68ad45cb": { "message": "Pink" },
+  "pixels_52ece7d1": { "message": "Pixels" },
+  "play_1a47eaa7": { "message": "Play" },
+  "play_media_comment_35257210": { "message": "Play media comment." },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Play media comment by { name } from { createdAt }."
   },
@@ -943,33 +685,15 @@ const locale = {
   "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
     "message": "Protocol must be ftp, http, https, mailto, skype, tel or may be omitted"
   },
-  "psi_e3f5f0f7": {
-    "message": "Psi"
-  },
-  "published_c944a23d": {
-    "message": "published"
-  },
-  "published_when_302d8e23": {
-    "message": "Published: { when }"
-  },
-  "pumpkin_904428d5": {
-    "message": "Pumpkin"
-  },
-  "purple_7678a9fc": {
-    "message": "Purple"
-  },
-  "quaternions_877024e0": {
-    "message": "Quaternions"
-  },
-  "quizzes_7e598f57": {
-    "message": "Quizzes"
-  },
-  "rational_numbers_80ddaa4a": {
-    "message": "Rational Numbers"
-  },
-  "real_numbers_7c99df94": {
-    "message": "Real Numbers"
-  },
+  "psi_e3f5f0f7": { "message": "Psi" },
+  "published_c944a23d": { "message": "published" },
+  "published_when_302d8e23": { "message": "Published: { when }" },
+  "pumpkin_904428d5": { "message": "Pumpkin" },
+  "purple_7678a9fc": { "message": "Purple" },
+  "quaternions_877024e0": { "message": "Quaternions" },
+  "quizzes_7e598f57": { "message": "Quizzes" },
+  "rational_numbers_80ddaa4a": { "message": "Rational Numbers" },
+  "real_numbers_7c99df94": { "message": "Real Numbers" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Real Portion (of Complex Number)"
   },
@@ -1000,18 +724,12 @@ const locale = {
   "right_downward_harpoon_arrow_d71b114f": {
     "message": "Right Downward Harpoon Arrow"
   },
-  "right_floor_5392d5cf": {
-    "message": "Right Floor"
-  },
-  "right_to_left_9cfb092a": {
-    "message": "Right-to-Left"
-  },
+  "right_floor_5392d5cf": { "message": "Right Floor" },
+  "right_to_left_9cfb092a": { "message": "Right-to-Left" },
   "right_upward_harpoon_arrow_f5a34c73": {
     "message": "Right Upward Harpoon Arrow"
   },
-  "rightward_arrow_32932107": {
-    "message": "Rightward Arrow"
-  },
+  "rightward_arrow_32932107": { "message": "Rightward Arrow" },
   "rightward_pointing_triangle_60330f5c": {
     "message": "Rightward Pointing Triangle"
   },
@@ -1072,21 +790,13 @@ const locale = {
   "single_color_image_color_95fa9a87": {
     "message": "Single Color Image Color"
   },
-  "size_b30e1077": {
-    "message": "Size"
-  },
+  "size_b30e1077": { "message": "Size" },
   "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
     "message": "Size of caption file is greater than the maximum { max } kb allowed file size."
   },
-  "small_b070434a": {
-    "message": "Small"
-  },
-  "solid_circle_9f061dfc": {
-    "message": "Solid Circle"
-  },
-  "something_went_wrong_89195131": {
-    "message": "Something went wrong."
-  },
+  "small_b070434a": { "message": "Small" },
+  "solid_circle_9f061dfc": { "message": "Solid Circle" },
+  "something_went_wrong_89195131": { "message": "Something went wrong." },
   "something_went_wrong_accessing_your_webcam_6643b87e": {
     "message": "Something went wrong accessing your webcam."
   },
@@ -1096,90 +806,36 @@ const locale = {
   "something_went_wrong_check_your_connection_reload__c7868286": {
     "message": "Something went wrong. Check your connection, reload the page, and try again."
   },
-  "something_went_wrong_d238c551": {
-    "message": "Something went wrong"
-  },
+  "something_went_wrong_d238c551": { "message": "Something went wrong" },
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Something went wrong while sharing your screen."
   },
-  "sort_by_e75f9e3e": {
-    "message": "Sort by"
-  },
-  "spades_suit_b37020c2": {
-    "message": "Spades (Suit)"
-  },
-  "square_511eb3b3": {
-    "message": "Square"
-  },
-  "square_cap_9ec88646": {
-    "message": "Square Cap"
-  },
-  "square_cup_b0665113": {
-    "message": "Square Cup"
-  },
-  "square_root_e8bcbc60": {
-    "message": "Square Root"
-  },
-  "square_root_symbol_d0898a53": {
-    "message": "Square Root Symbol"
-  },
-  "square_subset_17be67cb": {
-    "message": "Square Subset"
-  },
-  "square_subset_strict_7044e84f": {
-    "message": "Square Subset (Strict)"
-  },
-  "square_superset_3be8dae1": {
-    "message": "Square Superset"
-  },
-  "square_superset_strict_fa4262e4": {
-    "message": "Square Superset (Strict)"
-  },
-  "star_8d156e09": {
-    "message": "Star"
-  },
-  "start_over_f7552aa9": {
-    "message": "Start Over"
-  },
-  "start_recording_9a65141a": {
-    "message": "Start Recording"
-  },
-  "steel_blue_14296f08": {
-    "message": "Steel Blue"
-  },
-  "styles_2aa721ef": {
-    "message": "Styles"
-  },
-  "submit_a3cc6859": {
-    "message": "Submit"
-  },
-  "subscript_59744f96": {
-    "message": "Subscript"
-  },
-  "subset_19c1a92f": {
-    "message": "Subset"
-  },
-  "subset_strict_8d8948d6": {
-    "message": "Subset (Strict)"
-  },
-  "succeeds_9cc31be9": {
-    "message": "Succeeds"
-  },
-  "succeeds_equal_158e8c3a": {
-    "message": "Succeeds Equal"
-  },
-  "sum_b0842d31": {
-    "message": "Sum"
-  },
-  "superscript_8cb349a2": {
-    "message": "Superscript"
-  },
-  "superset_c4db8a7a": {
-    "message": "Superset"
-  },
-  "superset_strict_c77dd6d2": {
-    "message": "Superset (Strict)"
-  },
+  "sort_by_e75f9e3e": { "message": "Sort by" },
+  "spades_suit_b37020c2": { "message": "Spades (Suit)" },
+  "square_511eb3b3": { "message": "Square" },
+  "square_cap_9ec88646": { "message": "Square Cap" },
+  "square_cup_b0665113": { "message": "Square Cup" },
+  "square_root_e8bcbc60": { "message": "Square Root" },
+  "square_root_symbol_d0898a53": { "message": "Square Root Symbol" },
+  "square_subset_17be67cb": { "message": "Square Subset" },
+  "square_subset_strict_7044e84f": { "message": "Square Subset (Strict)" },
+  "square_superset_3be8dae1": { "message": "Square Superset" },
+  "square_superset_strict_fa4262e4": { "message": "Square Superset (Strict)" },
+  "star_8d156e09": { "message": "Star" },
+  "start_over_f7552aa9": { "message": "Start Over" },
+  "start_recording_9a65141a": { "message": "Start Recording" },
+  "steel_blue_14296f08": { "message": "Steel Blue" },
+  "styles_2aa721ef": { "message": "Styles" },
+  "submit_a3cc6859": { "message": "Submit" },
+  "subscript_59744f96": { "message": "Subscript" },
+  "subset_19c1a92f": { "message": "Subset" },
+  "subset_strict_8d8948d6": { "message": "Subset (Strict)" },
+  "succeeds_9cc31be9": { "message": "Succeeds" },
+  "succeeds_equal_158e8c3a": { "message": "Succeeds Equal" },
+  "sum_b0842d31": { "message": "Sum" },
+  "superscript_8cb349a2": { "message": "Superscript" },
+  "superset_c4db8a7a": { "message": "Superset" },
+  "superset_strict_c77dd6d2": { "message": "Superset (Strict)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Supported file types: SRT or WebVTT"
   },
@@ -1249,33 +905,15 @@ const locale = {
   "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
     "message": "The pretty html editor is not keyboard accessible. Press Shift O to open the raw HTML editor."
   },
-  "therefore_d860e024": {
-    "message": "Therefore"
-  },
-  "theta_ce2d2350": {
-    "message": "Theta"
-  },
-  "theta_variant_fff6da6f": {
-    "message": "Theta (Variant)"
-  },
-  "thick_downward_arrow_b85add4c": {
-    "message": "Thick Downward Arrow"
-  },
-  "thick_left_arrow_d5f3e925": {
-    "message": "Thick Left Arrow"
-  },
-  "thick_leftward_arrow_6ab89880": {
-    "message": "Thick Leftward Arrow"
-  },
-  "thick_right_arrow_3ed5e8f7": {
-    "message": "Thick Right Arrow"
-  },
-  "thick_rightward_arrow_a2e1839e": {
-    "message": "Thick Rightward Arrow"
-  },
-  "thick_upward_arrow_acd20328": {
-    "message": "Thick Upward Arrow"
-  },
+  "therefore_d860e024": { "message": "Therefore" },
+  "theta_ce2d2350": { "message": "Theta" },
+  "theta_variant_fff6da6f": { "message": "Theta (Variant)" },
+  "thick_downward_arrow_b85add4c": { "message": "Thick Downward Arrow" },
+  "thick_left_arrow_d5f3e925": { "message": "Thick Left Arrow" },
+  "thick_leftward_arrow_6ab89880": { "message": "Thick Leftward Arrow" },
+  "thick_right_arrow_3ed5e8f7": { "message": "Thick Right Arrow" },
+  "thick_rightward_arrow_a2e1839e": { "message": "Thick Rightward Arrow" },
+  "thick_upward_arrow_acd20328": { "message": "Thick Upward Arrow" },
   "this_document_cannot_be_displayed_within_canvas_7aba77be": {
     "message": "This document cannot be displayed within Canvas."
   },
@@ -1288,39 +926,17 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Though your video will have the correct title in the browser, we failed to update it in the database."
   },
-  "timebar_a4d18443": {
-    "message": "Time bar"
-  },
-  "title_ee03d132": {
-    "message": "Title"
-  },
-  "to_be_posted_when_d24bf7dc": {
-    "message": "To Be Posted: { when }"
-  },
-  "to_do_when_2783d78f": {
-    "message": "To-do: { when }"
-  },
-  "toggle_summary_group_413df9ac": {
-    "message": "Toggle { summary } group"
-  },
-  "toggle_tooltip_d3b7cb86": {
-    "message": "Toggle tooltip"
-  },
-  "tools_2fcf772e": {
-    "message": "Tools"
-  },
-  "top_66e0adb6": {
-    "message": "Top"
-  },
-  "tray_839df38a": {
-    "message": "Tray"
-  },
-  "triangle_6072304e": {
-    "message": "Triangle"
-  },
-  "turnstile_yields_f9e76df1": {
-    "message": "Turnstile (Yields)"
-  },
+  "timebar_a4d18443": { "message": "Time bar" },
+  "title_ee03d132": { "message": "Title" },
+  "to_be_posted_when_d24bf7dc": { "message": "To Be Posted: { when }" },
+  "to_do_when_2783d78f": { "message": "To-do: { when }" },
+  "toggle_summary_group_413df9ac": { "message": "Toggle { summary } group" },
+  "toggle_tooltip_d3b7cb86": { "message": "Toggle tooltip" },
+  "tools_2fcf772e": { "message": "Tools" },
+  "top_66e0adb6": { "message": "Top" },
+  "tray_839df38a": { "message": "Tray" },
+  "triangle_6072304e": { "message": "Triangle" },
+  "turnstile_yields_f9e76df1": { "message": "Turnstile (Yields)" },
   "type_control_f9_to_access_image_options_text_a47e319f": {
     "message": "type Control F9 to access image options. { text }"
   },
@@ -1330,93 +946,45 @@ const locale = {
   "type_control_f9_to_access_table_options_text_92141329": {
     "message": "type Control F9 to access table options. { text }"
   },
-  "union_e6b57a53": {
-    "message": "Union"
-  },
-  "unpublished_dfd8801": {
-    "message": "unpublished"
-  },
-  "untitled_16aa4f2b": {
-    "message": "Untitled"
-  },
-  "untitled_efdc2d7d": {
-    "message": "untitled"
-  },
+  "union_e6b57a53": { "message": "Union" },
+  "unpublished_dfd8801": { "message": "unpublished" },
+  "untitled_16aa4f2b": { "message": "Untitled" },
+  "untitled_efdc2d7d": { "message": "untitled" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Up And Left Diagonal Arrow"
   },
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Up And Right Diagonal Arrow"
   },
-  "upload_file_fd2361b8": {
-    "message": "Upload file"
-  },
-  "upload_image_6120b609": {
-    "message": "Upload image"
-  },
-  "upload_media_ce31135a": {
-    "message": "Upload media"
-  },
-  "uploading_19e8a4e7": {
-    "message": "Uploading"
-  },
-  "uppercase_delta_d4f4bc41": {
-    "message": "Uppercase Delta"
-  },
-  "uppercase_gamma_86f492e9": {
-    "message": "Uppercase Gamma"
-  },
-  "uppercase_lambda_c78d8ed4": {
-    "message": "Uppercase Lambda"
-  },
-  "uppercase_omega_8aedfa2": {
-    "message": "Uppercase Omega"
-  },
-  "uppercase_phi_caa36724": {
-    "message": "Uppercase Phi"
-  },
-  "uppercase_pi_fcc70f5e": {
-    "message": "Uppercase Pi"
-  },
-  "uppercase_psi_6395acbe": {
-    "message": "Uppercase Psi"
-  },
-  "uppercase_sigma_dbb70e92": {
-    "message": "Uppercase Sigma"
-  },
-  "uppercase_theta_49afc891": {
-    "message": "Uppercase Theta"
-  },
-  "uppercase_upsilon_8c1e623e": {
-    "message": "Uppercase Upsilon"
-  },
-  "uppercase_xi_341e8556": {
-    "message": "Uppercase Xi"
-  },
-  "upsilon_33651634": {
-    "message": "Upsilon"
-  },
+  "upload_file_fd2361b8": { "message": "Upload file" },
+  "upload_image_6120b609": { "message": "Upload image" },
+  "upload_media_ce31135a": { "message": "Upload media" },
+  "uploading_19e8a4e7": { "message": "Uploading" },
+  "uppercase_delta_d4f4bc41": { "message": "Uppercase Delta" },
+  "uppercase_gamma_86f492e9": { "message": "Uppercase Gamma" },
+  "uppercase_lambda_c78d8ed4": { "message": "Uppercase Lambda" },
+  "uppercase_omega_8aedfa2": { "message": "Uppercase Omega" },
+  "uppercase_phi_caa36724": { "message": "Uppercase Phi" },
+  "uppercase_pi_fcc70f5e": { "message": "Uppercase Pi" },
+  "uppercase_psi_6395acbe": { "message": "Uppercase Psi" },
+  "uppercase_sigma_dbb70e92": { "message": "Uppercase Sigma" },
+  "uppercase_theta_49afc891": { "message": "Uppercase Theta" },
+  "uppercase_upsilon_8c1e623e": { "message": "Uppercase Upsilon" },
+  "uppercase_xi_341e8556": { "message": "Uppercase Xi" },
+  "upsilon_33651634": { "message": "Upsilon" },
   "upward_and_downward_pointing_arrow_fa90a918": {
     "message": "Upward And Downward Pointing Arrow"
   },
   "upward_and_downward_pointing_arrow_thick_d420fdef": {
     "message": "Upward And Downward Pointing Arrow (Thick)"
   },
-  "upward_arrow_9992cb2d": {
-    "message": "Upward Arrow"
-  },
+  "upward_arrow_9992cb2d": { "message": "Upward Arrow" },
   "upward_pointing_triangle_d078d7cb": {
     "message": "Upward Pointing Triangle"
   },
-  "url_22a5f3b8": {
-    "message": "URL"
-  },
-  "usage_right_ff96f3e2": {
-    "message": "Usage right:"
-  },
-  "usage_rights_required_5fe4dd68": {
-    "message": "Usage Rights (required)"
-  },
+  "url_22a5f3b8": { "message": "URL" },
+  "usage_right_ff96f3e2": { "message": "Usage right:" },
+  "usage_rights_required_5fe4dd68": { "message": "Usage Rights (required)" },
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "Use arrow keys to navigate options."
   },
@@ -1444,51 +1012,25 @@ const locale = {
   "used_by_screen_readers_to_describe_the_video_37ebad25": {
     "message": "Used by screen readers to describe the video"
   },
-  "user_documents_c206e61f": {
-    "message": "User Documents"
-  },
-  "user_files_78e21703": {
-    "message": "User Files"
-  },
-  "user_images_b6490852": {
-    "message": "User Images"
-  },
-  "user_media_14fbf656": {
-    "message": "User Media"
-  },
-  "vector_notation_cf6086ab": {
-    "message": "Vector (Notation)"
-  },
+  "user_documents_c206e61f": { "message": "User Documents" },
+  "user_files_78e21703": { "message": "User Files" },
+  "user_images_b6490852": { "message": "User Images" },
+  "user_media_14fbf656": { "message": "User Media" },
+  "vector_notation_cf6086ab": { "message": "Vector (Notation)" },
   "vertical_bar_set_builder_notation_4300495f": {
     "message": "Vertical Bar (Set Builder Notation)"
   },
-  "vertical_dots_bfb21f14": {
-    "message": "Vertical Dots"
-  },
-  "video_options_24ef6e5d": {
-    "message": "Video Options"
-  },
-  "video_options_tray_3b9809a5": {
-    "message": "Video Options Tray"
-  },
-  "video_player_b371005": {
-    "message": "Video player"
-  },
-  "video_player_for_9e7d373b": {
-    "message": "Video player for "
-  },
+  "vertical_dots_bfb21f14": { "message": "Vertical Dots" },
+  "video_options_24ef6e5d": { "message": "Video Options" },
+  "video_options_tray_3b9809a5": { "message": "Video Options Tray" },
+  "video_player_b371005": { "message": "Video player" },
+  "video_player_for_9e7d373b": { "message": "Video player for " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Video player for { title }"
   },
-  "view_ba339f93": {
-    "message": "View"
-  },
-  "view_description_30446afc": {
-    "message": "View description"
-  },
-  "view_keyboard_shortcuts_34d1be0b": {
-    "message": "View keyboard shortcuts"
-  },
+  "view_ba339f93": { "message": "View" },
+  "view_description_30446afc": { "message": "View description" },
+  "view_keyboard_shortcuts_34d1be0b": { "message": "View keyboard shortcuts" },
   "view_title_description_67940918": {
     "message": "View { title } description"
   },
@@ -1518,21 +1060,11 @@ const locale = {
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Width and height must be numbers"
   },
-  "width_x_height_px_ff3ccb93": {
-    "message": "{ width } x { height }px"
-  },
-  "wiki_home_9cd54d0": {
-    "message": "Wiki Home"
-  },
-  "wreath_product_200b38ef": {
-    "message": "Wreath Product"
-  },
-  "xi_149681d0": {
-    "message": "Xi"
-  },
-  "yes_dde87d5": {
-    "message": "Yes"
-  },
+  "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
+  "wiki_home_9cd54d0": { "message": "Wiki Home" },
+  "wreath_product_200b38ef": { "message": "Wreath Product" },
+  "xi_149681d0": { "message": "Xi" },
+  "yes_dde87d5": { "message": "Yes" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "You have unsaved changes in the Icon Maker tray. Do you want to continue without saving these changes?"
   },
@@ -1557,18 +1089,10 @@ const locale = {
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Your webcam may already be in use."
   },
-  "zeta_5ef24f0e": {
-    "message": "Zeta"
-  },
-  "zoom_f3e54d69": {
-    "message": "Zoom"
-  },
-  "zoom_in_image_bb97d4f": {
-    "message": "Zoom in image"
-  },
-  "zoom_out_image_d0a0a2ec": {
-    "message": "Zoom out image"
-  }
+  "zeta_5ef24f0e": { "message": "Zeta" },
+  "zoom_f3e54d69": { "message": "Zoom" },
+  "zoom_in_image_bb97d4f": { "message": "Zoom in image" },
+  "zoom_out_image_d0a0a2ec": { "message": "Zoom out image" }
 }
 
 

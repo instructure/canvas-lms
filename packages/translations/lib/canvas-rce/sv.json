@@ -2,8 +2,12 @@
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n  other {}\n}"
   },
+  "decrease_indent_d9cf469d": { "message": "Minska indraget" },
   "description_436c48d7": { "message": "Beskrivning" },
+  "down_5831a426": { "message": "Ner" },
   "icon_215a1dc6": { "message": "Ikon" },
+  "increase_indent_6af90f7c": { "message": "Öka indraget" },
+  "insert_math_equation_57c6e767": { "message": "För in ett mattetal" },
   "links_to_an_external_site_de74145d": {
     "message": "Länkar till en externa sida."
   },
@@ -19,5 +23,6 @@
   },
   "this_document_cannot_be_displayed_within_canvas_7aba77be": {
     "message": "Det här dokumentet kan inte visas i Canvas."
-  }
+  },
+  "up_c553575d": { "message": "Upp" }
 }

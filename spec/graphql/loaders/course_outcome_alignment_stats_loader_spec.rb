@@ -22,7 +22,7 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
   context "with only direct alignments" do
     before :once do
       outcome_alignment_stats_model
-      @course.account.enable_feature!(:outcome_alignment_summary)
+      @course.account.enable_feature!(:improved_outcomes_management)
     end
 
     it "returns nil if course is invalid" do
@@ -34,7 +34,7 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
     end
 
     it "returns nil if outcome alignment summary FF is disabled" do
-      @course.account.disable_feature!(:outcome_alignment_summary)
+      @course.account.disable_feature!(:improved_outcomes_management)
 
       GraphQL::Batch.batch do
         Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |alignment_stats|
@@ -63,7 +63,7 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
       course_model
       @teacher = User.create!
       @course.enroll_teacher(@teacher, enrollment_state: "active")
-      @course.account.enable_feature!(:outcome_alignment_summary)
+      @course.account.enable_feature!(:improved_outcomes_management)
 
       assessment_question_bank_with_questions
       @outcome = outcome_model(context: @course, title: "outcome - aligned to question bank")
@@ -225,7 +225,7 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
       )
       @rubric.associate_with(@assignment5, @course, purpose: "grading")
 
-      @course.account.enable_feature!(:outcome_alignment_summary)
+      @course.account.enable_feature!(:improved_outcomes_management)
     end
 
     def unpublish_artifacts(*args)

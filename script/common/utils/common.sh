@@ -155,7 +155,7 @@ function check_dependencies {
       continue
     fi
     if [[ ${#dep[@]} -gt 1 ]]; then
-      version=$(eval "${dep[0]}" version |grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+")
+      version=$(eval "${dep[0]}" version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+" | head -1)
       if (( $(echo "$version ${dep[1]}" | awk '{print ($1 < $2)}') )); then
         wrong_version+=("$dependency or higher. Found: ${dep[0]} $version.")
       fi

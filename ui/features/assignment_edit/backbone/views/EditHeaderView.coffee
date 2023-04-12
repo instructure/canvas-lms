@@ -105,5 +105,7 @@ export default class EditHeaderView extends Backbone.View
     json = @model.toView()
     json.canDelete = @canDelete()
     json['CONDITIONAL_RELEASE_SERVICE_ENABLED'] = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+    json.courseId = ENV.COURSE_ID
+    json.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
     json['is_locked'] = (ENV.MASTER_COURSE_DATA?.is_master_course_child_content && ENV.MASTER_COURSE_DATA.restricted_by_master_course)
     json

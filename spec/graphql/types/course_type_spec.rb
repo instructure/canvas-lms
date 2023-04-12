@@ -191,7 +191,7 @@ describe Types::CourseType do
       account_admin_user
       outcome_alignment_stats_model
       course_with_student(course: @course)
-      @course.account.enable_feature!(:outcome_alignment_summary)
+      @course.account.enable_feature!(:improved_outcomes_management)
     end
 
     context "for users with Admin role" do

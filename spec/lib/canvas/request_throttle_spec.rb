@@ -19,15 +19,21 @@
 #
 
 describe RequestThrottle do
+  let(:site_admin_service_user) { site_admin_user }
+  let(:developer_key_sasu) { DeveloperKey.create!(account: Account.site_admin, user: site_admin_service_user) }
   let(:base_req) { { "QUERY_STRING" => "", "PATH_INFO" => "/", "REQUEST_METHOD" => "GET" } }
   let(:request_user_1) { base_req.merge({ "REMOTE_ADDR" => "1.2.3.4", "rack.session" => { user_id: 1 } }) }
   let(:request_user_2) { base_req.merge({ "REMOTE_ADDR" => "4.3.2.1", "rack.session" => { user_id: 2 } }) }
   let(:token1) { AccessToken.create!(user: user_factory) }
   let(:token2) { AccessToken.create!(user: user_factory) }
+  let(:token_sasu) { AccessToken.create!(developer_key: developer_key_sasu, user: site_admin_service_user) }
   let(:request_query_token) { request_user_1.merge({ "REMOTE_ADDR" => "1.2.3.4", "QUERY_STRING" => "access_token=#{token1.full_token}" }) }
   let(:request_header_token) { request_user_2.merge({ "REMOTE_ADDR" => "4.3.2.1", "HTTP_AUTHORIZATION" => "Bearer #{token2.full_token}" }) }
   let(:request_logged_out) { base_req.merge({ "REMOTE_ADDR" => "1.2.3.4", "rack.session.options" => { id: "sess1" } }) }
   let(:request_no_session) { base_req.merge({ "REMOTE_ADDR" => "1.2.3.4" }) }
+  let(:request_sasu) { request_no_session.merge({ "USER_AGENT" => "inst-service1/1t34F67e  	  (  region: us-east-1; host:p.8A67n5d30a9; env:	pRod)	" }) }
+  let(:request_sasu_query_token) { request_sasu.merge({ "QUERY_STRING" => "access_token=#{token_sasu.full_token}", "rack.input" => StringIO.new("") }) }
+  let(:request_sasu_header_token) { request_sasu.merge({ "HTTP_AUTHORIZATION" => "Bearer #{token_sasu.full_token}", "rack.input" => StringIO.new("") }) }
   let(:inner_app) { ->(_env) { response } }
   let(:throttler) { RequestThrottle.new(inner_app) }
   let(:rate_limit_exceeded) { throttler.rate_limit_exceeded }
@@ -46,8 +52,17 @@ describe RequestThrottle do
   end
 
   describe "#client_identifier" do
+    specs_require_sharding
+
     def req(hash)
-      ActionDispatch::Request.new(hash).tap(&:fullpath)
+      r = ActionDispatch::Request.new(hash).tap(&:fullpath)
+      allow(r).to receive(:user_agent).and_return(hash["USER_AGENT"]) if hash.key?("USER_AGENT")
+      r
+    end
+
+    it "uses site admin service user id" do
+      expect(throttler.client_identifier(req(request_sasu_query_token))).to eq "service_user_key:#{developer_key_sasu.global_id}"
+      expect(throttler.client_identifier(req(request_sasu_header_token))).to eq "service_user_key:#{developer_key_sasu.global_id}"
     end
 
     it "uses access token" do

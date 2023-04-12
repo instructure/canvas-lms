@@ -307,7 +307,7 @@ module Api::V1::Attachment
     # an LTI request
     actual_user = opts[:override_logged_in_user] ? current_user : logged_in_user
 
-    # user must have permission on folder to user a custom folder other
+    # user must have permission on folder to use a custom folder other
     # than the "preferred" folder (that specified by the caller).
     folder = infer_upload_folder(context, params)
     return if folder && !authorized_action(folder, current_user, :manage_contents)

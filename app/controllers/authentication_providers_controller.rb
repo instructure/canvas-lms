@@ -1001,7 +1001,7 @@ class AuthenticationProvidersController < ApplicationController
     data[:auth_type] = auth_type
     if data[:auth_type] == "ldap"
       data[:auth_over_tls] = "start_tls" unless data.key?(:auth_over_tls)
-      data[:auth_over_tls] = AuthenticationProvider::LDAP.auth_over_tls_setting(data[:auth_over_tls])
+      data[:auth_over_tls] = AuthenticationProvider::LDAP.auth_over_tls_setting(data[:auth_over_tls], tls_required: @account.feature_enabled?(:verify_ldap_certs))
     end
     if data[:mfa_option]
       data[:mfa_required] = data[:mfa_option] == "required"

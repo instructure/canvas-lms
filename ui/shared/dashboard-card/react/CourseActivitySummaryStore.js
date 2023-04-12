@@ -19,6 +19,12 @@
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 import createStore from '@canvas/util/createStore'
 
+/**
+ * @type { import('@canvas/util/createStore').CanvasStore<{streams: Record<string, {stream?: unknown[]}> }> & {
+ *   _fetchForCourse: (courseId: string) => Promise<void>
+ *   getStateForCourse: (courseId: string) => {stream?: unknown[]} | undefined
+ * } }
+ */
 const CourseActivitySummaryStore = createStore({streams: {}})
 
 CourseActivitySummaryStore.getStateForCourse = function (courseId) {

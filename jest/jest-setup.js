@@ -51,7 +51,6 @@ const ignoredErrors = [
   /An update to %s inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
   /contextType was defined as an instance property on %s/,
-  /Functions are not valid as a React child/, // https://instructure.atlassian.net/browse/LS-3837
   /Function components cannot be given refs/,
   /Invalid prop `children` supplied to `(Option)`/,
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
@@ -61,12 +60,11 @@ const ignoredErrors = [
   /Prop `children` should be supplied unless/, // https://instructure.atlassian.net/browse/FOO-3407
   /Render methods should be a pure function of props and state/, // https://instructure.atlassian.net/browse/LS-3840
   /The above error occurred in the <.*> component/,
-  /Warning: Failed prop type: Expected one of Checkbox in CheckboxGroup but found `View`/, // https://instructure.atlassian.net/browse/VICE-3378
   /You seem to have overlapping act\(\) calls/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
-  /Please update the following components: %s/, // https://instructure.atlassian.net/browse/LS-3841
+  /Please update the following components: %s/, // https://instructure.atlassian.net/browse/LS-3901 & https://instructure.atlassian.net/browse/LS-3906
   /value provided is not in a recognized RFC2822 or ISO format/,
 ]
 global.console = {

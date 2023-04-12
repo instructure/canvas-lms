@@ -19,10 +19,11 @@
  */
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 try {
   stage('Upload Junit Results') {
-    protectedNode(configuration.nodeLabel()) {
+    protectedNode(nodeLabel()) {
       def buildLinks = buildSummaryReport.getSubBuildLinks(env.SOURCE)
 
       buildLinks.each { buildLink ->

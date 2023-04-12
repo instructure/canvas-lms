@@ -21,8 +21,6 @@
 require "nokogiri"
 
 class BookmarkService < UserService
-  include Delicious
-
   def post_bookmark(opts)
     url = opts[:url]
     return unless url
@@ -32,17 +30,17 @@ class BookmarkService < UserService
     tags = opts[:tags] || ["instructure"]
     begin
       case service
-      when "delicious"
-        delicious_post_bookmark(self, url, title, description, tags)
       when "diigo"
         Diigo::Connection.diigo_post_bookmark(self, url, title, description, tags)
+      else
+        raise "Unknown bookmark service: #{service}"
       end
     rescue
       # Should probably save the data to try again if it fails... at least one more try
     end
   end
 
-  def find_bookmarks(query)
+  def find_bookmarks
     if service == "diigo"
       last_get = Rails.cache.fetch("last_diigo_lookup") { Time.now - 60 }
       if Time.now - last_get < 8
@@ -51,10 +49,10 @@ class BookmarkService < UserService
       end
       Rails.cache.write("last_diigo_lookup", Time.now)
     end
-    bookmark_search(self, query)
+    bookmark_search(self)
   end
 
-  def bookmark_search(service, query)
+  def bookmark_search(service)
     bookmarks = []
     case service.service
     when "diigo"
@@ -71,25 +69,8 @@ class BookmarkService < UserService
       else
         bookmarks
       end
-    when "delicious"
-      # This needs to be rewritten with new API and moved into a gem. (Currently not working and no way to test without updating the API.)
-      url = "https://api.del.icio.us/v1/posts/all?tag=#{query}"
-      http, request = delicious_generate_request(url, "GET", service.service_user_name, service.decrypted_password)
-      response = http.request(request)
-      case response
-      when Net::HTTPSuccess
-        document = Nokogiri::XML(response.body)
-        document.search("/posts/post").each do |post|
-          bookmarks << {
-            title: post["description"],
-            url: post["href"],
-            description: post["description"],
-            tags: post["tags"]
-          }
-        end
-      else
-        response.error!
-      end
+    else
+      raise "Unknown bookmark service: #{service}"
     end
     bookmarks
   end

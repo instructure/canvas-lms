@@ -127,7 +127,9 @@
           <div class="menu-item-icon-container" aria-hidden="true">
             <%= render(partial: dashboard_icon_path, formats: [:svg]) %>
           </div>
-          <div class="menu-item__text"><%= dashboard_title %></div>
+          <div class="menu-item__text">
+            <%= dashboard_title %>
+          </div>
         </a>
       </li>
       <% if @current_user %>
@@ -201,7 +203,7 @@
               <%= render(partial: "shared/svg/svg_icon_#{help_link_icon}", formats: [:svg]) %>
             <% else # fallback for if it is not one of the expected icons we know we have %>
               <%= svg_icon help_link_icon %>
-            <% end%>
+            <% end %>
             <span class="menu-item__badge"></span>
           </div>
           <div class="menu-item__text">

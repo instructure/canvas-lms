@@ -133,7 +133,7 @@ export default class TrayController {
       this._renderId++
     }
     const io = asImageEmbed(this.$img)
-    io.isLinked = this._editor.selection.getSel().anchorNode.tagName === 'A'
+    io.isLinked = this._editor?.selection?.getSel().anchorNode.tagName === 'A'
 
     const element = (
       <ImageOptionsTray

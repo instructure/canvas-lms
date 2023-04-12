@@ -34,7 +34,9 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
   const columns = gridSupport.columns.getColumns()
 
   const isInBack = columns.scrollable[columns.scrollable.length - 1]?.id === 'total_grade'
-  const isInFront = columns.frozen.some(frozenColumn => frozenColumn.id === 'total_grade')
+  const isInFront = columns.frozen.some(
+    (frozenColumn: {id: string}) => frozenColumn.id === 'total_grade'
+  )
 
   let onApplyScoreToUngraded
   if (gradebook.allowApplyScoreToUngraded()) {
@@ -55,7 +57,7 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
       onSelect: gradebook.togglePointsOrPercentTotals,
     },
 
-    onHeaderKeyDown: event => {
+    onHeaderKeyDown: (event: React.KeyboardEvent) => {
       gradebook.handleHeaderKeyDown(event, columnId)
     },
     onMenuDismiss() {

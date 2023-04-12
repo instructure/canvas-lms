@@ -110,7 +110,6 @@ describe TermsController do
       course_model(account: @account)
       account_admin_user(account: @account)
       @course.account.enable_feature!(:course_paces)
-      @course.restrict_enrollments_to_course_dates = false
       @course.enable_course_paces = true
       @course.save!
       @course_pace = course_pace_model(course: @course)

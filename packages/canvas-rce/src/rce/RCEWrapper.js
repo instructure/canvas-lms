@@ -73,6 +73,7 @@ import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
 import contentCSSBinding from 'tinymce/skins/ui/oxide/content.css'
 import {rceWrapperPropTypes} from './RCEWrapperProps'
 import {removePlaceholder} from '../util/loadingPlaceholder'
+import {transformRceContentForEditing} from './transformContent'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -106,6 +107,14 @@ function injectTinySkin() {
   style.appendChild(
     // the .replace here is because the ui-themeable babel hook adds that prefix to all the class names
     document.createTextNode(skinCSS)
+  )
+  // there's CSS from discussions that turns the instui Selectors bold
+  // and in classic quizzes that also mucks with padding
+  style.appendChild(
+    document.createTextNode(`
+      #discussion-edit-view .rce-wrapper input[readonly] {font-weight: normal;}
+      #quiz_edit_wrapper .rce-wrapper input[readonly] {font-weight: normal; padding-left: .75rem;}
+    `)
   )
   const beforeMe =
     document.head.querySelector('style[data-glamor]') || // find instui's themeable stylesheet
@@ -225,6 +234,13 @@ class RCEWrapper extends React.Component {
     this._prettyHtmlEditorRef = React.createRef()
     this._showOnFocusButton = null
 
+    // Process initial content
+    this.initialContent = this.getRequiredFeatureStatuses().rce_transform_loaded_content
+      ? transformRceContentForEditing(this.props.defaultContent, {
+          origin: this.props.canvasOrigin || window?.location?.origin,
+        })
+      : this.props.defaultContent
+
     injectTinySkin()
 
     // FWIW, for historic reaasons, the height does not include the
@@ -281,17 +297,6 @@ class RCEWrapper extends React.Component {
 
     this.handleContentTrayClosing = this.handleContentTrayClosing.bind(this)
 
-    this.a11yCheckerReady = import('../tinymce-a11y-checker/plugin')
-      .then(a11yChecker => {
-        const locale = this.language === 'zh-Hant' ? 'zh-HK' : this.language
-        a11yChecker.setLocale(locale)
-        this.checkAccessibility()
-      })
-      .catch(err => {
-        // eslint-disable-next-line no-console
-        console.error('Failed initializing a11y checker', err)
-      })
-
     this.resizeObserver = new ResizeObserver(_entries => {
       this._handleFullscreenResize()
     })
@@ -327,6 +332,7 @@ class RCEWrapper extends React.Component {
       rce_improved_placeholders = false,
       explicit_latex_typesetting = false,
       rce_show_studio_media_options = false,
+      rce_transform_loaded_content = false,
     } = this.props.features
 
     return {
@@ -337,6 +343,7 @@ class RCEWrapper extends React.Component {
       rce_improved_placeholders,
       explicit_latex_typesetting,
       rce_show_studio_media_options,
+      rce_transform_loaded_content,
     }
   }
 
@@ -839,18 +846,21 @@ class RCEWrapper extends React.Component {
     if (this.mceInstance().isDirty()) {
       return true
     }
-    const content = this.isHidden() ? this.textareaValue() : this.mceInstance()?.getContent()
-    return content !== this.cleanInitialContent()
+    const currentHtml = this.isHidden() ? this.textareaValue() : this.mceInstance()?.getContent()
+    return currentHtml !== this._mceSerializedInitialHtml
   }
 
-  cleanInitialContent() {
-    if (!this._cleanInitialContent) {
+  /**
+   * Holds a copy of the initial content of the editor as serialized by tinyMCE to normalize it.
+   */
+  get _mceSerializedInitialHtml() {
+    if (!this._mceSerializedInitialHtmlCached) {
       const el = window.document.createElement('div')
-      el.innerHTML = this.props.defaultContent
+      el.innerHTML = this.initialContent
       const serializer = this.mceInstance().serializer
-      this._cleanInitialContent = serializer.serialize(el, {getInner: true})
+      this._mceSerializedInitialHtmlCached = serializer.serialize(el, {getInner: true})
     }
-    return this._cleanInitialContent
+    return this._mceSerializedInitialHtmlCached
   }
 
   isHtmlView() {
@@ -1098,6 +1108,8 @@ class RCEWrapper extends React.Component {
     }
 
     this._setupSelectionSaving(editor)
+
+    this.checkAccessibility()
 
     this.props.onInitted?.(editor)
   }
@@ -1424,20 +1436,17 @@ class RCEWrapper extends React.Component {
   }
 
   onA11yChecker = () => {
-    // eslint-disable-next-line promise/catch-or-return
-    this.a11yCheckerReady.then(() => {
-      const editor = this.mceInstance()
-      editor.execCommand(
-        'openAccessibilityChecker',
-        false,
-        {
-          mountNode: instuiPopupMountNode,
-        },
-        {
-          skip_focus: true,
-        }
-      )
-    })
+    const editor = this.mceInstance()
+    editor.execCommand(
+      'openAccessibilityChecker',
+      false,
+      {
+        mountNode: instuiPopupMountNode,
+      },
+      {
+        skip_focus: true,
+      }
+    )
   }
 
   checkAccessibility = () => {
@@ -1521,6 +1530,7 @@ class RCEWrapper extends React.Component {
           !isOnCanvasDomain || rceFeatures.rce_new_external_tool_dialog_in_canvas
             ? 'instructure_rce_external_tools'
             : 'instructure_external_tools',
+          'a11y_checker',
         ]
       : ['instructure_links']
     if (rcsExists && !this.props.instRecordDisabled) {
@@ -1967,7 +1977,7 @@ class RCEWrapper extends React.Component {
                   id={mceProps.textareaId}
                   textareaName={mceProps.name}
                   init={this.tinymceInitOptions}
-                  initialValue={mceProps.defaultContent}
+                  initialValue={this.initialContent}
                   onInit={this.onInit}
                   onClick={this.handleFocusEditor}
                   onKeypress={this.handleFocusEditor}

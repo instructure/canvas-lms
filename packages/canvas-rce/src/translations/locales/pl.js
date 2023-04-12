@@ -57,123 +57,55 @@ const locale = {
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "Podczas wysyłania multimediów wystąpił błąd."
   },
-  "and_7fcc2911": {
-    "message": "Oraz"
-  },
-  "angle_c5b4ec50": {
-    "message": "Kąt"
-  },
-  "announcement_list_da155734": {
-    "message": "Lista ogłoszeń"
-  },
-  "announcements_a4b8ed4a": {
-    "message": "Ogłoszenia"
-  },
-  "apply_781a2546": {
-    "message": "Zastosuj"
-  },
+  "and_7fcc2911": { "message": "Oraz" },
+  "angle_c5b4ec50": { "message": "Kąt" },
+  "announcement_list_da155734": { "message": "Lista ogłoszeń" },
+  "announcements_a4b8ed4a": { "message": "Ogłoszenia" },
+  "apply_781a2546": { "message": "Zastosuj" },
   "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
     "message": "Zastosuj zmiany do wszystkich instancji tej ikony Icon Maker w kursie"
   },
-  "approaches_the_limit_893aeec9": {
-    "message": "Zbliża się do granicy"
-  },
-  "approximately_e7965800": {
-    "message": "W przybliżeniu"
-  },
-  "apps_54d24a47": {
-    "message": "Aplikacje"
-  },
-  "arrows_464a3e54": {
-    "message": "Strzałki"
-  },
-  "art_icon_8e1daad": {
-    "message": "Ikona sztuki"
-  },
+  "approaches_the_limit_893aeec9": { "message": "Zbliża się do granicy" },
+  "approximately_e7965800": { "message": "W przybliżeniu" },
+  "apps_54d24a47": { "message": "Aplikacje" },
+  "arrows_464a3e54": { "message": "Strzałki" },
+  "art_icon_8e1daad": { "message": "Ikona sztuki" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Współczynnik proporcji zostanie zachowany"
   },
-  "assignments_1e02582c": {
-    "message": "Zadania"
-  },
-  "asterisk_82255584": {
-    "message": "Gwiazdka"
-  },
-  "attributes_963ba262": {
-    "message": "Właściwości"
-  },
+  "assignments_1e02582c": { "message": "Zadania" },
+  "asterisk_82255584": { "message": "Gwiazdka" },
+  "attributes_963ba262": { "message": "Właściwości" },
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Nagrywanie dźwięku i wideo nie jest obsługiwane; użyj innej przeglądarki."
   },
-  "audio_options_feb58e2c": {
-    "message": "Opcje audio"
-  },
-  "audio_options_tray_33a90711": {
-    "message": "Panel opcji audio"
-  },
+  "audio_options_feb58e2c": { "message": "Opcje audio" },
+  "audio_options_tray_33a90711": { "message": "Panel opcji audio" },
   "audio_player_for_title_20cc70d": {
     "message": "Odtwarzacz audio dla { title }"
   },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Istnieje automatycznie zapisana zawartość. Czy wolisz wczytać automatyczną zawartość?"
   },
-  "available_folders_694d0436": {
-    "message": "Dostępne foldery"
-  },
-  "backslash_b2d5442d": {
-    "message": "Ukośnik lewy"
-  },
-  "bar_ec63ed6": {
-    "message": "Kreska"
-  },
-  "basic_554cdc0a": {
-    "message": "Podstawowy"
-  },
-  "because_501841b": {
-    "message": "Ponieważ"
-  },
-  "below_81d4dceb": {
-    "message": "Poniżej"
-  },
-  "beta_cb5f307e": {
-    "message": "Beta"
-  },
-  "big_circle_16b2e604": {
-    "message": "Duży okrąg"
-  },
-  "binomial_coefficient_ea5b9bb7": {
-    "message": "Współczynnik dwumianowy"
-  },
-  "black_4cb01371": {
-    "message": "Czarny"
-  },
-  "blue_daf8fea9": {
-    "message": "Niebieski"
-  },
-  "bottom_15a2a9be": {
-    "message": "Dół"
-  },
-  "bottom_third_5f5fec1d": {
-    "message": "Trzeci od dołu"
-  },
-  "bowtie_5f9629e4": {
-    "message": "Muszka"
-  },
-  "brick_f2656265": {
-    "message": "Cegła"
-  },
-  "c_2001_acme_inc_283f7f80": {
-    "message": "(c) 2001 Acme Inc."
-  },
-  "cancel_caeb1e68": {
-    "message": "Anuluj"
-  },
-  "cap_product_3a5265a6": {
-    "message": "G mnożenie"
-  },
-  "centered_dot_64d5e378": {
-    "message": "Kropka wyśrodkowana"
-  },
+  "available_folders_694d0436": { "message": "Dostępne foldery" },
+  "backslash_b2d5442d": { "message": "Ukośnik lewy" },
+  "bar_ec63ed6": { "message": "Kreska" },
+  "basic_554cdc0a": { "message": "Podstawowy" },
+  "because_501841b": { "message": "Ponieważ" },
+  "below_81d4dceb": { "message": "Poniżej" },
+  "beta_cb5f307e": { "message": "Beta" },
+  "big_circle_16b2e604": { "message": "Duży okrąg" },
+  "binomial_coefficient_ea5b9bb7": { "message": "Współczynnik dwumianowy" },
+  "black_4cb01371": { "message": "Czarny" },
+  "blue_daf8fea9": { "message": "Niebieski" },
+  "bottom_15a2a9be": { "message": "Dół" },
+  "bottom_third_5f5fec1d": { "message": "Trzeci od dołu" },
+  "bowtie_5f9629e4": { "message": "Muszka" },
+  "brick_f2656265": { "message": "Cegła" },
+  "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Anuluj" },
+  "cap_product_3a5265a6": { "message": "G mnożenie" },
+  "centered_dot_64d5e378": { "message": "Kropka wyśrodkowana" },
   "centered_horizontal_dots_451c5815": {
     "message": "Wyśrodkowane kropki poziomo"
   },
@@ -205,9 +137,7 @@ const locale = {
   "click_to_embed_imagename_c41ea8df": {
     "message": "Kliknij, aby osadzić { imageName }"
   },
-  "click_to_hide_preview_3c707763": {
-    "message": "Kliknij, aby ukryć podgląd"
-  },
+  "click_to_hide_preview_3c707763": { "message": "Kliknij, aby ukryć podgląd" },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Kliknij, aby wstawić łącze do edytora."
   },
@@ -227,18 +157,12 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": {
     "message": "Napisy / napisy dla niesłyszących"
   },
-  "clubs_suit_c1ffedff": {
-    "message": "Trefle (kolor)"
-  },
-  "collaborations_5c56c15f": {
-    "message": "Współprace"
-  },
+  "clubs_suit_c1ffedff": { "message": "Trefle (kolor)" },
+  "collaborations_5c56c15f": { "message": "Współprace" },
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Kliknij, aby ukryć { types }"
   },
-  "color_picker_6b359edf": {
-    "message": "Narzędzie wyboru kolorów"
-  },
+  "color_picker_6b359edf": { "message": "Narzędzie wyboru kolorów" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Narzędzie wyboru kolorów (wybrano { colorName })"
   },
@@ -252,48 +176,24 @@ const locale = {
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Zawartość jest nadal przesyłana; w przypadku kontynuowania obraz nie zostanie prawidłowo osadzony."
   },
-  "content_subtype_5ce35e88": {
-    "message": "Podtyp zawartości"
-  },
-  "content_type_2cf90d95": {
-    "message": "Typ zawartości"
-  },
-  "coproduct_e7838082": {
-    "message": "Suma"
-  },
-  "copyright_holder_66ee111": {
-    "message": "Właściciel praw autorskich:"
-  },
+  "content_subtype_5ce35e88": { "message": "Podtyp zawartości" },
+  "content_type_2cf90d95": { "message": "Typ zawartości" },
+  "coproduct_e7838082": { "message": "Suma" },
+  "copyright_holder_66ee111": { "message": "Właściciel praw autorskich:" },
   "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
     "message": "{ count, plural,\n     =0 {0 słów}\n    one {1 słowo}\n  other {# słowa}\n}"
   },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {# element przesłany}\n  other {# elementów przesłanych}\n}"
   },
-  "course_documents_104d76e0": {
-    "message": "Dokumenty kursu"
-  },
-  "course_files_62deb8f8": {
-    "message": "Pliki kursu"
-  },
-  "course_files_a31f97fc": {
-    "message": "Pliki kursu"
-  },
-  "course_images_f8511d04": {
-    "message": "Obrazy kursu"
-  },
-  "course_links_b56959b9": {
-    "message": "Łącza kursu"
-  },
-  "course_media_ec759ad": {
-    "message": "Multimedia kursu"
-  },
-  "course_navigation_dd035109": {
-    "message": "Nawigowanie po kursie"
-  },
-  "create_icon_110d6463": {
-    "message": "Utwórz ikonę"
-  },
+  "course_documents_104d76e0": { "message": "Dokumenty kursu" },
+  "course_files_62deb8f8": { "message": "Pliki kursu" },
+  "course_files_a31f97fc": { "message": "Pliki kursu" },
+  "course_images_f8511d04": { "message": "Obrazy kursu" },
+  "course_links_b56959b9": { "message": "Łącza kursu" },
+  "course_media_ec759ad": { "message": "Multimedia kursu" },
+  "course_navigation_dd035109": { "message": "Nawigowanie po kursie" },
+  "create_icon_110d6463": { "message": "Utwórz ikonę" },
   "creative_commons_license_725584ae": {
     "message": "Licencja Creative Commons:"
   },
@@ -335,57 +235,35 @@ const locale = {
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Wyświetl łącze tekstowe (otwiera się w nowej karcie)"
   },
-  "division_sign_72190870": {
-    "message": "Znak dzielenia"
-  },
-  "documents_81393201": {
-    "message": "Dokumenty"
-  },
-  "done_54e3d4b6": {
-    "message": "Gotowe"
-  },
-  "double_dagger_faf78681": {
-    "message": "Podwójny krzyż"
-  },
+  "division_sign_72190870": { "message": "Znak dzielenia" },
+  "documents_81393201": { "message": "Dokumenty" },
+  "done_54e3d4b6": { "message": "Gotowe" },
+  "double_dagger_faf78681": { "message": "Podwójny krzyż" },
   "down_and_left_diagonal_arrow_40ef602c": {
     "message": "Strzałka po przekątnej w dół i w lewo"
   },
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Strzałka po przekątnej w dół i w prawo"
   },
-  "download_filename_2baae924": {
-    "message": "Pobierz { filename }"
-  },
-  "downward_arrow_cca52012": {
-    "message": "Strzałka w dół"
-  },
+  "download_filename_2baae924": { "message": "Pobierz { filename }" },
+  "downward_arrow_cca52012": { "message": "Strzałka w dół" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Trójkąt skierowany w dół"
   },
-  "drag_a_file_here_1bf656d5": {
-    "message": "Przeciągnij plik tutaj"
-  },
+  "drag_a_file_here_1bf656d5": { "message": "Przeciągnij plik tutaj" },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Przeciągnij i upuść lub kliknij, aby przeglądać komputer"
   },
   "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
     "message": "Przeciągnij uchwyt. Użyj strzałek w dół i w górę, aby zmienić rozmiar"
   },
-  "due_multiple_dates_cc0ee3f5": {
-    "message": "Termin: Wiele dat"
-  },
-  "due_when_7eed10c6": {
-    "message": "Termin: { when }"
-  },
+  "due_multiple_dates_cc0ee3f5": { "message": "Termin: Wiele dat" },
+  "due_when_7eed10c6": { "message": "Termin: { when }" },
   "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
     "message": "Edytuj tekst alternatywny dla tej instancji ikony"
   },
-  "edit_c5fbea07": {
-    "message": "Edytuj"
-  },
-  "edit_course_link_5a5c3c59": {
-    "message": "Edytuj łącze do kursu"
-  },
+  "edit_c5fbea07": { "message": "Edytuj" },
+  "edit_course_link_5a5c3c59": { "message": "Edytuj łącze do kursu" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Edytuj istniejącą ikonę Icon Maker"
   },
@@ -410,69 +288,35 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Wpisz co najmniej 3 znaki, aby wyszukać."
   },
-  "epsilon_54bb8afa": {
-    "message": "Epsilon"
-  },
-  "epsilon_variant_d31f1e77": {
-    "message": "Epsilon (wariant)"
-  },
-  "equals_sign_c51bdc58": {
-    "message": "Znak równości"
-  },
-  "equation_editor_39fbc3f1": {
-    "message": "Edytor równań"
-  },
-  "equivalence_class_7b0f11c0": {
-    "message": "Klasa równoważności"
-  },
-  "equivalent_identity_654b3ce5": {
-    "message": "Równoważność (identyczność)"
-  },
-  "eta_b8828f99": {
-    "message": "ETA"
-  },
-  "exists_2e62bdaa": {
-    "message": "Istnieje"
-  },
-  "exit_fullscreen_b7eb0aa4": {
-    "message": "Zamknij tryb pełnoekranowy"
-  },
+  "epsilon_54bb8afa": { "message": "Epsilon" },
+  "epsilon_variant_d31f1e77": { "message": "Epsilon (wariant)" },
+  "equals_sign_c51bdc58": { "message": "Znak równości" },
+  "equation_editor_39fbc3f1": { "message": "Edytor równań" },
+  "equivalence_class_7b0f11c0": { "message": "Klasa równoważności" },
+  "equivalent_identity_654b3ce5": { "message": "Równoważność (identyczność)" },
+  "eta_b8828f99": { "message": "ETA" },
+  "exists_2e62bdaa": { "message": "Istnieje" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Zamknij tryb pełnoekranowy" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Domyślnie rozwiń podgląd"
   },
   "expand_to_see_types_f5d29352": {
     "message": "Rozszerz, aby zobaczyć { types }"
   },
-  "external_tools_6e77821": {
-    "message": "Narzędzia zewnętrzne"
-  },
-  "extra_large_b6cdf1ff": {
-    "message": "Wyjątkowo duże"
-  },
-  "extra_small_9ae33252": {
-    "message": "Bardzo małe"
-  },
-  "extracurricular_icon_67c8ca42": {
-    "message": "Ikona zajęć pozalekcyjnych"
-  },
-  "f_function_fe422d65": {
-    "message": "F (funkcja)"
-  },
+  "external_tools_6e77821": { "message": "Narzędzia zewnętrzne" },
+  "extra_large_b6cdf1ff": { "message": "Wyjątkowo duże" },
+  "extra_small_9ae33252": { "message": "Bardzo małe" },
+  "extracurricular_icon_67c8ca42": { "message": "Ikona zajęć pozalekcyjnych" },
+  "f_function_fe422d65": { "message": "F (funkcja)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Nie udało się pobrać zawartości pliku"
   },
-  "file_name_8fd421ff": {
-    "message": "Nazwa pliku"
-  },
+  "file_name_8fd421ff": { "message": "Nazwa pliku" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Przekroczono przydział magazynowania plików"
   },
-  "file_url_c12b64be": {
-    "message": "Adres URL pliku"
-  },
-  "filename_file_icon_602eb5de": {
-    "message": "Ikona pliku { filename }"
-  },
+  "file_url_c12b64be": { "message": "Adres URL pliku" },
+  "filename_file_icon_602eb5de": { "message": "Ikona pliku { filename }" },
   "filename_image_preview_6cef8f26": {
     "message": "Podgląd obrazu { filename }"
   },
@@ -501,18 +345,10 @@ const locale = {
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Odnaleziono { count, plural,\n     =0 {# wyników}\n    one {# wynik}\n  other {# wyników}\n}"
   },
-  "fraction_41bac7af": {
-    "message": "Ułamek"
-  },
-  "fullscreen_873bf53f": {
-    "message": "Pełny ekran"
-  },
-  "gamma_1767928": {
-    "message": "Gamma"
-  },
-  "generating_preview_45b53be0": {
-    "message": "Generowanie podglądu..."
-  },
+  "fraction_41bac7af": { "message": "Ułamek" },
+  "fullscreen_873bf53f": { "message": "Pełny ekran" },
+  "gamma_1767928": { "message": "Gamma" },
+  "generating_preview_45b53be0": { "message": "Generowanie podglądu..." },
   "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
     "message": "Obrazy w formacie GIF/PNG większe niż { size } kB nie są obecnie obsługiwane."
   },
@@ -567,36 +403,16 @@ const locale = {
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Mam uprawnienie do korzystania z tego pliku."
   },
-  "i_hold_the_copyright_71ee91b1": {
-    "message": "Posiadam prawa autorskie"
-  },
-  "icon_215a1dc6": {
-    "message": "Ikona"
-  },
-  "icon_8168b2f8": {
-    "message": "ikona"
-  },
-  "icon_color_b86dd6d6": {
-    "message": "Kolor ikony"
-  },
-  "icon_maker_icons_cc560f7e": {
-    "message": "Ikony Icon Maker"
-  },
-  "icon_options_7e32746e": {
-    "message": "Opcje ikony"
-  },
-  "icon_options_tray_2b407977": {
-    "message": "Panel opcji ikony"
-  },
-  "icon_preview_1782a1d9": {
-    "message": "Podgląd ikony"
-  },
-  "icon_shape_30b61e7": {
-    "message": "Kształt ikony"
-  },
-  "icon_size_9353edea": {
-    "message": "Rozmiar ikony"
-  },
+  "i_hold_the_copyright_71ee91b1": { "message": "Posiadam prawa autorskie" },
+  "icon_215a1dc6": { "message": "Ikona" },
+  "icon_8168b2f8": { "message": "ikona" },
+  "icon_color_b86dd6d6": { "message": "Kolor ikony" },
+  "icon_maker_icons_cc560f7e": { "message": "Ikony Icon Maker" },
+  "icon_options_7e32746e": { "message": "Opcje ikony" },
+  "icon_options_tray_2b407977": { "message": "Panel opcji ikony" },
+  "icon_preview_1782a1d9": { "message": "Podgląd ikony" },
+  "icon_shape_30b61e7": { "message": "Kształt ikony" },
+  "icon_size_9353edea": { "message": "Rozmiar ikony" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
     "message": "Jeśli łącze pozostanie puste, tekst zostanie wyświetlony jako nazwa łącza do kursu"
   },
@@ -685,18 +501,12 @@ const locale = {
   "left_downard_harpoon_arrow_1d7b3d2e": {
     "message": "Strzała harpuna w lewo w dół"
   },
-  "left_floor_29ac2274": {
-    "message": "Lewa podłoga"
-  },
-  "left_to_right_e9b4fd06": {
-    "message": "Lewa-prawa"
-  },
+  "left_floor_29ac2274": { "message": "Lewa podłoga" },
+  "left_to_right_e9b4fd06": { "message": "Lewa-prawa" },
   "left_upward_harpoon_arrow_3a562a96": {
     "message": "Strzała harpuna w lewo do góry"
   },
-  "leftward_arrow_1e4765de": {
-    "message": "Strzałka w lewo"
-  },
+  "leftward_arrow_1e4765de": { "message": "Strzałka w lewo" },
   "leftward_pointing_triangle_d14532ce": {
     "message": "Trójkąt skierowany w lewo"
   },
@@ -722,27 +532,13 @@ const locale = {
   "loading_closed_captions_subtitles_failed_95ceef47": {
     "message": "Nie udało się wczytać napisów (dla niesłyszących)."
   },
-  "loading_failed_b3524381": {
-    "message": "Niepowodzenie wczytywania..."
-  },
-  "loading_failed_e6a9d8ef": {
-    "message": "Niepowodzenie wczytywania."
-  },
-  "loading_folders_d8b5869e": {
-    "message": "Wczytywanie folderów"
-  },
-  "loading_please_wait_d276220a": {
-    "message": "Ładowanie, proszę czekać"
-  },
-  "loading_preview_9f077aa1": {
-    "message": "Wczytywanie podglądu"
-  },
-  "locked_762f138b": {
-    "message": "Zablokowany"
-  },
-  "logical_equivalence_76fca396": {
-    "message": "Równoważność logiczna"
-  },
+  "loading_failed_b3524381": { "message": "Niepowodzenie wczytywania..." },
+  "loading_failed_e6a9d8ef": { "message": "Niepowodzenie wczytywania." },
+  "loading_folders_d8b5869e": { "message": "Wczytywanie folderów" },
+  "loading_please_wait_d276220a": { "message": "Ładowanie, proszę czekać" },
+  "loading_preview_9f077aa1": { "message": "Wczytywanie podglądu" },
+  "locked_762f138b": { "message": "Zablokowany" },
+  "logical_equivalence_76fca396": { "message": "Równoważność logiczna" },
   "logical_equivalence_short_8efd7b4f": {
     "message": "Równoważność logiczna (krótki)"
   },
@@ -752,21 +548,11 @@ const locale = {
   "logical_equivalence_thick_662dd3f2": {
     "message": "Równoważność logiczna (pogrubiony)"
   },
-  "low_horizontal_dots_cc08498e": {
-    "message": "Niskie kropki poziomo"
-  },
-  "magenta_4a65993c": {
-    "message": "Amarantowy"
-  },
-  "maps_to_e5ef7382": {
-    "message": "Mapy do"
-  },
-  "math_icon_ad4e9d03": {
-    "message": "Ikona matematyki"
-  },
-  "media_af190855": {
-    "message": "Multimedia"
-  },
+  "low_horizontal_dots_cc08498e": { "message": "Niskie kropki poziomo" },
+  "magenta_4a65993c": { "message": "Amarantowy" },
+  "maps_to_e5ef7382": { "message": "Mapy do" },
+  "math_icon_ad4e9d03": { "message": "Ikona matematyki" },
+  "media_af190855": { "message": "Multimedia" },
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Trwa przetwarzanie pliku multimediów. Spróbuj ponownie później."
   },
@@ -792,27 +578,13 @@ const locale = {
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Wymagane co najmniej { width } x { height } px"
   },
-  "my_files_2f621040": {
-    "message": "Moje pliki"
-  },
-  "n_th_root_9991a6e4": {
-    "message": "Pierwiastek n-tego stopnia"
-  },
-  "nabla_1e216d25": {
-    "message": "Nabla"
-  },
-  "name_1aed4a1b": {
-    "message": "Nazwa"
-  },
-  "name_color_ceec76ff": {
-    "message": "{ name } ({ color })"
-  },
-  "natural_music_54a70258": {
-    "message": "Kasownik (muzyka)"
-  },
-  "natural_numbers_3da07060": {
-    "message": "Liczby naturalne"
-  },
+  "my_files_2f621040": { "message": "Moje pliki" },
+  "n_th_root_9991a6e4": { "message": "Pierwiastek n-tego stopnia" },
+  "nabla_1e216d25": { "message": "Nabla" },
+  "name_1aed4a1b": { "message": "Nazwa" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
+  "natural_music_54a70258": { "message": "Kasownik (muzyka)" },
+  "natural_numbers_3da07060": { "message": "Liczby naturalne" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Przejdź w menu lub na pasku narzędzi"
   },
@@ -829,84 +601,46 @@ const locale = {
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Nie ma możliwości podglądu tego pliku."
   },
-  "no_results_940393cf": {
-    "message": "Brak wyników."
-  },
+  "no_results_940393cf": { "message": "Brak wyników." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nie znaleziono wyników dla { filterTerm }"
   },
-  "no_video_1ed00b26": {
-    "message": "Brak wideo"
-  },
-  "none_3b5e34d2": {
-    "message": "Brak"
-  },
-  "none_selected_b93d56d2": {
-    "message": "Nie wybrano żadnego"
-  },
-  "not_equal_6e2980e6": {
-    "message": "Nie jest równe"
-  },
+  "no_video_1ed00b26": { "message": "Brak wideo" },
+  "none_3b5e34d2": { "message": "Brak" },
+  "none_selected_b93d56d2": { "message": "Nie wybrano żadnego" },
+  "not_equal_6e2980e6": { "message": "Nie jest równe" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Nie znajduje się w (nie jest elementem)"
   },
-  "not_negation_1418ebb8": {
-    "message": "Nie (Negacja)"
-  },
-  "not_subset_dc2b5e84": {
-    "message": "Nie jest podzbiorem"
-  },
-  "not_subset_strict_23d282bf": {
-    "message": "Nie jest podzbiorem (ścisłym)"
-  },
-  "not_superset_5556b913": {
-    "message": "Nie jest nadzbiorem"
-  },
+  "not_negation_1418ebb8": { "message": "Nie (Negacja)" },
+  "not_subset_dc2b5e84": { "message": "Nie jest podzbiorem" },
+  "not_subset_strict_23d282bf": { "message": "Nie jest podzbiorem (ścisłym)" },
+  "not_superset_5556b913": { "message": "Nie jest nadzbiorem" },
   "not_superset_strict_24e06f36": {
     "message": "Nie jest nadzbiorem (ścisłym)"
   },
-  "nu_1c0f6848": {
-    "message": "Nu"
-  },
-  "octagon_e48be9f": {
-    "message": "Ośmiobok"
-  },
-  "olive_6a3e4d6b": {
-    "message": "Oliwkowy"
-  },
-  "omega_8f2c3463": {
-    "message": "Omega"
-  },
+  "nu_1c0f6848": { "message": "Nu" },
+  "octagon_e48be9f": { "message": "Ośmiobok" },
+  "olive_6a3e4d6b": { "message": "Oliwkowy" },
+  "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Aby zapisać ikonę, należy dodać jeden z następujących stylów: Kolor ikony, Rozmiar konturu, Tekst ikony lub Obraz"
   },
-  "open_circle_e9bd069": {
-    "message": "Otwarty okrąg"
-  },
+  "open_circle_e9bd069": { "message": "Otwarty okrąg" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Otwórz to okno dialogowe skrótów klawiatury"
   },
   "open_title_application_fd624fc5": {
     "message": "Otwórz aplikację { title }"
   },
-  "operators_a2ef9a93": {
-    "message": "Operatory"
-  },
-  "or_9b70ccaa": {
-    "message": "Lub"
-  },
-  "orange_81386a62": {
-    "message": "Pomarańczowy"
-  },
+  "operators_a2ef9a93": { "message": "Operatory" },
+  "or_9b70ccaa": { "message": "Lub" },
+  "orange_81386a62": { "message": "Pomarańczowy" },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Skróty do innych edytorów można znaleźć na"
   },
-  "outline_color_3ef2cea7": {
-    "message": "Kolor konturu"
-  },
-  "outline_size_a6059a21": {
-    "message": "Rozmiar konturu"
-  },
+  "outline_color_3ef2cea7": { "message": "Kolor konturu" },
+  "outline_size_a6059a21": { "message": "Rozmiar konturu" },
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } nie jest prawidłowym protokołem; wymagany jest  ftp, http, https, mailto, skype, tel lub można go pominąć"
   },
@@ -925,36 +659,18 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "Odsetek musi być liczbą"
   },
-  "performing_arts_icon_f3497486": {
-    "message": "Ikona sztuk wizualnych"
-  },
-  "perpendicular_7c48ede4": {
-    "message": "Prostopadłość"
-  },
-  "phi_4ac33b6d": {
-    "message": "Fi"
-  },
-  "phi_variant_c9bb3ac5": {
-    "message": "Fi (wariant)"
-  },
+  "performing_arts_icon_f3497486": { "message": "Ikona sztuk wizualnych" },
+  "perpendicular_7c48ede4": { "message": "Prostopadłość" },
+  "phi_4ac33b6d": { "message": "Fi" },
+  "phi_variant_c9bb3ac5": { "message": "Fi (wariant)" },
   "physical_education_icon_d7dffd3e": {
     "message": "Ikona wychowania fizycznego"
   },
-  "pi_dc4f0bd8": {
-    "message": "Pi"
-  },
-  "pi_variant_10f5f520": {
-    "message": "Pi (wariant)"
-  },
-  "pink_68ad45cb": {
-    "message": "Różowy"
-  },
-  "pixels_52ece7d1": {
-    "message": "Piksele"
-  },
-  "play_1a47eaa7": {
-    "message": "Odtwórz"
-  },
+  "pi_dc4f0bd8": { "message": "Pi" },
+  "pi_variant_10f5f520": { "message": "Pi (wariant)" },
+  "pink_68ad45cb": { "message": "Różowy" },
+  "pixels_52ece7d1": { "message": "Piksele" },
+  "play_1a47eaa7": { "message": "Odtwórz" },
   "play_media_comment_35257210": {
     "message": "Odtwórz komentarz multimedialny."
   },
@@ -983,33 +699,15 @@ const locale = {
   "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
     "message": "Wymagany jest protokół ftp, http, https, mailto, skype, tel lub można go pominąć"
   },
-  "psi_e3f5f0f7": {
-    "message": "Psi"
-  },
-  "published_c944a23d": {
-    "message": "opublikowane"
-  },
-  "published_when_302d8e23": {
-    "message": "Opublikowane: { when }"
-  },
-  "pumpkin_904428d5": {
-    "message": "Dynia"
-  },
-  "purple_7678a9fc": {
-    "message": "Fioletowy"
-  },
-  "quaternions_877024e0": {
-    "message": "Kwaterniony"
-  },
-  "quizzes_7e598f57": {
-    "message": "Testy"
-  },
-  "rational_numbers_80ddaa4a": {
-    "message": "Liczby wymierne"
-  },
-  "real_numbers_7c99df94": {
-    "message": "Liczby rzeczywiste"
-  },
+  "psi_e3f5f0f7": { "message": "Psi" },
+  "published_c944a23d": { "message": "opublikowane" },
+  "published_when_302d8e23": { "message": "Opublikowane: { when }" },
+  "pumpkin_904428d5": { "message": "Dynia" },
+  "purple_7678a9fc": { "message": "Fioletowy" },
+  "quaternions_877024e0": { "message": "Kwaterniony" },
+  "quizzes_7e598f57": { "message": "Testy" },
+  "rational_numbers_80ddaa4a": { "message": "Liczby wymierne" },
+  "real_numbers_7c99df94": { "message": "Liczby rzeczywiste" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Część rzeczywista (liczby zespolonej)"
   },
@@ -1028,12 +726,8 @@ const locale = {
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Kołowrót zwrotny (nie spełnia)"
   },
-  "rho_a0244a36": {
-    "message": "Rho"
-  },
-  "rho_variant_415245cd": {
-    "message": "Rho (wariant)"
-  },
+  "rho_a0244a36": { "message": "Rho" },
+  "rho_variant_415245cd": { "message": "Rho (wariant)" },
   "rich_content_editor_2708ef21": {
     "message": "Edytor wzbogaconej zawartości"
   },
@@ -1048,18 +742,12 @@ const locale = {
   "right_downward_harpoon_arrow_d71b114f": {
     "message": "Strzała harpuna w prawo w dół"
   },
-  "right_floor_5392d5cf": {
-    "message": "Prawa podłoga"
-  },
-  "right_to_left_9cfb092a": {
-    "message": "Prawa-lewa"
-  },
+  "right_floor_5392d5cf": { "message": "Prawa podłoga" },
+  "right_to_left_9cfb092a": { "message": "Prawa-lewa" },
   "right_upward_harpoon_arrow_f5a34c73": {
     "message": "Strzała harpuna w prawo do góry"
   },
-  "rightward_arrow_32932107": {
-    "message": "Strzałka skierowana w prawo"
-  },
+  "rightward_arrow_32932107": { "message": "Strzałka skierowana w prawo" },
   "rightward_pointing_triangle_60330f5c": {
     "message": "Trójkąt skierowany w prawo"
   },
@@ -1120,21 +808,13 @@ const locale = {
   "single_color_image_color_95fa9a87": {
     "message": "Kolor obrazu jednokolorowego"
   },
-  "size_b30e1077": {
-    "message": "Rozmiar"
-  },
+  "size_b30e1077": { "message": "Rozmiar" },
   "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
     "message": "Rozmiar pliku z napisami przekracza maksymalną dozwoloną wartość { max } kb."
   },
-  "small_b070434a": {
-    "message": "Mały"
-  },
-  "solid_circle_9f061dfc": {
-    "message": "Pełny okrąg"
-  },
-  "something_went_wrong_89195131": {
-    "message": "Coś poszło nie tak."
-  },
+  "small_b070434a": { "message": "Mały" },
+  "solid_circle_9f061dfc": { "message": "Pełny okrąg" },
+  "something_went_wrong_89195131": { "message": "Coś poszło nie tak." },
   "something_went_wrong_accessing_your_webcam_6643b87e": {
     "message": "Wystąpił problem z dostępem do kamery sieciowej."
   },
@@ -1144,90 +824,42 @@ const locale = {
   "something_went_wrong_check_your_connection_reload__c7868286": {
     "message": "Coś poszło nie tak. Sprawdź połączenie, odśwież stronę i spróbuj ponownie."
   },
-  "something_went_wrong_d238c551": {
-    "message": "Coś poszło nie tak"
-  },
+  "something_went_wrong_d238c551": { "message": "Coś poszło nie tak" },
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Wystąpił błąd podczas udostępniania ekranu."
   },
-  "sort_by_e75f9e3e": {
-    "message": "Sortuj wg"
-  },
-  "spades_suit_b37020c2": {
-    "message": "Piki (kolor)"
-  },
-  "square_511eb3b3": {
-    "message": "Kwadrat"
-  },
-  "square_cap_9ec88646": {
-    "message": "Kwadratowa czapka"
-  },
-  "square_cup_b0665113": {
-    "message": "Kwadratowy kubek"
-  },
-  "square_root_e8bcbc60": {
-    "message": "Pierwiastek kwadratowy"
-  },
+  "sort_by_e75f9e3e": { "message": "Sortuj wg" },
+  "spades_suit_b37020c2": { "message": "Piki (kolor)" },
+  "square_511eb3b3": { "message": "Kwadrat" },
+  "square_cap_9ec88646": { "message": "Kwadratowa czapka" },
+  "square_cup_b0665113": { "message": "Kwadratowy kubek" },
+  "square_root_e8bcbc60": { "message": "Pierwiastek kwadratowy" },
   "square_root_symbol_d0898a53": {
     "message": "Pierwiastek kwadratowy - symbol"
   },
-  "square_subset_17be67cb": {
-    "message": "Podzbiór kwadratowy"
-  },
+  "square_subset_17be67cb": { "message": "Podzbiór kwadratowy" },
   "square_subset_strict_7044e84f": {
     "message": "Podzbiór kwadratowy (ścisły)"
   },
-  "square_superset_3be8dae1": {
-    "message": "Nadzbiór kwadratowy"
-  },
+  "square_superset_3be8dae1": { "message": "Nadzbiór kwadratowy" },
   "square_superset_strict_fa4262e4": {
     "message": "Nadzbiór kwadratowy (ścisły)"
   },
-  "star_8d156e09": {
-    "message": "Gwiazdka"
-  },
-  "start_over_f7552aa9": {
-    "message": "Rozpocznij ponownie"
-  },
-  "start_recording_9a65141a": {
-    "message": "Rozpocznij nagrywanie"
-  },
-  "steel_blue_14296f08": {
-    "message": "Stalowy niebieski"
-  },
-  "styles_2aa721ef": {
-    "message": "Style"
-  },
-  "submit_a3cc6859": {
-    "message": "Prześlij"
-  },
-  "subscript_59744f96": {
-    "message": "Indeks dolny"
-  },
-  "subset_19c1a92f": {
-    "message": "Podzbiór"
-  },
-  "subset_strict_8d8948d6": {
-    "message": "Podzbiór (ścisły)"
-  },
-  "succeeds_9cc31be9": {
-    "message": "Następuje po"
-  },
-  "succeeds_equal_158e8c3a": {
-    "message": "Następuje po lub równa się"
-  },
-  "sum_b0842d31": {
-    "message": "Suma"
-  },
-  "superscript_8cb349a2": {
-    "message": "Indeks górny"
-  },
-  "superset_c4db8a7a": {
-    "message": "Nadzbiór"
-  },
-  "superset_strict_c77dd6d2": {
-    "message": "Nadzbiór (ścisły)"
-  },
+  "star_8d156e09": { "message": "Gwiazdka" },
+  "start_over_f7552aa9": { "message": "Rozpocznij ponownie" },
+  "start_recording_9a65141a": { "message": "Rozpocznij nagrywanie" },
+  "steel_blue_14296f08": { "message": "Stalowy niebieski" },
+  "styles_2aa721ef": { "message": "Style" },
+  "submit_a3cc6859": { "message": "Prześlij" },
+  "subscript_59744f96": { "message": "Indeks dolny" },
+  "subset_19c1a92f": { "message": "Podzbiór" },
+  "subset_strict_8d8948d6": { "message": "Podzbiór (ścisły)" },
+  "succeeds_9cc31be9": { "message": "Następuje po" },
+  "succeeds_equal_158e8c3a": { "message": "Następuje po lub równa się" },
+  "sum_b0842d31": { "message": "Suma" },
+  "superscript_8cb349a2": { "message": "Indeks górny" },
+  "superset_c4db8a7a": { "message": "Nadzbiór" },
+  "superset_strict_c77dd6d2": { "message": "Nadzbiór (ścisły)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Obsługiwane typy plików: SRT lub WebVTT"
   },
@@ -1297,27 +929,13 @@ const locale = {
   "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
     "message": "Ulepszony edytor HTML nie jest dostępny z poziomu klawiatury. Naciśnij Shift O, aby otworzyć edytor html bez formatowania."
   },
-  "therefore_d860e024": {
-    "message": "Dlatego"
-  },
-  "theta_ce2d2350": {
-    "message": "Theta"
-  },
-  "theta_variant_fff6da6f": {
-    "message": "Theta (wariant)"
-  },
-  "thick_downward_arrow_b85add4c": {
-    "message": "Strzałka w dół pogrubiona"
-  },
-  "thick_left_arrow_d5f3e925": {
-    "message": "Strzałka w lewo pogrubiona"
-  },
-  "thick_leftward_arrow_6ab89880": {
-    "message": "Strzałka w kierunku lewym"
-  },
-  "thick_right_arrow_3ed5e8f7": {
-    "message": "Strzałka w prawo pogrubiona"
-  },
+  "therefore_d860e024": { "message": "Dlatego" },
+  "theta_ce2d2350": { "message": "Theta" },
+  "theta_variant_fff6da6f": { "message": "Theta (wariant)" },
+  "thick_downward_arrow_b85add4c": { "message": "Strzałka w dół pogrubiona" },
+  "thick_left_arrow_d5f3e925": { "message": "Strzałka w lewo pogrubiona" },
+  "thick_leftward_arrow_6ab89880": { "message": "Strzałka w kierunku lewym" },
+  "thick_right_arrow_3ed5e8f7": { "message": "Strzałka w prawo pogrubiona" },
   "thick_rightward_arrow_a2e1839e": {
     "message": "Strzałka w kierunku prawym pogrubiona"
   },
@@ -1336,39 +954,17 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Chociaż nagranie wideo będzie mieć prawidłowy tytuł w przeglądarce, nie udało się go zaktualizować w bazie danych."
   },
-  "timebar_a4d18443": {
-    "message": "Oś czasu"
-  },
-  "title_ee03d132": {
-    "message": "Tytuł"
-  },
-  "to_be_posted_when_d24bf7dc": {
-    "message": "Do opublikowania: { when }"
-  },
-  "to_do_when_2783d78f": {
-    "message": "Lista zadań: { when }"
-  },
-  "toggle_summary_group_413df9ac": {
-    "message": "Przełącz grupę { summary }"
-  },
-  "toggle_tooltip_d3b7cb86": {
-    "message": "Etykieta przełącznika"
-  },
-  "tools_2fcf772e": {
-    "message": "Narzędzia"
-  },
-  "top_66e0adb6": {
-    "message": "Góra"
-  },
-  "tray_839df38a": {
-    "message": "Zasobnik"
-  },
-  "triangle_6072304e": {
-    "message": "Trójkąt"
-  },
-  "turnstile_yields_f9e76df1": {
-    "message": "Kołowrót (spełnia)"
-  },
+  "timebar_a4d18443": { "message": "Oś czasu" },
+  "title_ee03d132": { "message": "Tytuł" },
+  "to_be_posted_when_d24bf7dc": { "message": "Do opublikowania: { when }" },
+  "to_do_when_2783d78f": { "message": "Lista zadań: { when }" },
+  "toggle_summary_group_413df9ac": { "message": "Przełącz grupę { summary }" },
+  "toggle_tooltip_d3b7cb86": { "message": "Etykieta przełącznika" },
+  "tools_2fcf772e": { "message": "Narzędzia" },
+  "top_66e0adb6": { "message": "Góra" },
+  "tray_839df38a": { "message": "Zasobnik" },
+  "triangle_6072304e": { "message": "Trójkąt" },
+  "turnstile_yields_f9e76df1": { "message": "Kołowrót (spełnia)" },
   "type_control_f9_to_access_image_options_text_a47e319f": {
     "message": "Wpisz Control F9, aby uzyskać dostęp do opcji obrazu. { text }"
   },
@@ -1378,90 +974,44 @@ const locale = {
   "type_control_f9_to_access_table_options_text_92141329": {
     "message": "Wpisz Control F9, aby uzyskać dostęp do opcji tabeli. { text }"
   },
-  "union_e6b57a53": {
-    "message": "Suma zbiorów"
-  },
-  "unpublished_dfd8801": {
-    "message": "nieopublikowane"
-  },
-  "untitled_16aa4f2b": {
-    "message": "Bez tytułu"
-  },
-  "untitled_efdc2d7d": {
-    "message": "bez tytułu"
-  },
+  "union_e6b57a53": { "message": "Suma zbiorów" },
+  "unpublished_dfd8801": { "message": "nieopublikowane" },
+  "untitled_16aa4f2b": { "message": "Bez tytułu" },
+  "untitled_efdc2d7d": { "message": "bez tytułu" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Strzałka po przekątnej do góry i w lewo"
   },
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Strzałka po przekątnej do góry i w prawo"
   },
-  "upload_file_fd2361b8": {
-    "message": "Prześlij plik"
-  },
-  "upload_image_6120b609": {
-    "message": "Prześlij obraz"
-  },
-  "upload_media_ce31135a": {
-    "message": "Przekaż pliki multimedialne"
-  },
-  "uploading_19e8a4e7": {
-    "message": "Przekazywanie"
-  },
-  "uppercase_delta_d4f4bc41": {
-    "message": "Duża delta"
-  },
-  "uppercase_gamma_86f492e9": {
-    "message": "Duża gamma"
-  },
-  "uppercase_lambda_c78d8ed4": {
-    "message": "Duża lambda"
-  },
-  "uppercase_omega_8aedfa2": {
-    "message": "Duża omega"
-  },
-  "uppercase_phi_caa36724": {
-    "message": "Duże fi"
-  },
-  "uppercase_pi_fcc70f5e": {
-    "message": "Duże pi"
-  },
-  "uppercase_psi_6395acbe": {
-    "message": "Duże psi"
-  },
-  "uppercase_sigma_dbb70e92": {
-    "message": "Duża sigma"
-  },
-  "uppercase_theta_49afc891": {
-    "message": "Duża theta "
-  },
-  "uppercase_upsilon_8c1e623e": {
-    "message": "Duży ipsylon"
-  },
-  "uppercase_xi_341e8556": {
-    "message": "Duże ksi"
-  },
-  "upsilon_33651634": {
-    "message": "Ipsylon"
-  },
+  "upload_file_fd2361b8": { "message": "Prześlij plik" },
+  "upload_image_6120b609": { "message": "Prześlij obraz" },
+  "upload_media_ce31135a": { "message": "Przekaż pliki multimedialne" },
+  "uploading_19e8a4e7": { "message": "Przekazywanie" },
+  "uppercase_delta_d4f4bc41": { "message": "Duża delta" },
+  "uppercase_gamma_86f492e9": { "message": "Duża gamma" },
+  "uppercase_lambda_c78d8ed4": { "message": "Duża lambda" },
+  "uppercase_omega_8aedfa2": { "message": "Duża omega" },
+  "uppercase_phi_caa36724": { "message": "Duże fi" },
+  "uppercase_pi_fcc70f5e": { "message": "Duże pi" },
+  "uppercase_psi_6395acbe": { "message": "Duże psi" },
+  "uppercase_sigma_dbb70e92": { "message": "Duża sigma" },
+  "uppercase_theta_49afc891": { "message": "Duża theta " },
+  "uppercase_upsilon_8c1e623e": { "message": "Duży ipsylon" },
+  "uppercase_xi_341e8556": { "message": "Duże ksi" },
+  "upsilon_33651634": { "message": "Ipsylon" },
   "upward_and_downward_pointing_arrow_fa90a918": {
     "message": "Strzałka skierowana do góry i w dół"
   },
   "upward_and_downward_pointing_arrow_thick_d420fdef": {
     "message": "Strzałka skierowana do góry i w dół (pogrubiona)"
   },
-  "upward_arrow_9992cb2d": {
-    "message": "Strzałka skierowana do góry"
-  },
+  "upward_arrow_9992cb2d": { "message": "Strzałka skierowana do góry" },
   "upward_pointing_triangle_d078d7cb": {
     "message": "Trójkąt skierowany do góry"
   },
-  "url_22a5f3b8": {
-    "message": "URL"
-  },
-  "usage_right_ff96f3e2": {
-    "message": "Prawo użytkowania:"
-  },
+  "url_22a5f3b8": { "message": "URL" },
+  "usage_right_ff96f3e2": { "message": "Prawo użytkowania:" },
   "usage_rights_required_5fe4dd68": {
     "message": "Prawo użytkowania (wymagane)"
   },
@@ -1492,54 +1042,28 @@ const locale = {
   "used_by_screen_readers_to_describe_the_video_37ebad25": {
     "message": "Używane przez czytniki ekranu do opisania zawartości wideo"
   },
-  "user_documents_c206e61f": {
-    "message": "Dokumenty użytkownika"
-  },
-  "user_files_78e21703": {
-    "message": "Pliki użytkownika"
-  },
-  "user_images_b6490852": {
-    "message": "Zdjęcia użytkownika"
-  },
-  "user_media_14fbf656": {
-    "message": "Multimedia użytkownika"
-  },
-  "vector_notation_cf6086ab": {
-    "message": "Wektor (notacja)"
-  },
+  "user_documents_c206e61f": { "message": "Dokumenty użytkownika" },
+  "user_files_78e21703": { "message": "Pliki użytkownika" },
+  "user_images_b6490852": { "message": "Zdjęcia użytkownika" },
+  "user_media_14fbf656": { "message": "Multimedia użytkownika" },
+  "vector_notation_cf6086ab": { "message": "Wektor (notacja)" },
   "vertical_bar_set_builder_notation_4300495f": {
     "message": "Kreska pionowa (notacja budująca zbiory)"
   },
-  "vertical_dots_bfb21f14": {
-    "message": "Kropki pionowo"
-  },
-  "video_options_24ef6e5d": {
-    "message": "Opcje wideo"
-  },
-  "video_options_tray_3b9809a5": {
-    "message": "Panel opcji wideo"
-  },
-  "video_player_b371005": {
-    "message": "Odtwarzacz wideo"
-  },
-  "video_player_for_9e7d373b": {
-    "message": "Odtwarzacz wideo dla "
-  },
+  "vertical_dots_bfb21f14": { "message": "Kropki pionowo" },
+  "video_options_24ef6e5d": { "message": "Opcje wideo" },
+  "video_options_tray_3b9809a5": { "message": "Panel opcji wideo" },
+  "video_player_b371005": { "message": "Odtwarzacz wideo" },
+  "video_player_for_9e7d373b": { "message": "Odtwarzacz wideo dla " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Odtwarzacz wideo dla { title }"
   },
-  "view_ba339f93": {
-    "message": "Wyświetl"
-  },
-  "view_description_30446afc": {
-    "message": "Wyświetl opis"
-  },
+  "view_ba339f93": { "message": "Wyświetl" },
+  "view_description_30446afc": { "message": "Wyświetl opis" },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Wyświetl skróty klawiszowe"
   },
-  "view_title_description_67940918": {
-    "message": "Wyświetl opis { title }"
-  },
+  "view_title_description_67940918": { "message": "Wyświetl opis { title }" },
   "view_word_and_character_counts_a743dd0c": {
     "message": "Wyświetl liczbę słów i znaków"
   },
@@ -1566,21 +1090,11 @@ const locale = {
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Szerokość i wysokość muszą być liczbami"
   },
-  "width_x_height_px_ff3ccb93": {
-    "message": "{ width } x { height }px"
-  },
-  "wiki_home_9cd54d0": {
-    "message": "Wiki — Strona główna"
-  },
-  "wreath_product_200b38ef": {
-    "message": "Produkt splotowy"
-  },
-  "xi_149681d0": {
-    "message": "Ksi"
-  },
-  "yes_dde87d5": {
-    "message": "Tak"
-  },
+  "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
+  "wiki_home_9cd54d0": { "message": "Wiki — Strona główna" },
+  "wreath_product_200b38ef": { "message": "Produkt splotowy" },
+  "xi_149681d0": { "message": "Ksi" },
+  "yes_dde87d5": { "message": "Tak" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Masz niezapisane zmiany w panelu Icon Maker. Czy chcesz kontynuować bez zapisywania tych zmian?"
   },
@@ -1605,18 +1119,10 @@ const locale = {
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Kamera sieciowa może być już w użyciu."
   },
-  "zeta_5ef24f0e": {
-    "message": "Zeta"
-  },
-  "zoom_f3e54d69": {
-    "message": "Zoom"
-  },
-  "zoom_in_image_bb97d4f": {
-    "message": "Przybliż obraz"
-  },
-  "zoom_out_image_d0a0a2ec": {
-    "message": "Oddal obraz"
-  }
+  "zeta_5ef24f0e": { "message": "Zeta" },
+  "zoom_f3e54d69": { "message": "Zoom" },
+  "zoom_in_image_bb97d4f": { "message": "Przybliż obraz" },
+  "zoom_out_image_d0a0a2ec": { "message": "Oddal obraz" }
 }
 
 

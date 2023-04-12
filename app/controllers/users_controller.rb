@@ -185,7 +185,6 @@ require "atom"
 #
 #
 class UsersController < ApplicationController
-  include Delicious
   include SearchHelper
   include SectionTabHelper
   include I18nUtilities
@@ -568,6 +567,7 @@ class UsersController < ApplicationController
              })
 
       css_bundle :k5_common, :k5_dashboard, :dashboard_card
+      css_bundle :k5_font unless use_classic_font?
       js_bundle :k5_dashboard
     else
       # things needed only for classic dashboard
@@ -1280,8 +1280,6 @@ class UsersController < ApplicationController
     password = params[:user_service][:password]
     service = ServiceCredentials.new(user_name, password)
     case params[:user_service][:service]
-    when "delicious"
-      delicious_get_last_posted(service)
     when "diigo"
       Diigo::Connection.diigo_get_bookmarks(service)
     when "skype"
@@ -1311,7 +1309,7 @@ class UsersController < ApplicationController
   def bookmark_search
     @service = @current_user.user_services.where(type: "BookmarkService", service: params[:service_type]).first rescue nil
     res = nil
-    res = @service.find_bookmarks(params[:q]) if @service
+    res = @service.find_bookmarks if @service
     render json: res
   end
 
@@ -1319,7 +1317,7 @@ class UsersController < ApplicationController
     GuardRail.activate(:secondary) do
       # we _don't_ want to get context if the user is the context
       # so that for missing user context we can 401, but for others we can 404
-      get_context(include_deleted: true) if params[:account_id] || params[:course_id] || params[:group_id]
+      get_context(user_scope: User) if params[:account_id] || params[:course_id] || params[:group_id]
 
       @context_account = @context.is_a?(Account) ? @context : @domain_root_account
       @user = api_find_all(@context&.all_users || User, [params[:id]]).first
@@ -1463,6 +1461,7 @@ class UsersController < ApplicationController
                   context: @domain_root_account,
                   return_url: @return_url,
                   expander: variable_expander,
+                  include_storage_target: !in_lti_mobile_webview?,
                   opts: opts
                 )
               else
@@ -1473,6 +1472,7 @@ class UsersController < ApplicationController
     @lti_launch.resource_url = @tool.login_or_launch_url(extension_type: :user_navigation)
     @lti_launch.link_text = @tool.label_for(:user_navigation, I18n.locale)
     @lti_launch.analytics_id = @tool.tool_id
+    InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: @tool.lti_version, type: :user_navigation })
 
     set_active_tab @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))

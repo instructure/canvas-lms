@@ -106,6 +106,27 @@ test('does not attempt to delete an assignment due in a closed grading period', 
   ok(view.delete.notCalled)
 })
 
+QUnit.module('EditHeaderView - speed grader link', {
+  setup() {
+    fakeENV.setup()
+    ENV.SHOW_SPEED_GRADER_LINK = true
+  },
+  teardown() {
+    fakeENV.teardown()
+  },
+})
+
+test('shows when assignment is published', () => {
+  const view = editHeaderView({published: true})
+  ok(view.$('.speed-grader-link-container').length)
+})
+
+test('does not show when assignment is not published', () => {
+  ENV.SHOW_SPEED_GRADER_LINK = false
+  const view = editHeaderView({published: false})
+  strictEqual(view.$('.speed-grader-link-container').length, 0)
+})
+
 QUnit.module('EditHeaderView - try deleting assignment', {
   setup() {
     fakeENV.setup()

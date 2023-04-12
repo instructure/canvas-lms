@@ -362,11 +362,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
       strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length, 0)
     })
 
-    QUnit.module('when post assignment grades tray is open', postTrayHooks => {
-      postTrayHooks.beforeEach(() => {
-        columnDef.postAssignmentGradesTrayOpenForAssignmentId = true
-      })
-
+    QUnit.module('when post assignment grades tray is open', () => {
       test('displays an unposted grade indicator when grade is graded and unposted', () => {
         submission.workflow_state = 'graded'
         strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length, 1)

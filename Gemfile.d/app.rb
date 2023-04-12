@@ -30,7 +30,7 @@ end
 gem "bootsnap", "1.13.0", require: false
 gem "rails", "7.0.3"
 gem "tzinfo", "2.0.4"
-gem_override "switchman", "3.3.3"
+gem_override "switchman", "3.3.7"
 gem "guardrail", "3.0.2"
 gem_override "switchman-inst-jobs", "4.0.13"
 gem "irb", "1.4.1"
@@ -112,6 +112,7 @@ gem "pdf-reader", "2.5.0"
 gem "pg_query", "2.2.0"
 gem "prawn-rails", "1.3.0"
   gem "matrix", "0.4.2" # Used to be a default gem but is no more, but prawn depends on it implicitly
+gem "prosopite", "~> 1.3"
 gem "rack", "2.2.3"
 gem "rack-brotli", "1.0.0"
 gem "rack-test", "1.1.0"

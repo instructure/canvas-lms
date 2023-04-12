@@ -37,6 +37,7 @@ const locale = {
   "blue_daf8fea9": { "message": "Μπλε" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Ακύρωση" },
+  "characters_9d897d1c": { "message": "Χαρακτήρες" },
   "choose_usage_rights_33683854": {
     "message": "Επιλέξτε δικαιώματα χρήσης..."
   },
@@ -60,6 +61,7 @@ const locale = {
   "course_navigation_dd035109": { "message": "Πλοήγηση στο μάθημα" },
   "creative_commons_license_725584ae": { "message": "Άδεια Creative Commons:" },
   "cyan_c1d5f68a": { "message": "Κυανό" },
+  "decrease_indent_d9cf469d": { "message": "Μείωση Εσοχής Κειμένου" },
   "deep_purple_bb3e2907": { "message": "Βαθύ μοβ" },
   "delimiters_4db4840d": { "message": "Οριοθέτες" },
   "description_436c48d7": { "message": "Περιγραφή" },
@@ -68,6 +70,7 @@ const locale = {
   "discussions_a5f96392": { "message": "Συζητήσεις" },
   "discussions_index_6c36ced": { "message": "Ευρετήριο Συζητήσεων" },
   "done_54e3d4b6": { "message": "Ολοκληρώθηκε" },
+  "down_5831a426": { "message": "Κάτω" },
   "due_multiple_dates_cc0ee3f5": {
     "message": "<mrk mid=\"4290\" mtype=\"seg\">Καταληκτική Ημερ/νία:</mrk> <mrk mid=\"4291\" mtype=\"seg\">Πολλαπλές Ημερομηνίες</mrk>"
   },
@@ -84,6 +87,7 @@ const locale = {
   "group_files_82e5dcdb": { "message": "Αρχεία ομάδας" },
   "group_navigation_99f191a": { "message": "Πλοήγηση στην Ομάδα" },
   "home_351838cd": { "message": "Αρχική Σελίδα" },
+  "html_editor_fb2ab713": { "message": "Επεξεργαστής HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Πήρα άδεια για να χρησιμοποιήσω αυτό το αρχείο."
   },
@@ -93,9 +97,13 @@ const locale = {
   "icon_215a1dc6": { "message": "Εικονίδιο" },
   "image_8ad06": { "message": "Εικόνα" },
   "images_7ce26570": { "message": "Εικόνες" },
+  "increase_indent_6af90f7c": { "message": "Αύξηση Εσοχής Κειμένου" },
   "indigo_2035fc55": { "message": "Λουλακί" },
   "insert_593145ef": { "message": "Εισαγωγή" },
   "insert_link_6dc23cae": { "message": "Εισαγωγή Συνδέσμου" },
+  "insert_math_equation_57c6e767": {
+    "message": "Εισαγωγή Μαθηματικής Εξίσωσης"
+  },
   "invalid_file_type_881cc9b2": { "message": "Μη έγκυρος τύπος αρχείου" },
   "invalid_url_cbde79f": { "message": "Μη έγκυρο URL" },
   "keyboard_shortcuts_ed1844bd": { "message": "Συντομεύσεις πληκτρολογίου" },
@@ -147,6 +155,7 @@ const locale = {
   },
   "save_11a80ec3": { "message": "Αποθήκευση" },
   "search_280d00bd": { "message": "Αναζήτηση" },
+  "selection_b52c4c5e": { "message": "Επιλογή" },
   "size_b30e1077": { "message": "Μέγεθος" },
   "star_8d156e09": { "message": " " },
   "start_over_f7552aa9": { "message": "Ξεκινήστε Ξανά" },
@@ -170,6 +179,7 @@ const locale = {
   },
   "title_ee03d132": { "message": "Τίτλος" },
   "unpublished_dfd8801": { "message": "μη δημοσιευμένο" },
+  "up_c553575d": { "message": "Επάνω" },
   "upload_file_fd2361b8": { "message": "Φόρτωση Αρχείου" },
   "upload_media_ce31135a": { "message": "Μεταφόρτωση Αρχείου Πολυμέσων" },
   "uploading_19e8a4e7": { "message": "Γίνεται φόρτωση..." },

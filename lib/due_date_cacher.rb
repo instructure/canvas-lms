@@ -258,6 +258,8 @@ class DueDateCacher
         while subs.update_all(workflow_state: :deleted, updated_at: Time.zone.now) > 0; end
       end
 
+      nq_restore_pending_flag_enabled = Account.site_admin.feature_enabled?(:new_quiz_deleted_workflow_restore_pending_review_state)
+
       # Get any stragglers that might have had their enrollment removed from the course
       # 100 students at a time for 10 assignments each == slice of up to 1K submissions
       enrollment_counts.deleted_student_ids.each_slice(100) do |student_slice|
@@ -279,6 +281,10 @@ class DueDateCacher
         if record_due_date_changed_events?
           auditable_entries = batch.select { |entry| @assignments_auditable_by_id.include?(entry.first) }
           cached_due_dates_by_submission = current_cached_due_dates(auditable_entries)
+        end
+
+        if nq_restore_pending_flag_enabled
+          handle_lti_deleted_submissions(batch)
         end
 
         # prepare values for SQL interpolation
@@ -484,6 +490,38 @@ class DueDateCacher
     rescue ActiveRecord::Deadlocked => e
       Canvas::Errors.capture_exception(:due_date_cacher, e, :warn)
       raise Delayed::RetriableError, "Deadlock when upserting submissions"
+    end
+  end
+
+  def handle_lti_deleted_submissions(batch)
+    quiz_lti_index = 5
+
+    assignments_and_users_query = batch.each_with_object([]) do |entry, memo|
+      next unless entry[quiz_lti_index]
+
+      memo << "(#{entry.first}, #{entry.second})"
+    end
+
+    return if assignments_and_users_query.empty?
+
+    submission_join_query = <<~SQL.squish
+      INNER JOIN (VALUES #{assignments_and_users_query.join(",")})
+      AS vals(assignment_id, student_id)
+      ON submissions.assignment_id = vals.assignment_id
+      AND submissions.user_id = vals.student_id
+    SQL
+
+    submission_query = Submission.deleted.joins(submission_join_query)
+    submission_versions_to_check = Version
+                                   .where(versionable: submission_query)
+                                   .order(number: :desc)
+                                   .distinct(:versionable_id)
+    submissions_in_pending_review = submission_versions_to_check
+                                    .select { |version| version.model.workflow_state == "pending_review" }
+                                    .pluck(:versionable_id)
+
+    if submissions_in_pending_review.any?
+      Submission.where(id: submissions_in_pending_review).update_all(workflow_state: "pending_review")
     end
   end
 end

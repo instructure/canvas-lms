@@ -638,6 +638,7 @@ zh-Hant:
     titles: 
       configure_report: 配置報告
       open_registration_delegated_warning_dialog: 外部身份識別提供方已啟用
+      rqd_help: 限制定量資料
       what_are_quiz_ip_filters: "Quiz IP Filter（測驗IP篩選器）是什麼？"
     user: 使用者
   account_settings_fe083453: 帳戶設定
@@ -1626,6 +1627,8 @@ zh-Hant:
         update_button: 更新
       report_last_run_never: 不會到期
       report_running: 報告正在執行。*在其完成後，您會收到一封電子郵件。*
+      rqd_help_message: 選取時，此設定將限制使用者檢視定量（數字）評分資料，並限制教師的作業建立選項。使用者將只能看到包括成績等級和評論的質性資料。管理員可以透過調整使用者角色的權限來進一步自訂此設定。
+      rqd_screenreader: 關於限制定量資料
       select: 
         mfa: 
           disabled: 已停用
@@ -2269,7 +2272,7 @@ zh-Hant:
   adjust_final_grade_fa45e7e0: 調整最後評分
   adjusting_due_dates_a5918b9c: 調整截止日期中...
   admin_4d3ba42f: 管理員
-  admin_analytics_description: "顯示「管理員分析工具」以顯示課程和學生的概覽。在 Canvas 社群中加入*新分析工具使用者群組*以瞭解更多和提供反饋。"
+  admin_analytics_description: "在帳戶級別啟用「分析工具」。管理員「分析工具」控制面板提供與 Canvas 使用情況、Canvas 課程成功和學生參與有關的詳細資料。了解更多有關 Canvas 社群中的*管理員分析工具中心*。"
   admin_analytics_eacba735: 管理員分析工具
   admin_csv_f8d1b3eb: "管理員 CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: 多個評分期的管理員匯出
@@ -4457,6 +4460,7 @@ zh-Hant:
       no_points: 無
       no_submission: 什麼也沒有
       points: 分數
+      speed_grader: SpeedGrader™
       submission_types: 文檔類型
       submitting: 正在提交
       turnitin: Turnitin
@@ -5994,6 +5998,7 @@ zh-Hant:
   canvas_for_elementary_analytics_15dc1e07: "Canvas 小學版分析工具"
   canvas_for_elementary_beta_28bc5181: "Canvas 小學版（測試版）"
   canvas_for_elementary_e6f5a06f: "Canvas 小學版"
+  canvas_for_elementary_font_selection_5d1f2271: "Canvas 小學版字型選擇"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas 小學版：主教室中很多通告"
   canvas_for_elementary_parent_support_74a2356e: "Canvas 小學版：Parent 支援"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
@@ -6131,6 +6136,7 @@ zh-Hant:
   check_your_spelling_or_try_fewer_letters_70769a90: 檢查您的拼字或輸入較少的字母。
   checkbox_examples_dc790142: 勾選框範例
   checked_883b93fd: 已剔選
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: 勾選「添加到行事曆」將邀請所有課程成員。
   cheerful_panda_holding_a_map_17ba47ee: 快樂的熊貓拿著一張地圖
   child_course_must_belong_to_the_same_root_account__66ed7b8e: 所有子課程均屬該主課程的銀根帳戶
   child_s_username_dde3aa9: 孩子的使用者名稱
@@ -8916,6 +8922,7 @@ zh-Hant:
         participation_id: 參與
         public_syllabus: 使本課程的教學大綱公開可見
         restrict_enrollments_to_course_dates: 學生只能在這些日期之間參加課程
+        restrict_quantitative_data: 定量資料選項
         restrict_student_future_view: 限制學生在開始日期之前檢視此課程
         restrict_student_past_view: 限制學生在結束日期之後檢視此課程
         root_account: 根帳戶
@@ -11032,6 +11039,7 @@ zh-Hant:
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: 啟用重新設計的「傳送訊息給以下學生...」對話，允許傳送訊息給學生以外的觀察者。
   enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "啟用存取新測驗公開 API：測驗項目 API。"
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "啟用透過 Canvas 存取新測驗公開 API。"
+  enables_administrators_to_register_lti_tools_with__b16d560f: "讓管理員可以使用「動態註冊」註冊 LTI 工具"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: 在新成績單提交項目托盤中啟用抄襲報告和相似度評分的顯示。
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: 啟用要套用到作業列表、行事曆活動和其他的重要日期。
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "草稿評論在 SpeedGrader 中未公佈時，啟用模態以警告使用者。"
@@ -13390,6 +13398,7 @@ zh-Hant:
   grades_view_audit_trail_cc4c1fcc: "成績 - 查看稽核跟蹤"
   grades_view_audit_trail_db7364b1: "成績 - 查看審計跟蹤"
   grades_view_change_logs_6bc1b959: "成績 - 查看變更日誌"
+  grades_view_quantitative_feedback_90a4ffc7: "成績 - 檢視定量反饋"
   grades_visible_to_students_1584fa83: 學生可以看到的成績
   grades_were_successfully_published_to_the_gradeboo_79203993: 成績已成功發佈到成績單。
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: 成績已成功發佈到成績單。
@@ -14097,12 +14106,18 @@ zh-Hant:
       event: "%{date} 於%{time}"
   handler_7912052f: 處理程式
   has_been_automatically_selected_based_upon_where_t_61f805c5: "已自動根據此帳戶的 Canvas 實例所在位置選擇 在有些情況中，可能是不同的區域。"
+  has_no_submissions_2826a7a2: 沒有提交項目
+  has_no_submissions_63de50ad: 沒有提交項目
   has_not_submitted_2350bc24: 尚未提交
   has_similarity_score_d5f332b4: 具有相似性分數
   has_submissions_6c12ef4c: 有提交項目
+  has_submissions_ea8e609b: 有提交項目
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "有 Turnitin 分數"
   has_ungraded_submissions_2bff87df: 有未評分的提交項目
+  has_ungraded_submissions_b79f5803: 有未評分的提交項目
+  has_unposted_grades_3567391e: 有未公佈的成績
+  has_unposted_grades_ba0e02b6: 有未公佈的成績
   have_a_question_about_canvas_ask_it_here_5781cce: "有關於 Canvas 的問題？請在此處詢問。"
   have_not_been_graded_df2a5fd2: 尚未評分
   have_not_yet_submitted_57e6a58b: 尚未提交
@@ -14757,6 +14772,7 @@ zh-Hant:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "如果啟用「使用者 - 管理登入詳細資料」或「統計 - 查看」，使用者將可以於管理員工具中產生登入/登出活動。要隱藏管理員工具中的登入/登出活動選項，需要同時停用這兩個權限。"
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "如果啟用「使用者 - 管理登入詳細資料」或「統計 - 檢視」，使用者將可以於管理員工具中產生登入/登出活動。要隱藏管理員工具中的登入/登出活動選項，需要同時停用這兩個權限。"
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "如果已啟用「使用者 - 管理登入詳細資料」或「統計 - 檢視」，使用者將可以於管理員工具中產生登入/登出活動。要隱藏管理員工具中的登入/登出活動選項，需要同時停用這兩個權限。"
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: "如果您即將定義限制群組成員，數量必須大於 1。"
   if_you_change_an_assignment_s_points_possible_exis_505e6015: 如果您更改一項任務的分數，現有的評分會被自動按比例計算。
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 如果您更改一項作業的分數，您可能必須對該作業重新進行評分。
   if_you_change_an_assignment_s_points_possible_you__dba531cb: 如果您更改一項作業的分數，您可能必須對任何任務重新進行評分。
@@ -14981,6 +14997,7 @@ zh-Hant:
   individual_2033c005: 個人
   individual_assignment_grade_posting_d8322b99: 個人作業成績公佈中
   individual_gradebook_c7de9821: 個別成績單…
+  individual_gradebook_enhancements_de33aa3d: 個人成績單強化
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: 不能修改個別成果計算值。
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: 不能修改個別成果掌握程度分數。
   individual_outcome_rating_and_calculation_method_o_f0eae85f: 個別的成果評級和計算方法選項
@@ -15477,6 +15494,7 @@ zh-Hant:
     lock_module_until: 鎖定直至
   language_6b3e2c7c: 語言
   languages_835813f0: 語言
+  large_balsamiq_font_5fe45fae: "大 Balsamiq 字型"
   large_course_db3d58b: 大課程：
   last_7_days_bd411f1f: "過去 7 天"
   last_activity_a983e541: 上次活動
@@ -15906,6 +15924,7 @@ zh-Hant:
   loading_features_d26820f6: 載入功能
   loading_folders_d8b5869e: 正在載入資料夾
   loading_gradebook_b0b75cd3: 載入成績單
+  loading_gradebook_submissions_d2ba017f: 載入成績單提交項目
   loading_graders_f6a76142: 正在載入評分人
   loading_grades_446fc226: 載入成績中...
   loading_grades_for_coursename_26784c2d: "載入 %{courseName} 的成績"
@@ -16167,6 +16186,7 @@ zh-Hant:
   lti_deep_linking_line_items_5e0079f7: "LTI 深入連結細項"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "作業編輯頁的 LTI 深入連結細項"
   lti_delete_ee5f1bef: "LTI - 刪除"
+  lti_dynamic_registration_8592edb0: "LTI 動態註冊"
   lti_edit_83a27850: "LTI - 編輯"
   lti_key_14ad02b1: "LTI 金鑰"
   lti_launch_af082dc3: "LTI 啟動："
@@ -19071,6 +19091,7 @@ zh-Hant:
   new_question_9107c469: 新問題
   new_question_group_d9306280: 新問題群組
   new_quiz_34aacba6: 新測驗
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: 刪除的新測驗使用者還原與註冊有關的擱置檢閱狀態
   new_quiz_items_3c850331: 新測驗項目
   new_quiz_statistics_desc: 為一門課程啟用新測驗統計資料頁面。
   new_quizzes_account_and_course_level_item_banks_9152fb1: 新的測驗帳戶和課程級別項目題庫
@@ -21783,6 +21804,7 @@ zh-Hant:
   qti_img_matching_question: 導入的相符問題兩側均包含影像，這並不受支援
   qti_img_matching_question_distractors: 導入的相符問題包含選項裡面的影像，無法固定，因為其也包含干擾項
   qti_name: "QTI 轉換器"
+  quantitative_data_options_4f071510: 定量資料選項
   question_9121487: 問題
   question_answered: 已回答
   question_bank: 
@@ -23535,6 +23557,7 @@ zh-Hant:
         name: 名稱
     welcome_to_canvas: "歡迎使用 Canvas！"
   registration_url_60e0eaaa: "註冊 URL"
+  regular_lato_font_7f3cf24c: "一般 Lato 字型"
   regular_style_checkbox_ee3d71c1: 一般風格復選框
   reinforce_student_understanding_304d18a6: 提升學生掌握程度
   relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: 放鬆，休息一下。現在沒有什麼可做的。
@@ -26028,6 +26051,13 @@ zh-Hant:
       aria_stop: 按一下「停止」，結束錄製。
     edit_view_rubric: 檢視評分標準
     group: 群組
+    late_input: 
+      days: 
+        one: 天
+        other: 天
+      hours: 
+        one: 小時
+        other: 小時
     mic_blocked_message: "使用麥克風的權限遭到封鎖。若要變更，請前往 chrome://settings/content/microphone"
     mute_assignment: 隱藏評分作業
     no_submission_time: 沒有提交時間
@@ -27637,6 +27667,7 @@ zh-Hant:
       此功能標記可啟用更新的
       討論區建立/編輯頁面
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "帳戶可以打開此功能標記，如果他們想讓帳戶使用者使用書寫方式通常為從右到左的語言（例如：阿拉伯語、希伯來語、波斯語），並在我們正在處理它時查看 RTL 佈局。一旦此功能準備就緒，此功能標記將會消失，任何使用這些語言之一的人都會看到 RTL 界面。"
+  this_feature_introduces_performance_and_maintenanc_50c325aa: 此功能介紹個別成績單的效能和維護。
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       此功能造成，當
       第三方工具透過「作業列表」和「評分服務 API」一起提交多個檔案時，
@@ -28810,6 +28841,10 @@ zh-Hant:
   traditional_gradebook_d7ad59c6: 傳統成績單…
   traditional_gradebook_d90461dc: 傳統成績單
   transferred_student_enrollments_90dc27d3: 轉移的學生註冊
+  transform_rce_content_on_load_1f521086: "載入時轉換 RCE 內容"
+  transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
+      將絕對網址轉換為相對網址，並在載入時從 RCE 內容移除無關的屬性。
+      RCE 在新測驗中完全發揮功能所需。
   travel_places_f461329c: 旅行和位置
   treat_ungraded_as_0_d38c2b41: "將未評分視為 0"
   tree_browser: 
@@ -29931,6 +29966,8 @@ zh-Hant:
       resubmit_to_vericite: 重新提交到VeriCite
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite 相似分數 -- 更多資訊"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite相似分數 - 參閱詳細報告"
+  verify_ldap_tls_certificates_70241d8e: "驗證 LDAP TLS 憑證"
+  verify_tls_certificates_presented_by_ldap_authenti_946337a3: "驗證 LDAP 驗證提供者提供的 TLS 憑證。"
   version_versionnumber_updatedat_9f5b7a5b: "版本 %{versionNumber} %{updatedAt}"
   video_78335c71: 影片
   video_b9f27375: 視訊
@@ -30210,6 +30247,7 @@ zh-Hant:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: 選取後，課程在這些日期以外的時間會變為唯讀狀態。
   when_selected_the_course_is_inaccessible_outside_c_af595406: 選取後，課程在這些日期以外的時間會變為不可訪問。如果課程日期為空白，將套用這些開始及結束日期至學期日期。
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: 選取後，課程分班在這些日期以外的時間會變為唯讀狀態。
+  when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "設定時，如果使用者有之前的 pending_review 新測驗，但已在課程中重新註冊，請決定新測驗的工作流程狀態應設定為已評分或 pending_review。"
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       啟用此標記時，課程導航在頁面之間導航時，
       將保持收起或展開，這取決於使用者的最後設定，

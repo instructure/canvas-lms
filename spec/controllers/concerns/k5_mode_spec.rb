@@ -38,6 +38,7 @@ describe K5Mode do
     student_in_course(active_all: true)
     account_admin_user(account: @course.account)
     toggle_k5_setting(@course.account)
+    Account.site_admin.enable_feature! :k5_font_selection
   end
 
   describe "set_k5_mode" do
@@ -60,7 +61,7 @@ describe K5Mode do
         get :index, params: { course_id: @course.id }
         expect(assigns(:k5_details_view)).to eq(false)
         expect(assigns(:show_left_side)).to eq(true)
-        expect(assigns(:css_bundles).flatten).to include(:k5_theme)
+        expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
         expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
 
@@ -75,7 +76,7 @@ describe K5Mode do
           get :index, params: { course_id: @course.id }
           expect(assigns(:k5_details_view)).to eq(false)
           expect(assigns(:show_left_side)).to eq(true)
-          expect(assigns(:css_bundles).flatten).to include(:k5_theme)
+          expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
           expect(assigns(:js_bundles).flatten).to include(:k5_theme)
         end
       end
@@ -92,7 +93,7 @@ describe K5Mode do
         get :index, params: { course_id: @course.id }
         expect(assigns(:k5_details_view)).to eq(false)
         expect(assigns(:show_left_side)).to eq(true)
-        expect(assigns(:css_bundles).flatten).to include(:k5_theme)
+        expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
         expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
     end
@@ -108,7 +109,7 @@ describe K5Mode do
         get :index, params: { course_id: @course.id }
         expect(assigns(:k5_details_view)).to eq(true)
         expect(assigns(:show_left_side)).to eq(false)
-        expect(assigns(:css_bundles).flatten).to include(:k5_theme)
+        expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
         expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
     end
@@ -117,7 +118,7 @@ describe K5Mode do
       @course.homeroom_course = true
       user_session(@teacher)
       get :index, params: { course_id: @course.id }
-      expect(assigns(:css_bundles).flatten).to include(:k5_theme)
+      expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
       expect(assigns(:js_bundles).flatten).to include(:k5_theme)
     end
 
@@ -125,7 +126,7 @@ describe K5Mode do
       @course.enable_feature!(:canvas_k6_theme)
       user_session(@teacher)
       get :index, params: { course_id: @course.id }
-      expect(assigns(:css_bundles).flatten).to include(:k5_theme)
+      expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
       expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       expect(assigns(:js_bundles).flatten).not_to include(:k6_theme)
     end
@@ -137,6 +138,15 @@ describe K5Mode do
       user_session(@teacher)
       get :index, params: { course_id: @course.id }
       expect(assigns(:css_bundles).flatten).to include(:k6_theme)
+    end
+
+    it "does not include the k5_font css bundle if use_classic_font_in_k5? is true" do
+      @course.account.settings[:use_classic_font_in_k5] = { value: true }
+      @course.account.save!
+      user_session(@teacher)
+      get :index, params: { course_id: @course.id }
+      expect(assigns(:css_bundles).flatten).to include(:k5_theme)
+      expect(assigns(:css_bundles).flatten).not_to include(:k5_font)
     end
   end
 end

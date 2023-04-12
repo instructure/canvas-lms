@@ -35,6 +35,8 @@ module PostgreSQLAdapterExtensions
                          :debug
                        when "INFO", "LOG"
                          :info
+                       else
+                         :error
                        end
       logger.send(rails_severity, "PG notice: " + result.result_error_message.strip)
 

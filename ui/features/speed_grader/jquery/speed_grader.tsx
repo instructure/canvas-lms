@@ -1084,7 +1084,8 @@ function initKeyCodes() {
     keyCodes: 'j k p n c r g',
     ignore: 'input, textarea, embed, object',
   }
-  $window.keycodes(keycodeOptions, (event: JQuery.KeyDownEvent & {keyString: string}) => {
+
+  $window.keycodes(keycodeOptions, event => {
     event.preventDefault()
     event.stopPropagation()
     const {keyString} = event
@@ -1404,7 +1405,7 @@ EG = {
       $(this).closest('.alert').hide()
     })
 
-    $('#eg_sort_by').val(userSettings.get('eg_sort_by'))
+    $('#eg_sort_by').val(userSettings.get('eg_sort_by') || '')
     $('#submit_same_score').click((e: JQuery.ClickEvent) => {
       // By passing true as the second argument, we're telling
       // handleGradeSubmit to use the existing previous submission score

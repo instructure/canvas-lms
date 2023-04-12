@@ -1260,4 +1260,146 @@ describe ContentMigration do
       end
     end
   end
+
+  context "outcomes" do
+    def context_outcome(context)
+      outcome_group ||= context.root_outcome_group
+      outcome = context.created_learning_outcomes.create!(title: "outcome")
+      outcome_group.add_outcome(outcome)
+      outcome
+    end
+
+    def mig_id(obj)
+      @template.migration_id_for(obj)
+    end
+
+    def run_migration
+      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
+      @cm = @course_to.content_migrations.build
+      @cm.migration_type = "master_course_import"
+      @cm.migration_settings[:master_migration_id] = @migration.id
+      @cm.migration_settings["import_immediately"] = true
+      @cm.child_subscription_id = @sub.id
+      @cm.save!
+      run_jobs
+      @migration.reload
+    end
+
+    def create_learning_outcome_resuls(outcome)
+      student = user_factory
+      @course_to.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
+      time = Time.zone.now
+      rubric = outcome_with_rubric context: @course_to, outcome: outcome
+      assignment1 = @course_to.assignments.create!(title: "Assignment 1")
+      alignment1 = outcome.align(assignment1, @course_to)
+      rubric_association1 = rubric.associate_with(assignment1, @course_to, purpose: "grading")
+      LearningOutcomeResult.create!(
+        learning_outcome: outcome,
+        user: student,
+        context: @course_to,
+        alignment: alignment1,
+        associated_asset: assignment1,
+        association_type: "RubricAssociation",
+        association_id: rubric_association1.id,
+        title: "",
+        score: 3,
+        possible: 5,
+        mastery: 3,
+        created_at: time,
+        updated_at: time,
+        submitted_at: time,
+        assessed_at: time
+      )
+    end
+
+    before(:once) do
+      @course_from = course_model
+      @course_to = course_model
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@course_from)
+      @sub = @template.add_child_course!(@course_to)
+    end
+
+    describe "course level outcomes" do
+      before do
+        @outcome_from = context_outcome(@course_from)
+        run_migration
+      end
+
+      it "there are no learning outcome results nor authoritative results" do
+        @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id(@outcome_from)).first
+        @outcome_from.destroy!
+        run_migration
+        expect(@outcome_from.reload).to be_deleted
+        expect(@outcome_to.reload).to be_deleted
+      end
+
+      it "there are learning outcome results" do
+        mig_id = mig_id(@outcome_from)
+        @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id).first
+        create_learning_outcome_resuls(@outcome_to)
+        @outcome_from.destroy!
+        run_migration
+        expect(@outcome_from.reload).to be_deleted
+        expect(@outcome_to.reload).not_to be_deleted
+        expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+      end
+
+      it "there are authoritative results" do
+        mig_id = mig_id(@outcome_from)
+        @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id).first
+        @outcome_from.destroy!
+        allow_any_instance_of(ContentMigration).to receive(:outcome_has_authoritative_results?).and_return true
+        run_migration
+        expect(@outcome_from.reload).to be_deleted
+        expect(@outcome_to.reload).not_to be_deleted
+        expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+      end
+    end
+
+    describe "account level outcomes" do
+      before(:once) do
+        @account = @course_from.account
+        @account_outcome = context_outcome(@account)
+      end
+
+      before do
+        @course_root = @course_from.root_outcome_group
+        @course_root.add_outcome(@account_outcome)
+        run_migration
+      end
+
+      it "there are no learning outcome results nor authoritative results" do
+        @ct_from = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_from.id)
+        @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
+        @ct_from.destroy!
+        run_migration
+        expect(@ct_from.reload).to be_deleted
+        expect(@ct_to.reload).to be_deleted
+      end
+
+      it "there are learning outcome results" do
+        create_learning_outcome_resuls(@account_outcome)
+        @ct_from = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_from.id)
+        @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
+        mig_id = @ct_to.migration_id
+        @ct_from.destroy!
+        run_migration
+        expect(@ct_from.reload).to be_deleted
+        expect(@ct_to.reload).not_to be_deleted
+        expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+      end
+
+      it "there are authoritative results" do
+        @ct_from = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_from.id)
+        @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
+        mig_id = @ct_to.migration_id
+        @ct_from.destroy!
+        allow_any_instance_of(ContentMigration).to receive(:outcome_has_authoritative_results?).and_return true
+        run_migration
+        expect(@ct_from.reload).to be_deleted
+        expect(@ct_to.reload).not_to be_deleted
+        expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+      end
+    end
+  end
 end

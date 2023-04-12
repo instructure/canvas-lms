@@ -59,123 +59,55 @@ const locale = {
   "an_error_occurred_uploading_your_media_71f1444d": {
     "message": "Der opstod en fejl ved overførsel af mediet."
   },
-  "and_7fcc2911": {
-    "message": "Og"
-  },
-  "angle_c5b4ec50": {
-    "message": "Vinkel"
-  },
-  "announcement_list_da155734": {
-    "message": "Meddelelsesliste"
-  },
-  "announcements_a4b8ed4a": {
-    "message": "Beskeder"
-  },
-  "apply_781a2546": {
-    "message": "Tildel"
-  },
+  "and_7fcc2911": { "message": "Og" },
+  "angle_c5b4ec50": { "message": "Vinkel" },
+  "announcement_list_da155734": { "message": "Meddelelsesliste" },
+  "announcements_a4b8ed4a": { "message": "Beskeder" },
+  "apply_781a2546": { "message": "Tildel" },
   "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
     "message": "Anvend ændringer på alle instanser af denne Icon Maker i faget"
   },
-  "approaches_the_limit_893aeec9": {
-    "message": "Nærmer sig grænsen"
-  },
-  "approximately_e7965800": {
-    "message": "Cirka"
-  },
-  "apps_54d24a47": {
-    "message": "Apps"
-  },
-  "arrows_464a3e54": {
-    "message": "Pile"
-  },
-  "art_icon_8e1daad": {
-    "message": "Kunst-ikon"
-  },
+  "approaches_the_limit_893aeec9": { "message": "Nærmer sig grænsen" },
+  "approximately_e7965800": { "message": "Cirka" },
+  "apps_54d24a47": { "message": "Apps" },
+  "arrows_464a3e54": { "message": "Pile" },
+  "art_icon_8e1daad": { "message": "Kunst-ikon" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Dimensionsforhold bevares"
   },
-  "assignments_1e02582c": {
-    "message": "Opgaver"
-  },
-  "asterisk_82255584": {
-    "message": "Stjerne"
-  },
-  "attributes_963ba262": {
-    "message": "Attributter"
-  },
+  "assignments_1e02582c": { "message": "Opgaver" },
+  "asterisk_82255584": { "message": "Stjerne" },
+  "attributes_963ba262": { "message": "Attributter" },
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Lyd- og videooptagelse understøttes ikke, brug en anden browser."
   },
-  "audio_options_feb58e2c": {
-    "message": "Lydindstillinger"
-  },
-  "audio_options_tray_33a90711": {
-    "message": "Skuffe til lydindstillinger"
-  },
+  "audio_options_feb58e2c": { "message": "Lydindstillinger" },
+  "audio_options_tray_33a90711": { "message": "Skuffe til lydindstillinger" },
   "audio_player_for_title_20cc70d": {
     "message": "Audioafspiller til { title }"
   },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Der findes automatisk gemt indhold. Vil du indlæse det automatisk gemte indhold i stedet?"
   },
-  "available_folders_694d0436": {
-    "message": "Tilgængelige mapper"
-  },
-  "backslash_b2d5442d": {
-    "message": "Omvendt skråstreg"
-  },
-  "bar_ec63ed6": {
-    "message": "Bar"
-  },
-  "basic_554cdc0a": {
-    "message": "Grundlæggende"
-  },
-  "because_501841b": {
-    "message": "Fordi"
-  },
-  "below_81d4dceb": {
-    "message": "Under"
-  },
-  "beta_cb5f307e": {
-    "message": "Beta"
-  },
-  "big_circle_16b2e604": {
-    "message": "Stor cirkel"
-  },
-  "binomial_coefficient_ea5b9bb7": {
-    "message": "Binomial koefficient"
-  },
-  "black_4cb01371": {
-    "message": "Sort"
-  },
-  "blue_daf8fea9": {
-    "message": "Blå"
-  },
-  "bottom_15a2a9be": {
-    "message": "Bund"
-  },
-  "bottom_third_5f5fec1d": {
-    "message": "Nederste tredjedel"
-  },
-  "bowtie_5f9629e4": {
-    "message": "Butterfly"
-  },
-  "brick_f2656265": {
-    "message": "Mursten"
-  },
-  "c_2001_acme_inc_283f7f80": {
-    "message": "(c) 2001 Acme Inc."
-  },
-  "cancel_caeb1e68": {
-    "message": "Annullér"
-  },
-  "cap_product_3a5265a6": {
-    "message": "Cap product"
-  },
-  "centered_dot_64d5e378": {
-    "message": "Centreret prik"
-  },
+  "available_folders_694d0436": { "message": "Tilgængelige mapper" },
+  "backslash_b2d5442d": { "message": "Omvendt skråstreg" },
+  "bar_ec63ed6": { "message": "Bar" },
+  "basic_554cdc0a": { "message": "Grundlæggende" },
+  "because_501841b": { "message": "Fordi" },
+  "below_81d4dceb": { "message": "Under" },
+  "beta_cb5f307e": { "message": "Beta" },
+  "big_circle_16b2e604": { "message": "Stor cirkel" },
+  "binomial_coefficient_ea5b9bb7": { "message": "Binomial koefficient" },
+  "black_4cb01371": { "message": "Sort" },
+  "blue_daf8fea9": { "message": "Blå" },
+  "bottom_15a2a9be": { "message": "Bund" },
+  "bottom_third_5f5fec1d": { "message": "Nederste tredjedel" },
+  "bowtie_5f9629e4": { "message": "Butterfly" },
+  "brick_f2656265": { "message": "Mursten" },
+  "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
+  "cancel_caeb1e68": { "message": "Annullér" },
+  "cap_product_3a5265a6": { "message": "Cap product" },
+  "centered_dot_64d5e378": { "message": "Centreret prik" },
   "centered_horizontal_dots_451c5815": {
     "message": "Centrerede vandrette prikker"
   },
@@ -229,18 +161,10 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": {
     "message": "Billedtekster / undertekster"
   },
-  "clubs_suit_c1ffedff": {
-    "message": "Klør (kulør)"
-  },
-  "collaborations_5c56c15f": {
-    "message": "Samarbejde"
-  },
-  "collapse_to_hide_types_1ab46d2e": {
-    "message": "Skjul { types }"
-  },
-  "color_picker_6b359edf": {
-    "message": "Farvevælger"
-  },
+  "clubs_suit_c1ffedff": { "message": "Klør (kulør)" },
+  "collaborations_5c56c15f": { "message": "Samarbejde" },
+  "collapse_to_hide_types_1ab46d2e": { "message": "Skjul { types }" },
+  "color_picker_6b359edf": { "message": "Farvevælger" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Farvevælger ({ colorName } valgt)"
   },
@@ -254,48 +178,24 @@ const locale = {
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Indhold er stadig ved at blive uploadet. Hvis du fortsætter, bliver det ikke integreret korrekt."
   },
-  "content_subtype_5ce35e88": {
-    "message": "Indholdsundertype"
-  },
-  "content_type_2cf90d95": {
-    "message": "Indholdstype"
-  },
-  "coproduct_e7838082": {
-    "message": "Koprodukt"
-  },
-  "copyright_holder_66ee111": {
-    "message": "Rettighedshaver:"
-  },
+  "content_subtype_5ce35e88": { "message": "Indholdsundertype" },
+  "content_type_2cf90d95": { "message": "Indholdstype" },
+  "coproduct_e7838082": { "message": "Koprodukt" },
+  "copyright_holder_66ee111": { "message": "Rettighedshaver:" },
   "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
     "message": "{ count, plural,\n     =0 {0 ord}\n    one {1 ord}\n  other {# ord}\n}"
   },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {# element indlæst}\n  other {# elementer indlæst}\n}"
   },
-  "course_documents_104d76e0": {
-    "message": "Fagdokumenter"
-  },
-  "course_files_62deb8f8": {
-    "message": "Fagets filer"
-  },
-  "course_files_a31f97fc": {
-    "message": "Fagets filer"
-  },
-  "course_images_f8511d04": {
-    "message": "Fagbilleder"
-  },
-  "course_links_b56959b9": {
-    "message": "Faglinks"
-  },
-  "course_media_ec759ad": {
-    "message": "Fagmedier"
-  },
-  "course_navigation_dd035109": {
-    "message": "Fagnavigation"
-  },
-  "create_icon_110d6463": {
-    "message": "Opret ikon"
-  },
+  "course_documents_104d76e0": { "message": "Fagdokumenter" },
+  "course_files_62deb8f8": { "message": "Fagets filer" },
+  "course_files_a31f97fc": { "message": "Fagets filer" },
+  "course_images_f8511d04": { "message": "Fagbilleder" },
+  "course_links_b56959b9": { "message": "Faglinks" },
+  "course_media_ec759ad": { "message": "Fagmedier" },
+  "course_navigation_dd035109": { "message": "Fagnavigation" },
+  "create_icon_110d6463": { "message": "Opret ikon" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons licens:"
   },
@@ -337,57 +237,33 @@ const locale = {
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Vis tekstlink (åbnes i en ny fane)"
   },
-  "division_sign_72190870": {
-    "message": "Divisionstegn"
-  },
-  "documents_81393201": {
-    "message": "Dokumenter"
-  },
-  "done_54e3d4b6": {
-    "message": "Udført"
-  },
-  "double_dagger_faf78681": {
-    "message": "Dobbelt kors"
-  },
+  "division_sign_72190870": { "message": "Divisionstegn" },
+  "documents_81393201": { "message": "Dokumenter" },
+  "done_54e3d4b6": { "message": "Udført" },
+  "double_dagger_faf78681": { "message": "Dobbelt kors" },
   "down_and_left_diagonal_arrow_40ef602c": {
     "message": "Ned og venstre diagonal pil"
   },
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Ned og højre diagonal pil"
   },
-  "download_filename_2baae924": {
-    "message": "Download { filename }"
-  },
-  "downward_arrow_cca52012": {
-    "message": "Pil ned"
-  },
-  "downward_pointing_triangle_2a12a601": {
-    "message": "Nedadpegende trekant"
-  },
-  "drag_a_file_here_1bf656d5": {
-    "message": "Træk en fil her hen"
-  },
+  "download_filename_2baae924": { "message": "Download { filename }" },
+  "downward_arrow_cca52012": { "message": "Pil ned" },
+  "downward_pointing_triangle_2a12a601": { "message": "Nedadpegende trekant" },
+  "drag_a_file_here_1bf656d5": { "message": "Træk en fil her hen" },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Træk og slip eller klik for at browse din computer"
   },
   "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
     "message": "Træk i håndtaget. Brug op- og ned-pilene til at ændre størrelse"
   },
-  "due_multiple_dates_cc0ee3f5": {
-    "message": "Forfalder: Flere datoer"
-  },
-  "due_when_7eed10c6": {
-    "message": "Forfalder: { when }"
-  },
+  "due_multiple_dates_cc0ee3f5": { "message": "Forfalder: Flere datoer" },
+  "due_when_7eed10c6": { "message": "Forfalder: { when }" },
   "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
     "message": "Rediger alternativ tekst for denne ikoninstans"
   },
-  "edit_c5fbea07": {
-    "message": "Redigér"
-  },
-  "edit_course_link_5a5c3c59": {
-    "message": "Rediger faglink"
-  },
+  "edit_c5fbea07": { "message": "Redigér" },
+  "edit_course_link_5a5c3c59": { "message": "Rediger faglink" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Rediger eksisterende Icon Maker-ikon"
   },
@@ -412,69 +288,35 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Indtast mindst 3 tegn for at søge"
   },
-  "epsilon_54bb8afa": {
-    "message": "Epsilon"
-  },
-  "epsilon_variant_d31f1e77": {
-    "message": "Epsilon (variant)"
-  },
-  "equals_sign_c51bdc58": {
-    "message": "Lig med-symbol"
-  },
+  "epsilon_54bb8afa": { "message": "Epsilon" },
+  "epsilon_variant_d31f1e77": { "message": "Epsilon (variant)" },
+  "equals_sign_c51bdc58": { "message": "Lig med-symbol" },
   "equation_editor_39fbc3f1": {
     "message": "Redigeringsværktøj til regnestykker"
   },
-  "equivalence_class_7b0f11c0": {
-    "message": "Ækvivalensklasse"
-  },
-  "equivalent_identity_654b3ce5": {
-    "message": "Ækvivalent (identitet)"
-  },
-  "eta_b8828f99": {
-    "message": "Eta"
-  },
-  "exists_2e62bdaa": {
-    "message": "Findes"
-  },
-  "exit_fullscreen_b7eb0aa4": {
-    "message": "Afslut fuld skærm"
-  },
+  "equivalence_class_7b0f11c0": { "message": "Ækvivalensklasse" },
+  "equivalent_identity_654b3ce5": { "message": "Ækvivalent (identitet)" },
+  "eta_b8828f99": { "message": "Eta" },
+  "exists_2e62bdaa": { "message": "Findes" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Afslut fuld skærm" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Udvid forhåndsvisning som standard"
   },
-  "expand_to_see_types_f5d29352": {
-    "message": "Udvid for at se { types }"
-  },
-  "external_tools_6e77821": {
-    "message": "Eksterne værktøjer"
-  },
-  "extra_large_b6cdf1ff": {
-    "message": "Ekstra stor"
-  },
-  "extra_small_9ae33252": {
-    "message": "Ekstra lille"
-  },
-  "extracurricular_icon_67c8ca42": {
-    "message": "Fritids-ikon"
-  },
-  "f_function_fe422d65": {
-    "message": "F (funktion)"
-  },
+  "expand_to_see_types_f5d29352": { "message": "Udvid for at se { types }" },
+  "external_tools_6e77821": { "message": "Eksterne værktøjer" },
+  "extra_large_b6cdf1ff": { "message": "Ekstra stor" },
+  "extra_small_9ae33252": { "message": "Ekstra lille" },
+  "extracurricular_icon_67c8ca42": { "message": "Fritids-ikon" },
+  "f_function_fe422d65": { "message": "F (funktion)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Kunne ikke hente filindhold"
   },
-  "file_name_8fd421ff": {
-    "message": "Filnavn"
-  },
+  "file_name_8fd421ff": { "message": "Filnavn" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Kvote for fillagring er overskredet"
   },
-  "file_url_c12b64be": {
-    "message": "Fil-URL"
-  },
-  "filename_file_icon_602eb5de": {
-    "message": "{ filename } filikon"
-  },
+  "file_url_c12b64be": { "message": "Fil-URL" },
+  "filename_file_icon_602eb5de": { "message": "{ filename } filikon" },
   "filename_image_preview_6cef8f26": {
     "message": "{ filename } billedets forhåndsvisning"
   },
@@ -501,18 +343,10 @@ const locale = {
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Fandt { count, plural,\n     =0 {# resultater}\n    one {# resultat}\n  other {# resultater}\n}"
   },
-  "fraction_41bac7af": {
-    "message": "Brøk"
-  },
-  "fullscreen_873bf53f": {
-    "message": "Fuld skærm"
-  },
-  "gamma_1767928": {
-    "message": "Gamma"
-  },
-  "generating_preview_45b53be0": {
-    "message": "Genererer forhåndsvisning ..."
-  },
+  "fraction_41bac7af": { "message": "Brøk" },
+  "fullscreen_873bf53f": { "message": "Fuld skærm" },
+  "gamma_1767928": { "message": "Gamma" },
+  "generating_preview_45b53be0": { "message": "Genererer forhåndsvisning ..." },
   "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
     "message": "GIF/PNG-format billeder større end { size } KB understøttes ikke i øjeblikket."
   },
@@ -571,36 +405,16 @@ const locale = {
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Jeg har opnået tilladelse til at bruge denne fil."
   },
-  "i_hold_the_copyright_71ee91b1": {
-    "message": "Jeg er rettighedshaveren"
-  },
-  "icon_215a1dc6": {
-    "message": "Ikon"
-  },
-  "icon_8168b2f8": {
-    "message": "ikon"
-  },
-  "icon_color_b86dd6d6": {
-    "message": "Ikonfarve"
-  },
-  "icon_maker_icons_cc560f7e": {
-    "message": "Icon Maker-ikoner"
-  },
-  "icon_options_7e32746e": {
-    "message": "Ikonindstillinger"
-  },
-  "icon_options_tray_2b407977": {
-    "message": "Skuffe til ikonindstillinger"
-  },
-  "icon_preview_1782a1d9": {
-    "message": "Ikonforhåndsvisning"
-  },
-  "icon_shape_30b61e7": {
-    "message": "Ikon-form"
-  },
-  "icon_size_9353edea": {
-    "message": "Ikon-størrelse"
-  },
+  "i_hold_the_copyright_71ee91b1": { "message": "Jeg er rettighedshaveren" },
+  "icon_215a1dc6": { "message": "Ikon" },
+  "icon_8168b2f8": { "message": "ikon" },
+  "icon_color_b86dd6d6": { "message": "Ikonfarve" },
+  "icon_maker_icons_cc560f7e": { "message": "Icon Maker-ikoner" },
+  "icon_options_7e32746e": { "message": "Ikonindstillinger" },
+  "icon_options_tray_2b407977": { "message": "Skuffe til ikonindstillinger" },
+  "icon_preview_1782a1d9": { "message": "Ikonforhåndsvisning" },
+  "icon_shape_30b61e7": { "message": "Ikon-form" },
+  "icon_size_9353edea": { "message": "Ikon-størrelse" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
     "message": "Hvis linket er tomt, vises tekst som faglinkets navn"
   },
@@ -689,18 +503,12 @@ const locale = {
   "left_downard_harpoon_arrow_1d7b3d2e": {
     "message": "Venstre nedadgående harpunpil"
   },
-  "left_floor_29ac2274": {
-    "message": "Venstre etage"
-  },
-  "left_to_right_e9b4fd06": {
-    "message": "Venstre til højre"
-  },
+  "left_floor_29ac2274": { "message": "Venstre etage" },
+  "left_to_right_e9b4fd06": { "message": "Venstre til højre" },
   "left_upward_harpoon_arrow_3a562a96": {
     "message": "Venstre opadgående harpunpil"
   },
-  "leftward_arrow_1e4765de": {
-    "message": "Venstre pil"
-  },
+  "leftward_arrow_1e4765de": { "message": "Venstre pil" },
   "leftward_pointing_triangle_d14532ce": {
     "message": "Venstre-pegende trekant"
   },
@@ -726,27 +534,13 @@ const locale = {
   "loading_closed_captions_subtitles_failed_95ceef47": {
     "message": "indlæsning af undertekster mislykkedes."
   },
-  "loading_failed_b3524381": {
-    "message": "Indlæsning mislykkedes ..."
-  },
-  "loading_failed_e6a9d8ef": {
-    "message": "Indlæsning mislykkedes."
-  },
-  "loading_folders_d8b5869e": {
-    "message": "Indlæser mapper"
-  },
-  "loading_please_wait_d276220a": {
-    "message": "Indlæser, vent venligst"
-  },
-  "loading_preview_9f077aa1": {
-    "message": "Indlæser forhåndsvisning"
-  },
-  "locked_762f138b": {
-    "message": "Låst"
-  },
-  "logical_equivalence_76fca396": {
-    "message": "Logisk ækvivalens"
-  },
+  "loading_failed_b3524381": { "message": "Indlæsning mislykkedes ..." },
+  "loading_failed_e6a9d8ef": { "message": "Indlæsning mislykkedes." },
+  "loading_folders_d8b5869e": { "message": "Indlæser mapper" },
+  "loading_please_wait_d276220a": { "message": "Indlæser, vent venligst" },
+  "loading_preview_9f077aa1": { "message": "Indlæser forhåndsvisning" },
+  "locked_762f138b": { "message": "Låst" },
+  "logical_equivalence_76fca396": { "message": "Logisk ækvivalens" },
   "logical_equivalence_short_8efd7b4f": {
     "message": "Logisk ækvivalens (kort)"
   },
@@ -756,21 +550,11 @@ const locale = {
   "logical_equivalence_thick_662dd3f2": {
     "message": "Logisk ækvivalens (tyk)"
   },
-  "low_horizontal_dots_cc08498e": {
-    "message": "Lave vandrette prikker"
-  },
-  "magenta_4a65993c": {
-    "message": "Magenta"
-  },
-  "maps_to_e5ef7382": {
-    "message": "Svarer til"
-  },
-  "math_icon_ad4e9d03": {
-    "message": "Matematik-ikon"
-  },
-  "media_af190855": {
-    "message": "Medier"
-  },
+  "low_horizontal_dots_cc08498e": { "message": "Lave vandrette prikker" },
+  "magenta_4a65993c": { "message": "Magenta" },
+  "maps_to_e5ef7382": { "message": "Svarer til" },
+  "math_icon_ad4e9d03": { "message": "Matematik-ikon" },
+  "media_af190855": { "message": "Medier" },
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Mediefil behandles. Prøv igen senere."
   },
@@ -782,63 +566,29 @@ const locale = {
   "minimize_file_preview_da911944": {
     "message": "Minimer fil-forhåndsvisning"
   },
-  "minimize_video_20aa554b": {
-    "message": "Minimer video"
-  },
-  "minus_fd961e2e": {
-    "message": "Minus"
-  },
-  "minus_plus_3461f637": {
-    "message": "Minus/plus"
-  },
-  "misc_3b692ea7": {
-    "message": "Bland"
-  },
-  "miscellaneous_e9818229": {
-    "message": "Diverse"
-  },
-  "modules_c4325335": {
-    "message": "Forløb"
-  },
-  "mu_37223b8b": {
-    "message": "My"
-  },
-  "multi_color_image_63d7372f": {
-    "message": "Billede i flere farver"
-  },
-  "multiplication_sign_15f95c22": {
-    "message": "Multiplikationstegn"
-  },
-  "music_icon_4db5c972": {
-    "message": "Musik-ikon"
-  },
+  "minimize_video_20aa554b": { "message": "Minimer video" },
+  "minus_fd961e2e": { "message": "Minus" },
+  "minus_plus_3461f637": { "message": "Minus/plus" },
+  "misc_3b692ea7": { "message": "Bland" },
+  "miscellaneous_e9818229": { "message": "Diverse" },
+  "modules_c4325335": { "message": "Forløb" },
+  "mu_37223b8b": { "message": "My" },
+  "multi_color_image_63d7372f": { "message": "Billede i flere farver" },
+  "multiplication_sign_15f95c22": { "message": "Multiplikationstegn" },
+  "music_icon_4db5c972": { "message": "Musik-ikon" },
   "must_be_at_least_percentage_22e373b6": {
     "message": "Skal være mindst { percentage }%"
   },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Skal være mindst { width } x { height } px"
   },
-  "my_files_2f621040": {
-    "message": "Mine filer"
-  },
-  "n_th_root_9991a6e4": {
-    "message": "N''te rod"
-  },
-  "nabla_1e216d25": {
-    "message": "Nabla"
-  },
-  "name_1aed4a1b": {
-    "message": "Navn"
-  },
-  "name_color_ceec76ff": {
-    "message": "{ name } ({ color })"
-  },
-  "natural_music_54a70258": {
-    "message": "Naturlig (musik)"
-  },
-  "natural_numbers_3da07060": {
-    "message": "Naturlige tal"
-  },
+  "my_files_2f621040": { "message": "Mine filer" },
+  "n_th_root_9991a6e4": { "message": "N''te rod" },
+  "nabla_1e216d25": { "message": "Nabla" },
+  "name_1aed4a1b": { "message": "Navn" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
+  "natural_music_54a70258": { "message": "Naturlig (musik)" },
+  "natural_numbers_3da07060": { "message": "Naturlige tal" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviger gennem menuen eller værktøjslinjen"
   },
@@ -855,84 +605,42 @@ const locale = {
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Der findes ikke forhåndsvisning for denne fil."
   },
-  "no_results_940393cf": {
-    "message": "Ingen resultater."
-  },
+  "no_results_940393cf": { "message": "Ingen resultater." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultater fundet for { filterTerm }"
   },
-  "no_video_1ed00b26": {
-    "message": "Ingen video"
-  },
-  "none_3b5e34d2": {
-    "message": "Ingen"
-  },
-  "none_selected_b93d56d2": {
-    "message": "Ingen valgt"
-  },
-  "not_equal_6e2980e6": {
-    "message": "Ikke lig"
-  },
+  "no_video_1ed00b26": { "message": "Ingen video" },
+  "none_3b5e34d2": { "message": "Ingen" },
+  "none_selected_b93d56d2": { "message": "Ingen valgt" },
+  "not_equal_6e2980e6": { "message": "Ikke lig" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Ikke i (ikke et element af)"
   },
-  "not_negation_1418ebb8": {
-    "message": "Ikke (negation)"
-  },
-  "not_subset_dc2b5e84": {
-    "message": "Ikke delmængde"
-  },
-  "not_subset_strict_23d282bf": {
-    "message": "Ikke delmængde (streng)"
-  },
-  "not_superset_5556b913": {
-    "message": "Ikke overmængde"
-  },
-  "not_superset_strict_24e06f36": {
-    "message": "Ikke overmængde (streng)"
-  },
-  "nu_1c0f6848": {
-    "message": "Ny"
-  },
-  "octagon_e48be9f": {
-    "message": "Octagon"
-  },
-  "olive_6a3e4d6b": {
-    "message": "Oliven"
-  },
-  "omega_8f2c3463": {
-    "message": "Omega"
-  },
+  "not_negation_1418ebb8": { "message": "Ikke (negation)" },
+  "not_subset_dc2b5e84": { "message": "Ikke delmængde" },
+  "not_subset_strict_23d282bf": { "message": "Ikke delmængde (streng)" },
+  "not_superset_5556b913": { "message": "Ikke overmængde" },
+  "not_superset_strict_24e06f36": { "message": "Ikke overmængde (streng)" },
+  "nu_1c0f6848": { "message": "Ny" },
+  "octagon_e48be9f": { "message": "Octagon" },
+  "olive_6a3e4d6b": { "message": "Oliven" },
+  "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "En af følgende stilarter skal tilføjes for at gemme et ikon: Ikonfarve, konturstørrelse, ikontekst eller billede"
   },
-  "open_circle_e9bd069": {
-    "message": "Åben cirkel"
-  },
+  "open_circle_e9bd069": { "message": "Åben cirkel" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Åbn dialogen for denne genvejstast"
   },
-  "open_title_application_fd624fc5": {
-    "message": "Åbn { title } applikation"
-  },
-  "operators_a2ef9a93": {
-    "message": "Operatører"
-  },
-  "or_9b70ccaa": {
-    "message": "Eller"
-  },
-  "orange_81386a62": {
-    "message": "Orange"
-  },
+  "open_title_application_fd624fc5": { "message": "Åbn { title } applikation" },
+  "operators_a2ef9a93": { "message": "Operatører" },
+  "or_9b70ccaa": { "message": "Eller" },
+  "orange_81386a62": { "message": "Orange" },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Andre redigeringsgenveje kan findes på"
   },
-  "outline_color_3ef2cea7": {
-    "message": "Konturfarve"
-  },
-  "outline_size_a6059a21": {
-    "message": "Konturstørrelse"
-  },
+  "outline_color_3ef2cea7": { "message": "Konturfarve" },
+  "outline_size_a6059a21": { "message": "Konturstørrelse" },
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } er ikke en gyldig protokol. Den skal være ftp, http, https, mailto, skype, tel eller kan udelades"
   },
@@ -951,39 +659,17 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "Procent skal være et tal"
   },
-  "performing_arts_icon_f3497486": {
-    "message": "Scenekunst-ikon"
-  },
-  "perpendicular_7c48ede4": {
-    "message": "Vinkelret"
-  },
-  "phi_4ac33b6d": {
-    "message": "Phi"
-  },
-  "phi_variant_c9bb3ac5": {
-    "message": "Phi (variant)"
-  },
-  "physical_education_icon_d7dffd3e": {
-    "message": "Idræt-ikon"
-  },
-  "pi_dc4f0bd8": {
-    "message": "Pi"
-  },
-  "pi_variant_10f5f520": {
-    "message": "Pi (variant)"
-  },
-  "pink_68ad45cb": {
-    "message": "Lyserød"
-  },
-  "pixels_52ece7d1": {
-    "message": "Pixels"
-  },
-  "play_1a47eaa7": {
-    "message": "Afspil"
-  },
-  "play_media_comment_35257210": {
-    "message": "Afspil medie kommentar."
-  },
+  "performing_arts_icon_f3497486": { "message": "Scenekunst-ikon" },
+  "perpendicular_7c48ede4": { "message": "Vinkelret" },
+  "phi_4ac33b6d": { "message": "Phi" },
+  "phi_variant_c9bb3ac5": { "message": "Phi (variant)" },
+  "physical_education_icon_d7dffd3e": { "message": "Idræt-ikon" },
+  "pi_dc4f0bd8": { "message": "Pi" },
+  "pi_variant_10f5f520": { "message": "Pi (variant)" },
+  "pink_68ad45cb": { "message": "Lyserød" },
+  "pixels_52ece7d1": { "message": "Pixels" },
+  "play_1a47eaa7": { "message": "Afspil" },
+  "play_media_comment_35257210": { "message": "Afspil medie kommentar." },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Afspil mediekommentar af { name } fra { createdAt }."
   },
@@ -1009,33 +695,15 @@ const locale = {
   "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
     "message": "Protokollen skal være ftp, http, https, mailto, skype, tel eller kan udelades"
   },
-  "psi_e3f5f0f7": {
-    "message": "Psi"
-  },
-  "published_c944a23d": {
-    "message": "Offentliggjort"
-  },
-  "published_when_302d8e23": {
-    "message": "Offentliggjort: { when }"
-  },
-  "pumpkin_904428d5": {
-    "message": "Græskar"
-  },
-  "purple_7678a9fc": {
-    "message": "Lilla"
-  },
-  "quaternions_877024e0": {
-    "message": "Kvaternioner"
-  },
-  "quizzes_7e598f57": {
-    "message": "Quizzer"
-  },
-  "rational_numbers_80ddaa4a": {
-    "message": "Rationelle tal"
-  },
-  "real_numbers_7c99df94": {
-    "message": "Reelle tal"
-  },
+  "psi_e3f5f0f7": { "message": "Psi" },
+  "published_c944a23d": { "message": "Offentliggjort" },
+  "published_when_302d8e23": { "message": "Offentliggjort: { when }" },
+  "pumpkin_904428d5": { "message": "Græskar" },
+  "purple_7678a9fc": { "message": "Lilla" },
+  "quaternions_877024e0": { "message": "Kvaternioner" },
+  "quizzes_7e598f57": { "message": "Quizzer" },
+  "rational_numbers_80ddaa4a": { "message": "Rationelle tal" },
+  "real_numbers_7c99df94": { "message": "Reelle tal" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Reel del (af komplekst tal)"
   },
@@ -1068,18 +736,12 @@ const locale = {
   "right_downward_harpoon_arrow_d71b114f": {
     "message": "Højre nedadgående harpunpil"
   },
-  "right_floor_5392d5cf": {
-    "message": "Højre etage"
-  },
-  "right_to_left_9cfb092a": {
-    "message": "Højre mod venstre"
-  },
+  "right_floor_5392d5cf": { "message": "Højre etage" },
+  "right_to_left_9cfb092a": { "message": "Højre mod venstre" },
   "right_upward_harpoon_arrow_f5a34c73": {
     "message": "Højre opadgående harpunpil"
   },
-  "rightward_arrow_32932107": {
-    "message": "Højre pil"
-  },
+  "rightward_arrow_32932107": { "message": "Højre pil" },
   "rightward_pointing_triangle_60330f5c": {
     "message": "Højre-pegende trekant"
   },
@@ -1142,21 +804,13 @@ const locale = {
   "single_color_image_color_95fa9a87": {
     "message": "Enkeltfarvet billedfarve"
   },
-  "size_b30e1077": {
-    "message": "Størrelse"
-  },
+  "size_b30e1077": { "message": "Størrelse" },
   "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
     "message": "Tekstfilens størrelse er større end den tilladte filstørrelse på maks. { max } kb."
   },
-  "small_b070434a": {
-    "message": "Lille"
-  },
-  "solid_circle_9f061dfc": {
-    "message": "Farvet cirkel"
-  },
-  "something_went_wrong_89195131": {
-    "message": "Noget gik galt."
-  },
+  "small_b070434a": { "message": "Lille" },
+  "solid_circle_9f061dfc": { "message": "Farvet cirkel" },
+  "something_went_wrong_89195131": { "message": "Noget gik galt." },
   "something_went_wrong_accessing_your_webcam_6643b87e": {
     "message": "Noget gik galt ved adgang til dit webcam."
   },
@@ -1166,90 +820,40 @@ const locale = {
   "something_went_wrong_check_your_connection_reload__c7868286": {
     "message": "Noget gik galt. Tjek din forbindelse, genindlæs siden, og prøv igen."
   },
-  "something_went_wrong_d238c551": {
-    "message": "Noget gik galt"
-  },
+  "something_went_wrong_d238c551": { "message": "Noget gik galt" },
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Noget gik galt under deling af din skærm."
   },
-  "sort_by_e75f9e3e": {
-    "message": "Sorter efter"
-  },
-  "spades_suit_b37020c2": {
-    "message": "Spar (kulør)"
-  },
-  "square_511eb3b3": {
-    "message": "Kvadrat"
-  },
-  "square_cap_9ec88646": {
-    "message": "Firkantet fællesmængde"
-  },
-  "square_cup_b0665113": {
-    "message": "Firkantet foreningsmængde"
-  },
-  "square_root_e8bcbc60": {
-    "message": "Kvadratrod"
-  },
-  "square_root_symbol_d0898a53": {
-    "message": "Kvadratrod-symbol"
-  },
-  "square_subset_17be67cb": {
-    "message": "Kvadratisk delmængde"
-  },
+  "sort_by_e75f9e3e": { "message": "Sorter efter" },
+  "spades_suit_b37020c2": { "message": "Spar (kulør)" },
+  "square_511eb3b3": { "message": "Kvadrat" },
+  "square_cap_9ec88646": { "message": "Firkantet fællesmængde" },
+  "square_cup_b0665113": { "message": "Firkantet foreningsmængde" },
+  "square_root_e8bcbc60": { "message": "Kvadratrod" },
+  "square_root_symbol_d0898a53": { "message": "Kvadratrod-symbol" },
+  "square_subset_17be67cb": { "message": "Kvadratisk delmængde" },
   "square_subset_strict_7044e84f": {
     "message": "Kvadratisk delmængde (streng)"
   },
-  "square_superset_3be8dae1": {
-    "message": "Kvadratisk overmængde"
-  },
+  "square_superset_3be8dae1": { "message": "Kvadratisk overmængde" },
   "square_superset_strict_fa4262e4": {
     "message": "Kvadratisk overmængde (streng)"
   },
-  "star_8d156e09": {
-    "message": "Giv stjerne"
-  },
-  "start_over_f7552aa9": {
-    "message": "Start forfra"
-  },
-  "start_recording_9a65141a": {
-    "message": "Start optagelse"
-  },
-  "steel_blue_14296f08": {
-    "message": "Stålblå"
-  },
-  "styles_2aa721ef": {
-    "message": "Stile"
-  },
-  "submit_a3cc6859": {
-    "message": "Aflever"
-  },
-  "subscript_59744f96": {
-    "message": "Sænket skrift"
-  },
-  "subset_19c1a92f": {
-    "message": "Delmængde"
-  },
-  "subset_strict_8d8948d6": {
-    "message": "Delmængde (streng)"
-  },
-  "succeeds_9cc31be9": {
-    "message": "Kommer efter"
-  },
-  "succeeds_equal_158e8c3a": {
-    "message": "Kommer efter lig med"
-  },
-  "sum_b0842d31": {
-    "message": "Sum"
-  },
-  "superscript_8cb349a2": {
-    "message": "Hævet skrift"
-  },
-  "superset_c4db8a7a": {
-    "message": "Overmængde"
-  },
-  "superset_strict_c77dd6d2": {
-    "message": "Overmængde (streng)"
-  },
+  "star_8d156e09": { "message": "Giv stjerne" },
+  "start_over_f7552aa9": { "message": "Start forfra" },
+  "start_recording_9a65141a": { "message": "Start optagelse" },
+  "steel_blue_14296f08": { "message": "Stålblå" },
+  "styles_2aa721ef": { "message": "Stile" },
+  "submit_a3cc6859": { "message": "Aflever" },
+  "subscript_59744f96": { "message": "Sænket skrift" },
+  "subset_19c1a92f": { "message": "Delmængde" },
+  "subset_strict_8d8948d6": { "message": "Delmængde (streng)" },
+  "succeeds_9cc31be9": { "message": "Kommer efter" },
+  "succeeds_equal_158e8c3a": { "message": "Kommer efter lig med" },
+  "sum_b0842d31": { "message": "Sum" },
+  "superscript_8cb349a2": { "message": "Hævet skrift" },
+  "superset_c4db8a7a": { "message": "Overmængde" },
+  "superset_strict_c77dd6d2": { "message": "Overmængde (streng)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Understøttede filtyper: SRT eller WebVTT"
   },
@@ -1319,33 +923,15 @@ const locale = {
   "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
     "message": "Det pæne html-redigeringsværktøj er ikke tilgængeligt på tastaturet. Tryk på Shift-O for at åbne det rå html-redigeringsværktøj."
   },
-  "therefore_d860e024": {
-    "message": "Derfor"
-  },
-  "theta_ce2d2350": {
-    "message": "Theta"
-  },
-  "theta_variant_fff6da6f": {
-    "message": "Theta (variant)"
-  },
-  "thick_downward_arrow_b85add4c": {
-    "message": "Tyk nedadgående pil"
-  },
-  "thick_left_arrow_d5f3e925": {
-    "message": "Tyk venstre pil"
-  },
-  "thick_leftward_arrow_6ab89880": {
-    "message": "Tyk venstre-pegende pil"
-  },
-  "thick_right_arrow_3ed5e8f7": {
-    "message": "Tyk højre pil"
-  },
-  "thick_rightward_arrow_a2e1839e": {
-    "message": "Tyk højre-pegende pil"
-  },
-  "thick_upward_arrow_acd20328": {
-    "message": "Tyk opadgående pil"
-  },
+  "therefore_d860e024": { "message": "Derfor" },
+  "theta_ce2d2350": { "message": "Theta" },
+  "theta_variant_fff6da6f": { "message": "Theta (variant)" },
+  "thick_downward_arrow_b85add4c": { "message": "Tyk nedadgående pil" },
+  "thick_left_arrow_d5f3e925": { "message": "Tyk venstre pil" },
+  "thick_leftward_arrow_6ab89880": { "message": "Tyk venstre-pegende pil" },
+  "thick_right_arrow_3ed5e8f7": { "message": "Tyk højre pil" },
+  "thick_rightward_arrow_a2e1839e": { "message": "Tyk højre-pegende pil" },
+  "thick_upward_arrow_acd20328": { "message": "Tyk opadgående pil" },
   "this_document_cannot_be_displayed_within_canvas_7aba77be": {
     "message": "Dette dokument kan ikke vises i Canvas."
   },
@@ -1358,39 +944,17 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Selvom din video har den rigtige titel i browseren, kunne vi ikke opdatere den i databasen."
   },
-  "timebar_a4d18443": {
-    "message": "Tidslinje"
-  },
-  "title_ee03d132": {
-    "message": "Titel"
-  },
-  "to_be_posted_when_d24bf7dc": {
-    "message": "Skal slås op: { when }"
-  },
-  "to_do_when_2783d78f": {
-    "message": "Opgaveliste: { when }"
-  },
-  "toggle_summary_group_413df9ac": {
-    "message": "Skift { summary } gruppe"
-  },
-  "toggle_tooltip_d3b7cb86": {
-    "message": "Skift værktøjstip"
-  },
-  "tools_2fcf772e": {
-    "message": "Værktøjer"
-  },
-  "top_66e0adb6": {
-    "message": "Top"
-  },
-  "tray_839df38a": {
-    "message": "Bakke"
-  },
-  "triangle_6072304e": {
-    "message": "Trekant"
-  },
-  "turnstile_yields_f9e76df1": {
-    "message": "Drejekors (afkast)"
-  },
+  "timebar_a4d18443": { "message": "Tidslinje" },
+  "title_ee03d132": { "message": "Titel" },
+  "to_be_posted_when_d24bf7dc": { "message": "Skal slås op: { when }" },
+  "to_do_when_2783d78f": { "message": "Opgaveliste: { when }" },
+  "toggle_summary_group_413df9ac": { "message": "Skift { summary } gruppe" },
+  "toggle_tooltip_d3b7cb86": { "message": "Skift værktøjstip" },
+  "tools_2fcf772e": { "message": "Værktøjer" },
+  "top_66e0adb6": { "message": "Top" },
+  "tray_839df38a": { "message": "Bakke" },
+  "triangle_6072304e": { "message": "Trekant" },
+  "turnstile_yields_f9e76df1": { "message": "Drejekors (afkast)" },
   "type_control_f9_to_access_image_options_text_a47e319f": {
     "message": "tryk Ctrl + F9 for at få adgang til billedindstillinger. { text }"
   },
@@ -1400,90 +964,42 @@ const locale = {
   "type_control_f9_to_access_table_options_text_92141329": {
     "message": "tryk Ctrl + F9 for at få adgang til tabelindstillinger. { text }"
   },
-  "union_e6b57a53": {
-    "message": "Union"
-  },
-  "unpublished_dfd8801": {
-    "message": "Ikke offentliggjort"
-  },
-  "untitled_16aa4f2b": {
-    "message": "Uden titel"
-  },
-  "untitled_efdc2d7d": {
-    "message": "uden titel"
-  },
+  "union_e6b57a53": { "message": "Union" },
+  "unpublished_dfd8801": { "message": "Ikke offentliggjort" },
+  "untitled_16aa4f2b": { "message": "Uden titel" },
+  "untitled_efdc2d7d": { "message": "uden titel" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Op og venstre diagonal pil"
   },
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Op og højre diagonal pil"
   },
-  "upload_file_fd2361b8": {
-    "message": "Overfør fil"
-  },
-  "upload_image_6120b609": {
-    "message": "Upload billede"
-  },
-  "upload_media_ce31135a": {
-    "message": "Upload medier"
-  },
-  "uploading_19e8a4e7": {
-    "message": "Uploader"
-  },
-  "uppercase_delta_d4f4bc41": {
-    "message": "Delta med stort bogstav"
-  },
-  "uppercase_gamma_86f492e9": {
-    "message": "Gamma med stort bogstav"
-  },
-  "uppercase_lambda_c78d8ed4": {
-    "message": "Lambda med stort bogstav"
-  },
-  "uppercase_omega_8aedfa2": {
-    "message": "Omega med stort bogstav"
-  },
-  "uppercase_phi_caa36724": {
-    "message": "Phi med stort bogstav"
-  },
-  "uppercase_pi_fcc70f5e": {
-    "message": "Pi med stort bogstav"
-  },
-  "uppercase_psi_6395acbe": {
-    "message": "Psi med stort bogstav"
-  },
-  "uppercase_sigma_dbb70e92": {
-    "message": "Sigma med stort bogstav"
-  },
-  "uppercase_theta_49afc891": {
-    "message": "Theta med stort bogstav"
-  },
-  "uppercase_upsilon_8c1e623e": {
-    "message": "Upsilon med stort bogstav"
-  },
-  "uppercase_xi_341e8556": {
-    "message": "Xi med stort bogstav"
-  },
-  "upsilon_33651634": {
-    "message": "Upsilon"
-  },
+  "upload_file_fd2361b8": { "message": "Overfør fil" },
+  "upload_image_6120b609": { "message": "Upload billede" },
+  "upload_media_ce31135a": { "message": "Upload medier" },
+  "uploading_19e8a4e7": { "message": "Uploader" },
+  "uppercase_delta_d4f4bc41": { "message": "Delta med stort bogstav" },
+  "uppercase_gamma_86f492e9": { "message": "Gamma med stort bogstav" },
+  "uppercase_lambda_c78d8ed4": { "message": "Lambda med stort bogstav" },
+  "uppercase_omega_8aedfa2": { "message": "Omega med stort bogstav" },
+  "uppercase_phi_caa36724": { "message": "Phi med stort bogstav" },
+  "uppercase_pi_fcc70f5e": { "message": "Pi med stort bogstav" },
+  "uppercase_psi_6395acbe": { "message": "Psi med stort bogstav" },
+  "uppercase_sigma_dbb70e92": { "message": "Sigma med stort bogstav" },
+  "uppercase_theta_49afc891": { "message": "Theta med stort bogstav" },
+  "uppercase_upsilon_8c1e623e": { "message": "Upsilon med stort bogstav" },
+  "uppercase_xi_341e8556": { "message": "Xi med stort bogstav" },
+  "upsilon_33651634": { "message": "Upsilon" },
   "upward_and_downward_pointing_arrow_fa90a918": {
     "message": "Opad- og nedadpegende pil"
   },
   "upward_and_downward_pointing_arrow_thick_d420fdef": {
     "message": "Opad- og nedadpegende pil (tyk)"
   },
-  "upward_arrow_9992cb2d": {
-    "message": "Opadpegende pil"
-  },
-  "upward_pointing_triangle_d078d7cb": {
-    "message": "Opadpegende trekant"
-  },
-  "url_22a5f3b8": {
-    "message": "URL"
-  },
-  "usage_right_ff96f3e2": {
-    "message": "Brugsrettigheder:"
-  },
+  "upward_arrow_9992cb2d": { "message": "Opadpegende pil" },
+  "upward_pointing_triangle_d078d7cb": { "message": "Opadpegende trekant" },
+  "url_22a5f3b8": { "message": "URL" },
+  "usage_right_ff96f3e2": { "message": "Brugsrettigheder:" },
   "usage_rights_required_5fe4dd68": {
     "message": "Brugsrettigheder (påkrævet)"
   },
@@ -1514,54 +1030,26 @@ const locale = {
   "used_by_screen_readers_to_describe_the_video_37ebad25": {
     "message": "Bruges af skærmlæsere til at beskrive videoen"
   },
-  "user_documents_c206e61f": {
-    "message": "Brugerdokumenter"
-  },
-  "user_files_78e21703": {
-    "message": "Brugerfiler"
-  },
-  "user_images_b6490852": {
-    "message": "Brugerbilleder"
-  },
-  "user_media_14fbf656": {
-    "message": "Brugermedier"
-  },
-  "vector_notation_cf6086ab": {
-    "message": "Vektor (notation)"
-  },
+  "user_documents_c206e61f": { "message": "Brugerdokumenter" },
+  "user_files_78e21703": { "message": "Brugerfiler" },
+  "user_images_b6490852": { "message": "Brugerbilleder" },
+  "user_media_14fbf656": { "message": "Brugermedier" },
+  "vector_notation_cf6086ab": { "message": "Vektor (notation)" },
   "vertical_bar_set_builder_notation_4300495f": {
     "message": "Lodret bjælke (notering af mængder)"
   },
-  "vertical_dots_bfb21f14": {
-    "message": "Lodrette prikker"
-  },
-  "video_options_24ef6e5d": {
-    "message": "Videoindstillinger"
-  },
-  "video_options_tray_3b9809a5": {
-    "message": "Bakke for videoindstillinger"
-  },
-  "video_player_b371005": {
-    "message": "Videoafspiller"
-  },
-  "video_player_for_9e7d373b": {
-    "message": "Videoafspiller til "
-  },
+  "vertical_dots_bfb21f14": { "message": "Lodrette prikker" },
+  "video_options_24ef6e5d": { "message": "Videoindstillinger" },
+  "video_options_tray_3b9809a5": { "message": "Bakke for videoindstillinger" },
+  "video_player_b371005": { "message": "Videoafspiller" },
+  "video_player_for_9e7d373b": { "message": "Videoafspiller til " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Videoafspiller til { title }"
   },
-  "view_ba339f93": {
-    "message": "Vis"
-  },
-  "view_description_30446afc": {
-    "message": "Vis beskrivelse"
-  },
-  "view_keyboard_shortcuts_34d1be0b": {
-    "message": "Se tastaturgenveje"
-  },
-  "view_title_description_67940918": {
-    "message": "Vis { title } beskrivelse"
-  },
+  "view_ba339f93": { "message": "Vis" },
+  "view_description_30446afc": { "message": "Vis beskrivelse" },
+  "view_keyboard_shortcuts_34d1be0b": { "message": "Se tastaturgenveje" },
+  "view_title_description_67940918": { "message": "Vis { title } beskrivelse" },
   "view_word_and_character_counts_a743dd0c": {
     "message": "Se antal ord og tegn"
   },
@@ -1588,21 +1076,11 @@ const locale = {
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Bredde og højde skal være tal"
   },
-  "width_x_height_px_ff3ccb93": {
-    "message": "{ width } x { height } px"
-  },
-  "wiki_home_9cd54d0": {
-    "message": "Wiki startside"
-  },
-  "wreath_product_200b38ef": {
-    "message": "Krans-produkt"
-  },
-  "xi_149681d0": {
-    "message": "Xi"
-  },
-  "yes_dde87d5": {
-    "message": "Ja"
-  },
+  "width_x_height_px_ff3ccb93": { "message": "{ width } x { height } px" },
+  "wiki_home_9cd54d0": { "message": "Wiki startside" },
+  "wreath_product_200b38ef": { "message": "Krans-produkt" },
+  "xi_149681d0": { "message": "Xi" },
+  "yes_dde87d5": { "message": "Ja" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Du har ikke-gemte ændringer i Icon Maker-bakken. Vil du fortsætte uden at gemme disse ændringer?"
   },
@@ -1627,18 +1105,10 @@ const locale = {
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Dit webcam kan allerede være i brug."
   },
-  "zeta_5ef24f0e": {
-    "message": "Zeta"
-  },
-  "zoom_f3e54d69": {
-    "message": "Zoom"
-  },
-  "zoom_in_image_bb97d4f": {
-    "message": "Zoom ind på billede"
-  },
-  "zoom_out_image_d0a0a2ec": {
-    "message": "Zoom ud på billede"
-  }
+  "zeta_5ef24f0e": { "message": "Zeta" },
+  "zoom_f3e54d69": { "message": "Zoom" },
+  "zoom_in_image_bb97d4f": { "message": "Zoom ind på billede" },
+  "zoom_out_image_d0a0a2ec": { "message": "Zoom ud på billede" }
 }
 
 

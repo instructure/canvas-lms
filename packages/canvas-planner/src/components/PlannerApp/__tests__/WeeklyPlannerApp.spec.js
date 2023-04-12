@@ -35,7 +35,7 @@ const getDefaultValues = overrides => {
       avatarUrl: '/images/thumbnails/2',
       color: 'blue',
       displayName: 'The Student',
-      id: '2'
+      id: '2',
     },
     days: [],
     timeZone: TZ,
@@ -47,16 +47,16 @@ const getDefaultValues = overrides => {
       weekStart: thisWeekStart,
       weekEnd: thisWeekEnd,
       thisWeek: thisWeekStart,
-      weeks: {}
+      weeks: {},
     },
     thisWeek: {
       weekStart: thisWeekStart,
-      weekEnd: thisWeekEnd
+      weekEnd: thisWeekEnd,
     },
     weekLoaded: true,
     loadingOpportunities: false,
     opportunityCount: 0,
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -90,12 +90,12 @@ describe('Weekly PlannerApp', () => {
         weekStart: nextWeekStart,
         weekEnd: nextWeekEnd,
         thisWeek: nextWeekStart,
-        weeks: {}
+        weeks: {},
       },
       thisWeek: {
         weekStart: nextWeekStart,
-        weekEnd: nextWeekEnd
-      }
+        weekEnd: nextWeekEnd,
+      },
     })
     const {queryAllByText} = render(<PlannerApp {...opts} />)
     expect(queryAllByText('Nothing Planned Yet').length).toEqual(7)
@@ -110,7 +110,7 @@ describe('Weekly PlannerApp', () => {
   it('displays the whole week if there are any items', () => {
     const opts = getDefaultValues()
     let days = [opts.thisWeek.weekStart.clone().add(1, 'day')]
-    days = days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]])
+    days = days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d, uniqueId: '1'}]])
     const {container, queryAllByText} = render(<PlannerApp {...getDefaultValues({days})} />)
     expect(container.querySelectorAll('.planner-day').length).toEqual(7)
     const d = opts.thisWeek.weekStart.clone()
@@ -147,13 +147,13 @@ describe('mapStateToProps', () => {
         hasSomeItems: false,
         partialPastDays: [],
         partialFutureDays: [],
-        partialWeekDays: []
+        partialWeekDays: [],
       },
       days: [],
       weeklyDashboard: initProps.weeklyDashboard,
       opportunities: {
-        items: [{foo: 1}]
-      }
+        items: [{foo: 1}],
+      },
     }
     const props = mapStateToProps(state)
     expect(props).toMatchObject({thisWeek: initProps.thisWeek})

@@ -17,15 +17,18 @@
  */
 
 import type Gradebook from '../../Gradebook'
+import type {SortRowsSettingKey} from '../../gradebook.d'
+import React from 'react'
 
 export function getProps(gradebook: Gradebook, options: {ref: any}, columnHeaderName: string) {
   const columnId = columnHeaderName
   const sortRowsBySetting = gradebook.getSortRowsBySetting()
   const {columnId: currentColumnId, direction, settingKey} = sortRowsBySetting
 
-  const studentSettingKey = currentColumnId === columnHeaderName ? settingKey : 'sortable_name'
+  const studentSettingKey: SortRowsSettingKey =
+    currentColumnId === columnHeaderName ? settingKey : 'sortable_name'
 
-  const getSortKey = () => {
+  const getSortKey = (): SortRowsSettingKey => {
     return columnId === 'student_firstname' ? 'name' : studentSettingKey
   }
 
@@ -34,7 +37,7 @@ export function getProps(gradebook: Gradebook, options: {ref: any}, columnHeader
     addGradebookElement: gradebook.keyboardNav?.addGradebookElement,
     disabled: !gradebook.contentLoadStates.studentsLoaded,
     loginHandleName: gradebook.options.login_handle_name,
-    onHeaderKeyDown: event => {
+    onHeaderKeyDown: (event: React.KeyboardEvent) => {
       gradebook.handleHeaderKeyDown(event, columnId)
     },
     onMenuDismiss() {

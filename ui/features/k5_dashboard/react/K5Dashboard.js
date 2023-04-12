@@ -332,17 +332,22 @@ const K5Dashboard = ({
       <View as="div" margin={`medium 0 ${sticky && showingAdditionalOptions ? '0' : 'small'} 0`}>
         {placeAdditionalOptionsAbove && (
           <Flex margin={`0 0 ${sticky ? 'small' : 'medium'} 0`}>
-            {/* place the Welcome... heading above the observer picker when necessary since
-                the h1 should be the first item on the page */}
+            {/* place the Welcome... heading above the observer picker when necessary (observer mode with mobile view) */}
             <ScreenReaderContent>
-              <Heading as="h1">{welcomeMessage}</Heading>
+              <Heading as="span" level="h1">
+                {welcomeMessage}
+              </Heading>
             </ScreenReaderContent>
             {additionalOptions}
           </Flex>
         )}
         <Flex alignItems="center">
           <Flex.Item shouldGrow={true} shouldShrink={true} margin="0 small 0 0">
-            <Heading as="h1" aria-hidden={placeAdditionalOptionsAbove} level={sticky ? 'h2' : 'h1'}>
+            <Heading
+              as="span"
+              aria-hidden={placeAdditionalOptionsAbove}
+              level={sticky ? 'h2' : 'h1'}
+            >
               {welcomeMessage}
             </Heading>
           </Flex.Item>

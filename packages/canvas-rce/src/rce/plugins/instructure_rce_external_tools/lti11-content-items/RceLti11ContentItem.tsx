@@ -22,6 +22,12 @@ import {ExternalToolsEnv, externalToolsEnvFor} from '../ExternalToolsEnv'
 import {emptyAsNull} from '../../../../util/string-util'
 import {addParentFrameContextToUrl} from '../util/addParentFrameContextToUrl'
 import tinymce from 'tinymce'
+import {
+  StudioContentItemCustomJson,
+  isStudioContentItemCustomJson,
+  studioAttributesFrom,
+  displayStyleFrom,
+} from '../../shared/StudioLtiSupportUtils'
 
 export class RceLti11ContentItem {
   static fromJSON(
@@ -107,6 +113,11 @@ export class RceLti11ContentItem {
   }
 
   private generateCodePayloadIframe(): string {
+    const studioAttributes =
+      this.env?.studioMediaOptionsEnabled && isStudioContentItemCustomJson(this.contentItem.custom)
+        ? studioAttributesFrom(this.contentItem.custom)
+        : null
+
     return $('<div/>')
       .append(
         $('<iframe/>', {
@@ -116,11 +127,13 @@ export class RceLti11ContentItem {
           webkitallowfullscreen: 'true',
           mozallowfullscreen: 'true',
           allow: this.env?.ltiIframeAllowPolicy,
+          ...studioAttributes,
         })
           .addClass(this.contentItem.class ?? '')
           .css({
             width: this.contentItem.placementAdvice?.displayWidth ?? '',
             height: this.contentItem.placementAdvice?.displayHeight ?? '',
+            display: displayStyleFrom(studioAttributes),
           })
           .attr({
             width: this.contentItem.placementAdvice?.displayWidth ?? '',
@@ -256,4 +269,7 @@ export type RceLti11ContentItemJson = DeepPartialNullable<{
   // Extra properties used in canvas
   canvasURL: string
   class: string
+
+  // Custom property which is part of the standard, but is currently only supported for the Studio LTI
+  custom: StudioContentItemCustomJson | unknown
 }>

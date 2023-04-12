@@ -54,5 +54,5 @@ if [ ! -z "${SSH_USERNAME-}" ]; then
     git push origin sync-translations-tmp:refs/for/master%submit,l=Verified+1 && \
     git checkout -q "$CURRENT_BRANCH"
 
-  yarn wsrun --exclude-missing commitTranslations
+  yarn wsrun --serial --exclude-missing commitTranslations
 fi

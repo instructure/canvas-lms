@@ -55,12 +55,20 @@ class SRGB
       f("label[for='student_and_assignment_grade']")
     end
 
+    def proxy_submitter_label
+      f("label[for='proxy_submitter']")
+    end
+
     def next_assignment_button
       fj("button:contains('Next Assignment')")
     end
 
     def submission_details_button
       f("#submission_details")
+    end
+
+    def submit_for_student_button
+      f("#proxy_upload_trigger")
     end
 
     def notes_field

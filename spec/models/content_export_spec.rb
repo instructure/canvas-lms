@@ -30,6 +30,14 @@ describe ContentExport do
     expect(@ce.reload.settings[:job_id]).to eq(123)
   end
 
+  it "logs duration on export success" do
+    allow(InstStatsd::Statsd).to receive(:timing)
+    @ce.export(synchronous: true)
+    expect(InstStatsd::Statsd).to have_received(:timing).with("content_migrations.export_duration", anything, {
+                                                                tags: { export_type: nil, selective_export: false }
+                                                              }).once
+  end
+
   context "export_object?" do
     it "returns true for everything if there are no copy options" do
       expect(@ce.export_object?(@ce)).to eq true

@@ -41,10 +41,11 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     end
   end
 
-  def self.auth_over_tls_setting(value)
+  def self.auth_over_tls_setting(value, tls_required: false)
     case value
     when nil, "", false, "false", "f", 0, "0"
-      nil
+      # fall back to simple_tls if overridden
+      tls_required ? "simple_tls" : nil
     when true, "true", "t", 1, "1", "simple_tls", :simple_tls
       "simple_tls"
     when "start_tls", :start_tls
@@ -55,19 +56,20 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   end
 
   def auth_over_tls
-    self.class.auth_over_tls_setting(read_attribute(:auth_over_tls))
+    self.class.auth_over_tls_setting(read_attribute(:auth_over_tls), tls_required: account.feature_enabled?(:verify_ldap_certs))
   end
 
   def ldap_connection
     raise "Not an LDAP config" unless auth_type == "ldap"
 
     require "net/ldap"
+
+    tls_verification_required = account.feature_enabled?(:verify_ldap_certs)
     args = {}
     if auth_over_tls
       encryption = {
         method: auth_over_tls.to_sym,
-        tls_options: { verify_mode: OpenSSL::SSL::VERIFY_NONE,
-                       verify_hostname: false }
+        tls_options: tls_verification_required ? OpenSSL::SSL::SSLContext::DEFAULT_PARAMS : { verify_mode: OpenSSL::SSL::VERIFY_NONE, verify_hostname: false }
       }
       encryption[:tls_options][:ssl_version] = requested_authn_context if requested_authn_context.present?
       args = { encryption: encryption }
