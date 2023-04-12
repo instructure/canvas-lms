@@ -83,7 +83,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
                                         .select("assessment_question_banks.id as bank_id, assessment_questions.id as question_id")
                                         .where(context: @context)
                                         .left_joins(:assessment_questions)
-                                        .where(assessment_questions: { workflow_state: "active" })
+                                        .where("assessment_questions.workflow_state<>'deleted'")
 
       # map question banks to quizzes via questions
       question_banks_to_quizzes_sub = AssessmentQuestionBank
