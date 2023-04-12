@@ -166,7 +166,7 @@ module AccountReports
       end
       filetype = "application/zip"
     elsif csv
-      ext = csv !~ /\n/ && File.extname(csv)
+      ext = !csv.include?("\n") && File.extname(csv)
       case ext
       when ".csv"
         filename = File.basename(csv)

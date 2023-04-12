@@ -321,11 +321,11 @@ class Submission < ActiveRecord::Base
   end
 
   def submitted_changed?
-    submitted? != %w[submitted pending_review graded].include?(send("workflow_state_before_last_save"))
+    submitted? != %w[submitted pending_review graded].include?(send(:workflow_state_before_last_save))
   end
 
   def graded_changed?
-    graded? != (send("workflow_state_before_last_save") == "graded")
+    graded? != (send(:workflow_state_before_last_save) == "graded")
   end
 
   scope :needs_grading, lambda {

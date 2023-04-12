@@ -145,7 +145,7 @@ describe AcademicBenchmark do
   end
 
   def check_for_parent_num_duplication(outcome)
-    parent = outcome.instance_variable_get("@parent")
+    parent = outcome.instance_variable_get(:@parent)
     if outcome.resolve_number && parent && parent.build_title && outcome.resolve_number.include?(parent.build_title)
       outcome.title == "#{parent.title}.#{outcome.resolve_number}"
     else
@@ -155,7 +155,7 @@ describe AcademicBenchmark do
 
   def check_built_outcome(outcome)
     expect(check_for_parent_num_duplication(outcome)).to be_falsey
-    outcome.instance_variable_get("@children").each { |o| check_built_outcome(o) }
+    outcome.instance_variable_get(:@children).each { |o| check_built_outcome(o) }
   end
 
   it "imports the standards successfully" do

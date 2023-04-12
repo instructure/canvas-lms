@@ -384,7 +384,7 @@ describe BasicLTI::BasicOutcomes do
       expect(request.body).to eq "<replaceResultResponse />"
       expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
-      expected_value = assignment.points_possible * 0.92.to_d
+      expected_value = assignment.points_possible * BigDecimal("0.92")
       expect(submission.grade).to eq expected_value.to_s
     end
 
@@ -798,7 +798,7 @@ describe BasicLTI::BasicOutcomes do
         expect(request.body).to eq "<replaceResultResponse />"
         expect(request.handle_request(tool)).to be_truthy
         submission = assignment.submissions.where(user_id: @user1.id).first
-        expected_value = assignment.points_possible * 0.92.to_d
+        expected_value = assignment.points_possible * BigDecimal("0.92")
         expect(submission.grade).to eq expected_value.to_s
       end
     end

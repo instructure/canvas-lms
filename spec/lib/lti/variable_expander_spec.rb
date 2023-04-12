@@ -2251,7 +2251,7 @@ module Lti
           masquerading_user = User.new
           allow(masquerading_user).to receive(:id).and_return(7878)
           allow(user).to receive(:id).and_return(42)
-          variable_expander.instance_variable_set("@current_user", masquerading_user)
+          variable_expander.instance_variable_set(:@current_user, masquerading_user)
           exp_hash = { test: "$Canvas.masqueradingUser.id" }
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 42
@@ -2268,7 +2268,7 @@ module Lti
         it "has substitution for $Canvas.masqueradingUser.userId" do
           masquerading_user = User.new
           allow(masquerading_user).to receive(:id).and_return(7878)
-          variable_expander.instance_variable_set("@current_user", masquerading_user)
+          variable_expander.instance_variable_set(:@current_user, masquerading_user)
           exp_hash = { test: "$Canvas.masqueradingUser.userId" }
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f"
@@ -2277,7 +2277,7 @@ module Lti
         it "has substitution for Canvas.module.id" do
           content_tag = double("content_tag")
           allow(content_tag).to receive(:context_module_id).and_return("foo")
-          variable_expander.instance_variable_set("@content_tag", content_tag)
+          variable_expander.instance_variable_set(:@content_tag, content_tag)
           exp_hash = { test: "$Canvas.module.id" }
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "foo"
@@ -2286,7 +2286,7 @@ module Lti
         it "has substitution for Canvas.moduleItem.id" do
           content_tag = double("content_tag")
           allow(content_tag).to receive(:id).and_return(7878)
-          variable_expander.instance_variable_set("@content_tag", content_tag)
+          variable_expander.instance_variable_set(:@content_tag, content_tag)
           exp_hash = { test: "$Canvas.moduleItem.id" }
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 7878
@@ -2627,7 +2627,7 @@ module Lti
               masquerading_user = User.new
               allow(masquerading_user).to receive(:id).and_return(7878)
               allow(user).to receive(:id).and_return(42)
-              variable_expander.instance_variable_set("@current_user", masquerading_user)
+              variable_expander.instance_variable_set(:@current_user, masquerading_user)
               exp_hash = { test: "$Canvas.masqueradingUser.id" }
               variable_expander.expand_variables!(exp_hash)
               expect(exp_hash[:test]).to eq "42"
@@ -2636,7 +2636,7 @@ module Lti
             it "has substitution for Canvas.moduleItem.id" do
               content_tag = double("content_tag")
               allow(content_tag).to receive(:id).and_return(7878)
-              variable_expander.instance_variable_set("@content_tag", content_tag)
+              variable_expander.instance_variable_set(:@content_tag, content_tag)
               exp_hash = { test: "$Canvas.moduleItem.id" }
               variable_expander.expand_variables!(exp_hash)
               expect(exp_hash[:test]).to eq "7878"

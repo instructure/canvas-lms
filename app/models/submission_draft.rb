@@ -44,7 +44,7 @@ class SubmissionDraft < ActiveRecord::Base
         # also updates the url with a scheme if missing and is a valid url
         # otherwise leaves the url as whatever the user submitted as thier draft
         value, = CanvasHttp.validate_url(url)
-        send("url=", value)
+        send(:url=, value)
       rescue
         nil
       end
@@ -55,7 +55,7 @@ class SubmissionDraft < ActiveRecord::Base
     return if lti_launch_url.blank?
 
     value, = CanvasHttp.validate_url(lti_launch_url)
-    send("lti_launch_url=", value) if value
+    send(:lti_launch_url=, value) if value
   rescue
     # we couldn't validate, just leave it
   end

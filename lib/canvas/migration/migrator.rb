@@ -169,7 +169,7 @@ module Canvas::Migration
               end
       end
 
-      doc.remove_namespaces! if doc.respond_to?("remove_namespaces!")
+      doc.remove_namespaces! if doc.respond_to?(:remove_namespaces!)
       doc
     end
   end

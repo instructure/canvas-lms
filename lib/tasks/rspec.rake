@@ -32,7 +32,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?("gems") }
     end
   end
 
-  Rake.application.instance_variable_get("@tasks").delete("default")
+  Rake.application.instance_variable_get(:@tasks).delete("default")
 
   task default: :spec
   task stats: "spec:statsetup"

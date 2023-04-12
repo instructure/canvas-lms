@@ -1520,7 +1520,7 @@ class Assignment < ActiveRecord::Base
     case grade.to_s
     when /^[+-]?\d*\.?\d+%$/
       # interpret as a percentage
-      percentage = grade.to_f / 100.0.to_d
+      percentage = grade.to_f / BigDecimal("100.0")
       points_possible.to_f * percentage
     when /^[+-]?\d*\.?\d+$/
       if !prefer_points_over_scheme && uses_grading_standard && (standard_based_score = grading_standard_or_default.grade_to_score(grade))
@@ -1535,7 +1535,7 @@ class Assignment < ActiveRecord::Base
     else
       # try to treat it as a letter grade
       if uses_grading_standard && (standard_based_score = grading_standard_or_default.grade_to_score(grade))
-        ((points_possible || 0.0).to_d * standard_based_score.to_d / 100.0.to_d).to_f
+        ((points_possible || 0.0).to_d * standard_based_score.to_d / BigDecimal("100.0")).to_f
       else
         nil
       end
