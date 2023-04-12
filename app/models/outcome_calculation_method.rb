@@ -54,7 +54,7 @@ class OutcomeCalculationMethod < ApplicationRecord
     if: lambda do |model|
       CALCULATION_METHODS.include?(model.calculation_method)
     end,
-    message: "invalid calculation_int for this calculation_method"
+    message: -> { t("invalid calculation_int for this calculation_method") }
   }
 
   after_save :clear_cached_methods

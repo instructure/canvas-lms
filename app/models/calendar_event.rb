@@ -421,7 +421,7 @@ class CalendarEvent < ActiveRecord::Base
         e.updating_user = updating_user
         e.destroy(false)
       end
-      return true unless update_context_or_parent
+      next unless update_context_or_parent
 
       if appointment_group
         context.touch if context_type == "AppointmentGroup" # ensures end_at/start_at get updated
@@ -433,8 +433,8 @@ class CalendarEvent < ActiveRecord::Base
         parent_event.workflow_state = parent_event.locked? ? "active" : "deleted"
         parent_event.save!
       end
-      true
     end
+    true
   end
 
   def time_zone_edited

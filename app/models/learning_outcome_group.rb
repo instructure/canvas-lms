@@ -121,7 +121,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   def sync_source_group
     transaction do
-      return unless source_outcome_group
+      raise ActiveRecord::Rollback unless source_outcome_group
 
       source_outcome_group.child_outcome_links.active.each do |link|
         add_outcome(link.content, skip_touch: true)

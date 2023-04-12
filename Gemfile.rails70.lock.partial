@@ -148,6 +148,7 @@ PATH
       jira_ref_parser (= 1.0.1)
       outrigger (~> 3.0)
       rubocop (~> 1.19)
+      rubocop-rails (~> 2.19)
 
 PATH
   remote: gems
@@ -979,10 +980,10 @@ GEM
     rubocop-performance (1.17.1)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
-    rubocop-rails (2.12.4)
+    rubocop-rails (2.19.0)
       activesupport (>= 4.2.0)
       rack (>= 1.1)
-      rubocop (>= 1.7.0, < 2.0)
+      rubocop (>= 1.33.0, < 2.0)
     rubocop-rake (0.6.0)
       rubocop (~> 1.0)
     rubocop-rspec (2.19.0)
@@ -1360,7 +1361,7 @@ DEPENDENCIES
   rubocop (= 1.49.0)
   rubocop-canvas!
   rubocop-performance (= 1.17.1)
-  rubocop-rails (= 2.12.4)
+  rubocop-rails (= 2.19)
   rubocop-rake (= 0.6.0)
   rubocop-rspec (= 2.19.0)
   ruby-duration (= 3.2.3)
