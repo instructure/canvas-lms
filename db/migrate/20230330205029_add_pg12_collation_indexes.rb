@@ -26,7 +26,7 @@ class AddPg12CollationIndexes < ActiveRecord::Migration[7.0]
     if connection.index_name_exists?(:users, :index_users_on_sortable_name)
       if connection.index_name_exists?(:users, :index_users_on_sortable_name_collkey)
         # both indexes exist? probably from a failed migration. just remove the base index and try again
-        remove_index :users, :index_users_on_sortable_name # rubocop:disable Migration/NonTransactional
+        remove_index :users, name: :index_users_on_sortable_name # rubocop:disable Migration/NonTransactional
       else
         rename_index :users, :index_users_on_sortable_name, :index_users_on_sortable_name_collkey
       end
@@ -39,7 +39,7 @@ class AddPg12CollationIndexes < ActiveRecord::Migration[7.0]
 
     if connection.index_name_exists?(:attachments, :index_attachments_on_folder_id_and_file_state_and_display_name)
       if connection.index_name_exists?(:attachments, :index_attachments_collkey)
-        remove_index :attachments, :index_attachments_on_folder_id_and_file_state_and_display_name # rubocop:disable Migration/NonTransactional
+        remove_index :attachments, name: :index_attachments_on_folder_id_and_file_state_and_display_name # rubocop:disable Migration/NonTransactional
       else
         rename_index :attachments, :index_attachments_on_folder_id_and_file_state_and_display_name, :index_attachments_collkey
       end
