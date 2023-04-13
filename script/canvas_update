@@ -32,7 +32,7 @@ function update_canvas {
   fi
 
   if [[ -z "$SKIP_DEPS" ]] ; then
-    bundle_install_with_check
+    bundle_install
     install_node_packages
   fi
 
