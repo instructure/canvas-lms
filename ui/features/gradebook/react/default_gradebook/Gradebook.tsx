@@ -121,7 +121,6 @@ import AssignmentOverrideHelper from '@canvas/due-dates/AssignmentOverrideHelper
 import UserSettings from '@canvas/user-settings'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-// @ts-expect-error
 import GradeDisplayWarningDialog from '../../jquery/GradeDisplayWarningDialog'
 import PostGradesFrameDialog from '../../jquery/PostGradesFrameDialog'
 import NumberCompare from '../../util/NumberCompare'
