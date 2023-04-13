@@ -19,6 +19,8 @@
 #
 
 class AuthenticationProvider::LDAP < AuthenticationProvider
+  validate :validate_internal_ca
+
   def self.sti_name
     "ldap"
   end
@@ -30,7 +32,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     super +
       %i[auth_host auth_port auth_over_tls auth_base
          auth_filter auth_username auth_password
-         identifier_format jit_provisioning].freeze
+         identifier_format jit_provisioning internal_ca verify_tls_cert_opt_in].freeze
   end
 
   SENSITIVE_PARAMS = [:auth_password].freeze
@@ -64,12 +66,28 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
 
     require "net/ldap"
 
-    tls_verification_required = account.feature_enabled?(:verify_ldap_certs)
+    tls_verification_required = account.feature_enabled?(:verify_ldap_certs) || verify_tls_cert_opt_in
     args = {}
     if auth_over_tls
+      custom_params = {}
+
+      if tls_verification_required && internal_ca.present?
+        ensure_no_internal_ca_errors
+
+        # begin DEFAULT_CERT_STORE definition from openssl/lib/ssl.rb
+        cert_store = OpenSSL::X509::Store.new
+        cert_store.set_default_paths
+        cert_store.flags = OpenSSL::X509::V_FLAG_CRL_CHECK_ALL
+        # end DEFAULT_CERT_STORE definition from openssl/lib/ssl.rb
+
+        cert_store.add_cert internal_ca_cert
+
+        custom_params[:cert_store] = cert_store
+      end
+
       encryption = {
         method: auth_over_tls.to_sym,
-        tls_options: tls_verification_required ? OpenSSL::SSL::SSLContext::DEFAULT_PARAMS : { verify_mode: OpenSSL::SSL::VERIFY_NONE, verify_hostname: false }
+        tls_options: tls_verification_required ? OpenSSL::SSL::SSLContext::DEFAULT_PARAMS.merge(custom_params) : { verify_mode: OpenSSL::SSL::VERIFY_NONE, verify_hostname: false }
       }
       encryption[:tls_options][:ssl_version] = requested_authn_context if requested_authn_context.present?
       args = { encryption: encryption }
@@ -239,5 +257,37 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
 
   def user_logout_redirect(controller, _current_user)
     controller.login_ldap_url unless controller.instance_variable_get(:@domain_root_account).auth_discovery_url
+  end
+
+  def internal_ca_cert
+    OpenSSL::X509::Certificate.new(internal_ca) if internal_ca.present?
+  end
+
+  def internal_ca_errors
+    errors = []
+
+    begin
+      return errors unless (cert = internal_ca_cert)
+
+      time = Time.now
+
+      errors << "certificate is not a CA" unless cert.extensions.map(&:to_h)&.any? { |e| e["critical"] && e["oid"] == "basicConstraints" && e["value"].include?("CA:TRUE") }
+      errors << "certificate is expired or not yet valid" unless cert.not_before <= time && cert.not_after >= time
+    rescue => e
+      errors << "unable to parse certificate: #{e.message}"
+    end
+
+    errors
+  end
+
+  def ensure_no_internal_ca_errors
+    errors = internal_ca_errors
+    raise errors.join(", ") if errors.any?
+  end
+
+  def validate_internal_ca
+    internal_ca_errors.each do |error|
+      errors.add(:internal_ca, error)
+    end
   end
 end

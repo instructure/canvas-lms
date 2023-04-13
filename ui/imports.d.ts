@@ -124,6 +124,10 @@ declare module '@instructure/ui-text' {
   export interface Text {
     tag?: string
   }
+
+  export interface TextProps {
+    dangerouslySetInnerHTML?: {__html: string} | undefined
+  }
 }
 
 declare module '@instructure/ui-select' {
