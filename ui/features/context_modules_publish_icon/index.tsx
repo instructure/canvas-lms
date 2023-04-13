@@ -19,7 +19,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ContextModulesPublishIcon from '@canvas/context-modules-publish-icon/ContextModulesPublishIcon'
+import ContextModulesPublishIcon from '@canvas/context-modules/react/ContextModulesPublishIcon'
 import ready from '@instructure/ready'
 
 ready(() => {

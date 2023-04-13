@@ -27,7 +27,7 @@ import {View} from '@instructure/ui-view'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {ProgressResult} from '@canvas/context-modules/utils/publishAllModulesHelper'
+import {ProgressResult} from '../utils/publishAllModulesHelper'
 
 const I18n = useI18nScope('context_modules_publish_menu')
 

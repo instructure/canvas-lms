@@ -68,7 +68,7 @@ import {
   setExpandAllButton,
   updateProgressionState,
 } from './utils'
-import ContextModulesPublishMenu from '@canvas/context-modules-publish-menu/ContextModulesPublishMenu'
+import ContextModulesPublishMenu from '../react/ContextModulesPublishMenu'
 
 if (!('INST' in window)) window.INST = {}
 

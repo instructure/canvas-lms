@@ -40,8 +40,8 @@ import {
   monitorProgress,
   updateModulePendingPublishedStates,
   ProgressResult,
-} from '@canvas/context-modules/utils/publishAllModulesHelper'
-import {disableContextModulesPublishMenu} from '@canvas/context-modules/utils/publishOneModuleHelper'
+} from '../utils/publishAllModulesHelper'
+import {disableContextModulesPublishMenu} from '../utils/publishOneModuleHelper'
 import ContextModulesPublishModal from './ContextModulesPublishModal'
 
 const I18n = useI18nScope('context_modules_publish_menu')
