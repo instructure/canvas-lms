@@ -254,7 +254,7 @@
               <% end %>
               <% if @context.allows_speed_grader? && @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)%>
                 <% speed_grader_id = module_item ? "#{module_item.content_type_class}-#{module_item.content_id}" : "blank" %>
-                <li id="<%="speed-grader-container-#{speed_grader_id}"%>" role='presentation' class="speed-grader-link-container <%= item_data[:published_status] == 'published' ? '' : 'hidden' %>">
+                <li id="<%="speed-grader-container-#{speed_grader_id}"%>" role='presentation' class="speed-grader-link-container <%= module_item&.assignment&.id && ['assignment', 'quiz', 'discussion_topic'].include?(module_item.content_type_class) && item_data[:published_status] == 'published' ? '' : 'hidden' %>">
                   <a href="<%= context_url(@context, :context_url) %>/gradebook/speed_grader?assignment_id=<%= module_item&.assignment&.present? ? module_item.assignment.id : "{{ assignment_id }}" %>" title="<%= t('SpeedGrader')%>"><%= @module_item_image_tags['speed_grader'] %> <%= t('SpeedGrader') %></a>
                 </li>
               <% end %>

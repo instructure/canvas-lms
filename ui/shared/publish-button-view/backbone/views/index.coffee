@@ -108,6 +108,8 @@ export default class PublishButton extends Backbone.View
       @enable()
       @render()
       @setFocusToElement()
+      if !['discussion_topic', 'quiz', 'assignment'].includes(@model.attributes.module_type) or (@model.attributes.module_type is 'discussion_topic' and !@$el[0]?.dataset?.assignmentId)
+        return false
       $sgLink = $("#speed-grader-container-" + @model.attributes.module_type + "-" + @model.attributes.content_id)
       $sgLink.removeClass("hidden")
 
