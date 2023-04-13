@@ -1076,7 +1076,7 @@ GEM
       axe-core-rspec (~> 4.1.0)
       axe-core-selenium (~> 4.1.0)
       rspec (~> 3.8)
-    strscan (3.0.5)
+    strscan (3.0.6)
     swearjar (1.4.0)
     switchman (3.3.7)
       activerecord (>= 6.1.4, < 7.1)
