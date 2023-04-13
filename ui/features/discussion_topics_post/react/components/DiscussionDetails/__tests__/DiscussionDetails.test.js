@@ -234,15 +234,9 @@ describe('DiscussionDetails', () => {
           permissions: DiscussionPermissions.mock({readAsAdmin: false}),
         })
 
-        it('does not displays points possible when user does not have readAsAdmin', () => {
+        it('does not displays points possible when RQD is true', () => {
           const {queryByText} = setup({discussionTopic: mockTopic})
           expect(queryByText('7 points')).toBeFalsy()
-        })
-
-        it('displays points possible when user has readAsAdmin permission', () => {
-          mockTopic.permissions.readAsAdmin = true
-          const {queryByText} = setup({discussionTopic: mockTopic})
-          expect(queryByText('7 points')).toBeTruthy()
         })
       })
     })

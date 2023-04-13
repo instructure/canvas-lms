@@ -35,6 +35,7 @@ describe Types::AssignmentType do
   end
 
   let(:assignment_type) { GraphQLTypeTester.new(assignment, current_user: student) }
+  let(:teacher_assignment_type) { GraphQLTypeTester.new(assignment, current_user: teacher) }
 
   it "works" do
     expect(assignment_type.resolve("_id")).to eq assignment.id.to_s
@@ -676,10 +677,32 @@ describe Types::AssignmentType do
         Account.default.reload
       end
 
-      it "returns false when restrictQuantitativeData is off" do
-        expect(
-          assignment_type.resolve("restrictQuantitativeData")
-        ).to be true
+      context "default RQD state" do
+        it "returns true for student" do
+          expect(
+            assignment_type.resolve("restrictQuantitativeData")
+          ).to be true
+        end
+
+        it "returns true for teacher" do
+          expect(
+            teacher_assignment_type.resolve("restrictQuantitativeData")
+          ).to be true
+        end
+      end
+
+      context "checkExtraPermissions RQD state" do
+        it "returns true for student" do
+          expect(
+            assignment_type.resolve("restrictQuantitativeData(checkExtraPermissions: true)")
+          ).to be true
+        end
+
+        it "returns false for teacher" do
+          expect(
+            teacher_assignment_type.resolve("restrictQuantitativeData(checkExtraPermissions: true)")
+          ).to be false
+        end
       end
     end
   end
