@@ -3524,10 +3524,12 @@ class Course < ActiveRecord::Base
     !homeroom_course? && elementary_enabled?
   end
 
-  def restrict_quantitative_data?(user = nil)
+  def restrict_quantitative_data?(user = nil, check_extra_permissions = false)
     return unless user.is_a?(User)
 
-    root_account.feature_enabled?(:restrict_quantitative_data) && restrict_quantitative_data && !grants_right?(user, :restrict_quantitative_data)
+    # When check_extra_permissions is true, return false for a teacher,ta, admin, or designer
+    can_read_as_admin = check_extra_permissions ? grants_right?(user, :read_as_admin) : false
+    root_account.feature_enabled?(:restrict_quantitative_data) && restrict_quantitative_data && !grants_right?(user, :restrict_quantitative_data) && !can_read_as_admin
   end
 
   def friendly_name

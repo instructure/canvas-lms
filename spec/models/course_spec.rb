@@ -7787,6 +7787,12 @@ describe Course do
       @course.enroll_teacher(@teacher, enrollment_state: "active")
       @student = user_model
       @course.enroll_student(@student, enrollment_state: "active")
+      @observer = user_model
+      @course.enroll_user(@observer, "ObserverEnrollment").update_attribute(:associated_user_id, @student.id)
+      @ta = user_model
+      @course.enroll_ta(@ta, enrollment_state: "active")
+      @designer = user_model
+      @course.enroll_designer(@designer, enrollment_state: "active")
     end
 
     describe "with no user" do
@@ -7806,6 +7812,11 @@ describe Course do
           @course.save!
         end
 
+        # Admins are the only role to return false when the setting is on
+        it "does not restrict quantitative data for admin" do
+          expect(@course.restrict_quantitative_data?(@admin)).to be false
+        end
+
         it "restricts quantitative data for students" do
           expect(@course.restrict_quantitative_data?(@student)).to be true
         end
@@ -7814,8 +7825,43 @@ describe Course do
           expect(@course.restrict_quantitative_data?(@teacher)).to be true
         end
 
-        it "restricts quantitative data for admin" do
-          expect(@course.restrict_quantitative_data?(@admin)).to be false
+        it "restricts quantitative data for observers" do
+          expect(@course.restrict_quantitative_data?(@observer)).to be true
+        end
+
+        it "restricts quantitative data for designer" do
+          expect(@course.restrict_quantitative_data?(@designer)).to be true
+        end
+
+        it "restricts quantitative data for ta" do
+          expect(@course.restrict_quantitative_data?(@ta)).to be true
+        end
+
+        # By default, only students and observers should be restricted when extra permissions are checked
+        context "with check_extra_permissions" do
+          it "restricts quantitative data for students" do
+            expect(@course.restrict_quantitative_data?(@student, check_extra_permissions: true)).to be true
+          end
+
+          it "restricts quantitative data for observers" do
+            expect(@course.restrict_quantitative_data?(@observer, check_extra_permissions: true)).to be true
+          end
+
+          it "does not restrict quantitative data for admin" do
+            expect(@course.restrict_quantitative_data?(@admin, check_extra_permissions: true)).to be false
+          end
+
+          it "does not restrict quantitative data for teacher" do
+            expect(@course.restrict_quantitative_data?(@teacher, check_extra_permissions: true)).to be false
+          end
+
+          it "does not restrict quantitative data for ta" do
+            expect(@course.restrict_quantitative_data?(@ta, check_extra_permissions: true)).to be false
+          end
+
+          it "does not restrict quantitative data for designer" do
+            expect(@course.restrict_quantitative_data?(@designer, check_extra_permissions: true)).to be false
+          end
         end
       end
 
