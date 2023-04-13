@@ -35,6 +35,45 @@ describe "context modules" do
       course_with_teacher_logged_in(course: @course, active_enrollment: true)
     end
 
+    context "when Restrict Quantitative Data is enabled" do
+      before do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+      end
+
+      it "hides points possible for student", priority: "1" do
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+        course_with_student_logged_in(course: @course, active_enrollment: true)
+        a = @course.assignments.create!(title: "some assignment", points_possible: 10)
+        @pub_graded_discussion = @course.discussion_topics.build(assignment: a, title: "Graded Published Discussion")
+        @pub_graded_discussion.save!
+        @mod.add_item(type: "discussion_topic", id: @pub_graded_discussion.id)
+        go_to_modules
+        verify_module_title("Graded Published Discussion")
+        expect(f("body")).not_to contain_jqcss(".points_possible_display")
+      end
+
+      it "does not hide points possible for teacher", priority: "1" do
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+        a = @course.assignments.create!(title: "some assignment", points_possible: 10)
+        @pub_graded_discussion = @course.discussion_topics.build(assignment: a, title: "Graded Published Discussion")
+        @pub_graded_discussion.save!
+        @mod.add_item(type: "discussion_topic", id: @pub_graded_discussion.id)
+        go_to_modules
+        verify_module_title("Graded Published Discussion")
+        expect(f("span.publish-icon.published.publish-icon-published")).to be_displayed
+        expect(f(".points_possible_display")).to include_text "10 pts"
+      end
+    end
+
     it "adds an unpublished page to a module", priority: "1" do
       @unpub_page = @course.wiki_pages.create!(title: "Unpublished Page")
       @unpub_page.workflow_state = "unpublished"

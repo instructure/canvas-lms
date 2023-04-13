@@ -140,7 +140,9 @@
 
       <div class="ig-details">
         <div class="due_date_display ig-details__item"></div>
-        <div class="points_possible_display ig-details__item"></div>
+        <% if module_item&.graded? && (!module_item.try_rescue(:assignment).restrict_quantitative_data?(@current_user, check_extra_permissions: true))%>
+            <div class="points_possible_display ig-details__item"></div>
+        <%end%>
         <div class="requirement-description ig-details__item">
           <span class="completion_requirement">
             <span class="requirement_type min_score_requirement">
