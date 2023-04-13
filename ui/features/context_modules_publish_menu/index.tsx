@@ -20,7 +20,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ContextModulesPublishMenu from '@canvas/context-modules-publish-menu/ContextModulesPublishMenu'
+import ContextModulesPublishMenu from '@canvas/context-modules/react/ContextModulesPublishMenu'
 import ready from '@instructure/ready'
 
 ready(() => {

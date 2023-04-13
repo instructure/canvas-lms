@@ -24,7 +24,7 @@ import {Menu} from '@instructure/ui-menu'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
-import {publishModule, unpublishModule} from '@canvas/context-modules/utils/publishOneModuleHelper'
+import {publishModule, unpublishModule} from '../utils/publishOneModuleHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('context_modules_publish_icon')
