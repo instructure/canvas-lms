@@ -222,7 +222,7 @@ class Pseudonym < ActiveRecord::Base
     unless self.deleted?
       self.shard.activate do
         existing_pseudo = Pseudonym.active.by_unique_id(self.unique_id).where(:account_id => self.account_id,
-          :authentication_provider_id => self.authentication_provider_id).exists?
+          :authentication_provider_id => self.authentication_provider_id).where.not(id: self).exists?
         if existing_pseudo
           self.errors.add(:unique_id, :taken,
             message: t("ID already in use for this account and authentication provider"))
