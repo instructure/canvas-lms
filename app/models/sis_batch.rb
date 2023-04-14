@@ -278,7 +278,7 @@ class SisBatch < ActiveRecord::Base
 
     self.progress = val
     state = SisBatch.connection.select_value(<<~SQL.squish)
-      UPDATE #{SisBatch.quoted_table_name} SET progress=#{val} WHERE id=#{id} RETURNING workflow_state
+      UPDATE #{SisBatch.quoted_table_name} SET progress=#{val}, updated_at = NOW() WHERE id=#{id} RETURNING workflow_state
     SQL
     raise SisBatch::Aborted if state == "aborted"
   end
