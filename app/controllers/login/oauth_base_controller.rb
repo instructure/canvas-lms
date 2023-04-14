@@ -77,6 +77,10 @@ class Login::OauthBaseController < ApplicationController
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
     end
 
+    if unique_ids.first && identity_v2_applicable?
+      pseudonym = Pseudonym.active.find_by(integration_id: unique_ids.first)
+    end
+
     if pseudonym
       @aac.apply_federated_attributes(pseudonym, provider_attributes)
     elsif !unique_ids.empty? && (@aac.jit_provisioning? || provider_attributes["is_admin"])
