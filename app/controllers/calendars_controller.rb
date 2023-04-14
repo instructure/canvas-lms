@@ -87,7 +87,7 @@ class CalendarsController < ApplicationController
         default_due_time: context.is_a?(Course) && context.default_due_time,
         can_view_context: context.grants_right?(@current_user, session, :read)
       }
-      if context.respond_to?(:course_sections)
+      if context.respond_to?(:course_sections) && !context.is_a?(Account)
         info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|
           hash = { id: id, asset_string: "course_section_#{id}", name: name }
           if ag_permission

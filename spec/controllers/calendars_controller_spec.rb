@@ -24,7 +24,10 @@ describe CalendarsController do
     @event = @course.calendar_events.create(title: "some assignment", start_at: date, end_at: date)
   end
 
-  before(:once) { course_with_student(active_all: true) }
+  before(:once) do
+    Account.site_admin.enable_feature! :account_calendar_events
+    course_with_student(active_all: true)
+  end
 
   before { user_session(@student) }
 
@@ -112,6 +115,21 @@ describe CalendarsController do
           expect(section[:can_create_ag]).to be_falsey
         end
       end
+    end
+
+    it "does not set context.course_sections on account contexts" do
+      account = @course.account
+      account.account_calendar_visible = true
+      account.save!
+      @admin = account_admin_user(account: account, active_all: true)
+      @course.enroll_teacher(@admin, enrollment_state: :active)
+      @admin.set_preference(:enabled_account_calendars, account.id)
+      user_session(@admin)
+
+      get "show"
+      contexts = assigns(:contexts_json)
+      expect(contexts.find { |c| c[:type] == "account" }[:course_sections]).to be_nil
+      expect(contexts.find { |c| c[:type] == "course" }[:course_sections].length).to be 1
     end
 
     it "emits calendar.visit metric to statsd with appropriate enrollment tags" do
