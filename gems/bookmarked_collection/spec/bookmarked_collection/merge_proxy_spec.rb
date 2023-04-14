@@ -67,8 +67,8 @@ describe "BookmarkedCollection::MergeProxy" do
       value2 = ["label", 0]
       bookmark1 = 1
       bookmark2 = "bookmark:W1td" # base64 of '[[]' which should fail to parse
-      bookmark3 = "bookmark:#{::JSONToken.encode(value1)}"
-      bookmark4 = "bookmark:#{::JSONToken.encode(value2)}"
+      bookmark3 = "bookmark:#{JSONToken.encode(value1)}"
+      bookmark4 = "bookmark:#{JSONToken.encode(value2)}"
       expect(@proxy.paginate(page: bookmark1, per_page: 5).current_bookmark).to be_nil
       expect(@proxy.paginate(page: bookmark2, per_page: 5).current_bookmark).to be_nil
       expect(@proxy.paginate(page: bookmark3, per_page: 5).current_bookmark).to be_nil

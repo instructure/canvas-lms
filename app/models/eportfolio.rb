@@ -153,7 +153,7 @@ class Eportfolio < ActiveRecord::Base
 
   def self.spam_criteria_regexp(type: :title)
     setting_name =
-      type == :title ? "eportfolio_title_spam_keywords" : "eportfolio_content_spam_keywords"
+      (type == :title) ? "eportfolio_title_spam_keywords" : "eportfolio_content_spam_keywords"
     spam_keywords = Setting.get(setting_name, "").split(",").map(&:strip).reject(&:empty?)
     return nil if spam_keywords.blank?
 

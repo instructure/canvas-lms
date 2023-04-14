@@ -14,10 +14,10 @@ Dir.chdir(File.expand_path("..", __dir__)) do
   # be tricksy and use a tiny subset of the gemfile so that
   # it will be very quick
   gemfile do
-    source 'https://rubygems.org/'
+    source "https://rubygems.org/"
 
     gemfile = File.expand_path("../Gemfile.d/rubocop.rb", __dir__)
-    eval(File.read(gemfile))
+    eval(File.read(gemfile)) # rubocop:disable Security/Eval
   end
 end
 

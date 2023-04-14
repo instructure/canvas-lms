@@ -630,7 +630,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def update_unread_count(direction = :up, user_id = self.user_id)
     User.where(id: user_id)
-        .update_all(["unread_conversations_count = GREATEST(unread_conversations_count + ?, 0), updated_at = ?", direction == :up ? 1 : -1, Time.now.utc])
+        .update_all(["unread_conversations_count = GREATEST(unread_conversations_count + ?, 0), updated_at = ?", (direction == :up) ? 1 : -1, Time.now.utc])
   end
 
   def update_unread_count_for_update
@@ -638,7 +638,7 @@ class ConversationParticipant < ActiveRecord::Base
       update_unread_count(:up) if unread?
       update_unread_count(:down, user_id_was) if workflow_state_was == "unread"
     elsif workflow_state_changed? && [workflow_state, workflow_state_was].include?("unread")
-      update_unread_count(workflow_state == "unread" ? :up : :down)
+      update_unread_count((workflow_state == "unread") ? :up : :down)
     end
   end
 

@@ -49,6 +49,10 @@ class GlobalGrades
       score(course).text[/\d+\.*\d*+%/]
     end
 
+    def get_raw_grade_for_course(course)
+      score(course).text
+    end
+
     def get_score_for_course_no_percent(course)
       get_score_for_course(course).delete!("%").to_f
     end

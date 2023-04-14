@@ -75,20 +75,20 @@ describe AccountNotification do
       Timecop.freeze do
         @announcement.update(start_at: Time.zone.now - 1.minute)
         @announcement.update(end_at: Time.zone.now)
-        expect(@announcement.current).to eq true
+        expect(@announcement.current).to be true
       end
     end
 
     it "returns true if announcement is current" do
       @announcement.update(start_at: Time.zone.now - 1.minute)
       @announcement.update(end_at: Time.zone.now + 1.minute)
-      expect(@announcement.current).to eq true
+      expect(@announcement.current).to be true
     end
 
     it "returns false if announcement is past" do
       @announcement.update(start_at: Time.zone.now - 2.minutes)
       @announcement.update(end_at: Time.zone.now - 1.minute)
-      expect(@announcement.current).to eq false
+      expect(@announcement.current).to be false
     end
   end
 
@@ -96,13 +96,13 @@ describe AccountNotification do
     it "returns true if announcement is past" do
       @announcement.update(start_at: Time.zone.now - 2.minutes)
       @announcement.update(end_at: Time.zone.now - 1.minute)
-      expect(@announcement.past).to eq true
+      expect(@announcement.past).to be true
     end
 
     it "returns false if announcement is current" do
       @announcement.update(start_at: Time.zone.now - 1.minute)
       @announcement.update(end_at: Time.zone.now + 1.minute)
-      expect(@announcement.past).to eq false
+      expect(@announcement.past).to be false
     end
   end
 
@@ -330,23 +330,23 @@ describe AccountNotification do
 
     describe "display_for_user?" do
       it "selects each mod value once throughout the cycle" do
-        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse("2012-04-02"))).to eq false
-        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse("2012-04-02"))).to eq false
-        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-04-02"))).to eq true
+        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse("2012-04-02"))).to be false
+        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse("2012-04-02"))).to be false
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-04-02"))).to be true
 
-        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse("2012-05-05"))).to eq true
-        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse("2012-05-05"))).to eq false
-        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-05-05"))).to eq false
+        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse("2012-05-05"))).to be true
+        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse("2012-05-05"))).to be false
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-05-05"))).to be false
 
-        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse("2012-06-04"))).to eq false
-        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse("2012-06-04"))).to eq true
-        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-06-04"))).to eq false
+        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse("2012-06-04"))).to be false
+        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse("2012-06-04"))).to be true
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-06-04"))).to be false
       end
 
       it "shifts the mod values each new cycle" do
-        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-04-02"))).to eq true
-        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-07-02"))).to eq false
-        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-09-02"))).to eq true
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-04-02"))).to be true
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-07-02"))).to be false
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-09-02"))).to be true
       end
     end
 
@@ -538,7 +538,7 @@ describe AccountNotification do
         an = account_notification(account: Account.default)
         an.messages_sent_at = 1.day.ago
         an.send_message = true
-        expect { an.save! }.to change(Delayed::Job, :count).by(0)
+        expect { an.save! }.not_to change(Delayed::Job, :count)
       end
     end
 

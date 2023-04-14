@@ -51,7 +51,7 @@ class Quizzes::QuizStatistics::ItemAnalysis::Item
     return unless answer[:answer_id] # blanks don't count for item stats
 
     answer_id = answer[:answer_id]
-    @scores << (answer_id == @answers.first ? question[:points_possible] : 0)
+    @scores << ((answer_id == @answers.first) ? question[:points_possible] : 0)
     @respondent_ids << respondent_id
     @respondent_map[answer_id] << respondent_id
   end

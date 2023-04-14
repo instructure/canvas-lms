@@ -76,7 +76,7 @@ describe "course syllabus" do
       expect(f("#course_syllabus").text).to eq new_description
     end
 
-    it "inserts a file using RCE in the syllabus", priority: "1", custom_timeout: 30 do
+    it "inserts a file using RCE in the syllabus", custom_timeout: 30, priority: "1" do
       file = @course.attachments.create!(display_name: "text_file.txt", uploaded_data: default_uploaded_data)
       file.context = @course
       file.save!

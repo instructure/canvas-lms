@@ -83,7 +83,7 @@ class GradebookUserIds
   def sort_by_student_first_name
     students
       .order(Arel.sql("enrollments.type = 'StudentViewEnrollment'"))
-      .order_by_name(direction: @direction.to_sym)
+      .order_by_name(direction: @direction.to_sym, table: "users")
       .pluck(:id)
       .uniq
   end
@@ -240,7 +240,7 @@ class GradebookUserIds
   end
 
   def sort_direction
-    @direction == "ascending" ? :asc : :desc
+    (@direction == "ascending") ? :asc : :desc
   end
 
   def grading_period_id

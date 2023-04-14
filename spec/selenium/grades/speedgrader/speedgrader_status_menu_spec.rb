@@ -74,7 +74,7 @@ describe "speed grader" do
       Speedgrader.status_menu_option("Excused").click
       expect(Speedgrader.grade_value).to eq "EX"
       submission = Submission.find_by(user_id: @student.id)
-      expect(submission.excused).to eq true
+      expect(submission.excused).to be true
     end
   end
 end

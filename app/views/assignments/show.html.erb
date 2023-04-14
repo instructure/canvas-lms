@@ -142,12 +142,14 @@
 
     <form class="form-horizontal bootstrap-form display-only" style="margin-top:18px;">
       <fieldset>
+      <% if !@assignment.restrict_quantitative_data?(@current_user)%>
         <div class="control-group">
           <div class="control-label"><%= t(:points, 'Points') %></div>
           <div class="controls">
             <span class="value points_possible"><%= n(round_if_whole(@assignment.points_possible)) || t(:no_points, 'None') %></span>
           </div>
         </div>
+        <%end%>
         <div class="control-group">
           <div class="control-label"><%= t :submitting, 'Submitting' %></div>
           <div class="controls">

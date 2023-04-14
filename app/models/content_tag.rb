@@ -329,11 +329,11 @@ class ContentTag < ActiveRecord::Base
     return unless asset_context_matches?
 
     # Assignment proxies name= and name to title= and title, which breaks the asset_safe_title logic
-    if content.respond_to?("name=") && content.respond_to?("name") && !content.is_a?(Assignment)
+    if content.respond_to?(:name=) && content.respond_to?(:name) && !content.is_a?(Assignment)
       content.name = asset_safe_title("name")
-    elsif content.respond_to?("title=")
+    elsif content.respond_to?(:title=)
       content.title = asset_safe_title("title")
-    elsif content.respond_to?("display_name=")
+    elsif content.respond_to?(:display_name=)
       content.display_name = asset_safe_title("display_name")
     end
     if content.changed?
@@ -696,7 +696,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def quiz_lti
-    @quiz_lti ||= has_attribute?(:content_type) && content_type == "Assignment" ? content&.quiz_lti? : false
+    @quiz_lti ||= (has_attribute?(:content_type) && content_type == "Assignment") ? content&.quiz_lti? : false
   end
 
   def to_json(options = {})
@@ -710,7 +710,7 @@ class ContentTag < ActiveRecord::Base
   def clear_total_outcomes_cache
     return unless tag_type == "learning_outcome_association" && associated_asset_type == "LearningOutcomeGroup"
 
-    clear_context = context_type == "LearningOutcomeGroup" ? nil : context
+    clear_context = (context_type == "LearningOutcomeGroup") ? nil : context
     Outcomes::LearningOutcomeGroupChildren.new(clear_context).clear_total_outcomes_cache
   end
 
@@ -743,7 +743,7 @@ class ContentTag < ActiveRecord::Base
 
   def trigger_publish!
     enable_publish_at = context.root_account.feature_enabled?(:scheduled_page_publication)
-    if unpublished?
+    if unpublished? && (!content.respond_to?(:can_publish?) || content&.can_publish?)
       if content_type == "Attachment"
         content.set_publish_state_for_usage_rights
         content.save!
@@ -757,7 +757,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def trigger_unpublish!
-    if published?
+    if published? && (!content.respond_to?(:can_unpublish?) || content&.can_unpublish?)
       if content_type == "Attachment"
         content.locked = true
         content.save!

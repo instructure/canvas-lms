@@ -43,8 +43,8 @@ describe DataFixup::ReassociateGradingPeriodGroups do
 
   context "pre-fixup" do
     it "root account enrollment terms do not have an associated grading period group" do
-      expect(first_term.grading_period_group).to eq nil
-      expect(second_term.grading_period_group).to eq nil
+      expect(first_term.grading_period_group).to be_nil
+      expect(second_term.grading_period_group).to be_nil
     end
 
     it "root account enrollment terms do not have associated grading periods" do
@@ -53,7 +53,7 @@ describe DataFixup::ReassociateGradingPeriodGroups do
     end
 
     it "sub account enrollment terms do not have an associated grading period group" do
-      expect(sub_account_term.grading_period_group).to eq nil
+      expect(sub_account_term.grading_period_group).to be_nil
     end
 
     it "sub account enrollment terms do not have associated grading periods" do
@@ -78,7 +78,7 @@ describe DataFixup::ReassociateGradingPeriodGroups do
     end
 
     it "sub account enrollment terms do not have an associated grading period group" do
-      expect(sub_account_term.grading_period_group).to eq nil
+      expect(sub_account_term.grading_period_group).to be_nil
     end
 
     it "sub account enrollment terms do not have associated grading periods" do

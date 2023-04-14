@@ -474,7 +474,7 @@ $(document).ready(function () {
     )
   }
 
-  $('#auth-google').live('click', function (e) {
+  $(document).on('click', '#auth-google', function (e) {
     e.preventDefault()
     const href = $(this).attr('href')
     reauth(href)
@@ -548,7 +548,7 @@ $(document).ready(function () {
     }
     fileInput.parent().find('img').attr('alt', altText)
   }
-  $('.submission_attachment input[type=file]').live('change', function () {
+  $(document).on('change', '.submission_attachment input[type=file]', function () {
     updateRemoveLinkAltText($(this))
     if ($(this).val() === '') return
 

@@ -289,7 +289,7 @@ module Lti
           assignment.update!(anonymous_grading: true)
           message_handler.update!(parameters: [{ "name" => "anonymous_grading", "variable" => "com.instructure.Assignment.anonymous_grading" }])
           get "basic_lti_launch_request", params: { course_id: course.id, message_handler_id: message_handler.id, assignment_id: assignment.id }
-          expect(assigns[:lti_launch].params[:custom_anonymous_grading]).to eq true
+          expect(assigns[:lti_launch].params[:custom_anonymous_grading]).to be true
         end
 
         context "when secure params are given" do
@@ -383,7 +383,7 @@ module Lti
           params = assigns[:lti_launch].params
           launch_url = assigns[:lti_launch].resource_url
           authenticator = ::IMS::LTI::Services::MessageAuthenticator.new(launch_url, params, tool_proxy.shared_secret)
-          expect(authenticator.valid_signature?).to eq true
+          expect(authenticator.valid_signature?).to be true
         end
 
         it "returns the roles as an array" do
@@ -425,7 +425,7 @@ module Lti
             let(:tag) { ContentTag.create!(context: assignment, content: message_handler) }
 
             it "finds the specified assignment from content tag" do
-              expect(subject).to eq false
+              expect(subject).to be false
             end
           end
 

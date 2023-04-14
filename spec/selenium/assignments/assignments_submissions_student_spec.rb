@@ -271,7 +271,7 @@ describe "submissions" do
 
       # it should not actually submit and pop up an error message
       expect { submit_form(assignment_form) }.not_to change { submission.reload.updated_at }
-      expect(submission.reload.body).to be nil
+      expect(submission.reload.body).to be_nil
       expect(ff(".error_box")[1]).to include_text("Required")
 
       # now make sure it works

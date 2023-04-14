@@ -238,6 +238,7 @@ module Canvas::LiveEvents
 
     event = {
       assignment_id: assignment.global_id,
+      assignment_id_duplicated_from: assignment.duplicate_of&.global_id&.to_s,
       context_id: assignment.global_context_id,
       context_uuid: assignment.context.uuid,
       context_type: assignment.context_type,
@@ -256,11 +257,13 @@ module Canvas::LiveEvents
       lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id,
       submission_types: assignment.submission_types,
       created_on_blueprint_sync: created_on_blueprint_sync || false,
-      asset_map: assignment.asset_map
+      resource_map: assignment.resource_map
     }
     actl = assignment.assignment_configuration_tool_lookups.take
     domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
     event[:domain] = domain if domain
+    original_domain = assignment.duplicate_of&.root_account&.domain(ApplicationController.test_cluster_name)
+    event[:domain_duplicated_from] = original_domain if original_domain
     if actl && (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
       context: assignment.course,
       vendor_code: actl.tool_vendor_code,
@@ -1084,7 +1087,7 @@ module Canvas::LiveEvents
 
   def self.blueprint_restrictions_updated_data(master_content_tag)
     lti_resource_link_id =
-      master_content_tag.content_type == "Assignment" ? master_content_tag.content.lti_resource_link_id : nil
+      (master_content_tag.content_type == "Assignment") ? master_content_tag.content.lti_resource_link_id : nil
 
     {
       canvas_assignment_id: master_content_tag.content_id,

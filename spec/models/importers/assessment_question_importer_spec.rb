@@ -112,20 +112,20 @@ describe "Assessment Question import from hash" do
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
     Importers::AssessmentQuestionImporter.process_migration(data, migration)
 
-    expect(context.assessment_question_banks.count).to eql(3)
-    expect(context.assessment_questions.count).to eql(4)
+    expect(context.assessment_question_banks.count).to be(3)
+    expect(context.assessment_questions.count).to be(4)
 
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title: "Group1").first
-    expect(bank.assessment_questions.count).to eql(1)
+    expect(bank.assessment_questions.count).to be(1)
     expect(bank.assessment_questions.first.migration_id).to eql("1")
 
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title: "Assmnt1").first
-    expect(bank.assessment_questions.count).to eql(2)
+    expect(bank.assessment_questions.count).to be(2)
     expect(["2", "3"].member?(bank.assessment_questions.first.migration_id)).not_to be_nil
     expect(["2", "3"].member?(bank.assessment_questions.last.migration_id)).not_to be_nil
 
     bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title: "test question bank").first
-    expect(bank.assessment_questions.count).to eql(1)
+    expect(bank.assessment_questions.count).to be(1)
     expect(bank.assessment_questions.first.migration_id).to eql("4")
   end
 

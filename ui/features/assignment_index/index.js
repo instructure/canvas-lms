@@ -17,12 +17,12 @@
  */
 
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
-import Course from '@canvas/courses/backbone/models/Course.coffee'
-import AssignmentGroupListView from './backbone/views/AssignmentGroupListView.coffee'
+import Course from '@canvas/courses/backbone/models/Course'
+import AssignmentGroupListView from './backbone/views/AssignmentGroupListView'
 import CreateGroupView from './backbone/views/CreateGroupView'
-import IndexView from './backbone/views/IndexView.coffee'
-import AssignmentSettingsView from './backbone/views/AssignmentSettingsView.coffee'
-import AssignmentSyncSettingsView from './backbone/views/AssignmentSyncSettingsView.coffee'
+import IndexView from './backbone/views/IndexView'
+import AssignmentSettingsView from './backbone/views/AssignmentSettingsView'
+import AssignmentSyncSettingsView from './backbone/views/AssignmentSyncSettingsView'
 import AssignmentGroupWeightsView from './backbone/views/AssignmentGroupWeightsView'
 import ToggleShowByView from './backbone/views/ToggleShowByView'
 import _ from 'underscore'

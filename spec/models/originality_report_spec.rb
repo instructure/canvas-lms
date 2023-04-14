@@ -250,8 +250,8 @@ describe OriginalityReport do
 
     it "creates an LTI launch URL if a lti_link is present" do
       report.update(lti_link: lti_link)
-      expected_url = "/courses/"\
-                     "#{submission.assignment.course.id}/assignments/"\
+      expected_url = "/courses/" \
+                     "#{submission.assignment.course.id}/assignments/" \
                      "#{submission.assignment.id}/lti/resource/#{lti_link.resource_link_id}?display=borderless"
       expect(report.report_launch_path).to eq expected_url
     end
@@ -390,12 +390,10 @@ describe OriginalityReport do
 
     it "uses the updated_at of the original report so an old report doesn't look new" do
       originality_report.copy_to_group_submissions!
-      expect(submission_two.originality_reports.first.updated_at).to \
-        eq(originality_report.updated_at)
+      expect(submission_two.originality_reports.first.updated_at).to eq(originality_report.updated_at)
       originality_report.touch
       originality_report.copy_to_group_submissions!
-      expect(submission_two.originality_reports.first.updated_at).to \
-        eq(originality_report.updated_at)
+      expect(submission_two.originality_reports.first.updated_at).to eq(originality_report.updated_at)
     end
 
     context "with sharding" do

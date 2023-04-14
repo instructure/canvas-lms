@@ -1,12 +1,6 @@
 [
   {
     "name": "AccessViolationError",
-    "source": "packages/backbone-identity-map/index.js",
-    "target": "ui/shared/backbone/index.js",
-    "request": "@canvas/backbone"
-  },
-  {
-    "name": "AccessViolationError",
     "source": "packages/jqueryui/tooltip.js",
     "target": "ui/shared/i18n/rtlHelper.js",
     "request": "@canvas/i18n/rtlHelper"

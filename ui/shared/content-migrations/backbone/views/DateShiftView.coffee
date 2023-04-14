@@ -17,8 +17,8 @@
 
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import DaySubView from '@canvas/day-substitution/backbone/views/DaySubstitutionView.coffee'
-import DaySubModel from '@canvas/day-substitution/backbone/models/DaySubstitution.coffee'
+import DaySubView from '@canvas/day-substitution/backbone/views/DaySubstitutionView'
+import DaySubModel from '@canvas/day-substitution/backbone/models/DaySubstitution'
 import template from '../../jst/DateShift.handlebars'
 
 export default class DateShiftView extends Backbone.View

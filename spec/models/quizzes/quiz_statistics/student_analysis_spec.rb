@@ -21,7 +21,7 @@ require_relative "common"
 
 describe Quizzes::QuizStatistics::StudentAnalysis do
   def temporary_user_code
-    "tmp_#{Digest::MD5.hexdigest("#{Time.now.to_i}_#{rand}")}"
+    "tmp_#{Digest::SHA256.hexdigest("#{Time.now.to_i}_#{rand}")}"
   end
 
   def survey_with_logged_out_submission
@@ -534,7 +534,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
     stats = q.statistics
 
-    expect(stats[:questions].first.last[:user_ids].first).to eq nil
+    expect(stats[:questions].first.last[:user_ids].first).to be_nil
   end
 
   it "does not count student view submissions" do

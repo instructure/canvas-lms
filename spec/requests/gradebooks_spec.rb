@@ -21,7 +21,7 @@
 require_relative "../spec_helper"
 require_relative "../support/request_helper"
 
-describe "Access Different Gradebooks Environments", type: :request do
+describe "Access Different Gradebooks Environments" do
   before :once do
     course_with_teacher active_all: true
     @teacher_enrollment = @enrollment
@@ -44,7 +44,7 @@ describe "Access Different Gradebooks Environments", type: :request do
           get speed_grader_course_gradebook_path(course_id: @course.id), params: { assignment_id: @assignment.id }
           js_env = js_env_from_response(response)
 
-          expect(js_env.fetch("can_comment_on_submission")).to eq(false)
+          expect(js_env.fetch("can_comment_on_submission")).to be(false)
         end
 
         it "is false if the teacher enrollment is concluded" do
@@ -53,14 +53,14 @@ describe "Access Different Gradebooks Environments", type: :request do
           get speed_grader_course_gradebook_path(course_id: @course.id), params: { assignment_id: @assignment.id }
           js_env = js_env_from_response(response)
 
-          expect(js_env.fetch("can_comment_on_submission")).to eq(false)
+          expect(js_env.fetch("can_comment_on_submission")).to be(false)
         end
 
         it "is true otherwise" do
           get speed_grader_course_gradebook_path(course_id: @course.id), params: { assignment_id: @assignment.id }
           js_env = js_env_from_response(response)
 
-          expect(js_env.fetch("can_comment_on_submission")).to eq(true)
+          expect(js_env.fetch("can_comment_on_submission")).to be(true)
         end
       end
 

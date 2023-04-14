@@ -80,13 +80,13 @@ module StickySisFields
     private
 
     def load_stuck_sis_fields_cache
-      @stuck_sis_fields_cache ||= (read_attribute(:stuck_sis_fields) || "").split(",").map(&:to_sym).to_set
+      @stuck_sis_fields_cache ||= (read_attribute(:stuck_sis_fields) || "").split(",").to_set(&:to_sym)
     end
 
     def calculate_currently_stuck_sis_fields
       @sis_fields_to_stick ||= [].to_set
       @sis_fields_to_unstick ||= [].to_set
-      changed_sis_fields = self.class.sticky_sis_fields & (changed.map(&:to_sym).to_set | @sis_fields_to_stick)
+      changed_sis_fields = self.class.sticky_sis_fields & (changed.to_set(&:to_sym) | @sis_fields_to_stick)
       (load_stuck_sis_fields_cache | changed_sis_fields) - @sis_fields_to_unstick
     end
   end
@@ -94,7 +94,7 @@ module StickySisFields
   module ClassMethods
     # specify which fields are able to be stuck
     def are_sis_sticky(*fields)
-      self.sticky_sis_fields = fields.map(&:to_sym).to_set
+      self.sticky_sis_fields = fields.to_set(&:to_sym)
     end
 
     # takes a block and runs it with the following options:

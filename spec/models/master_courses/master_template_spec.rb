@@ -27,7 +27,7 @@ describe MasterCourses::MasterTemplate do
       template = MasterCourses::MasterTemplate.set_as_master_course(@course)
       expect(template.course).to eq @course
       expect(template.root_account).to eq @course.root_account
-      expect(template.full_course).to eq true
+      expect(template.full_course).to be true
 
       expect(MasterCourses::MasterTemplate.set_as_master_course(@course)).to eq template # should not create a copy
       expect(MasterCourses::MasterTemplate.full_template_for(@course)).to eq template
@@ -51,7 +51,7 @@ describe MasterCourses::MasterTemplate do
       other_course = Course.create!
       sub = template.add_child_course!(other_course)
       expect(template.workflow_state).to eq "active"
-      expect(template.active?).to eq true
+      expect(template.active?).to be true
 
       expect { MasterCourses::MasterTemplate.remove_as_master_course(@course) }.to change { template.reload.workflow_state }.from("active").to("deleted")
       expect(MasterCourses::MasterTemplate.full_template_for(@course)).to be_nil
@@ -324,7 +324,7 @@ describe MasterCourses::MasterTemplate do
       sub = t.add_child_course!(c2)
       expect(MasterCourses::MasterTemplate.master_course_for_child_course(c2)).to eq @course
       sub.destroy!
-      expect(MasterCourses::MasterTemplate.master_course_for_child_course(c2)).to eq nil
+      expect(MasterCourses::MasterTemplate.master_course_for_child_course(c2)).to be_nil
     end
   end
 

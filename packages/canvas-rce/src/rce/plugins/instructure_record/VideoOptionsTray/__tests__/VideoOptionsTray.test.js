@@ -243,4 +243,55 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       })
     })
   })
+
+  describe('Studio Media Options Tray', () => {
+    beforeEach(() => {
+      props.studioOptions = {
+        resizable: true,
+        convertibleToLink: true,
+      }
+    })
+
+    it('is labeled correctly', () => {
+      const {getByLabelText} = render(<VideoOptionsTray {...props} />)
+      expect(getByLabelText('Studio Media Options Tray')).toBeInTheDocument()
+    })
+
+    it('has the correct heading', () => {
+      const {getByText} = render(<VideoOptionsTray {...props} />)
+      expect(getByText('Studio Media Options')).toBeInTheDocument()
+    })
+
+    it('has a "Media Title" field', () => {
+      const {getByText} = render(<VideoOptionsTray {...props} />)
+      expect(getByText('Media Title')).toBeInTheDocument()
+    })
+
+    it('does not have closed caption controls', () => {
+      const {queryByText} = render(<VideoOptionsTray {...props} />)
+      expect(queryByText('Closed Captions/Subtitles')).not.toBeInTheDocument()
+    })
+
+    describe('when resizable is false', () => {
+      beforeEach(() => {
+        props.studioOptions.resizable = false
+      })
+
+      it('does not have size controls', () => {
+        const {queryByText} = render(<VideoOptionsTray {...props} />)
+        expect(queryByText('Size')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when convertibleToLink is false', () => {
+      beforeEach(() => {
+        props.studioOptions.convertibleToLink = false
+      })
+
+      it('does not have display controls', () => {
+        const {queryByText} = render(<VideoOptionsTray {...props} />)
+        expect(queryByText('Display Options')).not.toBeInTheDocument()
+      })
+    })
+  })
 })

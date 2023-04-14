@@ -68,7 +68,7 @@ describe Quizzes::QuizQuestionsController do
       } }
       expect(assigns[:question]).not_to be_nil
       expect(assigns[:question].question_data).not_to be_nil
-      expect(assigns[:question].question_data[:answers].length).to eql(2)
+      expect(assigns[:question].question_data[:answers].length).to be(2)
       expect(assigns[:quiz]).to eql(@quiz)
     end
 
@@ -98,9 +98,9 @@ describe Quizzes::QuizQuestionsController do
       expect(assigns[:question].question_data).not_to be_nil
       data = assigns[:question].question_data[:answers]
 
-      expect(data.length).to eql(3)
-      expect(data[0][:id]).to eql(123_456)
-      expect(data[1][:id]).to eql(654_321)
+      expect(data.length).to be(3)
+      expect(data[0][:id]).to be(123_456)
+      expect(data[1][:id]).to be(654_321)
       expect(data[2][:id]).not_to eql(654_321)
     end
 
@@ -174,7 +174,7 @@ describe Quizzes::QuizQuestionsController do
       } }
       expect(assigns[:question]).not_to be_nil
       expect(assigns[:question].question_data).not_to be_nil
-      expect(assigns[:question].question_data[:answers].length).to eql(3)
+      expect(assigns[:question].question_data[:answers].length).to be(3)
       expect(assigns[:quiz]).to eql(@quiz)
     end
 
@@ -203,9 +203,9 @@ describe Quizzes::QuizQuestionsController do
       expect(assigns[:question]).not_to be_nil
       expect(assigns[:question].question_data).not_to be_nil
       data = assigns[:question].question_data[:answers]
-      expect(data.length).to eql(3)
-      expect(data[0][:id]).to eql(123_456)
-      expect(data[1][:id]).to eql(654_321)
+      expect(data.length).to be(3)
+      expect(data[0][:id]).to be(123_456)
+      expect(data[1][:id]).to be(654_321)
       expect(data[2][:id]).not_to eql(654_321)
     end
 

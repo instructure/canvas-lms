@@ -51,7 +51,7 @@ class MessagesController < ApplicationController
   def html_message
     message = @context.messages.find(params[:message_id])
     if message.html_body.present?
-      render inline: message.html_body, layout: false
+      render inline: message.html_body, layout: false # rubocop:disable Rails/RenderInline
     else
       render layout: false
     end

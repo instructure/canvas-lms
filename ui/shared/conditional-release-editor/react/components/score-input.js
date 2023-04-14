@@ -19,7 +19,7 @@
 import React from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import shortid from 'shortid'
+import shortid from '@canvas/shortid'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingTypes from '../grading-types'

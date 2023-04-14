@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -18,14 +17,24 @@
  */
 
 import React from 'react'
-import {arrayOf, number, oneOf, shape, string} from 'prop-types'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {SubmissionData} from '@canvas/grading/grading.d'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const I18n = useI18nScope('gradebook')
 
-export default function LatePolicyGrade(props) {
+type Props = {
+  assignment: {
+    pointsPossible: number
+  }
+  enterGradesAs: 'points' | 'percent' | 'passFail' | 'gradingScheme'
+  gradingScheme: Array<Array<string | number>>
+  submission: SubmissionData
+}
+
+export default function LatePolicyGrade(props: Props) {
+  // @ts-expect-error
   const pointsDeducted = I18n.n(-props.submission.pointsDeducted)
   const formatOptions = {
     formatType: props.enterGradesAs,
@@ -63,17 +72,4 @@ export default function LatePolicyGrade(props) {
       </div>
     </div>
   )
-}
-
-LatePolicyGrade.propTypes = {
-  assignment: shape({
-    pointsPossible: number,
-  }).isRequired,
-  enterGradesAs: oneOf(['points', 'percent', 'passFail', 'gradingScheme']).isRequired,
-  gradingScheme: arrayOf(Array).isRequired,
-  submission: shape({
-    grade: string,
-    score: number,
-    pointsDeducted: number,
-  }).isRequired,
 }

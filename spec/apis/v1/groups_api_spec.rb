@@ -443,7 +443,7 @@ describe "Groups API", type: :request do
     @community.reload
     expect(@community.name).to eq "Algebra II Teachers"
     expect(@community.description).to eq "Math rocks!"
-    expect(@community.is_public).to eq true
+    expect(@community.is_public).to be true
     expect(@community.join_level).to eq "parent_context_auto_join"
     expect(@community.avatar_attachment).to eq avatar
     expect(json).to eq group_json(@community, include_users: true, include_permissions: true, include_category: true)
@@ -456,14 +456,14 @@ describe "Groups API", type: :request do
     }
     api_call(:put, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "update"), new_attrs)
     @community.reload
-    expect(@community.is_public).to eq true
+    expect(@community.is_public).to be true
 
     new_attrs = {
       "is_public" => false,
     }
     api_call(:put, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "update"), new_attrs, {}, expected_status: 400)
     @community.reload
-    expect(@community.is_public).to eq true
+    expect(@community.is_public).to be true
   end
 
   it "does not allow a member to edit a group" do

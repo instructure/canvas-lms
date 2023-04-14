@@ -34,7 +34,7 @@ module Api::V1::ContentShare
 
   def content_share_json(content_share, user, session, opts = {})
     json = api_json(content_share, user, session, opts.merge(only: %w[id name created_at updated_at user_id read_state]))
-    json["sender"] = content_share.respond_to?(:sender) && content_share.sender ? user_display_json(content_share.sender) : nil
+    json["sender"] = (content_share.respond_to?(:sender) && content_share.sender) ? user_display_json(content_share.sender) : nil
     json["receivers"] = content_share.respond_to?(:receivers) ? content_share.receivers.map { |rec| user_display_json(rec) } : []
     if content_share.content_export
       json["content_type"] = get_content_type_from_export_settings(content_share.content_export.settings)

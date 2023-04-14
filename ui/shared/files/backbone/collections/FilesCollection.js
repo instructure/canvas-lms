@@ -17,10 +17,10 @@
 //
 
 import $ from 'jquery'
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import _ from 'underscore'
 import deparam from 'deparam'
-import File from '../models/File.coffee'
+import File from '../models/File'
 
 export default class FilesCollection extends PaginatedCollection {
   initialize() {

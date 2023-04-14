@@ -403,7 +403,7 @@ describe DueDateCacher do
     end
 
     it "returns nil if no user has been set" do
-      expect(DueDateCacher.current_executing_user).to be nil
+      expect(DueDateCacher.current_executing_user).to be_nil
     end
 
     it "returns the user in the closest scope when multiple calls are nested" do
@@ -1357,7 +1357,7 @@ describe DueDateCacher do
 
         it "includes nil as the old due date in the payload" do
           DueDateCacher.recompute(assignment, executing_user: teacher)
-          expect(last_event.payload["due_at"].first).to be nil
+          expect(last_event.payload["due_at"].first).to be_nil
         end
 
         it "includes the new due date in the payload" do
@@ -1391,7 +1391,7 @@ describe DueDateCacher do
 
         it "includes nil as the new due date in the payload" do
           DueDateCacher.recompute(assignment, executing_user: teacher)
-          expect(last_event.payload["due_at"].second).to be nil
+          expect(last_event.payload["due_at"].second).to be_nil
         end
       end
 

@@ -156,6 +156,21 @@ describe RuboCop::Cop::Migration::RootAccountId do
     expect(cop.offenses.size).to eq 0
   end
 
+  it "handle old-style migrations" do
+    inspect_source(<<~RUBY)
+      class TestMigration < ActiveRecord::Migration
+        def self.up
+          create_table :widgets do |t|
+            t.boolean :purple, default: true, null: false
+            t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+          end
+          add_replica_identity "Widget", :root_account_id
+        end
+      end
+    RUBY
+    expect(cop.offenses.size).to eq 0
+  end
+
   it "works with multiple table creations in one migration" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration[6.0]

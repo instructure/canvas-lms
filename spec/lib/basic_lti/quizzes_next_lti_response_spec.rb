@@ -263,7 +263,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
       before do
         allow(BasicLTI::QuizzesNextVersionedSubmission).to receive(:new).and_return(quiz_lti_submission)
         allow(quiz_lti_submission).to receive(:submission).and_return(submission)
-        (0..2).each do |i|
+        3.times do |i|
           grade = "#{TextHelper.round_if_whole(grades[i] * 100)}%"
           grade, score = assignment.compute_grade_and_score(grade, nil)
           submission.grade = grade
@@ -349,7 +349,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
         before do
           BasicLTI::BasicOutcomes.process_request(tool, xml)
           submission = assignment.submissions.first
-          (0..2).each do |i|
+          3.times do |i|
             grade = "#{TextHelper.round_if_whole(grades[i] * 100)}%"
             grade, score = assignment.compute_grade_and_score(grade, nil)
             submission.grade = grade

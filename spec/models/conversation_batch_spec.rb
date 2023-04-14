@@ -40,13 +40,13 @@ describe ConversationBatch do
       start_count = ConversationMessage.count
       batch = ConversationBatch.generate(@message, [@user2, @user3], :sync)
       expect(batch).to be_sent
-      expect(batch.completion).to eql 1
+      expect(batch.completion).to be 1
       expect(batch.root_conversation_message.reload.conversation).to be_nil
-      expect(ConversationMessage.count - start_count).to eql 3 # the root message, plus the ones to each recipient
-      expect(@user1.reload.unread_conversations_count).to eql 0
-      expect(@user1.all_conversations.size).to eql 2
-      expect(@user2.reload.unread_conversations_count).to eql 1
-      expect(@user3.reload.unread_conversations_count).to eql 1
+      expect(ConversationMessage.count - start_count).to be 3 # the root message, plus the ones to each recipient
+      expect(@user1.reload.unread_conversations_count).to be 0
+      expect(@user1.all_conversations.size).to be 2
+      expect(@user2.reload.unread_conversations_count).to be 1
+      expect(@user3.reload.unread_conversations_count).to be 1
     end
   end
 
@@ -57,13 +57,13 @@ describe ConversationBatch do
       batch.deliver
 
       expect(batch).to be_sent
-      expect(batch.completion).to eql 1
+      expect(batch.completion).to be 1
       expect(batch.root_conversation_message.reload.conversation).to be_nil
-      expect(ConversationMessage.count - start_count).to eql 3 # the root message, plus the ones to each recipient
-      expect(@user1.reload.unread_conversations_count).to eql 0
-      expect(@user1.all_conversations.size).to eql 2
-      expect(@user2.reload.unread_conversations_count).to eql 1
-      expect(@user3.reload.unread_conversations_count).to eql 1
+      expect(ConversationMessage.count - start_count).to be 3 # the root message, plus the ones to each recipient
+      expect(@user1.reload.unread_conversations_count).to be 0
+      expect(@user1.all_conversations.size).to be 2
+      expect(@user2.reload.unread_conversations_count).to be 1
+      expect(@user3.reload.unread_conversations_count).to be 1
     end
 
     it "applies the tags to each conversation" do
@@ -73,12 +73,12 @@ describe ConversationBatch do
       batch = ConversationBatch.generate(@message, [@user2, @user3], :async, tags: [g.asset_string])
       batch.deliver
 
-      expect(ConversationMessage.count - start_count).to eql 3 # the root message, plus the ones to each recipient
-      expect(@user1.reload.unread_conversations_count).to eql 0
-      expect(@user1.all_conversations.size).to eql 2
-      expect(@user2.reload.unread_conversations_count).to eql 1
+      expect(ConversationMessage.count - start_count).to be 3 # the root message, plus the ones to each recipient
+      expect(@user1.reload.unread_conversations_count).to be 0
+      expect(@user1.all_conversations.size).to be 2
+      expect(@user2.reload.unread_conversations_count).to be 1
       expect(@user2.conversations.first.tags).to eql [g.asset_string]
-      expect(@user3.reload.unread_conversations_count).to eql 1
+      expect(@user3.reload.unread_conversations_count).to be 1
       expect(@user3.conversations.first.tags).to eql [@course.asset_string] # not in group, so it falls back to common contexts
     end
 
@@ -90,7 +90,7 @@ describe ConversationBatch do
       batch = ConversationBatch.generate(@message, [@user2, @user3], :async)
       batch.deliver
 
-      expect(ConversationMessage.count - start_count).to eql 3
+      expect(ConversationMessage.count - start_count).to be 3
       ConversationMessage.all.each do |message|
         expect(message.attachments).to eq @message.attachments
       end
@@ -113,13 +113,13 @@ describe ConversationBatch do
         conversation.add_message(@user1, "hello")
         batch = ConversationBatch.generate(@message, [@user3, @user4], :sync)
         expect(batch).to be_sent
-        expect(batch.completion).to eql 1
+        expect(batch.completion).to be 1
         expect(batch.root_conversation_message.reload.conversation).to be_nil
-        expect(ConversationMessage.count).to eql 4 # the root message, plus the ones to each recipient
-        expect(@user1.reload.unread_conversations_count).to eql 0
-        expect(@user1.all_conversations.size).to eql 2
-        expect(@user3.reload.unread_conversations_count).to eql 1
-        expect(@user4.reload.unread_conversations_count).to eql 1
+        expect(ConversationMessage.count).to be 4 # the root message, plus the ones to each recipient
+        expect(@user1.reload.unread_conversations_count).to be 0
+        expect(@user1.all_conversations.size).to be 2
+        expect(@user3.reload.unread_conversations_count).to be 1
+        expect(@user4.reload.unread_conversations_count).to be 1
       end
     end
   end

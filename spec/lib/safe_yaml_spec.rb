@@ -221,7 +221,7 @@ describe "safe_yaml" do
   end
 
   it "restores default value on sets on load" do
-    expect(YAML.unsafe_load(YAML.dump(Set.new)).include?("test")).to eq false
+    expect(YAML.unsafe_load(YAML.dump(Set.new)).include?("test")).to be false
   end
 end
 # rubocop:enable Security/YAMLLoad

@@ -87,7 +87,7 @@ describe Types::OutcomeFriendlyDescriptionType do
     it "returns nil" do
       expect(
         outcome_friendly_description_type.resolve("_id")
-      ).to eq nil
+      ).to be_nil
     end
   end
 end

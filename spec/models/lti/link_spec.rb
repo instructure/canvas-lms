@@ -20,7 +20,7 @@
 
 require_relative "../../lti2_spec_helper"
 module Lti
-  RSpec.describe Link, type: :model do
+  RSpec.describe Link do
     include_context "lti2_spec_helper"
 
     describe "validations" do
@@ -36,31 +36,31 @@ module Lti
       it "requires vendor_code" do
         params.delete :vendor_code
         link = Lti::Link.new(params)
-        expect(link.valid?).to eq false
+        expect(link.valid?).to be false
       end
 
       it "requires product_code" do
         params.delete :product_code
         link = Lti::Link.new(params)
-        expect(link.valid?).to eq false
+        expect(link.valid?).to be false
       end
 
       it "requires resource_type_code" do
         params.delete :resource_type_code
         link = Lti::Link.new(params)
-        expect(link.valid?).to eq false
+        expect(link.valid?).to be false
       end
 
       it "populates resource_link_id if not present" do
         params.delete :resource_link_id
         link = Lti::Link.new(params)
-        expect(link.valid?).to eq true
+        expect(link.valid?).to be true
       end
 
       it "requires resource_link_id to be unique" do
         Lti::Link.create!(params)
         link = Lti::Link.new(params)
-        expect(link.valid?).to eq false
+        expect(link.valid?).to be false
       end
     end
 

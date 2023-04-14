@@ -207,7 +207,7 @@ describe Turnitin::Client do
 
       expect(status).to be_falsey
       expect(@submission.turnitin_data[@attachment.asset_string][:object_id]).to be_nil
-      expect(@submission.turnitin_data[@attachment.asset_string][:error_code]).to eql 216
+      expect(@submission.turnitin_data[@attachment.asset_string][:error_code]).to be 216
       expect(@submission.turnitin_data[@attachment.asset_string][:error_message]).to eql "I am a random turnitin error message."
       expect(@submission.turnitin_data[@attachment.asset_string][:public_error_message]).to eql "The student limit for this account has been reached. Please contact your account administrator."
     end

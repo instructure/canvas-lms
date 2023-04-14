@@ -19,7 +19,7 @@
 
 require "microsoft_sync/membership_diff"
 
-describe MicrosoftSync::GroupsController, type: :controller do
+describe MicrosoftSync::GroupsController do
   let!(:group) { MicrosoftSync::Group.create!(course: course, workflow_state: workflow_state) }
 
   let(:course_id) { course.id }
@@ -259,7 +259,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
 
       it 'responds with "created"' do
         subject
-        expect(response.status).to eq 201
+        expect(response).to have_http_status :created
       end
 
       it "creates a new group" do
@@ -283,7 +283,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
           expect(response.parsed_body["message"]).to match(
             /allows a maximum of 2 owners/
           )
-          expect(response.status).to eq 422
+          expect(response).to have_http_status :unprocessable_entity
         end
       end
 
@@ -297,7 +297,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
           expect(response.parsed_body["message"]).to match(
             /allows a maximum of 2 members/
           )
-          expect(response.status).to eq 422
+          expect(response).to have_http_status :unprocessable_entity
         end
       end
     end

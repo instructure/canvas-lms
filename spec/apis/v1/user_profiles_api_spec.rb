@@ -233,7 +233,7 @@ describe "User Profile API", type: :request do
                       controller: "profile", action: "settings",
                       user_id: @student.to_param, format: "json")
 
-      expect(json["k5_user"]).to eq(false)
+      expect(json["k5_user"]).to be(false)
     end
 
     context "k5 mode on" do
@@ -246,7 +246,7 @@ describe "User Profile API", type: :request do
         json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
                         controller: "profile", action: "settings",
                         user_id: @student.to_param, format: "json")
-        expect(json["k5_user"]).to eq(true)
+        expect(json["k5_user"]).to be(true)
       end
 
       it "returns k5_user nil for other users" do

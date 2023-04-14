@@ -95,7 +95,7 @@ describe "account admin outcomes" do
       wait_for_ajaximations
 
       f(".delete_button").click
-      expect(driver.switch_to.alert).not_to be nil
+      expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
       refresh_page
       wait_for_ajaximations

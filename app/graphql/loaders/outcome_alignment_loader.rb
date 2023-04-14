@@ -168,7 +168,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
 
   def id(alignment)
     # prepend id with alignment type (D - direct/I - indirect) to ensure unique alignment id
-    base_id = [alignment[:alignment_type] == "direct" ? "D" : "I", alignment[:id]].join("_")
+    base_id = [(alignment[:alignment_type] == "direct") ? "D" : "I", alignment[:id]].join("_")
     # append id with module id to ensure unique alignment id when artifact is included in multiple modules
     return [base_id, alignment[:module_id]].join("_") if alignment[:module_id]
 

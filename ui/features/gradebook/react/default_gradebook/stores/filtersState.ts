@@ -154,6 +154,12 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         'has-submissions',
         'has-no-submissions',
         'has-unposted-grades',
+        'late',
+        'missing',
+        'resubmitted',
+        'dropped',
+        'excused',
+        'extended',
       ].includes(initialColumnFilterSettings.submissions || '')
     ) {
       appliedFilters.push({

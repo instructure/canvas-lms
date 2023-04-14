@@ -168,9 +168,7 @@ module Canvas::Migration
     end
 
     def delete_unzipped_file
-      if File.exist?(unzipped_file_path)
-        FileUtils.rm_rf(unzipped_file_path)
-      end
+      FileUtils.rm_rf(unzipped_file_path)
     end
 
     def add_warning(warning)

@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import SubmissionDetailsDialog from 'ui/features/screenreader_gradebook/jquery/SubmissionDetailsDialog'
 import qs from 'qs'
 import 'ui/features/screenreader_gradebook/jst/SubmissionDetailsDialog.handlebars'

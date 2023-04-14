@@ -255,7 +255,7 @@ class Message < ActiveRecord::Base
       tap do
         @table = klass.arel_table_from_key_values(attrs)
         @predicate_builder = predicate_builder.dup
-        @predicate_builder.instance_variable_set("@table", ActiveRecord::TableMetadata.new(klass, @table))
+        @predicate_builder.instance_variable_set(:@table, ActiveRecord::TableMetadata.new(klass, @table))
       end
     end
   }
@@ -849,7 +849,7 @@ class Message < ActiveRecord::Base
     end
 
     # not sure what this is even doing?
-    message_types.to_a.sort_by { |m| m[0] == "Other" ? CanvasSort::Last : m[0] }
+    message_types.to_a.sort_by { |m| (m[0] == "Other") ? CanvasSort::Last : m[0] }
   end
 
   # Public: Message to use if the message is unavailable to send.

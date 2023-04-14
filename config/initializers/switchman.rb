@@ -23,7 +23,7 @@ Rails.application.config.after_initialize do
     def to_a(*args)
       if current_page.nil? then super # workaround for Active Record 3.0
       else
-        ::WillPaginate::Collection.create(current_page, limit_value) do |col|
+        WillPaginate::Collection.create(current_page, limit_value) do |col|
           col.replace super
           col.next_page = nil if total_entries.nil? && col.respond_to?(:length) && col.length < col.per_page # don't return a next page if there's nothing to get next
           col.total_entries ||= total_entries
@@ -239,10 +239,12 @@ Rails.application.config.after_initialize do
     end
   end
 
-  Object.send(:remove_const, :Shard) if defined?(::Shard)
-  Object.send(:remove_const, :DatabaseServer) if defined?(::DatabaseServer)
-  ::Shard = Switchman::Shard
-  ::DatabaseServer = Switchman::DatabaseServer
+  Object.send(:remove_const, :Shard) if defined?(Shard)
+  Object.send(:remove_const, :DatabaseServer) if defined?(DatabaseServer)
+  # rubocop:disable Lint/ConstantDefinitionInBlock
+  Shard = Switchman::Shard
+  DatabaseServer = Switchman::DatabaseServer
+  # rubocop:enable Lint/ConstantDefinitionInBlock
 
   Switchman::DefaultShard.class_eval do
     attr_writer :settings

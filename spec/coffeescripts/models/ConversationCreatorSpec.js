@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ConversationCreator from '@canvas/message-students-dialog/backbone/models/ConversationCreator.coffee'
+import ConversationCreator from '@canvas/message-students-dialog/backbone/models/ConversationCreator'
 
 QUnit.module('ConversationCreator', {
   setup() {

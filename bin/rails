@@ -2,15 +2,16 @@
 # frozen_string_literal: true
 
 begin
-  load File.expand_path("../spring", __FILE__)
+  load File.expand_path("spring", __dir__)
 rescue LoadError
+  nil
 end
 
 # added by instructure:
 # resolve any symlinks in the file path, to avoid double-require issues
-require 'pathname'
+require "pathname"
 expanded_path = Pathname.new(__FILE__).realpath
 
-APP_PATH = File.expand_path('../../config/application',  expanded_path)
-require_relative '../config/boot'
-require 'rails/commands'
+APP_PATH = File.expand_path("../../config/application", expanded_path)
+require_relative "../config/boot"
+require "rails/commands"

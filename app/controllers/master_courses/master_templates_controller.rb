@@ -448,7 +448,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     mc_tag = @template.content_tag_for(item)
     if value_to_boolean(params[:restricted])
-      custom_restrictions = params[:restrictions] && params[:restrictions].to_unsafe_h.map { |k, v| [k.to_sym, value_to_boolean(v)] }.to_h
+      custom_restrictions = params[:restrictions] && params[:restrictions].to_unsafe_h.to_h { |k, v| [k.to_sym, value_to_boolean(v)] }
       mc_tag.restrictions = custom_restrictions || @template.default_restrictions_for(item)
       mc_tag.use_default_restrictions = !custom_restrictions
     else
@@ -497,7 +497,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                      end
 
         remaining_count = max_records - items.size
-        condition = klass == "ContentTag" ? "#{ContentTag.quoted_table_name}.updated_at>?" : "updated_at>?"
+        condition = (klass == "ContentTag") ? "#{ContentTag.quoted_table_name}.updated_at>?" : "updated_at>?"
         items += item_scope.where(condition, cutoff_time).order(:id).limit(remaining_count).to_a
         break if items.size >= max_records
       end

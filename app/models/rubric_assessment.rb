@@ -188,7 +188,7 @@ class RubricAssessment < ActiveRecord::Base
   protected :update_assessment_requests
 
   def attempt
-    artifact_type == "Submission" ? artifact.attempt : nil
+    (artifact_type == "Submission") ? artifact.attempt : nil
   end
 
   def set_graded_anonymously

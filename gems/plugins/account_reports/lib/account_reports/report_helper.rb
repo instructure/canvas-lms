@@ -48,7 +48,7 @@ module AccountReports::ReportHelper
   # it will then format the datetime using the given format string
   def timezone_strftime(datetime, format, account = root_account)
     if (datetime = parse_utc_string(datetime))
-      (datetime.in_time_zone(account.default_time_zone)).strftime(format)
+      datetime.in_time_zone(account.default_time_zone).strftime(format)
     end
   end
 
@@ -384,7 +384,7 @@ module AccountReports::ReportHelper
 
   def number_of_items_per_runner(item_count, min: 25, max: 1000)
     # use 100 jobs for the report, but no fewer than 25, and no more than 1000 per job
-    [[item_count / 99.to_f.round(0), min].max, max].min
+    (item_count / 99.to_f).round(0).clamp(min, max)
   end
 
   def create_report_runners(ids, total, min: 25, max: 1000)

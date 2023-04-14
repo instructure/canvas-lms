@@ -151,7 +151,7 @@ describe Gradebook::FinalGradeOverrides do
 
     describe ".queue_bulk_update" do
       it "returns a progress object" do
-        progress = ::Gradebook::FinalGradeOverrides.queue_bulk_update(course, teacher, override_updates, nil)
+        progress = Gradebook::FinalGradeOverrides.queue_bulk_update(course, teacher, override_updates, nil)
 
         expect(progress).to be_a(Progress)
       end
@@ -162,7 +162,7 @@ describe Gradebook::FinalGradeOverrides do
 
       def run(updates: override_updates, grading_period: nil, updating_user: teacher, progress: nil)
         course.recompute_student_scores(run_immediately: true)
-        ::Gradebook::FinalGradeOverrides.process_bulk_update(progress, course, updating_user, updates, grading_period)
+        Gradebook::FinalGradeOverrides.process_bulk_update(progress, course, updating_user, updates, grading_period)
       end
 
       it "updates the override score for each included record" do
@@ -175,7 +175,7 @@ describe Gradebook::FinalGradeOverrides do
           expect(student1_enrollment.override_score).to eq 70.0
           expect(student2_enrollment.override_score).to eq 75.0
 
-          expect(unaffected_student.enrollments.first.override_score).to eq nil
+          expect(unaffected_student.enrollments.first.override_score).to be_nil
         end
       end
 
@@ -188,11 +188,11 @@ describe Gradebook::FinalGradeOverrides do
 
         aggregate_failures do
           expect(student1_enrollment.override_score({ grading_period_id: grading_period.id })).to eq 70.0
-          expect(student1_enrollment.override_score).to eq nil
+          expect(student1_enrollment.override_score).to be_nil
           expect(student2_enrollment.override_score({ grading_period_id: grading_period.id })).to eq 75.0
-          expect(student2_enrollment.override_score).to eq nil
+          expect(student2_enrollment.override_score).to be_nil
 
-          expect(unaffected_enrollment.override_score({ grading_period_id: grading_period.id })).to eq nil
+          expect(unaffected_enrollment.override_score({ grading_period_id: grading_period.id })).to be_nil
         end
       end
 
@@ -200,7 +200,7 @@ describe Gradebook::FinalGradeOverrides do
         student1_enrollment = student.enrollments.first
 
         run(grading_period: grading_period)
-        expect(student1_enrollment.override_score({ grading_period_id: other_grading_period.id })).to be nil
+        expect(student1_enrollment.override_score({ grading_period_id: other_grading_period.id })).to be_nil
       end
 
       it "updates all enrollments for students with multiple enrollments" do
@@ -273,7 +273,7 @@ describe Gradebook::FinalGradeOverrides do
 
           aggregate_failures do
             expect(section1_student_enrollment.override_score).to eq 50.0
-            expect(section2_student_enrollment.override_score).to eq nil
+            expect(section2_student_enrollment.override_score).to be_nil
           end
         end
 

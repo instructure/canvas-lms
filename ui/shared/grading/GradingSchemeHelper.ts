@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import round from 'round'
+import round from '@canvas/round'
 import type {GradingScheme} from './grading.d'
 
 export function indexOfGrade(grade: null | string | number, gradingSchemes: GradingScheme[]) {

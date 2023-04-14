@@ -129,11 +129,11 @@ RSpec.describe SubmissionDraft do
 
     it "returns true if there is a media_object_id" do
       @submission_draft.media_object_id = @media_object.media_id
-      expect(@submission_draft.meets_media_recording_criteria?).to eq(true)
+      expect(@submission_draft.meets_media_recording_criteria?).to be(true)
     end
 
     it "returns false if there is no media_object_id" do
-      expect(@submission_draft.meets_media_recording_criteria?).to eq(false)
+      expect(@submission_draft.meets_media_recording_criteria?).to be(false)
     end
   end
 
@@ -145,19 +145,19 @@ RSpec.describe SubmissionDraft do
 
       it "returns true if there is a text body" do
         @submission_draft.body = "some body"
-        expect(@submission_draft.meets_assignment_criteria?).to eq(true)
+        expect(@submission_draft.meets_assignment_criteria?).to be(true)
       end
 
       it "returns false if the text body is empty" do
         @submission_draft.body = ""
-        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+        expect(@submission_draft.meets_assignment_criteria?).to be(false)
       end
 
       it "returns false if drafts exist for a different type" do
         attachment = attachment_model
         @submission_draft.attachments = [attachment]
 
-        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+        expect(@submission_draft.meets_assignment_criteria?).to be(false)
       end
     end
 
@@ -170,17 +170,17 @@ RSpec.describe SubmissionDraft do
         attachment = attachment_model
         @submission_draft.attachments = [attachment]
 
-        expect(@submission_draft.meets_assignment_criteria?).to eq(true)
+        expect(@submission_draft.meets_assignment_criteria?).to be(true)
       end
 
       it "returns false if attachments is an empty array" do
         @submission_draft.attachments = []
-        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+        expect(@submission_draft.meets_assignment_criteria?).to be(false)
       end
 
       it "returns false if drafts exist for a different type" do
         @submission_draft.body = "some body"
-        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+        expect(@submission_draft.meets_assignment_criteria?).to be(false)
       end
 
       it "returns true if a valid lti_launch_url is present" do
@@ -201,29 +201,29 @@ RSpec.describe SubmissionDraft do
 
       it "returns true if there is a url" do
         @submission_draft.url = "http://www.google.com"
-        expect(@submission_draft.meets_assignment_criteria?).to eq(true)
+        expect(@submission_draft.meets_assignment_criteria?).to be(true)
       end
 
       it "returns false if the url is not valid" do
         @submission_draft.url = "oogy boogy"
-        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+        expect(@submission_draft.meets_assignment_criteria?).to be(false)
       end
 
       it "returns false if the url is malformed" do
         @submission_draft.url = "http:www.google.com"
-        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+        expect(@submission_draft.meets_assignment_criteria?).to be(false)
       end
 
       it "returns false if the url is empty" do
         @submission_draft.url = ""
-        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+        expect(@submission_draft.meets_assignment_criteria?).to be(false)
       end
 
       it "returns false if drafts exist for a different type" do
         attachment = attachment_model
         @submission_draft.attachments = [attachment]
 
-        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+        expect(@submission_draft.meets_assignment_criteria?).to be(false)
       end
     end
 
@@ -234,19 +234,19 @@ RSpec.describe SubmissionDraft do
 
       it "returns true if there is a media_object_id" do
         @submission_draft.media_object_id = @media_object.media_id
-        expect(@submission_draft.meets_assignment_criteria?).to eq(true)
+        expect(@submission_draft.meets_assignment_criteria?).to be(true)
       end
 
       it "returns false if the media_object_id is empty" do
         @submission_draft.media_object_id = ""
-        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+        expect(@submission_draft.meets_assignment_criteria?).to be(false)
       end
 
       it "returns false if drafts exist for a different type" do
         attachment = attachment_model
         @submission_draft.attachments = [attachment]
 
-        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+        expect(@submission_draft.meets_assignment_criteria?).to be(false)
       end
     end
 
@@ -263,14 +263,14 @@ RSpec.describe SubmissionDraft do
       end
 
       it "returns false if the submission does not have an annotation context draft" do
-        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+        expect(@submission_draft.meets_assignment_criteria?).to be(false)
       end
 
       it "returns false if drafts exist for a different type" do
         attachment = attachment_model
         @submission_draft.attachments = [attachment]
 
-        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+        expect(@submission_draft.meets_assignment_criteria?).to be(false)
       end
     end
 
@@ -281,12 +281,12 @@ RSpec.describe SubmissionDraft do
 
       it "returns true if a draft exists for any of the submission types" do
         @submission_draft.body = "some body"
-        expect(@submission_draft.meets_assignment_criteria?).to eq(true)
+        expect(@submission_draft.meets_assignment_criteria?).to be(true)
       end
     end
 
     it "returns false if there are no draft states" do
-      expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      expect(@submission_draft.meets_assignment_criteria?).to be(false)
     end
   end
 end

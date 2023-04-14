@@ -90,7 +90,7 @@ describe Autoextend do
   it "autoextends a class afterwards" do
     module AutoextendSpec::MyExtension; end
     Autoextend.hook(:"AutoextendSpec::Class", :"AutoextendSpec::MyExtension")
-    expect(defined?(AutoextendSpec::Class)).to eq nil
+    expect(defined?(AutoextendSpec::Class)).to be_nil
     class AutoextendSpec::Class; end
     expect(AutoextendSpec::Class.ancestors).to include AutoextendSpec::MyExtension
   end
@@ -210,7 +210,7 @@ describe Autoextend do
     it "hooks an autoloaded module after_load" do
       # This method will call an existing method on load
       Autoextend.hook(:"AutoextendSpec::TestLaterMethod", :"AutoextendSpec::PrependExistingMethod", method: :prepend, after_load: true)
-      expect(AutoextendSpec::TestLaterMethod.new.b_method).to eq(true)
+      expect(AutoextendSpec::TestLaterMethod.new.b_method).to be(true)
     end
   end
 end

@@ -22,7 +22,7 @@ import {Button} from '@instructure/ui-buttons'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Actions from '../actions'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 
 const I18n = useI18nScope('react_scheduler')
 

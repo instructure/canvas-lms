@@ -45,7 +45,7 @@ describe DataFixup::FixSelectFinalGradeForExistingAccounts do
       @account.role_overrides.create!(permission: "moderate_grades", enabled: true, role: @ta_role)
       DataFixup::FixSelectFinalGradeForExistingAccounts.run
       role_override = @account.role_overrides.find_by(permission: "select_final_grade", role: @ta_role.id)
-      expect(role_override).to be nil
+      expect(role_override).to be_nil
     end
 
     it "creates a select_final_grade role override when moderate_grades is disabled" do
@@ -90,7 +90,7 @@ describe DataFixup::FixSelectFinalGradeForExistingAccounts do
       @account.role_overrides.create!(permission: "moderate_grades", enabled: true, role: @new_role)
       DataFixup::FixSelectFinalGradeForExistingAccounts.run
       role_override = @account.role_overrides.find_by(permission: "select_final_grade", role: @new_role.id)
-      expect(role_override).to be nil
+      expect(role_override).to be_nil
     end
 
     it "creates a select_final_grade role override when moderate_grades is disabled" do
@@ -121,7 +121,7 @@ describe DataFixup::FixSelectFinalGradeForExistingAccounts do
     it "does not create a disabled select_final_grade role override for accounts without a moderate grades one" do
       DataFixup::FixSelectFinalGradeForExistingAccounts.run
       role_override = @account.role_overrides.find_by(permission: "select_final_grade", role_id: @teacher_role.id)
-      expect(role_override).to be nil
+      expect(role_override).to be_nil
     end
 
     it "does not create duplicate select_final_grade role override if already existing" do
@@ -135,7 +135,7 @@ describe DataFixup::FixSelectFinalGradeForExistingAccounts do
       @account.role_overrides.create!(permission: "moderate_grades", enabled: true, role: @teacher_role)
       DataFixup::FixSelectFinalGradeForExistingAccounts.run
       role_override = @account.role_overrides.find_by(permission: "select_final_grade", role: @teacher_role.id)
-      expect(role_override).to be nil
+      expect(role_override).to be_nil
     end
 
     it "creates a select_final_grade role override when moderate_grades is disabled" do
@@ -173,7 +173,7 @@ describe DataFixup::FixSelectFinalGradeForExistingAccounts do
     it "does not create a select_final_grade role override for site admin" do
       DataFixup::FixSelectFinalGradeForExistingAccounts.run
       role_override = @site_admin.role_overrides.find_by(permission: "select_final_grade")
-      expect(role_override).to be nil
+      expect(role_override).to be_nil
     end
   end
 end

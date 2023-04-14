@@ -67,7 +67,7 @@ def render_comment(property)
   indent_chars = "// "
   description = property["description"] ? indent(word_wrap(property["description"], 80 - indent_chars.length), 1, indent_chars) : ""
   deprecation = deprecation_message(property)
-  separator = description.present? && deprecation.present? ? "//\n" : ""
+  separator = (description.present? && deprecation.present?) ? "//\n" : ""
   "#{description}#{separator}#{deprecation}"
 end
 

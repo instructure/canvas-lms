@@ -158,7 +158,7 @@ describe LoginController do
         allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(true)
 
         get "session_token", format: :json
-        expect(JSON.parse(response.body)["requires_terms_acceptance"]).to eq(true)
+        expect(JSON.parse(response.body)["requires_terms_acceptance"]).to be(true)
       end
     end
 
@@ -169,7 +169,7 @@ describe LoginController do
         allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(false)
 
         get "session_token", format: :json
-        expect(JSON.parse(response.body)["requires_terms_acceptance"]).to eq(false)
+        expect(JSON.parse(response.body)["requires_terms_acceptance"]).to be(false)
       end
     end
   end
@@ -194,7 +194,7 @@ describe LoginController do
       account_with_saml(account: Account.default, saml_log_out_url: "https://www.google.com/")
       session[:login_aac] = Account.default.authentication_providers.first.id
       delete "destroy"
-      expect(response.status).to eq 302
+      expect(response).to have_http_status :found
       expect(response.location).to match(%r{^https://www.google.com/\?SAMLRequest=})
     end
 
@@ -202,7 +202,7 @@ describe LoginController do
       account_with_cas(account: Account.default)
       session[:login_aac] = Account.default.authentication_providers.first.id
       delete "destroy"
-      expect(response.status).to eq 302
+      expect(response).to have_http_status :found
       expect(response.location).to match(%r{localhost/cas/})
     end
 
@@ -210,7 +210,7 @@ describe LoginController do
       account_with_saml(account: Account.default, saml_log_out_url: "https://www.google.com/")
       session[:login_aac] = Account.default.canvas_authentication_provider.id
       delete "destroy"
-      expect(response.status).to eq 302
+      expect(response).to have_http_status :found
       expect(response.location).to match(%r{/login/canvas$})
     end
   end

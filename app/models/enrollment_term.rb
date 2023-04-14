@@ -76,7 +76,7 @@ class EnrollmentTerm < ActiveRecord::Base
   end
 
   def touch_all_courses
-    courses.touch_all
+    courses.in_batches(of: 10_000).touch_all
   end
 
   def update_courses_and_states_later(enrollment_type = nil)

@@ -161,9 +161,9 @@ describe "discussions" do
         expect(drop_down).to include("category 1")
         click_option("#assignment_group_category_id", @category1.name)
         expect_new_page_load { submit_form(".form-actions") }
-        expect(f("#discussion_container").text).to include("Since this is a group discussion,"\
-                                                           " each group has its own conversation for this topic."\
-                                                           " Here are the ones you have access to:\nsome group")
+        expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
+                                                           "each group has its own conversation for this topic. " \
+                                                           "Here are the ones you have access to:\nsome group")
       end
 
       it "creates a graded discussion", priority: "1" do
@@ -202,9 +202,9 @@ describe "discussions" do
         click_option("#assignment_group_category_id", @category1.name)
         expect_new_page_load { submit_form(".form-actions") }
         expect(f("#discussion_container").text).to include("This is a graded discussion: 10 points possible")
-        expect(f("#discussion_container").text).to include("Since this is a group discussion,"\
-                                                           " each group has its own conversation for this topic."\
-                                                           " Here are the ones you have access to:\nsome group")
+        expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
+                                                           "each group has its own conversation for this topic. " \
+                                                           "Here are the ones you have access to:\nsome group")
         expect(f("a.discussion-reply-action[role='button']")).to be_present
       end
 

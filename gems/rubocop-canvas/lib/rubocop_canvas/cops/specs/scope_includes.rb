@@ -17,15 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# frozen_string_literal: true
-
 module RuboCop
   module Cop
     module Specs
       class ScopeIncludes < Cop
-        MSG = "Never `include` a module at the top-level. Otherwise its "\
-              "methods will be added to `Object` (and thus everything), "\
-              "causing all sorts of mayhem. Move this inside a `describe`, "\
+        MSG = "Never `include` a module at the top-level. Otherwise its " \
+              "methods will be added to `Object` (and thus everything), " \
+              "causing all sorts of mayhem. Move this inside a `describe`, " \
               "`shared_context`, etc."
 
         WHITELISTED_BLOCKS = %i[

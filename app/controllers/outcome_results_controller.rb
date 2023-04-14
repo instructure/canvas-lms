@@ -558,7 +558,7 @@ class OutcomeResultsController < ApplicationController
     # (sorting by name for duplicate scores), then reorder users
     # from those rollups, then paginate those users, and finally
     # only include rollups for those users
-    missing_score_sort = params[:sort_order] == "desc" ? CanvasSort::First : CanvasSort::Last
+    missing_score_sort = (params[:sort_order] == "desc") ? CanvasSort::First : CanvasSort::Last
     rollups = user_rollups.sort_by do |r|
       score = r.scores.find { |s| s.outcome.id.to_s == params[:sort_outcome_id] }&.score
       [score || missing_score_sort, Canvas::ICU.collation_key(r.context.sortable_name)]

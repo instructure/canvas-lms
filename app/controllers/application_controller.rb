@@ -311,7 +311,7 @@ class ApplicationController < ActionController::Base
         @js_env[:rce_auto_save_max_age_ms] = Setting.get("rce_auto_save_max_age_ms", 1.day.to_i * 1000).to_i
         @js_env[:FEATURES][:new_math_equation_handling] = use_new_math_equation_handling?
         @js_env[:K5_USER] = k5_user?
-        @js_env[:USE_CLASSIC_FONT] = @context.is_a?(Course) ? @context.account.use_classic_font_in_k5? : (k5_user? && use_classic_font?)
+        @js_env[:USE_CLASSIC_FONT] = @context.is_a?(Course) ? @context.account.use_classic_font_in_k5? : use_classic_font?
         @js_env[:K5_HOMEROOM_COURSE] = @context.is_a?(Course) && @context.elementary_homeroom_course?
         @js_env[:K5_SUBJECT_COURSE] = @context.is_a?(Course) && @context.elementary_subject_course?
         @js_env[:LOCALE_TRANSLATION_FILE] = ::Canvas::Cdn.registry.url_for("javascripts/translations/#{@js_env[:LOCALES].first}.json")
@@ -353,7 +353,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
   ].freeze
-  JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES + JS_ENV_BRAND_ACCOUNT_FEATURES].sort.join(",")).freeze
+  JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES + JS_ENV_BRAND_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
     # can be invalidated by a flag change on site admin, the domain root account, or the brand config account
     MultiCache.fetch(["js_env_account_features", JS_ENV_FEATURES_HASH,
@@ -676,7 +676,7 @@ class ApplicationController < ActionController::Base
   end
 
   def user_url(*opts)
-    opts[0] == @current_user ? user_profile_url(@current_user) : super
+    (opts[0] == @current_user) ? user_profile_url(@current_user) : super
   end
 
   protected
@@ -1913,7 +1913,7 @@ class ApplicationController < ActionController::Base
   # Retrieving wiki pages needs to search either using the id or
   # the page title.
   def get_wiki_page
-    GuardRail.activate(params[:action] == "edit" ? :primary : :secondary) do
+    GuardRail.activate((params[:action] == "edit") ? :primary : :secondary) do
       @wiki = @context.wiki
 
       @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
@@ -1937,7 +1937,7 @@ class ApplicationController < ActionController::Base
   end
 
   def content_tag_redirect(context, tag, error_redirect_symbol, tag_type = nil)
-    url_params = tag.tag_type == "context_module" ? { module_item_id: tag.id } : {}
+    url_params = (tag.tag_type == "context_module") ? { module_item_id: tag.id } : {}
     if tag.content_type == "Assignment"
       use_edit_url = params[:build].nil? &&
                      Account.site_admin.feature_enabled?(:new_quizzes_modules_support) &&
@@ -2316,7 +2316,7 @@ class ApplicationController < ActionController::Base
 
   def temporary_user_code(generate = true)
     if generate
-      session[:temporary_user_code] ||= "tmp_#{Digest::MD5.hexdigest("#{Time.now.to_i}_#{rand}")}"
+      session[:temporary_user_code] ||= "tmp_#{Digest::SHA256.hexdigest("#{Time.now.to_i}_#{rand}")}"
     else
       session[:temporary_user_code]
     end
@@ -2806,12 +2806,12 @@ class ApplicationController < ActionController::Base
       permissions[:manage_assignments_delete] = permissions[:manage_assignments]
       permissions[:manage] = permissions[:manage_assignments]
     end
-    permissions[:by_assignment_id] = @context.assignments.map do |assignment|
+    permissions[:by_assignment_id] = @context.assignments.to_h do |assignment|
       [assignment.id, {
         update: assignment.user_can_update?(@current_user, session),
         delete: assignment.grants_right?(@current_user, :delete)
       }]
-    end.to_h
+    end
 
     current_user_has_been_observer_in_this_course = @context.user_has_been_observer?(@current_user)
 

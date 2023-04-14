@@ -1895,7 +1895,7 @@ describe GradeCalculator do
       it ".save_assignment_group_scores raises Delayed::RetriableError when deadlocked" do
         allow(Score.connection).to receive(:execute).and_raise(ActiveRecord::Deadlocked)
 
-        expect { calc.send(:save_assignment_group_scores, nil, nil) }.to raise_error(Delayed::RetriableError)
+        expect { calc.send(:save_assignment_group_scores, [], []) }.to raise_error(Delayed::RetriableError)
       end
 
       it ".save_course_and_grading_period_scores raises Delayed::RetriableError when deadlocked" do

@@ -51,9 +51,9 @@ describe "discussion assignments" do
 
     it "creates a group discussion ungraded", priority: "1" do
       expect_new_page_load { submit_form(".form-actions") }
-      expect(f("#discussion_container").text).to include("Since this is a group discussion,"\
-                                                         " each group has its own conversation for this topic."\
-                                                         " Here are the ones you have access to:\nsome group")
+      expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
+                                                         "each group has its own conversation for this topic. " \
+                                                         "Here are the ones you have access to:\nsome group")
     end
 
     it "creates a group discussion graded", priority: "1" do
@@ -62,9 +62,9 @@ describe "discussion assignments" do
       click_option("#assignment_group_id", "Assignment Group")
       expect_new_page_load { submit_form(".form-actions") }
       expect(f("#discussion_container").text).to include("This is a graded discussion: 10 points possible")
-      expect(f("#discussion_container").text).to include("Since this is a group discussion,"\
-                                                         " each group has its own conversation for this topic."\
-                                                         " Here are the ones you have access to:\nsome group")
+      expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
+                                                         "each group has its own conversation for this topic. " \
+                                                         "Here are the ones you have access to:\nsome group")
     end
   end
 
@@ -79,7 +79,7 @@ describe "discussion assignments" do
       @g1.add_user @student1
     end
 
-    it "allows the student to reply and teacher to see the unread count", priority: "1", ignore_js_errors: true do
+    it "allows the student to reply and teacher to see the unread count", ignore_js_errors: true, priority: "1" do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       expect(f(".new-and-total-badge .new-items").text).to include ""
       user_session(@student1)

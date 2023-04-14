@@ -18,9 +18,9 @@
 import noResultsTemplate from '../../jst/noResults.handlebars'
 import $ from 'jquery'
 import _ from 'underscore'
-import FilterEntryView from './FilterEntryView.coffee'
-import EntryCollectionView from './EntryCollectionView.coffee'
-import EntryCollection from '../collections/EntryCollection.coffee'
+import FilterEntryView from './FilterEntryView'
+import EntryCollectionView from './EntryCollectionView'
+import EntryCollection from '../collections/EntryCollection'
 import rEscape from 'escape-regex'
 
 export default class DiscussionFilterResultsView extends EntryCollectionView {

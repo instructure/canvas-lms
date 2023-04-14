@@ -18,9 +18,9 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
-import GroupCollection from '../collections/GroupCollection.coffee'
-import UnassignedGroupUserCollection from '../collections/UnassignedGroupUserCollection.coffee'
-import progressable from '@canvas/progress/backbone/models/progressable.coffee'
+import GroupCollection from '../collections/GroupCollection'
+import UnassignedGroupUserCollection from '../collections/UnassignedGroupUserCollection'
+import progressable from '@canvas/progress/backbone/models/progressable'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 
 export default class GroupCategory extends Backbone.Model

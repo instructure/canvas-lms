@@ -368,7 +368,7 @@ describe "Default Account Reports" do
           end
 
           aggregate_failures do
-            expect(line_using_grading_standard["current grade"]).to eq nil
+            expect(line_using_grading_standard["current grade"]).to be_nil
             expect(line_using_grading_standard["final grade"]).to eq "B"
             expect(line_using_grading_standard["unposted current grade"]).to eq "B"
             expect(line_using_grading_standard["unposted final grade"]).to eq "A"
@@ -381,11 +381,11 @@ describe "Default Account Reports" do
             line["course"] == @course2.name && line["student name"] == "Michael Bolton"
           end
           aggregate_failures do
-            expect(line_not_using_grading_standard["current grade"]).to be nil
-            expect(line_not_using_grading_standard["final grade"]).to be nil
-            expect(line_not_using_grading_standard["unposted current grade"]).to be nil
-            expect(line_not_using_grading_standard["unposted final grade"]).to be nil
-            expect(line_not_using_grading_standard["override grade"]).to be nil
+            expect(line_not_using_grading_standard["current grade"]).to be_nil
+            expect(line_not_using_grading_standard["final grade"]).to be_nil
+            expect(line_not_using_grading_standard["unposted current grade"]).to be_nil
+            expect(line_not_using_grading_standard["unposted final grade"]).to be_nil
+            expect(line_not_using_grading_standard["override grade"]).to be_nil
           end
         end
       end
@@ -482,7 +482,7 @@ describe "Default Account Reports" do
             ["Math 101", "Fun 404"].include?(student["course"])
             student["grading period set"] == "Grading Periods"
           end
-        ).to eq true
+        ).to be true
 
         jason1, jason2, mike1, mike2 = csv
 
@@ -492,8 +492,8 @@ describe "Default Account Reports" do
         expect(jason1["Future current score"].to_f).to eq 75
         expect(jason1["Past unposted current score"].to_f).to eq 25
         expect(jason1["Future unposted current score"].to_f).to eq 75
-        expect(jason1["Past override score"]).to be nil
-        expect(jason1["Future override score"]).to be nil
+        expect(jason1["Past override score"]).to be_nil
+        expect(jason1["Future override score"]).to be_nil
 
         expect(jason2["student name"]).to eq "Jason Donovan"
         expect(jason2["course"]).to eq "Math 101"
@@ -510,8 +510,8 @@ describe "Default Account Reports" do
         expect(mike1["Future final score"].to_f).to eq 25
         expect(mike1["Past unposted final score"].to_f).to eq 75
         expect(mike1["Future unposted final score"].to_f).to eq 25
-        expect(mike1["Past override score"]).to be nil
-        expect(mike1["Future override score"]).to be nil
+        expect(mike1["Past override score"]).to be_nil
+        expect(mike1["Future override score"]).to be_nil
 
         expect(mike2["student name"]).to eq "Michael Bolton"
         expect(mike2["course"]).to eq "Math 101"
@@ -642,17 +642,17 @@ describe "Default Account Reports" do
           it "returns empty values for courses not using a grading scheme" do
             mike_row = default_term_csv.detect { |row| row["course"] == @course3.name && row["student name"] == "Michael Bolton" }
             aggregate_failures do
-              expect(mike_row["Past current grade"]).to be nil
-              expect(mike_row["Past final grade"]).to be nil
-              expect(mike_row["Past unposted current grade"]).to be nil
-              expect(mike_row["Past unposted final grade"]).to be nil
-              expect(mike_row["Past override grade"]).to be nil
+              expect(mike_row["Past current grade"]).to be_nil
+              expect(mike_row["Past final grade"]).to be_nil
+              expect(mike_row["Past unposted current grade"]).to be_nil
+              expect(mike_row["Past unposted final grade"]).to be_nil
+              expect(mike_row["Past override grade"]).to be_nil
 
-              expect(mike_row["current grade"]).to be nil
-              expect(mike_row["final grade"]).to be nil
-              expect(mike_row["unposted current grade"]).to be nil
-              expect(mike_row["unposted final grade"]).to be nil
-              expect(mike_row["override grade"]).to be nil
+              expect(mike_row["current grade"]).to be_nil
+              expect(mike_row["final grade"]).to be_nil
+              expect(mike_row["unposted current grade"]).to be_nil
+              expect(mike_row["unposted final grade"]).to be_nil
+              expect(mike_row["override grade"]).to be_nil
             end
           end
         end

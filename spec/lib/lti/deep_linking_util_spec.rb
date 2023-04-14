@@ -22,7 +22,7 @@ describe Lti::DeepLinkingUtil do
   describe ".validate_custom_params" do
     it "returns nil if not a hash or JSON string of a hash" do
       [123, "foo", "123", "null", "true", "undefined", 1.0, 1, true, false, nil].each do |input|
-        expect(described_class.validate_custom_params(input)).to eq(nil)
+        expect(described_class.validate_custom_params(input)).to be_nil
       end
     end
 

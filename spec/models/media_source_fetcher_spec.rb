@@ -42,7 +42,7 @@ describe MediaSourceFetcher do
 
         url = fetcher.fetch_preferred_source_url(media_id: "theMediaId", file_extension: "mp4")
 
-        expect(url).to eq nil
+        expect(url).to be_nil
       end
     end
 

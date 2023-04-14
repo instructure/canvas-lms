@@ -101,7 +101,7 @@ end
 unless long_lines.empty?
   comment "warn", long_lines.first[1] + 3,
           "try to keep all lines under #{BODY_IDEAL_LINE_LENGTH} characters" +
-          (long_lines.size > 1 ? " (note that #{long_lines.size - 1} other long lines follow this one)" : ""),
+          ((long_lines.size > 1) ? " (note that #{long_lines.size - 1} other long lines follow this one)" : ""),
           link_to_guidelines: true
 end
 
@@ -142,7 +142,7 @@ if only_affects_specs
   exit
 end
 
-flag_name = (commit_message =~ /^flag\s{0,3}=\s{0,3}([a-zA-Z][\w\-]+)\s{0,3}$/)
+flag_name = (commit_message =~ /^flag\s{0,3}=\s{0,3}([a-zA-Z][\w-]+)\s{0,3}$/)
 unless flag_name
   comment "warn", nil, "ლ(ಠ益ಠლ) y u no add release flag? https://instructure.atlassian.net/wiki/spaces/CE/pages/603586589/Commit+Message+Release+Flags"
 end

@@ -19,7 +19,8 @@
 import loadEventListeners from '@canvas/rce/loadEventListeners'
 import 'jquery'
 import 'jqueryui/tabs'
-import 'browser-sniffer'
+
+if (!('INST' in window)) window.INST = {}
 
 describe('loadEventListeners', () => {
   let fakeEditor, dispatchEvent

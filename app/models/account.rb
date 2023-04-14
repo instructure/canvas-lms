@@ -1007,7 +1007,7 @@ class Account < ActiveRecord::Base
     end
 
     if starting_account_id
-      guard_rail_env = Account.connection.open_transactions == 0 ? :secondary : GuardRail.environment
+      guard_rail_env = (Account.connection.open_transactions == 0) ? :secondary : GuardRail.environment
       GuardRail.activate(guard_rail_env) do
         chain.concat(Shard.shard_for(starting_account_id).activate do
           Account.find_by_sql(<<~SQL.squish)
@@ -1135,7 +1135,7 @@ class Account < ActiveRecord::Base
     original_shard = Shard.current
     result = Shard.shard_for(parent_account_id).activate do
       parent_account_id = Shard.relative_id_for(parent_account_id, original_shard, Shard.current)
-      guard_rail_env = Account.connection.open_transactions == 0 ? :secondary : GuardRail.environment
+      guard_rail_env = (Account.connection.open_transactions == 0) ? :secondary : GuardRail.environment
       GuardRail.activate(guard_rail_env) do
         sql = Account.sub_accounts_recursive_sql(parent_account_id)
         if pluck
@@ -2119,7 +2119,7 @@ class Account < ActiveRecord::Base
     return unless referer.host
 
     referer_with_port = "#{referer.scheme}://#{referer.host}"
-    referer_with_port += ":#{referer.port}" unless referer.port == (referer.scheme == "https" ? 443 : 80)
+    referer_with_port += ":#{referer.port}" unless referer.port == ((referer.scheme == "https") ? 443 : 80)
     referer_with_port
   end
 

@@ -62,6 +62,11 @@ Migration/IdColumn:
   Include:
     - "**/db/migrate/*.rb"
 
+Migration/FunctionUnqualifiedTable:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+
 Migration/Predeploy:
   Enabled: true
   Include:

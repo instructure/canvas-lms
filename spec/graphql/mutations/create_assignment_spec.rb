@@ -149,11 +149,11 @@ describe Mutations::CreateAssignment do
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "createAssignment", "errors")).to be_nil
     expect(result.dig("data", "createAssignment", "assignment", "name")).to eq "moderated grading test assignment"
-    expect(result.dig("data", "createAssignment", "assignment", "moderatedGrading", "enabled")).to eq true
+    expect(result.dig("data", "createAssignment", "assignment", "moderatedGrading", "enabled")).to be true
     expect(result.dig("data", "createAssignment", "assignment", "moderatedGrading", "graderCount")).to eq 1
-    expect(result.dig("data", "createAssignment", "assignment", "moderatedGrading", "graderCommentsVisibleToGraders")).to eq false
-    expect(result.dig("data", "createAssignment", "assignment", "moderatedGrading", "graderNamesVisibleToFinalGrader")).to eq false
-    expect(result.dig("data", "createAssignment", "assignment", "moderatedGrading", "gradersAnonymousToGraders")).to eq false
+    expect(result.dig("data", "createAssignment", "assignment", "moderatedGrading", "graderCommentsVisibleToGraders")).to be false
+    expect(result.dig("data", "createAssignment", "assignment", "moderatedGrading", "graderNamesVisibleToFinalGrader")).to be false
+    expect(result.dig("data", "createAssignment", "assignment", "moderatedGrading", "gradersAnonymousToGraders")).to be false
     expect(result.dig("data", "createAssignment", "assignment", "moderatedGrading", "finalGrader", "_id")).to eq @teacher.to_param
 
     assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
@@ -184,21 +184,21 @@ describe Mutations::CreateAssignment do
     GQL
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "createAssignment", "errors")).to be_nil
-    expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "enabled")).to eq true
+    expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "enabled")).to be true
     expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "count")).to eq 2
     expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "dueAt")).to eq "2018-01-01T01:00:00Z"
-    expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "intraReviews")).to eq true
-    expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "anonymousReviews")).to eq true
-    expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "automaticReviews")).to eq true
+    expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "intraReviews")).to be true
+    expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "anonymousReviews")).to be true
+    expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "automaticReviews")).to be true
 
     assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
     expect(assignment.name).to eq "peer review test assignment"
-    expect(assignment.peer_reviews).to eq true
+    expect(assignment.peer_reviews).to be true
     expect(assignment.peer_review_count).to eq 2
     expect(assignment.peer_reviews_due_at).to eq "2018-01-01T01:00:00Z"
-    expect(assignment.intra_group_peer_reviews).to eq true
-    expect(assignment.anonymous_peer_reviews).to eq true
-    expect(assignment.automatic_peer_reviews).to eq true
+    expect(assignment.intra_group_peer_reviews).to be true
+    expect(assignment.anonymous_peer_reviews).to be true
+    expect(assignment.automatic_peer_reviews).to be true
   end
 
   it "creates an assignment in an assignment group" do
@@ -217,9 +217,9 @@ describe Mutations::CreateAssignment do
 
     assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
     expect(assignment.assignment_group).to eq new_assignment_group
-    expect(assignment.grade_group_students_individually).to eq false
+    expect(assignment.grade_group_students_individually).to be false
     expect(assignment.group_category_id).to eq gc.id
-    expect(assignment.grade_as_group?).to eq true
+    expect(assignment.grade_as_group?).to be true
   end
 
   it "creates an assignment in an assignment group with grading group students individually" do
@@ -238,9 +238,9 @@ describe Mutations::CreateAssignment do
 
     assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
     expect(assignment.assignment_group).to eq new_assignment_group
-    expect(assignment.grade_group_students_individually).to eq true
+    expect(assignment.grade_group_students_individually).to be true
     expect(assignment.group_category_id).to eq gc.id
-    expect(assignment.grade_as_group?).to eq false
+    expect(assignment.grade_as_group?).to be false
   end
 
   it "creates an assignment in a module" do

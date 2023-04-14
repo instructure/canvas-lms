@@ -759,9 +759,9 @@ module Gradebook
     sort_by_item = ""
 
     case sort_type
-    when /(low[\s\-]to[\s\-]high)/i
+    when /(low[\s-]to[\s-]high)/i
       sort_by_item = "Grade - Low to High"
-    when /(high[\s\-]to[\s\-]low)/i
+    when /(high[\s-]to[\s-]low)/i
       sort_by_item = "Grade - High to Low"
     when /(missing)/i
       sort_by_item = "Missing"

@@ -33,6 +33,241 @@ describe "as a student" do
       @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
     end
 
+    context "assignment details with restrict_quantitative_data truthy" do
+      before :once do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+      end
+
+      context "not submitted" do
+        it "does not show points possible for points grading_type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "points"
+          )
+
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+
+          expect(f("body")).not_to contain_jqcss("span:contains('#{assignment.points_possible}'))")
+        end
+      end
+
+      context "graded" do
+        it "shows grade as letter_grade for points grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "points"
+          )
+
+          assignment.grade_student(@student, grade: "9", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          expect(f("span.selected-submission-grade").text).to include("A-")
+          expect(f("span.selected-submission-grade").text).not_to include("9")
+          expect(f("span[data-testid='grade-display']").text).to include("A-")
+          expect(f("span[data-testid='grade-display']").text).not_to include("9")
+        end
+
+        context "0 points possible" do
+          it "shows no grade when score is 0 or less for points" do
+            assignment = @course.assignments.create!(
+              name: "assignment",
+              due_at: 5.days.ago,
+              points_possible: 0,
+              submission_types: "online_text_entry",
+              grading_type: "points"
+            )
+
+            assignment.grade_student(@student, grade: "0", grader: @teacher)
+            user_session(@student)
+            StudentAssignmentPageV2.visit(@course, assignment)
+            wait_for_ajaximations
+            expect(f("body")).not_to contain_css("span.selected-submission-grade")
+            expect(f("span[data-testid='grade-display']").text).to eq ""
+          end
+
+          it "shows A when score is greater than 0 for quantitative assignments" do
+            assignment = @course.assignments.create!(
+              name: "assignment",
+              due_at: 5.days.ago,
+              points_possible: 0,
+              submission_types: "online_text_entry",
+              grading_type: "points"
+            )
+            assignment.submit_homework(@student, { body: "blah" })
+            assignment.grade_student(@student, grade: "1", grader: @teacher)
+            user_session(@student)
+            StudentAssignmentPageV2.visit(@course, assignment)
+            wait_for_ajaximations
+            expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\nA"
+            expect(f("span[data-testid='grade-display']").text).to eq "A"
+          end
+
+          it "shows complete when score is greater than 0 for pass_fail assignments" do
+            assignment = @course.assignments.create!(
+              name: "assignment",
+              due_at: 5.days.ago,
+              points_possible: 0,
+              submission_types: "online_text_entry",
+              grading_type: "pass_fail"
+            )
+            assignment.submit_homework(@student, { body: "blah" })
+            assignment.grade_student(@student, grade: "complete", grader: @teacher)
+            user_session(@student)
+            StudentAssignmentPageV2.visit(@course, assignment)
+            wait_for_ajaximations
+            expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\nComplete"
+            expect(f("span[data-testid='grade-display']").text).to eq "Complete"
+          end
+
+          it "uses the coerced score to letter_grade when score is greater than 0 for letter_grade assignments" do
+            assignment = @course.assignments.create!(
+              name: "assignment",
+              due_at: 5.days.ago,
+              points_possible: 0,
+              submission_types: "online_text_entry",
+              grading_type: "letter_grade"
+            )
+            assignment.submit_homework(@student, { body: "blah" })
+            assignment.grade_student(@student, grade: "1", grader: @teacher)
+            user_session(@student)
+            StudentAssignmentPageV2.visit(@course, assignment)
+            wait_for_ajaximations
+            # showing A means it used the coerced score, without coercion, it would show "1"
+            expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\nA"
+            expect(f("span[data-testid='grade-display']").text).to eq "A"
+          end
+        end
+
+        it "shows 0 grade as F for points grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "points"
+          )
+
+          assignment.grade_student(@student, grade: "0", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          expect(f("span.selected-submission-grade").text).to include("F")
+          expect(f("span.selected-submission-grade").text).not_to include("0")
+          expect(f("span[data-testid='grade-display']").text).to include("F")
+          expect(f("span[data-testid='grade-display']").text).not_to include("0")
+        end
+
+        it "shows Excused when student is excused" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "points"
+          )
+
+          assignment.grade_student(@student, excused: true, grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          expect(f("body")).not_to contain_css("span.selected-submission-grade")
+          expect(f("span[data-testid='grade-display']").text).to include("Excused")
+        end
+
+        it "shows grade as letter_grade for percent grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "percent"
+          )
+
+          assignment.grade_student(@student, grade: "9", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          # making sure 9 does not show implicitly makes sure 90% does not show as well
+          expect(f("span.selected-submission-grade").text).to include("A-")
+          expect(f("span.selected-submission-grade").text).not_to include("9")
+          expect(f("span[data-testid='grade-display']").text).to include("A-")
+          expect(f("span[data-testid='grade-display']").text).not_to include("9")
+        end
+
+        it "shows grade as letter_grade for gpa_scale grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "gpa_scale"
+          )
+
+          assignment.grade_student(@student, grade: "9", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          # making sure 9 does not show implicitly makes sure 90% does not show as well
+          expect(f("span.selected-submission-grade").text).to include("A-")
+          expect(f("span[data-testid='grade-display']").text).to include("A-")
+        end
+
+        it "still shows grade as letter_grade for letter_grade grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "letter_grade"
+          )
+
+          assignment.grade_student(@student, grade: "9", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          # making sure 9 does not show implicitly makes sure 90% does not show as well
+          expect(f("span.selected-submission-grade").text).to include("A-")
+          expect(f("span[data-testid='grade-display']").text).to include("A-")
+        end
+
+        it "still shows grade as complete/incomplete for pass_fail grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "pass_fail"
+          )
+
+          assignment.grade_student(@student, grade: "pass", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          # making sure 9 does not show implicitly makes sure 90% does not show as well
+          expect(f("span.selected-submission-grade").text).to include("Complete")
+          expect(f("span[data-testid='grade-display']").text).to include("Complete")
+        end
+      end
+    end
+
     context "assignment details" do
       before(:once) do
         @assignment = @course.assignments.create!(
@@ -159,6 +394,79 @@ describe "as a student" do
         StudentAssignmentPageV2.cancel_attempt_button.click
 
         expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("REVIEW FEEDBACK")
+      end
+    end
+
+    context "0 points possible assignments" do
+      it "shows score/0 for points type assignments" do
+        assignment = @course.assignments.create!(
+          name: "assignment",
+          due_at: 5.days.from_now,
+          points_possible: 0,
+          submission_types: "online_text_entry"
+        )
+        assignment.submit_homework(@student, { body: "blah" })
+        assignment.grade_student(@student, grade: "4", grader: @teacher)
+
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, assignment)
+        wait_for_ajaximations
+        expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\n4/0"
+        expect(f("span[data-testid='grade-display']").text).to eq "4/0 Points"
+      end
+
+      it "simply shows the score for letter-grade assignments" do
+        assignment = @course.assignments.create!(
+          name: "assignment",
+          due_at: 5.days.from_now,
+          points_possible: 0,
+          submission_types: "online_text_entry",
+          grading_type: "letter_grade"
+        )
+        assignment.submit_homework(@student, { body: "blah" })
+        assignment.grade_student(@student, grade: "9", grader: @teacher)
+
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, assignment)
+        wait_for_ajaximations
+        expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\n9"
+        expect(f("span[data-testid='grade-display']").text).to eq "9"
+      end
+
+      it "shows N/A once for complete/incomplete assignments" do
+        assignment = @course.assignments.create!(
+          name: "assignment",
+          due_at: 5.days.from_now,
+          points_possible: 0,
+          submission_types: "online_text_entry",
+          grading_type: "pass_fail"
+        )
+        assignment.submit_homework(@student, { body: "blah" })
+        assignment.grade_student(@student, grade: "9", grader: @teacher)
+
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, assignment)
+        wait_for_ajaximations
+        expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\nN/A"
+        expect(f("span[data-testid='grade-display']").text).to eq ""
+      end
+
+      it "shows simply the percentage for percent assignments" do
+        assignment = @course.assignments.create!(
+          name: "assignment",
+          due_at: 5.days.from_now,
+          points_possible: 0,
+          submission_types: "online_text_entry",
+          grading_type: "percent"
+        )
+        assignment.submit_homework(@student, { body: "blah" })
+        assignment.grade_student(@student, grade: "9", grader: @teacher)
+
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, assignment)
+        wait_for_ajaximations
+        expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\n9%"
+        expect(f("span[data-testid='grade-display']").text).to eq "9%"
       end
     end
 

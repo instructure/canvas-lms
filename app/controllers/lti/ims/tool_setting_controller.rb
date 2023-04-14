@@ -94,7 +94,7 @@ module Lti
       def tool_setting_json(tool_setting, bubble)
         if %w[all distinct].include?(bubble)
           graph = []
-          distinct = bubble == "distinct" ? [] : nil
+          distinct = (bubble == "distinct") ? [] : nil
           while tool_setting
             graph << collect_tool_settings(tool_setting, distinct)
             distinct |= graph.last.custom.keys if distinct
@@ -208,9 +208,9 @@ module Lti
 
       def render_bad_request
         render json: {
-          status: I18n.t("lib.auth.api.bad_request_status", "bad_request"),
-          errors: [{ message: I18n.t("lib.auth.api.bad_request_message", "bad_request") }]
-        },
+                 status: I18n.t("lib.auth.api.bad_request_status", "bad_request"),
+                 errors: [{ message: I18n.t("lib.auth.api.bad_request_message", "bad_request") }]
+               },
                status: :bad_request
       end
     end

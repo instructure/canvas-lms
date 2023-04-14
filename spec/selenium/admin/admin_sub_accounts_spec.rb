@@ -29,7 +29,7 @@ describe "admin sub accounts" do
       sub_account = Account.create(name: name + " #{i}", parent_account: parent_account)
       created_sub_accounts.push(sub_account)
     end
-    created_sub_accounts.count == 1 ? created_sub_accounts[0] : created_sub_accounts
+    (created_sub_accounts.count == 1) ? created_sub_accounts[0] : created_sub_accounts
   end
 
   def click_account_action_link(account_id, action_link_css)

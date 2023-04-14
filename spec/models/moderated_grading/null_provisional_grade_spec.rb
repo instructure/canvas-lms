@@ -60,7 +60,7 @@ describe ModeratedGrading::NullProvisionalGrade do
 
     it "returns nil if scorer_id is nil" do
       scored_grade = ModeratedGrading::NullProvisionalGrade.new(nil, nil, true)
-      expect(scored_grade.scorer).to be nil
+      expect(scored_grade.scorer).to be_nil
     end
   end
 end

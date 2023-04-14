@@ -21,10 +21,6 @@ class SwitchToPg12CollationIndexes < ActiveRecord::Migration[5.2]
   tag :predeploy
   disable_ddl_transaction!
 
-  def self.runnable?
-    connection.postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
-  end
-
   def up
     if connection.index_name_exists?(:users, :index_users_on_sortable_name) &&
        !connection.index_name_exists?(:users, :index_users_on_sortable_name_old2)

@@ -24,10 +24,7 @@
  */
 /* eslint-disable no-console */
 const globalError = global.console.error
-const ignoredErrors = [
-  /A theme registry has already been initialized/,
-  /The prop `title` is marked as required/,
-]
+const ignoredErrors = [/A theme registry has already been initialized/]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
   /\[(Popover|DateInput|Select|TimeInput|DateTimeInput)\] is deprecated/,

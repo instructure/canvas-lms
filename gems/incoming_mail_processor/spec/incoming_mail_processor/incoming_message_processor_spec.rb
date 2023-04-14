@@ -535,15 +535,15 @@ module IncomingMailProcessor
         }
         IncomingMessageProcessor.configure(config)
         accounts = IncomingMessageProcessor.mailbox_accounts
-        expect(accounts.size).to eql 3
+        expect(accounts.size).to be 3
         protocols = accounts.map(&:protocol)
-        expect(protocols.count).to eql 3
-        expect(protocols.count(:imap)).to eql 2
-        expect(protocols.count(:directory)).to eql 1
+        expect(protocols.count).to be 3
+        expect(protocols.count(:imap)).to be 2
+        expect(protocols.count(:directory)).to be 1
         usernames = accounts.map(&:config).map { |c| c[:username] } # rubocop:disable Rails/Pluck
-        expect(usernames.count("foo")).to eql 1
-        expect(usernames.count("bar")).to eql 1
-        expect(usernames.count(nil)).to eql 1
+        expect(usernames.count("foo")).to be 1
+        expect(usernames.count("bar")).to be 1
+        expect(usernames.count(nil)).to be 1
       end
 
       it "does not try to load messages with invalid address tag" do
@@ -553,7 +553,7 @@ module IncomingMailProcessor
         expect(account).to receive(:address).and_return("user@example.com")
         expect(message).to receive(:to).and_return(["user@example.com"])
         result = IncomingMessageProcessor.extract_address_tag(message, account)
-        expect(result).to eq(false)
+        expect(result).to be(false)
       end
     end
 

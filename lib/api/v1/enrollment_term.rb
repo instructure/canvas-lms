@@ -43,7 +43,9 @@ module Api::V1::EnrollmentTerm
     enrollment_terms.map { |t| enrollment_term_json(t, user, session, enrollments, includes, course_counts) }
   end
 
-  protected def date_overrides_json(term)
+  protected
+
+  def date_overrides_json(term)
     term.enrollment_dates_overrides.select { |o| o.start_at || o.end_at }.each_with_object({}) do |override, json|
       json[override.enrollment_type] = override.attributes.slice("start_at", "end_at")
     end

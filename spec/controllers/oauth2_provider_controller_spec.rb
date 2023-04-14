@@ -681,7 +681,7 @@ describe OAuth2ProviderController do
           Canvas::Security::JwtValidator::REQUIRED_ASSERTIONS.each do |assertion|
             it "returns 400 when #{assertion} missing" do
               jwt.delete assertion.to_sym
-              expected = assertion == "sub" ? :unauthorized : :bad_request
+              expected = (assertion == "sub") ? :unauthorized : :bad_request
               expect(subject).to have_http_status expected
             end
           end

@@ -19,7 +19,7 @@ import $ from 'jquery'
 import Backbone from 'backbone'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
-import mixin from './mixin.coffee'
+import mixin from './mixin'
 
 ##
 # Extends Backbone.View on top of itself to be 100X more useful

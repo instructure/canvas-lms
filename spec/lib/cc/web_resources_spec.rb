@@ -31,8 +31,8 @@ describe CC::WebResources do
         allow(self).to receive(:for_course_copy).and_return(false)
         allow(self).to receive(:export_media_objects?).and_return(true)
         allow(self).to receive(:add_error).and_return(true)
-
-        add_media_objects(double("Html_Exporter", used_media_objects: [mo], media_object_infos: {}))
+        @html_exporter = double("Html_Exporter", used_media_objects: [mo], media_object_infos: {})
+        add_media_objects
         expect(mo.attachment).to be_truthy
       end
     end

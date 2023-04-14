@@ -66,7 +66,7 @@ describe Login::OAuth2Controller do
 
       get :create, params: { state: "" }
       expect(response).not_to be_successful
-      expect(session[:sentinel]).to eq true
+      expect(session[:sentinel]).to be true
     end
 
     it "works" do

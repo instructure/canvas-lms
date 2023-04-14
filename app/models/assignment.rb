@@ -80,7 +80,7 @@ class Assignment < ActiveRecord::Base
   DUPLICATED_IN_CONTEXT = "duplicated_in_context"
 
   attr_accessor(
-    :asset_map,
+    :resource_map,
     :copying,
     :grade_posting_in_progress,
     :needs_update_cached_due_dates,
@@ -175,11 +175,13 @@ class Assignment < ActiveRecord::Base
   scope :exclude_muted_associations_for_user, lambda { |user|
     joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id = #{User.connection.quote(user.id_for_database)} AND submissions.assignment_id = assignments.id")
       .joins("LEFT JOIN #{PostPolicy.quoted_table_name} pc on pc.assignment_id  = assignments.id")
-      .where(" assignments.id IS NULL"\
-             " OR submissions.posted_at IS NOT NULL"\
-             " OR assignments.grading_type = 'not_graded'"\
-             " OR pc.id IS NULL"\
-             " OR (pc.id IS NOT NULL AND pc.post_manually = False)")
+      .where(<<~SQL.squish)
+        assignments.id IS NULL
+             OR submissions.posted_at IS NOT NULL
+             OR assignments.grading_type = 'not_graded'
+             OR pc.id IS NULL
+             OR (pc.id IS NOT NULL AND pc.post_manually = False)
+      SQL
   }
 
   validates_associated :external_tool_tag, if: :external_tool?
@@ -594,7 +596,7 @@ class Assignment < ActiveRecord::Base
   before_destroy :delete_observer_alerts
 
   def delete_observer_alerts
-    until observer_alerts.limit(1_000).delete_all < 1_000; end
+    observer_alerts.in_batches(of: 10_000).delete_all
   end
 
   before_create :set_root_account_id, :set_muted
@@ -1282,7 +1284,7 @@ class Assignment < ActiveRecord::Base
     p.to do |assignment|
       # everyone who is _not_ covered by an assignment override affecting due_at
       # (the AssignmentOverride records will take care of notifying those users)
-      excluded_ids = participants_with_overridden_due_at.map(&:id).to_set
+      excluded_ids = participants_with_overridden_due_at.to_set(&:id)
       BroadcastPolicies::AssignmentParticipants.new(assignment, excluded_ids).to
     end
     p.whenever do |assignment|
@@ -1518,7 +1520,7 @@ class Assignment < ActiveRecord::Base
     case grade.to_s
     when /^[+-]?\d*\.?\d+%$/
       # interpret as a percentage
-      percentage = grade.to_f / 100.0.to_d
+      percentage = grade.to_f / BigDecimal("100.0")
       points_possible.to_f * percentage
     when /^[+-]?\d*\.?\d+$/
       if !prefer_points_over_scheme && uses_grading_standard && (standard_based_score = grading_standard_or_default.grade_to_score(grade))
@@ -1533,7 +1535,7 @@ class Assignment < ActiveRecord::Base
     else
       # try to treat it as a letter grade
       if uses_grading_standard && (standard_based_score = grading_standard_or_default.grade_to_score(grade))
-        ((points_possible || 0.0).to_d * standard_based_score.to_d / 100.0.to_d).to_f
+        ((points_possible || 0.0).to_d * standard_based_score.to_d / BigDecimal("100.0")).to_f
       else
         nil
       end
@@ -1580,7 +1582,7 @@ class Assignment < ActiveRecord::Base
     # the time zone that was active during editing
     time_zone = tz || (ActiveSupport::TimeZone.new(time_zone_edited) rescue nil) || Time.zone
     self.all_day, self.all_day_date = Assignment.all_day_interpretation(
-      due_at: due_at ? due_at.in_time_zone(time_zone) : nil,
+      due_at: due_at&.in_time_zone(time_zone),
       due_at_was: due_at_was,
       all_day_was: all_day_was,
       all_day_date_was: all_day_date_was
@@ -1590,17 +1592,21 @@ class Assignment < ActiveRecord::Base
   def to_atom(opts = {})
     extend ApplicationHelper
     author_name = context.present? ? context.name : t("atom_no_author", "No Author")
+    content = "#{before_label(:due, "Due")} #{datetime_string(due_at, :due_date)}"
+    unless opts[:exclude_description]
+      content += "<br/>#{description}<br/><br/>
+        <div>
+          #{description}
+        </div>
+      "
+    end
     Atom::Entry.new do |entry|
       entry.title     = t(:feed_entry_title, "Assignment: %{assignment}", assignment: self.title) unless opts[:include_context]
       entry.title     = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", assignment: self.title, course: context.name) if opts[:include_context]
       entry.updated   = updated_at.utc
       entry.published = created_at.utc
       entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/assignments/#{feed_code}_#{due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
-      entry.content   = Atom::Content::Html.new(before_label(:due, "Due") + " #{datetime_string(due_at, :due_date)}<br/>#{description}<br/><br/>
-        <div>
-          #{description}
-        </div>
-      ")
+      entry.content   = Atom::Content::Html.new(content)
       entry.links << Atom::Link.new(rel: "alternate", href: direct_link)
       entry.authors << Atom::Person.new(name: author_name)
     end
@@ -2326,9 +2332,9 @@ class Assignment < ActiveRecord::Base
 
     # move the following 2 lines out of the trnx
     # make the trnx simpler. The trnx will have fewer locks and rollbacks.
-    homework_lti_user_id_hash = students.map do |student|
+    homework_lti_user_id_hash = students.to_h do |student|
       [student.global_id, Lti::Asset.opaque_identifier_for(student)]
-    end.to_h
+    end
     submissions = find_or_create_submissions(students, Submission.preload(:grading_period)).sort_by(&:id)
 
     transaction do
@@ -2506,21 +2512,21 @@ class Assignment < ActiveRecord::Base
     return visible_students_for_speed_grader(user: user, includes: includes, group_id: group_id, section_id: section_id) unless grade_as_group?
 
     submissions = self.submissions.to_a
-    user_ids_with_submissions = submissions.select(&:has_submission?).map(&:user_id).to_set
+    user_ids_with_submissions = submissions.select(&:has_submission?).to_set(&:user_id)
     user_ids_with_turnitin_data = if turnitin_enabled?
-                                    submissions.reject { |s| s.turnitin_data.blank? }.map(&:user_id).to_set
+                                    submissions.reject { |s| s.turnitin_data.blank? }.to_set(&:user_id)
                                   else
                                     []
                                   end
     user_ids_with_vericite_data = if vericite_enabled?
                                     submissions
                                       .reject { |s| s.turnitin_data.blank? }
-                                      .map(&:user_id).to_set
+                                      .to_set(&:user_id)
                                   else
                                     []
                                   end
     # this only includes users with a submission who are unexcused
-    user_ids_who_arent_excused = submissions.reject(&:excused?).map(&:user_id).to_set
+    user_ids_who_arent_excused = submissions.reject(&:excused?).to_set(&:user_id)
 
     enrollment_state =
       context.all_accepted_student_enrollments.pluck(:user_id, :workflow_state).to_h
@@ -2529,7 +2535,7 @@ class Assignment < ActiveRecord::Base
     enrollment_priority = { "active" => 1, "inactive" => 2 }
     enrollment_priority.default = 100
 
-    visible_student_ids = visible_students_for_speed_grader(user: user, includes: includes).map(&:id).to_set
+    visible_student_ids = visible_students_for_speed_grader(user: user, includes: includes).to_set(&:id)
 
     reps_and_others = groups_and_ungrouped(user, includes: includes).filter_map do |group_name, group_info|
       group_students = group_info[:users]
@@ -2616,7 +2622,7 @@ class Assignment < ActiveRecord::Base
         scope = scope.where(assessor_id: user.id)
       end
     end
-    scope.to_a.sort_by { |a| [a.assessment_type == "grading" ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
+    scope.to_a.sort_by { |a| [(a.assessment_type == "grading") ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
   end
 
   # Takes a zipped file full of assignment comments/annotated assignments
@@ -2786,7 +2792,7 @@ class Assignment < ActiveRecord::Base
     { student_ids: student_ids,
       submissions: submissions,
       submission_ids: Set.new(submissions.pluck(:id)),
-      assessor_id_map: submissions.map { |s| [s.id, s.assessment_requests.map(&:assessor_asset_id)] }.to_h }
+      assessor_id_map: submissions.to_h { |s| [s.id, s.assessment_requests.map(&:assessor_asset_id)] } }
   end
 
   def sorted_review_candidates(peer_review_params, current_submission, candidate_set)
@@ -2797,7 +2803,7 @@ class Assignment < ActiveRecord::Base
     candidates_for_review.sort_by do |c|
       [
         # prefer those who need reviews done
-        assessor_id_map[c.id].count < peer_review_count ? CanvasSort::First : CanvasSort::Last,
+        (assessor_id_map[c.id].count < peer_review_count) ? CanvasSort::First : CanvasSort::Last,
         # then prefer those who are not reviewing this submission
         assessor_id_map[current_submission.id].include?(c.id) ? CanvasSort::Last : CanvasSort::First,
         # then prefer those who need the most reviews done (that way we don't run the risk of
@@ -3913,6 +3919,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def hide_on_modules_view?
+    ["duplicating", "failed_to_duplicate"].include?(workflow_state)
+  end
+
   private
 
   def grading_type_requires_points?
@@ -4102,7 +4112,7 @@ class Assignment < ActiveRecord::Base
 
   def mark_module_progressions_outdated
     progressions = ContextModuleProgression.for_course(context).where(current: true)
-    progressions.update_all(current: false)
+    progressions.in_batches(of: 10_000).update_all(current: false)
     User.where(id: progressions.pluck(:user_id)).touch_all
   end
 end

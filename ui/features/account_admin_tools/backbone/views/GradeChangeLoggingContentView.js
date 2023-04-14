@@ -17,10 +17,10 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
+import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import DateRangeSearchView from './DateRangeSearchView'
 import AutocompleteView from './AutocompleteView'
-import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin.coffee'
+import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import GradeChangeLoggingItemView from './GradeChangeLoggingItemView'
 import GradeChangeLoggingCollection from '../collections/GradeChangeLoggingCollection'
 import template from '../../jst/gradeChangeLoggingContent.handlebars'
@@ -84,42 +84,7 @@ Object.assign(GradeChangeLoggingContentView.prototype, {
     // Update the params (which fetches the collection)
     if (!json) json = this.$form.toJSON()
 
-    // TODO remove this check after OSS instances have been given a path to migrate from cassandra auditors
-    if (ENV.enhanced_grade_change_query) {
-      return this.collection.setParams(json)
-    } else {
-      const params = {
-        id: null,
-        type: null,
-        start_time: '',
-        end_time: '',
-      }
-
-      if (json.start_time) params.start_time = json.start_time
-      if (json.end_time) params.end_time = json.end_time
-
-      if (json.grader_id) {
-        params.type = 'graders'
-        params.id = json.grader_id
-      }
-
-      if (json.student_id) {
-        params.type = 'students'
-        params.id = json.student_id
-      }
-
-      if (json.course_id) {
-        params.type = 'courses'
-        params.id = json.course_id
-      }
-
-      if (json.assignment_id) {
-        params.type = 'assignments'
-        params.id = json.assignment_id
-      }
-
-      return this.collection.setParams(params)
-    }
+    return this.collection.setParams(json)
   },
 
   validate(json) {

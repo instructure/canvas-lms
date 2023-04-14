@@ -55,8 +55,8 @@ describe "Grading quizzes" do
 
         it "shows the regrade options", priority: "1" do
           # verify presence of regrade alert
-          expect(fj(".ui-dialog:visible .alert")).to include_text "Choose a regrade option" \
-                                                                  " for students who have already taken the quiz"
+          expect(fj(".ui-dialog:visible .alert")).to include_text "Choose a regrade option " \
+                                                                  "for students who have already taken the quiz"
 
           # verify all regrade options are present
           expect(visible_regrade_options.count).to eq 4
@@ -88,16 +88,16 @@ describe "Grading quizzes" do
           delete_possible_answer(1)
 
           # verify alert message
-          expect(driver.switch_to.alert.text).to eq "Are you sure? Deleting answers from a question with" \
-                                                    " submissions disables the option to regrade this question."
+          expect(driver.switch_to.alert.text).to eq "Are you sure? Deleting answers from a question with " \
+                                                    "submissions disables the option to regrade this question."
           accept_alert
 
           select_different_correct_answer(1)
 
           # verify explanation message
-          expect(fj(".ui-dialog:visible .regrade_option_text")).to include_text "Regrading is not allowed" \
-                                                                                " on this question because either an answer was removed or the" \
-                                                                                " question type was changed after a student completed a submission."
+          expect(fj(".ui-dialog:visible .regrade_option_text")).to include_text "Regrading is not allowed " \
+                                                                                "on this question because either an answer was removed or the " \
+                                                                                "question type was changed after a student completed a submission."
 
           expect(f("#content")).not_to contain_jqcss(".regrade_enabled label.checkbox:visible")
         end

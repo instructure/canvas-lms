@@ -91,7 +91,7 @@ module CoursesHelper
   #
   # Returns a text string.
   def user_count(count)
-    count == 0 ? t("#courses.settings.none", "None") : count
+    (count == 0) ? t("#courses.settings.none", "None") : count
   end
 
   # Public: check for permission on a new course

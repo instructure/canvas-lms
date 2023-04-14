@@ -256,9 +256,13 @@ class UsersController < ApplicationController
     if enrollment.course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
       grade_data[:unposted_grade] = enrollment.unposted_current_score(opts)
       grade_data[:grade] = enrollment.computed_current_score(opts)
+      # since this page is read_only, and enrollment.computed_current_score(opts) is a percentage value,
+      # we can convert this into letter-grade
     else
       grade_data[:grade] = enrollment.effective_current_score(opts)
     end
+    grade_data[:restrict_quantitative_data] = enrollment.course.restrict_quantitative_data?(@current_user)
+    grade_data[:grading_scheme] = enrollment.course.grading_standard_or_default.data
 
     render json: grade_data
   end
@@ -869,7 +873,7 @@ class UsersController < ApplicationController
       [
         c.enrollment_term.default_term? ? CanvasSort::First : CanvasSort::Last, # Default term first
         c.enrollment_term.start_at || CanvasSort::First, # Most recent start_at
-        c.sort_key # Alphabetical
+        Canvas::ICU.collation_key(c.name) # Alphabetical
       ]
     end[0, limit]
 
@@ -1327,7 +1331,7 @@ class UsersController < ApplicationController
 
       @context ||= @user
 
-      add_crumb(t("crumbs.profile", "%{user}'s profile", user: @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user))
+      add_crumb(t("crumbs.profile", "%{user}'s profile", user: @user.short_name), (@user == @current_user) ? user_profile_path(@current_user) : user_path(@user))
 
       @group_memberships = @user.cached_current_group_memberships_by_date
 
@@ -2054,7 +2058,7 @@ class UsersController < ApplicationController
 
     update_email = @user.grants_right?(@current_user, :manage_user_details) && user_params[:email]
     managed_attributes = []
-    managed_attributes.concat %i[name short_name sortable_name] if @user.grants_right?(@current_user, :rename)
+    managed_attributes.push(:name, :short_name, :sortable_name) if @user.grants_right?(@current_user, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
     managed_attributes << :email if update_email
 
@@ -2071,7 +2075,7 @@ class UsersController < ApplicationController
     end
 
     if @user.grants_right?(@current_user, :manage_user_details)
-      managed_attributes.concat(%i[time_zone locale event])
+      managed_attributes.push(:time_zone, :locale, :event)
     end
 
     if @user.grants_right?(@current_user, :update_avatar)
@@ -2152,14 +2156,14 @@ class UsersController < ApplicationController
         next if p.active? && event == "unsuspend"
         next if p.suspended? && event == "suspend"
 
-        p.update!(workflow_state: event == "suspend" ? "suspended" : "active")
+        p.update!(workflow_state: (event == "suspend") ? "suspended" : "active")
       end
     end
 
     respond_to do |format|
       if @user.update(user_params)
         if admin_avatar_update
-          avatar_state = old_avatar_state == :locked ? old_avatar_state : "approved"
+          avatar_state = (old_avatar_state == :locked) ? old_avatar_state : "approved"
           @user.avatar_state = user_params[:avatar_image][:state] || avatar_state
         end
         @user.profile.save if @user.profile.changed?
@@ -2800,7 +2804,7 @@ class UsersController < ApplicationController
     # reload @current_user to make sure we get a current value for their :elementary_dashboard_disabled preference
     @current_user.reload
     observed_users(@current_user, session) if @current_user.roles(@domain_root_account).include?("observer")
-    render json: { show_k5_dashboard: k5_user? }
+    render json: { show_k5_dashboard: k5_user?, use_classic_font: use_classic_font? }
   end
 
   protected
@@ -2879,7 +2883,7 @@ class UsersController < ApplicationController
   def generate_grading_period_id(period_id)
     # nil and '' will get converted to 0 in the .to_i call
     id = period_id.to_i
-    id == 0 ? nil : id
+    (id == 0) ? nil : id
   end
 
   def render_new_user_tutorial_statuses(user)

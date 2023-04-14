@@ -341,20 +341,20 @@ describe "Roles API", type: :request do
       json = api_call_with_settings(enabled: "1", explicit: "1", applies_to_descendants: "0")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
       expect(override).to_not be_nil
-      expect(json["permissions"][@permission]["applies_to_self"]).to eq true
-      expect(json["permissions"][@permission]["applies_to_descendants"]).to eq false
-      expect(override.applies_to_self).to eq true
-      expect(override.applies_to_descendants).to eq false
+      expect(json["permissions"][@permission]["applies_to_self"]).to be true
+      expect(json["permissions"][@permission]["applies_to_descendants"]).to be false
+      expect(override.applies_to_self).to be true
+      expect(override.applies_to_descendants).to be false
     end
 
     it "sets applies to self" do
       json = api_call_with_settings(enabled: "1", explicit: "1", applies_to_self: "0")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
       expect(override).to_not be_nil
-      expect(json["permissions"][@permission]["applies_to_self"]).to eq false
-      expect(json["permissions"][@permission]["applies_to_descendants"]).to eq true
-      expect(override.applies_to_self).to eq false
-      expect(override.applies_to_descendants).to eq true
+      expect(json["permissions"][@permission]["applies_to_self"]).to be false
+      expect(json["permissions"][@permission]["applies_to_descendants"]).to be true
+      expect(override.applies_to_self).to be false
+      expect(override.applies_to_descendants).to be true
     end
 
     it "requires at least applies to self or applies to descendents" do
@@ -371,18 +371,18 @@ describe "Roles API", type: :request do
       json = api_call_with_settings(enabled: "1", explicit: "1", applies_to_descendants: "1", applies_to_self: "0")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
       expect(override).to_not be_nil
-      expect(json["permissions"][@permission]["applies_to_self"]).to eq false
-      expect(json["permissions"][@permission]["applies_to_descendants"]).to eq true
-      expect(override.applies_to_self).to eq false
-      expect(override.applies_to_descendants).to eq true
+      expect(json["permissions"][@permission]["applies_to_self"]).to be false
+      expect(json["permissions"][@permission]["applies_to_descendants"]).to be true
+      expect(override.applies_to_self).to be false
+      expect(override.applies_to_descendants).to be true
 
       json = api_call(:get, "/api/v1/accounts/#{sub.id}/roles",
                       { controller: "role_overrides", action: "api_index",
                         format: "json", account_id: sub.id.to_s,
                         show_inherited: "1" })
       perm = json.find { |role| role["role"] == @role.name }["permissions"][@permission]
-      expect(perm["applies_to_self"]).to eq true
-      expect(perm["applies_to_descendants"]).to eq true
+      expect(perm["applies_to_self"]).to be true
+      expect(perm["applies_to_descendants"]).to be true
     end
 
     it "does not cascade if applies to descendents is false" do
@@ -390,25 +390,25 @@ describe "Roles API", type: :request do
       json = api_call_with_settings(enabled: "1", explicit: "1", applies_to_descendants: "0", applies_to_self: "1")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
       expect(override).to_not be_nil
-      expect(json["permissions"][@permission]["applies_to_self"]).to eq true
-      expect(json["permissions"][@permission]["applies_to_descendants"]).to eq false
-      expect(override.applies_to_self).to eq true
-      expect(override.applies_to_descendants).to eq false
+      expect(json["permissions"][@permission]["applies_to_self"]).to be true
+      expect(json["permissions"][@permission]["applies_to_descendants"]).to be false
+      expect(override.applies_to_self).to be true
+      expect(override.applies_to_descendants).to be false
 
       json = api_call(:get, "/api/v1/accounts/#{sub.id}/roles",
                       { controller: "role_overrides", action: "api_index",
                         format: "json", account_id: sub.id.to_s,
                         show_inherited: "1" })
       perm = json.find { |role| role["role"] == @role.name }["permissions"][@permission]
-      expect(perm["enabled"]).to eq false
+      expect(perm["enabled"]).to be false
     end
 
     it "only sets the parts that are specified" do
       api_call_with_settings(explicit: "1", enabled: "0")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
       expect(override).to_not be_nil
-      expect(override.enabled).to eq false
-      expect(override.locked).to eq false
+      expect(override.enabled).to be false
+      expect(override.locked).to be false
 
       override.destroy
       r = @account.roles.first
@@ -418,8 +418,8 @@ describe "Roles API", type: :request do
       api_call_with_settings(locked: "1")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
       expect(override).to_not be_nil
-      expect(override.enabled).to eq true
-      expect(override.locked).to eq true
+      expect(override.enabled).to be true
+      expect(override.locked).to be true
     end
 
     it "discards restricted permissions" do
@@ -712,7 +712,7 @@ describe "Roles API", type: :request do
             @path_options.merge(id: admin_role.id),
             { permissions: { manage_master_courses: { explicit: 1, enabled: 0 } } }
           )
-        expect(json["permissions"]["manage_master_courses"]["enabled"]).to eql false
+        expect(json["permissions"]["manage_master_courses"]["enabled"]).to be false
       end
 
       it "is not able to add an unavailable permission for a base role" do
@@ -740,7 +740,7 @@ describe "Roles API", type: :request do
         @permissions[:permissions][:read_question_banks][:enabled] = 1
 
         json = api_call(:put, @path, @path_options, @permissions)
-        expect(json["permissions"]["read_question_banks"]["enabled"]).to eq false
+        expect(json["permissions"]["read_question_banks"]["enabled"]).to be false
 
         @account.reload
 

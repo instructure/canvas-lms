@@ -125,8 +125,8 @@ describe "student k5 dashboard" do
     it "shows subject course on dashboard" do
       get "/"
 
-      expect(element_exists?(course_card_selector(@course_name))).to eq(false)
-      expect(element_exists?(course_card_selector(@subject_course_title))).to eq(true)
+      expect(element_exists?(course_card_selector(@course_name))).to be(false)
+      expect(element_exists?(course_card_selector(@subject_course_title))).to be(true)
     end
 
     it "shows latest announcement on subject course card" do

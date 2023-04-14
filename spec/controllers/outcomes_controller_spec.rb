@@ -138,7 +138,7 @@ describe OutcomesController do
       it "does not return the global root id for a course" do
         user_session(@admin)
         get "index", params: { course_id: @course.id }
-        expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to eq nil
+        expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to be_nil
       end
     end
 
@@ -147,14 +147,14 @@ describe OutcomesController do
         Account.site_admin.enable_feature!(:outcomes_friendly_description)
         user_session(@admin)
         get "index", params: { account_id: @account.id }
-        expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to eq true
+        expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to be true
       end
 
       it "returns false if outcomes_friendly_description feature flag is disabled" do
         Account.site_admin.disable_feature!(:outcomes_friendly_description)
         user_session(@admin)
         get "index", params: { account_id: @account.id }
-        expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to eq false
+        expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to be false
       end
     end
   end
@@ -164,14 +164,14 @@ describe OutcomesController do
       @account.root_account.enable_feature!(:outcome_average_calculation)
       user_session(@admin)
       get "index", params: { account_id: @account.id }
-      expect(assigns[:js_env][:OUTCOME_AVERAGE_CALCULATION]).to eq true
+      expect(assigns[:js_env][:OUTCOME_AVERAGE_CALCULATION]).to be true
     end
 
     it "returns false if outcome_average_calculation feature flag is disabled" do
       @account.root_account.disable_feature!(:outcome_average_calculation)
       user_session(@admin)
       get "index", params: { account_id: @account.id }
-      expect(assigns[:js_env][:OUTCOME_AVERAGE_CALCULATION]).to eq false
+      expect(assigns[:js_env][:OUTCOME_AVERAGE_CALCULATION]).to be false
     end
   end
 

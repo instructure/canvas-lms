@@ -16,8 +16,8 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
-import Course from '@canvas/courses/backbone/models/Course.coffee'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
+import Course from '@canvas/courses/backbone/models/Course'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import ToggleShowByView from 'ui/features/assignment_index/backbone/views/ToggleShowByView'
 import $ from 'jquery'

@@ -577,7 +577,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     update_or_create_participant(current_user: current_user,
                                  new_state: new_state,
-                                 new_count: new_state == "unread" ? default_unread_count : 0)
+                                 new_count: (new_state == "unread") ? default_unread_count : 0)
   end
   protected :update_participants_read_state
 
@@ -1342,7 +1342,7 @@ class DiscussionTopic < ActiveRecord::Base
   def participants(include_observers = false)
     participants = context.participants(include_observers: include_observers, by_date: true)
     participants_in_section = users_with_section_visibility(participants.compact)
-    if user && !participants_in_section.map(&:id).to_set.include?(user.id)
+    if user && !participants_in_section.to_set(&:id).include?(user.id)
       participants_in_section += [user]
     end
     participants_in_section
@@ -1444,7 +1444,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def user_name
-    user ? user.name : nil
+    user&.name
   end
 
   def available_from_for(user)
@@ -1587,7 +1587,7 @@ class DiscussionTopic < ActiveRecord::Base
       txt = (message.message || "")
       attachment_matches = txt.scan(%r{/#{context.class.to_s.pluralize.underscore}/#{context.id}/files/(\d+)/download})
       attachment_ids += (attachment_matches || []).map { |m| m[0] }
-      media_object_matches = txt.scan(/media_comment_([\w\-]+)/) + txt.scan(/data-media-id="([\w\-]+)"/)
+      media_object_matches = txt.scan(/media_comment_([\w-]+)/) + txt.scan(/data-media-id="([\w-]+)"/)
       media_object_ids += (media_object_matches || []).map { |m| m[0] }.uniq
       (attachment_ids + media_object_ids).each do |id|
         messages_hash[id] ||= message
@@ -1642,7 +1642,7 @@ class DiscussionTopic < ActiveRecord::Base
       case elem
       when Attachment
         item.guid.content = link + "/#{elem.uuid}"
-        url = "http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}"\
+        url = "http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}" \
               "/files/#{elem.id}/download#{elem.extension}?verifier=#{elem.uuid}"
         item.enclosure = RSS::Rss::Channel::Item::Enclosure.new(url, elem.size, elem.content_type)
       when MediaObject
@@ -1652,7 +1652,7 @@ class DiscussionTopic < ActiveRecord::Base
         content_type = "audio/mpeg" if elem.media_type == "audio"
         size = details[:size].to_i.kilobytes
         ext = details[:extension] || details[:fileExt]
-        url = "http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}"\
+        url = "http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}" \
               "/media_download.#{ext}?type=#{ext}&entryId=#{elem.media_id}&redirect=1"
         item.enclosure = RSS::Rss::Channel::Item::Enclosure.new(url, size, content_type)
       end

@@ -46,7 +46,7 @@ describe ContentMigration do
 
       expect(tool_to.name).to eq @tool_from.name
       expect(tool_to.custom_fields).to eq @tool_from.custom_fields
-      expect(tool_to.has_placement?(:course_navigation)).to eq true
+      expect(tool_to.has_placement?(:course_navigation)).to be true
       expect(tool_to.consumer_key).to eq @tool_from.consumer_key
       expect(tool_to.shared_secret).to eq @tool_from.shared_secret
     end
@@ -66,7 +66,7 @@ describe ContentMigration do
       tool_to = @copy_to.context_external_tools.first
       expect(tool_to.name).to eq @tool_from.name
       expect(tool_to.consumer_key).to eq @tool_from.consumer_key
-      expect(tool_to.has_placement?(:course_navigation)).to eq true
+      expect(tool_to.has_placement?(:course_navigation)).to be true
     end
 
     it "copies external tool assignments" do

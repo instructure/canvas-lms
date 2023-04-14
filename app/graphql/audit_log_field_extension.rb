@@ -116,7 +116,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       when Array
         o.map! { |x| truncate_params!(x) }
       when String
-        o.size > 256 ? o.slice(0, 256) : o
+        (o.size > 256) ? o.slice(0, 256) : o
       else
         o
       end

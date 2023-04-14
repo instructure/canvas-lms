@@ -287,7 +287,7 @@ describe "grades" do
         f("#submission_#{@second_assignment.id} .toggle_rubric_assessments_link").click
 
         # check if no highlights exist on a non-range criterion for a score of 2 on scale of 10|5|0
-        expect(find_with_jquery(".rubric_assessments:visible .selected")).to be nil
+        expect(find_with_jquery(".rubric_assessments:visible .selected")).to be_nil
       end
     end
 

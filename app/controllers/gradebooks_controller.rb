@@ -39,7 +39,7 @@ class GradebooksController < ApplicationController
 
   batch_jobs_in_actions only: :update_submission, batch: { priority: Delayed::LOW_PRIORITY }
 
-  add_crumb(proc { t "#crumbs.grades", "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
+  add_crumb(proc { t "#crumbs.grades", "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_grades_url }
   before_action { |c| c.active_tab = "grades" }
 
   MAX_POST_GRADES_TOOLS = 10
@@ -483,6 +483,7 @@ class GradebooksController < ApplicationController
 
       publish_to_sis_url: context_url(@context, :context_details_url, anchor: "tab-grade-publishing"),
       re_upload_submissions_url: named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
+      restrict_quantitative_data: @context.restrict_quantitative_data?(@current_user),
       reorder_custom_columns_url: api_v1_custom_gradebook_columns_reorder_url(@context),
       sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
       setting_update_url: api_v1_course_settings_url(@context),
@@ -1288,7 +1289,7 @@ class GradebooksController < ApplicationController
   def requested_gradebook_view
     return nil if params[:view].blank?
 
-    params[:view] == "learning_mastery" ? "learning_mastery" : "gradebook"
+    (params[:view] == "learning_mastery") ? "learning_mastery" : "gradebook"
   end
 
   def preferred_gradebook_view

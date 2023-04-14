@@ -24,7 +24,7 @@ describe BrandAccountChainResolver do
 
   context "with no associated accounts" do
     it "returns an empty chain" do
-      expect(subject(Account.create!(name: "A"))).to eql(nil)
+      expect(subject(Account.create!(name: "A"))).to be_nil
     end
   end
 
@@ -50,7 +50,7 @@ describe BrandAccountChainResolver do
       user.user_account_associations.create!(account: a, depth: 0)
 
       expect(subject(a).try(&:name)).to eql("A")
-      expect(subject(b).try(&:name)).to eql(nil)
+      expect(subject(b).try(&:name)).to be_nil
     end
   end
 

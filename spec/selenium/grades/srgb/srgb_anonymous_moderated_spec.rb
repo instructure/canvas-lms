@@ -100,7 +100,7 @@ describe "Individual View Gradebook" do
         wait_for_ajaximations
         scroll_into_view("#assignment_muted_check")
 
-        expect(SRGB.assignment_muted_checkbox.attribute("disabled")).to be nil
+        expect(SRGB.assignment_muted_checkbox.attribute("disabled")).to be_nil
       end
     end
   end

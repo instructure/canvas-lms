@@ -61,7 +61,7 @@ describe PluginsController do
         put "update", params: { id: "account_reports", settings: { "course_storage_csv" => "0" }, all: 1 }
         expect(response).to be_redirect
         ps.reload
-        expect(ps.settings[:course_storage_csv]).to eq false
+        expect(ps.settings[:course_storage_csv]).to be false
       end
     end
   end

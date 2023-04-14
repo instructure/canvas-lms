@@ -25,7 +25,7 @@ describe PaginatedCollection do
     it "returns a #paginate proxy" do
       expect { PaginatedCollection.build }.to raise_error(ArgumentError)
       proxy = PaginatedCollection.build { |pager| pager }
-      expect(proxy).to be_a_kind_of(PaginatedCollection::Proxy)
+      expect(proxy).to be_a(PaginatedCollection::Proxy)
 
       expect(proxy.paginate(per_page: 5).size).to eq 0
     end

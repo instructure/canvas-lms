@@ -74,7 +74,7 @@ module LocaleSelection
       quality = (range =~ QUALITY_VALUE) ? $1.to_f : 1
       [range.sub(/\s*;.*/, ""), quality]
     end
-    ranges = ranges.sort_by { |r,| r == "*" ? 1 : -r.count("-") }
+    ranges = ranges.sort_by { |r,| (r == "*") ? 1 : -r.count("-") }
     # we want the longest ranges first (and * last of all), since the "quality
     # factor assigned to a [language] ... is the quality value of the longest
     # language-range ... that matches", e.g.
@@ -84,7 +84,7 @@ module LocaleSelection
     #                           en-US range is a longer match, so it loses)
 
     best_locales = supported_locales.filter_map do |locale|
-      if (best_range = ranges.detect { |r, _q| "#{r}-" == ("#{locale.downcase}-")[0..r.size] || r == "*" }) &&
+      if (best_range = ranges.detect { |r, _q| "#{r}-" == "#{locale.downcase}-"[0..r.size] || r == "*" }) &&
          best_range.last != 0
         [locale, best_range.last, ranges.index(best_range)]
       end
@@ -136,7 +136,7 @@ module LocaleSelection
 
   def self.locales_with_aliases
     @locales_with_aliases ||= begin
-      locales = I18n.available_locales.map { |l| [l.to_s, nil] }.to_h
+      locales = I18n.available_locales.to_h { |l| [l.to_s, nil] }
       locales.keys.each do |locale| # rubocop:disable Style/HashEachMethods mutation during iteration
         aliases = Array.wrap(I18n.send(:t, :aliases, locale: locale, default: nil))
         aliases.each do |a|

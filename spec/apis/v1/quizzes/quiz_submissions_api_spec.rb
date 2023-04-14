@@ -206,7 +206,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       json = qs_api_index
       expect(json["quiz_submissions"].size).to eq 1
       # checking for the new field added in JSON response as part of fix CNVS-19664
-      expect(json["quiz_submissions"].first["overdue_and_needs_submission"]).to eq false
+      expect(json["quiz_submissions"].first["overdue_and_needs_submission"]).to be false
     end
 
     it "is accessible by the owner student" do
@@ -237,7 +237,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       expect(json["quiz_submissions"].length).to eq 1
       expect(json["quiz_submissions"].first["started_at"]).to be_truthy
       expect(json["quiz_submissions"].first["workflow_state"]).to eq "untaken"
-      expect(json["quiz_submissions"].first["finished_at"]).to eq nil
+      expect(json["quiz_submissions"].first["finished_at"]).to be_nil
     end
 
     it "shows most recent attemps of quiz to teacher" do

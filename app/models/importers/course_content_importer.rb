@@ -601,7 +601,7 @@ module Importers
 
         old_full_diff = old_end_date - old_start_date
         old_event_diff = old_date - old_start_date
-        old_event_percent = old_full_diff > 0 ? old_event_diff.to_f / old_full_diff.to_f : 0
+        old_event_percent = (old_full_diff > 0) ? old_event_diff.to_f / old_full_diff.to_f : 0
         new_full_diff = new_end_date - new_start_date
         new_event_diff = (new_full_diff.to_f * old_event_percent).round
         new_date = new_start_date + new_event_diff

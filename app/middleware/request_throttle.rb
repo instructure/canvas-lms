@@ -193,16 +193,10 @@ class RequestThrottle
   end
 
   def site_admin_service_user_key(request)
-    # We only want to allow this approvelist method for requests using the correct User-Agent
-    # Example: `inst-service-name/2d0c1jk2 (region: us-east-1; host: 1de983c20j1ak2; env: production)`
-    regexp = %r{^
-      inst-[a-z0-9_-]+?/[a-z0-9_-]+?\s*?
-      \(\s*?
-        region:\s*?[a-z0-9_-]+?;\s*?
-        host:\s*?[a-z0-9._-]+?;\s*?
-        env:\s*?[a-z0-9_-]+?\s*?
-      \)\s*?
-      $}xi.freeze
+    # We only want to allow this approvelist method for User-Agent strings that match the following format:
+    # Example (short): `inst-service-name/2d0c1jk2`
+    # Example (full): `inst-service-name/2d0c1jk2 (region: us-east-1; host: 1de983c20j1ak2; env: production)`
+    regexp = %r{^inst-[a-z0-9_-]+/[a-z0-9]+.*$}i.freeze
     return unless regexp.match?(request.user_agent)
 
     return unless (token_string = AuthenticationMethods.access_token(request))

@@ -59,7 +59,7 @@ describe "discussion_topics" do
     @topic = DiscussionTopic.new(context: @course, title: "will this work?", user: @user)
     @topic.save!
     expect(@topic.grants_right?(@user, :update)).to be
-    student_enrollment.send("conclude")
+    student_enrollment.send(:conclude)
     AdheresToPolicy::Cache.clear
     expect(@topic.grants_right?(@user, :update)).not_to be
   end
@@ -70,7 +70,7 @@ describe "discussion_topics" do
     @topic = DiscussionTopic.new(context: @course, title: "will this work?", user: @student)
     @topic.save!
     expect(@topic.grants_right?(@teacher, :update)).to be
-    student_enrollment.send("conclude")
+    student_enrollment.send(:conclude)
     AdheresToPolicy::Cache.clear
     expect(@topic.grants_right?(@teacher, :update)).to be
   end

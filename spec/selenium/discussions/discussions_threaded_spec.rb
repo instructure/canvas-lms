@@ -111,7 +111,7 @@ describe "threaded discussions" do
       )
       user_session(@student)
       Discussion.visit(@course, @topic)
-      student_enrollment.send("conclude")
+      student_enrollment.send(:conclude)
       Discussion.visit(@course, @topic)
       wait_for_ajaximations
 
@@ -131,7 +131,7 @@ describe "threaded discussions" do
       )
       user_session(@student)
       Discussion.visit(@course, @topic)
-      student_enrollment.send("conclude")
+      student_enrollment.send(:conclude)
       Discussion.visit(@course, @topic)
       wait_for_ajaximations
 
@@ -343,7 +343,7 @@ describe "threaded discussions" do
           new_reply = DiscussionEntry.last
           # Verify new entry data is correct
           expect(new_reply.depth).to eq 1
-          expect(new_reply.parent_id).to eq nil
+          expect(new_reply.parent_id).to be_nil
           expect(new_reply.discussion_topic_id).to eq @threaded_topic.id
           # Verify that the correct level is opened
           expect(fj("div:contains(#{new_reply.summary})")).to be_present
@@ -486,7 +486,7 @@ describe "threaded discussions" do
           new_reply = DiscussionEntry.last
           # Verify new entry data is correct
           expect(new_reply.depth).to eq 1
-          expect(new_reply.parent_id).to eq nil
+          expect(new_reply.parent_id).to be_nil
           expect(new_reply.discussion_topic_id).to eq @threaded_topic.id
           # Verify that the correct level is opened
           expect(fj("div:contains(#{new_reply.summary})")).to be_present
@@ -694,7 +694,7 @@ describe "threaded discussions" do
           new_reply = DiscussionEntry.last
           # Verify new entry data is correct
           expect(new_reply.depth).to eq 1
-          expect(new_reply.parent_id).to eq nil
+          expect(new_reply.parent_id).to be_nil
           expect(new_reply.discussion_topic_id).to eq @threaded_topic.id
           # Verify that the correct level is opened
           expect(fj("div:contains(#{new_reply.summary})")).to be_present
@@ -940,7 +940,7 @@ describe "threaded discussions" do
           user: @student,
           message: "new threaded reply from student"
         )
-        student_enrollment.send("conclude")
+        student_enrollment.send(:conclude)
         user_session(@student)
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       end

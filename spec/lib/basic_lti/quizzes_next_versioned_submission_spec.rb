@@ -101,13 +101,13 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
       end
 
       it "returns false" do
-        expect(subject.active?).to eq false
+        expect(subject.active?).to be false
       end
     end
 
     context "when submission is active" do
       it "returns true" do
-        expect(subject.active?).to eq true
+        expect(subject.active?).to be true
       end
     end
   end
@@ -315,7 +315,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
             [submission[:url], submission[:score], submission[:grade]]
           end
 
-          expect(grade_history_response.length).to eql 2
+          expect(grade_history_response.length).to be 2
           expect(grade_history_response).to eq(
             url_grades.filter_map do |x|
               next if x[:grade].blank? && x[:workflow_state] != "graded"

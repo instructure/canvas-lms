@@ -280,7 +280,7 @@ describe Mutations::CreateLearningOutcome do
         groupId: #{@course_group.id}
         title: "Spec Learning Outcome via Mutation"
       GQL
-      expect { execute_with_input(query) }.to raise_error("Boom!").and change { LearningOutcome.count }.by(0)
+      expect { execute_with_input(query) }.to raise_error("Boom!").and not_change(LearningOutcome, :count)
     end
   end
 end

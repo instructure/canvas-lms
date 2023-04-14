@@ -77,6 +77,7 @@ module Api::V1::StreamItem
         hash["participant_count"] = data.participant_count
         hash["html_url"] = conversation_url(stream_item.asset_id)
         hash["latest_messages"] = data.latest_messages_from_stream_item if data.latest_messages_from_stream_item.present?
+        hash["read_state"] = stream_item.data.conversation_participants.find_by(user_id: current_user)&.read?
       when "Message"
         hash["message_id"] = stream_item.asset_id
         # this type encompasses a huge number of different types of messages,

@@ -35,7 +35,7 @@ describe "Student Enrollment Paces API" do
   def assert_grant_check
     user_session(student)
     yield
-    expect(response.status).to eq 401
+    expect(response).to have_http_status :unauthorized
   end
 
   describe "show" do
@@ -43,7 +43,7 @@ describe "Student Enrollment Paces API" do
       student_pace = student_enrollment_pace_model(student_enrollment: student_enrollment)
       Progress.create!(context: student_pace, tag: "course_pace_publish")
       get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
       json = JSON.parse(response.body)
       expect(json["pace"]["id"]).to eq student_pace.id
     end
@@ -57,9 +57,9 @@ describe "Student Enrollment Paces API" do
 
         it "falls back to the section pace" do
           get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
-          expect(json["pace"]["id"]).to eq nil
+          expect(json["pace"]["id"]).to be_nil
           expect(json["pace"]["workflow_state"]).to eq "unpublished"
         end
       end
@@ -69,9 +69,9 @@ describe "Student Enrollment Paces API" do
 
         it "falls back to the course pace" do
           get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
-          expect(json["pace"]["id"]).to eq nil
+          expect(json["pace"]["id"]).to be_nil
           expect(json["pace"]["workflow_state"]).to eq "unpublished"
         end
       end
@@ -79,7 +79,7 @@ describe "Student Enrollment Paces API" do
       context "neither the section nor the course have a pace" do
         it "returns a 404" do
           get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
-          expect(response.status).to eq 404
+          expect(response).to have_http_status :not_found
         end
       end
     end
@@ -90,9 +90,9 @@ describe "Student Enrollment Paces API" do
 
         it "falls back to the course pace" do
           get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
-          expect(response.status).to eq 200
+          expect(response).to have_http_status :ok
           json = JSON.parse(response.body)
-          expect(json["pace"]["id"]).to eq nil
+          expect(json["pace"]["id"]).to be_nil
           expect(json["pace"]["workflow_state"]).to eq "unpublished"
         end
       end
@@ -100,7 +100,7 @@ describe "Student Enrollment Paces API" do
       context "the course does not have a pace" do
         it "returns a 404" do
           get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
-          expect(response.status).to eq 404
+          expect(response).to have_http_status :not_found
         end
       end
     end
@@ -119,7 +119,7 @@ describe "Student Enrollment Paces API" do
       }.by(1)
         .and change { Progress.count }.by(1)
       expect(Progress.last.queued?).to be_truthy
-      expect(response.status).to eq 201
+      expect(response).to have_http_status :created
       json = JSON.parse(response.body)
       expect(json["pace"]["student"]["name"]).to eq student.name
       expect(json["progress"]["context_id"]).to eq(CoursePace.last.id)
@@ -135,7 +135,7 @@ describe "Student Enrollment Paces API" do
         end.to not_change {
           student_enrollment.course_paces.reload.count
         }
-        expect(response.status).to eq 201
+        expect(response).to have_http_status :created
         json = JSON.parse(response.body)
         expect(json["pace"]["id"]).to eq student_pace.id
         expect(json["progress"]["context_id"]).to eq(CoursePace.last.id)
@@ -163,7 +163,7 @@ describe "Student Enrollment Paces API" do
         .to(false)
         .and change { Progress.count }.by(1)
       expect(Progress.last.queued?).to be_truthy
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "handles invalid update parameters" do
@@ -174,7 +174,7 @@ describe "Student Enrollment Paces API" do
           exclude_weekends: "foobar"
         }
       }
-      expect(response.status).to eq 422
+      expect(response).to have_http_status :unprocessable_entity
     end
 
     it "returns a 401 if the user lacks permissions" do
@@ -198,12 +198,12 @@ describe "Student Enrollment Paces API" do
       end.to change {
         pace.reload.workflow_state
       }.from("active").to("deleted")
-      expect(response.status).to eq 204
+      expect(response).to have_http_status :no_content
     end
 
     it "returns 404 if the student enrollment does not have a pace" do
       delete api_v1_delete_student_enrollment_pace_path(course, student_enrollment), params: { format: :json }
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
     end
 
     it "returns a 401 if the user lacks permissions" do
@@ -223,14 +223,14 @@ describe "Student Enrollment Paces API" do
 
       it "returns 404" do
         get api_v1_student_enrollment_pace_path(course, student_enrollment), params: { format: :json }
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 
     describe "create" do
       it "returns 404" do
         post api_v1_new_student_enrollment_pace_path(course, student_enrollment), params: { format: :json }
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 
@@ -244,7 +244,7 @@ describe "Student Enrollment Paces API" do
             exclude_weekends: false
           }
         }
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 
@@ -253,7 +253,7 @@ describe "Student Enrollment Paces API" do
 
       it "returns 404" do
         delete api_v1_delete_student_enrollment_pace_path(course, student_enrollment), params: { format: :json }
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
   end

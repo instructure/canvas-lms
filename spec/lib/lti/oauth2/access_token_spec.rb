@@ -128,7 +128,7 @@ module Lti
         let(:access_token) { Lti::OAuth2::AccessToken.from_jwt(aud: aud, jwt: token) }
 
         it "returns true if there are no errors" do
-          expect(access_token.validate!).to eq true
+          expect(access_token.validate!).to be true
         end
 
         it "raises InvalidTokenError if any of the assertions are missing" do

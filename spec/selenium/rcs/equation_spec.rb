@@ -30,7 +30,7 @@ describe "equation editor" do
     wait_for_tiny(f("#quiz_description"))
     type_in_tiny "textarea", "foo"
     equation_editor_button.click
-    expect(equation_editor_modal_exists?).to eq true
+    expect(equation_editor_modal_exists?).to be true
     equation_editor_close_button.click
     type_in_tiny "textarea#quiz_description", "bar"
     f(".save_quiz_button").click

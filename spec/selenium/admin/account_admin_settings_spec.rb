@@ -38,7 +38,7 @@ describe "root account basic settings" do
 
     submit_form("#account_settings")
     wait_for_ajaximations
-    expect(Account.default.reload.settings[:enable_gravatar]).to eq false
+    expect(Account.default.reload.settings[:enable_gravatar]).to be false
   end
 
   it "lets admins enable kill_joy on root account settings", ignore_js_errors: true do
@@ -50,7 +50,7 @@ describe "root account basic settings" do
     f("#account_settings_kill_joy").click
     submit_form("#account_settings")
     wait_for_ajaximations
-    expect(Account.default.reload.settings[:kill_joy]).to eq true
+    expect(Account.default.reload.settings[:kill_joy]).to be true
   end
 
   context "with restrict_quantitative_data" do
@@ -73,7 +73,7 @@ describe "root account basic settings" do
       f("#account_settings_restrict_quantitative_data_value").click
       submit_form("#account_settings")
       wait_for_ajaximations
-      expect(Account.default.reload.settings[:restrict_quantitative_data][:value]).to eq true
+      expect(Account.default.reload.settings[:restrict_quantitative_data][:value]).to be true
     end
 
     it "lets admins enable restrict_quantitative_data_lock on root account settings", ignore_js_errors: true do
@@ -85,7 +85,7 @@ describe "root account basic settings" do
       f("#account_settings_restrict_quantitative_data_locked").click
       submit_form("#account_settings")
       wait_for_ajaximations
-      expect(Account.default.reload.settings[:restrict_quantitative_data][:locked]).to eq true
+      expect(Account.default.reload.settings[:restrict_quantitative_data][:locked]).to be true
     end
   end
 

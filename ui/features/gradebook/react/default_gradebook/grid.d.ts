@@ -43,6 +43,7 @@ export type GridColumn = {
   id: string
   cssClass: string
   headerCssClass: string
+  object: GridColumnObject
   width: number
 } & Partial<{
   assignmentGroupId: string
@@ -55,7 +56,6 @@ export type GridColumn = {
   maxLength: number
   maxWidth: number
   minWidth: number
-  object: GridColumnObject
   resizable: boolean
   teacher_notes: string
   toolTip: string

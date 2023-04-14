@@ -6,8 +6,9 @@
   </div>
   <div class="form-column-right">
     <div class="border border-trbl border-round">
+
       {{!-- Submission type accepted --}}
-      <select id="assignment_submission_type" name="submission_type"
+      <select id="assignment_submission_type" name="submission_type" style="margin-left: 0;"
         aria-controls="assignment_online_submission_types,assignment_external_tool_settings,assignment_group_selector,assignment_peer_reviews_fields"
         {{disabledIfIncludes frozenAttributes "submission_types"}}>
         {{#if defaultToolName}}
@@ -43,7 +44,7 @@
       <div id="assignment_online_submission_types" aria-enabled="{{isOnlineSubmission}}"
         style="{{hiddenUnless isOnlineSubmission}}">
 
-        <div class="subtitle">
+        <div class="subtitle" style="margin-left: 0;">
           <strong>
             {{#t 'online_entry_options'}}Online Entry Options{{/t}}
           </strong>
@@ -238,12 +239,12 @@
 
       {{!-- External tool submissions --}}
       <div id="assignment_external_tool_settings" style="{{hiddenUnless isNonPlacementExternalTool}}">
-        <div class="subtitle">
+        <div class="subtitle" style="margin-left: 0px;">
           <strong>
             {{#t 'external_tool_options'}}External Tool Options{{/t}}
           </strong>
         </div>
-        <div class="pad-box-mini">
+        <div class="pad-box-mini" style="padding: 10px 0 0">
           <div class="ic-Form-control">
             <label class="ic-Label" for="assignment_external_tool_tag_attributes_url">
               {{#t}}Enter or find an External Tool URL{{/t}}
@@ -321,6 +322,7 @@
         </label>
       </div>
       {{/unless}}
+
     </div>
   </div>
 </fieldset>

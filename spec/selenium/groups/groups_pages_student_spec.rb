@@ -229,7 +229,7 @@ describe "groups" do
         expect(f("#content")).not_to contain_css(".edit-btn")
       end
 
-      it "allows all group members to see announcements", priority: "1", ignore_js_errors: true do
+      it "allows all group members to see announcements", ignore_js_errors: true, priority: "1" do
         @announcement = @testgroup.first.announcements.create!(
           title: "Group Announcement",
           message: "Group",
@@ -306,7 +306,7 @@ describe "groups" do
         verify_no_course_user_access(discussions_page)
       end
 
-      it "allows discussions to be deleted by their creator", priority: "1", ignore_js_errors: true do
+      it "allows discussions to be deleted by their creator", ignore_js_errors: true, priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first, user: @user, title: "Delete Me", message: "Discussion text")
         get discussions_page
         expect(f("[data-testid='discussion-link-#{dt.id}']")).to be_truthy

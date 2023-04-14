@@ -31,7 +31,7 @@ import type {
   SubmissionData,
   SubmissionWithOriginalityReport,
 } from '@canvas/grading/grading.d'
-import type {Student, Submission} from '../../../../../../api.d'
+import type {Assignment, Student, Submission} from '../../../../../../api.d'
 
 const I18n = useI18nScope('gradebook')
 
@@ -55,7 +55,9 @@ type Getters = {
     userId: string
   }): ReturnType<Gradebook['getPendingGradeInfo']>
   getStudent(studentId: string): ReturnType<Gradebook['student']>
-  getSubmissionState(submission): ReturnType<Gradebook['submissionStateMap']['getSubmissionState']>
+  getSubmissionState(
+    submission: Submission
+  ): ReturnType<Gradebook['submissionStateMap']['getSubmissionState']>
   showUpdatedSimilarityScore(): boolean
 }
 
@@ -85,7 +87,7 @@ function needsGrading(submission: Submission, pendingGradeInfo: PendingGradeInfo
   )
 }
 
-function formatGrade(submissionData: SubmissionData, assignment, options: Getters) {
+function formatGrade(submissionData: SubmissionData, assignment: Assignment, options: Getters) {
   const formatOptions = {
     formatType: options.getEnterGradesAsSetting(assignment.id),
     gradingScheme: options.getGradingSchemeData(assignment.id),
@@ -96,7 +98,11 @@ function formatGrade(submissionData: SubmissionData, assignment, options: Getter
   return GradeFormatHelper.formatSubmissionGrade(submissionData, formatOptions)
 }
 
-function renderStartContainer(options) {
+function renderStartContainer(options: {
+  showUnpostedIndicator?: boolean
+  invalid?: boolean
+  similarityData?: ReturnType<typeof extractSimilarityInfo>
+}) {
   let content = ''
 
   if (options.showUnpostedIndicator) {

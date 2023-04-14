@@ -127,7 +127,7 @@ describe CustomGradebookColumnsApiController, type: :request do
                       "column[title]" => "Bar", "column[read_only]" => true
       expect(response).to be_successful
       expect(json["title"]).to eq "Bar"
-      expect(json["read_only"]).to eq(true)
+      expect(json["read_only"]).to be(true)
       expect(@col.reload.title).to eq "Bar"
     end
   end

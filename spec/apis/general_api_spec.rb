@@ -101,8 +101,8 @@ describe "API", type: :request do
       a1 = attachment_model(context: @user)
       a2 = attachment_model(context: @user)
       json_request = { "comment" => {
-        "text_comment" => "yay"
-      },
+                         "text_comment" => "yay"
+                       },
                        "submission" => {
                          "submission_type" => "online_upload",
                          "file_ids" => [a1.id, a2.id]

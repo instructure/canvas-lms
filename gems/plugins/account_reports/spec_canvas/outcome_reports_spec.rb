@@ -79,7 +79,7 @@ describe "Outcome Reports" do
         learning_outcome_id: @outcome.id
       }
     ]
-    @rubric.instance_variable_set("@alignments_changed", true)
+    @rubric.instance_variable_set(:@alignments_changed, true)
     @rubric.save!
     @a = @rubric.associate_with(@assignment, @course1, purpose: "grading")
     @assignment.reload
@@ -838,7 +838,7 @@ describe "Outcome Reports" do
             expect(results[i]["learning outcome name"]).to eq @outcome.short_description
             expect(results[i]["learning outcome id"]).to eq @outcome.id
             expect(results[i]["learning outcome friendly name"]).to eq @outcome.display_name
-            expect(results[i]["learning outcome mastered"]).to eq false
+            expect(results[i]["learning outcome mastered"]).to be false
             expect(results[i]["learning outcome data"]).to eq @outcome.data.to_yaml
 
             # 2 attempts were returned so we are looking at 1st attempt
@@ -930,7 +930,7 @@ describe "Outcome Reports" do
             expect(results[i]["learning outcome name"]).to eq @outcome.short_description
             expect(results[i]["learning outcome id"]).to eq @outcome.id
             expect(results[i]["learning outcome friendly name"]).to eq @outcome.display_name
-            expect(results[i]["learning outcome mastered"]).to eq false
+            expect(results[i]["learning outcome mastered"]).to be false
             expect(results[i]["learning outcome data"]).to eq @outcome.data.to_yaml
 
             # 2 attempts were returned so we are looking at 1st attempt
@@ -1021,7 +1021,7 @@ describe "Outcome Reports" do
             expect(results[i]["learning outcome name"]).to eq @outcome.short_description
             expect(results[i]["learning outcome id"]).to eq @outcome.id
             expect(results[i]["learning outcome friendly name"]).to eq @outcome.display_name
-            expect(results[i]["learning outcome mastered"]).to eq false
+            expect(results[i]["learning outcome mastered"]).to be false
             expect(results[i]["learning outcome data"]).to eq @outcome.data.to_yaml
 
             # 2 attempts were returned so we are looking at 2nd attempt
@@ -1301,7 +1301,7 @@ describe "Outcome Reports" do
           @outcome.learning_outcome_results[0].save!
           expect(report[0]["learning outcome rating"]).to eq "Low Rating"
           expect(report[1]["learning outcome rating"]).to eq "Low Rating"
-          expect(report[2]["learning outcome rating"]).to eq nil
+          expect(report[2]["learning outcome rating"]).to be_nil
         end
       end
 

@@ -62,7 +62,7 @@ module BundlerDefinitionFilterableSources
       end
     end
 
-    proven_pinned = check_dependencies.map { |x| [x, false] }.to_h
+    proven_pinned = check_dependencies.to_h { |x| [x, false] } # rubocop:disable Rails/IndexWith
 
     valid_sources = []
 

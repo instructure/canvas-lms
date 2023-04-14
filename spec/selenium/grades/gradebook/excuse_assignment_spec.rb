@@ -237,7 +237,7 @@ describe "Excuse an Assignment" do
       assignment = @course.assignments.create! title: "Excuse Me", points_possible: 20
 
       if view == "srgb"
-        skip "Skipped because this spec fails if not run in foreground\n"\
+        skip "Skipped because this spec fails if not run in foreground\n" \
              "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
         get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
         click_option f("#assignment_select"), assignment.title
@@ -276,7 +276,7 @@ describe "Excuse an Assignment" do
 
         total = ""
         if view == "srgb"
-          skip "Skipped because this spec fails if not run in foreground\n"\
+          skip "Skipped because this spec fails if not run in foreground\n" \
                "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
           get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
           click_option f("#student_select"), @student.name

@@ -122,7 +122,7 @@ module Canvas::Security
       it "is false when validated twice", skip_before: true do
         enable_cache do
           validator.validate
-          expect(validator.validate).to eq false
+          expect(validator.validate).to be false
         end
       end
 
@@ -132,7 +132,7 @@ module Canvas::Security
         it "is true when when validated twice", skip_before: true do
           enable_cache do
             validator.validate
-            expect(validator.validate).to eq true
+            expect(validator.validate).to be true
           end
         end
       end

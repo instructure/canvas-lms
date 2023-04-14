@@ -298,7 +298,7 @@ describe ContentSharesController do
         user_session @teacher_1
         delete :destroy, params: { user_id: @teacher_1.id, id: @sent_share.id }
         expect(response).to be_successful
-        expect(ContentShare.where(id: @sent_share.id).exists?).to eq false
+        expect(ContentShare.where(id: @sent_share.id).exists?).to be false
       end
 
       it "scopes to user" do

@@ -394,7 +394,7 @@ describe DiscussionTopicsController do
       ann.save!
       get :show, params: { course_id: @course.id, id: ann.id }
       get :edit, params: { course_id: @course.id, id: ann.id }
-      expect(response.status).to equal(401)
+      expect(response).to have_http_status(:unauthorized)
     end
 
     it "redirects full_anonymity discussions to index when react_discussions_post is turned off(teacher)" do
@@ -929,7 +929,7 @@ describe DiscussionTopicsController do
         user_session(@teacher)
 
         get "show", params: { course_id: @course.id, id: @topic.id }
-        expect(assigns[:groups].size).to eql(2)
+        expect(assigns[:groups].size).to be(2)
       end
 
       it "only shows applicable groups if DA applies" do
@@ -1101,7 +1101,7 @@ describe DiscussionTopicsController do
       it "is enabled for teachers" do
         user_session(@teacher)
         get :show, params: { course_id: @course.id, id: @topic.id }
-        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to eq true
+        expect(assigns[:js_env][:STUDENT_CONTEXT_CARDS_ENABLED]).to be true
       end
     end
 
@@ -1143,28 +1143,28 @@ describe DiscussionTopicsController do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get "new", params: { course_id: @course.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get "new", params: { course_id: @course.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get "new", params: { course_id: @course.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get "new", params: { course_id: @course.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
@@ -1184,7 +1184,7 @@ describe DiscussionTopicsController do
     it "js_env allow_student_anonymous_discussion_topics defaults to false" do
       user_session(@teacher)
       get "new", params: { course_id: @course.id }
-      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq false
+      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to be false
     end
 
     it "js_env allow_student_anonymous_discussion_topics is true when its only when course setting is true" do
@@ -1192,7 +1192,7 @@ describe DiscussionTopicsController do
       @course.allow_student_anonymous_discussion_topics = true
       @course.save!
       get "new", params: { course_id: @course.id }
-      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq true
+      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to be true
     end
 
     it "creates a default assignment group if none exist" do
@@ -1295,28 +1295,28 @@ describe DiscussionTopicsController do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get :edit, params: { course_id: @course.id, id: @topic.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get :edit, params: { course_id: @course.id, id: @topic.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get :edit, params: { course_id: @course.id, id: @topic.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get :edit, params: { course_id: @course.id, id: @topic.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
@@ -1336,7 +1336,7 @@ describe DiscussionTopicsController do
     it "js_env allow_student_anonymous_discussion_topics defaults to false" do
       user_session(@teacher)
       get :edit, params: { course_id: @course.id, id: @topic.id }
-      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq false
+      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to be false
     end
 
     it "js_env allow_student_anonymous_discussion_topics is true when its only when course setting is true" do
@@ -1344,7 +1344,7 @@ describe DiscussionTopicsController do
       @course.allow_student_anonymous_discussion_topics = true
       @course.save!
       get :edit, params: { course_id: @course.id, id: @topic.id }
-      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to eq true
+      expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to be true
     end
 
     context "conditional-release" do
@@ -1448,13 +1448,13 @@ describe DiscussionTopicsController do
       user_session(@teacher)
       @topic.update(todo_date: 1.day.from_now.in_time_zone("America/New_York"))
       put "update", params: { course_id: @course.id, topic_id: @topic.id, todo_date: nil }, format: "json"
-      expect(@topic.reload.todo_date).to be nil
+      expect(@topic.reload.todo_date).to be_nil
     end
 
     it "does not allow a student to update the to-do date" do
       user_session(@student)
       put "update", params: { course_id: @course.id, topic_id: @topic.id, todo_date: 1.day.from_now }, format: "json"
-      expect(@topic.reload.todo_date).to eq nil
+      expect(@topic.reload.todo_date).to be_nil
     end
 
     it "does not allow a todo date on a graded topic" do
@@ -1480,7 +1480,7 @@ describe DiscussionTopicsController do
       put "update", params: { course_id: @course.id, topic_id: topic.id, todo_date: todo_date.iso8601(6),
                               assignment: { set_assignment: false, name: "Graded Topic 1" } }, format: "json"
       expect(response.code).to eq "200"
-      expect(topic.reload.assignment).to be nil
+      expect(topic.reload.assignment).to be_nil
       expect(topic.todo_date).to eq todo_date
     end
 
@@ -1491,7 +1491,7 @@ describe DiscussionTopicsController do
                               assignment: { submission_types: ["discussion_topic"], name: "Graded Topic 1" } }, format: "json"
       expect(response.code).to eq "200"
       expect(@topic.reload.assignment).to be_truthy
-      expect(@topic.todo_date).to be nil
+      expect(@topic.todo_date).to be_nil
     end
   end
 
@@ -2090,7 +2090,7 @@ describe DiscussionTopicsController do
                               delayed_post_at: nil })
       expect(response).to have_http_status :ok
       expect(assigns[:topic].title).to eq "Updated Topic"
-      expect(assigns[:topic].locked).to eq false
+      expect(assigns[:topic].locked).to be false
       expect(assigns[:topic].delayed_post_at).to be_nil
       expect(@topic.reload).not_to be_locked
       expect(@topic.delayed_post_at).to be_nil
@@ -2107,7 +2107,7 @@ describe DiscussionTopicsController do
                               delayed_post_at: delayed_post_time.to_s })
       expect(response).to have_http_status :ok
       expect(assigns[:topic].title).to eq "Updated Topic"
-      expect(assigns[:topic].locked).to eq true
+      expect(assigns[:topic].locked).to be true
       expect(assigns[:topic].delayed_post_at.year).to eq 2018
       expect(assigns[:topic].delayed_post_at.month).to eq 4
       expect(@topic.reload).to be_locked
@@ -2218,7 +2218,7 @@ describe DiscussionTopicsController do
       expect(response).to be_successful
       visibilities = DiscussionTopicSectionVisibility.active
                                                      .where(discussion_topic_id: @announcement.id)
-      expect(visibilities.empty?).to eq true
+      expect(visibilities.empty?).to be true
     end
 
     it "does not remove specific sections if key is missing in PUT json" do

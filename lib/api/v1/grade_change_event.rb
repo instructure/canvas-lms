@@ -36,7 +36,7 @@ module Api::V1::GradeChangeEvent
     links[:assignment] = Shard.relative_id_for(event.assignment_id, Shard.current, Shard.current) unless event.override_grade?
 
     json = {
-      id: event.id,
+      id: event.uuid,
       created_at: event.created_at.in_time_zone,
       event_type: event.event_type,
       grade_before: display_grade(event: event, grade: event.grade_before, score: event.score_before),

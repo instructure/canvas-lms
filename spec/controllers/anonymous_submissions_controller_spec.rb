@@ -111,10 +111,10 @@ RSpec.describe AnonymousSubmissionsController do
       request.accept = Mime[:json].to_s
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
       expect(body["anonymous_id"]).to eq @submission.anonymous_id
-      expect(body["score"]).to be nil
-      expect(body["grade"]).to be nil
-      expect(body["published_grade"]).to be nil
-      expect(body["published_score"]).to be nil
+      expect(body["score"]).to be_nil
+      expect(body["grade"]).to be_nil
+      expect(body["published_grade"]).to be_nil
+      expect(body["published_score"]).to be_nil
     end
 
     it "shows rubric assessments to peer reviewers" do

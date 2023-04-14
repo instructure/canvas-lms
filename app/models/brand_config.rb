@@ -31,8 +31,8 @@ class BrandConfig < ActiveRecord::Base
 
   before_validation :generate_md5
   before_update do
-    raise "BrandConfigs are a key-value mapping of config variables and an md5 digest "\
-          "of those variables, so they are immutable. You do not update them, you just "\
+    raise "BrandConfigs are a key-value mapping of config variables and an md5 digest " \
+          "of those variables, so they are immutable. You do not update them, you just " \
           "save a new one and it will generate the new md5 for you"
   end
 
@@ -126,7 +126,7 @@ class BrandConfig < ActiveRecord::Base
   def clone_with_new_parent(new_parent)
     attrs = attributes.with_indifferent_access.slice(*BrandConfig::ATTRS_TO_INCLUDE_IN_MD5)
     attrs[:parent_md5] = if new_parent
-                           new_parent.shard.id == shard.id ? new_parent.md5 : "#{new_parent.shard.id}~#{new_parent.md5}"
+                           (new_parent.shard.id == shard.id) ? new_parent.md5 : "#{new_parent.shard.id}~#{new_parent.md5}"
                          else
                            nil
                          end

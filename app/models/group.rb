@@ -136,13 +136,13 @@ class Group < ActiveRecord::Base
   end
 
   def all_real_students
-    return context.all_real_students.where(users: { id: group_memberships.select(:user_id) }) if context.respond_to? "all_real_students"
+    return context.all_real_students.where(users: { id: group_memberships.select(:user_id) }) if context.respond_to? :all_real_students
 
     users
   end
 
   def all_real_student_enrollments
-    return context.all_real_student_enrollments.where(user_id: group_memberships.select(:user_id)) if context.respond_to? "all_real_student_enrollments"
+    return context.all_real_student_enrollments.where(user_id: group_memberships.select(:user_id)) if context.respond_to? :all_real_student_enrollments
 
     group_memberships
   end

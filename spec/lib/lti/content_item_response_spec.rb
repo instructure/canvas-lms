@@ -234,7 +234,7 @@ describe Lti::ContentItemResponse do
       expect(json["@graph"].first["url"]).to include "api_export_url"
       expect(json["@graph"].first["mediaType"]).to eq "application/vnd.instructure.api.content-exports.quiz"
       expect(json["@graph"].first["title"]).to eq "a quiz"
-      expect(json["@graph"].first["copyAdvice"]).to eq true
+      expect(json["@graph"].first["copyAdvice"]).to be true
     end
   end
 end

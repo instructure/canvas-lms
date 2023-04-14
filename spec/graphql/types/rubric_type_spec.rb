@@ -32,7 +32,7 @@ describe Types::RubricType do
 
   it "requires permission" do
     user2 = User.create!
-    expect(rubric_type.resolve("_id", current_user: user2)).to eq nil
+    expect(rubric_type.resolve("_id", current_user: user2)).to be_nil
   end
 
   describe "works for the field" do
@@ -45,11 +45,11 @@ describe Types::RubricType do
     it "free_form_criterion_comments" do
       expect(
         rubric_type.resolve("freeFormCriterionComments")
-      ).to eq false
+      ).to be false
     end
 
     it "hide_score_total" do
-      expect(rubric_type.resolve("hideScoreTotal")).to eq false
+      expect(rubric_type.resolve("hideScoreTotal")).to be false
     end
 
     it "points_possible" do

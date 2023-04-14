@@ -10,7 +10,6 @@ Gem::Specification.new do |spec|
   spec.summary       = "Generate CSV diffs"
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w[test.sh]
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
   spec.add_dependency "sqlite3"

@@ -319,21 +319,21 @@ describe EpubExport do
       communication_channel_model.confirm!
 
       @epub.workflow_state = "generated"
-      expect { @epub.save! }.to change(DelayedMessage, :count).by 0
+      expect { @epub.save! }.not_to change(DelayedMessage, :count)
       expect(@epub.messages_sent["Content Export Finished"]).not_to be_blank
 
       @epub.workflow_state = "failed"
-      expect { @epub.save! }.to change(DelayedMessage, :count).by 0
+      expect { @epub.save! }.not_to change(DelayedMessage, :count)
       expect(@epub.messages_sent["Content Export Failed"]).not_to be_blank
     end
 
     it "does not send emails for epub or webzip exports when content export has exported" do
       @ce.workflow_state = "exported"
-      expect { @ce.save! }.to change(DelayedMessage, :count).by 0
+      expect { @ce.save! }.not_to change(DelayedMessage, :count)
       expect(@ce.messages_sent["Content Export Finished"]).to be_blank
 
       @ce.workflow_state = "failed"
-      expect { @ce.save! }.to change(DelayedMessage, :count).by 0
+      expect { @ce.save! }.not_to change(DelayedMessage, :count)
       expect(@ce.messages_sent["Content Export Failed"]).to be_blank
     end
   end

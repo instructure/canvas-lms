@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'browser-sniffer'
 import $ from 'jquery'
+
+if (!('INST' in window)) window.INST = {}
 
 class Client {
   // Is truthy if PandaPub is enabled.

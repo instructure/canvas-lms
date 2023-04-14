@@ -21,8 +21,8 @@ plugin "bundler_lockfile_extensions", path: "gems/bundler_lockfile_extensions"
 
 require File.expand_path("config/canvas_rails_switcher", __dir__)
 
-if Plugin.installed?('bundler_lockfile_extensions')
-  Plugin.send(:load_plugin, 'bundler_lockfile_extensions') if !defined?(BundlerLockfileExtensions)
+if Plugin.installed?("bundler_lockfile_extensions")
+  Plugin.send(:load_plugin, "bundler_lockfile_extensions") unless defined?(BundlerLockfileExtensions)
 
   # Specifically exclude private plugins + private sources so that we can share a Gemfile.lock
   # with OSS users without needing to encrypt / put it in a different repo. In order to actually
@@ -32,26 +32,24 @@ if Plugin.installed?('bundler_lockfile_extensions')
   # 2. All sub-dependencies of (1) must be pinned in plugins.rb
   # 3. All additional public dependencies of private plugins must be pinned in plugins.rb
   #
-  install_filter = lambda do |lockfile, source|
-    return false if (
-      source.to_s.match(/plugins\/(?!academic_benchmark|account_reports|moodle_importer|qti_exporter|respondus_soap_endpoint|simply_versioned)/)
-    )
+  install_filter = lambda do |_lockfile, source|
+    return false if
+      source.to_s.match?(%r{plugins/(?!academic_benchmark|account_reports|moodle_importer|qti_exporter|respondus_soap_endpoint|simply_versioned)})
 
-    source_md5 = ::Digest::MD5.hexdigest(source.to_s)
+    source_md5 = ::Digest::MD5.hexdigest(source.to_s) # rubocop:disable Style/RedundantConstantBase
 
-    return false if (
+    return false if
       source_md5 == "52288aac483aed012b58e6707e1660a5" || # rubygems repository <redacted>
       source_md5 == "252f6aa6a56f69f01f8a19275e91f0d8" # rubygems repository <redacted> or installed locally
-    )
 
     true
   end
 
   base_gemfile = ENV.fetch("BUNDLE_GEMFILE", "Gemfile")
-  lockfile_defs = SUPPORTED_VERSIONS.map do |x|
+  lockfile_defs = SUPPORTED_VERSIONS.to_h do |x|
     prepare_environment = lambda do
       Object.send(:remove_const, :CANVAS_RAILS)
-      ::CANVAS_RAILS = x
+      ::CANVAS_RAILS = x # rubocop:disable Style/RedundantConstantBase
     end
 
     ["#{base_gemfile}.rails#{x.delete(".")}.lock", {
@@ -59,7 +57,7 @@ if Plugin.installed?('bundler_lockfile_extensions')
       install_filter: install_filter,
       prepare_environment: prepare_environment,
     }]
-  end.to_h
+  end
 
   BundlerLockfileExtensions.enable(lockfile_defs)
 end
@@ -68,7 +66,7 @@ end
 # makes it actually go and retrieve metadata from them even though the plugin will
 # never exist there. Short-circuit it here if we're in the plugin-specific DSL
 # phase to prevent that from happening.
-return if method(:source).owner == ::Bundler::Plugin::DSL
+return if method(:source).owner == Bundler::Plugin::DSL
 
 Dir[File.join(File.dirname(__FILE__), "gems/plugins/*/Gemfile.d/_before.rb")].each do |file|
   eval(File.read(file), nil, file) # rubocop:disable Security/Eval

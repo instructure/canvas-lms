@@ -35,6 +35,8 @@ module PostgreSQLAdapterExtensions
                          :debug
                        when "INFO", "LOG"
                          :info
+                       else
+                         :error
                        end
       logger.send(rails_severity, "PG notice: " + result.result_error_message.strip)
 
@@ -254,6 +256,13 @@ module PostgreSQLAdapterExtensions
     end
   end
 
+  def with_max_update_limit(limit)
+    transaction do
+      execute("SET LOCAL inst.max_update_limit = #{limit}")
+      yield
+    end
+  end
+
   def quote(*args)
     value = args.first
     return value if value.is_a?(QuotedValue)
@@ -294,7 +303,7 @@ module PostgreSQLAdapterExtensions
       WHERE
         collprovider='i' AND
         NOT collisdeterministic AND
-        collcollate LIKE '%-u-kn-true'
+        collname LIKE '%-u-kn-true'
     SQL
   end
 

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe OutcomeProficiencyRating, type: :model do
+describe OutcomeProficiencyRating do
   describe "associations" do
     it { is_expected.to belong_to(:outcome_proficiency) }
   end

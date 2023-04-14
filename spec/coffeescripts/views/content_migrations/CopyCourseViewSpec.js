@@ -18,10 +18,10 @@
 
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration.coffee'
-import CopyCourseView from 'ui/features/content_migrations/backbone/views/CopyCourseView.coffee'
-import DateShiftView from '@canvas/content-migrations/backbone/views/DateShiftView.coffee'
-import SelectContentCheckboxView from '@canvas/content-migrations/backbone/views/subviews/SelectContentCheckboxView.coffee'
+import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration'
+import CopyCourseView from 'ui/features/content_migrations/backbone/views/CopyCourseView'
+import DateShiftView from '@canvas/content-migrations/backbone/views/DateShiftView'
+import SelectContentCheckboxView from '@canvas/content-migrations/backbone/views/subviews/SelectContentCheckboxView'
 import assertions from 'helpers/assertions'
 
 QUnit.module('CopyCourseView: Initializer', {

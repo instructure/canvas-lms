@@ -98,7 +98,7 @@ describe "Notifications" do
         expect(ff(".ic-Table--condensed.grid td")[7]).to include_text("Anonymous User")
 
         fj('.ui-tabs-anchor:contains("Plain Text")').click
-        expect(f(".message-body")).to include_text("Anonymous User just made a new comment on the "\
+        expect(f(".message-body")).to include_text("Anonymous User just made a new comment on the " \
                                                    "submission for #{@student.reload.short_name} for assignment")
       end
 

@@ -460,7 +460,7 @@ class WebConference < ActiveRecord::Base
   def has_calendar_event
     return 0 if calendar_event.nil?
 
-    calendar_event.workflow_state == "deleted" ? 0 : 1
+    (calendar_event.workflow_state == "deleted") ? 0 : 1
   end
 
   scope :after, ->(date) { where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }

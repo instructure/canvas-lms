@@ -250,7 +250,7 @@ describe EportfoliosController do
           user_session(@user)
           get :show, params: { id: @portfolio.id }
 
-          expect(response.status).to eq(200)
+          expect(response).to have_http_status(:ok)
         end
       end
 
@@ -280,7 +280,7 @@ describe EportfoliosController do
           user_session(@admin)
           get :show, params: { id: @portfolio.id }
 
-          expect(response.status).to eq(200)
+          expect(response).to have_http_status(:ok)
         end
 
         it "is unauthorized when the eportfolio is spam and the admin does not have :moderate_user_content permissions" do
@@ -317,14 +317,14 @@ describe EportfoliosController do
           @portfolio.update!(spam_status: "flagged_as_possible_spam")
           user_session(@user)
           put :update, params: { id: @portfolio.id, eportfolio: { name: "not spam i promise ;)" } }
-          expect(response.status).to eq(401)
+          expect(response).to have_http_status(:unauthorized)
         end
 
         it "can not make updates to the eportfolio if it has been marked as spam" do
           @portfolio.update!(spam_status: "marked_as_spam")
           user_session(@user)
           put :update, params: { id: @portfolio.id, eportfolio: { name: "not spam i promise ;)" } }
-          expect(response.status).to eq(401)
+          expect(response).to have_http_status(:unauthorized)
         end
 
         it "can make updates to the eportfolio if it has been marked as safe" do
@@ -339,7 +339,7 @@ describe EportfoliosController do
           user_session(@user)
           put :update, params: { id: @portfolio.id, eportfolio: { name: "new title", spam_status: "marked_as_safe" } }
           expect(response).to be_redirect
-          expect(assigns[:portfolio].spam_status).to eq(nil)
+          expect(assigns[:portfolio].spam_status).to be_nil
         end
       end
 
@@ -362,7 +362,7 @@ describe EportfoliosController do
           user_session(@admin)
           put :update, params: { id: @portfolio.id, eportfolio: { name: "changed name" } }
           expect(response).to be_redirect
-          expect(assigns[:portfolio].name).to eq(nil)
+          expect(assigns[:portfolio].name).to be_nil
         end
 
         it "cannot change the spam_status attribute if not granted the moderate_user_content permission" do
@@ -409,17 +409,17 @@ describe EportfoliosController do
       c1 = eportfolio_category
       c2 = eportfolio_category
       c3 = eportfolio_category
-      expect(c1.position).to eql(1)
-      expect(c2.position).to eql(2)
-      expect(c3.position).to eql(3)
+      expect(c1.position).to be(1)
+      expect(c2.position).to be(2)
+      expect(c3.position).to be(3)
       post "reorder_categories", params: { eportfolio_id: @portfolio.id, order: "#{c2.id},#{c3.id},#{c1.id}" }
       expect(response).to be_successful
       c1.reload
       c2.reload
       c3.reload
-      expect(c1.position).to eql(3)
-      expect(c2.position).to eql(1)
-      expect(c3.position).to eql(2)
+      expect(c1.position).to be(3)
+      expect(c2.position).to be(1)
+      expect(c3.position).to be(2)
     end
   end
 
@@ -434,18 +434,18 @@ describe EportfoliosController do
       c1 = eportfolio_category
       c2 = eportfolio_category
       c3 = eportfolio_category
-      expect(c1.position).to eql(1)
-      expect(c2.position).to eql(2)
-      expect(c3.position).to eql(3)
+      expect(c1.position).to be(1)
+      expect(c2.position).to be(2)
+      expect(c3.position).to be(3)
       [c2, c3, c1].map(&:id).join(",")
       post "reorder_categories", params: { eportfolio_id: @portfolio.id, order: "#{c2.id},#{c3.id},#{c1.id}" }
       expect(response).to be_successful
       c1.reload
       c2.reload
       c3.reload
-      expect(c1.position).to eql(3)
-      expect(c2.position).to eql(1)
-      expect(c3.position).to eql(2)
+      expect(c1.position).to be(3)
+      expect(c2.position).to be(1)
+      expect(c3.position).to be(2)
     end
   end
 
@@ -463,16 +463,16 @@ describe EportfoliosController do
       e1 = category_entry
       e2 = category_entry
       e3 = category_entry
-      expect(e1.position).to eql(1)
-      expect(e2.position).to eql(2)
-      expect(e3.position).to eql(3)
+      expect(e1.position).to be(1)
+      expect(e2.position).to be(2)
+      expect(e3.position).to be(3)
       post "reorder_entries", params: { eportfolio_id: @portfolio.id, eportfolio_category_id: @category.id, order: "#{e2.id},#{e3.id},#{e1.id}" }
       e1.reload
       e2.reload
       e3.reload
-      expect(e1.position).to eql(3)
-      expect(e2.position).to eql(1)
-      expect(e3.position).to eql(2)
+      expect(e1.position).to be(3)
+      expect(e2.position).to be(1)
+      expect(e3.position).to be(2)
     end
   end
 

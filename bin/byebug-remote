@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'byebug/core'
-require 'tmpdir'
+require "byebug/core"
+require "tmpdir"
 
 def byebug_port_file
-  File.join(Dir.tmpdir, 'byebug.port')
+  File.join(Dir.tmpdir, "byebug.port")
 end
 
 def byebug_port
@@ -15,17 +15,16 @@ def byebug_port
 end
 
 def connect
-  begin
-    while !byebug_port do
-      puts "Waiting for byebug port..."
-      sleep 0.5
-    end
-
-    Byebug.start_client('localhost', byebug_port)
-  rescue Errno::ECONNREFUSED
+  until byebug_port do
+    puts "Waiting for byebug port..."
+    sleep 0.5
   end
+
+  Byebug.start_client("localhost", byebug_port)
+rescue Errno::ECONNREFUSED
+  nil
 end
 
-while !connect do
+until connect do
   sleep 0.5
 end

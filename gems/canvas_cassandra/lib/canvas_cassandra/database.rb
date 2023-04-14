@@ -254,7 +254,7 @@ module CanvasCassandra
         end.join(", ")
         statement << " SET #{update_cql} WHERE #{where_clause}"
         args.concat where_args
-        args.concat [execute_options]
+        args.push execute_options
         update(statement, *args)
       end
 
@@ -263,7 +263,7 @@ module CanvasCassandra
         delete_cql = deletes.map(&:first).join(", ")
         statement = "DELETE #{delete_cql} FROM #{table_name} WHERE #{where_clause}"
         args.concat where_args
-        args.concat [execute_options]
+        args.push execute_options
         update(statement, *args)
       end
     end

@@ -24,11 +24,11 @@ describe Lti::PermissionChecker do
 
   describe ".authorized_lti2_action?" do
     it "is true if the tool is authorized for the context" do
-      expect(Lti::PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: account)).to eq true
+      expect(Lti::PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: account)).to be true
     end
 
     it "is false if the tool isn't installed in the context" do
-      expect(Lti::PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: Account.create!)).to eq false
+      expect(Lti::PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: Account.create!)).to be false
     end
 
     context "assignment" do
@@ -64,13 +64,13 @@ describe Lti::PermissionChecker do
 
       it "is false if the context is an assignment and the tool isn't associated" do
         assignment.tool_settings_tool = []
-        expect(Lti::PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: assignment)).to eq false
+        expect(Lti::PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: assignment)).to be false
       end
 
       it "returns true if the requesting tool has the same access as the associated tool" do
         assignment.tool_settings_tool = message_handler
         assignment.save!
-        expect(Lti::PermissionChecker.authorized_lti2_action?(tool: other_tp, context: assignment)).to eq true
+        expect(Lti::PermissionChecker.authorized_lti2_action?(tool: other_tp, context: assignment)).to be true
       end
 
       it "returns false if the requesting tool does not have the same access as the associated tool" do
@@ -78,11 +78,11 @@ describe Lti::PermissionChecker do
         other_tp.raw_data["tool_profile"]["product_instance"]["product_info"]["product_family"]["code"] = "different"
         other_tp.update(guid: SecureRandom.uuid, context: course)
         allow(other_tp).to receive(:active_in_context?) { true }
-        expect(Lti::PermissionChecker.authorized_lti2_action?(tool: other_tp, context: assignment)).to eq false
+        expect(Lti::PermissionChecker.authorized_lti2_action?(tool: other_tp, context: assignment)).to be false
       end
 
       it "is true if the tool is authorized for an assignment context" do
-        expect(Lti::PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: assignment)).to eq true
+        expect(Lti::PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: assignment)).to be true
       end
     end
   end

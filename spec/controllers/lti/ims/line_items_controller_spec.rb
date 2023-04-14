@@ -119,7 +119,7 @@ module Lti
 
           it "sets coupled to false on the new line item" do
             send_request
-            expect(Lti::LineItem.last.coupled).to eq(false)
+            expect(Lti::LineItem.last.coupled).to be(false)
           end
 
           it "responds with the line item mime type" do
@@ -238,7 +238,7 @@ module Lti
           it "does not create a resource_link record" do
             expect do
               send_request
-            end.to change { Lti::ResourceLink.count }.by(0)
+            end.not_to change { Lti::ResourceLink.count }
           end
 
           context "when a new assignment is created" do

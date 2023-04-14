@@ -31,7 +31,7 @@ import ReactDOM from 'react-dom'
 import gradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import htmlEscape from 'html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import round from 'round'
+import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {scopeToUser} from '@canvas/grading/EffectiveDueDates'
@@ -829,7 +829,7 @@ function setup() {
 
     $('.comments .play_comment_link').mediaCommentThumbnail('normal')
 
-    $('.play_comment_link').live('click', function (event) {
+    $(document).on('click', '.play_comment_link', function (event) {
       event.preventDefault()
       const $parent = $(this).parents('.comment_media')
       const commentId = $parent.getTemplateData({textValues: ['media_comment_id']}).media_comment_id

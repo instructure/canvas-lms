@@ -435,7 +435,7 @@ describe AddressBook::Service do
       )
 
       known_users = @address_book.search_users(search: "Bob")
-      bookmark = "bookmark:#{::JSONToken.encode(cursor)}"
+      bookmark = "bookmark:#{JSONToken.encode(cursor)}"
       page = known_users.paginate(per_page: 10, page: bookmark)
       expect(page.map(&:id)).to include(@recipient.id)
     end
@@ -463,7 +463,7 @@ describe AddressBook::Service do
       known_users = @address_book.search_users(search: "Bob")
       page = known_users.paginate(per_page: 1)
       expected_cursor = page.bookmark_for(other_recipient)
-      expected_bookmark = "bookmark:#{::JSONToken.encode(expected_cursor)}"
+      expected_bookmark = "bookmark:#{JSONToken.encode(expected_cursor)}"
       expect(page.next_page).to eq(expected_bookmark)
     end
 

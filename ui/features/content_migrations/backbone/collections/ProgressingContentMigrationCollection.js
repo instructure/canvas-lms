@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import ProgressingContentMigration from '../models/ProgressingContentMigration.coffee'
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
+import ProgressingContentMigration from '../models/ProgressingContentMigration'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 
 export default class ProgressingContentMigrationCollection extends PaginatedCollection {
   url() {

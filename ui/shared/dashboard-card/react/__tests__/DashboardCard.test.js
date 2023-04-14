@@ -19,6 +19,11 @@
 import DashboardCard, {DashboardCardHeaderHero} from '../DashboardCard'
 import React from 'react'
 import {render} from '@testing-library/react'
+import {mount} from 'enzyme'
+import PublishButton from '../PublishButton'
+import * as apiClient from '@canvas/courses/courseAPIClient'
+
+jest.mock('@canvas/courses/courseAPIClient')
 
 function createMockProps(opts = {}) {
   return {
@@ -84,6 +89,23 @@ describe('PublishButton', () => {
     })
     const {queryByText} = render(<DashboardCard {...props} />)
     expect(queryByText(/Publish/i)).toBeInTheDocument()
+  })
+
+  describe('.updatePublishedCourse', () => {
+    it('calls onPublishedCourse callback when registered', () => {
+      const onPublishedCourse = jest.fn()
+      const props = createMockProps({
+        id: '0',
+        published: false,
+        canChangeCoursePublishState: true,
+        pagesUrl: '',
+        defaultView: '',
+        onPublishedCourse,
+      })
+      const wrapper = mount(<DashboardCard {...props} />)
+      wrapper.find(PublishButton).find('button').simulate('click')
+      expect(apiClient.publishCourse).toHaveBeenCalledWith(expect.objectContaining({courseId: '0'}))
+    })
   })
 
   it('does not render the button for users that do not have the permission', () => {

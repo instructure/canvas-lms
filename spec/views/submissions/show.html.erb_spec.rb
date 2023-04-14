@@ -769,7 +769,7 @@ describe "submissions/show" do
       html = Nokogiri::HTML5.fragment(response.body)
       comment_list = html.css(".submission-details-comments .comment_list")
       comment_contents = comment_list.css(".comment .comment").map { |comment| comment.text.strip }
-      expect(comment_contents.find { |c| c.include?("good job!") }).not_to be nil
+      expect(comment_contents.find { |c| c.include?("good job!") }).not_to be_nil
     end
 
     it "comment text includes boilerplate about being a media comment" do

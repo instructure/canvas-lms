@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import round from 'round'
+import round from '@canvas/round'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
@@ -181,7 +181,7 @@ $(document).ready(() => {
       $brief.find('.collapse_data_link,.expand_data_link').toggle()
       $brief.find('.details').slideToggle()
     })
-  $('.grading_standard_select').live('click', function (event) {
+  $(document).on('click', '.grading_standard_select', function (event) {
     event.preventDefault()
     const id = $(this).getTemplateData({textValues: ['id']}).id
     $('.grading_standard .grading_standards_select .grading_standard_select').removeClass(

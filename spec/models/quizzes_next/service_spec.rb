@@ -25,14 +25,14 @@ describe QuizzesNext::Service do
     context "when the feature is enabled on the context" do
       it "will return true" do
         allow(context).to receive(:feature_enabled?).and_return(true)
-        expect(described_class.enabled_in_context?(context)).to eq(true)
+        expect(described_class.enabled_in_context?(context)).to be(true)
       end
     end
 
     context "when the feature is not enabled on the context but allowed on root account" do
       it "will return true" do
         allow(context).to receive(:feature_enabled?).and_return(false)
-        expect(described_class.enabled_in_context?(context)).to eq(true)
+        expect(described_class.enabled_in_context?(context)).to be(true)
       end
     end
 
@@ -40,7 +40,7 @@ describe QuizzesNext::Service do
       it "will return false" do
         allow(context).to receive(:feature_enabled?).and_return(false)
         allow(context.root_account).to receive(:feature_allowed?).and_return(false)
-        expect(described_class.enabled_in_context?(context)).to eq(false)
+        expect(described_class.enabled_in_context?(context)).to be(false)
       end
     end
   end
@@ -84,8 +84,8 @@ describe QuizzesNext::Service do
       assignment_hash = { "$canvas_assignment_id": "1234" }
       assignment_not_found = { "$canvas_assignment_id": Canvas::Migration::ExternalContent::Translator::NOT_FOUND }
 
-      expect(described_class.assignment_not_in_export?(assignment_hash)).to eq(false)
-      expect(described_class.assignment_not_in_export?(assignment_not_found)).to eq(true)
+      expect(described_class.assignment_not_in_export?(assignment_hash)).to be(false)
+      expect(described_class.assignment_not_in_export?(assignment_not_found)).to be(true)
     end
   end
 

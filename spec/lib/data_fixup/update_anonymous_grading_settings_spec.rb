@@ -52,7 +52,7 @@ describe DataFixup::UpdateAnonymousGradingSettings do
 
       it "removes the flag on the account" do
         run_for_account
-        expect(@course.feature_flag(:anonymous_grading)).to be nil
+        expect(@course.feature_flag(:anonymous_grading)).to be_nil
       end
 
       it "enables the anonymous_marking flag on the account" do
@@ -103,7 +103,7 @@ describe DataFixup::UpdateAnonymousGradingSettings do
 
       it "removes the flag on the course" do
         run_for_course
-        expect(@course.feature_flag(:anonymous_grading)).to be nil
+        expect(@course.feature_flag(:anonymous_grading)).to be_nil
       end
 
       it "enables the anonymous_marking flag on the course" do
@@ -130,13 +130,13 @@ describe DataFixup::UpdateAnonymousGradingSettings do
     it "removes the anonymous_grading feature flag for an account with the flag set to allowed" do
       set_anonymous_grading_flag(course_or_account: @account, state: "allowed")
       destroy_allowed_and_off_flags
-      expect(@account.feature_flag(:anonymous_grading)).to be nil
+      expect(@account.feature_flag(:anonymous_grading)).to be_nil
     end
 
     it "removes the anonymous_grading feature flag for an account with the flag set to off" do
       set_anonymous_grading_flag(course_or_account: @account, state: "off")
       destroy_allowed_and_off_flags
-      expect(@account.feature_flag(:anonymous_grading)).to be nil
+      expect(@account.feature_flag(:anonymous_grading)).to be_nil
     end
 
     it "ignores the anonymous_grading feature flag for an account with the flag set to on" do

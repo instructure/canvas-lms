@@ -78,3 +78,8 @@ new_quizzes_allow_service_jwt_refresh:
   environments:
     development:
       state: allowed_on
+new_quizzes_exports:
+  state: hidden
+  display_name: New Quizzes Export Support
+  description: Support exporting New Quizzes in QTI format
+  applies_to: SiteAdmin

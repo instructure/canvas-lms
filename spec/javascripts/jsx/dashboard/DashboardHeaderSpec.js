@@ -99,7 +99,7 @@ QUnit.module('Dashboard Header', hooks => {
 
   test('it renders', () => {
     const dashboardHeader = shallow(
-      <DashboardHeader planner_enabled planner_selected env={window.ENV} />
+      <DashboardHeader planner_enabled={true} planner_selected={true} env={window.ENV} />
     )
     ok(dashboardHeader)
   })
@@ -190,7 +190,7 @@ QUnit.module('Dashboard Header', hooks => {
         headerRef={c => {
           dashboardHeader = c
         }}
-        planner_enabled
+        planner_enabled={true}
         dashboard_view="activity"
       />,
       container
@@ -236,7 +236,7 @@ QUnit.module('Dashboard Header', hooks => {
         headerRef={c => {
           dashboardHeader = c
         }}
-        planner_enabled
+        planner_enabled={true}
         dashboard_view="activity"
       />,
       container
@@ -274,7 +274,7 @@ QUnit.module('Dashboard Header', hooks => {
         headerRef={c => {
           dashboardHeader = c
         }}
-        planner_enabled
+        planner_enabled={true}
         dashboard_view="activity"
       />,
       container
@@ -301,7 +301,7 @@ QUnit.module('Dashboard Header', hooks => {
           dashboardHeader = c
         }}
         dashboard_view="planner"
-        planner_enabled
+        planner_enabled={true}
       />,
       container
     )
@@ -319,7 +319,7 @@ QUnit.module('Dashboard Header', hooks => {
           dashboardHeader = c
         }}
         dashboard_view="activity"
-        canEnableElementaryDashboard
+        canEnableElementaryDashboard={true}
       />,
       container
     )
@@ -340,7 +340,7 @@ QUnit.module('Dashboard Header', hooks => {
         {id: '19', name: 'mary', avatar_url: undefined},
       ]
 
-      fetchMock.get(SHOW_K5_DASHBOARD_ROUTE, JSON.stringify(showK5DashboardResponse(false)))
+      fetchMock.get(SHOW_K5_DASHBOARD_ROUTE, JSON.stringify(showK5DashboardResponse(false, false)))
     })
 
     hooks2.afterEach(() => {
@@ -348,12 +348,12 @@ QUnit.module('Dashboard Header', hooks => {
     })
 
     test('it should show the observer options Select on planner dashboard', () => {
-      ReactDOM.render(<FakeDashboard planner_enabled dashboard_view="planner" />, container)
+      ReactDOM.render(<FakeDashboard planner_enabled={true} dashboard_view="planner" />, container)
       ok(document.querySelector('[data-testid="observed-student-dropdown"]'))
     })
 
     test('it should show the observer options Select on recent activity dashboard', () => {
-      ReactDOM.render(<FakeDashboard planner_enabled dashboard_view="activity" />, container)
+      ReactDOM.render(<FakeDashboard planner_enabled={true} dashboard_view="activity" />, container)
       ok(document.querySelector('[data-testid="observed-student-dropdown"]'))
     })
   })

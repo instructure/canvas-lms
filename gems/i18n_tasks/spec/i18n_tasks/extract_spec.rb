@@ -58,7 +58,7 @@ describe I18nTasks::Extract do
 
   it "removes Proc-like values" do
     expect(
-      subject(rb: { date: { nth: proc { |v| "1st" } } })
+      subject(rb: { date: { nth: proc { "1st" } } })
     ).to eq({ "date" => {} })
   end
 

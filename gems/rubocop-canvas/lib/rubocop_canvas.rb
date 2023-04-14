@@ -28,6 +28,8 @@ require "rubocop_canvas/helpers/file_meta"
 require "rubocop_canvas/helpers/migration_tags"
 require "rubocop_canvas/helpers/new_tables"
 require "rubocop_canvas/helpers/current_def"
+require "rubocop_canvas/helpers/indifferent"
+require "rubocop_canvas/helpers/legacy_migrations"
 require "rubocop_canvas/helpers/non_transactional"
 
 # cops
@@ -51,6 +53,7 @@ require "rubocop_canvas/cops/migration/boolean_columns"
 require "rubocop_canvas/cops/migration/data_fixup"
 require "rubocop_canvas/cops/migration/predeploy"
 require "rubocop_canvas/cops/migration/id_column"
+require "rubocop_canvas/cops/migration/function_unqualified_table"
 require "rubocop_canvas/cops/migration/root_account_id"
 ## specs
 require "rubocop_canvas/cops/specs/no_before_once_stubs"
@@ -65,6 +68,8 @@ require "rubocop_canvas/cops/specs/no_wait_for_no_such_element"
 require "rubocop_canvas/cops/specs/prefer_f_over_fj"
 require "rubocop_canvas/cops/specs/scope_helper_modules"
 require "rubocop_canvas/cops/specs/scope_includes"
+## style
+require "rubocop_canvas/cops/style/concat_array_literals"
 
 module RuboCop
   module Canvas
@@ -78,6 +83,12 @@ module RuboCop
         config = ConfigLoader.merge_with_default(config, path)
 
         ConfigLoader.instance_variable_set(:@default_configuration, config)
+
+        AST::Node.include(Indifferent)
+        AST::SymbolNode.include(IndifferentSymbol)
+        if defined?(Cop::Style::ConcatArrayLiterals)
+          Cop::Style::ConcatArrayLiterals.prepend(Cop::Style::ConcatArrayLiteralsWithIgnoredReceivers)
+        end
       end
     end
   end

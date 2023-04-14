@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.describe AttachmentUploadStatus, type: :model do
+RSpec.describe AttachmentUploadStatus do
   let(:upload) { AttachmentUploadStatus.new(attachment: attachment, error: "error") }
   let(:progress) { Progress.create!(context: assignment_model, tag: "tag") }
   let(:attachment) { attachment_model }

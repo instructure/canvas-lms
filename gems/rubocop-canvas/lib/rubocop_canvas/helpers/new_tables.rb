@@ -28,7 +28,7 @@ module RuboCop::Canvas
     # end
 
     def new_tables(class_node)
-      new_tables_impl(class_node).map { |node| node.value.to_s }
+      new_tables_impl(class_node).map(&:indifferent)
     end
 
     def_node_search :new_tables_impl, <<~PATTERN

@@ -37,6 +37,7 @@ describe EventStream::IndexStrategy::Cassandra do
     end
 
     @stream = double("stream",
+                     backend_strategy: :cassandra,
                      database: @database,
                      record_type: EventStream::Record,
                      ttl_seconds: 1.year,
@@ -420,6 +421,7 @@ describe EventStream::IndexStrategy::Cassandra do
       @table = double("table")
       table = @table
       @stream = EventStream::Stream.new do
+        backend_strategy :cassandra
         database database
         self.table table
       end

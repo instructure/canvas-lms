@@ -74,7 +74,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
   it "updates the read state" do
     expect(@discussion_entry.read?(@discussion_entry.user)).to be true
     result = run_mutation({ id: @discussion_entry.id, read: false })
-    expect(result["errors"]).to be nil
+    expect(result["errors"]).to be_nil
     expect(
       result.dig(
         "data",
@@ -90,10 +90,10 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
 
   it "updates the entry rating" do
     @discussion_entry.discussion_topic.update!(allow_rating: true)
-    expect(@discussion_entry.rating(@discussion_entry.user)).to be nil
+    expect(@discussion_entry.rating(@discussion_entry.user)).to be_nil
     result = run_mutation({ id: @discussion_entry.id, rating: "liked" })
 
-    expect(result["errors"]).to be nil
+    expect(result["errors"]).to be_nil
     expect(
       result.dig(
         "data",
@@ -115,9 +115,9 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
   end
 
   it "updates the report type" do
-    expect(@discussion_entry.report_type?(@discussion_entry.user)).to be nil
+    expect(@discussion_entry.report_type?(@discussion_entry.user)).to be_nil
     result = run_mutation({ id: @discussion_entry.id, report_type: "other" })
-    expect(result["errors"]).to be nil
+    expect(result["errors"]).to be_nil
     expect(
       result.dig(
         "data",
@@ -137,7 +137,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
       it "updates the forcedReadState to true" do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be true
         result = run_mutation({ id: @discussion_entry.id, read: false, forcedReadState: true })
-        expect(result["errors"]).to be nil
+        expect(result["errors"]).to be_nil
         expect(
           result.dig(
             "data",
@@ -164,7 +164,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
       it "updates the forcedReadState to false" do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be true
         result = run_mutation({ id: @discussion_entry.id, read: false, forcedReadState: false })
-        expect(result["errors"]).to be nil
+        expect(result["errors"]).to be_nil
         expect(
           result.dig(
             "data",
@@ -197,7 +197,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
       it "updates the forcedReadState to true" do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be false
         result = run_mutation({ id: @discussion_entry.id, read: true, forcedReadState: true })
-        expect(result["errors"]).to be nil
+        expect(result["errors"]).to be_nil
         expect(
           result.dig(
             "data",
@@ -224,7 +224,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
       it "updates the forcedReadState to false" do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be false
         result = run_mutation({ id: @discussion_entry.id, read: true, forcedReadState: false })
-        expect(result["errors"]).to be nil
+        expect(result["errors"]).to be_nil
         expect(
           result.dig(
             "data",

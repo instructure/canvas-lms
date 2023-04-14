@@ -19,11 +19,11 @@ import $ from 'jquery'
 import _ from 'underscore'
 import {Model} from '@canvas/backbone'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
-import TurnitinSettings from '../../TurnitinSettings.coffee'
-import VeriCiteSettings from '../../VeriCiteSettings.coffee'
+import TurnitinSettings from '../../TurnitinSettings'
+import VeriCiteSettings from '../../VeriCiteSettings'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
-import AssignmentOverrideCollection from '../collections/AssignmentOverrideCollection.coffee'
-import DateGroupCollection from '@canvas/date-group/backbone/collections/DateGroupCollection.coffee'
+import AssignmentOverrideCollection from '../collections/AssignmentOverrideCollection'
+import DateGroupCollection from '@canvas/date-group/backbone/collections/DateGroupCollection'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 import tz from '@canvas/timezone'
@@ -640,7 +640,8 @@ export default class Assignment extends Model
       id: @get('id'),
       is_master_course_child_content: @get('is_master_course_child_content'),
       restricted_by_master_course: @get('restricted_by_master_course'),
-      master_course_restrictions: @get('master_course_restrictions')
+      master_course_restrictions: @get('master_course_restrictions'),
+      restrict_quantitative_data: @restrictQuantitativeData()
     for field in fields
       hash[field] = @[field]()
     hash

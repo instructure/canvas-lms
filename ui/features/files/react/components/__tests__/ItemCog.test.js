@@ -25,7 +25,7 @@ import {screen} from '@testing-library/dom'
 import fetchMock from 'fetch-mock'
 import $ from 'jquery'
 import ItemCog from '../ItemCog'
-import File from '@canvas/files/backbone/models/File.coffee'
+import File from '@canvas/files/backbone/models/File'
 import Folder from '@canvas/files/backbone/models/Folder'
 
 const {Simulate} = TestUtils

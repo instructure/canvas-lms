@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
-import EditHeaderView from 'ui/features/assignment_edit/backbone/views/EditHeaderView.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
+import EditHeaderView from 'ui/features/assignment_edit/backbone/views/EditHeaderView'
 import editViewTemplate from 'ui/features/assignment_edit/jst/EditView.handlebars'
 import fakeENV from 'helpers/fakeENV'
 import Backbone from '@canvas/backbone'

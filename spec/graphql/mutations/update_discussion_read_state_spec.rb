@@ -64,7 +64,7 @@ RSpec.describe Mutations::UpdateDiscussionReadState do
   it "marks all as unread" do
     @topic.change_all_read_state(:read, @teacher)
     result = run_mutation({ id: @topic.id, read: false })
-    expect(result["errors"]).to be nil
+    expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionReadState", "discussionTopic", "title")).to eq @topic.title
     scope = @topic.discussion_entry_participants.where(user: @teacher)
                   .where.not(discussion_entries: { workflow_state: "deleted" })
@@ -75,7 +75,7 @@ RSpec.describe Mutations::UpdateDiscussionReadState do
     expect(@topic.unread_count(@teacher)).to eq 5
     result = run_mutation({ id: @topic.id, read: true })
     expect(@topic.unread_count(@teacher)).to eq 0
-    expect(result["errors"]).to be nil
+    expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionReadState", "discussionTopic", "title")).to eq @topic.title
     scope = @topic.discussion_entry_participants.where(user: @teacher)
                   .where.not(discussion_entries: { workflow_state: "deleted" })

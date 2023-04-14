@@ -119,10 +119,10 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
 
       it "continues w/o error when given already graded ids" do
         Quizzes::SubmissionGrader.new(@submission).grade_submission
-        expect(@submission.needs_grading?).to eq false
+        expect(@submission.needs_grading?).to be false
         api_grade({ raw: true }, { quiz_submission_ids: [@submission.id, @submission2.id] })
         @submission2.reload
-        expect(@submission2.needs_grading?).to eq false
+        expect(@submission2.needs_grading?).to be false
         expect(Quizzes::OutstandingQuizSubmissionManager.new(@quiz).find_by_quiz.size).to eq 0
         assert_status 204
       end

@@ -26,7 +26,7 @@ describe DataFixup::SplitUpUserPreferences do
     User.where(id: u).update_all(preferences: original_prefs)
     DataFixup::SplitUpUserPreferences.run(nil, nil)
     u.reload
-    expect(u.reload.needs_preference_migration?).to eq false
+    expect(u.reload.needs_preference_migration?).to be false
     rows = u.user_preference_values.to_a.index_by { |v| [v.key, v.sub_key] }
     expect(rows.count).to eq 2
     expect(rows[["selected_calendar_contexts", nil]].value).to eq ["course_1000"]

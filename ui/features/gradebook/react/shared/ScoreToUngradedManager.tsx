@@ -56,7 +56,7 @@ class ScoreToUngradedManager {
 
     if (existingProcess) {
       const workflowState = existingProcess.workflowState
-      if (!['completed', 'failed'].includes(workflowState)) {
+      if (!['completed', 'failed'].includes(workflowState || '')) {
         this.process = existingProcess
       }
     }
@@ -96,7 +96,7 @@ class ScoreToUngradedManager {
     }, this.pollingInterval)
   }
 
-  startProcess(courseId: string, options) {
+  startProcess(courseId?: string, options: any = {}) {
     if (this.process) {
       return Promise.reject(I18n.t('A process is already in progress.'))
     }

@@ -111,7 +111,7 @@ module AssignmentsHelper
 
   def i18n_grade(grade, grading_type = nil)
     if grading_type == "pass_fail" && %w[complete incomplete].include?(grade)
-      return grade == "complete" ? I18n.t("Complete") : I18n.t("Incomplete")
+      return (grade == "complete") ? I18n.t("Complete") : I18n.t("Incomplete")
     end
 
     number = Float(grade.sub(/%$/, "")) rescue nil

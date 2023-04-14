@@ -117,11 +117,11 @@ describe BasicLTI::BasicOutcomes do
           )
         end
 
-        it { is_expected.to eq true }
+        it { is_expected.to be true }
       end
 
       context "when the needsAdditionalReview element is absent" do
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
     end
   end
@@ -270,7 +270,7 @@ describe BasicLTI::BasicOutcomes do
       it "returns false" do
         response = BasicLTI::BasicOutcomes::LtiResponse.new(xml)
         result = response.handle_request(tool)
-        expect(result).to eq false
+        expect(result).to be false
       end
 
       it "does not report a total count metric" do
@@ -384,7 +384,7 @@ describe BasicLTI::BasicOutcomes do
       expect(request.body).to eq "<replaceResultResponse />"
       expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
-      expected_value = assignment.points_possible * 0.92.to_d
+      expected_value = assignment.points_possible * BigDecimal("0.92")
       expect(submission.grade).to eq expected_value.to_s
     end
 
@@ -798,7 +798,7 @@ describe BasicLTI::BasicOutcomes do
         expect(request.body).to eq "<replaceResultResponse />"
         expect(request.handle_request(tool)).to be_truthy
         submission = assignment.submissions.where(user_id: @user1.id).first
-        expected_value = assignment.points_possible * 0.92.to_d
+        expected_value = assignment.points_possible * BigDecimal("0.92")
         expect(submission.grade).to eq expected_value.to_s
       end
     end

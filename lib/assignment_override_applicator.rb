@@ -264,7 +264,7 @@ module AssignmentOverrideApplicator
 
           model_version <= assignment_or_quiz.version_number
         end
-        override_version ? override_version.model : nil
+        override_version&.model
       else
         override
       end
@@ -293,7 +293,7 @@ module AssignmentOverrideApplicator
 
     # ActiveRecord::Base#clone wipes out some important crap; put it back
     %i[id updated_at created_at].each do |attr|
-      clone[attr] = assignment.send(attr)
+      clone[attr] = assignment[attr]
     end
     copy_preloaded_associations_to_clone(assignment, clone)
     yield(clone) if block_given?
@@ -368,7 +368,7 @@ module AssignmentOverrideApplicator
   # turn the list of overrides into a unique but consistent cache key component
   def self.overrides_hash(overrides)
     canonical = overrides.map(&:cache_key).inspect
-    Digest::MD5.hexdigest(canonical)
+    Digest::SHA256.hexdigest(canonical)
   end
 
   # perform overrides of specific fields
@@ -450,7 +450,7 @@ module AssignmentOverrideApplicator
   def self.should_preload_override_students?(assignments, user, endpoint_key)
     return false unless user
 
-    assignment_key = Digest::MD5.hexdigest(assignments.map(&:id).sort.map(&:to_s).join(","))
+    assignment_key = Digest::SHA256.hexdigest(assignments.map(&:id).sort.map(&:to_s).join(","))
     key = ["should_preload_assignment_override_students", user.cache_key(:enrollments), user.cache_key(:groups), endpoint_key, assignment_key].cache_key
     # if the user has been touch we should preload all of the overrides because it's almost certain we'll need them all
     if Rails.cache.read(key)

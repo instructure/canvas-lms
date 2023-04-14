@@ -255,8 +255,8 @@ describe UserMerge do
         attachment_model context: user1
         submission = assignment.submit_homework user1, attachments: [@attachment]
         UserMerge.from(user2).into(user1)
-        expect(user2.reload.submissions.length).to eql(0)
-        expect(user1.reload.submissions.length).to eql(1)
+        expect(user2.reload.submissions.length).to be(0)
+        expect(user1.reload.submissions.length).to be(1)
         expect(user1.submissions.map(&:id)).to be_include(submission.id)
       end
 
@@ -284,8 +284,8 @@ describe UserMerge do
         assignment2.grade_student(user2, grader: @teacher, grade: 10)
         submission2 = Submission.where(user_id: user2, assignment_id: assignment2).graded.take
         UserMerge.from(user2).into(user1)
-        expect(user2.reload.submissions.length).to eql(0)
-        expect(user1.reload.submissions.length).to eql(2)
+        expect(user2.reload.submissions.length).to be(0)
+        expect(user1.reload.submissions.length).to be(2)
         expect(user1.submissions.map(&:id)).to be_include(submission.id)
         expect(user1.submissions.map(&:id)).not_to be_include(submission2.id)
       end
@@ -303,14 +303,14 @@ describe UserMerge do
       s3 = a2.find_or_create_submission(user2)
       s3.submission_type = "online_quiz"
       s3.save!
-      expect(user2.submissions.length).to eql(2)
-      expect(user1.submissions.length).to eql(1)
+      expect(user2.submissions.length).to be(2)
+      expect(user1.submissions.length).to be(1)
       UserMerge.from(user2).into(user1)
       user2.reload
       user1.reload
-      expect(user2.submissions.length).to eql(1)
+      expect(user2.submissions.length).to be(1)
       expect(user2.submissions.first.id).to eql(s2.id)
-      expect(user1.submissions.length).to eql(2)
+      expect(user1.submissions.length).to be(2)
       expect(user1.submissions.map(&:id)).to be_include(s1.id)
       expect(user1.submissions.map(&:id)).to be_include(s3.id)
     end
@@ -585,16 +585,16 @@ describe UserMerge do
       add_linked_observer(user1, observer1)
       add_linked_observer(user1, observer2)
       add_linked_observer(user2, observer2)
-      expect(ObserverEnrollment.count).to eql 3
+      expect(ObserverEnrollment.count).to be 3
       Enrollment.where(user_id: observer2, associated_user_id: user1).update_all(workflow_state: "completed")
 
       UserMerge.from(user1).into(user2)
-      expect(user1.observee_enrollments.size).to eql 1 # deleted
+      expect(user1.observee_enrollments.size).to be 1 # deleted
       expect(user1.observee_enrollments.active_or_pending).to be_empty
-      expect(user2.observee_enrollments.size).to eql 2
-      expect(user2.observee_enrollments.active_or_pending.size).to eql 2
-      expect(observer1.observer_enrollments.active_or_pending.size).to eql 1
-      expect(observer2.observer_enrollments.active_or_pending.size).to eql 1
+      expect(user2.observee_enrollments.size).to be 2
+      expect(user2.observee_enrollments.active_or_pending.size).to be 2
+      expect(observer1.observer_enrollments.active_or_pending.size).to be 1
+      expect(observer2.observer_enrollments.active_or_pending.size).to be 1
     end
 
     it "moves and uniquify observers" do
@@ -652,12 +652,12 @@ describe UserMerge do
       UserMerge.from(user1).into(user2)
       expect(c1.reload.user_id).to eql user2.id
       expect(c1.conversation.participants).not_to include(user1)
-      expect(user1.reload.unread_conversations_count).to eql 0
+      expect(user1.reload.unread_conversations_count).to be 0
 
       expect(c2.reload.user_id).to eql user2.id
       expect(c2.conversation.participants).not_to include(user1)
       expect(c2.conversation.private_hash).not_to eql old_private_hash
-      expect(user2.reload.unread_conversations_count).to eql 2
+      expect(user2.reload.unread_conversations_count).to be 2
     end
 
     it "points other user's observers to the new user" do
@@ -785,7 +785,7 @@ describe UserMerge do
                                        body: "hi again"
                                      })
 
-        expect(s1.versions.count).to eql(2)
+        expect(s1.versions.count).to be(2)
         s1.versions.each { |v| expect(v.model.user_id).to eql(user2.id) }
         expect(s_other.versions.first.model.user_id).to eql(other_user.id)
 
@@ -793,7 +793,7 @@ describe UserMerge do
         s1 = Submission.find(s1.id)
         s_other.reload
 
-        expect(s1.versions.count).to eql(2)
+        expect(s1.versions.count).to be(2)
         s1.versions.each { |v| expect(v.model.user_id).to eql(user1.id) }
         expect(s_other.versions.first.model.user_id).to eql(other_user.id)
       end
@@ -811,12 +811,12 @@ describe UserMerge do
 
         versions = SubmissionVersion.where(version_id: submission.versions)
 
-        expect(versions.count).to eql(2)
+        expect(versions.count).to be(2)
         versions.each { |v| expect(v.user_id).to eql(user2.id) }
         UserMerge.from(user2).into(user1)
 
         versions.reload
-        expect(versions.count).to eql(2)
+        expect(versions.count).to be(2)
         versions.each { |v| expect(v.user_id).to eql(user1.id) }
       end
     end

@@ -79,13 +79,13 @@ class CoursePaceHardEndDateCompressor
     # This is how much time we're currently using
     plan_length_with_items = CoursePacesDateHelpers.days_between(
       start_date_of_item_group,
-      start_date_of_item_group > final_item_due_date ? start_date_of_item_group : final_item_due_date,
+      (start_date_of_item_group > final_item_due_date) ? start_date_of_item_group : final_item_due_date,
       course_pace.exclude_weekends,
       blackout_dates: blackout_dates
     )
 
     # This is the percentage that we should modify the plan by, so it hits our specified end date
-    compression_percentage = plan_length_with_items == 0 ? 0 : actual_plan_length / plan_length_with_items.to_f
+    compression_percentage = (plan_length_with_items == 0) ? 0 : actual_plan_length / plan_length_with_items.to_f
 
     unrounded_durations = items.map { |ppmi| ppmi.duration * compression_percentage }
     rounded_durations = round_durations(unrounded_durations, actual_plan_length)

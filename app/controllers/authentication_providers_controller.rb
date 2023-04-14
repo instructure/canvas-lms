@@ -739,7 +739,7 @@ class AuthenticationProvidersController < ApplicationController
     if aac.auth_type != data[:auth_type]
       render(json: {
                message: t("no_changing_auth_types",
-                          "Can not change type of authorization config, "\
+                          "Can not change type of authorization config, " \
                           "please delete and create new config.")
              },
              status: :bad_request)

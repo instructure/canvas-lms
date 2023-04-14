@@ -25,7 +25,7 @@ describe CC::Importer::CCWorker do
     cm.reset_job_progress
     expect_any_instance_of(CC::Importer::Canvas::Converter).to receive(:export).and_return({})
     worker = CC::Importer::CCWorker.new(cm.id)
-    expect(worker.perform).to eq true
+    expect(worker.perform).to be true
     expect(cm.reload.migration_settings[:worker_class]).to eq "CC::Importer::Canvas::Converter"
   end
 
@@ -34,7 +34,7 @@ describe CC::Importer::CCWorker do
                                                         no_archive_file: true, skip_job_progress: true }, context: course_factory)
     expect_any_instance_of(CC::Importer::Canvas::Converter).to receive(:export).and_return({})
     worker = CC::Importer::CCWorker.new(cm.id)
-    expect(worker.perform).to eq true
+    expect(worker.perform).to be true
     expect(cm.skip_job_progress).to be_truthy
   end
 end

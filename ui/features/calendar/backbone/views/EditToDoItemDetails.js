@@ -25,8 +25,8 @@ import '@canvas/datetime'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import 'date-js'
-import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
-import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
+import fcUtil from '@canvas/calendar/jquery/fcUtil'
+import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import '../../fcMomentHandlebarsHelpers'
 
 const I18n = useI18nScope('calendar')

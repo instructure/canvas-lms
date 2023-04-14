@@ -162,7 +162,7 @@ describe "better_file_browsing, folders" do
       f(".ef-name-col > a.ef-name-col__link").click
       wait_for_ajaximations
       1.upto(15) do |number_of_folders|
-        folder_regex = number_of_folders > 1 ? Regexp.new("New Folder\\s#{number_of_folders}") : "New Folder"
+        folder_regex = (number_of_folders > 1) ? Regexp.new("New Folder\\s#{number_of_folders}") : "New Folder"
         create_new_folder
         expect(all_files_folders.count).to eq number_of_folders
         expect(all_files_folders.last.text).to match folder_regex

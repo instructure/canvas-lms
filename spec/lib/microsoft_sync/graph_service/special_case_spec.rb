@@ -49,8 +49,7 @@ describe MicrosoftSync::GraphService::SpecialCase do
   end
 
   it "instantiates the value if it is a class" do
-    expect(described_class.match(cases, status_code: 401, body: "=myclass!")).to \
-      be_instance_of(my_class)
+    expect(described_class.match(cases, status_code: 401, body: "=myclass!")).to be_instance_of(my_class)
   end
 
   context "when passed in a block which gets a Response object" do

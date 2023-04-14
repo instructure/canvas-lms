@@ -243,7 +243,7 @@ class SubmissionsBaseController < ApplicationController
   private
 
   def update_student_entered_score(score)
-    new_score = score.present? && score != "null" ? score.to_f.round(2) : nil
+    new_score = (score.present? && score != "null") ? score.to_f.round(2) : nil
     # TODO: fix this by making the callback optional
     # intentionally skipping callbacks here to fix a bug where entering a
     # what-if grade for a quiz can put the submission back in a 'pending review' state
@@ -257,7 +257,7 @@ class SubmissionsBaseController < ApplicationController
   end
 
   def legacy_plagiarism_report(submission, asset_string, type)
-    plag_data = type == "vericite" ? submission.vericite_data : submission.turnitin_data
+    plag_data = (type == "vericite") ? submission.vericite_data : submission.turnitin_data
 
     if plag_data.dig(asset_string, :report_url).present?
       polymorphic_url([:retrieve, @context, :external_tools], url: plag_data[asset_string][:report_url], display: "borderless")

@@ -114,7 +114,7 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
         expect(submission.versions.count).to be(submission_version_data.count + 1)
         versions = submission.versions.map(&:model).sort_by(&:submitted_at)
         data = submission_version_data.sort_by { |x| x[:submitted_at] }
-        (0..3).each do |i|
+        4.times do |i|
           d = data[i]
           v = versions[i]
           expect(d[:submitted_at]).to eq(v.submitted_at)

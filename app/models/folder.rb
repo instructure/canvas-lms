@@ -258,7 +258,7 @@ class Folder < ActiveRecord::Base
   end
 
   def hidden=(val)
-    self.workflow_state = (val == true || val == "1" || val == "true" ? "hidden" : "visible")
+    self.workflow_state = ((val == true || val == "1" || val == "true") ? "hidden" : "visible")
   end
 
   def just_hide

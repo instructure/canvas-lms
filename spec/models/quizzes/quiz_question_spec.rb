@@ -34,9 +34,9 @@ describe Quizzes::QuizQuestion do
     data = q.data
     expect(data[:assessment_question_id]).to eql(a.id)
     expect(data[:answers]).not_to be_empty
-    expect(data[:answers].length).to eql(2)
+    expect(data[:answers].length).to be(2)
     expect(data[:answers][0][:weight]).to eq 100
-    expect(data[:answers][1][:weight]).to eql(0.0)
+    expect(data[:answers][1][:weight]).to be(0.0)
   end
 
   context "blank answers for fill_in[_multiple]_blank[s] questions" do

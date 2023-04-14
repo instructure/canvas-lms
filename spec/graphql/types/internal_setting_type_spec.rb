@@ -30,7 +30,7 @@ describe Types::InternalSettingType do
     expect(type.resolve("_id")).to eq setting.id.to_s
     expect(type.resolve("name")).to eq "test_setting"
     expect(type.resolve("value")).to eq "test_value"
-    expect(type.resolve("secret")).to eq false
+    expect(type.resolve("secret")).to be false
   end
 
   context "when the setting is marked as secret" do
@@ -40,7 +40,7 @@ describe Types::InternalSettingType do
       expect(type.resolve("_id")).to eq secret_setting.id.to_s
       expect(type.resolve("name")).to eq "secret_setting"
       expect(type.resolve("value")).to be_nil
-      expect(type.resolve("secret")).to eq true
+      expect(type.resolve("secret")).to be true
     end
   end
 

@@ -36,7 +36,7 @@ describe CommMessagesApiController, type: :request do
                             controller: "comm_messages_api", action: "index", format: "json",
                             user_id: @test_user.to_param
                           })
-          expect(json.size).to eql 2
+          expect(json.size).to be 2
           expect(EmailAddressValidator.valid?(json.first["from"])).to be_truthy
           expect(json.first["from_name"]).to eq "Instructure Canvas"
           expect(json.map { |m| m["body"] }.sort).to eql ["account message", "site admin message"]
@@ -79,19 +79,19 @@ describe CommMessagesApiController, type: :request do
                             controller: "comm_messages_api", action: "index", format: "json",
                             user_id: @test_user.to_param, per_page: "2"
                           })
-          expect(json.size).to eql 2
+          expect(json.size).to be 2
 
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}&per_page=2&page=2", {
                             controller: "comm_messages_api", action: "index", format: "json",
                             user_id: @test_user.to_param, per_page: "2", page: "2"
                           })
-          expect(json.size).to eql 2
+          expect(json.size).to be 2
 
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}&per_page=2&page=3", {
                             controller: "comm_messages_api", action: "index", format: "json",
                             user_id: @test_user.to_param, per_page: "2", page: "3"
                           })
-          expect(json.size).to eql 1
+          expect(json.size).to be 1
         end
       end
 
@@ -139,7 +139,7 @@ describe CommMessagesApiController, type: :request do
                             controller: "comm_messages_api", action: "index", format: "json",
                             user_id: @test_user.to_param
                           })
-          expect(json.size).to eql 1
+          expect(json.size).to be 1
           expect(json.map { |m| m["body"] }.sort).to eql ["account message"]
         end
       end

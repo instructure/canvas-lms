@@ -56,7 +56,7 @@ describe EportfolioEntry do
       attachment_model(context: @user)
       @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "attachment", attachment_id: @attachment.id } })
       expect(@eportfolio_entry.content).not_to be_nil
-      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content.length).to be(1)
       expect(@eportfolio_entry.content[0][:section_type]).to eql("attachment")
       expect(@eportfolio_entry.content[0][:attachment_id]).to eql(@attachment.id)
     end
@@ -65,12 +65,12 @@ describe EportfolioEntry do
       attachment_model(context: User.create)
       @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "attachment", attachment_id: @attachment.id } })
       expect(@eportfolio_entry.content).not_to be_nil
-      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content.length).to be(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
 
       @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "attachment" } })
       expect(@eportfolio_entry.content).not_to be_nil
-      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content.length).to be(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
 
@@ -78,7 +78,7 @@ describe EportfolioEntry do
       submission_model(user: @user)
       @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "submission", submission_id: @submission.id } })
       expect(@eportfolio_entry.content).not_to be_nil
-      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content.length).to be(1)
       expect(@eportfolio_entry.content[0][:section_type]).to eql("submission")
       expect(@eportfolio_entry.content[0][:submission_id]).to eql(@submission.id)
     end
@@ -90,19 +90,19 @@ describe EportfolioEntry do
       submission_model(user: @user)
       @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "submission", submission_id: @bad_submission.id } })
       expect(@eportfolio_entry.content).not_to be_nil
-      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content.length).to be(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
 
       @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "submission" } })
       expect(@eportfolio_entry.content).not_to be_nil
-      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content.length).to be(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
 
     it "accepts valid html content" do
       @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "html", content: "<a onclick='javascript: alert(5);' href='#bob;'>link</a>" } })
       expect(@eportfolio_entry.content).not_to be_nil
-      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content.length).to be(1)
       expect(@eportfolio_entry.content[0][:section_type]).to eql("html")
       expect(@eportfolio_entry.content[0][:content]).to match(/\#bob/)
       expect(@eportfolio_entry.content[0][:content]).to match(/link/)
@@ -113,14 +113,14 @@ describe EportfolioEntry do
     it "does not accept invalid html content" do
       @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "html" } })
       expect(@eportfolio_entry.content).not_to be_nil
-      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content.length).to be(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
 
     it "accepts valid rich content" do
       @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "rich_text", content: "<a onclick='javascript: alert(5);' href='#bob;'>link</a>" } })
       expect(@eportfolio_entry.content).not_to be_nil
-      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content.length).to be(1)
       expect(@eportfolio_entry.content[0][:section_type]).to eql("rich_text")
       expect(@eportfolio_entry.content[0][:content]).to match(/\#bob/)
       expect(@eportfolio_entry.content[0][:content]).to match(/link/)
@@ -131,7 +131,7 @@ describe EportfolioEntry do
     it "does not accept invalid rich content" do
       @eportfolio_entry.parse_content({ section_count: 1, section_1: { section_type: "rich_text", content: "<blink/>" } })
       expect(@eportfolio_entry.content).not_to be_nil
-      expect(@eportfolio_entry.content.length).to eql(1)
+      expect(@eportfolio_entry.content.length).to be(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
   end

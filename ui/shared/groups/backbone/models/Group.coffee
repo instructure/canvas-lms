@@ -17,7 +17,7 @@
 #
 
 import Backbone from '@canvas/backbone'
-import GroupUserCollection from '../collections/GroupUserCollection.coffee'
+import GroupUserCollection from '../collections/GroupUserCollection'
 
 export default class Group extends Backbone.Model
   modelType: 'group'

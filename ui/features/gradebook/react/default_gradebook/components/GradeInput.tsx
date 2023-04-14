@@ -280,7 +280,7 @@ export default class GradeInput extends Component<Props, State> {
         id="grade-detail-tray--grade-input"
         interaction={interaction}
         messages={messages}
-        // @ts-ignore
+        // @ts-expect-error
         onInput={this.handleTextChange}
         onBlur={this.handleTextBlur}
         placeholder="–"

@@ -30,11 +30,11 @@ describe CanvasBreachMitigation::MaskingSecrets do
     it "puts :_csrf_token into the supplied object" do
       hash = {}
       masking_secrets.masked_authenticity_token(hash)
-      expect(hash["_csrf_token"]).not_to be nil
+      expect(hash["_csrf_token"]).not_to be_nil
     end
 
     it "returns a byte string" do
-      expect(masking_secrets.masked_authenticity_token({})).not_to be nil
+      expect(masking_secrets.masked_authenticity_token({})).not_to be_nil
     end
   end
 

@@ -47,6 +47,7 @@ class K5::UserService
   def use_classic_font?
     return false unless Account.site_admin.feature_enabled?(:k5_font_selection)
     return false unless @actual_user
+    return false unless k5_user?
 
     RequestCache.cache("use_classic_font", @actual_user, @observed_user, @root_account) do
       set_observer_variables

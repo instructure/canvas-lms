@@ -27,7 +27,7 @@ module CC::Importer::Canvas
 
       blueprint_settings = doc.at_css("blueprint_settings")
       hash["use_default_restrictions_by_type"] = get_bool_val(blueprint_settings, "use_default_restrictions_by_type", false)
-      hash["restrictions"] = blueprint_settings.css("restrictions > restriction").map { |node| convert_restriction(node) }.to_h
+      hash["restrictions"] = blueprint_settings.css("restrictions > restriction").to_h { |node| convert_restriction(node) }
       hash["restricted_items"] = blueprint_settings.css("restricted_items > item").map { |node| convert_item(node) }
 
       hash

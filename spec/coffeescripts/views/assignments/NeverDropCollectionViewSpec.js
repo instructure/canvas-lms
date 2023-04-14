@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import NeverDropCollection from 'ui/features/assignment_index/backbone/collections/NeverDropCollection.coffee'
-import NeverDropCollectionView from 'ui/features/assignment_index/backbone/views/NeverDropCollectionView.coffee'
+import NeverDropCollection from 'ui/features/assignment_index/backbone/collections/NeverDropCollection'
+import NeverDropCollectionView from 'ui/features/assignment_index/backbone/views/NeverDropCollectionView'
 import {useNormalDebounce, useOldDebounce} from 'helpers/util'
 
 class AssignmentStub extends Backbone.Model {

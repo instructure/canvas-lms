@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.describe CourseScoreStatistic, type: :model do
+RSpec.describe CourseScoreStatistic do
   describe "relationships" do
     it { is_expected.to belong_to(:course).required }
   end
@@ -32,10 +32,10 @@ RSpec.describe CourseScoreStatistic, type: :model do
   end
 
   describe "#grades_presenter_hash" do
-    let(:course_score_statistic) { CourseScoreStatistic.new(course_id: 123, average: 12.23.to_d, score_count: 2) }
+    let(:course_score_statistic) { CourseScoreStatistic.new(course_id: 123, average: BigDecimal("12.23"), score_count: 2) }
 
     it "returns the data in the grades presenter expected shape and keys" do
-      expect(course_score_statistic.grades_presenter_hash).to eq({ score: 12.23.to_d, students: 2 })
+      expect(course_score_statistic.grades_presenter_hash).to eq({ score: BigDecimal("12.23"), students: 2 })
     end
   end
 end

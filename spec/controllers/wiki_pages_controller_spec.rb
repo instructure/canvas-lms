@@ -187,7 +187,7 @@ describe WikiPagesController do
         it "allows edit" do
           get "edit", params: { course_id: @course.id, id: @page.url }
           expect(response.code).to eq "200"
-          expect(controller.js_env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
+          expect(controller.js_env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to be false
         end
 
         it "allows revisions" do

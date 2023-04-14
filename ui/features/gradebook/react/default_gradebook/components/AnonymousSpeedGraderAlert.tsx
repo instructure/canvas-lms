@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -18,7 +17,6 @@
  */
 
 import React from 'react'
-import {func, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
@@ -29,13 +27,21 @@ import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('gradebook')
 
-class AnonymousSpeedGraderAlert extends React.Component {
-  static propTypes = {
-    speedGraderUrl: string.isRequired,
-    onClose: func.isRequired,
-  }
+type Props = {
+  speedGraderUrl: string
+  onClose: () => void
+}
 
-  constructor(props) {
+type State = {
+  isOpen: boolean
+}
+
+class AnonymousSpeedGraderAlert extends React.Component<Props, State> {
+  openButton: React.LegacyRef<Button>
+
+  cancelButton: React.LegacyRef<Button>
+
+  constructor(props: Props) {
     super(props)
 
     this.state = {isOpen: false}
@@ -43,13 +49,8 @@ class AnonymousSpeedGraderAlert extends React.Component {
     this.open = this.open.bind(this)
     this.close = this.close.bind(this)
 
-    this.bindOpenButton = ref => {
-      this.openButton = ref
-    }
-
-    this.bindCancelButton = ref => {
-      this.cancelButton = ref
-    }
+    this.openButton = React.createRef()
+    this.cancelButton = React.createRef()
   }
 
   open() {
@@ -80,13 +81,13 @@ class AnonymousSpeedGraderAlert extends React.Component {
 
             <Grid.Row hAlign="end">
               <Grid.Col width="auto">
-                <Button ref={this.bindCancelButton} onClick={this.close}>
+                <Button ref={this.cancelButton} onClick={this.close}>
                   {I18n.t('Cancel')}
                 </Button>
 
                 <Button
                   margin="auto auto auto small"
-                  ref={this.bindOpenButton}
+                  ref={this.openButton}
                   href={this.props.speedGraderUrl}
                   color="primary"
                 >

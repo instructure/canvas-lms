@@ -30,7 +30,6 @@ module Factories
   end
 
   def valid_rubric_assessment_attributes
-    {
-    }
+    {}
   end
 end

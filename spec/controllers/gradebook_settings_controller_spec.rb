@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.describe GradebookSettingsController, type: :controller do
+RSpec.describe GradebookSettingsController do
   let(:teacher) { course_with_teacher.user }
 
   before do

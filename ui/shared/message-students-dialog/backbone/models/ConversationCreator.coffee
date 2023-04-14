@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import _ from 'lodash'
-import Conversation from './Conversation.coffee'
+import Conversation from './Conversation'
 
 export default class ConversationCreator
   constructor: (opts) ->

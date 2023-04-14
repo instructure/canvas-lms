@@ -28,9 +28,9 @@ def gem_override(name, version)
 end
 
 gem "bootsnap", "1.13.0", require: false
-gem "rails", "7.0.3"
+gem "rails", "~> 7.0.4"
 gem "tzinfo", "2.0.4"
-gem_override "switchman", "3.3.7"
+gem_override "switchman", "3.4.1"
 gem "guardrail", "3.0.2"
 gem_override "switchman-inst-jobs", "4.0.13"
 gem "irb", "1.4.1"
@@ -40,18 +40,16 @@ gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
 gem "active_model_serializers", "0.9.0alpha1",
     github: "rails-api/active_model_serializers", ref: "61882e1e4127facfe92e49057aec71edbe981829"
 gem "activerecord-pg-extensions", "0.4.4"
-gem "addressable", "2.7.0", require: false
+gem "addressable", "~> 2.8", require: false
 gem "after_transaction_commit", "2.2.2"
 gem "authlogic", "6.4.2"
   gem "scrypt", "3.0.7"
-gem "aws-sdk-core", "3.168.4", require: false
-gem "aws-sdk-dynamodb", "1.80.0"
-gem "aws-sdk-kinesis", "1.43.0", require: false
-gem "aws-sdk-s3", "1.117.2", require: false
-gem "aws-sdk-sns", "1.57.0", require: false
-gem "aws-sdk-sqs", "1.52.1", require: false
-gem "aws-sdk-kms", "1.61.0", require: false
-gem "aws-sigv4", "1.5.2", require: false
+gem "aws-sdk-dynamodb", "~> 1.83"
+gem "aws-sdk-kinesis", "~> 1.45", require: false
+gem "aws-sdk-kms", "~> 1.63", require: false
+gem "aws-sdk-s3", "~> 1.119", require: false
+gem "aws-sdk-sns", "~> 1.60", require: false
+gem "aws-sdk-sqs", "~> 1.53", require: false
 gem "barby", "0.6.8", require: false
   gem "rqrcode", "1.2.0", require: false
   gem "chunky_png", "1.4.0", require: false
@@ -75,7 +73,7 @@ gem "graphql-batch", "0.4.3"
 gem "hashery", "2.1.2", require: false
 gem "highline", "2.0.3", require: false
 gem "httparty", "0.18.1"
-gem "i18n", "1.9.1"
+gem "i18n", "~> 1.12"
 gem "i18nliner", "0.2.2", github: "instructure/i18nliner", ref: "ruby3"
 gem "icalendar", "2.7.0", require: false
 gem "diplomat", "2.6.3", require: false
@@ -91,7 +89,7 @@ gem "inst-jobs-statsd", "2.2.0"
 # the json gem is installed, it will always use that one even before bundler
 # gets activated. Updating the gem in it's own commit will make this easier.
 gem "json", "~> 2.6.1"
-gem "json_schemer", "0.2.16", github: "robotdana/json_schemer", ref: "0d2ac359a87964f74c07a14cafeb98cfcae4e29f"
+gem "json_schemer", "~> 0.2"
 gem "json-jwt", "1.13.0", require: false
 gem "link_header", "0.0.8"
 gem "mail", "2.7.1", require: false
@@ -110,6 +108,7 @@ gem "oj", "3.10.16"
 gem "outrigger", "3.0.1"
 gem "pdf-reader", "2.5.0"
 gem "pg_query", "2.2.0"
+gem "prawn-emoji", "~> 5.3", require: false
 gem "prawn-rails", "1.3.0"
   gem "matrix", "0.4.2" # Used to be a default gem but is no more, but prawn depends on it implicitly
 gem "prosopite", "~> 1.3"
@@ -145,9 +144,6 @@ gem "will_paginate", "3.3.0", require: false # required for folio-pagination
 
 gem "faraday", "0.17.4"
 
-path "engines" do
-  gem "audits"
-end
 path "gems" do
   gem "activesupport-suspend_callbacks"
   gem "acts_as_list"

@@ -78,7 +78,7 @@ module DataFixup::MoveFeatureFlagsToSettings
       when "off"
         override_value = false
       else
-        Rails.logger.warn("DataFixup::MoveFeatureFlagsToSettings => unable to handle override state for context "\
+        Rails.logger.warn("DataFixup::MoveFeatureFlagsToSettings => unable to handle override state for context " \
                           "#{context.asset_string} of feature #{override.id} with state #{override.state}")
       end
     end

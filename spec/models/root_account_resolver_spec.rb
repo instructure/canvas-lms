@@ -47,6 +47,7 @@ describe RootAccountResolver do
       extend RootAccountResolver
 
       def initialize(root_account_id)
+        super()
         @root_account_id = root_account_id
       end
 

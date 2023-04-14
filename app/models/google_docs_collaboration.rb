@@ -114,7 +114,7 @@ class GoogleDocsCollaboration < Collaboration
 
   def authorized_service_user_id_for(user)
     service = google_adapter_user_service(user)
-    service ? service.service_user_id : nil
+    service&.service_user_id
   end
 
   private

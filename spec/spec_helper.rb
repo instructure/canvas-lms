@@ -175,9 +175,9 @@ module ActionView::TestCase::Behavior
     if is_a?(RSpec::Rails::HelperExampleGroup)
       # the original implementation. we can't call super because
       # we replaced the whole original method
-      return _user_defined_ivars.map do |ivar|
+      return _user_defined_ivars.to_h do |ivar|
         [ivar[1..].to_sym, instance_variable_get(ivar)]
-      end.to_h
+      end
     end
     {}
   end
@@ -251,7 +251,7 @@ module ReadOnlySecondaryStub
 
   def switch_role!(env)
     if readonly_user_exists? && readonly_user_can_read?
-      ActiveRecord::Base.connection.execute(env == :secondary ? "SET ROLE canvas_readonly_user" : "RESET ROLE")
+      ActiveRecord::Base.connection.execute((env == :secondary) ? "SET ROLE canvas_readonly_user" : "RESET ROLE")
     else
       puts "The database #{test_db_name} is not setup with a secondary/readonly_user to fix run the following."
       puts "psql -c 'ALTER USER #{datbase_username} CREATEDB CREATEROLE' -d #{test_db_name}"
@@ -370,7 +370,7 @@ module RSpec::Matchers::Helpers
   # allows for matchers to use symbols and literals even though URIs are always strings.
   # i.e. `and_query({assignment_id: @assignment.id})`
   def self.cast_to_strings(expected:)
-    expected.map { |k, v| [k.to_s, v.to_s] }.to_h
+    expected.to_h { |k, v| [k.to_s, v.to_s] }
   end
 end
 
@@ -436,7 +436,6 @@ RSpec.configure do |config|
   config.include Factories
   config.include RequestHelper, type: :request
   config.include Onceler::BasicHelpers
-  config.include PGCollkeyHelper
   config.include ActionDispatch::TestProcess::FixtureFile
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
@@ -481,6 +480,8 @@ RSpec.configure do |config|
     TermsOfService.skip_automatic_terms_creation = true
     LiveEvents.clear_context!
     $spec_api_tokens = {}
+
+    remove_user_session
   end
 
   Notification.after_create do
@@ -972,7 +973,7 @@ module I18nStubs
   def lookup(locale, key, scope = [], options = {})
     return super unless @stubs
 
-    ensure_initialized
+    init_translations unless initialized?
     keys = I18n.normalize_keys(locale, key, scope, options[:separator])
     keys.inject(@stubs) { |h, k| h[k] if h.respond_to?(:key) } || super
   end
@@ -983,7 +984,7 @@ module I18nStubs
     super | @stubs.keys.map(&:to_sym)
   end
 end
-LazyPresumptuousI18nBackend.prepend(I18nStubs)
+I18n.backend.class.prepend(I18nStubs)
 
 Dir[Rails.root.join("{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb")].sort.each { |file| require file }
 

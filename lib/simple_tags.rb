@@ -43,7 +43,7 @@ module SimpleTags
       if conditions.empty?
         none
       else
-        where(conditions.join(options[:mode] == :or ? " OR " : " AND "))
+        where(conditions.join((options[:mode] == :or) ? " OR " : " AND "))
       end
     end
 

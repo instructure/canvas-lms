@@ -33,6 +33,7 @@ export const Assignment = {
       unlockAt(applyOverrides: false)
       onlyVisibleToOverrides
       pointsPossible
+      restrictQuantitativeData
       assignmentOverrides {
         nodes {
           ...AssignmentOverride
@@ -57,6 +58,7 @@ export const Assignment = {
     lockAt: string,
     unlockAt: string,
     onlyVisibleToOverrides: bool,
+    restrictQuantitativeData: bool,
     pointsPossible: number,
     assignmentOverrides: shape({nodes: arrayOf(AssignmentOverride.shape)}),
     assessmentRequest: arrayOf(AssessmentRequest.shape),
@@ -71,6 +73,7 @@ export const Assignment = {
     unlockAt = '2021-03-24T00:00:00-06:00',
     onlyVisibleToOverrides = false,
     pointsPossible = 10,
+    restrictQuantitativeData = false,
     assignmentOverrides = {
       nodes: [AssignmentOverride.mock()],
       __typename: 'AssignmentOverrideConnection',
@@ -87,6 +90,7 @@ export const Assignment = {
     pointsPossible,
     assignmentOverrides,
     assessmentRequestsForCurrentUser,
+    restrictQuantitativeData,
     peerReviews,
     __typename: 'Assignment',
   }),
@@ -99,6 +103,7 @@ export const DefaultMocks = {
     lockAt: '2021-03-27T13:22:24-06:00',
     unlockAt: '2021-03-21T13:22:24-06:00',
     onlyVisibleToOverrides: false,
+    restrictQuantitativeData: false,
     pointsPossible: 10,
     assignmentOverrides: {
       nodes: [AssignmentOverride.mock()],

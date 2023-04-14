@@ -138,8 +138,8 @@ class AssessmentQuestion < ActiveRecord::Base
       rescue => e
         new_file = nil
         er_id = Canvas::Errors.capture_exception(:file_clone_during_translate_links, e)[:error_report]
-        logger.error("Error while cloning attachment during"\
-                     " AssessmentQuestion#translate_links: "\
+        logger.error("Error while cloning attachment during " \
+                     "AssessmentQuestion#translate_links: " \
                      "id: #{self.id} error_report: #{er_id}")
       end
       new_file&.save

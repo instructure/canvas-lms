@@ -97,7 +97,7 @@ describe "Announcements API", type: :request do
                                             start_date: start_date, end_date: end_date))
 
       all_anns = @anns.map { |e| [e["context_code"], e["id"]] }
-      all_anns.concat([["course_#{@course1.id}", @ann1.id], ["course_#{@course2.id}", @ann2.id]])
+      all_anns.push(["course_#{@course1.id}", @ann1.id], ["course_#{@course2.id}", @ann2.id])
       expect(json.length).to eq 7
       expect(json.map { |e| [e["context_code"], e["id"]] }).to match_array all_anns
     end
@@ -289,7 +289,7 @@ describe "Announcements API", type: :request do
 
       expect(json.count).to eq(1)
       expect(json[0]["id"]).to eq(@announcement.id)
-      expect(json[0]["is_section_specific"]).to eq(true)
+      expect(json[0]["is_section_specific"]).to be(true)
     end
 
     it "teacher should be able to see section specific announcements and include sections" do
@@ -305,7 +305,7 @@ describe "Announcements API", type: :request do
 
       expect(json.count).to eq(1)
       expect(json[0]["id"]).to eq(@announcement.id)
-      expect(json[0]["is_section_specific"]).to eq(true)
+      expect(json[0]["is_section_specific"]).to be(true)
       expect(json[0]["sections"].count).to eq(1)
       expect(json[0]["sections"][0]["id"]).to eq(@section.id)
     end
@@ -323,7 +323,7 @@ describe "Announcements API", type: :request do
 
       expect(json.count).to eq(1)
       expect(json[0]["id"]).to eq(@announcement.id)
-      expect(json[0]["is_section_specific"]).to eq(true)
+      expect(json[0]["is_section_specific"]).to be(true)
       expect(json[0]["sections"].count).to eq(1)
       expect(json[0]["sections"][0]["id"]).to eq(@section.id)
       expect(json[0]["sections"][0]["user_count"]).to eq(1)
@@ -341,7 +341,7 @@ describe "Announcements API", type: :request do
 
       expect(json.count).to eq(1)
       expect(json[0]["id"]).to eq(@announcement.id)
-      expect(json[0]["is_section_specific"]).to eq(true)
+      expect(json[0]["is_section_specific"]).to be(true)
     end
 
     it "student not in section should not be able to see section specific announcements" do

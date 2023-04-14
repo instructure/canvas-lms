@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 import {each, extend, flatten, reject} from 'underscore'
-import PaginatedView from '@canvas/pagination/backbone/views/PaginatedView.coffee'
-import UserCollection from '@canvas/users/backbone/collections/UserCollection.coffee'
-import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection.coffee'
+import PaginatedView from '@canvas/pagination/backbone/views/PaginatedView'
+import UserCollection from '@canvas/users/backbone/collections/UserCollection'
+import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection'
 import collaboratorTemplate from '../../jst/collaborator.handlebars'
 
 export default class ListView extends PaginatedView

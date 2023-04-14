@@ -48,7 +48,7 @@ describe DiscussionTopicSectionVisibility do
         discussion_topic: @announcement,
         course_section: @section1
       )
-    expect(@announcement.valid?).to eq false
+    expect(@announcement.valid?).to be false
     errors = @announcement.discussion_topic_section_visibilities.first.errors[:discussion_topic_id]
     expect(errors).to eq ["Cannot add section to a non-section-specific discussion"]
   end
@@ -60,7 +60,7 @@ describe DiscussionTopicSectionVisibility do
         discussion_topic: @announcement,
         course_section: @section2 # section in wrong course
       )
-    expect(@announcement.valid?).to eq false
+    expect(@announcement.valid?).to be false
     errors = @announcement.discussion_topic_section_visibilities.first.errors[:course_section_id]
     expect(errors).to eq ["Section does not belong to course for this discussion topic"]
   end
@@ -72,9 +72,9 @@ describe DiscussionTopicSectionVisibility do
         discussion_topic: @announcement,
         course_section: @section1
       )
-    expect(@announcement.valid?).to eq true
+    expect(@announcement.valid?).to be true
     expect(@announcement.discussion_topic_section_visibilities.length).to eq 1
-    expect(@announcement.discussion_topic_section_visibilities.first.valid?).to eq true
+    expect(@announcement.discussion_topic_section_visibilities.first.valid?).to be true
   end
 
   def add_section_to_announcement(announcement, section)
@@ -108,17 +108,17 @@ describe DiscussionTopicSectionVisibility do
     # Two *different* announcements can have the same section.
     add_section_to_announcement(announcement2, section3a)
     announcement2.save!
-    expect(announcement2.discussion_topic_section_visibilities.first.valid?).to eq true
+    expect(announcement2.discussion_topic_section_visibilities.first.valid?).to be true
     bad_duplicate_visibility = DiscussionTopicSectionVisibility.new(
       discussion_topic: announcement1,
       course_section: section3a
     )
-    expect(bad_duplicate_visibility.valid?).to eq false
+    expect(bad_duplicate_visibility.valid?).to be false
     section3b_visibility = DiscussionTopicSectionVisibility.new(
       discussion_topic: announcement1,
       course_section: section3b
     )
-    expect(section3b_visibility.valid?).to eq true
+    expect(section3b_visibility.valid?).to be true
     section3b_visibility.save! # Should success because it's a different section
     # We needed to save the second section first because section specific topics
     # actually have to have sections
@@ -129,6 +129,6 @@ describe DiscussionTopicSectionVisibility do
       discussion_topic: announcement1,
       course_section: section3a
     )
-    expect(reborn_section3a_visibility.valid?).to eq true
+    expect(reborn_section3a_visibility.valid?).to be true
   end
 end

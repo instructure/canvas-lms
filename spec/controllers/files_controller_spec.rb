@@ -591,14 +591,14 @@ describe FilesController do
         get "show", params: { course_id: @course.id, id: @file.id, inline: 1 }
         expect(json_parse).to eq({ "ok" => true })
         @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
       it "marks files as viewed for module progressions if the file is downloaded" do
         file_in_a_module
         get "show", params: { course_id: @course.id, id: @file.id, download: 1 }
         @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
       it "marks files as viewed for module progressions if the file data is requested and is canvadocable" do
@@ -606,7 +606,7 @@ describe FilesController do
         allow_any_instance_of(Attachment).to receive(:canvadocable?).and_return true
         get "show", params: { course_id: @course.id, id: @file.id }, format: :json
         @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
       it "marks media files viewed when rendering html with file_preview" do
@@ -614,7 +614,7 @@ describe FilesController do
         file_in_a_module
         get "show", params: { course_id: @course.id, id: @file.id }, format: :html
         @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
       it "redirects to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
@@ -646,7 +646,7 @@ describe FilesController do
         unowned_file.destroy
 
         get "show", params: { course_id: @course.id, id: unowned_file.id }
-        expect(response.status).to eq(404)
+        expect(response).to have_http_status(:not_found)
         expect(assigns(:not_found_message)).to eq("This file has been deleted")
       end
 
@@ -658,7 +658,7 @@ describe FilesController do
 
         remove_user_session
         get "show", params: { course_id: @course.id, id: unowned_file.id }
-        expect(response.status).to eq(404)
+        expect(response).to have_http_status(:not_found)
         expect(assigns(:not_found_message)).to eq("This file has been deleted")
       end
 
@@ -1017,13 +1017,13 @@ describe FilesController do
       it "does not move a file into a submissions folder" do
         user_session(@student)
         put "update", params: { user_id: @student.id, id: @file.id, attachment: { folder_id: @sub_folder.id } }, format: "json"
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
 
       it "does not move a file out of a submissions folder" do
         user_session(@student)
         put "update", params: { user_id: @student.id, id: @sub_file.id, attachment: { folder_id: @root_folder.id } }, format: "json"
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
     end
 
@@ -1085,7 +1085,7 @@ describe FilesController do
     it "refuses to delete a file in a submissions folder" do
       file = @student.attachments.create! display_name: "blah", uploaded_data: default_uploaded_data, folder: @student.submissions_folder
       delete "destroy", params: { user_id: @student.id, id: file.id }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     context "file that has been submitted" do
@@ -1203,6 +1203,28 @@ describe FilesController do
       expect(json["upload_params"]["x-amz-credential"]).to start_with("stub_id")
     end
 
+    # This test verifies that an attachment on a graded discussion will not affect the files quota
+    it "allows going over quota for graded discussions submissions" do
+      s3_storage!
+      user_session(@student)
+      @assignment = @course.assignments.create!(title: "discussion assignment", submission_types: "discussion_topic")
+      Setting.set("user_default_quota", -1)
+      post "create_pending", params: { attachment: {
+        context_code: @assignment.context_code,
+        asset_string: @assignment.asset_string,
+        intent: "submit",
+        filename: "bob.txt"
+      }, format: :json }
+      expect(response).to be_successful
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment].id).not_to be_nil
+      json = json_parse
+      expect(json).not_to be_nil
+      expect(json["upload_url"]).not_to be_nil
+      expect(json["upload_params"]).to be_present
+      expect(json["upload_params"]["x-amz-credential"]).to start_with("stub_id")
+    end
+
     it "associates assignment submission for a group assignment with the group" do
       user_session(@student)
       category = group_category
@@ -1258,7 +1280,7 @@ describe FilesController do
         filename: "test.txt",
         folder_id: @student.submissions_folder.id
       } }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "creates a file in the submissions folder if intent=='submit'" do
@@ -1566,7 +1588,7 @@ describe FilesController do
           )
         end
         let(:progress) do
-          ::Progress
+          Progress
             .new(context: assignment, user: user, tag: :test)
             .tap(&:start)
             .tap(&:save!)
@@ -1617,7 +1639,7 @@ describe FilesController do
 
         context "with Progress tagged as :upload_via_url" do
           let(:progress) do
-            ::Progress
+            Progress
               .new(context: assignment, user: user, tag: :upload_via_url)
               .tap(&:start)
               .tap(&:save!)

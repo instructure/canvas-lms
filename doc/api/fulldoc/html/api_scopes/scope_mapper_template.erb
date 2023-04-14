@@ -20,7 +20,7 @@
 
 ###########################################################################################
 ###         This file is auto generated, any changes made directly will be lost.        ###
-###              To regenerate this file run `bundle exec rake doc:api                  ###
+###              To regenerate this file run `bundle exec rake doc:api`                 ###
 ###                                                                                     ###
 ###                   The template for this file is located here:                       ###
 ###                doc/api/fulldoc/html/api_scopes/scope_mapper_template.erb            ###
@@ -38,13 +38,13 @@ class ApiScopeMapper
 }.freeze
 
   RESOURCE_NAMES = {
-    oauth2: -> { I18n.t('OAuth 2') },
-    peer_services: -> { I18n.t('Peer Services') },
-    <%=resource_lookup.map { |k, v| "#{k}: -> { I18n.t('#{v}') }"}.join(",\n    " ) %>
+    oauth2: -> { I18n.t("OAuth 2") },
+    peer_services: -> { I18n.t("Peer Services") },
+    <%=resource_lookup.map { |k, v| "#{k}: -> { I18n.t(#{v.inspect}) }"}.join(",\n    " ) %>
   }.freeze
 
   def self.lookup_resource(controller, action)
-    controller_class = controller.to_s.split('/').last.to_sym
+    controller_class = controller.to_s.split("/").last.to_sym
     SCOPE_MAP.dig(controller_class, action)
   end
 

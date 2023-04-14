@@ -16,11 +16,11 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
+import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import GroupView from './GroupView'
 import GroupUsersView from './GroupUsersView'
 import GroupDetailView from './GroupDetailView'
-import Filterable from '../mixins/Filterable.coffee'
+import Filterable from '../mixins/Filterable'
 import template from '../../jst/groups.handlebars'
 
 export default class GroupsView extends PaginatedCollectionView {

@@ -22,7 +22,7 @@ import CommMessageCollection from 'ui/features/account_admin_tools/backbone/coll
 import AccountUserCollection from 'ui/features/account_admin_tools/backbone/collections/AccountUserCollection'
 import UserDateRangeSearchFormView from 'ui/features/account_admin_tools/backbone/views/UserDateRangeSearchFormView'
 import InputFilterView from '@canvas/backbone-input-filter-view'
-import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
+import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import UserView from 'ui/features/account_admin_tools/backbone/views/UserView'
 
 QUnit.module('UserDateRangeSearchFormView', {

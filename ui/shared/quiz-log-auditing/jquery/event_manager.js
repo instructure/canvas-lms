@@ -20,7 +20,7 @@ import K from './constants'
 import QuizEvent from './event'
 import EventBuffer from './event_buffer'
 import {ajax, when as jWhen} from 'jquery'
-import eraseFromArray from 'array-erase'
+import eraseFromArray from '@canvas/array-erase'
 import debugConsole from './util/debugConsole'
 import {extend} from 'underscore'
 

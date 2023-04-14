@@ -42,7 +42,7 @@ module Outcomes
       friendly_descriptions = OutcomeFriendlyDescription.active.where(
         learning_outcome_id: outcome_ids
       ).where(context_queries(account, course)).to_a.sort_by do |friendly_description|
-        friendly_description.context_type == "Course" ? 0 : account_order.index(friendly_description.context_id) + 1
+        (friendly_description.context_type == "Course") ? 0 : account_order.index(friendly_description.context_id) + 1
       end
       friendly_descriptions.uniq(&:learning_outcome_id)
     end

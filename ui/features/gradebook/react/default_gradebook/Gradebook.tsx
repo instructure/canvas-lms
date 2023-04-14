@@ -19,9 +19,8 @@
 import $ from 'jquery'
 import type JQuery from 'jquery'
 import {deferPromise} from 'defer-promise'
-// @ts-ignore
 import _ from 'underscore'
-import {intersection, isEqual} from 'lodash'
+import {intersection, isEqual, map, pick} from 'lodash'
 import tz from '@canvas/timezone'
 import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
@@ -106,10 +105,11 @@ import type GradebookGridType from './GradebookGrid/index'
 import type {StatusColors} from './constants/colors'
 import type {ProxyDetails} from '@canvas/proxy-submission/react/ProxyUploadModal'
 import type TotalGradeColumnHeader from './GradebookGrid/headers/TotalGradeColumnHeader'
+import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
-// @ts-ignore
+// @ts-expect-error
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
-// @ts-ignore
+// @ts-expect-error
 import KeyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -121,8 +121,7 @@ import AssignmentOverrideHelper from '@canvas/due-dates/AssignmentOverrideHelper
 import UserSettings from '@canvas/user-settings'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-// @ts-ignore
-import GradeDisplayWarningDialog from '../../jquery/GradeDisplayWarningDialog.coffee'
+import GradeDisplayWarningDialog from '../../jquery/GradeDisplayWarningDialog'
 import PostGradesFrameDialog from '../../jquery/PostGradesFrameDialog'
 import NumberCompare from '../../util/NumberCompare'
 import {camelize} from 'convert-case'
@@ -164,7 +163,6 @@ import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import LatePolicyApplicator from '../LatePolicyApplicator'
 import {IconButton} from '@instructure/ui-buttons'
-// @ts-ignore
 import {IconSettingsSolid} from '@instructure/ui-icons'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import MultiSelectSearchInput from './components/MultiSelectSearchInput'
@@ -881,7 +879,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       student.initialized = true
       this.calculateStudentGrade(student)
     }
-    const studentIds: string[] = _.pluck(students, 'id')
+    const studentIds: string[] = map(students, 'id')
     this.setAssignmentVisibility(studentIds)
     return studentIds
   }
@@ -943,7 +941,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
       const assignment = this.getAssignment(assignmentId)
       assignmentStudentVisibility[assignmentId] = assignment.only_visible_to_overrides
-        ? (_.pick(allStudentsById, ...assignment.assignment_visibility) as StudentMap)
+        ? (pick(allStudentsById, ...assignment.assignment_visibility) as StudentMap)
         : allStudentsById
     }
 
@@ -956,7 +954,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   visibleStudentsThatCanSeeAssignment = (assignmentId: string): StudentMap => {
     const allStudentIds = this.courseContent.students.listStudentIds()
 
-    const visibleStudentsIgnoringSearch: StudentMap = _.pick(
+    const visibleStudentsIgnoringSearch: StudentMap = pick(
       this.studentsThatCanSeeAssignment(assignmentId),
       allStudentIds
     )
@@ -1299,6 +1297,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     for (const studentSubmissionGroup of student_submission_groups) {
       changedStudentIds.push(studentSubmissionGroup.user_id)
       const student = this.student(studentSubmissionGroup.user_id)
+      if (!student) {
+        continue
+      }
       for (const submission of studentSubmissionGroup.submissions) {
         submission.posted_at = tz.parse(submission.posted_at)
         ensureAssignmentVisibility(this.getAssignment(submission.assignment_id), submission)
@@ -1324,6 +1325,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     submission: Partial<Submission> & Pick<Submission, 'user_id' | 'assignment_id'>
   ) => {
     const student = this.student(submission.user_id)
+    if (!student) {
+      return
+    }
     submission.submitted_at = tz.parse(submission.submitted_at)
     submission.excused = Boolean(submission.excused)
     submission.hidden = Boolean(submission.hidden)
@@ -1340,7 +1344,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
     const name = `assignment_${submission.assignment_id}`
     const cell = student[name] || (student[name] = {})
-    return _.extend(cell, submission)
+    Object.assign(cell, submission)
   }
 
   // this is used after the CurveGradesDialog submit xhr comes back.  it does not use the api
@@ -2549,15 +2553,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       totalWidth = testWidth(label, columnWidths.total.min, columnWidths.total.max)
     }
     return {
-      id: 'total_grade',
-      field: 'total_grade',
-      toolTip: label,
-      minWidth: columnWidths.total.min,
-      maxWidth: columnWidths.total.max,
-      width: totalWidth,
       cssClass: 'total-cell total_grade',
+      field: 'total_grade',
       headerCssClass: 'total_grade',
+      id: 'total_grade',
+      maxWidth: columnWidths.total.max,
+      minWidth: columnWidths.total.min,
+      object: {},
+      toolTip: label,
       type: 'total_grade',
+      width: totalWidth,
     }
   }
 
@@ -2582,6 +2587,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       id: 'total_grade_override',
       maxWidth: columnWidths.total_grade_override.max,
       minWidth: columnWidths.total_grade_override.min,
+      object: {},
       propFactory: new TotalGradeOverrideCellPropFactory(this),
       toolTip: label,
       type: 'total_grade_override',
@@ -2893,7 +2899,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       }
     }
     this.gridData.rows.sort(respectorOfPersonsSort())
-    this.courseContent.students.setStudentIds(_.map(this.gridData.rows, 'id'))
+    this.courseContent.students.setStudentIds(map(this.gridData.rows, 'id'))
     this.gradebookGrid?.invalidate()
   }
 
@@ -2947,11 +2953,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   missingSort = (columnId: string) => {
-    this.sortRowsWithFunction((row: GradebookStudent) => Boolean(row[columnId]?.missing))
+    // @ts-ignore
+    this.sortRowsWithFunction((row: Submission) => Boolean(row[columnId].missing))
   }
 
   lateSort = (columnId: string) => {
-    this.sortRowsWithFunction((row: GradebookStudent) => row[columnId].late)
+    // @ts-ignore
+    this.sortRowsWithFunction((row: Submission) => Boolean(row[columnId].late))
   }
 
   sortByStudentColumn = (settingKey: SortRowsSettingKey, direction: SortDirection) => {
@@ -3967,7 +3975,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   getAssignmentGroupToShow = (): string => {
     const groupId = this.getFilterColumnsBySetting('assignmentGroupId') || '0'
-    if (_.pluck(this.assignmentGroups, 'id').indexOf(groupId) >= 0) {
+    if (map(this.assignmentGroups, 'id').indexOf(groupId) >= 0) {
       return groupId
     } else {
       return '0'
@@ -4208,9 +4216,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   setStudentGroups = (studentGroupCategories: StudentGroupCategory[]) => {
     this.studentGroupCategoriesById = _.indexBy(studentGroupCategories, 'id')
-    const studentGroupList: StudentGroup[] = _.flatten(
-      _.pluck(studentGroupCategories, 'groups')
-    ).map(htmlEscape)
+    const studentGroupList: StudentGroup[] = _.flatten(map(studentGroupCategories, 'groups')).map(
+      htmlEscape
+    )
     this.studentGroups = _.indexBy(studentGroupList, 'id')
     this.studentGroupsEnabled = studentGroupList.length > 0
   }
@@ -4336,7 +4344,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const assignment = this.getAssignment(assignmentId)
     const manager = new SetDefaultGradeDialogManager(
       assignment,
-      this.visibleStudentsThatCanSeeAssignment(assignmentId),
+      this.visibleStudentsThatCanSeeAssignment,
       this.options.context_id,
       this.options.assignment_missing_shortcut,
       this.getFilterRowsBySetting('sectionId'),
@@ -4585,7 +4593,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  showSimilarityScore = (_assignment: Assignment) => !!this.options.show_similarity_score
+  showSimilarityScore = (_assignment?: Assignment) => !!this.options.show_similarity_score
 
   viewUngradedAsZero = () =>
     !!(this.courseFeatures.allowViewUngradedAsZero && this.gridDisplaySettings.viewUngradedAsZero)
@@ -4689,16 +4697,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     body,
     mediaFile,
     attachmentIds,
-  }: {
-    recipientsIds: string[]
-    subject: string
-    body: string
-    mediaFile: {
-      id: string
-      type: string
-    }
-    attachmentIds: string[]
-  }) => {
+  }: SendMessageArgs) => {
     return MessageStudentsWhoHelper.sendMessageStudentsWho(
       recipientsIds,
       subject,
@@ -4919,7 +4918,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
 
-      // submissions ('has-ungraded-submissions' | 'has-submissions' | 'has-no-submissions' | 'has-unposted-grades')
+      // submissions
       const prevSubmissionsFilter = findSubmissionFilterValue(prevProps.appliedFilters)
       const submissionFilter = findSubmissionFilterValue(this.props.appliedFilters)
       if (prevSubmissionsFilter !== submissionFilter) {
@@ -5048,7 +5047,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             id="gradebook-student-search"
             style={{
               flex: 1,
-              paddingRight: '12px',
+              paddingInlineEnd: '12px',
             }}
           >
             <MultiSelectSearchInput

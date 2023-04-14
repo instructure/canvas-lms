@@ -649,7 +649,7 @@ class AccountsController < ApplicationController
             end
 
     if params[:sort] && params[:order]
-      order += (params[:order] == "desc" ? " DESC, id DESC" : ", id")
+      order += ((params[:order] == "desc") ? " DESC, id DESC" : ", id")
     end
 
     opts = { include_crosslisted_courses: value_to_boolean(params[:include_crosslisted_courses]) }
@@ -1295,7 +1295,6 @@ class AccountsController < ApplicationController
                      Account.site_admin.grants_right?(@current_user, :read_messages),
       logging: logging
     }
-    js_env enhanced_grade_change_query: Auditors.read_from_postgres?
     js_env bounced_emails_admin_tool: @account.grants_right?(@current_user, session, :view_bounced_emails)
   end
 
@@ -1728,7 +1727,7 @@ class AccountsController < ApplicationController
   end
 
   def format_avatar_count(count = 0)
-    count > 99 ? "99+" : count
+    (count > 99) ? "99+" : count
   end
   private :format_avatar_count
 

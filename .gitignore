@@ -18,6 +18,7 @@
 /app/views/info/styleguide.html.erb
 /config/*.yml
 /config/credentials.yml.enc
+!/config/brakeman.yml
 !/config/credentials.test.yml
 !/config/crystalball.yml
 /config/environments/*-local.rb
@@ -63,6 +64,7 @@ dump.rdb
 
 # user docker compose overrides
 docker-compose.local.*
+!/inst-cli/docker-compose/docker-compose.local.dev.yml
 # experimental api gateway config
 docker-compose/api-gateway.override.yml
 

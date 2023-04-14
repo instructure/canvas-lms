@@ -904,14 +904,14 @@ describe "Files API", type: :request do
     it "does not list locked file if not authed" do
       course_with_student_logged_in(course: @course)
       json = api_call(:get, @files_path, @files_path_options, {})
-      expect(json.any? { |f| f[:id] == @a2.id }).to eq false
+      expect(json.any? { |f| f[:id] == @a2.id }).to be false
     end
 
     it "does not list hidden files if not authed" do
       course_with_student_logged_in(course: @course)
       json = api_call(:get, @files_path, @files_path_options, {})
 
-      expect(json.any? { |f| f[:id] == @a3.id }).to eq false
+      expect(json.any? { |f| f[:id] == @a3.id }).to be false
     end
 
     it "does not list locked folder if not authed" do
@@ -1686,13 +1686,9 @@ describe "Files API", type: :request do
     end
 
     it "truncates names over 255 characters" do
-      overly_long_name = "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
-                         "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
-                         "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi"
+      overly_long_name = "hi" * 129
 
-      truncated_overly_long_name = "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
-                                   "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
-                                   "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi..."
+      truncated_overly_long_name = ("hi" * 126) + "..."
 
       api_call(:put, @file_path, @file_path_options, name: overly_long_name)
       updated_name = @att.reload.display_name

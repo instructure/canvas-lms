@@ -39,7 +39,7 @@ describe "Section Paces API" do
   def assert_grant_check
     user_session(@user)
     yield
-    expect(response.status).to eq 401
+    expect(response).to have_http_status :unauthorized
   end
 
   describe "show" do
@@ -47,7 +47,7 @@ describe "Section Paces API" do
       section_pace = section_pace_model(section: section)
       Progress.create!(context: section_pace, tag: "course_pace_publish")
       get api_v1_section_pace_path(course, section), params: { format: :json }
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
       json = JSON.parse(response.body)
       expect(json["pace"]["id"]).to eq section_pace.id
     end
@@ -57,9 +57,9 @@ describe "Section Paces API" do
 
       it "falls back to the course pace" do
         get api_v1_section_pace_path(course, section), params: { format: :json }
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
         json = JSON.parse(response.body)
-        expect(json["pace"]["id"]).to eq nil
+        expect(json["pace"]["id"]).to be_nil
         expect(json["pace"]["workflow_state"]).to eq "unpublished"
       end
     end
@@ -67,13 +67,13 @@ describe "Section Paces API" do
     context "the section and course do not have paces" do
       it "returns a 404" do
         get api_v1_section_pace_path(course, section), params: { format: :json }
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 
     it "returns a 404 if the section and course are unrelated" do
       get api_v1_section_pace_path(course.id, unrelated_section.id), params: { format: :json }
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
     end
 
     it "returns a 401 if the user lacks permission" do
@@ -90,7 +90,7 @@ describe "Section Paces API" do
       }.by(1)
         .and change { Progress.count }.by(1)
       expect(Progress.last.queued?).to be_truthy
-      expect(response.status).to eq 201
+      expect(response).to have_http_status :created
       json = JSON.parse(response.body)
       expect(json["pace"]["section"]["name"]).to eq section.name
       expect(json["progress"]["context_id"]).to eq(CoursePace.last.id)
@@ -99,7 +99,7 @@ describe "Section Paces API" do
 
     it "returns a 404 if the section and course are unrelated" do
       post api_v1_new_section_pace_path(course, unrelated_section), params: { format: :json }
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
     end
 
     it "returns a 401 if the user lacks permission" do
@@ -115,7 +115,7 @@ describe "Section Paces API" do
         end.to not_change {
           section.course_paces.reload.count
         }
-        expect(response.status).to eq 201
+        expect(response).to have_http_status :created
         json = JSON.parse(response.body)
         expect(json["pace"]["id"]).to eq section_pace.id
         expect(json["progress"]["context_id"]).to eq(CoursePace.last.id)
@@ -139,7 +139,7 @@ describe "Section Paces API" do
         .to(false)
         .and change { Progress.count }.by(1)
       expect(Progress.last.queued?).to be_truthy
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "returns a 401 if the user lacks permission" do
@@ -148,7 +148,7 @@ describe "Section Paces API" do
 
     it "returns a 404 if the section and course are unrelated" do
       patch api_v1_patch_section_pace_path(course, unrelated_section), params: { format: :json, pace: {} }
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
     end
 
     it "handles invalid update parameters" do
@@ -159,7 +159,7 @@ describe "Section Paces API" do
           exclude_weekends: "foobar"
         }
       }
-      expect(response.status).to eq 422
+      expect(response).to have_http_status :unprocessable_entity
     end
   end
 
@@ -172,7 +172,7 @@ describe "Section Paces API" do
       end.to change {
         pace.reload.workflow_state
       }.from("active").to("deleted")
-      expect(response.status).to eq 204
+      expect(response).to have_http_status :no_content
     end
 
     it "returns a 401 if the user lacks permission" do
@@ -181,12 +181,12 @@ describe "Section Paces API" do
 
     it "returns a 404 if the section and course are unrelated" do
       delete api_v1_delete_section_pace_path(course, unrelated_section), params: { format: :json }
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
     end
 
     it "returns 404 if the section does not have a pace" do
       delete api_v1_delete_section_pace_path(course, section), params: { format: :json }
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
     end
   end
 
@@ -201,14 +201,14 @@ describe "Section Paces API" do
 
       it "returns 404" do
         get api_v1_section_pace_path(course.id, section_pace.id), params: { format: :json }
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 
     describe "create" do
       it "returns 404" do
         post api_v1_new_section_pace_path(course, section), params: { format: :json }
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 
@@ -222,7 +222,7 @@ describe "Section Paces API" do
             exclude_weekends: false
           }
         }
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 
@@ -230,7 +230,7 @@ describe "Section Paces API" do
       it "returns 404" do
         pace = section_pace_model(section: section)
         delete api_v1_delete_section_pace_path(course, section, pace), params: { format: :json }
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
   end

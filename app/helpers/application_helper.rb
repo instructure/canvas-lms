@@ -87,7 +87,7 @@ module ApplicationHelper
   end
 
   def count_if_any(count = nil)
-    count && count > 0 ? "(#{count})" : ""
+    (count && count > 0) ? "(#{count})" : ""
   end
 
   # Used to generate context_specific urls, as in:
@@ -96,7 +96,7 @@ module ApplicationHelper
   def context_url(context, *opts)
     @context_url_lookup ||= {}
     context_name = url_helper_context_from_object(context)
-    lookup = [context ? context.id : nil, context_name, *opts]
+    lookup = [context&.id, context_name, *opts]
     return @context_url_lookup[lookup] if @context_url_lookup[lookup]
 
     res = nil
@@ -472,7 +472,7 @@ module ApplicationHelper
 
   def safe_cache_key(*args)
     key = args.cache_key
-    key = Digest::MD5.hexdigest(key) if key.length > 200
+    key = Digest::SHA256.hexdigest(key) if key.length > 200
     key
   end
 
@@ -621,7 +621,7 @@ module ApplicationHelper
         folders_as_options(child_folders, opts.merge({ depth: opts[:depth] + 1 }))
       end
     end
-    opts[:depth] == 0 ? raw(opts[:options_so_far].join("\n")) : nil
+    (opts[:depth] == 0) ? raw(opts[:options_so_far].join("\n")) : nil
   end
 
   # this little helper just allows you to do <% ot(...) %> and have it output the same as <%= t(...) %>. The upside though, is you can interpolate whole blocks of HTML, like:
@@ -908,7 +908,7 @@ module ApplicationHelper
   # if you can avoid loading the list at all, that's even better, of course.
   def collection_cache_key(collection)
     keys = collection.map(&:cache_key)
-    Digest::MD5.hexdigest(keys.join("/"))
+    Digest::SHA256.hexdigest(keys.join("/"))
   end
 
   def add_uri_scheme_name(uri)

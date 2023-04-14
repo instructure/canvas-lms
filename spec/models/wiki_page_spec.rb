@@ -112,7 +112,7 @@ describe WikiPage do
     course_with_teacher(active_all: true)
 
     new_front_page = @course.wiki_pages.create!(title: "asdf")
-    expect(new_front_page.set_as_front_page!).to eq true
+    expect(new_front_page.set_as_front_page!).to be true
 
     @course.wiki.reload
     expect(@course.wiki.front_page).to eq new_front_page
@@ -218,11 +218,11 @@ describe WikiPage do
 
     it "does not allow students to read" do
       student_in_course(course: @course, active_all: true)
-      expect(@page.can_read_page?(@student)).to eq false
+      expect(@page.can_read_page?(@student)).to be false
     end
 
     it "allows teachers to read" do
-      expect(@page.can_read_page?(@teacher)).to eq true
+      expect(@page.can_read_page?(@teacher)).to be true
     end
 
     context "allows account admins to read" do
@@ -232,7 +232,7 @@ describe WikiPage do
           role = custom_account_role("CustomAccountUser", account: account)
           RoleOverride.manage_role_override(account, role, perm, override: true)
           admin = account_admin_user(account: account, role: role, active_all: true)
-          expect(@page.can_read_page?(admin)).to eq true
+          expect(@page.can_read_page?(admin)).to be true
         end
       end
     end
@@ -426,7 +426,7 @@ describe WikiPage do
         let(:editing_roles) { "teachers" }
 
         it "returns false for a teacher" do
-          expect(subject).to eq false
+          expect(subject).to be false
         end
       end
 
@@ -434,7 +434,7 @@ describe WikiPage do
         let(:editing_roles) { "teachers,students" }
 
         it "returns false for a teacher" do
-          expect(subject).to eq false
+          expect(subject).to be false
         end
       end
 
@@ -442,7 +442,7 @@ describe WikiPage do
         let(:editing_roles) { "teachers,students,public" }
 
         it "returns false for a teacher" do
-          expect(subject).to eq false
+          expect(subject).to be false
         end
       end
     end
@@ -469,7 +469,7 @@ describe WikiPage do
       context "when the current user is a teacher in the group's course" do
         let(:current_user) { teacher }
 
-        it { is_expected.to eq true }
+        it { is_expected.to be true }
       end
 
       context "when the current user is a concluded teacher" do
@@ -477,7 +477,7 @@ describe WikiPage do
 
         let(:current_user) { teacher }
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
     end
   end
@@ -954,15 +954,15 @@ describe WikiPage do
         ---
         id: 787500
         wiki_id: 15160
-        title: \"\\U0001F4D8\\U0001F4D5Ss10.20 | Social Studies: Warm Up - Las Cruces, New Mexico\"
-        body: \"<p style=\\\"text-align: center;\\\"><a id=\"media_comment_m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\" class=\"instructure_inline_media_comment audio_comment\" data-media_comment_type=\"audio\" data-alt=\"\" href=\"/media_objects/m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\"/></p>\\r\
-        <p style=\\\"text-align: center;\\\"> </p>\\r\
+        title: "\\U0001F4D8\\U0001F4D5Ss10.20 | Social Studies: Warm Up - Las Cruces, New Mexico"
+        body: "<p style=\\"text-align: center;\\"><a id="media_comment_m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P" class="instructure_inline_media_comment audio_comment" data-media_comment_type="audio" data-alt="" href="/media_objects/m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P"/></p>\\r\
+        <p style=\\"text-align: center;\\"> </p>\\r\
         <p
-          style=\\\"text-align: center;\\\"><span style=\\\"font-size: 18pt;\\\">Geography is the
+          style=\\"text-align: center;\\"><span style=\\"font-size: 18pt;\\">Geography is the
           study of Earth and its land, water, air and people. We are concentrating on learning
           about the physical features, climate and natural resources that affect an area and
           its people.</span></p>\\r\
-          center;\\\"> </p>\"
+          center;\\"> </p>"
         user_id:#{" "}
         created_at: !ruby/object:ActiveSupport::TimeWithZone
           utc: &1 2020-11-05 20:24:57.390301492 Z
@@ -994,23 +994,23 @@ describe WikiPage do
         id: 19903
         wiki_id: 513
         title: Jason otitis media treatment
-        body: \"<ul>\\r\\n
-                        <li\n  class=\\\"distractors\\\"><a class=\\\"radio_link\\\" href=\\\"#\\\">Yes</a></li>\\r\\n
-                        <li class=\\\"distractors\\\"><a\n  class=\\\"radio_link answer\\\" href=\\\"#\\\">No</a></li>\\r\\n
+        body: "<ul>\\r\\n
+                        <li\n  class=\\"distractors\\"><a class=\\"radio_link\\" href=\\"#\\">Yes</a></li>\\r\\n
+                        <li class=\\"distractors\\"><a\n  class=\\"radio_link answer\\" href=\\"#\\">No</a></li>\\r\\n
                       </ul>\\r\\n</div>\\r\\n
-                      <div class=\\\"col-md-4\\\">
-                        <img\n  src=\\\"/courses/348/files/102814/preview\\\" alt=\\\"Antibiotics\\\" width=\\\"100%\\\"\n  height=\\\"auto\\\" data-api-endpoint=\\\"https://dev.iheed.org/api/v1/courses/328/files/41094\\\"\n  data-api-returntype=\\\"File\\\">
+                      <div class=\\"col-md-4\\">
+                        <img\n  src=\\"/courses/348/files/102814/preview\\" alt=\\"Antibiotics\\" width=\\"100%\\"\n  height=\\"auto\\" data-api-endpoint=\\"https://dev.iheed.org/api/v1/courses/328/files/41094\\"\n  data-api-returntype=\\"File\\">
                       </div>\\r\\n
                     </div>\\r\\n
-                    <div class=\\\"feedback\\\">\\r\\n
+                    <div class=\\"feedback\\">\\r\\n
                       <p>Jason\n  does not need antibiotics at this time. He is not systemically unwell, he has no\n  high-risk complications and there is no discharge from his ear.</p>\\r\\n
                     </div>\\r\\n
-                    <div\n  class=\\\"feedback correct\\\">\\r\\n<p>Correct.</p>\\r\\n</div>\\r\\n
-                    <div class=\\\"feedback\n  incorrect\\\">\\r\\n<p>Incorrect.</p>\\r\\n</div>\\r\\n
+                    <div\n  class=\\"feedback correct\\">\\r\\n<p>Correct.</p>\\r\\n</div>\\r\\n
+                    <div class=\\"feedback\n  incorrect\\">\\r\\n<p>Incorrect.</p>\\r\\n</div>\\r\\n
                   </div>\\r\\n
-                </div>\\r\\n<div class=\\\"content-box\\\">\\r\\n<div\n  class=\\\"grid-row spacer center-xs\\\">\\r\\n
-                <div class=\\\"col-md-4 text-left\\\">\\r\\n<p\n  class=\\\"text-info\\\">Listen to the audio to hear the advice you give Laura about\n  what to do next.</p>\\r\\n</div>\\r\\n<div class=\\\"col-md-4\\\">
-                <a id=\"media_comment_m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\" class=\"instructure_inline_media_comment audio_comment\" href=\"/media_objects/m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\"/>\"
+                </div>\\r\\n<div class=\\"content-box\\">\\r\\n<div\n  class=\\"grid-row spacer center-xs\\">\\r\\n
+                <div class=\\"col-md-4 text-left\\">\\r\\n<p\n  class=\\"text-info\\">Listen to the audio to hear the advice you give Laura about\n  what to do next.</p>\\r\\n</div>\\r\\n<div class=\\"col-md-4\\">
+                <a id="media_comment_m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx" class="instructure_inline_media_comment audio_comment" href="/media_objects/m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx"/>"
       YAML
       good_yaml = WikiPage.reinterpret_version_yaml(bad_yaml)
       expect(good_yaml).to include("<a id=\\\"media_comment_m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\\\"")

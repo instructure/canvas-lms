@@ -107,7 +107,7 @@ describe Folder do
     f2 = f1.sub_folders.create!(name: "f2", context: @course)
     f3 = f2.sub_folders.create!(name: "f3", context: @course)
     f1.parent_folder = f3
-    expect(f1.save).to eq false
+    expect(f1.save).to be false
     expect(f1.errors.detect { |e| e.first.to_s == "parent_folder_id" }).to be_present
   end
 
@@ -115,7 +115,7 @@ describe Folder do
     f1 = Folder.root_folders(@course).first
     f1.reload
     f1.update(name: "something")
-    expect(f1.save).to eq false
+    expect(f1.save).to be false
     expect(f1.errors.detect { |e| e.first.to_s == "name" }).to be_present
   end
 
@@ -201,7 +201,7 @@ describe Folder do
       @course.folders.create!(name: "locked 3", lock_at: 1.day.ago, unlock_at: 1.day.from_now)
     ]
     expect(@course.folders.map(&:id).sort).to eq (not_locked + locked).map(&:id).sort
-    expect(@course.folders.not_locked.map(&:id).sort).to eq (not_locked).map(&:id).sort
+    expect(@course.folders.not_locked.map(&:id).sort).to eq not_locked.map(&:id).sort
   end
 
   it "does not create multiple root folders for a course" do

@@ -112,7 +112,7 @@ class Lti::LineItem < ApplicationRecord
     return if resource_link.blank?
 
     ids = resource_link.line_items.pluck(:assignment_id)
-    return if ids.size.zero?
+    return if ids.empty?
     return if ids.uniq.size == 1 && ids.first == assignment_id
 
     errors.add(:assignment, "does not match ltiLink")

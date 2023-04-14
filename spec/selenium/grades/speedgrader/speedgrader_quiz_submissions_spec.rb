@@ -32,7 +32,7 @@ describe "speed grader - quiz submissions" do
     student_in_course
     2.times do |i|
       qs = @quiz.generate_submission(@student)
-      opts = i == 0 ? { finished_at: (Time.zone.today - 7) + 30.minutes } : {}
+      opts = (i == 0) ? { finished_at: (Time.zone.today - 7) + 30.minutes } : {}
       Quizzes::SubmissionGrader.new(qs).grade_submission(opts)
     end
   end

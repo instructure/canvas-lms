@@ -2,9 +2,9 @@
 # frozen_string_literal: true
 
 begin
-  load File.expand_path("../spring", __FILE__)
+  load File.expand_path("spring", __dir__)
 rescue LoadError => e
-  raise unless e.message.include?('spring')
+  raise unless e.message.include?("spring")
 end
-require 'bundler/setup'
-load Gem.bin_path('flakey_spec_catcher', 'flakey_spec_catcher')
+require "bundler/setup"
+load Gem.bin_path("flakey_spec_catcher", "flakey_spec_catcher")

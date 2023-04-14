@@ -366,19 +366,19 @@ describe "Default Account Reports" do
       end
 
       it "evaluates to true when enabled" do
-        expect(@report.should_add_pronouns?).to eq(true)
+        expect(@report.should_add_pronouns?).to be(true)
       end
 
       it "evaluates to false when not enabled" do
         @account.settings[:can_add_pronouns] = false
         @account.save!
-        expect(@report.should_add_pronouns?).to eq(false)
+        expect(@report.should_add_pronouns?).to be(false)
       end
 
       it "evaluates to false when disabled for just report" do
         @account.settings[:enable_sis_export_pronouns] = false
         @account.save!
-        expect(@report.should_add_pronouns?).to eq(false)
+        expect(@report.should_add_pronouns?).to be(false)
       end
     end
 
@@ -1584,12 +1584,12 @@ describe "Default Account Reports" do
       parameters["xlist"] = true
       parsed = read_report("sis_export_csv", { params: parameters, header: true })
 
-      expect(parsed["accounts.csv"]).to eq nil
+      expect(parsed["accounts.csv"]).to be_nil
       expect(parsed["terms.csv"]).to eq [%w[term_id name status start_date end_date]]
       expect(parsed["users.csv"]).to eq [user_headers]
-      expect(parsed["courses.csv"]).to eq nil
-      expect(parsed["sections.csv"]).to eq nil
-      expect(parsed["enrollments.csv"]).to eq nil
+      expect(parsed["courses.csv"]).to be_nil
+      expect(parsed["sections.csv"]).to be_nil
+      expect(parsed["enrollments.csv"]).to be_nil
       expect(parsed["groups.csv"]).to eq [%w[group_id group_category_id account_id course_id name status]]
       expect(parsed["group_membership.csv"]).to eq [%w[group_id user_id status]]
       expect(parsed["xlist.csv"]).to eq [%w[xlist_course_id section_id status]]

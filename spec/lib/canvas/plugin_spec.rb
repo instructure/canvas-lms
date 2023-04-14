@@ -21,17 +21,17 @@
 describe Canvas::Plugin do
   describe ".value_to_boolean" do
     it "accepts 0/1 as strings" do
-      expect(Canvas::Plugin.value_to_boolean("0")).to eq false
-      expect(Canvas::Plugin.value_to_boolean("1")).to eq true
+      expect(Canvas::Plugin.value_to_boolean("0")).to be false
+      expect(Canvas::Plugin.value_to_boolean("1")).to be true
     end
 
     it "accepts t/f" do
-      expect(Canvas::Plugin.value_to_boolean("f")).to eq false
-      expect(Canvas::Plugin.value_to_boolean("t")).to eq true
+      expect(Canvas::Plugin.value_to_boolean("f")).to be false
+      expect(Canvas::Plugin.value_to_boolean("t")).to be true
     end
 
     it "accepts nil" do
-      expect(Canvas::Plugin.value_to_boolean(nil)).to eq false
+      expect(Canvas::Plugin.value_to_boolean(nil)).to be false
     end
 
     it "does not accept unrecognized arguments" do

@@ -31,8 +31,8 @@ describe CanvasSecurity do
             expires = 1.hour.from_now
             token = CanvasSecurity.create_jwt({ a: 1 }, expires)
 
-            expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."\
-                             "eyJhIjoxLCJleHAiOjEzNjMxNjk1MjB9."\
+            expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." \
+                             "eyJhIjoxLCJleHAiOjEzNjMxNjk1MjB9." \
                              "VwDKl46gfjFLPAIDwlkVPze1UwC6H_ApdyWYoUXFT8M"
             expect(token).to eq(expected_token)
           end
@@ -40,8 +40,8 @@ describe CanvasSecurity do
 
         it "generates a token without expiration" do
           token = CanvasSecurity.create_jwt({ a: 1 })
-          expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."\
-                           "eyJhIjoxfQ."\
+          expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." \
+                           "eyJhIjoxfQ." \
                            "Pr4RQfnytL0LMwQ0pJXiKoHmEGAYw2OW3pYJTQM4d9I"
           expect(token).to eq(expected_token)
         end
@@ -108,10 +108,10 @@ describe CanvasSecurity do
 
     describe ".base64_encode" do
       it "trims off newlines" do
-        input = "SuperSuperSuperSuperSuperSuperSuperSuper"\
+        input = "SuperSuperSuperSuperSuperSuperSuperSuper" \
                 "SuperSuperSuperSuperSuperSuperSuperSuperLongString"
-        output = "U3VwZXJTdXBlclN1cGVyU3VwZXJTdXBlclN1cGVy"\
-                 "U3VwZXJTdXBlclN1cGVyU3VwZXJTdXBlclN1cGVy"\
+        output = "U3VwZXJTdXBlclN1cGVyU3VwZXJTdXBlclN1cGVy" \
+                 "U3VwZXJTdXBlclN1cGVyU3VwZXJTdXBlclN1cGVy" \
                  "U3VwZXJTdXBlclN1cGVyU3VwZXJMb25nU3RyaW5n"
         expect(CanvasSecurity.base64_encode(input)).to eq(output)
       end

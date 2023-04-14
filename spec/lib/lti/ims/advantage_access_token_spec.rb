@@ -36,27 +36,27 @@ describe Lti::IMS::AdvantageAccessToken do
 
     it "raises a specific type of AdvantageClientError if the aud is invalid" do
       acceptable_auds = ["http://example.com/", "http://example2.com/"]
-      expect { token.validate!(acceptable_auds) }.to \
-        raise_error(Lti::IMS::AdvantageErrors::InvalidAccessTokenClaims, /\Waud\W.*invalid/)
-      expect(Lti::IMS::AdvantageErrors::InvalidAccessTokenClaims).to \
-        be < Lti::IMS::AdvantageErrors::AdvantageClientError
+      expect { token.validate!(acceptable_auds) }
+        .to raise_error(Lti::IMS::AdvantageErrors::InvalidAccessTokenClaims, /\Waud\W.*invalid/)
+      expect(Lti::IMS::AdvantageErrors::InvalidAccessTokenClaims)
+        .to be < Lti::IMS::AdvantageErrors::AdvantageClientError
     end
 
     it "raises a specific type of AdvantageClientError when the token is malformed" do
       token = described_class.new("garbage")
-      expect { token.validate!(access_token_aud) }.to \
-        raise_error(Lti::IMS::AdvantageErrors::MalformedAccessToken)
-      expect(Lti::IMS::AdvantageErrors::MalformedAccessToken).to \
-        be < Lti::IMS::AdvantageErrors::AdvantageClientError
+      expect { token.validate!(access_token_aud) }
+        .to raise_error(Lti::IMS::AdvantageErrors::MalformedAccessToken)
+      expect(Lti::IMS::AdvantageErrors::MalformedAccessToken)
+        .to be < Lti::IMS::AdvantageErrors::AdvantageClientError
     end
 
     it "raises a specific type of AdvantageClientError when decoding the JWT raises a JSON::JWT::Exception" do
-      expect(Canvas::Security::JwtValidator).to \
-        receive(:new).and_raise(JSON::JWT::Exception)
-      expect { token.validate!(access_token_aud) }.to \
-        raise_error(Lti::IMS::AdvantageErrors::InvalidAccessToken)
-      expect(Lti::IMS::AdvantageErrors::InvalidAccessToken).to \
-        be < Lti::IMS::AdvantageErrors::AdvantageClientError
+      expect(Canvas::Security::JwtValidator)
+        .to receive(:new).and_raise(JSON::JWT::Exception)
+      expect { token.validate!(access_token_aud) }
+        .to raise_error(Lti::IMS::AdvantageErrors::InvalidAccessToken)
+      expect(Lti::IMS::AdvantageErrors::InvalidAccessToken)
+        .to be < Lti::IMS::AdvantageErrors::AdvantageClientError
     end
   end
 end

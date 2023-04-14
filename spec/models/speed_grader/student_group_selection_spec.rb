@@ -86,7 +86,7 @@ describe SpeedGrader::StudentGroupSelection do
       context "when the selected student belongs to no groups" do
         it "returns a nil group" do
           selection = group_selector.select_group(student_id: groupless_student.id)
-          expect(selection.group).to be nil
+          expect(selection.group).to be_nil
         end
 
         it "returns :student_in_no_groups as the reason for the change" do

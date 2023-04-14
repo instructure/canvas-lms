@@ -126,7 +126,7 @@ module Lti::IMS
 
     def member_sourced_id(expander)
       expanded = expander.expand_variables!({ value: "$Person.sourcedId" })[:value]
-      expanded == "$Person.sourcedId" ? nil : expanded
+      (expanded == "$Person.sourcedId") ? nil : expanded
     end
 
     def message(enrollment, expander)

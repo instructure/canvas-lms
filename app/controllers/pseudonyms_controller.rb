@@ -175,7 +175,7 @@ class PseudonymsController < ApplicationController
       end
       @password_pseudonyms = @cc.user.pseudonyms.active_only.select { |p| p.account.canvas_authentication? }
       js_env PASSWORD_POLICY: @domain_root_account.password_policy,
-             PASSWORD_POLICIES: @password_pseudonyms.map { |p| [p.id, p.account.password_policy] }.to_h
+             PASSWORD_POLICIES: @password_pseudonyms.to_h { |p| [p.id, p.account.password_policy] }
     end
   end
 
@@ -530,7 +530,7 @@ class PseudonymsController < ApplicationController
     if params[:pseudonym].key?(:password) && !@pseudonym.passwordable?
       @pseudonym.errors.add(:password, "password can only be set for Canvas authentication")
       respond_to do |format|
-        format.html { render(params[:action] == "edit" ? :edit : :new) }
+        format.html { render((params[:action] == "edit") ? :edit : :new) }
         format.json { render json: @pseudonym.errors, status: :bad_request }
       end
       return false
@@ -547,7 +547,7 @@ class PseudonymsController < ApplicationController
     if params[:pseudonym].key?(:workflow_state) && !%w[active suspended].include?(params[:pseudonym][:workflow_state])
       @pseudonym.errors.add(:workflow_state, "invalid workflow_state")
       respond_to do |format|
-        format.html { render(params[:action] == "edit" ? :edit : :new) }
+        format.html { render((params[:action] == "edit") ? :edit : :new) }
         format.json { render json: @pseudonym.errors, status: :bad_request }
       end
       return false

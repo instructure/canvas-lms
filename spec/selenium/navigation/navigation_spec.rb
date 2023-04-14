@@ -64,7 +64,7 @@ describe "Global Navigation" do
         f("#global_nav_courses_link").send_keys(:enter)
         wait_for_ajaximations
         links = ff('[aria-label="Courses tray"] li a')
-        expect(links.count).to eql 2
+        expect(links.count).to be 2
       end
     end
 

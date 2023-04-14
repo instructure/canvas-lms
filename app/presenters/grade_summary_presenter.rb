@@ -128,11 +128,11 @@ class GradeSummaryPresenter
   end
 
   def student_name
-    student ? student.name : nil
+    student&.name
   end
 
   def student_id
-    student ? student.id : nil
+    student&.id
   end
 
   def groups

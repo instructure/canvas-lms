@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
-import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
+import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import template from '../../jst/DeleteGroup.handlebars'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import '@canvas/jquery/jquery.disableWhileLoading'

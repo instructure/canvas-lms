@@ -75,7 +75,7 @@ describe AuditLogFieldExtension do
       logger: Rails.logger
     )
     expect(dynamo).to receive(:put_item).and_raise(Aws::DynamoDB::Errors::ServiceError.new("two", "arguments"))
-    expect(::Canvas::Errors).to receive(:capture_exception) do |name, e|
+    expect(Canvas::Errors).to receive(:capture_exception) do |name, e|
       expect(name).to eq(:graphql_mutation_audit_logs)
       expect(e.class).to eq(Aws::DynamoDB::Errors::ServiceError)
     end

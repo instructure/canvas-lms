@@ -51,17 +51,17 @@ describe Types::PostPolicyType do
 
     it "does not return the legacy canvas id of the PostPolicy" do
       resolver = GraphQLTypeTester.new(course.default_post_policy, context)
-      expect(resolver.resolve("_id")).to be nil
+      expect(resolver.resolve("_id")).to be_nil
     end
 
     it "does not return the course of the PostPolicy" do
       resolver = GraphQLTypeTester.new(course.default_post_policy, context)
-      expect(resolver.resolve("course {_id}")).to be nil
+      expect(resolver.resolve("course {_id}")).to be_nil
     end
 
     it "does not return the assignment of the PostPolicy" do
       resolver = GraphQLTypeTester.new(assignment.post_policy, context)
-      expect(resolver.resolve("assignment {_id}")).to be nil
+      expect(resolver.resolve("assignment {_id}")).to be_nil
     end
   end
 end

@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import Submission from '@canvas/assignments/backbone/models/Submission'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 import fakeENV from 'helpers/fakeENV'

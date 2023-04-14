@@ -21,7 +21,7 @@
 require_relative "../../conditional_release_spec_helper"
 
 module ConditionalRelease
-  describe AssignmentSetAction, type: :model do
+  describe AssignmentSetAction do
     it_behaves_like "a soft-deletable model"
 
     it "must have student_id and actor_id" do

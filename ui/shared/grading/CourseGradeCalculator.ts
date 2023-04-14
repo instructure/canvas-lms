@@ -19,7 +19,7 @@
 // @ts-ignore
 import _ from 'underscore'
 // @ts-ignore
-import round from 'round'
+import round from '@canvas/round'
 import AssignmentGroupGradeCalculator from './AssignmentGroupGradeCalculator'
 import {bigSum, sum, sumBy, toNumber, weightedPercent} from './GradeCalculationHelper'
 import type {

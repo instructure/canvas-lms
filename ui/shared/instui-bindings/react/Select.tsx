@@ -55,12 +55,13 @@ const {Option: SelectOption, Group: SelectGroup} = Select as any
 const noOptionsOptionId = '_noOptionsOption'
 
 type Props = {
-  value: string
+  children: ReactElement | ReactElement[]
+  disabled?: boolean
   id: string
   label?: ReactElement | string
-  onChange: (event: ChangeEvent, value: string) => void
-  children: ReactElement | ReactElement[]
   noOptionsLabel?: string
+  onChange: (event: ChangeEvent, value: string) => void
+  value: string
 }
 
 type State = {

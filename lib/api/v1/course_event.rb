@@ -46,7 +46,7 @@ module Api::V1::CourseEvent
     end
 
     {
-      id: event.id,
+      id: event.uuid,
       created_at: event.created_at.in_time_zone,
       event_type: event.event_type,
       event_source: event.event_source,

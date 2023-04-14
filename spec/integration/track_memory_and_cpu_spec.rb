@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe "memory and cpu tracking", type: :request do
+describe "memory and cpu tracking" do
   it "passes cpu info to statsd" do
     account = Account.default
 

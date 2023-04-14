@@ -81,12 +81,12 @@ describe Quizzes::QuizStatistics::ItemAnalysis do
 
     expect(point_biserials[0][:answer_id]).to eq answer_ids[0]
     expect(point_biserials[0][:point_biserial]).to be_within(precision).of(0.8696263565463043)
-    expect(point_biserials[0][:correct]).to eq true
-    expect(point_biserials[0][:distractor]).to eq false
+    expect(point_biserials[0][:correct]).to be true
+    expect(point_biserials[0][:distractor]).to be false
 
     expect(point_biserials[1][:answer_id]).to eq answer_ids[1]
     expect(point_biserials[1][:point_biserial]).to be_within(precision).of(-0.8696263565463043)
-    expect(point_biserials[1][:correct]).to eq false
-    expect(point_biserials[1][:distractor]).to eq true
+    expect(point_biserials[1][:correct]).to be false
+    expect(point_biserials[1][:distractor]).to be true
   end
 end

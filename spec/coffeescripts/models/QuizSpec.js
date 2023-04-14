@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 import Quiz from '@canvas/quizzes/backbone/models/Quiz'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
-import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection.coffee'
+import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
 import fakeENV from 'helpers/fakeENV'
 import '@canvas/jquery/jquery.ajaxJSON'
 

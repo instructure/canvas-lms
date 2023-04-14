@@ -25,7 +25,7 @@ require "securerandom"
 describe EventStream::Failure do
   describe "Record" do
     let(:event_record) do
-      Class.new(::EventStream::Record) do
+      Class.new(EventStream::Record) do
         class << self
           def name
             "EventRecord"
@@ -52,8 +52,8 @@ describe EventStream::Failure do
     end
 
     it "sets default values" do
-      expect(@event.id).to_not eq nil
-      expect(@event.created_at).to_not eq nil
+      expect(@event.id).to_not be_nil
+      expect(@event.created_at).to_not be_nil
       expect(@event.event_type).to eq "event_record"
       expect(@event.request_id).to eq @request_id
     end

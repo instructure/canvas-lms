@@ -254,7 +254,7 @@ describe CourseSection, "moving to new course" do
     u.favorites.where(context_type: "Course", context_id: course1).first_or_create!
 
     cs.crosslist_to_course(course2)
-    expect(u.favorites.where(context_type: "Course", context_id: course2).exists?).to eq true
+    expect(u.favorites.where(context_type: "Course", context_id: course2).exists?).to be true
   end
 
   it "removes discussion visibilites on crosslist" do
@@ -637,14 +637,14 @@ describe CourseSection, "moving to new course" do
     it "invalidates access if section is cross-listed" do
       @course.update(workflow_state: "available", restrict_student_future_view: true,
                      restrict_enrollments_to_course_dates: true, start_at: 1.day.from_now)
-      expect(@enrollment.enrollment_state.reload.restricted_access?).to eq true
+      expect(@enrollment.enrollment_state.reload.restricted_access?).to be true
 
       other_course = course_factory(active_all: true)
       other_course.update(restrict_enrollments_to_course_dates: true, start_at: 1.day.from_now)
 
       @section.crosslist_to_course(other_course)
 
-      expect(@enrollment.enrollment_state.reload.restricted_access?).to eq false
+      expect(@enrollment.enrollment_state.reload.restricted_access?).to be false
     end
   end
 

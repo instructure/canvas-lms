@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useRef} from 'react'
 import {bool, func, number} from 'prop-types'
-import shortid from 'shortid'
+import shortid from '@canvas/shortid'
 import {FormField} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
 
@@ -88,12 +88,12 @@ export default function AllowedAttempts({
         </select>
       </FormField>
 
-      <div hidden={!limited}>
+      <div hidden={!limited} style={{marginTop: '16px'}}>
         <NumberInput
           renderLabel={I18n.t('Number of Attempts')}
           name="allowed_attempts"
           display="inline-block"
-          width="200px"
+          width="220px"
           value={attemptsValue}
           interaction={locked ? 'disabled' : 'enabled'}
           messages={attemptsMessages}

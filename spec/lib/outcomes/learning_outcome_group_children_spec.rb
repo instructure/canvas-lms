@@ -235,7 +235,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
     end
 
     it "returns nil if no target_group_id provided" do
-      expect(subject.not_imported_outcomes(g2.id)).to eq nil
+      expect(subject.not_imported_outcomes(g2.id)).to be_nil
     end
   end
 
@@ -335,29 +335,29 @@ describe Outcomes::LearningOutcomeGroupChildren do
           context: context,
           outcome_group: g1,
           title: "LA.1.1.1",
-          description: "continue to apply phonic knowledge and skills as the route to decode words until "\
+          description: "continue to apply phonic knowledge and skills as the route to decode words until " \
                        "automatic decoding has become embedded and reading is fluent"
         )
         outcome_model(
           context: context,
           outcome_group: g1,
           title: "LA.2.2.1.2",
-          description: "Explain anticipated meaning, recognize relationships, and draw conclusions; self-correct"\
-                       " understanding using a variety of strategies [including rereading for story sense]."
+          description: "Explain anticipated meaning, recognize relationships, and draw conclusions; self-correct " \
+                       "understanding using a variety of strategies [including rereading for story sense]."
         )
         outcome_model(
           context: context,
           outcome_group: g1,
           title: "FO.3",
-          description: "apply their growing knowledge of root words, prefixes and suffixes (etymology and morphology)"\
-                       " as listed in English Appendix 1, both to read aloud and to understand the meaning of new wor"\
+          description: "apply their growing knowledge of root words, prefixes and suffixes (etymology and morphology) " \
+                       "as listed in English Appendix 1, both to read aloud and to understand the meaning of new wor" \
                        "ds they meet"
         )
         outcome_model(
           context: context,
           outcome_group: g1,
           title: "HT.ML.1.1",
-          description: "<p>Pellentesque&nbsp;habitant morbi tristique senectus et netus et malesuada fames ac turpis e"\
+          description: "<p>Pellentesque&nbsp;habitant morbi tristique senectus et netus et malesuada fames ac turpis e" \
                        "gestas.</p>"
         )
         outcome_model(
@@ -515,19 +515,19 @@ describe Outcomes::LearningOutcomeGroupChildren do
         cg1.add_outcome o4
       end
 
-      it "filters out outcomes with alignments" do
+      it "filters outcomes without alignments in Canvas" do
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "NO_ALIGNMENTS" })
                           .map(&:learning_outcome_content).map(&:id)
         expect(outcomes).to eql([o4.id, o8.id])
       end
 
-      it "filters out outcomes with no alignments" do
+      it "filters outcomes with alignments in Canvas" do
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
                           .map(&:learning_outcome_content).map(&:id)
         expect(outcomes).to eql([o3.id])
       end
 
-      it "filters out outcomes with no alignments and with search" do
+      it "filters outcomes without alignments in Canvas and with search" do
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { search_query: "4.1", filter: "NO_ALIGNMENTS" })
                           .map(&:learning_outcome_content).map(&:id)
         expect(outcomes).to eql([o4.id])
@@ -545,17 +545,35 @@ describe Outcomes::LearningOutcomeGroupChildren do
                           .map(&:learning_outcome_content).map(&:id)
         expect(outcomes).to eql([o3.id, o4.id, o8.id])
       end
-    end
-  end
 
-  describe "#clear_total_outcomes_cache" do
-    it "clears the cache" do
-      enable_cache do
-        expect(ContentTag).to receive(:active).and_call_original.twice
-        expect(subject.total_outcomes(g0.id)).to eq 12
-        subject.clear_total_outcomes_cache
-        instance = described_class.new(context)
-        expect(instance.total_outcomes(g0.id)).to eq 12
+      context "when Outcome Alignment Summary with NQ FF is enabled" do
+        let!(:os_aligned_outcomes_mock) { { o8.id => [] } }
+
+        before do
+          cg1.add_outcome o5
+          course.enable_feature!(:outcome_alignment_summary_with_new_quizzes)
+          allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+            .to receive(:get_os_aligned_outcomes)
+            .and_return(os_aligned_outcomes_mock)
+        end
+
+        it "filters outcomes without alignments in Canvas or Outcomes-Service" do
+          outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "NO_ALIGNMENTS" })
+                            .map(&:learning_outcome_content).map(&:id)
+          expect(outcomes).to eql([o4.id, o5.id])
+        end
+
+        it "filters outcomes with alignments in Canvas or Outcomes-Service" do
+          outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
+                            .map(&:learning_outcome_content).map(&:id)
+          expect(outcomes).to eql([o3.id, o8.id])
+        end
+
+        it "filters outcomes without alignments in Canvas or Outcomes-Service and with search" do
+          outcomes = subject.suboutcomes_by_group_id(cg1.id, { search_query: "4.1", filter: "NO_ALIGNMENTS" })
+                            .map(&:learning_outcome_content).map(&:id)
+          expect(outcomes).to eql([o4.id])
+        end
       end
     end
   end

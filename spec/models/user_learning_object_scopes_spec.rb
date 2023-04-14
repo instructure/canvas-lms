@@ -608,7 +608,7 @@ describe UserLearningObjectScopes do
     end
 
     it "counts assignments with ungraded submissions across multiple courses" do
-      expect(@teacher.assignments_needing_grading.size).to eql(2)
+      expect(@teacher.assignments_needing_grading.size).to be(2)
       expect(@teacher.assignments_needing_grading).to be_include(@course1.assignments.first)
       expect(@teacher.assignments_needing_grading).to be_include(@course2.assignments.first)
 

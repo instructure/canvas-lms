@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import Outcome from '@canvas/outcomes/backbone/models/Outcome.coffee'
-import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup.coffee'
+import Outcome from '@canvas/outcomes/backbone/models/Outcome'
+import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
 
 // Manage the toolbar buttons.
 export default class ToolbarView extends Backbone.View {

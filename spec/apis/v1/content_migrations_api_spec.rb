@@ -220,7 +220,7 @@ describe ContentMigrationsController, type: :request do
       @migration.save!
 
       json = api_call(:get, @migration_url, @params)
-      expect(json["settings"]).to eq nil
+      expect(json["settings"]).to be_nil
     end
 
     it "marks as failed if stuck in pre_processing" do
@@ -512,7 +512,7 @@ describe ContentMigrationsController, type: :request do
       it "sets attachment pre-flight data" do
         json = api_call(:post, @migration_url, @params, @post_params)
         expect(json["pre_attachment"]).not_to be_nil
-        expect(json["pre_attachment"]["upload_params"]["key"].end_with?("test.zip")).to eq true
+        expect(json["pre_attachment"]["upload_params"]["key"].end_with?("test.zip")).to be true
       end
 
       it "does not queue migration with pre_attachent on create" do
@@ -598,7 +598,7 @@ describe ContentMigrationsController, type: :request do
       it "verifies the content export exists" do
         post_params = { migration_type: "common_cartridge_importer", settings: { content_export_id: 0 } }
         json = api_call(:post, @migration_url, @params, post_params)
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(json["message"]).to eq "invalid content export"
         expect(ContentMigration.last).to be_pre_process_error
       end
@@ -610,7 +610,7 @@ describe ContentMigrationsController, type: :request do
         @user = me
         post_params = { migration_type: "common_cartridge_importer", settings: { content_export_id: export.id } }
         json = api_call(:post, @migration_url, @params, post_params)
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(json["message"]).to eq "invalid content export"
         expect(ContentMigration.last).to be_pre_process_error
       end
@@ -619,7 +619,7 @@ describe ContentMigrationsController, type: :request do
         export = stub_export(@course, @user, "exporting", false)
         post_params = { migration_type: "common_cartridge_importer", settings: { content_export_id: export.id } }
         json = api_call(:post, @migration_url, @params, post_params)
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(json["message"]).to eq "content export is incomplete"
         expect(ContentMigration.last).to be_pre_process_error
       end
@@ -887,6 +887,8 @@ describe ContentMigrationsController, type: :request do
       @src = course_factory active_all: true
       @ann = @src.announcements.create! title: "ann", message: "ohai"
       @assign = @src.assignments.create! name: "assign"
+      @shell_assign = @src.assignments.create!
+      @assign_topic = @src.discussion_topics.create! message: "assigned", assignment_id: @shell_assign.id
       @mod = @src.context_modules.create! name: "mod"
       @tag = @mod.add_item type: "sub_header", title: "blah"
       @page = @src.wiki_pages.create! title: "der page"
@@ -901,10 +903,12 @@ describe ContentMigrationsController, type: :request do
     def test_asset_id_mapping(json)
       expect(@dst.announcements.find(json["announcements"][@ann.id.to_s]).title).to eq "ann"
       expect(@dst.assignments.find(json["assignments"][@assign.id.to_s]).name).to eq "assign"
+      expect(@dst.assignments.find(json["assignments"][@shell_assign.id.to_s]).description).to eq "assigned"
       expect(@dst.context_modules.find(json["modules"][@mod.id.to_s]).name).to eq "mod"
       expect(@dst.context_module_tags.find(json["module_items"][@tag.id.to_s]).title).to eq "blah"
       expect(@dst.wiki_pages.find(json["pages"][@page.id.to_s]).title).to eq "der page"
       expect(@dst.discussion_topics.find(json["discussion_topics"][@topic.id.to_s]).message).to eq "some topic"
+      expect(@dst.discussion_topics.find(json["discussion_topics"][@assign_topic.id.to_s]).message).to eq "assigned"
       expect(@dst.quizzes.find(json["quizzes"][@quiz.id.to_s]).title).to eq "a quiz"
       expect(@dst.attachments.find(json["files"][@file.id.to_s]).filename).to eq "teh_file.txt"
     end

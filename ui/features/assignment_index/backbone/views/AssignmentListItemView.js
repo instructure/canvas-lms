@@ -24,22 +24,24 @@ import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import * as MoveItem from '@canvas/move-item-tray'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import PublishIconView from '@canvas/publish-icon-view'
 import LockIconView from '@canvas/lock-icon'
-import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnView.coffee'
-import DateAvailableColumnView from '@canvas/assignments/backbone/views/DateAvailableColumnView.coffee'
-import CreateAssignmentView from './CreateAssignmentView.coffee'
-import SisButtonView from '@canvas/sis/backbone/views/SisButtonView.coffee'
-import preventDefault from 'prevent-default'
+import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnView'
+import DateAvailableColumnView from '@canvas/assignments/backbone/views/DateAvailableColumnView'
+import CreateAssignmentView from './CreateAssignmentView'
+import SisButtonView from '@canvas/sis/backbone/views/SisButtonView'
+import preventDefault from '@canvas/util/preventDefault'
 import template from '../../jst/AssignmentListItem.handlebars'
 import scoreTemplate from '../../jst/_assignmentListItemScore.handlebars'
-import round from 'round'
+import round from '@canvas/round'
 import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
 import 'jqueryui/tooltip'
 import '@canvas/rails-flash-notifications'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 import {StudentViewPeerReviews} from '../../react/components/StudentViewPeerReviews'
+import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 
 const I18n = useI18nScope('AssignmentListItemView')
 
@@ -695,6 +697,13 @@ export default AssignmentListItemView = (function () {
 
     _setJSONForGrade(json) {
       let submission
+      let {gradingType} = json
+      const {pointsPossible} = json
+
+      if (typeof pointsPossible === 'number' && !Number.isNaN(pointsPossible)) {
+        json.pointsPossible = round(pointsPossible, round.DEFAULT)
+      }
+
       if ((submission = this.model.get('submission'))) {
         const submissionJSON = submission.present ? submission.present() : submission.toJSON()
         const score = submission.get('score')
@@ -702,24 +711,36 @@ export default AssignmentListItemView = (function () {
           submissionJSON.score = round(score, round.DEFAULT)
         }
         json.submission = submissionJSON
-        const grade = submission.get('grade')
-        const gradeString = this.gradeStrings(grade)[json.gradingType]
-        json.submission.gradeDisplay = gradeString != null ? gradeString.nonscreenreader : undefined
-        json.submission.gradeDisplayForScreenreader =
-          gradeString != null ? gradeString.screenreader : undefined
-      }
+        let grade = submission.get('grade')
 
-      const {pointsPossible} = json
+        if (json.restrict_quantitative_data && gradingType !== 'pass_fail') {
+          gradingType = 'letter_grade'
 
-      if (typeof pointsPossible === 'number' && !Number.isNaN(pointsPossible)) {
-        json.pointsPossible = round(pointsPossible, round.DEFAULT)
-        if (json.submission != null) {
-          json.submission.pointsPossible = json.pointsPossible
+          if (json.pointsPossible === 0 && json.submission.score <= 0) {
+            grade = null
+          } else if (json.pointsPossible === 0 && json.submission.score > 0) {
+            grade = scoreToGrade(100, ENV.grading_scheme)
+          } else {
+            grade = scoreToGrade(
+              scoreToPercentage(json.submission.score, json.pointsPossible),
+              ENV.grading_scheme
+            )
+          }
+        }
+
+        if (grade !== null) {
+          const gradeString = this.gradeStrings(grade)[gradingType]
+          json.submission.gradeDisplay =
+            gradeString != null ? gradeString.nonscreenreader : undefined
+          json.submission.gradeDisplayForScreenreader =
+            gradeString != null ? gradeString.screenreader : undefined
         }
       }
 
       if (json.submission != null) {
-        json.submission.gradingType = json.gradingType
+        json.submission.gradingType = gradingType
+        json.submission.restrict_quantitative_data = json.restrict_quantitative_data // This is so this variable is accessible on the {{#with submission}} block.
+        json.submission.pointsPossible = json.pointsPossible
       }
 
       if (json.gradingType === 'not_graded') {

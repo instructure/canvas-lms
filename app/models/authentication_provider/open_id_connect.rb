@@ -22,11 +22,11 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   attr_accessor :instance_debugging
 
   def self.sti_name
-    self == OpenIDConnect ? "openid_connect" : super
+    (self == OpenIDConnect) ? "openid_connect" : super
   end
 
   def self.display_name
-    self == OpenIDConnect ? "OpenID Connect" : super
+    (self == OpenIDConnect) ? "OpenID Connect" : super
   end
 
   def self.open_id_connect_params

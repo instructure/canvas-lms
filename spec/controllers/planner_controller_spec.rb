@@ -1120,7 +1120,7 @@ describe PlannerController do
             @entry = @topic.discussion_entries.create!(message: "Hello!", user: @student)
             @reply = @entry.reply_from(user: @teacher, text: "ohai!")
             @topic.reload
-            expect(@topic.unread?(@student)).to eq true
+            expect(@topic.unread?(@student)).to be true
             expect(@topic.unread_count(@student)).to eq 1
 
             get :index, params: { filter: "new_activity" }

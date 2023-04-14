@@ -175,11 +175,11 @@ RSpec.shared_examples "DiscussionType" do
     student_in_course(active_all: true)
     type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
 
-    expect(type_with_student.resolve("initialPostRequiredForCurrentUser")).to eq true
+    expect(type_with_student.resolve("initialPostRequiredForCurrentUser")).to be true
     expect(type_with_student.resolve("discussionEntriesConnection { nodes { message } }").count).to eq 0
 
     discussion.discussion_entries.create!(message: "Here is my entry", user: @student)
-    expect(type_with_student.resolve("initialPostRequiredForCurrentUser")).to eq false
+    expect(type_with_student.resolve("initialPostRequiredForCurrentUser")).to be false
     expect(type_with_student.resolve("discussionEntriesConnection { nodes { message } }").count).to eq 2
   end
 
@@ -410,11 +410,11 @@ RSpec.shared_examples "DiscussionType" do
     end
 
     it "author is nil" do
-      expect(@anon_discussion_type.resolve("author { shortName }")).to eq nil
+      expect(@anon_discussion_type.resolve("author { shortName }")).to be_nil
     end
 
     it "editor is nil" do
-      expect(@anon_discussion_type.resolve("editor { shortName }")).to eq nil
+      expect(@anon_discussion_type.resolve("editor { shortName }")).to be_nil
     end
 
     it "anonymous_author is not nil" do
@@ -422,7 +422,7 @@ RSpec.shared_examples "DiscussionType" do
     end
 
     it "mentionableUsersConnection is nil" do
-      expect(@anon_discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq nil
+      expect(@anon_discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to be_nil
     end
 
     it "returns the teacher author if a course id is provided" do
@@ -454,11 +454,11 @@ RSpec.shared_examples "DiscussionType" do
     end
 
     it "does not return the student author if a course id is provided" do
-      expect(@anon_student_discussion_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq nil
+      expect(@anon_student_discussion_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to be_nil
     end
 
     it "does not return the student editor if a course id is provided" do
-      expect(@anon_student_discussion_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq nil
+      expect(@anon_student_discussion_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to be_nil
     end
 
     context "partial anonymity" do
@@ -468,11 +468,11 @@ RSpec.shared_examples "DiscussionType" do
         end
 
         it "does not return as student author" do
-          expect(@anon_student_discussion_with_anonymous_author_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq nil
+          expect(@anon_student_discussion_with_anonymous_author_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to be_nil
         end
 
         it "does not return as student editor" do
-          expect(@anon_student_discussion_with_anonymous_author_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq nil
+          expect(@anon_student_discussion_with_anonymous_author_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to be_nil
         end
 
         it "returns student's anonymousAuthor" do
@@ -494,18 +494,18 @@ RSpec.shared_examples "DiscussionType" do
         end
 
         it "does not return student's anonymousAuthor" do
-          expect(@anon_student_discussion_with_non_anonymous_author_type.resolve("anonymousAuthor { shortName }")).to eq nil
+          expect(@anon_student_discussion_with_non_anonymous_author_type.resolve("anonymousAuthor { shortName }")).to be_nil
         end
       end
     end
 
     context "can reply anonymously" do
       it "returns false for teachers" do
-        expect(@anon_discussion_type.resolve("canReplyAnonymously")).to eq false
+        expect(@anon_discussion_type.resolve("canReplyAnonymously")).to be false
       end
 
       it "returns true for students" do
-        expect(@anon_discussion_as_student_type.resolve("canReplyAnonymously")).to eq true
+        expect(@anon_discussion_as_student_type.resolve("canReplyAnonymously")).to be true
       end
     end
   end
@@ -570,7 +570,7 @@ RSpec.shared_examples "DiscussionType" do
       result = discussion_type.resolve("discussionEntriesConnection(filter:deleted) { nodes { deleted } }")
 
       expect(result.count).to be 1
-      expect(result[0]).to eq true
+      expect(result[0]).to be true
     end
   end
 
@@ -723,7 +723,7 @@ describe Types::DiscussionType do
       end
 
       it "returns nil for message and emtpy entries array for student" do
-        expect(@delayed_type_with_student.resolve("message")).to be nil
+        expect(@delayed_type_with_student.resolve("message")).to be_nil
         expect(@delayed_type_with_student.resolve("discussionEntriesConnection { nodes { message } }")).to eq []
       end
 
@@ -733,7 +733,7 @@ describe Types::DiscussionType do
       end
 
       it "returns correct message and entries of topics when delayed_post_at is nil" do
-        expect(discussion.delayed_post_at).to eq nil
+        expect(discussion.delayed_post_at).to be_nil
         expect(@nil_delayed_at_type_with_student.resolve("message")).to eq discussion.message
         expect(@nil_delayed_at_type_with_student.resolve("discussionEntriesConnection { nodes { message } }").count).to eq 1
       end

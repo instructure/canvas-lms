@@ -52,7 +52,7 @@ shared_examples_for "k5 subject navigation tabs" do
 
     get "/courses/#{@subject_course.id}"
 
-    tab_list_text = "Math Schedule\nSchedule\nMath Home\nHome\nMath Grades\nGrades\nMath Modules\nModules\n"\
+    tab_list_text = "Math Schedule\nSchedule\nMath Home\nHome\nMath Grades\nGrades\nMath Modules\nModules\n" \
                     "Math Resources\nResources"
     tab_list_text += "\nMath Groups\nGroups" if @subject_course.user_is_instructor?(@current_user)
 

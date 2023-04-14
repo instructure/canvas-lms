@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'browser-sniffer'
 import $ from 'jquery'
 import authenticity_token from '@canvas/authenticity-token'
 import '@canvas/jquery/jquery.ajaxJSON'
+
+if (!('INST' in window)) window.INST = {}
 
 let update_url = window.ENV.page_view_update_url
 if (update_url) {

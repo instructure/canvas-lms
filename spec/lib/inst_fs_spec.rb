@@ -46,17 +46,17 @@ describe InstFS do
     context "validate_capture_jwt" do
       it "returns true for jwt signed with primary key" do
         token = Canvas::Security.create_jwt({}, nil, secret, :HS512)
-        expect(InstFS.validate_capture_jwt(token)).to eq(true)
+        expect(InstFS.validate_capture_jwt(token)).to be(true)
       end
 
       it "returns true for jwt signed with rotating key" do
         token = Canvas::Security.create_jwt({}, nil, rotating_secret, :HS512)
-        expect(InstFS.validate_capture_jwt(token)).to eq(true)
+        expect(InstFS.validate_capture_jwt(token)).to be(true)
       end
 
       it "returns false for jwt signed with bogus key" do
         token = Canvas::Security.create_jwt({}, nil, "boguskey", :HS512)
-        expect(InstFS.validate_capture_jwt(token)).to eq(false)
+        expect(InstFS.validate_capture_jwt(token)).to be(false)
       end
     end
 
@@ -553,7 +553,7 @@ describe InstFS do
         allow(CanvasHttp).to receive(:delete).with(%r{/files/#{instfs_uuid}}).and_return(
           instance_double("Net::HTTPOK", code: "200")
         )
-        expect(InstFS.delete_file(instfs_uuid)).to eq true
+        expect(InstFS.delete_file(instfs_uuid)).to be true
       end
     end
   end

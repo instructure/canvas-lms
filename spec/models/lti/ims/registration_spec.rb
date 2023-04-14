@@ -67,24 +67,24 @@ module Lti::IMS
       subject { registration.validate }
 
       context "when valid" do
-        it { is_expected.to eq true }
+        it { is_expected.to be true }
       end
 
       context "application_type" do
         context "is \"web\"" do
-          it { is_expected.to eq true }
+          it { is_expected.to be true }
         end
 
         context "is not \"web\"" do
           let(:application_type) { "native" }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
 
         context "is not included" do
           let(:application_type) { nil }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
@@ -92,19 +92,19 @@ module Lti::IMS
         context "includes other types" do
           let(:grant_types) { %i[client_credentials implicit foo bar] }
 
-          it { is_expected.to eq true }
+          it { is_expected.to be true }
         end
 
         context "does not include implicit" do
           let(:grant_types) { [:client_credentials, :foo] }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
 
         context "does not include client_credentials" do
           let(:grant_types) { [:implicit, :foo] }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
@@ -112,19 +112,19 @@ module Lti::IMS
         context "includes other types" do
           let(:response_types) { %i[id_token foo bar] }
 
-          it { is_expected.to eq true }
+          it { is_expected.to be true }
         end
 
         context "is not included" do
           let(:response_types) { nil }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
 
         context "does not include id_token" do
           let(:response_types) { [:foo, :bar] }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
@@ -132,19 +132,19 @@ module Lti::IMS
         context "includes valid uris" do
           let(:redirect_uris) { ["https://example.com", "https://example.com/foo"] }
 
-          it { is_expected.to eq true }
+          it { is_expected.to be true }
         end
 
         context "is not included" do
           let(:redirect_uris) { nil }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
 
         context "includes a non-url" do
           let(:redirect_uris) { ["https://example.com", "asdf"] }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
@@ -152,19 +152,19 @@ module Lti::IMS
         context "is not included" do
           let(:initiate_login_uri) { nil }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
 
         context "is a valid uri" do
           let(:initiate_login_uri) { "http://example.com/login" }
 
-          it { is_expected.to eq true }
+          it { is_expected.to be true }
         end
 
         context "is not a valid uri" do
           let(:initiate_login_uri) { "asdf" }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
@@ -172,7 +172,7 @@ module Lti::IMS
         context "is not included" do
           let(:client_name) { nil }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
@@ -180,13 +180,13 @@ module Lti::IMS
         context "is not included" do
           let(:jwks_uri) { nil }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
 
         context "is not a valid uri" do
           let(:jwks_uri) { "asdf" }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
@@ -194,7 +194,7 @@ module Lti::IMS
         context "is not \"private_key_jwt\"" do
           let(:token_endpoint_auth_method) { "asdf" }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
@@ -202,7 +202,7 @@ module Lti::IMS
         context "is not a valid uri" do
           let(:logo_uri) { "asdf" }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
@@ -210,7 +210,7 @@ module Lti::IMS
         context "is not a valid uri" do
           let(:client_uri) { "asdf" }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
@@ -218,7 +218,7 @@ module Lti::IMS
         context "is not a valid uri" do
           let(:tos_uri) { "asdf" }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
@@ -226,7 +226,7 @@ module Lti::IMS
         context "is not a valid uri" do
           let(:policy_uri) { "asdf" }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
 
@@ -234,7 +234,7 @@ module Lti::IMS
         context "contains invalid scopes" do
           let(:scopes) { ["asdf"] }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
     end

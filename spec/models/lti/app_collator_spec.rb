@@ -126,8 +126,8 @@ module Lti
         expect(definitions.count).to eq 2
         external_tool = definitions.find { |d| d[:app_type] == "ContextExternalTool" }
         tool_proxy = definitions.find { |d| d[:app_type] == "Lti::ToolProxy" }
-        expect(tool_proxy).to_not be nil
-        expect(external_tool).to_not be nil
+        expect(tool_proxy).to_not be_nil
+        expect(external_tool).to_not be_nil
       end
 
       it "has check_for_update set to false" do
@@ -141,8 +141,8 @@ module Lti
         expect(definitions.count).to eq 2
         external_tool = definitions.find { |d| d[:app_type] == "ContextExternalTool" }
         tool_proxy = definitions.find { |d| d[:app_type] == "Lti::ToolProxy" }
-        expect(external_tool[:reregistration_url]).to eq nil
-        expect(tool_proxy[:reregistration_url]).to eq nil
+        expect(external_tool[:reregistration_url]).to be_nil
+        expect(tool_proxy[:reregistration_url]).to be_nil
       end
 
       it "has reregistartion set to true for tool proxies if the feature flag is enabled" do
@@ -199,7 +199,7 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition[:reregistration_url]).to eq nil
+        expect(definition[:reregistration_url]).to be_nil
       end
     end
   end

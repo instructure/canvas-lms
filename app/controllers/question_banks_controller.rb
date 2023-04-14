@@ -20,7 +20,7 @@
 
 class QuestionBanksController < ApplicationController
   before_action :require_context, except: :bookmark
-  add_crumb(proc { t("#crumbs.question_banks", "Question Banks") }, except: :bookmark) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
+  add_crumb(proc { t("#crumbs.question_banks", "Question Banks") }, except: :bookmark) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_question_banks_url }
 
   include Api::V1::Outcome
   include QuizMathDataFixup

@@ -25,7 +25,7 @@ module Lti::MembershipService
         course_with_teacher
         @group_category = @course.group_categories.create!(name: "Membership")
 
-        (0..100).each do |n|
+        101.times do |n|
           @course.groups.create!(name: "Group #{n}", group_category: @group_category)
         end
       end
@@ -104,13 +104,13 @@ module Lti::MembershipService
         describe "#next_page?" do
           it "returns true when there is an additional page of results" do
             collator = CourseGroupCollator.new(@course, page: 1)
-            expect(collator.next_page?).to eq(true)
+            expect(collator.next_page?).to be(true)
           end
 
           it "returns false when there are no more pages" do
             collator = CourseGroupCollator.new(@course, page: 11)
             collator.memberships
-            expect(collator.next_page?).to eq(false)
+            expect(collator.next_page?).to be(false)
           end
         end
       end

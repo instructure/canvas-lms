@@ -158,7 +158,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       outcome = create_outcome
 
       assignments = []
-      (0...20).each do |points|
+      20.times do |points|
         assignments.push(create_alignment)
         create_learning_outcome_result @students[0], points, { points_possible: 19.0 }
       end
@@ -227,7 +227,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
 
       assignments = []
       (1..3).each do |i|
-        (0..3).each do |j|
+        4.times do |j|
           @outcome = outcomes[j]
           assignments.push(create_alignment)
           create_learning_outcome_result @students[0], nil, { submitted_at: time - i.days }

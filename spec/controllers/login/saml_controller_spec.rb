@@ -594,7 +594,7 @@ describe Login::SamlController do
 
         session[:sentinel] = true
         post_create
-        expect(session[:sentinel]).to eq true
+        expect(session[:sentinel]).to be true
 
         expect(response).to redirect_to(login_url)
         expect(flash[:delegated_message]).to eq "Canvas is not configured to receive logins from hahahahahahaha."
@@ -626,7 +626,7 @@ describe Login::SamlController do
 
       it "reject unknown specified AAC" do
         get_new("0")
-        expect(response.status).to eq 404
+        expect(response).to have_http_status :not_found
       end
     end
 
@@ -640,7 +640,7 @@ describe Login::SamlController do
         it "returns bad request if a SAMLResponse or SAMLRequest parameter is not provided" do
           expect(controller).not_to receive(:logout_user_action)
           get :destroy
-          expect(response.status).to eq 400
+          expect(response).to have_http_status :bad_request
         end
 
         it "finds the correct AAC" do
@@ -680,7 +680,7 @@ describe Login::SamlController do
           logout_request.issuer = SAML2::NameID.new(@aac3.idp_entity_id)
           expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_request)
           get :destroy, params: { SAMLRequest: "foo" }
-          expect(response.status).to eq 400
+          expect(response).to have_http_status :bad_request
         end
 
         it "returns bad request if SAMLRequest parameter doesn't match an AAC" do
@@ -690,7 +690,7 @@ describe Login::SamlController do
 
           controller.request.env["canvas.domain_root_account"] = @account
           get :destroy, params: { SAMLRequest: "foo" }
-          expect(response.status).to eq 400
+          expect(response).to have_http_status :bad_request
         end
       end
     end
@@ -707,7 +707,7 @@ describe Login::SamlController do
       expect(controller).not_to receive(:logout_user_action)
       controller.request.env["canvas.domain_root_account"] = @account
       get :destroy, params: { SAMLResponse: "foo", RelayState: "/courses" }
-      expect(response.status).to eq 400
+      expect(response).to have_http_status :bad_request
     end
 
     it "renders an error if the IdP fails the request" do
@@ -748,7 +748,7 @@ describe Login::SamlController do
       end
       get :destroy, params: { SAMLRequest: saml_request }
 
-      expect(response.status).to eq 400
+      expect(response).to have_http_status :bad_request
     end
 
     it "accepts an HTTP-POST message" do
@@ -769,7 +769,7 @@ describe Login::SamlController do
       expect_any_instance_of(SAML2::LogoutRequest).to receive(:validate_signature).and_return([])
       post :destroy, params: post_params
 
-      expect(response.status).to eq 302
+      expect(response).to have_http_status :found
       expect(response.location).to match(%r{^https://idp.school.edu/logout})
     end
   end

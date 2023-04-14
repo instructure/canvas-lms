@@ -33,7 +33,7 @@ describe "Importing assignments" do
       data[:assignments_to_import] = {}
       expect do
         expect(Importers::AssignmentImporter.import_from_migration(data, context, migration)).to be_nil
-      end.to change(Assignment, :count).by(0)
+      end.not_to change(Assignment, :count)
 
       data[:assignments_to_import][data[:migration_id]] = true
       expect do
@@ -193,7 +193,7 @@ describe "Importing assignments" do
     }
     Importers::AssignmentImporter.import_from_migration(nameless_assignment_hash, @course, migration)
     assignment = @course.assignments.where(migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6").first
-    expect(assignment.turnitin_enabled).to eq true
+    expect(assignment.turnitin_enabled).to be true
     settings = assignment.turnitin_settings
     expect(settings["originality_report_visibility"]).to eq("after_due_date")
     expect(settings["exclude_value"]).to eq("5")
@@ -495,7 +495,7 @@ describe "Importing assignments" do
 
           it "does not create an Lti::ResourceLink" do
             expect(created_resource_link_ids).to eq([])
-            expect(assignment.line_items.take.lti_resource_link_id).to eq(nil)
+            expect(assignment.line_items.take.lti_resource_link_id).to be_nil
           end
 
           context "without an explicit client_id" do
@@ -535,8 +535,7 @@ describe "Importing assignments" do
           end
 
           it "creates the line items with the same Lti::ResourceLink" do
-            expect(assignment.line_items.pluck(:lti_resource_link_id)).to \
-              eq(created_resource_link_ids * 3)
+            expect(assignment.line_items.pluck(:lti_resource_link_id)).to eq(created_resource_link_ids * 3)
           end
         end
 
@@ -560,13 +559,13 @@ describe "Importing assignments" do
           end
 
           it "creates all line items" do
-            expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first)).to \
-              eq(expected_created_line_items_fields)
+            expect(assignment.line_items.pluck(:label, :coupled, :score_maximum)
+            .sort_by(&:first)).to eq(expected_created_line_items_fields)
           end
 
           it "creates the line items with the same Lti::ResourceLink" do
-            expect(assignment.line_items.pluck(:lti_resource_link_id)).to \
-              eq(created_resource_link_ids * 4)
+            expect(assignment.line_items.pluck(:lti_resource_link_id))
+              .to eq(created_resource_link_ids * 4)
           end
 
           context "when the same line items are imported again in an additional run" do
@@ -576,8 +575,8 @@ describe "Importing assignments" do
                 Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
                 Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
               end.to_not change { Assignment.count }
-              expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first)).to \
-                eq(expected_created_line_items_fields)
+              expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first))
+                .to eq(expected_created_line_items_fields)
             end
           end
         end

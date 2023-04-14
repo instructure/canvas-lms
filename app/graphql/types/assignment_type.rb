@@ -113,6 +113,11 @@ module Types
     field :points_possible, Float, "the assignment is out of this many points",
           null: true
 
+    field :restrict_quantitative_data, Boolean, "Is the current user restricted from viewing quantitative data", null: true
+    def restrict_quantitative_data
+      assignment.restrict_quantitative_data?(current_user)
+    end
+
     def self.overridden_field(field_name, description)
       field field_name, DateTimeType, description, null: true do
         argument :apply_overrides, Boolean, <<~MD, required: false, default_value: true

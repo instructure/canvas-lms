@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe OutcomeImport, type: :model do
+describe OutcomeImport do
   before :once do
     account_model
   end
@@ -249,7 +249,7 @@ describe OutcomeImport, type: :model do
       expect(errors.pluck(:row, :message)).to eq([
                                                    [1, "Very Bad Error"]
                                                  ])
-      expect(import.progress).to eq(nil)
+      expect(import.progress).to be_nil
       expect(import.workflow_state).to eq("failed")
     end
 

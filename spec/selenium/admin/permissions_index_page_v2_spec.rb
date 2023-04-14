@@ -89,8 +89,8 @@ describe "permissions index" do
         r = RoleOverride.last
         expect(r.role_id).to eq(ta_role.id)
         expect(r.permission).to eq(permission_name)
-        expect(r.enabled).to eq(true)
-        expect(r.locked).to eq(false)
+        expect(r.enabled).to be(true)
+        expect(r.locked).to be(false)
       end
 
       it "permissions disables on grid" do
@@ -100,8 +100,8 @@ describe "permissions index" do
         r = RoleOverride.last
         expect(r.role_id).to eq(student_role.id)
         expect(r.permission).to eq(permission_name)
-        expect(r.enabled).to eq(false)
-        expect(r.locked).to eq(false)
+        expect(r.enabled).to be(false)
+        expect(r.locked).to be(false)
       end
 
       it "permissions locks on grid" do
@@ -111,7 +111,7 @@ describe "permissions index" do
         r = RoleOverride.last
         expect(r.role_id).to eq(ta_role.id)
         expect(r.permission).to eq(permission_name)
-        expect(r.locked).to eq(true)
+        expect(r.locked).to be(true)
       end
 
       it "permissions unlocks on grid" do
@@ -122,8 +122,8 @@ describe "permissions index" do
         r = RoleOverride.find(id)
         expect(r.role_id).to eq(student_role.id)
         expect(r.permission).to eq(permission_name)
-        expect(r.enabled).to eq(false)
-        expect(r.locked).to eq(false)
+        expect(r.enabled).to be(false)
+        expect(r.locked).to be(false)
       end
 
       it "permissions default on grid works" do

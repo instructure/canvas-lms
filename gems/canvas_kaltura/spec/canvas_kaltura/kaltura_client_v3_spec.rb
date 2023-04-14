@@ -401,7 +401,7 @@ describe CanvasKaltura::ClientV3 do
 
       expect(parsed_bulk_upload[:id]).to eq "batch_job_12345"
       expect(parsed_bulk_upload[:status]).to eq "ready"
-      expect(parsed_bulk_upload[:ready]).to eq true
+      expect(parsed_bulk_upload[:ready]).to be true
       expect(parsed_bulk_upload[:entries]).to eq [{ name: "aName", entryId: "anEntryId", originalId: "anOriginalId" }]
     end
   end

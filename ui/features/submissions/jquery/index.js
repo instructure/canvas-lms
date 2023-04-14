@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import round from 'round'
+import round from '@canvas/round'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import isNumber from 'lodash/isNumber'
@@ -469,7 +469,7 @@ export function setup() {
         }
       )
     })
-    $('#media_recorder_container a').live('click', _event => {
+    $(document).on('click', '#media_recorder_container a', _event => {
       $('#add_comment_form').show()
       $('#media_media_recording').hide()
     })

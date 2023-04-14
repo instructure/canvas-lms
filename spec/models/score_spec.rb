@@ -277,26 +277,26 @@ describe Score do
 
   context "permissions" do
     it "allows the proper people" do
-      expect(score.grants_right?(@enrollment.user, :read)).to eq true
+      expect(score.grants_right?(@enrollment.user, :read)).to be true
 
       teacher_in_course(active_all: true)
-      expect(score.grants_right?(@teacher, :read)).to eq true
+      expect(score.grants_right?(@teacher, :read)).to be true
     end
 
     it "doesn't work for nobody" do
-      expect(score.grants_right?(nil, :read)).to eq false
+      expect(score.grants_right?(nil, :read)).to be false
     end
 
     it "doesn't allow random classmates to read" do
       score
       student_in_course(active_all: true)
-      expect(score.grants_right?(@student, :read)).to eq false
+      expect(score.grants_right?(@student, :read)).to be false
     end
 
     it "doesn't work for yourself if the course is configured badly" do
       @enrollment.course.hide_final_grade = true
       @enrollment.course.save!
-      expect(score.grants_right?(@enrollment.user, :read)).to eq false
+      expect(score.grants_right?(@enrollment.user, :read)).to be false
     end
   end
 

@@ -54,21 +54,21 @@ module Alerts
         ::UserNote.create!(creator: @teacher, user: @user, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 30.days }
 
         user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-        expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to eq true
+        expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to be true
       end
 
       it "returns true when the student has received a note less than threshold days ago" do
         ::UserNote.create!(creator: @teacher, user: @user, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 30.days }
 
         user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-        expect(user_note_alert.should_not_receive_message?(@student.id, 31)).to eq true
+        expect(user_note_alert.should_not_receive_message?(@student.id, 31)).to be true
       end
 
       it "returns false when the student has not received a note less than threshold days ago" do
         ::UserNote.create!(creator: @teacher, user: @user, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 30.days }
 
         user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-        expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to eq false
+        expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to be false
       end
 
       it "handles multiple user notes" do
@@ -76,7 +76,7 @@ module Alerts
         ::UserNote.create!(creator: @teacher, user: @user, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 10.days }
 
         user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-        expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to eq true
+        expect(user_note_alert.should_not_receive_message?(@student.id, 29)).to be true
       end
 
       it "handles notes from multiple students" do
@@ -87,7 +87,7 @@ module Alerts
         ::UserNote.create!(creator: @teacher, user: student_2, root_account_id: @root_account.id) { |un| un.created_at = Time.now - 10.days }
 
         ungraded_timespan = Alerts::UserNote.new(@course, [student_1.id, student_2.id], [@teacher.id])
-        expect(ungraded_timespan.should_not_receive_message?(student_1.id, 2)).to eq false
+        expect(ungraded_timespan.should_not_receive_message?(student_1.id, 2)).to be false
       end
 
       context "when the student has not received any notes" do
@@ -97,7 +97,7 @@ module Alerts
             @course.save!
 
             user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to eq true
+            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to be true
           end
 
           it "returns false when threshold days from course start are not exceeded" do
@@ -105,7 +105,7 @@ module Alerts
             @course.save!
 
             user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to eq false
+            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to be false
           end
         end
 
@@ -116,7 +116,7 @@ module Alerts
             @course.save!
 
             user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to eq true
+            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to be true
           end
 
           it "returns false when threshold days from course created at are not exceeded" do
@@ -125,7 +125,7 @@ module Alerts
             @course.save!
 
             user_note_alert = Alerts::UserNote.new(@course, [@student.id], [@teacher.id])
-            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to eq false
+            expect(user_note_alert.should_not_receive_message?(@student.id, 3)).to be false
           end
         end
       end
