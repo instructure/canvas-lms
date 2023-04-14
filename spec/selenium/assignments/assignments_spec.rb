@@ -1086,11 +1086,11 @@ describe "assignments" do
       end
 
       context "assignment show page" do
-        it "does not show points for teachers" do
+        it "shows points for teachers" do
           @assignment = @course.assignments.create({ name: "Test Assignment" })
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           wait_for_ajaximations
-          expect(ff("div .control-label").map(&:text)).not_to include "Points"
+          expect(ff("div .control-label").map(&:text)).to include "Points"
         end
 
         it "does not show points for students" do
