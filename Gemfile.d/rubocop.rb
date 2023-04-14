@@ -30,11 +30,11 @@ group :test do
   gem "gergich", "2.1.1", require: false
     gem "mime-types-data", "~> 3.2023", require: false
 
-  gem "rubocop", "1.49.0", require: false
+  gem "rubocop", "1.50.2", require: false
   gem "rubocop-canvas", require: false, path: "gems/rubocop-canvas"
   gem "rubocop-graphql", "1.1.1", require: false
   gem "rubocop-performance", "1.17.1", require: false
-  gem "rubocop-rails", "2.19", require: false
+  gem "rubocop-rails", "2.19.1", require: false
   gem "rubocop-rake", "0.6.0", require: false
   gem "rubocop-rspec", "2.19.0", require: false
 end
