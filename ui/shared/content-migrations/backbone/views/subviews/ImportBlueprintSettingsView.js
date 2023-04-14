@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-import template from '../../../jst/subviews/ImportBlueprintSettingsView.handlebars'
+import template from './ImportBlueprintSettingsView.handlebars'
 
 extend(ImportBlueprintSettingsView, Backbone.View)
 
