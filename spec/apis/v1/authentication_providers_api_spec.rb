@@ -395,6 +395,8 @@ describe "AuthenticationProviders API", type: :request do
       @ldap_hash["position"] = 1
       @ldap_hash["mfa_required"] = false
       @ldap_hash["skip_internal_mfa"] = false
+      @ldap_hash["internal_ca"] = nil
+      @ldap_hash["verify_tls_cert_opt_in"] = false
       expect(json).to eq @ldap_hash
     end
 
