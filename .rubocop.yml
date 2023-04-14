@@ -1,4 +1,5 @@
 require:
+  - rubocop-graphql
   - rubocop-rails
   - rubocop-rake
   - rubocop-rspec
@@ -33,6 +34,17 @@ Gemspec/RequiredRubyVersion:
   # don't specify required_ruby_version in the rest to reduce
   # maintenance pain when updating ruby versions
   Enabled: false
+
+GraphQL/ArgumentDescription:
+  Enabled: false
+GraphQL/FieldDescription:
+  Enabled: false
+GraphQL/FieldDefinitions:
+  Enabled: false # we group field definitions with their implementation method
+GraphQL/ObjectDescription:
+  Enabled: false
+GraphQL/ResolverMethodLength:
+  Enabled: false # this is a Metrics-style cop
 
 Layout:
   Severity: error
@@ -252,6 +264,19 @@ Style/WordArray:
 # we should eventually either fix them, or turn them off completely (and move
 # them to the section above)
 # auto-correct needs to be disabled for any that support it in the meantime
+
+GraphQL/FieldMethod:
+  AutoCorrect: false
+GraphQL/FieldName:
+  AutoCorrect: false
+GraphQL/MultipleFieldDefinitions:
+  AutoCorrect: false
+GraphQL/OrderedArguments:
+  AutoCorrect: false
+GraphQL/OrderedFields:
+  AutoCorrect: false
+GraphQL/UnusedArgument:
+  AutoCorrect: false
 
 Layout/LineLength:
   Enabled: false

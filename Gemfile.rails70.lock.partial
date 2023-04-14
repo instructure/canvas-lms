@@ -977,6 +977,8 @@ GEM
       parser (>= 3.2.1.0)
     rubocop-capybara (2.17.1)
       rubocop (~> 1.41)
+    rubocop-graphql (1.1.1)
+      rubocop (>= 0.87, < 2)
     rubocop-performance (1.17.1)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
@@ -1360,6 +1362,7 @@ DEPENDENCIES
   rss (= 0.2.9)
   rubocop (= 1.49.0)
   rubocop-canvas!
+  rubocop-graphql (= 1.1.1)
   rubocop-performance (= 1.17.1)
   rubocop-rails (= 2.19)
   rubocop-rake (= 0.6.0)
