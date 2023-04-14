@@ -77,29 +77,13 @@ class Login::OauthBaseController < ApplicationController
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
     end
 
-    if unique_ids.first && identity_v2_applicable?
-      pseudonym = Pseudonym.active.find_by(integration_id: unique_ids.first)
-      HTTParty.post(
-        SettingsService.get_settings(object: "school", id: 1)["slack_api_url"],
-        headers: {
-          "Content-Type": "application"
-        },
-        body: {
-          'username': SettingsService.get_settings(object: "school", id: 1)["slack_api_user"],
-          'text': "#{unique_ids.first} did not match an integration id. Provider attributes: " +
-                  "#{provider_attributes.map do |k, v| "#{k}: #{v}" end.join(", ")}"
-        }.to_json,
-        verify: false
-      ) unless pseudonym || provider_attributes["is_admin"]
-    end
-
     if pseudonym
       @aac.apply_federated_attributes(pseudonym, provider_attributes)
     elsif !unique_ids.empty? && (@aac.jit_provisioning? || provider_attributes["is_admin"])
       pseudonym = @aac.provision_user(unique_ids.first, provider_attributes)
     end
 
-    if pseudonym
+    if pseudonym && (user = pseudonym.login_assertions_for_user)
       # Successful login and we have a user
       @domain_root_account.pseudonym_sessions.create!(pseudonym, false)
       session[:login_aac] = @aac.global_id
