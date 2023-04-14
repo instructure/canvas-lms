@@ -526,4 +526,58 @@ describe RubricAssociation do
       expect { association.restore }.to change { association.workflow_state }.from("deleted").to("active")
     end
   end
+
+  describe "restrict_quantitative_data" do
+    before do
+      course_with_teacher(active_course: true, active_user: true)
+      @student = student_in_course(active_user: true).user
+
+      assignment = @course.assignments.create!(
+        title: "Test Assignment",
+        submission_types: "online_text_entry"
+      )
+
+      rubric = @course.rubrics.create!
+      @course_rubric_association = RubricAssociation.create!(
+        rubric: rubric,
+        association_object: @course,
+        context: @course,
+        purpose: "bookmark"
+      )
+      @assignment_rubric_association = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params_for_assignment(assignment))
+    end
+
+    describe "is off" do
+      it "with course_rubric_association to be false" do
+        expect(@course_rubric_association.restrict_quantitative_data?(@teacher)).to be false
+        expect(@course_rubric_association.restrict_quantitative_data?(@student)).to be false
+        expect(@course_rubric_association.restrict_quantitative_data?).to be false
+      end
+
+      it "with assignment_rubric_association to be false" do
+        expect(@assignment_rubric_association.restrict_quantitative_data?(@teacher)).to be false
+        expect(@assignment_rubric_association.restrict_quantitative_data?(@student)).to be false
+        expect(@assignment_rubric_association.restrict_quantitative_data?).to be false
+      end
+    end
+
+    describe "is on" do
+      before do
+        @course.root_account.enable_feature!(:restrict_quantitative_data)
+        @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+        @course.save!
+      end
+
+      it "with course_rubric_association to be false" do
+        expect(@course_rubric_association.restrict_quantitative_data?(@teacher)).to be false
+        expect(@course_rubric_association.restrict_quantitative_data?(@student)).to be false
+        expect(@course_rubric_association.restrict_quantitative_data?).to be false
+      end
+
+      it "with assignment_rubric_association to be true" do
+        expect(@assignment_rubric_association.restrict_quantitative_data?(@teacher)).to be true
+        expect(@assignment_rubric_association.restrict_quantitative_data?(@student)).to be true
+      end
+    end
+  end
 end

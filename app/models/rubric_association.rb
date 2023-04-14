@@ -397,6 +397,12 @@ class RubricAssociation < ActiveRecord::Base
     assignment&.auditable?
   end
 
+  def restrict_quantitative_data?(user = nil)
+    return false if user.nil? || assignment.nil?
+
+    assignment.restrict_quantitative_data?(user)
+  end
+
   private
 
   def record_save_audit_event
