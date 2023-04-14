@@ -97,6 +97,12 @@
   },
   {
     "name": "AccessViolationError",
+    "source": "ui/features/assignment_edit/backbone/views/EditView.js",
+    "target": "ui/boot/initializers/activateTooltips.js",
+    "request": "../../../../boot/initializers/activateTooltips"
+  },
+  {
+    "name": "AccessViolationError",
     "source": "ui/features/gradebook/react/default_gradebook/Gradebook.js",
     "target": "ui/boot/initializers/activateTooltips.js",
     "request": "../../../../boot/initializers/activateTooltips"
