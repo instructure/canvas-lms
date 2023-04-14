@@ -20,5 +20,5 @@
     }
   },
   "include": ["ui/**/*"],
-  "exclude": ["**/node_modules", "**/.*/"]
+  "exclude": ["**/node_modules", "**/.*/", "vendor"]
 }
