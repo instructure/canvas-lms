@@ -43,7 +43,7 @@
     </div>
   <% end %>
 
-  <%= external_tools_menu_items(@course_settings_sub_navigation_tools, {link_class: "Button Button--link Button--link--has-divider Button--course-settings course-settings-sub-navigation-lti", settings_key: :course_settings_sub_navigation}) %>
+  <%= external_tools_menu_items(@course_settings_sub_navigation_tools, {link_class: "Button Button--link Button--link--has-divider Button--course-settings course-settings-sub-navigation-lti", settings_key: :course_settings_sub_navigation, remove_space_between_icon_and_text: true}) %>
   <% if can_do(@context, @current_user, :read_reports) %>
     <%= link_to context_url(@context, :context_statistics_url), :class => ' Button Button--link Button--link--has-divider Button--course-settings' do %>
       <i class="icon-stats"></i><%= t('links.stats', 'Course Statistics') %>
