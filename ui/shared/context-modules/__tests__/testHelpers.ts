@@ -23,11 +23,12 @@ interface backboneSpan extends HTMLSpanElement {
   data?: any
 }
 
-function makeModel(type, id) {
+function makeModel(type, id, module_item_id) {
   return {
     attributes: {
       type,
       id,
+      module_item_id,
     },
     view: {
       render: jest.fn(),
@@ -35,9 +36,14 @@ function makeModel(type, id) {
   }
 }
 
-export function makeModuleItem(courseId, moduleId, {item_type, item_id}) {
+export function makeModuleItem(courseId, moduleId, {content_type, content_id}) {
+  const module_item_id = 1000 * moduleId + content_id
+
   const item = document.createElement('div')
-  item.id = `context_module_item-${item_id}`
+  item.id = `context_module_item_${module_item_id}`
+  const row = document.createElement('div')
+  row.className = 'ig-row'
+  item.appendChild(row)
   const admin = document.createElement('div')
   admin.className = 'ig-admin'
   item.appendChild(admin)
@@ -45,23 +51,16 @@ export function makeModuleItem(courseId, moduleId, {item_type, item_id}) {
   const publishButton: backboneSpan = document.createElement('span')
   publishButton.setAttribute('data-course-id', courseId)
   publishButton.setAttribute('data-module-id', moduleId)
-  publishButton.setAttribute('data-module-item-id', item_id)
+  publishButton.setAttribute('data-module-item-id', `${module_item_id}`)
   publishButton.className = 'publish-icon'
   const $publishButton = $(publishButton) // sets up jquery's data()
 
   $publishButton.data({
     moduleId,
     view: {
-      model: makeModel(item_type, item_id),
+      model: makeModel(content_type, content_id, module_item_id),
     },
   })
-
-  publishButton.model = makeModel(item_type, item_id)
-  publishButton.data = {
-    view: {
-      model: publishButton.model,
-    },
-  }
 
   admin.appendChild(publishButton)
   return item
@@ -83,17 +82,24 @@ export function makeModule(moduleId: number, published: boolean = false): HTMLDi
   const content = document.createElement('div')
   content.id = `context_module_content_${moduleId}`
   module.appendChild(content)
-  document.body.appendChild(module)
+  document.getElementById('context_modules')?.appendChild(module)
   return module
 }
 
-export function makeModuleWithItems(moduleId, published = false) {
+export function makeModuleWithItems(
+  moduleId: number,
+  itemIds: number[],
+  published: boolean = false
+): void {
   makeModule(moduleId, published)
   const moduleContent = document.getElementById(`context_module_content_${moduleId}`)
-  moduleContent?.appendChild(
-    makeModuleItem(1, moduleId, {item_type: 'assignment', item_id: `${moduleId * 100 + 17}`})
-  )
-  moduleContent?.appendChild(
-    makeModuleItem(1, moduleId, {item_type: 'assignment', item_id: `${moduleId * 100 + 19}`})
-  )
+  itemIds.forEach(id => {
+    moduleContent?.appendChild(
+      makeModuleItem(1, moduleId, {content_type: 'assignment', content_id: id})
+    )
+  })
+}
+
+export function initBody() {
+  document.body.innerHTML = '<div id="context_modules"></div>'
 }

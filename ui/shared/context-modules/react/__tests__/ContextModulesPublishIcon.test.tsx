@@ -21,7 +21,7 @@ import {act, render, waitFor} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {updateModuleItem} from '@canvas/context-modules/jquery/utils'
 import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
-import {makeModuleWithItems} from '@canvas/context-modules/__tests__/testHelpers'
+import {initBody, makeModuleWithItems} from '@canvas/context-modules/__tests__/testHelpers'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/context-modules/jquery/utils', () => {
@@ -44,7 +44,8 @@ const PUBLISH_URL = '/api/v1/courses/1/modules/1'
 
 beforeEach(() => {
   doFetchApi.mockResolvedValue({response: {ok: true}, json: {published: true}})
-  makeModuleWithItems(1)
+  initBody()
+  makeModuleWithItems(1, [117, 119])
 })
 
 afterEach(() => {

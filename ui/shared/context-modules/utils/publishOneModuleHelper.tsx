@@ -27,6 +27,27 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('context_modules_utils_publishmoduleitemhelper')
 
+interface ModuleItemAttributes {
+  module_item_id: number
+}
+
+interface ModuleItemModel {
+  attributes: ModuleItemAttributes
+}
+
+interface ModuleItemView {
+  model: ModuleItemModel
+}
+
+interface ModuleItem {
+  model: ModuleItemModel
+  view: ModuleItemView
+}
+
+interface KeyedModuleItems {
+  [key: string]: ModuleItem[]
+}
+
 type moduleItemStateData = {
   published?: boolean
   bulkPublishInFlight?: boolean
@@ -145,41 +166,85 @@ export const fetchModuleItemPublishedState = (courseId, moduleId, nextLink?: str
     )
 }
 
-// update the state of all the module items' pub/unpub buttons
+// collect all the module items, indexed by their key
+// which is the underlying learning object's asset_string
+// (e.g. assignment_17 or wiki_page_5)
+export function getAllModuleItems(): KeyedModuleItems {
+  const moduleItems = {}
+  document.querySelectorAll('#context_modules .publish-icon').forEach(element => {
+    const $publishIcon = $(element)
+    const data = $publishIcon.data()
+    const view = data.view
+    if (view) {
+      const key = itemContentKey(view.model) as string
+      if (moduleItems[key]) {
+        moduleItems[key].push({view, model: view.model})
+      } else {
+        moduleItems[key] = [{view, model: view.model}]
+      }
+    }
+  })
+  return moduleItems
+}
+
+// update the state of all the module items' pub/unpub state
 export function updateModuleItemsPublishedStates(
   moduleId: number,
   published: boolean | undefined,
   isPublishing: boolean
 ) {
+  const moduleItems = exportFuncs.getAllModuleItems()
+
+  // update all the module items in the module being updated,
+  // plus module items that are also in other modules
   document
     .querySelectorAll(`#context_module_content_${moduleId} .publish-icon`)
     .forEach(element => {
       const $publishIcon = $(element)
       const data = $publishIcon.data()
-      const view = data.view
-      const updatedAttrs: moduleItemStateData = {bulkPublishInFlight: isPublishing}
-      if (!isPublishing && typeof published === 'boolean') updatedAttrs.published = published
-      if (view) {
-        const key = itemContentKey(view.model) as string
-        updateModuleItem({[key]: [{view, model: view.model}]}, updatedAttrs, view.model)
-      }
+      exportFuncs.updateModuleItemPublishedState(
+        data.moduleItemId,
+        published,
+        isPublishing,
+        moduleItems
+      )
     })
 }
 
-export function updateModuleItemPublishedState(itemId: string, isPublished: boolean) {
-  const itemRow = document.querySelector(`#context_module_item_${itemId}`) as HTMLElement | null
-  if (itemRow) {
-    itemRow.querySelector('.ig-row')?.classList.toggle('ig-published', isPublished)
-    const publishIcon = itemRow.querySelector('.publish-icon')
-    if (publishIcon) {
-      const $publishIcon = $(publishIcon)
-      const data = $publishIcon.data()
-      const view = data.view
-      const updatedAttrs: moduleItemStateData = {published: isPublished}
-      const key = itemContentKey(view.model) as string
-      updateModuleItem({[key]: [{view, model: view.model}]}, updatedAttrs, view.model)
+// update an  item's pub/sub state
+export function updateModuleItemPublishedState(
+  itemId: string,
+  isPublished: boolean | undefined,
+  isPublishing?: boolean,
+  allModuleItems?: KeyedModuleItems | undefined
+) {
+  const publishIcon = document.querySelector(`#context_module_item_${itemId} .publish-icon`)
+  if (publishIcon) {
+    const $publishIcon = $(publishIcon)
+    const data = $publishIcon.data()
+    const view = data.view
+    const updatedAttrs: moduleItemStateData = {
+      bulkPublishInFlight: isPublishing,
     }
+    if (!isPublishing && typeof isPublished === 'boolean') updatedAttrs.published = isPublished
+    const key = itemContentKey(view.model) as string
+    const items = allModuleItems?.[key] || [{view, model: view.model}]
+    updateModuleItem({[key]: items}, updatedAttrs, view.model)
+    if (!isPublishing && typeof isPublished === 'boolean')
+      updateModuleItemRowsPublishStates(items, isPublished)
   }
+}
+
+// published items have a green bar on their leading edge.
+// make that happen for all the matching items
+export function updateModuleItemRowsPublishStates(items: ModuleItem[], isPublished: boolean): void {
+  items.forEach(item => {
+    const itemId = item.model.attributes.module_item_id
+    const itemRow = document.querySelector(`#context_module_item_${itemId}`) as HTMLElement | null
+    if (itemRow) {
+      itemRow.querySelector('.ig-row')?.classList.toggle('ig-published', isPublished)
+    }
+  })
 }
 
 export function renderContextModulesPublishIcon(
@@ -226,6 +291,7 @@ const exportFuncs = {
   unpublishModule,
   batchUpdateOneModuleApiCall,
   fetchModuleItemPublishedState,
+  getAllModuleItems,
   updateModuleItemsPublishedStates,
   updateModuleItemPublishedState,
   renderContextModulesPublishIcon,

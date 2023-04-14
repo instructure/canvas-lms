@@ -23,7 +23,7 @@ import {
   updateModuleItemsPublishedStates,
 } from '../utils/publishOneModuleHelper'
 import publishAllModulesHelperModule from '../utils/publishAllModulesHelper'
-import {makeModuleWithItems} from './testHelpers'
+import {initBody, makeModuleWithItems} from './testHelpers'
 
 const {
   batchUpdateAllModulesApiCall,
@@ -43,6 +43,7 @@ jest.mock('../utils/publishOneModuleHelper')
 describe('publishAllModulesHelper', () => {
   beforeEach(() => {
     doFetchApi.mockResolvedValue({response: {ok: true}, json: {published: true}})
+    initBody()
   })
 
   afterEach(() => {
@@ -53,8 +54,8 @@ describe('publishAllModulesHelper', () => {
 
   describe('batchUpdateAllModulesApiCall', () => {
     beforeEach(() => {
-      makeModuleWithItems(1, false)
-      makeModuleWithItems(2, true)
+      makeModuleWithItems(1, [117, 119], false)
+      makeModuleWithItems(2, [217, 219], true)
     })
 
     it('PUTS the batch request', async () => {
@@ -235,8 +236,8 @@ describe('publishAllModulesHelper', () => {
   describe('updateModulePendingPublishedStates', () => {
     let spy
     beforeEach(() => {
-      makeModuleWithItems(1, false)
-      makeModuleWithItems(2, true)
+      makeModuleWithItems(1, [117, 119], false)
+      makeModuleWithItems(2, [217, 219], true)
     })
     afterEach(() => {
       spy?.mockRestore()
@@ -254,8 +255,8 @@ describe('publishAllModulesHelper', () => {
   describe('updateModulePublishedState', () => {
     let spy
     beforeEach(() => {
-      makeModuleWithItems(1, false)
-      makeModuleWithItems(2, true)
+      makeModuleWithItems(1, [117, 119], false)
+      makeModuleWithItems(2, [217, 219], true)
     })
     afterEach(() => {
       spy?.mockRestore()

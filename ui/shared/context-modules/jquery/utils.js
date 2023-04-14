@@ -126,11 +126,8 @@ export function initPublishButton($el, data) {
       display_name: moduleItem.content_details.display_name,
       thumbnail_url: moduleItem.content_details.thumbnail_url,
       usage_rights: moduleItem.content_details.usage_rights,
+      module_item_id: parseInt(moduleItem.id, 10),
     })
-
-    file.url = function () {
-      return '/api/v1/files/' + this.id
-    }
 
     const props = {
       togglePublishClassOn: $el.parents('.ig-row')[0],
@@ -353,11 +350,14 @@ export function updateModuleItem(moduleItems, attrs, model) {
     for (i = 0; i < items.length; i++) {
       item = items[i]
       parsedAttrs = item.model.parse(attrs)
-      const published =
-        'published' in parsedAttrs ? parsedAttrs.published : item.model.get('published')
+
       if (parsedAttrs.type === 'File' || model.attributes.type === 'file') {
-        item.model.set({locked: !published, disabled: parsedAttrs.bulkPublishInFlight})
+        const locked =
+          'published' in parsedAttrs ? !parsedAttrs.published : item.model.get('locked')
+        item.model.set({locked, disabled: parsedAttrs.bulkPublishInFlight})
       } else {
+        const published =
+          'published' in parsedAttrs ? parsedAttrs.published : item.model.get('published')
         item.model.set({published, bulkPublishInFlight: parsedAttrs.bulkPublishInFlight})
       }
       item.model.view.render()
