@@ -20,7 +20,7 @@ import {getByText, waitFor} from '@testing-library/dom'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {updateModuleItem} from '@canvas/context-modules/jquery/utils'
 import publishModuleItemHelperModule from '../utils/publishOneModuleHelper'
-import {makeModuleWithItems} from './testHelpers'
+import {initBody, makeModuleWithItems} from './testHelpers'
 
 const {
   batchUpdateOneModuleApiCall,
@@ -29,7 +29,9 @@ const {
   renderContextModulesPublishIcon,
   publishModule,
   unpublishModule,
+  getAllModuleItems,
   updateModuleItemsPublishedStates,
+  updateModuleItemPublishedState,
 } = {
   ...publishModuleItemHelperModule,
 }
@@ -57,6 +59,7 @@ describe('publishOneModuleHelper', () => {
 
   beforeEach(() => {
     doFetchApi.mockResolvedValue({response: {ok: true}, json: {published: true}})
+    initBody()
   })
 
   afterEach(() => {
@@ -69,7 +72,7 @@ describe('publishOneModuleHelper', () => {
     let spy
     beforeEach(() => {
       spy = jest.spyOn(publishModuleItemHelperModule, 'batchUpdateOneModuleApiCall')
-      makeModuleWithItems(1, false)
+      makeModuleWithItems(1, [117, 119], false)
     })
     afterEach(() => {
       spy.mockRestore()
@@ -106,7 +109,7 @@ describe('publishOneModuleHelper', () => {
     let spy
     beforeEach(() => {
       spy = jest.spyOn(publishModuleItemHelperModule, 'batchUpdateOneModuleApiCall')
-      makeModuleWithItems(1, false)
+      makeModuleWithItems(1, [117, 119], false)
     })
     afterEach(() => {
       spy.mockRestore()
@@ -129,8 +132,8 @@ describe('publishOneModuleHelper', () => {
   describe('batchUpdateOneModuleApiCall', () => {
     let spy
     beforeEach(() => {
-      makeModuleWithItems(1, false)
-      makeModuleWithItems(2, true)
+      makeModuleWithItems(1, [117, 119], false)
+      makeModuleWithItems(2, [217, 219], true)
     })
     afterEach(() => {
       spy?.mockRestore()
@@ -193,67 +196,129 @@ describe('publishOneModuleHelper', () => {
     })
   })
 
-  describe('updateModulePublishedStates', () => {
+  describe('updateModuleItemsPublishedStates', () => {
+    let allModuleItems
     beforeEach(() => {
-      makeModuleWithItems(1)
-      makeModuleWithItems(2)
+      makeModuleWithItems(1, [117, 119])
+      makeModuleWithItems(2, [217, 219, 117])
+      allModuleItems = getAllModuleItems()
     })
 
-    it('calls updateModuleItemsPublishedStates', () => {
+    it('calls updateModuleItemPublishedState for each module item', () => {
+      const spy = jest.spyOn(publishModuleItemHelperModule, 'updateModuleItemPublishedState')
       const published = true
       const isPublishing = false
+
       updateModuleItemsPublishedStates(1, published, isPublishing)
+      expect(spy).toHaveBeenCalledTimes(2)
+      expect(spy).toHaveBeenCalledWith(1117, published, isPublishing, allModuleItems)
+      expect(spy).toHaveBeenCalledWith(1119, published, isPublishing, allModuleItems)
+    })
+
+    it('does not change published state if undefined', () => {
+      const spy = jest.spyOn(publishModuleItemHelperModule, 'updateModuleItemPublishedState')
+      const published = undefined
+      const isPublishing = true
+
+      updateModuleItemsPublishedStates(1, published, isPublishing)
+      expect(spy).toHaveBeenCalledTimes(2)
       expect(updateModuleItem).toHaveBeenCalledTimes(2)
       expect(updateModuleItem).toHaveBeenCalledWith(
-        expect.objectContaining({assignment_117: expect.any(Array)}),
-        expect.objectContaining({published, bulkPublishInFlight: isPublishing}),
-        expect.anything()
+        expect.objectContaining({assignment_117: expect.any(Object)}),
+        {bulkPublishInFlight: isPublishing},
+        expect.any(Object)
       )
       expect(updateModuleItem).toHaveBeenCalledWith(
-        expect.objectContaining({assignment_119: expect.any(Array)}),
-        expect.objectContaining({published, bulkPublishInFlight: isPublishing}),
-        expect.anything()
+        expect.objectContaining({assignment_119: expect.any(Object)}),
+        {bulkPublishInFlight: isPublishing},
+        expect.any(Object)
       )
     })
   })
 
-  describe('updateModuleItemsPublishedStates', () => {
+  describe('updateModuleItemPublishedState', () => {
     beforeEach(() => {
-      makeModuleWithItems(1)
+      makeModuleWithItems(1, [117, 119])
+      makeModuleWithItems(2, [217, 219, 117])
     })
 
-    it('calls updateModuleItem for each module item', () => {
+    it('calls updateModuleItem with all items for the same assignment', () => {
       const published = true
       const isPublishing = false
-      updateModuleItemsPublishedStates(1, published, isPublishing)
-      expect(updateModuleItem).toHaveBeenCalledTimes(2)
+      const allModuleItems = getAllModuleItems()
+
+      updateModuleItemPublishedState('1117', published, isPublishing, allModuleItems)
       expect(updateModuleItem).toHaveBeenCalledWith(
-        expect.objectContaining({assignment_117: expect.any(Object)}),
-        {published, bulkPublishInFlight: isPublishing},
-        expect.any(Object)
-      )
-      expect(updateModuleItem).toHaveBeenCalledWith(
-        expect.objectContaining({assignment_119: expect.any(Object)}),
-        {published, bulkPublishInFlight: isPublishing},
-        expect.any(Object)
+        {assignment_117: allModuleItems.assignment_117},
+        {bulkPublishInFlight: isPublishing, published},
+        expect.anything() // view.model
       )
     })
 
-    it('does not change published state if undefined', () => {
-      const published = undefined
+    it("builds it's own 'items' array if none are given", () => {
+      const published = true
+      const isPublishing = false
+
+      updateModuleItemPublishedState('1117', published, isPublishing)
+      expect(updateModuleItem).toHaveBeenCalledWith(
+        {assignment_117: [{view: expect.anything(), model: expect.anything()}]},
+        {bulkPublishInFlight: isPublishing, published},
+        expect.anything() // view.model
+      )
+    })
+
+    it('omits "published" from updatedAttrs if called with isPublished undefined', () => {
       const isPublishing = true
-      updateModuleItemsPublishedStates(1, published, isPublishing)
-      expect(updateModuleItem).toHaveBeenCalledTimes(2)
+      updateModuleItemPublishedState('1117', undefined, isPublishing)
       expect(updateModuleItem).toHaveBeenCalledWith(
-        expect.objectContaining({assignment_117: expect.any(Object)}),
+        {assignment_117: [{view: expect.anything(), model: expect.anything()}]},
         {bulkPublishInFlight: isPublishing},
-        expect.any(Object)
+        expect.anything() // view.model
       )
-      expect(updateModuleItem).toHaveBeenCalledWith(
-        expect.objectContaining({assignment_119: expect.any(Object)}),
-        {bulkPublishInFlight: isPublishing},
-        expect.any(Object)
-      )
+    })
+
+    it('sets ig-published class on the item row if published', () => {
+      updateModuleItemPublishedState('1117', true, false)
+      expect(
+        document
+          .querySelector('#context_module_item_1117 .ig-row')
+          ?.classList.contains('ig-published')
+      ).toBe(true)
+
+      updateModuleItemPublishedState('1117', false, false)
+      expect(
+        document
+          .querySelector('#context_module_item_1117 .ig-row')
+          ?.classList.contains('ig-published')
+      ).toBe(false)
+    })
+
+    it('sets ig-published class on the row of all matching items', () => {
+      const allModuleItems = getAllModuleItems()
+      updateModuleItemPublishedState('1117', true, false, allModuleItems)
+
+      expect(
+        document
+          .querySelector('#context_module_item_1117 .ig-row')
+          ?.classList.contains('ig-published')
+      ).toBe(true)
+      expect(
+        document
+          .querySelector('#context_module_item_2117 .ig-row')
+          ?.classList.contains('ig-published')
+      ).toBe(true)
+
+      updateModuleItemPublishedState('1117', false, false, allModuleItems)
+      expect(
+        document
+          .querySelector('#context_module_item_1117 .ig-row')
+          ?.classList.contains('ig-published')
+      ).toBe(false)
+      expect(
+        document
+          .querySelector('#context_module_item_2117 .ig-row')
+          ?.classList.contains('ig-published')
+      ).toBe(false)
     })
   })
 
@@ -298,11 +363,26 @@ describe('publishOneModuleHelper', () => {
 
   describe('renderContextModulesPublishIcon', () => {
     beforeEach(() => {
-      makeModuleWithItems(2, false)
+      makeModuleWithItems(2, [217, 219], false)
     })
     it('renders the ContextModulesPublishIcon', () => {
       renderContextModulesPublishIcon(1, 2, true, false, 'loading message')
       expect(getByText(document.body, 'Module publish menu')).toBeInTheDocument()
+    })
+  })
+
+  describe('getAllModuleItems', () => {
+    beforeEach(() => {
+      makeModuleWithItems(1, [117, 119])
+      makeModuleWithItems(2, [217, 219, 117])
+    })
+
+    it('finds all the module items', () => {
+      const allModuleItems = getAllModuleItems()
+      expect(allModuleItems.assignment_117).toHaveLength(2)
+      expect(allModuleItems.assignment_119).toHaveLength(1)
+      expect(allModuleItems.assignment_217).toHaveLength(1)
+      expect(allModuleItems.assignment_219).toHaveLength(1)
     })
   })
 })
