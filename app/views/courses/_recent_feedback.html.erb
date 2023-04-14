@@ -33,7 +33,7 @@
       context_params = {:id => recent_feedback.assignment_id}
     else
       context_symbol = :context_assignment_submission_url
-      context_params = {:assignment_id => recent_feedback.assignment_id, :id => @current_user.id}
+      context_params = {:assignment_id => recent_feedback.assignment_id, :id => @user&.id || @current_user.id}
     end
     url = context_url(context, context_symbol, context_params)
     grade = readable_grade(recent_feedback)
