@@ -18,7 +18,7 @@
 
 import UniqueDropdownCollection from 'ui/features/assignment_index/backbone/collections/UniqueDropdownCollection'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
+import _ from 'lodash'
 
 QUnit.module('UniqueDropdownCollection', {
   setup() {

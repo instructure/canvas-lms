@@ -20,7 +20,7 @@ import React from 'react'
 
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
-import _ from 'underscore'
+import _ from 'lodash'
 import GradingPeriodSetForm from 'ui/features/account_grading_standards/react/EditGradingPeriodSetForm'
 
 const wrapper = document.getElementById('fixtures')

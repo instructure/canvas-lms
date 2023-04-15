@@ -20,7 +20,7 @@ import React from 'react'
 
 import ReactDOM from 'react-dom'
 import {findRenderedDOMComponentWithClass} from 'react-dom/test-utils'
-import _ from 'underscore'
+import _ from 'lodash'
 import Input from 'ui/features/account_grading_standards/react/EnrollmentTermInput'
 
 const wrapper = document.getElementById('fixtures')
@@ -85,7 +85,7 @@ test("displays 'No unassigned terms' if there are no selectable terms", function
 
 test('selectedEnrollmentTerms uses the enrollment term display name', function () {
   const enrollmentTermInput = this.renderComponent()
-  const termNames = _.pluck(enrollmentTermInput.selectedEnrollmentTerms(), 'name')
+  const termNames = _.map(enrollmentTermInput.selectedEnrollmentTerms(), 'name')
   propEqual(termNames, ['Term created Oct 27, 2015'])
 })
 

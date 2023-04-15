@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import _ from 'lodash'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 
 let submissions
@@ -1194,7 +1194,7 @@ test('recombines assignment group grades of divided assignment groups', () => {
 test('recombines assignment group submissions of divided assignment groups', () => {
   const grades = calculateWithGradingPeriods('percent')
   const listSubmissionAssignmentIds = grade =>
-    _.pluck(grade.submissions, ({submission}) => submission.assignment_id)
+    _.map(grade.submissions, ({submission}) => submission.assignment_id)
   deepEqual(listSubmissionAssignmentIds(grades.assignmentGroups[301].current), [201, 202])
   deepEqual(listSubmissionAssignmentIds(grades.assignmentGroups[301].final), [201, 202])
   equal(grades.assignmentGroups[301].current.submission_count, 2)

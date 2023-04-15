@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import _ from 'lodash'
 
 import {underscore} from 'convert-case'
 import FakeServer, {

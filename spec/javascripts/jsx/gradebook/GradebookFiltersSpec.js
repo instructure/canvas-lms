@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {map} from 'lodash'
 import $ from 'jquery'
 import {
   createGradebook,
@@ -680,52 +680,52 @@ test('includes "attendance" assignments when "show_attendance" is true', functio
 test('includes assignments from all grading periods when not filtering by grading period', function () {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0') // value indicates "All Grading Periods"
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304'])
+  deepEqual(map(assignments, 'id'), ['2301', '2302', '2304'])
 })
 
 test('excludes assignments from other grading periods when filtering by a grading period', function () {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '1401')
   this.gradebook.setCurrentGradingPeriod()
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  deepEqual(_.map(assignments, 'id'), ['2301'])
+  deepEqual(map(assignments, 'id'), ['2301'])
 })
 
 test('includes assignments from all grading periods grading period set has not been assigned', function () {
   this.gradebook.gradingPeriodSet = null
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '1401')
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304'])
+  deepEqual(map(assignments, 'id'), ['2301', '2302', '2304'])
 })
 
 test('includes assignments from all modules when not filtering by module', function () {
   this.gradebook.setFilterColumnsBySetting('contextModuleId', '0') // All Modules
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304'])
+  deepEqual(map(assignments, 'id'), ['2301', '2302', '2304'])
 })
 
 test('excludes assignments from other modules when filtering by a module', function () {
   this.gradebook.setFilterColumnsBySetting('contextModuleId', '2')
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  deepEqual(_.map(assignments, 'id'), ['2301'])
+  deepEqual(map(assignments, 'id'), ['2301'])
 })
 
 test('does not filter assignments when filtering by a module that was deleted', function () {
   this.gradebook.courseContent.contextModules = []
   this.gradebook.setFilterColumnsBySetting('contextModuleId', '2')
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304'])
+  deepEqual(map(assignments, 'id'), ['2301', '2302', '2304'])
 })
 
 test('includes assignments from all assignment groups when not filtering by assignment group', function () {
   this.gradebook.setFilterColumnsBySetting('assignmentGroupId', '0') // All Modules
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304'])
+  deepEqual(map(assignments, 'id'), ['2301', '2302', '2304'])
 })
 
 test('excludes assignments from other assignment groups when filtering by an assignment group', function () {
   this.gradebook.setFilterColumnsBySetting('assignmentGroupId', '2')
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  deepEqual(_.map(assignments, 'id'), ['2302'])
+  deepEqual(map(assignments, 'id'), ['2302'])
 })
 
 QUnit.module('Gradebook#getSelectedEnrollmentFilters')

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import _ from 'lodash'
 import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 
 QUnit.module('messageStudentsWhoHelper#options', function (hooks) {
