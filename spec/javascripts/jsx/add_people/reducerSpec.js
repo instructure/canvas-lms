@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {cloneDeep} from 'lodash'
 import {actions} from '@canvas/add-people/react/actions'
 import reducer from '@canvas/add-people/react/reducer'
 
@@ -276,7 +276,7 @@ QUnit.module('Course Enrollment Add People Reducer')
 
 const reduce = (action, state = INITIAL_STATE) => reducer(state, action)
 
-let runningState = _.cloneDeep(INITIAL_STATE)
+let runningState = cloneDeep(INITIAL_STATE)
 
 test('set input paramaters', () => {
   const newSearchParams = {
@@ -329,7 +329,7 @@ test('VALIDATE_USERS_SUCCESS', () => {
   runningState = newState
 })
 test('VALIDATE_USERS_ERROR', () => {
-  const state = _.cloneDeep(INITIAL_STATE)
+  const state = cloneDeep(INITIAL_STATE)
   state.apiState.pendingCount = 1
   const newState = reduce(actions.validateUsersError('whoops'), state)
   deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')
@@ -424,7 +424,7 @@ test('ENQUEUE_NEW_FOR_DUPLICATE', () => {
 // manipulating missing users
 test('ENQUEUE_NEW_FOR_MISSING', () => {
   // reset state to just after validation
-  runningState.userValidationResult.duplicates = _.cloneDeep(dupeList)
+  runningState.userValidationResult.duplicates = cloneDeep(dupeList)
 
   // create a new user for amelia
   const newState = reduce(
@@ -520,7 +520,7 @@ test('CREATE_USERS_SUCCESS, with error', () => {
   runningState = newState
 })
 test('ENROLL_USERS_ERROR', () => {
-  const state = _.cloneDeep(runningState)
+  const state = cloneDeep(runningState)
   state.apiState.pendingCount = 1
   const newState = reduce(actions.createUsersError({response: {data: 'uh oh'}}), state)
   deepEqual(newState.courseParams, runningState.courseParams, 'courseParams')
@@ -581,8 +581,8 @@ test('ENROLL_USERS_SUCCESS', () => {
   deepEqual(newState.usersToBeEnrolled, [], 'usersToBeEnrolled is emptied')
   equal(Boolean(newState.usersEnrolled), true, 'usersEnrolled')
 })
-test('ENROLL_USERS_ERROR', () => {
-  const state = _.cloneDeep(INITIAL_STATE)
+test('ENROLL_USERS_ERROR (2)', () => {
+  const state = cloneDeep(INITIAL_STATE)
   state.apiState.pendingCount = 1
   const newState = reduce(actions.enrollUsersError('whoops'), state)
   deepEqual(
