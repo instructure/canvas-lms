@@ -24,7 +24,7 @@ class TruncateLongAttachmentDisplayNames < ActiveRecord::Migration[7.0]
 
   def up
     # columns much larger than this can't be indexed with PG12 collations
-    Attachment.where("pg_column_size(display_name) > 2000").find_each do |attachment|
+    Attachment.where("pg_column_size(display_name) > 2000").find_each(strategy: :pluck_ids) do |attachment|
       attachment.update_attribute :display_name, Attachment.truncate_filename(attachment.display_name, 1000)
     end
   end
