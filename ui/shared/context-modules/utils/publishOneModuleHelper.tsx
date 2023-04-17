@@ -23,6 +23,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import ContextModulesPublishIcon from '../react/ContextModulesPublishIcon'
 import {updateModuleItem, itemContentKey} from '../jquery/utils'
+import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('context_modules_utils_publishmoduleitemhelper')
@@ -98,7 +99,7 @@ export function batchUpdateOneModuleApiCall(
   exportFuncs.renderContextModulesPublishIcon(courseId, moduleId, published, true, loadingMessage)
   exportFuncs.updateModuleItemsPublishedStates(moduleId, undefined, true)
   exportFuncs.disableContextModulesPublishMenu(true)
-
+  const relockModulesDialog = new RelockModulesDialog()
   return doFetchApi({
     path,
     method: 'PUT',
@@ -110,6 +111,15 @@ export function batchUpdateOneModuleApiCall(
     },
   })
     .then(result => {
+      if (result.json.publish_warning) {
+        showFlashAlert({
+          message: I18n.t('Some module items could not be published'),
+          type: 'warning',
+          err: null,
+        })
+      }
+      relockModulesDialog.renderIfNeeded(result.json)
+
       exportFuncs.fetchModuleItemPublishedState(courseId, moduleId)
       exportFuncs.renderContextModulesPublishIcon(
         courseId,
