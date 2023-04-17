@@ -41,6 +41,9 @@ class SubmissionsBaseController < ApplicationController
       format.html do
         rubric_association = @assignment&.rubric_association
         rubric_association_json = rubric_association&.as_json
+        unless rubric_association_json.nil?
+          rubric_association_json["rubric_association"]["hide_points"] = rubric_association.hide_points(@current_user)
+        end
         rubric = rubric_association&.rubric
         js_env({
                  nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),

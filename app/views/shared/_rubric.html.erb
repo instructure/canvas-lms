@@ -87,7 +87,7 @@
         <div class="free_form_criterion_comments"><%= (rubric && rubric.free_form_criterion_comments) ? "true" : nbsp %></div>
         <div class="hide_score_total"><%= (rubric && rubric.hide_score_total) ? "true" : nbsp %></div>
         <div class="hide_outcome_results"><%= (rubric_association&.hide_outcome_results) ? "true" : nbsp %></div>
-        <div class="hide_points"><%= (rubric_association&.hide_points) ? "true" : nbsp %></div>
+        <div class="hide_points"><%= (rubric_association&.hide_points(@current_user)) ? "true" : nbsp %></div>
         <div class="rubric_association_id"><%= rubric_association ? rubric_association.id : nbsp %></div>
         <% if anonymize_student %>
           <div class="anonymous_id"><%= assessment ? assessment.asset.anonymous_id : nbsp %></div>
@@ -144,7 +144,7 @@
   <tr>
     <th scope="col"><%= t 'headers.criteria', "Criteria" %></th>
     <th scope="col"><%= t 'headers.ratings', "Ratings" %></th>
-    <th scope="col" class="toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">
+    <th scope="col" class="toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>">
       <%= t 'headers.points', "Pts" %>
     </th>
   </tr>
@@ -160,7 +160,7 @@
   <%= render :partial => "shared/rubric_criterion", :object => nil %>
   <tr class="summary">
     <td colspan="4">
-      <div class="total_points_holder toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>"
+      <div class="total_points_holder toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>"
         style="float: <%= direction('right') %>; <%= hidden if rubric_association && rubric_association.hide_score_total %>">
         <span><%= before_label :total_points, "Total Points" %>
           <% ot(:out_of, "%{points} *out of %{total}*", :points => capture { %>
