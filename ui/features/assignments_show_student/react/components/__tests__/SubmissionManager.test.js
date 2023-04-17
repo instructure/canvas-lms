@@ -938,14 +938,33 @@ describe('SubmissionManager', () => {
     it('accounts for any extra attempts awarded to the student', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {allowedAttempts: 1},
-        Submission: {...SubmissionMocks.submitted, extraAttempts: 2},
+        Submission: {...SubmissionMocks.submitted},
       })
-      const {queryByTestId} = render(
+      const latestSubmission = {attempt: 1, extraAttempts: 2}
+
+      const {queryByTestId} = renderInContext(
+        {latestSubmission},
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
       expect(queryByTestId('try-again-button')).toBeInTheDocument()
+    })
+
+    it('is not shown when looking at prevous attempts when all allowed attempts have been used', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {allowedAttempts: 1},
+        Submission: {...SubmissionMocks.submitted, attempt: 1, extraAttempts: 2},
+      })
+      const latestSubmission = {attempt: 4, extraAttempts: 3}
+
+      const {queryByTestId} = renderInContext(
+        {latestSubmission},
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
     })
   })
 

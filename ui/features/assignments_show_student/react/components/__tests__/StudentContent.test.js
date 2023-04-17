@@ -21,6 +21,7 @@ import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphq
 import {MockedProvider} from '@apollo/react-testing'
 import {initializeReaderButton} from '../../../../../shared/immersive-reader/ImmersiveReader'
 import React from 'react'
+import StudentViewContext from '../Context'
 import StudentContent from '../StudentContent'
 import {AssignmentMocks} from '@canvas/assignments/graphql/student/Assignment'
 import ContextModuleApi from '../../apis/ContextModuleApi'
@@ -462,12 +463,14 @@ describe('Assignment Student Content View', () => {
     it('takes into account extra attempts awarded to the student', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {allowedAttempts: 3},
-        Submission: {extraAttempts: 2},
+        Submission: {attempt: 1, extraAttempts: 1},
       })
       const {getByText} = render(
-        <MockedProvider>
-          <StudentContent {...props} />
-        </MockedProvider>
+        <StudentViewContext.Provider value={{latestSubmission: {extraAttempts: 2}}}>
+          <MockedProvider>
+            <StudentContent {...props} />
+          </MockedProvider>
+        </StudentViewContext.Provider>
       )
       expect(getByText('5 Attempts Allowed')).toBeInTheDocument()
     })
