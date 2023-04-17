@@ -957,6 +957,47 @@ describe "assignments" do
           wait_for_ajaximations
           expect(ff("div .title").map(&:text)).to include "Points"
         end
+
+        context "with rubric" do
+          before do
+            rubric = @course.rubrics.create!
+            rubric.data = [{ description: "Description of criterion",
+                             long_description: "",
+                             points: 5.0,
+                             id: "_7491",
+                             criterion_use_range: false,
+                             ratings: [{ description: "Full Marks", long_description: "", points: 5.0, criterion_id: "_7491", id: "blank" },
+                                       { description: "No Marks", long_description: "", points: 0.0, criterion_id: "_7491", id: "blank_2" }] }]
+            rubric.save!
+
+            @course_rubric_association = RubricAssociation.create!(
+              rubric: rubric,
+              association_object: @course,
+              context: @course,
+              purpose: "bookmark"
+            )
+
+            @assignment = @course.assignments.create({ name: "Test Assignment" })
+            @assignment_rubric_association = RubricAssociation.generate(@teacher, rubric, @course, ActiveSupport::HashWithIndifferentAccess.new({
+                                                                                                                                                  hide_score_total: "0",
+                                                                                                                                                  purpose: "grading",
+                                                                                                                                                  skip_updating_points_possible: false,
+                                                                                                                                                  update_if_existing: true,
+                                                                                                                                                  use_for_grading: "1",
+                                                                                                                                                  association_object: @assignment
+                                                                                                                                                }))
+          end
+
+          it "show points and totals" do
+            get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+            wait_for_ajaximations
+
+            expect(ff("div .rating-main")[0].text).to match "5 pts\nFull Marks"
+            expect(ff("div .rating-main")[1].text).to match "0 pts\nNo Marks"
+            expect(ff("div .points_form")[0].text).to match "5 pts"
+            expect(ff("div .total_points_holder")[0].text).to match "Total Points:"
+          end
+        end
       end
     end
 
@@ -1100,6 +1141,47 @@ describe "assignments" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           wait_for_ajaximations
           expect(ff("div .title").map(&:text)).not_to include "Points"
+        end
+
+        context "with rubric" do
+          before do
+            rubric = @course.rubrics.create!
+            rubric.data = [{ description: "Description of criterion",
+                             long_description: "",
+                             points: 5.0,
+                             id: "_7491",
+                             criterion_use_range: false,
+                             ratings: [{ description: "Full Marks", long_description: "", points: 5.0, criterion_id: "_7491", id: "blank" },
+                                       { description: "No Marks", long_description: "", points: 0.0, criterion_id: "_7491", id: "blank_2" }] }]
+            rubric.save!
+
+            @course_rubric_association = RubricAssociation.create!(
+              rubric: rubric,
+              association_object: @course,
+              context: @course,
+              purpose: "bookmark"
+            )
+
+            @assignment = @course.assignments.create({ name: "Test Assignment" })
+            @assignment_rubric_association = RubricAssociation.generate(@teacher, rubric, @course, ActiveSupport::HashWithIndifferentAccess.new({
+                                                                                                                                                  hide_score_total: "0",
+                                                                                                                                                  purpose: "grading",
+                                                                                                                                                  skip_updating_points_possible: false,
+                                                                                                                                                  update_if_existing: true,
+                                                                                                                                                  use_for_grading: "1",
+                                                                                                                                                  association_object: @assignment
+                                                                                                                                                }))
+          end
+
+          it "hide points and totals" do
+            get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+            wait_for_ajaximations
+
+            expect(ff("div .rating-main")[0].text).to match "Full Marks"
+            expect(ff("div .rating-main")[1].text).to match "No Marks"
+            expect(ff("div .points_form")[0].text).to match ""
+            expect(ff("div .total_points_holder")[0].text).to match ""
+          end
         end
       end
     end

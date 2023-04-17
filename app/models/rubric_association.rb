@@ -403,6 +403,12 @@ class RubricAssociation < ActiveRecord::Base
     assignment.restrict_quantitative_data?(user)
   end
 
+  def hide_points(user = nil)
+    return true if restrict_quantitative_data?(user)
+
+    read_attribute(:hide_points)
+  end
+
   private
 
   def record_save_audit_event
