@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getByText, waitFor} from '@testing-library/dom'
+import {getByText, getAllByText, waitFor} from '@testing-library/dom'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {updateModuleItem} from '@canvas/context-modules/jquery/utils'
 import publishModuleItemHelperModule from '../utils/publishOneModuleHelper'
@@ -193,6 +193,40 @@ describe('publishOneModuleHelper', () => {
       expect(spy).toHaveBeenCalledTimes(2)
       expect(spy).toHaveBeenCalledWith(1, undefined, true)
       expect(spy).toHaveBeenCalledWith(1, true, false)
+    })
+
+    it('shows an alert if not all items were published', async () => {
+      doFetchApi.mockResolvedValueOnce({
+        response: {ok: true},
+        json: {published: true, publish_warning: true},
+      })
+
+      await batchUpdateOneModuleApiCall(1, 1, true, true, 'loading message', 'success message')
+      expect(getAllByText(document.body, 'Some module items could not be published')).toHaveLength(
+        2
+      ) // one visual, one screenreader alert
+    })
+
+    it('shows an alert if the publish failed', async () => {
+      doFetchApi.mockRejectedValueOnce(new Error('whoops'))
+
+      await batchUpdateOneModuleApiCall(1, 1, true, true, 'loading message', 'success message')
+      expect(
+        getAllByText(document.body, 'There was an error while saving your changes')
+      ).toHaveLength(2) // one visual, one screenreader alert
+    })
+
+    it('shows the re-lock modal when necessary', async () => {
+      doFetchApi.mockResolvedValueOnce({
+        response: {ok: true},
+        json: {published: true, relock_warning: true},
+      })
+
+      await batchUpdateOneModuleApiCall(1, 1, true, true, 'loading message', 'success message')
+      expect(
+        // @ts-expect-error
+        getByText(document.querySelector('.ui-dialog'), 'Requirements Changed')
+      ).toBeInTheDocument()
     })
   })
 
