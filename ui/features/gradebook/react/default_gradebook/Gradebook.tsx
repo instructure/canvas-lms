@@ -107,7 +107,6 @@ import type {ProxyDetails} from '@canvas/proxy-submission/react/ProxyUploadModal
 import type TotalGradeColumnHeader from './GradebookGrid/headers/TotalGradeColumnHeader'
 import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
-// @ts-expect-error
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 // @ts-expect-error
 import KeyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
@@ -325,7 +324,7 @@ type GradebookState = {
 }
 
 class Gradebook extends React.Component<GradebookProps, GradebookState> {
-  kbDialog: KeyboardNavDialog
+  kbDialog: any
 
   anonymousSpeedGraderAlert?: any
 
