@@ -54,7 +54,6 @@ async function loadPostAssignmentGradesTray() {
 }
 
 async function loadSetDefaultGradeDialog() {
-  // @ts-expect-error
   return (await import('@canvas/grading/jquery/SetDefaultGradeDialog')).default
 }
 
