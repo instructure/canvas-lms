@@ -32,7 +32,7 @@ import UnassessedAssignment from './UnassessedAssignment'
 import OutcomePopover from './OutcomePopover'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import TruncateWithTooltip from '../TruncateWithTooltip'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import * as shapes from './shapes'
 
 const I18n = useI18nScope('IndividualStudentMasteryOutcome')

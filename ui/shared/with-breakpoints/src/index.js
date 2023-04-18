@@ -27,7 +27,7 @@ export const BREAKPOINTS = {
   desktop: {minWidth: '992px'},
   desktopNavOpen: {minWidth: '1140px'},
   desktopOnly: {minWidth: '768px'},
-  mobileOnly: {maxWidth: '767px'}
+  mobileOnly: {maxWidth: '767px'},
 }
 
 const convertMatchesToProp = matches => {
@@ -58,7 +58,7 @@ export const breakpointsShape = PropTypes.shape({
   desktop: PropTypes.bool,
   desktopNavOpen: PropTypes.bool,
   desktopOnly: PropTypes.bool,
-  mobileOnly: PropTypes.bool
+  mobileOnly: PropTypes.bool,
 })
 
 export default WithBreakpoints

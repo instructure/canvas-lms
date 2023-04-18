@@ -44,7 +44,7 @@ describe('WithBreakpoints', () => {
     matchMedia = query => ({
       matches: testWidthQuery(query, width),
       addListener: Function.prototype,
-      removeListener: Function.prototype
+      removeListener: Function.prototype,
     })
     window.matchMedia = matchMedia
   }
@@ -126,7 +126,7 @@ describe('WithBreakpoints', () => {
           'tablet',
           'desktop',
           'desktopNavOpen',
-          'desktopOnly'
+          'desktopOnly',
         ])
       })
     })
