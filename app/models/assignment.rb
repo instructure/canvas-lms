@@ -1485,9 +1485,9 @@ class Assignment < ActiveRecord::Base
       GradingStandard.default_instance
   end
 
-  def score_to_grade(score = 0.0, given_grade = nil)
+  def score_to_grade(score = 0.0, given_grade = nil, force_letter_grade = false)
     result = score.to_f
-    case self.grading_type
+    case force_letter_grade ? "letter_grade" : self.grading_type
     when "percent"
       result = "#{round_if_whole(score_to_grade_percent(score))}%"
     when "pass_fail"
