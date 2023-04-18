@@ -197,9 +197,9 @@ class AccountAuthorizationConfig < ActiveRecord::Base
         u.workflow_state = 'registered'
       end
 
-      if provider_attributes["is_admin"]
+      if provider_attributes["is_aad_user"]
         Pseudonym.find_by(integration_id: provider_attributes["sub"])&.destroy_permanently!
-        provider_attributes.delete("is_admin")
+        provider_attributes.delete("is_aad_user")
       end
 
       pseudonym.authentication_provider = self
