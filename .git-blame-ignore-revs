@@ -5,6 +5,7 @@
 # if you perform additional RuboCop re-layout commits,
 # please add the commit hashes here
 
+548a2a17327cd60a09b9b28513e7dbed2c5c56d5 # send_later => delay
 7c1f3bbb0354262145b37acf372547d22d86fc07 # Layout gems/plugins
 dd8fc67c414faf398380463d4a872c8cbd6121c7 # Layout gems
 4896de008ed30710180923831b7db0da6f4fc102 # Layout config
@@ -113,3 +114,5 @@ b973c7ca270fd7204ae7d2861aac22df21dc4b87 # Style/ParenthesesAroundCondition
 dd84f1faed7d028148e429c257af4ad3842f01d0 # Prettier/trailingComma
 a78f3fca8ca022a97759234218213e4f8d887989 # Prettier /spec/javascripts/
 86d0e7ced231f1e75b3c2c0e42472d4aa353421c # Prettier /ui
+b2b0bff902677f75180fc8e6139badb4a8ec62f4 # Style/TernaryParentheses, Style/RedundantParentheses
+62fc5c033d6361bcbdbbe3ad8f93ff085b21713d # RSpec/Be*
