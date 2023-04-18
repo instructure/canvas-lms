@@ -20,6 +20,10 @@
 
 class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
   include OutcomesFeaturesHelper
+  include OutcomesServiceAlignmentsHelper
+
+  # Need to add support for NQ questions after OUT-5474 is merged
+  SUPPORTED_OS_ALIGNMENTS = %w[quizzes.quiz].freeze
 
   def initialize(context)
     super()
@@ -32,12 +36,14 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
       return
     end
 
+    active_os_alignments = outcome_alignment_summary_with_new_quizzes_enabled?(@context) ? get_active_os_alignments(@context) : {}
+
     outcomes.each do |outcome|
       # direct outcome alignments to rubric, assignment, quiz, and graded discussions
       # map assignment id to quiz/discussion id
       assignments_sub = Assignment
                         .active
-                        .select("assignments.id as assignment_id, assignments.workflow_state as assignment_workflow_state, discussion_topics.id as discussion_id, quizzes.id as quiz_id")
+                        .select("assignments.id as assignment_id, assignments.submission_types as assignment_submission_types, assignments.workflow_state as assignment_workflow_state, discussion_topics.id as discussion_id, quizzes.id as quiz_id")
                         .where(context: @context)
                         .left_joins(:discussion_topic)
                         .left_joins(:quiz)
@@ -60,7 +66,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
                              WHEN content_tags.content_type = 'Rubric' THEN rubrics.title
                              ELSE content_tags.title
                            END AS title,
-                         content_tags.learning_outcome_id, content_tags.created_at, content_tags.updated_at, assignments.assignment_id, assignments.assignment_workflow_state, assignments.discussion_id, assignments.quiz_id
+                         content_tags.learning_outcome_id, content_tags.created_at, content_tags.updated_at, assignments.assignment_id, assignments.assignment_submission_types, assignments.assignment_workflow_state, assignments.discussion_id, assignments.quiz_id
                        ")
                        .where(context: @context, content_type: %w[Rubric Assignment AssessmentQuestionBank])
                        .joins("LEFT OUTER JOIN (#{assignments_sub.to_sql}) AS assignments ON content_tags.content_id = assignments.assignment_id AND content_tags.content_type = 'Assignment'")
@@ -105,7 +111,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
 
       indirect_alignments = Assignment
                             .active
-                            .select("assignments.id, 'indirect' as alignment_type, assignments.id as content_id, 'Assignment' as content_type, assignments.context_id, assignments.context_type, quizzes.title as title, #{outcome.id} as learning_outcome_id, assignments.created_at, assignments.updated_at, assignments.id as assignment_id, assignments.workflow_state as assignment_workflow_state, null::bigint as discussion_id, quizzes.id as quiz_id, modules.module_id, modules.module_name, modules.module_workflow_state")
+                            .select("assignments.id, 'indirect' as alignment_type, assignments.id as content_id, 'Assignment' as content_type, assignments.context_id, assignments.context_type, quizzes.title as title, #{outcome.id} as learning_outcome_id, assignments.created_at, assignments.updated_at, assignments.id as assignment_id, assignments.submission_types as assignment_submission_types, assignments.workflow_state as assignment_workflow_state, null::bigint as discussion_id, quizzes.id as quiz_id, modules.module_id, modules.module_name, modules.module_workflow_state")
                             .where(context: @context)
                             .left_joins(:quiz)
                             .where(quizzes: { id: quizzes_to_outcome_indirect })
@@ -115,7 +121,27 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
                             ")
                             .distinct
 
-      all_alignments = ContentTag.from("(#{direct_alignments.to_sql} UNION #{indirect_alignments.to_sql}) AS content_tags")
+      # outcome-service alignments
+      if active_os_alignments[outcome.id.to_s].present?
+
+        os_aligned_new_quiz_ids = active_os_alignments[outcome.id.to_s]
+                                  .filter_map { |a| a[:associated_asset_id].to_i if SUPPORTED_OS_ALIGNMENTS.include?(a[:artifact_type]) && a[:associated_asset_type] == "canvas.assignment.quizzes" }
+                                  .uniq
+
+        external_alignments = Assignment
+                              .active
+                              .select("assignments.id, 'external' as alignment_type, assignments.id as content_id, 'Assignment' as content_type, assignments.context_id, assignments.context_type, assignments.title as title, #{outcome.id} as learning_outcome_id, assignments.created_at, assignments.updated_at, assignments.id as assignment_id, assignments.submission_types as assignment_submission_types, assignments.workflow_state as assignment_workflow_state, null::bigint as discussion_id, null::bigint as quiz_id, modules.module_id, modules.module_name, modules.module_workflow_state")
+                              .where(context: @context, id: os_aligned_new_quiz_ids)
+                              .joins("LEFT OUTER JOIN (#{modules_sub.to_sql}) AS modules
+                                ON (assignments.id = modules.assignment_content_id
+                                AND modules.assignment_content_type = 'Assignment')
+                              ")
+                              .distinct
+
+        all_alignments = ContentTag.from("(#{direct_alignments.to_sql} UNION #{indirect_alignments.to_sql} UNION #{external_alignments.to_sql}) AS content_tags")
+      else
+        all_alignments = ContentTag.from("(#{direct_alignments.to_sql} UNION #{indirect_alignments.to_sql}) AS content_tags")
+      end
 
       # deduplicate and sort alignments
       alignments = []
@@ -167,8 +193,14 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
   end
 
   def id(alignment)
-    # prepend id with alignment type (D - direct/I - indirect) to ensure unique alignment id
-    base_id = [(alignment[:alignment_type] == "direct") ? "D" : "I", alignment[:id]].join("_")
+    # prepend id with alignment type to ensure unique alignment id
+    alignment_types = {
+      "direct" => "D",
+      "indirect" => "I",
+      "external" => "E"
+    }
+    base_id = [alignment_types[alignment[:alignment_type]], alignment[:id]].join("_")
+
     # append id with module id to ensure unique alignment id when artifact is included in multiple modules
     return [base_id, alignment[:module_id]].join("_") if alignment[:module_id]
 
@@ -178,6 +210,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
   def assignment_content_type(alignment)
     return "quiz" unless alignment[:quiz_id].nil?
     return "discussion" unless alignment[:discussion_id].nil?
+    return "new_quiz" if alignment[:assignment_id].present? && alignment[:assignment_submission_types] == "external_tool"
     return "assignment" unless alignment[:assignment_id].nil?
   end
 
@@ -198,7 +231,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
   end
 
   def artifact_id(alignment)
-    base_art_id = [alignment[:content_type], alignment[:content_id]].join("_")
+    base_art_id = [alignment[:content_type], alignment[:content_id], (alignment[:alignment_type] == "external") ? "EXT" : "INT"].join("_")
     return [base_art_id, alignment[:module_id]].join("_") if alignment[:module_id]
 
     base_art_id
