@@ -56,7 +56,7 @@ interface Props {
 const {Item: MenuItem} = Menu as any
 
 const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId, disabled}) => {
-  const [isPublishing, setIsPublishing] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(!!runningProgressId)
   const [isCanceling, setIsCanceling] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [shouldPublishModules, setShouldPublishModules] = useState<boolean | undefined>(undefined)
@@ -68,7 +68,7 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
 
   useEffect(() => {
     if (progressId) {
-      monitorProgress(progressId, updateCurrentProgress_cb)
+      monitorProgress(progressId, updateCurrentProgress_cb, onProgressFail)
     }
   }, [progressId, updateCurrentProgress_cb])
 
@@ -85,25 +85,31 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
       onPublishComplete()
     } else if (progress.workflow_state === 'failed') {
       showFlashAlert({
-        message: I18n.t('Your publishing job has failed.'),
+        message: I18n.t('Your publishing job did not complete.'),
         err: undefined,
         type: 'error',
       })
-      onPublishComplete()
+      refreshPublishStates()
     } else {
       setCurrentProgress(progress)
     }
+  }
+
+  function onProgressFail(error) {
+    showFlashAlert({
+      message: I18n.t(
+        "Something went wrong monitoring the work's progress. Try refreshing the page."
+      ),
+      err: error,
+      type: 'error',
+    })
   }
 
   const onCancelComplete = (error = undefined) => {
     setIsCanceling(false)
     setIsPublishing(false)
     if (error) {
-      showFlashAlert({
-        message: I18n.t('There was an error while saving your changes'),
-        err: error,
-        type: 'error',
-      })
+      onPublishFail(error)
     } else {
       window.location.reload()
     }
@@ -119,28 +125,58 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
     if (isPublishing) return
     setIsPublishing(true)
     updateModulePendingPublishedStates(undefined, true)
-    // the error is handled w/in the call
-    // eslint-disable-next-line promise/catch-or-return
-    batchUpdateAllModulesApiCall(courseId, shouldPublishModules, shouldSkipModuleItems).then(
-      result => {
+    batchUpdateAllModulesApiCall(courseId, shouldPublishModules, shouldSkipModuleItems)
+      .then(result => {
         setProgressId(result.json.progress.progress.id)
         setCurrentProgress(result.json.progress.progress)
-      }
-    )
+      })
+      .catch(error => {
+        onPublishFail(error)
+      })
   }
 
-  const onPublishComplete = () => {
-    fetchAllItemPublishedStates(courseId)
+  const reset = () => {
     disableContextModulesPublishMenu(false)
-    updateModulePendingPublishedStates(shouldPublishModules, false)
     setIsPublishing(false)
     setProgressId(null)
     setCurrentProgress(undefined)
     setIsModalOpen(false)
+  }
+
+  const refreshPublishStates = () => {
+    fetchAllItemPublishedStates(courseId)
+      .then(() => {
+        showFlashAlert({
+          message: I18n.t('Modules updated'),
+          type: 'success',
+          err: null,
+        })
+      })
+      .catch(error =>
+        showFlashAlert({
+          message: I18n.t(
+            'There was an error updating module and items publish status. Try refreshing the page.'
+          ),
+          type: 'error',
+          err: error,
+        })
+      )
+      .finally(() => reset())
+  }
+
+  const onPublishComplete = () => {
+    refreshPublishStates()
+    updateModulePendingPublishedStates(shouldPublishModules, false)
+    reset()
+  }
+
+  const onPublishFail = error => {
+    reset()
+    updateModulePendingPublishedStates(undefined, false)
     showFlashAlert({
-      message: I18n.t('Modules updated'),
-      type: 'success',
-      err: null,
+      message: I18n.t('There was an error while saving your changes'),
+      err: error,
+      type: 'error',
     })
   }
 

@@ -100,6 +100,7 @@ export function batchUpdateOneModuleApiCall(
   exportFuncs.updateModuleItemsPublishedStates(moduleId, undefined, true)
   exportFuncs.disableContextModulesPublishMenu(true)
   const relockModulesDialog = new RelockModulesDialog()
+  let published_result
   return doFetchApi({
     path,
     method: 'PUT',
@@ -121,13 +122,8 @@ export function batchUpdateOneModuleApiCall(
       relockModulesDialog.renderIfNeeded(result.json)
 
       exportFuncs.fetchModuleItemPublishedState(courseId, moduleId)
-      exportFuncs.renderContextModulesPublishIcon(
-        courseId,
-        moduleId,
-        result.json.published,
-        false,
-        loadingMessage
-      )
+      published_result = result.json.published
+
       if (skipContentTags) {
         exportFuncs.updateModuleItemsPublishedStates(moduleId, undefined, false)
       } else {
@@ -150,6 +146,13 @@ export function batchUpdateOneModuleApiCall(
     })
     .finally(() => {
       exportFuncs.disableContextModulesPublishMenu(false)
+      exportFuncs.renderContextModulesPublishIcon(
+        courseId,
+        moduleId,
+        published_result,
+        false,
+        loadingMessage
+      )
     })
 }
 
