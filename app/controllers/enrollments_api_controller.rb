@@ -453,14 +453,17 @@ class EnrollmentsApiController < ApplicationController
             pseudonyms = @domain_root_account.pseudonyms.where(sis_user_id: params[:sis_user_id])
             enrollments.where(sis_pseudonym: pseudonyms)
           else
+            # include inactive enrollment states by default unless state param is specified
+            filter_params = params[:state].present? ? { enrollment_state: params[:state] } : { include_inactive_enrollments: true }
+
             user_ids = Set.new
-            filter_params = { include_inactive_enrollments: false }
             sis_user_ids = Array.wrap(params[:sis_user_id])
             sis_user_ids.each do |sis_id|
               sis_id = sis_id.to_s
               users = UserSearch.for_user_in_context(sis_id,
                                                      @context,
                                                      @current_user,
+                                                     session,
                                                      filter_params)
               users.find_each do |user|
                 if user.pseudonyms.shard(user).active.where(sis_user_id: sis_id).exists?

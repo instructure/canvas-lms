@@ -1270,6 +1270,7 @@ describe EnrollmentsApiController, type: :request do
 
         context "filtering by sis_user_id" do
           before :once do
+            account_admin_user(active_all: true)
             @teacher.pseudonym.update_attribute(:sis_user_id, "1234")
           end
 
@@ -1303,6 +1304,37 @@ describe EnrollmentsApiController, type: :request do
             @params[:sis_user_id] = "5678"
             json = api_call(:get, @path, @params)
             expect(json).to be_empty
+          end
+
+          it "will include inactive enrollment states by default" do
+            inactive_user = user_with_pseudonym(active_user: true, sis_user_id: "abc123")
+            invited_user = user_with_pseudonym(active_user: true, sis_user_id: "def456")
+            completed_user = user_with_pseudonym(active_user: true, sis_user_id: "ghi789")
+            @course.enroll_user(inactive_user, "StudentEnrollment", enrollment_state: "inactive")
+            @course.enroll_user(invited_user, "StudentEnrollment", enrollment_state: "invited")
+            @course.enroll_user(completed_user, "StudentEnrollment", enrollment_state: "completed")
+            @params[:sis_user_id] = %w[1234 abc123 def456 ghi789]
+            user_session(@admin)
+            json = api_call_as_user(@admin, :get, @path, @params)
+            # includes active, invited, and inactive states
+            expect(json.length).to eq(3)
+          end
+
+          it "will support the enrollment :state param if provided" do
+            active_user1 = user_with_pseudonym(active_user: true, sis_user_id: "abc123")
+            active_user2 = user_with_pseudonym(active_user: true, sis_user_id: "def456")
+            invited_user = user_with_pseudonym(active_user: true, sis_user_id: "ghi789")
+            inactive_user = user_with_pseudonym(active_user: true, sis_user_id: "jkl101")
+            @course.enroll_user(active_user1, "StudentEnrollment", enrollment_state: "active")
+            @course.enroll_user(active_user2, "StudentEnrollment", enrollment_state: "active")
+            @course.enroll_user(invited_user, "StudentEnrollment", enrollment_state: "invited")
+            @course.enroll_user(inactive_user, "StudentEnrollment", enrollment_state: "inactive")
+            @params[:state] = "active"
+            @params[:sis_user_id] = %w[abc123 def456 ghi789 jkl101]
+            user_session(@admin)
+            json = api_call_as_user(@admin, :get, @path, @params)
+            # includes only active state enrollments
+            expect(json.length).to eq(2)
           end
         end
 
