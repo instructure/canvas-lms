@@ -22,7 +22,7 @@ import GradingPeriod from './gradingPeriod'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
-import {camelize} from 'convert-case'
+import {camelize} from '@canvas/convert-case'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
 const I18n = useI18nScope('gradinggradingPeriodCollection')

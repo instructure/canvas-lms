@@ -31,7 +31,7 @@ function underscoreString(str: string) {
 }
 
 // Convert all property keys in an object to camelCase
-export function camelize(props: {[key: string]: any}) {
+export function camelize<T>(props: {[key: string]: unknown}): T {
   const attrs: {
     [key: string]: any
   } = {}
@@ -42,10 +42,10 @@ export function camelize(props: {[key: string]: any}) {
     }
   }
 
-  return attrs
+  return attrs as T
 }
 
-export function underscore(props: {[key: string]: any}) {
+export function underscore<T>(props: {[key: string]: unknown}): T {
   let prop
   const attrs: {
     [key: string]: any
@@ -57,5 +57,5 @@ export function underscore(props: {[key: string]: any}) {
     }
   }
 
-  return attrs
+  return attrs as T
 }

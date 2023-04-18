@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {camelize, underscore} from 'convert-case'
+import {camelize, underscore} from '@canvas/convert-case'
 
 export function bulkSelectProvisionalGrades(courseId, assignmentId, provisionalGradeIds) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/provisional_grades/bulk_select`

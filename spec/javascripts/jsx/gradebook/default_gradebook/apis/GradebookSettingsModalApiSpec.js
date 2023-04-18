@@ -18,7 +18,7 @@
 
 import _ from 'lodash'
 
-import {underscore} from 'convert-case'
+import {underscore} from '@canvas/convert-case'
 import FakeServer, {
   jsonBodyFromRequest,
   pathFromRequest,

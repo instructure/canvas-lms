@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {camelize, underscore} from 'convert-case'
+import {camelize, underscore} from '@canvas/convert-case'
 import type {LatePolicyCamelized, LatePolicy} from '../gradebook.d'
 
 export const DEFAULT_LATE_POLICY_DATA: LatePolicyCamelized = {

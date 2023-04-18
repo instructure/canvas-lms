@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {underscore} from 'convert-case'
+import {underscore} from '@canvas/convert-case'
 
 // will be removed in EVAL-1911
 export function styleSubmissionStatusPills(pills) {

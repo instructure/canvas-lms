@@ -17,7 +17,7 @@
  */
 
 import SubmissionCommentApi from 'ui/features/gradebook/react/default_gradebook/apis/SubmissionCommentApi'
-import {underscore} from 'convert-case'
+import {underscore} from '@canvas/convert-case'
 
 QUnit.module('SubmissionCommentApi.updateSubmissionComment', hooks => {
   let server

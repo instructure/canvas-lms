@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {camelize, underscore} from 'convert-case'
+import {camelize, underscore} from '@canvas/convert-case'
 import {originalityReportSubmissionKey} from './originalityReportHelper'
 import type {
   SubmissionOriginalityData,
