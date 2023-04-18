@@ -1,5 +1,5 @@
 {
-  "name": "query-string-encoding",
+  "name": "@canvas/query-string-encoding",
   "private": true,
   "version": "1.0.0",
   "author": "neme",

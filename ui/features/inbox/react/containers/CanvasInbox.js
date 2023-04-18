@@ -32,7 +32,7 @@ import {
   UPDATE_SUBMISSIONS_READ_STATE,
 } from '../../graphql/Mutations'
 import {CONVERSATIONS_QUERY, VIEWABLE_SUBMISSIONS_QUERY} from '../../graphql/Queries'
-import {decodeQueryString} from 'query-string-encoding'
+import {decodeQueryString} from '@canvas/query-string-encoding'
 import {responsiveQuerySizes} from '../../util/utils'
 
 import {Link} from '@instructure/ui-link'
