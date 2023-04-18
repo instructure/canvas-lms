@@ -12,7 +12,7 @@ CANVAS=$(dirname $SCRIPTPATH)
 
 if [ $(pwd -P) = $CANVAS ]; then
   # if .ts or .tsx files have changed (excluding those in packages/), run tsc
-  if git diff --cached --name-only | grep -vE '^packages/' | grep -qE '\.(ts|tsx)$'; then
+  if git diff --cached --name-only | grep -qE '\.(ts|tsx|js)$'; then
     if [ -f node_modules/.bin/tsc ]; then
       echo 'Checking TypeScript...'
       NODE_OPTIONS=--max-old-space-size=4096 node_modules/.bin/tsc -p tsconfig.json
