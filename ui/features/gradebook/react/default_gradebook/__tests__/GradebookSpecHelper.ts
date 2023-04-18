@@ -25,7 +25,7 @@ import CellFormatterFactory from '../GradebookGrid/formatters/CellFormatterFacto
 import ColumnHeaderRenderer from '../GradebookGrid/headers/ColumnHeaderRenderer'
 import PerformanceControls from '../PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
-import {camelize} from 'convert-case'
+import {camelize} from '@canvas/convert-case'
 
 const performance_controls = {
   students_chunk_size: 2, // students per page

@@ -214,11 +214,6 @@ declare module '@instructure/ui-badge' {
   }
 }
 
-declare module 'convert-case' {
-  export function camelize<T>(props: {[key: string]: unknown}): T
-  export function underscore<T>(props: {[key: string]: unknown}): T
-}
-
 declare module 'html-escape' {
   type Escapeable = string | number | {[key: string]: Escapeable}
   export function escape<T>(strOrObject: Escapeable): T

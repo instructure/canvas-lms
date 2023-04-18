@@ -29,7 +29,7 @@ import type {
 } from './gradebook.d'
 import type {StatusColors} from './constants/colors'
 import type {GridDisplaySettings, FilterColumnsOptions} from './grid.d'
-import {camelize} from 'convert-case'
+import {camelize} from '@canvas/convert-case'
 
 export function getInitialGradebookContent(options: {teacher_notes: null | CustomColumn}) {
   return {

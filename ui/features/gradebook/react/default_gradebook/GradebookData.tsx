@@ -18,7 +18,7 @@
 
 import React, {useRef, useEffect, useCallback} from 'react'
 import shallow from 'zustand/shallow'
-import {camelize} from 'convert-case'
+import {camelize} from '@canvas/convert-case'
 import PostGradesStore from '../SISGradePassback/PostGradesStore'
 import Gradebook from './Gradebook'
 import {findFilterValuesOfType} from './Gradebook.utils'

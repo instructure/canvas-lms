@@ -18,7 +18,7 @@
 
 import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {underscore} from 'convert-case'
+import {underscore} from '@canvas/convert-case'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {serializeFilter} from '../Gradebook.utils'
 import type {CustomColumn, FilterPreset, GradebookSettings} from '../gradebook.d'

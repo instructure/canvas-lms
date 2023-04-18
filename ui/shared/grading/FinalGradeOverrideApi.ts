@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {camelize} from 'convert-case'
+import {camelize} from '@canvas/convert-case'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {createClient, gql} from '@canvas/apollo'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'

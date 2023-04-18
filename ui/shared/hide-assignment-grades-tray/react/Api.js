@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {camelize} from 'convert-case'
+import {camelize} from '@canvas/convert-case'
 import {createClient, gql} from '@canvas/apollo'
 import resolveProgress from '@canvas/progress/resolve_progress'
 
