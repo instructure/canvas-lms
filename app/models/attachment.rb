@@ -101,6 +101,7 @@ class Attachment < ActiveRecord::Base
 
   before_save :set_root_account_id
   before_save :infer_display_name
+  before_save :truncate_display_name
   before_save :default_values
   before_save :set_need_notify
 
@@ -1199,6 +1200,13 @@ class Attachment < ActiveRecord::Base
     self.display_name ||= unencoded_filename
   end
   protected :infer_display_name
+
+  def truncate_display_name
+    if display_name_changed? && display_name.length > 1000
+      self.display_name = Attachment.truncate_filename(display_name, 1000)
+    end
+  end
+  protected :truncate_display_name
 
   def readable_size
     ActiveSupport::NumberHelper.number_to_human_size(size) rescue "size unknown"
