@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function encodeQueryString(params) {
+export function encodeQueryString(params: Array<{[key: string]: string | null}>) {
   return params
     .map(param => {
       const key = Object.keys(param)[0]
@@ -27,7 +27,7 @@ export function encodeQueryString(params) {
     .join('&')
 }
 
-export function decodeQueryString(string) {
+export function decodeQueryString(string: string) {
   return string
     .split('&')
     .map(pair => pair.split('='))
