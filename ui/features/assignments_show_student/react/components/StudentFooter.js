@@ -26,7 +26,7 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-con
 import theme from '@instructure/canvas-theme'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 

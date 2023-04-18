@@ -30,7 +30,7 @@ import natcompare from '@canvas/util/natcompare'
 import TruncateWithTooltip from '../TruncateWithTooltip'
 import Outcome from './Outcome'
 import * as shapes from './shapes'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('IndividualStudentMasteryOutcomeGroup')
 

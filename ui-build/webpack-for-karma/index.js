@@ -68,7 +68,6 @@ module.exports = {
           path.resolve(canvasDir, 'packages/convert-case'),
           path.resolve(canvasDir, 'packages/html-escape'),
           path.join(canvasDir, 'packages/slickgrid'),
-          path.join(canvasDir, 'packages/with-breakpoints'),
           path.join(canvasDir, 'spec/javascripts/jsx'),
           path.join(canvasDir, 'spec/coffeescripts'),
           /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//,
