@@ -305,6 +305,7 @@ export class UploadMediaModal extends React.Component {
                   this.setState({subtitles})
                 }}
                 bounds={this.state.modalBodySize}
+                mountNode={this.props.mountNode}
               />
             </Suspense>
           </Tabs.Panel>

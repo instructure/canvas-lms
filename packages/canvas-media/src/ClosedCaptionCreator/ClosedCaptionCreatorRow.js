@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {Component} from 'react'
-import {arrayOf, func, objectOf, shape, string} from 'prop-types'
+import {arrayOf, func, objectOf, shape, string, element, oneOfType} from 'prop-types'
 import formatMessage from 'format-message'
 import {StyleSheet, css} from 'aphrodite'
 import {Alert} from '@instructure/ui-alerts'
@@ -47,6 +47,7 @@ export default class ClosedCaptionCreatorRow extends Component {
     onLanguageSelected: func,
     selectedFile: shape({name: string.isRequired}), // there's more, but his is all I care about
     selectedLanguage: shape({id: string.isRequired, label: string.isRequired}),
+    mountNode: oneOfType([element, func]),
   }
 
   styles = StyleSheet.create({
@@ -147,6 +148,7 @@ export default class ClosedCaptionCreatorRow extends Component {
           onChange={this.handleLanguageChange}
           placeholder={CLOSED_CAPTIONS_SELECT_LANGUAGE}
           translatedStrings={this.props.uploadMediaTranslations.SelectStrings}
+          mountNode={this.props.mountNode}
         >
           {this.props.languages.map(o => {
             return (
