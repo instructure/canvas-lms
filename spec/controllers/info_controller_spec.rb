@@ -104,11 +104,13 @@ describe InfoController do
     context "when the secondary is not connected" do
       let(:secondary_connection) { GuardRail.activate(:secondary) { Account.connection } }
 
-      before { secondary_connection.disconnect! }
-
-      after { secondary_connection.reconnect! }
-
       it "responds with 503" do
+        allow(secondary_connection).to receive(:active?) do
+          raise ActiveRecord::ConnectionNotEstablished if GuardRail.current == :secondary # double check, in case we're sharing connections
+
+          true
+        end
+
         get "readiness"
         expect(response.code).to eq "503"
         json = response.parsed_body
