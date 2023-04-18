@@ -77,6 +77,12 @@ describe('publishAllModulesHelper', () => {
         })
       )
     })
+
+    it('returns a rejected promise on error', async () => {
+      const whoops = new Error('whoops')
+      doFetchApi.mockRejectedValueOnce(whoops)
+      await expect(batchUpdateAllModulesApiCall(2, true, true)).rejects.toBe(whoops)
+    })
   })
 
   describe('monitorProgress', () => {
@@ -112,7 +118,7 @@ describe('publishAllModulesHelper', () => {
       })
 
       const setCurrentProgress = jest.fn()
-      monitorProgress(3533, setCurrentProgress)
+      monitorProgress(3533, setCurrentProgress, () => {})
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(1))
       expect(doFetchApi).toHaveBeenCalledTimes(1)
       expect(doFetchApi).toHaveBeenNthCalledWith(1, {path: '/api/v1/progress/3533'})
@@ -144,7 +150,7 @@ describe('publishAllModulesHelper', () => {
       })
 
       const setCurrentProgress = jest.fn()
-      monitorProgress(3533, setCurrentProgress)
+      monitorProgress(3533, setCurrentProgress, () => {})
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(1))
       expect(doFetchApi).toHaveBeenCalledTimes(1)
       expect(doFetchApi).toHaveBeenNthCalledWith(1, {path: '/api/v1/progress/3533'})
@@ -153,6 +159,14 @@ describe('publishAllModulesHelper', () => {
       expect(doFetchApi).toHaveBeenCalledTimes(2)
       expect(doFetchApi).toHaveBeenNthCalledWith(2, {path: '/api/v1/progress/3533'})
       jest.runOnlyPendingTimers()
+    })
+
+    it('calls onProgressFail on a catestrophic failure', async () => {
+      const err = new Error('whoops')
+      doFetchApi.mockRejectedValueOnce(err)
+      const onProgressFail = jest.fn()
+      monitorProgress(3533, () => {}, onProgressFail)
+      await waitFor(() => expect(onProgressFail).toHaveBeenCalledWith(err))
     })
   })
 
@@ -230,6 +244,11 @@ describe('publishAllModulesHelper', () => {
         method: 'GET',
         path: '/another/page',
       })
+    })
+    it('returns a rejected promise on error', async () => {
+      const whoops = new Error('whoops')
+      doFetchApi.mockRejectedValueOnce(whoops)
+      await expect(fetchAllItemPublishedStates(7)).rejects.toBe(whoops)
     })
   })
 

@@ -18,17 +18,12 @@
 
 import $ from 'jquery'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 import {
   renderContextModulesPublishIcon,
   updateModuleItemPublishedState,
   updateModuleItemsPublishedStates,
 } from './publishOneModuleHelper'
-
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-const I18n = useI18nScope('context_modules_utils_publishmodulehelper')
 
 export type ProgressResult = {
   id: string
@@ -60,16 +55,10 @@ export function batchUpdateAllModulesApiCall(
       skip_content_tags: skipContentTags,
       async,
     },
-  }).catch(error =>
-    showFlashAlert({
-      message: I18n.t('There was an error while saving your changes'),
-      type: 'error',
-      err: error,
-    })
-  )
+  })
 }
 
-export function monitorProgress(progressId, setCurrentProgress) {
+export function monitorProgress(progressId, setCurrentProgress, onProgressFail) {
   let progress
 
   const pollBatchApiProgress = () => {
@@ -92,11 +81,7 @@ export function monitorProgress(progressId, setCurrentProgress) {
           setCurrentProgress(progress)
         })
         .catch(error => {
-          showFlashAlert({
-            message: I18n.t('There was an error while saving your changes'),
-            err: error,
-            type: 'error',
-          })
+          onProgressFail(error)
         })
     }
     pollingLoop()
@@ -121,30 +106,21 @@ export function cancelBatchUpdate(progress, onCancelComplete) {
 }
 
 export function fetchAllItemPublishedStates(courseId: string | number, nextLink?: string) {
-  doFetchApi({
+  return doFetchApi({
     path: nextLink || `/api/v1/courses/${courseId}/modules?include[]=items`,
     method: 'GET',
-  })
-    .then(({json, link}) => {
-      json.forEach((module: any) => {
-        updateModulePublishedState(module.id, module.published, false)
-        module.items.forEach((item: any) => {
-          updateModuleItemPublishedState(item.id, item.published)
-        })
+  }).then(({json, link}) => {
+    json.forEach((module: any) => {
+      updateModulePublishedState(module.id, module.published, false)
+      module.items.forEach((item: any) => {
+        updateModuleItemPublishedState(item.id, item.published)
       })
-      if (link?.next) {
-        fetchAllItemPublishedStates(courseId, link.next.url)
-      }
     })
-    .catch(error =>
-      showFlashAlert({
-        message: I18n.t('There was an error while saving your changes'),
-        type: 'error',
-        err: error,
-      })
-    )
+    if (link?.next) {
+      fetchAllItemPublishedStates(courseId, link.next.url)
+    }
+  })
 }
-
 // update the state of the modules and items
 // based on what the user asked to be done
 export function updateModulePendingPublishedStates(
