@@ -949,6 +949,13 @@ describe Attachment do
     end
   end
 
+  context "explicitly-set display name" do
+    it "truncates to 1000 characters" do
+      a = attachment_model(filename: "HE COMES", display_name: "#{"A" * 1000}.docx")
+      expect(a.display_name).to eq "#{"A" * 995}.docx"
+    end
+  end
+
   context "clone_for" do
     context "with S3 storage enabled" do
       subject { attachment.clone_for(context, nil, { force_copy: true }) }
