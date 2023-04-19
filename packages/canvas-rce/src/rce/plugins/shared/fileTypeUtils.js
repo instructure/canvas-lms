@@ -19,13 +19,13 @@
 import {parse} from 'url'
 import {absoluteToRelativeUrl} from '../../../common/fileUrl'
 import {
+  IconAudioLine,
   IconDocumentLine,
   IconMsExcelLine,
   IconMsPptLine,
   IconMsWordLine,
   IconPdfLine,
   IconVideoLine,
-  IconAudioLine,
 } from '@instructure/ui-icons'
 import RCEGlobals from '../../RCEGlobals'
 
@@ -103,7 +103,7 @@ export function mediaPlayerURLFromFile(file, canvasOrigin) {
   if (RCEGlobals.getFeatures()?.media_links_use_attachment_id && isAudioOrVideo(content_type)) {
     const attachmentId = file.id
     if (attachmentId) {
-      return `/media_attachments_iframe/${attachmentId}?type=${type}`
+      return `/media_attachments_iframe/${attachmentId}?type=${type}&embedded=true`
     }
   }
 

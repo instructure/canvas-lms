@@ -27,7 +27,7 @@ body {
   font-weight: 300;
 
   &.no-headers, &.embedded {
-    #header, #topbar, #left-side, #breadcrumbs { display: none !important; }
+    #header, #mobile-header, #masquerade_bar, #topbar, #left-side, #breadcrumbs { display: none !important; }
     .ic-app-nav-toggle-and-crumbs { display: none; }
     #footer { display: none; }
   }
