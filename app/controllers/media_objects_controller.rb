@@ -316,6 +316,7 @@ class MediaObjectsController < ApplicationController
 
       @media_id = attachment.media_entry_id
       @media_object = MediaObject.by_media_id(@media_id).take
+      @media_object.current_attachment = attachment
 
     elsif params[:media_object_id].present?
       @media_id = params[:media_object_id]
