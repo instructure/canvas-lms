@@ -128,6 +128,20 @@ describe MediaTracksController do
         expect(t["user_id"]).to eql tracks[t["locale"]]["user_id"]
       end
     end
+
+    it "does not list tracks that belong to an attachment other than the one media object belongs to" do
+      tracks = {}
+      tracks["en"] = @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher.id)
+      tracks["af"] = @mo.media_tracks.create!(kind: "subtitles", locale: "af", content: "af subs", user_id: @teacher.id)
+
+      attachment_model(media_entry_id: @mo.media_id)
+      @attachment.media_tracks.create!(kind: "subtitles", locale: "en", content: "new en subs", user_id: @teacher.id, media_object: @mo)
+
+      get "index", params: { media_object_id: @mo.media_id, include: ["content"] }
+      expect(response).to be_successful
+      parsed = response.parsed_body
+      expect(parsed.pluck("content")).to match_array ["en subs", "af subs"]
+    end
   end
 
   describe "#update" do
