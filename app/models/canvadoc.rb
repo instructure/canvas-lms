@@ -76,6 +76,9 @@ class Canvadoc < ActiveRecord::Base
     application/vnd.apple.pages
     application/vnd.apple.keynote
     application/vnd.apple.numbers
+    application/x-iwork-keynote-sffkey
+    application/x-iwork-pages-sffpages
+    application/x-iwork-numbers-sffnumbers
   ].freeze
 
   DEFAULT_MIME_TYPES = %w[
