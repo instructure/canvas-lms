@@ -126,17 +126,12 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     when "online_upload"
       owning_user = nil
       if input[:student_id]
-        owning_user =
-          User
-          .joins(:submissions)
-          .where(submissions: { assignment: })
-          .find(input[:student_id])
+        owning_user = assignment.submissions.find_by(user_id: input[:student_id])&.user
         submission_params[:proxied_student] = owning_user
       else
         owning_user = current_user
       end
       file_ids = (input[:file_ids] || []).compact.uniq
-
       attachments = owning_user&.submittable_attachments&.active&.where(id: file_ids) || []
       unless file_ids.size == attachments.size
         attachment_ids = attachments.map(&:id)
