@@ -1954,6 +1954,7 @@ describe Canvas::LiveEvents do
   end
 
   describe "learning_outcomes" do
+    specs_require_sharding
     before do
       @context = course_model
     end
@@ -1975,7 +1976,9 @@ describe Canvas::LiveEvents do
           calculation_int: @outcome.calculation_int,
           rubric_criterion: @outcome.rubric_criterion,
           title: @outcome.title,
-          workflow_state: @outcome.workflow_state
+          workflow_state: @outcome.workflow_state,
+          copied_from_outcome_id: @outcome.copied_from_outcome_id,
+          original_outcome_root_account_uuid: nil
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_created(@outcome)
@@ -1997,10 +2000,38 @@ describe Canvas::LiveEvents do
           calculation_int: @global_outcome.calculation_int,
           rubric_criterion: @global_outcome.rubric_criterion,
           title: @global_outcome.title,
-          workflow_state: @global_outcome.workflow_state
+          workflow_state: @global_outcome.workflow_state,
+          copied_from_outcome_id: nil,
+          original_outcome_root_account_uuid: nil
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_created(@global_outcome)
+      end
+
+      it "triggers a learning_outcome_created live event for course copy" do
+        original_outcome = outcome_model(title: "original outcome")
+        copied_outcome = outcome_model(title: "copied outcome")
+        copied_outcome.update!(copied_from_outcome_id: original_outcome.global_id)
+
+        expect_event("learning_outcome_created", {
+          learning_outcome_id: copied_outcome.id.to_s,
+          context_type: copied_outcome.context_type,
+          context_id: copied_outcome.context_id.to_s,
+          context_uuid: @context.uuid.to_s,
+          display_name: copied_outcome.display_name,
+          short_description: copied_outcome.short_description,
+          description: copied_outcome.description,
+          vendor_guid: copied_outcome.vendor_guid,
+          calculation_method: copied_outcome.calculation_method,
+          calculation_int: copied_outcome.calculation_int,
+          rubric_criterion: copied_outcome.rubric_criterion,
+          title: copied_outcome.title,
+          workflow_state: copied_outcome.workflow_state,
+          copied_from_outcome_id: copied_outcome.copied_from_outcome_id.to_s,
+          original_outcome_root_account_uuid: nil
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_created(copied_outcome)
       end
     end
 
@@ -2024,7 +2055,9 @@ describe Canvas::LiveEvents do
           rubric_criterion: @outcome.rubric_criterion,
           title: @outcome.title,
           updated_at: @outcome.updated_at,
-          workflow_state: @outcome.workflow_state
+          workflow_state: @outcome.workflow_state,
+          copied_from_outcome_id: @outcome.copied_from_outcome_id,
+          original_outcome_root_account_uuid: nil
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_updated(@outcome)
@@ -2049,10 +2082,36 @@ describe Canvas::LiveEvents do
           rubric_criterion: @global_outcome.rubric_criterion,
           title: @global_outcome.title,
           updated_at: @global_outcome.updated_at,
-          workflow_state: @global_outcome.workflow_state
+          workflow_state: @global_outcome.workflow_state,
+          copied_from_outcome_id: nil,
+          original_outcome_root_account_uuid: nil
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_updated(@global_outcome)
+      end
+    end
+
+    context "root account uuid for course copy original outcome" do
+      before do
+        @copied_outcome = outcome_model(title: "test copied outcome 1")
+      end
+
+      it "returns nil when copied_from_outcome_id comes from an outcome within the current shard" do
+        original_outcome = outcome_model(title: "test outcome 1")
+        @copied_outcome.update!(copied_from_outcome_id: original_outcome.global_id)
+        response = Canvas::LiveEvents.get_root_account_uuid(@copied_outcome.copied_from_outcome_id)
+        expect(response).to be_nil
+      end
+
+      it "return an account uuid when copied_from_outcome_id comes from an outcome in a different shard" do
+        @shard1.activate do
+          @s1_account = Account.create
+          @s1_course = @s1_account.courses.create!
+          @s1_outcome = @s1_course.created_learning_outcomes.create!(title: "S1 outcome")
+        end
+        @copied_outcome.update!(copied_from_outcome_id: @s1_outcome.global_id)
+        response = Canvas::LiveEvents.get_root_account_uuid(@copied_outcome.copied_from_outcome_id)
+        expect(response).to eq @s1_account.uuid
       end
     end
   end

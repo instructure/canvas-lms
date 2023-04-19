@@ -573,6 +573,7 @@
             <xs:element name="external_identifier" type="xs:string" minOccurs="0"/>
             <xs:element name="is_global_outcome" type="xs:boolean" minOccurs="0"/>
             <xs:element name="vendor_guid" type="xs:string" minOccurs="0"/>
+            <xs:element name="copied_from_outcome_id" type="optional_integer" minOccurs="0"/>
             <xs:element name="friendly_description" type="xs:string" minOccurs="0"/>
             <xs:element name="alignments" minOccurs="0">
               <xs:complexType>

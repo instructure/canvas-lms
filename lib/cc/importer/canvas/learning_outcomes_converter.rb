@@ -69,6 +69,7 @@ module CC::Importer::Canvas
       outcome[:external_identifier] = get_node_val(node, "external_identifier")
       outcome[:vendor_guid] = get_val_if_child(node, "vendor_guid")
       outcome[:friendly_description] = get_val_if_child(node, "friendly_description")
+      outcome[:copied_from_outcome_id] = get_val_if_child(node, "copied_from_outcome_id")
 
       outcome[:ratings] = []
       node.css("rating").each do |r_node|

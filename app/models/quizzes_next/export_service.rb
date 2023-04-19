@@ -78,6 +78,7 @@ module QuizzesNext
             content_migration.migration_type == "master_course_import" &&
             MasterCourses::ChildSubscription.is_child_course?(new_course)
 
+          remove_alignments = content_migration.migration_type == "course_copy_importer" && content_migration.copy_options.exclude?(:everything) && content_migration.copy_options.exclude?(:all_learning_outcomes)
           Canvas::LiveEvents.quizzes_next_quiz_duplicated(
             {
               original_course_uuid: imported_content[:original_course_uuid],
@@ -86,7 +87,8 @@ module QuizzesNext
               domain: new_course.root_account&.domain(ApplicationController.test_cluster_name),
               new_course_name: new_course.name,
               created_on_blueprint_sync: is_blueprint_sync,
-              resource_map_url: content_migration.asset_map_url(generate_if_needed: true)
+              resource_map_url: content_migration.asset_map_url(generate_if_needed: true),
+              remove_alignments:
             }
           )
         end

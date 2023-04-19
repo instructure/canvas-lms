@@ -19,11 +19,21 @@
 #
 
 describe LearningOutcome do
+  let(:calc_method_no_int) { %w[highest latest average] }
+
+  describe "associations" do
+    it { is_expected.to belong_to(:copied_from).inverse_of(:cloned_outcomes) }
+
+    it do
+      expect(subject).to have_many(:cloned_outcomes).with_foreign_key("copied_from_outcome_id")
+                                                    .inverse_of(:copied_from)
+    end
+  end
+
   def outcome_errors(prop)
     @outcome.errors[prop].map(&:to_s)
   end
 
-  # rubocop:disable Lint/DuplicateBranch
   def generate_rubric_criterion(outcome, num_ratings)
     criterion = {}
     criterion[:description] = "default description"
@@ -67,9 +77,6 @@ describe LearningOutcome do
 
     outcome.rubric_criterion = criterion
   end
-  # rubocop:enable Lint/DuplicateBranch
-
-  let(:calc_method_no_int) { %w[highest latest average] }
 
   context "validations" do
     describe "lengths" do
@@ -1234,13 +1241,6 @@ describe LearningOutcome do
       end
     end
 
-    def add_or_get_rubric(outcome)
-      @add_or_get_rubric_cache ||= Hash.new do |h, key|
-        h[key] = find_rubric.call(outcome) || create_rubric.call(outcome)
-      end
-      @add_or_get_rubric_cache[outcome.id]
-    end
-
     let(:assess_with) do
       lambda do |outcome, context|
         assignment = assignment_model(context:)
@@ -1281,6 +1281,13 @@ describe LearningOutcome do
         rubric.reload
         { assignment:, assessment:, rubric:, result: }
       end
+    end
+
+    def add_or_get_rubric(outcome)
+      @add_or_get_rubric_cache ||= Hash.new do |h, key|
+        h[key] = find_rubric.call(outcome) || create_rubric.call(outcome)
+      end
+      @add_or_get_rubric_cache[outcome.id]
     end
 
     context "learning outcome results" do
