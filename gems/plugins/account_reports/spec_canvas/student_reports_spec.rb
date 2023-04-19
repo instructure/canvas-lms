@@ -646,5 +646,14 @@ describe "Student reports" do
       parsed = read_report(@type, { order: 1 })
       expect(parsed.length).to eq 2
     end
+
+    it "deals with a missing developer key" do
+      dk = DeveloperKey.create!
+      @at3.update developer_key: dk
+      dk.destroy_permanently!
+      parsed = read_report(@type, order: 1)
+      user3_row = parsed.detect { |row| row[0] == @user3.id.to_s }
+      expect(user3_row.last).to be_nil
+    end
   end
 end
