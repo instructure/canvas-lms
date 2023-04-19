@@ -107,6 +107,7 @@ module CC
         out_node.calculation_method item.calculation_method if item.calculation_method.present?
         out_node.calculation_int item.calculation_int if item.calculation_int.present?
         out_node.vendor_guid item.vendor_guid if item.vendor_guid.present?
+        out_node.copied_from_outcome_id Shard.global_id_for(item.id) if item.id.present?
 
         # Populate friendly_description for course export
         if Account.site_admin.feature_enabled?(:outcomes_friendly_description) && item.context == @course

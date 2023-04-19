@@ -830,6 +830,18 @@ module Canvas::LiveEvents
     post_event_stringified("learning_outcome_result_created", get_learning_outcome_result_data(result))
   end
 
+  # Since outcome service canvas learning_outcome global id record won't match outcomes service shard
+  # we are also sending the root_account_uuid for the original outcome, however we only send the uuid
+  # if the record is from another shard otherwise we send nil to indicate the id is for the current shard
+  def self.get_root_account_uuid(copied_from_outcome_id)
+    _, shard = Shard.local_id_for(copied_from_outcome_id)
+    return if shard.nil?
+
+    original_outcome = LearningOutcome.find(copied_from_outcome_id)
+
+    original_outcome&.context&.root_account&.uuid
+  end
+
   def self.get_learning_outcome_data(outcome)
     {
       learning_outcome_id: outcome.id,
@@ -844,7 +856,9 @@ module Canvas::LiveEvents
       calculation_int: outcome.calculation_int,
       rubric_criterion: outcome.rubric_criterion,
       title: outcome.title,
-      workflow_state: outcome.workflow_state
+      workflow_state: outcome.workflow_state,
+      copied_from_outcome_id: Shard.local_id_for(outcome.copied_from_outcome_id)&.first,
+      original_outcome_root_account_uuid: get_root_account_uuid(outcome.copied_from_outcome_id)
     }
   end
 

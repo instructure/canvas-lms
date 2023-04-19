@@ -128,7 +128,8 @@ describe QuizzesNext::ExportService do
         domain: "canvas.instructure.com",
         new_course_name: "Course Name",
         created_on_blueprint_sync: false,
-        resource_map_url: "http://example.com/resource_map.json"
+        resource_map_url: "http://example.com/resource_map.json",
+        remove_alignments: false
       }
 
       basic_import_content[:assignments] << {
@@ -278,6 +279,38 @@ describe QuizzesNext::ExportService do
           hash_including(created_on_blueprint_sync: false)
         ).once
         described_class.send_imported_content(new_course, content_migration, basic_import_content)
+      end
+    end
+
+    context "when an assignment is imported using course copy" do
+      it "emits a live event with the field remove_alignments set as false" do
+        cm = double({ started_at: 1.hour.ago, migration_type: "course_copy_importer", copy_options: { everything: true }, asset_map_url: "http://example.com/resource_map.json" })
+
+        expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(
+          hash_including(remove_alignments: false)
+        ).once
+
+        described_class.send_imported_content(new_course, cm, basic_import_content)
+      end
+
+      it "emits a live event with the field remove_alignments set as true" do
+        cm = double({ started_at: 1.hour.ago, migration_type: "course_copy_importer", copy_options: { all_course_settings: "1", all_assignments: "1" }, asset_map_url: "http://example.com/resource_map.json" })
+
+        expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(
+          hash_including(remove_alignments: true)
+        ).once
+
+        described_class.send_imported_content(new_course, cm, basic_import_content)
+      end
+
+      it "emits a live event with the field remove_alignments set as false (selected outcomes in course content)" do
+        cm = double({ started_at: 1.hour.ago, migration_type: "course_copy_importer", copy_options: { all_course_settings: "1", all_assignments: "1", all_learning_outcomes: "1" }, asset_map_url: "http://example.com/resource_map.json" })
+
+        expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(
+          hash_including(remove_alignments: false)
+        ).once
+
+        described_class.send_imported_content(new_course, cm, basic_import_content)
       end
     end
   end
