@@ -327,14 +327,16 @@ class Course < ActiveRecord::Base
   # assignment can have.
   MODERATED_GRADING_GRADER_LIMIT = 10
 
+  # using a lambda for setting name to avoid caching the translated string when the model is loaded
+  # (in case selected language changes)
   CUSTOMIZABLE_PERMISSIONS = ActiveSupport::OrderedHash[
     "syllabus", {
-      setting: t("syllabus", "Syllabus"),
+      get_setting_name: -> { t("syllabus", "Syllabus") },
       flex: :looser,
       as_bools: true,
     },
     "files", {
-      setting: t("files", "Files"),
+      get_setting_name: -> { t("files", "Files") },
       flex: :any
     },
   ].freeze

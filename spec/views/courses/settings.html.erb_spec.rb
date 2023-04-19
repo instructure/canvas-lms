@@ -276,4 +276,13 @@ describe "courses/settings" do
       end
     end
   end
+
+  describe "visibility settings" do
+    it "calls Course::CUSTOMIZABLE_PERMISSIONS's get_setting_name to get translated setting name" do
+      expect(Course::CUSTOMIZABLE_PERMISSIONS["syllabus"][:get_setting_name]).to receive(:call).once.and_call_original
+      expect(Course::CUSTOMIZABLE_PERMISSIONS["files"][:get_setting_name]).to receive(:call).once.and_call_original
+      view_context(@course, @user)
+      render
+    end
+  end
 end
