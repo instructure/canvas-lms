@@ -172,6 +172,15 @@ describe LoginController do
         expect(response.parsed_body["requires_terms_acceptance"]).to be(false)
       end
     end
+
+    it "rejects javascript scheme" do
+      user_session user_with_pseudonym(active: true)
+      request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })
+      allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(false)
+
+      get "session_token", format: :json, params: { return_to: "javascript://localhost/" }
+      expect(response).to have_http_status :unauthorized
+    end
   end
 
   describe "#logout" do
