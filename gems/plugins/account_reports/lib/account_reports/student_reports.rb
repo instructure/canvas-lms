@@ -353,7 +353,7 @@ module AccountReports
           row << (token[:permanent_expires_at] ? default_timezone_format(token[:permanent_expires_at]) : "never")
           row << (token[:last_used_at] ? default_timezone_format(token[:last_used_at]) : "never")
           row << token[:developer_key_id]
-          row << dev_key.name
+          row << dev_key&.name
           csv << row
         end
       end
@@ -361,7 +361,9 @@ module AccountReports
 
     def developer_key(dev_key_id)
       @dev_keys ||= {}
-      @dev_keys[dev_key_id] ||= DeveloperKey.find(dev_key_id)
+      return @dev_keys[dev_key_id] if @dev_keys.include?(dev_key_id)
+
+      @dev_keys[dev_key_id] = DeveloperKey.find_by(id: dev_key_id)
     end
   end
 end
