@@ -37,6 +37,7 @@ class MediaObject < ActiveRecord::Base
   serialize :data
 
   attr_accessor :podcast_associated_asset
+  attr_accessor :current_attachment
 
   def user_entered_title=(val)
     @push_user_title = true
@@ -317,17 +318,20 @@ class MediaObject < ActiveRecord::Base
   end
 
   def viewed!
-    delay.updated_viewed_at_and_retrieve_details(Time.now) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
+    # in the delayed job, current_attachment gets reset
+    # so we pass it in here and then set it again in the next method
+    delay.updated_viewed_at_and_retrieve_details(Time.now, current_attachment) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
     true
   end
 
-  def updated_viewed_at_and_retrieve_details(time)
+  def updated_viewed_at_and_retrieve_details(time, current_attachment)
+    self.current_attachment = current_attachment if current_attachment
     self.data[:last_viewed_at] = [time, self.data[:last_viewed_at]].compact.max
     retrieve_details
   end
 
   def create_attachment
-    return if attachment_id || Attachment.find_by(media_entry_id: media_id)
+    return if current_attachment || attachment_id || Attachment.find_by(media_entry_id: media_id)
     return unless %w[Account Course Group User].include?(context_type)
 
     self.attachment = Folder.media_folder(context).attachments
@@ -345,9 +349,12 @@ class MediaObject < ActiveRecord::Base
 
   def ensure_attachment_media_info
     create_attachment
-    return unless attachment_id && attachment.workflow_state == "pending_upload"
+    return unless (current_attachment || attachment_id) && attachment.workflow_state == "pending_upload"
 
-    file_state = attachment.file_state
+    # if there are multiple attachments attached to the media_object, we need to update the right one
+    updated_attachment = current_attachment || attachment
+
+    file_state = updated_attachment.file_state
     sources = media_sources
     return unless sources.present?
 
@@ -355,10 +362,10 @@ class MediaObject < ActiveRecord::Base
     url = sources.find { |s| s[:isOriginal] == "1" }&.dig(:url) if url.blank?
     url = sources.min_by { |a| a[:bitrate].to_i }&.dig(:url) if url.blank?
 
-    attachment.clone_url(url, :rename, false) # no check_quota because the bits are in kaltura
-    attachment.file_state = file_state
-    attachment.workflow_state = "processed"
-    attachment.save!
+    updated_attachment.clone_url(url, :rename, false) # no check_quota because the bits are in kaltura
+    updated_attachment.file_state = file_state
+    updated_attachment.workflow_state = "processed"
+    updated_attachment.save!
   end
 
   def deleted?
