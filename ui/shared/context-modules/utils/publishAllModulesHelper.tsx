@@ -186,7 +186,7 @@ export function moduleIds(): Array<number> {
   dataModules.forEach(el => {
     if (el.id === undefined) return
 
-    const id = parseInt(el.getAttribute('data-module-id') || '', 10)
+    const id = parseInt(el.id?.replace(/\D/g, '') || '', 10)
     if (!Number.isNaN(id)) ids.add(id)
   })
 

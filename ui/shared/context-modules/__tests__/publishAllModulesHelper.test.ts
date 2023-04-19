@@ -262,7 +262,7 @@ describe('publishAllModulesHelper', () => {
       spy?.mockRestore()
     })
 
-    it('updades the module and its items', () => {
+    it('updates the module and its items', () => {
       const published = true
       const isPublishing = false
       updateModulePublishedState(1, published, isPublishing)
@@ -283,8 +283,8 @@ describe('publishAllModulesHelper', () => {
     it('extracts module ids from the erb generated dom elements', () => {
       document.body.innerHTML = `
       <div>
-        <span id="a_module" class="context_module" data-module-id="17">module 17</span>
-        <span id="b_module" class="context_module" data-module-id="19">module 19</span
+        <span id="a_module_17" class="context_module" data-module-id="17">module 17</span>
+        <span id="b_module_19" class="context_module" data-module-id="19">module 19</span
         <span id="template_module" class="context_module" data-module-id="{{ id }}"></span
       `
       const mids = moduleIds()
@@ -294,8 +294,8 @@ describe('publishAllModulesHelper', () => {
     it('returns only unique its', () => {
       document.body.innerHTML = `
       <div>
-        <span id="a_module" class="context_module" data-module-id="17">module 17</span>
-        <span id="b_module" class="context_module" data-module-id="17">module 17 too</span
+        <span id="a_module_17" class="context_module" data-module-id="17">module 17</span>
+        <span id="b_module_17" class="context_module" data-module-id="17">module 17 too</span
         <span id="template_module" class="context_module" data-module-id="{{ id }}"></span
       `
       const mids = moduleIds()
