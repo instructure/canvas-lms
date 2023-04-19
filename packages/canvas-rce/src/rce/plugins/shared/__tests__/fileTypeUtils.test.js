@@ -17,13 +17,13 @@
  */
 
 import {
-  isImage,
-  isAudioOrVideo,
-  isVideo,
-  isAudio,
-  isText,
-  isIWork,
   getIWorkType,
+  isAudio,
+  isAudioOrVideo,
+  isImage,
+  isIWork,
+  isText,
+  isVideo,
   mediaPlayerURLFromFile,
 } from '../fileTypeUtils'
 import RCEGlobals from '../../../RCEGlobals'
@@ -170,7 +170,7 @@ describe('fileTypeUtils', () => {
           type: 'video/mov',
         }
         const url = mediaPlayerURLFromFile(file)
-        expect(url).toBe('/media_attachments_iframe/123?type=video')
+        expect(url).toBe('/media_attachments_iframe/123?type=video&embedded=true')
       })
 
       it('uses media_object route if no attachmentId exists', () => {

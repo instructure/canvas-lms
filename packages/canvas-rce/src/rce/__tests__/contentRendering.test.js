@@ -17,7 +17,7 @@
  */
 
 import * as contentRendering from '../contentRendering'
-import {videoFromTray, videoFromUpload, audioFromTray, audioFromUpload} from './contentHelpers'
+import {audioFromTray, audioFromUpload, videoFromTray, videoFromUpload} from './contentHelpers'
 import RCEGlobals from '../RCEGlobals'
 
 describe('contentRendering', () => {
@@ -326,7 +326,7 @@ describe('contentRendering', () => {
       const video = videoFromTray()
       const html = contentRendering.renderVideo(video, canvasOrigin)
       expect(html).toEqual(
-        `<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_attachments_iframe/17?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>`
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_attachments_iframe/17?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>`
       )
     })
 
@@ -334,7 +334,7 @@ describe('contentRendering', () => {
       const video = videoFromUpload()
       const html = contentRendering.renderVideo(video, canvasOrigin)
       expect(html).toEqual(
-        `<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="/media_attachments_iframe/maybe?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>`
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="/media_attachments_iframe/maybe?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>`
       )
     })
   })
@@ -352,7 +352,7 @@ describe('contentRendering', () => {
       const audio = audioFromTray()
       const rendered = contentRendering.renderAudio(audio, canvasOrigin)
       expect(rendered).toEqual(
-        '<iframe data-media-id="29" data-media-type="audio" src="/media_attachments_iframe/29?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>'
+        '<iframe data-media-id="29" data-media-type="audio" src="/media_attachments_iframe/29?type=audio&embedded=true" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>'
       )
     })
 
@@ -360,7 +360,7 @@ describe('contentRendering', () => {
       const audio = audioFromUpload()
       const rendered = contentRendering.renderAudio(audio, canvasOrigin)
       expect(rendered).toEqual(
-        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/media_attachments_iframe/maybe?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>'
+        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/media_attachments_iframe/maybe?type=audio&embedded=true" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>'
       )
     })
   })

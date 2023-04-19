@@ -207,7 +207,7 @@ a.Button--flash {
 // When the fixed bottom alert is showing, add a
 // left and right border, making Canvas appear as if
 // it is inside a frame.
-body.is-masquerading-or-student-view {
+body.is-masquerading-or-student-view:not(.embedded) {
   border-#{direction(right)}: 3px solid $ic-color-action;
   .ic-app-header { border-#{direction(left)}: 3px solid $ic-color-action; }
 }
