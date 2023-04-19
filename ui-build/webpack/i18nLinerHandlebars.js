@@ -152,7 +152,7 @@ function i18nLinerHandlebarsLoader(source) {
   }
 
   // make sure the template has access to all our handlebars helpers
-  dependencies.push('@canvas/handlebars-helpers/index.coffee')
+  dependencies.push('@canvas/handlebars-helpers/index.js')
 
   return emitTemplate({
     name,
