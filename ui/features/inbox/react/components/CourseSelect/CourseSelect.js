@@ -49,7 +49,7 @@ const filterOptions = (value, options) => {
 const getOptionById = (id, options) => {
   return Object.values(options)
     .flat()
-    .find(({assetString}) => id === assetString)
+    .find(o => o?.assetString === id)
 }
 
 const getCourseName = (courseAssetString, options) => {
@@ -110,6 +110,7 @@ export class CourseSelect extends React.Component {
     if (props.options !== state.options) {
       return {
         filteredOptions: filterOptions(state.inputValue, props.options),
+        inputValue: getCourseName(props.activeCourseFilterID, props.options),
       }
     }
     return null

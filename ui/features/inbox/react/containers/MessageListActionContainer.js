@@ -93,7 +93,7 @@ const MessageListActionContainer = props => {
   const doesCourseFilterOptionExist = (id, courseOptions) => {
     return !!Object.values(courseOptions)
       .flat()
-      .find(({assetString}) => id === assetString)
+      .find(o => o?.assetString === id)
   }
 
   useEffect(() => {
