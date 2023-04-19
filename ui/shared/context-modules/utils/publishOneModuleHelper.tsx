@@ -278,7 +278,7 @@ export function renderContextModulesPublishIcon(
 }
 
 function findModulePublishIcon(moduleId) {
-  return document.querySelector(`.module-publish-icon[data-module-id="${moduleId}"]`)
+  return document.querySelector(`#context_module_${moduleId} .module-publish-icon`)
 }
 
 function getModulePublishState(moduleId) {

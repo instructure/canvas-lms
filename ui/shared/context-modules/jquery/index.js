@@ -69,6 +69,7 @@ import {
   updateProgressionState,
 } from './utils'
 import ContextModulesPublishMenu from '../react/ContextModulesPublishMenu'
+import {renderContextModulesPublishIcon} from '../utils/publishOneModuleHelper'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -1027,6 +1028,7 @@ modules.initModuleManagement = function (duplicate) {
       $('#no_context_modules_message').slideUp()
       $('#expand_collapse_all').show()
       setExpandAllButton()
+      const published = data.context_module.workflow_state === 'published'
       const $publishIcon = $module.find('.publish-icon')
       // new module, setup publish icon and other stuff
       if (!$publishIcon.data('id')) {
@@ -1042,11 +1044,24 @@ modules.initModuleManagement = function (duplicate) {
           moduleType: 'module',
           id: data.context_module.id,
           courseId: data.context_module.context_id,
-          published: data.context_module.workflow_state === 'published',
+          published,
           publishable: true,
         }
         const view = initPublishButton($publishIcon, publishData)
         overrideModel(moduleItems, relock_modules_dialog, view.model, view)
+      }
+      if (window.ENV?.FEATURES?.module_publish_menu) {
+        const isPublishing =
+          document.querySelector('#context-modules-publish-menu').dataset['data-progress-id'] !==
+          undefined
+        updatePublishMenuDisabledState(isPublishing)
+        renderContextModulesPublishIcon(
+          data.context_module.context_id,
+          data.context_module.id,
+          published,
+          isPublishing,
+          isPublishing
+        )
       }
       relock_modules_dialog.renderIfNeeded(data.context_module)
       $module.triggerHandler('update', data)
