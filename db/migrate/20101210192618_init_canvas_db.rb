@@ -82,7 +82,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :access_tokens, [:crypted_refresh_token], unique: true
     add_index :access_tokens, :user_id
 
-    create_table "account_authorization_configs", force: true do |t|
+    create_table "authentication_providers", force: true do |t|
       t.integer  "account_id", limit: 8, null: false
       t.integer  "auth_port"
       t.string   "auth_host", limit: 255
@@ -112,9 +112,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.json     "settings", default: {}, null: false
     end
 
-    add_index "account_authorization_configs", ["account_id"], name: "index_account_authorization_configs_on_account_id"
-    add_index :account_authorization_configs, :workflow_state
-    add_index :account_authorization_configs, :metadata_uri, where: "metadata_uri IS NOT NULL"
+    add_index "authentication_providers", ["account_id"], name: "index_authentication_providers_on_account_id"
+    add_index :authentication_providers, :workflow_state
+    add_index :authentication_providers, :metadata_uri, where: "metadata_uri IS NOT NULL"
 
     create_table "account_reports" do |t|
       t.integer  "user_id", limit: 8, null: false
@@ -3332,7 +3332,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :abstract_courses, :enrollment_terms
     add_foreign_key :abstract_courses, :sis_batches
     add_foreign_key :access_tokens, :users
-    add_foreign_key :account_authorization_configs, :accounts
+    add_foreign_key :authentication_providers, :accounts
     add_foreign_key :account_notification_roles, :account_notifications
     add_foreign_key :account_notification_roles, :roles
     add_foreign_key :account_notifications, :accounts
@@ -3535,7 +3535,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :polling_poll_submissions, :users
     add_foreign_key :polling_polls, :users
     add_foreign_key :profiles, :accounts, column: "root_account_id"
-    add_foreign_key :pseudonyms, :account_authorization_configs, column: :authentication_provider_id
+    add_foreign_key :pseudonyms, :authentication_providers, column: :authentication_provider_id
     add_foreign_key :pseudonyms, :accounts
     add_foreign_key :pseudonyms, :sis_batches
     add_foreign_key :pseudonyms, :users

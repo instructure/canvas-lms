@@ -90,20 +90,6 @@ class AuthenticationProvider < ActiveRecord::Base
     t("Login with %{provider}", provider: display_name)
   end
 
-  # Drop and recreate the authentication_providers view, if it exists.
-  #
-  # to be used from migrations that existed before the table rename. should
-  # only be used from inside a transaction.
-  def self.maybe_recreate_view
-    if (view_exists = connection.view_exists?("authentication_providers"))
-      connection.execute("DROP VIEW #{connection.quote_table_name("authentication_providers")}")
-    end
-    yield
-    if view_exists
-      connection.execute("CREATE VIEW #{connection.quote_table_name("authentication_providers")} AS SELECT * FROM #{connection.quote_table_name("account_authorization_configs")}")
-    end
-  end
-
   scope :active, -> { where("workflow_state <> 'deleted'") }
   belongs_to :account
   include ::Canvas::RootAccountCacher
