@@ -3028,6 +3028,11 @@ class ApplicationController < ActionController::Base
   end
   helper_method :show_student_view_button?
 
+  def show_blueprint_button?
+    @context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(@context)
+  end
+  helper_method :show_blueprint_button?
+
   def show_immersive_reader?
     return false if @current_user.blank?
 
