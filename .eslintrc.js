@@ -91,7 +91,13 @@ module.exports = {
     'no-return-assign': 'off',
     'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
-    '@typescript-eslint/no-use-before-define': ['error', 'nofunc'],
+    '@typescript-eslint/no-use-before-define': [
+      'error',
+      {
+        functions: false,
+        classes: false,
+      },
+    ],
     'no-useless-escape': 'off',
     'one-var': 'off',
     'prefer-destructuring': 'off',
