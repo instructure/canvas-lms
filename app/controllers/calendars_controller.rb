@@ -82,6 +82,7 @@ class CalendarsController < ApplicationController
         can_update_wiki_page: context.grants_right?(@current_user, session, :update),
         concluded: context.is_a?(Course) ? context.concluded? : false,
         k5_course: context.is_a?(Course) && context.elementary_enabled?,
+        k5_account: context.is_a?(Account) && context.enable_as_k5_account?,
         course_pacing_enabled: context.is_a?(Course) && @domain_root_account.feature_enabled?(:course_paces) && context.enable_course_paces,
         user_is_observer: context.is_a?(Course) && context.enrollments.where(user_id: @current_user).first&.observer?,
         default_due_time: context.is_a?(Course) && context.default_due_time,
