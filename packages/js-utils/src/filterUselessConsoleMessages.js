@@ -24,13 +24,13 @@ const consoleMessagesToIgnore = {
 
     // This is from @instructure/ui-menu, nothing we can do about it ourselves
     /Function components cannot be given refs\. Attempts to access this ref will fail[\s\S]*in (CanvasInstUIModal|PopoverTrigger)/,
-    /Warning: \[themeable\] A theme registry has already been initialized.*/,
+    /.*A theme registry has already been initialized.*/,
     // from an old discussions edit page
     /Error: Not implemented: navigation \(except hash changes\)/,
     // Until INSTUI updates FormPropTypes.message
     // see https://github.com/instructure/instructure-ui/issues/815
     'Invalid prop `messages[0].text` of type `object` supplied to',
-    /unknown pseudo-class selector/
+    /unknown pseudo-class selector/,
   ],
   warn: [
     // Uncomment the following line if all the react 16.9 deprecations are cluttering up
@@ -54,8 +54,8 @@ const consoleMessagesToIgnore = {
     // Put any others we can't control here.
     /Please update the following components:[ (BaseTransition|Billboard|Button|Checkbox|CloseButton|Dialog|Expandable|FileDrop|Flex|FlexItem|FormFieldGroup|FormFieldLabel|FormFieldLayout|FormFieldMessage|FormFieldMessages|Grid|GridCol|GridRow|Heading|InlineSVG|Mask|ModalBody|ModalFooter|ModalHeader|NumberInput|Portal|Query|Responsive|SVGIcon|ScreenReaderContent|SelectOptionsList|SelectField|SelectMultiple|SelectOptionsList|SelectSingle|Spinner|Tab|Text|TextArea|TextInput|TinyMCE|ToggleDetails|ToggleFacade|Transition|TruncateText|View),?]+$/,
     // output of Pagination component substitutes the component name for the placeholder %s
-    /Please update the following components: %s,Pagination/
-  ]
+    /Please update the following components: %s,Pagination/,
+  ],
 }
 
 export function filterUselessConsoleMessages(originalConsole = console) {
