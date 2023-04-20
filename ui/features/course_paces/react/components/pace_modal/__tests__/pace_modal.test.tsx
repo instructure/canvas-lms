@@ -58,10 +58,9 @@ afterEach(() => {
 })
 
 describe('PaceModal', () => {
-  it.skip('calls onClose and clears publishing errors when dismiss button is clicked', () => {
-    const {getByRole} = renderConnected(<PaceModal {...defaultProps} />)
-
-    const closeButton = getByRole('button', {name: 'Close'})
+  it('calls onClose and clears publishing errors when dismiss button is clicked', () => {
+    const {getByTestId} = renderConnected(<PaceModal {...defaultProps} />)
+    const closeButton = getByTestId('course-pace-edit-close-x')
     expect(closeButton).toBeInTheDocument()
     act(() => closeButton.click())
     expect(onClose).toHaveBeenCalled()
