@@ -33,7 +33,6 @@ module TatlTael
 
       def needs_non_selenium_specs?
         missing_public_js_specs? ||
-          missing_coffee_specs? ||
           missing_jsx_specs? ||
           missing_ruby_specs?
       end
@@ -50,20 +49,6 @@ module TatlTael
 
       def public_js_specs?
         changes_exist?(include: config[:globs][:public_js_spec])
-      end
-
-      ### coffee specs
-      def missing_coffee_specs?
-        needs_coffee_specs? && !coffee_specs?
-      end
-
-      def needs_coffee_specs?
-        changes_exist?(include: config[:globs][:coffee],
-                       allowlist: config[:globs][:coffee_allowlist])
-      end
-
-      def coffee_specs?
-        changes_exist?(include: config[:globs][:coffee_spec].concat(config[:globs][:jsx_spec]))
       end
 
       ### jsx specs
