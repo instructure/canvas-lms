@@ -48,7 +48,7 @@ const I18n = useI18nScope('context_modules_publish_menu')
 
 interface Props {
   readonly courseId: string | number
-  readonly runningProgressId: string | null
+  readonly runningProgressId: string | number | null
   readonly disabled: boolean
 }
 
@@ -63,8 +63,23 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
   const [shouldSkipModuleItems, setShouldSkipModuleItems] = useState(false)
   const [progressId, setProgressId] = useState(runningProgressId)
   const [currentProgress, setCurrentProgress] = useState<ProgressResult | undefined>(undefined)
+  const [modelsReady, setModelsReady] = useState<boolean>(false)
 
   const updateCurrentProgress_cb = useCallback(updateCurrentProgress, [shouldPublishModules])
+
+  useEffect(() => {
+    window.addEventListener('module-publish-models-ready', () => {
+      setModelsReady(true)
+    })
+  }, [])
+  // if the module page is loaded while a publish is in progress,
+  // initialize the UI accordingly
+  useEffect(() => {
+    if (modelsReady && isPublishing) {
+      updateModulePendingPublishedStates(undefined, true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modelsReady])
 
   useEffect(() => {
     if (progressId) {

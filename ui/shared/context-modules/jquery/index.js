@@ -1957,7 +1957,7 @@ modules.initModuleManagement = function (duplicate) {
     overrideModel(moduleItems, relock_modules_dialog, view.model, view)
   }
 
-  const initNewItemDirectShare = ($item, data) => {
+  function initNewItemDirectShare($item, data) {
     const $copyToMenuItem = $item.find('.module_item_copy_to')
     if ($copyToMenuItem.length === 0) return // feature not enabled, probably
     const $sendToMenuItem = $item.find('.module_item_send_to')
@@ -1996,6 +1996,12 @@ modules.initModuleManagement = function (duplicate) {
     const view = new PublishButtonView({model, el: $el})
     view.render()
   })
+  // I tried deferring the rendering of ContextModulesPuyblishMenu
+  // and ContextModulesPublishIcons until here,
+  // after the models and views were all setup, but it made
+  // the UI janky. Let them get rendered early, the tell
+  // ContextModulesPublishMenu everything is ready.
+  window.dispatchEvent(new Event('module-publish-models-ready'))
 }
 
 function toggleModuleCollapse(event) {

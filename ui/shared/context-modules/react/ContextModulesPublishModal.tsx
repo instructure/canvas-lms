@@ -38,7 +38,7 @@ interface Props {
   readonly onPublish: () => void
   readonly isCanceling: boolean
   readonly isPublishing: boolean
-  readonly progressId: string | null
+  readonly progressId: string | number | null
   readonly progressCurrent?: ProgressResult
   readonly title: string
 }

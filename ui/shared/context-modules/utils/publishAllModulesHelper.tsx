@@ -129,25 +129,25 @@ export function updateModulePendingPublishedStates(
 ): void {
   const completedModuleIds = moduleIds()
   completedModuleIds.forEach(moduleId => {
-    exportFuncs.updateModulePublishedState(moduleId, !!published, isPublishing)
+    exportFuncs.updateModulePublishedState(moduleId, published, isPublishing)
   })
 }
 
 // update the state of a single module and its items
 export function updateModulePublishedState(
   moduleId: number,
-  published: boolean,
+  published: boolean | undefined,
   isPublishing: boolean
 ) {
   const publishIcon = document.querySelector(
     `#context_module_${moduleId} .module-publish-icon`
   ) as HTMLElement | null
   if (publishIcon) {
-    const courseId = publishIcon.getAttribute('data-course-id')
+    const courseId = publishIcon.getAttribute('data-course-id') as string
     // Update the new state of the module then we unmount the component to render the newly changed state
     const $publishIcon = $(publishIcon)
-    $publishIcon.data('published', !!published)
-    renderContextModulesPublishIcon(courseId, moduleId, published, isPublishing, isPublishing)
+    if (typeof published === 'boolean') $publishIcon.data('published', !!published)
+    renderContextModulesPublishIcon(courseId, moduleId, published, isPublishing)
     updateModuleItemsPublishedStates($publishIcon.data('moduleId'), published, isPublishing)
   }
 }

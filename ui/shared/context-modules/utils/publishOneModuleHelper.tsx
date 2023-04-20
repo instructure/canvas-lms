@@ -261,11 +261,11 @@ export function updateModuleItemRowsPublishStates(items: ModuleItem[], isPublish
 }
 
 export function renderContextModulesPublishIcon(
-  courseId,
-  moduleId,
-  published,
-  isPublishing,
-  loadingMessage
+  courseId: string | number,
+  moduleId: string | number,
+  published: boolean | undefined,
+  isPublishing: boolean,
+  loadingMessage?: string
 ) {
   const publishIcon = findModulePublishIcon(moduleId)
   ReactDOM.render(
