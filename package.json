@@ -22,7 +22,7 @@
     "@instructure/canvas-theme": "^7",
     "@instructure/debounce": "^7",
     "@instructure/js-utils": "*",
-    "@instructure/media-capture": "~8.0.1-rc.11",
+    "@instructure/media-capture": "~8.4.1-rc.16",
     "@instructure/outcomes-ui": "^2.0.0",
     "@instructure/react-crop": "^5.0.1",
     "@instructure/reactour": "https://github.com/instructure/reactour#b908434fe544703e26bc67c67c4111252c401f92",
