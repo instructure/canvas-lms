@@ -1,0 +1,21 @@
+openapi: 3.1.0
+info:
+  title: Dynamic Registration
+  description: TBD
+  version: 0.1.0
+paths:
+  /api/lti/register:
+    get:
+      summary: TBD
+      parameters:
+        - in: path
+          name: registration_url
+          schema:
+            type: string
+      responses:
+        302:
+          description: TBD
+          headers:
+            location:
+              type: string
+
