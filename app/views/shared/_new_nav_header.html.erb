@@ -63,6 +63,13 @@
   <% else %>
     <div class="mobile-header-space"></div>
   <% end %>
+  <% if show_blueprint_button? %>
+    <button class="mobile-header-blueprint-button Button Button--icon-action-rev Button--large" aria-label="<%= t "Open Blueprint Sidebar" %>">
+      <i class="icon-blueprint"></i>
+    </button>
+  <% else %>
+    <div class="mobile-header-space"></div>
+  <% end %>
   <% if context_crumb %>
     <button type="button" class="Button Button--icon-action-rev Button--large mobile-header-arrow" aria-label="<%= t "Navigation Menu" %>">
       <i class="icon-arrow-open-down" id="mobileHeaderArrowIcon"></i>

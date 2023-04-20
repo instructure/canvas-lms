@@ -49,6 +49,10 @@ export default class MobileNavigation extends React.Component {
       preventDefault(() => this.setState({globalNavIsOpen: true}))
     )
 
+    $('.mobile-header-blueprint-button').on('touchstart click', () => {
+      window.openBPSidebar()
+    })
+
     const arrowIcon = document.getElementById('mobileHeaderArrowIcon')
     const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
     $('.mobile-header-title.expandable, .mobile-header-arrow').on(

@@ -71,6 +71,7 @@ export default class BlueprintCourseSidebar extends Component {
 
   componentDidMount() {
     const easyStudentBtn = document.getElementById('easy_student_view')
+    window.openBPSidebar = this.open
     if (easyStudentBtn) {
       easyStudentBtn.classList.add('mr3')
     }
@@ -82,7 +83,7 @@ export default class BlueprintCourseSidebar extends Component {
         <div className="bcs__trigger">
           <IconButton
             renderIcon={IconBlueprintSolid}
-            screenReaderLabel={I18n.t('Open sidebar')}
+            screenReaderLabel={I18n.t('Open Blueprint Sidebar')}
             onClick={this.open}
             elementRef={c => {
               this.openBtn = c
