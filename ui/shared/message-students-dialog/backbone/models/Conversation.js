@@ -26,7 +26,7 @@ const I18n = useI18nScope('models_conversations')
 extend(Conversation, Model)
 
 // This new class is here instead of reusing
-// coffeescripts/models/conversations/Conversation.coffee in order to
+// coffeescripts/models/conversations/Conversation.js in order to
 // take advantage of the API.
 //
 // For a full list of supported attributes, see the Conversation API

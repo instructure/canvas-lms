@@ -95,16 +95,6 @@ module.exports = {
         },
       },
       {
-        test: /\.coffee$/,
-        include: [path.join(canvasDir, 'ui'), path.join(canvasDir, 'spec/coffeescripts')].concat(
-          glob.sync('gems/plugins/*/{app,spec_canvas}/coffeescripts/', {
-            cwd: canvasDir,
-            absolute: true,
-          })
-        ),
-        use: ['coffee-loader'],
-      },
-      {
         test: /\.handlebars$/,
         include: [path.join(canvasDir, 'ui'), /gems\/plugins\/.*\/app\/views\/jst\//],
         use: [
@@ -181,7 +171,7 @@ module.exports = {
     fallback: {
       path: false, // for minimatch
     },
-    extensions: ['.mjs', '.js', '.ts', '.tsx', '.coffee'],
+    extensions: ['.mjs', '.js', '.ts', '.tsx'],
     modules: [
       path.join(canvasDir, 'ui/shims'),
       path.join(canvasDir, 'public/javascripts'),

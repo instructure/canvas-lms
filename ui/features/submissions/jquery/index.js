@@ -225,7 +225,7 @@ function insertEmoji(emoji) {
 }
 
 // This `setup` function allows us to control when the setup is triggered.
-// submissions.coffee requires this file and then immediately triggers it,
+// submissions.js requires this file and then immediately triggers it,
 // while submissionsSpec.jsx triggers it after setup is complete.
 export function setup() {
   $(document).ready(function () {

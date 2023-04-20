@@ -113,15 +113,6 @@ module.exports = {
         }
       },
       {
-        test: /\.coffee$/,
-        include: [
-          path.resolve(canvasDir, 'ui'),
-          path.resolve(canvasDir, 'spec/coffeescripts'),
-          ...globPlugins('{app,spec_canvas}/coffeescripts/')
-        ],
-        use: ['coffee-loader']
-      },
-      {
         test: /\.handlebars$/,
         include: [
           path.resolve(canvasDir, 'ui'),
