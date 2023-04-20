@@ -210,10 +210,10 @@ new_quiz_deleted_workflow_restore_pending_review_state:
     test:
       state: allowed_on # enable for the deployed 'test' environment
 individual_gradebook_enhancements:
-  state: allowed
+  state: hidden
   applies_to: RootAccount
   display_name: Individual Gradebook Enhancements
-  description: This feature introduces performance and maintenance enhancements 
+  description: This feature introduces performance and maintenance enhancements
     to Individual Gradebook
   environments:
     ci:
