@@ -42,6 +42,18 @@ describe "discussions" do
                                      message: "assignment topic message",
                                      assignment: assignment)
   end
+  let(:assignment_with_points) do
+    course.assignments.create!(
+      name: "assignment",
+      points_possible: 10
+    )
+  end
+  let(:graded_discussion) do
+    course.discussion_topics.create!(user: teacher,
+                                     title: "graded discussion topic",
+                                     message: "assignment topic message",
+                                     assignment: assignment_with_points)
+  end
   let(:entry) { topic.discussion_entries.create!(user: teacher, message: "teacher entry") }
 
   let(:group) do
@@ -64,6 +76,27 @@ describe "discussions" do
 
       before do
         user_session(student)
+      end
+
+      context "restrict quantitative data" do
+        before do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+        end
+
+        it "hides points possible" do
+          # truthy permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+          Account.default.reload
+          get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/"
+          wait_for_ajaximations
+          expect(f("#discussion_container").text).to include("This is a graded discussion")
+          expect(f("#discussion_container").text).not_to include("This is a graded discussion: 10 points possible")
+        end
       end
 
       context "teacher topic" do
@@ -148,6 +181,26 @@ describe "discussions" do
 
       before do
         user_session(teacher)
+      end
+
+      context "restrict quantitative data" do
+        before do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+        end
+
+        it "does not hide points possible" do
+          # truthy permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+          Account.default.reload
+          get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/"
+          wait_for_ajaximations
+          expect(f("#discussion_container").text).to include("This is a graded discussion: 10 points possible")
+        end
       end
 
       it "creates a group discussion", priority: "1" do
