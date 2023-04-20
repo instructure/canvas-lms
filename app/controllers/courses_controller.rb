@@ -2316,6 +2316,14 @@ class CoursesController < ApplicationController
           js_bundle :wiki_page_show
           css_bundle :wiki_page, :tinymce
         when "modules"
+          if Account.site_admin.feature_enabled?(:module_publish_menu)
+            @progress = Progress.find_by(
+              context: @context,
+              tag: "context_module_batch_update",
+              workflow_state: ["queued", "running"]
+            )
+          end
+
           js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
 
           js_bundle :context_modules

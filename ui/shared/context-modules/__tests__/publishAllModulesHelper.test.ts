@@ -286,13 +286,7 @@ describe('publishAllModulesHelper', () => {
       const isPublishing = false
       updateModulePublishedState(1, published, isPublishing)
       expect(renderContextModulesPublishIcon).toHaveBeenCalledTimes(1)
-      expect(renderContextModulesPublishIcon).toHaveBeenCalledWith(
-        '1',
-        1,
-        published,
-        isPublishing,
-        isPublishing
-      )
+      expect(renderContextModulesPublishIcon).toHaveBeenCalledWith('1', 1, published, isPublishing)
       expect(updateModuleItemsPublishedStates).toHaveBeenCalledTimes(1)
       expect(updateModuleItemsPublishedStates).toHaveBeenCalledWith(1, published, isPublishing)
     })

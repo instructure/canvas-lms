@@ -32,7 +32,7 @@ const I18n = useI18nScope('context_modules_publish_icon')
 interface Props {
   readonly courseId: string | number
   readonly moduleId: string | number
-  readonly published: boolean
+  readonly published: boolean | undefined
   readonly isPublishing: boolean
   readonly loadingMessage?: string
 }
@@ -52,7 +52,7 @@ const ContextModulesPublishIcon: React.FC<Props> = ({
       paddingLeft: '0.25rem',
     }
     if (isPublishing) {
-      return <Spinner renderTitle={() => loadingMessage} size="x-small" />
+      return <Spinner renderTitle={() => loadingMessage || I18n.t('working')} size="x-small" />
     } else if (published) {
       return (
         <>
