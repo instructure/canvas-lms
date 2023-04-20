@@ -431,11 +431,6 @@ export function uploadPreflight(tabContext, fileMetaProps) {
           }
           return results
         })
-        .then(results => {
-          // This may or may not be necessary depending on the upload
-          dispatch(removePlaceholdersFor(fileMetaProps.name))
-          return results
-        })
         .then(async results => {
           let newBookmark
           const editorComponent = bridge.activeEditor()
