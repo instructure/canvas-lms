@@ -6,7 +6,6 @@ CopyrightLinter:
     Statuses:
       - added
     Include:
-      - "*.coffee"
       - "*.js"
       - "*.rb"
       # TODO: add the following once the initial autocorrect sweep is complete
@@ -55,10 +54,6 @@ CopyrightLinter:
     Rb:
       Block: false
       BlockStart: "#" # empty first line
-      Line: "#"
-    Coffee:
-      Block: false
-      BlockStart: "#"
       Line: "#"
   Message: |-
     Please prefix source files with our COPYRIGHT header. i.e.:
@@ -138,12 +133,6 @@ SeleniumSpecsLinter:
     PublicJsSpec:
       - "spec/coffeescripts/**"
       - "spec/javascripts/**"
-    Coffee:
-      - "app/coffeescripts/**.coffee"
-    CoffeeAllowlist:
-      - "app/coffeescripts/bundles/**"
-    CoffeeSpec:
-      - "spec/coffeescripts/**.coffee"
     Jsx:
       - "app/jsx/**.js"
     JsxSpec:
@@ -151,32 +140,6 @@ SeleniumSpecsLinter:
       - "spec/javascripts/jsx/**"
   Message: Your commit modifies selenium specs, when your changes might be more appropriately
       tested at a lower level. Please limit your selenium specs to happy-path scenarios.
-
-Simple/CoffeeLinter:
-  Severity: "warn"
-  Precondition:
-    Include:
-    - "**/*[^Gradebook,Assignment].coffee"
-  Message: Your commit modifies CoffeeScript. You should probably decaffeinate
-    (https://decaffeinate-project.org/repl/) it then make your changes in the JS file instead.
-    CoffeeScript is deprecated in canvas and we eventually want to get rid of all of it.
-    If you've given that honest thought and your team still feels it makes sense leave this file
-    as CoffeeScript for now and you don't want to see this message
-    about it anymore, you can add it to the pattern in gems/tatl_tael/config/default.yml
-
-Simple/CoffeeSpecsLinter:
-  Severity: "warn"
-  Precondition:
-    Include:
-    - "app/coffeescripts/**.coffee"
-  Requirement:
-    Include:
-    - "app/jsx/**/__tests__/**"
-    - "app/coffeescripts/**/__tests__/**"
-    - "spec/coffeescripts/**"
-    - "spec/javascripts/**"
-  Message: Your commit includes coffee changes, but does not include
-    specs. Please add some to verify your changes.
 
 Simple/JsxSpecsLinter:
   Severity: "warn"
