@@ -91,6 +91,7 @@ module.exports = {
     'no-return-assign': 'off',
     'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
+    '@typescript-eslint/no-use-before-define': ['error', 'nofunc'],
     'no-useless-escape': 'off',
     'one-var': 'off',
     'prefer-destructuring': 'off',

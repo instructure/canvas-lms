@@ -24,11 +24,12 @@ import Backbone from '@canvas/backbone'
 const I18n = useI18nScope('user')
 
 export default (function (superClass) {
-  extend(User, superClass)
 
   function User() {
     return User.__super__.constructor.apply(this, arguments)
   }
+
+  extend(User, superClass)
 
   User.prototype.modelType = 'user'
 
