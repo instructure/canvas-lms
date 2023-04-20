@@ -1941,7 +1941,7 @@ ActiveRecord::Relation.prepend(ExplainAnalyze)
 
 # fake Rails into grabbing correct column information for a table rename in-progress
 module TableRename
-  RENAMES = { "authentication_providers" => "account_authorization_configs" }.freeze
+  RENAMES = {}.freeze
 
   def columns(table_name)
     if (old_name = RENAMES[table_name]) && connection.table_exists?(old_name)

@@ -21,23 +21,9 @@ class AddInternalCaFieldsToAuthenticationProvider < ActiveRecord::Migration[7.0]
   tag :predeploy
 
   def change
-    # `authentication_providers` was previously called `account_authorization_configs`. Before the rename occurred, a temporary
-    # `authentication_providers` view was created in a predeploy migration. Then the view was dropped and the table was
-    # *actually* renamed in a postdeploy migration.
-    #
-    # This means that if we're running all migrations at once (in a predeploy context), the frd `authentication_providers`
-    # table will still be called by its old name -- so we need to identify the correct table to migrate.
+    add_column :authentication_providers, :internal_ca, :text
 
-    if connection.table_exists?(:authentication_providers)
-      add_column :authentication_providers, :internal_ca, :text
-
-      # this field will be removed after VERIFY_NONE is removed entirely
-      add_column :authentication_providers, :verify_tls_cert_opt_in, :boolean, null: false, default: false
-    else
-      add_column :account_authorization_configs, :internal_ca, :text
-
-      # this field will be removed after VERIFY_NONE is removed entirely
-      add_column :account_authorization_configs, :verify_tls_cert_opt_in, :boolean, null: false, default: false
-    end
+    # this field will be removed after VERIFY_NONE is removed entirely
+    add_column :authentication_providers, :verify_tls_cert_opt_in, :boolean, null: false, default: false
   end
 end
