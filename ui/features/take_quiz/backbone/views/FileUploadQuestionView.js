@@ -16,7 +16,6 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {View} from '@canvas/backbone'
-import $ from 'jquery'
 import template from '../../jst/fileUploadQuestionState.handlebars'
 import uploadedOrRemovedTemplate from '../../jst/fileUploadedOrRemoved.handlebars'
 import '@canvas/forms/jquery/jquery.instructure_forms'

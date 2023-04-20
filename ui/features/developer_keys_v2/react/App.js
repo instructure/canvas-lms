@@ -136,7 +136,7 @@ class DeveloperKeysApp extends React.Component {
     this.setState({selectedTab: id})
   }
 
-  buildDevKeyOIDCText(features) {
+  buildDevKeyOIDCText(_features) {
     const today = new Date()
     const changeDate = new Date(1688212799000) // July 1, 2023 at 11:59:59 UTC
     const formattedDate = DateHelper.formatDateForDisplay(changeDate)
