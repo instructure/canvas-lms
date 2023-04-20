@@ -48,11 +48,14 @@ module BroadcastPolicy
 
         data = record.instance_eval(&self.data) if self.data
         to_list.each_slice(NotificationPolicy.slice_size) do |to_slice|
+          recipients = to_slice.reject { |to| to.class.method_defined?(:suspended?) ? to.suspended? : false }
+          next if recipients.empty?
+
           BroadcastPolicy.notifier.send_notification(
             record,
             dispatch,
             notification,
-            to_slice,
+            recipients,
             data
           )
         end
