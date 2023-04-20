@@ -239,7 +239,7 @@ module.exports = {
   settings: {
     'import/resolver': {
       node: {
-        extensions: ['.js', '.jsx', '.json', '.coffee', '.ts', '.tsx', '.d.ts'], // add Typescript and CoffeeScript extensions
+        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.d.ts'], // add Typescript and CoffeeScript extensions
       },
     },
     react: {

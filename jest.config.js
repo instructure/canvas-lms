@@ -77,7 +77,6 @@ module.exports = {
   testEnvironment: '<rootDir>/jest/strictTimeLimitEnvironment.js',
 
   transform: {
-    '\\.coffee$': '<rootDir>/jest/coffeeTransformer.js',
     '\\.handlebars$': '<rootDir>/jest/handlebarsTransformer.js',
     '\\.graphql$': '<rootDir>/jest/rawLoader.js',
     '\\.[jt]sx?$': [

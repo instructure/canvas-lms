@@ -152,16 +152,6 @@ exports.babel = {
   },
 }
 
-exports.coffeescript = {
-  test: /\.coffee$/,
-  include: [
-    resolve(canvasDir, 'ui'),
-    resolve(canvasDir, 'spec/coffeescripts'),
-    ...globPlugins('{app,spec_canvas}/coffeescripts/'),
-  ],
-  use: ['coffee-loader'],
-}
-
 exports.handlebars = {
   test: /\.handlebars$/,
   include: [resolve(canvasDir, 'ui'), ...globPlugins('app/views/jst/')],

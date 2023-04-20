@@ -3941,7 +3941,7 @@ ready(function () {
           questionData.id
         quiz.updateDisplayQuestion($displayQuestion, questionData, true)
         // Trigger a custom 'saved' event for catching and responding to change
-        // after save process completed. Used in quizzes_bundle.coffee
+        // after save process completed. Used in quizzes_bundle.js
         $displayQuestion.trigger('saved')
         $('#unpublished_changes_message').slideDown()
         if (question && questionData && questionData.id) {

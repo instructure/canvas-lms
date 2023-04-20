@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-// cache.coffee
+// cache.js
 // defines a caching mixin for classes. may use memory, sessionStorage, or
 // localStorage to hold cached data. also accepts a prefix to namespace any
 // data stored (e.g. if using localStorage).

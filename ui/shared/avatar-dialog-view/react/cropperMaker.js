@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import CanvasCropper from './cropper'
 
 // CanvasCropperMaker is the component you'll create if injecting the cropper
-// into existing non-react UI (see UploadFileView.coffee for sample usage)
+// into existing non-react UI (see UploadFileView.js for sample usage)
 //  let cropper = new Cropper(@$('.avatar-preview')[0], {imgFile: @file, width: @avatarSize.w, height: @avatarSize.h})
 //  cropper.render()
 //

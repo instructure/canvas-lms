@@ -27,7 +27,6 @@ const {canvasDir} = require('../params')
 
 const {
   babel,
-  coffeescript,
   css,
   emberHandlebars,
   fonts,
@@ -172,7 +171,7 @@ module.exports = {
 
     modules: [resolve(canvasDir, 'public/javascripts'), 'node_modules'],
 
-    extensions: ['.js', '.ts', '.tsx', '.coffee'],
+    extensions: ['.js', '.ts', '.tsx'],
   },
 
   module: {
@@ -198,7 +197,6 @@ module.exports = {
       images,
       fonts,
       babel,
-      coffeescript,
       handlebars,
       emberHandlebars,
     ].filter(Boolean),
