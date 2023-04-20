@@ -2880,6 +2880,10 @@ class User < ActiveRecord::Base
     accounts.any?(&:users_can_edit_comm_channels?)
   end
 
+  def suspended?
+    pseudonyms.shard(self).active.any?(&:suspended?)
+  end
+
   def limit_parent_app_web_access?
     pseudonyms.shard(self).active.map(&:account).any?(&:limit_parent_app_web_access?)
   end
