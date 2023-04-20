@@ -71,7 +71,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   const shouldShowConferenceField = () => shouldShowConferences
   const shouldEnableConferenceField = () => !isBlackout
   const shouldShowContextField = () => event.can_change_context
-  const shouldShowImportantDatesField = () => context.k5_course
+  const shouldShowImportantDatesField = () => context.k5_course || context.k5_account
   const shouldShowBlackoutDateCheckbox = useCallback(() => {
     return (
       ENV.FEATURES.account_level_blackout_dates &&

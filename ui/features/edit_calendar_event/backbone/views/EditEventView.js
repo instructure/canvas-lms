@@ -414,7 +414,7 @@ export default class EditCalendarEventView extends Backbone.View {
   toJSON() {
     const result = super.toJSON(...arguments)
     result.recurringEventLimit = 200
-    result.k5_course = ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE
+    result.k5_context = ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE || ENV.K5_ACCOUNT
     result.should_show_blackout_dates = this.shouldShowBlackoutDatesCheckbox()
     result.disableSectionDates =
       result.use_section_dates &&
