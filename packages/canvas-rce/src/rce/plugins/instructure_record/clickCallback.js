@@ -23,6 +23,7 @@ import {StoreProvider} from '../shared/StoreContext'
 import formatMessage from '../../../format-message'
 import {headerFor, originFromHost} from '../../../rcs/api'
 import {instuiPopupMountNode} from '../../../util/fullscreenHelpers'
+import RCEGlobals from '../../RCEGlobals'
 
 export const handleUpload = (error, uploadData, onUploadComplete, uploadBookmark) => {
   let err_msg = error && Bridge.uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR
@@ -100,6 +101,7 @@ export default function (ed, document) {
             onDismiss={handleDismiss}
             tabs={{record: true, upload: true}}
             uploadMediaTranslations={Bridge.uploadMediaTranslations}
+            media_links_use_attachment_id={RCEGlobals.getFeatures().media_links_use_attachment_id}
           />
         )}
       </StoreProvider>,
