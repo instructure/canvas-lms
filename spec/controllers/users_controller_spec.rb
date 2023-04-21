@@ -2825,6 +2825,37 @@ describe UsersController do
             expect(assigns[:js_env][:SELECTED_CONTEXT_CODES]).to eq([])
           end
         end
+
+        context "ENV.ACCOUNT_CALENDAR_CONTEXTS" do
+          before :once do
+            @account1 = Account.create!(name: "test 1")
+            @account2 = Account.create!(name: "test 2")
+            toggle_k5_setting(@account1)
+            toggle_k5_setting(@account2)
+          end
+
+          before do
+            allow_any_instance_of(User).to receive(:enabled_account_calendars).and_return([@account1, @account2])
+          end
+
+          it "includes a list of account calendars' asset_string and name" do
+            get "user_dashboard"
+            account_contexts = assigns[:js_env][:ACCOUNT_CALENDAR_CONTEXTS]
+            expect(account_contexts.length).to be 2
+            expect(account_contexts[0][:name]).to eq "test 1"
+            expect(account_contexts[0][:asset_string]).to eq "account_#{@account1.id}"
+            expect(account_contexts[1][:name]).to eq "test 2"
+            expect(account_contexts[1][:asset_string]).to eq "account_#{@account2.id}"
+          end
+
+          it "does not include classic accounts in the list" do
+            toggle_k5_setting(@account2, false)
+            get "user_dashboard"
+            account_contexts = assigns[:js_env][:ACCOUNT_CALENDAR_CONTEXTS]
+            expect(account_contexts.length).to be 1
+            expect(account_contexts[0][:name]).to eq "test 1"
+          end
+        end
       end
     end
 

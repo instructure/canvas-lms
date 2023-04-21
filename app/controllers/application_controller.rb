@@ -1218,8 +1218,7 @@ class ApplicationController < ActionController::Base
       if opts[:include_accounts]
         # reload @current_user to make sure we get a current value for their :enabled_account_calendars preference
         @current_user.reload
-        account_ids = @current_user.get_preference(:enabled_account_calendars) || []
-        accounts = @current_user.associated_accounts.active.where(id: account_ids, account_calendar_visible: true)
+        accounts = @current_user.enabled_account_calendars
       end
 
       if opts[:favorites_first]

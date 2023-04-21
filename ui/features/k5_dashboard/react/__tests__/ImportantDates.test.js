@@ -26,10 +26,10 @@ import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import tz from '@canvas/timezone'
 import {
   MOCK_ASSIGNMENTS,
-  MOCK_CARDS,
   MOCK_EVENTS,
   MOCK_OBSERVEE_EVENTS,
   MOCK_OBSERVEE_ASSIGNMENTS,
+  IMPORTANT_DATES_CONTEXTS,
 } from '@canvas/k5/react/__tests__/fixtures'
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
@@ -44,7 +44,7 @@ describe('ImportantDates', () => {
   const currentUserId = '1'
   const getProps = (overrides = {}) => ({
     timeZone: 'UTC',
-    contexts: MOCK_CARDS,
+    contexts: IMPORTANT_DATES_CONTEXTS,
     selectedContextsLimit: 2,
     ...overrides,
   })
