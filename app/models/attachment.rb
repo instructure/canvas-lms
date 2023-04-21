@@ -1618,6 +1618,7 @@ class Attachment < ActiveRecord::Base
 
     where(visibility_level: vlevels)
   }
+  scope :is_media_object, -> { where.not(media_entry_id: nil) }
 
   def self.build_content_types_sql(types)
     clauses = []
