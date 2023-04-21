@@ -82,6 +82,9 @@ const locale = {
   "swedish_59a593ca": { "message": "Svensk" },
   "tagalog_74906db7": { "message": "Tagalog" },
   "thai_8f9bc548": { "message": "Thai" },
+  "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+    "message": "Den valde fila er større enn grensa på { maxSize } bytes."
+  },
   "turkish_5b69578b": { "message": "Tyrkisk" },
   "ukrainian_945b00b7": { "message": "Ukrainsk" },
   "vietnamese_e7a76583": { "message": "Vietnamesisk" },
