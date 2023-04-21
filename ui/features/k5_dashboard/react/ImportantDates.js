@@ -32,7 +32,7 @@ import useFetchApi from '@canvas/use-fetch-api-hook'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
-import FilterCalendarsModal from './FilterCalendarsModal'
+import FilterCalendarsModal, {ImportantDatesContextsShape} from './FilterCalendarsModal'
 import ImportantDatesEmpty from './ImportantDatesEmpty'
 import ImportantDateSection from './ImportantDateSection'
 import {groupImportantDates} from '@canvas/k5/react/utils'
@@ -242,7 +242,7 @@ const ImportantDates = ({
 }
 
 ImportantDates.propTypes = {
-  contexts: PropTypes.arrayOf(PropTypes.object),
+  contexts: PropTypes.arrayOf(ImportantDatesContextsShape),
   handleClose: PropTypes.func,
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
   selectedContextsLimit: PropTypes.number.isRequired,

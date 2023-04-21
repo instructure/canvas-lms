@@ -202,6 +202,17 @@ export const MOCK_EVENTS = [
   },
 ]
 
+export const MOCK_ACCOUNT_CALENDAR_EVENT = {
+  context_color: null,
+  context_name: 'CSU',
+  html_url: 'http://localhost:3000/calendar?event_id=45&include_contexts=account_1',
+  id: '45',
+  important_dates: true,
+  start_at: '2021-06-29T07:00:00Z',
+  title: 'Football Game',
+  type: 'event',
+}
+
 export const MOCK_OBSERVEE_EVENTS = [
   {
     context_color: '#CCCCCC',
@@ -245,4 +256,10 @@ export const MOCK_PLANNER_ITEM = [
       submitted: false,
     },
   },
+]
+
+export const IMPORTANT_DATES_CONTEXTS = [
+  {assetString: 'course_1', name: 'Economics 101', color: 'yellow'},
+  {assetString: 'course_2', name: 'Home Room', color: 'blue'},
+  {assetString: 'course_3', name: 'The Maths', color: 'red'},
 ]

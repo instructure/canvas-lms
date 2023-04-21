@@ -4315,7 +4315,7 @@ describe User do
     end
   end
 
-  describe "account_calendars" do
+  context "account_calendars" do
     before :once do
       Account.site_admin.enable_feature! :account_calendar_events
       user_factory(active_all: true)
@@ -4328,22 +4328,33 @@ describe User do
       course_with_student(account: @associated_subaccount, user: @user)
     end
 
-    it "returns only accounts associated to the user where the calendar is visible" do
-      expect(@user.account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id)
-    end
-
-    describe "sharding" do
-      specs_require_sharding
-
-      before :once do
-        @shard2.activate do
-          @account2 = Account.create!(account_calendar_visible: true)
-        end
-        course_with_student(account: @account2, user: @user)
+    describe "all_account_calendars" do
+      it "returns only accounts associated to the user where the calendar is visible" do
+        expect(@user.all_account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id)
       end
 
-      it "includes cross-shard accounts" do
-        expect(@user.account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id, @account2.id)
+      describe "sharding" do
+        specs_require_sharding
+
+        before :once do
+          @shard2.activate do
+            @account2 = Account.create!(account_calendar_visible: true)
+          end
+          course_with_student(account: @account2, user: @user)
+        end
+
+        it "includes cross-shard accounts" do
+          expect(@user.all_account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id, @account2.id)
+        end
+      end
+    end
+
+    describe "enabled_account_calendars" do
+      it "returns subset of all_account_calendars where the user has subscribed" do
+        @root_account.account_calendar_visible = true
+        @root_account.save!
+        @user.set_preference(:enabled_account_calendars, [@root_account.id])
+        expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@root_account.id)
       end
     end
   end

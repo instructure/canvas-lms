@@ -160,6 +160,7 @@ const K5Dashboard = ({
   canAddObservee,
   openTodosInNewTab,
   loadingOpportunities,
+  accountCalendarContexts,
 }) => {
   const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
@@ -357,10 +358,20 @@ const K5Dashboard = ({
     )
   }
 
+  const importantDatesContexts = cards
+    ?.filter(c => c.isK5Subject || c.isHomeroom)
+    .map(c => ({assetString: c.assetString, color: c.color, name: c.shortName}))
+    .concat(
+      accountCalendarContexts.map(c => ({
+        assetString: c.asset_string,
+        name: c.name,
+      }))
+    )
+
   const importantDates = (
     <ImportantDates
       timeZone={timeZone}
-      contexts={cards?.filter(c => c.isK5Subject || c.isHomeroom)}
+      contexts={importantDatesContexts}
       handleClose={useImportantDatesTray ? () => setTrayOpen(false) : undefined}
       selectedContextCodes={selectedContextCodes}
       selectedContextsLimit={selectedContextsLimit}
@@ -487,6 +498,12 @@ K5Dashboard.propTypes = {
   observedUsersList: ObservedUsersListShape.isRequired,
   canAddObservee: PropTypes.bool.isRequired,
   openTodosInNewTab: PropTypes.bool.isRequired,
+  accountCalendarContexts: PropTypes.arrayOf(
+    PropTypes.shape({
+      asset_string: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    })
+  ),
 }
 
 const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))
