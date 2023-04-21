@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash-underscore'
+import _ from '@instructure/lodash-underscore'
 import Config from '../config'
 import Dispatcher from '../dispatcher'
 import Environment from '@canvas/quiz-legacy-client-apps/environment'

@@ -16,25 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-// backward is a stupid requirement for discussions
-_.flattenObjects = function (array, key, backward, output) {
-  if (!_.isArray(array)) {
+import {isArray, each, clone} from 'lodash'
+
+function flattenObjects(array, key, backward, output) {
+  if (!isArray(array)) {
     array = [array]
   }
-  if (!_.isArray(output)) {
+  if (!isArray(output)) {
     output = []
   }
-  _.each(array, object => {
+  each(array, object => {
     output.push(object)
     if (object[key]) {
       let children = object[key]
       if (backward) {
-        children = _.clone(children)
+        children = clone(children)
         children.reverse()
       }
-      _.flattenObjects(children, key, backward, output)
+      flattenObjects(children, key, backward, output)
     }
   })
   return output
 }
+
+export default flattenObjects
