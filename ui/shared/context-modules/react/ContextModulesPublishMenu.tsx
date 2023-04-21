@@ -80,61 +80,6 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
     }
   }
 
-  function updateCurrentProgress(progress) {
-    if (progress.workflow_state === 'completed') {
-      onPublishComplete()
-    } else if (progress.workflow_state === 'failed') {
-      showFlashAlert({
-        message: I18n.t('Your publishing job did not complete.'),
-        err: undefined,
-        type: 'error',
-      })
-      refreshPublishStates()
-    } else {
-      setCurrentProgress(progress)
-    }
-  }
-
-  function onProgressFail(error) {
-    showFlashAlert({
-      message: I18n.t(
-        "Something went wrong monitoring the work's progress. Try refreshing the page."
-      ),
-      err: error,
-      type: 'error',
-    })
-  }
-
-  const onCancelComplete = (error = undefined) => {
-    setIsCanceling(false)
-    setIsPublishing(false)
-    if (error) {
-      onPublishFail(error)
-    } else {
-      window.location.reload()
-    }
-  }
-
-  const handleCancel = () => {
-    cancelBatchUpdate(currentProgress, onCancelComplete)
-    setIsCanceling(true)
-    setCurrentProgress(undefined)
-  }
-
-  function handlePublish() {
-    if (isPublishing) return
-    setIsPublishing(true)
-    updateModulePendingPublishedStates(undefined, true)
-    batchUpdateAllModulesApiCall(courseId, shouldPublishModules, shouldSkipModuleItems)
-      .then(result => {
-        setProgressId(result.json.progress.progress.id)
-        setCurrentProgress(result.json.progress.progress)
-      })
-      .catch(error => {
-        onPublishFail(error)
-      })
-  }
-
   const reset = () => {
     disableContextModulesPublishMenu(false)
     setIsPublishing(false)
@@ -170,6 +115,31 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
     reset()
   }
 
+  function updateCurrentProgress(progress) {
+    if (progress.workflow_state === 'completed') {
+      onPublishComplete()
+    } else if (progress.workflow_state === 'failed') {
+      showFlashAlert({
+        message: I18n.t('Your publishing job did not complete.'),
+        err: undefined,
+        type: 'error',
+      })
+      refreshPublishStates()
+    } else {
+      setCurrentProgress(progress)
+    }
+  }
+
+  function onProgressFail(error) {
+    showFlashAlert({
+      message: I18n.t(
+        "Something went wrong monitoring the work's progress. Try refreshing the page."
+      ),
+      err: error,
+      type: 'error',
+    })
+  }
+
   const onPublishFail = error => {
     reset()
     updateModulePendingPublishedStates(undefined, false)
@@ -178,6 +148,34 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
       err: error,
       type: 'error',
     })
+  }
+
+  const onCancelComplete = (error = undefined) => {
+    setIsCanceling(false)
+    setIsPublishing(false)
+    if (error) {
+      onPublishFail(error)
+    }
+  }
+
+  const handleCancel = () => {
+    cancelBatchUpdate(currentProgress, onCancelComplete)
+    setIsCanceling(true)
+    setCurrentProgress(undefined)
+  }
+
+  function handlePublish() {
+    if (isPublishing) return
+    setIsPublishing(true)
+    updateModulePendingPublishedStates(undefined, true)
+    batchUpdateAllModulesApiCall(courseId, shouldPublishModules, shouldSkipModuleItems)
+      .then(result => {
+        setProgressId(result.json.progress.progress.id)
+        setCurrentProgress(result.json.progress.progress)
+      })
+      .catch(error => {
+        onPublishFail(error)
+      })
   }
 
   const unpublishAll = () => {
