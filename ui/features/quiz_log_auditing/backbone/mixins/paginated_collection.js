@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash-underscore'
+import _ from '@instructure/lodash-underscore'
 
 const find = _.find
 const RE_EXTRACT_LINK = /<([^>]+)>; rel="([^"]+)",?\s*/g

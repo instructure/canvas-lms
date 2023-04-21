@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash-underscore'
+import _ from '@instructure/lodash-underscore'
 import CalculatedRenderer from './questions/calculated'
 import EssayRenderer from './questions/essay'
 import FileUploadRenderer from './questions/file_upload'

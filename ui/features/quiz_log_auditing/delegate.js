@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import _ from 'lodash-underscore'
+import _ from '@instructure/lodash-underscore'
 import config from './config'
 import initialize from './config/initializers/initializer'
 import Layout from './react/routes'

@@ -16,12 +16,12 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
+import flattenObjects from '@canvas/util/flattenObjects'
 import $ from 'jquery'
 import pageNavTemplate from '../../jst/pageNav.handlebars'
 import Backbone from '@canvas/backbone'
 import EntryCollectionView from './EntryCollectionView'
 import 'jquery-scroll-into-view'
-import '../../underscore.flattenObjects'
 
 export default class EntriesView extends Backbone.View {
   static initClass() {
@@ -218,7 +218,7 @@ export default class EntriesView extends Backbone.View {
 
     const json = this.collection.toJSON()
     // sub-collections are displayed in reverse when flat, in imitation of Facebook
-    const list = _.flattenObjects(json, 'replies', !this.options.threaded)
+    const list = flattenObjects(json, 'replies', !this.options.threaded)
     const entry = _.find(list, x => `${x.id}` === id)
     let pos = _.indexOf(list, entry)
     pos += reverse ? -1 : 1
