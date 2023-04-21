@@ -18763,7 +18763,7 @@ nn:
   qr_code_display_was_canceled_96234bf2: "Vising av QR-kode er kansellert"
   qr_code_image_2b3a89b5: QR-kodebildet
   qr_codes_are_not_the_same_as_pairing_codes_and_are_19f506d4: "QRkodar er ikkje det same som paringskodar og brukast kun for å hjelpe brukarar å logge inn på deira eigen konto via Canvas sin mobilapp."
-  qr_codes_are_not_the_same_as_pairing_codes_and_are_e9a16676: "QRkodar er ikkje det same som paringskodar og brukast kun for å hjelpe brukarar å logge inn på deira eigen konto via Canvas sin mobilapp. For å slå av moglegheiten for innlogging med QRkode for alle brukarar "
+  qr_codes_are_not_the_same_as_pairing_codes_and_are_e9a16676: "QRkodar er ikkje det same som paringskodar og brukast kun for å hjelpe brukarar å logge inn på deira eigen konto via Canvas sin mobilapp. For å slå av moglegheiten for innlogging med QRkode for alle brukarar ver venleg å kontakt brukerstøtte."
   qr_for_mobile_login_1b1560ce: "QR-kode for mobilinnlogging"
   qti_display: QTI
   qti_export_from_date_8f018de5: "*QTI-eksport sidan %{date}*"
