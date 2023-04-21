@@ -1066,6 +1066,9 @@ CanvasRails::Application.routes.draw do
       get "media_objects", controller: "media_objects", action: :index, as: :media_objects
       get "courses/:course_id/media_objects", controller: "media_objects", action: :index, as: :course_media_objects
       get "groups/:group_id/media_objects", controller: "media_objects", action: :index, as: :group_media_objects
+      get "media_attachments", controller: "media_objects", action: :index, as: :media_attachments
+      get "courses/:course_id/media_attachments", controller: "media_objects", action: :index, as: :course_media_attachments
+      get "groups/:group_id/media_attachments", controller: "media_objects", action: :index, as: :group_media_attachments
       put "accounts/:account_id/courses", action: :batch_update
       post "courses/:course_id/ping", action: :ping, as: "course_ping"
 
