@@ -83,7 +83,9 @@ describe('ContextModulesPublishModal', () => {
     const publishButton = getByTestId('publish-button')
     expect(publishButton.textContent).toBe('Continue')
     rerender(<ContextModulesPublishModal {...defaultProps} isPublishing={true} />)
-    expect(publishButton.textContent).toBe('Stop')
+    expect(publishButton.textContent).toBe(
+      'Stop publishing button. Click to discontinue processing.Stop Publishing'
+    )
   })
 
   it('disables the stop button if canceling', () => {
@@ -91,7 +93,9 @@ describe('ContextModulesPublishModal', () => {
       <ContextModulesPublishModal {...defaultProps} isPublishing={true} isCanceling={true} />
     )
     const publishButton = getByTestId('publish-button')
-    expect(publishButton.textContent).toBe('Stop')
+    expect(publishButton.textContent).toBe(
+      'Stop publishing button. Click to discontinue processing.Stop Publishing'
+    )
     expect(publishButton).toBeDisabled()
   })
 })

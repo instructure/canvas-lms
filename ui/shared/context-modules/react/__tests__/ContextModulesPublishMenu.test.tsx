@@ -39,15 +39,7 @@ const defaultProps = {
 
 describe('ContextModulesPublishMenu', () => {
   beforeEach(() => {
-    doFetchApi.mockResolvedValue({
-      json: {
-        progress: {
-          progress: {
-            id: 1234,
-          },
-        },
-      },
-    })
+    doFetchApi.mockResolvedValue({response: {ok: true}, json: [], link: null})
   })
 
   afterEach(() => {
@@ -70,6 +62,13 @@ describe('ContextModulesPublishMenu', () => {
     })
 
     it('renders a spinner when publish is in-flight', () => {
+      doFetchApi.mockResolvedValueOnce({
+        json: {
+          id: 1234,
+          completion: 100,
+          workflow_state: 'completed',
+        },
+      })
       const {getByText} = render(
         <ContextModulesPublishMenu {...defaultProps} runningProgressId={17} />
       )
@@ -77,11 +76,35 @@ describe('ContextModulesPublishMenu', () => {
     })
 
     it('updates all the modules when ready', async () => {
+      doFetchApi.mockResolvedValueOnce({
+        json: {
+          id: 1234,
+          completion: 100,
+          workflow_state: 'completed',
+        },
+      })
       const spy = jest.spyOn(publishAllModulesHelperModule, 'updateModulePendingPublishedStates')
       render(<ContextModulesPublishMenu {...defaultProps} runningProgressId={17} />)
       expect(spy).not.toHaveBeenCalled()
       window.dispatchEvent(new Event('module-publish-models-ready'))
       await waitFor(() => expect(spy).toHaveBeenCalled())
+    })
+
+    it('renders a screenreader message with progress updates', async () => {
+      doFetchApi.mockResolvedValueOnce({
+        json: {
+          id: 1234,
+          completion: 17,
+          workflow_state: 'running',
+        },
+      })
+      const {getByText} = render(
+        <ContextModulesPublishMenu {...defaultProps} runningProgressId={17} />
+      )
+
+      await waitFor(() =>
+        expect(getByText('Publishing progress is 17 percent complete')).toBeInTheDocument()
+      )
     })
   })
 

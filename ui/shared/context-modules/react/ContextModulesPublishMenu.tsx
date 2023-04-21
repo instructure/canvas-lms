@@ -72,6 +72,7 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
       setModelsReady(true)
     })
   }, [])
+
   // if the module page is loaded while a publish is in progress,
   // initialize the UI accordingly
   useEffect(() => {
@@ -141,6 +142,16 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
       refreshPublishStates()
     } else {
       setCurrentProgress(progress)
+      if (progress.workflow_state === 'running' && progress.completion > 0) {
+        showFlashAlert({
+          message: I18n.t('Publishing progress is %{progress} percent complete', {
+            progress: Math.round(progress.completion),
+          }),
+          type: 'info',
+          err: undefined,
+          srOnly: true,
+        })
+      }
     }
   }
 
