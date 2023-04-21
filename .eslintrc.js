@@ -96,6 +96,7 @@ module.exports = {
       {
         functions: false,
         classes: false,
+        variables: false,
       },
     ],
     'no-useless-escape': 'off',
