@@ -901,9 +901,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Något gick fel vid delning av skärmen."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Tyvärr, vi stöder inte flera filer."
-  },
   "sort_by_e75f9e3e": { "message": "Sortera efter" },
   "spades_suit_b37020c2": { "message": "Spader (kortlek)" },
   "square_511eb3b3": { "message": "Kvadrat" },

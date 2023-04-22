@@ -875,9 +875,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "画面の共有中に問題が発生しました。"
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "申し訳ありませんが、複数ファイルの貼り付けには対応していません。"
-  },
   "sort_by_e75f9e3e": { "message": "分類する" },
   "spades_suit_b37020c2": { "message": "スペード (1組)" },
   "square_511eb3b3": { "message": "四角" },

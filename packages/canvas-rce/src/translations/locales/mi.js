@@ -908,9 +908,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "He hapa i te wā e tuari ana i tō mata."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Aroha mai, kaore matou e tautoko i nga konae maha."
-  },
   "sort_by_e75f9e3e": { "message": "Wehewehe e" },
   "spades_suit_b37020c2": { "message": "Haka (Hutu)" },
   "square_511eb3b3": { "message": "Tapawha" },

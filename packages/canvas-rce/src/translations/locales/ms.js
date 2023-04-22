@@ -892,9 +892,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Sesuatu tidak kena semasa berkongsi skrin anda."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Maaf, kami tidak menyokong berbilang fail."
-  },
   "sort_by_e75f9e3e": { "message": "Isih Mengikut" },
   "spades_suit_b37020c2": { "message": "Penyodok (Sut)" },
   "square_511eb3b3": { "message": "Segi empat" },
