@@ -909,9 +909,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Aeth rhywbeth o’i le wrth rannu eich sgrin."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Yn anffodus, nid ydym ni’n gallu delio â mwy nag un ffeil."
-  },
   "sort_by_e75f9e3e": { "message": "Trefnu yn ôl" },
   "spades_suit_b37020c2": { "message": "Spades (Suit)" },
   "square_511eb3b3": { "message": "Sgwâr" },

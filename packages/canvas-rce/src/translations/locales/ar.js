@@ -865,9 +865,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "حدث خطأ ما أثناء مشاركة شاشتك."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "عذرًا، لا مدعم ملفات متعددة."
-  },
   "sort_by_e75f9e3e": { "message": "الفزر حسب" },
   "spades_suit_b37020c2": { "message": "Spades (Suit)" },
   "square_511eb3b3": { "message": "مربع" },

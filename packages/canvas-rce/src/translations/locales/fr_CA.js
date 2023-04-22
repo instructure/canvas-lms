@@ -939,9 +939,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Une erreur est survenue lors du partage de votre écran."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Désolé, nous ne prenons pas en charge les fichiers multiples."
-  },
   "sort_by_e75f9e3e": { "message": "Trier par" },
   "spades_suit_b37020c2": { "message": "Pique (combinaison)" },
   "square_511eb3b3": { "message": "Carré" },

@@ -827,9 +827,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Noko gjekk gale under deling av skjermen din."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Fleire filer er ikkje støtta."
-  },
   "sort_by_e75f9e3e": { "message": "Sorter etter" },
   "spades_suit_b37020c2": { "message": "Spar (Korttype)" },
   "square_511eb3b3": { "message": "Kvadrat" },

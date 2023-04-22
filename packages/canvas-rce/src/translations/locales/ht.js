@@ -860,9 +860,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Gen yon bagay ki pase mal pandan n ap pataje ekran w lan."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Dezole, nou pa rekonpet fichye miltip yo."
-  },
   "sort_by_e75f9e3e": { "message": "Triye Pa" },
   "spades_suit_b37020c2": { "message": "Pik (Konbinezon)" },
   "square_511eb3b3": { "message": "Kare" },
