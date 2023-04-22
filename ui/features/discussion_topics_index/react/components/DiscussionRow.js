@@ -60,7 +60,7 @@ import DiscussionModel from '@canvas/discussions/backbone/models/DiscussionTopic
 import LockIconView from '@canvas/lock-icon'
 
 import actions from '../actions'
-import compose from 'compose'
+import {flowRight as compose} from 'lodash'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import DiscussionManageMenu from './DiscussionManageMenu'
 import discussionShape from '../proptypes/discussion'
