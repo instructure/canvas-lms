@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 

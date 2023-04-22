@@ -23,7 +23,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 import '@canvas/rails-flash-notifications'
 
 import {Text} from '@instructure/ui-text'

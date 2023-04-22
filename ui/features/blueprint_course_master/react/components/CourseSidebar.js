@@ -21,7 +21,7 @@ import React, {Component, lazy, Suspense} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
