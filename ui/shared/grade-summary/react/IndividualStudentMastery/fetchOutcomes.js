@@ -20,7 +20,7 @@ import _ from 'lodash'
 import uuid from 'uuid'
 import parseLinkHeader from 'parse-link-header'
 import NaiveFetchDispatch from './NaiveFetchDispatch'
-import makePromisePool from 'make-promise-pool'
+import makePromisePool from '@canvas/make-promise-pool'
 
 const deepMerge = (lhs, rhs) => {
   if (lhs === undefined || lhs === null) {
