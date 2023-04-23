@@ -88,15 +88,13 @@ export default function makePromisePool(dataList, makePromise, opts = {}) {
 
         // check on the progress again after an interval timeout
         setTimeout(evaluateProgress, intervalTime)
-      } else {
         // check that all workers are actually done
-        if (activeWorkers === 0) {
-          // looks like all our promises finished executing, so lets return results
-          resolve({successes, failures})
-        } else {
-          // check on the progress again after an interval timeout
-          setTimeout(evaluateProgress, intervalTime)
-        }
+      } else if (activeWorkers === 0) {
+        // looks like all our promises finished executing, so lets return results
+        resolve({successes, failures})
+      } else {
+        // check on the progress again after an interval timeout
+        setTimeout(evaluateProgress, intervalTime)
       }
     }
 

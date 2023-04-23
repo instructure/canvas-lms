@@ -1,5 +1,5 @@
 {
-  "name": "make-promise-pool",
+  "name": "@canvas/make-promise-pool",
   "private": true,
   "version": "1.0.0",
   "author": "neme",

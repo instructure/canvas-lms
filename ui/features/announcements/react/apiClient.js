@@ -18,7 +18,7 @@
 
 import axios from '@canvas/axios'
 import {encodeQueryString} from '@canvas/query-string-encoding'
-import makePromisePool from 'make-promise-pool'
+import makePromisePool from '@canvas/make-promise-pool'
 
 const MAX_CONCURRENT_REQS = 5
 
