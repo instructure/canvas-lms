@@ -16,9 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable @typescript-eslint/no-redeclare */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable block-scoped-var */
+/* eslint-disable eqeqeq */
+/* eslint-disable no-var */
+/* eslint-disable vars-on-top */
+
 // xsslint jqueryObject.identifier tree
 import $ from 'jquery'
-import _ from 'underscore'
 import htmlEscape from 'html-escape'
 import 'jqueryui/draggable'
 import 'jqueryui/droppable'
@@ -28,8 +35,8 @@ function isOpera() {
   return ua.indexOf('OPR/') !== -1 || ua.indexOf('Opera/') !== -1 || ua.indexOf('OPT/') !== -1
 }
 
-$.fn.instTree = function(options) {
-  return $(this).each(function() {
+$.fn.instTree = function (options) {
+  return $(this).each(function () {
     let binded = false
     let tree = $(this)
     const it = this
@@ -48,44 +55,30 @@ $.fn.instTree = function(options) {
       onEditNode: false,
       onDeleteNode: false,
       onDrag: false,
-      onDrop: false
+      onDrop: false,
     }
     it.opts = $.extend({}, it.options, options)
 
-    $.fn.instTree.InitInstTree = function(obj) {
+    $.fn.instTree.InitInstTree = function (obj) {
       tree = $(obj)
 
       const $sep = '<li class="separator"></li>'
 
       tree
         .find('li:not(.separator)')
-        .filter(function() {
-          return !(
-            $(this)
-              .prev('li.separator')
-              .get(0) ||
-            $(this)
-              .parents('ul.non-instTree')
-              .get(0)
-          )
+        .filter(function () {
+          return !($(this).prev('li.separator').get(0) || $(this).parents('ul.non-instTree').get(0))
         })
-        .each(function() {
+        .each(function () {
           $(this).before($sep)
         })
 
-      tree
-        .find('li > span')
-        .not('.sign')
-        .not('.clr')
-        .addClass('text')
-        .attr('unselectable', 'on')
+      tree.find('li > span').not('.sign').not('.clr').addClass('text').attr('unselectable', 'on')
 
       tree
         .find('li:not(.separator)')
-        .filter(function() {
-          return !$(this)
-            .parents('ul.non-instTree')
-            .get(0)
+        .filter(function () {
+          return !$(this).parents('ul.non-instTree').get(0)
         })
         .filter(':has(ul)')
         .addClass('node')
@@ -107,7 +100,7 @@ $.fn.instTree = function(options) {
         it.InitDragDrop(obj)
       } // if (it.opts.dragdrop)
     } // InitInstTree
-    it.InitDragDrop = function(obj) {
+    it.InitDragDrop = function (obj) {
       tree = $(obj)
 
       tree.find('span.text').draggable({
@@ -116,15 +109,15 @@ $.fn.instTree = function(options) {
         helper() {
           return $('<div id="instTree-drag"><span>' + $(this).html() + '</span></div>')
         },
-        appendTo: tree
+        appendTo: tree,
       })
 
       tree.find('li.separator').droppable({
         accept: 'span.text',
-        hoverClass: 'dd-hover'
+        hoverClass: 'dd-hover',
       })
 
-      tree.find('span.text').bind('dragstart', function(event, ui) {
+      tree.find('span.text').bind('dragstart', function (event, ui) {
         tree = $(this).parents('ul.instTree:first')
 
         const li = $(this).parent('li')
@@ -141,17 +134,14 @@ $.fn.instTree = function(options) {
           dd.addClass('node')
         }
 
-        li.prev('li.separator')
-          .addClass('alt')
-          .end()
-          .addClass('alt')
+        li.prev('li.separator').addClass('alt').end().addClass('alt')
 
         if (typeof it.opts.onDrag === 'function') {
           it.opts.onDrag(event, li)
         }
       })
 
-      tree.find('li.separator').bind('dropover', function(event, ui) {
+      tree.find('li.separator').bind('dropover', function (event, ui) {
         ddover = $(this)
       })
 
@@ -171,12 +161,7 @@ $.fn.instTree = function(options) {
           }
         } // if (ddover)
         if (ddover && lvlok) {
-          ddover.before(
-            tree
-              .find('li.alt')
-              .remove()
-              .removeClass('alt')
-          )
+          ddover.before(tree.find('li.alt').remove().removeClass('alt'))
 
           ddover = null
 
@@ -191,7 +176,7 @@ $.fn.instTree = function(options) {
         }
       })
     } // InitDragDrop
-    it.CancelDragDrop = function(obj) {
+    it.CancelDragDrop = function (obj) {
       tree = $(obj)
 
       tree.find('span.text').draggable('destroy')
@@ -200,7 +185,7 @@ $.fn.instTree = function(options) {
       tree.find('span.text').unbind()
     }
 
-    $.fn.instTree.AddNode = function(obj, type) {
+    $.fn.instTree.AddNode = function (obj, type) {
       tree = $(obj)
 
       const activeElement = tree.find('span.active').get(0)
@@ -260,7 +245,7 @@ $.fn.instTree = function(options) {
               .find('input:text')
               .focus()
               .select()
-              .blur(function() {
+              .blur(function () {
                 it.SaveInput(obj, $(this))
               })
           } // if (ok)
@@ -272,7 +257,7 @@ $.fn.instTree = function(options) {
         } // if ((!li.is('.fixedLevel')) || (type != 'node'))
       } // if (activeElement)
     } // AddNode
-    $.fn.instTree.EditNode = function(obj) {
+    $.fn.instTree.EditNode = function (obj) {
       tree = $(obj)
       const activeElement = tree.find('span.active').get(0)
       if (activeElement) {
@@ -287,7 +272,7 @@ $.fn.instTree = function(options) {
         li.find('input:text')
           .focus()
           .select()
-          .blur(function() {
+          .blur(function () {
             it.SaveInput(obj, $(this))
           })
 
@@ -297,7 +282,7 @@ $.fn.instTree = function(options) {
       }
       // if (activeElement)
     } // EditNode
-    $.fn.instTree.DeleteNode = function(obj) {
+    $.fn.instTree.DeleteNode = function (obj) {
       tree = $(obj)
 
       const activeElement = tree.find('span.active').get(0)
@@ -306,10 +291,7 @@ $.fn.instTree = function(options) {
         const li = $(activeElement).parents('li:first')
         const prnt = li.parents('li.node:first')
 
-        li.prev('li.separator')
-          .remove()
-          .end()
-          .remove()
+        li.prev('li.separator').remove().end().remove()
 
         $.fn.instTree.InitInstTree(obj)
 
@@ -318,7 +300,7 @@ $.fn.instTree = function(options) {
         }
       } // if (activeElement)
     } // DeleteNode
-    it.SaveInput = function(obj, input) {
+    it.SaveInput = function (obj, input) {
       input.prev('span.text').remove()
 
       const val = $.trim(input.get(0).value) !== '' ? input.get(0).value : '_____'
@@ -327,8 +309,8 @@ $.fn.instTree = function(options) {
 
       $.fn.instTree.InitInstTree(obj)
     } // SaveInput
-    it.Clean = function() {
-      tree.find('li:not(.separator)').each(function() {
+    it.Clean = function () {
+      tree.find('li:not(.separator)').each(function () {
         $(this).removeClass('last')
 
         if (!$(this).next('li').length || $(this).find('ul').length) {
@@ -336,25 +318,17 @@ $.fn.instTree = function(options) {
         }
       })
     } // Clean
-    it.AddSigns = function() {
-      tree.find('li.node').each(function() {
+    it.AddSigns = function () {
+      tree.find('li.node').each(function () {
         if ($(this).hasClass('open')) {
-          $(this)
-            .find('span.sign')
-            .remove()
-            .end()
-            .append('<span class="sign minus"></span>')
+          $(this).find('span.sign').remove().end().append('<span class="sign minus"></span>')
         } else {
-          $(this)
-            .find('span.sign')
-            .remove()
-            .end()
-            .append('<span class="sign plus"></span>')
+          $(this).find('span.sign').remove().end().append('<span class="sign plus"></span>')
         }
       })
     } // AddSigns
-    it.BindEvents = function(obj) {
-      tree.on('keydown', function(e) {
+    it.BindEvents = function (obj) {
+      tree.on('keydown', function (e) {
         const $currentSelected = tree.find('[aria-selected="true"]')
         const $fileListContainer = $('#file_list_container')
 
@@ -443,7 +417,7 @@ $.fn.instTree = function(options) {
         }
       })
 
-      tree.click(function(e) {
+      tree.click(function (e) {
         const tree = $(this).closest('.instTree')
         const clicked = $(e.target)
         let node
@@ -516,7 +490,7 @@ $.fn.instTree = function(options) {
 
       binded = true
     } // BindEvents
-    it.ToggleNode = function(obj, node) {
+    it.ToggleNode = function (obj, node) {
       if (node.hasClass('open')) {
         it.CollapseNode(node)
       } else {
@@ -525,12 +499,12 @@ $.fn.instTree = function(options) {
 
       it.Clean()
     } // ToggleNode
-    it.ExpandNode = function(obj, node) {
+    it.ExpandNode = function (obj, node) {
       node.addClass('open')
       node.attr('aria-expanded', true)
 
       if (it.opts.autoclose) {
-        node.siblings('.open').each(function() {
+        node.siblings('.open').each(function () {
           it.CollapseNode($(this))
         })
       }
@@ -548,7 +522,7 @@ $.fn.instTree = function(options) {
       }
     } // ExpandNode
 
-    it.CollapseNode = function(node) {
+    it.CollapseNode = function (node) {
       node.removeClass('open')
       node.attr('aria-expanded', false)
 
@@ -565,7 +539,7 @@ $.fn.instTree = function(options) {
     // to a node to qualify it as 'selected'. This means aria-selected,
     // activedecendant and any other tags that might need to be added.
 
-    it.SelectNode = function($node) {
+    it.SelectNode = function ($node) {
       if ($node.length) {
         tree.attr('aria-activedescendant', $node.attr('id'))
         tree.find('[aria-selected="true"]').attr('aria-selected', 'false')
@@ -580,7 +554,7 @@ $.fn.instTree = function(options) {
     // Accepts 2 arguments -> jQuery Object | "up" or "down" (defaults to down)
     // Returns jQuery Node
 
-    it.FindNode = function($currentSelected, direction) {
+    it.FindNode = function ($currentSelected, direction) {
       const $treeItems = $('[role="treeitem"]:visible')
       const currentIndex = $treeItems.index($currentSelected)
       let newIndex = currentIndex
@@ -599,19 +573,11 @@ $.fn.instTree = function(options) {
     // Accepts 2 argument -> jQuery Object (file/folder node) and jQuery Object its container
     // Returns Integer which is the offset to use for scrolling to the correct position
 
-    it.FileScrollOffset = function($item, $fileListContainer) {
+    it.FileScrollOffset = function ($item, $fileListContainer) {
       const index = $item.data('indexPosition')
 
-      const leafHight =
-        $fileListContainer
-          .find('.leaf')
-          .first()
-          .height() || 20 // defaults to 20 px
-      const seperatorHeight =
-        $item
-          .siblings('.separator')
-          .first()
-          .height() || 2 // defaults to 2 px
+      const leafHight = $fileListContainer.find('.leaf').first().height() || 20 // defaults to 20 px
+      const seperatorHeight = $item.siblings('.separator').first().height() || 2 // defaults to 2 px
       const seperatorOffset = seperatorHeight * index
       const nodeOffset = leafHight * index
       const containerOffset = $fileListContainer.height() / 2
