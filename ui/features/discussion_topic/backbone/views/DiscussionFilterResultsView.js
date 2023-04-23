@@ -21,7 +21,7 @@ import _ from 'underscore'
 import FilterEntryView from './FilterEntryView'
 import EntryCollectionView from './EntryCollectionView'
 import EntryCollection from '../collections/EntryCollection'
-import rEscape from 'escape-regex'
+import rEscape from '@canvas/escape-regex'
 
 export default class DiscussionFilterResultsView extends EntryCollectionView {
   static initClass() {
