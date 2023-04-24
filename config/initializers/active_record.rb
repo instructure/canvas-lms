@@ -732,13 +732,13 @@ class ActiveRecord::Base
       self.created_at = updated_at if touch
       self.id = self.class._insert_record(
         attributes_with_values(attribute_names_for_partial_inserts)
-        .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
+          .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
       )
       @new_record = false
     else
       update_columns(
         attributes_with_values(attribute_names_for_partial_updates)
-        .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
+          .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
       )
     end
     changes_applied
@@ -914,7 +914,7 @@ module UsefulFindInBatches
                   fields = result.fields
                   fields.each_with_index do |fname, i|
                     ftype = result.ftype i
-                    fmod  = result.fmod i
+                    fmod = result.fmod i
                     types[fname] = conn.send(:get_oid_type, ftype, fmod, fname)
                   end
 
@@ -1906,7 +1906,8 @@ end
 ActiveRecord::Migration.prepend(AlwaysUseMigrationDates)
 
 module ExplainAnalyze
-  def exec_explain(queries, analyze: false) # :nodoc:
+  def exec_explain(queries, analyze: false)
+    # :nodoc:
     str = queries.map do |sql, binds|
       msg = "EXPLAIN #{"ANALYZE " if analyze}for: #{sql}"
       unless binds.empty?
