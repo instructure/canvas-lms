@@ -16,75 +16,87 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {mount, shallow} from 'enzyme'
 import moment from 'moment-timezone'
 import {Day} from '../index'
 
 const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#0B874B'}
 const defaultProps = {registerAnimatable: jest.fn, deregisterAnimatable: jest.fn}
 
-it('renders the base component with required props', () => {
-  const wrapper = shallow(<Day {...defaultProps} timeZone="America/Denver" day="2017-04-25" />)
-  expect(wrapper).toMatchSnapshot()
-})
+const currentTimeZoneName = moment.tz.guess()
+const otherTimeZoneName = ['America/Denver', 'Europe/London'].find(it => it !== currentTimeZoneName)
 
-it('renders the friendly name in large text and rest of the date on a second line when it is today', () => {
-  const today = moment()
-  const wrapper = shallow(
-    <Day {...defaultProps} timeZone="America/Denver" day={today.format('YYYY-MM-DD')} />
-  )
-  const friendlyName = wrapper.find('Heading').first().childAt(0)
-  const fullDate = wrapper.find('Heading').first().childAt(1)
+// Tests need to run in at least one timezone
+for (const [timeZoneDesc, timeZoneName] of [
+  ['In current timezone', currentTimeZoneName],
+  ['In other timezone', otherTimeZoneName],
+]) {
+  // eslint-disable-next-line jest/valid-describe
+  describe(timeZoneDesc, () => {
+    it('renders the base component with required props', () => {
+      const wrapper = shallow(<Day {...defaultProps} timeZone={timeZoneName} day="2017-04-25" />)
+      expect(wrapper).toMatchSnapshot()
+    })
 
-  expect(friendlyName.props().size).toBe('large')
-  expect(fullDate.text()).toBe(today.format('MMMM D'))
-})
+    it('renders the friendly name in large text and rest of the date on a second line when it is today', () => {
+      const today = moment()
+      const wrapper = shallow(
+        <Day {...defaultProps} timeZone={timeZoneName} day={today.format('YYYY-MM-DD')} />
+      )
+      const friendlyName = wrapper.find('Heading').first().childAt(0)
+      const fullDate = wrapper.find('Heading').first().childAt(1)
 
-it('renders the full date with friendly name on one line when it is not today', () => {
-  const yesterday = moment().subtract(1, 'days')
-  const wrapper = shallow(
-    <Day {...defaultProps} timeZone="America/Denver" day={yesterday.format('YYYY-MM-DD')} />
-  )
-  const fullDate = wrapper.find('Heading').first().childAt(0)
+      expect(friendlyName.props().size).toBe('large')
+      expect(fullDate.text()).toBe(today.format('MMMM D'))
+    })
 
-  expect(fullDate.text()).toBe(`Yesterday, ${yesterday.format('MMMM D')}`)
-})
+    it('renders the full date with friendly name on one line when it is not today', () => {
+      const yesterday = moment().subtract(1, 'days')
+      const wrapper = shallow(
+        <Day {...defaultProps} timeZone={timeZoneName} day={yesterday.format('YYYY-MM-DD')} />
+      )
+      const fullDate = wrapper.find('Heading').first().childAt(0)
 
-it('renders missing assignments if showMissingAssignments is true and it is today', () => {
-  const today = moment()
-  const wrapper = shallow(
-    <Day
-      {...defaultProps}
-      timeZone="America/Denver"
-      day={today.format('YYYY-MM-DD')}
-      showMissingAssignments={true}
-    />
-  )
-  expect(wrapper.find('Connect(MissingAssignments)').exists()).toBeTruthy()
-})
+      expect(fullDate.text()).toBe(`Yesterday, ${yesterday.format('MMMM D')}`)
+    })
 
-it('does not render missing assignments if it is not today', () => {
-  const yesterday = moment().subtract(1, 'days')
-  const wrapper = shallow(
-    <Day
-      {...defaultProps}
-      timeZone="America/Denver"
-      day={yesterday.format('YYYY-MM-DD')}
-      showMissingAssignments={true}
-    />
-  )
-  expect(wrapper.find('Connect(MissingAssignments)').exists()).toBeFalsy()
-})
+    it('renders missing assignments if showMissingAssignments is true and it is today', () => {
+      const today = moment()
+      const wrapper = shallow(
+        <Day
+          {...defaultProps}
+          timeZone={timeZoneName}
+          day={today.format('YYYY-MM-DD')}
+          showMissingAssignments={true}
+        />
+      )
+      expect(wrapper.find('Connect(MissingAssignments)').exists()).toBeTruthy()
+    })
 
-it('only renders the year when the date is not in the current year', () => {
-  const lastYear = moment().subtract(1, 'year')
-  const wrapper = shallow(
-    <Day {...defaultProps} timeZone="America/Denver" day={lastYear.format('YYYY-MM-DD')} />
-  )
-  const fullDate = wrapper.find('Heading').first().childAt(0)
+    it('does not render missing assignments if it is not today', () => {
+      const yesterday = moment().subtract(1, 'days')
+      const wrapper = shallow(
+        <Day
+          {...defaultProps}
+          timeZone={timeZoneName}
+          day={yesterday.format('YYYY-MM-DD')}
+          showMissingAssignments={true}
+        />
+      )
+      expect(wrapper.find('Connect(MissingAssignments)').exists()).toBeFalsy()
+    })
 
-  expect(fullDate.text()).toBe(lastYear.format('dddd, MMMM D, YYYY'))
-})
+    it('only renders the year when the date is not in the current year', () => {
+      const lastYear = moment().subtract(1, 'year')
+      const wrapper = shallow(
+        <Day {...defaultProps} timeZone={timeZoneName} day={lastYear.format('YYYY-MM-DD')} />
+      )
+      const fullDate = wrapper.find('Heading').first().childAt(0)
+
+      expect(fullDate.text()).toBe(lastYear.format('dddd, MMMM D, YYYY'))
+    })
+  })
+}
 
 it('renders grouping correctly when having itemsForDay', () => {
   const TZ = 'America/Denver'
