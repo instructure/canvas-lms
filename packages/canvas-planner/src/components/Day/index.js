@@ -23,12 +23,14 @@ import {themeable} from '@instructure/ui-themeable'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {bool, shape, string, number, arrayOf, func} from 'prop-types'
-import {userShape, itemShape, sizeShape} from '../plannerPropTypes'
+import {arrayOf, bool, func, number, shape, string} from 'prop-types'
+import {itemShape, sizeShape, userShape} from '../plannerPropTypes'
 import styles from './styles.css'
 import theme from './theme'
-import {getFriendlyDate, getDynamicFullDate, isToday} from '../../utilities/dateUtils'
+import {getDynamicFullDate, getFriendlyDate, isToday} from '../../utilities/dateUtils'
+// eslint-disable-next-line import/no-named-as-default
 import MissingAssignments from '../MissingAssignments'
+// eslint-disable-next-line import/no-named-as-default
 import Grouping from '../Grouping'
 import formatMessage from '../../format-message'
 import {animatable} from '../../dynamic-ui'
@@ -48,7 +50,7 @@ export class Day extends Component {
     singleCourseView: bool,
     showMissingAssignments: bool,
     responsiveSize: sizeShape,
-    isObserving: bool
+    isObserving: bool,
   }
 
   static defaultProps = {
@@ -57,14 +59,14 @@ export class Day extends Component {
     singleCourseView: false,
     showMissingAssignments: false,
     responsiveSize: 'large',
-    isObserving: false
+    isObserving: false,
   }
 
   constructor(props) {
     super(props)
 
     const tzMomentizedDate = moment.tz(props.day, props.timeZone)
-    this.friendlyName = getFriendlyDate(tzMomentizedDate)
+    this.friendlyName = getFriendlyDate(tzMomentizedDate, moment().tz(props.timeZone))
     this.date = getDynamicFullDate(tzMomentizedDate, props.timeZone)
   }
 
@@ -110,7 +112,7 @@ export class Day extends Component {
         url={courseInfo.url}
         key={groupKey}
         theme={{
-          titleColor: groupColor
+          titleColor: groupColor,
         }}
         toggleCompletion={this.props.toggleCompletion}
         currentUser={this.props.currentUser}

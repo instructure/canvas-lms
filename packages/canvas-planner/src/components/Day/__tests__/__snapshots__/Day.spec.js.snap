@@ -1,5 +1,79 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`In current timezone renders the base component with required props 1`] = `
+<div
+  className="Day-styles__root planner-day"
+>
+  <Heading
+    border="bottom"
+    color="inherit"
+    level="h2"
+  >
+    <div
+      className="Day-styles__secondary"
+    >
+      Tuesday
+      , 
+      April 25, 2017
+    </div>
+  </Heading>
+  <div>
+    <View
+      borderColor="primary"
+      display="block"
+      focusColor="info"
+      focusPosition="offset"
+      margin="small 0 0 0"
+      overflowX="visible"
+      overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      textAlign="center"
+      withVisualDebug={false}
+    >
+      Nothing Planned Yet
+    </View>
+  </div>
+</div>
+`;
+
+exports[`In other timezone renders the base component with required props 1`] = `
+<div
+  className="Day-styles__root planner-day"
+>
+  <Heading
+    border="bottom"
+    color="inherit"
+    level="h2"
+  >
+    <div
+      className="Day-styles__secondary"
+    >
+      Tuesday
+      , 
+      April 25, 2017
+    </div>
+  </Heading>
+  <div>
+    <View
+      borderColor="primary"
+      display="block"
+      focusColor="info"
+      focusPosition="offset"
+      margin="small 0 0 0"
+      overflowX="visible"
+      overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      textAlign="center"
+      withVisualDebug={false}
+    >
+      Nothing Planned Yet
+    </View>
+  </div>
+</div>
+`;
+
 exports[`groups itemsForDay that come in on prop changes 1`] = `
 <div
   className="Day-styles__root planner-day"
@@ -488,43 +562,6 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       }
       timeZone="America/Denver"
     />
-  </div>
-</div>
-`;
-
-exports[`renders the base component with required props 1`] = `
-<div
-  className="Day-styles__root planner-day"
->
-  <Heading
-    border="bottom"
-    color="inherit"
-    level="h2"
-  >
-    <div
-      className="Day-styles__secondary"
-    >
-      Tuesday
-      , 
-      April 25, 2017
-    </div>
-  </Heading>
-  <div>
-    <View
-      borderColor="primary"
-      display="block"
-      focusColor="info"
-      focusPosition="offset"
-      margin="small 0 0 0"
-      overflowX="visible"
-      overflowY="visible"
-      position="static"
-      shouldAnimateFocus={true}
-      textAlign="center"
-      withVisualDebug={false}
-    >
-      Nothing Planned Yet
-    </View>
   </div>
 </div>
 `;
