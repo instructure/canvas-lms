@@ -912,6 +912,39 @@ describe DiscussionEntry do
         end
       end
     end
+
+    describe "create" do
+      context "with an active enrollment" do
+        before :once do
+          course_with_student active_all: true
+        end
+
+        let(:topic) { @course.discussion_topics.create(title: "topic", message: "message") }
+        let(:announcement) { @course.announcements.create(title: "announcement", message: "message") }
+
+        it "allows replies from students on topics" do
+          entry = topic.discussion_entries.build(user: @student, message: "message")
+          expect(entry.grants_right?(@student, :create)).to be true
+        end
+
+        it "does not allow replies from students on locked topics" do
+          topic.lock!
+          entry = topic.discussion_entries.build(user: @student, message: "message")
+          expect(entry.grants_right?(@student, :create)).to be false
+        end
+
+        it "allows replies from students on announcements" do
+          entry = announcement.discussion_entries.build(user: @student, message: "message")
+          expect(entry.grants_right?(@student, :create)).to be true
+        end
+
+        it "does not allow replies from students on locked announcements" do
+          announcement.lock!
+          entry = announcement.discussion_entries.build(user: @student, message: "message")
+          expect(entry.grants_right?(@student, :create)).to be false
+        end
+      end
+    end
   end
 
   describe "#author_name" do
