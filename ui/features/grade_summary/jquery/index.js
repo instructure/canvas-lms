@@ -88,6 +88,10 @@ const GradeSummary = {
     }
   },
 
+  getOriginalWorkflowState($assignment) {
+    return $assignment.find('.submission_status').text().trim()
+  },
+
   onEditWhatIfScore($assignmentScore, $ariaAnnouncer) {
     // Store the original score so that it can be restored when the "What-If" score is reverted.
     if (!$assignmentScore.find('.grade').data('originalValue')) {
@@ -208,7 +212,7 @@ const GradeSummary = {
       $assignment.find('.grade').prepend($screenreaderLinkClone)
     }
 
-    GradeSummary.updateScoreForAssignment(assignmentId, score.numericalValue)
+    GradeSummary.updateScoreForAssignment(assignmentId, score.numericalValue, 'graded')
     GradeSummary.updateStudentGrades()
   },
 
@@ -245,7 +249,8 @@ const GradeSummary = {
     $grade.removeClass('changed')
 
     const assignmentId = $assignment.getTemplateValue('assignment_id')
-    GradeSummary.updateScoreForAssignment(assignmentId, score.numericalValue)
+    const workflowState = GradeSummary.getOriginalWorkflowState($assignment)
+    GradeSummary.updateScoreForAssignment(assignmentId, score.numericalValue, workflowState)
     if (!opts.skipEval) {
       GradeSummary.updateStudentGrades()
     }
@@ -521,11 +526,12 @@ function updateStudentGrades() {
   }
 }
 
-function updateScoreForAssignment(assignmentId, score) {
+function updateScoreForAssignment(assignmentId, score, workflowStateOverride) {
   const submission = _.find(ENV.submissions, s => `${s.assignment_id}` === `${assignmentId}`)
 
   if (submission) {
     submission.score = score
+    submission.workflow_state = workflowStateOverride ?? submission.workflow_state
   } else {
     ENV.submissions.push({assignment_id: assignmentId, score})
   }
