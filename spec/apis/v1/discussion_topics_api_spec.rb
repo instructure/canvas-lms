@@ -1991,6 +1991,17 @@ describe DiscussionTopicsController, type: :request do
       )
     end
 
+    it "does not allow students to create an entry under an announcement that is closed for comments" do
+      @announcement = @course.announcements.create!(message: "lorem ipsum", locked: true)
+      student_in_course(course: @course, active_all: true)
+      api_call(
+        :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@announcement.id}/entries.json",
+        { controller: "discussion_topics_api", action: "add_entry", format: "json",
+          course_id: @course.id.to_s, topic_id: @announcement.id.to_s },
+        { message: @message }, {}, expected_status: 401
+      )
+    end
+
     it "returns json representation of the new entry" do
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
