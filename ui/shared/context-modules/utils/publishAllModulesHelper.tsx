@@ -123,13 +123,11 @@ export function fetchAllItemPublishedStates(courseId: string | number, nextLink?
 }
 // update the state of the modules and items
 // based on what the user asked to be done
-export function updateModulePendingPublishedStates(
-  published: boolean | undefined,
-  isPublishing: boolean
-): void {
+export function updateModulePendingPublishedStates(isPublishing: boolean): void {
   const completedModuleIds = moduleIds()
   completedModuleIds.forEach(moduleId => {
-    exportFuncs.updateModulePublishedState(moduleId, published, isPublishing)
+    exportFuncs.updateModulePublishedState(moduleId, undefined, isPublishing)
+    updateModuleItemsPublishedStates(moduleId, undefined, isPublishing)
   })
 }
 
@@ -146,9 +144,8 @@ export function updateModulePublishedState(
     const courseId = publishIcon.getAttribute('data-course-id') as string
     // Update the new state of the module then we unmount the component to render the newly changed state
     const $publishIcon = $(publishIcon)
-    if (typeof published === 'boolean') $publishIcon.data('published', !!published)
+    $publishIcon.data('published', !!published)
     renderContextModulesPublishIcon(courseId, moduleId, published, isPublishing)
-    updateModuleItemsPublishedStates($publishIcon.data('moduleId'), published, isPublishing)
   }
 }
 

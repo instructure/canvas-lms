@@ -76,7 +76,7 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
   // initialize the UI accordingly
   useEffect(() => {
     if (modelsReady && isPublishing) {
-      updateModulePendingPublishedStates(undefined, true)
+      updateModulePendingPublishedStates(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modelsReady])
@@ -104,7 +104,7 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
   }
 
   const refreshPublishStates = () => {
-    fetchAllItemPublishedStates(courseId)
+    return fetchAllItemPublishedStates(courseId)
       .then(() => {
         showFlashAlert({
           message: I18n.t('Modules updated'),
@@ -125,9 +125,8 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
   }
 
   const onPublishComplete = () => {
-    refreshPublishStates()
-    updateModulePendingPublishedStates(shouldPublishModules, false)
-    reset()
+    // eslint-disable-next-line promise/catch-or-return
+    refreshPublishStates().then(() => reset())
   }
 
   function updateCurrentProgress(progress) {
@@ -157,7 +156,7 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
 
   const onPublishFail = error => {
     reset()
-    updateModulePendingPublishedStates(undefined, false)
+    updateModulePendingPublishedStates(false)
     showFlashAlert({
       message: I18n.t('There was an error while saving your changes'),
       err: error,
@@ -182,7 +181,7 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
   function handlePublish() {
     if (isPublishing) return
     setIsPublishing(true)
-    updateModulePendingPublishedStates(undefined, true)
+    updateModulePendingPublishedStates(true)
     batchUpdateAllModulesApiCall(courseId, shouldPublishModules, shouldSkipModuleItems)
       .then(result => {
         setProgressId(result.json.progress.progress.id)
