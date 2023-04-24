@@ -18,10 +18,8 @@
 
 import {waitFor} from '@testing-library/dom'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {
-  renderContextModulesPublishIcon,
-  updateModuleItemsPublishedStates,
-} from '../utils/publishOneModuleHelper'
+import publishOneModuleHelperModule from '../utils/publishOneModuleHelper'
+
 import publishAllModulesHelperModule from '../utils/publishAllModulesHelper'
 import {initBody, makeModuleWithItems} from './testHelpers'
 
@@ -35,6 +33,10 @@ const {
   moduleIds,
 } = {
   ...publishAllModulesHelperModule,
+}
+
+const {renderContextModulesPublishIcon} = {
+  ...publishOneModuleHelperModule,
 }
 
 jest.mock('@canvas/do-fetch-api-effect')
@@ -253,21 +255,23 @@ describe('publishAllModulesHelper', () => {
   })
 
   describe('updateModulePendingPublishedStates', () => {
-    let spy
+    let updateModuleSpy, updateItemsSpy
     beforeEach(() => {
       makeModuleWithItems(1, [117, 119], false)
       makeModuleWithItems(2, [217, 219], true)
     })
     afterEach(() => {
-      spy?.mockRestore()
+      updateModuleSpy?.mockRestore()
     })
 
     it('updates the modules and their items', () => {
-      spy = jest.spyOn(publishAllModulesHelperModule, 'updateModulePublishedState')
-      const published = true
+      updateModuleSpy = jest.spyOn(publishAllModulesHelperModule, 'updateModulePublishedState')
+      updateItemsSpy = jest.spyOn(publishOneModuleHelperModule, 'updateModuleItemsPublishedStates')
       const isPublishing = true
-      updateModulePendingPublishedStates(published, isPublishing)
-      expect(spy).toHaveBeenCalledTimes(2)
+      updateModulePendingPublishedStates(isPublishing)
+      expect(updateModuleSpy).toHaveBeenCalledTimes(2)
+      expect(updateItemsSpy).toHaveBeenCalledTimes(2)
+      expect(updateItemsSpy).toHaveBeenCalledWith(1, undefined, isPublishing)
     })
   })
 
@@ -281,14 +285,12 @@ describe('publishAllModulesHelper', () => {
       spy?.mockRestore()
     })
 
-    it('updates the module and its items', () => {
+    it('updates the module', () => {
       const published = true
       const isPublishing = false
       updateModulePublishedState(1, published, isPublishing)
       expect(renderContextModulesPublishIcon).toHaveBeenCalledTimes(1)
       expect(renderContextModulesPublishIcon).toHaveBeenCalledWith('1', 1, published, isPublishing)
-      expect(updateModuleItemsPublishedStates).toHaveBeenCalledTimes(1)
-      expect(updateModuleItemsPublishedStates).toHaveBeenCalledWith(1, published, isPublishing)
     })
   })
 

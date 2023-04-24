@@ -1059,7 +1059,6 @@ modules.initModuleManagement = function (duplicate) {
           data.context_module.context_id,
           data.context_module.id,
           published,
-          isPublishing,
           isPublishing
         )
       }
