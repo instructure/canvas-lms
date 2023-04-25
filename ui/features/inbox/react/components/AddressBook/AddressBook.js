@@ -101,7 +101,7 @@ export const AddressBook = ({
     : []
   const homeMenu = [
     {id: 'subMenuCourse', name: I18n.t('Courses'), itemType: SUBMENU_TYPE},
-    {id: 'subMenuStudents', name: I18n.t('Students'), itemType: SUBMENU_TYPE},
+    {id: 'subMenuUsers', name: I18n.t('Users'), itemType: SUBMENU_TYPE},
   ]
   const [data, setData] = useState([
     ...backButtonArray,
