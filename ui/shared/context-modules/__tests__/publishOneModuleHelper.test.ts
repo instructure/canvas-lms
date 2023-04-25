@@ -245,8 +245,24 @@ describe('publishOneModuleHelper', () => {
 
       updateModuleItemsPublishedStates(1, published, isPublishing)
       expect(spy).toHaveBeenCalledTimes(2)
-      expect(spy).toHaveBeenCalledWith(1117, published, isPublishing, allModuleItems)
-      expect(spy).toHaveBeenCalledWith(1119, published, isPublishing, allModuleItems)
+      expect(spy).toHaveBeenCalledWith(
+        expect.any(HTMLElement),
+        published,
+        isPublishing,
+        allModuleItems
+      )
+      expect(spy).toHaveBeenCalledWith(
+        expect.any(HTMLElement),
+        published,
+        isPublishing,
+        allModuleItems
+      )
+      expect((spy.mock.calls[0][0] as HTMLElement).getAttribute('data-module-item-id')).toEqual(
+        '1117'
+      )
+      expect((spy.mock.calls[1][0] as HTMLElement).getAttribute('data-module-item-id')).toEqual(
+        '1119'
+      )
     })
 
     it('does not change published state if undefined', () => {
@@ -372,7 +388,7 @@ describe('publishOneModuleHelper', () => {
     it('exhausts paginated responses', async () => {
       doFetchApi.mockResolvedValueOnce({
         response: {ok: true},
-        json: [{id: 1, published: true}],
+        json: [{id: '1', published: true}],
         link: {next: {url: '/another/page'}},
       })
 
