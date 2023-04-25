@@ -3674,6 +3674,129 @@ describe Submission do
       expect(@submission.unread?(@user)).to be_truthy
     end
 
+    it "is read after submission is commented on by teacher and then teacher deletes comment (ff on)" do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      student = @user
+      submission = @assignment.submission_for_student(@student)
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+
+      comment = submission.submission_comments.first
+
+      expect do
+        comment.updating_user = @current_user
+        comment.destroy!
+      end.to change { SubmissionComment.count }.from(1).to(0)
+
+      expect(submission.read?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 0
+    end
+
+    it "is read after submission is commented on twice by teacher and then teacher deletes the first comment" do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      student = @user
+      submission = @assignment.submission_for_student(student)
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+
+      comment = submission.submission_comments.first
+
+      expect do
+        comment.updating_user = @current_user
+        comment.destroy!
+      end.to change { SubmissionComment.count }.from(2).to(1)
+
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+    end
+
+    it "is read after submission is commented on by teacher, student views comment, teacher comments again, and then teacher deletes the not viewed comment" do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      student = @user
+      submission = @assignment.submission_for_student(student)
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+
+      submission.mark_submission_comments_read(student)
+      submission.mark_item_read("comment")
+      expect(submission.read?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 0
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+      expect(submission.unread?(student)).to be_truthy
+
+      comment = submission.submission_comments[1]
+
+      expect do
+        comment.updating_user = @current_user
+        comment.destroy!
+      end.to change { SubmissionComment.count }.from(2).to(1)
+
+      expect(submission.read?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 0
+    end
+
+    it "is unread after submission is commented on by teacher, student views comment, teacher comments again, and then teacher deletes the viewed comment" do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      student = @user
+      submission = @assignment.submission_for_student(student)
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+
+      submission.mark_submission_comments_read(student)
+      submission.mark_item_read("comment")
+      expect(submission.read?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: @student.id).first
+      expect(content_participation_count.unread_count).to eq 0
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+      expect(submission.unread?(student)).to be_truthy
+
+      comment = submission.submission_comments.first
+
+      expect do
+        comment.updating_user = @current_user
+        comment.destroy!
+      end.to change { SubmissionComment.count }.from(2).to(1)
+
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+    end
+
     it "is read if other submission fields change" do
       @submission = @assignment.submit_homework(@user)
       @submission.workflow_state = "graded"
