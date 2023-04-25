@@ -110,7 +110,8 @@ describe "User Profile API", type: :request do
                          "time_zone" => "Etc/UTC",
                          "locale" => nil,
                          "effective_locale" => "en",
-                         "k5_user" => false
+                         "k5_user" => false,
+                         "use_classic_font_in_k5" => false
                        })
   end
 
@@ -136,7 +137,8 @@ describe "User Profile API", type: :request do
                          "time_zone" => "Etc/UTC",
                          "locale" => "es",
                          "effective_locale" => "es",
-                         "k5_user" => false
+                         "k5_user" => false,
+                         "use_classic_font_in_k5" => false
                        })
   end
 
@@ -160,7 +162,8 @@ describe "User Profile API", type: :request do
                          "time_zone" => "Etc/UTC",
                          "locale" => nil,
                          "effective_locale" => "en",
-                         "k5_user" => false
+                         "k5_user" => false,
+                         "use_classic_font_in_k5" => false
                        })
   end
 

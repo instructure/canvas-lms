@@ -121,6 +121,25 @@ describe CourseForMenuPresenter do
       end
     end
 
+    context "useClassicFont" do
+      before :once do
+        Account.site_admin.enable_feature! :k5_font_selection
+        @account = course.account
+        toggle_k5_setting(@account)
+      end
+
+      it "is true when the course's account has use_classic_font?" do
+        toggle_classic_font_setting(@account)
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:useClassicFont]).to be_truthy
+      end
+
+      it "is false if the course's account does not have use_classic_font?" do
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:useClassicFont]).to be_falsey
+      end
+    end
+
     context "with `homeroom_course` setting enabled" do
       before do
         course.update! homeroom_course: true
