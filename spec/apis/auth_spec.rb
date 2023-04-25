@@ -886,7 +886,8 @@ describe "API Authentication", type: :request do
                            "locale" => nil,
                            "effective_locale" => "en",
                            "calendar" => { "ics" => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-                           "k5_user" => false
+                           "k5_user" => false,
+                           "use_classic_font_in_k5" => false
                          })
 
       # as_user_id is ignored if it's not allowed
@@ -910,7 +911,8 @@ describe "API Authentication", type: :request do
                            "locale" => nil,
                            "effective_locale" => "en",
                            "calendar" => { "ics" => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-                           "k5_user" => false
+                           "k5_user" => false,
+                           "use_classic_font_in_k5" => false
                          })
 
       # as_user_id is ignored if it's blank
@@ -932,7 +934,8 @@ describe "API Authentication", type: :request do
                            "locale" => nil,
                            "effective_locale" => "en",
                            "calendar" => { "ics" => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-                           "k5_user" => false
+                           "k5_user" => false,
+                           "use_classic_font_in_k5" => false
                          })
     end
 
@@ -960,7 +963,8 @@ describe "API Authentication", type: :request do
                            "locale" => nil,
                            "effective_locale" => "en",
                            "calendar" => { "ics" => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-                           "k5_user" => false
+                           "k5_user" => false,
+                           "use_classic_font_in_k5" => false
                          })
     end
 
@@ -989,7 +993,8 @@ describe "API Authentication", type: :request do
                            "locale" => nil,
                            "effective_locale" => "en",
                            "calendar" => { "ics" => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-                           "k5_user" => false
+                           "k5_user" => false,
+                           "use_classic_font_in_k5" => false
                          })
     end
 

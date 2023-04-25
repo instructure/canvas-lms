@@ -90,6 +90,11 @@
 #           "description": "Optional: Whether or not the user is a K5 user. This field is nil if the user settings are not for the user making the request.",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "use_classic_font_in_k5": {
+#           "description": "Optional: Whether or not the user should see the classic font on the dashboard. Only applies if k5_user is true. This field is nil if the user settings are not for the user making the request.",
+#           "example": false,
+#           "type": "boolean"
 #         }
 #       }
 #     }
