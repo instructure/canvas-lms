@@ -1577,6 +1577,9 @@
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "Fichye miltimedya an tretman. Tanpri eseye ankò."
     },
+    "media_title_2112243b": {
+        "message": "Tit Medya"
+    },
     "medium_5a8e9ead": {
         "message": "Mwayen"
     },
@@ -2389,6 +2392,9 @@
     },
     "studio_media_options_ee504361": {
         "message": "Opsyon Estidyo Medya a"
+    },
+    "studio_media_options_tray_cfb94654": {
+        "message": "Opsyon Plato Medya Studio"
     },
     "styles_2aa721ef": {
         "message": "Stil"

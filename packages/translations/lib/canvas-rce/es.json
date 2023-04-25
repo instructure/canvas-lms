@@ -607,6 +607,7 @@
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "El archivo multimedia se está procesando. Inténtelo de nuevo más tarde."
   },
+  "media_title_2112243b": { "message": "Título del elemento multimedia" },
   "medium_5a8e9ead": { "message": "Regular" },
   "merge_links_2478df96": { "message": "Fusionar enlaces" },
   "mic_a7f3d311": { "message": "Micrófono" },
@@ -934,6 +935,9 @@
   "steel_blue_14296f08": { "message": "Azul acero" },
   "studio_media_options_ee504361": {
     "message": "Opciones de contenido multimedia de Studio"
+  },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Bandeja de opciones de contenido multimedia de Studio"
   },
   "styles_2aa721ef": { "message": "Estilos" },
   "submit_a3cc6859": { "message": "Entregar" },

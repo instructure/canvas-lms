@@ -595,6 +595,7 @@
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Predstavnostna datoteka je v obdelavi. Poskusite znova pozneje."
   },
+  "media_title_2112243b": { "message": "Naslov medija" },
   "medium_5a8e9ead": { "message": "Srednja" },
   "merge_links_2478df96": { "message": "Spoji povezave" },
   "mic_a7f3d311": { "message": "Mikrofon" },
@@ -913,6 +914,9 @@
   "start_recording_9a65141a": { "message": "Zaženi snemanje" },
   "steel_blue_14296f08": { "message": "Kovinsko modra" },
   "studio_media_options_ee504361": { "message": "Prikaži medijske možnosti" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Prikaži pladenj z medijskimi možnostmi"
+  },
   "styles_2aa721ef": { "message": "Slogi" },
   "submit_a3cc6859": { "message": "Pošlji" },
   "subscript_59744f96": { "message": "Podpisano" },

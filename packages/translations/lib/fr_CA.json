@@ -1577,6 +1577,9 @@
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "Le fichier multimédia est en cours de traitement. Veuillez essayer de nouveau plus tard."
     },
+    "media_title_2112243b": {
+        "message": "Titre du média"
+    },
     "medium_5a8e9ead": {
         "message": "Moyen"
     },
@@ -2389,6 +2392,9 @@
     },
     "studio_media_options_ee504361": {
         "message": "Options média de Studio"
+    },
+    "studio_media_options_tray_cfb94654": {
+        "message": "Plateau des options de média Studio"
     },
     "styles_2aa721ef": {
         "message": "Styles"

@@ -1577,6 +1577,9 @@
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "Mediendatei wird verarbeitet. Versuchen Sie es später noch einmal."
     },
+    "media_title_2112243b": {
+        "message": "Medien-Titel"
+    },
     "medium_5a8e9ead": {
         "message": "Medium"
     },
@@ -2388,6 +2391,9 @@
         "message": "Studierendenaufgabenliste"
     },
     "studio_media_options_ee504361": {
+        "message": "Studio-Medienoptionen"
+    },
+    "studio_media_options_tray_cfb94654": {
         "message": "Studio-Medienoptionen"
     },
     "styles_2aa721ef": {
