@@ -227,6 +227,7 @@ nl:
   a_simplified_canvas_interface_for_k_5_enable_appli_bc32b2d1: |-
       Een vereenvoudigd Canvas-interface voor K-5. Geschikte
       subaccounts inschakelen als K-5 accounts in accountinstellingen.
+  a_single_certificate_file_e7f347f1: "Een enkel certificaatbestand"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "Er is geen SIS-integratie geconfigureerd en de functie Nieuwe instellingen voor SIS-integratie inschakelen is niet ingeschakeld"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "Een cursist heeft zojuist een te late inlevering verzonden voor %{assignment_name} in de cursus %{course_name}"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "Een cursist heeft zojuist een herinlevering verzonden voor %{assignment_title} in de cursus %{course_name}"
@@ -4094,9 +4095,11 @@ nl:
       settings: Instellingen
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: "Deze opdracht zal geen cijfer krijgen."
+      assignment_not_yet_graded_rqd_screenreader: "Opdracht nog niet beoordeeld."
       assignment_not_yet_graded_screenreader: "Opdracht is nog niet beoordeeld. %{pointsPossible} punten mogelijk."
       empty_points_possible: "-/%{pointsPossible} punten"
       no_submission: "Geen inzending"
+      no_submission_for_assignment_rqd_screenreader: "Geen inlevering voor deze opdracht."
       no_submission_for_assignment_screenreader: "Geen inzending voor deze opdracht. %{pointsPossible} punten mogelijk."
       not_yet_graded: "*Nog niet beoordeeld*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} punten"
@@ -4877,7 +4880,10 @@ nl:
     ldap_fields: 
       auth_filter_description: "Gebruik *%{placeholder}* als tijdelijke plaatsaanduiding voor de gebruikersnaam, opgegeven door de gebruiker. Bijvoorbeeld: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "Het te gebruiken LDAP-kenmerk om de Canvas-aanmelding te zoeken. Laat leeg om de door de gebruiker geleverde gebruikersnaam te gebruiken."
+      internal_ca_description: "Als je LDAP-server een certificaat weergeeft dat is uitgegeven door een interne hoofd-CA die niet wordt vertrouwd, *moet* je je hoofd-CA uploaden zodat Canvas deze kan vertrouwen wanneer er verbinding wordt gemaakt."
+      internal_ca_warning: "*Waarschuwing*: Het gebruik van een interne hoofd-CA is minder veilig en verhoogt het risico op compromittering. We raden ten zeerste aan in plaats daarvan certificaten te gebruiken die door een vertrouwde certificaatautoriteit zijn uitgegeven."
       ldap_timeout_failure_help2: "Als Canvas te vaak een time-out ondervindt bij het communiceren met de LDAP-server, worden verdere aanmeldingspogingen om die LDAP-server te gebruiken geblokkeerd voor %{time}. De laatste keer dat de LDAP-server een time-out ondervond was op %{timestamp}."
+      verify_tls_cert_opt_in_description: "Op *%{enforcement_date}* zal TLS-certificaatverificatie vereist zijn, maar je kunt het eerder inschakelen om ervoor te zorgen dat je LDAP-server voldoet."
     ldap_settings_test: 
       labels: 
         pass: Wachtwoord
@@ -6054,6 +6060,9 @@ nl:
   catalog_name_46d37909: Catalogusnaam
   catalog_url_a01655dd: "Catalogus URL"
   catalog_users_already_exist_2894b8c4: "Catalogusgebruikers bestaan al"
+  catalog_was_provisioned_9851448f: "Catalogus was ingericht."
+  catalog_was_unprovisioned_9524cb58: "Inrichting catalogus was ongedaan gemaakt."
+  catalog_was_updated_743a58eb: "Catalogus was bijgewerkt."
   category_b9a94408: Categorie
   categoryname_notification_preferences_cd64e4a0: "%{categoryName}-meldingsvoorkeuren"
   cc: 
@@ -6072,6 +6081,8 @@ nl:
   cell_number_is_required_2edcee60: "Mobiel telefoonnummer is verplicht"
   central_value_in_a_set_of_results_calculated_by_di_19a8c48a: "Centrale waarde in een reeks resultaten. Berekend door de som van alle itemscores te delen door het aantal scores."
   certificate_fingerprint_b376df90: "Certificaat van vingerafdruk"
+  certificate_is_expired_or_not_yet_valid_4a3bb8f1: "Cerfiticaat is verlopen of niet meer geldig."
+  certificate_is_not_a_ca_9ec5d574: "Cerfiticaat is geen CA"
   change_applied_89d1aa5a: "Wijziging toegepast"
   change_beginning_date_to_39dbd06e: "Startdatum wijzigen naar"
   change_color_for_mastery_level_position_daa51849: "Kleur voor vakbeheersingsniveau %{position} veranderen"
@@ -10616,6 +10627,8 @@ nl:
   drag_a_file_here_or_1aaf19c1: "Sleep een bestand hierheen of"
   drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: "Sleep een bestand hierheen of klik op een bestand om dit te selecteren voor uploaden"
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: "Bestanden naar modules slepen en neerzetten en uploads van module-items met meerdere bestanden"
+  drag_and_drop_or_browse_your_files_92ad4c17: "Slepen en neerzetten of *je bestanden doorzoeken*"
+  drag_and_drop_or_browse_your_files_to_replace_27cc42d6: "Slepen en neerzetten of *je bestanden doorzoeken* om te vervangen"
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "Slepen en neerzetten of klikken om je computer te doorzoeken"
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "Slepen en neerzetten of klikken om je computer te doorzoeken"
   drag_and_drop_your_image_here_or_7fba7c14: "Je afbeelding slepen en hier neerzetten of "
@@ -15188,6 +15201,7 @@ nl:
   integrations_cadb03f3: Integraties
   interactions_report_47c1219e: "Rapport Interacties"
   internal_analytics_f02b3fff: "Internal Analytics"
+  internal_certificate_authority_ca_76566a37: "Interne certificaatautoriteit (CA)"
   internal_setting_created_f3f72416: "Interne instelling gemaakt"
   internal_setting_deleted_aaf1dd9d: "Interne instelling verwijderd"
   internal_setting_updated_87510559: "Interne instelling bijgewerkt"
@@ -15240,6 +15254,7 @@ nl:
   invalid_hexcode_9124519f: "Ongeldige hex-code"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Ongeldige hex-code. Voer hier een geldige hex-code in om een aangepaste kleur te gebruiken."
   invalid_hexcode_provided_522ba223: "Ongeldige hex-code geleverd"
+  invalid_login_request_1639c89f: "Ongeldige aanmeldverzoek"
   invalid_microsoft_sync_tenant_given_please_validat_97be36bf: "Ongeldige Microsoft Sync-tenant gegeven. Valideer je tenant"
   invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "Ongeldige Microsoft Sync-tenant gegeven. Valideer je tenant."
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "Ongeldig Microsoft Team Sync remote-kenmerk. Geldige remote-kenmerken: %{VALID_SYNC_REMOTE_ATTRIBUTES}"
@@ -17773,6 +17788,8 @@ nl:
       email: 
         html: 
           announcement_info: "Antwoorden op deze e-mail worden gepost als antwoord op de aankondiging, die voor iedereen in de cursus wordt weergegeven."
+          announcement_info_course: "Antwoorden op deze e-mail worden gepost als antwoord op de aankondiging, die voor iedereen in de cursus wordt weergegeven."
+          announcement_info_group: "Antwoorden op deze e-mail worden gepost als antwoord op de aankondiging, die voor iedereen in de groep wordt weergegeven."
           attached_file: "Bijgevoegd bestand"
           link: "Aankondiging weergeven"
         labels: 
@@ -18566,6 +18583,8 @@ nl:
   modify_permissions_for_account_rubrics_6c3aee59: "Machtigingen wijzigen voor accountrubrieken"
   modify_settings_ed8b9ccf: "Instellingen wijzigen"
   module_90d9fd32: Module
+  module_and_items_published_13ed5cd6: "Module en items gepubliceerd"
+  module_and_items_unpublished_e953ba4f: "Publicatie module en items ongedaan gemaakt"
   module_completed_50c50762: "Module voltooid"
   module_content_import_enhancements_c00b0ea2: "Importverbeteringen voor module-inhoud"
   module_file_upload_enhancements_eecd4d37: "Verbeteringen bij uploaden van modulebestanden"
@@ -18597,6 +18616,7 @@ nl:
   module_navigation_97043417: Modulenavigatie
   module_publish_menu_30b638dd: "Menu Module publiceren"
   module_publish_menu_88b54c1b: "Menu Module publiceren"
+  module_published_80f0b9b8: "Module gepubliceerd"
   modules: 
     add: 
       assignment: 
@@ -19005,6 +19025,7 @@ nl:
   nav_text_94206145: "Nav tekst"
   nav_text_active_a924ae88: "Nav tekst actief"
   navigate_to_speed_grader_for_name_f28cb5b1: "Ga naar SpeedGrader voor %{name}"
+  navigate_to_speed_grader_for_title_assignment_828b1366: "Navigeer naar SpeedGrader voor %{title} opdracht"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigatie - Hiermee kan een gebruiker de link Personen in Cursusnavigatie weergeven."
   navigation_icon_45db938e: "Navigatie icoon"
   navigation_menu_fd782ff8: Navigatiemenu
@@ -19099,6 +19120,7 @@ nl:
   new_quizzes_dbda7e0a: "Nieuwe toetsen"
   new_quizzes_description: "Deze functie verbetert de Canvas-ervaring bij toetsen. Wanneer deze vlag is ingeschakeld, is de tool Nieuwe toetsen beschikbaar. Zie voor alle details de *Nieuwe toetsen gebruikersgroep* in de Canvas Community."
   new_quizzes_embedded_module_progression_cd2307b6: "Voortgang van module met ingesloten Nieuwe toetsen"
+  new_quizzes_export_support_b0a6a625: "Ondersteuning voor export van nieuwe toetsen"
   new_quizzes_importing_c167dce0: "New Quizzes importeren"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "Nieuwe toetsen opgenomen op tabblad Overzicht Leerdoelen afstemmen"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Migratie van Nieuwe toetsen tijdens het importeren of kopiëren van een cursus"
@@ -19374,6 +19396,8 @@ nl:
   not_submitted_fff47f17: "Niet ingeleverd"
   not_synced_529cbf29: "Niet gesynchroniseerd"
   not_synced_message_a343fe5e: "Niet gesynchroniseerd: %{message}"
+  not_valid_after_81c9faec: "Niet geldig na"
+  not_valid_before_9ad2d22d: "Niet geldig voor"
   not_visible_in_student_files_22f11883: "Niet zichtbaar in cursistbestanden."
   not_yet_assessed_9362f199: "Nog niet beoordeeld"
   not_yet_completed_345a0bca: "Nog niet voltooid"
@@ -20563,6 +20587,7 @@ nl:
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "Voer een getal in tussen 0 en 100 voor de migratiesnelheid"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Voer een zoekterm in van drie of meer tekens"
   please_enter_a_url_d2c868b5: "Voer een URL in"
+  please_enter_a_valid_search_term_5c69b0b0: "Voer een geldige zoekterm in"
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Voer een geldige URL in (bijvoorbeeld http://voorbeeld.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Voer een geldige URL in. Protocol is vereist (bijvoorbeeld http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__6dc0071c: "Voer een geldige URL in. Protocol is vereist (bijv. http://, https://, ftp://, tel:)."
@@ -21257,6 +21282,7 @@ nl:
   privacy_290109ea: Privacy
   privacy_level_f0ec09a3: Privacyniveau
   private_3883d133: Privé
+  private_key_is_present_in_certificate_file_1a1b7b42: "Privésleutel bevindt zich in certificaatbestand"
   pro_tip_30e41fa3: "HANDIGE TIP!"
   proceed_f3d33864: Doorgaan
   proceed_with_caution_aa9b3285: "Ga voorzichtig te werk"
@@ -21776,6 +21802,8 @@ nl:
   publishing_error_bdfb3390: Publicatiefout
   publishing_is_disabled_for_this_item_efa7803f: "Publicatie van dit item is uitgeschakeld"
   publishing_item_name_is_disabled_8207a9e7: "Publicatie van %{item_name} is uitgeschakeld"
+  publishing_module_and_items_ce128d12: "Bezig met publiceren van module en items"
+  publishing_module_c2b5211: "Bezig met publiceren van module"
   publishing_pace_a65e4152: Publicatietempo...
   publishing_plan_b70186ed: Publicatieplan...
   publishing_progress_5154a430: "Voortgang van publiceren"
@@ -23146,6 +23174,8 @@ nl:
         one: "1 seconde"
         other: "%{count} seconden"
       show_time_link: "Tijd tonen"
+      time_remaining: "Je hebt nog %{time} over"
+      times_up: "De tijd is om! De resultaten worden over 10 seconden ingeleverd"
       titles: 
         come_back_later: "Je hebt deze vraag gemarkeerd om later nogmaals weer te geven"
         times_up: "Tijd is om!"
@@ -23585,6 +23615,7 @@ nl:
   remove_attribute_59a4aa64: "Kenmerk verwijderen"
   remove_avatar_picture_aba765eb: "Avatarfoto verwijderen"
   remove_c_name_section_d8eabd3a: "%{c.name} Sectie verwijderen"
+  remove_certificate_4e979eee: "Certificaat verwijderen"
   remove_collaborationtitle_c3e81adb: "\"%{collaborationTitle}\" verwijderen?"
   remove_condition_9cf94f7f: "Conditie verwijderen"
   remove_conference_69b9e0d0: "Vergadering verwijderen"
@@ -24396,6 +24427,7 @@ nl:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: "Opdrachten zoeken in Cijferlijst en nieuw ontwerp voor opdrachten en cursisten zoeken"
   search_by_99d1ba5f: "Zoeken op"
   search_by_c559efd: "Zoeken op"
+  search_by_name_or_id_3bdab12e: "Zoeken op naam of ID"
   search_by_student_name_26536097: "Zoeken op naam van cursist"
   search_by_title_or_author_273a8f49: "Zoeken op titel of auteur..."
   search_by_title_short_name_or_sis_id_fe84aa12: "Zoeken op titel, korte naam of SIS-ID"
@@ -24586,6 +24618,7 @@ nl:
     one: "Selecteer (%{count}) cursus"
     other: "Selecteer alle (%{count}) cursussen"
   select_all_students_7c2c34b3: "Alle cursisten selecteren"
+  select_an_account_to_update_b7521f0a: "Een account selecteren om bij te werken."
   select_an_edit_operation_ec1467d: "Selecteer een bewerking"
   select_an_outcome_group_6edb08a7: "Selecteer een leerdoelgroep"
   select_another_group_24773e5f: "Andere groep selecteren"
@@ -26244,6 +26277,7 @@ nl:
   sticky_left_navigation_3d438a81: "Sticky navigatie aan linkerkant"
   still_having_difficulty_get_more_help_here_3cdc8de1: "Nog steeds problemen? Hier krijg je hulp:"
   stop_acting_as_user_8809a97f: "Stop met optreden als gebruiker"
+  stop_fd9822ab: Stoppen
   storage_quotas_manage_6ca14bbb: "Opslagquota - beheren"
   storage_used_in_mb_c75fbd9c: "opslag gebruikt in MB"
   store_and_share_course_assets_82a9967c: "Cursusmiddelen bewaren en delen"
@@ -26774,6 +26808,7 @@ nl:
       student_support: "NetAcad ondersteuning - Cursist"
       student_support_description: "Je cursusleider moet je eerste contactpunt zijn. Zij kunnen je Networking Academy-vragen beantwoorden of voor jou contact opnemen met de helpdesk. Je kunt contact opnemen met je cursusleider met behulp van de Inbox-functie."
       support_desk_livechat: "Helpdesk Live Chat"
+  support_exporting_new_quizzes_in_qti_format_ba09b465: "Ondersteuning exporteren van Nieuwe toetsen in QTI-indeling"
   support_favorite_lti_tools_in_the_rce_1680436d: "Ondersteun favoriete LTI-tools in de RCE"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "Bijna overal ondersteuning voor LaTex wiskundige vergelijkingen"
   support_uploading_closed_caption_files_in_all_the__418c06d4: |-
@@ -27824,6 +27859,7 @@ nl:
   this_permission_requires_the_account_and_course_le_bdeefd51: "Deze machtiging vereist de functieoptie Vakbeheersingsschalen voor leerdoelen op account- en cursusniveau die alleen op accountniveau kan worden ingeschakeld."
   this_permission_should_only_be_assigned_to_users_t_231c182e: "Deze machtiging mag alleen worden toegekend aan gebruikers die je instituut heeft geautoriseerd om op te treden als andere gebruikers in je volledige Canvas-account."
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Voor deze plaatsing is Deep Link-ondersteuning door de leverancier vereist. Controleer bij de leverancier van de tool of deze functionaliteit wordt ondersteund."
+  this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: "Dit proces kan een paar minuten duren. Kik op de knop Stoppen om de verwerking te onderbreken. Items die al zijn verwerkt, worden niet naar hun vorige status teruggezet."
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: "Dit een paar minuten duren. Door op Annuleren te klikken wordt het proces stopgezet, maar items die al zijn verwerkt, worden niet naar de vorige status teruggezet."
   this_pronoun_appears_after_last_name_bf5c0bf5: "Dit voornaamwoord wordt na de achternaam weergegeven"
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Dit voornaamwoord verschijnt achter je naam indien ingeschakeld"
@@ -29021,6 +29057,7 @@ nl:
   unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
       Kan geen vergrendeling op SFTP-gebruikerstabel verkrijgen. Probeer het straks opnieuw.
                                     Neem contact op in #canvas-sre in Slack als het blijft mislukken.
+  unable_to_parse_certificate_f25ff8b5: "Kan certificaat niet parseren"
   unable_to_read_file_2d04b0c: "Kan bestand niet lezen"
   unable_to_remove_app_4293cb53: "Kan app niet verwijderen"
   unable_to_remove_outcomes_f682e68f: 
@@ -29037,7 +29074,9 @@ nl:
   unable_to_switch_students_b901bc4b: "Kan niet van cursist wisselen"
   unable_to_toggle_placement_833db6ff: "Kan plaatsing niet in-/uitschakelen"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Kan bestand niet overzetten naar de opslagservice. Misschien is de service niet geactiveerd of moet je je opnieuw aanmelden bij Canvas."
+  unable_to_update_domains_44c5dd55: "Kan domeinen niet bijwerken"
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Kan Microsoft Teams Sync-instellingen niet bijwerken. Probeer het opnieuw. Neem contact op met ondersteuning als het probleem blijft bestaan."
+  unable_to_update_quotas_62baf95b: "Kan quota's niet bijwerken"
   unable_to_update_splitscreen_preference_4d449fa5: "Kan Splitscreen-voorkeur niet bijwerken."
   unaccepted_students_aa68ea98: "Geweigerde cursisten"
   unarchive_f245e2d6: "Archiveren ongedaan maken"
@@ -29190,6 +29229,7 @@ nl:
   unpublished_drafts_count_86e16f17: "Niet gepubliceerde concepten (%{count})"
   unpublished_subjects_62a7d38: "Niet-gepubliceerde vakken"
   unpublishing_1fa99dc6: "Publicatie ongedaan maken..."
+  unpublishing_module_and_items_ca2edd97: "Bezig met het ongedaan maken van het publiceren van module en items"
   unread_c14cb06f: "ongelezen,"
   unread_e9c1b19c: Ongelezen
   unread_ee6db4aa: ongelezen
@@ -29315,6 +29355,7 @@ nl:
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Ingezonden bestanden met opdrachten uploaden naar een speciale map alleen-lezen met inzendingen."
   upload_gradebook_386a46c8: "Cijferlijst uploaden"
   upload_image_6120b609: "Afbeelding uploaden"
+  upload_internal_root_ca_46cf9b36: "Interne hoofd-CA uploaden"
   upload_media_ce31135a: "Media uploaden"
   upload_not_available_for_this_folder_8f8623c6: "Upload niet beschikbaar voor deze map"
   upload_percent_complete_d533d3e2: "Percentage voltooid uploaden"
@@ -29362,6 +29403,10 @@ nl:
   use_arrows_a60b3330: "Pijlen gebruiken"
   use_as_front_page_274a488b: "Als voorpagina gebruiken"
   use_as_frontpagetext_fa88bbb2: "Gebruik als %{frontPageText}"
+  use_attachment_ids_in_media_links_7bfb3422: "Gebruik bijlage-ID's in medialinks"
+  use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
+      Gebruik bijlage-ID's in medialinks zodat gebruikers altijd naar de juiste instantie van de media worden verwezen 
+      in plaats van naar het origineel.
   use_between_for_adding_multiple_users_26bff207: "Gebruik \",\" tussen namen wanneer je meerdere gebruikers toevoegt."
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Gebruik bladwijzers voor API-paginering in Inschrijvingenindex"
   use_cloudfront_for_docviewer_f21b96db: "Gebruik CloudFront voor DocViewer"
@@ -29945,6 +29990,7 @@ nl:
   users_with_this_permission_may_be_able_to_use_the__84394072: "Gebruikers met deze machtiging kunnen de functie Optreden als mogelijk gebruiken om accountinstellingen te beheren, cijfers te bekijken en aan te passen, toegang te verkrijgen tot gebruikersinformatie, enz. Deze machtiging geeft beheerders die zijn toegewezen aan een subaccount ook toegang tot instellingen en informatie buiten hun subaccount."
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Gebruikt de nieuwe planner en de functionaliteit daarvan"
   utc_e44049af: "Universeel Gecoördineerde Tijd (UTC)"
+  uuid_has_been_provisioned_ab0c6c9: "UUID is ingericht."
   validate: 
     is_required: "Dit veld is verplicht"
   validate_links_in_content_b1630fba: "Links in inhoud valideren"
@@ -29967,6 +30013,7 @@ nl:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite vergelijkbaarheidsscore -- meer informatie"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Vergelijkbaarheidsscore - Zie rapport met details"
   verify_ldap_tls_certificates_70241d8e: "LDAP TLS-certificaten verifiëren"
+  verify_tls_certificate_9cfa26d1: "TLS-certificaat verifiëren"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Verifieer TLS-certificaten die worden verstrekt door providers van LDAP-verificatie."
   version_versionnumber_updatedat_9f5b7a5b: "Versie %{versionNumber} %{updatedAt}"
   video_78335c71: video
