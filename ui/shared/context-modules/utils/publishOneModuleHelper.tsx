@@ -213,10 +213,8 @@ export function updateModuleItemsPublishedStates(
   document
     .querySelectorAll(`#context_module_content_${moduleId} .publish-icon`)
     .forEach(element => {
-      const $publishIcon = $(element)
-      const data = $publishIcon.data()
       exportFuncs.updateModuleItemPublishedState(
-        data.moduleItemId,
+        element as HTMLElement,
         published,
         isPublishing,
         moduleItems
@@ -226,12 +224,16 @@ export function updateModuleItemsPublishedStates(
 
 // update an  item's pub/sub state
 export function updateModuleItemPublishedState(
-  itemId: string,
+  itemIdOrElem: string | HTMLElement,
   isPublished: boolean | undefined,
   isPublishing?: boolean,
   allModuleItems?: KeyedModuleItems | undefined
 ) {
-  const publishIcon = document.querySelector(`#context_module_item_${itemId} .publish-icon`)
+  const publishIcon =
+    typeof itemIdOrElem === 'string'
+      ? document.querySelector(`#context_module_item_${itemIdOrElem} .publish-icon`)
+      : itemIdOrElem
+
   if (publishIcon) {
     const $publishIcon = $(publishIcon)
     const data = $publishIcon.data()
