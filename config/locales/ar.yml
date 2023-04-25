@@ -255,6 +255,7 @@ ar:
   a_simplified_canvas_interface_for_k_5_enable_appli_bc32b2d1: |-
       واجهة Canvas مبسطة لرياض الأطفال وحتى الصف الخامس. تمكين حسابات فرعية
       قابلة للتطبيق كحسابات  لرياض الأطفال وحتى الصف الخامس في إعدادات الحساب.
+  a_single_certificate_file_e7f347f1: "ملف شهادة واحد"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "لم يتم تكوين تكامل SIS ولم يتم تمكين ميزة تمكين إعدادات تكامل SIS جديدة"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "قام طالب للتو بتسليم إرسال متأخر لـ %{assignment_name} في المساق %{course_name}"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "قام طالب للتو بتسليم إعادة إرسال لـ %{assignment_title} في المساق %{course_name}"
@@ -4224,9 +4225,11 @@ ar:
       settings: إعدادات
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: "لن يتم تعيين درجة لهذه المهمة."
+      assignment_not_yet_graded_rqd_screenreader: "لم يتم تقييم المهمة بعد"
       assignment_not_yet_graded_screenreader: "لم يتم تقييم المهمة حتى الآن. %{pointsPossible} نقطة/نقاط ممكنة."
       empty_points_possible: "-/%{pointsPossible} من النقاط"
       no_submission: "لا يوجد إرسال"
+      no_submission_for_assignment_rqd_screenreader: "لا يوجد إرسال لهذه المهمة."
       no_submission_for_assignment_screenreader: "لا يوجد إرسال لهذه المهمة. %{pointsPossible} نقطة/نقاط ممكنة."
       not_yet_graded: "*لم يتم منح درجة بعد*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} من النقاط"
@@ -5039,7 +5042,10 @@ ar:
     ldap_fields: 
       auth_filter_description: "استخدام *%{placeholder}* كعنصر نائب لاسم المستخدم المزود بواسطة المستخدم. على سبيل المثال: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "سمة LDAP المقرر استخدامها للبحث عن تسجيل دخول Canvas. اترك المساحة فارغة لاستخدام اسم المستخدم المزود بواسطة المستخدم."
+      internal_ca_description: "إذا كان خادم LDAP يعرض شهادة صادرة من مرجع مصدق جذري داخلي غير موثوق، *يجب* أن تحمّل المرجع المصدق الجذر حتى تثق به Canvas عند الاتصال."
+      internal_ca_warning: "*تحذير*: استخدام المرجع المصدق الجذري الداخلي أقل أمانًا، ويزيد من خطر الاختراق. بدلاً من ذلك نوصي بقوة باستخدام الشهادات الصادرة من مرجع مصدق موثوق."
       ldap_timeout_failure_help2: "إذا انتهت مهلة اتصال Canvas بخادم LDAP لمرات كثيرة للغاية، سيتم منع أي محاولات أخرى لتسجيل دخول من استخدام خادم LDAP ذلك لمدة %{time}. انتهت مهلة خادم LDAP الخاص بك آخر مرة في %{timestamp}."
+      verify_tls_cert_opt_in_description: "يلزم التحقق من صحة شهادة TLS على *%{enforcement_date}*، ولكن يمكنك تمكينه مبكرًا لضمان توافق خادم LDAP."
     ldap_settings_test: 
       labels: 
         pass: "كلمة المرور"
@@ -6223,6 +6229,9 @@ ar:
   catalog_name_46d37909: "اسم الكتالوج"
   catalog_url_a01655dd: "عنوان URL الكتالوج"
   catalog_users_already_exist_2894b8c4: "مستخدمو كتالوج موجودون بالفعل"
+  catalog_was_provisioned_9851448f: "تم توفير الكتالوج."
+  catalog_was_unprovisioned_9524cb58: "تم إلغاء توفير الكتالوج."
+  catalog_was_updated_743a58eb: "تم تحديث الكتالوج."
   category_b9a94408: الفئة
   categoryname_notification_preferences_cd64e4a0: "%{categoryName} تفضيلات الإعلامات"
   cc: 
@@ -6241,6 +6250,8 @@ ar:
   cell_number_is_required_2edcee60: "رقم الهاتف المحمول مطلوب"
   central_value_in_a_set_of_results_calculated_by_di_19a8c48a: "القيمة المركزية في مجموعة النتائج. تُحتسب بقسم مجموع نتائج جميع العناصر على عدد النتائج."
   certificate_fingerprint_b376df90: "بصمة الشهادة"
+  certificate_is_expired_or_not_yet_valid_4a3bb8f1: "انتهت صلاحية الشهادة أو لم يتم التحقق من صحتها"
+  certificate_is_not_a_ca_9ec5d574: "الشهادة ليست مرجع مصدق"
   change_applied_89d1aa5a: "تم تطبيق التغيير"
   change_beginning_date_to_39dbd06e: "تغيير تاريخ البدء إلى"
   change_color_for_mastery_level_position_daa51849: "تغيير اللون لمستوى الإجادة %{position}"
@@ -11199,6 +11210,8 @@ ar:
   drag_a_file_here_or_1aaf19c1: "قم بإفلات ملف هنا، أو"
   drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: "قم بإفلات ملف هنا، أو انقر لتحديد ملف للتحميل"
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: "اسحب وأفلت الملفات على الوحدات وتحميلات عناصر الوحدات متعددة الملفات"
+  drag_and_drop_or_browse_your_files_92ad4c17: "اسحب وأفلت أو *استعرض ملفاتك*"
+  drag_and_drop_or_browse_your_files_to_replace_27cc42d6: "اسحب وأفلت أو *استعرض ملفاتك* لاستبدالها"
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "اسحب وأفلت أو انقر لاستعراض الكمبيوتر الخاص بك"
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "اسحب وأفلت أو انقر لاستعراض الكمبيوتر الخاص بك"
   drag_and_drop_your_image_here_or_7fba7c14: "سحب وإسقاط الصورة هنا أو "
@@ -16001,6 +16014,7 @@ ar:
   integrations_cadb03f3: التكاملات
   interactions_report_47c1219e: "تقرير التفاعلات"
   internal_analytics_f02b3fff: "التحليلات الداخلية"
+  internal_certificate_authority_ca_76566a37: "المرجع المصدق (CA) الداخلي"
   internal_setting_created_f3f72416: "تم إنشاء الإعداد الداخلي"
   internal_setting_deleted_aaf1dd9d: "تم حذف الإعداد الداخلي"
   internal_setting_updated_87510559: "تم تحديث الإعداد الداخلي"
@@ -16053,6 +16067,7 @@ ar:
   invalid_hexcode_9124519f: "رمز سداسي غير صالح"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "رمز سداسي غير صالح. أدخل رمزًا سداسيًا صالحًا هنا لاستخدام لون مخصص."
   invalid_hexcode_provided_522ba223: "تم إدخال رمز سداسي غير صالح"
+  invalid_login_request_1639c89f: "طلب تسجيل دخول غير صالح"
   invalid_microsoft_sync_tenant_given_please_validat_97be36bf: "تم تحديد مستأجر مزامنة Microsoft غير صالح. يرجى التحقق من المستأجر"
   invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "تم تحديد مستأجر مزامنة Microsoft غير صالح. يرجى التحقق من المستأجر."
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "سمة غير صالحة لمزامنة Microsoft Teams عن بعد. سمات صالحة للمزامنة عن بعد: %{VALID_SYNC_REMOTE_ATTRIBUTES}"
@@ -18643,6 +18658,8 @@ ar:
       email: 
         html: 
           announcement_info: "سيتم نشر الردود على هذه الرسالة كرد على الإعلام، والذي سيراه الجميع في المساق."
+          announcement_info_course: "سيتم نشر الردود على هذه الرسالة كرد على الإعلان، والذي سيراه الجميع في المساق."
+          announcement_info_group: "سيتم نشر الردود على هذه الرسالة كرد على الإعلان، والذي سيراه الجميع في المجموعة."
           attached_file: "ملف مرفق"
           link: "عرض الإعلان"
         labels: 
@@ -19464,6 +19481,8 @@ ar:
   modify_permissions_for_account_rubrics_6c3aee59: "تعديل الأذونات لمعايير تقييم الحسابات"
   modify_settings_ed8b9ccf: "تعديل الإعدادات."
   module_90d9fd32: الوحدة
+  module_and_items_published_13ed5cd6: "تم نشر الوحدة النمطية والعناصر"
+  module_and_items_unpublished_e953ba4f: "تم إلغاء نشر الوحدة النمطية والعناصر"
   module_completed_50c50762: "الوحدة مكتملة"
   module_content_import_enhancements_c00b0ea2: "تعزيزات في استيراد محتوى الوحدات النمطية"
   module_file_upload_enhancements_eecd4d37: "تحسينات تحميل ملفات الوحدة"
@@ -19495,6 +19514,7 @@ ar:
   module_navigation_97043417: "التنقل بين الوحدات"
   module_publish_menu_30b638dd: "قائمة نشر الوحدة النمطية"
   module_publish_menu_88b54c1b: "قائمة نشر الوحدة النمطية"
+  module_published_80f0b9b8: "تم نشر الوحدة النمطية"
   modules: 
     add: 
       assignment: 
@@ -19919,6 +19939,7 @@ ar:
   nav_text_94206145: "نص التنقل"
   nav_text_active_a924ae88: "نص التنقل نشط"
   navigate_to_speed_grader_for_name_f28cb5b1: "تنقل إلى Speed Grader لـ%{name}"
+  navigate_to_speed_grader_for_title_assignment_828b1366: "انتقل إلى Speed Grader لمهمة %{title}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "تسمح لوحة التنقل للمستخدم بعرض ارتباط الأشخاص في لوحة تنقل المساق."
   navigation_icon_45db938e: "رمز التصفح"
   navigation_menu_fd782ff8: "قائمة التنقل"
@@ -20013,6 +20034,7 @@ ar:
   new_quizzes_dbda7e0a: "الاختبارات الموجزة الجديدة"
   new_quizzes_description: "تعزز هذه الميزة من تجربة Canvas للاختبارات الموجزة. عند تمكين هذه العلامة، ستتوفر أداة الاختبارات الموجزة الجديدة. للحصول على التفاصيل الكاملة، يرجى الاطلاع على *مجموعة مستخدم الاختبارات الموجزة الجديد* في مجتمع Canvas."
   new_quizzes_embedded_module_progression_cd2307b6: "تقدم الوحدة النمطية المضمنة للاختبارات الموجزة الجديدة"
+  new_quizzes_export_support_b0a6a625: "دعم تصدير الاختبارات الموجزة الجديدة"
   new_quizzes_importing_c167dce0: "استيراد New Quizzes"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "تضمين الاختبارات الموجزة الجديدة على علامة تبويب ملخص محاذاة المخرجات"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "ترحيل الاختبارات الموجزة الجديدة أثناء استيراد/نسخ المساق"
@@ -20288,6 +20310,8 @@ ar:
   not_submitted_fff47f17: "لم يتم الإرسال"
   not_synced_529cbf29: "غير متزامن"
   not_synced_message_a343fe5e: "غير متزامن: %{message}"
+  not_valid_after_81c9faec: "غير صالح بعد"
+  not_valid_before_9ad2d22d: "غير صالح قبل"
   not_visible_in_student_files_22f11883: "غير مرئي في ملفات الطالب"
   not_yet_assessed_9362f199: "لم يتم تقييمها حتى الآن"
   not_yet_completed_345a0bca: "لم يكتمل بعد"
@@ -21498,6 +21522,7 @@ ar:
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "يرجى إدخال رقم بين 0 و100 لمعدل الترحيل"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "يرجى إدخال مصطلح بحث يحتوي على ثلاثة أحرف أو أكثر"
   please_enter_a_url_d2c868b5: "الرجاء إدخال عنوان URL"
+  please_enter_a_valid_search_term_5c69b0b0: "يرجى إدخال مصطلح بحث صالح"
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "يُرجى إدخال عنوان URL صالح (مثل http://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "يُرجى إدخال عنوان URL صالح. البروتوكول مطلوب (مثل: http://، https://، ftp://، tel:، mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__6dc0071c: "يُرجى إدخال عنوان URL صالح. يجب إدخال بروتوكول (مثل http://، https://، ftp://، tel:)."
@@ -22190,6 +22215,7 @@ ar:
   privacy_290109ea: الخصوصية
   privacy_level_f0ec09a3: "مستوى الخصوصية"
   private_3883d133: خاص
+  private_key_is_present_in_certificate_file_1a1b7b42: "المفتاح الخاص موجود في ملف الشهادة"
   pro_tip_30e41fa3: "نصيحة احترافية!"
   proceed_f3d33864: تقدم
   proceed_with_caution_aa9b3285: "تابع بحذر."
@@ -22708,6 +22734,8 @@ ar:
   publishing_error_bdfb3390: "خطأ في النشر"
   publishing_is_disabled_for_this_item_efa7803f: "ميزة النشر لهذا العنصر معطلة"
   publishing_item_name_is_disabled_8207a9e7: "ميزة نشر %{item_name} معطلة"
+  publishing_module_and_items_ce128d12: "جارٍ نشر الوحدة النمطية والعناصر"
+  publishing_module_c2b5211: "جارٍ نشر الوحدة النمطية"
   publishing_pace_a65e4152: "جارٍ نشر السرعة..."
   publishing_plan_b70186ed: "جارٍ نشر الخطة..."
   publishing_progress_5154a430: "تقدم النشر"
@@ -24234,6 +24262,8 @@ ar:
         two: "%{count} ثوانٍ"
         zero: "%{count} ثوانٍ"
       show_time_link: "إظهار الوقت"
+      time_remaining: "تبقى أمامك %{time}"
+      times_up: "انتهى الوقت! جارٍ إرسال نتائج بعد 10 ثوان"
       titles: 
         come_back_later: "قمت بوضع علامة على هذا السؤال للرجوع إليه لاحقًا"
         times_up: "انتهى الوقت!"
@@ -24709,6 +24739,7 @@ ar:
   remove_attribute_59a4aa64: "إزالة السمة"
   remove_avatar_picture_aba765eb: "إزالة صورة الأفاتار"
   remove_c_name_section_d8eabd3a: "إزالة القسم %{c.name}"
+  remove_certificate_4e979eee: "إزالة الشهادة"
   remove_collaborationtitle_c3e81adb: "إزالة \"%{collaborationTitle}\"؟"
   remove_condition_9cf94f7f: "إزالة الشرط"
   remove_conference_69b9e0d0: "إزالة مؤتمر"
@@ -25572,6 +25603,7 @@ ar:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: "بحث عن المهام في دفتر الدرجات وتصميم جديد للمهام وبحث الطلاب"
   search_by_99d1ba5f: "البحث بـ"
   search_by_c559efd: "البحث بـ"
+  search_by_name_or_id_3bdab12e: "البحث بالاسم أو بالمعرف"
   search_by_student_name_26536097: "البحث باسم الطالب"
   search_by_title_or_author_273a8f49: "البحث حسب العنوان أو المؤلف..."
   search_by_title_short_name_or_sis_id_fe84aa12: "البحث بالعنوان أو الاسم القصير أو معرف SIS"
@@ -25778,6 +25810,7 @@ ar:
     two: "تحديد كل الـ (%{count}) مساق"
     zero: "تحديد كل الـ (%{count}) مساق"
   select_all_students_7c2c34b3: "تحديد جميع الطلاب"
+  select_an_account_to_update_b7521f0a: "حدد حسابًا للتحديث."
   select_an_edit_operation_ec1467d: "تحديد عملية تحرير"
   select_an_outcome_group_6edb08a7: "حدد مجموعة مخرجات"
   select_another_group_24773e5f: "حدد مجموعة أخرى"
@@ -27481,6 +27514,7 @@ ar:
   sticky_left_navigation_3d438a81: "التنقل الأيسر اللاصق"
   still_having_difficulty_get_more_help_here_3cdc8de1: "هل ما زلت تواجه صعوبة؟ احصل على المزيد من المساعدة هنا:"
   stop_acting_as_user_8809a97f: "إيقاف التصرف كمستخدم"
+  stop_fd9822ab: إيقاف
   storage_quotas_manage_6ca14bbb: "حصص التخزين - إدارة"
   storage_used_in_mb_c75fbd9c: "حجم التخزين المستخدم بالميجابايت"
   store_and_share_course_assets_82a9967c: "خزن أصول المساق وشاركها"
@@ -28037,6 +28071,7 @@ ar:
       student_support: "دعم NetAcad - الطالب"
       student_support_description: "ينبغي أن يكون معلمك النقطة الأولى للاتصال. يمكنه الإجابة على أسئلتك على Networking Academy أو الاتصال بمكتب الدعم بالنيابة عنك. يمكنك الاتصال بمعلمك من خلال استخدام ميزة مربع الوارد."
       support_desk_livechat: "محادثة مباشرة مع مكتب الدعم"
+  support_exporting_new_quizzes_in_qti_format_ba09b465: "دعم تصدير الاختبارات الموجزة الجديدة بتنسيق QTI"
   support_favorite_lti_tools_in_the_rce_1680436d: "دعم أدوات LTI المفضلة في RCE"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "ادعم معادلات LaTex الرياضية في كل مكان تقريبًا"
   support_uploading_closed_caption_files_in_all_the__418c06d4: |-
@@ -29135,6 +29170,7 @@ ar:
   this_permission_requires_the_account_and_course_le_bdeefd51: "يتطلب هذا الإذن خيار ميزة مقاييس إجادة المخرجات على مستويي الحساب والمساق، والتي لا يمكن تمكينها إلى على مستوى الحساب."
   this_permission_should_only_be_assigned_to_users_t_231c182e: "يجب تعيين هذا الإذن فقط للمستخدمين الذين خولتهم مؤسستك للتصرف كمستخدمين آخرين في حساب Canvas لديك بالكامل."
   this_placement_requires_deep_link_support_by_the_v_702d554f: "هذا التعيين يتطلب دعم ارتباط داخلي بواسطة البائع. تحقق من بائع الأداة للتأكد من دعمهم لهذه الوظيفة"
+  this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: "قد تستغرق هذه العملية بضع دقائق. انقر فوق زر \"إيقاف\" للتوقف عن المعالجة. لن يتم عكس العناصر التي تمت معالجتها بالفعل إلى حالتها السابقة."
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: "قد تستغرق هذه العملية بضع دقائق. سيؤدي النقر فوق إلغاء إلى إيقاف العملية، ولكن يتم عكس العناصر التي تمت معالجتها بالفعل إلى حالتها السابقة."
   this_pronoun_appears_after_last_name_bf5c0bf5: "هذا الضمير يظهر بعد اسم العائلة"
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "سيظهر هذا الضمير بعد تمكين اسمك"
@@ -30340,6 +30376,7 @@ ar:
   unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
       يتعذر الحصول على جدول مستخدمي SFTP للتأمين. يرجى إعادة المحاولة بعد دقيقة واحدة.
                                     إذا استمر الفشل، يرجى التواصل من خلال #canvas-sre في Slack.
+  unable_to_parse_certificate_f25ff8b5: "يتعذر تحليل الشهادة"
   unable_to_read_file_2d04b0c: "يتعذر قراءة الملف"
   unable_to_remove_app_4293cb53: "يتعذر إزالة التطبيق"
   unable_to_remove_outcomes_f682e68f: 
@@ -30360,7 +30397,9 @@ ar:
   unable_to_switch_students_b901bc4b: "يتعذر تبديل الطلاب"
   unable_to_toggle_placement_833db6ff: "يتعذر تبديل التعيين"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "يتعذر نقل الملف إلى خدمة التخزين. قد تكون الخدمة معطلة أو قد تحتاج إلى إعادة تسجيل الدخول إلى Canvas."
+  unable_to_update_domains_44c5dd55: "يتعذر تحديث المجالات"
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "يتعذر تحديث إعدادات مزامنة Microsoft Teams. يرجى إعادة المحاولة. إذا استمرت المشكلة، يرجى الاتصال بالدعم."
+  unable_to_update_quotas_62baf95b: "يتعذر تحديث الحصص النسبية"
   unable_to_update_splitscreen_preference_4d449fa5: "يتعذر تحديث تفضيل تقسيم الشاشة."
   unaccepted_students_aa68ea98: "طلاب غير مقبولين"
   unarchive_f245e2d6: "إلغاء الأرشفة"
@@ -30521,6 +30560,7 @@ ar:
   unpublished_drafts_count_86e16f17: "المسودات غير المنشورة (%{count})"
   unpublished_subjects_62a7d38: "الموضوعات غير المنشورة"
   unpublishing_1fa99dc6: "جارٍ إلغاء النشر..."
+  unpublishing_module_and_items_ca2edd97: "جارٍ إلغاء نشر الوحدة النمطية والعناصر"
   unread_c14cb06f: "غير مقروء،"
   unread_e9c1b19c: "غير مقروء"
   unread_ee6db4aa: "غير مقروء"
@@ -30654,6 +30694,7 @@ ar:
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "تحميل ملفات أُرسلت مع مهام إلى مجلد إرسالات خاص قابل للقراءة فقط"
   upload_gradebook_386a46c8: "تحميل دفتر الدرجات"
   upload_image_6120b609: "تحميل صورة"
+  upload_internal_root_ca_46cf9b36: "تحميل المرجع المصدق الجذري الداخلي"
   upload_media_ce31135a: "تحميل الوسائط"
   upload_not_available_for_this_folder_8f8623c6: "التحميل غير متاح لهذا المجلد"
   upload_percent_complete_d533d3e2: "اكتملت النسبة المئوية للتحميل"
@@ -30701,6 +30742,10 @@ ar:
   use_arrows_a60b3330: "استخدام أسهم"
   use_as_front_page_274a488b: "استخدم كصفحة أمامية"
   use_as_frontpagetext_fa88bbb2: "استخدام كـ%{frontPageText}"
+  use_attachment_ids_in_media_links_7bfb3422: "استخدام معرفات المرفقات في روابط الوسائط"
+  use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
+      استخدم معرفات المرفقات في روابط الوسائط حتى يشير المستخدمون دائمًا إلى المثيل الصحيح للوسائط 
+      بدلاً من الأصلي
   use_between_for_adding_multiple_users_26bff207: "استخدم \",\" في الوسط لإضافة مستخدمين متعددين."
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "استخدام إضافة إشارة مرجعية لفصل الصفحات في فهرس التسجيلات"
   use_cloudfront_for_docviewer_f21b96db: "استخدام CloudFront لـ DocViewer"
@@ -31317,6 +31362,7 @@ ar:
   users_with_this_permission_may_be_able_to_use_the__84394072: "يستطيع المستخدمون من خلال هذا الإذن استخدام الإجراء كميزة لإدارة إعدادات الحساب وعرض الدرجات وتعديلها والوصول إلى معلومات المستخدم وما شابه. كما يسمح هذا الإذن للمسؤولين المخصصين لحساب فرعي بالوصول إلى الإعدادات والمعلومات خارج حسابهم الفرعي."
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "استخدام المجدول الجديد ووظيفته"
   utc_e44049af: "التوقيت العالمي المتفق عليه"
+  uuid_has_been_provisioned_ab0c6c9: "تم توفير المعرف الفريد العالمي (UUID)."
   validate: 
     is_required: "هذا الحقل مطلوب"
   validate_links_in_content_b1630fba: "المصادقة على الارتباطات في المحتوى"
@@ -31339,6 +31385,7 @@ ar:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite درجة التشابه -- مزيد من المعلومات"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite درجة التشابه  - انظر التقرير التفصيلي"
   verify_ldap_tls_certificates_70241d8e: "التحقق من شهادات LDAP TLS"
+  verify_tls_certificate_9cfa26d1: "تحقق من شهادة TLS"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "تحقق من شهادات TLS المقدمة بواسطة مزودي مصادقة LDAP."
   version_versionnumber_updatedat_9f5b7a5b: "الإصدار %{versionNumber} %{updatedAt}"
   video_78335c71: فيديو

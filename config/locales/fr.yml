@@ -227,6 +227,7 @@ fr:
   a_simplified_canvas_interface_for_k_5_enable_appli_bc32b2d1: |-
       Une interface Canvas simplifiée pour K-5. Activer le(s) sous-compte(s) applicable(s)
       comme comptes K-5 dans les paramètres du compte.
+  a_single_certificate_file_e7f347f1: "Un fichier certificat unique"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "Une intégration SIS n'a pas été configurée, et la fonction « Activer les nouveaux paramètres d'intégration SIS » n'est pas activée."
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "Un étudiant vient de remettre en retard une demande de %{assignment_name} dans le cours %{course_name}"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "Un élève vient de transmettre une re-soumission pour %{assignment_title} dans le cours %{course_name}"
@@ -4091,9 +4092,11 @@ fr:
       settings: Paramètres
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: "Ce travail ne sera pas noté."
+      assignment_not_yet_graded_rqd_screenreader: "Travail pas encore noté."
       assignment_not_yet_graded_screenreader: "Travail pas encore noté. %{pointsPossible} points possibles."
       empty_points_possible: "-/%{pointsPossible} pts"
       no_submission: "Aucun envoi"
+      no_submission_for_assignment_rqd_screenreader: "Pas de soumission pour ce travail."
       no_submission_for_assignment_screenreader: "Pas d’envoi pour ce travail. %{pointsPossible} points possibles."
       not_yet_graded: "*Pas encore noté*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} points"
@@ -4875,7 +4878,10 @@ fr:
     ldap_fields: 
       auth_filter_description: "Utiliser *%{placeholder}* comme espace réservé pour le nom d'utilisateur fourni par l'utilisateur. Par exemple : *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "L'attribut LDAP à utiliser pour rechercher la connexion Canvas. Laisser vide pour utiliser le nom d'utilisateur fourni par l'utilisateur."
+      internal_ca_description: "Si votre serveur LDAP présente un certificat émis par une AC racine interne sans confiance, vous *devez* téléverser votre AC racine pour que Canvas lui fasse confiance au moment de la connexion."
+      internal_ca_warning: "*Avertissement* : L’utilisation d'une AC racine interne est une technique moins sécurisée, qui augmente le risque de compromission. Nous recommandons fortement d’utiliser plutôt des certificats issus d'une autorité de certification de confiance."
       ldap_timeout_failure_help2: "Si Canvas se déconnecte trop souvent en communiquant avec le serveur LDAP, il bloquera d'autres tentatives de connexion à l'aide de ce serveur LDAP pendant %{time}. La dernière fois que votre serveur LDAP s'est arrêté à %{timestamp}."
+      verify_tls_cert_opt_in_description: "La vérification de certificat TLS sera nécessaire à compter du *%{enforcement_date}*, mais vous pouvez l’activer en avance pour vous assurer de disposer d'un serveur conforme au protocole LDAP."
     ldap_settings_test: 
       labels: 
         pass: "Mot de passe"
@@ -6057,6 +6063,9 @@ fr:
   catalog_name_46d37909: "Nom du catalogue"
   catalog_url_a01655dd: "URL du catalogue"
   catalog_users_already_exist_2894b8c4: "Il y a déjà des utilisateurs de catalogue"
+  catalog_was_provisioned_9851448f: "Le catalogue a été provisionné."
+  catalog_was_unprovisioned_9524cb58: "Le catalogue a été déprovisionné."
+  catalog_was_updated_743a58eb: "Le catalogue a été mis à jour."
   category_b9a94408: Catégorie
   categoryname_notification_preferences_cd64e4a0: "Préférences de notifications %{categoryName}"
   cc: 
@@ -6075,6 +6084,8 @@ fr:
   cell_number_is_required_2edcee60: "Le numéro de téléphone portable est requis"
   central_value_in_a_set_of_results_calculated_by_di_19a8c48a: "La valeur centrale est un ensemble de résultats Calculé en divisant la somme de tous les scores par le nombre de scores."
   certificate_fingerprint_b376df90: "Empreinte digitale du Certificat"
+  certificate_is_expired_or_not_yet_valid_4a3bb8f1: "Le certificat a expiré, ou bien il n’est pas encore valide."
+  certificate_is_not_a_ca_9ec5d574: "Le certificat n’est pas celui d'une AC"
   change_applied_89d1aa5a: "Modification appliquée"
   change_beginning_date_to_39dbd06e: "Changer la date de début par"
   change_color_for_mastery_level_position_daa51849: "Changer la couleur du niveau de réussite %{position}"
@@ -6136,7 +6147,7 @@ fr:
   check_your_spelling_or_try_fewer_letters_70769a90: "Vérifiez que vous l’avez écrit correctement, ou essayez avec moins de lettres."
   checkbox_examples_dc790142: "Exemples de cases à cocher"
   checked_883b93fd: coché
-  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Cocher « Ajouter au calendrier » invitera tous les membres du cours."
+  checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Cocher « Ajouter au calendrier » invitera tous les membres du cours."
   cheerful_panda_holding_a_map_17ba47ee: "Joyeux panda tenant une carte"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Le cours enfant doit appartenir au même compte racine que le cours maître"
   child_s_username_dde3aa9: "Nom d'utilisateur de votre enfant"
@@ -10629,6 +10640,8 @@ fr:
   drag_a_file_here_or_1aaf19c1: "Faites glisser un fichier ici, ou"
   drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: "Faites glisser un fichier ici, ou cliquez pour sélectionner un fichier à télécharger."
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: "Glisser-déposer de fichiers sur les modules et envois multi-fichiers d’éléments de modules"
+  drag_and_drop_or_browse_your_files_92ad4c17: "Glissez-déposez ou *parcourez vos fichiers*"
+  drag_and_drop_or_browse_your_files_to_replace_27cc42d6: "Glissez-déposez ou *parcourez vos fichiers* à remplacer"
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "Glissez-déposez ou cliquez pour naviguer sur votre ordinateur"
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "Glissez et déposez ou cliquez pour rechercher sur votre ordinateur"
   drag_and_drop_your_image_here_or_7fba7c14: "Faire glisser et déposer votre image ici ou "
@@ -15198,6 +15211,7 @@ fr:
   integrations_cadb03f3: Intégrations
   interactions_report_47c1219e: "Rapport d’interactions"
   internal_analytics_f02b3fff: "Analyses internes"
+  internal_certificate_authority_ca_76566a37: "Autorité de certification interne (AC)"
   internal_setting_created_f3f72416: "Paramètre interne créé"
   internal_setting_deleted_aaf1dd9d: "Paramètre interne supprimé"
   internal_setting_updated_87510559: "Paramètre interne mis à jour"
@@ -15250,6 +15264,7 @@ fr:
   invalid_hexcode_9124519f: "Hexcode non valide"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Hexcode non valide. Saisissez ici un hexcode valide pour utiliser une couleur personnalisée."
   invalid_hexcode_provided_522ba223: "Hexcode invalide fourni"
+  invalid_login_request_1639c89f: "Requête de connexion non valide"
   invalid_microsoft_sync_tenant_given_please_validat_97be36bf: "Le client Microsoft Sync indiqué est invalide. Veuillez valider votre client"
   invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "Le client Microsoft Sync indiqué est invalide. Veuillez valider votre locataire"
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "Attribut Microsoft Team Sync distant non valide Les attributs valides sont les suivants : %{VALID_SYNC_REMOTE_ATTRIBUTES}"
@@ -17783,6 +17798,8 @@ fr:
       email: 
         html: 
           announcement_info: "Les réponses à cet e-mail seront publiées sous forme de réponse à l'annonce et visible par tous les participants du cours."
+          announcement_info_course: "Les réponses à cet e-mail seront publiées sous forme de réponse à l'annonce et visible par tous les participants du cours."
+          announcement_info_group: "Les réponses à cet e-mail seront publiées sous forme de réponse à l'annonce et visible par tous les participants du groupe."
           attached_file: "Fichier joint"
           link: "Afficher l’annonce"
         labels: 
@@ -18576,6 +18593,8 @@ fr:
   modify_permissions_for_account_rubrics_6c3aee59: "Modifier les autorisations pour la section « Barèmes de comptes »."
   modify_settings_ed8b9ccf: "Modifier les paramètres"
   module_90d9fd32: Module
+  module_and_items_published_13ed5cd6: "Module et éléments publiés"
+  module_and_items_unpublished_e953ba4f: "Modules et éléments dépubliés"
   module_completed_50c50762: "Module terminé"
   module_content_import_enhancements_c00b0ea2: "Amélioration de l'importation des contenus de module"
   module_file_upload_enhancements_eecd4d37: "Améliorations du module d’envoi de fichiers"
@@ -18607,6 +18626,7 @@ fr:
   module_navigation_97043417: "Navigation module"
   module_publish_menu_30b638dd: "Menu de publication de module"
   module_publish_menu_88b54c1b: "Menu de publication de module"
+  module_published_80f0b9b8: "Module publié"
   modules: 
     add: 
       assignment: 
@@ -19015,6 +19035,7 @@ fr:
   nav_text_94206145: "Texte de navigation"
   nav_text_active_a924ae88: "Texte de navigation activé"
   navigate_to_speed_grader_for_name_f28cb5b1: "Se rendre sur Speed Grader pour %{name}"
+  navigate_to_speed_grader_for_title_assignment_828b1366: "Rendez-vous dans SpeedGrader pour le travail %{title}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigation permet à l'utilisateur d'afficher le lien Personnes dans Navigation du cours."
   navigation_icon_45db938e: "Icône de navigation"
   navigation_menu_fd782ff8: "Menu de navigation"
@@ -19109,6 +19130,7 @@ fr:
   new_quizzes_dbda7e0a: "Nouveaux questionnaires"
   new_quizzes_description: "Cette fonctionnalité améliore l’expérience Canvas pour les questionnaires. Lorsque ce drapeau est activé, l’outil Nouveaux questionnaires est rendu disponible. Pour de plus amples informations, consultez le *groupe d’utilisateurs New Quizzes* sur la Communauté Canvas."
   new_quizzes_embedded_module_progression_cd2307b6: "Progression dans le module des nouveaux questionnaires intégrés"
+  new_quizzes_export_support_b0a6a625: "Prise en charge de l’exportation des nouveaux quiz"
   new_quizzes_importing_c167dce0: "Importation de Nouveaux quiz"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "Nouveaux quiz inclus à l'onglet de résumé d'alignement des résultats"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Migration nouveaux quiz pendant l'import/copie de cours"
@@ -19384,6 +19406,8 @@ fr:
   not_submitted_fff47f17: "Non soumis"
   not_synced_529cbf29: "Non synchronisé"
   not_synced_message_a343fe5e: "Non synchronisé : %{message}"
+  not_valid_after_81c9faec: "Non valide après"
+  not_valid_before_9ad2d22d: "Non valide avant"
   not_visible_in_student_files_22f11883: "Non visible dans les fichiers des élèves"
   not_yet_assessed_9362f199: "Pas encore évalué"
   not_yet_completed_345a0bca: "Pas encore terminé"
@@ -20576,6 +20600,7 @@ fr:
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "Veuillez entrer un nombre entre 0 et 100 pour le taux de migration"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Veuillez saisir un terme à rechercher comprenant au moins trois caractères"
   please_enter_a_url_d2c868b5: "Veuillez saisir une url"
+  please_enter_a_valid_search_term_5c69b0b0: "Veuillez saisir un terme de recherche valide."
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Veuillez entrer une url valide (par ex. http://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Veuillez entrer une URL valide Le protocole est nécessaire (par ex., http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__6dc0071c: "Veuillez entrer une URL valide Le protocole est requis (par ex. http://, https://, ftp://, tel:)."
@@ -21268,6 +21293,7 @@ fr:
   privacy_290109ea: Confidentialité
   privacy_level_f0ec09a3: "Niveau de confidentialité"
   private_3883d133: Privé
+  private_key_is_present_in_certificate_file_1a1b7b42: "La clé privée est présente dans le fichier de certificat."
   pro_tip_30e41fa3: "CONSEIL DE PRO !"
   proceed_f3d33864: Procéder
   proceed_with_caution_aa9b3285: "Soyez prudent"
@@ -21787,6 +21813,8 @@ fr:
   publishing_error_bdfb3390: "Erreur lors de la publication"
   publishing_is_disabled_for_this_item_efa7803f: "La publication est désactivée pour cet élément."
   publishing_item_name_is_disabled_8207a9e7: "La publication de %{item_name} est désactivée"
+  publishing_module_and_items_ce128d12: "Publication du module et des éléments"
+  publishing_module_c2b5211: "Publication du module"
   publishing_pace_a65e4152: "Publication de l’allure..."
   publishing_plan_b70186ed: "Publication du plan..."
   publishing_progress_5154a430: "Publication en cours"
@@ -23157,6 +23185,8 @@ fr:
         one: "1 seconde"
         other: "%{count} secondes"
       show_time_link: "Afficher l’heure"
+      time_remaining: "Il vous reste %{time}"
+      times_up: "Temps écoulé ! Soumission des résultats dans 10 secondes"
       titles: 
         come_back_later: "Vous avez marqué cette question pour y revenir ultérieurement"
         times_up: "Terminé !"
@@ -23596,6 +23626,7 @@ fr:
   remove_attribute_59a4aa64: "Retirer l'attribut"
   remove_avatar_picture_aba765eb: "Supprimer l’image de l’avatar"
   remove_c_name_section_d8eabd3a: "Retirer la section %{c.name}"
+  remove_certificate_4e979eee: "Supprimer un certificat"
   remove_collaborationtitle_c3e81adb: "Supprimer \"%{collaborationTitle}\"?"
   remove_condition_9cf94f7f: "Supprimer la condition"
   remove_conference_69b9e0d0: "Supprimer la conférence"
@@ -24407,6 +24438,7 @@ fr:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: "Recherche des travaux dans le Carnet de notes et nouveau design pour la recherche de travaux et d'élèves"
   search_by_99d1ba5f: "Rechercher par"
   search_by_c559efd: "Rechercher "
+  search_by_name_or_id_3bdab12e: "Rechercher par nom ou par identifiant"
   search_by_student_name_26536097: "Rechercher par nom d'élève"
   search_by_title_or_author_273a8f49: "Rechercher par titre ou auteur..."
   search_by_title_short_name_or_sis_id_fe84aa12: "Rechercher par titre, nom court, ou identifiant SIS"
@@ -24596,6 +24628,7 @@ fr:
     one: "Sélectionner (%{count}) cours"
     other: "Sélectionner l’ensemble (%{count}) des cours"
   select_all_students_7c2c34b3: "Sélectionner tous les étudiants"
+  select_an_account_to_update_b7521f0a: "Sélectionnez un compte à mettre à jour."
   select_an_edit_operation_ec1467d: "Sélectionner une opération de modification"
   select_an_outcome_group_6edb08a7: "Sélectionner un groupe de résultats"
   select_another_group_24773e5f: "Sélectionnez un autre groupe"
@@ -26252,6 +26285,7 @@ fr:
   sticky_left_navigation_3d438a81: "Navigation latérale gauche fixe"
   still_having_difficulty_get_more_help_here_3cdc8de1: "Vous rencontrez toujours des difficultés ? Obtenez plus d'aide ici :"
   stop_acting_as_user_8809a97f: "Cesser d'agir en tant qu'utilisateur"
+  stop_fd9822ab: Stop
   storage_quotas_manage_6ca14bbb: "Quotas de stockage - gérer"
   storage_used_in_mb_c75fbd9c: "stockage utilisé en MB"
   store_and_share_course_assets_82a9967c: "Stocker et partager des éléments de cours"
@@ -26784,6 +26818,7 @@ fr:
       student_support: "NetAcad  Soutien - Élève"
       student_support_description: "Votre instructeur est votre premier point de contact. Il peut répondre à vos questions sur la Networking Academy ou contacter le service d'assistance pour vous. Vous pouvez contacter votre instructeur en utilisant la fonction Boîte de réception."
       support_desk_livechat: "Dialogue en direct avec le service d’assistance"
+  support_exporting_new_quizzes_in_qti_format_ba09b465: "Prise en charge de l’exportation des Nouveaux quiz au format QTI"
   support_favorite_lti_tools_in_the_rce_1680436d: "Prise en charge des outils LTI favoris dans l’ECE"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "Prendre en charge les équations mathématiques LaTex presque partout"
   support_uploading_closed_caption_files_in_all_the__418c06d4: |-
@@ -27834,6 +27869,7 @@ fr:
   this_permission_requires_the_account_and_course_le_bdeefd51: "Cette autorisation nécessite l'option de fonctionnalité « Échelles de maîtrise des résultats aux niveaux du compte et du cours », qui peut uniquement être activée au niveau du compte."
   this_permission_should_only_be_assigned_to_users_t_231c182e: "Cette autorisation ne doit être accordée qu’aux utilisateurs que votre établissement a autorisé à agir au nom d'autres utilisateurs sur la totalité de votre compte Canvas."
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Ce placement nécessite la prise en charge de Deep Link par le fournisseur. Vérifiez auprès de votre fournisseur d'outils pour vous assurer qu'il prend en charge cette fonctionnalité."
+  this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: "Ce processus peut prendre quelques minutes Cliquez sur le bouton Stop pour interrompre le traitement. Les éléments déjà traités ne reprendront pas leur état initial."
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: "Ce processus peut prendre quelques minutes En appuyant sur Annuler, vous arrêterez le processus, mais les éléments déjà traités ne reprendront pas leur état initial."
   this_pronoun_appears_after_last_name_bf5c0bf5: "Ce pronom apparaît après le nom de famille"
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Ce pronom s'affichera après votre nom lorsque l'option est activée"
@@ -29031,6 +29067,7 @@ fr:
   unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
       Impossible d'obtenir le verrou sur le tableau des utilisateurs SFTP. Veuillez réessayer dans une minute.
                                     Si le problème persiste, veuillez nous contacter dans le canal #canvas-sre sur Slack.
+  unable_to_parse_certificate_f25ff8b5: "Impossible d'analyser le certificat"
   unable_to_read_file_2d04b0c: "Impossible de lire le fichier"
   unable_to_remove_app_4293cb53: "Impossible de supprimer l’application"
   unable_to_remove_outcomes_f682e68f: 
@@ -29047,7 +29084,9 @@ fr:
   unable_to_switch_students_b901bc4b: "Impossible de changer les élèves"
   unable_to_toggle_placement_833db6ff: "Impossible de changer de positionnement"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Impossible de transmettre le fichier au service de stockage. Le service peut être en panne ou vous devez peut-être vous reconnecter à Canvas."
+  unable_to_update_domains_44c5dd55: "Impossible de mettre à jour les domaines"
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Impossible de mettre à jour les paramètres de synchronisation Microsoft Teams. Veuillez réessayer. Si le problème persiste, veuillez contacter l’assistance."
+  unable_to_update_quotas_62baf95b: "Impossible de mettre à jour les quotas"
   unable_to_update_splitscreen_preference_4d449fa5: "Impossible de mettre à jour les préférences d'écran partagé."
   unaccepted_students_aa68ea98: "Étudiants non acceptés"
   unarchive_f245e2d6: Désarchiver
@@ -29200,6 +29239,7 @@ fr:
   unpublished_drafts_count_86e16f17: "Brouillons non publiés (%{count})"
   unpublished_subjects_62a7d38: "Sujets non publiés"
   unpublishing_1fa99dc6: "Retrait de la publication..."
+  unpublishing_module_and_items_ca2edd97: "Dépublication du module et des éléments"
   unread_c14cb06f: "non-lu,"
   unread_e9c1b19c: "Non lu(e)(s)"
   unread_ee6db4aa: "non lu"
@@ -29328,6 +29368,7 @@ fr:
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Télécharger les fichiers soumis avec des devoirs dans un dossier en lecture seule dédié aux soumissions"
   upload_gradebook_386a46c8: "Télécharger le relevé de notes"
   upload_image_6120b609: "Télécharger l’image"
+  upload_internal_root_ca_46cf9b36: "Envoi de l’AC racine interne"
   upload_media_ce31135a: "Importer un fichier multimédia"
   upload_not_available_for_this_folder_8f8623c6: "Envoi indisponible pour ce dossier."
   upload_percent_complete_d533d3e2: "Pourcentage de complétion de l’envoi"
@@ -29375,6 +29416,10 @@ fr:
   use_arrows_a60b3330: "Utiliser les flèches"
   use_as_front_page_274a488b: "Utiliser comme première page"
   use_as_frontpagetext_fa88bbb2: "Utiliser en tant que %{frontPageText}"
+  use_attachment_ids_in_media_links_7bfb3422: "Utiliser les identifiants de fichiers joints dans les Liens média"
+  use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
+      Utiliser les identifiants de fichiers joints afin que les utilisateurs soient toujours envoyés vers l’instance appropriée du média 
+      au lieu de l'original.
   use_between_for_adding_multiple_users_26bff207: "Pour ajouter plusieurs utilisateurs, utilisez le signe « , » entre chaque."
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Utiliser les favoris pour la pagination par API dans l’index des inscriptions"
   use_cloudfront_for_docviewer_f21b96db: "Utiliser CloudFront pour DocViewer"
@@ -29959,6 +30004,7 @@ fr:
   users_with_this_permission_may_be_able_to_use_the__84394072: "Les utilisateurs disposant de cette autorisation pourront utiliser la fonction « Agir en tant que » pour gérer les paramètres de compte, afficher et ajuster les notes, accéder aux informations utilisateurs, etc. Ces autorisations permettent également aux administrateurs désignés d'un sous-compte d'accéder aux paramètres et informations en dehors de leur sous-compte."
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Utilise le nouveau planificateur et ses fonctionnalités"
   utc_e44049af: UTC
+  uuid_has_been_provisioned_ab0c6c9: "UUID provisionné : "
   validate: 
     is_required: "Ce champ est obligatoire."
   validate_links_in_content_b1630fba: "Valider les liens dans le contenu"
@@ -29981,6 +30027,7 @@ fr:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite note de similitude -- plus d’informations"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Score de similarité – Voir rapport détaillé"
   verify_ldap_tls_certificates_70241d8e: "Vérifier les certificats LDAP TLS"
+  verify_tls_certificate_9cfa26d1: "Vérifier le certificat TLS"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Vérifier les certificats TLS présentés par les fournisseurs d'authentification LDAP."
   version_versionnumber_updatedat_9f5b7a5b: "Version %{versionNumber} %{updatedAt}"
   video_78335c71: vidéo

@@ -242,6 +242,7 @@ ru:
   a_simplified_canvas_interface_for_k_5_enable_appli_bc32b2d1: |-
       Упрощенный интерфейс Canvas для K-5 Активировать применимые
       подчиненные учетные записи как учетные записи K-5 в настройках учетных записей.
+  a_single_certificate_file_e7f347f1: "Файл единого сертификата"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "Интеграция SIS не сконфигурирована, функция настройки интеграции «Активировать новый SIS» не включена"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "Учащийся только что включил позднюю отправку для %{assignment_name} в курс %{course_name}"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "Учащийся только что включил повторную отправку для %{assignment_title} в курс %{course_name}"
@@ -4167,9 +4168,11 @@ ru:
       settings: Настройки
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: "Этому заданию не будет присвоена оценка."
+      assignment_not_yet_graded_rqd_screenreader: "Задание пока не оценено."
       assignment_not_yet_graded_screenreader: "Задание еще не оценено. %{pointsPossible} возможных баллов."
       empty_points_possible: "-/%{pointsPossible} бал"
       no_submission: "Нет отправки"
+      no_submission_for_assignment_rqd_screenreader: "Это задание не назначено."
       no_submission_for_assignment_screenreader: "По данному заданию ничего не отправлено. %{pointsPossible} возможных баллов."
       not_yet_graded: "*Еще не оценено*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} баллов"
@@ -4967,7 +4970,10 @@ ru:
     ldap_fields: 
       auth_filter_description: "Используйте *%{placeholder}*в качестве заполнителя для имени пользователя, указанного пользователем. Например: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "Атрибут LDAP используется для поиска входа в систему Canvas. Не заполняйте, чтобы использовать имя пользователя, предоставленное пользователем."
+      internal_ca_description: "Если ваш LDAP-сервер представляет сертификат, выданный недоверенным внутренним корневым ЦС, вы *должны* загрузить свой корневой ЦС, чтобы Canvas доверял ему при подключении."
+      internal_ca_warning: "*Предупреждение*: Использование внутреннего корневого ЦС менее безопасно и повышает риск компрометации. Мы настоятельно рекомендуем использовать сертификаты, выданные доверенным центром сертификации."
       ldap_timeout_failure_help2: "Если Canvas слишком часто прерывает соединение с LDAP-сервером, он будет блокировать дальнейшие попытки входа в систему с использованием LDAP-сервера в течение %{time}. Последний тайм-аут вашего сервера LDAP был в %{timestamp}."
+      verify_tls_cert_opt_in_description: "Проверка сертификата TLS будет необходима на *%{enforcement_date}*, но вы можете включить ее раньше, чтобы обеспечить соответствие требованиям своего сервера LDAP."
     ldap_settings_test: 
       labels: 
         pass: Пароль
@@ -6146,6 +6152,9 @@ ru:
   catalog_name_46d37909: "Имя каталога"
   catalog_url_a01655dd: "URL каталога"
   catalog_users_already_exist_2894b8c4: "Пользователи каталога уже существуют"
+  catalog_was_provisioned_9851448f: "Каталог был предоставлен."
+  catalog_was_unprovisioned_9524cb58: "Каталог был удален."
+  catalog_was_updated_743a58eb: "Каталог был обновлен."
   category_b9a94408: Категория
   categoryname_notification_preferences_cd64e4a0: "%{categoryName} Настройки уведомлений"
   cc: 
@@ -6164,6 +6173,8 @@ ru:
   cell_number_is_required_2edcee60: "Необходимо указать номер сотового телефона"
   central_value_in_a_set_of_results_calculated_by_di_19a8c48a: "Центральное значение в наборе результатов. Рассчитано путем деления суммы оценок всех элементов на количество оценок."
   certificate_fingerprint_b376df90: "Отпечаток пальца сертификата"
+  certificate_is_expired_or_not_yet_valid_4a3bb8f1: "Срок действия сертификата истек, или срок его действия еще не наступил"
+  certificate_is_not_a_ca_9ec5d574: "Сертификат не является ЦС"
   change_applied_89d1aa5a: "Изменение выполнено"
   change_beginning_date_to_39dbd06e: "Изменить дату начала на"
   change_color_for_mastery_level_position_daa51849: "Изменить цвет для уровня усвоения %{position}"
@@ -10917,6 +10928,8 @@ ru:
   drag_a_file_here_or_1aaf19c1: "Перетащите файл сюда или"
   drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: "Перетащите файл сюда или щелкните, чтобы выбрать файл для загрузки"
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: "Перетаскивание файлов на модули и загрузка многофайловых элементов модулей"
+  drag_and_drop_or_browse_your_files_92ad4c17: "Перетащите и бросьте или *перейдите к своим файлам*"
+  drag_and_drop_or_browse_your_files_to_replace_27cc42d6: "Перетащите и бросьте или *перейдите к своим файлам* для замены"
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "Перетащите или щелкните, чтобы просмотреть свой компьютер"
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "Перетащите или щелкните, чтобы просмотреть свой компьютер"
   drag_and_drop_your_image_here_or_7fba7c14: "Перетащите изображение сюда или "
@@ -15620,6 +15633,7 @@ ru:
   integrations_cadb03f3: Интеграции
   interactions_report_47c1219e: "Отчет о взаимодействиях"
   internal_analytics_f02b3fff: "Внутренняя аналитика"
+  internal_certificate_authority_ca_76566a37: "Внутренний центр сертификации (ЦС)"
   internal_setting_created_f3f72416: "Создана внутренняя настройка"
   internal_setting_deleted_aaf1dd9d: "Внутренняя настройка удалена"
   internal_setting_updated_87510559: "Внутренняя настройка обновлена"
@@ -15672,6 +15686,7 @@ ru:
   invalid_hexcode_9124519f: "Неверный шестнадцатеричный код"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Неверный шестнадцатеричный код. Введите верный шестнадцатеричный код для использования пользовательского цвета."
   invalid_hexcode_provided_522ba223: "Указан неверный шестнадцатеричный код"
+  invalid_login_request_1639c89f: "Неверный запрос на вход в систему"
   invalid_microsoft_sync_tenant_given_please_validat_97be36bf: "Указан недопустимый клиент Microsoft Sync. Подтвердите своего клиента"
   invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "Указан недопустимый клиент Microsoft Sync. Подтвердите своего клиента."
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "Недопустимый удаленный атрибут в Microsoft Teams Sync. Допустимые удаленные атрибуты: %{VALID_SYNC_REMOTE_ATTRIBUTES}"
@@ -18237,6 +18252,8 @@ ru:
       email: 
         html: 
           announcement_info: "Ответы на это сообщение будут опубликованы как ответ на объявление, которое увидят все участники курса."
+          announcement_info_course: "Ответы на это сообщение будут опубликованы как ответ на объявление, которое увидят все участники курса."
+          announcement_info_group: "Ответы на это сообщение будут опубликованы как ответ на объявление, которое увидят все в группе."
           attached_file: "Прикрепленный файл"
           link: "Просмотреть объявления"
         labels: 
@@ -19044,6 +19061,8 @@ ru:
   modify_permissions_for_account_rubrics_6c3aee59: "Изменение прав доступа к рубрикам учетной записи"
   modify_settings_ed8b9ccf: "Изменить настройки"
   module_90d9fd32: Модуль
+  module_and_items_published_13ed5cd6: "Модуль и элементы опубликованы"
+  module_and_items_unpublished_e953ba4f: "Публикация модуля и элементов отменена"
   module_completed_50c50762: "Модуль завершен"
   module_content_import_enhancements_c00b0ea2: "Усовершенствования импорта содержимого модуля"
   module_file_upload_enhancements_eecd4d37: "Улучшения отправки файла модуля"
@@ -19075,6 +19094,7 @@ ru:
   module_navigation_97043417: "Навигация по модулю"
   module_publish_menu_30b638dd: "Меню публикации модулей"
   module_publish_menu_88b54c1b: "Меню публикации модулей"
+  module_published_80f0b9b8: "Модуль опубликована"
   modules: 
     add: 
       assignment: 
@@ -19491,6 +19511,7 @@ ru:
   nav_text_94206145: "Текст нав."
   nav_text_active_a924ae88: "Активный текст нав."
   navigate_to_speed_grader_for_name_f28cb5b1: "Перейдите к Speed Grader для %{name}"
+  navigate_to_speed_grader_for_title_assignment_828b1366: "Перейдите к Speed Grader для задания %{title}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Навигация позволяет пользователю отобразить ссылку «Люди» в навигации по курсу."
   navigation_icon_45db938e: "Иконка Навигации"
   navigation_menu_fd782ff8: "Меню навигации"
@@ -19585,6 +19606,7 @@ ru:
   new_quizzes_dbda7e0a: "Новые тестирования"
   new_quizzes_description: "Эта функция улучшает работу в Canvas в ходе обсуждений. Если этот флажок установлен, будет доступен инструмент New Quizzes (Новые тесты). Более подробная информация находится в *Новые тесты для группы пользователей* в сообществе Canvas."
   new_quizzes_embedded_module_progression_cd2307b6: "Встроенная обработка новых тестов"
+  new_quizzes_export_support_b0a6a625: "Поддержка экспорта новых тестов"
   new_quizzes_importing_c167dce0: "Импортирование Новых тестирований"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "Новые тесты добавлены на вкладку обзора согласования результатов"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Миграция новых тестирований во время импорта/копирования курса"
@@ -19860,6 +19882,8 @@ ru:
   not_submitted_fff47f17: "Не отправлено"
   not_synced_529cbf29: "Не синхрониз."
   not_synced_message_a343fe5e: "Не синхрониз.: %{message}"
+  not_valid_after_81c9faec: "Недействительно после"
+  not_valid_before_9ad2d22d: "Недействительно до"
   not_visible_in_student_files_22f11883: "Не отображается в файлах учащихся"
   not_yet_assessed_9362f199: "Еще не оценено"
   not_yet_completed_345a0bca: "Еще не завершено"
@@ -21064,6 +21088,7 @@ ru:
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "Введите номер от 0 до 100 для коэффициента миграции"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Введите ключевое слово, содержащее не менее трех символов"
   please_enter_a_url_d2c868b5: "Введите url-адрес"
+  please_enter_a_valid_search_term_5c69b0b0: "Введите действительный критерий поиска"
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Пожалуйста, введите действительный адрес веб-сайта (например, http://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Пожалуйста, введите действительный адрес URL. Требуется указать протокол (например, http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__6dc0071c: "Пожалуйста, введите действительный адрес URL. Требуется протокол (например, http://, https://, ftp://, tel:)."
@@ -21757,6 +21782,7 @@ ru:
   privacy_290109ea: Конфиденциальность
   privacy_level_f0ec09a3: "Уровень конфиденциальности"
   private_3883d133: Приватный
+  private_key_is_present_in_certificate_file_1a1b7b42: "Закрытый ключ присутствует в файле сертификата"
   pro_tip_30e41fa3: "ПРОФЕССИОНАЛЬНЫЙ СОВЕТ!"
   proceed_f3d33864: Продолжить
   proceed_with_caution_aa9b3285: "Соблюдайте осторожность"
@@ -22278,6 +22304,8 @@ ru:
   publishing_error_bdfb3390: "Ошибка опубликования"
   publishing_is_disabled_for_this_item_efa7803f: "Возможность публикации для этого элемента отключена"
   publishing_item_name_is_disabled_8207a9e7: "Возможность публикации для %{item_name} отключена"
+  publishing_module_and_items_ce128d12: "Публикация модуля и элементов"
+  publishing_module_c2b5211: "Публикация модуля"
   publishing_pace_a65e4152: "Публикование плана прохождения..."
   publishing_plan_b70186ed: "План опубликования..."
   publishing_progress_5154a430: "Процесс выполнения публикации"
@@ -23726,6 +23754,8 @@ ru:
         one: "1 секунда"
         other: "%{count} секунд(ы)"
       show_time_link: "Показать время"
+      time_remaining: "У вас осталось %{time}"
+      times_up: "Время вышло! Представление результатов через 10 секунд"
       titles: 
         come_back_later: "Вы отметили этот вопрос, чтобы вернуться к нему позднее"
         times_up: "Время истекло!"
@@ -24184,6 +24214,7 @@ ru:
   remove_attribute_59a4aa64: "Удалить атрибут"
   remove_avatar_picture_aba765eb: "Удалить изображение аватара"
   remove_c_name_section_d8eabd3a: "Удалить раздел %{c.name}"
+  remove_certificate_4e979eee: "Удалить сертификат"
   remove_collaborationtitle_c3e81adb: "Удалить «%{collaborationTitle}»?"
   remove_condition_9cf94f7f: "Удалить условие"
   remove_conference_69b9e0d0: "Удалить конференцию"
@@ -25022,6 +25053,7 @@ ru:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: "Поиск заданий в Журнале успеваемости и новый дизайн для поиска заданий и учащихся"
   search_by_99d1ba5f: "Поиск по"
   search_by_c559efd: "Поиск по"
+  search_by_name_or_id_3bdab12e: "Поиск по имени или ID"
   search_by_student_name_26536097: "Поиск по имени учащегося"
   search_by_title_or_author_273a8f49: "Поиск по названию или автору..."
   search_by_title_short_name_or_sis_id_fe84aa12: "Поиск по заголовку, краткому названию или идентификатору SIS"
@@ -25220,6 +25252,7 @@ ru:
     one: "Выбрать (%{count}) курс"
     other: "Выбрать все (%{count}) курсы"
   select_all_students_7c2c34b3: "Выбрать всех студентов"
+  select_an_account_to_update_b7521f0a: "Выбрать учетную запись для обновления."
   select_an_edit_operation_ec1467d: "Выбрать операцию редактирования"
   select_an_outcome_group_6edb08a7: "Выберите группу результатов"
   select_another_group_24773e5f: "Выбрать другую группу"
@@ -26903,6 +26936,7 @@ ru:
   sticky_left_navigation_3d438a81: "Прикрепленная левая навигационная панель"
   still_having_difficulty_get_more_help_here_3cdc8de1: "По-прежнему испытываете трудности? Получите дополнительную помощь здесь:"
   stop_acting_as_user_8809a97f: "Перестать действовать как пользователь"
+  stop_fd9822ab: Стоп
   storage_quotas_manage_6ca14bbb: "Квоты хранилища - управление"
   storage_used_in_mb_c75fbd9c: "используемое хранилище в МБ"
   store_and_share_course_assets_82a9967c: "Сохраняйте и делитесь мнениями и информацией, накопленной в ходе учебного курса"
@@ -27451,6 +27485,7 @@ ru:
       student_support: "NetAcad Поддержка — студент"
       student_support_description: "Ваш преподаватель должен быть вашим основным контактным лицом. Он может ответить на ваши вопросы по поводу Networking Academy или передать ваш вопрос в службу поддержки. Вы можете обратиться к своему преподавателю с помощью функции Inbox."
       support_desk_livechat: "Чат в реальном времени со службой технической поддержки"
+  support_exporting_new_quizzes_in_qti_format_ba09b465: "Поддержка экспорта новых тестов в формате QTI"
   support_favorite_lti_tools_in_the_rce_1680436d: "Поддержка избранных инструментов LTI в RCE"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "Поддержка математических уравнений LaTex практически в любой точке"
   support_uploading_closed_caption_files_in_all_the__418c06d4: |-
@@ -28525,6 +28560,7 @@ ru:
   this_permission_requires_the_account_and_course_le_bdeefd51: "Это разрешение требует параметра функции «Шкалы выходного уровня усвоения на уровне учетных записей и курсов», который может быть включен только на уровне учетной записи."
   this_permission_should_only_be_assigned_to_users_t_231c182e: "Это разрешение должно назначаться только пользователям, уполномоченным вашим учреждением действовать в качестве других пользователей во всей вашей учетной записи Canvas."
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Данное размещение требует поддержки глубинной ссылки поставщиком. Обратитесь к поставщику инструмента, чтобы убедиться, что он поддерживает эту функцию"
+  this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: "Этот процесс может занять несколько минут. Нажмите кнопку Стоп, чтобы прекратить обработку. Элементы, которые уже были обработаны, не будут возвращены в прежнее состояние."
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: "Этот процесс может занять несколько минут. Нажатие кнопки отмены остановит процесс, но элементы, которые уже были обработаны, не будут возвращены в прежнее состояние."
   this_pronoun_appears_after_last_name_bf5c0bf5: "Это местоимение стоит после фамилии"
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Это местоимение появится после вашего имени, если включено"
@@ -29726,6 +29762,7 @@ ru:
   unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
       Невозможно получить блокировку в таблице пользователей SFTP. Повторите попытку через минуту.
                                     Если не удается устранить сбой, обратитесь в #canvas-sre в Slack.
+  unable_to_parse_certificate_f25ff8b5: "Невозможно обработать сертификат"
   unable_to_read_file_2d04b0c: "Невозможно прочитать файл"
   unable_to_remove_app_4293cb53: "Невозможно удалить приложение."
   unable_to_remove_outcomes_f682e68f: 
@@ -29744,7 +29781,9 @@ ru:
   unable_to_switch_students_b901bc4b: "Невозможно переключить студентов"
   unable_to_toggle_placement_833db6ff: "Невозможно переключить размещение"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Невозможно передать файл на устройство хранения. Сервис может быть отключен, или вам может быть необходимо выйти и снова войти в Canvas."
+  unable_to_update_domains_44c5dd55: "Невозможно обновить домены"
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Не удалось обновить настройки Microsoft Teams Sync. Попробуйте еще раз. Если проблема не устранена, обратитесь в службу поддержки."
+  unable_to_update_quotas_62baf95b: "Невозможно обновить квоты"
   unable_to_update_splitscreen_preference_4d449fa5: "Невозможно обновить предпочтение разделенного экрана."
   unaccepted_students_aa68ea98: "Непринятые студенты"
   unarchive_f245e2d6: Разархивировать
@@ -29901,6 +29940,7 @@ ru:
   unpublished_drafts_count_86e16f17: "Неопубликованные проекты (%{count})"
   unpublished_subjects_62a7d38: "Неопубликованные темы"
   unpublishing_1fa99dc6: "Отмена публикации..."
+  unpublishing_module_and_items_ca2edd97: "Отмена публикации модуля и элементов"
   unread_c14cb06f: "не прочитано,"
   unread_e9c1b19c: Непрочитанное
   unread_ee6db4aa: "не прочитано"
@@ -30029,6 +30069,7 @@ ru:
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Загрузить файлы, представленные с заданиями в специальную папку для предоставленных материалов, которая существует только для чтения"
   upload_gradebook_386a46c8: "Загрузить табель успеваемости"
   upload_image_6120b609: "Загрузить изображение"
+  upload_internal_root_ca_46cf9b36: "Загрузить внутренний корневой ЦС"
   upload_media_ce31135a: "Загрузить медиа"
   upload_not_available_for_this_folder_8f8623c6: "Отправка недоступна для этой папки"
   upload_percent_complete_d533d3e2: "Загрузить долю завершенной работы в процентах"
@@ -30076,6 +30117,10 @@ ru:
   use_arrows_a60b3330: "Использовать стрелки"
   use_as_front_page_274a488b: "Выбрать в качестве титульной страницы"
   use_as_frontpagetext_fa88bbb2: "Использовать как %{frontPageText}"
+  use_attachment_ids_in_media_links_7bfb3422: "Использовать идентификаторы вложений в ссылках на медиафайлы"
+  use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
+      Используйте идентификаторы вложений в ссылках на медиа, чтобы пользователи всегда указывали на правильный экземпляр медиа, 
+      а не на оригинал
   use_between_for_adding_multiple_users_26bff207: "При добавлении нескольких пользователей для их разделения используйте символы \",\"."
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Использовать установку закладок для разбивки на страницы API в указателе зачислений"
   use_cloudfront_for_docviewer_f21b96db: "Использовать CloudFront для DocViewer"
@@ -30676,6 +30721,7 @@ ru:
   users_with_this_permission_may_be_able_to_use_the__84394072: "Пользователи с этим разрешением могут использовать функцию Act в качестве функции управления настройками учетной записи, просмотра и настройки оценок, доступа к информации о пользователе и т. д. Эти разрешения также позволяют администраторам, назначенным для субучетной записи, получать доступ к настройкам и информации за пределами своей субучетной записи."
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Использует новый планировщик и его функциональность"
   utc_e44049af: UTC
+  uuid_has_been_provisioned_ab0c6c9: "УУИД был предоставлен."
   validate: 
     is_required: "Необходимо это поле"
   validate_links_in_content_b1630fba: "Подтвердить ссылки в содержании"
@@ -30698,6 +30744,7 @@ ru:
   vericite_similarity_score_more_information_7df9ea5c: "Оценка сходства VeriCite -- более подробная информация"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Коэффициент сходства - См. подробный отчет"
   verify_ldap_tls_certificates_70241d8e: "Верификация сертификатов LDAP TLS"
+  verify_tls_certificate_9cfa26d1: "Верифицировать сертификат TLS"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Верификация сертификатов TLS, предоставленных провайдерами аутентификации LDAP."
   version_versionnumber_updatedat_9f5b7a5b: "Версия %{versionNumber} %{updatedAt}"
   video_78335c71: видео
