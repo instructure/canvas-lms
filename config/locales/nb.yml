@@ -227,6 +227,7 @@ nb:
   a_simplified_canvas_interface_for_k_5_enable_appli_bc32b2d1: |-
       Et forenklet Canvas-brukergrensesnitt for K-5. Aktiver gjeldende
       underkonto(er) som K-5 kontoer i kontoinnstillinger.
+  a_single_certificate_file_e7f347f1: "En enkel sertifikatfil"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "SIS-integrering er ikke konfigurert og funksjonen for å aktivere nye SIS-integreringsinnstillinger er ikke aktivert"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "En student har nettopp levert inn en forsinket innlevering for %{assignment_name} i emnet %{course_name}"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "En student har nettopp levert inn en innlevering for %{assignment_title} i emnet %{course_name}på nytt"
@@ -4094,9 +4095,11 @@ nb:
       settings: Innstillinger
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: "Denne oppgaven vil ikke bli gitt vurdering."
+      assignment_not_yet_graded_rqd_screenreader: "Oppgaven er ikke vurdert enda."
       assignment_not_yet_graded_screenreader: "Oppgaven er ikke vurdert enda. %{pointsPossible} poeng oppnåelig."
       empty_points_possible: "-/%{pointsPossible} poeng"
       no_submission: "Ingen innlevering"
+      no_submission_for_assignment_rqd_screenreader: "Ingen innlevering for denne oppgaven."
       no_submission_for_assignment_screenreader: "Ingen innlevering for denne oppgaven. %{pointsPossible} poeng oppnåelig."
       not_yet_graded: "*Ikke vurdert enda*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} poeng"
@@ -4877,7 +4880,10 @@ nb:
     ldap_fields: 
       auth_filter_description: "Bruk *%{placeholder}* som en plassholder for brukernavnet som gis av brukeren. For eksempel: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "LDAP-attributten som brukes til å finne Canvas-innloggingen. La stå blank for å bruke brukernavnet til brukeren."
+      internal_ca_description: "Hvis LDAP-serveren din presenterer et sertifikat utstedt av en ikke-klarert, intern rot-CA, må *du* laste opp rot-CA for at Canvas skal stole på den når du kobler til."
+      internal_ca_warning: "*Advarsel*: Å bruke en intern rot-CA er mindre sikkert, og øker risikoen for kompromittering. Vi anbefaler på det sterkeste å bruke sertifikater utstedt av en pålitelig sertifiseringinstans i stedet."
       ldap_timeout_failure_help2: "Hvis Canvas opplever for mange tidsavbrudd under kommunikasjon med LDAP-serveren, vil den blokkere ytterlige påloggingsforsøk fra å bruke den LDAP-serverene i %{time}. LDAP-serveren opplevde sist tidsavbrudd %{timestamp}."
+      verify_tls_cert_opt_in_description: "TLS-seritifikatverifisering vil kreves den *%{enforcement_date}*, men du kan aktivere den tidlig for å sikre at LDAP-serveren din er kompatibel."
     ldap_settings_test: 
       labels: 
         pass: Passord
@@ -6053,6 +6059,9 @@ nb:
   catalog_name_46d37909: Katalog-navn
   catalog_url_a01655dd: "Katalog URL"
   catalog_users_already_exist_2894b8c4: "Katalog-brukere eksisterer allerede"
+  catalog_was_provisioned_9851448f: "Katalog ble provisjonert."
+  catalog_was_unprovisioned_9524cb58: "Provisjonering av Katalog ble fjernet."
+  catalog_was_updated_743a58eb: "Katalog ble oppdatert."
   category_b9a94408: Kategori
   categoryname_notification_preferences_cd64e4a0: "%{categoryName} Innstillinger for varslinger"
   cc: 
@@ -6071,6 +6080,8 @@ nb:
   cell_number_is_required_2edcee60: "Celletall er påkrevd"
   central_value_in_a_set_of_results_calculated_by_di_19a8c48a: "Sentral verdi i et sett med resultater. Beregnes ved å dele summen av alle elementresultater på antall vurderinger."
   certificate_fingerprint_b376df90: Sertifikat-fingeravtrykk
+  certificate_is_expired_or_not_yet_valid_4a3bb8f1: "Sertifikat er utløpt eller ikke gyldig ennå"
+  certificate_is_not_a_ca_9ec5d574: "Sertifikat er ikke et CA"
   change_applied_89d1aa5a: "Endringer brukt"
   change_beginning_date_to_39dbd06e: "Endre startdato til"
   change_color_for_mastery_level_position_daa51849: "Endre farge for mestringsnivå %{position}"
@@ -10624,6 +10635,8 @@ nb:
   drag_a_file_here_or_1aaf19c1: "Dra en fil hit, eller"
   drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: "Dra en fil hit, eller klikk for å velge en fil å laste opp"
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: "Dra og slipp filer på moduler og last opp flere modulelementer"
+  drag_and_drop_or_browse_your_files_92ad4c17: "Dra og slipp eller *bla gjennom filer*"
+  drag_and_drop_or_browse_your_files_to_replace_27cc42d6: "Dra og slipp eller *bla gjennom filer* for å bytte ut"
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "Slipp og dra, eller klikk for å bla gjennom datamaskin"
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "Dra og slipp, eller trykk for å bla i din datamaskin"
   drag_and_drop_your_image_here_or_7fba7c14: "Dra og slipp bildet ditt her eller "
@@ -15207,6 +15220,7 @@ nb:
   integrations_cadb03f3: Integrasjoner
   interactions_report_47c1219e: "Rapport over interaksjoner"
   internal_analytics_f02b3fff: "Interne analyser"
+  internal_certificate_authority_ca_76566a37: "Intern sertifikatmyndighet (CA)"
   internal_setting_created_f3f72416: "Intern innstilling opprettet"
   internal_setting_deleted_aaf1dd9d: "Intern innstilling slettet"
   internal_setting_updated_87510559: "Intern innstilling oppdatert"
@@ -15259,6 +15273,7 @@ nb:
   invalid_hexcode_9124519f: "Ugyldig hex-kode"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Ugyldig hex-kode. Angi en gyldig hex-kode her for å velge en tilpasset farge."
   invalid_hexcode_provided_522ba223: "Ugyldig hex-kode angitt"
+  invalid_login_request_1639c89f: "Ugyldig påloggingsforespørsel"
   invalid_microsoft_sync_tenant_given_please_validat_97be36bf: "Ugyldig Microsoft synk.-bruker gitt. Bekreft brukeren din"
   invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "Ugyldig Microsoft synk.-bruker gitt. Bekreft brukeren din."
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "Ugyldig innloggingsattributt for Microsoft Teams synk. Gyldige eksterne attributter: %{VALID_SYNC_REMOTE_ATTRIBUTES}"
@@ -17791,6 +17806,8 @@ nb:
       email: 
         html: 
           announcement_info: "Svar på denne e-posten vil bli lagt ut som et svar på kunngjøringen, som vil bli sett av alle i emnet."
+          announcement_info_course: "Svar på denne e-posten vil bli lagt ut som et svar på kunngjøringen, som vil bli sett av alle i emnet."
+          announcement_info_group: "Svar på denne e-posten vil bli lagt ut som et svar på kunngjøringen, som vil bli sett av alle i gruppen."
           attached_file: "Vedlagt fil"
           link: "Vis kunngjøring"
         labels: 
@@ -18584,6 +18601,8 @@ nb:
   modify_permissions_for_account_rubrics_6c3aee59: "Endre tillatelser for kontovurderingsveiledninger"
   modify_settings_ed8b9ccf: "Endre innstillinger"
   module_90d9fd32: Modul
+  module_and_items_published_13ed5cd6: "Modul og elementer publisert"
+  module_and_items_unpublished_e953ba4f: "Publisering av modul og elementer fjernet"
   module_completed_50c50762: "Modul godkjent"
   module_content_import_enhancements_c00b0ea2: "Importforbedringer for modulinnhold"
   module_file_upload_enhancements_eecd4d37: "Forbedringer av modulfilopplastning"
@@ -18615,6 +18634,7 @@ nb:
   module_navigation_97043417: Modulnavigering
   module_publish_menu_30b638dd: "Modulenes publiseringsmeny"
   module_publish_menu_88b54c1b: "Modulenes publiseringsmeny"
+  module_published_80f0b9b8: "Modul publisert"
   modules: 
     add: 
       assignment: 
@@ -19020,6 +19040,7 @@ nb:
   nav_text_94206145: "Nav tekst"
   nav_text_active_a924ae88: "Nav tekst aktiv"
   navigate_to_speed_grader_for_name_f28cb5b1: "Naviger til SpeedGrader for %{name}"
+  navigate_to_speed_grader_for_title_assignment_828b1366: "Naviger til SpeedGrader for %{title}-oppgave"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigering lar en bruker vise folk-lenken i emnenavigasjon."
   navigation_icon_45db938e: Navigasjons-ikon
   navigation_menu_fd782ff8: Navigasjonsmeny
@@ -19114,6 +19135,7 @@ nb:
   new_quizzes_dbda7e0a: "Nye quizer"
   new_quizzes_description: "Denne funksjonen forbedrer Canvas-opplevelsen for quizing. Når dette flagget er aktivert, vil verktøyet Nye Quizer være tilgjengelig. For fullstendig informasjon, se *brukergruppen nye quizer* i Canvas Community."
   new_quizzes_embedded_module_progression_cd2307b6: "Modulprogresjon for innebygging av Nye tester"
+  new_quizzes_export_support_b0a6a625: "Eksportstøtte for Nye quizer"
   new_quizzes_importing_c167dce0: "Ny Quizzes importering"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "Nye quizer inkludert på fanen Sammendrag av læringsmåltilpasning"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Migrering av nye quizer under emneimport/-kopiering"
@@ -19389,6 +19411,8 @@ nb:
   not_submitted_fff47f17: "Ikke levert inn"
   not_synced_529cbf29: "Ikke synkronisert"
   not_synced_message_a343fe5e: "Ikke synkronisert: %{message}"
+  not_valid_after_81c9faec: "Ikke gyldig etter"
+  not_valid_before_9ad2d22d: "Ikke gyldig før"
   not_visible_in_student_files_22f11883: "Ikke synlig i studentfiler"
   not_yet_assessed_9362f199: "Ikke vurdert ennå"
   not_yet_completed_345a0bca: "Ennå ikke godkjent"
@@ -20578,6 +20602,7 @@ nb:
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "Oppgi enn nummer mellom 0 og 100 for migreringsraten"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Skriv inn søkeord med tre eller flere tegn"
   please_enter_a_url_d2c868b5: "Angi en url"
+  please_enter_a_valid_search_term_5c69b0b0: "Skriv inn et gyldig søkeord"
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Skriv inn gyldig URL (f.eks. http://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Oppgi en gyldig lenke. Protokoll kreves (f.eks. http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__6dc0071c: "Oppgi en gyldig lenke. Protokoll kreves (f. eks. http://, https://, ftp://, tel:)."
@@ -21270,6 +21295,7 @@ nb:
   privacy_290109ea: Personvern
   privacy_level_f0ec09a3: Personvern-nivå
   private_3883d133: Privat
+  private_key_is_present_in_certificate_file_1a1b7b42: "Privat nøkkel finnes i sertifikatfilen"
   pro_tip_30e41fa3: PROFFTIPS!
   proceed_f3d33864: Fortsett
   proceed_with_caution_aa9b3285: "Fortsett med forsiktighet."
@@ -21790,6 +21816,8 @@ nb:
   publishing_error_bdfb3390: Publiseringsfeil
   publishing_is_disabled_for_this_item_efa7803f: "Publisering er deaktivert for dette objektet"
   publishing_item_name_is_disabled_8207a9e7: "Publisering %{item_name} er deaktivert"
+  publishing_module_and_items_ce128d12: "Publiserer moduler og elementer"
+  publishing_module_c2b5211: "Publiserer modul"
   publishing_pace_a65e4152: "Publiserer tempo …"
   publishing_plan_b70186ed: "Publiseringsplan …"
   publishing_progress_5154a430: Publiseringsfremgang
@@ -23160,6 +23188,8 @@ nb:
         one: "1 sekund"
         other: "%{count} sekunder"
       show_time_link: "Vis tid"
+      time_remaining: "Du har %{time} igjen"
+      times_up: "Tiden er ute! Sender inn resultater om 10 sekunder"
       titles: 
         come_back_later: "Du indikerte at du ville komme tilbake til dette spørsmålet"
         times_up: "Tiden er ute!"
@@ -23599,6 +23629,7 @@ nb:
   remove_attribute_59a4aa64: "Fjern attributt"
   remove_avatar_picture_aba765eb: "Fjern avatarbilde"
   remove_c_name_section_d8eabd3a: "Fjerne %{c.name} seksjonen"
+  remove_certificate_4e979eee: "Fjern sertifikat"
   remove_collaborationtitle_c3e81adb: "Fjern «%{collaborationTitle}»?"
   remove_condition_9cf94f7f: "Fjern betingelse"
   remove_conference_69b9e0d0: "Fjerner konferanse"
@@ -24410,6 +24441,7 @@ nb:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: "Søk etter oppgaver i Vurderingsoversikt og nytt design for oppgaver og studentsøk"
   search_by_99d1ba5f: "Søk etter"
   search_by_c559efd: "Søk via"
+  search_by_name_or_id_3bdab12e: "Søk etter navn eller ID"
   search_by_student_name_26536097: "Søk på studentnavn"
   search_by_title_or_author_273a8f49: "Søk etter tittel eller forfatter …"
   search_by_title_short_name_or_sis_id_fe84aa12: "Søk etter tittel, kortnavn, eller SIS-ID"
@@ -24600,6 +24632,7 @@ nb:
     one: "Velg (%{count}) emne"
     other: "Velge alle (%{count}) emner"
   select_all_students_7c2c34b3: "Velg alle studenter"
+  select_an_account_to_update_b7521f0a: "Velg en konto du vil oppdatere."
   select_an_edit_operation_ec1467d: "Velg en redigeringsoperasjon"
   select_an_outcome_group_6edb08a7: "Velg en læringsmålgruppe"
   select_another_group_24773e5f: "Velg en annen gruppe"
@@ -26263,6 +26296,7 @@ nb:
   sticky_left_navigation_3d438a81: "Fest navigasjonsfelt til venstre"
   still_having_difficulty_get_more_help_here_3cdc8de1: "Har du fortsatt problemer? Få mer hjelp her:"
   stop_acting_as_user_8809a97f: "Avslutt opptre som bruker"
+  stop_fd9822ab: Stopp
   storage_quotas_manage_6ca14bbb: "Lagringsplasskvote - administrer"
   storage_used_in_mb_c75fbd9c: "Lagringsplass brukt i MB"
   store_and_share_course_assets_82a9967c: "Lagre og dele emne-fordeler"
@@ -26795,6 +26829,7 @@ nb:
       student_support: "NetAcad Støtte - Student"
       student_support_description: "faglæreren din skal være ditt første kontaktpunkt De kan svare deg på spørsmål om Networking Academy eller kontakte kundestøtte for deg. Du kan kontakte faglæreren din ved å bruke innboks-funksjonen."
       support_desk_livechat: "Support Desk Live Chat"
+  support_exporting_new_quizzes_in_qti_format_ba09b465: "Støtt eksportering av Nye quizer i QTI-format"
   support_favorite_lti_tools_in_the_rce_1680436d: "Støtter foretrukne LTI-verktøy i RCE"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "Støtt LaTex-matteligninger nesten overalt."
   support_uploading_closed_caption_files_in_all_the__418c06d4: |-
@@ -27845,6 +27880,7 @@ nb:
   this_permission_requires_the_account_and_course_le_bdeefd51: "Denne rettigheten krever forhåndsvisning av funksjonsvalget Mestringsskalaer på konto- og emnenivå, som bare kan aktiveres på kontonivå."
   this_permission_should_only_be_assigned_to_users_t_231c182e: "Denne rettigheten skal bare tildeles brukere som institusjonen din har autorisert til å handle som andre brukere i hele Canvas-kontoen din."
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Denne plasseringen krever Deep Link-støtte fra leverandøren. Sjekk med din verktøyleverandør for å sikre at de støtter denne funksjonen"
+  this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: "Denne prosessen kan ta noen minutter. Klikk på Stopp-knappen for å avbryte behandlingen. Elementer som allerede er behandlet, vil ikke bli tilbakestilt til tidligere tilstand."
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: "Denne prosessen kan ta noen minutter. Hvis du trykker på avbryt, stopper prosessen, men elementer som allerede er behandlet, vil ikke bli tilbakestilt til tidligere tilstand."
   this_pronoun_appears_after_last_name_bf5c0bf5: "Dette pronomenet vises etter etternavnet"
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Dette pronomenet står etter navnet ditt når det er aktivert"
@@ -29041,6 +29077,7 @@ nb:
   unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
       Kan ikke slette lås på SFTP-brukertabell. Prøv igjen om et minutt.
                                     Hvis det fremdeles mislykkes, ta kontakt via #canvas-sre i Slack.
+  unable_to_parse_certificate_f25ff8b5: "Kan ikke analysere sertifikatet"
   unable_to_read_file_2d04b0c: "Kan ikke lese filen"
   unable_to_remove_app_4293cb53: "Kan ikke fjerne app"
   unable_to_remove_outcomes_f682e68f: 
@@ -29057,7 +29094,9 @@ nb:
   unable_to_switch_students_b901bc4b: "Kan ikke bytte mellom studenter"
   unable_to_toggle_placement_833db6ff: "Kan ikke velge plassering"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Kan ikke overføre fil til lagringsenhet. Denne tjeneste kan være nede eller du må kanskje logge på Canvas på nytt."
+  unable_to_update_domains_44c5dd55: "Kan ikke oppdatere domener"
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Kan ikke oppdatere Microsoft Teams synk.-innstillinger. Prøv på nytt. Dersom problemet vedvarer, kontakt kundestøtte."
+  unable_to_update_quotas_62baf95b: "Kan ikke oppdatere kvoter"
   unable_to_update_splitscreen_preference_4d449fa5: "Kan ikke oppdatere preferanse for delt skjerm."
   unaccepted_students_aa68ea98: "Ikke aksepterte studenter"
   unarchive_f245e2d6: "Fjern arkivering"
@@ -29210,6 +29249,7 @@ nb:
   unpublished_drafts_count_86e16f17: "Upubliserte emner (%{count})"
   unpublished_subjects_62a7d38: "Upubliserte emner"
   unpublishing_1fa99dc6: Opphever...
+  unpublishing_module_and_items_ca2edd97: "Fjerner publisering av moduler og elementer"
   unread_c14cb06f: "ulest,"
   unread_e9c1b19c: Ulest
   unread_ee6db4aa: ulest
@@ -29335,6 +29375,7 @@ nb:
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Last opp innsendte filer med oppgaver til en spesiell innleveringsmappe med kun leserettigheter"
   upload_gradebook_386a46c8: "Last opp vurderingsoversikt"
   upload_image_6120b609: "Last opp bilde"
+  upload_internal_root_ca_46cf9b36: "Last opp intern rot-CA"
   upload_media_ce31135a: "Laste opp medier"
   upload_not_available_for_this_folder_8f8623c6: "Opplasting er ikke tilgjengelig for denne mappen"
   upload_percent_complete_d533d3e2: "Opplastingsprosent fullført"
@@ -29382,6 +29423,10 @@ nb:
   use_arrows_a60b3330: "Bruk piler"
   use_as_front_page_274a488b: "Bruk som forside"
   use_as_frontpagetext_fa88bbb2: "Bruk som %{frontPageText}"
+  use_attachment_ids_in_media_links_7bfb3422: "Bruk vedleggs-ID i medielenker"
+  use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
+      Bruk vedleggs-ID-er i medielenker slik at brukeren alltid tas videre til riktig forekomst av medier 
+      i stedet for originalen.
   use_between_for_adding_multiple_users_26bff207: "Bruk «,» mellom for å legge til flere brukere."
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Bruke bokmerke for API-sideinndeling i påmeldingsindeks"
   use_cloudfront_for_docviewer_f21b96db: "Bruk CloudFront for DocViewer"
@@ -29966,6 +30011,7 @@ nb:
   users_with_this_permission_may_be_able_to_use_the__84394072: "Brukere med denne rettigheten vil kanskje kunne bruke Opptre som-funksjonen til å administrere kontoinnstillinger, vise og endre vurderinger, få tilgang til brukerinformasjon, osv. Denne rettigheten gir også administratorer som er utpekt til en underkonto å få tilgang til innstillinger og informasjon utenfor underkontoen."
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Bruker den nye planleggeren og dens funksjonalitet"
   utc_e44049af: UTC
+  uuid_has_been_provisioned_ab0c6c9: "UUID er provisjonert."
   validate: 
     is_required: "Dette feltet er obligatorisk"
   validate_links_in_content_b1630fba: "Validere lenker i innholdet"
@@ -29988,6 +30034,7 @@ nb:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite quizlikhet – mer informasjon"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Quizlikhet – se detaljert rapport"
   verify_ldap_tls_certificates_70241d8e: "Bekreft LDAP TLS-sertifikater"
+  verify_tls_certificate_9cfa26d1: "Bekreft TLS-sertifikat"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Bekreft TLS-sertifikater presentert av LDAP-autentiseringsleverandører."
   version_versionnumber_updatedat_9f5b7a5b: "Versjon %{versionNumber} %{updatedAt}"
   video_78335c71: video
