@@ -632,6 +632,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "File multimediale in elaborazione. Riprova in seguito."
   },
+  "media_title_2112243b": { "message": "Titolo multimediale" },
   "medium_5a8e9ead": { "message": "Medio" },
   "merge_links_2478df96": { "message": "Unisci link" },
   "mic_a7f3d311": { "message": "Microfono" },
@@ -953,6 +954,9 @@ const locale = {
   "steel_blue_14296f08": { "message": "Blu acciaio" },
   "studio_media_options_ee504361": {
     "message": "Opzioni supporti multimediali Studio"
+  },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Barra delle opzioni supporti multimediali Studio"
   },
   "styles_2aa721ef": { "message": "Stili" },
   "submit_a3cc6859": { "message": "Invia" },

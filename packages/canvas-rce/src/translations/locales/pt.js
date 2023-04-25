@@ -626,6 +626,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "O ficheiro multimédia está a ser processado. É favor, tentar novamente mais tarde."
   },
+  "media_title_2112243b": { "message": "Título do Media" },
   "medium_5a8e9ead": { "message": "Médio" },
   "merge_links_2478df96": { "message": "Criar ligações" },
   "mic_a7f3d311": { "message": "Mic" },
@@ -936,6 +937,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Iniciar gravação" },
   "steel_blue_14296f08": { "message": "Azul Aço" },
   "studio_media_options_ee504361": { "message": "Opções de mídia do Studio" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Tabuleiro de Opções do Media do Studio"
+  },
   "styles_2aa721ef": { "message": "Estilos" },
   "submit_a3cc6859": { "message": "Submeter" },
   "subscript_59744f96": { "message": "Assinatura" },

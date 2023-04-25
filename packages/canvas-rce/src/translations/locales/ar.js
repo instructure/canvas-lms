@@ -588,6 +588,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "جارٍ معالجة ملف الوسائط. الرجاء إعادة المحاولة لاحقًا."
   },
+  "media_title_2112243b": { "message": "عنوان الوسائط" },
   "medium_5a8e9ead": { "message": "متوسط" },
   "merge_links_2478df96": { "message": "دمج الروابط" },
   "mic_a7f3d311": { "message": "الميكروفون" },
@@ -882,6 +883,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "بدء التسجيل" },
   "steel_blue_14296f08": { "message": "أزرق فولاذي" },
   "studio_media_options_ee504361": { "message": "خيارات وسائط Studio" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "علبة خيارات وسائط Studio"
+  },
   "styles_2aa721ef": { "message": "الأنماط" },
   "submit_a3cc6859": { "message": "إرسال" },
   "subscript_59744f96": { "message": "منخفض" },

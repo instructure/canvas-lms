@@ -544,6 +544,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "正在處理媒體檔案中。請稍後重試。"
   },
+  "media_title_2112243b": { "message": "媒體標題" },
   "medium_5a8e9ead": { "message": "中" },
   "merge_links_2478df96": { "message": "合併連結" },
   "mic_a7f3d311": { "message": "麥克風" },
@@ -824,6 +825,7 @@ const locale = {
   "start_recording_9a65141a": { "message": "開始錄製" },
   "steel_blue_14296f08": { "message": "鋼鐵藍" },
   "studio_media_options_ee504361": { "message": "Studio 媒體選項" },
+  "studio_media_options_tray_cfb94654": { "message": "Studio 媒體選項收集箱" },
   "styles_2aa721ef": { "message": "樣式" },
   "submit_a3cc6859": { "message": "提交" },
   "subscript_59744f96": { "message": "下標" },

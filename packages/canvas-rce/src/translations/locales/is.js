@@ -597,6 +597,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Miðilsskrá er í vinnslu. Vinsamlegast reyndu aftur seinna."
   },
+  "media_title_2112243b": { "message": "Heiti margmiðlunarefnis" },
   "medium_5a8e9ead": { "message": "Meðal" },
   "merge_links_2478df96": { "message": "Fella tengla saman" },
   "mic_a7f3d311": { "message": "Hljóðnemi" },
@@ -897,6 +898,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Hefja upptöku" },
   "steel_blue_14296f08": { "message": "Stálblár" },
   "studio_media_options_ee504361": { "message": "Valkostir Studio Media" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Valmöguleikabakki Studio margmiðlunarefnis"
+  },
   "styles_2aa721ef": { "message": "Stílar" },
   "submit_a3cc6859": { "message": "Leggja fram" },
   "subscript_59744f96": { "message": "Undirskrift" },

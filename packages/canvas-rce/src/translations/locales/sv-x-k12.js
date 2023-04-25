@@ -614,6 +614,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Mediefilen behandlas. Försök igen senare."
   },
+  "media_title_2112243b": { "message": "Medietitel" },
   "medium_5a8e9ead": { "message": "Medium" },
   "merge_links_2478df96": { "message": "Sammanfoga länkar" },
   "mic_a7f3d311": { "message": "Mikrofon" },
@@ -924,6 +925,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Starta inspelning" },
   "steel_blue_14296f08": { "message": "Stålblå" },
   "studio_media_options_ee504361": { "message": "Mediealternativ för Studio" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Panel för Studio-mediealternativ"
+  },
   "styles_2aa721ef": { "message": "Stilar" },
   "submit_a3cc6859": { "message": "Spara" },
   "subscript_59744f96": { "message": "Nedsänkt" },

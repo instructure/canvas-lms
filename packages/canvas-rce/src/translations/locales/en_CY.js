@@ -597,6 +597,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Media file is processing. Please try again later."
   },
+  "media_title_2112243b": { "message": "Media Title" },
   "medium_5a8e9ead": { "message": "Medium" },
   "merge_links_2478df96": { "message": "Merge links" },
   "mic_a7f3d311": { "message": "Mic" },
@@ -895,6 +896,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Start Recording" },
   "steel_blue_14296f08": { "message": "Steel Blue" },
   "studio_media_options_ee504361": { "message": "Studio Media Options" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Studio Media Options Tray"
+  },
   "styles_2aa721ef": { "message": "Styles" },
   "submit_a3cc6859": { "message": "Submit" },
   "subscript_59744f96": { "message": "Subscript" },

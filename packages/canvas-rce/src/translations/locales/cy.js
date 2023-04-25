@@ -622,6 +622,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Ffeil cyfryngau’n cael ei phrosesu Rhowch gynnig arall arni rywbryd eto."
   },
+  "media_title_2112243b": { "message": "Teitl Cyfryngau" },
   "medium_5a8e9ead": { "message": "Cyfrwng" },
   "merge_links_2478df96": { "message": "Cyfuno dolenni" },
   "mic_a7f3d311": { "message": "Meicroffon" },
@@ -928,6 +929,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Dechrau’r Recordiad" },
   "steel_blue_14296f08": { "message": "Durlas" },
   "studio_media_options_ee504361": { "message": "Opsiynau Cyfryngau Studio" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Ardal Opsiynau Cyfryngau Studio"
+  },
   "styles_2aa721ef": { "message": "Arddulliau" },
   "submit_a3cc6859": { "message": "Cyflwyno" },
   "subscript_59744f96": { "message": "Isysgrif" },
