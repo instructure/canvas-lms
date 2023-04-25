@@ -1273,10 +1273,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where("NOT EXISTS (?)",
-          Ignore.where(asset_type: "Quizzes::Quiz",
-                       user_id: user,
-                       purpose: purpose).where("asset_id=quizzes.id"))
+    where.not(Ignore.where(asset_type: "Quizzes::Quiz",
+                           user_id: user,
+                           purpose: purpose).where("asset_id=quizzes.id")
+                       .arel.exists)
   }
 
   def peer_reviews_due_at
@@ -1390,7 +1390,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     quiz_ids_with_subs = Quizzes::QuizSubmission
                          .from(constant_table)
-                         .where("EXISTS (?)", filter)
+                         .where(filter.arel.exists)
                          .pluck("s.quiz_id")
 
     quizzes.each do |quiz|

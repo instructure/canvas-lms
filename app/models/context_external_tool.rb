@@ -1223,19 +1223,22 @@ class ContextExternalTool < ActiveRecord::Base
 
   scope :placements, lambda { |*placements|
     if placements.present?
+      scope = ContextExternalTool.where(
+        ContextExternalToolPlacement
+          .where(placement_type: placements)
+          .where("context_external_tools.id = context_external_tool_placements.context_external_tool_id").arel.exists
+      )
       # Default placements are only applicable to LTI 1.1
-      default_placement_sql = if (placements.map(&:to_s) & Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).present?
-                                "(context_external_tools.lti_version = '1.1' AND
-                           context_external_tools.not_selectable IS NOT TRUE AND
-                           ((COALESCE(context_external_tools.url, '') <> '' ) OR
-                           (COALESCE(context_external_tools.domain, '') <> ''))) OR "
-                              else
-                                ""
-                              end
+      if (placements.map(&:to_s) & Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).present?
+        scope = ContextExternalTool
+                .where(lti_version: "1.1", not_selectable: [nil, false])
+                .merge(
+                  ContextExternalTool.where("COALESCE(context_external_tools.url, '') <> ''")
+                                     .or(ContextExternalTool.where("COALESCE(context_external_tools.domain, '') <> ''"))
+                ).or(scope)
+      end
 
-      where(default_placement_sql + "EXISTS (?)",
-            ContextExternalToolPlacement.where(placement_type: placements)
-        .where("context_external_tools.id = context_external_tool_placements.context_external_tool_id"))
+      merge(scope)
     else
       all
     end

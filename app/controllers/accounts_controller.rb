@@ -732,12 +732,11 @@ class AccountsController < ApplicationController
       if params[:search_by] == "teacher"
         @courses =
           @courses.where(
-            "EXISTS (?)",
             TeacherEnrollment.active.joins(:user).where(
               ActiveRecord::Base.wildcard("users.name", params[:search_term])
             ).where(
               "enrollments.workflow_state NOT IN ('rejected', 'inactive', 'completed', 'deleted') AND enrollments.course_id=courses.id"
-            )
+            ).arel.exists
           )
       else
         name = ActiveRecord::Base.wildcard("courses.name", search_term)
@@ -1409,7 +1408,7 @@ class AccountsController < ApplicationController
                                .joins(:user)
                                .joins("JOIN #{UserAccountAssociation.quoted_table_name} ON eportfolios.user_id = user_account_associations.user_id AND user_account_associations.account_id = #{@account.id}")
                                .where(spam_status: %w[flagged_as_possible_spam marked_as_spam marked_as_safe])
-                               .where("EXISTS (?)", Eportfolio.where("user_id = users.id").where(spam_status: ["flagged_as_possible_spam", "marked_as_spam"]))
+                               .where(Eportfolio.where("user_id = users.id").where(spam_status: ["flagged_as_possible_spam", "marked_as_spam"]).arel.exists)
                                .merge(User.active)
                                .order(Arel.sql(spam_status_order), Arel.sql("eportfolios.public DESC NULLS LAST"), updated_at: :desc)
                                .paginate(per_page: results_per_page, page: params[:page])

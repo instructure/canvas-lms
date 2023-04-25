@@ -755,9 +755,11 @@ module AccountReports
                    AND group_categories.context_type = 'Course'")
                                .joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
                    AND group_categories.context_type = 'Account'")
-                               .where("a.id IN (#{Account.sub_account_ids_recursive_sql(account.id)}) OR a.id=? OR EXISTS (?)",
-                                      account,
-                                      CourseAccountAssociation.where("course_id=c.id").where(account_id: account))
+                               .merge(
+                                 Account.where("a.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})")
+                                 .or(Account.where(a: { id: account }))
+                                 .or(Account.where(CourseAccountAssociation.where("course_id=c.id").where(account_id: account).arel.exists))
+                               )
                            end
         group_categories = group_category_query_options(group_categories)
 

@@ -165,9 +165,10 @@ class Assignment < ActiveRecord::Base
   scope :auditable, -> { anonymous.or(moderated) }
   scope :type_quiz_lti, lambda {
     all.primary_shard.activate do
-      where("EXISTS (?)",
-            ContentTag.where("content_tags.context_id=assignments.id").where(context_type: "Assignment", content_type: "ContextExternalTool")
-                .where("EXISTS (?)", ContextExternalTool.where("context_external_tools.id=content_tags.content_id").quiz_lti.offset(0)).offset(0))
+      where(ContentTag.where("content_tags.context_id=assignments.id")
+                      .where(context_type: "Assignment", content_type: "ContextExternalTool")
+                      .where(ContextExternalTool.where("context_external_tools.id=content_tags.content_id").quiz_lti.arel.exists)
+                .arel.exists)
     end
   }
   scope :not_type_quiz_lti, -> { where.not(id: type_quiz_lti) }
@@ -1687,16 +1688,16 @@ class Assignment < ActiveRecord::Base
 
     # Ignore test student enrollments so that adding a test student doesn't
     # inadvertently flip a posted anonymous assignment back to unposted
-    assignment_ids_with_unposted_anonymous_submissions = Assignment
-                                                         .where(id: assignments, anonymous_grading: true)
-                                                         .where(
-                                                           "EXISTS (?)", Submission.active.unposted.joins(user: :enrollments)
-          .where("submissions.user_id = users.id")
-          .where("submissions.assignment_id = assignments.id")
-          .where("enrollments.course_id = assignments.context_id")
-          .merge(Enrollment.of_student_type.where(workflow_state: "active"))
-                                                         )
-                                                         .pluck(:id).to_set
+    assignment_ids_with_unposted_anonymous_submissions =
+      Assignment
+      .where(id: assignments, anonymous_grading: true)
+      .where(Submission.active.unposted.joins(user: :enrollments)
+            .where("submissions.user_id = users.id")
+            .where("submissions.assignment_id = assignments.id")
+            .where("enrollments.course_id = assignments.context_id")
+            .merge(Enrollment.of_student_type.where(workflow_state: "active"))
+            .arel.exists)
+      .pluck(:id).to_set
 
     assignments.each do |assignment|
       assignment.unposted_anonymous_submissions = assignment_ids_with_unposted_anonymous_submissions.include?(assignment.id)
@@ -3014,7 +3015,7 @@ class Assignment < ActiveRecord::Base
                                            .where(due_at_overridden: true, due_at: start..ending)
 
     scope1 = where(due_at: start..ending)
-    scope2 = where("EXISTS (?)", overrides_subquery)
+    scope2 = where(overrides_subquery.arel.exists)
     if group_values.present?
       # subquery strategy doesn't work with GROUP BY
       scope1.or(scope2)
@@ -3055,10 +3056,10 @@ class Assignment < ActiveRecord::Base
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where("NOT EXISTS (?)",
-          Ignore.where(asset_type: "Assignment",
-                       user_id: user,
-                       purpose: purpose).where("asset_id=assignments.id"))
+    where.not(Ignore.where(asset_type: "Assignment",
+                           user_id: user,
+                           purpose: purpose).where("asset_id=assignments.id")
+                       .arel.exists)
   }
 
   # This should only be used in the course drop down to show assignments needing a submission
@@ -3465,7 +3466,7 @@ class Assignment < ActiveRecord::Base
 
   def self.assignment_ids_with_submissions(assignment_ids)
     Submission.from(sanitize_sql(["unnest('{?}'::int8[]) as subs (assignment_id)", assignment_ids]))
-              .where("EXISTS (?)", Submission.active.having_submission.where("submissions.assignment_id=subs.assignment_id"))
+              .where(Submission.active.having_submission.where("submissions.assignment_id=subs.assignment_id").arel.exists)
               .distinct.pluck("subs.assignment_id")
   end
 

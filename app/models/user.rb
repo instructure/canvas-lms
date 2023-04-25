@@ -313,9 +313,9 @@ class User < ActiveRecord::Base
   scope :has_created_account, -> { where("users.workflow_state NOT IN ('creation_pending', 'deleted')") }
 
   scope :has_current_student_enrollments, lambda {
-    where("EXISTS (?)",
-          Enrollment.joins("JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id AND courses.workflow_state='available'")
-              .where("enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment'"))
+    where(Enrollment.joins("JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id AND courses.workflow_state='available'")
+              .where("enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment'")
+              .arel.exists)
   }
 
   scope :not_fake_student, -> { where("enrollments.type <> 'StudentViewEnrollment'") }

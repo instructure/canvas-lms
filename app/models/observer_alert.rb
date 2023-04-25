@@ -80,12 +80,12 @@ class ObserverAlert < ActiveRecord::Base
                       .where(user_id: user_ids)
                       .for_enrollments(Enrollment.all_active_or_pending).
                       # users_are_still_linked?
-                      where("EXISTS (?)", ObserverEnrollment.where("enrollments.course_id=assignments.context_id AND enrollments.user_id=observer_alert_thresholds.observer_id AND enrollments.associated_user_id=submissions.user_id"))
+                      where(ObserverEnrollment.where("enrollments.course_id=assignments.context_id AND enrollments.user_id=observer_alert_thresholds.observer_id AND enrollments.associated_user_id=submissions.user_id").arel.exists)
                       .missing
                       .merge(Assignment.submittable)
                       .merge(Assignment.published)
                       .where("late_policy_status = 'missing' OR cached_due_date > ?", 1.day.ago)
-                      .where("NOT EXISTS (?)", ObserverAlert.where(context_type: "Submission", alert_type: "assignment_missing").where("context_id=submissions.id"))
+                      .where.not(ObserverAlert.where(context_type: "Submission", alert_type: "assignment_missing").where("context_id=submissions.id").arel.exists)
 
         submissions.find_in_batches do |batch|
           courses = Course.select(:id, :course_code).find(batch.map(&:course_id)).index_by(&:id)

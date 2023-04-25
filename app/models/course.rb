@@ -933,14 +933,14 @@ class Course < ActiveRecord::Base
   scope :not_deleted, -> { where("workflow_state<>'deleted'") }
 
   scope :with_enrollments, lambda {
-    where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
+    where(Enrollment.active.where("enrollments.course_id=courses.id").arel.exists)
   }
   scope :with_enrollment_types, lambda { |types|
     types = types.map { |type| "#{type.capitalize}Enrollment" }
-    where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id").where(type: types))
+    where(Enrollment.active.where("enrollments.course_id=courses.id").where(type: types).arel.exists)
   }
   scope :without_enrollments, lambda {
-    where("NOT EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
+    where.not(Enrollment.active.where("enrollments.course_id=courses.id").arel.exists)
   }
 
   # completed and not_completed -- logic should match up as much as possible with #soft_concluded?
@@ -960,14 +960,14 @@ class Course < ActiveRecord::Base
     if teacher_ids.empty?
       none
     else
-      where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id AND enrollments.type='TeacherEnrollment' AND enrollments.user_id IN (?)", teacher_ids))
+      where(Enrollment.active.where("enrollments.course_id=courses.id AND enrollments.type='TeacherEnrollment' AND enrollments.user_id IN (?)", teacher_ids).arel.exists)
     end
   }
   scope :by_associated_accounts, lambda { |account_ids|
     if account_ids.empty?
       none
     else
-      where("EXISTS (?)", CourseAccountAssociation.where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids))
+      where(CourseAccountAssociation.where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids).arel.exists)
     end
   }
   scope :published, -> { where(workflow_state: %w[available completed]) }
@@ -4183,7 +4183,7 @@ class Course < ActiveRecord::Base
 
     assignments.active
                .where(anonymous_grading: false, moderated_grading: false)
-               .where("NOT EXISTS (?)", matching_post_policies_scope)
+               .where.not(matching_post_policies_scope.arel.exists)
                .preload(:post_policy)
                .each do |assignment|
       assignment.ensure_post_policy(post_manually: post_manually)

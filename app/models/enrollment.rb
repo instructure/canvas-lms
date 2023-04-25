@@ -170,16 +170,17 @@ class Enrollment < ActiveRecord::Base
   def clear_needs_grading_count_cache
     Assignment
       .where(context_id: course_id, context_type: "Course")
-      .where("EXISTS (?) AND NOT EXISTS (?)",
-             Submission.where(user_id: user_id)
+      .where(Submission.where(user_id: user_id)
                .where("assignment_id=assignments.id")
                .where("#{Submission.needs_grading_conditions} OR
             (workflow_state = 'deleted' AND submission_type IS NOT NULL AND
             (score IS NULL OR NOT grade_matches_current_submission OR
-            (submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL)))"),
-             Enrollment.where(Enrollment.active_student_conditions)
+            (submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL)))")
+            .arel.exists)
+      .where.not(Enrollment.where(Enrollment.active_student_conditions)
                .where(user_id: user_id, course_id: course_id)
-               .where("id<>?", self))
+               .where("id<>?", self)
+               .arel.exists)
       .clear_cache_keys(:needs_grading)
   end
 

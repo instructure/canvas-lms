@@ -858,13 +858,15 @@ class Attachment < ActiveRecord::Base
             new_name = opts[:name] || self.display_name
             self.display_name = Attachment.make_unique_filename(new_name, existing_names, iter_count)
 
-            if Attachment.where("id = ? AND NOT EXISTS (?)",
-                                self,
-                                Attachment.where("id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?",
-                                                 self,
-                                                 display_name,
-                                                 folder_id,
-                                                 "deleted"))
+            if Attachment.where(id: self)
+                         .where.not(
+                           Attachment.where("id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?",
+                                            self,
+                                            display_name,
+                                            folder_id,
+                                            "deleted")
+                                     .arel.exists
+                         )
                          .limit(1)
                          .update_all(display_name: display_name) > 0
               valid_name = true
