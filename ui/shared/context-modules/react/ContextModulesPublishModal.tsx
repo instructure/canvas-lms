@@ -135,14 +135,14 @@ const ContextModulesPublishModal: React.FC<Props> = ({
           color="primary"
           disabled={isCanceling}
         >
-          {isPublishing ? (
+          {!isPublishing && isOpen ? (
+            I18n.t('Continue')
+          ) : (
             <AccessibleContent
               alt={I18n.t('Stop publishing button. Click to discontinue processing.')}
             >
               {I18n.t('Stop Publishing')}
             </AccessibleContent>
-          ) : (
-            I18n.t('Continue')
           )}
         </Button>
       </Modal.Footer>
