@@ -149,6 +149,32 @@ describe('ContextModulesPublishMenu', () => {
     })
   })
 
+  describe('Modal actions', () => {
+    it('closes the modal when stopping an action', () => {
+      const stopButtonText =
+        'Stop publishing button. Click to discontinue processing.Stop Publishing'
+      const {queryByRole, getByRole, getByText, getByTestId} = render(
+        <ContextModulesPublishMenu {...defaultProps} />
+      )
+      const menuButton = getByRole('button')
+      act(() => menuButton.click())
+      const publishAllOption = getByText('Publish all modules and items')
+      act(() => publishAllOption.click())
+      expect(queryByRole('heading', {name: 'Publish all modules and items'})).toBeInTheDocument()
+      const publishButton = getByTestId('publish-button')
+      expect(publishButton.textContent).toBe('Continue')
+      act(() => publishButton.click())
+      expect(publishButton.textContent).toBe(stopButtonText)
+      act(() => publishButton.click())
+      // keeps the same button state
+      expect(publishButton.textContent).toBe(stopButtonText)
+      // closes the modal
+      expect(
+        queryByRole('heading', {name: 'Publish all modules and items'})
+      ).not.toBeInTheDocument()
+    })
+  })
+
   describe('error handling', () => {
     it('shows alert on successful publish', async () => {
       doFetchApi.mockResolvedValueOnce({

@@ -184,6 +184,7 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
   }
 
   const handleCancel = () => {
+    setIsModalOpen(false)
     cancelBatchUpdate(currentProgress, onCancelComplete)
     setIsCanceling(true)
     setCurrentProgress(undefined)
