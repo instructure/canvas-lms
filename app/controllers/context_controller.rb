@@ -208,6 +208,8 @@ class ContextController < ApplicationController
         respond_to do |format|
           format.html do
             @accesses = @accesses.paginate(page: params[:page], per_page: 50)
+            @last_activity_at = @context.enrollments.where(user_id: @user).maximum(:last_activity_at)
+            @aua_expiration_date = AssetUserAccess.expiration_date
             js_env(context_url: context_url(@context, :context_user_usage_url, @user, format: :json),
                    accesses_total_pages: @accesses.total_pages)
           end
