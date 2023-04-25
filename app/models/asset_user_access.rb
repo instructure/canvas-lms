@@ -330,6 +330,21 @@ class AssetUserAccess < ActiveRecord::Base
     ICON_MAP[asset_category.to_sym]&.[](1) || ""
   end
 
+  def self.expiration_date
+    cutoff = Setting.get("asset_user_accesses_retain_for", 1.year.to_s).to_i
+    cutoff.seconds.ago
+  end
+
+  def self.delete_old_records
+    batch_size = Setting.get("asset_user_accesses_delete_batch_size", "10000").to_i
+    batch_sleep = Setting.get("asset_user_accesses_delete_batch_sleep", "0").to_f
+    AssetUserAccess.connection.with_max_update_limit(batch_size) do
+      while where(last_access: ..expiration_date).limit(batch_size).delete_all > 0
+        sleep(batch_sleep) if batch_sleep > 0 # rubocop:disable Lint/NoSleep
+      end
+    end
+  end
+
   private
 
   def increment(attribute)
