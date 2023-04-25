@@ -111,7 +111,7 @@ The tool is created using the ExternalTool API, and the `CC::Importer::BLTIConve
 
 ##### Via JSON Config
 
-The user provides a JSON config in the Developer Keys UI, and saves the key. The tool is registered using a DeveloperKey and Lti::ToolConfiguration models. The privacy level is taken from the `extensions` property of the JSON tool configuration and exposed via the Lti::ToolConfiguration's `privacy_level` method, and in its `settings` hash as well. During tool deployment (installation into a context), the `settings` hash is copied to the tool and the tool's workflow_state is set using the privacy_level.
+The user provides a JSON config in the Developer Keys UI, and saves the key. The tool is registered using a DeveloperKey and Lti::ToolConfiguration models. The privacy level is taken from the `extensions` property of the JSON tool configuration and stored in the Lti::ToolConfiguration's `privacy_level` column, and in its `settings` hash as well. During tool deployment (installation into a context), the `settings` hash is copied to the tool and the tool's workflow_state is set using the privacy_level.
 
 ##### Manually
 
