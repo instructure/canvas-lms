@@ -121,20 +121,28 @@ export function batchUpdateOneModuleApiCall(
       }
       relockModulesDialog.renderIfNeeded(result.json)
 
-      exportFuncs.fetchModuleItemPublishedState(courseId, moduleId)
-      published_result = result.json.published
+      return exportFuncs
+        .fetchModuleItemPublishedState(courseId, moduleId)
+        .then(() => {
+          published_result = result.json.published
 
-      if (skipContentTags) {
-        exportFuncs.updateModuleItemsPublishedStates(moduleId, undefined, false)
-      } else {
-        exportFuncs.updateModuleItemsPublishedStates(moduleId, result.json.published, false)
-      }
-      showFlashAlert({
-        message: successMessage,
-        type: 'success',
-        err: null,
-        srOnly: true,
-      })
+          showFlashAlert({
+            message: successMessage,
+            type: 'success',
+            err: null,
+            srOnly: true,
+          })
+        })
+        .finally(() => {
+          exportFuncs.disableContextModulesPublishMenu(false)
+          exportFuncs.renderContextModulesPublishIcon(
+            courseId,
+            moduleId,
+            published_result,
+            false,
+            loadingMessage
+          )
+        })
     })
     .catch(error => {
       showFlashAlert({
@@ -144,20 +152,10 @@ export function batchUpdateOneModuleApiCall(
       })
       exportFuncs.updateModuleItemsPublishedStates(moduleId, undefined, false)
     })
-    .finally(() => {
-      exportFuncs.disableContextModulesPublishMenu(false)
-      exportFuncs.renderContextModulesPublishIcon(
-        courseId,
-        moduleId,
-        published_result,
-        false,
-        loadingMessage
-      )
-    })
 }
 
 export const fetchModuleItemPublishedState = (courseId, moduleId, nextLink?: string) => {
-  doFetchApi({
+  return doFetchApi({
     path: nextLink || `/api/v1/courses/${courseId}/modules/${moduleId}/items`,
     method: 'GET',
   })
@@ -167,7 +165,9 @@ export const fetchModuleItemPublishedState = (courseId, moduleId, nextLink?: str
         exportFuncs.updateModuleItemPublishedState(item.id, item.published)
       })
       if (link?.next) {
-        exportFuncs.fetchModuleItemPublishedState(courseId, moduleId, link.next.url)
+        return exportFuncs.fetchModuleItemPublishedState(courseId, moduleId, link.next.url)
+      } else {
+        return response
       }
     })
     .catch(error =>
