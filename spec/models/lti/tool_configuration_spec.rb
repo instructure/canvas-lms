@@ -413,7 +413,8 @@ module Lti
       let_once(:account) { Account.create! }
       let(:params) do
         {
-          settings: settings.with_indifferent_access
+          settings: settings.with_indifferent_access,
+          privacy_level: "public"
         }
       end
       let(:tool_configuration) { described_class.create_tool_config_and_key!(account, params) }
@@ -434,6 +435,10 @@ module Lti
 
       it "correctly sets custom_fields" do
         expect(tool_configuration.settings["custom_fields"]).to eq settings["custom_fields"]
+      end
+
+      it "correctly sets privacy_level" do
+        expect(tool_configuration[:privacy_level]).to eq params[:privacy_level]
       end
 
       context "when the account is site admin" do
@@ -556,6 +561,63 @@ module Lti
 
       it "returns the appropriate placements" do
         expect(subject).to eq(settings["extensions"].first["settings"]["placements"])
+      end
+    end
+
+    describe "privacy_level" do
+      subject do
+        extensions["privacy_level"] = extension_privacy_level
+        tool_configuration.privacy_level = privacy_level
+        tool_configuration.save!
+        tool_configuration[:privacy_level] # bypass getter and read from column
+      end
+
+      let(:extension_privacy_level) { "name_only" }
+      let(:privacy_level) { raise "set in examples" }
+      let(:extensions) { settings["extensions"].first }
+
+      before { tool_configuration.developer_key = developer_key }
+
+      context "when nil" do
+        let(:privacy_level) { nil }
+
+        it "is set to the value from canvas_extensions" do
+          expect(subject).to eq extension_privacy_level
+        end
+      end
+
+      context "when already defined" do
+        context "when the same as the value from canvas_extensions" do
+          before { tool_configuration.privacy_level = extension_privacy_level }
+
+          let(:privacy_level) { extension_privacy_level }
+
+          it "is not reset" do
+            expect { subject }.not_to change { tool_configuration[:privacy_level] }
+          end
+        end
+
+        context "when different from the value in canvas_extensions" do
+          let(:privacy_level) { "anonymous" }
+
+          it "is updated to match" do
+            expect(subject).to eq extension_privacy_level
+          end
+        end
+
+        context "when the canvas_extensions value is nil" do
+          let(:privacy_level) { "anonymous" }
+
+          before do
+            # setting the value directly to nil violates the
+            # extension schema, so nuke the whole thing
+            tool_configuration.settings.delete("extensions")
+          end
+
+          it "ignores the override" do
+            expect(subject).to eq privacy_level
+          end
+        end
       end
     end
   end

@@ -166,7 +166,7 @@ export default class DeveloperKeyModal extends React.Component {
     } = this.props
     this.setState({toolConfiguration: settings, isSaving: true})
     return actions
-      .updateLtiKey(developerKey, [], this.developerKey.id, settings, settings.custom_fields, null)
+      .updateLtiKey(developerKey, [], this.developerKey.id, settings, settings.custom_fields)
       .then(data => {
         this.setState({isSaving: false})
         const {developer_key, tool_configuration} = data
