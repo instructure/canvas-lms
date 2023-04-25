@@ -624,6 +624,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "O arquivo de mídia está sendo processado. Por favor, tente novamente mais tarde."
   },
+  "media_title_2112243b": { "message": "Título da mídia" },
   "medium_5a8e9ead": { "message": "Média" },
   "merge_links_2478df96": { "message": "Mesclar links" },
   "mic_a7f3d311": { "message": "Mic" },
@@ -944,6 +945,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Iniciar gravação" },
   "steel_blue_14296f08": { "message": "Azul aço" },
   "studio_media_options_ee504361": { "message": "Opções de mídia do Studio" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Bandeja de opções de mídia do Studio"
+  },
   "styles_2aa721ef": { "message": "Estilos" },
   "submit_a3cc6859": { "message": "Enviar" },
   "subscript_59744f96": { "message": "Subscrito" },

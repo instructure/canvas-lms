@@ -592,6 +592,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "メディアファイルは処理中です。後ほどもう一度やり直してください。"
   },
+  "media_title_2112243b": { "message": "メディアタイトル" },
   "medium_5a8e9ead": { "message": "中" },
   "merge_links_2478df96": { "message": "リンクをマージする" },
   "mic_a7f3d311": { "message": "マイク" },
@@ -892,6 +893,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "録画開始" },
   "steel_blue_14296f08": { "message": "スチールブルー" },
   "studio_media_options_ee504361": { "message": "スタジオメディアオプション" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Studio メディア オプショントレイ"
+  },
   "styles_2aa721ef": { "message": "スタイル" },
   "submit_a3cc6859": { "message": "提出" },
   "subscript_59744f96": { "message": "下付き" },

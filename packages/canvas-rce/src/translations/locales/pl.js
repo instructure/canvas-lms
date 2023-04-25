@@ -610,6 +610,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Trwa przetwarzanie pliku multimediów. Spróbuj ponownie później."
   },
+  "media_title_2112243b": { "message": "Tytuł multimediów" },
   "medium_5a8e9ead": { "message": "Średni" },
   "merge_links_2478df96": { "message": "Scal łącza" },
   "mic_a7f3d311": { "message": "Mikrofon" },
@@ -928,6 +929,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Rozpocznij nagrywanie" },
   "steel_blue_14296f08": { "message": "Stalowy niebieski" },
   "studio_media_options_ee504361": { "message": "Opcje multimediów Studio" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Panel opcji multimediów Studio"
+  },
   "styles_2aa721ef": { "message": "Style" },
   "submit_a3cc6859": { "message": "Prześlij" },
   "subscript_59744f96": { "message": "Indeks dolny" },

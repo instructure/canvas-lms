@@ -634,6 +634,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Le fichier multimédia est en cours de traitement. Veuillez réessayer plus tard."
   },
+  "media_title_2112243b": { "message": "Titre du fichier multimédia" },
   "medium_5a8e9ead": { "message": "Moyen" },
   "merge_links_2478df96": { "message": "Fusionner les liens" },
   "mic_a7f3d311": { "message": "Micro" },
@@ -968,6 +969,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Démarrer l''enregistrement" },
   "steel_blue_14296f08": { "message": "Bleu métallisé" },
   "studio_media_options_ee504361": { "message": "Options de média Studio" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Tiroir d’options de médias Studio"
+  },
   "styles_2aa721ef": { "message": "Styles" },
   "submit_a3cc6859": { "message": "Soumettre" },
   "subscript_59744f96": { "message": "En indice" },
