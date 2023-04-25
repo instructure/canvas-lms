@@ -67,7 +67,8 @@ module PostgreSQLAdapterExtensions
 
   def explain(arel, binds = [], analyze: false)
     sql = "EXPLAIN #{"ANALYZE " if analyze}#{to_sql(arel, binds)}"
-    ActiveRecord::ConnectionAdapters::PostgreSQL::ExplainPrettyPrinter.new.pp(exec_query(sql, "EXPLAIN", binds))
+    ActiveRecord::ConnectionAdapters::PostgreSQL::ExplainPrettyPrinter.new
+                                                                      .pp(exec_query(sql, "EXPLAIN", binds))
   end
 
   def readonly?

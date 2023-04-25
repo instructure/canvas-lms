@@ -169,7 +169,7 @@ class Submission < ActiveRecord::Base
     end
   }
   scope :with_hidden_comments, lambda {
-    where("EXISTS (?)", SubmissionComment.where("submission_id = submissions.id AND hidden = true"))
+    where(SubmissionComment.where("submission_id = submissions.id AND hidden = true").arel.exists)
   }
 
   # This should only be used in the course drop down to show assignments recently graded.

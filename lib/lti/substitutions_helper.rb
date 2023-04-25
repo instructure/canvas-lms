@@ -317,7 +317,7 @@ module Lti
       return [] unless @context.is_a?(Course)
 
       @previous_ids ||= Course.where(
-        "EXISTS (?)", ContentMigration.where(context_id: @context.id, workflow_state: :imported).where("content_migrations.source_course_id = courses.id")
+        ContentMigration.where(context_id: @context.id, workflow_state: :imported).where("content_migrations.source_course_id = courses.id").arel.exists
       ).pluck(:id, :lti_context_id)
     end
   end

@@ -167,9 +167,10 @@ class DiscussionTopic < ActiveRecord::Base
                                                               .select("discussion_topic_section_visibilities.course_section_id"))
     else
       CourseSection.where(id: DiscussionTopicSectionVisibility.active.where(discussion_topic_id: id)
-                                                              .where("EXISTS (?)", Enrollment.active_or_pending
+                                                              .where(Enrollment.active_or_pending
                                                                                              .where(user_id: user)
-                                                                                             .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id"))
+                                                                                             .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")
+                                                                                             .arel.exists)
                                                               .select("discussion_topic_section_visibilities.course_section_id"))
     end
   end
@@ -728,8 +729,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where("NOT EXISTS (?)", Ignore.where(asset_type: "DiscussionTopic", user_id: user, purpose: purpose)
-      .where("asset_id=discussion_topics.id"))
+    where.not(Ignore.where(asset_type: "DiscussionTopic", user_id: user, purpose: purpose)
+      .where("asset_id=discussion_topics.id").arel.exists)
   }
 
   scope :todo_date_between, lambda { |starting, ending|
@@ -781,11 +782,19 @@ class DiscussionTopic < ActiveRecord::Base
   }
 
   scope :visible_to_student_sections, lambda { |student|
-    visibility_scope = DiscussionTopicSectionVisibility.active
-                                                       .where("discussion_topic_section_visibilities.discussion_topic_id = discussion_topics.id")
-                                                       .where("EXISTS (?)", Enrollment.active_or_pending.where(user_id: student)
-        .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id"))
-    where("discussion_topics.context_type <> 'Course' OR discussion_topics.is_section_specific = false OR EXISTS (?)", visibility_scope)
+    visibility_scope = DiscussionTopicSectionVisibility
+                       .active
+                       .where("discussion_topic_section_visibilities.discussion_topic_id = discussion_topics.id")
+                       .where(
+                         Enrollment.active_or_pending.where(user_id: student)
+                          .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")
+                          .arel.exists
+                       )
+    merge(
+      DiscussionTopic.where.not(discussion_topics: { context_type: "Course" })
+      .or(DiscussionTopic.where(discussion_topics: { is_section_specific: false }))
+      .or(DiscussionTopic.where(visibility_scope.arel.exists))
+    )
   }
 
   scope :recent, -> { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }

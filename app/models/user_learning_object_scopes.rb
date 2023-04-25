@@ -345,10 +345,12 @@ module UserLearningObjectScopes
               .where(grader_enrollments: { workflow_state: "active", user_id: self, type: ["TeacherEnrollment", "TaEnrollment"] })
               .where("grader_enrollments.limit_privileges_to_course_section = 'f'
         OR grader_enrollments.course_section_id = enrollments.course_section_id")
-              .where("NOT EXISTS (?)",
-                     Ignore.where(asset_type: "Assignment",
-                                  user_id: self,
-                                  purpose: "grading").where("asset_id=submissions.assignment_id")).count
+              .where.not(
+                Ignore.where(asset_type: "Assignment",
+                             user_id: self,
+                             purpose: "grading").where("asset_id=submissions.assignment_id")
+                           .arel.exists
+              ).count
   end
 
   def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, **opts)
@@ -369,7 +371,7 @@ module UserLearningObjectScopes
                                         .where("student_enrollments.user_id=submissions_needing_grading.user_id AND student_enrollments.workflow_state='active'")
                                         .where("(enrollments.limit_privileges_to_course_section='f' OR student_enrollments.course_section_id=enrollments.course_section_id)")
         as = assignment_scope.joins("INNER JOIN (#{submissions_needing_grading.to_sql}) AS submissions_needing_grading ON assignments.id=submissions_needing_grading.assignment_id")
-                             .where("EXISTS(?)", student_enrollments)
+                             .where(student_enrollments.arel.exists)
       else
         as = assignment_scope
              .where("EXISTS (#{grader_visible_submissions_sql})")

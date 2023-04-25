@@ -151,7 +151,7 @@ module UserSearch
         if context.is_a?(Account)
           # for example, one user can have multiple teacher enrollments, but
           # we only want one such a user record in results
-          users_scope = users_scope.where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").active.where(type: enrollment_types)).distinct
+          users_scope = users_scope.where(Enrollment.where("enrollments.user_id=users.id").active.where(type: enrollment_types).arel.exists).distinct
         else
           if context.is_a?(Group) && context.context_type == "Course"
             users_scope = users_scope.joins(:enrollments).where(enrollments: { course_id: context.context_id })

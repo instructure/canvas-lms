@@ -174,9 +174,14 @@ class Pseudonym < ActiveRecord::Base
   def self.custom_find_by_unique_id(unique_id)
     return unless unique_id
 
-    active_only.by_unique_id(unique_id).where("authentication_provider_id IS NULL OR EXISTS (?)",
-                                              AuthenticationProvider.active.where(auth_type: ["canvas", "ldap"])
-                                                .where("authentication_provider_id=authentication_providers.id"))
+    active_only.by_unique_id(unique_id).merge(
+      where(authentication_provider_id: nil)
+        .or(where(AuthenticationProvider
+          .active
+          .where(auth_type: ["canvas", "ldap"])
+          .where("authentication_provider_id=authentication_providers.id")
+          .arel.exists))
+    )
                .order("authentication_provider_id NULLS LAST").first
   end
 

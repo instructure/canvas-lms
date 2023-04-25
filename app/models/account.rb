@@ -746,11 +746,13 @@ class Account < ActiveRecord::Base
     else
       shard.activate do
         if opts[:include_crosslisted_courses]
-          Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self)
-            .where("course_id=courses.id"))
+          Course.where(CourseAccountAssociation.where(account_id: self)
+            .where("course_id=courses.id")
+            .arel.exists)
         else
-          Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self, course_section_id: nil)
-            .where("course_id=courses.id"))
+          Course.where(CourseAccountAssociation.where(account_id: self, course_section_id: nil)
+            .where("course_id=courses.id")
+            .arel.exists)
         end
       end
     end

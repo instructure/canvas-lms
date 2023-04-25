@@ -447,11 +447,12 @@ class DiscussionEntry < ActiveRecord::Base
       scope = DiscussionTopicParticipant.where(discussion_topic_id: discussion_topic_id)
       if discussion_topic.root_topic?
         group_ids = discussion_topic.group_category.groups.active.pluck(:id)
-        scope = scope.where("NOT EXISTS (?)",
-                            GroupMembership.where("group_memberships.workflow_state <> 'deleted' AND
-            group_memberships.user_id=discussion_topic_participants.user_id AND
-            group_memberships.group_id IN (?)",
-                                                  group_ids))
+        scope = scope.where.not(
+          GroupMembership.where.not(workflow_state: "deleted")
+                         .where("group_memberships.user_id=discussion_topic_participants.user_id")
+                         .where(group_id: group_ids)
+                         .arel.exists
+        )
       end
       scope = scope.where("user_id<>?", user) if user
       scope.in_batches(of: 10_000).update_all("unread_entry_count = unread_entry_count + 1")
