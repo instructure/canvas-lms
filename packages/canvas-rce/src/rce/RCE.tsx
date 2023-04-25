@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+// @ts-nocheck
+
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
