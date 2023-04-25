@@ -605,6 +605,7 @@
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Yritä myöhemmin uudelleen. Yritä myöhemmin uudelleen."
   },
+  "media_title_2112243b": { "message": "Median otsikko" },
   "medium_5a8e9ead": { "message": "Tietoväline" },
   "merge_links_2478df96": { "message": "Yhdistä linkkejä" },
   "mic_a7f3d311": { "message": "Mikrofoni" },
@@ -909,6 +910,9 @@
   "start_recording_9a65141a": { "message": "Aloita nauhoitus" },
   "steel_blue_14296f08": { "message": "Teräksensininen" },
   "studio_media_options_ee504361": { "message": "Studion mediaväline" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Studion mediavälinealue"
+  },
   "styles_2aa721ef": { "message": "Tyylit" },
   "submit_a3cc6859": { "message": "Lähetä" },
   "subscript_59744f96": { "message": "Alaindeksi" },

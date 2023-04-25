@@ -559,6 +559,7 @@
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Fichye miltimedya an tretman. Tanpri eseye ankò."
   },
+  "media_title_2112243b": { "message": "Tit Medya" },
   "medium_5a8e9ead": { "message": "Mwayen" },
   "merge_links_2478df96": { "message": "Fizyone lyen" },
   "mic_a7f3d311": { "message": "Mikwo" },
@@ -857,6 +858,9 @@
   "start_recording_9a65141a": { "message": "Kòmanse Anrejistre" },
   "steel_blue_14296f08": { "message": "Ble Gri" },
   "studio_media_options_ee504361": { "message": "Opsyon Estidyo Medya a" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Opsyon Plato Medya Studio"
+  },
   "styles_2aa721ef": { "message": "Stil" },
   "submit_a3cc6859": { "message": "Soumèt" },
   "subscript_59744f96": { "message": "Endis" },

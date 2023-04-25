@@ -589,6 +589,7 @@
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Mediendatei wird verarbeitet. Versuchen Sie es später noch einmal."
   },
+  "media_title_2112243b": { "message": "Medien-Titel" },
   "medium_5a8e9ead": { "message": "Medium" },
   "merge_links_2478df96": { "message": "Links zusammenführen" },
   "mic_a7f3d311": { "message": "Mikrofon" },
@@ -907,6 +908,7 @@
   "start_recording_9a65141a": { "message": "Aufzeichnung starten" },
   "steel_blue_14296f08": { "message": "Stahlblau" },
   "studio_media_options_ee504361": { "message": "Studio-Medienoptionen" },
+  "studio_media_options_tray_cfb94654": { "message": "Studio-Medienoptionen" },
   "styles_2aa721ef": { "message": "Styles" },
   "submit_a3cc6859": { "message": "Abgeben" },
   "subscript_59744f96": { "message": "Abonnieren" },

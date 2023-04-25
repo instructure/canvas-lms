@@ -583,6 +583,7 @@
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Mediefilen behandles. Prøv igjen senere."
   },
+  "media_title_2112243b": { "message": "Medietittel" },
   "medium_5a8e9ead": { "message": "Medium" },
   "merge_links_2478df96": { "message": "Slå sammen lenker" },
   "mic_a7f3d311": { "message": "Mikrofon" },
@@ -885,6 +886,9 @@
   "start_recording_9a65141a": { "message": "Start opptak" },
   "steel_blue_14296f08": { "message": "Stålblå" },
   "studio_media_options_ee504361": { "message": "Studiomediealternativer" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Skuff for studiomediealternativer"
+  },
   "styles_2aa721ef": { "message": "Stiler" },
   "submit_a3cc6859": { "message": "Send inn" },
   "subscript_59744f96": { "message": "Senket skrift" },
