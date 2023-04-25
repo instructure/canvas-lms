@@ -1986,6 +1986,16 @@ modules.initModuleManagement = function (duplicate) {
     }
   })
 
+  if (duplicate && duplicate.length) {
+    const modulePublishIcon = duplicate[0].querySelector('.module-publish-icon')
+    if (modulePublishIcon) {
+      const courseId = modulePublishIcon.getAttribute('data-course-id')
+      const moduleId = modulePublishIcon.getAttribute('data-module-id')
+      const published = modulePublishIcon.getAttribute('data-published') === 'true'
+      renderContextModulesPublishIcon(courseId, moduleId, false, published)
+    }
+  }
+
   $('.module-publish-link').each((i, element) => {
     const $el = $(element)
     const model = new Publishable(
