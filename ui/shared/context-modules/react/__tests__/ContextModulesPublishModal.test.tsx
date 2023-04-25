@@ -55,7 +55,12 @@ describe('ContextModulesPublishModal', () => {
     expect(modalTitle).toBeInTheDocument()
     expect(
       getByText(
-        'This process could take a few minutes. Click the Stop button to discontinue processing. Items that have already been processed will not be reverted to their previous state.'
+        'This process could take a few minutes. You may close the modal or navigate away from the page during this process.'
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        'To discontinue processing, click the Stop button. Note: Items that have already been processed will not be reverted to their previous state when the process is discontinued.'
       )
     ).toBeInTheDocument()
   })

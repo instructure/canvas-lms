@@ -296,7 +296,7 @@ class ContextModulesApiController < ApplicationController
         progress.process_job(
           @context,
           :batch_update_context_modules,
-          { run_at: Time.now },
+          { run_at: Time.now, priority: Delayed::HIGH_PRIORITY },
           **batch_update_params
         )
       else
