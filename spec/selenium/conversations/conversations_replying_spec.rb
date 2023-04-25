@@ -71,7 +71,7 @@ describe "conversations new" do
 
         f("textarea[data-testid='message-body']").send_keys("new recipient")
         ff("input[aria-label='Address Book']")[1].click
-        fj("div[data-testid='address-book-item']:contains('Students')").click
+        fj("div[data-testid='address-book-item']:contains('Users')").click
         fj("div[data-testid='address-book-item']:contains('first student')").click
         f("button[data-testid='send-button']").click
         wait_for_ajaximations

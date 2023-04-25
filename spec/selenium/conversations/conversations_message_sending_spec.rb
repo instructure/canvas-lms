@@ -603,7 +603,7 @@ describe "conversations new" do
         f("button[data-testid='compose']").click
         ff("input[aria-label='Address Book']")[1].click
         wait_for_ajaximations
-        fj("li:contains('Students')").click
+        fj("li:contains('Users')").click
         fj("li:contains('#{@s1.name}')").click
         ff("input[aria-label='Address Book']")[1].click
         wait_for_ajaximations
