@@ -122,7 +122,11 @@ class Header extends React.Component {
           />
         )
 
-        if (this.isSubmissionLate(submission) && !submission.gradeHidden) {
+        if (
+          !ENV.restrict_quantitative_data &&
+          this.isSubmissionLate(submission) &&
+          !submission.gradeHidden
+        ) {
           return (
             <Tooltip
               as="div"

@@ -26,6 +26,11 @@ import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 jest.mock('../AttemptSelect')
 jest.mock('../CommentsTray', () => () => '')
 
+afterEach(() => {
+  // @ts-ignore
+  window.ENV = {}
+})
+
 it('renders normally', async () => {
   const props = await mockAssignmentAndSubmission()
   const {getByTestId} = render(<Header {...props} />)
@@ -125,6 +130,35 @@ it('shows the number of points deducted in the tooltip when the current grade is
   fireEvent.focus(pointsDisplay)
   expect(getByText('Late Penalty')).toBeInTheDocument()
   expect(getByText('-4')).toBeInTheDocument()
+})
+
+it('does not show the late policy tooltip when restrict_quantitative_data is truthy', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {
+      gradingType: 'points',
+      pointsPossible: 10,
+    },
+    Submission: {
+      ...SubmissionMocks.graded,
+      attempt: 1,
+      deductedPoints: 4,
+      enteredGrade: 10,
+      grade: 6,
+      submissionStatus: 'late',
+    },
+  })
+
+  window.ENV.restrict_quantitative_data = true
+
+  const {queryByText, getByTestId} = render(
+    <StudentViewContext.Provider value={{lastSubmittedSubmission: props.submission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+  const gradeDisplay = getByTestId('grade-display')
+  fireEvent.focus(gradeDisplay)
+  expect(queryByText('Late Penalty')).not.toBeInTheDocument()
+  expect(queryByText('-4')).not.toBeInTheDocument()
 })
 
 it('renders a "missing" status pill if the last graded submission is missing', async () => {
