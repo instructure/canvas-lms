@@ -227,6 +227,7 @@ ja:
   a_simplified_canvas_interface_for_k_5_enable_appli_bc32b2d1: |-
       K-5用の簡略化されたCanvasインターフェース。アカウント設定でK-5アカウントとして該当する
       サブアカウントを有効にします。
+  a_single_certificate_file_e7f347f1: 単一の証明書ファイル
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: SIS統合が設定されておらず、新しいSIS統合設定を有効にする機能が有効になっていません
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "受講者がコースの%{assignment_name}の%{course_name}の提出を遅れて行いました"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "受講者がコース%{assignment_title}の%{course_name}の再提出を行いました"
@@ -4092,9 +4093,11 @@ ja:
       settings: 設定
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: この課題には評定は割り当てられません。
+      assignment_not_yet_graded_rqd_screenreader: 課題はまだ採点されていません。
       assignment_not_yet_graded_screenreader: "課題はまだ採点されていません。配点は %{pointsPossible} です。"
       empty_points_possible: "-/%{pointsPossible} 点"
       no_submission: 提出なし
+      no_submission_for_assignment_rqd_screenreader: この課題の提出はありません。
       no_submission_for_assignment_screenreader: "この課題は提出されていません。配点は %{pointsPossible} です。"
       not_yet_graded: "*まだ採点されていません*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} 点"
@@ -4875,7 +4878,10 @@ ja:
     ldap_fields: 
       auth_filter_description: "*%{placeholder}*をユーザーが指定したユーザー名のプレースホルダーとして使用します。例えば：*(sAMAccountName=%{placeholder})*"
       identifer_format_description: "Canvas ログインをルックアップするために使用するLDAP属性。空欄のままにして、ユーザーが入力したユーザー名を使用します。"
+      internal_ca_description: LDAPサーバーが信頼されていない内部ルートCAによって発行された証明書を提示する場合、Canvasが接続時にそれを信頼できるようにするために、ルートCAをアップロードする*必要があります*。
+      internal_ca_warning: "*警告*:内部ルートCAを使用すると安全性が低くなり、不正・侵害のリスクが高まります。信頼できる認証局から発行された証明書を使用することを強くお勧めします。"
       ldap_timeout_failure_help2: "Canvas がLDAPサーバーとの通信時間時に頻回にタイムアウトしすぎると、%{time}回でさらにそのLDAPサーバーを使用してのログイン試行がブロックされます。LDAP サーバーは、%{timestamp}に最後にタイムアウトしました。"
+      verify_tls_cert_opt_in_description: "TLS証明書の検証は*%{enforcement_date}*が期限ですが、LDAPサーバーが準拠していることを確認できるよう、早めに有効化することができます。"
     ldap_settings_test: 
       labels: 
         pass: パスワード
@@ -6060,6 +6066,9 @@ ja:
   catalog_name_46d37909: Catalog名
   catalog_url_a01655dd: "Catalog URL"
   catalog_users_already_exist_2894b8c4: "Catalog ユーザは既に存在します"
+  catalog_was_provisioned_9851448f: カタログがプロビジョニングされました。
+  catalog_was_unprovisioned_9524cb58: カタログがプロビジョニングされていません。
+  catalog_was_updated_743a58eb: カタログが更新されました。
   category_b9a94408: カテゴリ
   categoryname_notification_preferences_cd64e4a0: "%{categoryName}の通知設定"
   cc: 
@@ -6078,6 +6087,8 @@ ja:
   cell_number_is_required_2edcee60: 電話番号は必須項目です
   central_value_in_a_set_of_results_calculated_by_di_19a8c48a: 結果の集合における中心値。全項目の得点の合計を得点数で割って算出。
   certificate_fingerprint_b376df90: 証明書の指紋
+  certificate_is_expired_or_not_yet_valid_4a3bb8f1: 証明書の有効期限が切れているか、まだ有効ではありません
+  certificate_is_not_a_ca_9ec5d574: 証明書がCAでない
   change_applied_89d1aa5a: 変更内容が適用されました
   change_beginning_date_to_39dbd06e: 開始日の変更
   change_color_for_mastery_level_position_daa51849: "達成レベル%{position}のカラーを変更する"
@@ -10620,6 +10631,8 @@ ja:
   drag_a_file_here_or_1aaf19c1: ファイルをここにドラッグするか、
   drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: ファイルをここにドラッグするか、アップロードする
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: "モジュールでのファイルのドラッグ & ドロップ、および複数ファイルのモジュール項目のアップロード"
+  drag_and_drop_or_browse_your_files_92ad4c17: ドラッグ＆ドロップするか、または*ファイルをブラウズしてください*
+  drag_and_drop_or_browse_your_files_to_replace_27cc42d6: ファイルをドラッグ＆ドロップするか、または*ファイルをブラウズして*交換します
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: ドラッグアンドドロップまたはクリックしてコンピュータを参照
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: ドラッグアンドドロップまたはクリックしてコンピュータを参照
   drag_and_drop_your_image_here_or_7fba7c14: 画像をここにドラッグ＆ドロップするか
@@ -15194,6 +15207,7 @@ ja:
   integrations_cadb03f3: インテグレーション
   interactions_report_47c1219e: インタラクションレポート
   internal_analytics_f02b3fff: 内部分析
+  internal_certificate_authority_ca_76566a37: 内部認証局(CA)
   internal_setting_created_f3f72416: 内部設定の作成
   internal_setting_deleted_aaf1dd9d: 内部設定の削除
   internal_setting_updated_87510559: 内部設定の更新
@@ -15246,6 +15260,7 @@ ja:
   invalid_hexcode_9124519f: 無効な16進コード
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: 無効な16進コード。カスタム色を使用するには、ここに有効な16進コードを入力してください。
   invalid_hexcode_provided_522ba223: 無効な16進コード
+  invalid_login_request_1639c89f: 無効なログイン要求
   invalid_microsoft_sync_tenant_given_please_validat_97be36bf: "指定されたMicrosoft Syncテナントは無効です。テナントを検証してください"
   invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "指定されたMicrosoft Syncテナントは無効です。テナントを検証してください。"
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "Microsoft Teams Syncのリモコン属性が無効です。有効なリモコン属性：%{VALID_SYNC_REMOTE_ATTRIBUTES}"
@@ -17779,6 +17794,8 @@ ja:
       email: 
         html: 
           announcement_info: このメールへの返信はお知らせへの返信として投稿され、コースの全員の目に触れます。
+          announcement_info_course: このメールへの返信はお知らせへの返信として投稿され、コースの全員の目に触れます。
+          announcement_info_group: このメールへの返信は、お知らせへの返信として投稿され、グループの全員の目に触れます。
           attached_file: 添付ファイル
           link: アナウンスを表示
         labels: 
@@ -18572,6 +18589,8 @@ ja:
   modify_permissions_for_account_rubrics_6c3aee59: アカウント規定の許可を変更
   modify_settings_ed8b9ccf: 設定を変更
   module_90d9fd32: モジュール
+  module_and_items_published_13ed5cd6: モジュールと公開アイテム
+  module_and_items_unpublished_e953ba4f: モジュールとアイテムは非公開
   module_completed_50c50762: モジュール完了
   module_content_import_enhancements_c00b0ea2: モジュールコンテンツのインポート機能改善
   module_file_upload_enhancements_eecd4d37: モジュールファイルアップロードの機能強化
@@ -18603,6 +18622,7 @@ ja:
   module_navigation_97043417: モジュールネビゲーション
   module_publish_menu_30b638dd: モジュール公開メニュー
   module_publish_menu_88b54c1b: モジュール公開メニュー
+  module_published_80f0b9b8: モジュールは公開
   modules: 
     add: 
       assignment: 
@@ -19011,6 +19031,7 @@ ja:
   nav_text_94206145: ナビテキスト
   nav_text_active_a924ae88: ナビテキストアクティブ
   navigate_to_speed_grader_for_name_f28cb5b1: "%{name}用にSpeed Grader forに移動します。"
+  navigate_to_speed_grader_for_title_assignment_828b1366: "%{title}課題用スピードグレーダーに移動する"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: ユーザーがコースナビゲーションの人物のリンクを表示できるようにします。
   navigation_icon_45db938e: ナビゲーションのアイコン
   navigation_menu_fd782ff8: ナビゲーションメニュー
@@ -19105,6 +19126,7 @@ ja:
   new_quizzes_dbda7e0a: 新しい小テスト
   new_quizzes_description: "この機能は、ディスカッション内の Canvas エクスペリエンスを強化します。このフラグを有効にすると、新しい小テストツールが使用可能になります。詳細については、Canvas コミュニティの*新しい小テストユーザーグループ*を参照してください。"
   new_quizzes_embedded_module_progression_cd2307b6: 新しいクイズ組み込みモジュールの進行
+  new_quizzes_export_support_b0a6a625: 新しい小テストエクスポート対応
   new_quizzes_importing_c167dce0: 新クイズのインポート
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: アウトカムアライメントサマリータブに新しい小テストが追加されました。
   new_quizzes_migration_during_course_import_copy_e9dd124e: コースのインポート/コピー中の、新しい小テストの移行
@@ -19380,6 +19402,8 @@ ja:
   not_submitted_fff47f17: 提出されていません
   not_synced_529cbf29: 非同期
   not_synced_message_a343fe5e: "非同期：%{message}"
+  not_valid_after_81c9faec: 以後は無効
+  not_valid_before_9ad2d22d: 以前は無効
   not_visible_in_student_files_22f11883: 受講生ファイルでは表示できません。
   not_yet_assessed_9362f199: まだ評価されていません
   not_yet_completed_345a0bca: まだ完了していません
@@ -20569,6 +20593,7 @@ ja:
   please_enter_a_name_for_this_link_318f01a4: このリンクの名前を入力してください。
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: 移行率には0〜100の数値を入力してください
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "検索語を 3 文字以上で入力してください"
+  please_enter_a_valid_search_term_5c69b0b0: 有効な検索語句を入力してください
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "有効な URLを入力してください (例： http://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "有効な URLを入力してください。プロトコルが必要です (e.g. http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__6dc0071c: "有効な URLを入力してください。プロトコルが必要です (e.g. http://, https://, ftp://, tel:)."
@@ -21261,6 +21286,7 @@ ja:
   privacy_290109ea: プライバシー
   privacy_level_f0ec09a3: プライバシーレベル
   private_3883d133: 個人
+  private_key_is_present_in_certificate_file_1a1b7b42: 秘密鍵が証明書ファイルに存在します
   pro_tip_30e41fa3: プロのヒント！
   proceed_f3d33864: 続行する
   proceed_with_caution_aa9b3285: 慎重に進めてください
@@ -21779,6 +21805,8 @@ ja:
   publishing_error_bdfb3390: 公開時エラー
   publishing_is_disabled_for_this_item_efa7803f: このアイテムでは公開は無効になっています
   publishing_item_name_is_disabled_8207a9e7: "%{item_name} は公開は無効になっています"
+  publishing_module_and_items_ce128d12: パブリッシングモジュールとアイテム
+  publishing_module_c2b5211: パブリッシングモジュール
   publishing_pace_a65e4152: 公開ペース...
   publishing_plan_b70186ed: プランの公開...
   publishing_progress_5154a430: 進行状況を公開中
@@ -23149,6 +23177,8 @@ ja:
         one: "%{count} 秒"
         other: "%{count} 秒"
       show_time_link: 時間を表示する
+      time_remaining: "%{time}残りがあります"
+      times_up: 時間切れです！10秒以内に結果を提出します
       titles: 
         come_back_later: この問題に、後で戻ってくるためのマークを付けました
         times_up: 制限時間になりました!
@@ -23588,6 +23618,7 @@ ja:
   remove_attribute_59a4aa64: 属性の削除
   remove_avatar_picture_aba765eb: アバター画像を削除
   remove_c_name_section_d8eabd3a: " %{c.name} セクションを削除"
+  remove_certificate_4e979eee: 証明書を削除する
   remove_collaborationtitle_c3e81adb: "\"%{collaborationTitle}\"を削除しますか？"
   remove_condition_9cf94f7f: 条件を削除
   remove_conference_69b9e0d0: 会議を削除する
@@ -24399,6 +24430,7 @@ ja:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: 評定表内の課題と課題や受講者用の新デザインの検索
   search_by_99d1ba5f: 検索条件
   search_by_c559efd: 検索条件
+  search_by_name_or_id_3bdab12e: 名前またはIDで検索
   search_by_student_name_26536097: 受講者名で検索
   search_by_title_or_author_273a8f49: タイトルや作成者で検索...
   search_by_title_short_name_or_sis_id_fe84aa12: "タイトル、短い名前、またはSIS IDで検索する"
@@ -24588,6 +24620,7 @@ ja:
     one: "すべての (%{count}) コースを選択する"
     other: "すべての (%{count}) コースを選択する"
   select_all_students_7c2c34b3: すべての受講生を選択
+  select_an_account_to_update_b7521f0a: 更新するアカウントを選択します。
   select_an_edit_operation_ec1467d: 編集操作を選択する
   select_an_outcome_group_6edb08a7: アウトカムグループを選択する
   select_another_group_24773e5f: 別のグループを選択
@@ -26243,6 +26276,7 @@ ja:
   sticky_left_navigation_3d438a81: スティッキーの左ナビゲーション
   still_having_difficulty_get_more_help_here_3cdc8de1: まだ問題が解決しませんか？ここでヘルプを受けられます：
   stop_acting_as_user_8809a97f: ユーザーとして行動することを止める
+  stop_fd9822ab: 停止
   storage_quotas_manage_6ca14bbb: "ストレージクォータ - 管理"
   storage_used_in_mb_c75fbd9c: MBで使用されたストレージ
   store_and_share_course_assets_82a9967c: コースアセットを保存および共有する
@@ -26775,6 +26809,7 @@ ja:
       student_support: "NetAcad サポート - 受講者"
       student_support_description: "講師が最初の窓口となります。あなたのNetworking Academyに関する質問に回答したり、サポートデスクに連絡したりすることができます。受信トレイ機能を使用して、講師に連絡することができます。"
       support_desk_livechat: "サポート デスクのライブ チャット"
+  support_exporting_new_quizzes_in_qti_format_ba09b465: 新しい小テストのQTI形式でのエクスポートに対応
   support_favorite_lti_tools_in_the_rce_1680436d: RCEでお気に入りのLTIツールをサポートする
   support_latex_math_equations_almost_everywhere_6ce8ca24: ほぼ随所のLaTex数学方程式を支持するものです
   support_uploading_closed_caption_files_in_all_the__418c06d4: |-
@@ -27825,6 +27860,7 @@ ja:
   this_permission_requires_the_account_and_course_le_bdeefd51: "この権限には、アカウントレベルでのみ有効な[アカウントおよびコースレベルのアウトカムの達成度スケール]機能のオプションが必要です。"
   this_permission_should_only_be_assigned_to_users_t_231c182e: "この権限は、Canvas アカウント全体で他のユーザーとして行動することを教育機関が許可したユーザーにのみ割り当ててください。"
   this_placement_requires_deep_link_support_by_the_v_702d554f: この配置には、ベンダーによるディープリンクサポートが必要です。ベンダーのツールに問い合わせて、彼らがこの機能をサポートしているかどうか確認します
+  this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: この処理には数分かかることがあります。処理を中止する場合は、「停止」ボタンをクリックしてください。すでに処理されたアイテムは、以前の状態には戻りません。
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: この処理には数分かかることがあります。キャンセルを押すと処理は停止しますが、すでに処理されたアイテムは以前の状態には戻りません。
   this_pronoun_appears_after_last_name_bf5c0bf5: この代名詞は、姓の後に表示されます
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: この代名詞は、有効にすると名前の後に表示されます。
@@ -29022,6 +29058,7 @@ ja:
   unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
       SFTPユーザテーブルのロックを取得できませんでした。少ししてから、もう一度お試しください。
                                     引き続きエラーが起こる場合は、Slack の #canvas-sre までご連絡ください。
+  unable_to_parse_certificate_f25ff8b5: 証明書の解析ができない
   unable_to_read_file_2d04b0c: ファイルが読めません
   unable_to_remove_app_4293cb53: アプリを削除できません
   unable_to_remove_outcomes_f682e68f: 
@@ -29038,7 +29075,9 @@ ja:
   unable_to_switch_students_b901bc4b: 受講生を切り替えられません
   unable_to_toggle_placement_833db6ff: 配置を切り替えることができません
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "ストレージサービスにファイルを送信できません。サービスが停止しているか、Canvas に再度ログインする必要があるかもしれません。"
+  unable_to_update_domains_44c5dd55: ドメインが更新できない
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Microsoft Teams Sync設定を読み込めません。再度試してください。問題が解決しない場合は、サポートに連絡してください。"
+  unable_to_update_quotas_62baf95b: 定数（クォータ）の更新ができない
   unable_to_update_splitscreen_preference_4d449fa5: 分割スクリーンの環境設定を更新できません。
   unaccepted_students_aa68ea98: 受諾されていない受講者
   unarchive_f245e2d6: アーカイブ解凍
@@ -29191,6 +29230,7 @@ ja:
   unpublished_drafts_count_86e16f17: "未公開の下書き (%{count})"
   unpublished_subjects_62a7d38: 未公開の科目
   unpublishing_1fa99dc6: 公開取り消し中...
+  unpublishing_module_and_items_ca2edd97: モジュールとアイテムの公開停止
   unread_c14cb06f: 未読
   unread_e9c1b19c: 未読です
   unread_ee6db4aa: 未読
@@ -29319,6 +29359,7 @@ ja:
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: 課題と提出されたファイルを特別読み取り専用の提出フォルダにアップロードしてください
   upload_gradebook_386a46c8: 評定表のアップロード
   upload_image_6120b609: イメージのアップロード
+  upload_internal_root_ca_46cf9b36: 内部ルートCAをアップロードする
   upload_media_ce31135a: メディアを読み込む
   upload_not_available_for_this_folder_8f8623c6: このフォルダにはアップロードできません
   upload_percent_complete_d533d3e2: アップロード完了率
@@ -29366,6 +29407,10 @@ ja:
   use_arrows_a60b3330: 矢印を使用する
   use_as_front_page_274a488b: "トップ ページとして使用"
   use_as_frontpagetext_fa88bbb2: "%{frontPageText}として使用"
+  use_attachment_ids_in_media_links_7bfb3422: メディアリンクでアタッチメントIDを使用する
+  use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
+      メディアリンクに添付ファイルIDを使用することで、ユーザーがオリジナルのメディアではなく、
+      正しいインスタンスに常にアクセスできるようにします。
   use_between_for_adding_multiple_users_26bff207: "複数のユーザーを追加するには、\",\" で区切ります。"
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: 登録インデックスでAPIページネーションにブックマークを使用する
   use_cloudfront_for_docviewer_f21b96db: "DocViewer にはCloudFrontを使用"
@@ -29950,6 +29995,7 @@ ja:
   users_with_this_permission_may_be_able_to_use_the__84394072: この権限を持つユーザーは、アカウント設定の管理、評定の表示と調整、ユーザー情報へのアクセスを行う機能として権限を利用できます。この権限はまた、サブアカウントに指定された管理者が、サブアカウント外の設定や情報にアクセスすることもできるようにします。
   uses_the_new_scheduler_and_its_functionality_b07e9b14: 新しいスケジューラーとその機能を使う
   utc_e44049af: UTC
+  uuid_has_been_provisioned_ab0c6c9: UUIDがプロビジョニングされました。
   validate: 
     is_required: このフィールドは必須項目です
   validate_links_in_content_b1630fba: コンテンツでリンクを有効にする
@@ -29972,6 +30018,7 @@ ja:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite 類似スコア -- 詳細情報類似スコア -- 詳細"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite類似スコア - 詳細レポートを参照"
   verify_ldap_tls_certificates_70241d8e: "LDAP TLS証明書を検証する"
+  verify_tls_certificate_9cfa26d1: TLS証明書を確認する
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: LDAP認証プロバイダによって提示されたTLS証明書を検証します。
   version_versionnumber_updatedat_9f5b7a5b: "バージョン %{versionNumber} %{updatedAt}"
   video_78335c71: ビデオ
