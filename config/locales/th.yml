@@ -203,6 +203,7 @@ th:
   a_role_name_is_required_47efd33: ต้องระบุชื่อบทบาท
   a_section_is_required_64103992: ต้องระบุกลุ่มย่อย
   a_setting_with_the_name_name_already_exists_3bf5f9b8: "ค่าปรับตั้ง \"%{name}\" มีอยู่แล้ว"
+  a_single_certificate_file_e7f347f1: ไฟล์เอกสารรับรองแยกเดี่ยว
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "ผู้เรียนเพิ่งส่งมอบผลงานจัดส่งล่าช้าสำหรับ %{assignment_name} ในบทเรียน %{course_name}"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "ผู้เรียนเพิ่งส่งมอบผลงานจัดส่งซ้ำสำหรับ %{assignment_title} ในบทเรียน %{course_name}"
   a_student_has_just_turned_in_a_submission_for_assi_d5ba674d: "ผู้เรียนเพิ่งส่งมอบผลงานจัดส่งสำหรับ %{assignment_title} ในบทเรียน %{course_name}"
@@ -3039,9 +3040,11 @@ th:
       delete: ลบ
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: ภารกิจนี้จะไม่มีการให้เกรด
+      assignment_not_yet_graded_rqd_screenreader: ยังไม่ได้ให้เกรดภารกิจ
       assignment_not_yet_graded_screenreader: "ยังไม่ได้ให้เกรดภารกิจ %{pointsPossible} คะแนนที่เป็นไปได้"
       empty_points_possible: "-/%{pointsPossible} คะแนน"
       no_submission: ไม่มีผลงานจัดส่ง
+      no_submission_for_assignment_rqd_screenreader: ไม่มีผลงานจัดส่งสำหรับภารกิจนี้
       no_submission_for_assignment_screenreader: "ไม่มีผลงานจัดส่งสำหรับภารกิจนี้ %{pointsPossible} คะแนนที่เป็นไปได้"
       score_with_points_possible: "*%{score}*/%{pointsPossible} คะแนน"
       score_with_points_possible_screenreader: "คะแนน: %{score} จาก %{pointsPossible} คะแนน"
@@ -3590,7 +3593,10 @@ th:
     ldap_fields: 
       auth_filter_description: "ใช้ *%{placeholder}* เป็นตัวกำกับตำแหน่งสำหรับชื่อผู้ใช้ที่แจ้งโดยผู้ใช้นี้ ตัวอย่างเช่น *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "คุณลักษณะของ LDAP เพื่อใช้ค้นหาข้อมูลล็อกอิน Canvas ปล่อยว่างไว้เพื่อใช้ชื่อผู้ใช้ที่จัดหาโดยผู้ใช้"
+      internal_ca_description: "หากเซิร์ฟเวอร์ LDAP ของคุณนำเสนอเอกสารรับรองที่ออกโดย CA รากภายในที่ไม่ได้รับการรับรอง คุณ*จะต้อง*อัพโหลด CA รากของคุณเพื่อให้ Canvas รับรองขณะทำการเชื่อมต่อ"
+      internal_ca_warning: "*คำเตือน*: การใช้ CA รากภายในมีความปลอดภัยน้อยกว่า และเพิ่มความเสี่ยงต่อระบบ เราขอแนะนำให้ใช้เอกสารรับรองที่ออกโดยผู้ออกเอกสารรับรองที่ได้รับการรับรองแทน"
       ldap_timeout_failure_help2: "หากเกินกำหนดเวลาของ Canvas หลายครั้งในการสื่อสารกับเซิร์ฟเวอร์ LDAP ระบบจะบล็อคการล็อกอินเพิ่มเติมจากการใช้เซิร์ฟเวอร์ LDAP ดังกล่าวสำหรับ %{time} เซิร์ฟเวอร์ LDAP ของคุณเกินกำหนดครั้งล่าสุดเมื่อ %{timestamp}"
+      verify_tls_cert_opt_in_description: "จะต้องมีการตรวจสอบเอกสารรับรอง TLS เวลา *%{enforcement_date}* แต่คุณสามารถเปิดใช้งานก่อนเพื่อให้แน่ใจว่าเซิร์ฟเวอร์ LDAP ของคุณเป็นไปตามเงื่อนไข"
     ldap_settings_test: 
       labels: 
         pass: รหัสผ่าน
@@ -4465,6 +4471,9 @@ th:
   catalog_name_46d37909: ชื่อแคตาล็อก
   catalog_url_a01655dd: "URL แคตาล้อก"
   catalog_users_already_exist_2894b8c4: ผู้ใช้แคตาล็อกมีอยู่แล้ว
+  catalog_was_provisioned_9851448f: จัดสรรแคตาล็อกแล้ว
+  catalog_was_unprovisioned_9524cb58: เลิกการจัดสรรแคตาล็อกแล้ว
+  catalog_was_updated_743a58eb: อัพเดตแคตาล็อกแล้ว
   category_b9a94408: หมวดหมู่
   categoryname_notification_preferences_cd64e4a0: "ค่าปรับแต่งการแจ้งข้อมูล %{categoryName}"
   cc: 
@@ -4482,6 +4491,8 @@ th:
   cell_number_is_required_2edcee60: ต้องระบุเบอร์มือถือ
   central_value_in_a_set_of_results_calculated_by_di_19a8c48a: "ค่าส่วนกลางในชุดผลลัพธ์ คำนวณโดยการหารผลรวมคะแนนรายการทั้งหมดด้วยจำนวนคะแนน"
   certificate_fingerprint_b376df90: ลายนิ้วมือเอกสารรับรอง
+  certificate_is_expired_or_not_yet_valid_4a3bb8f1: เอกสารรับรองหมดอายุหรือยังใช้ไได้
+  certificate_is_not_a_ca_9ec5d574: "เอกสารรับรองไม่ใช่ CA"
   change_applied_89d1aa5a: ปรับใช้การแก้ไขแล้ว
   change_beginning_date_to_39dbd06e: เปลี่ยนวันที่เริ่มต้นเป็น
   change_color_for_mastery_level_position_daa51849: "เปลี่ยนสีสำหรับระดับความเชี่ยวชาญ %{position}"
@@ -7967,6 +7978,8 @@ th:
   drag_a_file_here_39357b48: ลากไฟล์ที่นี่
   drag_a_file_here_or_1aaf19c1: ลากไฟล์ที่นี่หรือ
   drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: ลากไฟล์ที่นี่หรือคลิกเพื่อเลือกไฟล์ที่จะอัพโหลด
+  drag_and_drop_or_browse_your_files_92ad4c17: ลากและวางหรือ*เรียกดูไฟล์ของคุณ*
+  drag_and_drop_or_browse_your_files_to_replace_27cc42d6: ลากและวางหรือ*เรียกดูไฟล์ของคุณ*เพื่อแทนที่
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "ลากและวาง หรือคลิกเพื่อเรียกดูในคอมพิวเตอร์ของคุณ"
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "ลากและวาง หรือคลิกเพื่อเรียกดูในคอมพิวเตอร์ของคุณ"
   drag_to_rearrange_sections_637efee3: ลากเพื่อจัดเรียงกลุ่มย่อยใหม่
@@ -10996,6 +11009,7 @@ th:
   integrations_cadb03f3: การผสานการทำงาน
   interactions_report_47c1219e: รายงานการปฏิสัมพันธ์
   internal_analytics_f02b3fff: "ข้อมูลวิเคราะห์ภายใน (Internal Analytics)"
+  internal_certificate_authority_ca_76566a37: "หน่วยงานออกเอกสารรับรองภายใน (CA)"
   internal_setting_created_f3f72416: จัดทำค่าปรับตั้งภายในแล้ว
   internal_setting_deleted_aaf1dd9d: ลบค่าปรับตั้งภายในแล้ว
   internal_setting_updated_87510559: อัพเดตค่าปรับตั้งภายในแล้ว
@@ -11041,6 +11055,7 @@ th:
   invalid_hexcode_9124519f: "Hexcode ไม่ถูกต้อง"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Hexcode ไม่ถูกต้อง กรอก hexcode ที่ถูกต้องที่นี่เพื่อใช้สีกำหนดเอง"
   invalid_hexcode_provided_522ba223: "Hexcode ที่แจ้งไม่ถูกต้อง"
+  invalid_login_request_1639c89f: คำขอล็อกอินไม่ถูกต้อง
   invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "ระบุ Microsoft Sync tenant ไม่ถูกต้อง กรุณาตรวจสอบ tenant ของคุณ"
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "คุณลักษณะการทำงานระยะไกลของ Microsoft Teams Sync ที่ไม่ถูกต้อง คุณลักษณะการทำงานทางไกลที่ถูกต้อง: %{VALID_SYNC_REMOTE_ATTRIBUTES}"
   invalid_microsoft_teams_sync_login_attribute_suffi_3c6eb0e6: "อักขระพ่วงท้ายคุณลักษณะการล็อกอินสำหรับ Microsoft Teams Sync ไม่ถูกต้อง อักขระพ่วงท้ายจะต้องยาวน้อยกว่า 255 ตัวอักษรและจะมีเคาะว่างไม่ได้"
@@ -13158,6 +13173,8 @@ th:
       email: 
         html: 
           announcement_info: "การตอบกลับอีเมลนี้จะถูกแจ้งเป็นการตอบกลับประกาศแจ้ง ซึ่งทุกคนในบทเรียนจะมองเห็นได้"
+          announcement_info_course: "การตอบกลับอีเมลนี้จะถูกแจ้งเป็นการตอบกลับประกาศแจ้ง ซึ่งทุกคนในบทเรียนจะมองเห็นได้"
+          announcement_info_group: "การตอบกลับอีเมลนี้จะถูกแจ้งเป็นการตอบกลับประกาศแจ้ง ซึ่งทุกคนในกลุ่มจะมองเห็นได้"
           attached_file: ไฟล์ที่แนบ
           link: ดูประกาศ
         labels: 
@@ -13876,6 +13893,8 @@ th:
   modified_by_user_e6c8ade3: "แก้ไขโดย: %{user}"
   modify_settings_ed8b9ccf: แก้ไขค่าปรับตั้ง
   module_90d9fd32: หน่วยการเรียน
+  module_and_items_published_13ed5cd6: เผยแพร่หน่วยการเรียนและรายการที่เกี่ยวข้องแล้ว
+  module_and_items_unpublished_e953ba4f: เลิกเผยแพร่หน่วยการเรียนและรายการที่เกี่ยวข้องแล้ว
   module_completed_50c50762: หน่วยการเรียนเสร็จสมบูรณ์
   module_filter_63b17d11: ตัวกรองหน่วยการเรียน
   module_first_to_last_6921f3ec: "หน่วยการเรียน - ลำดับแรกไปลำดับสุดท้าย"
@@ -13896,6 +13915,7 @@ th:
   module_navigation_97043417: การสืบค้นเนื้อหาหน่วยการเรียน
   module_publish_menu_30b638dd: เมนูเผยแพร่หน่วยการเรียน
   module_publish_menu_88b54c1b: เมนูเผยแพร่หน่วยการเรียน
+  module_published_80f0b9b8: เผยแพร่หน่วยการเรียนแล้ว
   modules: 
     assignments_to_grade: 
       one: "1 ภารกิจมีผลงานจัดส่งที่ยังไม่ให้เกรด"
@@ -14147,6 +14167,7 @@ th:
   nav_text_94206145: ข้อความส่วนการสืบค้น
   nav_text_active_a924ae88: ข้อความส่วนการสืบค้นใช้งาน
   navigate_to_speed_grader_for_name_f28cb5b1: "ไปที่ Speed Grader สำหรับ %{name}"
+  navigate_to_speed_grader_for_title_assignment_828b1366: "ไปที่ Speed Grader สำหรับภารกิจ %{title}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "ส่วนการสืบค้นช่วยให้ผู้ใช้สามารถดูลิงค์ บุคคล ใน การสืบค้นเนื้อหาบทเรียน"
   navigation_menu_fd782ff8: เมนูสืบค้นเนื้อหา
   near_mastery_f25174a4: ใกล้เคียงระดับความเชี่ยวขาญ
@@ -14222,6 +14243,7 @@ th:
   new_quizzes_dbda7e0a: แบบทดสอบใหม่
   new_quizzes_description: "คุณสมบัตินี้เป็นการปรับปรุงการใช้งาน Canvas ในการทำแบบทดสอบ หากเปิดใช้งานหมายเหตุกำกับนี้ไว้ เครื่องมือ แบบทดสอบใหม่ จะยังคงใช้การได้ ดูรายละเอียดทั้งหมดได้จาก*กลุ่มผู้ใช้แบบทดสอบใหม่* ในกลุ่ม Canvas"
   new_quizzes_embedded_module_progression_cd2307b6: สถานะในหน่วยการเรียนที่แทรกแบบทดสอบใหม่
+  new_quizzes_export_support_b0a6a625: ระบบรองรับการส่งออกแบบทดสอบใหม่
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "แบบทดสอบใหม่ (New Quizzes) รวมอยู่ในแท็บสรุปการปรับประสานผลลัพธ์ (Outcome Alignment Summary)"
   new_quizzes_migration_during_course_import_copy_e9dd124e: การโอนย้ายแบบทดสอบใหม่ระหว่างการนำเข้า/ทำสำเนาบทเรียน
   new_quizzes_migration_enabled_by_default_5f9bcc81: การโอนย้ายแบบทดสอบใหม่ถูกเปิดใช้งานเป็นค่าเริ่มต้น
@@ -14468,6 +14490,8 @@ th:
   not_submitted_7d05fdb4: ไม่ได้จัดส่ง
   not_synced_529cbf29: ไม่ได้ซิงค์ไว้
   not_synced_message_a343fe5e: "ไม่ได้ซิงค์ไว้: %{message}"
+  not_valid_after_81c9faec: ใช้ไม่ได้หลังจาก
+  not_valid_before_9ad2d22d: ใช้ไม่ได้ก่อน
   not_yet_assessed_9362f199: ยังไม่ได้ประเมิน
   not_yet_completed_345a0bca: ยังไม่เสร็จสิ้น
   not_yet_graded_40475341: ยังไม่ได้ให้เกรด
@@ -15416,6 +15440,7 @@ th:
   please_enter_a_name_for_this_link_318f01a4: กรุณากรอกชื่อสำหรับลิงค์นี้
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "กรุณากรอกหมายเลขระหว่าง 0 - 100 สำหรับอัตราการโอนย้าย"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: กรุณากรอกคำค้นหาความยาวสามตัวอักษรขึ้นไป
+  please_enter_a_valid_search_term_5c69b0b0: กรุณากรอกคำค้นหาที่ถูกต้อง
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "กรุณากรอก url ที่ถูกต้อง (เช่น http://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "กรุณากรอก URL ที่ถูกต้อง ต้องระบุโปรโตคอล (เช่น http://, https://, ftp://, tel:, mailto:0"
   please_enter_your_label_name_7745272d: "กรุณากรอก %{label_name} ของคุณ:"
@@ -16014,6 +16039,7 @@ th:
   privacy_290109ea: ความเป็นส่วนตัว
   privacy_level_f0ec09a3: ระดับความเป็นส่วนตัว
   private_3883d133: ส่วนตัว
+  private_key_is_present_in_certificate_file_1a1b7b42: มีคีย์ส่วนตัวในไฟล์เอกสารรับรอง
   pro_tip_30e41fa3: คำแนะนำของโปร!
   proceed_f3d33864: ดำเนินการต่อ
   proceed_with_caution_aa9b3285: ดำเนินการด้วยความระมัดระวัง
@@ -16410,6 +16436,8 @@ th:
   publishing_error_bdfb3390: ข้อผิดพลาดในการเผยแพร่
   publishing_is_disabled_for_this_item_efa7803f: การเผยแพร่ถูกปิดใช้งานสำหรับรายการนี้
   publishing_item_name_is_disabled_8207a9e7: "การเผยแพร่ %{item_name} ถูกปิดใช้งาน"
+  publishing_module_and_items_ce128d12: กำลังเผยแพร่หน่วยการเรียนและรายการที่เกี่ยวข้อง
+  publishing_module_c2b5211: กำลังเผยแพร่หน่วยการเรียน
   publishing_pace_a65e4152: กำลังเผยแพร่ความคืบหน้า...
   publishing_plan_b70186ed: กำลังเผยแพร่แผน...
   publishing_progress_5154a430: สถานะการเผยแพร่
@@ -17426,6 +17454,8 @@ th:
         one: "1 วินาที"
         other: "%{count} วินาที"
       show_time_link: แสดงเวลา
+      time_remaining: "คุณเหลืออีก %{time}"
+      times_up: "หมดเวลา! กำลังส่งผลลัพธ์ภายใน 10 นาที"
       titles: 
         come_back_later: คุณกำกับคำถามนี้ไว้เพื่อกลับมาในภายหลัง
         times_up: หมดเวลา!
@@ -17801,6 +17831,7 @@ th:
   remove_attendee_name_55165070: "ลบผู้เข้าร่วม %{name}"
   remove_attribute_59a4aa64: ลบคุณลักษณะ
   remove_avatar_picture_aba765eb: ลบภาพประจำตัว
+  remove_certificate_4e979eee: ลบเอกสารรับรอง
   remove_collaborationtitle_c3e81adb: "ลบ \"%{collaborationTitle}\" หรือไม่"
   remove_condition_9cf94f7f: ลบเงื่อนไข
   remove_conference_title_207d32c0: "ลบการประชุม: %{title}"
@@ -18451,6 +18482,7 @@ th:
   search_assignments_8c3c21bb: ค้นหาภารกิจ
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: ค้นหาภารกิจในสมุดบันทึกเกรดและรูปแบบใหม่สำหรับภารกิจและการค้นหาผู้เรียน
   search_by_99d1ba5f: ค้นหาจาก
+  search_by_name_or_id_3bdab12e: "ค้นหาจากชื่อหรือ ID"
   search_by_student_name_26536097: ค้นหาจากชื่อผู้เรียน
   search_by_title_or_author_273a8f49: ค้นหาจากชื่อหรือผู้จัดทำ...
   search_by_title_short_name_or_sis_id_fe84aa12: "ค้นหาจากชื่อ ชื่อย่อหรือ SIS ID"
@@ -18623,6 +18655,7 @@ th:
   select_all_count_courses_4fc63811: 
     one: "เลือกบทเรียน (%{count})"
     other: "เลือกบทเรียนทั้งหมด (%{count})"
+  select_an_account_to_update_b7521f0a: เลือกบัญชีที่จะอัพเดต
   select_an_edit_operation_ec1467d: เลือกการแก้ไข
   select_an_outcome_group_6edb08a7: เลือกกลุ่มผลลัพธ์
   select_another_group_24773e5f: เลือกกลุ่มอื่น
@@ -19804,6 +19837,7 @@ th:
   sticky_left_navigation_3d438a81: ส่วนสืบค้นเนื้อหาค้างตำแหน่งด้านซ้าย
   still_having_difficulty_get_more_help_here_3cdc8de1: "ยังมีปัญหาอยู่หรือไม่ ขอความช่วยเหลือเพิ่มเติมได้ที่นี่:"
   stop_acting_as_user_8809a97f: หยุดดำเนินการในฐานะผู้ใช้
+  stop_fd9822ab: หยุด
   storage_quotas_manage_6ca14bbb: "โควต้าพื้นที่จัดเก็บ - จัดการ"
   storage_used_in_mb_c75fbd9c: "พื้นที่จัดเก็บที่ใช้เป็น MB"
   store_and_share_course_assets_82a9967c: จัดเก็บและแชร์ทรัพยากรข้อมูลสำหรับบทเรียน
@@ -20255,6 +20289,7 @@ th:
       student_support: "ฝ่ายบริการ NetAcad - ผู้เรียน"
       student_support_description: "ผู้สอนของคุณควรเป็นเจ้าหน้าที่ประสานงานด่านแรก เจ้าหน้าที่สามารถตอบคำถามของคุณเกี่ยวกับ Networking Academy หรือติดต่อฝ่ายบริการของคุณ คุณสามารถติดต่อกับผู้สอนโดยใช้คุณสมบัติ กล่องจดหมาย"
       support_desk_livechat: ระบบแชทไลฟ์ของส่วนบริการ
+  support_exporting_new_quizzes_in_qti_format_ba09b465: "รองรับการส่งออกแบบทดสอบใหม่ (New Quizzes) แบบ QTI"
   supported_file_types_vtt_srt_8cb75c13: "ประเภทไฟล์ที่รองรับ: .vtt, .srt"
   suspend_db764978: พักระงับ
   suspend_user_e19fa489: พักระงับผู้ใช้
@@ -21079,6 +21114,7 @@ th:
   this_permission_requires_the_account_and_course_le_bdeefd51: "สิทธิ์อนุญาตนี้ต้องใช้ตัวเลือกคุณสมบัติของ ระดับความเชี่ยวชาญตามผลลัพธ์ในระดับบัญชีและบทเรียน (Account and Course Level Outcome Mastery Scales) ซึ่งสามารถเปิดใช้งานได้ในระดับบัญชีผู้ใช้เท่านั้น"
   this_permission_should_only_be_assigned_to_users_t_231c182e: "สิทธิ์อนุญาตนี้ควรจัดสรรให้แก่ผู้ใช้ที่สถาบันของคุณให้อนุญาตในฐานะผู้ใช้รายอื่นในบัญชี Canvas ทั้งหมดของคุณเท่านั้น"
   this_placement_requires_deep_link_support_by_the_v_702d554f: "การจัดวางนี้ต้องอาศัย Deep Link ของผู้ให้บริการ ตรวจสอบกับผู้ให้บริการเครื่องมือของคุณเพื่อตรวจสอบว่ารองรับฟังก์ชั่นนี้หรือไม่"
+  this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: "กระบวนการนี้อาจต้องใช้เวลาสักครู่ คลิกปุ่มหยุด (Stop) เพื่อหยุดการประมวลผล รายการที่ดำเนินการไปแล้วจะไม่กลับคืนเป็นสถานะก่อนหน้า"
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: "กระบวนการนี้อาจต้องใช้เวลาสักครู่ การกดยกเลิกจะเป็นการยกเลิกกระบวนการ แต่รายการที่ดำเนินการไปแล้วจะไม่กลับคืนเป็นสถานะก่อนหน้า"
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: สรรพนามนี้จะปรากฏขึ้นต่อจากชื่อของคุณเมื่อเปิดใช้งาน
   this_question_group_is_set_to_pick_more_questions__2e3552c4: กลุ่มคำถามนี้ถูกกำหนดไว้ให้สามารถเลือกคำถามได้จำนวนมากกว่าที่จัดไว้
@@ -21840,6 +21876,7 @@ th:
   unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
       ไม่สามารถจัดหาล็อคในตารางผู้ใช้ SFTP กรุณาลองใหม่ในอีกหนึ่งนาที
                                     หากยังมีปัญหา ให้ติดต่อ #canvas-sre ใน Slack
+  unable_to_parse_certificate_f25ff8b5: ไม่สามารถแบ่งเอกสารรับรองได้
   unable_to_read_file_2d04b0c: ไม่สามารถอ่านไฟล์ได้
   unable_to_remove_app_4293cb53: ไม่สามารถลบแอพได้
   unable_to_remove_outcomes_f682e68f: 
@@ -21856,7 +21893,9 @@ th:
   unable_to_switch_students_b901bc4b: ไม่สามารถสลับผู้เรียนได้
   unable_to_toggle_placement_833db6ff: ไม่สามารถเปิดปิดการจัดวาง
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "ไม่สามารถส่งไฟล์ไปยังบริการจัดเก็บข้อมูล บริการอาจไม่พร้อมใช้งานหรือคุณอาจต้องล็อกอินไปยัง Canvas ใหม่"
+  unable_to_update_domains_44c5dd55: ไม่สามารถอัพเดตโดเมนได้
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "ไม่สามารถอัพเดตค่าปรับตึ้ง Microsoft Teams Sync กรุณาลองใหม่อีกครั้งในภายหลัง หากยังเกิดปัญหาอยู่ กรุณาติดต่อฝ่ายบริการ"
+  unable_to_update_quotas_62baf95b: ไม่สามารถอัพเดตโควต้าได้
   unable_to_update_splitscreen_preference_4d449fa5: ไม่สามารถอัพเดตค่าปรับแต่งหน้าจอแยกได้
   unaccepted_students_aa68ea98: ผู้เรียนที่ไม่ได้ตอบรับ
   unarchive_f245e2d6: ยกเลิกการจัดเก็บแยก
@@ -21987,6 +22026,7 @@ th:
   unpublished_courses_title: บทเรียนที่เลิกเผยแพร่แล้ว
   unpublished_dfd8801: เลิกเผยแพร่แล้ว
   unpublished_subjects_62a7d38: วิชาที่เลิกเผยแพร่แล้ว
+  unpublishing_module_and_items_ca2edd97: กำลังเลิกเผยแพร่หน่วยการเรียนและรายการที่เกี่ยวข้อง
   unread_c14cb06f: ไม่ได้อ่าน
   unread_e9c1b19c: ไม่ได้อ่าน
   unread_post_47a1a06b: โพสต์ที่ไม่ได้อ่าน
@@ -22071,6 +22111,7 @@ th:
   upload_files_a228f20f: อัพโหลดไฟล์
   upload_gradebook_386a46c8: อัพโหลดสมุดบันทึกเกรด
   upload_image_6120b609: อัพโหลดภาพ
+  upload_internal_root_ca_46cf9b36: "อัพโหลด CA รากภายใน"
   upload_media_ce31135a: อัพโหลดสื่อ
   upload_not_available_for_this_folder_8f8623c6: ไม่สามารถอัพโหลดได้สำหรับโฟลเดอร์นี้
   upload_percent_complete_d533d3e2: อัพโหลดเปอร์เซ็นต์ที่เสร็จสิ้น
@@ -22113,6 +22154,10 @@ th:
   use_arrow_keys_to_select_a_conference_provider_c5b456a6: ใช้ปุ่มลูกศรเพื่อเลือกผู้ให้บริการจัดการประชุม
   use_arrows_a60b3330: ใช้ลูกศร
   use_as_frontpagetext_fa88bbb2: "ใช้เป็น %{frontPageText}"
+  use_attachment_ids_in_media_links_7bfb3422: "ใช้ ID เอกสารรับรองในลิงค์มีเดีย (Media Links)"
+  use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
+      ใช้ id เอกสารแนบในลิงค์มีเดียเพื่อให้ผู้ใช้ถูกนำไปยังส่วนทำรายการสำหรับมีเดียที่ถูกต้อง
+      แทนที่จะเป็นต้นฉบับ
   use_cloudfront_for_docviewer_f21b96db: "ใช้ CloudFront สำหรับ DocViewer"
   use_comment_comment_136b5cb3: "ใช้ความเห็น %{comment}"
   use_default_890939b7: ใช้ค่าเริ่มต้น
@@ -22579,6 +22624,7 @@ th:
   users_with_no_enrollments_5dddce33: ผู้ใช้ที่ไม่มีการลงทะเบียน
   users_with_this_permission_may_be_able_to_use_the__84394072: "ผู้ใช้ที่ได้รับสิทธิ์อนุญาตนี้สามารถใช้ ดำเนินการในฐานะ เพื่อจัดการค่าปรับตั้งทางบัญชี ดูและปรับเกรด สืบค้นข้อมูลผู้ใช้ เป็นต้นสิทธิ์อนุญาตนี้ยังช่วยให้ผู้ดูแลระบบที่กำหนดไว้สำหรับบัญชีย่อยสามารถเข้าไปยับค่าปรับตั้งและข้อมูลภายนอกบัญชีย่อยของตน"
   utc_e44049af: UTC
+  uuid_has_been_provisioned_ab0c6c9: "UUID ได้รับการจัดสรรแล้ว"
   validate: 
     is_required: นี่เป็นฟิลด์บังคับ
   validate_links_in_content_b1630fba: ยืนยันลิงค์ในเนื้อหา
@@ -22601,6 +22647,7 @@ th:
   vericite_similarity_score_more_information_7df9ea5c: "คะแนนความใกล้เคียง VeriCite -- ข้อมูลเพิ่มเติม"
   vericite_similarity_score_see_detailed_report_390ab687: "คะแนนความใกล้เคียง VeriCite - ดูรายงานอย่างละเอียด"
   verify_ldap_tls_certificates_70241d8e: "ตรวจสอบเอกสารรับรอง LDAP TLS"
+  verify_tls_certificate_9cfa26d1: "ตรวจสอบเอกสารรับรอง TLS"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "ตรวจสอบเอกสารรับรอง TLS ที่นำเสนอโดยผู้ให้บริการตรวจรับรอง LDAP"
   version_versionnumber_updatedat_9f5b7a5b: "เวอร์ชั่น %{versionNumber} %{updatedAt}"
   video_78335c71: วีดีโอ
