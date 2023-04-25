@@ -2708,6 +2708,16 @@ class Submission < ActiveRecord::Base
     change_item_read_state("unread", content_item)
   end
 
+  def refresh_comment_read_state
+    unread_comments = visible_submission_comments.left_joins(:viewed_submission_comments).where.not(author: user).where(viewed_submission_comments: { id: nil }).exists?
+
+    if unread_comments
+      mark_item_unread("comment")
+    else
+      mark_item_read("comment")
+    end
+  end
+
   def mark_submission_comments_read(current_user)
     timestamp = Time.now.utc
     viewed_comments = visible_submission_comments.pluck(:id).map do |id|

@@ -63,6 +63,7 @@ class SubmissionComment < ActiveRecord::Base
   end
   validates :workflow_state, inclusion: { in: ["active"] }, allow_nil: true
 
+  after_destroy :refresh_submission_comment_read_state
   before_save :infer_details
   before_save :set_root_account_id
   before_save :set_edited_at
@@ -93,6 +94,10 @@ class SubmissionComment < ActiveRecord::Base
 
   workflow do
     state :active
+  end
+
+  def refresh_submission_comment_read_state
+    submission.refresh_comment_read_state
   end
 
   def delete_other_comments_in_this_group
