@@ -227,6 +227,7 @@ pt-BR:
   a_simplified_canvas_interface_for_k_5_enable_appli_bc32b2d1: |-
       Uma interface simplificada do Canvas para K-5. Ative subcontas
       aplicáveis como contas K-5 nas configurações da conta.
+  a_single_certificate_file_e7f347f1: "Um único arquivo de certificado"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "Uma integração SIS não está configurada e o recurso de configurações Habilitar nova Integração SIS não está habilitado"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "Um aluno acabou de entregar um envio atrasado para %{assignment_name} no curso %{course_name}"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "Um aluno acabou de entregar um re-envio para %{assignment_title} no curso %{course_name}"
@@ -4094,9 +4095,11 @@ pt-BR:
       settings: Configurações
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: "Esta tarefa não receberá uma nota."
+      assignment_not_yet_graded_rqd_screenreader: "Tarefa não avaliada ainda."
       assignment_not_yet_graded_screenreader: "Tarefa não avaliada ainda. %{pointsPossible} pontos possíveis."
       empty_points_possible: "-/%{pointsPossible} pts"
       no_submission: "Sem envio"
+      no_submission_for_assignment_rqd_screenreader: "Nenhum envio para esta tarefa."
       no_submission_for_assignment_screenreader: "Nenhum envio para esta tarefa. %{pointsPossible} pontos possíveis."
       not_yet_graded: "*Não avaliado ainda*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
@@ -4877,7 +4880,10 @@ pt-BR:
     ldap_fields: 
       auth_filter_description: "Use *%{placeholder}* como um espaço reservado para o nome de usuário fornecido pelo usuário. Por exemplo: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "O atributo LDAP para usar para procurar o login do Canvas. Deixe em branco para usar o nome de usuário fornecido pelo usuário."
+      internal_ca_description: "Se o seu servidor LDAP apresentar um certificado emitido por uma CA raiz interna não confiável, você *deve* carregar sua CA raiz para que o Canvas confie nela ao se conectar."
+      internal_ca_warning: "*Aviso*: O uso de uma CA raiz interna é menos seguro e aumenta o risco de comprometimento. Recomendamos enfaticamente o uso de certificados emitidos por uma autoridade de certificação confiável."
       ldap_timeout_failure_help2: "Se o Canvas expirar demais ao se comunicar com o servidor LDAP, ele irá bloquear futuras tentativas de login de usar esse servidor LDAP por %{time}. Seu servidor LDAP expirou pela última vez às %{timestamp}."
+      verify_tls_cert_opt_in_description: "A verificação do certificado TLS será necessária no *%{enforcement_date}*, mas você pode ativá-la antecipadamente para garantir que seu servidor LDAP seja compatível."
     ldap_settings_test: 
       labels: 
         pass: Senha
@@ -6054,6 +6060,9 @@ pt-BR:
   catalog_name_46d37909: "Nome do Catalog"
   catalog_url_a01655dd: "URL do Catalog"
   catalog_users_already_exist_2894b8c4: "Usuários de Catalog já existem"
+  catalog_was_provisioned_9851448f: "O Catalog estava provisionado."
+  catalog_was_unprovisioned_9524cb58: "O Catalog não estava provisionado."
+  catalog_was_updated_743a58eb: "O Catalog foi atualizado."
   category_b9a94408: Categoria
   categoryname_notification_preferences_cd64e4a0: "%{categoryName} preferências de notificações"
   cc: 
@@ -6072,6 +6081,8 @@ pt-BR:
   cell_number_is_required_2edcee60: "Número de celular é necessário"
   central_value_in_a_set_of_results_calculated_by_di_19a8c48a: "Valor central em um conjunto de resultados. Calculado dividindo a soma de todas as pontuações dos itens pelo número de pontuações."
   certificate_fingerprint_b376df90: "Digital do certificado"
+  certificate_is_expired_or_not_yet_valid_4a3bb8f1: "O certificado expirou ou ainda não é válido"
+  certificate_is_not_a_ca_9ec5d574: "O certificado não é uma CA"
   change_applied_89d1aa5a: "Alteração aplicada"
   change_beginning_date_to_39dbd06e: "Alterar data de início a"
   change_color_for_mastery_level_position_daa51849: "Alterar a cor para nível de domínio %{position}"
@@ -10612,6 +10623,8 @@ pt-BR:
   drag_a_file_here_or_1aaf19c1: "Arraste um arquivo aqui, ou"
   drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: "Arraste um arquivo aqui, ou clique para selecionar um arquivo para carregar"
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: "Arraste e solte arquivos em módulos e carregamentos de itens de módulos de vários arquivos"
+  drag_and_drop_or_browse_your_files_92ad4c17: "Arraste e solte ou *procure seus arquivos*"
+  drag_and_drop_or_browse_your_files_to_replace_27cc42d6: "Arraste e solte ou *procure seus arquivos* para substituir"
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "Arraste e solte ou clique para navegar no seu computador"
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "Arraste e solte ou clique para navegar no seu computador"
   drag_and_drop_your_image_here_or_7fba7c14: "Arraste e solte sua imagem aqui ou "
@@ -15191,6 +15204,7 @@ pt-BR:
   integrations_cadb03f3: Integrações
   interactions_report_47c1219e: "Relatório de interações"
   internal_analytics_f02b3fff: "Análise interna"
+  internal_certificate_authority_ca_76566a37: "Autoridade de certificação interna (CA)"
   internal_setting_created_f3f72416: "Configuração interna criada"
   internal_setting_deleted_aaf1dd9d: "Configuração interna excluída"
   internal_setting_updated_87510559: "Configuração interna atualizada"
@@ -15243,6 +15257,7 @@ pt-BR:
   invalid_hexcode_9124519f: "Código hexadecimal inválido"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Hexcode inválido. Insira um código hexadecimal válido aqui para usar uma cor personalizada."
   invalid_hexcode_provided_522ba223: "Código hexadecimal inválido fornecido"
+  invalid_login_request_1639c89f: "Solicitação de login inválida"
   invalid_microsoft_sync_tenant_given_please_validat_97be36bf: "Locatário inválido do Microsoft Sync fornecido. Valide o seu inquilino"
   invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "Locatário inválido do Microsoft Sync fornecido. Valide o seu inquilino."
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "Atributo remoto do Microsoft Team Sync inválido. Atributos remotos válidos: %{VALID_SYNC_REMOTE_ATTRIBUTES}"
@@ -17776,6 +17791,8 @@ pt-BR:
       email: 
         html: 
           announcement_info: "As respostas a este e-mail serão postadas como uma resposta ao anúncio, que será visto por todos no curso."
+          announcement_info_course: "As respostas a este e-mail serão postadas como uma resposta ao anúncio, que será visto por todos no curso."
+          announcement_info_group: "As respostas a este e-mail serão postadas como uma resposta ao anúncio, que será vista por todos no grupo."
           attached_file: "Arquivo anexo"
           link: "Visualizar aviso"
         labels: 
@@ -18569,6 +18586,8 @@ pt-BR:
   modify_permissions_for_account_rubrics_6c3aee59: "Modificar permissões para rubricas da conta"
   modify_settings_ed8b9ccf: "Modificar configurações"
   module_90d9fd32: Módulo
+  module_and_items_published_13ed5cd6: "Módulo e itens publicados"
+  module_and_items_unpublished_e953ba4f: "Módulo e itens não publicados"
   module_completed_50c50762: "Módulo Concluído"
   module_content_import_enhancements_c00b0ea2: "Melhorias da importação de conteúdo do módulo"
   module_file_upload_enhancements_eecd4d37: "Melhorias de carregamento de arquivos para módulos"
@@ -18600,6 +18619,7 @@ pt-BR:
   module_navigation_97043417: "Navegação do módulo"
   module_publish_menu_30b638dd: "Menu de publicação do módulo"
   module_publish_menu_88b54c1b: "Menu de publicação do módulo"
+  module_published_80f0b9b8: "Módulo publicado"
   modules: 
     add: 
       assignment: 
@@ -19008,6 +19028,7 @@ pt-BR:
   nav_text_94206145: "Texto do Navegador"
   nav_text_active_a924ae88: "Texto do Navegador Ativo"
   navigate_to_speed_grader_for_name_f28cb5b1: "Navegue para o Speed Grader para %{name}"
+  navigate_to_speed_grader_for_title_assignment_828b1366: "Navegue até o Speed Grader para a %{title} tarefa"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navegação permite que o usuário visualize o link Pessoas na Navegação do curso."
   navigation_icon_45db938e: "Ícone de navegação"
   navigation_menu_fd782ff8: "Menu de Navegação"
@@ -19102,6 +19123,7 @@ pt-BR:
   new_quizzes_dbda7e0a: "Novos testes"
   new_quizzes_description: "Este recurso aprimora a experiência do Canvas para questionários. Quando este sinalizador está habilitado, a ferramenta Novos Testes estará disponível. Para obter detalhes completos, consulte o *Grupo de usuários de Novos Testes* na comunidade Canvas."
   new_quizzes_embedded_module_progression_cd2307b6: "Progressão do módulo embutido de Novos Testes"
+  new_quizzes_export_support_b0a6a625: "Suporte para exportação de novos testes"
   new_quizzes_importing_c167dce0: "Importação de Novos Testes"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "Novos testes incluídos na guia Resumo de Alinhamento de Resultados"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Migração de New Quizzes durante importação/cópia do curso"
@@ -19377,6 +19399,8 @@ pt-BR:
   not_submitted_fff47f17: "Não enviado"
   not_synced_529cbf29: "Não sincronizado"
   not_synced_message_a343fe5e: "Não sincronizado: %{message}"
+  not_valid_after_81c9faec: "Não é válido depois de"
+  not_valid_before_9ad2d22d: "Não é válido antes de"
   not_visible_in_student_files_22f11883: "Invisível nos arquivos de alunos"
   not_yet_assessed_9362f199: "Ainda não avaliado"
   not_yet_completed_345a0bca: "Ainda não concluído"
@@ -20566,6 +20590,7 @@ pt-BR:
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "Insira um número entre 0 e 100 para a taxa de migração"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Inserir um termo de pesquisa com três ou mais caracteres"
   please_enter_a_url_d2c868b5: "Insira uma url"
+  please_enter_a_valid_search_term_5c69b0b0: "Por favor, insira um termo de busca válido"
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Por favor, insira uma URL válida (por ex., http://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Por favor, digite um URL válido. Protocolo é necessário (por exemplo, http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__6dc0071c: "Por favor, digite uma URL válida. Protocolo é obrigatório (por exemplo, http://, https://, ftp://, tel:)."
@@ -21258,6 +21283,7 @@ pt-BR:
   privacy_290109ea: Privacidade
   privacy_level_f0ec09a3: "Nível de privacidade"
   private_3883d133: Privado
+  private_key_is_present_in_certificate_file_1a1b7b42: "A chave privada está presente no arquivo de certificado"
   pro_tip_30e41fa3: DICA!
   proceed_f3d33864: Proceder
   proceed_with_caution_aa9b3285: "Proceda com cuidado"
@@ -21775,6 +21801,8 @@ pt-BR:
   publishing_error_bdfb3390: "Erro de publicação"
   publishing_is_disabled_for_this_item_efa7803f: "Publicação está desativada para esse item"
   publishing_item_name_is_disabled_8207a9e7: "Publicação de %{item_name} está desativada"
+  publishing_module_and_items_ce128d12: "Módulo de publicação e itens"
+  publishing_module_c2b5211: "Módulo de publicação"
   publishing_pace_a65e4152: "Ritmo de publicação..."
   publishing_plan_b70186ed: "Publicando plano ..."
   publishing_progress_5154a430: "Publicando progresso"
@@ -23145,6 +23173,8 @@ pt-BR:
         one: "1 segundo"
         other: "%{count} Segundos"
       show_time_link: "Mostrar hora"
+      time_remaining: "Você tem %{time} restante"
+      times_up: "O tempo acabou! Envio de resultados em 10 segundos"
       titles: 
         come_back_later: "Você marcou esta pergunta para voltar mais tarde"
         times_up: "O tempo acabou!"
@@ -23584,6 +23614,7 @@ pt-BR:
   remove_attribute_59a4aa64: "Remover Atributo"
   remove_avatar_picture_aba765eb: "Remover imagem do avatar"
   remove_c_name_section_d8eabd3a: "Remover a Seção %{c.name}"
+  remove_certificate_4e979eee: "Remover certificado"
   remove_collaborationtitle_c3e81adb: "Remover \"%{collaborationTitle}\"?"
   remove_condition_9cf94f7f: "Remover condição"
   remove_conference_69b9e0d0: "Remover conferência"
@@ -24395,6 +24426,7 @@ pt-BR:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: "Pesquise tarefas no diário de classe e novo design para tarefas e pesquisa de alunos"
   search_by_99d1ba5f: "Pesquisar por"
   search_by_c559efd: "Pesquisar por"
+  search_by_name_or_id_3bdab12e: "Pesquisar por nome ou id"
   search_by_student_name_26536097: "Pesquisar por nome do aluno"
   search_by_title_or_author_273a8f49: "Pesquisar por título ou autor..."
   search_by_title_short_name_or_sis_id_fe84aa12: "Pesquisar por título, nome curto ou ID de SIS"
@@ -24585,6 +24617,7 @@ pt-BR:
     one: "Selecionar (%{count}) curso"
     other: "Selecionar todos os (%{count}) cursos"
   select_all_students_7c2c34b3: "Selecionar todos os alunos"
+  select_an_account_to_update_b7521f0a: "Selecione uma conta para atualizar."
   select_an_edit_operation_ec1467d: "Selecionar uma operação de edição"
   select_an_outcome_group_6edb08a7: "Selecionar um grupo de resultados"
   select_another_group_24773e5f: "Selecionar outro grupo"
@@ -26246,6 +26279,7 @@ pt-BR:
   sticky_left_navigation_3d438a81: "Navegação fixa para a esquerda"
   still_having_difficulty_get_more_help_here_3cdc8de1: "Ainda está com dificuldades? Obtenha mais ajuda aqui:"
   stop_acting_as_user_8809a97f: "Parar de Agir como Usuário"
+  stop_fd9822ab: Parar
   storage_quotas_manage_6ca14bbb: "Cotas que armazenamento - gerenciar"
   storage_used_in_mb_c75fbd9c: "armazenamento utilizado em MB"
   store_and_share_course_assets_82a9967c: "Armazenar e compartilhar ativos do curso"
@@ -26776,6 +26810,7 @@ pt-BR:
       student_support: "NetAcad Suporte - Aluno"
       student_support_description: "Seu instrutor deve ser seu primeiro ponto de contato. Ele pode tirar as suas perguntas sobre a Networking Academy ou entrar em contato com o suporte para você. Você pode entrar em contato com seu instrutor usando o recurso Caixa de Entrada."
       support_desk_livechat: "Chat ao vivo do Support Desk"
+  support_exporting_new_quizzes_in_qti_format_ba09b465: "Suporta a exportação de novos testes no formato QTI"
   support_favorite_lti_tools_in_the_rce_1680436d: "Suporte a ferramentas LTI favoritas no RCE"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "Suporta LaTex equações matemáticas em quase todos os lugares"
   support_uploading_closed_caption_files_in_all_the__418c06d4: |-
@@ -27825,6 +27860,7 @@ pt-BR:
   this_permission_requires_the_account_and_course_le_bdeefd51: "Essa permissão requer a opção de recurso Escalas de domínio de resultado em nível de conta e curso, que só pode ser habilitada no nível da conta."
   this_permission_should_only_be_assigned_to_users_t_231c182e: "Esta permissão só deve ser atribuída a usuários que sua instituição tenha autorizado para atuar como outros usuários em toda a sua conta do Canvas."
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Esta colocação exige suporte Deep Link pelo fornecedor. Verifique com o fornecedor da sua ferramenta para assegurar que ele suporte esta funcionalidade"
+  this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: "Esse processo pode levar alguns minutos. Clique no botão Parar para interromper o processamento. Os itens que já foram processados não serão revertidos ao estado anterior."
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: "Esse processo pode levar alguns minutos. Pressionar cancelar interromperá o processo, mas os itens que já foram processados não serão revertidos ao estado anterior."
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Este pronome aparecerá após o seu nome quando ativado"
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Este grupo de perguntas está configurado para selecionar mais perguntas do que estão disponíveis."
@@ -29021,6 +29057,7 @@ pt-BR:
   unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
       Não foi possível obter o bloqueio na tabela de usuários SFTP. Tente novamente em um minuto.
                                     Se continuar a falhar, entre em contato em #canvas-sre no Slack.
+  unable_to_parse_certificate_f25ff8b5: "Não foi possível analisar o certificado"
   unable_to_read_file_2d04b0c: "Não foi possível ler o arquivo"
   unable_to_remove_app_4293cb53: "Não foi possível remover o aplicativo"
   unable_to_remove_outcomes_f682e68f: 
@@ -29037,7 +29074,9 @@ pt-BR:
   unable_to_switch_students_b901bc4b: "Não foi possível alternar alunos"
   unable_to_toggle_placement_833db6ff: "Não foi possível alternar o posicionamento"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Incapaz de transmitir o arquivo para o serviço de armazenamento. O serviço pode estar interrompido ou você precisa fazer login novamente no Canvas."
+  unable_to_update_domains_44c5dd55: "Não foi possível atualizar os domínios"
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Incapaz de atualizar as configurações do Microsoft Teams Sync. Por favor, tente novamente. Se o problema persistir, entre em contato com o suporte."
+  unable_to_update_quotas_62baf95b: "Não foi possível atualizar cotas"
   unable_to_update_splitscreen_preference_4d449fa5: "Não foi possível atualizar a preferência de tela dividida."
   unaccepted_students_aa68ea98: "Alunos não aceitos"
   unarchive_f245e2d6: Desarquivar
@@ -29190,6 +29229,7 @@ pt-BR:
   unpublished_drafts_count_86e16f17: "Rascunhos não publicados (%{count})"
   unpublished_subjects_62a7d38: "Disciplunas não publicadas"
   unpublishing_1fa99dc6: "Cancelando publicação..."
+  unpublishing_module_and_items_ca2edd97: "Cancelando a publicação do módulo e itens"
   unread_c14cb06f: "não lido,"
   unread_e9c1b19c: "Não lido"
   unread_post_47a1a06b: "Publicação não lida"
@@ -29314,6 +29354,7 @@ pt-BR:
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Faça o upload dos arquivos enviados com atribuições para uma pasta  de Envios especial somente leitura"
   upload_gradebook_386a46c8: "Atualizar boletim"
   upload_image_6120b609: "Carregar imagem"
+  upload_internal_root_ca_46cf9b36: "Carregar CA raiz interna"
   upload_media_ce31135a: "Fazer Upload de Mídia"
   upload_not_available_for_this_folder_8f8623c6: "Carregamento não disponível para esta pasta"
   upload_percent_complete_d533d3e2: "Porcentagem de upload concluído"
@@ -29361,6 +29402,10 @@ pt-BR:
   use_arrows_a60b3330: "Usar as setas"
   use_as_front_page_274a488b: "Utilizar como página inicial"
   use_as_frontpagetext_fa88bbb2: "Use como %{frontPageText}"
+  use_attachment_ids_in_media_links_7bfb3422: "Use IDs de anexo em links de mídia"
+  use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
+      Use IDs de anexo em links de mídia para que os usuários sejam sempre direcionados para a instância correta da mídia 
+      em vez do original
   use_between_for_adding_multiple_users_26bff207: "Use “,”no meio para adicionar diversos usuários."
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Usar bookmarking para paginação de API no Índice de Matrículas"
   use_cloudfront_for_docviewer_f21b96db: "Use CloudFront para o DocViewer"
@@ -29944,6 +29989,7 @@ pt-BR:
   users_with_this_permission_may_be_able_to_use_the__84394072: "Os usuários com essa permissão podem usar o recurso Agir como para gerenciar as configurações da conta, visualizar e ajustar notas, acessar informações do usuário, etc. Estas permissões também permitem que os administradores designados a uma subconta acessem configurações e informações fora de sua subconta."
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Usa o novo Agendador e sua funcionalidade"
   utc_e44049af: UTC
+  uuid_has_been_provisioned_ab0c6c9: "UUID foi provisionado."
   validate: 
     is_required: "Este campo é obrigatório"
   validate_links_in_content_b1630fba: "Validar Links no Conteúdo"
@@ -29966,6 +30012,7 @@ pt-BR:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite pontuação de similaridade -- mais informações"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Pontuação de similaridade – Ver relatório detalhado"
   verify_ldap_tls_certificates_70241d8e: "Verifique os certificados TLS do LDAP"
+  verify_tls_certificate_9cfa26d1: "Verificar certificado TLS"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Verifique os certificados TLS apresentados pelos provedores de autenticação LDAP."
   version_versionnumber_updatedat_9f5b7a5b: "Versão %{versionNumber} %{updatedAt}"
   video_78335c71: vídeo
