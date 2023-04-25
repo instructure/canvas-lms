@@ -244,11 +244,7 @@ const FilterDropdown = ({
                       return (
                         <MenuItem key={item.id} as="div">
                           <Flex as="div" justifyItems="space-between">
-                            <TruncateText position="middle">
-                              {/* Gradebook.ts:setStudentGroups html escapes the group name */}
-                              {/* If we remove that or set the group data in zustand we can remove this */}
-                              <div dangerouslySetInnerHTML={{__html: item.name}} />
-                            </TruncateText>
+                            <TruncateText position="middle">{item.name}</TruncateText>
                           </Flex>
                         </MenuItem>
                       )
