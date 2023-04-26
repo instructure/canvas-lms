@@ -18,6 +18,7 @@
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
+declare const INST: any
 
 class SafeString {
   'string': string
@@ -70,7 +71,6 @@ export default function escape<T>(strOrObject: string | SafeString | Object) {
 escape.SafeString = SafeString
 
 // tinymce plugins use this and they need it global :(
-// @ts-expect-error
 INST.htmlEscape = escape
 
 const UNESCAPE_ENTITIES = Object.keys(ENTITIES).reduce((map, key) => {

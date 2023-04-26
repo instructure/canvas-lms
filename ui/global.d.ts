@@ -21,10 +21,12 @@ import {sendMessageStudentsWho} from './shared/grading/messageStudentsWhoHelper'
 declare global {
   interface Global {
     readonly ENV?: any
+    readonly INST?: any
   }
 
   interface Window {
     readonly ENV?: any
+    readonly INST?: any
     webkitSpeechRecognition: any
     jsonData: any
 
@@ -33,6 +35,7 @@ declare global {
   }
 
   const ENV: any
+  const INST: any
 
   declare interface JQuery {
     scrollTo: (y: number, x?: number) => void
