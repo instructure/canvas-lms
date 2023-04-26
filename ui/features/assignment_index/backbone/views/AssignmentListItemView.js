@@ -532,7 +532,7 @@ export default AssignmentListItemView = (function () {
         if (!mountPoint) {
           return
         }
-        return ReactDOM.render(
+        ReactDOM.render(
           React.createElement(DirectShareUserModal, {
             open,
             courseId: ENV.COURSE_ID || ENV.COURSE.id,
@@ -560,7 +560,7 @@ export default AssignmentListItemView = (function () {
         if (!mountPoint) {
           return
         }
-        return ReactDOM.render(
+        ReactDOM.render(
           React.createElement(DirectShareCourseTray, {
             open,
             sourceCourseId: ENV.COURSE_ID || ENV.COURSE.id,

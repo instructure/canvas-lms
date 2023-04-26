@@ -176,6 +176,7 @@ export default class ItemView extends Backbone.View {
   onDelete(e) {
     e.preventDefault()
     if (this.canDelete()) {
+      // eslint-disable-next-line no-alert
       if (window.confirm(this.messages.confirm)) return this.delete()
     }
   }
@@ -348,6 +349,7 @@ export default class ItemView extends Backbone.View {
     base.isDuplicating = this.model.get('workflow_state') === 'duplicating'
     base.failedToDuplicate = this.model.get('workflow_state') === 'failed_to_duplicate'
     base.isMigrating = this.model.get('workflow_state') === 'migrating'
+    base.isMasterCourseChildContent = this.model.isMasterCourseChildContent()
     base.failedToMigrate = this.model.get('workflow_state') === 'failed_to_migrate'
     base.showAvailability =
       !(this.model.get('in_paced_course') && this.canManage()) &&

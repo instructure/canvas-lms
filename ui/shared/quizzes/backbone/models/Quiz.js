@@ -136,6 +136,11 @@ export default class Quiz extends Backbone.Model {
     return this.get('quiz_type') === 'survey'
   }
 
+  isMasterCourseChildContent() {
+    const migration_id = this.get('migration_id')
+    return migration_id && migration_id.indexOf('mastercourse_') === 0
+  }
+
   publish_url() {
     if (this.isQuizzesNext()) {
       return `${this.get('base_url')}/publish/quiz`
