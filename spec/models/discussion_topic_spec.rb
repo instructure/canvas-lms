@@ -2185,6 +2185,46 @@ describe DiscussionTopic do
       @topic.restore
       expect(@topic.reload).to be_active
     end
+
+    it "does not allow restoring child discussion when the parent is destroyed" do
+      group_discussion_assignment
+      @topic.destroy
+
+      child = @topic.child_topics.first
+
+      expect(child.restore).to be false
+      expect(child.deleted?).to be true
+      expect(child.errors[:deleted_at]).to be_present
+    end
+  end
+
+  context "restorable?" do
+    it "returns true for basic discussions" do
+      group_assignment_discussion
+
+      expect(@root_topic.restorable?).to be(true)
+      expect(@topic.restorable?).to be(true)
+    end
+
+    it "returns true for deleted root_topics" do
+      group_assignment_discussion
+
+      @root_topic.destroy
+      expect(@root_topic.restorable?).to be(true)
+    end
+
+    it "returns false for deleted child_topics when the root topic is deleted" do
+      group_assignment_discussion
+
+      @root_topic.destroy
+      expect(@topic.reload.restorable?).to be(false)
+    end
+
+    it "returns true for deleted_child topics when the root topic is not deleted" do
+      group_assignment_discussion
+      @topic.destroy
+      expect(@topic.restorable?).to be(true)
+    end
   end
 
   describe "reply_from" do

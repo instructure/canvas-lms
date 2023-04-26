@@ -422,6 +422,17 @@ describe ContextController do
       expect(assigns[:deleted_items]).to include(g1)
     end
 
+    it "does now show group discussions that are not restorable" do
+      group_assignment_discussion(course: @course)
+
+      @root_topic.destroy
+      user_session(@teacher)
+      get :undelete_index, params: { group_id: @group }
+
+      expect(response).to be_successful
+      expect(assigns[:deleted_items]).not_to include(@topic)
+    end
+
     describe "Rubric Associations" do
       before(:once) do
         assignment = assignment_model(course: @course)
@@ -485,6 +496,17 @@ describe ContextController do
       expect_any_instantiation_of(@course).not_to receive(:teacher_names)
       post :undelete_item, params: { course_id: @course.id, asset_string: "teacher_name_1" }
       expect(response).to have_http_status :internal_server_error
+    end
+
+    it "does not allow restoring unrestorable discussion topics" do
+      group_assignment_discussion(course: @course)
+      @root_topic.destroy
+
+      expect(@topic.reload.restorable?).to be(false)
+
+      user_session(@teacher)
+      post :undelete_item, params: { group_id: @group.id, asset_string: @topic.asset_string }
+      expect(response).to have_http_status :forbidden
     end
 
     it 'allows undeleting a "normal" association' do
