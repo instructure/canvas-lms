@@ -35,7 +35,7 @@ import {
   lastNameFirst,
   nameParts,
 } from '@canvas/user-sortable-name/jquery/user_utils'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 import unflatten from 'obj-unflatten'
 import registrationErrors from '@canvas/normalize-registration-errors'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'

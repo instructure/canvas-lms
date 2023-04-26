@@ -63,18 +63,18 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
 
   it "is a no-op for :settings_only submissions (has no quiz_data)" do
     quiz_submission.quiz_data = nil
-    expect(subject.run!(quiz_submission)).to eq(nil)
+    expect(subject.run!(quiz_submission)).to be_nil
   end
 
   it "is a no-op if the data fix has already been applied" do
     quiz_submission.quiz_data = []
     quiz_submission.question_references_fixed = true
 
-    expect(subject.run!(quiz_submission)).to eq(nil)
+    expect(subject.run!(quiz_submission)).to be_nil
   end
 
   it "creates missing questions" do
-    expect(subject.run!(quiz_submission)).to eq(true)
+    expect(subject.run!(quiz_submission)).to be(true)
 
     expect(@quiz.quiz_questions.count).to eq(2),
                                           "it implicitly created a QuizQuestion"
@@ -84,7 +84,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
   end
 
   it "updates the IDs in quiz_data to point to newly created questions" do
-    expect(subject.run!(quiz_submission)).to eq(true)
+    expect(subject.run!(quiz_submission)).to be(true)
     expect(quiz_submission.quiz_data[0][:id])
       .to eq(generated_quiz_question.id)
   end
@@ -101,7 +101,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
         }
       ]
 
-      expect(subject.run!(quiz_submission)).to eq(true)
+      expect(subject.run!(quiz_submission)).to be(true)
       expect(quiz_submission.submission_data[0][:question_id])
         .to eq(generated_quiz_question.id)
     end
@@ -121,7 +121,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
         }
       ]
 
-      expect(subject.run!(quiz_submission)).to eq(true)
+      expect(subject.run!(quiz_submission)).to be(true)
       expect(quiz_submission.submission_data[0][:question_id])
         .not_to eq(@aq.id)
     end
@@ -280,7 +280,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
       quiz_submission.quiz_data = [@qq.data]
       quiz_submission.without_versioning { quiz_submission.save! }
 
-      expect(subject.run!(quiz_submission)).to eq(true)
+      expect(subject.run!(quiz_submission)).to be(true)
 
       expect(quiz_submission.quiz_data[0][:id]).to eq(@qq.id)
 
@@ -293,7 +293,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     it "does not generate another, only link to the existing one" do
       @qq2 = @aq.create_quiz_question(@quiz.id)
 
-      expect(subject.run!(quiz_submission)).to eq(true)
+      expect(subject.run!(quiz_submission)).to be(true)
       expect(@quiz.reload.quiz_questions.generated.count).to eq(1)
       expect(quiz_submission.quiz_data[0][:id]).to eq(@qq2.id)
     end

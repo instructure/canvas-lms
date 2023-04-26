@@ -33,12 +33,12 @@ describe Types::CoursePermissionsType do
         "permissions { viewAllGrades }",
         current_user: @student
       )
-    ).to eq false
+    ).to be false
     expect(
       course_type.resolve(
         "permissions { viewAllGrades }",
         current_user: @teacher
       )
-    ).to eq true
+    ).to be true
   end
 end

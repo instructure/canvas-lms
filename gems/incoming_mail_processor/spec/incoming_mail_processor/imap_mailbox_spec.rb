@@ -60,7 +60,7 @@ describe IncomingMailProcessor::ImapMailbox do
                                                         })
 
       expect(@mailbox.server).to eql "imap.server.com"
-      expect(@mailbox.port).to eql 1234
+      expect(@mailbox.port).to be 1234
       expect(@mailbox.ssl).to eql "truthy-value"
       expect(@mailbox.filter).to eql ["ALL"]
       expect(@mailbox.username).to eql "user@server.com"
@@ -89,12 +89,12 @@ describe IncomingMailProcessor::ImapMailbox do
   describe "#unprocessed_message_count" do
     it "returns zero if there are no messages" do
       expect(@imap_mock).to receive(:search).with(["X-GM-RAW", "label:unread"]).once.and_return([])
-      expect(@mailbox.unprocessed_message_count).to eql 0
+      expect(@mailbox.unprocessed_message_count).to be 0
     end
 
     it "returns the number of messages if there are any" do
       expect(@imap_mock).to receive(:search).with(["X-GM-RAW", "label:unread"]).once.and_return([1, 2, 3, 58, 42])
-      expect(@mailbox.unprocessed_message_count).to eql 5
+      expect(@mailbox.unprocessed_message_count).to be 5
     end
   end
 

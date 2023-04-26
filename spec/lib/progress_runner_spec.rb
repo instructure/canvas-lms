@@ -72,7 +72,7 @@ describe ProgressRunner do
     progress_runner = ProgressRunner.new(@progress)
 
     progress_runner.completed_message do |count|
-      expect(count).to eql 1
+      expect(count).to be 1
       "abra"
     end
 
@@ -87,9 +87,9 @@ describe ProgressRunner do
       raise "error processing #{id}" if id >= 2
     end
 
-    expect(error_callback_count).to eql 2
+    expect(error_callback_count).to be 2
     message_lines = @progress.message.lines.map(&:strip).sort
-    expect(message_lines.size).to eql 3
+    expect(message_lines.size).to be 3
     expect(message_lines).to eql ["abra", "error processing 2: 2", "error processing 3: 3"]
   end
 

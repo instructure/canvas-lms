@@ -147,7 +147,7 @@ describe "Tutorials" do
 
     it "the 'Don't Show Again' button ends the tutorial", priority: "1" do
       get "/courses/#{@course.id}"
-      fj("button:contains('Don\'t Show Again')").click
+      fj("button:contains('Don't Show Again')").click
       wait_for_new_page_load do
         fj("button:contains('Okay')").click
       end
@@ -156,7 +156,7 @@ describe "Tutorials" do
 
     it "the 'x' button closes the End Course Set-up Tutorial modal", priority: "1" do
       get "/courses/#{@course.id}"
-      fj("button:contains('Don\'t Show Again')").click
+      fj("button:contains('Don't Show Again')").click
       fj("span[data-testid='instui-modal-close'] button:contains('Close')").click
       expect(f(".NewUserTutorialTray")).to be_displayed
       expect(driver).not_to contain_css("End Course Set-up Tutorial")
@@ -164,7 +164,7 @@ describe "Tutorials" do
 
     it "the 'Cancel' button closes the End Course Set-up Tutorial modal", priority: "1" do
       get "/courses/#{@course.id}"
-      fj("button:contains('Don\'t Show Again')").click
+      fj("button:contains('Don't Show Again')").click
       fj("span button:contains('Cancel')").click
       expect(f(".NewUserTutorialTray")).to be_displayed
       expect(driver).not_to contain_css("End Course Set-up Tutorial")

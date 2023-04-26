@@ -32,7 +32,7 @@ describe "Importing Assignment Groups" do
       data[:assignment_groups_to_import] = {}
       expect do
         expect(Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)).to be_nil
-      end.to change(AssignmentGroup, :count).by(0)
+      end.not_to change(AssignmentGroup, :count)
 
       data[:assignment_groups_to_import][data[:migration_id]] = true
       expect do
@@ -78,6 +78,6 @@ describe "Importing Assignment Groups" do
     expect do
       ass = Importers::AssignmentImporter.import_from_migration(get_import_data("bb8", "assignment"), context, migration)
       expect(ass.assignment_group.name).to eq data[:title]
-    end.to change(AssignmentGroup, :count).by(0)
+    end.not_to change(AssignmentGroup, :count)
   end
 end

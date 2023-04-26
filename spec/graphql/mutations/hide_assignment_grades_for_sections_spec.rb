@@ -110,7 +110,7 @@ describe Mutations::HideAssignmentGradesForSections do
       assignment.update!(anonymous_grading: true)
       assignment.post_submissions
       result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)
-      expect(result["errors"]).to be nil
+      expect(result["errors"]).to be_nil
     end
 
     it "does not allow hiding by section for moderated assignments that have not had grades published yet" do
@@ -124,7 +124,7 @@ describe Mutations::HideAssignmentGradesForSections do
       now = Time.zone.now
       assignment.update!(moderated_grading: true, grader_count: 2, final_grader: teacher, grades_published_at: now)
       result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)
-      expect(result["errors"]).to be nil
+      expect(result["errors"]).to be_nil
     end
 
     describe "hiding the grades" do
@@ -198,7 +198,7 @@ describe Mutations::HideAssignmentGradesForSections do
         it "does not hide grades for the requested sections if the user cannot see them" do
           execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id, section2.id]), { current_user: ta })
           hide_submissions_job.invoke_job
-          expect(assignment.submission_for_student(@section2_student).posted_at).not_to be nil
+          expect(assignment.submission_for_student(@section2_student).posted_at).not_to be_nil
         end
 
         it "stores only the user ids of affected students on the Progress object" do
@@ -221,7 +221,7 @@ describe Mutations::HideAssignmentGradesForSections do
 
     it "does not return data for the related submissions" do
       result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section2.id]), context)
-      expect(result.dig("data", "hideAssignmentGradesForSections")).to be nil
+      expect(result.dig("data", "hideAssignmentGradesForSections")).to be_nil
     end
   end
 end

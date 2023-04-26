@@ -116,7 +116,7 @@ namespace :i18n do
 
   # TODO: remove once we're sure all places that called i18n:generate are now
   # calling i18n:extract (e.g. caturday)
-  desc 'Alias for i18n:extract'
+  desc "Alias for i18n:extract"
   task generate: [:extract]
 
   desc "generate JavaScript translation files"
@@ -163,16 +163,14 @@ namespace :i18n do
     end
 
     t = Time.now
-    translations = YAML.safe_load(open(source_translations_file))
+    translations = YAML.safe_load(File.open(source_translations_file))
 
     I18n.extend I18nTasks::Lolcalize
     lolz_translations = {}
     lolz_translations["lolz"] = process_lolz.call(translations["en"])
     puts
 
-    File.open("config/locales/lolz.yml", "w") do |f|
-      f.write(lolz_translations.to_yaml(line_width: -1))
-    end
+    File.write("config/locales/lolz.yml", lolz_translations.to_yaml(line_width: -1))
     print "\nFinished generating LOLZ from #{strings_processed} strings in #{Time.now - t} seconds\n"
 
     # add lolz to the locales.yml file
@@ -185,9 +183,7 @@ namespace :i18n do
         "crowdsourced" => true
       }
 
-      File.open("config/locales/locales.yml", "w") do |f|
-        f.write(locales.to_yaml(line_width: -1))
-      end
+      File.write("config/locales/locales.yml", locales.to_yaml(line_width: -1))
       print "Added LOLZ to locales\n"
     end
   end
@@ -251,7 +247,7 @@ namespace :i18n do
       loop do
         puts "Enter local branch containing current en translations (default master):"
         current_branch = $stdin.gets.strip
-        break if current_branch.blank? || current_branch !~ /[^a-z0-9_.\-]/
+        break if current_branch.blank? || current_branch !~ /[^a-z0-9_.-]/
       end
       current_branch = nil if current_branch.blank?
 
@@ -268,7 +264,7 @@ namespace :i18n do
                     else
                       current_strings
                     end
-      File.open(export_filename, "w") { |f| f.write new_strings.expand_keys.to_yaml(line_width: -1) }
+      File.write(export_filename, new_strings.expand_keys.to_yaml(line_width: -1))
 
       push = "n"
       y_n = %w[y n]
@@ -344,9 +340,7 @@ namespace :i18n do
 
     next if complete_translations.nil?
 
-    File.open("config/locales/#{import.language}.yml", "w") do |f|
-      f.write({ import.language => complete_translations }.to_yaml(line_width: -1))
-    end
+    File.write("config/locales/#{import.language}.yml", { import.language => complete_translations }.to_yaml(line_width: -1))
   end
 
   desc "Imports new translations, ignores missing or unexpected keys"

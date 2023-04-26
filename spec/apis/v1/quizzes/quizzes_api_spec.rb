@@ -134,7 +134,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                               {},
                               "Accept" => "application/vnd.api+json")
           meta = response["meta"]
-          expect(meta["permissions"]["quizzes"]["create"]).to eq(true)
+          expect(meta["permissions"]["quizzes"]["create"]).to be(true)
 
           quizzes_json = response["quizzes"]
           quiz_ids = quizzes_json.collect { |quiz| quiz["id"] }
@@ -543,7 +543,7 @@ describe Quizzes::QuizzesApiController, type: :request do
           call_create({ title: "Example Quiz", due_at: nil }, 200)
           json = JSON.parse response.body
           quiz = Quizzes::Quiz.find(json["id"])
-          expect(quiz.due_at).to eq nil
+          expect(quiz.due_at).to be_nil
         end
       end
     end
@@ -581,12 +581,12 @@ describe Quizzes::QuizzesApiController, type: :request do
 
     it "allows quiz attribute 'only_visible_to_overrides' to be updated to true with PUT request" do
       api_update_quiz({ "only_visible_to_overrides" => "false" }, { "only_visible_to_overrides" => "true" })
-      expect(updated_quiz.only_visible_to_overrides).to eq true
+      expect(updated_quiz.only_visible_to_overrides).to be true
     end
 
     it "allows quiz attribute 'only_visible_to_overrides' to be updated to false with PUT request" do
       api_update_quiz({ "only_visible_to_overrides" => "true" }, { "only_visible_to_overrides" => "false" })
-      expect(updated_quiz.only_visible_to_overrides).to eq false
+      expect(updated_quiz.only_visible_to_overrides).to be false
     end
 
     it "removes domain from URLs" do
@@ -623,7 +623,7 @@ describe Quizzes::QuizzesApiController, type: :request do
     context "anonymous_submissions" do
       it "updates anonymous_submissions" do
         api_update_quiz({}, { anonymous_submissions: true })
-        expect(updated_quiz.anonymous_submissions).to eq true
+        expect(updated_quiz.anonymous_submissions).to be true
       end
     end
 
@@ -673,17 +673,17 @@ describe Quizzes::QuizzesApiController, type: :request do
         api_update_quiz({}, {})
         expect(@quiz.reload).not_to be_published # in 'created' state by default
         json = api_update_quiz({}, { published: false })
-        expect(json["unpublishable"]).to eq true
+        expect(json["unpublishable"]).to be true
         expect(@quiz.reload).to be_unpublished
         json = api_update_quiz({}, { published: true })
-        expect(json["unpublishable"]).to eq true
+        expect(json["unpublishable"]).to be true
         expect(@quiz.reload).to be_published
         api_update_quiz({}, { published: nil }) # nil shouldn't change published
         expect(@quiz.reload).to be_published
 
         allow_any_instantiation_of(@quiz).to receive(:has_student_submissions?).and_return true
         json = api_update_quiz({}, {}) # nil shouldn't change published
-        expect(json["unpublishable"]).to eq false
+        expect(json["unpublishable"]).to be false
 
         json = api_update_quiz({}, { published: false }, { expected_status: 400 })
         expect(json["errors"]["published"]).not_to be_nil
@@ -871,19 +871,19 @@ describe Quizzes::QuizzesApiController, type: :request do
         it "allows disabling only_visible_to_overrides when due in an open grading period" do
           @quiz = create_quiz(due_at: 3.days.from_now, only_visible_to_overrides: true)
           call_update({ only_visible_to_overrides: false }, 200)
-          expect(@quiz.reload.only_visible_to_overrides).to eql false
+          expect(@quiz.reload.only_visible_to_overrides).to be false
         end
 
         it "allows enabling only_visible_to_overrides when due in an open grading period" do
           @quiz = create_quiz(due_at: 3.days.from_now, only_visible_to_overrides: false)
           call_update({ only_visible_to_overrides: true }, 200)
-          expect(@quiz.reload.only_visible_to_overrides).to eql true
+          expect(@quiz.reload.only_visible_to_overrides).to be true
         end
 
         it "does not allow disabling only_visible_to_overrides when due in a closed grading period" do
           @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: true)
           call_update({ only_visible_to_overrides: false }, 403)
-          expect(@quiz.reload.only_visible_to_overrides).to eql true
+          expect(@quiz.reload.only_visible_to_overrides).to be true
           json = JSON.parse response.body
           expect(json["errors"].keys).to include "due_at"
         end
@@ -891,7 +891,7 @@ describe Quizzes::QuizzesApiController, type: :request do
         it "does not allow enabling only_visible_to_overrides when due in a closed grading period" do
           @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: false)
           call_update({ only_visible_to_overrides: true }, 403)
-          expect(@quiz.reload.only_visible_to_overrides).to eql false
+          expect(@quiz.reload.only_visible_to_overrides).to be false
           json = JSON.parse response.body
           expect(json["errors"].keys).to include "only_visible_to_overrides"
         end
@@ -900,7 +900,7 @@ describe Quizzes::QuizzesApiController, type: :request do
           due_date = 3.days.from_now.iso8601
           @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: true)
           call_update({ due_at: due_date, only_visible_to_overrides: false }, 200)
-          expect(@quiz.reload.only_visible_to_overrides).to eql false
+          expect(@quiz.reload.only_visible_to_overrides).to be false
           expect(@quiz.due_at).to eq due_date
         end
 
@@ -975,13 +975,13 @@ describe Quizzes::QuizzesApiController, type: :request do
         it "does not allow disabling only_visible_to_overrides when due in a closed grading period" do
           @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: true)
           call_update({ only_visible_to_overrides: false }, 200)
-          expect(@quiz.reload.only_visible_to_overrides).to eql false
+          expect(@quiz.reload.only_visible_to_overrides).to be false
         end
 
         it "does not allow enabling only_visible_to_overrides when due in a closed grading period" do
           @quiz = create_quiz(due_at: 3.days.ago, only_visible_to_overrides: false)
           call_update({ only_visible_to_overrides: true }, 200)
-          expect(@quiz.reload.only_visible_to_overrides).to eql true
+          expect(@quiz.reload.only_visible_to_overrides).to be true
         end
 
         it "allows changing the due date on a quiz due in a closed grading period" do
@@ -1009,7 +1009,7 @@ describe Quizzes::QuizzesApiController, type: :request do
         it "allows unsetting the due date when the last grading period is closed" do
           @quiz = create_quiz(due_at: 3.days.from_now)
           call_update({ due_at: nil }, 200)
-          expect(@quiz.reload.due_at).to eq nil
+          expect(@quiz.reload.due_at).to be_nil
         end
       end
     end

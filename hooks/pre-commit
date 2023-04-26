@@ -15,14 +15,23 @@ if [ $(pwd -P) = $CANVAS ]; then
   if git diff --cached --name-only | grep -vE '^packages/' | grep -qE '\.(ts|tsx)$'; then
     if [ -f node_modules/.bin/tsc ]; then
       echo 'Checking TypeScript...'
-      NODE_OPTIONS=--max-old-space-size=4096 node_modules/.bin/tsc -p tsconfig.json --noEmit
+      NODE_OPTIONS=--max-old-space-size=4096 node_modules/.bin/tsc -p tsconfig.json
+      if [ $? -ne 0 ]; then
+        echo 'TypeScript errors found, aborting commit'
+        exit 1
+      fi
+
+      echo 'Checking TypeScript (strict)...'
+      NODE_OPTIONS=--max-old-space-size=4096 node_modules/.bin/tsc -p tsconfig-strict.json
       if [ $? -ne 0 ]; then
         echo 'TypeScript errors found, aborting commit'
         exit 1
       fi
     else
       echo 'Trying to run tsc inside Docker. If you want things quicker yarn install locally.'
-      docker-compose exec -T web node_modules/.bin/tsc -p tsconfig.json --noEmit ||
+      docker-compose exec -T web node_modules/.bin/tsc -p tsconfig.json ||
+        echo "You should run yarn locally or check to make sure docker is running."
+      docker-compose exec -T web node_modules/.bin/tsc -p tsconfig-strict.json ||
         echo "You should run yarn locally or check to make sure docker is running."
     fi
   fi

@@ -45,7 +45,7 @@ module Factories
 
   def pseudonym(user, opts = {})
     @spec_pseudonym_count ||= 0
-    username = opts[:username] || (@spec_pseudonym_count > 0 ? "nobody+#{@spec_pseudonym_count}@example.com" : "nobody@example.com")
+    username = opts[:username] || ((@spec_pseudonym_count > 0) ? "nobody+#{@spec_pseudonym_count}@example.com" : "nobody@example.com")
     opts[:username] ||= username
     @spec_pseudonym_count += 1 if /nobody(\+\d+)?@example.com/.match?(username)
     password = opts[:password] || "asdfasdf"

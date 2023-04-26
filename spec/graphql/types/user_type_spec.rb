@@ -425,7 +425,7 @@ describe Types::UserType do
       it "returns nil" do
         expect(
           user_type.resolve("notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }")
-        ).to eq nil
+        ).to be_nil
       end
     end
   end
@@ -557,7 +557,7 @@ describe Types::UserType do
       type = GraphQLTypeTester.new(@teacher, current_user: @student, domain_root_account: @teacher.account, request: ActionDispatch::TestRequest.create)
       expect(
         type.resolve("conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")
-      ).to be nil
+      ).to be_nil
     end
 
     it "filters the conversations" do
@@ -657,7 +657,7 @@ describe Types::UserType do
 
     it "returns nil if the user is not the current user" do
       result = user_type.resolve("recipients { usersConnection { nodes { _id } } }")
-      expect(result).to be nil
+      expect(result).to be_nil
     end
 
     it "returns known users" do
@@ -673,20 +673,20 @@ describe Types::UserType do
 
     it "returns false for sendMessagesAll if no context is given" do
       result = type.resolve("recipients { sendMessagesAll }")
-      expect(result).to eq(false)
+      expect(result).to be(false)
     end
 
     it "returns false for sendMessagesAll if not allowed" do
       # Students do not have the sendMessagesAll permission by default
       result = type.resolve("recipients(context: \"course_#{@course.id}_students\") { sendMessagesAll }")
-      expect(result).to eq(false)
+      expect(result).to be(false)
     end
 
     it "returns true for sendMessagesAll if allowed" do
       @random_person.account.role_overrides.create!(permission: :send_messages_all, role: student_role, enabled: true)
 
       result = type.resolve("recipients(context: \"course_#{@course.id}_students\") { sendMessagesAll }")
-      expect(result).to eq(true)
+      expect(result).to be(true)
     end
 
     it "searches users" do
@@ -830,12 +830,12 @@ describe Types::UserType do
 
     it "returns nil if the user is not the current user" do
       result = teacher_type.resolve('recipientsObservers(contextCode: "course_1", recipientIds: ["1"]) { nodes { _id } } ')
-      expect(result).to be nil
+      expect(result).to be_nil
     end
 
     it "returns nil if invalid course is given" do
       result = teacher_type.resolve('recipientsObservers(contextCode: "fake_2", recipientIds: ["1"]) { nodes { _id } } ')
-      expect(result).to be nil
+      expect(result).to be_nil
     end
 
     it "returns a users observers as messageable user" do

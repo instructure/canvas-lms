@@ -104,7 +104,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
 
       expect(
         result.dig(:data, :createSubmissionDraft, :errors)
-      ).to be nil
+      ).to be_nil
 
       expect(
         result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments, 0, :_id)
@@ -121,7 +121,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
 
       expect(
         result.dig(:data, :createSubmissionDraft, :errors)
-      ).to be nil
+      ).to be_nil
 
       expect(
         result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).length
@@ -238,7 +238,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
 
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :body)
-    ).to be nil
+    ).to be_nil
   end
 
   it "only updates the body when the active submission type is online_text_entry" do
@@ -256,7 +256,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
 
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :url)
-    ).to be nil
+    ).to be_nil
   end
 
   it "only updates the url when the active submission type is online_url" do
@@ -270,7 +270,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
 
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :body)
-    ).to be nil
+    ).to be_nil
 
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :url)

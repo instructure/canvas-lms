@@ -172,7 +172,7 @@ describe Mutations::SetModuleItemCompletion do
 
     it "does not return data pertaining to the module item" do
       result = CanvasSchema.execute(mutation_str, context: { current_user: student })
-      expect(result.dig("data", "setModuleItemCompletion")).to be nil
+      expect(result.dig("data", "setModuleItemCompletion")).to be_nil
     end
   end
 end

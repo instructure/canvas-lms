@@ -125,19 +125,19 @@ describe Types::EnrollmentType do
   context "concluded" do
     context "teacher enrollment" do
       it "returns false if the enrollment is not completed" do
-        expect(teacher_enrollment_type.resolve("concluded")).to eq false
+        expect(teacher_enrollment_type.resolve("concluded")).to be false
       end
 
       it "returns true if the date is past the enrollment term end at time" do
         course = teacher_enrollment.course
         course.enrollment_term.update_attribute :end_at, 1.day.ago
-        expect(teacher_enrollment_type.resolve("concluded")).to eq true
+        expect(teacher_enrollment_type.resolve("concluded")).to be true
       end
 
       it "returns false if the date is before the enrollment term end at time" do
         course = teacher_enrollment.course
         course.enrollment_term.update_attribute :end_at, 5.days.from_now
-        expect(teacher_enrollment_type.resolve("concluded")).to eq false
+        expect(teacher_enrollment_type.resolve("concluded")).to be false
       end
 
       it "returns false when section override is past course end date" do
@@ -157,7 +157,7 @@ describe Types::EnrollmentType do
 
         my_section.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
 
-        expect(teacher_enrollment_type.resolve("concluded")).to eq false
+        expect(teacher_enrollment_type.resolve("concluded")).to be false
       end
 
       it "returns true when section override ends before course end date" do
@@ -176,7 +176,7 @@ describe Types::EnrollmentType do
 
         my_section.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
 
-        expect(teacher_enrollment_type.resolve("concluded")).to eq true
+        expect(teacher_enrollment_type.resolve("concluded")).to be true
       end
 
       it "does not errors out when course conclude_at is nil and returns correct value" do
@@ -190,7 +190,7 @@ describe Types::EnrollmentType do
 
         course.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
 
-        expect(teacher_enrollment_type.resolve("concluded")).to eq false
+        expect(teacher_enrollment_type.resolve("concluded")).to be false
       end
 
       it "does not errors out when section end_at is nil and returns correct value" do
@@ -211,12 +211,12 @@ describe Types::EnrollmentType do
 
         my_section.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
 
-        expect(teacher_enrollment_type.resolve("concluded")).to eq false
+        expect(teacher_enrollment_type.resolve("concluded")).to be false
       end
 
       it "returns true when enrollment is concluded" do
         teacher_enrollment.complete!
-        expect(teacher_enrollment_type.resolve("concluded")).to eq true
+        expect(teacher_enrollment_type.resolve("concluded")).to be true
       end
 
       it "returns true when course is soft_concluded" do
@@ -225,30 +225,30 @@ describe Types::EnrollmentType do
         course.conclude_at = 1.day.ago
         course.restrict_enrollments_to_course_dates = true
         course.save!
-        expect(teacher_enrollment_type.resolve("concluded")).to eq true
+        expect(teacher_enrollment_type.resolve("concluded")).to be true
       end
 
       it "returns true when course is hard_concluded" do
         teacher_enrollment.course.complete!
-        expect(teacher_enrollment_type.resolve("concluded")).to eq true
+        expect(teacher_enrollment_type.resolve("concluded")).to be true
       end
     end
 
     context "student enrollment" do
       it "returns false if the enrollment is not completed" do
-        expect(enrollment_type.resolve("concluded")).to eq false
+        expect(enrollment_type.resolve("concluded")).to be false
       end
 
       it "returns true if the date is past the enrollment term end at time" do
         course = enrollment.course
         course.enrollment_term.update_attribute :end_at, 1.day.ago
-        expect(enrollment_type.resolve("concluded")).to eq true
+        expect(enrollment_type.resolve("concluded")).to be true
       end
 
       it "returns false if the date is before the enrollment term end at time" do
         course = enrollment.course
         course.enrollment_term.update_attribute :end_at, 5.days.from_now
-        expect(enrollment_type.resolve("concluded")).to eq false
+        expect(enrollment_type.resolve("concluded")).to be false
       end
 
       it "returns false when section override is past course end date" do
@@ -268,7 +268,7 @@ describe Types::EnrollmentType do
 
         my_section.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
 
-        expect(enrollment_type.resolve("concluded")).to eq false
+        expect(enrollment_type.resolve("concluded")).to be false
       end
 
       it "returns true when section override ends before course end date" do
@@ -287,12 +287,12 @@ describe Types::EnrollmentType do
 
         my_section.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
 
-        expect(enrollment_type.resolve("concluded")).to eq true
+        expect(enrollment_type.resolve("concluded")).to be true
       end
 
       it "returns true when enrollment is concluded" do
         enrollment.complete!
-        expect(enrollment_type.resolve("concluded")).to eq true
+        expect(enrollment_type.resolve("concluded")).to be true
       end
 
       it "returns true when course is soft_concluded" do
@@ -301,12 +301,12 @@ describe Types::EnrollmentType do
         course.conclude_at = 1.day.ago
         course.restrict_enrollments_to_course_dates = true
         course.save!
-        expect(enrollment_type.resolve("concluded")).to eq true
+        expect(enrollment_type.resolve("concluded")).to be true
       end
 
       it "returns true when course is hard_concluded" do
         enrollment.course.complete!
-        expect(enrollment_type.resolve("concluded")).to eq true
+        expect(enrollment_type.resolve("concluded")).to be true
       end
     end
   end
@@ -322,7 +322,7 @@ describe Types::EnrollmentType do
     end
 
     it "returns nil when no associated user exists" do
-      expect(enrollment_type.resolve("associatedUser { _id }")).to be nil
+      expect(enrollment_type.resolve("associatedUser { _id }")).to be_nil
     end
   end
 end

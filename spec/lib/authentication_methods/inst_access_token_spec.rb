@@ -33,13 +33,13 @@ describe AuthenticationMethods::InstAccessToken do
 
   describe ".parse" do
     it "is false for bad tokens" do
-      result = ::AuthenticationMethods::InstAccessToken.parse("not-a-token")
+      result = AuthenticationMethods::InstAccessToken.parse("not-a-token")
       expect(result).to be_falsey
     end
 
     it "returns a token object for good tokens" do
-      token_obj = ::InstAccess::Token.for_user(user_uuid: "fake-user-uuid", account_uuid: "fake-acct-uuid")
-      result = ::AuthenticationMethods::InstAccessToken.parse(token_obj.to_unencrypted_token_string)
+      token_obj = InstAccess::Token.for_user(user_uuid: "fake-user-uuid", account_uuid: "fake-acct-uuid")
+      result = AuthenticationMethods::InstAccessToken.parse(token_obj.to_unencrypted_token_string)
       expect(result.user_uuid).to eq("fake-user-uuid")
     end
   end
@@ -50,8 +50,8 @@ describe AuthenticationMethods::InstAccessToken do
     it "finds the user who created the token" do
       account = Account.default
       user_with_pseudonym(active_all: true)
-      token_obj = ::InstAccess::Token.for_user(user_uuid: @user.uuid, account_uuid: account.uuid)
-      ctx = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token_obj, account)
+      token_obj = InstAccess::Token.for_user(user_uuid: @user.uuid, account_uuid: account.uuid)
+      ctx = AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token_obj, account)
       expect(ctx[:current_user]).to eq(@user)
       expect(ctx[:current_pseudonym]).to eq(@pseudonym)
     end
@@ -63,8 +63,8 @@ describe AuthenticationMethods::InstAccessToken do
       user_with_pseudonym(active_all: true)
       @user.uuid = "a-shared-uuid-between-users"
       @user.save!
-      token_obj = ::InstAccess::Token.for_user(user_uuid: "a-shared-uuid-between-users", account_uuid: account.uuid)
-      ctx = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token_obj, account)
+      token_obj = InstAccess::Token.for_user(user_uuid: "a-shared-uuid-between-users", account_uuid: account.uuid)
+      ctx = AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token_obj, account)
       expect(ctx[:current_user]).to eq(@user)
       expect(ctx[:current_pseudonym]).to eq(@pseudonym)
     end
@@ -74,16 +74,16 @@ describe AuthenticationMethods::InstAccessToken do
       user_model(uuid: "a-shared-uuid-between-users", workflow_state: "deleted")
       user_with_pseudonym(active_all: true)
       @user.update!(uuid: "a-shared-uuid-between-users")
-      token_obj = ::InstAccess::Token.for_user(user_uuid: "a-shared-uuid-between-users", account_uuid: account.uuid)
-      ctx = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token_obj, account)
+      token_obj = InstAccess::Token.for_user(user_uuid: "a-shared-uuid-between-users", account_uuid: account.uuid)
+      ctx = AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token_obj, account)
       expect(ctx[:current_user]).to eq(@user)
       expect(ctx[:current_pseudonym]).to eq(@pseudonym)
     end
 
     it "returns an empty hash when the user identified by the token does not exist" do
       account = Account.default
-      token_obj = ::InstAccess::Token.for_user(user_uuid: "inexplicably-untied-to-any-user", account_uuid: account.uuid)
-      ctx = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token_obj, account)
+      token_obj = InstAccess::Token.for_user(user_uuid: "inexplicably-untied-to-any-user", account_uuid: account.uuid)
+      ctx = AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token_obj, account)
       expect(ctx[:current_user]).to be_nil
       expect(ctx[:current_pseudonym]).to be_nil
     end

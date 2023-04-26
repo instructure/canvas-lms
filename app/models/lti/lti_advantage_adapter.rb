@@ -182,6 +182,7 @@ module Lti
         deployment_id: @tool.deployment_id,
         target_link_uri: target_link_uri,
         lti_message_hint: message_hint,
+        canvas_environment: ApplicationController.test_cluster_name || "prod",
         canvas_region: @context.shard.database_server.config[:region] || "not_configured"
       )
       req.lti_storage_target = Lti::PlatformStorage.lti_storage_target if @include_storage_target

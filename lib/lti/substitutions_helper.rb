@@ -191,7 +191,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-        @context.is_a?(Course) && @user ? @user.enrollments.concluded.where(course_id: @context.id).shard(@context.shard) : []
+        (@context.is_a?(Course) && @user) ? @user.enrollments.concluded.where(course_id: @context.id).shard(@context.shard) : []
     end
 
     def concluded_lis_roles
@@ -204,13 +204,13 @@ module Lti
 
     def current_canvas_roles
       roles = (course_enrollments + account_enrollments).map(&:role).map(&:name).uniq
-      roles = roles.map { |role| role == "AccountAdmin" ? "Account Admin" : role } # to maintain backwards compatibility
+      roles = roles.map { |role| (role == "AccountAdmin") ? "Account Admin" : role } # to maintain backwards compatibility
       roles.join(",")
     end
 
     def current_canvas_roles_lis_v2(version = "lis2")
       roles = (course_enrollments + account_enrollments).map(&:class).uniq
-      role_map = version == "lti1_3" ? LIS_V2_LTI_ADVANTAGE_ROLE_MAP : LIS_V2_ROLE_MAP
+      role_map = (version == "lti1_3") ? LIS_V2_LTI_ADVANTAGE_ROLE_MAP : LIS_V2_ROLE_MAP
       roles.map { |r| role_map[r] }.join(",")
     end
 
@@ -218,7 +218,7 @@ module Lti
       enrollments = @user ? @context.enrollments.where(user_id: @user.id).preload(:enrollment_state) : []
       return "" if enrollments.empty?
 
-      enrollments.any? { |membership| membership.state_based_on_date == :active } ? LtiOutbound::LTIUser::ACTIVE_STATE : LtiOutbound::LTIUser::INACTIVE_STATE
+      (enrollments.any? { |membership| membership.state_based_on_date == :active }) ? LtiOutbound::LTIUser::ACTIVE_STATE : LtiOutbound::LTIUser::INACTIVE_STATE
     end
 
     def previous_lti_context_ids

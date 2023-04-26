@@ -55,7 +55,7 @@ module CC::Importer::Standard
         if item_node.name == "title"
           if mod[:title]
             # This is a sub folder, or a "heading" in a canvas module
-            item = { title: item_node.text, indent: (indent > 0 ? indent - 1 : 0), type: "heading" }
+            item = { title: item_node.text, indent: ((indent > 0) ? indent - 1 : 0), type: "heading" }
             mod[:items] << item
           else
             mod[:title] = item_node.text

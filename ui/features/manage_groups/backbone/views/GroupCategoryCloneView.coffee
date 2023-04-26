@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
+import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import template from '../../jst/groupCategoryClone.handlebars'
 

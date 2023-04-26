@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe "session token", type: :request do
+describe "session token" do
   before do
     user_with_pseudonym
     enable_default_developer_key!
@@ -31,7 +31,7 @@ describe "session token", type: :request do
         params: { access_token: access_token }
     expect(response).to be_successful
     json = JSON.parse(response.body)
-    expect(json["session_url"]).to match %r{^https://www.example.com/courses\?session_token=[0-9a-zA-Z_\-]+$}
+    expect(json["session_url"]).to match %r{^https://www.example.com/courses\?session_token=[0-9a-zA-Z_-]+$}
 
     get json["session_url"]
     expect(response).to be_redirect
@@ -50,7 +50,7 @@ describe "session token", type: :request do
 
     follow_redirect!
     expect(response).to be_successful
-    expect(session[:used_remember_me_token]).to eq true
+    expect(session[:used_remember_me_token]).to be true
   end
 
   it "rejects bad tokens" do

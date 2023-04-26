@@ -22,7 +22,7 @@ import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 import GroupModal from '@canvas/group-modal'
-import Group from '@canvas/groups/backbone/models/Group.coffee'
+import Group from '@canvas/groups/backbone/models/Group'
 
 const I18n = useI18nScope('StudentGroupDialog')
 

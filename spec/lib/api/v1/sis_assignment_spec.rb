@@ -118,7 +118,7 @@ describe Api::V1::SisAssignment do
       assignment_1[:grading_type] = "points"
       assignments = [assignment_1]
       result = subject.sis_assignments_json(assignments)
-      expect(result[0]["include_in_final_grade"]).to eq(false)
+      expect(result[0]["include_in_final_grade"]).to be(false)
     end
 
     it "returns false for include_in_final_grade when grading_type is not_graded" do
@@ -126,7 +126,7 @@ describe Api::V1::SisAssignment do
       assignment_1[:grading_type] = "not_graded"
       assignments = [assignment_1]
       result = subject.sis_assignments_json(assignments)
-      expect(result[0]["include_in_final_grade"]).to eq(false)
+      expect(result[0]["include_in_final_grade"]).to be(false)
     end
 
     it "returns true for include_in_final_grade when appropriate" do
@@ -134,7 +134,7 @@ describe Api::V1::SisAssignment do
       assignment_1[:grading_type] = "points"
       assignments = [assignment_1]
       result = subject.sis_assignments_json(assignments)
-      expect(result[0]["include_in_final_grade"]).to eq(true)
+      expect(result[0]["include_in_final_grade"]).to be(true)
     end
 
     it "returns an empty hash for 0 assignments" do
@@ -188,7 +188,7 @@ describe Api::V1::SisAssignment do
 
       result = generator.sis_assignments_json(assignments)
 
-      expect(result[0]["due_at"]).to eq nil
+      expect(result[0]["due_at"]).to be_nil
     end
 
     context "mastery paths overrides" do

@@ -161,9 +161,7 @@ class AssetUserAccessLog
       # us to a state where we can make claims about how far into the postgres partitions
       # we've advanced, and so is allowed to zero this state out after it updates the
       # global postgres state above for this shard "max_log_ids".
-      temp_root_account_max_log_ids: {
-
-      }
+      temp_root_account_max_log_ids: {}
     }
     output_metadatum = CanvasMetadatum.get(METADATUM_KEY, default_metadatum)
     # make sure if we have prior storage without this key that
@@ -349,7 +347,9 @@ class AssetUserAccessLog
           GuardRail.activate(:primary) do
             partition_model.transaction do
               log_message("batch updating (sometimes these queries don't get logged)...")
-              partition_model.connection.execute(update_query)
+              partition_model.connection.with_max_update_limit(log_batch_size) do
+                partition_model.connection.execute(update_query)
+              end
               log_message("...batch update complete")
               # Here we want to write the iteration state into the database
               # so that we don't double count rows later.  The next time the job

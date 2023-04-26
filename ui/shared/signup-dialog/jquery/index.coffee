@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 import registrationErrors from '@canvas/normalize-registration-errors'
 import teacherDialog from '../jst/teacherDialog.handlebars'
 import studentDialog from '../jst/studentDialog.handlebars'

@@ -413,7 +413,7 @@ describe "Conferences API", type: :request do
       body_params = { signed_parameters: jwt }
 
       raw_api_call(:post, path, params, body_params)
-      expect(response.status).to eq 202
+      expect(response).to have_http_status :accepted
     end
 
     it "errors if the secret key is wrong" do
@@ -422,7 +422,7 @@ describe "Conferences API", type: :request do
       body_params = { signed_parameters: jwt }
 
       raw_api_call(:post, path, params, body_params)
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "errors if the conference_key is wrong" do
@@ -431,7 +431,7 @@ describe "Conferences API", type: :request do
       body_params = { signed_parameters: jwt }
 
       raw_api_call(:post, path, params, body_params)
-      expect(response.status).to eq 422
+      expect(response).to have_http_status :unprocessable_entity
     end
   end
 end

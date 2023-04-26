@@ -115,7 +115,7 @@ describe Canvadocs do
             end
 
             it "does not include the anonymous ID if the grader does not have a moderation_grader record" do
-              expect(session_params[:user_anonymous_id]).to be nil
+              expect(session_params[:user_anonymous_id]).to be_nil
             end
           end
         end
@@ -173,11 +173,11 @@ describe Canvadocs do
             end
 
             it "does not set restrict_annotations_to_user_filter" do
-              expect(session_params[:restrict_annotations_to_user_filter]).to be nil
+              expect(session_params[:restrict_annotations_to_user_filter]).to be_nil
             end
 
             it "does not set user_filter" do
-              expect(user_filter).to be nil
+              expect(user_filter).to be_nil
             end
           end
 
@@ -259,11 +259,11 @@ describe Canvadocs do
             end
 
             it "does not set restrict_annotations_to_user_filter" do
-              expect(session_params[:restrict_annotations_to_user_filter]).to be nil
+              expect(session_params[:restrict_annotations_to_user_filter]).to be_nil
             end
 
             it "does not set user_filter" do
-              expect(user_filter).to be nil
+              expect(user_filter).to be_nil
             end
           end
 
@@ -273,11 +273,11 @@ describe Canvadocs do
             end
 
             it "does not set restrict_annotations_to_user_filter" do
-              expect(session_params[:restrict_annotations_to_user_filter]).to be nil
+              expect(session_params[:restrict_annotations_to_user_filter]).to be_nil
             end
 
             it "does not set user_filter" do
-              expect(user_filter).to be nil
+              expect(user_filter).to be_nil
             end
           end
 
@@ -576,7 +576,7 @@ describe Canvadocs do
             end
 
             it "does not include the anonymous ID if the grader does not have a moderation_grader record" do
-              expect(session_params[:user_anonymous_id]).to be nil
+              expect(session_params[:user_anonymous_id]).to be_nil
             end
           end
         end

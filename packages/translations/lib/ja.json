@@ -56,6 +56,9 @@
     "aleph_f4ffd155": {
         "message": "アレフ"
     },
+    "align_11050992": {
+        "message": "位置調整"
+    },
     "alignment_and_lists_5cebcb69": {
         "message": "配置とリスト"
     },
@@ -133,6 +136,9 @@
     },
     "arabic_c5c87acd": {
         "message": "アラビア語"
+    },
+    "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+        "message": "ほんとうにキャンセルしますか?行われた変更は保存されません。"
     },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "この計画項目をほんとうに削除しますか？"
@@ -284,6 +290,9 @@
     "catalan_16f6b78f": {
         "message": "カタロニア語"
     },
+    "center_align_e68d9997": {
+        "message": "センターアライン"
+    },
     "centered_dot_64d5e378": {
         "message": "中央の点"
     },
@@ -301,6 +310,15 @@
     },
     "change_text_color_1aecb912": {
         "message": "テキストの色を変更する"
+    },
+    "changes_you_made_may_not_be_saved_4e8db973": {
+        "message": "行われた変更は保存されません。"
+    },
+    "characters_9d897d1c": {
+        "message": "文字"
+    },
+    "characters_no_spaces_485e5367": {
+        "message": "文字（スペースなしで）"
     },
     "check_accessibility_3c78211c": {
         "message": "アクセシビリティをチェックする"
@@ -328,6 +346,9 @@
     },
     "circle_484abe63": {
         "message": "円"
+    },
+    "circle_unordered_list_9e3a0763": {
+        "message": "丸い番号無しリスト"
     },
     "clear_2084585f": {
         "message": "クリア"
@@ -425,6 +446,12 @@
     "copyright_holder_66ee111": {
         "message": "著作権保有者:"
     },
+    "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
+        "message": "コンテンツを挿入できません：\"{ itemType }\" アイテムは、現在Canvasにサポートされていません。"
+    },
+    "count_40eced3b": {
+        "message": "数"
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 語}\n    one {1 語}\n  other {# 語}\n}"
     },
@@ -458,6 +485,9 @@
     "course_images_f8511d04": {
         "message": "コース画像"
     },
+    "course_link_b369426": {
+        "message": "コースリンク"
+    },
     "course_links_b56959b9": {
         "message": "コースリンク"
     },
@@ -472,6 +502,9 @@
     },
     "create_icon_110d6463": {
         "message": "アイコンを作成する"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "アイコンメーカーのアイコンを作成する"
     },
     "creative_commons_license_725584ae": {
         "message": "クリエイティブ コモンズ ライセンス:"
@@ -536,8 +569,17 @@
     "decorative_type_upper_f2c95e3": {
         "message": "装飾的{ TYPE_UPPER }"
     },
+    "decrease_indent_d9cf469d": {
+        "message": "インデントを減らす"
+    },
     "deep_purple_bb3e2907": {
         "message": "ディープパープル"
+    },
+    "default_bulleted_unordered_list_47079da8": {
+        "message": "デフォルトの箇条書きの番号無しリスト"
+    },
+    "default_numerical_ordered_list_48dd3548": {
+        "message": "デフォルトの番号順リスト"
     },
     "definite_integral_fe7ffed1": {
         "message": "定積分"
@@ -632,6 +674,9 @@
     "division_sign_72190870": {
         "message": "分割サイン"
     },
+    "document_678cd7bf": {
+        "message": "ドキュメント"
+    },
     "documents_81393201": {
         "message": "ドキュメント"
     },
@@ -640,6 +685,9 @@
     },
     "double_dagger_faf78681": {
         "message": "ダブルの短剣"
+    },
+    "down_5831a426": {
+        "message": "下"
     },
     "down_and_left_diagonal_arrow_40ef602c": {
         "message": "下・左の対角線矢印"
@@ -689,6 +737,9 @@
     "edit_course_link_5a5c3c59": {
         "message": "コースリンクを編集"
     },
+    "edit_equation_f5279959": {
+        "message": "方程式を編集する"
+    },
     "edit_existing_icon_maker_icon_5d0ebb3f": {
         "message": "既存のアイコンメーカーのアイコンを編集する"
     },
@@ -712,6 +763,9 @@
     },
     "embed_code_314f1bd5": {
         "message": "埋め込みコード"
+    },
+    "embed_content_from_external_tool_3397ad2d": {
+        "message": "外部ツールからの埋込コンテンツ"
     },
     "embed_image_1080badc": {
         "message": "画像の埋め込み"
@@ -767,8 +821,14 @@
     "equals_sign_c51bdc58": {
         "message": "等記号"
     },
+    "equation_1c5ac93c": {
+        "message": "方程式"
+    },
     "equation_editor_39fbc3f1": {
         "message": "方程式エディタ"
+    },
+    "equilibrium_6ff3040b": {
+        "message": "均衡"
     },
     "equivalence_class_7b0f11c0": {
         "message": "等価クラス"
@@ -815,6 +875,12 @@
     "extended_9a58dcb6": {
         "message": "拡大された"
     },
+    "external_link_d3f9e62a": {
+        "message": "外部リンク"
+    },
+    "external_tool_frame_70b32473": {
+        "message": "外部ツールフレーム"
+    },
     "external_tools_6e77821": {
         "message": "外部ツール"
     },
@@ -859,6 +925,9 @@
     },
     "failed_to_load_opportunities_52ab6404": {
         "message": "機会が読み込めませんでした"
+    },
+    "failed_to_retrieve_content_from_external_tool_5899c213": {
+        "message": "外部ツールからのコンテンツ取得に失敗しました"
     },
     "failed_to_save_to_do_ddc7503b": {
         "message": "タスクの保存に失敗しました"
@@ -1016,6 +1085,9 @@
     "group_isomorphism_45b1458c": {
         "message": "グループ同型"
     },
+    "group_link_63e626b3": {
+        "message": "グループリンク"
+    },
     "group_links_9493129e": {
         "message": "グループリンク"
     },
@@ -1094,6 +1166,9 @@
     "html_code_editor_fd967a44": {
         "message": "Html コードエディタ"
     },
+    "html_editor_fb2ab713": {
+        "message": "HTML エディタ"
+    },
     "hungarian_fc7d30c9": {
         "message": "ハンガリー語"
     },
@@ -1136,6 +1211,9 @@
     "if_left_empty_link_text_will_display_as_course_lin_61087540": {
         "message": "空のリンクのままの場合、テキストがコースリンク名として表示されます。"
     },
+    "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
+        "message": "利用権が必要な場合は、「ファイル」ページで利用権を有効にするまでファイルは公開されません。"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "今すぐ使用権を選択しないと、このファイルはアップロード後に公開されません。"
     },
@@ -1172,6 +1250,9 @@
     "in_element_of_19ca2f33": {
         "message": "（）内（の要素）"
     },
+    "increase_indent_6af90f7c": {
+        "message": "インデントを増やす"
+    },
     "indefinite_integral_6623307e": {
         "message": "不定積分"
     },
@@ -1192,6 +1273,9 @@
     },
     "insert_link_6dc23cae": {
         "message": "リンクの挿入"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "数学数式を挿入"
     },
     "integers_336344e1": {
         "message": "整数"
@@ -1313,6 +1397,12 @@
     "leave_as_is_4facfe55": {
         "message": "そのままにする"
     },
+    "left_3ea9d375": {
+        "message": "左"
+    },
+    "left_align_43d95491": {
+        "message": "左揃え"
+    },
     "left_angle_bracket_c87a6d07": {
         "message": "左傾きブラケット"
     },
@@ -1403,6 +1493,9 @@
     "loading_closed_captions_subtitles_failed_95ceef47": {
         "message": "クローズドキャプション/サブタイトルの読み込みに失敗しました。"
     },
+    "loading_external_tool_d839042c": {
+        "message": "外部ツールを読み込み中"
+    },
     "loading_failed_b3524381": {
         "message": "読み込みに失敗しました..."
     },
@@ -1417,6 +1510,9 @@
     },
     "loading_past_items_ca499e75": {
         "message": "過去のアイテムを読み込む"
+    },
+    "loading_placeholder_for_filename_792ef5e8": {
+        "message": "{ fileName }のプレースホルダを読み込み中。"
     },
     "loading_planner_items_947a813d": {
         "message": "プランナーアイテムをもっと読み込む"
@@ -1522,6 +1618,9 @@
     },
     "modules_c4325335": {
         "message": "モジュール"
+    },
+    "moving_image_to_crop_directionword_6f66cde2": {
+        "message": "{ directionWord }トリミングに画像を移動中。"
     },
     "mu_37223b8b": {
         "message": "ミュー"
@@ -1730,6 +1829,9 @@
     "orange_81386a62": {
         "message": "オレンジ"
     },
+    "ordered_and_unordered_lists_cfadfc38": {
+        "message": "番号付きリストと番号無しリスト"
+    },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "他のエディタショートカットは下記をご覧ください"
     },
@@ -1931,6 +2033,9 @@
     "record_7c9448b": {
         "message": "記録"
     },
+    "record_upload_media_5fdce166": {
+        "message": "メディアの記録/アップロード"
+    },
     "recording_98da6bda": {
         "message": "記録"
     },
@@ -1951,6 +2056,9 @@
     },
     "remove_heading_style_5fdc8855": {
         "message": "見出しスタイルを削除する"
+    },
+    "remove_link_d1f2f4d0": {
+        "message": "リンクの削除"
     },
     "replace_e61834a7": {
         "message": "置換"
@@ -1981,6 +2089,12 @@
     },
     "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
         "message": "リッチテキストエリア{ OSKey }+F8 を押すとリッチコンテンツエディタにショートカットできます。"
+    },
+    "right_71ffdc4d": {
+        "message": "右"
+    },
+    "right_align_39e7a32a": {
+        "message": "右揃え"
     },
     "right_angle_bracket_d704e2d6": {
         "message": "直角ブラケット"
@@ -2048,6 +2162,9 @@
     "save_media_cb9e786e": {
         "message": "メディアを保存する"
     },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "保存したアイコンメーカーのアイコン"
+    },
     "schedule_preview_3bcda153": {
         "message": "スケジュールプレビュー"
     },
@@ -2099,6 +2216,9 @@
     "selected_linkfilename_c093b1f2": {
         "message": "選択された{ linkFileName }"
     },
+    "selection_b52c4c5e": {
+        "message": "選択"
+    },
     "serbian_7187f1f2": {
         "message": "セルビア語"
     },
@@ -2126,8 +2246,23 @@
     "show_all_ae37d610": {
         "message": "すべて表示する"
     },
+    "show_audio_options_b489926b": {
+        "message": "オーディオオプションを表示する"
+    },
+    "show_image_options_1e2ecc6b": {
+        "message": "画像オプションを表示"
+    },
+    "show_link_options_545338fd": {
+        "message": "リンクオプションを表示する"
+    },
     "show_my_grades_ebd08684": {
         "message": "私の評定を表示"
+    },
+    "show_studio_media_options_a0c748c6": {
+        "message": "スタジオメディアオプションを表示する"
+    },
+    "show_video_options_6ed3721a": {
+        "message": "ビデオオプションを表示する"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "視認ユーザーは大きく太字の見出しを探し、Webページをすばやく参照します。スクリーンリーダーのユーザーは、文脈に基づいた理解を行う際にヘッダーに依存しています。ヘッダーは適切な構造を使用しなければなりません。"
@@ -2186,6 +2321,9 @@
     "something_went_wrong_while_sharing_your_screen_8de579e5": {
         "message": "画面の共有中に問題が発生しました。"
     },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "申し訳ありませんが、複数ファイルの貼り付けには対応していません。"
+    },
     "sort_by_e75f9e3e": {
         "message": "分類する"
     },
@@ -2222,6 +2360,9 @@
     "square_superset_strict_fa4262e4": {
         "message": "正方形部分集合 (厳密)"
     },
+    "square_unordered_list_b15ce93b": {
+        "message": "四角い番号無しリスト"
+    },
     "star_8d156e09": {
         "message": "スター"
     },
@@ -2248,6 +2389,9 @@
     },
     "student_to_do_c018c835": {
         "message": "受講者 To Do"
+    },
+    "studio_media_options_ee504361": {
+        "message": "スタジオメディアオプション"
     },
     "styles_2aa721ef": {
         "message": "スタイル"
@@ -2281,6 +2425,9 @@
     },
     "superscript_8cb349a2": {
         "message": "上付き"
+    },
+    "superscript_and_subscript_37f94a50": {
+        "message": "上付き文字と下付き文字"
     },
     "superset_c4db8a7a": {
         "message": "部分集合"
@@ -2390,6 +2537,9 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "ページの最初のヘッダーはH2であるべきです。"
     },
+    "the_following_content_is_partner_provided_ed1da756": {
+        "message": "以下のコンテンツはパートナーが提供しています"
+    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "この資料はパブリック ドメインです"
     },
@@ -2398,6 +2548,9 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "素材には例外があります。例：公正使用、引用権、または適用される著作権法に基づくその他"
+    },
+    "the_preceding_content_is_partner_provided_d753928c": {
+        "message": "上記のコンテンツはパートナーが提供しています"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "pretty HTMLエディタはキーボードからはアクセスできません。ShiftOを押してpretty HTMLエディタを開きます。"
@@ -2525,6 +2678,9 @@
     "ukrainian_945b00b7": {
         "message": "ウクライナ語"
     },
+    "unable_to_determine_resource_selection_url_7867e060": {
+        "message": "リソースURL選択を決定するために利用可能"
+    },
     "unable_to_mark_as_complete_8141856d": {
         "message": "終了とマークできません。"
     },
@@ -2546,6 +2702,12 @@
     "up_and_right_diagonal_arrow_935b902e": {
         "message": "上・右の対角線矢印"
     },
+    "up_c553575d": {
+        "message": "上"
+    },
+    "upload_document_253f0478": {
+        "message": "ドキュメントをアップロードする"
+    },
     "upload_file_fd2361b8": {
         "message": "ファイルアップロード"
     },
@@ -2555,8 +2717,14 @@
     "upload_media_ce31135a": {
         "message": "メディアを読み込む"
     },
+    "upload_record_media_e4207d72": {
+        "message": "メディアをアップロード/記録する"
+    },
     "uploading_19e8a4e7": {
         "message": "アップロードしています"
+    },
+    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+        "message": "大文字のアルファベット順リスト"
     },
     "uppercase_delta_d4f4bc41": {
         "message": "大文字のデルタ"
@@ -2578,6 +2746,9 @@
     },
     "uppercase_psi_6395acbe": {
         "message": "大文字のプシー"
+    },
+    "uppercase_roman_numeral_ordered_list_853f292b": {
+        "message": "大文字のローマ数字順リスト"
     },
     "uppercase_sigma_dbb70e92": {
         "message": "大文字のシグマ"
@@ -2681,6 +2852,9 @@
     "vietnamese_e7a76583": {
         "message": "ベトナム語"
     },
+    "view_all_e13bf0a6": {
+        "message": "すべてを表示する"
+    },
     "view_ba339f93": {
         "message": "表示"
     },
@@ -2746,6 +2920,12 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki ホーム"
+    },
+    "word_count_c77fe3a6": {
+        "message": "語数"
+    },
+    "words_b448b7d5": {
+        "message": "語"
     },
     "wreath_product_200b38ef": {
         "message": "花輪製品"

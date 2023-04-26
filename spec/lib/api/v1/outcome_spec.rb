@@ -125,7 +125,7 @@ RSpec.describe "Api::V1::Outcome" do
 
           it "ignores the resolved_outcome_proficiency and resolved_calculation_method of the provided context" do
             opts[:context] = @course
-            check_outcome_json.call(lib.outcome_json(new_outcome(({ **outcome_params, context: @course })), nil, nil, opts))
+            check_outcome_json.call(lib.outcome_json(new_outcome({ **outcome_params, context: @course }), nil, nil, opts))
           end
         end
       end

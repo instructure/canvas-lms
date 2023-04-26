@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 
 export default QuizOverrideLoader = {
   _setQuizOverrides: (pool, quizId, overrides) ->

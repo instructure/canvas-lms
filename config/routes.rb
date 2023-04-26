@@ -495,13 +495,18 @@ CanvasRails::Application.routes.draw do
   post "media_objects" => "media_objects#create_media_object", :as => :create_media_object
   get "media_objects/:id" => "media_objects#media_object_inline", :as => :media_object
   get "media_objects/:id/redirect" => "media_objects#media_object_redirect", :as => :media_object_redirect
-  get "media_objects/:id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_object_thumbnail
+  get "media_objects/:media_object_id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_object_thumbnail
   get "media_objects/:media_object_id/info" => "media_objects#show", :as => :media_object_info
   get "media_objects_iframe/:media_object_id" => "media_objects#iframe_media_player", :as => :media_object_iframe
   get "media_objects_iframe" => "media_objects#iframe_media_player", :as => :media_object_iframe_href
   get "media_objects/:media_object_id/media_tracks/:id" => "media_tracks#show", :as => :show_media_tracks
   post "media_objects/:media_object_id/media_tracks" => "media_tracks#create", :as => :create_media_tracks
   delete "media_objects/:media_object_id/media_tracks/:media_track_id" => "media_tracks#destroy", :as => :delete_media_tracks
+
+  post "media_attachments" => "media_objects#create_media_object", :as => :create_media_attachment
+  get "media_attachments/:attachment_id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_attachment_thumbnail
+  get "media_attachments/:attachment_id/info" => "media_objects#show", :as => :media_attachment_info
+  get "media_attachments_iframe/:attachment_id" => "media_objects#iframe_media_player", :as => :media_attachment_iframe
 
   get "external_content/success/:service" => "external_content#success", :as => :external_content_success
   get "external_content/success/:service/:id" => "external_content#success", :as => :external_content_update
@@ -2033,7 +2038,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :outcome_groups_api) do
       %w[global account course].each do |context|
-        prefix = (context == "global" ? context : "#{context}s/:#{context}_id")
+        prefix = ((context == "global") ? context : "#{context}s/:#{context}_id")
         unless context == "global"
           get "#{prefix}/outcome_groups", action: :index, as: "#{context}_outcome_groups"
           get "#{prefix}/outcome_group_links", action: :link_index, as: "#{context}_outcome_group_links"
@@ -2365,11 +2370,10 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :media_objects) do
-      post "media_objects", action: "create_media_object", as: :create_media_object
-    end
-
-    scope(controller: :media_objects) do
       put "media_objects/:media_object_id", action: "update_media_object", as: :update_media_object
+      post "media_objects", action: "create_media_object", as: :create_media_object
+      put "media_attachments/:attachment_id", action: "update_media_object", as: :update_media_attachment
+      post "media_attachments", action: "create_media_object", as: :create_media_attachment
     end
 
     scope(controller: :media_tracks) do

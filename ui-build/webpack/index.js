@@ -198,7 +198,7 @@ module.exports = {
 
     modules: [path.resolve(canvasDir, 'public/javascripts'), 'node_modules'],
 
-    extensions: ['.js', '.ts', '.tsx'],
+    extensions: ['.js', '.ts', '.tsx', '.coffee'],
   },
 
   module: {
@@ -263,13 +263,10 @@ module.exports = {
           path.resolve(canvasDir, 'packages/jquery-kyle-menu'),
           path.resolve(canvasDir, 'packages/jquery-popover'),
           path.resolve(canvasDir, 'packages/jquery-selectmenu'),
-          path.resolve(canvasDir, 'packages/jquery-sticky'),
           path.resolve(canvasDir, 'packages/defer-promise'),
           path.resolve(canvasDir, 'packages/convert-case'),
           path.resolve(canvasDir, 'packages/html-escape'),
-          path.resolve(canvasDir, 'packages/persistent-array'),
           path.resolve(canvasDir, 'packages/slickgrid'),
-          path.resolve(canvasDir, 'packages/str-pluralize'),
           path.resolve(canvasDir, 'packages/with-breakpoints'),
           path.resolve(canvasDir, 'spec/javascripts/jsx'),
           path.resolve(canvasDir, 'spec/coffeescripts'),
@@ -496,10 +493,8 @@ if (process.env.CRYSTALBALL_MAP === '1') {
     include: [
       path.resolve(canvasDir, 'ui'),
       path.resolve(canvasDir, 'packages/jquery-kyle-menu'),
-      path.resolve(canvasDir, 'packages/jquery-sticky'),
       path.resolve(canvasDir, 'packages/jquery-popover'),
       path.resolve(canvasDir, 'packages/jquery-selectmenu'),
-      path.resolve(canvasDir, 'packages/persistent-array'),
       path.resolve(canvasDir, 'packages/slickgrid'),
       path.resolve(canvasDir, 'packages/with-breakpoints'),
       path.resolve(canvasDir, 'spec/javascripts/jsx'),

@@ -218,13 +218,13 @@ describe OutcomeResultsController do
 
   def get_results(params)
     get "index", params: {
-      context_id: @course.id,
-      course_id: @course.id,
-      context_type: "Course",
-      user_ids: [@student.id],
-      outcome_ids: [@outcome.id],
-      **params
-    },
+                   context_id: @course.id,
+                   course_id: @course.id,
+                   context_type: "Course",
+                   user_ids: [@student.id],
+                   outcome_ids: [@outcome.id],
+                   **params
+                 },
                  format: "json"
   end
 
@@ -515,11 +515,11 @@ describe OutcomeResultsController do
 
     def get_rollups(params)
       get "rollups", params: {
-        context_id: @course.id,
-        course_id: @course.id,
-        context_type: "Course",
-        **params
-      },
+                       context_id: @course.id,
+                       course_id: @course.id,
+                       context_type: "Course",
+                       **params
+                     },
                      format: "json"
     end
 

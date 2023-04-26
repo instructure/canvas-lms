@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 import Folder from '../backbone/models/Folder'
-import File from '../backbone/models/File.coffee'
+import File from '../backbone/models/File'
 import ModuleFile from '../backbone/models/ModuleFile'
 
 /*

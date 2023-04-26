@@ -128,12 +128,10 @@ describe "Global Grades" do
   context "as student" do
     before do
       user_session(@student)
-
-      # navigate to global grades page
-      GlobalGrades.visit
     end
 
     it "goes to student grades page", priority: "1" do
+      GlobalGrades.visit
       # grab score to compare
       course_score = GlobalGrades.get_score_for_course(@course_with_gp)
       # find link for Second Course and click
@@ -146,13 +144,39 @@ describe "Global Grades" do
     end
 
     it "show score for grading period", priority: "1" do
+      GlobalGrades.visit
       GlobalGrades.select_grading_period(@course_with_gp, "old grading period")
       # verify course grade
       expect(GlobalGrades.get_score_for_course_no_percent(@course_with_gp)).to eq(grade_old_gp.round(2))
     end
 
     it "show score for course without grading periods", priority: "1" do
+      GlobalGrades.visit
       expect(GlobalGrades.get_score_for_course_no_percent(@course_no_gp)).to eq(grade_total_no_gp.round(2))
+    end
+
+    context "when student is quantitative data restricted" do
+      before :once do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+      end
+
+      it "shows score as letter grade for students" do
+        GlobalGrades.visit
+        expect(GlobalGrades.get_score_for_course(@course_with_gp)).to be_nil
+        expect(GlobalGrades.get_raw_grade_for_course(@course_with_gp)).to eq "B-"
+
+        expect(GlobalGrades.get_score_for_course(@course_no_gp)).to be_nil
+        expect(GlobalGrades.get_raw_grade_for_course(@course_no_gp)).to eq "A"
+      end
     end
   end
 
@@ -196,6 +220,30 @@ describe "Global Grades" do
       expect(StudentInteractionsReport.report).to be_displayed
       # verify current score
       expect(StudentInteractionsReport.current_score(@student.name)).to eq("#{grade_total_gp.round(1)}%")
+    end
+
+    context "when teacher is quantitative data restricted" do
+      before :once do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+      end
+
+      it "shows average score as letter grade for students" do
+        GlobalGrades.visit
+        expect(GlobalGrades.get_score_for_course(@course_with_gp)).to be_nil
+        expect(GlobalGrades.get_raw_grade_for_course(@course_with_gp)).to eq "B-\naverage for 1 student"
+
+        expect(GlobalGrades.get_score_for_course(@course_no_gp)).to be_nil
+        expect(GlobalGrades.get_raw_grade_for_course(@course_no_gp)).to eq "A\naverage for 1 student"
+      end
     end
   end
 end

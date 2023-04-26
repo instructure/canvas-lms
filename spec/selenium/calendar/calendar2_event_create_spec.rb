@@ -400,7 +400,7 @@ describe "calendar2" do
           event_content.find_element(:css, ".event-details-timestring").text
         ).to eq format_date_for_view(new_date, "%b %d")
         @event.reload
-        expect(@event.all_day).to eq true
+        expect(@event.all_day).to be true
       end
 
       it "can create timed events in calendar" do
@@ -514,7 +514,7 @@ describe "calendar2" do
       it "preserves correct time when editing an event in a different DST window" do
         @user.time_zone = "America/Denver"
         @user.save!
-        now = DateTime.current.beginning_of_hour
+        now = DateTime.current.noon
         # by creating an event at t+3, t+6, and t+9 months, we guarantee that at least 1 of those
         # events will be in a different DST state than now
         [now + 3.months, now + 6.months, now + 9.months].each do |start_at|

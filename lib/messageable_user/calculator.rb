@@ -463,7 +463,7 @@ class MessageableUser
       # Discussion Topics could be assigned to multiple sections so this allows
       # supporting multiple sections through this method.
       sections = nil
-      if section_or_id.respond_to?("count") && section_or_id.count > 0
+      if section_or_id.respond_to?(:count) && section_or_id.count > 0
         sections = section_or_id
         section_or_id = sections.first
       end
@@ -887,7 +887,7 @@ class MessageableUser
             methods.each do |method|
               canonical = send(method).cache_key
               shard_key << method
-              shard_key << Digest::MD5.hexdigest(canonical)
+              shard_key << Digest::SHA256.hexdigest(canonical)
             end
             by_shard[Shard.current] = Rails.cache.fetch(shard_key.cache_key, expires_in: 1.day, &block)
           end

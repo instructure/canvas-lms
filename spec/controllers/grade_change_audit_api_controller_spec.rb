@@ -37,10 +37,6 @@ describe GradeChangeAuditApiController do
 
   before do
     user_session(admin)
-    allow(Audits).to receive(:write_to_cassandra?).and_return(CanvasCassandra::DatabaseBuilder.configured?(:auditors))
-    allow(Audits).to receive(:write_to_postgres?).and_return(true)
-    allow(Audits).to receive(:read_from_cassandra?).and_return(false)
-    allow(Audits).to receive(:read_from_postgres?).and_return(true)
   end
 
   describe "GET for_assignment" do
@@ -50,56 +46,14 @@ describe GradeChangeAuditApiController do
       assignment.grade_student(student, grader: teacher, score: 100)
     end
 
-    context "reading from cassandra" do
-      before do
-        skip unless CanvasCassandra::DatabaseBuilder.configured?(:auditors)
-        allow(Audits).to receive(:read_from_cassandra?).and_return(true)
-        allow(Audits).to receive(:read_from_postgres?).and_return(false)
-      end
-
-      it "returns events with the student's id included" do
-        get :for_assignment, params: params
-        expect(student_ids).to include(student.id.to_s)
-      end
-
-      context "when assignment is anonymous and muted" do
-        before do
-          assignment.update!(anonymous_grading: true)
-          assignment.update!(muted: true)
-          assignment.reload
-          assignment.grade_student(student, grader: teacher, score: 99)
-        end
-
-        it "returns events" do
-          get :for_assignment, params: params
-          # The >= 2 is because there are at least events from grade_student of
-          # score 100 and grade_student of score 99, but setting the assignment
-          # to anonymous_grading also duplicated events. That behavior is
-          # unwanted and should be removed in a later patchset.
-          expect(events_for_assignment.count).to be >= 2
-          # should be UUIDs from cassandra
-          expect(events_for_assignment.first["id"].length > 16).to eq(true)
-        end
-
-        it "returns events without the student id included" do
-          get :for_assignment, params: params
-          expect(student_ids).to be_empty
-        end
-      end
+    it "returns events" do
+      get :for_assignment, params: params
+      expect(events_for_assignment.count).to eq(1)
     end
 
-    context "reading from active_record" do
-      it "returns events" do
-        get :for_assignment, params: params
-        expect(events_for_assignment.count).to eq(1)
-        # should be sequence IDs from postgres
-        expect(events_for_assignment.first["id"].to_i).to be >= 1
-      end
-
-      it "returns events with the student's id included" do
-        get :for_assignment, params: params
-        expect(student_ids).to include(student.id.to_s)
-      end
+    it "returns events with the student's id included" do
+      get :for_assignment, params: params
+      expect(student_ids).to include(student.id.to_s)
     end
 
     describe "override grade change events" do
@@ -139,13 +93,6 @@ describe GradeChangeAuditApiController do
     end
 
     describe "current_grade" do
-      before do
-        allow(Audits).to receive(:read_from_cassandra?).and_return(false)
-        allow(Audits).to receive(:write_to_cassandra?).and_return(false)
-        allow(Audits).to receive(:read_from_postgres?).and_return(true)
-        allow(Audits).to receive(:write_to_postgres?).and_return(true)
-      end
-
       let(:returned_events) do
         get :for_course, params: { course_id: course.id, include: ["current_grade"] }
         json_parse(response.body).fetch("events")
@@ -360,10 +307,6 @@ describe GradeChangeAuditApiController do
     end
 
     before do
-      allow(Audits).to receive(:read_from_cassandra?).and_return(false)
-      allow(Audits).to receive(:write_to_cassandra?).and_return(false)
-      allow(Audits).to receive(:read_from_postgres?).and_return(true)
-      allow(Audits).to receive(:write_to_postgres?).and_return(true)
       assignment.grade_student(student, grader: teacher, score: 100)
     end
 

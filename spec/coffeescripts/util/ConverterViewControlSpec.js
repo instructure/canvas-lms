@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import ConverterViewControl from '@canvas/content-migrations/backbone/views/ConverterViewControl.coffee'
+import ConverterViewControl from '@canvas/content-migrations/backbone/views/ConverterViewControl'
 
 class BackboneSubView extends Backbone.View {
   template() {

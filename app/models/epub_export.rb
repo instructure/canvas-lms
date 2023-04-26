@@ -202,7 +202,7 @@ class EpubExport < ActiveRecord::Base
   end
 
   def cleanup_file_path!(file_path)
-    FileUtils.rm_rf(file_path, secure: true) if File.exist?(file_path)
+    FileUtils.rm_rf(file_path, secure: true)
   end
 
   def sort_by_content_type?

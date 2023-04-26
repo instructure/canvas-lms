@@ -36,25 +36,25 @@ describe Schemas::Lti::PublicJwk do
     context "when the json is valid" do
       let(:json_hash) { valid_json_hash }
 
-      it { is_expected.to eq true }
+      it { is_expected.to be true }
     end
 
     context "when required properties are missing" do
       let(:json_hash) { {} }
 
-      it { is_expected.to eq false }
+      it { is_expected.to be false }
     end
 
     context "when 'kty' is not 'RSA'" do
       let(:json_hash) { valid_json_hash.merge({ "kty" => "bad value" }) }
 
-      it { is_expected.to eq false }
+      it { is_expected.to be false }
     end
 
     context "when 'alg' is not 'RS256'" do
       let(:json_hash) { valid_json_hash.merge({ "alg" => "bad value" }) }
 
-      it { is_expected.to eq false }
+      it { is_expected.to be false }
     end
   end
 end

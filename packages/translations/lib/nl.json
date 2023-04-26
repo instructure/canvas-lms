@@ -56,6 +56,9 @@
     "aleph_f4ffd155": {
         "message": "Alef"
     },
+    "align_11050992": {
+        "message": "Uitlijnen"
+    },
     "alignment_and_lists_5cebcb69": {
         "message": "Koppeling en lijsten"
     },
@@ -133,6 +136,9 @@
     },
     "arabic_c5c87acd": {
         "message": "Arabisch"
+    },
+    "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+        "message": "Weet je zeker dat je wilt annuleren? Je wijzigingen worden niet opgeslagen."
     },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Weet je zeker dat je dit planneritem wilt verwijderen?"
@@ -284,6 +290,9 @@
     "catalan_16f6b78f": {
         "message": "Catalaans"
     },
+    "center_align_e68d9997": {
+        "message": "Gecentreerd uitlijnen"
+    },
     "centered_dot_64d5e378": {
         "message": "Gecentreerde punt"
     },
@@ -301,6 +310,15 @@
     },
     "change_text_color_1aecb912": {
         "message": "Tekstkleur wijzigen"
+    },
+    "changes_you_made_may_not_be_saved_4e8db973": {
+        "message": "Je wijzigingen worden niet opgeslagen."
+    },
+    "characters_9d897d1c": {
+        "message": "Tekens"
+    },
+    "characters_no_spaces_485e5367": {
+        "message": "Tekens (geen spaties)"
     },
     "check_accessibility_3c78211c": {
         "message": "Toegankelijkheid controleren"
@@ -328,6 +346,9 @@
     },
     "circle_484abe63": {
         "message": "Cirkel"
+    },
+    "circle_unordered_list_9e3a0763": {
+        "message": "ongeordende lijst omcirkelen"
     },
     "clear_2084585f": {
         "message": "Wissen"
@@ -425,6 +446,12 @@
     "copyright_holder_66ee111": {
         "message": "Houder van auteursrecht:"
     },
+    "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
+        "message": "Kan deze inhoud niet invoegen: \"{ itemType }\" items worden momenteel niet ondersteund in Canvas."
+    },
+    "count_40eced3b": {
+        "message": "Telling"
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 woorden}\n    one {1 woord}\n  other {# woorden}\n}"
     },
@@ -458,6 +485,9 @@
     "course_images_f8511d04": {
         "message": "Cursusafbeeldingen"
     },
+    "course_link_b369426": {
+        "message": "Cursuslink"
+    },
     "course_links_b56959b9": {
         "message": "Cursuslinks"
     },
@@ -472,6 +502,9 @@
     },
     "create_icon_110d6463": {
         "message": "Pictogram maken"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "Pictogrammaker-pictogram maken"
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons-licentie:"
@@ -536,8 +569,17 @@
     "decorative_type_upper_f2c95e3": {
         "message": "Decoratief { TYPE_UPPER }"
     },
+    "decrease_indent_d9cf469d": {
+        "message": "Inspringen verkleinen"
+    },
     "deep_purple_bb3e2907": {
         "message": "Diep paars"
+    },
+    "default_bulleted_unordered_list_47079da8": {
+        "message": "standaard ongeordende opsommingslijst"
+    },
+    "default_numerical_ordered_list_48dd3548": {
+        "message": "standaard geordende numerieke lijst"
     },
     "definite_integral_fe7ffed1": {
         "message": "Bepaalde integraal"
@@ -632,6 +674,9 @@
     "division_sign_72190870": {
         "message": "Deelteken"
     },
+    "document_678cd7bf": {
+        "message": "Document"
+    },
     "documents_81393201": {
         "message": "Documenten"
     },
@@ -640,6 +685,9 @@
     },
     "double_dagger_faf78681": {
         "message": "Double Dagger"
+    },
+    "down_5831a426": {
+        "message": "Omlaag"
     },
     "down_and_left_diagonal_arrow_40ef602c": {
         "message": "Pijl omlaag en links diagonaal"
@@ -689,6 +737,9 @@
     "edit_course_link_5a5c3c59": {
         "message": "Cursuslink bewerken"
     },
+    "edit_equation_f5279959": {
+        "message": "Vergelijking bewerken"
+    },
     "edit_existing_icon_maker_icon_5d0ebb3f": {
         "message": "Bestaand Icon Maker-pictogram bewerken"
     },
@@ -712,6 +763,9 @@
     },
     "embed_code_314f1bd5": {
         "message": "Code insluiten"
+    },
+    "embed_content_from_external_tool_3397ad2d": {
+        "message": "Inhoud insluiten vanuit extern tool"
     },
     "embed_image_1080badc": {
         "message": "Afbeelding insluiten"
@@ -767,8 +821,14 @@
     "equals_sign_c51bdc58": {
         "message": "Gelijkteken"
     },
+    "equation_1c5ac93c": {
+        "message": "Vergelijking"
+    },
     "equation_editor_39fbc3f1": {
         "message": "Vergelijkingseditor"
+    },
+    "equilibrium_6ff3040b": {
+        "message": "In evenwicht"
     },
     "equivalence_class_7b0f11c0": {
         "message": "Equivalentieklasse"
@@ -815,6 +875,12 @@
     "extended_9a58dcb6": {
         "message": "Uitgebreid"
     },
+    "external_link_d3f9e62a": {
+        "message": "Externe link"
+    },
+    "external_tool_frame_70b32473": {
+        "message": "Frame externe tool"
+    },
     "external_tools_6e77821": {
         "message": "Externe tools"
     },
@@ -859,6 +925,9 @@
     },
     "failed_to_load_opportunities_52ab6404": {
         "message": "Kan mogelijkheden niet laden"
+    },
+    "failed_to_retrieve_content_from_external_tool_5899c213": {
+        "message": "Kan geen inhoud ophalen uit externe tool"
     },
     "failed_to_save_to_do_ddc7503b": {
         "message": "Kan To Do-lijst niet opslaan"
@@ -1016,6 +1085,9 @@
     "group_isomorphism_45b1458c": {
         "message": "Groepsisomorfie"
     },
+    "group_link_63e626b3": {
+        "message": "Groepslink"
+    },
     "group_links_9493129e": {
         "message": "Groeplinks"
     },
@@ -1094,6 +1166,9 @@
     "html_code_editor_fd967a44": {
         "message": "HTML-code-editor"
     },
+    "html_editor_fb2ab713": {
+        "message": "HTML-editor"
+    },
     "hungarian_fc7d30c9": {
         "message": "Hongaars"
     },
@@ -1136,6 +1211,9 @@
     "if_left_empty_link_text_will_display_as_course_lin_61087540": {
         "message": "Als de link leeg wordt gelaten, wordt de naam van de cursuslink als tekst weergegeven"
     },
+    "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
+        "message": "Als er Gebruiksrechten vereist zijn, wordt het bestand pas gepubliceerd nadat dit op de pagina Bestanden is ingeschakeld."
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Als je nu geen gebruiksrechten selecteert, wordt de publicatie van dit bestand ongedaan gemaakt nadat het is geüpload."
     },
@@ -1172,6 +1250,9 @@
     "in_element_of_19ca2f33": {
         "message": "In (element van)"
     },
+    "increase_indent_6af90f7c": {
+        "message": "Inspringen vergroten"
+    },
     "indefinite_integral_6623307e": {
         "message": "Onbepaalde integraal"
     },
@@ -1192,6 +1273,9 @@
     },
     "insert_link_6dc23cae": {
         "message": "Koppeling invoegen"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Wiskundige vergelijking invoeren"
     },
     "integers_336344e1": {
         "message": "Gehele getallen"
@@ -1313,6 +1397,12 @@
     "leave_as_is_4facfe55": {
         "message": "Ongewijzigd laten"
     },
+    "left_3ea9d375": {
+        "message": "Links"
+    },
+    "left_align_43d95491": {
+        "message": "Links uitlijnen"
+    },
     "left_angle_bracket_c87a6d07": {
         "message": "Recht haakje links"
     },
@@ -1403,6 +1493,9 @@
     "loading_closed_captions_subtitles_failed_95ceef47": {
         "message": "laden van bijschriften/ondertiteling is mislukt."
     },
+    "loading_external_tool_d839042c": {
+        "message": "Externe tool laden"
+    },
     "loading_failed_b3524381": {
         "message": "Laden mislukt..."
     },
@@ -1417,6 +1510,9 @@
     },
     "loading_past_items_ca499e75": {
         "message": "Eerdere items laden"
+    },
+    "loading_placeholder_for_filename_792ef5e8": {
+        "message": "Tijdelijke aanduiding laden voor { fileName }"
     },
     "loading_planner_items_947a813d": {
         "message": "Planner items laden"
@@ -1522,6 +1618,9 @@
     },
     "modules_c4325335": {
         "message": "Modules"
+    },
+    "moving_image_to_crop_directionword_6f66cde2": {
+        "message": "Afbeelding verplaatsen om naar { directionWord } bij te snijden"
     },
     "mu_37223b8b": {
         "message": "Mu"
@@ -1730,6 +1829,9 @@
     "orange_81386a62": {
         "message": "Oranje"
     },
+    "ordered_and_unordered_lists_cfadfc38": {
+        "message": "Geordende en ongeordende lijsten"
+    },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Andere editorsnelkoppelingen zijn te vinden op"
     },
@@ -1931,6 +2033,9 @@
     "record_7c9448b": {
         "message": "Opnemen"
     },
+    "record_upload_media_5fdce166": {
+        "message": "Media opnemen/uploaden"
+    },
     "recording_98da6bda": {
         "message": "Bezig met opnemen"
     },
@@ -1951,6 +2056,9 @@
     },
     "remove_heading_style_5fdc8855": {
         "message": "Koptekststijl verwijderen"
+    },
+    "remove_link_d1f2f4d0": {
+        "message": "Link verwijderen"
     },
     "replace_e61834a7": {
         "message": "Vervangen"
@@ -1981,6 +2089,12 @@
     },
     "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
         "message": "Rich Text-gebied. Druk op { OSKey }+F8 voor snelkoppelingen van Rich Content Editor."
+    },
+    "right_71ffdc4d": {
+        "message": "Rechts"
+    },
+    "right_align_39e7a32a": {
+        "message": "Rechts uitlijnen"
     },
     "right_angle_bracket_d704e2d6": {
         "message": "Recht haakje rechts"
@@ -2048,6 +2162,9 @@
     "save_media_cb9e786e": {
         "message": "Media opslaan"
     },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "Opgeslagen pictogrammaker-pictogrammen"
+    },
     "schedule_preview_3bcda153": {
         "message": "Planningsvoorbeeld"
     },
@@ -2099,6 +2216,9 @@
     "selected_linkfilename_c093b1f2": {
         "message": "Geselecteerd { linkFileName }"
     },
+    "selection_b52c4c5e": {
+        "message": "Selectie"
+    },
     "serbian_7187f1f2": {
         "message": "Sevisch"
     },
@@ -2126,8 +2246,23 @@
     "show_all_ae37d610": {
         "message": "Alles tonen"
     },
+    "show_audio_options_b489926b": {
+        "message": "Audio-opties weergeven"
+    },
+    "show_image_options_1e2ecc6b": {
+        "message": "Afbeeldingsopties weergeven"
+    },
+    "show_link_options_545338fd": {
+        "message": "Linkopties weergeven"
+    },
     "show_my_grades_ebd08684": {
         "message": "Mijn cijfers tonen"
+    },
+    "show_studio_media_options_a0c748c6": {
+        "message": "Studio Media-opties weergeven"
+    },
+    "show_video_options_6ed3721a": {
+        "message": "Video-opties weergeven"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Slechtzienden bladeren snel door webpagina''s, op zoek naar grote of vette koppen. Gebruikers van schermlezers zijn afhankelijk van koppen om een idee van de context te krijgen. Koppen moeten de juiste structuur hebben."
@@ -2186,6 +2321,9 @@
     "something_went_wrong_while_sharing_your_screen_8de579e5": {
         "message": "Er is iets fout gegaan bij het delen van je scherm."
     },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "Helaas, we bieden geen ondersteuning voor meerdere bestanden."
+    },
     "sort_by_e75f9e3e": {
         "message": "Sorteren op"
     },
@@ -2222,6 +2360,9 @@
     "square_superset_strict_fa4262e4": {
         "message": "Superset van vierkantswortel (strikt)"
     },
+    "square_unordered_list_b15ce93b": {
+        "message": "vierkante ongeordende lijst"
+    },
     "star_8d156e09": {
         "message": "Ster"
     },
@@ -2248,6 +2389,9 @@
     },
     "student_to_do_c018c835": {
         "message": "Takenlijst cursist"
+    },
+    "studio_media_options_ee504361": {
+        "message": "Studio Media-opties"
     },
     "styles_2aa721ef": {
         "message": "Stijlen"
@@ -2281,6 +2425,9 @@
     },
     "superscript_8cb349a2": {
         "message": "Superscript"
+    },
+    "superscript_and_subscript_37f94a50": {
+        "message": "Superscript en subscript"
     },
     "superset_c4db8a7a": {
         "message": "Superset"
@@ -2390,6 +2537,9 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "De eerste koptekst op een pagina moet een H2 zijn."
     },
+    "the_following_content_is_partner_provided_ed1da756": {
+        "message": "De volgende inhoud is door een partner geleverd"
+    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Het materiaal bevindt zich in het openbaar domein"
     },
@@ -2398,6 +2548,9 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Op het materiaal is een uitzondering van toepassing, bijvoorbeeld redelijk gebruik, het recht om te citeren of andere toepasselijke wetgeving op het auteursrecht"
+    },
+    "the_preceding_content_is_partner_provided_d753928c": {
+        "message": "De voorgaande inhoud is door een partner geleverd"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "De pretty HTML-editor is niet toetsenbordtoegankelijk. Druk op Shift O om de raw HTML-editor te openen."
@@ -2525,6 +2678,9 @@
     "ukrainian_945b00b7": {
         "message": "Oekraïens"
     },
+    "unable_to_determine_resource_selection_url_7867e060": {
+        "message": "Kan geen bronselectie-URL vaststellen"
+    },
     "unable_to_mark_as_complete_8141856d": {
         "message": "Kan dit niet als voltooid markeren."
     },
@@ -2546,6 +2702,12 @@
     "up_and_right_diagonal_arrow_935b902e": {
         "message": "Pijl omhoog en rechts diagonaal"
     },
+    "up_c553575d": {
+        "message": "Omhoog"
+    },
+    "upload_document_253f0478": {
+        "message": "Document uploaden"
+    },
     "upload_file_fd2361b8": {
         "message": "Bestand uploaden"
     },
@@ -2555,8 +2717,14 @@
     "upload_media_ce31135a": {
         "message": "Media uploaden"
     },
+    "upload_record_media_e4207d72": {
+        "message": "Media uploaden/opnemen"
+    },
     "uploading_19e8a4e7": {
         "message": "Bezig met uploaden"
+    },
+    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+        "message": "geordende lijst op hoofdletters alfabet"
     },
     "uppercase_delta_d4f4bc41": {
         "message": "Delta in kapitalen"
@@ -2578,6 +2746,9 @@
     },
     "uppercase_psi_6395acbe": {
         "message": "Psi in kapitalen"
+    },
+    "uppercase_roman_numeral_ordered_list_853f292b": {
+        "message": "geordende lijst op Romeinse cijfers in hoofdletters"
     },
     "uppercase_sigma_dbb70e92": {
         "message": "Sigma in kapitalen"
@@ -2681,6 +2852,9 @@
     "vietnamese_e7a76583": {
         "message": "Vietnamees"
     },
+    "view_all_e13bf0a6": {
+        "message": "Alles weergeven"
+    },
     "view_ba339f93": {
         "message": "Bekijken"
     },
@@ -2746,6 +2920,12 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki Home"
+    },
+    "word_count_c77fe3a6": {
+        "message": "Woordtelling"
+    },
+    "words_b448b7d5": {
+        "message": "Woorden"
     },
     "wreath_product_200b38ef": {
         "message": "Kransproduct"

@@ -147,9 +147,9 @@ module Lti
     end
 
     it "clears the lti_helper instance variable when you set the current_user" do
-      expect(variable_expander.lti_helper).not_to be nil
+      expect(variable_expander.lti_helper).not_to be_nil
       variable_expander.current_user = nil
-      expect(variable_expander.instance_variable_get(:@current_user)).to be nil
+      expect(variable_expander.instance_variable_get(:@current_user)).to be_nil
     end
 
     it "expands registered variables" do
@@ -444,7 +444,7 @@ module Lti
           )
 
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq true
+          expect(exp_hash[:test]).to be true
         end
 
         it "is false if the assignment does not have anonymous grading on" do
@@ -458,7 +458,7 @@ module Lti
           )
 
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq false
+          expect(exp_hash[:test]).to be false
         end
       end
 
@@ -473,7 +473,7 @@ module Lti
           end
 
           it "expands to false" do
-            expect(subject[:test]).to eq false
+            expect(subject[:test]).to be false
           end
         end
 
@@ -484,7 +484,7 @@ module Lti
           end
 
           it "expands to true" do
-            expect(subject[:test]).to eq true
+            expect(subject[:test]).to be true
           end
         end
       end
@@ -1044,7 +1044,7 @@ module Lti
           course.hide_distribution_graphs = true
           exp_hash = { test: "$Canvas.course.hideDistributionGraphs" }
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq true
+          expect(exp_hash[:test]).to be true
         end
 
         it "has substitution for $Canvas.course.gradePassbackSetting" do
@@ -1416,7 +1416,7 @@ module Lti
           allow(substitution_helper).to receive(:section_restricted).and_return(true)
           exp_hash = { test: "$Canvas.course.sectionRestricted" }
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq true
+          expect(exp_hash[:test]).to be true
         end
 
         it "has substitution for $Canvas.course.sectionSisSourceIds" do
@@ -1786,7 +1786,7 @@ module Lti
           allow(assignment).to receive(:workflow_state).and_return("published")
           exp_hash = { test: "$Canvas.assignment.published" }
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq true
+          expect(exp_hash[:test]).to be true
         end
 
         describe "$Canvas.assignment.lockdownEnabled" do
@@ -1798,7 +1798,7 @@ module Lti
                                                                })
             exp_hash = { test: "$Canvas.assignment.lockdownEnabled" }
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to eq true
+            expect(exp_hash[:test]).to be true
           end
 
           it "returns false when lockdown is disabled" do
@@ -1809,14 +1809,14 @@ module Lti
                                                                })
             exp_hash = { test: "$Canvas.assignment.lockdownEnabled" }
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to eq false
+            expect(exp_hash[:test]).to be false
           end
 
           it "returns false as default" do
             allow(assignment).to receive(:settings).and_return({})
             exp_hash = { test: "$Canvas.assignment.lockdownEnabled" }
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to eq false
+            expect(exp_hash[:test]).to be false
           end
         end
 
@@ -2038,7 +2038,7 @@ module Lti
           allow(user).to receive(:roles).and_return(["root_admin"])
           exp_hash = { test: "$Canvas.user.isRootAccountAdmin" }
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq true
+          expect(exp_hash[:test]).to be true
         end
 
         it "has substitution for $Canvas.xuser.allRoles" do
@@ -2251,7 +2251,7 @@ module Lti
           masquerading_user = User.new
           allow(masquerading_user).to receive(:id).and_return(7878)
           allow(user).to receive(:id).and_return(42)
-          variable_expander.instance_variable_set("@current_user", masquerading_user)
+          variable_expander.instance_variable_set(:@current_user, masquerading_user)
           exp_hash = { test: "$Canvas.masqueradingUser.id" }
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 42
@@ -2268,7 +2268,7 @@ module Lti
         it "has substitution for $Canvas.masqueradingUser.userId" do
           masquerading_user = User.new
           allow(masquerading_user).to receive(:id).and_return(7878)
-          variable_expander.instance_variable_set("@current_user", masquerading_user)
+          variable_expander.instance_variable_set(:@current_user, masquerading_user)
           exp_hash = { test: "$Canvas.masqueradingUser.userId" }
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f"
@@ -2277,7 +2277,7 @@ module Lti
         it "has substitution for Canvas.module.id" do
           content_tag = double("content_tag")
           allow(content_tag).to receive(:context_module_id).and_return("foo")
-          variable_expander.instance_variable_set("@content_tag", content_tag)
+          variable_expander.instance_variable_set(:@content_tag, content_tag)
           exp_hash = { test: "$Canvas.module.id" }
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "foo"
@@ -2286,7 +2286,7 @@ module Lti
         it "has substitution for Canvas.moduleItem.id" do
           content_tag = double("content_tag")
           allow(content_tag).to receive(:id).and_return(7878)
-          variable_expander.instance_variable_set("@content_tag", content_tag)
+          variable_expander.instance_variable_set(:@content_tag, content_tag)
           exp_hash = { test: "$Canvas.moduleItem.id" }
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 7878
@@ -2627,7 +2627,7 @@ module Lti
               masquerading_user = User.new
               allow(masquerading_user).to receive(:id).and_return(7878)
               allow(user).to receive(:id).and_return(42)
-              variable_expander.instance_variable_set("@current_user", masquerading_user)
+              variable_expander.instance_variable_set(:@current_user, masquerading_user)
               exp_hash = { test: "$Canvas.masqueradingUser.id" }
               variable_expander.expand_variables!(exp_hash)
               expect(exp_hash[:test]).to eq "42"
@@ -2636,7 +2636,7 @@ module Lti
             it "has substitution for Canvas.moduleItem.id" do
               content_tag = double("content_tag")
               allow(content_tag).to receive(:id).and_return(7878)
-              variable_expander.instance_variable_set("@content_tag", content_tag)
+              variable_expander.instance_variable_set(:@content_tag, content_tag)
               exp_hash = { test: "$Canvas.moduleItem.id" }
               variable_expander.expand_variables!(exp_hash)
               expect(exp_hash[:test]).to eq "7878"

@@ -21,8 +21,8 @@ module RuboCop
   module Cop
     module Specs
       class NoWaitForNoSuchElement < Cop
-        MSG = "Avoid using wait_for_no_such_element. Instead, use"\
-              " not_to contain_css/contain_link.\n"\
+        MSG = "Avoid using wait_for_no_such_element. Instead, use " \
+              "not_to contain_css/contain_link.\n" \
               "e.g. expect(f('#courses')).not_to contain_css('#course_123')"
 
         METHOD = :wait_for_no_such_element

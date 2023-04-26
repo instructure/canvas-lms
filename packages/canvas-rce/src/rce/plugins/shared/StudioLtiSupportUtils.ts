@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {bool, shape, InferType} from 'prop-types'
+import {EditorEvent, Events} from 'tinymce'
+
 /**
  * Interface for content item's 'custom' field, specifically for what is expected to come from Studio
  *
@@ -33,6 +36,13 @@ export interface StudioMediaOptionsAttributes {
   'data-studio-tray-enabled': boolean
   'data-studio-convertible-to-link': boolean
 }
+
+export const parsedStudioOptionsPropType = shape({
+  resizable: bool.isRequired,
+  convertibleToLink: bool.isRequired,
+})
+
+export type ParsedStudioOptions = InferType<typeof parsedStudioOptionsPropType>
 
 export function isStudioContentItemCustomJson(input: any): input is StudioContentItemCustomJson {
   return typeof input === 'object' && input.source === 'studio'
@@ -60,11 +70,34 @@ export function displayStyleFrom(
 
 export function isStudioEmbeddedMedia(element: Element): boolean {
   // Borrowing this structure from isMediaElement in ContentSelection.js
-  const tinymceIframeShim = element.tagName === 'IFRAME' ? element.parentElement : element
+  const tinymceIframeShim = element?.tagName === 'IFRAME' ? element?.parentElement : element
 
   if (tinymceIframeShim?.firstElementChild?.tagName !== 'IFRAME') {
     return false
   }
 
   return tinymceIframeShim.getAttribute('data-mce-p-data-studio-tray-enabled') === 'true'
+}
+
+export function parseStudioOptions(element: Element | null): ParsedStudioOptions {
+  const tinymceIframeShim = element?.tagName === 'IFRAME' ? element?.parentElement : element
+  return {
+    resizable: tinymceIframeShim?.getAttribute('data-mce-p-data-studio-resizable') === 'true',
+    convertibleToLink:
+      tinymceIframeShim?.getAttribute('data-mce-p-data-studio-convertible-to-link') === 'true',
+  }
+}
+
+/**
+ * Tinymce adds an overlay when you click on an iframe inside the editor. It will by default
+ * add resize handles to the corners of the overlay. The code that adds these handles won't
+ * if the overlay has `data-mce-resize='false'` on it. Here, we force that behavior when the
+ * underlying iframe has a `data-studio-resizable='false'`
+ */
+export function handleBeforeObjectSelected(e: EditorEvent<Events.ObjectSelectedEvent>): void {
+  const targetElement = e.target as Element
+
+  if (targetElement.getAttribute('data-mce-p-data-studio-resizable') === 'false') {
+    targetElement.setAttribute('data-mce-resize', 'false')
+  }
 }

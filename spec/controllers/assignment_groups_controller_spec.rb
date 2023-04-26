@@ -549,7 +549,7 @@ describe AssignmentGroupsController do
           assessment_request = json[0]["assignments"][0]["assessment_requests"][0]
           expect(assessment_request["workflow_state"]).to eq @assessment_request.workflow_state
           expect(assessment_request["anonymous_id"]).to eq @assessment_request.asset.anonymous_id
-          expect(assessment_request["available"]).to eq true
+          expect(assessment_request["available"]).to be true
         end
 
         it "includes workflow_state, user_id, user_name when the assignment has anonymous_peer_reviews disabled" do
@@ -559,14 +559,14 @@ describe AssignmentGroupsController do
           expect(assessment_request["workflow_state"]).to eq @assessment_request.workflow_state
           expect(assessment_request["user_id"]).to eq @assessment_request.user.id
           expect(assessment_request["user_name"]).to eq @assessment_request.user.name
-          expect(assessment_request["available"]).to eq true
+          expect(assessment_request["available"]).to be true
         end
 
         it "has available set correctly if both asset and assessor_asset have submitted_at" do
           assessment_request0 = json[0]["assignments"][0]["assessment_requests"][0]
           assessment_request1 = json[0]["assignments"][1]["assessment_requests"][0]
-          expect(assessment_request0["available"]).to eq true
-          expect(assessment_request1["available"]).to eq false
+          expect(assessment_request0["available"]).to be true
+          expect(assessment_request1["available"]).to be false
         end
       end
     end
@@ -698,8 +698,8 @@ describe AssignmentGroupsController do
         expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment2.reload.assignment_group_id).to eq(@group2.id)
         expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
-        expect(@assignment2.position).to eql(2)
-        expect(@assignment3.position).to eql(1)
+        expect(@assignment2.position).to be(2)
+        expect(@assignment3.position).to be(1)
       end
 
       it "allows assignments not in closed grading periods to be moved into different assignment groups" do
@@ -710,8 +710,8 @@ describe AssignmentGroupsController do
         expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment2.reload.assignment_group_id).to eq(@group2.id)
         expect(@assignment3.reload.assignment_group_id).to eq(@group2.id)
-        expect(@assignment2.position).to eql(2)
-        expect(@assignment3.position).to eql(1)
+        expect(@assignment2.position).to be(2)
+        expect(@assignment3.position).to be(1)
       end
 
       it "allows assignments in closed grading periods to be reordered within the same assignment group" do
@@ -722,9 +722,9 @@ describe AssignmentGroupsController do
         expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment2.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment3.reload.assignment_group_id).to eq(@group1.id)
-        expect(@assignment1.position).to eql(2)
-        expect(@assignment2.position).to eql(3)
-        expect(@assignment3.position).to eql(1)
+        expect(@assignment1.position).to be(2)
+        expect(@assignment2.position).to be(3)
+        expect(@assignment3.position).to be(1)
       end
 
       it "allows assignments in closed grading periods when the user is a root admin" do
@@ -794,7 +794,7 @@ describe AssignmentGroupsController do
                                                                           integration_data: group_integration_data } }
       expect(response).to be_redirect
       expect(assigns[:assignment_group].name).to eql(name)
-      expect(assigns[:assignment_group].position).to eql(1)
+      expect(assigns[:assignment_group].position).to be(1)
       expect(assigns[:assignment_group].integration_data).to eql(group_integration_data)
     end
 
@@ -804,7 +804,7 @@ describe AssignmentGroupsController do
                                                                           integration_data: {} } }
       expect(response).to be_redirect
       expect(assigns[:assignment_group].name).to eql(name)
-      expect(assigns[:assignment_group].position).to eql(1)
+      expect(assigns[:assignment_group].position).to be(1)
       expect(assigns[:assignment_group].integration_data).to eql({})
     end
 
@@ -814,7 +814,7 @@ describe AssignmentGroupsController do
                                                                           integration_data: nil } }
       expect(response).to be_redirect
       expect(assigns[:assignment_group].name).to eql(name)
-      expect(assigns[:assignment_group].position).to eql(1)
+      expect(assigns[:assignment_group].position).to be(1)
       expect(assigns[:assignment_group].integration_data).to eql({})
     end
 
@@ -823,7 +823,7 @@ describe AssignmentGroupsController do
       integration_data = "something"
       post "create", params: { course_id: @course.id, assignment_group: { name: name,
                                                                           integration_data: integration_data } }
-      expect(response.status).to eq(400)
+      expect(response).to have_http_status(:bad_request)
     end
 
     it "creates a new group when integration_data is not present" do
@@ -831,7 +831,7 @@ describe AssignmentGroupsController do
       post "create", params: { course_id: @course.id, assignment_group: { name: name } }
       expect(response).to be_redirect
       expect(assigns[:assignment_group].name).to eql(name)
-      expect(assigns[:assignment_group].position).to eql(1)
+      expect(assigns[:assignment_group].position).to be(1)
       expect(assigns[:assignment_group].integration_data).to eql({})
     end
   end
@@ -921,7 +921,7 @@ describe AssignmentGroupsController do
                               id: @group.id,
                               assignment_group: { name: name,
                                                   integration_data: integration_data } }
-      expect(response.status).to eq(400)
+      expect(response).to have_http_status(:bad_request)
     end
 
     it "retains integration_data when updating a group" do
@@ -971,9 +971,9 @@ describe AssignmentGroupsController do
       delete "destroy", params: { course_id: @course.id, id: @group1.id }
       expect(assigns[:assignment_group]).to eql(@group1)
       expect(assigns[:assignment_group]).to be_deleted
-      expect(@group1.reload.assignments.length).to eql(1)
+      expect(@group1.reload.assignments.length).to be(1)
       expect(@group1.reload.assignments[0]).to eql(@assignment1)
-      expect(@group1.assignments.active.length).to eql(0)
+      expect(@group1.assignments.active.length).to be(0)
     end
 
     it "moves assignments to a different group if specified" do
@@ -982,21 +982,21 @@ describe AssignmentGroupsController do
       @assignment1 = @course.assignments.create!(title: "assignment 1", assignment_group: @group1)
       @group2 = @course.assignment_groups.create!(name: "group 2")
       @assignment2 = @course.assignments.create!(title: "assignment 2", assignment_group: @group2)
-      expect(@assignment1.position).to eql(1)
+      expect(@assignment1.position).to be(1)
       expect(@assignment1.assignment_group_id).to eql(@group1.id)
-      expect(@assignment2.position).to eql(1)
+      expect(@assignment2.position).to be(1)
       expect(@assignment2.assignment_group_id).to eql(@group2.id)
 
       delete "destroy", params: { course_id: @course.id, id: @group2.id, move_assignments_to: @group1.id }
 
       expect(assigns[:assignment_group]).to eql(@group2)
       expect(assigns[:assignment_group]).to be_deleted
-      expect(@group2.reload.assignments.length).to eql(0)
-      expect(@group1.reload.assignments.length).to eql(2)
-      expect(@group1.assignments.active.length).to eql(2)
-      expect(@assignment1.reload.position).to eql(1)
+      expect(@group2.reload.assignments.length).to be(0)
+      expect(@group1.reload.assignments.length).to be(2)
+      expect(@group1.assignments.active.length).to be(2)
+      expect(@assignment1.reload.position).to be(1)
       expect(@assignment1.assignment_group_id).to eql(@group1.id)
-      expect(@assignment2.reload.position).to eql(2)
+      expect(@assignment2.reload.position).to be(2)
       expect(@assignment2.assignment_group_id).to eql(@group1.id)
     end
 

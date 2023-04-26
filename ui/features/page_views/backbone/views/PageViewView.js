@@ -17,7 +17,7 @@
 //
 
 import _ from 'underscore'
-import PaginatedView from '@canvas/pagination/backbone/views/PaginatedView.coffee'
+import PaginatedView from '@canvas/pagination/backbone/views/PaginatedView'
 import pageViewTemplate from '../../jst/PageView.handlebars'
 
 export default class PageViewView extends PaginatedView {

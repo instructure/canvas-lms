@@ -113,7 +113,7 @@ module Canvas::ICU
           :lower_first => 24,
           :upper_first => 25,
         }.freeze
-        ATTRIBUTE_VALUES_INVERSE = ATTRIBUTE_VALUES.map { |k, v| [v, k] }.to_h.freeze
+        ATTRIBUTE_VALUES_INVERSE = ATTRIBUTE_VALUES.to_h { |k, v| [v, k] }.freeze
       end
     end
 

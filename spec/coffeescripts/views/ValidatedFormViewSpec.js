@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import {Model} from '@canvas/backbone'
-import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
+import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 
 QUnit.module('ValidatedFormView', {
   setup() {

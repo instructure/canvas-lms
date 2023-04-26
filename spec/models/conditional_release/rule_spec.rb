@@ -21,7 +21,7 @@
 require_relative "../../conditional_release_spec_helper"
 
 module ConditionalRelease
-  describe Rule, type: :model do
+  describe Rule do
     it_behaves_like "a soft-deletable model"
 
     describe "rule definition" do

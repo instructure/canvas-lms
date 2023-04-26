@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DialogFormView, {
   getResponsiveWidth,
-} from '@canvas/forms/backbone/views/DialogFormView.coffee'
+} from '@canvas/forms/backbone/views/DialogFormView'
 import wrapperTemplate from '../../jst/WikiPageIndexEditDialog.handlebars'
 
 const I18n = useI18nScope('pages')

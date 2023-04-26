@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
-import GroupCategoryEditView from '@canvas/groups/backbone/views/GroupCategoryEditView.coffee'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
+import GroupCategoryEditView from '@canvas/groups/backbone/views/GroupCategoryEditView'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 

@@ -39,7 +39,7 @@ module Quizzes
         tally += (user_answer[:points] || 0).to_d if user_answer[:correct]
       end
       @submission.score = tally.to_d
-      @submission.score = @submission.quiz.points_possible if @submission&.quiz && @submission&.quiz&.graded_survey?
+      @submission.score = @submission.quiz.points_possible if @submission&.quiz&.graded_survey?
       @submission.submission_data = user_answers
       @submission.workflow_state = "complete"
       user_answers.each do |answer|
@@ -134,7 +134,7 @@ module Quizzes
     private
 
     def versioned_submission(submission, attempt)
-      submission.attempt == attempt ? submission : submission.versions.sort_by(&:created_at).map(&:model).reverse.detect { |s| s.attempt == attempt }
+      (submission.attempt == attempt) ? submission : submission.versions.sort_by(&:created_at).map(&:model).reverse.detect { |s| s.attempt == attempt }
     end
 
     def kept_score_updating?(original_score, original_workflow_state)

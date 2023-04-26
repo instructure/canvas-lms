@@ -43,9 +43,7 @@ module ErrorContext
     def write_error_page
       return if summary.discard?
 
-      File.open(File.join(errors_path, "index.html"), "w") do |file|
-        file.write error_page_content
-      end
+      File.write(File.join(errors_path, "index.html"), error_page_content)
     end
 
     def error_page_content

@@ -18,7 +18,7 @@
 
 import I18n from '@canvas/i18n'
 
-import round from 'round'
+import round from '@canvas/round'
 import GradeFormatHelper from '../GradeFormatHelper'
 import {gradeToScoreLowerBound, scoreToGrade} from '../GradingSchemeHelper'
 import GradeOverride from '../GradeOverride'

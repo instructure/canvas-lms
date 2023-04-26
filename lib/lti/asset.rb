@@ -30,7 +30,7 @@ module Lti
     end
 
     def self.set_asset_context_id(asset, lti_context_id, context: nil)
-      if asset.respond_to?("lti_context_id")
+      if asset.respond_to?(:lti_context_id)
         global_context_id = global_context_id_for(asset)
         if asset.new_record?
           asset.lti_context_id = global_context_id

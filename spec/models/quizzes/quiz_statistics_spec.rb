@@ -151,7 +151,7 @@ describe Quizzes::QuizStatistics do
     allow(InstFS).to receive(:enabled?).and_return(false)
     stats = @quiz.current_statistics_for "student_analysis"
     attachment = stats.generate_csv
-    expect(attachment.instfs_uuid).to eq(nil)
+    expect(attachment.instfs_uuid).to be_nil
   end
 
   describe "self#large_quiz?" do

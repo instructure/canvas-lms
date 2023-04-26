@@ -117,10 +117,10 @@ opts.on_tail("-h", "--help", "Show this message") do
   exit
 end
 opts.parse(ARGV)
-student_count = generate_for == :speedgrader ? 50 : 400
-assignment_count = generate_for == :speedgrader ? 50 : 200
+student_count = (generate_for == :speedgrader) ? 50 : 400
+assignment_count = (generate_for == :speedgrader) ? 50 : 200
 
-puts generate_for == :speedgrader ? "Speedgrader".yellow : "Gradebook".yellow
+puts((generate_for == :speedgrader) ? "Speedgrader".yellow : "Gradebook".yellow)
 puts "Student Count = #{student_count}".red
 puts "Assignment Count = #{assignment_count}".red
 

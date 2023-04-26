@@ -117,7 +117,7 @@ module DynamicSettings
     # @param global [boolean] Is it a global key?
     # @return Consul txn response
     def set_keys(kvs, global: false)
-      opts = @data_center.present? && global ? { dc: @data_center } : {}
+      opts = (@data_center.present? && global) ? { dc: @data_center } : {}
       value = kvs.map do |k, v|
         {
           "KV" => {
@@ -248,7 +248,7 @@ module DynamicSettings
       timing = format("CONSUL (%.2fms)", ms)
       status = "OK"
       unless error.nil?
-        status = error.is_a?(Diplomat::KeyNotFound) && error.message == full_key ? "NOT_FOUND" : "ERROR"
+        status = (error.is_a?(Diplomat::KeyNotFound) && error.message == full_key) ? "NOT_FOUND" : "ERROR"
       end
       DynamicSettings.logger.debug("  #{timing} get (#{full_key}) -> status:#{status}") if @query_logging
       return nil if status == "NOT_FOUND"
@@ -269,11 +269,11 @@ module DynamicSettings
       else
         key_array << cluster
       end
-      key_array.concat([prefix, key]).compact.join("/")
+      key_array.push(prefix, key).compact.join("/")
     end
 
     def populate_cache(subtree, ttl)
-      cache.write_set(subtree.map { |st| [CACHE_KEY_PREFIX + st[:key], st[:value]] }.to_h, ttl: ttl)
+      cache.write_set(subtree.to_h { |st| [CACHE_KEY_PREFIX + st[:key], st[:value]] }, ttl: ttl)
     end
   end
 end

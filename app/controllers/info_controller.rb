@@ -211,7 +211,7 @@ class InfoController < ApplicationController
     components = HealthChecks.process_readiness_checks(true)
     readiness_response = render_readiness_json(components, true)
 
-    status = readiness_response[:status] == 503 ? readiness_response[:status] : status_code
+    status = (readiness_response[:status] == 503) ? readiness_response[:status] : status_code
 
     response = {
       readiness: components,

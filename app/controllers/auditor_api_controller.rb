@@ -19,15 +19,7 @@
 #
 
 class AuditorApiController < ApplicationController
-  before_action :check_configured
-
   private
-
-  def check_configured
-    return if Audits.configured?
-
-    render json: { message: "Audits module is not configured" }, status: :not_found
-  end
 
   def query_options
     start_time = CanvasTime.try_parse(params[:start_time])

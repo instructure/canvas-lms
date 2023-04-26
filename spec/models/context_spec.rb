@@ -26,7 +26,7 @@ describe Context do
     end
 
     it "does not find an invalid course" do
-      expect(Context.find_by_asset_string("course_0")).to be nil
+      expect(Context.find_by_asset_string("course_0")).to be_nil
     end
 
     it "finds a valid group" do
@@ -35,7 +35,7 @@ describe Context do
     end
 
     it "does not find an invalid group" do
-      expect(Context.find_by_asset_string("group_0")).to be nil
+      expect(Context.find_by_asset_string("group_0")).to be_nil
     end
 
     it "finds a valid account" do
@@ -44,7 +44,7 @@ describe Context do
     end
 
     it "does not find an invalid account" do
-      expect(Context.find_by_asset_string("account_#{Account.last.id + 9999}")).to be nil
+      expect(Context.find_by_asset_string("account_#{Account.last.id + 9999}")).to be_nil
     end
 
     it "finds a valid user" do
@@ -53,21 +53,21 @@ describe Context do
     end
 
     it "does not find an invalid user" do
-      expect(Context.find_by_asset_string("user_0")).to be nil
+      expect(Context.find_by_asset_string("user_0")).to be_nil
     end
 
     it "does not find an invalid asset string" do
-      expect(Context.find_by_asset_string("")).to be nil
-      expect(Context.find_by_asset_string("loser_5")).to be nil
+      expect(Context.find_by_asset_string("")).to be_nil
+      expect(Context.find_by_asset_string("loser_5")).to be_nil
     end
 
     it "does not find a valid asset" do
       assignment_model
-      expect(Context.find_by_asset_string(@assignment.asset_string)).to be nil
+      expect(Context.find_by_asset_string(@assignment.asset_string)).to be_nil
     end
 
     it "does not find a context with invalid type" do
-      expect(Context.find_by_asset_string("WRONG_1")).to be nil
+      expect(Context.find_by_asset_string("WRONG_1")).to be_nil
     end
   end
 
@@ -87,15 +87,15 @@ describe Context do
     it "does not find a valid wiki page if told to ignore wiki pages" do
       course_model
       page = @course.wiki_pages.create!(title: "test")
-      expect(@course.find_asset(page.asset_string, [:assignment])).to be nil
+      expect(@course.find_asset(page.asset_string, [:assignment])).to be_nil
     end
 
     it "does not find an invalid assignment" do
       assignment_model
       @course2 = Course.create!
-      expect(@course2.find_asset(@assignment.asset_string)).to be nil
-      expect(@course.find_asset("assignment_0")).to be nil
-      expect(@course.find_asset("")).to be nil
+      expect(@course2.find_asset(@assignment.asset_string)).to be_nil
+      expect(@course.find_asset("assignment_0")).to be_nil
+      expect(@course.find_asset("")).to be_nil
     end
 
     describe "context" do
@@ -453,7 +453,7 @@ describe Context do
     it "returns nil if root_account_id not present" do
       klass = Class.new { include Context }
 
-      expect(klass.new.resolved_root_account_id).to eq nil
+      expect(klass.new.resolved_root_account_id).to be_nil
     end
   end
 end

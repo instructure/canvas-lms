@@ -193,11 +193,11 @@ describe CalendarEvent do
         @event.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
         res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
-        expect(res.dtstart.tz_utc).to eq true
+        expect(res.dtstart.tz_utc).to be true
         expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
-        expect(res.dtend.tz_utc).to eq true
+        expect(res.dtend.tz_utc).to be true
         expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:00pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
-        expect(res.dtstamp.tz_utc).to eq true
+        expect(res.dtstamp.tz_utc).to be true
         expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
       end
 
@@ -208,11 +208,11 @@ describe CalendarEvent do
         @event.updated_at = Time.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
         res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
-        expect(res.dtstart.tz_utc).to eq true
+        expect(res.dtstart.tz_utc).to be true
         expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
-        expect(res.dtend.tz_utc).to eq true
+        expect(res.dtend.tz_utc).to be true
         expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:00pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
-        expect(res.dtend.tz_utc).to eq true
+        expect(res.dtend.tz_utc).to be true
         expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
       end
 
@@ -223,7 +223,7 @@ describe CalendarEvent do
 
       it "returns string dates for all_day events" do
         calendar_event_model(start_at: "Sep 3 2008 12:00am")
-        expect(@event.all_day).to eql(true)
+        expect(@event.all_day).to be(true)
         expect(@event.end_at).to eql(@event.start_at)
         res = @event.to_ics
         expect(res.include?("DTSTART;VALUE=DATE:20080903")).not_to be_nil
@@ -690,13 +690,13 @@ describe CalendarEvent do
       appointment = ag.appointments.first
       appointment.participants_per_appointment = 3
       appointment.save!
-      expect(appointment.participants_per_appointment).to eql 3
+      expect(appointment.participants_per_appointment).to be 3
 
       appointment.participants_per_appointment = 2
       appointment.save!
       expect(appointment.read_attribute(:participants_per_limit)).to be_nil
       expect(appointment.override_participants_per_appointment?).to be_falsey
-      expect(appointment.participants_per_appointment).to eql 2
+      expect(appointment.participants_per_appointment).to be 2
     end
 
     it "does not let participants exceed max_appointments_per_participant" do
@@ -867,11 +867,11 @@ describe CalendarEvent do
       appointment = ag.appointments.first
 
       r1 = appointment.reserve_for(@student1, @student1).reload
-      expect(ag.reload.available_slots).to eql 0
+      expect(ag.reload.available_slots).to be 0
       r1.destroy
-      expect(ag.reload.available_slots).to eql 1
+      expect(ag.reload.available_slots).to be 1
       expect { appointment.reserve_for(@student1, @student1) }.not_to raise_error
-      expect(ag.reload.available_slots).to eql 0
+      expect(ag.reload.available_slots).to be 0
     end
 
     it "always allows editing the description on an appointment" do
@@ -1023,7 +1023,7 @@ describe CalendarEvent do
         ]
         e1.reload
         events2 = e1.child_events.sort_by(&:id)
-        expect(events2.size).to eql 2
+        expect(events2.size).to be 2
 
         expect(events1.first.reload).to eql events2.first
         expect(events1.last.reload).to be_deleted
@@ -1206,7 +1206,7 @@ describe CalendarEvent do
       event = course.calendar_events.create! title: "Foo", web_conference: conference(context: course)
       expect(event.web_conference.id).to eq WebConference.last.id
       event.destroy!
-      expect(event.web_conference).to eq nil
+      expect(event.web_conference).to be_nil
     end
 
     context "after_save callbacks" do

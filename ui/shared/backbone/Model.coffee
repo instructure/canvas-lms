@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import mixin from './mixin.coffee'
+import mixin from './mixin'
 import _ from 'underscore'
 import Backbone from 'backbone'
 import './Model/computedAttributes'

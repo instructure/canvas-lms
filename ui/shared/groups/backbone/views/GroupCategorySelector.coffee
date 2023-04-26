@@ -23,7 +23,7 @@ import '@canvas/assignments/jquery/toggleAccessibly'
 import awaitElement from '@canvas/await-element'
 import {renderCreateDialog} from '@canvas/groups/react/CreateOrEditSetModal'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
-import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
 
 I18n = useI18nScope('assignment_group_category')
 
@@ -146,7 +146,6 @@ export default class GroupCategorySelector extends Backbone.View
     sectionLabel: @sectionLabel
     fieldLabel: @fieldLabel
     lockedMessage: @lockedMessage
-    ariaChecked: if @parentModel.groupCategoryId() then 'true' else 'false'
 
     nested: @nested
     prefix: 'assignment' if @nested

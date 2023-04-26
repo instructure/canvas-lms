@@ -29,12 +29,12 @@ module Qti
       return unless read_setting("hasSettings") == "true"
 
       apply_if_set(assessment, :description, "instructions")
-      apply_if_set(assessment, :allowed_attempts, "attempts") { |v| v == "unlimited" ? -1 : v.to_i }
-      apply_if_set(assessment, :time_limit, "timeLimit") { |v| v == "unlimited" ? nil : v.to_f }
+      apply_if_set(assessment, :allowed_attempts, "attempts") { |v| (v == "unlimited") ? -1 : v.to_i }
+      apply_if_set(assessment, :time_limit, "timeLimit") { |v| (v == "unlimited") ? nil : v.to_f }
       apply_if_set(assessment, :unlock_at, "availableFrom") { |v| readtime(v) }
       apply_if_set(assessment, :lock_at, "availableTo") { |v| readtime(v) }
       apply_if_set(assessment, :access_code, "password")
-      apply_if_set(assessment, :ip_filter, "ipRestriction") { |v| v == "unlimited" ? nil : v }
+      apply_if_set(assessment, :ip_filter, "ipRestriction") { |v| (v == "unlimited") ? nil : v }
       apply_if_set(assessment, :shuffle_answers, "shuffleAnswers") { |v| v == "true" }
       apply_if_set(assessment, :due_at, "dueDate") { |v| readtime(v) }
       if read_setting("publishNow") == "true"
@@ -81,7 +81,7 @@ module Qti
     end
 
     def readtime(v)
-      v == "unlimited" ? nil : Time.at(v.to_i)
+      (v == "unlimited") ? nil : Time.at(v.to_i)
     end
 
     def read_setting(setting_name)

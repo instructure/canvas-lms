@@ -24,7 +24,7 @@ module RuboCop
         MSG = "Raw SQL in migrations must be approved by a migration reviewer"
 
         def_node_matcher :execute?, <<~PATTERN
-          (send _ :execute str)
+          (send _ :execute {str | dstr})
         PATTERN
 
         def on_send(node)

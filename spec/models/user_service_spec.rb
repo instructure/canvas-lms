@@ -24,9 +24,9 @@ describe UserService do
   end
 
   it "has a useful workflow" do
-    expect(@user_service.state).to eql(:active)
+    expect(@user_service.state).to be(:active)
     @user_service.failed_request
-    expect(@user_service.state).to eql(:failed)
+    expect(@user_service.state).to be(:failed)
   end
 
   it "has a named scope for type" do
@@ -148,9 +148,9 @@ describe UserService do
 
   describe "valid?" do
     it "validates character length maximum (255) for user input fields" do
-      lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod \
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud \
-      exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure \
+      lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+      exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
       dolor in reprehenderit."
       params = {}
       params[:service] = "diigo"

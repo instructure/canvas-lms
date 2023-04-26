@@ -979,7 +979,7 @@ describe SIS::CSV::CourseImporter do
 
     course = @account.all_courses.where(sis_source_id: "test_1").first
     expect(course.name).to eq "Test Course 101"
-    expect(course.friendly_name).to eq nil
+    expect(course.friendly_name).to be_nil
   end
 
   it "does not import friendly name for not elementary account" do
@@ -995,6 +995,6 @@ describe SIS::CSV::CourseImporter do
 
     course = @account.all_courses.where(sis_source_id: "test_1").first
     expect(course.name).to eq "Test Course 101"
-    expect(course.friendly_name).to eq nil
+    expect(course.friendly_name).to be_nil
   end
 end

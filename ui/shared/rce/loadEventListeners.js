@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import initializeExternalTools from '@canvas/tinymce-external-tools'
-import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+
+if (!('INST' in window)) window.INST = {}
 
 const I18n = useI18nScope('loadEventListeners')
 

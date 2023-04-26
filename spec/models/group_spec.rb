@@ -64,7 +64,7 @@ describe Group do
     course_with_student(active_all: true)
     group_model(group_category: @communities, is_public: true)
     group.add_user(@student)
-    expect(@group.inactive?).to eq false
+    expect(@group.inactive?).to be false
   end
 
   it "identifies a destroyed course as not active" do
@@ -73,7 +73,7 @@ describe Group do
     group.add_user(@student)
     @group.context = @course
     @course.destroy!
-    expect(@group.inactive?).to eq true
+    expect(@group.inactive?).to be true
   end
 
   it "identifies a concluded course as not active" do
@@ -82,7 +82,7 @@ describe Group do
     group.add_user(@student)
     @group.context = @course
     @course.complete!
-    expect(@group.inactive?).to eq true
+    expect(@group.inactive?).to be true
   end
 
   it "identifies an account group as not active correctly" do
@@ -90,14 +90,14 @@ describe Group do
     group_model(group_category: @communities, is_public: true, context: @account)
     group.add_user(@student)
     @group.context.destroy
-    expect(@group.inactive?).to eq true
+    expect(@group.inactive?).to be true
   end
 
   it "identifies an account group as active" do
     @account = account_model
     group_model(group_category: @communities, is_public: true, context: @account)
     group.add_user(@student)
-    expect(@group.inactive?).to eq false
+    expect(@group.inactive?).to be false
   end
 
   it "sets the root_account_id for GroupMemberships when bulk adding users" do
@@ -105,7 +105,7 @@ describe Group do
     group_model(group_category: @communities, is_public: true, context: @account)
     @group.bulk_add_users_to_group([@user])
     @group.group_memberships.each do |gm|
-      expect(gm.root_account_id).not_to be nil
+      expect(gm.root_account_id).not_to be_nil
     end
   end
 
@@ -232,7 +232,7 @@ describe Group do
     it "allows specifying that the user should be a moderator" do
       user_model
       @membership = @group.add_user(@user, "accepted", true)
-      expect(@membership.moderator).to eq true
+      expect(@membership.moderator).to be true
     end
 
     it "changes the workflow_state of an already active user" do
@@ -866,11 +866,11 @@ describe Group do
     end
 
     it "returns true if a user has a course set as a favorite" do
-      expect(@group_fave.favorite_for_user?(@user)).to eql(true)
+      expect(@group_fave.favorite_for_user?(@user)).to be(true)
     end
 
     it "returns false if a user has not set a group to be a favorite" do
-      expect(@group_not_fave.favorite_for_user?(@user)).to eql(false)
+      expect(@group_not_fave.favorite_for_user?(@user)).to be(false)
     end
   end
 

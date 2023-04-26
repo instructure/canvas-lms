@@ -149,7 +149,7 @@ describe "Importers::QuizImporter" do
     expect(Quizzes::Quiz.count).to eq 1
 
     quiz = Quizzes::Quiz.where(migration_id: quiz_hash[:migration_id]).first
-    expect(quiz.unpublished?).to eq true
+    expect(quiz.unpublished?).to be true
     expect(quiz.assignment).to be_nil
   end
 
@@ -166,7 +166,7 @@ describe "Importers::QuizImporter" do
     expect(Quizzes::Quiz.count).to eq 1
 
     quiz = Quizzes::Quiz.where(migration_id: quiz_hash[:migration_id]).first
-    expect(quiz.unpublished?).to eq true
+    expect(quiz.unpublished?).to be true
     expect(quiz.assignment).to_not be_nil
   end
 
@@ -186,7 +186,7 @@ describe "Importers::QuizImporter" do
     expect(Quizzes::Quiz.count).to eq 1
 
     quiz = Quizzes::Quiz.where(migration_id: quiz_hash[:migration_id]).first
-    expect(quiz.available?).to eq true
+    expect(quiz.available?).to be true
     expect(quiz.assignment).not_to be_nil
     expect(quiz.quiz_type).to eq "assignment"
   end

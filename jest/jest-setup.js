@@ -58,7 +58,6 @@ const ignoredErrors = [
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
   /Invariant Violation/,
   /Prop `children` should be supplied unless/, // https://instructure.atlassian.net/browse/FOO-3407
-  /Render methods should be a pure function of props and state/, // https://instructure.atlassian.net/browse/LS-3840
   /The above error occurred in the <.*> component/,
   /You seem to have overlapping act\(\) calls/,
 ]

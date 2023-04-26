@@ -27,7 +27,7 @@ module Lti
       @tc_half_secret = tc_half_shared_secret
       tp = ::IMS::LTI::Models::ToolProxy.new.from_json(json)
       tp.tool_proxy_guid = guid
-      tcp_uuid = tp.tool_consumer_profile&.match(%r{tool_consumer_profile/([a-fA-f0-9\-]+)})&.captures&.first
+      tcp_uuid = tp.tool_consumer_profile&.match(%r{tool_consumer_profile/([a-fA-f0-9-]+)})&.captures&.first
       tcp_uuid ||= developer_key&.tool_consumer_profile&.uuid
       tcp_uuid ||= Lti::ToolConsumerProfile::DEFAULT_TCP_UUID
       begin

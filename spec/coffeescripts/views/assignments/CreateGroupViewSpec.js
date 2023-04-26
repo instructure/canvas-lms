@@ -18,9 +18,9 @@
 
 import {isEmpty, keys} from 'lodash'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
-import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
-import Course from '@canvas/courses/backbone/models/Course.coffee'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
+import Course from '@canvas/courses/backbone/models/Course'
 import CreateGroupView from 'ui/features/assignment_index/backbone/views/CreateGroupView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'

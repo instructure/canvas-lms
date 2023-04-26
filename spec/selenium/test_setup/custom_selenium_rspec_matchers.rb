@@ -195,12 +195,12 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      "expected #{element.inspect}'s #{attribute} attribute to have value of #{expected || "not nil"}, "\
+      "expected #{element.inspect}'s #{attribute} attribute to have value of #{expected || "not nil"}, " \
         "actual #{attribute} attribute value: #{element.attribute(attribute.to_s)}"
     end
 
     failure_message_when_negated do |element|
-      "expected #{element.inspect}'s #{attribute} attribute to NOT have value of #{expected || "not nil"}, "\
+      "expected #{element.inspect}'s #{attribute} attribute to NOT have value of #{expected || "not nil"}, " \
         "actual #{attribute} attribute type: #{element.attribute(attribute.to_s)}"
     end
   end

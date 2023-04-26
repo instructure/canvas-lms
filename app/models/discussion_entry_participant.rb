@@ -51,7 +51,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
   def self.entry_ratings(entry_ids, user)
     ratings = where(user_id: user, discussion_entry_id: entry_ids).where.not(rating: nil)
-    ratings.map { |x| [x.discussion_entry_id, x.rating] }.to_h
+    ratings.to_h { |x| [x.discussion_entry_id, x.rating] }
   end
 
   def self.not_null_column_object(column: nil, entry: nil, user: nil)

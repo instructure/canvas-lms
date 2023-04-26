@@ -29,7 +29,7 @@ describe I18nTasks::GenerateJs do
   end
 
   before do
-    I18nTasks::Utils::CORE_KEYS.each do |key|
+    I18nTasks::CORE_KEYS.each do |key|
       allow(I18n).to receive(:translate!)
         .with(key.to_sym, { locale: "en", raise: true })
         .and_return({})

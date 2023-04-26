@@ -52,7 +52,7 @@ describe.skip "speed grader EVAL-2664" do
         driver.navigate.refresh
         alert_shown = alert_present?
         dismiss_alert
-        expect(alert_shown).to eq(true)
+        expect(alert_shown).to be(true)
       end
     end
 
@@ -134,7 +134,7 @@ describe.skip "speed grader EVAL-2664" do
         # add comment
         Speedgrader.add_comment_and_submit("grader comment")
         # make sure avatar shows up for user comment
-        expect(Speedgrader.avatar_comment).to have_attribute("style", "display: inline\;")
+        expect(Speedgrader.avatar_comment).to have_attribute("style", "display: inline;")
       end
 
       context "Hide Student names checked" do

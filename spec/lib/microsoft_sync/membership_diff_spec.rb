@@ -55,8 +55,8 @@ describe MicrosoftSync::MembershipDiff do
       end
 
       it "indicates #{enrollment_type} users to be added as members" do
-        expect(additions_all_members.select { |user| user.start_with?("student") }).to \
-          eq(%w[student3 student4])
+        expect(additions_all_members.select { |user| user.start_with?("student") })
+          .to eq(%w[student3 student4])
       end
     end
   end
@@ -69,13 +69,13 @@ describe MicrosoftSync::MembershipDiff do
 
     describe "#additions_in_slices_of" do
       it "indicates #{enrollment_type} users to be added as owners" do
-        expect(additions_all_owners.select { |user| user.start_with?("teacher") }).to \
-          eq(%w[teacher5])
+        expect(additions_all_owners.select { |user| user.start_with?("teacher") })
+          .to eq(%w[teacher5])
       end
 
       it "indicates #{enrollment_type} users to be added as members" do
-        expect(additions_all_members.select { |user| user.start_with?("teacher") }).to \
-          eq(%w[teacher5])
+        expect(additions_all_members.select { |user| user.start_with?("teacher") })
+          .to eq(%w[teacher5])
       end
     end
   end
@@ -105,8 +105,8 @@ describe MicrosoftSync::MembershipDiff do
 
     it "yields owners first" do
       expect(additions_all_owners).to eq(%w[teacher4 teacher5 teacher6])
-      expect((additions[0][:owners] + additions[1][:owners]).sort).to \
-        eq(%w[teacher4 teacher5 teacher6])
+      expect((additions[0][:owners] + additions[1][:owners]).sort)
+        .to eq(%w[teacher4 teacher5 teacher6])
     end
 
     it "yields members" do
@@ -171,8 +171,8 @@ describe MicrosoftSync::MembershipDiff do
 
     it "yields owners first" do
       expect(removals_all_owners).to eq(%w[teacher1 teacher2 teacher3])
-      expect((removals[0][:owners] + removals[1][:owners]).sort).to \
-        eq(%w[teacher1 teacher2 teacher3])
+      expect((removals[0][:owners] + removals[1][:owners]).sort)
+        .to eq(%w[teacher1 teacher2 teacher3])
     end
 
     it "yields members" do
@@ -221,13 +221,13 @@ describe MicrosoftSync::MembershipDiff do
     it "when the members size is less than or equal to the max enrollment members" do
       set_local_members "student", (min..half), member_enrollment_type
       set_local_members "teacher", (half...max), owner_enrollment_type
-      expect(subject.max_enrollment_members_reached?).to eq false
+      expect(subject.max_enrollment_members_reached?).to be false
     end
 
     it "when the members size is greater than to the max enrollment members" do
       set_local_members "student", (min..half), member_enrollment_type
       set_local_members "teacher", (half..max), owner_enrollment_type
-      expect(subject.max_enrollment_members_reached?).to eq true
+      expect(subject.max_enrollment_members_reached?).to be true
     end
   end
 
@@ -236,12 +236,12 @@ describe MicrosoftSync::MembershipDiff do
 
     it "when the owners size is less than or equal to the max enrollment owners" do
       set_local_members "teacher", (1...max), owner_enrollment_type
-      expect(subject.max_enrollment_owners_reached?).to eq false
+      expect(subject.max_enrollment_owners_reached?).to be false
     end
 
     it "when the owners size is greater than to the max enrollment owners" do
       set_local_members "teacher", (0..max), owner_enrollment_type
-      expect(subject.max_enrollment_owners_reached?).to eq true
+      expect(subject.max_enrollment_owners_reached?).to be true
     end
   end
 end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Model from '@canvas/backbone/Model.coffee'
+import Model from '@canvas/backbone/Model'
 
 QUnit.module('dateAttributes')
 

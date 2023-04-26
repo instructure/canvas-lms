@@ -114,20 +114,20 @@ describe CommunicationChannel do
 
   it "has a decent state machine" do
     communication_channel_model
-    expect(@cc.state).to eql(:unconfirmed)
+    expect(@cc.state).to be(:unconfirmed)
     @cc.confirm
-    expect(@cc.state).to eql(:active)
+    expect(@cc.state).to be(:active)
     @cc.retire
-    expect(@cc.state).to eql(:retired)
+    expect(@cc.state).to be(:retired)
     @cc.re_activate
-    expect(@cc.state).to eql(:active)
+    expect(@cc.state).to be(:active)
 
     communication_channel_model(path: "another_path@example.com")
-    expect(@cc.state).to eql(:unconfirmed)
+    expect(@cc.state).to be(:unconfirmed)
     @cc.retire
-    expect(@cc.state).to eql(:retired)
+    expect(@cc.state).to be(:retired)
     @cc.re_activate
-    expect(@cc.state).to eql(:active)
+    expect(@cc.state).to be(:active)
   end
 
   it "resets the bounce count when being reactivated" do
@@ -200,14 +200,14 @@ describe CommunicationChannel do
   it "uses a 15-digit confirmation code for default or email path_type settings" do
     communication_channel_model
     expect(@cc.path_type).to eql("email")
-    expect(@cc.confirmation_code.size).to eql(25)
+    expect(@cc.confirmation_code.size).to be(25)
   end
 
   it "uses a 4-digit confirmation_code for settings other than email" do
     communication_channel_model
     @cc.path_type = "sms"
     @cc.set_confirmation_code(true)
-    expect(@cc.confirmation_code.size).to eql(4)
+    expect(@cc.confirmation_code.size).to be(4)
   end
 
   it "defaults the path type to email" do
@@ -266,15 +266,15 @@ describe CommunicationChannel do
     expect(@cc2.user).to eql(@u1)
     expect(@cc3.user).to eql(@u2)
     expect(@cc1.user_id).not_to eql(@cc3.user_id)
-    expect(@cc2.position).to eql(2)
+    expect(@cc2.position).to be(2)
     @cc2.move_to_top
     @cc2.save
     @cc2.reload
-    expect(@cc2.position).to eql(1)
+    expect(@cc2.position).to be(1)
     @cc1.reload
-    expect(@cc1.position).to eql(2)
+    expect(@cc1.position).to be(2)
     @cc3.reload
-    expect(@cc3.position).to eql(1)
+    expect(@cc3.position).to be(1)
   end
 
   it "counts the number of confirmations sent correctly" do
@@ -764,8 +764,8 @@ describe CommunicationChannel do
     context "when destroying a communication channel" do
       it "flags old mappings when destroying a communication channel" do
         cc = communication_channel_model
-        expect(MicrosoftSync::UserMapping).to \
-          receive(:flag_as_needs_updating_if_using_email).with(cc.user)
+        expect(MicrosoftSync::UserMapping).to receive(:flag_as_needs_updating_if_using_email)
+          .with(cc.user)
         cc.destroy_permanently!
       end
     end
@@ -774,8 +774,9 @@ describe CommunicationChannel do
       let!(:cc) { communication_channel_model(path_type: described_class::TYPE_EMAIL) }
 
       it "flags old mappings if path/path_type/position/workflow_state is changed" do
-        expect(MicrosoftSync::UserMapping).to \
-          receive(:flag_as_needs_updating_if_using_email).with(cc.user).exactly(5).times
+        expect(MicrosoftSync::UserMapping).to receive(:flag_as_needs_updating_if_using_email)
+          .with(cc.user)
+          .exactly(5).times
         cc.update!(path: "foo" + cc.path)
         cc.update!(position: cc.position + 1)
         expect(cc.workflow_state).to_not eq("active")

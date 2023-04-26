@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import SwitchEditorControl from '../../react/SwitchEditorControl'

@@ -48,6 +48,7 @@ export const SubmissionInterface = {
       originalityData
       proxySubmitter
       resourceLinkLookupUuid
+      score
       state
       submissionDraft {
         ...SubmissionDraft

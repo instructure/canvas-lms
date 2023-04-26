@@ -386,7 +386,7 @@ describe ContextController do
     it "paginates" do
       get :prior_users, params: { course_id: @course.id }
       expect(response).to be_successful
-      expect(assigns[:prior_users].size).to eql 20
+      expect(assigns[:prior_users].size).to be 20
     end
   end
 
@@ -484,7 +484,7 @@ describe ContextController do
       user_session(@teacher)
       expect_any_instantiation_of(@course).not_to receive(:teacher_names)
       post :undelete_item, params: { course_id: @course.id, asset_string: "teacher_name_1" }
-      expect(response.status).to eq 500
+      expect(response).to have_http_status :internal_server_error
     end
 
     it 'allows undeleting a "normal" association' do

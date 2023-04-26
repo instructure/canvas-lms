@@ -52,7 +52,7 @@ describe "Canvadoc" do
 
     it "returns nil if no secret found in DynamicSettings" do
       allow(DynamicSettings).to receive(:find).with(service: "canvadoc", default_ttl: 5.minutes).and_return({})
-      expect(Canvadoc.jwt_secret).to eq nil
+      expect(Canvadoc.jwt_secret).to be_nil
     end
   end
 
@@ -82,7 +82,7 @@ describe "Canvadoc" do
 
     it "uses targeted exception for timeouts" do
       allow(Canvas).to receive(:timeout_protection).and_return(nil)
-      expect { @doc.upload }.to raise_error(::Canvadoc::UploadTimeout)
+      expect { @doc.upload }.to raise_error(Canvadoc::UploadTimeout)
     end
   end
 

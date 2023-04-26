@@ -17,10 +17,10 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
+import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import template from '../../jst/messageStudentsDialog.handlebars'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
-import ConversationCreator from '../models/ConversationCreator.coffee'
+import ConversationCreator from '../models/ConversationCreator'
 import recipientListTemplate from '../../jst/_messageStudentsWhoRecipientList.handlebars'
 import _ from 'underscore'
 import '@canvas/forms/jquery/serializeForm'

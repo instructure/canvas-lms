@@ -167,7 +167,7 @@ module Canvas
       options = { controller: @controller, scope: scope }
       association.build_serializer(object, options).tap do |serializer|
         if association.options.key?(:wrap_in_array)
-          serializer.instance_variable_set("@wrap_in_array",
+          serializer.instance_variable_set(:@wrap_in_array,
                                            association.options[:wrap_in_array])
         end
       end

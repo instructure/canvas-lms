@@ -227,6 +227,7 @@ zh-Hant:
   a_simplified_canvas_interface_for_k_5_enable_appli_bc32b2d1: |-
       供 K-5 學生使用的簡化版 Canvas。於帳戶設定中啟用作為 K-5 帳戶的適用
       子帳戶。
+  a_single_certificate_file_e7f347f1: 單一憑證檔案
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "未配置 SIS 集成，「啟用新 SIS 集成設定」功能尚未啟用"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "有一名學生剛剛提交了課程 %{course_name} 之 %{assignment_name} 的逾期提交項目"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "有一名學生剛剛提交了課程 %{course_name} 之 %{assignment_title} 的重新提交項目"
@@ -4093,9 +4094,11 @@ zh-Hant:
       settings: 設定
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: 不會為此作業指定成績。
+      assignment_not_yet_graded_rqd_screenreader: 作業尚未評分。
       assignment_not_yet_graded_screenreader: "作業尚未評分。可能分數：%{pointsPossible}。"
       empty_points_possible: "-/%{pointsPossible} 分"
       no_submission: 無提交件
+      no_submission_for_assignment_rqd_screenreader: 未提交此作業。
       no_submission_for_assignment_screenreader: "沒有此作業的提交件。可能分數：%{pointsPossible}。"
       not_yet_graded: "*尚未評分*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} 分"
@@ -4875,7 +4878,10 @@ zh-Hant:
     ldap_fields: 
       auth_filter_description: "使用 *%{placeholder}* 作為使用者提供的使用者名稱預留位置。例如：*(sAMAccountName=%{placeholder})*"
       identifer_format_description: "用於查找 Canvas 登入的 LDAP 屬性。留空以使用使用者提供的使用者名稱。"
+      internal_ca_description: "您果您的 LDAP 伺服器由不愛信任的、內部的根 CA 發行憑證，您*必須*上傳您的根 CA，以便在連線時讓 Canvas 信任該憑證。"
+      internal_ca_warning: "*警告*：使用內部根 CA 較不安全，並且會增加破壞的風險。強烈建議改用信任的憑證機構發行的憑證。"
       ldap_timeout_failure_help2: "如果 Canvas 與 LDAP 伺服器通信時超時次數過多，則會阻止使用 LDAP 伺服器 %{time} 的進一步的登入嘗試。您的 LDAP 伺服器上次超時斷開時間為 %{timestamp}。"
+      verify_tls_cert_opt_in_description: "在 *%{enforcement_date}* 將需要 TLS 憑證驗證，但您可以提早啟用以確保您的 LDAP 伺服器相容。"
     ldap_settings_test: 
       labels: 
         pass: 密碼
@@ -6057,6 +6063,9 @@ zh-Hant:
   catalog_name_46d37909: "Catalog 名稱"
   catalog_url_a01655dd: "Catalog 目錄 URL"
   catalog_users_already_exist_2894b8c4: "Catalog 使用者已存在"
+  catalog_was_provisioned_9851448f: "Catalog 已佈建。"
+  catalog_was_unprovisioned_9524cb58: "Catalog 未佈建。"
+  catalog_was_updated_743a58eb: "Catalog 已更新。"
   category_b9a94408: 類別
   categoryname_notification_preferences_cd64e4a0: "%{categoryName}通知偏好設定"
   cc: 
@@ -6075,6 +6084,8 @@ zh-Hant:
   cell_number_is_required_2edcee60: 行動電話號碼是必填項
   central_value_in_a_set_of_results_calculated_by_di_19a8c48a: 一組結果的中間值。計算方式是以所有項目總分除以分數。
   certificate_fingerprint_b376df90: 憑證指紋
+  certificate_is_expired_or_not_yet_valid_4a3bb8f1: 憑證到期或尚未有效
+  certificate_is_not_a_ca_9ec5d574: "憑證不是 CA"
   change_applied_89d1aa5a: 變更已應用
   change_beginning_date_to_39dbd06e: 更改開始日期為
   change_color_for_mastery_level_position_daa51849: "變更掌握程度評級%{position}的顏色"
@@ -10625,6 +10636,8 @@ zh-Hant:
   drag_a_file_here_or_1aaf19c1: 拖曳檔案到此處，或
   drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: 拖曳檔案到此處，或點按選擇要上傳的檔案
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: 可於單元拖放檔案，並可上載包含多個檔案的單元項目
+  drag_and_drop_or_browse_your_files_92ad4c17: 拖放或*瀏覽您的檔案*
+  drag_and_drop_or_browse_your_files_to_replace_27cc42d6: 拖放或*瀏覽您的檔案*以取代
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: 拖放或點擊以瀏覽您的電腦
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: 拖放或按一下以瀏覽您的電腦
   drag_and_drop_your_image_here_or_7fba7c14: 將您的影像拖放到這裡或者
@@ -15191,6 +15204,7 @@ zh-Hant:
   integrations_cadb03f3: 集成
   interactions_report_47c1219e: 互動報告
   internal_analytics_f02b3fff: 內部分析工具
+  internal_certificate_authority_ca_76566a37: "內部憑證機構 (CA)"
   internal_setting_created_f3f72416: 建立的內部設定
   internal_setting_deleted_aaf1dd9d: 刪除的內部設定
   internal_setting_updated_87510559: 更新的內部設定
@@ -15243,6 +15257,7 @@ zh-Hant:
   invalid_hexcode_9124519f: "無效 hexcode"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "無效 hexcode。請在此輸入有效 hexcode 以使用自訂顏色。"
   invalid_hexcode_provided_522ba223: "提供無效的 hexcode"
+  invalid_login_request_1639c89f: 無效的登入請求
   invalid_microsoft_sync_tenant_given_please_validat_97be36bf: "無效的指定 Microsoft Sync 租借用戶。請驗證您的租借用戶"
   invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "無效的指定 Microsoft Sync 租借用戶。請驗證您的租借用戶。"
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "無效的「Microsoft Teams 同步」遠端屬性。有效的遠端屬性：%{VALID_SYNC_REMOTE_ATTRIBUTES}"
@@ -17776,6 +17791,8 @@ zh-Hant:
       email: 
         html: 
           announcement_info: 此電郵的回覆將發佈為通告的回覆，課程中的每個人都可看到。
+          announcement_info_course: 此電郵的回覆將發佈為通告的回覆，課程中的每個人都可看到。
+          announcement_info_group: 此電郵的回覆將公佈為通告的回覆，群組的每個人都可看到。
           attached_file: 附加的文檔
           link: 檢視通告
         labels: 
@@ -18569,6 +18586,8 @@ zh-Hant:
   modify_permissions_for_account_rubrics_6c3aee59: 帳戶評分標準修改權限
   modify_settings_ed8b9ccf: 修改設定
   module_90d9fd32: 單元
+  module_and_items_published_13ed5cd6: 單元和項目已發佈
+  module_and_items_unpublished_e953ba4f: 單元和項目未發佈
   module_completed_50c50762: 單元已完成
   module_content_import_enhancements_c00b0ea2: 單元內容匯入強化
   module_file_upload_enhancements_eecd4d37: 單元檔案上載強化
@@ -18600,6 +18619,7 @@ zh-Hant:
   module_navigation_97043417: 單元導航
   module_publish_menu_30b638dd: 單元發佈選單
   module_publish_menu_88b54c1b: 單元發佈選單
+  module_published_80f0b9b8: 單元已發佈
   modules: 
     add: 
       assignment: 
@@ -19008,6 +19028,7 @@ zh-Hant:
   nav_text_94206145: 導航文字
   nav_text_active_a924ae88: 導航文字活躍
   navigate_to_speed_grader_for_name_f28cb5b1: "導航到 %{name} 的 Speed Grader"
+  navigate_to_speed_grader_for_title_assignment_828b1366: "導航到 %{title} 作業的 Speed Grader"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: 導航工具允許使用者查看課程導航中的成員連結。
   navigation_icon_45db938e: 導覽圖標
   navigation_menu_fd782ff8: 導航工具選單
@@ -19102,6 +19123,7 @@ zh-Hant:
   new_quizzes_dbda7e0a: 新測驗
   new_quizzes_description: "此功能提升測驗的 Canvas 體驗。啟用此標記後，將可以使用新測驗工具。如需完整詳細資料，請參閱「Canvas 社群」中的*「新測驗使用者群組」*。"
   new_quizzes_embedded_module_progression_cd2307b6: 新測驗嵌入單元進度
+  new_quizzes_export_support_b0a6a625: 新測驗匯出支援
   new_quizzes_importing_c167dce0: "New Quizzes 匯入 LTI"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: 「成果對齊摘要標籤」上包括的新測驗
   new_quizzes_migration_during_course_import_copy_e9dd124e: 課程匯入/複製期間的新測驗遷移
@@ -19377,6 +19399,8 @@ zh-Hant:
   not_submitted_fff47f17: 未提交
   not_synced_529cbf29: 未同步
   not_synced_message_a343fe5e: "未同步：%{message}"
+  not_valid_after_81c9faec: 有效至
+  not_valid_before_9ad2d22d: 開始有效
   not_visible_in_student_files_22f11883: 在學生檔案中看不到
   not_yet_assessed_9362f199: 尚未評估
   not_yet_completed_345a0bca: 尚未完成
@@ -20569,6 +20593,7 @@ zh-Hant:
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "請輸入 0 至 100 之間的數字以指定遷移率"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: 請輸入三個或更多字元的搜索字詞
   please_enter_a_url_d2c868b5: "請輸入一個 URL"
+  please_enter_a_valid_search_term_5c69b0b0: 請輸入有效的搜尋詞彙
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "請輸入有效的 URL（如：http://example.com）"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "請輸入有效的 URL必須有協議 (例如  http://, https://, ftp://, tel:, mailto:)。"
   please_enter_a_valid_url_protocol_is_required_e_g__6dc0071c: "請輸入有效的 URL需要輸入協定 (例如 http://, https://, ftp://, tel:)。"
@@ -21261,6 +21286,7 @@ zh-Hant:
   privacy_290109ea: 隱私權
   privacy_level_f0ec09a3: 隱私層級
   private_3883d133: 私密
+  private_key_is_present_in_certificate_file_1a1b7b42: 私密金鑰在憑證檔案中
   pro_tip_30e41fa3: 小技巧！
   proceed_f3d33864: 繼續
   proceed_with_caution_aa9b3285: 請謹慎進行
@@ -21781,6 +21807,8 @@ zh-Hant:
   publishing_error_bdfb3390: 發佈錯誤
   publishing_is_disabled_for_this_item_efa7803f: 已停用此項目的發佈
   publishing_item_name_is_disabled_8207a9e7: "已停用 %{item_name} 的發佈"
+  publishing_module_and_items_ce128d12: 發佈單元和項目
+  publishing_module_c2b5211: 發佈單元
   publishing_pace_a65e4152: 正在發佈進度中...
   publishing_plan_b70186ed: 發佈計畫中...
   publishing_progress_5154a430: 發佈進度
@@ -23151,6 +23179,8 @@ zh-Hant:
         one: "%{count} 秒"
         other: "%{count} 秒"
       show_time_link: 顯示時間
+      time_remaining: "您已%{time}剩餘"
+      times_up: "時間到了！10 秒後提交結果"
       titles: 
         come_back_later: 您標記了此問題，以在隨後再返回
         times_up: 时间已到！
@@ -23590,6 +23620,7 @@ zh-Hant:
   remove_attribute_59a4aa64: 刪除屬性
   remove_avatar_picture_aba765eb: 移除頭像圖片
   remove_c_name_section_d8eabd3a: "刪除 %{c.name} 章節"
+  remove_certificate_4e979eee: 移除憑證
   remove_collaborationtitle_c3e81adb: "確定要刪除 \"%{collaborationTitle}\"？"
   remove_condition_9cf94f7f: 移除條件
   remove_conference_69b9e0d0: 移除會議
@@ -24401,6 +24432,7 @@ zh-Hant:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: 在成績單中搜尋作業列表和作業與學生搜尋的新設計
   search_by_99d1ba5f: 以...搜索
   search_by_c559efd: 以...搜索
+  search_by_name_or_id_3bdab12e: "依名稱或 ID 搜尋"
   search_by_student_name_26536097: 依學生姓名搜尋
   search_by_title_or_author_273a8f49: 根據標題或作者搜尋...
   search_by_title_short_name_or_sis_id_fe84aa12: "按標題、短名稱、或 SIS ID 搜索"
@@ -24590,6 +24622,7 @@ zh-Hant:
     one: "選擇所有 (%{count}) 課程"
     other: "選擇所有 (%{count}) 課程"
   select_all_students_7c2c34b3: 選擇所有學生
+  select_an_account_to_update_b7521f0a: 選擇要更新的帳戶。
   select_an_edit_operation_ec1467d: 選擇一個編輯操作
   select_an_outcome_group_6edb08a7: 選擇成果群組
   select_another_group_24773e5f: 選擇其他小組
@@ -26241,6 +26274,7 @@ zh-Hant:
   sticky_left_navigation_3d438a81: 自黏便箋左側導航
   still_having_difficulty_get_more_help_here_3cdc8de1: 仍有問題？在此取得更多協助：
   stop_acting_as_user_8809a97f: 停止作為使用者
+  stop_fd9822ab: 停止
   storage_quotas_manage_6ca14bbb: "儲存空間限額 - 管理"
   storage_used_in_mb_c75fbd9c: "已使用儲存 (MB)"
   store_and_share_course_assets_82a9967c: 儲存及分享課程資產
@@ -26771,6 +26805,7 @@ zh-Hant:
       student_support: "NetAcad 支援 - 學生"
       student_support_description: "您的導師應該是您的第一個聯絡點。他們可以回答您的 Networking Academy（網路學院）問題，或為您聯絡支援中心。您可以使用收件匣功能聯絡您的導師。"
       support_desk_livechat: 支援桌面實時聊天
+  support_exporting_new_quizzes_in_qti_format_ba09b465: "支援以 QTI 格式匯出新測驗"
   support_favorite_lti_tools_in_the_rce_1680436d: "RCE 支援最愛 LTI 工具"
   support_latex_math_equations_almost_everywhere_6ce8ca24: 在大部分位置支援LaTex數學方程式
   support_uploading_closed_caption_files_in_all_the__418c06d4: |-
@@ -27821,6 +27856,7 @@ zh-Hant:
   this_permission_requires_the_account_and_course_le_bdeefd51: 此權限需要「帳戶和課程級別學習成果掌握程度」預覽選項，僅可以在帳戶級別啟用。
   this_permission_should_only_be_assigned_to_users_t_231c182e: "此權限應僅指派給您的機構已授權作為您的整個 Canvas 帳戶中的其他使用者的使用者。"
   this_placement_requires_deep_link_support_by_the_v_702d554f: "此配置需要供應商支援 Deep Link。與您的工具供應商確認以確保他們支援此功能"
+  this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: 此程序可能需要幾分鐘的時間。按一下「停止」按鈕以中止處理。已處理的項目將不會回復到之前的狀態。
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: 此程序可能需要幾分鐘的時間。按下取消將會停止程序，但已處理的項目不會回復到之前的狀態。
   this_pronoun_appears_after_last_name_bf5c0bf5: 此代詞將顯示於姓氏後面
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: 此代詞在啟用後將出現在您的名字之後
@@ -29018,6 +29054,7 @@ zh-Hant:
   unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
       無法取得 SFTP 使用者表格的鎖。請在一分鐘內再試一次。
                                     如果持續失敗，請在 Slack 的 #canvas-sre 中聯絡。
+  unable_to_parse_certificate_f25ff8b5: 無法剖析憑證
   unable_to_read_file_2d04b0c: 無法讀取檔案
   unable_to_remove_app_4293cb53: 無法刪除應用程式
   unable_to_remove_outcomes_f682e68f: 
@@ -29034,7 +29071,9 @@ zh-Hant:
   unable_to_switch_students_b901bc4b: 無法切換學生
   unable_to_toggle_placement_833db6ff: 無法切換配置
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "無法將檔案傳輸到儲存空間服務。該服務可能已關閉，或者您可能需要重新登入 Canvas。"
+  unable_to_update_domains_44c5dd55: 無法更新網域
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "無法更新「Microsoft Teams 同步」設定。請重試。如果問題仍然存在，請聯絡支援中心。"
+  unable_to_update_quotas_62baf95b: 無法更新限額
   unable_to_update_splitscreen_preference_4d449fa5: 無法更新分割畫面偏好設定。
   unaccepted_students_aa68ea98: 未接受的學生
   unarchive_f245e2d6: 取消存檔
@@ -29187,6 +29226,7 @@ zh-Hant:
   unpublished_drafts_count_86e16f17: "已取消發佈草稿（%{count}）"
   unpublished_subjects_62a7d38: 取消發佈的主題
   unpublishing_1fa99dc6: 正在取消發佈...
+  unpublishing_module_and_items_ca2edd97: 未發佈單元和項目
   unread_c14cb06f: 未讀，
   unread_e9c1b19c: 未讀
   unread_ee6db4aa: 未讀
@@ -29315,6 +29355,7 @@ zh-Hant:
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: 將任務所需的提交文檔上載至一個特殊的只讀提交文件夾
   upload_gradebook_386a46c8: 上傳成績冊
   upload_image_6120b609: 上傳影像
+  upload_internal_root_ca_46cf9b36: "上傳內部根 CA"
   upload_media_ce31135a: 上傳媒體
   upload_not_available_for_this_folder_8f8623c6: 此資料夾無法使用上載功能。
   upload_percent_complete_d533d3e2: 完成上傳百分比
@@ -29362,6 +29403,10 @@ zh-Hant:
   use_arrows_a60b3330: 使用箭頭
   use_as_front_page_274a488b: 用作標題版
   use_as_frontpagetext_fa88bbb2: "作為 %{frontPageText}"
+  use_attachment_ids_in_media_links_7bfb3422: "在媒體連結中使用附件 ID"
+  use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
+      在媒體連結中使用附件 ID，因此使用者始終可以指向媒體
+      而不是原始的執行個體
   use_between_for_adding_multiple_users_26bff207: 添加多個使用者時以逗號分隔。
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "對於註冊學生索引中的 API 分頁使用書籤"
   use_cloudfront_for_docviewer_f21b96db: "在 DocViewer 使用 CloudFront"
@@ -29945,6 +29990,7 @@ zh-Hant:
   users_with_this_permission_may_be_able_to_use_the__84394072: 擁有此權限的使用者獲許使用「作為」功能以管理帳戶設定、檢視及調整評分、存取使用者資訊等。此權限亦允許獲指派至子帳戶的管理員存取其子帳戶以外的設定及資訊。
   uses_the_new_scheduler_and_its_functionality_b07e9b14: 使用新的排程工具及其功能
   utc_e44049af: UTC
+  uuid_has_been_provisioned_ab0c6c9: "UUID 已佈建。"
   validate: 
     is_required: 此字段為必填項
   validate_links_in_content_b1630fba: 驗證內容中的連結
@@ -29967,6 +30013,7 @@ zh-Hant:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite 相似分數 -- 更多資訊"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite相似分數 - 參閱詳細報告"
   verify_ldap_tls_certificates_70241d8e: "驗證 LDAP TLS 憑證"
+  verify_tls_certificate_9cfa26d1: "驗證 TLS 憑證"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "驗證 LDAP 驗證提供者提供的 TLS 憑證。"
   version_versionnumber_updatedat_9f5b7a5b: "版本 %{versionNumber} %{updatedAt}"
   video_78335c71: 影片

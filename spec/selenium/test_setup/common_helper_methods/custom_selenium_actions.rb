@@ -513,7 +513,7 @@ module CustomSeleniumActions
     # This is a known issue and hasn't been solved yet. https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
     if SeleniumDriverSetup.saucelabs_test_run?
       el.click
-      el.send_keys [(driver.browser == :safari ? :command : :control), "a"]
+      el.send_keys [((driver.browser == :safari) ? :command : :control), "a"]
       el.send_keys(value)
     else
       driver.execute_script("arguments[0].select();", el)
@@ -673,7 +673,7 @@ module CustomSeleniumActions
   end
 
   def dismiss_flash_messages_if_present
-    unless (find_all_with_jquery(flash_message_selector).length) == 0
+    unless find_all_with_jquery(flash_message_selector).empty?
       find_all_with_jquery(flash_message_selector).each(&:click)
     end
   end

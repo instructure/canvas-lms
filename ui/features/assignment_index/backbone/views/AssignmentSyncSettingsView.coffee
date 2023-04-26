@@ -18,7 +18,7 @@
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
-import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
+import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import assignmentSyncSettingsTemplate from '../../jst/AssignmentSyncSettings.handlebars'
 import '@canvas/rails-flash-notifications'

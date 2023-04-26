@@ -97,8 +97,8 @@ module ManageGroupsCommon
   end
 
   def simulate_group_drag(user_id, from_group_id, to_group_id)
-    from_group = (from_group_id == "blank" ? ".group_blank:visible" : "#group_#{from_group_id}")
-    to_group = (to_group_id == "blank" ? ".group_blank:visible" : "#group_#{to_group_id}")
+    from_group = ((from_group_id == "blank") ? ".group_blank:visible" : "#group_#{from_group_id}")
+    to_group = ((to_group_id == "blank") ? ".group_blank:visible" : "#group_#{to_group_id}")
     driver.execute_script(<<~JS)
       window.contextGroups.moveToGroup(
         $('#{from_group} .user_id_#{user_id}'),
@@ -108,7 +108,7 @@ module ManageGroupsCommon
   end
 
   def expand_group(group_id)
-    group_selector = (group_id == "unassigned" ? ".unassigned-students" : ".group[data-id=\"#{group_id}\"]")
+    group_selector = ((group_id == "unassigned") ? ".unassigned-students" : ".group[data-id=\"#{group_id}\"]")
     return if group_selector == ".unassigned-students" || f(group_selector).attribute(:class).include?("group-expanded")
 
     fj("#{group_selector} .toggle-group").click

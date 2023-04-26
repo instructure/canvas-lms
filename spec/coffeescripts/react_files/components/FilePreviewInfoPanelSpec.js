@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
 import FilePreviewInfoPanel from '@canvas/files/react/components/FilePreviewInfoPanel'
-import File from '@canvas/files/backbone/models/File.coffee'
+import File from '@canvas/files/backbone/models/File'
 
 QUnit.module('File Preview Info Panel Specs', {
   setup() {

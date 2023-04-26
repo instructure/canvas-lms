@@ -372,8 +372,8 @@ describe MicrosoftSync::GraphService::Http do
 
     it "passes in a url and quota to subsequent requests" do
       subject
-      expect(http).to \
-        have_received(:request).with(:get, continue_url, hash_including(quota: [2, 3]))
+      expect(http).to have_received(:request)
+        .with(:get, continue_url, hash_including(quota: [2, 3]))
     end
 
     context "when passed special_cases" do
@@ -384,14 +384,14 @@ describe MicrosoftSync::GraphService::Http do
 
       it "passes it on to the first request" do
         subject
-        expect(http).to \
-          have_received(:request).with(:get, "some/list", hash_including(special_cases: cases))
+        expect(http).to have_received(:request)
+          .with(:get, "some/list", hash_including(special_cases: cases))
       end
 
       it "passes it on to subsequent requests" do
         subject
-        expect(http).to \
-          have_received(:request).with(:get, continue_url, hash_including(special_cases: cases))
+        expect(http).to have_received(:request)
+          .with(:get, continue_url, hash_including(special_cases: cases))
       end
     end
   end

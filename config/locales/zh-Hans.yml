@@ -227,6 +227,7 @@ zh-Hans:
   a_simplified_canvas_interface_for_k_5_enable_appli_bc32b2d1: |-
       针对 K-5 进行简化的 Canvas 界面。允许在帐户设置中使用适用的子帐户作为
       K-5 帐户。
+  a_single_certificate_file_e7f347f1: 单个证书文件
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "未配置 SIS 集成，且未启用“启用新 SIS 集成设置”功能"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "一位学生刚刚在课程%{course_name}中延迟提交了%{assignment_name}"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "一个学生刚刚提交了课程 %{course_name} 中 %{assignment_title} 的重新提交项"
@@ -4091,9 +4092,11 @@ zh-Hans:
       settings: 设置
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: 此作业将不评分。
+      assignment_not_yet_graded_rqd_screenreader: 作业尚未评分。
       assignment_not_yet_graded_screenreader: "作业尚未计分。%{pointsPossible} 最高得分。"
       empty_points_possible: "-/%{pointsPossible} 分"
       no_submission: 无提交
+      no_submission_for_assignment_rqd_screenreader: 此作业无提交项。
       no_submission_for_assignment_screenreader: "此作业无提交。%{pointsPossible} 最高得分。"
       not_yet_graded: "*尚未计分*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} 分"
@@ -4871,7 +4874,10 @@ zh-Hans:
     ldap_fields: 
       auth_filter_description: "使用*%{placeholder}*作为由用户提供的用户名的占位符。例如：*(sAMAccountName=%{placeholder})*"
       identifer_format_description: "查找 Canvas 登录时要使用的 LDAP 属性。保留空白，以使用由用户提供的用户名。"
+      internal_ca_description: "如果 LDAP 服务器提供的证书由不受信任的内部根 CA 颁发，就*必须*上传根 CA，让 Canvas 在连接时信任它。"
+      internal_ca_warning: "*警告*：使用内部根 CA 的安全性较低，同时增加了泄露风险。强烈建议使用由受信任的证书颁发机构颁发的证书。"
       ldap_timeout_failure_help2: "如果 Canvas 在与 LDAP 服务器通信时多次超时，它将在 %{time} 内阻止使用该 LDAP 服务器尝试再次登录。您的 LDAP 服务器上次超时时间为 %{timestamp}。"
+      verify_tls_cert_opt_in_description: "*%{enforcement_date}* 开始需要 TLS 证书验证，但您可以提前启用以确保 LDAP 服务器合规。"
     ldap_settings_test: 
       labels: 
         pass: 密码
@@ -6051,6 +6057,9 @@ zh-Hans:
   catalog_name_46d37909: 目录名称
   catalog_url_a01655dd: "目录 URL"
   catalog_users_already_exist_2894b8c4: 目录用户已经存在
+  catalog_was_provisioned_9851448f: 已提供目录。
+  catalog_was_unprovisioned_9524cb58: 未提供目录。
+  catalog_was_updated_743a58eb: 已更新目录。
   category_b9a94408: 类别
   categoryname_notification_preferences_cd64e4a0: "%{categoryName} 通知首选项"
   cc: 
@@ -6069,6 +6078,8 @@ zh-Hans:
   cell_number_is_required_2edcee60: 手机号码无效！
   central_value_in_a_set_of_results_calculated_by_di_19a8c48a: 一组结果中的中间值。通过各项分数总和除以分数个数计算得出。
   certificate_fingerprint_b376df90: 指纹证明
+  certificate_is_expired_or_not_yet_valid_4a3bb8f1: 证书已过期或尚未生效
+  certificate_is_not_a_ca_9ec5d574: "证书不是 CA"
   change_applied_89d1aa5a: 已应用的更改
   change_beginning_date_to_39dbd06e: 改变开始日期到
   change_color_for_mastery_level_position_daa51849: "更改掌握程度级别 %{position} 的颜色"
@@ -10609,6 +10620,8 @@ zh-Hans:
   drag_a_file_here_or_1aaf19c1: 将文件拖到此处，或者
   drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: 将文件拖到此处，或者单击选择要上传的文件
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: 将文件拖放到模块上并上传多文件模块项目
+  drag_and_drop_or_browse_your_files_92ad4c17: 拖放或*浏览文件*
+  drag_and_drop_or_browse_your_files_to_replace_27cc42d6: 拖放或*浏览文件*以替换
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: 拖放或单击以浏览计算机
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: 拖放或点击以浏览计算机
   drag_and_drop_your_image_here_or_7fba7c14: 拖放您的图像到此或
@@ -15177,6 +15190,7 @@ zh-Hans:
   integrations_cadb03f3: 整合
   interactions_report_47c1219e: 互动报告
   internal_analytics_f02b3fff: 内部分析工具
+  internal_certificate_authority_ca_76566a37: "内部证书颁发机构 (CA)"
   internal_setting_created_f3f72416: 已创建内部设置
   internal_setting_deleted_aaf1dd9d: 已删除内部设置
   internal_setting_updated_87510559: 已更新内部设置
@@ -15229,6 +15243,7 @@ zh-Hans:
   invalid_hexcode_9124519f: 无效的十六进制代码
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: 无效的十六进制代码。在此处输入有效的十六进制代码，以使用自定义颜色。
   invalid_hexcode_provided_522ba223: 提供的十六进制代码无效
+  invalid_login_request_1639c89f: 无效的登录请求
   invalid_microsoft_sync_tenant_given_please_validat_97be36bf: "给定的 Microsoft Sync 租户无效。请验证您的租户"
   invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "给定的 Microsoft Sync 租户无效。请验证您的租户。"
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "无效的 Microsoft Team Sync 远程属性。有效的远程属性：%{VALID_SYNC_REMOTE_ATTRIBUTES}"
@@ -17762,6 +17777,8 @@ zh-Hans:
       email: 
         html: 
           announcement_info: 对此电子邮件的回复将作为对公告的回复发布，对课程中的每个人都可见。
+          announcement_info_course: 对此电子邮件的回复将作为对公告的回复发布，对课程中的每个人都可见。
+          announcement_info_group: 对此电子邮件的回复将作为对公告的回复发布，对小组中的每个人都可见。
           attached_file: 附件文件
           link: 查看公告
         labels: 
@@ -18555,6 +18572,8 @@ zh-Hans:
   modify_permissions_for_account_rubrics_6c3aee59: 修改帐户评价量规的权限
   modify_settings_ed8b9ccf: 修改设置
   module_90d9fd32: 单元
+  module_and_items_published_13ed5cd6: 已发布单元和项目
+  module_and_items_unpublished_e953ba4f: 已取消发布单元和项目
   module_completed_50c50762: 单元已完成
   module_content_import_enhancements_c00b0ea2: 模块内容导入增强
   module_file_upload_enhancements_eecd4d37: 模块化文件上传增强
@@ -18586,6 +18605,7 @@ zh-Hans:
   module_navigation_97043417: 单元导航
   module_publish_menu_30b638dd: 单元发布菜单
   module_publish_menu_88b54c1b: 单元发布菜单
+  module_published_80f0b9b8: 已发布单元
   modules: 
     add: 
       assignment: 
@@ -18994,6 +19014,7 @@ zh-Hans:
   nav_text_94206145: 导航文本
   nav_text_active_a924ae88: 导航文本活动
   navigate_to_speed_grader_for_name_f28cb5b1: "导航到%{name}的Speed Grader"
+  navigate_to_speed_grader_for_title_assignment_828b1366: "导航到 speed grader 对 %{title} 作业进行评分"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: 导航允许用户在“课程导航”中查看“人员”链接。
   navigation_icon_45db938e: 导航图标
   navigation_menu_fd782ff8: 导航菜单
@@ -19088,6 +19109,7 @@ zh-Hans:
   new_quizzes_dbda7e0a: 新测验
   new_quizzes_description: "此功能改进了 Canvas 的测验体验。启用此标记后，新测验工具将可用。有关完整详情，请参阅 Canvas 社区中的*新测验用户组*。"
   new_quizzes_embedded_module_progression_cd2307b6: 新测验嵌入模块进度
+  new_quizzes_export_support_b0a6a625: 新测验导出支持
   new_quizzes_importing_c167dce0: "New Quizzes 导入"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: 包含在“结果核对概览”选项卡上的新测验
   new_quizzes_migration_during_course_import_copy_e9dd124e: 在课程导入/复制期间的新测验迁移
@@ -19363,6 +19385,8 @@ zh-Hans:
   not_submitted_fff47f17: 未提交
   not_synced_529cbf29: 未同步
   not_synced_message_a343fe5e: "未同步：%{message}"
+  not_valid_after_81c9faec: 有效期截至
+  not_valid_before_9ad2d22d: 生效时间为
   not_visible_in_student_files_22f11883: 在学生文件中不可见
   not_yet_assessed_9362f199: 尚未评估
   not_yet_completed_345a0bca: 尚未完成
@@ -20552,6 +20576,7 @@ zh-Hans:
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "请输入 0 至 100 之间的数字表示迁移概率"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: 请输入具有三个或更多字符的搜索词
   please_enter_a_url_d2c868b5: 请输入url
+  please_enter_a_valid_search_term_5c69b0b0: 请输入有效的搜索词
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "请输入有效的url（例如http://example.com）"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "请输入有效的 URL。要求协议（例如 http://、https://、ftp://、tel:、mailto:）。"
   please_enter_a_valid_url_protocol_is_required_e_g__6dc0071c: "请输入有效的 URL。协议是必填项（例如，http://、https://、ftp://，电话：）。"
@@ -21244,6 +21269,7 @@ zh-Hans:
   privacy_290109ea: 隐私
   privacy_level_f0ec09a3: 隐私级别
   private_3883d133: 私人
+  private_key_is_present_in_certificate_file_1a1b7b42: 证书文件中存在私钥
   pro_tip_30e41fa3: 专业意见！
   proceed_f3d33864: 继续
   proceed_with_caution_aa9b3285: 谨慎考虑后再继续
@@ -21760,6 +21786,8 @@ zh-Hans:
   publishing_error_bdfb3390: 发布错误
   publishing_is_disabled_for_this_item_efa7803f: 发布为此项目禁用
   publishing_item_name_is_disabled_8207a9e7: "禁止发布%{item_name}"
+  publishing_module_and_items_ce128d12: 正在发布单元和项目
+  publishing_module_c2b5211: 正在发布单元
   publishing_pace_a65e4152: 正在发布进度...
   publishing_plan_b70186ed: 正在发布计划...
   publishing_progress_5154a430: 发布进度
@@ -23131,6 +23159,8 @@ zh-Hans:
         one: "%{count} 秒"
         other: "%{count} 秒"
       show_time_link: 显示时间
+      time_remaining: "您的剩余时间为 %{time}"
+      times_up: "时间到了！在 10 秒内提交结果"
       titles: 
         come_back_later: 您已标记此问题以稍后返回
         times_up: 时间到！
@@ -23570,6 +23600,7 @@ zh-Hans:
   remove_attribute_59a4aa64: 移除属性
   remove_avatar_picture_aba765eb: 删除头像
   remove_c_name_section_d8eabd3a: "删除%{c.name} 部分"
+  remove_certificate_4e979eee: 删除证书
   remove_collaborationtitle_c3e81adb: "删除“%{collaborationTitle}”？"
   remove_condition_9cf94f7f: 移除条件
   remove_conference_69b9e0d0: 删除会议
@@ -24380,6 +24411,7 @@ zh-Hans:
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: 评分册中的搜索作业以及作业和学生搜索的新设计
   search_by_99d1ba5f: 搜索条件
   search_by_c559efd: 搜索依据
+  search_by_name_or_id_3bdab12e: "按名称或 id 搜索"
   search_by_student_name_26536097: 按学生姓名搜索
   search_by_title_or_author_273a8f49: 按标题或作者搜索……
   search_by_title_short_name_or_sis_id_fe84aa12: "按标题、简称或 SIS ID 搜索"
@@ -24569,6 +24601,7 @@ zh-Hans:
     one: "选择所有(%{count})课程"
     other: "选择所有(%{count})课程"
   select_all_students_7c2c34b3: 选择全部学生
+  select_an_account_to_update_b7521f0a: 请选择要更新的帐户。
   select_an_edit_operation_ec1467d: 选择编辑操作
   select_an_outcome_group_6edb08a7: 选择结果组
   select_another_group_24773e5f: 选择其他小组
@@ -26219,6 +26252,7 @@ zh-Hans:
   sticky_left_navigation_3d438a81: 粘滞左侧导航
   still_having_difficulty_get_more_help_here_3cdc8de1: 仍然有困难？在此处获取更多帮助：
   stop_acting_as_user_8809a97f: 停止临时代理用户
+  stop_fd9822ab: 停止
   storage_quotas_manage_6ca14bbb: "存储限额 - 管理"
   storage_used_in_mb_c75fbd9c: 以MB为单位使用存储
   store_and_share_course_assets_82a9967c: 存储和共享课程资源
@@ -26751,6 +26785,7 @@ zh-Hans:
       student_support: "NetAcad 支持 - 学生"
       student_support_description: 你的讲师将是您的第一联络人。他们可以回答您的网络学院问题或为您联系支持服务台。您可以使用收件箱功能联系您的讲师。
       support_desk_livechat: 支持桌面实时聊天
+  support_exporting_new_quizzes_in_qti_format_ba09b465: "支持以 QTI 格式导出新测验"
   support_favorite_lti_tools_in_the_rce_1680436d: "RCE 中支持 LTI 工具收藏"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "几乎在任何位置支持 LaTex 数学等式"
   support_uploading_closed_caption_files_in_all_the__418c06d4: "支持以 Canvas 支持的所有语言上传关闭的字幕文件。"
@@ -27798,6 +27833,7 @@ zh-Hans:
   this_permission_requires_the_account_and_course_le_bdeefd51: 此权限要求使用帐户和课程级结果掌握程度等级功能选项，该选项只能在帐户级启用。
   this_permission_should_only_be_assigned_to_users_t_231c182e: 此权限只能分配给经您的机构授权在您整个Canvas帐户中以其他用户的身份执行操作的用户。
   this_placement_requires_deep_link_support_by_the_v_702d554f: 此位置需要供应商支持深层链接。请与您的工具供应商核实，确保他们支持此功能。
+  this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: 该过程可能需要几分钟。单击“停止”按钮以停止处理。已处理的项目将不会恢复到以前的状态。
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: 该过程可能需要几分钟。单击“取消”将停止该过程，但已处理的项目将不会恢复到以前的状态。
   this_pronoun_appears_after_last_name_bf5c0bf5: 此代词显示在姓氏后面
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: 启用后，该代号将显示在您的姓名后面。
@@ -28994,6 +29030,7 @@ zh-Hans:
   unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
       无法获取 SFTP 用户表上的锁定。请稍后重试。
                                     如果仍然失败，请在 Slack 中的 #canvas-sre 中联系相关人员。
+  unable_to_parse_certificate_f25ff8b5: 无法解析证书
   unable_to_read_file_2d04b0c: 无法读取文件
   unable_to_remove_app_4293cb53: 无法删除应用程序
   unable_to_remove_outcomes_f682e68f: 
@@ -29010,7 +29047,9 @@ zh-Hans:
   unable_to_switch_students_b901bc4b: 无法切换学生
   unable_to_toggle_placement_833db6ff: 无法切换位置
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "无法将文件传输到存储服务。服务可能中断，或者您可能需要重新登录到 Canvas。"
+  unable_to_update_domains_44c5dd55: 无法更新域
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "无法更新 Microsoft Teams Sync 设置。请重试。如果问题仍然存在，请联系支持人员。"
+  unable_to_update_quotas_62baf95b: 无法更新配额
   unable_to_update_splitscreen_preference_4d449fa5: 无法更新分屏首选项。
   unaccepted_students_aa68ea98: 未接受的学生
   unarchive_f245e2d6: 取消存档
@@ -29163,6 +29202,7 @@ zh-Hans:
   unpublished_drafts_count_86e16f17: "未发布的草稿 (%{count})"
   unpublished_subjects_62a7d38: 取消发布的主题
   unpublishing_1fa99dc6: 取消发布...
+  unpublishing_module_and_items_ca2edd97: 正在取消发布单元和项目
   unread_c14cb06f: 未读，
   unread_e9c1b19c: 未读
   unread_ee6db4aa: 未读
@@ -29286,6 +29326,7 @@ zh-Hans:
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: 上传作业提交的文件到一个具体只读提交文件夹里
   upload_gradebook_386a46c8: 上传评分册
   upload_image_6120b609: 上传图像
+  upload_internal_root_ca_46cf9b36: "上传内部根 CA"
   upload_media_ce31135a: 上传媒体
   upload_not_available_for_this_folder_8f8623c6: 无法上传此文件
   upload_percent_complete_d533d3e2: 上传完成百分比
@@ -29333,6 +29374,10 @@ zh-Hans:
   use_arrows_a60b3330: 使用箭头
   use_as_front_page_274a488b: 用作首页
   use_as_frontpagetext_fa88bbb2: "作为%{frontPageText}使用"
+  use_attachment_ids_in_media_links_7bfb3422: "在媒体链接中使用附件 ID"
+  use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
+      在媒体链接中使用附件 id 以便始终将用户指向正确的媒体
+      实例，而不是原始媒体实例
   use_between_for_adding_multiple_users_26bff207: 添加多个用户时使用“，”隔开。
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: 在注册索引里使用API分页书签
   use_cloudfront_for_docviewer_f21b96db: "对 DocViewer 使用 CloudFront"
@@ -29916,6 +29961,7 @@ zh-Hans:
   users_with_this_permission_may_be_able_to_use_the__84394072: 具有此权限的用户可能还能使用“身份”功能管理帐户设置、查看和调整评分、访问用户消息等。此权限还允许向子帐户指定管理员，以访问其子帐户以外的设置和信息。
   uses_the_new_scheduler_and_its_functionality_b07e9b14: 使用新的调度器及其功能
   utc_e44049af: UTC
+  uuid_has_been_provisioned_ab0c6c9: "已提供 UUID。"
   validate: 
     is_required: 此字段为必填字段
   validate_links_in_content_b1630fba: 验证的内容链接
@@ -29938,6 +29984,7 @@ zh-Hans:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite 相似度评分 - 更多信息"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite相似性分数 - 查看详细报告"
   verify_ldap_tls_certificates_70241d8e: "验证 LDAP TLS 证书"
+  verify_tls_certificate_9cfa26d1: "验证 TLS 证书"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "验证 LDAP 身份验证提供程序提供的 TLS 证书。"
   version_versionnumber_updatedat_9f5b7a5b: "版本 %{versionNumber} %{updatedAt}"
   video_78335c71: 视频

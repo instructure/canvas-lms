@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {sendMessageStudentsWho} from './shared/grading/messageStudentsWhoHelper'
+
 declare global {
   interface Global {
     readonly ENV?: any
@@ -25,6 +27,8 @@ declare global {
     readonly ENV?: any
     webkitSpeechRecognition: any
     jsonData: any
+
+    messageStudents: (options: ReturnType<typeof sendMessageStudentsWho>) => void
     updateGrades: () => void
   }
 

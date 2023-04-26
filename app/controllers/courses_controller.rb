@@ -1105,7 +1105,7 @@ class CoursesController < ApplicationController
         # don't calculate a total count/last page for this endpoint.
         # total_entries: nil
         users = Api.paginate(users, self, api_v1_course_users_url, { total_entries: nil })
-        includes = Array(params[:include]).concat(["sis_user_id", "email"])
+        includes = Array(params[:include]).push("sis_user_id", "email")
 
         # user_json_preloads loads both active/accepted and deleted
         # group_memberships when passed "group_memberships: true." In a
@@ -1894,7 +1894,7 @@ class CoursesController < ApplicationController
     if (enrollment = fetch_enrollment)
       if enrollment.state_based_on_date == :inactive && !ignore_restricted_courses
         flash[:notice] = t("notices.enrollment_not_active", "Your membership in the course, %{course}, is not yet activated", course: @context.name)
-        return !!redirect_to(enrollment.workflow_state == "invited" ? courses_url : dashboard_url)
+        return !!redirect_to((enrollment.workflow_state == "invited") ? courses_url : dashboard_url)
       end
 
       if enrollment.rejected?
@@ -1982,7 +1982,7 @@ class CoursesController < ApplicationController
         id = split.pop
         (types[split.join("_")] ||= []) << id
       end
-      locks_hash = Rails.cache.fetch(["locked_for_results", @current_user, Digest::MD5.hexdigest(params[:assets])].cache_key) do
+      locks_hash = Rails.cache.fetch(["locked_for_results", @current_user, Digest::SHA256.hexdigest(params[:assets])].cache_key) do
         locks = {}
         types.each do |type, ids|
           case type
@@ -3177,7 +3177,7 @@ class CoursesController < ApplicationController
         if (mc_restrictions_by_type = params[:course][:blueprint_restrictions_by_object_type])
           parsed_restrictions_by_type = {}
           mc_restrictions_by_type.to_unsafe_h.each do |type, restrictions|
-            class_name = type == "quiz" ? "Quizzes::Quiz" : type.camelcase
+            class_name = (type == "quiz") ? "Quizzes::Quiz" : type.camelcase
             parsed_restrictions_by_type[class_name] = restrictions.to_h { |k, v| [k.to_sym, value_to_boolean(v)] }
           end
           template.default_restrictions_by_type = parsed_restrictions_by_type
@@ -3954,7 +3954,7 @@ class CoursesController < ApplicationController
   def require_user_or_observer
     return render_unauthorized_action unless @current_user.present?
 
-    @user = params[:user_id] == "self" ? @current_user : api_find(User, params[:user_id])
+    @user = (params[:user_id] == "self") ? @current_user : api_find(User, params[:user_id])
     authorized_action(@user, @current_user, :read)
   end
 

@@ -17,7 +17,7 @@
  */
 
 import ScoreToGradeHelper from './shared/helpers/ScoreToGradeHelper'
-import round from 'round'
+import round from '@canvas/round'
 import type {Submission} from '../../../api.d'
 
 const equivalentToNull = [undefined, null, '', 0]

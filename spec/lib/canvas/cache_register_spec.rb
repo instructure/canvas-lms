@@ -360,7 +360,7 @@ describe Canvas::CacheRegister do
         @user.cache_key(:enrollments)
       end
       Timecop.freeze(time2) do
-        expect(User.cache_key_for_id(@user.id, :enrollments)).to eq nil
+        expect(User.cache_key_for_id(@user.id, :enrollments)).to be_nil
       end
     end
 

@@ -51,7 +51,7 @@
 //       bool,default true  storing / retrieving unread counts before polling
 //                          the Canvas API.
 
-import React, {useRef, useState, useEffect} from 'react'
+import React, {useRef, useState, useEffect, useCallback} from 'react'
 import {createPortal} from 'react-dom'
 import {any, bool, func, number, string} from 'prop-types'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
@@ -202,7 +202,7 @@ export default function UnreadCounts(props) {
     return cleanup
   }
 
-  function checkSavedValue() {
+  const checkSavedValue = useCallback(() => {
     // Get some data from saved history and use it if we can before we start
     // polling the API. If we do use it, arrange to poll the API only when
     // the saved value ages out.
@@ -218,14 +218,19 @@ export default function UnreadCounts(props) {
         }
       }
     }
-    syncState.current.savedChecked = true
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allowedAge, count, dataUrl])
+
+  useEffect(() => {
+    // If we haven't started polling yet, see if we can use a saved value
+    if (useSessionStorage && !syncState.current.savedChecked) {
+      checkSavedValue()
+      syncState.current.savedChecked = true
+    }
+  }, [useSessionStorage, checkSavedValue])
 
   // deps is the empty array because we want to fire off the polling exactly once
   useEffect(startPolling, [])
-
-  // If we haven't started polling yet, see if we can use a saved value
-  if (useSessionStorage && !syncState.current.savedChecked) checkSavedValue()
 
   if (!count) return createPortal(null, targetEl)
 

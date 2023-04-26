@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
-import Course from '@canvas/courses/backbone/models/Course.coffee'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
+import Course from '@canvas/courses/backbone/models/Course'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
-import AssignmentGroupListView from 'ui/features/assignment_index/backbone/views/AssignmentGroupListView.coffee'
-import AssignmentSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSettingsView.coffee'
-import AssignmentSyncSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSyncSettingsView.coffee'
+import AssignmentGroupListView from 'ui/features/assignment_index/backbone/views/AssignmentGroupListView'
+import AssignmentSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSettingsView'
+import AssignmentSyncSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSyncSettingsView'
 import AssignmentGroupWeightsView from 'ui/features/assignment_index/backbone/views/AssignmentGroupWeightsView'
-import IndexView from 'ui/features/assignment_index/backbone/views/IndexView.coffee'
+import IndexView from 'ui/features/assignment_index/backbone/views/IndexView'
 import ToggleShowByView from 'ui/features/assignment_index/backbone/views/ToggleShowByView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'

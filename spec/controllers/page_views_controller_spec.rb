@@ -68,7 +68,7 @@ describe PageViewsController do
 
     it "errors if end_time is before start_time" do
       get "index", params: { user_id: @user.id, start_time: "2021-07-04", end_time: "2021-07-03" }, format: "csv"
-      expect(response.status).to eq 400
+      expect(response).to have_http_status :bad_request
       expect(response.body).to eq "end_time must be after start_time"
     end
   end
@@ -92,7 +92,7 @@ describe PageViewsController do
 
         user_session(@student)
         put "update", params: { id: pv.token, interaction_seconds: "5", page_view_token: pv.token }, xhr: true
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
       end
     end
   end

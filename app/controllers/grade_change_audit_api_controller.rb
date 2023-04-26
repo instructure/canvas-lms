@@ -252,10 +252,6 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def query
-    unless Auditors.read_from_postgres?
-      return render json: { message: "Advanced query is unsupported on this instance" }, status: :not_implemented
-    end
-
     assignment = Auditors::GradeChange::COURSE_OVERRIDE_ASSIGNMENT if params[:assignment_id] == "override"
 
     if params[:course_id].present?

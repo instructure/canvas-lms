@@ -114,7 +114,7 @@ describe MasterCourses::MasterContentTag do
         restrictions = { content: true }
         tag = @template.create_content_tag_for!(course_module, { restrictions: restrictions })
 
-        expect(tag.quiz_lti_content?).to eq(false)
+        expect(tag.quiz_lti_content?).to be(false)
       end
     end
 
@@ -124,7 +124,7 @@ describe MasterCourses::MasterContentTag do
         restrictions = { content: true }
         tag = @template.create_content_tag_for!(assignment, { restrictions: restrictions })
 
-        expect(tag.quiz_lti_content?).to eq(false)
+        expect(tag.quiz_lti_content?).to be(false)
       end
 
       it "returns true if the assignment is a New Quiz" do
@@ -133,7 +133,7 @@ describe MasterCourses::MasterContentTag do
         allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(true)
         tag = @template.create_content_tag_for!(assignment, { restrictions: restrictions })
 
-        expect(tag.quiz_lti_content?).to eq(true)
+        expect(tag.quiz_lti_content?).to be(true)
       end
     end
   end

@@ -56,6 +56,9 @@
     "aleph_f4ffd155": {
         "message": "Alef"
     },
+    "align_11050992": {
+        "message": "Poravnaj"
+    },
     "alignment_and_lists_5cebcb69": {
         "message": "Poravnava in seznami"
     },
@@ -133,6 +136,9 @@
     },
     "arabic_c5c87acd": {
         "message": "arabščina"
+    },
+    "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+        "message": "Ali ste prepričani, da želite preklicati? Spremembe, ki ste jih izvedli, morda ne bodo shranjene."
     },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Ali ste prepričani, da želite odstraniti ta element orodja Planner?"
@@ -284,6 +290,9 @@
     "catalan_16f6b78f": {
         "message": "katalonščina"
     },
+    "center_align_e68d9997": {
+        "message": "Sredinska poravnava"
+    },
     "centered_dot_64d5e378": {
         "message": "Središčna pika"
     },
@@ -301,6 +310,15 @@
     },
     "change_text_color_1aecb912": {
         "message": "Spremeni barvo besedila"
+    },
+    "changes_you_made_may_not_be_saved_4e8db973": {
+        "message": "Spremembe, ki ste jih izvedli, morda ne bodo shranjene."
+    },
+    "characters_9d897d1c": {
+        "message": "Znaki"
+    },
+    "characters_no_spaces_485e5367": {
+        "message": "Znaki (brez presledkov)"
     },
     "check_accessibility_3c78211c": {
         "message": "Preveri dostopnost"
@@ -328,6 +346,9 @@
     },
     "circle_484abe63": {
         "message": "Krog"
+    },
+    "circle_unordered_list_9e3a0763": {
+        "message": "nerazvrščeni seznam s krogi"
     },
     "clear_2084585f": {
         "message": "Počisti"
@@ -425,6 +446,12 @@
     "copyright_holder_66ee111": {
         "message": "Lastnik avtorskih pravic:"
     },
+    "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
+        "message": "Vsebine ni mogoče vstaviti: V sistemu Canvas elementi »{ itemType }« trenutno niso podprti."
+    },
+    "count_40eced3b": {
+        "message": "Število"
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 besed}\n    one {1 beseda}\n  other {# besede}\n}"
     },
@@ -458,6 +485,9 @@
     "course_images_f8511d04": {
         "message": "Slike predmeta"
     },
+    "course_link_b369426": {
+        "message": "Povezava do predmeta"
+    },
     "course_links_b56959b9": {
         "message": "Povezave predmeta"
     },
@@ -472,6 +502,9 @@
     },
     "create_icon_110d6463": {
         "message": "Ustvari ikono"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "Ustvari ikono ustvarjalnika ikon"
     },
     "creative_commons_license_725584ae": {
         "message": "Licenca Creative Commons:"
@@ -536,8 +569,17 @@
     "decorative_type_upper_f2c95e3": {
         "message": "Dekorativni { TYPE_UPPER }"
     },
+    "decrease_indent_d9cf469d": {
+        "message": "Zmanjšaj zamik"
+    },
     "deep_purple_bb3e2907": {
         "message": "Temno škrlatna"
+    },
+    "default_bulleted_unordered_list_47079da8": {
+        "message": "privzeti neurejeni seznam z alinejami"
+    },
+    "default_numerical_ordered_list_48dd3548": {
+        "message": "privzeti številčno urejeni seznam"
     },
     "definite_integral_fe7ffed1": {
         "message": "Določeni integral"
@@ -632,6 +674,9 @@
     "division_sign_72190870": {
         "message": "Znak za deljenje"
     },
+    "document_678cd7bf": {
+        "message": "Dokument"
+    },
     "documents_81393201": {
         "message": "Dokumenti"
     },
@@ -640,6 +685,9 @@
     },
     "double_dagger_faf78681": {
         "message": "Dvojno bodalo"
+    },
+    "down_5831a426": {
+        "message": "Navzdol"
     },
     "down_and_left_diagonal_arrow_40ef602c": {
         "message": "Diagonalna puščica navzdol in levo"
@@ -689,6 +737,9 @@
     "edit_course_link_5a5c3c59": {
         "message": "Uredi povezavo do predmeta"
     },
+    "edit_equation_f5279959": {
+        "message": "Uredi enačbo"
+    },
     "edit_existing_icon_maker_icon_5d0ebb3f": {
         "message": "Uredi obstoječo ikono ustvarjalnika ikon"
     },
@@ -712,6 +763,9 @@
     },
     "embed_code_314f1bd5": {
         "message": "Vdelaj kodo"
+    },
+    "embed_content_from_external_tool_3397ad2d": {
+        "message": "Vdelaj vsebino iz zunanjega orodja"
     },
     "embed_image_1080badc": {
         "message": "Vdelaj sliko"
@@ -767,8 +821,14 @@
     "equals_sign_c51bdc58": {
         "message": "Znak enakosti"
     },
+    "equation_1c5ac93c": {
+        "message": "Enačba"
+    },
     "equation_editor_39fbc3f1": {
         "message": "Urejevalnik enačb"
+    },
+    "equilibrium_6ff3040b": {
+        "message": "Ravnotežje"
     },
     "equivalence_class_7b0f11c0": {
         "message": "Razred enakosti"
@@ -815,6 +875,12 @@
     "extended_9a58dcb6": {
         "message": "Razširjeno"
     },
+    "external_link_d3f9e62a": {
+        "message": "Zunanja povezava"
+    },
+    "external_tool_frame_70b32473": {
+        "message": "Okvir zunanjega orodja"
+    },
     "external_tools_6e77821": {
         "message": "Zunanja orodja"
     },
@@ -859,6 +925,9 @@
     },
     "failed_to_load_opportunities_52ab6404": {
         "message": "Nalaganje priložnosti ni uspelo."
+    },
+    "failed_to_retrieve_content_from_external_tool_5899c213": {
+        "message": "Vsebine iz zunanjega orodja ni bilo mogoče pridobiti"
     },
     "failed_to_save_to_do_ddc7503b": {
         "message": "Neuspelo shranjevanje seznama opravil."
@@ -1016,6 +1085,9 @@
     "group_isomorphism_45b1458c": {
         "message": "Skupinski izomorfizem"
     },
+    "group_link_63e626b3": {
+        "message": "Povezava do skupine"
+    },
     "group_links_9493129e": {
         "message": "Povezave do skupin"
     },
@@ -1094,6 +1166,9 @@
     "html_code_editor_fd967a44": {
         "message": "urejevalnik kode html"
     },
+    "html_editor_fb2ab713": {
+        "message": "Urejevalnik HTML"
+    },
     "hungarian_fc7d30c9": {
         "message": "madžarščina"
     },
@@ -1136,6 +1211,9 @@
     "if_left_empty_link_text_will_display_as_course_lin_61087540": {
         "message": "Če povezavo pustite prazno, bo besedilo prikazano kot ime povezave na predmet"
     },
+    "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
+        "message": "Če so zahtevane pravice uporabe, datoteka ne bo objavljena, dokler to ni omogočeno na strani Datoteke."
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Če ne izberete pravic uporabe zdaj, ta datoteka po nalaganju ne bo objavljena."
     },
@@ -1172,6 +1250,9 @@
     "in_element_of_19ca2f33": {
         "message": "V (element)"
     },
+    "increase_indent_6af90f7c": {
+        "message": "Povečaj zamik"
+    },
     "indefinite_integral_6623307e": {
         "message": "Nedoločeni integral"
     },
@@ -1192,6 +1273,9 @@
     },
     "insert_link_6dc23cae": {
         "message": "Vstavi povezavo"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Vstavi matematično enačbo"
     },
     "integers_336344e1": {
         "message": "Cela števila"
@@ -1313,6 +1397,12 @@
     "leave_as_is_4facfe55": {
         "message": "Ne spreminjaj"
     },
+    "left_3ea9d375": {
+        "message": "Levo"
+    },
+    "left_align_43d95491": {
+        "message": "Leva poravnava"
+    },
     "left_angle_bracket_c87a6d07": {
         "message": "Levi kotni oklepaj"
     },
@@ -1403,6 +1493,9 @@
     "loading_closed_captions_subtitles_failed_95ceef47": {
         "message": "nalaganje razširjenih podnapisov/podnapisov ni uspelo."
     },
+    "loading_external_tool_d839042c": {
+        "message": "Nalaganje zunanjega orodja"
+    },
     "loading_failed_b3524381": {
         "message": "Nalaganje ni uspelo ..."
     },
@@ -1417,6 +1510,9 @@
     },
     "loading_past_items_ca499e75": {
         "message": "Nalaganje preteklih elementov"
+    },
+    "loading_placeholder_for_filename_792ef5e8": {
+        "message": "Nalaganje označbe mesta za { fileName }"
     },
     "loading_planner_items_947a813d": {
         "message": "Nalaganje elementov orodja Planner"
@@ -1522,6 +1618,9 @@
     },
     "modules_c4325335": {
         "message": "Moduli"
+    },
+    "moving_image_to_crop_directionword_6f66cde2": {
+        "message": "Premikam sliko za obrezovanje { directionWord }"
     },
     "mu_37223b8b": {
         "message": "Mu"
@@ -1730,6 +1829,9 @@
     "orange_81386a62": {
         "message": "Oranžno"
     },
+    "ordered_and_unordered_lists_cfadfc38": {
+        "message": "Urejeni in neurejeni seznami"
+    },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Druge bližnjice urejevalnika je mogoče najti na"
     },
@@ -1931,6 +2033,9 @@
     "record_7c9448b": {
         "message": "Posnemi"
     },
+    "record_upload_media_5fdce166": {
+        "message": "Posnemi/naloži medije"
+    },
     "recording_98da6bda": {
         "message": "Snemanje"
     },
@@ -1951,6 +2056,9 @@
     },
     "remove_heading_style_5fdc8855": {
         "message": "Odstrani slog naslova"
+    },
+    "remove_link_d1f2f4d0": {
+        "message": "Odstrani povezavo"
     },
     "replace_e61834a7": {
         "message": "Zamenjaj"
@@ -1981,6 +2089,12 @@
     },
     "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
         "message": "Območje besedila Pritisnite { OSKey }+F8 za bližnjice do urejevalnika."
+    },
+    "right_71ffdc4d": {
+        "message": "Desno"
+    },
+    "right_align_39e7a32a": {
+        "message": "Desna poravnava"
     },
     "right_angle_bracket_d704e2d6": {
         "message": "Desni kotni oklepaj"
@@ -2048,6 +2162,9 @@
     "save_media_cb9e786e": {
         "message": "Shrani medije"
     },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "Shranjene ikone ustvarjalnika ikon"
+    },
     "schedule_preview_3bcda153": {
         "message": "Predogled urnika"
     },
@@ -2099,6 +2216,9 @@
     "selected_linkfilename_c093b1f2": {
         "message": "Izbrano { linkFileName }"
     },
+    "selection_b52c4c5e": {
+        "message": "Izbira"
+    },
     "serbian_7187f1f2": {
         "message": "srbščina"
     },
@@ -2126,8 +2246,23 @@
     "show_all_ae37d610": {
         "message": "Prikaži vse"
     },
+    "show_audio_options_b489926b": {
+        "message": "Prikaži možnosti zvoka"
+    },
+    "show_image_options_1e2ecc6b": {
+        "message": "Prikaži možnosti slike"
+    },
+    "show_link_options_545338fd": {
+        "message": "Prikaži povezave na slike"
+    },
     "show_my_grades_ebd08684": {
         "message": "Prikaži moje ocene"
+    },
+    "show_studio_media_options_a0c748c6": {
+        "message": "Prikaži medijske možnosti za Studio"
+    },
+    "show_video_options_6ed3721a": {
+        "message": "Prikaži možnosti videoposnetka"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Slabovidni uporabniki hitro brskajo po spletnih straneh in iščejo velike ali krepko zapisane naslove. Uporabniki bralnikov zaslonov se za razumevanje konteksta zanašajo na glave. Pri glavah mora biti uporabljena pravilna zgradba."
@@ -2186,6 +2321,9 @@
     "something_went_wrong_while_sharing_your_screen_8de579e5": {
         "message": "Pri souporabi zaslon je prišlo je do težave."
     },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "Oprostite, ni podpore za delo z več datotekami."
+    },
     "sort_by_e75f9e3e": {
         "message": "Razvrsti po"
     },
@@ -2222,6 +2360,9 @@
     "square_superset_strict_fa4262e4": {
         "message": "Kvadratna nadmnožica (strogo)"
     },
+    "square_unordered_list_b15ce93b": {
+        "message": "nerazvrščeni seznam s kvadrati"
+    },
     "star_8d156e09": {
         "message": "Zvezdica"
     },
@@ -2248,6 +2389,9 @@
     },
     "student_to_do_c018c835": {
         "message": "Seznam opravil študenta"
+    },
+    "studio_media_options_ee504361": {
+        "message": "Prikaži medijske možnosti"
     },
     "styles_2aa721ef": {
         "message": "Slogi"
@@ -2281,6 +2425,9 @@
     },
     "superscript_8cb349a2": {
         "message": "Nadpisano"
+    },
+    "superscript_and_subscript_37f94a50": {
+        "message": "Dvignjeno in spuščeno"
     },
     "superset_c4db8a7a": {
         "message": "Nadmnožica"
@@ -2390,6 +2537,9 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Prvi naslov na strani mora biti H2."
     },
+    "the_following_content_is_partner_provided_ed1da756": {
+        "message": "Naslednjo vsebino zagotavljajo partnerji."
+    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Gradivo je dostopno javnosti."
     },
@@ -2398,6 +2548,9 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Za gradivo velja izjema – npr. poštena uporaba, pravica do citiranja ali drugo v skladu z veljavno zakonodajo o avtorskih pravicah"
+    },
+    "the_preceding_content_is_partner_provided_d753928c": {
+        "message": "Predhodno vsebino zagotavljajo partnerji."
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Urejevalnik Pretty HTML Editor ni dostopen s tipkovnico. Surovi urejevalnik HTML odprete s pritiskom na tipki Shift+O"
@@ -2525,6 +2678,9 @@
     "ukrainian_945b00b7": {
         "message": "ukrajinščina"
     },
+    "unable_to_determine_resource_selection_url_7867e060": {
+        "message": "Ni mogoče določiti URL za izbiro vira"
+    },
     "unable_to_mark_as_complete_8141856d": {
         "message": "Ni bilo mogoče označiti kot zaključeno."
     },
@@ -2546,6 +2702,12 @@
     "up_and_right_diagonal_arrow_935b902e": {
         "message": "Diagonalna puščica navzdol in desno"
     },
+    "up_c553575d": {
+        "message": "Navzgor"
+    },
+    "upload_document_253f0478": {
+        "message": "Naloži dokument"
+    },
     "upload_file_fd2361b8": {
         "message": "Naloži datoteko"
     },
@@ -2555,8 +2717,14 @@
     "upload_media_ce31135a": {
         "message": "Naloži medije"
     },
+    "upload_record_media_e4207d72": {
+        "message": "Naloži/posnemi medij"
+    },
     "uploading_19e8a4e7": {
         "message": "Nalaganje"
+    },
+    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+        "message": "abecedno urejeni seznam z velikimi začetnicami"
     },
     "uppercase_delta_d4f4bc41": {
         "message": "Velika delta"
@@ -2578,6 +2746,9 @@
     },
     "uppercase_psi_6395acbe": {
         "message": "Velika psi"
+    },
+    "uppercase_roman_numeral_ordered_list_853f292b": {
+        "message": "abecedno urejeni seznam z rimskimi številkami"
     },
     "uppercase_sigma_dbb70e92": {
         "message": "Velika sigma"
@@ -2681,6 +2852,9 @@
     "vietnamese_e7a76583": {
         "message": "vietnamščina"
     },
+    "view_all_e13bf0a6": {
+        "message": "Prikaži vse"
+    },
     "view_ba339f93": {
         "message": "Ogled"
     },
@@ -2746,6 +2920,12 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Glavna stran wiki"
+    },
+    "word_count_c77fe3a6": {
+        "message": "Štetje besed"
+    },
+    "words_b448b7d5": {
+        "message": "Besede"
     },
     "wreath_product_200b38ef": {
         "message": "Venčni produkt"

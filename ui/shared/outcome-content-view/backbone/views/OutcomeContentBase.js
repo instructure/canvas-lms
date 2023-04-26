@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
-import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
+import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'

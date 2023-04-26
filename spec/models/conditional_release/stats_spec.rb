@@ -104,7 +104,7 @@ module ConditionalRelease
           set_user_submissions(1, "foo", [[@trigger, 32, 40]])
           rollup = Stats.students_per_range(@rule, true).with_indifferent_access
           expect(rollup.dig(:ranges, 0, :students, 0)).to have_key "trend"
-          expect(rollup.dig(:ranges, 0, :students, 0, :trend)).to eq nil
+          expect(rollup.dig(:ranges, 0, :students, 0, :trend)).to be_nil
         end
 
         it "returns the correct trend for a single follow on assignment" do

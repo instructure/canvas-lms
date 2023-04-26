@@ -47,13 +47,13 @@ describe "jquery ui" do
   end
 
   it "makes dialogs modal by default" do
-    expect(driver.execute_script(<<~JS)).to eq true
+    expect(driver.execute_script(<<~JS)).to be true
       return $('<div />').dialog().dialog('option', 'modal');
     JS
     expect(f(".ui-widget-overlay")).to be_displayed
 
     # make sure that hiding then showing the same dialog again, it still looks modal
-    expect(driver.execute_script(<<~JS)).to eq true
+    expect(driver.execute_script(<<~JS)).to be true
       return $('<div />')
         .dialog()
         .dialog('close')

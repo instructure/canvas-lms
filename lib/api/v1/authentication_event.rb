@@ -33,7 +33,7 @@ module Api::V1::AuthenticationEvent
     }
 
     {
-      id: event.id,
+      id: event.uuid,
       created_at: event.created_at.in_time_zone,
       event_type: event.event_type,
       links: links

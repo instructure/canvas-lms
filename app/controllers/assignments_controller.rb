@@ -38,7 +38,7 @@ class AssignmentsController < ApplicationController
   add_crumb(
     proc { t "#crumbs.assignments", "Assignments" },
     except: %i[destroy syllabus index new edit]
-  ) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
+  ) { |c| c.send :course_assignments_path, c.instance_variable_get(:@context) }
   before_action(except: [:new, :edit]) { |c| c.active_tab = "assignments" }
   before_action(only: [:new, :edit]) { |c| setup_active_tab(c) }
   before_action :normalize_title_param, only: [:new, :edit]
@@ -84,7 +84,8 @@ class AssignmentsController < ApplicationController
             new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
             new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
             show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
-          }
+          },
+          grading_scheme: @context.grading_standard_or_default.data
         }
 
         set_default_tool_env!(@context, hash)
@@ -145,7 +146,9 @@ class AssignmentsController < ApplicationController
              peer_review_mode_enabled: submission.present? && peer_review_mode_enabled,
              peer_review_available: peer_review_available,
              peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission&.user&.name,
-             originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2)
+             originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2),
+             restrict_quantitative_data: @assignment.restrict_quantitative_data?(@current_user),
+             grading_scheme: @context.grading_standard_or_default.data
            })
 
     if peer_review_mode_enabled
@@ -619,9 +622,7 @@ class AssignmentsController < ApplicationController
       set_tutorial_js_env
 
       log_asset_access(["syllabus", @context], "syllabus", "other")
-      respond_to do |format|
-        format.html
-      end
+      respond_to(&:html)
     end
   end
 
@@ -1059,7 +1060,7 @@ class AssignmentsController < ApplicationController
   end
 
   def on_quizzes_page?
-    @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) && \
+    @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
       @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present?
   end
 

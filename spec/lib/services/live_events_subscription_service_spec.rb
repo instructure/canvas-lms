@@ -35,7 +35,7 @@ module Services
 
       describe ".available?" do
         it "returns false if the service is not configured" do
-          expect(LiveEventsSubscriptionService.available?).to eq false
+          expect(LiveEventsSubscriptionService.available?).to be false
         end
       end
     end
@@ -96,7 +96,7 @@ module Services
 
       describe ".available?" do
         it "returns true if the service is configured" do
-          expect(LiveEventsSubscriptionService.available?).to eq true
+          expect(LiveEventsSubscriptionService.available?).to be true
         end
       end
 

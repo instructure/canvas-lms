@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import File from '@canvas/files/backbone/models/File.coffee'
+import File from '@canvas/files/backbone/models/File'
 import DialogPreview from '@canvas/files/react/components/DialogPreview'
 import FilesystemObjectThumbnail from '@canvas/files/react/components/FilesystemObjectThumbnail'
 

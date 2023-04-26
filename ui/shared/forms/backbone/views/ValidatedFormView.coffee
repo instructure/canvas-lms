@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import ValidatedMixin from './ValidatedMixin.coffee'
+import ValidatedMixin from './ValidatedMixin'
 import $ from 'jquery'
 import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'

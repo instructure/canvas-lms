@@ -61,6 +61,7 @@ describe EventStream::Backend::Cassandra do
   let(:stream) do
     db = database
     s = EventStream::Stream.new do
+      backend_strategy :cassandra
       table "test_table"
       database db
     end

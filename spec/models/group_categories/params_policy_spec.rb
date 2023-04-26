@@ -57,7 +57,7 @@ module GroupCategories
       it "can null out an existing autoleader value" do
         category.auto_leader = "FIRST"
         policy.populate_with({ enable_auto_leader: "0", auto_leader_type: "RANDOM" }, populate_options)
-        expect(category.auto_leader).to be(nil)
+        expect(category.auto_leader).to be_nil
       end
 
       it "lets you override the name" do

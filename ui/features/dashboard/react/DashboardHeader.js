@@ -239,8 +239,8 @@ class DashboardHeader extends React.Component {
   handleChangeObservedUser(id) {
     if (id !== this.state.selectedObserveeId) {
       fetchShowK5Dashboard(id)
-        .then(isK5User => {
-          if (!isK5User) {
+        .then(response => {
+          if (!response.show_k5_dashboard) {
             this.reloadDashboardForObserver(id)
             if (this.props.planner_enabled) {
               this.planner_init_promise

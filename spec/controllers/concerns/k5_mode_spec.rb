@@ -59,8 +59,8 @@ describe K5Mode do
 
       it "sets k5 variables" do
         get :index, params: { course_id: @course.id }
-        expect(assigns(:k5_details_view)).to eq(false)
-        expect(assigns(:show_left_side)).to eq(true)
+        expect(assigns(:k5_details_view)).to be(false)
+        expect(assigns(:show_left_side)).to be(true)
         expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
         expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
@@ -74,8 +74,8 @@ describe K5Mode do
 
         it "sets k5 variables" do
           get :index, params: { course_id: @course.id }
-          expect(assigns(:k5_details_view)).to eq(false)
-          expect(assigns(:show_left_side)).to eq(true)
+          expect(assigns(:k5_details_view)).to be(false)
+          expect(assigns(:show_left_side)).to be(true)
           expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
           expect(assigns(:js_bundles).flatten).to include(:k5_theme)
         end
@@ -91,8 +91,8 @@ describe K5Mode do
 
       it "sets k5 variables" do
         get :index, params: { course_id: @course.id }
-        expect(assigns(:k5_details_view)).to eq(false)
-        expect(assigns(:show_left_side)).to eq(true)
+        expect(assigns(:k5_details_view)).to be(false)
+        expect(assigns(:show_left_side)).to be(true)
         expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
         expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
@@ -107,8 +107,8 @@ describe K5Mode do
 
       it "sets k5 variables" do
         get :index, params: { course_id: @course.id }
-        expect(assigns(:k5_details_view)).to eq(true)
-        expect(assigns(:show_left_side)).to eq(false)
+        expect(assigns(:k5_details_view)).to be(true)
+        expect(assigns(:show_left_side)).to be(false)
         expect(assigns(:css_bundles).flatten).to include(:k5_theme, :k5_font)
         expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end

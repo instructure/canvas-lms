@@ -55,7 +55,7 @@ describe GradingPeriodsController do
   end
 
   def expect_grading_period_id_match(json, period)
-    expect(json["grading_periods"].count).to eql(1)
+    expect(json["grading_periods"].count).to be(1)
     returned_period = json["grading_periods"].first
     expect(returned_period["id"]).to eql(period.id.to_s)
   end
@@ -95,7 +95,7 @@ describe GradingPeriodsController do
         period = create_course_grading_period(course)
         get :index, params: { course_id: course.id }
         expect_grading_period_id_match(json_parse, period)
-        expect(json_parse["grading_periods_read_only"]).to eql(false)
+        expect(json_parse["grading_periods_read_only"]).to be(false)
       end
 
       it "is ordered by start_date" do
@@ -110,7 +110,7 @@ describe GradingPeriodsController do
         period = create_account_grading_period(root_account)
         get :index, params: { course_id: course.id }
         expect_grading_period_id_match(json_parse, period)
-        expect(json_parse["grading_periods_read_only"]).to eql(true)
+        expect(json_parse["grading_periods_read_only"]).to be(true)
       end
 
       it "gets course associated grading periods if both are available" do
@@ -122,7 +122,7 @@ describe GradingPeriodsController do
 
       it "sets read_only to false if no grading periods are given" do
         get :index, params: { course_id: course.id }
-        expect(json_parse["grading_periods_read_only"]).to eql(false)
+        expect(json_parse["grading_periods_read_only"]).to be(false)
       end
     end
 
@@ -131,7 +131,7 @@ describe GradingPeriodsController do
         period = create_account_grading_period(root_account)
         get :index, params: { account_id: root_account.id }
         expect_grading_period_id_match(json_parse, period)
-        expect(json_parse["grading_periods_read_only"]).to eql(false)
+        expect(json_parse["grading_periods_read_only"]).to be(false)
       end
 
       it "is ordered by start_date" do
@@ -145,12 +145,12 @@ describe GradingPeriodsController do
       it "cannot get any course associated grading periods" do
         create_course_grading_period(course)
         get :index, params: { account_id: root_account.id }
-        expect(json_parse["grading_periods"].count).to eql(0)
+        expect(json_parse["grading_periods"].count).to be(0)
       end
 
       it "sets read_only to false if no grading periods are given" do
         get :index, params: { account_id: root_account.id }
-        expect(json_parse["grading_periods_read_only"]).to eql(false)
+        expect(json_parse["grading_periods_read_only"]).to be(false)
       end
     end
   end
@@ -281,7 +281,7 @@ describe GradingPeriodsController do
             set_id: group.id,
             grading_periods: [period_1_params]
           }
-          expect(group.grading_periods.count).to eql(1)
+          expect(group.grading_periods.count).to be(1)
           expect(unrelated_group.grading_periods).to be_empty
         end
 
@@ -311,7 +311,7 @@ describe GradingPeriodsController do
           }
           json = JSON.parse(response.body)
           expect(json).not_to have_key("meta")
-          expect(json.fetch("grading_periods").count).to eql 11
+          expect(json.fetch("grading_periods").count).to be 11
         end
 
         describe "with root account admins" do

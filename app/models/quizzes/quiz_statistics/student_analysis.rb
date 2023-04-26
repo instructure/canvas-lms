@@ -275,7 +275,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
             blank_ids = question[:answers].pluck(:blank_id).uniq
             row << blank_ids.filter_map { |blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, "\\,") }.join(",")
           when "multiple_answers_question"
-            row << question[:answers].filter_map { |a| answer["answer_#{a[:id]}".to_sym] == "1" ? a[:text].gsub(/,/, "\\,") : nil }.join(",")
+            row << question[:answers].filter_map { |a| (answer["answer_#{a[:id]}".to_sym] == "1") ? a[:text].gsub(/,/, "\\,") : nil }.join(",")
           when "multiple_dropdowns_question"
             blank_ids = question[:answers].pluck(:blank_id).uniq
             answer_ids = blank_ids.map { |blank_id| answer["answer_for_#{blank_id}".to_sym] }

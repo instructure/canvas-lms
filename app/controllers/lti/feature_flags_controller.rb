@@ -68,7 +68,7 @@ module Lti
 
     def context_from_id(context_type, context_id)
       # If the id is an integer, it's a Canvas id, not an LTI id
-      column_name = context_id.to_i.to_s == context_id ? :id : :lti_context_id
+      column_name = (context_id.to_i.to_s == context_id) ? :id : :lti_context_id
       context_type.find_by(column_name => context_id)
     end
 

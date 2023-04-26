@@ -44,7 +44,7 @@ describe "jquery" do
 
   it "is able to handle ':hidden' and ':visible' pseudo-selector on window" do
     get("/login")
-    expect(driver.execute_script("return $(window).is(':visible')")).to eq true
-    expect(driver.execute_script("return $(window).is(':hidden')")).to eq false
+    expect(driver.execute_script("return $(window).is(':visible')")).to be true
+    expect(driver.execute_script("return $(window).is(':hidden')")).to be false
   end
 end

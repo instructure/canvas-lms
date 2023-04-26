@@ -82,6 +82,36 @@
   </div>
 </div>
 <div class="ic-Form-control">
+  <%= f.label :internal_ca, t('Internal Certificate Authority (CA)'), class: 'ic-Label', for: "internal_ca_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_area :internal_ca, style: hidden, id: "internal_ca_#{presenter.id_suffix(aac)}" %>
+
+  <div id="internal-ca-select-<%= presenter.id_suffix(aac) %>" style="flex: 1"></div>
+  <div class="ic-Form-help-text">
+          <%= t(:internal_ca_description,
+                "If your LDAP server presents a certificate issued by an untrusted, internal root CA, you *must* upload your root "\
+          "CA in order for Canvas to trust it when connecting.", wrapper: '<strong>\1</strong>') %>
+    </div>
+    <div class="ic-Form-help-text">
+          <%= t(:internal_ca_warning,
+                "*Warning*: Using an internal root CA is less secure, and increases the risk of compromise. We strongly "\
+                "recommend using certificates issued by a trusted certificate authority, instead.", wrapper: '<strong>\1</strong>') %>
+  </div>
+</div>
+<!--If prior to enforcement date, allow admins to manually opt in -->
+<% if Time.now.to_i < Setting.get("ldap_validate_tls_cert_enforcement_date", 0).to_i %>
+  <div class="ic-Form-control">
+    <%= f.label :verify_tls_cert_opt_in, t('Verify TLS Certificate'), class: 'ic-Label', for: "verify_tls_cert_opt_in_#{presenter.id_suffix(aac)}" %>
+    <%= f.check_box :verify_tls_cert_opt_in, class: 'verify_tls_cert_opt_in_checkbox', disabled: aac.account.feature_enabled?(:verify_ldap_certs), checked: aac.account.feature_enabled?(:verify_ldap_certs) || aac.verify_tls_cert_opt_in, id: "verify_tls_cert_opt_in_#{presenter.id_suffix(aac)}" %>
+
+    <!-- Only show help text if verification isn't forced on -->
+    <% if !aac.account.feature_enabled?(:verify_ldap_certs) %>
+      <div class="ic-Form-help-text">
+        <%= t(:verify_tls_cert_opt_in_description, "TLS certificate verification will be required on *%{enforcement_date}*, but you may enable it early to ensure your LDAP server is compliant.", enforcement_date: date_string(Time.at(Setting.get("ldap_validate_tls_cert_enforcement_date", 0).to_i)), wrapper: '<strong>\1</strong>') %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+<div class="ic-Form-control">
   <%= f.label :auth_username, t('Username'), class: 'ic-Label', for: "auth_username_#{presenter.id_suffix(aac)}" %>
   <%= f.text_field :auth_username, class: 'ic-Input', id: "auth_username_#{presenter.id_suffix(aac)}" %>
 </div>

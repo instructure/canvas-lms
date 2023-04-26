@@ -60,7 +60,7 @@ module Lti
 
     def analytics_message_type
       @analytics_message_type ||
-        (params["lti_message_type"] == "basic-lti-launch-request" ? "tool_launch" : params["lti_message_type"]) ||
+        ((params["lti_message_type"] == "basic-lti-launch-request") ? "tool_launch" : params["lti_message_type"]) ||
         "tool_launch"
     end
   end

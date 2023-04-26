@@ -1,6 +1,8 @@
 # i18nliner/i18n_extractor currently do not support prawn templates
 # so pass I18nable strins from the controller until this is resovled
 
+require 'prawn/emoji'
+
 prawn_document(page_layout: :portrait, page_size: page_size) do |pdf|
   pdf.font_families.update('LatoWeb' => {
     normal: "public/fonts/lato/latin/LatoLatin-Regular.ttf",

@@ -237,7 +237,7 @@ module SIS
           end
 
           if user_row.declared_user_type.present?
-            pseudo.declared_user_type = user_row.declared_user_type == "<delete>" ? nil : user_row.declared_user_type
+            pseudo.declared_user_type = (user_row.declared_user_type == "<delete>") ? nil : user_row.declared_user_type
           end
 
           if status == "deleted" && !user.new_record?
@@ -375,7 +375,7 @@ module SIS
             cc.pseudonym_id = pseudo.id
             cc.path = user_row.email
             cc.bounce_count = 0 if cc.path_changed?
-            cc.workflow_state = status == "deleted" ? "retired" : "active"
+            cc.workflow_state = (status == "deleted") ? "retired" : "active"
             newly_active = cc.path_changed? || (cc.active? && cc.workflow_state_changed?)
             if cc.changed?
               if cc.valid? && cc.save_without_broadcasting
@@ -544,8 +544,8 @@ module SIS
       def generate_readable_error_message(options)
         response = ERRORS_TO_REASONS.fetch(options[:message]) { DEFAULT_REASON }
         reason = format(response, options)
-        "Could not save the user with user_id: '#{options[:user_id]}'." \
-          " #{reason}"
+        "Could not save the user with user_id: '#{options[:user_id]}'. " \
+          "#{reason}"
       end
     end
   end

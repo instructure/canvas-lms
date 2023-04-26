@@ -231,11 +231,11 @@ describe Types::DiscussionEntryType do
     end
 
     it "does not return the author of student anonymous entry" do
-      expect(@anon_student_discussion_entry_type.resolve("author { shortName }")).to eq nil
+      expect(@anon_student_discussion_entry_type.resolve("author { shortName }")).to be_nil
     end
 
     it "does not return the editor of student anonymous entry" do
-      expect(@anon_student_discussion_entry_type.resolve("editor { shortName }")).to eq nil
+      expect(@anon_student_discussion_entry_type.resolve("editor { shortName }")).to be_nil
     end
 
     it "returns current_user for anonymousAuthor when the current user created the entry" do
@@ -264,11 +264,11 @@ describe Types::DiscussionEntryType do
     end
 
     it "does not return the student author if a course id is provided" do
-      expect(@anon_student_discussion_entry_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq nil
+      expect(@anon_student_discussion_entry_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to be_nil
     end
 
     it "does not return the student editor if a course id is provided" do
-      expect(@anon_student_discussion_entry_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq nil
+      expect(@anon_student_discussion_entry_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to be_nil
     end
 
     describe "quoted reply" do
@@ -303,7 +303,7 @@ describe Types::DiscussionEntryType do
         end
 
         it "does not return author of anonymous student" do
-          expect(anon_student_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq nil
+          expect(anon_student_quoted_type.resolve("quotedEntry { author { shortName } }")).to be_nil
         end
       end
 
@@ -325,7 +325,7 @@ describe Types::DiscussionEntryType do
         end
 
         it "does not return author of anonymous student" do
-          expect(anon_student_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq nil
+          expect(anon_student_quoted_type.resolve("quotedEntry { author { shortName } }")).to be_nil
         end
       end
     end
@@ -333,11 +333,11 @@ describe Types::DiscussionEntryType do
     context "partial anonymity" do
       context "when is_anonymous_author is set to true" do
         it "does not return author" do
-          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq nil
+          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to be_nil
         end
 
         it "does not return editor" do
-          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq nil
+          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to be_nil
         end
 
         it "returns anonymous_author" do
@@ -359,7 +359,7 @@ describe Types::DiscussionEntryType do
         end
 
         it "does not return anonymous_author" do
-          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("anonymousAuthor { shortName }")).to eq nil
+          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("anonymousAuthor { shortName }")).to be_nil
         end
       end
     end
@@ -453,9 +453,9 @@ describe Types::DiscussionEntryType do
   end
 
   it "allows querying for participant information" do
-    expect(discussion_entry_type.resolve("entryParticipant { read }")).to eq true
+    expect(discussion_entry_type.resolve("entryParticipant { read }")).to be true
     expect(discussion_entry_type.resolve("entryParticipant { forcedReadState }")).to be_nil
-    expect(discussion_entry_type.resolve("entryParticipant { rating }")).to eq false
+    expect(discussion_entry_type.resolve("entryParticipant { rating }")).to be false
     expect(discussion_entry_type.resolve("entryParticipant { reportType }")).to be_nil
   end
 
@@ -488,16 +488,16 @@ describe Types::DiscussionEntryType do
 
     it "returns nil if student" do
       discussion_entry_type = GraphQLTypeTester.new(@entry, current_user: @user[0])
-      expect(discussion_entry_type.resolve("reportTypeCounts { inappropriateCount }")).to eq nil
-      expect(discussion_entry_type.resolve("reportTypeCounts { offensiveCount }")).to eq nil
-      expect(discussion_entry_type.resolve("reportTypeCounts { otherCount }")).to eq nil
-      expect(discussion_entry_type.resolve("reportTypeCounts { total }")).to eq nil
+      expect(discussion_entry_type.resolve("reportTypeCounts { inappropriateCount }")).to be_nil
+      expect(discussion_entry_type.resolve("reportTypeCounts { offensiveCount }")).to be_nil
+      expect(discussion_entry_type.resolve("reportTypeCounts { otherCount }")).to be_nil
+      expect(discussion_entry_type.resolve("reportTypeCounts { total }")).to be_nil
     end
   end
 
   it "returns a null message when entry is marked as deleted" do
     discussion_entry.destroy
-    expect(discussion_entry_type.resolve("message")).to eq nil
+    expect(discussion_entry_type.resolve("message")).to be_nil
   end
 
   it "returns subentries count" do
@@ -555,7 +555,7 @@ describe Types::DiscussionEntryType do
   it "returns the root entry if there is one" do
     de = discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: discussion_entry.id)
 
-    expect(discussion_entry_type.resolve("rootEntry { _id }")).to be nil
+    expect(discussion_entry_type.resolve("rootEntry { _id }")).to be_nil
 
     sub_entry_type = GraphQLTypeTester.new(de, current_user: @teacher)
     expect(sub_entry_type.resolve("rootEntry { _id }")).to eq discussion_entry.id.to_s
@@ -583,7 +583,7 @@ describe Types::DiscussionEntryType do
     discussion_entry.save!
 
     discussion_entry_versions = discussion_entry_student_type.resolve("discussionEntryVersionsConnection { nodes { message } }")
-    expect(discussion_entry_versions).to eq(nil)
+    expect(discussion_entry_versions).to be_nil
   end
 
   it "return the discussion entry versions when they belong to the student" do

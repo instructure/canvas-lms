@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
+import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
 import WrappedCollection from './WrappedCollection'
 
 class OutcomeResultCollection extends WrappedCollection {

@@ -20,7 +20,7 @@ import Backbone from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/ContentCheckbox.handlebars'
 import checkboxCollectionTemplate from '../../jst/ContentCheckboxCollection.handlebars'
-import CheckboxCollection from '../collections/ContentCheckboxCollection.coffee'
+import CheckboxCollection from '../collections/ContentCheckboxCollection'
 import CollectionView from '@canvas/backbone-collection-view'
 
 I18n = useI18nScope('content_migrations')

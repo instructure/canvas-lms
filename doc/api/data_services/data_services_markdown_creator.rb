@@ -48,8 +48,6 @@ class DataServicesMarkdownCreator
   def self.write_file(file_name, template, content)
     erb_renderer = ERB.new(template)
 
-    File.open("#{MARKDOWN_PATH}/data_service_#{file_name}.md", "wb") do |file|
-      file.write erb_renderer.result(binding)
-    end
+    File.binwrite("#{MARKDOWN_PATH}/data_service_#{file_name}.md", erb_renderer.result(binding))
   end
 end

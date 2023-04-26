@@ -104,7 +104,7 @@ module Login::Shared
           redirect_to(registration_confirmation_path(session.delete(:confirm),
                                                      enrollment: session.delete(:enrollment),
                                                      login_success: 1,
-                                                     confirm: (user.id == session.delete(:expected_user_id) ? 1 : nil)))
+                                                     confirm: ((user.id == session.delete(:expected_user_id)) ? 1 : nil)))
         end
       else
         # the URL to redirect back to is stored in the session, so it's

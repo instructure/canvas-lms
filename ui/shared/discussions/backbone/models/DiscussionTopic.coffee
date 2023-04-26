@@ -20,14 +20,18 @@ import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import _ from 'underscore'
 import { showFlashError } from '@canvas/alerts/react/FlashAlert'
-import ParticipantCollection from '../collections/ParticipantCollection.coffee'
-import DiscussionEntriesCollection from '../collections/DiscussionEntriesCollection.coffee'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import ParticipantCollection from '../collections/ParticipantCollection'
+import DiscussionEntriesCollection from '../collections/DiscussionEntriesCollection'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
-import stripTags from 'strip-tags'
 import axios from '@canvas/axios'
 
 I18n = useI18nScope('discussion_topics')
+
+stripTags = (str) ->
+  div = document.createElement('div')
+  div.innerHTML = str
+  div.textContent or div.innerText or ''
 
 export default class DiscussionTopic extends Backbone.Model
   resourceName: 'discussion_topics'

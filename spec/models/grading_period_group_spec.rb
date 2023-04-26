@@ -122,7 +122,7 @@ describe GradingPeriodGroup do
       it "fetches sets on a root account" do
         set = account.grading_period_groups.create!(valid_attributes)
         sets = GradingPeriodGroup.for(account)
-        expect(sets.count).to eql 1
+        expect(sets.count).to be 1
         expect(sets).to include set
       end
 
@@ -130,7 +130,7 @@ describe GradingPeriodGroup do
         set = account.grading_period_groups.create!(valid_attributes)
         sub_account = account.sub_accounts.create!
         sets = GradingPeriodGroup.for(sub_account)
-        expect(sets.count).to eql 1
+        expect(sets.count).to be 1
         expect(sets).to include set
       end
     end

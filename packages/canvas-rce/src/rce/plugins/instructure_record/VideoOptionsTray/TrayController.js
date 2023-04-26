@@ -22,6 +22,7 @@ import ReactDOM from 'react-dom'
 import bridge from '../../../../bridge'
 import {asVideoElement, findMediaPlayerIframe} from '../../shared/ContentSelection'
 import VideoOptionsTray from '.'
+import {isStudioEmbeddedMedia, parseStudioOptions} from '../../shared/StudioLtiSupportUtils'
 
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
 
@@ -183,6 +184,11 @@ export default class TrayController {
         onRequestClose={() => this._dismissTray()}
         open={this._shouldOpen}
         trayProps={trayProps}
+        studioOptions={
+          isStudioEmbeddedMedia(this.$videoContainer)
+            ? parseStudioOptions(this.$videoContainer)
+            : null
+        }
       />
     )
     ReactDOM.render(element, this.$container)

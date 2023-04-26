@@ -43,8 +43,8 @@ describe ContentNotices do
         thing = thing_class.new
         thing.add_content_notice :foo
         notices = thing.content_notices("user")
-        expect(notices.size).to eql(1)
-        expect(notices[0].tag).to eql(:foo)
+        expect(notices.size).to be(1)
+        expect(notices[0].tag).to be(:foo)
         expect(notices[0].text).to eql("foo!")
         thing.remove_content_notice :foo
         expect(thing.content_notices("user")).to be_empty

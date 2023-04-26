@@ -340,7 +340,7 @@ class User < ActiveRecord::Base
 
   def self.order_by_sortable_name(options = {})
     clause = sortable_name_order_by_clause
-    sort_direction = options[:direction] == :descending ? "DESC" : "ASC"
+    sort_direction = (options[:direction] == :descending) ? "DESC" : "ASC"
     scope = order(Arel.sql("#{clause} #{sort_direction}")).order(Arel.sql("#{table_name}.id #{sort_direction}"))
     if scope.select_values.empty?
       scope = scope.select(arel_table[Arel.star])
@@ -355,8 +355,8 @@ class User < ActiveRecord::Base
   end
 
   def self.order_by_name(options = {})
-    clause = name_order_by_clause
-    sort_direction = options[:direction] == :descending ? "DESC" : "ASC"
+    clause = name_order_by_clause(options[:table])
+    sort_direction = (options[:direction] == :descending) ? "DESC" : "ASC"
     scope = order(Arel.sql("#{clause} #{sort_direction}")).order(Arel.sql("#{table_name}.id #{sort_direction}"))
     if scope.select_values.empty?
       scope = scope.select(arel_table[Arel.star])
@@ -459,7 +459,7 @@ class User < ActiveRecord::Base
                     .merge(enrollment_scope.except(:joins))
                     .where(enrollments: { associated_user_id: associated_user.id })
     else
-      join = associated_user == self ? :enrollments_excluding_linked_observers : :all_enrollments
+      join = (associated_user == self) ? :enrollments_excluding_linked_observers : :all_enrollments
       scope = Course.active.joins(join).merge(enrollment_scope.except(:joins)).distinct
     end
 
@@ -971,7 +971,7 @@ class User < ActiveRecord::Base
         email_channel.try(:path) || :none
       end
       # this sillyness is because rails equates falsey as not in the cache
-      value == :none ? nil : value
+      (value == :none) ? nil : value
     end
   end
 
@@ -1024,7 +1024,7 @@ class User < ActiveRecord::Base
 
   def google_service_address(service_name)
     user_services.where(service: service_name)
-                 .limit(1).pluck(service_name == "google_drive" ? :service_user_name : :service_user_id).first
+                 .limit(1).pluck((service_name == "google_drive") ? :service_user_name : :service_user_id).first
   end
 
   def email=(e)
@@ -1663,7 +1663,7 @@ class User < ActiveRecord::Base
     context_codes = ([self] + management_contexts).uniq.map(&:asset_string)
     rubrics = context_rubrics.active
     rubrics += Rubric.active.where(context_code: context_codes).to_a
-    rubrics.uniq.sort_by { |r| [(r.association_count || 0) > 3 ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(r.title || CanvasSort::Last)] }
+    rubrics.uniq.sort_by { |r| [((r.association_count || 0) > 3) ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(r.title || CanvasSort::Last)] }
   end
 
   def assignments_recently_graded(opts = {})
@@ -1749,7 +1749,7 @@ class User < ActiveRecord::Base
 
   def course_nickname_hash
     if preferences[:course_nicknames].present?
-      @nickname_hash ||= Digest::MD5.hexdigest(user_preference_values.where(key: :course_nicknames).pluck(:sub_key, :value).sort.join(","))
+      @nickname_hash ||= Digest::SHA256.hexdigest(user_preference_values.where(key: :course_nicknames).pluck(:sub_key, :value).sort.join(","))
     else
       "default"
     end
@@ -2229,7 +2229,7 @@ class User < ActiveRecord::Base
     return [] unless course_ids.present?
 
     shard.activate do
-      ids_hash = Digest::MD5.hexdigest(course_ids.sort.join(","))
+      ids_hash = Digest::SHA256.hexdigest(course_ids.sort.join(","))
       Rails.cache.fetch_with_batched_keys(["submissions_for_course_ids", ids_hash, start_at, limit].cache_key, expires_in: 1.day, batch_object: self, batched_keys: :submissions) do
         start_at ||= 4.weeks.ago
 
@@ -3101,7 +3101,7 @@ class User < ActiveRecord::Base
   def self.preload_shard_associations(users); end
 
   def associated_shards(strength = :strong)
-    strength == :strong ? [Shard.default] : []
+    (strength == :strong) ? [Shard.default] : []
   end
 
   def in_region_associated_shards
@@ -3301,7 +3301,7 @@ class User < ActiveRecord::Base
 
   # user tokens are returned by UserListV2 and used to bulk-enroll users using information that isn't easy to guess
   def self.token(id, uuid)
-    "#{id}_#{Digest::MD5.hexdigest(uuid)}"
+    "#{id}_#{Digest::SHA256.hexdigest(uuid)}"
   end
 
   def token

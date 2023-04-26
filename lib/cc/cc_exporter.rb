@@ -148,7 +148,7 @@ module CC
     end
 
     def export_id
-      @content_export ? @content_export.id : nil
+      @content_export&.id
     end
 
     def create_key(*args)

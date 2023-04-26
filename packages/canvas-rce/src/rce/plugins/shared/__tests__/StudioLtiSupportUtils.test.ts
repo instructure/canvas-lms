@@ -19,10 +19,14 @@
 import {
   displayStyleFrom,
   isStudioEmbeddedMedia,
+  parseStudioOptions,
   studioAttributesFrom,
   StudioContentItemCustomJson,
   StudioMediaOptionsAttributes,
+  handleBeforeObjectSelected,
 } from '../StudioLtiSupportUtils'
+import {EditorEvent, Events} from 'tinymce'
+import {createDeepMockProxy} from '../../../../util/__tests__/deepMockProxy'
 
 describe('studioAttributesFrom', () => {
   it('uses the default values for missing attributes', () => {
@@ -113,5 +117,87 @@ describe('isStudioEmbeddedMedia', () => {
     element.innerHTML = '<iframe/>'
     element.setAttribute('data-mce-p-data-studio-tray-enabled', 'true')
     expect(isStudioEmbeddedMedia(element)).toEqual(true)
+  })
+})
+
+describe('parseStudioOptions', () => {
+  it('returns falses for null', () => {
+    expect(parseStudioOptions(null)).toEqual({
+      resizable: false,
+      convertibleToLink: false,
+    })
+  })
+
+  it('returns falses for missing studio attributes', () => {
+    const element = document.createElement('span')
+    expect(parseStudioOptions(element)).toEqual({
+      resizable: false,
+      convertibleToLink: false,
+    })
+  })
+
+  it('parses correct values for attributes 1', () => {
+    const element = document.createElement('span')
+    element.setAttribute('data-mce-p-data-studio-resizable', 'false')
+    element.setAttribute('data-mce-p-data-studio-convertible-to-link', 'false')
+    expect(parseStudioOptions(element)).toEqual({
+      resizable: false,
+      convertibleToLink: false,
+    })
+  })
+
+  it('parses correct values for attributes 2', () => {
+    const element = document.createElement('span')
+    element.setAttribute('data-mce-p-data-studio-resizable', 'true')
+    element.setAttribute('data-mce-p-data-studio-convertible-to-link', 'false')
+    expect(parseStudioOptions(element)).toEqual({
+      resizable: true,
+      convertibleToLink: false,
+    })
+  })
+
+  it('parses correct values for attributes 3', () => {
+    const element = document.createElement('span')
+    element.setAttribute('data-mce-p-data-studio-resizable', 'false')
+    element.setAttribute('data-mce-p-data-studio-convertible-to-link', 'true')
+    expect(parseStudioOptions(element)).toEqual({
+      resizable: false,
+      convertibleToLink: true,
+    })
+  })
+
+  it('parses correct values for attributes 4', () => {
+    const element = document.createElement('span')
+    element.setAttribute('data-mce-p-data-studio-resizable', 'true')
+    element.setAttribute('data-mce-p-data-studio-convertible-to-link', 'true')
+    expect(parseStudioOptions(element)).toEqual({
+      resizable: true,
+      convertibleToLink: true,
+    })
+  })
+})
+
+describe('handleBeforeObjectSelected', () => {
+  it('does not set data-mce-resize if resize attribute is true', () => {
+    const node = document.createElement('span')
+    node.setAttribute('data-mce-p-data-studio-resizable', 'true')
+    const event = createDeepMockProxy<EditorEvent<Events.ObjectSelectedEvent>>({}, {target: node})
+    handleBeforeObjectSelected(event)
+    expect(node).not.toHaveAttribute('data-mce-resize')
+  })
+
+  it('does not set data-mce-resize if resize attribute is missing', () => {
+    const node = document.createElement('span')
+    const event = createDeepMockProxy<EditorEvent<Events.ObjectSelectedEvent>>({}, {target: node})
+    handleBeforeObjectSelected(event)
+    expect(node).not.toHaveAttribute('data-mce-resize')
+  })
+
+  it('sets data-mce-resize if resize attribute is false', () => {
+    const node = document.createElement('span')
+    node.setAttribute('data-mce-p-data-studio-resizable', 'false')
+    const event = createDeepMockProxy<EditorEvent<Events.ObjectSelectedEvent>>({}, {target: node})
+    handleBeforeObjectSelected(event)
+    expect(node.getAttribute('data-mce-resize')).toEqual('false')
   })
 })

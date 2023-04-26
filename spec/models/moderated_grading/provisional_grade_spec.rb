@@ -275,7 +275,7 @@ describe ModeratedGrading::ProvisionalGrade do
         submission = assignment.submit_homework(student, submission_type: "online_text_entry", body: "hallo")
       end
       provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
-      expect(provisional_grade.reload.grade_matches_current_submission).to eq true
+      expect(provisional_grade.reload.grade_matches_current_submission).to be true
     end
 
     it "returns false if the submission is newer than the grade" do
@@ -286,7 +286,7 @@ describe ModeratedGrading::ProvisionalGrade do
         provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
       end
       assignment.submit_homework(student, submission_type: "online_text_entry", body: "resubmit")
-      expect(provisional_grade.reload.grade_matches_current_submission).to eq false
+      expect(provisional_grade.reload.grade_matches_current_submission).to be false
     end
   end
 
@@ -450,7 +450,7 @@ describe ModeratedGrading::ProvisionalGrade do
             }
           }
         )
-      end.to change { LearningOutcomeResult.count }.by(0)
+      end.not_to change { LearningOutcomeResult.count }
 
       expect { provisional_grade.publish! }.to change { LearningOutcomeResult.count }.by(1)
     end
@@ -499,12 +499,12 @@ describe ModeratedGrading::ProvisionalGrade do
       provisional_grade.publish!
       submission.reload
 
-      expect(submission.grade_matches_current_submission).to eq true
+      expect(submission.grade_matches_current_submission).to be true
       expect(submission.graded_at).not_to be_nil
       expect(submission.grader_id).to eq scorer.id
       expect(submission.score).to eq 80
       expect(submission.grade).not_to be_nil
-      expect(submission.graded_anonymously).to eq true
+      expect(submission.graded_anonymously).to be true
     end
 
     it "duplicates submission comments from the provisional grade to the submission" do

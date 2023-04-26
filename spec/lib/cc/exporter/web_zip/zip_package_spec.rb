@@ -520,9 +520,9 @@ describe "ZipPackage" do
 
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
       module_item_data = zip_package.parse_module_item_data(@module)
-      expect(module_item_data[0][:content]).to be nil
+      expect(module_item_data[0][:content]).to be_nil
       expect(module_item_data[0][:locked]).to be true
-      expect(module_item_data[1][:content]).to be nil
+      expect(module_item_data[1][:content]).to be_nil
       expect(module_item_data[1][:locked]).to be true
     end
 

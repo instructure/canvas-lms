@@ -22,10 +22,8 @@ import formatMessage from '../../../format-message'
 import VideoTrayController from './VideoOptionsTray/TrayController'
 import AudioTrayController from './AudioOptionsTray/TrayController'
 import {isAudioElement, isVideoElement} from '../shared/ContentSelection'
-import {isStudioEmbeddedMedia} from '../shared/StudioLtiSupportUtils'
 import {isOKToLink} from '../../contentInsertionUtils'
 import tinymce from 'tinymce'
-import RCEGlobals from '../../RCEGlobals'
 
 const videoTrayController = new VideoTrayController()
 const audioTrayController = new AudioTrayController()
@@ -153,23 +151,6 @@ tinymce.PluginManager.add('instructure_record', function (ed) {
     predicate: isVideoElement,
     scope: 'node',
   })
-
-  if (RCEGlobals.getFeatures()?.rce_show_studio_media_options) {
-    ed.ui.registry.addButton('studio-media-options', {
-      onAction() {
-        videoTrayController.showTrayForEditor(ed)
-      },
-      text: formatMessage('Studio Media Options'),
-      tooltip: formatMessage('Show Studio media options'),
-    })
-
-    ed.ui.registry.addContextToolbar('studio-media-options-toolbar', {
-      items: 'studio-media-options',
-      position: 'node',
-      predicate: isStudioEmbeddedMedia,
-      scope: 'node',
-    })
-  }
 
   ed.ui.registry.addButton('instructure-audio-options', {
     onAction() {

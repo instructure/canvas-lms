@@ -34,7 +34,7 @@ module RollupScoreAggregatorHelper
   private
 
   def present_scores
-    score_sets.pluck(:score).reject(&:nil?)
+    score_sets.pluck(:score).compact
   end
 
   def latest_result
@@ -88,7 +88,7 @@ module RollupScoreAggregatorHelper
   def alignment_aggregate_score(result_aggregates)
     return if result_aggregates[:total] == 0
 
-    possible = @points_possible > 0 ? @points_possible : @mastery_points
+    possible = (@points_possible > 0) ? @points_possible : @mastery_points
     (result_aggregates[:weighted] / result_aggregates[:total]) * possible
   end
 

@@ -81,7 +81,7 @@ describe "viewing a quiz with variable due dates on the quizzes index page" do
     end
 
     it "shows the availability dates for Section B", priority: "2" do
-      expect(f(".date-available")).to include_text("Not available until "\
+      expect(f(".date-available")).to include_text("Not available until " \
                                                    "#{format_date_for_view(@unlock_at_b, :short)}")
     end
   end

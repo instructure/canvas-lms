@@ -33,8 +33,8 @@ class WikiPagesController < ApplicationController
   include K5Mode
 
   add_crumb(proc { t "#crumbs.wiki_pages", "Pages" }) do |c|
-    context = c.instance_variable_get("@context")
-    current_user = c.instance_variable_get("@current_user")
+    context = c.instance_variable_get(:@context)
+    current_user = c.instance_variable_get(:@current_user)
     if context.grants_right?(current_user, :read)
       c.send :polymorphic_path, [context, :wiki_pages]
     end
@@ -78,7 +78,7 @@ class WikiPagesController < ApplicationController
     GuardRail.activate(:secondary) do
       if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
         log_asset_access(["pages", @context], "pages", "other")
-        js_env((ConditionalRelease::Service.env_for(@context)))
+        js_env(ConditionalRelease::Service.env_for(@context))
         wiki_pages_js_env(@context)
         set_tutorial_js_env
         @padless = true

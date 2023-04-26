@@ -971,7 +971,7 @@ describe "Accounts API", type: :request do
         expect(json.first["id"]).to eq @c1.id
         expect(json.first["name"]).to eq "c1"
         expect(json.first["account_id"]).to eq @c1.account_id
-        expect(json.first["is_public"]).to eq true
+        expect(json.first["is_public"]).to be true
 
         expect(json.last["id"]).to eq @c2.id
         expect(json.last["name"]).to eq "c2"
@@ -1035,14 +1035,14 @@ describe "Accounts API", type: :request do
                       { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                         format: "json", include: ["term", "concluded"] })
       expect(json[0]).to have_key("term")
-      expect(json[0]["concluded"]).to eq false
+      expect(json[0]["concluded"]).to be false
 
       @c1.enrollment_term.update_attribute :end_at, 1.week.ago
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=term&include[]=concluded",
                       { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                         format: "json", include: ["term", "concluded"] })
       expect(json[0]).to have_key("term")
-      expect(json[0]["concluded"]).to eq true
+      expect(json[0]["concluded"]).to be true
     end
 
     it "returns a teacher count if too many teachers are found" do
@@ -1175,7 +1175,7 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?state[]=deleted",
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json", state: %w[deleted] })
-        expect(json.length).to eql 1
+        expect(json.length).to be 1
         expect(json.first["name"]).to eql "c2"
       end
 
@@ -1183,7 +1183,7 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json" })
-        expect(json.length).to eql 3
+        expect(json.length).to be 3
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@c1.id, @c3.id, @c4.id].sort
       end
 
@@ -1191,7 +1191,7 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?state[]=all",
                         { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                           format: "json", state: %w[all] })
-        expect(json.length).to eql 4
+        expect(json.length).to be 4
         expect(json.collect { |c| c["id"].to_i }.sort).to eq [@c1.id, @c2.id, @c3.id, @c4.id].sort
       end
     end
@@ -1204,7 +1204,7 @@ describe "Accounts API", type: :request do
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?enrollment_term_id=#{term.id}",
                       { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                         format: "json", enrollment_term_id: term.to_param })
-      expect(json.length).to eql 1
+      expect(json.length).to be 1
       expect(json.first["name"]).to eql "c2"
     end
 
@@ -1548,14 +1548,14 @@ describe "Accounts API", type: :request do
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
                       { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                         format: "json", search_term: search_term })
-      expect(json.length).to eql 3
+      expect(json.length).to be 3
 
       # Should return empty result set
       search_term = "0000000000"
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
                       { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                         format: "json", search_term: search_term })
-      expect(json.length).to eql 0
+      expect(json.length).to be 0
 
       # To short should return 400
       search_term = "a"
@@ -1586,7 +1586,7 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?search_term=#{search_term}",
                         { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                           format: "json", search_term: search_term })
-        expect(json.length).to eql 1
+        expect(json.length).to be 1
         expect(json.first["name"]).to eq @course.name
       end
     end
@@ -1661,7 +1661,7 @@ describe "Accounts API", type: :request do
       @a1.settings = { microsoft_sync_enabled: true, microsoft_sync_tenant: "testtenant.com" }
       @a1.save!
       json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
-      expect(json["microsoft_sync_enabled"]).to eq(true)
+      expect(json["microsoft_sync_enabled"]).to be(true)
       expect(json["microsoft_sync_tenant"]).to eq("testtenant.com")
     end
   end

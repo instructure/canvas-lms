@@ -97,7 +97,7 @@ describe "Wiki Pages" do
       expect_flash_message :info
     end
 
-    it "updates with changes made in other window", priority: "1", custom_timeout: 40.seconds do
+    it "updates with changes made in other window", custom_timeout: 40.seconds, priority: "1" do
       @course.wiki_pages.create!(title: "Page1")
       edit_page("this is")
       driver.execute_script("window.open()")

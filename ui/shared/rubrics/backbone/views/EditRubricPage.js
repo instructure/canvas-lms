@@ -17,7 +17,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup.coffee'
+import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import rubricEditing from '../../jquery/edit_rubric'
 

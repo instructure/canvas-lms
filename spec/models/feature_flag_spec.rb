@@ -121,10 +121,6 @@ describe FeatureFlag do
   describe "audit log" do
     let_once(:acting_user) { user_model }
 
-    before do
-      allow(Audits).to receive(:config).and_return({ "write_paths" => ["active_record"], "read_path" => "active_record" })
-    end
-
     it "logs account feature creation" do
       flag = t_root_account.feature_flags.build(feature: "root_account_feature")
       flag.current_user = acting_user

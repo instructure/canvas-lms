@@ -19,13 +19,13 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import ready from '@instructure/ready'
-import DateShiftView from '@canvas/content-migrations/backbone/views/DateShiftView.coffee'
-import DaySubstitutionView from '@canvas/day-substitution/backbone/views/DaySubstitutionView.coffee'
-import ImportQuizzesNextView from '@canvas/content-migrations/backbone/views/ImportQuizzesNextView.coffee'
-import DaySubstitutionCollection from '@canvas/day-substitution/backbone/collections/DaySubstitutionCollection.coffee'
+import DateShiftView from '@canvas/content-migrations/backbone/views/DateShiftView'
+import DaySubstitutionView from '@canvas/day-substitution/backbone/views/DaySubstitutionView'
+import ImportQuizzesNextView from '@canvas/content-migrations/backbone/views/ImportQuizzesNextView'
+import DaySubstitutionCollection from '@canvas/day-substitution/backbone/collections/DaySubstitutionCollection'
 import CollectionView from '@canvas/backbone-collection-view'
 import template from '@canvas/day-substitution/jst/DaySubstitutionCollection.handlebars'
-import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration.coffee'
+import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration'
 import '@canvas/datetime'
 
 const I18n = useI18nScope('content_migrations')

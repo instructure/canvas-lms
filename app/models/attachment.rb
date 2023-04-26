@@ -748,7 +748,7 @@ class Attachment < ActiveRecord::Base
       GuardRail.activate(:secondary) do
         context.shard.activate do
           quota = Setting.get("context_default_quota", 50.megabytes.to_s).to_i
-          quota = context.quota if context.respond_to?("quota") && context.quota
+          quota = context.quota if context.respond_to?(:quota) && context.quota
 
           attachment_scope = context.attachments.active.where(root_attachment_id: nil)
 
@@ -838,7 +838,7 @@ class Attachment < ActiveRecord::Base
             ContextModule.where(id: ContentTag.where(content_id: id, content_type: "Attachment").select(:context_module_id)).touch_all
           end
           # update replacement pointers pointing at the overwritten file
-          context.attachments.where(replacement_attachment_id: a).update_all(replacement_attachment_id: id)
+          context.attachments.where(replacement_attachment_id: a).in_batches(of: 10_000).update_all(replacement_attachment_id: id)
           # delete the overwritten file (unless the caller is queueing them up)
           a.destroy unless opts[:caller_will_destroy]
           deleted_attachments << a
@@ -1182,7 +1182,7 @@ class Attachment < ActiveRecord::Base
         recipient_keys = (to_list || []).compact.map(&:asset_string)
         next if recipient_keys.empty?
 
-        notification = BroadcastPolicy.notification_finder.by_name(count.to_i > 1 ? "New Files Added" : "New File Added")
+        notification = BroadcastPolicy.notification_finder.by_name((count.to_i > 1) ? "New Files Added" : "New File Added")
         data = { count: count, display_names: display_name }
         DelayedNotification.delay_if_production(priority: 30).process(record, notification, recipient_keys, data)
       end
@@ -1479,7 +1479,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def hidden=(val)
-    self.file_state = (val == true || val == "1" ? "hidden" : "available")
+    self.file_state = ((val == true || val == "1") ? "hidden" : "available")
   end
 
   def context_module_action(user, action)
@@ -1692,7 +1692,7 @@ class Attachment < ActiveRecord::Base
     elsif Attachment.s3_storage? && s3object.exists?
       s3object.copy_to(bucket.object(purgatory_filename))
     elsif Attachment.local_storage?
-      FileUtils.mkdir(local_purgatory_directory) unless File.exist?(local_purgatory_directory)
+      FileUtils.mkdir_p(local_purgatory_directory)
       FileUtils.cp full_filename, local_purgatory_file
     end
     if (p = Purgatory.find_by(attachment_id: self))
@@ -1767,8 +1767,8 @@ class Attachment < ActiveRecord::Base
       self.instfs_uuid = nil
     elsif Attachment.s3_storage?
       s3object.delete unless ApplicationController.test_cluster?
-    elsif File.exist?(full_filename)
-      FileUtils.rm full_filename
+    else
+      FileUtils.rm_f(full_filename)
     end
   end
 
@@ -1909,7 +1909,7 @@ class Attachment < ActiveRecord::Base
       Canvadocs::ServerError,
       Canvadocs::HeavyLoadError
     ]
-    error_level = warnable_errors.any? { |kls| e.is_a?(kls) } ? :warn : :error
+    error_level = (warnable_errors.any? { |kls| e.is_a?(kls) }) ? :warn : :error
     update_attribute(:workflow_state, "errored")
     error_data = { type: :canvadocs, attachment_id: id, annotatable: opts[:wants_annotation] }
     Canvas::Errors.capture(e, error_data, error_level)
@@ -2068,7 +2068,7 @@ class Attachment < ActiveRecord::Base
 
     addition = attempts || 1
     dir = File.dirname(filename)
-    dir = dir == "." ? "" : "#{dir}/"
+    dir = (dir == ".") ? "" : "#{dir}/"
     extname = filename[/(\.[A-Za-z][A-Za-z0-9]*)*(\.[A-Za-z0-9]*)$/] || ""
     basename = File.basename(filename, extname)
 

@@ -36,7 +36,7 @@ describe JwtsController do
     it "requires being logged in" do
       post "create"
       expect(response).to be_redirect
-      expect(response.status).to eq(302)
+      expect(response).to have_http_status(:found)
     end
 
     context "with valid user session" do
@@ -130,37 +130,37 @@ describe JwtsController do
       context "returns error when" do
         it "context_type param is missing" do
           post "create", params: params.except(:context_type), format: "json"
-          expect(response.status).to eq(400)
+          expect(response).to have_http_status(:bad_request)
           expect(response.body).to match(/Missing context_type parameter./)
         end
 
         it "context_id or context_uuid param is missing" do
           post "create", params: params.except(:context_id), format: "json"
-          expect(response.status).to eq(400)
+          expect(response).to have_http_status(:bad_request)
           expect(response.body).to match(/Missing context_id or context_uuid parameter./)
         end
 
         it "context_type and context_uuid are passed" do
           post "create", params: params.merge({ context_uuid: @context_uuid }), format: "json"
-          expect(response.status).to eq(400)
+          expect(response).to have_http_status(:bad_request)
           expect(response.body).to match(/Should provide context_id or context_uuid parameters, but not both./)
         end
 
         it "context_type is invalid" do
           post "create", params: params.merge({ context_type: "unknown" }), format: "json"
-          expect(response.status).to eq(400)
+          expect(response).to have_http_status(:bad_request)
           expect(response.body).to match(/Invalid context_type parameter./)
         end
 
         it "context not found with id" do
           post "create", params: params.merge({ context_id: "unknown" }), format: "json"
-          expect(response.status).to eq(404)
+          expect(response).to have_http_status(:not_found)
           expect(response.body).to match(/Context not found./)
         end
 
         it "context not found with uuid" do
           post "create", params: params.except(:context_id).merge({ context_uuid: "unknown" }), format: "json"
-          expect(response.status).to eq(404)
+          expect(response).to have_http_status(:not_found)
           expect(response.body).to match(/Context not found./)
         end
 
@@ -184,7 +184,7 @@ describe JwtsController do
       token = build_wrapped_token(token_user.global_id)
       @request.headers["Authorization"] = "Bearer #{token}"
       get "create", format: "json"
-      expect(response.status).to eq(403)
+      expect(response).to have_http_status(:forbidden)
       expect(response.body).to match(/cannot generate a JWT when authorized by a JWT/)
     end
   end
@@ -193,14 +193,14 @@ describe JwtsController do
     it "requires being logged in" do
       post "refresh"
       expect(response).to be_redirect
-      expect(response.status).to eq(302)
+      expect(response).to have_http_status(:found)
     end
 
     it "doesn't allow using a token to gen a token" do
       token = build_wrapped_token(token_user.global_id)
       @request.headers["Authorization"] = "Bearer #{token}"
       get "refresh", format: "json"
-      expect(response.status).to eq(403)
+      expect(response).to have_http_status(:forbidden)
       expect(response.body).to match(/cannot generate a JWT when authorized by a JWT/)
     end
 
@@ -212,7 +212,7 @@ describe JwtsController do
 
       it "requires a jwt param" do
         post "refresh"
-        expect(response.status).to_not eq(200)
+        expect(response).to_not have_http_status(:ok)
       end
 
       it "returns a refreshed token for user" do
@@ -246,7 +246,7 @@ describe JwtsController do
         expect(services_jwt).to receive(:refresh_for_user)
           .and_raise(CanvasSecurity::ServicesJwt::InvalidRefresh)
         post "refresh", params: { jwt: "testjwt" }, format: "json"
-        expect(response.status).to eq(400)
+        expect(response).to have_http_status(:bad_request)
       end
     end
 
@@ -267,7 +267,7 @@ describe JwtsController do
 
         it "returns an invalid refresh error" do
           expect(response.body).to match(/invalid refresh/)
-          expect(response.status).to eq(400)
+          expect(response).to have_http_status(:bad_request)
         end
       end
 
@@ -290,7 +290,7 @@ describe JwtsController do
         end
 
         it "returns with a fresh JWT" do
-          expect(response.status).to eq(200)
+          expect(response).to have_http_status(:ok)
           expect(response.body).to match(/fresh-jwt/)
         end
       end
@@ -307,7 +307,7 @@ describe JwtsController do
 
         it "returns an invalid refresh error" do
           expect(response.body).to match(/invalid refresh/)
-          expect(response.status).to eq(400)
+          expect(response).to have_http_status(:bad_request)
         end
       end
 
@@ -324,7 +324,7 @@ describe JwtsController do
 
         it "returns an invalid refresh error" do
           expect(response.body).to match(/invalid refresh/)
-          expect(response.status).to eq(400)
+          expect(response).to have_http_status(:bad_request)
         end
 
         context "incoming jwt invalid formatting" do
@@ -334,7 +334,7 @@ describe JwtsController do
 
           it "returns an invalid refresh error" do
             expect(response.body).to match(/invalid refresh/)
-            expect(response.status).to eq(400)
+            expect(response).to have_http_status(:bad_request)
           end
         end
       end

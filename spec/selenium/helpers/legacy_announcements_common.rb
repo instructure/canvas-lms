@@ -65,9 +65,9 @@ module AnnouncementsCommon
   def refresh_and_filter(filter_type, filter, expected_text, expected_results = 1)
     refresh_page # in order to get the new topic information
     expect(ff(".toggleSelected")).to have_size(what_to_create.count)
-    filter_type == :css ? fj(filter).click : replace_content(f("#searchTerm"), filter)
+    (filter_type == :css) ? fj(filter).click : replace_content(f("#searchTerm"), filter)
     expect(ff(".discussionTopicIndexList .discussion-topic").count).to eq expected_results
-    expected_results > 1 ? ff(".discussionTopicIndexList .discussion-topic").each { |topic| expect(topic).to include_text(expected_text) } : (expect(f(".discussionTopicIndexList .discussion-topic")).to include_text(expected_text))
+    (expected_results > 1) ? ff(".discussionTopicIndexList .discussion-topic").each { |topic| expect(topic).to include_text(expected_text) } : (expect(f(".discussionTopicIndexList .discussion-topic")).to include_text(expected_text))
   end
 
   def add_attachment_and_validate

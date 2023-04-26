@@ -724,10 +724,10 @@ $(document).ready(function () {
       $('#video_upload')[0].removeFiles(0, files.length - 1)
     }
   })
-  $('#media_upload_submit').live('click', _event => {
+  $(document).on('click', '#media_upload_submit', _event => {
     $.mediaComment.upload_delegate.submit()
   })
-  $('#video_record_option,#audio_record_option').live('click', function (event) {
+  $(document).on('click', '#video_record_option,#audio_record_option', function (event) {
     event.preventDefault()
     $('#video_record_option,#audio_record_option').removeClass('selected_option')
     $(this).addClass('selected_option')

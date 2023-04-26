@@ -147,8 +147,8 @@ describe GradebookExporter do
         expect(rows[2]["Custom Column 1"]).to eq "Row2 Custom Column 1"
         expect(rows[1]["Custom Column 2"]).to eq "Row1 Custom Column 2"
         expect(rows[2]["Custom Column 2"]).to eq "Row2 Custom Column 2"
-        expect(rows[1]["Custom Column 3"]).to eq nil
-        expect(rows[2]["Custom Column 3"]).to eq nil
+        expect(rows[1]["Custom Column 3"]).to be_nil
+        expect(rows[2]["Custom Column 3"]).to be_nil
       end
     end
 
@@ -352,7 +352,7 @@ describe GradebookExporter do
         end
 
         it "emits an empty value for auto-posted assignments" do
-          expect(manual_posting_row[auto_header]).to be nil
+          expect(manual_posting_row[auto_header]).to be_nil
         end
       end
 
@@ -738,7 +738,7 @@ describe GradebookExporter do
           progress: progress
         }
         GradebookExporter.new(@course, @teacher, exporter_options).to_csv
-        expect(progress.reload.completion).to eql(90.0)
+        expect(progress.reload.completion).to be(90.0)
       end
 
       it "does early return if progress workflow_state has been set to failed" do
@@ -748,7 +748,7 @@ describe GradebookExporter do
           progress: progress
         }
         GradebookExporter.new(@course, @teacher, exporter_options).to_csv
-        expect(progress.reload.completion).to eql(50.0)
+        expect(progress.reload.completion).to be(50.0)
       end
     end
   end

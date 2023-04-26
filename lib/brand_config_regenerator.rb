@@ -73,7 +73,7 @@ class BrandConfigRegenerator
         end
 
         sub_scope = if @account.root_account?
-                      Account.active.where(root_account_id: [root_scope&.pluck(:id), Shard.current == @account.shard ? @account.id : nil].compact.flatten).preload(:brand_config)
+                      Account.active.where(root_account_id: [root_scope&.pluck(:id), (Shard.current == @account.shard) ? @account.id : nil].compact.flatten).preload(:brand_config)
                     else
                       Account.active.where(id: Account.sub_account_ids_recursive(@account.id))
                     end

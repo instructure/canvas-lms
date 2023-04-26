@@ -73,6 +73,6 @@ describe SIS::CSV::UserObserverImporter do
       "observer_id,student_id,status",
       "U001,U002,ACTIVE"
     )
-    expect(observer.reload.default_notifications_disabled?).to eq true
+    expect(observer.reload.default_notifications_disabled?).to be true
   end
 end

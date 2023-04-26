@@ -88,7 +88,7 @@ describe Api::V1::SubmissionComment do
         submission_comments: student_sub.submission_comments
       ).find { |comment| comment[:anonymous_id] == student3_sub.anonymous_id }
 
-      expect(student3_comment).to be nil
+      expect(student3_comment).to be_nil
     end
 
     it "comments retain author data when the viewing user wrote the comment" do

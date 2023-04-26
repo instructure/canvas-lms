@@ -74,7 +74,7 @@ describe AssignmentOverride do
     @override = AssignmentOverride.new
     @override.set_type = "Noop"
     expect(@override.set_id).to be_nil
-    expect(@override.set).to eq nil
+    expect(@override.set).to be_nil
   end
 
   it "removes adhoc associations when an adhoc override is deleted" do
@@ -224,17 +224,17 @@ describe AssignmentOverride do
     end
 
     it "returns true when it is a mastery_paths override" do
-      expect(override.mastery_paths?).to eq true
+      expect(override.mastery_paths?).to be true
     end
 
     it "returns false when it is not a mastery_paths noop" do
       override.set_id = 999
-      expect(override.mastery_paths?).to eq false
+      expect(override.mastery_paths?).to be false
     end
 
     it "returns false when it is not a noop override" do
       override.set_type = "EvilType"
-      expect(override.mastery_paths?).to eq false
+      expect(override.mastery_paths?).to be false
     end
   end
 
@@ -523,14 +523,14 @@ describe AssignmentOverride do
 
       it "sets the override when a override_#{field} is called" do
         @override.send("override_#{field}", value2)
-        expect(@override.send("#{field}_overridden")).to eq true
+        expect(@override.send("#{field}_overridden")).to be true
         expect(@override.send(field)).to eq value2
       end
 
       it "clears the override when clear_#{field}_override is called" do
         @override.send("override_#{field}", value2)
         @override.send("clear_#{field}_override")
-        expect(@override.send("#{field}_overridden")).to eq false
+        expect(@override.send("#{field}_overridden")).to be false
         expect(@override.send(field)).to be_nil
       end
     end
@@ -555,60 +555,60 @@ describe AssignmentOverride do
 
     it "interprets 11:59pm as all day with no prior value" do
       @override.due_at = fancy_midnight(zone: "Alaska")
-      expect(@override.all_day).to eq true
+      expect(@override.all_day).to be true
     end
 
     it "interprets 11:59pm as all day with same-tz all-day prior value" do
       @override.due_at = fancy_midnight(zone: "Alaska") + 1.day
       @override.due_at = fancy_midnight(zone: "Alaska")
-      expect(@override.all_day).to eq true
+      expect(@override.all_day).to be true
     end
 
     it "interprets 11:59pm as all day with other-tz all-day prior value" do
       @override.due_at = fancy_midnight(zone: "Baghdad")
       @override.due_at = fancy_midnight(zone: "Alaska")
-      expect(@override.all_day).to eq true
+      expect(@override.all_day).to be true
     end
 
     it "interprets 11:59pm as all day with non-all-day prior value" do
       @override.due_at = fancy_midnight(zone: "Alaska") + 1.hour
       @override.due_at = fancy_midnight(zone: "Alaska")
-      expect(@override.all_day).to eq true
+      expect(@override.all_day).to be true
     end
 
     it "does not interpret non-11:59pm as all day no prior value" do
       @override.due_at = fancy_midnight(zone: "Alaska").in_time_zone("Baghdad")
-      expect(@override.all_day).to eq false
+      expect(@override.all_day).to be false
     end
 
     it "does not interpret non-11:59pm as all day with same-tz all-day prior value" do
       @override.due_at = fancy_midnight(zone: "Alaska")
       @override.due_at = fancy_midnight(zone: "Alaska") + 1.hour
-      expect(@override.all_day).to eq false
+      expect(@override.all_day).to be false
     end
 
     it "does not interpret non-11:59pm as all day with other-tz all-day prior value" do
       @override.due_at = fancy_midnight(zone: "Baghdad")
       @override.due_at = fancy_midnight(zone: "Alaska") + 1.hour
-      expect(@override.all_day).to eq false
+      expect(@override.all_day).to be false
     end
 
     it "does not interpret non-11:59pm as all day with non-all-day prior value" do
       @override.due_at = fancy_midnight(zone: "Alaska") + 1.hour
       @override.due_at = fancy_midnight(zone: "Alaska") + 2.hours
-      expect(@override.all_day).to eq false
+      expect(@override.all_day).to be false
     end
 
     it "preserves all-day when only changing time zone" do
       @override.due_at = fancy_midnight(zone: "Alaska")
       @override.due_at = fancy_midnight(zone: "Alaska").in_time_zone("Baghdad")
-      expect(@override.all_day).to eq true
+      expect(@override.all_day).to be true
     end
 
     it "preserves non-all-day when only changing time zone" do
       @override.due_at = fancy_midnight(zone: "Alaska").in_time_zone("Baghdad")
       @override.due_at = fancy_midnight(zone: "Alaska")
-      expect(@override.all_day).to eq false
+      expect(@override.all_day).to be false
     end
 
     it "determines date from due_at's timezone" do
@@ -1029,18 +1029,18 @@ describe AssignmentOverride do
       allow(@override).to receive(:set_type).and_return "ADHOC"
       allow(@override).to receive(:set).and_return []
 
-      expect(@override.set_not_empty?).to eq false
+      expect(@override.set_not_empty?).to be false
     end
 
     it "returns true if no students who are active in course and CourseSection or Group" do
       allow(@override).to receive(:set_type).and_return "CourseSection"
       allow(@override).to receive(:set).and_return []
 
-      expect(@override.set_not_empty?).to eq true
+      expect(@override.set_not_empty?).to be true
 
       allow(@override).to receive(:set_type).and_return "Group"
 
-      expect(@override.set_not_empty?).to eq true
+      expect(@override.set_not_empty?).to be true
     end
 
     it "returns true if has students who are active in course for ADHOC" do
@@ -1050,7 +1050,7 @@ describe AssignmentOverride do
       @override_student.user = student.user
       @override_student.save!
 
-      expect(@override.set_not_empty?).to eq true
+      expect(@override.set_not_empty?).to be true
     end
   end
 

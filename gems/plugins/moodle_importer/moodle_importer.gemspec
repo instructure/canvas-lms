@@ -13,7 +13,6 @@ Gem::Specification.new do |s|
   s.description = "This enables importing Moodle 1.9 and 2.x .zip/.mbz files to Canvas."
 
   s.files = Dir["{lib}/**/*"]
-  s.test_files = Dir["spec_canvas/**/*"]
 
   s.add_dependency "moodle2cc", "0.2.41"
   s.add_dependency "rails", ">= 3.2"

@@ -17,8 +17,8 @@
 #
 import $ from 'jquery'
 import _ from 'underscore'
-import SortableCollectionView from './SortableCollectionView.coffee'
-import AssignmentGroupListItemView from './AssignmentGroupListItemView.coffee'
+import SortableCollectionView from './SortableCollectionView'
+import AssignmentGroupListItemView from './AssignmentGroupListItemView'
 import template from '../../jst/AssignmentGroupList.handlebars'
 import NoAssignmentsListItem from '../../jst/NoAssignmentsListItem.handlebars'
 

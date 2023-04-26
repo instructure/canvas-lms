@@ -146,7 +146,7 @@ module I18nTasks
       # only do fancy markdown checks on multi-line strings
       if dashed_str.include?("\n")
         matches.concat(scan_and_report(dashed_str, /^(\#{1,6})\s+[^#]*#*$/).map { |m| "h#{m.first.size}" }) # headings
-               .concat(scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map { |m| m.first[0] == "=" ? "h1" : "h2" }) # moar headings
+               .concat(scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map { |m| (m.first[0] == "=") ? "h1" : "h2" }) # moar headings
                .concat(scan_and_report(dashed_str, /^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map { "hr" })
                .concat(scan_and_report(dashed_str, LIST_ITEM_PATTERN).map { |m| /\d/.match?(m.first) ? "1." : "*" })
       end

@@ -38,6 +38,7 @@ const locale = {
     "message": "Aangrenzende koppelingen met dezelfde URL moeten één koppeling zijn."
   },
   "aleph_f4ffd155": { "message": "Alef" },
+  "align_11050992": { "message": "Uitlijnen" },
   "alignment_and_lists_5cebcb69": { "message": "Koppeling en lijsten" },
   "all_4321c3a1": { "message": "Alle" },
   "all_apps_a50dea49": { "message": "Alle apps" },
@@ -68,6 +69,9 @@ const locale = {
   "approaches_the_limit_893aeec9": { "message": "Benadert de limiet" },
   "approximately_e7965800": { "message": "Ongeveer" },
   "apps_54d24a47": { "message": "Apps" },
+  "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+    "message": "Weet je zeker dat je wilt annuleren? Je wijzigingen worden niet opgeslagen."
+  },
   "arrows_464a3e54": { "message": "Pijlen" },
   "art_icon_8e1daad": { "message": "Kunstpictogram" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
@@ -105,6 +109,7 @@ const locale = {
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Annuleren" },
   "cap_product_3a5265a6": { "message": "Cap-product" },
+  "center_align_e68d9997": { "message": "Gecentreerd uitlijnen" },
   "centered_dot_64d5e378": { "message": "Gecentreerde punt" },
   "centered_horizontal_dots_451c5815": {
     "message": "Gecentreerde horizontale punten"
@@ -117,6 +122,11 @@ const locale = {
     "message": "Alleen het niveau van deze kop wijzigen"
   },
   "change_text_color_1aecb912": { "message": "Tekstkleur wijzigen" },
+  "changes_you_made_may_not_be_saved_4e8db973": {
+    "message": "Je wijzigingen worden niet opgeslagen."
+  },
+  "characters_9d897d1c": { "message": "Tekens" },
+  "characters_no_spaces_485e5367": { "message": "Tekens (geen spaties)" },
   "check_accessibility_3c78211c": { "message": "Toegankelijkheid controleren" },
   "checking_for_accessibility_issues_fac18c6d": {
     "message": "Controleren op toegankelijkheidsproblemen"
@@ -125,6 +135,9 @@ const locale = {
   "choose_caption_file_9c45bc4e": { "message": "Ondertitelingsbestand kiezen" },
   "choose_usage_rights_33683854": { "message": "Gebruiksrechten kiezen..." },
   "circle_484abe63": { "message": "Cirkel" },
+  "circle_unordered_list_9e3a0763": {
+    "message": "ongeordende lijst omcirkelen"
+  },
   "clear_2084585f": { "message": "Wissen" },
   "clear_image_3213fe62": { "message": "Afbeelding wissen" },
   "clear_selected_file_82388e50": {
@@ -182,6 +195,10 @@ const locale = {
   "content_type_2cf90d95": { "message": "Inhoudtype" },
   "coproduct_e7838082": { "message": "Coproduct" },
   "copyright_holder_66ee111": { "message": "Houder van auteursrecht:" },
+  "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
+    "message": "Kan deze inhoud niet invoegen: \"{ itemType }\" items worden momenteel niet ondersteund in Canvas."
+  },
+  "count_40eced3b": { "message": "Telling" },
   "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
     "message": "{ count, plural,\n     =0 {0 woorden}\n    one {1 woord}\n  other {# woorden}\n}"
   },
@@ -192,10 +209,14 @@ const locale = {
   "course_files_62deb8f8": { "message": "Cursusbestanden" },
   "course_files_a31f97fc": { "message": "Cursusbestanden" },
   "course_images_f8511d04": { "message": "Cursusafbeeldingen" },
+  "course_link_b369426": { "message": "Cursuslink" },
   "course_links_b56959b9": { "message": "Cursuslinks" },
   "course_media_ec759ad": { "message": "Cursusmedia" },
   "course_navigation_dd035109": { "message": "Cursusnavigatie" },
   "create_icon_110d6463": { "message": "Pictogram maken" },
+  "create_icon_maker_icon_c716bffe": {
+    "message": "Pictogrammaker-pictogram maken"
+  },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-licentie:"
   },
@@ -211,7 +232,14 @@ const locale = {
   "decorative_icon_9a7f3fc3": { "message": "Decoratief pictogram" },
   "decorative_image_fde98579": { "message": "Decoratieve afbeelding" },
   "decorative_type_upper_f2c95e3": { "message": "Decoratief { TYPE_UPPER }" },
+  "decrease_indent_d9cf469d": { "message": "Inspringen verkleinen" },
   "deep_purple_bb3e2907": { "message": "Diep paars" },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "standaard ongeordende opsommingslijst"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "standaard geordende numerieke lijst"
+  },
   "definite_integral_fe7ffed1": { "message": "Bepaalde integraal" },
   "degree_symbol_4a823d5f": { "message": "Gradensymbool" },
   "delimiters_4db4840d": { "message": "Scheidingstekens" },
@@ -238,9 +266,11 @@ const locale = {
     "message": "Tekstkoppeling weergeven (Opent in een nieuw tabblad)"
   },
   "division_sign_72190870": { "message": "Deelteken" },
+  "document_678cd7bf": { "message": "Document" },
   "documents_81393201": { "message": "Documenten" },
   "done_54e3d4b6": { "message": "Gereed" },
   "double_dagger_faf78681": { "message": "Double Dagger" },
+  "down_5831a426": { "message": "Omlaag" },
   "down_and_left_diagonal_arrow_40ef602c": {
     "message": "Pijl omlaag en links diagonaal"
   },
@@ -266,6 +296,7 @@ const locale = {
   },
   "edit_c5fbea07": { "message": "Bewerken" },
   "edit_course_link_5a5c3c59": { "message": "Cursuslink bewerken" },
+  "edit_equation_f5279959": { "message": "Vergelijking bewerken" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Bestaand Icon Maker-pictogram bewerken"
   },
@@ -277,6 +308,9 @@ const locale = {
   },
   "embed_828fac4a": { "message": "Insluiten" },
   "embed_code_314f1bd5": { "message": "Code insluiten" },
+  "embed_content_from_external_tool_3397ad2d": {
+    "message": "Inhoud insluiten vanuit extern tool"
+  },
   "embed_image_1080badc": { "message": "Afbeelding insluiten" },
   "embed_video_a97a64af": { "message": "Video insluiten" },
   "embedded_content_aaeb4d3d": { "message": "ingesloten inhoud" },
@@ -293,7 +327,9 @@ const locale = {
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (variant)" },
   "equals_sign_c51bdc58": { "message": "Gelijkteken" },
+  "equation_1c5ac93c": { "message": "Vergelijking" },
   "equation_editor_39fbc3f1": { "message": "Vergelijkingseditor" },
+  "equilibrium_6ff3040b": { "message": "In evenwicht" },
   "equivalence_class_7b0f11c0": { "message": "Equivalentieklasse" },
   "equivalent_identity_654b3ce5": { "message": "Equivalent (identiteit)" },
   "eta_b8828f99": { "message": "Eta" },
@@ -305,6 +341,8 @@ const locale = {
   "expand_to_see_types_f5d29352": {
     "message": "Uitklappen om te bekijken { types }"
   },
+  "external_link_d3f9e62a": { "message": "Externe link" },
+  "external_tool_frame_70b32473": { "message": "Frame externe tool" },
   "external_tools_6e77821": { "message": "Externe tools" },
   "extra_large_b6cdf1ff": { "message": "Extra groot" },
   "extra_small_9ae33252": { "message": "Extra klein" },
@@ -312,6 +350,9 @@ const locale = {
   "f_function_fe422d65": { "message": "F (functie)" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Kan geen bestandsinhoud ophalen"
+  },
+  "failed_to_retrieve_content_from_external_tool_5899c213": {
+    "message": "Kan geen inhoud ophalen uit externe tool"
   },
   "file_name_8fd421ff": { "message": "Bestandsnaam" },
   "file_storage_quota_exceeded_b7846cd1": {
@@ -375,6 +416,7 @@ const locale = {
   "group_files_82e5dcdb": { "message": "Groepsbestanden" },
   "group_images_98e0ac17": { "message": "Afbeeldingen groeperen" },
   "group_isomorphism_45b1458c": { "message": "Groepsisomorfie" },
+  "group_link_63e626b3": { "message": "Groepslink" },
   "group_links_9493129e": { "message": "Groeplinks" },
   "group_media_2f3d128a": { "message": "Media groeperen" },
   "group_navigation_99f191a": { "message": "Groepsnavigatie" },
@@ -408,6 +450,7 @@ const locale = {
   },
   "home_351838cd": { "message": "Startpagina" },
   "html_code_editor_fd967a44": { "message": "HTML-code-editor" },
+  "html_editor_fb2ab713": { "message": "HTML-editor" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Ik heb toestemming gekregen om dit bestand te gebruiken."
   },
@@ -423,6 +466,9 @@ const locale = {
   "icon_size_9353edea": { "message": "Pictogramgrootte" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
     "message": "Als de link leeg wordt gelaten, wordt de naam van de cursuslink als tekst weergegeven"
+  },
+  "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
+    "message": "Als er Gebruiksrechten vereist zijn, wordt het bestand pas gepubliceerd nadat dit op de pagina Bestanden is ingeschakeld."
   },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Als je nu geen gebruiksrechten selecteert, wordt de publicatie van dit bestand ongedaan gemaakt nadat het is geüpload."
@@ -446,12 +492,16 @@ const locale = {
     "message": "Denkbeeldig deel (van complex getal)"
   },
   "in_element_of_19ca2f33": { "message": "In (element van)" },
+  "increase_indent_6af90f7c": { "message": "Inspringen vergroten" },
   "indefinite_integral_6623307e": { "message": "Onbepaalde integraal" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "gevolgtrekking" },
   "infinity_7a10f206": { "message": "Oneindigheid" },
   "insert_593145ef": { "message": "Invoegen" },
   "insert_link_6dc23cae": { "message": "Koppeling invoegen" },
+  "insert_math_equation_57c6e767": {
+    "message": "Wiskundige vergelijking invoeren"
+  },
   "integers_336344e1": { "message": "Gehele getallen" },
   "intersection_cd4590e4": { "message": "Snijpunt" },
   "invalid_entry_f7d2a0f5": { "message": "Ongeldige invoer." },
@@ -501,6 +551,8 @@ const locale = {
     "message": "Meer informatie over gebruik van bereikkenmerken met tabellen"
   },
   "leave_as_is_4facfe55": { "message": "Ongewijzigd laten" },
+  "left_3ea9d375": { "message": "Links" },
+  "left_align_43d95491": { "message": "Links uitlijnen" },
   "left_angle_bracket_c87a6d07": { "message": "Recht haakje links" },
   "left_arrow_4fde1a64": { "message": "Pijl-links" },
   "left_arrow_with_hook_5bfcad93": { "message": "Pijl-links met hoek" },
@@ -540,9 +592,13 @@ const locale = {
   "loading_closed_captions_subtitles_failed_95ceef47": {
     "message": "laden van bijschriften/ondertiteling is mislukt."
   },
+  "loading_external_tool_d839042c": { "message": "Externe tool laden" },
   "loading_failed_b3524381": { "message": "Laden mislukt..." },
   "loading_failed_e6a9d8ef": { "message": "Laden mislukt." },
   "loading_folders_d8b5869e": { "message": "Mappen worden geladen" },
+  "loading_placeholder_for_filename_792ef5e8": {
+    "message": "Tijdelijke aanduiding laden voor { fileName }"
+  },
   "loading_please_wait_d276220a": {
     "message": "Bezig met laden, even wachten"
   },
@@ -580,6 +636,9 @@ const locale = {
   "misc_3b692ea7": { "message": "Diversen" },
   "miscellaneous_e9818229": { "message": "Diversen" },
   "modules_c4325335": { "message": "Modules" },
+  "moving_image_to_crop_directionword_6f66cde2": {
+    "message": "Afbeelding verplaatsen om naar { directionWord } bij te snijden"
+  },
   "mu_37223b8b": { "message": "Mu" },
   "multi_color_image_63d7372f": { "message": "Veelkleurige afbeelding" },
   "multiplication_sign_15f95c22": { "message": "Vermenigvuldigingsteken" },
@@ -648,6 +707,9 @@ const locale = {
   "operators_a2ef9a93": { "message": "Operators" },
   "or_9b70ccaa": { "message": "Of" },
   "orange_81386a62": { "message": "Oranje" },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "Geordende en ongeordende lijsten"
+  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Andere editorsnelkoppelingen zijn te vinden op"
   },
@@ -724,11 +786,13 @@ const locale = {
     "message": "Reëel deel (van complex getal)"
   },
   "record_7c9448b": { "message": "Opnemen" },
+  "record_upload_media_5fdce166": { "message": "Media opnemen/uploaden" },
   "recording_98da6bda": { "message": "Bezig met opnemen" },
   "red_8258edf3": { "message": "Rood" },
   "relationships_6602af70": { "message": "Relaties" },
   "religion_icon_246e0be1": { "message": "Religiepictogram" },
   "remove_heading_style_5fdc8855": { "message": "Koptekststijl verwijderen" },
+  "remove_link_d1f2f4d0": { "message": "Link verwijderen" },
   "replace_e61834a7": { "message": "Vervangen" },
   "reset_95a81614": { "message": "Opnieuw instellen" },
   "resize_ec83d538": { "message": "Grootte wijzigen" },
@@ -744,6 +808,8 @@ const locale = {
   "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
     "message": "Rich Text-gebied. Druk op { OSKey }+F8 voor snelkoppelingen van Rich Content Editor."
   },
+  "right_71ffdc4d": { "message": "Rechts" },
+  "right_align_39e7a32a": { "message": "Rechts uitlijnen" },
   "right_angle_bracket_d704e2d6": { "message": "Recht haakje rechts" },
   "right_arrow_35e0eddf": { "message": "Pijl-rechts" },
   "right_arrow_with_hook_29d92d31": { "message": "Pijl-rechts met hoek" },
@@ -772,6 +838,9 @@ const locale = {
   "save_11a80ec3": { "message": "Opslaan" },
   "save_copy_ca63944e": { "message": "Kopie opslaan" },
   "save_media_cb9e786e": { "message": "Media opslaan" },
+  "saved_icon_maker_icons_df86e2a1": {
+    "message": "Opgeslagen pictogrammaker-pictogrammen"
+  },
   "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
     "message": "Schermlezers kunnen niet bepalen wat er wordt weergegeven in een afbeelding zonder alt-tekst en bestandsnamen zijn vaak betekenisloze tekenreeksen van cijfers en letters die niets over de inhoud of betekenis prijsgeven."
   },
@@ -799,6 +868,7 @@ const locale = {
   "selected_linkfilename_c093b1f2": {
     "message": "Geselecteerd { linkFileName }"
   },
+  "selection_b52c4c5e": { "message": "Selectie" },
   "set_header_scope_8c548f40": { "message": "Kopbeschrijving instellen" },
   "set_minus_b46e9b88": { "message": "Setminus" },
   "set_table_header_cfab13a0": { "message": "Tabelkop instellen" },
@@ -808,6 +878,13 @@ const locale = {
     "message": "Shift-O om de pretty HTML-editor te openen."
   },
   "shortcut_911d6255": { "message": "Snelkoppeling" },
+  "show_audio_options_b489926b": { "message": "Audio-opties weergeven" },
+  "show_image_options_1e2ecc6b": { "message": "Afbeeldingsopties weergeven" },
+  "show_link_options_545338fd": { "message": "Linkopties weergeven" },
+  "show_studio_media_options_a0c748c6": {
+    "message": "Studio Media-opties weergeven"
+  },
+  "show_video_options_6ed3721a": { "message": "Video-opties weergeven" },
   "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
     "message": "Slechtzienden bladeren snel door webpagina''s, op zoek naar grote of vette koppen. Gebruikers van schermlezers zijn afhankelijk van koppen om een idee van de context te krijgen. Koppen moeten de juiste structuur hebben."
   },
@@ -840,6 +917,9 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Er is iets fout gegaan bij het delen van je scherm."
   },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Helaas, we bieden geen ondersteuning voor meerdere bestanden."
+  },
   "sort_by_e75f9e3e": { "message": "Sorteren op" },
   "spades_suit_b37020c2": { "message": "Schoppen (speelkaart)" },
   "square_511eb3b3": { "message": "Vierkant" },
@@ -855,10 +935,14 @@ const locale = {
   "square_superset_strict_fa4262e4": {
     "message": "Superset van vierkantswortel (strikt)"
   },
+  "square_unordered_list_b15ce93b": {
+    "message": "vierkante ongeordende lijst"
+  },
   "star_8d156e09": { "message": "Ster" },
   "start_over_f7552aa9": { "message": "Opnieuw starten" },
   "start_recording_9a65141a": { "message": "Opname starten" },
   "steel_blue_14296f08": { "message": "Staalblauw" },
+  "studio_media_options_ee504361": { "message": "Studio Media-opties" },
   "styles_2aa721ef": { "message": "Stijlen" },
   "submit_a3cc6859": { "message": "Inleveren" },
   "subscript_59744f96": { "message": "Subscript" },
@@ -868,6 +952,9 @@ const locale = {
   "succeeds_equal_158e8c3a": { "message": "Volgt op gelijk" },
   "sum_b0842d31": { "message": "Som" },
   "superscript_8cb349a2": { "message": "Superscript" },
+  "superscript_and_subscript_37f94a50": {
+    "message": "Superscript en subscript"
+  },
   "superset_c4db8a7a": { "message": "Superset" },
   "superset_strict_c77dd6d2": { "message": "Superset (strikt)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
@@ -927,6 +1014,9 @@ const locale = {
   "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
     "message": "De eerste koptekst op een pagina moet een H2 zijn."
   },
+  "the_following_content_is_partner_provided_ed1da756": {
+    "message": "De volgende inhoud is door een partner geleverd"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Het materiaal bevindt zich in het openbaar domein"
   },
@@ -935,6 +1025,9 @@ const locale = {
   },
   "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
     "message": "Op het materiaal is een uitzondering van toepassing, bijvoorbeeld redelijk gebruik, het recht om te citeren of andere toepasselijke wetgeving op het auteursrecht"
+  },
+  "the_preceding_content_is_partner_provided_d753928c": {
+    "message": "De voorgaande inhoud is door een partner geleverd"
   },
   "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
     "message": "De pretty HTML-editor is niet toetsenbordtoegankelijk. Druk op Shift O om de raw HTML-editor te openen."
@@ -986,6 +1079,9 @@ const locale = {
   "type_control_f9_to_access_table_options_text_92141329": {
     "message": "typ Ctrl+F9 om opties voor tabellen te openen. { text }"
   },
+  "unable_to_determine_resource_selection_url_7867e060": {
+    "message": "Kan geen bronselectie-URL vaststellen"
+  },
   "union_e6b57a53": { "message": "Vereniging" },
   "unpublished_dfd8801": { "message": "niet-gepubliceerd" },
   "untitled_16aa4f2b": { "message": "Zonder titel" },
@@ -996,10 +1092,16 @@ const locale = {
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Pijl omhoog en rechts diagonaal"
   },
+  "up_c553575d": { "message": "Omhoog" },
+  "upload_document_253f0478": { "message": "Document uploaden" },
   "upload_file_fd2361b8": { "message": "Bestand uploaden" },
   "upload_image_6120b609": { "message": "Afbeelding uploaden" },
   "upload_media_ce31135a": { "message": "Media uploaden" },
+  "upload_record_media_e4207d72": { "message": "Media uploaden/opnemen" },
   "uploading_19e8a4e7": { "message": "Bezig met uploaden" },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "geordende lijst op hoofdletters alfabet"
+  },
   "uppercase_delta_d4f4bc41": { "message": "Delta in kapitalen" },
   "uppercase_gamma_86f492e9": { "message": "Gamma in kapitalen" },
   "uppercase_lambda_c78d8ed4": { "message": "Lambda in kapitalen" },
@@ -1007,6 +1109,9 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "Phi in kapitalen" },
   "uppercase_pi_fcc70f5e": { "message": "Pi in kapitalen" },
   "uppercase_psi_6395acbe": { "message": "Psi in kapitalen" },
+  "uppercase_roman_numeral_ordered_list_853f292b": {
+    "message": "geordende lijst op Romeinse cijfers in hoofdletters"
+  },
   "uppercase_sigma_dbb70e92": { "message": "Sigma in kapitalen" },
   "uppercase_theta_49afc891": { "message": "Theta in kapitalen" },
   "uppercase_upsilon_8c1e623e": { "message": "Ypsilon in kapitalen" },
@@ -1068,6 +1173,7 @@ const locale = {
   "video_player_for_title_ffd9fbc4": {
     "message": "Videospeler voor { title }"
   },
+  "view_all_e13bf0a6": { "message": "Alles weergeven" },
   "view_ba339f93": { "message": "Bekijken" },
   "view_description_30446afc": { "message": "Beschrijving bekijken" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "Sneltoetsen bekijken" },
@@ -1102,6 +1208,8 @@ const locale = {
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
   "wiki_home_9cd54d0": { "message": "Wiki Home" },
+  "word_count_c77fe3a6": { "message": "Woordtelling" },
+  "words_b448b7d5": { "message": "Woorden" },
   "wreath_product_200b38ef": { "message": "Kransproduct" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Ja" },

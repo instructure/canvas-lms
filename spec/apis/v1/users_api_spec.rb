@@ -658,7 +658,7 @@ describe Api::V1::User do
       expect(@test_api.context).to receive(:account).and_return(@test_api.context)
       expect(@test_api.context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis, :view_user_logins).and_return(true)
       @test_api.current_user = @admin
-      expect(@test_api.user_json_is_admin?).to eq true
+      expect(@test_api.user_json_is_admin?).to be true
     end
 
     it "supports loading the current user as a member var" do
@@ -667,7 +667,7 @@ describe Api::V1::User do
       expect(mock_context).to receive(:account).and_return(mock_context)
       expect(mock_context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis, :view_user_logins).and_return(true)
       @test_api.current_user = @admin
-      expect(@test_api.user_json_is_admin?(mock_context, @admin)).to eq true
+      expect(@test_api.user_json_is_admin?(mock_context, @admin)).to be true
     end
 
     it "supports loading multiple different things (via args)" do
@@ -892,18 +892,18 @@ describe "Users API", type: :request do
         @user = @other_user
         json = api_call(:get, "/api/v1/users/self",
                         { controller: "users", action: "api_show", id: "self", format: "json" })
-        expect(json["permissions"]["can_update_avatar"]).to eq(false)
+        expect(json["permissions"]["can_update_avatar"]).to be(false)
 
         Account.default.tap { |a| a.enable_service(:avatars) }.save
         json = api_call(:get, "/api/v1/users/self",
                         { controller: "users", action: "api_show", id: "self", format: "json" })
-        expect(json["permissions"]["can_update_avatar"]).to eq(true)
+        expect(json["permissions"]["can_update_avatar"]).to be(true)
 
         @user.avatar_state = :locked
         @user.save
         json = api_call(:get, "/api/v1/users/self",
                         { controller: "users", action: "api_show", id: "self", format: "json" })
-        expect(json["permissions"]["can_update_avatar"]).to eq(false)
+        expect(json["permissions"]["can_update_avatar"]).to be(false)
       end
 
       it "requires :read_roster or :manage_user_logins permission from the account" do
@@ -1277,7 +1277,7 @@ describe "Users API", type: :request do
                  }
                })
       users = User.where(name: "Test User").to_a
-      expect(users.length).to eql 1
+      expect(users.length).to be 1
       user = users.first
       expect(user.sms_channel.workflow_state).to eq "active"
     end
@@ -1325,7 +1325,7 @@ describe "Users API", type: :request do
                           })
 
           users = User.where(name: "").to_a
-          expect(users.length).to eql 1
+          expect(users.length).to be 1
           user = users.first
 
           expect(json).to eq({
@@ -1365,7 +1365,7 @@ describe "Users API", type: :request do
                    }
                  })
         users = User.where(name: "Test User").to_a
-        expect(users.length).to eql 1
+        expect(users.length).to be 1
         user = users.first
         expect(user.name).to eql "Test User"
         expect(user.short_name).to eql "Test"
@@ -1373,7 +1373,7 @@ describe "Users API", type: :request do
         expect(user.time_zone.name).to eql "Mountain Time (US & Canada)"
         expect(user.locale).to eql "en"
 
-        expect(user.pseudonyms.count).to eql 1
+        expect(user.pseudonyms.count).to be 1
         pseudonym = user.pseudonyms.first
         expect(pseudonym.unique_id).to eql "test@example.com"
         expect(pseudonym.sis_user_id).to eql "12345"
@@ -1548,7 +1548,7 @@ describe "Users API", type: :request do
                    }
                  })
         users = User.where(name: "Test User").to_a
-        expect(users.length).to eql 1
+        expect(users.length).to be 1
         user = users.first
         expect(user.pseudonyms.first.authentication_provider).to eq ap
       end
@@ -1983,7 +1983,7 @@ describe "Users API", type: :request do
                         })
         user = User.find(json["id"])
         expect(user.avatar_image_source).to eql to_set["type"]
-        expect(user.avatar_state).to eql :approved
+        expect(user.avatar_state).to be :approved
       end
 
       it "re-locks the avatar after being updated by an admin" do
@@ -2006,7 +2006,7 @@ describe "Users API", type: :request do
                         })
         user = User.find(json["id"])
         expect(user.avatar_image_source).to eql to_set["type"]
-        expect(user.avatar_state).to eql :locked
+        expect(user.avatar_state).to be :locked
       end
 
       it "sets avatar state manually by an admin" do
@@ -2020,7 +2020,7 @@ describe "Users API", type: :request do
                           }
                         })
         user = User.find(json["id"])
-        expect(user.avatar_state).to eql :locked
+        expect(user.avatar_state).to be :locked
       end
 
       it "retains avatar image_url on user update" do
@@ -2050,7 +2050,7 @@ describe "Users API", type: :request do
                         })
         user = User.find(json["id"])
         expect(user.avatar_image_source).to eql "no_pic"
-        expect(user.avatar_image_url).to eql nil
+        expect(user.avatar_image_url).to be_nil
       end
 
       it "is able to update a name without changing sortable name if sent together" do
@@ -2216,21 +2216,21 @@ describe "Users API", type: :request do
         @student.preferences[:collapse_global_nav] = true
         @student.save!
         json = api_call(:get, path, path_options)
-        expect(json["manual_mark_as_read"]).to eq false
-        expect(json["collapse_global_nav"]).to eq true
-        expect(json["hide_dashcard_color_overlays"]).to eq false
+        expect(json["manual_mark_as_read"]).to be false
+        expect(json["collapse_global_nav"]).to be true
+        expect(json["hide_dashcard_color_overlays"]).to be false
       end
 
       it "is able to update other users' settings" do
         json = api_call(:put, path, path_options, manual_mark_as_read: true, hide_dashcard_color_overlays: false, comment_library_suggestions_enabled: true)
-        expect(json["manual_mark_as_read"]).to eq true
-        expect(json["hide_dashcard_color_overlays"]).to eq false
-        expect(json["comment_library_suggestions_enabled"]).to eq true
+        expect(json["manual_mark_as_read"]).to be true
+        expect(json["hide_dashcard_color_overlays"]).to be false
+        expect(json["comment_library_suggestions_enabled"]).to be true
 
         json = api_call(:put, path, path_options, manual_mark_as_read: false, hide_dashcard_color_overlays: true, comment_library_suggestions_enabled: false)
-        expect(json["manual_mark_as_read"]).to eq false
-        expect(json["hide_dashcard_color_overlays"]).to eq true
-        expect(json["comment_library_suggestions_enabled"]).to eq false
+        expect(json["manual_mark_as_read"]).to be false
+        expect(json["hide_dashcard_color_overlays"]).to be true
+        expect(json["comment_library_suggestions_enabled"]).to be false
       end
     end
 
@@ -2884,7 +2884,7 @@ describe "Users API", type: :request do
           },
           {}
         )
-        expect(json["new_user_tutorial_statuses"]["collapsed"]["modules"]).to eq true
+        expect(json["new_user_tutorial_statuses"]["collapsed"]["modules"]).to be true
       end
 
       it "rejects setting status for pages that are not whitelisted" do
@@ -2918,7 +2918,7 @@ describe "Users API", type: :request do
 
     it "returns unsubmitted assignments due in the past" do
       json = api_call(:get, @path, @params)
-      expect(json.length).to eql 2
+      expect(json.length).to be 2
     end
 
     it "returns assignments in order of the submission time for the user" do
@@ -2942,10 +2942,10 @@ describe "Users API", type: :request do
                                   submission_types: "online_text_entry",
                                   lock_at: 2.days.ago)
       json = api_call(:get, @path, @params)
-      expect(json.length).to eql 3
+      expect(json.length).to be 3
 
       submittable_json = api_call(:get, @path, @params.merge(filter: ["submittable"]))
-      expect(submittable_json.length).to eql 2
+      expect(submittable_json.length).to be 2
     end
 
     it "returns course information if requested" do
@@ -3047,12 +3047,12 @@ describe "Users API", type: :request do
 
       it "returns all missing submissions when not applied" do
         json = api_call(:get, @path, @params)
-        expect(json.length).to eql 4
+        expect(json.length).to be 4
       end
 
       it "returns only missing submissions in the current grading period when applied" do
         json = api_call(:get, @path, @params.merge(filter: ["current_grading_period"]))
-        expect(json.length).to eql 3
+        expect(json.length).to be 3
         json.each do |assignment|
           expect(assignment["name"]).not_to eq "Assignment in closed period"
         end
@@ -3101,13 +3101,13 @@ describe "Users API", type: :request do
 
         it "returns all assignments from multiple shards without filter" do
           json = api_call(:get, @path, @params)
-          expect(json.length).to eql 6
+          expect(json.length).to be 6
         end
 
         it "returns just the missing submissions from 2 shards" do
           json = api_call(:get, @path, @params.merge(filter: ["current_grading_period"]))
           expect(response).to be_successful
-          expect(json.length).to eql 4
+          expect(json.length).to be 4
           assignments = ["Assignment", "Assignment", "Assignment in current period", "Assignment in current period (Shard 2)"]
           expect(json.map { |assignment| assignment["name"] }.sort).to eq assignments.sort
         end

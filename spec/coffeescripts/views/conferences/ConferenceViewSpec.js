@@ -18,7 +18,7 @@
 
 import Backbone from '@canvas/backbone'
 import Conference from 'ui/features/conferences/backbone/models/Conference'
-import ConferenceView from 'ui/features/conferences/backbone/views/ConferenceView.coffee'
+import ConferenceView from 'ui/features/conferences/backbone/views/ConferenceView'
 import $ from 'jquery'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'

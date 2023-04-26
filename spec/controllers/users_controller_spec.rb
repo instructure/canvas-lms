@@ -111,6 +111,7 @@ describe UsersController do
           target_link_uri
           lti_message_hint
           canvas_region
+          canvas_environment
           client_id
           deployment_id
           lti_storage_target
@@ -345,8 +346,8 @@ describe UsersController do
       get "manageable_courses", params: { user_id: @teacher.id }
       expect(response).to be_successful
       courses = json_parse
-      expect(courses.find { |c| c["id"] == @course1.id }["blueprint"]).to eq true
-      expect(courses.find { |c| c["id"] == @course2.id }["blueprint"]).to eq false
+      expect(courses.find { |c| c["id"] == @course1.id }["blueprint"]).to be true
+      expect(courses.find { |c| c["id"] == @course2.id }["blueprint"]).to be false
     end
 
     context "query matching" do
@@ -1104,6 +1105,8 @@ describe UsersController do
     end
     let(:json) { json_parse(response.body) }
     let(:grade) { json.fetch("grade") }
+    let(:restrict_quantitative_data) { json.fetch("restrict_quantitative_data") }
+    let(:grading_scheme) { json.fetch("grading_scheme") }
 
     before(:once) do
       assignment_1 = assignment_model(course: course, due_at: Time.zone.now, points_possible: 10)
@@ -1129,6 +1132,25 @@ describe UsersController do
         it "returns okay" do
           get_grades!(all_grading_periods_id)
           expect(response).to be_ok
+          expect(restrict_quantitative_data).to eq false
+          expect(grading_scheme).to eq course.grading_standard_or_default.data
+        end
+
+        it "returns restrict_quantitative_data as true when student is restricted for the course context" do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+
+          # truthy permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+          Account.default.reload
+
+          get_grades!(all_grading_periods_id)
+          expect(restrict_quantitative_data).to eq true
+          expect(grading_scheme).to eq course.grading_standard_or_default.data
         end
 
         context "when Final Grade Override is enabled and allowed" do
@@ -1215,6 +1237,30 @@ describe UsersController do
         student_enrollment.scores.find_by!(course_score: true).update!(override_score: 89.2)
         get_grades!(grading_period.id)
         expect(grade).to eq 40.0
+      end
+
+      it "shows restrict_quantitative_data as falsey by default" do
+        user_session(teacher)
+        get_grades!(grading_period.id)
+        expect(restrict_quantitative_data).to eq false
+        expect(grading_scheme).to eq course.grading_standard_or_default.data
+      end
+
+      it "shows restrict_quantitative_data as true when teacher is restricted" do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+        user_session(teacher)
+        get_grades!(grading_period.id)
+        expect(restrict_quantitative_data).to eq true
+        expect(grading_scheme).to eq course.grading_standard_or_default.data
       end
     end
 
@@ -1309,6 +1355,28 @@ describe UsersController do
         it "returns okay" do
           get_grades!(all_grading_periods_id)
           expect(response).to be_ok
+        end
+
+        it "shows restrict_quantitative_data as falsey by default" do
+          get_grades!(grading_period.id)
+          expect(restrict_quantitative_data).to eq false
+          expect(grading_scheme).to eq course.grading_standard_or_default.data
+        end
+
+        it "shows restrict_quantitative_data as true when teacher is restricted" do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+
+          # truthy permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: observer_role, enabled: false, permission: "restrict_quantitative_data")
+          Account.default.reload
+          get_grades!(grading_period.id)
+          expect(restrict_quantitative_data).to eq true
+          expect(grading_scheme).to eq course.grading_standard_or_default.data
         end
 
         context "when Final Grade Override is enabled and allowed" do
@@ -2138,7 +2206,7 @@ describe UsersController do
       @teacher.destroy
 
       get "show", params: { id: @teacher.id }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
       expect(response).not_to render_template("users/show")
     end
 
@@ -2150,7 +2218,7 @@ describe UsersController do
       @teacher.destroy
 
       get "show", params: { id: @teacher.id }
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
       expect(response).to render_template("users/show")
     end
 
@@ -2176,7 +2244,7 @@ describe UsersController do
       user_factory(active_all: true)
       user_session(@user)
       get "show", params: { id: defunct_user.id }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "401s if the user exists but you don't have permission" do
@@ -2184,14 +2252,14 @@ describe UsersController do
       user_factory(active_all: true)
       user_session(@user)
       get "show", params: { id: user2.id }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "renders for an admin" do
       account_admin_user(active_all: true)
       user_session(@user)
       get "show", params: { id: @user.id }
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
   end
 
@@ -2202,7 +2270,7 @@ describe UsersController do
       user_session(@user)
       put "update", params: { id: other_user.id }, format: "json"
       expect(response.body).not_to include "secret"
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "overwrites stuck sis fields" do
@@ -2210,7 +2278,7 @@ describe UsersController do
       user_session(@user)
       put "update", params: { id: @user.id, "user[sortable_name]": "overwritten@example.com" }, format: "json"
       expect(response.body).to include "overwritten@example.com"
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "doesn't overwrite stuck sis fields" do
@@ -2218,7 +2286,7 @@ describe UsersController do
       user_session(@user)
       put "update", params: { id: @user.id, "user[sortable_name]": "overwritten@example.com", override_sis_stickiness: false }, format: "json"
       expect(response.body).not_to include "overwritten@example.com"
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
   end
 
@@ -2923,21 +2991,21 @@ describe UsersController do
 
     it "rejects unauthenticated users" do
       delete "terminate_sessions", params: { id: user.id }, format: :json
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "rejects one person from terminating someone else" do
       user_session(user2)
 
       delete "terminate_sessions", params: { id: user.id }, format: :json
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "allows admin to terminate sessions" do
       user_session(admin)
 
       delete "terminate_sessions", params: { id: user.id }, format: :json
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
 
       expect(user.reload.last_logged_out).not_to be_nil
       expect(user.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
@@ -3002,6 +3070,13 @@ describe UsersController do
       allow(controller).to receive(:k5_user?).and_return(true)
       get "show_k5_dashboard", format: "json"
       expect(json_parse["show_k5_dashboard"]).to be_truthy
+    end
+
+    it "returns value of use_classic_font?" do
+      user_session(@user)
+      allow(controller).to receive(:use_classic_font?).and_return(false)
+      get "show_k5_dashboard", format: "json"
+      expect(json_parse["use_classic_font"]).to be_falsey
     end
   end
 end

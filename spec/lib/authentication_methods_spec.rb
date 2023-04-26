@@ -225,7 +225,7 @@ describe AuthenticationMethods do
 
       it "sets the CSRF cookie" do
         @controller.send(:load_user)
-        expect(@controller.cookies["_csrf_token"]).not_to be nil
+        expect(@controller.cookies["_csrf_token"]).not_to be_nil
       end
     end
 
@@ -387,7 +387,7 @@ describe AuthenticationMethods do
         controller = setup_with_token(token)
         controller.params[:as_user_id] = @other_user.id
 
-        expect(controller.send(:load_user)).to eq false
+        expect(controller.send(:load_user)).to be false
         expect(controller.render_hash[:json][:errors]).to eq "Cannot change masquerade"
       end
     end

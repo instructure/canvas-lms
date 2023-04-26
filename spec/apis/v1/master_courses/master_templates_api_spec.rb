@@ -232,15 +232,15 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       migration = @template.master_migrations.find(json["id"])
       expect(migration).to be_queued
       expect(migration.comment).to eq "seriously"
-      expect(migration.migration_settings[:copy_settings]).to eq true
-      expect(migration.send_notification).to eq false
+      expect(migration.migration_settings[:copy_settings]).to be true
+      expect(migration.send_notification).to be false
     end
 
     it "accepts the send_notification option" do
       json = api_call(:post, @url, @params.merge(send_notification: true))
       migration = @template.master_migrations.find(json["id"])
       expect(migration).to be_queued
-      expect(migration.send_notification).to eq true
+      expect(migration.send_notification).to be true
     end
   end
 

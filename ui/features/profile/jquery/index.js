@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym.coffee'
+import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
 import AvatarWidget from '@canvas/avatar-dialog-view'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime' /* datetimeString, time_field, datetime_field */

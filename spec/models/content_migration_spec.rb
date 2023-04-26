@@ -137,42 +137,42 @@ describe ContentMigration do
 
   context "import_object?" do
     it "returns true for everything if there are no copy options" do
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be true
     end
 
     it "returns true for everything if 'everything' is selected" do
       @cm.migration_ids_to_import = { copy: { everything: "1" } }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be true
     end
 
     it "returns true if there are no copy options" do
       @cm.migration_ids_to_import = { copy: {} }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be true
     end
 
     it "returns false for nil objects" do
-      expect(@cm.import_object?("content_migrations", nil)).to eq false
+      expect(@cm.import_object?("content_migrations", nil)).to be false
     end
 
     it "returns true for all object types if the all_ option is true" do
       @cm.migration_ids_to_import = { copy: { all_content_migrations: "1" } }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be true
     end
 
     it "returns false for objects not selected" do
       @cm.save!
       @cm.migration_ids_to_import = { copy: { all_content_migrations: "0" } }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be false
       @cm.migration_ids_to_import = { copy: { content_migrations: {} } }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be false
       @cm.migration_ids_to_import = { copy: { content_migrations: { CC::CCHelper.create_key(@cm) => "0" } } }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be false
     end
 
     it "returns true for selected objects" do
       @cm.save!
       @cm.migration_ids_to_import = { copy: { content_migrations: { CC::CCHelper.create_key(@cm) => "1" } } }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be true
     end
   end
 
@@ -1058,13 +1058,13 @@ describe ContentMigration do
     it "doesn't overreeact to todo issues" do
       expect do
         @cm.add_todo("test todo", { exception: err })
-      end.to change { ErrorReport.count }.by(0)
+      end.not_to change { ErrorReport.count }
     end
 
     it "doesn't overreeact to warning issues" do
       expect do
         @cm.add_warning("test warn", { exception: err })
-      end.to change { ErrorReport.count }.by(0)
+      end.not_to change { ErrorReport.count }
     end
 
     it "reports error issues appropriately" do
@@ -1076,13 +1076,13 @@ describe ContentMigration do
     it "accepts downgrades for real errors" do
       expect do
         @cm.add_error("test error", { exception: err, issue_level: :warning })
-      end.to change { ErrorReport.count }.by(0)
+      end.not_to change { ErrorReport.count }
     end
 
     it "accepts issue level option when failing a migration" do
       expect do
         @cm.fail_with_error!(err, error_message: "foo", issue_level: :warning)
-      end.to change { ErrorReport.count }.by(0)
+      end.not_to change { ErrorReport.count }
     end
   end
 

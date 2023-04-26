@@ -90,16 +90,16 @@ describe Quizzes::QuizGroup do
       g.quiz_questions << quiz.quiz_questions.create!(question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
       g.quiz_questions << quiz.quiz_questions.create!(question_data: { "name" => "test question 2", "answers" => [{ "id" => 3 }, { "id" => 4 }] })
       expect(g.name).to eql("question group")
-      expect(g.pick_count).to eql(2)
-      expect(g.question_points).to eql(5.0)
+      expect(g.pick_count).to be(2)
+      expect(g.question_points).to be(5.0)
       g.save!
 
       data = g.data
       expect(data[:name]).to eql("question group")
-      expect(data[:pick_count]).to eql(2)
-      expect(data[:question_points]).to eql(5.0)
+      expect(data[:pick_count]).to be(2)
+      expect(data[:question_points]).to be(5.0)
       expect(data[:questions]).not_to be_empty
-      expect(data[:questions].length).to eql(2)
+      expect(data[:questions].length).to be(2)
       data[:questions].sort_by! { |q| q[:id] }
       expect(data[:questions][0][:name]).to eql("test question")
       expect(data[:questions][1][:name]).to eql("test question 2")

@@ -40,37 +40,37 @@ describe ContentExport do
 
   context "export_object?" do
     it "returns true for everything if there are no copy options" do
-      expect(@ce.export_object?(@ce)).to eq true
+      expect(@ce.export_object?(@ce)).to be true
     end
 
     it "returns true for everything if 'everything' is selected" do
       @ce.selected_content = { everything: "1" }
-      expect(@ce.export_object?(@ce)).to eq true
+      expect(@ce.export_object?(@ce)).to be true
     end
 
     it "returns false for nil objects" do
-      expect(@ce.export_object?(nil)).to eq false
+      expect(@ce.export_object?(nil)).to be false
     end
 
     it "returns true for all object types if the all_ option is true" do
       @ce.selected_content = { all_content_exports: "1" }
-      expect(@ce.export_object?(@ce)).to eq true
+      expect(@ce.export_object?(@ce)).to be true
     end
 
     it "returns false for objects not selected" do
       @ce.save!
       @ce.selected_content = { all_content_exports: "0" }
-      expect(@ce.export_object?(@ce)).to eq false
+      expect(@ce.export_object?(@ce)).to be false
       @ce.selected_content = { content_exports: {} }
-      expect(@ce.export_object?(@ce)).to eq false
+      expect(@ce.export_object?(@ce)).to be false
       @ce.selected_content = { content_exports: { CC::CCHelper.create_key(@ce) => "0" } }
-      expect(@ce.export_object?(@ce)).to eq false
+      expect(@ce.export_object?(@ce)).to be false
     end
 
     it "returns true for selected objects" do
       @ce.save!
       @ce.selected_content = { content_exports: { CC::CCHelper.create_key(@ce) => "1" } }
-      expect(@ce.export_object?(@ce)).to eq true
+      expect(@ce.export_object?(@ce)).to be true
     end
   end
 
@@ -306,17 +306,17 @@ describe ContentExport do
 
       %w[created exporting exported_for_course_copy deleted].each do |workflow|
         @ce.workflow_state = workflow
-        expect { @ce.save! }.to change(DelayedMessage, :count).by 0
+        expect { @ce.save! }.not_to change(DelayedMessage, :count)
         expect(@ce.messages_sent["Content Export Finished"]).to be_blank
         expect(@ce.messages_sent["Content Export Failed"]).to be_blank
       end
 
       @ce.workflow_state = "exported"
-      expect { @ce.save! }.to change(DelayedMessage, :count).by 0
+      expect { @ce.save! }.not_to change(DelayedMessage, :count)
       expect(@ce.messages_sent["Content Export Finished"]).not_to be_blank
 
       @ce.workflow_state = "failed"
-      expect { @ce.save! }.to change(DelayedMessage, :count).by 0
+      expect { @ce.save! }.not_to change(DelayedMessage, :count)
       expect(@ce.messages_sent["Content Export Failed"]).not_to be_blank
     end
 
@@ -326,11 +326,11 @@ describe ContentExport do
       @ce.save!
 
       @ce.workflow_state = "exported"
-      expect { @ce.save! }.to change(DelayedMessage, :count).by 0
+      expect { @ce.save! }.not_to change(DelayedMessage, :count)
       expect(@ce.messages_sent["Content Export Finished"]).to be_blank
 
       @ce.workflow_state = "failed"
-      expect { @ce.save! }.to change(DelayedMessage, :count).by 0
+      expect { @ce.save! }.not_to change(DelayedMessage, :count)
       expect(@ce.messages_sent["Content Export Failed"]).to be_blank
     end
   end
@@ -378,14 +378,14 @@ describe ContentExport do
   context "global_identifiers" do
     it "is automatically set to true" do
       cc_export = @course.content_exports.create!(export_type: ContentExport::COURSE_COPY)
-      expect(cc_export.global_identifiers).to eq true
+      expect(cc_export.global_identifiers).to be true
     end
 
     it "does not set if there are any other exports in the context that weren't set" do
       prev_export = @course.content_exports.create!(export_type: ContentExport::COURSE_COPY)
       prev_export.update_attribute(:global_identifiers, false)
       cc_export = @course.content_exports.create!(export_type: ContentExport::COURSE_COPY)
-      expect(cc_export.global_identifiers).to eq false
+      expect(cc_export.global_identifiers).to be false
     end
 
     it "uses global asset strings for keys if set" do

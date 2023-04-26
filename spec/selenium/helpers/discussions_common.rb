@@ -213,7 +213,7 @@ module DiscussionsCommon
   end
 
   def confirm(state)
-    checkbox_state = state == :on ? "true" : nil
+    checkbox_state = (state == :on) ? "true" : nil
     get url
     wait_for_ajaximations
 

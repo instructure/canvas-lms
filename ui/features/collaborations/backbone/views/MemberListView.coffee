@@ -19,9 +19,9 @@
 import $ from 'jquery'
 import {extend, filter, map} from 'underscore'
 import {View} from '@canvas/backbone'
-import Group from '@canvas/groups/backbone/models/Group.coffee'
-import User from '@canvas/users/backbone/models/User.coffee'
-import CollaboratorCollection from '../collections/CollaboratorCollection.coffee'
+import Group from '@canvas/groups/backbone/models/Group'
+import User from '@canvas/users/backbone/models/User'
+import CollaboratorCollection from '../collections/CollaboratorCollection'
 import collaboratorTemplate from '../../jst/collaborator.handlebars'
 
 export default class MemberListView extends View

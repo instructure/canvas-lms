@@ -41,9 +41,9 @@ describe ContentMigration do
       attrs = %w[title message discussion_type type pinned position require_initial_post]
       expect(new_topic.attributes.slice(*attrs)).to eq topic.attributes.slice(*attrs)
 
-      expect(new_topic.locked).to_not eq true # don't lock copied discussions
+      expect(new_topic.locked).to_not be true # don't lock copied discussions
       expect(new_topic.last_reply_at).to be_nil
-      expect(new_topic.allow_rating).to eq false
+      expect(new_topic.allow_rating).to be false
       expect(new_topic.posted_at).to be_nil
       expect(new_topic.todo_date.to_i).to eq todo_date.to_i
     end
@@ -67,8 +67,8 @@ describe ContentMigration do
 
       new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
 
-      expect(new_topic.anonymous_state).to eq nil
-      expect(new_topic.is_anonymous_author).to eq false
+      expect(new_topic.anonymous_state).to be_nil
+      expect(new_topic.is_anonymous_author).to be false
     end
 
     it "copies locked state for announcements" do
@@ -77,7 +77,7 @@ describe ContentMigration do
       run_course_copy
 
       new_ann = @copy_to.announcements.first
-      expect(new_ann.locked).to eq true
+      expect(new_ann.locked).to be true
     end
 
     it "copies rating settings" do
@@ -90,14 +90,14 @@ describe ContentMigration do
       run_course_copy
 
       new_topic1 = @copy_to.discussion_topics.where(migration_id: mig_id(topic1)).first
-      expect(new_topic1.allow_rating).to eq true
-      expect(new_topic1.only_graders_can_rate).to eq true
-      expect(new_topic1.sort_by_rating).to eq false
+      expect(new_topic1.allow_rating).to be true
+      expect(new_topic1.only_graders_can_rate).to be true
+      expect(new_topic1.sort_by_rating).to be false
 
       new_topic2 = @copy_to.discussion_topics.where(migration_id: mig_id(topic2)).first
-      expect(new_topic2.allow_rating).to eq true
-      expect(new_topic2.only_graders_can_rate).to eq false
-      expect(new_topic2.sort_by_rating).to eq true
+      expect(new_topic2.allow_rating).to be true
+      expect(new_topic2.only_graders_can_rate).to be false
+      expect(new_topic2.sort_by_rating).to be true
     end
 
     it "copies group setting" do
@@ -246,7 +246,7 @@ describe ContentMigration do
       @assignment.save!
 
       @topic.reload
-      expect(@topic.active?).to eq true
+      expect(@topic.active?).to be true
 
       run_course_copy
 

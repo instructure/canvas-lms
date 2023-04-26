@@ -56,6 +56,9 @@
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
+    "align_11050992": {
+        "message": "محاذاة"
+    },
     "alignment_and_lists_5cebcb69": {
         "message": "المحاذاة والقوائم"
     },
@@ -133,6 +136,9 @@
     },
     "arabic_c5c87acd": {
         "message": "العربية"
+    },
+    "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+        "message": "هل تريد الإلغاء بالفعل؟ قد لا يتم حفظ التغييرات التي أجريتها."
     },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "هل أنت متأكد أنك تريد حذف عنصر المخطط هذا؟"
@@ -284,6 +290,9 @@
     "catalan_16f6b78f": {
         "message": "الكاتالونية"
     },
+    "center_align_e68d9997": {
+        "message": "محاذاة إلى الوسط"
+    },
     "centered_dot_64d5e378": {
         "message": "نقطة مركزية"
     },
@@ -301,6 +310,15 @@
     },
     "change_text_color_1aecb912": {
         "message": "تغيير لون النص"
+    },
+    "changes_you_made_may_not_be_saved_4e8db973": {
+        "message": "قد لا يتم حفظ التغييرات التي أجريتها."
+    },
+    "characters_9d897d1c": {
+        "message": "أحرف"
+    },
+    "characters_no_spaces_485e5367": {
+        "message": "الأحرف (بدون مسافات)"
     },
     "check_accessibility_3c78211c": {
         "message": "التحقق من إمكانية الوصول"
@@ -328,6 +346,9 @@
     },
     "circle_484abe63": {
         "message": "الدائرة"
+    },
+    "circle_unordered_list_9e3a0763": {
+        "message": "قائمة دائرية غير المرتبة"
     },
     "clear_2084585f": {
         "message": "مسح"
@@ -425,6 +446,12 @@
     "copyright_holder_66ee111": {
         "message": "مالك حق النشر:"
     },
+    "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
+        "message": "تعذر إدراج المحتوى: عناصر \"{ itemType }\" غير مدعومة حاليًا في Canvas."
+    },
+    "count_40eced3b": {
+        "message": "العدد"
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 كلمات}\n    one {1 كلمة}\n  other {# من الكلمات}\n}"
     },
@@ -458,6 +485,9 @@
     "course_images_f8511d04": {
         "message": "صور المساق"
     },
+    "course_link_b369426": {
+        "message": "رابط المساق"
+    },
     "course_links_b56959b9": {
         "message": "روابط المساق"
     },
@@ -472,6 +502,9 @@
     },
     "create_icon_110d6463": {
         "message": "إنشاء أيقونة"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "إنشاء أيقونة صانع الأيقونات"
     },
     "creative_commons_license_725584ae": {
         "message": "ترخيص المشاع الإبداعي:"
@@ -536,8 +569,17 @@
     "decorative_type_upper_f2c95e3": {
         "message": "{ TYPE_UPPER } زينة"
     },
+    "decrease_indent_d9cf469d": {
+        "message": "تقليل المسافة البادئة"
+    },
     "deep_purple_bb3e2907": {
         "message": "أرجواني داكن"
+    },
+    "default_bulleted_unordered_list_47079da8": {
+        "message": "قائمة افتراضية غير مرتبة بتعداد نقطي"
+    },
+    "default_numerical_ordered_list_48dd3548": {
+        "message": "قائمة افتراضية مرقمة غير مرتبة"
     },
     "definite_integral_fe7ffed1": {
         "message": "قيمة التكامل المحدد"
@@ -632,6 +674,9 @@
     "division_sign_72190870": {
         "message": "علامة القسمة"
     },
+    "document_678cd7bf": {
+        "message": "مستند"
+    },
     "documents_81393201": {
         "message": "المستندات"
     },
@@ -640,6 +685,9 @@
     },
     "double_dagger_faf78681": {
         "message": "Double Dagger"
+    },
+    "down_5831a426": {
+        "message": "لأسفل"
     },
     "down_and_left_diagonal_arrow_40ef602c": {
         "message": "سهم قطري لأسفل ويسار"
@@ -689,6 +737,9 @@
     "edit_course_link_5a5c3c59": {
         "message": "تحرير ارتباط المساق"
     },
+    "edit_equation_f5279959": {
+        "message": "تحرير المعادلة"
+    },
     "edit_existing_icon_maker_icon_5d0ebb3f": {
         "message": "تحرير أيقونة صانع الأيقونات"
     },
@@ -712,6 +763,9 @@
     },
     "embed_code_314f1bd5": {
         "message": "تضمين تعليمات برمجية"
+    },
+    "embed_content_from_external_tool_3397ad2d": {
+        "message": "تضمين محتوى من الأداة الخارجية"
     },
     "embed_image_1080badc": {
         "message": "تضمين صورة"
@@ -767,8 +821,14 @@
     "equals_sign_c51bdc58": {
         "message": "علامة يساوي"
     },
+    "equation_1c5ac93c": {
+        "message": "المعادلة"
+    },
     "equation_editor_39fbc3f1": {
         "message": "محرر المعادلات"
+    },
+    "equilibrium_6ff3040b": {
+        "message": "التعادل"
     },
     "equivalence_class_7b0f11c0": {
         "message": "فئة تكافؤ"
@@ -815,6 +875,12 @@
     "extended_9a58dcb6": {
         "message": "موسع"
     },
+    "external_link_d3f9e62a": {
+        "message": "الرابط الخارجي"
+    },
+    "external_tool_frame_70b32473": {
+        "message": "إطار الأداة الخارجية"
+    },
     "external_tools_6e77821": {
         "message": "الأدوات الخارجية"
     },
@@ -859,6 +925,9 @@
     },
     "failed_to_load_opportunities_52ab6404": {
         "message": "تعذر تحميل الفرص"
+    },
+    "failed_to_retrieve_content_from_external_tool_5899c213": {
+        "message": "تعذر استرداد المحتوى من الأداة الخارجية"
     },
     "failed_to_save_to_do_ddc7503b": {
         "message": "تعذر حفظ قائمة مهام"
@@ -1016,6 +1085,9 @@
     "group_isomorphism_45b1458c": {
         "message": "تساوي شكل المجموعة"
     },
+    "group_link_63e626b3": {
+        "message": "رابط المجموعة"
+    },
     "group_links_9493129e": {
         "message": "تجميع الارتباطات"
     },
@@ -1094,6 +1166,9 @@
     "html_code_editor_fd967a44": {
         "message": "محرر التعليمات البرمجية HTML"
     },
+    "html_editor_fb2ab713": {
+        "message": "محرر HTML"
+    },
     "hungarian_fc7d30c9": {
         "message": "المجرية"
     },
@@ -1136,6 +1211,9 @@
     "if_left_empty_link_text_will_display_as_course_lin_61087540": {
         "message": "إذا ترك الارتباط فارغًا، سيُعرض النص كاسم ارتباط المساق"
     },
+    "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
+        "message": "إذا تتطلب الأمر حقوق استخدام، لن يتم نشر الملف حتى تمكينه في صفحة الملفات."
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "إن لم تحدد الآن حقوق الاستخدام، فسيتم إلغاء نشر هذا الملف بعد تحميله."
     },
@@ -1172,6 +1250,9 @@
     "in_element_of_19ca2f33": {
         "message": "In (Element Of)"
     },
+    "increase_indent_6af90f7c": {
+        "message": "زيادة المسافة البادئة"
+    },
     "indefinite_integral_6623307e": {
         "message": "قيمة التكامل غير المحدد"
     },
@@ -1192,6 +1273,9 @@
     },
     "insert_link_6dc23cae": {
         "message": "إدراج ارتباط"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "إدخال معادلة رياضية"
     },
     "integers_336344e1": {
         "message": "أعداد صحيحة"
@@ -1313,6 +1397,12 @@
     "leave_as_is_4facfe55": {
         "message": "ترك كما هو"
     },
+    "left_3ea9d375": {
+        "message": "اليسار"
+    },
+    "left_align_43d95491": {
+        "message": "محاذاة إلى اليسار"
+    },
     "left_angle_bracket_c87a6d07": {
         "message": "Left Angle Bracket"
     },
@@ -1403,6 +1493,9 @@
     "loading_closed_captions_subtitles_failed_95ceef47": {
         "message": "تعذر تحميل التسميات التوضيحية/العناوين الفرعية."
     },
+    "loading_external_tool_d839042c": {
+        "message": "جارٍ تحميل الأداة الخارجية"
+    },
     "loading_failed_b3524381": {
         "message": "فشل التحميل..."
     },
@@ -1417,6 +1510,9 @@
     },
     "loading_past_items_ca499e75": {
         "message": "جارٍ تحميل العناصر السابقة"
+    },
+    "loading_placeholder_for_filename_792ef5e8": {
+        "message": "جارٍ تحميل عنصر النائب لـ { fileName }"
     },
     "loading_planner_items_947a813d": {
         "message": "جارٍ تحميل عناصر المخطِط"
@@ -1522,6 +1618,9 @@
     },
     "modules_c4325335": {
         "message": "الوحدات النمطية"
+    },
+    "moving_image_to_crop_directionword_6f66cde2": {
+        "message": "جارٍ نقل الصورة إلى القص { directionWord }"
     },
     "mu_37223b8b": {
         "message": "Mu"
@@ -1730,6 +1829,9 @@
     "orange_81386a62": {
         "message": "برتقالي"
     },
+    "ordered_and_unordered_lists_cfadfc38": {
+        "message": "القوائم المرتبة وغير المرتبة"
+    },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "يمكن العثور على اختصارات أخرى للمحرر على"
     },
@@ -1931,6 +2033,9 @@
     "record_7c9448b": {
         "message": "تسجيل"
     },
+    "record_upload_media_5fdce166": {
+        "message": "تسجيل/تحميل الوسائط"
+    },
     "recording_98da6bda": {
         "message": "جارٍ التسجيل"
     },
@@ -1951,6 +2056,9 @@
     },
     "remove_heading_style_5fdc8855": {
         "message": "إزالة نمط العنوان"
+    },
+    "remove_link_d1f2f4d0": {
+        "message": "إزالة الارتباط"
     },
     "replace_e61834a7": {
         "message": "استبدال"
@@ -1981,6 +2089,12 @@
     },
     "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
         "message": "مساحة النص المنسق اضغط على { OSKey }+F8 لاختصارات محرر المحتوى المنسق."
+    },
+    "right_71ffdc4d": {
+        "message": "لليمين"
+    },
+    "right_align_39e7a32a": {
+        "message": "محاذاة إلى اليمين"
     },
     "right_angle_bracket_d704e2d6": {
         "message": "Right Angle Bracket"
@@ -2048,6 +2162,9 @@
     "save_media_cb9e786e": {
         "message": "حفظ الوسائط"
     },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "تم حفظ أيقونة صانع الأيقونات"
+    },
     "schedule_preview_3bcda153": {
         "message": "جدولة معاينة"
     },
@@ -2099,6 +2216,9 @@
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } المحدد"
     },
+    "selection_b52c4c5e": {
+        "message": "تحديد"
+    },
     "serbian_7187f1f2": {
         "message": "الصربية"
     },
@@ -2126,8 +2246,23 @@
     "show_all_ae37d610": {
         "message": "عرض الكل"
     },
+    "show_audio_options_b489926b": {
+        "message": "إظهار خيارات الصوت"
+    },
+    "show_image_options_1e2ecc6b": {
+        "message": "إظهار خيارات الصورة"
+    },
+    "show_link_options_545338fd": {
+        "message": "إظهار خيارات الارتباطات"
+    },
     "show_my_grades_ebd08684": {
         "message": "إظهار درجاتي"
+    },
+    "show_studio_media_options_a0c748c6": {
+        "message": "إظهار خيارات وسائط Studio"
+    },
+    "show_video_options_6ed3721a": {
+        "message": "إظهار خيارات الفيديو"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "يتصفح المستخدمون الذين يتمتعون بالقدرة على الإبصار صفحات الويب بشكل سريع، بحثًا عن عناوين كبيرة أو بخط عريض. ويعتمد مستخدمو قارئة الشاشة على الرؤوس لفهم السياق. يجب أن توظف الرؤوس البنية الملائمة."
@@ -2186,6 +2321,9 @@
     "something_went_wrong_while_sharing_your_screen_8de579e5": {
         "message": "حدث خطأ ما أثناء مشاركة شاشتك."
     },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "عذرًا، لا مدعم ملفات متعددة."
+    },
     "sort_by_e75f9e3e": {
         "message": "الفزر حسب"
     },
@@ -2222,6 +2360,9 @@
     "square_superset_strict_fa4262e4": {
         "message": "Square Superset (Strict)"
     },
+    "square_unordered_list_b15ce93b": {
+        "message": "قائمة مربعة غير مرتبة"
+    },
     "star_8d156e09": {
         "message": "نجمة"
     },
@@ -2248,6 +2389,9 @@
     },
     "student_to_do_c018c835": {
         "message": "قائمة مهام الطالب"
+    },
+    "studio_media_options_ee504361": {
+        "message": "خيارات وسائط Studio"
     },
     "styles_2aa721ef": {
         "message": "الأنماط"
@@ -2281,6 +2425,9 @@
     },
     "superscript_8cb349a2": {
         "message": "مرتفع"
+    },
+    "superscript_and_subscript_37f94a50": {
+        "message": "مرتفع ومنخفض"
     },
     "superset_c4db8a7a": {
         "message": "Superset"
@@ -2390,6 +2537,9 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "يجب أن يكون أول عنوان في الصفحة هو H2."
     },
+    "the_following_content_is_partner_provided_ed1da756": {
+        "message": "المحتوى التالي تم إدخاله بواسطة شريك"
+    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "توجد المادة في المجال العام"
     },
@@ -2398,6 +2548,9 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "المادة خاضعة لاستثناء - مثال استخدام عادل أو حق الاقتباس أو استثناءات أخرى بموجب قوانين حقوق النشر المعمول بها"
+    },
+    "the_preceding_content_is_partner_provided_d753928c": {
+        "message": "المحتوى السابق تم إدخاله بواسطة شريك"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "محرر HTML الأنيق لا يمكن الوصول إليه من خلال لوحة المفاتيح. اضغط على Shift-O لفتح محرر HTML البسيط."
@@ -2525,6 +2678,9 @@
     "ukrainian_945b00b7": {
         "message": "الأوكرانية"
     },
+    "unable_to_determine_resource_selection_url_7867e060": {
+        "message": "يتعذر تحديد عنوان URL تحديد الموارد"
+    },
     "unable_to_mark_as_complete_8141856d": {
         "message": "يتعذر وضع علامة مكتمل."
     },
@@ -2546,6 +2702,12 @@
     "up_and_right_diagonal_arrow_935b902e": {
         "message": "Up And Right Diagonal Arrow"
     },
+    "up_c553575d": {
+        "message": "لأعلى"
+    },
+    "upload_document_253f0478": {
+        "message": "تحميل المستند"
+    },
     "upload_file_fd2361b8": {
         "message": "تحميل ملف"
     },
@@ -2555,8 +2717,14 @@
     "upload_media_ce31135a": {
         "message": "تحميل الوسائط"
     },
+    "upload_record_media_e4207d72": {
+        "message": "تحميل/تسجيل الوسائط"
+    },
     "uploading_19e8a4e7": {
         "message": "جارٍ التحميل"
+    },
+    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+        "message": "قائمة أبجدية مرتبة بأحرف كبيرة"
     },
     "uppercase_delta_d4f4bc41": {
         "message": "Uppercase Delta"
@@ -2578,6 +2746,9 @@
     },
     "uppercase_psi_6395acbe": {
         "message": "Uppercase Psi"
+    },
+    "uppercase_roman_numeral_ordered_list_853f292b": {
+        "message": "قائمة بأرقام رومانية مرتبة بأحرف كبيرة"
     },
     "uppercase_sigma_dbb70e92": {
         "message": "Uppercase Sigma"
@@ -2681,6 +2852,9 @@
     "vietnamese_e7a76583": {
         "message": "الفيتنامية"
     },
+    "view_all_e13bf0a6": {
+        "message": "عرض الكل"
+    },
     "view_ba339f93": {
         "message": "عرض"
     },
@@ -2746,6 +2920,12 @@
     },
     "wiki_home_9cd54d0": {
         "message": "الصفحة الرئيسية لـ Wiki"
+    },
+    "word_count_c77fe3a6": {
+        "message": "عدد الكلمات"
+    },
+    "words_b448b7d5": {
+        "message": "الكلمات"
     },
     "wreath_product_200b38ef": {
         "message": "Wreath Product"

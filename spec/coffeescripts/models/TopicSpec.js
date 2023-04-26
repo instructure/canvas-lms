@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Topic from 'ui/features/discussion_topic/backbone/models/Topic.coffee'
+import Topic from 'ui/features/discussion_topic/backbone/models/Topic'
 
 QUnit.module('Topic')
 

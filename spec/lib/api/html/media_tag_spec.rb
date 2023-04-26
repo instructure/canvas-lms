@@ -165,7 +165,7 @@ module Api
           specify { expect(html5_node["data-media_comment_id"]).to eq("24") }
           specify { expect(html5_node["data-media_comment_type"]).to eq("audio") }
           specify { expect(html5_node["controls"]).to eq("controls") }
-          specify { expect(html5_node["poster"]).to be(nil) }
+          specify { expect(html5_node["poster"]).to be_nil }
           specify { expect(html5_node["src"]).to eq(url_helper.media_redirect_url) }
           specify { expect(html5_node.inner_html).to eq(base_tag.inner_html) }
           specify { expect(html5_node.tag_name).to eq("audio") }

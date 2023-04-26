@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
@@ -25,7 +24,7 @@ import FileSelectBox from '../react/components/FileSelectBox'
 import UploadForm from '@canvas/files/react/components/UploadForm'
 import CurrentUploads from '@canvas/files/react/components/CurrentUploads'
 import splitAssetString from '@canvas/util/splitAssetString'
-import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject.coffee'
+import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
 import BaseUploader from '@canvas/files/react/modules/BaseUploader'
 import UploadQueue from '@canvas/files/react/modules/UploadQueue'
 import htmlEscape from 'html-escape'
@@ -45,6 +44,8 @@ import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import processMultipleContentItems from '@canvas/deep-linking/processors/processMultipleContentItems'
+
+if (!('INST' in window)) window.INST = {}
 
 const I18n = useI18nScope('select_content_dialog')
 

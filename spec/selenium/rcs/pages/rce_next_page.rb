@@ -195,7 +195,7 @@ module RCENextPage
 
   def rce_validate_wiki_style_attrib(type, value, selectors)
     in_frame rce_page_body_ifr_id do
-      expect(f("#tinymce #{selectors}").attribute("style")).to match("#{type}: #{value}\;")
+      expect(f("#tinymce #{selectors}").attribute("style")).to match("#{type}: #{value};")
     end
   end
 
@@ -1074,10 +1074,15 @@ module RCENextPage
   end
 
   def possibly_hidden_toolbar_button(selector)
-    f(selector)
-  rescue Selenium::WebDriver::Error::NoSuchElementError
-    more_toolbar_button.click
-    f(selector)
+    element = f(selector)
+    if !element.displayed? || !element.enabled?
+      more_toolbar_button.click
+
+      # Wait for the toolbar opening animation to finish
+      # Toolbar buttons can't be interacted with until it's done
+      wait_for_no_such_element { f(".tox-toolbar__overflow--growing") }
+    end
+    element
   end
 
   def toolbar_button(button_label)

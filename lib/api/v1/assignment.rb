@@ -714,7 +714,7 @@ module Api::V1::Assignment
     if update_params["submission_types"].is_a? Array
       update_params["submission_types"] = update_params["submission_types"].map do |type|
         # TODO: remove. this was temporary backward support for a hotfix
-        type == "online_media_recording" ? "media_recording" : type
+        (type == "online_media_recording") ? "media_recording" : type
       end
       update_params["submission_types"] = update_params["submission_types"].join(",")
     end
@@ -895,7 +895,7 @@ module Api::V1::Assignment
     has_observed_users = include_params.include?("observed_users")
 
     subs_list = if submissions_for_user
-                  assignment_ids = assignments.map(&:id).to_set
+                  assignment_ids = assignments.to_set(&:id)
                   submissions_for_user.select do |s|
                     assignment_ids.include?(s.assignment_id)
                   end

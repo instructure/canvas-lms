@@ -25,7 +25,7 @@ const I18n = useI18nScope('manage_avatars')
 /* showIf */
 
 $(document).ready(function () {
-  $('.update_avatar_link').live('click', function (event) {
+  $(document).on('click', '.update_avatar_link', function (event) {
     event.preventDefault()
     const $link = $(this)
     if ($link.attr('data-state') === 'none') {

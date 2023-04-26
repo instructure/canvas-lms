@@ -46,11 +46,11 @@ describe MicrosoftSync::GraphService::GroupMembershipChangeResult do
 
   describe "#blank?" do
     it "returns true when no issues have been added" do
-      expect(described_class.new.blank?).to eq(true)
+      expect(described_class.new.blank?).to be(true)
     end
 
     it "returns false when issues have been added" do
-      expect(subject.blank?).to eq(false)
+      expect(subject.blank?).to be(false)
     end
   end
 

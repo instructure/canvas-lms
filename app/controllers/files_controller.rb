@@ -327,7 +327,7 @@ class FilesController < ApplicationController
                          Attachment.display_name_order_by_clause("attachments")
                        end
         order_clause += " DESC" if params[:order] == "desc"
-        scope = scope.order(Arel.sql(order_clause)).order(id: params[:order] == "desc" ? :desc : :asc)
+        scope = scope.order(Arel.sql(order_clause)).order(id: (params[:order] == "desc") ? :desc : :asc)
 
         if params[:content_types].present?
           scope = scope.by_content_types(Array(params[:content_types]))
@@ -403,7 +403,7 @@ class FilesController < ApplicationController
 
         {
           asset_string: context.asset_string,
-          name: context == @current_user ? t("my_files", "My Files") : context.name,
+          name: (context == @current_user) ? t("my_files", "My Files") : context.name,
           usage_rights_required: tool_context.respond_to?(:usage_rights_required?) && tool_context.usage_rights_required?,
           permissions: {
             manage_files_add: context.grants_right?(@current_user, session, :manage_files_add),
@@ -861,7 +861,8 @@ class FilesController < ApplicationController
     elsif asset.is_a?(Assignment) && intent == "submit"
       # despite name, this is really just asking if the assignment expects an
       # upload
-      if asset.allow_google_docs_submission?
+      # The discussion_topic check is to allow attachments to graded discussions to not count against the user's quota.
+      if asset.allow_google_docs_submission? || asset.submission_types == "discussion_topic"
         authorized_action(asset, @current_user, :submit)
       else
         authorized_action(asset, @current_user, :nothing)
@@ -933,7 +934,6 @@ class FilesController < ApplicationController
       group = @asset.group_category.group_for(@current_user) if @asset.has_group_category?
       @context = group || @current_user
     end
-
     if authorized_upload?(@context, @asset, intent)
       api_attachment_preflight(@context, request,
                                check_quota: check_quota?(@context, intent),

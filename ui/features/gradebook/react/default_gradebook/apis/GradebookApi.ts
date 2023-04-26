@@ -25,7 +25,7 @@ import type {CustomColumn, FilterPreset, GradebookSettings} from '../gradebook.d
 
 const I18n = useI18nScope('gradebookGradebookApi')
 
-function applyScoreToUngradedSubmissions(courseId: string, params) {
+function applyScoreToUngradedSubmissions(courseId?: string, params: any = {}) {
   const url = `/api/v1/courses/${courseId}/apply_score_to_ungraded_submissions`
   return axios.put(url, underscore(params))
 }

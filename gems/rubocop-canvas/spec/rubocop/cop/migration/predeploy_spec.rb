@@ -43,12 +43,12 @@ describe RuboCop::Cop::Migration::Predeploy do
     RUBY
 
     expect(cop.offenses.size).to eq 6
-    expect(cop.messages[0]).to eq "Create tables in a predeploy migration"
-    expect(cop.messages[1]).to eq "Add indexes in a predeploy migration"
-    expect(cop.messages[2]).to eq "Add columns in a predeploy migration"
-    expect(cop.messages[3]).to eq "Add indexes in a predeploy migration"
-    expect(cop.messages[4]).to eq "Add columns in a predeploy migration"
-    expect(cop.messages[5]).to eq "Add columns in a predeploy migration"
+    expect(cop.messages[0]).to eq "Migration/Predeploy: Create tables in a predeploy migration"
+    expect(cop.messages[1]).to eq "Migration/Predeploy: Add indexes in a predeploy migration"
+    expect(cop.messages[2]).to eq "Migration/Predeploy: Add columns in a predeploy migration"
+    expect(cop.messages[3]).to eq "Migration/Predeploy: Add indexes in a predeploy migration"
+    expect(cop.messages[4]).to eq "Migration/Predeploy: Add columns in a predeploy migration"
+    expect(cop.messages[5]).to eq "Migration/Predeploy: Add columns in a predeploy migration"
   end
 
   it "doesn't flag column removal in a change_table block in a postdeploy migration" do

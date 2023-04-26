@@ -395,7 +395,7 @@ module CanvasCache
 
       ::Sentry.register_patch do
         patch = ::Sentry::Redis::Client
-        ::Redis::Client.prepend(patch) unless ::Redis::Client <= patch
+        ::Redis::Client.prepend(patch) unless ::Redis::Client <= patch # rubocop:disable Style/YodaCondition
       end
 
       ::Redis::Client.prepend(::CanvasCache::Redis::Client)

@@ -9,7 +9,6 @@ Gem::Specification.new do |spec|
 
   spec.files         = Dir.glob("{lib|spec}/**/*")
   spec.require_paths = ["lib"]
-  spec.test_files    = spec.files.grep(%r{^spec/})
 
   spec.required_ruby_version = ">= 2.0"
 

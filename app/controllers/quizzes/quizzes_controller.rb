@@ -37,7 +37,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   include K5Mode
 
-  add_crumb(proc { t("#crumbs.quizzes", "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
+  add_crumb(proc { t("#crumbs.quizzes", "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_quizzes_url }
   before_action { |c| c.active_tab = "quizzes" }
   before_action :require_quiz, only: %i[
     statistics
@@ -253,7 +253,7 @@ class Quizzes::QuizzesController < ApplicationController
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
       hash = {
-        ATTACHMENTS: @attachments.map { |_, a| [a.id, attachment_hash(a)] }.to_h,
+        ATTACHMENTS: @attachments.to_h { |_, a| [a.id, attachment_hash(a)] },
         CONTEXT_ACTION_SOURCE: :quizzes,
         COURSE_ID: @context.id,
         LOCKDOWN_BROWSER: @quiz.require_lockdown_browser?,
@@ -333,9 +333,9 @@ class Quizzes::QuizzesController < ApplicationController
         flash[:notice] = t("notices.has_submissions_already", "Keep in mind, some students have already taken or started taking this quiz")
       end
 
-      regrade_options = @quiz.current_quiz_question_regrades.map do |qqr|
+      regrade_options = @quiz.current_quiz_question_regrades.to_h do |qqr|
         [qqr.quiz_question_id, qqr.regrade_option]
-      end.to_h
+      end
       sections = @context.course_sections.active
 
       max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)

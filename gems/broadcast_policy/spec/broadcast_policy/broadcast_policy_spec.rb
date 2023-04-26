@@ -60,8 +60,8 @@ describe BroadcastPolicy do
       end
 
       policy_list = policy_harness.broadcast_policy_list
-      expect(policy_list.find_policy_for("Foo")).not_to be(nil)
-      expect(policy_list.find_policy_for("Bar")).not_to be(nil)
+      expect(policy_list.find_policy_for("Foo")).not_to be_nil
+      expect(policy_list.find_policy_for("Bar")).not_to be_nil
     end
   end
 
@@ -90,8 +90,8 @@ describe BroadcastPolicy do
 
     it "overwrites any inherited blocks" do
       policy_list = child.broadcast_policy_list
-      expect(policy_list.find_policy_for("Foo")).to be(nil)
-      expect(policy_list.find_policy_for("Bar")).not_to be(nil)
+      expect(policy_list.find_policy_for("Foo")).to be_nil
+      expect(policy_list.find_policy_for("Bar")).not_to be_nil
     end
   end
 end

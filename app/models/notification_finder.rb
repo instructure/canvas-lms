@@ -38,7 +38,7 @@ class NotificationFinder
 
   def refresh_cache(notifications = Notification.all_cached)
     @notifications = notifications.index_by(&:name)
-    @notifications.values.each(&:freeze)
+    @notifications.each_value(&:freeze)
     true
   end
 end

@@ -80,7 +80,14 @@ module RuboCop
           @replica_identity_models = add_replica_identity_search(node).map { |n| n.split("::").last.downcase }
         end
 
+        def on_defs(node)
+          super
+          @replica_identity_models = add_replica_identity_search(node).map { |n| n.split("::").last.downcase }
+        end
+
         def replica_identity_present?(table_name)
+          return false unless %i[str sym].include?(table_name.type)
+
           table_name = table_name.value.to_s.delete("_")
           @replica_identity_models.any? { |model_name| table_name.include?(model_name) }
         end
@@ -124,9 +131,12 @@ module RuboCop
 
             unless replica_identity_present?(table_name)
               # put the complaint on the last line of the block
+              if %i[str sym].include?(table_name.type)
+                example = "e.g. `#{EXAMPLE_REPLICA_IDENTITY_LINE % table_name.value.to_s.split("_").map(&:capitalize).join.sub(/s$/, "")}`"
+              end
               add_offense nil, location: last_line_range(node), message: <<~TEXT, severity: :warning
                 Use `add_replica_identity` after the create_table block
-                e.g. `#{EXAMPLE_REPLICA_IDENTITY_LINE % table_name.value.to_s.split("_").map(&:capitalize).join.sub(/s$/, "")}`
+                #{example}
               TEXT
             end
 

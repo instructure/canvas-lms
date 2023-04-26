@@ -220,6 +220,7 @@ sv-x-k12:
   a_simplified_canvas_interface_for_k_5_enable_appli_bc32b2d1: |-
       Ett förenklat Canvas-gränssnitt för K-5. Aktivera tillämpliga
       underkonton som K-5-konton i kontoinställningarna.
+  a_single_certificate_file_e7f347f1: "En enkel certifieringsfil"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "En SIS-integration är inte konfigurerad, och funktionen aktivera nya SIS-integrationsinställningar är inte aktiverad"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "En elev gjorde nyss en sen inlämning för %{assignment_name} i kursen %{course_name}"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "En elev lämnade nyss in en återinlämning för %{assignment_title} i kursen %{course_name}"
@@ -3823,9 +3824,11 @@ sv-x-k12:
       delete: "Ta bort"
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: "Den här uppgiften kommer inte att bedömas."
+      assignment_not_yet_graded_rqd_screenreader: "Uppgiften inte har bedömts ännu."
       assignment_not_yet_graded_screenreader: "Uppgiften har inte bedömts ännu. %{pointsPossible} möjliga poäng."
       empty_points_possible: "-/%{pointsPossible} poäng"
       no_submission: "Ingen inlämning"
+      no_submission_for_assignment_rqd_screenreader: "Ingen inlämning för den här uppgiften."
       no_submission_for_assignment_screenreader: "Ingen inlämning för den här uppgiften. %{pointsPossible} möjliga poäng."
       not_yet_graded: "*Inte bedömda ännu*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} poäng"
@@ -4481,7 +4484,10 @@ sv-x-k12:
     ldap_fields: 
       auth_filter_description: "Använd *%{placeholder}* som en platshållare för det användarnamn som användaren anger. Exempel: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "Det LDAP-attribut som ska användas för att leta upp Canvas-inloggningen. Lämna tomt för att använda det användarnamn som anges av användaren."
+      internal_ca_description: "Om din LDAP-server presenterar ett certifikat som utfärdats av en intern rotcertifikatutfärdare som inte är betrodd *måste* du ladda upp din rotcertifikatutfärdare för att den ska bli betrodd i Canvas när du ansluter."
+      internal_ca_warning: "*Varning*: Det är mindre säkert att använda en intern rotcertifikatutfärdare och det ökar riskerna. Vi rekommenderar start att du använder certifikat som utfärdats av betrodda certifikatutfärdare."
       ldap_timeout_failure_help2: "Om tiden går ut för många gånger när Canvas försöker kommunicera med LDAP-servern blockeras ytterligare inloggningsförsök från den LDAP-servern i %{time}. LDAP-servern drabbades senast av avbrott %{timestamp}."
+      verify_tls_cert_opt_in_description: "TLS-certifikatverifiering krävs på *%{enforcement_date}*, men du kan aktivera det tidigt så att din LDAP-server kan var kompatibel."
     ldap_settings_test: 
       labels: 
         pass: Lösenord
@@ -5576,6 +5582,9 @@ sv-x-k12:
   catalog_name_46d37909: "Katalogens namn"
   catalog_url_a01655dd: Katalog-URL
   catalog_users_already_exist_2894b8c4: "Catalog-användarna finns redan"
+  catalog_was_provisioned_9851448f: "Catalog etablerades."
+  catalog_was_unprovisioned_9524cb58: "Catalog avetablerades."
+  catalog_was_updated_743a58eb: "Catalog uppdaterades."
   category_b9a94408: Kategori
   categoryname_notification_preferences_cd64e4a0: "%{categoryName} aviseringsinställningar"
   cc: 
@@ -5594,6 +5603,8 @@ sv-x-k12:
   cell_number_is_required_2edcee60: "Mobil telefonnummer krävs"
   central_value_in_a_set_of_results_calculated_by_di_19a8c48a: "Centralt värde i en resultatuppsättning Beräknat genom division av summan av alla objektresultat genom antalet resultat."
   certificate_fingerprint_b376df90: "Fingeravtryck för certifikat"
+  certificate_is_expired_or_not_yet_valid_4a3bb8f1: "Certifikatet har gått ut eller så har det inte börjat gälla än"
+  certificate_is_not_a_ca_9ec5d574: "Certifikatet är inte en certifikatutfärdare"
   change_applied_89d1aa5a: "Tillämpad ändring"
   change_beginning_date_to_39dbd06e: "Ändra startdatumet till"
   change_color_for_mastery_level_position_daa51849: "Ändra färg för måluppfyllelsenivå %{position}"
@@ -9634,6 +9645,8 @@ sv-x-k12:
   drag_a_file_here_or_1aaf19c1: "Dra hit en fil eller"
   drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: "Dra hit en fil eller klicka för att välja en fil för uppladdning"
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: "Dra och släpp filer i moduler och ladda upp modulobjekt med flera filer"
+  drag_and_drop_or_browse_your_files_92ad4c17: "Dra och släpp eller *sök i dina filer*"
+  drag_and_drop_or_browse_your_files_to_replace_27cc42d6: "Dra och släpp eller *sök i dina filer* för att ersätta"
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "Dra och släpp, eller klicka för att söka på datorn"
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "Dra och släpp, eller klicka för att söka i din dator"
   drag_and_drop_your_image_here_or_7fba7c14: "Dra och släpp din bild här eller "
@@ -13380,6 +13393,7 @@ sv-x-k12:
   integrations_cadb03f3: Integreringar
   interactions_report_47c1219e: Interaktionsrapport
   internal_analytics_f02b3fff: "Interna analyser"
+  internal_certificate_authority_ca_76566a37: "Intern certifikatutfärdare (CA)"
   internal_setting_created_f3f72416: "Intern inställning skapades"
   internal_setting_deleted_aaf1dd9d: "Intern inställning raderades"
   internal_setting_updated_87510559: "Intern inställning uppdaterades"
@@ -13430,6 +13444,7 @@ sv-x-k12:
   invalid_hexcode_9124519f: "Ogiltig hexadecimal kod"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Ogiltig hexadecimal kod. Ange en giltig hexadecimal kod här för att använda en anpassad färg."
   invalid_hexcode_provided_522ba223: "Ogiltig hexadecimal kod tillhandahölls"
+  invalid_login_request_1639c89f: "Ogiltig inloggningsbegäran"
   invalid_microsoft_sync_tenant_given_please_validat_97be36bf: "En ogiltig Microsoft Sync-klientorganisation har angetts. Validera din klientorganisation"
   invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "En ogiltig Microsoft Sync-klientorganisation har angetts. Validera din användare."
   invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "Ogiltigt fjärrattribut för Microsoft Teams Sync Giltiga fjärrattribut: %{VALID_SYNC_REMOTE_ATTRIBUTES}"
@@ -15726,6 +15741,8 @@ sv-x-k12:
       email: 
         html: 
           announcement_info: "Svar på det här e-postmeddelandet publiceras som ett svar på meddelandet, som alla i kursen kan se."
+          announcement_info_course: "Svar på det här e-postmeddelandet publiceras som ett svar på meddelandet, som alla i kursen kan se."
+          announcement_info_group: "Svar på det här e-postmeddelandet publiceras som ett svar på meddelandet, som alla i gruppen kan se."
           attached_file: "Bifogad fil"
           link: "Visa anslag"
         labels: 
@@ -16490,6 +16507,8 @@ sv-x-k12:
   modify_permissions_for_account_rubrics_6c3aee59: "Ändra behörigheter för kontomatriser"
   modify_settings_ed8b9ccf: "Modifiera inställningar"
   module_90d9fd32: Modul
+  module_and_items_published_13ed5cd6: "Modulen och objekten publicerades"
+  module_and_items_unpublished_e953ba4f: "Modulen och objekten avpublicerades"
   module_completed_50c50762: "Modul slutförd"
   module_content_import_enhancements_c00b0ea2: "Förbättringar i importen av modulinnehåll"
   module_file_upload_enhancements_eecd4d37: "Förbättrad filuppladdning för moduler"
@@ -16512,6 +16531,7 @@ sv-x-k12:
   module_navigation_97043417: Modulnavigering
   module_publish_menu_30b638dd: Modulpubliceringsmeny
   module_publish_menu_88b54c1b: Modulpubliceringsmeny
+  module_published_80f0b9b8: "Modulen publicerades"
   modules: 
     assignments_to_grade: 
       one: "1 uppgift har inlämningar som inte bedömts"
@@ -16777,6 +16797,7 @@ sv-x-k12:
   nav_text_94206145: Navigeringstext
   nav_text_active_a924ae88: "Navigeringstext aktiv"
   navigate_to_speed_grader_for_name_f28cb5b1: "Navigera till SpeedGrader för %{name}"
+  navigate_to_speed_grader_for_title_assignment_828b1366: "Gå till SpeedGrader för uppgiften %{title}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigering gör det möjligt för användaren att se länken Personer i kursnavigeringen."
   navigation_menu_fd782ff8: Navigeringsmeny
   near_mastery_f25174a4: "Nära måluppfyllelse"
@@ -16864,6 +16885,7 @@ sv-x-k12:
   new_quizzes_dbda7e0a: "New Quizzes"
   new_quizzes_description: "Den här funktionen ger en förbättrad Canvas-upplevelse för quiz. När den här flaggan är aktiverad är verktyget New Quizzes tillgängligt. För fullständig information, se *användargruppen New Quizzes* i Canvas Community."
   new_quizzes_embedded_module_progression_cd2307b6: "Förlopp för inbäddad modul i New Quizzes"
+  new_quizzes_export_support_b0a6a625: "Stöd för New Quizzes-export"
   new_quizzes_importing_c167dce0: "New Quizzes-import"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "New Quizzes inkluderat på fliken Sammanfattning av lärandemålsjusteringar"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Migrering av New Quizzes under import eller kopiering av kurs"
@@ -17123,6 +17145,8 @@ sv-x-k12:
   not_submitted_fff47f17: "Inte skickad"
   not_synced_529cbf29: "Inte synkroniserad"
   not_synced_message_a343fe5e: "Inte synkroniserad: %{message}"
+  not_valid_after_81c9faec: "Ej giltig efter"
+  not_valid_before_9ad2d22d: "Ej giltig före"
   not_visible_in_student_files_22f11883: "Ej synlig i elevfiler"
   not_yet_assessed_9362f199: "Ännu inte bedömda"
   not_yet_completed_345a0bca: "Inte färdig än"
@@ -18232,6 +18256,7 @@ sv-x-k12:
   please_enter_a_name_for_this_link_318f01a4: "Ange ett namn för den här länken."
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: "Ange ett nummer mellan 0 och 100 som migreringshastighet"
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Ange en sökterm med minst tre tecken"
+  please_enter_a_valid_search_term_5c69b0b0: "Ange en giltig sökterm"
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Ange en giltig URL (t.ex. http://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Ange en giltig URL. Protokoll är obligatoriskt (dvs.http://, https://, ftp://, tel:, mailto:)."
   please_enter_your_label_name_7745272d: "Uppge ditt %{label_name}:"
@@ -18873,6 +18898,7 @@ sv-x-k12:
   privacy_290109ea: Integritet
   privacy_level_f0ec09a3: Integritetsnivå
   private_3883d133: Privat
+  private_key_is_present_in_certificate_file_1a1b7b42: "En privat nyckel är närvarande i certifikatfilen"
   pro_tip_30e41fa3: PROFFSTIPS!
   proceed_f3d33864: Fortsätt
   proceed_with_caution_aa9b3285: "Fortsätt med försiktighet"
@@ -19320,6 +19346,8 @@ sv-x-k12:
   publishing_error_bdfb3390: Publiceringsfel
   publishing_is_disabled_for_this_item_efa7803f: "Publicering har inaktiverats för detta objekt"
   publishing_item_name_is_disabled_8207a9e7: "Publicering %{item_name} har inaktiverats"
+  publishing_module_and_items_ce128d12: "Publicerar modul och objekt"
+  publishing_module_c2b5211: "Publicerar modul"
   publishing_pace_a65e4152: "Publicerar takt …"
   publishing_plan_b70186ed: "Publiceringsplan ..."
   publishing_progress_5154a430: Publiceringsförlopp
@@ -20458,6 +20486,8 @@ sv-x-k12:
         one: "1 sekund"
         other: "%{count} sekunder"
       show_time_link: "Visa tid"
+      time_remaining: "Du har %{time} kvar"
+      times_up: "Tiden är ute! Skickar in resultat om 10 sekunder"
       titles: 
         come_back_later: "Du har markerat den här frågan för att komma tillbaka senare"
         times_up: "Tiden är slut!"
@@ -20864,6 +20894,7 @@ sv-x-k12:
   remove_attendee_name_55165070: "Ta bort deltagare %{name}"
   remove_attribute_59a4aa64: "Ta bort attribut"
   remove_avatar_picture_aba765eb: "Ta bort avatarbild"
+  remove_certificate_4e979eee: "Ta bort certifikatet"
   remove_collaborationtitle_c3e81adb: "Ta bort \"%{collaborationTitle}\"?"
   remove_condition_9cf94f7f: "Ta bort villkor"
   remove_conference_69b9e0d0: "Tar bort konferensen"
@@ -21617,6 +21648,7 @@ sv-x-k12:
   search_assignments_8c3c21bb: "Sök i uppgifter"
   search_assignments_in_gradebook_and_new_design_for_8f966bcc: "Sök efter uppgifter i omdömesboken och ny design för uppgifter och elevsökning"
   search_by_99d1ba5f: "Sök efter"
+  search_by_name_or_id_3bdab12e: "Söker efter namn eller ID"
   search_by_student_name_26536097: "Sök efter elevnamn"
   search_by_title_or_author_273a8f49: "Sök efter titel eller skapare ..."
   search_by_title_short_name_or_sis_id_fe84aa12: "Sök efter titel, kort namn, eller SIS-ID"
@@ -21800,6 +21832,7 @@ sv-x-k12:
     one: "Välj (%{count}) kurs"
     other: "Välj alla (%{count}) kurser"
   select_all_students_7c2c34b3: "Välj alla elever"
+  select_an_account_to_update_b7521f0a: "Välj ett konto att uppdatera."
   select_an_edit_operation_ec1467d: "Välj en redigeringsåtgärd"
   select_an_outcome_group_6edb08a7: "Välj en lärandemålsgrupp"
   select_another_group_24773e5f: "Välj en annan grupp"
@@ -23213,6 +23246,7 @@ sv-x-k12:
   sticky_left_navigation_3d438a81: "Sticky-navigering till vänster"
   still_having_difficulty_get_more_help_here_3cdc8de1: "Kvarstår problemet? Få mer hjälp här:"
   stop_acting_as_user_8809a97f: "Sluta att agera som en användare"
+  stop_fd9822ab: Stopp
   storage_quotas_manage_6ca14bbb: "Lagringskvoter – hantera"
   storage_used_in_mb_c75fbd9c: "använt lagringsutrymme i MB"
   store_and_share_course_assets_82a9967c: "Ladda upp och dela kursmaterial"
@@ -23706,6 +23740,7 @@ sv-x-k12:
       student_support: "NetAcad Support – elev"
       student_support_description: "Din lärare är din huvudkontaktperson De kan svara på dina frågor om Networking Academy eller kontakta supporten för din räkning. Du kan kontakta din lärare via inkorgsfunktionen."
       support_desk_livechat: "Livechatt med supportdesk"
+  support_exporting_new_quizzes_in_qti_format_ba09b465: "Stöd för New Quizzes-export i QTI-format"
   support_favorite_lti_tools_in_the_rce_1680436d: "Stöd favorit-LTI-verktyg i RCE"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "Få stöd för LaTex matematiska ekvationer nästan överallt"
   support_uploading_closed_caption_files_in_all_the__418c06d4: |-
@@ -24686,6 +24721,7 @@ sv-x-k12:
   this_permission_requires_the_account_and_course_le_bdeefd51: "Behörigheten kräver funktionsalternativet Måluppfyllelseskalor på kurs- och kontonivå, som endast kan aktiveras på kontonivå."
   this_permission_should_only_be_assigned_to_users_t_231c182e: "Den här behörigheten bör endast tilldelas användare som din institution har godkänt för att agera som andra användare i hela ditt Canvas-konto."
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Den här placeringen kräver djuplänkssupport från leverantören. Kontrollera med din verktygsleverantör för att säkerställa att de stöder den här funktionen"
+  this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: "Detta kan ta några minuter. Klicka på Stopp-knappen för att avsluta bearbetningen. Objekt som redan har bearbetats återställs inte till tidigare tillstånd."
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: "Detta kan ta några minuter. Om du trycker på Avbryt stoppas processen, men objekt som redan har bearbetats återställs inte till tidigare tillstånd."
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Detta pronomen visas efter ditt namn när det är aktiverat"
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Denna frågegruppen ska välja fler frågor än de som finns tillgängliga."
@@ -25851,6 +25887,7 @@ sv-x-k12:
   unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
       Det gick inte att hämta låset på SFTP-användartabell. Försök igen om en minut.
                                     Om problemet kvarstår, kontakta #canvas-sre i Slack.
+  unable_to_parse_certificate_f25ff8b5: "Det gick inte att parsa certifikatet"
   unable_to_read_file_2d04b0c: "Det gick inte att läsa filen"
   unable_to_remove_app_4293cb53: "Kunde inte ta bort appen"
   unable_to_remove_outcomes_f682e68f: 
@@ -25867,7 +25904,9 @@ sv-x-k12:
   unable_to_switch_students_b901bc4b: "Det gick inte att växla elev"
   unable_to_toggle_placement_833db6ff: "Det gick inte att växla placering"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Det går inte att överföra filen till lagringstjänsten. Tjänsten kan ligga nere, eller kan du behöva logga in till Canvas på nytt."
+  unable_to_update_domains_44c5dd55: "Det gick inte att uppdatera domäner"
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Det gick inte att uppdatera inställningarna för Microsoft Teams Sync. Försök igen. Kontakta supporten om problemet kvarstår."
+  unable_to_update_quotas_62baf95b: "Det gick inte att uppdatera kvoter"
   unable_to_update_splitscreen_preference_4d449fa5: "Det går inte att uppdatera inställningen för delad skärm."
   unaccepted_students_aa68ea98: "Icke-godkända elever"
   unarchive_f245e2d6: "Ta bort arkivering"
@@ -26007,6 +26046,7 @@ sv-x-k12:
   unpublished_drafts_bb352243: "Opublicerade utkast"
   unpublished_drafts_count_86e16f17: "Opublicerade utkast (%{count})"
   unpublished_subjects_62a7d38: "Avpublicerade ämnen"
+  unpublishing_module_and_items_ca2edd97: "Avpublicerar modul och objekt"
   unread_c14cb06f: "oläst,"
   unread_e9c1b19c: Olästa
   unread_post_47a1a06b: "Oläst inlägg"
@@ -26112,6 +26152,7 @@ sv-x-k12:
   upload_files_a228f20f: "Ladda upp filer"
   upload_gradebook_386a46c8: "Ladda upp bedömningsöversikt"
   upload_image_6120b609: "Ladda upp bild"
+  upload_internal_root_ca_46cf9b36: "Ladda upp intern rotcertifikatsutfärdare"
   upload_media_ce31135a: "Ladda upp media"
   upload_not_available_for_this_folder_8f8623c6: "Uppladdning är inte tillgängligt för den här mappen"
   upload_percent_complete_d533d3e2: "Slutförandeprocent för uppladdning"
@@ -26155,6 +26196,10 @@ sv-x-k12:
   use_arrows_a60b3330: "Använd pilarna"
   use_as_front_page_274a488b: "Använd som framsida"
   use_as_frontpagetext_fa88bbb2: "Använd som %{frontPageText}"
+  use_attachment_ids_in_media_links_7bfb3422: "Använd bilage-ID i medielänkar"
+  use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
+      Använda bilage-ID i medielänkar så att användare alltid pekas till rätt medieinstans 
+      istället för originalet
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Använd bokmärkning för API-sidnumrering i registreringsindex"
   use_cloudfront_for_docviewer_f21b96db: "Använd CloudFront för DocViewer"
   use_comment_comment_136b5cb3: "Använd kommentaren %{comment}"
@@ -26674,6 +26719,7 @@ sv-x-k12:
   users_with_this_permission_may_be_able_to_use_the__84394072: "Användare med den här behörigheten kan använda funktionen Agera som för att hantera kontoinställningar, visa och justera bedömningar, komma åt användarinformation m.m. Denna behörighet ger administratörer för ett underkonto åtkomst till inställningar och information utanför sitt underkonto."
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Använder den nya schemabokaren och dess funktioner"
   utc_e44049af: UTC
+  uuid_has_been_provisioned_ab0c6c9: "UUID har etablerats."
   validate: 
     is_required: "Det här fältet är obligatoriskt"
   validate_links_in_content_b1630fba: "Validera länkar i innehållet"
@@ -26696,6 +26742,7 @@ sv-x-k12:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite likhetsresultat -- mer information"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Likhetspoäng – se detaljerad rapport"
   verify_ldap_tls_certificates_70241d8e: "Verifiera TLS-certifikat för LDAP"
+  verify_tls_certificate_9cfa26d1: "Verifiera TLS-certifikat"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Verifiera TLS-certifikat från LDAP-autentiseringsleverantörer."
   version_versionnumber_updatedat_9f5b7a5b: "Version %{versionNumber} %{updatedAt}"
   video_78335c71: video

@@ -650,7 +650,7 @@
   }
   .tox-toolbar .tox-toolbar__group::after, /* regular toolbar */
   .tox-toolbar-overlord .tox-toolbar__group::after, /* wrapping toolbar */
-  .tox-toolbar__overflow .tox-toolbar__group::after, /* floating toolbar */
+  .tox-toolbar__overflow .tox-toolbar__group::after, /* overflow toolbar */
   .tox-tinymce-aux .tox-toolbar .tox-toolbar__group::after {
     /* popup toolbar */
     content: '';
@@ -753,5 +753,10 @@
   /* not part of tinymce, but a convenient place to add a style I need */
   [data-canvascontenttray-content]:focus {
     outline-color: var(--canvasFocusBorderColor);
+  }
+
+  .tox .tox-toolbar-overlord .tox-toolbar__overflow {
+    /* Remove the errant gray line below the expanded toolbar in "sliding" mode */
+    background: none;
   }
 }

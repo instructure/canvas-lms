@@ -37,7 +37,7 @@ module LtiOutbound
               value = value.call
               instance_variable_set(variable_name, value)
             end
-            return value
+            value
           end
         end
       end

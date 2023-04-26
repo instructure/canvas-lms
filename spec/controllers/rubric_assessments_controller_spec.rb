@@ -476,7 +476,7 @@ describe RubricAssessmentsController do
       res = @assignment.assign_peer_reviews
       expect(res).not_to be_empty
       # two of the six possible combinations have already been created
-      expect(res.length).to eql(4)
+      expect(res.length).to be(4)
       expect(res.to_a.find { |r| r.assessor == @student1 && r.user == @student2 }).not_to be_nil
 
       post "create", params: { course_id: @course.id, rubric_association_id: @rubric_association.id, rubric_assessment: { user_id: @student2.to_param, assessment_type: "peer_review" } }

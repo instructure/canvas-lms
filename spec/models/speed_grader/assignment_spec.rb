@@ -406,7 +406,7 @@ describe SpeedGrader::Assignment do
         entry.save!
         topic.ensure_submission(@student)
 
-        expect(canvadoc_url.include?("enable_annotations%22:false")).to eq true
+        expect(canvadoc_url.include?("enable_annotations%22:false")).to be true
       end
 
       it "creates DocViewer session anonymous instructor annotations if assignment has it set" do
@@ -417,7 +417,7 @@ describe SpeedGrader::Assignment do
         entry.save!
         topic.ensure_submission(@student)
 
-        expect(canvadoc_url.include?("anonymous_instructor_annotations%22:true")).to eq true
+        expect(canvadoc_url.include?("anonymous_instructor_annotations%22:true")).to be true
       end
 
       it "passes enrollment type to DocViewer" do
@@ -427,7 +427,7 @@ describe SpeedGrader::Assignment do
         entry.save!
         topic.ensure_submission(@student)
 
-        expect(canvadoc_url.include?("enrollment_type%22:%22teacher%22")).to eq true
+        expect(canvadoc_url.include?("enrollment_type%22:%22teacher%22")).to be true
       end
 
       it "passes submission id to DocViewer" do
@@ -512,7 +512,7 @@ describe SpeedGrader::Assignment do
       end
 
       it "includes nil for the posted_at field if the submission is not posted" do
-        expect(submission_json["posted_at"]).to be nil
+        expect(submission_json["posted_at"]).to be_nil
       end
     end
 

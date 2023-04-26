@@ -1420,7 +1420,7 @@ describe CommunicationChannelsController do
       json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
                       { controller: "communication_channels", action: "delete_push_token", format: "json",
                         push_token: fake_token }, { push_token: fake_token })
-      expect(json["success"]).to eq true
+      expect(json["success"]).to be true
       endpoints = @user.notification_endpoints.where("lower(token) = ?", fake_token)
       expect(endpoints.length).to eq 0
     end
@@ -1440,7 +1440,7 @@ describe CommunicationChannelsController do
         json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
                         { controller: "communication_channels", action: "delete_push_token", format: "json",
                           push_token: "notatoken" }, { push_token: "notatoken" })
-        expect(json["success"]).to eq true
+        expect(json["success"]).to be true
       end
 
       context "has a notification endpoint" do
@@ -1458,7 +1458,7 @@ describe CommunicationChannelsController do
             json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
                             { controller: "communication_channels", action: "delete_push_token", format: "json",
                               push_token: fake_token }, { push_token: fake_token })
-            expect(json["success"]).to eq true
+            expect(json["success"]).to be true
             endpoints = @user.notification_endpoints.shard(@user).where("lower(token) = ?", fake_token)
             expect(endpoints.length).to eq 0
           end
@@ -1468,7 +1468,7 @@ describe CommunicationChannelsController do
           json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
                           { controller: "communication_channels", action: "delete_push_token", format: "json",
                             push_token: fake_token }, { push_token: fake_token })
-          expect(json["success"]).to eq true
+          expect(json["success"]).to be true
           endpoints = @user.notification_endpoints.where("lower(token) = ?", fake_token)
           expect(endpoints.length).to eq 0
         end

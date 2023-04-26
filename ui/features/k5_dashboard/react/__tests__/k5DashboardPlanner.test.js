@@ -44,7 +44,9 @@ describe('K5Dashboard Schedule Section', () => {
     moxios.install()
     createPlannerMocks()
     global.ENV = defaultEnv
-    fetchShowK5Dashboard.mockImplementation(() => Promise.resolve(true))
+    fetchShowK5Dashboard.mockImplementation(() =>
+      Promise.resolve({show_k5_dashboard: true, use_classic_font: false})
+    )
   })
 
   afterEach(() => {

@@ -113,11 +113,11 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def prior_flag_state(operation)
-    operation == :create ? default_for_flag : state_in_database
+    (operation == :create) ? default_for_flag : state_in_database
   end
 
   def post_flag_state(operation)
-    operation == :destroy ? default_for_flag : state
+    (operation == :destroy) ? default_for_flag : state
   end
 
   def default_for_flag

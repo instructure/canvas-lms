@@ -65,8 +65,8 @@ describe Lti::PlatformStorageController do
 
       it "modifies the frame-ancestors in the CSP header" do
         subject
-        expect(response.headers["Content-Security-Policy"]).to \
-          match(/frame-ancestors [^;]*self[^;]*test\.host/)
+        expect(response.headers["Content-Security-Policy"])
+          .to match(/frame-ancestors [^;]*self[^;]*test\.host/)
       end
     end
   end

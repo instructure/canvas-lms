@@ -78,7 +78,7 @@ module Lti
       context "placement advice" do
         it "creates placement advice" do
           placement_advice = described_class.convert_resource_selection(fake_selection).placement_advice
-          expect(placement_advice).to_not be nil
+          expect(placement_advice).to_not be_nil
         end
 
         it "converts width to display_width" do

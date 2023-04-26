@@ -17,7 +17,7 @@
  */
 
 import tz from '@canvas/timezone'
-import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import _Handlebars from 'handlebars/runtime'
 
 const Handlebars = _Handlebars.default // because this version of handlebars has old, messed up es6 transpilation

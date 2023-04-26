@@ -70,7 +70,7 @@ RSpec.describe Mutations::UpdateSubmissionsReadState do
   it "marks submission as unread" do
     @submission.change_read_state("read", @teacher)
     result = run_mutation({ ids: [@submission.id], read: false })
-    expect(result.dig("data", "updateSubmissionsReadState", "errors")).to be nil
+    expect(result.dig("data", "updateSubmissionsReadState", "errors")).to be_nil
     expect(result.dig("data", "updateSubmissionsReadState", "submissions")).to include({ _id: @submission.id.to_s })
     expect(@submission.read_state(@teacher)).to eq "unread"
   end
@@ -79,7 +79,7 @@ RSpec.describe Mutations::UpdateSubmissionsReadState do
     @submission.change_read_state("unread", @teacher)
     result = run_mutation({ ids: [@submission.id], read: true })
 
-    expect(result.dig("data", "updateSubmissionsReadState", "errors")).to be nil
+    expect(result.dig("data", "updateSubmissionsReadState", "errors")).to be_nil
     expect(result.dig("data", "updateSubmissionsReadState", "submissions")).to include({ _id: @submission.id.to_s })
     expect(@submission.read_state(@teacher)).to eq "read"
   end
@@ -90,7 +90,7 @@ RSpec.describe Mutations::UpdateSubmissionsReadState do
       submission_id_that_does_not_exist = "4"
       result = run_mutation({ ids: [submission_id_that_does_not_exist, @submission.id], read: true })
 
-      expect(result.dig("data", "updateSubmissionsReadState", "errors")).not_to be nil
+      expect(result.dig("data", "updateSubmissionsReadState", "errors")).not_to be_nil
       expect(result.dig("data", "updateSubmissionsReadState", "submissions")).to include({ _id: @submission.id.to_s })
       expect(result.dig("data", "updateSubmissionsReadState", "errors")).to include({ attribute: submission_id_that_does_not_exist, message: "Unable to find Submission" })
       expect(@submission.read_state(@teacher)).to eq "read"
@@ -100,8 +100,8 @@ RSpec.describe Mutations::UpdateSubmissionsReadState do
       @submission.change_read_state("unread", @teacher)
       result = run_mutation({ ids: [@submission.id], read: true }, user_model)
 
-      expect(result.dig("data", "updateSubmissionsReadState", "errors")).not_to be nil
-      expect(result.dig("data", "updateSubmissionsReadState", "submissions")).to be nil
+      expect(result.dig("data", "updateSubmissionsReadState", "errors")).not_to be_nil
+      expect(result.dig("data", "updateSubmissionsReadState", "submissions")).to be_nil
       expect(result.dig("data", "updateSubmissionsReadState", "errors")).to include({ attribute: @submission.id.to_s, message: "Not authorized to read Submission" })
       expect(@submission.read_state(@teacher)).to eq "unread"
     end

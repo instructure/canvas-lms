@@ -574,8 +574,8 @@ describe Api do
     end
 
     it "handles user uuid" do
-      expect(Api.sis_parse_id("uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0")).to \
-        eq ["uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
+      expect(Api.sis_parse_id("uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"))
+        .to eq ["uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
       expect(Api.sis_parse_ids(["uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"], @lookups)).to \
         eq({ "users.uuid" => { ids: ["tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"] } })
     end
@@ -1158,7 +1158,7 @@ describe Api do
       allow(controller).to receive(:request).and_return double(headers: {
                                                                  "Accept" => "application/vnd.api+json"
                                                                })
-      expect(controller.accepts_jsonapi?).to eq true
+      expect(controller.accepts_jsonapi?).to be true
     end
 
     it "returns false when application/vnd.api+json not in the Accept header" do
@@ -1166,7 +1166,7 @@ describe Api do
       allow(controller).to receive(:request).and_return double(headers: {
                                                                  "Accept" => "application/json"
                                                                })
-      expect(controller.accepts_jsonapi?).to eq false
+      expect(controller.accepts_jsonapi?).to be false
     end
   end
 

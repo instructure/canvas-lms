@@ -254,17 +254,17 @@ describe Submission do
           end
 
           it "does not have grade permissions if the user is a root account admin" do
-            expect(@submission.grants_right?(@admin, :grade)).to eq(false)
+            expect(@submission.grants_right?(@admin, :grade)).to be(false)
           end
 
           it "does not have grade permissions if the user is non-root account admin with manage_grades permissions" do
-            expect(@submission.grants_right?(@teacher, :grade)).to eq(false)
+            expect(@submission.grants_right?(@teacher, :grade)).to be(false)
           end
 
           it "doesn't have grade permissions if the user is non-root account admin without manage_grades permissions" do
             @student = user_factory(active_all: true)
             @context.enroll_student(@student)
-            expect(@submission.grants_right?(@student, :grade)).to eq(false)
+            expect(@submission.grants_right?(@student, :grade)).to be(false)
           end
         end
 
@@ -276,17 +276,17 @@ describe Submission do
           end
 
           it "has grade permissions if the user is a root account admin" do
-            expect(@submission.grants_right?(@admin, :grade)).to eq(true)
+            expect(@submission.grants_right?(@admin, :grade)).to be(true)
           end
 
           it "has grade permissions if the user is non-root account admin with manage_grades permissions" do
-            expect(@submission.grants_right?(@teacher, :grade)).to eq(true)
+            expect(@submission.grants_right?(@teacher, :grade)).to be(true)
           end
 
           it "doesn't have grade permissions if the user is non-root account admin without manage_grades permissions" do
             @student = user_factory(active_all: true)
             @context.enroll_student(@student)
-            expect(@submission.grants_right?(@student, :grade)).to eq(false)
+            expect(@submission.grants_right?(@student, :grade)).to be(false)
           end
         end
 
@@ -298,17 +298,17 @@ describe Submission do
           end
 
           it "has grade permissions if the user is a root account admin" do
-            expect(@submission.grants_right?(@admin, :grade)).to eq(true)
+            expect(@submission.grants_right?(@admin, :grade)).to be(true)
           end
 
           it "has grade permissions if the user is non-root account admin with manage_grades permissions" do
-            expect(@submission.grants_right?(@teacher, :grade)).to eq(true)
+            expect(@submission.grants_right?(@teacher, :grade)).to be(true)
           end
 
           it "doesn't have grade permissions if the user is non-root account admin without manage_grades permissions" do
             @student = user_factory(active_all: true)
             @context.enroll_student(@student)
-            expect(@submission.grants_right?(@student, :grade)).to eq(false)
+            expect(@submission.grants_right?(@student, :grade)).to be(false)
           end
         end
 
@@ -322,7 +322,7 @@ describe Submission do
           end
 
           it "may not be graded if grades are not published" do
-            expect(@submission.grants_right?(@teacher, :grade)).to eq false
+            expect(@submission.grants_right?(@teacher, :grade)).to be false
           end
 
           it "sets an error message indicating moderation is in progress if grades are not published" do
@@ -332,12 +332,12 @@ describe Submission do
 
           it "may be graded if grades are not published but grade_posting_in_progress is true" do
             @submission.grade_posting_in_progress = true
-            expect(@submission.grants_right?(@teacher, :grade)).to eq true
+            expect(@submission.grants_right?(@teacher, :grade)).to be true
           end
 
           it "may be graded when grades for the assignment are published" do
             @submission.assignment.update!(grades_published_at: Time.zone.now)
-            expect(@submission.grants_right?(@teacher, :grade)).to eq true
+            expect(@submission.grants_right?(@teacher, :grade)).to be true
           end
         end
       end
@@ -421,7 +421,7 @@ describe Submission do
 
     it "returns score without deduction" do
       submission.update(score: 100, points_deducted: 23)
-      expect(submission.entered_score).to eql(123)
+      expect(submission.entered_score).to eq 123
     end
 
     it "returns the score without deduction when late policy is disabled" do
@@ -517,8 +517,8 @@ describe Submission do
           }.from(20.minutes.ago(@now)).to(15.minutes.ago(@now))
         end
 
-        it "changes if an individual override is added for the student, even when the due date is earlier" \
-           " than an existing override that applies to the student for the assignment" do
+        it "changes if an individual override is added for the student, even when the due date is earlier " \
+           "than an existing override that applies to the student for the assignment" do
           section = @course.course_sections.create!(name: "My Awesome Section")
           student_in_section(section, user: @student)
           @assignment.assignment_overrides.create!(
@@ -537,8 +537,8 @@ describe Submission do
           }.from(10.minutes.ago(@now)).to(15.minutes.ago(@now))
         end
 
-        it "does not change if a non-individual-override is added for the student and the due date" \
-           " is earlier than an existing override that applies to the student for the assignment" do
+        it "does not change if a non-individual-override is added for the student and the due date " \
+           "is earlier than an existing override that applies to the student for the assignment" do
           category = @course.group_categories.create!(name: "New Group Category")
           group = @course.groups.create!(group_category: category)
           group.add_user(@student, "active")
@@ -848,8 +848,8 @@ describe Submission do
       end
     end
 
-    it "returns seconds_late_override if the submission has a late_policy_status of 'late'" \
-       " and a seconds_late_override" do
+    it "returns seconds_late_override if the submission has a late_policy_status of 'late' " \
+       "and a seconds_late_override" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late", seconds_late_override: 90.minutes)
@@ -857,8 +857,8 @@ describe Submission do
       end
     end
 
-    it "is not adjusted if the student resubmits and the submission has a late_policy_status of 'late'" \
-       " and a seconds_late_override" do
+    it "is not adjusted if the student resubmits and the submission has a late_policy_status of 'late' " \
+       "and a seconds_late_override" do
       Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
       submission.update!(late_policy_status: "late", seconds_late_override: 90.minutes)
       Timecop.freeze(40.minutes.from_now(@date)) do
@@ -882,8 +882,8 @@ describe Submission do
       end
     end
 
-    it "is zero if it was turned in late but the teacher sets the late_policy_status to 'late'" \
-       " and sets seconds_late_override to zero" do
+    it "is zero if it was turned in late but the teacher sets the late_policy_status to 'late' " \
+       "and sets seconds_late_override to zero" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late", seconds_late_override: 0)
@@ -968,7 +968,7 @@ describe Submission do
           submission.score = 700
           submission.grade_matches_current_submission = true
           submission.save!
-          expect(submission.points_deducted).to eql 300.0
+          expect(submission.points_deducted).to eq 300.0
         end
       end
 
@@ -978,7 +978,7 @@ describe Submission do
           submission.score = 700
           submission.grade_matches_current_submission = nil
           submission.save!
-          expect(submission.points_deducted).to eql 300.0
+          expect(submission.points_deducted).to eq 300.0
         end
       end
 
@@ -1021,7 +1021,7 @@ describe Submission do
       submission.score = 700
       submission.apply_late_policy(@late_policy, @assignment)
       expect(submission.score).to eq 700
-      expect(submission.points_deducted).to be nil
+      expect(submission.points_deducted).to be_nil
     end
 
     it "deducts a percentage per interval late" do
@@ -1085,7 +1085,7 @@ describe Submission do
         submission.update!(score: 400, points_deducted: 300)
         submission.score = nil
         submission.apply_late_policy(@late_policy, @assignment)
-        expect(submission.points_deducted).to eql 0.0
+        expect(submission.points_deducted).to eq 0.0
       end
     end
 
@@ -1169,7 +1169,7 @@ describe Submission do
         context "for an automatically-posted assignment" do
           it "posts a previously-unscored submission if deducting points for missing submissions" do
             submission.update!(late_policy_status: :missing)
-            expect(submission.posted_at).not_to be nil
+            expect(submission.posted_at).not_to be_nil
           end
 
           it "does not post the submission if missing submission deduction is not enabled" do
@@ -1237,15 +1237,15 @@ describe Submission do
           @assignment.submit_homework(@student, body: "a body")
           @assignment.grade_student(@student, grade: 700, grader: @teacher)
           expect(submission.score).to eq 700
-          expect(submission.points_deducted).to eq nil
+          expect(submission.points_deducted).to be_nil
         end
       end
 
       it "does not grade missing assignment" do
         Timecop.freeze(@date) do
           submission.apply_late_policy
-          expect(submission.score).to eq nil
-          expect(submission.points_deducted).to eq nil
+          expect(submission.score).to be_nil
+          expect(submission.points_deducted).to be_nil
         end
       end
 
@@ -1349,15 +1349,15 @@ describe Submission do
           @assignment.submit_homework(@student, body: "a body")
           @assignment.grade_student(@student, grade: 700, grader: @teacher)
           expect(submission.score).to eq 700
-          expect(submission.points_deducted).to eq nil
+          expect(submission.points_deducted).to be_nil
         end
       end
 
       it "does not grade missing assignment" do
         Timecop.freeze(@date) do
           submission.apply_late_policy
-          expect(submission.score).to eq nil
-          expect(submission.points_deducted).to eq nil
+          expect(submission.score).to be_nil
+          expect(submission.points_deducted).to be_nil
         end
       end
 
@@ -1565,14 +1565,14 @@ describe Submission do
         ph = asg.submissions.last
         expect(ph.missing?).to be true
         expect(ph.score).to eq 200
-        expect(ph.points_deducted).to be nil
+        expect(ph.points_deducted).to be_nil
       end
       Timecop.freeze(@date) do
         hw = asg.submit_homework(@student, body: "a body", submission_type: "online_text_entry")
         hw.save!
         expect(hw.late?).to be true
         expect(hw.score).to eq 200
-        expect(hw.points_deducted).to be nil
+        expect(hw.points_deducted).to be_nil
       end
     end
 
@@ -1618,9 +1618,9 @@ describe Submission do
 
   it "has an interesting state machine" do
     submission_spec_model(submit_homework: true)
-    expect(@submission.state).to eql(:submitted)
+    expect(@submission.state).to be(:submitted)
     @submission.grade_it
-    expect(@submission.state).to eql(:graded)
+    expect(@submission.state).to be(:graded)
   end
 
   it "is versioned" do
@@ -1745,8 +1745,7 @@ describe Submission do
     end
 
     it "inserts a grade change audit record if grade changed" do
-      # once for Cassandra, once for Postgres
-      expect(Auditors::GradeChange::Stream).to receive(:insert).twice
+      expect(Auditors::GradeChange::Stream).to receive(:insert)
       submission.score = 11
       submission.save!
     end
@@ -2047,7 +2046,7 @@ describe Submission do
         @submission.save!
         @submission.reload
         expect(@submission.assignment).to eql(@assignment)
-        expect(@submission.assignment.state).to eql(:published)
+        expect(@submission.assignment.state).to be(:published)
         @submission = @assignment.grade_student(@student, grader: @teacher, score: 5).first
         expect(@submission.messages_sent).not_to include("Submission Graded")
       end
@@ -2610,12 +2609,12 @@ describe Submission do
           OriginalityReport.create!(attachment: attachment,
                                     submission: submission,
                                     workflow_state: preferred_state,
-                                    originality_score: preferred_state == "scored" ? 1 : nil)
+                                    originality_score: (preferred_state == "scored") ? 1 : nil)
         end
         let(:other_report) do
           OriginalityReport.create!(attachment: attachment,
                                     submission: submission, workflow_state: other_state,
-                                    originality_score: other_state == "scored" ? 2 : nil)
+                                    originality_score: (other_state == "scored") ? 2 : nil)
         end
 
         before do
@@ -2813,7 +2812,7 @@ describe Submission do
           originality_score: 0.5,
           originality_report_url: report_url
         )
-        expect(submission.has_originality_report?).to eq true
+        expect(submission.has_originality_report?).to be true
       end
 
       it "returns true for text entry reports" do
@@ -2823,7 +2822,7 @@ describe Submission do
           originality_score: 0.5,
           originality_report_url: report_url
         )
-        expect(submission.has_originality_report?).to eq true
+        expect(submission.has_originality_report?).to be true
       end
 
       it "returns true for group reports" do
@@ -2852,7 +2851,7 @@ describe Submission do
 
       it "returns false when no reports are present" do
         submission = assignment.submit_homework(test_student, attachments: [attachment])
-        expect(submission.has_originality_report?).to eq false
+        expect(submission.has_originality_report?).to be false
       end
     end
 
@@ -3014,14 +3013,14 @@ describe Submission do
           let(:preferred_report) do
             OriginalityReport.create!(attachment: attachment,
                                       submission: submission,
-                                      originality_score: preferred_state == "scored" ? 1 : nil,
+                                      originality_score: (preferred_state == "scored") ? 1 : nil,
                                       workflow_state: preferred_state,
                                       originality_report_url: preferred_url)
           end
           let(:other_report) do
             OriginalityReport.create!(attachment: attachment,
                                       submission: submission,
-                                      originality_score: other_state == "scored" ? 2 : nil,
+                                      originality_score: (other_state == "scored") ? 2 : nil,
                                       workflow_state: other_state,
                                       originality_report_url: other_url)
           end
@@ -3629,16 +3628,16 @@ describe Submission do
     @submission.reload
 
     @submission.limit_comments(@teacher)
-    expect(@submission.submission_comments.count).to eql 5
-    expect(@submission.visible_submission_comments.count).to eql 4
+    expect(@submission.submission_comments.count).to be 5
+    expect(@submission.visible_submission_comments.count).to be 4
 
     @submission.limit_comments(@student1)
-    expect(@submission.submission_comments.count).to eql 4
-    expect(@submission.visible_submission_comments.count).to eql 4
+    expect(@submission.submission_comments.count).to be 4
+    expect(@submission.visible_submission_comments.count).to be 4
 
     @submission.limit_comments(@student2)
-    expect(@submission.submission_comments.count).to eql 1
-    expect(@submission.visible_submission_comments.count).to eql 1
+    expect(@submission.submission_comments.count).to be 1
+    expect(@submission.visible_submission_comments.count).to be 1
   end
 
   describe "read/unread state" do
@@ -3783,14 +3782,14 @@ describe Submission do
       assignment = double(muted?: true)
       @submission = Submission.new
       expect(@submission).to receive(:assignment).and_return(assignment)
-      expect(@submission.muted_assignment?).to eq true
+      expect(@submission.muted_assignment?).to be true
     end
 
     it "returns false if assignment is not muted" do
       assignment = double(muted?: false)
       @submission = Submission.new
       expect(@submission).to receive(:assignment).and_return(assignment)
-      expect(@submission.muted_assignment?).to eq false
+      expect(@submission.muted_assignment?).to be false
     end
   end
 
@@ -3800,19 +3799,19 @@ describe Submission do
     it "returns false if submission does not has_submission?" do
       allow(submission).to receive(:has_submission?).and_return false
       allow(submission).to receive(:graded?).and_return true
-      expect(submission.without_graded_submission?).to eq false
+      expect(submission.without_graded_submission?).to be false
     end
 
     it "returns false if submission does is not graded" do
       allow(submission).to receive(:has_submission?).and_return true
       allow(submission).to receive(:graded?).and_return false
-      expect(submission.without_graded_submission?).to eq false
+      expect(submission.without_graded_submission?).to be false
     end
 
     it "returns true if submission is not graded and has no submission" do
       allow(submission).to receive(:has_submission?).and_return false
       allow(submission).to receive(:graded?).and_return false
-      expect(submission.without_graded_submission?).to eq true
+      expect(submission.without_graded_submission?).to be true
     end
   end
 
@@ -4529,8 +4528,8 @@ describe Submission do
       attachment_model context: @student
       sub = @assignment.submit_homework @student, attachments: [@attachment]
       expect(sub.attachments).to eq([@attachment])
-      expect(sub.includes_attachment?(spoiler)).to eq false
-      expect(sub.includes_attachment?(@attachment)).to eq true
+      expect(sub.includes_attachment?(spoiler)).to be false
+      expect(sub.includes_attachment?(@attachment)).to be true
     end
 
     it "includes attachments to previous versions" do
@@ -4540,8 +4539,8 @@ describe Submission do
       attachment_model context: @student
       sub = @assignment.submit_homework @student, attachments: [@attachment]
       expect(sub.attachments.to_a).to eq([@attachment])
-      expect(sub.includes_attachment?(old_attachment_1)).to eq true
-      expect(sub.includes_attachment?(old_attachment_2)).to eq true
+      expect(sub.includes_attachment?(old_attachment_1)).to be true
+      expect(sub.includes_attachment?(old_attachment_2)).to be true
     end
   end
 
@@ -4900,18 +4899,18 @@ describe Submission do
 
     it "does not allow read access when assignment's peer reviews are off" do
       @student1_homework.assign_assessor(@student2_homework)
-      expect(@student1_homework.grants_right?(@student2, :read)).to eq true
+      expect(@student1_homework.grants_right?(@student2, :read)).to be true
       @assignment.peer_reviews = false
       @assignment.save!
       @student1_homework.reload
       AdheresToPolicy::Cache.clear
-      expect(@student1_homework.grants_right?(@student2, :read)).to eq false
+      expect(@student1_homework.grants_right?(@student2, :read)).to be false
     end
 
     it "does not allow read access when other student's enrollment is not active" do
       @student2_homework.assign_assessor(@student1_homework)
       @student2_enrollment.conclude
-      expect(@student2_homework.grants_right?(@student, :read)).to eq false
+      expect(@student2_homework.grants_right?(@student, :read)).to be false
     end
   end
 
@@ -5380,22 +5379,22 @@ describe Submission do
       @submission.find_or_create_provisional_grade!(@teacher, grade: "20", score: 12.0)
 
       expect(@submission.provisional_grades.first.grade).to eql "20"
-      expect(@submission.provisional_grades.first.score).to eql 12.0
+      expect(@submission.provisional_grades.first.score).to be 12.0
 
       @submission.find_or_create_provisional_grade!(@teacher)
 
       expect(@submission.provisional_grades.first.grade).to eql "20"
-      expect(@submission.provisional_grades.first.score).to eql 12.0
+      expect(@submission.provisional_grades.first.score).to be 12.0
     end
 
     it "does not update graded_anonymously if not given" do
       @submission.find_or_create_provisional_grade!(@teacher, graded_anonymously: true)
 
-      expect(@submission.provisional_grades.first.graded_anonymously).to eql true
+      expect(@submission.provisional_grades.first.graded_anonymously).to be true
 
       @submission.find_or_create_provisional_grade!(@teacher)
 
-      expect(@submission.provisional_grades.first.graded_anonymously).to eql true
+      expect(@submission.provisional_grades.first.graded_anonymously).to be true
     end
 
     it "raises an exception if final is true and user is not allowed to select final grade" do
@@ -6175,7 +6174,7 @@ describe Submission do
       end
 
       it "viewed by reviewed_student does not include peer reviewer's identity when viewed by the reviewee" do
-        expect(@submission.visible_rubric_assessments_for(@reviewed_student)[1].assessor).to eql(nil)
+        expect(@submission.visible_rubric_assessments_for(@reviewed_student)[1].assessor).to be_nil
       end
 
       it "includes peer reviewer's identity when viewed by the reviewer" do
@@ -6369,7 +6368,7 @@ describe Submission do
           it 'captures the value of the "anonymous" attribute' do
             assignment.update!(anonymous_peer_reviews: true)
             submission.add_comment(comment_params)
-            expect(last_event.payload["anonymous"]).to eq true
+            expect(last_event.payload["anonymous"]).to be true
           end
 
           it 'captures the value of the "provisional_grade_id" attribute' do
@@ -7940,7 +7939,7 @@ describe Submission do
 
       it "returns nil if default_to_null_grade is false" do
         provisional_grade = submission.provisional_grade(non_scorer, default_to_null_grade: false)
-        expect(provisional_grade).to be nil
+        expect(provisional_grade).to be_nil
       end
     end
   end
@@ -8109,7 +8108,7 @@ describe Submission do
   describe "#grade_posting_in_progress" do
     subject { submission.grade_posting_in_progress }
 
-    it { is_expected.to be nil }
+    it { is_expected.to be_nil }
 
     it "reports its value" do
       submission.grade_posting_in_progress = true
@@ -8258,7 +8257,7 @@ describe Submission do
   describe "#attempt" do
     it "is nil when homework has not been submitted" do
       submission = Submission.find_by(user: @student)
-      expect(submission.attempt).to eq nil
+      expect(submission.attempt).to be_nil
     end
 
     it "is 1 when homework is submitted" do
@@ -8515,7 +8514,7 @@ describe Submission do
 
     it "redo request is reset on an updated submission" do
       submission.update!(attempt: 2)
-      expect(submission.redo_request).to eq false
+      expect(submission.redo_request).to be false
     end
   end
 
@@ -8526,15 +8525,15 @@ describe Submission do
     end
 
     it "returns nil if there is no body" do
-      expect(submission.body).to eq nil
-      expect(submission.word_count).to eq nil
+      expect(submission.body).to be_nil
+      expect(submission.word_count).to be_nil
     end
 
     it "returns nil if it's a quiz submission" do
       submission.update(submission_type: "online_quiz", body: "test submission")
       expect(submission.submission_type).to eq "online_quiz"
-      expect(submission.body).not_to eq nil
-      expect(submission.word_count).to eq nil
+      expect(submission.body).not_to be_nil
+      expect(submission.word_count).to be_nil
     end
 
     it "returns 0 if the body is empty" do
@@ -8652,19 +8651,19 @@ describe Submission do
     end
 
     it "is true for observer" do
-      expect(@submission.observer?(@observer)).to eq true
+      expect(@submission.observer?(@observer)).to be true
     end
 
     it "is false for student" do
-      expect(@submission.observer?(@student)).to eq false
+      expect(@submission.observer?(@student)).to be false
     end
 
     it "is false for teacher" do
-      expect(@submission.observer?(@teacher)).to eq false
+      expect(@submission.observer?(@teacher)).to be false
     end
 
     it "is false for others" do
-      expect(@submission.observer?(user_factory)).to eq false
+      expect(@submission.observer?(user_factory)).to be false
     end
   end
 
@@ -8688,19 +8687,19 @@ describe Submission do
     end
 
     it "is true for reviewer" do
-      expect(@submission.peer_reviewer?(@peer_reviewer)).to eq true
+      expect(@submission.peer_reviewer?(@peer_reviewer)).to be true
     end
 
     it "is false for student" do
-      expect(@submission.peer_reviewer?(@student)).to eq false
+      expect(@submission.peer_reviewer?(@student)).to be false
     end
 
     it "is false for teacher" do
-      expect(@submission.peer_reviewer?(@teacher)).to eq false
+      expect(@submission.peer_reviewer?(@teacher)).to be false
     end
 
     it "is false for others" do
-      expect(@submission.peer_reviewer?(user_factory)).to eq false
+      expect(@submission.peer_reviewer?(user_factory)).to be false
     end
   end
 

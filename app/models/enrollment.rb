@@ -434,7 +434,7 @@ class Enrollment < ActiveRecord::Base
     # we don't want to create a new observer enrollment if one exists
     self.class.unique_constraint_retry do
       enrollment = linked_enrollment_for(observer)
-      return true if enrollment && !enrollment.deleted?
+      return true if enrollment && !enrollment.deleted? && !enrollment.inactive?
       return false unless observer.can_be_enrolled_in_course?(course)
 
       enrollment ||= observer.observer_enrollments.build
@@ -900,7 +900,7 @@ class Enrollment < ActiveRecord::Base
   def can_be_concluded_by(user, context, session)
     can_remove = [StudentEnrollment].include?(self.class) &&
                  context.grants_right?(user, session, :manage_students) &&
-                 context.id == ((context.is_a? Course) ? course_id : course_section_id)
+                 context.id == (context.is_a?(Course) ? course_id : course_section_id)
     can_remove || context.grants_right?(user, session, manage_admin_users_perm)
   end
 

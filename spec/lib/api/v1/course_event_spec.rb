@@ -38,8 +38,6 @@ describe Api::V1::CourseEvent do
   end
 
   before do
-    skip("needs auditors cassandra keyspace configured") unless Auditors::Course::Stream.available?
-
     @request_id = SecureRandom.uuid
     allow(RequestContextGenerator).to receive_messages(request_id: @request_id)
 
@@ -105,9 +103,9 @@ describe Api::V1::CourseEvent do
 
     linked = json_hash[:linked]
     expect(linked.keys.sort).to eq %i[courses page_views users]
-    expect(linked[:courses].size).to eql(1)
-    expect(linked[:users].size).to eql(1)
-    expect(linked[:page_views].size).to eql(1)
+    expect(linked[:courses].size).to be(1)
+    expect(linked[:users].size).to be(1)
+    expect(linked[:page_views].size).to be(1)
   end
 
   it "handles an empty result set" do

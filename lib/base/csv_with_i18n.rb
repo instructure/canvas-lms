@@ -55,7 +55,7 @@ class CSVWithI18n < CSV
     return ";" if user.feature_enabled?(:use_semi_colon_field_separators_in_gradebook_exports)
     return "," unless user.feature_enabled?(:autodetect_field_separators_for_gradebook_exports)
 
-    I18n.t("number.format.separator", ".") == "," ? ";" : ","
+    (I18n.t("number.format.separator", ".") == ",") ? ";" : ","
   end
   private_class_method :determine_column_separator
 end

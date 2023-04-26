@@ -25,7 +25,7 @@ class MediaTrack < ActiveRecord::Base
   before_save :convert_srt_to_wvtt
   validates :media_object_id, presence: true
   validates :kind, inclusion: { in: %w[subtitles captions descriptions chapters metadata] }
-  validates :locale, format: { with: /\A[A-Za-z\-]+\z/ }
+  validates :locale, format: { with: /\A[A-Za-z-]+\z/ }
   validates :content, presence: true
   validates :locale, uniqueness: { scope: :attachment_id }, unless: proc { |mt| mt.attachment_id.blank? }
 

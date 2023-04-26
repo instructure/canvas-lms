@@ -265,7 +265,7 @@ describe MicrosoftSync::Errors do
       context "when the response status code is 429" do
         let(:code) { 429 }
 
-        it { expect(subject.retry_after_seconds).to eq(nil) }
+        it { expect(subject.retry_after_seconds).to be_nil }
 
         context "when the retry-after header is set" do
           let(:headers) { { "Retry-After" => "12.345" } }

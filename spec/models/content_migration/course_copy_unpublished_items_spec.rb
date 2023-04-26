@@ -71,8 +71,8 @@ describe ContentMigration do
       expect(mod1_copy.content_tags.count).to eq 2
 
       mod1_copy.content_tags.each do |tag_copy|
-        expect(tag_copy.unpublished?).to eq true
-        expect(tag_copy.content.unpublished?).to eq true
+        expect(tag_copy.unpublished?).to be true
+        expect(tag_copy.content.unpublished?).to be true
       end
     end
 

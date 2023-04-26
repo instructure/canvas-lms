@@ -36,6 +36,6 @@ describe DataFixup::FixOverwrittenFileModuleItems do
     DataFixup::FixOverwrittenFileModuleItems.run
 
     att2.reload
-    expect(att2.could_be_locked).to eq true
+    expect(att2.could_be_locked).to be true
   end
 end

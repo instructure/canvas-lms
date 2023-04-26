@@ -51,14 +51,14 @@ describe GradeSummaryAssignmentPresenter do
                                submission: @submission,
                                workflow_state: "scored")
 
-      expect(presenter.plagiarism_attachment?(@attachment)).to eq true
+      expect(presenter.plagiarism_attachment?(@attachment)).to be true
     end
 
     it "returns true when the attachment has a pending originality report" do
       OriginalityReport.create(attachment: @attachment,
                                submission: @submission)
 
-      expect(presenter.plagiarism_attachment?(@attachment)).to eq true
+      expect(presenter.plagiarism_attachment?(@attachment)).to be true
     end
 
     it "returns when submission was automatically created by group assignment submission" do
@@ -70,7 +70,7 @@ describe GradeSummaryAssignmentPresenter do
                                attachment: @attachment,
                                submission: @submission,
                                workflow_state: "pending")
-      expect(presenter.plagiarism_attachment?(submission_two.attachments.first)).to eq true
+      expect(presenter.plagiarism_attachment?(submission_two.attachments.first)).to be true
     end
   end
 
@@ -182,22 +182,22 @@ describe GradeSummaryAssignmentPresenter do
   describe "#deduction_present?" do
     it "returns true when submission has positive points_deducted" do
       allow(@submission).to receive(:points_deducted).and_return(10)
-      expect(presenter.deduction_present?).to eq(true)
+      expect(presenter.deduction_present?).to be(true)
     end
 
     it "returns false when submission has zero points_deducted" do
       allow(@submission).to receive(:points_deducted).and_return(0)
-      expect(presenter.deduction_present?).to eq(false)
+      expect(presenter.deduction_present?).to be(false)
     end
 
     it "returns false when submission has nil points_deducted" do
       allow(@submission).to receive(:points_deducted).and_return(nil)
-      expect(presenter.deduction_present?).to eq(false)
+      expect(presenter.deduction_present?).to be(false)
     end
 
     it "returns false when submission is not present" do
       allow(presenter).to receive(:submission).and_return(nil)
-      expect(presenter.deduction_present?).to eq(false)
+      expect(presenter.deduction_present?).to be(false)
     end
   end
 

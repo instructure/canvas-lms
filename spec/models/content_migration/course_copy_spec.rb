@@ -30,7 +30,7 @@ describe ContentMigration do
       @cm.content_export = ce
       ce.save!
 
-      expect(@cm.progress).to eq nil
+      expect(@cm.progress).to be_nil
       @cm.workflow_state = "exporting"
 
       ce.progress = 10
@@ -120,7 +120,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      expect(@copy_to.syllabus_body).to eq nil
+      expect(@copy_to.syllabus_body).to be_nil
     end
 
     it "merges locked files and retain correct html links" do
@@ -411,7 +411,7 @@ describe ContentMigration do
       expect(@copy_to.wiki_pages.where(migration_id: mig_id(wiki)).first.workflow_state).to eq "active"
       rub2 = @copy_to.rubrics.where(migration_id: mig_id(rub1)).first
       expect(rub2.workflow_state).to eq "active"
-      expect(rub2.rubric_associations.first.bookmarked).to eq true
+      expect(rub2.rubric_associations.first.bookmarked).to be true
       expect(@copy_to.created_learning_outcomes.where(migration_id: mig_id(lo)).first.workflow_state).to eq "active"
       expect(@copy_to.quizzes.where(migration_id: mig_id(quiz)).first.workflow_state).to eq "unpublished" if Qti.qti_enabled?
       expect(@copy_to.context_external_tools.where(migration_id: mig_id(tool)).first.workflow_state).to eq "public"
@@ -488,19 +488,19 @@ describe ContentMigration do
       run_course_copy
 
       # compare settings
-      expect(@copy_to.conclude_at).to eq nil
-      expect(@copy_to.start_at).to eq nil
-      expect(@copy_to.restrict_enrollments_to_course_dates).to eq true
+      expect(@copy_to.conclude_at).to be_nil
+      expect(@copy_to.start_at).to be_nil
+      expect(@copy_to.restrict_enrollments_to_course_dates).to be true
       expect(@copy_to.storage_quota).to eq 444
-      expect(@copy_to.hide_final_grades).to eq true
-      expect(@copy_to.grading_standard_enabled).to eq true
+      expect(@copy_to.hide_final_grades).to be true
+      expect(@copy_to.grading_standard_enabled).to be true
       gs_2 = @copy_to.grading_standards.where(migration_id: mig_id(gs)).first
       expect(gs_2.data).to eq gs.data
       expect(@copy_to.grading_standard).to eq gs_2
       expect(@copy_to.name).to eq "tocourse"
       expect(@copy_to.course_code).to eq "tocourse"
-      expect(@copy_to.syllabus_course_summary).to eq false
-      expect(@copy_to.homeroom_course).to eq true
+      expect(@copy_to.syllabus_course_summary).to be false
+      expect(@copy_to.homeroom_course).to be true
       expect(@copy_to.course_color).to eq "#123456"
       expect(@copy_to.alt_name).to eq "drama"
       expect(@copy_to.time_zone.name).to eq "Alaska"
@@ -517,7 +517,7 @@ describe ContentMigration do
       expect(rla.url).to eq "http://example.com/resource-link-url"
 
       rlb = @copy_to.lti_resource_links.find { |rl| rl.lookup_uuid == "1b302c1e-c0a2-42dc-88b6-c029699a7c7b" }
-      expect(rlb.url).to eq nil
+      expect(rlb.url).to be_nil
     end
 
     context "with prevent_course_availability_editing_by_teachers on" do
@@ -533,7 +533,7 @@ describe ContentMigration do
 
         run_course_copy
 
-        expect(@copy_to.restrict_enrollments_to_course_dates).to eq false
+        expect(@copy_to.restrict_enrollments_to_course_dates).to be false
       end
 
       it "does copy restrict_enrollments_to_course_dates for admins" do
@@ -550,7 +550,7 @@ describe ContentMigration do
 
         run_course_copy
 
-        expect(@copy_to.restrict_enrollments_to_course_dates).to eq true
+        expect(@copy_to.restrict_enrollments_to_course_dates).to be true
       end
     end
 
@@ -680,7 +680,7 @@ describe ContentMigration do
       mod1.update_attribute(:requirement_count, nil)
       run_course_copy
       expect(mod1_to.reload.require_sequential_progress).to be_falsey
-      expect(mod1_to.requirement_count).to eq nil
+      expect(mod1_to.requirement_count).to be_nil
     end
 
     it "syncs module items (even when removed) on re-copy" do
@@ -788,7 +788,7 @@ describe ContentMigration do
       expect(cal_2.title).to eq cal.title
       expect(cal_2.start_at.to_i).to eq cal.start_at.to_i
       expect(cal_2.end_at.to_i).to eq cal.end_at.to_i
-      expect(cal_2.all_day).to eq true
+      expect(cal_2.all_day).to be true
       expect(cal_2.all_day_date).to eq cal.all_day_date
       cal_2.description = body_with_link % @copy_to.id
 

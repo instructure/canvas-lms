@@ -205,7 +205,7 @@ describe AppointmentGroup do
 
     it "allows additional appointments" do
       expect(@ag.update(new_appointments: [["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])).to be_truthy
-      expect(@ag.appointments.size).to eql 2
+      expect(@ag.appointments.size).to be 2
     end
 
     it "does not allow invalid appointments" do
@@ -225,7 +225,7 @@ describe AppointmentGroup do
                           ["2012-01-01 07:00:00", "2012-01-01 08:00:00"]
                         ])).to be_truthy
 
-      expect(@ag.appointments.size).to eql 3
+      expect(@ag.appointments.size).to be 3
       expect(@ag.start_at).to eql @ag.appointments.map(&:start_at).min
       expect(@ag.end_at).to eql @ag.appointments.map(&:end_at).max
     end
@@ -518,45 +518,45 @@ describe AppointmentGroup do
 
     it "changes if participants_per_appointment changes" do
       @ag.update participants_per_appointment: 1
-      expect(@ag.available_slots).to eql 2
+      expect(@ag.available_slots).to be 2
     end
 
     it "is correct if participants exceed the limit for a given appointment" do
       @appointment.reserve_for(student_in_course(course: @course, active_all: true).user, @teacher)
       @appointment.reserve_for(student_in_course(course: @course, active_all: true).user, @teacher)
-      expect(@ag.reload.available_slots).to eql 2
+      expect(@ag.reload.available_slots).to be 2
       @ag.update participants_per_appointment: 1
-      expect(@ag.reload.available_slots).to eql 1
+      expect(@ag.reload.available_slots).to be 1
     end
 
     it "increases as appointments are added" do
       @ag.update(new_appointments: [["#{Time.now.year + 1}-01-01 14:00:00", "#{Time.now.year + 1}-01-01 15:00:00"]])
-      expect(@ag.available_slots).to eql 6
+      expect(@ag.available_slots).to be 6
     end
 
     it "decreases as appointments are deleted" do
       @appointment.destroy
-      expect(@ag.reload.available_slots).to eql 2
+      expect(@ag.reload.available_slots).to be 2
     end
 
     it "decreases as reservations are made" do
       @appointment.reserve_for(student_in_course(course: @course, active_all: true).user, @teacher)
-      expect(@ag.reload.available_slots).to eql 3
+      expect(@ag.reload.available_slots).to be 3
     end
 
     it "increases as reservations are canceled" do
       res = @appointment.reserve_for(student_in_course(course: @course, active_all: true).user, @teacher)
-      expect(@ag.reload.available_slots).to eql 3
+      expect(@ag.reload.available_slots).to be 3
       res.destroy
-      expect(@ag.reload.available_slots).to eql 4
+      expect(@ag.reload.available_slots).to be 4
     end
 
     it "decreases as enrollments conclude (if reservations are in the future)" do
       enrollment = student_in_course(course: @course, active_all: true)
       @appointment.reserve_for(enrollment.user, @teacher)
-      expect(@ag.reload.available_slots).to eql 3
+      expect(@ag.reload.available_slots).to be 3
       enrollment.conclude
-      expect(@ag.reload.available_slots).to eql 4
+      expect(@ag.reload.available_slots).to be 4
     end
 
     it "does not cancel a slot for a user if they have another active enrollment" do
@@ -565,16 +565,16 @@ describe AppointmentGroup do
       enrollment2 = @course.enroll_student(@student, section: cs, allow_multiple_enrollments: true, enrollment_state: "active")
 
       @appointment.reserve_for(@student, @teacher)
-      expect(@ag.reload.available_slots).to eql 3
+      expect(@ag.reload.available_slots).to be 3
       enrollment1.conclude
-      expect(@ag.reload.available_slots).to eql 3
+      expect(@ag.reload.available_slots).to be 3
       enrollment2.conclude
-      expect(@ag.reload.available_slots).to eql 4
+      expect(@ag.reload.available_slots).to be 4
     end
 
     it "respects the current_only option" do
       @ag.update(new_appointments: [[(Time.zone.now - 2.hours).to_s, (Time.zone.now - 1.hour).to_s]])
-      expect(@ag.available_slots(current_only: true)).to eql 4
+      expect(@ag.available_slots(current_only: true)).to be 4
     end
   end
 

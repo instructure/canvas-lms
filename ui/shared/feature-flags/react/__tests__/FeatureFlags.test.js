@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitFor, fireEvent} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 
 import FeatureFlags from '../FeatureFlags'
@@ -53,14 +53,14 @@ describe('feature_flags::FeatureFlags', () => {
   describe('search', () => {
     it('renders an empty search bar on load', async () => {
       const {findByPlaceholderText} = render(<FeatureFlags />)
-      const searchField = await findByPlaceholderText('Search')
+      const searchField = await findByPlaceholderText('Search by name or id')
       expect(searchField).toBeInTheDocument()
       expect(searchField.value).toBe('')
     })
 
     it('filters rows to show only those matching query', async () => {
       const {findByPlaceholderText, getByText, queryByText} = render(<FeatureFlags />)
-      const searchField = await findByPlaceholderText('Search')
+      const searchField = await findByPlaceholderText('Search by name or id')
       const query = 'Feature 3'
       fireEvent.change(searchField, {target: {value: query}})
       expect(await getByText(query)).toBeInTheDocument()
@@ -72,7 +72,7 @@ describe('feature_flags::FeatureFlags', () => {
 
     it('hides section titles if no row exists in section after search', async () => {
       const {findByPlaceholderText, getAllByText, queryByText} = render(<FeatureFlags />)
-      const searchField = await findByPlaceholderText('Search')
+      const searchField = await findByPlaceholderText('Search by name or id')
       fireEvent.change(searchField, {target: {value: 'Feature 4'}})
       expect(await getAllByText('User')[0]).toBeInTheDocument()
       await waitFor(() => {
@@ -82,22 +82,50 @@ describe('feature_flags::FeatureFlags', () => {
     })
 
     it('performs search when search input length is 3 characters or more', async () => {
-      const {findByPlaceholderText, getAllByTestId} = render(<FeatureFlags />)
-      const searchField = await findByPlaceholderText('Search')
+      const {findByPlaceholderText, getAllByTestId, queryAllByTestId} = render(<FeatureFlags />)
+      const searchField = await findByPlaceholderText('Search by name or id')
       const allFeatureFlagsCount = getAllByTestId('ff-table-row').length
+
+      // Checks no query case and also resets the search to ensure other tests are accurate
+      const checkNoQuery = async () => {
+        fireEvent.change(searchField, {target: {value: ''}})
+        await waitFor(() => {
+          expect(getAllByTestId('ff-table-row')).toHaveLength(allFeatureFlagsCount)
+        })
+      }
+
+      // Check short query case
+      await checkNoQuery()
       fireEvent.change(searchField, {target: {value: 'Fe'}})
       await waitFor(() => {
         expect(getAllByTestId('ff-table-row')).toHaveLength(allFeatureFlagsCount)
       })
+
+      // Check name-based search matching
+      await checkNoQuery()
       fireEvent.change(searchField, {target: {value: 'Feature 4'}})
       await waitFor(() => {
         expect(getAllByTestId('ff-table-row')).toHaveLength(1)
+      })
+
+      // Check feature-id based search matching
+      await checkNoQuery()
+      fireEvent.change(searchField, {target: {value: 'feature4'}})
+      await waitFor(() => {
+        expect(getAllByTestId('ff-table-row')).toHaveLength(1)
+      })
+
+      // Check not found case
+      await checkNoQuery()
+      fireEvent.change(searchField, {target: {value: 'asdfasjdhf1234'}})
+      await waitFor(() => {
+        expect(queryAllByTestId('ff-table-row')).toHaveLength(0)
       })
     })
 
     it('displays all feature flags when user clears search input', async () => {
       const {findByPlaceholderText, getAllByTestId} = render(<FeatureFlags />)
-      const searchField = await findByPlaceholderText('Search')
+      const searchField = await findByPlaceholderText('Search by name or id')
       const allFeatureFlagsCount = getAllByTestId('ff-table-row').length
       fireEvent.change(searchField, {target: {value: 'Feature 4'}})
       await waitFor(() => {
@@ -156,7 +184,7 @@ describe('feature_flags::FeatureFlags', () => {
     })
     fireEvent.click(getByLabelText('Filter by'))
     fireEvent.click(getByText('Disabled'))
-    const searchField = await findByPlaceholderText('Search')
+    const searchField = await findByPlaceholderText('Search by name or id')
     fireEvent.change(searchField, {target: {value: 'Feature 1'}})
     await waitFor(() => {
       expect(getAllByTestId('ff-table-row')).toHaveLength(1)
@@ -178,7 +206,7 @@ describe('feature_flags::FeatureFlags', () => {
       const allFeatureFlagsCount = getAllByTestId('ff-table-row').length
       fireEvent.click(getByLabelText('Filter by'))
       fireEvent.click(getByText('Disabled'))
-      const searchField = await findByPlaceholderText('Search')
+      const searchField = await findByPlaceholderText('Search by name or id')
       fireEvent.change(searchField, {target: {value: 'Feature 1'}})
       await waitFor(() => {
         expect(getAllByTestId('ff-table-row')).toHaveLength(1)

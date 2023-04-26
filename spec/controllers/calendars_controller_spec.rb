@@ -48,20 +48,20 @@ describe CalendarsController do
       course_event
       get "show", params: { user_id: @user.id }
       expect(response).to be_successful
-      expect(assigns[:contexts_json][0][:can_make_reservation]).to eql(false)
-      expect(assigns[:contexts_json][1][:can_make_reservation]).to eql(true)
+      expect(assigns[:contexts_json][0][:can_make_reservation]).to be(false)
+      expect(assigns[:contexts_json][1][:can_make_reservation]).to be(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get "show", params: { user_id: @user.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get "show", params: { user_id: @user.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env SIS_NAME is SIS when @context does not respond_to assignments" do
@@ -80,13 +80,13 @@ describe CalendarsController do
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get "show", params: { user_id: @user.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get "show", params: { user_id: @user.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do

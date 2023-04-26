@@ -118,7 +118,7 @@ module Outcomes
       has_bom = header.start_with?((+"\xEF\xBB\xBF").force_encoding("ASCII-8BIT"))
       @file.rewind
       @file.read(3) if has_bom
-      header.count(";") > header.count(",") ? ";" : ","
+      (header.count(";") > header.count(",")) ? ";" : ","
     end
 
     def file_line_count

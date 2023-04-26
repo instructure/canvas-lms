@@ -321,7 +321,7 @@ describe ContentMigration do
       to_assign = @copy_to.assignments.first
 
       expect(to_rub.data[1]["learning_outcome_id"]).to eq new_lo2.id
-      expect(to_rub.data[1]["ignore_for_scoring"]).to eq true
+      expect(to_rub.data[1]["ignore_for_scoring"]).to be true
       expect(to_rub.data[0]["learning_outcome_id"]).to eq lo.id
       expect(to_rub.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eq [lo.id, new_lo2.id].sort
       expect(to_assign.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eq [lo.id, new_lo2.id].sort
@@ -381,8 +381,8 @@ describe ContentMigration do
 
       asmnt2 = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       expect(asmnt2.rubric.id).to eq rub.id
-      expect(asmnt2.rubric_association.use_for_grading).to eq true
-      expect(asmnt2.rubric_association.hide_score_total).to eq true
+      expect(asmnt2.rubric_association.use_for_grading).to be true
+      expect(asmnt2.rubric_association.hide_score_total).to be true
       expect(asmnt2.rubric_association.summary_data).to eq @assoc.summary_data
     end
 

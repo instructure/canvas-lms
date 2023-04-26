@@ -17,8 +17,8 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState, useEffect} from 'react'
-import {groupBy, debounce} from 'lodash'
+import React, {useEffect, useState} from 'react'
+import {debounce, groupBy} from 'lodash'
 
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -56,10 +56,6 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     },
   })
 
-  const matchesName = name => {
-    return name.toLowerCase().includes(searchQuery.toLowerCase())
-  }
-
   const filterableStateOf = x => (x.state === 'hidden' ? 'off' : x.state)
   function matchesState(flag) {
     if (stateFilter === 'all') {
@@ -76,7 +72,10 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     }
   }
 
-  const matchesFilters = x => matchesName(x.display_name) && matchesState(x.feature_flag)
+  const containsSearchQuery = value => value.toLowerCase().includes(searchQuery.toLowerCase())
+  const matchesFilters = feature =>
+    (containsSearchQuery(feature.feature) || containsSearchQuery(feature.display_name)) &&
+    matchesState(feature.feature_flag)
 
   useEffect(() => {
     const groupings = groupBy(
@@ -164,7 +163,7 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
             <Flex.Item padding="small">
               <TextInput
                 renderLabel={<ScreenReaderContent>{I18n.t('Search Features')}</ScreenReaderContent>}
-                placeholder={I18n.t('Search')}
+                placeholder={I18n.t('Search by name or id')}
                 type="search"
                 value={searchInput}
                 onChange={acceptSearchInput}

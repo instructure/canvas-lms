@@ -193,7 +193,7 @@ describe ContentMigration do
 
         run_course_copy
 
-        expect(@copy_to.wiki.has_no_front_page).to eq true
+        expect(@copy_to.wiki.has_no_front_page).to be true
       end
 
       it "sets default view to modules if wiki front page is missing" do
@@ -204,7 +204,7 @@ describe ContentMigration do
         run_course_copy
 
         expect(@copy_to.default_view).to eq "modules"
-        expect(@copy_to.wiki.has_front_page?).to eq false
+        expect(@copy_to.wiki.has_front_page?).to be false
       end
     end
   end

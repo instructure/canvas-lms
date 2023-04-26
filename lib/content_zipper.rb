@@ -389,7 +389,7 @@ class ContentZipper
   def add_online_submission_content(filename, display_page, zipfile)
     extend(ApplicationHelper)
 
-    content = File.open(File.join("app", "views", "assignments", display_page)).read
+    content = File.read(File.join("app", "views", "assignments", display_page))
     content = ERB.new(content).result(binding)
 
     if content

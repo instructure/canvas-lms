@@ -564,7 +564,7 @@ describe "RCE next tests", ignore_js_errors: true do
         click_course_links_toolbar_menuitem
         click_assignments_accordion
         wait_for_ajaximations
-        expect(assignment_due_date_exists?(due_at)).to eq true
+        expect(assignment_due_date_exists?(due_at)).to be true
       end
 
       context "without manage files permissions" do
@@ -950,7 +950,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         exit_full_screen_button.click
         fs_elem = driver.execute_script("return document.fullscreenElement")
-        expect(fs_elem).to eq nil
+        expect(fs_elem).to be_nil
       end
     end
 
@@ -959,7 +959,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       click_course_links_toolbar_menuitem
 
-      expect(tray_container_exists?).to eq true
+      expect(tray_container_exists?).to be true
 
       driver.action.send_keys(:escape).perform
 
@@ -967,7 +967,7 @@ describe "RCE next tests", ignore_js_errors: true do
       # and because we're waiting for something to _disappear_
       # we can't use implicit waits, so just keep trying for a bit
       keep_trying_until do
-        expect(tray_container_exists?).to eq false # Press esc key
+        expect(tray_container_exists?).to be false # Press esc key
       end
     end
 
@@ -975,12 +975,12 @@ describe "RCE next tests", ignore_js_errors: true do
       visit_front_page_edit(@course)
 
       click_course_images_toolbar_menuitem
-      expect(tray_container_exists?).to eq true
+      expect(tray_container_exists?).to be true
 
       driver.action.send_keys(:escape).perform
 
       keep_trying_until do
-        expect(tray_container_exists?).to eq false # Press esc key
+        expect(tray_container_exists?).to be false # Press esc key
       end
     end
 
@@ -1281,8 +1281,8 @@ describe "RCE next tests", ignore_js_errors: true do
             .and_return(DynamicSettings::FallbackProxy.new)
           rce_wysiwyg_state_setup(@course)
           plugins = driver.execute_script("return Object.keys(tinymce.activeEditor.plugins)") # rubocop:disable Specs/NoExecuteScript
-          expect(plugins.include?("instructure_paste")).to eql(false)
-          expect(plugins.include?("paste")).to eql(true)
+          expect(plugins.include?("instructure_paste")).to be(false)
+          expect(plugins.include?("paste")).to be(true)
         end
       end
 

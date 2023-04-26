@@ -145,15 +145,15 @@ describe "LTI integration tests" do
     adapter.prepare_tool_launch(return_url, variable_expander)
     post_payload = adapter.generate_post_payload
 
-    expect(post_payload["lis_person_contact_email_primary"]).to eq nil
-    expect(post_payload["lis_person_name_family"]).to eq nil
-    expect(post_payload["lis_person_name_full"]).to eq nil
-    expect(post_payload["lis_person_name_given"]).to eq nil
-    expect(post_payload["lis_person_sourcedid"]).to eq nil
+    expect(post_payload["lis_person_contact_email_primary"]).to be_nil
+    expect(post_payload["lis_person_name_family"]).to be_nil
+    expect(post_payload["lis_person_name_full"]).to be_nil
+    expect(post_payload["lis_person_name_given"]).to be_nil
+    expect(post_payload["lis_person_sourcedid"]).to be_nil
     expect(post_payload["roles"]).to eq "urn:lti:sysrole:ims/lis/None"
     expect(post_payload["ext_roles"]).to eq "urn:lti:sysrole:ims/lis/None"
-    expect(post_payload["user_id"]).to eq nil
-    expect(post_payload["user_image"]).to eq nil
+    expect(post_payload["user_id"]).to be_nil
+    expect(post_payload["user_image"]).to be_nil
   end
 
   describe "legacy integration tests" do
@@ -293,8 +293,8 @@ describe "LTI integration tests" do
     it "does not include name and email if anonymous" do
       course_with_teacher(active_all: true)
       @tool = @course.context_external_tools.create!(domain: "yahoo.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "anonymous", name: "tool")
-      expect(@tool.include_name?).to eql(false)
-      expect(@tool.include_email?).to eql(false)
+      expect(@tool.include_name?).to be(false)
+      expect(@tool.include_email?).to be(false)
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
@@ -310,8 +310,8 @@ describe "LTI integration tests" do
     it "includes name if name_only" do
       course_with_teacher(active_all: true)
       @tool = @course.context_external_tools.create!(domain: "yahoo.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "name_only", name: "tool")
-      expect(@tool.include_name?).to eql(true)
-      expect(@tool.include_email?).to eql(false)
+      expect(@tool.include_name?).to be(true)
+      expect(@tool.include_email?).to be(false)
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
@@ -319,7 +319,7 @@ describe "LTI integration tests" do
       hash = adapter.generate_post_payload
 
       expect(hash["lis_person_name_given"]).to eq "User"
-      expect(hash["lis_person_name_family"]).to eq nil
+      expect(hash["lis_person_name_family"]).to be_nil
       expect(hash["lis_person_name_full"]).to eq @user.name
       expect(hash["lis_person_contact_email_primary"]).to be_nil
     end
@@ -327,25 +327,25 @@ describe "LTI integration tests" do
     it "includes email if email_only" do
       course_with_teacher(active_all: true)
       @tool = @course.context_external_tools.create!(domain: "yahoo.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "email_only", name: "tool")
-      expect(@tool.include_name?).to eql(false)
-      expect(@tool.include_email?).to eql(true)
+      expect(@tool.include_name?).to be(false)
+      expect(@tool.include_email?).to be(true)
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
       adapter.prepare_tool_launch("http://www.yahoo.com", variable_expander, launch_url: "http://www.yahoo.com", link_code: "123456")
       hash = adapter.generate_post_payload
 
-      expect(hash["lis_person_name_given"]).to eq nil
-      expect(hash["lis_person_name_family"]).to eq nil
-      expect(hash["lis_person_name_full"]).to eq nil
+      expect(hash["lis_person_name_given"]).to be_nil
+      expect(hash["lis_person_name_family"]).to be_nil
+      expect(hash["lis_person_name_full"]).to be_nil
       hash["lis_person_contact_email_primary"] = @user.email
     end
 
     it "includes email if public" do
       course_with_teacher(active_all: true)
       @tool = @course.context_external_tools.create!(domain: "yahoo.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "public", name: "tool")
-      expect(@tool.include_name?).to eql(true)
-      expect(@tool.include_email?).to eql(true)
+      expect(@tool.include_name?).to be(true)
+      expect(@tool.include_email?).to be(true)
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
@@ -353,7 +353,7 @@ describe "LTI integration tests" do
       hash = adapter.generate_post_payload
 
       expect(hash["lis_person_name_given"]).to eq "User"
-      expect(hash["lis_person_name_family"]).to eq nil
+      expect(hash["lis_person_name_family"]).to be_nil
       expect(hash["lis_person_name_full"]).to eq @user.name
       hash["lis_person_contact_email_primary"] = @user.email
     end

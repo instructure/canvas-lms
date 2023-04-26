@@ -792,7 +792,7 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
 
       expect(json["quiz_submission_questions"]).to be_present
       expect(json["quiz_submission_questions"].length).to eq 1
-      expect(json["quiz_submission_questions"][0]["flagged"]).to eq true
+      expect(json["quiz_submission_questions"][0]["flagged"]).to be true
     end
 
     it "prevents unauthorized flagging" do
@@ -817,7 +817,7 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
 
       expect(json["quiz_submission_questions"]).to be_present
       expect(json["quiz_submission_questions"].length).to eq 1
-      expect(json["quiz_submission_questions"][0]["flagged"]).to eq false
+      expect(json["quiz_submission_questions"][0]["flagged"]).to be false
     end
 
     it "prevents unauthorized unflagging" do

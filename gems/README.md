@@ -9,9 +9,6 @@ from this path locally without installing from a remote source. This is valuable
      of canvas, saving iteration time
   - it allows for eventual build optimization via only running specs for the
     transitive closure of parents depending on a gem where a change is.
-  - it gives ENGINES extracted from canvas (see the "engines" directory) a place
-    to reference code shared with canvas without it being packaged into the canvas
-    monolith directly.
 
 There are some tradeoffs:
   - spreads canvas over more subdirectories, giving some mental overhad to traversing

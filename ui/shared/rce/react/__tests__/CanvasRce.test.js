@@ -258,4 +258,46 @@ describe('CanvasRce', () => {
       )
     })
   })
+
+  describe('body theme', () => {
+    const setupRCEWithENV = async env => {
+      window.ENV = env
+      const rceRef = createRef(null)
+      render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
+      await waitFor(() => expect(rceRef.current).not.toBeNull())
+      return rceRef
+    }
+
+    it('is set to elementary-theme if canvas_k6_theme is enabled', async () => {
+      const rceRef = await setupRCEWithENV({
+        FEATURES: {
+          canvas_k6_theme: true,
+        },
+      })
+      expect(rceRef.current.props.editorOptions.body_class).toEqual('elementary-theme')
+    })
+
+    it('is set to elementary-theme if in a k5 course with balsamiq font selected', async () => {
+      const rceRef = await setupRCEWithENV({
+        K5_SUBJECT_COURSE: true,
+        USE_CLASSIC_FONT: false,
+      })
+      expect(rceRef.current.props.editorOptions.body_class).toEqual('elementary-theme')
+    })
+
+    it('is set to default-theme if in a k5 course with lato font selected', async () => {
+      const rceRef = await setupRCEWithENV({
+        K5_SUBJECT_COURSE: true,
+        USE_CLASSIC_FONT: true,
+      })
+      expect(rceRef.current.props.editorOptions.body_class).toEqual('default-theme')
+    })
+
+    it('is set to default-theme if in a classic course', async () => {
+      const rceRef = await setupRCEWithENV({
+        K5_SUBJECT_COURSE: false,
+      })
+      expect(rceRef.current.props.editorOptions.body_class).toEqual('default-theme')
+    })
+  })
 })

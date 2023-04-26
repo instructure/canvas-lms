@@ -615,7 +615,7 @@ class CoursePacesController < ApplicationController
 
   def latest_progress
     progress = Progress.order(created_at: :desc).find_by(context: @course_pace, tag: "course_pace_publish")
-    progress&.workflow_state == "completed" ? nil : progress
+    (progress&.workflow_state == "completed") ? nil : progress
   end
 
   def load_and_run_progress

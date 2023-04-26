@@ -110,6 +110,8 @@ const DiscussionTopicManager = props => {
 
   const [isUserMissingInitialPost, setIsUserMissingInitialPost] = useState(null)
 
+  const [isGradedDiscussion, setIsGradedDiscussion] = useState(false)
+
   const discussionManagerUtilities = {
     replyFromId,
     setReplyFromId,
@@ -117,6 +119,8 @@ const DiscussionTopicManager = props => {
     setUserSplitScreenPreference,
     highlightEntryId,
     setHighlightEntryId,
+    setIsGradedDiscussion,
+    isGradedDiscussion,
   }
 
   // Unread filter
@@ -215,6 +219,10 @@ const DiscussionTopicManager = props => {
     fetchPolicy: isUserMissingInitialPost || searchTerm ? 'network-only' : 'cache-and-network',
     skip: waitForUnreadFilter,
   })
+
+  useEffect(() => {
+    setIsGradedDiscussion(!!discussionTopicQuery?.data?.legacyNode?.assignment)
+  }, [discussionTopicQuery])
 
   const updateDraftCache = (cache, result) => {
     try {

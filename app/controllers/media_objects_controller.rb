@@ -73,6 +73,7 @@
 class MediaObjectsController < ApplicationController
   include Api::V1::MediaObject
 
+  before_action :check_attachment, except: %i[index update_media_object create_media_object]
   before_action :load_media_object, only: %i[show iframe_media_player]
   before_action :require_user, only: %i[index update_media_object]
   protect_from_forgery only: %i[create_media_object media_object_redirect media_object_inline media_object_thumbnail], with: :exception
@@ -146,7 +147,7 @@ class MediaObjectsController < ApplicationController
       url = api_v1_media_objects_url
     end
 
-    order_dir = params[:order] == "desc" ? "desc" : "asc"
+    order_dir = (params[:order] == "desc") ? "desc" : "asc"
     order_by = params[:sort] || "title"
     if order_by == "title"
       order_by = MediaObject.best_unicode_collation_key("COALESCE(user_entered_title, title)")
@@ -178,19 +179,33 @@ class MediaObjectsController < ApplicationController
 
       return render_unauthorized_action unless @media_object.user_id == @current_user.id
 
-      if params[:user_entered_title].blank?
-        return(
-          render json: { message: "The user_entered_title parameter must have a value" },
-                 status: :bad_request
-        )
+    elsif params[:attachment_id]
+      attachment = Attachment.find(params[:attachment_id])
+
+      return render_unauthorized_action unless attachment
+      return render_unauthorized_action unless attachment.media_entry_id
+
+      if params[:verifier]
+        verifier_checker = Attachments::Verification.new(attachment)
+        return render_unauthorized_action unless verifier_checker.valid_verifier_for_permission?(params[:verifier], :update, session)
+      else
+        return render_unauthorized_action unless attachment.grants_right?(@current_user, session, :update)
       end
 
-      extend TextHelper
-      @media_object.user_entered_title =
-        CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
-      @media_object.save!
-      render json: media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
+      @media_id = attachment.media_entry_id
+      @media_object = MediaObject.by_media_id(@media_id).take
     end
+    if params[:user_entered_title].blank?
+      return(
+        render json: { message: "The user_entered_title parameter must have a value" },
+               status: :bad_request
+      )
+    end
+    extend TextHelper
+    @media_object.user_entered_title =
+      CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
+    @media_object.save!
+    render json: media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
   end
 
   def create_media_object
@@ -242,18 +257,12 @@ class MediaObjectsController < ApplicationController
   end
 
   def media_object_thumbnail
-    media_id = params[:id]
-    # we prefer using the MediaObject if it exists (so that it can give us
-    # a different media_id if it wants to), but we will also use the provided
-    # media id directly if we can't find a MediaObject. (They don't always get
-    # created yet.)
-    mo = MediaObject.by_media_id(media_id).first
     width = params[:width]
     height = params[:height]
     type = (params[:type].presence || 2).to_i
     config = CanvasKaltura::ClientV3.config
     if config
-      redirect_to CanvasKaltura::ClientV3.new.thumbnail_url(mo.try(:media_id) || media_id,
+      redirect_to CanvasKaltura::ClientV3.new.thumbnail_url(@media_object.try(:media_id) || @media_id,
                                                             width: width,
                                                             height: height,
                                                             type: type),
@@ -278,9 +287,6 @@ class MediaObjectsController < ApplicationController
   private
 
   def load_media_object
-    return nil unless params[:media_object_id].present?
-
-    @media_object = MediaObject.by_media_id(params[:media_object_id]).first
     unless @media_object
       # Unfortunately, we don't have media_object entities created for everything,
       # so we use this opportunity to create the object if it does not exist.
@@ -292,5 +298,31 @@ class MediaObjectsController < ApplicationController
     end
 
     @media_object.viewed!
+  end
+
+  def check_attachment
+    if params[:attachment_id].present?
+      attachment = Attachment.find(params[:attachment_id])
+
+      return render_unauthorized_action unless attachment
+      return render_unauthorized_action unless attachment.media_entry_id
+
+      if params[:verifier]
+        verifier_checker = Attachments::Verification.new(attachment)
+        return render_unauthorized_action unless verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)
+      else
+        return render_unauthorized_action unless attachment.grants_right?(@current_user, session, :read)
+      end
+
+      @media_id = attachment.media_entry_id
+      @media_object = MediaObject.by_media_id(@media_id).take
+
+    elsif params[:media_object_id].present?
+      @media_id = params[:media_object_id]
+      @media_object = MediaObject.by_media_id(params[:media_object_id]).take
+
+    else
+      nil
+    end
   end
 end

@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 import ready from '@instructure/ready'
-import UserCollection from '@canvas/users/backbone/collections/UserCollection.coffee'
+import UserCollection from '@canvas/users/backbone/collections/UserCollection'
 import progressionsIndexTemplate from './jst/ProgressionsIndex.handlebars'
-import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
+import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import ProgressionStudentView from './backbone/views/ProgressionStudentView'
 
 ready(() => {

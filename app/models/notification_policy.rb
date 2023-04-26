@@ -72,7 +72,7 @@ class NotificationPolicy < ActiveRecord::Base
       # User preference change not being made. Make a notification policy change.
 
       # Using the category name, fetch all Notifications for the category. Will set the desired value on them.
-      notifications = Notification.all_cached.select { |n| (n.category&.underscore&.gsub(/\s/, "_")) == params[:category] }.map(&:id)
+      notifications = Notification.all_cached.select { |n| n.category&.underscore&.gsub(/\s/, "_") == params[:category] }.map(&:id)
       frequency = params[:frequency]
       cc = user.communication_channels.find(params[:channel_id])
 

@@ -17,8 +17,8 @@
 //
 
 import OutcomesDirectoryView from './OutcomesDirectoryView'
-import OutcomeCollection from '@canvas/outcomes/backbone/collections/OutcomeCollection.coffee'
-import OutcomeGroupCollection from '../collections/OutcomeGroupCollection.coffee'
+import OutcomeCollection from '@canvas/outcomes/backbone/collections/OutcomeCollection'
+import OutcomeGroupCollection from '../collections/OutcomeGroupCollection'
 
 // for working with Account Standards in the import dialog
 export default class AccountDirectoryView extends OutcomesDirectoryView {

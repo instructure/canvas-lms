@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import {string, bool, node} from 'prop-types'
 import cx from 'classnames'
-import shortId from 'shortid'
+import shortId from '@canvas/shortid'
 
 import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'

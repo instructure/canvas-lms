@@ -40,24 +40,24 @@ describe "#configure!" do
     before { allow(ENV).to receive(:[]).with("AR_QUERY_TRACE").and_return("true") }
 
     it "enables AR query trace" do
-      expect(subject.enabled).to eq true
+      expect(subject.enabled).to be true
     end
   end
 
   context "when Rails ENV is production" do
     before do
       allow(ENV).to receive(:[]).with("AR_QUERY_TRACE").and_return("true")
-      allow(Rails).to receive(:env) { "production".inquiry }
+      allow(Rails).to receive(:env) { "production".inquiry } # rubocop:disable Rails/Inquiry
     end
 
     it "does not enable AR query trace" do
-      expect(subject.enabled).to eq false
+      expect(subject.enabled).to be false
     end
   end
 
   context "when Rails ENV is development" do
     before do
-      allow(Rails).to receive(:env) { "development".inquiry }
+      allow(Rails).to receive(:env) { "development".inquiry } # rubocop:disable Rails/Inquiry
     end
 
     context "and AR_QUERY_TRACE is falsy" do
@@ -66,7 +66,7 @@ describe "#configure!" do
       end
 
       it "disables AR query trace" do
-        expect(subject.enabled).to eq false
+        expect(subject.enabled).to be false
       end
     end
 
@@ -76,7 +76,7 @@ describe "#configure!" do
       end
 
       it "enables AR query trace" do
-        expect(subject.enabled).to eq true
+        expect(subject.enabled).to be true
       end
 
       it 'defaults "lines" to 10' do

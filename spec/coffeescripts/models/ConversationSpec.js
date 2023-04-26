@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Conversation from '@canvas/message-students-dialog/backbone/models/Conversation.coffee'
+import Conversation from '@canvas/message-students-dialog/backbone/models/Conversation'
 
 QUnit.module('Conversation', {
   setup() {

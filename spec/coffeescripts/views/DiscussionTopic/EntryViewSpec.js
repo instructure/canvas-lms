@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import Entry from 'ui/features/discussion_topic/backbone/models/Entry.coffee'
-import EntryView from 'ui/features/discussion_topic/backbone/views/EntryView.coffee'
+import Entry from 'ui/features/discussion_topic/backbone/models/Entry'
+import EntryView from 'ui/features/discussion_topic/backbone/views/EntryView'
 import Reply from 'ui/features/discussion_topic/backbone/Reply'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'

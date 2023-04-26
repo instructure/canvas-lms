@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.describe GradingPeriodSetsController, type: :controller do
+RSpec.describe GradingPeriodSetsController do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
 
   context "given a root account" do
@@ -170,7 +170,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
           grading_period_set: group_helper.valid_attributes
         }
         expect(response.status).to eql Rack::Utils.status_code(:no_content)
-        expect(grading_period_set.reload.enrollment_terms.count).to eql(0)
+        expect(grading_period_set.reload.enrollment_terms.count).to be(0)
       end
 
       context "given a sub account enrollment term" do
@@ -212,7 +212,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
 
           get :index, params: { account_id: sub_account.to_param }, session: valid_session
 
-          expect(json_parse.fetch("grading_period_sets").count).to eql 1
+          expect(json_parse.fetch("grading_period_sets").count).to be 1
         end
       end
     end

@@ -195,16 +195,16 @@ describe NotificationPolicy do
       params[:root_account] = Account.default
       params[:user] = { send_observed_names_in_notifications: "true" }
       NotificationPolicy.setup_for(@user, params)
-      expect(@user.send_observed_names_in_notifications?).to eq true
+      expect(@user.send_observed_names_in_notifications?).to be true
       params[:user] = { send_observed_names_in_notifications: "false" }
       NotificationPolicy.setup_for(@user, params)
-      expect(@user.send_observed_names_in_notifications?).to eq false
+      expect(@user.send_observed_names_in_notifications?).to be false
 
       # Verify KNO-298
       params[:root_account].settings[:allow_sending_scores_in_emails] = false
       params[:user] = { send_observed_names_in_notifications: "true" }
       NotificationPolicy.setup_for(@user, params)
-      expect(@user.send_observed_names_in_notifications?).to eq true
+      expect(@user.send_observed_names_in_notifications?).to be true
     end
 
     it "sets all notification entries within the same category" do
@@ -236,7 +236,7 @@ describe NotificationPolicy do
       expect do
         NotificationPolicy.setup_for(hax0r, channel_id: @cc.id, frequency: Notification::FREQ_IMMEDIATELY, category: "test_immediately")
       end.to raise_error(ActiveRecord::RecordNotFound)
-      expect(@user.notification_policies.any?).to eq false
+      expect(@user.notification_policies.any?).to be false
     end
 
     context "sharding" do

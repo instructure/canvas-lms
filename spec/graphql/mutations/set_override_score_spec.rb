@@ -83,7 +83,7 @@ describe Mutations::SetOverrideScore do
 
       it "does not return a value for gradingPeriod if the score has no grading period" do
         result = CanvasSchema.execute(mutation_str, context: context)
-        expect(result.dig("data", "setOverrideScore", "grades", "gradingPeriod")).to be nil
+        expect(result.dig("data", "setOverrideScore", "grades", "gradingPeriod")).to be_nil
       end
 
       it "returns the newly-set score in the overrideScore field" do
@@ -93,7 +93,7 @@ describe Mutations::SetOverrideScore do
 
       it "returns a null value for the newly-set score in the overrideScore field if the score is cleared" do
         result = CanvasSchema.execute(mutation_str(override_score: nil), context: context)
-        expect(result.dig("data", "setOverrideScore", "grades", "overrideScore")).to be nil
+        expect(result.dig("data", "setOverrideScore", "grades", "overrideScore")).to be_nil
       end
 
       it "creates a live event" do
@@ -116,7 +116,7 @@ describe Mutations::SetOverrideScore do
       it "nullifies the override_score for the associated score object if a null value is passed" do
         score_for_enrollment.update!(override_score: 99.0)
         CanvasSchema.execute(mutation_str(override_score: nil), context: context)
-        expect(score_for_enrollment.reload.override_score).to be nil
+        expect(score_for_enrollment.reload.override_score).to be_nil
       end
     end
 
@@ -151,7 +151,7 @@ describe Mutations::SetOverrideScore do
       it "ignores deleted enrollments" do
         second_enrollment.update!(workflow_state: "deleted")
         CanvasSchema.execute(mutation_str, context: context)
-        expect(score_for_second_enrollment.override_score).to be nil
+        expect(score_for_second_enrollment.override_score).to be_nil
       end
     end
 
@@ -188,7 +188,7 @@ describe Mutations::SetOverrideScore do
 
     it "does not return data pertaining to the score in question" do
       result = CanvasSchema.execute(mutation_str, context: { current_user: student_enrollment.user })
-      expect(result.dig("data", "setOverrideScore")).to be nil
+      expect(result.dig("data", "setOverrideScore")).to be_nil
     end
   end
 end

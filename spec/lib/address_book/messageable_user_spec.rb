@@ -354,7 +354,7 @@ describe AddressBook::MessageableUser do
       address_book = AddressBook::MessageableUser.new(teacher)
       known_users = address_book.search_users(search: "Bob")
       expect(known_users).to respond_to(:paginate)
-      expect(known_users.paginate(per_page: 1).size).to eql(1)
+      expect(known_users.paginate(per_page: 1).size).to be(1)
     end
 
     it "finds matching known users" do

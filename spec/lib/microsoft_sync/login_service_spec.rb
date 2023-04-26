@@ -53,9 +53,9 @@ describe MicrosoftSync::LoginService do
         before do
           allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
           allow(DynamicSettings).to receive(:find).with("microsoft-sync").and_return({
-                                                                                               "client-id" => "theclientid",
-                                                                                               "client-secret" => "thesecret"
-                                                                                             })
+                                                                                       "client-id" => "theclientid",
+                                                                                       "client-secret" => "thesecret"
+                                                                                     })
 
           WebMock.stub_request(
             :post, "https://login.microsoftonline.com/mytenant/oauth2/v2.0/token"

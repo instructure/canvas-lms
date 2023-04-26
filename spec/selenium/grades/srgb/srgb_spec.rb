@@ -198,7 +198,7 @@ describe "Screenreader Gradebook" do
   end
 
   it "displays/removes warning message for resubmitted assignments", priority: "1" do
-    skip "Skipped because this spec fails if not run in foreground\n"\
+    skip "Skipped because this spec fails if not run in foreground\n" \
          "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     assignment = basic_percent_setup
     user_session @students[0]
@@ -221,7 +221,7 @@ describe "Screenreader Gradebook" do
   end
 
   it "grades match default gradebook grades", priority: "1" do
-    skip "Skipped because this spec fails if not run in foreground\n"\
+    skip "Skipped because this spec fails if not run in foreground\n" \
          "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     a1 = basic_percent_setup
     a2 = @course.assignments.create!(
@@ -424,7 +424,7 @@ describe "Screenreader Gradebook" do
       basic_point_setup 3
 
       grades = [12, 10, 11]
-      (0..2).each { |num| @curve_assignment.grade_student(@students[num], grade: grades[num], grader: @teacher) }
+      3.times { |num| @curve_assignment.grade_student(@students[num], grade: grades[num], grader: @teacher) }
 
       SRGB.visit(@course.id)
       SRGB.select_assignment(@curve_assignment)
@@ -443,7 +443,7 @@ describe "Screenreader Gradebook" do
       assignment_score = SRGB.assignment_scores.text.split
       # assignment avg score, high score, low score
       scores_as_string = %w[13 20 8]
-      (0..2).each { |num| expect(assignment_score[num + 1]).to eq(scores_as_string[num]) }
+      3.times { |num| expect(assignment_score[num + 1]).to eq(scores_as_string[num]) }
     end
   end
 end

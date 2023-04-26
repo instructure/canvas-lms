@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
-import ListView from './ListView.coffee'
-import MemberListView from './MemberListView.coffee'
+import ListView from './ListView'
+import MemberListView from './MemberListView'
 import widgetTemplate from '../../jst/CollaboratorPicker.handlebars'
 
 export default class CollaboratorPickerView extends View

@@ -24,14 +24,14 @@ describe QuizzesNext::ExportService do
     context "service enabled for context" do
       it "returns true" do
         allow(QuizzesNext::Service).to receive(:enabled_in_context?).and_return(true)
-        expect(described_class.applies_to_course?(course)).to eq(true)
+        expect(described_class.applies_to_course?(course)).to be(true)
       end
     end
 
     context "service not enabled for context" do
       it "returns false" do
         allow(QuizzesNext::Service).to receive(:enabled_in_context?).and_return(false)
-        expect(described_class.applies_to_course?(course)).to eq(false)
+        expect(described_class.applies_to_course?(course)).to be(false)
       end
     end
   end

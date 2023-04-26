@@ -1,0 +1,17 @@
+---
+:ignore_file: config/brakeman.ignore
+:min_confidence: 1
+:rails3: true
+:rails4: true
+:rails5: true
+:rails6: true
+:rails7: true
+:skip_files:
+- gems/plugins/
+:sql_safe_methods:
+- :Integer
+- :best_unicode_collation_key
+- :needs_grading_conditions
+- :resolved_root_account_id_sql
+- :sortable_name_order_by_clause
+- :type_rank_sql

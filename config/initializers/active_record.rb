@@ -400,30 +400,18 @@ class ActiveRecord::Base
   end
 
   def self.best_unicode_collation_key(col)
-    val = begin
+    val =
       # For PostgreSQL, we can't trust a simple LOWER(column), with any collation, since
       # Postgres just defers to the C library which is different for each platform. The best
-      # choice is the collkey function from pg_collkey which uses ICU to get a full unicode sort.
-      # If that extension isn't around, casting to a bytea sucks for international characters,
+      # choice is to use an ICU collation to get a full unicode sort.
+      # If the collations aren't around, casting to a bytea sucks for international characters,
       # but at least it's consistent, and orders commas before letters so you don't end up with
       # Johnson, Bob sorting before Johns, Jimmy
-      unless @collkey&.key?(Shard.current.database_server.id)
-        @collkey ||= {}
-        @collkey[Shard.current.database_server.id] = connection.extension(:pg_collkey)&.schema
-      end
-      if (collation = Canvas::ICU.choose_pg12_collation(connection.icu_collations) && false)
+      if (collation = Canvas::ICU.choose_pg12_collation(connection.icu_collations))
         "(#{col} COLLATE #{collation})"
-      elsif (schema = @collkey[Shard.current.database_server.id])
-        # The collation level of 3 is the default, but is explicitly specified here and means that
-        # case, accents and base characters are all taken into account when creating a collation key
-        # for a string - more at https://pgxn.org/dist/pg_collkey/0.5.1/
-        # if you change these arguments, you need to rebuild all db indexes that use them,
-        # and you should also match the settings with Canvas::ICU::Collator and natcompare.js
-        "#{schema}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)"
       else
         "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
       end
-    end
     Arel.sql(val)
   end
 
@@ -457,7 +445,7 @@ class ActiveRecord::Base
   end
 
   def self.rank_hash(ary)
-    ary.each_with_index.each_with_object(Hash.new(ary.size + 1)) do |(values, i), hash|
+    ary.each_with_index.with_object(Hash.new(ary.size + 1)) do |(values, i), hash|
       Array(values).each { |value| hash[value] = i + 1 }
     end
   end
@@ -650,12 +638,12 @@ class ActiveRecord::Base
     hashed_objects = []
     excluded_columns << objects.first.class.primary_key if excluded_columns.delete("primary_key")
     objects.each do |object|
-      hashed_objects << object.attributes.except(excluded_columns.join(",")).map do |(name, value)|
+      hashed_objects << object.attributes.except(excluded_columns.join(",")).to_h do |name, value|
         if (type = object.class.attribute_types[name]).is_a?(ActiveRecord::Type::Serialized)
           value = type.serialize(value)
         end
         [name, value]
-      end.to_h
+      end
     end
     objects.first.class.bulk_insert(hashed_objects)
   end
@@ -1095,7 +1083,10 @@ module UsefulBatchEnumerator
     sum = 0
     if @strategy.nil? && !@relation.in_batches_needs_temp_table?
       loop do
-        current = @relation.limit(@of).delete_all
+        current = nil
+        @relation.connection.with_max_update_limit(@of) do
+          current = @relation.limit(@of).delete_all
+        end
         sum += current
         break unless current == @of
       end
@@ -1104,7 +1095,9 @@ module UsefulBatchEnumerator
 
     strategy = @strategy || @relation.infer_in_batches_strategy
     @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
-      sum += relation.delete_all
+      @relation.connection.with_max_update_limit(@of) do
+        sum += relation.delete_all
+      end
     end
     sum
   end
@@ -1113,7 +1106,10 @@ module UsefulBatchEnumerator
     sum = 0
     if @strategy.nil? && !@relation.in_batches_needs_temp_table? && relation_has_condition_on_updates?(updates)
       loop do
-        current = @relation.limit(@of).update_all(updates)
+        current = nil
+        @relation.connection.with_max_update_limit(@of) do
+          current = @relation.limit(@of).update_all(updates)
+        end
         sum += current
         break unless current == @of
       end
@@ -1122,9 +1118,28 @@ module UsefulBatchEnumerator
 
     strategy = @strategy || @relation.infer_in_batches_strategy
     @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
-      sum += relation.update_all(updates)
+      @relation.connection.with_max_update_limit(@of) do
+        sum += relation.update_all(updates)
+      end
     end
     sum
+  end
+
+  # not implementing relation_has_condition_on_updates logic because this method is not used in places
+  # where that would be useful.  If that changes no reason we couldn't implement it here
+  def update_all_locked_in_order(lock_type: :no_key_update, **updates)
+    sum = 0
+    strategy = @strategy || @relation.infer_in_batches_strategy
+    @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
+      @relation.connection.with_max_update_limit(@of) do
+        sum += relation.update_all_locked_in_order(lock_type: lock_type, **updates)
+      end
+    end
+    sum
+  end
+
+  def touch_all(*names, time: nil)
+    update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time: time))
   end
 
   def destroy_all
@@ -1260,19 +1275,19 @@ ActiveRecord::Relation.class_eval do
     end
   end
 
-  def touch_all
+  def touch_all(*names, time: nil)
     activate do |relation|
-      relation.update_all_locked_in_order(updated_at: Time.now.utc)
+      relation.update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time: time))
     end
   end
 
-  def touch_all_skip_locked
+  def touch_all_skip_locked(*names, time: nil)
     if Setting.get("touch_all_skip_locked_enabled", "true") == "true"
       activate do |relation|
-        relation.update_all_locked_in_order(updated_at: Time.now.utc, lock_type: :no_key_update_skip_locked)
+        relation.update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time: time), lock_type: :no_key_update_skip_locked)
       end
     else
-      touch_all
+      touch_all(*names, time: time)
     end
   end
 
@@ -1313,7 +1328,7 @@ ActiveRecord::Relation.class_eval do
       end.join(" UNION ALL ")
       return unscoped.where("#{table}.#{connection.quote_column_name(primary_key)} IN (#{sub_query})") unless from
 
-      sub_query = +"(#{sub_query}) #{from == true ? table : from}"
+      sub_query = +"(#{sub_query}) #{(from == true) ? table : from}"
       unscoped.from(sub_query)
     end
   end

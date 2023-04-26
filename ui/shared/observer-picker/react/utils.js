@@ -54,4 +54,4 @@ export const parseObservedUsersResponse = (enrollments, isOnlyObserver, currentU
 }
 
 export const fetchShowK5Dashboard = () =>
-  doFetchApi({path: `/api/v1/show_k5_dashboard`}).then(({json}) => json.show_k5_dashboard)
+  doFetchApi({path: `/api/v1/show_k5_dashboard`}).then(({json}) => json)

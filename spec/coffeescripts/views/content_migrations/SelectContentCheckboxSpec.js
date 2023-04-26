@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration.coffee'
-import SelectContentCheckbox from '@canvas/content-migrations/backbone/views/subviews/SelectContentCheckboxView.coffee'
+import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration'
+import SelectContentCheckbox from '@canvas/content-migrations/backbone/views/subviews/SelectContentCheckboxView'
 
 QUnit.module('SelectContentCheckbox: Blueprint Settings', {
   setup() {

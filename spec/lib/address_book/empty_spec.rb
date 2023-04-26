@@ -68,7 +68,7 @@ describe AddressBook::Empty do
     it "returns an empty but paginatable collection" do
       known_users = @address_book.search_users(search: "Bob")
       expect(known_users).to respond_to(:paginate)
-      expect(known_users.paginate(per_page: 1).size).to eql(0)
+      expect(known_users.paginate(per_page: 1).size).to be(0)
     end
   end
 

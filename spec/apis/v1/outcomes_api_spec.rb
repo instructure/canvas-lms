@@ -571,13 +571,13 @@ describe "Outcomes API", type: :request do
                             calculation_method: "n_mastery",
                             calculation_int: 3 })
 
-          expect(json["calculation_int"]).to eql(3)
+          expect(json["calculation_int"]).to be(3)
           expect(json["calculation_method"]).to eql("n_mastery")
 
           @outcome.reload
           expect(json).to eq(outcome_json)
           expect(@outcome.calculation_method).to eql("n_mastery")
-          expect(@outcome.calculation_int).to eql(3)
+          expect(@outcome.calculation_int).to be(3)
         end
 
         context "should not allow updating the calculation_int to an illegal value for the calculation_method" do

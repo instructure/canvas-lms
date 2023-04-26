@@ -39,7 +39,7 @@ describe Stats do
 
     def check_stats(c, size, max, min, sum, mean, var, histogram)
       check_stats_with_matchers c,
-                                (size > 0 ? be_falsey : be_truthy),
+                                ((size > 0) ? be_falsey : be_truthy),
                                 eql(size),
                                 eql(max),
                                 eql(min),

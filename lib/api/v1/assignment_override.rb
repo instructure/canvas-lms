@@ -23,7 +23,7 @@ module Api::V1::AssignmentOverride
 
   def assignment_override_json(override, visible_users = nil)
     fields = %i[id assignment_id title]
-    fields.concat(%i[due_at all_day all_day_date]) if override.due_at_overridden
+    fields.push(:due_at, :all_day, :all_day_date) if override.due_at_overridden
     fields << :unlock_at if override.unlock_at_overridden
     fields << :lock_at if override.lock_at_overridden
     api_json(override, @current_user, session, only: fields).tap do |json|
@@ -293,7 +293,7 @@ module Api::V1::AssignmentOverride
       defunct_student_ids = if override.new_record?
                               Set.new
                             else
-                              override.assignment_override_students.map(&:user_id).to_set
+                              override.assignment_override_students.to_set(&:user_id)
                             end
 
       override.changed_student_ids = Set.new

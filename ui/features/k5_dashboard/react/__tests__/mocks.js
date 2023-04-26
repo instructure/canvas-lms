@@ -212,6 +212,7 @@ export const defaultEnv = {
   },
   MOMENT_LOCALE: 'en',
   TIMEZONE: 'America/Denver',
+  USE_CLASSIC_FONT: false,
 }
 
 export const defaultK5DashboardProps = {

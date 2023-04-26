@@ -91,7 +91,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
       end
 
       it "must retain the import status url" do
-        status_url = importer.instance_variable_get("@status_url")
+        status_url = importer.instance_variable_get(:@status_url)
         expect(status_url).to eq "https://lti.example.com/imports/42/status"
       end
 
@@ -235,8 +235,8 @@ RSpec.describe Lti::ContentMigrationService::Importer do
                                                                                     }
                                                                                   })
       tool.save!
-      importer.instance_variable_set("@tool", tool)
-      importer.instance_variable_set("@status_url", "https://lti.example.com/imports/42/status")
+      importer.instance_variable_set(:@tool, tool)
+      importer.instance_variable_set(:@status_url, "https://lti.example.com/imports/42/status")
     end
 
     it 'must return false when the remote end returns a status other than "completed"' do

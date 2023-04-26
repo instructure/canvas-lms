@@ -27,7 +27,7 @@ import {IconUploadLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import BaseUploader from '@canvas/files/react/modules/BaseUploader'
 import CurrentUploads from '@canvas/files/react/components/CurrentUploads'
-import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject.coffee'
+import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import UploadForm from '@canvas/files/react/components/UploadForm'
 

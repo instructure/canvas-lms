@@ -440,7 +440,7 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
     })
   })
 
-  QUnit.module('#visibleStudentsThatCanSeeAssinment', hooks => {
+  QUnit.module('#visibleStudentsThatCanSeeAssignment', hooks => {
     hooks.beforeEach(() => {
       gradebook.gotChunkOfStudents(allStudents)
       gradebook.courseContent.students.setStudentIds(['1101', '1102'])
@@ -478,12 +478,6 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
 
       const students = gradebook.visibleStudentsThatCanSeeAssignment('2302')
       notOk(Object.keys(students).includes('1102'))
-    })
-
-    test('used in default grade dialog', () => {
-      sinon.stub(gradebook, 'visibleStudentsThatCanSeeAssignment')
-      gradebook.getSetDefaultGradeAction('2302')
-      equal(gradebook.visibleStudentsThatCanSeeAssignment.callCount, 1)
     })
   })
 })

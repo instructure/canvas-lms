@@ -5,7 +5,6 @@ require File.expand_path("../config/boot", __dir__)
 
 require "aws-sdk-kinesis"
 require "json"
-require "pp"
 
 ENDPOINT = ARGV[0]
 STREAM_NAME = ARGV[1]

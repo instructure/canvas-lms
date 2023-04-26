@@ -27,7 +27,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Menu} from '@instructure/ui-menu'
 import {IconReplyLine, IconLockLine, IconUnlockLine, IconTrashLine} from '@instructure/ui-icons'
 
-import AnnouncementModel from '@canvas/discussions/backbone/models/Announcement.coffee'
+import AnnouncementModel from '@canvas/discussions/backbone/models/Announcement'
 import SectionsTooltip from '@canvas/sections-tooltip'
 import CourseItemRow from './CourseItemRow'
 import UnreadBadge from '@canvas/unread-badge'

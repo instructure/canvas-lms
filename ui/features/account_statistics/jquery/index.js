@@ -59,7 +59,7 @@ function populateDialog(data_points, axis, $link) {
 }
 
 $(document).ready(() => {
-  $('.over_time_link').live('click', function (event) {
+  $(document).on('click', '.over_time_link', function (event) {
     event.preventDefault()
     const $link = $(this)
     const name = $link.attr('data-name')

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
+RSpec.describe DeveloperKeyAccountBindingsController do
   let(:root_account) { account_model }
   let(:root_account_admin) { account_admin_user(account: root_account) }
   let(:sub_account) { account_model(parent_account: root_account) }

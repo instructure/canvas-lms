@@ -663,7 +663,7 @@ module Api
             end
 
             it "allows the nil value to go into the has" do
-              expect(hash["sis_course_id"]).to eq nil
+              expect(hash["sis_course_id"]).to be_nil
             end
 
             it "does not get cleared out before translation to json" do

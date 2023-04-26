@@ -87,21 +87,21 @@ describe Types::GroupType do
     it "returns false when course is active" do
       expect(
         group_type.resolve("canMessage")
-      ).to eq true
+      ).to be true
     end
 
     it "returns nil when course is deleted" do
       @group.context.destroy!
       expect(
         group_type.resolve("canMessage")
-      ).to eq nil
+      ).to be_nil
     end
 
     it "returns false when course is concluded" do
       @group.context.complete!
       expect(
         group_type.resolve("canMessage")
-      ).to eq false
+      ).to be false
     end
   end
 

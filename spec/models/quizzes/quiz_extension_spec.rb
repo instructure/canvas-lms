@@ -170,7 +170,7 @@ describe Quizzes::QuizExtension do
 
       expect(extension.extra_attempts).to eq 0
       expect(extension.extra_time).to eq 0
-      expect(extension.manually_unlocked).to eq false
+      expect(extension.manually_unlocked).to be false
     end
   end
 end

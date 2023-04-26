@@ -54,9 +54,9 @@ describe Types::LearningOutcomeGroupType do
     expect(outcome_group_type.resolve("vendorGuid")).to eq @outcome_group.vendor_guid
     expect(outcome_group_type.resolve("childGroupsCount")).to eq 2
     expect(outcome_group_type.resolve("outcomesCount")).to be_a Integer
-    expect(outcome_group_type.resolve("notImportedOutcomesCount")).to eq nil
+    expect(outcome_group_type.resolve("notImportedOutcomesCount")).to be_nil
     expect(outcome_group_type.resolve("parentOutcomeGroup { _id }")).to eq @parent_group.id.to_s
-    expect(outcome_group_type.resolve("canEdit")).to eq true
+    expect(outcome_group_type.resolve("canEdit")).to be true
     expect(outcome_group_type.resolve("childGroups { nodes { _id } }"))
       .to match_array([@child_group.id.to_s, @child_group3.id.to_s])
   end
@@ -129,7 +129,7 @@ describe Types::LearningOutcomeGroupType do
     end
 
     it "returns false for canEdit" do
-      expect(outcome_group_type.resolve("canEdit")).to eq false
+      expect(outcome_group_type.resolve("canEdit")).to be false
     end
 
     it "returns false for canUnlink on the outcome edge" do
@@ -210,7 +210,7 @@ describe Types::LearningOutcomeGroupType do
     end
 
     it "returns nil if no targetGroupId provided" do
-      expect(outcome_group_type.resolve("notImportedOutcomesCount")).to eq nil
+      expect(outcome_group_type.resolve("notImportedOutcomesCount")).to be_nil
     end
   end
 

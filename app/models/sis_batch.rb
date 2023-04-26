@@ -115,7 +115,7 @@ class SisBatch < ActiveRecord::Base
     # Progress is calculated on the number of jobs remaining.
     num_jobs, min_rows, max_rows = Setting.get("sis_batch_rows_for_parallel",
                                                "99,100,1000").split(",").map(&:to_i)
-    [[(rows / num_jobs.to_f).ceil, min_rows].max, max_rows].min
+    (rows / num_jobs.to_f).ceil.clamp(min_rows, max_rows)
   end
 
   workflow do
@@ -717,7 +717,7 @@ class SisBatch < ActiveRecord::Base
       "workflow_state" => workflow_state,
       "data" => self.data,
       "batch_mode" => batch_mode,
-      "batch_mode_term_id" => batch_mode_term ? batch_mode_term.id : nil,
+      "batch_mode_term_id" => batch_mode_term&.id,
       "multi_term_batch_mode" => options[:multi_term_batch_mode],
       "override_sis_stickiness" => options[:override_sis_stickiness],
       "add_sis_stickiness" => options[:add_sis_stickiness],

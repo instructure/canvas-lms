@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import {mount} from 'enzyme'
 import FilePreview from '@canvas/files/react/components/FilePreview'
 import Folder from '@canvas/files/backbone/models/Folder'
-import File from '@canvas/files/backbone/models/File.coffee'
+import File from '@canvas/files/backbone/models/File'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 
 let filesCollection = {}

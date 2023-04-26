@@ -25,14 +25,13 @@ module Factories
       user: opts[:user],
       assessor: opts[:assessor] || opts[:user],
       artifact: rubric_association.association_object.submit_homework(opts[:user]),
-      assessment: rubric_association.rubric.criteria_object.map { |x| ["criterion_#{x.id}".to_sym, {}] }.to_h.merge(
+      assessment: rubric_association.rubric.criteria_object.to_h { |x| ["criterion_#{x.id}".to_sym, {}] }.merge(
         assessment_type: (opts[:assessment_type] || "no_reason")
       )
     )
   end
 
   def valid_rubric_assessment_attributes
-    {
-    }
+    {}
   end
 end

@@ -209,8 +209,8 @@ unless $canvas_tasks_loaded
         end
         ActiveRecord::Tasks::DatabaseTasks.create(queue) if queue
         ActiveRecord::Tasks::DatabaseTasks.create(config)
-        ::ActiveRecord::Base.connection.schema_cache.clear!
-        ::ActiveRecord::Base.descendants.each(&:reset_column_information)
+        ActiveRecord::Base.connection.schema_cache.clear!
+        ActiveRecord::Base.descendants.each(&:reset_column_information)
         Rake::Task["db:migrate"].invoke
       end
     end

@@ -108,7 +108,7 @@ module Types
           Loaders::DiscussionTopicParticipantLoader.for(topic.id).load(object.user_id).then do |participant|
             {
               id: participant.id.to_s(36),
-              short_name: object.user_id == current_user.id ? "current_user" : participant.id.to_s(36),
+              short_name: (object.user_id == current_user.id) ? "current_user" : participant.id.to_s(36),
               avatar_url: nil
             }
           end

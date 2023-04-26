@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import SelectContentView from 'ui/features/content_migrations/backbone/views/SelectContentView.coffee'
-import ProgressingMigration from 'ui/features/content_migrations/backbone/models/ProgressingContentMigration.coffee'
+import SelectContentView from 'ui/features/content_migrations/backbone/views/SelectContentView'
+import ProgressingMigration from 'ui/features/content_migrations/backbone/models/ProgressingContentMigration'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'

@@ -162,7 +162,7 @@ class BrandConfigsController < ApplicationController
   def save_to_account
     old_md5 = @account.brand_config_md5
     session_config = session.delete(:brand_config)
-    new_md5 = session_config.nil? || session_config[:type] == :default ? nil : session_config[:md5]
+    new_md5 = (session_config.nil? || session_config[:type] == :default) ? nil : session_config[:md5]
     new_brand_config = new_md5 && BrandConfig.find(new_md5)
     progress = BrandConfigRegenerator.process(@account, @current_user, new_brand_config)
 

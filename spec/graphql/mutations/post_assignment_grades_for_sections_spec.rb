@@ -118,7 +118,7 @@ describe Mutations::PostAssignmentGradesForSections do
       now = Time.zone.now
       assignment.update!(moderated_grading: true, grader_count: 2, final_grader: teacher, grades_published_at: now)
       result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)
-      expect(result["errors"]).to be nil
+      expect(result["errors"]).to be_nil
     end
 
     describe "posting the grades" do
@@ -187,7 +187,7 @@ describe Mutations::PostAssignmentGradesForSections do
         it "does not post grades for the requested sections if the user cannot see them" do
           execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id, section2.id]), { current_user: ta })
           post_submissions_job.invoke_job
-          expect(assignment.submission_for_student(@section2_student).posted_at).to be nil
+          expect(assignment.submission_for_student(@section2_student).posted_at).to be_nil
         end
 
         it "stores only the user ids of affected students on the Progress object" do
@@ -302,7 +302,7 @@ describe Mutations::PostAssignmentGradesForSections do
 
     it "does not return data for the related submissions" do
       result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section2.id]), context)
-      expect(result.dig("data", "postAssignmentGradesForSections")).to be nil
+      expect(result.dig("data", "postAssignmentGradesForSections")).to be_nil
     end
   end
 end

@@ -368,7 +368,7 @@ describe "Rubrics API", type: :request do
       it "creates a rubric" do
         response = create_rubric_api_call(@course)
         expect(response["rubric"]["user_id"]).to eq @user.id
-        expect(response["rubric_association"]).to eq nil
+        expect(response["rubric_association"]).to be_nil
       end
 
       it "creats a rubric with an association" do

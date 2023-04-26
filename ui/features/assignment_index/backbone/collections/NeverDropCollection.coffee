@@ -17,7 +17,7 @@
 
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
-import UniqueDropdownCollection from './UniqueDropdownCollection.coffee'
+import UniqueDropdownCollection from './UniqueDropdownCollection'
 
 export default class NeverDropCollection extends UniqueDropdownCollection
 

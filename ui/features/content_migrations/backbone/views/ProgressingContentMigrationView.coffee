@@ -20,12 +20,12 @@ import Backbone from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/ProgressingContentMigration.handlebars'
 import progressingIssuesTemplate from '../../jst/ProgressingIssues.handlebars'
-import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
-import ContentMigrationIssueView from './ContentMigrationIssueView.coffee'
-import ProgressBarView from './ProgressBarView.coffee'
-import ProgressStatusView from './ProgressStatusView.coffee'
-import SelectContentView from './SelectContentView.coffee'
-import SourceLinkView from './SourceLinkView.coffee'
+import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
+import ContentMigrationIssueView from './ContentMigrationIssueView'
+import ProgressBarView from './ProgressBarView'
+import ProgressStatusView from './ProgressStatusView'
+import SelectContentView from './SelectContentView'
+import SourceLinkView from './SourceLinkView'
 
 I18n = useI18nScope('content_migrations')
 

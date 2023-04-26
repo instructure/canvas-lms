@@ -23,7 +23,7 @@ module AddressBook
     def known_users(users, options = {})
       options = { strict_checks: true }.merge(options)
       if options[:context]
-        user_ids = users.map { |user| Shard.global_id_for(user) }.to_set
+        user_ids = users.to_set { |user| Shard.global_id_for(user) }
         asset_string = options[:context].respond_to?(:asset_string) ? options[:context].asset_string : options[:context]
         known_users = @sender.messageable_user_calculator
                              .messageable_users_in_context(asset_string, admin_context: admin_context?(options[:context]))

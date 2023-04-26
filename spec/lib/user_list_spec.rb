@@ -67,7 +67,7 @@ describe UserList do
   end
 
   it "processes a list of irregular emails" do
-    ul = UserList.new(%( Shaw "Ryan" <ryankshaw@gmail.com>, \"whoopsies\" <stuff@stuff.stuff>,
+    ul = UserList.new(%( Shaw "Ryan" <ryankshaw@gmail.com>, "whoopsies" <stuff@stuff.stuff>,
           guess what my name has an@sign <blah@gmail.com>, <derp@derp.depr>))
     expect(ul.addresses.map { |x| [x[:name], x[:address]] }).to eql([
                                                                       ["Shaw \"Ryan\"", "ryankshaw@gmail.com"],

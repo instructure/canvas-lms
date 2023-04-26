@@ -194,7 +194,7 @@ pipeline {
     FORCE_FAILURE = commitMessageFlag('force-failure-fsc').asBooleanInteger()
     // fsc errors when running specs from gems.
     // until we figure out how to run them, we should ignore them
-    FSC_IGNORE_FILES = 'gems/.*/spec/,spec/contracts/,engines/.*/spec/,spec/selenium/performance/'
+    FSC_IGNORE_FILES = 'gems/.*/spec/,spec/contracts/,spec/selenium/performance/'
     POSTGRES_PASSWORD = 'sekret'
 
     // Targeting 10 minutes / node, each node runs RSPEC_PROCESSES threads and

@@ -170,7 +170,7 @@ describe "ListTest" do
       expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [2, 1, 3, 4]
 
       expect(ListMixin.find(1).pos).to eq 1
-      expect(ListMixin.find(2).pos).to eq nil
+      expect(ListMixin.find(2).pos).to be_nil
       expect(ListMixin.find(3).pos).to eq 2
       expect(ListMixin.find(4).pos).to eq 3
     end

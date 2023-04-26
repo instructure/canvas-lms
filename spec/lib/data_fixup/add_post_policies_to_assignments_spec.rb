@@ -51,7 +51,7 @@ describe DataFixup::AddPostPoliciesToAssignments do
     context "for an assignment that would receive a manual post policy" do
       it "sets the posted_at of submissions to nil" do
         run_for_submissions
-        expect(assignment.submission_for_student(student1).posted_at).to eq nil
+        expect(assignment.submission_for_student(student1).posted_at).to be_nil
       end
     end
 
@@ -71,7 +71,7 @@ describe DataFixup::AddPostPoliciesToAssignments do
 
       it "sets the posted_at of ungraded submissions to nil" do
         run_for_submissions
-        expect(assignment.submission_for_student(student1).reload.posted_at).to eq nil
+        expect(assignment.submission_for_student(student1).reload.posted_at).to be_nil
       end
     end
 

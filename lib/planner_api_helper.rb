@@ -89,6 +89,6 @@ module PlannerApiHelper
         req[:id] == tag.id && req[:type] == "must_mark_done"
       end
     end
-    doneable_tags.length == 1 ? doneable_tags.first : nil
+    (doneable_tags.length == 1) ? doneable_tags.first : nil
   end
 end

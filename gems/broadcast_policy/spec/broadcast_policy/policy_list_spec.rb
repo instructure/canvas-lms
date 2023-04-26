@@ -46,7 +46,7 @@ describe BroadcastPolicy::PolicyList do
         whenever { true }
       end
 
-      expect(subject.find_policy_for("Foo")).not_to be(nil)
+      expect(subject.find_policy_for("Foo")).not_to be_nil
     end
   end
 
@@ -67,7 +67,7 @@ describe BroadcastPolicy::PolicyList do
   describe "#dispatch" do
     it "saves new notifications" do
       subject.dispatch(:foo)
-      expect(subject.notifications).not_to be(nil)
+      expect(subject.notifications).not_to be_nil
     end
 
     it "ignores existing notifications" do

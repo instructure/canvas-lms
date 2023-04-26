@@ -97,11 +97,11 @@ describe "creating a quiz" do
       assign_quiz_to_no_one
       save_settings
 
-      expect(ffj("div.error_text", "div.error_box.errorBox")[1].text).to eq "You " \
-                                                                            "must have a student or section selected"
+      expect(ffj("div.error_text", "div.error_box.errorBox")[1].text)
+        .to eq "You must have a student or section selected"
     end
 
-    it "saves and publishes a new quiz", :xbrowser, priority: "1", custom_timeout: 30 do
+    it "saves and publishes a new quiz", :xbrowser, custom_timeout: 30, priority: "1" do
       @quiz = course_quiz
       open_quiz_edit_form
 
@@ -184,7 +184,7 @@ describe "creating a quiz" do
 
     describe "upon save" do
       let(:title) { "My Title" }
-      let(:error_text) { "\'Please add a due date\'" }
+      let(:error_text) { "'Please add a due date'" }
       let(:error) { fj(".error_box div:contains(#{error_text})") }
       let(:due_date_input_fields) { ff(".DueDateInput") }
       let(:save_button) { f(".save_quiz_button") }

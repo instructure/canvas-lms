@@ -100,8 +100,8 @@ describe MicrosoftSync::UserMapping do
 
       it "creates UserMappings if they don't already exist and overrides if they do" do
         subject
-        expect(described_class.where(root_account_id: account.id).pluck(:user_id, :aad_id).sort).to \
-          eq([[user1.id, "user1override"], [user2.id, "user2"]].sort)
+        expect(described_class.where(root_account_id: account.id).pluck(:user_id, :aad_id).sort)
+          .to eq([[user1.id, "user1override"], [user2.id, "user2"]].sort)
       end
 
       it "sets needs_updating=false" do
@@ -130,8 +130,7 @@ describe MicrosoftSync::UserMapping do
             klass = described_class::AccountSettingsChanged
             msg = /account-wide sync settings were changed/
 
-            expect { subject }.to \
-              raise_microsoft_sync_graceful_cancel_error(klass, msg)
+            expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
 
             expect(described_class.pluck(:root_account_id, :user_id, :aad_id)).to contain_exactly(
               # [account.id, user1.id, "manual"] was overwritten, then deleted, so not here anymore
@@ -144,8 +143,8 @@ describe MicrosoftSync::UserMapping do
 
     context "when user_id_to_aad_hash is empty" do
       it "doesn't raise an error" do
-        expect { described_class.bulk_insert_for_root_account(account_model, {}) }.to_not \
-          change { described_class.count }.from(0)
+        expect { described_class.bulk_insert_for_root_account(account_model, {}) }
+          .to_not change { described_class.count }.from(0)
       end
     end
   end
@@ -277,10 +276,8 @@ describe MicrosoftSync::UserMapping do
       @enrollment = student_in_course(active_all: true)
       @ra = @enrollment.root_account
 
-      @um1 = MicrosoftSync::UserMapping.create! \
-        user: @enrollment.user, root_account: @ra, aad_id: "abc123"
-      @um2 = MicrosoftSync::UserMapping.create! \
-        user: user_model, root_account: @ra, aad_id: "abc123"
+      @um1 = MicrosoftSync::UserMapping.create!(user: @enrollment.user, root_account: @ra, aad_id: "abc123")
+      @um2 = MicrosoftSync::UserMapping.create!(user: user_model, root_account: @ra, aad_id: "abc123")
 
       @ra.settings[:microsoft_sync_enabled] = true
       @ra.settings[:microsoft_sync_login_attribute] = "email"
@@ -291,7 +288,7 @@ describe MicrosoftSync::UserMapping do
       expect do
         described_class.flag_as_needs_updating_if_using_email(@enrollment.user)
       end.to change { @um1.reload.needs_updating }.from(false).to(true)
-      expect(@um2.needs_updating).to eq(false)
+      expect(@um2.needs_updating).to be(false)
     end
 
     it "doesn't set needs_updating if the root account doesn't use email login attribute" do
@@ -307,7 +304,7 @@ describe MicrosoftSync::UserMapping do
         root_account: account_model(root_account_id: nil), user: @enrollment.user
       )
       described_class.flag_as_needs_updating_if_using_email(@enrollment.user)
-      expect(um.reload.needs_updating).to eq(false)
+      expect(um.reload.needs_updating).to be(false)
     end
   end
 

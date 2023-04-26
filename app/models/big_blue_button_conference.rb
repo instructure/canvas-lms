@@ -367,7 +367,7 @@ class BigBlueButtonConference < WebConference
     generate_request :join,
                      fullName: user.short_name,
                      meetingID: conference_key,
-                     password: settings[(type == :user ? :user_key : :admin_key)],
+                     password: settings[((type == :user) ? :user_key : :admin_key)],
                      userID: user.id,
                      createTime: settings[:create_time]
   end
@@ -375,7 +375,7 @@ class BigBlueButtonConference < WebConference
   def end_meeting
     response = send_request(:end, {
                               meetingID: conference_key,
-                              password: settings[(type == :user ? :user_key : :admin_key)],
+                              password: settings[((type == :user) ? :user_key : :admin_key)],
                             })
     response[:ended] if response
   end

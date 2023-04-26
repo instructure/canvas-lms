@@ -426,11 +426,11 @@ describe "Group Categories API", type: :request do
           project_groups = @course.group_categories.build
           project_groups.name = @name
           project_groups.save
-          expect(GroupCategory.find(project_groups.id)).not_to eq nil
+          expect(GroupCategory.find(project_groups.id)).not_to be_nil
           api_call :delete, "/api/v1/group_categories/#{project_groups.id}",
                    @category_path_options.merge(action: "destroy",
                                                 group_category_id: project_groups.to_param)
-          expect(GroupCategory.find(project_groups.id).deleted_at).not_to eq nil
+          expect(GroupCategory.find(project_groups.id).deleted_at).not_to be_nil
         end
 
         it "allows a teacher to delete the imported groups category for a course" do
@@ -438,11 +438,11 @@ describe "Group Categories API", type: :request do
           project_groups.name = @name
           project_groups.role = "imported"
           project_groups.save
-          expect(GroupCategory.find(project_groups.id)).not_to eq nil
+          expect(GroupCategory.find(project_groups.id)).not_to be_nil
           api_call :delete, "/api/v1/group_categories/#{project_groups.id}",
                    @category_path_options.merge(action: "destroy",
                                                 group_category_id: project_groups.to_param)
-          expect(GroupCategory.find(project_groups.id).deleted_at).not_to eq nil
+          expect(GroupCategory.find(project_groups.id).deleted_at).not_to be_nil
         end
 
         it "does not allow a teacher to delete the communities category for a course" do
@@ -450,7 +450,7 @@ describe "Group Categories API", type: :request do
           project_groups.name = @name
           project_groups.role = "communities"
           project_groups.save
-          expect(GroupCategory.find(project_groups.id)).not_to eq nil
+          expect(GroupCategory.find(project_groups.id)).not_to be_nil
           api_call :delete, "/api/v1/group_categories/#{project_groups.id}",
                    @category_path_options.merge(action: "destroy",
                                                 group_category_id: project_groups.to_param),
@@ -501,7 +501,7 @@ describe "Group Categories API", type: :request do
       end
 
       it "does not allow a teacher to delete the student groups category" do
-        expect(GroupCategory.find(@category.id)).not_to eq nil
+        expect(GroupCategory.find(@category.id)).not_to be_nil
         raw_api_call :delete, "/api/v1/group_categories/#{@category.id}",
                      @category_path_options.merge(action: "destroy",
                                                   group_category_id: @category.to_param)
@@ -512,7 +512,7 @@ describe "Group Categories API", type: :request do
         project_groups = @course.group_categories.build
         project_groups.name = "Course Project Groups"
         project_groups.save
-        expect(GroupCategory.find(project_groups.id)).not_to eq nil
+        expect(GroupCategory.find(project_groups.id)).not_to be_nil
         raw_api_call :delete, "/api/v1/group_categories/#{project_groups.id}",
                      @category_path_options.merge(action: "destroy",
                                                   group_category_id: project_groups.to_param)
@@ -704,7 +704,7 @@ describe "Group Categories API", type: :request do
 
       it "allows an admin to delete a category for an account" do
         account_category = GroupCategory.create(name: "Groups", context: @account)
-        expect(GroupCategory.find(@communities.id)).not_to eq nil
+        expect(GroupCategory.find(@communities.id)).not_to be_nil
         raw_api_call :delete, "/api/v1/group_categories/#{account_category.id}",
                      @category_path_options.merge(action: "destroy",
                                                   group_category_id: account_category.to_param)

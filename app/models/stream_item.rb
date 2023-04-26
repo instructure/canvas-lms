@@ -243,7 +243,7 @@ class StreamItem < ActiveRecord::Base
     item = new
     item.generate_data(object)
     StreamItem.unique_constraint_retry do |retry_count|
-      retry_count == 0 ? item.save! : item = nil # if it fails just carry on - it got created somewhere else so grab it later
+      (retry_count == 0) ? item.save! : item = nil # if it fails just carry on - it got created somewhere else so grab it later
     end
     item ||= object.reload.stream_item
 
@@ -474,7 +474,7 @@ class StreamItem < ActiveRecord::Base
       else
         StreamItemCache.invalidate_all_recent_stream_items(user_ids, context_type, context_id)
       end
-      scope.delete_all
+      scope.in_batches(of: 10_000).delete_all
       nil
     end
   end

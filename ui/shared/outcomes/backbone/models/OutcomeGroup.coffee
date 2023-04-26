@@ -17,8 +17,8 @@
 #
 
 import Backbone from '@canvas/backbone'
-import OutcomeCollection from '../collections/OutcomeCollection.coffee'
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
+import OutcomeCollection from '../collections/OutcomeCollection'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 
 class OutcomeGroup extends Backbone.Model
   initialize: (options) ->

@@ -251,12 +251,12 @@ module Lti
 
       it "returns false if the domain does not match the launch path domain" do
         invalid_url = "http://www.banana.com/launch"
-        expect(message_handler.valid_resource_url?(invalid_url)).to eq false
+        expect(message_handler.valid_resource_url?(invalid_url)).to be false
       end
 
       it "returns true if the domain matches the launch path domain" do
         valid_url = "#{message_handler.launch_path}/my-launch"
-        expect(message_handler.valid_resource_url?(valid_url)).to eq true
+        expect(message_handler.valid_resource_url?(valid_url)).to be true
       end
     end
 

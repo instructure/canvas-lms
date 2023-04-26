@@ -69,7 +69,7 @@ describe Lti::Concerns::ParentFrame do
           ).and_return(false)
         end
 
-        it { is_expected.to eq(nil) }
+        it { is_expected.to be_nil }
       end
     end
   end
