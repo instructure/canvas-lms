@@ -39,6 +39,7 @@ interface Props {
   readonly onPublish: () => void
   readonly isCanceling: boolean
   readonly isPublishing: boolean
+  readonly skippingItems: boolean
   readonly progressId: string | number | null
   readonly progressCurrent?: ProgressResult
   readonly title: string
@@ -52,6 +53,7 @@ const ContextModulesPublishModal: React.FC<Props> = ({
   onPublish,
   isCanceling,
   isPublishing,
+  skippingItems,
   progressId,
   progressCurrent,
   title,
@@ -112,9 +114,13 @@ const ContextModulesPublishModal: React.FC<Props> = ({
             )}
           </Text>
           <Text as="p">
-            {I18n.t(
-              'To discontinue processing, click the Stop button. Note: Items that have already been processed will not be reverted to their previous state when the process is discontinued.'
-            )}
+            {skippingItems
+              ? I18n.t(
+                  'To discontinue processing, click the Stop button. Note: Modules that have already been processed will not be reverted to their previous state when the process is discontinued.'
+                )
+              : I18n.t(
+                  'To discontinue processing, click the Stop button. Note: Modules and items that have already been processed will not be reverted to their previous state when the process is discontinued.'
+                )}
           </Text>
         </View>
         {progressBar()}
