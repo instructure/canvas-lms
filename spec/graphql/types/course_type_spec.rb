@@ -166,6 +166,24 @@ describe Types::CourseType do
         ].map { |a| a.id.to_s })
       end
     end
+
+    context "grading standards" do
+      it "returns grading standard title" do
+        expect(
+          course_type.resolve("gradingStandard { title }", current_user: @student)
+        ).to eq "Default Grading Scheme"
+      end
+
+      it "returns grading standard data" do
+        expect(
+          course_type.resolve("gradingStandard { data { letterGrade } }", current_user: @student)
+        ).to eq ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"]
+
+        expect(
+          course_type.resolve("gradingStandard { data { baseValue } }", current_user: @student)
+        ).to eq [0.94, 0.9, 0.87, 0.84, 0.8, 0.77, 0.74, 0.7, 0.67, 0.64, 0.61, 0.0]
+      end
+    end
   end
 
   describe "outcomeProficiency" do
