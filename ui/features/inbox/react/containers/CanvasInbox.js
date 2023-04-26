@@ -417,15 +417,18 @@ const CanvasInbox = () => {
   const firstConversationIsStarred = myConversationParticipant?.label === 'starred'
 
   const [starConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
-    onCompleted: () => {
-      if (firstConversationIsStarred) {
+    onCompleted: data => {
+      const isStarred =
+        data.updateConversationParticipants.conversationParticipants[0].label === 'starred'
+      const count = data.updateConversationParticipants.conversationParticipants.length
+      if (!isStarred) {
         setOnSuccess(
           I18n.t(
             {
               one: 'The conversation has been successfully unstarred.',
               other: 'The conversations has been successfully unstarred.',
             },
-            {count: selectedConversations.length}
+            {count}
           )
         )
       } else {
@@ -435,7 +438,7 @@ const CanvasInbox = () => {
               one: 'The conversation has been successfully starred.',
               other: 'The conversations has been successfully starred.',
             },
-            {count: selectedConversations.length}
+            {count}
           )
         )
       }
@@ -445,10 +448,10 @@ const CanvasInbox = () => {
     },
   })
 
-  const handleStar = starred => {
+  const handleStar = (starred, conversationIds = null) => {
     starConversationParticipants({
       variables: {
-        conversationIds: selectedConversations.map(convo => convo._id),
+        conversationIds: conversationIds || selectedConversations.map(convo => convo._id),
         starred,
       },
     })
@@ -632,6 +635,7 @@ const CanvasInbox = () => {
                       userFilter={userFilter}
                       scope={scope}
                       onSelectConversation={updateSelectedConversations}
+                      onStarStateChange={handleStar}
                       onReadStateChange={handleReadState}
                       commonQueryVariables={commonQueryVariables}
                       conversationsQuery={conversationsQuery}

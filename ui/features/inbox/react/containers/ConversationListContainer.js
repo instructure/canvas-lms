@@ -16,16 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ConversationContext} from '../../util/constants'
-import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
 import {ConversationListHolder} from '../components/ConversationListHolder/ConversationListHolder'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Mask} from '@instructure/ui-overlays'
 import PropTypes from 'prop-types'
 import React, {useContext, useMemo, useState} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
-import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {inboxConversationsWrapper, responsiveQuerySizes} from '../../util/utils'
 import {Responsive} from '@instructure/ui-responsive'
@@ -36,42 +33,13 @@ const ConversationListContainer = ({
   scope,
   onSelectConversation,
   onReadStateChange,
+  onStarStateChange,
   commonQueryVariables,
   conversationsQuery,
   submissionCommentsQuery,
 }) => {
-  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
-
-  const [starChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
-    onCompleted(data) {
-      if (data.updateConversationParticipants.errors) {
-        setOnFailure(I18n.t('There was an unexpected error updating the conversation participants'))
-      } else {
-        const isStarred =
-          data.updateConversationParticipants.conversationParticipants[0].label === 'starred'
-
-        if (isStarred) {
-          setOnSuccess(I18n.t('The conversation has been successfully starred'))
-        } else {
-          setOnSuccess(I18n.t('The conversation has been successfully unstarred'))
-        }
-      }
-    },
-    onError() {
-      setOnFailure(I18n.t('There was an unexpected error updating the conversation participants'))
-    },
-  })
-
-  const handleStar = (starred, conversationId) => {
-    starChangeConversationParticipants({
-      variables: {
-        conversationIds: [conversationId],
-        starred,
-      },
-    })
-  }
 
   const handleMarkAsUnread = conversationId => {
     onReadStateChange('unread', [conversationId])
@@ -210,7 +178,7 @@ const ConversationListContainer = ({
           <ConversationListHolder
             conversations={inboxItemData}
             onSelect={onSelectConversation}
-            onStar={handleStar}
+            onStar={onStarStateChange}
             onMarkAsRead={handleMarkAsRead}
             onMarkAsUnread={handleMarkAsUnread}
             textSize={responsiveProps.textSize}
@@ -238,6 +206,7 @@ ConversationListContainer.propTypes = {
   scope: PropTypes.string,
   onSelectConversation: PropTypes.func,
   onReadStateChange: PropTypes.func,
+  onStarStateChange: PropTypes.func,
   commonQueryVariables: PropTypes.object,
   conversationsQuery: PropTypes.object,
   submissionCommentsQuery: PropTypes.object,
