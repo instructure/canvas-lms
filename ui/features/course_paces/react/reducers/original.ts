@@ -18,7 +18,7 @@
 
 import moment from 'moment-timezone'
 
-import {StoreState, OriginalState, CoursePace} from '../types'
+import {CoursePace, OriginalState, StoreState} from '../types'
 import {BlackoutDate} from '../shared/types'
 import {Constants as CoursePaceConstants} from '../actions/course_paces'
 import {Constants as BlackoutDateConstants} from '../shared/actions/blackout_dates'
@@ -61,7 +61,7 @@ export const getInitialBlackoutDates = (): BlackoutDate[] => {
   })
   return dates
 }
-export const getInitialCoursePace = (): CoursePace => window.ENV.COURSE_PACE
+export const getInitialCoursePace = (): CoursePace => window.ENV.COURSE_PACE as CoursePace
 
 // the current reference values
 export const getOriginalPace = (state: StoreState): CoursePace => state.original.coursePace

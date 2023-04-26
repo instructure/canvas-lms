@@ -51,6 +51,8 @@ class DownloadSubmissionsDialogManager {
 
   showDialog(cb) {
     this.submissionsDownloading(this.assignment.id)
+
+    // @ts-expect-error
     INST.downloadSubmissions(this.downloadUrl, cb)
   }
 }

@@ -212,7 +212,7 @@ export default class DeepLinkingResponse {
     // tools within tools to send content items to the tool,
     // not to Canvas. This assumes that tools are always only
     // "one level deep" in the frame hierarchy.
-    const environment: Environment = window.ENV
+    const environment: Environment = window.ENV as Environment
     const shouldUseParent = environment.deep_linking_use_window_parent
     return window.opener || (shouldUseParent && window.parent) || window.top
   }
@@ -220,7 +220,7 @@ export default class DeepLinkingResponse {
   static mount() {
     const parentWindow = this.targetWindow(window)
     ReactDOM.render(
-      <RetrievingContent environment={window.ENV} parentWindow={parentWindow} />,
+      <RetrievingContent environment={window.ENV as Environment} parentWindow={parentWindow} />,
       document.getElementById('deepLinkingContent')
     )
   }
