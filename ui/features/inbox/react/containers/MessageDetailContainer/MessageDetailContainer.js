@@ -116,7 +116,7 @@ export const MessageDetailContainer = props => {
       (conversationMessagesQuery.data?.legacyNode || submissionCommentsQuery.data?.legacyNode) &&
       props.conversation.workflowState === 'unread'
     ) {
-      props.onReadStateChange('read', props.conversation._id)
+      props.onReadStateChange('read', [props.conversation])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationMessagesQuery.data, submissionCommentsQuery.data])

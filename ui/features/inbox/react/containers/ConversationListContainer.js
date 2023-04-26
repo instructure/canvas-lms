@@ -41,12 +41,12 @@ const ConversationListContainer = ({
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
 
-  const handleMarkAsUnread = conversationId => {
-    onReadStateChange('unread', [conversationId])
+  const handleMarkAsUnread = conversation => {
+    onReadStateChange('unread', [conversation])
   }
 
-  const handleMarkAsRead = conversationId => {
-    onReadStateChange('read', [conversationId])
+  const handleMarkAsRead = conversation => {
+    onReadStateChange('read', [conversation])
   }
 
   const fetchMoreMenuData = () => {
