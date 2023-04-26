@@ -252,6 +252,8 @@ export function updateModuleItemPublishedState(
 
 // published items have a green bar on their leading edge.
 // make that happen for all the matching items
+// the code in PublishButton.prototype.renderState handles it for a single item
+// but doesn't work for items that are in multiple modules during bulk publish
 export function updateModuleItemRowsPublishStates(items: ModuleItem[], isPublished: boolean): void {
   items.forEach(item => {
     const itemId = item.model.attributes.module_item_id

@@ -383,6 +383,11 @@ export default (function (superClass) {
     this.$el.attr('aria-pressed', options.buttonClass === this.publishedClass)
     this.$icon.addClass(options.iconClass)
     this.$text.html('&nbsp;' + htmlEscape(options.text))
+
+    // a riff on the code from initPublishButton
+    const $row = this.$el.closest('.ig-row')
+    $row.toggleClass('ig-published', this.model.get('published'))
+
     // uneditable because the current user does not have the Select Final
     // Grade permission.
     if (this.model.get('disabledForModeration')) {
