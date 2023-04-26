@@ -448,11 +448,26 @@ const CanvasInbox = () => {
     },
   })
 
-  const handleStar = (starred, conversationIds = null) => {
+  const handleStar = (starred, conversations = null) => {
+    const conversationIds =
+      conversations?.map(convo => convo._id) || selectedConversations.map(convo => convo._id)
+    const globalConversationIds =
+      conversations?.map(convo => convo.id) || selectedConversations.map(convo => convo.id)
     starConversationParticipants({
       variables: {
-        conversationIds: conversationIds || selectedConversations.map(convo => convo._id),
+        conversationIds,
         starred,
+      },
+      optimisticResponse: {
+        updateConversationParticipants: {
+          conversationParticipants: globalConversationIds.map(id => ({
+            id,
+            label: starred ? 'starred' : null,
+            __typename: 'ConversationParticipant',
+          })),
+          errors: null,
+          __typename: 'UpdateConversationParticipantsPayload',
+        },
       },
     })
   }
@@ -499,8 +514,11 @@ const CanvasInbox = () => {
     },
   })
 
-  const handleReadState = (markAsRead, conversationIds = null) => {
-    const conversationIdsToChange = conversationIds || selectedConversations.map(convo => convo._id)
+  const handleReadState = (markAsRead, conversations = null) => {
+    const conversationIds =
+      conversations?.map(convo => convo._id) || selectedConversations.map(convo => convo._id)
+    const globalConversationIds =
+      conversations?.map(convo => convo.id) || selectedConversations.map(convo => convo.id)
     if (scope === 'submission_comments') {
       readStateChangeSubmission({
         variables: {
@@ -511,18 +529,26 @@ const CanvasInbox = () => {
     } else {
       readStateChangeConversationParticipants({
         variables: {
-          conversationIds: conversationIdsToChange,
+          conversationIds,
           workflowState: markAsRead,
+        },
+        optimisticResponse: {
+          updateConversationParticipants: {
+            conversationParticipants: globalConversationIds.map(id => ({
+              id,
+              workflowState: markAsRead,
+              __typename: 'ConversationParticipant',
+            })),
+            errors: null,
+            __typename: 'UpdateConversationParticipantsPayload',
+          },
         },
       })
     }
 
     // always change this to whatever was just changed
     if (markAsRead === 'unread') {
-      sessionStorage.setItem(
-        'conversationsManuallyMarkedUnread',
-        JSON.stringify(conversationIdsToChange)
-      )
+      sessionStorage.setItem('conversationsManuallyMarkedUnread', JSON.stringify(conversationIds))
     }
   }
 
