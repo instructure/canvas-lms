@@ -18,6 +18,7 @@
  */
 
 import ready from '@instructure/ready'
+import {EnvPlatformStoragePostMessageForwarding} from '@canvas/global/env/EnvPlatformStorage'
 
 type Message = {
   toolOrigin?: string
@@ -35,6 +36,7 @@ export const handler =
       return false
     }
 
+    // eslint-disable-next-line eqeqeq
     if (e.origin == PARENT_DOMAIN) {
       const targetOrigin = message.toolOrigin
       if (!targetOrigin) {
@@ -54,7 +56,7 @@ export const handler =
   }
 
 ready(() => {
-  const {PARENT_DOMAIN} = window.ENV
+  const {PARENT_DOMAIN} = window.ENV as EnvPlatformStoragePostMessageForwarding
   const windowReferences = {}
   window.addEventListener('message', handler(PARENT_DOMAIN, windowReferences, window.top))
 })

@@ -29,20 +29,24 @@ import {Menu} from '@instructure/ui-menu'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 import BlackoutDatesModal from '../../../shared/components/blackout_dates_modal'
-import {StoreState, CoursePace, ResponsiveSizes} from '../../../types'
-import {Course, BlackoutDate} from '../../../shared/types'
+import {CoursePace, ResponsiveSizes, StoreState} from '../../../types'
+import {BlackoutDate, Course} from '../../../shared/types'
 import {getCourse} from '../../../reducers/course'
-import {getExcludeWeekends, getCoursePace} from '../../../reducers/course_paces'
+import {getCoursePace, getExcludeWeekends} from '../../../reducers/course_paces'
 import {coursePaceActions} from '../../../actions/course_paces'
 import {actions as uiActions} from '../../../actions/ui'
 import {actions as blackoutDateActions} from '../../../shared/actions/blackout_dates'
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
 import {getResponsiveSize, getSyncing} from '../../../reducers/ui'
+import {EnvCoursePaces} from '@canvas/global/env/EnvCoursePaces'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+
+// Allow unchecked access to module-specific ENV variables
+declare const ENV: GlobalEnv & EnvCoursePaces
 
 const I18n = useI18nScope('course_paces_settings')
 
 const {Item: MenuItem} = Menu as any
-
 interface StoreProps {
   readonly blackoutDates: BlackoutDate[]
   readonly course: Course

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,21 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
+export type EnvPlatformStorage = Partial<EnvPlatformStoragePostMessageForwarding>
 
-import ready from '@instructure/ready'
-
-import {AccountCalendarSettings} from './react/components/AccountCalendarSettings'
-import {EnvAccountsAdminTools} from '@canvas/global/env/EnvAccounts'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
-
-// Allow unchecked access to module-specific ENV variables
-declare const ENV: GlobalEnv & EnvAccountsAdminTools
-
-ready(() => {
-  ReactDOM.render(
-    <AccountCalendarSettings accountId={parseInt(ENV.ACCOUNT_ID, 10)} />,
-    document.getElementById('account-calendar-settings-container')
-  )
-})
+/**
+ * From Lti::PlatformStorageController#post_message_forwarding
+ */
+export interface EnvPlatformStoragePostMessageForwarding {
+  PARENT_DOMAIN: string
+}

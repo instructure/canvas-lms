@@ -242,6 +242,8 @@ import {ExportProgressBar} from './components/ExportProgressBar'
 import {ProgressBar} from '@instructure/ui-progress'
 import GradebookExportManager from '../shared/GradebookExportManager'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
+import {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 const I18n = useI18nScope('gradebook')
 
@@ -252,6 +254,8 @@ const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
 export function Portal({node, children}: {node: HTMLElement; children: React.ReactNode}) {
   return ReactDOM.createPortal(children, node)
 }
+// Allow unchecked access to module-specific ENV variables
+declare const ENV: GlobalEnv & EnvGradebookCommon
 
 export type GradebookProps = {
   actionMenuNode: HTMLSpanElement
@@ -757,7 +761,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.assignmentGroups[group.id] = group
       }
 
-      // @ts-ignore
+      // @ts-expect-error
       group.assignments = group.assignments || [] // perhaps unnecessary
       assignmentGroup.assignments.forEach(assignment => {
         assignment.assignment_group = group
