@@ -816,6 +816,29 @@ test('displays failed to duplicate message when assignment failed to duplicate',
   ok(view.$el.text().includes('Something went wrong with making a copy of "Foo"'))
 })
 
+test('does not display cancel button when assignment failed to duplicate is blueprint', () => {
+  const model = buildAssignment({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_duplicate',
+    is_master_course_child_content: true
+  })
+  const view = createView(model)
+  strictEqual(view.$('button.duplicate-failed-cancel.btn').length, 0)
+})
+
+test('displays cancel button when assignment failed to duplicate is not blueprint', () => {
+  const model = buildAssignment({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_duplicate'
+  })
+  const view = createView(model)
+  ok(view.$('button.duplicate-failed-cancel.btn').text().includes('Cancel'))
+})
+
 test('can move when userIsAdmin is true', function () {
   const view = createView(this.model, {
     userIsAdmin: true,

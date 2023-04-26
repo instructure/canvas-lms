@@ -851,12 +851,45 @@ class AssignmentsApiController < ApplicationController
       new_assignment.resource_map = Assignment::DUPLICATED_IN_CONTEXT
     end
 
+    is_blueprint_retry = (target_assignment.migration_id || "").start_with?("mastercourse_") &&
+                         target_assignment.workflow_state == "failed_to_duplicate"
+
     # Specify the updating user to ensure that audit events are created
     # for anonymous or moderated assignments (we need to do it before the
     # insert_at since that could save the record)
     new_assignment.updating_user = @current_user
     new_assignment.insert_at(target_assignment.position + 1)
+    if is_blueprint_retry
+      new_assignment.migration_id = target_assignment.migration_id
+      set_assignment_asset_map(new_assignment) if new_assignment.quiz_lti?
+    end
     new_assignment.save!
+
+    if is_blueprint_retry
+      target_content_tag = ContentTag.unscoped.where(context_id: target_assignment.id, context_type: "Assignment").first
+      new_content_tag =  ContentTag.unscoped.where(context_id: new_assignment.id, context_type: "Assignment").first
+      if target_content_tag
+        target_content_tag.migration_id = nil
+        target_content_tag.save!
+        mc_cctt = MasterCourses::ChildContentTag.unscoped.where(content_type: "ContentTag", content_id: target_content_tag.id).first&.dup
+        if mc_cctt
+          mc_cctt.content_id = new_content_tag.id
+          mc_cctt.save!
+        end
+      end
+      if new_content_tag
+        new_content_tag.migration_id = target_assignment.migration_id
+        new_content_tag.workflow_state = "active"
+        new_content_tag.save!
+      end
+      mc_ccta = MasterCourses::ChildContentTag.unscoped.where(content_type: "Assignment", content_id: target_assignment.id).first&.dup
+      if mc_ccta
+        mc_ccta.content_id = new_assignment.id
+        mc_ccta.save!
+      end
+      target_assignment.migration_id = nil
+      target_assignment.save!
+    end
     positions_in_group = Assignment.active.where(
       assignment_group_id: target_assignment.assignment_group_id
     ).pluck("id", "position")

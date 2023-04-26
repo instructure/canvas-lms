@@ -1997,6 +1997,39 @@ describe AssignmentsApiController, type: :request do
           expect(json["quiz_type"]).to eq("quizzes.next")
         end
       end
+
+      context "when retrying blueprint child" do
+        let!(:failed_blueprint_assignment) do
+          course_copied.assignments.create(
+            title: "failed assignment",
+            workflow_state: "failed_to_duplicate",
+            duplicate_of_id: assignment.id,
+            migration_id: "mastercourse_xxxxxx"
+          )
+        end
+
+        it "creates a new assignment with workflow_state duplicating preserving migration_id" do
+          url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json" \
+                "?target_assignment_id=#{failed_blueprint_assignment.id}&target_course_id=#{course_copied.id}"
+
+          json = api_call_as_user(
+            @teacher,
+            :post,
+            url,
+            {
+              controller: "assignments_api",
+              action: "duplicate",
+              format: "json",
+              course_id: @course.id.to_s,
+              assignment_id: assignment.id.to_s,
+              target_assignment_id: failed_blueprint_assignment.id,
+              target_course_id: course_copied.id
+            }
+          )
+          expect(Assignment.find(json["id"].to_i).migration_id).to eq(failed_blueprint_assignment.migration_id)
+          expect(Assignment.find(failed_blueprint_assignment.id).migration_id).to be_nil
+        end
+      end
     end
   end
 

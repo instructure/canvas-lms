@@ -607,6 +607,29 @@ test('displays failed to duplicate message when assignment failed to duplicate',
   ok(view.$el.text().includes('Something went wrong with making a copy of "Foo"'))
 })
 
+test('does not display cancel button when quiz failed to duplicate is blueprint', () => {
+  const quiz = createQuiz({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_duplicate',
+    migration_id: 'mastercourse_xxxxxxx'
+  })
+  const view = createView(quiz)
+  strictEqual(view.$('button.duplicate-failed-cancel.btn').length, 0)
+})
+
+test('displays cancel button when quiz failed to duplicate is not blueprint', () => {
+  const quiz = createQuiz({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_duplicate'
+  })
+  const view = createView(quiz)
+  ok(view.$('button.duplicate-failed-cancel.btn').text().includes('Cancel'))
+})
+
 QUnit.module('direct share', hooks => {
   hooks.beforeEach(() => {
     $('<div id="direct-share-mount-point">').appendTo('#fixtures')
