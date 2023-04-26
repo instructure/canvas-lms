@@ -1104,6 +1104,10 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def restore(from = nil)
+    unless restorable?
+      errors.add(:deleted_at, I18n.t("Cannot undelete a child topic when the root course topic is also deleted. Please undelete the root course topic instead."))
+      return false
+    end
     if is_section_specific?
       DiscussionTopicSectionVisibility.where(discussion_topic_id: id).to_a.uniq(&:course_section_id).each do |dtsv|
         dtsv.workflow_state = "active"
@@ -1119,6 +1123,12 @@ class DiscussionTopic < ActiveRecord::Base
     end
 
     child_topics.each(&:restore)
+  end
+
+  def restorable?
+    # Not restorable if the root topic context is a course and
+    # root topic is deleted.
+    !(root_topic&.context_type == "Course" && root_topic&.deleted?)
   end
 
   def unlink!(type)

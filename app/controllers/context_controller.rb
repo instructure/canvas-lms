@@ -315,10 +315,10 @@ class ContextController < ApplicationController
           end
         end
 
-      @deleted_items = []
-      @item_types.each do |scope|
-        @deleted_items += scope.where(workflow_state: "deleted").limit(25).to_a
-      end
+      @deleted_items = @item_types.reduce([]) do |acc, scope|
+        acc + scope.where(workflow_state: "deleted").limit(25).to_a
+      end.reject { |item| item.is_a?(DiscussionTopic) && !item.restorable? }
+
       @deleted_items += @context.attachments.where(file_state: "deleted").limit(25).to_a
       if @context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
         @deleted_items += @context.all_group_categories.where.not(deleted_at: nil).limit(25).to_a
@@ -348,6 +348,10 @@ class ContextController < ApplicationController
 
       @item = scope.association(type).reader.find(id)
       @item.restore
+      if @item.errors.any?
+        return render json: @item.errors.full_messages, status: :forbidden
+      end
+
       render json: @item
     end
   end
