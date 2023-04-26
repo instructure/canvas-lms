@@ -262,6 +262,7 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
         onPublish={handlePublish}
         isCanceling={isCanceling}
         isPublishing={isPublishing}
+        skippingItems={shouldSkipModuleItems}
         progressId={progressId}
         progressCurrent={currentProgress}
         title={modalTitle()}

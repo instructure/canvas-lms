@@ -34,6 +34,7 @@ const defaultProps = {
   onCancel: () => {},
   isCanceling: false,
   isPublishing: false,
+  skippingItems: false,
 }
 
 beforeAll(() => {
@@ -60,7 +61,25 @@ describe('ContextModulesPublishModal', () => {
     ).toBeInTheDocument()
     expect(
       getByText(
-        'To discontinue processing, click the Stop button. Note: Items that have already been processed will not be reverted to their previous state when the process is discontinued.'
+        'To discontinue processing, click the Stop button. Note: Modules and items that have already been processed will not be reverted to their previous state when the process is discontinued.'
+      )
+    ).toBeInTheDocument()
+  })
+
+  it('renders warning text for bulk publish modules only', () => {
+    const {getByRole, getByText} = render(
+      <ContextModulesPublishModal {...defaultProps} skippingItems={true} />
+    )
+    const modalTitle = getByRole('heading', {name: 'Test Title'})
+    expect(modalTitle).toBeInTheDocument()
+    expect(
+      getByText(
+        'This process could take a few minutes. You may close the modal or navigate away from the page during this process.'
+      )
+    ).toBeInTheDocument()
+    expect(
+      getByText(
+        'To discontinue processing, click the Stop button. Note: Modules that have already been processed will not be reverted to their previous state when the process is discontinued.'
       )
     ).toBeInTheDocument()
   })
