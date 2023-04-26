@@ -20,7 +20,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import formatMessage from '../format-message'
 import {Spinner} from '@instructure/ui-spinner'
-import htmlEscape from 'escape-html'
 import {getData, setData} from './jqueryish_funcs'
 
 export const previewableMimeTypes = [
@@ -213,6 +212,7 @@ export function loadDocPreview($container, options) {
         }
       }
       showLoadingImage($container, 'centered')
+      // eslint-disable-next-line promise/catch-or-return
       fetch(url)
         .then(response => {
           if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`)
@@ -235,20 +235,15 @@ export function loadDocPreview($container, options) {
     }
   } else {
     // else fall back with a message that the document can't be viewed inline
-    // eslint-disable-next-line no-lonely-if
+    const paragraph = document.createElement('p')
     if (opts.attachment_preview_processing) {
-      $container.innerHTML = `<p>
-          ${htmlEscape(
-            formatMessage(
-              'The document preview is currently being processed. Please try again later.'
-            )
-          )}
-          </p>`
+      paragraph.textContent = formatMessage(
+        'The document preview is currently being processed. Please try again later.'
+      )
     } else {
-      $container.innerHTML = `<p>${htmlEscape(
-        formatMessage('This document cannot be displayed within Canvas.')
-      )}</p>`
+      paragraph.textContent = formatMessage('This document cannot be displayed within Canvas.')
     }
+    $container.empty().append(paragraph)
   }
 }
 
