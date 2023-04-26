@@ -54,6 +54,11 @@ module Types
       object.read_state(current_user)
     end
 
+    field :hide_grade_from_student, Boolean, null: true
+    def hide_grade_from_student
+      object.hide_grade_from_student?
+    end
+
     field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
       argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
     end

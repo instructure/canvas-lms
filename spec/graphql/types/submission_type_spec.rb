@@ -71,6 +71,17 @@ describe Types::SubmissionType do
     end
   end
 
+  describe "hide_grade_from_student" do
+    it "returns true for hide_grade_from_student" do
+      @assignment.mute!
+      expect(submission_type.resolve("hideGradeFromStudent")).to be true
+    end
+
+    it "returns false for hide_grade_from_student" do
+      expect(submission_type.resolve("hideGradeFromStudent")).to be false
+    end
+  end
+
   describe "unread_comment_count" do
     let(:valid_submission_comment_attributes) { { comment: "some comment" } }
 
