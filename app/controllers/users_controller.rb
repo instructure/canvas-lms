@@ -2698,6 +2698,7 @@ class UsersController < ApplicationController
   def pandata_events_token
     settings = DynamicSettings.find("events", service: "pandata")
     dk_ids = Setting.get("pandata_events_token_allowed_developer_key_ids", "").split(",")
+    token_prefixes = Setting.get("pandata_events_token_prefixes", "ios,android").split(",")
 
     unless @access_token
       return render json: { message: "Access token required" }, status: :bad_request
@@ -2707,13 +2708,16 @@ class UsersController < ApplicationController
       return render json: { message: "Developer key not authorized" }, status: :forbidden
     end
 
-    if params[:app_key] == settings["ios-key"]
-      key = settings["ios-key"]
-      sekrit = settings["ios-secret"]
-    elsif params[:app_key] == settings["android-key"]
-      key = settings["android-key"]
-      sekrit = settings["android-secret"]
-    else
+    key = nil
+    sekrit = nil
+    token_prefixes.each do |prefix|
+      next unless params[:app_key] == settings["#{prefix}-key"]
+
+      key = settings["#{prefix}-key"]
+      sekrit = settings["#{prefix}-secret"]
+    end
+
+    unless key
       return render json: { message: "Invalid app key" }, status: :bad_request
     end
 

@@ -3228,6 +3228,16 @@ describe "Users API", type: :request do
       expect(json["message"]).to eq "Invalid app key"
     end
 
+    it "returns bad_request for app keys not in the prefix list" do
+      Setting.set("pandata_events_token_allowed_developer_key_ids", DeveloperKey.default.global_id)
+      Setting.set("pandata_events_token_prefixes", "android")
+      json = api_call(:post, "/api/v1/users/self/pandata_events_token",
+                      { controller: "users", action: "pandata_events_token", format: "json", id: @user.to_param },
+                      { app_key: "IOS_key" })
+      assert_status(400)
+      expect(json["message"]).to eq "Invalid app key"
+    end
+
     it "returns forbidden if the tokens key is not authorized" do
       json = api_call(:post, "/api/v1/users/self/pandata_events_token",
                       { controller: "users", action: "pandata_events_token", format: "json", id: @user.to_param },
