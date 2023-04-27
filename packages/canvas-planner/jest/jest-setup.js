@@ -26,12 +26,7 @@
 const globalError = global.console.error
 const ignoredErrors = [/A theme registry has already been initialized/]
 const globalWarn = global.console.warn
-const ignoredWarnings = [
-  /\[(Popover|DateInput|Select|TimeInput|DateTimeInput)\] is deprecated/,
-  /\[Focusable\] Exactly one focusable child is required/,
-  /\[TextInput\] `(label|required|inline)` is deprecated/,
-  /componentWillReceiveProps has been renamed, and is not recommended for use/,
-]
+const ignoredWarnings = [/\[Focusable\] Exactly one focusable child is required/]
 global.console = {
   log: console.log,
   error: error => {

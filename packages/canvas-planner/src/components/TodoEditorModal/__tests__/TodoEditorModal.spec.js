@@ -19,9 +19,10 @@
 import moment from 'moment-timezone'
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import TodoEditorModal from '../index'
 import {initialize} from '../../../utilities/alertUtils'
+
+jest.useFakeTimers()
 
 const defaultProps = (options = {}) => ({
   savePlannerItem: () => {},
@@ -92,11 +93,11 @@ it('updates the planner item and then closes the editor when Save is clicked ', 
   const date = getByLabelText('Date')
   const details = getByTestId('details')
 
-  userEvent.clear(date)
-  userEvent.type(date, 'May 30,2021')
-  userEvent.clear(title)
-  userEvent.type(title, 'Updated Todo')
+  fireEvent.change(date, {target: {value: 'May 30,2021'}})
+  fireEvent.blur(date)
+  fireEvent.change(title, {target: {value: 'Updated Todo'}})
   fireEvent.change(details, {target: {value: 'These are the todo details'}})
+  jest.runOnlyPendingTimers()
 
   const saveButton = getByTestId('save')
   fireEvent.click(saveButton)
@@ -104,7 +105,7 @@ it('updates the planner item and then closes the editor when Save is clicked ', 
   expect(mockSave).toHaveBeenCalledWith({
     ...todoItem,
     title: 'Updated Todo',
-    date: moment('2021-05-30T06:00:00Z').toISOString(),
+    date: moment('2021-05-30T11:00:00Z').toISOString(),
     details: 'These are the todo details',
   })
 

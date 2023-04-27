@@ -23,7 +23,7 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import PropTypes from 'prop-types'
-import {DateTimeInput} from '@instructure/ui-forms'
+import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -211,10 +211,10 @@ export class UpdateItemTray extends Component {
           </ScreenReaderContent>
         }
         messages={this.state.dateMessages}
-        dateLabel={formatMessage('Date')}
-        dateNextLabel={formatMessage('Next Month')}
-        datePreviousLabel={formatMessage('Previous Month')}
-        timeLabel={formatMessage('Time')}
+        dateRenderLabel={formatMessage('Date')}
+        nextMonthLabel={formatMessage('Next Month')}
+        prevMonthLabel={formatMessage('Previous Month')}
+        timeRenderLabel={formatMessage('Time')}
         timeStep={30}
         locale={this.props.locale}
         timezone={this.props.timeZone}
@@ -222,6 +222,7 @@ export class UpdateItemTray extends Component {
         layout="stacked"
         onChange={this.handleDateChange}
         invalidDateTimeMessage={this.onInvalidDateTimeMessage}
+        allowNonStepInput={true}
       />
     )
   }
