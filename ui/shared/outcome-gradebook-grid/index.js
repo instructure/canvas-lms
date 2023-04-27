@@ -195,7 +195,12 @@ const Grid = {
       }
       const student = Grid.Util.lookupStudent(user)
       const sections = Grid.Util.lookupSection(section_list)
-      const section_name = $.toSentence(_.pluck(sections, 'name').sort())
+      const listFormat = new Intl.ListFormat(ENV.LOCALE || navigator.language)
+      const section_name = listFormat.format(
+        _.pluck(sections, 'name')
+          .filter(x => x)
+          .sort()
+      )
       const courseID = ENV.context_asset_string.split('_')[1]
       const row = {
         student: _.extend(

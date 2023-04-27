@@ -64,7 +64,6 @@ declare global {
     raw: (str: string) => string
     showIf: (boolean) => void
     titleize: (str: string) => string
-    toSentence: (array: string[], options: any) => string
     underscore: (str: string) => string
     youTubeID: (path: string) => string
   }
@@ -85,7 +84,6 @@ declare global {
     datetimeString: any
     ajaxJSONFiles: any
     isPreviewable: any
-    toSentence: any
   }
 
   declare interface Array<T> {
