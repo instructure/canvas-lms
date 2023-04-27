@@ -18,7 +18,6 @@
 
 import formatMessage from '../format-message'
 import {closest, getData, setData} from './jqueryish_funcs'
-import htmlEscape from 'escape-html'
 
 const MEDIA_COMMENT_THUMBNAIL_SIZES = {
   normal: {width: 140, height: 100},
@@ -76,20 +75,20 @@ function createMediaCommentThumbnail(elem, size, keepOriginalText, kalturaSettin
       `${dimensions.width}/height/${dimensions.height}/bgcolor/000000/type/2/vid_sec/5`
 
     const $thumbnail = document.createElement('span')
-    $thumbnail.setAttribute('style', `background-image: url(${htmlEscape(backgroundUrl)});`)
-    $thumbnail.setAttribute(
-      'class',
-      `media_comment_thumbnail media_comment_thumbnail-${htmlEscape(size)}`
-    )
-    $thumbnail.innerHTML = `<span class='media_comment_thumbnail_play_button'>
-      <span class='screenreader-only'>
-        ${htmlEscape(altText)}
-       </span>
-    </span>`
+    $thumbnail.setAttribute('style', `background-image: url(${backgroundUrl});`)
+    $thumbnail.setAttribute('class', `media_comment_thumbnail media_comment_thumbnail-${size}`)
+
+    const span1 = document.createElement('span')
+    span1.classList.add('media_comment_thumbnail_play_button')
+    const span2 = document.createElement('span')
+    span2.classList.add('screenreader-only')
+    span2.textContent = altText
+    span1.appendChild(span2)
+    $thumbnail.appendChild(span1)
 
     const $p = closest($link, 'p')
     if ($p && !$p.getAttribute('title')) {
-      $p.setAttribute('title', htmlEscape(altText))
+      $p.setAttribute('title', altText)
     }
 
     let $a = $link
