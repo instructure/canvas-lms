@@ -5,6 +5,7 @@
     "isolatedModules": true, // required to adhere to babel's single-file transpilation process
     "jsx": "react", // transpiles jsx to React.createElement calls (maybe not needed w/ babel transpilation)
     "lib": ["DOM", "ES2020", "ESNext"], // include types for DOM APIs and standard JS up to ES2020
+    "incremental": true, // enables incremental compilation for faster builds
     "module": "es2020", // support the most modern ES6-style module syntax
     "moduleResolution": "node", // required for non-commonjs imports
     "noEmit": true, // don't generate transpiled JS files, source-maps, or .d.ts files for Canvas source code
