@@ -106,6 +106,8 @@ class Assignment < ActiveRecord::Base
   serialize :lti_resource_link_custom_params, JSON
   attribute :lti_resource_link_lookup_uuid, :string, default: nil
   attribute :lti_resource_link_url, :string, default: nil
+  attribute :line_item_resource_id, :string, default: nil
+  attribute :line_item_tag, :string, default: nil
 
   has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
   has_many :all_submissions, class_name: "Submission", dependent: :delete_all
@@ -1201,12 +1203,12 @@ class Assignment < ActiveRecord::Base
           url: lti_resource_link_url
         )
 
-        li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true)
+        li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true, resource_id: line_item_resource_id, tag: line_item_tag)
         create_results_from_prior_grades(li)
       elsif saved_change_to_title? || saved_change_to_points_possible?
         line_items
           .find(&:assignment_line_item?)
-          &.update!(label: title, score_maximum: points_possible || 0)
+          &.update!(label: title, score_maximum: points_possible || 0, resource_id: line_item_resource_id, tag: line_item_tag)
       end
 
       if lti_1_3_external_tool_tag?(lti_1_3_tool) && !lti_resource_links.empty?

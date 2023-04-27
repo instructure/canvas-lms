@@ -103,7 +103,7 @@ export const externalContentReadyHandler = (event: MessageEvent, tool: LtiLaunch
   }
 }
 
-const setCreateNewTab = (newTab: boolean) => {
+function setCreateNewTab(newTab: boolean) {
   const create_new_tab = document.querySelector('#external_tool_create_new_tab')
   if (create_new_tab && create_new_tab instanceof HTMLInputElement) {
     create_new_tab.checked = newTab
@@ -190,7 +190,7 @@ export const ltiPostMessageHandler = (tool: LtiLaunchDefinition) => (event: Mess
   }
 }
 
-export const closeAll = function () {
+export function closeAll() {
   const $selectContextContentDialog = $('#select_context_content_dialog')
   const $resourceSelectionDialog = $('#resource_selection_dialog')
 
@@ -201,7 +201,7 @@ export const closeAll = function () {
   $selectContextContentDialog.dialog('close')
 }
 
-export const dialogCancelHandler = function (
+export function dialogCancelHandler(
   // eslint-disable-next-line no-undef
   event: JQuery.TriggeredEvent<HTMLElement, any, any, any>
 ) {
@@ -214,7 +214,7 @@ export const dialogCancelHandler = function (
   }
 }
 
-export const beforeUnloadHandler = function (
+export function beforeUnloadHandler(
   // eslint-disable-next-line no-undef
   e: JQuery.TriggeredEvent<Window & typeof globalThis, any, any, any>
 ) {
@@ -228,8 +228,13 @@ const setValueIfDefined = (id: string, value: string | number | undefined): void
     $(id).val(value)
   }
 }
+const setJsonValueIfDefined = (id: string, value: unknown): void => {
+  if (typeof value !== 'undefined') {
+    $(id).val(JSON.stringify(value))
+  }
+}
 
-export const handleContentItemResult = function (
+export function handleContentItemResult(
   result: ResourceLinkContentItem,
   tool: LtiLaunchDefinition
 ) {
@@ -242,20 +247,18 @@ export const handleContentItemResult = function (
   $('#external_tool_create_custom_params').val(JSON.stringify(result.custom))
   setValueIfDefined('#external_tool_create_iframe_width', result.iframe?.width)
   setValueIfDefined('#external_tool_create_iframe_height', result.iframe?.height)
+  setValueIfDefined('#external_tool_create_assignment_id', result.assignment_id)
+  setJsonValueIfDefined('#external_tool_create_line_item', result.lineItem)
+  setJsonValueIfDefined('#external_tool_create_submission', result.submission)
+  setJsonValueIfDefined('#external_tool_create_available', result.available)
+  if ('text' in result && typeof result.text === 'string') {
+    $('#external_tool_create_description').val(result.text)
+  }
   if (result.window && result.window.targetName === '_blank') {
     setCreateNewTab(true)
   }
 
   $('#context_external_tools_select .domain_message').hide()
-
-  // content item with an assignment_id means that an assignment was already
-  // created on the backend, so close this dialog without giving the user
-  // any chance to make changes that would be discarded
-  if (result.assignment_id) {
-    $('#external_tool_create_assignment_id').val(result.assignment_id)
-    $('#select_context_content_dialog .add_item_button').click()
-    closeAll()
-  }
 }
 
 export const Events = {
@@ -460,7 +463,7 @@ export const Events = {
   },
 }
 
-export const extractContextExternalToolItemData = function () {
+export function extractContextExternalToolItemData() {
   const tool: LtiLaunchDefinition = $('#context_external_tools_select .tools .tool.selected').data(
     'tool'
   )
@@ -474,7 +477,6 @@ export const extractContextExternalToolItemData = function () {
 
     tool_id = tool.definition_id
   }
-
   return {
     'item[type]': tool_type,
     'item[id]': tool_id,
@@ -483,16 +485,24 @@ export const extractContextExternalToolItemData = function () {
     'item[url]': $('#external_tool_create_url').val(),
     'item[title]': $('#external_tool_create_title').val(),
     'item[custom_params]': $('#external_tool_create_custom_params').val(),
+    'item[line_item]': $('#external_tool_create_line_item').val(),
     'item[assignment_id]': $('#external_tool_create_assignment_id').val(),
     'item[iframe][width]': $('#external_tool_create_iframe_width').val(),
     'item[iframe][height]': $('#external_tool_create_iframe_height').val(),
-  }
+    'item[description]': $('#external_tool_create_description').val(),
+    'item[submission]': $('#external_tool_create_submission').val(),
+    'item[available]': $('#external_tool_create_available').val(),
+  } as const
 }
 
-export const resetExternalToolFields = function () {
+export function resetExternalToolFields() {
   $('#external_tool_create_url').val('')
   $('#external_tool_create_title').val('')
   $('#external_tool_create_custom_params').val('')
+  $('#external_tool_create_line_item').val('')
+  $('#external_tool_create_description').val('')
+  $('#external_tool_create_submission').val('')
+  $('#external_tool_create_available').val('')
   $('#external_tool_create_assignment_id').val('')
   $('#external_tool_create_iframe_width').val('')
   $('#external_tool_create_iframe_height').val('')
@@ -642,11 +652,6 @@ $(document).ready(function () {
       }
     } else if (item_type === 'context_external_tool') {
       item_data = extractContextExternalToolItemData()
-      if (item_data['item[assignment_id]']) {
-        // don't keep fields populated after an assignment was created
-        // since assignment creation via deep link requires another tool launch
-        resetExternalToolFields()
-      }
 
       $dialog.find('.alert-error').remove()
 
@@ -842,6 +847,7 @@ $(document).ready(function () {
 
     $('#select_context_content_dialog .module_item_option').hide()
     if ($(this).val() === 'attachment') {
+      // eslint-disable-next-line react/no-render-return-value
       fileSelectBox = ReactDOM.render(
         React.createFactory(FileSelectBox)({
           contextString: ENV.context_asset_string,

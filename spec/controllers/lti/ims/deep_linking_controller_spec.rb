@@ -824,10 +824,6 @@ module Lti
               end
             end
 
-            it "creates an assignment from lineItem data" do
-              expect { subject }.to change { course.assignments.count }.by 1
-            end
-
             it "leaves assignment unpublished" do
               subject
               expect(course.assignments.last.workflow_state).to eq("unpublished")
@@ -975,13 +971,8 @@ module Lti
                 expect { subject }.not_to change { course.context_modules.count }
               end
 
-              it "only uses the first content item for a new assignment" do
-                expect { subject }.to change { course.assignments.count }.by 1
-              end
-
-              it "leaves assignment unpublished" do
-                subject
-                expect(course.assignments.last.workflow_state).to eq("unpublished")
+              it "does not create an assignment" do
+                expect { subject }.not_to change { course.assignments.count }
               end
             end
 

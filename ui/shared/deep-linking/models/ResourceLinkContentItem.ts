@@ -29,6 +29,14 @@ export type ResourceLinkContentItem = {
   lineItem?: unknown
   text?: string
   assignment_id?: string
+  available?: {
+    startDateTime?: string
+    endDateTime?: string
+  }
+  submission?: {
+    startDateTime?: string
+    endDateTime?: string
+  }
 }
 
 const ltiEndpointParams = (lookupUuid?: string | null | undefined) => {
