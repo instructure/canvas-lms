@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// main entry for frontend code
+
 import './boot/initializers/setWebpackCdnHost'
 import '@canvas/jquery/jquery.instructure_jquery_patches' // this needs to be before anything else that requires jQuery
 import './boot'
@@ -48,6 +50,8 @@ window.dispatchEvent(new CustomEvent('canvasReadyStateChange'))
 up({
   up: () => {
     advanceReadiness('capabilities')
+    // list of all bundles the current page needs
+    //   populated by app/helpers/application_helper.rb
     if (!window.bundles) window.bundles = []
     window.bundles.push = loadBundle
     window.bundles.forEach(loadBundle)
@@ -167,6 +171,8 @@ if (ENV.INCOMPLETE_REGISTRATION) {
   isolate(() => import('./boot/initializers/warnOnIncompleteRegistration'))()
 }
 
+// TODO: remove the need for this
+// it is only used in submissions
 if (ENV.badge_counts) {
   isolate(() => import('./boot/initializers/showBadgeCounts'))()
 }

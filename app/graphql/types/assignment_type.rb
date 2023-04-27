@@ -113,9 +113,11 @@ module Types
     field :points_possible, Float, "the assignment is out of this many points",
           null: true
 
-    field :restrict_quantitative_data, Boolean, "Is the current user restricted from viewing quantitative data", null: true
-    def restrict_quantitative_data
-      assignment.restrict_quantitative_data?(current_user)
+    field :restrict_quantitative_data, Boolean, "Is the current user restricted from viewing quantitative data", null: true do
+      argument :check_extra_permissions, Boolean, "Check extra permissions in RQD method", required: false
+    end
+    def restrict_quantitative_data(check_extra_permissions: false)
+      assignment.restrict_quantitative_data?(current_user, check_extra_permissions)
     end
 
     def self.overridden_field(field_name, description)

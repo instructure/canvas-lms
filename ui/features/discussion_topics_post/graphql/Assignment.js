@@ -33,7 +33,7 @@ export const Assignment = {
       unlockAt(applyOverrides: false)
       onlyVisibleToOverrides
       pointsPossible
-      restrictQuantitativeData
+      restrictQuantitativeData(checkExtraPermissions: true)
       assignmentOverrides {
         nodes {
           ...AssignmentOverride

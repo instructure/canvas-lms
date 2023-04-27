@@ -25,9 +25,9 @@ require "crocodoc"
 class Attachment < ActiveRecord::Base
   class UniqueRenameFailure < StandardError; end
 
-  self.ignored_columns = %i[last_lock_at last_unlock_at enrollment_id cached_s3_url s3_url_cached_at
-                            scribd_account_id scribd_user scribd_mime_type_id submitted_to_scribd_at scribd_doc scribd_attempts
-                            cached_scribd_thumbnail last_inline_view local_filename]
+  self.ignored_columns += %i[last_lock_at last_unlock_at enrollment_id cached_s3_url s3_url_cached_at
+                             scribd_account_id scribd_user scribd_mime_type_id submitted_to_scribd_at scribd_doc scribd_attempts
+                             cached_scribd_thumbnail last_inline_view local_filename]
 
   def self.display_name_order_by_clause(table = nil)
     col = table ? "#{table}.display_name" : "display_name"
@@ -80,6 +80,7 @@ class Attachment < ActiveRecord::Base
   has_one :account_report, inverse_of: :attachment
   has_one :group_and_membership_importer, inverse_of: :attachment
   has_one :media_object
+  belongs_to :media_object_by_media_id, class_name: "MediaObject", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :attachments_by_media_id
   has_many :media_tracks
   has_many :submission_draft_attachments, inverse_of: :attachment
   has_many :submissions, -> { active }
@@ -100,6 +101,7 @@ class Attachment < ActiveRecord::Base
 
   before_save :set_root_account_id
   before_save :infer_display_name
+  before_save :truncate_display_name
   before_save :default_values
   before_save :set_need_notify
 
@@ -308,6 +310,11 @@ class Attachment < ActiveRecord::Base
     rescue IOError => e
       logger.error("Error inferring encoding for attachment #{global_id}: #{e.message}")
     end
+  end
+
+  def media_tracks_include_originals
+    media_object_scope = MediaObject.where(media_id: media_entry_id).select("media_objects.id")
+    media_tracks.union(MediaTrack.where(media_object: media_object_scope).where.not(locale: media_tracks.select(:locale)))
   end
 
   # this is here becase attachment_fu looks to make sure that parent_id is nil before it will create a thumbnail of something.
@@ -1194,6 +1201,13 @@ class Attachment < ActiveRecord::Base
   end
   protected :infer_display_name
 
+  def truncate_display_name
+    if display_name_changed? && display_name.length > 1000
+      self.display_name = Attachment.truncate_filename(display_name, 1000)
+    end
+  end
+  protected :truncate_display_name
+
   def readable_size
     ActiveSupport::NumberHelper.number_to_human_size(size) rescue "size unknown"
   end
@@ -1660,7 +1674,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.file_removed_path
-    Rails.root.join("public/file_removed/file_removed.pdf")
+    Rails.public_path.join("file_removed/file_removed.pdf")
   end
 
   # find the file_removed file on instfs (or upload it)

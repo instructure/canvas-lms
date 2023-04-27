@@ -117,7 +117,7 @@ describe Mutations::UpdateConversationParticipants do
         expect(result["errors"]).to be_nil
         expect(result.dig("data", "updateConversationParticipants", "errors")).to be_nil
         updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
-        expect(updated_attrs.map { |i| i["label"] }).to match_array %w[starred starred]
+        expect(updated_attrs.pluck("label")).to match_array %w[starred starred]
 
         participant1 = participant1.reload
         expect(participant1.starred).to be_truthy
@@ -140,7 +140,7 @@ describe Mutations::UpdateConversationParticipants do
         expect(result["errors"]).to be_nil
         expect(result.dig("data", "updateConversationParticipants", "errors")).to be_nil
         updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
-        expect(updated_attrs.map { |i| i["label"] }).to match_array [nil, nil]
+        expect(updated_attrs.pluck("label")).to match_array [nil, nil]
 
         participant1 = participant1.reload
         expect(participant1.starred).to be_falsey
@@ -166,7 +166,7 @@ describe Mutations::UpdateConversationParticipants do
         expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.unarchived.react")
 
         updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
-        expect(updated_attrs.map { |i| i["workflowState"] }).to match_array %w[unread unread]
+        expect(updated_attrs.pluck("workflowState")).to match_array %w[unread unread]
       end
 
       it "archives each conversation" do
@@ -185,7 +185,7 @@ describe Mutations::UpdateConversationParticipants do
         expect(InstStatsd::Statsd).not_to have_received(:count).with("inbox.conversation.archived.legacy", 2)
 
         updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
-        expect(updated_attrs.map { |i| i["workflowState"] }).to match_array %w[archived archived]
+        expect(updated_attrs.pluck("workflowState")).to match_array %w[archived archived]
       end
 
       it "unarchives each conversation by marking as read" do
@@ -205,7 +205,7 @@ describe Mutations::UpdateConversationParticipants do
         expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.unarchived.legacy")
 
         updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
-        expect(updated_attrs.map { |i| i["workflowState"] }).to match_array %w[read read]
+        expect(updated_attrs.pluck("workflowState")).to match_array %w[read read]
       end
 
       it "unarchives each conversation by marking as unread" do
@@ -225,7 +225,7 @@ describe Mutations::UpdateConversationParticipants do
         expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.unarchived.legacy")
 
         updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
-        expect(updated_attrs.map { |i| i["workflowState"] }).to match_array %w[unread unread]
+        expect(updated_attrs.pluck("workflowState")).to match_array %w[unread unread]
       end
     end
 

@@ -44,7 +44,7 @@ module AttachmentFu # :nodoc:
 
       # Used as the base path that #public_filename strips off full_filename to create the public path
       def base_path
-        @base_path ||= Rails.root.join("public").to_s
+        @base_path ||= Rails.public_path.to_s
       end
 
       # The attachment ID used in the full path of a file

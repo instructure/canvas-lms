@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import type JQuery from 'jquery'
 import {deferPromise} from 'defer-promise'
-import _ from 'underscore'
+import _ from '@instructure/lodash-underscore'
 import {intersection, isEqual, map, pick} from 'lodash'
 import tz from '@canvas/timezone'
 import React, {Suspense} from 'react'
@@ -107,7 +107,6 @@ import type {ProxyDetails} from '@canvas/proxy-submission/react/ProxyUploadModal
 import type TotalGradeColumnHeader from './GradebookGrid/headers/TotalGradeColumnHeader'
 import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
-// @ts-expect-error
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 // @ts-expect-error
 import KeyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
@@ -124,7 +123,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import GradeDisplayWarningDialog from '../../jquery/GradeDisplayWarningDialog'
 import PostGradesFrameDialog from '../../jquery/PostGradesFrameDialog'
 import NumberCompare from '../../util/NumberCompare'
-import {camelize} from 'convert-case'
+import {camelizeProperties} from '@canvas/convert-case'
 import htmlEscape from 'html-escape'
 import * as EnterGradesAsSetting from '../shared/EnterGradesAsSetting'
 import SetDefaultGradeDialogManager from '../shared/SetDefaultGradeDialogManager'
@@ -325,7 +324,7 @@ type GradebookState = {
 }
 
 class Gradebook extends React.Component<GradebookProps, GradebookState> {
-  kbDialog: KeyboardNavDialog
+  kbDialog: any
 
   anonymousSpeedGraderAlert?: any
 
@@ -3455,7 +3454,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const isGroupWeightZero =
       this.assignmentGroups[assignment.assignment_group_id].group_weight === 0
     return {
-      assignment: camelize(assignment),
+      assignment: camelizeProperties(assignment),
       colors: this.state.gridColors,
       courseId: this.options.context_id,
       currentUserId: this.props.currentUserId,
@@ -3505,7 +3504,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         gradesUrl: `${student.enrollments[0].grades.html_url}#tab-assignments`,
         isConcluded: Boolean(student.isConcluded),
       },
-      submission: camelize(submission),
+      submission: camelizeProperties(submission),
       submissionUpdating: this.submissionIsUpdating({
         assignmentId,
         userId: studentId,

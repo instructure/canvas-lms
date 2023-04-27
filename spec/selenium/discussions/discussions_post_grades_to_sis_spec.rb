@@ -103,7 +103,7 @@ describe "sync grades to sis" do
                                         title: "Sync to SIS discussion",
                                         message: "Discussion topic message",
                                         assignment: @assignment)
-      due_at = Time.zone.now + 3.days
+      due_at = 3.days.from_now
       post_grades_dialog
       expect(f("#assignment-errors").text).to include("1 Assignment with Errors")
       f(".assignment-due-at").send_keys(format_date_for_view(due_at))

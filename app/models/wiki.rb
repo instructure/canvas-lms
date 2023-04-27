@@ -181,7 +181,7 @@ class Wiki < ActiveRecord::Base
         # otherwise we lose dirty changes
         context.save! if context.changed?
         context.lock!
-        return context.wiki if context.wiki_id
+        next context.wiki if context.wiki_id
 
         # TODO: i18n
         t :default_course_wiki_name, "%{course_name} Wiki", course_name: nil

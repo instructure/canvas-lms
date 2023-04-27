@@ -127,7 +127,7 @@ export default class TopicView extends Backbone.View {
   }
 
   toggleLocked(event) {
-    // this is weird but Topic.coffee was not set up to talk to the API for CRUD
+    // this is weird but Topic.js was not set up to talk to the API for CRUD
     const locked = $(event.currentTarget).data('mark-locked')
     return this.topic.save({locked}).done(() => window.location.reload())
   }

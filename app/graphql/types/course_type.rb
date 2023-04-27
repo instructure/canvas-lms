@@ -211,6 +211,11 @@ module Types
       GradingPeriod.for(course).order(:start_date)
     end
 
+    field :grading_standard, GradingStandardType, null: true
+    def grading_standard
+      object.grading_standard_or_default
+    end
+
     field :submissions_connection, SubmissionType.connection_type, null: true do
       description "all the submissions for assignments in this course"
 

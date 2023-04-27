@@ -42,7 +42,7 @@ describe LtiApiController, type: :request do
   def check_error_response(message, check_generated_sig = true, with_report: true)
     expect(response.body.strip).to_not be_empty, "Should not have an empty response body"
 
-    json = JSON.parse response.body
+    json = response.parsed_body
     expect(json["errors"][0]["message"]).to eq message
 
     if with_report
@@ -64,7 +64,7 @@ describe LtiApiController, type: :request do
   end
 
   def error_data(json = nil)
-    json ||= JSON.parse response.body
+    json ||= response.parsed_body
     error_report = ErrorReport.find json["error_report_id"]
     error_report.data
   end

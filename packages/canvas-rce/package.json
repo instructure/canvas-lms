@@ -72,7 +72,7 @@
     "@instructure/canvas-theme": "7",
     "@instructure/debounce": "^7",
     "@instructure/k5uploader": "*",
-    "@instructure/media-capture": "~8.0.1-rc.11",
+    "@instructure/media-capture": "~8.4.1-rc.16",
     "@instructure/ui-a11y-content": "^7",
     "@instructure/ui-a11y-utils": "^7",
     "@instructure/ui-alerts": "^7",

@@ -28,7 +28,7 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-con
 
 import {IconBlueprintLockSolid, IconBlueprintSolid} from '@instructure/ui-icons'
 
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 const I18n = useI18nScope('blueprint_coursesLockToggle')
 

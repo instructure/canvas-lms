@@ -21,8 +21,6 @@ class DisableNoTlsForLdap < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   class AuthenticationProvider < ActiveRecord::Base
-    self.table_name = "account_authorization_configs"
-
     def auth_over_tls
       ::AuthenticationProvider::LDAP.auth_over_tls_setting(read_attribute(:auth_over_tls))
     end

@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape from 'escape-html'
 import formatMessage from '../../../format-message'
 import clickCallback from './clickCallback'
 import {IconEquationLine} from '@instructure/ui-icons/es/svg'
@@ -42,12 +41,10 @@ tinymce.PluginManager.add('instructure_equation', function (ed) {
   })
 
   ed.ui.registry.addToggleButton('instructure_equation', {
-    tooltip: htmlEscape(
-      formatMessage({
-        default: 'Insert Math Equation',
-        description: 'Title for RCE button to insert a math equation',
-      })
-    ),
+    tooltip: formatMessage({
+      default: 'Insert Math Equation',
+      description: 'Title for RCE button to insert a math equation',
+    }),
     onAction: () => ed.execCommand('instructureEquation'),
     icon: 'equation',
     onSetup(buttonApi) {

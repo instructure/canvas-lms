@@ -339,7 +339,7 @@ describe "quizzes" do
 
       quiz_original_end_time = Quizzes::QuizSubmission.last.end_at
       submission = Quizzes::QuizSubmission.last
-      submission.end_at = Time.zone.now + 20.minutes
+      submission.end_at = 20.minutes.from_now
       submission.save!
       expect(quiz_original_end_time).to be < Quizzes::QuizSubmission.last.end_at
 

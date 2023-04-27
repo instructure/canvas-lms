@@ -73,7 +73,7 @@ describe PageView::CSVReport do
       csv = PageView::CSVReport.new(@user).generate
       rows = CSV.parse(csv, headers: true)
       expect(rows.length).to eq 2
-      expect(rows.map { |x| x["request_id"] }.sort).to eq [pv1.id, pv2.id].sort
+      expect(rows.pluck("request_id").sort).to eq [pv1.id, pv2.id].sort
     end
   end
 end

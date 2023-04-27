@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash-underscore'
+import _ from '@instructure/lodash-underscore'
 import {camelize} from './convert_case'
 
 const pick = _.pick

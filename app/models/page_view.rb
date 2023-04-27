@@ -292,7 +292,9 @@ class PageView < ActiveRecord::Base
 
   def self.pv4_client
     ConfigFile.cache_object("pv4") do |config|
-      Pv4Client.new(config["uri"], config["access_token"])
+      creds = Rails.application.credentials.pv4_creds
+
+      Pv4Client.new(config["uri"], creds&.dig(Rails.env.to_sym, :access_token))
     end
   end
 

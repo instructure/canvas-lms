@@ -94,7 +94,7 @@ module Importers
         migration.check_cross_institution
         logger.debug "migration is cross-institution; external references will not be used" if migration.cross_institution?
 
-        (data["web_link_categories"] || []).map { |c| c["links"] }.flatten.each do |link|
+        (data["web_link_categories"] || []).pluck("links").flatten.each do |link|
           course.external_url_hash[link["link_id"]] = link
         end
         ActiveRecord::Base.skip_touch_context

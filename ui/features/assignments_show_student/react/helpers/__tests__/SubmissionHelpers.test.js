@@ -26,19 +26,19 @@ describe('totalAllowedAttempts', () => {
 
   it('returns the allowed attempts on the assignment if no submission is provided', () => {
     const assignment = {allowedAttempts: 7}
-    expect(totalAllowedAttempts({assignment})).toBe(7)
+    expect(totalAllowedAttempts(assignment)).toBe(7)
   })
 
   it('returns the allowed attempts on the assignment if extraAttempts on submission is null', () => {
     const assignment = {allowedAttempts: 7}
     const submission = {extraAttempts: null}
-    expect(totalAllowedAttempts({assignment, submission})).toBe(7)
+    expect(totalAllowedAttempts(assignment, submission)).toBe(7)
   })
 
   it('returns the sum of allowedAttempts and extraAttempts if both are present and non-null', () => {
     const assignment = {allowedAttempts: 7}
     const submission = {extraAttempts: 5}
-    expect(totalAllowedAttempts({assignment, submission})).toBe(12)
+    expect(totalAllowedAttempts(assignment, submission)).toBe(12)
   })
 })
 

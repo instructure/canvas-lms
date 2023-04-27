@@ -63,7 +63,7 @@ module TatlTael
 
         return false unless lines
 
-        if first_line_exception?(lines.first)
+        while first_line_exception?(lines.first)
           lines.shift
         end
 

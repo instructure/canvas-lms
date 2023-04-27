@@ -102,7 +102,7 @@ export function externalToolsEnvFor(
   editor: ExternalToolsEditor | null | undefined
 ): ExternalToolsEnv {
   const props: () => RCEWrapperProps | undefined = () =>
-    (RCEWrapper.getByEditor(editor)?.props as RCEWrapperProps) ?? undefined
+    (RCEWrapper.getByEditor(editor as Editor)?.props as RCEWrapperProps) ?? undefined
   let cachedCanvasToolId: string | null | undefined
 
   function nonNullishArray<T>(
@@ -115,7 +115,7 @@ export function externalToolsEnvFor(
     editor: editor ?? null,
 
     get rceWrapper() {
-      return RCEWrapper.getByEditor(editor) ?? null
+      return RCEWrapper.getByEditor(editor as Editor) ?? null
     },
 
     get availableRceLtiTools(): RceLtiToolInfo[] {

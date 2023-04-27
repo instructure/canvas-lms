@@ -44,7 +44,7 @@ describe "Account Notification API", type: :request do
       second_announcement
       json = api_call(:get, @path, @api_params)
       expect(json.length).to eq 2
-      expect(json.map { |r| r["message"] }).to match_array(%w[default second])
+      expect(json.pluck("message")).to match_array(%w[default second])
     end
 
     it "still works on the old endpoint" do
@@ -55,7 +55,7 @@ describe "Account Notification API", type: :request do
                         user_id: @admin.id.to_s,
                         account_id: @admin.account.id.to_s
                       })
-      expect(json.map { |r| r["message"] }).to eq %w[default]
+      expect(json.pluck("message")).to eq %w[default]
     end
 
     it "catches a user_id mismatch on the old endpoint" do
@@ -307,7 +307,7 @@ describe "Account Notification API", type: :request do
                       account_id: @admin.account.id.to_s,
                       id: @notification.id.to_s }
       @start_at = Time.zone.now
-      @end_at = Time.zone.now + 1.day
+      @end_at = 1.day.from_now
     end
 
     it "returns not authorized for non admin user" do

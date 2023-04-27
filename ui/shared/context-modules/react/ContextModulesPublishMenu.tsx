@@ -48,7 +48,7 @@ const I18n = useI18nScope('context_modules_publish_menu')
 
 interface Props {
   readonly courseId: string | number
-  readonly runningProgressId: string | null
+  readonly runningProgressId: string | number | null
   readonly disabled: boolean
 }
 
@@ -56,19 +56,35 @@ interface Props {
 const {Item: MenuItem} = Menu as any
 
 const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId, disabled}) => {
-  const [isPublishing, setIsPublishing] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(!!runningProgressId)
   const [isCanceling, setIsCanceling] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [shouldPublishModules, setShouldPublishModules] = useState<boolean | undefined>(undefined)
   const [shouldSkipModuleItems, setShouldSkipModuleItems] = useState(false)
   const [progressId, setProgressId] = useState(runningProgressId)
   const [currentProgress, setCurrentProgress] = useState<ProgressResult | undefined>(undefined)
+  const [modelsReady, setModelsReady] = useState<boolean>(false)
 
   const updateCurrentProgress_cb = useCallback(updateCurrentProgress, [shouldPublishModules])
 
   useEffect(() => {
+    window.addEventListener('module-publish-models-ready', () => {
+      setModelsReady(true)
+    })
+  }, [])
+
+  // if the module page is loaded while a publish is in progress,
+  // initialize the UI accordingly
+  useEffect(() => {
+    if (modelsReady && isPublishing) {
+      updateModulePendingPublishedStates(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modelsReady])
+
+  useEffect(() => {
     if (progressId) {
-      monitorProgress(progressId, updateCurrentProgress_cb)
+      monitorProgress(progressId, updateCurrentProgress_cb, onProgressFail)
     }
   }, [progressId, updateCurrentProgress_cb])
 
@@ -80,36 +96,95 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
     }
   }
 
+  const reset = () => {
+    disableContextModulesPublishMenu(false)
+    setIsPublishing(false)
+    setProgressId(null)
+    setCurrentProgress(undefined)
+    setIsModalOpen(false)
+  }
+
+  const refreshPublishStates = () => {
+    return fetchAllItemPublishedStates(courseId)
+      .then(() => {
+        showFlashAlert({
+          message: I18n.t('Modules updated'),
+          type: 'success',
+          err: null,
+        })
+      })
+      .catch(error =>
+        showFlashAlert({
+          message: I18n.t(
+            'There was an error updating module and items publish status. Try refreshing the page.'
+          ),
+          type: 'error',
+          err: error,
+        })
+      )
+      .finally(() => reset())
+  }
+
+  const onPublishComplete = () => {
+    // eslint-disable-next-line promise/catch-or-return
+    refreshPublishStates().then(() => reset())
+  }
+
   function updateCurrentProgress(progress) {
     if (progress.workflow_state === 'completed') {
       onPublishComplete()
     } else if (progress.workflow_state === 'failed') {
       showFlashAlert({
-        message: I18n.t('Your publishing job has failed.'),
+        message: I18n.t('Your publishing job did not complete.'),
         err: undefined,
         type: 'error',
       })
-      onPublishComplete()
+      refreshPublishStates()
     } else {
       setCurrentProgress(progress)
+      if (progress.workflow_state === 'running' && progress.completion > 0) {
+        showFlashAlert({
+          message: I18n.t('Publishing progress is %{progress} percent complete', {
+            progress: Math.round(progress.completion),
+          }),
+          type: 'info',
+          err: undefined,
+          srOnly: true,
+        })
+      }
     }
+  }
+
+  function onProgressFail(error) {
+    showFlashAlert({
+      message: I18n.t(
+        "Something went wrong monitoring the work's progress. Try refreshing the page."
+      ),
+      err: error,
+      type: 'error',
+    })
+  }
+
+  const onPublishFail = error => {
+    reset()
+    updateModulePendingPublishedStates(false)
+    showFlashAlert({
+      message: I18n.t('There was an error while saving your changes'),
+      err: error,
+      type: 'error',
+    })
   }
 
   const onCancelComplete = (error = undefined) => {
     setIsCanceling(false)
     setIsPublishing(false)
     if (error) {
-      showFlashAlert({
-        message: I18n.t('There was an error while saving your changes'),
-        err: error,
-        type: 'error',
-      })
-    } else {
-      window.location.reload()
+      onPublishFail(error)
     }
   }
 
   const handleCancel = () => {
+    setIsModalOpen(false)
     cancelBatchUpdate(currentProgress, onCancelComplete)
     setIsCanceling(true)
     setCurrentProgress(undefined)
@@ -118,30 +193,15 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
   function handlePublish() {
     if (isPublishing) return
     setIsPublishing(true)
-    updateModulePendingPublishedStates(undefined, true)
-    // the error is handled w/in the call
-    // eslint-disable-next-line promise/catch-or-return
-    batchUpdateAllModulesApiCall(courseId, shouldPublishModules, shouldSkipModuleItems).then(
-      result => {
+    updateModulePendingPublishedStates(true)
+    batchUpdateAllModulesApiCall(courseId, shouldPublishModules, shouldSkipModuleItems)
+      .then(result => {
         setProgressId(result.json.progress.progress.id)
         setCurrentProgress(result.json.progress.progress)
-      }
-    )
-  }
-
-  const onPublishComplete = () => {
-    fetchAllItemPublishedStates(courseId)
-    disableContextModulesPublishMenu(false)
-    updateModulePendingPublishedStates(shouldPublishModules, false)
-    setIsPublishing(false)
-    setProgressId(null)
-    setCurrentProgress(undefined)
-    setIsModalOpen(false)
-    showFlashAlert({
-      message: I18n.t('Modules updated'),
-      type: 'success',
-      err: null,
-    })
+      })
+      .catch(error => {
+        onPublishFail(error)
+      })
   }
 
   const unpublishAll = () => {
@@ -203,6 +263,7 @@ const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId
         onPublish={handlePublish}
         isCanceling={isCanceling}
         isPublishing={isPublishing}
+        skippingItems={shouldSkipModuleItems}
         progressId={progressId}
         progressCurrent={currentProgress}
         title={modalTitle()}

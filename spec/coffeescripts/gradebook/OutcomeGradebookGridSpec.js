@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isEqual} from 'underscore'
+import {isEqual} from 'lodash'
 import Grid from '@canvas/outcome-gradebook-grid'
 import fakeENV from 'helpers/fakeENV'
 

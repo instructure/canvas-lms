@@ -182,11 +182,11 @@ module CanvasCassandra
 
     def tables
       if @db.connection.describe_version >= "20.1.0" && @db.execute("SELECT cql_version FROM system.local").first["cql_version"] >= "3.4.4"
-        @db.execute("SELECT table_name FROM system_schema.tables WHERE keyspace_name=?", keyspace).map do |row|
+        @db.execute("SELECT table_name FROM system_schema.tables WHERE keyspace_name=?", keyspace).map do |row| # rubocop:disable Rails/Pluck
           row["table_name"]
         end
       elsif @db.use_cql3?
-        @db.execute("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", keyspace).map do |row|
+        @db.execute("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", keyspace).map do |row| # rubocop:disable Rails/Pluck
           row["columnfamily_name"]
         end
       else

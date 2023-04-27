@@ -442,7 +442,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       retrieve_quiz_submission_attempt!(params[:quiz_submission_attempt])
 
       scope = Quizzes::QuizQuestion.where({
-                                            id: @quiz_submission.quiz_data.map { |question| question["id"] }
+                                            id: @quiz_submission.quiz_data.pluck("id")
                                           })
 
       results_visible = @quiz_submission.results_visible?(user: @current_user)

@@ -18,17 +18,12 @@
 
 import $ from 'jquery'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 import {
   renderContextModulesPublishIcon,
   updateModuleItemPublishedState,
   updateModuleItemsPublishedStates,
 } from './publishOneModuleHelper'
-
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-const I18n = useI18nScope('context_modules_utils_publishmodulehelper')
 
 export type ProgressResult = {
   id: string
@@ -60,16 +55,10 @@ export function batchUpdateAllModulesApiCall(
       skip_content_tags: skipContentTags,
       async,
     },
-  }).catch(error =>
-    showFlashAlert({
-      message: I18n.t('There was an error while saving your changes'),
-      type: 'error',
-      err: error,
-    })
-  )
+  })
 }
 
-export function monitorProgress(progressId, setCurrentProgress) {
+export function monitorProgress(progressId, setCurrentProgress, onProgressFail) {
   let progress
 
   const pollBatchApiProgress = () => {
@@ -92,11 +81,7 @@ export function monitorProgress(progressId, setCurrentProgress) {
           setCurrentProgress(progress)
         })
         .catch(error => {
-          showFlashAlert({
-            message: I18n.t('There was an error while saving your changes'),
-            err: error,
-            type: 'error',
-          })
+          onProgressFail(error)
         })
     }
     pollingLoop()
@@ -121,58 +106,46 @@ export function cancelBatchUpdate(progress, onCancelComplete) {
 }
 
 export function fetchAllItemPublishedStates(courseId: string | number, nextLink?: string) {
-  doFetchApi({
+  return doFetchApi({
     path: nextLink || `/api/v1/courses/${courseId}/modules?include[]=items`,
     method: 'GET',
-  })
-    .then(({json, link}) => {
-      json.forEach((module: any) => {
-        updateModulePublishedState(module.id, module.published, false)
-        module.items.forEach((item: any) => {
-          updateModuleItemPublishedState(item.id, item.published)
-        })
+  }).then(({json, link}) => {
+    json.forEach((module: any) => {
+      updateModulePublishedState(module.id, module.published, false)
+      module.items.forEach((item: any) => {
+        updateModuleItemPublishedState(item.id, item.published)
       })
-      if (link?.next) {
-        fetchAllItemPublishedStates(courseId, link.next.url)
-      }
     })
-    .catch(error =>
-      showFlashAlert({
-        message: I18n.t('There was an error while saving your changes'),
-        type: 'error',
-        err: error,
-      })
-    )
+    if (link?.next) {
+      fetchAllItemPublishedStates(courseId, link.next.url)
+    }
+  })
 }
-
 // update the state of the modules and items
 // based on what the user asked to be done
-export function updateModulePendingPublishedStates(
-  published: boolean | undefined,
-  isPublishing: boolean
-): void {
+export function updateModulePendingPublishedStates(isPublishing: boolean): void {
   const completedModuleIds = moduleIds()
   completedModuleIds.forEach(moduleId => {
-    exportFuncs.updateModulePublishedState(moduleId, !!published, isPublishing)
+    exportFuncs.updateModulePublishedState(moduleId, undefined, isPublishing)
+    updateModuleItemsPublishedStates(moduleId, undefined, isPublishing)
   })
 }
 
 // update the state of a single module and its items
 export function updateModulePublishedState(
   moduleId: number,
-  published: boolean,
+  published: boolean | undefined,
   isPublishing: boolean
 ) {
   const publishIcon = document.querySelector(
     `#context_module_${moduleId} .module-publish-icon`
   ) as HTMLElement | null
   if (publishIcon) {
-    const courseId = publishIcon.getAttribute('data-course-id')
+    const courseId = publishIcon.getAttribute('data-course-id') as string
     // Update the new state of the module then we unmount the component to render the newly changed state
     const $publishIcon = $(publishIcon)
     $publishIcon.data('published', !!published)
-    renderContextModulesPublishIcon(courseId, moduleId, published, isPublishing, isPublishing)
-    updateModuleItemsPublishedStates($publishIcon.data('moduleId'), published, isPublishing)
+    renderContextModulesPublishIcon(courseId, moduleId, published, isPublishing)
   }
 }
 
@@ -186,7 +159,7 @@ export function moduleIds(): Array<number> {
   dataModules.forEach(el => {
     if (el.id === undefined) return
 
-    const id = parseInt(el.getAttribute('data-module-id') || '', 10)
+    const id = parseInt(el.id?.replace(/\D/g, '') || '', 10)
     if (!Number.isNaN(id)) ids.add(id)
   })
 

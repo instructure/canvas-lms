@@ -94,7 +94,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   def parse_and_create_mentions
     mention_data = Nokogiri::HTML.fragment(message).search("[data-mention]")
-    user_ids = mention_data.map { |l| l["data-mention"] }
+    user_ids = mention_data.pluck("data-mention")
     User.where(id: user_ids).each do |u|
       mentions.find_or_create_by!(user: u, root_account_id: root_account_id)
     end
@@ -354,7 +354,7 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user, session| !discussion_topic.is_announcement && context.grants_right?(user, session, :read_forum) && discussion_topic.visible_for?(user) }
     can :read
 
-    given { |user, session| discussion_topic.is_announcement && context.grants_right?(user, session, :participate_as_student) && discussion_topic.visible_for?(user) }
+    given { |user, session| discussion_topic.is_announcement && context.grants_right?(user, session, :participate_as_student) && discussion_topic.visible_for?(user) && !discussion_topic.locked_for?(user, check_policies: true) }
     can :create
 
     given { |user, session| context.grants_right?(user, session, :post_to_forum) && !discussion_topic.locked_for?(user) && discussion_topic.visible_for?(user) }
@@ -565,7 +565,8 @@ class DiscussionEntry < ActiveRecord::Base
       lock!
       old_rating = rating(current_user)
       if new_rating == old_rating
-        return true
+        entry_participant = true
+        raise ActiveRecord::Rollback
       end
 
       entry_participant = update_or_create_participant(current_user: current_user, rating: new_rating).first

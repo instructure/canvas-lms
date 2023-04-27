@@ -23,7 +23,7 @@ import _Handlebars from 'handlebars/runtime'
 const Handlebars = _Handlebars.default // because this version of handlebars has old, messed up es6 transpilation
 
 // This file is to add the methods that depend on '../util/fcUtil'
-// as registered handelbars helpers. These are not in ui/shared/handlebars-helpers/index.coffee
+// as registered handelbars helpers. These are not in ui/shared/handlebars-helpers/index.js
 // because otherwise everypage would load fullcalendar.js (which fcUtil depends on).
 // So anything that depends on these helpers in their handlbars needs to make sure
 // to require this file first, so they are available as helpers.

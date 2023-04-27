@@ -45,6 +45,7 @@ module Api::V1::RubricAssessment
     hash["data"] = rubric_assessment.data if opts[:style] == "full"
     if opts[:style] == "full" && rubric_assessment.active_rubric_association?
       hash["rubric_association"] = rubric_assessment.rubric_association.as_json["rubric_association"]
+      hash["rubric_association"]["hide_points"] = rubric_assessment.rubric_association.hide_points(user)
     end
     hash["comments"] = rubric_assessment.data.pluck(:comments) if opts[:style] == "comments_only"
     hash

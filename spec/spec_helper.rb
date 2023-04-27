@@ -751,7 +751,7 @@ RSpec.configure do |config|
     BACKENDS = %w[FileSystem S3].map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
 
     class As # :nodoc:
-      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$)/))
+      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$)/)) # rubocop:disable Style/AccessModifierDeclarations
 
       def initialize(subject, ancestor)
         @subject = subject
@@ -1024,6 +1024,12 @@ end
 
 def enable_default_developer_key!
   enable_developer_key_account_binding!(DeveloperKey.default)
+end
+
+# register mime types for their responses being decoded as JSON
+Mime::SET.select { |t| t.to_s.end_with?("+json") }.map(&:ref).each do |type|
+  ActionDispatch::RequestEncoder.register_encoder(type,
+                                                  response_parser: ->(body) { JSON.parse(body) })
 end
 
 # rubocop:enable Lint/ConstantDefinitionInBlock

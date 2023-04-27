@@ -22,7 +22,6 @@ import {HTMLElement, KeyboardEventHandler, MouseEventHandler} from 'react'
 // by default. Declaring them as wildcard modules allows TS to recognize them as
 // bare-bones interfaces with the `any` type.
 // See https://www.typescriptlang.org/docs/handbook/modules.html#wildcard-module-declarations
-declare module '*.coffee'
 declare module '*.graphql'
 declare module '*.handlebars'
 declare module '*.svg'
@@ -212,11 +211,6 @@ declare module '@instructure/ui-badge' {
       export const theme: symbol
     }
   }
-}
-
-declare module 'convert-case' {
-  export function camelize<T>(props: {[key: string]: unknown}): T
-  export function underscore<T>(props: {[key: string]: unknown}): T
 }
 
 declare module 'html-escape' {

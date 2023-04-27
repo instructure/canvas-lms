@@ -222,3 +222,16 @@ individual_gradebook_enhancements:
       state: on # enable for local development
     test:
       state: on # enable for the deployed 'test' environment
+hide_zero_point_quizzes_option:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Hide zero point new quizzes from the student and teacher gradebooks
+  description: When set, an option to not display a new quiz with 0 points possible in the gradebook
+    will be available in the form of a checkbox when creating or editing the quiz.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
+    test:
+      state: allowed_on # enable for the deployed 'test' environment

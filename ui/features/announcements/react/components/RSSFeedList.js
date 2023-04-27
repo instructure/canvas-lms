@@ -31,7 +31,7 @@ import {IconXLine} from '@instructure/ui-icons'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 
 import {Link} from '@instructure/ui-link'
 

@@ -18,12 +18,10 @@
 
 import {waitFor} from '@testing-library/dom'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {
-  renderContextModulesPublishIcon,
-  updateModuleItemsPublishedStates,
-} from '../utils/publishOneModuleHelper'
+import publishOneModuleHelperModule from '../utils/publishOneModuleHelper'
+
 import publishAllModulesHelperModule from '../utils/publishAllModulesHelper'
-import {makeModuleWithItems} from './testHelpers'
+import {initBody, makeModuleWithItems} from './testHelpers'
 
 const {
   batchUpdateAllModulesApiCall,
@@ -37,12 +35,17 @@ const {
   ...publishAllModulesHelperModule,
 }
 
+const {renderContextModulesPublishIcon} = {
+  ...publishOneModuleHelperModule,
+}
+
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('../utils/publishOneModuleHelper')
 
 describe('publishAllModulesHelper', () => {
   beforeEach(() => {
     doFetchApi.mockResolvedValue({response: {ok: true}, json: {published: true}})
+    initBody()
   })
 
   afterEach(() => {
@@ -53,8 +56,8 @@ describe('publishAllModulesHelper', () => {
 
   describe('batchUpdateAllModulesApiCall', () => {
     beforeEach(() => {
-      makeModuleWithItems(1, false)
-      makeModuleWithItems(2, true)
+      makeModuleWithItems(1, [117, 119], false)
+      makeModuleWithItems(2, [217, 219], true)
     })
 
     it('PUTS the batch request', async () => {
@@ -75,6 +78,12 @@ describe('publishAllModulesHelper', () => {
           },
         })
       )
+    })
+
+    it('returns a rejected promise on error', async () => {
+      const whoops = new Error('whoops')
+      doFetchApi.mockRejectedValueOnce(whoops)
+      await expect(batchUpdateAllModulesApiCall(2, true, true)).rejects.toBe(whoops)
     })
   })
 
@@ -111,7 +120,7 @@ describe('publishAllModulesHelper', () => {
       })
 
       const setCurrentProgress = jest.fn()
-      monitorProgress(3533, setCurrentProgress)
+      monitorProgress(3533, setCurrentProgress, () => {})
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(1))
       expect(doFetchApi).toHaveBeenCalledTimes(1)
       expect(doFetchApi).toHaveBeenNthCalledWith(1, {path: '/api/v1/progress/3533'})
@@ -143,7 +152,7 @@ describe('publishAllModulesHelper', () => {
       })
 
       const setCurrentProgress = jest.fn()
-      monitorProgress(3533, setCurrentProgress)
+      monitorProgress(3533, setCurrentProgress, () => {})
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(1))
       expect(doFetchApi).toHaveBeenCalledTimes(1)
       expect(doFetchApi).toHaveBeenNthCalledWith(1, {path: '/api/v1/progress/3533'})
@@ -152,6 +161,14 @@ describe('publishAllModulesHelper', () => {
       expect(doFetchApi).toHaveBeenCalledTimes(2)
       expect(doFetchApi).toHaveBeenNthCalledWith(2, {path: '/api/v1/progress/3533'})
       jest.runOnlyPendingTimers()
+    })
+
+    it('calls onProgressFail on a catestrophic failure', async () => {
+      const err = new Error('whoops')
+      doFetchApi.mockRejectedValueOnce(err)
+      const onProgressFail = jest.fn()
+      monitorProgress(3533, () => {}, onProgressFail)
+      await waitFor(() => expect(onProgressFail).toHaveBeenCalledWith(err))
     })
   })
 
@@ -230,51 +247,50 @@ describe('publishAllModulesHelper', () => {
         path: '/another/page',
       })
     })
+    it('returns a rejected promise on error', async () => {
+      const whoops = new Error('whoops')
+      doFetchApi.mockRejectedValueOnce(whoops)
+      await expect(fetchAllItemPublishedStates(7)).rejects.toBe(whoops)
+    })
   })
 
   describe('updateModulePendingPublishedStates', () => {
-    let spy
+    let updateModuleSpy, updateItemsSpy
     beforeEach(() => {
-      makeModuleWithItems(1, false)
-      makeModuleWithItems(2, true)
+      makeModuleWithItems(1, [117, 119], false)
+      makeModuleWithItems(2, [217, 219], true)
     })
     afterEach(() => {
-      spy?.mockRestore()
+      updateModuleSpy?.mockRestore()
     })
 
     it('updates the modules and their items', () => {
-      spy = jest.spyOn(publishAllModulesHelperModule, 'updateModulePublishedState')
-      const published = true
+      updateModuleSpy = jest.spyOn(publishAllModulesHelperModule, 'updateModulePublishedState')
+      updateItemsSpy = jest.spyOn(publishOneModuleHelperModule, 'updateModuleItemsPublishedStates')
       const isPublishing = true
-      updateModulePendingPublishedStates(published, isPublishing)
-      expect(spy).toHaveBeenCalledTimes(2)
+      updateModulePendingPublishedStates(isPublishing)
+      expect(updateModuleSpy).toHaveBeenCalledTimes(2)
+      expect(updateItemsSpy).toHaveBeenCalledTimes(2)
+      expect(updateItemsSpy).toHaveBeenCalledWith(1, undefined, isPublishing)
     })
   })
 
   describe('updateModulePublishedState', () => {
     let spy
     beforeEach(() => {
-      makeModuleWithItems(1, false)
-      makeModuleWithItems(2, true)
+      makeModuleWithItems(1, [117, 119], false)
+      makeModuleWithItems(2, [217, 219], true)
     })
     afterEach(() => {
       spy?.mockRestore()
     })
 
-    it('updades the module and its items', () => {
+    it('updates the module', () => {
       const published = true
       const isPublishing = false
       updateModulePublishedState(1, published, isPublishing)
       expect(renderContextModulesPublishIcon).toHaveBeenCalledTimes(1)
-      expect(renderContextModulesPublishIcon).toHaveBeenCalledWith(
-        '1',
-        1,
-        published,
-        isPublishing,
-        isPublishing
-      )
-      expect(updateModuleItemsPublishedStates).toHaveBeenCalledTimes(1)
-      expect(updateModuleItemsPublishedStates).toHaveBeenCalledWith(1, published, isPublishing)
+      expect(renderContextModulesPublishIcon).toHaveBeenCalledWith('1', 1, published, isPublishing)
     })
   })
 
@@ -282,8 +298,8 @@ describe('publishAllModulesHelper', () => {
     it('extracts module ids from the erb generated dom elements', () => {
       document.body.innerHTML = `
       <div>
-        <span id="a_module" class="context_module" data-module-id="17">module 17</span>
-        <span id="b_module" class="context_module" data-module-id="19">module 19</span
+        <span id="a_module_17" class="context_module" data-module-id="17">module 17</span>
+        <span id="b_module_19" class="context_module" data-module-id="19">module 19</span
         <span id="template_module" class="context_module" data-module-id="{{ id }}"></span
       `
       const mids = moduleIds()
@@ -293,8 +309,8 @@ describe('publishAllModulesHelper', () => {
     it('returns only unique its', () => {
       document.body.innerHTML = `
       <div>
-        <span id="a_module" class="context_module" data-module-id="17">module 17</span>
-        <span id="b_module" class="context_module" data-module-id="17">module 17 too</span
+        <span id="a_module_17" class="context_module" data-module-id="17">module 17</span>
+        <span id="b_module_17" class="context_module" data-module-id="17">module 17 too</span
         <span id="template_module" class="context_module" data-module-id="{{ id }}"></span
       `
       const mids = moduleIds()

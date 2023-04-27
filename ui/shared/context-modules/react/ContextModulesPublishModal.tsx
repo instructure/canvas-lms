@@ -22,6 +22,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {ProgressBar} from '@instructure/ui-progress'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
@@ -38,7 +39,8 @@ interface Props {
   readonly onPublish: () => void
   readonly isCanceling: boolean
   readonly isPublishing: boolean
-  readonly progressId: string | null
+  readonly skippingItems: boolean
+  readonly progressId: string | number | null
   readonly progressCurrent?: ProgressResult
   readonly title: string
 }
@@ -51,6 +53,7 @@ const ContextModulesPublishModal: React.FC<Props> = ({
   onPublish,
   isCanceling,
   isPublishing,
+  skippingItems,
   progressId,
   progressCurrent,
   title,
@@ -74,7 +77,7 @@ const ContextModulesPublishModal: React.FC<Props> = ({
         <ProgressBar
           screenReaderLabel={I18n.t('Publishing Progress')}
           formatScreenReaderValue={({valueNow, valueMax}) => {
-            return Math.round((valueNow / valueMax) * 100) + ' percent'
+            return I18n.t('%val percent', {val: Math.round((valueNow / valueMax) * 100)})
           }}
           renderValue={({valueNow, valueMax}) => {
             return <Text size="small">{Math.round((valueNow / valueMax) * 100)}%</Text>
@@ -105,10 +108,19 @@ const ContextModulesPublishModal: React.FC<Props> = ({
       </Modal.Header>
       <Modal.Body>
         <View as="div">
-          <Text>
+          <Text as="p">
             {I18n.t(
-              'This process could take a few minutes. Click the Stop button to discontinue processing. Items that have already been processed will not be reverted to their previous state.'
+              'This process could take a few minutes. You may close the modal or navigate away from the page during this process.'
             )}
+          </Text>
+          <Text as="p">
+            {skippingItems
+              ? I18n.t(
+                  'To discontinue processing, click the Stop button. Note: Modules that have already been processed will not be reverted to their previous state when the process is discontinued.'
+                )
+              : I18n.t(
+                  'To discontinue processing, click the Stop button. Note: Modules and items that have already been processed will not be reverted to their previous state when the process is discontinued.'
+                )}
           </Text>
         </View>
         {progressBar()}
@@ -123,7 +135,15 @@ const ContextModulesPublishModal: React.FC<Props> = ({
           color="primary"
           disabled={isCanceling}
         >
-          {isPublishing ? I18n.t('Stop') : I18n.t('Continue')}
+          {!isPublishing && isOpen ? (
+            I18n.t('Continue')
+          ) : (
+            <AccessibleContent
+              alt={I18n.t('Stop publishing button. Click to discontinue processing.')}
+            >
+              {I18n.t('Stop Publishing')}
+            </AccessibleContent>
+          )}
         </Button>
       </Modal.Footer>
     </Modal>

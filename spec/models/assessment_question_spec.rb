@@ -162,7 +162,7 @@ describe AssessmentQuestion do
     data[:points_possible] = "50"
     question.form_question_data = data
     question.save
-    expect(question.question_data.class).to eq HashWithIndifferentAccess
+    expect(question.question_data.class).to eq ActiveSupport::HashWithIndifferentAccess
     expect(question.question_data[:points_possible]).to eq 50
     expect(question.question_data[:answers][0][:weight]).to eq 100
     expect(question.question_data[:answers][0][:id]).not_to be_nil
@@ -181,10 +181,10 @@ describe AssessmentQuestion do
     }
 
     question = @bank.assessment_questions.create!(question_data: data)
-    expect(question.question_data.class).to eq HashWithIndifferentAccess
+    expect(question.question_data.class).to eq ActiveSupport::HashWithIndifferentAccess
 
     question.question_data = data
-    expect(question.question_data.class).to eq HashWithIndifferentAccess
+    expect(question.question_data.class).to eq ActiveSupport::HashWithIndifferentAccess
 
     data = question.question_data
     data[:name] = "new name"

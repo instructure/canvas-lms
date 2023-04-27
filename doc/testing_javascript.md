@@ -134,4 +134,4 @@ You can generate code coverage locally by having webpack
 set up( `touch config/WEBPACK`) then running `COVERAGE=1 yarn test`.
 You should then have a folder in your root directory called `coverage-js`
 in which contains an `index.html` which if you open it will show you
-the test coverage for all javascript (js, coffee, jsx)
+the test coverage for all javascript (js, jsx)

@@ -45,7 +45,7 @@ module Api::V1::DiscussionTopics
   #
   # The ids of the root topics are always included.
   def get_root_topic_data(topics, fields)
-    root_topic_ids = topics.pluck(:root_topic_id).reject(&:blank?).uniq
+    root_topic_ids = topics.pluck(:root_topic_id).compact_blank.uniq
     return {} unless root_topic_ids.present?
 
     fields_with_id = fields.unshift(:id)

@@ -217,7 +217,7 @@ describe "Student reports" do
 
       parameters = {}
       parameters["start_at"] = @start_at.to_s
-      parameters["end_at"] = @end_at.to_s(:db)
+      parameters["end_at"] = @end_at.to_fs(:db)
       parameters["enrollment_term"] = @term1.id
       parsed = read_report(@type, { params: parameters, order: 1 })
 
@@ -645,6 +645,15 @@ describe "Student reports" do
     it "runs and exclude deleted users" do
       parsed = read_report(@type, { order: 1 })
       expect(parsed.length).to eq 2
+    end
+
+    it "deals with a missing developer key" do
+      dk = DeveloperKey.create!
+      @at3.update developer_key: dk
+      dk.destroy_permanently!
+      parsed = read_report(@type, order: 1)
+      user3_row = parsed.detect { |row| row[0] == @user3.id.to_s }
+      expect(user3_row.last).to be_nil
     end
   end
 end

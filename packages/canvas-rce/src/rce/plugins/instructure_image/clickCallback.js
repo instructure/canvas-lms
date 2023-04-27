@@ -22,5 +22,5 @@ export default function (ed, document) {
   return doFileUpload(ed, document, {
     accept: 'image/*',
     panels: ['COMPUTER', 'URL'],
-  })
+  }).shownPromise
 }

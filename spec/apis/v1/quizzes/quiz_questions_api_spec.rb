@@ -40,7 +40,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
                         controller: "quizzes/quiz_questions", action: "index", format: "json",
                         course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
 
-        question_ids = json.collect { |q| q["id"] }
+        question_ids = json.pluck("id")
         expect(question_ids).to eq questions.map(&:id)
       end
 
@@ -68,7 +68,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
                         controller: "quizzes/quiz_questions", action: "index", format: "json",
                         course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
-        question_ids = json.collect { |q| q["id"] }
+        question_ids = json.pluck("id")
         expect(question_ids).to eq [question2.id]
       end
 
@@ -100,7 +100,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
             }
           )
 
-          question_ids = json.collect { |q| q["id"] }.sort
+          question_ids = json.pluck("id").sort
           expect(question_ids).to eq [question1.id, question2.id]
         end
       end

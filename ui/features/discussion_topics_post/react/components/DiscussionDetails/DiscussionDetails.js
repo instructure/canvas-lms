@@ -85,8 +85,7 @@ export function DiscussionDetails({...props}) {
                   courseId={props.courseId}
                 />
               </Flex.Item>
-              {(!props.discussionTopic.assignment.restrictQuantitativeData ||
-                props.discussionTopic.permissions.readAsAdmin) && (
+              {!props.discussionTopic.assignment.restrictQuantitativeData && (
                 <Flex.Item padding="xx-small" shouldShrink={true} align="end" overflowY="hidden">
                   <Text weight="normal" size={responsiveProps.textSize}>
                     {responsiveProps.text}

@@ -1392,6 +1392,8 @@ class AssignmentsApiController < ApplicationController
       @assignment.updating_user = @current_user
       # update_api_assignment mutates params so this has to be done here
       opts = assignment_json_opts
+
+      @assignment.skip_downstream_changes! if params[:skip_downstream_changes].present?
       result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context)
       render_create_or_update_result(result, opts)
     end
@@ -1441,7 +1443,7 @@ class AssignmentsApiController < ApplicationController
     return render json: { message: "expected array" }, status: :bad_request unless data.is_a?(Array)
     return render json: { message: "missing assignment id" }, status: :bad_request unless data.all? { |a| a.key?("id") }
 
-    assignments = @context.assignments.active.where(id: data.map { |a| a["id"] }).to_a
+    assignments = @context.assignments.active.where(id: data.pluck("id")).to_a
     raise ActiveRecord::RecordNotFound unless assignments.size == data.size
 
     assignments.each do |assignment|

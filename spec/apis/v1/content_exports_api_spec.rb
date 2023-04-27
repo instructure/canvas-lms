@@ -118,7 +118,7 @@ describe ContentExportsApiController, type: :request do
       json += api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/content_exports?per_page=3&page=2",
                                { controller: "content_exports_api", action: "index", format: "json", course_id: t_course.to_param, per_page: "3", page: "2" })
       expect(json.size).to be 5
-      expect(json.map { |el| el["id"] }).to eql exports.map(&:id).sort.reverse
+      expect(json.pluck("id")).to eql exports.map(&:id).sort.reverse
     end
 
     it "does not return attachments for expired exports" do
@@ -837,7 +837,7 @@ describe ContentExportsApiController, type: :request do
           past_export(t_course, t_teacher, "zip")               # other user
           json = api_call_as_user(t_student, :get, "/api/v1/courses/#{t_course.id}/content_exports",
                                   { controller: "content_exports_api", action: "index", format: "json", course_id: t_course.to_param })
-          expect(json.map { |ex| ex["id"] }).to match_array [my_zip_export.id]
+          expect(json.pluck("id")).to match_array [my_zip_export.id]
         end
 
         it "denies access to admin exports in #show" do
@@ -921,7 +921,7 @@ describe ContentExportsApiController, type: :request do
         zip_export = past_export(t_group, t_teacher, "zip")
         json = api_call_as_user(t_teacher, :get, "/api/v1/groups/#{t_group.id}/content_exports",
                                 { controller: "content_exports_api", action: "index", format: "json", group_id: t_group.to_param })
-        expect(json.map { |e| e["id"] }).to eql [zip_export.id]
+        expect(json.pluck("id")).to eql [zip_export.id]
       end
 
       it "shows an export" do
@@ -961,7 +961,7 @@ describe ContentExportsApiController, type: :request do
         past_export(t_student, t_teacher, "zip")
         json = api_call_as_user(t_student, :get, "/api/v1/users/#{t_student.id}/content_exports",
                                 { controller: "content_exports_api", action: "index", format: "json", user_id: t_student.to_param })
-        expect(json.map { |e| e["id"] }).to eql [zip_export.id]
+        expect(json.pluck("id")).to eql [zip_export.id]
       end
 
       it "shows an export" do

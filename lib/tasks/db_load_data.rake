@@ -43,7 +43,7 @@ namespace :db do
 
   desc "Make sure all message templates have notifications in the db"
   task evaluate_notification_templates: :load_environment do
-    Dir.glob(Rails.root.join("app/messages/*.erb")) do |filename|
+    Rails.root.glob("app/messages/*.erb") do |filename|
       filename = File.split(filename)[1]
       name = filename.split(".")[0]
       unless name[0, 1] == "_"
@@ -52,7 +52,7 @@ namespace :db do
       end
     end
     Notification.all_cached.each do |n|
-      puts "No notification files found for #{n.name}" if Dir.glob(Rails.root.join("app", "messages", "#{n.name.downcase.gsub(/\s/, "_")}.*.erb")).empty?
+      puts "No notification files found for #{n.name}" if Rails.root.glob("app/messages/#{n.name.downcase.gsub(/\s/, "_")}.*.erb").empty?
     end
   end
 

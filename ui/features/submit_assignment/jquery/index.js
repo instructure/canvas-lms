@@ -27,7 +27,7 @@ import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {recordEulaAgreement, verifyPledgeIsChecked} from './helper'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.ajaxJSON'
-import 'jquery-tree'
+import '@canvas/jquery/jquery.tree'
 import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONPreparedFiles, getFormData */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* fragmentChange, showIf, /\.log\(/ */

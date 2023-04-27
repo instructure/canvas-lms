@@ -47,7 +47,7 @@ module Lti
         end
         assignment_model(opts)
       end
-      let(:parsed_response_body) { JSON.parse(response.body) }
+      let(:parsed_response_body) { response.parsed_body }
       let(:label) { "Originality Score" }
       let(:tag) { "some_tag" }
       let(:resource_id) { "orig-123" }

@@ -1235,16 +1235,16 @@ describe SpeedGrader::Assignment do
       end
 
       it "includes rubric assessment comments from other graders" do
-        rubric_assessments = submission_json["provisional_grades"].map { |grade| grade["rubric_assessments"] }.flatten
-        assessment_data = rubric_assessments.map { |assessment| assessment["data"] }.flatten
-        comments = assessment_data.map { |datum| datum["comments"] }
+        rubric_assessments = submission_json["provisional_grades"].pluck("rubric_assessments").flatten
+        assessment_data = rubric_assessments.pluck("data").flatten
+        comments = assessment_data.pluck("comments")
         expect(comments).to include("ta comment")
       end
 
       it "includes rubric assessment comments html from other graders" do
-        rubric_assessments = submission_json["provisional_grades"].map { |grade| grade["rubric_assessments"] }.flatten
-        assessment_data = rubric_assessments.map { |assessment| assessment["data"] }.flatten
-        comments = assessment_data.map { |datum| datum["comments_html"] }
+        rubric_assessments = submission_json["provisional_grades"].pluck("rubric_assessments").flatten
+        assessment_data = rubric_assessments.pluck("data").flatten
+        comments = assessment_data.pluck("comments_html")
         expect(comments).to include("ta comment")
       end
     end
@@ -1482,7 +1482,7 @@ describe SpeedGrader::Assignment do
       it "includes all comments" do
         s = find_real_submission(json)
         expect(s["score"]).to eq 2
-        comments = s["submission_comments"].map { |comment| comment["comment"] }
+        comments = s["submission_comments"].pluck("comment")
         expect(comments).to match_array [
           "student comment",
           "teacher provisional comment",
@@ -1538,7 +1538,7 @@ describe SpeedGrader::Assignment do
     let(:assignment) { @course.assignments.create!(title: "anonymous", anonymous_grading: true) }
     let(:speed_grader_json) { SpeedGrader::Assignment.new(assignment, @teacher).json }
     let(:students) { speed_grader_json[:context][:students] }
-    let(:returned_ids) { students.map { |student| student["anonymous_id"] } }
+    let(:returned_ids) { students.pluck("anonymous_id") }
 
     context "unposted assignments" do
       it "returns only active students if the teacher is not viewing inactive or concluded" do
@@ -1744,7 +1744,7 @@ describe SpeedGrader::Assignment do
       teacher.preferences[:gradebook_settings] = gradebook_settings
       json = SpeedGrader::Assignment.new(assignment, teacher).json
 
-      students = json["context"]["students"].map { |s| s["id"] }
+      students = json["context"]["students"].pluck("id")
       expect(students).to include(active_student.id.to_s)
     end
 
@@ -1753,7 +1753,7 @@ describe SpeedGrader::Assignment do
       teacher.preferences[:gradebook_settings] = gradebook_settings
       json = SpeedGrader::Assignment.new(assignment, teacher).json
 
-      students = json["context"]["students"].map { |s| s["id"] }
+      students = json["context"]["students"].pluck("id")
       expect(students).to include(active_student.id.to_s, inactive_student.id.to_s)
     end
 
@@ -1762,7 +1762,7 @@ describe SpeedGrader::Assignment do
       teacher.preferences[:gradebook_settings] = gradebook_settings
       json = SpeedGrader::Assignment.new(assignment, teacher).json
 
-      students = json["context"]["students"].map { |s| s["id"] }
+      students = json["context"]["students"].pluck("id")
       expect(students).to include(active_student.id.to_s, concluded_student.id.to_s)
     end
 
@@ -1772,7 +1772,7 @@ describe SpeedGrader::Assignment do
       teacher.preferences[:gradebook_settings] = gradebook_settings
       json = SpeedGrader::Assignment.new(assignment, teacher).json
 
-      students = json["context"]["students"].map { |s| s["id"] }
+      students = json["context"]["students"].pluck("id")
       expect(students).to include(active_student.id.to_s, inactive_student.id.to_s,
                                   concluded_student.id.to_s)
     end
@@ -1780,7 +1780,7 @@ describe SpeedGrader::Assignment do
     it "returns concluded students if the course is concluded" do
       test_course.complete
       json = SpeedGrader::Assignment.new(assignment, teacher).json
-      students = json["context"]["students"].map { |s| s["id"] }
+      students = json["context"]["students"].pluck("id")
       expect(students).to include(active_student.id.to_s, concluded_student.id.to_s)
     end
   end
@@ -1899,7 +1899,7 @@ describe SpeedGrader::Assignment do
       end
 
       it "includes user ids on student enrollments" do
-        user_ids = json["context"]["enrollments"].map { |enrollment| enrollment["user_id"] }
+        user_ids = json["context"]["enrollments"].pluck("user_id")
         expect(user_ids.uniq).to match_array([student_1.id, student_2.id, test_student.id].map(&:to_s))
       end
 
@@ -1908,7 +1908,7 @@ describe SpeedGrader::Assignment do
       end
 
       it "includes ids on students" do
-        ids = json["context"]["students"].map { |student| student["id"] }
+        ids = json["context"]["students"].pluck("id")
         expect(ids.uniq).to match_array([student_1.id, student_2.id, test_student.id].map(&:to_s))
       end
 
@@ -1917,7 +1917,7 @@ describe SpeedGrader::Assignment do
       end
 
       it "includes user ids on submissions" do
-        user_ids = json["submissions"].map { |submission| submission["user_id"] }
+        user_ids = json["submissions"].pluck("user_id")
         expect(user_ids.uniq).to match_array([student_1.id, student_2.id, test_student.id].map(&:to_s))
       end
 
@@ -1927,13 +1927,13 @@ describe SpeedGrader::Assignment do
 
       it "includes user ids on rubrics" do
         student = json["context"]["students"].detect { |s| s["id"] == student_1.id.to_s }
-        user_ids = student["rubric_assessments"].map { |assessment| assessment["user_id"] }
+        user_ids = student["rubric_assessments"].pluck("user_id")
         expect(user_ids).to include(student_1.id.to_s)
       end
 
       it "includes user ids from rubrics on provisional grades" do
-        rubric_assessments = submission_1_json["provisional_grades"].map { |grade| grade["rubric_assessments"] }.flatten
-        user_ids = rubric_assessments.map { |assessment| assessment["user_id"] }
+        rubric_assessments = submission_1_json["provisional_grades"].pluck("rubric_assessments").flatten
+        user_ids = rubric_assessments.pluck("user_id")
         expect(user_ids).to include(student_1.id.to_s)
       end
 
@@ -1958,7 +1958,7 @@ describe SpeedGrader::Assignment do
       it "uses the user avatar for students on submission comments" do
         submission_1.add_comment(author: student_1, comment: "Example")
         submission_1.add_comment(author: student_2, comment: "Sample")
-        avatar_paths = student_comments.map { |s| s["avatar_path"] }
+        avatar_paths = student_comments.pluck("avatar_path")
         expect(avatar_paths.uniq).to include(student_1.avatar_path, student_2.avatar_path)
       end
 
@@ -1989,7 +1989,7 @@ describe SpeedGrader::Assignment do
       end
 
       it "adds anonymous ids to student enrollments" do
-        anonymous_ids = json["context"]["enrollments"].map { |enrollment| enrollment["anonymous_id"] }
+        anonymous_ids = json["context"]["enrollments"].pluck("anonymous_id")
         expect(anonymous_ids.uniq).to match_array(%w[aaaaa bbbbb ccccc])
       end
 
@@ -2002,7 +2002,7 @@ describe SpeedGrader::Assignment do
       end
 
       it "adds anonymous ids to students" do
-        anonymous_ids = json["context"]["students"].map { |student| student["anonymous_id"] }
+        anonymous_ids = json["context"]["students"].pluck("anonymous_id")
         expect(anonymous_ids).to match_array(%w[aaaaa bbbbb ccccc])
       end
 
@@ -2018,7 +2018,7 @@ describe SpeedGrader::Assignment do
       end
 
       it "includes anonymous ids on submissions" do
-        anonymous_ids = json["submissions"].map { |submission| submission["anonymous_id"] }
+        anonymous_ids = json["submissions"].pluck("anonymous_id")
         expect(anonymous_ids).to match_array(%w[aaaaa bbbbb ccccc])
       end
 
@@ -2028,7 +2028,7 @@ describe SpeedGrader::Assignment do
       end
 
       it "excludes user ids from rubrics on provisional grades" do
-        rubric_assessments = submission_1_json["provisional_grades"].map { |grade| grade["rubric_assessments"] }.flatten
+        rubric_assessments = submission_1_json["provisional_grades"].pluck("rubric_assessments").flatten
         expect(rubric_assessments).to all(not_have_key("user_id"))
       end
 
@@ -2052,41 +2052,41 @@ describe SpeedGrader::Assignment do
 
       it "includes author ids of other graders on submission comments" do
         submission = grader_json["submissions"].detect { |s| s["anonymous_id"] == "aaaaa" }
-        author_ids = submission["submission_comments"].map { |s| s["author_id"] }
+        author_ids = submission["submission_comments"].pluck("author_id")
         expect(author_ids).to include(teacher.id.to_s, ta.id.to_s)
       end
 
       it "includes author names of other graders on submission comments" do
         submission = grader_json["submissions"].detect { |s| s["anonymous_id"] == "aaaaa" }
-        author_names = submission["submission_comments"].map { |s| s["author_name"] }
+        author_names = submission["submission_comments"].pluck("author_name")
         expect(author_names).to include(teacher.name, ta.name)
       end
 
       it "uses the default avatar for students on submission comments" do
         submission_1.add_comment(author: student_1, comment: "Example")
         submission_1.add_comment(author: student_1, comment: "Sample")
-        avatars = student_comments.map { |s| s["avatar_path"] }
+        avatars = student_comments.pluck("avatar_path")
         expect(avatars).to all(eql(User.default_avatar_fallback))
       end
 
       it "uses the user avatar for other graders on submission comments" do
-        avatars = submission_1_json["submission_comments"].map { |s| s["avatar_path"] }
+        avatars = submission_1_json["submission_comments"].pluck("avatar_path")
         expect(avatars).to include(ta.avatar_path, teacher.avatar_path)
       end
 
       it "adds anonymous ids to submission comments" do
         submission_1.add_comment(author: student_1, comment: "Example")
         submission_1.add_comment(author: student_2, comment: "Sample")
-        anonymous_ids = student_comments.map { |s| s["anonymous_id"] }
+        anonymous_ids = student_comments.pluck("anonymous_id")
         expect(anonymous_ids).to match_array(["aaaaa", "bbbbb"])
       end
 
       it "includes the current user's author ids on submission comments" do
-        expect(submission_1_json["submission_comments"].map { |s| s["author_id"] }).to include(teacher.id.to_s)
+        expect(submission_1_json["submission_comments"].pluck("author_id")).to include(teacher.id.to_s)
       end
 
       it "includes the current user's author name on submission comments" do
-        expect(submission_1_json["submission_comments"].map { |s| s["author_name"] }).to include(teacher.name)
+        expect(submission_1_json["submission_comments"].pluck("author_name")).to include(teacher.name)
       end
 
       it "excludes students who are not assigned" do
@@ -2254,7 +2254,7 @@ describe SpeedGrader::Assignment do
 
       it "includes anonymous_id on grader comments" do
         grader_comments = submission_json["submission_comments"].reject { |comment| comment["author_id"] == student.id.to_s }
-        anonymous_ids = grader_comments.map { |comment| comment["anonymous_id"] }
+        anonymous_ids = grader_comments.pluck("anonymous_id")
         expect(anonymous_ids.uniq).to match_array [teacher_anonymous_id, ta_anonymous_id, final_grader_anonymous_id]
       end
 
@@ -2436,7 +2436,7 @@ describe SpeedGrader::Assignment do
 
       it "includes author_id on grader comments" do
         grader_comments = submission_json["submission_comments"].reject { |comment| comment["author_id"] == student.id.to_s }
-        anonymous_ids = grader_comments.map { |comment| comment["author_id"] }
+        anonymous_ids = grader_comments.pluck("author_id")
         expect(anonymous_ids.uniq).to match_array([teacher.id, ta.id, final_grader.id].map(&:to_s))
       end
 
@@ -2447,13 +2447,13 @@ describe SpeedGrader::Assignment do
 
       it "includes author_name on the all graders' comments" do
         grader_comments = submission_json["submission_comments"].reject { |comment| comment["author_id"] == student.id.to_s }
-        grader_names = grader_comments.map { |comment| comment["author_name"] }
+        grader_names = grader_comments.pluck("author_name")
         expect(grader_names.uniq).to match_array([teacher, ta, final_grader].map(&:name))
       end
 
       it "uses the user avatar for the all grader's comments" do
         grader_comments = submission_json["submission_comments"].reject { |comment| comment["author_id"] == student.id.to_s }
-        grader_avatars = grader_comments.map { |comment| comment["avatar_path"] }
+        grader_avatars = grader_comments.pluck("avatar_path")
         expect(grader_avatars.uniq).to match_array([teacher, ta, final_grader].map(&:avatar_path))
       end
 
@@ -2512,7 +2512,7 @@ describe SpeedGrader::Assignment do
       # all provisional grades
 
       it "includes scorer_id on all provisional grades" do
-        scorer_ids = submission_json["provisional_grades"].map { |grade| grade["scorer_id"] }
+        scorer_ids = submission_json["provisional_grades"].pluck("scorer_id")
         expect(scorer_ids.uniq).to match_array([teacher.id, ta.id, final_grader.id].map(&:to_s))
       end
 
@@ -2523,19 +2523,19 @@ describe SpeedGrader::Assignment do
       # all provisional grade rubric assessments
 
       it "includes assessor_name on all graders' rubric assessments on provisional grades'" do
-        grader_assessments = submission_json["provisional_grades"].map { |grade| grade["rubric_assessments"] }.flatten
-        grader_names = grader_assessments.map { |assessment| assessment["assessor_name"] }
+        grader_assessments = submission_json["provisional_grades"].pluck("rubric_assessments").flatten
+        grader_names = grader_assessments.pluck("assessor_name")
         expect(grader_names.uniq).to match_array([teacher, ta].map(&:name))
       end
 
       it "includes assessor_id on all graders' rubric assessments on provisional grades" do
-        grader_assessments = submission_json["provisional_grades"].map { |grade| grade["rubric_assessments"] }.flatten
-        assessor_ids = grader_assessments.map { |assessment| assessment["assessor_id"] }
+        grader_assessments = submission_json["provisional_grades"].pluck("rubric_assessments").flatten
+        assessor_ids = grader_assessments.pluck("assessor_id")
         expect(assessor_ids.uniq).to match_array([teacher.id, ta.id].map(&:to_s))
       end
 
       it "excludes anonymous_assessor_id from all graders' rubric assessments on provisional grades" do
-        grader_assessments = submission_json["provisional_grades"].map { |grade| grade["rubric_assessments"] }.flatten
+        grader_assessments = submission_json["provisional_grades"].pluck("rubric_assessments").flatten
         expect(grader_assessments).to all(not_have_key("anonymous_assessor_id"))
       end
 
@@ -2611,7 +2611,7 @@ describe SpeedGrader::Assignment do
 
       it "includes anonymous_id on grader comments" do
         grader_comments = submission_json["submission_comments"].reject { |comment| comment["author_id"] == student.id.to_s }
-        anonymous_ids = grader_comments.map { |comment| comment["anonymous_id"] }
+        anonymous_ids = grader_comments.pluck("anonymous_id")
         expect(anonymous_ids.uniq).to match_array [teacher_anonymous_id, ta_anonymous_id, final_grader_anonymous_id]
       end
 
@@ -2854,7 +2854,7 @@ describe SpeedGrader::Assignment do
 
       it "includes author_id on grader comments" do
         grader_comments = submission_json["submission_comments"].reject { |comment| comment["author_id"] == student.id.to_s }
-        anonymous_ids = grader_comments.map { |comment| comment["author_id"] }
+        anonymous_ids = grader_comments.pluck("author_id")
         expect(anonymous_ids.uniq).to match_array([teacher.id, ta.id, final_grader.id].map(&:to_s))
       end
 
@@ -2865,13 +2865,13 @@ describe SpeedGrader::Assignment do
 
       it "includes author_name on the all graders' comments" do
         grader_comments = submission_json["submission_comments"].reject { |comment| comment["author_id"] == student.id.to_s }
-        grader_names = grader_comments.map { |comment| comment["author_name"] }
+        grader_names = grader_comments.pluck("author_name")
         expect(grader_names.uniq).to match_array([teacher, ta, final_grader].map(&:name))
       end
 
       it "uses the user avatar for the all grader's comments" do
         grader_comments = submission_json["submission_comments"].reject { |comment| comment["author_id"] == student.id.to_s }
-        grader_avatars = grader_comments.map { |comment| comment["avatar_path"] }
+        grader_avatars = grader_comments.pluck("avatar_path")
         expect(grader_avatars.uniq).to match_array([teacher, ta, final_grader].map(&:avatar_path))
       end
 
@@ -2943,7 +2943,7 @@ describe SpeedGrader::Assignment do
       # all provisional grades
 
       it "includes scorer_id on all provisional grades" do
-        scorer_ids = submission_json["provisional_grades"].map { |grade| grade["scorer_id"] }
+        scorer_ids = submission_json["provisional_grades"].pluck("scorer_id")
         expect(scorer_ids.uniq).to match_array([teacher.id, ta.id, final_grader.id].map(&:to_s))
       end
 

@@ -38,7 +38,7 @@ describe Types::QueryType do
       CanvasSchema.execute(
         "{ allCourses { _id } }",
         context: { current_user: teacher }
-      ).dig("data", "allCourses").map { |c| c["_id"] }
+      ).dig("data", "allCourses").pluck("_id")
     ).to match_array [test_course_1, test_course_2].map(&:to_param)
   end
 

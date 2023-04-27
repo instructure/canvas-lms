@@ -573,7 +573,7 @@ describe ExternalToolsController, type: :request do
                     { controller: "external_tools", action: "index", format: "json",
                       "#{type.singularize}_id": context.id.to_s, search_term: "fir" })
 
-    expect(json.map { |h| h["id"] }.sort).to eq ids.sort
+    expect(json.pluck("id").sort).to eq ids.sort
   end
 
   def only_selectables(context)

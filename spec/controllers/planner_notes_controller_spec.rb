@@ -58,7 +58,7 @@ describe PlannerNotesController do
         it "excludes deleted courses" do
           @course_1.destroy
           get :index
-          note_ids = json_parse(response.body).map { |n| n["id"] }
+          note_ids = json_parse(response.body).pluck("id")
           expect(note_ids).to_not include(@course_1_note.id)
           expect(note_ids).to include(@course_2_note.id)
 
@@ -83,7 +83,7 @@ describe PlannerNotesController do
           get :index, params: { context_codes: ["course_#{@course_1.id}", "user_#{@user.id}"] }
           course_notes = json_parse(response.body)
           expect(course_notes.length).to eq 2
-          expect(course_notes.map { |n| n["id"] }).to match_array [@course_1_note.id, @student_note.id]
+          expect(course_notes.pluck("id")).to match_array [@course_1_note.id, @student_note.id]
         end
 
         it "filters by start and end dates when specified" do
@@ -205,7 +205,7 @@ describe PlannerNotesController do
                                     linked_object_type: "assignment", linked_object_id: a.to_param }
             expect(response).to have_http_status(:created)
 
-            json = JSON.parse(response.body)
+            json = response.parsed_body
             expect(json["title"]).to eq "Foo"
             expect(json["details"]).to eq "foo"
             expect(json["linked_object_type"]).to eq "assignment"
@@ -225,7 +225,7 @@ describe PlannerNotesController do
                                     linked_object_type: "announcement", linked_object_id: a.to_param }
             expect(response).to have_http_status(:created)
 
-            json = JSON.parse(response.body)
+            json = response.parsed_body
             expect(json["title"]).to eq "Bar"
             expect(json["details"]).to eq "bar"
             expect(json["linked_object_type"]).to eq "discussion_topic"
@@ -245,7 +245,7 @@ describe PlannerNotesController do
                                     linked_object_type: "discussion_topic", linked_object_id: dt.to_param }
             expect(response).to have_http_status(:created)
 
-            json = JSON.parse(response.body)
+            json = response.parsed_body
             expect(json["title"]).to eq "Baz"
             expect(json["details"]).to eq "baz"
             expect(json["linked_object_type"]).to eq "discussion_topic"
@@ -265,7 +265,7 @@ describe PlannerNotesController do
                                     linked_object_type: "wiki_page", linked_object_id: wp.id.to_s }
             expect(response).to have_http_status(:created)
 
-            json = JSON.parse(response.body)
+            json = response.parsed_body
             expect(json["title"]).to eq "Quux"
             expect(json["details"]).to eq "quux"
             expect(json["linked_object_type"]).to eq "wiki_page"
@@ -286,7 +286,7 @@ describe PlannerNotesController do
                                     linked_object_type: "quiz", linked_object_id: q.to_param }
             expect(response).to have_http_status(:created)
 
-            json = JSON.parse(response.body)
+            json = response.parsed_body
             expect(json["title"]).to eq "Quuux"
             expect(json["details"]).to eq "quuux"
             expect(json["linked_object_type"]).to eq "quiz"
@@ -361,7 +361,7 @@ describe PlannerNotesController do
                                       linked_object_type: "assignment", linked_object_id: @remote_assignment.id }
               expect(response).to be_successful
 
-              json = JSON.parse(response.body)
+              json = response.parsed_body
               note = PlannerNote.find(json["id"])
               expect(note.linked_object_id).to eq @remote_assignment.global_id
             end

@@ -29,7 +29,7 @@ import _ from 'lodash'
 import {fromJS, List} from 'immutable'
 import NumberHelper from '@canvas/i18n/numberHelper'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
 
 const I18n = useI18nScope('ProficiencyTable')

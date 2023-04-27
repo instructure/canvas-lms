@@ -97,4 +97,20 @@ describe "courses/_recent_feedback" do
     url = context_url(@assignment.context, :context_assignment_submission_url, assignment_id: @assignment.id, id: @user.id)
     expect(response.body).to include("\"#{url}\"")
   end
+
+  it "contains student's url when observer is viewing the student" do
+    student = @user
+    observer = user_factory
+
+    @assignment.update!(points_possible: 25_734)
+    @assignment.grade_student(student, grade: 25_734, grader: @teacher)
+    @submission.reload
+
+    assign(:user, student)
+    assign(:current_user, observer)
+
+    render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
+    url = context_url(@assignment.context, :context_assignment_submission_url, assignment_id: @assignment.id, id: student.id)
+    expect(response.body).to include("\"#{url}\"")
+  end
 end

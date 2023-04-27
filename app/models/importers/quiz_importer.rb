@@ -90,8 +90,8 @@ module Importers
     def self.check_question_equality(question1, question2)
       stripped_q1 = question1.except(*IGNORABLE_QUESTION_KEYS)
       stripped_q2 = question2.except(*IGNORABLE_QUESTION_KEYS)
-      stripped_q1_answers = (question1["answers"] || []).map { |ans| ans.reject { |k, _v| k == "id" } }
-      stripped_q2_answers = (question2["answers"] || []).map { |ans| ans.reject { |k, _v| k == "id" } }
+      stripped_q1_answers = (question1["answers"] || []).map { |ans| ans.except("id") }
+      stripped_q2_answers = (question2["answers"] || []).map { |ans| ans.except("id") }
 
       stripped_q1 == stripped_q2 && stripped_q1_answers == stripped_q2_answers
     end

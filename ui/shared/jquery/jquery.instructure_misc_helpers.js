@@ -96,13 +96,6 @@ $.replaceTags = function (text, mapping_or_name, maybe_value) {
   }
 }
 
-$.underscore = function (string) {
-  return (string || '')
-    .replace(/([A-Z])/g, '_$1')
-    .replace(/^_/, '')
-    .toLowerCase()
-}
-
 $.titleize = function (string) {
   const res = (string || '')
     .replace(/([A-Z])/g, ' $1')

@@ -830,6 +830,10 @@ class SubmissionsApiController < ApplicationController
     end
 
     @user ||= get_user_considering_section(params[:user_id])
+    unless @assignment.assigned?(@user)
+      render_unauthorized_action
+      return
+    end
     @submission ||= @assignment.all_submissions.find_or_create_by!(user: @user)
 
     authorized = if params[:submission] || params[:rubric_assessment]

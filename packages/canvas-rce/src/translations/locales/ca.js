@@ -638,6 +638,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "S’està processant el fitxer multimèdia. Torneu a provar-ho més endavant."
   },
+  "media_title_2112243b": { "message": "Títol de l''element multimèdia" },
   "medium_5a8e9ead": { "message": "Mitjà" },
   "merge_links_2478df96": { "message": "Fusiona els enllaços" },
   "mic_a7f3d311": { "message": "Micròfon" },
@@ -947,9 +948,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "S''ha produït un error en compartir la vostra pantalla."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "No admetem diversos fitxers."
-  },
   "sort_by_e75f9e3e": { "message": "Ordena per" },
   "spades_suit_b37020c2": { "message": "Piques (coll de cartes)" },
   "square_511eb3b3": { "message": "Quadrat" },
@@ -974,6 +972,9 @@ const locale = {
   "steel_blue_14296f08": { "message": "Blau acer" },
   "studio_media_options_ee504361": {
     "message": "Opcions d’elements multimèdia de l’Studio"
+  },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Safata d’opcions dels elements multimèdia de l’Studio"
   },
   "styles_2aa721ef": { "message": "Estils" },
   "submit_a3cc6859": { "message": "Entrega" },

@@ -20,7 +20,7 @@
 
 describe RubricAssociation do
   def rubric_association_params_for_assignment(assign, override = {})
-    HashWithIndifferentAccess.new({
+    ActiveSupport::HashWithIndifferentAccess.new({
       hide_score_total: "0",
       purpose: "grading",
       skip_updating_points_possible: false,
@@ -278,8 +278,8 @@ describe RubricAssociation do
       user_session(@user)
       @account = @user.account
       @rubric = @account.rubrics.build
-      rubric_params = HashWithIndifferentAccess.new({ "title" => "Some Rubric", "criteria" => { "0" => { "learning_outcome_id" => "", "ratings" => { "0" => { "points" => "5", "id" => "blank", "description" => "Full Marks" }, "1" => { "points" => "0", "id" => "blank_2", "description" => "No Marks" } }, "points" => "5", "long_description" => "", "id" => "", "description" => "Description of criterion" } }, "points_possible" => "5", "free_form_criterion_comments" => "0" })
-      rubric_association_params = HashWithIndifferentAccess.new({ association_object: @account, hide_score_total: "0", use_for_grading: "0", purpose: "bookmark" })
+      rubric_params = ActiveSupport::HashWithIndifferentAccess.new({ "title" => "Some Rubric", "criteria" => { "0" => { "learning_outcome_id" => "", "ratings" => { "0" => { "points" => "5", "id" => "blank", "description" => "Full Marks" }, "1" => { "points" => "0", "id" => "blank_2", "description" => "No Marks" } }, "points" => "5", "long_description" => "", "id" => "", "description" => "Description of criterion" } }, "points_possible" => "5", "free_form_criterion_comments" => "0" })
+      rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({ association_object: @account, hide_score_total: "0", use_for_grading: "0", purpose: "bookmark" })
       # 8864: the below raised a MethodNotFound error by trying to call @account.submissions
       expect { @rubric.update_with_association(@user, rubric_params, @account, rubric_association_params) }.not_to raise_error
     end
@@ -289,8 +289,8 @@ describe RubricAssociation do
     it "does not try to link to assessments" do
       course_with_teacher(active_all: true)
       @rubric = @course.rubrics.build
-      rubric_params = HashWithIndifferentAccess.new({ "title" => "Some Rubric", "criteria" => { "0" => { "learning_outcome_id" => "", "ratings" => { "0" => { "points" => "5", "id" => "blank", "description" => "Full Marks" }, "1" => { "points" => "0", "id" => "blank_2", "description" => "No Marks" } }, "points" => "5", "long_description" => "", "id" => "", "description" => "Description of criterion" } }, "points_possible" => "5", "free_form_criterion_comments" => "0" })
-      rubric_association_params = HashWithIndifferentAccess.new({ association_object: @course, hide_score_total: "0", use_for_grading: "0", purpose: "bookmark" })
+      rubric_params = ActiveSupport::HashWithIndifferentAccess.new({ "title" => "Some Rubric", "criteria" => { "0" => { "learning_outcome_id" => "", "ratings" => { "0" => { "points" => "5", "id" => "blank", "description" => "Full Marks" }, "1" => { "points" => "0", "id" => "blank_2", "description" => "No Marks" } }, "points" => "5", "long_description" => "", "id" => "", "description" => "Description of criterion" } }, "points_possible" => "5", "free_form_criterion_comments" => "0" })
+      rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({ association_object: @course, hide_score_total: "0", use_for_grading: "0", purpose: "bookmark" })
       expect_any_instantiation_of(@course).not_to receive(:submissions)
       @rubric.update_with_association(@user, rubric_params, @course, rubric_association_params)
     end
@@ -524,6 +524,60 @@ describe RubricAssociation do
       )
       association.destroy
       expect { association.restore }.to change { association.workflow_state }.from("deleted").to("active")
+    end
+  end
+
+  describe "restrict_quantitative_data" do
+    before do
+      course_with_teacher(active_course: true, active_user: true)
+      @student = student_in_course(active_user: true).user
+
+      assignment = @course.assignments.create!(
+        title: "Test Assignment",
+        submission_types: "online_text_entry"
+      )
+
+      rubric = @course.rubrics.create!
+      @course_rubric_association = RubricAssociation.create!(
+        rubric: rubric,
+        association_object: @course,
+        context: @course,
+        purpose: "bookmark"
+      )
+      @assignment_rubric_association = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params_for_assignment(assignment))
+    end
+
+    describe "is off" do
+      it "with course_rubric_association to be false" do
+        expect(@course_rubric_association.restrict_quantitative_data?(@teacher)).to be false
+        expect(@course_rubric_association.restrict_quantitative_data?(@student)).to be false
+        expect(@course_rubric_association.restrict_quantitative_data?).to be false
+      end
+
+      it "with assignment_rubric_association to be false" do
+        expect(@assignment_rubric_association.restrict_quantitative_data?(@teacher)).to be false
+        expect(@assignment_rubric_association.restrict_quantitative_data?(@student)).to be false
+        expect(@assignment_rubric_association.restrict_quantitative_data?).to be false
+      end
+    end
+
+    describe "is on" do
+      before do
+        @course.root_account.enable_feature!(:restrict_quantitative_data)
+        @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+        @course.save!
+      end
+
+      it "with course_rubric_association to be false" do
+        expect(@course_rubric_association.restrict_quantitative_data?(@teacher)).to be false
+        expect(@course_rubric_association.restrict_quantitative_data?(@student)).to be false
+        expect(@course_rubric_association.restrict_quantitative_data?).to be false
+      end
+
+      it "with assignment_rubric_association to be true" do
+        expect(@assignment_rubric_association.restrict_quantitative_data?(@teacher)).to be true
+        expect(@assignment_rubric_association.restrict_quantitative_data?(@student)).to be true
+      end
     end
   end
 end

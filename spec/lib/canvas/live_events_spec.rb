@@ -42,6 +42,15 @@ describe Canvas::LiveEvents do
     )
   end
 
+  def dont_expect_event(event_name, event_body)
+    expect(LiveEvents).not_to receive(:post_event).with(
+      event_name: event_name,
+      payload: event_body,
+      time: anything,
+      context: nil
+    )
+  end
+
   before do
     LiveEvents.stream_client = Class.new do
       attr_accessor :data, :stream, :stream_name
@@ -140,6 +149,12 @@ describe Canvas::LiveEvents do
                    hash_including(
                      associated_user_id: observee.global_id.to_s
                    ))
+      Canvas::LiveEvents.enrollment_updated(enrollment)
+    end
+
+    it "includes course_uuid and user_uuid" do
+      enrollment = course_with_student
+      expect_event("enrollment_updated", hash_including(course_uuid: @course.uuid, user_uuid: @user.uuid))
       Canvas::LiveEvents.enrollment_updated(enrollment)
     end
   end
@@ -303,6 +318,17 @@ describe Canvas::LiveEvents do
                      message_id: convo_message.id.to_s
                    )).once
       Canvas::LiveEvents.conversation_message_created(convo_message)
+    end
+
+    it "doesnt include conversation_id" do
+      user = user_model
+      msg = Conversation.build_message(user, "lorem ipsum")
+      msg.save
+      dont_expect_event("conversation_message_created",
+                        hash_including(
+                          conversation_id: nil
+                        ))
+      Canvas::LiveEvents.conversation_message_created(msg)
     end
   end
 

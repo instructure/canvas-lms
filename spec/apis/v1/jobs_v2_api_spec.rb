@@ -139,13 +139,13 @@ describe "Jobs V2 API", type: :request do
           json = api_call(:get, "/api/v1/jobs2/queued/by_tag?per_page=1",
                           { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "tag", per_page: "1" },
                           {}, {}, expected_status: 200)
-          expect(json.map { |e| e["tag"] }).to eq ["Kernel.pp"]
+          expect(json.pluck("tag")).to eq ["Kernel.pp"]
           links = Api.parse_pagination_links(response.headers["Link"])
           next_link = links.find { |link| link[:rel] == "next" }
           json = api_call(:get, next_link[:uri].path,
                           { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "tag", per_page: "1", page: "2" },
                           {}, {}, expected_status: 200)
-          expect(json.map { |e| e["tag"] }).to eq ["Kernel.p"]
+          expect(json.pluck("tag")).to eq ["Kernel.p"]
         end
       end
 
@@ -413,8 +413,8 @@ describe "Jobs V2 API", type: :request do
         json = api_call(:get, "/api/v1/jobs2/running",
                         { controller: "jobs_v2", action: "list", format: "json", bucket: "running", order: "strand_singleton" })
         expect(json.size).to eq 6
-        expect(json.map { |x| x["strand"] }).to eq ["barfood", "foo", "foo", "foo", nil, nil]
-        expect(json.map { |x| x["singleton"] }).to eq [nil, "singletonA", "singletonB", "singletonC", nil, nil]
+        expect(json.pluck("strand")).to eq ["barfood", "foo", "foo", "foo", nil, nil]
+        expect(json.pluck("singleton")).to eq [nil, "singletonA", "singletonB", "singletonC", nil, nil]
       end
 
       it "searches running tags" do
@@ -712,7 +712,7 @@ describe "Jobs V2 API", type: :request do
       it "enumerates job clusters" do
         json = api_call(:get, "/api/v1/jobs2/clusters?per_page=2",
                         { controller: "jobs_v2", action: "clusters", format: "json", per_page: 2 })
-        expect(json.map { |row| row["id"] }).to match_array([Shard.default.id, @shard2.id])
+        expect(json.pluck("id")).to match_array([Shard.default.id, @shard2.id])
       end
 
       it "retrieves stats from a job cluster" do

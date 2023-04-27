@@ -42,7 +42,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     def deserialize(submission_data, full: false)
       # when this is present, it would be an array, but it always includes 1
       # ID (or none, in which case it would contain 1 item which is '')
-      attachment_ids = Array(submission_data[question_key]).reject(&:blank?)
+      attachment_ids = Array(submission_data[question_key]).compact_blank
 
       if attachment_ids.present?
         attachment_ids.first

@@ -54,8 +54,8 @@ describe "assignments sync to sis" do
     let(:valid_name) { "Name" }
     let(:points) { "10" }
     let(:differentiate) { false }
-    let(:due_date_valid) { "#{format_date_for_view(Time.zone.now + 3.years)} at 11:59pm" }
-    let(:short_date) { format_date_for_view(Time.zone.now + 3.years) }
+    let(:due_date_valid) { "#{format_date_for_view(3.years.from_now)} at 11:59pm" }
+    let(:short_date) { format_date_for_view(3.years.from_now) }
     let(:error) { "" }
     let(:settings_enable) { {} }
     let(:name_length_invalid) { false }
@@ -194,7 +194,7 @@ describe "assignments sync to sis" do
     context "when on index page" do
       let(:assignment_name) { "Test Assignment" }
       let(:settings_enable) { { sis_require_assignment_due_date: { value: true } } }
-      let(:expected_date) { format_date_for_view(Time.zone.now - 1.month) }
+      let(:expected_date) { format_date_for_view(1.month.ago) }
       let(:assignment_id) { @assignment.id }
       let(:assignment_entry) { f("#assignment_#{assignment_id}") }
       let(:post_to_sis_button) { f(".post-to-sis-status", assignment_entry) }

@@ -39,7 +39,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import actions from '../actions'
 import ExternalFeedsTray from './ExternalFeedsTray'
 import propTypes from '../propTypes'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 import {showConfirmDelete} from './ConfirmDeleteModal'
 
 const I18n = useI18nScope('announcements_v2')

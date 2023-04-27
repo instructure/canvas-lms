@@ -145,7 +145,7 @@ describe EventStream::IndexStrategy::Cassandra do
         end
 
         # force just one bucket
-        @index.index.bucket_size Time.zone.now + 1.minute
+        @index.index.bucket_size 1.minute.from_now
         @index.index.scrollback_limit 10.minutes
         @pager = @index.for_key("key")
 
@@ -338,7 +338,7 @@ describe EventStream::IndexStrategy::Cassandra do
         end
 
         # force just one bucket
-        @index.index.bucket_size Time.zone.now + 1.minute
+        @index.index.bucket_size 1.minute.from_now
         @index.index.scrollback_limit 10.minutes
         @pager = @index.ids_for_key("key")
 

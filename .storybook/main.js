@@ -62,7 +62,6 @@ module.exports = {
           path.resolve(canvasDir, 'packages/convert-case'),
           path.resolve(canvasDir, 'packages/html-escape'),
           path.resolve(canvasDir, 'packages/slickgrid'),
-          path.resolve(canvasDir, 'packages/with-breakpoints'),
           path.resolve(canvasDir, 'spec/javascripts/jsx'),
           path.resolve(canvasDir, 'spec/coffeescripts'),
           path.resolve(canvasDir, '.storybook'),
@@ -112,15 +111,6 @@ module.exports = {
             }
           }
         }
-      },
-      {
-        test: /\.coffee$/,
-        include: [
-          path.resolve(canvasDir, 'ui'),
-          path.resolve(canvasDir, 'spec/coffeescripts'),
-          ...globPlugins('{app,spec_canvas}/coffeescripts/')
-        ],
-        use: ['coffee-loader']
       },
       {
         test: /\.handlebars$/,

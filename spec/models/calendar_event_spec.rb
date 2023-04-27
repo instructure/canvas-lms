@@ -1218,14 +1218,14 @@ describe CalendarEvent do
 
       it "keeps date of conference in sync with event" do
         event = course.calendar_events.create! title: "Foo", web_conference: conference(context: course)
-        start_at = Time.zone.now + 3.days
+        start_at = 3.days.from_now
         event.reload.update! start_at: start_at
         expect(event.web_conference.reload.user_settings[:scheduled_date]).to eq start_at
       end
 
       it "does not fail when conference does not support scheduled_date" do
         event = course.calendar_events.create! title: "Foo", web_conference: conference(context: course, type: "Wimba")
-        start_at = Time.zone.now + 3.days
+        start_at = 3.days.from_now
         event.reload.update! start_at: start_at
         expect(event.reload.start_at).to eq start_at
         expect(event.web_conference.reload.user_settings).not_to have_key(:scheduled_date)

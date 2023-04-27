@@ -20,7 +20,7 @@
 RSpec.describe SecurityController, type: :request do
   # This uses the lti keyset, but it doesn't really matter which one
   let(:url) { Rails.application.routes.url_helpers.jwks_show_path }
-  let(:json) { JSON.parse(response.body) }
+  let(:json) { response.parsed_body }
 
   let(:past_key) { CanvasSecurity::KeyStorage.new_key }
   let(:present_key) { CanvasSecurity::KeyStorage.new_key }

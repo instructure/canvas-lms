@@ -1,0 +1,92 @@
+PATH
+  remote: ../canvas_http
+  specs:
+    canvas_http (1.0.0)
+      multipart
+
+PATH
+  remote: ../canvas_slug
+  specs:
+    canvas_slug (0.0.1)
+      swearjar (~> 1.4)
+
+PATH
+  remote: ../multipart
+  specs:
+    multipart (0.0.1)
+      canvas_slug
+      mime-types (~> 3.2)
+
+PATH
+  remote: .
+  specs:
+    canvas_panda_pub (1.0.0)
+      canvas_http
+      json-jwt (~> 1.10)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activesupport (7.0.4.3)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+    addressable (2.8.1)
+      public_suffix (>= 2.0.2, < 6.0)
+    aes_key_wrap (1.1.0)
+    bindata (2.4.14)
+    concurrent-ruby (1.2.2)
+    crack (0.4.5)
+      rexml
+    diff-lcs (1.5.0)
+    hashdiff (1.0.1)
+    i18n (1.12.0)
+      concurrent-ruby (~> 1.0)
+    json-jwt (1.13.0)
+      activesupport (>= 4.2)
+      aes_key_wrap
+      bindata
+    mime-types (3.3.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2023.0218.1)
+    minitest (5.18.0)
+    public_suffix (5.0.1)
+    rake (13.0.6)
+    rexml (3.2.5)
+    rspec (3.12.0)
+      rspec-core (~> 3.12.0)
+      rspec-expectations (~> 3.12.0)
+      rspec-mocks (~> 3.12.0)
+    rspec-core (3.12.1)
+      rspec-support (~> 3.12.0)
+    rspec-expectations (3.12.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.12.0)
+    rspec-mocks (3.12.5)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.12.0)
+    rspec-support (3.12.0)
+    swearjar (1.4.0)
+    tzinfo (2.0.4)
+      concurrent-ruby (~> 1.0)
+    webmock (3.18.1)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
+
+PLATFORMS
+  arm64-darwin-21
+
+DEPENDENCIES
+  bundler (>= 1.5, < 3)
+  canvas_http!
+  canvas_panda_pub!
+  canvas_slug!
+  multipart!
+  rake
+  rspec (~> 3.0)
+  webmock (~> 3.0)
+
+BUNDLED WITH
+   2.4.10

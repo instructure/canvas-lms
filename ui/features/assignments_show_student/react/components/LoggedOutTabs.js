@@ -34,15 +34,16 @@ export default function LoggedOutTabs(props) {
       {props.assignment.rubric && (
         <RubricTab rubric={props.assignment.rubric} peerReviewModeEnabled={false} />
       )}
-
-      <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-        <Flex.Item>
-          <LoginActionPrompt
-            nonAcceptedEnrollment={props.nonAcceptedEnrollment}
-            enrollmentState={props.assignment.env.enrollmentState}
-          />
-        </Flex.Item>
-      </Flex>
+      {ENV.current_user ? null : (
+        <Flex as="header" alignItems="center" justifyItems="center" direction="column">
+          <Flex.Item>
+            <LoginActionPrompt
+              nonAcceptedEnrollment={props.nonAcceptedEnrollment}
+              enrollmentState={props.assignment.env.enrollmentState}
+            />
+          </Flex.Item>
+        </Flex>
+      )}
     </div>
   )
 }

@@ -16,6 +16,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "jira_ref_parser", "1.0.1"
   spec.add_dependency "outrigger", "~> 3.0"
   spec.add_dependency "rubocop", "~> 1.19"
+  spec.add_dependency "rubocop-rails", "~> 2.19"
 
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "byebug"

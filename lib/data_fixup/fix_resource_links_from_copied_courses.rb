@@ -42,7 +42,7 @@ module DataFixup::FixResourceLinksFromCopiedCourses
 
   def self.run
     resource_links_to_update.group_by { |r| r["orig_id"] }.each do |orig_id, resource_links|
-      copied_ids = ActiveRecord::Base.sanitize_sql(resource_links.map { |rl| rl["copy_id"] }.join(","))
+      copied_ids = ActiveRecord::Base.sanitize_sql(resource_links.pluck("copy_id").join(","))
       next if resource_links.empty?
 
       ActiveRecord::Base.connection.execute(

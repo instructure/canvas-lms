@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'

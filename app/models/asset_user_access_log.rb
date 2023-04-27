@@ -343,7 +343,7 @@ class AssetUserAccessLog
           # of all ids because we constrained the aggregation to a range of ids,
           # taking the full set of logs in that range)
           update_query = compaction_sql(log_segment_aggregation)
-          new_iterator_pos = log_segment_aggregation.map { |r| r["max_id"] }.max
+          new_iterator_pos = log_segment_aggregation.pluck("max_id").max
           GuardRail.activate(:primary) do
             partition_model.transaction do
               log_message("batch updating (sometimes these queries don't get logged)...")
@@ -450,7 +450,7 @@ class AssetUserAccessLog
   def self.compaction_sql(aggregation_results)
     values_list = aggregation_results.map do |row|
       max_updated_at = row["max_updated_at"]
-      max_updated_at = max_updated_at.to_s(:db)
+      max_updated_at = max_updated_at.to_fs(:db)
       "(#{row["aua_id"]}, #{row["view_count"]}, '#{max_updated_at}')"
     end.join(", ")
 

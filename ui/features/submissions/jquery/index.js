@@ -225,7 +225,7 @@ function insertEmoji(emoji) {
 }
 
 // This `setup` function allows us to control when the setup is triggered.
-// submissions.coffee requires this file and then immediately triggers it,
+// submissions.js requires this file and then immediately triggers it,
 // while submissionsSpec.jsx triggers it after setup is complete.
 export function setup() {
   $(document).ready(function () {
@@ -279,7 +279,7 @@ export function setup() {
           !formData['submission[comment]'] &&
           $("#add_comment_form input[type='file']").length > 0
         ) {
-          formData['submission[comment]'] = I18n.t('see_attached_files', 'See attached files')
+          formData['submission[comment]'] = I18n.t('see_attached_files', 'Please see attached files')
         }
       }
       if (!formData['submission[comment]'] && !formData['submission[media_comment_id]']) {

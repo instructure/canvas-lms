@@ -306,7 +306,7 @@ describe Quizzes::QuizzesController do
     end
 
     context "when newquizzes_on_quiz_page FF is enabled" do
-      let_once(:due_at) { Time.zone.now + 1.week }
+      let_once(:due_at) { 1.week.from_now }
       let_once(:course_assignments) do
         group = @course.assignment_groups.create(name: "some group")
         (0..3).map do |i|
@@ -452,7 +452,7 @@ describe Quizzes::QuizzesController do
         it "returns the new quiz's edit url" do
           post "new", params: { course_id: @course.id }, xhr: true
           expect(response).to be_successful
-          expect(JSON.parse(response.body)["url"]).to match(%r{/courses/\w+/quizzes/\w+/edit$})
+          expect(response.parsed_body["url"]).to match(%r{/courses/\w+/quizzes/\w+/edit$})
         end
       end
     end
@@ -1598,7 +1598,7 @@ describe Quizzes::QuizzesController do
                                  quiz_type: "assignment",
                                  assignment_group_id: ag.id
                                } }
-      json = JSON.parse response.body
+      json = response.parsed_body
       quiz = Quizzes::Quiz.find(json["quiz"]["id"])
       expect(quiz).to be_unpublished
       expect(quiz.assignment).to be_unpublished
@@ -1644,7 +1644,7 @@ describe Quizzes::QuizzesController do
           call_create(due_at: 3.days.ago.iso8601)
           assert_forbidden
           expect(@course.quizzes.count).to be 0
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json["errors"].keys).to include "due_at"
         end
 
@@ -1660,7 +1660,7 @@ describe Quizzes::QuizzesController do
           call_create(due_at: nil)
           assert_forbidden
           expect(@course.quizzes.count).to be 0
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json["errors"].keys).to include "due_at"
         end
 
@@ -1684,7 +1684,7 @@ describe Quizzes::QuizzesController do
           call_create(due_at: 7.days.from_now.iso8601, assignment_overrides: override_params)
           assert_forbidden
           expect(@course.quizzes.count).to be 0
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json["errors"].keys).to include "due_at"
         end
 
@@ -1694,7 +1694,7 @@ describe Quizzes::QuizzesController do
           call_create(due_at: 7.days.from_now.iso8601, assignment_overrides: override_params)
           assert_forbidden
           expect(@course.quizzes.count).to be 0
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json["errors"].keys).to include "due_at"
         end
       end

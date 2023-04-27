@@ -52,7 +52,7 @@ module Lti::IMS
       lti_result_model line_item: line_item, user: user, scoreGiven: nil, scoreMaximum: nil
     end
     let(:submission) { nil }
-    let(:json) { JSON.parse(response.body) }
+    let(:json) { response.parsed_body }
     let(:access_token_scopes) { "https://purl.imsglobal.org/spec/lti-ags/scope/score" }
     let(:userId) { user.id }
     let(:params_overrides) do
@@ -1329,7 +1329,7 @@ module Lti::IMS
         context "when submitted_at is in the future" do
           let(:params_overrides) do
             super().merge(
-              Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: Time.zone.now + 5.minutes }
+              Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: 5.minutes.from_now }
             )
           end
 

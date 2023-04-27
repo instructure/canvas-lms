@@ -299,7 +299,7 @@ class DueDateCacher
           previous_cached_dates: cached_due_dates_by_submission
         )
       end
-      User.clear_cache_keys(values.map { |v| v[1] }, :submissions)
+      User.clear_cache_keys(values.pluck(1), :submissions)
     end
 
     if @update_grades

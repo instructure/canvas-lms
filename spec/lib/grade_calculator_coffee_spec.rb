@@ -23,8 +23,8 @@ describe GradeCalculator do
     course_with_student active_all: true
   end
 
-  # We should keep this in sync with GradeCalculatorSpec.coffee
-  context "GradeCalculatorSpec.coffee examples" do
+  # We should keep this in sync with GradeCalculatorSpec.js
+  context "GradeCalculatorSpec.js examples" do
     before do
       @group = @group1 = @course.assignment_groups.create!(name: "group 1")
     end

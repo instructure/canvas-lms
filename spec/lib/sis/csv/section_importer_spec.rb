@@ -217,8 +217,8 @@ describe SIS::CSV::SectionImporter do
     s1 = course.course_sections.where(sis_source_id: "S001").first
     expect(s1).not_to be_nil
     expect(s1.name).to eq "Sec1"
-    expect(s1.start_at.to_s(:db)).to eq "2011-01-05 00:00:00"
-    expect(s1.end_at.to_s(:db)).to eq "2011-04-14 00:00:00"
+    expect(s1.start_at.to_fs(:db)).to eq "2011-01-05 00:00:00"
+    expect(s1.end_at.to_fs(:db)).to eq "2011-04-14 00:00:00"
 
     s2 = course.course_sections.where(sis_source_id: "S002").first
     expect(s2).not_to be_nil

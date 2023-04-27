@@ -586,28 +586,21 @@ $.mediaComment.init = function (mediaType, opts) {
         jsUploader.onReady = mediaCommentReady
         jsUploader.addEntry = addEntry
 
-        const getBrowser = require('parse-browser-info').getBrowser
-        const currentBrowser = getBrowser()
-        if (
-          (currentBrowser.name === 'Chrome' && Number(currentBrowser.version) >= 68) ||
-          (currentBrowser.name === 'Firefox' && Number(currentBrowser.version) >= 61)
-        ) {
-          import('@canvas/media-recorder')
-            .then(({default: renderCanvasMediaRecorder}) => {
-              let tryToRenderInterval
-              const renderFunc = () => {
-                const e = document.getElementById('record_media_tab')
-                if (e) {
-                  renderCanvasMediaRecorder(e, jsUploader.doUploadByFile)
-                  clearInterval(tryToRenderInterval)
-                }
+        import('@canvas/media-recorder')
+          .then(({default: renderCanvasMediaRecorder}) => {
+            let tryToRenderInterval
+            const renderFunc = () => {
+              const e = document.getElementById('record_media_tab')
+              if (e) {
+                renderCanvasMediaRecorder(e, jsUploader.doUploadByFile)
+                clearInterval(tryToRenderInterval)
               }
-              tryToRenderInterval = setInterval(renderFunc, 10)
-            })
-            .catch(() => {
-              throw new Error('Failed to load @canvas/media-recorder')
-            })
-        }
+            }
+            tryToRenderInterval = setInterval(renderFunc, 10)
+          })
+          .catch(() => {
+            throw new Error('Failed to load @canvas/media-recorder')
+          })
       }
 
       const now = new Date()

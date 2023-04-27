@@ -60,7 +60,7 @@ describe ReleaseNotesController do
     it "returns the object without langs by default" do
       the_note = note
       get "index"
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res.first["id"]).to eq(the_note.id)
       expect(res.first["langs"]).to be_nil
     end
@@ -68,7 +68,7 @@ describe ReleaseNotesController do
     it "returns the object with langs with includes[]=langs" do
       the_note = note
       get "index", params: { includes: ["langs"] }
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res.first["id"]).to eq(the_note.id)
       expect(res.first.dig("langs", "en")&.with_indifferent_access).to eq(note["en"].with_indifferent_access)
     end
@@ -88,7 +88,7 @@ describe ReleaseNotesController do
           }
         }
       }, as: :json
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       the_note = ReleaseNote.find(res["id"])
       expect(the_note.target_roles).to eq(["user"])
       expect(the_note.show_ats["test"]).to eq(show_at)
@@ -130,7 +130,7 @@ describe ReleaseNotesController do
       expect(the_note.target_roles).to_not be_nil
       put "update", params: { id: the_note.id }
       expect(response).to have_http_status(:ok)
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res["id"]).to eq(the_note.id)
     end
 
@@ -191,7 +191,7 @@ describe ReleaseNotesController do
       I18n.locale = :ar
       get "latest"
       expect(response).to have_http_status(:ok)
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res.length).to eq(1)
 
       json_note = res[0]
@@ -206,7 +206,7 @@ describe ReleaseNotesController do
       @user.update_attribute :locale, "es"
       get "latest"
       expect(response).to have_http_status(:ok)
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res.length).to eq(1)
 
       json_note = res[0]
@@ -224,7 +224,7 @@ describe ReleaseNotesController do
 
       get "latest"
       expect(response).to have_http_status(:ok)
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res.length).to eq(0)
 
       the_note.published = true
@@ -232,7 +232,7 @@ describe ReleaseNotesController do
 
       get "latest"
       expect(response).to have_http_status(:ok)
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res.length).to eq(1)
     end
 
@@ -243,7 +243,7 @@ describe ReleaseNotesController do
 
       get "latest"
       expect(response).to have_http_status(:ok)
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res.length).to eq(0)
 
       the_note.set_show_at("test", Time.now.utc.change(usec: 0) - 1.hour)
@@ -251,7 +251,7 @@ describe ReleaseNotesController do
 
       get "latest"
       expect(response).to have_http_status(:ok)
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res.length).to eq(1)
     end
 
@@ -259,7 +259,7 @@ describe ReleaseNotesController do
       user_session(account_admin_user)
       get "latest"
       expect(response).to have_http_status(:ok)
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res.length).to eq(0)
     end
 
@@ -278,10 +278,10 @@ describe ReleaseNotesController do
 
     it "clears the new flag after the first request" do
       get "latest"
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res[0]["new"]).to be(true)
       get "latest"
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res[0]["new"]).to be(false)
     end
   end
@@ -298,14 +298,14 @@ describe ReleaseNotesController do
 
     it "includes all notes if the user has seen none" do
       get "unread_count"
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res["unread_count"]).to eq(1)
     end
 
     it "includes no notes if the user has seen them all" do
       get "latest"
       get "unread_count"
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res["unread_count"]).to eq(0)
     end
   end

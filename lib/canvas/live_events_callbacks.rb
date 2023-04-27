@@ -27,7 +27,7 @@ module Canvas::LiveEventsCallbacks
     when Conversation
       Canvas::LiveEvents.conversation_created(obj)
     when ConversationMessage
-      Canvas::LiveEvents.conversation_message_created(obj)
+      Canvas::LiveEvents.conversation_message_created(obj) unless ConversationBatch.created_as_template?(message: obj)
     when DiscussionEntry
       Canvas::LiveEvents.discussion_entry_created(obj)
     when DiscussionTopic

@@ -34,7 +34,7 @@ import {ConnectedIndexHeader} from './IndexHeader'
 import AnnouncementEmptyState from './AnnouncementEmptyState'
 import {showConfirmDelete} from './ConfirmDeleteModal'
 
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 import {selectPaginationState} from '@canvas/pagination/redux/actions'
 import {announcementList} from '@canvas/announcements/react/proptypes/announcement'
 import masterCourseDataShape from '@canvas/courses/react/proptypes/masterCourseData'

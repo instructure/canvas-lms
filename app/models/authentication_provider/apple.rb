@@ -48,7 +48,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_params
-    super - open_id_connect_params
+    [*(super - open_id_connect_params), :login_attribute].freeze
   end
 
   def self.recognized_federated_attributes
@@ -101,7 +101,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
 
   def scope
     result = []
-    requested_attributes = [login_attribute] + federated_attributes.values.map { |v| v["attribute"] }
+    requested_attributes = [login_attribute] + federated_attributes.values.pluck("attribute")
     result << "name" unless (requested_attributes & ["firstName", "lastName"]).empty?
     result << "email" if requested_attributes.include?("email")
     result.join(" ")

@@ -74,7 +74,7 @@ describe "blueprint courses assignments" do
 
   context "in the associated course" do
     before :once do
-      due_date = format_date_for_view(Time.zone.now - 1.month)
+      due_date = format_date_for_view(1.month.ago)
       @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @original_assmt = @copy_from.assignments.create!(

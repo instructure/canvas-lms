@@ -17,7 +17,7 @@
  */
 
 import ChildCourse from 'ui/features/blueprint_course_child/react/apps/ChildCourse'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 import getSampleData from '../getSampleData'
 
 let child = null

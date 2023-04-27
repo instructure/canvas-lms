@@ -580,22 +580,27 @@ describe('RCEWrapper', () => {
     })
 
     describe('broken images', () => {
-      it('calls checkImageLoadError when complete', () => {
+      it('calls checkImageLoadError when complete', async () => {
         const image = {complete: true}
         jest.spyOn(rce, 'checkImageLoadError')
         jest.spyOn(contentInsertion, 'insertImage').mockReturnValue(image)
-        rce.insertImage(image)
+        const result = rce.insertImage(image)
         expect(rce.checkImageLoadError).toHaveBeenCalled()
+
+        return result.loadingPromise
       })
 
-      it('sets an onerror handler when not complete', () => {
+      it('sets an onerror handler when not complete', async () => {
         const image = {complete: false}
         jest.spyOn(rce, 'checkImageLoadError')
         jest.spyOn(contentInsertion, 'insertImage').mockReturnValue(image)
-        rce.insertImage(image)
+        const result = rce.insertImage(image)
         expect(typeof image.onerror).toEqual('function')
         image.onerror()
         expect(rce.checkImageLoadError).toHaveBeenCalled()
+
+        // We need to handle the rejection by the loadingPromise, otherwise it'll cause issues in future tests
+        return result.loadingPromise.catch(() => {})
       })
 
       describe('checkImageLoadError', () => {
@@ -615,6 +620,7 @@ describe('RCEWrapper', () => {
             naturalWidth: 0,
             style: {},
           }
+
           rce.checkImageLoadError(fakeElement)
           expect(Object.keys(fakeElement.style).length).toEqual(0)
           fakeElement.complete = true

@@ -45,7 +45,7 @@ describe BlackoutDatesController do
       get :index, format: :json, params: { course_id: @course.id }
 
       expect(response).to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       expect(json_response).to eq([@blackout_date.as_json(include_root: false)].as_json)
     end
   end
@@ -76,7 +76,7 @@ describe BlackoutDatesController do
       post :create, params: { course_id: @course.id, blackout_date: { start_date: "2022-01-01", end_date: "2022-01-02", event_title: "Test" } }
 
       expect(response).to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       blackout_date = json_response["blackout_date"]
       expect(blackout_date["id"]).not_to be_nil
       expect(blackout_date["context_id"]).to eq(@course.id)
@@ -90,7 +90,7 @@ describe BlackoutDatesController do
       post :create, params: { course_id: @course.id, blackout_date: { start_date: "2022-02-01", end_date: "2022-01-01", event_title: "Test" } }
 
       expect(response).not_to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       expect(json_response["errors"]).to eq(["End date can't be before start date"])
     end
   end
@@ -100,7 +100,7 @@ describe BlackoutDatesController do
       put :update, params: { course_id: @course.id, id: @blackout_date.id, blackout_date: { start_date: "2022-01-01", end_date: "2022-01-02", event_title: "Test" } }
 
       expect(response).to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       blackout_date = json_response["blackout_date"]
       expect(blackout_date["id"]).to eq(@blackout_date.id)
       expect(blackout_date["context_id"]).to eq(@course.id)
@@ -114,7 +114,7 @@ describe BlackoutDatesController do
       post :create, params: { course_id: @course.id, id: @blackout_date.id, blackout_date: { start_date: "2022-02-01", end_date: "2022-01-01", event_title: "Test" } }
 
       expect(response).not_to be_successful
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       expect(json_response["errors"]).to eq(["End date can't be before start date"])
     end
   end

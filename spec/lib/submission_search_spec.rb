@@ -155,7 +155,7 @@ describe SubmissionSearch do
   it "orders by submission date" do
     Timecop.freeze do
       assignment.submit_homework(peter, submission_type: "online_text_entry", body: "homework", submitted_at: Time.zone.now)
-      assignment.submit_homework(amanda, submission_type: "online_text_entry", body: "homework", submitted_at: Time.zone.now + 1.hour)
+      assignment.submit_homework(amanda, submission_type: "online_text_entry", body: "homework", submitted_at: 1.hour.from_now)
       results = SubmissionSearch.new(assignment, teacher, nil, states: "submitted", order_by: [{ field: "submitted_at" }]).search
       expect(results.preload(:user).map(&:user)).to eq [peter, amanda]
     end

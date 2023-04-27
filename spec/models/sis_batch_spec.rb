@@ -1277,12 +1277,14 @@ test_1,u1,student,active)
         end
 
         it "sets enrollment workflow_state to completed" do
+          @e3 = student_in_course(course: @c1, enrollment_state: "completed")
+          @e3.update sis_batch_id: @old_batch.id
           batch = create_csv_data([
                                     %(term_id,name,status
-              term1,term1,active
-              term2,term2,active),
+                                      term1,term1,active
+                                      term2,term2,active),
                                     %(course_id,short_name,long_name,account_id,term_id,status
-              test_1,TC 101,Test Course 101,,term1,active),
+                                      test_1,TC 101,Test Course 101,,term1,active),
                                     %(course_id,user_id,role,status),
                                   ]) do |item|
             item.options = {}
@@ -1295,6 +1297,7 @@ test_1,u1,student,active)
           end
           expect(@e1.reload.workflow_state).to eq "completed"
           expect(@e2.reload.workflow_state).to eq "completed"
+          expect(@e3.reload.sis_batch_id).to eq @old_batch.id
           old_time = @e1.updated_at
           expect(@c2.reload).to be_deleted
           expect(batch.roll_back_data.where(previous_workflow_state: "created").count).to eq 1
@@ -1312,12 +1315,14 @@ test_1,u1,student,active)
         end
 
         it "sets enrollment workflow_state to inactive" do
+          @e3 = student_in_course(course: @c1, enrollment_state: "inactive")
+          @e3.update sis_batch_id: @old_batch.id
           batch = create_csv_data([
                                     %(term_id,name,status
-              term1,term1,active
-              term2,term2,active),
+                                      term1,term1,active
+                                      term2,term2,active),
                                     %(course_id,short_name,long_name,account_id,term_id,status
-              test_1,TC 101,Test Course 101,,term1,active),
+                                      test_1,TC 101,Test Course 101,,term1,active),
                                     %(course_id,user_id,role,status),
                                   ]) do |item|
             item.options = {}
@@ -1330,6 +1335,7 @@ test_1,u1,student,active)
           end
           expect(@e1.reload.workflow_state).to eq "inactive"
           expect(@e2.reload.workflow_state).to eq "inactive"
+          expect(@e3.reload.sis_batch_id).to eq @old_batch.id
           old_time = @e1.updated_at
           expect(@c2.reload).to be_deleted
           expect(batch.roll_back_data.where(previous_workflow_state: "created").count).to eq 1

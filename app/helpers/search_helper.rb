@@ -23,7 +23,7 @@ module SearchHelper
 
   ##
   # Loads all the contexts the user belongs to into instance variable @contexts
-  # Used for TokenInput.coffee instances
+  # Used for TokenInput.js instances
   #
   # If a course is provided, just return it (and its groups/sections)
   def load_all_contexts(options = {})

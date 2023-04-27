@@ -69,7 +69,7 @@ describe ObserverAlertsApiController, type: :request do
       json = api_call_as_user(@observer, :get, @path, @params)
       expect(json.length).to eq 3
 
-      expect(json.map { |e| e["id"] }).to eq alerts.map(&:id).reverse
+      expect(json.pluck("id")).to eq alerts.map(&:id).reverse
     end
 
     it "doesnt return alerts for other students" do
@@ -94,7 +94,7 @@ describe ObserverAlertsApiController, type: :request do
 
     it "sets locked_for_user if the course is invisible" do
       @course.destroy
-      expect(api_call_as_user(@observer, :get, @path, @params).map { |a| a["locked_for_user"] }).to all(be true)
+      expect(api_call_as_user(@observer, :get, @path, @params).pluck("locked_for_user")).to all(be true)
     end
 
     it "sets locked_for_user if the assignment is deleted" do

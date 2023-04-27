@@ -230,7 +230,7 @@ describe UserContent, type: :request do
 
     doc = Nokogiri::HTML5.fragment(json["description"])
     expect(doc.at_css("img")["src"]).to eq "http://www.example.com/equation_images/1234"
-    expect(doc.css("a").map { |e| e["href"] }).to eq [
+    expect(doc.css("a").pluck("href")).to eq [
       "http://www.example.com/help",
       "//example.com/quiz",
       "http://example.com/test1",
@@ -282,7 +282,7 @@ describe UserContent, type: :request do
                         { controller: "wiki_pages_api", action: "show",
                           format: "json", course_id: @course.id.to_s, url_or_id: @wiki_page.url })
         doc = Nokogiri::HTML5.fragment(json["body"])
-        expect(doc.css("a").collect { |att| att["data-api-endpoint"] }).to eq [
+        expect(doc.css("a").pluck("data-api-endpoint")).to eq [
           "http://www.example.com/api/v1/courses/#{@course.id}/assignments",
           "http://www.example.com/api/v1/courses/#{@course.id}/assignments/9~123",
           "http://www.example.com/api/v1/courses/#{@course.id}/pages",
@@ -302,7 +302,7 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/courses/#{@course.id}/modules/1024",
           "http://www.example.com/api/v1/courses/#{@course.id}/external_tools/sessionless_launch?url=http%3A%2F%2Flti-tool-provider.example.com%2Flti_tool"
         ]
-        expect(doc.css("a").collect { |att| att["data-api-returntype"] }).to eq(
+        expect(doc.css("a").pluck("data-api-returntype")).to eq(
           %w([Assignment] Assignment [Page] Page Page [Page] Page Page [Discussion] Discussion Folder File File [Quiz] Quiz [Module] Module SessionlessLaunchUrl)
         )
       end
@@ -331,7 +331,7 @@ describe UserContent, type: :request do
                         { controller: "wiki_pages_api", action: "show",
                           format: "json", group_id: @group.id.to_s, url_or_id: @wiki_page.url })
         doc = Nokogiri::HTML5.fragment(json["body"])
-        expect(doc.css("a").collect { |att| att["data-api-endpoint"] }).to eq [
+        expect(doc.css("a").pluck("data-api-endpoint")).to eq [
           "http://www.example.com/api/v1/groups/#{@group.id}/pages",
           "http://www.example.com/api/v1/groups/#{@group.id}/pages/some-page",
           "http://www.example.com/api/v1/groups/#{@group.id}/pages",
@@ -341,7 +341,7 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/groups/#{@group.id}/folders/root",
           "http://www.example.com/api/v1/groups/#{@group.id}/files/789"
         ]
-        expect(doc.css("a").collect { |att| att["data-api-returntype"] }).to eq(
+        expect(doc.css("a").pluck("data-api-returntype")).to eq(
           %w([Page] Page [Page] Page [Discussion] Discussion Folder File)
         )
       end
@@ -358,11 +358,11 @@ describe UserContent, type: :request do
                         controller: "discussion_topics_api", action: "show", format: "json",
                         course_id: @course.id.to_s, topic_id: @topic.id.to_s)
         doc = Nokogiri::HTML5.fragment(json["message"])
-        expect(doc.css("a").collect { |att| att["data-api-endpoint"] }).to eq [
+        expect(doc.css("a").pluck("data-api-endpoint")).to eq [
           "http://www.example.com/api/v1/users/#{@teacher.id}/folders/root",
           "http://www.example.com/api/v1/users/#{@teacher.id}/files/789"
         ]
-        expect(doc.css("a").collect { |att| att["data-api-returntype"] }).to eq(
+        expect(doc.css("a").pluck("data-api-returntype")).to eq(
           %w[Folder File]
         )
       end

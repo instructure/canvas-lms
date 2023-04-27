@@ -23,9 +23,31 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import ContextModulesPublishIcon from '../react/ContextModulesPublishIcon'
 import {updateModuleItem, itemContentKey} from '../jquery/utils'
+import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('context_modules_utils_publishmoduleitemhelper')
+
+interface ModuleItemAttributes {
+  module_item_id: number
+}
+
+interface ModuleItemModel {
+  attributes: ModuleItemAttributes
+}
+
+interface ModuleItemView {
+  model: ModuleItemModel
+}
+
+interface ModuleItem {
+  model: ModuleItemModel
+  view: ModuleItemView
+}
+
+interface KeyedModuleItems {
+  [key: string]: ModuleItem[]
+}
 
 type moduleItemStateData = {
   published?: boolean
@@ -77,7 +99,8 @@ export function batchUpdateOneModuleApiCall(
   exportFuncs.renderContextModulesPublishIcon(courseId, moduleId, published, true, loadingMessage)
   exportFuncs.updateModuleItemsPublishedStates(moduleId, undefined, true)
   exportFuncs.disableContextModulesPublishMenu(true)
-
+  const relockModulesDialog = new RelockModulesDialog()
+  let published_result
   return doFetchApi({
     path,
     method: 'PUT',
@@ -89,25 +112,37 @@ export function batchUpdateOneModuleApiCall(
     },
   })
     .then(result => {
-      exportFuncs.fetchModuleItemPublishedState(courseId, moduleId)
-      exportFuncs.renderContextModulesPublishIcon(
-        courseId,
-        moduleId,
-        result.json.published,
-        false,
-        loadingMessage
-      )
-      if (skipContentTags) {
-        exportFuncs.updateModuleItemsPublishedStates(moduleId, undefined, false)
-      } else {
-        exportFuncs.updateModuleItemsPublishedStates(moduleId, result.json.published, false)
+      if (result.json.publish_warning) {
+        showFlashAlert({
+          message: I18n.t('Some module items could not be published'),
+          type: 'warning',
+          err: null,
+        })
       }
-      showFlashAlert({
-        message: successMessage,
-        type: 'success',
-        err: null,
-        srOnly: true,
-      })
+      relockModulesDialog.renderIfNeeded(result.json)
+
+      return exportFuncs
+        .fetchModuleItemPublishedState(courseId, moduleId)
+        .then(() => {
+          published_result = result.json.published
+
+          showFlashAlert({
+            message: successMessage,
+            type: 'success',
+            err: null,
+            srOnly: true,
+          })
+        })
+        .finally(() => {
+          exportFuncs.disableContextModulesPublishMenu(false)
+          exportFuncs.renderContextModulesPublishIcon(
+            courseId,
+            moduleId,
+            published_result,
+            false,
+            loadingMessage
+          )
+        })
     })
     .catch(error => {
       showFlashAlert({
@@ -117,13 +152,10 @@ export function batchUpdateOneModuleApiCall(
       })
       exportFuncs.updateModuleItemsPublishedStates(moduleId, undefined, false)
     })
-    .finally(() => {
-      exportFuncs.disableContextModulesPublishMenu(false)
-    })
 }
 
 export const fetchModuleItemPublishedState = (courseId, moduleId, nextLink?: string) => {
-  doFetchApi({
+  return doFetchApi({
     path: nextLink || `/api/v1/courses/${courseId}/modules/${moduleId}/items`,
     method: 'GET',
   })
@@ -133,7 +165,9 @@ export const fetchModuleItemPublishedState = (courseId, moduleId, nextLink?: str
         exportFuncs.updateModuleItemPublishedState(item.id, item.published)
       })
       if (link?.next) {
-        exportFuncs.fetchModuleItemPublishedState(courseId, moduleId, link.next.url)
+        return exportFuncs.fetchModuleItemPublishedState(courseId, moduleId, link.next.url)
+      } else {
+        return response
       }
     })
     .catch(error =>
@@ -145,49 +179,97 @@ export const fetchModuleItemPublishedState = (courseId, moduleId, nextLink?: str
     )
 }
 
-// update the state of all the module items' pub/unpub buttons
+// collect all the module items, indexed by their key
+// which is the underlying learning object's asset_string
+// (e.g. assignment_17 or wiki_page_5)
+export function getAllModuleItems(): KeyedModuleItems {
+  const moduleItems = {}
+  document.querySelectorAll('#context_modules .publish-icon').forEach(element => {
+    const $publishIcon = $(element)
+    const data = $publishIcon.data()
+    const view = data.view
+    if (view) {
+      const key = itemContentKey(view.model) as string
+      if (moduleItems[key]) {
+        moduleItems[key].push({view, model: view.model})
+      } else {
+        moduleItems[key] = [{view, model: view.model}]
+      }
+    }
+  })
+  return moduleItems
+}
+
+// update the state of all the module items' pub/unpub state
 export function updateModuleItemsPublishedStates(
   moduleId: number,
   published: boolean | undefined,
   isPublishing: boolean
 ) {
+  const moduleItems = exportFuncs.getAllModuleItems()
+
+  // update all the module items in the module being updated,
+  // plus module items that are also in other modules
   document
     .querySelectorAll(`#context_module_content_${moduleId} .publish-icon`)
     .forEach(element => {
-      const $publishIcon = $(element)
-      const data = $publishIcon.data()
-      const view = data.view
-      const updatedAttrs: moduleItemStateData = {bulkPublishInFlight: isPublishing}
-      if (!isPublishing && typeof published === 'boolean') updatedAttrs.published = published
-      if (view) {
-        const key = itemContentKey(view.model) as string
-        updateModuleItem({[key]: [{view, model: view.model}]}, updatedAttrs, view.model)
-      }
+      exportFuncs.updateModuleItemPublishedState(
+        element as HTMLElement,
+        published,
+        isPublishing,
+        moduleItems
+      )
     })
 }
 
-export function updateModuleItemPublishedState(itemId: string, isPublished: boolean) {
-  const itemRow = document.querySelector(`#context_module_item_${itemId}`) as HTMLElement | null
-  if (itemRow) {
-    itemRow.querySelector('.ig-row')?.classList.toggle('ig-published', isPublished)
-    const publishIcon = itemRow.querySelector('.publish-icon')
-    if (publishIcon) {
-      const $publishIcon = $(publishIcon)
-      const data = $publishIcon.data()
-      const view = data.view
-      const updatedAttrs: moduleItemStateData = {published: isPublished}
-      const key = itemContentKey(view.model) as string
-      updateModuleItem({[key]: [{view, model: view.model}]}, updatedAttrs, view.model)
+// update an  item's pub/sub state
+export function updateModuleItemPublishedState(
+  itemIdOrElem: string | HTMLElement,
+  isPublished: boolean | undefined,
+  isPublishing?: boolean,
+  allModuleItems?: KeyedModuleItems | undefined
+) {
+  const publishIcon =
+    typeof itemIdOrElem === 'string'
+      ? document.querySelector(`#context_module_item_${itemIdOrElem} .publish-icon`)
+      : itemIdOrElem
+
+  if (publishIcon) {
+    const $publishIcon = $(publishIcon)
+    const data = $publishIcon.data()
+    const view = data.view
+    const updatedAttrs: moduleItemStateData = {
+      bulkPublishInFlight: isPublishing,
     }
+    if (!isPublishing && typeof isPublished === 'boolean') updatedAttrs.published = isPublished
+    const key = itemContentKey(view.model) as string
+    const items = allModuleItems?.[key] || [{view, model: view.model}]
+    updateModuleItem({[key]: items}, updatedAttrs, view.model)
+    if (!isPublishing && typeof isPublished === 'boolean')
+      updateModuleItemRowsPublishStates(items, isPublished)
   }
 }
 
+// published items have a green bar on their leading edge.
+// make that happen for all the matching items
+// the code in PublishButton.prototype.renderState handles it for a single item
+// but doesn't work for items that are in multiple modules during bulk publish
+export function updateModuleItemRowsPublishStates(items: ModuleItem[], isPublished: boolean): void {
+  items.forEach(item => {
+    const itemId = item.model.attributes.module_item_id
+    const itemRow = document.querySelector(`#context_module_item_${itemId}`) as HTMLElement | null
+    if (itemRow) {
+      itemRow.querySelector('.ig-row')?.classList.toggle('ig-published', isPublished)
+    }
+  })
+}
+
 export function renderContextModulesPublishIcon(
-  courseId,
-  moduleId,
-  published,
-  isPublishing,
-  loadingMessage
+  courseId: string | number,
+  moduleId: string | number,
+  published: boolean | undefined,
+  isPublishing: boolean,
+  loadingMessage?: string
 ) {
   const publishIcon = findModulePublishIcon(moduleId)
   ReactDOM.render(
@@ -203,7 +285,7 @@ export function renderContextModulesPublishIcon(
 }
 
 function findModulePublishIcon(moduleId) {
-  return document.querySelector(`.module-publish-icon[data-module-id="${moduleId}"]`)
+  return document.querySelector(`#context_module_${moduleId} .module-publish-icon`)
 }
 
 function getModulePublishState(moduleId) {
@@ -226,6 +308,7 @@ const exportFuncs = {
   unpublishModule,
   batchUpdateOneModuleApiCall,
   fetchModuleItemPublishedState,
+  getAllModuleItems,
   updateModuleItemsPublishedStates,
   updateModuleItemPublishedState,
   renderContextModulesPublishIcon,

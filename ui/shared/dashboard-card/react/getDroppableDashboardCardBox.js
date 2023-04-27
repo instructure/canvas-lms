@@ -17,7 +17,7 @@
  */
 
 import {DropTarget} from 'react-dnd'
-import compose from 'compose'
+import {flowRight as compose} from 'lodash'
 import ItemTypes from './Types'
 import DashboardCardBox from './DashboardCardBox'
 import DefaultDragDropContext from './DefaultDragDropContext'

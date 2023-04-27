@@ -615,6 +615,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Kei te tukatuka te konae pāpāho. Tēnā koa ngana anō i muri mai."
   },
+  "media_title_2112243b": { "message": "Pāpāho Taitara" },
   "medium_5a8e9ead": { "message": "Kauwaka" },
   "merge_links_2478df96": { "message": "Whakapiri ngā hononga" },
   "mic_a7f3d311": { "message": "Mic" },
@@ -908,9 +909,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "He hapa i te wā e tuari ana i tō mata."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Aroha mai, kaore matou e tautoko i nga konae maha."
-  },
   "sort_by_e75f9e3e": { "message": "Wehewehe e" },
   "spades_suit_b37020c2": { "message": "Haka (Hutu)" },
   "square_511eb3b3": { "message": "Tapawha" },
@@ -932,6 +930,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Timata te hopu ana" },
   "steel_blue_14296f08": { "message": "Te rino Kahurangi" },
   "studio_media_options_ee504361": { "message": "kōwhiringa pāpāho studio" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Paepae Kōwhiringa Papapāho Studio"
+  },
   "styles_2aa721ef": { "message": "Ngā Kāhua" },
   "submit_a3cc6859": { "message": "Tuku" },
   "subscript_59744f96": { "message": "Tuhinga" },

@@ -319,5 +319,35 @@ describe CC::CCHelper do
         HTML
       end.not_to raise_error
     end
+
+    context "disable_content_rewriting is truthy" do
+      let(:html) { "<p><a href=\"/courses/#{@course.id}/files\">Files tab</a></p>" }
+
+      it "skips html rewrite" do
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, disable_content_rewriting: true)
+        expect(@exporter.html_content(html)).to eq(html)
+
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, disable_content_rewriting: "false")
+        expect(@exporter.html_content(html)).to eq(html)
+
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, disable_content_rewriting: "true")
+        expect(@exporter.html_content(html)).to eq(html)
+
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, disable_content_rewriting: 5)
+        expect(@exporter.html_content(html)).to eq(html)
+      end
+    end
+
+    context "disable_content_rewriting is false or unset" do
+      let(:html) { "<p><a href=\"/courses/#{@course.id}/files\">Files tab</a></p>" }
+
+      it "does html rewrite" do
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, disable_content_rewriting: false)
+        expect(@exporter.html_content(html)).to not_eq(html)
+
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+        expect(@exporter.html_content(html)).to not_eq(html)
+      end
+    end
   end
 end

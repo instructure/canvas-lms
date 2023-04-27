@@ -60,7 +60,7 @@ describe('doFileUpload()', () => {
       accept: undefined,
       panels: ['COMPUTER', 'URL'],
       preselectedFile: undefined,
-    })
+    }).shownPromise
     expect(document.querySelector('.canvas-rce-upload-container')).toBeTruthy()
   })
 
@@ -72,7 +72,7 @@ describe('doFileUpload()', () => {
       accept: undefined,
       panels: ['COMPUTER'],
       preselectedFile: undefined,
-    })
+    }).shownPromise
     expect(document.querySelectorAll('.canvas-rce-upload-container').length).toEqual(1)
   })
 
@@ -81,7 +81,7 @@ describe('doFileUpload()', () => {
       accept: 'image/*',
       panels: ['COMPUTER'],
       preselectedFile: undefined,
-    })
+    }).shownPromise
     expect(
       getAllByLabelText(document, 'Upload Image', {
         selector: '[role="dialog"]',
@@ -94,7 +94,7 @@ describe('doFileUpload()', () => {
       accept: undefined,
       panels: ['COMPUTER'],
       preselectedFile: undefined,
-    })
+    }).shownPromise
     expect(
       getAllByLabelText(document, 'Upload File', {
         selector: '[role="dialog"]',
@@ -107,7 +107,7 @@ describe('doFileUpload()', () => {
       accept: undefined,
       panels: ['COMPUTER'],
       preselectedFile: undefined,
-    })
+    }).shownPromise
     expect(
       getAllByLabelText(document, 'Upload File', {
         selector: '[role="dialog"]',
@@ -127,7 +127,7 @@ describe('doFileUpload()', () => {
         accept: 'image/*',
         panels: ['COMPUTER', 'URL'],
         preselectedFile: undefined,
-      })
+      }).shownPromise
       await waitFor(() => {
         expect(document.querySelectorAll('[role="tab"]').length).toEqual(2)
       })
@@ -148,7 +148,7 @@ describe('doFileUpload()', () => {
         accept: 'image/*',
         panels: ['URL'],
         preselectedFile: undefined,
-      })
+      }).shownPromise
       await waitFor(() => {
         expect(document.querySelectorAll('[role="tab"]').length).toEqual(1)
       })

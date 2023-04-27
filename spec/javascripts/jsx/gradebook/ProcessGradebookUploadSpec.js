@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import _ from 'lodash'
 
 import ProcessGradebookUpload from 'ui/features/gradebook_uploads/jquery/process_gradebook_upload'
 import fakeENV from 'helpers/fakeENV'

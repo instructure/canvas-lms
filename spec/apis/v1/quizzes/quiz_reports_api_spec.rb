@@ -55,7 +55,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
         json = api_index
         expect(json.length).to eq 2
-        expect(json.map { |report| report["report_type"] }.sort)
+        expect(json.pluck("report_type").sort)
           .to eq %w[item_analysis student_analysis]
       end
 
@@ -98,7 +98,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
           expect(json["quiz_reports"]).to be_present
           expect(json["quiz_reports"].length).to eq 2
-          expect(json["quiz_reports"].map { |report| report["report_type"] }.sort)
+          expect(json["quiz_reports"].pluck("report_type").sort)
             .to eq %w[item_analysis student_analysis]
         end
       end

@@ -871,8 +871,8 @@ describe GradingPeriod do
           title: "B"
         )
         json = GradingPeriod.json_for(course, nil)
-        expect(json.map { |el| el["title"] }).to eq %w[A B C]
-        expect(json.map { |el| el["is_last"] }).to eq [false, false, true]
+        expect(json.pluck("title")).to eq %w[A B C]
+        expect(json.pluck("is_last")).to eq [false, false, true]
       end
     end
   end

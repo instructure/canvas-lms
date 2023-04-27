@@ -614,6 +614,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Mediefilen behandlas. Försök igen senare."
   },
+  "media_title_2112243b": { "message": "Medietitel" },
   "medium_5a8e9ead": { "message": "Medium" },
   "merge_links_2478df96": { "message": "Sammanfoga länkar" },
   "mic_a7f3d311": { "message": "Mikrofon" },
@@ -901,9 +902,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Något gick fel vid delning av skärmen."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Tyvärr, vi stöder inte flera filer."
-  },
   "sort_by_e75f9e3e": { "message": "Sortera efter" },
   "spades_suit_b37020c2": { "message": "Spader (kortlek)" },
   "square_511eb3b3": { "message": "Kvadrat" },
@@ -927,6 +925,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Starta inspelning" },
   "steel_blue_14296f08": { "message": "Stålblå" },
   "studio_media_options_ee504361": { "message": "Mediealternativ för Studio" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Panel för Studio-mediealternativ"
+  },
   "styles_2aa721ef": { "message": "Stilar" },
   "submit_a3cc6859": { "message": "Spara" },
   "subscript_59744f96": { "message": "Nedsänkt" },

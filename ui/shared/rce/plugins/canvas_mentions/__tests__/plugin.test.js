@@ -385,6 +385,12 @@ describe('pluginDefinition', () => {
     })
 
     sharedExamplesForHandlersThatUnmount(subject)
+
+    it('removes onWindowMouseDown listener', () => {
+      window.removeEventListener = jest.fn()
+      subject()
+      expect(window.removeEventListener).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('ViewChange', () => {

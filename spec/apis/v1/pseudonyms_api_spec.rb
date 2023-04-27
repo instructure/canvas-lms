@@ -91,7 +91,7 @@ describe PseudonymsController, type: :request do
 
         json = api_call(:get, @user_path, @user_path_options)
         expect(json.count).to be 2
-        expect(json.map { |j| j["id"] }.include?(to_delete.id)).to be_falsey
+        expect(json.pluck("id").include?(to_delete.id)).to be_falsey
       end
 
       it "includes suspended pseudonyms" do

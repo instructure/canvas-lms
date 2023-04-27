@@ -18,11 +18,10 @@
 
 import Handlebars from '@canvas/handlebars-helpers'
 import $ from 'jquery'
-import _ from 'underscore'
+import _ from 'lodash'
 import assertions from 'helpers/assertions'
 import fakeENV from 'helpers/fakeENV'
 import numberFormat from '@canvas/i18n/numberFormat'
-import tz from '@canvas/timezone'
 import tzInTest from '@canvas/timezone/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
