@@ -22,7 +22,7 @@ import GradingPeriod from './gradingPeriod'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
-import {camelize} from '@canvas/convert-case'
+import {camelizeProperties} from '@canvas/convert-case'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
 const I18n = useI18nScope('gradinggradingPeriodCollection')
@@ -63,7 +63,7 @@ class GradingPeriodCollection extends React.Component {
 
   deserializePeriods = periods =>
     _.map(periods.grading_periods, period => {
-      const newPeriod = camelize(period)
+      const newPeriod = camelizeProperties(period)
       newPeriod.startDate = new Date(period.start_date)
       newPeriod.endDate = new Date(period.end_date)
       newPeriod.closeDate = new Date(period.close_date || period.end_date)

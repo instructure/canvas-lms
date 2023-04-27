@@ -29,7 +29,7 @@ import type {
 } from './gradebook.d'
 import type {StatusColors} from './constants/colors'
 import type {GridDisplaySettings, FilterColumnsOptions} from './grid.d'
-import {camelize} from '@canvas/convert-case'
+import {camelizeProperties} from '@canvas/convert-case'
 
 export function getInitialGradebookContent(options: {teacher_notes: null | CustomColumn}) {
   return {
@@ -59,14 +59,14 @@ export function getInitialGridDisplaySettings(
     endDate: null,
   }
   if (settings.filter_columns_by != null) {
-    Object.assign(filterColumnsBy, camelize(settings.filter_columns_by))
+    Object.assign(filterColumnsBy, camelizeProperties(settings.filter_columns_by))
   }
   const filterRowsBy = {
     sectionId: null,
     studentGroupId: null,
   }
   if (settings.filter_rows_by != null) {
-    Object.assign(filterRowsBy, camelize(settings.filter_rows_by))
+    Object.assign(filterRowsBy, camelizeProperties(settings.filter_rows_by))
   }
   return {
     colors,
@@ -132,11 +132,11 @@ export function getInitialCourseContent(options: GradebookOptions): CourseConten
     contextModules: [],
     courseGradingScheme,
     defaultGradingScheme,
-    gradingSchemes: options.grading_schemes.map(camelize),
+    gradingSchemes: options.grading_schemes.map(camelizeProperties),
     gradingPeriodAssignments: {},
     assignmentStudentVisibility: {},
     latePolicy: options.late_policy
-      ? camelize<LatePolicyCamelized>(options.late_policy)
+      ? camelizeProperties<LatePolicyCamelized>(options.late_policy)
       : undefined,
     students: new StudentDatastore({}, {}),
     modulesById: {},

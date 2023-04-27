@@ -25,6 +25,7 @@ import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
 import PublishableModuleItem from '../backbone/models/PublishableModuleItem'
 import PublishIconView from '@canvas/publish-icon-view'
+import {underscoreString} from '@canvas/convert-case'
 
 const I18n = useI18nScope('context_modulespublic')
 
@@ -300,7 +301,7 @@ export function itemContentKey(model) {
   if (model === null) return null
 
   const attrs = model.attributes || model
-  let content_type = $.underscore(attrs.module_type || attrs.type)
+  let content_type = underscoreString(attrs.module_type || attrs.type)
   let content_id = attrs.content_id || attrs.id
 
   content_type = content_type_map[content_type] || content_type

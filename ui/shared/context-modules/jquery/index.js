@@ -70,6 +70,7 @@ import {
 } from './utils'
 import ContextModulesPublishMenu from '../react/ContextModulesPublishMenu'
 import {renderContextModulesPublishIcon} from '../utils/publishOneModuleHelper'
+import {underscoreString} from '@canvas/convert-case'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -515,7 +516,7 @@ window.modules = (function () {
         return $('<div/>')
       }
       data.id = data.id || 'new'
-      data.type = data.type || data['item[type]'] || $.underscore(data.content_type)
+      data.type = data.type || data['item[type]'] || underscoreString(data.content_type)
       data.title = data.title || data['item[title]']
       data.new_tab = data.new_tab ? '1' : '0'
       data.graded = data.graded ? '1' : '0'

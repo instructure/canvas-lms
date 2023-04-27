@@ -18,7 +18,7 @@
 
 import React, {useRef, useEffect, useCallback} from 'react'
 import shallow from 'zustand/shallow'
-import {camelize} from '@canvas/convert-case'
+import {camelizeProperties} from '@canvas/convert-case'
 import PostGradesStore from '../SISGradePassback/PostGradesStore'
 import Gradebook from './Gradebook'
 import {findFilterValuesOfType} from './Gradebook.utils'
@@ -47,7 +47,7 @@ type Props = {
 
 export default function GradebookData(props: Props) {
   const performanceControls = useRef(
-    new PerformanceControls(camelize(props.gradebookEnv.performance_controls))
+    new PerformanceControls(camelizeProperties(props.gradebookEnv.performance_controls))
   )
   const dispatch = useRef(
     new RequestDispatch({

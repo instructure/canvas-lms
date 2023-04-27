@@ -18,7 +18,7 @@
 
 import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {underscore} from '@canvas/convert-case'
+import {underscoreProperties} from '@canvas/convert-case'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {serializeFilter} from '../Gradebook.utils'
 import type {CustomColumn, FilterPreset, GradebookSettings} from '../gradebook.d'
@@ -27,7 +27,7 @@ const I18n = useI18nScope('gradebookGradebookApi')
 
 function applyScoreToUngradedSubmissions(courseId?: string, params: any = {}) {
   const url = `/api/v1/courses/${courseId}/apply_score_to_ungraded_submissions`
-  return axios.put(url, underscore(params))
+  return axios.put(url, underscoreProperties(params))
 }
 
 function createTeacherNotesColumn(courseId: string) {
@@ -56,7 +56,7 @@ function updateSubmission(
 ) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${userId}`
   return axios.put(url, {
-    submission: underscore(submission),
+    submission: underscoreProperties(submission),
     include: ['visibility'],
     prefer_points_over_scheme: enterGradesAs === 'points',
   })

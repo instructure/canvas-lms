@@ -18,7 +18,7 @@
 
 import _ from 'lodash'
 
-import {underscore} from '@canvas/convert-case'
+import {underscoreProperties} from '@canvas/convert-case'
 import FakeServer, {
   jsonBodyFromRequest,
   pathFromRequest,
@@ -51,7 +51,7 @@ QUnit.module('GradebookSettingsModalApi.fetchLatePolicy success', {
   setup() {
     this.url = '/api/v1/courses/19/late_policy'
     this.server = sinon.fakeServer.create({respondImmediately: true})
-    const responseBody = JSON.stringify({late_policy: underscore(latePolicyData)})
+    const responseBody = JSON.stringify({late_policy: underscoreProperties(latePolicyData)})
     this.server.respondWith('GET', this.url, [
       200,
       {'Content-Type': 'application/json'},
@@ -121,7 +121,7 @@ QUnit.module('GradebookSettingsModalApi.createLatePolicy', {
     delete this.latePolicyCreationData.id
     this.url = '/api/v1/courses/19/late_policy'
     this.server = sinon.fakeServer.create({respondImmediately: true})
-    const responseBody = JSON.stringify({late_policy: underscore(latePolicyData)})
+    const responseBody = JSON.stringify({late_policy: underscoreProperties(latePolicyData)})
     this.server.respondWith('POST', this.url, [
       200,
       {'Content-Type': 'application/json'},
@@ -137,7 +137,7 @@ QUnit.module('GradebookSettingsModalApi.createLatePolicy', {
 test('includes data to create a late_policy', function () {
   return createLatePolicy('19', latePolicyData).then(() => {
     const bodyData = JSON.parse(getRequestWithUrl(this.server, this.url).requestBody)
-    deepEqual(bodyData, {late_policy: underscore(latePolicyData)})
+    deepEqual(bodyData, {late_policy: underscoreProperties(latePolicyData)})
   })
 })
 
@@ -163,7 +163,7 @@ QUnit.module('GradebookSettingsModalApi.updateLatePolicy', {
 test('includes data to update a late_policy', function () {
   return updateLatePolicy('19', this.changes).then(() => {
     const bodyData = JSON.parse(getRequestWithUrl(this.server, this.url).requestBody)
-    deepEqual(bodyData, {late_policy: underscore(this.changes)})
+    deepEqual(bodyData, {late_policy: underscoreProperties(this.changes)})
   })
 })
 

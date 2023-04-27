@@ -22,18 +22,13 @@ import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
-
 import '@canvas/jquery/jquery.instructure_misc_plugins'
-
 import '@canvas/loading-image'
-
 import '@canvas/rails-flash-notifications'
-
 import 'jquery-scroll-to-visible'
-
 import '@canvas/util/templateData'
-
 import 'jquery-scroll-to-visible/jquery.scrollTo'
+import {underscoreString} from '@canvas/convert-case'
 
 const I18n = useI18nScope('user_lists')
 
@@ -289,7 +284,7 @@ const UL = (INST.UserLists = {
   },
   addUserToList(enrollment) {
     let $before, $enrollment, $list, already_existed
-    const enrollmentType = $.underscore(enrollment.type)
+    const enrollmentType = underscoreString(enrollment.type)
     $list = $('.user_list.' + enrollmentType + 's')
     if (!$list.length) {
       if (enrollmentType === 'student_enrollment' || enrollmentType === 'observer_enrollment') {

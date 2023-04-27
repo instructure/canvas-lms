@@ -24,7 +24,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
-import toUnderscore from './str-underscore'
+import {underscoreString} from '@canvas/convert-case'
 
 const I18n = useI18nScope('section')
 
@@ -88,7 +88,7 @@ export default data =>
 
     // add extra fields to enrollments
     enrollment.typeLabel = keys[scope][enrollment.role] || customLabel
-    enrollment.typeClass = toUnderscore(enrollment.type)
+    enrollment.typeClass = underscoreString(enrollment.type)
 
     return enrollment
   })

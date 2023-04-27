@@ -17,7 +17,7 @@
  */
 
 import SubmissionCommentApi from 'ui/features/gradebook/react/default_gradebook/apis/SubmissionCommentApi'
-import {underscore} from '@canvas/convert-case'
+import {underscoreProperties} from '@canvas/convert-case'
 
 QUnit.module('SubmissionCommentApi.updateSubmissionComment', hooks => {
   let server
@@ -31,7 +31,7 @@ QUnit.module('SubmissionCommentApi.updateSubmissionComment', hooks => {
     comment: updatedComment,
     edited_at: editedAt,
   }
-  const responseBody = JSON.stringify({submission_comment: underscore(submissionComment)})
+  const responseBody = JSON.stringify({submission_comment: underscoreProperties(submissionComment)})
 
   hooks.beforeEach(() => {
     server = sinon.fakeServer.create({respondImmediately: true})

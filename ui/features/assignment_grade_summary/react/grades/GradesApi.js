@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {camelize, underscore} from '@canvas/convert-case'
+import {camelizeProperties, underscoreProperties} from '@canvas/convert-case'
 
 export function bulkSelectProvisionalGrades(courseId, assignmentId, provisionalGradeIds) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/provisional_grades/bulk_select`
@@ -35,10 +35,10 @@ export function updateProvisionalGrade(courseId, submission) {
   const url = `/courses/${courseId}/gradebook/update_submission`
   const data = {
     submission: {
-      ...underscore(submission),
+      ...underscoreProperties(submission),
       provisional: true,
     },
   }
 
-  return axios.post(url, data).then(response => camelize(response.data[0].submission))
+  return axios.post(url, data).then(response => camelizeProperties(response.data[0].submission))
 }
