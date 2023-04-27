@@ -59,21 +59,10 @@ module Lti
         end
 
         # deep linking on the new/edit assignment page should:
-        # * only use the first content item to create an assignment
-        # * not create a new module
-        # * reload the page
+        # * not create a resource link
+        # * not reload the page
         if for_placement?(:assignment_selection)
-          unless @context.root_account.feature_enabled? :lti_assignment_page_line_items
-            render_content_items(reload_page: false)
-            return
-          end
-
-          item_for_assignment = lti_resource_links.first
-          if allow_line_items? && item_for_assignment.key?(:lineItem) && validate_line_item!(item_for_assignment)
-            create_update_assignment!(item_for_assignment, return_url_parameters[:assignment_id])
-          end
-
-          render_content_items(items: [item_for_assignment])
+          render_content_items(reload_page: false)
           return
         end
 

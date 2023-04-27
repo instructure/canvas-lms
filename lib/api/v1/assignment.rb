@@ -1009,6 +1009,12 @@ module Api::V1::Assignment
       assignment.peer_reviews = false
     end
 
+    line_item = assignment_params.dig(:external_tool_tag_attributes, :line_item)
+    if line_item.respond_to?(:dig)
+      assignment.line_item_resource_id = line_item[:resourceId]
+      assignment.line_item_tag = line_item[:tag]
+    end
+
     {
       assignment: assignment,
       overrides: overrides,

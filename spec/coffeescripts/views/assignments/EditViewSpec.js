@@ -1428,6 +1428,11 @@ test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes 
     'item[new_tab]': '1',
     'item[iframe][width]': '111',
     'item[iframe][height]': '222',
+    'item[line_item]': '{"scoreMaximum": 1234}',
+    'item[submission]': '{"endDateTime": "2023-04-21T00:00:00.000Z"}',
+    'item[available]':
+      '{"startDateTime": "2023-04-13T00:00:00.000Z", "endDateTime": "2023-04-14T00:00:00.000Z"}',
+    'item[description]': 'todo_fix_me',
   }
   const view = editView()
 
@@ -1442,6 +1447,7 @@ test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes 
   equal(view.$externalToolsContentId.val(), '1')
   equal(view.$externalToolsUrl.val(), 'https://foo.bar/internal_link/klIknZO7sE')
   equal(view.$externalToolsNewTab.val(), '1')
+  equal(view.$assignmentPointsPossible.val(), '1234')
   equal(view.$externalToolsIframeWidth.val(), '111')
   equal(view.$externalToolsIframeHeight.val(), '222')
 })

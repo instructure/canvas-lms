@@ -25,7 +25,6 @@ import {
   selectContentDialog,
 } from '@canvas/select-content-dialog'
 import $ from 'jquery'
-import _ from 'lodash'
 
 let fixtures = null
 let clickEvent = {}
@@ -162,6 +161,10 @@ QUnit.module('SelectContentDialog: deepLinkingResponseHandler', {
         <input type='text' id='external_tool_create_url' />
         <input type='text' id='external_tool_create_title' />
         <input type='text' id='external_tool_create_custom_params' />
+        <input type='text' id='external_tool_create_line_item' />
+        <input type='text' id='external_tool_create_description' />
+        <input type='text' id='external_tool_create_available' />
+        <input type='text' id='external_tool_create_submission' />
         <input type='text' id='external_tool_create_assignment_id' />
         <input type='text' id='external_tool_create_iframe_width' />
         <input type='text' id='external_tool_create_iframe_height' />
@@ -208,12 +211,16 @@ const contentItem = {
     width: 123,
     height: 456,
   },
+  lineItem: {scoreMaximum: 4},
+  available: {startDateTime: '2023-04-12T00:00:00.000Z', endDateTime: '2023-04-22T00:00:00.000Z'},
+  submission: {startDateTime: '2023-04-12T00:00:00.000Z', endDateTime: '2023-04-21T00:00:00.000Z'},
+  text: 'Description text',
 }
 const makeDeepLinkingEvent = (additionalContentItemFields = {}) => {
   return {
     data: {
       subject: 'LtiDeepLinkingResponse',
-      content_items: [_.merge(additionalContentItemFields, contentItem)],
+      content_items: [{...contentItem, ...additionalContentItemFields}],
       ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking',
     },
   }
@@ -280,6 +287,16 @@ test('recover item data from context external tool item', async () => {
   equal(data['item[custom_params]'], JSON.stringify(customParams))
   equal(data['item[iframe][width]'], 123)
   equal(data['item[iframe][height]'], 456)
+  equal(data['item[line_item]'], '{"scoreMaximum":4}')
+  equal(
+    data['item[available]'],
+    '{"startDateTime":"2023-04-12T00:00:00.000Z","endDateTime":"2023-04-22T00:00:00.000Z"}'
+  )
+  equal(
+    data['item[submission]'],
+    '{"startDateTime":"2023-04-12T00:00:00.000Z","endDateTime":"2023-04-21T00:00:00.000Z"}'
+  )
+  equal(data['item[description]'], 'Description text')
 })
 
 test('recover assignment id from context external tool item data if given', async () => {
@@ -331,13 +348,6 @@ test('close all dialogs when content items attribute is empty', async () => {
   }
 
   await deepLinkingResponseHandler(deepLinkingEvent)
-
-  strictEqual($('#select_context_content_dialog').is(':visible'), false)
-  strictEqual($('#resource_selection_dialog').is(':visible'), false)
-})
-
-test('close dialog when content item has assignment_id', async () => {
-  await deepLinkingResponseHandler(deepLinkingEventWithAssignmentId)
 
   strictEqual($('#select_context_content_dialog').is(':visible'), false)
   strictEqual($('#resource_selection_dialog').is(':visible'), false)

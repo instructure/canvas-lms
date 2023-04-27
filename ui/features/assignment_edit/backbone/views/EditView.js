@@ -99,6 +99,7 @@ const EXTERNAL_TOOLS_NEW_TAB = '#assignment_external_tool_tag_attributes_new_tab
 const EXTERNAL_TOOLS_IFRAME_WIDTH = '#assignment_external_tool_tag_attributes_iframe_width'
 const EXTERNAL_TOOLS_IFRAME_HEIGHT = '#assignment_external_tool_tag_attributes_iframe_height'
 const EXTERNAL_TOOLS_CUSTOM_PARAMS = '#assignment_external_tool_tag_attributes_custom_params'
+const EXTERNAL_TOOLS_LINE_ITEM = '#assignment_external_tool_tag_attributes_line_item'
 const ASSIGNMENT_POINTS_POSSIBLE = '#assignment_points_possible'
 const ASSIGNMENT_POINTS_CHANGE_WARN = '#point_change_warning'
 const SECURE_PARAMS = '#secure_params'
@@ -227,6 +228,7 @@ EditView.prototype.els = _.extend(
     els['' + EXTERNAL_TOOLS_NEW_TAB] = '$externalToolsNewTab'
     els['' + EXTERNAL_TOOLS_IFRAME_WIDTH] = '$externalToolsIframeWidth'
     els['' + EXTERNAL_TOOLS_IFRAME_HEIGHT] = '$externalToolsIframeHeight'
+    els['' + EXTERNAL_TOOLS_LINE_ITEM] = '$externalToolsLineItem'
     els['' + EXTERNAL_TOOLS_CONTENT_TYPE] = '$externalToolsContentType'
     els['' + EXTERNAL_TOOLS_CUSTOM_PARAMS] = '$externalToolsCustomParams'
     els['' + EXTERNAL_TOOLS_CONTENT_ID] = '$externalToolsContentId'
@@ -561,7 +563,7 @@ EditView.prototype.showTurnitinDialog = function (ev) {
 }
 
 EditView.prototype.handleAssignmentSelectionSubmit = function (data) {
-  let context_id, context_type, message, ref
+  const line_items_enabled = !!window.ENV.FEATURES.lti_assignment_page_line_items
   this.$externalToolsCustomParams.val(data['item[custom_params]'])
   this.$externalToolsContentType.val(data['item[type]'])
   this.$externalToolsContentId.val(data['item[id]'])
@@ -569,21 +571,53 @@ EditView.prototype.handleAssignmentSelectionSubmit = function (data) {
   this.$externalToolsNewTab.prop('checked', data['item[new_tab]'] === '1')
   this.$externalToolsIframeWidth.val(data['item[iframe][width]'])
   this.$externalToolsIframeHeight.val(data['item[iframe][height]'])
-  if (data['item[assignment_id]']) {
-    message = I18n.t('Loading assignment details from external app')
-    $.flashMessage(message)
-    $.screenReaderFlashMessageExclusive(message)
-    ref = ENV.context_asset_string.split('_')
-    context_type = ref[0]
-    context_id = ref[1]
-    return (window.location.href =
-      '/' +
-      context_type +
-      's/' +
-      context_id +
-      '/assignments/' +
-      data['item[assignment_id]'] +
-      '/edit')
+
+  if (data['item[line_item]']) {
+    const line_item = tryJsonParse(data['item[line_item]'])
+    if (typeof line_item !== 'undefined') {
+      this.$externalToolsLineItem.val(data['item[line_item]'])
+    }
+    if (
+      line_item &&
+      'scoreMaximum' in line_item &&
+      (line_items_enabled || this.$assignmentPointsPossible.val() === '0')
+    ) {
+      this.$assignmentPointsPossible.val(line_item.scoreMaximum)
+    }
+    const new_assignment_name = 'label' in line_item ? line_item.label : data['item[title]']
+
+    if (new_assignment_name && (line_items_enabled || this.$name.val() === '')) {
+      this.$name.val(new_assignment_name)
+    }
+  } else {
+    const new_assignment_name = data['item[title]']
+    if (new_assignment_name && (line_items_enabled || this.$name.val() === '')) {
+      this.$name.val(new_assignment_name)
+    }
+  }
+
+  const description = data['item[description]']
+  if (description) {
+    const existing_desc = RichContentEditor.callOnRCE(this.$description, 'get_code')
+    if (line_items_enabled || existing_desc === '') {
+      RichContentEditor.callOnRCE(this.$description, 'set_code', description)
+    }
+  }
+
+  // TODO: add date prefill here
+}
+
+/**
+ * Attempts to JSON.parse the input, returning undefined if
+ * it's not possible
+ * @param {string} jsonStr
+ * @returns {unknown}
+ */
+function tryJsonParse(jsonStr) {
+  try {
+    return JSON.parse(jsonStr)
+  } catch {
+    return undefined
   }
 }
 
@@ -1130,8 +1164,13 @@ EditView.prototype.getFormData = function () {
   // The custom_params are stored as a JSONified string in a hidden input, but the API uses an
   // actual JSON object, so we have to convert.
   if (data.external_tool_tag_attributes.custom_params.trim()) {
-    data.external_tool_tag_attributes.custom_params = JSON.parse(
+    data.external_tool_tag_attributes.custom_params = tryJsonParse(
       data.external_tool_tag_attributes.custom_params
+    )
+  }
+  if (data.external_tool_tag_attributes.line_item.trim()) {
+    data.external_tool_tag_attributes.line_item = tryJsonParse(
+      data.external_tool_tag_attributes.line_item
     )
   }
   if ($grader_count.length > 0) {
