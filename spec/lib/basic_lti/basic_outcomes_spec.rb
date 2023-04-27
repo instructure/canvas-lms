@@ -225,11 +225,18 @@ describe BasicLTI::BasicOutcomes do
 
     context "jwt sourcedid" do
       before do
-        dynamic_settings = {
-          "lti-signing-secret" => "signing-secret-vp04BNqApwdwUYPUI",
-          "lti-encryption-secret" => "encryption-secret-5T14NjaTbcYjc4"
+        fake_lti_secrets = {
+          "lti-signing-secret" => Base64.encode64("signing-secret-vp04BNqApwdwUYPUI"),
+          "lti-encryption-secret" => Base64.encode64("encryption-secret-5T14NjaTbcYjc4")
         }
-        allow(DynamicSettings).to receive(:find) { dynamic_settings }
+
+        allow(Rails.application.credentials).to receive(:dig)
+          .with(:lti, :signing_secret)
+          .and_return(fake_lti_secrets["lti-signing-secret"])
+
+        allow(Rails.application.credentials).to receive(:dig)
+          .with(:lti, :encryption_secret)
+          .and_return(fake_lti_secrets["lti-encryption-secret"])
       end
 
       let(:jwt_source_id) do
