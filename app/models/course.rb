@@ -834,7 +834,7 @@ class Course < ActiveRecord::Base
 
         to_delete += current_associations.map { |_k, v| v.map { |_k2, v2| v2[0] } }.flatten
         unless to_delete.empty?
-          CourseAccountAssociation.where(id: to_delete).delete_all
+          CourseAccountAssociation.where(id: to_delete).in_batches(of: 10_000).delete_all
         end
       end
       Course.clear_cache_keys(course_ids_to_update_user_account_associations, :account_associations)
@@ -1310,7 +1310,7 @@ class Course < ActiveRecord::Base
       end
 
       self.class.connection.after_transaction_commit do
-        Enrollment.where(course_id: self).touch_all
+        Enrollment.where(course_id: self).in_batches(of: 10_000).touch_all
         user_ids = Enrollment.where(course_id: self).distinct.pluck(:user_id).sort
         # We might get lots of database locks when lots of courses with the same users are being updated,
         # so we can skip touching those users' updated_at stamp since another process will do it
@@ -3757,14 +3757,14 @@ class Course < ActiveRecord::Base
         course_sections.update_all(course_id: new_course.id)
         # we also want to bring along prior enrollments, so don't use the enrollments
         # association
-        Enrollment.where(course_id: self).update_all(course_id: new_course.id, updated_at: Time.now.utc)
+        Enrollment.where(course_id: self).in_batches(of: 10_000).update_all(course_id: new_course.id, updated_at: Time.now.utc)
         user_ids = new_course.all_enrollments.pluck(:user_id)
         self.class.connection.after_transaction_commit do
           User.touch_and_clear_cache_keys(user_ids, :enrollments)
         end
         Shard.partition_by_shard(user_ids) do |sharded_user_ids|
           Favorite.where(user_id: sharded_user_ids, context_type: "Course", context_id: id)
-                  .update_all(context_id: new_course.id, updated_at: Time.now.utc)
+                  .in_batches(of: 10_000).update_all(context_id: new_course.id, updated_at: Time.now.utc)
         end
 
         self.replacement_course_id = new_course.id

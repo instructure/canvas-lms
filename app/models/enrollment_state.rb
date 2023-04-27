@@ -254,18 +254,18 @@ class EnrollmentState < ActiveRecord::Base
 
   INVALIDATEABLE_STATES = %w[pending_invited pending_active invited active completed inactive].freeze # don't worry about creation_pending or rejected, etc
   def self.invalidate_states(enrollment_scope)
-    EnrollmentState.where(enrollment_id: enrollment_scope, state: INVALIDATEABLE_STATES)
+    EnrollmentState.where(enrollment_id: enrollment_scope, state: INVALIDATEABLE_STATES).in_batches(of: 10_000)
                    .update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
   end
 
   def self.invalidate_states_and_access(enrollment_scope)
-    EnrollmentState.where(enrollment_id: enrollment_scope, state: INVALIDATEABLE_STATES)
+    EnrollmentState.where(enrollment_id: enrollment_scope, state: INVALIDATEABLE_STATES).in_batches(of: 10_000)
                    .update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?, access_is_current = ?", false, false])
   end
 
   def self.force_recalculation(enrollment_ids, strand: nil)
     if enrollment_ids.any?
-      EnrollmentState.where(enrollment_id: enrollment_ids)
+      EnrollmentState.where(enrollment_id: enrollment_ids).in_batches(of: 10_000)
                      .update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
       args = strand ? { n_strand: strand } : {}
       EnrollmentState.delay_if_production(**args).process_states_for_ids(enrollment_ids)
@@ -273,7 +273,7 @@ class EnrollmentState < ActiveRecord::Base
   end
 
   def self.invalidate_access(enrollment_scope, states_to_update)
-    EnrollmentState.where(enrollment_id: enrollment_scope, state: states_to_update)
+    EnrollmentState.where(enrollment_id: enrollment_scope, state: states_to_update).in_batches(of: 10_000)
                    .update_all(["lock_version = COALESCE(lock_version, 0) + 1, access_is_current = ?", false])
   end
 

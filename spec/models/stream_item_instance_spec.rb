@@ -26,10 +26,10 @@ describe StreamItemInstance do
   end
 
   describe ".update_all_with_invalidation" do
-    it "invalidates stream item cache keys and runs update_all (the original)" do
+    it "invalidates stream item cache keys and runs batched updates" do
       # expect
       expect(StreamItemCache).to receive(:invalidate_context_stream_item_key).twice
-      expect(StreamItemInstance).to receive(:original_update_all).with("updates")
+      expect(StreamItemInstance).to receive(:in_batches).and_call_original
       # when
       StreamItemInstance.update_all_with_invalidation(["code_1", "code_2"],
                                                       "updates")
