@@ -19,15 +19,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ready from '@instructure/ready'
-import {QRMobileLogin} from './react/QRMobileLogin'
+import {QRMobileLogin} from './react/components/QRMobileLogin'
 
 ready(() => {
-  let container
+  let container: HTMLDivElement | null
 
   container = document.createElement('div')
   container.setAttribute('id', 'qr_login_container')
   const content = document.querySelector('#content')
-  content.appendChild(container)
+  content?.appendChild(container)
   container = document.querySelector('#qr_login_container')
 
   if (container) {

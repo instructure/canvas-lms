@@ -15,19 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fromNow} from '../fromNowFuzzy'
+import {fromNow} from '..'
 
-describe('fromNowFuzzy::', () => {
-  let now
+describe('fuzzy-relative-time::', () => {
+  let now: number
   beforeEach(() => {
     now = Date.now()
   })
-  const thence = msec => new Date(now + msec)
-  const thenceSec = sec => thence(1000 * sec)
-  const thenceMin = min => thenceSec(60 * min)
-  const thenceHour = hour => thenceMin(60 * hour)
-  const thenceDay = day => thenceHour(24 * day)
-  const thenceYear = year => thenceDay(365.25 * year)
+  const thence = (msec: number) => new Date(now + msec).getTime()
+  const thenceSec = (sec: number) => thence(1000 * sec)
+  const thenceMin = (min: number) => thenceSec(60 * min)
+  const thenceHour = (hour: number) => thenceMin(60 * hour)
+  const thenceDay = (day: number) => thenceHour(24 * day)
+  const thenceYear = (year: number) => thenceDay(365.25 * year)
 
   // fromNow accepts either a Date object in the past or future,
   // or a numeric value of milliseconds representing same

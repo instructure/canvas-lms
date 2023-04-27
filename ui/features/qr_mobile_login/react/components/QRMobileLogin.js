@@ -29,7 +29,7 @@ import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {fromNow} from '../fromNowFuzzy'
+import {fromNow} from '@canvas/fuzzy-relative-time'
 import {number, bool} from 'prop-types'
 
 const I18n = useI18nScope('QRMobileLogin')
