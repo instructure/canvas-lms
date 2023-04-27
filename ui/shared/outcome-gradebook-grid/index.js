@@ -30,6 +30,8 @@ import ReactDOM from 'react-dom'
 
 const I18n = useI18nScope('gradebookOutcomeGradebookGrid')
 
+const listFormatter = new Intl.ListFormat(ENV.LOCALE || navigator.language)
+
 /*
 xsslint safeString.method cellHtml
 */
@@ -195,8 +197,7 @@ const Grid = {
       }
       const student = Grid.Util.lookupStudent(user)
       const sections = Grid.Util.lookupSection(section_list)
-      const listFormat = new Intl.ListFormat(ENV.LOCALE || navigator.language)
-      const section_name = listFormat.format(
+      const section_name = listFormatter.format(
         _.pluck(sections, 'name')
           .filter(x => x)
           .sort()

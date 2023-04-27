@@ -29,6 +29,8 @@ import type {GradingScheme} from '../../gradebook.d'
 
 const I18n = useI18nScope('gradebook')
 
+const listFormatter = new Intl.ListFormat(ENV.LOCALE || navigator.language)
+
 function getGradePercentage(score, pointsPossible) {
   const grade = scoreToPercentage(score, pointsPossible)
   return round(grade, round.DEFAULT)
@@ -45,7 +47,6 @@ function buildHiddenAssignmentsWarning() {
 
 function buildInvalidAssignmentGroupsWarning(invalidAssignmentGroups: {name: string}[]) {
   const names: string[] = invalidAssignmentGroups.map(group => htmlEscape(group.name))
-  const listFormat = new Intl.ListFormat(ENV.LOCALE || navigator.language)
   const warningText = I18n.t(
     {
       one: 'Score does not include %{groups} because it has no points possible',
@@ -53,7 +54,7 @@ function buildInvalidAssignmentGroupsWarning(invalidAssignmentGroups: {name: str
     },
     {
       count: names.length,
-      groups: listFormat.format(names),
+      groups: listFormatter.format(names),
     }
   )
 

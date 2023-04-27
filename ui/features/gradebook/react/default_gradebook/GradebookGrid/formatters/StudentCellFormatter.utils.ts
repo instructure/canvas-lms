@@ -22,6 +22,8 @@ import type Gradebook from '../../Gradebook'
 
 const I18n = useI18nScope('gradebook')
 
+const listFormatter = new Intl.ListFormat(ENV.LOCALE || navigator.language)
+
 export function getSecondaryDisplayInfo(
   student: {
     sections: string[]
@@ -37,16 +39,14 @@ export function getSecondaryDisplayInfo(
     const sectionNames: string[] = (student?.sections || [])
       .filter(options.isVisibleSection)
       .map((sectionId: string) => options.getSection(sectionId).name)
-    const listFormat = new Intl.ListFormat(ENV.LOCALE || navigator.language)
-    return listFormat.format(sectionNames.sort())
+    return listFormatter.format(sectionNames.sort())
   }
 
   if (options.shouldShowGroups() && secondaryInfo === 'group') {
     const groupNames: string[] = student.group_ids.map(
       (groupId: string) => options.getGroup(groupId).name
     )
-    const listFormat = new Intl.ListFormat(ENV.LOCALE || navigator.language)
-    return listFormat.format(groupNames.sort())
+    return listFormatter.format(groupNames.sort())
   }
 
   return {
