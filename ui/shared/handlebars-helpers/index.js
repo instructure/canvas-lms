@@ -577,10 +577,11 @@ const object = {
     return inverse(this)
   },
 
-  // evaluates the block for each item in context and passes the result to $.toSentence
+  // evaluates the block for each item in context and passes the result to list formatter
   toSentence(context, options) {
     const results = _.map(context, c => options.fn(c))
-    return $.toSentence(results)
+    const listFormat = new Intl.ListFormat(ENV.LOCALE || navigator.language)
+    return listFormat.format(results)
   },
 
   dateSelect(name, options) {
