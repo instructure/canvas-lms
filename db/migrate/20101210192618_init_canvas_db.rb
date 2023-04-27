@@ -207,6 +207,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "lti_context_id", limit: 255
       t.string   "brand_config_md5", limit: 32
       t.string   "turnitin_originality", limit: 255
+      t.string   "account_calendar_subscription_type", default: "manual", null: false, limit: 255
     end
 
     add_index "accounts", ["name", "parent_account_id"], name: "index_accounts_on_name_and_parent_account_id"

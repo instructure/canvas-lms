@@ -28,7 +28,8 @@ class Account < ActiveRecord::Base
 
   INSTANCE_GUID_SUFFIX = "canvas-lms"
   # a list of columns necessary for validation and save callbacks to work on a slim object
-  BASIC_COLUMNS_FOR_CALLBACKS = %i[id parent_account_id root_account_id name workflow_state settings].freeze
+  BASIC_COLUMNS_FOR_CALLBACKS = %i[id parent_account_id root_account_id name workflow_state settings account_calendar_subscription_type].freeze
+  CALENDAR_SUBSCRIPTION_TYPES = %w[manual auto].freeze
 
   include Workflow
   include BrandConfigHelpers
@@ -186,6 +187,7 @@ class Account < ActiveRecord::Base
   validate :no_active_sub_accounts, if: ->(a) { a.workflow_state_changed? && !a.active? }
   validate :validate_help_links, if: ->(a) { a.settings_changed? }
   validate :validate_course_template, if: ->(a) { a.has_attribute?(:course_template_id) && a.course_template_id_changed? }
+  validates :account_calendar_subscription_type, inclusion: { in: CALENDAR_SUBSCRIPTION_TYPES }
 
   include StickySisFields
   are_sis_sticky :name, :parent_account_id
@@ -2097,6 +2099,7 @@ class Account < ActiveRecord::Base
   scope :processing_sis_batch, -> { where.not(accounts: { current_sis_batch_id: nil }).order(:updated_at) }
   scope :name_like, ->(name) { where(wildcard("accounts.name", name)) }
   scope :active, -> { where("accounts.workflow_state<>'deleted'") }
+  scope :auto_subscribe_calendar, -> { where(account_calendar_subscription_type: "auto") }
 
   def self.resolved_root_account_id_sql(table = table_name)
     quoted_table_name = connection.quote_local_table_name(table)

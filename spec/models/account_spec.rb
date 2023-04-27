@@ -27,6 +27,10 @@ describe Account do
     it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
   end
 
+  describe "validations" do
+    it { is_expected.to validate_inclusion_of(:account_calendar_subscription_type).in_array(Account::CALENDAR_SUBSCRIPTION_TYPES) }
+  end
+
   context "BASIC_COLUMNS_FOR_CALLBACKS" do
     it "can save a minimal object" do
       a = Account.select(*Account::BASIC_COLUMNS_FOR_CALLBACKS).find(Account.default.id)
