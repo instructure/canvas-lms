@@ -3399,7 +3399,10 @@ class User < ActiveRecord::Base
   end
 
   def enabled_account_calendars
-    enabled_account_ids = get_preference(:enabled_account_calendars) || []
-    all_account_calendars.where(id: enabled_account_ids)
+    acct_cals = all_account_calendars
+    auto_sub = {
+      account_calendar_subscription_type: Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars) ? "auto" : nil
+    }
+    acct_cals.where(id: get_preference(:enabled_account_calendars) || []).or(acct_cals.where(auto_sub))
   end
 end
