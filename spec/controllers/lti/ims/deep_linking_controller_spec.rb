@@ -29,7 +29,7 @@ module Lti
         subject { post :deep_linking_response, params: params }
 
         let(:placement) { "editor_button" }
-        let(:return_url_params) { { placement: placement } }
+        let(:return_url_params) { { placement: placement, content_item_id: 123 } }
         let(:data_token) { Lti::DeepLinkingData.jwt_from(return_url_params) }
         let(:params) { { JWT: deep_linking_jwt, account_id: account.id, data: data_token } }
         let(:course) { course_model(account: account) }
@@ -58,6 +58,7 @@ module Lti
                                                         deep_link_response: {
                                                           placement: placement,
                                                           content_items: content_items,
+                                                          service_id: 123,
                                                           msg: msg,
                                                           log: log,
                                                           errormsg: errormsg,

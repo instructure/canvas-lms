@@ -71,6 +71,23 @@ describe('handleDeepLinking', () => {
     )
   })
 
+  describe('when there is a service_id in the postMessage', () => {
+    const overrides = {data: {subject: 'LtiDeepLinkingResponse', content_items, service_id: 123}}
+    it('updates the collaboration', async () => {
+      jest.spyOn(document, 'querySelector')
+      await handleDeepLinking(event(overrides))
+
+      expect($.ajaxJSON).toHaveBeenCalledWith(
+        undefined,
+        'PUT',
+        {contentItems: JSON.stringify(content_items)},
+        expect.anything(),
+        expect.anything()
+      )
+      expect(document.querySelector).toHaveBeenCalledWith('.collaboration_123 a.title')
+    })
+  })
+
   describe('when there is a unhandled error parsing the content item', () => {
     const overrides = {
       data: {subject: 'LtiDeepLinkingResponse', content_items: 1},
