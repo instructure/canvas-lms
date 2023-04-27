@@ -945,8 +945,7 @@ class RoleOverride < ActiveRecord::Base
         group_label: -> { t("Manage Account Calendars") },
         account_only: true,
         available_to: %w[AccountAdmin AccountMembership],
-        true_for: %w[AccountAdmin],
-        account_allows: ->(_a) { Account.site_admin.feature_enabled?(:account_calendar_events) }
+        true_for: %w[AccountAdmin]
       },
       manage_account_calendar_events: {
         label: -> { t("Add, edit and delete events on account calendars") },
@@ -955,8 +954,7 @@ class RoleOverride < ActiveRecord::Base
         group_label: -> { t("Manage Account Calendars") },
         account_only: true,
         available_to: %w[AccountAdmin AccountMembership],
-        true_for: %w[AccountAdmin],
-        account_allows: ->(_a) { Account.site_admin.feature_enabled?(:account_calendar_events) }
+        true_for: %w[AccountAdmin]
       },
       manage_calendar: {
         label: -> { t("permissions.manage_calendar", "Add, edit and delete events on the course calendar") },

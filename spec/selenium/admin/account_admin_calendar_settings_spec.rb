@@ -34,7 +34,6 @@ describe "Account Calendar Settings" do
     @admin_user = account_admin_user(account: account, active_all: true)
     account_admin_user(account: @sub_account, user: @admin_user)
     account_admin_user(account: @sub_sub_account, user: @admin_user)
-    Account.site_admin.enable_feature!(:account_calendar_events)
   end
 
   before do

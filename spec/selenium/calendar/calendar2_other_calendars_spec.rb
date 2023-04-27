@@ -30,7 +30,6 @@ describe "calendar2" do
       @root_account = Account.default
       @subaccount1 = @root_account.sub_accounts.create!(name: "SA-1", account_calendar_visible: true)
       @student = user_factory(active_all: true)
-      Account.site_admin.enable_feature!(:account_calendar_events)
     end
 
     before do

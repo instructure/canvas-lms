@@ -58,13 +58,6 @@ create_course_subaccount_picker:
     "Manually Created Courses" sub-account, when enabled, this feature allows
     people who can manually create courses to put those courses into any sub-account
     where they have enrollments.
-account_calendar_events:
-  applies_to: SiteAdmin
-  state: hidden
-  display_name: Account-level calendars
-  description: |-
-    Allows admins to create events in root- and sub-account calendars that everyone in
-    the account can see.
 submission_feedback_indicators:
   state: allowed
   applies_to: RootAccount

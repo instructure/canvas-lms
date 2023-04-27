@@ -20,7 +20,6 @@
 
 describe AccountCalendarsApiController do
   before :once do
-    Account.site_admin.enable_feature! :account_calendar_events
     @user = user_factory(active_all: true)
 
     @root_account = Account.default
@@ -145,14 +144,6 @@ describe AccountCalendarsApiController do
       get :index
 
       expect(response).to be_redirect
-    end
-
-    it "returns not found if the flag is disabled" do
-      Account.site_admin.disable_feature! :account_calendar_events
-      course_with_student_logged_in(user: @user, account: @subaccount1a)
-      get :index
-
-      expect(response).to be_not_found
     end
 
     context "metrics collection" do

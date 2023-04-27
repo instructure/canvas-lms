@@ -1218,10 +1218,6 @@ describe Account do
     end
 
     describe "account calendars tab" do
-      before :once do
-        Account.site_admin.enable_feature! :account_calendar_events
-      end
-
       it "is shown if the user has manage_account_calendar_visibility permission" do
         account_admin_user_with_role_changes(account: @account)
         expect(@account.tabs_available(@admin).pluck(:id)).to include(Account::TAB_ACCOUNT_CALENDARS)
@@ -1229,12 +1225,6 @@ describe Account do
 
       it "is not shown if the user lacks manage_account_calendar_visibility permission" do
         account_admin_user_with_role_changes(account: @account, role_changes: { manage_account_calendar_visibility: false })
-        expect(@account.tabs_available(@admin).pluck(:id)).not_to include(Account::TAB_ACCOUNT_CALENDARS)
-      end
-
-      it "is not shown if the :account_calendar_events flag is disabled" do
-        Account.site_admin.disable_feature! :account_calendar_events
-        account_admin_user_with_role_changes(account: @account)
         expect(@account.tabs_available(@admin).pluck(:id)).not_to include(Account::TAB_ACCOUNT_CALENDARS)
       end
     end
@@ -1360,7 +1350,6 @@ describe Account do
 
     context "view_account_calendar_details permission" do
       before :once do
-        Account.site_admin.enable_feature! :account_calendar_events
         @account = Account.default
       end
 
