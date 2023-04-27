@@ -25,21 +25,6 @@ if [ $(pwd -P) = $CANVAS ]; then
       echo "You should run yarn locally or check to make sure docker is running."
   fi
 
-  # per-package pre-commit hooks
-  git diff --cached --name-only | grep -E -o '^(packages/[^/]+)' | sort | uniq | while read -r PACKAGE; do
-    # check if CHANGED_PACKAGES/pre-commit-hook.sh exists and run it
-    if [ -f "$PACKAGE/pre-commit-hook.sh" ]; then
-      echo "Running pre-commit hook for $PACKAGE"
-
-      (cd "$PACKAGE" && "./pre-commit-hook.sh")
-
-      if [ $? -ne 0 ]; then
-        echo "Pre-commit hook for $PACKAGE failed, aborting commit"
-        exit 1
-      fi
-    fi
-  done || exit 1
-
   if git diff --cached --name-only | grep -q Gemfile.lock; then
     echo "Checking lockfiles..."
     script/sync_lockfiles.rb
