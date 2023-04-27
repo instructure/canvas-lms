@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {underscore} from '@canvas/convert-case'
+import {underscoreProperties} from '@canvas/convert-case'
 
 // will be removed in EVAL-1911
 export function styleSubmissionStatusPills(pills) {
@@ -57,6 +57,6 @@ export function makeSubmissionUpdateRequest(submission, isAnonymous, courseId, u
     url = `/api/v1/courses/${courseId}/assignments/${submission.assignment_id}/submissions/${submission.user_id}`
   }
 
-  data.submission = underscore(submissionData)
+  data.submission = underscoreProperties(submissionData)
   return axios.put(url, data)
 }

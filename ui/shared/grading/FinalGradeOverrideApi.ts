@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {camelize} from '@canvas/convert-case'
+import {camelizeProperties} from '@canvas/convert-case'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {createClient, gql} from '@canvas/apollo'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -46,14 +46,14 @@ export function getFinalGradeOverrides(
         } = (data.finalGradeOverrides[studentId] = {})
 
         if (responseOverrides.course_grade) {
-          studentOverrides.courseGrade = camelize(responseOverrides.course_grade)
+          studentOverrides.courseGrade = camelizeProperties(responseOverrides.course_grade)
         }
 
         if (responseOverrides.grading_period_grades) {
           studentOverrides.gradingPeriodGrades = {}
 
           for (const gradingPeriodId in responseOverrides.grading_period_grades) {
-            studentOverrides.gradingPeriodGrades[gradingPeriodId] = camelize(
+            studentOverrides.gradingPeriodGrades[gradingPeriodId] = camelizeProperties(
               responseOverrides.grading_period_grades[gradingPeriodId]
             )
           }

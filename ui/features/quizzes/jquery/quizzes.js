@@ -66,6 +66,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
+import {underscoreString} from '@canvas/convert-case'
 
 const I18n = useI18nScope('quizzes_public')
 
@@ -4122,7 +4123,7 @@ ready(function () {
       } else if ($bank.data('bank_data')) {
         const bank = $bank.data('bank_data')
         bank.bank_id = bank.id
-        bank.context_type_string = pluralize($.underscore(bank.context_type))
+        bank.context_type_string = pluralize(underscoreString(bank.context_type))
         $group.data('bank_question_count', bank.assessment_question_count)
         $group
           .next('.assessment_question_bank')

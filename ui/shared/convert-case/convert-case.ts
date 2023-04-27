@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-function camelizeString(str: string, lowerFirst: boolean = false) {
+// converts to PascalCase by default
+export function camelizeString(str: string, lowerFirst: boolean = false) {
   return (str || '').replace(/(?:^|[-_])(\w)/g, (_, c, index) => {
     if (index === 0 && lowerFirst) {
       return c ? c.toLowerCase() : ''
@@ -26,12 +27,8 @@ function camelizeString(str: string, lowerFirst: boolean = false) {
   })
 }
 
-function underscoreString(str: string) {
-  return str.replace(/([A-Z])/g, $1 => `_${$1.toLowerCase()}`)
-}
-
 // Convert all property keys in an object to camelCase
-export function camelize<T>(props: {[key: string]: unknown}): T {
+export function camelizeProperties<T>(props: {[key: string]: unknown}): T {
   const attrs: {
     [key: string]: any
   } = {}
@@ -45,13 +42,19 @@ export function camelize<T>(props: {[key: string]: unknown}): T {
   return attrs as T
 }
 
-export function underscore<T>(props: {[key: string]: unknown}): T {
-  let prop
+export function underscoreString(string: string) {
+  return (string || '')
+    .replace(/([A-Z])/g, '_$1')
+    .replace(/^_/, '')
+    .toLowerCase()
+}
+
+export function underscoreProperties<T>(props: {[key: string]: unknown}): T {
   const attrs: {
     [key: string]: any
   } = {}
 
-  for (prop in props) {
+  for (const prop in props) {
     if (props.hasOwnProperty(prop)) {
       attrs[underscoreString(prop)] = props[prop]
     }

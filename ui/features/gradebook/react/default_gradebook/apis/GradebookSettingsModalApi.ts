@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {camelize, underscore} from '@canvas/convert-case'
+import {camelizeProperties, underscoreProperties} from '@canvas/convert-case'
 import type {LatePolicyCamelized, LatePolicy} from '../gradebook.d'
 
 export const DEFAULT_LATE_POLICY_DATA: LatePolicyCamelized = {
@@ -32,12 +32,14 @@ export const DEFAULT_LATE_POLICY_DATA: LatePolicyCamelized = {
 } as const
 
 function camelizeLatePolicyResponseData(latePolicyResponseData: {late_policy: LatePolicy}) {
-  const camelizedData = camelize(latePolicyResponseData.late_policy) as LatePolicyCamelized
+  const camelizedData = camelizeProperties(
+    latePolicyResponseData.late_policy
+  ) as LatePolicyCamelized
   return {latePolicy: camelizedData}
 }
 
 function underscoreLatePolicyData(latePolicyData: Partial<LatePolicyCamelized>) {
-  return underscore(latePolicyData) as LatePolicy
+  return underscoreProperties(latePolicyData) as LatePolicy
 }
 
 export function fetchLatePolicy(courseId: string) {
@@ -84,7 +86,7 @@ export function updateCourseSettings(
   }
 ) {
   const url = `/api/v1/courses/${courseId}/settings`
-  return axios.put(url, underscore(settings)).then(response => ({
-    data: camelize<{allowFinalGradeOverride: boolean}>(response.data),
+  return axios.put(url, underscoreProperties(settings)).then(response => ({
+    data: camelizeProperties<{allowFinalGradeOverride: boolean}>(response.data),
   }))
 }

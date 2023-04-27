@@ -25,7 +25,7 @@ import '@canvas/util/templateData'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import '@canvas/media-comments' /* mediaComment */
 import axios from '@canvas/axios'
-import {camelize} from '@canvas/convert-case'
+import {camelizeProperties} from '@canvas/convert-case'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import gradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
@@ -579,7 +579,7 @@ function saveAssignmentOrder(order) {
 }
 
 function coursesWithGrades() {
-  return ENV.courses_with_grades.map(course => camelize(course))
+  return ENV.courses_with_grades.map(course => camelizeProperties(course))
 }
 
 function getSelectMenuGroupProps() {

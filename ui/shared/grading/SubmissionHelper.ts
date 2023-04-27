@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {camelize, underscore} from '@canvas/convert-case'
+import {camelizeProperties, underscoreProperties} from '@canvas/convert-case'
 import {originalityReportSubmissionKey} from './originalityReportHelper'
 import type {
   SubmissionOriginalityData,
@@ -56,7 +56,7 @@ export function isHideable(submission) {
 //   - "pending" reports (reports still being processed)
 //   - scored reports, with higher scores (indicating more likely plagiarism) first
 export function extractSimilarityInfo(submission) {
-  const sub = camelize(submission) as CamelizedSubmissionWithOriginalityReport
+  const sub = camelizeProperties(submission) as CamelizedSubmissionWithOriginalityReport
   let plagiarismData
   let type: 'vericite' | 'turnitin' | 'originality_report' | null = null
 
@@ -103,7 +103,7 @@ function getSimilarityEntries(submission, plagiarismData) {
     // may be keyed by the submission version (or not). Try to use the data for
     // the current version (as returned by originalityReportSubmissionKey), but
     // if that's not available, check the "base" submission instead.
-    const originalityReportKey = originalityReportSubmissionKey(underscore(submission))
+    const originalityReportKey = originalityReportSubmissionKey(underscoreProperties(submission))
     const dataForKey = plagiarismData[originalityReportKey]
 
     const baseSubmissionId = `submission_${submission.id}`

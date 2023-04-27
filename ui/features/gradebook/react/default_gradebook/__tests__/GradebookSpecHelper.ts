@@ -25,7 +25,7 @@ import CellFormatterFactory from '../GradebookGrid/formatters/CellFormatterFacto
 import ColumnHeaderRenderer from '../GradebookGrid/headers/ColumnHeaderRenderer'
 import PerformanceControls from '../PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
-import {camelize} from '@canvas/convert-case'
+import {camelizeProperties} from '@canvas/convert-case'
 
 const performance_controls = {
   students_chunk_size: 2, // students per page
@@ -165,7 +165,7 @@ export function createGradebook(
 } {
   const performanceControls = new PerformanceControls({
     ...performance_controls,
-    ...camelize(options.performance_controls),
+    ...camelizeProperties(options.performance_controls),
   })
   const dispatch = new RequestDispatch({
     activeRequestLimit: performanceControls.activeRequestLimit,
