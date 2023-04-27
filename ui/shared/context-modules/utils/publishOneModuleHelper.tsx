@@ -34,6 +34,7 @@ interface ModuleItemAttributes {
 
 interface ModuleItemModel {
   attributes: ModuleItemAttributes
+  get: (name: string) => any
 }
 
 interface ModuleItemView {
@@ -52,6 +53,33 @@ interface KeyedModuleItems {
 type moduleItemStateData = {
   published?: boolean
   bulkPublishInFlight?: boolean
+}
+
+type FetchedModuleItem = {
+  id: string
+  published: boolean
+  type: string
+  content_id?: string
+  page_url?: string
+}
+
+type OneFetchLinkHeader = {
+  page: string
+  per_page: string
+  rel: string
+  url: string
+}
+
+type FetchLinkHeader = {
+  current: OneFetchLinkHeader
+  first: OneFetchLinkHeader
+  last: OneFetchLinkHeader
+  next: OneFetchLinkHeader
+}
+
+type FetchResponse = {
+  json: FetchedModuleItem[]
+  link: FetchLinkHeader
 }
 
 export function publishModule(courseId, moduleId, skipItems) {
@@ -159,10 +187,11 @@ export const fetchModuleItemPublishedState = (courseId, moduleId, nextLink?: str
     path: nextLink || `/api/v1/courses/${courseId}/modules/${moduleId}/items`,
     method: 'GET',
   })
-    .then(response => {
+    .then((response: FetchResponse) => {
       const {json, link} = response
+      const moduleItems = exportFuncs.getAllModuleItems()
       json.forEach((item: any) => {
-        exportFuncs.updateModuleItemPublishedState(item.id, item.published)
+        exportFuncs.updateModuleItemPublishedState(item.id, item.published, false, moduleItems)
       })
       if (link?.next) {
         return exportFuncs.fetchModuleItemPublishedState(courseId, moduleId, link.next.url)
