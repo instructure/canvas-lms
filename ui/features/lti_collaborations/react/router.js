@@ -40,7 +40,7 @@ const attachListeners = () => {
       const item = processSingleContentItem(event)
       store.dispatch(
         actions.externalContentReady({
-          service_id: item.service_id,
+          service_id: event.data?.service_id,
           contentItems: [item],
         })
       )

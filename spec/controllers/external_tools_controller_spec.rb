@@ -1031,6 +1031,62 @@ describe ExternalToolsController do
         end
       end
 
+      context "tool is used to edit an existing collaboration" do
+        let(:collab) do
+          ExternalToolCollaboration.create!(
+            title: "my collab",
+            user: @teacher,
+            url: "http://www.example.com/launch",
+            context: @course,
+            data: {
+              "updateUrl" => "http://www.example.com/launch?abc=def"
+            }
+          )
+        end
+
+        let(:launch_params) do
+          JSON.parse(fetch_and_delete_launch(@course, decoded_jwt["verifier"]))
+        end
+
+        # it "it passes collaboration into the expander" do
+        #   get :retrieve, params: { course_id: @course.id, url: collab.update_url, launch_type: "collaboration", content_item_id: collab.id }
+        #   expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]["assignment_id"]).to eq(lti_assignment_id)
+        # end
+
+        let(:jwt) do
+          deep_link_return_url = launch_params["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
+          return_jwt = deep_link_return_url.match(/data=([^&]*)/)[1]
+          JSON::JWT.decode(return_jwt, :skip_verification)
+        end
+
+        before do
+          lti_1_3_tool.collaboration = {
+            "enabled" => true,
+            "message_type" => "LtiDeepLinkingRequest",
+            "placement" => "collaboration",
+            "text" => "tool",
+          }
+          lti_1_3_tool.save!
+        end
+
+        it "adds content_item_id to the data JWT" do
+          get :retrieve, params: { course_id: @course.id, url: collab.update_url, launch_type: "collaboration", content_item_id: collab.id }
+          expect(jwt[:content_item_id]).to eq(collab.id)
+        end
+
+        context "when the update_url in the collaboration given by content_item_id does not match up with the given launch URL" do
+          it "does not add content_item_id to the data JWT" do
+            get :retrieve, params: {
+              course_id: @course.id,
+              url: collab.update_url + "&mismatch",
+              launch_type: "collaboration",
+              content_item_id: collab.id
+            }
+            expect(jwt[:content_item_id]).to be_nil
+          end
+        end
+      end
+
       context "tool is used for student_context_card" do
         # If and when we add the functionality, we can also test here that the
         # student_id appears in the launch.

@@ -574,6 +574,7 @@ class ExternalToolsController < ApplicationController
       opts[:content_item_id] = content_item_id if content_item_id
       content_item_selection_request(tool, selection_type, opts)
     else
+      opts[:content_item_id] = content_item_id if content_item_id
       basic_lti_launch_request(tool, selection_type, opts)
     end
   rescue Lti::Errors::UnauthorizedError => e
@@ -634,6 +635,10 @@ class ExternalToolsController < ApplicationController
     end
   end
 
+  # This handles non-content item 1.1 launches, and 1.3 launches including deep linking requests.
+  # LtiAdvantageAdapter#generate_lti_params (called via
+  # adapter.generate_post_payload) determines whether or not an LTI 1.3 launch
+  # is a deep linking request
   def basic_lti_launch_request(tool, selection_type = nil, opts = {})
     lti_launch = tool.settings["post_only"] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     default_opts = {
@@ -655,13 +660,22 @@ class ExternalToolsController < ApplicationController
     # resource_link_id in regular QN launches is assignment.lti_resource_link_id
     opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag) if assignment.present? && assignment.quiz_lti?
 
-    expander = variable_expander(assignment: assignment,
-                                 tool: tool,
-                                 launch: lti_launch,
-                                 post_message_token: opts[:launch_token],
-                                 secure_params: params[:secure_params],
-                                 placement: opts[:resource_type],
-                                 launch_url: opts[:launch_url])
+    # This is only for 1.3: editing collaborations for 1.1 goes thru content_item_selection_request()
+    if selection_type == "collaboration"
+      collaboration = opts[:content_item_id].presence&.then { ExternalToolCollaboration.find _1 }
+      collaboration = nil unless collaboration&.update_url == params[:url]
+    end
+
+    expander = variable_expander(
+      assignment: assignment,
+      tool: tool,
+      launch: lti_launch,
+      post_message_token: opts[:launch_token],
+      secure_params: params[:secure_params],
+      placement: opts[:resource_type],
+      launch_url: opts[:launch_url],
+      collaboration: collaboration
+    )
 
     adapter = if tool.use_1_3?
                 a = Lti::LtiAdvantageAdapter.new(

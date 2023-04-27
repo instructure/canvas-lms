@@ -135,6 +135,7 @@ module Lti
                  deep_link_response: {
                    placement: return_url_parameters[:placement],
                    content_items: items,
+                   service_id: return_url_parameters[:content_item_id],
                    msg: messaging_value("msg"),
                    log: messaging_value("log"),
                    errormsg: messaging_value("errormsg"),
