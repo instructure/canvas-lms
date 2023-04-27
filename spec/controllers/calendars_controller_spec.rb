@@ -25,7 +25,6 @@ describe CalendarsController do
   end
 
   before(:once) do
-    Account.site_admin.enable_feature! :account_calendar_events
     course_with_student(active_all: true)
   end
 

@@ -1891,21 +1891,11 @@ describe AccountsController do
 
   describe "account_calendar_settings" do
     before :once do
-      Account.site_admin.enable_feature! :account_calendar_events
       @account = Account.default
     end
 
     it "returns unauthorized if the user does not have manage_account_calendar_visibility permission" do
       account_admin_user_with_role_changes(account: @account, role_changes: { manage_account_calendar_visibility: false })
-      user_session(@user)
-      get "account_calendar_settings", params: { account_id: @account.id }
-
-      expect(response).to be_unauthorized
-    end
-
-    it "returns unauthorized if the :account_calendar_events feature is disabled" do
-      Account.site_admin.disable_feature! :account_calendar_events
-      account_admin_user(account: @account)
       user_session(@user)
       get "account_calendar_settings", params: { account_id: @account.id }
 

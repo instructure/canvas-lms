@@ -99,7 +99,6 @@ class AccountCalendarsApiController < ApplicationController
   include Api::V1::AccountCalendar
 
   before_action :require_user
-  before_action :require_feature_flag # remove once :account_calendar_events FF is gone
 
   # @API List available account calendars
   #
@@ -277,11 +276,5 @@ class AccountCalendarsApiController < ApplicationController
       count = Account.active.where(id: [account.id] + Account.sub_account_ids_recursive(account.id)).where(account_calendar_visible: true).count
       render json: { count: count }
     end
-  end
-
-  private
-
-  def require_feature_flag
-    not_found unless Account.site_admin.feature_enabled?(:account_calendar_events)
   end
 end

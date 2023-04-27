@@ -406,8 +406,7 @@ export default class EditCalendarEventView extends Backbone.View {
     const course_pacing_enabled = this.model.get('course_pacing_enabled') === 'true'
     return (
       ENV.FEATURES?.account_level_blackout_dates &&
-      ((context_type === 'account' && ENV.FEATURES?.account_calendar_events) ||
-        (context_type === 'course' && course_pacing_enabled))
+      (context_type === 'account' || (context_type === 'course' && course_pacing_enabled))
     )
   }
 

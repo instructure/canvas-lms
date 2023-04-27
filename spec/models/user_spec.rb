@@ -4317,7 +4317,6 @@ describe User do
 
   context "account_calendars" do
     before :once do
-      Account.site_admin.enable_feature! :account_calendar_events
       user_factory(active_all: true)
       @root_account = Account.default
       @root_account.account_calendar_visible = false

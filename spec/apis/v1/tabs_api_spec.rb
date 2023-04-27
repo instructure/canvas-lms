@@ -396,11 +396,20 @@ describe TabsController, type: :request do
           "type" => "internal"
         },
         {
+          "id" => "account_calendars",
+          "html_url" => "/accounts/#{@account.id}/calendar_settings",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/calendar_settings",
+          "label" => "Account Calendars",
+          "position" => 10,
+          "visibility" => "public",
+          "type" => "internal"
+        },
+        {
           "id" => "terms",
           "html_url" => "/accounts/#{@account.id}/terms",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/terms",
           "label" => "Terms",
-          "position" => 10,
+          "position" => 11,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -409,7 +418,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/authentication_providers",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/authentication_providers",
           "label" => "Authentication",
-          "position" => 11,
+          "position" => 12,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -418,7 +427,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/sis_import",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/sis_import",
           "label" => "SIS Import",
-          "position" => 12,
+          "position" => 13,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -427,7 +436,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/brand_configs",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/brand_configs",
           "label" => "Themes",
-          "position" => 13,
+          "position" => 14,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -436,7 +445,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/developer_keys",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/developer_keys",
           "label" => "Developer Keys",
-          "position" => 14,
+          "position" => 15,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -445,7 +454,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/admin_tools",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/admin_tools",
           "label" => "Admin Tools",
-          "position" => 15,
+          "position" => 16,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -454,7 +463,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/eportfolio_moderation",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/eportfolio_moderation",
           "label" => "ePortfolio Moderation",
-          "position" => 16,
+          "position" => 17,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -463,7 +472,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/settings",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/settings",
           "label" => "Settings",
-          "position" => 17,
+          "position" => 18,
           "visibility" => "admins",
           "type" => "internal"
         }
