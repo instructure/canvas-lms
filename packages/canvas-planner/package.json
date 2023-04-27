@@ -52,6 +52,7 @@
     "@instructure/ui-badge": "7",
     "@instructure/ui-buttons": "7",
     "@instructure/ui-checkbox": "7",
+    "@instructure/ui-date-time-input": "8",
     "@instructure/ui-flex": "7",
     "@instructure/ui-forms": "6",
     "@instructure/ui-form-field": "7",

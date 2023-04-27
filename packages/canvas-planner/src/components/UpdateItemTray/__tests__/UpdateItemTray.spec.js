@@ -20,20 +20,22 @@ import React from 'react'
 import {shallow, mount} from 'enzyme'
 import {UpdateItemTray} from '../index'
 
+jest.useFakeTimers()
+
 const defaultProps = {
   onSavePlannerItem: () => {},
   locale: 'en',
   timeZone: 'Asia/Tokyo',
   onDeletePlannerItem: () => {},
   courses: [],
-  noteItem: {}
+  noteItem: {},
 }
 
 const simpleItem = (opts = {}) => ({
   uniqueId: '1',
   title: '',
   date: moment('2017-04-28T11:00:00Z'),
-  ...opts
+  ...opts,
 })
 
 let ariaLive
@@ -60,7 +62,7 @@ it('renders the item to update if provided', () => {
     title: 'Planner Item',
     date: moment('2017-04-25 01:49:00-0700'),
     context: {id: '1'},
-    details: 'You made this item to remind you of something, but you forgot what.'
+    details: 'You made this item to remind you of something, but you forgot what.',
   }
   const wrapper = shallow(
     <UpdateItemTray
@@ -68,7 +70,7 @@ it('renders the item to update if provided', () => {
       noteItem={noteItem}
       courses={[
         {id: '1', longName: 'a course', enrollmentType: 'StudentEnrollment'},
-        {id: '2', longName: 'a course I teach', enrollmentType: 'TeacherEnrollment'}
+        {id: '2', longName: 'a course I teach', enrollmentType: 'TeacherEnrollment'},
       ]}
     />
   )
@@ -90,7 +92,9 @@ it('renders Add To Do header when creating a new to do', () => {
 
 it('shows title inputs', () => {
   const wrapper = mount(<UpdateItemTray {...defaultProps} />)
-  expect(wrapper.find('TextInput')).toHaveLength(3)
+  // DateTimeInput appears to only render 2 TextInputs, but in reality
+  // renders 6, 3 for Dates and 3 for Time :mindblown:
+  expect(wrapper.find('TextInput')).toHaveLength(8)
   const input = wrapper.find('TextInput').first()
   input.find('input').simulate('change', {target: {value: 'New Text'}})
   expect(input.instance().props.value).toEqual('New Text')
@@ -130,8 +134,8 @@ it('correctly updates id to null when courseid is none', () => {
     title: item.title,
     date: item.date.toISOString(),
     context: {
-      id: null
-    }
+      id: null,
+    },
   })
 })
 
@@ -204,7 +208,8 @@ it.skip('clears the error message when a date is typed in', () => {
 it('respects the provided timezone', () => {
   const item = simpleItem({date: moment('2017-04-25 12:00:00-0300')})
   const wrapper = mount(<UpdateItemTray {...defaultProps} noteItem={item} />)
-  const d = wrapper.find('DateInput').find('TextInput').props().value
+  // DateInput internally renders 3 TextInputs, we only need the first
+  const d = wrapper.find('DateInput').find('TextInput').first().props().value
   expect(d).toEqual('April 26, 2017') // timezone shift from -3 to +9 pushes it to the next day
 })
 
@@ -221,7 +226,7 @@ it('changes state when new date is typed in', () => {
     uniqueId: '1',
     title: noteItem.title,
     date: newDate.toISOString(),
-    context: {id: null}
+    context: {id: null},
   })
 })
 
@@ -229,7 +234,7 @@ it('updates state when new note is passed in', () => {
   const noteItem1 = simpleItem({
     title: 'Planner Item 1',
     context: {id: '1'},
-    details: 'You made this item to remind you of something, but you forgot what.'
+    details: 'You made this item to remind you of something, but you forgot what.',
   })
   const wrapper = shallow(
     <UpdateItemTray
@@ -237,7 +242,7 @@ it('updates state when new note is passed in', () => {
       noteItem={noteItem1}
       courses={[
         {id: '1', longName: 'first course', enrollmentType: 'StudentEnrollment'},
-        {id: '2', longName: 'second course', enrollmentType: 'StudentEnrollment'}
+        {id: '2', longName: 'second course', enrollmentType: 'StudentEnrollment'},
       ]}
     />
   )
@@ -247,7 +252,7 @@ it('updates state when new note is passed in', () => {
     uniqueId: '2',
     title: 'Planner Item 2',
     context: {id: '2'},
-    details: 'This is another reminder'
+    details: 'This is another reminder',
   })
   wrapper.setProps({noteItem: noteItem2})
   expect(wrapper).toMatchSnapshot()
@@ -301,7 +306,7 @@ it('renders course options plus an optional option when provided with courses', 
       {...defaultProps}
       courses={[
         {id: '1', longName: 'first course', enrollmentType: 'StudentEnrollment'},
-        {id: '2', longName: 'second course', enrollmentType: 'StudentEnrollment'}
+        {id: '2', longName: 'second course', enrollmentType: 'StudentEnrollment'},
       ]}
     />
   )
@@ -322,11 +327,11 @@ it('invokes save callback with updated data', () => {
         title: 'title',
         date: moment('2017-04-27T13:00:00Z'),
         courseId: '42',
-        details: 'details'
+        details: 'details',
       }}
       courses={[
         {id: '42', longName: 'first', enrollmentType: 'StudentEnrollment'},
-        {id: '43', longName: 'second', enrollmentType: 'StudentEnrollment'}
+        {id: '43', longName: 'second', enrollmentType: 'StudentEnrollment'},
       ]}
       onSavePlannerItem={saveMock}
     />
@@ -341,7 +346,7 @@ it('invokes save callback with updated data', () => {
     title: 'new title',
     date: moment('2017-05-01T14:00:00Z').toISOString(),
     context: {id: '43'},
-    details: 'new details'
+    details: 'new details',
   })
 })
 
@@ -363,5 +368,6 @@ it('invokes invalidDateTimeMessage when an invalid date is entered', () => {
   const dateInput = wrapper.find('DateInput').find('input')
   dateInput.simulate('change', {target: {value: 'xxxxx'}})
   dateInput.simulate('blur')
+  jest.runOnlyPendingTimers()
   expect(invalidCallbackSpy).toHaveBeenCalled()
 })

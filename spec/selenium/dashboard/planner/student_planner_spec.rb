@@ -370,6 +370,9 @@ describe "student planner" do
         expect(element_value_for_attr(date_input, "value")).to eq(day)
       end
 
+      # date input needs to be blurred in order to trigger state update
+      date_input.send_keys(:tab)
+
       todo_save_button.click
       @student_to_do.reload
       expect(format_date_for_view(@student_to_do.todo_date, :long)).to eq(day)
@@ -384,7 +387,7 @@ describe "student planner" do
       fj("button:contains('15')").click
       title_input.send_keys("the title")
       time_input.click
-      fj("li[role=option]:contains('9:00 AM')").click
+      fj("span[role=option]:contains('9:00 AM')").click
 
       todo_save_button.click
       expect(ff(".planner-item").last).to include_text "DUE: 9:00 AM"
