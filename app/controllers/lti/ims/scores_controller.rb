@@ -81,6 +81,24 @@ module Lti::IMS
 
     MIME_TYPE = "application/vnd.ims.lis.v1.score+json"
 
+    def report_grade_progress_metric
+      dynamic_settings_tree = DynamicSettings.find(tree: :private)
+      if dynamic_settings_tree["frontend_data_collection_endpoint"]
+        data_collection_endpoint = dynamic_settings_tree["frontend_data_collection_endpoint"]
+        put_body = [{
+          id: SecureRandom.uuid,
+          type: "ags_grade_progress",
+          account_id: @domain_root_account.id.to_s,
+          account_name: @domain_root_account.name,
+          tool_domain: tool.domain,
+          grading_progress: params[:gradingProgress]
+        }]
+        CanvasHttp.put(data_collection_endpoint, {}, body: put_body.to_json, content_type: "application/json")
+      end
+    rescue
+      Rails.logger.warn("Couldn't send LTI AGS grade progress metric")
+    end
+
     # @API Create a Score
     #
     # Create a new Result from the score params. If this is for the first created line_item for a
@@ -199,6 +217,7 @@ module Lti::IMS
     #         }
     #   }
     def create
+      report_grade_progress_metric
       ags_scores_multiple_files = @domain_root_account.feature_enabled?(:ags_scores_multiple_files)
       return old_create unless ags_scores_multiple_files
 
