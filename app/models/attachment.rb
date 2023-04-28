@@ -2441,7 +2441,20 @@ class Attachment < ActiveRecord::Base
                               end
                               new_attachment
                             end
-        change_attachment.folder = Folder.assert_path(attachment.folder_path, to_context)
+        change_attachment.folder = if attachment.folder.submission_context_code
+                                     # source folder is a submissions folder; find the corresponding submissions
+                                     # folder in the destination context
+                                     submission_context = from_context.shard.activate do
+                                       Context.find_by_asset_string(attachment.folder.submission_context_code)
+                                     end
+                                     to_context.submissions_folder(submission_context)
+                                   else
+                                     # source folder is _not_ a submissions folder; ensure the file
+                                     # doesn't get placed in a submissions folder in the destination
+                                     Folder.assert_path(attachment.folder_path,
+                                                        to_context,
+                                                        conditions: { submission_context_code: nil })
+                                   end
         change_attachment.save_without_broadcasting!
         if match
           change_attachment.folder.reload

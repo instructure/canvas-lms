@@ -393,7 +393,7 @@ class Folder < ActiveRecord::Base
 
   # if a block is given, it'll be called with each new folder created by this
   # method before the folder is saved
-  def self.assert_path(path, context)
+  def self.assert_path(path, context, conditions: {})
     @@path_lookups ||= {}
     key = [context.global_asset_string, path].join("//")
     return @@path_lookups[key] if @@path_lookups[key]
@@ -406,7 +406,7 @@ class Folder < ActiveRecord::Base
     end
     folders.each do |name|
       sub_folder = @@path_lookups[[context.global_asset_string, current_folder.full_name + "/" + name].join("//")]
-      sub_folder ||= current_folder.sub_folders.active.where(name: name).first_or_initialize
+      sub_folder ||= current_folder.sub_folders.active.where({ name: name }.merge(conditions)).first_or_initialize
       current_folder = sub_folder
       if current_folder.new_record?
         current_folder.context = context
