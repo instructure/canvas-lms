@@ -649,9 +649,11 @@
               <%= f.check_box :allow_student_organized_groups, :disabled => !can_manage %>
               <%= f.label :allow_student_organized_groups, :en => "Let students organize their own groups" %><br/>
               </div>
-              <div class="checkbox-flex-container">
-              <%= f.check_box :hide_final_grades, :disabled => !can_manage %>
-              <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
+              <% unless @context.restrict_quantitative_data && @context.root_account.feature_enabled?(:restrict_quantitative_data) %>
+                <div class="checkbox-flex-container">
+                <%= f.check_box :hide_final_grades, :disabled => !can_manage %>
+                <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
+              <% end %>
               </div>
               <% unless @context.elementary_subject_course? || (@context.restrict_quantitative_data && @context.root_account.feature_enabled?(:restrict_quantitative_data)) %>
                 <div class="checkbox-flex-container">

@@ -314,13 +314,14 @@ describe "course settings" do
       expect(element_exists?("#course_lock_all_announcements")).to be_falsey
     end
 
-    context "Hide grade distribution graphs from student" do
+    context "restrict_quantitative_data dependent settings" do
       it "shows by default" do
         get "/courses/#{@course.id}/settings"
         more_options_link = f(".course_form_more_options_link")
         more_options_link.click
         wait_for_ajaximations
         expect(f("#course_hide_distribution_graphs")).to be_present
+        expect(f("#course_hide_final_grades")).to be_present
       end
 
       it "is not shown when both restrict_quantitative_data course setting and feature flags are ON" do
@@ -333,6 +334,7 @@ describe "course settings" do
         more_options_link.click
         wait_for_ajaximations
         expect(f("body")).not_to contain_jqcss("#course_hide_distribution_graphs")
+        expect(f("body")).not_to contain_jqcss("#course_hide_final_grades")
       end
 
       it "is not shown when both restrict_quantitative_data account locked setting and feature flags are ON" do
@@ -346,6 +348,7 @@ describe "course settings" do
         more_options_link.click
         wait_for_ajaximations
         expect(f("body")).not_to contain_jqcss("#course_hide_distribution_graphs")
+        expect(f("body")).not_to contain_jqcss("#course_hide_final_grades")
       end
 
       it "is shown when restrict_quantitative_data feature flag is on but course setting is off" do
@@ -358,6 +361,7 @@ describe "course settings" do
         more_options_link.click
         wait_for_ajaximations
         expect(f("#course_hide_distribution_graphs")).to be_present
+        expect(f("#course_hide_final_grades")).to be_present
       end
     end
   end
