@@ -388,7 +388,8 @@ module PlannerPageObject
 
   def view_todo_item
     @student_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now,
-                                                     title: "Student to do", course_id: @course.id)
+                                                     title: "Student to do",
+                                                     course_id: @course.id)
     go_to_list_view
     click_item_button(@student_to_do.title)
     @modal = todo_sidebar_modal(@student_to_do.title)

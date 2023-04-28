@@ -141,7 +141,8 @@ describe ContentMigration do
 
     it "keeps reference to ContextExternalTool by id for courses" do
       mod1 = @copy_from.context_modules.create!(name: "some module")
-      mod1.add_item type: "context_external_tool", id: @tool_from.id,
+      mod1.add_item type: "context_external_tool",
+                    id: @tool_from.id,
                     url: "https://www.example.com/launch"
       run_course_copy
 
@@ -193,7 +194,8 @@ describe ContentMigration do
     end
 
     it "copies message_type (and other fields)" do
-      @tool_from.course_settings_sub_navigation = { url: "http://www.example.com", text: "hello",
+      @tool_from.course_settings_sub_navigation = { url: "http://www.example.com",
+                                                    text: "hello",
                                                     message_type: "ContentItemSelectionResponse" }
       @tool_from.settings[:selection_width] = 5000
       @tool_from.save!

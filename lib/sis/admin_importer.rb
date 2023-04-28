@@ -42,7 +42,8 @@ module SIS
     end
 
     class Work
-      attr_accessor :success_count, :roll_back_data,
+      attr_accessor :success_count,
+                    :roll_back_data,
                     :account_users_to_update_associations,
                     :account_users_to_set_batch_id
 

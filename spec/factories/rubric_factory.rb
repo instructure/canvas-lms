@@ -42,14 +42,18 @@ module Factories
 
   def larger_rubric_data
     [
-      { description: "Crit1", points: 10, id: "crit1",
+      { description: "Crit1",
+        points: 10,
+        id: "crit1",
         ratings: [
           { description: "A", points: 10, id: "rat1", criterion_id: "crit1" },
           { description: "B", points: 7, id: "rat2", criterion_id: "crit1" },
           { description: "F", points: 0, id: "rat3", criterion_id: "crit1" }
         ] },
 
-      { description: "Crit2", points: 2, id: "crit2",
+      { description: "Crit2",
+        points: 2,
+        id: "crit2",
         ratings: [
           { description: "Pass", points: 2, id: "rat1", criterion_id: "crit2" },
           { description: "Fail", points: 0, id: "rat2", criterion_id: "crit2" }

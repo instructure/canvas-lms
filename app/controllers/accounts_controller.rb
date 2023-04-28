@@ -393,7 +393,10 @@ class AccountsController < ApplicationController
         return course_user_search
       end
       format.json do
-        render json: account_json(@account, @current_user, session, params[:includes] || [],
+        render json: account_json(@account,
+                                  @current_user,
+                                  session,
+                                  params[:includes] || [],
                                   !@account.grants_right?(@current_user, session, :manage))
       end
     end
@@ -478,7 +481,9 @@ class AccountsController < ApplicationController
                   @account.sub_accounts.order(:id)
                 end
 
-    @accounts = Api.paginate(@accounts, self, api_v1_sub_accounts_url,
+    @accounts = Api.paginate(@accounts,
+                             self,
+                             api_v1_sub_accounts_url,
                              total_entries: recursive ? nil : @accounts.count)
 
     ActiveRecord::Associations.preload(@accounts, [:root_account, :parent_account])
@@ -692,12 +697,16 @@ class AccountsController < ApplicationController
       if starts_before
         @courses = @courses.where("
         (courses.start_at IS NULL AND enrollment_terms.start_at IS NULL)
-        OR courses.start_at <= ? OR enrollment_terms.start_at <= ?", starts_before, starts_before)
+        OR courses.start_at <= ? OR enrollment_terms.start_at <= ?",
+                                  starts_before,
+                                  starts_before)
       end
       if ends_after
         @courses = @courses.where("
         (courses.conclude_at IS NULL AND enrollment_terms.end_at IS NULL)
-        OR courses.conclude_at >= ? OR enrollment_terms.end_at >= ?", ends_after, ends_after)
+        OR courses.conclude_at >= ? OR enrollment_terms.end_at >= ?",
+                                  ends_after,
+                                  ends_after)
       end
     end
 
@@ -777,7 +786,11 @@ class AccountsController < ApplicationController
     end
 
     render json: @courses.map { |c|
-                   course_json(c, @current_user, session, includes, nil,
+                   course_json(c,
+                               @current_user,
+                               session,
+                               includes,
+                               nil,
                                precalculated_permissions: all_precalculated_permissions&.dig(c.global_id),
                                prefer_friendly_name: false)
                  }
@@ -837,7 +850,8 @@ class AccountsController < ApplicationController
       MicrosoftSync::SettingsValidator.new(microsoft_sync_settings, @account).validate_and_save
 
       # quotas (:manage_account_quotas)
-      quota_settings = account_params.slice(:default_storage_quota_mb, :default_user_storage_quota_mb,
+      quota_settings = account_params.slice(:default_storage_quota_mb,
+                                            :default_user_storage_quota_mb,
                                             :default_group_storage_quota_mb)
       unless quota_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_storage_quotas)
@@ -1037,9 +1051,13 @@ class AccountsController < ApplicationController
         allow_sis_import = params[:account].delete :allow_sis_import
         params[:account].delete :default_user_storage_quota_mb unless @account.root_account? && !@account.site_admin?
         unless @account.grants_right? @current_user, :manage_storage_quotas
-          %i[storage_quota default_storage_quota default_storage_quota_mb
-             default_user_storage_quota default_user_storage_quota_mb
-             default_group_storage_quota default_group_storage_quota_mb].each { |key| params[:account].delete key }
+          %i[storage_quota
+             default_storage_quota
+             default_storage_quota_mb
+             default_user_storage_quota
+             default_user_storage_quota_mb
+             default_group_storage_quota
+             default_group_storage_quota_mb].each { |key| params[:account].delete key }
         end
         if params[:account][:services]
           params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
@@ -1745,63 +1763,121 @@ class AccountsController < ApplicationController
                                       end
   end
 
-  PERMITTED_SETTINGS_FOR_UPDATE = [:admins_can_change_passwords, :admins_can_view_notifications,
-                                   :allow_additional_email_at_registration, :allow_invitation_previews,
+  PERMITTED_SETTINGS_FOR_UPDATE = [:admins_can_change_passwords,
+                                   :admins_can_view_notifications,
+                                   :allow_additional_email_at_registration,
+                                   :allow_invitation_previews,
                                    :allow_sending_scores_in_emails,
-                                   :author_email_in_notifications, :canvadocs_prefer_office_online,
-                                   :can_add_pronouns, :can_change_pronouns,
-                                   :consortium_parent_account, :consortium_can_create_own_accounts,
-                                   :shard_per_account, :consortium_autocreate_web_of_trust,
+                                   :author_email_in_notifications,
+                                   :canvadocs_prefer_office_online,
+                                   :can_add_pronouns,
+                                   :can_change_pronouns,
+                                   :consortium_parent_account,
+                                   :consortium_can_create_own_accounts,
+                                   :shard_per_account,
+                                   :consortium_autocreate_web_of_trust,
                                    :consortium_autocreate_reverse_trust,
-                                   :default_storage_quota, :default_storage_quota_mb,
-                                   :default_group_storage_quota, :default_group_storage_quota_mb,
-                                   :default_user_storage_quota, :default_user_storage_quota_mb, :default_time_zone,
+                                   :default_storage_quota,
+                                   :default_storage_quota_mb,
+                                   :default_group_storage_quota,
+                                   :default_group_storage_quota_mb,
+                                   :default_user_storage_quota,
+                                   :default_user_storage_quota_mb,
+                                   :default_time_zone,
                                    :disable_post_to_sis_when_grading_period_closed,
-                                   :edit_institution_email, :enable_alerts, :enable_eportfolios, :enable_course_catalog,
-                                   :limit_parent_app_web_access, :allow_gradebook_show_first_last_names,
+                                   :edit_institution_email,
+                                   :enable_alerts,
+                                   :enable_eportfolios,
+                                   :enable_course_catalog,
+                                   :limit_parent_app_web_access,
+                                   :allow_gradebook_show_first_last_names,
                                    { enable_offline_web_export: [:value] }.freeze,
                                    { disable_rce_media_uploads: [:value] }.freeze,
-                                   :enable_profiles, :enable_gravatar, :enable_turnitin, :equella_endpoint,
-                                   :equella_teaser, :external_notification_warning, :global_includes,
-                                   :google_docs_domain, :help_link_icon, :help_link_name,
+                                   :enable_profiles,
+                                   :enable_gravatar,
+                                   :enable_turnitin,
+                                   :equella_endpoint,
+                                   :equella_teaser,
+                                   :external_notification_warning,
+                                   :global_includes,
+                                   :google_docs_domain,
+                                   :help_link_icon,
+                                   :help_link_name,
                                    :include_integration_ids_in_gradebook_exports,
-                                   :include_students_in_global_survey, :kill_joy, :license_type,
+                                   :include_students_in_global_survey,
+                                   :kill_joy,
+                                   :license_type,
                                    { lock_all_announcements: [:value, :locked] }.freeze,
-                                   :login_handle_name, :mfa_settings, :no_enrollments_can_create_courses,
+                                   :login_handle_name,
+                                   :mfa_settings,
+                                   :no_enrollments_can_create_courses,
                                    :mobile_qr_login_is_enabled,
-                                   :microsoft_sync_enabled, :microsoft_sync_tenant, :microsoft_sync_login_attribute,
-                                   :microsoft_sync_login_attribute_suffix, :microsoft_sync_remote_attribute,
-                                   :open_registration, :outgoing_email_default_name, :prevent_course_availability_editing_by_teachers,
-                                   :prevent_course_renaming_by_teachers, :restrict_quiz_questions,
+                                   :microsoft_sync_enabled,
+                                   :microsoft_sync_tenant,
+                                   :microsoft_sync_login_attribute,
+                                   :microsoft_sync_login_attribute_suffix,
+                                   :microsoft_sync_remote_attribute,
+                                   :open_registration,
+                                   :outgoing_email_default_name,
+                                   :prevent_course_availability_editing_by_teachers,
+                                   :prevent_course_renaming_by_teachers,
+                                   :restrict_quiz_questions,
                                    { restrict_student_future_listing: [:value, :locked] }.freeze,
                                    { restrict_student_future_view: [:value, :locked] }.freeze,
                                    { restrict_student_past_view: [:value, :locked] }.freeze,
-                                   :self_enrollment, :show_scheduler, :sis_app_token, :sis_app_url,
+                                   :self_enrollment,
+                                   :show_scheduler,
+                                   :sis_app_token,
+                                   :sis_app_url,
                                    { sis_assignment_name_length: [:value] }.freeze,
                                    { sis_assignment_name_length_input: [:value] }.freeze,
                                    { sis_default_grade_export: [:value, :locked] }.freeze,
                                    :sis_name,
                                    { sis_require_assignment_due_date: [:value] }.freeze,
                                    { sis_syncing: [:value, :locked] }.freeze,
-                                   :strict_sis_check, :storage_quota, :students_can_create_courses,
-                                   :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
-                                   :turnitin_host, :turnitin_account_id,
-                                   :users_can_edit_name, :users_can_edit_profile, :users_can_edit_comm_channels,
+                                   :strict_sis_check,
+                                   :storage_quota,
+                                   :students_can_create_courses,
+                                   :sub_account_includes,
+                                   :teachers_can_create_courses,
+                                   :trusted_referers,
+                                   :turnitin_host,
+                                   :turnitin_account_id,
+                                   :users_can_edit_name,
+                                   :users_can_edit_profile,
+                                   :users_can_edit_comm_channels,
                                    { usage_rights_required: [:value, :locked] }.freeze,
                                    { restrict_quantitative_data: [:value, :locked] }.freeze,
-                                   :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
-                                   :smart_alerts_threshold, :enable_fullstory,
-                                   :enable_push_notifications, :teachers_can_create_courses_anywhere,
+                                   :app_center_access_token,
+                                   :default_dashboard_view,
+                                   :force_default_dashboard_view,
+                                   :smart_alerts_threshold,
+                                   :enable_fullstory,
+                                   :enable_push_notifications,
+                                   :teachers_can_create_courses_anywhere,
                                    :students_can_create_courses_anywhere,
                                    { default_due_time: [:value] }.freeze,
                                    { conditional_release: [:value, :locked] }.freeze,].freeze
 
   def permitted_account_attributes
-    [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,
-     :turnitin_host, :turnitin_comments, :turnitin_pledge, :turnitin_originality,
-     :default_time_zone, :parent_account, :default_storage_quota,
-     :default_storage_quota_mb, :storage_quota, :default_locale,
-     :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5,
+    [:name,
+     :turnitin_account_id,
+     :turnitin_shared_secret,
+     :include_crosslisted_courses,
+     :turnitin_host,
+     :turnitin_comments,
+     :turnitin_pledge,
+     :turnitin_originality,
+     :default_time_zone,
+     :parent_account,
+     :default_storage_quota,
+     :default_storage_quota_mb,
+     :storage_quota,
+     :default_locale,
+     :default_user_storage_quota_mb,
+     :default_group_storage_quota_mb,
+     :integration_id,
+     :brand_config_md5,
      settings: PERMITTED_SETTINGS_FOR_UPDATE, ip_filters: strong_anything]
   end
 

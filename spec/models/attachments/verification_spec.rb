@@ -41,7 +41,8 @@ describe Attachments::Verification do
     it "creates a verifier with the attachment id and ctx" do
       expect(CanvasSecurity).to receive(:create_jwt).with({
                                                             id: attachment.global_id, user_id: student.global_id, ctx: course.asset_string
-                                                          }, nil).and_return("thetoken")
+                                                          },
+                                                          nil).and_return("thetoken")
 
       verifier = v.verifier_for_user(student, context: course.asset_string)
       expect(verifier).to eq("thetoken")
@@ -50,7 +51,8 @@ describe Attachments::Verification do
     it "does not include user id if one is not specified" do
       expect(CanvasSecurity).to receive(:create_jwt).with({
                                                             id: attachment.global_id, ctx: course.asset_string
-                                                          }, nil).and_return("thetoken")
+                                                          },
+                                                          nil).and_return("thetoken")
 
       verifier = v.verifier_for_user(nil, context: course.asset_string)
       expect(verifier).to eq("thetoken")
@@ -60,7 +62,8 @@ describe Attachments::Verification do
       expires = 1.hour.from_now
       expect(CanvasSecurity).to receive(:create_jwt).with({
                                                             id: attachment.global_id, ctx: course.asset_string
-                                                          }, expires).and_return("thetoken")
+                                                          },
+                                                          expires).and_return("thetoken")
 
       verifier = v.verifier_for_user(nil, context: course.asset_string, expires: expires)
       expect(verifier).to eq("thetoken")

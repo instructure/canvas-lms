@@ -501,10 +501,18 @@ Implemented for: Canvas LMS)]
       raise NotImplementedError
     end
 
-    wrap_api_call :identifyServer, :validateAuth, :getServerItems,
-                  :selectServerItem, :publishServerItem, :deleteServerItem,
-                  :replaceServerItem, :retrieveServerItem, :appendServerItem,
-                  :getAttachmentLink, :uploadAttachment, :downloadAttachment
+    wrap_api_call :identifyServer,
+                  :validateAuth,
+                  :getServerItems,
+                  :selectServerItem,
+                  :publishServerItem,
+                  :deleteServerItem,
+                  :replaceServerItem,
+                  :retrieveServerItem,
+                  :appendServerItem,
+                  :getAttachmentLink,
+                  :uploadAttachment,
+                  :downloadAttachment
 
     protected
 

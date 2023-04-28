@@ -52,11 +52,12 @@ if Plugin.installed?("bundler_lockfile_extensions")
       ::CANVAS_RAILS = x # rubocop:disable Style/RedundantConstantBase
     end
 
-    ["#{base_gemfile}.rails#{x.delete(".")}.lock", {
-      default: x == CANVAS_RAILS,
-      install_filter: install_filter,
-      prepare_environment: prepare_environment,
-    }]
+    ["#{base_gemfile}.rails#{x.delete(".")}.lock",
+     {
+       default: x == CANVAS_RAILS,
+       install_filter: install_filter,
+       prepare_environment: prepare_environment,
+     }]
   end
 
   BundlerLockfileExtensions.enable(lockfile_defs)

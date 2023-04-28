@@ -843,8 +843,10 @@ describe AssignmentsController do
       @assignment.submission_types = "discussion_topic"
       @assignment.save!
 
-      RoleOverride.create!(context: @course.account, permission: "read_forum",
-                           role: observer_role, enabled: false)
+      RoleOverride.create!(context: @course.account,
+                           permission: "read_forum",
+                           role: observer_role,
+                           enabled: false)
 
       get "show", params: { course_id: @course.id, id: @assignment.id }
       expect(response).not_to be_redirect

@@ -35,9 +35,13 @@ describe Lti::DeepLinkingUtil do
     it "removes non-string keys and non-string/number/boolean/nil values" do
       val = {
         "foo" => "bar",
-        "bool1" => true, "bool2" => false,
-        "abc" => {}, "def" => { "ghi" => "jkl" },
-        "mno" => nil, "pqr" => 1, 1 => "one",
+        "bool1" => true,
+        "bool2" => false,
+        "abc" => {},
+        "def" => { "ghi" => "jkl" },
+        "mno" => nil,
+        "pqr" => 1,
+        1 => "one",
         "badscalar" => Object.new
       }
 

@@ -23,8 +23,10 @@ describe RoleOverride do
     @account = account_model(parent_account: Account.default)
 
     role = teacher_role
-    RoleOverride.create!(context: @account, permission: "moderate_forum",
-                         role: role, enabled: false)
+    RoleOverride.create!(context: @account,
+                         permission: "moderate_forum",
+                         role: role,
+                         enabled: false)
     permissions = RoleOverride.permission_for(Account.default, :moderate_forum, role)
     expect(permissions[:enabled]).to be_truthy
     expect(permissions[:prior_default]).to be_truthy
@@ -42,10 +44,14 @@ describe RoleOverride do
     a3 = account_model(parent_account: a2)
 
     role = teacher_role(root_account_id: a1.id)
-    RoleOverride.create!(context: a1, permission: "moderate_forum",
-                         role: role, enabled: false)
-    RoleOverride.create!(context: a2, permission: "moderate_forum",
-                         role: role, enabled: true)
+    RoleOverride.create!(context: a1,
+                         permission: "moderate_forum",
+                         role: role,
+                         enabled: false)
+    RoleOverride.create!(context: a2,
+                         permission: "moderate_forum",
+                         role: role,
+                         enabled: true)
 
     permissions = RoleOverride.permission_for(a1, :moderate_forum, role)
     expect(permissions[:enabled]).to be_falsey
@@ -75,10 +81,14 @@ describe RoleOverride do
     u2 = user_factory
     c2.enroll_student(u2, role: role)
 
-    ro = RoleOverride.create!(context: a1, permission: "moderate_forum",
-                              role: role, enabled: true)
-    RoleOverride.create!(context: a2, permission: "moderate_forum",
-                         role: role, enabled: false)
+    ro = RoleOverride.create!(context: a1,
+                              permission: "moderate_forum",
+                              role: role,
+                              enabled: true)
+    RoleOverride.create!(context: a2,
+                         permission: "moderate_forum",
+                         role: role,
+                         enabled: false)
 
     expect(c1.grants_right?(u1, :moderate_forum)).to be_truthy
     expect(c2.grants_right?(u2, :moderate_forum)).to be_falsey
@@ -103,8 +113,10 @@ describe RoleOverride do
   it "updates the roles updated_at timestamp on save" do
     account = account_model(parent_account: Account.default)
     role = teacher_role
-    role_override = RoleOverride.create!(context: account, permission: "moderate_forum",
-                                         role: role, enabled: false)
+    role_override = RoleOverride.create!(context: account,
+                                         permission: "moderate_forum",
+                                         role: role,
+                                         enabled: false)
     role.update!(updated_at: 1.day.ago)
     old_updated_at = role.updated_at
 
@@ -281,8 +293,10 @@ describe RoleOverride do
     end
 
     def create_override(role, enabled)
-      RoleOverride.create!(context: @account, permission: @permission.to_s,
-                           role: role, enabled: enabled)
+      RoleOverride.create!(context: @account,
+                           permission: @permission.to_s,
+                           role: role,
+                           enabled: enabled)
     end
 
     it "does not mark a permission as explicit in a sub account when it's explicit in the root" do
@@ -507,8 +521,10 @@ describe RoleOverride do
       role = Account.site_admin.roles.build(name: "role")
       role.base_role_type = "AccountMembership"
       role.save!
-      ro = RoleOverride.new(context: Account.site_admin, permission: "manage_role_overrides",
-                            role: role, enabled: true)
+      ro = RoleOverride.new(context: Account.site_admin,
+                            permission: "manage_role_overrides",
+                            role: role,
+                            enabled: true)
       ro.applies_to_self = false
       ro.save!
       # for the UI - should be enabled
@@ -523,8 +539,10 @@ describe RoleOverride do
       role = Account.site_admin.roles.build(name: "role")
       role.base_role_type = "AccountMembership"
       role.save!
-      ro = RoleOverride.new(context: Account.site_admin, permission: "manage_role_overrides",
-                            role: role, enabled: true)
+      ro = RoleOverride.new(context: Account.site_admin,
+                            permission: "manage_role_overrides",
+                            role: role,
+                            enabled: true)
       ro.applies_to_descendants = false
       ro.save!
       # for the UI - should be enabled

@@ -38,11 +38,15 @@ module BlueprintCourseCommon
 
   def create_and_migrate_master_assignments(master)
     template = master.master_course_templates.first
-    @assignment1 = master.assignments.create!(title: "Assignment 1", grading_type: "points",
-                                              points_possible: 10.0, unlock_at: 2.days.from_now)
+    @assignment1 = master.assignments.create!(title: "Assignment 1",
+                                              grading_type: "points",
+                                              points_possible: 10.0,
+                                              unlock_at: 2.days.from_now)
     template.create_content_tag_for!(@assignment1)
-    @assignment2 = master.assignments.create!(title: "Assignment 2", grading_type: "points",
-                                              points_possible: 10.0, unlock_at: 2.days.from_now)
+    @assignment2 = master.assignments.create!(title: "Assignment 2",
+                                              grading_type: "points",
+                                              points_possible: 10.0,
+                                              unlock_at: 2.days.from_now)
     tag1 = template.create_content_tag_for!(@assignment2)
     tag1.update(restrictions: { points: true, availability_dates: true })
     run_master_course_migration(master)

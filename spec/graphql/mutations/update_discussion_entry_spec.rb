@@ -154,8 +154,10 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
       entry = @topic.discussion_entries.create!(message: "Howdy", user: @student, attachment: @attachment, parent_id: child_reply.id, include_reply_preview: false)
       result = run_mutation(discussion_entry_id: entry.id, include_reply_preview: true)
       expect(result["errors"]).to be_nil
-      expect(result.dig("data", 'updateDiscussion
-        Entry', "errors")).to be_nil
+      expect(result.dig("data",
+                        'updateDiscussion
+        Entry',
+                        "errors")).to be_nil
       expect(entry.reload.include_reply_preview).to be true
     end
 
@@ -192,8 +194,10 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
       entry = @topic.discussion_entries.create!(message: "Howdy", user: @student, attachment: @attachment, parent_id: child_reply.id, quoted_entry_id: nil)
       result = run_mutation(discussion_entry_id: entry.id, quoted_entry_id: parent_entry.id)
       expect(result["errors"]).to be_nil
-      expect(result.dig("data", 'updateDiscussion
-        Entry', "errors")).to be_nil
+      expect(result.dig("data",
+                        'updateDiscussion
+        Entry',
+                        "errors")).to be_nil
       expect(entry.reload.quoted_entry_id).to be parent_entry.id
     end
 

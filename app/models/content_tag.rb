@@ -21,8 +21,18 @@ class ContentTag < ActiveRecord::Base
   class LastLinkToOutcomeNotDestroyed < StandardError
   end
 
-  TABLED_CONTENT_TYPES = ["Attachment", "Assignment", "WikiPage", "Quizzes::Quiz", "LearningOutcome", "DiscussionTopic",
-                          "Rubric", "ContextExternalTool", "LearningOutcomeGroup", "AssessmentQuestionBank", "LiveAssessments::Assessment", "Lti::MessageHandler"].freeze
+  TABLED_CONTENT_TYPES = ["Attachment",
+                          "Assignment",
+                          "WikiPage",
+                          "Quizzes::Quiz",
+                          "LearningOutcome",
+                          "DiscussionTopic",
+                          "Rubric",
+                          "ContextExternalTool",
+                          "LearningOutcomeGroup",
+                          "AssessmentQuestionBank",
+                          "LiveAssessments::Assessment",
+                          "Lti::MessageHandler"].freeze
   TABLELESS_CONTENT_TYPES = ["ContextModuleSubHeader", "ExternalUrl"].freeze
   CONTENT_TYPES = (TABLED_CONTENT_TYPES + TABLELESS_CONTENT_TYPES).freeze
 
@@ -36,10 +46,14 @@ class ContentTag < ActiveRecord::Base
   belongs_to :content, polymorphic: [], exhaustive: false
   validates :content_type, inclusion: { allow_nil: true, in: CONTENT_TYPES }
   belongs_to :context, polymorphic:
-      [:course, :learning_outcome_group, :assignment, :account,
+      [:course,
+       :learning_outcome_group,
+       :assignment,
+       :account,
        { quiz: "Quizzes::Quiz" }]
-  belongs_to :associated_asset, polymorphic: [:learning_outcome_group, lti_resource_link: "Lti::ResourceLink"],
-                                polymorphic_prefix: true
+  belongs_to :associated_asset,
+             polymorphic: [:learning_outcome_group, lti_resource_link: "Lti::ResourceLink"],
+             polymorphic_prefix: true
   belongs_to :context_module
   belongs_to :learning_outcome
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
@@ -579,7 +593,8 @@ class ContentTag < ActiveRecord::Base
       .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND content_tags.content_type = 'DiscussionTopic'
-             AND discussion_topics.assignment_id IS NULL", course_ids)
+             AND discussion_topics.assignment_id IS NULL",
+             course_ids)
   }
 
   scope :for_non_differentiable_wiki_pages, lambda { |course_ids|
@@ -587,7 +602,8 @@ class ContentTag < ActiveRecord::Base
       .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND content_tags.content_type = 'WikiPage'
-             AND wp.assignment_id IS NULL", course_ids)
+             AND wp.assignment_id IS NULL",
+             course_ids)
   }
 
   scope :for_differentiable_quizzes, lambda { |user_ids, course_ids|
@@ -597,7 +613,10 @@ class ContentTag < ActiveRecord::Base
              AND qsv.course_id IN (?)
              AND content_tags.content_type in ('Quiz', 'Quizzes::Quiz')
              AND qsv.user_id = ANY( '{?}'::INT8[] )
-        ", course_ids, course_ids, user_ids)
+        ",
+             course_ids,
+             course_ids,
+             user_ids)
   }
 
   scope :for_differentiable_assignments, lambda { |user_ids, course_ids|
@@ -607,7 +626,10 @@ class ContentTag < ActiveRecord::Base
              AND asv.course_id IN (?)
              AND content_tags.content_type = 'Assignment'
              AND asv.user_id = ANY( '{?}'::INT8[] )
-        ", course_ids, course_ids, user_ids)
+        ",
+             course_ids,
+             course_ids,
+             user_ids)
   }
 
   scope :for_differentiable_discussions, lambda { |user_ids, course_ids|
@@ -620,7 +642,10 @@ class ContentTag < ActiveRecord::Base
              AND content_tags.content_type = 'DiscussionTopic'
              AND discussion_topics.assignment_id IS NOT NULL
              AND asv.user_id = ANY( '{?}'::INT8[] )
-      ", course_ids, course_ids, user_ids)
+      ",
+             course_ids,
+             course_ids,
+             user_ids)
   }
 
   scope :for_differentiable_wiki_pages, lambda { |user_ids, course_ids|
@@ -633,7 +658,10 @@ class ContentTag < ActiveRecord::Base
              AND content_tags.content_type = 'WikiPage'
              AND wp.assignment_id IS NOT NULL
              AND asv.user_id = ANY( '{?}'::INT8[] )
-      ", course_ids, course_ids, user_ids)
+      ",
+             course_ids,
+             course_ids,
+             user_ids)
   }
 
   scope :can_have_assignment, -> { where(content_type: ["Assignment", "DiscussionTopic", "Quizzes::Quiz", "WikiPage"]) }

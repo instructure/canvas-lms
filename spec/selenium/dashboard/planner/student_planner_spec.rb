@@ -68,7 +68,8 @@ describe "student planner" do
   it "shows course images", priority: "1" do
     @course_root = Folder.root_folders(@course).first
     @course_attachment = @course_root.attachments.create!(context: @course,
-                                                          uploaded_data: jpeg_data_frd, filename: "course.jpg",
+                                                          uploaded_data: jpeg_data_frd,
+                                                          filename: "course.jpg",
                                                           display_name: "course.jpg")
     @course.image_id = @course_attachment.id
     @course.save!

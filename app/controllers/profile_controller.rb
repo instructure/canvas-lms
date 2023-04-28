@@ -350,8 +350,18 @@ class ProfileController < ApplicationController
     respond_to do |format|
       user_params = if params[:user]
                       params[:user]
-                        .permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
-                                :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :pronouns)
+                        .permit(:name,
+                                :short_name,
+                                :sortable_name,
+                                :time_zone,
+                                :show_user_services,
+                                :gender,
+                                :avatar_image,
+                                :subscribe_to_emails,
+                                :locale,
+                                :bio,
+                                :birthdate,
+                                :pronouns)
                     else
                       {}
                     end

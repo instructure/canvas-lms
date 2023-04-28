@@ -136,10 +136,20 @@ class UserMerge
       Attachment.delay.migrate_attachments(from_user, target_user)
 
       updates = {}
-      %w[access_tokens asset_user_accesses calendar_events collaborations
-         context_module_progressions group_memberships ignores
-         page_comments Polling::Poll rubric_assessments user_services
-         web_conference_participants web_conferences wiki_pages].each do |key|
+      %w[access_tokens
+         asset_user_accesses
+         calendar_events
+         collaborations
+         context_module_progressions
+         group_memberships
+         ignores
+         page_comments
+         Polling::Poll
+         rubric_assessments
+         user_services
+         web_conference_participants
+         web_conferences
+         wiki_pages].each do |key|
         updates[key] = "user_id"
       end
       updates["submission_comments"] = "author_id"
@@ -562,7 +572,8 @@ class UserMerge
       .where("EXISTS (SELECT *
                      FROM #{ContextModuleProgression.quoted_table_name} cmp2
                      WHERE context_module_progressions.context_module_id=cmp2.context_module_id
-                       AND cmp2.user_id = ?)", target_user.id).find_each do |cmp|
+                       AND cmp2.user_id = ?)",
+             target_user.id).find_each do |cmp|
       ContextModuleProgression
         .where(context_module_id: cmp.context_module_id, user_id: [from_user, target_user])
         .order(Arel.sql("CASE WHEN workflow_state = 'completed' THEN 0

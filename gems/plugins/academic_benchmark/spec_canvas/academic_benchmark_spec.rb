@@ -26,7 +26,8 @@ describe AcademicBenchmark do
     @cm.converter_class = @plugin.settings["converter_class"]
     @cm.migration_settings[:migration_type] = "academic_benchmark_importer"
     @cm.migration_settings[:import_immediately] = true
-    @cm.migration_settings[:migration_options] = { points_possible: 10, mastery_points: 6,
+    @cm.migration_settings[:migration_options] = { points_possible: 10,
+                                                   mastery_points: 6,
                                                    ratings: [{ description: "Bad", points: 0 }, { description: "Awesome", points: 10 }] }
     @cm.user = @user
     @cm.save!

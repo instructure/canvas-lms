@@ -36,8 +36,10 @@ describe ContentShare do
       "page" => { "wiki_pages" => { "blah" => "1" } },
       "quiz" => { "quizzes" => { "blah" => "1" } },
       "module_item" => { "wiki_pages" => { "bap" => "1" }, "content_tags" => { "blah" => "1" } },
-      "module" => { "content_tags" => { "bar" => "1", "baz" => "1" }, "context_modules" => { "foo" => "1" },
-                    "assignments" => { "bip" => "1" }, "wiki_pages" => { "bap" => "1" } }
+      "module" => { "content_tags" => { "bar" => "1", "baz" => "1" },
+                    "context_modules" => { "foo" => "1" },
+                    "assignments" => { "bip" => "1" },
+                    "wiki_pages" => { "bap" => "1" } }
     }
   end
 

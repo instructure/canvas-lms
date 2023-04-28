@@ -47,7 +47,8 @@ describe "Gradebook - uploads" do
 
   it "updates grades for assignments with GPA Scale grading type correctly", priority: "1" do
     assignment = @course.assignments.create!(title: "GPA Scale Assignment",
-                                             grading_type: "gpa_scale", points_possible: 5)
+                                             grading_type: "gpa_scale",
+                                             points_possible: 5)
     assignment.grade_student(@student, grade: "D", grader: @teacher)
     _filename, fullpath, _data = gradebook_file("gradebook0.csv",
                                                 "Student Name,ID,Section,GPA Scale Assignment",

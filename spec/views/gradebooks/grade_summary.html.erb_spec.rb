@@ -79,7 +79,9 @@ describe "gradebooks/grade_summary" do
     view_context
     a = @course.assignments.create!(title: "some assignment", submission_types: ["online_text_entry"])
     sub = a.submit_homework(@student, submission_type: "online_text_entry", body: "o hai")
-    sub.add_comment(author: @teacher, media_comment_id: "0_ijklmnop", media_comment_type: "video",
+    sub.add_comment(author: @teacher,
+                    media_comment_id: "0_ijklmnop",
+                    media_comment_type: "video",
                     comment: "hello")
     assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     render("gradebooks/grade_summary")

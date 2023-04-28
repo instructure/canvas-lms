@@ -457,7 +457,8 @@ describe FilesController do
     allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
 
     some_course = Course.create!
-    some_file = attachment_model(context: some_course, content_type: "text/html",
+    some_file = attachment_model(context: some_course,
+                                 content_type: "text/html",
                                  uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
     secret_user = User.create!(name: "secret user name gasp")
 

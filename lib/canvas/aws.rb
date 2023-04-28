@@ -19,10 +19,14 @@
 
 module Canvas
   module AWS
-    OLD_KEYS_SYMBOLS = %i[kinesis_endpoint kinesis_port
-                          s3_endpoint s3_port
-                          server port
-                          sqs_endpoint sqs_port
+    OLD_KEYS_SYMBOLS = %i[kinesis_endpoint
+                          kinesis_port
+                          s3_endpoint
+                          s3_port
+                          server
+                          port
+                          sqs_endpoint
+                          sqs_port
                           use_ssl].freeze
     OLD_KEYS = (OLD_KEYS_SYMBOLS + OLD_KEYS_SYMBOLS.map(&:to_s)).freeze
 

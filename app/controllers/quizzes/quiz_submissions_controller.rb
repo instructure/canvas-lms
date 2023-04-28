@@ -185,7 +185,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
   def show
     if authorized_action(@quiz_submission, @current_user, :read)
-      redirect_to named_context_url(@context, :context_quiz_history_url,
+      redirect_to named_context_url(@context,
+                                    :context_quiz_history_url,
                                     @quiz.id,
                                     user_id: @quiz_submission.user_id)
     end

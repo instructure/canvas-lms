@@ -50,16 +50,18 @@ describe "student planner" do
     end
 
     it "navigates to the assignment submissions page when they are submitted." do
-      @assignment.submit_homework(@student1, submission_type: "online_text_entry",
-                                             body: "Assignment submitted")
+      @assignment.submit_homework(@student1,
+                                  submission_type: "online_text_entry",
+                                  body: "Assignment submitted")
       go_to_list_view
       fj("button:contains('Show 1 completed item')").click
       validate_link_to_submissions(@assignment, @student1, "assignments")
     end
 
     it "enables the checkbox when an assignment is completed", priority: "1" do
-      @assignment.submit_homework(@student1, submission_type: "online_text_entry",
-                                             body: "Assignment submitted")
+      @assignment.submit_homework(@student1,
+                                  submission_type: "online_text_entry",
+                                  body: "Assignment submitted")
       go_to_list_view
       expect(planner_app_div).to contain_jqcss('span:contains("Show 1 completed item")')
     end

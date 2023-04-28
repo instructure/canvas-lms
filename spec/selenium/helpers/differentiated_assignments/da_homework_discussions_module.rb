@@ -23,8 +23,12 @@ module DifferentiatedAssignments
   module Homework
     module Discussions
       class << self
-        attr_reader :discussion_for_everyone, :discussion_for_section_a, :discussion_for_section_b,
-                    :discussion_for_sections_a_and_b, :discussion_for_section_c, :discussion_for_first_student,
+        attr_reader :discussion_for_everyone,
+                    :discussion_for_section_a,
+                    :discussion_for_section_b,
+                    :discussion_for_sections_a_and_b,
+                    :discussion_for_section_c,
+                    :discussion_for_first_student,
                     :discussion_for_second_and_third_students
 
         def initialize

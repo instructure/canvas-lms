@@ -228,9 +228,12 @@ describe PseudonymsController, type: :request do
 
     it "does not allow user to add their own pseudonym to an arbitrary account" do
       user_with_pseudonym(active_all: true)
-      raw_api_call(:post, "/api/v1/accounts/#{Account.site_admin.id}/logins",
-                   { account_id: Account.site_admin.id.to_param, controller: "pseudonyms",
-                     action: "create", format: "json" },
+      raw_api_call(:post,
+                   "/api/v1/accounts/#{Account.site_admin.id}/logins",
+                   { account_id: Account.site_admin.id.to_param,
+                     controller: "pseudonyms",
+                     action: "create",
+                     format: "json" },
                    user: { id: @user.id },
                    login: { unique_id: "user" })
       expect(response.code).to eql "401"
@@ -429,8 +432,10 @@ describe PseudonymsController, type: :request do
       @student.pseudonyms.create!(unique_id: "student@example.com")
       @path = "/api/v1/users/#{@student.id}/logins/#{@student.pseudonym.id}"
       @path_options = { controller: "pseudonyms",
-                        action: "destroy", format: "json",
-                        user_id: @student.id.to_param, id: @student.pseudonym.id.to_param }
+                        action: "destroy",
+                        format: "json",
+                        user_id: @student.id.to_param,
+                        id: @student.pseudonym.id.to_param }
     end
 
     context "an authorized user" do
@@ -501,7 +506,8 @@ describe PseudonymsController, type: :request do
       CommunicationChannel.create(user: @student, path: "student@example.com")
       @path = "/api/v1/users/reset_password"
       @path_options = { controller: "pseudonyms",
-                        action: "forgot_password", format: "json" }
+                        action: "forgot_password",
+                        format: "json" }
     end
 
     context "an authorized user" do

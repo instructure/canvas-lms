@@ -1845,8 +1845,9 @@ describe Course do
 
     it "correctly limits visibilities for a limited teacher" do
       limited_teacher = User.create(name: "Limited Teacher")
-      @course.enroll_teacher(limited_teacher, limit_privileges_to_course_section: true,
-                                              section: @section2)
+      @course.enroll_teacher(limited_teacher,
+                             limit_privileges_to_course_section: true,
+                             section: @section2)
       expect(@course.course_section_visibility(limited_teacher)).to eq [@section2.id]
     end
 
@@ -2403,8 +2404,12 @@ describe Course do
       before(:once) do
         @account = Account.create!(name: "A new root")
         course_factory(active_all: true, account: @account)
-        @user1 = user_with_managed_pseudonym(active_all: true, name: "Brian", username: "brianp@instructure.com",
-                                             account: @account, sis_user_id: "SISUSERID", integration_id: "int1")
+        @user1 = user_with_managed_pseudonym(active_all: true,
+                                             name: "Brian",
+                                             username: "brianp@instructure.com",
+                                             account: @account,
+                                             sis_user_id: "SISUSERID",
+                                             integration_id: "int1")
         student_in_course(user: @user1)
         @user2 = user_with_pseudonym(active_all: true, name: "Cody", username: "cody@instructure.com", account: @account)
         student_in_course(user: @user2)
@@ -3425,8 +3430,10 @@ describe Course do
       end
 
       it "does not show discussion tab for observers without read_forum" do
-        RoleOverride.create!(context: @course.account, permission: "read_forum",
-                             role: observer_role, enabled: false)
+        RoleOverride.create!(context: @course.account,
+                             permission: "read_forum",
+                             role: observer_role,
+                             enabled: false)
         tab_ids = @course.tabs_available(@user).pluck(:id)
         expect(tab_ids).not_to be_include(Course::TAB_DISCUSSIONS)
       end
@@ -3832,7 +3839,9 @@ describe Course do
             enrollments, publishing_user, publishing_pseudonym, include_final_grade_overrides: false
           ).and_return 42
           expect(Course.valid_grade_export_types["instructure_csv"][:callback].call(course,
-                                                                                    enrollments, publishing_user, publishing_pseudonym)).to eq 42
+                                                                                    enrollments,
+                                                                                    publishing_user,
+                                                                                    publishing_pseudonym)).to eq 42
           expect(Course.valid_grade_export_types["instructure_csv"][:requires_grading_standard]).to be_falsey
           expect(Course.valid_grade_export_types["instructure_csv"][:requires_publishing_pseudonym]).to be_falsey
         end
@@ -4143,7 +4152,8 @@ describe Course do
                                                                                return [
                                                                                  [[@ase[1].id, @ase[3].id],
                                                                                   "post1",
-                                                                                  "test/mime1", { "header_param" => "header_value" }],
+                                                                                  "test/mime1",
+                                                                                  { "header_param" => "header_value" }],
                                                                                  [[@ase[4].id, @ase[5].id],
                                                                                   "post2",
                                                                                   "test/mime2"]
@@ -4484,9 +4494,18 @@ describe Course do
         it "works for a number of boolean representations" do
           expect(@course.grading_standard_enabled?).to be_falsey
           expect(@course.grading_standard_enabled).to be_falsey
-          [[false, false], [true, true], ["false", false], ["true", true],
-           ["0", false], [0, false], ["1", true], [1, true], ["off", false],
-           ["on", true], ["yes", true], ["no", false]].each do |val, enabled|
+          [[false, false],
+           [true, true],
+           ["false", false],
+           ["true", true],
+           ["0", false],
+           [0, false],
+           ["1", true],
+           [1, true],
+           ["off", false],
+           ["on", true],
+           ["yes", true],
+           ["no", false]].each do |val, enabled|
             @course.grading_standard_enabled = val
             expect(@course.grading_standard_enabled?).to eq enabled
             expect(@course.grading_standard_enabled).to eq enabled
@@ -4508,7 +4527,8 @@ describe Course do
                       expect(publishing_user).to eq @user
                       return [[[], "test-jt-data", "application/jtmimetype"]]
                     end,
-          requires_grading_standard: false, requires_publishing_pseudonym: true
+          requires_grading_standard: false,
+          requires_publishing_pseudonym: true
         }
 
         @plugin = Canvas::Plugin.find!("grade_export")
@@ -5323,12 +5343,18 @@ describe Course do
       it "does not return observers to section-restricted students" do
         section2 = @course.course_sections.create!
         limited_student = user_factory(active_all: true)
-        @course.enroll_user(limited_student, "StudentEnrollment", enrollment_state: "active",
-                                                                  section: section2, limit_privileges_to_course_section: true)
+        @course.enroll_user(limited_student,
+                            "StudentEnrollment",
+                            enrollment_state: "active",
+                            section: section2,
+                            limit_privileges_to_course_section: true)
 
         limited_teacher = user_factory(active_all: true)
-        @course.enroll_user(limited_teacher, "TeacherEnrollment", enrollment_state: "active",
-                                                                  section: section2, limit_privileges_to_course_section: true)
+        @course.enroll_user(limited_teacher,
+                            "TeacherEnrollment",
+                            enrollment_state: "active",
+                            section: section2,
+                            limit_privileges_to_course_section: true)
 
         observer = user_factory(active_all: true)
         @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active", section: section2)
@@ -5381,15 +5407,19 @@ describe Course do
     context "restricted" do
       it "returns no students except self and the observed" do
         expect(@course.students_visible_to(@observer)).to eq [@student1]
-        RoleOverride.create!(context: @course.account, permission: "read_roster",
-                             role: student_role, enabled: false)
+        RoleOverride.create!(context: @course.account,
+                             permission: "read_roster",
+                             role: student_role,
+                             enabled: false)
         expect(@course.students_visible_to(@student1)).to eq [@student1]
       end
 
       it "returns student's sections" do
         expect(@course.sections_visible_to(@observer)).to eq [@course.default_section]
-        RoleOverride.create!(context: @course.account, permission: "read_roster",
-                             role: student_role, enabled: false)
+        RoleOverride.create!(context: @course.account,
+                             permission: "read_roster",
+                             role: student_role,
+                             enabled: false)
         expect(@course.sections_visible_to(@student1)).to eq [@course.default_section]
       end
     end
@@ -5398,8 +5428,10 @@ describe Course do
       it "checks the message permission" do
         expect(@course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), require_message_permission: true)).to be :full
         expect(@course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), require_message_permission: true)).to be :restricted
-        RoleOverride.create!(context: @course.account, permission: "send_messages",
-                             role: student_role, enabled: false)
+        RoleOverride.create!(context: @course.account,
+                             permission: "send_messages",
+                             role: student_role,
+                             enabled: false)
         expect(@course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), require_message_permission: true)).to be :restricted
       end
     end

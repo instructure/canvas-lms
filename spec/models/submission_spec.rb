@@ -2613,7 +2613,8 @@ describe Submission do
         end
         let(:other_report) do
           OriginalityReport.create!(attachment: attachment,
-                                    submission: submission, workflow_state: other_state,
+                                    submission: submission,
+                                    workflow_state: other_state,
                                     originality_score: (other_state == "scored") ? 2 : nil)
         end
 
@@ -2917,9 +2918,11 @@ describe Submission do
             other_report
 
             expect(other_submission.attempt).to be > submission.attempt
-            expect(submission.originality_report_url(submission.asset_string, test_teacher,
+            expect(submission.originality_report_url(submission.asset_string,
+                                                     test_teacher,
                                                      submission.attempt.to_s)).to eq report_url
-            expect(submission.originality_report_url(submission.asset_string, test_teacher,
+            expect(submission.originality_report_url(submission.asset_string,
+                                                     test_teacher,
                                                      other_submission.attempt.to_s)).to eq(other_report_url)
           end
         end
@@ -2928,19 +2931,23 @@ describe Submission do
           let(:other_attachment) { attachment_model(filename: "submission-b.doc", context: test_student) }
           let(:other_report_url) { "http://another-report.com" }
           let(:other_report) do
-            OriginalityReport.create!(attachment: other_attachment, submission: submission,
-                                      originality_score: 0.4, originality_report_url: other_report_url)
+            OriginalityReport.create!(attachment: other_attachment,
+                                      submission: submission,
+                                      originality_score: 0.4,
+                                      originality_report_url: other_report_url)
           end
 
           it "considers all attachments in submission history valid" do
             Timecop.freeze(2.days.ago) do
-              assignment.submit_homework(test_student, submission_type: "online_upload",
-                                                       attachments: [attachment])
+              assignment.submit_homework(test_student,
+                                         submission_type: "online_upload",
+                                         attachments: [attachment])
             end
 
             Timecop.freeze(1.day.ago) do
-              assignment.submit_homework(test_student, submission_type: "online_upload",
-                                                       attachments: [other_attachment])
+              assignment.submit_homework(test_student,
+                                         submission_type: "online_upload",
+                                         attachments: [other_attachment])
             end
 
             originality_report
@@ -2952,8 +2959,9 @@ describe Submission do
           end
 
           it "gives the correct url for each attachment" do
-            assignment.submit_homework(test_student, submission_type: "online_upload",
-                                                     attachments: [attachment, other_attachment])
+            assignment.submit_homework(test_student,
+                                       submission_type: "online_upload",
+                                       attachments: [attachment, other_attachment])
             originality_report
             other_report
             expect(submission.originality_report_url(attachment.asset_string, test_teacher))
@@ -2966,14 +2974,16 @@ describe Submission do
           context "with some duplicate reports for an attachment" do
             let(:duplicate_url) { "http://duplicate.com" }
             let(:duplicate_report) do
-              OriginalityReport.create!(attachment: attachment, submission: submission,
+              OriginalityReport.create!(attachment: attachment,
+                                        submission: submission,
                                         workflow_state: "pending",
                                         originality_report_url: duplicate_url)
             end
 
             before do
-              assignment.submit_homework(test_student, submission_type: "online_upload",
-                                                       attachments: [attachment, other_attachment])
+              assignment.submit_homework(test_student,
+                                         submission_type: "online_upload",
+                                         attachments: [attachment, other_attachment])
             end
 
             it "uses the scored report's URL" do
@@ -4781,8 +4791,9 @@ describe Submission do
         student_in_course(active_all: true)
         attachments = [attachment_model(filename: "submission-a.doc", context: @student)]
         Timecop.freeze(10.seconds.ago) do
-          @assignment.submit_homework(@student, submission_type: "online_upload",
-                                                attachments: [attachments[0]])
+          @assignment.submit_homework(@student,
+                                      submission_type: "online_upload",
+                                      attachments: [attachments[0]])
         end
 
         attachments << attachment_model(filename: "submission-b.doc", context: @student)
@@ -5162,7 +5173,10 @@ describe Submission do
 
     it "maintains grade when only updating comments" do
       @a1.grade_student(@u1, grade: 3, grader: @teacher)
-      Submission.process_bulk_update(@progress, @course, nil, @teacher,
+      Submission.process_bulk_update(@progress,
+                                     @course,
+                                     nil,
+                                     @teacher,
                                      {
                                        @a1.id => {
                                          @u1.id => { text_comment: "comment" }
@@ -5174,7 +5188,10 @@ describe Submission do
 
     it "nils grade when receiving empty posted_grade" do
       @a1.grade_student(@u1, grade: 3, grader: @teacher)
-      Submission.process_bulk_update(@progress, @course, nil, @teacher,
+      Submission.process_bulk_update(@progress,
+                                     @course,
+                                     nil,
+                                     @teacher,
                                      {
                                        @a1.id => {
                                          @u1.id => { posted_grade: nil }
@@ -5201,7 +5218,10 @@ describe Submission do
     end
 
     it "does not update grader_id if submission is blank or missing with -" do
-      Submission.process_bulk_update(@progress, @course, nil, @teacher,
+      Submission.process_bulk_update(@progress,
+                                     @course,
+                                     nil,
+                                     @teacher,
                                      {
                                        @a1.id => {
                                          @u1.id => { posted_grade: nil }
@@ -7457,16 +7477,18 @@ describe Submission do
 
   describe "#plagiarism_service_to_use" do
     it "returns nil when no service is configured" do
-      submission = @assignment.submit_homework(@student, submission_type: "online_text_entry",
-                                                         body: "whee")
+      submission = @assignment.submit_homework(@student,
+                                               submission_type: "online_text_entry",
+                                               body: "whee")
 
       expect(submission.plagiarism_service_to_use).to be_nil
     end
 
     it "returns :turnitin when only turnitin is configured" do
       setup_account_for_turnitin(@context.account)
-      submission = @assignment.submit_homework(@student, submission_type: "online_text_entry",
-                                                         body: "whee")
+      submission = @assignment.submit_homework(@student,
+                                               submission_type: "online_text_entry",
+                                               body: "whee")
 
       expect(submission.plagiarism_service_to_use).to eq(:turnitin)
     end
@@ -7475,8 +7497,9 @@ describe Submission do
       plugin = Canvas::Plugin.find(:vericite)
       PluginSetting.create!(name: plugin.id, settings: plugin.default_settings, disabled: false)
 
-      submission = @assignment.submit_homework(@student, submission_type: "online_text_entry",
-                                                         body: "whee")
+      submission = @assignment.submit_homework(@student,
+                                               submission_type: "online_text_entry",
+                                               body: "whee")
 
       expect(submission.plagiarism_service_to_use).to eq(:vericite)
     end
@@ -7486,8 +7509,9 @@ describe Submission do
       plugin = Canvas::Plugin.find(:vericite)
       PluginSetting.create!(name: plugin.id, settings: plugin.default_settings, disabled: false)
 
-      submission = @assignment.submit_homework(@student, submission_type: "online_text_entry",
-                                                         body: "whee")
+      submission = @assignment.submit_homework(@student,
+                                               submission_type: "online_text_entry",
+                                               body: "whee")
 
       expect(submission.plagiarism_service_to_use).to eq(:vericite)
     end
@@ -7498,8 +7522,9 @@ describe Submission do
       plugin = Canvas::Plugin.find(:vericite)
       PluginSetting.create!(name: plugin.id, settings: plugin.default_settings, disabled: false)
 
-      submission = @assignment.submit_homework(@student, submission_type: "online_text_entry",
-                                                         body: "whee")
+      submission = @assignment.submit_homework(@student,
+                                               submission_type: "online_text_entry",
+                                               body: "whee")
 
       expect(submission).to receive(:submit_to_plagiarism_later).once
       submission.resubmit_to_vericite

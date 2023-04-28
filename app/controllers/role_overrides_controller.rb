@@ -607,7 +607,8 @@ class RoleOverridesController < ApplicationController
                },
                status: :not_found
       else
-        redirect_to named_context_url(@context, :context_permissions_url,
+        redirect_to named_context_url(@context,
+                                      :context_permissions_url,
                                       account_roles: params[:account_roles])
       end
 
@@ -681,8 +682,13 @@ class RoleOverridesController < ApplicationController
         target_permissions.each do |permission|
           perm_override = (value_to_boolean(permission_updates[:explicit]) && override.nil?) ? permission[:currently] : override
           RoleOverride.manage_role_override(
-            context, role, permission[:name].to_s, override: perm_override, locked: locked,
-                                                   applies_to_self: applies_to_self, applies_to_descendants: applies_to_descendants
+            context,
+            role,
+            permission[:name].to_s,
+            override: perm_override,
+            locked: locked,
+            applies_to_self: applies_to_self,
+            applies_to_descendants: applies_to_descendants
           )
         end
       end

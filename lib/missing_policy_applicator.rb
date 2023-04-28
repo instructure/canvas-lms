@@ -42,7 +42,9 @@ class MissingPolicyApplicator
               .merge(Assignment.published)
               .merge(Enrollment.all_active_or_pending)
               .missing
-              .where(score: nil, grade: nil, cached_due_date: 1.day.ago(now)..now,
+              .where(score: nil,
+                     grade: nil,
+                     cached_due_date: 1.day.ago(now)..now,
                      late_policies: { missing_submission_deduction_enabled: true })
   end
 

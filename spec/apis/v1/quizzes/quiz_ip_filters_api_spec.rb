@@ -31,8 +31,10 @@ describe Quizzes::QuizIpFiltersController, type: :request do
   context "index" do
     def get_index(raw = false, data = {})
       url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/ip_filters"
-      params = { controller: "quizzes/quiz_ip_filters", action: "index",
-                 format: "json", course_id: @course.id.to_s,
+      params = { controller: "quizzes/quiz_ip_filters",
+                 action: "index",
+                 format: "json",
+                 course_id: @course.id.to_s,
                  quiz_id: @quiz.id.to_s }
 
       if raw

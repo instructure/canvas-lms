@@ -39,13 +39,18 @@ describe "Outcome Reports" do
     @course1.enroll_teacher(@teacher)
 
     @user1 = user_with_managed_pseudonym(
-      active_all: true, account: @root_account, name: "John St. Clair",
-      sortable_name: "St. Clair, John", username: "john@stclair.com",
+      active_all: true,
+      account: @root_account,
+      name: "John St. Clair",
+      sortable_name: "St. Clair, John",
+      username: "john@stclair.com",
       sis_user_id: "user_sis_id_01"
     )
     @user2 = user_with_managed_pseudonym(
-      active_all: true, username: "micheal@michaelbolton.com",
-      name: "Michael Bolton", account: @root_account,
+      active_all: true,
+      username: "micheal@michaelbolton.com",
+      name: "Michael Bolton",
+      account: @root_account,
       sis_user_id: "user_sis_id_02"
     )
 
@@ -115,8 +120,18 @@ describe "Outcome Reports" do
 
   def verify(row, values, row_index: nil)
     user, assignment, outcome, outcome_result, course, section, submission, quiz, question, quiz_outcome_result, quiz_submission, pseudonym =
-      values.values_at(:user, :assignment, :outcome, :outcome_result, :course, :section, :submission, :quiz, :question,
-                       :quiz_outcome_result, :quiz_submission, :pseudonym)
+      values.values_at(:user,
+                       :assignment,
+                       :outcome,
+                       :outcome_result,
+                       :course,
+                       :section,
+                       :submission,
+                       :quiz,
+                       :question,
+                       :quiz_outcome_result,
+                       :quiz_submission,
+                       :pseudonym)
     result = quiz.nil? ? outcome_result : quiz_outcome_result
     rating = if outcome.present? && result&.score&.present?
                outcome.rubric_criterion&.[](:ratings)&.select do |r|
@@ -1241,17 +1256,34 @@ describe "Outcome Reports" do
       context "With Account Level Mastery" do
         before(:once) do
           user1_values[:outcome_result]
-          @outcome_proficiency = OutcomeProficiency.new(id: 1, root_account_id: @root_account.id, context_type: "Account", context: @root_account,
+          @outcome_proficiency = OutcomeProficiency.new(id: 1,
+                                                        root_account_id: @root_account.id,
+                                                        context_type: "Account",
+                                                        context: @root_account,
                                                         outcome_proficiency_ratings: [OutcomeProficiencyRating.new(
-                                                          id: 1, points: 5, color: "3ADF00", description: "High Rating",
-                                                          mastery: false, outcome_proficiency: @outcome_proficiency
-                                                        ), OutcomeProficiencyRating.new(
-                                                          id: 2, points: 3, color: "FFFF00", description: "Mastery Rating",
-                                                          mastery: true, outcome_proficiency: @outcome_proficiency
-                                                        ), OutcomeProficiencyRating.new(
-                                                          id: 3, points: 1, color: "FF0000", description: "Low Rating",
-                                                          mastery: false, outcome_proficiency: @outcome_proficiency
-                                                        )])
+                                                          id: 1,
+                                                          points: 5,
+                                                          color: "3ADF00",
+                                                          description: "High Rating",
+                                                          mastery: false,
+                                                          outcome_proficiency: @outcome_proficiency
+                                                        ),
+                                                                                      OutcomeProficiencyRating.new(
+                                                                                        id: 2,
+                                                                                        points: 3,
+                                                                                        color: "FFFF00",
+                                                                                        description: "Mastery Rating",
+                                                                                        mastery: true,
+                                                                                        outcome_proficiency: @outcome_proficiency
+                                                                                      ),
+                                                                                      OutcomeProficiencyRating.new(
+                                                                                        id: 3,
+                                                                                        points: 1,
+                                                                                        color: "FF0000",
+                                                                                        description: "Low Rating",
+                                                                                        mastery: false,
+                                                                                        outcome_proficiency: @outcome_proficiency
+                                                                                      )])
           @root_account.outcome_proficiency = @outcome_proficiency
           @root_account.set_feature_flag!(:account_level_mastery_scales, "on")
         end
@@ -1307,17 +1339,34 @@ describe "Outcome Reports" do
 
       context "With Course Level Mastery" do
         before(:once) do
-          @outcome_proficiency = OutcomeProficiency.new(id: 1, root_account_id: @root_account.id, context_type: "Course", context: @course1,
+          @outcome_proficiency = OutcomeProficiency.new(id: 1,
+                                                        root_account_id: @root_account.id,
+                                                        context_type: "Course",
+                                                        context: @course1,
                                                         outcome_proficiency_ratings: [OutcomeProficiencyRating.new(
-                                                          id: 1, points: 5, color: "3ADF00", description: "High Rating",
-                                                          mastery: false, outcome_proficiency: @outcome_proficiency
-                                                        ), OutcomeProficiencyRating.new(
-                                                          id: 2, points: 3, color: "FFFF00", description: "Mastery Rating",
-                                                          mastery: true, outcome_proficiency: @outcome_proficiency
-                                                        ), OutcomeProficiencyRating.new(
-                                                          id: 3, points: 1, color: "FF0000", description: "Low Rating",
-                                                          mastery: false, outcome_proficiency: @outcome_proficiency
-                                                        )])
+                                                          id: 1,
+                                                          points: 5,
+                                                          color: "3ADF00",
+                                                          description: "High Rating",
+                                                          mastery: false,
+                                                          outcome_proficiency: @outcome_proficiency
+                                                        ),
+                                                                                      OutcomeProficiencyRating.new(
+                                                                                        id: 2,
+                                                                                        points: 3,
+                                                                                        color: "FFFF00",
+                                                                                        description: "Mastery Rating",
+                                                                                        mastery: true,
+                                                                                        outcome_proficiency: @outcome_proficiency
+                                                                                      ),
+                                                                                      OutcomeProficiencyRating.new(
+                                                                                        id: 3,
+                                                                                        points: 1,
+                                                                                        color: "FF0000",
+                                                                                        description: "Low Rating",
+                                                                                        mastery: false,
+                                                                                        outcome_proficiency: @outcome_proficiency
+                                                                                      )])
           @course1.outcome_proficiency = @outcome_proficiency
           @root_account.set_feature_flag!(:account_level_mastery_scales, "on")
         end

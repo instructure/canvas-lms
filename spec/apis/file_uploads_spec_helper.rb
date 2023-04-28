@@ -527,7 +527,8 @@ shared_examples_for "file uploads api with quotas" do
     attachment.content_type = "text/plain"
     attachment.size = 6.megabytes
     attachment.save!
-    json = api_call(:get, "/api/v1/files/#{attachment.id}/create_success",
+    json = api_call(:get,
+                    "/api/v1/files/#{attachment.id}/create_success",
                     { id: attachment.id.to_s, controller: "files", action: "api_create_success", format: "json" },
                     { uuid: attachment.uuid },
                     {},

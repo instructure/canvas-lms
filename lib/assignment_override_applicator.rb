@@ -92,7 +92,8 @@ module AssignmentOverrideApplicator
     RequestCache.cache("overrides_for_assignment_and_user", assignment_or_quiz, user) do
       Rails.cache.fetch_with_batched_keys(
         ["overrides_for_assignment_and_user3", version_for_cache(assignment_or_quiz), assignment_or_quiz.cache_key(:availability)].cache_key,
-        batch_object: user, batched_keys: [:enrollments, :groups]
+        batch_object: user,
+        batched_keys: [:enrollments, :groups]
       ) do
         next [] if has_invalid_args?(assignment_or_quiz, user)
 

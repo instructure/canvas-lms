@@ -52,7 +52,9 @@ describe SubmissionSearch do
   end
 
   it "finds submissions with user name search" do
-    results = SubmissionSearch.new(assignment, teacher, nil,
+    results = SubmissionSearch.new(assignment,
+                                   teacher,
+                                   nil,
                                    user_search: "man",
                                    order_by: [{ field: "username", direction: "descending" }]).search
     expect(results).to eq [
@@ -165,7 +167,9 @@ describe SubmissionSearch do
     assignment.grade_student(peter, score: 1, grader: teacher)
     assignment.grade_student(amanda, score: 1, grader: teacher)
     assignment.grade_student(james, score: 3, grader: teacher)
-    results = SubmissionSearch.new(assignment, teacher, nil,
+    results = SubmissionSearch.new(assignment,
+                                   teacher,
+                                   nil,
                                    scored_more_than: 0,
                                    order_by: [
                                      { field: "score", direction: "descending" },

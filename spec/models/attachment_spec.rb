@@ -198,7 +198,8 @@ describe Attachment do
         moderated_grading_allow_list: moderated_grading_allow_list
       }
       url = Rack::Utils.parse_nested_query(@attachment.crocodoc_url(user, url_opts).sub(/^.*\?{1}/, ""))
-      blob = extract_blob(url["hmac"], url["blob"],
+      blob = extract_blob(url["hmac"],
+                          url["blob"],
                           "user_id" => user.id,
                           "type" => "crocodoc")
 
@@ -211,7 +212,8 @@ describe Attachment do
       @attachment.submit_to_crocodoc
 
       url = Rack::Utils.parse_nested_query(@attachment.crocodoc_url(user, {}).sub(/^.*\?{1}/, ""))
-      blob = extract_blob(url["hmac"], url["blob"],
+      blob = extract_blob(url["hmac"],
+                          url["blob"],
                           "user_id" => user.id,
                           "type" => "crocodoc")
 
@@ -2046,9 +2048,11 @@ describe Attachment do
       NotificationPolicy.create(notification: Notification.create!(name: "New Files Added"), communication_channel: cc, frequency: "immediately")
 
       NotificationPolicy.create(notification: Notification.create!(name: "New File Added - ended"),
-                                communication_channel: cc_ended, frequency: "immediately")
+                                communication_channel: cc_ended,
+                                frequency: "immediately")
       NotificationPolicy.create(notification: Notification.create!(name: "New Files Added - ended"),
-                                communication_channel: cc_ended, frequency: "immediately")
+                                communication_channel: cc_ended,
+                                frequency: "immediately")
     end
 
     it "sends a single-file notification" do
@@ -2653,7 +2657,9 @@ describe Attachment do
       @merge_user_1 = student_in_course(active_all: true).user
       @merge_user_2 = student_in_course(active_all: true).user
 
-      @user_1_file = Attachment.create!(user: @merge_user_1, context: @merge_user_1, filename: "hi.txt",
+      @user_1_file = Attachment.create!(user: @merge_user_1,
+                                        context: @merge_user_1,
+                                        filename: "hi.txt",
                                         uploaded_data: StringIO.new("hi_data"))
     end
 
@@ -2663,7 +2669,9 @@ describe Attachment do
     end
 
     it "doesn't move files that already exist in the new context" do
-      @user_2_file = Attachment.create!(user: @merge_user_2, context: @merge_user_2, filename: "hi.txt",
+      @user_2_file = Attachment.create!(user: @merge_user_2,
+                                        context: @merge_user_2,
+                                        filename: "hi.txt",
                                         uploaded_data: StringIO.new("hi_data"))
       Attachment.migrate_attachments(@merge_user_1, @merge_user_2)
       expect(@user_1_file.reload.context).to eq @merge_user_1
@@ -2671,7 +2679,9 @@ describe Attachment do
 
     it "does move files that already exist (by filename), but have nil md5" do
       @user_1_file.update(md5: nil)
-      @user_2_file = Attachment.create!(user: @merge_user_2, context: @merge_user_2, filename: "hi.txt",
+      @user_2_file = Attachment.create!(user: @merge_user_2,
+                                        context: @merge_user_2,
+                                        filename: "hi.txt",
                                         uploaded_data: StringIO.new("hi_data"))
       @user_2_file.update(md5: nil)
       Attachment.migrate_attachments(@merge_user_1, @merge_user_2)
@@ -2679,7 +2689,9 @@ describe Attachment do
     end
 
     it "handles name changes for files that are different but have the same name" do
-      @user_2_file = Attachment.create!(user: @merge_user_2, context: @merge_user_2, filename: "hi.txt",
+      @user_2_file = Attachment.create!(user: @merge_user_2,
+                                        context: @merge_user_2,
+                                        filename: "hi.txt",
                                         uploaded_data: StringIO.new("yo_data"))
       Attachment.migrate_attachments(@merge_user_1, @merge_user_2)
       expect(@user_1_file.title).not_to eq(@user_1_file.reload.title)

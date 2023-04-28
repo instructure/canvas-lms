@@ -75,7 +75,9 @@ class Quizzes::QuizzesController < ApplicationController
 
       quiz_options = Rails.cache.fetch(
         [
-          "quiz_user_permissions", @context.id, @current_user,
+          "quiz_user_permissions",
+          @context.id,
+          @current_user,
           quiz_index.map(&:id), # invalidate on add/delete of quizzes
           quiz_index.map(&:updated_at).max # invalidate on modifications
         ].cache_key
@@ -96,12 +98,15 @@ class Quizzes::QuizzesController < ApplicationController
       if scoped_new_quizzes_index.any? && @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
         mc_status = setup_master_course_restrictions(scoped_new_quizzes_index, @context)
       end
-      serializer_options = [@context, @current_user, session, {
-        permissions: quiz_options,
-        master_course_status: mc_status,
-        skip_date_overrides: true,
-        skip_lock_tests: true
-      }]
+      serializer_options = [@context,
+                            @current_user,
+                            session,
+                            {
+                              permissions: quiz_options,
+                              master_course_status: mc_status,
+                              skip_date_overrides: true,
+                              skip_lock_tests: true
+                            }]
       max_name_length = AssignmentUtil.assignment_max_name_length(@context)
       sis_name = AssignmentUtil.post_to_sis_friendly_name(@context)
       due_date_required_for_account = AssignmentUtil.due_date_required_for_account?(@context)
@@ -1108,8 +1113,10 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def update_quiz_and_assignment_versions(quiz, prepared_batch)
-    params = { quiz_id: quiz.id, quiz_version: quiz.version_number,
-               assignment_id: quiz.assignment_id, assignment_version: quiz.assignment&.version_number }
+    params = { quiz_id: quiz.id,
+               quiz_version: quiz.version_number,
+               assignment_id: quiz.assignment_id,
+               assignment_version: quiz.assignment&.version_number }
     prepared_batch[:overrides_to_create].each { |override| override.assign_attributes(params) }
     prepared_batch[:overrides_to_update].each { |override| override.assign_attributes(params) }
   end

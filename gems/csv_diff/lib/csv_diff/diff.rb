@@ -123,7 +123,8 @@ module CsvDiff
 
     def setup_output(headers)
       @output_file = Tempfile.new(["csv_diff", ".csv"])
-      @output = CSV.open(@output_file, "wb",
+      @output = CSV.open(@output_file,
+                         "wb",
                          headers: headers)
       @output << headers
     end

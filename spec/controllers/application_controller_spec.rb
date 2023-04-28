@@ -1699,11 +1699,26 @@ RSpec.describe ApplicationController do
         @tool = @course.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret", url: "http://example.com")
 
         @tool_settings = %i[
-          user_navigation course_navigation account_navigation resource_selection
-          editor_button homework_submission migration_selection course_home_sub_navigation
-          course_settings_sub_navigation global_navigation
-          assignment_menu file_menu discussion_topic_menu module_menu quiz_menu wiki_page_menu
-          tool_configuration link_selection assignment_selection post_grades
+          user_navigation
+          course_navigation
+          account_navigation
+          resource_selection
+          editor_button
+          homework_submission
+          migration_selection
+          course_home_sub_navigation
+          course_settings_sub_navigation
+          global_navigation
+          assignment_menu
+          file_menu
+          discussion_topic_menu
+          module_menu
+          quiz_menu
+          wiki_page_menu
+          tool_configuration
+          link_selection
+          assignment_selection
+          post_grades
         ]
 
         @tool_settings.each do |setting|

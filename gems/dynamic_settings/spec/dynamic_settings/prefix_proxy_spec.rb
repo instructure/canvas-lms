@@ -209,7 +209,8 @@ module DynamicSettings
                                                          "Value" => "bar3"
                                                        }
                                                      }
-                                                   ], {})
+                                                   ],
+                                                   {})
         proxy.set_keys(kvs)
       end
 
@@ -236,7 +237,8 @@ module DynamicSettings
                                                          "Value" => "bar3"
                                                        }
                                                      }
-                                                   ], { dc: "iad-test" })
+                                                   ],
+                                                   { dc: "iad-test" })
         proxy.set_keys(kvs, global: true)
       end
     end

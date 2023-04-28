@@ -144,7 +144,9 @@ class ApplicationController < ActionController::Base
     HTML
 
     crumb.html_safe
-  end, :root_path, class: "home")
+  end,
+            :root_path,
+            class: "home")
 
   def clear_js_env
     @js_env = nil
@@ -339,17 +341,38 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
-    featured_help_links lti_platform_storage scale_equation_images buttons_and_icons_cropper calendar_series
-    account_level_blackout_dates rce_ux_improvements render_both_to_do_lists
-    course_paces_redesign course_paces_for_students rce_better_paste module_publish_menu explicit_latex_typesetting
-    dev_key_oidc_alert rce_new_external_tool_dialog_in_canvas rce_show_studio_media_options rce_improved_placeholders
+    featured_help_links
+    lti_platform_storage
+    scale_equation_images
+    buttons_and_icons_cropper
+    calendar_series
+    account_level_blackout_dates
+    rce_ux_improvements
+    render_both_to_do_lists
+    course_paces_redesign
+    course_paces_for_students
+    rce_better_paste
+    module_publish_menu
+    explicit_latex_typesetting
+    dev_key_oidc_alert
+    rce_new_external_tool_dialog_in_canvas
+    rce_show_studio_media_options
+    rce_improved_placeholders
     media_links_use_attachment_id
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
-    product_tours files_dnd usage_rights_discussion_topics
-    granular_permissions_manage_users create_course_subaccount_picker
-    lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking buttons_and_icons_root_account
-    extended_submission_state scheduled_page_publication send_usage_metrics rce_transform_loaded_content
+    product_tours
+    files_dnd
+    usage_rights_discussion_topics
+    granular_permissions_manage_users
+    create_course_subaccount_picker
+    lti_deep_linking_module_index_menu_modal
+    lti_multiple_assignment_deep_linking
+    buttons_and_icons_root_account
+    extended_submission_state
+    scheduled_page_publication
+    send_usage_metrics
+    rce_transform_loaded_content
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -357,8 +380,10 @@ class ApplicationController < ActionController::Base
   JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES + JS_ENV_BRAND_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
     # can be invalidated by a flag change on site admin, the domain root account, or the brand config account
-    MultiCache.fetch(["js_env_account_features", JS_ENV_FEATURES_HASH,
-                      Account.site_admin.cache_key(:feature_flags), @domain_root_account&.cache_key(:feature_flags),
+    MultiCache.fetch(["js_env_account_features",
+                      JS_ENV_FEATURES_HASH,
+                      Account.site_admin.cache_key(:feature_flags),
+                      @domain_root_account&.cache_key(:feature_flags),
                       brand_config_account&.cache_key(:feature_flags)].cache_key) do
       results = {}
       JS_ENV_SITE_ADMIN_FEATURES.each do |f|
@@ -444,7 +469,8 @@ class ApplicationController < ActionController::Base
     context = context.account if context.is_a?(User)
     tools = GuardRail.activate(:secondary) do
       Lti::ContextToolFinder.all_tools_for(context, { placements: type,
-                                                      root_account: @domain_root_account, current_user: @current_user,
+                                                      root_account: @domain_root_account,
+                                                      current_user: @current_user,
                                                       tool_ids: tool_ids }).to_a
     end
 
@@ -1014,9 +1040,10 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.json do
         render json: {
-          status: "unverified",
-          errors: [{ message: json_message }]
-        }, status: :unauthorized
+                 status: "unverified",
+                 errors: [{ message: json_message }]
+               },
+               status: :unauthorized
       end
       format.all do
         flash[:warning] = flash_message
@@ -1598,8 +1625,12 @@ class ApplicationController < ActionController::Base
         }
       end
 
-      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level,
-                                      context: context, context_membership: @context_membership)
+      Canvas::LiveEvents.asset_access(asset,
+                                      asset_category,
+                                      membership_type,
+                                      level,
+                                      context: context,
+                                      context_membership: @context_membership)
 
       @accessed_asset
     end
@@ -2387,7 +2418,8 @@ class ApplicationController < ActionController::Base
 
   def verified_file_download_url(attachment, context = nil, permission_map_id = nil, *opts)
     verifier = Attachments::Verification.new(attachment).verifier_for_user(@current_user,
-                                                                           context: context.try(:asset_string), permission_map_id: permission_map_id)
+                                                                           context: context.try(:asset_string),
+                                                                           permission_map_id: permission_map_id)
     file_download_url(attachment, { verifier: verifier }, *opts)
   end
   helper_method :verified_file_download_url
@@ -2807,10 +2839,11 @@ class ApplicationController < ActionController::Base
       permissions[:manage] = permissions[:manage_assignments]
     end
     permissions[:by_assignment_id] = @context.assignments.to_h do |assignment|
-      [assignment.id, {
-        update: assignment.user_can_update?(@current_user, session),
-        delete: assignment.grants_right?(@current_user, :delete)
-      }]
+      [assignment.id,
+       {
+         update: assignment.user_can_update?(@current_user, session),
+         delete: assignment.grants_right?(@current_user, :delete)
+       }]
     end
 
     current_user_has_been_observer_in_this_course = @context.user_has_been_observer?(@current_user)
@@ -2828,7 +2861,8 @@ class ApplicationController < ActionController::Base
                    exclude_assignment_submission_types: ["wiki_page"],
                    override_assignment_dates: !permissions[:manage],
                    per_page: ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX
-                 ), id: "assignment_groups_url")
+                 ),
+                 id: "assignment_groups_url")
 
     js_env({
              COURSE_ID: @context.id.to_s,

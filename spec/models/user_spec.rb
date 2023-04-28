@@ -1394,8 +1394,10 @@ describe User do
     end
 
     it "does not let users message the entire class if they cannot send_messages" do
-      RoleOverride.create!(context: @course.account, permission: "send_messages",
-                           role: student_role, enabled: false)
+      RoleOverride.create!(context: @course.account,
+                           permission: "send_messages",
+                           role: student_role,
+                           enabled: false)
       @course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
 
       # can only message self or the admins
@@ -3778,14 +3780,16 @@ describe User do
     before do
       # restricts view of this course when it is in the past (it IS in the past)
       @restricted = Account.default.courses.create!(
-        start_at: 2.months.ago, conclude_at: 1.month.ago,
+        start_at: 2.months.ago,
+        conclude_at: 1.month.ago,
         restrict_enrollments_to_course_dates: true,
         name: "Restricted",
         restrict_student_past_view: true
       )
       # doesnt restrict view of this course when it is in the past (it IS in the past)
       @unrestricted = Account.default.courses.create!(
-        start_at: 2.months.ago, conclude_at: 1.month.ago,
+        start_at: 2.months.ago,
+        conclude_at: 1.month.ago,
         restrict_enrollments_to_course_dates: true,
         name: "Unrestricted",
         restrict_student_past_view: false

@@ -19,8 +19,16 @@
 
 module Polling
   class PollSessionSerializer < Canvas::APISerializer
-    attributes :id, :is_published, :has_public_results, :results, :course_id,
-               :course_section_id, :created_at, :poll_id, :poll_submissions, :has_submitted
+    attributes :id,
+               :is_published,
+               :has_public_results,
+               :results,
+               :course_id,
+               :course_section_id,
+               :created_at,
+               :poll_id,
+               :poll_submissions,
+               :has_submitted
 
     def_delegators :object, :results, :poll
 

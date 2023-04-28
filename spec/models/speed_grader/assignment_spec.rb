@@ -1773,7 +1773,8 @@ describe SpeedGrader::Assignment do
       json = SpeedGrader::Assignment.new(assignment, teacher).json
 
       students = json["context"]["students"].pluck("id")
-      expect(students).to include(active_student.id.to_s, inactive_student.id.to_s,
+      expect(students).to include(active_student.id.to_s,
+                                  inactive_student.id.to_s,
                                   concluded_student.id.to_s)
     end
 

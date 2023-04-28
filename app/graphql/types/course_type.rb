@@ -74,18 +74,21 @@ module Types
     class CourseUsersFilterInputType < Types::BaseInputObject
       graphql_name "CourseUsersFilter"
 
-      argument :user_ids, [ID],
+      argument :user_ids,
+               [ID],
                "only include users with the given ids",
                prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
                required: false
 
-      argument :enrollment_states, [CourseFilterableEnrollmentWorkflowState],
+      argument :enrollment_states,
+               [CourseFilterableEnrollmentWorkflowState],
                <<~MD,
                  only return users with the given enrollment state. defaults
                  to `invited`, `creation_pending`, `active`
                MD
                required: false
-      argument :enrollment_types, [CourseFilterableEnrollmentType],
+      argument :enrollment_types,
+               [CourseFilterableEnrollmentType],
                "Only return users with the specified enrollment types",
                required: false
     end
@@ -102,7 +105,8 @@ module Types
     field :syllabus_body, String, null: true
     field :state, CourseWorkflowState, method: :workflow_state, null: false
 
-    field :assignment_groups_connection, AssignmentGroupType.connection_type,
+    field :assignment_groups_connection,
+          AssignmentGroupType.connection_type,
           method: :assignment_groups,
           null: true
 
@@ -155,11 +159,13 @@ module Types
     end
 
     field :users_connection, UserType.connection_type, null: true do
-      argument :user_ids, [ID], <<~MD,
-        Only include users with the given ids.
+      argument :user_ids,
+               [ID],
+               <<~MD,
+                 Only include users with the given ids.
 
-        **This field is deprecated, use `filter: {userIds}` instead.**
-      MD
+                 **This field is deprecated, use `filter: {userIds}` instead.**
+               MD
                prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
                required: false
 
@@ -167,12 +173,16 @@ module Types
     end
     def users_connection(user_ids: nil, filter: {})
       return nil unless course.grants_any_right?(
-        current_user, session,
-        :read_roster, :view_all_grades, :manage_grades
+        current_user,
+        session,
+        :read_roster,
+        :view_all_grades,
+        :manage_grades
       )
 
       context.scoped_merge!(course: course)
-      scope = UserSearch.scope_for(course, current_user,
+      scope = UserSearch.scope_for(course,
+                                   current_user,
                                    include_inactive_enrollments: true,
                                    enrollment_state: filter[:enrollment_states],
                                    enrollment_type: filter[:enrollment_types])
@@ -195,8 +205,11 @@ module Types
     end
     def enrollments_connection(filter: {})
       return nil unless course.grants_any_right?(
-        current_user, session,
-        :read_roster, :view_all_grades, :manage_grades
+        current_user,
+        session,
+        :read_roster,
+        :view_all_grades,
+        :manage_grades
       )
 
       context.scoped_merge!(course: course)
@@ -219,7 +232,9 @@ module Types
     field :submissions_connection, SubmissionType.connection_type, null: true do
       description "all the submissions for assignments in this course"
 
-      argument :student_ids, [ID], "Only return submissions for the given students.",
+      argument :student_ids,
+               [ID],
+               "Only return submissions for the given students.",
                prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
                required: false
       argument :order_by, [SubmissionOrderInputType], required: false
@@ -299,13 +314,15 @@ module Types
       load_association(:enrollment_term)
     end
 
-    field :permissions, CoursePermissionsType,
+    field :permissions,
+          CoursePermissionsType,
           "returns permission information for the current user in this course",
           null: true
     def permissions
       Loaders::PermissionsLoader.for(
         course,
-        current_user: current_user, session: session
+        current_user: current_user,
+        session: session
       )
     end
 
@@ -316,7 +333,8 @@ module Types
       load_association(:default_post_policy)
     end
 
-    field :assignment_post_policies, PostPolicyType.connection_type,
+    field :assignment_post_policies,
+          PostPolicyType.connection_type,
           <<~MD,
             PostPolicies for assignments within a course
           MD

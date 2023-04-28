@@ -54,23 +54,24 @@ describe OutcomesServiceAlignmentsHelper do
   end
 
   def mock_aligned_outcomes_response(outcomes, quizzes)
-    [[:outcomes, (outcomes || [])
-      .map
-      .with_index do |o, idx|
-                   {
-                     id: idx + 1,
-                     external_id: o.id.to_s,
-                     title: o.short_description,
-                     alignments: (quizzes || []).map.with_index do |q, ind|
-                                   {
-                                     artifact_type: "quizzes.quiz",
-                                     artifact_id: (ind + 1).to_s,
-                                     associated_asset_type: "canvas.assignment.quizzes",
-                                     associated_asset_id: q.id.to_s
-                                   }
-                                 end
-                   }
-                 end]].to_h
+    [[:outcomes,
+      (outcomes || [])
+        .map
+        .with_index do |o, idx|
+        {
+          id: idx + 1,
+          external_id: o.id.to_s,
+          title: o.short_description,
+          alignments: (quizzes || []).map.with_index do |q, ind|
+                        {
+                          artifact_type: "quizzes.quiz",
+                          artifact_id: (ind + 1).to_s,
+                          associated_asset_type: "canvas.assignment.quizzes",
+                          associated_asset_id: q.id.to_s
+                        }
+                      end
+        }
+      end]].to_h
   end
 
   def mock_minified_aligned_outcomes_response(response)

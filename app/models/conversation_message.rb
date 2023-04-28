@@ -342,10 +342,11 @@ class ConversationMessage < ActiveRecord::Base
     unless attachments.empty?
       content += "<ul>"
       attachments.each do |attachment|
-        href = file_download_url(attachment, verifier: attachment.uuid,
-                                             download: "1",
-                                             download_frd: "1",
-                                             host: HostUrl.context_host(context))
+        href = file_download_url(attachment,
+                                 verifier: attachment.uuid,
+                                 download: "1",
+                                 download_frd: "1",
+                                 host: HostUrl.context_host(context))
         content += "<li><a href='#{href}'>#{ERB::Util.h(attachment.display_name)}</a></li>"
       end
       content += "</ul>"
@@ -363,10 +364,11 @@ class ConversationMessage < ActiveRecord::Base
                                     href: "http://#{HostUrl.context_host(context)}/conversations/#{conversation.id}")
       attachments.each do |attachment|
         entry.links << Atom::Link.new(rel: "enclosure",
-                                      href: file_download_url(attachment, verifier: attachment.uuid,
-                                                                          download: "1",
-                                                                          download_frd: "1",
-                                                                          host: HostUrl.context_host(context)))
+                                      href: file_download_url(attachment,
+                                                              verifier: attachment.uuid,
+                                                              download: "1",
+                                                              download_frd: "1",
+                                                              host: HostUrl.context_host(context)))
       end
       entry.content = Atom::Content::Html.new(content)
     end
@@ -374,10 +376,11 @@ class ConversationMessage < ActiveRecord::Base
 
   class EventFormatter
     def self.users_added(author_name, user_names)
-      I18n.t "conversation_message.users_added", {
-        one: "%{user} was added to the conversation by %{current_user}",
-        other: "%{list_of_users} were added to the conversation by %{current_user}"
-      },
+      I18n.t "conversation_message.users_added",
+             {
+               one: "%{user} was added to the conversation by %{current_user}",
+               other: "%{list_of_users} were added to the conversation by %{current_user}"
+             },
              count: user_names.size,
              user: user_names.first,
              list_of_users: user_names.all?(&:html_safe?) ? user_names.to_sentence.html_safe : user_names.to_sentence,

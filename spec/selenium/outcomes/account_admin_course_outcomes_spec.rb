@@ -29,8 +29,10 @@ describe "account admin outcomes" do
 
   describe "course outcomes" do
     before do
-      RoleOverride.create!(context: account, permission: "manage_courses",
-                           role: admin_role, enabled: false) # should not manage_courses permission
+      RoleOverride.create!(context: account,
+                           permission: "manage_courses",
+                           role: admin_role,
+                           enabled: false) # should not manage_courses permission
       course_with_admin_logged_in
     end
 

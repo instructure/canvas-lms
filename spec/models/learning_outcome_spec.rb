@@ -1325,8 +1325,10 @@ describe LearningOutcome do
 
     it "de-dups outcomes linked multiple times" do
       course_factory
-      lo = LearningOutcome.create!(context: @course, title: "outcome",
-                                   calculation_method: "highest", workflow_state: "active")
+      lo = LearningOutcome.create!(context: @course,
+                                   title: "outcome",
+                                   calculation_method: "highest",
+                                   workflow_state: "active")
       3.times do |i|
         group = @course.learning_outcome_groups.create!(title: "groupage_#{i}")
         group.add_outcome(lo)

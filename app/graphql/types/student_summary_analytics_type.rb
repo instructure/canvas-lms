@@ -22,15 +22,18 @@ module Types
   class PageViewAnalysisType < ApplicationObjectType
     graphql_name "PageViewAnalysis"
 
-    field :total, Integer,
+    field :total,
+          Integer,
           "The number of views/participations this student has",
           null: true
 
-    field :max, Integer,
+    field :max,
+          Integer,
           "The maximum number of views/participations in this course",
           null: true
 
-    field :level, Integer,
+    field :level,
+          Integer,
           "This number (0-3) is intended to give an idea of how the student is doing relative to others in the course",
           null: true
   end

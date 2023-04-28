@@ -159,7 +159,8 @@ PactConfig::Consumers::ALL.each do |consumer|
           rubric.save!
           # Unbelievable -- The only way I could see to apply rubric criteria to the assignment was
           # to update them here.  Couldn't do it in Rubric.create!() above.
-          rubric_association = rubric.update_with_association(mteacher, {
+          rubric_association = rubric.update_with_association(mteacher,
+                                                              {
                                                                 criteria: {
                                                                   "0" => {
                                                                     ignore_for_scoring: "0",
@@ -172,7 +173,9 @@ PactConfig::Consumers::ALL.each do |consumer|
                                                                     },
                                                                   },
                                                                 },
-                                                              }, mcourse, {
+                                                              },
+                                                              mcourse,
+                                                              {
                                                                 association_object: assignment, purpose: "grading", update_if_existing: true, use_for_grading: "1", skip_updating_points_possible: true
                                                               })
           rubric.save!

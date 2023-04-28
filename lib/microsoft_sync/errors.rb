@@ -230,13 +230,21 @@ module MicrosoftSync
 
     INTERMITTENT = [
       EOFError,
-      Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EINVAL, Errno::ETIMEDOUT,
-      Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
+      Errno::ECONNREFUSED,
+      Errno::ECONNRESET,
+      Errno::EINVAL,
+      Errno::ETIMEDOUT,
+      Net::HTTPBadResponse,
+      Net::HTTPHeaderSyntaxError,
+      Net::ProtocolError,
       OpenSSL::SSL::SSLError,
       SocketError,
       Timeout::Error,
 
-      HTTPBadGateway, HTTPGatewayTimeout, HTTPInternalServerError, HTTPServiceUnavailable,
+      HTTPBadGateway,
+      HTTPGatewayTimeout,
+      HTTPInternalServerError,
+      HTTPServiceUnavailable,
 
       Throttled,
     ].freeze

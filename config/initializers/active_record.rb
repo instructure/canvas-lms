@@ -557,7 +557,8 @@ class ActiveRecord::Base
     specifics.each do |(name, class_name)|
       # ensure we capture this class's table name
       table_name = self.table_name
-      belongs_to :"#{prefix}#{name}", -> { where(table_name => { reflection.foreign_type => class_name }) },
+      belongs_to :"#{prefix}#{name}",
+                 -> { where(table_name => { reflection.foreign_type => class_name }) },
                  foreign_key: reflection.foreign_key,
                  class_name: class_name # rubocop:disable Rails/ReflectionClassName
 
@@ -1935,7 +1936,8 @@ module ExplainAnalyze
         # fold in switchman's override
         activate { |relation| relation.send(:exec_queries) }
       end
-    end, analyze: analyze)
+    end,
+                 analyze: analyze)
   end
 end
 ActiveRecord::Relation.prepend(ExplainAnalyze)

@@ -212,11 +212,12 @@ class SubmissionsBaseController < ApplicationController
       render_unauthorized_action
     elsif @assignment.locked_for?(@submission.user)
       render json: {
-        errors: {
-          message: "Assignment is locked for student.",
-          error_code: "ASSIGNMENT_LOCKED"
-        }
-      }, status: :unprocessable_entity
+               errors: {
+                 message: "Assignment is locked for student.",
+                 error_code: "ASSIGNMENT_LOCKED"
+               }
+             },
+             status: :unprocessable_entity
     else
       @submission.update!(redo_request: true)
       head :no_content

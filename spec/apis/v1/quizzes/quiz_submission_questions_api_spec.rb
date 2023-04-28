@@ -428,10 +428,11 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
                             quiz_questions: [{
                               id: mc.id,
                               answer: 1658
-                            }, {
-                              id: formula.id,
-                              answer: 40.0
-                            }]
+                            },
+                                             {
+                                               id: formula.id,
+                                               answer: 40.0
+                                             }]
                           })
 
         expect(json["quiz_submission_questions"][0]["answers"].map(&:keys).uniq.include?("weight")).to be_falsey
@@ -714,7 +715,8 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
                        id: question.id,
                        answer: "asdf"
                      }]
-                   }, { raw: true })
+                   },
+                   { raw: true })
 
         assert_status(400)
         expect(response.body).to match(/must be of type integer/i)
@@ -744,7 +746,8 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
                        id: question.id,
                        answer: nil
                      }]
-                   }, { raw: true })
+                   },
+                   { raw: true })
 
         assert_status(403)
         expect(response.body).to match(/requires the lockdown browser/i)
@@ -759,10 +762,11 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
                             quiz_questions: [{
                               id: question1.id,
                               answer: 1658
-                            }, {
-                              id: question2.id,
-                              answer: 2.5e-3
-                            }]
+                            },
+                                             {
+                                               id: question2.id,
+                                               answer: 2.5e-3
+                                             }]
                           })
 
         expect(json["quiz_submission_questions"]).to be_present

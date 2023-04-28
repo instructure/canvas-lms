@@ -262,7 +262,9 @@ describe AccountCalendarsApiController do
     end
 
     it "returns unauthorized for an admin without :manage_account_calendar_visibility" do
-      account_admin_user_with_role_changes(active_all: true, account: @root_account, user: @user,
+      account_admin_user_with_role_changes(active_all: true,
+                                           account: @root_account,
+                                           user: @user,
                                            role_changes: { manage_account_calendar_visibility: false })
       user_session(@user)
       put :update, params: { account_id: @root_account.id, visible: false }
@@ -292,7 +294,9 @@ describe AccountCalendarsApiController do
     end
 
     it "returns unauthorized for an admin without :manage_account_calendar_visibility on provided account" do
-      account_admin_user_with_role_changes(active_all: true, account: @subaccount2, user: @user,
+      account_admin_user_with_role_changes(active_all: true,
+                                           account: @subaccount2,
+                                           user: @user,
                                            role_changes: { manage_account_calendar_visibility: false })
       user_session(@user)
       put :bulk_update, params: { account_id: @subaccount2.id, _json: [{ id: @subaccount2.id, visible: false }] }
@@ -452,7 +456,9 @@ describe AccountCalendarsApiController do
     end
 
     it "returns unauthorized for an admin without :manage_account_calendar_visibility" do
-      account_admin_user_with_role_changes(active_all: true, account: @root_account, user: @user,
+      account_admin_user_with_role_changes(active_all: true,
+                                           account: @root_account,
+                                           user: @user,
                                            role_changes: { manage_account_calendar_visibility: false })
       user_session(@user)
       get :all_calendars, params: { account_id: @root_account.id }
@@ -529,7 +535,9 @@ describe AccountCalendarsApiController do
     end
 
     it "returns unauthorized for an admin without :manage_account_calendar_visibility" do
-      account_admin_user_with_role_changes(active_all: true, account: @root_account, user: @user,
+      account_admin_user_with_role_changes(active_all: true,
+                                           account: @root_account,
+                                           user: @user,
                                            role_changes: { manage_account_calendar_visibility: false })
       user_session(@user)
       get :visible_calendars_count, params: { account_id: @root_account.id }

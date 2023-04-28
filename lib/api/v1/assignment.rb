@@ -335,7 +335,8 @@ module Api::V1::Assignment
         assignment.discussion_topic.context,
         user,
         session,
-        include_assignment: false, exclude_messages: opts[:exclude_response_fields].include?("description")
+        include_assignment: false,
+        exclude_messages: opts[:exclude_response_fields].include?("description")
       )
     end
 

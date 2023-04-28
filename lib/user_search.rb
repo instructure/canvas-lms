@@ -35,8 +35,10 @@ module UserSearch
         users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments))
         users_scope = users_scope.from("(#{conditions_statement(search_term, context.root_account, users_scope)}) AS users")
         users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
-        roles_scope(users_scope, context, options.slice(:enrollment_type, :enrollment_role,
-                                                        :enrollment_role_id, :exclude_groups))
+        roles_scope(users_scope, context, options.slice(:enrollment_type,
+                                                        :enrollment_role,
+                                                        :enrollment_role_id,
+                                                        :exclude_groups))
       end
     end
 
@@ -69,8 +71,10 @@ module UserSearch
       when Account
         User.of_account(context).active
       when Course
-        context.users_visible_to(searcher, include_prior_enrollments,
-                                 enrollment_state: enrollment_states, include_inactive: include_inactive_enrollments).distinct
+        context.users_visible_to(searcher,
+                                 include_prior_enrollments,
+                                 enrollment_state: enrollment_states,
+                                 include_inactive: include_inactive_enrollments).distinct
       else
         context.users_visible_to(searcher, include_inactive: include_inactive_enrollments).distinct
       end

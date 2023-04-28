@@ -102,7 +102,8 @@ module MicrosoftSync
         # into fetch() above because we don't know it at that point.
         if expiry && expiry != CACHE_DEFAULT_EXPIRY
           Rails.cache.write(
-            cache_key, new_value,
+            cache_key,
+            new_value,
             expires_in: expiry - CACHE_EXPIRY_BUFFER - CACHE_RACE_CONDITION_TTL,
             race_condition_ttl: CACHE_RACE_CONDITION_TTL
           )

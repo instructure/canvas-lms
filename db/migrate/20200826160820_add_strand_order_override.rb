@@ -7,7 +7,8 @@ class AddStrandOrderOverride < ActiveRecord::Migration[4.2]
   def up
     add_column :delayed_jobs, :strand_order_override, :integer, default: 0, null: false, if_not_exists: true
     add_column :failed_jobs, :strand_order_override, :integer, default: 0, null: false, if_not_exists: true
-    add_index :delayed_jobs, %i[strand strand_order_override id],
+    add_index :delayed_jobs,
+              %i[strand strand_order_override id],
               algorithm: :concurrently,
               where: "strand IS NOT NULL",
               name: "next_in_strand_index",

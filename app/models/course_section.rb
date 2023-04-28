@@ -37,9 +37,11 @@ class CourseSection < ActiveRecord::Base
   has_many :course_account_associations
   has_many :calendar_events, as: :context, inverse_of: :context
   has_many :assignment_overrides, as: :set, dependent: :destroy
-  has_many :discussion_topic_section_visibilities, lambda {
-    where("discussion_topic_section_visibilities.workflow_state<>'deleted'")
-  }, dependent: :destroy
+  has_many :discussion_topic_section_visibilities,
+           lambda {
+             where("discussion_topic_section_visibilities.workflow_state<>'deleted'")
+           },
+           dependent: :destroy
   has_many :discussion_topics, through: :discussion_topic_section_visibilities
   has_many :course_paces, dependent: :destroy
 

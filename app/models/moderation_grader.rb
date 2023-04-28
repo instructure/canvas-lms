@@ -22,10 +22,11 @@ class ModerationGrader < ActiveRecord::Base
   belongs_to :user
   belongs_to :assignment, inverse_of: :moderation_graders
 
-  validates :anonymous_id, presence: true,
-                           format: { with: /\A[A-Za-z0-9]{5}\z/ },
-                           length: { is: 5 },
-                           uniqueness: { scope: :assignment_id }
+  validates :anonymous_id,
+            presence: true,
+            format: { with: /\A[A-Za-z0-9]{5}\z/ },
+            length: { is: 5 },
+            uniqueness: { scope: :assignment_id }
 
   validates :user, uniqueness: { scope: :assignment_id }
   validates :slot_taken, inclusion: { in: [true, false] }

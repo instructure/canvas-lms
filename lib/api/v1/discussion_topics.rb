@@ -30,10 +30,23 @@ module Api::V1::DiscussionTopics
 
   # Public: DiscussionTopic fields to serialize.
   ALLOWED_TOPIC_FIELDS = %w[
-    id title assignment_id delayed_post_at lock_at created_at
-    last_reply_at posted_at root_topic_id podcast_has_student_posts
-    discussion_type position allow_rating only_graders_can_rate sort_by_rating
-    is_section_specific anonymous_state
+    id
+    title
+    assignment_id
+    delayed_post_at
+    lock_at
+    created_at
+    last_reply_at
+    posted_at
+    root_topic_id
+    podcast_has_student_posts
+    discussion_type
+    position
+    allow_rating
+    only_graders_can_rate
+    sort_by_rating
+    is_section_specific
+    anonymous_state
   ].freeze
 
   # Public: DiscussionTopic methods to serialize.
@@ -117,10 +130,14 @@ module Api::V1::DiscussionTopics
 
     if opts[:include_assignment] && topic.assignment
       excludes = opts[:exclude_assignment_description] ? ["description"] : []
-      json[:assignment] = assignment_json(topic.assignment, user, session,
-                                          { include_discussion_topic: false, override_dates: opts[:override_dates],
+      json[:assignment] = assignment_json(topic.assignment,
+                                          user,
+                                          session,
+                                          { include_discussion_topic: false,
+                                            override_dates: opts[:override_dates],
                                             include_all_dates: opts[:include_all_dates],
-                                            exclude_response_fields: excludes, include_overrides: opts[:include_overrides] }.merge(opts[:assignment_opts]))
+                                            exclude_response_fields: excludes,
+                                            include_overrides: opts[:include_overrides] }.merge(opts[:assignment_opts]))
     end
 
     if opts[:include_sections_user_count] && !topic.is_section_specific
@@ -166,25 +183,35 @@ module Api::V1::DiscussionTopics
     attachment_opts = {}
     attachment_opts[:include] = ["usage_rights"] if opts[:include_usage_rights]
     attachments = topic.attachment ? [attachment_json(topic.attachment, user, {}, attachment_opts)] : []
-    html_url    = named_context_url(context, :context_discussion_topic_url,
-                                    topic, include_host: true)
-    url         = if topic.podcast_enabled?
-                    code = (@context_enrollment || @context || context).feed_code
-                    feeds_topic_format_path(topic.id, code, :rss)
-                  else
-                    nil
-                  end
+    html_url    = named_context_url(context,
+                                    :context_discussion_topic_url,
+                                    topic,
+                                    include_host: true)
+    url = if topic.podcast_enabled?
+            code = (@context_enrollment || @context || context).feed_code
+            feeds_topic_format_path(topic.id, code, :rss)
+          else
+            nil
+          end
 
     fields = { require_initial_post: topic.require_initial_post?,
-               user_can_see_posts: topic.user_can_see_posts?(user), podcast_url: url,
-               read_state: topic.read_state(user), unread_count: topic.unread_count(user, opts: opts),
+               user_can_see_posts: topic.user_can_see_posts?(user),
+               podcast_url: url,
+               read_state: topic.read_state(user),
+               unread_count: topic.unread_count(user, opts: opts),
                subscribed: topic.subscribed?(user, opts: opts),
-               attachments: attachments, published: topic.published?,
+               attachments: attachments,
+               published: topic.published?,
                can_unpublish: opts[:user_can_moderate] ? topic.can_unpublish?(opts) : false,
-               locked: topic.locked?, can_lock: topic.can_lock?, comments_disabled: topic.comments_disabled?,
+               locked: topic.locked?,
+               can_lock: topic.can_lock?,
+               comments_disabled: topic.comments_disabled?,
                author: topic.anonymous? ? nil : user_display_json(topic.user, topic.context),
-               html_url: html_url, url: html_url, pinned: !!topic.pinned,
-               group_category_id: topic.group_category_id, can_group: topic.can_group?(opts) }
+               html_url: html_url,
+               url: html_url,
+               pinned: !!topic.pinned,
+               group_category_id: topic.group_category_id,
+               can_group: topic.can_group?(opts) }
 
     child_topic_data = topic.root_topic? ? topic.child_topics.active.pluck(:id, :context_id) : []
     fields[:topic_children] = child_topic_data.map(&:first)

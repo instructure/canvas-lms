@@ -747,7 +747,8 @@ describe Pseudonym do
     it "finds a valid pseudonym" do
       expect(Pseudonym.find_all_by_arbitrary_credentials(
                { unique_id: "a", password: "abcdefgh" },
-               [Account.default.id], "127.0.0.1"
+               [Account.default.id],
+               "127.0.0.1"
              )).to eq [p]
     end
 
@@ -756,7 +757,8 @@ describe Pseudonym do
       expect(Pseudonym).to receive(:associated_shards).and_raise("an error")
       expect(Pseudonym.find_all_by_arbitrary_credentials(
                { unique_id: "a", password: "abcdefgh" },
-               [Account.default.id], "127.0.0.1"
+               [Account.default.id],
+               "127.0.0.1"
              )).to eq [p]
     end
 
@@ -771,7 +773,8 @@ describe Pseudonym do
       p.update!(workflow_state: "deleted")
       expect(Pseudonym.find_all_by_arbitrary_credentials(
                { unique_id: "a", password: "abcdefgh" },
-               [Account.default.id], "127.0.0.1"
+               [Account.default.id],
+               "127.0.0.1"
              )).to eq []
     end
 
@@ -779,7 +782,8 @@ describe Pseudonym do
       p.update!(workflow_state: "suspended")
       expect(Pseudonym.find_all_by_arbitrary_credentials(
                { unique_id: "a", password: "abcdefgh" },
-               [Account.default.id], "127.0.0.1"
+               [Account.default.id],
+               "127.0.0.1"
              )).to eq []
     end
   end

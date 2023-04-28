@@ -37,8 +37,10 @@ gem "irb", "1.4.1"
 
 gem "academic_benchmarks", "1.1.2", require: false
 gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
-gem "active_model_serializers", "0.9.0alpha1",
-    github: "rails-api/active_model_serializers", ref: "61882e1e4127facfe92e49057aec71edbe981829"
+gem "active_model_serializers",
+    "0.9.0alpha1",
+    github: "rails-api/active_model_serializers",
+    ref: "61882e1e4127facfe92e49057aec71edbe981829"
 gem "activerecord-pg-extensions", "0.4.4"
 gem "addressable", "~> 2.8", require: false
 gem "after_transaction_commit", "2.2.2"
@@ -138,8 +140,10 @@ gem "twilio-ruby", "5.36.0", require: false
 gem "vault", "0.15.0", require: false
 gem "vericite_api", "1.5.3"
 gem "wcag_color_contrast", "0.1.0"
-gem "week_of_month", "1.2.5",
-    github: "instructure/week-of-month", ref: "b3013639e9474f302b5a6f27e4e45313e8d24902"
+gem "week_of_month",
+    "1.2.5",
+    github: "instructure/week-of-month",
+    ref: "b3013639e9474f302b5a6f27e4e45313e8d24902"
 gem "will_paginate", "3.3.0", require: false # required for folio-pagination
 
 gem "faraday", "0.17.4"

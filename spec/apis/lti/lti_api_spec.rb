@@ -67,8 +67,10 @@ describe LtiApiController, type: :request do
     consumer = OAuth::Consumer.new(tool.consumer_key, tool.shared_secret, site: "https://www.example.com", signature_method: "HMAC-SHA1")
     req = consumer.create_signed_request(:post, path, nil, { scheme: "header", timestamp: Time.now.to_i, nonce: SecureRandom.hex(32) }, body)
     content_type = body.is_a?(Hash) ? "application/x-www-form-urlencoded" : "application/json"
-    __send__(method, "https://www.example.com#{req.path}", params: req.body,
-                                                           headers: { "CONTENT_TYPE" => content_type, "HTTP_AUTHORIZATION" => req["Authorization"] })
+    __send__(method,
+             "https://www.example.com#{req.path}",
+             params: req.body,
+             headers: { "CONTENT_TYPE" => content_type, "HTTP_AUTHORIZATION" => req["Authorization"] })
   end
 
   describe "turnitin_outcomes_placement" do

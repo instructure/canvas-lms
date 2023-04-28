@@ -214,7 +214,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "accounts", ["parent_account_id", "root_account_id"], name: "index_accounts_on_parent_account_id_and_root_account_id"
     add_index :accounts, [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
     add_index :accounts, :root_account_id
-    add_index :accounts, [:integration_id, :root_account_id],
+    add_index :accounts,
+              [:integration_id, :root_account_id],
               unique: true,
               name: "index_accounts_on_integration_id",
               where: "integration_id IS NOT NULL"
@@ -433,7 +434,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  :quiz_version
     end
 
-    add_index :assignment_overrides, %i[assignment_id set_type set_id],
+    add_index :assignment_overrides,
+              %i[assignment_id set_type set_id],
               name: "index_assignment_overrides_on_assignment_and_set",
               unique: true,
               where: "workflow_state='active' and set_id is not null"
@@ -646,15 +648,18 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
 
     add_index :canvadocs_submissions, :submission_id
-    add_index :canvadocs_submissions, [:submission_id, :canvadoc_id],
+    add_index :canvadocs_submissions,
+              [:submission_id, :canvadoc_id],
               where: "canvadoc_id IS NOT NULL",
               name: "unique_submissions_and_canvadocs",
               unique: true
-    add_index :canvadocs_submissions, [:submission_id, :crocodoc_document_id],
+    add_index :canvadocs_submissions,
+              [:submission_id, :crocodoc_document_id],
               where: "crocodoc_document_id IS NOT NULL",
               name: "unique_submissions_and_crocodocs",
               unique: true
-    add_index :canvadocs_submissions, :crocodoc_document_id,
+    add_index :canvadocs_submissions,
+              :crocodoc_document_id,
               where: "crocodoc_document_id IS NOT NULL"
 
     create_table "cloned_items", force: true do |t|
@@ -1021,7 +1026,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :course_sections, [:nonxlist_course_id], name: "index_course_sections_on_nonxlist_course", where: "nonxlist_course_id IS NOT NULL"
     add_index :course_sections, :root_account_id
     add_index :course_sections, [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
-    add_index :course_sections, [:integration_id, :root_account_id],
+    add_index :course_sections,
+              [:integration_id, :root_account_id],
               unique: true,
               name: "index_sections_on_integration_id",
               where: "integration_id IS NOT NULL"
@@ -1091,7 +1097,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       add_index :courses, "LOWER(name) #{trgm}.gist_trgm_ops", name: "index_trgm_courses_name", using: :gist
       add_index :courses, "LOWER(course_code) #{trgm}.gist_trgm_ops", name: "index_trgm_courses_course_code", using: :gist
       add_index :courses, "LOWER(sis_source_id) #{trgm}.gist_trgm_ops", name: "index_trgm_courses_sis_source_id", using: :gist
-      add_index :courses, "(
+      add_index :courses,
+                "(
           coalesce(lower(name), '') || ' ' ||
           coalesce(lower(sis_source_id), '') || ' ' ||
           coalesce(lower(course_code), '')
@@ -1099,7 +1106,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
                 name: "index_trgm_courses_composite_search",
                 using: :gist
     end
-    add_index :courses, [:integration_id, :root_account_id],
+    add_index :courses,
+              [:integration_id, :root_account_id],
               unique: true,
               name: "index_courses_on_integration_id",
               where: "integration_id IS NOT NULL"
@@ -1350,7 +1358,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     add_index :enrollment_terms, [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
     add_index :enrollment_terms, :root_account_id
-    add_index :enrollment_terms, [:integration_id, :root_account_id],
+    add_index :enrollment_terms,
+              [:integration_id, :root_account_id],
               unique: true,
               name: "index_terms_on_integration_id",
               where: "integration_id IS NOT NULL"
@@ -1910,9 +1919,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.bigint :message_handler_id
     end
     add_index :lti_resource_placements,
-              [:placement, :message_handler_id], unique: true,
-                                                 where: "message_handler_id IS NOT NULL",
-                                                 name: "index_resource_placements_on_placement_and_message_handler"
+              [:placement, :message_handler_id],
+              unique: true,
+              where: "message_handler_id IS NOT NULL",
+              name: "index_resource_placements_on_placement_and_message_handler"
 
     create_table :lti_tool_proxies do |t|
       t.text :shared_secret, null: false
@@ -1961,8 +1971,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text :downstream_changes
     end
 
-    add_index :master_courses_child_content_tags, [:content_type, :content_id], unique: true,
-                                                                                name: "index_child_content_tags_on_content"
+    add_index :master_courses_child_content_tags,
+              [:content_type, :content_id],
+              unique: true,
+              name: "index_child_content_tags_on_content"
     add_index :master_courses_child_content_tags, :child_subscription_id, name: "index_child_content_tags_on_subscription"
 
     create_table :master_courses_child_subscriptions do |t|
@@ -1979,8 +1991,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
 
     add_index :master_courses_child_subscriptions, :master_template_id
-    add_index :master_courses_child_subscriptions, [:master_template_id, :child_course_id],
-              unique: true, where: "workflow_state <> 'deleted'",
+    add_index :master_courses_child_subscriptions,
+              [:master_template_id, :child_course_id],
+              unique: true,
+              where: "workflow_state <> 'deleted'",
               name: "index_mc_child_subscriptions_on_template_id_and_course_id"
 
     create_table :master_courses_master_content_tags do |t|
@@ -2001,8 +2015,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
 
     add_index :master_courses_master_content_tags, :master_template_id
-    add_index :master_courses_master_content_tags, %i[master_template_id content_type content_id], unique: true,
-                                                                                                   name: "index_master_content_tags_on_template_id_and_content"
+    add_index :master_courses_master_content_tags,
+              %i[master_template_id content_type content_id],
+              unique: true,
+              name: "index_master_content_tags_on_template_id_and_content"
     add_index :master_courses_master_content_tags, :migration_id, unique: true, name: "index_master_content_tags_on_migration_id"
 
     create_table :master_courses_master_migrations do |t|
@@ -2379,7 +2395,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :pseudonyms, :sis_communication_channel_id
     add_index :pseudonyms, [:sis_user_id, :account_id], where: "sis_user_id IS NOT NULL", unique: true
     add_index :pseudonyms, :account_id
-    add_index :pseudonyms, [:integration_id, :account_id],
+    add_index :pseudonyms,
+              [:integration_id, :account_id],
               unique: true,
               name: "index_pseudonyms_on_integration_id",
               where: "integration_id IS NOT NULL"
@@ -2460,7 +2477,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "quiz_questions", ["quiz_group_id"], name: "quiz_questions_quiz_group_id"
     add_index :quiz_questions, [:quiz_id, :assessment_question_id], name: "idx_qqs_on_quiz_and_aq_ids"
     add_index :quiz_questions, :assessment_question_id, where: "assessment_question_id IS NOT NULL"
-    add_index :quiz_questions, %i[assessment_question_id quiz_group_id duplicate_index],
+    add_index :quiz_questions,
+              %i[assessment_question_id quiz_group_id duplicate_index],
               name: "index_generated_quiz_questions",
               where: "assessment_question_id IS NOT NULL AND quiz_group_id IS NOT NULL AND workflow_state='generated'",
               unique: true
@@ -2499,7 +2517,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime :client_timestamp
     end
     add_index :quiz_submission_events, :created_at
-    add_index :quiz_submission_events, %i[quiz_submission_id attempt created_at],
+    add_index :quiz_submission_events,
+              %i[quiz_submission_id attempt created_at],
               name: "event_predecessor_locator_index"
 
     create_table "quiz_submission_snapshots", force: true do |t|
@@ -2776,7 +2795,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :sis_batches, [:account_id, :created_at], where: "workflow_state='created'", name: "index_sis_batches_pending_for_accounts"
     add_index :sis_batches, [:account_id, :created_at], name: "index_sis_batches_account_id_created_at"
     add_index :sis_batches, :batch_mode_term_id, where: "batch_mode_term_id IS NOT NULL"
-    add_index :sis_batches, %i[account_id diffing_data_set_identifier created_at],
+    add_index :sis_batches,
+              %i[account_id diffing_data_set_identifier created_at],
               name: "index_sis_batches_diffing"
 
     create_table :sis_post_grades_statuses do |t|
@@ -2869,7 +2889,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "assignment_id", limit: 8
     end
 
-    add_index :submission_versions, %i[context_id version_id user_id assignment_id],
+    add_index :submission_versions,
+              %i[context_id version_id user_id assignment_id],
               name: "index_submission_versions",
               where: "context_type='Course'",
               unique: true
@@ -2991,8 +3012,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
 
     add_index :user_merge_data_records, :user_merge_data_id
-    add_index :user_merge_data_records, %i[context_id context_type user_merge_data_id previous_user_id],
-              unique: true, name: "index_user_merge_data_records_on_context_id_and_context_type"
+    add_index :user_merge_data_records,
+              %i[context_id context_type user_merge_data_id previous_user_id],
+              unique: true,
+              name: "index_user_merge_data_records_on_context_id_and_context_type"
 
     create_table "user_notes", force: true do |t|
       t.integer  "user_id", limit: 8
@@ -3097,11 +3120,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     if (trgm = connection.extension(:pg_trgm)&.schema)
       add_index :users, "lower(name) #{trgm}.gist_trgm_ops", name: "index_trgm_users_name", using: :gist
       add_index :users, "LOWER(short_name) #{trgm}.gist_trgm_ops", name: "index_trgm_users_short_name", using: :gist
-      add_index :users, "LOWER(short_name) #{trgm}.gist_trgm_ops",
+      add_index :users,
+                "LOWER(short_name) #{trgm}.gist_trgm_ops",
                 name: "index_trgm_users_short_name_active_only",
                 using: :gist,
                 where: "workflow_state IN ('registered', 'pre_registered')"
-      add_index :users, "LOWER(name) #{trgm}.gist_trgm_ops",
+      add_index :users,
+                "LOWER(name) #{trgm}.gist_trgm_ops",
                 name: "index_trgm_users_name_active_only",
                 using: :gist,
                 where: "workflow_state IN ('registered', 'pre_registered')"
@@ -3128,7 +3153,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :user, limit: 8
       t.timestamps null: true
     end
-    add_index :custom_data, [:user_id, :namespace],
+    add_index :custom_data,
+              [:user_id, :namespace],
               name: "index_custom_data_on_user_id_and_namespace",
               unique: true
 
@@ -3510,8 +3536,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :media_objects, :accounts, column: :root_account_id
     add_foreign_key :media_objects, :users
     add_foreign_key :migration_issues, :content_migrations
-    add_foreign_key :moderated_grading_provisional_grades, :moderated_grading_provisional_grades,
-                    column: :source_provisional_grade_id, name: "provisional_grades_source_provisional_grade_fk"
+    add_foreign_key :moderated_grading_provisional_grades,
+                    :moderated_grading_provisional_grades,
+                    column: :source_provisional_grade_id,
+                    name: "provisional_grades_source_provisional_grade_fk"
     add_foreign_key :moderated_grading_provisional_grades, :submissions
     add_foreign_key :moderated_grading_provisional_grades, :users, column: :scorer_id
     add_foreign_key :moderated_grading_selections, :assignments

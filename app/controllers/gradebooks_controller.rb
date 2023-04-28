@@ -66,7 +66,8 @@ class GradebooksController < ApplicationController
 
     return render :grade_summary_list unless @presenter.student
 
-    add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url,
+    add_crumb(@presenter.student_name, named_context_url(@context,
+                                                         :context_student_grades_url,
                                                          @presenter.student_id))
 
     js_bundle :grade_summary, :rubric_assessment
@@ -197,8 +198,10 @@ class GradebooksController < ApplicationController
   def save_assignment_order
     if authorized_action(@context, @current_user, :read)
       allowed_orders = {
-        "due_at" => :due_at, "title" => :title,
-        "module" => :module, "assignment_group" => :assignment_group
+        "due_at" => :due_at,
+        "title" => :title,
+        "module" => :module,
+        "assignment_group" => :assignment_group
       }
       assignment_order = allowed_orders.fetch(params.fetch(:assignment_order), :due_at)
       @current_user.set_preference(:course_grades_assignment_order, @context.id, assignment_order)
@@ -717,9 +720,18 @@ class GradebooksController < ApplicationController
         @assignment = assignments[submission[:assignment_id].to_i]
         @user = users[submission[:user_id].to_i]
 
-        submission = submission.permit(:grade, :score, :excuse, :excused,
-                                       :graded_anonymously, :provisional, :final, :set_by_default_grade,
-                                       :comment, :media_comment_id, :media_comment_type, :group_comment,
+        submission = submission.permit(:grade,
+                                       :score,
+                                       :excuse,
+                                       :excused,
+                                       :graded_anonymously,
+                                       :provisional,
+                                       :final,
+                                       :set_by_default_grade,
+                                       :comment,
+                                       :media_comment_id,
+                                       :media_comment_type,
+                                       :group_comment,
                                        :late_policy_status).to_unsafe_h
         is_default_grade_for_missing = value_to_boolean(submission.delete(:set_by_default_grade)) && submission_record.missing? && submission_record.late_policy_status.nil?
 

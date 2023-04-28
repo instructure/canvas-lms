@@ -59,7 +59,8 @@ module Factories
     @page_view.assign_attributes(created_at: opts[:created_at]) if opts[:created_at]
     @page_view.real_user = opts[:real_user] if opts[:real_user]
     if opts[:asset_code] || opts[:asset_category]
-      @page_view.build_asset_user_access context: @context, asset_code: opts[:asset_code],
+      @page_view.build_asset_user_access context: @context,
+                                         asset_code: opts[:asset_code],
                                          asset_category: opts[:asset_category]
     end
 

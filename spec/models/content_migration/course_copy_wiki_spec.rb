@@ -24,8 +24,10 @@ describe ContentMigration do
     include_context "course copy"
 
     it "copies wiki page attributes" do
-      page = @copy_from.wiki_pages.create!(title: "title", body: "<address><ul></ul></address>",
-                                           editing_roles: "teachers", todo_date: Time.zone.now,
+      page = @copy_from.wiki_pages.create!(title: "title",
+                                           body: "<address><ul></ul></address>",
+                                           editing_roles: "teachers",
+                                           todo_date: Time.zone.now,
                                            publish_at: 1.week.from_now.beginning_of_day)
 
       run_course_copy

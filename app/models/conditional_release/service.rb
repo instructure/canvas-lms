@@ -162,7 +162,8 @@ module ConditionalRelease
                   end
               end
               assignment_sets_data = (assignment_sets || []).as_json(
-                include_root: false, except: [:root_account_id, :deleted_at],
+                include_root: false,
+                except: [:root_account_id, :deleted_at],
                 include: { assignment_set_associations: { except: [:root_account_id, :deleted_at] } }
               ).map(&:deep_symbolize_keys)
               rule.as_json(include_root: false, except: [:root_account_id, :deleted_at]).merge(
@@ -229,10 +230,23 @@ module ConditionalRelease
       end
 
       def assignment_keys
-        %i[id title name description due_at unlock_at lock_at
-           points_possible min_score max_score grading_type
-           submission_types workflow_state context_id
-           context_type updated_at context_code]
+        %i[id
+           title
+           name
+           description
+           due_at
+           unlock_at
+           lock_at
+           points_possible
+           min_score
+           max_score
+           grading_type
+           submission_types
+           workflow_state
+           context_id
+           context_type
+           updated_at
+           context_code]
       end
     end
   end

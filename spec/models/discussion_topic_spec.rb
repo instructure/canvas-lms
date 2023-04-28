@@ -447,7 +447,8 @@ describe DiscussionTopic do
       add_section_to_topic(@topic, section)
       @topic.save!
       nobody_role = custom_account_role("NobodyAdmin", account: account)
-      account_with_role_changes(account: account, role: nobody_role,
+      account_with_role_changes(account: account,
+                                role: nobody_role,
                                 role_changes: { read_course_content: true, read_forum: true })
       admin = account_admin_user(account: account, role: nobody_role, active_user: true)
       expect(@topic.visible_for?(admin)).to be_truthy
@@ -609,7 +610,8 @@ describe DiscussionTopic do
           @group = @course.groups.create(name: "group", group_category: group_category)
           @group.add_user(@student1)
           @course.update(start_at: 2.days.ago, conclude_at: 1.day.ago, restrict_enrollments_to_course_dates: true)
-          @section.update(start_at: 2.days.ago, end_at: 2.days.from_now,
+          @section.update(start_at: 2.days.ago,
+                          end_at: 2.days.from_now,
                           restrict_enrollments_to_section_dates: true)
           @topic = @group.discussion_topics.create(title: "group topic")
           @topic.save!
@@ -708,8 +710,10 @@ describe DiscussionTopic do
     end
 
     it "does not grant observers read permission when read_forum override is false" do
-      RoleOverride.create!(context: @course.account, permission: "read_forum",
-                           role: observer_role, enabled: false)
+      RoleOverride.create!(context: @course.account,
+                           permission: "read_forum",
+                           role: observer_role,
+                           enabled: false)
 
       @relevant_permissions = %i[read reply update delete]
       @topic = @course.discussion_topics.create!(user: @teacher)
@@ -1333,10 +1337,14 @@ describe DiscussionTopic do
       before :once do
         @other_student = user_factory(active_all: true)
         @course.enroll_student(@other_student, enrollment_state: "active")
-        @course.enroll_user(@observer, "ObserverEnrollment",
-                            associated_user_id: @student, enrollment_state: "active")
-        @course.enroll_user(@observer, "ObserverEnrollment",
-                            associated_user_id: @other_student, enrollment_state: "active")
+        @course.enroll_user(@observer,
+                            "ObserverEnrollment",
+                            associated_user_id: @student,
+                            enrollment_state: "active")
+        @course.enroll_user(@observer,
+                            "ObserverEnrollment",
+                            associated_user_id: @other_student,
+                            enrollment_state: "active")
       end
 
       it "does not allow observers to see replies to a discussion linked students haven't posted in" do
@@ -2437,7 +2445,8 @@ describe DiscussionTopic do
     end
 
     it "allows discussions to be section-specific if the feature is enabled" do
-      topic = DiscussionTopic.create!(title: "some title", context: @course,
+      topic = DiscussionTopic.create!(title: "some title",
+                                      context: @course,
                                       user: @teacher)
       add_section_to_topic(topic, @section)
       expect(topic.valid?).to be true
@@ -2811,23 +2820,29 @@ describe DiscussionTopic do
       @course = course_factory(active_all: true)
       @section1 = @course.course_sections.create!
       @section2 = @course.course_sections.create!
-      @limited_teacher = create_enrolled_user(@course, @section1, name: "limited teacher",
-                                                                  enrollment_type: "TeacherEnrollment", limit_privileges_to_course_section: true)
+      @limited_teacher = create_enrolled_user(@course,
+                                              @section1,
+                                              name: "limited teacher",
+                                              enrollment_type: "TeacherEnrollment",
+                                              limit_privileges_to_course_section: true)
       @student1 = create_enrolled_user(@course, @section1, name: "student 1", enrollment_type: "StudentEnrollment")
       @student2 = create_enrolled_user(@course, @section2, name: "student 2", enrollment_type: "StudentEnrollment")
       @all_users = [@teacher, @limited_teacher, @student1, @student2]
     end
 
     it "non-specific-topic is visible to everyone" do
-      topic = @course.discussion_topics.create!(title: "foo", message: "bar",
+      topic = @course.discussion_topics.create!(title: "foo",
+                                                message: "bar",
                                                 workflow_state: "published")
       users = topic.users_with_permissions(@all_users)
       expect(users.to_set(&:id)).to eq(@all_users.to_set(&:id))
     end
 
     it "specific topic limits properly" do
-      topic = DiscussionTopic.new(title: "foo", message: "bar",
-                                  context: @course, user: @teacher)
+      topic = DiscussionTopic.new(title: "foo",
+                                  message: "bar",
+                                  context: @course,
+                                  user: @teacher)
       add_section_to_topic(topic, @section2)
       topic.save!
       users = topic.users_with_permissions(@all_users)
@@ -2850,8 +2865,10 @@ describe DiscussionTopic do
     end
 
     it "section specific topic.users_with_permissions does not show completed enrollments" do
-      topic = DiscussionTopic.new(title: "foo", message: "bar",
-                                  context: @course, user: @teacher)
+      topic = DiscussionTopic.new(title: "foo",
+                                  message: "bar",
+                                  context: @course,
+                                  user: @teacher)
       add_section_to_topic(topic, @section2)
       topic.save!
 

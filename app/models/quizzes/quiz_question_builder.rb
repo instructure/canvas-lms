@@ -132,7 +132,8 @@ class Quizzes::QuizQuestionBuilder
   def self.decorate_question_for_submission(q, position)
     question_name = t(
       "#quizzes.quiz.question_name_counter",
-      "Question %{question_number}", {
+      "Question %{question_number}",
+      {
         question_number: position
       }
     )

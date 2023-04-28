@@ -323,8 +323,12 @@ class Assignment < ActiveRecord::Base
     result.ignores.clear
     result.moderated_grading_selections.clear
     result.grades_published_at = nil
-    %i[migration_id lti_context_id turnitin_id
-       discussion_topic integration_id integration_data].each do |attr|
+    %i[migration_id
+       lti_context_id
+       turnitin_id
+       discussion_topic
+       integration_id
+       integration_data].each do |attr|
       result.send(:"#{attr}=", nil)
     end
     result.peer_review_count = 0
@@ -988,11 +992,23 @@ class Assignment < ActiveRecord::Base
     end
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
     %i[
-      all_day could_be_locked grade_group_students_individually
-      anonymous_peer_reviews turnitin_enabled vericite_enabled
-      moderated_grading omit_from_final_grade freeze_on_copy
-      copied only_visible_to_overrides post_to_sis peer_reviews_assigned
-      peer_reviews automatic_peer_reviews muted intra_group_peer_reviews
+      all_day
+      could_be_locked
+      grade_group_students_individually
+      anonymous_peer_reviews
+      turnitin_enabled
+      vericite_enabled
+      moderated_grading
+      omit_from_final_grade
+      freeze_on_copy
+      copied
+      only_visible_to_overrides
+      post_to_sis
+      peer_reviews_assigned
+      peer_reviews
+      automatic_peer_reviews
+      muted
+      intra_group_peer_reviews
       anonymous_grading
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self.graders_anonymous_to_graders = false unless grader_comments_visible_to_graders
@@ -3051,7 +3067,9 @@ class Assignment < ActiveRecord::Base
             WHERE assignment_id = assignments.id
             AND submissions.workflow_state <> 'deleted'
             AND (submission_type IS NOT NULL OR excused = ?)
-            AND user_id = ?)", true, user_id)
+            AND user_id = ?)",
+                  true,
+                  user_id)
             .limit(limit)
             .order("assignments.due_at")
 
@@ -3242,9 +3260,18 @@ class Assignment < ActiveRecord::Base
   end
   protected :infer_comment_context_from_filename
 
-  FREEZABLE_ATTRIBUTES = %w[title description lock_at points_possible grading_type
-                            submission_types assignment_group_id allowed_extensions
-                            group_category_id notify_of_update peer_reviews workflow_state].freeze
+  FREEZABLE_ATTRIBUTES = %w[title
+                            description
+                            lock_at
+                            points_possible
+                            grading_type
+                            submission_types
+                            assignment_group_id
+                            allowed_extensions
+                            group_category_id
+                            notify_of_update
+                            peer_reviews
+                            workflow_state].freeze
   def frozen?
     !!(freeze_on_copy && copied &&
        PluginSetting.settings_for_plugin(:assignment_freezer))

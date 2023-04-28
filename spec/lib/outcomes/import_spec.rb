@@ -350,8 +350,12 @@ RSpec.describe Outcomes::Import do
           existing_outcome.update! vendor_guid: nil
           expect do
             importer.import_outcome(
-              **existing_outcome.slice(:title, :description, :display_name,
-                                       :workflow_state, :calculation_method, :calculation_int).symbolize_keys,
+              **existing_outcome.slice(:title,
+                                       :description,
+                                       :display_name,
+                                       :workflow_state,
+                                       :calculation_method,
+                                       :calculation_int).symbolize_keys,
               vendor_guid: magic_guid
             )
             existing_outcome.reload

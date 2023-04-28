@@ -91,7 +91,8 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
       event = subject.build_event({
                                     "attempt" => 1,
                                     "question_1" => "11" # choose the answer "A" in MC question
-                                  }, quiz_submission)
+                                  },
+                                  quiz_submission)
 
       expect(event.attempt).to eq 1
       expect(event.event_type).to be_present
@@ -195,22 +196,26 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
         it "tracks only the things i did just now" do
           one = answer_and_generate_event({
                                             question_1: 11
-                                          }, Time.now)
+                                          },
+                                          Time.now)
 
           two = answer_and_generate_event({
                                             question_1: 11,
                                             question_2: 21
-                                          }, 1.second.from_now)
+                                          },
+                                          1.second.from_now)
 
           three = answer_and_generate_event({
                                               question_1: 12,
                                               question_2: 21
-                                            }, 2.seconds.from_now)
+                                            },
+                                            2.seconds.from_now)
 
           four = answer_and_generate_event({
                                              question_1: 12,
                                              question_2: 21
-                                           }, 3.seconds.from_now)
+                                           },
+                                           3.seconds.from_now)
 
           # first save, it keeps everything:
           expect(one.answers.as_json).to eq [{

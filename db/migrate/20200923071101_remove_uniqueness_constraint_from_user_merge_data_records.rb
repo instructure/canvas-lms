@@ -23,13 +23,18 @@ class RemoveUniquenessConstraintFromUserMergeDataRecords < ActiveRecord::Migrati
 
   def up
     remove_index :user_merge_data_records, name: "index_user_merge_data_records_on_context_id_and_context_type", if_exists: true
-    add_index :user_merge_data_records, %i[context_id context_type user_merge_data_id previous_user_id],
-              name: "index_user_merge_data_records_on_context_id_and_context_type", algorithm: :concurrently
+    add_index :user_merge_data_records,
+              %i[context_id context_type user_merge_data_id previous_user_id],
+              name: "index_user_merge_data_records_on_context_id_and_context_type",
+              algorithm: :concurrently
   end
 
   def down
     remove_index :user_merge_data_records, name: "index_user_merge_data_records_on_context_id_and_context_type", if_exists: true
-    add_index :user_merge_data_records, %i[context_id context_type user_merge_data_id previous_user_id],
-              unique: true, name: "index_user_merge_data_records_on_context_id_and_context_type", algorithm: :concurrently
+    add_index :user_merge_data_records,
+              %i[context_id context_type user_merge_data_id previous_user_id],
+              unique: true,
+              name: "index_user_merge_data_records_on_context_id_and_context_type",
+              algorithm: :concurrently
   end
 end

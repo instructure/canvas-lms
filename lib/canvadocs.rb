@@ -97,7 +97,8 @@ module Canvadocs
     #
     # Returns a hash containing the session id
     def session(document_id, opts = {})
-      raw_body = api_call(:post, "sessions",
+      raw_body = api_call(:post,
+                          "sessions",
                           opts.merge(document_id: document_id))
       JSON.parse(raw_body)
     end

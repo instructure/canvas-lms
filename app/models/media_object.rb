@@ -22,9 +22,16 @@ class MediaObject < ActiveRecord::Base
   include Workflow
   include SearchTermHelper
   belongs_to :user
-  belongs_to :context, polymorphic:
-    [:course, :group, :conversation_message, :account, :assignment,
-     :assessment_question, { context_user: "User" }], exhaustive: false
+  belongs_to :context,
+             polymorphic:
+                 [:course,
+                  :group,
+                  :conversation_message,
+                  :account,
+                  :assignment,
+                  :assessment_question,
+                  { context_user: "User" }],
+             exhaustive: false
   belongs_to :attachment
   belongs_to :root_account, class_name: "Account"
 
@@ -224,10 +231,12 @@ class MediaObject < ActiveRecord::Base
       if attempt < 10
         delay(run_at: (5 * attempt).minutes.from_now).retrieve_details_ensure_codecs(attempt + 1)
       else
-        Canvas::Errors.capture(:media_object_failure, {
+        Canvas::Errors.capture(:media_object_failure,
+                               {
                                  message: "Kaltura flavor retrieval failed",
                                  object: inspect.to_s,
-                               }, :warn)
+                               },
+                               :warn)
       end
     end
   end

@@ -140,7 +140,8 @@ describe CanvasQuizStatistics::Analyzers::Essay do
       it "maps each score to the number of receivers" do
         output = subject.run([
                                { points: 1, user_id: 1 },
-                               { points: 3, user_id: 2 }, { points: 3, user_id: 3 },
+                               { points: 3, user_id: 2 },
+                               { points: 3, user_id: 3 },
                                { points: nil, user_id: 5 }
                              ])
 
@@ -151,7 +152,8 @@ describe CanvasQuizStatistics::Analyzers::Essay do
 
       it "sorts them in score ascending mode" do
         output = subject.run([
-                               { points: 3, user_id: 2 }, { points: 3, user_id: 3 },
+                               { points: 3, user_id: 2 },
+                               { points: 3, user_id: 3 },
                                { points: 1, user_id: 1 },
                                { points: nil, user_id: 5 }
                              ])

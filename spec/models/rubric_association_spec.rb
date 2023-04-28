@@ -212,8 +212,11 @@ describe RubricAssociation do
         context: @course,
         purpose: "grading"
       )
-      request = AssessmentRequest.create!(user: submission_student, asset: submission, assessor_asset: assessor_submission,
-                                          assessor: review_student, rubric_association: ra)
+      request = AssessmentRequest.create!(user: submission_student,
+                                          asset: submission,
+                                          assessor_asset: assessor_submission,
+                                          assessor: review_student,
+                                          rubric_association: ra)
       expect(request).not_to be_nil
       ra.destroy
       expect(request.reload).not_to be_nil
@@ -326,11 +329,15 @@ describe RubricAssociation do
     let(:assessment_params) { { assessment_type: "grading", criterion_stuff: { points: 1 } } }
 
     it "updates the assessor/grader if the second assessor is different than the first" do
-      rubric_association.assess(user: student, assessor: first_teacher, artifact: submission,
+      rubric_association.assess(user: student,
+                                assessor: first_teacher,
+                                artifact: submission,
                                 assessment: assessment_params)
 
       assessment_params[:criterion_stuff][:points] = 0
-      assessment = rubric_association.assess(user: student, assessor: second_teacher, artifact: submission,
+      assessment = rubric_association.assess(user: student,
+                                             assessor: second_teacher,
+                                             artifact: submission,
                                              assessment: assessment_params)
       submission.reload
 
@@ -340,13 +347,17 @@ describe RubricAssociation do
 
     it "propagated hide_points value" do
       rubric_association.update!(hide_points: true)
-      assessment = rubric_association.assess(user: student, assessor: first_teacher, artifact: submission,
+      assessment = rubric_association.assess(user: student,
+                                             assessor: first_teacher,
+                                             artifact: submission,
                                              assessment: assessment_params)
       expect(assessment.hide_points).to be true
     end
 
     it "updates the rating description and id if not present in passed params" do
-      assessment = rubric_association.assess(user: student, assessor: first_teacher, artifact: submission,
+      assessment = rubric_association.assess(user: student,
+                                             assessor: first_teacher,
+                                             artifact: submission,
                                              assessment: assessment_params)
       expect(assessment.data[0][:id]).to eq "blank"
       expect(assessment.data[0][:description]).to eq "Full Marks"

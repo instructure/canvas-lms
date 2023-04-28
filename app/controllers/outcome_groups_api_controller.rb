@@ -531,8 +531,14 @@ class OutcomeGroupsApiController < ApplicationController
         return
       end
     else
-      outcome_params = params.permit(:title, :description, :mastery_points, :vendor_guid,
-                                     :display_name, :calculation_method, :calculation_int, ratings: strong_anything)
+      outcome_params = params.permit(:title,
+                                     :description,
+                                     :mastery_points,
+                                     :vendor_guid,
+                                     :display_name,
+                                     :calculation_method,
+                                     :calculation_int,
+                                     ratings: strong_anything)
       @outcome = context_create_outcome(outcome_params)
       unless @outcome.valid?
         render json: @outcome.errors, status: :bad_request

@@ -173,14 +173,16 @@ describe CoursesController do
         # no dates at all
         enrollment1 = student_in_course active_all: true, course_name: "A"
 
-        course2 = Account.default.courses.create! start_at: 2.weeks.ago, conclude_at: 1.week.from_now,
+        course2 = Account.default.courses.create! start_at: 2.weeks.ago,
+                                                  conclude_at: 1.week.from_now,
                                                   restrict_enrollments_to_course_dates: false,
                                                   name: "B"
         course2.offer!
         enrollment2 = student_in_course user: @student, course: course2, active_all: true
 
         # future date that doesn't count
-        course3 = Account.default.courses.create! start_at: 1.week.from_now, conclude_at: 2.weeks.from_now,
+        course3 = Account.default.courses.create! start_at: 1.week.from_now,
+                                                  conclude_at: 2.weeks.from_now,
                                                   restrict_enrollments_to_course_dates: false,
                                                   name: "C"
         course3.offer!
@@ -195,7 +197,8 @@ describe CoursesController do
       end
 
       it "includes courses with current start/end dates" do
-        course1 = Account.default.courses.create! start_at: 1.week.ago, conclude_at: 1.week.from_now,
+        course1 = Account.default.courses.create! start_at: 1.week.ago,
+                                                  conclude_at: 1.week.from_now,
                                                   restrict_enrollments_to_course_dates: true,
                                                   name: "A"
         course1.offer!
@@ -322,7 +325,8 @@ describe CoursesController do
         enrollment1 = course_with_student course: course1, user: @student, active_all: true
 
         # by course date, restricted
-        course2 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago,
+        course2 = Account.default.courses.create! start_at: 2.months.ago,
+                                                  conclude_at: 1.month.ago,
                                                   restrict_enrollments_to_course_dates: true,
                                                   name: "Two"
         course2.offer!
@@ -335,14 +339,16 @@ describe CoursesController do
         enrollment3.course.save!
 
         # by course date, unrestricted but the course dates aren't over yet
-        course4 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.from_now,
+        course4 = Account.default.courses.create! start_at: 2.months.ago,
+                                                  conclude_at: 1.month.from_now,
                                                   restrict_enrollments_to_course_dates: false,
                                                   name: "Fore"
         course4.offer!
         enrollment4 = course_with_student course: course4, user: @student, active_all: true
 
         # by course date, unrestricted past view
-        course5 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago,
+        course5 = Account.default.courses.create! start_at: 2.months.ago,
+                                                  conclude_at: 1.month.ago,
                                                   restrict_enrollments_to_course_dates: false,
                                                   name: "Phive",
                                                   restrict_student_past_view: false
@@ -350,7 +356,8 @@ describe CoursesController do
         enrollment5 = course_with_student course: course5, user: @student, active_all: true
 
         # by course date, restricted past view & enrollment dates
-        course6 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago,
+        course6 = Account.default.courses.create! start_at: 2.months.ago,
+                                                  conclude_at: 1.month.ago,
                                                   restrict_enrollments_to_course_dates: true,
                                                   name: "Styx",
                                                   restrict_student_past_view: true
@@ -358,7 +365,8 @@ describe CoursesController do
         course_with_student course: course6, user: @student, active_all: true
 
         # past course date, restricted past view & enrollment dates not concluded
-        course7 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago,
+        course7 = Account.default.courses.create! start_at: 2.months.ago,
+                                                  conclude_at: 1.month.ago,
                                                   restrict_enrollments_to_course_dates: false,
                                                   name: "Ptheven",
                                                   restrict_student_past_view: true
@@ -1040,7 +1048,8 @@ describe CoursesController do
                      start_at: Time.now + 2.weeks)
       @enrollment.update(workflow_state: "invited", last_activity_at: nil)
 
-      post "enrollment_invitation", params: { course_id: @course.id, accept: "1",
+      post "enrollment_invitation", params: { course_id: @course.id,
+                                              accept: "1",
                                               invitation: @enrollment.uuid }
 
       expect(response).to redirect_to(course_url(@course))
@@ -1699,8 +1708,11 @@ describe CoursesController do
 
     context "course_home_sub_navigation" do
       before :once do
-        @tool = @course.context_external_tools.create(consumer_key: "test", shared_secret: "secret", url: "http://example.com/lti",
-                                                      name: "tool", course_home_sub_navigation: { enabled: true, visibility: "admins" })
+        @tool = @course.context_external_tools.create(consumer_key: "test",
+                                                      shared_secret: "secret",
+                                                      url: "http://example.com/lti",
+                                                      name: "tool",
+                                                      course_home_sub_navigation: { enabled: true, visibility: "admins" })
       end
 
       it "shows admin-level course_home_sub_navigation external tools for teachers" do
@@ -2271,15 +2283,18 @@ describe CoursesController do
     end
 
     it "sets the visibility settings when we have permission" do
-      post "create", params: {
-        account_id: @account.id, course: {
-          name: "new course",
-          is_public: true,
-          public_syllabus: true,
-          is_public_to_auth_users: true,
-          public_syllabus_to_auth: true
-        }
-      }, format: :json
+      post "create",
+           params: {
+             account_id: @account.id,
+             course: {
+               name: "new course",
+               is_public: true,
+               public_syllabus: true,
+               is_public_to_auth_users: true,
+               public_syllabus_to_auth: true
+             }
+           },
+           format: :json
 
       json = response.parsed_body
       expect(json["is_public"]).to be true
@@ -2289,12 +2304,15 @@ describe CoursesController do
     end
 
     it "sets grade_passback_setting" do
-      post "create", params: {
-        account_id: @account.id, course: {
-          name: "new course",
-          grade_passback_setting: "nightly_sync",
-        }
-      }, format: :json
+      post "create",
+           params: {
+             account_id: @account.id,
+             course: {
+               name: "new course",
+               grade_passback_setting: "nightly_sync",
+             }
+           },
+           format: :json
 
       json = response.parsed_body
       expect(Course.find(json["id"]).grade_passback_setting).to eq "nightly_sync"
@@ -2304,15 +2322,18 @@ describe CoursesController do
       @visperm.enabled = false
       @visperm.save
 
-      post "create", params: {
-        account_id: @account.id, course: {
-          name: "new course",
-          is_public: true,
-          public_syllabus: true,
-          is_public_to_auth_users: true,
-          public_syllabus_to_auth: true
-        }
-      }, format: :json
+      post "create",
+           params: {
+             account_id: @account.id,
+             course: {
+               name: "new course",
+               is_public: true,
+               public_syllabus: true,
+               is_public_to_auth_users: true,
+               public_syllabus_to_auth: true
+             }
+           },
+           format: :json
 
       json = response.parsed_body
       expect(json["is_public"]).to be false
@@ -2694,10 +2715,11 @@ describe CoursesController do
       expect(Auditors::Course).to receive(:record_updated)
         .with(anything, anything, changes, source: :manual)
 
-      put "update", params: { id: @course.id, course: {
-        name: changes["name"].last,
-        lock_all_announcements: false
-      } }
+      put "update", params: { id: @course.id,
+                              course: {
+                                name: changes["name"].last,
+                                lock_all_announcements: false
+                              } }
     end
 
     it "updates its lock_all_announcements setting" do
@@ -3031,8 +3053,11 @@ describe CoursesController do
       end
 
       it "allows setting of default template restrictions" do
-        put "update", params: { id: @course.id, course: { blueprint: "1",
-                                                          blueprint_restrictions: { "content" => "0", "due_dates" => "1" } } }, format: "json"
+        put "update",
+            params: { id: @course.id,
+                      course: { blueprint: "1",
+                                blueprint_restrictions: { "content" => "0", "due_dates" => "1" } } },
+            format: "json"
         expect(response).to be_successful
         template = MasterCourses::MasterTemplate.full_template_for(@course)
         expect(template.default_restrictions).to eq({ content: false, due_dates: true })
@@ -3045,8 +3070,11 @@ describe CoursesController do
         end
 
         it "allows an admin to change restrictions" do
-          put "update", params: { id: @course.id, course: { blueprint: "1",
-                                                            blueprint_restrictions: { "content" => "0", "due_dates" => "1" } } }, format: "json"
+          put "update",
+              params: { id: @course.id,
+                        course: { blueprint: "1",
+                                  blueprint_restrictions: { "content" => "0", "due_dates" => "1" } } },
+              format: "json"
           expect(response).to be_successful
           template = MasterCourses::MasterTemplate.full_template_for(@course)
           expect(template.default_restrictions).to eq({ content: false, due_dates: true })
@@ -3054,37 +3082,52 @@ describe CoursesController do
 
         it "forbids a non-admin from changing restrictions" do
           user_session @ta
-          put "update", params: { id: @course.id, course: { blueprint: "1",
-                                                            blueprint_restrictions: { "content" => "0", "due_dates" => "1" } } }, format: "json"
+          put "update",
+              params: { id: @course.id,
+                        course: { blueprint: "1",
+                                  blueprint_restrictions: { "content" => "0", "due_dates" => "1" } } },
+              format: "json"
           expect(response).to be_unauthorized
         end
 
         it "allows a non-admin to perform a no-op request" do
           user_session @ta
-          put "update", params: { id: @course.id, course: { blueprint: "1",
-                                                            blueprint_restrictions: { "content" => "1" } } }, format: "json"
+          put "update",
+              params: { id: @course.id,
+                        course: { blueprint: "1",
+                                  blueprint_restrictions: { "content" => "1" } } },
+              format: "json"
           expect(response).to be_successful
         end
       end
 
       it "validates template restrictions" do
-        put "update", params: { id: @course.id, course: { blueprint: "1",
-                                                          blueprint_restrictions: { "content" => "1", "doo_dates" => "1" } } }, format: "json"
+        put "update",
+            params: { id: @course.id,
+                      course: { blueprint: "1",
+                                blueprint_restrictions: { "content" => "1", "doo_dates" => "1" } } },
+            format: "json"
         expect(response).to_not be_successful
         expect(response.body).to include "Invalid restrictions"
       end
 
       it "allows setting whether to use template restrictions by object type" do
-        put "update", params: { id: @course.id, course: { blueprint: "1",
-                                                          use_blueprint_restrictions_by_object_type: "1" } }, format: "json"
+        put "update",
+            params: { id: @course.id,
+                      course: { blueprint: "1",
+                                use_blueprint_restrictions_by_object_type: "1" } },
+            format: "json"
         expect(response).to be_successful
         template = MasterCourses::MasterTemplate.full_template_for(@course)
         expect(template.use_default_restrictions_by_type).to be_truthy
       end
 
       it "allows setting default template restrictions by object type" do
-        put "update", params: { id: @course.id, course: { blueprint: "1",
-                                                          blueprint_restrictions_by_object_type: { "assignment" => { "content" => "1", "due_dates" => "1" }, "quiz" => { "content" => "1" } } } }, format: "json"
+        put "update",
+            params: { id: @course.id,
+                      course: { blueprint: "1",
+                                blueprint_restrictions_by_object_type: { "assignment" => { "content" => "1", "due_dates" => "1" }, "quiz" => { "content" => "1" } } } },
+            format: "json"
         expect(response).to be_successful
         template = MasterCourses::MasterTemplate.full_template_for(@course)
         expect(template.default_restrictions_by_type).to eq({
@@ -3094,8 +3137,11 @@ describe CoursesController do
       end
 
       it "validates default template restrictions by object type" do
-        put "update", params: { id: @course.id, course: { blueprint: "1",
-                                                          blueprint_restrictions_by_object_type: { "notarealtype" => { "content" => "1", "due_dates" => "1" } } } }, format: "json"
+        put "update",
+            params: { id: @course.id,
+                      course: { blueprint: "1",
+                                blueprint_restrictions_by_object_type: { "notarealtype" => { "content" => "1", "due_dates" => "1" } } } },
+            format: "json"
         expect(response).to_not be_successful
         expect(response.body).to include "Invalid restrictions"
       end
@@ -3823,7 +3869,8 @@ describe CoursesController do
           @account = Account.default
           @account.disable_feature!(:granular_permissions_manage_courses)
           role = custom_account_role "lamer", account: @account
-          @account.role_overrides.create! permission: "manage_courses", enabled: true,
+          @account.role_overrides.create! permission: "manage_courses",
+                                          enabled: true,
                                           role: role
           user_factory
           @account.account_users.create!(user: @user, role: role)

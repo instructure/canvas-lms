@@ -68,7 +68,8 @@ describe AccountsController do
         end
 
         # change a permission on the user's role
-        @account.role_overrides.create! role: admin_role, permission: "manage_outcomes",
+        @account.role_overrides.create! role: admin_role,
+                                        permission: "manage_outcomes",
                                         enabled: false
 
         # ensure the change is reflected once the user's cached permissions expire

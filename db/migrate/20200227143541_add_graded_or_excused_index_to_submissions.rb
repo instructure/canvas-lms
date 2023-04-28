@@ -22,8 +22,10 @@ class AddGradedOrExcusedIndexToSubmissions < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def change
-    add_index :submissions, :assignment_id, algorithm: :concurrently,
-                                            where: "workflow_state <> 'deleted' AND ((score IS NOT NULL AND workflow_state = 'graded') OR excused = TRUE)",
-                                            name: "index_submissions_graded_or_excused_on_assignment_id"
+    add_index :submissions,
+              :assignment_id,
+              algorithm: :concurrently,
+              where: "workflow_state <> 'deleted' AND ((score IS NOT NULL AND workflow_state = 'graded') OR excused = TRUE)",
+              name: "index_submissions_graded_or_excused_on_assignment_id"
   end
 end

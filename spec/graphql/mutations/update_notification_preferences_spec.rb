@@ -340,11 +340,12 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
                                                  account_id: @account.id,
                                                  communication_channel_id: @teacher.communication_channels.first.id,
                                                  notification_category: "DiscussionMention",
-                                                 frequency: "immediately"), context: {
-                                                   current_user: @student,
-                                                   request: ActionDispatch::TestRequest.create,
-                                                   domain_root_account: @account
-                                                 })
+                                                 frequency: "immediately"),
+                                    context: {
+                                      current_user: @student,
+                                      request: ActionDispatch::TestRequest.create,
+                                      domain_root_account: @account
+                                    })
       result = result.to_h.with_indifferent_access
 
       expect(result[:errors][0][:message]).to be "not found"

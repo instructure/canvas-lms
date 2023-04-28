@@ -55,7 +55,8 @@ SUBJECT_IDEAL_LINE_LEN = 65
 length_exemption_regex = /^Revert/
 
 if subject.size > SUBJECT_MAX_LINE_LEN && subject !~ length_exemption_regex
-  comment "error", 1,
+  comment "error",
+          1,
           "subject line can't exceed #{SUBJECT_MAX_LINE_LEN} chars (ideally keep it well under #{SUBJECT_IDEAL_LINE_LEN})",
           link_to_guidelines: true
 elsif subject.size > SUBJECT_IDEAL_LINE_LEN && subject !~ length_exemption_regex
@@ -82,7 +83,8 @@ actually_ok_regex = /\A
 maybe_start_with_wrong_tense = subject =~ maybe_wrong_tense_regex &&
                                subject !~ actually_ok_regex
 if maybe_start_with_wrong_tense
-  comment "warn", 1,
+  comment "warn",
+          1,
           "make sure your commit message has an imperative verb (e.g. \"add\" instead of \"adds\", \"added\", or \"adding\")",
           link_to_guidelines: true
 end
@@ -99,7 +101,8 @@ long_lines = lines.each_with_index.select do |line, _i|
 end
 
 unless long_lines.empty?
-  comment "warn", long_lines.first[1] + 3,
+  comment "warn",
+          long_lines.first[1] + 3,
           "try to keep all lines under #{BODY_IDEAL_LINE_LENGTH} characters" +
           ((long_lines.size > 1) ? " (note that #{long_lines.size - 1} other long lines follow this one)" : ""),
           link_to_guidelines: true
@@ -129,7 +132,8 @@ if issue_ids.empty? && !gh_issue
                         .split(TICKET_REGEX)
   if parts.size > 1
     jira_hook_words = JiraRefParser::RefKeywords + JiraRefParser::FixKeywords
-    comment "warn", parts.first.count("\n") + 1,
+    comment "warn",
+            parts.first.count("\n") + 1,
             "the jira hooks won't link this commit to #{parts[1]} unless you use one of the following keywords: #{jira_hook_words.join(", ")}"
   else
     comment "warn", nil, "you should really reference a ticket ლ(ٱ٥ٱლ)"
@@ -154,6 +158,7 @@ end
 
 skip_eslint_flag = commit_message.include? "[skip-eslint]"
 if skip_eslint_flag
-  comment "error", nil,
+  comment "error",
+          nil,
           "[skip-eslint] should only be used for large restructuring changes where no real code changes are actually made"
 end

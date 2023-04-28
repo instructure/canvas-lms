@@ -23,9 +23,18 @@ module AccountReports
     include ReportHelper
     include Pronouns
 
-    SIS_CSV_REPORTS = %w[users accounts terms courses sections
-                         enrollments groups group_membership
-                         group_categories xlist user_observers admins].freeze
+    SIS_CSV_REPORTS = %w[users
+                         accounts
+                         terms
+                         courses
+                         sections
+                         enrollments
+                         groups
+                         group_membership
+                         group_categories
+                         xlist
+                         user_observers
+                         admins].freeze
 
     def initialize(account_report, params = {})
       @account_report = account_report
@@ -86,9 +95,18 @@ module AccountReports
       headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[user_id integration_id authentication_provider_id
-                     login_id password first_name last_name full_name
-                     sortable_name short_name email status]
+        headers = %w[user_id
+                     integration_id
+                     authentication_provider_id
+                     login_id
+                     password
+                     first_name
+                     last_name
+                     full_name
+                     sortable_name
+                     short_name
+                     email
+                     status]
         headers << "pronouns" if should_add_pronouns?
       else # provisioning_report
         headers << I18n.t("#account_reports.report_header_canvas_user_id", "canvas_user_id")
@@ -277,8 +295,10 @@ module AccountReports
       headers = course_headers
       courses = course_query
       courses = course_query_options(courses)
-      course_state_sub = { "claimed" => "unpublished", "created" => "unpublished",
-                           "completed" => "concluded", "deleted" => "deleted",
+      course_state_sub = { "claimed" => "unpublished",
+                           "created" => "unpublished",
+                           "completed" => "concluded",
+                           "deleted" => "deleted",
                            "available" => "active" }
 
       generate_and_run_report headers do |csv|
@@ -307,8 +327,16 @@ module AccountReports
       headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[course_id integration_id short_name long_name
-                     account_id term_id status start_date end_date course_format
+        headers = %w[course_id
+                     integration_id
+                     short_name
+                     long_name
+                     account_id
+                     term_id
+                     status
+                     start_date
+                     end_date
+                     course_format
                      blueprint_course_id]
       else
         headers << I18n.t("#account_reports.report_header_canvas_course_id", "canvas_course_id")
@@ -341,7 +369,8 @@ module AccountReports
       if @include_deleted
         courses.where!("(courses.workflow_state='deleted' AND courses.updated_at > ?)
                           OR courses.workflow_state<>'deleted'
-                          OR courses.sis_source_id IS NOT NULL", 120.days.ago)
+                          OR courses.sis_source_id IS NOT NULL",
+                       120.days.ago)
       else
         courses.where!("courses.workflow_state<>'deleted' AND courses.workflow_state<>'completed'")
       end
@@ -400,8 +429,13 @@ module AccountReports
       headers = []
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[section_id course_id integration_id name status
-                     start_date end_date]
+        headers = %w[section_id
+                     course_id
+                     integration_id
+                     name
+                     status
+                     start_date
+                     end_date]
       else
         headers << I18n.t("#account_reports.report_header_canvas_section_id", "canvas_section_id")
         headers << I18n.t("#account_reports.report_header_section__id", "section_id")
@@ -585,8 +619,14 @@ module AccountReports
     def enrollment_headers(include_other_roots)
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
-        headers = %w[course_id user_id role role_id section_id
-                     status associated_user_id limit_section_privileges]
+        headers = %w[course_id
+                     user_id
+                     role
+                     role_id
+                     section_id
+                     status
+                     associated_user_id
+                     limit_section_privileges]
         headers << "root_account" if include_other_roots
       else
         headers = []
@@ -678,7 +718,8 @@ module AccountReports
                            OR accounts.id = :account_id))
                        OR (groups.context_type = 'Course'
                          AND (courses.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
-                           OR courses.account_id = :account_id))", { account_id: account.id })
+                           OR courses.account_id = :account_id))",
+                      { account_id: account.id })
       end
       groups
     end
@@ -784,7 +825,8 @@ module AccountReports
                            OR accounts.id = :account_id))
                        OR (groups.context_type = 'Course'
                          AND (courses.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
-                           OR courses.account_id = :account_id))", { account_id: account.id })
+                           OR courses.account_id = :account_id))",
+                  { account_id: account.id })
       end
 
       generate_and_run_report headers do |csv|
@@ -931,7 +973,8 @@ module AccountReports
       if account != root_account
         observers = observers
                     .where("EXISTS (SELECT user_id FROM #{UserAccountAssociation.quoted_table_name} uaa
-                WHERE uaa.account_id = ? AND uaa.user_id=pseudonyms.user_id)", account)
+                WHERE uaa.account_id = ? AND uaa.user_id=pseudonyms.user_id)",
+                           account)
       end
       observers
     end
@@ -966,7 +1009,8 @@ module AccountReports
                  INNER JOIN #{User.quoted_table_name} u ON account_users.user_id=u.id
                  INNER JOIN #{Role.quoted_table_name} r ON account_users.role_id=r.id")
                  .where("account_users.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
-                 OR account_users.account_id= :account_id", { account_id: account.id })
+                 OR account_users.account_id= :account_id",
+                        { account_id: account.id })
 
         admins = admin_query_options(admins)
         generate_and_run_report headers do |csv|

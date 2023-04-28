@@ -76,19 +76,21 @@ class Pseudonym < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :unique_id, :workflow_state
 
-  validates :unique_id, format: { with: /\A[[:print:]]+\z/ },
-                        length: { within: 1..MAX_UNIQUE_ID_LENGTH },
-                        uniqueness: {
-                          case_sensitive: false,
-                          scope: %i[account_id workflow_state authentication_provider_id],
-                          if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
-                        }
+  validates :unique_id,
+            format: { with: /\A[[:print:]]+\z/ },
+            length: { within: 1..MAX_UNIQUE_ID_LENGTH },
+            uniqueness: {
+              case_sensitive: false,
+              scope: %i[account_id workflow_state authentication_provider_id],
+              if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
+            }
 
   validates :password,
             confirmation: true,
             if: :require_password?
 
-  validates_each :password, if: :require_password?,
+  validates_each :password,
+                 if: :require_password?,
                  &Canvas::PasswordPolicy.method(:validate)
   validates :password_confirmation,
             presence: true,
@@ -273,7 +275,8 @@ class Pseudonym < ActiveRecord::Base
         existing_pseudo = Pseudonym.active.by_unique_id(unique_id).where(account_id: account_id,
                                                                          authentication_provider_id: authentication_provider_id).where.not(id: self).exists?
         if existing_pseudo
-          errors.add(:unique_id, :taken,
+          errors.add(:unique_id,
+                     :taken,
                      message: t("ID already in use for this account and authentication provider"))
           throw :abort
         end
@@ -286,7 +289,8 @@ class Pseudonym < ActiveRecord::Base
     return true unless sis_user_id
     return true unless Pseudonym.where.not(id: id).where(account_id: account_id, sis_user_id: sis_user_id).exists?
 
-    errors.add(:sis_user_id, :taken,
+    errors.add(:sis_user_id,
+               :taken,
                message: t("#errors.sis_id_in_use", "SIS ID \"%{sis_id}\" is already in use", sis_id: sis_user_id))
     throw :abort
   end
@@ -295,7 +299,8 @@ class Pseudonym < ActiveRecord::Base
     return true unless integration_id
     return true unless Pseudonym.where.not(id: id).where(account_id: account_id, integration_id: integration_id).exists?
 
-    errors.add(:integration_id, :taken,
+    errors.add(:integration_id,
+               :taken,
                message: t("Integration ID \"%{integration_id}\" is already in use", integration_id: integration_id))
     throw :abort
   end

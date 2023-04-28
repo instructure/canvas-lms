@@ -121,16 +121,18 @@ describe EnrollmentTerm do
     end
 
     it "returns the most favorable dates given multiple enrollments" do
-      @term.set_overrides(@account, "StudentEnrollment" => { start_at: "2014-12-01", end_at: "2015-01-31" },
-                                    "ObserverEnrollment" => { start_at: "2014-11-01", end_at: "2014-12-31" })
+      @term.set_overrides(@account,
+                          "StudentEnrollment" => { start_at: "2014-12-01", end_at: "2015-01-31" },
+                          "ObserverEnrollment" => { start_at: "2014-11-01", end_at: "2014-12-31" })
       student_enrollment = student_in_course
       observer_enrollment = @course.enroll_user(student_enrollment.user, "ObserverEnrollment")
       expect(@term.overridden_term_dates([student_enrollment, observer_enrollment])).to eq([Date.parse("2014-11-01"), Date.parse("2015-01-31")])
     end
 
     it "prioritizes nil (unrestricted) dates if present" do
-      @term.set_overrides(@account, "StudentEnrollment" => { start_at: "2014-12-01", end_at: nil },
-                                    "TaEnrollment" => { start_at: nil, end_at: "2014-12-31" })
+      @term.set_overrides(@account,
+                          "StudentEnrollment" => { start_at: "2014-12-01", end_at: nil },
+                          "TaEnrollment" => { start_at: nil, end_at: "2014-12-31" })
       student_enrollment = student_in_course
       ta_enrollment = course_with_ta course: @course, user: student_enrollment.user
       expect(@term.overridden_term_dates([student_enrollment, ta_enrollment])).to eq([nil, nil])
@@ -320,16 +322,27 @@ describe EnrollmentTerm do
       @student = User.create!
       teacher = User.create!
       @first_course_in_term, @first_course_assignment = course_with_graded_assignment(
-        account: root_account, teacher: teacher, student: @student,
-        term: @term, due: @now, grade: 8
+        account: root_account,
+        teacher: teacher,
+        student: @student,
+        term: @term,
+        due: @now,
+        grade: 8
       )
       @second_course_in_term, @second_course_assignment = course_with_graded_assignment(
-        account: root_account, teacher: teacher, student: @student,
-        term: @term, due: @now, grade: 5
+        account: root_account,
+        teacher: teacher,
+        student: @student,
+        term: @term,
+        due: @now,
+        grade: 5
       )
       @course_not_in_term, @not_in_term_assignment = course_with_graded_assignment(
-        account: root_account, teacher: teacher, student: @student,
-        due: @now, grade: 4
+        account: root_account,
+        teacher: teacher,
+        student: @student,
+        due: @now,
+        grade: 4
       )
     end
 

@@ -164,7 +164,8 @@ describe "quizzes question with html answers" do
   end
 
   it "saves open html answers when the question is submitted for multiple answers",
-     custom_timeout: 30, priority: "1" do
+     custom_timeout: 30,
+     priority: "1" do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer "Multiple Answers"

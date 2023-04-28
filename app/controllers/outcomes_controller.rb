@@ -247,7 +247,9 @@ class OutcomesController < ApplicationController
         anchor = "question_#{question_id}"
       end
       redirect_to named_context_url(
-        @result.context, :context_quiz_history_url, @submission.quiz_id,
+        @result.context,
+        :context_quiz_history_url,
+        @submission.quiz_id,
         quiz_submission_id: @submission.id,
         version: @submission_version.version_number,
         anchor: anchor

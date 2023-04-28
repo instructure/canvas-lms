@@ -31,10 +31,14 @@ describe DataFixup::FixPlannerOverridesMarkedCompleteData do
     course_with_student(course: @course)
     student2 = @student
     assignment_model(context: @course)
-    override1 = PlannerOverride.create!(plannable_id: @assignment.id, plannable_type: "Assignment",
-                                        marked_complete: true, user_id: student1.id)
-    override2 = PlannerOverride.create!(plannable_id: @assignment.id, plannable_type: "Assignment",
-                                        marked_complete: false, user_id: student2.id)
+    override1 = PlannerOverride.create!(plannable_id: @assignment.id,
+                                        plannable_type: "Assignment",
+                                        marked_complete: true,
+                                        user_id: student1.id)
+    override2 = PlannerOverride.create!(plannable_id: @assignment.id,
+                                        plannable_type: "Assignment",
+                                        marked_complete: false,
+                                        user_id: student2.id)
     subject.run
     expect(override1.reload.marked_complete).to be false
     expect(override2.reload.marked_complete).to be true

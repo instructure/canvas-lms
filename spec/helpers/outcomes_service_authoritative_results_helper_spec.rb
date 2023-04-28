@@ -300,7 +300,10 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       outcome6, assignments6 = create_from_scores [1.0, 2.0, 3.0, 4.0], 1
 
       from_lor = rollup_user_results LearningOutcomeResult.all.to_a
-      from_ar = rollup_scores(authoritative_results_from_db, @course, [outcome1, outcome2, outcome3, outcome4, outcome5, outcome6], @students,
+      from_ar = rollup_scores(authoritative_results_from_db,
+                              @course,
+                              [outcome1, outcome2, outcome3, outcome4, outcome5, outcome6],
+                              @students,
                               assignments1.concat(assignments2, assignments3, assignments4, assignments5, assignments6))
 
       expect(from_lor.size).to eq 6

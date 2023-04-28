@@ -337,7 +337,9 @@ describe LatePolicyApplicator do
 
         # Build an assignment with two students in an open grading period and one in a closed
         assignment_to_override = @course.assignments.create!(
-          points_possible: 20, due_at: @now - 1.month, submission_types: "online_text_entry",
+          points_possible: 20,
+          due_at: @now - 1.month,
+          submission_types: "online_text_entry",
           workflow_state: "published"
         )
         override = assignment_to_override.assignment_overrides.create(

@@ -218,7 +218,10 @@ module Importers
                                            type: "wiki_page",
                                            id: wiki.id,
                                            indent: hash[:indent].to_i
-                                         }, existing_item, wiki_page: wiki, position: context_module.migration_position)
+                                         },
+                                         existing_item,
+                                         wiki_page: wiki,
+                                         position: context_module.migration_position)
         end
       elsif resource_class == Attachment
         file = context_module.context.attachments.not_deleted.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
@@ -229,7 +232,10 @@ module Importers
                                            type: "attachment",
                                            id: file.id,
                                            indent: hash[:indent].to_i
-                                         }, existing_item, attachment: file, position: context_module.migration_position)
+                                         },
+                                         existing_item,
+                                         attachment: file,
+                                         position: context_module.migration_position)
         end
       elsif resource_class == Assignment
         ass = context_module.context.assignments.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
@@ -239,7 +245,10 @@ module Importers
                                            type: "assignment",
                                            id: ass.id,
                                            indent: hash[:indent].to_i
-                                         }, existing_item, assignment: ass, position: context_module.migration_position)
+                                         },
+                                         existing_item,
+                                         assignment: ass,
+                                         position: context_module.migration_position)
         end
       elsif /folder|heading|contextmodulesubheader/i.match?((hash[:linked_resource_type] || hash[:type]))
         # just a snippet of text
@@ -247,7 +256,9 @@ module Importers
                                          title: hash[:title] || hash[:linked_resource_title],
                                          type: "context_module_sub_header",
                                          indent: hash[:indent].to_i
-                                       }, existing_item, position: context_module.migration_position)
+                                       },
+                                       existing_item,
+                                       position: context_module.migration_position)
       elsif /url/i.match?(hash[:linked_resource_type])
         # external url
         if (url = hash[:url])
@@ -259,7 +270,9 @@ module Importers
                                              type: "external_url",
                                              indent: hash[:indent].to_i,
                                              url: url
-                                           }, existing_item, position: context_module.migration_position)
+                                           },
+                                           existing_item,
+                                           position: context_module.migration_position)
           else
             migration.add_import_warning(t(:migration_module_item_type, "Module Item"), hash[:title], "#{hash[:url]} is not a valid URL")
           end
@@ -298,7 +311,9 @@ module Importers
                                            url: external_tool_url,
                                            id: external_tool_id,
                                            lti_resource_link_lookup_uuid: hash[:lti_resource_link_lookup_uuid]
-                                         }, existing_item, position: context_module.migration_position)
+                                         },
+                                         existing_item,
+                                         position: context_module.migration_position)
           if hash[:link_settings_json]
             item.link_settings = JSON.parse(hash[:link_settings_json])
           end
@@ -320,7 +335,10 @@ module Importers
                                            type: "quiz",
                                            indent: hash[:indent].to_i,
                                            id: quiz.id
-                                         }, existing_item, quiz: quiz, position: context_module.migration_position)
+                                         },
+                                         existing_item,
+                                         quiz: quiz,
+                                         position: context_module.migration_position)
         end
       elsif resource_class == DiscussionTopic
         topic = context_module.context.discussion_topics.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
@@ -332,7 +350,10 @@ module Importers
                                            type: "discussion_topic",
                                            indent: hash[:indent].to_i,
                                            id: topic.id
-                                         }, existing_item, discussion_topic: topic, position: context_module.migration_position)
+                                         },
+                                         existing_item,
+                                         discussion_topic: topic,
+                                         position: context_module.migration_position)
         end
       elsif hash[:linked_resource_type] == "UNSUPPORTED_TYPE"
         # We know what this is and that we don't support it

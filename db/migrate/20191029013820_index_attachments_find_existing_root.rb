@@ -5,8 +5,10 @@ class IndexAttachmentsFindExistingRoot < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_index :attachments, %i[md5 namespace content_type], algorithm: :concurrently,
-                                                            where: "root_attachment_id IS NULL and filename IS NOT NULL"
+    add_index :attachments,
+              %i[md5 namespace content_type],
+              algorithm: :concurrently,
+              where: "root_attachment_id IS NULL and filename IS NOT NULL"
   end
 
   def down

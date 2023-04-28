@@ -279,7 +279,8 @@ module IncomingMailProcessor
       age = age(incoming_message)
       if age
         stat_name = "incoming_mail_processor.message_age.#{mailbox_account.escaped_address}"
-        InstStatsd::Statsd.timing(stat_name, age,
+        InstStatsd::Statsd.timing(stat_name,
+                                  age,
                                   short_stat: "incoming_mail_processor.message_age",
                                   tags: { mailbox: mailbox_account.escaped_address })
       end
@@ -345,7 +346,8 @@ module IncomingMailProcessor
 
       process_single(message, tag, account)
     rescue => e
-      @error_reporter.log_exception(self.class.error_report_category, e,
+      @error_reporter.log_exception(self.class.error_report_category,
+                                    e,
                                     from: message.from.try(:first),
                                     to: message.to.to_s)
     end

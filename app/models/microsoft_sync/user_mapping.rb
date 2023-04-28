@@ -112,8 +112,10 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
     records = user_id_to_aad_hash.map do |user_id, aad_id|
       {
         root_account_id: root_account.id,
-        created_at: now, updated_at: now,
-        user_id: user_id, aad_id: aad_id,
+        created_at: now,
+        updated_at: now,
+        user_id: user_id,
+        aad_id: aad_id,
         needs_updating: false
       }
     end

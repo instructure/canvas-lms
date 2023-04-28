@@ -31,11 +31,13 @@ module MicrosoftSync
 
       CREATE_FOR_EDUCATION_CLASS_SPECIAL_CASES = [
         SpecialCase.new(
-          400, /have one or more owners in order to create a Team/i,
+          400,
+          /have one or more owners in order to create a Team/i,
           result: MicrosoftSync::Errors::GroupHasNoOwners
         ),
         SpecialCase.new(
-          409, /group is already provisioned/i,
+          409,
+          /group is already provisioned/i,
           result: MicrosoftSync::Errors::TeamAlreadyExists
         )
       ].freeze

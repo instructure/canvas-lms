@@ -90,8 +90,10 @@ module CC
         "xsi:schemaLocation" => %w[
           http://www.imsglobal.org/xsd/imslticc_v1p3.xsd
           http://www.imsglobal.org/xsd/imslticp_v1p0
-          imslticp_v1p0.xsd http://www.imsglobal.org/xsd/imslticm_v1p0
-          imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0
+          imslticp_v1p0.xsd
+          http://www.imsglobal.org/xsd/imslticm_v1p0
+          imslticm_v1p0.xsd
+          http://www.imsglobal.org/xsd/imsbasiclti_v1p0
           imsbasiclti_v1p0p1.xsd
         ].join(" ")
       ) do |cartridge_basiclti_link|

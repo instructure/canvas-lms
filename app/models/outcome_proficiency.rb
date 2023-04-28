@@ -27,8 +27,11 @@ class OutcomeProficiency < ApplicationRecord
     true
   end
 
-  has_many :outcome_proficiency_ratings, -> { order "points DESC, id ASC" },
-           dependent: :destroy, inverse_of: :outcome_proficiency, autosave: true
+  has_many :outcome_proficiency_ratings,
+           -> { order "points DESC, id ASC" },
+           dependent: :destroy,
+           inverse_of: :outcome_proficiency,
+           autosave: true
   belongs_to :context, polymorphic: %i[account course], required: true
 
   validates :outcome_proficiency_ratings, presence: { message: t("Missing required ratings") }, unless: :deleted?

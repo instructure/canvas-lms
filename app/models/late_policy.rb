@@ -26,7 +26,9 @@ class LatePolicy < ActiveRecord::Base
   validates :course_id,
             presence: true,
             uniqueness: true
-  validates :late_submission_minimum_percent, :missing_submission_deduction, :late_submission_deduction,
+  validates :late_submission_minimum_percent,
+            :missing_submission_deduction,
+            :late_submission_deduction,
             presence: true,
             numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   validates :late_submission_interval,

@@ -106,11 +106,14 @@ class Submission < ActiveRecord::Base
   has_many :attachment_associations, as: :context, inverse_of: :context
   has_many :provisional_grades, class_name: "ModeratedGrading::ProvisionalGrade"
   has_many :originality_reports
-  has_one :rubric_assessment, lambda {
-    joins(:rubric_association)
-      .where(assessment_type: "grading")
-      .where(rubric_associations: { workflow_state: "active" })
-  }, as: :artifact, inverse_of: :artifact
+  has_one :rubric_assessment,
+          lambda {
+            joins(:rubric_association)
+              .where(assessment_type: "grading")
+              .where(rubric_associations: { workflow_state: "active" })
+          },
+          as: :artifact,
+          inverse_of: :artifact
   has_one :lti_result, inverse_of: :submission, class_name: "Lti::Result", dependent: :destroy
   has_many :submission_drafts, inverse_of: :submission, dependent: :destroy
 
@@ -865,7 +868,8 @@ class Submission < ActiveRecord::Base
       WHEN workflow_state = 'scored' THEN 0
       WHEN workflow_state = 'error' THEN 1
       WHEN workflow_state = 'pending' THEN 2
-      END"), updated_at: :desc).first
+      END"),
+                                                                 updated_at: :desc).first
     report&.report_launch_path
   end
 
@@ -2254,9 +2258,18 @@ class Submission < ActiveRecord::Base
     else
       touch
     end
-    valid_keys = %i[comment author media_comment_id media_comment_type
-                    group_comment_id assessment_request attachments
-                    anonymous hidden provisional_grade_id draft attempt]
+    valid_keys = %i[comment
+                    author
+                    media_comment_id
+                    media_comment_type
+                    group_comment_id
+                    assessment_request
+                    attachments
+                    anonymous
+                    hidden
+                    provisional_grade_id
+                    draft
+                    attempt]
     if opts[:comment].present? || opts[:media_comment_id]
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end
@@ -2880,10 +2893,12 @@ class Submission < ActiveRecord::Base
             submission = preloaded_submissions[user_id.to_i].first if preloaded_submissions[user_id.to_i]
             if !submission || user_data.key?(:posted_grade) || user_data.key?(:excuse)
               submissions =
-                assignment.grade_student(user, grader: grader,
-                                               grade: user_data[:posted_grade],
-                                               excuse: Canvas::Plugin.value_to_boolean(user_data[:excuse]),
-                                               skip_grade_calc: true, return_if_score_unchanged: true)
+                assignment.grade_student(user,
+                                         grader: grader,
+                                         grade: user_data[:posted_grade],
+                                         excuse: Canvas::Plugin.value_to_boolean(user_data[:excuse]),
+                                         skip_grade_calc: true,
+                                         return_if_score_unchanged: true)
               submissions.each { |s| graded_user_ids << s.user_id unless s.score_unchanged }
               submission = submissions.first
             end
@@ -2897,7 +2912,9 @@ class Submission < ActiveRecord::Base
                 "criterion_#{crit_name}"
               end
               assignment.rubric_association.assess(
-                assessor: grader, user: user, artifact: submission,
+                assessor: grader,
+                user: user,
+                artifact: submission,
                 assessment: assessment.merge(assessment_type: "grading")
               )
             end

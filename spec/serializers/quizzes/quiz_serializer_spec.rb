@@ -56,13 +56,29 @@ describe Quizzes::QuizSerializer do
   end
 
   %i[
-    title quiz_type hide_results time_limit
-    shuffle_answers show_correct_answers scoring_policy
-    allowed_attempts one_question_at_a_time question_count
-    points_possible cant_go_back access_code ip_filter due_at
-    lock_at unlock_at published show_correct_answers_at
-    hide_correct_answers_at show_correct_answers_last_attempt
-    has_access_code migration_id
+    title
+    quiz_type
+    hide_results
+    time_limit
+    shuffle_answers
+    show_correct_answers
+    scoring_policy
+    allowed_attempts
+    one_question_at_a_time
+    question_count
+    points_possible
+    cant_go_back
+    access_code
+    ip_filter
+    due_at
+    lock_at
+    unlock_at
+    published
+    show_correct_answers_at
+    hide_correct_answers_at
+    show_correct_answers_last_attempt
+    has_access_code
+    migration_id
   ].each do |attribute|
     it "serializes #{attribute}" do
       expect(json[attribute]).to eq quiz.send(attribute)
@@ -307,7 +323,8 @@ describe Quizzes::QuizSerializer do
           @quiz.assignment_group = assignment_group = AssignmentGroup.new
           assignment_group.id = 1
           expect(serializer.as_json[:quiz]["links"]["assignment_group"]).to eq(
-            controller.send(:api_v1_course_assignment_group_url, course.id,
+            controller.send(:api_v1_course_assignment_group_url,
+                            course.id,
                             assignment_group.id)
           )
         end
@@ -561,12 +578,13 @@ describe Quizzes::QuizSerializer do
       lock_at: nil,
       unlock_at: nil,
       base: true
-    }, {
-      due_at: 30.minutes.from_now,
-      lock_at: 1.hour.from_now,
-      unlock_at: 10.minutes.from_now,
-      title: "Some Section"
-    }]
+    },
+                         {
+                           due_at: 30.minutes.from_now,
+                           lock_at: 1.hour.from_now,
+                           unlock_at: 10.minutes.from_now,
+                           title: "Some Section"
+                         }]
 
     expect(quiz).to receive(:due_at).at_least(:once)
     allow(serializer).to receive(:all_dates).and_return teacher_overrides

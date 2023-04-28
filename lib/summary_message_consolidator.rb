@@ -39,7 +39,10 @@ class SummaryMessageConsolidator
       ids_to_update = batches.flatten
       update_sql = DelayedMessage.send(:sanitize_sql_array, ["UPDATE #{DelayedMessage.quoted_table_name}
                     SET workflow_state='sent', updated_at=?, batched_at=?
-                    WHERE workflow_state='pending' AND id IN (?) RETURNING id", Time.now.utc, Time.now.utc, ids_to_update])
+                    WHERE workflow_state='pending' AND id IN (?) RETURNING id",
+                                                             Time.now.utc,
+                                                             Time.now.utc,
+                                                             ids_to_update])
       updated_ids = Shard.current.database_server.unguard do
         DelayedMessage.connection.with_max_update_limit(ids_to_update.size) do
           DelayedMessage.connection.select_values(update_sql)
