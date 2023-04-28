@@ -94,7 +94,9 @@ namespace :db do
         # picky. the admin should know what they're doing, and we'd rather not
         # fail here.
         pseudonym = user.pseudonyms.create!(unique_id: email,
-                                            password: "validpassword", password_confirmation: "validpassword", account: Account.site_admin)
+                                            password: "validpassword",
+                                            password_confirmation: "validpassword",
+                                            account: Account.site_admin)
         user.communication_channels.create!(path: email) { |cc| cc.workflow_state = "active" }
       end
       # set the password later.
@@ -183,7 +185,8 @@ namespace :db do
   end
 
   desc "generate data"
-  task generate_data: %i[configure_default_settings load_notifications
+  task generate_data: %i[configure_default_settings
+                         load_notifications
                          evaluate_notification_templates]
 
   desc "Configure Default Account Name"

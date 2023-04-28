@@ -235,7 +235,8 @@ describe TextHelper do
       end
 
       it "allows wrapper with markdown" do
-        expect(th.mt(:foo, %(Dolore jerky bacon officia t-bone aute magna. Officia corned beef et ut bacon.
+        expect(th.mt(:foo,
+                     %(Dolore jerky bacon officia t-bone aute magna. Officia corned beef et ut bacon.
 
 Commodo in ham, *short ribs %{name} pastrami* sausage elit sunt dolore eiusmod ut ea proident ribeye.
 

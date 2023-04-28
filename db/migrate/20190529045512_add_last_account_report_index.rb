@@ -22,7 +22,8 @@ class AddLastAccountReportIndex < ActiveRecord::Migration[5.1]
   disable_ddl_transaction!
 
   def change
-    add_index :account_reports, %i[account_id report_type created_at],
+    add_index :account_reports,
+              %i[account_id report_type created_at],
               order: { created_at: :desc },
               algorithm: :concurrently,
               name: "index_account_reports_latest_of_type_per_account"

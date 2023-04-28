@@ -565,9 +565,10 @@ class CalendarEventsApiController < ApplicationController
         if dup_options[:count] > RECURRING_EVENT_LIMIT
           InstStatsd::Statsd.gauge("calendar_events_api.recurring.count_exceeding_limit", dup_options[:count])
           return render json: {
-            message: t("only a maximum of %{limit} events can be created",
-                       limit: RECURRING_EVENT_LIMIT)
-          }, status: :bad_request
+                          message: t("only a maximum of %{limit} events can be created",
+                                     limit: RECURRING_EVENT_LIMIT)
+                        },
+                        status: :bad_request
         elsif dup_options[:count] > 0
           InstStatsd::Statsd.gauge("calendar_events_api.recurring.count", dup_options[:count])
           events += create_event_and_duplicates(dup_options)
@@ -593,8 +594,10 @@ class CalendarEventsApiController < ApplicationController
           render json: event_json(
             original_event,
             @current_user,
-            session, { duplicates: events, include: includes(["web_conference", "series_natural_language"]) }
-          ), status: :created
+            session,
+            { duplicates: events, include: includes(["web_conference", "series_natural_language"]) }
+          ),
+                 status: :created
         end
       end
     end
@@ -645,7 +648,8 @@ class CalendarEventsApiController < ApplicationController
         end
         raise CalendarEvent::ReservationError, "invalid participant" unless participant
 
-        reservation = @event.reserve_for(participant, @current_user,
+        reservation = @event.reserve_for(participant,
+                                         @current_user,
                                          cancel_existing: value_to_boolean(params[:cancel_existing]),
                                          comments: params["comments"])
         render json: event_json(reservation, @current_user, session)
@@ -1105,8 +1109,10 @@ class CalendarEventsApiController < ApplicationController
 
           appointment_user = event_context.users.find { |user| user.id == appointment.user_id }
           unless appointment_user.nil?
-            appointments.push({ user: appointment_user.name, comments: appointment.comments,
-                                parent_id: appointment.parent_calendar_event_id, course_name: event_context.name })
+            appointments.push({ user: appointment_user.name,
+                                comments: appointment.comments,
+                                parent_id: appointment.parent_calendar_event_id,
+                                course_name: event_context.name })
           end
         end
         @events.concat appointment_groups
@@ -1845,8 +1851,9 @@ class CalendarEventsApiController < ApplicationController
       )
     rescue => e
       render json: {
-        message: t("Failed parsing the event's recurrence rule: %{e}", e: e)
-      }, status: :bad_request
+               message: t("Failed parsing the event's recurrence rule: %{e}", e: e)
+             },
+             status: :bad_request
       return nil
     end
     # If RRULE generates a lot of events, rr.count can take a very long time to compute.
@@ -1854,9 +1861,10 @@ class CalendarEventsApiController < ApplicationController
     if rr.all(limit: RECURRING_EVENT_LIMIT + 1).length > RECURRING_EVENT_LIMIT
       InstStatsd::Statsd.gauge("calendar_events_api.recurring.count_exceeding_limit", rr.count)
       render json: {
-        message: t("A maximum of %{limit} events may be created",
-                   limit: RECURRING_EVENT_LIMIT)
-      }, status: :bad_request
+               message: t("A maximum of %{limit} events may be created",
+                          limit: RECURRING_EVENT_LIMIT)
+             },
+             status: :bad_request
       return nil
     end
     rr

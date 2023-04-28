@@ -22,8 +22,11 @@ class ChangeLookupUuidIndexAtLtiResourceLinks < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def change
-    add_index :lti_resource_links, %i[lookup_uuid context_id context_type],
-              algorithm: :concurrently, if_not_exists: true, unique: true,
+    add_index :lti_resource_links,
+              %i[lookup_uuid context_id context_type],
+              algorithm: :concurrently,
+              if_not_exists: true,
+              unique: true,
               name: "index_lti_resource_links_unique_lookup_uuid_on_context"
 
     remove_index :lti_resource_links, column: :lookup_uuid, if_exists: true

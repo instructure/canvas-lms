@@ -67,8 +67,11 @@ describe SearchController do
       end
 
       get "recipients", params: {
-        search: "b", type: "user", skip_visibility_checks: true,
-        synthetic_contexts: true, context: "course_#{@course.id}_students"
+        search: "b",
+        type: "user",
+        skip_visibility_checks: true,
+        synthetic_contexts: true,
+        context: "course_#{@course.id}_students"
       }
       expect(response).to be_successful
       expect(response.body).to include("bob")
@@ -112,8 +115,10 @@ describe SearchController do
         expect(response).to be_successful
 
         get "recipients", params: {
-          type: "section", skip_visibility_checks: true,
-          synthetic_contexts: true, context: "course_#{@course.id}_sections"
+          type: "section",
+          skip_visibility_checks: true,
+          synthetic_contexts: true,
+          context: "course_#{@course.id}_sections"
         }
         expect(response.body).to match(/\[\]\z/)
       end
@@ -124,8 +129,10 @@ describe SearchController do
         course_factory(active_all: true).course_sections.create(name: "other section")
 
         get "recipients", params: {
-          type: "section", skip_visibility_checks: true,
-          synthetic_contexts: true, context: "course_#{@course.id}_sections"
+          type: "section",
+          skip_visibility_checks: true,
+          synthetic_contexts: true,
+          context: "course_#{@course.id}_sections"
         }
         expect(response).to be_successful
         expect(response.body).to include("other section")
@@ -143,8 +150,10 @@ describe SearchController do
         @section2.enroll_user(@student2, "StudentEnrollment", "active")
 
         get "recipients", params: {
-          type: "section", exclude: ["section_#{@section2.id}"],
-          synthetic_contexts: true, context: "course_#{@course.id}_sections",
+          type: "section",
+          exclude: ["section_#{@section2.id}"],
+          synthetic_contexts: true,
+          context: "course_#{@course.id}_sections",
           search_all_contexts: true
         }
         expect(response.body).to include("Section1")
@@ -159,8 +168,10 @@ describe SearchController do
         course_with_student(active_all: true)
 
         get "recipients", params: {
-          type: "user", skip_visibility_checks: true,
-          synthetic_contexts: true, context: "course_#{@course.id}_all"
+          type: "user",
+          skip_visibility_checks: true,
+          synthetic_contexts: true,
+          context: "course_#{@course.id}_all"
         }
         expect(response.body).to include(@teacher.name)
         expect(response.body).to include(@student.name)
@@ -227,8 +238,10 @@ describe SearchController do
 
         it "returns concluded teachers" do
           get "recipients", params: {
-            search: "m", type: "user",
-            synthetic_contexts: true, context: "course_#{@course.id}_teachers"
+            search: "m",
+            type: "user",
+            synthetic_contexts: true,
+            context: "course_#{@course.id}_teachers"
           }
           expect(response).to be_successful
           expect(response.body).to include("Mr. Teacher")
@@ -237,8 +250,10 @@ describe SearchController do
 
         it "does not return concluded students" do
           get "recipients", params: {
-            search: "b", type: "user",
-            synthetic_contexts: true, context: "course_#{@course.id}_students"
+            search: "b",
+            type: "user",
+            synthetic_contexts: true,
+            context: "course_#{@course.id}_students"
           }
           expect(response).to be_successful
           expect(response.body).to include("bob")
@@ -253,8 +268,10 @@ describe SearchController do
 
         it "does not return concluded teachers" do
           get "recipients", params: {
-            search: "m", type: "user",
-            synthetic_contexts: true, context: "course_#{@course.id}_teachers"
+            search: "m",
+            type: "user",
+            synthetic_contexts: true,
+            context: "course_#{@course.id}_teachers"
           }
           expect(response).to be_successful
           expect(response.body).to include("Mr. Teacher")
@@ -263,8 +280,10 @@ describe SearchController do
 
         it "does not return concluded students" do
           get "recipients", params: {
-            search: "b", type: "user",
-            synthetic_contexts: true, context: "course_#{@course.id}_students"
+            search: "b",
+            type: "user",
+            synthetic_contexts: true,
+            context: "course_#{@course.id}_students"
           }
           expect(response).to be_successful
           expect(response.body).to include("bob")

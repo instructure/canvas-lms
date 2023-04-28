@@ -32,7 +32,8 @@ class MasterCourses::FolderHelper
       Rails.cache.fetch(cache_key(child_course)) do
         folder_id_restriction_pairs = child_course.attachments.not_deleted
                                                   .where("#{Attachment.table_name}.migration_id IS NOT NULL AND
-            #{Attachment.table_name}.migration_id LIKE ?", "#{MasterCourses::MIGRATION_ID_PREFIX}%")
+            #{Attachment.table_name}.migration_id LIKE ?",
+                                                         "#{MasterCourses::MIGRATION_ID_PREFIX}%")
                                                   .joins("INNER JOIN #{MasterCourses::MasterContentTag.quoted_table_name} ON
             #{Attachment.table_name}.migration_id=#{MasterCourses::MasterContentTag.table_name}.migration_id")
                                                   .distinct.pluck(:folder_id, :restrictions)

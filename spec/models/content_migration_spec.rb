@@ -282,8 +282,11 @@ describe ContentMigration do
 
   context "copying only some content" do
     let(:content_migration) do
-      ContentMigration.create(context: destination_course, user: user_model, source_course: course,
-                              migration_type: "course_copy_importer", copy_options: copy_options,
+      ContentMigration.create(context: destination_course,
+                              user: user_model,
+                              source_course: course,
+                              migration_type: "course_copy_importer",
+                              copy_options: copy_options,
                               migration_settings: {
                                 import_immediately: true,
                                 migration_ids_to_import: {
@@ -322,7 +325,8 @@ describe ContentMigration do
         # have to make everything *exactly* the same, very explicitly >:(
         tool = external_tool_1_3_model(context: course,
                                        opts: {
-                                         settings: { vendor_extensions: [], custom_fields: {},
+                                         settings: { vendor_extensions: [],
+                                                     custom_fields: {},
                                                      client_id: dev_key.global_id.to_s },
                                          developer_key: dev_key,
                                          name: "first tool"

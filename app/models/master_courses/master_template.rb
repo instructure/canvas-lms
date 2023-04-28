@@ -335,7 +335,8 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
           data = root_account.all_courses.where(sis_source_id: associated_sis_ids).not_master_courses
                              .joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'")
                              .joins(sanitize_sql(["LEFT OUTER JOIN #{CourseAccountAssociation.quoted_table_name} AS caa ON
-              caa.course_id=courses.id AND caa.account_id = ?", template.account_id]))
+              caa.course_id=courses.id AND caa.account_id = ?",
+                                                  template.account_id]))
                              .pluck(:id, :sis_source_id, "mcs.master_template_id", "caa.id")
 
           if data.count != associated_sis_ids

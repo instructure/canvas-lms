@@ -334,7 +334,8 @@ class EnrollmentState < ActiveRecord::Base
   # called every ~5 minutes by a periodic delayed job
   def self.recalculate_expired_states
     while (enrollments = Enrollment.joins(:enrollment_state).where("enrollment_states.state_valid_until IS NOT NULL AND
-           enrollment_states.state_valid_until < ?", Time.now.utc).limit(250).to_a) && enrollments.any?
+           enrollment_states.state_valid_until < ?",
+                                                                   Time.now.utc).limit(250).to_a) && enrollments.any?
       process_states_for(enrollments)
     end
   end

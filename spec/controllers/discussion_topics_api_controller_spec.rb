@@ -71,8 +71,14 @@ describe DiscussionTopicsApiController do
       Setting.set("user_default_quota", -1)
       expect(@student.attachments.count).to eq 0
 
-      post "add_entry", params: { topic_id: @topic.id, course_id: @course.id, user_id: @user.id, message: "message",
-                                  read_state: "read", attachment: default_uploaded_data }, format: "json"
+      post "add_entry",
+           params: { topic_id: @topic.id,
+                     course_id: @course.id,
+                     user_id: @user.id,
+                     message: "message",
+                     read_state: "read",
+                     attachment: default_uploaded_data },
+           format: "json"
 
       expect(response).to be_successful
       expect(@student.attachments.count).to eq 1
@@ -83,16 +89,28 @@ describe DiscussionTopicsApiController do
     it "fails if attachment a file over student quota (not course)" do
       Setting.set("user_default_quota", -1)
 
-      post "add_entry", params: { topic_id: @topic.id, course_id: @course.id, user_id: @user.id, message: "message",
-                                  read_state: "read", attachment: default_uploaded_data }, format: "json"
+      post "add_entry",
+           params: { topic_id: @topic.id,
+                     course_id: @course.id,
+                     user_id: @user.id,
+                     message: "message",
+                     read_state: "read",
+                     attachment: default_uploaded_data },
+           format: "json"
 
       expect(response).to_not be_successful
       expect(response.body).to include("User storage quota exceeded")
     end
 
     it "succeeds otherwise" do
-      post "add_entry", params: { topic_id: @topic.id, course_id: @course.id, user_id: @user.id, message: "message",
-                                  read_state: "read", attachment: default_uploaded_data }, format: "json"
+      post "add_entry",
+           params: { topic_id: @topic.id,
+                     course_id: @course.id,
+                     user_id: @user.id,
+                     message: "message",
+                     read_state: "read",
+                     attachment: default_uploaded_data },
+           format: "json"
 
       expect(response).to be_successful
     end
@@ -101,8 +119,14 @@ describe DiscussionTopicsApiController do
       allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
       allow(InstFS).to receive(:direct_upload).and_return(uuid)
-      post "add_entry", params: { topic_id: @topic.id, course_id: @course.id, user_id: @user.id, message: "message",
-                                  read_state: "read", attachment: default_uploaded_data }, format: "json"
+      post "add_entry",
+           params: { topic_id: @topic.id,
+                     course_id: @course.id,
+                     user_id: @user.id,
+                     message: "message",
+                     read_state: "read",
+                     attachment: default_uploaded_data },
+           format: "json"
       expect(@student.attachments.first.instfs_uuid).to eq(uuid)
     end
   end

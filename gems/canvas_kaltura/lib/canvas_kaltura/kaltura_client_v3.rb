@@ -180,7 +180,8 @@ module CanvasKaltura
     def startSession(type = SessionType::USER, userId = nil)
       partnerId = @partnerId
       secret = (type == SessionType::USER) ? @user_secret : @secret
-      result = getRequest(:session, :start,
+      result = getRequest(:session,
+                          :start,
                           secret: secret,
                           partnerId: partnerId,
                           userId: userId,
@@ -189,7 +190,8 @@ module CanvasKaltura
     end
 
     def mediaGet(entryId)
-      result = getRequest(:media, :get,
+      result = getRequest(:media,
+                          :get,
                           ks: @ks,
                           entryId: entryId)
       return nil unless result
@@ -239,7 +241,8 @@ module CanvasKaltura
     end
 
     def bulkUploadGet(id)
-      result = getRequest(:bulkUpload, :get,
+      result = getRequest(:bulkUpload,
+                          :get,
                           ks: @ks,
                           id: id)
       return nil unless result
@@ -267,7 +270,8 @@ module CanvasKaltura
     end
 
     def bulkUploadCsv(csv)
-      result = postRequest(:bulkUpload, :add,
+      result = postRequest(:bulkUpload,
+                           :add,
                            ks: @ks,
                            conversionProfileId: -1,
                            csvFileData: KalturaStringIO.new(csv, "bulk_data.csv"))
@@ -298,7 +302,8 @@ module CanvasKaltura
     end
 
     def flavorAssetGetByEntryId(entryId)
-      result = getRequest(:flavorAsset, :getByEntryId,
+      result = getRequest(:flavorAsset,
+                          :getByEntryId,
                           ks: @ks,
                           entryId: entryId)
       return nil unless result
@@ -322,7 +327,8 @@ module CanvasKaltura
     end
 
     def flavorAssetGetDownloadUrl(assetId)
-      result = getRequest(:flavorAsset, :getDownloadUrl,
+      result = getRequest(:flavorAsset,
+                          :getDownloadUrl,
                           ks: @ks,
                           id: assetId)
       return result.content if result

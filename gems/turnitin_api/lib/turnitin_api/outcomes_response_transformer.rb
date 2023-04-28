@@ -106,8 +106,12 @@ module TurnitinApi
         "resource_link_id" => SecureRandom.hex(32),
       }
       params = default_params.merge(lti_params)
-      header = SimpleOAuth::Header.new(:post, url, params, consumer_key: @key, consumer_secret: @secret,
-                                                           callback: "about:blank")
+      header = SimpleOAuth::Header.new(:post,
+                                       url,
+                                       params,
+                                       consumer_key: @key,
+                                       consumer_secret: @secret,
+                                       callback: "about:blank")
       connection.post url, params.merge(header.signed_attributes)
     end
   end

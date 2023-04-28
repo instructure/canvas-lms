@@ -21,12 +21,13 @@
 describe Loaders::CourseOutcomeAlignmentStatsLoader do
   def mock_os_aligned_outcomes(outcomes, associated_asset_id)
     (outcomes || []).to_h do |o|
-      [o.id.to_s, [{
-        artifact_type: "quizzes.quiz",
-        artifact_id: "1",
-        associated_asset_type: "canvas.assignment.quizzes",
-        associated_asset_id: associated_asset_id.to_s
-      }]]
+      [o.id.to_s,
+       [{
+         artifact_type: "quizzes.quiz",
+         artifact_id: "1",
+         associated_asset_type: "canvas.assignment.quizzes",
+         associated_asset_id: associated_asset_id.to_s
+       }]]
     end
   end
 

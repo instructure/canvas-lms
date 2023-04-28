@@ -28,7 +28,9 @@ describe "appointment_deleted_for_user.twitter" do
     appointment_participant_model(participant: user)
     @event.cancel_reason = "just because"
 
-    generate_message(:appointment_deleted_for_user, :twitter, @event,
+    generate_message(:appointment_deleted_for_user,
+                     :twitter,
+                     @event,
                      data: { updating_user_name: @teacher.name,
                              cancel_reason: "just because" })
 
@@ -44,7 +46,9 @@ describe "appointment_deleted_for_user.twitter" do
     appointment_participant_model(participant: @group, course: @course)
     @event.cancel_reason = "just because"
 
-    generate_message(:appointment_deleted_for_user, :twitter, @event,
+    generate_message(:appointment_deleted_for_user,
+                     :twitter,
+                     @event,
                      data: { updating_user_name: @teacher.name,
                              cancel_reason: "just because" })
 

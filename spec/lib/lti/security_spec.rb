@@ -71,8 +71,11 @@ describe Lti::Security do
           expect(line).to match(/abc%250D%250Axyz/i)
         end
         Lti::Security.signed_post_params(
-          params.merge(custom_b: "abc\nxyz"), "http://example.com/",
-          consumer_key, consumer_secret, true
+          params.merge(custom_b: "abc\nxyz"),
+          "http://example.com/",
+          consumer_key,
+          consumer_secret,
+          true
         )
       end
     end
@@ -238,8 +241,10 @@ describe Lti::Security do
         expect(line).to match(/abc%250D%250Axyz/i)
       end
       Lti::Security.signed_post_params(
-        params.merge(custom_b: "abc\nxyz"), "http://example.com/",
-        consumer_key, consumer_secret
+        params.merge(custom_b: "abc\nxyz"),
+        "http://example.com/",
+        consumer_key,
+        consumer_secret
       )
     end
   end

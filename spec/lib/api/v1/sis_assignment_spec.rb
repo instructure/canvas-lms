@@ -90,7 +90,8 @@ describe Api::V1::SisAssignment do
       integration_data = { "something" => "else", "foo" => { "bar" => "baz" } }
       assignment_group = AssignmentGroup.new(name: ag_name,
                                              sis_source_id: sis_source_id,
-                                             integration_data: integration_data, group_weight: 8.7)
+                                             integration_data: integration_data,
+                                             group_weight: 8.7)
       allow(assignment_1).to receive(:assignment_group).and_return(assignment_group)
       result = subject.sis_assignments_json([assignment_1])
       expect(result[0]["assignment_group"]["name"]).to eq(ag_name)
@@ -104,7 +105,8 @@ describe Api::V1::SisAssignment do
       sis_source_id = "some super cool id"
       assignment_group = AssignmentGroup.new(name: ag_name,
                                              sis_source_id: sis_source_id,
-                                             integration_data: nil, group_weight: 8.7)
+                                             integration_data: nil,
+                                             group_weight: 8.7)
       allow(assignment_1).to receive(:assignment_group).and_return(assignment_group)
       result = subject.sis_assignments_json([assignment_1])
       expect(result[0]["assignment_group"]["name"]).to eq(ag_name)

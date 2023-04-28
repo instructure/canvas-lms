@@ -302,9 +302,17 @@ class ContextController < ApplicationController
     end
   end
 
-  WORKFLOW_TYPES = %i[all_discussion_topics assignment_groups assignments
-                      collaborations context_modules enrollments groups
-                      quizzes rubrics wiki_pages rubric_associations_with_deleted].freeze
+  WORKFLOW_TYPES = %i[all_discussion_topics
+                      assignment_groups
+                      assignments
+                      collaborations
+                      context_modules
+                      enrollments
+                      groups
+                      quizzes
+                      rubrics
+                      wiki_pages
+                      rubric_associations_with_deleted].freeze
   ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
   def undelete_index
     if authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])

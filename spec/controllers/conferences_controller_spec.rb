@@ -614,14 +614,16 @@ describe ConferencesController do
     context "#create" do
       it "can create LTI conferences" do
         user_session(@teacher)
-        post "create", params: {
-          course_id: @course.id,
-          web_conference: {
-            title: "My Conference",
-            conference_type: "LtiConference",
-            lti_settings: { tool_id: tool.id }
-          }
-        }, format: "json"
+        post "create",
+             params: {
+               course_id: @course.id,
+               web_conference: {
+                 title: "My Conference",
+                 conference_type: "LtiConference",
+                 lti_settings: { tool_id: tool.id }
+               }
+             },
+             format: "json"
         expect(response).to be_successful
       end
     end

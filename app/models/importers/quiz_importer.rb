@@ -84,8 +84,13 @@ module Importers
     end
 
     QUIZ_QUESTION_KEYS = ["position", "points_possible"].freeze
-    IGNORABLE_QUESTION_KEYS = QUIZ_QUESTION_KEYS + %w[answers assessment_question_migration_id migration_id question_bank_migration_id
-                                                      question_bank_id is_quiz_question_bank question_bank_name]
+    IGNORABLE_QUESTION_KEYS = QUIZ_QUESTION_KEYS + %w[answers
+                                                      assessment_question_migration_id
+                                                      migration_id
+                                                      question_bank_migration_id
+                                                      question_bank_id
+                                                      is_quiz_question_bank
+                                                      question_bank_name]
 
     def self.check_question_equality(question1, question2)
       stripped_q1 = question1.except(*IGNORABLE_QUESTION_KEYS)
@@ -359,14 +364,24 @@ module Importers
         case question[:question_type]
         when "question_reference"
           if (aq = question_data[:aq_data][question[:migration_id]] || question_data[:aq_data][question[:assessment_question_migration_id]])
-            Importers::QuizQuestionImporter.import_from_migration(aq, question, i + 1,
-                                                                  question_data[:qq_ids][item.migration_id], context, migration, item)
+            Importers::QuizQuestionImporter.import_from_migration(aq,
+                                                                  question,
+                                                                  i + 1,
+                                                                  question_data[:qq_ids][item.migration_id],
+                                                                  context,
+                                                                  migration,
+                                                                  item)
           end
         when "question_group"
           Importers::QuizGroupImporter.import_from_migration(question, context, item, question_data, i + 1, migration)
         when "text_only_question"
-          Importers::QuizQuestionImporter.import_from_migration(question, question, i + 1,
-                                                                question_data[:qq_ids][item.migration_id], context, migration, item)
+          Importers::QuizQuestionImporter.import_from_migration(question,
+                                                                question,
+                                                                i + 1,
+                                                                question_data[:qq_ids][item.migration_id],
+                                                                context,
+                                                                migration,
+                                                                item)
         end
       end
       item.reload # reload to catch question additions

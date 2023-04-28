@@ -548,22 +548,24 @@ describe UsersController do
           @domain_root_account = @course.account
           pairing_code = @student.generate_observer_pairing_code
 
-          post "create", params: {
-            pseudonym: {
-              unique_id: "jon@example.com",
-              password: "password",
-              password_confirmation: "password"
-            },
-            user: {
-              name: "Jon",
-              terms_of_use: "1",
-              initial_enrollment_type: "observer",
-              skip_registration: "1"
-            },
-            pairing_code: {
-              code: pairing_code.code
-            }
-          }, format: "json"
+          post "create",
+               params: {
+                 pseudonym: {
+                   unique_id: "jon@example.com",
+                   password: "password",
+                   password_confirmation: "password"
+                 },
+                 user: {
+                   name: "Jon",
+                   terms_of_use: "1",
+                   initial_enrollment_type: "observer",
+                   skip_registration: "1"
+                 },
+                 pairing_code: {
+                   code: pairing_code.code
+                 }
+               },
+               format: "json"
 
           expect(response).to be_successful
           new_pseudo = Pseudonym.where(unique_id: "jon@example.com").first
@@ -580,25 +582,27 @@ describe UsersController do
           @domain_root_account = @course.account
           pairing_code = @student.generate_observer_pairing_code
 
-          post "create", params: {
-            pseudonym: {
-              unique_id: "jon@example.com",
-              password: "password",
-              password_confirmation: "password"
-            },
-            user: {
-              name: "Jon",
-              terms_of_use: "1",
-              initial_enrollment_type: "observer",
-              skip_registration: "1"
-            },
-            communication_channel: {
-              skip_confirmation: true
-            },
-            pairing_code: {
-              code: pairing_code.code
-            }
-          }, format: "json"
+          post "create",
+               params: {
+                 pseudonym: {
+                   unique_id: "jon@example.com",
+                   password: "password",
+                   password_confirmation: "password"
+                 },
+                 user: {
+                   name: "Jon",
+                   terms_of_use: "1",
+                   initial_enrollment_type: "observer",
+                   skip_registration: "1"
+                 },
+                 communication_channel: {
+                   skip_confirmation: true
+                 },
+                 pairing_code: {
+                   code: pairing_code.code
+                 }
+               },
+               format: "json"
 
           expect(response).to be_successful
           new_pseudo = Pseudonym.where(unique_id: "jon@example.com").first
@@ -620,22 +624,25 @@ describe UsersController do
           @domain_root_account = @course.account
           pairing_code = @student.generate_observer_pairing_code
 
-          post "create", params: {
-            pseudonym: {
-              unique_id: "jon@example.com",
-              password: "password",
-              password_confirmation: "password"
-            },
-            user: {
-              name: "Jon",
-              terms_of_use: "1",
-              initial_enrollment_type: "observer",
-              skip_registration: "1"
-            },
-            pairing_code: {
-              code: pairing_code.code
-            }
-          }, format: "json", session: { oauth2: provider.session_hash }
+          post "create",
+               params: {
+                 pseudonym: {
+                   unique_id: "jon@example.com",
+                   password: "password",
+                   password_confirmation: "password"
+                 },
+                 user: {
+                   name: "Jon",
+                   terms_of_use: "1",
+                   initial_enrollment_type: "observer",
+                   skip_registration: "1"
+                 },
+                 pairing_code: {
+                   code: pairing_code.code
+                 }
+               },
+               format: "json",
+               session: { oauth2: provider.session_hash }
 
           expect(response).to be_successful
           json = json_parse
@@ -909,9 +916,11 @@ describe UsersController do
         end
 
         it "reassigns null values when passing empty strings for pseudonym[integration_id]" do
-          post "create", params: { account_id: account.id,
-                                   pseudonym: { unique_id: "jacob", sis_user_id: "testsisid", integration_id: "", path: "" },
-                                   user: { name: "Jacob Fugal" } }, format: "json"
+          post "create",
+               params: { account_id: account.id,
+                         pseudonym: { unique_id: "jacob", sis_user_id: "testsisid", integration_id: "", path: "" },
+                         user: { name: "Jacob Fugal" } },
+               format: "json"
           expect(response).to be_successful
           p = Pseudonym.where(unique_id: "jacob").first
           expect(p.account_id).to eq account.id
@@ -944,9 +953,12 @@ describe UsersController do
           expect_any_instance_of(Pseudonym).to receive(:send_confirmation!)
           post "create", params: { account_id: account.id,
                                    pseudonym: {
-                                     unique_id: "jacob@instructure.com", password: "asdfasdf",
-                                     password_confirmation: "asdfasdf", force_self_registration: "1",
-                                   }, user: { name: "Jacob Fugal" } }
+                                     unique_id: "jacob@instructure.com",
+                                     password: "asdfasdf",
+                                     password_confirmation: "asdfasdf",
+                                     force_self_registration: "1",
+                                   },
+                                   user: { name: "Jacob Fugal" } }
           expect(response).to be_successful
           u = User.where(name: "Jacob Fugal").first
           expect(u).to be_present
@@ -999,16 +1011,18 @@ describe UsersController do
         u.pseudonyms.create!(unique_id: "jon@instructure.com")
         notification = Notification.create(name: "Merge Email Communication Channel", category: "Registration")
 
-        post "create", params: {
-          account_id: account.id,
-          pseudonym: {
-            unique_id: "jacob@instructure.com",
-            send_confirmation: "0"
-          },
-          user: {
-            name: "Jacob Fugal"
-          }
-        }, format: "json"
+        post "create",
+             params: {
+               account_id: account.id,
+               pseudonym: {
+                 unique_id: "jacob@instructure.com",
+                 send_confirmation: "0"
+               },
+               user: {
+                 name: "Jacob Fugal"
+               }
+             },
+             format: "json"
         expect(response).to be_successful
         p = Pseudonym.where(unique_id: "jacob@instructure.com").first
         expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: notification).first).to be_present
@@ -1025,16 +1039,18 @@ describe UsersController do
 
         u = User.create! { |user| user.workflow_state = "registered" }
         communication_channel(u, { username: "jacob@instructure.com", active_cc: true })
-        post "create", params: {
-          account_id: account.id,
-          pseudonym: {
-            unique_id: "jacob@instructure.com",
-            send_confirmation: "0"
-          },
-          user: {
-            name: "Jacob Fugal"
-          }
-        }, format: "json"
+        post "create",
+             params: {
+               account_id: account.id,
+               pseudonym: {
+                 unique_id: "jacob@instructure.com",
+                 send_confirmation: "0"
+               },
+               user: {
+                 name: "Jacob Fugal"
+               }
+             },
+             format: "json"
         expect(response).to be_successful
         p = Pseudonym.where(unique_id: "jacob@instructure.com").first
         expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: notification).first).to be_nil
@@ -1287,7 +1303,8 @@ describe UsersController do
     context "with unposted assignments" do
       before do
         unposted_assignment = assignment_model(
-          course: course, due_at: Time.zone.now,
+          course: course,
+          due_at: Time.zone.now,
           points_possible: 90
         )
         unposted_assignment.ensure_post_policy(post_manually: true)

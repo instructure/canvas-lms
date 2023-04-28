@@ -352,11 +352,13 @@ describe "AuthenticationAudit API", type: :request do
 
     context "with :view_statistics permission on account" do
       before do
-        @user, _ = @user, account_admin_user_with_role_changes(
-          account: @account, user: @viewing_user,
-          role: @custom_role,
-          role_changes: { view_statistics: true }
-        )
+        @user, _ = @user,
+account_admin_user_with_role_changes(
+  account: @account,
+  user: @viewing_user,
+  role: @custom_role,
+  role_changes: { view_statistics: true }
+)
       end
 
       it "authorizes the login endpoint" do
@@ -374,11 +376,13 @@ describe "AuthenticationAudit API", type: :request do
 
     context "with :manage_user_logins permission on account" do
       before do
-        @user, _ = @user, account_admin_user_with_role_changes(
-          account: @account, user: @viewing_user,
-          role: @custom_role,
-          role_changes: { manage_user_logins: true }
-        )
+        @user, _ = @user,
+account_admin_user_with_role_changes(
+  account: @account,
+  user: @viewing_user,
+  role: @custom_role,
+  role_changes: { manage_user_logins: true }
+)
       end
 
       it "authorizes the login endpoint" do
@@ -396,11 +400,13 @@ describe "AuthenticationAudit API", type: :request do
 
     context "with :view_statistics permission on site admin account" do
       before do
-        @user, _ = @user, account_admin_user_with_role_changes(
-          account: Account.site_admin, user: @viewing_user,
-          role: @custom_sa_role,
-          role_changes: { view_statistics: true }
-        )
+        @user, _ = @user,
+account_admin_user_with_role_changes(
+  account: Account.site_admin,
+  user: @viewing_user,
+  role: @custom_sa_role,
+  role_changes: { view_statistics: true }
+)
       end
 
       it "authorizes the login endpoint" do
@@ -418,11 +424,13 @@ describe "AuthenticationAudit API", type: :request do
 
     context "with :manage_user_logins permission on site admin account" do
       before do
-        @user, _ = @user, account_admin_user_with_role_changes(
-          account: Account.site_admin, user: @viewing_user,
-          role: @custom_sa_role,
-          role_changes: { manage_user_logins: true }
-        )
+        @user, _ = @user,
+account_admin_user_with_role_changes(
+  account: Account.site_admin,
+  user: @viewing_user,
+  role: @custom_sa_role,
+  role_changes: { manage_user_logins: true }
+)
       end
 
       it "authorizes the login endpoint" do
@@ -443,11 +451,13 @@ describe "AuthenticationAudit API", type: :request do
         @account = account_model
         user_with_pseudonym(user: @user, account: @account, active_all: true)
         custom_role = custom_account_role("CustomAdmin", account: @account)
-        @user, _ = @user, account_admin_user_with_role_changes(
-          account: @account, user: @viewing_user,
-          role: custom_role,
-          role_changes: { manage_user_logins: true }
-        )
+        @user, _ = @user,
+account_admin_user_with_role_changes(
+  account: @account,
+  user: @viewing_user,
+  role: custom_role,
+  role_changes: { manage_user_logins: true }
+)
       end
 
       context "without permission on the second account" do
@@ -458,11 +468,13 @@ describe "AuthenticationAudit API", type: :request do
 
       context "with permission on the site admin account" do
         before do
-          @user, _ = @user, account_admin_user_with_role_changes(
-            account: Account.site_admin, user: @viewing_user,
-            role: @custom_sa_role,
-            role_changes: { manage_user_logins: true }
-          )
+          @user, _ = @user,
+account_admin_user_with_role_changes(
+  account: Account.site_admin,
+  user: @viewing_user,
+  role: @custom_sa_role,
+  role_changes: { manage_user_logins: true }
+)
         end
 
         it "includes cross-account events at user endpoint" do
@@ -501,14 +513,16 @@ describe "AuthenticationAudit API", type: :request do
     context "with permission on only a subset of accounts" do
       before do
         @user, @viewing_user = @user, @shard2.activate { user_model }
-        @user, _ = @user, @shard2.activate do
-          custom_role = custom_account_role("CustomAdmin", account: @account)
-          account_admin_user_with_role_changes(
-            account: @account, user: @viewing_user,
-            role: custom_role,
-            role_changes: { manage_user_logins: true }
-          )
-        end
+        @user, _ = @user,
+@shard2.activate do
+  custom_role = custom_account_role("CustomAdmin", account: @account)
+  account_admin_user_with_role_changes(
+    account: @account,
+    user: @viewing_user,
+    role: custom_role,
+    role_changes: { manage_user_logins: true }
+  )
+end
       end
 
       it "includes events from visible accounts" do

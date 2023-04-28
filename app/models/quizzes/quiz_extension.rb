@@ -22,8 +22,13 @@ class Quizzes::QuizExtension
 
   attr_accessor :quiz_submission, :ext_params
 
-  delegate :quiz_id, :user_id, :extra_attempts, :extra_time,
-           :manually_unlocked, :end_at, to: :quiz_submission
+  delegate :quiz_id,
+           :user_id,
+           :extra_attempts,
+           :extra_time,
+           :manually_unlocked,
+           :end_at,
+           to: :quiz_submission
 
   def initialize(quiz_submission, ext_params)
     @quiz_submission = quiz_submission

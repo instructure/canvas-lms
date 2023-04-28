@@ -551,9 +551,10 @@ describe DeveloperKeysController do
 
     it "is allowed update a dev key" do
       dk = test_domain_root_account.developer_keys.create!(redirect_uri: "http://asd.com/")
-      put "update", params: { id: dk.id, developer_key: {
-        redirect_uri: "http://example.com/sdf"
-      } }
+      put "update", params: { id: dk.id,
+                              developer_key: {
+                                redirect_uri: "http://example.com/sdf"
+                              } }
       expect(response).to be_successful
       dk.reload
       expect(dk.redirect_uri).to eq("http://example.com/sdf")

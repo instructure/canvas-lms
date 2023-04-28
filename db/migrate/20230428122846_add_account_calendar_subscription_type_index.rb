@@ -23,7 +23,8 @@ class AddAccountCalendarSubscriptionTypeIndex < ActiveRecord::Migration[7.0]
   disable_ddl_transaction!
 
   def change
-    add_index :accounts, :account_calendar_subscription_type,
+    add_index :accounts,
+              :account_calendar_subscription_type,
               where: "account_calendar_subscription_type <> 'manual'",
               algorithm: :concurrently,
               if_not_exists: true

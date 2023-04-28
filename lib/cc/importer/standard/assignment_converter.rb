@@ -118,15 +118,29 @@ module CC::Importer::Standard
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end
-      %w[turnitin_enabled vericite_enabled peer_reviews
-         automatic_peer_reviews anonymous_peer_reviews freeze_on_copy
-         grade_group_students_individually external_tool_new_tab
-         rubric_hide_points rubric_hide_outcome_results rubric_use_for_grading
-         rubric_hide_score_total has_group_category omit_from_final_grade
-         intra_group_peer_reviews only_visible_to_overrides post_to_sis
-         moderated_grading grader_comments_visible_to_graders
-         anonymous_grading graders_anonymous_to_graders
-         grader_names_visible_to_final_grader anonymous_instructor_annotations].each do |bool_val|
+      %w[turnitin_enabled
+         vericite_enabled
+         peer_reviews
+         automatic_peer_reviews
+         anonymous_peer_reviews
+         freeze_on_copy
+         grade_group_students_individually
+         external_tool_new_tab
+         rubric_hide_points
+         rubric_hide_outcome_results
+         rubric_use_for_grading
+         rubric_hide_score_total
+         has_group_category
+         omit_from_final_grade
+         intra_group_peer_reviews
+         only_visible_to_overrides
+         post_to_sis
+         moderated_grading
+         grader_comments_visible_to_graders
+         anonymous_grading
+         graders_anonymous_to_graders
+         grader_names_visible_to_final_grader
+         anonymous_instructor_annotations].each do |bool_val|
         val = get_bool_val(meta_doc, bool_val)
         assignment[bool_val] = val unless val.nil?
       end

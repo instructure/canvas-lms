@@ -213,7 +213,8 @@ class AssetUserAccess < ActiveRecord::Base
     return unless correct_context && Context::CONTEXT_TYPES.include?(correct_context.class_name.to_sym)
 
     GuardRail.activate(:secondary) do
-      @access = AssetUserAccess.where(user: user, asset_code: accessed_asset[:code],
+      @access = AssetUserAccess.where(user: user,
+                                      asset_code: accessed_asset[:code],
                                       context: correct_context).first_or_initialize
     end
     accessed_asset[:level] ||= "view"

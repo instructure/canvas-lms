@@ -22,16 +22,28 @@ require_relative "../views_helper"
 
 describe "accounts/_sis_batch_counts" do
   it "renders sis count data" do
-    data = { counts: { xlists: 2, enrollments: 3, courses: 5, users: 6, terms: 6,
-                       group_memberships: 7, group_categories: 2, groups: 8,
-                       sections: 9, accounts: 10, admins: 1, user_observers: 3,
-                       change_sis_ids: 3, logins: 0 } }
+    data = { counts: { xlists: 2,
+                       enrollments: 3,
+                       courses: 5,
+                       users: 6,
+                       terms: 6,
+                       group_memberships: 7,
+                       group_categories: 2,
+                       groups: 8,
+                       sections: 9,
+                       accounts: 10,
+                       admins: 1,
+                       user_observers: 3,
+                       change_sis_ids: 3,
+                       logins: 0 } }
     report = double
     expect(report).to receive(:data).and_return(data)
     render partial: "accounts/sis_batch_counts", object: report
 
-    map = { xlists: "Crosslists", group_memberships: "Group Enrollments",
-            user_observers: "User Observers", change_sis_ids: "Change SIS IDs",
+    map = { xlists: "Crosslists",
+            group_memberships: "Group Enrollments",
+            user_observers: "User Observers",
+            change_sis_ids: "Change SIS IDs",
             group_categories: "Group Categories", }
 
     data[:counts].each_pair do |type, count|

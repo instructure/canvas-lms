@@ -96,8 +96,9 @@ module CC
 
       @resources.resource(identifier: migration_id + "_fallback",
                           type: CCHelper::WEBCONTENT) do |res|
-        res.tag!("cpx:variant", identifier: migration_id + "_variant",
-                                identifierref: migration_id) do |var|
+        res.tag!("cpx:variant",
+                 identifier: migration_id + "_variant",
+                 identifierref: migration_id) do |var|
           var.tag!("cpx:metadata")
         end
         res.file(href: html_path)
@@ -241,13 +242,29 @@ module CC
       node.allowed_extensions assignment.allowed_extensions&.join(",")
       node.has_group_category assignment.has_group_category?
       node.group_category assignment.group_category.try :name if assignment.group_category
-      atts = %i[points_possible grading_type
-                all_day submission_types position turnitin_enabled vericite_enabled peer_review_count
-                peer_reviews automatic_peer_reviews
-                anonymous_peer_reviews grade_group_students_individually freeze_on_copy
-                omit_from_final_grade intra_group_peer_reviews only_visible_to_overrides post_to_sis
-                moderated_grading grader_count grader_comments_visible_to_graders
-                anonymous_grading graders_anonymous_to_graders grader_names_visible_to_final_grader
+      atts = %i[points_possible
+                grading_type
+                all_day
+                submission_types
+                position
+                turnitin_enabled
+                vericite_enabled
+                peer_review_count
+                peer_reviews
+                automatic_peer_reviews
+                anonymous_peer_reviews
+                grade_group_students_individually
+                freeze_on_copy
+                omit_from_final_grade
+                intra_group_peer_reviews
+                only_visible_to_overrides
+                post_to_sis
+                moderated_grading
+                grader_count
+                grader_comments_visible_to_graders
+                anonymous_grading
+                graders_anonymous_to_graders
+                grader_names_visible_to_final_grader
                 anonymous_instructor_annotations
                 allowed_attempts]
       atts.each do |att|

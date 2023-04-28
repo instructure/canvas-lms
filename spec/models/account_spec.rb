@@ -381,9 +381,19 @@ describe Account do
     context "fast list" do
       it "lists associated courses" do
         expect(@account.fast_all_courses.map(&:sis_source_id).sort).to eq %w[
-          C001 C005 C006 C007 C008 C009
+          C001
+          C005
+          C006
+          C007
+          C008
+          C009
 
-          C001S C005S C006S C007S C008S C009S
+          C001S
+          C005S
+          C006S
+          C007S
+          C008S
+          C009S
         ].sort
       end
 
@@ -1180,7 +1190,9 @@ describe Account do
     end
 
     it "uses localized labels" do
-      tool = @account.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret",
+      tool = @account.context_external_tools.new(name: "bob",
+                                                 consumer_key: "test",
+                                                 shared_secret: "secret",
                                                  url: "http://example.com")
 
       account_navigation = {
@@ -1372,13 +1384,15 @@ describe Account do
       it "is true for an account admin without :manage_account_calendar_visibility on a visible calendar" do
         @account.account_calendar_visible = true
         @account.save!
-        account_admin_user_with_role_changes(active_all: true, account: @account,
+        account_admin_user_with_role_changes(active_all: true,
+                                             account: @account,
                                              role_changes: { manage_account_calendar_visibility: false })
         expect(@account.grants_right?(@admin, :view_account_calendar_details)).to be_truthy
       end
 
       it "is false for an account admin without :manage_account_calendar_visibility on a hidden calendar" do
-        account_admin_user_with_role_changes(active_all: true, account: @account,
+        account_admin_user_with_role_changes(active_all: true,
+                                             account: @account,
                                              role_changes: { manage_account_calendar_visibility: false })
         expect(@account.grants_right?(@admin, :view_account_calendar_details)).to be_falsey
       end

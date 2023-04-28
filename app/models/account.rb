@@ -1268,7 +1268,9 @@ class Account < ActiveRecord::Base
               SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
             )
             SELECT id FROM t
-          )", id, id)
+          )",
+                                      id,
+                                      id)
                    else
                      role_scope.where(account_id: account_chain.map(&:id))
                    end
@@ -1356,7 +1358,9 @@ class Account < ActiveRecord::Base
                                                account_users_for(user) # has own cache
                                              else
                                                Rails.cache.fetch_with_batched_keys(["account_users_for_user", user.cache_key(:account_users)].cache_key,
-                                                                                   batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true) do
+                                                                                   batch_object: self,
+                                                                                   batched_keys: :account_chain,
+                                                                                   skip_cache_if_disabled: true) do
                                                  account_users_for(user).each(&:clear_association_cache)
                                                end
                                              end
@@ -1378,7 +1382,9 @@ class Account < ActiveRecord::Base
 
     Rails.cache.fetch_with_batched_keys(
       ["all_account_users_for_user", user.cache_key(:account_users)].cache_key,
-      batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true
+      batch_object: self,
+      batched_keys: :account_chain,
+      skip_cache_if_disabled: true
     ) { all_account_users_for(user) }
   end
 
@@ -1399,8 +1405,15 @@ class Account < ActiveRecord::Base
 
     given { |user| !cached_account_users_for(user).empty? }
     can %i[
-      read read_as_admin manage update delete
-      read_outcomes read_terms read_files launch_external_tool
+      read
+      read_as_admin
+      manage
+      update
+      delete
+      read_outcomes
+      read_terms
+      read_files
+      launch_external_tool
     ]
 
     given { |user| root_account? && cached_all_account_users_for(user).any? }
@@ -1772,7 +1785,8 @@ class Account < ActiveRecord::Base
 
     if turnitin_account_id.present? && turnitin_shared_secret.present?
       if settings[:enable_turnitin]
-        @turnitin_settings = [turnitin_account_id, turnitin_shared_secret,
+        @turnitin_settings = [turnitin_account_id,
+                              turnitin_shared_secret,
                               turnitin_host]
       end
     else
@@ -1872,8 +1886,10 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_TERMS, label: t("#account.tab_terms", "Terms"), css_class: "terms", href: :account_terms_path } if root_account? && manage_settings
       tabs << { id: TAB_AUTHENTICATION, label: t("#account.tab_authentication", "Authentication"), css_class: "authentication", href: :account_authentication_providers_path } if root_account? && manage_settings
       if root_account? && allow_sis_import && user && grants_any_right?(user, :manage_sis, :import_sis)
-        tabs << { id: TAB_SIS_IMPORT, label: t("#account.tab_sis_import", "SIS Import"),
-                  css_class: "sis_import", href: :account_sis_import_path }
+        tabs << { id: TAB_SIS_IMPORT,
+                  label: t("#account.tab_sis_import", "SIS Import"),
+                  css_class: "sis_import",
+                  href: :account_sis_import_path }
       end
     end
 

@@ -25,7 +25,8 @@ describe EpubExports::CourseEpubExportsPresenter do
     @epub_export = @course.epub_exports.create(user: @student)
     @course_with_epub = @course
     @course_without_epub = course_with_user("StudentEnrollment",
-                                            active_all: true, user: @student).course
+                                            active_all: true,
+                                            user: @student).course
     @course_as_obsever = course_with_user("ObserverEnrollment",
                                           active_all: true,
                                           user: @student).course

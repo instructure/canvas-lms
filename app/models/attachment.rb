@@ -25,23 +25,48 @@ require "crocodoc"
 class Attachment < ActiveRecord::Base
   class UniqueRenameFailure < StandardError; end
 
-  self.ignored_columns += %i[last_lock_at last_unlock_at enrollment_id cached_s3_url s3_url_cached_at
-                             scribd_account_id scribd_user scribd_mime_type_id submitted_to_scribd_at scribd_doc scribd_attempts
-                             cached_scribd_thumbnail last_inline_view local_filename]
+  self.ignored_columns += %i[last_lock_at
+                             last_unlock_at
+                             enrollment_id
+                             cached_s3_url
+                             s3_url_cached_at
+                             scribd_account_id
+                             scribd_user
+                             scribd_mime_type_id
+                             submitted_to_scribd_at
+                             scribd_doc
+                             scribd_attempts
+                             cached_scribd_thumbnail
+                             last_inline_view
+                             local_filename]
 
   def self.display_name_order_by_clause(table = nil)
     col = table ? "#{table}.display_name" : "display_name"
     best_unicode_collation_key(col)
   end
 
-  PERMITTED_ATTRIBUTES = %i[filename display_name locked position lock_at
-                            unlock_at uploaded_data hidden viewed_at].freeze
+  PERMITTED_ATTRIBUTES = %i[filename
+                            display_name
+                            locked
+                            position
+                            lock_at
+                            unlock_at
+                            uploaded_data
+                            hidden
+                            viewed_at].freeze
   def self.permitted_attributes
     PERMITTED_ATTRIBUTES
   end
 
-  EXCLUDED_COPY_ATTRIBUTES = %w[id root_attachment_id uuid folder_id user_id
-                                filename namespace workflow_state root_account_id].freeze
+  EXCLUDED_COPY_ATTRIBUTES = %w[id
+                                root_attachment_id
+                                uuid
+                                folder_id
+                                user_id
+                                filename
+                                namespace
+                                workflow_state
+                                root_account_id].freeze
 
   CLONING_ERROR_TYPE = "attachment_clone_url"
 
@@ -66,12 +91,24 @@ class Attachment < ActiveRecord::Base
   attr_accessor :ok_for_submission_comment
 
   belongs_to :context, exhaustive: false, polymorphic:
-      [:account, :assessment_question, :assignment, :attachment,
-       :content_export, :content_migration, :course, :eportfolio, :epub_export,
-       :gradebook_upload, :group, :submission, :purgatory,
-       { context_folder: "Folder", context_sis_batch: "SisBatch",
+      [:account,
+       :assessment_question,
+       :assignment,
+       :attachment,
+       :content_export,
+       :content_migration,
+       :course,
+       :eportfolio,
+       :epub_export,
+       :gradebook_upload,
+       :group,
+       :submission,
+       :purgatory,
+       { context_folder: "Folder",
+         context_sis_batch: "SisBatch",
          context_outcome_import: "OutcomeImport",
-         context_user: "User", quiz: "Quizzes::Quiz",
+         context_user: "User",
+         quiz: "Quizzes::Quiz",
          quiz_statistics: "Quizzes::QuizStatistics",
          quiz_submission: "Quizzes::QuizSubmission" }]
   belongs_to :cloned_item
@@ -447,7 +484,10 @@ class Attachment < ActiveRecord::Base
   def related_attachments
     if root_attachment_id
       Attachment.where("id=? OR root_attachment_id=? OR (root_attachment_id=? AND id<>?)",
-                       root_attachment_id, id, root_attachment_id, id)
+                       root_attachment_id,
+                       id,
+                       root_attachment_id,
+                       id)
     else
       Attachment.where(root_attachment_id: id)
     end
@@ -818,9 +858,13 @@ class Attachment < ActiveRecord::Base
             new_name = opts[:name] || self.display_name
             self.display_name = Attachment.make_unique_filename(new_name, existing_names, iter_count)
 
-            if Attachment.where("id = ? AND NOT EXISTS (?)", self,
+            if Attachment.where("id = ? AND NOT EXISTS (?)",
+                                self,
                                 Attachment.where("id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?",
-                                                 self, display_name, folder_id, "deleted"))
+                                                 self,
+                                                 display_name,
+                                                 folder_id,
+                                                 "deleted"))
                          .limit(1)
                          .update_all(display_name: display_name) > 0
               valid_name = true
@@ -1540,7 +1584,9 @@ class Attachment < ActiveRecord::Base
   scope :not_locked, lambda {
     where("attachments.locked IS NOT TRUE
       AND (attachments.lock_at IS NULL OR attachments.lock_at>?)
-      AND (attachments.unlock_at IS NULL OR attachments.unlock_at<?)", Time.now.utc, Time.now.utc)
+      AND (attachments.unlock_at IS NULL OR attachments.unlock_at<?)",
+          Time.now.utc,
+          Time.now.utc)
   }
 
   scope :by_content_types, lambda { |types|
@@ -1720,8 +1766,13 @@ class Attachment < ActiveRecord::Base
       p.workflow_state = "active"
       p.save!
     else
-      Purgatory.create!(attachment: self, old_filename: filename, old_display_name: display_name, old_content_type: content_type,
-                        old_file_state: file_state, old_workflow_state: workflow_state, new_instfs_uuid: new_instfs_uuid,
+      Purgatory.create!(attachment: self,
+                        old_filename: filename,
+                        old_display_name: display_name,
+                        old_content_type: content_type,
+                        old_file_state: file_state,
+                        old_workflow_state: workflow_state,
+                        new_instfs_uuid: new_instfs_uuid,
                         deleted_by_user: deleted_by_user)
     end
   end
@@ -2428,7 +2479,8 @@ class Attachment < ActiveRecord::Base
 
   def word_count_supported?
     ["application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-     "application/x-docx", "application/rtf",
+     "application/x-docx",
+     "application/rtf",
      "text/rtf"].include?(mimetype) || ["pdf", "text"].include?(mime_class)
   end
 

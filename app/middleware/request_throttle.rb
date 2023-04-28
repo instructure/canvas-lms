@@ -245,10 +245,12 @@ class RequestThrottle
     RequestContext::Generator.add_meta_header("d", "%.2f" % [db_runtime])
 
     if account&.shard&.database_server
-      InstStatsd::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}", system_cpu,
+      InstStatsd::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}",
+                                system_cpu,
                                 short_stat: "requests_system_cpu",
                                 tags: { cluster: account.shard.database_server.id })
-      InstStatsd::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}", user_cpu,
+      InstStatsd::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}",
+                                user_cpu,
                                 short_stat: "requests_user_cpu",
                                 tags: { cluster: account.shard.database_server.id })
     end

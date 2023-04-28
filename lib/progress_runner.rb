@@ -76,7 +76,8 @@ class ProgressRunner
   # The default completed message.
   # @param [Integer] completed_count The number of items that were processed successfully.
   def default_completed_message(completed_count)
-    I18n.t("lib.progress_runner.completed_message", {
+    I18n.t("lib.progress_runner.completed_message",
+           {
              one: "1 item processed",
              other: "%{count} items processed"
            },

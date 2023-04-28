@@ -787,9 +787,13 @@ class ContextModule < ActiveRecord::Base
       next if tags.any? { |tag| tag.content_type == item.class_name && tag.content_id == item.id }
 
       state = (item.respond_to?(:published?) && !item.published?) ? "unpublished" : "active"
-      new_tags << content_tags.create!(context: context, title: Context.asset_name(item), content: item,
-                                       tag_type: "context_module", indent: 0,
-                                       position: next_pos, workflow_state: state)
+      new_tags << content_tags.create!(context: context,
+                                       title: Context.asset_name(item),
+                                       content: item,
+                                       tag_type: "context_module",
+                                       indent: 0,
+                                       position: next_pos,
+                                       workflow_state: state)
       next_pos += 1
     end
 

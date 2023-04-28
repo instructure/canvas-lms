@@ -21,7 +21,10 @@ class IndexAuaWithContextId < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def change
-    add_index :asset_user_accesses, %i[user_id context_id asset_code id], name: "index_asset_user_accesses_on_user_id_context_id_asset_code",
-                                                                          algorithm: :concurrently, if_not_exists: true
+    add_index :asset_user_accesses,
+              %i[user_id context_id asset_code id],
+              name: "index_asset_user_accesses_on_user_id_context_id_asset_code",
+              algorithm: :concurrently,
+              if_not_exists: true
   end
 end

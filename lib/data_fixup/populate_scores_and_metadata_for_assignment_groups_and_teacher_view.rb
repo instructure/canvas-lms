@@ -62,8 +62,10 @@ module DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView
       # want to use those
       score_ids = Score.joins(:enrollment)
                        .where(enrollments: { type: ["StudentEnrollment", "StudentViewEnrollment"],
-                                             course_id: course.id, user_id: user_ids_group },
-                              unposted_current_score: nil, unposted_final_score: nil).pluck(:id)
+                                             course_id: course.id,
+                                             user_id: user_ids_group },
+                              unposted_current_score: nil,
+                              unposted_final_score: nil).pluck(:id)
       score_ids.each_slice(1000) do |ids|
         Score.where(id: ids).update_all("unposted_current_score = current_score, unposted_final_score = final_score")
       end

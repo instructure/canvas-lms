@@ -39,8 +39,13 @@ module CC::Importer::Canvas
     end
 
     def get_quiz_meta(doc, quiz)
-      %w[title description access_code ip_filter
-         quiz_type scoring_policy hide_results
+      %w[title
+         description
+         access_code
+         ip_filter
+         quiz_type
+         scoring_policy
+         hide_results
          lockdown_browser_monitor_data].each do |string_type|
         val = get_node_val(doc, string_type)
         quiz[string_type] = val unless val.nil?

@@ -49,7 +49,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
         "question_5_answer_7397" => nil,
         "question_5_answer_7398" => nil,
         "question_5_answer_7399" => nil,
-      }.as_json, full: true).as_json.sort_by { |v| v["answer_id"] }
+      }.as_json,
+                                   full: true).as_json.sort_by { |v| v["answer_id"] }
 
       expect(output).to eq([
         { answer_id: "4224", match_id: "3855" },

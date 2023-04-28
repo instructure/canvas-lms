@@ -29,8 +29,13 @@ module AccountReports
 
     def default_courses
       root_account.all_courses
-                  .select(%i[id sis_source_id name course_code start_at
-                             conclude_at restrict_enrollments_to_course_dates])
+                  .select(%i[id
+                             sis_source_id
+                             name
+                             course_code
+                             start_at
+                             conclude_at
+                             restrict_enrollments_to_course_dates])
     end
 
     def recently_deleted

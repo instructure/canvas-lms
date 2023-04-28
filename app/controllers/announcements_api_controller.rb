@@ -126,9 +126,14 @@ class AnnouncementsApiController < ApplicationController
     include_params = Array(params[:include])
     text_only = value_to_boolean(params[:text_only])
 
-    render json: discussion_topics_api_json(@topics, nil, @current_user, session,
-                                            user_can_moderate: false, include_assignment: false,
-                                            include_context_code: true, text_only: text_only,
+    render json: discussion_topics_api_json(@topics,
+                                            nil,
+                                            @current_user,
+                                            session,
+                                            user_can_moderate: false,
+                                            include_assignment: false,
+                                            include_context_code: true,
+                                            text_only: text_only,
                                             include_sections: include_params.include?("sections"),
                                             include_sections_user_count: include_params.include?("sections_user_count"))
   end

@@ -579,7 +579,8 @@ module ActiveRecord
       end
 
       it "finds the name of a foreign key on a specific column" do
-        fk_name = ActiveRecord::Migration.find_foreign_key(:accounts, :outcome_imports,
+        fk_name = ActiveRecord::Migration.find_foreign_key(:accounts,
+                                                           :outcome_imports,
                                                            column: "latest_outcome_import_id")
         expect(fk_name).to eq("fk_rails_3f0c8923c0")
       end

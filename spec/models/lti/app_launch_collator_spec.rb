@@ -157,7 +157,9 @@ module Lti
       end
 
       it "uses localized labels" do
-        tool = account.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret",
+        tool = account.context_external_tools.new(name: "bob",
+                                                  consumer_key: "test",
+                                                  shared_secret: "secret",
                                                   url: "http://example.com")
 
         assignment_selection = {

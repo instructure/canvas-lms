@@ -198,10 +198,22 @@ describe GradebookExporter do
 
       let(:expected_headers) do
         [
-          "Student", "ID", "SIS Login ID", "Section", "Custom Column 1", "Custom Column 2",
-          "Current Points", "Final Points",
-          "Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score",
-          "Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade"
+          "Student",
+          "ID",
+          "SIS Login ID",
+          "Section",
+          "Custom Column 1",
+          "Custom Column 2",
+          "Current Points",
+          "Final Points",
+          "Current Score",
+          "Unposted Current Score",
+          "Final Score",
+          "Unposted Final Score",
+          "Current Grade",
+          "Unposted Current Grade",
+          "Final Grade",
+          "Unposted Final Grade"
         ]
       end
 
@@ -693,9 +705,16 @@ describe GradebookExporter do
 
       let(:total_columns) do
         [
-          "Current Points", "Final Points",
-          "Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade",
-          "Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score"
+          "Current Points",
+          "Final Points",
+          "Current Grade",
+          "Unposted Current Grade",
+          "Final Grade",
+          "Unposted Final Grade",
+          "Current Score",
+          "Unposted Current Score",
+          "Final Score",
+          "Unposted Final Score"
         ]
       end
       let(:total_and_override_columns) { total_columns + ["Override Score", "Override Grade"] }
@@ -848,8 +867,10 @@ describe GradebookExporter do
       first_group = @course.assignment_groups.create!(name: "First Group", group_weight: 0.5)
       @course.assignment_groups.create!(name: "Second Group", group_weight: 0.5)
 
-      @assignment = @course.assignments.create!(title: "Assignment 1", points_possible: 10,
-                                                grading_type: "gpa_scale", assignment_group: first_group)
+      @assignment = @course.assignments.create!(title: "Assignment 1",
+                                                points_possible: 10,
+                                                grading_type: "gpa_scale",
+                                                assignment_group: first_group)
       @assignment.grade_student(@student, grade: 8, grader: @teacher)
     end
 

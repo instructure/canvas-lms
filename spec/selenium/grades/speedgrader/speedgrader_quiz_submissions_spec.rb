@@ -163,7 +163,8 @@ describe "speed grader - quiz submissions" do
   end
 
   it "properly displays student quiz results when the teacher also " \
-     "has a student enrollment", priority: "2" do
+     "has a student enrollment",
+     priority: "2" do
     @course.enroll_student(@teacher).accept!
 
     @quiz.quiz_questions.create!(quiz: @quiz, question_data: {

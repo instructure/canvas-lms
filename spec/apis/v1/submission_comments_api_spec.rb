@@ -55,9 +55,12 @@ describe "Submissions Comment API", type: :request do
     def preflight(preflight_params)
       api_call :post,
                "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/files",
-               { controller: "submission_comments_api", action: "create_file",
-                 format: "json", course_id: @course.to_param,
-                 assignment_id: @assignment.to_param, user_id: @student.to_param },
+               { controller: "submission_comments_api",
+                 action: "create_file",
+                 format: "json",
+                 course_id: @course.to_param,
+                 assignment_id: @assignment.to_param,
+                 user_id: @student.to_param },
                preflight_params
     end
 
@@ -67,9 +70,12 @@ describe "Submissions Comment API", type: :request do
       @course = orig_course
       raw_api_call :post,
                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/files",
-                   { controller: "submission_comments_api", action: "create_file",
-                     format: "json", course_id: @course.to_param,
-                     assignment_id: @assignment.to_param, user_id: @student.to_param },
+                   { controller: "submission_comments_api",
+                     action: "create_file",
+                     format: "json",
+                     course_id: @course.to_param,
+                     assignment_id: @assignment.to_param,
+                     user_id: @student.to_param },
                    name: "whatever"
       expect(response).not_to be_successful
     end
@@ -137,9 +143,12 @@ describe "Submissions Comment API", type: :request do
     def annotation_notification_call(author_id: @student.to_param, assignment_id: auto_post_assignment.to_param)
       raw_api_call(:post,
                    "/api/v1/courses/#{@course.id}/assignments/#{assignment_id}/submissions/#{@student.to_param}/annotation_notification",
-                   { controller: "submission_comments_api", action: "annotation_notification",
-                     format: "json", course_id: @course.to_param,
-                     assignment_id: assignment_id, user_id: @student.to_param },
+                   { controller: "submission_comments_api",
+                     action: "annotation_notification",
+                     format: "json",
+                     course_id: @course.to_param,
+                     assignment_id: assignment_id,
+                     user_id: @student.to_param },
                    { author_id: author_id })
     end
 

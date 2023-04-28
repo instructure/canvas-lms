@@ -585,7 +585,8 @@ class ConversationParticipant < ActiveRecord::Base
   def self.do_batch_update(progress, user, conversation_ids, update_params)
     progress_runner = ProgressRunner.new(progress)
     progress_runner.completed_message do |completed_count|
-      t("batch_update_message", {
+      t("batch_update_message",
+        {
           one: "1 conversation processed",
           other: "%{count} conversations processed"
         },

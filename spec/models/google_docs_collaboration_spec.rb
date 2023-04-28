@@ -49,12 +49,21 @@ describe GoogleDocsCollaboration do
       course_factory(active_all: true)
       @course.enroll_student(@student)
 
-      @teacher.user_services.create! service: "google_drive", service_domain: "drive.google.com",
-                                     service_user_id: "teh_teacher@gmail.com", token: "blah", secret: "bleh"
-      @student.user_services.create! service: "google_drive", service_domain: "drive.google.com",
-                                     service_user_id: "teh_student@gmail.com", token: "bleh", secret: "blah"
-      @other_user.user_services.create! service: "google_drive", service_domain: "drive.google.com",
-                                        service_user_id: "distractor@gmail.com", token: "bleh", secret: "bleh"
+      @teacher.user_services.create! service: "google_drive",
+                                     service_domain: "drive.google.com",
+                                     service_user_id: "teh_teacher@gmail.com",
+                                     token: "blah",
+                                     secret: "bleh"
+      @student.user_services.create! service: "google_drive",
+                                     service_domain: "drive.google.com",
+                                     service_user_id: "teh_student@gmail.com",
+                                     token: "bleh",
+                                     secret: "blah"
+      @other_user.user_services.create! service: "google_drive",
+                                        service_domain: "drive.google.com",
+                                        service_user_id: "distractor@gmail.com",
+                                        token: "bleh",
+                                        secret: "bleh"
     end
 
     before do

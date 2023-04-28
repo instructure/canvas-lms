@@ -72,7 +72,9 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def qs_api_index(raw = false, data = {})
     url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions.json"
-    params = { controller: "quizzes/quiz_submissions_api", action: "index", format: "json",
+    params = { controller: "quizzes/quiz_submissions_api",
+               action: "index",
+               format: "json",
                course_id: @course.id.to_s,
                quiz_id: @quiz.id.to_s }
     if raw
@@ -404,8 +406,10 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         json = qs_api_show
         expect(json["quiz_submissions"][0]).to have_key("result_url")
         expected_url = course_quiz_history_url(
-          @course, @quiz,
-          quiz_submission_id: @quiz_submission.id, version: @quiz_submission.version_number
+          @course,
+          @quiz,
+          quiz_submission_id: @quiz_submission.id,
+          version: @quiz_submission.version_number
         )
         expect(json["quiz_submissions"][0]["result_url"]).to eq expected_url
 

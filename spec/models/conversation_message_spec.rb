@@ -120,7 +120,8 @@ describe ConversationMessage do
       message = conversation_message.messages_sent["Conversation Message"].first
 
       expect(message.context).to eq conversation_message
-      message.context.reply_from(user: message.user, purpose: "general",
+      message.context.reply_from(user: message.user,
+                                 purpose: "general",
                                  subject: message.subject,
                                  text: "Reply to notification")
       # The initial message, the one the sent the notification,
@@ -472,8 +473,10 @@ describe ConversationMessage do
         my_section.save!
         @course.save!
 
-        @course.enroll_student(@user, allow_multiple_enrollments: true,
-                                      enrollment_state: "active", section: my_section)
+        @course.enroll_student(@user,
+                               allow_multiple_enrollments: true,
+                               enrollment_state: "active",
+                               section: my_section)
 
         email_reply = @last_message.reply_from({
                                                  purpose: "general",
@@ -495,11 +498,15 @@ describe ConversationMessage do
 
         my_section = @course.course_sections.create!(name: "test section")
 
-        @course.enroll_student(@student, allow_multiple_enrollments: true,
-                                         enrollment_state: "active", section: my_section)
+        @course.enroll_student(@student,
+                               allow_multiple_enrollments: true,
+                               enrollment_state: "active",
+                               section: my_section)
 
-        @course.enroll_teacher(@teacher, allow_multiple_enrollments: true,
-                                         enrollment_state: "active", section: my_section)
+        @course.enroll_teacher(@teacher,
+                               allow_multiple_enrollments: true,
+                               enrollment_state: "active",
+                               section: my_section)
 
         # test the OR case by concluding the section
         my_section.start_at = 5.days.ago

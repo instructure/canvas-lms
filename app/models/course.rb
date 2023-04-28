@@ -71,11 +71,14 @@ class Course < ActiveRecord::Base
   has_many :participating_enrollments, -> { where(enrollments: { workflow_state: "active" }).preload(:user) }, class_name: "Enrollment", inverse_of: :course
 
   has_many :participating_students, -> { where(enrollments: { type: ["StudentEnrollment", "StudentViewEnrollment"], workflow_state: "active" }) }, through: :enrollments, source: :user
-  has_many :participating_students_by_date, lambda {
-                                              where(enrollments: { type: ["StudentEnrollment", "StudentViewEnrollment"], workflow_state: "active" })
-                                                .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
-                                                .where(enrollment_states: { state: "active" })
-                                            }, through: :all_enrollments, source: :user
+  has_many :participating_students_by_date,
+           lambda {
+             where(enrollments: { type: ["StudentEnrollment", "StudentViewEnrollment"], workflow_state: "active" })
+               .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
+               .where(enrollment_states: { state: "active" })
+           },
+           through: :all_enrollments,
+           source: :user
 
   has_many :student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: "Enrollment"
   has_many :students, through: :student_enrollments, source: :user
@@ -100,38 +103,51 @@ class Course < ActiveRecord::Base
   has_many :tas, through: :ta_enrollments, source: :user
   has_many :observer_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: "ObserverEnrollment"
   has_many :observers, through: :observer_enrollments, source: :user
-  has_many :non_observer_enrollments, lambda {
-    where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type<>'ObserverEnrollment'")
-      .preload(:user)
-  }, class_name: "Enrollment"
-  has_many :enrollments_excluding_linked_observers, lambda {
-    where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND NOT (enrollments.type = 'ObserverEnrollment' AND enrollments.associated_user_id IS NOT NULL)")
-      .preload(:user)
-  }, class_name: "Enrollment"
+  has_many :non_observer_enrollments,
+           lambda {
+             where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type<>'ObserverEnrollment'")
+               .preload(:user)
+           },
+           class_name: "Enrollment"
+  has_many :enrollments_excluding_linked_observers,
+           lambda {
+             where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND NOT (enrollments.type = 'ObserverEnrollment' AND enrollments.associated_user_id IS NOT NULL)")
+               .preload(:user)
+           },
+           class_name: "Enrollment"
   has_many :participating_observers, -> { where(enrollments: { workflow_state: "active" }) }, through: :observer_enrollments, source: :user
-  has_many :participating_observers_by_date, lambda {
-                                               where(enrollments: { type: "ObserverEnrollment", workflow_state: "active" })
-                                                 .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
-                                                 .where(enrollment_states: { state: "active" })
-                                             }, through: :all_enrollments, source: :user
+  has_many :participating_observers_by_date,
+           lambda {
+             where(enrollments: { type: "ObserverEnrollment", workflow_state: "active" })
+               .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
+               .where(enrollment_states: { state: "active" })
+           },
+           through: :all_enrollments,
+           source: :user
 
   has_many :instructors, -> { where(enrollments: { type: ["TaEnrollment", "TeacherEnrollment"] }) }, through: :enrollments, source: :user
   has_many :instructor_enrollments, -> { where(type: ["TaEnrollment", "TeacherEnrollment"]) }, class_name: "Enrollment"
   has_many :participating_instructors, -> { where(enrollments: { type: ["TaEnrollment", "TeacherEnrollment"], workflow_state: "active" }) }, through: :enrollments, source: :user
-  has_many :participating_instructors_by_date, lambda {
-                                                 where(enrollments: { type: ["TaEnrollment", "TeacherEnrollment"], workflow_state: "active" })
-                                                   .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
-                                                   .where(enrollment_states: { state: "active" })
-                                               }, through: :all_enrollments, source: :user
+  has_many :participating_instructors_by_date,
+           lambda {
+             where(enrollments: { type: ["TaEnrollment", "TeacherEnrollment"], workflow_state: "active" })
+               .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
+               .where(enrollment_states: { state: "active" })
+           },
+           through: :all_enrollments,
+           source: :user
 
   has_many :admins, -> { where(enrollments: { type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment] }) }, through: :enrollments, source: :user
   has_many :admin_enrollments, -> { where(type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment]) }, class_name: "Enrollment"
   has_many :participating_admins, -> { where(enrollments: { type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment], workflow_state: "active" }) }, through: :enrollments, source: :user
-  has_many :participating_admins_by_date, lambda {
-                                            where(enrollments: { type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment], workflow_state: "active" })
-                                              .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
-                                              .where(enrollment_states: { state: "active" })
-                                          }, through: :all_enrollments, source: :user
+  has_many :participating_admins_by_date,
+           lambda {
+             where(enrollments: { type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment], workflow_state: "active" })
+               .joins("INNER JOIN #{EnrollmentState.quoted_table_name} ON enrollment_states.enrollment_id=enrollments.id")
+               .where(enrollment_states: { state: "active" })
+           },
+           through: :all_enrollments,
+           source: :user
 
   has_many :student_view_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: "StudentViewEnrollment"
   has_many :student_view_students, through: :student_view_enrollments, source: :user
@@ -306,9 +322,15 @@ class Course < ActiveRecord::Base
   sanitize_field :syllabus_body, CanvasSanitize::SANITIZE
 
   include StickySisFields
-  are_sis_sticky :name, :course_code, :start_at, :conclude_at,
-                 :restrict_enrollments_to_course_dates, :enrollment_term_id,
-                 :workflow_state, :account_id, :grade_passback_setting
+  are_sis_sticky :name,
+                 :course_code,
+                 :start_at,
+                 :conclude_at,
+                 :restrict_enrollments_to_course_dates,
+                 :enrollment_term_id,
+                 :workflow_state,
+                 :account_id,
+                 :grade_passback_setting
 
   include FeatureFlags
 
@@ -330,12 +352,14 @@ class Course < ActiveRecord::Base
   # using a lambda for setting name to avoid caching the translated string when the model is loaded
   # (in case selected language changes)
   CUSTOMIZABLE_PERMISSIONS = ActiveSupport::OrderedHash[
-    "syllabus", {
+    "syllabus",
+    {
       get_setting_name: -> { t("syllabus", "Syllabus") },
       flex: :looser,
       as_bools: true,
     },
-    "files", {
+    "files",
+    {
       get_setting_name: -> { t("files", "Files") },
       flex: :any
     },
@@ -501,7 +525,8 @@ class Course < ActiveRecord::Base
       scope = scope.where("id<>?", self) unless new_record?
       if scope.exists?
         is_unique = false
-        errors.add(:sis_source_id, t("errors.sis_in_use", "SIS ID \"%{sis_id}\" is already in use",
+        errors.add(:sis_source_id, t("errors.sis_in_use",
+                                     "SIS ID \"%{sis_id}\" is already in use",
                                      sis_id: sis_source_id))
       end
     end
@@ -883,11 +908,13 @@ class Course < ActiveRecord::Base
         INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = courses.enrollment_term_id
         WHERE courses.workflow_state<>'completed' AND
           ((et.end_at IS NULL OR et.end_at >= :end) OR
-          (courses.restrict_enrollments_to_course_dates = true AND courses.conclude_at >= :end))", end: Time.now.utc])
+          (courses.restrict_enrollments_to_course_dates = true AND courses.conclude_at >= :end))",
+                                          end: Time.now.utc])
       enrollment_completed_sql = sanitize_sql(["INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = courses.enrollment_term_id
         WHERE courses.workflow_state<>'completed' AND
           ((et.end_at IS NULL OR et.end_at >= :end) OR
-          (courses.restrict_enrollments_to_course_dates = true AND courses.conclude_at >= :end))", end: Time.now.utc])
+          (courses.restrict_enrollments_to_course_dates = true AND courses.conclude_at >= :end))",
+                                               end: Time.now.utc])
     end
 
     distinct.joins("INNER JOIN (
@@ -925,7 +952,9 @@ class Course < ActiveRecord::Base
     joins(:enrollment_term)
       .where("courses.workflow_state<>'completed' AND
           (courses.conclude_at IS NULL OR courses.conclude_at>=?) AND
-          (courses.conclude_at IS NOT NULL OR enrollment_terms.end_at IS NULL OR enrollment_terms.end_at>=?)", Time.now.utc, Time.now.utc)
+          (courses.conclude_at IS NOT NULL OR enrollment_terms.end_at IS NULL OR enrollment_terms.end_at>=?)",
+             Time.now.utc,
+             Time.now.utc)
   }
   scope :by_teachers, lambda { |teacher_ids|
     if teacher_ids.empty?
@@ -1022,7 +1051,9 @@ class Course < ActiveRecord::Base
       instructor_enrollment_scope = instructor_enrollments.active_by_date
       if section_ids.any?
         instructor_enrollment_scope = instructor_enrollment_scope.where("enrollments.limit_privileges_to_course_section IS NULL OR
-          enrollments.limit_privileges_to_course_section<>? OR enrollments.course_section_id IN (?)", true, section_ids)
+          enrollments.limit_privileges_to_course_section<>? OR enrollments.course_section_id IN (?)",
+                                                                        true,
+                                                                        section_ids)
       end
 
       if require_grade_permissions
@@ -1376,7 +1407,8 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def recompute_student_scores(student_ids = nil, grading_period_id: nil,
+  def recompute_student_scores(student_ids = nil,
+                               grading_period_id: nil,
                                update_all_grading_period_scores: true,
                                update_course_score: true,
                                run_immediately: false)
@@ -1751,9 +1783,17 @@ class Course < ActiveRecord::Base
         end
     end
     can %i[
-      read_as_admin read read_as_member manage update
-      read_outcomes view_unpublished_items manage_feature_flags
-      view_feature_flags read_rubrics use_student_view
+      read_as_admin
+      read
+      read_as_member
+      manage
+      update
+      read_outcomes
+      view_unpublished_items
+      manage_feature_flags
+      view_feature_flags
+      read_rubrics
+      use_student_view
     ]
 
     # Teachers and Designers can reset content, but not TAs
@@ -2612,8 +2652,11 @@ class Course < ActiveRecord::Base
     Canvas::Plugin.value_to_boolean(val)
   end
 
-  attr_accessor :full_migration_hash, :external_url_hash,
-                :folder_name_lookups, :assignment_group_no_drop_assignments, :migration_results
+  attr_accessor :full_migration_hash,
+                :external_url_hash,
+                :folder_name_lookups,
+                :assignment_group_no_drop_assignments,
+                :migration_results
 
   def map_merge(old_item, new_item)
     @merge_mappings ||= {}
@@ -2716,21 +2759,53 @@ class Course < ActiveRecord::Base
   end
 
   def self.clonable_attributes
-    %i[group_weighting_scheme grading_standard_id is_public is_public_to_auth_users
-       public_syllabus public_syllabus_to_auth files_visibility
-       allow_student_wiki_edits show_public_context_messages
-       syllabus_body syllabus_course_summary allow_student_forum_attachments
-       lock_all_announcements default_wiki_editing_roles allow_student_organized_groups
-       default_view show_total_grade_as_points allow_final_grade_override
-       open_enrollment filter_speed_grader_by_student_group
-       storage_quota tab_configuration allow_wiki_comments
-       turnitin_comments self_enrollment license indexed locale
-       hide_final_grade hide_distribution_graphs allow_student_anonymous_discussion_topics
-       allow_student_discussion_topics allow_student_discussion_editing lock_all_announcements
-       allow_student_discussion_reporting organize_epub_by_content_type show_announcements_on_home_page
-       home_page_announcement_limit enable_offline_web_export usage_rights_required
-       restrict_student_future_view restrict_student_past_view restrict_enrollments_to_course_dates
-       homeroom_course course_color alt_name restrict_quantitative_data]
+    %i[group_weighting_scheme
+       grading_standard_id
+       is_public
+       is_public_to_auth_users
+       public_syllabus
+       public_syllabus_to_auth
+       files_visibility
+       allow_student_wiki_edits
+       show_public_context_messages
+       syllabus_body
+       syllabus_course_summary
+       allow_student_forum_attachments
+       lock_all_announcements
+       default_wiki_editing_roles
+       allow_student_organized_groups
+       default_view
+       show_total_grade_as_points
+       allow_final_grade_override
+       open_enrollment
+       filter_speed_grader_by_student_group
+       storage_quota
+       tab_configuration
+       allow_wiki_comments
+       turnitin_comments
+       self_enrollment
+       license
+       indexed
+       locale
+       hide_final_grade
+       hide_distribution_graphs
+       allow_student_anonymous_discussion_topics
+       allow_student_discussion_topics
+       allow_student_discussion_editing
+       lock_all_announcements
+       allow_student_discussion_reporting
+       organize_epub_by_content_type
+       show_announcements_on_home_page
+       home_page_announcement_limit
+       enable_offline_web_export
+       usage_rights_required
+       restrict_student_future_view
+       restrict_student_past_view
+       restrict_enrollments_to_course_dates
+       homeroom_course
+       course_color
+       alt_name
+       restrict_quantitative_data]
   end
 
   def student_reporting?
@@ -2866,7 +2941,8 @@ class Course < ActiveRecord::Base
       scope
     when :sections, :sections_limited
       scope.where("enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))",
-                  visibilities.pluck(:course_section_id), false)
+                  visibilities.pluck(:course_section_id),
+                  false)
     when :restricted
       user_ids = visibilities.filter_map { |s| s[:associated_user_id] }
       scope.where(enrollments: { user_id: (user_ids + [user&.id]).compact })
@@ -3038,92 +3114,108 @@ class Course < ActiveRecord::Base
       label: t("#tabs.home", "Home"),
       css_class: "home",
       href: :course_path
-    }, {
-      id: TAB_ANNOUNCEMENTS,
-      label: t("#tabs.announcements", "Announcements"),
-      css_class: "announcements",
-      href: :course_announcements_path,
-      icon: "icon-announcement"
-    }, {
-      id: TAB_ASSIGNMENTS,
-      label: t("#tabs.assignments", "Assignments"),
-      css_class: "assignments",
-      href: :course_assignments_path,
-      icon: "icon-assignment"
-    }, {
-      id: TAB_DISCUSSIONS,
-      label: t("#tabs.discussions", "Discussions"),
-      css_class: "discussions",
-      href: :course_discussion_topics_path,
-      icon: "icon-discussion"
-    }, {
-      id: TAB_GRADES,
-      label: t("#tabs.grades", "Grades"),
-      css_class: "grades",
-      href: :course_grades_path,
-    }, {
-      id: TAB_PEOPLE,
-      label: t("#tabs.people", "People"),
-      css_class: "people",
-      href: :course_users_path
-    }, {
-      id: TAB_PAGES,
-      label: t("#tabs.pages", "Pages"),
-      css_class: "pages",
-      href: :course_wiki_path
-    }, {
-      id: TAB_FILES,
-      label: t("#tabs.files", "Files"),
-      css_class: "files",
-      href: :course_files_path,
-      icon: "icon-folder"
-    }, {
-      id: TAB_SYLLABUS,
-      label: t("#tabs.syllabus", "Syllabus"),
-      css_class: "syllabus",
-      href: :syllabus_course_assignments_path
-    }, {
-      id: TAB_OUTCOMES,
-      label: t("#tabs.outcomes", "Outcomes"),
-      css_class: "outcomes",
-      href: :course_outcomes_path
-    }, {
-      id: TAB_RUBRICS,
-      label: t("#tabs.rubrics", "Rubrics"),
-      css_class: "rubrics",
-      href: :course_rubrics_path,
-      visibility: "admins"
-    }, {
-      id: TAB_QUIZZES,
-      label: t("#tabs.quizzes", "Quizzes"),
-      css_class: "quizzes",
-      href: :course_quizzes_path
-    }, {
-      id: TAB_MODULES,
-      label: t("#tabs.modules", "Modules"),
-      css_class: "modules",
-      href: :course_context_modules_path
-    }, {
-      id: TAB_CONFERENCES,
-      label: WebConference.conference_tab_name,
-      css_class: "conferences",
-      href: :course_conferences_path
-    }, {
-      id: TAB_COLLABORATIONS,
-      label: t("#tabs.collaborations", "Collaborations"),
-      css_class: "collaborations",
-      href: :course_collaborations_path
-    }, {
-      id: TAB_COLLABORATIONS_NEW,
-      label: t("#tabs.collaborations", "Collaborations"),
-      css_class: "collaborations",
-      href: :course_lti_collaborations_path
-    }, {
-      id: TAB_SETTINGS,
-      label: t("#tabs.settings", "Settings"),
-      css_class: "settings",
-      href: :course_settings_path,
-    }]
+    },
+     {
+       id: TAB_ANNOUNCEMENTS,
+       label: t("#tabs.announcements", "Announcements"),
+       css_class: "announcements",
+       href: :course_announcements_path,
+       icon: "icon-announcement"
+     },
+     {
+       id: TAB_ASSIGNMENTS,
+       label: t("#tabs.assignments", "Assignments"),
+       css_class: "assignments",
+       href: :course_assignments_path,
+       icon: "icon-assignment"
+     },
+     {
+       id: TAB_DISCUSSIONS,
+       label: t("#tabs.discussions", "Discussions"),
+       css_class: "discussions",
+       href: :course_discussion_topics_path,
+       icon: "icon-discussion"
+     },
+     {
+       id: TAB_GRADES,
+       label: t("#tabs.grades", "Grades"),
+       css_class: "grades",
+       href: :course_grades_path,
+     },
+     {
+       id: TAB_PEOPLE,
+       label: t("#tabs.people", "People"),
+       css_class: "people",
+       href: :course_users_path
+     },
+     {
+       id: TAB_PAGES,
+       label: t("#tabs.pages", "Pages"),
+       css_class: "pages",
+       href: :course_wiki_path
+     },
+     {
+       id: TAB_FILES,
+       label: t("#tabs.files", "Files"),
+       css_class: "files",
+       href: :course_files_path,
+       icon: "icon-folder"
+     },
+     {
+       id: TAB_SYLLABUS,
+       label: t("#tabs.syllabus", "Syllabus"),
+       css_class: "syllabus",
+       href: :syllabus_course_assignments_path
+     },
+     {
+       id: TAB_OUTCOMES,
+       label: t("#tabs.outcomes", "Outcomes"),
+       css_class: "outcomes",
+       href: :course_outcomes_path
+     },
+     {
+       id: TAB_RUBRICS,
+       label: t("#tabs.rubrics", "Rubrics"),
+       css_class: "rubrics",
+       href: :course_rubrics_path,
+       visibility: "admins"
+     },
+     {
+       id: TAB_QUIZZES,
+       label: t("#tabs.quizzes", "Quizzes"),
+       css_class: "quizzes",
+       href: :course_quizzes_path
+     },
+     {
+       id: TAB_MODULES,
+       label: t("#tabs.modules", "Modules"),
+       css_class: "modules",
+       href: :course_context_modules_path
+     },
+     {
+       id: TAB_CONFERENCES,
+       label: WebConference.conference_tab_name,
+       css_class: "conferences",
+       href: :course_conferences_path
+     },
+     {
+       id: TAB_COLLABORATIONS,
+       label: t("#tabs.collaborations", "Collaborations"),
+       css_class: "collaborations",
+       href: :course_collaborations_path
+     },
+     {
+       id: TAB_COLLABORATIONS_NEW,
+       label: t("#tabs.collaborations", "Collaborations"),
+       css_class: "collaborations",
+       href: :course_lti_collaborations_path
+     },
+     {
+       id: TAB_SETTINGS,
+       label: t("#tabs.settings", "Settings"),
+       css_class: "settings",
+       href: :course_settings_path,
+     }]
   end
 
   def self.default_homeroom_tabs
@@ -3141,12 +3233,14 @@ class Course < ActiveRecord::Base
   def self.course_subject_tabs
     course_tabs = Course.default_tabs.select { |tab| COURSE_SUBJECT_TAB_IDS.include?(tab[:id]) }
     # Add the unique TAB_SCHEDULE and TAB_GROUPS
-    course_tabs.insert(1, {
+    course_tabs.insert(1,
+                       {
                          id: TAB_SCHEDULE,
                          label: t("#tabs.schedule", "Schedule"),
                          css_class: "schedule",
                          href: :course_path
-                       }, {
+                       },
+                       {
                          id: TAB_GROUPS,
                          label: t("#tabs.groups", "Groups"),
                          css_class: "groups",
@@ -3633,8 +3727,16 @@ class Course < ActiveRecord::Base
       Course.transaction do
         new_course = Course.new
         keys_to_copy = Course.column_names - %i[
-          id created_at updated_at syllabus_body wiki_id default_view
-          tab_configuration lti_context_id workflow_state latest_outcome_import_id
+          id
+          created_at
+          updated_at
+          syllabus_body
+          wiki_id
+          default_view
+          tab_configuration
+          lti_context_id
+          workflow_state
+          latest_outcome_import_id
           grading_standard_id
         ].map(&:to_s)
         attributes.each do |key, val|
@@ -3734,7 +3836,8 @@ class Course < ActiveRecord::Base
     Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
       course_sections.active.each do |section|
         # enroll fake_student will only create the enrollment if it doesn't already exist
-        enroll_user(fake_student, "StudentViewEnrollment",
+        enroll_user(fake_student,
+                    "StudentViewEnrollment",
                     allow_multiple_enrollments: true,
                     section: section,
                     enrollment_state: "active",
@@ -3798,7 +3901,8 @@ class Course < ActiveRecord::Base
     progress_runner = ProgressRunner.new(progress)
 
     progress_runner.completed_message do |completed_count|
-      t("batch_update_message", {
+      t("batch_update_message",
+        {
           one: "1 course processed",
           other: "%{count} courses processed"
         },

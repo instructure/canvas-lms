@@ -303,7 +303,8 @@ module AccountReports
                                     OR c.conclude_at >= ?
                                     OR (enrollments.workflow_state IN ('inactive', 'deleted')
                                     AND enrollments.updated_at >= ?)",
-                                    limiting_period.days.ago, limiting_period.days.ago)
+                                    limiting_period.days.ago,
+                                    limiting_period.days.ago)
         end
       else
         students = students.where(

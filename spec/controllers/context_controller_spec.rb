@@ -247,7 +247,8 @@ describe ContextController do
         @other_student = user_factory
         @course.enroll_student(
           @other_student,
-          section: @other_section, limit_privileges_to_course_section: true
+          section: @other_section,
+          limit_privileges_to_course_section: true
         )
                .accept!
       end

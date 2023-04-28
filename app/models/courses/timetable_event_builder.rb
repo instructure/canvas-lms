@@ -130,8 +130,20 @@ module Courses
     protected
 
     WEEKDAY_STR_MAP = {
-      "sunday" => "Sun", "monday" => "Mon", "tuesday" => "Tue", "wednesday" => "Wed", "thursday" => "Thu", "friday" => "Fri", "saturday" => "Sat",
-      "su" => "Sun", "m" => "Mon", "t" => "Tue", "w" => "Wed", "th" => "Thu", "f" => "Fri", "s" => "Sat"
+      "sunday" => "Sun",
+      "monday" => "Mon",
+      "tuesday" => "Tue",
+      "wednesday" => "Wed",
+      "thursday" => "Thu",
+      "friday" => "Fri",
+      "saturday" => "Sat",
+      "su" => "Sun",
+      "m" => "Mon",
+      "t" => "Tue",
+      "w" => "Wed",
+      "th" => "Thu",
+      "f" => "Fri",
+      "s" => "Sat"
     }.freeze
     def standardize_weekdays_string(weekdays_string)
       # turn strings like "M,W" into a standard string "Mon,Wed" (for sending back to the client)

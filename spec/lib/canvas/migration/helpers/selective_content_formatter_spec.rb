@@ -119,7 +119,10 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
     it "groups assignments into assignment groups" do
       expect(@formatter.get_content_list("assignments")).to eq [
-        { :type => "assignment_groups", :property => "copy[assignment_groups][id_a1]", :title => "a1", :migration_id => "a1",
+        { :type => "assignment_groups",
+          :property => "copy[assignment_groups][id_a1]",
+          :title => "a1",
+          :migration_id => "a1",
           "sub_items" => [{ type: "assignments", property: "copy[assignments][id_a2]", title: "a2", migration_id: "a2" }] },
         { type: "assignments", property: "copy[assignments][id_a1]", title: "a1", migration_id: "a1" }
       ]

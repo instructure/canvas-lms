@@ -30,7 +30,8 @@ describe "discussions index" do
       @teacher = user_with_pseudonym(active_user: true)
       @student = user_with_pseudonym(active_user: true)
       @account = Account.create(name: "New Account", default_time_zone: "UTC")
-      @course = course_factory(course_name: "Aaron 101", account: @account,
+      @course = course_factory(course_name: "Aaron 101",
+                               account: @account,
                                active_course: true)
       course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
       course_with_student(course: @course, active_enrollment: true)

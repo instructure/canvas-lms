@@ -569,15 +569,34 @@ class Group < ActiveRecord::Base
           context.grants_right?(user, session, :manage_groups)
       end
       can %i[
-        create create_collaborations delete manage
-        manage_admin_users allow_course_admin_actions manage_calendar
-        manage_content manage_course_content_add
-        manage_course_content_edit manage_course_content_delete
-        manage_files_add manage_files_edit manage_files_delete
-        manage_students manage_wiki_create manage_wiki_delete
-        manage_wiki_update moderate_forum post_to_forum
-        create_forum read read_forum read_announcements
-        read_roster send_messages send_messages_all update
+        create
+        create_collaborations
+        delete
+        manage
+        manage_admin_users
+        allow_course_admin_actions
+        manage_calendar
+        manage_content
+        manage_course_content_add
+        manage_course_content_edit
+        manage_course_content_delete
+        manage_files_add
+        manage_files_edit
+        manage_files_delete
+        manage_students
+        manage_wiki_create
+        manage_wiki_delete
+        manage_wiki_update
+        moderate_forum
+        post_to_forum
+        create_forum
+        read
+        read_forum
+        read_announcements
+        read_roster
+        send_messages
+        send_messages_all
+        update
         view_unpublished_items
         read_files
       ]
@@ -596,15 +615,33 @@ class Group < ActiveRecord::Base
           context.grants_right?(user, session, :manage_groups_manage)
       end
       can %i[
-        read update create_collaborations manage
-        manage_admin_users allow_course_admin_actions manage_calendar
-        manage_content manage_course_content_add
-        manage_course_content_edit manage_course_content_delete
-        manage_files_add manage_files_edit manage_files_delete
-        manage_students manage_wiki_create manage_wiki_delete
-        manage_wiki_update moderate_forum post_to_forum
-        create_forum read_forum read_announcements read_roster
-        send_messages send_messages_all view_unpublished_items
+        read
+        update
+        create_collaborations
+        manage
+        manage_admin_users
+        allow_course_admin_actions
+        manage_calendar
+        manage_content
+        manage_course_content_add
+        manage_course_content_edit
+        manage_course_content_delete
+        manage_files_add
+        manage_files_edit
+        manage_files_delete
+        manage_students
+        manage_wiki_create
+        manage_wiki_delete
+        manage_wiki_update
+        moderate_forum
+        post_to_forum
+        create_forum
+        read_forum
+        read_announcements
+        read_roster
+        send_messages
+        send_messages_all
+        view_unpublished_items
         read_files
       ]
 

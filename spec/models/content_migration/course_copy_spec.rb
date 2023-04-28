@@ -726,8 +726,10 @@ describe ContentMigration do
     end
 
     it "copies weird object links" do
-      att = Attachment.create!(filename: "test.txt", uploaded_data: StringIO.new("pixels and frames and stuff"),
-                               folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+      att = Attachment.create!(filename: "test.txt",
+                               uploaded_data: StringIO.new("pixels and frames and stuff"),
+                               folder: Folder.root_folders(@copy_from).first,
+                               context: @copy_from)
       @copy_from.syllabus_body = "<object><param value=\"/courses/#{@copy_from.id}/files/#{att.id}/download\"></object>"
       @copy_from.save!
 
@@ -800,8 +802,11 @@ describe ContentMigration do
     end
 
     it "does not leave link placeholders on catastrophic failure" do
-      att = Attachment.create!(filename: "test.txt", display_name: "testing.txt",
-                               uploaded_data: StringIO.new("file"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+      att = Attachment.create!(filename: "test.txt",
+                               display_name: "testing.txt",
+                               uploaded_data: StringIO.new("file"),
+                               folder: Folder.root_folders(@copy_from).first,
+                               context: @copy_from)
       topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<img src='/courses/#{@copy_from.id}/files/#{att.id}/preview'>")
 
       allow(Importers::WikiPageImporter).to receive(:process_migration).and_raise(ArgumentError)
@@ -820,8 +825,11 @@ describe ContentMigration do
 
     it "is able to copy links to folders" do
       folder = Folder.root_folders(@copy_from).first.sub_folders.create!(context: @copy_from, name: "folder_1")
-      Attachment.create!(filename: "test.txt", display_name: "testing.txt",
-                         uploaded_data: StringIO.new("file"), folder: folder, context: @copy_from)
+      Attachment.create!(filename: "test.txt",
+                         display_name: "testing.txt",
+                         uploaded_data: StringIO.new("file"),
+                         folder: folder,
+                         context: @copy_from)
 
       topic = @copy_from.discussion_topics.create!(title: "some topic",
                                                    message: "<a href='/courses/#{@copy_from.id}/files/folder/#{folder.name}'>an ill-advised link</a>")

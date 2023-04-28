@@ -82,7 +82,8 @@ module MicrosoftSync
   end
 
   class StateMachineJobTestSteps2 < StateMachineJobTestStepsBase
-    def initialize(step_initial_retries, step_second_delay_amounts = [1, 2, 3],
+    def initialize(step_initial_retries,
+                   step_second_delay_amounts = [1, 2, 3],
                    error_class: Errors::PublicError)
       super()
       @error_class = error_class
@@ -448,8 +449,12 @@ module MicrosoftSync
 
               it "clips the delay to between 0 and the maximum" do
                 expect(run_ats).to eq([
-                                        nil, nil, Time.zone.now, (max_delay - 5).from_now,
-                                        max_delay.from_now, max_delay.from_now
+                                        nil,
+                                        nil,
+                                        Time.zone.now,
+                                        (max_delay - 5).from_now,
+                                        max_delay.from_now,
+                                        max_delay.from_now
                                       ])
               end
             end

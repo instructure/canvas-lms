@@ -230,7 +230,8 @@ describe AuthenticationProvider do
                                        "sis_id" => "28",
                                        "sortable_name" => "Cutrer, Cody",
                                        "timezone" => "America/New_York"
-                                     }, purpose: :provisioning)
+                                     },
+                                     purpose: :provisioning)
       @user.reload
       expect(@user.short_name).to eq "Mr. Cutler"
       expect(@user.communication_channels.email.active.pluck(:path)).to be_include("cody@school.edu")

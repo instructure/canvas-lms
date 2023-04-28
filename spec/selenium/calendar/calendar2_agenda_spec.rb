@@ -68,7 +68,8 @@ describe "calendar2" do
       it "sets the header in the format 'Oct 11, 2013'", priority: "1" do
         start_date = Time.zone.now.beginning_of_day + 12.hours
         @course.calendar_events.create!(title: "ohai",
-                                        start_at: start_date, end_at: start_date + 1.hour)
+                                        start_at: start_date,
+                                        end_at: start_date + 1.hour)
         load_agenda_view
         expect(agenda_view_header.text).to match(/[A-Z][a-z]{2}\s\d{1,2},\s\d{4}/)
       end
@@ -76,7 +77,8 @@ describe "calendar2" do
       it "respects context filters" do
         start_date = Time.now.utc.beginning_of_day + 12.hours
         @course.calendar_events.create!(title: "ohai",
-                                        start_at: start_date, end_at: start_date + 1.hour)
+                                        start_at: start_date,
+                                        end_at: start_date + 1.hour)
         load_agenda_view
         expect(all_agenda_items.length).to eq 1
         fj(".context-list-toggle-box:last").click

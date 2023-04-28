@@ -1467,8 +1467,12 @@ describe DiscussionTopicsController do
 
     it "does not allow changing a topic to graded and adding a todo date" do
       user_session(@teacher)
-      put "update", params: { course_id: @course.id, topic_id: @topic.id, todo_date: 1.day.from_now,
-                              assignment: { submission_types: ["discussion_topic"], name: "Graded Topic 1" } }, format: "json"
+      put "update",
+          params: { course_id: @course.id,
+                    topic_id: @topic.id,
+                    todo_date: 1.day.from_now,
+                    assignment: { submission_types: ["discussion_topic"], name: "Graded Topic 1" } },
+          format: "json"
       expect(response.code).to eq "400"
     end
 
@@ -1477,8 +1481,12 @@ describe DiscussionTopicsController do
       todo_date = 1.day.from_now
       assign = @course.assignments.create!(title: "Graded Topic 1", submission_types: "discussion_topic")
       topic = assign.discussion_topic
-      put "update", params: { course_id: @course.id, topic_id: topic.id, todo_date: todo_date.iso8601(6),
-                              assignment: { set_assignment: false, name: "Graded Topic 1" } }, format: "json"
+      put "update",
+          params: { course_id: @course.id,
+                    topic_id: topic.id,
+                    todo_date: todo_date.iso8601(6),
+                    assignment: { set_assignment: false, name: "Graded Topic 1" } },
+          format: "json"
       expect(response.code).to eq "200"
       expect(topic.reload.assignment).to be_nil
       expect(topic.todo_date).to eq todo_date
@@ -1487,8 +1495,11 @@ describe DiscussionTopicsController do
     it "removes an existing todo date when changing a topic from ungraded to graded" do
       user_session(@teacher)
       @topic.update(todo_date: 1.day.from_now)
-      put "update", params: { course_id: @course.id, topic_id: @topic.id,
-                              assignment: { submission_types: ["discussion_topic"], name: "Graded Topic 1" } }, format: "json"
+      put "update",
+          params: { course_id: @course.id,
+                    topic_id: @topic.id,
+                    assignment: { submission_types: ["discussion_topic"], name: "Graded Topic 1" } },
+          format: "json"
       expect(response.code).to eq "200"
       expect(@topic.reload.assignment).to be_truthy
       expect(@topic.todo_date).to be_nil
@@ -1645,7 +1656,8 @@ describe DiscussionTopicsController do
 
       it "creates a discussion with sections" do
         post "create",
-             params: topic_params(@course, { specific_sections: @section1.id.to_s }), format: :json
+             params: topic_params(@course, { specific_sections: @section1.id.to_s }),
+             format: :json
         expect(response).to be_successful
         expect(DiscussionTopic.last.course_sections.first).to eq @section1
         expect(DiscussionTopicSectionVisibility.count).to eq 1
@@ -1655,7 +1667,8 @@ describe DiscussionTopicsController do
         @group_category = @course.group_categories.create(name: "gc")
         @group = @course.groups.create!(group_category: @group_category)
         post "create",
-             params: group_topic_params(@group, { specific_sections: @section1.id.to_s }), format: :json
+             params: group_topic_params(@group, { specific_sections: @section1.id.to_s }),
+             format: :json
         expect(response).to have_http_status :bad_request
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
@@ -1923,8 +1936,10 @@ describe DiscussionTopicsController do
 
   describe "PUT: update" do
     before(:once) do
-      @topic = DiscussionTopic.create!(context: @course, title: "Test Topic",
-                                       delayed_post_at: "2013-01-01T00:00:00UTC", lock_at: "2013-01-02T00:00:00UTC")
+      @topic = DiscussionTopic.create!(context: @course,
+                                       title: "Test Topic",
+                                       delayed_post_at: "2013-01-01T00:00:00UTC",
+                                       lock_at: "2013-01-02T00:00:00UTC")
     end
 
     before do
@@ -1973,8 +1988,10 @@ describe DiscussionTopicsController do
 
       group_category = @course.group_categories.create(name: "gc")
       group = @course.groups.create!(group_category: group_category)
-      topic = DiscussionTopic.create!(context: group, title: "Test Topic",
-                                      delayed_post_at: "2013-01-01T00:00:00UTC", lock_at: "2013-01-02T00:00:00UTC")
+      topic = DiscussionTopic.create!(context: group,
+                                      title: "Test Topic",
+                                      delayed_post_at: "2013-01-01T00:00:00UTC",
+                                      lock_at: "2013-01-02T00:00:00UTC")
       put("update", params: {
             id: topic.id,
             group_id: group.id,
@@ -2041,8 +2058,11 @@ describe DiscussionTopicsController do
     it "triggers module progression recalculation if undoing section specificness" do
       @course.course_sections.create!(name: "Section")
       section2 = @course.course_sections.create!(name: "Section2")
-      topic = @course.discussion_topics.create!(title: "foo", message: "bar", user: @teacher,
-                                                is_section_specific: true, course_sections: [section2])
+      topic = @course.discussion_topics.create!(title: "foo",
+                                                message: "bar",
+                                                user: @teacher,
+                                                is_section_specific: true,
+                                                course_sections: [section2])
       mod = @course.context_modules.create!
       tag = mod.add_item({ id: topic.id, type: "discussion_topic" })
       mod.completion_requirements = { tag.id => { type: "must_view" } }
@@ -2071,9 +2091,11 @@ describe DiscussionTopicsController do
     end
 
     it "does not clear lock_at if locked is not changed" do
-      put("update", params: { course_id: @course.id, topic_id: @topic.id,
+      put("update", params: { course_id: @course.id,
+                              topic_id: @topic.id,
                               title: "Updated Topic",
-                              lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
+                              lock_at: @topic.lock_at,
+                              delayed_post_at: @topic.delayed_post_at,
                               locked: false })
       expect(response).to have_http_status :ok
       expect(@topic.reload).not_to be_locked
@@ -2084,7 +2106,8 @@ describe DiscussionTopicsController do
       @topic.delayed_post_at = "2013-01-02T00:00:00UTC"
       @topic.locked = true
       @topic.save!
-      put("update", params: { course_id: @course.id, topic_id: @topic.id,
+      put("update", params: { course_id: @course.id,
+                              topic_id: @topic.id,
                               title: "Updated Topic",
                               locked: false,
                               delayed_post_at: nil })
@@ -2101,7 +2124,8 @@ describe DiscussionTopicsController do
       @topic.locked = false
       @topic.save!
       delayed_post_time = Time.new(2018, 4, 15)
-      put("update", params: { course_id: @course.id, topic_id: @topic.id,
+      put("update", params: { course_id: @course.id,
+                              topic_id: @topic.id,
                               title: "Updated Topic",
                               locked: true,
                               delayed_post_at: delayed_post_time.to_s })
@@ -2125,9 +2149,11 @@ describe DiscussionTopicsController do
     it "does not clear delayed_post_at if published is not changed" do
       @topic.workflow_state = "post_delayed"
       @topic.save!
-      put("update", params: { course_id: @course.id, topic_id: @topic.id,
+      put("update", params: { course_id: @course.id,
+                              topic_id: @topic.id,
                               title: "Updated Topic",
-                              lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
+                              lock_at: @topic.lock_at,
+                              delayed_post_at: @topic.delayed_post_at,
                               published: false })
       expect(@topic.reload).not_to be_published
       expect(@topic.delayed_post_at).not_to be_nil
@@ -2135,9 +2161,11 @@ describe DiscussionTopicsController do
 
     it "unlocks discussions with a lock_at attribute if lock state changes" do
       @topic.lock!
-      put("update", params: { course_id: @course.id, topic_id: @topic.id,
+      put("update", params: { course_id: @course.id,
+                              topic_id: @topic.id,
                               title: "Updated Topic",
-                              lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
+                              lock_at: @topic.lock_at,
+                              delayed_post_at: @topic.delayed_post_at,
                               locked: false })
 
       expect(@topic.reload).not_to be_locked
@@ -2145,23 +2173,29 @@ describe DiscussionTopicsController do
     end
 
     it "sets workflow to post_delayed when delayed_post_at and lock_at are in the future" do
-      put(:update, params: { course_id: @course.id, topic_id: @topic.id,
-                             title: "Updated topic", delayed_post_at: 5.days.from_now })
+      put(:update, params: { course_id: @course.id,
+                             topic_id: @topic.id,
+                             title: "Updated topic",
+                             delayed_post_at: 5.days.from_now })
       expect(@topic.reload).to be_post_delayed
     end
 
     it "does not clear lock_at if lock state hasn't changed" do
-      put("update", params: { course_id: @course.id, topic_id: @topic.id,
-                              title: "Updated Topic", lock_at: @topic.lock_at,
+      put("update", params: { course_id: @course.id,
+                              topic_id: @topic.id,
+                              title: "Updated Topic",
+                              lock_at: @topic.lock_at,
                               locked: true })
       expect(@topic.reload).to be_locked
       expect(@topic.lock_at).not_to be_nil
     end
 
     it "sets draft state on discussions with delayed_post_at" do
-      put("update", params: { course_id: @course.id, topic_id: @topic.id,
+      put("update", params: { course_id: @course.id,
+                              topic_id: @topic.id,
                               title: "Updated Topic",
-                              lock_at: @topic.lock_at, delayed_post_at: @topic.delayed_post_at,
+                              lock_at: @topic.lock_at,
+                              delayed_post_at: @topic.delayed_post_at,
                               published: false })
 
       expect(@topic.reload).not_to be_published
@@ -2205,16 +2239,21 @@ describe DiscussionTopicsController do
     end
 
     it "editing section-specific topic to not-specific should clear out visibilities" do
-      @announcement = Announcement.create!(context: @course, title: "Test Announcement",
-                                           message: "Foo", delayed_post_at: "2013-01-01T00:00:00UTC",
+      @announcement = Announcement.create!(context: @course,
+                                           title: "Test Announcement",
+                                           message: "Foo",
+                                           delayed_post_at: "2013-01-01T00:00:00UTC",
                                            lock_at: "2013-01-02T00:00:00UTC")
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
       @announcement.is_section_specific = true
       @announcement.course_sections = [section1, section2]
       @announcement.save!
-      put("update", params: { course_id: @course.id, topic_id: @announcement.id, message: "Foobar",
-                              is_announcement: true, specific_sections: "all" })
+      put("update", params: { course_id: @course.id,
+                              topic_id: @announcement.id,
+                              message: "Foobar",
+                              is_announcement: true,
+                              specific_sections: "all" })
       expect(response).to be_successful
       visibilities = DiscussionTopicSectionVisibility.active
                                                      .where(discussion_topic_id: @announcement.id)
@@ -2222,8 +2261,10 @@ describe DiscussionTopicsController do
     end
 
     it "does not remove specific sections if key is missing in PUT json" do
-      @announcement = Announcement.create!(context: @course, title: "Test Announcement",
-                                           message: "Foo", delayed_post_at: "2013-01-01T00:00:00UTC",
+      @announcement = Announcement.create!(context: @course,
+                                           title: "Test Announcement",
+                                           message: "Foo",
+                                           delayed_post_at: "2013-01-01T00:00:00UTC",
                                            lock_at: "2013-01-02T00:00:00UTC")
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
@@ -2231,7 +2272,9 @@ describe DiscussionTopicsController do
       @announcement.course_sections = [section1, section2]
       @announcement.save!
 
-      put("update", params: { course_id: @course.id, topic_id: @announcement.id, message: "Foobar",
+      put("update", params: { course_id: @course.id,
+                              topic_id: @announcement.id,
+                              message: "Foobar",
                               is_announcement: true })
       expect(response).to be_successful
       visibilities = DiscussionTopicSectionVisibility.active

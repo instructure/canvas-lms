@@ -453,12 +453,18 @@ describe "GradeChangeAudit API", type: :request do
     end
 
     it "does not authorize the endpoints with :view_all_grades, :view_grade_changes and :manage_grades revoked" do
-      RoleOverride.manage_role_override(@account_user.account, @account_user.role,
-                                        :view_grade_changes.to_s, override: false)
-      RoleOverride.manage_role_override(@account_user.account, @account_user.role,
-                                        :manage_grades.to_s, override: false)
-      RoleOverride.manage_role_override(@account_user.account, @account_user.role,
-                                        :view_all_grades.to_s, override: false)
+      RoleOverride.manage_role_override(@account_user.account,
+                                        @account_user.role,
+                                        :view_grade_changes.to_s,
+                                        override: false)
+      RoleOverride.manage_role_override(@account_user.account,
+                                        @account_user.role,
+                                        :manage_grades.to_s,
+                                        override: false)
+      RoleOverride.manage_role_override(@account_user.account,
+                                        @account_user.role,
+                                        :view_all_grades.to_s,
+                                        override: false)
 
       fetch_for_context(@course, expected_status: 401)
       fetch_for_context(@assignment, expected_status: 401)

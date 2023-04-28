@@ -310,12 +310,18 @@ module Importers
       end
 
       %i[peer_reviews
-         automatic_peer_reviews anonymous_peer_reviews
-         grade_group_students_individually allowed_extensions
-         position peer_review_count
-         omit_from_final_grade intra_group_peer_reviews
-         grader_count grader_comments_visible_to_graders
-         graders_anonymous_to_graders grader_names_visible_to_final_grader
+         automatic_peer_reviews
+         anonymous_peer_reviews
+         grade_group_students_individually
+         allowed_extensions
+         position
+         peer_review_count
+         omit_from_final_grade
+         intra_group_peer_reviews
+         grader_count
+         grader_comments_visible_to_graders
+         graders_anonymous_to_graders
+         grader_names_visible_to_final_grader
          anonymous_instructor_annotations].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
@@ -397,7 +403,8 @@ module Importers
         if active_proxies.blank?
           migration.add_warning(I18n.t(
                                   "We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".",
-                                  vendor_code: vendor_code, product_code: product_code
+                                  vendor_code: vendor_code,
+                                  product_code: product_code
                                 ))
         else
           item.lti_context_id ||= SecureRandom.uuid

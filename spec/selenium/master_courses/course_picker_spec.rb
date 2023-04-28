@@ -36,27 +36,42 @@ describe "master courses - course picker" do
 
     # create some courses
     c = Course.create!(
-      account: Account.default, name: "AlphaDog", course_code: "CCC1", sis_source_id: "SIS_A1",
+      account: Account.default,
+      name: "AlphaDog",
+      course_code: "CCC1",
+      sis_source_id: "SIS_A1",
       enrollment_term_id: term1.id
     )
     c.offer!
     c = Course.create!(
-      account: Account.default, name: "AlphaMale", course_code: "CCC2", sis_source_id: "SIS_A2",
+      account: Account.default,
+      name: "AlphaMale",
+      course_code: "CCC2",
+      sis_source_id: "SIS_A2",
       enrollment_term_id: term1.id
     )
     c.offer!
     c = Course.create!(
-      account: Account.default, name: "Alphabet", course_code: "CCC3", sis_source_id: "SIS_A3",
+      account: Account.default,
+      name: "Alphabet",
+      course_code: "CCC3",
+      sis_source_id: "SIS_A3",
       enrollment_term_id: term1.id
     )
     c.offer!
     c = Course.create!(
-      account: Account.default, name: "BetaCarotine", course_code: "DDD4", sis_source_id: "SIS_B4",
+      account: Account.default,
+      name: "BetaCarotine",
+      course_code: "DDD4",
+      sis_source_id: "SIS_B4",
       enrollment_term_id: term1.id
     )
     c.offer!
     c = Course.create!(
-      account: sub_account1, name: "BetaGetOuttaHere", course_code: "DDD5", sis_source_id: "SIS_B5",
+      account: sub_account1,
+      name: "BetaGetOuttaHere",
+      course_code: "DDD5",
+      sis_source_id: "SIS_B5",
       enrollment_term_id: term2.id
     )
     c.offer!

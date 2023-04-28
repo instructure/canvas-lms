@@ -54,10 +54,13 @@ describe Polling::PollSubmissionsController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_sessions/#{@session.id}/poll_submissions/#{@submission.id}",
-                  { controller: "polling/poll_submissions", action: "show", format: "json",
+                  { controller: "polling/poll_submissions",
+                    action: "show",
+                    format: "json",
                     poll_id: @poll.id.to_s,
                     poll_session_id: @session.id.to_s,
-                    id: @submission.id.to_s }, data)
+                    id: @submission.id.to_s },
+                  data)
     end
 
     it "retrieves the poll submission specified" do
@@ -77,10 +80,14 @@ describe Polling::PollSubmissionsController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/polls/#{@poll.id}/poll_sessions/#{@session.id}/poll_submissions",
-                  { controller: "polling/poll_submissions", action: "create", format: "json",
+                  { controller: "polling/poll_submissions",
+                    action: "create",
+                    format: "json",
                     poll_id: @poll.id.to_s,
                     poll_session_id: @session.id.to_s },
-                  { poll_submissions: [params] }, {}, {})
+                  { poll_submissions: [params] },
+                  {},
+                  {})
     end
 
     context "as a student" do

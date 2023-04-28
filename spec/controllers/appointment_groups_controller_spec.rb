@@ -28,14 +28,16 @@ describe AppointmentGroupsController do
     student_in_course(active_all: true)
     teacher_in_course(active_all: true)
     @next_year = Time.now.year + 1
-    @ag = AppointmentGroup.create!(title: "blah", contexts: [@course, @course2],
+    @ag = AppointmentGroup.create!(title: "blah",
+                                   contexts: [@course, @course2],
                                    new_appointments: [
                                      ["#{@next_year}-01-01 12:00:00", "#{@next_year}-01-01 13:00:00"],
                                      ["#{@next_year}-02-01 12:00:00", "#{@next_year}-02-01 13:00:00"],
                                    ])
     @ag.publish!
 
-    @ag_with_reservation = AppointmentGroup.create!(title: "blah", contexts: [@course, @course2],
+    @ag_with_reservation = AppointmentGroup.create!(title: "blah",
+                                                    contexts: [@course, @course2],
                                                     new_appointments: [
                                                       ["#{@next_year}-01-01 14:00:00", "#{@next_year}-01-01 15:00:00"],
                                                       ["#{@next_year}-02-01 14:00:00", "#{@next_year}-02-01 15:00:00"],
@@ -50,7 +52,8 @@ describe AppointmentGroupsController do
     @group1.participating_users << @group_users
     @group1.save!
     @gc = @group1.group_category
-    @group_ag = AppointmentGroup.create!(title: "test", contexts: [@course, @course2],
+    @group_ag = AppointmentGroup.create!(title: "test",
+                                         contexts: [@course, @course2],
                                          participants_per_appointment: 2,
                                          new_appointments: [
                                            ["#{@next_year}-01-01 17:00:00", "#{@next_year}-01-01 18:00:00"],
@@ -76,8 +79,10 @@ describe AppointmentGroupsController do
   describe "GET 'show'" do
     it "without appointment - redirects to the agenda on date of appt. in find_appointment mode" do
       get "show", params: { id: @ag.to_param }
-      check_redirect(response, "view_name" => "agenda", "view_start" => "#{@next_year}-01-01",
-                               "find_appointment" => @course.asset_string)
+      check_redirect(response,
+                     "view_name" => "agenda",
+                     "view_start" => "#{@next_year}-01-01",
+                     "find_appointment" => @course.asset_string)
     end
 
     it "redirects to a specific event on the month view" do
@@ -92,14 +97,16 @@ describe AppointmentGroupsController do
 
     it "with appt it redirects to a specific event in month view" do
       get "show", params: { id: @ag_with_reservation.to_param, event_id: @reservation.to_param }
-      check_redirect(response, { "view_name" => "month", "view_start" => "#{@next_year}-02-01" },
+      check_redirect(response,
+                     { "view_name" => "month", "view_start" => "#{@next_year}-02-01" },
                      "event_id=#{@reservation.id}")
     end
 
     it "with appt it redirects to a specific parent event in month view if requester did not create the event." do
       user_session @teacher
       get "show", params: { id: @ag_with_reservation.to_param, event_id: @reservation.to_param }
-      check_redirect(response, { "view_name" => "month", "view_start" => "#{@next_year}-02-01" },
+      check_redirect(response,
+                     { "view_name" => "month", "view_start" => "#{@next_year}-02-01" },
                      "event_id=#{@reservation.parent_event.id}")
     end
 

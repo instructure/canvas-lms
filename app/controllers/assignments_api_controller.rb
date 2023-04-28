@@ -928,8 +928,11 @@ class AssignmentsApiController < ApplicationController
                                        nil
                                      end
 
-        assignment_json(assignment, user, session,
-                        submission: submission, override_dates: override_dates,
+        assignment_json(assignment,
+                        user,
+                        session,
+                        submission: submission,
+                        override_dates: override_dates,
                         include_visibility: include_visibility,
                         assignment_visibilities: visibility_array,
                         needs_grading_count_by_section: needs_grading_count_by_section,
@@ -1187,7 +1190,10 @@ class AssignmentsApiController < ApplicationController
     @assignment.workflow_state = "unpublished"
     if authorized_action(@assignment, @current_user, :create)
       @assignment.content_being_saved_by(@current_user)
-      result = create_api_assignment(@assignment, params.require(:assignment), @current_user, @context,
+      result = create_api_assignment(@assignment,
+                                     params.require(:assignment),
+                                     @current_user,
+                                     @context,
                                      calculate_grades: params.delete(:calculate_grades))
       render_create_or_update_result(result)
     end

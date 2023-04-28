@@ -337,32 +337,35 @@ describe AccountsController do
     it "does not allow admins to set the trusted_referers on sub accounts" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
-      post "update", params: { id: @account.id, account: { settings: {
-        trusted_referers: "http://example.com"
-      } } }
+      post "update", params: { id: @account.id,
+                               account: { settings: {
+                                 trusted_referers: "http://example.com"
+                               } } }
       @account.reload
       expect(@account.settings[:trusted_referers]).to be_nil
     end
 
     it "allows admins to set the trusted_referers on root accounts" do
       account_with_admin_logged_in
-      post "update", params: { id: @account.id, account: { settings: {
-        trusted_referers: "http://example.com"
-      } } }
+      post "update", params: { id: @account.id,
+                               account: { settings: {
+                                 trusted_referers: "http://example.com"
+                               } } }
       @account.reload
       expect(@account.settings[:trusted_referers]).to eq "http://example.com"
     end
 
     it "does not allow non-site-admins to update certain settings" do
       account_with_admin_logged_in
-      post "update", params: { id: @account.id, account: { settings: {
-        global_includes: true,
-        enable_profiles: true,
-        enable_turnitin: true,
-        admins_can_change_passwords: true,
-        admins_can_view_notifications: true,
-        limit_parent_app_web_access: true,
-      } } }
+      post "update", params: { id: @account.id,
+                               account: { settings: {
+                                 global_includes: true,
+                                 enable_profiles: true,
+                                 enable_turnitin: true,
+                                 admins_can_change_passwords: true,
+                                 admins_can_view_notifications: true,
+                                 limit_parent_app_web_access: true,
+                               } } }
       @account.reload
       expect(@account.global_includes?).to be_falsey
       expect(@account.enable_profiles?).to be_falsey
@@ -377,14 +380,15 @@ describe AccountsController do
       user_session(@user)
       @account = Account.create!
       Account.site_admin.account_users.create!(user: @user)
-      post "update", params: { id: @account.id, account: { settings: {
-        global_includes: true,
-        enable_profiles: true,
-        enable_turnitin: true,
-        admins_can_change_passwords: true,
-        admins_can_view_notifications: true,
-        limit_parent_app_web_access: true,
-      } } }
+      post "update", params: { id: @account.id,
+                               account: { settings: {
+                                 global_includes: true,
+                                 enable_profiles: true,
+                                 enable_turnitin: true,
+                                 admins_can_change_passwords: true,
+                                 admins_can_view_notifications: true,
+                                 limit_parent_app_web_access: true,
+                               } } }
       @account.reload
       expect(@account.global_includes?).to be_truthy
       expect(@account.enable_profiles?).to be_truthy
@@ -399,9 +403,10 @@ describe AccountsController do
       user_session(@user)
       @account = Account.create!
       Account.site_admin.account_users.create!(user: @user)
-      post "update", params: { id: @account.id, account: { settings: {
-        product_name: "blah"
-      } } }
+      post "update", params: { id: @account.id,
+                               account: { settings: {
+                                 product_name: "blah"
+                               } } }
       @account.reload
       expect(@account.settings[:product_name]).to be_nil
     end
@@ -410,14 +415,16 @@ describe AccountsController do
       account_with_admin_logged_in
       subaccount = @account.sub_accounts.create!
 
-      post "update", params: { id: subaccount.id, account: { settings: {
-        restrict_student_future_view: { value: true }
-      } } }
+      post "update", params: { id: subaccount.id,
+                               account: { settings: {
+                                 restrict_student_future_view: { value: true }
+                               } } }
       expect(subaccount.reload.settings[:restrict_student_future_view][:value]).to be true
 
-      post "update", params: { id: subaccount.id, account: { settings: {
-        restrict_student_future_view: { value: false }
-      } } }
+      post "update", params: { id: subaccount.id,
+                               account: { settings: {
+                                 restrict_student_future_view: { value: false }
+                               } } }
       expect(subaccount.reload.settings[:restrict_student_future_view]).to be_nil
     end
 
@@ -430,21 +437,24 @@ describe AccountsController do
       expect(subaccount.reload.settings[:restrict_student_future_view]).to be_nil
       expect(subaccount.restrict_student_future_view[:value]).to be false
 
-      post "update", params: { id: root_account.id, account: { settings: {
-        restrict_student_future_view: { value: true }
-      } } }
+      post "update", params: { id: root_account.id,
+                               account: { settings: {
+                                 restrict_student_future_view: { value: true }
+                               } } }
       expect(subaccount.reload.settings[:restrict_student_future_view]).to be_nil
       expect(subaccount.restrict_student_future_view[:value]).to be true
 
-      post "update", params: { id: subaccount.id, account: { settings: {
-        restrict_student_future_view: { value: false }
-      } } }
+      post "update", params: { id: subaccount.id,
+                               account: { settings: {
+                                 restrict_student_future_view: { value: false }
+                               } } }
       expect(subaccount.reload.settings[:restrict_student_future_view][:value]).to be false
       expect(subaccount.restrict_student_future_view[:value]).to be false
 
-      post "update", params: { id: subaccount.id, account: { settings: {
-        restrict_student_future_view: { value: true }
-      } } }
+      post "update", params: { id: subaccount.id,
+                               account: { settings: {
+                                 restrict_student_future_view: { value: true }
+                               } } }
       expect(subaccount.reload.settings[:restrict_student_future_view]).to be_nil
       expect(subaccount.restrict_student_future_view[:value]).to be true
     end
@@ -452,15 +462,17 @@ describe AccountsController do
     it "doesn't break I18n by setting the help_link_name unnecessarily" do
       account_with_admin_logged_in
 
-      post "update", params: { id: @account.id, account: { settings: {
-        help_link_name: "Help"
-      } } }
+      post "update", params: { id: @account.id,
+                               account: { settings: {
+                                 help_link_name: "Help"
+                               } } }
       @account.reload
       expect(@account.settings[:help_link_name]).to be_nil
 
-      post "update", params: { id: @account.id, account: { settings: {
-        help_link_name: "Halp"
-      } } }
+      post "update", params: { id: @account.id,
+                               account: { settings: {
+                                 help_link_name: "Halp"
+                               } } }
       @account.reload
       expect(@account.settings[:help_link_name]).to eq "Halp"
     end
@@ -468,19 +480,28 @@ describe AccountsController do
     it "doesn't break I18n by setting customized text for default help links unnecessarily" do
       Setting.set("show_feedback_link", "true")
       account_with_admin_logged_in
-      post "update", params: { id: @account.id, account: { custom_help_links: { "0" =>
-        { id: "instructor_question", text: "Ask Your Instructor a Question",
-          subtext: "Questions are submitted to your instructor", type: "default",
-          url: "#teacher_feedback", available_to: ["student"] } } } }
+      post "update", params: { id: @account.id,
+                               account: { custom_help_links: { "0" =>
+        { id: "instructor_question",
+          text: "Ask Your Instructor a Question",
+          subtext: "Questions are submitted to your instructor",
+          type: "default",
+          url: "#teacher_feedback",
+          available_to: ["student"] } } } }
       @account.reload
       link = @account.settings[:custom_help_links].detect { |l| l["id"] == "instructor_question" }
       expect(link).not_to have_key("text")
       expect(link).not_to have_key("subtext")
       expect(link).not_to have_key("url")
 
-      post "update", params: { id: @account.id, account: { custom_help_links: { "0" =>
-        { id: "instructor_question", text: "yo", subtext: "wiggity", type: "default",
-          url: "#dawg", available_to: ["student"] } } } }
+      post "update", params: { id: @account.id,
+                               account: { custom_help_links: { "0" =>
+        { id: "instructor_question",
+          text: "yo",
+          subtext: "wiggity",
+          type: "default",
+          url: "#dawg",
+          available_to: ["student"] } } } }
       @account.reload
       link = @account.settings[:custom_help_links].detect { |l| l["id"] == "instructor_question" }
       expect(link["text"]).to eq "yo"
@@ -490,11 +511,16 @@ describe AccountsController do
 
     it "doesn't allow invalid help links" do
       account_with_admin_logged_in
-      post "update", params: { id: @account.id, account: { custom_help_links: { "0" =>
-        { id: "instructor_question", text: "Ask Your Instructor a Question",
-          subtext: "Questions are submitted to your instructor", type: "default",
-          url: "#teacher_feedback", available_to: ["student"],
-          is_featured: true, is_new: true } } } }
+      post "update", params: { id: @account.id,
+                               account: { custom_help_links: { "0" =>
+        { id: "instructor_question",
+          text: "Ask Your Instructor a Question",
+          subtext: "Questions are submitted to your instructor",
+          type: "default",
+          url: "#teacher_feedback",
+          available_to: ["student"],
+          is_featured: true,
+          is_new: true } } } }
       expect(flash[:error]).to match(/update failed/)
       expect(@account.reload.settings[:custom_help_links]).to be_nil
     end
@@ -509,13 +535,14 @@ describe AccountsController do
       AccountServices.register_service(:test3,
                                        { name: "test3", description: "", expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |_, account| account == @account } })
       Account.site_admin.account_users.create!(user: @user)
-      post "update", params: { id: @account.id, account: {
-        services: {
-          "test1" => "1",
-          "test2" => "1",
-          "test3" => "1",
-        }
-      } }
+      post "update", params: { id: @account.id,
+                               account: {
+                                 services: {
+                                   "test1" => "1",
+                                   "test2" => "1",
+                                   "test3" => "1",
+                                 }
+                               } }
       @account.reload
       expect(@account.allowed_services).to match(/\+test1/)
       expect(@account.allowed_services).not_to match(/\+test2/)
@@ -667,19 +694,22 @@ describe AccountsController do
       context "with :manage_storage_quotas" do
         before :once do
           role = custom_account_role "quota-setter", account: @account
-          @account.role_overrides.create! permission: "manage_account_settings", enabled: true,
+          @account.role_overrides.create! permission: "manage_account_settings",
+                                          enabled: true,
                                           role: role
-          @account.role_overrides.create! permission: "manage_storage_quotas", enabled: true,
+          @account.role_overrides.create! permission: "manage_storage_quotas",
+                                          enabled: true,
                                           role: role
           @account.account_users.create!(user: @user, role: role)
         end
 
         it "allows setting default quota (mb)" do
-          post "update", params: { id: @account.id, account: {
-            default_storage_quota_mb: 999,
-            default_user_storage_quota_mb: 99,
-            default_group_storage_quota_mb: 9999
-          } }
+          post "update", params: { id: @account.id,
+                                   account: {
+                                     default_storage_quota_mb: 999,
+                                     default_user_storage_quota_mb: 99,
+                                     default_group_storage_quota_mb: 9999
+                                   } }
           @account.reload
           expect(@account.default_storage_quota_mb).to eq 999
           expect(@account.default_user_storage_quota_mb).to eq 99
@@ -687,17 +717,19 @@ describe AccountsController do
         end
 
         it "allows setting default quota (bytes)" do
-          post "update", params: { id: @account.id, account: {
-            default_storage_quota: 101.megabytes,
-          } }
+          post "update", params: { id: @account.id,
+                                   account: {
+                                     default_storage_quota: 101.megabytes,
+                                   } }
           @account.reload
           expect(@account.default_storage_quota).to eq 101.megabytes
         end
 
         it "allows setting storage quota" do
-          post "update", params: { id: @account.id, account: {
-            storage_quota: 777.megabytes
-          } }
+          post "update", params: { id: @account.id,
+                                   account: {
+                                     storage_quota: 777.megabytes
+                                   } }
           @account.reload
           expect(@account.storage_quota).to eq 777.megabytes
         end
@@ -706,18 +738,20 @@ describe AccountsController do
       context "without :manage_storage_quotas" do
         before :once do
           role = custom_account_role "quota-example", account: @account
-          @account.role_overrides.create! permission: "manage_account_settings", enabled: true,
+          @account.role_overrides.create! permission: "manage_account_settings",
+                                          enabled: true,
                                           role: role
           @account.account_users.create!(user: @user, role: role)
         end
 
         it "disallows setting default quota (mb)" do
-          post "update", params: { id: @account.id, account: {
-            default_storage_quota: 999,
-            default_user_storage_quota_mb: 99,
-            default_group_storage_quota_mb: 9,
-            default_time_zone: "Alaska"
-          } }
+          post "update", params: { id: @account.id,
+                                   account: {
+                                     default_storage_quota: 999,
+                                     default_user_storage_quota_mb: 99,
+                                     default_group_storage_quota_mb: 9,
+                                     default_time_zone: "Alaska"
+                                   } }
           @account.reload
           expect(@account.default_storage_quota_mb).to eq 123
           expect(@account.default_user_storage_quota_mb).to eq 45
@@ -726,20 +760,22 @@ describe AccountsController do
         end
 
         it "disallows setting default quota (bytes)" do
-          post "update", params: { id: @account.id, account: {
-            default_storage_quota: 101.megabytes,
-            default_time_zone: "Alaska"
-          } }
+          post "update", params: { id: @account.id,
+                                   account: {
+                                     default_storage_quota: 101.megabytes,
+                                     default_time_zone: "Alaska"
+                                   } }
           @account.reload
           expect(@account.default_storage_quota).to eq 123.megabytes
           expect(@account.default_time_zone.name).to eq "Alaska"
         end
 
         it "disallows setting storage quota" do
-          post "update", params: { id: @account.id, account: {
-            storage_quota: 777.megabytes,
-            default_time_zone: "Alaska"
-          } }
+          post "update", params: { id: @account.id,
+                                   account: {
+                                     storage_quota: 777.megabytes,
+                                     default_time_zone: "Alaska"
+                                   } }
           @account.reload
           expect(@account.storage_quota).to eq 555.megabytes
           expect(@account.default_time_zone.name).to eq "Alaska"
@@ -753,13 +789,14 @@ describe AccountsController do
       before { user_session(@admin) }
 
       it "allows setting turnitin values" do
-        post "update", params: { id: @account.id, account: {
-          turnitin_account_id: "123456",
-          turnitin_shared_secret: "sekret",
-          turnitin_host: "secret.turnitin.com",
-          turnitin_pledge: "i will do it",
-          turnitin_comments: "good work",
-        } }
+        post "update", params: { id: @account.id,
+                                 account: {
+                                   turnitin_account_id: "123456",
+                                   turnitin_shared_secret: "sekret",
+                                   turnitin_host: "secret.turnitin.com",
+                                   turnitin_pledge: "i will do it",
+                                   turnitin_comments: "good work",
+                                 } }
 
         @account.reload
         expect(@account.turnitin_account_id).to eq "123456"
@@ -770,23 +807,26 @@ describe AccountsController do
       end
 
       it "pulls out the host from a valid url" do
-        post "update", params: { id: @account.id, account: {
-          turnitin_host: "https://secret.turnitin.com/"
-        } }
+        post "update", params: { id: @account.id,
+                                 account: {
+                                   turnitin_host: "https://secret.turnitin.com/"
+                                 } }
         expect(@account.reload.turnitin_host).to eq "secret.turnitin.com"
       end
 
       it "nils out the host if blank is passed" do
-        post "update", params: { id: @account.id, account: {
-          turnitin_host: ""
-        } }
+        post "update", params: { id: @account.id,
+                                 account: {
+                                   turnitin_host: ""
+                                 } }
         expect(@account.reload.turnitin_host).to be_nil
       end
 
       it "errors on an invalid host" do
-        post "update", params: { id: @account.id, account: {
-          turnitin_host: "blah"
-        } }
+        post "update", params: { id: @account.id,
+                                 account: {
+                                   turnitin_host: "blah"
+                                 } }
         expect(response).not_to be_successful
       end
     end
@@ -797,9 +837,10 @@ describe AccountsController do
       before { user_session(@admin) }
 
       it "is able to set and update a custom terms of service" do
-        post "update", params: { id: @account.id, account: {
-          terms_of_service: { terms_type: "custom", content: "stuff" }
-        } }
+        post "update", params: { id: @account.id,
+                                 account: {
+                                   terms_of_service: { terms_type: "custom", content: "stuff" }
+                                 } }
         tos = @account.reload.terms_of_service
         expect(tos.terms_type).to eq "custom"
         expect(tos.terms_of_service_content.content).to eq "stuff"
@@ -870,13 +911,15 @@ describe AccountsController do
 
     it "is set and unset outgoing email name" do
       account_with_admin_logged_in
-      post "update", params: { id: @account.id, account: {
-        settings: { outgoing_email_default_name_option: "custom", outgoing_email_default_name: "beep" }
-      } }
+      post "update", params: { id: @account.id,
+                               account: {
+                                 settings: { outgoing_email_default_name_option: "custom", outgoing_email_default_name: "beep" }
+                               } }
       expect(@account.reload.settings[:outgoing_email_default_name]).to eq "beep"
-      post "update", params: { id: @account.id, account: {
-        settings: { outgoing_email_default_name_option: "default" }
-      } }
+      post "update", params: { id: @account.id,
+                               account: {
+                                 settings: { outgoing_email_default_name_option: "default" }
+                               } }
       expect(@account.reload.settings[:outgoing_email_default_name]).to be_nil
     end
 
@@ -1076,10 +1119,11 @@ describe AccountsController do
 
       it "creates a new external integration key" do
         key_value = "2142"
-        post "update", params: { id: @account.id, account: { external_integration_keys: {
-          external_key0: "42",
-          external_key2: key_value
-        } } }
+        post "update", params: { id: @account.id,
+                                 account: { external_integration_keys: {
+                                   external_key0: "42",
+                                   external_key2: key_value
+                                 } } }
         @account.reload
         eik = @account.external_integration_keys.where(key_type: :external_key2).first
         expect(eik).to_not be_nil
@@ -1088,11 +1132,12 @@ describe AccountsController do
 
       it "updates an existing external integration key" do
         key_value = "2142"
-        post "update", params: { id: @account.id, account: { external_integration_keys: {
-          external_key0: key_value,
-          external_key1: key_value,
-          external_key2: key_value
-        } } }
+        post "update", params: { id: @account.id,
+                                 account: { external_integration_keys: {
+                                   external_key0: key_value,
+                                   external_key1: key_value,
+                                   external_key2: key_value
+                                 } } }
         @account.reload
 
         # Should not be able to edit external_key1.  The user does not have the rights.
@@ -1105,9 +1150,10 @@ describe AccountsController do
       end
 
       it "deletes an external integration key when not provided or the value is blank" do
-        post "update", params: { id: @account.id, account: { external_integration_keys: {
-          external_key0: nil
-        } } }
+        post "update", params: { id: @account.id,
+                                 account: { external_integration_keys: {
+                                   external_key0: nil
+                                 } } }
         expect(@account.external_integration_keys.count).to eq 0
       end
     end
@@ -1293,7 +1339,8 @@ describe AccountsController do
       u = User.create(name: "billy bob")
       user_session(u)
       @account.role_overrides.create! permission: "read_course_list",
-                                      enabled: false, role: role
+                                      enabled: false,
+                                      role: role
       @account.account_users.create!(user: u, role: role)
       get "courses_api", params: { account_id: @account.id }
       assert_unauthorized
@@ -1508,7 +1555,8 @@ describe AccountsController do
         @account = Account.create!
         create_courses(letters_in_random_order.map do |i|
           { enrollment_term_id: @account.enrollment_terms.create!(name: i).id }
-        end, account: @account)
+        end,
+                       account: @account)
         admin_logged_in(@account)
       end
 
@@ -1622,8 +1670,10 @@ describe AccountsController do
 
       admin_logged_in(@account)
 
-      get "courses_api", params: { account_id: @account.id, sort: "sis_course_id",
-                                   order: "asc", search_by: "course",
+      get "courses_api", params: { account_id: @account.id,
+                                   sort: "sis_course_id",
+                                   order: "asc",
+                                   search_by: "course",
                                    include: ["active_teachers"] }
 
       expect(response.body).not_to match(/"display_name":"rejected"/)
@@ -1699,8 +1749,10 @@ describe AccountsController do
         admin_logged_in(@account)
 
         @shard1.activate do
-          get "courses_api", params: { account_id: @account.id, sort: "sis_course_id",
-                                       order: "asc", search_by: "course",
+          get "courses_api", params: { account_id: @account.id,
+                                       sort: "sis_course_id",
+                                       order: "asc",
+                                       search_by: "course",
                                        include: ["active_teachers"] }
         end
 
@@ -1729,8 +1781,10 @@ describe AccountsController do
 
         admin_logged_in(@account)
 
-        get "courses_api", params: { account_id: @account.id, sort: "sis_course_id",
-                                     order: "asc", search_by: "course",
+        get "courses_api", params: { account_id: @account.id,
+                                     sort: "sis_course_id",
+                                     order: "asc",
+                                     search_by: "course",
                                      include: ["active_teachers"] }
 
         expect(response.body).not_to match(/"display_name":"rejected"/)

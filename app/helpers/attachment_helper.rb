@@ -88,8 +88,10 @@ module AttachmentHelper
 
     set_cache_header(attachment, direct)
     if safer_domain_available?
-      redirect_to safe_domain_file_url(attachment, host_and_shard: @safer_domain_host,
-                                                   verifier: verifier, download: !inline)
+      redirect_to safe_domain_file_url(attachment,
+                                       host_and_shard: @safer_domain_host,
+                                       verifier: verifier,
+                                       download: !inline)
     elsif attachment.stored_locally?
       @headers = false if @files_domain
       send_file(attachment.full_filename, type: attachment.content_type_with_encoding, disposition: (inline ? "inline" : "attachment"), filename: attachment.display_name)

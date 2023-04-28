@@ -269,10 +269,14 @@ class ConversationsController < ApplicationController
       conversations = Api.paginate(@conversations_scope, self, api_v1_conversations_url)
       # OPTIMIZE: loading the most recent messages for each conversation into a single query
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
-      @conversations_json = conversations_json(conversations, @current_user,
-                                               session, include_participant_avatars: (Array(params[:include]).include? "participant_avatars"),
-                                                        include_participant_contexts: false, visible: true,
-                                                        include_context_name: true, include_beta: params[:include_beta])
+      @conversations_json = conversations_json(conversations,
+                                               @current_user,
+                                               session,
+                                               include_participant_avatars: (Array(params[:include]).include? "participant_avatars"),
+                                               include_participant_contexts: false,
+                                               visible: true,
+                                               include_context_name: true,
+                                               include_beta: params[:include_beta])
 
       if params[:include_all_conversation_ids]
         @conversations_json = { conversations: @conversations_json, conversation_ids: @conversations_scope.conversation_ids }
@@ -449,9 +453,14 @@ class ConversationsController < ApplicationController
         mode = (params[:mode] == "async") ? :async : :sync
         message.relativize_attachment_ids(from_shard: message.shard, to_shard: shard)
         message.shard = shard
-        batch = ConversationBatch.generate(message, @recipients, mode,
-                                           subject: params[:subject], context_type: context_type,
-                                           context_id: context_id, tags: @tags, group: batch_group_messages)
+        batch = ConversationBatch.generate(message,
+                                           @recipients,
+                                           mode,
+                                           subject: params[:subject],
+                                           context_type: context_type,
+                                           context_id: context_id,
+                                           tags: @tags,
+                                           group: batch_group_messages)
 
         InstStatsd::Statsd.count("inbox.conversation.created.legacy", batch.recipient_count)
         InstStatsd::Statsd.increment("inbox.message.sent.legacy")
@@ -1120,7 +1129,8 @@ class ConversationsController < ApplicationController
     if audience_names.length <= participant_list_cutoff
       content += ERB::Util.h(audience_names.to_sentence).to_s
     else
-      others_string = t("other_recipients", {
+      others_string = t("other_recipients",
+                        {
                           one: "and 1 other",
                           other: "and %{count} others"
                         },

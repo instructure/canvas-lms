@@ -396,7 +396,8 @@ class DiscussionEntry < ActiveRecord::Base
 
   def self.participant_join_sql(current_user)
     sanitize_sql(["LEFT OUTER JOIN #{DiscussionEntryParticipant.quoted_table_name} ON discussion_entries.id = discussion_entry_participants.discussion_entry_id
-      AND discussion_entry_participants.user_id = ?", current_user.id])
+      AND discussion_entry_participants.user_id = ?",
+                  current_user.id])
   end
 
   def to_atom(opts = {})
@@ -449,7 +450,8 @@ class DiscussionEntry < ActiveRecord::Base
         scope = scope.where("NOT EXISTS (?)",
                             GroupMembership.where("group_memberships.workflow_state <> 'deleted' AND
             group_memberships.user_id=discussion_topic_participants.user_id AND
-            group_memberships.group_id IN (?)", group_ids))
+            group_memberships.group_id IN (?)",
+                                                  group_ids))
       end
       scope = scope.where("user_id<>?", user) if user
       scope.in_batches(of: 10_000).update_all("unread_entry_count = unread_entry_count + 1")

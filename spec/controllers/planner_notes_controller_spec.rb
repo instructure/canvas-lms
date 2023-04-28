@@ -201,8 +201,11 @@ describe PlannerNotesController do
           it "links to an assignment" do
             a = @course_1.assignments.create!(title: "Foo")
 
-            post :create, params: { course_id: @course_1.to_param, details: "foo", todo_date: 1.day.from_now,
-                                    linked_object_type: "assignment", linked_object_id: a.to_param }
+            post :create, params: { course_id: @course_1.to_param,
+                                    details: "foo",
+                                    todo_date: 1.day.from_now,
+                                    linked_object_type: "assignment",
+                                    linked_object_id: a.to_param }
             expect(response).to have_http_status(:created)
 
             json = response.parsed_body
@@ -221,8 +224,11 @@ describe PlannerNotesController do
           it "links to an announcement" do
             a = @course_1.announcements.create!(title: "Bar", message: "eh")
 
-            post :create, params: { course_id: @course_1.to_param, details: "bar", todo_date: 1.day.from_now,
-                                    linked_object_type: "announcement", linked_object_id: a.to_param }
+            post :create, params: { course_id: @course_1.to_param,
+                                    details: "bar",
+                                    todo_date: 1.day.from_now,
+                                    linked_object_type: "announcement",
+                                    linked_object_id: a.to_param }
             expect(response).to have_http_status(:created)
 
             json = response.parsed_body
@@ -241,8 +247,11 @@ describe PlannerNotesController do
           it "links to a discussion topic" do
             dt = @course_1.discussion_topics.create!(title: "Baz")
 
-            post :create, params: { course_id: @course_1.to_param, details: "baz", todo_date: 1.day.from_now,
-                                    linked_object_type: "discussion_topic", linked_object_id: dt.to_param }
+            post :create, params: { course_id: @course_1.to_param,
+                                    details: "baz",
+                                    todo_date: 1.day.from_now,
+                                    linked_object_type: "discussion_topic",
+                                    linked_object_id: dt.to_param }
             expect(response).to have_http_status(:created)
 
             json = response.parsed_body
@@ -261,8 +270,11 @@ describe PlannerNotesController do
           it "links to a wiki page" do
             wp = @course_1.wiki_pages.create!(title: "Quux")
 
-            post :create, params: { course_id: @course_1.to_param, details: "quux", todo_date: 1.day.from_now,
-                                    linked_object_type: "wiki_page", linked_object_id: wp.id.to_s }
+            post :create, params: { course_id: @course_1.to_param,
+                                    details: "quux",
+                                    todo_date: 1.day.from_now,
+                                    linked_object_type: "wiki_page",
+                                    linked_object_id: wp.id.to_s }
             expect(response).to have_http_status(:created)
 
             json = response.parsed_body
@@ -282,8 +294,11 @@ describe PlannerNotesController do
             q = @course_1.quizzes.create!(title: "Quuux")
             q.publish!
 
-            post :create, params: { course_id: @course_1.to_param, details: "quuux", todo_date: 1.day.from_now,
-                                    linked_object_type: "quiz", linked_object_id: q.to_param }
+            post :create, params: { course_id: @course_1.to_param,
+                                    details: "quuux",
+                                    todo_date: 1.day.from_now,
+                                    linked_object_type: "quiz",
+                                    linked_object_id: q.to_param }
             expect(response).to have_http_status(:created)
 
             json = response.parsed_body
@@ -300,44 +315,63 @@ describe PlannerNotesController do
           end
 
           it "returns 404 when the linked object doesn't exist" do
-            post :create, params: { course_id: @course_1.to_param, details: "quuux", todo_date: 1.day.from_now,
-                                    linked_object_type: "discussion_topic", linked_object_id: 0 }
+            post :create, params: { course_id: @course_1.to_param,
+                                    details: "quuux",
+                                    todo_date: 1.day.from_now,
+                                    linked_object_type: "discussion_topic",
+                                    linked_object_id: 0 }
             expect(response).to have_http_status(:not_found)
           end
 
           it "checks :read permission on the linked object" do
             a = @course_1.assignments.create!(title: "Foo", workflow_state: "unpublished")
-            post :create, params: { course_id: @course_1.to_param, details: "quuux", todo_date: 1.day.from_now,
-                                    linked_object_type: "assignment", linked_object_id: a.id }
+            post :create, params: { course_id: @course_1.to_param,
+                                    details: "quuux",
+                                    todo_date: 1.day.from_now,
+                                    linked_object_type: "assignment",
+                                    linked_object_id: a.id }
             expect(response).to have_http_status(:unauthorized)
           end
 
           it "returns 400 when attempting to link to an unsupported type" do
             outcome = @course_1.learning_outcomes.create!(title: "eh")
-            post :create, params: { course_id: @course_1.to_param, details: "quuux", todo_date: 1.day.from_now,
-                                    linked_object_type: "learning_outcome", linked_object_id: outcome.id }
+            post :create, params: { course_id: @course_1.to_param,
+                                    details: "quuux",
+                                    todo_date: 1.day.from_now,
+                                    linked_object_type: "learning_outcome",
+                                    linked_object_id: outcome.id }
             expect(response).to have_http_status(:bad_request)
           end
 
           it "returns 400 if the course_id is omitted" do
             a = @course_1.assignments.create!(title: "Foo")
-            post :create, params: { details: "foo", todo_date: 1.day.from_now,
-                                    linked_object_type: "assignment", linked_object_id: a.id }
+            post :create, params: { details: "foo",
+                                    todo_date: 1.day.from_now,
+                                    linked_object_type: "assignment",
+                                    linked_object_id: a.id }
             expect(response).to have_http_status(:bad_request)
           end
 
           it "returns 400 if a non-deleted planner note link to the object already exists" do
             a = @course_1.assignments.create!(title: "Foo")
-            n = @student.planner_notes.create!(title: "Foo", todo_date: 1.day.from_now, course_id: @course_1,
+            n = @student.planner_notes.create!(title: "Foo",
+                                               todo_date: 1.day.from_now,
+                                               course_id: @course_1,
                                                linked_object: a)
-            post :create, params: { details: "bar", todo_date: 2.days.from_now, linked_object_type: "assignment",
-                                    course_id: @course_1.id, linked_object_id: a.id }
+            post :create, params: { details: "bar",
+                                    todo_date: 2.days.from_now,
+                                    linked_object_type: "assignment",
+                                    course_id: @course_1.id,
+                                    linked_object_id: a.id }
             expect(response).to have_http_status(:bad_request)
             expect(response.body).to include "a planner note linked to that object already exists"
 
             n.destroy
-            post :create, params: { details: "bar", todo_date: 2.days.from_now, linked_object_type: "assignment",
-                                    course_id: @course_1.id, linked_object_id: a.id }
+            post :create, params: { details: "bar",
+                                    todo_date: 2.days.from_now,
+                                    linked_object_type: "assignment",
+                                    course_id: @course_1.id,
+                                    linked_object_id: a.id }
             expect(response).to be_successful
 
             scope = @student.planner_notes.where(linked_object_id: a.id, linked_object_type: "Assignment")
@@ -357,8 +391,10 @@ describe PlannerNotesController do
             end
 
             it "links to an object in another shard" do
-              post :create, params: { todo_date: 1.day.from_now, course_id: @remote_course.id,
-                                      linked_object_type: "assignment", linked_object_id: @remote_assignment.id }
+              post :create, params: { todo_date: 1.day.from_now,
+                                      course_id: @remote_course.id,
+                                      linked_object_type: "assignment",
+                                      linked_object_id: @remote_assignment.id }
               expect(response).to be_successful
 
               json = response.parsed_body

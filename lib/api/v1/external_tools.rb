@@ -32,7 +32,9 @@ module Api::V1::ExternalTools
     methods += extension_types
     only = %w[id name description url domain consumer_key created_at updated_at description]
     only << "allow_membership_service_access" if tool.context.root_account.feature_enabled?(:membership_service_for_lti_tools)
-    json = api_json(tool, user, session,
+    json = api_json(tool,
+                    user,
+                    session,
                     only: only,
                     methods: methods)
     json["url"] = tool.url_with_environment_overrides(tool.url, include_launch_url: true)

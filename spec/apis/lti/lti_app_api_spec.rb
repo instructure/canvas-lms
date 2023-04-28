@@ -40,9 +40,13 @@ module Lti
       it "returns a list of launch definitions for a context and placements" do
         resource_tool = new_valid_external_tool(account, true)
         course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
-                        { controller: "lti/lti_apps", action: "launch_definitions", format: "json",
-                          placements: %w[resource_selection], course_id: @course.id.to_s })
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+                        { controller: "lti/lti_apps",
+                          action: "launch_definitions",
+                          format: "json",
+                          placements: %w[resource_selection],
+                          course_id: @course.id.to_s })
         expect(json.detect { |j| j["definition_type"] == resource_tool.class.name && j["definition_id"] == resource_tool.id }).not_to be_nil
         expect(json.detect { |j| j["definition_type"] == @external_tool.class.name && j["definition_id"] == @external_tool.id }).to be_nil
       end
@@ -50,7 +54,8 @@ module Lti
       it "works for a teacher even without lti_add_edit permissions" do
         course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
         account.role_overrides.create!(permission: "lti_add_edit", enabled: false, role: teacher_role)
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s })
         expect(json.count).to eq 1
         expect(json.detect { |j| j["definition_type"] == @external_tool.class.name && j["definition_id"] == @external_tool.id }).not_to be_nil
@@ -59,7 +64,8 @@ module Lti
       it "returns authorized for a student but with no results when no placement is specified" do
         course_with_student(active_all: true, user: user_with_pseudonym, account: account)
 
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s })
 
         expect(response).to have_http_status :ok
@@ -71,7 +77,8 @@ module Lti
         resource_tool = new_valid_external_tool(account, true)
         resource_tool.settings[:resource_selection][:visibility] = "admins"
         resource_tool.save!
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s, placements: %w[resource_selection] })
 
         expect(response).to have_http_status :ok
@@ -83,7 +90,8 @@ module Lti
         resource_tool = new_valid_external_tool(account, true)
         resource_tool.settings[:resource_selection][:visibility] = "members"
         resource_tool.save!
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s, placements: %w[resource_selection] })
 
         expect(response).to have_http_status :ok
@@ -96,7 +104,8 @@ module Lti
         resource_tool = new_valid_external_tool(account, true)
         resource_tool.settings[:resource_selection][:visibility] = "public"
         resource_tool.save!
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s, placements: %w[resource_selection] })
 
         expect(response).to have_http_status :ok
@@ -107,7 +116,8 @@ module Lti
       it "student can get definition for tool with unspecified visibility" do
         course_with_student(active_all: true, user: user_with_pseudonym, account: account)
         resource_tool = new_valid_external_tool(account, true)
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s, placements: %w[resource_selection] })
 
         expect(response).to have_http_status :ok
@@ -120,7 +130,8 @@ module Lti
         resource_tool = new_valid_external_tool(account, true)
         resource_tool.settings[:resource_selection][:visibility] = "public"
         resource_tool.save!
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s, placements: %w[resource_selection] })
 
         expect(response).to have_http_status :ok
@@ -129,7 +140,8 @@ module Lti
       end
 
       it "cannot get the definition of public stuff at the account level" do
-        api_call(:get, "/api/v1/accounts/self/lti_apps/launch_definitions",
+        api_call(:get,
+                 "/api/v1/accounts/self/lti_apps/launch_definitions",
                  { controller: "lti/lti_apps", action: "launch_definitions", format: "json", account_id: "self", placements: %w[global_navigation] })
         expect(response).to have_http_status :unauthorized
       end
@@ -139,7 +151,8 @@ module Lti
         resource_tool = new_valid_external_tool(account, true)
         resource_tool.settings[:resource_selection][:visibility] = "members"
         resource_tool.save!
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s, placements: %w[resource_selection] })
 
         expect(response).to have_http_status :ok
@@ -155,7 +168,8 @@ module Lti
         }
         tool.save!
 
-        json = api_call(:get, "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
+        json = api_call(:get,
+                        "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", account_id: account.id.to_param, format: "json" },
                         placements: ["global_navigation"])
 
@@ -178,7 +192,8 @@ module Lti
         }
         tool.save!
 
-        json = api_call(:get, "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
+        json = api_call(:get,
+                        "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", account_id: account.id.to_param, format: "json" },
                         placements: ["global_navigation"])
 
@@ -190,9 +205,14 @@ module Lti
       it "paginates the launch definitions" do
         5.times { |_| new_valid_external_tool(account) }
         course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions?per_page=3",
-                        { controller: "lti/lti_apps", action: "launch_definitions", format: "json",
-                          placements: Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS, course_id: @course.id.to_s, per_page: "3" })
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions?per_page=3",
+                        { controller: "lti/lti_apps",
+                          action: "launch_definitions",
+                          format: "json",
+                          placements: Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS,
+                          course_id: @course.id.to_s,
+                          per_page: "3" })
 
         json_next = follow_pagination_link("next", {
                                              controller: "lti/lti_apps",

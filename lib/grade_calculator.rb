@@ -209,9 +209,12 @@ class GradeCalculator
       next unless threshold.did_pass_threshold(old_score.current_score, score.current_score)
       next unless observer_ids.include?(threshold.observer_id)
 
-      ObserverAlert.create(observer_id: threshold.observer_id, user_id: threshold.user_id,
+      ObserverAlert.create(observer_id: threshold.observer_id,
+                           user_id: threshold.user_id,
                            observer_alert_threshold: threshold,
-                           context: @course, action_date: score.updated_at, alert_type: threshold.alert_type,
+                           context: @course,
+                           action_date: score.updated_at,
+                           alert_type: threshold.alert_type,
                            title: I18n.t("Course grade: %{grade}% in %{course_code}", {
                                            grade: score.current_score,
                                            course_code: @course.course_code

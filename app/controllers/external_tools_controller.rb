@@ -656,10 +656,12 @@ class ExternalToolsController < ApplicationController
     opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag) if assignment.present? && assignment.quiz_lti?
 
     expander = variable_expander(assignment: assignment,
-                                 tool: tool, launch: lti_launch,
+                                 tool: tool,
+                                 launch: lti_launch,
                                  post_message_token: opts[:launch_token],
                                  secure_params: params[:secure_params],
-                                 placement: opts[:resource_type], launch_url: opts[:launch_url])
+                                 placement: opts[:resource_type],
+                                 launch_url: opts[:launch_url])
 
     adapter = if tool.use_1_3?
                 a = Lti::LtiAdvantageAdapter.new(
@@ -1532,9 +1534,25 @@ class ExternalToolsController < ApplicationController
 
   def set_tool_attributes(tool, params)
     attrs = Lti::ResourcePlacement.valid_placements(@domain_root_account)
-    attrs += %i[name description url icon_url canvas_icon_class domain privacy_level consumer_key shared_secret
-                custom_fields custom_fields_string text config_type config_url config_xml not_selectable app_center_id
-                oauth_compliant is_rce_favorite]
+    attrs += %i[name
+                description
+                url
+                icon_url
+                canvas_icon_class
+                domain
+                privacy_level
+                consumer_key
+                shared_secret
+                custom_fields
+                custom_fields_string
+                text
+                config_type
+                config_url
+                config_xml
+                not_selectable
+                app_center_id
+                oauth_compliant
+                is_rce_favorite]
     attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
 
     attrs.each do |prop|

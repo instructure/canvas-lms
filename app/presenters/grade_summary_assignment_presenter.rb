@@ -322,7 +322,8 @@ class GradeSummaryAssignmentPresenter
 
     def title
       if legacy
-        I18n.t("#grade_summary.graph_title", "Mean %{mean}, High %{high}, Low %{low}",
+        I18n.t("#grade_summary.graph_title",
+               "Mean %{mean}, High %{high}, Low %{low}",
                {
                  mean: I18n.n(mean), high: I18n.n(high), low: I18n.n(low)
                })

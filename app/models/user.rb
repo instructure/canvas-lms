@@ -40,8 +40,18 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
-  self.ignored_columns += %i[type creation_unique_id creation_sis_batch_id creation_email
-                             sis_name bio merge_to unread_inbox_items_count visibility account_pronoun_id gender birthdate]
+  self.ignored_columns += %i[type
+                             creation_unique_id
+                             creation_sis_batch_id
+                             creation_email
+                             sis_name
+                             bio
+                             merge_to
+                             unread_inbox_items_count
+                             visibility
+                             account_pronoun_id
+                             gender
+                             birthdate]
 
   include Context
   include ModelCache
@@ -84,20 +94,44 @@ class User < ActiveRecord::Base
 
   has_many :observer_pairing_codes, -> { where("workflow_state<>'deleted' AND expires_at > ?", Time.zone.now) }, dependent: :destroy, inverse_of: :user
 
-  has_many :as_student_observation_links, -> { where.not(workflow_state: "deleted") }, class_name: "UserObservationLink",
-                                                                                       foreign_key: :user_id, dependent: :destroy, inverse_of: :student
-  has_many :as_observer_observation_links, -> { where.not(workflow_state: "deleted") }, class_name: "UserObservationLink",
-                                                                                        foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
+  has_many :as_student_observation_links,
+           -> { where.not(workflow_state: "deleted") },
+           class_name: "UserObservationLink",
+           foreign_key: :user_id,
+           dependent: :destroy,
+           inverse_of: :student
+  has_many :as_observer_observation_links,
+           -> { where.not(workflow_state: "deleted") },
+           class_name: "UserObservationLink",
+           foreign_key: :observer_id,
+           dependent: :destroy,
+           inverse_of: :observer
 
-  has_many :as_student_observer_alert_thresholds, -> { where.not(workflow_state: "deleted") }, class_name: "ObserverAlertThreshold",
-                                                                                               foreign_key: :user_id, dependent: :destroy, inverse_of: :student
-  has_many :as_student_observer_alerts, -> { where.not(workflow_state: "deleted") }, class_name: "ObserverAlert",
-                                                                                     foreign_key: :user_id, dependent: :destroy, inverse_of: :student
+  has_many :as_student_observer_alert_thresholds,
+           -> { where.not(workflow_state: "deleted") },
+           class_name: "ObserverAlertThreshold",
+           foreign_key: :user_id,
+           dependent: :destroy,
+           inverse_of: :student
+  has_many :as_student_observer_alerts,
+           -> { where.not(workflow_state: "deleted") },
+           class_name: "ObserverAlert",
+           foreign_key: :user_id,
+           dependent: :destroy,
+           inverse_of: :student
 
-  has_many :as_observer_observer_alert_thresholds, -> { where.not(workflow_state: "deleted") }, class_name: "ObserverAlertThreshold",
-                                                                                                foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
-  has_many :as_observer_observer_alerts, -> { where.not(workflow_state: "deleted") }, class_name: "ObserverAlert",
-                                                                                      foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
+  has_many :as_observer_observer_alert_thresholds,
+           -> { where.not(workflow_state: "deleted") },
+           class_name: "ObserverAlertThreshold",
+           foreign_key: :observer_id,
+           dependent: :destroy,
+           inverse_of: :observer
+  has_many :as_observer_observer_alerts,
+           -> { where.not(workflow_state: "deleted") },
+           class_name: "ObserverAlert",
+           foreign_key: :observer_id,
+           dependent: :destroy,
+           inverse_of: :observer
 
   has_many :linked_observers, -> { distinct }, through: :as_student_observation_links, source: :observer, class_name: "User"
   has_many :linked_students, -> { distinct }, through: :as_observer_observation_links, source: :student, class_name: "User"
@@ -180,7 +214,8 @@ class User < ActiveRecord::Base
   has_many :content_migrations, as: :context, inverse_of: :context
   has_many :content_exports, as: :context, inverse_of: :context
   has_many :usage_rights,
-           as: :context, inverse_of: :context,
+           as: :context,
+           inverse_of: :context,
            class_name: "UsageRights",
            dependent: :destroy
   has_many :gradebook_csvs, dependent: :destroy, class_name: "GradebookCSV"
@@ -415,9 +450,13 @@ class User < ActiveRecord::Base
     scope.group("users.id")
   }
 
-  attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
-                :require_self_enrollment_code, :self_enrollment_code,
-                :self_enrollment_course, :validation_root_account, :sortable_name_explicitly_set
+  attr_accessor :require_acceptance_of_terms,
+                :require_presence_of_name,
+                :require_self_enrollment_code,
+                :self_enrollment_code,
+                :self_enrollment_course,
+                :validation_root_account,
+                :sortable_name_explicitly_set
   attr_reader :self_enrollment
 
   validates :name, length: { maximum: maximum_string_length, allow_nil: true }
@@ -2037,7 +2076,8 @@ class User < ActiveRecord::Base
       enrollments = shard.activate do
         res = Rails.cache.fetch_with_batched_keys(
           ["current_enrollments4", opts[:include_future], ApplicationController.region].cache_key,
-          batch_object: self, batched_keys: :enrollments
+          batch_object: self,
+          batched_keys: :enrollments
         ) do
           scope = (opts[:include_future] ? self.enrollments.current_and_future : self.enrollments.current_and_invited)
           scope.shard(in_region_associated_shards).to_a

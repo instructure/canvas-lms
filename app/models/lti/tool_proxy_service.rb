@@ -150,7 +150,8 @@ module Lti
     end
 
     def create_proxy_binding(tool_proxy, context)
-      ToolProxyBinding.where(context_id: context, context_type: context.class.to_s,
+      ToolProxyBinding.where(context_id: context,
+                             context_type: context.class.to_s,
                              tool_proxy_id: tool_proxy).first_or_create!
     end
 

@@ -616,7 +616,8 @@ describe "course settings" do
 
       bank = @course.assessment_question_banks.create!(title: "bank")
       aq = bank.assessment_questions.create!(question_data: { "question_name" => "test question",
-                                                              "question_text" => html, "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+                                                              "question_text" => html,
+                                                              "answers" => [{ "id" => 1 }, { "id" => 2 }] })
 
       assmnt = @course.assignments.create!(title: "assignment", description: html)
       event = @course.calendar_events.create!(title: "event", description: html)

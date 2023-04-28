@@ -34,7 +34,8 @@ describe "Outcomes Import API", type: :request do
   end
 
   def available_json(expected_status: 200)
-    api_call(:get, "/api/v1/global/outcomes_import/available",
+    api_call(:get,
+             "/api/v1/global/outcomes_import/available",
              {
                controller: "outcomes_academic_benchmark_import_api",
                action: "available",
@@ -49,7 +50,8 @@ describe "Outcomes Import API", type: :request do
   end
 
   def create_json(guid:, expected_status: 200)
-    api_call(:post, "/api/v1/global/outcomes_import",
+    api_call(:post,
+             "/api/v1/global/outcomes_import",
              {
                controller: "outcomes_academic_benchmark_import_api",
                action: "create",
@@ -66,7 +68,8 @@ describe "Outcomes Import API", type: :request do
   end
 
   def create_full_json(json:, expected_status: 200)
-    api_call(:post, "/api/v1/global/outcomes_import",
+    api_call(:post,
+             "/api/v1/global/outcomes_import",
              {
                controller: "outcomes_academic_benchmark_import_api",
                action: "create",
@@ -81,7 +84,8 @@ describe "Outcomes Import API", type: :request do
   end
 
   def status_json(migration_id:, expected_status: 200)
-    api_call(:get, "/api/v1/global/outcomes_import/migration_status/#{migration_id}",
+    api_call(:get,
+             "/api/v1/global/outcomes_import/migration_status/#{migration_id}",
              {
                controller: "outcomes_academic_benchmark_import_api",
                action: "migration_status",
@@ -220,7 +224,10 @@ describe "Outcomes Import API", type: :request do
         it "rejects malformed guids" do
           %w[
             test
-            not a real guid
+            not
+            a
+            real
+            guid
             A833C528<901A-11DF-A622-0C319DFF4B22
             A833C528-901A-11DF>A622-0C319DFF4B22
             A833C528;901A-11DF-A622-0C319DFF4B22

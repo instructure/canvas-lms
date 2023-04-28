@@ -79,12 +79,14 @@ module Canvas
       before do
         allow(described_class).to receive(:config).and_return(static_config)
         @stub = stub_request(:get, "#{addr}/v1/test/path")
-                .to_return(status: 200, body: {
-                  data: {
-                    foo: "bar"
-                  },
-                  lease_duration: 3600,
-                }.to_json, headers: { "content-type": "application/json" })
+                .to_return(status: 200,
+                           body: {
+                             data: {
+                               foo: "bar"
+                             },
+                             lease_duration: 3600,
+                           }.to_json,
+                           headers: { "content-type": "application/json" })
         stub_request(:get, "#{addr}/v1/bad/test/path")
           .to_return(status: 404, headers: { "content-type": "application/json" })
       end
@@ -167,10 +169,12 @@ module Canvas
                                                                              })
           allow(ConfigFile).to receive(:load).and_call_original
           @lock_stub = stub_request(:get, "#{addr}/v1/#{credential_path}")
-                       .to_return(status: 200, body: {
-                         data: credential_data,
-                         lease_duration: lease_duration,
-                       }.to_json, headers: { "content-type": "application/json" })
+                       .to_return(status: 200,
+                                  body: {
+                                    data: credential_data,
+                                    lease_duration: lease_duration,
+                                  }.to_json,
+                                  headers: { "content-type": "application/json" })
         end
 
         it "will queue if the lock is taken and there is no value in the cache" do

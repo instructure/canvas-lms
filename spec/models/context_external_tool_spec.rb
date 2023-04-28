@@ -135,7 +135,9 @@ describe ContextExternalTool do
 
     let(:granted_permissions) do
       ContextExternalTool.global_navigation_granted_permissions(root_account: @root_account,
-                                                                user: global_nav_user, context: global_nav_context, session: nil)
+                                                                user: global_nav_user,
+                                                                context: global_nav_context,
+                                                                session: nil)
     end
     let(:global_nav_user) { nil }
     let(:global_nav_context) { nil }

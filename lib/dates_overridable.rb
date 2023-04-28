@@ -18,8 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module DatesOverridable
-  attr_accessor :applied_overrides, :overridden_for_user, :overridden,
-                :has_no_overrides, :has_too_many_overrides, :preloaded_override_students
+  attr_accessor :applied_overrides,
+                :overridden_for_user,
+                :overridden,
+                :has_no_overrides,
+                :has_too_many_overrides,
+                :preloaded_override_students
   attr_writer :without_overrides
 
   include DifferentiableAssignment
@@ -247,7 +251,8 @@ module DatesOverridable
     association(:context).target ||= context
     tag_info = Rails.cache.fetch_with_batched_keys(
       ["context_module_tag_info3", user.cache_key(:enrollments), user.cache_key(:groups)].cache_key,
-      batch_object: self, batched_keys: :availability
+      batch_object: self,
+      batched_keys: :availability
     ) do
       hash = {}
       if user_is_admin && has_too_many_overrides

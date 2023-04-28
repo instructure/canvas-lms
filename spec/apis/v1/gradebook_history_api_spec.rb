@@ -46,7 +46,8 @@ describe GradebookHistoryApiController, type: :request do
       bare_submission_model(assignment1, student3, graded_at: 24.hours.ago.in_time_zone, grader_id: other_grader.id, score: 80)
       bare_submission_model(assignment2, student, graded_at: 24.hours.ago.in_time_zone, grader_id: other_grader.id, score: 70)
 
-      json = api_call_as_user(@teacher, :get,
+      json = api_call_as_user(@teacher,
+                              :get,
                               "/api/v1/courses/#{@course.id}/gradebook_history/days.json",
                               {
                                 controller: "gradebook_history_api",
@@ -73,7 +74,8 @@ describe GradebookHistoryApiController, type: :request do
       bare_submission_model(assignment, student, graded_at: Time.now.in_time_zone, grader_id: grader.id, score: 100)
 
       date = Time.now.in_time_zone.strftime("%Y-%m-%d")
-      json = api_call_as_user(@teacher, :get,
+      json = api_call_as_user(@teacher,
+                              :get,
                               "/api/v1/courses/#{@course.id}/gradebook_history/#{date}.json",
                               {
                                 controller: "gradebook_history_api",
@@ -103,7 +105,8 @@ describe GradebookHistoryApiController, type: :request do
       grader = user_with_pseudonym(name: "Grader", username: "grader@example.com", active_all: 1)
       @submission.update!(graded_at: date, grader_id: grader.id, score: 100)
 
-      json = api_call_as_user(@teacher, :get,
+      json = api_call_as_user(@teacher,
+                              :get,
                               "/api/v1/courses/#{@course.id}/gradebook_history/#{date_str}/graders/#{grader.id}/assignments/#{@assignment.id}/submissions.json",
                               {
                                 controller: "gradebook_history_api",
@@ -121,7 +124,8 @@ describe GradebookHistoryApiController, type: :request do
     it "can find autograded data" do
       @submission.update!(graded_at: date, grader_id: -50, score: 100)
 
-      json = api_call_as_user(@teacher, :get,
+      json = api_call_as_user(@teacher,
+                              :get,
                               "/api/v1/courses/#{@course.id}/gradebook_history/#{date_str}/graders/0/assignments/#{@assignment.id}/submissions.json",
                               {
                                 controller: "gradebook_history_api",

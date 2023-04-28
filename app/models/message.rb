@@ -384,7 +384,8 @@ class Message < ActiveRecord::Base
   end
 
   def transpose_url_ids(html)
-    url_helper = Api::Html::UrlProxy.new(self, context,
+    url_helper = Api::Html::UrlProxy.new(self,
+                                         context,
                                          HostUrl.context_host(link_root_account),
                                          HostUrl.protocol,
                                          target_shard: link_root_account.shard)
@@ -663,7 +664,10 @@ class Message < ActiveRecord::Base
     end
 
     context, asset, user, delayed_messages, data = [self.context,
-      self.context, self.user, @delayed_messages, @data]
+      self.context,
+self.user,
+@delayed_messages,
+@data]
 
     link_root_account.shard.activate do
       if message_body_template.present?
@@ -824,7 +828,8 @@ class Message < ActiveRecord::Base
       [
         "recipient" => to,
         "access_token" => Canvas::Security.decrypt_password(context_root_account.settings[:encrypted_slack_key],
-                                                            context_root_account.settings[:encrypted_slack_key_salt], "instructure_slack_encrypted_key")
+                                                            context_root_account.settings[:encrypted_slack_key_salt],
+                                                            "instructure_slack_encrypted_key")
       ]
     else
       [to]

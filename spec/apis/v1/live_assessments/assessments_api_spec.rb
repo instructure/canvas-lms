@@ -40,7 +40,9 @@ describe LiveAssessments::AssessmentsController, type: :request do
                        :post,
                        "/api/v1/courses/#{assessment_course.id}/live_assessments",
                        { controller: "live_assessments/assessments", action: "create", format: "json", course_id: assessment_course.id.to_s },
-                       { assessments: params }, {}, opts)
+                       { assessments: params },
+                       {},
+                       opts)
     end
 
     context "as a teacher" do
@@ -86,7 +88,9 @@ describe LiveAssessments::AssessmentsController, type: :request do
                        :get,
                        "/api/v1/courses/#{assessment_course.id}/live_assessments",
                        { controller: "live_assessments/assessments", action: "index", format: "json", course_id: assessment_course.id.to_s },
-                       {}, {}, opts)
+                       {},
+                       {},
+                       opts)
     end
 
     context "as a teacher" do

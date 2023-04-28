@@ -52,12 +52,16 @@ module UserLearningObjectScopes
   end
 
   def assignments_visible_in_course(course)
-    return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades,
+    return course.active_assignments if course.grants_any_right?(self,
+                                                                 :read_as_admin,
+                                                                 :manage_grades,
                                                                  *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
     published_visible_assignments = course.active_assignments.published
     DifferentiableAssignment.scope_filter(published_visible_assignments,
-                                          self, course, is_teacher: false)
+                                          self,
+                                          course,
+                                          is_teacher: false)
   end
 
   # everything is relative to the user's shard
@@ -99,15 +103,26 @@ module UserLearningObjectScopes
   end
 
   def objects_needing(
-    object_type, purpose, participation_type, params, expires_in,
-    limit: ULOS_DEFAULT_LIMIT, scope_only: false,
-    course_ids: nil, group_ids: nil, contexts: nil, include_concluded: false,
-    include_ignored: false, include_ungraded: false
+    object_type,
+    purpose,
+    participation_type,
+    params,
+    expires_in,
+    limit: ULOS_DEFAULT_LIMIT,
+    scope_only: false,
+    course_ids: nil,
+    group_ids: nil,
+    contexts: nil,
+    include_concluded: false,
+    include_ignored: false,
+    include_ungraded: false
   )
     original_shard = Shard.current
     shard.activate do
       course_ids = course_ids_for_todo_lists(participation_type,
-                                             course_ids: course_ids, contexts: contexts, include_concluded: include_concluded)
+                                             course_ids: course_ids,
+                                             contexts: contexts,
+                                             include_concluded: include_concluded)
       group_ids = group_ids_for_todo_lists(group_ids: group_ids, contexts: contexts)
       ids_by_shard = Hash.new({ course_ids: [], group_ids: [] })
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
@@ -126,7 +141,11 @@ module UserLearningObjectScopes
           shard_group_ids = ids_by_shard.dig(original_shard, :group_ids)
           if shard_course_ids.present? || shard_group_ids.present?
             return yield(*arguments_for_objects_needing(
-              object_type, purpose, shard_course_ids, shard_group_ids, participation_type,
+              object_type,
+              purpose,
+              shard_course_ids,
+              shard_group_ids,
+              participation_type,
               include_ignored: include_ignored,
               include_ungraded: include_ungraded
             ))
@@ -143,7 +162,11 @@ module UserLearningObjectScopes
             ids_by_shard.flat_map do |shard, shard_hash|
               shard.activate do
                 yield(*arguments_for_objects_needing(
-                  object_type, purpose, shard_hash[:course_ids], shard_hash[:group_ids], participation_type,
+                  object_type,
+                  purpose,
+                  shard_hash[:course_ids],
+                  shard_hash[:group_ids],
+                  participation_type,
                   include_ignored: include_ignored,
                   include_ungraded: include_ungraded
                 ))
@@ -158,7 +181,11 @@ module UserLearningObjectScopes
   end
 
   def arguments_for_objects_needing(
-    object_type, purpose, shard_course_ids, shard_group_ids, participation_type,
+    object_type,
+    purpose,
+    shard_course_ids,
+    shard_group_ids,
+    participation_type,
     include_ignored: false,
     include_ungraded: false
   )
@@ -182,8 +209,13 @@ module UserLearningObjectScopes
     **opts # arguments that are just forwarded to objects_needing
   )
     params = _params_hash(binding)
-    objects_needing("Assignment", purpose, :student, params, cache_timeout,
-                    limit: limit, **opts) do |assignment_scope|
+    objects_needing("Assignment",
+                    purpose,
+                    :student,
+                    params,
+                    cache_timeout,
+                    limit: limit,
+                    **opts) do |assignment_scope|
       assignments = assignment_scope.due_between_for_user(due_after, due_before, self)
 
       if opts[:course_ids].present?

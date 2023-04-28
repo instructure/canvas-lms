@@ -22,9 +22,11 @@ class AddIndexOnMissingSubmissionsForUser < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def change
-    add_index :submissions, [:user_id], where: "late_policy_status='missing'",
-                                        name: "index_on_submissions_missing_for_user",
-                                        algorithm: :concurrently,
-                                        if_not_exists: true
+    add_index :submissions,
+              [:user_id],
+              where: "late_policy_status='missing'",
+              name: "index_on_submissions_missing_for_user",
+              algorithm: :concurrently,
+              if_not_exists: true
   end
 end

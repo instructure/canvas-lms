@@ -794,8 +794,11 @@ describe BasicLTI::BasicOutcomes do
       it "succeeds with cross-sharded users" do
         @shard1.activate do
           @root = Account.create
-          @user1 = user_with_managed_pseudonym(active_all: true, account: @root, name: "Jimmy John",
-                                               username: "other_shard@example.com", sis_user_id: "other_shard")
+          @user1 = user_with_managed_pseudonym(active_all: true,
+                                               account: @root,
+                                               name: "Jimmy John",
+                                               username: "other_shard@example.com",
+                                               sis_user_id: "other_shard")
         end
         @course.enroll_student(@user1)
         xml.css("resultData").remove

@@ -76,13 +76,15 @@ class CustomGradebookColumnsApiController < ApplicationController
   # @returns [CustomColumn]
   def index
     if authorized_action? @context.custom_gradebook_columns.build,
-                          @current_user, :read
+                          @current_user,
+                          :read
       scope = if value_to_boolean(params[:include_hidden])
                 @context.custom_gradebook_columns.not_deleted
               else
                 @context.custom_gradebook_columns.active
               end
-      columns = Api.paginate(scope, self,
+      columns = Api.paginate(scope,
+                             self,
                              api_v1_course_custom_gradebook_columns_url(@context))
 
       render json: columns.map { |c|
@@ -133,7 +135,8 @@ class CustomGradebookColumnsApiController < ApplicationController
     if authorized_action? column, @current_user, :manage
       column.destroy
       render json: custom_gradebook_column_json(column,
-                                                @current_user, session)
+                                                @current_user,
+                                                session)
     end
   end
 
@@ -155,7 +158,8 @@ class CustomGradebookColumnsApiController < ApplicationController
     if authorized_action? column, @current_user, :manage
       if column.save
         render json: custom_gradebook_column_json(column,
-                                                  @current_user, session)
+                                                  @current_user,
+                                                  session)
       else
         render json: column.errors, status: :bad_request
       end

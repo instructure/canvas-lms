@@ -106,8 +106,10 @@ class OriginalityReport < ActiveRecord::Base
       # have created another report, so if we find that, it's an expected
       # error.
       info = {
-        report_id: report_id, submission_id: submission_id,
-        attachment_id: attachment_id, updated_at: updated_at
+        report_id: report_id,
+        submission_id: submission_id,
+        attachment_id: attachment_id,
+        updated_at: updated_at
       }
       Canvas::Errors.capture(e, info, :info)
     else

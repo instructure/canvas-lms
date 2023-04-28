@@ -612,8 +612,10 @@ describe "assignments" do
       let(:assignment) do
         @course.assignment_groups.first.assignments.create!(title: "custom params",
                                                             lti_resource_link_custom_params: custom_params,
-                                                            submission_types: "external_tool", context: @course,
-                                                            points_possible: 10, external_tool_tag: content_tag,
+                                                            submission_types: "external_tool",
+                                                            context: @course,
+                                                            points_possible: 10,
+                                                            external_tool_tag: content_tag,
                                                             workflow_state: "unpublished")
       end
 

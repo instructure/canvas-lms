@@ -408,9 +408,12 @@ describe Message do
         expect(@user).to receive(:notification_endpoints).and_return([ne])
 
         message_model(notification_name: "Assignment Created",
-                      dispatch_at: Time.now, workflow_state: "staged",
-                      to: "somebody", updated_at: Time.now.utc - 11.minutes,
-                      path_type: "push", user: @user)
+                      dispatch_at: Time.now,
+                      workflow_state: "staged",
+                      to: "somebody",
+                      updated_at: Time.now.utc - 11.minutes,
+                      path_type: "push",
+                      user: @user)
         @message.deliver
       end
 
@@ -421,9 +424,12 @@ describe Message do
         expect(@user).to receive(:notification_endpoints).and_return([ne, ne])
 
         message_model(notification_name: "Assignment Created",
-                      dispatch_at: Time.now, workflow_state: "staged",
-                      to: "somebody", updated_at: Time.now.utc - 11.minutes,
-                      path_type: "push", user: @user)
+                      dispatch_at: Time.now,
+                      workflow_state: "staged",
+                      to: "somebody",
+                      updated_at: Time.now.utc - 11.minutes,
+                      path_type: "push",
+                      user: @user)
         @message.deliver
       end
 

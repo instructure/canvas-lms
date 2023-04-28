@@ -123,7 +123,8 @@ module AccountReports
       end
 
       add_extra_text(I18n.t("account_reports.student.enrollment_states",
-                            "Enrollment States: %{states};", states: enrollment_states_string))
+                            "Enrollment States: %{states};",
+                            states: enrollment_states_string))
 
       headers = []
       headers << I18n.t("#account_reports.report_header_user_id", "user id")
@@ -192,7 +193,8 @@ module AccountReports
               other_ens.last_activity_at IS NOT NULL
               AND other_ens.last_activity_at > ?
             )
-        )}, start_at)
+        )},
+                          start_at)
       else
         data = data.where(enrollments: { last_activity_at: nil })
         data = data.where(%{NOT EXISTS (

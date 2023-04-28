@@ -31,9 +31,22 @@ module Api::V1::PlannerItem
   include Api::V1::AssessmentRequest
   include PlannerApiHelper
 
-  API_PLANNABLE_FIELDS = %i[id title course_id location_name todo_date details url unread_count
-                            read_state created_at updated_at].freeze
-  CALENDAR_PLANNABLE_FIELDS = %i[all_day location_address description start_at end_at
+  API_PLANNABLE_FIELDS = %i[id
+                            title
+                            course_id
+                            location_name
+                            todo_date
+                            details
+                            url
+                            unread_count
+                            read_state
+                            created_at
+                            updated_at].freeze
+  CALENDAR_PLANNABLE_FIELDS = %i[all_day
+                                 location_address
+                                 description
+                                 start_at
+                                 end_at
                                  online_meeting_url].freeze
   GRADABLE_FIELDS = %i[assignment_id points_possible due_at].freeze
   PLANNER_NOTE_FIELDS = [:user_id].freeze

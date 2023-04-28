@@ -167,8 +167,10 @@ describe ContentZipper do
 
       @assignment = @course.assignments.create!(anonymous_grading: true, muted: true)
       submission_model(body: "hai this is my answer", assignment: @assignment, user: @student)
-      attachment = Attachment.create!(display_name: "my_download.zip", user: @teacher,
-                                      workflow_state: "to_be_zipped", context: @assignment)
+      attachment = Attachment.create!(display_name: "my_download.zip",
+                                      user: @teacher,
+                                      workflow_state: "to_be_zipped",
+                                      context: @assignment)
       ContentZipper.process_attachment(attachment, @teacher)
       attachment.reload
       content = nil
@@ -320,22 +322,32 @@ describe ContentZipper do
         course_with_student(active_all: true)
         folder = Folder.root_folders(@course).first
         attachment_model(uploaded_data: stub_png_data("hidden.png"),
-                         content_type: "image/png", hidden: true, folder: folder)
+                         content_type: "image/png",
+                         hidden: true,
+                         folder: folder)
         attachment_model(uploaded_data: stub_png_data("visible.png"),
-                         content_type: "image/png", folder: folder)
+                         content_type: "image/png",
+                         folder: folder)
         attachment_model(uploaded_data: stub_png_data("locked.png"),
-                         content_type: "image/png", folder: folder, locked: true)
+                         content_type: "image/png",
+                         folder: folder,
+                         locked: true)
         hidden_folder = folder.sub_folders.create!(context: @course, name: "hidden", hidden: true)
         visible_folder = folder.sub_folders.create!(context: @course, name: "visible")
         locked_folder = folder.sub_folders.create!(context: @course, name: "locked", locked: true)
         attachment_model(uploaded_data: stub_png_data("sub-hidden.png"),
-                         content_type: "image/png", folder: hidden_folder)
+                         content_type: "image/png",
+                         folder: hidden_folder)
         attachment_model(uploaded_data: stub_png_data("sub-vis.png"),
-                         content_type: "image/png", folder: visible_folder)
+                         content_type: "image/png",
+                         folder: visible_folder)
         attachment_model(uploaded_data: stub_png_data("sub-locked.png"),
-                         content_type: "image/png", folder: visible_folder, locked: true)
+                         content_type: "image/png",
+                         folder: visible_folder,
+                         locked: true)
         attachment_model(uploaded_data: stub_png_data("sub-locked-vis.png"),
-                         content_type: "image/png", folder: locked_folder)
+                         content_type: "image/png",
+                         folder: locked_folder)
 
         @attachment = Attachment.new(display_name: "my_download.zip")
         @attachment.workflow_state = "to_be_zipped"
@@ -454,7 +466,9 @@ describe ContentZipper do
       course_with_student(active_all: true)
       folder = Folder.root_folders(@course).first
       attachment_model(uploaded_data: stub_png_data("hidden.png"),
-                       content_type: "image/png", folder: folder, display_name: "otherfile.png")
+                       content_type: "image/png",
+                       folder: folder,
+                       display_name: "otherfile.png")
       attachment = Attachment.new(display_name: "my_download.zip")
       attachment.user_id = @user.id
       attachment.workflow_state = "to_be_zipped"
@@ -497,7 +511,9 @@ describe ContentZipper do
         course_with_student(active_all: true)
         folder = Folder.root_folders(@course).first
         attachment_model(uploaded_data: stub_png_data("hidden.png"),
-                         content_type: "image/png", folder: folder, display_name: "hidden.png")
+                         content_type: "image/png",
+                         folder: folder,
+                         display_name: "hidden.png")
       end
 
       let(:eportfolio) do

@@ -137,10 +137,25 @@ class FilesController < ApplicationController
 
   before_action :require_user, only: :create_pending
   before_action :require_context, except: %i[
-    assessment_question_show image_thumbnail show_thumbnail
-    create_pending s3_success show api_create api_create_success api_create_success_cors
-    api_show api_index destroy api_update api_file_status public_url api_capture icon_metadata
-    reset_verifier show_relative
+    assessment_question_show
+    image_thumbnail
+    show_thumbnail
+    create_pending
+    s3_success
+    show
+    api_create
+    api_create_success
+    api_create_success_cors
+    api_show
+    api_index
+    destroy
+    api_update
+    api_file_status
+    public_url
+    api_capture
+    icon_metadata
+    reset_verifier
+    show_relative
   ]
 
   before_action :open_limited_cors, only: [:show]
@@ -935,7 +950,8 @@ class FilesController < ApplicationController
       @context = group || @current_user
     end
     if authorized_upload?(@context, @asset, intent)
-      api_attachment_preflight(@context, request,
+      api_attachment_preflight(@context,
+                               request,
                                check_quota: check_quota?(@context, intent),
                                folder: default_folder(@context, @asset, intent),
                                temporary: temporary_file?(@asset, intent),
@@ -981,8 +997,14 @@ class FilesController < ApplicationController
 
   # intentionally narrower than the list on `Attachment.belongs_to :context`
   VALID_ATTACHMENT_CONTEXTS = [
-    "User", "Course", "Group", "Assignment", "ContentMigration",
-    "Quizzes::QuizSubmission", "ContentMigration", "Quizzes::QuizSubmission"
+    "User",
+    "Course",
+    "Group",
+    "Assignment",
+    "ContentMigration",
+    "Quizzes::QuizSubmission",
+    "ContentMigration",
+    "Quizzes::QuizSubmission"
   ].freeze
 
   def api_capture

@@ -152,8 +152,10 @@ class WikiPagesController < ApplicationController
   end
 
   def show_redirect
-    redirect_to polymorphic_url([@context, @page], titleize: params[:titleize],
-                                                   module_item_id: params[:module_item_id]), status: :moved_permanently
+    redirect_to polymorphic_url([@context, @page],
+                                titleize: params[:titleize],
+                                module_item_id: params[:module_item_id]),
+                status: :moved_permanently
   end
 
   def revisions_redirect

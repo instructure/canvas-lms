@@ -91,8 +91,11 @@ describe OAuth2ProviderController do
     end
 
     it "passes pseudonym_session[unique_id] to login to populate username textbox" do
-      get :auth, params: { :client_id => key.id, :redirect_uri => Canvas::OAuth::Provider::OAUTH2_OOB_URI,
-                           "unique_id" => "test", :force_login => true, :response_type => "code" }
+      get :auth, params: { :client_id => key.id,
+                           :redirect_uri => Canvas::OAuth::Provider::OAUTH2_OOB_URI,
+                           "unique_id" => "test",
+                           :force_login => true,
+                           :response_type => "code" }
       expect(response).to redirect_to(login_url + "?force_login=true&pseudonym_session%5Bunique_id%5D=test")
     end
 

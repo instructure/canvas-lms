@@ -133,7 +133,8 @@ class ContextExternalTool < ActiveRecord::Base
       # still use the original visibility setting
       permissions_hash[:original_visibility] = Rails.cache.fetch_with_batched_keys(
         ["external_tools/global_navigation/visibility", root_account.asset_string].cache_key,
-        batch_object: user, batched_keys: [:enrollments, :account_users]
+        batch_object: user,
+        batched_keys: [:enrollments, :account_users]
       ) do
         # let them see admin level tools if there are any courses they can manage
         if root_account.grants_any_right?(user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) ||
@@ -961,8 +962,16 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  IDENTITY_FIELDS = %i[name context_id context_type domain url consumer_key shared_secret
-                       description workflow_state settings].freeze
+  IDENTITY_FIELDS = %i[name
+                       context_id
+                       context_type
+                       domain
+                       url
+                       consumer_key
+                       shared_secret
+                       description
+                       workflow_state
+                       settings].freeze
 
   def calculate_identity_hash
     props = [*slice(IDENTITY_FIELDS.excluding(:settings)).values, Utils::HashUtils.sort_nested_data(settings)]
@@ -1072,7 +1081,9 @@ class ContextExternalTool < ActiveRecord::Base
 
       sorted_external_tools = find_and_order_tools(
         context,
-        preferred_tool_id, exclude_tool_id, preferred_client_id,
+        preferred_tool_id,
+        exclude_tool_id,
+        preferred_client_id,
         only_1_3: only_1_3
       )
 

@@ -930,11 +930,23 @@ class CoursesController < ApplicationController
               @course,
               @current_user,
               session,
-              [:start_at, course_end, :license,
-               :is_public, :is_public_to_auth_users, :public_syllabus, :public_syllabus_to_auth, :allow_student_assignment_edits, :allow_wiki_comments,
-               :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
-               :root_account_id, :account_id, :public_description,
-               :restrict_enrollments_to_course_dates, :hide_final_grades],
+              [:start_at,
+               course_end,
+               :license,
+               :is_public,
+               :is_public_to_auth_users,
+               :public_syllabus,
+               :public_syllabus_to_auth,
+               :allow_student_assignment_edits,
+               :allow_wiki_comments,
+               :allow_student_forum_attachments,
+               :open_enrollment,
+               :self_enrollment,
+               :root_account_id,
+               :account_id,
+               :public_description,
+               :restrict_enrollments_to_course_dates,
+               :hide_final_grades],
               nil,
               prefer_friendly_name: false
             )
@@ -1194,7 +1206,8 @@ class CoursesController < ApplicationController
       includes = Array(params[:include])
       users = api_find_all(@context.users_visible_to(@current_user, {
                                                        include_inactive: includes.include?("inactive_enrollments")
-                                                     }), [params[:id]])
+                                                     }),
+                           [params[:id]])
 
       user_json_preloads(users, includes.include?("email"))
       user = users.first or raise ActiveRecord::RecordNotFound
@@ -1556,8 +1569,10 @@ class CoursesController < ApplicationController
              })
 
       @course_settings_sub_navigation_tools = Lti::ContextToolFinder.new(
-        @context, type: :course_settings_sub_navigation,
-                  root_account: @domain_root_account, current_user: @current_user
+        @context,
+        type: :course_settings_sub_navigation,
+        root_account: @domain_root_account,
+        current_user: @current_user
       ).all_tools_sorted_array(
         exclude_admin_visibility: !@context.grants_right?(@current_user, session, :read_as_admin)
       )
@@ -2305,8 +2320,10 @@ class CoursesController < ApplicationController
           @current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
         )
         @course_home_sub_navigation_tools = Lti::ContextToolFinder.new(
-          @context, type: :course_home_sub_navigation,
-                    root_account: @domain_root_account, current_user: @current_user
+          @context,
+          type: :course_home_sub_navigation,
+          root_account: @domain_root_account,
+          current_user: @current_user
         ).all_tools_sorted_array(exclude_admin_visibility: !can_see_admin_tools)
 
         css_bundle :dashboard
@@ -2612,7 +2629,11 @@ class CoursesController < ApplicationController
         # will become a DB constraint eventually)
         @possible_dup = @context.enrollments.where(
           "id<>? AND user_id=? AND course_section_id=? AND type=? AND (associated_user_id IS NULL OR associated_user_id=?)",
-          @enrollment, @enrollment.user_id, params[:course_section_id], @enrollment.type, @enrollment.associated_user_id
+          @enrollment,
+          @enrollment.user_id,
+          params[:course_section_id],
+          @enrollment.type,
+          @enrollment.associated_user_id
         ).first
         if @possible_dup.present?
           format.json { render json: @enrollment, status: :forbidden }
@@ -2685,8 +2706,10 @@ class CoursesController < ApplicationController
       @course.enroll_user(@current_user, "TeacherEnrollment", enrollment_state: "active")
 
       @content_migration = @course.content_migrations.build(
-        user: @current_user, source_course: @context,
-        context: @course, migration_type: "course_copy_importer",
+        user: @current_user,
+        source_course: @context,
+        context: @course,
+        migration_type: "course_copy_importer",
         initiated_source: if api_request?
                             in_app? ? :api_in_app : :api
                           else
@@ -3491,8 +3514,9 @@ class CoursesController < ApplicationController
 
     if MasterCourses::MasterTemplate.is_master_course?(@context) || @context.template?
       return render json: {
-        message: "cannot reset_content on a blueprint or template course"
-      }, status: :bad_request
+                      message: "cannot reset_content on a blueprint or template course"
+                    },
+                    status: :bad_request
     end
 
     @new_course = @context.reset_content
@@ -3619,8 +3643,9 @@ class CoursesController < ApplicationController
 
     unless @context.module_based?
       return render json: {
-        error: { message: "No progress available because this course is not module based (meaning, it does not have modules and module completion requirements)." }
-      }, status: :bad_request
+                      error: { message: "No progress available because this course is not module based (meaning, it does not have modules and module completion requirements)." }
+                    },
+                    status: :bad_request
     end
 
     # NOTE: Similar to #user_progress, this endpoint should remain on the primary db
@@ -3952,7 +3977,12 @@ class CoursesController < ApplicationController
 
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course
-      hash << course_json(course, @current_user, session, includes, course_enrollments, user,
+      hash << course_json(course,
+                          @current_user,
+                          session,
+                          includes,
+                          course_enrollments,
+                          user,
                           preloaded_progressions: progressions,
                           precalculated_permissions: all_precalculated_permissions&.dig(course.global_id))
     end
@@ -4060,17 +4090,69 @@ class CoursesController < ApplicationController
     return {} unless params[:course]
 
     params[:course].permit(
-      :name, :group_weighting_scheme, :start_at, :conclude_at,
-      :grading_standard_id, :grade_passback_setting, :is_public, :is_public_to_auth_users, :allow_student_wiki_edits, :show_public_context_messages,
-      :syllabus_body, :syllabus_course_summary, :public_description, :allow_student_forum_attachments, :allow_student_discussion_topics, :allow_student_discussion_editing,
-      :show_total_grade_as_points, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view,
-      :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed,
-      :abstract_course, :storage_quota, :storage_quota_mb, :restrict_enrollments_to_course_dates, :use_rights_required,
-      :restrict_student_past_view, :restrict_student_future_view, :restrict_quantitative_data, :grading_standard, :grading_standard_enabled,
-      :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :hide_sections_on_course_users_page, :lock_all_announcements, :public_syllabus,
-      :quiz_engine_selected, :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
-      :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,
-      :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom, :friendly_name, :enable_course_paces, :default_due_time, :conditional_release
+      :name,
+      :group_weighting_scheme,
+      :start_at,
+      :conclude_at,
+      :grading_standard_id,
+      :grade_passback_setting,
+      :is_public,
+      :is_public_to_auth_users,
+      :allow_student_wiki_edits,
+      :show_public_context_messages,
+      :syllabus_body,
+      :syllabus_course_summary,
+      :public_description,
+      :allow_student_forum_attachments,
+      :allow_student_discussion_topics,
+      :allow_student_discussion_editing,
+      :show_total_grade_as_points,
+      :default_wiki_editing_roles,
+      :allow_student_organized_groups,
+      :course_code,
+      :default_view,
+      :open_enrollment,
+      :allow_wiki_comments,
+      :turnitin_comments,
+      :self_enrollment,
+      :license,
+      :indexed,
+      :abstract_course,
+      :storage_quota,
+      :storage_quota_mb,
+      :restrict_enrollments_to_course_dates,
+      :use_rights_required,
+      :restrict_student_past_view,
+      :restrict_student_future_view,
+      :restrict_quantitative_data,
+      :grading_standard,
+      :grading_standard_enabled,
+      :locale,
+      :integration_id,
+      :hide_final_grades,
+      :hide_distribution_graphs,
+      :hide_sections_on_course_users_page,
+      :lock_all_announcements,
+      :public_syllabus,
+      :quiz_engine_selected,
+      :public_syllabus_to_auth,
+      :course_format,
+      :time_zone,
+      :organize_epub_by_content_type,
+      :enable_offline_web_export,
+      :show_announcements_on_home_page,
+      :home_page_announcement_limit,
+      :allow_final_grade_override,
+      :filter_speed_grader_by_student_group,
+      :homeroom_course,
+      :template,
+      :course_color,
+      :homeroom_course_id,
+      :sync_enrollments_from_homeroom,
+      :friendly_name,
+      :enable_course_paces,
+      :default_due_time,
+      :conditional_release
     )
   end
 

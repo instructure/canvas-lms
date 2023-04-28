@@ -1607,9 +1607,10 @@ describe Quizzes::QuizzesController do
 
     context "with grading periods" do
       def call_create(params)
-        post("create", params: { course_id: @course.id, quiz: {
-          title: "Example Quiz", quiz_type: "assignment"
-        }.merge(params) })
+        post("create", params: { course_id: @course.id,
+                                 quiz: {
+                                   title: "Example Quiz", quiz_type: "assignment"
+                                 }.merge(params) })
       end
 
       let(:section_id) { @course.course_sections.first.id }
@@ -1912,7 +1913,9 @@ describe Quizzes::QuizzesController do
       expect(@quiz.assignment).not_to be_present
       @quiz.publish!
 
-      post "update", params: { course_id: @course.id, id: @quiz.id, activate: true,
+      post "update", params: { course_id: @course.id,
+                               id: @quiz.id,
+                               activate: true,
                                quiz: { quiz_type: "assignment" } }
       expect(response).to be_redirect
 

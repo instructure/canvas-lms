@@ -58,7 +58,9 @@ class RoleOverride < ActiveRecord::Base
   ACCOUNT_ADMIN_LABEL = -> { t("roles.account_admin", "Account Admin") }
   def self.account_membership_types(account)
     res = [{ id: Role.get_built_in_role("AccountAdmin", root_account_id: account.resolved_root_account_id).id,
-             name: "AccountAdmin", base_role_name: Role::DEFAULT_ACCOUNT_TYPE, label: ACCOUNT_ADMIN_LABEL.call }]
+             name: "AccountAdmin",
+             base_role_name: Role::DEFAULT_ACCOUNT_TYPE,
+             label: ACCOUNT_ADMIN_LABEL.call }]
     account.available_custom_account_roles.each do |r|
       res << { id: r.id, name: r.name, base_role_name: Role::DEFAULT_ACCOUNT_TYPE, label: r.name }
     end
@@ -1862,8 +1864,10 @@ class RoleOverride < ActiveRecord::Base
     else
       full_base_key = [permissionless_base_key, permission, Shard.global_id_for(role_context)].join("/")
       LocalCache.fetch([full_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
-        Rails.cache.fetch_with_batched_keys(full_base_key, batch_object: account,
-                                                           batched_keys: [:account_chain, :role_overrides], skip_cache_if_disabled: true) do
+        Rails.cache.fetch_with_batched_keys(full_base_key,
+                                            batch_object: account,
+                                            batched_keys: [:account_chain, :role_overrides],
+                                            skip_cache_if_disabled: true) do
           uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, preloaded_overrides: preloaded_overrides)
         end
       end
@@ -2009,8 +2013,10 @@ class RoleOverride < ActiveRecord::Base
                 else
                   RequestCache.cache(permissionless_base_key, account) do
                     LocalCache.fetch([permissionless_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
-                      Rails.cache.fetch_with_batched_keys(permissionless_base_key, batch_object: account,
-                                                                                   batched_keys: [:account_chain, :role_overrides], skip_cache_if_disabled: true) do
+                      Rails.cache.fetch_with_batched_keys(permissionless_base_key,
+                                                          batch_object: account,
+                                                          batched_keys: [:account_chain, :role_overrides],
+                                                          skip_cache_if_disabled: true) do
                         uncached_overrides_for(context, role, role_context, preloaded_overrides: preloaded_overrides)
                       end
                     end

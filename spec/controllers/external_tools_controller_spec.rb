@@ -638,8 +638,10 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.submission_types = "online_upload"
           assignment.save!
-          get :show, params: { course_id: @course.id, id: @tool.id,
-                               launch_type: "homework_submission", assignment_id: assignment.id }
+          get :show, params: { course_id: @course.id,
+                               id: @tool.id,
+                               launch_type: "homework_submission",
+                               assignment_id: assignment.id }
           expect(response).to be_successful
 
           lti_launch = assigns[:lti_launch]
@@ -652,7 +654,9 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.submission_types = "online_text_entry"
           assignment.save!
-          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id,
+                               id: @tool.id,
+                               launch_type: "homework_submission",
                                assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params["accept_copy_advice"]).to eq "false"
@@ -664,7 +668,9 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.submission_types = "online_upload"
           assignment.save!
-          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id,
+                               id: @tool.id,
+                               launch_type: "homework_submission",
                                assignment_id: assignment.id }
           expect(response).to be_successful
 
@@ -678,7 +684,9 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.submission_types = "online_upload"
           assignment.save!
-          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id,
+                               id: @tool.id,
+                               launch_type: "homework_submission",
                                assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params["ext_content_file_extensions"]).to eq "pdf,jpeg"
@@ -690,7 +698,9 @@ describe ExternalToolsController do
           assignment.submission_types = "online_text_entry"
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.save!
-          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id,
+                               id: @tool.id,
+                               launch_type: "homework_submission",
                                assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params).not_to have_key("ext_content_file_extensions")
@@ -701,7 +711,9 @@ describe ExternalToolsController do
           assignment = @course.assignments.new(name: "an assignment")
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.save!
-          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id,
+                               id: @tool.id,
+                               launch_type: "homework_submission",
                                assignment_id: assignment.id }
           expect(response).to be_successful
 
@@ -714,7 +726,9 @@ describe ExternalToolsController do
           assignment = @course.assignments.new(name: "an assignment")
           assignment.submission_types = "online_url"
           assignment.save!
-          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id,
+                               id: @tool.id,
+                               launch_type: "homework_submission",
                                assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params["accept_presentation_document_targets"]).to include "window"
@@ -725,7 +739,9 @@ describe ExternalToolsController do
           assignment = @course.assignments.new(name: "an assignment")
           assignment.submission_types = "online_url"
           assignment.save!
-          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id,
+                               id: @tool.id,
+                               launch_type: "homework_submission",
                                assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params["accept_presentation_document_targets"]).not_to include "none"
@@ -737,7 +753,9 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.submission_types = "online_upload,online_url"
           assignment.save!
-          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id,
+                               id: @tool.id,
+                               launch_type: "homework_submission",
                                assignment_id: assignment.id }
           expect(response).to be_successful
 
@@ -850,7 +868,8 @@ describe ExternalToolsController do
       end
 
       let(:lti_1_3_tool) do
-        tool = @course.context_external_tools.new(name: "test", consumer_key: "key",
+        tool = @course.context_external_tools.new(name: "test",
+                                                  consumer_key: "key",
                                                   shared_secret: "secret")
         tool.url = "http://www.example.com/launch"
         tool.use_1_3 = true
@@ -956,8 +975,11 @@ describe ExternalToolsController do
 
         it "does not include custom params if the resource_link is for the wrong tool" do
           tool2 = @course.context_external_tools.create!(
-            name: "test", consumer_key: "key", shared_secret: "secret",
-            url: "http://www.example2.com/launch", use_1_3: true,
+            name: "test",
+            consumer_key: "key",
+            shared_secret: "secret",
+            url: "http://www.example2.com/launch",
+            use_1_3: true,
             developer_key: DeveloperKey.create!
           )
           rl.update(context_external_tool: tool2)
@@ -967,8 +989,11 @@ describe ExternalToolsController do
 
         it "succeeds if the resource_link is for a tool with the same host" do
           tool2 = @course.account.context_external_tools.create!(
-            name: "test", consumer_key: "key", shared_secret: "secret",
-            url: "http://www.example.com/launch", use_1_3: true,
+            name: "test",
+            consumer_key: "key",
+            shared_secret: "secret",
+            url: "http://www.example.com/launch",
+            use_1_3: true,
             developer_key: lti_1_3_tool.developer_key
           )
           rl.update(context_external_tool: tool2)
@@ -1159,7 +1184,8 @@ describe ExternalToolsController do
     it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
       subject do
         get :retrieve, params: {
-          url: tool.url, course_id: @course.id,
+          url: tool.url,
+          course_id: @course.id,
           parent_frame_context: pfc_tool.id
         }
       end
@@ -1838,17 +1864,19 @@ describe ExternalToolsController do
 
     it "accepts is_rce_favorite parameter" do
       user_session(account_admin_user)
-      post "create", params: {
-        account_id: @course.account.id,
-        external_tool: {
-          name: "tool name",
-          url: "http://example.com",
-          consumer_key: "key",
-          shared_secret: "secret",
-          editor_button: { url: "http://example.com", enabled: true },
-          is_rce_favorite: true
-        }
-      }, format: "json"
+      post "create",
+           params: {
+             account_id: @course.account.id,
+             external_tool: {
+               name: "tool name",
+               url: "http://example.com",
+               consumer_key: "key",
+               shared_secret: "secret",
+               editor_button: { url: "http://example.com", enabled: true },
+               is_rce_favorite: true
+             }
+           },
+           format: "json"
       expect(response).to be_successful
       expect(assigns[:tool].is_rce_favorite).to be true
     end
@@ -2038,9 +2066,15 @@ describe ExternalToolsController do
     it "fails gracefully trying to retrieve from localhost" do
       expect(CanvasHttp).to receive(:insecure_host?).with("localhost").and_return(true)
       user_session(@teacher)
-      post "create", params: { course_id: @course.id, external_tool: { name: "tool name", url: "http://example.com",
-                                                                       consumer_key: "key", shared_secret: "secret", config_type: "by_url",
-                                                                       config_url: "http://localhost:9001" } }, format: "json"
+      post "create",
+           params: { course_id: @course.id,
+                     external_tool: { name: "tool name",
+                                      url: "http://example.com",
+                                      consumer_key: "key",
+                                      shared_secret: "secret",
+                                      config_type: "by_url",
+                                      config_url: "http://localhost:9001" } },
+           format: "json"
       expect(response).not_to be_successful
       expect(assigns[:tool]).to be_new_record
       json = json_parse(response.body)
@@ -2051,9 +2085,16 @@ describe ExternalToolsController do
       expect(CanvasHttp).to receive(:insecure_host?).with("localhost").and_return(true)
       user_session(@teacher)
 
-      post "create", params: { course_id: @course.id, external_tool: { name: "tool name", url: "http://example.com",
-                                                                       consumer_key: "key", shared_secret: "secret", config_type: "by_url",
-                                                                       config_url: "http://localhost:9001", course_navigation: { enabled: true } } }, format: "json"
+      post "create",
+           params: { course_id: @course.id,
+                     external_tool: { name: "tool name",
+                                      url: "http://example.com",
+                                      consumer_key: "key",
+                                      shared_secret: "secret",
+                                      config_type: "by_url",
+                                      config_url: "http://localhost:9001",
+                                      course_navigation: { enabled: true } } },
+           format: "json"
       expect(assigns[:tool].settings).to have_key "course_navigation"
     end
 

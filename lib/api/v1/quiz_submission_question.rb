@@ -44,7 +44,8 @@ module Api::V1::QuizSubmissionQuestion
       data[:quiz_questions] = questions_json(quiz_questions,
                                              meta[:user],
                                              meta[:session],
-                                             nil, [],
+                                             nil,
+                                             [],
                                              meta[:censored],
                                              quiz_submission.quiz_data,
                                              shuffle_answers: meta[:shuffle_answers])
