@@ -652,9 +652,45 @@ describe DeveloperKey do
         If these routes must be changed, it will require a data fixup to change
         the scope attribute of any developer keys that refer to those routes.
         The list of API routes used by developer keys can be changed in
-        spec/lib/token_scopes/last_known_accepted_scopes.rb.
+        spec/lib/token_scopes/last_known_scopes.yml.
       TEXT
       expect(modified_scopes).to be_empty, error_message
+    end
+
+    it "ensures that newly added routes are included in the known scopes list" do
+      all_routes_including_plugins = Set.new(TokenScopes.api_routes.pluck(:verb, :path))
+
+      stub_const("CanvasRails::Application", TokenScopesHelper::SpecHelper::MockCanvasRails::Application)
+
+      routes_from_plugins = Set.new
+      Dir[Rails.root.join("{gems,vendor}/plugins/*/config/*routes.rb")].each do |plugin_path|
+        CanvasRails::Application.reset_routes
+        load plugin_path
+        plugin_route_set = Set.new(CanvasRails::Application.routes.routes.map do |route|
+          [route.verb, TokenScopesHelper.path_without_format(route)]
+        end)
+        routes_from_plugins = routes_from_plugins.merge(plugin_route_set)
+      end
+
+      # Take all routes, subtract the ones added in plugins (we'll look for those in their
+      # respective repos), and then omit any that are already in the known route list.
+      # If any routes remain, it must have been added after the known route list was last
+      # updated.
+      newly_added_routes = (all_routes_including_plugins - routes_from_plugins).reject! do |route|
+        TokenScopesHelper::SpecHelper.last_known_accepted_scopes.include? route
+      end
+
+      error_message = <<~TEXT
+        These routes have been added by your commit, and need to be included
+        in spec/lib/token_scopes/last_known_accepted_scopes.rb.
+        #{newly_added_routes.map { |scope| "- #{scope[0]}: #{scope[1]}" }.join("\n")}
+
+        This allows us to keep track of which API routes can be specified on a
+        developer key, so that we can avoid making breaking changes to those
+        API routes later.
+      TEXT
+
+      expect(newly_added_routes).to be_empty, error_message
     end
 
     context "when api token scoping FF is enabled" do
