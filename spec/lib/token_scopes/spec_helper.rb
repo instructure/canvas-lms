@@ -26,5 +26,13 @@ module TokenScopesHelper::SpecHelper
     def self.routes
       @_routes ||= ActionDispatch::Routing::RouteSet.new
     end
+
+    # Clear out all routes that we have previously loaded. This
+    # allows us to re-load only routes from some plugin, e.g. to
+    # isolate one plugin's routes from another plugin's routes when
+    # running tests.
+    def self.reset_routes
+      @_routes = ActionDispatch::Routing::RouteSet.new
+    end
   end
 end
