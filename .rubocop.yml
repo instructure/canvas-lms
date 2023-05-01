@@ -2,19 +2,18 @@ require:
   - rubocop-graphql
   - rubocop-rails
   - rubocop-rake
-  - rubocop-rspec
-  - rubocop-performance
   # this odd relative path is so that rubocop works when run without "bundle
   # exec", such as from most editors/IDEs.
   - ./gems/rubocop-canvas/lib/rubocop_canvas
   - outrigger/cops/migration/tagged
 
+inherit_gem:
+  rubocop-inst:
+  - rubocop.yml
+  - rubocop-rspec.yml
+
 AllCops:
   TargetRubyVersion: 2.7
-  NewCops: enable
-  Exclude:
-   - node_modules/**/*
-   - vendor/**/*
 
 Bundler:
   Severity: error
@@ -24,8 +23,6 @@ Capybara:
 
 Gemspec:
   Severity: error
-Gemspec/DevelopmentDependencies:
-  EnforcedStyle: gemspec
 Gemspec/RequireMFA:
   Enabled: false # gems hosted in this repo aren't meant to be published separately
 Gemspec/RequiredRubyVersion:
@@ -48,16 +45,6 @@ GraphQL/ResolverMethodLength:
 
 Layout:
   Severity: error
-Layout/MultilineArrayLineBreaks:
-  Enabled: true
-Layout/MultilineHashKeyLineBreaks:
-  Enabled: true
-Layout/MultilineMethodArgumentLineBreaks:
-  Enabled: true
-  AllowMultilineFinalElement: true
-Layout/MultilineMethodParameterLineBreaks:
-  Enabled: true
-  AllowMultilineFinalElement: true
 
 Lint:
   Severity: error
@@ -76,14 +63,6 @@ Lint/RedundantCopDisableDirective:
   Enabled: false # can't have this enabled until https://github.com/rubocop/rubocop/issues/10263
 Lint/SafeNavigationConsistency:
   Enabled: false # https://github.com/rubocop/rubocop/issues/9816
-Lint/UnusedBlockArgument:
-  AutoCorrect: false # force the engineer to think about how come it's unused, instead of silently _ prefixing it
-Lint/UnusedMethodArgument:
-  AllowUnusedKeywordArguments: true # there's no way to mark a kwarg as unused
-  AutoCorrect: false # force the engineer to think about how come it's unused, instead of silently _ prefixing it
-
-Metrics:
-  Enabled: false # SnR is just too low to have this enabled
 
 Migration/Tagged:
   AllowedTags:
@@ -101,17 +80,9 @@ Naming/FileName:
     - "**/fixtures/**/*.rb"
     - "config/locales/*.rb" # names must match locale names
     - "spec/selenium/a11y_and_i18n/localized-timezone-lists_spec.rb" # matches JS file it tests
-Naming/HeredocDelimiterNaming:
-  ForbiddenDelimiters:
-    # negative regex - these are the _allowed_ delimiters
-    # any you add should describe the format of the data, not describe
-    # what the data is for. this allows editors to syntax highlight
-    - ^(?!AST|BASE64|CSV|GQL|HTML|JS|MD|PEM|REGEX|RUBY|SQL|SRT|TEXT|XML|YAML|PATTERN).+$
 
 Performance:
   Severity: error
-Performance/Casecmp:
-  Enabled: false # casecmp(other).zero? is a bad suggestion because it's not Unicode-aware (also it's less clear)
 Performance/CollectionLiteralInLoop:
   Severity: convention # not auto-correctable; can be a pain to fix and isn't necessarily performance critical
 Performance/MethodObjectAsBlock:
@@ -163,34 +134,12 @@ RSpec:
   Severity: error
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain
-RSpec/ContainExactly:
-  Enabled: false # prefers match_array in some cases, which is an alias, and we don't have a strong preference either way
-RSpec/DescribedClass:
-  Enabled: false # we haven't used it, and it seems antithetical to RSpec/NamedSubject
-RSpec/ExampleLength:
-  Enabled: false # this is a Metrics-style cop
-RSpec/ExampleWording:
-  Enabled: false # this is a Metrics-style cop
-RSpec/ExpectInHook:
-  Enabled: false # follows RSpec/MultipleExpectations
 RSpec/InstanceVariable:
   Enabled: false # legacy code
-RSpec/MatchArray:
-  Enabled: false # prefers contain_exactly in some cases, which is an alias, and we don't have a strong preference either way
-RSpec/MessageSpies:
-  Enabled: false # we don't use spies
-RSpec/MultipleExpectations:
-  Enabled: false # we don't write specs in this style
 RSpec/MultipleMemoizedHelpers:
   Enabled: false # complicated setup is sometimes necessary
-RSpec/NestedGroups:
-  Enabled: false # legacy code
-RSpec/NoExpectationExample:
-  Enabled: false # we have many examples that simply "assert" that nothing is raised
 RSpec/SubjectStub:
   Enabled: false # yes, canvas is big and complicated sometimes
-RSpec/StubbedMock:
-  Enabled: false # this style goes along with spies
 
 RSpec/Capybara:
   Enabled: false # we don't use capybara
@@ -212,16 +161,12 @@ Specs/EnsureSpecExtension:
 
 Style:
   Severity: error
-Style/Alias:
-  EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
 Style/BlockDelimiters:
   AllowedMethods: []
 Style/Documentation:
   Enabled: false # most things don't need to be documented
 Style/DoubleNegation:
   Enabled: false # we use double negation, even outside of return context, to get an actual true/false for various API results
-Style/EmptyElse:
-  EnforcedStyle: empty # explicit nil indicates programmer intent
 Style/FetchEnvVar:
   Enabled: false # ENV vars are generally all optional, and it's expected to return nil
 Style/FloatDivision:
@@ -230,8 +175,6 @@ Style/FormatStringToken:
   Enabled: false # I18n requires template style, but ohter code uses annotated style, and there are some trivial unannotted that don't really need to be annotated
 Style/HashLikeCase:
   Enabled: false
-Style/HashSyntax:
-  EnforcedStyle: ruby19_no_mixed_keys
 Style/IfUnlessModifier:
   # see also https://github.com/rubocop/rubocop/discussions/10048
   Enabled: false # can obscure important decisions or put too much code in a line
@@ -243,26 +186,14 @@ Style/OpenStructUse:
   Severity: warning # unfortunately, legacy code uses it a lot;
 Style/ParallelAssignment:
   Enabled: false # most uses are legitimate deconstruction or value swapping
-Style/PercentQLiterals:
-  EnforcedStyle: upper_case_q
-Style/PerlBackrefs:
-  Enabled: false # Regexp.last_match(1) is far worse than $1
-Style/RescueStandardError:
-  EnforcedStyle: implicit
 Style/ReturnNil:
   Enabled: false # explicit nil is okay when a method is expected to have a return value
 Style/SoleNestedConditional:
   AllowModifier: true # it makes lines too long and complicated otherwise
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
-Style/StringLiteralsInInterpolation:
-  EnforcedStyle: double_quotes
 Style/SymbolArray:
   MinSize: 3
-Style/TernaryParentheses:
-  EnforcedStyle: require_parentheses_when_complex
 Style/WhileUntilModifier:
   Enabled: false # nontrivial loops should look like loops
 Style/WordArray:

@@ -65,16 +65,16 @@ module Importers
       end
       item.save!
       hash[:questions].each_with_index do |question, i|
-        if (aq = question_data[:aq_data][question[:migration_id]] || question_data[:aq_data][question[:assessment_question_migration_id]])
-          Importers::QuizQuestionImporter.import_from_migration(aq,
-                                                                question,
-                                                                i + 1,
-                                                                question_data[:qq_ids][quiz.migration_id],
-                                                                context,
-                                                                migration,
-                                                                quiz,
-                                                                item)
-        end
+        next unless (aq = question_data[:aq_data][question[:migration_id]] || question_data[:aq_data][question[:assessment_question_migration_id]])
+
+        Importers::QuizQuestionImporter.import_from_migration(aq,
+                                                              question,
+                                                              i + 1,
+                                                              question_data[:qq_ids][quiz.migration_id],
+                                                              context,
+                                                              migration,
+                                                              quiz,
+                                                              item)
       end
 
       item
