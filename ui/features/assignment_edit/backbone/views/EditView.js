@@ -109,6 +109,9 @@ const GROUP_CATEGORY_BOX = '#has_group_category'
 const CONDITIONAL_RELEASE_TARGET = '#conditional_release_target'
 const SIMILARITY_DETECTION_TOOLS = '#similarity_detection_tools'
 const ANONYMOUS_GRADING_BOX = '#assignment_anonymous_grading'
+const HIDE_ZERO_POINT_QUIZZES_BOX = '#hide-from-gradebook-checkbox'
+const HIDE_ZERO_POINT_QUIZZES_OPTION = '#hide-from-gradebook-option'
+const OMIT_FROM_FINAL_GRADE_BOX = '#assignment_omit_from_final_grade'
 const ASSIGNMENT_EXTERNAL_TOOLS = '#assignment_external_tools'
 const USAGE_RIGHTS_CONTAINER = '#annotated_document_usage_rights_container'
 const USAGE_RIGHTS_SELECTOR = '#usageRightSelector'
@@ -246,6 +249,9 @@ EditView.prototype.els = _.extend(
     els['' + SECURE_PARAMS] = '$secureParams'
     els['' + ANONYMOUS_GRADING_BOX] = '$anonymousGradingBox'
     els['' + ASSIGNMENT_EXTERNAL_TOOLS] = '$assignmentExternalTools'
+    els['' + HIDE_ZERO_POINT_QUIZZES_BOX] = '$hideZeroPointQuizzesBox'
+    els['' + HIDE_ZERO_POINT_QUIZZES_OPTION] = '$hideZeroPointQuizzesOption'
+    els['' + OMIT_FROM_FINAL_GRADE_BOX] = '$omitFromFinalGradeBox'
     return els
   })()
 )
@@ -271,6 +277,7 @@ EditView.prototype.events = _.extend(
     events['change ' + PEER_REVIEWS_BOX] = 'togglePeerReviewsAndGroupCategoryEnabled'
     events['change ' + GROUP_CATEGORY_BOX] = 'handleGroupCategoryChange'
     events['change ' + ANONYMOUS_GRADING_BOX] = 'handleAnonymousGradingChange'
+    events['change ' + HIDE_ZERO_POINT_QUIZZES_BOX] = 'handleHideZeroPointQuizChange'
     if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
       events.change = 'onChange'
     }
@@ -369,6 +376,13 @@ EditView.prototype.handlePointsChange = function (ev) {
       this.$assignmentPointsPossible.val() !== '' + this.assignment.pointsPossible()
     )
   }
+  if (newPoints === 0) {
+    this.$hideZeroPointQuizzesOption.toggleAccessibly(true)
+  } else {
+    this.$hideZeroPointQuizzesBox.prop('checked', false)
+    this.$hideZeroPointQuizzesOption.toggleAccessibly(false)
+    this.handleHideZeroPointQuizChange()
+  }
 }
 
 EditView.prototype.checkboxAccessibleAdvisory = function (box) {
@@ -377,7 +391,8 @@ EditView.prototype.checkboxAccessibleAdvisory = function (box) {
   const srOnly =
     box === this.$peerReviewsBox ||
     box === this.$groupCategoryBox ||
-    box === this.$anonymousGradingBox
+    box === this.$anonymousGradingBox ||
+    box === this.$omitFromFinalGradeBox
       ? ''
       : 'screenreader-only'
   advisory = label.find('div.accessible_label')
@@ -469,6 +484,20 @@ EditView.prototype.handleAnonymousGradingChange = function () {
     } else if (this.model.canGroup()) {
       return this.enableCheckbox(this.$groupCategoryBox)
     }
+  }
+}
+
+EditView.prototype.handleHideZeroPointQuizChange = function () {
+  if (this.$hideZeroPointQuizzesBox.prop('checked')) {
+    this.disableCheckbox(
+      this.$omitFromFinalGradeBox,
+      I18n.t(
+        'This is enabled by default as assignments can not be withheld from the gradebook and still count towards it.'
+      )
+    )
+    return this.$omitFromFinalGradeBox.prop('checked', true)
+  } else {
+    return this.enableCheckbox(this.$omitFromFinalGradeBox)
   }
 }
 
@@ -1024,6 +1053,8 @@ EditView.prototype.afterRender = function () {
   this.handleSubmissionTypeChange()
   this.handleGroupCategoryChange()
   this.handleAnonymousGradingChange()
+  this.$hideZeroPointQuizzesOption.toggleAccessibly(this.$assignmentPointsPossible.val() === '0')
+  this.handleHideZeroPointQuizChange()
   if (ENV.ANNOTATED_DOCUMENT) {
     this.setAnnotatedDocument({
       id: ENV.ANNOTATED_DOCUMENT.id,

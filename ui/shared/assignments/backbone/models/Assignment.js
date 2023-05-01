@@ -99,6 +99,7 @@ function Assignment() {
   this.showBuildButton = this.showBuildButton.bind(this)
   this.newQuizzesAssignmentBuildButtonEnabled =
     this.newQuizzesAssignmentBuildButtonEnabled.bind(this)
+  this.hideZeroPointQuizzesOptionEnabled = this.hideZeroPointQuizzesOptionEnabled.bind(this)
   this.submissionTypeSelectionTools = this.submissionTypeSelectionTools.bind(this)
   this.dueDateRequiredForAccount = this.dueDateRequiredForAccount.bind(this)
   this.maxNameLengthRequiredForAccount = this.maxNameLengthRequiredForAccount.bind(this)
@@ -1014,6 +1015,10 @@ Assignment.prototype.newQuizzesAssignmentBuildButtonEnabled = function () {
   return ENV.NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED
 }
 
+Assignment.prototype.hideZeroPointQuizzesOptionEnabled = function () {
+  return ENV.HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED
+}
+
 Assignment.prototype.showBuildButton = function () {
   return this.isQuizLTIAssignment() && this.newQuizzesAssignmentBuildButtonEnabled()
 }
@@ -1228,6 +1233,7 @@ Assignment.prototype.toView = function () {
     'multipleDueDates',
     'name',
     'newQuizzesAssignmentBuildButtonEnabled',
+    'hideZeroPointQuizzesOptionEnabled',
     'nonBaseDates',
     'notifyOfUpdate',
     'objectTypeDisplayName',
