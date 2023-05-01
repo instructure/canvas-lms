@@ -117,6 +117,33 @@
         {{#t}}Do not count this assignment towards the final grade{{/t}}
       </label>
     </div>
+    {{#if hideZeroPointQuizzesOptionEnabled}}
+      {{#if isQuizLTIAssignment}}
+          <div id="hide-from-gradebook-option">
+            <fieldset id="hide-from-gradebook-set">
+              <div class="form-column-left"></div>
+              <div id="hide-from-gradebook" class="form-column-right">
+                <label class="checkbox">
+                  {{#if inClosedGradingPeriod}}
+                    {{checkbox "hideFromGradebook"
+                      id="hide-from-gradebook-checkbox"
+                      name="hide-from-gradebook"
+                      readonly="readonly"
+                      aria-readonly="true"
+                    }}
+                  {{else}}
+                    {{checkbox "hideFromGradebook"
+                      id="hide-from-gradebook-checkbox"
+                      name="hide-from-gradebook"
+                    }}
+                  {{/if}}
+                  {{#t}}Do not display in gradebook or the student's grade page{{/t}}
+                </label>
+              </div>
+            <fieldset>
+          </div>
+      {{/if}}
+    {{/if}}
 
     {{>ui/features/assignment_edit/jst/_submission_types_form.handlebars}}
 

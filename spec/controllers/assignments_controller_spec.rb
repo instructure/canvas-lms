@@ -2434,6 +2434,22 @@ describe AssignmentsController do
         expect(assigns[:js_env][:NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED]).to be(false)
       end
     end
+
+    describe "js_env HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED" do
+      it "sets HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED in js_env as true if enabled" do
+        user_session(@teacher)
+        Account.site_admin.enable_feature!(:hide_zero_point_quizzes_option)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED]).to be(true)
+      end
+
+      it "sets HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED in js_env as false if disabled" do
+        user_session(@teacher)
+        Account.site_admin.disable_feature!(:hide_zero_point_quizzes_option)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED]).to be(false)
+      end
+    end
   end
 
   describe "DELETE 'destroy'" do
