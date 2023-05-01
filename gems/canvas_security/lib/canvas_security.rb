@@ -86,7 +86,9 @@ module CanvasSecurity
       path = Rails.root.join("config/security.yml")
       raise("config/security.yml missing, see security.yml.example") unless path.file?
 
-      YAML.safe_load(ERB.new(path.read).result, aliases: true)[Rails.env]
+      result = YAML.safe_load(ERB.new(path.read).result, aliases: true)[Rails.env]
+      result["encryption_key"] ||= Rails.application.credentials.security_encryption_key
+      result
     end
   end
 
