@@ -1108,12 +1108,12 @@ class CalendarEventsApiController < ApplicationController
           next if event_context.nil?
 
           appointment_user = event_context.users.find { |user| user.id == appointment.user_id }
-          unless appointment_user.nil?
-            appointments.push({ user: appointment_user.name,
-                                comments: appointment.comments,
-                                parent_id: appointment.parent_calendar_event_id,
-                                course_name: event_context.name })
-          end
+          next if appointment_user.nil?
+
+          appointments.push({ user: appointment_user.name,
+                              comments: appointment.comments,
+                              parent_id: appointment.parent_calendar_event_id,
+                              course_name: event_context.name })
         end
         @events.concat appointment_groups
       end

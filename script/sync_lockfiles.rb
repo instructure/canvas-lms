@@ -29,7 +29,7 @@ default_specs = Bundler::LockfileParser.new(File.read(lockfile_name)).specs.to_h
 end
 
 success = true
-Dir["gems/*/Gemfile.lock"].each do |lockfile|
+Dir["Gemfile.d/*.lock", "gems/*/Gemfile.lock"].each do |lockfile|
   lockfile_contents = File.read(lockfile)
   new_lockfile = lockfile_contents.dup
   updates = []
@@ -51,25 +51,24 @@ Dir["gems/*/Gemfile.lock"].each do |lockfile|
 
   next if !sync || lockfile_contents == new_lockfile
 
-  Dir.chdir(File.dirname(lockfile)) do
-    Bundler.with_unbundled_env do
-      updates = updates.map { |spec, platform, new_version| "  #{spec.name}#{platform} from #{spec.version} to #{new_version}" }
-      puts "Updating #{lockfile}:\n#{updates.join("\n")}"
+  Bundler.with_unbundled_env do
+    ENV["BUNDLE_GEMFILE"] = lockfile.sub(/\.lock$/, "")
+    updates = updates.map { |spec, platform, new_version| "  #{spec.name}#{platform} from #{spec.version} to #{new_version}" }
+    puts "Updating #{lockfile}:\n#{updates.join("\n")}"
 
-      # first make sure all referenced gems are installed
-      `bundle check 2> /dev/null || bundle install 2> /dev/null`
+    # first make sure all referenced gems are installed
+    `bundle check 2> /dev/null || bundle install 2> /dev/null`
 
-      File.write("Gemfile.lock", new_lockfile)
+    File.write(lockfile, new_lockfile)
 
-      # now see if we screwed it up
-      result = `bundle check`
-      unless $?.success?
-        warn result
-        success = false
+    # now see if we screwed it up
+    result = `bundle check`
+    unless $?.success?
+      warn result
+      success = false
 
-        # revert to its original state
-        File.write("Gemfile.lock", new_lockfile)
-      end
+      # revert to its original state
+      File.write(lockfile, new_lockfile)
     end
   end
 end

@@ -979,6 +979,9 @@ GEM
       rubocop (~> 1.41)
     rubocop-graphql (1.1.1)
       rubocop (>= 0.87, < 2)
+    rubocop-inst (1.0.0)
+      rubocop (~> 1.50)
+      rubocop-performance (~> 1.17)
     rubocop-performance (1.17.1)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
@@ -1360,15 +1363,13 @@ DEPENDENCIES
   rspec_junit_formatter
   rspecq!
   rss (= 0.2.9)
-  rubocop (= 1.50.2)
   rubocop-canvas!
   rubocop-graphql (= 1.1.1)
-  rubocop-performance (= 1.17.1)
+  rubocop-inst (~> 1)
   rubocop-rails (= 2.19.1)
   rubocop-rake (= 0.6.0)
   rubocop-rspec (= 2.19.0)
   ruby-duration (= 3.2.3)
-  ruby-progressbar (= 1.11.0)
   ruby-rtf (= 0.0.5)
   ruby2_keywords (= 0.0.3)
   rubycas-client (= 2.3.9)
