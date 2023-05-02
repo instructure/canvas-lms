@@ -106,7 +106,7 @@ export default ({
             </Text>
           </View>
           <View as="div" margin="x-small 0" textAlign="center">
-            <img alt={I18n.t('SUCCESS!')} src={successSVG} />
+            <img alt="" src={successSVG} />
           </View>
           <View
             as="div"
