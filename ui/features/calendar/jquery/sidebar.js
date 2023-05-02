@@ -226,6 +226,7 @@ function convertAccountCalendars(accountCalendars) {
     name: oC.name,
     asset_string: oC.asset_string,
     type: oC.type,
+    auto_subscribe: oC.auto_subscribe,
   }))
 }
 
