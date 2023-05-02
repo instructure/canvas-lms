@@ -1107,8 +1107,14 @@ module Canvas::LiveEvents
   end
 
   def self.heartbeat
+    environment = if ApplicationController.test_cluster?
+                    ApplicationController.test_cluster_name
+                  else
+                    Canvas.environment
+                  end
+
     data = {
-      environment: Canvas.environment,
+      environment: environment,
       region_code: Canvas.region_code || "not_configured",
       region: Canvas.region || "not_configured"
     }
