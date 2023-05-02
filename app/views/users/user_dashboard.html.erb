@@ -60,15 +60,15 @@
 if k5_user?
       %>
         <%= prefetch_xhr("/api/v1/dashboard/dashboard_cards?observed_user_id=#{@cards_prefetch_observed_param}") %>
-        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{last_year}&order=asc&per_page=1&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
-        <%= prefetch_xhr("/api/v1/planner/items?end_date=#{next_year}&order=desc&per_page=1&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
-        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_week}&end_date=#{end_of_week}&per_page=100&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
+        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{last_year}&include%5B%5D=account_calendars&order=asc&per_page=1&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
+        <%= prefetch_xhr("/api/v1/planner/items?end_date=#{next_year}&include%5B%5D=account_calendars&order=desc&per_page=1&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
+        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_week}&end_date=#{end_of_week}&include%5B%5D=account_calendars&per_page=100&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
         <%= prefetch_xhr("/api/v1/users/self/missing_submissions?include%5B%5D=planner_overrides&filter%5B%5D=current_grading_period&filter%5B%5D=submittable&per_page=100&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_course_ids}") %>
       <% else %>
         <%= prefetch_xhr("/api/v1/dashboard/dashboard_cards?observed_user_id=#{@cards_prefetch_observed_param}") %>
-        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{six_months_ago}&filter=new_activity&order=asc&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
-        <%= prefetch_xhr("/api/v1/planner/items?end_date=#{beginning_of_day}&order=desc&per_page=1&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
-        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_day}&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
+        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{six_months_ago}&include%5B%5D=account_calendars&filter=new_activity&order=asc&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
+        <%= prefetch_xhr("/api/v1/planner/items?end_date=#{beginning_of_day}&include%5B%5D=account_calendars&order=desc&per_page=1&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
+        <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_day}&include%5B%5D=account_calendars&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_context_codes}") %>
         <%= prefetch_xhr("/api/v1/users/self/missing_submissions?include%5B%5D=planner_overrides&filter%5B%5D=current_grading_period&filter%5B%5D=submittable&observed_user_id=#{@cards_prefetch_observed_param}&#{observed_course_ids}") %>
       <% end %>
     <% end%>
