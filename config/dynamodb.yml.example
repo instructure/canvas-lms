@@ -1,21 +1,18 @@
 development:
   auditors:
     region: us-east-42
-    access_key_id: ASDFASDF
-    secret_access_key: ZXCVZXCV
     endpoint: http://dynamodb:8000/
     table_prefix: canvas_auditors_dev
+    vault_credential_path: sts/testaccount/sts/canvas-auditors-test
 test:
   auditors:
     region: us-east-42
-    access_key_id: ASDFASDF
-    secret_access_key: ZXCVZXCV
     endpoint: http://dynamodb:8000/
     table_prefix: canvas_auditors_test
+    vault_credential_path: sts/testaccount/sts/canvas-auditors-test
 production:
   auditors:
-    access_key_id: asdfasdf
-    secret_access_key: asdfasdf
     region: us-east-42
     endpoint: http://dynamodb:8000/
     table_prefix: canvas_auditors_fake
+    vault_credential_path: sts/testaccount/sts/canvas-auditors-prod
