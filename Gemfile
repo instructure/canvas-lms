@@ -69,6 +69,17 @@ end
 # phase to prevent that from happening.
 return if method(:source).owner == Bundler::Plugin::DSL
 
+module GemOverride
+  def gem(name, *version, path: nil, **kwargs)
+    if File.directory?("vendor/#{name}")
+      super(name, path: "vendor/#{name}", **kwargs)
+    else
+      super(name, *version, path: path, **kwargs)
+    end
+  end
+end
+Bundler::Dsl.prepend(GemOverride)
+
 Dir[File.join(File.dirname(__FILE__), "gems/plugins/*/Gemfile.d/_before.rb")].each do |file|
   eval(File.read(file), nil, file) # rubocop:disable Security/Eval
 end
