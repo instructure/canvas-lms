@@ -19,20 +19,12 @@
 
 # NOTE: Indented gems are meant to indicate optional dependencies of parent gems
 
-def gem_override(name, version)
-  if File.directory?("vendor/#{name}")
-    gem name, path: "vendor/#{name}"
-  else
-    gem name, version
-  end
-end
-
 gem "bootsnap", "1.13.0", require: false
 gem "rails", "~> 7.0.4"
 gem "tzinfo", "2.0.4"
-gem_override "switchman", "3.4.2"
+gem "switchman", "3.4.2"
 gem "guardrail", "3.0.2"
-gem_override "switchman-inst-jobs", "4.0.13"
+gem "switchman-inst-jobs", "4.0.13"
 gem "irb", "1.4.1"
 
 gem "academic_benchmarks", "1.1.2", require: false
@@ -84,7 +76,7 @@ gem "rrule", "0.4.4", require: false
 
 gem "inst_access", "0.1.1"
 gem "inst_statsd", "2.2.0"
-gem_override "inst-jobs", "~> 3.1"
+gem "inst-jobs", "~> 3.1"
 gem "inst-jobs-autoscaling", "2.1.1"
 gem "inst-jobs-statsd", "2.2.0"
 # if updating json gem it will need to be hotfixed because if a newer version of
