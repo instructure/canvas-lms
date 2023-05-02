@@ -311,6 +311,81 @@ describe PlannerController do
         end
       end
 
+      describe "account calendars" do
+        before do
+          Account.default.account_calendar_visible = true
+          Account.default.save!
+          @sub_account1 = Account.default.sub_accounts.create!(name: "SA-1", account_calendar_visible: true)
+          @student2 = user_factory(active_all: true)
+          @course_ac = course_with_student(active_all: true, user: @student2).course
+          course_with_student_logged_in(user: @student2, account: Account.default)
+          course_with_student_logged_in(user: @student2, account: @sub_account1)
+          @sub_account_event = @sub_account1.calendar_events.create!(title: "Sub account event", start_at: 0.days.from_now)
+          @default_account_event = Account.default.calendar_events.create!(title: "Default account event", start_at: 0.days.from_now)
+
+          @student2.set_preference(:enabled_account_calendars, [@sub_account1.id, Account.default.id])
+        end
+
+        it "shows calendar events for the enabled account calendars" do
+          get :index
+          response_json = json_parse(response.body)
+          default_account_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == @default_account_event.id }
+          sub_account_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == @sub_account_event.id }
+          expect(response_json.length).to eq 2
+          expect(sub_account_event["plannable"]["title"]).to eq @sub_account_event.title
+          expect(default_account_event["plannable"]["title"]).to eq @default_account_event.title
+        end
+
+        it "does not show calendar events for hidden account calendars" do
+          Account.default.account_calendar_visible = false
+          Account.default.save!
+          get :index
+          response_json = json_parse(response.body)
+          account_event = response_json[0]
+          expect(response_json.length).to eq 1
+          expect(account_event["plannable"]["title"]).to eq @sub_account_event.title
+        end
+
+        it "filters by context_codes" do
+          get :index, params: { context_codes: [@sub_account1.asset_string] }
+          response_json = json_parse(response.body)
+          sub_account_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == @sub_account_event.id }
+          expect(response_json.length).to eq 1
+          expect(sub_account_event["plannable"]["title"]).to eq @sub_account_event.title
+        end
+
+        it "returns unauthorized if the context_code is not visible" do
+          @sub_account1.account_calendar_visible = false
+          @sub_account1.save!
+          get :index, params: { context_codes: [@sub_account1.asset_string] }
+          assert_unauthorized
+        end
+
+        it "does not include account calendar events by default when filtering by context_codes" do
+          course_ac_event = @course_ac.calendar_events.create!(title: "Course event", start_at: 0.days.from_now)
+          get :index, params: { context_codes: [@course_ac.asset_string] }
+
+          response_json = json_parse(response.body)
+          course_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == course_ac_event.id }
+          expect(response_json.length).to eq 1
+          expect(course_event["plannable"]["title"]).to eq course_ac_event.title
+        end
+
+        it "includes account calendar events along with context_codes events if requested" do
+          course_ac_event = @course_ac.calendar_events.create!(title: "Course event", start_at: 0.days.from_now)
+          get :index, params: { include: %w[account_calendars], context_codes: [@course_ac.asset_string] }
+
+          response_json = json_parse(response.body)
+          default_account_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == @default_account_event.id }
+          sub_account_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == @sub_account_event.id }
+          course_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == course_ac_event.id }
+          expect(response_json.length).to eq 3
+          expect(sub_account_event["plannable"]["title"]).to eq @sub_account_event.title
+          expect(default_account_event["plannable"]["title"]).to eq @default_account_event.title
+          expect(course_event["plannable"]["title"]).to eq course_ac_event.title
+        end
+      end
+
       context "with context codes" do
         before :once do
           @course1 = course_with_student(active_all: true).course

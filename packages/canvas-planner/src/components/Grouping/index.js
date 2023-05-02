@@ -287,7 +287,7 @@ export class Grouping extends Component {
 
   renderGroupLink() {
     if (this.props.singleCourseView) return null
-    if (!this.props.title || this.props.items[0].readOnly) {
+    if (!this.props.title || this.props.items[0].readOnly || this.props.url === undefined) {
       return (
         <span className={styles.hero} ref={elt => (this.plannerNoteHero = elt)}>
           {this.renderGroupLinkBackground()}

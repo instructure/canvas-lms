@@ -137,6 +137,7 @@ class PlannerController < ApplicationController
                              page,
                              params[:filter],
                              Digest::MD5.hexdigest(default_opts.to_s),
+                             @context_codes,
                              contexts_cache_key].cache_key
       if stale?(etag: composite_cache_key, template: false)
         items_response = Rails.cache.fetch(composite_cache_key, expires_in: 1.week) do
@@ -359,18 +360,20 @@ class PlannerController < ApplicationController
   end
 
   def set_params
-    includes = Array.wrap(params[:include]) & %w[concluded]
+    includes = Array.wrap(params[:include]) & %w[concluded account_calendars]
     @per_page = params[:per_page] || 50
     @page = params[:page] || "first"
     @include_concluded = includes.include? "concluded"
-
+    @include_account_calendars = includes.include? "account_calendars"
+    @enabled_account_calendars = @user&.enabled_account_calendars&.map(&:id) || []
     # for specs, that do multiple requests in a single spec, we have to reset these ivars
-    @course_ids = @group_ids = @user_ids = nil
+    @course_ids = @group_ids = @user_ids = @account_ids = nil
     if params[:context_codes].present?
       context_ids = ActiveRecord::Base.parse_asset_string_list(Array(params[:context_codes]))
       @course_ids = context_ids["Course"] || []
       @group_ids = context_ids["Group"] || []
       @user_ids = context_ids["User"] || []
+      @account_ids = context_ids["Account"] || []
       # needed for all_ungraded_todo_items, but otherwise we don't need to load the actual
       # objects
       @contexts = Context.find_all_by_asset_string(context_ids) if public_access?
@@ -379,20 +382,27 @@ class PlannerController < ApplicationController
       @user_ids = [@user.id] if params.key?(:observed_user_id) && @user.grants_right?(@current_user, session, :read_as_parent)
     end
 
+    if @include_account_calendars && context_ids["Account"].nil?
+      @account_ids = @enabled_account_calendars
+    end
+
     # make IDs relative to the user's shard
-    @course_ids, @group_ids, @user_ids = transpose_ids(Shard.current, @user.shard) if @user
+    @course_ids, @group_ids, @user_ids, @account_ids = transpose_ids(Shard.current, @user.shard) if @user
 
     (@user&.shard || Shard.current).activate do
       original_course_ids = @course_ids || []
       original_group_ids = @group_ids || []
       original_user_ids = @user_ids || []
+      original_account_ids = @account_ids || []
       if @user
         @course_ids = @user.course_ids_for_todo_lists(:student, course_ids: @course_ids, include_concluded: include_concluded)
         @group_ids = @user.group_ids_for_todo_lists(group_ids: @group_ids)
+        @account_ids ||= @enabled_account_calendars
+        @account_ids &= @enabled_account_calendars
         @user_ids ||= [@user.id]
         @user_ids &= [@user.id]
       else
-        @course_ids = @group_ids = @user_ids = []
+        @course_ids = @group_ids = @user_ids = @account_ids = []
       end
 
       # allow observers additional access to courses where they're enrolled as an observer
@@ -405,7 +415,8 @@ class PlannerController < ApplicationController
       contexts_to_check_permissions = ActiveRecord::Base.find_all_by_asset_string(
         "Course" => original_course_ids - @course_ids,
         "Group" => original_group_ids - @group_ids,
-        "User" => original_user_ids - @user_ids
+        "User" => original_user_ids - @user_ids,
+        "Account" => original_account_ids - @account_ids
       )
 
       perms = public_access? ? [:read, :read_syllabus] : [:read]
@@ -419,31 +430,35 @@ class PlannerController < ApplicationController
                 when Course then @course_ids
                 when Group then @group_ids
                 when User then @user_ids
+                when Account then @account_ids
                 end
         array << context.id
       end
     end
 
-    @local_course_ids, @local_group_ids, @local_user_ids = transpose_ids(@user&.shard || Shard.current, Shard.current)
+    @local_course_ids, @local_group_ids, @local_user_ids, @local_account_ids = transpose_ids(@user&.shard || Shard.current, Shard.current)
 
     @context_codes = @local_course_ids.map { |id| "course_#{id}" }
     @context_codes.concat(@local_group_ids.map { |id| "group_#{id}" })
     @context_codes.concat(@local_user_ids.map { |id| "user_#{id}" })
+    @context_codes.concat(@local_account_ids.map { |id| "account_#{id}" })
   end
 
   def contexts_cache_key
     (Context.last_updated_at(Course => @local_course_ids,
                              User => @local_user_ids,
-                             Group => @local_group_ids) ||
+                             Group => @local_group_ids,
+                             Account => @local_account_ids) ||
       Time.zone.now.beginning_of_day).to_i
   end
 
   def transpose_ids(source, target)
-    return [@course_ids, @group_ids, @user_ids] if source == target
+    return [@course_ids, @group_ids, @user_ids, @account_ids] if source == target
 
     [@course_ids&.map { |id| Shard.relative_id_for(id, source, target) },
      @group_ids&.map { |id| Shard.relative_id_for(id, source, target) },
-     @user_ids&.map { |id| Shard.relative_id_for(id, source, target) }]
+     @user_ids&.map { |id| Shard.relative_id_for(id, source, target) },
+     @account_ids&.map { |id| Shard.relative_id_for(id, source, target) }]
   end
 
   def default_opts
