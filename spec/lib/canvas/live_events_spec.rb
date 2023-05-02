@@ -2604,5 +2604,47 @@ describe Canvas::LiveEvents do
         Canvas::LiveEvents.heartbeat
       end
     end
+
+    context "environment" do
+      context "in development" do
+        let(:environment) { "development" }
+
+        before do
+          allow(Canvas).to receive(:environment).and_return environment
+        end
+
+        it "sets environment to development" do
+          expect_event("heartbeat", { region: "not_configured", environment: environment, region_code: "not_configured" })
+          Canvas::LiveEvents.heartbeat
+        end
+      end
+
+      context "in beta" do
+        let(:environment) { "beta" }
+
+        before do
+          allow(ApplicationController).to receive(:test_cluster?).and_return true
+          allow(ApplicationController).to receive(:test_cluster_name).and_return environment
+        end
+
+        it "sets environment to beta" do
+          expect_event("heartbeat", { region: "not_configured", environment: environment, region_code: "not_configured" })
+          Canvas::LiveEvents.heartbeat
+        end
+      end
+
+      context "in prod" do
+        let(:environment) { "prod" }
+
+        before do
+          allow(Canvas).to receive(:environment).and_return environment
+        end
+
+        it "sets environment to prod" do
+          expect_event("heartbeat", { region: "not_configured", environment: environment, region_code: "not_configured" })
+          Canvas::LiveEvents.heartbeat
+        end
+      end
+    end
   end
 end
