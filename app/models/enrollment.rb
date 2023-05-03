@@ -711,9 +711,7 @@ class Enrollment < ActiveRecord::Base
     raise "cannot call enrollment_state on a new record" if new_record?
     state = self.association(:enrollment_state).target ||=
       self.shard.activate { EnrollmentState.where(:enrollment_id => self).first }
-    if state.nil?
-      state = create_enrollment_state
-    end
+    state ||= create_enrollment_state
     state.association(:enrollment).target ||= self # ensure reverse association
     state
   end
