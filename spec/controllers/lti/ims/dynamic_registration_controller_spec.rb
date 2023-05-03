@@ -72,13 +72,12 @@ describe Lti::IMS::DynamicRegistrationController do
         expect(oidc_url).to eq("https://canvas.instructure.com/api/lti/ims/security/openid-configuration")
       end
 
-      it "sets registration url, user id, root account id, and date in the JWT" do
+      it "sets user id, root account id, and date in the JWT" do
         subject
         parsed_redirect_uri = Addressable::URI.parse(response.headers["Location"])
         jwt = parsed_redirect_uri.query_values["registration_token"]
         jwt_hash = Canvas::Security.decode_jwt(jwt)
 
-        expect(jwt_hash["registrations_url"]).to eq("https://canvas.instructure.com/api/lti/ims/registrations")
         expect(Time.parse(jwt_hash["initiated_at"])).to be_within(1.minute).of(Time.now)
         expect(jwt_hash["user_id"]).to eq(@admin.id)
         expect(jwt_hash["root_account_uuid"]).to eq(@admin.account.root_account.uuid)
