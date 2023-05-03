@@ -1077,7 +1077,7 @@ GEM
       rspec (~> 3.8)
     strscan (3.0.6)
     swearjar (1.4.0)
-    switchman (3.4.2)
+    switchman (3.5.0)
       activerecord (>= 6.1.4, < 7.1)
       guardrail (~> 3.0.1)
       parallel (~> 1.22)
@@ -1157,7 +1157,7 @@ GEM
     yard (0.9.26)
     yard-appendix (0.1.8)
       yard (>= 0.8.0)
-    zeitwerk (2.6.7)
+    zeitwerk (2.6.8)
     zendesk_api (1.28.0)
       faraday (>= 0.9.0, < 2.0.0)
       hashie (>= 3.5.2, < 5.0.0)
@@ -1395,7 +1395,7 @@ DEPENDENCIES
   stackprof (~> 0.2)
   stormbreaker (= 0.0.8)
   stringify_ids!
-  switchman (= 3.4.2)
+  switchman (~> 3.5)
   switchman-inst-jobs (= 4.0.13)
   testrailtagging (= 0.3.8.7)
   thrift_client (= 0.9.3)!
