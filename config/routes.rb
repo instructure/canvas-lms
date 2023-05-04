@@ -2666,6 +2666,11 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/progress/:id", action: :show, as: :lti_progress_show
     end
 
+    # Dynamic Registration Service
+    scope(controller: "lti/ims/dynamic_registration") do
+      get "register", action: :create
+    end
+
     # Public JWK Service
     scope(controller: "lti/public_jwk") do
       put "/developer_key/update_public_jwk", action: :update, as: :public_jwk_update
