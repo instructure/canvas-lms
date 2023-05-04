@@ -615,6 +615,20 @@ describe "conversations new" do
         expect(@s1.conversations.last.conversation.context).to eq @admin.account
       end
 
+      it "sets compose course when course filter is set" do
+        get "/conversations"
+
+        f("[data-testid = 'course-select']").click
+        wait_for_ajaximations
+        fj("li > span:contains('#{@course.name}')").click
+        f("button[data-testid='compose']").click
+
+        expect(f("input[data-testid = 'course-select']").property("value")).to eq(@course.name)
+
+        ff("input[aria-label='Address Book']")[1].click
+        expect(fj("li:contains('All in #{@course.name}')")).to be_displayed
+      end
+
       context "individual message sending" do
         it "allows messages to be sent individually for account-level groups", priority: "2" do
           @group.destroy
