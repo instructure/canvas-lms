@@ -19,7 +19,7 @@ GEM
     diff-lcs (1.5.0)
     erubi (1.12.0)
     globby (0.1.2)
-    i18n (1.12.0)
+    i18n (1.13.0)
       concurrent-ruby (~> 1.0)
     i18nliner (0.2.2)
       activesupport (>= 6.0)
