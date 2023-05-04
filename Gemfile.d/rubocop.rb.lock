@@ -45,7 +45,7 @@ GEM
     httparty (0.18.1)
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-    i18n (1.12.0)
+    i18n (1.13.0)
       concurrent-ruby (~> 1.0)
     jira_ref_parser (1.0.1)
     json (2.6.3)
