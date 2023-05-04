@@ -56,33 +56,109 @@ module Canvas
       sequences + sequences.map(&:reverse)
     end
 
-    # per http://www.prweb.com/releases/2012/10/prweb10046001.htm
+    # per https://en.wikipedia.org/wiki/Wikipedia:10,000_most_common_passwords (CC BY-SA 3.0)
+    # Top 100 common passwords as at May 2023
     COMMON_PASSWORDS = %w[
-      password
       123456
+      password
       12345678
-      abc123
       qwerty
+      123456789
+      12345
+      1234
+      111111
+      1234567
+      dragon
+      123123
+      baseball
+      abc123
+      football
       monkey
       letmein
-      dragon
-      111111
-      baseball
-      iloveyou
-      trustno1
-      1234567
-      sunshine
-      master
-      123123
-      welcome
+      696969
       shadow
-      ashley
-      football
-      jesus
-      michael
-      ninja
+      master
+      666666
+      qwertyuiop
+      123321
       mustang
-      password1
-    ].freeze
+      1234567890
+      michael
+      654321
+      # censored
+      superman
+      1qaz2wsx
+      7777777
+      # censored
+      121212
+      000000
+      qazwsx
+      123qwe
+      killer
+      trustno1
+      jordan
+      jennifer
+      zxcvbnm
+      asdfgh
+      hunter
+      buster
+      soccer
+      harley
+      batman
+      andrew
+      tigger
+      sunshine
+      iloveyou
+      # censored
+      2000
+      charlie
+      robert
+      thomas
+      hockey
+      ranger
+      daniel
+      starwars
+      klaster
+      112233
+      george
+      # censored
+      computer
+      michelle
+      jessica
+      pepper
+      1111
+      zxcvbn
+      555555
+      11111111
+      131313
+      freedom
+      777777
+      pass
+      # censored
+      maggie
+      159753
+      aaaaaa
+      ginger
+      princess
+      joshua
+      cheese
+      amanda
+      summer
+      love
+      ashley
+      6969
+      nicole
+      chelsea
+      biteme
+      matthew
+      access
+      yankees
+      987654321
+      dallas
+      austin
+      thunder
+      taylor
+      matrix
+].freeze
   end
 end
