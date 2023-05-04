@@ -17400,7 +17400,7 @@ is:
   nightingale_student_activity_tracking_f7d7c4cf: "Rakning virkni nemanda Nightingale"
   niles_student_activity_and_performance_eabf444d: "Nemandavirkni og frammistaða Niles"
   no_74e9b590: nei
-  no_additional_details_were_added_for_this_assignme_547c0de7: "Engum auka smáatriðum var bætt við þetta verkefni."
+  no_additional_details_were_added_for_this_assignme_547c0de7: "Frekari upplýsingar fylgja ekki verkefninu."
   no_alignments_are_available_for_this_outcome_7f8346f9: "Engar jafnanir vöru mögulegar fyrir þessa niðurstöðu."
   no_allowed_domains_b6633d12: "Engin leyfð lén"
   no_analytics_data_available_aa32c101: "Engin greiningargögn tiltæk."
@@ -18701,7 +18701,7 @@ is:
   plagiarism_detection_platform_assignments_fc19e0bd: "Verkefni ritstuldargreiningarvettvangs"
   plagiarism_detection_platform_users_b0e5410f: "Notendur ritstuldargreiningarvettvangs"
   plagiarism_detection_submissions_4f322a00: "Innsendingar ritstuldargreiningar"
-  plagiarism_review_7bccc7df: "Skoðun á ritstuld"
+  plagiarism_review_7bccc7df: Ritskimun
   plagiarism_review_tool_error_513f47ff: "Villa í ritstuldartóli"
   plagiarism_review_tool_is_missing_submission_event_75273069: "Ritstuldartól vantar skilaviðburðarþjónustu"
   plagiarism_review_tool_live_event_subscription_err_9094579d: "Áskriftarvilla beins viðburðar í verkfæri fyrir ritstuldarathugun"
@@ -18953,9 +18953,9 @@ is:
       name: "Einkunnir fluttar út"
     grade_export_settings: 
       description: |-
-          Þetta tengiforrit leyfir birtingu lokaeinkunna aftur til nemendaupplýsingakerfis (SIS)  Þegar það er virkjað fær notandinn möguleika í einkunnabókinni á að birta þessar einkunnir.  Það gerist með POST beiðni á tiltekin birtingarendapunkt.  Hver gerð skilgreinir sitt eigið efnissnið og mime-gerð.  Svarið frá endapunktinum skiptir ekki máli og er núna hunsað.
+          Þetta tengiforrit leyfir birtingu lokaeinkunna aftur til nemendaupplýsingakerfis (SIS) Þegar það er virkjað fær notandinn möguleika í einkunnabókinni á að birta þessar einkunnir.  Það gerist með POST beiðni á tiltekin birtingarendapunkt.  Hver gerð skilgreinir sitt eigið efnissnið og mime-gerð.  Svarið frá endapunktinum skiptir ekki máli og er núna hunsað.
           
-          Til dæmis mun Instructure sniðið CSV POST-a csv skrá með mime-gerð 'text/csv‘ á tiltekin endapunkt, sem inniheldur eftirfarandi dálka: 
+          Til dæmis mun Instructure sniðið CSV POST-a csv skrá með mime-gerð 'text/csv' á tiltekin endapunkt, sem inniheldur eftirfarandi dálka: 
           
           "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score", "grade"
           
@@ -19019,7 +19019,7 @@ is:
       account_settings: "Þessi gildi er að finna í stjórnborði Kaltura undir \"Settings > Integration Settings\""
       cache_explanation: "Autt merkir alltaf í skyndiminni, 0 merkir ekki varðveita í skyndiminni."
       description: |-
-          Þú þarft reikning hjá  [Kaltura.com](%{kaltura_url})
+          Þú þarft reikning hjá [Kaltura.com](%{kaltura_url})
           eða hjá sjálfhýstu tilfelli af Kaltura.
           
           **Ath:** Þegar þú hefur stillt Kaltura í Canvas,
@@ -19029,7 +19029,7 @@ is:
           
           %{notification_url}
           
-          Svo hakarðu í reitina "Add Entry" og"Delete Entry" í dálkinum "Sent by Server".
+          Svo hakarðu í reitina "Add Entry" og "Delete Entry" í dálkinum "Sent by Server".
       headers: 
         account_settings: "Stillingar reiknings"
         canvas_settings: Canvas-stillingar
@@ -20684,7 +20684,7 @@ is:
         choose_answer: Velja
       muted: 
         muted_quiz_description: "Prófeinkunn þín er ótiltæk því leiðbeinandinn þinn hefur ekki metið prófið. Að því loknu verður einkunnin tiltæk á þessari síðu."
-        muted_quiz_header: "Prófið þitt hefur verið gert óvirkt"
+        muted_quiz_header: "Prófinu er lokið og prófúrlausn móttekin"
       new: 
         default_page_title: "Nýtt próf"
         headers: 
