@@ -20,14 +20,15 @@
 
 # @API Account Calendars
 #
-# API for viewing and toggling visibility of account calendars.
+# API for viewing and toggling settings of account calendars.
 #
 # An account calendar is available for each account in Canvas. All account calendars
-# are visible by default, but administrators with the
-# `manage_account_calendar_visibility` permission may hide calendars. Administrators
-# with the `manage_account_calendar_events` permission can create events in visible
-# account calendars, and users associated with an account can add the calendar and
-# see its events (if the calendar is visible).
+# are hidden by default, but administrators with the `manage_account_calendar_visibility`
+# permission may set calendars as visible. Administrators with the
+# `manage_account_calendar_events` permission can create events in visible account
+# calendars, and users associated with an account can add the calendar and see its
+# events (if the calendar is visible). Events on calendars set as `auto_subscribe`
+# calendars will appear on users' calendars even if they do not manually add it.
 #
 # @model AccountCalendar
 #     {
@@ -56,6 +57,11 @@
 #         "visible": {
 #           "description": "whether this calendar is visible to users",
 #           "example": true,
+#           "type": "boolean"
+#         },
+#         "auto_subscribe": {
+#           "description": "whether users see this calendar's events without needing to manually add it",
+#           "example": false,
 #           "type": "boolean"
 #         },
 #         "sub_account_count": {
@@ -147,9 +153,9 @@ class AccountCalendarsApiController < ApplicationController
     end
   end
 
-  # @API Update a calendar's visibility
+  # @API Update a calendar
   #
-  # Set an account calendar as hidden or visible. Requires the
+  # Set an account calendar's visibility and auto_subscribe values. Requires the
   # `manage_account_calendar_visibility` permission on the account.
   #
   # @argument visible [Boolean]
@@ -157,58 +163,76 @@ class AccountCalendarsApiController < ApplicationController
   #   to create events on this calendar, and allow users to view this
   #   calendar and its events.
   #
+  # @argument auto_subscribe [Boolean]
+  #   When true, users will automatically see events from this account in their
+  #   calendar, even if they haven't manually added that calendar.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/account_calendars/204 \
   #     -X PUT \
   #     -H 'Authorization: Bearer <token>' \
-  #     -d 'visible=false'
+  #     -d 'visible=false' \
+  #     -d 'auto_subscribe=false'
   #
   # @returns AccountCalendar
   def update
     account = api_find(Account.active, params[:account_id])
     return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
-    return render json: { errors: t("Missing param: `%{param}`", { param: "visible" }) }, status: :bad_request if params[:visible].nil?
 
-    account.account_calendar_visible = value_to_boolean(params[:visible])
-    account.save!
+    account.account_calendar_visible = value_to_boolean(params[:visible]) if params.include?(:visible)
+    if params.include?(:auto_subscribe) && Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars)
+      account.account_calendar_subscription_type = value_to_boolean(params[:auto_subscribe]) ? "auto" : "manual"
+    end
+    account.save! if account.changed?
     render json: account_calendar_json(account, @current_user, session)
   end
 
-  # @API Update many calendars' visibility
+  # @API Update several calendars
   #
-  # Set visibility on many calendars simultaneously. Requires the
-  # `manage_account_calendar_visibility` permission on the account.
+  # Set visibility and/or auto_subscribe on many calendars simultaneously. Requires
+  # the `manage_account_calendar_visibility` permission on the account.
   #
-  # Accepts a JSON array of objects containing 2 keys each: `id`
-  # (the account's id), and `visible` (a boolean indicating whether
-  # the account calendar is visible).
+  # Accepts a JSON array of objects containing 2-3 keys each: `id`
+  # (the account's id, required), `visible` (a boolean indicating whether
+  # the account calendar is visible), and `auto_subscribe` (a boolean indicating
+  # whether users should see these events in their calendar without manually
+  # subscribing).
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/1/account_calendars \
   #     -X PUT \
   #     -H 'Authorization: Bearer <token>' \
-  #     --data '[{"id": 1, "visible": true}, {"id": 13, "visible": false}]'
+  #     --data '[{"id": 1, "visible": true, "auto_subscribe": false}, {"id": 13, "visible": false, "auto_subscribe": true}]'
   #
-  # @returns AccountCalendar
+  # Returns the count of updated accounts.
   def bulk_update
     account = api_find(Account.active, params[:account_id])
     return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
 
-    data = params.permit(_json: [:id, :visible]).to_h[:_json]
+    data = params.permit(_json: %i[id visible auto_subscribe]).to_h[:_json]
     return render json: { errors: t("Expected array of objects") }, status: :bad_request unless data.is_a?(Array) && !data.empty?
-    return render json: { errors: t("Missing key(s)") }, status: :bad_request unless data.all? { |c| c.key?("id") && c.key?("visible") }
+    return render json: { errors: t("Missing key(s)") }, status: :bad_request unless data.all? { |c| c.key?("id") }
+    return render json: { errors: t("Duplicate IDs") }, status: :bad_request unless data.pluck("id").uniq.count == data.pluck("id").count
 
     account_ids = data.map { |c| c["id"].to_i }
     allowed_account_ids = [account.id] + Account.sub_account_ids_recursive(account.id)
     return render_unauthorized_action unless (account_ids - allowed_account_ids).empty?
 
-    account_ids_to_enable = data.select { |c| value_to_boolean(c["visible"]) }.pluck("id")
-    account_ids_to_disable = data.reject { |c| value_to_boolean(c["visible"]) }.pluck("id")
-    return render json: { errors: t("Unexpected value") }, status: :bad_request unless account_ids_to_enable.length + account_ids_to_disable.length == data.length && account_ids_to_enable.intersection(account_ids_to_disable).empty?
+    account_scope = Account.active
 
-    updated_accounts = Account.active.where(id: account_ids_to_enable).update_all(account_calendar_visible: true)
-    updated_accounts += Account.active.where(id: account_ids_to_disable).update_all(account_calendar_visible: false)
-    render json: { message: t({ one: "Updated 1 account", other: "Updated %{count} accounts" }, { count: updated_accounts }) }
+    ids_to_enable_visible = data.select { |c| value_to_boolean(c["visible"]) }.pluck("id")
+    ids_to_disable_visible = data.reject { |c| value_to_boolean(c["visible"]) }.pluck("id")
+    account_scope.where(id: ids_to_enable_visible).update_all(account_calendar_visible: true)
+    account_scope.where(id: ids_to_disable_visible).update_all(account_calendar_visible: false)
+
+    if Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars)
+      ids_to_enable_auto_subscribe = data.select { |c| value_to_boolean(c["auto_subscribe"]) }.pluck("id")
+      ids_to_disable_auto_subscribe = data.reject { |c| value_to_boolean(c["auto_subscribe"]) }.pluck("id")
+      account_scope.where(id: ids_to_enable_auto_subscribe).update_all(account_calendar_subscription_type: "auto")
+      account_scope.where(id: ids_to_disable_auto_subscribe).update_all(account_calendar_subscription_type: "manual")
+    end
+
+    render json: { message: t({ one: "Updated 1 account", other: "Updated %{count} accounts" }, { count: account_ids.uniq.count }) }
   end
 
   # @API List all account calendars
