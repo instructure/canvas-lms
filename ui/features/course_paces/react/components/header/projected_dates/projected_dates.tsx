@@ -73,7 +73,7 @@ type StoreProps = {
   readonly compression: number
 }
 
-export const ProjectedDates: React.FC<StoreProps> = ({
+export const ProjectedDates = ({
   coursePace,
   assignments,
   paceDuration,
@@ -81,7 +81,7 @@ export const ProjectedDates: React.FC<StoreProps> = ({
   compressDates,
   uncompressDates,
   compression,
-}) => {
+}: StoreProps) => {
   const [dateFormatter] = useState(coursePaceDateFormatter)
 
   const enrollmentType = coursePace.context_type === 'Enrollment'

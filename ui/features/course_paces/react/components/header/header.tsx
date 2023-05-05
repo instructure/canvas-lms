@@ -89,7 +89,7 @@ const NEW_PACE_ALERT_MESSAGES = {
   ),
 }
 
-export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
+export const Header = (props: HeaderProps) => {
   const [newPaceAlertDismissed, setNewPaceAlertDismissed] = useState(false)
   const handleNewPaceAlertDismissed = useCallback(() => setNewPaceAlertDismissed(true), [])
   const metricsTableRef = useRef<HTMLElement | null>(null)

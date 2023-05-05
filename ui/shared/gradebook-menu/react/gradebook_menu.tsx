@@ -93,7 +93,7 @@ type Props = {
   variant: string
 }
 
-const GradebookMenu: React.FC<Props> = ({courseUrl, learningMasteryEnabled, variant}) => {
+const GradebookMenu = ({courseUrl, learningMasteryEnabled, variant}: Props) => {
   const selectedItem = variants[variant] as ActiveVariantConfig
   if (selectedItem == null) {
     return null

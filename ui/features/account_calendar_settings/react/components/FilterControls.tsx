@@ -66,12 +66,12 @@ const FILTER_OPTIONS = [
   },
 ]
 
-export const FilterControls: React.FC<ComponentProps> = ({
+export const FilterControls = ({
   searchValue,
   filterValue,
   setSearchValue,
   setFilterValue,
-}) => {
+}: ComponentProps) => {
   const clearSearchButton = (
     <IconButton
       renderIcon={IconXLine}

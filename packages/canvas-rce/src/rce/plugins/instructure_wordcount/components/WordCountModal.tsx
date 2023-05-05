@@ -60,7 +60,7 @@ export type WordCountModalProps = {
   readonly onDismiss: () => void
 }
 
-export const WordCountModal: React.FC<WordCountModalProps> = ({headers, rows, onDismiss}) => {
+export const WordCountModal = ({headers, rows, onDismiss}: WordCountModalProps) => {
   return (
     <Modal
       label={formatMessage('Word Count')}

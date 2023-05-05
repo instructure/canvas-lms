@@ -45,13 +45,13 @@ interface StoreProps {
 
 const {Item: FlexItem} = Flex as any
 
-const PaceModalHeading: React.FC<Props & StoreProps> = ({
+const PaceModalHeading = ({
   coursePace,
   contextName,
   paceContext,
   enrolledSection,
   blueprintLocked,
-}) => {
+}: Props & StoreProps) => {
   const renderPaceInfo = () => {
     if (['Section', 'Course'].includes(coursePace.context_type)) {
       return (
