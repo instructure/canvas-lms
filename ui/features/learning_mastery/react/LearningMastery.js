@@ -109,6 +109,9 @@ export default class LearningMastery {
     const props = {
       courseUrl: this.options.context_url,
       learningMasteryEnabled: true,
+      enhancedIndividualGradebookEnabled: Boolean(
+        ENV.GRADEBOOK_OPTIONS.individual_gradebook_enhancements
+      ),
       variant: 'DefaultGradebookLearningMastery',
     }
     ReactDOM.render(<GradebookMenu {...props} />, $container)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,14 +17,17 @@
  */
 
 import React from 'react'
-import GradebookMenu from './gradebook_menu'
+import ReactDOM from 'react-dom'
+import GradebookMenu from '@canvas/gradebook-menu'
 
-export default function GradebookMenuContainer({courseUrl, learningMasteryEnabled, variant}) {
-  return (
-    <GradebookMenu
-      courseUrl={courseUrl}
-      learningMasteryEnabled={learningMasteryEnabled}
-      variant={variant}
-    />
-  )
-}
+ReactDOM.render(
+  <GradebookMenu
+    courseUrl={ENV.GRADEBOOK_OPTIONS.context_url}
+    learningMasteryEnabled={Boolean(ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled)}
+    enhancedIndividualGradebookEnabled={Boolean(
+      ENV.GRADEBOOK_OPTIONS.individual_gradebook_enhancements
+    )}
+    variant="EnhancedIndividualGradebook"
+  />,
+  document.querySelector('[data-component="GradebookSelector"]')
+)

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -163,6 +162,7 @@ import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import LatePolicyApplicator from '../LatePolicyApplicator'
 import {IconButton} from '@instructure/ui-buttons'
+// @ts-expect-error
 import {IconSettingsSolid} from '@instructure/ui-icons'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import MultiSelectSearchInput from './components/MultiSelectSearchInput'
@@ -5009,6 +5009,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         <Portal node={this.props.gradebookMenuNode}>
           <GradebookMenu
             courseUrl={this.options.context_url}
+            enhancedIndividualGradebookEnabled={this.options.individual_gradebook_enhancements}
             learningMasteryEnabled={this.options.outcome_gradebook_enabled}
             variant="DefaultGradebook"
           />

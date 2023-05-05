@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+// @ts-expect-error
 import {Provider} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GradebookMenu from '@canvas/gradebook-menu'
@@ -25,11 +26,20 @@ import SearchForm from './SearchForm'
 import SearchResults from './SearchResults'
 
 import GradebookHistoryStore from './store/GradebookHistoryStore'
-import {bool, string} from 'prop-types'
 
 const I18n = useI18nScope('gradebook_history')
 
-const GradebookHistoryApp = ({courseUrl, learningMasteryEnabled}) => (
+type Props = {
+  courseUrl: string
+  learningMasteryEnabled?: boolean
+  enhancedIndividualGradebookEnabled?: boolean
+}
+
+const GradebookHistoryApp = ({
+  courseUrl,
+  learningMasteryEnabled,
+  enhancedIndividualGradebookEnabled,
+}: Props) => (
   <Provider store={GradebookHistoryStore}>
     <div>
       <h1 className="screenreader-only">{I18n.t('Gradebook History')}</h1>
@@ -39,6 +49,7 @@ const GradebookHistoryApp = ({courseUrl, learningMasteryEnabled}) => (
       <div style={{margin: '0 0 1.5em -0.75rem'}}>
         <GradebookMenu
           courseUrl={courseUrl}
+          enhancedIndividualGradebookEnabled={enhancedIndividualGradebookEnabled}
           learningMasteryEnabled={learningMasteryEnabled}
           variant="GradebookHistory"
         />
@@ -50,10 +61,5 @@ const GradebookHistoryApp = ({courseUrl, learningMasteryEnabled}) => (
     </div>
   </Provider>
 )
-
-GradebookHistoryApp.propTypes = {
-  courseUrl: string,
-  learningMasteryEnabled: bool,
-}
 
 export default GradebookHistoryApp

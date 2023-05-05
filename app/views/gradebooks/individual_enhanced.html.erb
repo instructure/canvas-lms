@@ -17,17 +17,9 @@
 %>
 
 <%
-  css_bundle :screenreader_gradebook
-  deferred_js_bundle :screenreader_gradebook
+  deferred_js_bundle :enhanced_individual_gradebook
 %>
-<% provide :page_title, t("Gradebook: Individual View") %>
+<% provide :page_title, t("Gradebook: Enhanced Individual View") %>
 <div>
   <span data-component="GradebookSelector"></span>
-  <span data-component="IndividualProxyUploader" data-variant="IndividualGradebook"></span>
 </div>
-<div style="display:none;">
-  <%= render :partial => "shared/message_students" %>
-</div>
-<% if show_message_students_with_observers_dialog? %>
-  <span data-component="MessageStudentsWithObserversModal"></span>
-<% end %>
