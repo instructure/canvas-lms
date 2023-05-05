@@ -25,7 +25,7 @@ import ready from '@instructure/ready'
 import App from './react/app'
 import createStore from './react/shared/create_store'
 
-const CoursePage: React.FC = () => (
+const CoursePage = () => (
   <Provider store={createStore()}>
     <App />
   </Provider>

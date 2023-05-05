@@ -37,13 +37,13 @@ interface StoreProps {
   readonly modulesWithItemsWithDates: ModuleWithDueDates[]
 }
 
-export const CoursePaceTable: React.FC<StoreProps> = ({
+export const CoursePaceTable = ({
   coursePace,
   responsiveSize,
   showProjections,
   compression,
   modulesWithItemsWithDates,
-}) => {
+}: StoreProps) => {
   return (
     <>
       {modulesWithItemsWithDates.map((module, index) => (

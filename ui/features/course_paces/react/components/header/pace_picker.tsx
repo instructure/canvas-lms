@@ -72,7 +72,7 @@ const createContextKey = (contextType: PaceContextTypes, contextId: string): str
 
 const parseContextKey = (key: string): ContextArgs => key.split(':') as ContextArgs
 
-export const PacePicker: React.FC<ComponentProps> = ({
+export const PacePicker = ({
   course,
   enrollments,
   sections,
@@ -81,7 +81,7 @@ export const PacePicker: React.FC<ComponentProps> = ({
   setSelectedPaceContext,
   responsiveSize,
   unappliedChangesExist,
-}) => {
+}: ComponentProps) => {
   const [open, setOpen] = useState(false)
   const [pendingContext, setPendingContext] = useState('')
 

@@ -29,7 +29,7 @@ interface PassedProps {
   readonly onChange: (blackoutDates: BlackoutDate[]) => any
 }
 
-const BlackoutDates: React.FC<PassedProps> = ({blackoutDates, onChange}) => {
+const BlackoutDates = ({blackoutDates, onChange}: PassedProps) => {
   const addBlackoutDate = useCallback(
     (blackoutDate: BlackoutDate) => {
       blackoutDate.temp_id = uid('temp_', 3)

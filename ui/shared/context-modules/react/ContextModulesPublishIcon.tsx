@@ -41,13 +41,13 @@ interface Props {
 // TODO: remove and replace MenuItem with Menu.Item below when on v8
 const {Item: MenuItem} = Menu as any
 
-const ContextModulesPublishIcon: React.FC<Props> = ({
+const ContextModulesPublishIcon = ({
   courseId,
   moduleId,
   published,
   isPublishing,
   loadingMessage,
-}) => {
+}: Props) => {
   const statusIcon = () => {
     const iconStyles = {
       paddingLeft: '0.25rem',

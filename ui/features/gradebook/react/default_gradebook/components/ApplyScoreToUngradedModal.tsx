@@ -56,7 +56,7 @@ type Props = {
   open: boolean
 }
 
-const ApplyScoreToUngradedModal: React.FC<Props> = ({assignmentGroup, onApply, onClose, open}) => {
+const ApplyScoreToUngradedModal = ({assignmentGroup, onApply, onClose, open}: Props) => {
   const [markAsMissing, setMarkAsMissing] = useState(false)
   const [artifactScope, setArtifactScope] = useState(APPLY_TO_PAST_DUE)
   const [percent, setPercent] = useState('')

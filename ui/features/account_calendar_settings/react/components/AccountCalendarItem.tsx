@@ -47,13 +47,13 @@ type ComponentProps = {
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Item: FlexItem} = Flex as any
 
-export const AccountCalendarItem: React.FC<ComponentProps> = ({
+export const AccountCalendarItem = ({
   item,
   visibilityChanges,
   onAccountToggled,
   padding,
   showTopSeparator = false,
-}) => (
+}: ComponentProps) => (
   <ApplyTheme theme={accountListTheme}>
     <View as="div" padding={padding} borderWidth={`${showTopSeparator ? 'small' : '0'} 0 0 0`}>
       <Flex data-testid="flex-calendar-item" as="div" alignItems="center">

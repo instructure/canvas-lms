@@ -47,7 +47,7 @@ interface Props {
 }
 export const PUBLISH_STATUS_POLLING_MS = 1000
 
-const ContextModulesPublishModal: React.FC<Props> = ({
+const ContextModulesPublishModal = ({
   isOpen,
   onCancel,
   onClose,
@@ -58,7 +58,7 @@ const ContextModulesPublishModal: React.FC<Props> = ({
   progressId,
   progressCurrent,
   title,
-}) => {
+}: Props) => {
   const handlePublish = () => {
     if (isPublishing) {
       onCancel()

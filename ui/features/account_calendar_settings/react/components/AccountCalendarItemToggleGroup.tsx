@@ -56,7 +56,7 @@ const accGroupSortCalback = (a, b, parentId) => {
   return 0
 }
 
-export const AccountCalendarItemToggleGroup: React.FC<ComponentProps> = ({
+export const AccountCalendarItemToggleGroup = ({
   parentId,
   accountGroup,
   defaultExpanded,
@@ -64,7 +64,7 @@ export const AccountCalendarItemToggleGroup: React.FC<ComponentProps> = ({
   handleToggle,
   visibilityChanges,
   onAccountToggled,
-}) => {
+}: ComponentProps) => {
   if (!accountGroup) return <Spinner renderTitle={I18n.t('Loading accounts')} size="x-small" />
 
   accountGroup = accountGroup
