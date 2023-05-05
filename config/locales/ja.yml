@@ -1604,7 +1604,7 @@ ja:
         external_services_warning_label: "ポップアップ メッセージの内容:"
         from: 自
         sample_subject: "Canvas からの最近のお知らせ"
-        subject: 科目
+        subject: 件名
       open_registration_delegated_warning_message: "外部 ID プロバイダーが有効になっている場合、[登録を開く] によって作成されたユーザは、外部 ID プロバイダーのログイン フォームに %{url} に戻るリンクがない限り、ログインできないことがあります。"
       open_registration_delegated_warning_tooltip: "外部 ID プロバイダーが有効です"
       open_report_description: レポートの説明を開く
@@ -1645,7 +1645,7 @@ ja:
       tab_announcements: アナウンスメント
       tab_external_tools: アプリ
       tab_integrations: インテグレーション
-      tab_notifications: お知らせ
+      tab_notifications: 通知
       tab_privacy: プライバシー
       tab_quotas: クォータ
       tab_reports: レポート
@@ -3500,8 +3500,8 @@ ja:
     podcast_feed_name: "%{course} アナウンスのポッドキャスト フィード"
     podcast_title_course: "コース アナウンスのポッドキャスト フィード"
     podcast_title_group: "グループ アナウンスのポッドキャスト フィード"
-  announcements_17c6a6bf: 発表
-  announcements_a4b8ed4a: 発表
+  announcements_17c6a6bf: アナウンスメント
+  announcements_a4b8ed4a: アナウンスメント
   announcements_account_4e9df626: お知らせ（アカウント）
   announcements_cannot_be_duplicated_2de8824c: アナウンスを複製することはできません
   announcements_deleted_successfully_7d77e9e1: アナウンスメントを正常に削除しました
@@ -3818,7 +3818,7 @@ ja:
   assign_reviews_on_date_7e48ec50: レビュー割り当て日付
   assign_to_6b806cd9: 課題対象者：
   assign_to_95404a83: ～へ割り当てられました
-  assign_to_c46e21: 割り当てられる
+  assign_to_c46e21: 対象者
   assigned_pace_e954962a: 割り当てられたペース
   assigned_permissions_6f6fecb6: 割り当てられた許可
   assigned_roles_ace6c950: 割り当てられたロール
@@ -3868,7 +3868,7 @@ ja:
       a_text_entry_box: テキスト入力ボックス
       a_website_url: "Web サイト URL"
       external_tool: 外部ツール
-      on_paper: 筆記
+      on_paper: 紙面
     titles: 
       gpa_scale_explainer: "GPA スケール採点とは"
       grading_scheme_info: 採点スキームの表示/編集
@@ -3933,7 +3933,7 @@ ja:
   assignment_grades_have_already_been_published_ff2d84c6: 課題の成績は、すでに公開されています。
   assignment_grades_have_already_been_released_4c8a91b: 課題の評定はすでにリリースされています。
   assignment_grades_will_be_visible_to_students_as_s_62975ef6: "\n\
-      \x20           課題の評定は、入力完了次第、受講者に開示されます。.\n\
+      \x20           課題の評定は、入力完了次第、受講者に開示されます。\n\
       \x20           すでに非表示になっている評定は、非表示のままです。\n\
       \x20         "
   assignment_grades_will_be_visible_to_students_as_s_bfbea571: "\n\
@@ -3945,7 +3945,7 @@ ja:
     grading_type_options: 
       gpa_scale: GPAスケール
       letter_grade: ABC...評価
-      not_graded: 未採点
+      not_graded: 採点なし
       pass_fail: 完了/未完了
       percent: 割合
       points: ポイント
@@ -4145,7 +4145,7 @@ ja:
       external_tool_type: 外部ツール
       more: その他のオプション
       multiple_due_dates: 複数の期日
-      not_graded_type: 未採点
+      not_graded_type: 採点なし
       quiz_type: 小テスト
       save: 保存
       saving: 保存しています...
@@ -4444,7 +4444,7 @@ ja:
       allowed_attempts: 試行許可数
       assignment_locked: この課題は現在ロックされています。
       attempts: 回数
-      available_from: 次から使用可能
+      available_from: 提出開始日時
       date_time_by: "%{date} %{time} まで"
       defaults: 
         no_content: コンテンツなし
@@ -4465,11 +4465,11 @@ ja:
       points: 点数
       speed_grader: SpeedGrader™
       submission_types: "ファイル タイプ"
-      submitting: 提出しています
+      submitting: 提出方法
       turnitin: Turnitin
       turnitin_enabled: "この課題では Turnitin が有効になっています。"
       turnitin_enabled_short: "(Turnitin を有効にしました)"
-      until: 次の日時まで
+      until: 提出終了日時
       vericite: VeriCite
       vericite_enabled: "VeriCite が、この課題に対して有効化されました。"
       vericite_enabled_short: "(VeriCite 有効)"
@@ -4488,7 +4488,7 @@ ja:
       no_points: なし
       points: ポイント
       submission_types: "ファイル タイプ"
-      submitting: 提出しています
+      submitting: 提出方法
       turnitin_enabled_short: "(Turnitin を有効にしました)"
       vericite_enabled_short: "(VeriCite を有効にしました)"
     submission_sidebar: 
@@ -4547,7 +4547,7 @@ ja:
       submission_types: 
         external_tool: 外部ツール
         no_submission: 提出なし
-        on_paper: 筆記
+        on_paper: 紙面
         online: オンライン
     submit_assignment: 
       additional_comments: 追加コメント
@@ -4586,7 +4586,7 @@ ja:
         google_drives_auth_required: "Google ドライブから課題を直接提出する前に、Canvas から Google ドライブ アカウントへのアクセスを許可する必要があります:"
         media_recording_ready: "提出の準備ができました! [課題の提出] ボタンをクリックして、完了します。"
         media_recordings_disabled: "メディアに記録されたデータは、この Canvas サイトでは無効になっています。そのため、この種類の課題を提出することはできません。この課題の設定変更については、インストラクタまでお問合せください。または、メディアに記録されたデータを有効にできるかどうか、システム管理者までお問合せください。"
-        submitting: 提出しています...
+        submitting: 提出方法...
         uploading: "この課題に対して提出するため、Google ドキュメントを 1 部取得しています。ファイルのサイズによっては、しばらく時間がかかる場合があります。"
       no_files: ファイルがありません
       no_submission: 提出物が選択されていません
@@ -4963,7 +4963,7 @@ ja:
   authentications_log_ca16ce81: 認証ログ
   authnrequest_sent_to_idp_74e030fc: AuthnRequest送付先：IdP
   authnresponse_from_idp_185037e9: AuthnResponse開始日IdP
-  author_215203d2: 著者
+  author_215203d2: 作成者
   author_id_570d3131: author_id
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author}（）の%{submission_submittor}用の提出物に新しいコメントが付きました%{assignment}"
   author_login_id_57aaec4f: author_login_id
@@ -4980,7 +4980,7 @@ ja:
   autodetect_field_separators_in_compatible_spreadsh_768067e1: 対応するスプレッドシートのエクスポートで、フィールド区切りを自動検出
   autodetect_field_separators_in_gradebook_exports_ed9a9d77: 成績表エクスポートでのフィールドセパレータの自動検出
   automatic_mobile_app_login_3724af59: モバイルアプリの自動ログイン
-  automatically_apply_deduction_to_late_submissions_2b68166e: 遅れた提出に控除を自動的に適用します
+  automatically_apply_deduction_to_late_submissions_2b68166e: 遅れた提出に減点を自動的に適用します
   automatically_apply_grade_for_missing_submissions_2b5c1a72: 未提出の物に採点を自動的に適用します
   automatically_assign_a_student_group_leader_29448649: "自動的に受講者グループ リーダーを割り当て"
   automatically_dff02416: 自動
@@ -5004,7 +5004,7 @@ ja:
   available_date_must_be_before_the_due_date_cbab390b: 「利用可能日」を「締切日」より前にすることはできません
   available_date_must_be_before_the_until_date_9ccc52b: 「利用可能日」は、「終了日」の日付の前でなければなりません
   available_folders_694d0436: 使用可能なフォルダ
-  available_from_587ce92f: から利用可能
+  available_from_587ce92f: 次から使用可能
   available_from_availabledate_b8cb93ef: "%{availableDate}から利用可能"
   available_from_availabledate_until_untildate_f27b70aa: "%{availableDate}から%{untilDate}まで利用可能"
   available_from_date_43b5e11d: 利用可能期間の開始日付
@@ -5360,7 +5360,7 @@ ja:
     submit_assignment: 課題の提出
   button_a1577211: ボタン
   buttons: 
-    add_item: アイテム
+    add_item: 追加
     apply: 適用
     authorize_google_docs: "Google ドキュメントへのアクセスの承認"
     authorize_google_drive: "Google ドライブへのアクセスの承認"
@@ -5388,7 +5388,7 @@ ja:
     sending: 送信しています...
     sent: 送信されました!
     show_all_artifacts: すべての成果物を表示
-    submit: 提出
+    submit: 送信
     unmasquerade: マスカレードを停止
     unpublish: 未公開
     unpublished: 未公開
@@ -5635,7 +5635,7 @@ ja:
       location_address: "住所:"
       location_name: "場所:"
       new_calendar_event_header: "カレンダー イベントの新規作成"
-      repeat: 重複
+      repeat: 繰り返し
       start_time: 開始時刻
     edit_event: 
       tabs: 
@@ -5803,7 +5803,7 @@ ja:
       other_calendars: その他のカレンダー
       page_title_header: カレンダー
       skip_to_calendar: カレンダーにスキップ
-      undated_items: 更新しました
+      undated_items: 日付なし
     show2: 
       calendar_feed: "カレンダー フィード"
       calendar_feed_instructions: "下のリンクをコピーして、iCal フィードを取得する任意のカレンダー アプリ (Google カレンダー、iCal、Outlook) に貼り付けます。"
@@ -5970,7 +5970,7 @@ ja:
   canvas_alert_grade_change_date_for_name_56f680ed: "Canvas アラート - 評定変更：%{date}ための%{name}"
   canvas_alert_graded_assignment_context_for_name_459fdf31: "Canvas アラート - 採点済み：%{assignment}、%{context} の %{name}"
   canvas_alert_in_asset_link_students_are_clicking_b_4cfcfbff: "Canvas アラート - %{asset_link} で、学生は %{bad_link} をクリックして、アクセスできないことに同意します。"
-  canvas_alert_in_asset_link_students_are_clicking_b_d3ff2650: "Canvas アラート - %{asset_link}では、受講者は%{bad_link}をコース内に存在しないページをクリックしています。."
+  canvas_alert_in_asset_link_students_are_clicking_b_d3ff2650: "Canvas アラート - %{asset_link}では、受講者は%{bad_link}をコース内に存在しないページをクリックしています。"
   canvas_alert_in_asset_link_students_are_clicking_b_da080154: "Canvas アラート - %{asset_link}では、受講者は%{bad_link}を別のコースのコンテンツにクリックしています。"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas アラート - コースに招待されています: %{role_type}として%{course}へ"
   canvas_alert_invited_course_as_role_type_ea825937: "Canvas アラート - コースに招待されています: %{role_type}として"
@@ -6719,10 +6719,10 @@ ja:
     resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
   community_releases_beta_test_schedule_e080d4d4: "#コミュニティ.リリース_ベータ_テスト_スケジュール"
   complete_4f4efbc: 完了
-  complete_all_items_e1779257: すべてのアイテムを完了する
+  complete_all_items_e1779257: 要件：すべてのアイテムの完了
   complete_fd828dea: 完了
   complete_icon_7455be93: アイコンを完了する
-  complete_one_item_90e5fb03: 1つのアイテムを完了する
+  complete_one_item_90e5fb03: 要件：１つのアイテムの完了
   complete_registration_by_clicking_the_finish_the_r_6c1c958b: あなたのEメールアドレスに送信された「登録プロセスの終了」リンクをクリックして、登録を完了してください。
   complete_registration_by_clicking_the_finish_the_r_fcd13ac8: あなたのEメールアドレスに送信された「登録プロセスの終了」リンクをクリックして、登録を完了してください。
   complete_title_7482ddcf: "完了%{title}"
@@ -7557,7 +7557,7 @@ ja:
   context_modulespublic: 
     buttons: 
       add: モジュールの追加
-      add_item: アイテム
+      add_item: 追加
       update: モジュールの更新
     confirm: 
       delete: このモジュールを削除してもよろしいですか?
@@ -7671,7 +7671,7 @@ ja:
       delete: 削除
       filter_messages_by_course: コースでメッセージをフィルタ
       filter_messages_by_type: タイプでメッセージをフィルタ
-      forward: 早送り
+      forward: 転送
       inbox: 受信箱
       mark_as_read: 既読にする
       mark_as_unread: 未読にする
@@ -7704,7 +7704,7 @@ ja:
     message_deleted: メッセージが削除されました!
     message_detail: 
       delete: 削除
-      forward: 早送り
+      forward: 転送
       message_actions: "メッセージ アクション"
       more_options: その他のオプション
       no_subject: 件名なし
@@ -7723,7 +7723,7 @@ ja:
         attachments: 添付ファイル
         course: コース
         select_course: コースを選択する
-        subject: 科目
+        subject: 件名
         to: 宛先
       links: 
         media_comment: 記録
@@ -7738,7 +7738,7 @@ ja:
         remove_media_comment: "メディア コメントを削除する"
     message_item: 
       delete: 削除
-      forward: 早送り
+      forward: 転送
       message_actions: "メッセージ アクション"
       more_options: その他のオプション
       reply: 返信
@@ -8181,7 +8181,7 @@ ja:
     public: 公開
     student_summary: 
       not_sorted: 受講者要約表
-    student_view_student_name: 受講者をテスト
+    student_view_student_name: テスト用受講生
     syllabus: シラバス
     wiki_permissions: 
       all: 全員
@@ -8623,7 +8623,7 @@ ja:
         drop_course: このコースを中断
         import: 既存のコンテンツをインポートする
         join_course: このコースに参加
-        new_announcement: 新規発表
+        new_announcement: 新規アナウンスメント
         view_course_calendar: コースカレンダーを表示
         view_course_notification_settings: コース通知を表示する
         view_course_stream: "コース ストリームを表示"
@@ -9295,7 +9295,7 @@ ja:
   cross_listing_course_sections_edit_2ad15f02: "相互リスト（コースセクション - 編集）"
   crumbs: 
     access_report: "アクセス レポート"
-    announcements: 発表
+    announcements: アナウンスメント
     assignments: 課題
     calendar_events: "カレンダー イベント"
     collaborations: コラボレーション
@@ -9678,7 +9678,7 @@ ja:
   decrease_indent_d9cf469d: インデントを減らす
   decrease_indent_de6343ab: インデントを戻す
   deduct_104e8866: 控除する
-  deduction_interval_e18bd51: 控除（差し引き）区間
+  deduction_interval_e18bd51: 間隔
   deep_orange_4c7eea99: ディープオレンジ
   deep_purple_bb3e2907: ディープパープル
   deeply_nested_replies_are_no_longer_supported_your_cfe125da: 深いネストのある返信はサポートされなくなりました。返信は、現在表示されているページに表示されます。
@@ -10162,7 +10162,7 @@ ja:
   discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: ディスカッショントピックは、日付の受講者タスクリストに表示されます
   discussion_topics: 
     assignment_details: 
-      available_from: 次から使用可能
+      available_from: 利用開始日時
       due: 期限
       due_date: "期限: %{date}"
       for: 対象
@@ -10170,7 +10170,7 @@ ja:
         one: "これは採点済みのディスカッションです:  *配点 %{count}*"
         other: "これは採点済みのディスカッションです:  *配点 %{count}*"
       show_due_dates: 期日の表示
-      until: 次の日時まで
+      until: 利用終了日時
     assignment_todo: 
       todo_date: "タスク日付：%{date}"
     cannot_unpublish_with_replies: 受講者の返信がある場合は未公開にできません
@@ -10220,7 +10220,7 @@ ja:
       allow_liking: いいねをつけることを許可
       allow_threaded_replies: スレッドでの返信を許可する
       attachment: 添付ファイル
-      available_from: 次から使用可能
+      available_from: 利用開始日時
       buttons: 
         not_published: 未公開
         published: 公開済み
@@ -10238,7 +10238,7 @@ ja:
       saving: 保存しています…
       sort_by_likes: いいね順
       topic_title: トピックのタイトル
-      until: 次の日時まで
+      until: 利用終了日時
       use_for_grading: 採点済み
       users_must_post_before_seeing_replies: ユーザは返信を表示する前に投稿する必要があります
     entry: 
@@ -10363,7 +10363,7 @@ ja:
       topic_time_locked: "このトピックは %{time} までロックされています"
       topic_unsubscribe: 購読済み
       unlock_topic: コメントを受け付ける
-      unread: 未読です
+      unread: 未読
     sub_entry: 
       authors_name: 作成者名
       post_message: メッセージの投稿
@@ -10648,7 +10648,7 @@ ja:
   dropdown_changed_state_to_expanded_517689c2: "ドロップダウンが%{expanded}の状態に変更されました。"
   dropdown_option_1_e6ff2fc: "ドロップダウン オプション1"
   dropdown_option_2_9766a346: "ドロップダウン オプション2"
-  dropped_38031953: ドロップされました
+  dropped_38031953: 除外
   dropped_for_grading_purposes_46256461: 採点のためドロップされています
   dropping_course_80aabb72: コースを中断
   dropping_subject_1d68ccf4: 科目を落とす（止める）
@@ -10713,7 +10713,7 @@ ja:
       \x20               コースのサイズにより、\n\
       \x20               SpeedGrader\n\
       \x20             の開始前に、受講者グループを選択しなければなりません。"
-  duplicate_31cec192: 重複
+  duplicate_31cec192: 複製
   duplicate_assignment_name_3ca7d753: "重複する課題%{name}"
   duplicate_discussion_title_43b39959: "ディスカッションを複製する%{title}"
   duplicate_discussion_title_6537ef4d: "ディスカッションを複製する%{title}"
@@ -11230,7 +11230,7 @@ ja:
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "ユーザのルート アカウント ドメインを置き換えるには、\"{{ACCOUNT_DOMAIN}}\" を入力します"
   enter_an_id_or_an_original_job_id_d81ad1c7: IDまたはoriginal_job_idを入力する
   enter_and_distribute_grades_c1216df: 評定を入力して配布する
-  enter_at_least_count_characters_1c7a0b36: "%{count} ３文字以上記入してください"
+  enter_at_least_count_characters_1c7a0b36: "%{count} 文字以上記入してください"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "ユーザの一意の Canvas ID を置き換えるには、\"{{CANVAS_USER_ID}}\" を入力します"
   enter_grades_as_e113e606: グレードを～として入力する
   enter_name_or_code_b4c103f6: 名前またはコードを入力する
@@ -11783,9 +11783,9 @@ ja:
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: 指定した日付以降、更新されていないデータを除外することができます。
   exclude_assignments_graded_with_a_0_score_5c853dc4: 採点が0点の課題は除外してください。
   excuse_this_assignment_for_the_selected_student_af04e132: 選ばれた受講者に、この課題を免除する
-  excused_3aab77: 免除
-  excused_5877183c: 免除！
-  excused_cf8792eb: 免除
+  excused_3aab77: 評価対象外(免除)
+  excused_5877183c: 評価対象外(免除)！
+  excused_cf8792eb: 評価対象外(免除)
   exit_d0c7b013: 終了する
   exit_theme_editor_9ddd41bb: テーマエディターを終了する
   expand_2f2fadbd: 展開
@@ -13120,7 +13120,7 @@ ja:
         other: "%{count} 件のコメント"
       comment_count_screenreader: コメントを読む
       comments: コメント
-      disabled_for_student_view: 「受講者をテスト」のスコアは評定統計に含まれません。
+      disabled_for_student_view: 「テスト用受講生」のスコアは評定統計に含まれません。
       expand: すべての学習達成アウトカムグループを展開します。
       expand_title: 展開
       for_course: "対象コース "
@@ -13362,8 +13362,8 @@ ja:
   graded_date_by_grader_e8e1ff75: "%{graded_date} 〜によって%{grader}"
   graded_discussion_a873bb3e: "課題用ディスカッション:"
   graded_on_submission_60ac3010: 提出時に採点済み
-  graded_quiz_7fabdf1f: 採点済みの小テスト
-  graded_survey_c0f0c395: 採点済みのサーベイ
+  graded_quiz_7fabdf1f: 採点対象の小テスト
+  graded_survey_c0f0c395: 採点対象のアンケート
   grader_comments_visible_to_graders_turned_off_d2af5e9d: 採点者に見える採点者コメントはオフになっています
   grader_comments_visible_to_graders_turned_on_dca303c7: 採点者に見える採点者コメントはオンになっています
   grader_count_cannot_be_0_9228afe4: グレーダーカウントは0にはできません
@@ -13421,7 +13421,8 @@ ja:
       \x20       "
   grades_will_be_hidden_by_default_any_grades_that_h_b6fac5e5: "\n\
       \x20           評定はデフォルトで非表示になります。すでに投稿した評定は表示されたままです。\n\
-      \x20           評定表の各列の課題ごとにいつ評定を投稿するか選択してください。 n          "
+      \x20           評定表の各列の課題ごとにいつ評定を投稿するか選択してください。\n\
+      \x20         "
   grades_will_be_made_visible_to_all_students_1cc4d67e: 成績はすべての受講生に表示されます
   grades_will_be_made_visible_to_students_with_grade_d83028d5: 成績は、提出物が採点された受講生が閲覧できるよう表示されます。
   gradezilla: 
@@ -14217,7 +14218,7 @@ ja:
     send_message: メッセージの送信
     sending: 送信しています...
     somethings_broken_but_i_can_work_around_it_for_now: 問題がありましたが、現在は回避できています
-    subject: 科目
+    subject: 件名
     submit_this_support_request: チケットの提出
     training_services_portal: 研修サービスポータル
     training_services_portal_sub: "Canvas のトレーニングビデオとコースにアクセスする"
@@ -14797,7 +14798,7 @@ ja:
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: この機能を有効にした場合、セールスフォースアカウントに、表の左の欄の中の名前と共にこれらのカスタムフィールドがきちんと追加されていることを確認してください。
   if_you_have_a_canvas_account_with_a_specific_insti_daa9696e: "特定の教育機関の%{canvas}アカウントをお持ちの方は、お手伝いできます。"
   if_you_have_a_moment_click_here_to_tell_us_what_ha_d8b578d5: ちょっとお時間があれば、*ここをクリックして何が起こったのか教えてください*。
-  if_you_keep_having_problems_click_the_link_link_be_a4d695eb: "問題が解決しない場合、下の\"%{link}\"リンクをクリックしてガイドを検索するか、状況を報告してください。　　　"
+  if_you_keep_having_problems_click_the_link_link_be_a4d695eb: "問題が解決しない場合、下の\"%{link}\"リンクをクリックしてガイドを検索するか、状況を報告してください。"
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "退出すると、現在準備中の zip ファイルのダウンロードはキャンセルされます。"
   if_you_made_changes_to_the_student_submission_file_e006d49b: |-
       以前にダウンロードした、その受講者からの提出ファイルに変更を加えた場合は
@@ -14926,7 +14927,7 @@ ja:
   improved_visual_reminders_to_encourage_instructors_f203c7f: コースを公開するように講師を促すために改善された視覚的リマインダ
   improvements_made_to_enhance_the_user_experience_w_5d07cd73: 学習達成度の評定表内のユーザーエクスペリエンスを強化するためになされた改善。
   in_a_few_seconds_538ddff3: 数秒で
-  in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "%{asset_link}では、受講者は%{bad_link}をコース内に存在しないページをクリックしています。."
+  in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "%{asset_link}では、受講者は%{bad_link}をコース内に存在しないページをクリックしています。"
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "%{asset_link}では、受講者は%{bad_link}を別のコースのコンテンツにクリックしています。"
   in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "%{asset_link}で、学生は %{bad_link} をクリックして、アクセスできないことに同意します。"
   in_cases_where_it_is_available_load_the_rce_and_th_2b94310d: それが利用可能である場合には、CanvasのリッチコンテンツサービスからRCEとwikiサイドバーをロードします
@@ -14949,7 +14950,7 @@ ja:
   inactive_enrollments_3b84be3d: 不活発な登録
   inactive_enrollments_bd1831ea: 非アクティブな登録
   inappropriate_1930c574: 不適切
-  inbox_bb245a60: 受信トレイ
+  inbox_bb245a60: メッセージ
   include_a_download_link_next_to_each_file_link_in__481761de: RCEの各ファイルリンクの横にダウンロードリンクを含める
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "*Jing* などを使用するスクリーンキャスト/スクリーンショットへのリンクを含めます。"
   include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: "プロファイルページに、簡単なモバイルログイン用の QR コードを表示するリンクを含めます。"
@@ -15554,7 +15555,7 @@ ja:
   last_used_f9457313: 最後に使用された：
   last_user_access_title: "最終ユーザ アクセス"
   last_viewed_cfbbbc3a: 最終閲覧日
-  late_2be42b88: 遅れる
+  late_2be42b88: 遅延
   late_8bd684b6: 遅延
   late_anonymous_assignment_a_student_has_submitted__60158b6a: "遅れた匿名の課題：受講者が、%{assignment_title}を遅れて提出しました"
   late_anonymous_assignment_assignment_name_b541c517: "遅れた匿名の課題：%{assignment_name}"
@@ -15581,10 +15582,10 @@ ja:
   late_policy_minus_count_points_1a945541: 
     one: "遅延ペナルティ： -  マイナス%{count}ポイント"
     other: "遅延ペナルティ： -  マイナス%{count}ポイント"
-  late_submission_deduction_5d7fa3cb: 最終提出差し引き（控除）
+  late_submission_deduction_5d7fa3cb: 減点割合
   late_submission_deduction_interval_b9fca334: 遅延提出控除の間隔
   late_submission_deduction_must_be_between_0_and_10_9cde872d: 遅延提出控除は、0と100の間でなければなりません
-  late_submission_deduction_must_be_numeric_5b3f468e: 遅延提出控除は数値でなければなりません
+  late_submission_deduction_must_be_numeric_5b3f468e: 遅延提出減点は数値でなければなりません
   late_submission_deduction_percent_52516a62: 遅延提出控除パーセント時間
   latest_assessment_a85280ef: 最新の課題
   latest_f604a75: 前回
@@ -15809,7 +15810,7 @@ ja:
   limit_search_to_activity_before_e05aad05: 前のアクティビティーに絞って検索
   limit_section_privileges_e6425dfd: limit_section_privileges
   limit_students_to_attend_input_value_slot_s_9a5bf576: "%{input_value}スロットに出席する受講者を制限する。"
-  limit_this_slot_to_input_type_number_name_max_part_1580add0: "このスロットを%{input_type_number_name_max_parti}グループに制限します。."
+  limit_this_slot_to_input_type_number_name_max_part_1580add0: "このスロットを%{input_type_number_name_max_parti}グループに制限します。"
   limit_this_slot_to_input_type_number_name_max_part_8344547a: "このストロットを%{input_type_number_name_max_parti}ユーザーに制限します。"
   limited_322546c5: 制限あり
   line_items_828f62cc: ライン項目
@@ -16178,9 +16179,9 @@ ja:
   lower_bound_to_upper_bound_48d093c2: "%{lower_bound} から %{upper_bound}まで"
   lower_limit_of_range_6ddd4983: 範囲の下限
   lowerbound_to_upperbound_352a3c0b: "%{lowerBound}+ から%{upperBound} へ"
-  lowest_possible_grade_ae5510be: 可能な限り低いグレード
+  lowest_possible_grade_ae5510be: 下限
   lowest_possible_grade_must_be_between_0_and_100_51256ea5: 可能な限り低いグレードは、0と100の間でなければなりません
-  lowest_possible_grade_must_be_numeric_3d97659d: 可能な限り低いグレードは数値でなければなりません
+  lowest_possible_grade_must_be_numeric_3d97659d: 下限は数値でなければなりません
   lowest_possible_grade_percent_20474418: 可能な限り低いグレードパーセント
   lti: 
     lti_message: 
@@ -17768,7 +17769,7 @@ ja:
         path_type: パスのタイプ
         reply_to: 返信先
         sent_at: 送信日時
-        subject: 科目
+        subject: 件名
         to: 宛先
     messages: 
       failure: 電子メールを送信する際にエラーが発生しました。ページを再読み込みしてから、もう一度試してください。
@@ -18506,7 +18507,7 @@ ja:
   minimum_score_e6d1c134: 最低スコア
   minutes_4aee5a41: 分
   minutes_per_slot_5b7169e5: スロットあたりの分
-  missing_1a256b3b: 欠落
+  missing_1a256b3b: 未提出(提出期限切れ)
   missing_count_or_until_62ad480c: カウント数または期限の欠落
   missing_d59852a7: 欠如
   missing_eaddacbd: 欠如
@@ -18858,7 +18859,7 @@ ja:
   move_to_25d7ef11: 移動先
   move_to_9b91c6e0: 移動先...
   move_to_bottom_d0f71bf0: 下に移動
-  move_to_dde1a5e1: ～に移動する
+  move_to_dde1a5e1: 移動
   move_to_end_c6bfbcf5: 最後まで移動
   move_to_end_fef2fa15: 末尾に移動
   move_to_front_7eae2e90: 先頭に移動
@@ -19381,8 +19382,8 @@ ja:
   not_enough_days_for_this_hypothetical_date_fc72710a: この仮定の日付に十分な日数がない
   not_factored_into_grading_455dcf6a: 採点に考慮されません
   not_for_this_conversation_f5271cf5: この会話に対するものではありません
-  not_graded_e027c866: 未採点
-  not_graded_e78bcd50: 未採点
+  not_graded_e027c866: 採点なし
+  not_graded_e78bcd50: 採点なし
   not_graded_yet_82f63c67: まだ採点されていません
   not_installed_37a21a76: 未インストール
   not_mastered_5c2f9968: 熟達していない
@@ -19702,7 +19703,7 @@ ja:
   notification_preferences_cf47083d: 通知設定
   notification_settings_652dc60b: 通知設定
   notification_settings_course_selector_ff07468b: 通知設定：コースセレクター
-  notifications_cbfa7704: お知らせ
+  notifications_cbfa7704: 通知
   notifications_off_80da021c: 通知オフ
   notifications_search_results_80a0b06f: 通知検索結果
   notifications_unsupported_65f6bf65: サポートされていない通知
@@ -19901,7 +19902,7 @@ ja:
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: 使用権が有効になっているコースでは、ディスカッショントピックファイルの添付ファイルに使用権の選択を適用します
   on_date_the_lti_1_3_oidc_auth_endpoint_will_be_cha_9df99806: "%{date}付けで、LTI 1.3 の OIDC Auth エンドポイントが https://canvas.instructure.com/api/lti/authorize_redirect から https://sso.canvaslms.com/api/lti/authorize_redirect に変更される予定です。この変更の理由と範囲については、*本Canvas Communityの記事で詳しく説明しています*。また、追加情報については、APIドキュメントを参照してください。この変更は小さいものですが、LTI 1.3 を使用しているすべてのツールで、ツール側の設定を変更する必要があります。"
   on_for_key_keyname_bbac4e1b: "キーがオン：%{keyName}"
-  on_paper_46d0ba36: 筆記
+  on_paper_46d0ba36: 紙面
   on_time_17ca5ad9: 時間通り
   on_time_percent_eebffe38: "時間通り:%{percent}"
   on_whitelist_will_only_be_the_domains_which_have_b_c4c3a861: "オン - ホワイトリストは、このアカウントに明示的に追加されたドメインのみになります。"
@@ -21754,7 +21755,7 @@ ja:
   publish_all_3860b220: すべて公開
   publish_all_modules_and_items_8e954cb3: すべてのモジュールとアイテムを公開する
   publish_announcement_fec6d7e2: アナウンスを公開
-  publish_at_3fd340d1: 公開場所
+  publish_at_3fd340d1: 公開日時
   publish_btn_module: 
     buttons: 
       publish: 公開
@@ -22342,7 +22343,7 @@ ja:
       question_name_counter: "問題 %{question_number}"
       types: 
         quiz: 小テスト
-        survey: サーベイ
+        survey: アンケート
     quiz_attempts_length_error: "クイズの試行は 3 桁に制限されています。受講生に無制限の試行を許可する場合は、左側の [複数回の試行を許可] ボックスをオンにしないでください"
     quiz_attempts_nan_error: クイズの試行は数値でのみ指定できます
     quiz_group: 
@@ -22394,7 +22395,7 @@ ja:
     quizzes: 
       access_code: 
         buttons: 
-          submit: 提出
+          submit: 送信
         labels: 
           access_code: "アクセス コード"
         quiz_restricted: "この小テストはアクセス コードで制限されています。小テストに回答するためには、アクセス コードを打ち込んでくれるよう、またはアクセス コードを教えてくれるよう、教員または試験監督官に依頼する必要があります。"
@@ -22508,7 +22509,7 @@ ja:
         matching_left: 左側と照合
         matching_right: 右側と照合
         numerical_answer: 数値による解答
-        possible_answer: 考えられる解答
+        possible_answer: 選択肢
         titles: 
           click_to_enter_answer_comments: クリックして、受講生がこの解答を選択した場合のコメントを入力
           click_to_set_as_correct: クリックして、この解答を正解として設定
@@ -22521,7 +22522,7 @@ ja:
           generate: 生成
           recompute: 再計算
         correct_answer_comments: 正解コメント
-        distractor_instructions: 各デストラクタを独立した行に入力
+        distractor_instructions: 各デストラクタを一行ずつ入力
         equation_example: "つまり、\"5 プラス [x] は何ですか?\""
         explanation: 
           generate_possible_solutions: 最後に、小テストに必要な数だけ変数と解の組を作ります。
@@ -22562,7 +22563,7 @@ ja:
             type: 問題の種類
         labels: 
           answers: 解答
-          distractors: "付加的な一致の可能性 (デストラクタ)"
+          distractors: "選択できる不正解の解答 (デストラクタ)"
           missing_word_after: 解答の後ろにくるテキスト
           points: 点
           question: 問題
@@ -22582,7 +22583,7 @@ ja:
           matching: 整合
           missing_word: 適語補充
           multiple_answers: 複数解答
-          multiple_choice: 複数選択
+          multiple_choice: 多肢選択
           multiple_dropdowns: 複数ドロップダウン
           numerical: 数値による解答
           short_answer: 穴埋め
@@ -22882,7 +22883,7 @@ ja:
       quiz_show_teacher: 
         anonymous_submissions: 匿名での提出
         attempts: 試行回数
-        available_from: 次から使用可能
+        available_from: 提出開始日時
         cant_go_back: 解答の後で問題をロックする
         code: "アクセス コード"
         due: 期限
@@ -22906,8 +22907,8 @@ ja:
           one: "%{count} 分"
           other: "%{count} 分"
         unlimited: 無制限
-        until: 次の日時まで
-        view_responses: 応答を表示
+        until: 提出終了日時
+        view_responses: 自回答を表示
       quiz_submission: 
         attempt_duration: "今回の試行は %{duration} かかりました。"
         buttons: 
@@ -22981,7 +22982,7 @@ ja:
           unlock_survey: 今すぐ受講者にこのサーベイを答えさせる
         course_concluded_notice: コースが完了しているため、この小テストは利用できません。
         labels: 
-          available_until: 次の日時まで
+          available_until: 提出終了日時
           no_time_limit: 時間制限なし
           warning_icon: 警告
         links: 
@@ -23278,7 +23279,7 @@ ja:
       quiz_score_too_short: "スコアは 0 より大きい数字で指定してください。"
       retrieving_filters_failed: フィルタの取得に失敗しました
     ? "false"
-    : 不正解
+    : 偽
     final_answer: 最終的な答え
     label: 
       answer: 
@@ -23295,7 +23296,7 @@ ja:
       correct_answer: 正解
       message_text: "メッセージ テキスト"
       other_incorrect_matches: 不正解となる他の整合選択肢
-      possible_answer: 可能な解答
+      possible_answer: 選択肢
     loading_more_questions: その他の問題を読み込んでいます...
     loading_question: 問題を読み込んでいます...
     loading_question_banks: 問題バンクを読み込んでいます...
@@ -23326,7 +23327,7 @@ ja:
       set_as_correct: この解答は正解として設定されます
     top_level: "-- トップ レベル --"
     ? "true"
-    : 正解
+    : 真
   quizzes_tutorial_tray_6f87cdd3: 小テストのチュートリアルトレイ
   quizzes_view_submission_log_ec105e3e: "小テスト - 提出ログを見る"
   quotas_account_settings_22c12b8d: 割り当て分担（アカウント設定）
@@ -24171,7 +24172,7 @@ ja:
           小テストに関連付けることができます。ルーブリックは採点のみに使用するか、
           または特にポイントなしの評価ベースおよび
           アウトカムベースの採点専用の非採点ルーブリックを作成します。ルーブリックの基準項目として
-          アウトカムを追加することができます。.
+          アウトカムを追加することができます。
   rubrics_export_report_76d30288: "ルーブリック エクスポート レポート"
   rubrics_in_course_navigation_539ea536: コースナビゲーションの規定
   rubrics_speedgrader_a6ebec57: ルービック、SpeedGrader
@@ -25262,7 +25263,7 @@ ja:
       for_title: "対象: %{title}"
       labels: 
         body: メッセージ
-        subject: 科目
+        subject: 件名
       message_students_who: 次の状態の受講生にメッセージを送る...
       message_type: "メッセージ タイプ"
       out_of_points: "配点: %{points_possible}"
@@ -25351,13 +25352,13 @@ ja:
       message_column: メッセージ
       recent_activity: 最近のアクティビティ
       recent_activity_in_course: "%{course_or_group} での最近のアクティビティ"
-      unread_column: 未読です
+      unread_column: 未読
       unread_count_badge: 
         one: "%{count} 件の*未読アイテム*"
         other: "%{count} 件の*未読アイテム*"
     recent_activity_item: 
       close: 閉じる
-      unread: 未読です
+      unread: 未読
     registration_incomplete: 
       confirm_email_instructions: "このページを表示するには、先に *電子メール アドレスの確認* (%{email}) をする必要があります。電子メールに記載されているリンクをクリックして、アカウントの設定を完了してください。電子メールが見つからない場合は、**クリックして再送信** し、スパム用の受信箱も確認してみてください"
       headings: 
@@ -26108,7 +26109,7 @@ ja:
       see_all_quiz_attempts: 小テストのすべての試行を表示
       submission_to_view: "表示する提出物:"
       submitted: "*提出済み：* %{submittedAt}%{proxy_submitter_label_text}"
-    submit: 提出
+    submit: 送信
     titles: 
       click_to_record: 音声認識
     turnitin: 
@@ -26130,7 +26131,7 @@ ja:
       aria_stop: 録音を終了するには、「停止」をクリックします。
     graded: 採点済み
     graded_then_resubmitted: "採点済、再提出済 (%{when})"
-    not_graded: 未採点
+    not_graded: 採点なし
     not_submitted: 未提出
     turnitin: 
       resubmitting: 再提出しています...
@@ -26175,7 +26176,7 @@ ja:
     no_student: 受講者が選択されていません
     none: なし
     notes: メモ
-    on_paper: 筆記
+    on_paper: 紙面
     online_quiz: "オンライン 小テスト"
     online_text_entry: "オンライン テキスト入力"
     online_upload: "オンライン アップロード"
@@ -28229,8 +28230,8 @@ ja:
   title_was_successfully_updated_14b78676: "\"%{title}\" は正常に更新されました。"
   titles: 
     aligned_items: 整列されたアイテム
-    announcement: 発表
-    announcements: 発表
+    announcement: アナウンスメント
+    announcements: アナウンスメント
     assignments: 課題
     come_back_later: この問題に、後で戻ってくるためのマークを付けました
     discussion: ディスカッション
@@ -29138,7 +29139,7 @@ ja:
   ungraded_out_of_pointspossible_2d6d81da: "%{pointsPossible}から未採点"
   ungraded_pointspossible_e2f86bd9: "未採点/%{pointsPossible}"
   ungraded_submissions_44efb0ec: 未採点の提出物
-  ungraded_survey_ad7de790: 未採点のサーベイ
+  ungraded_survey_ad7de790: 採点なしのアンケート
   unique_user_id_dfca1a7f: ユーザーID
   united_arab_emirates_971_649b3750: "アラブ首長国連邦 (+971)"
   united_arab_emirates_a71e57c6: アラブ首長国連邦
@@ -29232,7 +29233,7 @@ ja:
   unpublishing_1fa99dc6: 公開取り消し中...
   unpublishing_module_and_items_ca2edd97: モジュールとアイテムの公開停止
   unread_c14cb06f: 未読
-  unread_e9c1b19c: 未読です
+  unread_e9c1b19c: 未読
   unread_ee6db4aa: 未読
   unread_post_47a1a06b: 未読の投稿
   unreadcount_unread_9c86f4d1: "未読 %{unreadCount} 件"
@@ -29258,7 +29259,7 @@ ja:
   unsyncable_message_95faa75d: "同期できない：%{message}"
   unsynced_changes_4ddaec76: 同期されていない変更内容
   unsynched_changes_867a1790: 同期されていない変更
-  until_4a1f8cda: 次の日時から
+  until_4a1f8cda: 次の日時まで
   until_6437a827: まで
   until_8bdea3de: まで
   until_date_949017c4: "%{date} まで"
@@ -29653,7 +29654,7 @@ ja:
     profile_bio_too_long: 履歴が長すぎます
     profile_title_too_long: タイトルが長すぎます
     tabs: 
-      notifications: お知らせ
+      notifications: 通知
       profile: プロフィール
       settings: 設定
   user_profile_d56261fc: "ユーザ プロフィール"
