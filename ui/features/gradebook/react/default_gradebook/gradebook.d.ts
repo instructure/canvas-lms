@@ -128,6 +128,7 @@ export type GradebookOptions = {
   grading_standard: boolean
   group_weighting_scheme: null | string
   has_modules: boolean
+  individual_gradebook_enhancements: boolean
   late_policy: LatePolicy | null
   login_handle_name: null | string
   message_attachment_upload_folder_id: string

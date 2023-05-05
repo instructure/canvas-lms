@@ -33,10 +33,14 @@
   <% else %>
     <% js_bundle :learning_mastery %>
     <div class="outcome-gradebook-container">
-      <div class="outcome-menus" style="text-align: <%= direction('right') %>;">
-        <span data-component="SectionFilter"></span>
-        <span data-component="GradebookMenu" data-variant="DefaultGradebookLearningMastery"></span>
-      </div>
+      <nav style="display: flex; justify-content: space-between; padding: 0.4em 0;">
+        <span
+          style="display: flex; flex-direction: column; justify-content: center;"
+          data-component="GradebookMenu"></span>
+        <div class="outcome-menus">
+          <span data-component="SectionFilter" data-variant="DefaultGradebookLearningMastery"></span>
+        </div>
+      </nav>
 
       <div class="outcome-gradebook"></div>
       <div id="outcome-gradebook-paginator" style="height: 2.375em"></div>

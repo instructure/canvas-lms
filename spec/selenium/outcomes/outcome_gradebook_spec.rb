@@ -602,8 +602,7 @@ describe "outcome gradebook" do
 
       it "allows showing only a certain section" do
         Gradebook.visit(@course)
-        f(".assignment-gradebook-container .gradebook-menus button").click
-        f('span[data-menu-item-id="learning-mastery"]').click
+        select_learning_mastery
 
         toggle_no_results_students
         expect(ff(".outcome-student-cell-content")).to have_size 3
@@ -617,7 +616,7 @@ describe "outcome gradebook" do
         expect(ff(".outcome-student-cell-content")).to have_size 1
 
         # verify that it remembers the section to show across page loads
-        Gradebook.visit(@course)
+        refresh_page
         expect(section_filter).to have_value(@other_section.name)
         expect(ff(".outcome-student-cell-content")).to have_size 1
 

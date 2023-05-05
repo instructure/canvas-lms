@@ -16,6 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import GradebookMenu from '@canvas/gradebook-menu'
 import App from './ember/index'
+
+ReactDOM.render(
+  <GradebookMenu
+    courseUrl={ENV.GRADEBOOK_OPTIONS.context_url}
+    learningMasteryEnabled={Boolean(ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled)}
+    enhancedIndividualGradebookEnabled={Boolean(
+      ENV.GRADEBOOK_OPTIONS.individual_gradebook_enhancements
+    )}
+    variant="IndividualGradebook"
+  />,
+  document.querySelector('[data-component="GradebookSelector"]')
+)
 
 window.App = App.create()

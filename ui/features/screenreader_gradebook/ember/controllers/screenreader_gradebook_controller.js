@@ -38,7 +38,6 @@ import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import GradingPeriodsApi from '@canvas/grading/jquery/gradingPeriodsApi'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
-import GradebookSelector from '../../react/GradebookSelector'
 import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
 import '@canvas/datetime'
@@ -467,19 +466,6 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   setupAssignmentWeightingScheme: function () {
     this.set('weightingScheme', ENV.GRADEBOOK_OPTIONS.group_weighting_scheme)
-  }.on('init'),
-
-  renderGradebookMenu: function () {
-    const mountPoint = document.querySelector('[data-component="GradebookSelector"]')
-    if (!mountPoint) {
-      return
-    }
-    const props = {
-      courseUrl: ENV.GRADEBOOK_OPTIONS.context_url,
-      learningMasteryEnabled: ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled,
-    }
-    const component = React.createElement(GradebookSelector, props)
-    ReactDOM.render(component, mountPoint)
   }.on('init'),
 
   willDestroy() {

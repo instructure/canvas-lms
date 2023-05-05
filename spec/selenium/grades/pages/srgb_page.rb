@@ -34,9 +34,9 @@ class SRGB
     end
 
     def switch_to_default_gradebook
-      f('[data-component="GradebookSelector"] input').click
+      f('[data-component="GradebookSelector"]').click
       wait_for_animations
-      fj("[role=\"option\"]:contains(\"Gradebook…\")").click
+      fj("[role=\"menuitemradio\"]:contains(\"Gradebook\")").click
     end
 
     def assignment_sorting_dropdown

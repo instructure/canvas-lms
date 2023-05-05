@@ -24,7 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import ProficiencyFilter from './ProficiencyFilter'
 import Gradebook from './Gradebook'
 import useRollups from './hooks/useRollups'
-import GradebookMenu from '@canvas/gradebook-menu/react/gradebook_menu'
+import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
 import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('LearningMasteryGradebook')

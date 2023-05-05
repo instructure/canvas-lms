@@ -270,13 +270,26 @@ class GradebooksController < ApplicationController
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       log_asset_access(["grades", @context], "grades")
+
+      # nomenclature of gradebook "versions":
+      #   "gradebook" (default grid view)
+      #     within the "gradebook" version there are two "views":
+      #       "default"
+      #       "learning_mastery"
+      #   "individual" (also "srgb")
+      #   "individual_enhanced"
+
       if requested_gradebook_view.present?
-        update_preferred_gradebook_view!(requested_gradebook_view) if requested_gradebook_view != preferred_gradebook_view
+        if requested_gradebook_view != preferred_gradebook_view
+          update_preferred_gradebook_view!(requested_gradebook_view)
+        end
         redirect_to polymorphic_url([@context, :gradebook])
         return
       end
 
-      if ["srgb", "individual"].include?(gradebook_version)
+      if gradebook_version == "individual_enhanced"
+        show_enhanced_individual_gradebook
+      elsif ["srgb", "individual"].include?(gradebook_version)
         show_individual_gradebook
       elsif preferred_gradebook_view == "learning_mastery" && outcome_gradebook_enabled?
         show_learning_mastery
@@ -310,6 +323,13 @@ class GradebooksController < ApplicationController
     render "gradebooks/individual"
   end
   private :show_individual_gradebook
+
+  def show_enhanced_individual_gradebook
+    set_current_grading_period if grading_periods?
+    set_enhanced_individual_gradebook_env
+    render "gradebooks/individual_enhanced"
+  end
+  private :show_enhanced_individual_gradebook
 
   def show_learning_mastery
     InstStatsd::Statsd.increment("outcomes_page_views", tags: { type: "teacher_lmgb" })
@@ -476,6 +496,7 @@ class GradebooksController < ApplicationController
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
       group_weighting_scheme: @context.group_weighting_scheme,
       has_modules: @context.has_modules?,
+      individual_gradebook_enhancements: root_account.feature_enabled?(:individual_gradebook_enhancements),
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: root_account.settings[:login_handle_name],
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
@@ -514,6 +535,20 @@ class GradebooksController < ApplicationController
     js_env({
              EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
              EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
+             GRADEBOOK_OPTIONS: gradebook_options
+           })
+  end
+
+  def set_enhanced_individual_gradebook_env
+    gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
+    gradebook_options = {
+      context_id: @context.id.to_s,
+      context_url: named_context_url(@context, :context_url),
+      gradebook_is_editable: gradebook_is_editable,
+      individual_gradebook_enhancements: true,
+      outcome_gradebook_enabled: outcome_gradebook_enabled?
+    }
+    js_env({
              GRADEBOOK_OPTIONS: gradebook_options
            })
   end
@@ -592,6 +627,7 @@ class GradebooksController < ApplicationController
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: root_account.settings[:login_handle_name],
       has_modules: @context.has_modules?,
+      individual_gradebook_enhancements: root_account.feature_enabled?(:individual_gradebook_enhancements),
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       outcome_links_url: api_v1_course_outcome_group_links_url(@context, outcome_style: :full),
@@ -650,7 +686,8 @@ class GradebooksController < ApplicationController
                sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
                settings: gradebook_settings(@context.global_id),
                settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
-               IMPROVED_LMGB: root_account.feature_enabled?(:improved_lmgb)
+               IMPROVED_LMGB: root_account.feature_enabled?(:improved_lmgb),
+               individual_gradebook_enhancements: root_account.feature_enabled?(:individual_gradebook_enhancements),
              },
              OUTCOME_AVERAGE_CALCULATION: root_account.feature_enabled?(:outcome_average_calculation),
              outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
@@ -679,7 +716,8 @@ class GradebooksController < ApplicationController
         COURSE_URL: named_context_url(@context, :context_url),
         COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?,
         OUTCOME_GRADEBOOK_ENABLED: outcome_gradebook_enabled?,
-        OVERRIDE_GRADES_ENABLED: @context.try(:allow_final_grade_override?)
+        OVERRIDE_GRADES_ENABLED: @context.try(:allow_final_grade_override?),
+        individual_gradebook_enhancements: @context.root_account.feature_enabled?(:individual_gradebook_enhancements)
       )
 
       render html: "", layout: true
@@ -1258,6 +1296,7 @@ class GradebooksController < ApplicationController
   end
 
   def change_gradebook_version
+    update_preferred_gradebook_view!("gradebook")
     @current_user.migrate_preferences_if_needed
     @current_user.set_preference(:gradebook_version, params[:version])
     redirect_to polymorphic_url([@context, :gradebook])
@@ -1314,6 +1353,9 @@ class GradebooksController < ApplicationController
   end
 
   def update_preferred_gradebook_view!(gradebook_view)
+    if ["learning_mastery", "default"].include?(gradebook_view)
+      @current_user.set_preference(:gradebook_version, "gradebook")
+    end
     context_settings = gradebook_settings(context.global_id)
     context_settings.deep_merge!({ "gradebook_view" => gradebook_view })
     @current_user.set_preference(:gradebook_settings, @context.global_id, context_settings)
