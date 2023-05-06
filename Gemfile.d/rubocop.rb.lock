@@ -1,5 +1,5 @@
 PATH
-  remote: /Users/cody/src/canvas-lms/gems/rubocop-canvas
+  remote: ../gems/rubocop-canvas
   specs:
     rubocop-canvas (1.0.0)
       activesupport (>= 6.0)
@@ -128,6 +128,7 @@ PLATFORMS
   arm64-darwin-21
 
 DEPENDENCIES
+  activerecord (~> 7.0.4)
   gergich (= 2.1.1)
   mime-types-data (~> 3.2023)
   rubocop-canvas!

@@ -26,7 +26,12 @@ group :test do
   gem "gergich", "2.1.1", require: false
     gem "mime-types-data", "~> 3.2023", require: false
 
-  gem "rubocop-canvas", require: false, path: File.expand_path("../gems/rubocop-canvas", __dir__)
+  rubocop_canvas_path = "gems/rubocop-canvas"
+  if File.dirname(Bundler.default_gemfile) == __dir__
+    rubocop_canvas_path = "../#{rubocop_canvas_path}"
+  end
+
+  gem "rubocop-canvas", require: false, path: rubocop_canvas_path
   gem "rubocop-inst", "~> 1", require: false
   gem "rubocop-graphql", "1.1.1", require: false
   gem "rubocop-rails", "2.19.1", require: false
