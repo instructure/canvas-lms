@@ -31,7 +31,7 @@ module FilesHelper
     end
   end
 
-  def check_media_permissions(access_type: :read)
+  def check_media_permissions(access_type: :download)
     if @attachment.present?
       access_allowed(@attachment, @current_user, access_type)
     else
