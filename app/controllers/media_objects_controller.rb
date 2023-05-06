@@ -72,9 +72,12 @@
 #
 class MediaObjectsController < ApplicationController
   include Api::V1::MediaObject
+  include FilesHelper
 
-  before_action :check_attachment, except: %i[index update_media_object create_media_object]
-  before_action :load_media_object, only: %i[show iframe_media_player]
+  before_action :load_media_object, except: %i[create_media_object index]
+  before_action :load_media_object_from_service, only: %i[show iframe_media_player]
+  before_action :check_media_permissions, except: %i[create_media_object index media_object_thumbnail update_media_object]
+  before_action(only: %i[update_media_object]) { check_media_permissions(access_type: :update) }
   before_action :require_user, only: %i[index update_media_object]
   protect_from_forgery only: %i[create_media_object media_object_redirect media_object_inline media_object_thumbnail], with: :exception
 
@@ -169,32 +172,13 @@ class MediaObjectsController < ApplicationController
   #
   def update_media_object
     # media objects don't have any permissions associated with them,
-    # so we just check that this is the user's media
-
+    # so we just check that this is the user's media unless the media
+    # is linked by attachment
     if params[:media_object_id]
-      @media_object = MediaObject.by_media_id(params[:media_object_id]).first
-
-      return render_unauthorized_action unless @media_object
       return render_unauthorized_action unless @current_user&.id
-
       return render_unauthorized_action unless @media_object.user_id == @current_user.id
-
-    elsif params[:attachment_id]
-      attachment = Attachment.find(params[:attachment_id])
-
-      return render_unauthorized_action unless attachment
-      return render_unauthorized_action unless attachment.media_entry_id
-
-      if params[:verifier]
-        verifier_checker = Attachments::Verification.new(attachment)
-        return render_unauthorized_action unless verifier_checker.valid_verifier_for_permission?(params[:verifier], :update, session)
-      else
-        return render_unauthorized_action unless attachment.grants_right?(@current_user, session, :update)
-      end
-
-      @media_id = attachment.media_entry_id
-      @media_object = MediaObject.by_media_id(@media_id).take
     end
+
     if params[:user_entered_title].blank?
       return(
         render json: { message: "The user_entered_title parameter must have a value" },
@@ -239,15 +223,13 @@ class MediaObjectsController < ApplicationController
     @show_embedded_chat = false
     @show_left_side = false
     @show_right_side = false
-    @media_object = MediaObject.by_media_id(params[:id]).first
     js_env(MEDIA_OBJECT_ID: params[:id],
            MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : "video")
     render
   end
 
   def media_object_redirect
-    mo = MediaObject.by_media_id(params[:id]).first
-    mo&.viewed!
+    @media_object&.viewed!
     config = CanvasKaltura::ClientV3.config
     if config
       redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
@@ -286,7 +268,9 @@ class MediaObjectsController < ApplicationController
 
   private
 
-  def load_media_object
+  def load_media_object_from_service
+    return unless params[:media_object_id].present?
+
     unless @media_object
       # Unfortunately, we don't have media_object entities created for everything,
       # so we use this opportunity to create the object if it does not exist.
@@ -298,32 +282,5 @@ class MediaObjectsController < ApplicationController
     end
 
     @media_object.viewed!
-  end
-
-  def check_attachment
-    if params[:attachment_id].present?
-      attachment = Attachment.find(params[:attachment_id])
-
-      return render_unauthorized_action unless attachment
-      return render_unauthorized_action unless attachment.media_entry_id
-
-      if params[:verifier]
-        verifier_checker = Attachments::Verification.new(attachment)
-        return render_unauthorized_action unless verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)
-      else
-        return render_unauthorized_action unless attachment.grants_right?(@current_user, session, :read)
-      end
-
-      @media_id = attachment.media_entry_id
-      @media_object = MediaObject.by_media_id(@media_id).take
-      @media_object.current_attachment = attachment
-
-    elsif params[:media_object_id].present?
-      @media_id = params[:media_object_id]
-      @media_object = MediaObject.by_media_id(params[:media_object_id]).take
-
-    else
-      nil
-    end
   end
 end
