@@ -173,6 +173,7 @@ class FilesController < ApplicationController
   include Api::V1::Attachment
   include Api::V1::Avatar
   include AttachmentHelper
+  include FilesHelper
   include K5Mode
 
   before_action { |c| c.active_tab = "files" }
@@ -543,7 +544,7 @@ class FilesController < ApplicationController
     end
 
     params[:include] = Array(params[:include])
-    if access_allowed(@attachment, @current_user, :read, session, params)
+    if access_allowed(@attachment, @current_user, :read)
       json = attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
 
       # Add canvadoc session URL if the file is unlocked
@@ -658,7 +659,7 @@ class FilesController < ApplicationController
         return
       end
 
-      if access_allowed(@attachment, @current_user, :read, session, params)
+      if access_allowed(@attachment, @current_user, :read)
         @attachment.ensure_media_object
         verifier_checker = Attachments::Verification.new(@attachment)
 
@@ -1413,7 +1414,7 @@ class FilesController < ApplicationController
     @icon = Attachment.find(params[:id])
     @icon = attachment_or_replacement(@icon.context, params[:id]) if @icon.deleted? && @icon.replacement_attachment_id.present?
     return render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found if @icon.deleted?
-    return unless access_allowed(@icon, @current_user, :download, session, params)
+    return unless access_allowed(@icon, @current_user, :download)
 
     unless @icon.category == Attachment::ICON_MAKER_ICONS
       return render json: { errors: [{ message: "The requested attachment does not support viewing metadata." }] }, status: :bad_request
@@ -1585,7 +1586,7 @@ class FilesController < ApplicationController
     headers["Access-Control-Allow-Methods"] = "GET, HEAD"
   end
 
-  def access_allowed(attachment, user, access_type, session, params)
+  def access_allowed(attachment, user, access_type)
     if params[:verifier]
       verifier_checker = Attachments::Verification.new(attachment)
       return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], access_type, session)
