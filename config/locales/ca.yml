@@ -240,6 +240,7 @@ ca:
         partner_id: "ID de soci"
         partner_key: "Clau de soci"
   academic_engagement_capella_74946a80: "Participació acadèmica (Capella)"
+  academic_engagement_detail_sei_31f8f271: "Informació sobre la implicació acadèmica: SEI"
   academic_engagement_strayer_8c7832b9: "Participació acadèmica (Strayer)"
   academic_success_reporting_2585c499: "Informe sobre èxit acadèmic"
   acalanes_union_high_grade_report_ae9bce11: "Informe de notes altes d’Acalanes Union"
@@ -1523,6 +1524,41 @@ ca:
             sis_default: 
               parameters: 
                 note: "*La configuració del període acadèmic només afecta els fitxers CSV d'assignatures, seccions, inscripcions i llista X."
+        v2: 
+          parameters: 
+            account_reports: 
+              default: 
+                accounts: 
+                  check_box: "CSV de comptes"
+                courses: 
+                  check_box: "CSV d'assignatures"
+                enrollments: 
+                  check_box: "CSV d’inscripcions"
+                group_categories: 
+                  login: 
+                    check_box: "CSV de categories del grup"
+                group_membership: 
+                  login: 
+                    check_box: "CSV d’afiliacions del grup"
+                groups: 
+                  check_box: "CSV de grups"
+                pseudonyms: 
+                  check_box: "CSV de pseudònims"
+                question_bank_questions: 
+                  check_box: "Preguntes del banc de preguntes"
+                question_banks: 
+                  check_box: "Bancs de preguntes"
+                sections: 
+                  check_box: "CSV de seccions"
+                terms: 
+                  check_box: "CSV de períodes acadèmics"
+                users: 
+                  check_box: "CSV d’usuaris"
+                xlist: 
+                  check_box: "CSV de llista X"
+              sis_default: 
+                parameters: 
+                  note: "*La configuració del període acadèmic només afecta els fitxers CSV d'assignatures, seccions, inscripcions i llista X."
       user_course_access_log: 
         parameters: 
           account_reports: 
@@ -1535,6 +1571,18 @@ ca:
           students: "Inscripcions d’estudiants"
           ta: "Inscripcions de TA"
           teachers: "Inscripcions de professors"
+        v2: 
+          parameters: 
+            account_reports: 
+              usu: 
+                enrollment_type: 
+                  header: "Tipus d’inscripció"
+            all: "Totes les inscripcions"
+            designer: "Inscripcions de dissenyadors"
+            observer: "Inscripcions d’observadors"
+            students: "Inscripcions d’estudiants"
+            ta: "Inscripcions de TA"
+            teachers: "Inscripcions de professors"
     student_assessment_scores_csv_parameters: 
       account_reports: 
         orbis: 
@@ -2073,7 +2121,9 @@ ca:
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Totes les ponderacions han de ser majors o igual a 0"
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Permet a un professor establir el nombre d'intents permesos d'un tasca a través de la IU"
   allow_administrative_actions_in_courses_20c33fed: "Permet accions administratives a les assignatures"
+  allow_admins_to_configure_subscription_preferences_15754289: "Permeteu als administradors configurar les preferències de subscripció als calendaris del compte."
   allow_attendees_to_4ef30c3: "Permeteu que els assistents…"
+  allow_auto_subscription_to_account_calendars_455ba4bc: "Permeteu subscriure’s automàticament als calendaris del compte"
   allow_bb7ce9b1: Permet
   allow_blueprint_publishing_after_association_fae6ba95: "Permet la publicació de la plantilla després de l'associació"
   allow_bulk_grade_export_to_sis_e11a6e66: "Permet l'exportació de qualificacions en massa al SIS"
@@ -2641,8 +2691,10 @@ ca:
       Permet als usuaris substituir les preferències de notificació específiques
       curs per curs.
   allows_users_to_save_and_search_frequently_used_fe_806f8999: "Permet als usuaris desar i cercar els comentaris utilitzats freqüentment en una biblioteca de comentaris per utilitzar a l’SpeedGrader."
+  allows_users_to_see_quantitative_numeric_grading_d_c96924f0: "Permet als usuaris consultar les dades de qualificació (numèriques) quantitatives. Si es denega aquest permís, les opcions de creació de tasques per als professors es veuran limitades. Els usuaris només veuran les dades qualitatives, que inclouen qualificacions amb lletra i comentaris."
   allows_users_to_use_average_as_a_calulcation_metho_e5031470: "Permet als usuaris utilitzar la mitjana com a mètode de càlcul per a un resultat determinat."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Permet que els usuaris amb números de telèfon internacionals rebin missatges de text del Canvas."
+  already_belongs_to_an_assignment_override_99fc6f36: "ja pertany a una substitució de tasca"
   already_have_a_canvas_account_c4368ac9: "Ja teniu un usuari del Canvas?"
   also_note_that_microsoft_teams_is_unable_to_suppor_20d8f753: "Teniu en compte també que Microsoft Teams no és compatible amb cursos amb més de %{max_enrollments} inscripcions o més de %{max_owners} propietaris. Si teniu un curs gran amb què se superin aquests llindars, és possible que tingueu problemes de sincronització."
   also_note_that_microsoft_teams_is_unable_to_suppor_5b3c65e1: "Teniu en compte també que el Microsoft Teams no és compatible amb assignatures amb més de %{max_enrollments} inscripcions o més de %{max_owners} propietaris. Si la vostra assignatura supera aquests límits, és probable que s’interrompi la sincronització."
@@ -2991,6 +3043,7 @@ ca:
       student_view_unauthorized: "No podeu accedir a aquesta funcionalitat a la vista d'estudiant."
       submission_unauthorized: "No podeu accedir a aquesta entrega."
       unauthorized: 
+        default: "No teniu accés per visualitzar aquest recurs."
         not_started_yet: "L'assignatura a la qual esteu provant d'accedir encara no ha començat.  Començarà el %{date}."
         unpublished: "L'instructor encara no ha publicat aquesta assignatura."
     notices: 
@@ -4782,6 +4835,7 @@ ca:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "No pot establir la data de lliurament de substitució en una data dins d'un període de qualificació tancat"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "No es pot establir sis_account_id en un root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "No pot establir la data de lliurament en una data dins d'un període de qualificació tancat"
+  cannot_use_gradebook_importer_reserved_names_8f3b5748: "no podeu utilitzar noms reservats per a importadors del llibre de qualificacions"
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Els informes detallats de les activitats anònimes no es poden visualitzar fins que es publiquin les notes."
   canvas: 
     migration: 
@@ -8690,6 +8744,7 @@ ca:
   duration_must_be_less_than_99_999_999_minutes_ec7b116d: "La durada ha de ser inferior a 99.999.999 minuts"
   dutch_6d05cee5: Neerlandès
   dynamic_concurrency_231dbdc5: "Concurrència dinàmica"
+  dynamic_lti_1_1_environment_specific_override_urls_395db495: "URL de substitució dinàmica específica de l'entorn d’LTI 1.1"
   e_c2991d1b: e
   e_g_http_university_edu_helpdesk_acab04d6: "p. ex., http://university.edu/helpdesk"
   e_mail_only_2cc5e513: "Només l'adreça electrònica"
@@ -11178,6 +11233,7 @@ ca:
   hide_sub_accounts_for_account_name_a6de98bd: "Amaga els comptes secundaris de %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Amaga el botó Importa els resultats d'aprenentatge segons els permisos de l'usuari"
   hide_total_and_override_columns_6fde3e25: "Amagueu el total i substituïu les columnes"
+  hide_zero_point_new_quizzes_from_the_student_and_t_b4c22d88: "Amagueu les noves proves de punt zero a l’estudiant i als llibres de qualificacions dels professors"
   hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Amaga certs estudiants i seccions a LMGB si el professor només té accés a una secció concreta"
   hiding_grades_82691e44: "S'estan amagant les notes"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "No es permet amagar les notes perquè no s'han alliberat per a aquesta activitat."
@@ -11656,6 +11712,7 @@ ca:
   important_dates_tray_fa41a025: "Safata de dates importants"
   important_info_3bda6406: "Informació important"
   important_info_for_course_baa4bce1: "Informació important de %{course}"
+  important_note_educational_institutions_have_an_ob_c40b409f: "*Nota important: Les institucions educatives tenen l'obligació de fer que el seu contingut sigui el més accessible possible. L'Instructure recomana com a mínim una relació de 4,5:1 entre el color del text i del fons perquè el text es pugui llegir bé. Podeu provar fàcilment les vostres relacions de contrast amb el **WebAIM Color Contrast Checker***."
   important_note_educational_institutions_have_an_ob_c9350304: "*Nota important: Les institucions educatives tenen l'obligació de fer que el seu contingut sigui el més accessible possible. L'Instructure recomana com a mínim una relació de 3:1 entre el color del text i del fons perquè el text es pugui llegir bé. Podeu provar fàcilment les vostres relacions de contrast amb el **WebAIM Color Contrast Checker***."
   imported_from_posttosisname_f7cc9258: "Importat de %{postToSISName}"
   importers/assignment_importer: 
@@ -11914,6 +11971,7 @@ ca:
   invalid_byday_byday_6e361e78: "BYDAY '%{byday}' no és vàlid"
   invalid_bymonth_bymonth_91f621b3: "BYMONTH '%{bymonth}' no és vàlid"
   invalid_bymonthday_bymonthday_87791c1b: "BYMONTHDAY '%{bymonthday}' no és vàlid"
+  invalid_calculation_int_for_this_calculation_metho_971fada3: "calculation_int no és vàlid per a aquest calculation_method"
   invalid_content_type_utf_8_required_bd458b78: "Tipus de contingut no vàlid, es requereix UTF-8"
   invalid_context_for_group_f6cd268a: "context no vàlid per al grup"
   invalid_context_type_68f40a61: "Tipus de context no vàlid"
@@ -11991,7 +12049,9 @@ ca:
   ireland_353_3cd32cc0: "Irlanda (+353)"
   irish_567e109f: Irlandès
   is_blueprint_8f793ba8: is_blueprint
+  is_invalid_702840b6: "no és vàlid"
   is_public_ca8561e8: is_public
+  is_reserved_5f0516e4: "està reservat"
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " utilitza una versió gratuïta de BigBlueButton que permet fer 10 videoconferències simultànies, cadascuna amb 1 amfitrió i fins a 24 assistents. Les gravacions es desen durant 7 dies."
   isolated_entry_post_error_page_2a447d08: "Pàgina d’error de publicació d’entrada aïllada"
   isolated_entry_query_error_f0bfae18: "Error de consulta d’entrada aïllada"
@@ -14726,6 +14786,7 @@ ca:
   microsoft_tenant_name_domain_ba8ed4bb: "microsoft_tenant_name%{domain}"
   migrate_67c9f753: Migra
   migrate_quiz_5d0f777: "Migra la prova"
+  migrating_a_single_classic_quiz_will_leave_html_ri_91795a20: "En migrar una sola prova clàssica, els camps de contingut enriquit HTML quedaran tal com són."
   migrating_name_e05aa53e: "S'està migrant \"%{name}\""
   migration: 
     announcement_type: Anunci
@@ -15188,6 +15249,7 @@ ca:
   new_quizzes_export_support_b0a6a625: "Assistència per a l’exportació de proves noves"
   new_quizzes_importing_c167dce0: "Importació de Qüestionaris nous"
   new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "Proves noves incloses a la pestanya de resum de l’alineació de resultats"
+  new_quizzes_migrate_without_content_rewrite_1aec2ce8: "Les proves noves migren sense que se’n reescrigui el contingut"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Migració de Proves noves durant la importació/còpia de l'assignatura"
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Migració a Proves noves habilitada per defecte"
   new_quizzes_migration_required_7854aa1a: "La migració de Proves noves és obligatòria"
@@ -15910,9 +15972,11 @@ ca:
   only_collect_grades_that_have_been_graded_since_th_96baed94: "Només recopileu notes que s’hagin qualificat des de l’hora start_at."
   only_course_announcements_and_discussions_can_be_s_924d4386: "Només els fòrums i els anuncis de l'assignatura poden ser específics de seccions"
   only_csv_files_are_supported_e1ad5270: "Només s'admeten fitxers CSV."
+  only_impact_if_enrollments_selected_676f3bf8: "(Només afecta si se seleccionen inscripcions)"
   only_include_eportfolios_from_users_with_no_enroll_b1e26f4c: "Inclou només els ePortfolios dels usuaris sense inscripcions"
   only_include_eportfolios_that_have_been_removed_da40532c: "Inclou només els ePortfolios que s’han suprimit"
   only_needed_if_enrollments_selected_ee620ce3: "Només cal si se seleccionen inscripcions"
+  only_observerenrollments_may_have_an_associated_us_b2f78f8e: "només ObserverEnrollments poden tenir un associated_user_id"
   only_once_after_each_attempt_cc842738: "Només una vegada després de cada intent"
   only_show_announcement_on_current_account_domain_fc341eea: "Mostra només els anuncis al domini de l'usuari actual"
   only_show_site_admin_keys_in_the_site_admin_ui_64827f33: "Mostra només les claus d'administrador del lloc a la UI d'administrador del lloc"
@@ -15925,6 +15989,7 @@ ca:
   oops_something_went_wrong_with_migrating_name_acdbc98b: "Vaja! S'ha produït un error en migrar \"%{name}\""
   oops_there_was_a_problem_re_uploading_submissions__276cb8a1: "S'ha produït un problema en tornar a carregar les entregues. Comproveu si hi ha algun problema amb el fitxer zip i torneu-ho a provar."
   open_address_book_41ce8576: "Obre la llibreta d’adreces"
+  open_blueprint_sidebar_830b4c54: "Obre la barra lateral de la plantilla"
   open_comment_library_9debe2: "Obre la biblioteca de comentaris"
   open_comment_tray_160293d7: "Obre la safata de comentaris"
   open_complete_incomplete_menu_cfe2033b: "Menú Obre les completades/no completades"
@@ -17491,6 +17556,7 @@ ca:
   publishing_pace_a65e4152: "S’està publicant el ritme…"
   publishing_plan_b70186ed: "S’està publicant el pla…"
   publishing_progress_5154a430: "S'està publicant el progrés"
+  publishing_progress_is_progress_percent_complete_20482e3e: "La publicació del progrés ja s’ha completat en un %{progress} per cent"
   pumpkin_904428d5: Carabassa
   purple_7678a9fc: Porpra
   push_notification_a6532ff3: "Notificació d'inserció"
@@ -18508,7 +18574,7 @@ ca:
         other: "%{count} segons"
       show_time_link: "Mostra l’hora"
       time_remaining: "Us queden %{time}"
-      times_up: "S'ha acabat el temps! Es presentaran els resultats en 10 segons"
+      times_up: "S'ha acabat el temps! Es presentaran els resultats en 10 segons"
       titles: 
         come_back_later: "Heu marcat aquesta pregunta per tornar-hi més tard"
         times_up: "S'ha acabat el temps!"
@@ -18994,6 +19060,10 @@ ca:
       Substitueix la imatge existent de l’equació matemàtica i el seu mathml ocult
       per una versió processada per MathJax. Aquest canvi ofereix una millor accessibilitat
       i vàries opcions perquè el lector interactuï amb l’equació a la pàgina.
+  replaces_the_existing_update_external_tools_beta_r_308b8a71: |-
+      Substitueix la tasca d’actualització beta existent “update_external_tools” (que sobreescriu
+      tots els URL d’un grup amb URL d’inici específics de la versió beta) per una consulta dinàmica de
+      l’URL d’inici correcte.
   replies_replies_unread_unread_dc7c982f: "%{replies} respostes, %{unread} no llegides"
   repliescount_replies_a7fcb2e1: 
     one: "%{repliesCount} resposta"
@@ -19435,6 +19505,7 @@ ca:
   score_grade_8742b368: "%{score} (%{grade})"
   score_hidden_f345f875: "Puntuació: (amagat)"
   score_letter_grade_b3bb9e52: "nota amb lletra %{score}"
+  score_must_be_between_0_and_100_aa0d90e: "la puntuació ha de ser entre 0 y 100"
   score_n_a_34dfdcda: "Puntuació: N/A"
   score_out_of_points_84f44331: "(%{score} de %{points})"
   score_out_of_points_possible_88f370fd: "%{score} de %{points_possible}"
@@ -20733,6 +20804,7 @@ ca:
   something_went_wrong_loading_the_equation_editor_62bca61c: "S’ha produït un error en carregar l’editor d’equacions"
   something_went_wrong_loading_the_file_previewer_3fb369e8: "S’ha produït un error en carregar la visualització prèvia del fitxer."
   something_went_wrong_loading_the_violations_try_re_9461d057: "S’ha produït un error en carregar les infraccions. Proveu de tornar a carregar la pàgina."
+  something_went_wrong_monitoring_the_work_s_progres_d3e63d50: "S’ha produït un error en monitorar el progrés de la feina. Proveu d'actualitzar la pàgina."
   something_went_wrong_please_try_refreshing_the_pag_3f651814: "Alguna cosa no ha anat bé. Proveu d'actualitzar la pàgina. Si el problema persisteix, podeu provar de carregar un únic grup d'estudiants a l'SpeedGrader mitjançant la *configuració d'Assignatura gran*."
   something_went_wrong_please_try_refreshing_the_pag_689be273: "Alguna cosa no ha anat bé. Proveu d'actualitzar la pàgina."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "S'ha produït un error en reactivar l'usuari. Torneu a provar-ho més endavant."
@@ -20970,6 +21042,8 @@ ca:
   still_having_difficulty_get_more_help_here_3cdc8de1: "Encara teniu dificultats? Obteniu més ajuda aquí:"
   stop_acting_as_user_8809a97f: "Deixa d'actuar com a usuari"
   stop_fd9822ab: Atura
+  stop_publishing_9644e84: "Atura la publicació"
+  stop_publishing_button_click_to_discontinue_proces_abc3350: "Botó Atura la publicació. Feu clic per interrompre el processament."
   storage_quotas_manage_6ca14bbb: "Quotes d'emmagatzematge - administra"
   storage_used_in_mb_c75fbd9c: "emmagatzematge utilitzat en MB"
   store_and_share_course_assets_82a9967c: "Deseu i compartiu els actius de l'assignatura"
@@ -21183,7 +21257,7 @@ ca:
   subjects_14c0c4de: Matèries
   submission: 
     atom_no_author: "Sense autor"
-    attached_files_comment: "Vegeu els fitxers adjunts."
+    attached_files_comment: "Consulteu els fitxers adjunts."
     state: 
       graded: qualificat
       submitted: entregat
@@ -21199,6 +21273,7 @@ ca:
   submission_comment_user_name_assignment_title_cour_d88ba875: "Comentari sobre l'entrega: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comments_4fa03a17: "Comentaris sobre l'entrega"
   submission_comments_b6d65841: "Comentaris sobre l'entrega"
+  submission_comments_sei_a10bc997: "Comentaris sobre l'entrega: SEI"
   submission_comments_tray_290fad59: "Safata de comentaris sobre l'entrega"
   submission_completed_ba0e552e: "S’ha completat l'entrega"
   submission_data_88085815: "Dades d’entrega"
@@ -21270,7 +21345,7 @@ ca:
     gathering_files_progress: "S'estan obtenint els fitxers (%{progress})..."
     originality_score: 
       see_vericite_results: "Mostra VeriCite resultats"
-    see_attached_files: "Mostra els fitxers adjunts"
+    see_attached_files: "Consulta els fitxers adjunts"
     show: 
       allowed_attempts: "Intents permesos"
       anonymous_user: "Usuari anònim"
@@ -21583,6 +21658,7 @@ ca:
   teacher_count_teachers_a92f7199: "%{teacher_count} professors"
   teacher_dashboard_custom_report_6d20bef2: "Informe personalitzat del panell de control del professor"
   teacher_engagement_report_ec03613d: "Informe de participació del professor"
+  teacher_notes_must_be_true_or_false_271e7fe6: "teacher_notes ha de ser veritable o fals"
   teacher_s_fdefb2c: Professor(s)
   teacher_to_do_19d00df5: "Tasques pendents del professor"
   teacher_tour_26282921: "Visita guiada per a professors"
@@ -22102,6 +22178,7 @@ ca:
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "S'ha produït un error en enviar al servei de detecció de similitud. Torneu a provar d'entregar el fitxer abans de contactar amb l'assistència tècnica."
   there_was_an_error_submitting_your_attempt_fdbe9259: "S'ha produït un error en enviar l’intent."
   there_was_an_error_updating_a_filter_2a5ebc87: "S'ha produït un error en actualitzar un filtre."
+  there_was_an_error_updating_module_and_items_publi_61b23c00: "S'ha produït un error en actualitzar l'estat de publicació dels continguts i els elements. Proveu d'actualitzar la pàgina."
   there_was_an_error_updating_this_assignment_please_59fc608d: "S'ha produït un error en actualitzar aquesta activitat. Actualitzeu la pàgina i torneu a provar-ho."
   there_was_an_error_updating_view_options_d024a3ec: "S’ha produït un error en actualitzar les opcions de visualització."
   there_was_an_error_uploading_the_image_932fc4ce: "S'ha produït un error en carregar la imatge"
@@ -22289,6 +22366,7 @@ ca:
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Aquesta és una llista separada per comes d'URLs de confiança. En confiar en qualsevol dels URL d'aquest llista s'ometrà el testimoni CSRF quan s'iniciï la sessió al Canvas."
   this_is_a_course_template_99bbe698: "Aquesta és una plantilla d'assignatura"
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Aquesta característica permet el desenvolupament d'un disseny adaptatiu"
+  this_is_a_graded_discussion_28ad2728: "Aquest fòrum està qualificat"
   this_is_a_graded_discussion_count_points_possible_59926e2c: 
     one: "Aquest és un debat amb qualificació: %{count} punt possible"
     other: "Aquest és un debat amb qualificació: %{count} punts possibles"
@@ -22376,6 +22454,7 @@ ca:
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Aquesta ubicació requereix que el proveïdor admeti els enllaços profunds. Consulteu-ho amb el proveïdor de la vostra eina per assegurar-vos que admet aquesta funcionalitat"
   this_process_could_take_a_few_minutes_click_the_st_fc9bb32a: "Pot ser que aquest procés trigui uns minuts. Feu clic al botó Atura per interrompre el processament. Els elements que ja s’hagin processat no es revertiran al seu estat anterior."
   this_process_could_take_a_few_minutes_hitting_canc_dd7dc00c: "Pot ser que aquest procés trigui uns minuts. Si feu clic a Cancel·la, s’aturarà el procés, però els elements que ja s’hagin processat no es revertiran al seu estat anterior."
+  this_process_could_take_a_few_minutes_you_may_clos_c763aad6: "Pot ser que aquest procés trigui uns minuts. Podeu tancar el modal o sortir de la pàgina durant aquest procés."
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Aquest pronom es mostrarà després del vostre nom quan l’habiliteu"
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Aquest grup de preguntes està definit per triar més preguntes de les disponibles."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Aquesta pregunta mostrarà una casella de selecció al costat de cada resposta."
@@ -22847,6 +22926,8 @@ ca:
   to_differentiate_assignments_to_individual_student_6cc40fde: "Per diferenciar activitats per a usuaris individuals, també s'ha d'habilitar Usuaris - visualitza la llista"
   to_disallow_users_from_managing_sis_ids_at_the_cou_2058787b: "Per no permetre que els usuaris administrin cap ID del SIS a nivell de l'assignatura, Dades del SIS - administra i Dades del SIS - llegeix han d’estar inhabilitats."
   to_disallow_users_from_viewing_any_sis_ids_at_the__7e0cac1b: "Per no permetre que els usuaris visualitzin cap ID del SIS a nivell de l'assignatura, Dades del SIS - administra i Dades del SIS - llegeix han d’estar inhabilitats."
+  to_discontinue_processing_click_the_stop_button_no_989a959e: "Per interrompre el processament, feu clic al botó Atura. Nota: Els continguts que ja s’hagin processat no es revertiran al seu estat anterior un cop interromput el procés."
+  to_discontinue_processing_click_the_stop_button_no_fff71865: "Per interrompre el processament, feu clic al botó Atura. Nota: Els continguts i els elements que ja s’hagin processat no es revertiran al seu estat anterior un cop interromput el procés."
   to_do_1d554f36: "Tasques pendents"
   to_do_5526f10a: "Tasques pendents:"
   to_do_6ac7b2dc: "tasques pendents:"
@@ -23246,6 +23327,7 @@ ca:
   try_disabling_the_unread_filter_b8d9d77: "Proveu d'inhabilitar el filtre \"No llegit\"."
   try_entering_your_institution_s_complete_name_2013abab: "Proveu d’introduir el nom complet de la vostra institució."
   try_out_canvas_for_free_e2265d30: "Proveu el Canvas de manera gratuïta"
+  ttml_tracks_are_not_allowed_because_they_are_susce_d40b654a: "No es permeten les pistes TTML perquè poden patir atacs xss."
   tue_bb10b386: Dimarts
   turkish_5b69578b: Turc
   turned_in_submission_date_e9180b8b: "entregat: %{submission_date}"
@@ -23752,6 +23834,7 @@ ca:
     users_to_add: 
       one: "Si continueu així, s'afegirà un usuari."
       other: "Si continueu així, s'afegiran %{count} usuaris."
+  user_login_id_d40cab16: "id d'inici de sessió de l’usuari"
   user_login_logout_activity_90fbbd9a: "Activitat d'inici/tancament de sessió de l'usuari"
   user_logins: 
     buttons: 
@@ -24133,6 +24216,7 @@ ca:
   users_with_this_permission_may_be_able_to_use_the__84394072: "Els usuaris amb aquest permís poden utilitzar la característica Actua com per administrar la configuració de l'usuari, visualitzar i ajustar notes, accedir a la informació de l’usuari, etc. Aquests permisos també permetran als administradors designats a un usuari secundari accedir a la configuració i a la informació fora del seu usuari secundari."
   utc_e44049af: UTC
   uuid_has_been_provisioned_ab0c6c9: "S’ha proporcionat l’UUID."
+  val_percent_c2ca6679: "%val per cent"
   validate: 
     is_required: "Aquest camp és obligatori"
   validate_links_in_content_b1630fba: "Valida els enllaços del contingut"
@@ -24142,6 +24226,8 @@ ca:
   value_added_1846cc30: "S'ha afegit %{value}"
   value_d842f16d: Valor
   value_is_not_a_valid_date_23c2d0a2: "%{value} no és una data vàlida"
+  value_is_not_a_valid_lti_version_ef4f6b1e: "%{value} no és una versió d’LTI vàlida"
+  value_is_not_valid_563afee6: "%{value} no és vàlid"
   value_removed_bba9430c: "S'ha suprimit %{value}"
   value_too_long_allowed_length_is_length_a81d4cf: "El valor és massa llarg, la longitud permesa és %{length}"
   vanity_url_76f93382: "URL de Vanity"
@@ -24403,6 +24489,7 @@ ca:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Si se selecciona, el curs tindrà l'estat de només lectura fora d'aquestes dates."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Si se selecciona, el curs serà inaccessible fora de les dates del curs. Si les dates del curs estan en blanc, aquestes dates d'inici i fi s'aplicaran a les dates del període acadèmic."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Si se selecciona, la secció de l'assignatura tindrà l'estat de només lectura fora d'aquestes dates."
+  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "Un cop establerta, una opció de no mostrar una prova nova amb 0 punts possibles al llibre de qualificacions estarà disponible en forma de casella de verificació en crear o editar la prova."
   when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Un cop establert, determina si l'estat del flux de treball d’una prova nova s’ha d'establir com a qualificat o pending_review en cas que un usuari tingués una prova nova pending_review anterior, però s’hagi tornat a inscriure en l'assignatura."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Quan aquesta marca està habilitada, la navegació del curs romandrà contreta o desplegada
@@ -24608,6 +24695,7 @@ ca:
   word_count_c77fe3a6: "Recompte de paraules"
   work_and_create_together_c65f358b: "Treballeu i creeu junts"
   workflow_state_3a5c99d2: workflow_state
+  working_68a224fa: "s’està treballant"
   working_a71f1d66: "Està treballant"
   working_b1f63edf: treballant...
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Voleu acceptar o descartar aquesta actualització?"
@@ -24949,6 +25037,7 @@ ca:
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Les instruccions per recuperar la vostra contrasenya s'enviaran a *%{email_address}*. Pot ser que trigui fins a 30 minuts. Assegureu-vos de comprovar la bústia de correu brossa."
   your_peer_review_is_complete_e5fa3e40: "S’ha completat la revisió entre companys."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "No s'ha pogut carregar la vostra foto de perfil. Pot ser que hàgiu superat el vostre límit de càrrega."
+  your_publishing_job_did_not_complete_4560155e: "No s’ha completat el treball de publicació."
   your_publishing_job_has_failed_e04f59ce: "S’ha produït un error a la tasca de publicació."
   your_quiz_engine_choice_has_been_reset_68d268c1: "S'ha restablert la vostra elecció de motor de prova!"
   your_score_a1fc2fcf: "La vostra puntuació"
