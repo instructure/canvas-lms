@@ -1410,6 +1410,11 @@ class Attachment < ActiveRecord::Base
   end
 
   set_policy do
+    # The "read" permission doesn't act quite like you'd expect for files
+    # It gives access to read the metadata of a file (basically you can
+    # know it exists), but to actually read the contents of the file,
+    # you need download permissions.
+    # TODO: Fix permissions to be more descriptive of what they actually do
     given do |user, session|
       context&.grants_right?(user, session, :manage_files_edit) &&
         !associated_with_submission? &&

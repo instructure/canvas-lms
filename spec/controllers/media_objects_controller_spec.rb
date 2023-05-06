@@ -23,6 +23,10 @@ describe MediaObjectsController do
     student_in_course(active_all: true)
   end
 
+  before do
+    stub_kaltura
+  end
+
   describe "GET 'show'" do
     before do
       # We don't actually want to ping kaltura during these tests
@@ -744,6 +748,21 @@ describe MediaObjectsController do
 
       assert_status(200)
       expect(response.headers["content-security-policy"]).to be_nil
+    end
+  end
+
+  describe "GET 'media_attachments_iframe'" do
+    before do
+      @obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+    end
+
+    it "returns an error if the media is locked" do
+      user_session(@student)
+      attachment = @obj.attachment
+      attachment.update(locked: true)
+
+      get "iframe_media_player", params: { attachment_id: attachment.id }
+      assert_status(401)
     end
   end
 
