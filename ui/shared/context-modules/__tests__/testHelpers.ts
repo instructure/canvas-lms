@@ -67,11 +67,19 @@ export function makeModuleItem(courseId, moduleId, {content_type, content_id}) {
   return item
 }
 
-export function makeModule(moduleId: number, published: boolean = false): HTMLDivElement {
+export function makeModule(
+  moduleId: number,
+  moduleName: string,
+  published: boolean = false
+): HTMLDivElement {
   const module = document.createElement('div')
   module.id = `context_module_${moduleId}`
   module.className = 'context_module'
   module.setAttribute('data-module-id', `${moduleId}`)
+  const moduleTitle = document.createElement('div')
+  moduleTitle.className = 'ig-header-title'
+  moduleTitle.textContent = 'Lesson 2'
+  module.appendChild(moduleTitle)
   const publishModuleButton = document.createElement('div')
   publishModuleButton.className = 'module-publish-icon'
   publishModuleButton.setAttribute('data-course-id', '1')
@@ -89,10 +97,11 @@ export function makeModule(moduleId: number, published: boolean = false): HTMLDi
 
 export function makeModuleWithItems(
   moduleId: number,
+  moduleName: string,
   itemIds: number[],
   published: boolean = false
 ): void {
-  makeModule(moduleId, published)
+  makeModule(moduleId, moduleName, published)
   const moduleContent = document.getElementById(`context_module_content_${moduleId}`)
   itemIds.forEach(id => {
     moduleContent?.appendChild(

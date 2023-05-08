@@ -33,6 +33,7 @@ const I18n = useI18nScope('context_modules_publish_icon')
 interface Props {
   readonly courseId: string | number
   readonly moduleId: string | number
+  readonly moduleName: string
   readonly published: boolean | undefined
   readonly isPublishing: boolean
   readonly loadingMessage?: string
@@ -44,6 +45,7 @@ const {Item: MenuItem} = Menu as any
 const ContextModulesPublishIcon = ({
   courseId,
   moduleId,
+  moduleName,
   published,
   isPublishing,
   loadingMessage,
@@ -92,7 +94,10 @@ const ContextModulesPublishIcon = ({
         placement="bottom"
         show={isPublishing ? false : undefined}
         trigger={
-          <IconButton withBorder={false} screenReaderLabel={I18n.t('Module publish menu')}>
+          <IconButton
+            withBorder={false}
+            screenReaderLabel={I18n.t('%{moduleName} Module publish options', {moduleName})}
+          >
             {statusIcon()}
           </IconButton>
         }

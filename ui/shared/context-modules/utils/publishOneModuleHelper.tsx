@@ -302,10 +302,14 @@ export function renderContextModulesPublishIcon(
   loadingMessage?: string
 ) {
   const publishIcon = findModulePublishIcon(moduleId)
+  const moduleName = publishIcon
+    .closest('.context_module')
+    .querySelector('.ig-header-title').textContent
   ReactDOM.render(
     <ContextModulesPublishIcon
       courseId={courseId}
       moduleId={moduleId}
+      moduleName={moduleName}
       isPublishing={isPublishing}
       published={published}
       loadingMessage={loadingMessage}
