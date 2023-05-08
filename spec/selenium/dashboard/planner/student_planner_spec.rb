@@ -616,4 +616,40 @@ describe "student planner" do
       expect(planner_app_div).to contain_jqcss('span:contains("Show 1 completed item")')
     end
   end
+
+  context "with restrict_quantitative_data ff" do
+    before do
+      @course.account.enable_feature!(:restrict_quantitative_data)
+
+      @course.assignments.create!(name: "Assignment 1",
+                                  points_possible: 10,
+                                  due_at: 2.days.from_now)
+      @course.assignments.create!(name: "Assignment 2",
+                                  points_possible: 15,
+                                  due_at: 2.days.from_now)
+    end
+
+    describe "with setting turned off" do
+      it "should show points" do
+        go_to_dashcard_view
+
+        expect(ff("ul[data-testid='ToDoSidebarItem__InformationRow']")[0].text.start_with?("10 points")).to be_truthy
+        expect(ff("ul[data-testid='ToDoSidebarItem__InformationRow']")[1].text.start_with?("15 points")).to be_truthy
+      end
+    end
+
+    describe "with setting turned on" do
+      before do
+        @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+        @course.save!
+      end
+
+      it "should not show points" do
+        go_to_dashcard_view
+
+        expect(ff("ul[data-testid='ToDoSidebarItem__InformationRow']")[0].text.start_with?("10 points")).to be_falsey
+        expect(ff("ul[data-testid='ToDoSidebarItem__InformationRow']")[1].text.start_with?("15 points")).to be_falsey
+      end
+    end
+  end
 end
