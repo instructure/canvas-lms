@@ -22,6 +22,10 @@ module Canvas
     module DatabaseBuilder
       class InvalidConfig < StandardError; end
 
+      def self.reset
+        @clients = {}
+      end
+
       def self.configured?(category, environment = default_environment)
         raise ArgumentError, "config name required" if category.blank?
 
@@ -29,7 +33,7 @@ module Canvas
         !!(config && config[:table_prefix] && config[:region])
       end
 
-      def self.from_config(category, environment = default_environment)
+      def self.from_config(category, environment = default_environment, credentials: nil)
         key = [category, environment]
         @clients ||= {}
         @clients.fetch(key) do
@@ -40,9 +44,8 @@ module Canvas
           end
           validate_config(config)
           opts = {
+            credentials: credentials || Canvas::AwsCredentialProvider.new("auditors_creds", config["vault_credential_path"]),
             region: config[:region],
-            access_key_id: config[:access_key_id],
-            secret_access_key: config[:secret_access_key]
           }
           opts[:endpoint] = config[:endpoint] if config[:endpoint]
           fingerprint = "#{category}:#{environment}"

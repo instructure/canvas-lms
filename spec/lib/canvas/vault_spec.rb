@@ -44,6 +44,10 @@ module Canvas
     let(:local_config) { { token: "file", addr: "file" } }
 
     before do
+      # override default stub in spec_helper.rb since we actually
+      # want to test this function in this file
+      allow(Canvas::Vault).to receive(:read).and_call_original
+
       LocalCache.clear(force: true)
       WebMock.disable_net_connect!
     end
