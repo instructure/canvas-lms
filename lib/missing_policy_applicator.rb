@@ -38,7 +38,7 @@ class MissingPolicyApplicator
     Submission.active
               .joins(assignment: { course: [:late_policy, :enrollments] })
               .where("enrollments.user_id = submissions.user_id")
-              .eager_load(:grading_period, assignment: [:post_policy, { course: [:late_policy, :default_post_policy] }])
+              .preload(:grading_period, assignment: :post_policy, course: [:late_policy, :default_post_policy])
               .merge(Assignment.published)
               .merge(Enrollment.all_active_or_pending)
               .missing
