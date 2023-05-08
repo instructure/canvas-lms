@@ -364,10 +364,23 @@ class Auditors::GradeChange
     event_record
   end
 
+  def self.bulk_record_submission_events(submissions)
+    event_records = submissions.map do |submission|
+      stream_record = Auditors::GradeChange::Record.generate(submission)
+      Auditors::ActiveRecord::GradeChangeRecord.ar_attributes_from_event_stream(stream_record)
+    end
+    bulk_insert_records(event_records)
+  end
+
   def self.insert_record(event_record)
     Auditors::GradeChange::Stream.insert(event_record)
   end
   private_class_method :insert_record
+
+  def self.bulk_insert_records(event_records)
+    event_records.each_slice(1000) { |batch| Auditors::ActiveRecord::GradeChangeRecord.insert_all(batch) }
+  end
+  private_class_method :bulk_insert_records
 
   def self.for_root_account_student(account, student, options = {})
     account.shard.activate do

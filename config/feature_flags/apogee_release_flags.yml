@@ -241,4 +241,16 @@ student_grade_summary_upgrade:
   description: |-
     This refactor will make this page more maintainable
   applies_to: SiteAdmin
-
+fix_missing_policy_applicator_gradebook_history:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Fix Missing Policy Applicator Gradebook History
+  description: Fixes the missing policy applicator to insert records into Gradebook History
+    for each submission marked as missing.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testings builds and local testing
+    development:
+      state: allowed_on # enable for local development
+    test:
+      state: allowed_on # enable for the deployed 'test' environment

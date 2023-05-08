@@ -231,4 +231,20 @@ describe Auditors::GradeChange do
       end
     end
   end
+
+  describe "bulk_record_submission_events" do
+    it "records grade change events for all submissions" do
+      submission1 = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
+      submission2 = @assignment.grade_student(@student, grade: 2, grader: @teacher).first
+      submission3 = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+
+      expect do
+        Auditors::GradeChange.bulk_record_submission_events([submission1, submission2, submission3])
+      end.to change { Auditors::ActiveRecord::GradeChangeRecord.count }.by(3)
+
+      expect(Auditors::ActiveRecord::GradeChangeRecord.third_to_last.score_after).to eq 8.0
+      expect(Auditors::ActiveRecord::GradeChangeRecord.second_to_last.score_after).to eq 2.0
+      expect(Auditors::ActiveRecord::GradeChangeRecord.last.score_after).to eq 3.0
+    end
+  end
 end

@@ -384,5 +384,44 @@ describe MissingPolicyApplicator do
         end
       end
     end
+
+    describe "sending grade change audit events" do
+      let_once(:assignment) { create_recent_assignment }
+      before(:once) do
+        late_policy_missing_enabled
+      end
+
+      context "when the fix_missing_policy_applicator_gradebook_history flag is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:fix_missing_policy_applicator_gradebook_history)
+        end
+
+        it "queues a delayed job if the applicator marks any submissions as missing" do
+          assignment.submissions.update_all(score: nil, grade: nil)
+          expect(Auditors::GradeChange).to receive(:bulk_record_submission_events).with(assignment.submissions.to_a)
+
+          applicator.apply_missing_deductions
+        end
+
+        it "does not queue a delayed job if the applicator marks no submissions as missing" do
+          expect(Auditors::GradeChange).not_to receive(:bulk_record_submission_events)
+
+          applicator.apply_missing_deductions
+        end
+      end
+
+      context "when the fix_missing_policy_applicator_gradebook_history flag is not enabled" do
+        before do
+          Account.site_admin.disable_feature!(:fix_missing_policy_applicator_gradebook_history)
+        end
+
+        it "does not queue a delayed job when the applicator marks submissions as missing" do
+          assignment.submissions.update_all(score: nil, grade: nil)
+          expect(Auditors::GradeChange).not_to receive(:delay)
+
+          applicator.apply_missing_deductions
+        end
+      end
+    end
   end
 end
