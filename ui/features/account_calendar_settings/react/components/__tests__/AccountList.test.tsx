@@ -119,4 +119,22 @@ describe('AccountList', () => {
     await findByText('CPMS')
     expect(alertForMatchingAccounts).toHaveBeenCalledWith(2, false)
   })
+
+  it('shows subscription dropdown if autoSubscription is Enabled', async () => {
+    fetchMock.get(accountListUrl('', FilterType.SHOW_VISIBLE), RESPONSE_ACCOUNT_3)
+    const {findByText, queryAllByTestId, rerender} = render(
+      <AccountList {...defaultProps} searchValue="" filterValue={FilterType.SHOW_VISIBLE} />
+    )
+    expect(await findByText('Manually-Created Courses')).toBeInTheDocument()
+    expect(queryAllByTestId('subscription-dropdown')[0]).toBeUndefined()
+    rerender(
+      <AccountList
+        {...defaultProps}
+        searchValue=""
+        filterValue={FilterType.SHOW_VISIBLE}
+        autoSubscriptionEnabled={true}
+      />
+    )
+    expect(queryAllByTestId('subscription-dropdown')[0]).toBeInTheDocument()
+  })
 })

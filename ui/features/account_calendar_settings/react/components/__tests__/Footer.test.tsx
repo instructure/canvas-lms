@@ -35,6 +35,7 @@ const defaultProps = {
   ],
   onApplyClicked: jest.fn(),
   enableSaveButton: true,
+  showConfirmation: false,
 }
 
 describe('Footer', () => {
@@ -71,5 +72,17 @@ describe('Footer', () => {
     fetchMock.get(VISIBLE_CALENDARS_COUNT_MATCHER, 500, {overwriteRoutes: true})
     const {findAllByText} = render(<Footer {...defaultProps} />)
     expect((await findAllByText('Unable to load calendar count'))[0]).toBeInTheDocument()
+  })
+
+  it('displays the confirmation modal if showConfirmation is enabled', async () => {
+    const onApplyClicked = jest.fn()
+    const {getByRole} = render(
+      <Footer {...defaultProps} showConfirmation={true} onApplyClicked={onApplyClicked} />
+    )
+    getByRole('button', {name: 'Apply Changes'}).click()
+    const modalTitle = getByRole('heading', {name: 'Apply Changes'})
+    expect(modalTitle).toBeInTheDocument()
+    getByRole('button', {name: 'Confirm'}).click()
+    expect(onApplyClicked).toHaveBeenCalledTimes(1)
   })
 })
