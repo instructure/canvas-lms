@@ -21,9 +21,7 @@
 class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
   include OutcomesFeaturesHelper
   include OutcomesServiceAlignmentsHelper
-
-  # Need to add support for NQ questions after OUT-5474 is merged
-  SUPPORTED_OS_ALIGNMENTS = %w[quizzes.quiz].freeze
+  SUPPORTED_OS_ALIGNMENTS = %w[quizzes.quiz quizzes.item].freeze
 
   def initialize(context)
     super()
@@ -122,9 +120,10 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
                             .distinct
 
       # outcome-service alignments
-      if active_os_alignments[outcome.id.to_s].present?
+      outcome_os_alignments = active_os_alignments[outcome.id.to_s]
+      if outcome_os_alignments.present?
 
-        os_aligned_new_quiz_ids = active_os_alignments[outcome.id.to_s]
+        os_aligned_new_quiz_ids = outcome_os_alignments
                                   .filter_map { |a| a[:associated_asset_id].to_i if SUPPORTED_OS_ALIGNMENTS.include?(a[:artifact_type]) && a[:associated_asset_type] == "canvas.assignment.quizzes" }
                                   .uniq
 
@@ -150,6 +149,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
 
       all_alignments_sorted.each do |a|
         align = alignment_hash(a)
+        align[:quiz_items], align[:alignments_count] = get_quiz_items_and_alignments_count(a, outcome_os_alignments) if outcome_os_alignments.present? && a[:alignment_type] == "external"
         art_id = artifact_id(a)
         unless uniq_alignments.include?(art_id)
           alignments.push(align)
@@ -187,6 +187,8 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
       module_workflow_state: alignment[:module_workflow_state],
       assignment_content_type: assignment_content_type(alignment),
       assignment_workflow_state: alignment[:assignment_workflow_state],
+      quiz_items: nil,
+      alignments_count: 1,
       created_at: alignment[:created_at],
       updated_at: alignment[:updated_at]
     }
@@ -235,5 +237,17 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
     return [base_art_id, alignment[:module_id]].join("_") if alignment[:module_id]
 
     base_art_id
+  end
+
+  def get_quiz_items_and_alignments_count(alignment, os_alignments)
+    count = 0
+    items = []
+    os_alignments.each do |a|
+      next unless a[:associated_asset_type] == "canvas.assignment.quizzes" && a[:associated_asset_id] == alignment[:content_id].to_s
+
+      items << { _id: a[:artifact_id], title: a[:title] } if a[:artifact_type] == "quizzes.item"
+      count += 1  if SUPPORTED_OS_ALIGNMENTS.include?(a[:artifact_type])
+    end
+    [items, count]
   end
 end
