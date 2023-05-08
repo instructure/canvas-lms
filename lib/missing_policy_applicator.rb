@@ -74,6 +74,10 @@ class MissingPolicyApplicator
         Canvas::LiveEvents.delay_if_production.submissions_bulk_updated(submissions)
       end
 
+      if Account.site_admin.feature_enabled?(:fix_missing_policy_applicator_gradebook_history)
+        Auditors::GradeChange.delay_if_production.bulk_record_submission_events(submissions.reload)
+      end
+
       assignment.course.recompute_student_scores(submissions.map(&:user_id).uniq)
     end
   end
