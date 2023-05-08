@@ -28,6 +28,9 @@ const defaultProps = {
   visibilityChanges: [],
   onAccountToggled: jest.fn(),
   showSpinner: false,
+  subscriptionChanges: [],
+  onAccountSubscriptionToggled: jest.fn(),
+  autoSubscriptionEnabled: false,
 }
 
 beforeEach(() => {
@@ -103,5 +106,13 @@ describe('AccountTree', () => {
     const {findByRole, getByRole} = render(<AccountTree {...defaultProps} />)
     expect(await findByRole('button', {name: 'University, 24 accounts'})).toBeInTheDocument()
     expect(getByRole('button', {name: 'Elementary, 1 accounts'})).toBeInTheDocument()
+  })
+
+  it('shows subscription dropdown if autoSubscription is Enabled', async () => {
+    const {findByRole, queryAllByTestId, rerender} = render(<AccountTree {...defaultProps} />)
+    expect(await findByRole('button', {name: 'University, 24 accounts'})).toBeInTheDocument()
+    expect(queryAllByTestId('subscription-dropdown')[0]).toBeUndefined()
+    rerender(<AccountTree {...defaultProps} autoSubscriptionEnabled={true} />)
+    expect(queryAllByTestId('subscription-dropdown')[0]).toBeInTheDocument()
   })
 })
