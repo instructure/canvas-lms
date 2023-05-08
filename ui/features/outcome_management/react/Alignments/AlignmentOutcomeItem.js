@@ -38,7 +38,10 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
   const [truncated, setTruncated] = useState(true)
   const onClickHandler = () => setTruncated(prevState => !prevState)
   const truncatedDescription = stripHtmlTags(description || '')
-  const alignmentsCount = alignments?.length || 0
+  const alignmentsCount = (alignments || []).reduce(
+    (acc, alignment) => acc + alignment.alignmentsCount,
+    0
+  )
   const {isMobileView} = useCanvasContext()
 
   return (
@@ -84,6 +87,29 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
               <div style={{overflowWrap: 'break-word'}}>{addZeroWidthSpace(title)}</div>
             </Heading>
           </div>
+        </Flex.Item>
+        {!isMobileView && (
+          <Flex.Item size="9rem" alignSelf="end">
+            <div
+              style={{
+                padding: '0.4375rem 0.5rem 0 0',
+                display: 'flex',
+                flexFlow: 'row-reverse nowrap',
+              }}
+            >
+              <Text size="medium" weight="bold" data-testid="outcome-alignments">
+                {alignmentsCount}
+              </Text>
+              <View padding="0 xxx-small 0 0">
+                <Text size="medium">{`${I18n.t('Alignments')}:`}</Text>
+              </View>
+            </div>
+          </Flex.Item>
+        )}
+      </Flex>
+      <Flex as="div" alignItems="start">
+        <Flex.Item as="div" size={isMobileView ? '2.5rem' : '3rem'} />
+        <Flex.Item size="50%" shouldGrow={true}>
           <div style={{paddingBottom: '0.75rem'}}>
             {truncated && truncatedDescription && (
               <View
@@ -128,6 +154,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
                     moduleWorkflowState,
                     assignmentContentType,
                     assignmentWorkflowState,
+                    quizItems,
                   }) => (
                     <AlignmentItem
                       id={_id}
@@ -140,6 +167,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
                       moduleWorkflowState={moduleWorkflowState}
                       assignmentContentType={assignmentContentType}
                       assignmentWorkflowState={assignmentWorkflowState}
+                      quizItems={quizItems}
                     />
                   )
                 )}
@@ -155,24 +183,6 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
             )}
           </div>
         </Flex.Item>
-        {!isMobileView && (
-          <Flex.Item size="9rem" alignSelf="end">
-            <div
-              style={{
-                padding: '0.4375rem 0.5rem 0 0',
-                display: 'flex',
-                flexFlow: 'row-reverse nowrap',
-              }}
-            >
-              <Text size="medium" weight="bold" data-testid="outcome-alignments">
-                {alignmentsCount}
-              </Text>
-              <View padding="0 xxx-small 0 0">
-                <Text size="medium">{`${I18n.t('Alignments')}:`}</Text>
-              </View>
-            </div>
-          </Flex.Item>
-        )}
       </Flex>
     </View>
   )
