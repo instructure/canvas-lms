@@ -111,6 +111,62 @@ describe GraphQLController do
       expect(PageView.last.participated).to be(true)
     end
 
+    context "discussions" do
+      def mutation_str(
+        discussion_topic_id: nil,
+        message: nil
+      )
+        <<~GQL
+          mutation {
+            createDiscussionEntry(input: {
+              discussionTopicId: #{discussion_topic_id}
+              message: "#{message}"
+              }) {
+              discussionEntry {
+                _id
+                message
+                parentId
+                attachment {
+                  _id
+                }
+              }
+              errors {
+                message
+                attribute
+              }
+            }
+          }
+        GQL
+      end
+
+      def create_discussion_entry(message)
+        post :execute,
+             params: {
+               query: mutation_str(discussion_topic_id: @topic.id, message: message),
+               operationName: "CreateDiscussionEntry",
+               variables: {
+                 courseID: @course.id,
+                 discussionTopicId: @topic.id
+               }
+             },
+             format: :json
+      end
+
+      it "increments participate_score on participate for DiscussionTopic" do
+        course_with_teacher(active_all: true)
+        student_in_course(active_all: true)
+        discussion_topic_model({ context: @course, discussion_type: DiscussionTopic::DiscussionTypes::THREADED })
+
+        user_session(@student)
+
+        create_discussion_entry("Post 1")
+        expect(AssetUserAccess.last.participate_score).to eq 1.0
+
+        create_discussion_entry("Post 2")
+        expect(AssetUserAccess.last.participate_score).to eq 2.0
+      end
+    end
+
     context "datadog metrics" do
       before { allow(InstStatsd::Statsd).to receive(:increment).and_call_original }
 
