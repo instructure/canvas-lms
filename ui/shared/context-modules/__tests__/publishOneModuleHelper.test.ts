@@ -73,7 +73,7 @@ describe('publishOneModuleHelper', () => {
     let spy
     beforeEach(() => {
       spy = jest.spyOn(publishOneModuleHelperModule, 'batchUpdateOneModuleApiCall')
-      makeModuleWithItems(1, [117, 119], false)
+      makeModuleWithItems(1, 'Lesson 2', [117, 119], false)
     })
     afterEach(() => {
       spy.mockRestore()
@@ -110,7 +110,7 @@ describe('publishOneModuleHelper', () => {
     let spy
     beforeEach(() => {
       spy = jest.spyOn(publishOneModuleHelperModule, 'batchUpdateOneModuleApiCall')
-      makeModuleWithItems(1, [117, 119], false)
+      makeModuleWithItems(1, 'Lesson 2', [117, 119], false)
     })
     afterEach(() => {
       spy.mockRestore()
@@ -133,8 +133,8 @@ describe('publishOneModuleHelper', () => {
   describe('batchUpdateOneModuleApiCall', () => {
     let spy, spy2
     beforeEach(() => {
-      makeModuleWithItems(1, [117, 119], false)
-      makeModuleWithItems(2, [217, 219], true)
+      makeModuleWithItems(1, 'Lesson 2', [117, 119], false)
+      makeModuleWithItems(2, 'Lesson 2', [217, 219], true)
 
       // the batch update
       doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: {published: true}})
@@ -267,8 +267,8 @@ describe('publishOneModuleHelper', () => {
   describe('updateModuleItemsPublishedStates', () => {
     let allModuleItems
     beforeEach(() => {
-      makeModuleWithItems(1, [117, 119])
-      makeModuleWithItems(2, [217, 219, 117])
+      makeModuleWithItems(1, 'Lesson 2', [117, 119])
+      makeModuleWithItems(2, 'Lesson 2', [217, 219, 117])
       allModuleItems = getAllModuleItems()
     })
 
@@ -322,8 +322,8 @@ describe('publishOneModuleHelper', () => {
 
   describe('updateModuleItemPublishedState', () => {
     beforeEach(() => {
-      makeModuleWithItems(1, [117, 119])
-      makeModuleWithItems(2, [217, 219, 117])
+      makeModuleWithItems(1, 'Lesson 2', [117, 119])
+      makeModuleWithItems(2, 'Lesson 2', [217, 219, 117])
     })
 
     it('calls updateModuleItem with all items for the same assignment', () => {
@@ -447,18 +447,18 @@ describe('publishOneModuleHelper', () => {
 
   describe('renderContextModulesPublishIcon', () => {
     beforeEach(() => {
-      makeModuleWithItems(2, [217, 219], false)
+      makeModuleWithItems(2, 'Lesson 2', [217, 219], false)
     })
     it('renders the ContextModulesPublishIcon', () => {
       renderContextModulesPublishIcon(1, 2, true, false, 'loading message')
-      expect(getByText(document.body, 'Module publish menu')).toBeInTheDocument()
+      expect(getByText(document.body, 'Lesson 2 Module publish options')).toBeInTheDocument()
     })
   })
 
   describe('getAllModuleItems', () => {
     beforeEach(() => {
-      makeModuleWithItems(1, [117, 119])
-      makeModuleWithItems(2, [217, 219, 117])
+      makeModuleWithItems(1, 'Lesson 2', [117, 119])
+      makeModuleWithItems(2, 'Lesson 2', [217, 219, 117])
     })
 
     it('finds all the module items', () => {

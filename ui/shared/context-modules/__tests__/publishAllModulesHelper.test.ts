@@ -57,8 +57,8 @@ describe('publishAllModulesHelper', () => {
 
   describe('batchUpdateAllModulesApiCall', () => {
     beforeEach(() => {
-      makeModuleWithItems(1, [117, 119], false)
-      makeModuleWithItems(2, [217, 219], true)
+      makeModuleWithItems(1, 'Lesson 2', [117, 119], false)
+      makeModuleWithItems(2, 'Lesson 2', [217, 219], true)
     })
 
     it('PUTS the batch request', async () => {
@@ -258,8 +258,8 @@ describe('publishAllModulesHelper', () => {
   describe('updateModulePendingPublishedStates', () => {
     let updateModuleSpy, updateItemsSpy
     beforeEach(() => {
-      makeModuleWithItems(1, [117, 119], false)
-      makeModuleWithItems(2, [217, 219], true)
+      makeModuleWithItems(1, 'Lesson 2', [117, 119], false)
+      makeModuleWithItems(2, 'Lesson 2', [217, 219], true)
     })
     afterEach(() => {
       updateModuleSpy?.mockRestore()
@@ -279,8 +279,8 @@ describe('publishAllModulesHelper', () => {
   describe('updateModulePublishedState', () => {
     let spy
     beforeEach(() => {
-      makeModuleWithItems(1, [117, 119], false)
-      makeModuleWithItems(2, [217, 219], true)
+      makeModuleWithItems(1, 'Lesson 2', [117, 119], false)
+      makeModuleWithItems(2, 'Lesson 2', [217, 219], true)
     })
     afterEach(() => {
       spy?.mockRestore()
