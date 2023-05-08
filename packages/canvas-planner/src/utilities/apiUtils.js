@@ -35,7 +35,7 @@ const getItemDetailsFromPlannable = apiResponse => {
     uniqueId: `${plannable_type}-${plannableId}`,
     location: plannable.location_name || null,
     address: plannable.location_address || null,
-    dateStyle: plannable.todo_date ? 'todo' : 'due'
+    dateStyle: plannable.todo_date ? 'todo' : 'due',
   }
   details.originallyCompleted = details.completed
   details.feedback = apiResponse.submissions ? apiResponse.submissions.feedback : undefined
@@ -57,6 +57,10 @@ const getItemDetailsFromPlannable = apiResponse => {
     details.onlineMeetingURL = plannable.online_meeting_url
   }
 
+  if (plannable_type === 'assignment') {
+    details.restrict_quantitative_data = plannable.restrict_quantitative_data
+  }
+
   return details
 }
 
@@ -68,7 +72,7 @@ const TYPE_MAPPING = {
   announcement: 'Announcement',
   planner_note: 'To Do',
   calendar_event: 'Calendar Event',
-  assessment_request: 'Peer Review'
+  assessment_request: 'Peer Review',
 }
 
 const getItemType = plannableType => {
@@ -107,7 +111,7 @@ export function transformApiToInternalItem(apiResponse, courses, groups, timeZon
     const group = groups.find(g => g.id === contextId) || {
       name: 'Unknown Group',
       color: '#666666',
-      url: undefined
+      url: undefined,
     }
     contextInfo.context = getGroupContext(apiResponse, group)
   }
@@ -135,7 +139,7 @@ export function transformApiToInternalItem(apiResponse, courses, groups, timeZon
       (apiResponse.plannable_type !== 'discussion_topic' || details.unread_count > 0),
     toggleAPIPending: false,
     date: plannableDate,
-    ...details
+    ...details,
   }
 }
 
@@ -161,7 +165,7 @@ export function transformPlannerNoteApiToInternalItem(plannerItemApiResponse, co
     title: plannerNote.title,
     date: moment.tz(plannerNote.todo_date, timeZone),
     details: plannerNote.details,
-    completed: false
+    completed: false,
   }
 }
 
@@ -179,7 +183,7 @@ export function transformInternalToApiItem(internalItem) {
     ...contextInfo,
     todo_date: internalItem.date,
     title: internalItem.title,
-    details: internalItem.details
+    details: internalItem.details,
   }
 }
 
@@ -195,7 +199,7 @@ export function transformInternalToApiOverride(internalItem, userId) {
     plannable_id: id,
     plannable_type: type,
     user_id: userId,
-    marked_complete: internalItem.completed
+    marked_complete: internalItem.completed,
   }
 }
 
@@ -231,7 +235,7 @@ function getCourseContext(course) {
     title: course.shortName || course.name,
     image_url: course.image || course.image_url,
     color: course.color,
-    url: course.href
+    url: course.href,
   }
 }
 
@@ -243,7 +247,7 @@ function getGroupContext(apiResponse, group) {
     title: group.name,
     image_url: undefined,
     color: group.color,
-    url: group.url
+    url: group.url,
   }
 }
 
@@ -295,7 +299,7 @@ const paramOrder = [
   'per_page',
   'observed_user_id',
   'context_codes',
-  'course_ids'
+  'course_ids',
 ]
 export function buildURL(url, params = {}) {
   const result = new URL(url, 'http://localhost/')
