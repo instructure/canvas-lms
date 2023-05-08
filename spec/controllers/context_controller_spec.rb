@@ -72,6 +72,27 @@ describe ContextController do
       expect(teacher_ids & [active_teacher.id, inactive_teacher.id]).to eq [active_teacher.id]
     end
 
+    it "only shows instructors in the same section as section-restricted student" do
+      my_course = create_course
+      my_student = user_factory(name: "mystudent")
+      my_teacher = user_factory(name: "myteacher")
+      other_teacher = user_factory(name: "otherteacher")
+      section1 = my_course.course_sections.create!(name: "Section 1")
+      section2 = my_course.course_sections.create!(name: "Section 2")
+      my_course.enroll_user(my_student, "StudentEnrollment", section: section1, enrollment_state: "active", limit_privileges_to_course_section: true)
+      my_course.enroll_user(my_teacher, "TeacherEnrollment", section: section1, enrollment_state: "active")
+      my_course.enroll_user(other_teacher, "TeacherEnrollment", section: section2, enrollment_state: "active")
+
+      my_group = my_course.groups.create!
+      my_group.add_user(my_student, "accepted")
+
+      user_session(my_student)
+      get "roster", params: { group_id: my_group.id }
+      teacher_ids = assigns[:secondary_users].each_value.first.map(&:id)
+      expect(teacher_ids).to eq [my_teacher.id]
+      expect(teacher_ids).not_to include other_teacher.id
+    end
+
     it "shows all group members to admins" do
       active_student = user_factory
       @course.enroll_student(active_student).accept!

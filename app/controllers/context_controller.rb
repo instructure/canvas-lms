@@ -138,7 +138,9 @@ class ContextController < ApplicationController
                end
       @primary_users = { t("roster.group_members", "Group Members") => @users }
       if (course = @context.context.is_a?(Course) && @context.context)
-        @secondary_users = { t("roster.teachers_and_tas", "Teachers & TAs") => course.participating_instructors.order_by_sortable_name.distinct }
+        instructors = course.participating_instructors.order_by_sortable_name.distinct
+        # UserSearch.scope_for makes the teachers and ta's list to match what api v1 is returning with respect to section restrictions
+        @secondary_users = { t("roster.teachers_and_tas", "Teachers & TAs") => instructors.select { |instructor| UserSearch.scope_for(course, @current_user).include?(instructor) } }
       end
     end
 
