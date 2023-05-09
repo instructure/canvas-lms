@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "activerecord"
   spec.add_development_dependency "bundler", ">= 1.5", "< 3"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "RedCloth"
-  spec.add_development_dependency "rspec", "~> 3.5.0"
+  spec.add_development_dependency "rspec", "~> 3.12"
+  spec.add_development_dependency "simplecov", "~> 0.22"
   spec.add_development_dependency "sqlite3"
 end

@@ -1,0 +1,23 @@
+PATH
+  remote: .
+  specs:
+    canvas_color (0.0.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rake (13.0.6)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  bundler (~> 2.2)
+  canvas_color!
+  rake
+
+BUNDLED WITH
+   2.4.10

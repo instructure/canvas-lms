@@ -27,7 +27,7 @@ group :test do
     gem "mime-types-data", "~> 3.2023", require: false
 
   rubocop_canvas_path = "gems/rubocop-canvas"
-  if File.dirname(Bundler.default_gemfile) == __dir__
+  if File.dirname(@gemfile) == __dir__
     rubocop_canvas_path = "../#{rubocop_canvas_path}"
   end
 

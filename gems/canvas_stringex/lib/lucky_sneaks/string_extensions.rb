@@ -23,28 +23,6 @@ module LuckySneaks
       base.extend(ClassMethods)
     end
 
-    # Returns the string converted (via Textile/RedCloth) to HTML format or
-    # self if Redcloth is not available.
-    #
-    # Using <tt>:lite</tt> argument will cause RedCloth to not wrap the HTML in a container
-    # P element, which is useful behavior for generating header element text, etc.
-    # This is roughly equivalent to ActionView's <tt>textilize_without_paragraph</tt>
-    # except that it makes RedCloth do all the work instead of just gsubbing the return
-    # from RedCloth.
-    def to_html(lite_mode = false)
-      if defined?(RedCloth)
-        if lite_mode
-          RedCloth.new(self, [:lite_mode]).to_html
-        elsif include?("<pre>")
-          RedCloth.new(self).to_html.tr("\t", "")
-        else
-          RedCloth.new(self).to_html.tr("\t", "").gsub(/\n\n/, "")
-        end
-      else
-        self
-      end
-    end
-
     # Create a URI-friendly representation of the string. This is used internally by
     # acts_as_url[link:classes/LuckySneaks/ActsAsUrl/ClassMethods.html#M000012]
     # but can be called manually in order to generate an URI-friendly version of any string.

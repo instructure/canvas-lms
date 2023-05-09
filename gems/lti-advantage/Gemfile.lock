@@ -45,14 +45,17 @@ GEM
       concurrent-ruby (~> 1.0)
 
 PLATFORMS
-  arm64-darwin-21
+  aarch64-linux
+  arm64-darwin
+  x86_64-darwin
+  x86_64-linux
 
 DEPENDENCIES
   bundler (~> 2.2)
   lti-advantage!
-  rake (~> 10.0)
+  rake
   redcarpet
   rspec (~> 3.0)
 
 BUNDLED WITH
-   2.4.10
+   2.3.26

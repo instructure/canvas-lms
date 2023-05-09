@@ -23,6 +23,8 @@ require "webmock"
 require "tempfile"
 require "multipart"
 
+WebMock.enable!
+
 describe "CanvasHttp" do
   include WebMock::API
 

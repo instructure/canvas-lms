@@ -1,7 +1,24 @@
+GIT
+  remote: https://github.com/kreynolds/cassandra-cql.git
+  revision: 02b5abbe441a345c051a180327932566fd66bb36
+  ref: 02b5abbe441a345c051a180327932566fd66bb36
+  specs:
+    cassandra-cql (1.2.3)
+      simple_uuid (>= 0.2.0)
+      thrift_client (>= 0.7.1, < 0.10)
+
+PATH
+  remote: ../config_file
+  specs:
+    config_file (0.1.0)
+      rails (>= 5.0)
+
 PATH
   remote: .
   specs:
-    config_file (0.1.0)
+    canvas_cassandra (0.1.0)
+      cassandra-cql (~> 1.2.2)
+      config_file
       rails (>= 5.0)
 
 GEM
@@ -78,6 +95,7 @@ GEM
     crass (1.0.6)
     diff-lcs (1.5.0)
     digest (3.1.1)
+    docile (1.4.0)
     erubi (1.12.0)
     globalid (1.1.0)
       activesupport (>= 5.0)
@@ -159,8 +177,18 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
     rspec-support (3.12.0)
+    simple_uuid (0.4.0)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.12.3)
+    simplecov_json_formatter (0.1.4)
     strscan (3.0.6)
     thor (1.2.1)
+    thrift (0.9.3.0)
+    thrift_client (0.9.3)
+      thrift (~> 0.9.0)
     timeout (0.3.2)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
@@ -176,10 +204,14 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler
+  bundler (~> 2.2)
   byebug
+  canvas_cassandra!
+  cassandra-cql (= 1.2.3)!
   config_file!
-  rspec
+  rake
+  rspec (~> 3.12)
+  simplecov (~> 0.22)
 
 BUNDLED WITH
    2.3.26

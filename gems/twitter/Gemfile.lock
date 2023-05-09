@@ -33,40 +33,37 @@ GEM
     concurrent-ruby (1.2.2)
     crass (1.0.6)
     diff-lcs (1.5.0)
-    hashie (4.1.0)
     i18n (1.13.0)
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.5)
     minitest (5.18.0)
+    nokogiri (1.13.8-aarch64-linux)
+      racc (~> 1.4)
     nokogiri (1.13.8-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.13.8-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.13.8-x86_64-linux)
+      racc (~> 1.4)
     oauth (0.5.4)
-      oauth-tty (~> 1.0, >= 1.0.1)
-      snaky_hash (~> 2.0)
-      version_gem (~> 1.1)
-    oauth-tty (1.0.5)
-      version_gem (~> 1.1, >= 1.1.1)
     racc (1.6.2)
     rake (13.0.6)
     rspec (3.12.0)
-      rspec-core (~> 3.5.0)
-      rspec-expectations (~> 3.5.0)
-      rspec-mocks (~> 3.5.0)
+      rspec-core (~> 3.12.0)
+      rspec-expectations (~> 3.12.0)
+      rspec-mocks (~> 3.12.0)
     rspec-core (3.12.1)
-      rspec-support (~> 3.5.0)
+      rspec-support (~> 3.12.0)
     rspec-expectations (3.12.2)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.5.0)
+      rspec-support (~> 3.12.0)
     rspec-mocks (3.12.5)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.5.0)
+      rspec-support (~> 3.12.0)
     rspec-support (3.12.0)
     sanitize (6.0.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    snaky_hash (2.0.1)
-      hashie
-      version_gem (~> 1.1, >= 1.1.1)
     twitter-text (3.1.0)
       idn-ruby
       unf (~> 0.1.0)
@@ -75,20 +72,21 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8.2)
-    version_gem (1.1.2)
 
 PLATFORMS
-  arm64-darwin-21
+  aarch64-linux
+  arm64-darwin
+  x86_64-darwin
+  x86_64-linux
 
 DEPENDENCIES
   bundler (~> 2.2)
   byebug
   canvas_text_helper!
   html_text_helper!
-  iconv (= 1.0.4)
   rake
-  rspec (~> 3.5.0)
+  rspec (~> 3.12)
   twitter!
 
 BUNDLED WITH
-   2.4.10
+   2.3.26
