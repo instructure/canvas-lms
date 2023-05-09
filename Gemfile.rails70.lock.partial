@@ -635,8 +635,8 @@ GEM
     http-accept (1.7.0)
     http-cookie (1.0.5)
       domain_name (~> 0.5)
-    httparty (0.18.1)
-      mime-types (~> 3.0)
+    httparty (0.21.0)
+      mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
     i18n (1.13.0)
       concurrent-ruby (~> 1.0)
@@ -813,9 +813,9 @@ GEM
       diff-lcs (~> 1.4)
       expgen (~> 0.1)
       term-ansicolor (~> 1.0)
-    pact_broker-client (1.66.0)
+    pact_broker-client (1.66.1)
       dig_rb (~> 1.0)
-      httparty (~> 0.18.1)
+      httparty (>= 0.21.0, < 1.0.0)
       rake (~> 13.0)
       table_print (~> 1.5)
       term-ansicolor (~> 1.7)
@@ -1273,7 +1273,7 @@ DEPENDENCIES
   headless (= 2.3.1)
   highline (= 2.0.3)
   html_text_helper!
-  httparty (= 0.18.1)
+  httparty (~> 0.21)
   i18n (~> 1.12)
   i18n_extraction!
   i18n_tasks!
