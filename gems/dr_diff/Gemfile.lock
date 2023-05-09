@@ -13,7 +13,7 @@ GEM
     gergich (2.1.1)
       httparty (~> 0.17)
       sqlite3 (~> 1.4)
-    httparty (0.18.1)
+    httparty (0.21.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
     method_source (1.0.0)
