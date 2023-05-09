@@ -107,7 +107,7 @@ gem "prawn-emoji", "~> 5.3", require: false
 gem "prawn-rails", "1.3.0"
   gem "matrix", "0.4.2" # Used to be a default gem but is no more, but prawn depends on it implicitly
 gem "prosopite", "~> 1.3"
-gem "rack", "2.2.3"
+gem "rack", "~> 2.2"
 gem "rack-brotli", "1.0.0"
 gem "rack-test", "1.1.0"
 gem "rake", "~> 13.0"

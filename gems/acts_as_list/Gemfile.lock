@@ -115,7 +115,7 @@ GEM
     nokogiri (1.13.8-x86_64-linux)
       racc (~> 1.4)
     racc (1.6.2)
-    rack (2.2.3)
+    rack (2.2.7)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (7.0.4.3)
