@@ -8,13 +8,13 @@ GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.5.0)
-    nokogiri (1.13.8-aarch64-linux)
+    nokogiri (1.13.10-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.13.8-arm64-darwin)
+    nokogiri (1.13.10-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.13.8-x86_64-darwin)
+    nokogiri (1.13.10-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.13.8-x86_64-linux)
+    nokogiri (1.13.10-x86_64-linux)
       racc (~> 1.4)
     racc (1.6.2)
     rake (13.0.6)
