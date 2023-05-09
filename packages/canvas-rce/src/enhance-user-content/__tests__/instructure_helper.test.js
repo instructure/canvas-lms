@@ -155,6 +155,21 @@ describe('enhanced_user_content/instructure_helpers', () => {
       showFilePreviewInOverlay(event, canvasOrigin)
       expect(window.postMessage).not.toHaveBeenCalled()
     })
+
+    it('posts a message when link is to a canvas file with a global id', () => {
+      const link = document.createElement('a')
+      link.href = 'http://localhost/users/1/files/17~76640'
+      const event = makeEvent({target: link})
+      showFilePreviewInOverlay(event, canvasOrigin)
+      expect(window.postMessage).toHaveBeenCalledWith(
+        {
+          subject: 'preview_file',
+          file_id: '17~76640',
+          verifier: null,
+        },
+        canvasOrigin
+      )
+    })
   })
 
   describe('showFilePreviewInline', () => {

@@ -137,7 +137,7 @@ GEM
       railties (>= 6.1, < 7.1)
     i18n (1.13.0)
       concurrent-ruby (~> 1.0)
-    inst-jobs (3.1.8)
+    inst-jobs (3.1.10)
       activerecord (>= 6.0)
       activerecord-pg-extensions (~> 0.4.4)
       activesupport (>= 6.0)

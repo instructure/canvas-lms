@@ -230,3 +230,9 @@ Object.defineProperty(window, 'location', {
   // Prevents JSDOM errors from doing window.location = ...
   set: () => {},
 })
+
+if (!('structuredClone' in window)) {
+  Object.defineProperty(window, 'structuredClone', {
+    value: obj => JSON.parse(JSON.stringify(obj)),
+  })
+}

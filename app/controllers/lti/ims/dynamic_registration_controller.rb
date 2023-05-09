@@ -25,7 +25,6 @@ module Lti
       def create
         tool_registration_url = params.require(:registration_url) # redirect to this
         issuer_url = Canvas::Security.config["lti_iss"]
-        canvas_registrations_url = issuer_url + "/api/lti/ims/registrations"
         current_time = DateTime.now.iso8601
         user_id = @current_user.id
         root_account_uuid = @domain_root_account.uuid
@@ -33,7 +32,6 @@ module Lti
         oidc_configuration_url = issuer_url + "/api/lti/ims/security/openid-configuration"
 
         jwt = Canvas::Security.create_jwt({
-                                            registrations_url: canvas_registrations_url,
                                             initiated_at: current_time,
                                             user_id: user_id,
                                             root_account_uuid: root_account_uuid

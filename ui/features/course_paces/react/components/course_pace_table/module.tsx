@@ -55,7 +55,7 @@ interface PassedProps {
 
 type ComponentProps = PassedProps
 
-export const Module: React.FC<ComponentProps> = props => {
+export const Module = (props: ComponentProps) => {
   const [actuallyExpanded, setActuallyExpanded] = useState(props.showProjections)
   const [datesVisible, setDatesVisible] = useState(props.showProjections)
   const wasExpanded = useRef(props.showProjections)

@@ -97,6 +97,18 @@ describe CalendarsController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
+    it "sets account's auto_subscribe if auto_subscribe_account_calendars flag is on" do
+      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
+      account = @user.account
+      account.account_calendar_visible = true
+      account.account_calendar_subscription_type = "auto"
+      account.save!
+      @admin = account_admin_user(account: account, active_all: true)
+      @admin.set_preference(:enabled_account_calendars, account.id)
+      get "show"
+      expect(assigns[:contexts_json].find { |c| c[:type] == "account" }[:auto_subscribe]).to be(true)
+    end
+
     it "sets context.course_sections.can_create_ag based off :manage_calendar permission" do
       @section1 = @course.default_section
       @section2 = @course.course_sections.create!(name: "Section 2")

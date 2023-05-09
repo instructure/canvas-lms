@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useRef} from 'react'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -47,7 +47,7 @@ interface Props {
 }
 export const PUBLISH_STATUS_POLLING_MS = 1000
 
-const ContextModulesPublishModal: React.FC<Props> = ({
+const ContextModulesPublishModal = ({
   isOpen,
   onCancel,
   onClose,
@@ -58,12 +58,15 @@ const ContextModulesPublishModal: React.FC<Props> = ({
   progressId,
   progressCurrent,
   title,
-}) => {
+}: Props) => {
+  const closeButtonRef = useRef()
+
   const handlePublish = () => {
     if (isPublishing) {
       onCancel()
     } else {
       onPublish()
+      closeButtonRef.current.focus()
     }
   }
 
@@ -104,6 +107,7 @@ const ContextModulesPublishModal: React.FC<Props> = ({
           offset="small"
           onClick={onClose}
           screenReaderLabel={I18n.t('Close')}
+          elementRef={el => (closeButtonRef.current = el)}
         />
         <Heading>{title}</Heading>
       </Modal.Header>

@@ -35,7 +35,7 @@ export type ComponentProps = {
   onConfirm: () => void
 }
 
-export const ResetPaceWarningModal: React.FC<ComponentProps> = ({open, onCancel, onConfirm}) => (
+export const ResetPaceWarningModal = ({open, onCancel, onConfirm}: ComponentProps) => (
   <Modal
     data-testid="reset-changes-modal"
     size="small"

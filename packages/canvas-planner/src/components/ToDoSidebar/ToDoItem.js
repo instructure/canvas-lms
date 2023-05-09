@@ -30,7 +30,7 @@ import {
   IconNoteLine,
   IconCalendarMonthLine,
   IconDocumentLine,
-  IconPeerReviewLine
+  IconPeerReviewLine,
 } from '@instructure/ui-icons'
 
 import {func, shape, object, arrayOf, number, string, bool} from 'prop-types'
@@ -92,9 +92,9 @@ export default class ToDoItem extends React.Component {
     this.props.handleDismissClick(this.props.item)
   }
 
-  getInformationRow = (dueAt, points) => {
+  getInformationRow = (dueAt, points, restrictQuantitativeData) => {
     const toDisplay = []
-    if (points) {
+    if (points && !restrictQuantitativeData) {
       toDisplay.push(
         <InlineList.Item key="points">
           {formatMessage('{numPoints} points', {numPoints: points})}
@@ -142,8 +142,12 @@ export default class ToDoItem extends React.Component {
           <Text color="secondary" size="small" weight="bold" lineHeight="fit">
             {getContextShortName(this.props.courses, this.props.item.course_id)}
           </Text>
-          <InlineList delimiter="pipe" size="small">
-            {this.getInformationRow(this.props.item.date, this.props.item.points)}
+          <InlineList delimiter="pipe" size="small" data-testid="ToDoSidebarItem__InformationRow">
+            {this.getInformationRow(
+              this.props.item.date,
+              this.props.item.points,
+              this.props.item?.restrict_quantitative_data
+            )}
           </InlineList>
         </div>
         {!this.props.isObserving && (
@@ -152,7 +156,7 @@ export default class ToDoItem extends React.Component {
               size="small"
               onClick={this.handleClick}
               screenReaderLabel={formatMessage('Dismiss {itemTitle}', {
-                itemTitle: this.props.item.title
+                itemTitle: this.props.item.title,
               })}
               elementRef={elt => {
                 this.buttonRef = elt
@@ -172,10 +176,10 @@ ToDoItem.propTypes = {
     type: string,
     course_id: string,
     date: object, // moment
-    points: number
+    points: number,
   }),
   courses: arrayOf(object).isRequired,
   handleDismissClick: func.isRequired,
   timeZone: string,
-  isObserving: bool
+  isObserving: bool,
 }

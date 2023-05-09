@@ -56,7 +56,7 @@ interface Props {
 // TODO: remove and replace MenuItem with Menu.Item below when on v8
 const {Item: MenuItem} = Menu as any
 
-const ContextModulesPublishMenu: React.FC<Props> = ({courseId, runningProgressId, disabled}) => {
+const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Props) => {
   const [isPublishing, setIsPublishing] = useState(!!runningProgressId)
   const [isCanceling, setIsCanceling] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)

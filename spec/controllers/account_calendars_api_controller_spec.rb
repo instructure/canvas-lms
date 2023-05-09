@@ -399,6 +399,25 @@ describe AccountCalendarsApiController do
       expect(@root_account.reload.account_calendar_visible).to be_falsey
       expect(@root_account.account_calendar_subscription_type).to eq "manual"
     end
+
+    it "only updates provided attributes" do
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      @subaccount1.update!(account_calendar_subscription_type: "auto")
+      user_session(@user)
+      put :bulk_update, params: {
+        account_id: @root_account,
+        _json: [{ id: @root_account.id, auto_subscribe: true }, { id: @subaccount1.id, visible: true }]
+      }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json["message"]).to eq "Updated 2 accounts"
+
+      expect(@root_account.reload.account_calendar_visible).to be_truthy
+      expect(@root_account.account_calendar_subscription_type).to eq "auto"
+      expect(@subaccount1.reload.account_calendar_visible).to be_truthy
+      expect(@subaccount1.account_calendar_subscription_type).to eq "auto"
+    end
   end
 
   describe "GET 'all_calendars'" do

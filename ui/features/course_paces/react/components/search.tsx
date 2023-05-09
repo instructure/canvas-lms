@@ -53,14 +53,14 @@ export interface PassedProps {
 
 type ComponentProps = StoreProps & DispatchProps & PassedProps
 
-export const Search: React.FC<ComponentProps> = ({
+export const Search = ({
   searchTerm,
   fetchPaceContexts,
   setSearchTerm,
   contextType,
   currentOrderType,
   currentSortBy,
-}) => {
+}: ComponentProps) => {
   const handleClear = e => {
     e.stopPropagation()
     setSearchTerm('')

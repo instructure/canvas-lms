@@ -83,7 +83,7 @@ const UNESCAPE_ENTITIES = Object.keys(ENTITIES).reduce((map, key) => {
 const unescapeSource = `(?:${Object.keys(UNESCAPE_ENTITIES).join('|')})`
 const UNESCAPE_REGEX = new RegExp(unescapeSource, 'g')
 
-function unescape(str: string) {
+export function unescape(str: string) {
   return str.replace(UNESCAPE_REGEX, match => UNESCAPE_ENTITIES[match])
 }
 

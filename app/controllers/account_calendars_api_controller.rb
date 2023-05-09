@@ -221,13 +221,13 @@ class AccountCalendarsApiController < ApplicationController
     account_scope = Account.active
 
     ids_to_enable_visible = data.select { |c| value_to_boolean(c["visible"]) }.pluck("id")
-    ids_to_disable_visible = data.reject { |c| value_to_boolean(c["visible"]) }.pluck("id")
+    ids_to_disable_visible = data.select { |c| !value_to_boolean(c["visible"]) && !c["visible"].nil? }.pluck("id")
     account_scope.where(id: ids_to_enable_visible).update_all(account_calendar_visible: true)
     account_scope.where(id: ids_to_disable_visible).update_all(account_calendar_visible: false)
 
     if Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars)
       ids_to_enable_auto_subscribe = data.select { |c| value_to_boolean(c["auto_subscribe"]) }.pluck("id")
-      ids_to_disable_auto_subscribe = data.reject { |c| value_to_boolean(c["auto_subscribe"]) }.pluck("id")
+      ids_to_disable_auto_subscribe = data.select { |c| !value_to_boolean(c["auto_subscribe"]) && !c["auto_subscribe"].nil? }.pluck("id")
       account_scope.where(id: ids_to_enable_auto_subscribe).update_all(account_calendar_subscription_type: "auto")
       account_scope.where(id: ids_to_disable_auto_subscribe).update_all(account_calendar_subscription_type: "manual")
     end

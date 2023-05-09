@@ -333,7 +333,7 @@ class MediaObject < ActiveRecord::Base
     true
   end
 
-  def updated_viewed_at_and_retrieve_details(time, current_attachment)
+  def updated_viewed_at_and_retrieve_details(time, current_attachment = nil)
     self.current_attachment = current_attachment if current_attachment
     self.data[:last_viewed_at] = [time, self.data[:last_viewed_at]].compact.max
     retrieve_details

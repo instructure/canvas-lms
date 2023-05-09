@@ -38,12 +38,12 @@ type ComponentProps = {
   readonly enableSaveButton: boolean
 }
 
-export const Footer: React.FC<ComponentProps> = ({
+export const Footer = ({
   originAccountId,
   visibilityChanges,
   onApplyClicked,
   enableSaveButton,
-}) => {
+}: ComponentProps) => {
   const [initialEnabledCalendarsCount, setInitialEnabledCalendarsCount] = useState<
     number | undefined
   >(undefined)

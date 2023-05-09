@@ -173,6 +173,17 @@ describe('ContextModulesPublishMenu', () => {
         queryByRole('heading', {name: 'Publish all modules and items'})
       ).not.toBeInTheDocument()
     })
+
+    it('puts focus on close button when clicking continue', () => {
+      const {getByRole, getByText, getByTestId, getAllByRole} = render(
+        <ContextModulesPublishMenu {...defaultProps} />
+      )
+      act(() => getByRole('button').click())
+      act(() => getByText('Publish all modules and items').click())
+      act(() => getByTestId('publish-button').click())
+      const closeButton = getAllByRole('button', {name: 'Close'})[0]
+      expect(closeButton).toHaveFocus()
+    })
   })
 
   describe('error handling', () => {
