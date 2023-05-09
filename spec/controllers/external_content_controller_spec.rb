@@ -458,6 +458,13 @@ describe ExternalContentController do
           expect(subject).to be_successful
         end
 
+        context "when the disable_oembed_retrieve feature flag is enabled" do
+          it "returns a 410 gone" do
+            Account.default.enable_feature!(:disable_oembed_retrieve)
+            expect(subject.status).to eq(410)
+          end
+        end
+
         context "when a disabled tool shares the same consumer key" do
           before do
             disabled_tool = tool.dup
