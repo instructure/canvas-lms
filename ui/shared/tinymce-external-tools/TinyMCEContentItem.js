@@ -19,6 +19,11 @@
 import $ from 'jquery'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
+import {
+  isStudioContentItemCustomJson,
+  studioAttributesFrom,
+  displayStyleFrom,
+} from '@instructure/canvas-rce/es/rce/plugins/shared/StudioLtiSupportUtils'
 
 const LTI_MIME_TYPES = [
   'application/vnd.ims.lti.v1.ltilink',
@@ -67,6 +72,12 @@ ContentItem.fromJSON = function (obj) {
 
 const TinyMCEPayloadGenerators = {
   iframe(tinyMCEContentItem) {
+    const studioAttributes =
+      ENV?.FEATURES?.rce_show_studio_media_options &&
+      isStudioContentItemCustomJson(tinyMCEContentItem?.custom)
+        ? studioAttributesFrom(tinyMCEContentItem.custom)
+        : {}
+
     return $('<div/>')
       .append(
         $('<iframe/>', {
@@ -76,11 +87,15 @@ const TinyMCEPayloadGenerators = {
           webkitallowfullscreen: 'true',
           mozallowfullscreen: 'true',
           allow: iframeAllowances(),
+          'data-studio-resizable': studioAttributes['data-studio-resizable'],
+          'data-studio-tray-enabled': studioAttributes['data-studio-tray-enabled'],
+          'data-studio-convertible-to-link': studioAttributes['data-studio-convertible-to-link'],
         })
           .addClass(tinyMCEContentItem.class)
           .css({
             width: tinyMCEContentItem.placementAdvice.displayWidth,
             height: tinyMCEContentItem.placementAdvice.displayHeight,
+            display: displayStyleFrom(studioAttributes),
           })
           .attr({
             width: tinyMCEContentItem.placementAdvice.displayWidth,
