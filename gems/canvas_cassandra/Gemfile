@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 source "https://rubygems.org"
-gem "simplecov", "0.14.1", require: false
-# Specify your gem's dependencies in canvas_cassandra.gemspec
+
 gemspec
 
-gem "cassandra-cql", "1.2.2", github: "kreynolds/cassandra-cql", ref: "beed72e249d02cebc850a4b92b468c8b64b12257"
+gem "cassandra-cql", "1.2.3", github: "kreynolds/cassandra-cql", ref: "02b5abbe441a345c051a180327932566fd66bb36"
 gem "config_file", path: "../config_file"

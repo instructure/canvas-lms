@@ -11,7 +11,3 @@ gem "utf8_cleaner", path: "../utf8_cleaner"
 # a dependency of html_text_helper that bundler doesn't know how to resolve
 # here.  I've reached out to the bundler team, but no word yet
 gem "canvas_text_helper", path: "../canvas_text_helper"
-
-platforms :ruby_20, :ruby_21, :ruby_22 do
-  gem "iconv", "1.0.4"
-end

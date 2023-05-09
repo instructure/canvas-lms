@@ -2,9 +2,10 @@ PATH
   remote: ../gems/rubocop-canvas
   specs:
     rubocop-canvas (1.0.0)
-      activesupport (>= 6.0)
+      activesupport (~> 7.0.4)
       jira_ref_parser (= 1.0.1)
-      outrigger (~> 3.0)
+      outrigger (~> 3.0, >= 3.0.1)
+      railties (~> 7.0.4)
       rubocop (~> 1.19)
       rubocop-rails (~> 2.19)
 
@@ -57,7 +58,13 @@ GEM
     mini_mime (1.1.2)
     minitest (5.18.0)
     multi_xml (0.6.0)
+    nokogiri (1.13.8-aarch64-linux)
+      racc (~> 1.4)
     nokogiri (1.13.8-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.13.8-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.13.8-x86_64-linux)
       racc (~> 1.4)
     outrigger (3.0.1)
       activerecord (>= 6.0, < 7.1)
@@ -68,7 +75,7 @@ GEM
     racc (1.6.2)
     rack (2.2.3)
     rack-test (1.1.0)
-      rack (>= 1.3)
+      rack (>= 1.0, < 3)
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
@@ -117,7 +124,10 @@ GEM
       rubocop (~> 1.33)
       rubocop-capybara (~> 2.17)
     ruby-progressbar (1.11.0)
+    sqlite3 (1.6.2-aarch64-linux)
     sqlite3 (1.6.2-arm64-darwin)
+    sqlite3 (1.6.2-x86_64-darwin)
+    sqlite3 (1.6.2-x86_64-linux)
     thor (1.2.1)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
@@ -125,10 +135,12 @@ GEM
     zeitwerk (2.6.8)
 
 PLATFORMS
+  aarch64-linux
   arm64-darwin
+  x86_64-darwin
+  x86_64-linux
 
 DEPENDENCIES
-  activerecord (~> 7.0.4)
   gergich (= 2.1.1)
   mime-types-data (~> 3.2023)
   rubocop-canvas!
@@ -139,4 +151,4 @@ DEPENDENCIES
   rubocop-rspec (= 2.19.0)
 
 BUNDLED WITH
-   2.4.10
+   2.3.26

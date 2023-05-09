@@ -144,9 +144,10 @@ PATH
   remote: gems/rubocop-canvas
   specs:
     rubocop-canvas (1.0.0)
-      activesupport (>= 6.0)
+      activesupport (~> 7.0.4)
       jira_ref_parser (= 1.0.1)
-      outrigger (~> 3.0)
+      outrigger (~> 3.0, >= 3.0.1)
+      railties (~> 7.0.4)
       rubocop (~> 1.19)
       rubocop-rails (~> 2.19)
 

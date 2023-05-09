@@ -1,8 +1,59 @@
+GIT
+  remote: https://github.com/kreynolds/cassandra-cql.git
+  revision: 02b5abbe441a345c051a180327932566fd66bb36
+  ref: 02b5abbe441a345c051a180327932566fd66bb36
+  specs:
+    cassandra-cql (1.2.3)
+      simple_uuid (>= 0.2.0)
+      thrift_client (>= 0.7.1, < 0.10)
+
 PATH
-  remote: .
+  remote: ../bookmarked_collection
+  specs:
+    bookmarked_collection (1.0.0)
+      folio-pagination (~> 0.0.12)
+      json_token
+      paginated_collection
+      rails (>= 3.2)
+      will_paginate (~> 3.0)
+
+PATH
+  remote: ../canvas_cassandra
+  specs:
+    canvas_cassandra (0.1.0)
+      cassandra-cql (~> 1.2.2)
+      config_file
+      rails (>= 5.0)
+
+PATH
+  remote: ../config_file
   specs:
     config_file (0.1.0)
       rails (>= 5.0)
+
+PATH
+  remote: ../json_token
+  specs:
+    json_token (0.0.1)
+      json
+
+PATH
+  remote: ../paginated_collection
+  specs:
+    paginated_collection (1.0.0)
+      folio-pagination (~> 0.0.12)
+      will_paginate (~> 3.0)
+
+PATH
+  remote: .
+  specs:
+    event_stream (0.1.0)
+      bookmarked_collection
+      canvas_cassandra
+      inst_statsd
+      json_token
+      paginated_collection
+      rails (>= 4.2)
 
 GEM
   remote: https://rubygems.org/
@@ -72,17 +123,26 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
+    aroi (0.0.7)
+      rails (>= 3.2)
     builder (3.2.4)
-    byebug (11.1.3)
     concurrent-ruby (1.2.2)
     crass (1.0.6)
     diff-lcs (1.5.0)
     digest (3.1.1)
+    docile (1.4.0)
+    dogstatsd-ruby (4.8.2)
     erubi (1.12.0)
+    folio-pagination (0.0.12)
     globalid (1.1.0)
       activesupport (>= 5.0)
     i18n (1.13.0)
       concurrent-ruby (~> 1.0)
+    inst_statsd (2.2.0)
+      aroi (>= 0.0.7)
+      dogstatsd-ruby (~> 4.2)
+      statsd-ruby (~> 1.0)
+    json (2.6.3)
     loofah (2.20.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -159,14 +219,30 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
     rspec-support (3.12.0)
+    simple_uuid (0.4.0)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.12.3)
+    simplecov_json_formatter (0.1.4)
+    sqlite3 (1.6.2-aarch64-linux)
+    sqlite3 (1.6.2-arm64-darwin)
+    sqlite3 (1.6.2-x86_64-darwin)
+    sqlite3 (1.6.2-x86_64-linux)
+    statsd-ruby (1.4.0)
     strscan (3.0.6)
     thor (1.2.1)
+    thrift (0.9.3.0)
+    thrift_client (0.9.3)
+      thrift (~> 0.9.0)
     timeout (0.3.2)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    will_paginate (3.3.0)
     zeitwerk (2.6.8)
 
 PLATFORMS
@@ -176,10 +252,17 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler
-  byebug
+  bookmarked_collection!
+  bundler (~> 2.2)
+  canvas_cassandra!
+  cassandra-cql (= 1.2.3)!
   config_file!
-  rspec
+  event_stream!
+  json_token!
+  paginated_collection!
+  rspec (~> 3.12)
+  simplecov (~> 0.22)
+  sqlite3
 
 BUNDLED WITH
    2.3.26

@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    config_file (0.1.0)
-      rails (>= 5.0)
+    workflow (0.0.1)
+      rails (>= 3.2)
 
 GEM
   remote: https://rubygems.org/
@@ -73,7 +73,6 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
     builder (3.2.4)
-    byebug (11.1.3)
     concurrent-ruby (1.2.2)
     crass (1.0.6)
     diff-lcs (1.5.0)
@@ -176,10 +175,10 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler
-  byebug
-  config_file!
-  rspec
+  bundler (~> 2.2)
+  rake
+  rspec (~> 3.12)
+  workflow!
 
 BUNDLED WITH
    2.3.26
