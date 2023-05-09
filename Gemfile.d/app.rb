@@ -113,7 +113,7 @@ gem "rack-test", "1.1.0"
 gem "rake", "~> 13.0"
 gem "rails-observers", "0.1.5"
 gem "ratom-nokogiri", "0.10.11", require: false
-gem "redcarpet", "3.5.0", require: false
+gem "redcarpet", "~> 3.6", require: false
 gem "regexp_parser", "2.7.0", require: false
 gem "retriable", "1.4.1"
 gem "ritex", "1.0.1", require: false
