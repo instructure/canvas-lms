@@ -861,7 +861,7 @@ GEM
     pygments.rb (2.2.0)
     raabro (1.4.0)
     racc (1.6.2)
-    rack (2.2.3)
+    rack (2.2.7)
     rack-brotli (1.0.0)
       brotli (>= 0.1.7)
       git-version-bump (>= 0.15)
@@ -1336,7 +1336,7 @@ DEPENDENCIES
   pry-byebug (= 3.10.1)
   puma (~> 5.6.5)
   qti_exporter!
-  rack (= 2.2.3)
+  rack (~> 2.2)
   rack-brotli (= 1.0.0)
   rack-test (= 1.1.0)
   rails (~> 7.0.4)
