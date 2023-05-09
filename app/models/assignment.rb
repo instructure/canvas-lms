@@ -2045,11 +2045,6 @@ class Assignment < ActiveRecord::Base
     submissions.compact
   end
 
-  def grade_for_student(student)
-    submission = submission_for_student(student)
-    (submission.grade.presence || submission.excused?) ? s.grade : nil
-  end
-
   def tool_settings_resource_codes
     lookup = assignment_configuration_tool_lookups.first
     return {} unless lookup.present?

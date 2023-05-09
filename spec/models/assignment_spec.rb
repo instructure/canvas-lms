@@ -2109,16 +2109,6 @@ describe Assignment do
     end
   end
 
-  context "grade for student" do
-    it "returns the grade for the student" do
-      student = student_in_course(active_all: true).user
-      assignment = @course.assignments.create!(assignment_valid_attributes)
-      submission = Submission.where(assignment_id: assignment.id, user_id: student.id).first
-
-      expect(assignment.grade_for_student(student)).to eql(submission.grade)
-    end
-  end
-
   context "group assignments with all students assigned to a group and grade_group_students_individually set to true" do
     include GroupsCommon
     it "sorts by sortable_name" do
