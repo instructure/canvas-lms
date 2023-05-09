@@ -64,6 +64,11 @@ class GradebooksController < ApplicationController
 
     log_asset_access(["grades", @context], "grades", "other")
 
+    js_env({
+             course_id: @context.id,
+             restrict_quantitative_data: @context.restrict_quantitative_data?(@current_user),
+             student_grade_summary_upgrade: Account.site_admin.feature_enabled?(:student_grade_summary_upgrade),
+           })
     return render :grade_summary_list unless @presenter.student
 
     add_crumb(@presenter.student_name, named_context_url(@context,
