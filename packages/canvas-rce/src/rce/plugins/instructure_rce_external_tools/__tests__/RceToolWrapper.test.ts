@@ -171,6 +171,54 @@ describe('RceExternalToolHelper', () => {
       expect(config.image).toEqual('example.com')
     })
 
+    it('supports icon_url inside canvas_icon_class', function () {
+      const config = new RceToolWrapper(
+        externalToolsEnvFor(fakeEditor),
+        {
+          name: 'SomeName',
+          id: '_SomeId',
+          canvas_icon_class: {
+            icon_url: 'example.com',
+          },
+        },
+        []
+      )
+      expect(config.iconId).toEqual('lti_tool__SomeId')
+      expect(config.image).toEqual('example.com')
+    })
+
+    it('prefers top-level icon_url over one inside canvas_icon_class', function () {
+      const config = new RceToolWrapper(
+        externalToolsEnvFor(fakeEditor),
+        {
+          name: 'SomeName',
+          id: '_SomeId',
+          icon_url: 'example.com',
+          canvas_icon_class: {
+            icon_url: 'example2.com',
+          },
+        },
+        []
+      )
+      expect(config.iconId).toEqual('lti_tool__SomeId')
+      expect(config.image).toEqual('example.com')
+    })
+
+    it('handles non-string values where strings are expected', function () {
+      expect(() => {
+        new RceToolWrapper(
+          externalToolsEnvFor(fakeEditor),
+          {
+            name: 'SomeName',
+            id: '_SomeId',
+            icon_url: {a: 'whatever'},
+            canvas_icon_class: {b: 'something else'},
+          },
+          []
+        )
+      }).not.toThrow()
+    })
+
     it('handles number and string ids', function () {
       expect(
         RceToolWrapper.forEditorEnv(

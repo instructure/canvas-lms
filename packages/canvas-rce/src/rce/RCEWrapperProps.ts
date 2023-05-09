@@ -71,7 +71,15 @@ export const ltiToolsPropType = PropTypes.arrayOf(
     height: PropTypes.number,
     width: PropTypes.number,
     use_tray: PropTypes.bool,
-    canvas_icon_class: PropTypes.string,
+    canvas_icon_class: PropTypes.oneOfType([
+      PropTypes.string,
+
+      // Sometimes this is an object with an icon_url. Not sure why, see MAT-1354
+      PropTypes.shape({
+        icon_url: PropTypes.string,
+      }),
+      PropTypes.any,
+    ]),
   })
 )
 

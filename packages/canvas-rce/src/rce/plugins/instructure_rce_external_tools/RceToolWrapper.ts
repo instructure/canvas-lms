@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -22,6 +21,7 @@ import {openToolDialogFor} from './dialog-helper'
 import {simpleCache} from '../../../util/simpleCache'
 import {instUiIconsArray} from '../../../util/instui-icon-helper'
 
+// @ts-ignore
 import {IconLtiSolid} from '@instructure/ui-icons/es/svg'
 
 export interface ExternalToolMenuItem {
@@ -77,7 +77,7 @@ export class RceToolWrapper {
   }
 
   get image(): string | null | undefined {
-    return this.toolInfo.icon_url
+    return parseIconValueFor(this.toolInfo)?.iconUrl
   }
 
   get width(): number | null | undefined {
@@ -116,21 +116,51 @@ export class RceToolWrapper {
   }
 }
 
+export function parseIconValueFor(toolInfo: RceLtiToolInfo) {
+  const result: {
+    iconUrl?: string
+    canvasIconClass?: string
+  } = {}
+
+  const canvasIconClass = toolInfo.canvas_icon_class
+
+  // URL embedded in canvas_icon_class, which happens in some cases (see MAT-1354)
+  if (typeof canvasIconClass === 'object') {
+    const iconUrl = canvasIconClass?.icon_url
+
+    if (typeof iconUrl === 'string' && iconUrl !== '') {
+      result.iconUrl = iconUrl
+    }
+  }
+
+  // URL at the top level takes precedence
+  if (typeof toolInfo.icon_url === 'string' && toolInfo.icon_url !== '') {
+    result.iconUrl = toolInfo.icon_url
+  }
+
+  // Icon class as string
+  if (typeof canvasIconClass === 'string' && canvasIconClass !== '') {
+    result.canvasIconClass = canvasIconClass
+  }
+
+  return result
+}
+
 function registerToolIcon(env: ExternalToolsEnv, toolInfo: RceLtiToolInfo): string | undefined {
   if (env.editor == null) return undefined
 
   const iconId = 'lti_tool_' + String(toolInfo.id)
 
-  const iconUrl = toolInfo.icon_url ?? ''
+  const {iconUrl, canvasIconClass} = parseIconValueFor(toolInfo)
 
   // We need to strip off the icon- or icon_ prefix from the icon class name to match instui icons
-  const iconGlyphName = (toolInfo.canvas_icon_class ?? '').replace(/^icon[-_]/, '')
+  const iconGlyphName = (canvasIconClass ?? '').replace(/^icon[-_]/, '')
 
-  if (iconUrl.length > 0) {
+  if (iconUrl != null && iconUrl.length > 0) {
     // Icon image provided
     env.editor.ui.registry.addIcon(iconId, svgImageCache.get(iconUrl))
     return iconId
-  } else if (iconGlyphName.length > 0) {
+  } else if (iconGlyphName != null && iconGlyphName.length > 0) {
     // InstUI icon used
     const instUiIcon = instUiIconsArray.find(
       it => it.variant === 'Line' && it.glyphName === iconGlyphName
