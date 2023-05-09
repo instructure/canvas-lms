@@ -59,6 +59,8 @@ module Types
       object.hide_grade_from_student?
     end
 
+    field :grading_period_id, ID, null: true
+
     field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
       argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
     end
