@@ -1085,23 +1085,24 @@ describe User do
       end
 
       it "calls #includes_subset_of_course_admin_permissions? if self is a course admin user" do
-        allow_any_instance_of(User).to receive(:includes_subset_of_course_admin_permissions?).and_return(true)
         course_admin = user_with_pseudonym(username: "nobody@example.com")
         course_with_user("TeacherEnrollment", user: course_admin)
         admin = user_with_pseudonym(username: "nobody2@example.com")
         @account.account_users.create!(user: admin)
-        expect_any_instance_of(User).to receive(:includes_subset_of_course_admin_permissions?).once
-        course_admin.can_masquerade?(admin, @account)
+        expect(course_admin).to receive(:includes_subset_of_course_admin_permissions?).once.and_return(false)
+        expect(course_admin).not_to receive(:has_subset_of_account_permissions?)
+        expect(course_admin.can_masquerade?(admin, @account)).to be false
       end
 
-      it "does not call #includes_subset_of_course_admin_permissions? if self is an account user" do
-        allow_any_instance_of(User).to receive(:includes_subset_of_course_admin_permissions?).and_return(true)
-        admin = user_with_pseudonym(username: "nobody@example.com")
-        admin2 = user_with_pseudonym(username: "nobody2@example.com")
+      it "checks both account and course permissions if masquerade target is a teacher and an account admin" do
+        super_teacher = user_with_pseudonym(username: "nobody@example.com")
+        course_with_user("TeacherEnrollment", user: super_teacher)
+        @account.account_users.create!(user: super_teacher)
+        admin = user_with_pseudonym(username: "nobody2@example.com")
         @account.account_users.create!(user: admin)
-        @account.account_users.create!(user: admin2)
-        expect_any_instance_of(User).not_to receive(:includes_subset_of_course_admin_permissions?)
-        admin.can_masquerade?(admin2, @account)
+        expect(super_teacher).to receive(:includes_subset_of_course_admin_permissions?).once.and_return(true)
+        expect(super_teacher).to receive(:has_subset_of_account_permissions?).once.and_return(false)
+        expect(super_teacher.can_masquerade?(admin, @account)).to be false
       end
 
       it "does not allow restricted admins to become course admins with elevated permissions" do
