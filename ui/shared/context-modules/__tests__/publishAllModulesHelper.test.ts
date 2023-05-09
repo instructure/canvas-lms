@@ -203,7 +203,11 @@ describe('publishAllModulesHelper', () => {
       const onCancelComplete = jest.fn()
       cancelBatchUpdate({id: '17', workflow_state: 'running'}, onCancelComplete)
       expect(doFetchApi).toHaveBeenCalledTimes(1)
-      expect(doFetchApi).toHaveBeenCalledWith({method: 'POST', path: '/api/v1/progress/17/cancel'})
+      expect(doFetchApi).toHaveBeenCalledWith({
+        method: 'POST',
+        path: '/api/v1/progress/17/cancel',
+        body: {message: 'canceled'},
+      })
       await waitFor(() => expect(onCancelComplete).toHaveBeenCalled())
       expect(onCancelComplete).toHaveBeenCalledTimes(1)
       expect(onCancelComplete).toHaveBeenCalledWith()
@@ -214,7 +218,11 @@ describe('publishAllModulesHelper', () => {
       const onCancelComplete = jest.fn()
       cancelBatchUpdate({id: '17', workflow_state: 'running'}, onCancelComplete)
       expect(doFetchApi).toHaveBeenCalledTimes(1)
-      expect(doFetchApi).toHaveBeenCalledWith({method: 'POST', path: '/api/v1/progress/17/cancel'})
+      expect(doFetchApi).toHaveBeenCalledWith({
+        method: 'POST',
+        path: '/api/v1/progress/17/cancel',
+        body: {message: 'canceled'},
+      })
       await waitFor(() => expect(onCancelComplete).toHaveBeenCalled())
       expect(onCancelComplete).toHaveBeenCalledTimes(1)
       expect(onCancelComplete).toHaveBeenCalledWith('whoops')

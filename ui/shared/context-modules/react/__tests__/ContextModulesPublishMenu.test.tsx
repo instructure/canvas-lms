@@ -70,7 +70,7 @@ describe('ContextModulesPublishMenu', () => {
         },
       })
       const {getByText} = render(
-        <ContextModulesPublishMenu {...defaultProps} runningProgressId={17} />
+        <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />
       )
       expect(getByText('Loading')).toBeInTheDocument()
     })
@@ -84,27 +84,86 @@ describe('ContextModulesPublishMenu', () => {
         },
       })
       const spy = jest.spyOn(publishAllModulesHelperModule, 'updateModulePendingPublishedStates')
-      render(<ContextModulesPublishMenu {...defaultProps} runningProgressId={17} />)
+      render(<ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />)
       expect(spy).not.toHaveBeenCalled()
       window.dispatchEvent(new Event('module-publish-models-ready'))
       await waitFor(() => expect(spy).toHaveBeenCalled())
     })
 
-    it('renders a screenreader message with progress updates', async () => {
-      doFetchApi.mockResolvedValueOnce({
-        json: {
-          id: 1234,
-          completion: 17,
-          workflow_state: 'running',
-        },
-      })
-      const {getByText} = render(
-        <ContextModulesPublishMenu {...defaultProps} runningProgressId={17} />
-      )
+    describe('progress', () => {
+      it('renders a screenreader message with progress starts', async () => {
+        doFetchApi.mockResolvedValueOnce({
+          json: {
+            id: '17',
+            completion: 0,
+            workflow_state: 'running',
+          },
+        })
+        const {getByText} = render(
+          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />
+        )
 
-      await waitFor(() =>
-        expect(getByText('Publishing progress is 17 percent complete')).toBeInTheDocument()
-      )
+        await waitFor(() =>
+          expect(getByText('Publishing modules has started.')).toBeInTheDocument()
+        )
+      })
+
+      it('renders a screenreader message with progress updates', async () => {
+        doFetchApi.mockResolvedValueOnce({
+          json: {
+            id: '17',
+            completion: 33,
+            workflow_state: 'running',
+          },
+        })
+        const {getByText} = render(
+          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />
+        )
+
+        await waitFor(() =>
+          expect(getByText('Publishing progress is 33 percent complete')).toBeInTheDocument()
+        )
+      })
+
+      it('renders a screenreader message when progress completes', async () => {
+        doFetchApi.mockResolvedValueOnce({
+          json: {
+            id: '17',
+            completion: 100,
+            workflow_state: 'completed',
+          },
+        })
+        const {getByText} = render(
+          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />
+        )
+
+        await waitFor(() =>
+          expect(
+            getByText('Publishing progress is complete. Refreshing item status.')
+          ).toBeInTheDocument()
+        )
+      })
+
+      it('renders message when publishing was canceled', async () => {
+        doFetchApi.mockResolvedValueOnce({
+          json: {
+            id: '17',
+            completion: 33,
+            message: 'canceled',
+            workflow_state: 'failed',
+          },
+        })
+        const {getAllByText} = render(
+          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />
+        )
+
+        await waitFor(
+          () =>
+            expect(
+              getAllByText('Your publishing job was canceled before it completed.')
+            ).toHaveLength(2) // visible + screenreader
+        )
+      })
     })
   })
 
