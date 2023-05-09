@@ -42,7 +42,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
@@ -57,9 +56,21 @@ const messageHolderId = 'flashalert_message_holder' // specs fail if I reuse jqu
 const screenreaderMessageHolderId = 'flash_screenreader_holder'
 const timeout = 10000
 
-function findDetailMessage(err) {
-  let a = err.message
-  let b
+type CanvasApiResponseError = {
+  message: string
+  response?: {
+    data?: {
+      errors: {
+        message: string
+      }
+      message?: string
+    }
+  }
+}
+
+function findDetailMessage(err: CanvasApiResponseError) {
+  let a: string = err.message
+  let b: string | undefined
   if (err.response) {
     if (err.response.data) {
       try {
@@ -80,38 +91,35 @@ function findDetailMessage(err) {
   return {a, b}
 }
 
-const isLoadingChunkError = a => {
+const isLoadingChunkError = (a?: string): boolean => {
   return typeof a === 'string' && a.toLowerCase().includes('loading chunk')
 }
 
 // An Alert with a message and "Details" button which surfaces
 // more info about the error when pressed.
 // Is displayed at the top of the document, and will close itself after a while
-export default class FlashAlert extends React.Component {
-  static propTypes = {
-    onClose: PropTypes.func.isRequired,
-    message: PropTypes.node.isRequired,
-    error: PropTypes.instanceOf(Error),
-    variant: PropTypes.oneOf(['info', 'success', 'warning', 'error']),
-    timeout: PropTypes.number,
-    screenReaderOnly: PropTypes.bool,
-  }
 
+type FlashAlertProps = typeof FlashAlert.defaultProps & {
+  onClose: () => void
+  message: HTMLElement | string
+  error?: Error | null
+  variant?: 'info' | 'success' | 'warning' | 'error'
+  timeout?: number
+  screenReaderOnly?: boolean
+  liveRegionPoliteness?: 'assertive' | 'polite'
+}
+export default class FlashAlert extends React.Component<FlashAlertProps> {
   static defaultProps = {
-    error: null,
     variant: 'info',
     timeout,
     screenReaderOnly: false,
   }
 
-  constructor(props) {
-    super(props)
+  timerId: number = 0
 
-    this.state = {
-      showDetails: false,
-      isOpen: true,
-    }
-    this.timerId = 0
+  state = {
+    showDetails: false,
+    isOpen: true,
   }
 
   getLiveRegion() {
@@ -130,7 +138,7 @@ export default class FlashAlert extends React.Component {
   showDetails = () => {
     this.setState({showDetails: true})
     clearTimeout(this.timerId)
-    this.timerId = setTimeout(() => this.closeAlert(), this.props.timeout)
+    this.timerId = setTimeout(() => this.closeAlert(), this.props.timeout) as unknown as number
   }
 
   closeAlert = () => {
@@ -142,7 +150,7 @@ export default class FlashAlert extends React.Component {
     })
   }
 
-  renderDetailMessage(a, b) {
+  renderDetailMessage(a: string, b?: string) {
     const showPrimaryDetails = a && !isLoadingChunkError(a)
     const showSecondaryDetails = b && !isLoadingChunkError(b)
 
@@ -195,6 +203,7 @@ export default class FlashAlert extends React.Component {
           liveRegion={this.getLiveRegion}
           transition="fade"
           screenReaderOnly={this.props.screenReaderOnly}
+          liveRegionPoliteness={this.props.liveRegionPoliteness}
         >
           <div>
             <p style={{margin: '0 -5px'}}>{this.props.message}</p>
@@ -206,8 +215,18 @@ export default class FlashAlert extends React.Component {
   }
 }
 
-export function showFlashAlert({message, err, type = err ? 'error' : 'info', srOnly = false}) {
-  function closeAlert(atNode) {
+type ShowFlashAlertArgs = {
+  message: string
+  err?: Error | null
+  type?: 'info' | 'success' | 'warning' | 'error'
+  srOnly?: boolean
+  politeness?: 'assertive' | 'polite'
+}
+
+export function showFlashAlert(args: ShowFlashAlertArgs) {
+  const {message, err, type = err ? 'error' : 'info', srOnly = false, politeness} = args
+
+  function closeAlert(atNode: Element) {
     ReactDOM.unmountComponentAtNode(atNode)
     atNode.remove()
   }
@@ -227,7 +246,7 @@ export function showFlashAlert({message, err, type = err ? 'error' : 'info', srO
     return alertContainer
   }
 
-  function renderAlert(parent) {
+  function renderAlert(parent: Element) {
     ReactDOM.render(
       <FlashAlert
         message={message}
@@ -238,6 +257,7 @@ export function showFlashAlert({message, err, type = err ? 'error' : 'info', srO
         variant={type}
         onClose={closeAlert.bind(null, parent)}
         screenReaderOnly={srOnly}
+        liveRegionPoliteness={politeness}
       />,
       parent
     )
@@ -259,9 +279,9 @@ export function destroyContainer() {
 }
 
 export function showFlashError(message = I18n.t('An error occurred making a network request')) {
-  return err => showFlashAlert({message, err, type: 'error'})
+  return (err: Error) => showFlashAlert({message, err, type: 'error'})
 }
 
-export function showFlashSuccess(message) {
+export function showFlashSuccess(message: string) {
   return () => showFlashAlert({message, type: 'success'})
 }

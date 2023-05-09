@@ -26,6 +26,7 @@ jest.mock('@canvas/do-fetch-api-effect')
 const defaultProps = {
   isOpen: true,
   onClose: () => {},
+  onDismiss: () => {},
   onPublish: () => {},
   onPublishComplete: () => {},
   progressId: null,
@@ -95,11 +96,13 @@ describe('ContextModulesPublishModal', () => {
   })
 
   it('has a close button', () => {
-    const onClose = jest.fn()
-    const {getByTestId} = render(<ContextModulesPublishModal {...defaultProps} onClose={onClose} />)
+    const onDismiss = jest.fn()
+    const {getByTestId} = render(
+      <ContextModulesPublishModal {...defaultProps} onDismiss={onDismiss} />
+    )
     const closeButton = getByTestId('close-button')
     act(() => closeButton.click())
-    expect(onClose).toHaveBeenCalled()
+    expect(onDismiss).toHaveBeenCalled()
   })
 
   it('changes the publish button to stop button if is publishing', () => {
