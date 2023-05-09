@@ -37,6 +37,7 @@ interface Props {
   readonly isOpen: boolean
   readonly onCancel: () => void
   readonly onClose: () => void
+  readonly onDismiss: () => void
   readonly onPublish: () => void
   readonly isCanceling: boolean
   readonly isPublishing: boolean
@@ -51,6 +52,7 @@ const ContextModulesPublishModal = ({
   isOpen,
   onCancel,
   onClose,
+  onDismiss,
   onPublish,
   isCanceling,
   isPublishing,
@@ -96,7 +98,8 @@ const ContextModulesPublishModal = ({
   return (
     <Modal
       open={isOpen}
-      onDismiss={onClose}
+      onClose={onClose}
+      onDismiss={onDismiss}
       size="small"
       label={title}
       shouldCloseOnDocumentClick={false}
@@ -105,7 +108,7 @@ const ContextModulesPublishModal = ({
         <CloseButton
           placement="end"
           offset="small"
-          onClick={onClose}
+          onClick={onDismiss}
           screenReaderLabel={I18n.t('Close')}
           elementRef={el => (closeButtonRef.current = el)}
         />
@@ -131,7 +134,7 @@ const ContextModulesPublishModal = ({
         {progressBar()}
       </Modal.Body>
       <Modal.Footer>
-        <Button data-testid="close-button" onClick={onClose} margin="0 x-small 0 0">
+        <Button data-testid="close-button" onClick={onDismiss} margin="0 x-small 0 0">
           {I18n.t('Close')}
         </Button>
         <Button
