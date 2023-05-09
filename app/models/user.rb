@@ -1415,9 +1415,9 @@ class User < ActiveRecord::Base
     return true if fake_student? && courses.any? { |c| c.grants_right?(masquerader, :use_student_view) }
     return false unless
         account.grants_right?(masquerader, nil, :become_user) && SisPseudonym.for(self, account, type: :implicit, require_sis: false)
-    # self is not an account user
-    if account.root_account.feature_enabled?(:course_admin_role_masquerade_permission_check) && account_users.empty?
-      return includes_subset_of_course_admin_permissions?(masquerader, account)
+
+    if account.root_account.feature_enabled?(:course_admin_role_masquerade_permission_check)
+      return false unless includes_subset_of_course_admin_permissions?(masquerader, account)
     end
 
     has_subset_of_account_permissions?(masquerader, account)
