@@ -125,7 +125,7 @@ gem "rubycas-client", "2.3.9", require: false
 gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "2.3.0", require: "zip"
 gem "saml2", "3.1.2"
-gem "sanitize", "6.0.0", require: false
+gem "sanitize", "~> 6.0", require: false
 gem "sentry-ruby", "5.1.0"
 gem "sentry-rails", "5.1.0"
 gem "sentry-inst_jobs", "1.0.2"
