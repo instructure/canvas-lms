@@ -110,6 +110,11 @@ module Types
           method: :assignment_groups,
           null: true
 
+    field :apply_group_weights, Boolean, null: true
+    def apply_group_weights
+      object.apply_group_weights?
+    end
+
     implements Interfaces::AssignmentsConnectionInterface
     def assignments_connection(filter: {})
       super(filter: filter, course: course)

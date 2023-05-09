@@ -184,6 +184,14 @@ describe Types::CourseType do
         ).to eq [0.94, 0.9, 0.87, 0.84, 0.8, 0.77, 0.74, 0.7, 0.67, 0.64, 0.61, 0.0]
       end
     end
+
+    context "apply assignment group weights" do
+      it "returns false if not weighted" do
+        expect(
+          course_type.resolve("applyGroupWeights", current_user: @student)
+        ).to be false
+      end
+    end
   end
 
   describe "outcomeProficiency" do
