@@ -18,187 +18,315 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module BundlerDefinitionFilterableSources
-  def dependencies
-    return super unless BundlerLockfileExtensions.lockfile_writes_enabled && BundlerLockfileExtensions.lockfile_filter
+require "bundler_lockfile_extensions/bundler"
+require "bundler_lockfile_extensions/bundler/definition"
+require "bundler_lockfile_extensions/bundler/dsl"
+require "bundler_lockfile_extensions/bundler/source_list"
 
-    super.filter { |x| source_included?(x.instance_variable_get(:@source)) }
-  end
-
-  def sources
-    return super unless BundlerLockfileExtensions.lockfile_writes_enabled && BundlerLockfileExtensions.lockfile_filter
-
-    res = super.clone
-    res.instance_variable_get(:@path_sources).filter! { |x| source_included?(x) }
-    res.instance_variable_get(:@rubygems_sources).filter! { |x| source_included?(x) }
-    res
-  end
-
-  def lock(...)
-    return unless BundlerLockfileExtensions.lockfile_writes_enabled
-
-    super(...)
-  end
-
-  def nothing_changed?
-    locked_specs = instance_variable_get(:@locked_specs).to_hash.keys
-    actual_specs = converge_locked_specs.to_hash.keys
-
-    super && (locked_specs - actual_specs).empty?
-  end
-
-  def ensure_filtered_dependencies_pinned
-    return unless BundlerLockfileExtensions.lockfile_filter
-
-    check_dependencies = []
-
-    @sources.instance_variable_get(:@rubygems_sources).each do |x|
-      next if source_included?(x)
-
-      specs = resolve.select { |s| x.can_lock?(s) }
-
-      specs.each do |s|
-        check_dependencies << s.name
-      end
-    end
-
-    proven_pinned = check_dependencies.to_h { |x| [x, false] } # rubocop:disable Rails/IndexWith
-
-    valid_sources = []
-
-    valid_sources.push(*@sources.instance_variable_get(:@path_sources))
-    valid_sources.push(*@sources.instance_variable_get(:@rubygems_sources))
-
-    valid_sources.each do |x|
-      next if source_included?(x)
-
-      specs = resolve.select { |s| x.can_lock?(s) }
-
-      specs.each do |s|
-        s.dependencies.each do |d|
-          next unless proven_pinned.key?(d.name)
-
-          d.requirement.requirements.each do |r|
-            proven_pinned[d.name] = true if r[0] == "="
-          end
-        end
-      end
-    end
-
-    proven_pinned.each do |k, v|
-      raise BundlerLockfileExtensions::Error, "unable to prove that private gem #{k} was pinned - make sure it is pinned to only one resolveable version in the gemspec" unless v
-    end
-  end
-
-  private
-
-  def source_included?(source)
-    BundlerLockfileExtensions.lockfile_filter.call(BundlerLockfileExtensions.lockfile_path, source)
-  end
-end
-
+# Extends Bundler to allow arbitrarily many lockfiles (and Gemfiles!)
+# for variations of the Gemfile, while keeping all of the lockfiles in sync.
+#
+# `bundle install`, `bundle lock`, and `bundle update` will operate only on
+# the default lockfile (Gemfile.lock), afterwhich all other lockfiles will
+# be re-created based on this default lockfile. Additional lockfiles can be
+# based on the same Gemfile, but vary at runtime based on something like an
+# environment variable, global variable, or constant. When defining such a
+# lockfile, you should use a prepare callback that sets up the proper
+# environment for that variation, even if that's not what would otherwise
+# be selected by the launching environment.
+#
+# Alternately (or in addition!), you can define a lockfile to use a completely
+# different Gemfile. This will have the effect that common dependencies between
+# the two Gemfiles will stay locked to the same version in each lockfile.
+#
+# A lockfile definition can opt in to requiring explicit pinning for
+# any dependency that exists in that variation, but does not exist in the default
+# lockfile. This is especially useful if for some reason a given
+# lockfile will _not_ be committed to version control (such as a variation
+# that will include private plugins).
+#
+# Finally, `bundle check` will enforce additional checks to compare the final
+# locked versions of dependencies between the various lockfiles to ensure
+# they end up the same. This check might be tripped if Gemfile variations
+# (accidentally!) have conflicting version constraints on a dependency, that
+# are still self-consistent with that single Gemfile variation.
+# `bundle install`, `bundle lock`, and `bundle update` will also verify these
+# additional checks. You can additionally explicitly allow version variations
+# between explicit dependencies (and their sub-dependencies), for cases where
+# the lockfile variation is specifically to transition to a new version of
+# a dependency (like a Rails upgrade).
+#
 module BundlerLockfileExtensions
-  class Error < Bundler::BundlerError; status_code(99); end
-
   class << self
-    attr_accessor :lockfile_default, :lockfile_defs, :lockfile_filter, :lockfile_path, :lockfile_writes_enabled
+    attr_reader :lockfile_definitions
 
     def enabled?
-      !!@lockfile_defs
+      @lockfile_definitions
     end
 
-    def enable(lockfile_defs)
-      @lockfile_default = lockfile_defs.find { |x| !!x[1][:default] }[0]
-      @lockfile_defs = lockfile_defs
+    # @param lockfile [String] The lockfile path
+    # @param Builder [::Bundler::DSL] The Bundler DSL
+    # @param gemfile [String, nil]
+    #   The Gemfile for this lockfile (defaults to Gemfile)
+    # @param current [true, false] If this is the currently active combination
+    # @param prepare [Proc, nil]
+    #   The callback to set up the environment so your Gemfile knows this is
+    #   the intended lockfile, and to select dependencies appropriately.
+    # @param allow_mismatched_dependencies [true, false]
+    #   Allows version differences in dependencies between this lockfile and
+    #   the default lockfile. Note that even with this option, only top-level
+    #   dependencies that differ from the default lockfile, and their transitive
+    #   depedencies, are allowed to mismatch.
+    # @param enforce_pinned_additional_dependencies [true, false]
+    #   If dependencies are present in this lockfile that are not present in the
+    #   default lockfile, enforce that they are pinned.
+    def add_lockfile(lockfile = nil,
+                     builder:,
+                     gemfile: nil,
+                     current: false,
+                     prepare: nil,
+                     allow_mismatched_dependencies: true,
+                     enforce_pinned_additional_dependencies: false)
+      enable unless enabled?
 
-      @lockfile_path =
-        if defined?(Bundler::CLI::Cache) || defined?(Bundler::CLI::Lock)
-          @lockfile_writes_enabled = true
-          lockfile_default.to_s
-        elsif (!Bundler.settings[:deployment] && defined?(Bundler::CLI::Install)) || defined?(Bundler::CLI::Update)
-          # Sadly, this is the only place where the lockfile_path can be set correctly for the installation-like paths.
-          # Ideally, it would go into before-install-all, but that is called after the lockfile is already loaded.
-          install_lockfile_name(lockfile_default)
-        else
-          lockfile_default.to_s
-        end
-
-      Bundler::Dsl.class_eval do
-        def to_definition(_lockfile, unlock)
-          @sources << @rubygems_source if @sources.respond_to?(:include?) && !@sources.include?(@rubygems_source)
-          Bundler::Definition.new(Bundler.default_lockfile, @dependencies, @sources, unlock, @ruby_version)
-        end
+      default = gemfile.nil? && lockfile.nil?
+      if default && default_lockfile_definition
+        raise ArgumentError, "Only one default lockfile (gemfile and lockfile unspecified) is allowed"
+      end
+      if current && @lockfile_definitions.any? { |definition| definition[:current] }
+        raise ArgumentError, "Only one lockfile can be flagged as the current lockfile"
       end
 
-      Bundler::SharedHelpers.class_eval do
-        class << self
-          def default_lockfile
-            Pathname.new(BundlerLockfileExtensions.lockfile_path).expand_path
+      @lockfile_definitions << (lockfile_def = {
+        gemfile: (gemfile && Pathname.new(gemfile).expand_path) || ::Bundler.default_gemfile,
+        lockfile: (lockfile && Pathname.new(lockfile).expand_path) || ::Bundler.default_lockfile,
+        default: default,
+        current: current,
+        prepare: prepare,
+        allow_mismatched_dependencies: allow_mismatched_dependencies,
+        enforce_pinned_additional_dependencies: enforce_pinned_additional_dependencies
+      }.freeze)
+
+      # always use the default lockfile for `bundle check`, `bundle install`,
+      # `bundle lock`, and `bundle update`. `bundle cache` delegates to
+      # `bundle install`, but we want that to run as-normal.
+      set_lockfile = if (defined?(::Bundler::CLI::Check) ||
+                        defined?(::Bundler::CLI::Install) ||
+                        defined?(::Bundler::CLI::Lock) ||
+                        defined?(::Bundler::CLI::Update)) &&
+                        !defined?(::Bundler::CLI::Cache)
+                       prepare&.call if default
+                       default
+                     else
+                       current
+                     end
+      # if BUNDLE_LOCKFILE is specified, explicitly use only that lockfile, regardless of the command
+      if ENV["BUNDLE_LOCKFILE"] && File.expand_path(ENV["BUNDLE_LOCKFILE"]) == lockfile_def[:lockfile].to_s
+        prepare&.call
+        set_lockfile = true
+        # we started evaluating the project's primary gemfile, but got told to use a lockfile
+        # associated with a different Gemfile. so we need to evaluate that Gemfile instead
+        if lockfile_def[:gemfile] != ::Bundler.default_gemfile
+          # share a cache between all lockfiles
+          ::Bundler.cache_root = ::Bundler.root
+          ENV["BUNDLE_GEMFILE"] = lockfile_def[:gemfile].to_s
+          ::Bundler.root = ::Bundler.default_gemfile.dirname
+          ::Bundler.default_lockfile = lockfile_def[:lockfile]
+
+          builder.eval_gemfile(::Bundler.default_gemfile)
+
+          return false
+        end
+      end
+      ::Bundler.default_lockfile = lockfile_def[:lockfile] if set_lockfile
+      true
+    end
+
+    # @!visibility private
+    def after_install_all(install: true)
+      previous_recursive = @recursive
+
+      return unless enabled?
+      return if ENV["BUNDLE_LOCKFILE"] # explicitly working against a single lockfile
+
+      # must be running `bundle cache`
+      return unless ::Bundler.default_lockfile == default_lockfile_definition[:lockfile]
+
+      if ::Bundler.frozen_bundle? && !install
+        # only do the checks if we're frozen
+        require "bundler_lockfile_extensions/check"
+
+        exit 1 unless Check.run
+        return
+      end
+
+      # this hook will be called recursively when it has to install gems
+      # for a secondary lockfile. defend against that
+      return if @recursive
+
+      @recursive = true
+
+      require "tempfile"
+      require "bundler_lockfile_extensions/lockfile_generator"
+
+      ::Bundler.ui.info ""
+
+      default_lockfile_contents = ::Bundler.default_lockfile.read.freeze
+      default_specs = ::Bundler::LockfileParser.new(default_lockfile_contents).specs.to_h do |spec| # rubocop:disable Rails/IndexBy
+        [[spec.name, spec.platform], spec]
+      end
+      default_root = ::Bundler.root
+
+      ::Bundler.settings.temporary(cache_all_platforms: true, suppress_install_using_messages: true) do
+        @lockfile_definitions.each do |lockfile_definition|
+          # we already wrote the default lockfile
+          next if lockfile_definition[:default]
+
+          # root needs to be set so that paths are output relative to the correct root in the lockfile
+          ::Bundler.root = lockfile_definition[:gemfile].dirname
+
+          relative_lockfile = lockfile_definition[:lockfile].relative_path_from(Dir.pwd)
+          if ::Bundler.frozen_bundle?
+            # if we're frozen, you have to use the pre-existing lockfile
+            unless lockfile_definition[:lockfile].exist?
+              ::Bundler.ui.error("The bundle is locked, but #{relative_lockfile} is missing. Please make sure you have checked #{relative_lockfile} into version control before deploying.")
+              exit 1
+            end
+
+            ::Bundler.ui.info("Installing gems for #{relative_lockfile}...")
+            write_lockfile(lockfile_definition, lockfile_definition[:lockfile], install: install)
+          else
+            ::Bundler.ui.info("Syncing to #{relative_lockfile}...")
+
+            # adjust locked paths from the default lockfile to be relative to _this_ gemfile
+            adjusted_default_lockfile_contents = default_lockfile_contents.gsub(/PATH\n  remote: ([^\n]+)\n/) do |remote|
+              remote_path = Pathname.new($1)
+              next remote if remote_path.absolute?
+
+              relative_remote_path = remote_path.expand_path(default_root).relative_path_from(::Bundler.root).to_s
+              remote.sub($1, relative_remote_path)
+            end
+
+            # add a source for the current gem
+            gem_spec = default_specs[[File.basename(::Bundler.root), "ruby"]]
+
+            if gem_spec
+              adjusted_default_lockfile_contents += <<~TEXT
+                PATH
+                  remote: .
+                  specs:
+                #{gem_spec.to_lock}
+              TEXT
+            end
+
+            if lockfile_definition[:lockfile].exist?
+              # if the lockfile already exists, "merge" it together
+              default_lockfile = ::Bundler::LockfileParser.new(adjusted_default_lockfile_contents)
+              lockfile = ::Bundler::LockfileParser.new(lockfile_definition[:lockfile].read)
+
+              # replace any duplicate specs with what's in the default lockfile
+              lockfile.specs.map! do |spec|
+                default_specs[[spec.name, spec.platform]] || spec
+              end
+              lockfile.specs.replace(default_lockfile.specs + lockfile.specs).uniq!
+              lockfile.sources.replace(default_lockfile.sources + lockfile.sources).uniq!
+              lockfile.platforms.concat(default_lockfile.platforms).uniq!
+              lockfile.instance_variable_set(:@ruby_version, default_lockfile.ruby_version)
+              lockfile.instance_variable_set(:@bundler_version, default_lockfile.bundler_version)
+
+              new_contents = LockfileGenerator.generate(lockfile)
+            else
+              # no lockfile? just start out with the default lockfile's contents to inherit its
+              # locked gems
+              new_contents = adjusted_default_lockfile_contents
+            end
+
+            # Now build a definition based on the given Gemfile, with the combined lockfile
+            Tempfile.create do |temp_lockfile|
+              temp_lockfile.write(new_contents)
+              temp_lockfile.flush
+
+              write_lockfile(lockfile_definition, temp_lockfile.path, install: install)
+            end
           end
         end
       end
 
-      Bundler::Definition.prepend(BundlerDefinitionFilterableSources)
+      require "bundler_lockfile_extensions/check"
 
-      @lockfile_defs[lockfile_default][:prepare_environment]&.call
+      exit 1 unless Check.run
+    ensure
+      @recursive = previous_recursive
     end
 
-    def each_lockfile_for_writing(lock)
-      lock_def = @lockfile_defs[lock]
+    private
 
-      @lockfile_writes_enabled = true
+    def enable
+      @lockfile_definitions ||= []
 
-      @lockfile_path = lock.to_s
-      yield @lockfile_path
+      ::Bundler.singleton_class.prepend(Bundler::ClassMethods)
+      ::Bundler::Definition.prepend(Bundler::Definition)
+      ::Bundler::SourceList.prepend(Bundler::SourceList)
+    end
 
-      if lock_def[:install_filter]
-        @lockfile_filter = lock_def[:install_filter]
-        @lockfile_path = install_filter_lockfile_name(lock).to_s
-        yield @lockfile_path
+    def default_lockfile_definition
+      @default_lockfile_definition ||= @lockfile_definitions.find { |d| d[:default] }
+    end
 
-        @lockfile_filter = nil
+    def write_lockfile(lockfile_definition, lockfile, install:)
+      lockfile_definition[:prepare]&.call
+      definition = ::Bundler::Definition.build(lockfile_definition[:gemfile], lockfile, false)
+
+      resolved_remotely = false
+      begin
+        previous_ui_level = ::Bundler.ui.level
+        ::Bundler.ui.level = "warn"
+        begin
+          definition.resolve_with_cache!
+        rescue ::Bundler::GemNotFound
+          definition = ::Bundler::Definition.build(lockfile_definition[:gemfile], lockfile, false)
+          definition.resolve_remotely!
+          resolved_remotely = true
+        end
+        definition.lock(lockfile_definition[:lockfile], true)
+      ensure
+        ::Bundler.ui.level = previous_ui_level
       end
 
-      @lockfile_writes_enabled = false
-    end
-
-    def install_filter_lockfile_name(lock)
-      "#{lock}.partial"
-    end
-
-    def install_lockfile_name(lock)
-      if @lockfile_defs[lock][:install_filter]
-        install_filter_lockfile_name(lock)
-      else
-        lock.to_s
-      end
-    end
-
-    def write_all_lockfiles
-      current_definition = Bundler.definition
-      unlock = current_definition.instance_variable_get(:@unlock)
-
-      # Always prepare the default lockfiles first so that we don't re-resolve dependencies remotely
-      each_lockfile_for_writing(lockfile_default) do |x|
-        current_definition.ensure_filtered_dependencies_pinned
-        current_definition.lock(x)
-      end
-
-      lockfile_defs.each do |lock, opts|
-        next if lock == lockfile_default
-
-        @lockfile_path = install_lockfile_name(lock)
-        opts[:prepare_environment]&.call
-
-        definition = Bundler::Definition.build(Bundler.default_gemfile, @lockfile_path, unlock)
-        definition.resolve_remotely!
-        definition.specs
-
-        each_lockfile_for_writing(lock) do |x|
-          definition.ensure_filtered_dependencies_pinned
-          definition.lock(x)
+      # if we're running `bundle install` or `bundle update`, and something is missing from
+      # the secondary lockfile, install it.
+      if install && (definition.missing_specs.any? || resolved_remotely)
+        ::Bundler.with_default_lockfile(lockfile_definition[:lockfile]) do
+          ::Bundler::Installer.install(lockfile_definition[:gemfile].dirname, definition, {})
         end
       end
     end
+  end
+
+  @recursive = false
+end
+
+Bundler::Dsl.include(BundlerLockfileExtensions::Bundler::Dsl)
+
+# this is terrible, but we can't prepend into any module because we only load
+# _inside_ of the CLI commands already running
+if defined?(Bundler::CLI::Check)
+  require "bundler_lockfile_extensions/check"
+  at_exit do
+    next unless $!.nil?
+    next if $!.is_a?(SystemExit) && !$!.success?
+
+    next if BundlerLockfileExtensions::Check.run
+
+    Bundler.ui.warn("You can attempt to fix by running `bundle install`")
+    exit 1
+  end
+end
+if defined?(Bundler::CLI::Lock)
+  at_exit do
+    next unless $!.nil?
+    next if $!.is_a?(SystemExit) && !$!.success?
+
+    BundlerLockfileExtensions.after_install_all(install: false)
   end
 end

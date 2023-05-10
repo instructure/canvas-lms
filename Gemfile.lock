@@ -374,20 +374,12 @@ GEM
       globalid (>= 0.3.6)
     activemodel (7.0.4.3)
       activesupport (= 7.0.4.3)
-    activemodel-serializers-xml (1.0.2)
-      activemodel (> 5.x)
-      activesupport (> 5.x)
-      builder (~> 3.1)
     activerecord (7.0.4.3)
       activemodel (= 7.0.4.3)
       activesupport (= 7.0.4.3)
     activerecord-pg-extensions (0.4.4)
       activerecord (>= 6.0, < 7.1)
       railties (>= 6.0, < 7.1)
-    activeresource (6.0.0)
-      activemodel (>= 6.0)
-      activemodel-serializers-xml (~> 1.0)
-      activesupport (>= 6.0)
     activestorage (7.0.4.3)
       actionpack (= 7.0.4.3)
       activejob (= 7.0.4.3)
@@ -512,15 +504,12 @@ GEM
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     colored (1.2)
-    colorize (0.8.1)
     concurrent-ruby (1.2.2)
-    connection_pool (2.3.0)
     crack (0.4.5)
       rexml
     crass (1.0.6)
     crocodoc-ruby (0.0.1)
       json
-    crypt (2.2.1)
     crystalball (0.7.0)
       git
     database_cleaner (2.0.2)
@@ -559,9 +548,6 @@ GEM
       pygments.rb
       redcarpet
     dumb_delegator (1.0.0)
-    dynect4r (0.2.4)
-      json
-      rest-client
     ecma-re-validator (0.4.0)
       regexp_parser (~> 2.2)
     encrypted_cookie_store-instructure (1.2.12)
@@ -570,8 +556,6 @@ GEM
     escape_code (0.2)
     et-orbi (1.2.7)
       tzinfo
-    ethon (0.12.0)
-      ffi (>= 1.3.0)
     expgen (0.1.1)
       parslet
     extlib (0.9.16)
@@ -654,7 +638,6 @@ GEM
       json-jwt (~> 1.7)
       rexml
       simple_oauth (~> 0.3.1)
-    inflection (1.0.0)
     inst-jobs (3.1.10)
       activerecord (>= 6.0)
       activerecord-pg-extensions (~> 0.4.4)
@@ -713,17 +696,6 @@ GEM
       actionpack (>= 5.2)
       activerecord (>= 5.2)
     matrix (0.4.2)
-    maxminddb (0.1.22)
-    mechanize (2.7.7)
-      domain_name (~> 0.5, >= 0.5.1)
-      http-cookie (~> 1.0)
-      mime-types (>= 1.17.2)
-      net-http-digest_auth (~> 1.1, >= 1.1.1)
-      net-http-persistent (>= 2.5.2)
-      nokogiri (~> 1.6)
-      ntlm-http (~> 0.1, >= 0.1.1)
-      webrick (~> 1.7)
-      webrobots (>= 0.0.9, < 0.2)
     method_source (1.0.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
@@ -743,9 +715,6 @@ GEM
     multi_xml (0.6.0)
     multipart-post (2.1.1)
     mustache (1.1.1)
-    net-http-digest_auth (1.4.1)
-    net-http-persistent (4.0.1)
-      connection_pool (~> 2.2)
     net-imap (0.2.3)
       digest
       net-protocol
@@ -773,7 +742,6 @@ GEM
       racc (~> 1.4)
     nokogiri-xmlsec-instructure (0.10.2)
       nokogiri (>= 1.11.2)
-    ntlm-http (0.1.1)
     oauth (1.1.0)
       oauth-tty (~> 1.0, >= 1.0.1)
       snaky_hash (~> 2.0)
@@ -925,11 +893,6 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    restforce (5.0.3)
-      faraday (>= 0.9.0, <= 2.0)
-      faraday_middleware (>= 0.8.8, <= 2.0)
-      hashie (>= 1.2.0, < 5.0)
-      jwt (>= 1.5.6)
     retriable (1.4.1)
     rexml (3.2.5)
     ritex (1.0.1)
@@ -1076,7 +1039,6 @@ GEM
     sqlite3 (1.6.2-arm64-darwin)
     sqlite3 (1.6.2-x86_64-darwin)
     sqlite3 (1.6.2-x86_64-linux)
-    sshkey (2.0.0)
     stackprof (0.2.24)
     statsd-ruby (1.4.0)
     stormbreaker (0.0.8)
@@ -1120,8 +1082,6 @@ GEM
     twitter-text (3.1.0)
       idn-ruby
       unf (~> 0.1.0)
-    typhoeus (1.4.0)
-      ethon (>= 0.9.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
@@ -1134,7 +1094,6 @@ GEM
     uri_template (0.7.0)
     vault (0.15.0)
       aws-sigv4
-    vcr (6.1.0)
     vericite_api (1.5.3)
       json (>= 1.4.6)
     version_gem (1.1.2)
@@ -1155,12 +1114,10 @@ GEM
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
     webrick (1.8.1)
-    webrobots (0.1.2)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     will_paginate (3.3.0)
-    xml-simple (1.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     ya2yaml (0.31)
@@ -1168,12 +1125,6 @@ GEM
     yard-appendix (0.1.8)
       yard (>= 0.8.0)
     zeitwerk (2.6.8)
-    zendesk_api (1.28.0)
-      faraday (>= 0.9.0, < 2.0.0)
-      hashie (>= 3.5.2, < 5.0.0)
-      inflection
-      mime-types
-      multipart-post (~> 2.0)
 
 PLATFORMS
   aarch64-linux
@@ -1189,7 +1140,6 @@ DEPENDENCIES
   active_model_serializers (= 0.9.0alpha1)!
   active_record_query_trace (= 1.8)
   activerecord-pg-extensions (= 0.4.4)
-  activeresource (= 6.0.0)
   activesupport-suspend_callbacks!
   acts_as_list!
   addressable (~> 2.8)
@@ -1247,10 +1197,8 @@ DEPENDENCIES
   canvas_webex (= 0.18.2)
   cassandra-cql (= 1.2.3)!
   chunky_png (= 1.4.0)
-  colorize (= 0.8.1)
   config_file!
   crocodoc-ruby (= 0.0.1)
-  crypt (>= 2.2.0)
   crystalball (= 0.7.0)
   csv_diff!
   database_cleaner (~> 2.0)
@@ -1263,7 +1211,6 @@ DEPENDENCIES
   dotenv (~> 2.8)
   dress_code (= 1.2.1)
   dynamic_settings!
-  dynect4r (= 0.2.4)
   encrypted_cookie_store-instructure (= 1.2.12)
   escape_code (= 0.2)
   event_stream!
@@ -1313,8 +1260,6 @@ DEPENDENCIES
   mail (= 2.7.1)
   marginalia (= 1.11.1)
   matrix (= 0.4.2)
-  maxminddb (= 0.1.22)
-  mechanize (= 2.7.7)
   mime-types (= 3.3.1)
   mime-types-data (~> 3.2023)
   mini_magick (= 4.11.0)
@@ -1360,7 +1305,6 @@ DEPENDENCIES
   regexp_parser (= 2.7.0)
   request_context!
   respondus_soap_endpoint!
-  restforce (= 5.0.3)
   retriable (= 1.4.1)
   ritex (= 1.0.1)
   rotp (= 6.2.0)
@@ -1401,7 +1345,6 @@ DEPENDENCIES
   spring-commands-parallel-rspec (= 1.1.0)
   spring-commands-rspec (= 1.0.4)
   spring-commands-rubocop (= 0.3.0)!
-  sshkey (= 2.0.0)
   stackprof (~> 0.2)
   stormbreaker (= 0.0.8)
   stringify_ids!
@@ -1413,11 +1356,9 @@ DEPENDENCIES
   turnitin_api!
   twilio-ruby (= 5.36.0)
   twitter!
-  typhoeus (~> 1.3)
   tzinfo (= 2.0.4)
   utf8_cleaner!
   vault (= 0.15.0)
-  vcr (= 6.1.0)
   vericite_api (= 1.5.3)
   wcag_color_contrast (= 0.1.0)
   webdrivers (= 5.2.0)
@@ -1425,10 +1366,8 @@ DEPENDENCIES
   week_of_month (= 1.2.5)!
   will_paginate (= 3.3.0)
   workflow!
-  xml-simple (= 1.1.5)
   yard (~> 0.9)
   yard-appendix (= 0.1.8)
-  zendesk_api (= 1.28.0)
 
 RUBY VERSION
    ruby 2.7.5p203

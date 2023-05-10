@@ -10,9 +10,10 @@ RUN --mount=target=/tmp/src \
   tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
     config/canvas_rails_switcher.rb \
     Gemfile \
-    Gemfile*.lock.partial \
+    Gemfile*.lock \
     Gemfile.d \
     gems/**/Gemfile \
+    gems/**/Gemfile.lock \
     gems/**/*.gemspec \
     gems/**/gem_version.rb \
     gems/**/version.rb \
