@@ -36,10 +36,7 @@ module IncomingMailProcessor
     end
 
     def connect
-      @sqs = Aws::SQS::Client.new(config.slice(:access_key_id,
-                                               :secret_access_key,
-                                               :endpoint,
-                                               :region))
+      @sqs = Aws::SQS::Client.new(config.slice(:credentials, :endpoint, :region))
       @queue_url = @sqs.get_queue_url(queue_name: config[:incoming_mail_queue_name]).queue_url
       @incoming_mail_queue = Aws::SQS::QueuePoller.new(@queue_url, client: @sqs)
     end

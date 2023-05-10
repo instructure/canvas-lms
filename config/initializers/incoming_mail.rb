@@ -22,6 +22,10 @@
 config = ConfigFile.load("incoming_mail").dup || {}
 
 Rails.configuration.to_prepare do
+  if config.key?("sqs")
+    config["sqs"]["credentials"] = Canvas::AwsCredentialProvider.new("incoming_mail_creds", config["vault_credential_path"])
+  end
+
   IncomingMailProcessor::IncomingMessageProcessor.configure(config)
   IncomingMailProcessor::IncomingMessageProcessor.logger = Rails.logger
 end
