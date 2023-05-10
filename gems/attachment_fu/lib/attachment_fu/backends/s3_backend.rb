@@ -288,7 +288,7 @@ module AttachmentFu # :nodoc:
       end
 
       def save_to_storage
-        if save_attachment?
+        if save_attachment_from_temp_path?
           options = {
             content_type: content_type,
             acl: attachment_options[:s3_access]
