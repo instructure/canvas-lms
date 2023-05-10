@@ -104,7 +104,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Reports'),
       description: I18n.t(
-        'To access the Student Interactions report, Courses - view usage reports must also be enabled.'
+        'To access the Student Interactions report, Reports - manage must also be enabled.'
       ),
     },
     {
@@ -188,7 +188,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Reports'),
       description: I18n.t(
-        'To access the Student Interactions report, Courses - view usage reports must also be enabled.'
+        'To access the Student Interactions report, Reports - manage must also be enabled.'
       ),
     },
     {
