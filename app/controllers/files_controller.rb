@@ -1064,6 +1064,7 @@ class FilesController < ApplicationController
     @attachment.instfs_uuid = params[:instfs_uuid]
     @attachment.md5 = params[:sha512]
     @attachment.modified_at = Time.zone.now
+    @attachment.workflow_state = "processed"
 
     # check non-exempt quota usage now that we have an actual size
     return unless value_to_boolean(params[:quota_exempt]) || check_quota_after_attachment
