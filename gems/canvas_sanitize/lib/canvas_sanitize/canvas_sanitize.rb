@@ -631,6 +631,10 @@ module CanvasSanitize # :nodoc:
       "embed" => { "src" => DEFAULT_PROTOCOLS }.freeze,
       "iframe" => { "src" => DEFAULT_PROTOCOLS }.freeze,
       "style" => { "any" => DEFAULT_PROTOCOLS }.freeze,
+      "audio" => { "src" => ["data", "http", "https", :relative] }.freeze,
+      "video" => { "src" => ["data", "http", "https", :relative] }.freeze,
+      "source" => { "src" => ["data", "http", "https", :relative] }.freeze,
+      "track" => { "src" => ["data", "http", "https", :relative] }.freeze,
     },
 
     css: {
