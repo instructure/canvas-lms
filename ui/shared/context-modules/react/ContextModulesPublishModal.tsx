@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef} from 'react'
+import React from 'react'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -61,14 +61,11 @@ const ContextModulesPublishModal = ({
   progressCurrent,
   title,
 }: Props) => {
-  const closeButtonRef = useRef()
-
   const handlePublish = () => {
     if (isPublishing) {
       onCancel()
     } else {
       onPublish()
-      closeButtonRef.current.focus()
     }
   }
 
@@ -110,7 +107,6 @@ const ContextModulesPublishModal = ({
           offset="small"
           onClick={onDismiss}
           screenReaderLabel={I18n.t('Close')}
-          elementRef={el => (closeButtonRef.current = el)}
         />
         <Heading>{title}</Heading>
       </Modal.Header>
