@@ -315,7 +315,7 @@ describe GroupCategoriesController do
     it "includes group submissions if param is present" do
       user_session(@teacher)
       get "users", params: { course_id: @course.id, group_category_id: @category.id, include: ["group_submissions"] }
-      json = JSON.parse(response.body)
+      json = response.parsed_body
 
       expect(response).to be_successful
       expect(json.count).to be_equal 1
@@ -325,7 +325,7 @@ describe GroupCategoriesController do
     it "does not include group submissions if param is absent" do
       user_session(@teacher)
       get "users", params: { course_id: @course.id, group_category_id: @category.id }
-      json = JSON.parse(response.body)
+      json = response.parsed_body
 
       expect(response).to be_successful
       expect(json.count).to be_equal 1
@@ -358,7 +358,7 @@ describe GroupCategoriesController do
         attachment: fixture_file_upload("group_categories/test_group_categories.csv", "text/csv")
       }
       expect(response).to be_successful
-      json = JSON.parse(response.body)
+      json = JSON.parse(response.body) # rubocop:disable Rails/ResponseParsedBody
       expect(json["context_type"]).to eq "GroupCategory"
       expect(json["tag"]).to eq "course_group_import"
       expect(json["completion"]).to eq 0
@@ -373,7 +373,7 @@ describe GroupCategoriesController do
         attachment: fixture_file_upload("group_categories/test_group_categories.csv", "text/csv")
       }
       expect(response).to be_successful
-      json = JSON.parse(response.body)
+      json = JSON.parse(response.body) # rubocop:disable Rails/ResponseParsedBody
       expect(json["context_type"]).to eq "GroupCategory"
       expect(json["tag"]).to eq "course_group_import"
       expect(json["completion"]).to eq 0

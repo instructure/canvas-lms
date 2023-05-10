@@ -21,7 +21,7 @@ import {act, render, waitFor} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {updateModuleItem} from '@canvas/context-modules/jquery/utils'
 import ContextModulesPublishIcon from '../ContextModulesPublishIcon'
-import {makeModuleWithItems} from '@canvas/context-modules/__tests__/testHelpers'
+import {initBody, makeModuleWithItems} from '@canvas/context-modules/__tests__/testHelpers'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/context-modules/jquery/utils', () => {
@@ -44,7 +44,8 @@ const PUBLISH_URL = '/api/v1/courses/1/modules/1'
 
 beforeEach(() => {
   doFetchApi.mockResolvedValue({response: {ok: true}, json: {published: true}})
-  makeModuleWithItems(1)
+  initBody()
+  makeModuleWithItems(1, [117, 119])
 })
 
 afterEach(() => {
@@ -54,6 +55,42 @@ afterEach(() => {
 })
 
 describe('ContextModulesPublishIcon', () => {
+  describe('basic rendering', () => {
+    it('displays a spinner with default message while publishing is in-flight', () => {
+      const {getByText} = render(
+        <ContextModulesPublishIcon {...defaultProps} isPublishing={true} />
+      )
+      expect(getByText('working')).toBeInTheDocument()
+    })
+
+    it('displays a spinner with given message while publishing is in-flight', () => {
+      const {getByText} = render(
+        <ContextModulesPublishIcon
+          {...defaultProps}
+          isPublishing={true}
+          loadingMessage="the loading message"
+        />
+      )
+      expect(getByText('the loading message')).toBeInTheDocument()
+    })
+
+    it('renders as unpublished when unpublished', () => {
+      const {container, getByText} = render(
+        <ContextModulesPublishIcon {...defaultProps} published={false} />
+      )
+      expect(getByText('Module publish menu')).toBeInTheDocument()
+      expect(container.querySelector('[name="IconUnpublished"]')).toBeInTheDocument()
+    })
+
+    it('renders as published when published', () => {
+      const {container, getByText} = render(
+        <ContextModulesPublishIcon {...defaultProps} published={true} />
+      )
+      expect(getByText('Module publish menu')).toBeInTheDocument()
+      expect(container.querySelector('[name="IconPublish"]')).toBeInTheDocument()
+    })
+  })
+
   it('renders the menu when clicked', () => {
     const {getByRole, getByText} = render(<ContextModulesPublishIcon {...defaultProps} />)
     const menuButton = getByRole('button')

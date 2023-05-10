@@ -609,6 +609,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Fail media sedang diproses. Sila cuba semula kemudian."
   },
+  "media_title_2112243b": { "message": "Tajuk Media" },
   "medium_5a8e9ead": { "message": "Medium" },
   "merge_links_2478df96": { "message": "Gabung pautan" },
   "mic_a7f3d311": { "message": "Mikrofon" },
@@ -892,9 +893,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Sesuatu tidak kena semasa berkongsi skrin anda."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Maaf, kami tidak menyokong berbilang fail."
-  },
   "sort_by_e75f9e3e": { "message": "Isih Mengikut" },
   "spades_suit_b37020c2": { "message": "Penyodok (Sut)" },
   "square_511eb3b3": { "message": "Segi empat" },
@@ -914,6 +912,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Mulakan Rakaman" },
   "steel_blue_14296f08": { "message": "Biru Keluli" },
   "studio_media_options_ee504361": { "message": "Pilihan Media Studio" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Dulang Pilihan Media Studio"
+  },
   "styles_2aa721ef": { "message": "Gaya" },
   "submit_a3cc6859": { "message": "Serahkan" },
   "subscript_59744f96": { "message": "Subskrip" },

@@ -88,7 +88,7 @@ function process_resource_link_attributes(content_item) {
 // Close the CanvasModal used for the LTI launched in the submission_type_selection placement
 function closeModal() {
   //   see:
-  //   1 - renderSubmissionTypeSelectionDialog() from ui/features/assignment_edit/backbone/views/EditView.coffee
+  //   1 - renderSubmissionTypeSelectionDialog() from ui/features/assignment_edit/backbone/views/EditView.js
   //   2 - render() from ui/shared/external-tools/react/components/ExternalToolModalLauncher.js
   //   3 - CanvasModal component in ui/shared/instui-bindings/react/Modal.tsx
   document

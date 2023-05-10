@@ -23,7 +23,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'

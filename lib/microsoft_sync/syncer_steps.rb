@@ -150,7 +150,7 @@ module MicrosoftSync
 
     # Second step of a full sync. Create group on the Microsoft side.
     def step_ensure_class_group_exists(_mem_data, _job_state_data)
-      remote_ids = graph_service_helpers.list_education_classes_for_course(course).map { |c| c["id"] }
+      remote_ids = graph_service_helpers.list_education_classes_for_course(course).pluck("id")
 
       # If we've created the group previously, we're good to go
       if group.ms_group_id && remote_ids == [group.ms_group_id]

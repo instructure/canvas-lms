@@ -26,7 +26,7 @@ import MoreOptions from './MoreOptions/index'
 import React, {Component} from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import UploadFileSVG from '../../../images/UploadFile.svg'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'

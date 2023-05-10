@@ -139,7 +139,7 @@ describe Quizzes::QuizQuestion::QuestionData do
     it "returns an indifferent hash" do
       question = Quizzes::QuizQuestion::QuestionData.generate
 
-      expect(question.to_hash).to be_a(HashWithIndifferentAccess)
+      expect(question.to_hash).to be_a(ActiveSupport::HashWithIndifferentAccess)
     end
   end
 

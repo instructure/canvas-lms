@@ -604,7 +604,7 @@ function confirmAndDeleteRightSideTodoItemsWhenClicked() {
 
 // this really belongs in enhanced-user-content2/instructure_helper
 // but it uses FilePreview to render the file preview overlay, and
-// that has so many dependencies on things like @canvas/files/backbone/models/File.coffee
+// that has so many dependencies on things like @canvas/files/backbone/models/File.js
 // this it'll be too time consuming to decouple it from canvas in our
 // timeframe. Solve it for now by using postMessage from enhanced-user-content2
 // (which we hope to decouple from canvas) to ask canvas to render the preview

@@ -656,7 +656,7 @@ describe "accounts/settings" do
       render
       doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("#account_course_template_id")
-      expect(select.css("option").map { |o| o["value"] }).to eq [""]
+      expect(select.css("option").pluck("value")).to eq [""]
     end
 
     it "shows no template and inherit for sub accounts" do
@@ -668,7 +668,7 @@ describe "accounts/settings" do
       render
       doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("#account_course_template_id")
-      expect(select.css("option").map { |o| o["value"] }).to eq ["", "0"]
+      expect(select.css("option").pluck("value")).to eq ["", "0"]
     end
 
     it "disables if you don't have permission" do
@@ -678,8 +678,8 @@ describe "accounts/settings" do
       render
       doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("#account_course_template_id")
-      expect(select.css("option").map { |o| o["value"] }).to eq ["", c.id.to_s]
-      expect(select.css("option").map { |o| o["disabled"] }).to eq [nil, "disabled"]
+      expect(select.css("option").pluck("value")).to eq ["", c.id.to_s]
+      expect(select.css("option").pluck("disabled")).to eq [nil, "disabled"]
     end
 
     it "disables if you don't have permission in a sub-account" do
@@ -695,8 +695,8 @@ describe "accounts/settings" do
       render
       doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("#account_course_template_id")
-      expect(select.css("option").map { |o| o["value"] }).to eq ["", "0", c.id.to_s]
-      expect(select.css("option").map { |o| o["disabled"] }).to eq %w[disabled disabled disabled]
+      expect(select.css("option").pluck("value")).to eq ["", "0", c.id.to_s]
+      expect(select.css("option").pluck("disabled")).to eq %w[disabled disabled disabled]
     end
   end
 

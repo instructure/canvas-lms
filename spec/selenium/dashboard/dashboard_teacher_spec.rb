@@ -142,7 +142,7 @@ describe "dashboard" do
         wait_for_ajaximations
         f("#assignment_name").send_keys("unpublished assignment")
         f("input[type=checkbox][id=assignment_text_entry]").click
-        f(".datePickerDateField[data-date-type='due_at']").send_keys(Time.zone.now + 1.day)
+        f(".datePickerDateField[data-date-type='due_at']").send_keys(1.day.from_now)
 
         expect_new_page_load { f(".btn-primary[type=submit]").click }
         wait_for_ajaximations

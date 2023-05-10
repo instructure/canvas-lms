@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-// mediaComment.coffee
+// mediaComment.js
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import pubsub from 'jquery-tinypubsub'

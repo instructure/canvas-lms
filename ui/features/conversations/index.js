@@ -33,7 +33,7 @@ import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection
 import '@canvas/jquery/jquery.disableWhileLoading'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {decodeQueryString} from 'query-string-encoding'
+import {decodeQueryString} from '@canvas/query-string-encoding'
 import ConversationStatusFilter from './react/ConversationStatusFilter'
 import ready from '@instructure/ready'
 

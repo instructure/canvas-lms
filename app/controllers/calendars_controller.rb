@@ -26,7 +26,7 @@ class CalendarsController < ApplicationController
 
   def show
     get_context
-    @show_account_calendars = Account.site_admin.feature_enabled?(:account_calendar_events) && @current_user.account_calendars.any?
+    @show_account_calendars = Account.site_admin.feature_enabled?(:account_calendar_events) && @current_user.all_account_calendars.any?
     get_all_pertinent_contexts(include_groups: true, include_accounts: @show_account_calendars, favorites_first: true, cross_shard: true)
     @manage_contexts = @contexts.select do |c|
       c.grants_right?(@current_user, session, :manage_calendar)
@@ -82,12 +82,13 @@ class CalendarsController < ApplicationController
         can_update_wiki_page: context.grants_right?(@current_user, session, :update),
         concluded: context.is_a?(Course) ? context.concluded? : false,
         k5_course: context.is_a?(Course) && context.elementary_enabled?,
+        k5_account: context.is_a?(Account) && context.enable_as_k5_account?,
         course_pacing_enabled: context.is_a?(Course) && @domain_root_account.feature_enabled?(:course_paces) && context.enable_course_paces,
         user_is_observer: context.is_a?(Course) && context.enrollments.where(user_id: @current_user).first&.observer?,
         default_due_time: context.is_a?(Course) && context.default_due_time,
         can_view_context: context.grants_right?(@current_user, session, :read)
       }
-      if context.respond_to?(:course_sections)
+      if context.respond_to?(:course_sections) && !context.is_a?(Account)
         info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|
           hash = { id: id, asset_string: "course_section_#{id}", name: name }
           if ag_permission

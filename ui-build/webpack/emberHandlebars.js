@@ -1,3 +1,5 @@
+/* eslint-disable import/no-unresolved */
+/* eslint-disable import/no-extraneous-dependencies */
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -28,7 +30,7 @@ const EmberHandlebars = require('ember-template-compiler').EmberHandlebars
 const {readI18nScopeFromJSONFile} = require('@instructure/i18nliner-canvas/scoped_hbs_resolver')
 const ScopedHbsExtractor = require('@instructure/i18nliner-canvas/scoped_hbs_extractor')
 const ScopedHbsPreProcessor = require('@instructure/i18nliner-canvas/scoped_hbs_pre_processor')
-const {canvasDir} = require('#params')
+const {canvasDir} = require('../params')
 
 function compileHandlebars(data) {
   const {path, source} = data
@@ -45,14 +47,13 @@ function compileHandlebars(data) {
     const payload = {template, scope, translationCount}
     return payload
   } catch (e) {
+    // eslint-disable-next-line no-ex-assign
     e = e.message || e
+    // eslint-disable-next-line no-console
     console.log(e)
+    // eslint-disable-next-line no-throw-literal
     throw {error: e}
   }
-}
-
-function resourceName(path) {
-  return path.replace(/^.+?\/templates\//, '').replace(/\.hbs$/, '')
 }
 
 function emitTemplate({name, template, dependencies}) {

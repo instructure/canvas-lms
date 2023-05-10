@@ -65,12 +65,12 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
 
       it "returns list of quizzes" do
-        quiz_ids = subject.collect { |quiz| quiz["id"] }
+        quiz_ids = subject.pluck("id")
         expect(quiz_ids).to eq quizzes.map(&:id)
       end
 
       it "is not able to take quiz" do
-        actual_values = subject.map { |quiz| quiz["locked_for_user"] }
+        actual_values = subject.pluck("locked_for_user")
         expected_values = Array.new(actual_values.count, true)
         expect(actual_values).to eq(expected_values)
       end
@@ -90,7 +90,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                               course_id: @course.id.to_s,
                               search_term: search_term)
 
-          response_quiz_ids = response.map { |quiz| quiz["id"] }
+          response_quiz_ids = response.pluck("id")
 
           expect(response_quiz_ids.sort).to eq(quizzes_with_search_term.map(&:id).sort)
         end
@@ -137,7 +137,7 @@ describe Quizzes::QuizzesApiController, type: :request do
           expect(meta["permissions"]["quizzes"]["create"]).to be(true)
 
           quizzes_json = response["quizzes"]
-          quiz_ids = quizzes_json.collect { |quiz| quiz["id"] }
+          quiz_ids = quizzes_json.pluck("id")
           expect(quiz_ids).to eq quizzes.map(&:id).map(&:to_s)
         end
       end
@@ -180,12 +180,12 @@ describe Quizzes::QuizzesApiController, type: :request do
         end
 
         it "only returns published quizzes" do
-          quiz_ids = subject.map { |quiz| quiz["id"] }
+          quiz_ids = subject.pluck("id")
           expect(quiz_ids).to eq([published_quiz.id])
         end
 
         it "is able to take quiz" do
-          actual_values = subject.map { |quiz| quiz["locked_for_user"] }
+          actual_values = subject.pluck("locked_for_user")
           expected_values = [false]
           expect(actual_values).to eq(expected_values)
         end
@@ -203,7 +203,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                                 {},
                                 "Accept" => "application/vnd.api+json")
             quizzes_json = response["quizzes"]
-            quiz_ids = quizzes_json.collect { |quiz| quiz["id"] }
+            quiz_ids = quizzes_json.pluck("id")
             expect(quiz_ids).to eq([published_quiz.id.to_s])
           end
         end

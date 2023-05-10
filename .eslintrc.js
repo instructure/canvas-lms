@@ -91,6 +91,14 @@ module.exports = {
     'no-return-assign': 'off',
     'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
+    '@typescript-eslint/no-use-before-define': [
+      'error',
+      {
+        functions: false,
+        classes: false,
+        variables: false,
+      },
+    ],
     'no-useless-escape': 'off',
     'one-var': 'off',
     'prefer-destructuring': 'off',
@@ -238,7 +246,7 @@ module.exports = {
   settings: {
     'import/resolver': {
       node: {
-        extensions: ['.js', '.jsx', '.json', '.coffee', '.ts', '.tsx', '.d.ts'], // add Typescript and CoffeeScript extensions
+        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.d.ts'], // add Typescript and CoffeeScript extensions
       },
     },
     react: {

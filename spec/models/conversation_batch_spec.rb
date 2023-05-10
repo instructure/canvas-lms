@@ -29,6 +29,20 @@ describe ConversationBatch do
     @user3 = @user
   end
 
+  describe ".created_as_template?" do
+    let(:message) { Conversation.build_message(@user, "lorem ipsum") }
+
+    it "returns true for template messages" do
+      expect(ConversationBatch.created_as_template?(message: message)).to be true
+    end
+
+    it "returns false for non-template messages (messages that have a conversation_id)" do
+      conversation = Conversation.create!
+      message.conversation = conversation
+      expect(ConversationBatch.created_as_template?(message: message)).to be false
+    end
+  end
+
   context "generate" do
     it "creates an async batch" do
       batch = ConversationBatch.generate(@message, [@user2, @user3], :async)

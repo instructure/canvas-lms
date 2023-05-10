@@ -100,8 +100,8 @@ module SchedulerCommon
       title: opts[:title],
       contexts: opts[:contexts],
       new_appointments: [
-        [opts[:start_at] || (Time.zone.now + 1.hour),
-         opts[:end_at] || (Time.zone.now + 3.hours)],
+        [opts[:start_at] || 1.hour.from_now,
+         opts[:end_at] || 3.hours.from_now],
       ],
       participants_per_appointment: opts[:participants] || 4
     }

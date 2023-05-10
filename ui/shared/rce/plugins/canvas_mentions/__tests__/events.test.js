@@ -19,7 +19,15 @@
 import {makeBodyEditable} from '../contentEditable'
 import {insertMentionFor} from '../edit'
 import FakeEditor from './FakeEditor'
-import {onSetContent, onKeyDown, onMouseDown, onKeyUp, onFocusedUserChange} from '../events'
+import {
+  onSetContent,
+  onKeyDown,
+  onMouseDown,
+  onKeyUp,
+  onFocusedUserChange,
+  onWindowMouseDown,
+} from '../events'
+import {MENTION_MENU_ID} from '../constants'
 import ReactDOM from 'react-dom'
 
 jest.mock('../contentEditable', () => ({
@@ -554,6 +562,43 @@ describe('events', () => {
         subject()
         expect(editor.dom.select('#mentions-marker')[0].getAttribute('data-userId')).toEqual('')
       })
+    })
+  })
+
+  describe('onWindowMouseDown()', () => {
+    let event
+    const subject = () => onWindowMouseDown(event)
+
+    beforeEach(() => {
+      event = {
+        editor,
+        target: {},
+      }
+      const content = `<div id="outsideid"> </div>
+      <div data-testid="fake-body" contenteditable="false">
+          <span id="test"> @
+            <span id="mentions-marker" contenteditable="true">wes</span>
+            <span id="${MENTION_MENU_ID}"><div id="testid"></div></span>
+          </span>
+        </div>`
+      editor.setContent(content)
+      document.body.innerHTML = content
+    })
+
+    afterEach(() => {
+      document.body.innerHTML = ''
+    })
+
+    it('closes the MentionsMenu when click is outside the menu', () => {
+      event.target = document.getElementById('outsideid')
+      subject()
+      expect(ReactDOM.unmountComponentAtNode).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not close the MentionsMenu when click is inside the menu', () => {
+      event.target = document.getElementById('testid')
+      subject()
+      expect(ReactDOM.unmountComponentAtNode).not.toHaveBeenCalled()
     })
   })
 })

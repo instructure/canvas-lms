@@ -133,9 +133,7 @@ describe('DeveloperKeys App', () => {
   describe('OIDC auth change alert box', () => {
     describe('preFlip', () => {
       beforeEach(() => {
-        jest
-          .useFakeTimers()
-          .setSystemTime(new Date('May 31 2023'));
+        jest.useFakeTimers().setSystemTime(new Date('May 31 2023'))
         ENV = {FEATURES: {dev_key_oidc_alert: true}}
         setup(ENV, [...parentKeys, ...siteAdminKeys])
       })
@@ -155,9 +153,7 @@ describe('DeveloperKeys App', () => {
 
     describe('postFlip', () => {
       beforeEach(() => {
-        jest
-          .useFakeTimers()
-          .setSystemTime(new Date('July 2 2023'));
+        jest.useFakeTimers().setSystemTime(new Date('July 2 2023'))
         ENV = {FEATURES: {dev_key_oidc_alert: true}}
         setup(ENV, [...parentKeys, ...siteAdminKeys])
       })

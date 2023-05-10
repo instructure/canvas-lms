@@ -187,8 +187,8 @@ module Outcomes
     def normalize_i18n(string)
       raise ArgumentError if string.blank?
 
-      separator = I18n.t(:separator, scope: :"number.format")
-      delimiter = I18n.t(:delimiter, scope: :"number.format")
+      separator = I18n.t("number.format.separator")
+      delimiter = I18n.t("number.format.delimiter")
       string.gsub(delimiter, "").gsub(separator, ".")
     end
 

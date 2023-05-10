@@ -84,7 +84,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
                       course_id: @course.to_param, id: @col.to_param, action: "index",
                       controller: "custom_gradebook_column_data_api", format: "json"
       expect(response).to be_successful
-      expect(json.map { |datum| datum["user_id"] }).to include student.id
+      expect(json.pluck("user_id")).to include student.id
     end
 
     it "includes students with concluded enrollments" do
@@ -97,7 +97,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
                       course_id: @course.to_param, id: @col.to_param, action: "index",
                       controller: "custom_gradebook_column_data_api", format: "json"
       expect(response).to be_successful
-      expect(json.map { |datum| datum["user_id"] }).to include student.id
+      expect(json.pluck("user_id")).to include student.id
     end
 
     it "returns the column data" do

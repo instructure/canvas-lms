@@ -579,6 +579,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Fichye miltimedya an tretman. Tanpri eseye ankò."
   },
+  "media_title_2112243b": { "message": "Tit Medya" },
   "medium_5a8e9ead": { "message": "Mwayen" },
   "merge_links_2478df96": { "message": "Fizyone lyen" },
   "mic_a7f3d311": { "message": "Mikwo" },
@@ -860,9 +861,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Gen yon bagay ki pase mal pandan n ap pataje ekran w lan."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Dezole, nou pa rekonpet fichye miltip yo."
-  },
   "sort_by_e75f9e3e": { "message": "Triye Pa" },
   "spades_suit_b37020c2": { "message": "Pik (Konbinezon)" },
   "square_511eb3b3": { "message": "Kare" },
@@ -880,6 +878,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Kòmanse Anrejistre" },
   "steel_blue_14296f08": { "message": "Ble Gri" },
   "studio_media_options_ee504361": { "message": "Opsyon Estidyo Medya a" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Opsyon Plato Medya Studio"
+  },
   "styles_2aa721ef": { "message": "Stil" },
   "submit_a3cc6859": { "message": "Soumèt" },
   "subscript_59744f96": { "message": "Endis" },

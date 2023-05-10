@@ -112,7 +112,7 @@ module Api::V1
 
       # populate previous_* and new_* keys and convert hash to array of objects
       versions_hash.inject([]) do |memo, (submission_id, submission_versions)|
-        prior = HashWithIndifferentAccess.new
+        prior = ActiveSupport::HashWithIndifferentAccess.new
         filtered_versions = submission_versions.each_with_object([]) do |version, new_array|
           if version[:score] &&
              (prior[:id].nil? || prior[:score] != version[:score])

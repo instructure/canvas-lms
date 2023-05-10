@@ -21,8 +21,8 @@ class DefaultAuthOverTls < ActiveRecord::Migration[5.0]
   tag :predeploy
 
   def change
-    return if column_exists?(:account_authorization_configs, :auth_over_tls, :string, default: "start_tls")
+    return if column_exists?(:authentication_providers, :auth_over_tls, :string, default: "start_tls")
 
-    change_column_default :account_authorization_configs, :auth_over_tls, from: nil, to: "start_tls"
+    change_column_default :authentication_providers, :auth_over_tls, from: nil, to: "start_tls"
   end
 end

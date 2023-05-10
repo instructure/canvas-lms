@@ -69,6 +69,8 @@ import {
   updateProgressionState,
 } from './utils'
 import ContextModulesPublishMenu from '../react/ContextModulesPublishMenu'
+import {renderContextModulesPublishIcon} from '../utils/publishOneModuleHelper'
+import {underscoreString} from '@canvas/convert-case'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -514,7 +516,7 @@ window.modules = (function () {
         return $('<div/>')
       }
       data.id = data.id || 'new'
-      data.type = data.type || data['item[type]'] || $.underscore(data.content_type)
+      data.type = data.type || data['item[type]'] || underscoreString(data.content_type)
       data.title = data.title || data['item[title]']
       data.new_tab = data.new_tab ? '1' : '0'
       data.graded = data.graded ? '1' : '0'
@@ -1027,6 +1029,7 @@ modules.initModuleManagement = function (duplicate) {
       $('#no_context_modules_message').slideUp()
       $('#expand_collapse_all').show()
       setExpandAllButton()
+      const published = data.context_module.workflow_state === 'published'
       const $publishIcon = $module.find('.publish-icon')
       // new module, setup publish icon and other stuff
       if (!$publishIcon.data('id')) {
@@ -1042,11 +1045,23 @@ modules.initModuleManagement = function (duplicate) {
           moduleType: 'module',
           id: data.context_module.id,
           courseId: data.context_module.context_id,
-          published: data.context_module.workflow_state === 'published',
+          published,
           publishable: true,
         }
         const view = initPublishButton($publishIcon, publishData)
         overrideModel(moduleItems, relock_modules_dialog, view.model, view)
+      }
+      if (window.ENV?.FEATURES?.module_publish_menu) {
+        const isPublishing =
+          document.querySelector('#context-modules-publish-menu').dataset['data-progress-id'] !==
+          undefined
+        updatePublishMenuDisabledState(isPublishing)
+        renderContextModulesPublishIcon(
+          data.context_module.context_id,
+          data.context_module.id,
+          published,
+          isPublishing
+        )
       }
       relock_modules_dialog.renderIfNeeded(data.context_module)
       $module.triggerHandler('update', data)
@@ -1942,7 +1957,7 @@ modules.initModuleManagement = function (duplicate) {
     overrideModel(moduleItems, relock_modules_dialog, view.model, view)
   }
 
-  const initNewItemDirectShare = ($item, data) => {
+  function initNewItemDirectShare($item, data) {
     const $copyToMenuItem = $item.find('.module_item_copy_to')
     if ($copyToMenuItem.length === 0) return // feature not enabled, probably
     const $sendToMenuItem = $item.find('.module_item_send_to')
@@ -1972,6 +1987,16 @@ modules.initModuleManagement = function (duplicate) {
     }
   })
 
+  if (duplicate && duplicate.length) {
+    const modulePublishIcon = duplicate[0].querySelector('.module-publish-icon')
+    if (modulePublishIcon) {
+      const courseId = modulePublishIcon.getAttribute('data-course-id')
+      const moduleId = modulePublishIcon.getAttribute('data-module-id')
+      const published = modulePublishIcon.getAttribute('data-published') === 'true'
+      renderContextModulesPublishIcon(courseId, moduleId, false, published)
+    }
+  }
+
   $('.module-publish-link').each((i, element) => {
     const $el = $(element)
     const model = new Publishable(
@@ -1981,6 +2006,12 @@ modules.initModuleManagement = function (duplicate) {
     const view = new PublishButtonView({model, el: $el})
     view.render()
   })
+  // I tried deferring the rendering of ContextModulesPuyblishMenu
+  // and ContextModulesPublishIcons until here,
+  // after the models and views were all setup, but it made
+  // the UI janky. Let them get rendered early, the tell
+  // ContextModulesPublishMenu everything is ready.
+  window.dispatchEvent(new Event('module-publish-models-ready'))
 }
 
 function toggleModuleCollapse(event) {

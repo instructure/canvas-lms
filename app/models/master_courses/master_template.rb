@@ -339,7 +339,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
                              .pluck(:id, :sis_source_id, "mcs.master_template_id", "caa.id")
 
           if data.count != associated_sis_ids
-            (associated_sis_ids - data.map { |r| r[1] }).each do |invalid_id|
+            (associated_sis_ids - data.pluck(1)).each do |invalid_id|
               messages << "Cannot associate course \"#{invalid_id}\" - is a blueprint course"
             end
           end

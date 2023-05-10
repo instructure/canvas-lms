@@ -300,7 +300,7 @@ describe K5::UserService do
       toggle_classic_font_setting(@k5_account)
       service = K5::UserService.new(@student1, @root_account, nil)
       allow(service).to receive(:k5_user?).and_return(false)
-      expect(service.send(:use_classic_font?)).to eq false
+      expect(service.send(:use_classic_font?)).to be false
     end
 
     it "returns false if the user is not associated with a classic font k5 account" do

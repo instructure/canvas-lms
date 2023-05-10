@@ -33,7 +33,7 @@ export default function wrapInitCb(mirroredAttrs, editorOptions) {
 
     // *** moved from setupAndFocusTinyMCEConfig ***
     const $editor = $('#' + ed.id)
-    // KeyboardShortcuts.coffee needs to listen to events
+    // KeyboardShortcuts.js needs to listen to events
     // fired from inside the editor, so we pass out
     // keyup events to the document
     ed.on('keyup', e => {

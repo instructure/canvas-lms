@@ -66,6 +66,7 @@ module QuizzesNext
           old_assignment_id = assignment.fetch(:original_assignment_id)
           old_assignment = Assignment.find(old_assignment_id)
 
+          new_assignment.skip_downstream_changes! # don't let these updates prevent future blueprint syncs
           new_assignment.duplicate_of = old_assignment
           new_assignment.workflow_state = "duplicating"
           new_assignment.duplication_started_at = Time.zone.now

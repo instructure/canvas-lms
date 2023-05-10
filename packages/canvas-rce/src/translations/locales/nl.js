@@ -622,6 +622,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Verwerken van mediabestand. Probeer het later opnieuw."
   },
+  "media_title_2112243b": { "message": "Mediatitel" },
   "medium_5a8e9ead": { "message": "Medium" },
   "merge_links_2478df96": { "message": "Koppelingen samenvoegen" },
   "mic_a7f3d311": { "message": "Mic" },
@@ -917,9 +918,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Er is iets fout gegaan bij het delen van je scherm."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Helaas, we bieden geen ondersteuning voor meerdere bestanden."
-  },
   "sort_by_e75f9e3e": { "message": "Sorteren op" },
   "spades_suit_b37020c2": { "message": "Schoppen (speelkaart)" },
   "square_511eb3b3": { "message": "Vierkant" },
@@ -943,6 +941,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Opname starten" },
   "steel_blue_14296f08": { "message": "Staalblauw" },
   "studio_media_options_ee504361": { "message": "Studio Media-opties" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Menu Studio media-opties"
+  },
   "styles_2aa721ef": { "message": "Stijlen" },
   "submit_a3cc6859": { "message": "Inleveren" },
   "subscript_59744f96": { "message": "Subscript" },

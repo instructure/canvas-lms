@@ -36,14 +36,14 @@ describe "Rubrics API", type: :request do
   end
 
   def rubric_association_params_for_assignment(assign)
-    HashWithIndifferentAccess.new({
-                                    hide_score_total: "0",
-                                    purpose: "grading",
-                                    skip_updating_points_possible: false,
-                                    update_if_existing: true,
-                                    use_for_grading: "1",
-                                    association_object: assign
-                                  })
+    ActiveSupport::HashWithIndifferentAccess.new({
+                                                   hide_score_total: "0",
+                                                   purpose: "grading",
+                                                   skip_updating_points_possible: false,
+                                                   update_if_existing: true,
+                                                   use_for_grading: "1",
+                                                   association_object: assign
+                                                 })
   end
 
   def create_rubric_assessment(opts = {})

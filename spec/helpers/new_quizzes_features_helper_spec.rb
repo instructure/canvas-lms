@@ -205,4 +205,50 @@ describe NewQuizzesFeaturesHelper do
       expect(new_quizzes_by_default?).to be false
     end
   end
+
+  describe "#disable_content_rewriting?" do
+    def flag_state(value)
+      Account.site_admin.set_feature_flag!(:new_quizzes_migrate_without_content_rewrite, value)
+    end
+
+    context "quizzes_next is true" do
+      before do
+        allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+      end
+
+      context "flag is off" do
+        it "returns false" do
+          flag_state Feature::STATE_OFF
+          expect(NewQuizzesFeaturesHelper.disable_content_rewriting?(@context)).to be false
+        end
+      end
+
+      context "flag is on" do
+        it "returns true" do
+          flag_state Feature::STATE_ON
+          expect(NewQuizzesFeaturesHelper.disable_content_rewriting?(@context)).to be true
+        end
+      end
+    end
+
+    context "quizzes_next is false" do
+      before do
+        allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(false)
+      end
+
+      context "flag is off" do
+        it "returns false" do
+          flag_state Feature::STATE_OFF
+          expect(NewQuizzesFeaturesHelper.disable_content_rewriting?(@context)).to be false
+        end
+      end
+
+      context "flag is on" do
+        it "returns false" do
+          flag_state Feature::STATE_ON
+          expect(NewQuizzesFeaturesHelper.disable_content_rewriting?(@context)).to be false
+        end
+      end
+    end
+  end
 end

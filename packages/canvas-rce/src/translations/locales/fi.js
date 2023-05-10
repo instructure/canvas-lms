@@ -626,6 +626,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Yritä myöhemmin uudelleen. Yritä myöhemmin uudelleen."
   },
+  "media_title_2112243b": { "message": "Median otsikko" },
   "medium_5a8e9ead": { "message": "Tietoväline" },
   "merge_links_2478df96": { "message": "Yhdistä linkkejä" },
   "mic_a7f3d311": { "message": "Mikrofoni" },
@@ -911,9 +912,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Jokin meni pieleen näyttösi jakamisen yhteydessä."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Pahoittelut, emme tue useita tiedostoja."
-  },
   "sort_by_e75f9e3e": { "message": "Lajitteluperuste" },
   "spades_suit_b37020c2": { "message": "Pata (suit)" },
   "square_511eb3b3": { "message": "Neliö" },
@@ -933,6 +931,9 @@ const locale = {
   "start_recording_9a65141a": { "message": "Aloita nauhoitus" },
   "steel_blue_14296f08": { "message": "Teräksensininen" },
   "studio_media_options_ee504361": { "message": "Studion mediaväline" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Studion mediavälinealue"
+  },
   "styles_2aa721ef": { "message": "Tyylit" },
   "submit_a3cc6859": { "message": "Lähetä" },
   "subscript_59744f96": { "message": "Alaindeksi" },

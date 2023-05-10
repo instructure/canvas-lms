@@ -283,6 +283,7 @@ export default function VideoOptionsTray({
                             userLocale={Bridge.userLocale}
                             updateSubtitles={handleUpdateSubtitles}
                             liveRegion={getLiveRegion}
+                            mountNode={instuiPopupMountNode}
                           />
                         </FormFieldGroup>
                       </Flex.Item>

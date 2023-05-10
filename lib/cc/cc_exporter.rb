@@ -24,7 +24,7 @@ module CC
 
     ZIP_DIR = "zip_dir"
 
-    attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy, :for_master_migration
+    attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy, :for_master_migration, :disable_content_rewriting
 
     delegate :add_error, :add_item_to_export, to: :@content_export, allow_nil: true
 
@@ -33,6 +33,7 @@ module CC
       @course = opts[:course] || @content_export.context
       raise "CCExporter supports only Courses" unless @course.is_a?(Course) # a Course is a Course, of course, of course
 
+      @disable_content_rewriting = @content_export&.disable_content_rewriting?
       @user = opts[:user] || @content_export.user
       @export_dir = nil
       @manifest = nil

@@ -310,6 +310,15 @@ describe MediaObject do
       expect(@media_object.attachment.workflow_state).to eq("processed")
     end
 
+    it "marks the correct attachment as processed if one is specified" do
+      att = attachment_model
+      @media_object.current_attachment = att
+      @media_object.process_retrieved_details(@mock_entry, @media_type, @assets)
+      att.reload
+      expect(@media_object.attachment.workflow_state).to eq("pending_upload")
+      expect(att.workflow_state).to eq("processed")
+    end
+
     it "doesn't recreate deleted attachments" do
       @media_object.attachment.destroy
       expect { @media_object.reload.process_retrieved_details(@mock_entry, @media_type, @assets) }.not_to change { Attachment.count }

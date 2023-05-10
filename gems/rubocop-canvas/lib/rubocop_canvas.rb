@@ -20,6 +20,7 @@
 $LOAD_PATH << File.dirname(__FILE__)
 
 require "rubocop"
+require "rubocop-rails"
 require "rubocop_canvas/version"
 
 # helpers
@@ -49,7 +50,6 @@ require "rubocop_canvas/cops/migration/change_column"
 require "rubocop_canvas/cops/migration/rename_table"
 require "rubocop_canvas/cops/migration/add_index"
 require "rubocop_canvas/cops/migration/change_column_null"
-require "rubocop_canvas/cops/migration/boolean_columns"
 require "rubocop_canvas/cops/migration/data_fixup"
 require "rubocop_canvas/cops/migration/predeploy"
 require "rubocop_canvas/cops/migration/id_column"
@@ -86,9 +86,9 @@ module RuboCop
 
         AST::Node.include(Indifferent)
         AST::SymbolNode.include(IndifferentSymbol)
-        if defined?(Cop::Style::ConcatArrayLiterals)
-          Cop::Style::ConcatArrayLiterals.prepend(Cop::Style::ConcatArrayLiteralsWithIgnoredReceivers)
-        end
+        Cop::Style::ConcatArrayLiterals.prepend(Cop::Style::ConcatArrayLiteralsWithIgnoredReceivers)
+        Cop::Rails::ThreeStateBooleanColumn.prepend(LegacyMigrations)
+        Cop::Rails::ThreeStateBooleanColumn.legacy_cutoff_date = "20220628134809"
       end
     end
   end

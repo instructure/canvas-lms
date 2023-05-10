@@ -31,7 +31,7 @@ class CalendarEvent < ActiveRecord::Base
 
   include MasterCourses::Restrictor
 
-  self.ignored_columns = %i[series_id]
+  self.ignored_columns += %i[series_id]
 
   restrict_columns :content, [:title, :description]
   restrict_columns :settings, %i[location_name location_address start_at end_at all_day all_day_date series_uuid rrule]
@@ -421,7 +421,7 @@ class CalendarEvent < ActiveRecord::Base
         e.updating_user = updating_user
         e.destroy(false)
       end
-      return true unless update_context_or_parent
+      next unless update_context_or_parent
 
       if appointment_group
         context.touch if context_type == "AppointmentGroup" # ensures end_at/start_at get updated
@@ -433,8 +433,8 @@ class CalendarEvent < ActiveRecord::Base
         parent_event.workflow_state = parent_event.locked? ? "active" : "deleted"
         parent_event.save!
       end
-      true
     end
+    true
   end
 
   def time_zone_edited
@@ -759,7 +759,7 @@ class CalendarEvent < ActiveRecord::Base
       end
 
       loc_string = if @event.is_a?(CalendarEvent)
-                     [@event.location_name, @event.location_address].reject(&:blank?).join(", ")
+                     [@event.location_name, @event.location_address].compact_blank.join(", ")
                    else
                      nil
                    end

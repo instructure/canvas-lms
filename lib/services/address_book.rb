@@ -286,7 +286,7 @@ module Services
 
       # extract the next page cursor from the response
       def cursors
-        @response["records"].map { |record| record["cursor"] }
+        @response["records"].pluck("cursor")
       end
     end
   end

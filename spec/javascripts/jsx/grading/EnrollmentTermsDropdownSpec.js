@@ -20,7 +20,7 @@ import React from 'react'
 
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
-import _ from 'underscore'
+import _ from 'lodash'
 import Dropdown from 'ui/features/account_grading_standards/react/EnrollmentTermsDropdown'
 
 const wrapper = document.getElementById('fixtures')
@@ -106,6 +106,6 @@ test('calls changeSelectedEnrollmentTerm when a selection is made', function () 
 test("displays the terms in descending order by start date then created date if start date doesn't exist", function () {
   const dropdown = this.renderComponent()
   const node = ReactDOM.findDOMNode(dropdown.refs.termsDropdown)
-  const optionIDs = _.pluck(node.getElementsByTagName('OPTION'), 'value')
+  const optionIDs = _.map(node.getElementsByTagName('OPTION'), 'value')
   propEqual(optionIDs, ['0', '21', '18', '7', '2'])
 })

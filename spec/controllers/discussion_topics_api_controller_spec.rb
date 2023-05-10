@@ -123,12 +123,12 @@ describe DiscussionTopicsApiController do
       user_session(@student)
       @shard1.activate do
         post "entries", params: { topic_id: @topic.id, course_id: @course.id, user_id: @student.id }, format: "json"
-        expect(JSON.parse(response.body).count).to eq(2)
+        expect(response.parsed_body.count).to eq(2)
       end
 
       @shard2.activate do
         post "entries", params: { topic_id: @topic.id, course_id: @course.id, user_id: @student.id }, format: "json"
-        expect(JSON.parse(response.body).count).to eq(2)
+        expect(response.parsed_body.count).to eq(2)
       end
     end
 
@@ -136,12 +136,12 @@ describe DiscussionTopicsApiController do
       user_session(@student)
       @shard1.activate do
         post "replies", params: { topic_id: @topic.id, course_id: @course.id, user_id: @student.id, entry_id: @entry.id }, format: "json"
-        expect(JSON.parse(response.body).count).to eq(1)
+        expect(response.parsed_body.count).to eq(1)
       end
 
       @shard2.activate do
         post "replies", params: { topic_id: @topic.id, course_id: @course.id, user_id: @student.id, entry_id: @entry.id }, format: "json"
-        expect(JSON.parse(response.body).count).to eq(1)
+        expect(response.parsed_body.count).to eq(1)
       end
     end
   end

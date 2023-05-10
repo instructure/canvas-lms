@@ -98,20 +98,8 @@ If you want to migrate the existing database, cancel now
 
 function bundle_install {
   start_spinner "  Installing gems (bundle install) ..."
-  run_command bash -c 'rm -f Gemfile.lock* >/dev/null 2>&1'
   _canvas_lms_track_with_log run_command bundle install
   stop_spinner
-}
-
-function bundle_install_with_check {
-  start_spinner "Checking your gems (bundle check)..."
-  if _canvas_lms_track_with_log run_command bundle check ; then
-    stop_spinner
-    echo_console_and_log "  Gems are up to date, no need to bundle install ..."
-  else
-    stop_spinner
-    bundle_install
-  fi
 }
 
 function rake_db_migrate_dev_and_test {

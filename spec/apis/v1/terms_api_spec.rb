@@ -53,42 +53,42 @@ describe TermsApiController, type: :request do
 
       it "lists all active terms by default" do
         json = get_terms
-        names = json.map { |t| t["name"] }
+        names = json.pluck("name")
         expect(names).to include(@term1.name)
         expect(names).not_to include(@term2.name)
       end
 
       it "lists active terms with state=active" do
         json = get_terms(workflow_state: "active")
-        names = json.map { |t| t["name"] }
+        names = json.pluck("name")
         expect(names).to include(@term1.name)
         expect(names).not_to include(@term2.name)
       end
 
       it "lists deleted terms with state=deleted" do
         json = get_terms(workflow_state: "deleted")
-        names = json.map { |t| t["name"] }
+        names = json.pluck("name")
         expect(names).not_to include(@term1.name)
         expect(names).to include(@term2.name)
       end
 
       it "lists all terms, active and deleted, with state=all" do
         json = get_terms(workflow_state: "all")
-        names = json.map { |t| t["name"] }
+        names = json.pluck("name")
         expect(names).to include(@term1.name)
         expect(names).to include(@term2.name)
       end
 
       it "does not blow up for invalid state parameters" do
         json = get_terms(workflow_state: ["blall"])
-        names = json.map { |t| t["name"] }
+        names = json.pluck("name")
         expect(names).to include(@term1.name)
         expect(names).not_to include(@term2.name)
       end
 
       it "lists all terms, active and deleted, with state=[all]" do
         json = get_terms(workflow_state: ["all"])
-        names = json.map { |t| t["name"] }
+        names = json.pluck("name")
         expect(names).to include(@term1.name)
         expect(names).to include(@term2.name)
       end
@@ -136,15 +136,15 @@ describe TermsApiController, type: :request do
     it "includes overrides if requested" do
       @term1.set_overrides(@account, "StudentEnrollment" => { end_at: "2017-01-20T00:00:00Z" })
       json = get_terms(include: ["overrides"])
-      expect(json.map { |el| el["overrides"] }).to match_array([
-                                                                 {}, { "StudentEnrollment" => { "start_at" => nil, "end_at" => "2017-01-20T00:00:00Z" } }
-                                                               ])
+      expect(json.pluck("overrides")).to match_array([
+                                                       {}, { "StudentEnrollment" => { "start_at" => nil, "end_at" => "2017-01-20T00:00:00Z" } }
+                                                     ])
     end
 
     it "includes course count if requested" do
       2.times { course_factory(active_all: true, account: @account, enrollment_term_id: @term1.id) }
       json = get_terms(include: ["course_count"])
-      expect(json.map { |t| t["course_count"] }).to match_array([2, 0])
+      expect(json.pluck("course_count")).to match_array([2, 0])
     end
 
     describe "authorization" do
@@ -165,14 +165,14 @@ describe TermsApiController, type: :request do
       it "allows sub-account admins to view" do
         subaccount = @account.sub_accounts.create!(name: "subaccount")
         account_admin_user(account: subaccount)
-        res = get_terms.map { |t| t["name"] }
+        res = get_terms.pluck("name")
         expect(res).to match_array([@term1.name, @term2.name])
       end
 
       it "allows teachers to view" do
         c = @account.courses.create!(enrollment_term: @term1)
         teacher_in_course(course: c, active_all: true)
-        res = get_terms.map { |t| t["name"] }
+        res = get_terms.pluck("name")
         expect(res).to match_array([@term1.name, @term2.name])
       end
 
@@ -196,7 +196,7 @@ describe TermsApiController, type: :request do
       it "allows account admins without manage_account_settings to view" do
         role = custom_account_role("custom")
         account_admin_user_with_role_changes(account: @account, role: role)
-        res = get_terms.map { |t| t["name"] }
+        res = get_terms.pluck("name")
         expect(res).to match_array([@term1.name, @term2.name])
       end
     end

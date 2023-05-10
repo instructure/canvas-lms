@@ -225,11 +225,18 @@ describe BasicLTI::BasicOutcomes do
 
     context "jwt sourcedid" do
       before do
-        dynamic_settings = {
-          "lti-signing-secret" => "signing-secret-vp04BNqApwdwUYPUI",
-          "lti-encryption-secret" => "encryption-secret-5T14NjaTbcYjc4"
+        fake_lti_secrets = {
+          "lti-signing-secret" => Base64.encode64("signing-secret-vp04BNqApwdwUYPUI"),
+          "lti-encryption-secret" => Base64.encode64("encryption-secret-5T14NjaTbcYjc4")
         }
-        allow(DynamicSettings).to receive(:find) { dynamic_settings }
+
+        allow(Rails.application.credentials).to receive(:dig)
+          .with(:lti, :signing_secret)
+          .and_return(fake_lti_secrets["lti-signing-secret"])
+
+        allow(Rails.application.credentials).to receive(:dig)
+          .with(:lti, :encryption_secret)
+          .and_return(fake_lti_secrets["lti-encryption-secret"])
       end
 
       let(:jwt_source_id) do
@@ -834,7 +841,7 @@ describe BasicLTI::BasicOutcomes do
       stub_request(:get, "http://example.com/download").to_return(status: 500)
       Timecop.freeze do
         run_jobs
-        expect(Delayed::Job.find_by(strand: "file_download/example.com/failed").run_at).to be > Time.zone.now + 5.seconds
+        expect(Delayed::Job.find_by(strand: "file_download/example.com/failed").run_at).to be > 5.seconds.from_now
       end
       expect(submission.reload.versions.count).to eq 1
       expect(submission.attachments.count).to eq 0

@@ -49,7 +49,7 @@ describe "EportfoliosApi", type: :request do
                       user_id: @eportfolio_user.id)
 
       expected = [@active_eportfolio.id, @flagged_eportfolio.id, @safe_eportfolio.id, @spam_eportfolio.id]
-      expect(json.map { |j| j["id"] }.sort).to eql expected.sort
+      expect(json.pluck("id").sort).to eql expected.sort
     end
 
     context "as an admin" do
@@ -62,7 +62,7 @@ describe "EportfoliosApi", type: :request do
                         user_id: @eportfolio_user.id,
                         include: ["deleted"])
 
-        expect(json.map { |j| j["id"] }.size).to eq 5
+        expect(json.pluck("id").size).to eq 5
         expect(json.select { |j| j["id"] == @deleted_eportfolio.id }).to be_present
       end
     end
@@ -223,7 +223,7 @@ describe "EportfoliosApi", type: :request do
                         format: "json",
                         eportfolio_id: @active_eportfolio.id)
 
-        expect(json.map { |j| j["id"] }.size).to eq 2
+        expect(json.pluck("id").size).to eq 2
       end
 
       it "is unauthorized for a deleted eportfolio" do
@@ -246,7 +246,7 @@ describe "EportfoliosApi", type: :request do
                         format: "json",
                         eportfolio_id: @active_eportfolio.id)
 
-        expect(json.map { |j| j["id"] }.size).to eq 2
+        expect(json.pluck("id").size).to eq 2
       end
 
       it "is unauthorized for a deleted eportfolio" do

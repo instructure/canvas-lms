@@ -102,7 +102,7 @@ describe Api::V1::QuizSubmissionQuestion do
 
       it "shuffles answers when opt is given" do
         expect_any_instance_of(Array).to receive(:shuffle!).at_least(:once)
-        subject[:quiz_submission_questions].first["answers"].map { |a| a["text"] }
+        subject[:quiz_submission_questions].first["answers"].pluck("text")
       end
     end
 
@@ -111,7 +111,7 @@ describe Api::V1::QuizSubmissionQuestion do
 
       it "shuffles answers when opt is given" do
         expect_any_instance_of(Array).not_to receive(:shuffle!)
-        answer_text = subject[:quiz_submission_questions].first["answers"].map { |a| a["text"] }
+        answer_text = subject[:quiz_submission_questions].first["answers"].pluck("text")
         expect(answer_text).to eq(%w[a b c d])
       end
     end

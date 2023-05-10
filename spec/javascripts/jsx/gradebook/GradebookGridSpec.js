@@ -22,7 +22,7 @@ import {
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import fakeENV from 'helpers/fakeENV'
 import qs from 'qs'
-import _ from 'underscore'
+import {map} from 'lodash'
 import {
   getAssignmentColumnId,
   getAssignmentGroupColumnId,
@@ -802,7 +802,7 @@ test('invalidates each student row', function () {
 
 test('includes the row index of the student when invalidating', function () {
   this.gradebook.invalidateRowsForStudentIds(['1101', '1102'])
-  const rows = _.map(this.gradebook.gradebookGrid.invalidateRow.args, args => args[0]) // get the first arg of each call
+  const rows = map(this.gradebook.gradebookGrid.invalidateRow.args, args => args[0]) // get the first arg of each call
   deepEqual(rows, [0, 1])
 })
 
@@ -1561,13 +1561,13 @@ QUnit.module('Gradebook#updateTotalGradeColumn', hooks => {
 
   test('includes the row index of the student when updating', () => {
     gradebook.updateTotalGradeColumn()
-    const rows = _.map(gradebook.gradebookGrid.grid.updateCell.args, args => args[0])
+    const rows = map(gradebook.gradebookGrid.grid.updateCell.args, args => args[0])
     deepEqual(rows, [0, 1])
   })
 
   test('includes the index of the total_grade column when updating', () => {
     gradebook.updateTotalGradeColumn()
-    const rows = _.map(gradebook.gradebookGrid.grid.updateCell.args, args => args[1])
+    const rows = map(gradebook.gradebookGrid.grid.updateCell.args, args => args[1])
     deepEqual(rows, [2, 2])
   })
 
@@ -1738,13 +1738,13 @@ test('updates cells for each column', function () {
 
 test('includes the row index of the student when updating', function () {
   this.gradebook.updateRowCellsForStudentIds(['1102'])
-  const rows = _.map(this.gradebook.gradebookGrid.grid.updateCell.args, args => args[0]) // get the first arg of each call
+  const rows = map(this.gradebook.gradebookGrid.grid.updateCell.args, args => args[0]) // get the first arg of each call
   deepEqual(rows, [1, 1, 1, 1], 'each call specified row 1 (student 1102)')
 })
 
 test('includes the index of each column when updating', function () {
   this.gradebook.updateRowCellsForStudentIds(['1101', '1102'])
-  const rows = _.map(this.gradebook.gradebookGrid.grid.updateCell.args, args => args[1]) // get the first arg of each call
+  const rows = map(this.gradebook.gradebookGrid.grid.updateCell.args, args => args[1]) // get the first arg of each call
   deepEqual(rows, [0, 1, 2, 3, 0, 1, 2, 3])
 })
 

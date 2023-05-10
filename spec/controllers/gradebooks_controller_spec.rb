@@ -2120,7 +2120,7 @@ describe GradebooksController do
   end
 
   describe "POST 'update_submission'" do
-    let(:json) { JSON.parse(response.body) }
+    let(:json) { response.parsed_body }
 
     describe "returned JSON" do
       before(:once) do
@@ -2146,7 +2146,7 @@ describe GradebooksController do
         end
 
         it "includes assignment_visibility" do
-          submissions = json.map { |submission| submission["submission"] }
+          submissions = json.pluck("submission")
           expect(submissions).to all include("assignment_visible" => true)
         end
 
@@ -2157,7 +2157,7 @@ describe GradebooksController do
 
         it "includes missing in submission history" do
           submission_history = json.first["submission"]["submission_history"]
-          submissions = submission_history.map { |submission| submission["submission"] }
+          submissions = submission_history.pluck("submission")
           expect(submissions).to all include("missing" => false)
         end
 
@@ -2168,12 +2168,12 @@ describe GradebooksController do
 
         it "includes late in submission history" do
           submission_history = json.first["submission"]["submission_history"]
-          submissions = submission_history.map { |submission| submission["submission"] }
+          submissions = submission_history.pluck("submission")
           expect(submissions).to all include("late" => false)
         end
 
         it "includes user_ids" do
-          submissions = json.map { |submission| submission["submission"] }
+          submissions = json.pluck("submission")
           expect(submissions).to all include("user_id")
         end
       end
@@ -2317,14 +2317,14 @@ describe GradebooksController do
           it "includes anonymous_ids on submission_comments" do
             params_with_comment = post_params.deep_merge(submission: { score: 10 })
             post(:update_submission, params: params_with_comment, format: :json)
-            comments = json.first.fetch("submission").fetch("submission_comments").map { |c| c["submission_comment"] }
+            comments = json.first.fetch("submission").fetch("submission_comments").pluck("submission_comment")
             expect(comments).to all have_key("anonymous_id")
           end
 
           it "excludes author_name on submission_comments" do
             params_with_comment = post_params.deep_merge(submission: { score: 10 })
             post(:update_submission, params: params_with_comment, format: :json)
-            comments = json.first.fetch("submission").fetch("submission_comments").map { |c| c["submission_comment"] }
+            comments = json.first.fetch("submission").fetch("submission_comments").pluck("submission_comment")
             comments.each do |comment|
               expect(comment).not_to have_key("author_name")
             end
@@ -2524,7 +2524,7 @@ describe GradebooksController do
         expect(pg.submission_comments.first.comment).to eq "provisional!"
 
         # confirm the response JSON shows provisional information
-        json = JSON.parse response.body
+        json = response.parsed_body
         expect(json.first.fetch("submission").fetch("score")).to eq 100
         expect(json.first.fetch("submission").fetch("grade_matches_current_submission")).to be true
         expect(json.first.fetch("submission").fetch("submission_comments").first.fetch("submission_comment").fetch("comment")).to eq "provisional!"
@@ -2563,7 +2563,7 @@ describe GradebooksController do
         end
 
         let(:submission_json) do
-          response_json = JSON.parse(response.body)
+          response_json = response.parsed_body
           response_json[0]["submission"].with_indifferent_access
         end
 
@@ -2674,7 +2674,7 @@ describe GradebooksController do
         expect(pg.submission_comments.first.comment).to eq "provisional!"
 
         # confirm the response JSON shows provisional information
-        json = JSON.parse response.body
+        json = response.parsed_body
         expect(json[0]["submission"]["score"]).to eq 100
         expect(json[0]["submission"]["provisional_grade_id"]).to eq pg.id
         expect(json[0]["submission"]["grade_matches_current_submission"]).to be true
@@ -2698,7 +2698,7 @@ describe GradebooksController do
         }
 
         post(:update_submission, params: post_params, format: :json)
-        submission_json = JSON.parse(response.body).first.fetch("submission")
+        submission_json = response.parsed_body.first.fetch("submission")
         provisional_grade = ModeratedGrading::ProvisionalGrade.find(submission_json.fetch("provisional_grade_id"))
         expect(provisional_grade).not_to be_final
       end
@@ -2721,7 +2721,7 @@ describe GradebooksController do
       end
       let(:request_params) { { course_id: @course.id, submission: submission_params } }
 
-      let(:response_json) { JSON.parse(response.body) }
+      let(:response_json) { response.parsed_body }
 
       it "returns an error code of MAX_GRADERS_REACHED if a MaxGradersReachedError is raised" do
         @assignment.grade_student(@student, provisional: true, grade: 5, grader: @teacher)
@@ -3453,7 +3453,7 @@ describe GradebooksController do
     def make_request(**additional_params)
       params = additional_params.reverse_merge({ course_id: @course.id, assignment_ids: ["1", "2"], student_ids: ["11", "22"] })
       put :apply_score_to_ungraded_submissions, params: params, format: :json
-      JSON.parse(response.body)
+      response.parsed_body
     end
 
     describe "authorization" do
@@ -3493,12 +3493,12 @@ describe GradebooksController do
 
       it "does not accept empty assignment ids" do
         put :apply_score_to_ungraded_submissions, params: { course_id: @course.id, percent: 95.0, assignment_ids: [], student_ids: ["11", "22"] }, format: :json
-        expect(JSON.parse(response.body)["error"]).to eq "no_assignment_ids_provided"
+        expect(response.parsed_body["error"]).to eq "no_assignment_ids_provided"
       end
 
       it "does not accept empty student ids" do
         put :apply_score_to_ungraded_submissions, params: { course_id: @course.id, percent: 95.0, assignment_ids: ["1", "2"], student_ids: [] }, format: :json
-        expect(JSON.parse(response.body)["error"]).to eq "no_student_ids_provided"
+        expect(response.parsed_body["error"]).to eq "no_student_ids_provided"
       end
     end
   end

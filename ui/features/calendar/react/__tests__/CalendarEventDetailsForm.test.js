@@ -300,9 +300,10 @@ describe('CalendarEventDetailsForm', () => {
     )
   })
 
-  it('renders and updates an event with important dates checkbox when it is k5', async () => {
-    defaultProps.event.contextInfo.k5_course = true
-    const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+  it('renders and updates an event with important dates checkbox when context is a k5 subject', async () => {
+    const event = defaultProps.event
+    event.contextInfo.k5_course = true
+    const component = render(<CalendarEventDetailsForm {...defaultProps} event={event} />)
 
     select(component, 'checkbox', 'Mark as Important Date')
     select(component, 'button', 'Submit')
@@ -313,7 +314,22 @@ describe('CalendarEventDetailsForm', () => {
       expect.anything(),
       expect.anything()
     )
-    defaultProps.event.contextInfo.k5_course = false
+  })
+
+  it('renders and updates an event with important dates checkbox when context is a k5 account', async () => {
+    const event = defaultProps.event
+    event.contextInfo.k5_account = true
+    const component = render(<CalendarEventDetailsForm {...defaultProps} event={event} />)
+
+    select(component, 'checkbox', 'Mark as Important Date')
+    select(component, 'button', 'Submit')
+    expect(defaultProps.event.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        'calendar_event[important_dates]': true,
+      }),
+      expect.anything(),
+      expect.anything()
+    )
   })
 
   it('can create a blackout date event for a course with course pacing enabled', async () => {

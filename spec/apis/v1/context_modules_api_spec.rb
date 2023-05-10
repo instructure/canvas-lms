@@ -267,13 +267,13 @@ describe "Modules API", type: :request do
                         course_id: @course.id.to_s, per_page: "3")
         expect(response.headers["Link"]).to be_present
         expect(json.size).to eq 3
-        ids = json.collect { |mod| mod["id"] }
+        ids = json.pluck("id")
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?per_page=3&page=2",
                         controller: "context_modules_api", action: "index", format: "json",
                         course_id: @course.id.to_s, page: "2", per_page: "3")
         expect(json.size).to eq 2
-        ids += json.collect { |mod| mod["id"] }
+        ids += json.pluck("id")
 
         expect(ids).to eq @course.context_modules.not_deleted.sort_by(&:position).collect(&:id)
       end
@@ -285,7 +285,7 @@ describe "Modules API", type: :request do
                         controller: "context_modules_api", action: "index", format: "json",
                         course_id: @course.id.to_s, search_term: "spur")
         expect(json.size).to eq 2
-        expect(json.map { |mod| mod["id"] }.sort).to eq mods.map(&:id).sort
+        expect(json.pluck("id").sort).to eq mods.map(&:id).sort
       end
 
       it "searches for modules and items by name" do
@@ -311,7 +311,7 @@ describe "Modules API", type: :request do
                         controller: "context_modules_api", action: "index", format: "json",
                         course_id: @course.id.to_s, include: %w[items], search_term: "spur")
         expect(json.size).to eq 4
-        expect(json.map { |mod| mod["id"] }.sort).to eq (matching_mods + nonmatching_mods).map(&:id).sort
+        expect(json.pluck("id").sort).to eq (matching_mods + nonmatching_mods).map(&:id).sort
 
         json.each do |mod|
           expect(mod["items"].count).to eq 1
@@ -392,7 +392,7 @@ describe "Modules API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items",
                         controller: "context_modules_api", action: "show", format: "json",
                         course_id: @course.id.to_s, id: @module1.id.to_param, include: %w[items])
-        expect(json["items"].map { |item| item["type"] }).to eq %w[Assignment Quiz Discussion SubHeader ExternalUrl]
+        expect(json["items"].pluck("type")).to eq %w[Assignment Quiz Discussion SubHeader ExternalUrl]
       end
 
       it "does not include items if there are too many" do
@@ -1091,7 +1091,7 @@ describe "Modules API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
                       { controller: "context_modules_api", action: "index", format: "json",
                         course_id: @course.id.to_s, include: ["items"] })
-      mod1_items = json.find { |m| m["id"] == @module1.id }["items"].map { |item| item["id"] }
+      mod1_items = json.find { |m| m["id"] == @module1.id }["items"].pluck("id")
       expect(mod1_items).not_to include(@assignment_tag.id)
     end
 
@@ -1100,7 +1100,7 @@ describe "Modules API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
                       { controller: "context_modules_api", action: "index", format: "json",
                         course_id: @course.id.to_s, include: ["items"] })
-      mod1_items = json.find { |m| m["id"] == @module1.id }["items"].map { |item| item["id"] }
+      mod1_items = json.find { |m| m["id"] == @module1.id }["items"].pluck("id")
       expect(mod1_items).to include(@assignment_tag.id)
     end
 
@@ -1110,7 +1110,7 @@ describe "Modules API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
                       { controller: "context_modules_api", action: "index", format: "json",
                         course_id: @course.id.to_s, include: ["items"] })
-      mod1_items = json.find { |m| m["id"] == @module1.id }["items"].map { |item| item["id"] }
+      mod1_items = json.find { |m| m["id"] == @module1.id }["items"].pluck("id")
       expect(mod1_items).to include(@assignment_tag.id)
     end
   end

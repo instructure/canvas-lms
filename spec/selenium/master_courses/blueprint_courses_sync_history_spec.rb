@@ -108,8 +108,8 @@ describe "sync history modal" do
     end
 
     it "shows sync history for availability dates exception in assignments", priority: "2" do
-      update_child_assignment(@minion, :unlock_at, Time.zone.now + 1.day)
-      update_master_assignment_and_migrate(@master, :unlock_at, Time.zone.now + 3.days)
+      update_child_assignment(@minion, :unlock_at, 1.day.from_now)
+      update_master_assignment_and_migrate(@master, :unlock_at, 3.days.from_now)
       open_sync_history
       run_jobs
       verify_sync_history

@@ -1144,7 +1144,7 @@ describe GradebookImporter do
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5"
             )
-            assignment_ids = student_submissions.map { |s| s["assignment_id"] }
+            assignment_ids = student_submissions.pluck("assignment_id")
             expect(assignment_ids).to_not include @closed_assignment.id
           end
 
@@ -1153,7 +1153,7 @@ describe GradebookImporter do
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5"
             )
-            assignment_ids = student_submissions.map { |s| s["assignment_id"] }
+            assignment_ids = student_submissions.pluck("assignment_id")
             expect(assignment_ids).to include @open_assignment.id
           end
         end
@@ -1164,7 +1164,7 @@ describe GradebookImporter do
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5"
             )
-            expect(student_submissions.map { |s| s["assignment_id"] }).to_not include @closed_assignment.id
+            expect(student_submissions.pluck("assignment_id")).to_not include @closed_assignment.id
           end
 
           it "includes submissions that will not fall in closed grading periods" do
@@ -1172,7 +1172,7 @@ describe GradebookImporter do
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5"
             )
-            expect(student_submissions.map { |s| s["assignment_id"] }).to include @open_assignment.id
+            expect(student_submissions.pluck("assignment_id")).to include @open_assignment.id
           end
 
           it "does not grade submissions that had no grade and were marked with '-' in the import" do
@@ -1247,7 +1247,7 @@ describe GradebookImporter do
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5"
             )
-            assignment_ids = student_submissions.map { |s| s["assignment_id"] }
+            assignment_ids = student_submissions.pluck("assignment_id")
             expect(assignment_ids).not_to include @open_assignment.id
           end
 
@@ -1256,7 +1256,7 @@ describe GradebookImporter do
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5"
             )
-            assignment_ids = student_submissions.map { |s| s["assignment_id"] }
+            assignment_ids = student_submissions.pluck("assignment_id")
             expect(assignment_ids).to include @closed_assignment.id
           end
         end
@@ -1267,7 +1267,7 @@ describe GradebookImporter do
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5"
             )
-            assignment_ids = student_submissions.map { |s| s["assignment_id"] }
+            assignment_ids = student_submissions.pluck("assignment_id")
             expect(assignment_ids).to_not include @open_assignment.id
           end
 
@@ -1276,7 +1276,7 @@ describe GradebookImporter do
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5"
             )
-            assignment_ids = student_submissions.map { |s| s["assignment_id"] }
+            assignment_ids = student_submissions.pluck("assignment_id")
             expect(assignment_ids).to include @closed_assignment.id
           end
         end

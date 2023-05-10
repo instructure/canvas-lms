@@ -36,7 +36,7 @@ class Assignment < ActiveRecord::Base
   include DuplicatingObjects
   include LockedFor
 
-  self.ignored_columns = %i[context_code]
+  self.ignored_columns += %i[context_code]
 
   GRADING_TYPES = OpenStruct.new(
     {
@@ -1485,9 +1485,9 @@ class Assignment < ActiveRecord::Base
       GradingStandard.default_instance
   end
 
-  def score_to_grade(score = 0.0, given_grade = nil)
+  def score_to_grade(score = 0.0, given_grade = nil, force_letter_grade = false)
     result = score.to_f
-    case self.grading_type
+    case force_letter_grade ? "letter_grade" : self.grading_type
     when "percent"
       result = "#{round_if_whole(score_to_grade_percent(score))}%"
     when "pass_fail"
@@ -1690,7 +1690,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def touch_on_unlock_if_necessary
-    if unlock_at && Time.zone.now < unlock_at && (Time.zone.now + 1.hour) > unlock_at
+    if unlock_at && Time.zone.now < unlock_at && 1.hour.from_now > unlock_at
       GuardRail.activate(:primary) do
         # Because of assignemnt overrides, an assignment can have the same global id but
         # a different unlock_at time, so include that in the singleton key so that different
@@ -1960,6 +1960,14 @@ class Assignment < ActiveRecord::Base
     students = context.students.where(id: student_ids)
     students.each do |user|
       context_module_action(user, action, points)
+    end
+  end
+
+  def assigned?(user)
+    if association(:submissions).loaded?
+      submissions.any? { |sub| sub.user_id == user.id }
+    else
+      submissions.where(user: user).exists?
     end
   end
 

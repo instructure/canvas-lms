@@ -450,7 +450,7 @@
               <%= f.label :custom_course_visibility, :en => "Customize" %>
               <div id="customize_course_visibility">
                 <% Course::CUSTOMIZABLE_PERMISSIONS.map do |setting, options| %>
-                  <%= f.label :"#{setting}_visibility_option", options[:setting], :class => "#{setting}-visibility" %>
+                  <%= f.label :"#{setting}_visibility_option", options[:get_setting_name].call, :class => "#{setting}-visibility" %>
                   <%= f.select(
                     :"#{setting}_visibility_option",
                     @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], "#{id}"] },

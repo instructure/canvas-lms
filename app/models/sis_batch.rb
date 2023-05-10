@@ -277,8 +277,8 @@ class SisBatch < ActiveRecord::Base
     return true if val == progress
 
     self.progress = val
-    state = SisBatch.connection.select_value(<<~SQL.squish)
-      UPDATE #{SisBatch.quoted_table_name} SET progress=#{val} WHERE id=#{id} RETURNING workflow_state
+    state = SisBatch.connection.select_value(sanitize_sql([<<~SQL.squish, val, id]))
+      UPDATE #{SisBatch.quoted_table_name} SET progress=?, updated_at=NOW() WHERE id=? RETURNING workflow_state
     SQL
     raise SisBatch::Aborted if state == "aborted"
   end
@@ -594,7 +594,11 @@ class SisBatch < ActiveRecord::Base
 
   def term_enrollments_scope
     if data[:supplied_batches].include?(:enrollment)
-      scope = account.enrollments.active.joins(:course).readonly(false).where.not(sis_batch_id: nil)
+      scope = account.enrollments.active
+      if options[:batch_mode_enrollment_drop_status]
+        scope = scope.where.not(workflow_state: options[:batch_mode_enrollment_drop_status])
+      end
+      scope = scope.joins(:course).readonly(false).where.not(sis_batch_id: nil)
       scope.where(courses: { enrollment_term_id: batch_mode_terms })
     end
   end

@@ -27,12 +27,18 @@ import {
   defaultEnv,
   defaultK5DashboardProps as defaultProps,
 } from './mocks'
-import {MOCK_ASSIGNMENTS, MOCK_CARDS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
+import {
+  MOCK_ASSIGNMENTS,
+  MOCK_CARDS,
+  MOCK_EVENTS,
+  MOCK_ACCOUNT_CALENDAR_EVENT,
+} from '@canvas/k5/react/__tests__/fixtures'
 
 import K5Dashboard from '../K5Dashboard'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
+const EVENTS_URL = /\/api\/v1\/calendar_events\?type=event&important_dates=true&.*/
 const announcements = [
   {
     id: '20',
@@ -138,7 +144,7 @@ beforeEach(() => {
   fetchMock.get(/\/api\/v1\/users\/self\/todo.*/, MOCK_TODOS)
   fetchMock.put('/api/v1/users/self/settings', JSON.stringify({}))
   fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS)
-  fetchMock.get(/\/api\/v1\/calendar_events\?type=event&important_dates=true&.*/, MOCK_EVENTS)
+  fetchMock.get(EVENTS_URL, MOCK_EVENTS)
   fetchMock.post(
     /\/api\/v1\/calendar_events\/save_selected_contexts.*/,
     JSON.stringify({status: 'ok'})
@@ -454,6 +460,22 @@ describe('K-5 Dashboard', () => {
     it('loads important dates on the grades tab', async () => {
       const {getByText} = render(<K5Dashboard {...defaultProps} defaultTab="tab-grades" />)
       await waitFor(() => expect(getByText('History Discussion')).toBeInTheDocument())
+    })
+
+    it('includes account calendar events', async () => {
+      fetchMock.get(EVENTS_URL, [...MOCK_EVENTS, MOCK_ACCOUNT_CALENDAR_EVENT], {
+        overwriteRoutes: true,
+      })
+      const {getByText} = render(
+        <K5Dashboard {...defaultProps} selectedContextCodes={['course_1', 'account_1']} />
+      )
+      await waitFor(() => expect(getByText('History Discussion')).toBeInTheDocument())
+      expect(fetchMock.lastUrl(EVENTS_URL)).toMatch(
+        'context_codes%5B%5D=course_1&context_codes%5B%5D=account_1'
+      )
+      ;['Morning Yoga', 'Football Game', 'CSU'].forEach(label =>
+        expect(getByText(label)).toBeInTheDocument()
+      )
     })
   })
 })

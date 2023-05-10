@@ -571,6 +571,7 @@
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "メディアファイルは処理中です。後ほどもう一度やり直してください。"
   },
+  "media_title_2112243b": { "message": "メディアタイトル" },
   "medium_5a8e9ead": { "message": "中" },
   "merge_links_2478df96": { "message": "リンクをマージする" },
   "mic_a7f3d311": { "message": "マイク" },
@@ -854,9 +855,6 @@
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "画面の共有中に問題が発生しました。"
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "申し訳ありませんが、複数ファイルの貼り付けには対応していません。"
-  },
   "sort_by_e75f9e3e": { "message": "分類する" },
   "spades_suit_b37020c2": { "message": "スペード (1組)" },
   "square_511eb3b3": { "message": "四角" },
@@ -874,6 +872,9 @@
   "start_recording_9a65141a": { "message": "録画開始" },
   "steel_blue_14296f08": { "message": "スチールブルー" },
   "studio_media_options_ee504361": { "message": "スタジオメディアオプション" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Studio メディア オプショントレイ"
+  },
   "styles_2aa721ef": { "message": "スタイル" },
   "submit_a3cc6859": { "message": "提出" },
   "subscript_59744f96": { "message": "下付き" },

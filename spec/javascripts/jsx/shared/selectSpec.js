@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 
 QUnit.module('Select function')
 

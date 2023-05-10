@@ -557,7 +557,7 @@ describe Mutations::UpdateAssignment do
       state: "deleted"
     GQL
     expect(
-      result["errors"].map { |e| e["path"] }
+      result["errors"].pluck("path")
     ).to eq [
       %w[mutation updateAssignment input state]
     ]

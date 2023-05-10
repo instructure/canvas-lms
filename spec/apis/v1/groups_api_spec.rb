@@ -218,7 +218,7 @@ describe "Groups API", type: :request do
                     @category_path_options.merge(action: "context_index",
                                                  course_id: @course.to_param, include: ["users"]))
 
-    expect(json.first["users"].map { |u| u["id"] }).to eq [@user.id]
+    expect(json.first["users"].pluck("id")).to eq [@user.id]
 
     enrollment.reactivate
 
@@ -226,7 +226,7 @@ describe "Groups API", type: :request do
                     @category_path_options.merge(action: "context_index",
                                                  course_id: @course.to_param, include: ["users"]))
 
-    expect(json.first["users"].map { |u| u["id"] }).to match_array [@user.id, inactive_user.id]
+    expect(json.first["users"].pluck("id")).to match_array [@user.id, inactive_user.id]
   end
 
   it "shows inactive users to admins" do
@@ -244,7 +244,7 @@ describe "Groups API", type: :request do
                     @category_path_options.merge(action: "context_index",
                                                  course_id: @course.to_param, include: ["users"]))
 
-    expect(json.first["users"].map { |u| u["id"] }).to eq [inactive_user.id]
+    expect(json.first["users"].pluck("id")).to eq [inactive_user.id]
   end
 
   it "allows listing all of an account's groups for account admins" do
@@ -336,7 +336,7 @@ describe "Groups API", type: :request do
   it "includes tabs if requested" do
     json = api_call(:get, "#{@community_path}.json?include[]=tabs", @category_path_options.merge(group_id: @community.to_param, action: "show", format: "json", include: ["tabs"]))
     expect(json).to have_key "tabs"
-    expect(json["tabs"].map { |tab| tab["id"] }).to eq(%w[home announcements pages people discussions files])
+    expect(json["tabs"].pluck("id")).to eq(%w[home announcements pages people discussions files])
   end
 
   it "allows searching by SIS ID" do

@@ -363,7 +363,7 @@ module ConditionalRelease
         rule.reload
         expect(rule.assignment_set_associations.count).to be 3
         # Check that the rules have been sorted to match the order received
-        expect(rule.assignment_set_associations.pluck(:id)).to eq(assignments.map { |asg| asg["id"] })
+        expect(rule.assignment_set_associations.pluck(:id)).to eq(assignments.pluck("id"))
         # And that their positions are correctly updated
         verify_positions_for rule
       end

@@ -217,6 +217,7 @@ module CC
         @for_epub_export = opts[:for_epub_export]
         @key_generator = opts[:key_generator] || CC::CCHelper
         @referenced_files = {}
+        @disable_content_rewriting = !!opts[:disable_content_rewriting] || false
 
         @rewriter.set_handler("file_contents") do |match|
           if match.url =~ %r{/media_objects/(\d_\w+)}
@@ -337,6 +338,8 @@ module CC
       end
 
       def html_content(html)
+        return html if @disable_content_rewriting
+
         html = @rewriter.translate_content(html)
         return html if html.blank? || @for_course_copy
 

@@ -513,7 +513,7 @@ describe PseudonymsController do
 
       post "update", params: { id: @pseudonym2.id, user_id: @user2.id, pseudonym: { sis_user_id: "sis_user" } }, format: "json"
       expect(response).to be_bad_request
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res["errors"]["sis_user_id"][0]["type"]).to eq "taken"
       expect(res["errors"]["sis_user_id"][0]["message"]).to match(/is already in use/)
     end

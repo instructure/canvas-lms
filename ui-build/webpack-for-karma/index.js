@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -21,7 +22,7 @@ const glob = require('glob')
 const {DefinePlugin, EnvironmentPlugin, ProvidePlugin} = require('webpack')
 const partitioning = require('./partitioning')
 const PluginSpecsRunner = require('./PluginSpecsRunner')
-const {canvasDir} = require('#params')
+const {canvasDir} = require('../params')
 
 const {
   CONTEXT_COFFEESCRIPT_SPEC,
@@ -67,7 +68,6 @@ module.exports = {
           path.resolve(canvasDir, 'packages/convert-case'),
           path.resolve(canvasDir, 'packages/html-escape'),
           path.join(canvasDir, 'packages/slickgrid'),
-          path.join(canvasDir, 'packages/with-breakpoints'),
           path.join(canvasDir, 'spec/javascripts/jsx'),
           path.join(canvasDir, 'spec/coffeescripts'),
           /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//,
@@ -93,19 +93,6 @@ module.exports = {
             ],
           },
         },
-      },
-      {
-        test: /\.coffee$/,
-        include: [
-          path.join(canvasDir, 'ui'),
-          path.join(canvasDir, 'spec/coffeescripts'),
-        ].concat(
-          glob.sync('gems/plugins/*/{app,spec_canvas}/coffeescripts/', {
-            cwd: canvasDir,
-            absolute: true,
-          })
-        ),
-        use: ['coffee-loader'],
       },
       {
         test: /\.handlebars$/,
@@ -161,13 +148,13 @@ module.exports = {
   },
   resolve: {
     alias: {
-      ['d3']: 'd3/d3',
-      ['node_modules-version-of-backbone$']: require.resolve('backbone'),
-      ['node_modules-version-of-react-modal$']: require.resolve('react-modal'),
-      ['spec/jsx']: path.join(canvasDir, 'spec/javascripts/jsx'),
-      ['ui/boot/initializers']: path.join(canvasDir, 'ui/boot/initializers'),
-      ['ui/ext']: path.join(canvasDir, 'ui/ext'),
-      ['ui/features']: path.join(canvasDir, 'ui/features'),
+      d3: 'd3/d3',
+      'node_modules-version-of-backbone$': require.resolve('backbone'),
+      'node_modules-version-of-react-modal$': require.resolve('react-modal'),
+      'spec/jsx': path.join(canvasDir, 'spec/javascripts/jsx'),
+      'ui/boot/initializers': path.join(canvasDir, 'ui/boot/initializers'),
+      'ui/ext': path.join(canvasDir, 'ui/ext'),
+      'ui/features': path.join(canvasDir, 'ui/features'),
       [CONTEXT_COFFEESCRIPT_SPEC]: path.join(canvasDir, CONTEXT_COFFEESCRIPT_SPEC),
       [CONTEXT_EMBER_GRADEBOOK_SPEC]: path.join(canvasDir, CONTEXT_EMBER_GRADEBOOK_SPEC),
       [CONTEXT_JSX_SPEC]: path.join(canvasDir, CONTEXT_JSX_SPEC),
@@ -179,12 +166,12 @@ module.exports = {
       //
       // I suspect it's trying to use node's native impl and that doesn't work
       // when run through webpack
-      ['punycode']: path.join(canvasDir, 'node_modules/punycode/punycode.js'),
+      punycode: path.join(canvasDir, 'node_modules/punycode/punycode.js'),
     },
     fallback: {
       path: false, // for minimatch
     },
-    extensions: ['.mjs', '.js', '.ts', '.tsx', '.coffee'],
+    extensions: ['.mjs', '.js', '.ts', '.tsx'],
     modules: [
       path.join(canvasDir, 'ui/shims'),
       path.join(canvasDir, 'public/javascripts'),

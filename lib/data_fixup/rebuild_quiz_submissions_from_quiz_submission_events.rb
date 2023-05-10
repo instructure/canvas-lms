@@ -178,7 +178,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
         seen_question_ids << if event.event_type == "question_viewed"
                                event.answers
                              else
-                               event.answers.flatten.map { |h| h["quiz_question_id"] }
+                               event.answers.flatten.pluck("quiz_question_id")
                              end
       end
       seen_question_ids = seen_question_ids.flatten.uniq

@@ -250,7 +250,7 @@ class CourseLinkValidator
     path = ActionDispatch::Journey::Router::Utils.normalize_path(path)
 
     @route_set ||= ::Rails.application.routes.set.routes.select { |r| r.verb == "GET" }
-    @route_set.any? { |r| r.path.match(path) } || (!Pathname(path).each_filename.include?("..") && Rails.root.join("public", path.delete_prefix("/")).file?)
+    @route_set.any? { |r| r.path.match(path) } || (!Pathname(path).each_filename.include?("..") && Rails.public_path.join(path.delete_prefix("/")).file?)
   end
 
   # makes sure that links to course objects exist and are in a visible state

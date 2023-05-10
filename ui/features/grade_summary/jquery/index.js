@@ -25,7 +25,7 @@ import '@canvas/util/templateData'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import '@canvas/media-comments' /* mediaComment */
 import axios from '@canvas/axios'
-import {camelize} from 'convert-case'
+import {camelizeProperties} from '@canvas/convert-case'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import gradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
@@ -86,6 +86,10 @@ const GradeSummary = {
       numericalValue,
       formattedValue: $assignment.find('.original_score').text(),
     }
+  },
+
+  getOriginalWorkflowState($assignment) {
+    return $assignment.find('.submission_status').text().trim()
   },
 
   onEditWhatIfScore($assignmentScore, $ariaAnnouncer) {
@@ -208,7 +212,7 @@ const GradeSummary = {
       $assignment.find('.grade').prepend($screenreaderLinkClone)
     }
 
-    GradeSummary.updateScoreForAssignment(assignmentId, score.numericalValue)
+    GradeSummary.updateScoreForAssignment(assignmentId, score.numericalValue, 'graded')
     GradeSummary.updateStudentGrades()
   },
 
@@ -245,7 +249,8 @@ const GradeSummary = {
     $grade.removeClass('changed')
 
     const assignmentId = $assignment.getTemplateValue('assignment_id')
-    GradeSummary.updateScoreForAssignment(assignmentId, score.numericalValue)
+    const workflowState = GradeSummary.getOriginalWorkflowState($assignment)
+    GradeSummary.updateScoreForAssignment(assignmentId, score.numericalValue, workflowState)
     if (!opts.skipEval) {
       GradeSummary.updateStudentGrades()
     }
@@ -521,11 +526,12 @@ function updateStudentGrades() {
   }
 }
 
-function updateScoreForAssignment(assignmentId, score) {
+function updateScoreForAssignment(assignmentId, score, workflowStateOverride) {
   const submission = _.find(ENV.submissions, s => `${s.assignment_id}` === `${assignmentId}`)
 
   if (submission) {
     submission.score = score
+    submission.workflow_state = workflowStateOverride ?? submission.workflow_state
   } else {
     ENV.submissions.push({assignment_id: assignmentId, score})
   }
@@ -573,7 +579,7 @@ function saveAssignmentOrder(order) {
 }
 
 function coursesWithGrades() {
-  return ENV.courses_with_grades.map(course => camelize(course))
+  return ENV.courses_with_grades.map(course => camelizeProperties(course))
 }
 
 function getSelectMenuGroupProps() {

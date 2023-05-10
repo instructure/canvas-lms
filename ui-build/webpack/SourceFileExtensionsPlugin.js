@@ -18,11 +18,14 @@
 
 const crypto = require('crypto')
 const fs = require('fs')
+// eslint-disable-next-line import/no-extraneous-dependencies
 const mkdirp = require('mkdirp')
 const path = require('path')
 
 /**
- * Extend source files with code found in plugins.
+ * Extend source files with code found in Canvas plugins (not Webpack plugins).
+ *
+ *   Wraps modules with custom code
  *
  * To extend a source file, a plugin must provide a mapping inside its package
  * manifest from that file, relative to canvas-lms root, to the extension file
@@ -104,6 +107,7 @@ class SourceFileExtensionsPlugin {
     const errors = []
 
     for (const file of include) {
+      // eslint-disable-next-line import/no-dynamic-require
       const manifest = require(file)
       const mapping = (manifest.canvas && manifest.canvas['source-file-extensions']) || {}
 

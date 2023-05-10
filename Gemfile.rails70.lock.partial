@@ -148,6 +148,7 @@ PATH
       jira_ref_parser (= 1.0.1)
       outrigger (~> 3.0)
       rubocop (~> 1.19)
+      rubocop-rails (~> 2.19)
 
 PATH
   remote: gems
@@ -566,7 +567,7 @@ GEM
       actionpack (>= 4.2, < 7.1)
     erubi (1.12.0)
     escape_code (0.2)
-    et-orbi (1.2.4)
+    et-orbi (1.2.7)
       tzinfo
     ethon (0.12.0)
       ffi (>= 1.3.0)
@@ -589,8 +590,8 @@ GEM
       rspec (~> 3.10)
       timecop (~> 0.9)
     folio-pagination (0.0.12)
-    fugit (1.4.0)
-      et-orbi (~> 1.1, >= 1.1.8)
+    fugit (1.8.1)
+      et-orbi (~> 1, >= 1.2.7)
       raabro (~> 1.4)
     gepub (1.0.15)
       nokogiri (>= 1.8.2, < 2.0)
@@ -653,7 +654,7 @@ GEM
       rexml
       simple_oauth (~> 0.3.1)
     inflection (1.0.0)
-    inst-jobs (3.1.6)
+    inst-jobs (3.1.10)
       activerecord (>= 6.0)
       activerecord-pg-extensions (~> 0.4.4)
       activesupport (>= 6.0)
@@ -962,7 +963,7 @@ GEM
       rspec-core (>= 2, < 4, != 2.12.0)
     rss (0.2.9)
       rexml
-    rubocop (1.49.0)
+    rubocop (1.50.2)
       json (~> 2.3)
       parallel (~> 1.10)
       parser (>= 3.2.0.0)
@@ -976,13 +977,15 @@ GEM
       parser (>= 3.2.1.0)
     rubocop-capybara (2.17.1)
       rubocop (~> 1.41)
+    rubocop-graphql (1.1.1)
+      rubocop (>= 0.87, < 2)
     rubocop-performance (1.17.1)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
-    rubocop-rails (2.12.4)
+    rubocop-rails (2.19.1)
       activesupport (>= 4.2.0)
       rack (>= 1.1)
-      rubocop (>= 1.7.0, < 2.0)
+      rubocop (>= 1.33.0, < 2.0)
     rubocop-rake (0.6.0)
       rubocop (~> 1.0)
     rubocop-rspec (2.19.0)
@@ -1071,7 +1074,7 @@ GEM
       rspec (~> 3.8)
     strscan (3.0.6)
     swearjar (1.4.0)
-    switchman (3.3.7)
+    switchman (3.4.2)
       activerecord (>= 6.1.4, < 7.1)
       guardrail (~> 3.0.1)
       parallel (~> 1.22)
@@ -1275,7 +1278,7 @@ DEPENDENCIES
   icalendar (= 2.7.0)
   ims-lti (= 2.3.3)
   incoming_mail_processor!
-  inst-jobs (= 3.1.6)
+  inst-jobs (~> 3.1)
   inst-jobs-autoscaling (= 2.1.1)
   inst-jobs-statsd (= 2.2.0)
   inst_access (= 0.1.1)
@@ -1357,10 +1360,11 @@ DEPENDENCIES
   rspec_junit_formatter
   rspecq!
   rss (= 0.2.9)
-  rubocop (= 1.49.0)
+  rubocop (= 1.50.2)
   rubocop-canvas!
+  rubocop-graphql (= 1.1.1)
   rubocop-performance (= 1.17.1)
-  rubocop-rails (= 2.12.4)
+  rubocop-rails (= 2.19.1)
   rubocop-rake (= 0.6.0)
   rubocop-rspec (= 2.19.0)
   ruby-duration (= 3.2.3)
@@ -1390,7 +1394,7 @@ DEPENDENCIES
   stackprof (~> 0.2)
   stormbreaker (= 0.0.8)
   stringify_ids!
-  switchman (= 3.3.7)
+  switchman (= 3.4.2)
   switchman-inst-jobs (= 4.0.13)
   testrailtagging (= 0.3.8.7)
   thrift_client (= 0.9.3)!

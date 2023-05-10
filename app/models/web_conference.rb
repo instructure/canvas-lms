@@ -48,7 +48,7 @@ class WebConference < ActiveRecord::Base
 
   scope :for_context_codes, ->(context_codes) { where(context_code: context_codes) }
 
-  scope :with_config_for, ->(context:) { where(conference_type: WebConference.conference_types(context).map { |ct| ct["conference_type"] }) }
+  scope :with_config_for, ->(context:) { where(conference_type: WebConference.conference_types(context).pluck("conference_type")) }
 
   scope :live, -> { where("web_conferences.started_at BETWEEN (NOW() - interval '1 day') AND NOW() AND (web_conferences.ended_at IS NULL OR web_conferences.ended_at > NOW())") }
 
@@ -580,7 +580,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.enabled_plugin_conference_names
-    WebConference.plugin_types.map { |wt| wt["name"] }
+    WebConference.plugin_types.pluck("name")
   end
 
   def self.conference_tab_name

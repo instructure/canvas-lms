@@ -80,11 +80,13 @@ module LiveAssessments
 
       @assessments = []
 
+      if params[:assessments].any? { |assessment_hash| assessment_hash.dig(:links, :outcome) }
+        return unless authorized_action(@context, @current_user, :manage_outcomes)
+      end
+
       Assessment.transaction do
         params[:assessments].each do |assessment_hash|
           if (outcome_id = assessment_hash.dig(:links, :outcome))
-            return unless authorized_action(@context, @current_user, :manage_outcomes)
-
             @outcome = @context.linked_learning_outcomes.where(id: outcome_id).first
             reject! "outcome must be linked to the context" unless @outcome
           end

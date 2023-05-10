@@ -1,0 +1,83 @@
+PATH
+  remote: .
+  specs:
+    turnitin_api (0.1.0)
+      activesupport
+      faraday (~> 0.17.3)
+      faraday_middleware (~> 0.8)
+      inst_statsd
+      simple_oauth (~> 0.3)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activemodel (7.0.4.3)
+      activesupport (= 7.0.4.3)
+    activerecord (7.0.4.3)
+      activemodel (= 7.0.4.3)
+      activesupport (= 7.0.4.3)
+    activesupport (7.0.4.3)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+    addressable (2.8.1)
+      public_suffix (>= 2.0.2, < 6.0)
+    aroi (0.0.7)
+      activerecord (>= 5.2)
+      activesupport (>= 5.2)
+    concurrent-ruby (1.2.2)
+    crack (0.4.5)
+      rexml
+    diff-lcs (1.5.0)
+    dogstatsd-ruby (4.8.2)
+    faraday (0.17.4)
+      multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.14.0)
+      faraday (>= 0.7.4, < 1.0)
+    hashdiff (1.0.1)
+    i18n (1.12.0)
+      concurrent-ruby (~> 1.0)
+    inst_statsd (2.2.0)
+      aroi (>= 0.0.7)
+      dogstatsd-ruby (~> 4.2)
+      statsd-ruby (~> 1.0)
+    minitest (5.18.0)
+    multipart-post (2.1.1)
+    public_suffix (5.0.1)
+    rake (13.0.6)
+    rexml (3.2.5)
+    rspec (3.12.0)
+      rspec-core (~> 3.5.0)
+      rspec-expectations (~> 3.5.0)
+      rspec-mocks (~> 3.5.0)
+    rspec-core (3.12.1)
+      rspec-support (~> 3.5.0)
+    rspec-expectations (3.12.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.5.0)
+    rspec-mocks (3.12.5)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.5.0)
+    rspec-support (3.12.0)
+    simple_oauth (0.3.1)
+    statsd-ruby (1.4.0)
+    tzinfo (2.0.4)
+      concurrent-ruby (~> 1.0)
+    webmock (3.18.1)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
+
+PLATFORMS
+  arm64-darwin-21
+
+DEPENDENCIES
+  bundler (~> 2.2)
+  rake (~> 10.0)
+  rspec (~> 3.5.0)
+  turnitin_api!
+  webmock (~> 3.0)
+
+BUNDLED WITH
+   2.4.10

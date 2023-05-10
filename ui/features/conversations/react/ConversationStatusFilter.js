@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import {decodeQueryString} from 'query-string-encoding'
+import {decodeQueryString} from '@canvas/query-string-encoding'
 import {FormField} from '@instructure/ui-form-field'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'

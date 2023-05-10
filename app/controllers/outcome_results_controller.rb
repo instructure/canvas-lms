@@ -243,7 +243,7 @@ class OutcomeResultsController < ApplicationController
       @results = Api.paginate(@results, self, api_v1_course_outcome_results_url)
       json = outcome_results_json(@results)
     else
-      @outcome_service_results.push(@results).flatten!
+      @outcome_service_results.push(@results).flatten!.select! { |outcome| params[:outcome_ids].include? outcome.learning_outcome_id.to_s }
       @outcome_service_results = Api.paginate(@outcome_service_results, self, api_v1_course_outcome_results_url)
       json = outcome_results_json(@outcome_service_results)
     end

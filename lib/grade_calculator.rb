@@ -824,7 +824,7 @@ class GradeCalculator
     end
   end
 
-  # see comments for dropAssignments in grade_calculator.coffee
+  # see comments for dropAssignments in grade_calculator.js
   def drop_assignments(submissions, rules)
     drop_lowest    = rules[:drop_lowest] || 0
     drop_highest   = rules[:drop_highest] || 0

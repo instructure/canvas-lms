@@ -48,7 +48,7 @@ describe ExternalToolsController do
     it "returns the correct JWT token when given using the tool_id param" do
       user_session(@teacher)
       get :jwt_token, params: { course_id: @course.id, tool_id: @tool.id }
-      jwt = JSON.parse(response.body)["jwt_token"]
+      jwt = response.parsed_body["jwt_token"]
       decoded_token = Canvas::Security.decode_jwt(jwt, [:skip_verification])
 
       expect(decoded_token["custom_canvas_user_id"]).to eq @teacher.id.to_s
@@ -73,7 +73,7 @@ describe ExternalToolsController do
     it "returns the correct JWT token when given using the tool_launch_url param" do
       user_session(@teacher)
       get :jwt_token, params: { course_id: @course.id, tool_launch_url: @tool.url }
-      decoded_token = Canvas::Security.decode_jwt(JSON.parse(response.body)["jwt_token"], [:skip_verification])
+      decoded_token = Canvas::Security.decode_jwt(response.parsed_body["jwt_token"], [:skip_verification])
 
       expect(decoded_token["custom_canvas_user_id"]).to eq @teacher.id.to_s
       expect(decoded_token["custom_canvas_course_id"]).to eq @course.id.to_s
@@ -1532,7 +1532,7 @@ describe ExternalToolsController do
 
       include_context "lti_1_3_spec_helper"
 
-      let(:tool_id) { (response.status == 200) ? JSON.parse(response.body)["id"] : -1 }
+      let(:tool_id) { (response.status == 200) ? response.parsed_body["id"] : -1 }
       let(:tool_configuration) { Lti::ToolConfiguration.create! settings: settings, developer_key: developer_key }
       let(:developer_key) { DeveloperKey.create!(account: account) }
       let_once(:user) { account_admin_user(account: account) }
@@ -1610,7 +1610,7 @@ describe ExternalToolsController do
         it 'gives error message in response if duplicate tool and "verify_uniqueness" is true' do
           user_session(@teacher)
           post "create", params: params, format: "json"
-          error_message = JSON.parse(response.body).dig("errors", "tool_currently_installed").first["message"]
+          error_message = response.parsed_body.dig("errors", "tool_currently_installed").first["message"]
           expect(error_message).to eq "The tool is already installed in this context."
         end
       end
@@ -2169,7 +2169,7 @@ describe ExternalToolsController do
   describe "'GET 'generate_sessionless_launch'" do
     let(:login_pseudonym) { pseudonym(@user) }
     let(:tool) { new_valid_tool(@course) }
-    let(:url) { URI.parse(JSON.parse(response.body)["url"]) }
+    let(:url) { URI.parse(response.parsed_body["url"]) }
     let(:query_params) { CGI.parse(url.query) }
     let(:verifier) { query_params["verifier"].first }
     let(:session_token) { SessionToken.parse(query_params["session_token"].first) }
@@ -2626,7 +2626,7 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       verifier = CGI.parse(URI.parse(json["url"]).query)["verifier"].first
 
       expect(controller).to receive(:log_asset_access).once
@@ -2734,7 +2734,7 @@ describe ExternalToolsController do
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to be 3
-      expect(tools.map { |t| t["name"] }).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
+      expect(tools.pluck("name")).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
     end
 
     it "shows course nav tools for the single-context endpoint" do
@@ -2743,7 +2743,7 @@ describe ExternalToolsController do
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to be 2
-      expect(tools.map { |t| t["name"] }).to eq ["Course nav tool 1", "Course nav tool 2"]
+      expect(tools.pluck("name")).to eq ["Course nav tool 1", "Course nav tool 2"]
     end
 
     it "shows course nav tools to student" do
@@ -2752,7 +2752,7 @@ describe ExternalToolsController do
       expect(response).to be_successful
       tools = json_parse(response.body)
       expect(tools.count).to be 3
-      expect(tools.map { |t| t["name"] }).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
+      expect(tools.pluck("name")).to eq ["Course nav tool 1", "Course nav tool 2", "Course nav tool 3"]
     end
 
     it "only returns tools with a course navigation placement" do

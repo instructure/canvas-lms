@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-// PaginatedList.coffee
+// PaginatedList.js
 // This class paginates ajax results using a 'View More' link.
 // It accepts two arguments: the element to insert the list into
 // and an object literal of options. The following options are

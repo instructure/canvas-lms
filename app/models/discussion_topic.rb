@@ -1586,9 +1586,9 @@ class DiscussionTopic < ActiveRecord::Base
     messages.each do |message|
       txt = (message.message || "")
       attachment_matches = txt.scan(%r{/#{context.class.to_s.pluralize.underscore}/#{context.id}/files/(\d+)/download})
-      attachment_ids += (attachment_matches || []).map { |m| m[0] }
+      attachment_ids += (attachment_matches || []).pluck(0)
       media_object_matches = txt.scan(/media_comment_([\w-]+)/) + txt.scan(/data-media-id="([\w-]+)"/)
-      media_object_ids += (media_object_matches || []).map { |m| m[0] }.uniq
+      media_object_ids += (media_object_matches || []).pluck(0).uniq
       (attachment_ids + media_object_ids).each do |id|
         messages_hash[id] ||= message
       end

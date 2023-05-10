@@ -38,7 +38,7 @@ describe "Discussion Topics API" do
         it "includes the author information" do
           get api_v1_course_discussion_topics_path(course.id), params: { format: :json }
           expect(response).to have_http_status :ok
-          json = JSON.parse(response.body).detect { |d| d["id"] == discussion.id }
+          json = response.parsed_body.detect { |d| d["id"] == discussion.id }
           expect(json["author"]).to_not be_nil
         end
       end
@@ -47,7 +47,7 @@ describe "Discussion Topics API" do
         it "does not include the author information" do
           get api_v1_course_discussion_topics_path(course.id), params: { format: :json }
           expect(response).to have_http_status :ok
-          json = JSON.parse(response.body).detect { |d| d["id"] == anon_discussion.id }
+          json = response.parsed_body.detect { |d| d["id"] == anon_discussion.id }
           expect(json["author"]).to be_nil
         end
       end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import makePromisePool from 'make-promise-pool'
+import makePromisePool from '@canvas/make-promise-pool'
 
 QUnit.module('makePromisePool')
 

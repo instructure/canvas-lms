@@ -190,7 +190,7 @@ describe('Address Book Component', () => {
       fireEvent.keyDown(input, {key: 'ArrowDown', keyCode: 40})
       fireEvent.keyDown(input, {key: 'Enter', keyCode: 13})
       expect(onSelectSpy.mock.calls.length).toBe(1)
-      expect(onSelectSpy.mock.calls[0][0].id).toBe('subMenuStudents')
+      expect(onSelectSpy.mock.calls[0][0].id).toBe('subMenuUsers')
     })
 
     it('Should select item when navigating up and enter key is pressed', () => {

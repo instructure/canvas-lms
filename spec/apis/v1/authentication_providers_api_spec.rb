@@ -61,7 +61,7 @@ describe "AuthenticationProviders API", type: :request do
 
       res = call_index
 
-      expect(res.map { |c| c["idp_entity_id"] }.join).to eq "rad"
+      expect(res.pluck("idp_entity_id").join).to eq "rad"
     end
 
     it "returns unauthorized error" do

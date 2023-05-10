@@ -38,7 +38,7 @@ import {
   MediaCaptureStrings,
   SelectStrings,
 } from '@canvas/upload-media-translations'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'

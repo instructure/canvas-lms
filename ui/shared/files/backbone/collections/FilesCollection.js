@@ -53,7 +53,7 @@ export default class FilesCollection extends PaginatedCollection {
     return super.parse(...arguments)
   }
 
-  // TODO: This is duplicate code from Folder.coffee, can we DRY?
+  // TODO: This is duplicate code from Folder.js, can we DRY?
   setQueryStringParams() {
     const newParams = {
       include: ['user'],

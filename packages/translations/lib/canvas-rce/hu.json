@@ -692,9 +692,6 @@
     "message": "Valami elromlott. Ellenőrizze a kapcsolatot, töltse be újra az oldalt, és próbálja újra."
   },
   "something_went_wrong_d238c551": { "message": "Hiba történt!" },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Sajnáljuk, nem támogatunk több fájlt."
-  },
   "sort_by_e75f9e3e": { "message": "Rendezés alapja" },
   "spades_suit_b37020c2": { "message": "Treff (kártyszín)" },
   "square_511eb3b3": { "message": "Négyzet" },

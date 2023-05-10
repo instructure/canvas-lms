@@ -29,7 +29,7 @@ describe "Gradebook view options menu" do
 
   before(:once) do
     gradebook_data_setup
-    @first_assignment.update(due_at: Time.zone.now - 1.day)
+    @first_assignment.update(due_at: 1.day.ago)
     @first_assignment.unpublish!
     module1 = @course.context_modules.create!(name: "module1")
     module2 = @course.context_modules.create!(name: "module2")

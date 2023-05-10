@@ -32,6 +32,7 @@ import PropTypes from 'prop-types'
 import {Spinner} from '@instructure/ui-spinner'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import StudentFooter from './StudentFooter'
+import StudentViewContext from './Context'
 import {Text} from '@instructure/ui-text'
 import {totalAllowedAttempts} from '../helpers/SubmissionHelpers'
 import {View} from '@instructure/ui-view'
@@ -95,25 +96,29 @@ function SubmissionlessFooter({onMarkAsDoneError}) {
   )
 }
 
-function renderAttemptsAndAvailability({assignment, submission}) {
+function renderAttemptsAndAvailability(assignment) {
   return (
-    <View as="div" margin="medium 0">
-      {assignment.expectsSubmission && (
-        <Text as="div" weight="bold">
-          {I18n.t(
-            {
-              zero: 'Unlimited Attempts Allowed',
-              one: '1 Attempt Allowed',
-              other: '%{count} Attempts Allowed',
-            },
-            {count: totalAllowedAttempts({assignment, submission}) || 0}
+    <StudentViewContext.Consumer>
+      {context => (
+        <View as="div" margin="medium 0">
+          {assignment.expectsSubmission && (
+            <Text as="div" weight="bold">
+              {I18n.t(
+                {
+                  zero: 'Unlimited Attempts Allowed',
+                  one: '1 Attempt Allowed',
+                  other: '%{count} Attempts Allowed',
+                },
+                {count: totalAllowedAttempts(assignment, context.latestSubmission) || 0}
+              )}
+            </Text>
           )}
-        </Text>
+          <Text as="div">
+            <AvailabilityDates assignment={assignment} formatStyle="long" />
+          </Text>
+        </View>
       )}
-      <Text as="div">
-        <AvailabilityDates assignment={assignment} formatStyle="long" />
-      </Text>
-    </View>
+    </StudentViewContext.Consumer>
   )
 }
 
@@ -133,7 +138,7 @@ function renderContentBaseOnAvailability(
     // NOTE: handles case where user is not logged in, or the course hasn't started yet
     return (
       <>
-        {!assignment.env.peerReviewModeEnabled && renderAttemptsAndAvailability({assignment})}
+        {!assignment.env.peerReviewModeEnabled && renderAttemptsAndAvailability(assignment)}
         <AssignmentToggleDetails description={assignment.description} />
         <Suspense
           fallback={<Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
@@ -148,8 +153,7 @@ function renderContentBaseOnAvailability(
 
     return (
       <>
-        {!assignment.env.peerReviewModeEnabled &&
-          renderAttemptsAndAvailability({assignment, submission})}
+        {!assignment.env.peerReviewModeEnabled && renderAttemptsAndAvailability(assignment)}
         {assignment.submissionTypes.includes('student_annotation') && (
           <VisualOnFocusMessage
             message={I18n.t(

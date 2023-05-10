@@ -1496,7 +1496,7 @@ describe AccountsController do
       get "courses_api", params: { account_id: @account.id, include: ["total_students"] }
 
       expect(response).to be_successful
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res.detect { |r| r["id"] == @c1.id }["total_students"]).to eq(2)
       expect(res.detect { |r| r["id"] == @c2.id }["total_students"]).to eq(1)
     end
@@ -1596,7 +1596,7 @@ describe AccountsController do
       admin_logged_in(@account)
       get "courses_api", params: { account_id: @account.id, sort: "sis_course_id", order: "asc", search_by: "teacher", search_term: "teach" }
 
-      expect(JSON.parse(response.body).length).to eq 2
+      expect(response.parsed_body.length).to eq 2
     end
 
     it "excludes teachers that don't have an active enrollment workflow state" do
@@ -1749,7 +1749,7 @@ describe AccountsController do
         @shard1.activate { get "courses_api", params: { account_id: @account.id, include: ["total_students"] } }
 
         expect(response).to be_successful
-        res = JSON.parse(response.body)
+        res = response.parsed_body
         expect(res.detect { |r| r["id"] == @c1.global_id }["total_students"]).to eq(2)
         expect(res.detect { |r| r["id"] == @c2.global_id }["total_students"]).to eq(1)
       end

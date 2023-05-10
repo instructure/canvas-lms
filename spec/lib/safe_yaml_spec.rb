@@ -118,7 +118,7 @@ describe "safe_yaml" do
       obj
     end
 
-    hwia = verify(result, "hwia", HashWithIndifferentAccess)
+    hwia = verify(result, "hwia", ActiveSupport::HashWithIndifferentAccess)
     expect(hwia.values_at(:a, :b)).to eq [1, 2]
 
     float = verify(result, "float", Float)

@@ -172,7 +172,7 @@ class ContentZipper
           update_progress(zip_attachment, index, count)
         end
         zipfile.add("eportfolio.css", Rails.root.join("app/stylesheets/eportfolio_static.css"))
-        zipfile.add("logo.svg", Rails.root.join("public/images/canvas-logo.svg"))
+        zipfile.add("logo.svg", Rails.public_path.join("images/canvas-logo.svg"))
       end
       mark_successful!
       complete_attachment!(zip_attachment, zip_name)

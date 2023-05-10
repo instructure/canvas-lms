@@ -218,7 +218,7 @@ describe AssignmentGroupsController, type: :request do
                               course_id: @course.id,
                               include: %w[assignments observed_users submission] })
 
-    expect(json.first["assignments"].first["submission"].map { |s| s["user_id"] }).to eql [@observed_student.id]
+    expect(json.first["assignments"].first["submission"].pluck("user_id")).to eql [@observed_student.id]
   end
 
   it "optionally includes 'grades_published' for moderated assignments" do

@@ -629,9 +629,9 @@ class Quizzes::Quiz < ActiveRecord::Base
           # get ALL question types possible from the bank
           AssessmentQuestion
             .where(assessment_question_bank_id: datum["assessment_question_bank_id"])
-            .pluck(:question_data).map { |data| data["question_type"] }
+            .pluck(:question_data).pluck("question_type")
         else
-          datum["questions"].map { |q| q["question_type"] }
+          datum["questions"].pluck("question_type")
         end
       else
         datum["question_type"]

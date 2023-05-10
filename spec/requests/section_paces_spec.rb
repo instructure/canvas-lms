@@ -48,7 +48,7 @@ describe "Section Paces API" do
       Progress.create!(context: section_pace, tag: "course_pace_publish")
       get api_v1_section_pace_path(course, section), params: { format: :json }
       expect(response).to have_http_status :ok
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["pace"]["id"]).to eq section_pace.id
     end
 
@@ -58,7 +58,7 @@ describe "Section Paces API" do
       it "falls back to the course pace" do
         get api_v1_section_pace_path(course, section), params: { format: :json }
         expect(response).to have_http_status :ok
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["pace"]["id"]).to be_nil
         expect(json["pace"]["workflow_state"]).to eq "unpublished"
       end
@@ -91,7 +91,7 @@ describe "Section Paces API" do
         .and change { Progress.count }.by(1)
       expect(Progress.last.queued?).to be_truthy
       expect(response).to have_http_status :created
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["pace"]["section"]["name"]).to eq section.name
       expect(json["progress"]["context_id"]).to eq(CoursePace.last.id)
       expect(json["progress"]["tag"]).to eq("course_pace_publish")
@@ -116,7 +116,7 @@ describe "Section Paces API" do
           section.course_paces.reload.count
         }
         expect(response).to have_http_status :created
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["pace"]["id"]).to eq section_pace.id
         expect(json["progress"]["context_id"]).to eq(CoursePace.last.id)
         expect(json["progress"]["tag"]).to eq("course_pace_publish")

@@ -97,8 +97,8 @@ describe "discussions" do
 
           f('input[type=checkbox][name="assignment[set_assignment]"]').click
 
-          due_at1 = Time.zone.now + 3.days
-          due_at2 = Time.zone.now + 4.days
+          due_at1 = 3.days.from_now
+          due_at2 = 4.days.from_now
 
           fj(".ic-tokeninput-input:first").send_keys(default_section.name)
           wait_for_ajaximations

@@ -65,7 +65,7 @@ describe('Should load <AddressBookContainer> normally', () => {
         setup(contextSelectionDefaultProps)
         const items = await screen.findAllByTestId('address-book-item')
         expect(items.length).toBe(2)
-        expect(screen.queryByText('Students')).toBeInTheDocument()
+        expect(screen.queryByText('Users')).toBeInTheDocument()
         expect(screen.queryByText('Courses')).toBeInTheDocument()
       })
 
@@ -80,7 +80,7 @@ describe('Should load <AddressBookContainer> normally', () => {
         expect(screen.queryByText('Testing 101')).toBeInTheDocument()
       })
 
-      it('Does not show context select for initial students submenu', async () => {
+      it('Does not show context select for initial users submenu', async () => {
         setup()
         let items = await screen.findAllByTestId('address-book-item')
         fireEvent.mouseDown(items[1])
@@ -126,11 +126,11 @@ describe('Should load <AddressBookContainer> normally', () => {
       expect(items.length).toBe(2)
     })
 
-    it('Should load the new courses and students submenu on initial load', async () => {
+    it('Should load the new courses and users submenu on initial load', async () => {
       setup()
       const items = await screen.findAllByTestId('address-book-item')
       expect(items.length).toBe(2)
-      expect(screen.queryByText('Students')).toBeInTheDocument()
+      expect(screen.queryByText('Users')).toBeInTheDocument()
       expect(screen.queryByText('Courses')).toBeInTheDocument()
     })
 
@@ -142,7 +142,7 @@ describe('Should load <AddressBookContainer> normally', () => {
       fireEvent.mouseDown(items[1])
 
       items = await screen.findAllByTestId('address-book-item')
-      // VErify that all students and backbutton appear
+      // Verify that all students and backbutton appear
       expect(items.length).toBe(4)
     })
 
@@ -171,7 +171,7 @@ describe('Should load <AddressBookContainer> normally', () => {
       jest.useFakeTimers()
       const {container} = setup()
       let items = await screen.findAllByTestId('address-book-item')
-      // open students submenu
+      // open users submenu
       fireEvent.mouseDown(items[1])
 
       items = await screen.findAllByTestId('address-book-item')
@@ -212,7 +212,7 @@ describe('Should load <AddressBookContainer> normally', () => {
 
     it('should navigate through filters', async () => {
       setup()
-      // Find initial courses and students sub-menu
+      // Find initial courses and users sub-menu
       let items = await screen.findAllByTestId('address-book-item')
       expect(items.length).toBe(2)
 
@@ -229,16 +229,16 @@ describe('Should load <AddressBookContainer> normally', () => {
 
     it('Should be able to select only 1 tags when limit is 1', async () => {
       setup({limitTagCount: 1, open: true})
-      // Find initial courses and students sub-menu
+      // Find initial courses and users sub-menu
       let items = await screen.findAllByTestId('address-book-item')
       expect(items.length).toBe(2)
 
-      // Click students submenu
+      // Click users submenu
       fireEvent.mouseDown(items[1])
       items = await screen.findAllByTestId('address-book-item')
       expect(items.length).toBe(4)
 
-      // Click on 2 students to try to create 2 tags
+      // Click on 2 users to try to create 2 tags
       fireEvent.mouseDown(items[1])
       fireEvent.mouseDown(items[2])
 

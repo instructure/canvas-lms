@@ -84,6 +84,11 @@ Delayed::Settings.sleep_delay_stagger        = -> { Setting.get("delayed_jobs_sl
 Delayed::Settings.worker_procname_prefix     = -> { "#{Shard.current(Delayed::Backend::ActiveRecord::AbstractJob).id}~" }
 Delayed::Settings.worker_health_check_type   = Delayed::CLI.instance&.config&.dig("health_check", "type")&.to_sym || :none
 Delayed::Settings.worker_health_check_config = Delayed::CLI.instance&.config&.[]("health_check")
+# this is effectively disabled for now. The following areas of code use stranded jobs with long-delayed run_at:
+# ResendPlagiarismEvents
+# MicrosoftSync::StateMachineJob
+# turnitin/veracite/canvadocs/etc.
+Delayed::Settings.stranded_run_at_grace_period = -> { Setting.get("delayed_jobs_stranded_run_at_grace_period", 31_622_400).to_f.seconds }
 # transitional
 Delayed::Settings.infer_strand_from_singleton = -> { Setting.get("infer_strand_from_singleton", false) == "true" }
 

@@ -628,6 +628,7 @@ const locale = {
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "El archivo multimedia se está procesando. Inténtelo de nuevo más tarde."
   },
+  "media_title_2112243b": { "message": "Título del elemento multimedia" },
   "medium_5a8e9ead": { "message": "Regular" },
   "merge_links_2478df96": { "message": "Fusionar enlaces" },
   "mic_a7f3d311": { "message": "Micrófono" },
@@ -933,9 +934,6 @@ const locale = {
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Ocurrió un problema al compartir su pantalla."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Lo sentimos, no admitimos archivos múltiples."
-  },
   "sort_by_e75f9e3e": { "message": "Organizar según" },
   "spades_suit_b37020c2": { "message": "Espadas (palo)" },
   "square_511eb3b3": { "message": "Cuadrado" },
@@ -958,6 +956,9 @@ const locale = {
   "steel_blue_14296f08": { "message": "Azul acero" },
   "studio_media_options_ee504361": {
     "message": "Opciones de contenido multimedia de Studio"
+  },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Bandeja de opciones de contenido multimedia de Studio"
   },
   "styles_2aa721ef": { "message": "Estilos" },
   "submit_a3cc6859": { "message": "Entregar" },

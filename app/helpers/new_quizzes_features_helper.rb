@@ -56,4 +56,8 @@ module NewQuizzesFeaturesHelper
   def new_quizzes_bank_migrations_enabled?(context = @context)
     context.feature_enabled?(:quizzes_next) && context.root_account.feature_enabled?(:new_quizzes_migration) && Account.site_admin.feature_enabled?(:new_quizzes_bank_migrations)
   end
+
+  def disable_content_rewriting?(context = @context)
+    context.feature_enabled?(:quizzes_next) && Account.site_admin.feature_enabled?(:new_quizzes_migrate_without_content_rewrite)
+  end
 end

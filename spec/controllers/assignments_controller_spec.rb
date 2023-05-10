@@ -33,7 +33,7 @@ describe AssignmentsController do
     @assignment = course.assignments.create(
       title: "some assignment",
       assignment_group: @group,
-      due_at: Time.zone.now + 1.week
+      due_at: 1.week.from_now
     )
     @assignment
   end
@@ -1364,7 +1364,7 @@ describe AssignmentsController do
 
           it "includes all group categories for the course if the assignment does not belong to a specific category" do
             get :show, params: { course_id: @course.id, id: @assignment.id }
-            group_category_ids = assigns[:js_env][:group_categories].map { |category| category["id"] }
+            group_category_ids = assigns[:js_env][:group_categories].pluck("id")
             expect(group_category_ids).to eq @course.group_categories.map(&:id)
           end
 
@@ -1373,7 +1373,7 @@ describe AssignmentsController do
             @assignment.update!(group_category: assignment_category, grade_group_students_individually: true)
 
             get :show, params: { course_id: @course.id, id: @assignment.id }
-            group_category_ids = assigns[:js_env][:group_categories].map { |category| category["id"] }
+            group_category_ids = assigns[:js_env][:group_categories].pluck("id")
             expect(group_category_ids).to contain_exactly(assignment_category.id)
           end
 

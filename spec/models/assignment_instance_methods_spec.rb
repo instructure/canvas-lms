@@ -70,22 +70,22 @@ describe Assignment do
 
     it "returns true when the assignment is in the failed_to_duplicate state" do
       assignment = @course.assignments.create!(workflow_state: "failed_to_duplicate", **assignment_valid_attributes)
-      expect(assignment.hide_on_modules_view?).to eq true
+      expect(assignment.hide_on_modules_view?).to be true
     end
 
     it "returns true when the assignment is in the duplicating state" do
       assignment = @course.assignments.create!(workflow_state: "duplicating", **assignment_valid_attributes)
-      expect(assignment.hide_on_modules_view?).to eq true
+      expect(assignment.hide_on_modules_view?).to be true
     end
 
     it "returns false when the assignment is in the published state" do
       assignment = @course.assignments.create!(workflow_state: "published", **assignment_valid_attributes)
-      expect(assignment.hide_on_modules_view?).to eq false
+      expect(assignment.hide_on_modules_view?).to be false
     end
 
     it "returns false when the assignment is in the unpublished state" do
       assignment = @course.assignments.create!(workflow_state: "unpublished", **assignment_valid_attributes)
-      expect(assignment.hide_on_modules_view?).to eq false
+      expect(assignment.hide_on_modules_view?).to be false
     end
   end
 end

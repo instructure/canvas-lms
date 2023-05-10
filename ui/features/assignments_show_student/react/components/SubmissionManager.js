@@ -416,7 +416,7 @@ const SubmissionManager = ({assignment, submission, reviewerSubmission}) => {
   }
 
   const shouldRenderNewAttempt = () => {
-    const allowedAttempts = totalAllowedAttempts({assignment, submission})
+    const allowedAttempts = totalAllowedAttempts(assignment, latestSubmission)
     return (
       !assignment.env.peerReviewModeEnabled &&
       allowChangesToSubmission &&
@@ -424,7 +424,7 @@ const SubmissionManager = ({assignment, submission, reviewerSubmission}) => {
       isSubmitted(submission) &&
       submission.gradingStatus !== 'excused' &&
       latestSubmission.state !== 'unsubmitted' &&
-      (allowedAttempts == null || submission.attempt < allowedAttempts)
+      (allowedAttempts == null || latestSubmission.attempt < allowedAttempts)
     )
   }
 

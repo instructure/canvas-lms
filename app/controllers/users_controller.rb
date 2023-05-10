@@ -561,13 +561,18 @@ class UsersController < ApplicationController
       # hide the grades tab if the user does not have active enrollments or if all enrolled courses have the tab hidden
       active_courses = Course.where(id: @current_user.enrollments.active_by_date.select(:course_id), homeroom_course: false)
       calendar_contexts = @current_user.get_preference(:selected_calendar_contexts)
+      account_calendar_contexts = @current_user
+                                  .enabled_account_calendars
+                                  .select(&:enable_as_k5_account?)
+                                  .map { |a| { asset_string: a.asset_string, name: a.name } }
 
       js_env({
                HIDE_K5_DASHBOARD_GRADES_TAB: active_courses.empty? || active_courses.all? { |c| c.tab_hidden?(Course::TAB_GRADES) },
                SELECTED_CONTEXT_CODES: calendar_contexts.is_a?(Array) ? calendar_contexts : [],
                SELECTED_CONTEXTS_LIMIT: @domain_root_account.settings[:calendar_contexts_limit] || 10,
                INITIAL_NUM_K5_CARDS: Rails.cache.read(["last_known_k5_cards_count", @current_user.global_id].cache_key) || 5,
-               OPEN_TEACHER_TODOS_IN_NEW_TAB: @current_user.feature_enabled?(:open_todos_in_new_tab)
+               OPEN_TEACHER_TODOS_IN_NEW_TAB: @current_user.feature_enabled?(:open_todos_in_new_tab),
+               ACCOUNT_CALENDAR_CONTEXTS: account_calendar_contexts
              })
 
       css_bundle :k5_common, :k5_dashboard, :dashboard_card
@@ -2693,6 +2698,7 @@ class UsersController < ApplicationController
   def pandata_events_token
     settings = DynamicSettings.find("events", service: "pandata")
     dk_ids = Setting.get("pandata_events_token_allowed_developer_key_ids", "").split(",")
+    token_prefixes = Setting.get("pandata_events_token_prefixes", "ios,android").split(",")
 
     unless @access_token
       return render json: { message: "Access token required" }, status: :bad_request
@@ -2702,13 +2708,16 @@ class UsersController < ApplicationController
       return render json: { message: "Developer key not authorized" }, status: :forbidden
     end
 
-    if params[:app_key] == settings["ios-key"]
-      key = settings["ios-key"]
-      sekrit = settings["ios-secret"]
-    elsif params[:app_key] == settings["android-key"]
-      key = settings["android-key"]
-      sekrit = settings["android-secret"]
-    else
+    key = nil
+    sekrit = nil
+    token_prefixes.each do |prefix|
+      next unless params[:app_key] == settings["#{prefix}-key"]
+
+      key = settings["#{prefix}-key"]
+      sekrit = settings["#{prefix}-secret"]
+    end
+
+    unless key
       return render json: { message: "Invalid app key" }, status: :bad_request
     end
 

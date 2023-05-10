@@ -142,7 +142,7 @@
 
     <form class="form-horizontal bootstrap-form display-only" style="margin-top:18px;">
       <fieldset>
-      <% if !@assignment.restrict_quantitative_data?(@current_user)%>
+      <% if !@assignment.restrict_quantitative_data?(@current_user, check_extra_permissions: true)%>
         <div class="control-group">
           <div class="control-label"><%= t(:points, 'Points') %></div>
           <div class="controls">

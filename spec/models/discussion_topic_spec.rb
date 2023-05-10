@@ -2082,7 +2082,7 @@ describe DiscussionTopic do
 
     around do |example|
       # materialized view jobs are now delayed
-      Timecop.freeze(Time.zone.now + 20.seconds, &example)
+      Timecop.freeze(20.seconds.from_now, &example)
     end
 
     it "returns nil if the view has not been built yet, and schedule a job" do

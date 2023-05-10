@@ -592,6 +592,28 @@ describe Attachment do
     end
   end
 
+  context "media_tracks_include_originals" do
+    before :once do
+      @course = course_factory
+      teacher_in_course
+      @media_object = media_object
+      attachment_model(filename: "foo.mp4", content_type: "video", media_entry_id: @media_object.media_id)
+    end
+
+    it "returns original media object media tracks" do
+      track = @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher)
+      expect(@attachment.media_tracks_include_originals).to include track
+    end
+
+    it "returns attachment media tracks if both attachment and media object have media tracks in the same locale" do
+      en_track = @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher)
+      fr_track = @media_object.media_tracks.create!(kind: "subtitles", locale: "fr", content: "fr subs", user_id: @teacher)
+      fra_track = @attachment.media_tracks.create!(kind: "subtitles", locale: "fr", content: "fr new", user_id: @teacher, media_object: @media_object)
+      expect(@attachment.media_tracks_include_originals).to match [en_track, fra_track]
+      expect(@attachment.media_tracks_include_originals).not_to include fr_track
+    end
+  end
+
   context "destroy" do
     let(:a) { attachment_model(uploaded_data: default_uploaded_data) }
 
@@ -924,6 +946,13 @@ describe Attachment do
       a2 = Attachment.new
       a2.root_attachment = a
       expect(a2.sanitize_filename(nil)).to eq a.filename
+    end
+  end
+
+  context "explicitly-set display name" do
+    it "truncates to 1000 characters" do
+      a = attachment_model(filename: "HE COMES", display_name: "#{"A" * 1000}.docx")
+      expect(a.display_name).to eq "#{"A" * 995}.docx"
     end
   end
 
@@ -2009,7 +2038,7 @@ describe Attachment do
 
       @student_ended = user_model
       @student_ended.register!
-      @section_ended = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
+      @section_ended = @course.course_sections.create!(end_at: 1.day.ago)
       @course.enroll_student(@student_ended, section: @section_ended).accept
       cc_ended = communication_channel(@student_ended, { username: "default2@example.com", active_cc: true })
 

@@ -21,7 +21,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import $ from 'jquery'
 import axios from '@canvas/axios'
-import _ from 'underscore'
+import _ from 'lodash'
 import AccountTabContainer from 'ui/features/account_grading_standards/react/AccountTabContainer'
 import 'jqueryui/tabs'
 

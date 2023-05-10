@@ -32,15 +32,15 @@ import {View} from '@instructure/ui-view'
 
 import {Modal} from '@instructure/ui-modal'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {saveSelectedContexts} from '@canvas/k5/react/utils'
+import {DEFAULT_COURSE_COLOR, saveSelectedContexts} from '@canvas/k5/react/utils'
 
 const I18n = useI18nScope('filter_calendars_modal')
 
 export const ContextCheckbox = ({
   assetString,
-  color,
+  color = DEFAULT_COURSE_COLOR,
   maxContextsReached,
-  shortName,
+  name,
   onChange,
   selected,
 }) => (
@@ -54,7 +54,7 @@ export const ContextCheckbox = ({
   >
     <Checkbox
       data-testid="subject-calendars"
-      label={shortName}
+      label={name}
       value={`${assetString}_selected`}
       checked={selected}
       disabled={maxContextsReached && !selected}
@@ -171,9 +171,15 @@ const FilterCalendarsModal = ({
   )
 }
 
+export const ImportantDatesContextsShape = PropTypes.shape({
+  assetString: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  color: PropTypes.string,
+})
+
 FilterCalendarsModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
-  contexts: PropTypes.arrayOf(PropTypes.object).isRequired,
+  contexts: PropTypes.arrayOf(ImportantDatesContextsShape).isRequired,
   isOpen: PropTypes.bool.isRequired,
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string).isRequired,
   selectedContextsLimit: PropTypes.number.isRequired,

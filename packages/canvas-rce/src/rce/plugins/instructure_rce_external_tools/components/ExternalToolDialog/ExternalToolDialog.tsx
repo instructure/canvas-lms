@@ -27,7 +27,6 @@ import {RceLti11ContentItem} from '../../lti11-content-items/RceLti11ContentItem
 import formatMessage from '../../../../../format-message'
 import {TsMigrationAny} from '../../../../../types/ts-migration'
 import {ExternalToolsEnv} from '../../ExternalToolsEnv'
-import RCEWrapper from '../../../../RCEWrapper'
 import {RceToolWrapper} from '../../RceToolWrapper'
 import {instuiPopupMountNode} from '../../../../../util/fullscreenHelpers'
 import {ExternalToolDialogTray} from './ExternalToolDialogTray'
@@ -138,13 +137,11 @@ export default class ExternalToolDialog extends React.Component<
       return
     }
 
-    const editor = env.editor
-
     const contentItems = data.contentItems
     if (contentItems.length === 1 && contentItems[0]['@type'] === 'lti_replace') {
       const code = contentItems[0].text
 
-      RCEWrapper.getByEditor(editor).setCode(code)
+      env.rceWrapper?.setCode(code)
     } else {
       contentItems.forEach(contentData => {
         const code = RceLti11ContentItem.fromJSON(
@@ -155,7 +152,7 @@ export default class ExternalToolDialog extends React.Component<
           env
         ).codePayload
 
-        RCEWrapper.getByEditor(editor).insertCode(code)
+        env.rceWrapper?.insertCode(code)
       })
     }
     this.close()

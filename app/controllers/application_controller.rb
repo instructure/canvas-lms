@@ -343,6 +343,7 @@ class ApplicationController < ActionController::Base
     account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
     course_paces_redesign course_paces_for_students rce_better_paste module_publish_menu explicit_latex_typesetting
     dev_key_oidc_alert rce_new_external_tool_dialog_in_canvas rce_show_studio_media_options rce_improved_placeholders
+    media_links_use_attachment_id
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours files_dnd usage_rights_discussion_topics
@@ -391,12 +392,12 @@ class ApplicationController < ActionController::Base
   helper_method :render_js_env
 
   # add keys to JS environment necessary for the RCE at the given risk level
-  def rce_js_env_base(domain: request.host_with_port)
+  def rce_js_env_base(domain: request.host_with_port, user: @current_user, context: @context)
     Services::RichContent.env_for(
-      user: @current_user,
+      user: user,
       domain: domain,
       real_user: @real_current_user,
-      context: @context
+      context: context
     )
   end
 
@@ -1217,8 +1218,7 @@ class ApplicationController < ActionController::Base
       if opts[:include_accounts]
         # reload @current_user to make sure we get a current value for their :enabled_account_calendars preference
         @current_user.reload
-        account_ids = @current_user.get_preference(:enabled_account_calendars) || []
-        accounts = @current_user.associated_accounts.active.where(id: account_ids, account_calendar_visible: true)
+        accounts = @current_user.enabled_account_calendars
       end
 
       if opts[:favorites_first]
@@ -2541,7 +2541,7 @@ class ApplicationController < ActionController::Base
   # ensure that the bundle you are requiring isn't simply a dependency of some
   # other bundle.
   #
-  # Bundles are defined in ui/features/<bundle>.coffee
+  # Bundles are defined in ui/features/<bundle>.js
   #
   # usage: js_bundle :gradebook
   #
@@ -2755,7 +2755,7 @@ class ApplicationController < ActionController::Base
         instance_name = instance_symbol.to_s
         obj = instance_variable_get("@#{instance_name}")
         policy = obj.check_policy(@current_user, session) unless obj.nil? || !obj.respond_to?(:check_policy)
-        hash["#{instance_name.upcase}_RIGHTS".to_sym] = HashWithIndifferentAccess[policy.map { |right| [right, true] }] unless policy.nil?
+        hash["#{instance_name.upcase}_RIGHTS".to_sym] = ActiveSupport::HashWithIndifferentAccess[policy.map { |right| [right, true] }] unless policy.nil?
       end
 
       js_env hash
@@ -2823,7 +2823,7 @@ class ApplicationController < ActionController::Base
                      (permissions[:manage] || current_user_has_been_observer_in_this_course) && "all_dates",
                      permissions[:manage] && "module_ids",
                      peer_reviews_for_a2_enabled? && "assessment_requests"
-                   ].reject(&:blank?),
+                   ].compact_blank,
                    exclude_response_fields: ["description", "rubric"],
                    exclude_assignment_submission_types: ["wiki_page"],
                    override_assignment_dates: !permissions[:manage],
@@ -3027,6 +3027,11 @@ class ApplicationController < ActionController::Base
     STUDENT_VIEW_PAGES.key?(controller_action) && (STUDENT_VIEW_PAGES[controller_action].nil? || !@context.tab_hidden?(STUDENT_VIEW_PAGES[controller_action]))
   end
   helper_method :show_student_view_button?
+
+  def show_blueprint_button?
+    @context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(@context)
+  end
+  helper_method :show_blueprint_button?
 
   def show_immersive_reader?
     return false if @current_user.blank?

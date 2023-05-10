@@ -33,6 +33,10 @@ shared_context "blueprint sidebar context" do
     f(".blueprint__root .bcs__wrapper .bcs__trigger button")
   end
 
+  def blueprint_mobile_open_sidebar_button
+    f("#mobile-header .mobile-header-blueprint-button")
+  end
+
   def sync_modal_send_notification_checkbox
     fj("label span:contains('Send Notification')", f(".bcs__modal-content-wrapper .bcs__history"))
   end
@@ -115,9 +119,23 @@ describe "master courses sidebar" do
       expect(blueprint_open_sidebar_button).to be_displayed
     end
 
+    it "show mobile trigger button and hides trigger tab" do
+      resize_screen_to_mobile_width
+      get "/courses/#{@master.id}"
+      expect(blueprint_open_sidebar_button).to_not be_displayed
+      expect(blueprint_mobile_open_sidebar_button).to be_displayed
+    end
+
     it "shows sidebar when trigger is clicked" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
+      expect(bcs_content_panel).to be_displayed
+    end
+
+    it "shows sidebar when mobile trigger is clicked" do
+      resize_screen_to_mobile_width
+      get "/courses/#{@master.id}"
+      blueprint_mobile_open_sidebar_button.click
       expect(bcs_content_panel).to be_displayed
     end
 

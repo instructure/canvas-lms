@@ -103,13 +103,9 @@ module Workflow
       @name, @events = name, {}
     end
 
-    def to_s
-      name.to_s
-    end
+    delegate :to_s, to: :name
 
-    def to_sym
-      name.to_sym
-    end
+    delegate :to_sym, to: :name
   end
 
   class Event

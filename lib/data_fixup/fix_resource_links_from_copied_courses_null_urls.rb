@@ -41,7 +41,7 @@ module DataFixup::FixResourceLinksFromCopiedCoursesNullUrls
   end
 
   def self.run
-    copied_ids = resource_links_to_update.map { |r| r["copy_id"] }
+    copied_ids = resource_links_to_update.pluck("copy_id")
     Lti::ResourceLink.where(id: copied_ids).in_batches.update_all(url: nil)
   end
 end

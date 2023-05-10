@@ -200,7 +200,7 @@ describe MicrosoftSync::SyncerSteps do
     end
     let(:max_default) { (owners_or_members == "owners") ? 100 : 25_000 }
     let(:err_msg) do
-      "Microsoft 365 allows a maximum of #{(max || max_default).to_s(:delimited)} " \
+      "Microsoft 365 allows a maximum of #{(max || max_default).to_fs(:delimited)} " \
         "#{owners_or_members} in a team."
     end
 

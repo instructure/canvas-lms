@@ -118,7 +118,7 @@ describe "groups" do
 
       it "hides groups for inaccessible courses in groups list", priority: "2" do
         term = EnrollmentTerm.find(@course.enrollment_term_id)
-        term.end_at = Time.zone.now - 2.days
+        term.end_at = 2.days.ago
         term.save!
         @course.restrict_student_past_view = true
         @course.save

@@ -51,8 +51,8 @@ describe SIS::CSV::TermImporter do
     t1 = @account.enrollment_terms.where(sis_source_id: "T001").first
     expect(t1).not_to be_nil
     expect(t1.name).to eq "Winter11"
-    expect(t1.start_at.to_s(:db)).to eq "2011-01-05 00:00:00"
-    expect(t1.end_at.to_s(:db)).to eq "2011-04-14 00:00:00"
+    expect(t1.start_at.to_fs(:db)).to eq "2011-01-05 00:00:00"
+    expect(t1.end_at.to_fs(:db)).to eq "2011-04-14 00:00:00"
 
     t2 = @account.enrollment_terms.where(sis_source_id: "T002").first
     expect(t2).not_to be_nil

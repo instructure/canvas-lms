@@ -144,12 +144,12 @@ describe "Pages API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?per_page=2",
                         controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.to_param, per_page: "2")
         expect(json.size).to eq 2
-        urls = json.collect { |page| page["url"] }
+        urls = json.pluck("url")
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?per_page=2&page=2",
                         controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.to_param, per_page: "2", page: "2")
         expect(json.size).to eq 2
-        urls += json.collect { |page| page["url"] }
+        urls += json.pluck("url")
 
         expect(urls).to eq @wiki.wiki_pages.sort_by(&:id).collect(&:url)
       end
@@ -161,18 +161,18 @@ describe "Pages API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=new",
                         controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.to_param, search_term: "new")
         expect(json.size).to eq 3
-        expect(json.collect { |page| page["url"] }).to eq new_pages.sort_by(&:id).collect(&:url)
+        expect(json.pluck("url")).to eq new_pages.sort_by(&:id).collect(&:url)
 
         # Should also paginate
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=New&per_page=2",
                         controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.to_param, search_term: "New", per_page: "2")
         expect(json.size).to eq 2
-        urls = json.collect { |page| page["url"] }
+        urls = json.pluck("url")
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=New&per_page=2&page=2",
                         controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.to_param, search_term: "New", per_page: "2", page: "2")
         expect(json.size).to eq 1
-        urls += json.collect { |page| page["url"] }
+        urls += json.pluck("url")
 
         expect(urls).to eq new_pages.sort_by(&:id).collect(&:url)
       end
@@ -191,12 +191,12 @@ describe "Pages API", type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?sort=title",
                           controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.to_param,
                           sort: "title")
-          expect(json.map { |page| page["title"] }).to eq ["Front Page", "gIntermediate Page", "Hidden Page"]
+          expect(json.pluck("title")).to eq ["Front Page", "gIntermediate Page", "Hidden Page"]
 
           json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?sort=title&order=desc",
                           controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.to_param,
                           sort: "title", order: "desc")
-          expect(json.map { |page| page["title"] }).to eq ["Hidden Page", "gIntermediate Page", "Front Page"]
+          expect(json.pluck("title")).to eq ["Hidden Page", "gIntermediate Page", "Front Page"]
         end
 
         it "sorts by created_at" do
@@ -204,7 +204,7 @@ describe "Pages API", type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?sort=created_at&order=asc",
                           controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.to_param,
                           sort: "created_at", order: "asc")
-          expect(json.map { |page| page["url"] }).to eq [@hidden_page.url, @front_page.url]
+          expect(json.pluck("url")).to eq [@hidden_page.url, @front_page.url]
         end
 
         it "sorts by updated_at" do
@@ -212,7 +212,7 @@ describe "Pages API", type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?sort=updated_at&order=desc",
                           controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.to_param,
                           sort: "updated_at", order: "desc")
-          expect(json.map { |page| page["url"] }).to eq [@front_page.url, @hidden_page.url]
+          expect(json.pluck("url")).to eq [@front_page.url, @hidden_page.url]
         end
 
         context "planner feature enabled" do
@@ -420,7 +420,7 @@ describe "Pages API", type: :request do
         json += api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions?per_page=2&page=2",
                          controller: "wiki_pages_api", action: "revisions", format: "json",
                          course_id: @course.to_param, url_or_id: @vpage.url, per_page: "2", page: "2")
-        expect(json.map { |r| r["revision_id"] }).to eq [3, 2, 1]
+        expect(json.pluck("revision_id")).to eq [3, 2, 1]
       end
 
       it "retrieves an old revision" do
@@ -1131,12 +1131,12 @@ describe "Pages API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?per_page=2",
                       controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.id.to_s, per_page: "2")
       expect(json.size).to eq 2
-      urls = json.collect { |page| page["url"] }
+      urls = json.pluck("url")
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?per_page=2&page=2",
                       controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.id.to_s, per_page: "2", page: "2")
       expect(json.size).to eq 1
-      urls += json.collect { |page| page["url"] }
+      urls += json.pluck("url")
 
       expect(urls).to eq @wiki.wiki_pages.select(&:published?).sort_by(&:id).collect(&:url)
     end
@@ -1388,7 +1388,7 @@ describe "Pages API", type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions",
                           controller: "wiki_pages_api", action: "revisions", format: "json",
                           course_id: @course.to_param, url_or_id: @vpage.url)
-          expect(json.map { |r| r["revision_id"] }).to eq [4, 3, 2, 1]
+          expect(json.pluck("revision_id")).to eq [4, 3, 2, 1]
         end
 
         it "retrieves an old revision" do
@@ -1455,7 +1455,7 @@ describe "Pages API", type: :request do
     it "lists the contents of a group wiki" do
       json = api_call(:get, "/api/v1/groups/#{@group.id}/pages",
                       { controller: "wiki_pages_api", action: "index", format: "json", group_id: @group.to_param })
-      expect(json.collect { |row| row["title"] }).to eq @group.wiki_pages.active.order_by_id.collect(&:title)
+      expect(json.pluck("title")).to eq @group.wiki_pages.active.order_by_id.collect(&:title)
     end
 
     it "retrieves page content from a group wiki" do
@@ -1498,7 +1498,7 @@ describe "Pages API", type: :request do
         json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{@vpage.url}/revisions",
                         controller: "wiki_pages_api", action: "revisions", format: "json",
                         group_id: @group.to_param, url_or_id: @vpage.url)
-        expect(json.map { |v| v["revision_id"] }).to eq [2, 1]
+        expect(json.pluck("revision_id")).to eq [2, 1]
       end
 
       it "retrieves an old revision of a page" do

@@ -221,7 +221,7 @@ class GradingStandard < ActiveRecord::Base
 
   def valid_grading_scheme_data
     errors.add(:data, "grading scheme values cannot be negative") if data.present? && data.any? { |v| v[1] < 0 }
-    errors.add(:data, "grading scheme cannot contain duplicate values") if data.present? && data.map { |v| v[1] } != data.map { |v| v[1] }.uniq
+    errors.add(:data, "grading scheme cannot contain duplicate values") if data.present? && data.pluck(1) != data.pluck(1).uniq
     errors.add(:data, "a grading scheme name is too long") if data.present? && data.any? { |v| v[0].length > self.class.maximum_string_length }
   end
 

@@ -114,6 +114,23 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     expect(@entry.reload.attachment_id).to eq attachment.id
   end
 
+  it "allows teachers to edit post with student attachment" do
+    attachment = attachment_with_context(@student)
+    attachment.update!(user: @student)
+    @entry.attachment = attachment
+    @entry.save
+
+    # Update message as a teacher
+    result = run_mutation({ discussion_entry_id: @entry.id, file_id: attachment.id, message: "edit student entry without touching file_id" }, @teacher)
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateDiscussionEntry", "errors")).to be_nil
+    expect(result.dig("data", "updateDiscussionEntry", "discussionEntry", "attachment", "_id")).to eq attachment.id.to_s
+    expect(@entry.reload.attachment_id).to eq attachment.id
+    # Verify that the owner of the attachment did not change when teacher edited message
+    expect(@entry.reload.attachment.user.id).to eq @student.id
+  end
+
   context "include reply preview" do
     it "cannot be true on a root entry" do
       result = run_mutation(discussion_entry_id: @entry.id, include_reply_preview: true)

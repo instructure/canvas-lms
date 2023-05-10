@@ -75,7 +75,7 @@ module Lti
         )
       end
       let_once(:line_item) { assignment.line_items.first }
-      let(:parsed_response_body) { JSON.parse(response.body) }
+      let(:parsed_response_body) { response.parsed_body }
       let(:valid_params) { { course_id: context.id, userId: user.id, line_item_id: line_item.id } }
 
       describe "#before_actions" do
@@ -156,7 +156,7 @@ module Lti
           it "fails to find user" do
             get :index, params: valid_params
             expect(response.code).to eq "422"
-            expect(JSON.parse(response.body)["errors"]["message"]).to eq("User not found in course or is not a student")
+            expect(response.parsed_body["errors"]["message"]).to eq("User not found in course or is not a student")
           end
 
           it "still uses such a user_id to look up by lti_id" do
@@ -219,7 +219,7 @@ module Lti
           it "fails to find user" do
             get :index, params: valid_params
             expect(response.code).to eq "422"
-            expect(JSON.parse(response.body)["errors"]["message"]).to eq("User not found in course or is not a student")
+            expect(response.parsed_body["errors"]["message"]).to eq("User not found in course or is not a student")
           end
         end
 

@@ -21,7 +21,7 @@ import {Editor} from '@tinymce/tinymce-react'
 import _ from 'lodash'
 import {StoreProvider} from './plugins/shared/StoreContext'
 
-import themeable from '@instructure/ui-themeable'
+import themeable from '@instructure/ui-themeable' // eslint-disable-line  @typescript-eslint/no-unused-vars
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
@@ -54,7 +54,7 @@ import CanvasContentTray from './plugins/shared/CanvasContentTray'
 import StatusBar, {PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW, WYSIWYG_VIEW} from './StatusBar'
 import {VIEW_CHANGE} from './customEvents'
 import ShowOnFocusButton from './ShowOnFocusButton'
-import theme from '../skins/theme'
+import theme from '../skins/theme' // eslint-disable-line  @typescript-eslint/no-unused-vars
 import {isAudio, isImage, isVideo} from './plugins/shared/fileTypeUtils'
 import KeyboardShortcutModal from './KeyboardShortcutModal'
 import AlertMessageArea from './AlertMessageArea'
@@ -72,7 +72,7 @@ import styles from '../skins/skin-delta.css'
 import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
 import contentCSSBinding from 'tinymce/skins/ui/oxide/content.css'
 import {rceWrapperPropTypes} from './RCEWrapperProps'
-import {removePlaceholder} from '../util/loadingPlaceholder'
+import {insertPlaceholder, placeholderInfoFor, removePlaceholder} from '../util/loadingPlaceholder'
 import {transformRceContentForEditing} from './transformContent'
 import {IconMoreSolid} from '@instructure/ui-icons/es/svg'
 
@@ -328,6 +328,7 @@ class RCEWrapper extends React.Component {
       explicit_latex_typesetting = false,
       rce_show_studio_media_options = false,
       rce_transform_loaded_content = false,
+      media_links_use_attachment_id = false,
     } = this.props.features
 
     return {
@@ -339,6 +340,7 @@ class RCEWrapper extends React.Component {
       explicit_latex_typesetting,
       rce_show_studio_media_options,
       rce_transform_loaded_content,
+      media_links_use_attachment_id,
     }
   }
 
@@ -504,23 +506,37 @@ class RCEWrapper extends React.Component {
     const element = contentInsertion.insertImage(editor, image, this.getCanvasUrl())
 
     // Removes TinyMCE's caret &nbsp; text if exists.
-    if (element?.nextSibling?.data?.trim() === '') {
+    if (element?.nextSibling?.data?.startsWith('\xA0' /* nbsp */)) {
+      element.nextSibling.splitText(1)
       element.nextSibling.remove()
     }
 
-    if (element && element.complete) {
-      this.contentInserted(element)
-    } else if (element) {
-      element.onload = () => this.contentInserted(element)
-      element.onerror = () => this.checkImageLoadError(element)
+    return {
+      imageElem: element,
+      loadingPromise: new Promise((resolve, reject) => {
+        if (element && element.complete) {
+          this.contentInserted(element)
+          resolve()
+        } else if (element) {
+          element.onload = () => {
+            this.contentInserted(element)
+            resolve()
+          }
+          element.onerror = e => {
+            this.checkImageLoadError(element)
+            reject(e)
+          }
+        }
+      }),
     }
   }
 
   insertImagePlaceholder(fileMetaProps) {
     if (this.props.features?.rce_improved_placeholders) {
-      return import('../util/loadingPlaceholder').then(
-        async ({placeholderInfoFor, insertPlaceholder}) =>
-          insertPlaceholder(this.mceInstance(), await placeholderInfoFor(fileMetaProps))
+      return insertPlaceholder(
+        this.mceInstance(),
+        fileMetaProps.name,
+        placeholderInfoFor(fileMetaProps)
       )
     }
 
@@ -620,8 +636,7 @@ class RCEWrapper extends React.Component {
 
   removePlaceholders(name) {
     if (this.props.features?.rce_improved_placeholders) {
-      // Note that this needs to be done synchronously, or the image inserting code doesn't work
-      removePlaceholder(this.mceInstance(), encodeURIComponent(name))
+      removePlaceholder(this.mceInstance(), name)
     } else {
       const placeholder = this.mceInstance().dom.doc.querySelector(
         `[data-placeholder-for="${encodeURIComponent(name)}"]`

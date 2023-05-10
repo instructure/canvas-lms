@@ -829,7 +829,7 @@ module ApplicationHelper
     stylesheet_link_tag(*(includes + [{ media: "all" }])) if includes.present?
   end
 
-  # this should be the same as friendlyDatetime in handlebars_helpers.coffee
+  # this should be the same as friendlyDatetime in handlebars_helpers.js
   def friendly_datetime(datetime, opts = {}, attributes = {})
     attributes[:pubdate] = true if opts[:pubdate]
     context = opts[:context]

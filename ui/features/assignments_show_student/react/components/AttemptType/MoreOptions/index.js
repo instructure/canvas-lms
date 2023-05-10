@@ -33,7 +33,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import TakePhotoUrl from '../../../../images/TakePhoto.svg'
 import {Text} from '@instructure/ui-text'
 import WebcamCapture from './WebcamCapture'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 import {View} from '@instructure/ui-view'
 

@@ -613,6 +613,7 @@
   "media_file_is_processing_please_try_again_later_58a6d49": {
     "message": "Le fichier multimédia est en cours de traitement. Veuillez réessayer plus tard."
   },
+  "media_title_2112243b": { "message": "Titre du fichier multimédia" },
   "medium_5a8e9ead": { "message": "Moyen" },
   "merge_links_2478df96": { "message": "Fusionner les liens" },
   "mic_a7f3d311": { "message": "Micro" },
@@ -926,9 +927,6 @@
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Un problème est survenu lors du partage de votre écran."
   },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Désolé, nous ne prenons en charge qu''un seul fichier à la fois."
-  },
   "sort_by_e75f9e3e": { "message": "Trier par" },
   "spades_suit_b37020c2": { "message": "Pique (cartes)" },
   "square_511eb3b3": { "message": "Carré" },
@@ -950,6 +948,9 @@
   "start_recording_9a65141a": { "message": "Démarrer l''enregistrement" },
   "steel_blue_14296f08": { "message": "Bleu métallisé" },
   "studio_media_options_ee504361": { "message": "Options de média Studio" },
+  "studio_media_options_tray_cfb94654": {
+    "message": "Tiroir d’options de médias Studio"
+  },
   "styles_2aa721ef": { "message": "Styles" },
   "submit_a3cc6859": { "message": "Soumettre" },
   "subscript_59744f96": { "message": "En indice" },

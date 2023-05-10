@@ -694,7 +694,7 @@ describe "context modules" do
       submission = quiz.generate_submission(@student)
       submission.workflow_state = "complete"
       submission.save!
-      quiz.due_at = Time.zone.now - 2.days
+      quiz.due_at = 2.days.ago
       quiz.save!
       go_to_modules
       # validate that there is no warning icon for past due

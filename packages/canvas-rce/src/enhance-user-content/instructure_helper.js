@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape from 'escape-html'
 import formatMessage from '../format-message'
 import {showFlashAlert} from '../common/FlashAlert'
 import {isPreviewable, loadDocPreview, removeLoadingImage, showLoadingImage} from './doc_previews'
@@ -170,7 +169,7 @@ export function showFilePreviewInline(event, canvasOrigin, disableGooglePreviews
         $minimizeLink.setAttribute('href', '#')
         $minimizeLink.setAttribute('style', 'font-size: 0.8em;')
         $minimizeLink.setAttribute('class', 'hide_file_preview_link')
-        $minimizeLink.innerHTML = htmlEscape(formatMessage('Minimize File Preview'))
+        $minimizeLink.textContent = formatMessage('Minimize File Preview')
         $minimizeLink.addEventListener('click', event2 => {
           event2.preventDefault()
           resetInlinePreview($link, $div)

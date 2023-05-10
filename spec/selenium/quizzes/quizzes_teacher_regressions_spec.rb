@@ -45,7 +45,7 @@ describe "quizzes regressions" do
   it "marks questions as answered when the window loses focus", priority: "1"
 
   it "quiz show page displays the quiz due date", priority: "1" do
-    due_date = Time.zone.now + 4.days
+    due_date = 4.days.from_now
     create_quiz_with_due_date(due_at: due_date)
     verify_quiz_show_page_due_date(format_date_for_view(due_date))
   end
