@@ -107,6 +107,12 @@ module Lti::IMS::Concerns
       Assignment.transaction do
         assignment = @context.assignments.active.find_by(id: assignment_id) if assignment_id
         assignment ||= @context.assignments.new(workflow_state: "unpublished")
+
+        post_to_sis = assignment.post_to_sis
+        if assignment_id.nil? && Assignment.sis_grade_export_enabled?(context)
+          post_to_sis = @context.account.sis_default_grade_export[:value]
+        end
+
         assignment.update!(
           {
             submission_types: "external_tool",
@@ -116,6 +122,7 @@ module Lti::IMS::Concerns
             unlock_at: content_item.dig(:available, :startDateTime),
             lock_at: content_item.dig(:available, :endDateTime),
             due_at: content_item.dig(:submission, :endDateTime),
+            post_to_sis: post_to_sis,
             external_tool_tag_attributes: {
               content_type: "ContextExternalTool",
               content_id: tool.id,
@@ -128,7 +135,7 @@ module Lti::IMS::Concerns
         # make sure custom launch dimensions get to the ContentTag for launch from assignment
         assignment.external_tool_tag.update!(link_settings: launch_dimensions(content_item))
 
-        # default line item is created if assigment has submission_types: external_tool,
+        # default line item is created if assignment has submission_types: external_tool,
         # and an external tool tag
         line_item = assignment.line_items.first
         line_item.update!(
