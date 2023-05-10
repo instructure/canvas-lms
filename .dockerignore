@@ -36,5 +36,4 @@ vendor/bundle/
 vendor/*/.git
 Dockerfile
 *.Dockerfile
-Gemfile.lock
 mkmf.log

@@ -26,8 +26,8 @@
 # 2. Create a file RAILS_VERSION with <supported version> as the contents
 # 3. Create a Consul setting private/canvas/rails_version with <supported version> as the contents
 
-DEFAULT_VERSION = "7.0"
-SUPPORTED_VERSIONS = %w[7.0].freeze
+# the default version (corresponding to the bare Gemfile.lock) must be listed first
+SUPPORTED_RAILS_VERSIONS = %w[7.0].freeze
 
 unless defined?(CANVAS_RAILS)
   file_path = File.expand_path("RAILS_VERSION", __dir__)
@@ -61,13 +61,13 @@ unless defined?(CANVAS_RAILS)
         result = nil unless result.is_a?(Net::HTTPSuccess)
         break if result
       end
-      CANVAS_RAILS = result ? Base64.decode64(JSON.parse(result.body).first["Value"]).strip : DEFAULT_VERSION
+      CANVAS_RAILS = result ? Base64.decode64(JSON.parse(result.body).first["Value"]).strip : SUPPORTED_RAILS_VERSIONS.first
     rescue
-      CANVAS_RAILS = DEFAULT_VERSION
+      CANVAS_RAILS = SUPPORTED_RAILS_VERSIONS.first
     end
   end
 end
 
-unless SUPPORTED_VERSIONS.any?(CANVAS_RAILS)
+unless SUPPORTED_RAILS_VERSIONS.any?(CANVAS_RAILS)
   raise "unsupported Rails version specified #{CANVAS_RAILS}"
 end

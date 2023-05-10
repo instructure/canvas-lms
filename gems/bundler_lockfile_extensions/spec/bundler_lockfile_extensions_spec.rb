@@ -24,206 +24,328 @@ require "fileutils"
 require_relative "spec_helper"
 
 describe "BundlerLockfileExtensions" do
+  # the definition section for a gemfile with two lockfiles; one
+  # that will have more gems than the default.
+  let(:all_gems_definitions) do
+    <<~RUBY
+      add_lockfile(
+        prepare: -> { ::INCLUDE_ALL_GEMS = false },
+        current: false
+      )
+      add_lockfile(
+        "Gemfile.full.lock",
+        prepare: -> { ::INCLUDE_ALL_GEMS = true },
+        current: true
+      )
+    RUBY
+  end
+
+  let(:all_gems_preamble) do
+    "::INCLUDE_ALL_GEMS = true unless defined?(::INCLUDE_ALL_GEMS)"
+  end
+
   it "generates a default Gemfile.lock when loaded, but not configured" do
-    contents = <<-RUBY
-      gem "concurrent-ruby", "1.2.0"
+    contents = <<~RUBY
+      gem "concurrent-ruby", "1.2.2"
     RUBY
 
-    with_gemfile(contents) do |file|
-      output = invoke_bundler("install", file.path)
+    with_gemfile("", contents) do
+      output = invoke_bundler("install")
 
-      expect(output).to include("1.2.0")
-      expect(File.read("#{file.path}.lock")).to include("1.2.0")
+      expect(output).to include("1.2.2")
+      expect(File.read("Gemfile.lock")).to include("1.2.2")
     end
   end
 
-  it "generates custom lockfiles with varying versions and excluded gems" do
-    contents = <<-RUBY
-      unless BundlerLockfileExtensions.enabled?
-        BundlerLockfileExtensions.enable({
-          "\#{__FILE__}.old.lock": {
-            default: true,
-            prepare_environment: -> { ::GEM_VERSION = "1.1.10" },
-          },
-          "\#{__FILE__}.new.lock": {
-            default: false,
-            prepare_environment: -> { ::GEM_VERSION = "1.2.0" },
-          },
-        })
-      end
+  it "disallows multiple default lockfiles" do
+    with_gemfile(<<~RUBY) do
+      add_lockfile()
+      add_lockfile()
+    RUBY
+      expect { invoke_bundler("install") }.to raise_error(/Only one default lockfile/)
+    end
+  end
 
+  it "disallows multiple current lockfiles" do
+    with_gemfile(<<~RUBY) do
+      add_lockfile(current: true)
+      add_lockfile("Gemfile.new.lock", current: true)
+    RUBY
+      expect { invoke_bundler("install") }.to raise_error(/Only one lockfile/)
+    end
+  end
+
+  it "generates custom lockfiles with varying versions" do
+    definitions = <<~RUBY
+      add_lockfile(
+        prepare: -> { ::GEM_VERSION = "1.1.10" }
+      )
+      add_lockfile(
+        "Gemfile.new.lock",
+        prepare: -> { ::GEM_VERSION = "1.2.2" }
+      )
+    RUBY
+
+    contents = <<~RUBY
+      ::GEM_VERSION = "1.1.10" unless defined?(::GEM_VERSION)
       gem "concurrent-ruby", ::GEM_VERSION
     RUBY
 
-    with_gemfile(contents) do |file|
-      output = invoke_bundler("install", file.path)
+    with_gemfile(definitions, contents) do
+      invoke_bundler("install")
 
-      expect(output).to include("1.1.10")
-      expect(File.read("#{file.path}.old.lock")).to include("1.1.10")
-      expect(File.read("#{file.path}.new.lock")).to include("1.2.0")
+      expect(File.read("Gemfile.lock")).to include("1.1.10")
+      expect(File.read("Gemfile.lock")).not_to include("1.2.2")
+      expect(File.read("Gemfile.new.lock")).not_to include("1.1.10")
+      expect(File.read("Gemfile.new.lock")).to include("1.2.2")
     end
   end
 
   it "generates lockfiles with a subset of gems" do
-    contents = <<-RUBY
-      unless BundlerLockfileExtensions.enabled?
-        BundlerLockfileExtensions.enable({
-          "\#{__FILE__}.lock": {
-            default: true,
-            install_filter: lambda { |_, x| !x.to_s.include?("test_local") },
-          },
-        })
-      end
-
-      gem "test_local", path: "test_local"
-      gem "concurrent-ruby", "1.2.0"
-    RUBY
-
-    with_gemfile(contents) do |file, dir|
-      create_local_gem(dir, "test_local", "")
-
-      invoke_bundler("install", file.path)
-
-      expect(File.read("#{file.path}.lock")).to include("test_local")
-      expect(File.read("#{file.path}.lock.partial")).not_to include("test_local")
-
-      expect(File.read("#{file.path}.lock")).to include("concurrent-ruby")
-      expect(File.read("#{file.path}.lock.partial")).to include("concurrent-ruby")
-    end
-  end
-
-  it "regenerates the lockfile when a source is completely removed and its dependencies no longer exist" do
-    contents = <<-RUBY
-      unless BundlerLockfileExtensions.enabled?
-        BundlerLockfileExtensions.enable({
-          "\#{__FILE__}.lock": {
-            default: true,
-            install_filter: lambda { |_, x| !x.to_s.include?("test_local") },
-          },
-        })
-      end
-
-      if ENV["USE_TEST_LOCAL_GEM"] == "1"
+    contents = <<~RUBY
+      if ::INCLUDE_ALL_GEMS
         gem "test_local", path: "test_local"
       end
-
-      gem "concurrent-ruby", "1.2.0"
+      gem "concurrent-ruby", "1.2.2"
     RUBY
 
-    with_gemfile(contents) do |file, dir|
-      create_local_gem(dir, "test_local", <<-RUBY)
-        spec.add_dependency "dummy", "0.9.6"
-      RUBY
+    with_gemfile(all_gems_definitions, contents, all_gems_preamble) do
+      create_local_gem("test_local", "")
 
-      invoke_bundler("install", file.path, env: { "USE_TEST_LOCAL_GEM" => "1" })
+      invoke_bundler("install")
 
-      expect(File.read("#{file.path}.lock")).to include("dummy")
-      expect(File.read("#{file.path}.lock")).to include("test_local")
-      expect(File.read("#{file.path}.lock.partial")).to include("dummy")
-      expect(File.read("#{file.path}.lock.partial")).not_to include("test_local")
+      expect(File.read("Gemfile.lock")).not_to include("test_local")
+      expect(File.read("Gemfile.full.lock")).to include("test_local")
 
-      invoke_bundler("install", file.path, env: { "USE_TEST_LOCAL_GEM" => "0" })
-
-      expect(File.read("#{file.path}.lock")).not_to include("dummy")
-      expect(File.read("#{file.path}.lock")).not_to include("test_local")
-      expect(File.read("#{file.path}.lock.partial")).not_to include("dummy")
-      expect(File.read("#{file.path}.lock.partial")).not_to include("test_local")
+      expect(File.read("Gemfile.lock")).to include("concurrent-ruby")
+      expect(File.read("Gemfile.full.lock")).to include("concurrent-ruby")
     end
   end
 
   it "fails if an additional lockfile contains an invalid gem" do
-    contents = <<-RUBY
-      unless BundlerLockfileExtensions.enabled?
-        BundlerLockfileExtensions.enable({
-          "\#{__FILE__}.old.lock": {
-            default: true,
-          },
-          "\#{__FILE__}.new.lock": {
-            default: false,
-          },
-        })
-      end
-
-      gem "concurrent-ruby", ">= 1.2.0"
+    definitions = <<~RUBY
+      add_lockfile()
+      add_lockfile(
+        "Gemfile.new.lock"
+      )
     RUBY
 
-    with_gemfile(contents) do |file|
-      invoke_bundler("install", file.path)
-      replace_gemfile_lock_pin("#{file.path}.new.lock", "concurrent-ruby", "9.9.9")
+    contents = <<~RUBY
+      gem "concurrent-ruby", ">= 1.2.2"
+    RUBY
 
-      expect { invoke_bundler("install", file.path) }.to raise_error(/concurrent-ruby\s+\(9\.9\.9\)\s+has\s+removed\s+it/m)
+    with_gemfile(definitions, contents) do
+      invoke_bundler("install")
+
+      replace_lockfile_pin("Gemfile.new.lock", "concurrent-ruby", "9.9.9")
+
+      expect { invoke_bundler("check") }.to raise_error(/concurrent-ruby.*does not match/m)
     end
   end
 
-  # This section tests that the following constraint is adhered to:
-  # 1. All dependencies under a private source must be pinned in the private plugin gemspec
-  context "filtered dependency pins" do
-    let(:gemfile_contents) do
-      <<-RUBY
-        unless BundlerLockfileExtensions.enabled?
-          BundlerLockfileExtensions.enable({
-            "\#{__FILE__}.v1.lock": {
-              default: true,
-              install_filter: lambda { |_, x| !x.to_s.include?("packagecloud") && !x.to_s.include?("test_local") },
-              prepare_environment: -> { ::VERSION = "1" },
-            },
-            "\#{__FILE__}.v2.lock": {
-              default: false,
-              install_filter: lambda { |_, x| !x.to_s.include?("packagecloud") && !x.to_s.include?("test_local") },
-              prepare_environment: -> { ::VERSION = "2" },
-            },
-          })
+  it "preserves the locked version of a gem in an alternate lockfile when updating a different gem in common" do
+    contents = <<~RUBY
+      gem "net-ldap", "0.17.0"
+
+      if ::INCLUDE_ALL_GEMS
+        gem "net-smtp", "0.3.2"
+      end
+    RUBY
+
+    with_gemfile(all_gems_definitions, contents, all_gems_preamble) do
+      invoke_bundler("install")
+
+      expect(invoke_bundler("info net-ldap")).to include("0.17.0")
+      expect(invoke_bundler("info net-smtp")).to include("0.3.2")
+
+      # loosen the requirement on both gems
+      write_gemfile(all_gems_definitions, <<~RUBY, all_gems_preamble)
+        gem "net-ldap", "~> 0.17"
+
+        if ::INCLUDE_ALL_GEMS
+          gem "net-smtp", "~> 0.3"
         end
+      RUBY
 
-        gem "test_local", path: "test_local"
-        gem "concurrent-ruby", "1.2.0"
+      # but only update net-ldap
+      invoke_bundler("update net-ldap")
 
-        eval(File.read("\#{__dir__}/test_local/Gemfile"))
+      # net-smtp should be untouched, even though it's no longer pinned
+      expect(invoke_bundler("info net-ldap")).not_to include("0.17.0")
+      expect(invoke_bundler("info net-smtp")).to include("0.3.2")
+    end
+  end
+
+  it "maintains consistency across multiple Gemfiles" do
+    definitions = <<~RUBY
+      add_lockfile()
+      add_lockfile(
+        "local_test/Gemfile.lock",
+        gemfile: "local_test/Gemfile")
+    RUBY
+
+    contents = <<~RUBY
+      gem "net-smtp", "0.3.2"
+    RUBY
+
+    with_gemfile(definitions, contents) do
+      create_local_gem("local_test", <<~RUBY)
+        spec.add_dependency "net-smtp", "~> 0.3"
+      RUBY
+
+      invoke_bundler("install")
+
+      # locks to 0.3.2 in the local gem's lockfile, even though the local
+      # gem itself would allow newer
+      expect(File.read("local_test/Gemfile.lock")).to include("0.3.2")
+    end
+  end
+
+  it "whines about non-pinned dependencies in flagged gemfiles" do
+    definitions = <<~RUBY
+      add_lockfile(
+        prepare: -> { ::INCLUDE_ALL_GEMS = false },
+        current: false
+      )
+      add_lockfile(
+        "Gemfile.full.lock",
+        prepare: -> { ::INCLUDE_ALL_GEMS = true },
+        current: true,
+        enforce_pinned_additional_dependencies: true
+      )
+    RUBY
+
+    contents = <<~RUBY
+      gem "net-ldap", "0.17.0"
+
+      if ::INCLUDE_ALL_GEMS
+        gem "net-smtp", "~> 0.3"
+      end
+    RUBY
+
+    with_gemfile(definitions, contents, all_gems_preamble) do
+      expect { invoke_bundler("install") }.to raise_error(/net-smtp \([0-9.]+\) in Gemfile.full.lock has not been pinned/)
+
+      # not only have to pin net-smtp, but also its transitive dependencies
+      write_gemfile(definitions, <<~RUBY, all_gems_preamble)
+        gem "net-ldap", "0.17.0"
+
+        if ::INCLUDE_ALL_GEMS
+          gem "net-smtp", "0.3.2"
+            gem "net-protocol", "0.2.1"
+            gem "timeout", "0.3.2"
+        end
+      RUBY
+
+      invoke_bundler("install") # no error, because it's now pinned
+    end
+  end
+
+  context "with mismatched dependencies disallowed" do
+    let(:all_gems_definitions) do
+      <<~RUBY
+        add_lockfile(
+          prepare: -> { ::INCLUDE_ALL_GEMS = false },
+          current: false
+        )
+        add_lockfile(
+          "Gemfile.full.lock",
+          prepare: -> { ::INCLUDE_ALL_GEMS = true },
+          allow_mismatched_dependencies: false,
+          current: true
+        )
       RUBY
     end
 
-    let(:private_gemfile_contents) do
-      <<-RUBY
-        if ::VERSION == ENV["USE_VERSION"]
-          source "https://packagecloud.io/instructure/rubygems-public/" do
-            gem "hola", ">= 0.1.3"
-          end
+    it "notifies about mismatched versions between different lockfiles" do
+      contents = <<~RUBY
+        if ::INCLUDE_ALL_GEMS
+          gem "activesupport", "7.0.4.3"
+        else
+          gem "activesupport", "~> 6.1.0"
         end
       RUBY
-    end
 
-    it "fails if a filtered dependency isn't included in the gemspec" do
-      with_gemfile(gemfile_contents) do |file, dir|
-        create_local_gem(dir, "test_local", "")
-
-        File.write("#{dir}/test_local/Gemfile", private_gemfile_contents)
-
-        expect { invoke_bundler("install", file.path, env: { "USE_VERSION" => "1" }) }.to raise_error(/unable to prove that private gem hola was pinned/)
-        expect { invoke_bundler("install", file.path, env: { "USE_VERSION" => "2" }) }.to raise_error(/unable to prove that private gem hola was pinned/)
+      with_gemfile(all_gems_definitions, contents, all_gems_preamble) do
+        expect { invoke_bundler("install") }.to raise_error(/activesupport \(7.0.4.3\) in Gemfile.full.lock does not match the default lockfile's version/)
       end
     end
 
-    it "fails if a filtered dependency isn't pinned to an exact version in the gemspec" do
-      with_gemfile(gemfile_contents) do |file, dir|
-        create_local_gem(dir, "test_local", <<-RUBY)
-          spec.add_dependency "dummy", ">= 0.9.6"
-        RUBY
+    it "notifies about mismatched versions between different lockfiles for sub-dependencies" do
+      definitions = <<~RUBY
+        add_lockfile(
+          prepare: -> { ::INCLUDE_ALL_GEMS = false },
+          current: false
+        )
+        add_lockfile(
+          "Gemfile.full.lock",
+          prepare: -> { ::INCLUDE_ALL_GEMS = true },
+          allow_mismatched_dependencies: false,
+          current: true
+        )
+      RUBY
 
-        File.write("#{dir}/test_local/Gemfile", private_gemfile_contents)
+      contents = <<~RUBY
+        gem "activesupport", "7.0.4.3" # depends on tzinfo ~> 2.0, so will get >= 2.0.6
 
-        expect { invoke_bundler("install", file.path, env: { "USE_VERSION" => "1" }) }.to raise_error(/unable to prove that private gem hola was pinned/)
-        expect { invoke_bundler("install", file.path, env: { "USE_VERSION" => "2" }) }.to raise_error(/unable to prove that private gem hola was pinned/)
+        if ::INCLUDE_ALL_GEMS
+          gem "tzinfo", "2.0.5"
+        end
+      RUBY
+
+      with_gemfile(definitions, contents, all_gems_preamble) do
+        expect { invoke_bundler("install") }.to raise_error(/tzinfo \(2.0.5\) in Gemfile.full.lock does not match the default lockfile's version/)
       end
+    end
+  end
+
+  it "allows mismatched explicit dependencies by default" do
+    contents = <<~RUBY
+      if ::INCLUDE_ALL_GEMS
+        gem "activesupport", "7.0.4.3"
+      else
+        gem "activesupport", "~> 6.1.0"
+      end
+    RUBY
+
+    with_gemfile(all_gems_definitions, contents, all_gems_preamble) do
+      invoke_bundler("install") # no error
+      expect(File.read("Gemfile.lock")).to include("6.1.")
+      expect(File.read("Gemfile.lock")).not_to include("7.0.4.3")
+      expect(File.read("Gemfile.full.lock")).not_to include("6.1.")
+      expect(File.read("Gemfile.full.lock")).to include("7.0.4.3")
+    end
+  end
+
+  it "disallows mismatched implicit dependencies" do
+    definitions = <<~RUBY
+      add_lockfile()
+      add_lockfile(
+        "local_test/Gemfile.lock",
+        allow_mismatched_dependencies: false,
+        gemfile: "local_test/Gemfile")
+    RUBY
+    contents = <<~RUBY
+      gem "activesupport", "7.0.4.3"
+      gem "concurrent-ruby", "1.0.2"
+    RUBY
+
+    with_gemfile(definitions, contents) do
+      create_local_gem("local_test", <<~RUBY)
+        spec.add_dependency "activesupport", "7.0.4.3"
+      RUBY
+
+      expect { invoke_bundler("install") }.to raise_error(%r{concurrent-ruby \([0-9.]+\) in local_test/Gemfile.lock does not match the default lockfile's version \(@1.0.2\)})
     end
   end
 
   private
 
-  def create_local_gem(dir, name, content)
-    FileUtils.mkdir_p("#{dir}/#{name}")
-    File.write("#{dir}/#{name}/#{name}.gemspec", <<-RUBY)
+  def create_local_gem(name, content)
+    FileUtils.mkdir_p(name)
+    File.write("#{name}/#{name}.gemspec", <<~RUBY)
       Gem::Specification.new do |spec|
-        spec.name          = "#{name}"
+        spec.name          = #{name.inspect}
         spec.version       = "0.0.1"
         spec.authors       = ["Instructure"]
         spec.summary       = "for testing only"
@@ -231,40 +353,84 @@ describe "BundlerLockfileExtensions" do
         #{content}
       end
     RUBY
+
+    File.write("#{name}/Gemfile", <<~RUBY)
+      source "https://rubygems.org"
+
+      gemspec
+    RUBY
   end
 
-  def with_gemfile(content)
-    dir = Dir.mktmpdir
-    file = Tempfile.new("Gemfile", dir).tap do |f|
-      f.write(<<-RUBY)
-        source "https://rubygems.org"
-        plugin "bundler_lockfile_extensions", path: "#{File.dirname(__FILE__)}/.."
-        Plugin.send(:load_plugin, 'bundler_lockfile_extensions') if Plugin.installed?('bundler_lockfile_extensions') && !defined?(BundlerLockfileExtensions)
-        #{content}
-      RUBY
-      f.rewind
+  # creates a new temporary directory, writes the gemfile to it, and yields
+  #
+  # @param (see #write_gemfile)
+  # @yield
+  def with_gemfile(definitions, content = nil, preamble = nil)
+    Dir.mktmpdir do |dir|
+      Dir.chdir(dir) do
+        write_gemfile(definitions, content, preamble)
+
+        invoke_bundler("config frozen false")
+
+        yield
+      end
     end
-
-    yield(file, dir)
-  ensure
-    FileUtils.remove_dir(dir, true)
   end
 
-  def invoke_bundler(subcommand, gemfile_path, env: {})
+  # @param definitions [String]
+  #   Ruby code to set up lockfiles by calling add_lockfile. Called inside a
+  #   conditional for when BundlerLockfileExtensions is loaded the first time.
+  # @param content [String]
+  #   Additional Ruby code for adding gem requirements to the Gemfile
+  # @param preamble [String]
+  #   Additional Ruby code to execute prior to installing the plugin.
+  def write_gemfile(definitions, content = nil, preamble = nil)
+    raise ArgumentError, "Did you mean to use `with_gemfile`?" if block_given?
+
+    File.write("Gemfile", <<~RUBY)
+      source "https://rubygems.org"
+
+      #{preamble}
+
+      plugin "bundler_lockfile_extensions", path: #{File.dirname(__dir__).inspect}
+      if Plugin.installed?("bundler_lockfile_extensions")
+        Plugin.send(:load_plugin, "bundler_lockfile_extensions") unless defined?(BundlerLockfileExtensions)
+
+        unless BundlerLockfileExtensions.enabled?
+          #{definitions}
+        end
+      end
+
+      #{content}
+    RUBY
+  end
+
+  # Shells out to a new instance of bundler, with a clean bundler env
+  #
+  # @param subcommand [String] Args to pass to bundler
+  # @raise [RuntimeError] if the bundle command fails
+  def invoke_bundler(subcommand, env: {})
     output = nil
     bundler_version = ENV.fetch("BUNDLER_VERSION")
     command = "bundle _#{bundler_version}_ #{subcommand}"
     Bundler.with_unbundled_env do
-      output, status = Open3.capture2e({ "BUNDLE_GEMFILE" => gemfile_path }.merge(env), command)
+      output, status = Open3.capture2e(env, command)
 
       raise "bundle #{subcommand} failed: #{output}" unless status.success?
     end
     output
   end
 
-  def replace_gemfile_lock_pin(path, name, version)
-    new_contents = File.read(path).gsub(%r{#{name} \([0-9.]+\)}, "#{name} (#{version})")
+  # Directly modifies a lockfile to adjust the version of a gem
+  #
+  # Useful for simulating certain unusual situations that can arise.
+  #
+  # @param lockfile [String] The lockfile's location
+  # @param gem [String] The gem's name
+  # @param version [String] The new version to "pin" the gem to
+  def replace_lockfile_pin(lockfile, gem, version)
+    new_contents = File.read(lockfile).gsub(%r{#{gem} \([0-9.]+\)}, "#{gem} (#{version})")
 
-    File.write(path, new_contents)
+    File.write(lockfile, new_contents)
   end
 end

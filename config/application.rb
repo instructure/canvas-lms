@@ -209,7 +209,7 @@ module CanvasRails
           super
         else
           # Any is eager, so we must map first or we won't run on all keys
-          SUPPORTED_VERSIONS.map do |version|
+          SUPPORTED_RAILS_VERSIONS.map do |version|
             super(key, (options || {}).merge(explicit_version: version.delete(".")))
           end.any?
         end

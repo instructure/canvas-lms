@@ -142,7 +142,7 @@ gem "will_paginate", "3.3.0", require: false # required for folio-pagination
 
 gem "faraday", "0.17.4"
 
-path "gems" do
+path "../gems" do
   gem "activesupport-suspend_callbacks"
   gem "acts_as_list"
   gem "adheres_to_policy"
