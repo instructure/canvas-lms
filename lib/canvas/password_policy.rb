@@ -56,8 +56,9 @@ module Canvas
       sequences + sequences.map(&:reverse)
     end
 
-    # per https://en.wikipedia.org/wiki/Wikipedia:10,000_most_common_passwords (CC BY-SA 3.0)
-    # Top 100 common passwords as at May 2023
+    # per https://en.wikipedia.org/wiki/Wikipedia:10,000_most_common_passwords
+    # Licensed under CC BY-SA 3.0: https://creativecommons.org/licenses/by-sa/3.0/legalcode
+    # Top 100 common passwords as at May 2023, excluding profanity
     COMMON_PASSWORDS = %w[
       123456
       password
@@ -85,11 +86,9 @@ module Canvas
       1234567890
       michael
       654321
-      # censored
       superman
       1qaz2wsx
       7777777
-      # censored
       121212
       000000
       qazwsx
@@ -109,7 +108,6 @@ module Canvas
       tigger
       sunshine
       iloveyou
-      # censored
       2000
       charlie
       robert
@@ -121,7 +119,6 @@ module Canvas
       klaster
       112233
       george
-      # censored
       computer
       michelle
       jessica
@@ -134,7 +131,6 @@ module Canvas
       freedom
       777777
       pass
-      # censored
       maggie
       159753
       aaaaaa
