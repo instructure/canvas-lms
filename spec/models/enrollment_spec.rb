@@ -281,6 +281,10 @@ describe Enrollment do
       score = @enrollment.scores.create!
       @enrollment.destroy
       expect(score.reload).to be_deleted
+
+      # ensure callbacks don't run if enrollment was already deleted
+      expect(Enrollment).not_to receive(:recompute_final_score_in_singleton)
+      @enrollment.destroy
     end
   end
 

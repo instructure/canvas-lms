@@ -1142,7 +1142,7 @@ class User < ActiveRecord::Base
   def delete_enrollments(enrollment_scope = enrollments, updating_user: nil)
     courses_to_update = enrollment_scope.active.distinct.pluck(:course_id)
     Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
-      enrollment_scope.preload(:course, :enrollment_state).each(&:destroy)
+      enrollment_scope.active.preload(:course, :enrollment_state).find_each(&:destroy)
     end
     user_ids = enrollment_scope.pluck(:user_id).uniq
     courses_to_update.each do |course|

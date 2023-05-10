@@ -848,7 +848,7 @@ class Enrollment < ActiveRecord::Base
   def destroy
     self.workflow_state = "deleted"
     result = save
-    if result
+    if saved_change_to_workflow_state?
       user.try(:update_account_associations)
       scores.update_all(updated_at: Time.zone.now, workflow_state: :deleted)
       Enrollment.recompute_final_score_in_singleton(
