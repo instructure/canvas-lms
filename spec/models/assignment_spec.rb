@@ -9874,6 +9874,43 @@ describe Assignment do
     end
   end
 
+  describe "hide_in_gradebook validation" do
+    before(:once) do
+      assignment_model(course: @course)
+    end
+
+    it "allows hide_in_gradebook to be set to true if points_possible is 0 and omit_from_final_grade" do
+      @assignment.hide_in_gradebook = true
+      @assignment.omit_from_final_grade = true
+      @assignment.points_possible = 0
+
+      expect(@assignment).to be_valid
+    end
+
+    it "disallows hide_in_gradebook to be set to true if points_possible > 0" do
+      @assignment.hide_in_gradebook = true
+      @assignment.omit_from_final_grade = true
+      @assignment.points_possible = 10
+
+      expect(@assignment).to_not be_valid
+    end
+
+    it "disallows hide_in_gradebook to be set to true if omit_from_final_grade is false" do
+      @assignment.hide_in_gradebook = true
+      @assignment.omit_from_final_grade = false
+      @assignment.points_possible = 0
+
+      expect(@assignment).to_not be_valid
+    end
+
+    it "disallows hide_in_gradebook to be set to anything other than a boolean" do
+      @assignment.hide_in_gradebook = 2
+      expect(@assignment).to_not be_valid
+      @assignment.hide_in_gradebook = nil
+      expect(@assignment).to_not be_valid
+    end
+  end
+
   describe "allowed_attempts validation" do
     before(:once) do
       assignment_model(course: @course)
