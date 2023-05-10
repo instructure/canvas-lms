@@ -31,6 +31,7 @@ class Attachments::Storage
       attachment.size ||= data.size
       attachment.filename ||= detect_filename(data)
       attachment.content_type ||= attachment.detect_mimetype(data)
+      attachment.workflow_state = "processed"
     else
       attachment.uploaded_data = data
     end

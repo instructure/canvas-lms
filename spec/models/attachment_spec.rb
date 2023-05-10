@@ -977,6 +977,28 @@ describe Attachment do
       end
     end
 
+    context "with instfs enabled" do
+      specs_require_sharding
+
+      before do
+        allow(InstFS).to receive(:enabled?).and_return(true)
+
+        attachment_model(filename: "blech.ppt", instfs_uuid: "instfs_uuid")
+      end
+
+      it "creates an attachment with workflow_state of processed" do
+        expect(CanvasHttp).to receive(:get)
+        expect(InstFS).to receive(:direct_upload).and_return("more_uuid")
+        @shard1.activate do
+          account_model
+          course_model(account: @account)
+          attachment = @attachment.clone_for(@course, nil, { force_copy: true })
+          attachment.save!
+          expect(attachment.workflow_state).to eq "processed"
+        end
+      end
+    end
+
     it "clones to another context" do
       a = attachment_model(filename: "blech.ppt")
       course_factory
