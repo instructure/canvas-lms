@@ -139,7 +139,6 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     // latter changes, for example due to onResetPace
     if (prevProps.coursePaceItem.duration !== this.props.coursePaceItem.duration) {
       // we're checking that a redux state change has occurred before calling setState
-      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({duration: String(this.props.coursePaceItem.duration)})
     }
   }

@@ -33,7 +33,6 @@ const I18n = useI18nScope('usage_rights_modal')
 
 const MAX_FOLDERS_TO_SHOW = 2
 
-/* eslint-disable react/no-this-in-sfc */
 UsageRightsDialog.renderFileName = function () {
   const textToShow =
     this.props.itemsToManage.length > 1
@@ -216,6 +215,5 @@ UsageRightsDialog.render = function () {
     </Modal>
   )
 }
-/* eslint-enable react/no-this-in-sfc */
 
 export default createReactClass(UsageRightsDialog)
