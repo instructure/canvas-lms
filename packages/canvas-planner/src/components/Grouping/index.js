@@ -25,13 +25,14 @@ import {userShape, itemShape, sizeShape} from '../plannerPropTypes'
 import styles from './styles.css'
 import theme from './theme'
 import PlannerItem from '../PlannerItem'
+// eslint-disable-next-line import/no-named-as-default
 import CompletedItemsFacade from '../CompletedItemsFacade'
-import NotificationBadge, {MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
+import {MissingIndicator, NewActivityIndicator, NotificationBadge} from '../NotificationBadge'
 import formatMessage from '../../format-message'
 import {
   getBadgesForItem,
   getBadgesForItems,
-  showPillForOverdueStatus
+  showPillForOverdueStatus,
 } from '../../utilities/statusUtils'
 import {animatable} from '../../dynamic-ui'
 
@@ -52,7 +53,7 @@ export class Grouping extends Component {
     responsiveSize: sizeShape,
     simplifiedControls: bool,
     singleCourseView: bool,
-    isObserving: bool
+    isObserving: bool,
   }
 
   static defaultProps = {
@@ -61,7 +62,7 @@ export class Grouping extends Component {
     responsiveSize: 'large',
     simplifiedControls: false,
     singleCourseView: false,
-    isObserving: false
+    isObserving: false,
   }
 
   constructor(props) {
@@ -69,7 +70,7 @@ export class Grouping extends Component {
 
     this.state = {
       showCompletedItems: false,
-      badgeMap: this.setupItemBadgeMap(props.items)
+      badgeMap: this.setupItemBadgeMap(props.items),
     }
   }
 
@@ -122,7 +123,7 @@ export class Grouping extends Component {
     }
     this.setState(
       () => ({
-        showCompletedItems: true
+        showCompletedItems: true,
       }),
       () => {
         if (this.groupingLink) this.groupingLink.focus()
@@ -167,7 +168,7 @@ export class Grouping extends Component {
           date={moment(item.date).tz(this.props.timeZone)}
           associated_item={item.type}
           title={item.title}
-          points={item.points}
+          points={item.restrict_quantitative_data ? null : item.points}
           updateTodo={this.props.updateTodo}
           html_url={item.html_url}
           toggleCompletion={() => this.props.toggleCompletion(item)}
@@ -225,7 +226,7 @@ export class Grouping extends Component {
             animatableItemIds={completedItemIds}
             notificationBadge={notificationBadge}
             theme={{
-              labelColor: this.props.simplifiedControls ? undefined : this.props.color
+              labelColor: this.props.simplifiedControls ? undefined : this.props.color,
             }}
             date={theDay}
             responsiveSize={this.props.responsiveSize}
@@ -274,7 +275,7 @@ export class Grouping extends Component {
   renderGroupLinkBackground() {
     const clazz = classnames({
       [styles.overlay]: true,
-      [styles.withImage]: this.props.image_url
+      [styles.withImage]: this.props.image_url,
     })
     const style = this.getLayout() === 'large' ? {backgroundColor: this.props.color} : null
     return <span className={clazz} style={style} />

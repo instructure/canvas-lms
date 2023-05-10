@@ -75,6 +75,27 @@ describe "student planner" do
       validate_pill("Submitted")
     end
 
+    it "shows points possible for assignments only when restrict_quantitative_data? is falsy for user" do
+      @assignment.points_possible = 150
+      @assignment.save!
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # falsy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: false, locked: true }
+      Account.default.save!
+
+      go_to_list_view
+      expect(fj(".PlannerItem-styles__score:contains('150')")).to be_present
+
+      # now truthy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      Account.default.save!
+
+      go_to_list_view
+      expect(f("body")).not_to contain_jqcss(".PlannerItem-styles__score:contains('150')")
+    end
+
     it "shows new grades tag for assignments that are graded", priority: "1" do
       @assignment.grade_student(@student1, grade: 10, grader: @teacher)
       go_to_list_view
