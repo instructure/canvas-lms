@@ -29,9 +29,11 @@ class RubricAssociation < ActiveRecord::Base
   attr_writer :updating_user
 
   belongs_to :rubric
-  belongs_to :association_object, polymorphic: %i[account course assignment],
-                                  foreign_type: :association_type, foreign_key: :association_id,
-                                  polymorphic_prefix: :association
+  belongs_to :association_object,
+             polymorphic: %i[account course assignment],
+             foreign_type: :association_type,
+             foreign_key: :association_id,
+             polymorphic_prefix: :association
 
   belongs_to :context, polymorphic: [:course, :account]
   has_many :rubric_assessments

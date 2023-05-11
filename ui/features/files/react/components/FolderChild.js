@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable react/no-this-in-sfc */
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import createReactClass from 'create-react-class'

@@ -109,7 +109,8 @@ RSpec.shared_context "lti2_spec_helper", shared_context: :metadata do
       subscription_id: overrides[:add_subscription_id] && SecureRandom.uuid
     )
 
-    Lti::ToolProxyBinding.where(context_id: context.id, context_type: context.class.to_s,
+    Lti::ToolProxyBinding.where(context_id: context.id,
+                                context_type: context.class.to_s,
                                 tool_proxy_id: tp).first_or_create!
     tp
   end
@@ -130,65 +131,86 @@ RSpec.shared_context "lti2_spec_helper", shared_context: :metadata do
     )
   end
   let(:tool_proxy_binding) do
-    Lti::ToolProxyBinding.where(context_id: tool_proxy_context, context_type: tool_proxy_context.class.to_s,
+    Lti::ToolProxyBinding.where(context_id: tool_proxy_context,
+                                context_type: tool_proxy_context.class.to_s,
                                 tool_proxy_id: tool_proxy).first_or_create!
   end
   let(:tool_profile) do
     {
-      "lti_version" => "LTI-2p0", "product_instance" => {
-        "guid" => "be42ae52-23fe-48f5-a783-40ecc7ef6d5c", "product_info" => {
-          "product_version" => "1.0", "product_family" => {
-            "code" => "similarity detection reference tool", "vendor" => {
-              "code" => "Instructure.com", "vendor_name" => {
+      "lti_version" => "LTI-2p0",
+      "product_instance" => {
+        "guid" => "be42ae52-23fe-48f5-a783-40ecc7ef6d5c",
+        "product_info" => {
+          "product_version" => "1.0",
+          "product_family" => {
+            "code" => "similarity detection reference tool",
+            "vendor" => {
+              "code" => "Instructure.com",
+              "vendor_name" => {
                 "default_value" => "Instructure"
-              }, "description" => {
+              },
+              "description" => {
                 "default_value" => "Canvas Learning Management System"
               }
             }
-          }, "description" => {
+          },
+          "description" => {
             "default_value" => "LTI 2.1 tool provider reference implementation"
-          }, "product_name" => {
+          },
+          "product_name" => {
             "default_value" => "similarity detection reference tool"
           }
         }
-      }, "base_url_choice" => [{
-        "default_base_url" => "http://originality.docker", "selector" => {
+      },
+      "base_url_choice" => [{
+        "default_base_url" => "http://originality.docker",
+        "selector" => {
           "applies_to" => ["MessageHandler"]
         }
-      }], "resource_handler" => [{
+      }],
+      "resource_handler" => [{
         "resource_type" => {
           "code" => "sumbissions"
-        }, "resource_name" => {
+        },
+        "resource_name" => {
           "default_value" => "Similarity Detection Tool", "key" => ""
-        }, "message" => [{
+        },
+        "message" => [{
           "message_type" => "basic-lti-launch-request",
           "path" => "/submission/index",
           "enabled_capability" => ["Canvas.placements.accountNavigation", "Canvas.placements.courseNavigation"],
           "parameter" => []
         }]
-      }, {
-        "resource_type" => {
-          "code" => "placements"
-        }, "resource_name" => {
-          "default_value" => "Similarity Detection Tool", "key" => ""
-        }, "message" => [{
-          "message_type" => "basic-lti-launch-request",
-          "path" => "/assignments/configure",
-          "enabled_capability" => ["Canvas.placements.similarityDetection"],
-          "parameter" => []
-        }]
-      }, {
-        "resource_type" => {
-          "code" => "originality_reports"
-        }, "resource_name" => {
-          "default_value" => "Similarity Detection Tool", "key" => ""
-        }, "message" => [{
-          "message_type" => "basic-lti-launch-request",
-          "path" => "/originality_report",
-          "enabled_capability" => [],
-          "parameter" => []
-        }]
-      }], "service_offered" => [{
+      },
+                             {
+                               "resource_type" => {
+                                 "code" => "placements"
+                               },
+                               "resource_name" => {
+                                 "default_value" => "Similarity Detection Tool", "key" => ""
+                               },
+                               "message" => [{
+                                 "message_type" => "basic-lti-launch-request",
+                                 "path" => "/assignments/configure",
+                                 "enabled_capability" => ["Canvas.placements.similarityDetection"],
+                                 "parameter" => []
+                               }]
+                             },
+                             {
+                               "resource_type" => {
+                                 "code" => "originality_reports"
+                               },
+                               "resource_name" => {
+                                 "default_value" => "Similarity Detection Tool", "key" => ""
+                               },
+                               "message" => [{
+                                 "message_type" => "basic-lti-launch-request",
+                                 "path" => "/originality_report",
+                                 "enabled_capability" => [],
+                                 "parameter" => []
+                               }]
+                             }],
+      "service_offered" => [{
         "endpoint" => "http://originality.docker/event/submission",
         "action" => ["POST"],
         "@id" => "http://originality.docker/lti/v2/services#vnd.Canvas.SubmissionEvent",

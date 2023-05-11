@@ -214,8 +214,11 @@ describe "Provisional Grades API", type: :request do
       subs = @assignment.grade_student @student, grader: @ta, score: 0, provisional: true
       @pg = subs.first.provisional_grade(@ta)
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/#{@pg.id}/select"
-      @params = { controller: "provisional_grades", action: "select",
-                  format: "json", course_id: @course.to_param, assignment_id: @assignment.to_param,
+      @params = { controller: "provisional_grades",
+                  action: "select",
+                  format: "json",
+                  course_id: @course.to_param,
+                  assignment_id: @assignment.to_param,
                   provisional_grade_id: @pg.to_param }
     end
 
@@ -262,8 +265,11 @@ describe "Provisional Grades API", type: :request do
       course_with_ta course: @course, active_all: true
       @assignment = @course.assignments.create!
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/publish"
-      @params = { controller: "provisional_grades", action: "publish",
-                  format: "json", course_id: @course.to_param, assignment_id: @assignment.to_param }
+      @params = { controller: "provisional_grades",
+                  action: "publish",
+                  format: "json",
+                  course_id: @course.to_param,
+                  assignment_id: @assignment.to_param }
     end
 
     it "requires a moderated assignment" do

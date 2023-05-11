@@ -105,8 +105,13 @@ class ContentZipper
   end
 
   class StaticAttachment
-    attr_accessor :display_name, :filename, :unencoded_filename,
-                  :content_type, :uuid, :id, :attachment
+    attr_accessor :display_name,
+                  :filename,
+                  :unencoded_filename,
+                  :content_type,
+                  :uuid,
+                  :id,
+                  :attachment
 
     # Match on /files URLs capturing the object id.
     FILES_REGEX = %r{/files/(?<obj_id>\d+)/\w+(?:(?:[^\s"<'?/]*)(?:[^\s"<']*))?}.freeze

@@ -61,7 +61,7 @@ module Lti::IMS::Providers
         # Non-active students get an active ('submitted') Submission, so join on base_users_scope to narrow down
         # Submissions to only active students.
         students_scope = base_users_scope.where(enrollments: { type: student_queryable_roles })
-        narrowed_students_scope = students_scope.where("EXISTS (?)", correlated_assignment_submissions("users.id"))
+        narrowed_students_scope = students_scope.where(correlated_assignment_submissions("users.id").arel.exists)
         # If we only care about students, this scope is sufficient and can avoid the ugly union down below
         return narrowed_students_scope if filter_non_students?
 

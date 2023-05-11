@@ -29,7 +29,8 @@ describe AuditLogFieldExtension do
   end
 
   before(:once) do
-    Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true)
+    creds = Aws::Credentials.new("key", "secret")
+    Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true, credentials: creds)
     course_with_student(active_all: true)
     @assignment = @course.assignments.create! name: "asdf"
   end
@@ -91,7 +92,8 @@ describe AuditLogFieldExtension::Logger do
 
   before(:once) do
     WebMock.enable_net_connect!
-    Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true)
+    creds = Aws::Credentials.new("key", "secret")
+    Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true, credentials: creds)
     course_with_teacher(active_all: true)
     @entry = @course.assignments.create! name: "asdf"
   end

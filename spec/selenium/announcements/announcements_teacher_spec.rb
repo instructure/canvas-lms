@@ -174,7 +174,8 @@ describe "announcements" do
     end
 
     it "displayed delayed post note on page of delayed announcement" do
-      a = @course.announcements.create!(title: "Announcement", message: "foobers",
+      a = @course.announcements.create!(title: "Announcement",
+                                        message: "foobers",
                                         delayed_post_at: 1.week.from_now)
       get AnnouncementNewEdit.full_individual_announcement_url(@course, a)
       expect(f(".discussion-fyi")).to include_text(

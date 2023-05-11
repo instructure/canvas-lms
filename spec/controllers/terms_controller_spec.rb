@@ -28,12 +28,15 @@ describe TermsController do
     term = a.default_enrollment_term
     expect_any_instantiation_of(term).to receive(:touch_all_courses).once
 
-    put "update", params: { account_id: a.id, id: term.id, enrollment_term: { start_at: 1.day.ago, end_at: 1.day.from_now,
-                                                                              overrides: {
-                                                                                student_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
-                                                                                teacher_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
-                                                                                ta_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
-                                                                              } } }
+    put "update", params: { account_id: a.id,
+                            id: term.id,
+                            enrollment_term: { start_at: 1.day.ago,
+                                               end_at: 1.day.from_now,
+                                               overrides: {
+                                                 student_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
+                                                 teacher_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
+                                                 ta_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
+                                               } } }
   end
 
   it "is not able to change the name for a default term" do

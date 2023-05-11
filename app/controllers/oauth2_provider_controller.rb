@@ -92,8 +92,10 @@ class OAuth2ProviderController < ApplicationController
       redirect_to Canvas::OAuth::Provider.confirmation_redirect(self, provider, @current_user, logged_in_user)
     else
       params["pseudonym_session"] = { "unique_id" => params[:unique_id] } if params.key?(:unique_id)
-      redirect_to login_url(params.permit(:canvas_login, :force_login,
-                                          :authentication_provider, pseudonym_session: :unique_id))
+      redirect_to login_url(params.permit(:canvas_login,
+                                          :force_login,
+                                          :authentication_provider,
+                                          pseudonym_session: :unique_id))
     end
   rescue Canvas::OAuth::RequestError => e
     Canvas::OAuth::Provider.is_oob?(params[:redirect_uri]) ? oauth_error(e) : redirect_oauth_error(e)

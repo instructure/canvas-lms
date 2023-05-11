@@ -138,7 +138,9 @@ class ContextController < ApplicationController
                end
       @primary_users = { t("roster.group_members", "Group Members") => @users }
       if (course = @context.context.is_a?(Course) && @context.context)
-        @secondary_users = { t("roster.teachers_and_tas", "Teachers & TAs") => course.participating_instructors.order_by_sortable_name.distinct }
+        instructors = course.participating_instructors.order_by_sortable_name.distinct
+        # UserSearch.scope_for makes the teachers and ta's list to match what api v1 is returning with respect to section restrictions
+        @secondary_users = { t("roster.teachers_and_tas", "Teachers & TAs") => instructors.select { |instructor| UserSearch.scope_for(course, @current_user).include?(instructor) } }
       end
     end
 
@@ -302,9 +304,17 @@ class ContextController < ApplicationController
     end
   end
 
-  WORKFLOW_TYPES = %i[all_discussion_topics assignment_groups assignments
-                      collaborations context_modules enrollments groups
-                      quizzes rubrics wiki_pages rubric_associations_with_deleted].freeze
+  WORKFLOW_TYPES = %i[all_discussion_topics
+                      assignment_groups
+                      assignments
+                      collaborations
+                      context_modules
+                      enrollments
+                      groups
+                      quizzes
+                      rubrics
+                      wiki_pages
+                      rubric_associations_with_deleted].freeze
   ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
   def undelete_index
     if authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
@@ -315,10 +325,10 @@ class ContextController < ApplicationController
           end
         end
 
-      @deleted_items = []
-      @item_types.each do |scope|
-        @deleted_items += scope.where(workflow_state: "deleted").limit(25).to_a
-      end
+      @deleted_items = @item_types.reduce([]) do |acc, scope|
+        acc + scope.where(workflow_state: "deleted").limit(25).to_a
+      end.reject { |item| item.is_a?(DiscussionTopic) && !item.restorable? }
+
       @deleted_items += @context.attachments.where(file_state: "deleted").limit(25).to_a
       if @context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
         @deleted_items += @context.all_group_categories.where.not(deleted_at: nil).limit(25).to_a
@@ -348,6 +358,10 @@ class ContextController < ApplicationController
 
       @item = scope.association(type).reader.find(id)
       @item.restore
+      if @item.errors.any?
+        return render json: @item.errors.full_messages, status: :forbidden
+      end
+
       render json: @item
     end
   end

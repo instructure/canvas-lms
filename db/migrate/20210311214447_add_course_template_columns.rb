@@ -24,7 +24,8 @@ class AddCourseTemplateColumns < ActiveRecord::Migration[6.0]
   def up
     add_column :courses, :template, :boolean, if_not_exists: true, default: false, null: false
     add_index :courses, :root_account_id, where: "template", algorithm: :concurrently, if_not_exists: true
-    add_reference :accounts, :course_template,
+    add_reference :accounts,
+                  :course_template,
                   if_not_exists: true,
                   index: { where: "course_template_id IS NOT NULL", algorithm: :concurrently, if_not_exists: true },
                   foreign_key: { to_table: :courses }

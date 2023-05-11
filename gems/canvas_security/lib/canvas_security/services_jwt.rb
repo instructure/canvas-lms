@@ -131,7 +131,8 @@ class CanvasSecurity::ServicesJwt
       context = payload[:context_type].constantize.find(payload[:context_id])
     end
 
-    for_user(domain, user,
+    for_user(domain,
+             user,
              real_user: real_user,
              workflows: payload[:workflows],
              context: context,
@@ -155,10 +156,13 @@ class CanvasSecurity::ServicesJwt
   end
 
   def self.decrypt(token, ignore_expiration: false)
-    CanvasSecurity.decrypt_encrypted_jwt(token, {
+    CanvasSecurity.decrypt_encrypted_jwt(token,
+                                         {
                                            "HS256" => [signing_secret, previous_signing_secret],
                                            "RS256" => KeyStorage.public_keyset
-                                         }, encryption_secret, ignore_expiration: ignore_expiration)
+                                         },
+                                         encryption_secret,
+                                         ignore_expiration: ignore_expiration)
   end
 
   def self.encryption_secret

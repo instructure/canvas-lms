@@ -75,8 +75,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   const shouldShowBlackoutDateCheckbox = useCallback(() => {
     return (
       ENV.FEATURES.account_level_blackout_dates &&
-      ((context.type === 'account' && ENV.FEATURES.account_calendar_events) ||
-        (context.type === 'course' && context.course_pacing_enabled))
+      (context.type === 'account' || (context.type === 'course' && context.course_pacing_enabled))
     )
   }, [context])
 

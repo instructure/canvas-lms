@@ -41,9 +41,17 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
     context "with distributed submissions" do
       let(:quiz) do
         simple_quiz_with_submissions %w[T T A],
-                                     %w[T T A], %w[T T A], %w[T T B], # top
-                                     %w[T F B], %w[T F B], %w[F T C], %w[F T D], %w[F T B], # middle
-                                     %w[F F B], %w[F F C], %w[F F D] # bottom
+                                     %w[T T A],
+                                     %w[T T A],
+                                     %w[T T B], # top
+                                     %w[T F B],
+                                     %w[T F B],
+                                     %w[F T C],
+                                     %w[F T D],
+                                     %w[F T B], # middle
+                                     %w[F F B],
+                                     %w[F F C],
+                                     %w[F F D] # bottom
       end
 
       it "distributes the students accordingly" do
@@ -61,7 +69,10 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
     context "with tied submissions" do
       let(:quiz) do
         simple_quiz_with_submissions %w[T T A],
-                                     %w[T T A], %w[T T A], %w[F F B], %w[F F B]
+                                     %w[T T A],
+                                     %w[T T A],
+                                     %w[F F B],
+                                     %w[F F B]
       end
 
       let(:summary_options) do
@@ -86,7 +97,8 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
     context "with perfect submissions" do
       let(:quiz) do
         simple_quiz_with_submissions %w[T T A],
-                                     %w[T T A], %w[T T A]
+                                     %w[T T A],
+                                     %w[T T A]
       end
 
       it "does not choke" do

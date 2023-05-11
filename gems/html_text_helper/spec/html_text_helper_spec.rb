@@ -255,8 +255,10 @@ describe HtmlTextHelper do
     it "respects passed in tags and attributes" do
       original_html =
         ' <a href="/relative/link">Relative link</a><table border=1>foo</table><tr border=1>bar</tr></table> '
-      html = th.html_to_simple_html(original_html, base_url: "http://example.com",
-                                                   tags: ["table"], attributes: { "table" => ["border"] })
+      html = th.html_to_simple_html(original_html,
+                                    base_url: "http://example.com",
+                                    tags: ["table"],
+                                    attributes: { "table" => ["border"] })
       expect(html).to match(%r{http://example.com/relative/link})
       expect(html).to match(/table border/)
       expect(html).not_to match(/tr border/)

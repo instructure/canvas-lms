@@ -6,8 +6,11 @@ class AddRootAccountIdToUserObserver < ActiveRecord::Migration[5.0]
 
   def up
     add_column :user_observers, :root_account_id, :integer, limit: 8
-    add_index :user_observers, %i[user_id observer_id root_account_id], unique: true,
-                                                                        name: "index_user_observers_on_user_id_and_observer_id_and_ra", algorithm: :concurrently
+    add_index :user_observers,
+              %i[user_id observer_id root_account_id],
+              unique: true,
+              name: "index_user_observers_on_user_id_and_observer_id_and_ra",
+              algorithm: :concurrently
     remove_index :user_observers, [:user_id, :observer_id]
   end
 

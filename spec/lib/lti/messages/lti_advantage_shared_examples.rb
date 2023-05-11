@@ -49,10 +49,12 @@ RSpec.shared_context "lti_advantage_shared_examples" do
       {
         current_user: user,
         tool: tool,
-        assignment: assignment
+        assignment: assignment,
+        collaboration: collaboration
       }
     )
   end
+  let(:collaboration) { nil }
   let(:assignment) do
     assignment_model(
       course: course,

@@ -89,7 +89,9 @@ module Api
   # returned in the result.
   def self.map_ids(ids, collection, root_account, current_user = nil)
     sis_mapping = sis_find_sis_mapping_for_collection(collection)
-    columns = sis_parse_ids(ids, sis_mapping[:lookups], current_user,
+    columns = sis_parse_ids(ids,
+                            sis_mapping[:lookups],
+                            current_user,
                             root_account: root_account)
     result = columns.delete(sis_mapping[:lookups]["id"]) || { ids: [] }
     unless columns.empty?
@@ -603,8 +605,12 @@ module Api
     ) || attachment&.grants_right?(user, nil, :download)
   end
 
-  def api_user_content(html, context = @context, user = @current_user,
-                       preloaded_attachments = {}, options = {}, is_public = false)
+  def api_user_content(html,
+                       context = @context,
+                       user = @current_user,
+                       preloaded_attachments = {},
+                       options = {},
+                       is_public = false)
     return html if html.blank?
 
     # use the host of the request if available;
@@ -644,7 +650,9 @@ module Api
     account = Context.get_account(context) || @domain_root_account
     include_mobile = !(respond_to?(:in_app?, true) && in_app?)
     Html::Content.rewrite_outgoing(
-      html, account, url_helper,
+      html,
+      account,
+      url_helper,
       include_mobile: include_mobile,
       rewrite_api_urls: options[:rewrite_api_urls]
     )

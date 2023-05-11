@@ -1478,18 +1478,30 @@ describe Quizzes::QuizSubmission do
         student_in_course(active_all: true, active_cc: true)
         teacher_in_course(active_all: true)
         @observer = user_factory(active_all: true, active_cc: true)
-        @course.enroll_user(@observer, "ObserverEnrollment", active_all: true,
-                                                             active_cc: true, associated_user_id: @student.id)
+        @course.enroll_user(@observer,
+                            "ObserverEnrollment",
+                            active_all: true,
+                            active_cc: true,
+                            associated_user_id: @student.id)
         # Admittedly weird for a student to observe himself, but make sure we
         # don't send duplicates.
-        @course.enroll_user(@student, "ObserverEnrollment", active_all: true,
-                                                            active_cc: true, associated_user_id: @student.id)
+        @course.enroll_user(@student,
+                            "ObserverEnrollment",
+                            active_all: true,
+                            active_cc: true,
+                            associated_user_id: @student.id)
         @other_student = user_factory(active_all: true, active_cc: true)
         @other_observer = user_factory(active_all: true, active_cc: true)
-        @course.enroll_user(@other_student, "StudentEnrollment", active_all: true,
-                                                                 active_cc: true, associated_user_id: @student.id)
-        @course.enroll_user(@other_observer, "ObserverEnrollment", active_all: true,
-                                                                   active_cc: true, associated_user_id: @other_student.id)
+        @course.enroll_user(@other_student,
+                            "StudentEnrollment",
+                            active_all: true,
+                            active_cc: true,
+                            associated_user_id: @student.id)
+        @course.enroll_user(@other_observer,
+                            "ObserverEnrollment",
+                            active_all: true,
+                            active_cc: true,
+                            associated_user_id: @other_student.id)
         assignment_quiz([], course: @course, user: @teacher)
         @submission = @quiz.generate_submission(@student)
       end

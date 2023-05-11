@@ -350,9 +350,11 @@ describe GradeCalculator do
       @course.update_attribute :group_weighting_scheme, "percent"
       ag1 = @course.assignment_groups.create! name: "Group 1", group_weight: 80
       ag2 = @course.assignment_groups.create! name: "Group 2", group_weight: 20
-      a1 = ag1.assignments.create! points_possible: 10, name: "Assignment 1",
+      a1 = ag1.assignments.create! points_possible: 10,
+                                   name: "Assignment 1",
                                    context: @course
-      a2 = ag2.assignments.create! points_possible: 10, name: "Assignment 2",
+      a2 = ag2.assignments.create! points_possible: 10,
+                                   name: "Assignment 2",
                                    context: @course
 
       a1.grade_student(@student, grade: 0, grader: @teacher)
@@ -367,7 +369,8 @@ describe GradeCalculator do
     end
 
     it "recomputes during #run_if_overrides_changed!" do
-      a = @course.assignments.create! name: "Foo", points_possible: 10,
+      a = @course.assignments.create! name: "Foo",
+                                      points_possible: 10,
                                       context: @assignment
       a.grade_student(@student, grade: 10, grader: @teacher)
 
@@ -386,8 +389,11 @@ describe GradeCalculator do
       before do
         # Enroll student into two sections
         section = @course.course_sections.create!(name: "Section #2")
-        course_with_student(active_all: true, course: @course, user: @student,
-                            section: section, allow_multiple_enrollments: true)
+        course_with_student(active_all: true,
+                            course: @course,
+                            user: @student,
+                            section: section,
+                            allow_multiple_enrollments: true)
         assignment.grade_student(@student, grade: "5", grader: @teacher)
       end
 
@@ -1804,8 +1810,11 @@ describe GradeCalculator do
       it "stores separate assignment group scores for each of a student’s enrollments" do
         (1..2).each do |i|
           section = @course.course_sections.create!(name: "section #{i}")
-          @course.enroll_user(@student, "StudentEnrollment", section: section,
-                                                             enrollment_state: "active", allow_multiple_enrollments: true)
+          @course.enroll_user(@student,
+                              "StudentEnrollment",
+                              section: section,
+                              enrollment_state: "active",
+                              allow_multiple_enrollments: true)
         end
         GradeCalculator.new(@student.id, @course).compute_and_save_scores
         scored_enrollment_ids = Score.where(assignment_group_id: @group1.id).map(&:enrollment_id)

@@ -112,10 +112,12 @@ describe AssessmentQuestion do
       neutral_comments: "meh. #{attachment_tag.call([:neutral_comments])}",
       text_after_answers: "oh btw #{attachment_tag.call([:text_after_answers])}",
       answers: [
-        { weight: 1, text: "A",
+        { weight: 1,
+          text: "A",
           html: "A #{attachment_tag.call([:answers, 0, :html])}",
           comments_html: "yeppers #{attachment_tag.call([:answers, 0, :comments_html])}" },
-        { weight: 1, text: "B",
+        { weight: 1,
+          text: "B",
           html: "B #{attachment_tag.call([:answers, 1, :html])}",
           comments_html: "yeppers #{attachment_tag.call([:answers, 1, :comments_html])}" }
       ]

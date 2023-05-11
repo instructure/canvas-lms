@@ -40,7 +40,8 @@ module IncomingMailProcessor
       result.delete_if { |_k, v| v.nil? }
       result.each_pair do |identifier, count|
         name = "incoming_mail_processor.mailbox_queue_size.#{identifier}"
-        InstStatsd::Statsd.gauge(name, count,
+        InstStatsd::Statsd.gauge(name,
+                                 count,
                                  short_stat: "incoming_mail_processor.mailbox_queue_size",
                                  tags: { identifier: identifier })
       end

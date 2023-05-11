@@ -35,8 +35,10 @@ describe "context modules" do
       @assignment = @course.assignments.create!(name: "pls submit", submission_types: ["online_text_entry"], points_possible: 42)
       @assignment.publish
       @assignment_tag = @module1.add_item(id: @assignment.id, type: "assignment")
-      @external_url_tag = @module1.add_item(type: "external_url", url: "http://example.com/lolcats",
-                                            title: "pls view", indent: 1)
+      @external_url_tag = @module1.add_item(type: "external_url",
+                                            url: "http://example.com/lolcats",
+                                            title: "pls view",
+                                            indent: 1)
       @external_url_tag.publish
       @header_tag = @module1.add_item(type: "sub_header", title: "silly tag")
 
@@ -336,8 +338,10 @@ describe "context modules" do
     end
 
     it "shows student progress once External URL-view requirement is met", priority: "1" do
-      @external_url_tag = @module1.add_item(type: "external_url", url: "http://example.com/lolcats",
-                                            title: "External_URL", indent: 1)
+      @external_url_tag = @module1.add_item(type: "external_url",
+                                            url: "http://example.com/lolcats",
+                                            title: "External_URL",
+                                            indent: 1)
       @external_url_tag.publish!
       add_requirement({ @external_url_tag.id => { type: "must_view" } })
       wait_for_ajaximations

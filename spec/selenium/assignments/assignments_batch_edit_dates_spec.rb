@@ -68,7 +68,8 @@ describe "assignment batch edit" do
       # add some overrides for Assignment1
       @override1 = create_adhoc_override_for_assignment(@assignment1,
                                                         [@student1],
-                                                        { title: "override1", due_at: @date - 1.day,
+                                                        { title: "override1",
+                                                          due_at: @date - 1.day,
                                                           lock_at: @date + 4.days,
                                                           unlock_at: @date - 4.days })
       @override2 = create_adhoc_override_for_assignment(@assignment1,

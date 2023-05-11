@@ -48,7 +48,8 @@ class Lti::IMS::Registration < ApplicationRecord
             :client_uri,
             :tos_uri,
             :policy_uri,
-            format: { with: URI::DEFAULT_PARSER.make_regexp(["http", "https"]) }, allow_blank: true
+            format: { with: URI::DEFAULT_PARSER.make_regexp(["http", "https"]) },
+            allow_blank: true
 
   belongs_to :developer_key, inverse_of: :lti_registration
 

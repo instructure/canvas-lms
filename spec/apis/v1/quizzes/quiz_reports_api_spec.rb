@@ -26,14 +26,18 @@ describe Quizzes::QuizReportsController, type: :request do
     def api_index(params = {}, options = {})
       method = options[:raw] ? :raw_api_call : :api_call
       headers = options[:jsonapi] ? { "Accept" => "application/vnd.api+json" } : {}
-      send method, :get,
-           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports", {
+      send method,
+           :get,
+           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports",
+           {
              controller: "quizzes/quiz_reports",
              action: "index",
              format: "json",
              course_id: @course.id.to_s,
              quiz_id: @quiz.id.to_s
-           }, params, headers
+           },
+           params,
+           headers
     end
 
     it "denies unprivileged access" do
@@ -109,14 +113,18 @@ describe Quizzes::QuizReportsController, type: :request do
     def api_create(params = {}, options = {})
       method = options[:raw] ? :raw_api_call : :api_call
       headers = options[:jsonapi] ? { "Accept" => "application/vnd.api+json" } : {}
-      send method, :post,
-           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports", {
+      send method,
+           :post,
+           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports",
+           {
              controller: "quizzes/quiz_reports",
              action: "create",
              format: "json",
              course_id: @course.id.to_s,
              quiz_id: @quiz.id.to_s
-           }, params, headers
+           },
+           params,
+           headers
     end
 
     before :once do
@@ -149,7 +157,8 @@ describe Quizzes::QuizReportsController, type: :request do
                             quiz_reports: [{
                               report_type: "item_analysis"
                             }]
-                          }, { jsonapi: true })
+                          },
+                          { jsonapi: true })
 
         expect(Quizzes::QuizStatistics.count).to eq 1
 
@@ -186,7 +195,8 @@ describe Quizzes::QuizReportsController, type: :request do
                      quiz_reports: [{
                        report_type: report_type
                      }]
-                   }, { jsonapi: true })
+                   },
+                   { jsonapi: true })
 
         new_job = Delayed::Job.where(tag: job_tag).first
 
@@ -202,7 +212,8 @@ describe Quizzes::QuizReportsController, type: :request do
                      quiz_reports: [{
                        report_type: report_type
                      }]
-                   }, { jsonapi: true, raw: true })
+                   },
+                   { jsonapi: true, raw: true })
 
         assert_status(409)
       end
@@ -224,14 +235,17 @@ describe Quizzes::QuizReportsController, type: :request do
     def api_abort
       raw_api_call(
         :delete,
-        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports/#{report.id}", {
+        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports/#{report.id}",
+        {
           controller: "quizzes/quiz_reports",
           action: "abort",
           format: "json",
           course_id: @course.id.to_s,
           quiz_id: @quiz.id.to_s,
           id: report.id.to_s
-        }, {}, {
+        },
+        {},
+        {
           "Accept" => "application/vnd.api+json"
         }
       )
@@ -282,15 +296,19 @@ describe Quizzes::QuizReportsController, type: :request do
     def api_show(params = {}, options = {})
       method = options[:raw] ? :raw_api_call : :api_call
       headers = options[:jsonapi] ? { "Accept" => "application/vnd.api+json" } : {}
-      send method, :get,
-           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports/#{@report.id}", {
+      send method,
+           :get,
+           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports/#{@report.id}",
+           {
              controller: "quizzes/quiz_reports",
              action: "show",
              format: "json",
              course_id: @course.id.to_s,
              quiz_id: @quiz.id.to_s,
              id: @report.id.to_s
-           }, params, headers
+           },
+           params,
+           headers
     end
 
     it "denies unprivileged access" do

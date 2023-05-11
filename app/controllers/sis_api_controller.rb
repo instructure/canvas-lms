@@ -379,12 +379,16 @@ class SisApiController < ApplicationController
       if (starts_before = CanvasTime.try_parse(params[:starts_before]))
         course_scope = course_scope.where("
         (courses.start_at IS NULL AND enrollment_terms.start_at IS NULL)
-        OR courses.start_at < ? OR enrollment_terms.start_at < ?", starts_before, starts_before)
+        OR courses.start_at < ? OR enrollment_terms.start_at < ?",
+                                          starts_before,
+                                          starts_before)
       end
       if (ends_after = CanvasTime.try_parse(params[:ends_after]))
         course_scope = course_scope.where("
         (courses.conclude_at IS NULL AND enrollment_terms.end_at IS NULL)
-        OR courses.conclude_at > ? OR enrollment_terms.end_at > ?", ends_after, ends_after)
+        OR courses.conclude_at > ? OR enrollment_terms.end_at > ?",
+                                          ends_after,
+                                          ends_after)
       end
 
       if starts_before || ends_after

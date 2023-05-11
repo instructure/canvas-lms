@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -32,6 +33,7 @@ const I18n = useI18nScope('context_modules_publish_icon')
 interface Props {
   readonly courseId: string | number
   readonly moduleId: string | number
+  readonly moduleName: string
   readonly published: boolean | undefined
   readonly isPublishing: boolean
   readonly loadingMessage?: string
@@ -40,13 +42,14 @@ interface Props {
 // TODO: remove and replace MenuItem with Menu.Item below when on v8
 const {Item: MenuItem} = Menu as any
 
-const ContextModulesPublishIcon: React.FC<Props> = ({
+const ContextModulesPublishIcon = ({
   courseId,
   moduleId,
+  moduleName,
   published,
   isPublishing,
   loadingMessage,
-}) => {
+}: Props) => {
   const statusIcon = () => {
     const iconStyles = {
       paddingLeft: '0.25rem',
@@ -91,7 +94,10 @@ const ContextModulesPublishIcon: React.FC<Props> = ({
         placement="bottom"
         show={isPublishing ? false : undefined}
         trigger={
-          <IconButton withBorder={false} screenReaderLabel={I18n.t('Module publish menu')}>
+          <IconButton
+            withBorder={false}
+            screenReaderLabel={I18n.t('%{moduleName} Module publish options', {moduleName})}
+          >
             {statusIcon()}
           </IconButton>
         }

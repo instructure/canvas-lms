@@ -21,9 +21,13 @@
 <%= t :regraded_date, "re-graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %>
 <% if user.try(:send_scores_in_emails?, asset.assignment.context) %>
   <% if asset.excused? %>
-<%= t :excused, "This assignment has been excused." %>
+    <%= t :excused, "This assignment has been excused." %>
   <% elsif asset.score %>
-<%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>
+    <% if asset.assignment.restrict_quantitative_data?(user)%>
+      <%=t :grade, "grade: %{letter_grade}", :letter_grade => asset.assignment.score_to_grade(asset.score, asset.grade, true)%>
+    <% else %>
+      <%= t :score, "score: %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>
+    <% end %>
   <% end %>
 <% end %>
 

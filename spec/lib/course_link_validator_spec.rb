@@ -43,7 +43,8 @@ describe CourseLinkValidator do
 
     bank = @course.assessment_question_banks.create!(title: "bank")
     aq = bank.assessment_questions.create!(question_data: { "name" => "test question",
-                                                            "question_text" => html, "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+                                                            "question_text" => html,
+                                                            "answers" => [{ "id" => 1 }, { "id" => 2 }] })
 
     assmnt = @course.assignments.create!(title: "assignment", description: html)
     event = @course.calendar_events.create!(title: "event", description: html)
@@ -100,7 +101,8 @@ describe CourseLinkValidator do
     course_factory
     bank = @course.assessment_question_banks.create!(title: "bank")
     bank.assessment_questions.create!(question_data: { "name" => "test question",
-                                                       "question_text" => html, "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+                                                       "question_text" => html,
+                                                       "answers" => [{ "id" => 1 }, { "id" => 2 }] })
 
     CourseLinkValidator.queue_course(@course)
     run_jobs
@@ -124,7 +126,8 @@ describe CourseLinkValidator do
     course_factory
     quiz = @course.quizzes.create!(title: "quiz1", description: "desc")
     qq = quiz.quiz_questions.create!(question_data: { "name" => "test question",
-                                                      "question_text" => html, "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+                                                      "question_text" => html,
+                                                      "answers" => [{ "id" => 1 }, { "id" => 2 }] })
     qq.destroy!
 
     CourseLinkValidator.queue_course(@course)
@@ -197,9 +200,14 @@ describe CourseLinkValidator do
     course_factory
 
     tool_1_1 = @course.context_external_tools.create!(name: "blah1",
-                                                      url: "https://blah1.example.com", shared_secret: "123", consumer_key: "456")
+                                                      url: "https://blah1.example.com",
+                                                      shared_secret: "123",
+                                                      consumer_key: "456")
     tool_1_3 = @course.context_external_tools.create!(name: "blah2",
-                                                      url: "https://blah1.example.com", shared_secret: "123", consumer_key: "456", lti_version: "1.3")
+                                                      url: "https://blah1.example.com",
+                                                      shared_secret: "123",
+                                                      consumer_key: "456",
+                                                      lti_version: "1.3")
     resource_link = Lti::ResourceLink.create!(
       context: @course,
       lookup_uuid: "90abc684-0f4f-11ed-861d-0242ac120002",

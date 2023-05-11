@@ -100,7 +100,8 @@ export default class BaseUploader {
 
   // be careful if you ever need to change this implementation there
   // is other code that replaces BaseUploader.prototype.onUploadPosted
-  onUploadPosted() {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onUploadPosted(attachment) {}
 
   onUploadCancelled(_file) {
     this.inFlight = false

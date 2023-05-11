@@ -160,12 +160,16 @@ describe "context modules" do
 
     it "validates that a student can't get to locked external items", priority: "1" do
       external_tool = @course.context_external_tools.create!(url: "http://example.com/ims/lti",
-                                                             consumer_key: "asdf", shared_secret: "hjkl", name: "external tool")
+                                                             consumer_key: "asdf",
+                                                             shared_secret: "hjkl",
+                                                             name: "external tool")
 
       @module_2.reload
       tag_1 = @module_2.add_item(id: external_tool.id, type: "external_tool", url: external_tool.url)
-      tag_2 = @module_2.add_item(type: "external_url", url: "http://example.com/lolcats",
-                                 title: "pls view", indent: 1)
+      tag_2 = @module_2.add_item(type: "external_url",
+                                 url: "http://example.com/lolcats",
+                                 title: "pls view",
+                                 indent: 1)
 
       tag_1.publish!
       tag_2.publish!

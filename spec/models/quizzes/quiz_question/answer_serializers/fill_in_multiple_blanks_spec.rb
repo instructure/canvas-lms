@@ -62,7 +62,8 @@ describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
         "question_5_#{AssessmentQuestion.variable_id "answer4"}" => "blue",
         "question_5_#{AssessmentQuestion.variable_id "answer5"}" => nil,
         "question_5_#{AssessmentQuestion.variable_id "answer6"}" => nil,
-      }.as_json, full: true)
+      }.as_json,
+                                   full: true)
 
       expect(output).to eq({
         answer1: "red",

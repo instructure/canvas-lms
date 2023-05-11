@@ -451,8 +451,12 @@ describe ConversationsController do
           course1.enroll_user(student2, "StudentEnrollment").accept!
 
           user_session(student1)
-          post "create", params: { recipients: [student2.id.to_s], body: "yo", message: "you suck", group_conversation: true,
-                                   course: course1.asset_string, context_code: course1.asset_string }
+          post "create", params: { recipients: [student2.id.to_s],
+                                   body: "yo",
+                                   message: "you suck",
+                                   group_conversation: true,
+                                   course: course1.asset_string,
+                                   context_code: course1.asset_string }
           expect(response).to be_successful
         end
 
@@ -466,8 +470,12 @@ describe ConversationsController do
         # request, so it's not an issue
         RequestStore.clear!
 
-        post "create", params: { recipients: [student2.id.to_s], body: "yo again", message: "you still suck", group_conversation: true,
-                                 course: course2.asset_string, context_code: course2.asset_string }
+        post "create", params: { recipients: [student2.id.to_s],
+                                 body: "yo again",
+                                 message: "you still suck",
+                                 group_conversation: true,
+                                 course: course2.asset_string,
+                                 context_code: course2.asset_string }
         expect(response).to be_successful
 
         c = Conversation.where(context_type: "Course", context_id: course2).first
@@ -618,7 +626,9 @@ describe ConversationsController do
       enrollment3.save
 
       post "create", params: { recipients: [@course2.asset_string + "_students", @group1.asset_string],
-                               body: "yo", group_conversation: true, context_code: @group3.asset_string }
+                               body: "yo",
+                               group_conversation: true,
+                               context_code: @group3.asset_string }
       expect(response).to be_successful
 
       c = Conversation.first
@@ -982,11 +992,15 @@ describe ConversationsController do
         @my_section.restrict_enrollments_to_section_dates = true
         @my_section.save!
 
-        @course.enroll_student(@student, allow_multiple_enrollments: true,
-                                         enrollment_state: "active", section: @my_section)
+        @course.enroll_student(@student,
+                               allow_multiple_enrollments: true,
+                               enrollment_state: "active",
+                               section: @my_section)
 
-        @course.enroll_teacher(@teacher, allow_multiple_enrollments: true,
-                                         enrollment_state: "active", section: @my_section)
+        @course.enroll_teacher(@teacher,
+                               allow_multiple_enrollments: true,
+                               enrollment_state: "active",
+                               section: @my_section)
         teacher_convo = @teacher.initiate_conversation([@student])
         teacher_convo.add_message("test")
         teacher_convo.conversation.update_attribute(:context, @course)
@@ -1006,11 +1020,15 @@ describe ConversationsController do
 
         @my_section = @course.course_sections.create!(name: "test section")
 
-        @course.enroll_student(@student, allow_multiple_enrollments: true,
-                                         enrollment_state: "active", section: @my_section)
+        @course.enroll_student(@student,
+                               allow_multiple_enrollments: true,
+                               enrollment_state: "active",
+                               section: @my_section)
 
-        @course.enroll_teacher(@teacher, allow_multiple_enrollments: true,
-                                         enrollment_state: "active", section: @my_section)
+        @course.enroll_teacher(@teacher,
+                               allow_multiple_enrollments: true,
+                               enrollment_state: "active",
+                               section: @my_section)
         teacher_convo = @teacher.initiate_conversation([@student])
         teacher_convo.add_message("test")
 

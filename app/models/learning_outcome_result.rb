@@ -24,19 +24,26 @@ class LearningOutcomeResult < ActiveRecord::Base
   belongs_to :user
   belongs_to :learning_outcome
   belongs_to :alignment, class_name: "ContentTag", foreign_key: :content_tag_id
-  belongs_to :association_object, polymorphic:
-      [:rubric_association, :assignment,
-       { quiz: "Quizzes::Quiz", assessment: "LiveAssessments::Assessment" }],
-                                  polymorphic_prefix: :association,
-                                  foreign_type: :association_type, foreign_key: :association_id
-  belongs_to :artifact, polymorphic:
-      [:rubric_assessment, :submission,
-       { quiz_submission: "Quizzes::QuizSubmission", live_assessments_submission: "LiveAssessments::Submission" }],
-                        polymorphic_prefix: true
-  belongs_to :associated_asset, polymorphic:
-      [:assessment_question, :assignment,
-       { quiz: "Quizzes::Quiz", assessment: "LiveAssessments::Assessment" }],
-                                polymorphic_prefix: true
+  belongs_to :association_object,
+             polymorphic:
+                   [:rubric_association,
+                    :assignment,
+                    { quiz: "Quizzes::Quiz", assessment: "LiveAssessments::Assessment" }],
+             polymorphic_prefix: :association,
+             foreign_type: :association_type,
+             foreign_key: :association_id
+  belongs_to :artifact,
+             polymorphic:
+                   [:rubric_assessment,
+                    :submission,
+                    { quiz_submission: "Quizzes::QuizSubmission", live_assessments_submission: "LiveAssessments::Submission" }],
+             polymorphic_prefix: true
+  belongs_to :associated_asset,
+             polymorphic:
+                   [:assessment_question,
+                    :assignment,
+                    { quiz: "Quizzes::Quiz", assessment: "LiveAssessments::Assessment" }],
+             polymorphic_prefix: true
   belongs_to :context, polymorphic: [:course]
   belongs_to :root_account, class_name: "Account"
   has_many :learning_outcome_question_results, dependent: :destroy

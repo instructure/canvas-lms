@@ -103,7 +103,11 @@ describe OutcomesController do
       get "index", params: { account_id: @account.id }
       permissions = assigns[:js_env][:PERMISSIONS]
       %i[
-        manage_outcomes manage_rubrics can_manage_courses import_outcomes manage_proficiency_scales
+        manage_outcomes
+        manage_rubrics
+        can_manage_courses
+        import_outcomes
+        manage_proficiency_scales
         manage_proficiency_calculations
       ].each do |permission|
         expect(permissions).to have_key(permission)
@@ -409,7 +413,8 @@ describe OutcomesController do
       expect(outcome_group.id).not_to be_nil
       expect(outcome_group).not_to be_nil
 
-      post "create", params: { course_id: @course.id, learning_outcome_group_id: outcome_group.id,
+      post "create", params: { course_id: @course.id,
+                               learning_outcome_group_id: outcome_group.id,
                                learning_outcome: outcome_params }
       expect(response).to be_redirect
       expect(assigns[:outcome]).not_to be_nil
@@ -433,21 +438,24 @@ describe OutcomesController do
     end
 
     it "requires authorization" do
-      put "update", params: { course_id: @course.id, id: @outcome.id,
+      put "update", params: { course_id: @course.id,
+                              id: @outcome.id,
                               learning_outcome: { short_description: test_string } }
       assert_unauthorized
     end
 
     it "does not let a student update the outcome" do
       user_session(@student)
-      put "update", params: { course_id: @course.id, id: @outcome.id,
+      put "update", params: { course_id: @course.id,
+                              id: @outcome.id,
                               learning_outcome: { short_description: test_string } }
       assert_unauthorized
     end
 
     it "allows updating the outcome" do
       user_session(@teacher)
-      put "update", params: { course_id: @course.id, id: @outcome.id,
+      put "update", params: { course_id: @course.id,
+                              id: @outcome.id,
                               learning_outcome: { short_description: test_string } }
       @outcome.reload
       expect(@outcome[:short_description]).to eql test_string

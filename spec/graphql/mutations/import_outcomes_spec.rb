@@ -120,17 +120,20 @@ describe Mutations::ImportOutcomes do
                              groups: [{
                                title: "Group D",
                                outcomes: 5
-                             }, {
-                               title: "Group E",
-                               outcomes: 5
-                             }]
+                             },
+                                      {
+                                        title: "Group E",
+                                        outcomes: 5
+                                      }]
                            }]
-                         }, Account.default)
+                         },
+                         Account.default)
 
     make_group_structure({
                            title: "Group B",
                            outcomes: 5
-                         }, Account.default)
+                         },
+                         Account.default)
   end
 
   def assert_tree_exists(groups, db_parent_group)
@@ -361,8 +364,11 @@ describe Mutations::ImportOutcomes do
   context "passing outcomeId" do
     it "works when importing outcomes from same group" do
       [
-        "0 Group E outcome", "1 Group E outcome", "2 Group E outcome",
-        "3 Group E outcome", "4 Group E outcome"
+        "0 Group E outcome",
+        "1 Group E outcome",
+        "2 Group E outcome",
+        "3 Group E outcome",
+        "4 Group E outcome"
       ].each do |title|
         exec(outcome_id: get_outcome_id(title))
       end
@@ -370,10 +376,14 @@ describe Mutations::ImportOutcomes do
       assert_tree_exists([{
                            title: "Group E",
                            outcomes: [
-                             "0 Group E outcome", "1 Group E outcome", "2 Group E outcome",
-                             "3 Group E outcome", "4 Group E outcome"
+                             "0 Group E outcome",
+                             "1 Group E outcome",
+                             "2 Group E outcome",
+                             "3 Group E outcome",
+                             "4 Group E outcome"
                            ]
-                         }], @course.root_outcome_group)
+                         }],
+                         @course.root_outcome_group)
     end
 
     it "works when importing outcomes to a target_group" do
@@ -383,8 +393,11 @@ describe Mutations::ImportOutcomes do
       )
 
       [
-        "0 Group E outcome", "1 Group E outcome", "2 Group E outcome",
-        "3 Group E outcome", "4 Group E outcome"
+        "0 Group E outcome",
+        "1 Group E outcome",
+        "2 Group E outcome",
+        "3 Group E outcome",
+        "4 Group E outcome"
       ].each do |title|
         exec(outcome_id: get_outcome_id(title), target_group_id: target_group.id)
       end
@@ -394,11 +407,15 @@ describe Mutations::ImportOutcomes do
                            groups: [{
                              title: "Group E",
                              outcomes: [
-                               "0 Group E outcome", "1 Group E outcome", "2 Group E outcome",
-                               "3 Group E outcome", "4 Group E outcome"
+                               "0 Group E outcome",
+                               "1 Group E outcome",
+                               "2 Group E outcome",
+                               "3 Group E outcome",
+                               "4 Group E outcome"
                              ]
                            }]
-                         }], @course.root_outcome_group)
+                         }],
+                         @course.root_outcome_group)
     end
 
     it "works when importing outcomes from different group" do
@@ -415,7 +432,8 @@ describe Mutations::ImportOutcomes do
                              title: "Group E",
                              outcomes: ["0 Group E outcome"]
                            }]
-                         }], @course.root_outcome_group)
+                         }],
+                         @course.root_outcome_group)
     end
 
     it "rebuilds structure when importing a parent group and a group that was imported before" do
@@ -432,7 +450,8 @@ describe Mutations::ImportOutcomes do
                              title: "Group D",
                              outcomes: ["0 Group D outcome", "1 Group D outcome"]
                            }]
-                         }], @course.root_outcome_group)
+                         }],
+                         @course.root_outcome_group)
     end
 
     it "rebuilds structure when importing a parent group from a group that was imported before" do
@@ -453,7 +472,8 @@ describe Mutations::ImportOutcomes do
                                outcomes: ["0 Group D outcome"]
                              }]
                            }]
-                         }], @course.root_outcome_group)
+                         }],
+                         @course.root_outcome_group)
     end
 
     it "rebuilds structure when importing a child group from a group that was imported before" do
@@ -473,7 +493,8 @@ describe Mutations::ImportOutcomes do
                                outcomes: ["0 Group D outcome"]
                              }]
                            }]
-                         }], @course.root_outcome_group)
+                         }],
+                         @course.root_outcome_group)
     end
 
     it "rebuilds structure (reverse order)" do
@@ -493,7 +514,8 @@ describe Mutations::ImportOutcomes do
                                outcomes: ["0 Group D outcome"]
                              }]
                            }]
-                         }], @course.root_outcome_group)
+                         }],
+                         @course.root_outcome_group)
     end
 
     it "build structure correctly if import outcomes groups from different root parents" do
@@ -506,27 +528,32 @@ describe Mutations::ImportOutcomes do
       assert_tree_exists([{
                            title: "Group D",
                            outcomes: ["0 Group D outcome"]
-                         }, {
-                           title: "Group B",
-                           outcomes: ["0 Group B outcome"]
-                         }], @course.root_outcome_group)
+                         },
+                          {
+                            title: "Group B",
+                            outcomes: ["0 Group B outcome"]
+                          }],
+                         @course.root_outcome_group)
     end
 
     it "Don't mess with outcomes that belongs already to the course" do
       make_group_structure({
                              title: "Group in Course",
                              outcomes: 1
-                           }, @course)
+                           },
+                           @course)
 
       exec(outcome_id: get_outcome_id("0 Group D outcome"))
 
       assert_tree_exists([{
                            title: "Group D",
                            outcomes: ["0 Group D outcome"]
-                         }, {
-                           title: "Group in Course",
-                           outcomes: ["0 Group in Course outcome"]
-                         }], @course.root_outcome_group)
+                         },
+                          {
+                            title: "Group in Course",
+                            outcomes: ["0 Group in Course outcome"]
+                          }],
+                         @course.root_outcome_group)
     end
 
     it "doesn't reactivate previous destroyed imported groups" do
@@ -538,7 +565,8 @@ describe Mutations::ImportOutcomes do
       assert_tree_exists([{
                            title: "Group D",
                            outcomes: ["0 Group D outcome"]
-                         }], @course.root_outcome_group)
+                         }],
+                         @course.root_outcome_group)
     end
 
     it "imports outcomes that belongs to root folders" do
@@ -571,17 +599,20 @@ describe Mutations::ImportOutcomes do
                            groups: [{
                              title: "Group D",
                              outcomes: Array.new(5) { |i| "#{i} Group D outcome" }
-                           }, {
-                             title: "Group E",
-                             outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
-                           }]
-                         }], @course.root_outcome_group)
+                           },
+                                    {
+                                      title: "Group E",
+                                      outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
+                                    }]
+                         }],
+                         @course.root_outcome_group)
     end
 
     it "import all nested outcomes to a specific group" do
       make_group_structure({
                              title: "Group F",
-                           }, @course)
+                           },
+                           @course)
 
       exec(
         group_id: find_group("Group C").id,
@@ -596,12 +627,14 @@ describe Mutations::ImportOutcomes do
                              groups: [{
                                title: "Group D",
                                outcomes: Array.new(5) { |i| "#{i} Group D outcome" }
-                             }, {
-                               title: "Group E",
-                               outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
-                             }]
+                             },
+                                      {
+                                        title: "Group E",
+                                        outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
+                                      }]
                            }]
-                         }], @course.root_outcome_group)
+                         }],
+                         @course.root_outcome_group)
     end
 
     it "resync new added outcomes and groups" do
@@ -621,7 +654,9 @@ describe Mutations::ImportOutcomes do
       make_group_structure({
                              title: "Group F",
                              outcomes: 1
-                           }, Account.default, group_e)
+                           },
+                           Account.default,
+                           group_e)
 
       exec(group_id: groupc_id)
 
@@ -631,15 +666,17 @@ describe Mutations::ImportOutcomes do
                            groups: [{
                              title: "Group D",
                              outcomes: Array.new(5) { |i| "#{i} Group D outcome" }
-                           }, {
-                             title: "Group E",
-                             outcomes: Array.new(6) { |i| "#{i} Group E outcome" },
-                             groups: [{
-                               title: "Group F",
-                               outcomes: ["0 Group F outcome"],
-                             }]
-                           }]
-                         }], @course.root_outcome_group)
+                           },
+                                    {
+                                      title: "Group E",
+                                      outcomes: Array.new(6) { |i| "#{i} Group E outcome" },
+                                      groups: [{
+                                        title: "Group F",
+                                        outcomes: ["0 Group F outcome"],
+                                      }]
+                                    }]
+                         }],
+                         @course.root_outcome_group)
     end
 
     it "build structure correctly if import groups from different parents" do
@@ -652,14 +689,17 @@ describe Mutations::ImportOutcomes do
                            groups: [{
                              title: "Group D",
                              outcomes: Array.new(5) { |i| "#{i} Group D outcome" }
-                           }, {
-                             title: "Group E",
-                             outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
-                           }]
-                         }, {
-                           title: "Group B",
-                           outcomes: Array.new(5) { |i| "#{i} Group B outcome" }
-                         }], @course.root_outcome_group)
+                           },
+                                    {
+                                      title: "Group E",
+                                      outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
+                                    }]
+                         },
+                          {
+                            title: "Group B",
+                            outcomes: Array.new(5) { |i| "#{i} Group B outcome" }
+                          }],
+                         @course.root_outcome_group)
     end
 
     it "reactivate previous imported deleted group" do
@@ -700,7 +740,8 @@ describe Mutations::ImportOutcomes do
 
         exec(
           outcome_id: get_outcome_id("0 Root Group A outcome", nil),
-          source_context_id: nil, source_context_type: nil,
+          source_context_id: nil,
+          source_context_type: nil,
           target_group_id: Account.default.root_outcome_group.id
         )
 
@@ -717,25 +758,30 @@ describe Mutations::ImportOutcomes do
                                groups: [{
                                  title: "Group D",
                                  outcomes: Array.new(5) { |i| "#{i} Group D outcome" }
-                               }, {
-                                 title: "Group E",
-                                 outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
-                               }]
+                               },
+                                        {
+                                          title: "Group E",
+                                          outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
+                                        }]
                              }]
-                           }, {
-                             title: "Group B",
-                             outcomes: Array.new(5) { |i| "#{i} Group B outcome" }
-                           }, {
-                             title: "Root Group A",
-                             outcomes: ["0 Root Group A outcome"]
-                           }], Account.default.root_outcome_group)
+                           },
+                            {
+                              title: "Group B",
+                              outcomes: Array.new(5) { |i| "#{i} Group B outcome" }
+                            },
+                            {
+                              title: "Root Group A",
+                              outcomes: ["0 Root Group A outcome"]
+                            }],
+                           Account.default.root_outcome_group)
       end
 
       it "import Root Group A with 1 outcome to Course" do
         assert_tree_exists([{
                              title: "Root Group A",
                              outcomes: ["0 Root Group A outcome"]
-                           }], @course.root_outcome_group)
+                           }],
+                           @course.root_outcome_group)
       end
 
       it "handles source_outcome_group_id" do
@@ -776,13 +822,15 @@ describe Mutations::ImportOutcomes do
 
         exec(
           group_id: find_group("Root Group B").id,
-          source_context_id: nil, source_context_type: nil,
+          source_context_id: nil,
+          source_context_type: nil,
           target_group_id: Account.default.root_outcome_group.id
         )
 
         exec(
           group_id: find_group("Root Group C").id,
-          source_context_id: nil, source_context_type: nil,
+          source_context_id: nil,
+          source_context_type: nil,
           target_group_id: Account.default.root_outcome_group.id
         )
       end
@@ -797,24 +845,29 @@ describe Mutations::ImportOutcomes do
                                groups: [{
                                  title: "Group D",
                                  outcomes: Array.new(5) { |i| "#{i} Group D outcome" }
-                               }, {
-                                 title: "Group E",
-                                 outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
-                               }]
+                               },
+                                        {
+                                          title: "Group E",
+                                          outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
+                                        }]
                              }]
-                           }, {
-                             title: "Group B",
-                             outcomes: Array.new(5) { |i| "#{i} Group B outcome" }
-                           }, {
-                             title: "Root Group A",
-                             groups: [{
-                               title: "Root Group B",
-                               outcomes: ["0 Root Group B outcome"],
-                             }, {
-                               title: "Root Group C",
-                               outcomes: ["0 Root Group C outcome"],
-                             }]
-                           }], Account.default.root_outcome_group)
+                           },
+                            {
+                              title: "Group B",
+                              outcomes: Array.new(5) { |i| "#{i} Group B outcome" }
+                            },
+                            {
+                              title: "Root Group A",
+                              groups: [{
+                                title: "Root Group B",
+                                outcomes: ["0 Root Group B outcome"],
+                              },
+                                       {
+                                         title: "Root Group C",
+                                         outcomes: ["0 Root Group C outcome"],
+                                       }]
+                            }],
+                           Account.default.root_outcome_group)
 
         exec(group_id: LearningOutcomeGroup.find_by(context: Account.default, title: "Root Group B").id)
         exec(group_id: LearningOutcomeGroup.find_by(context: Account.default, title: "Root Group C").id)
@@ -824,11 +877,13 @@ describe Mutations::ImportOutcomes do
                              groups: [{
                                title: "Root Group B",
                                outcomes: ["0 Root Group B outcome"],
-                             }, {
-                               title: "Root Group C",
-                               outcomes: ["0 Root Group C outcome"],
-                             }]
-                           }], @course.root_outcome_group)
+                             },
+                                      {
+                                        title: "Root Group C",
+                                        outcomes: ["0 Root Group C outcome"],
+                                      }]
+                           }],
+                           @course.root_outcome_group)
       end
     end
   end

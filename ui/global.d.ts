@@ -21,18 +21,30 @@ import {sendMessageStudentsWho} from './shared/grading/messageStudentsWhoHelper'
 declare global {
   interface Global {
     readonly ENV?: any
+    readonly INST?: any
   }
 
   interface Window {
     readonly ENV?: any
+    readonly INST?: any
     webkitSpeechRecognition: any
     jsonData: any
-
     messageStudents: (options: ReturnType<typeof sendMessageStudentsWho>) => void
     updateGrades: () => void
   }
 
   const ENV: any
+  const INST: any
+
+  type ShowIf = {
+    (bool?: boolean): JQuery<HTMLElement>
+    /**
+     * @deprecated use a boolean parameter instead
+     * @param num
+     * @returns
+     */
+    (num?: number): JQuery<HTMLElement>
+  }
 
   declare interface JQuery {
     scrollTo: (y: number, x?: number) => void
@@ -47,7 +59,12 @@ declare global {
     fillTemplateData: any
     fillWindowWithMe: (options?: {onResize: () => void}) => JQuery<HTMLElement>
     fixDialogButtons: () => void
-    keycodes: any
+    errorBox: (
+      message: string,
+      scroll?: boolean,
+      override_position?: string | number
+    ) => JQuery<HTMLElement>
+    getFormData: () => Record<string, unknown>
     live: any
     loadDocPreview: (options: {
       height: string
@@ -62,9 +79,8 @@ declare global {
     mediaCommentThumbnail: (size?: 'normal' | 'small') => void
     queryParam: (name: string) => string
     raw: (str: string) => string
-    showIf: (boolean) => void
+    showIf: ShowIf
     titleize: (str: string) => string
-    toSentence: (array: string[], options: any) => string
     underscore: (str: string) => string
     youTubeID: (path: string) => string
   }
@@ -85,7 +101,6 @@ declare global {
     datetimeString: any
     ajaxJSONFiles: any
     isPreviewable: any
-    toSentence: any
   }
 
   declare interface Array<T> {

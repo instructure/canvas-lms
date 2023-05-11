@@ -35,7 +35,8 @@ class Quizzes::QuizSubmissionEventsController < ApplicationController
         flash[:error] = t("errors.quiz_log_auditing_required",
                           "The quiz log auditing feature needs to be enabled for this course.")
 
-        return redirect_to named_context_url(@context, :context_quiz_history_url,
+        return redirect_to named_context_url(@context,
+                                             :context_quiz_history_url,
                                              @quiz.id,
                                              user_id: @quiz_submission.user_id)
       end

@@ -402,7 +402,8 @@ module MicrosoftSync
         else
           statsd_increment(:final_retry, current_step, e)
           update_state_record_to_errored_and_cleanup(
-            error: e, step: current_step,
+            error: e,
+            step: current_step,
             capture: RetriesExhaustedError.new(e)
           )
           raise e

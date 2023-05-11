@@ -508,9 +508,9 @@ module DataFixup::PopulateRootAccountIdOnModels
     # cross-shard could actually exist so ignore:
     scope = scope.where("#{reflection.join_foreign_key} < #{Shard::IDS_PER_SHARD}")
 
-    scope.where("NOT EXISTS (?)", foreign_table.where(
-                                    "#{foreign_table.quoted_table_name}.#{reflection.join_primary_key}=#{table.quoted_table_name}.#{reflection.join_foreign_key}"
-                                  ))
+    scope.where.not(foreign_table.where(
+      "#{foreign_table.quoted_table_name}.#{reflection.join_primary_key}=#{table.quoted_table_name}.#{reflection.join_foreign_key}"
+    ).arel.exists)
   end
 
   def self.fill_nonexistent_associations_with_zeros(table, min, max)

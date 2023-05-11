@@ -29,7 +29,9 @@ module Api::V1::MasterCourses
 
   def master_migration_json(migration, user, session, opts = {})
     migration.expire_if_necessary!
-    hash = api_json(migration, user, session,
+    hash = api_json(migration,
+                    user,
+                    session,
                     only: %w[id user_id workflow_state created_at exports_started_at imports_queued_at imports_completed_at comment])
     if opts[:subscription]
       hash["subscription_id"] = opts[:subscription].id

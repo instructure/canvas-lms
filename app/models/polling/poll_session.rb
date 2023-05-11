@@ -45,9 +45,11 @@ module Polling
     end
 
     def self.available_for(user)
-      PollSession.where("course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))",
-                        Enrollment.where(user_id: user).active.select(:course_id),
-                        Enrollment.where(user_id: user).active.select(:course_section_id))
+      enrollments = Enrollment.where(user_id: user).active
+      subquery = PollSession.where(course_section_id: nil)
+                            .or(PollSession.where(course_section_id:
+                                enrollments.select(:course_section_id)))
+      PollSession.where(course_id: enrollments.select(:course_id)).merge(subquery)
     end
 
     def results

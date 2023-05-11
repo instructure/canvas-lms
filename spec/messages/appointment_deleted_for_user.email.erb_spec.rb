@@ -27,7 +27,9 @@ describe "appointment_deleted_for_user.email" do
     user = user_model(name: "bob")
     appointment_participant_model(participant: user)
 
-    generate_message(:appointment_deleted_for_user, :email, @event,
+    generate_message(:appointment_deleted_for_user,
+                     :email,
+                     @event,
                      data: { updating_user_name: @teacher.name,
                              cancel_reason: "just because" })
 
@@ -48,7 +50,9 @@ describe "appointment_deleted_for_user.email" do
     @group.users << user
     appointment_participant_model(participant: @group, course: @course)
 
-    generate_message(:appointment_deleted_for_user, :email, @event,
+    generate_message(:appointment_deleted_for_user,
+                     :email,
+                     @event,
                      data: { updating_user_name: @teacher.name,
                              cancel_reason: "just because" })
 
@@ -69,7 +73,9 @@ describe "appointment_deleted_for_user.email" do
     @appointment_group.destroy(@teacher)
     @event.reload
 
-    generate_message(:appointment_deleted_for_user, :email, @event,
+    generate_message(:appointment_deleted_for_user,
+                     :email,
+                     @event,
                      data: { updating_user_name: @teacher.name,
                              cancel_reason: "just because" })
 

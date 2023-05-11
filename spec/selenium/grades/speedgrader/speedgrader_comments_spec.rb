@@ -447,8 +447,11 @@ describe.skip "speed grader EVAL-2664" do
         add_user_to_group(@student_2, @testgroup[0])
 
         @group_comment_1 = "group comment from student 1"
-        @assignment.submit_homework(@student_1, submission_type: "online_url", url: "http://instructure.com",
-                                                comment: @group_comment_1, group_comment: true)
+        @assignment.submit_homework(@student_1,
+                                    submission_type: "online_url",
+                                    url: "http://instructure.com",
+                                    comment: @group_comment_1,
+                                    group_comment: true)
 
         @private_comment_1 = "private comment from student 1"
         @assignment.submit_homework(@student_1, comment: @private_comment_1)

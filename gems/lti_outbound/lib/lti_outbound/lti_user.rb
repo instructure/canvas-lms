@@ -24,9 +24,17 @@ module LtiOutbound
     ACTIVE_STATE = "active"
     INACTIVE_STATE = "inactive"
 
-    proc_accessor :avatar_url, :concluded_roles, :currently_active_in_course,
-                  :current_roles, :first_name, :email, :last_name, :login_id,
-                  :name, :timezone, :current_observee_ids
+    proc_accessor :avatar_url,
+                  :concluded_roles,
+                  :currently_active_in_course,
+                  :current_roles,
+                  :first_name,
+                  :email,
+                  :last_name,
+                  :login_id,
+                  :name,
+                  :timezone,
+                  :current_observee_ids
 
     def current_role_types
       roles = current_roles.join(",") if current_roles.present?

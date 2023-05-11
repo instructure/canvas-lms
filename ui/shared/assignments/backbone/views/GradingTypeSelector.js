@@ -144,8 +144,6 @@ GradingTypeSelector.prototype.toJSON = function () {
         this.parentModel.isNotGraded()) ||
       (!this.canEditGrades && this.parentModel.gradedSubmissionsExist()),
     gradingTypeMap: this.gradingTypeMap(),
-    restrictQuantitativeData:
-      this.parentModel.restrictQuantitativeData() || ENV.restrict_quantitative_data,
   }
 }
 

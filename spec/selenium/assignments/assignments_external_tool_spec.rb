@@ -157,7 +157,8 @@ describe "external tool assignments" do
     end
 
     it "shows the tool as selected when editing a saved configured assignment" do
-      assmt = @course.assignments.create!(title: "blah", submission_types: "external_tool",
+      assmt = @course.assignments.create!(title: "blah",
+                                          submission_types: "external_tool",
                                           external_tool_tag_attributes: { content: @t1, url: @t1.url })
       get "/courses/#{@course.id}/assignments/#{assmt.id}/edit"
       selected = first_selected_option(f("#assignment_submission_type"))

@@ -289,7 +289,8 @@ describe "content migrations", :non_parallel do
       cm.skip_job_progress = true
       cm.save!
 
-      att = attachment_model(context: cm, filename: "cc_full_test_smaller.zip",
+      att = attachment_model(context: cm,
+                             filename: "cc_full_test_smaller.zip",
                              uploaded_data: stub_file_data("cc_full_test_smaller.zip", data, "application/zip"))
       cm.attachment = att
       cm.save!
@@ -428,7 +429,8 @@ describe "content migrations", :non_parallel do
         cm.skip_job_progress = true
         cm.save!
 
-        att = attachment_model(context: cm, filename: "cc_full_test.zip",
+        att = attachment_model(context: cm,
+                               filename: "cc_full_test.zip",
                                uploaded_data: stub_file_data("cc_full_test.zip", data, "application/zip"))
         cm.attachment = att
         cm.save!
@@ -542,8 +544,10 @@ describe "content migrations", :non_parallel do
       expect(opts["shift_dates"]).to eq "1"
       expect(opts["day_substitutions"]).to eq({ "1" => "2", "2" => "3" })
       expected = {
-        "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
-        "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+        "old_start_date" => "Jul 1, 2012",
+        "old_end_date" => "Jul 11, 2012",
+        "new_start_date" => "Aug 5, 2012",
+        "new_end_date" => "Aug 15, 2012"
       }
       expected.each do |k, v|
         expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
@@ -572,8 +576,10 @@ describe "content migrations", :non_parallel do
       expect(opts["shift_dates"]).to eq "1"
       expect(opts["day_substitutions"]).to eq({})
       expected = {
-        "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
-        "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+        "old_start_date" => "Jul 1, 2012",
+        "old_end_date" => "Jul 11, 2012",
+        "new_start_date" => "Aug 5, 2012",
+        "new_end_date" => "Aug 15, 2012"
       }
       expected.each do |k, v|
         expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)

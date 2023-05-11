@@ -73,7 +73,8 @@ class CanvadocSessionsController < ApplicationController
   # This API can only be accessed when another endpoint provides a signed URL.
   # It will simply redirect you to the 3rd party document preview.
   def show
-    blob = extract_blob(params[:hmac], params[:blob],
+    blob = extract_blob(params[:hmac],
+                        params[:blob],
                         "user_id" => @current_user.try(:global_id),
                         "type" => "canvadoc")
     attachment = Attachment.find(blob["attachment_id"])

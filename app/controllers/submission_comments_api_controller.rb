@@ -94,7 +94,8 @@ class SubmissionCommentsApiController < ApplicationController
     @user = api_find(@context.students_visible_to(@current_user, include: :inactive),
                      params[:user_id])
 
-    if authorized_action?(@assignment, @current_user,
+    if authorized_action?(@assignment,
+                          @current_user,
                           :attach_submission_comment_files)
       api_attachment_preflight(@assignment, request, check_quota: false)
     end

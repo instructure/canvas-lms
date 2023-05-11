@@ -21,7 +21,8 @@ class AddIndexOnSubmissionsLatePolicyStatus < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
 
   def change
-    add_index :submissions, :late_policy_status,
+    add_index :submissions,
+              :late_policy_status,
               where: "workflow_state<>'deleted' and late_policy_status IS NOT NULL",
               algorithm: :concurrently
   end

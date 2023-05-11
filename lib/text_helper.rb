@@ -36,7 +36,8 @@ module TextHelper
     if end_date.nil? || start_date == end_date
       start_date_display
     else
-      I18n.t("time.ranges.different_days", "%{start_date_and_time} to %{end_date_and_time}",
+      I18n.t("time.ranges.different_days",
+             "%{start_date_and_time} to %{end_date_and_time}",
              start_date_and_time: start_date_display,
              end_date_and_time: Utils::DatePresenter.new(end_date).as_string(style))
     end
@@ -85,7 +86,8 @@ module TextHelper
     elsif hours > 1
       I18n.t(
         { one: "%{hours} hours and 1 minute", other: "%{hours} hours and %{count} minutes" },
-        hours: hours, count: minutes
+        hours: hours,
+        count: minutes
       )
     elsif hours == 1
       I18n.t(

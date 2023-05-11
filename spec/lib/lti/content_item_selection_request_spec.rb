@@ -62,6 +62,42 @@ describe Lti::ContentItemSelectionRequest do
       expect(lti_launch.resource_url).to eq "https://www.example.com"
     end
 
+    it "defaults resource_url to tool url" do
+      lti_launch = lti_request.generate_lti_launch(placement: placement)
+      expect(lti_launch.resource_url).to eq tool.resource_selection[:url]
+    end
+
+    context "with environment-specific overrides" do
+      let(:override_url) { "http://www.example-beta.com/selection_test" }
+      let(:domain) { "www.example-beta.com" }
+
+      before do
+        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+
+        tool.settings[:environments] = {
+          domain: domain
+        }
+        tool.save!
+      end
+
+      it "uses override for resource_url" do
+        lti_launch = lti_request.generate_lti_launch(placement: placement)
+        expect(lti_launch.resource_url).to eq override_url
+      end
+
+      context "when launch_url is passed in params" do
+        let(:launch_url) { "https://www.example.com/other_lti_launch" }
+        let(:override_launch_url) { "https://www.example-beta.com/other_lti_launch" }
+
+        it "uses overridden launch_url for resource_url" do
+          lti_launch = lti_request.generate_lti_launch(placement: placement, opts: { launch_url: launch_url })
+          expect(lti_launch.resource_url).to eq override_launch_url
+        end
+      end
+    end
+
     it "sets the link text to the placement label" do
       lti_launch = lti_request.generate_lti_launch(placement: placement, opts: { launch_url: "https://www.example.com" })
       expect(lti_launch.link_text).to eq tool.label_for(placement.to_sym, I18n.locale)

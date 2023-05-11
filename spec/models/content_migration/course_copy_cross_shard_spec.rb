@@ -25,15 +25,25 @@ describe ContentMigration do
       ag = @copy_from.assignment_groups.create!(name: "empty group")
       asmnt = @copy_from.assignments.create!(title: "some assignment")
       cal = @copy_from.calendar_events.create!(title: "haha", description: "oi")
-      tool = @copy_from.context_external_tools.create!(name: "new tool", consumer_key: "key", shared_secret: "secret",
-                                                       domain: "example.com", custom_fields: { "a" => "1", "b" => "2" }, workflow_state: "public")
+      tool = @copy_from.context_external_tools.create!(name: "new tool",
+                                                       consumer_key: "key",
+                                                       shared_secret: "secret",
+                                                       domain: "example.com",
+                                                       custom_fields: { "a" => "1", "b" => "2" },
+                                                       workflow_state: "public")
       data = [{ points: 3, description: "Outcome row", id: 1, ratings: [{ points: 3, description: "Rockin'", criterion_id: 1, id: 2 }] }]
       rub1 = @copy_from.rubrics.create!(title: "rub1", data: data)
       rub1.associate_with(@copy_from, @copy_from)
       default = @copy_from.root_outcome_group
-      lo = @copy_from.created_learning_outcomes.create!(context: @copy_from, short_description: "outcome1", workflow_state: "active",
-                                                        data: { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 },
-                                                                                                                 { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } })
+      lo = @copy_from.created_learning_outcomes.create!(context: @copy_from,
+                                                        short_description: "outcome1",
+                                                        workflow_state: "active",
+                                                        data: { rubric_criterion: { mastery_points: 2,
+                                                                                    ratings: [{ description: "e", points: 50 },
+                                                                                              { description: "me", points: 2 },
+                                                                                              { description: "Does Not Meet Expectations", points: 0.5 }],
+                                                                                    description: "First outcome",
+                                                                                    points_possible: 5 } })
       default.add_outcome(lo)
       gs = @copy_from.grading_standards.create!(title: "Standard eh", data: [["A", 0.93], ["A-", 0.89], ["F", 0]])
 
@@ -89,8 +99,10 @@ describe ContentMigration do
 
     it "does not blow up with usage rights" do
       ur = @copy_from.usage_rights.create! use_justification: "used_by_permission", legal_copyright: "(C) 2015 Wyndham Systems"
-      att = @copy_from.attachments.create!(filename: "first.txt", uploaded_data: StringIO.new("ohai"),
-                                           folder: Folder.unfiled_folder(@copy_from), usage_rights: ur)
+      att = @copy_from.attachments.create!(filename: "first.txt",
+                                           uploaded_data: StringIO.new("ohai"),
+                                           folder: Folder.unfiled_folder(@copy_from),
+                                           usage_rights: ur)
 
       run_course_copy
 

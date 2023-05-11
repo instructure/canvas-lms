@@ -24,7 +24,7 @@ module DataFixup::AddPostPoliciesToAssignments
     # - Set the posted_at time of the assignment's submissions to nil (if the
     #   assignment is muted) or to the submission's graded_at time
     Submission.joins(:assignment).where(id: start_at..end_at)
-              .where("NOT EXISTS (?)", PostPolicy.where("assignment_id = assignments.id"))
+              .where.not(PostPolicy.where("assignment_id = assignments.id").arel.exists)
               .find_ids_in_batches do |submission_ids|
       Submission.joins(:assignment)
                 .where(id: submission_ids)
@@ -43,7 +43,7 @@ module DataFixup::AddPostPoliciesToAssignments
   def self.create_post_policies(start_at, end_at)
     created_at = Time.zone.now
 
-    Assignment.where("NOT EXISTS (?)", PostPolicy.where("assignment_id = assignments.id"))
+    Assignment.where.not(PostPolicy.where("assignment_id = assignments.id").arel.exists)
               .where(context_id: start_at..end_at)
               .find_in_batches do |assignments|
       assignment_post_policy_records = assignments.map do |assignment|
@@ -61,7 +61,7 @@ module DataFixup::AddPostPoliciesToAssignments
     end
 
     Course.where(id: start_at..end_at)
-          .where("NOT EXISTS (?)", PostPolicy.where("course_id = courses.id AND assignment_id IS NULL"))
+          .where.not(PostPolicy.where("course_id = courses.id AND assignment_id IS NULL").arel.exists)
           .find_ids_in_batches do |course_ids|
       course_post_policy_records = course_ids.map do |id|
         {

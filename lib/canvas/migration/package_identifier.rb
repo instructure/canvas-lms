@@ -91,8 +91,11 @@ module Canvas::Migration
       end
     rescue
       # Not a valid archive file
-      raise Canvas::Migration::Error, I18n.t(:package_error,
-                                             "Error identifying package type: %{error}", error: $!.message), $!.backtrace
+      raise Canvas::Migration::Error,
+            I18n.t(:package_error,
+                   "Error identifying package type: %{error}",
+                   error: $!.message),
+            $!.backtrace
     end
 
     private

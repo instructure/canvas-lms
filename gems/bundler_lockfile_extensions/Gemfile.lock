@@ -8,25 +8,28 @@ GEM
   specs:
     diff-lcs (1.5.0)
     rspec (3.12.0)
-      rspec-core (~> 3.9.0)
-      rspec-expectations (~> 3.9.0)
-      rspec-mocks (~> 3.9.0)
+      rspec-core (~> 3.12.0)
+      rspec-expectations (~> 3.12.0)
+      rspec-mocks (~> 3.12.0)
     rspec-core (3.12.1)
-      rspec-support (~> 3.9.3)
+      rspec-support (~> 3.12.0)
     rspec-expectations (3.12.2)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.9.0)
+      rspec-support (~> 3.12.0)
     rspec-mocks (3.12.5)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.9.0)
+      rspec-support (~> 3.12.0)
     rspec-support (3.12.0)
 
 PLATFORMS
-  arm64-darwin-21
+  aarch64-linux
+  arm64-darwin
+  x86_64-darwin
+  x86_64-linux
 
 DEPENDENCIES
   bundler_lockfile_extensions!
-  rspec (~> 3.9.0)
+  rspec (~> 3.12)
 
 BUNDLED WITH
-   2.4.10
+   2.3.26

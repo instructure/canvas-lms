@@ -176,7 +176,8 @@ describe "groups" do
           user: @user
         )
         # NOTE: announcement_url includes a leading '/'
-        AnnouncementNewEdit.edit_group_announcement(@testgroup.first, announcement,
+        AnnouncementNewEdit.edit_group_announcement(@testgroup.first,
+                                                    announcement,
                                                     "Canvas will be rewritten in chicken")
         announcement.reload
         # Editing *appends* to existing message, and the resulting announcement's
@@ -283,8 +284,10 @@ describe "groups" do
       end
 
       it "allows group members to access a discussion", priority: "1" do
-        dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
-                                     title: "Discussion Topic", message: "hi dudes")
+        dt = DiscussionTopic.create!(context: @testgroup.first,
+                                     user: @teacher,
+                                     title: "Discussion Topic",
+                                     message: "hi dudes")
         get discussions_page
         # Verifies group member can access the teacher's group discussion & that it's the correct discussion
         expect_new_page_load { f("[data-testid='discussion-link-#{dt.id}']").click }

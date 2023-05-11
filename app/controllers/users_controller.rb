@@ -193,17 +193,35 @@ class UsersController < ApplicationController
   include Api::V1::Submission
   include ObserverEnrollmentsHelper
 
-  before_action :require_user, only: %i[grades merge kaltura_session
-                                        ignore_item ignore_stream_item close_notification mark_avatar_image
-                                        user_dashboard toggle_hide_dashcard_color_overlays
-                                        masquerade external_tool dashboard_sidebar settings activity_stream
-                                        activity_stream_summary pandata_events_token dashboard_cards
-                                        user_graded_submissions show terminate_sessions dashboard_stream_items
+  before_action :require_user, only: %i[grades
+                                        merge
+                                        kaltura_session
+                                        ignore_item
+                                        ignore_stream_item
+                                        close_notification
+                                        mark_avatar_image
+                                        user_dashboard
+                                        toggle_hide_dashcard_color_overlays
+                                        masquerade
+                                        external_tool
+                                        dashboard_sidebar
+                                        settings
+                                        activity_stream
+                                        activity_stream_summary
+                                        pandata_events_token
+                                        dashboard_cards
+                                        user_graded_submissions
+                                        show
+                                        terminate_sessions
+                                        dashboard_stream_items
                                         show_k5_dashboard]
   before_action :require_registered_user, only: [:delete_user_service,
                                                  :create_user_service]
   before_action :reject_student_view_student, only: %i[delete_user_service
-                                                       create_user_service merge user_dashboard masquerade]
+                                                       create_user_service
+                                                       merge
+                                                       user_dashboard
+                                                       masquerade]
   skip_before_action :load_user, only: [:create_self_registered_user]
   before_action :require_self_registration, only: %i[new create create_self_registered_user]
 
@@ -423,16 +441,25 @@ class UsersController < ApplicationController
 
     search_term = params[:search_term].presence
     if search_term
-      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
+      users = UserSearch.for_user_in_context(search_term,
+                                             @context,
+                                             @current_user,
+                                             session,
                                              {
-                                               order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
+                                               order: params[:order],
+                                               sort: params[:sort],
+                                               enrollment_role_id: params[:role_filter_id],
                                                enrollment_type: params[:enrollment_type]
                                              })
     else
-      users = UserSearch.scope_for(@context, @current_user,
+      users = UserSearch.scope_for(@context,
+                                   @current_user,
                                    {
-                                     order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
-                                     enrollment_type: params[:enrollment_type], ui_invoked: includes.include?("ui_invoked")
+                                     order: params[:order],
+                                     sort: params[:sort],
+                                     enrollment_role_id: params[:role_filter_id],
+                                     enrollment_type: params[:enrollment_type],
+                                     ui_invoked: includes.include?("ui_invoked")
                                    })
       users = users.with_last_login if params[:sort] == "last_login"
     end
@@ -613,8 +640,10 @@ class UsersController < ApplicationController
   end
 
   DASHBOARD_CARD_TABS = [
-    Course::TAB_DISCUSSIONS, Course::TAB_ASSIGNMENTS,
-    Course::TAB_ANNOUNCEMENTS, Course::TAB_FILES
+    Course::TAB_DISCUSSIONS,
+    Course::TAB_ASSIGNMENTS,
+    Course::TAB_ANNOUNCEMENTS,
+    Course::TAB_FILES
   ].freeze
 
   def dashboard_cards
@@ -1203,7 +1232,8 @@ class UsersController < ApplicationController
     end
 
     @current_user.ignore_item!(ActiveRecord::Base.find_by_asset_string(params[:asset_string], ["Assignment", "AssessmentRequest", "Quizzes::Quiz"]),
-                               params[:purpose], params[:permanent] == "1")
+                               params[:purpose],
+                               params[:permanent] == "1")
     render json: { ignored: true }
   end
 
@@ -1379,7 +1409,10 @@ class UsersController < ApplicationController
           render status: status
         end
         format.json do
-          render json: user_json(@user, @current_user, session, %w[locale avatar_url],
+          render json: user_json(@user,
+                                 @current_user,
+                                 session,
+                                 %w[locale avatar_url],
                                  @current_user.pseudonym.account),
                  status: status
         end
@@ -1760,8 +1793,21 @@ class UsersController < ApplicationController
       return render(json: { message: "This endpoint only works against the current user" }, status: :unauthorized)
     end
 
-    valid_names = %w[home modules pages assignments quizzes settings files people announcements
-                     grades discussions syllabus collaborations import conferences]
+    valid_names = %w[home
+                     modules
+                     pages
+                     assignments
+                     quizzes
+                     settings
+                     files
+                     people
+                     announcements
+                     grades
+                     discussions
+                     syllabus
+                     collaborations
+                     import
+                     conferences]
 
     # Check if the page_name is valid
     unless valid_names.include?(params[:page_name])
@@ -3072,9 +3118,18 @@ class UsersController < ApplicationController
 
     if params[:user]
       user_params = params[:user]
-                    .permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services,
-                            :avatar_image, :subscribe_to_emails, :locale, :bio, :terms_of_use,
-                            :self_enrollment_code, :initial_enrollment_type)
+                    .permit(:name,
+                            :short_name,
+                            :sortable_name,
+                            :time_zone,
+                            :show_user_services,
+                            :avatar_image,
+                            :subscribe_to_emails,
+                            :locale,
+                            :bio,
+                            :terms_of_use,
+                            :self_enrollment_code,
+                            :initial_enrollment_type)
       if self_enrollment && user_params[:self_enrollment_code]
         user_params[:self_enrollment_code].strip!
       else

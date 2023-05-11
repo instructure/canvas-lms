@@ -222,14 +222,18 @@ describe UserSearch do
           end
 
           it "will not match against a sis id without :read_sis permission" do
-            RoleOverride.create!(context: Account.default, role: teacher_role,
-                                 permission: "read_sis", enabled: false)
+            RoleOverride.create!(context: Account.default,
+                                 role: teacher_role,
+                                 permission: "read_sis",
+                                 enabled: false)
             expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq []
           end
 
           it "will not match against an integration id without :read_sis permission" do
-            RoleOverride.create!(context: Account.default, role: teacher_role,
-                                 permission: "read_sis", enabled: false)
+            RoleOverride.create!(context: Account.default,
+                                 role: teacher_role,
+                                 permission: "read_sis",
+                                 enabled: false)
             expect(UserSearch.for_user_in_context("ACME", course, user)).to eq []
           end
 
@@ -252,8 +256,10 @@ describe UserSearch do
           end
 
           it "will not search login id without permission" do
-            RoleOverride.create!(context: Account.default, role: teacher_role,
-                                 permission: "view_user_logins", enabled: false)
+            RoleOverride.create!(context: Account.default,
+                                 role: teacher_role,
+                                 permission: "view_user_logins",
+                                 enabled: false)
             expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq []
           end
 
@@ -273,18 +279,22 @@ describe UserSearch do
 
           it "sorts by sis id" do
             User.find_by(name: "Rose Tyler").pseudonyms.create!(unique_id: "rose.tyler@example.com",
-                                                                sis_user_id: "25rose", account_id: course.root_account_id)
+                                                                sis_user_id: "25rose",
+                                                                account_id: course.root_account_id)
             User.find_by(name: "Tyler Pickett").pseudonyms.create!(unique_id: "tyler.pickett@example.com",
-                                                                   sis_user_id: "1tyler", account_id: course.root_account_id)
+                                                                   sis_user_id: "1tyler",
+                                                                   account_id: course.root_account_id)
             users = UserSearch.for_user_in_context("Tyler", course, user, nil, sort: "sis_id")
             expect(users.map(&:name)).to eq ["Tyler Pickett", "Rose Tyler", "Tyler Teacher"]
           end
 
           it "sorts by integration id" do
             User.find_by(name: "Rose Tyler").pseudonyms.create!(unique_id: "rose.tyler@example.com",
-                                                                integration_id: "25rose", account_id: course.root_account_id)
+                                                                integration_id: "25rose",
+                                                                account_id: course.root_account_id)
             User.find_by(name: "Tyler Pickett").pseudonyms.create!(unique_id: "tyler.pickett@example.com",
-                                                                   integration_id: "1tyler", account_id: course.root_account_id)
+                                                                   integration_id: "1tyler",
+                                                                   account_id: course.root_account_id)
             users = UserSearch.for_user_in_context("Tyler", course, user, nil, sort: "integration_id")
             expect(users.map(&:name)).to eq ["Tyler Pickett", "Rose Tyler", "Tyler Teacher"]
           end
@@ -311,8 +321,10 @@ describe UserSearch do
           end
 
           it "requires :read_email_addresses permission" do
-            RoleOverride.create!(context: Account.default, role: teacher_role,
-                                 permission: "read_email_addresses", enabled: false)
+            RoleOverride.create!(context: Account.default,
+                                 role: teacher_role,
+                                 permission: "read_email_addresses",
+                                 enabled: false)
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
           end
 

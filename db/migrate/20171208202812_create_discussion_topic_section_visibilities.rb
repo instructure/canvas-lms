@@ -30,9 +30,11 @@ class CreateDiscussionTopicSectionVisibilities < ActiveRecord::Migration[5.0]
 
     add_foreign_key :discussion_topic_section_visibilities, :discussion_topics
     add_foreign_key :discussion_topic_section_visibilities, :course_sections
-    add_index :discussion_topic_section_visibilities, :discussion_topic_id,
+    add_index :discussion_topic_section_visibilities,
+              :discussion_topic_id,
               name: "idx_discussion_topic_section_visibility_on_topic"
-    add_index :discussion_topic_section_visibilities, :course_section_id,
+    add_index :discussion_topic_section_visibilities,
+              :course_section_id,
               name: "idx_discussion_topic_section_visibility_on_section"
 
     add_column :discussion_topics, :is_section_specific, :boolean

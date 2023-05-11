@@ -143,7 +143,8 @@ describe "better_file_browsing, folders" do
 
     it "displays folders in tree view", priority: "1" do
       add_file(fixture_file_upload("example.pdf", "application/pdf"),
-               @course, "example.pdf")
+               @course,
+               "example.pdf")
       get "/courses/#{@course.id}/files"
       create_new_folder
       add_folder("New Folder")

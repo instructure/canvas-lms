@@ -19,7 +19,8 @@
 
 module Canvas::Plugins::DefaultPlugins
   def self.apply_all
-    Canvas::Plugin.register("apple", nil,
+    Canvas::Plugin.register("apple",
+                            nil,
                             name: "Sign in with Apple",
                             description: -> { t :description, "Sign in With Apple" },
                             website: "https://developer.apple.com",
@@ -27,7 +28,8 @@ module Canvas::Plugins::DefaultPlugins
                             author_website: "https://www.instructure.com",
                             version: "1.0.0",
                             settings_partial: "plugins/apple_settings")
-    Canvas::Plugin.register("clever", nil,
+    Canvas::Plugin.register("clever",
+                            nil,
                             name: "Clever",
                             description: -> { t :description, "Clever Login" },
                             website: "https://clever.com",
@@ -36,7 +38,8 @@ module Canvas::Plugins::DefaultPlugins
                             version: "1.0.0",
                             settings_partial: "plugins/clever_settings",
                             encrypted_settings: [:client_secret])
-    Canvas::Plugin.register("facebook", nil,
+    Canvas::Plugin.register("facebook",
+                            nil,
                             name: "Facebook",
                             description: -> { t :description, "Facebook Login" },
                             website: "http://www.facebook.com",
@@ -45,7 +48,8 @@ module Canvas::Plugins::DefaultPlugins
                             version: "2.0.0",
                             settings_partial: "plugins/facebook_settings",
                             encrypted_settings: [:app_secret])
-    Canvas::Plugin.register("github", nil,
+    Canvas::Plugin.register("github",
+                            nil,
                             name: "GitHub",
                             description: -> { t :description, "Github Login" },
                             website: "https://github.com",
@@ -54,7 +58,8 @@ module Canvas::Plugins::DefaultPlugins
                             version: "1.0.0",
                             settings_partial: "plugins/github_settings",
                             encrypted_settings: [:client_secret])
-    Canvas::Plugin.register("linked_in", nil,
+    Canvas::Plugin.register("linked_in",
+                            nil,
                             name: "LinkedIn",
                             description: -> { t :description, "LinkedIn integration" },
                             website: "http://www.linkedin.com",
@@ -64,7 +69,8 @@ module Canvas::Plugins::DefaultPlugins
                             settings_partial: "plugins/linked_in_settings",
                             validator: "LinkedInValidator",
                             encrypted_settings: [:client_secret])
-    Canvas::Plugin.register("microsoft", nil,
+    Canvas::Plugin.register("microsoft",
+                            nil,
                             name: "Microsoft",
                             description: -> { t :description, "Microsoft Login" },
                             website: "https://apps.dev.microsoft.com",
@@ -83,7 +89,8 @@ module Canvas::Plugins::DefaultPlugins
                               settings_partial: "plugins/diigo_settings",
                               validator: "DiigoValidator"
                             })
-    Canvas::Plugin.register("twitter", nil,
+    Canvas::Plugin.register("twitter",
+                            nil,
                             name: "Twitter",
                             description: -> { t :description, "Twitter notifications" },
                             website: "http://www.twitter.com",
@@ -103,7 +110,8 @@ module Canvas::Plugins::DefaultPlugins
                               settings_partial: "plugins/etherpad_settings",
                               validator: "EtherpadValidator"
                             })
-    Canvas::Plugin.register("google_drive", :collaborations,
+    Canvas::Plugin.register("google_drive",
+                            :collaborations,
                             {
                               name: -> { t :name, "Google Drive" },
                               description: -> { t :description, "Google Drive file sharing" },

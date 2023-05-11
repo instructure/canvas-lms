@@ -179,7 +179,8 @@ module Api::V1::StreamItem
       @current_user.shard.activate do
         base_scope = @current_user.visible_stream_item_instances(opts).joins(:stream_item)
 
-        full_counts = base_scope.except(:order).group("stream_items.asset_type", "stream_items.notification_category",
+        full_counts = base_scope.except(:order).group("stream_items.asset_type",
+                                                      "stream_items.notification_category",
                                                       "stream_item_instances.workflow_state").count
         # as far as I can tell, the 'type' column previously extracted by stream_item_json is identical to asset_type
         # oh wait, except for Announcements -_-
@@ -218,8 +219,10 @@ module Api::V1::StreamItem
 
         total_counts.each do |key, count|
           type, category = key
-          items << { type: type, notification_category: category,
-                     count: count, unread_count: unread_counts[key] || 0 }
+          items << { type: type,
+                     notification_category: category,
+                     count: count,
+                     unread_count: unread_counts[key] || 0 }
         end
         items.sort_by! { |i| i[:type] }
       end

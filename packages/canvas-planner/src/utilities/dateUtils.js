@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -24,8 +25,7 @@ export function initializeDateTimeFormatters(formatters) {
   dateTimeFormatters = formatters
 }
 
-function getTodaysDetails() {
-  const today = moment()
+function getTodaysDetails(today = moment()) {
   const yesterday = today.clone().subtract(1, 'days')
   const tomorrow = today.clone().add(1, 'days')
 
@@ -74,8 +74,8 @@ export function isInMomentRange(checkMoment, firstMoment, lastMoment) {
  * it will return a string indicating Today, Tomorrow, Yesterday
  * or the day of the week if it doesn't fit in any of those categories
  */
-export function getFriendlyDate(date) {
-  const {today, yesterday, tomorrow} = getTodaysDetails()
+export function getFriendlyDate(date, today = moment()) {
+  const {yesterday, tomorrow} = getTodaysDetails(today)
   const momentizedDate = new moment(date)
 
   if (isToday(date, today)) {
@@ -96,7 +96,7 @@ export function getDynamicFullDate(date, timeZone) {
     year: date.isSame(today, 'year') ? undefined : 'numeric',
     month: 'long',
     day: 'numeric',
-    timeZone
+    timeZone,
   }).format(momentizedDate.toDate())
 }
 
@@ -115,11 +115,11 @@ export function getDynamicFullDateAndTime(date, timeZone) {
     year: date.isSame(today, 'year') ? undefined : 'numeric',
     month: 'short',
     day: 'numeric',
-    timeZone
+    timeZone,
   })
   return formatMessage('{date} at {time}', {
     date: dateFormatter.format(momentizedDate.toDate()),
-    time: momentizedDate.format('LT')
+    time: momentizedDate.format('LT'),
   })
 }
 
@@ -136,7 +136,7 @@ export function getFullDateAndTime(date) {
   } else {
     return formatMessage('{date} at {time}', {
       date: momentizedDate.format('LL'),
-      time: momentizedDate.format('LT')
+      time: momentizedDate.format('LT'),
     })
   }
 }
@@ -171,12 +171,12 @@ export function dateRangeString(startDate, endDate, timeZone) {
   } else if (startDate.dayOfYear() === endDate.dayOfYear()) {
     return formatMessage('{startDateTime} - {endTime}', {
       startDateTime: dateTimeString(startDate, timeZone),
-      endTime: timeString(endDate, timeZone)
+      endTime: timeString(endDate, timeZone),
     })
   } else {
     return formatMessage('{startDateTime} - {endDateTime}', {
       startDateTime: dateTimeString(startDate, timeZone),
-      endDateTime: dateTimeString(endDate, timeZone)
+      endDateTime: dateTimeString(endDate, timeZone),
     })
   }
 }

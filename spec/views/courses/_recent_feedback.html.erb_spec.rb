@@ -63,6 +63,47 @@ describe "courses/_recent_feedback" do
     expect(response.body).to include("5,782,394 out of 5,782,394")
   end
 
+  context "when restrict_quantitative_data is truthy" do
+    before :once do
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # truthy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      Account.default.save!
+
+      # truthy permission(since enabled is being "not"ed)
+      Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+      Account.default.reload
+    end
+
+    it "preserves complete / incomplete grade" do
+      @assignment.update!(grading_type: "pass_fail")
+      @assignment.grade_student(@user, grade: "complete", grader: @teacher)
+      @submission.reload
+      render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
+      expect(response.body).to include("Complete")
+    end
+
+    it "preserves letter-grade" do
+      @assignment.update!(grading_type: "letter_grade")
+      @assignment.update!(points_possible: 10)
+      @assignment.grade_student(@user, grade: "10", grader: @teacher)
+      @submission.reload
+      render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
+      expect(response.body).to include("A")
+    end
+
+    it "coerces points to letter-grade" do
+      @assignment.update!(grading_type: "points")
+      @assignment.update!(points_possible: 10)
+      @assignment.grade_student(@user, grade: "10", grader: @teacher)
+      @submission.reload
+      render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
+      expect(response.body).to include("A")
+    end
+  end
+
   it "shows the grade and the comment" do
     @assignment.update!(points_possible: 25_734)
     @assignment.grade_student(@user, grade: 25_734, grader: @teacher)

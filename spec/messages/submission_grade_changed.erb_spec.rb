@@ -66,4 +66,49 @@ describe "submission_grade_changed" do
       expect(message.body).to match("For #{@submission.user.name}")
     end
   end
+
+  context "Restrict Quantitative Data" do
+    let(:student) { student_in_course(course: @assignment.course, active_all: true).user }
+    let(:course_root_account) { @assignment.course.root_account }
+
+    before do
+      # truthy feature flag
+      course_root_account.enable_feature! :restrict_quantitative_data
+
+      # truthy setting
+      course_root_account.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      course_root_account.save!
+
+      # truthy permission(since enabled is being "not"ed)
+      course_root_account.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+      course_root_account.reload
+
+      asset.assignment.update_attribute(:points_possible, 10)
+      asset.update_attribute(:score, 5)
+      student.preferences[:send_scores_in_emails] = true
+      student.save!
+      asset.save!
+    end
+
+    it "shows only the letter grade when RQD is enabled - twitter" do
+      message = generate_message(:submission_grade_changed, :twitter, asset, user: student)
+      expect(message.body).to include("grade: F")
+    end
+
+    it "shows only the letter grade when RQD is enabled - sms" do
+      message = generate_message(:submission_grade_changed, :sms, asset, user: student)
+      expect(message.body).to include("grade: F")
+    end
+
+    it "shows only the letter grade when RQD is enabled - email" do
+      message = generate_message(:submission_grade_changed, :email, asset, user: student)
+      expect(message.body).to include("grade: F")
+      expect(message.html_body).to include("grade: F")
+    end
+
+    it "shows only the letter grade when RQD is enabled - summary" do
+      message = generate_message(:submission_grade_changed, :summary, asset, user: student)
+      expect(message.body).to include("grade: F")
+    end
+  end
 end

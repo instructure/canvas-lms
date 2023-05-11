@@ -165,11 +165,23 @@ class UnzipAttachment
   end
 
   def attach(path, entry, folder, md5, migration_id: nil)
-    FileInContext.attach(context, path, display_name: display_name(entry.name), folder: folder,
-                                        explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
+    FileInContext.attach(context,
+                         path,
+                         display_name: display_name(entry.name),
+                         folder: folder,
+                         explicit_filename: File.split(entry.name).last,
+                         allow_rename: @rename_files,
+                         md5: md5,
+                         migration_id: migration_id)
   rescue
-    FileInContext.attach(context, path, display_name: display_name(entry.name), folder: folder,
-                                        explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
+    FileInContext.attach(context,
+                         path,
+                         display_name: display_name(entry.name),
+                         folder: folder,
+                         explicit_filename: File.split(entry.name).last,
+                         allow_rename: @rename_files,
+                         md5: md5,
+                         migration_id: migration_id)
   end
 
   def with_unzip_configuration

@@ -76,7 +76,12 @@ def with_each_job_cluster(klass, method, *args, jitter: nil, local_offset: false
     PeriodicJobs,
     :with_each_shard_by_database_in_region,
     { singleton: "periodic:region: #{klass}.#{method}" },
-    klass, method, *args, jitter: jitter, local_offset: local_offset, connection_class: Delayed::Backend::ActiveRecord::AbstractJob
+    klass,
+    method,
+    *args,
+    jitter: jitter,
+    local_offset: local_offset,
+    connection_class: Delayed::Backend::ActiveRecord::AbstractJob
   )
 end
 
@@ -85,7 +90,13 @@ def with_each_shard_by_database(klass, method, *args, jitter: nil, local_offset:
     PeriodicJobs,
     :with_each_shard_by_database_in_region,
     { singleton: "periodic:region: #{klass}.#{method}" },
-    klass, method, *args, jitter: jitter, local_offset: local_offset, connection_class: ActiveRecord::Base, error_callback: error_callback
+    klass,
+    method,
+    *args,
+    jitter: jitter,
+    local_offset: local_offset,
+    connection_class: ActiveRecord::Base,
+    error_callback: error_callback
   )
 end
 
@@ -338,7 +349,8 @@ Rails.configuration.after_initialize do
 
   if MultiCache.cache.is_a?(ActiveSupport::Cache::HaStore) && MultiCache.cache.options[:consul_event] && InstStatsd.settings.present?
     Delayed::Periodic.cron "HaStore.validate_consul_event", "5 * * * *" do
-      DatabaseServer.send_in_each_region(MultiCache, :validate_consul_event,
+      DatabaseServer.send_in_each_region(MultiCache,
+                                         :validate_consul_event,
                                          {
                                            run_current_region_asynchronously: true,
                                            singleton: "HaStore.validate_consul_event"

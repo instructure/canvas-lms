@@ -25,8 +25,16 @@ class DiscussionEntryDraft < ActiveRecord::Base
   belongs_to :user, inverse_of: :discussion_entry_drafts
 
   def self.upsert_draft(user:, topic:, message:, entry: nil, parent: nil, attachment: nil, reply_preview: false)
-    insert_columns = %w[user_id discussion_topic_id discussion_entry_id root_entry_id parent_id
-                        attachment_id message include_reply_preview updated_at created_at]
+    insert_columns = %w[user_id
+                        discussion_topic_id
+                        discussion_entry_id
+                        root_entry_id
+                        parent_id
+                        attachment_id
+                        message
+                        include_reply_preview
+                        updated_at
+                        created_at]
 
     topic.shard.activate do
       insert_values = []

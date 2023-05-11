@@ -257,7 +257,7 @@ const AccountCalendarsModal = ({
             onClick={closeModal}
             screenReaderLabel={I18n.t('Close')}
           />
-          <Heading>{I18n.t('Add Calendar')}</Heading>
+          <Heading>{I18n.t('Select Calendars')}</Heading>
         </Modal.Header>
         <Modal.Body padding="none">
           <View as="div" margin="small medium">

@@ -436,11 +436,15 @@ describe Api do
       @user2 = @user
       user_with_pseudonym username: "sisuser3@example.com"
       @user3 = @user
-      expect(Api.map_ids(["sis_user_id:sisuser1", "sis_login_id:sisuser2@example.com",
-                          "hex:sis_login_id:7369737573657233406578616d706c652e636f6d", "sis_user_id:sisuser4",
-                          "5123"], User, Account.default).sort).to eq [
-                            @user1.id, @user2.id, @user3.id, 5123
-                          ].sort
+      expect(Api.map_ids(["sis_user_id:sisuser1",
+                          "sis_login_id:sisuser2@example.com",
+                          "hex:sis_login_id:7369737573657233406578616d706c652e636f6d",
+                          "sis_user_id:sisuser4",
+                          "5123"],
+                         User,
+                         Account.default).sort).to eq [
+                           @user1.id, @user2.id, @user3.id, 5123
+                         ].sort
     end
 
     it "works when only provided sis_ids" do
@@ -452,10 +456,14 @@ describe Api do
       @user2 = @user
       user_with_pseudonym username: "sisuser3@example.com"
       @user3 = @user
-      expect(Api.map_ids(["sis_user_id:sisuser1", "sis_login_id:sisuser2@example.com",
-                          "hex:sis_login_id:7369737573657233406578616d706c652e636f6d", "sis_user_id:sisuser4"], User, Account.default).sort).to eq [
-                            @user1.id, @user2.id, @user3.id
-                          ].sort
+      expect(Api.map_ids(["sis_user_id:sisuser1",
+                          "sis_login_id:sisuser2@example.com",
+                          "hex:sis_login_id:7369737573657233406578616d706c652e636f6d",
+                          "sis_user_id:sisuser4"],
+                         User,
+                         Account.default).sort).to eq [
+                           @user1.id, @user2.id, @user3.id
+                         ].sort
     end
 
     it "does not find sis ids in other accounts" do

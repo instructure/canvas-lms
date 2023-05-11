@@ -24,7 +24,9 @@ describe "assignments index grading period filter" do
   include_context "in-process server selenium tests"
 
   before(:once) do
-    course_with_teacher(active_all: true, account: @account, mgp_flag_enabled: true,
+    course_with_teacher(active_all: true,
+                        account: @account,
+                        mgp_flag_enabled: true,
                         grading_periods: %i[old current future])
     @assignments = []
     GradingPeriod.for(@course).sort_by(&:start_date).each do |grading_period|

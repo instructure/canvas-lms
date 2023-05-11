@@ -508,7 +508,8 @@ class ContentMigrationsController < ApplicationController
   def content_list
     @content_migration = @context.content_migrations.find(params[:id])
     base_url = api_v1_course_content_migration_selective_data_url(@context, @content_migration)
-    formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@content_migration, base_url,
+    formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@content_migration,
+                                                                          base_url,
                                                                           global_identifiers: @content_migration.use_global_identifiers?)
 
     unless formatter.valid_type?(params[:type])

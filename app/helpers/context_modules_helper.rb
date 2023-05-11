@@ -50,8 +50,17 @@ module ContextModulesHelper
   def cache_if_module(context_module, viewable, can_add, can_edit, can_delete, is_student, can_view_unpublished, user, context, &block)
     if context_module
       visible_assignments = user ? user.assignment_and_quiz_visibilities(context) : []
-      cache_key_items = ["context_module_render_22_", context_module.cache_key, viewable, can_add, can_edit, can_delete, is_student, can_view_unpublished,
-                         true, Time.zone, Digest::SHA256.hexdigest([visible_assignments, @section_visibility].join("/"))]
+      cache_key_items = ["context_module_render_22_",
+                         context_module.cache_key,
+                         viewable,
+                         can_add,
+                         can_edit,
+                         can_delete,
+                         is_student,
+                         can_view_unpublished,
+                         true,
+                         Time.zone,
+                         Digest::SHA256.hexdigest([visible_assignments, @section_visibility].join("/"))]
       cache_key = cache_key_items.join("/")
       cache_key = add_menu_tools_to_cache_key(cache_key)
       cache_key = add_mastery_paths_to_cache_key(cache_key, context, user)

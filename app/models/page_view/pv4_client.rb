@@ -29,7 +29,8 @@ class PageView
 
     PRECISION = 3
 
-    def fetch(user_id, start_time: nil,
+    def fetch(user_id,
+              start_time: nil,
               end_time: Time.now.utc,
               last_page_view_id: nil,
               limit: nil)

@@ -21,9 +21,16 @@ module Canvas
   class Errors
     describe Info do
       let(:request) do
-        double(env: {}, remote_ip: "", query_parameters: {},
-               request_parameters: {}, path_parameters: {}, url: "",
-               request_method_symbol: "", format: "HTML", headers: {}, authorization: nil)
+        double(env: {},
+               remote_ip: "",
+               query_parameters: {},
+               request_parameters: {},
+               path_parameters: {},
+               url: "",
+               request_method_symbol: "",
+               format: "HTML",
+               headers: {},
+               authorization: nil)
       end
 
       let(:request_context_id) { "abcdefg1234567" }
@@ -87,8 +94,12 @@ module Canvas
             (+"HTTP_HOST").force_encoding(Encoding::ASCII_8BIT).freeze =>
               (+"somehost.com").force_encoding(Encoding::ASCII_8BIT).freeze,
           }
-          req = double(env: dangerous_hash, remote_ip: "", url: "",
-                       path_parameters: {}, query_parameters: {}, request_parameters: {})
+          req = double(env: dangerous_hash,
+                       remote_ip: "",
+                       url: "",
+                       path_parameters: {},
+                       query_parameters: {},
+                       request_parameters: {})
           env_stuff = described_class.useful_http_env_stuff_from_request(req)
           expect do
             Utf8Cleaner.recursively_strip_invalid_utf8!(env_stuff, true)
@@ -96,8 +107,12 @@ module Canvas
         end
 
         it "has a max limit on the request_parameters data size" do
-          req = double(env: {}, remote_ip: "", url: "",
-                       path_parameters: {}, query_parameters: {}, request_parameters: { "body" => ("a" * (described_class::MAX_DATA_SIZE * 2)) })
+          req = double(env: {},
+                       remote_ip: "",
+                       url: "",
+                       path_parameters: {},
+                       query_parameters: {},
+                       request_parameters: { "body" => ("a" * (described_class::MAX_DATA_SIZE * 2)) })
           env_stuff = described_class.useful_http_env_stuff_from_request(req)
           expect(env_stuff["request_parameters"].size).to eq(described_class::MAX_DATA_SIZE)
         end

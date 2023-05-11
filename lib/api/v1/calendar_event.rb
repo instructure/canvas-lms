@@ -50,8 +50,19 @@ module Api::V1::CalendarEvent
       event,
       user,
       session,
-      only: %w[id created_at updated_at start_at end_at all_day all_day_date title workflow_state
-               comments series_uuid rrule blackout_date]
+      only: %w[id
+               created_at
+               updated_at
+               start_at
+               end_at
+               all_day
+               all_day_date
+               title
+               workflow_state
+               comments
+               series_uuid
+               rrule
+               blackout_date]
     )
 
     if user
@@ -156,7 +167,9 @@ module Api::V1::CalendarEvent
 
         hash["child_events"] = events.map do |e|
           e.parent_event = event
-          calendar_event_json(e, user, session,
+          calendar_event_json(e,
+                              user,
+                              session,
                               include: appointment_group ? ["participants"] : [],
                               appointment_group: appointment_group,
                               current_participant: participant,
@@ -229,7 +242,8 @@ module Api::V1::CalendarEvent
       group,
       user,
       session,
-      only: %w[id created_at description end_at max_appointments_per_participant min_appointments_per_participant participants_per_appointment start_at title updated_at workflow_state participant_visibility], methods: :sub_context_codes
+      only: %w[id created_at description end_at max_appointments_per_participant min_appointments_per_participant participants_per_appointment start_at title updated_at workflow_state participant_visibility],
+      methods: :sub_context_codes
     )
 
     if user
@@ -262,7 +276,9 @@ module Api::V1::CalendarEvent
         user_json_preloads(all_child_events.map(&:context)) if !all_child_events.empty? && all_child_events.first.context.is_a?(User) && user_json_is_admin?(@context, user)
       end
       hash["appointments"] = appointments_scope.map do |event|
-        calendar_event_json(event, user, session,
+        calendar_event_json(event,
+                            user,
+                            session,
                             context: group,
                             appointment_group: group,
                             appointment_group_id: group.id,

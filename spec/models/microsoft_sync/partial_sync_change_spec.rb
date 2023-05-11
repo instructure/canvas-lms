@@ -48,7 +48,10 @@ describe MicrosoftSync::PartialSyncChange do
       result = described_class
                .where(enrollment_type: "owner")
                .with_values_in(%w[course_id user_id created_at], [
-                                 [c1.id, u1.id, t1], [c1.id, u2.id, t2], [c2.id, u1.id, t2], [c2.id, u2.id, t1],
+                                 [c1.id, u1.id, t1],
+                                 [c1.id, u2.id, t2],
+                                 [c2.id, u1.id, t2],
+                                 [c2.id, u2.id, t1],
                                  [c2.id, u2.id, t2],
                                ])
                .pluck(:enrollment_type, :course_id, :user_id, :created_at)

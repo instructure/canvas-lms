@@ -24,8 +24,11 @@ class AddContextToOutcomeProficiency < ActiveRecord::Migration[5.2]
   def change
     add_column :outcome_proficiencies, :context_id, :integer, limit: 8, if_not_exists: true
     add_column :outcome_proficiencies, :context_type, :string, limit: 255, if_not_exists: true
-    add_index :outcome_proficiencies, [:context_id, :context_type],
-              algorithm: :concurrently, unique: true,
-              where: "context_id IS NOT NULL", if_not_exists: true
+    add_index :outcome_proficiencies,
+              [:context_id, :context_type],
+              algorithm: :concurrently,
+              unique: true,
+              where: "context_id IS NOT NULL",
+              if_not_exists: true
   end
 end

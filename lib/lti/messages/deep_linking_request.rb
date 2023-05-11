@@ -129,7 +129,8 @@ module Lti::Messages
     def add_deep_linking_request_claims!
       lti_assignment_id = Lti::Security.decoded_lti_assignment_id(@expander.controller&.params&.[]("secure_params"))
       assignment = Assignment.find_by(lti_context_id: lti_assignment_id) if lti_assignment_id
-      @message.deep_linking_settings.deep_link_return_url = return_url(assignment&.id)
+      content_item_id = @expander.collaboration&.id
+      @message.deep_linking_settings.deep_link_return_url = return_url(assignment&.id, content_item_id)
       @message.deep_linking_settings.accept_types = DEEP_LINKING_DETAILS.dig(placement, :accept_types)
       @message.deep_linking_settings.accept_presentation_document_targets = DEEP_LINKING_DETAILS.dig(placement, :document_targets)
       @message.deep_linking_settings.accept_media_types = DEEP_LINKING_DETAILS.dig(placement, :media_types).join(",")
@@ -141,20 +142,21 @@ module Lti::Messages
       @opts[:resource_type]
     end
 
-    def return_url(assignment_id = nil)
+    def return_url(assignment_id = nil, content_item_id = nil)
       @expander.controller.polymorphic_url(
         [@context, :deep_linking_response],
-        deep_link_params(assignment_id)
+        deep_link_params(assignment_id, content_item_id)
       )
     end
 
-    def deep_link_params(assignment_id)
+    def deep_link_params(assignment_id, content_item_id)
       {
         data: Lti::DeepLinkingData.jwt_from({
           modal: MODAL_PLACEMENTS.include?(placement),
           placement: placement,
           context_module_id: @opts[:context_module_id],
           assignment_id: assignment_id,
+          content_item_id: content_item_id,
           parent_frame_context: @opts[:parent_frame_context]
         }.compact),
       }

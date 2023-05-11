@@ -1,0 +1,53 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2023 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+module FilesHelper
+  def load_media_object
+    if params[:attachment_id].present?
+      @attachment = Attachment.not_deleted.find(params[:attachment_id])
+      return render_unauthorized_action unless @attachment&.media_entry_id
+
+      @media_object = @attachment.media_object_by_media_id
+      @media_object.current_attachment = @attachment
+      @media_id = @media_object&.id
+    elsif params[:media_object_id].present?
+      @media_id = params[:media_object_id]
+      @media_object = MediaObject.by_media_id(@media_id).take
+    end
+  end
+
+  def check_media_permissions(access_type: :read)
+    if @attachment.present?
+      access_allowed(@attachment, @current_user, access_type)
+    else
+      render_unauthorized_action unless @media_object.present?
+    end
+  end
+
+  def access_allowed(attachment, user, access_type)
+    if params[:verifier]
+      verifier_checker = Attachments::Verification.new(attachment)
+      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], access_type, session)
+    end
+    submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context)
+                            .filter_map(&:context)
+    return true if submissions.any? { |submission| submission.grants_right?(user, session, access_type) }
+
+    authorized_action(attachment, user, access_type)
+  end
+end

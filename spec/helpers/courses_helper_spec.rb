@@ -95,7 +95,9 @@ describe CoursesHelper do
         check_icon_data(submission.readable_state,
                         "Assignment",
                         "icon-assignment",
-                        current_user: @student_two, submission: submission, show_assignment_type_icon: true)
+                        current_user: @student_two,
+                        submission: submission,
+                        show_assignment_type_icon: true)
       end
 
       it "returns a no new submissions tooltip if some assignments have been submitted and graded" do

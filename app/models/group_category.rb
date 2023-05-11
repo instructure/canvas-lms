@@ -214,13 +214,13 @@ class GroupCategory < ActiveRecord::Base
 
   def group_for(user)
     shard.activate do
-      groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).take
+      groups.active.where(GroupMembership.active.where("group_id=groups.id").where(user_id: user).arel.exists).take
     end
   end
 
   def is_member?(user)
     shard.activate do
-      groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).exists?
+      groups.active.where(GroupMembership.active.where("group_id=groups.id").where(user_id: user).arel.exists).exists?
     end
   end
 

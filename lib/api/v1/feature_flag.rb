@@ -23,8 +23,13 @@ module Api::V1::FeatureFlag
 
   def feature_json(feature, _current_user, _session)
     # this isn't an AR object, so api_json doesn't work
-    hash = feature.as_json.slice("feature", "applies_to", "root_opt_in", "beta",
-                                 "release_notes_url", "autoexpand", "type")
+    hash = feature.as_json.slice("feature",
+                                 "applies_to",
+                                 "root_opt_in",
+                                 "beta",
+                                 "release_notes_url",
+                                 "autoexpand",
+                                 "type")
     # Only show the shdadow attribute if it's true, non-site-admin users don't need to see it exists
     hash["shadow"] = true if feature.shadow?
     add_localized_attr(hash, feature, "display_name")

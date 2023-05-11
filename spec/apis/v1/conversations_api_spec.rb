@@ -64,7 +64,8 @@ describe ConversationsController, type: :request do
       @c2 = conversation(@bob, @billy, workflow_state: "unread", subscribed: false)
       @c3 = conversation(@jane, workflow_state: "archived") # won't show up, since it's archived
 
-      json = api_call(:get, "/api/v1/conversations.json",
+      json = api_call(:get,
+                      "/api/v1/conversations.json",
                       { controller: "conversations", action: "index", format: "json" })
       json.each { |c| c.delete("avatar_url") } # this URL could change, we don't care
       json.each { |c| c.delete("last_authored_message_at") } # This is sometimes not updated. It's a known bug.
@@ -128,9 +129,12 @@ describe ConversationsController, type: :request do
     it "properlt responds to include[]=participant_avatars" do
       conversation(@bob, workflow_state: "read")
 
-      json = api_call(:get, "/api/v1/conversations.json",
-                      { controller: "conversations", action: "index",
-                        format: "json", include: ["participant_avatars"] })
+      json = api_call(:get,
+                      "/api/v1/conversations.json",
+                      { controller: "conversations",
+                        action: "index",
+                        format: "json",
+                        include: ["participant_avatars"] })
       json.each do |conversation|
         conversation["participants"].each do |user|
           expect(user).to have_key "avatar_url"
@@ -143,9 +147,12 @@ describe ConversationsController, type: :request do
 
       Setting.set("max_conversation_participant_count_for_avatars", "1")
 
-      json = api_call(:get, "/api/v1/conversations.json",
-                      { controller: "conversations", action: "index",
-                        format: "json", include: ["participant_avatars"] })
+      json = api_call(:get,
+                      "/api/v1/conversations.json",
+                      { controller: "conversations",
+                        action: "index",
+                        format: "json",
+                        include: ["participant_avatars"] })
       json.each do |conversation|
         conversation["participants"].each do |user|
           expect(user).to_not have_key "avatar_url"
@@ -157,7 +164,8 @@ describe ConversationsController, type: :request do
       @c1 = conversation(@bob, workflow_state: "read")
       @c2 = conversation(@bob, @billy, workflow_state: "unread", subscribed: false)
 
-      json = api_call(:get, "/api/v1/conversations",
+      json = api_call(:get,
+                      "/api/v1/conversations",
                       { controller: "conversations", action: "index", format: "json" },
                       {},
                       { "Accept" => "application/json+canvas-string-ids" })
@@ -172,7 +180,8 @@ describe ConversationsController, type: :request do
       students = create_users_in_course(@course, 7, return_type: :record)
       students.each { |s| conversation(s) }
       expect(@user.conversations.size).to be 7
-      json = api_call(:get, "/api/v1/conversations.json?scope=default&per_page=3",
+      json = api_call(:get,
+                      "/api/v1/conversations.json?scope=default&per_page=3",
                       { controller: "conversations", action: "index", format: "json", scope: "default", per_page: "3" })
 
       expect(json.size).to be 3
@@ -184,7 +193,8 @@ describe ConversationsController, type: :request do
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
 
       # get the last page
-      json = api_call(:get, "/api/v1/conversations.json?scope=default&page=3&per_page=3",
+      json = api_call(:get,
+                      "/api/v1/conversations.json?scope=default&page=3&per_page=3",
                       { controller: "conversations", action: "index", format: "json", scope: "default", page: "3", per_page: "3" })
       expect(json.size).to be 1
       links = response.headers["Link"].split(",")
@@ -200,7 +210,8 @@ describe ConversationsController, type: :request do
       @c2 = conversation(@bob, @billy, workflow_state: "unread", subscribed: false)
       @c3 = conversation(@jane, workflow_state: "read")
 
-      json = api_call(:get, "/api/v1/conversations.json?scope=unread",
+      json = api_call(:get,
+                      "/api/v1/conversations.json?scope=unread",
                       { controller: "conversations", action: "index", format: "json", scope: "unread" })
       json.each { |c| c.delete("avatar_url") }
       json.each { |c| c.delete("last_authored_message_at") } # This is sometimes not updated. It's a known bug.
@@ -250,7 +261,8 @@ describe ConversationsController, type: :request do
 
       describe "index" do
         it "prefers the context but fall back to the first context tag" do
-          json = api_call(:get, "/api/v1/conversations.json",
+          json = api_call(:get,
+                          "/api/v1/conversations.json",
                           { controller: "conversations", action: "index", format: "json" })
           expect(json.pluck("context_name")).to eql([nil, "the other course", "the course"])
         end
@@ -258,13 +270,16 @@ describe ConversationsController, type: :request do
 
       describe "show" do
         it "prefers the context but fall back to the first context tag" do
-          json = api_call(:get, "/api/v1/conversations/#{@c1.conversation.id}",
+          json = api_call(:get,
+                          "/api/v1/conversations/#{@c1.conversation.id}",
                           { controller: "conversations", action: "show", id: @c1.conversation.id.to_s, format: "json" })
           expect(json["context_name"]).to eql("the course")
-          json = api_call(:get, "/api/v1/conversations/#{@c2.conversation.id}",
+          json = api_call(:get,
+                          "/api/v1/conversations/#{@c2.conversation.id}",
                           { controller: "conversations", action: "show", id: @c2.conversation.id.to_s, format: "json" })
           expect(json["context_name"]).to eql("the other course")
-          json = api_call(:get, "/api/v1/conversations/#{@c3.conversation.id}",
+          json = api_call(:get,
+                          "/api/v1/conversations/#{@c3.conversation.id}",
                           { controller: "conversations", action: "show", id: @c3.conversation.id.to_s, format: "json" })
           expect(json["context_name"]).to be_nil
         end
@@ -280,7 +295,8 @@ describe ConversationsController, type: :request do
 
       def verify_filter(filter)
         @user = @me
-        json = api_call(:get, "/api/v1/conversations.json?filter=#{filter}",
+        json = api_call(:get,
+                        "/api/v1/conversations.json?filter=#{filter}",
                         { controller: "conversations", action: "index", format: "json", filter: filter })
         expect(json.size).to eq @conversations.size
         expect(json.pluck("id").sort).to eq @conversations.map(&:conversation_id).sort
@@ -412,7 +428,8 @@ describe ConversationsController, type: :request do
           @m2 = @c2.conversation.add_message(@bob, "ohai")
         end
 
-        json = api_call(:get, "/api/v1/conversations.json?scope=sent",
+        json = api_call(:get,
+                        "/api/v1/conversations.json?scope=sent",
                         { controller: "conversations", action: "index", format: "json", scope: "sent" })
         expect(json.size).to be 3
         expect(json[0]["id"]).to eql @c3.conversation_id
@@ -450,7 +467,8 @@ describe ConversationsController, type: :request do
         @c2.remove_messages(@message) # delete my original message
         @c3 = conversation(@jane, workflow_state: "archived")
 
-        json = api_call(:get, "/api/v1/conversations.json?scope=sent",
+        json = api_call(:get,
+                        "/api/v1/conversations.json?scope=sent",
                         { controller: "conversations", action: "index", format: "json", scope: "sent" })
         expect(json.size).to be 2
         expect(json.pluck("id").sort).to eql [@c1.conversation_id, @c3.conversation_id]
@@ -466,7 +484,8 @@ describe ConversationsController, type: :request do
       expect(@c1.reload.tags).to be_empty
       expect(@c1.context_tags).to eql [@course.asset_string]
 
-      json = api_call(:get, "/api/v1/conversations.json",
+      json = api_call(:get,
+                      "/api/v1/conversations.json",
                       { controller: "conversations", action: "index", format: "json" })
       expect(json.size).to be 1
       expect(json.first["id"]).to eql @c1.conversation_id
@@ -478,7 +497,8 @@ describe ConversationsController, type: :request do
       @c2 = conversation(@billy, workflow_state: "read", starred: true)
       @c3 = conversation(@jane, workflow_state: "archived", starred: true)
 
-      json = api_call(:get, "/api/v1/conversations.json?scope=starred",
+      json = api_call(:get,
+                      "/api/v1/conversations.json?scope=starred",
                       { controller: "conversations", action: "index", format: "json", scope: "starred" })
       expect(json.size).to eq 3
       expect(json.pluck("id").sort).to eq [@c1, @c2, @c3].map(&:conversation_id).sort
@@ -489,7 +509,8 @@ describe ConversationsController, type: :request do
       @c2 = conversation(@billy, workflow_state: "read")
       @c3 = conversation(@jane, workflow_state: "archived")
 
-      json = api_call(:get, "/api/v1/conversations.json?scope=starred",
+      json = api_call(:get,
+                      "/api/v1/conversations.json?scope=starred",
                       { controller: "conversations", action: "index", format: "json", scope: "starred" })
       expect(json).to be_empty
     end
@@ -499,7 +520,8 @@ describe ConversationsController, type: :request do
       @c2 = conversation(@bob, @billy, workflow_state: "unread")
       @c3 = conversation(@jane, workflow_state: "archived")
 
-      json = api_call(:post, "/api/v1/conversations/mark_all_as_read.json",
+      json = api_call(:post,
+                      "/api/v1/conversations/mark_all_as_read.json",
                       { controller: "conversations", action: "mark_all_as_read", format: "json" })
       expect(json).to eql({})
 
@@ -515,15 +537,19 @@ describe ConversationsController, type: :request do
 
         @message = conversation(@me, sender: @bob).messages.first
 
-        api_call(:post, "/api/v1/conversations/#{@conversation.conversation_id}/add_message",
-                 { controller: "conversations", action: "add_message",
-                   id: @conversation.conversation_id.to_s, format: "json" })
+        api_call(:post,
+                 "/api/v1/conversations/#{@conversation.conversation_id}/add_message",
+                 { controller: "conversations",
+                   action: "add_message",
+                   id: @conversation.conversation_id.to_s,
+                   format: "json" })
 
         assert_status(400)
       end
 
       it "creates a private conversation" do
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id], body: "test" })
         json.each do |c|
@@ -568,7 +594,8 @@ describe ConversationsController, type: :request do
       end
 
       it "adds a context to a private conversation" do
-        api_call(:post, "/api/v1/conversations",
+        api_call(:post,
+                 "/api/v1/conversations",
                  { controller: "conversations", action: "create", format: "json" },
                  { recipients: [@bob.id], body: "test", context_code: "course_#{@course.id}" })
         expect(@bob.conversations.last.conversation.context).to eql(@course)
@@ -579,13 +606,15 @@ describe ConversationsController, type: :request do
         course2 = course_with_teacher(user: @me, active_all: true).course
         course_with_student(course: course2, user: @bob, active_all: true)
 
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id], body: "test", context_code: "course_#{course1.id}" })
         conv1 = Conversation.find(json.first["id"])
         expect(conv1.context).to eql(course1)
 
-        json2 = api_call(:post, "/api/v1/conversations",
+        json2 = api_call(:post,
+                         "/api/v1/conversations",
                          { controller: "conversations", action: "create", format: "json" },
                          { recipients: [@bob.id], body: "test", context_code: "course_#{course2.id}" })
         conv2 = Conversation.find(json2.first["id"])
@@ -597,7 +626,8 @@ describe ConversationsController, type: :request do
         course2 = course_with_teacher(user: @me, active_all: true).course
         course_with_student(course: course2, user: @bob, active_all: true)
 
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id], body: "test", context_code: "course_#{course1.id}" })
         conv1 = Conversation.find(json.first["id"])
@@ -608,24 +638,28 @@ describe ConversationsController, type: :request do
         ConversationParticipant.where(conversation_id: conv1).update_all(private_hash: old_hash)
         Conversation.where(id: conv1).update_all(private_hash: old_hash)
 
-        json2 = api_call(:post, "/api/v1/conversations",
+        json2 = api_call(:post,
+                         "/api/v1/conversations",
                          { controller: "conversations", action: "create", format: "json" },
                          { recipients: [@bob.id], body: "test", context_code: "course_#{course1.id}" })
         expect(json2.first["id"]).to eq conv1.id # should reuse the conversation
 
-        json3 = api_call(:post, "/api/v1/conversations",
+        json3 = api_call(:post,
+                         "/api/v1/conversations",
                          { controller: "conversations", action: "create", format: "json" },
                          { recipients: [@bob.id], body: "test", context_code: "course_#{course2.id}" })
         expect(json3.first["id"]).to_not eq conv1.id # should make a new one
       end
 
       it "creates a new conversation if force_new parameter is provided" do
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id], body: "test", subject: "subject_1", force_new: "true" })
         conv1 = Conversation.find(json.first["id"])
 
-        json2 = api_call(:post, "/api/v1/conversations",
+        json2 = api_call(:post,
+                         "/api/v1/conversations",
                          { controller: "conversations", action: "create", format: "json" },
                          { recipients: [@bob.id], body: "test", subject: "subject_2", force_new: "true" })
         conv2 = Conversation.find(json2.first["id"])
@@ -639,7 +673,8 @@ describe ConversationsController, type: :request do
         course_with_student(course: course2, user: @bob, active_all: true)
 
         @user = @me
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id, @billy.id], body: "test", context_code: "course_#{course1.id}" })
         conv1 = Conversation.find(json.first["id"])
@@ -650,7 +685,8 @@ describe ConversationsController, type: :request do
         ConversationParticipant.where(conversation_id: conv1).update_all(private_hash: old_hash)
         Conversation.where(id: conv1).update_all(private_hash: old_hash)
 
-        json2 = api_call(:post, "/api/v1/conversations",
+        json2 = api_call(:post,
+                         "/api/v1/conversations",
                          { controller: "conversations", action: "create", format: "json" },
                          { recipients: [@bob.id, @billy.id], body: "test", context_code: "course_#{course1.id}" })
         expect(json2.pluck("id")).to include(conv1.id) # should reuse the conversation
@@ -659,7 +695,8 @@ describe ConversationsController, type: :request do
       describe "context is an account for admins validation" do
         it "allows root account context if the user is an admin on that account" do
           account_admin_user active_all: true
-          json = api_call(:post, "/api/v1/conversations",
+          json = api_call(:post,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@bob.id], body: "test", context_code: "account_#{Account.default.id}" })
           conv = Conversation.find(json.first["id"])
@@ -667,7 +704,8 @@ describe ConversationsController, type: :request do
         end
 
         it "does not allow account context if the user is not an admin in that account" do
-          raw_api_call(:post, "/api/v1/conversations",
+          raw_api_call(:post,
+                       "/api/v1/conversations",
                        { controller: "conversations", action: "create", format: "json" },
                        { recipients: [@bob.id], body: "test", context_code: "account_#{Account.default.id}" })
           assert_status(400)
@@ -675,7 +713,8 @@ describe ConversationsController, type: :request do
 
         it "allows an admin to send a message in course context" do
           account_admin_user active_all: true
-          json = api_call(:post, "/api/v1/conversations",
+          json = api_call(:post,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@bob.id], body: "test", context_code: @course.asset_string })
           conv = Conversation.find(json.first["id"])
@@ -686,7 +725,8 @@ describe ConversationsController, type: :request do
         # context
         it "uses account context if messages are coming from an admin through a course" do
           account_admin_user active_all: true
-          json = api_call(:post, "/api/v1/conversations",
+          json = api_call(:post,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@bob.id], body: "test", context_code: @course.asset_string })
           expect(json.first["context_code"]).to eq "account_#{Account.default.id}"
@@ -694,8 +734,11 @@ describe ConversationsController, type: :request do
 
         it "still uses course context if messages are NOT coming from an admin through a course" do
           conversation = conversation(@bob, context_type: "Course", context_id: @course.id)
-          json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
-                          { controller: "conversations", action: "show", id: conversation.conversation_id.to_s,
+          json = api_call(:get,
+                          "/api/v1/conversations/#{conversation.conversation_id}",
+                          { controller: "conversations",
+                            action: "show",
+                            id: conversation.conversation_id.to_s,
                             format: "json", })
           expect(json["context_code"]).to eq @course.asset_string
         end
@@ -707,10 +750,14 @@ describe ConversationsController, type: :request do
           # if they happen to be in another course it shouldn't use those tags - otherwise it will show up in the "sent" for other courses
           @course.account.role_overrides.where(permission: "send_messages_all", role: teacher_role).update_all(enabled: true)
 
-          api_call(:post, "/api/v1/conversations",
+          api_call(:post,
+                   "/api/v1/conversations",
                    { controller: "conversations", action: "create", format: "json" },
-                   { recipients: [@course.asset_string], body: "test", context_code: @course.asset_string,
-                     bulk_message: "1", group_conversation: "1" })
+                   { recipients: [@course.asset_string],
+                     body: "test",
+                     context_code: @course.asset_string,
+                     bulk_message: "1",
+                     group_conversation: "1" })
 
           @user.all_conversations.sent.each do |cp|
             expect(cp.tags).to eq [@course.asset_string]
@@ -718,7 +765,8 @@ describe ConversationsController, type: :request do
         end
 
         it "allows users to send messages to themselves" do
-          json = api_call(:post, "/api/v1/conversations",
+          json = api_call(:post,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@user.id], body: "hello, me", context_code: @course.asset_string })
           expect(response).to be_successful
@@ -727,7 +775,8 @@ describe ConversationsController, type: :request do
 
         it "allows site admin to set any account context" do
           site_admin_user(name: "site admin", active_all: true)
-          json = api_call(:post, "/api/v1/conversations",
+          json = api_call(:post,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@bob.id], body: "test", context_code: "account_#{Account.default.id}" })
           conv = Conversation.find(json.first["id"])
@@ -745,7 +794,8 @@ describe ConversationsController, type: :request do
           it "allows root account context if the user is an admin on a sub-account" do
             course_with_student(account: @sub_account, name: "sub student", active_all: true)
             @user = @admin
-            json = api_call(:post, "/api/v1/conversations",
+            json = api_call(:post,
+                            "/api/v1/conversations",
                             { controller: "conversations", action: "create", format: "json" },
                             { recipients: [@student.id], body: "test", context_code: "account_#{Account.default.id}" })
             conv = Conversation.find(json.first["id"])
@@ -753,7 +803,8 @@ describe ConversationsController, type: :request do
           end
 
           it "does not allow non-root account context" do
-            raw_api_call(:post, "/api/v1/conversations",
+            raw_api_call(:post,
+                         "/api/v1/conversations",
                          { controller: "conversations", action: "create", format: "json" },
                          { recipients: [@bob.id], body: "test", context_code: "account_#{@sub_account.id}" })
             assert_status(400)
@@ -769,7 +820,8 @@ describe ConversationsController, type: :request do
                 course_with_student(account: sub_account, name: "sub student", active_all: true)
                 # @admin is defined above and is from the default shard.
                 account_admin_user(user: @admin, account: sub_account, name: "sub admin", active_all: true)
-                json = api_call(:post, "/api/v1/conversations",
+                json = api_call(:post,
+                                "/api/v1/conversations",
                                 { controller: "conversations", action: "create", format: "json" },
                                 { recipients: [@student.id], body: "test", context_code: "account_#{new_root.id}" })
                 conv = Conversation.find(json.first["id"])
@@ -781,7 +833,8 @@ describe ConversationsController, type: :request do
       end
 
       it "creates a group conversation" do
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id, @billy.id], body: "test", group_conversation: true })
         json.each do |c|
@@ -832,7 +885,8 @@ describe ConversationsController, type: :request do
 
         it "updates the private conversation if it already exists" do
           conversation = @conversation
-          json = api_call(:post, "/api/v1/conversations",
+          json = api_call(:post,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@bob.id], body: "test" })
           conversation.reload
@@ -877,7 +931,8 @@ describe ConversationsController, type: :request do
         end
 
         it "create/updates bulk private conversations synchronously" do
-          json = api_call(:post, "/api/v1/conversations",
+          json = api_call(:post,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@bob.id, @joe.id, @billy.id], body: "test" })
           expect(json.size).to be 3
@@ -895,7 +950,8 @@ describe ConversationsController, type: :request do
         end
 
         it "sets the context on new synchronous bulk private conversations" do
-          json = api_call(:post, "/api/v1/conversations",
+          json = api_call(:post,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@bob.id, @joe.id, @billy.id], body: "test", context_code: "course_#{@course.id}" })
           expect(json.size).to be 3
@@ -909,15 +965,21 @@ describe ConversationsController, type: :request do
         end
 
         it "constraints the length of the subject of a conversation batch" do
-          json = api_call(:post, "/api/v1/conversations",
+          json = api_call(:post,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
-                          { recipients: [@bob.id, @joe.id, @billy.id], subject: "Z" * 300, body: "test",
-                            context_code: "course_#{@course.id}" }, {}, { expected_status: 400 })
+                          { recipients: [@bob.id, @joe.id, @billy.id],
+                            subject: "Z" * 300,
+                            body: "test",
+                            context_code: "course_#{@course.id}" },
+                          {},
+                          { expected_status: 400 })
           expect(json["errors"]["subject"]).to be_present
         end
 
         it "create/updates bulk private conversations asynchronously" do
-          json = api_call(:post, "/api/v1/conversations",
+          json = api_call(:post,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@bob.id, @joe.id, @billy.id], body: "test", mode: "async" })
           expect(json).to eql([])
@@ -935,7 +997,8 @@ describe ConversationsController, type: :request do
         end
 
         it "sets the context on new asynchronous bulk private conversations" do
-          json = api_call(:post, "/api/v1/conversations",
+          json = api_call(:post,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "create", format: "json" },
                           { recipients: [@bob.id, @joe.id, @billy.id], body: "test", mode: "async", context_code: "course_#{@course.id}" })
           expect(json).to eql([])
@@ -956,7 +1019,8 @@ describe ConversationsController, type: :request do
         forwarded_message.attachment_ids = [attachment.id]
         forwarded_message.save!
 
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@billy.id], body: "test", forwarded_message_ids: [forwarded_message.id] })
         json.each { |c| c.delete("last_authored_message_at") } # This is sometimes not updated. It's a known bug.
@@ -1001,9 +1065,22 @@ describe ConversationsController, type: :request do
             ],
             "messages" => [
               {
-                "id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "test", "author_id" => @me.id, "generated" => false, "media_comment" => nil, "attachments" => [], "participating_user_ids" => [@me.id, @billy.id].sort,
+                "id" => conversation.messages.first.id,
+                "created_at" => conversation.messages.first.created_at.to_json[1, 20],
+                "body" => "test",
+                "author_id" => @me.id,
+                "generated" => false,
+                "media_comment" => nil,
+                "attachments" => [],
+                "participating_user_ids" => [@me.id, @billy.id].sort,
                 "forwarded_messages" => [{
-                  "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [],
+                  "id" => forwarded_message.id,
+                  "created_at" => forwarded_message.created_at.to_json[1, 20],
+                  "body" => "test",
+                  "author_id" => @bob.id,
+                  "generated" => false,
+                  "media_comment" => nil,
+                  "forwarded_messages" => [],
                   "attachments" => [{
                     "filename" => attachment.filename,
                     "url" => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
@@ -1027,7 +1104,8 @@ describe ConversationsController, type: :request do
                     "mime_class" => attachment.mime_class,
                     "media_entry_id" => attachment.media_entry_id,
                     "category" => "uncategorized"
-                  }], "participating_user_ids" => [@me.id, @bob.id].sort
+                  }],
+                  "participating_user_ids" => [@me.id, @bob.id].sort
                 }]
               }
             ]
@@ -1046,7 +1124,8 @@ describe ConversationsController, type: :request do
 
             @message = conversation(@me, sender: @bob).messages.first
           end
-          json = api_call(:post, "/api/v1/conversations/#{@conversation.conversation_id}/add_message",
+          json = api_call(:post,
+                          "/api/v1/conversations/#{@conversation.conversation_id}/add_message",
                           { controller: "conversations", action: "add_message", id: @conversation.conversation_id.to_s, format: "json" },
                           { body: "wut wut", included_messages: [@message.id] })
 
@@ -1056,7 +1135,8 @@ describe ConversationsController, type: :request do
       end
 
       it "sets subject" do
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id], body: "test", subject: "lunch" })
         json.each do |c|
@@ -1101,7 +1181,8 @@ describe ConversationsController, type: :request do
       end
 
       it "sets subject on batch conversations" do
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id, @joe.id], body: "test", subject: "dinner" })
         expect(json.size).to be 2
@@ -1111,7 +1192,8 @@ describe ConversationsController, type: :request do
       end
 
       it "constrains subject length" do
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id], body: "test", subject: "a" * 256 },
                         {},
@@ -1121,7 +1203,8 @@ describe ConversationsController, type: :request do
       end
 
       it "respects course's send_messages_all permission" do
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id, @course.asset_string], body: "test", subject: "hey erryone" },
                         {},
@@ -1131,7 +1214,8 @@ describe ConversationsController, type: :request do
       end
 
       it "requires send_messages_all to send to all students" do
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
                         { recipients: [@bob.id, "course_#{@course.id}_students"], body: "test", subject: "hey ho" },
                         {},
@@ -1141,7 +1225,8 @@ describe ConversationsController, type: :request do
       end
 
       it "does not require send_messages_all to send to all teachers" do
-        api_call(:post, "/api/v1/conversations",
+        api_call(:post,
+                 "/api/v1/conversations",
                  { controller: "conversations", action: "create", format: "json" },
                  { recipients: [@bob.id, "course_#{@course.id}_teachers"], body: "test", subject: "halp" },
                  {},
@@ -1149,18 +1234,24 @@ describe ConversationsController, type: :request do
       end
 
       it "sends bulk group messages" do
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
-                        { recipients: [@bob.id, @joe.id], body: "test",
-                          group_conversation: "true", bulk_message: "true" })
+                        { recipients: [@bob.id, @joe.id],
+                          body: "test",
+                          group_conversation: "true",
+                          bulk_message: "true" })
         expect(json.size).to be 2
       end
 
       it "sends bulk group messages with a single recipient" do
-        json = api_call(:post, "/api/v1/conversations",
+        json = api_call(:post,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "create", format: "json" },
-                        { recipients: [@bob.id], body: "test",
-                          group_conversation: "true", bulk_message: "true" })
+                        { recipients: [@bob.id],
+                          body: "test",
+                          group_conversation: "true",
+                          bulk_message: "true" })
         expect(json.size).to be 1
       end
 
@@ -1177,7 +1268,8 @@ describe ConversationsController, type: :request do
           end
 
           @user = @me
-          api_call(:post, "/api/v1/conversations",
+          api_call(:post,
+                   "/api/v1/conversations",
                    { controller: "conversations", action: "create", format: "json" },
                    { recipients: [@other_student.id], body: "test", context_code: "course_#{@other_course.id}" })
           expect(@other_student.conversations.last.conversation.shard).to eq @shard1
@@ -1193,7 +1285,8 @@ describe ConversationsController, type: :request do
           end
 
           @user = @me
-          api_call(:post, "/api/v1/conversations",
+          api_call(:post,
+                   "/api/v1/conversations",
                    { controller: "conversations", action: "create", format: "json" },
                    { recipients: @other_students.map(&:id), body: "test", context_code: "course_#{@other_course.id}" })
           batch = @shard1.activate { ConversationBatch.last }
@@ -1212,10 +1305,15 @@ describe ConversationsController, type: :request do
           randos = @other_students.map { |cs| User.create!(id: cs.local_id) } # create a default shard user with a matching local id
 
           @user = @me
-          api_call(:post, "/api/v1/conversations",
+          api_call(:post,
+                   "/api/v1/conversations",
                    { controller: "conversations", action: "create", format: "json" },
-                   { recipients: @other_students.map(&:id), body: "test", context_code: "course_#{@other_course.id}",
-                     group_conversation: "1", bulk_message: "1", mode: "async" })
+                   { recipients: @other_students.map(&:id),
+                     body: "test",
+                     context_code: "course_#{@other_course.id}",
+                     group_conversation: "1",
+                     bulk_message: "1",
+                     mode: "async" })
           run_jobs
           batch = @shard1.activate { ConversationBatch.last }
           expect(batch).to be_sent
@@ -1236,11 +1334,17 @@ describe ConversationsController, type: :request do
           attachment = attachment_model(context: @me, folder: @me.conversation_attachments_folder)
           @user = @me
 
-          api_call(:post, "/api/v1/conversations",
+          api_call(:post,
+                   "/api/v1/conversations",
                    { controller: "conversations", action: "create", format: "json" },
-                   { recipients: [@other_student.id], body: "yep", context_code: "course_#{@other_course.id}",
+                   { recipients: [@other_student.id],
+                     body: "yep",
+                     context_code: "course_#{@other_course.id}",
                      course: "course_#{@other_course.id}",
-                     group_conversation: "1", bulk_message: "1", mode: "async", attachment_ids: [attachment.id] })
+                     group_conversation: "1",
+                     bulk_message: "1",
+                     mode: "async",
+                     attachment_ids: [attachment.id] })
           run_jobs
           expect(@other_student.conversations.last.conversation.conversation_messages.last.attachment_ids).to eq [attachment.global_id]
         end
@@ -1264,7 +1368,8 @@ describe ConversationsController, type: :request do
 
       conversation.reload
 
-      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
+      json = api_call(:get,
+                      "/api/v1/conversations/#{conversation.conversation_id}",
                       { controller: "conversations", action: "show", id: conversation.conversation_id.to_s, format: "json" })
       json.delete("avatar_url")
       json["participants"].each do |p|
@@ -1352,7 +1457,8 @@ describe ConversationsController, type: :request do
 
       @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
 
-      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
+      json = api_call(:get,
+                      "/api/v1/conversations/#{conversation.conversation_id}",
                       { controller: "conversations", action: "show", id: conversation.conversation_id.to_s, format: "json" })
 
       expect(json["cannot_reply"]).to be true
@@ -1402,7 +1508,8 @@ describe ConversationsController, type: :request do
       @group.add_user(@billy)
       conversation = conversation(@bob, sender: @billy, context_type: "Group", context_id: @group.id)
 
-      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
+      json = api_call(:get,
+                      "/api/v1/conversations/#{conversation.conversation_id}",
                       { controller: "conversations", action: "show", id: conversation.conversation_id.to_s, format: "json" })
 
       expect(json["cannot_reply"]).to_not be_truthy
@@ -1425,7 +1532,8 @@ describe ConversationsController, type: :request do
       conversation.last_message_at = Time.zone.parse(expected_lma)
       conversation.save!
       conversation.add_message("another test", update_for_sender: false)
-      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
+      json = api_call(:get,
+                      "/api/v1/conversations/#{conversation.conversation_id}",
                       { controller: "conversations", action: "show", id: conversation.conversation_id.to_s, format: "json" })
       expect(json["last_message_at"]).to eql expected_lma
     end
@@ -1434,7 +1542,8 @@ describe ConversationsController, type: :request do
       specs_require_sharding
 
       def check_conversation
-        json = api_call(:get, "/api/v1/conversations/#{@conversation.conversation_id}",
+        json = api_call(:get,
+                        "/api/v1/conversations/#{@conversation.conversation_id}",
                         { controller: "conversations", action: "show", id: @conversation.conversation_id.to_s, format: "json" })
         json.delete("avatar_url")
         json["participants"].each do |p|
@@ -1487,7 +1596,8 @@ describe ConversationsController, type: :request do
     it "auto-mark-as-reads if unread" do
       conversation = conversation(@bob, workflow_state: "unread")
 
-      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}?scope=unread",
+      json = api_call(:get,
+                      "/api/v1/conversations/#{conversation.conversation_id}?scope=unread",
                       { controller: "conversations", action: "show", id: conversation.conversation_id.to_s, scope: "unread", format: "json" })
       expect(json["visible"]).to be_falsey
       expect(conversation.reload).to be_read
@@ -1496,7 +1606,8 @@ describe ConversationsController, type: :request do
     it "does not auto-mark-as-read if auto_mark_as_read = false" do
       conversation = conversation(@bob, workflow_state: "unread")
 
-      json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}?scope=unread&auto_mark_as_read=0",
+      json = api_call(:get,
+                      "/api/v1/conversations/#{conversation.conversation_id}?scope=unread&auto_mark_as_read=0",
                       { controller: "conversations", action: "show", id: conversation.conversation_id.to_s, scope: "unread", auto_mark_as_read: "0", format: "json" })
       expect(json["visible"]).to be_truthy
       expect(conversation.reload).to be_unread
@@ -1506,11 +1617,13 @@ describe ConversationsController, type: :request do
       conversation1 = conversation(@bob)
       conversation2 = conversation(@billy, starred: true)
 
-      json = api_call(:get, "/api/v1/conversations/#{conversation1.conversation_id}",
+      json = api_call(:get,
+                      "/api/v1/conversations/#{conversation1.conversation_id}",
                       { controller: "conversations", action: "show", id: conversation1.conversation_id.to_s, format: "json" })
       expect(json["starred"]).to be_falsey
 
-      json = api_call(:get, "/api/v1/conversations/#{conversation2.conversation_id}",
+      json = api_call(:get,
+                      "/api/v1/conversations/#{conversation2.conversation_id}",
                       { controller: "conversations", action: "show", id: conversation2.conversation_id.to_s, format: "json" })
       expect(json["starred"]).to be_truthy
     end
@@ -1523,7 +1636,8 @@ describe ConversationsController, type: :request do
       submission1.add_comment(comment: "wut up teacher", author: @bob)
       submission2.add_comment(comment: "my name is bob", author: @bob)
 
-      json = api_call(:get, "/api/v1/conversations/#{@conversation.conversation_id}",
+      json = api_call(:get,
+                      "/api/v1/conversations/#{@conversation.conversation_id}",
                       { controller: "conversations", action: "show", id: @conversation.conversation_id.to_s, format: "json" })
 
       expect(json["messages"].size).to eq 1
@@ -1533,7 +1647,8 @@ describe ConversationsController, type: :request do
     it "adds a message to the conversation" do
       conversation = conversation(@bob)
 
-      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+      json = api_call(:post,
+                      "/api/v1/conversations/#{conversation.conversation_id}/add_message",
                       { controller: "conversations", action: "add_message", id: conversation.conversation_id.to_s, format: "json" },
                       { body: "another" })
       conversation.reload
@@ -1576,7 +1691,8 @@ describe ConversationsController, type: :request do
     it "only adds participants for the new message to the given recipients" do
       conversation = conversation(@bob, private: false)
 
-      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+      json = api_call(:post,
+                      "/api/v1/conversations/#{conversation.conversation_id}/add_message",
                       { controller: "conversations", action: "add_message", id: conversation.conversation_id.to_s, format: "json" },
                       { body: "another", recipients: [@billy.id] })
       conversation.reload
@@ -1623,9 +1739,12 @@ describe ConversationsController, type: :request do
 
       Setting.set("max_group_conversation_size", 1)
 
-      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+      json = api_call(:post,
+                      "/api/v1/conversations/#{conversation.conversation_id}/add_message",
                       { controller: "conversations", action: "add_message", id: conversation.conversation_id.to_s, format: "json" },
-                      { body: "another", recipients: [@billy.id] }, {}, { expected_status: 400 })
+                      { body: "another", recipients: [@billy.id] },
+                      {},
+                      { expected_status: 400 })
       expect(json.first["message"]).to include("Too many participants for group conversation")
     end
 
@@ -1633,7 +1752,8 @@ describe ConversationsController, type: :request do
       conversation = conversation(@bob, private: false)
       message = conversation.add_message("another one")
 
-      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+      json = api_call(:post,
+                      "/api/v1/conversations/#{conversation.conversation_id}/add_message",
                       { controller: "conversations", action: "add_message", id: conversation.conversation_id.to_s, format: "json" },
                       { body: "partially hydrogenated context oils", recipients: [@billy.id], included_messages: [message.id] })
       conversation.reload
@@ -1681,7 +1801,8 @@ describe ConversationsController, type: :request do
       conversation = conversation(@bob, @billy, private: false)
       message = conversation.add_message("another one")
 
-      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+      json = api_call(:post,
+                      "/api/v1/conversations/#{conversation.conversation_id}/add_message",
                       { controller: "conversations", action: "add_message", id: conversation.conversation_id.to_s, format: "json" },
                       { body: "partially hydrogenated context oils", recipients: [@billy.id], included_messages: [message.id] })
       conversation.reload
@@ -1729,7 +1850,8 @@ describe ConversationsController, type: :request do
       conversation = conversation(@bob, private: false)
       message = conversation.add_message("you're swell, @bob")
 
-      api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+      api_call(:post,
+               "/api/v1/conversations/#{conversation.conversation_id}/add_message",
                { controller: "conversations", action: "add_message", id: conversation.conversation_id.to_s, format: "json" },
                { body: "man, @bob sure does suck", recipients: [@billy.id] })
       # at this point, @billy can see ^^^ that message, but not the first one. @bob can't see ^^^ that one. everyone is a conversation participant now
@@ -1737,7 +1859,8 @@ describe ConversationsController, type: :request do
       bob_sucks = conversation.conversation.conversation_messages.first
 
       # implicitly send to all the conversation participants, including the original message. this will let @billy see it
-      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+      json = api_call(:post,
+                      "/api/v1/conversations/#{conversation.conversation_id}/add_message",
                       { controller: "conversations", action: "add_message", id: conversation.conversation_id.to_s, format: "json" },
                       { body: "partially hydrogenated context oils", included_messages: [message.id] })
       conversation.reload
@@ -1792,7 +1915,8 @@ describe ConversationsController, type: :request do
       real_conversation.save!
 
       @user = @other
-      api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
+      api_call(:post,
+               "/api/v1/conversations/#{real_conversation.id}/add_message",
                { controller: "conversations", action: "add_message", id: real_conversation.id.to_s, format: "json" },
                { body: "ok", recipients: [@admin.id.to_s] })
       real_conversation.reload
@@ -1808,7 +1932,8 @@ describe ConversationsController, type: :request do
 
       @joe.enrollments.each(&:destroy)
       @user = @billy
-      api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
+      api_call(:post,
+               "/api/v1/conversations/#{real_conversation.id}/add_message",
                { controller: "conversations", action: "add_message", id: real_conversation.id.to_s, format: "json" },
                { body: "ok", recipients: [@bob, @billy, @jane, @joe].map(&:id).map(&:to_s) })
       real_conversation.reload
@@ -1820,7 +1945,8 @@ describe ConversationsController, type: :request do
       conversation = conversation(@bob)
 
       expect(MediaObject.count).to be 0
-      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+      json = api_call(:post,
+                      "/api/v1/conversations/#{conversation.conversation_id}/add_message",
                       { controller: "conversations", action: "add_message", id: conversation.conversation_id.to_s, format: "json" },
                       { body: "another", media_comment_id: "asdf", media_comment_type: "audio" })
       conversation.reload
@@ -1834,7 +1960,8 @@ describe ConversationsController, type: :request do
     it "adds recipients to the conversation" do
       conversation = conversation(@bob, @billy)
 
-      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_recipients",
+      json = api_call(:post,
+                      "/api/v1/conversations/#{conversation.conversation_id}/add_recipients",
                       { controller: "conversations", action: "add_recipients", id: conversation.conversation_id.to_s, format: "json" },
                       { recipients: [@jane.id.to_s, "course_#{@course.id}"] })
       conversation.reload
@@ -1883,9 +2010,12 @@ describe ConversationsController, type: :request do
 
       Setting.set("max_group_conversation_size", 2)
 
-      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_recipients",
+      json = api_call(:post,
+                      "/api/v1/conversations/#{conversation.conversation_id}/add_recipients",
                       { controller: "conversations", action: "add_recipients", id: conversation.conversation_id.to_s, format: "json" },
-                      { recipients: [@jane.id.to_s, "course_#{@course.id}"] }, {}, { expected_status: 400 })
+                      { recipients: [@jane.id.to_s, "course_#{@course.id}"] },
+                      {},
+                      { expected_status: 400 })
       expect(json.first["message"]).to include("too many participants")
     end
 
@@ -1897,7 +2027,8 @@ describe ConversationsController, type: :request do
           @conversation.participants
         end
 
-        json = api_call(:post, "/api/v1/conversations/#{@conversation.conversation_id}/add_recipients",
+        json = api_call(:post,
+                        "/api/v1/conversations/#{@conversation.conversation_id}/add_recipients",
                         { controller: "conversations", action: "add_recipients", id: @conversation.conversation_id.to_s, format: "json" },
                         { recipients: [@jane.id.to_s, "course_#{@course.id}"] })
         expect(json["audience"]).to match_array [@billy.id, @bob.id, @jane.id, @joe.id, @tommy.id]
@@ -1907,7 +2038,8 @@ describe ConversationsController, type: :request do
     it "updates the conversation" do
       conversation = conversation(@bob, @billy)
 
-      json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
+      json = api_call(:put,
+                      "/api/v1/conversations/#{conversation.conversation_id}",
                       { controller: "conversations", action: "update", id: conversation.conversation_id.to_s, format: "json" },
                       { conversation: { subscribed: false, workflow_state: "archived" } })
       conversation.reload
@@ -1947,7 +2079,8 @@ describe ConversationsController, type: :request do
     it "is able to star the conversation via update" do
       conversation = conversation(@bob, @billy)
 
-      json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
+      json = api_call(:put,
+                      "/api/v1/conversations/#{conversation.conversation_id}",
                       { controller: "conversations", action: "update", id: conversation.conversation_id.to_s, format: "json" },
                       { conversation: { starred: true } })
       expect(json["starred"]).to be_truthy
@@ -1956,7 +2089,8 @@ describe ConversationsController, type: :request do
     it "is able to unstar the conversation via update" do
       conversation = conversation(@bob, @billy, starred: true)
 
-      json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
+      json = api_call(:put,
+                      "/api/v1/conversations/#{conversation.conversation_id}",
                       { controller: "conversations", action: "update", id: conversation.conversation_id.to_s, format: "json" },
                       { conversation: { starred: false } })
       expect(json["starred"]).to be_falsey
@@ -1965,7 +2099,8 @@ describe ConversationsController, type: :request do
     it "leaves starryness alone when left out of update" do
       conversation = conversation(@bob, @billy, starred: true)
 
-      json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
+      json = api_call(:put,
+                      "/api/v1/conversations/#{conversation.conversation_id}",
                       { controller: "conversations", action: "update", id: conversation.conversation_id.to_s, format: "json" },
                       { conversation: { workflow_state: "read" } })
       expect(json["starred"]).to be_truthy
@@ -1975,7 +2110,8 @@ describe ConversationsController, type: :request do
       conversation = conversation(@bob)
       message = conversation.add_message("another one")
 
-      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/remove_messages",
+      json = api_call(:post,
+                      "/api/v1/conversations/#{conversation.conversation_id}/remove_messages",
                       { controller: "conversations", action: "remove_messages", id: conversation.conversation_id.to_s, format: "json" },
                       { remove: [message.id] })
       conversation.reload
@@ -2015,7 +2151,8 @@ describe ConversationsController, type: :request do
     it "deletes the conversation" do
       conversation = conversation(@bob)
 
-      json = api_call(:delete, "/api/v1/conversations/#{conversation.conversation_id}",
+      json = api_call(:delete,
+                      "/api/v1/conversations/#{conversation.conversation_id}",
                       { controller: "conversations", action: "destroy", id: conversation.conversation_id.to_s, format: "json" })
       json.delete("avatar_url")
       json["participants"].each do |p|
@@ -2056,7 +2193,8 @@ describe ConversationsController, type: :request do
     end
 
     it "supports the deprecated route" do
-      json = api_call(:get, "/api/v1/conversations/find_recipients.json?search=o",
+      json = api_call(:get,
+                      "/api/v1/conversations/find_recipients.json?search=o",
                       { controller: "search", action: "recipients", format: "json", search: "o" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
@@ -2078,7 +2216,8 @@ describe ConversationsController, type: :request do
       ConversationBatch.generate(Conversation.build_message(@me, "ohai"), [@bob, @billy], :sync)
       ConversationBatch.generate(Conversation.build_message(@bob, "sup"), [@me, @billy], :async)
 
-      json = api_call(:get, "/api/v1/conversations/batches",
+      json = api_call(:get,
+                      "/api/v1/conversations/batches",
                       controller: "conversations",
                       action: "batches",
                       format: "json")
@@ -2091,7 +2230,8 @@ describe ConversationsController, type: :request do
   describe "visibility inference" do
     it "does not break with empty string as filter" do
       # added for 1.9.3
-      json = api_call(:post, "/api/v1/conversations",
+      json = api_call(:post,
+                      "/api/v1/conversations",
                       { controller: "conversations", action: "create", format: "json" },
                       { recipients: [@bob.id], body: "Test Message", filter: "" })
       expect(json.first["visible"]).to be_falsey
@@ -2104,7 +2244,8 @@ describe ConversationsController, type: :request do
     let_once(:conversation_ids) { [c1, c2].map { |c| c.conversation.id } }
 
     it "marks conversations as read" do
-      json = api_call(:put, "/api/v1/conversations",
+      json = api_call(:put,
+                      "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
                       { event: "mark_as_read", conversation_ids: conversation_ids })
       run_jobs
@@ -2116,7 +2257,8 @@ describe ConversationsController, type: :request do
     end
 
     it "marks conversations as unread" do
-      json = api_call(:put, "/api/v1/conversations",
+      json = api_call(:put,
+                      "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
                       { event: "mark_as_unread", conversation_ids: conversation_ids })
       run_jobs
@@ -2130,7 +2272,8 @@ describe ConversationsController, type: :request do
     it "marks conversations as starred" do
       c1.update_attribute :starred, true
 
-      json = api_call(:put, "/api/v1/conversations",
+      json = api_call(:put,
+                      "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
                       { event: "star", conversation_ids: conversation_ids })
       run_jobs
@@ -2144,7 +2287,8 @@ describe ConversationsController, type: :request do
     it "marks conversations as unstarred" do
       c1.update_attribute :starred, true
 
-      json = api_call(:put, "/api/v1/conversations",
+      json = api_call(:put,
+                      "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
                       { event: "unstar", conversation_ids: conversation_ids })
       run_jobs
@@ -2165,7 +2309,8 @@ describe ConversationsController, type: :request do
 
       conversation_ids = conversations.map { |c| c.conversation.id }
       allow(InstStatsd::Statsd).to receive(:count)
-      json = api_call(:put, "/api/v1/conversations",
+      json = api_call(:put,
+                      "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
                       { event: "archive", conversation_ids: conversation_ids })
       run_jobs
@@ -2186,7 +2331,8 @@ describe ConversationsController, type: :request do
 
       conversation_ids = conversations.map { |c| c.conversation.id }
       allow(InstStatsd::Statsd).to receive(:increment)
-      json = api_call(:put, "/api/v1/conversations",
+      json = api_call(:put,
+                      "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
                       { event: "mark_as_read", conversation_ids: conversation_ids })
       run_jobs
@@ -2202,7 +2348,8 @@ describe ConversationsController, type: :request do
 
       conversation_ids = conversations.map { |c| c.conversation.id }
       allow(InstStatsd::Statsd).to receive(:increment)
-      json = api_call(:put, "/api/v1/conversations",
+      json = api_call(:put,
+                      "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
                       { event: "mark_as_unread", conversation_ids: conversation_ids })
       run_jobs
@@ -2212,7 +2359,8 @@ describe ConversationsController, type: :request do
     end
 
     it "destroys conversations" do
-      json = api_call(:put, "/api/v1/conversations",
+      json = api_call(:put,
+                      "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
                       { event: "destroy", conversation_ids: conversation_ids })
       run_jobs
@@ -2225,45 +2373,54 @@ describe ConversationsController, type: :request do
 
     describe "immediate failures" do
       it "fails if event is invalid" do
-        json = api_call(:put, "/api/v1/conversations",
+        json = api_call(:put,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "batch_update", format: "json" },
                         { event: "NONSENSE", conversation_ids: conversation_ids },
-                        {}, { expected_status: 400 })
+                        {},
+                        { expected_status: 400 })
 
         expect(json["message"]).to include "invalid event"
       end
 
       it "fails if event parameter is not specified" do
-        json = api_call(:put, "/api/v1/conversations",
+        json = api_call(:put,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "batch_update", format: "json" },
                         { conversation_ids: conversation_ids },
-                        {}, { expected_status: 400 })
+                        {},
+                        { expected_status: 400 })
 
         expect(json["message"]).to include "event not specified"
       end
 
       it "fails if conversation_ids is not specified" do
-        json = api_call(:put, "/api/v1/conversations",
+        json = api_call(:put,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "batch_update", format: "json" },
                         { event: "mark_as_read" },
-                        {}, { expected_status: 400 })
+                        {},
+                        { expected_status: 400 })
 
         expect(json["message"]).to include "conversation_ids not specified"
       end
 
       it "fails if batch size limit is exceeded" do
         conversation_ids = (1..501).to_a
-        json = api_call(:put, "/api/v1/conversations",
+        json = api_call(:put,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "batch_update", format: "json" },
                         { event: "mark_as_read", conversation_ids: conversation_ids },
-                        {}, { expected_status: 400 })
+                        {},
+                        { expected_status: 400 })
         expect(json["message"]).to include "exceeded"
       end
     end
 
     describe "progress" do
       it "creates and update a progress object" do
-        json = api_call(:put, "/api/v1/conversations",
+        json = api_call(:put,
+                        "/api/v1/conversations",
                         { controller: "conversations", action: "batch_update", format: "json" },
                         { event: "mark_as_read", conversation_ids: conversation_ids })
         progress = Progress.find(json["id"])
@@ -2280,7 +2437,8 @@ describe ConversationsController, type: :request do
           c3 = conversation(@bob, @jane, sender: @bob, workflow_state: "unread")
           conversation_ids = [c1, c2, c3].map { |c| c.conversation.id }
 
-          json = api_call(:put, "/api/v1/conversations",
+          json = api_call(:put,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "batch_update", format: "json" },
                           { event: "mark_as_read", conversation_ids: conversation_ids })
           run_jobs
@@ -2298,7 +2456,8 @@ describe ConversationsController, type: :request do
           c1 = conversation(@bob, @jane, sender: @bob, workflow_state: "unread")
           conversation_ids = [c1.conversation.id]
 
-          json = api_call(:put, "/api/v1/conversations",
+          json = api_call(:put,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "batch_update", format: "json" },
                           { event: "mark_as_read", conversation_ids: conversation_ids })
 
@@ -2316,7 +2475,8 @@ describe ConversationsController, type: :request do
 
           c1 = conversation(@me, @jane, workflow_state: "unread")
           conversation_ids = [c1.conversation.id]
-          json = api_call(:put, "/api/v1/conversations",
+          json = api_call(:put,
+                          "/api/v1/conversations",
                           { controller: "conversations", action: "batch_update", format: "json" },
                           { event: "mark_as_read", conversation_ids: conversation_ids })
           run_jobs
@@ -2335,20 +2495,23 @@ describe ConversationsController, type: :request do
       expect(@joe.conversations.size).to be 1
 
       account_admin_user_with_role_changes(account: Account.site_admin, role_changes: { manage_students: false })
-      raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+      raw_api_call(:delete,
+                   "/api/v1/conversations/#{conv.id}/delete_for_all",
                    { controller: "conversations", action: "delete_for_all", format: "json", id: conv.id.to_s },
                    { domain_root_account: Account.site_admin })
       assert_status(401)
 
       account_admin_user
       Account.default.pseudonyms.create!(unique_id: "admin", user: @user)
-      raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+      raw_api_call(:delete,
+                   "/api/v1/conversations/#{conv.id}/delete_for_all",
                    { controller: "conversations", action: "delete_for_all", format: "json", id: conv.id.to_s },
                    {})
       assert_status(401)
 
       @user = @me
-      raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+      raw_api_call(:delete,
+                   "/api/v1/conversations/#{conv.id}/delete_for_all",
                    { controller: "conversations", action: "delete_for_all", format: "json", id: conv.id.to_s },
                    {})
       assert_status(401)
@@ -2359,7 +2522,8 @@ describe ConversationsController, type: :request do
 
     it "fails if conversation doesn't exist" do
       site_admin_user
-      raw_api_call(:delete, "/api/v1/conversations/0/delete_for_all",
+      raw_api_call(:delete,
+                   "/api/v1/conversations/0/delete_for_all",
                    { controller: "conversations", action: "delete_for_all", format: "json", id: "0" },
                    {})
       assert_status(404)
@@ -2375,7 +2539,8 @@ describe ConversationsController, type: :request do
       end
 
       site_admin_user
-      json = api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+      json = api_call(:delete,
+                      "/api/v1/conversations/#{conv.id}/delete_for_all",
                       { controller: "conversations", action: "delete_for_all", format: "json", id: conv.id.to_s },
                       {})
 
@@ -2408,7 +2573,8 @@ describe ConversationsController, type: :request do
 
         site_admin_user
         @shard2.activate do
-          json = api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+          json = api_call(:delete,
+                          "/api/v1/conversations/#{conv.id}/delete_for_all",
                           { controller: "conversations", action: "delete_for_all", format: "json", id: conv.id.to_s },
                           {})
 
@@ -2431,7 +2597,8 @@ describe ConversationsController, type: :request do
   describe "unread_count" do
     it "returns the number of unread conversations for the current user" do
       conversation(student_in_course, workflow_state: "unread")
-      json = api_call(:get, "/api/v1/conversations/unread_count.json",
+      json = api_call(:get,
+                      "/api/v1/conversations/unread_count.json",
                       { controller: "conversations", action: "unread_count", format: "json" })
       expect(json).to eql({ "unread_count" => "1" })
     end
@@ -2450,8 +2617,11 @@ describe ConversationsController, type: :request do
     end
 
     it "returns a list of deleted conversation messages" do
-      json = api_call(:get, "/api/v1/conversations/deleted",
-                      { controller: "conversations", action: "deleted_index", format: "json",
+      json = api_call(:get,
+                      "/api/v1/conversations/deleted",
+                      { controller: "conversations",
+                        action: "deleted_index",
+                        format: "json",
                         user_id: @bob.id })
 
       expect(json.count).to be 1
@@ -2472,8 +2642,11 @@ describe ConversationsController, type: :request do
     end
 
     it "returns a paginated response with proper link headers" do
-      api_call(:get, "/api/v1/conversations/deleted",
-               { controller: "conversations", action: "deleted_index", format: "json",
+      api_call(:get,
+               "/api/v1/conversations/deleted",
+               { controller: "conversations",
+                 action: "deleted_index",
+                 format: "json",
                  user_id: @bob.id })
 
       links = response.headers["Link"].split(",")
@@ -2484,40 +2657,63 @@ describe ConversationsController, type: :request do
     end
 
     it "can respond with multiple users data" do
-      json = api_call(:get, "/api/v1/conversations/deleted",
-                      { controller: "conversations", action: "deleted_index", format: "json",
+      json = api_call(:get,
+                      "/api/v1/conversations/deleted",
+                      { controller: "conversations",
+                        action: "deleted_index",
+                        format: "json",
                         user_id: [@bob.id, @billy.id] })
 
       expect(json.count).to be 2
     end
 
     it "will only get the provided conversation id" do
-      json = api_call(:get, "/api/v1/conversations/deleted",
-                      { controller: "conversations", action: "deleted_index", format: "json",
-                        user_id: [@bob.id, @billy.id], conversation_id: @c1.conversation_id })
+      json = api_call(:get,
+                      "/api/v1/conversations/deleted",
+                      { controller: "conversations",
+                        action: "deleted_index",
+                        format: "json",
+                        user_id: [@bob.id, @billy.id],
+                        conversation_id: @c1.conversation_id })
 
       expect(json.count).to be 1
     end
 
     it "can filter based on the deletion date" do
-      json = api_call(:get, "/api/v1/conversations/deleted",
-                      { controller: "conversations", action: "deleted_index", format: "json",
-                        user_id: @bob.id, deleted_before: 1.hour.from_now })
+      json = api_call(:get,
+                      "/api/v1/conversations/deleted",
+                      { controller: "conversations",
+                        action: "deleted_index",
+                        format: "json",
+                        user_id: @bob.id,
+                        deleted_before: 1.hour.from_now })
       expect(json.count).to be 1
 
-      json = api_call(:get, "/api/v1/conversations/deleted",
-                      { controller: "conversations", action: "deleted_index", format: "json",
-                        user_id: @bob.id, deleted_before: 1.hour.ago })
+      json = api_call(:get,
+                      "/api/v1/conversations/deleted",
+                      { controller: "conversations",
+                        action: "deleted_index",
+                        format: "json",
+                        user_id: @bob.id,
+                        deleted_before: 1.hour.ago })
       expect(json.count).to be 0
 
-      json = api_call(:get, "/api/v1/conversations/deleted",
-                      { controller: "conversations", action: "deleted_index", format: "json",
-                        user_id: @bob.id, deleted_after: 1.hour.ago })
+      json = api_call(:get,
+                      "/api/v1/conversations/deleted",
+                      { controller: "conversations",
+                        action: "deleted_index",
+                        format: "json",
+                        user_id: @bob.id,
+                        deleted_after: 1.hour.ago })
       expect(json.count).to be 1
 
-      json = api_call(:get, "/api/v1/conversations/deleted",
-                      { controller: "conversations", action: "deleted_index", format: "json",
-                        user_id: @bob.id, deleted_after: 1.hour.from_now })
+      json = api_call(:get,
+                      "/api/v1/conversations/deleted",
+                      { controller: "conversations",
+                        action: "deleted_index",
+                        format: "json",
+                        user_id: @bob.id,
+                        deleted_after: 1.hour.from_now })
       expect(json.count).to be 0
     end
   end
@@ -2540,9 +2736,13 @@ describe ConversationsController, type: :request do
     it "returns an error when the conversation_message_id is not provided" do
       @c1.all_messages.first
 
-      raw_api_call(:put, "/api/v1/conversations/restore",
-                   { controller: "conversations", action: "restore_message", format: "json",
-                     user_id: @bob.id, conversation_id: @c1.conversation_id })
+      raw_api_call(:put,
+                   "/api/v1/conversations/restore",
+                   { controller: "conversations",
+                     action: "restore_message",
+                     format: "json",
+                     user_id: @bob.id,
+                     conversation_id: @c1.conversation_id })
 
       expect(response).to have_http_status :bad_request
     end
@@ -2550,9 +2750,13 @@ describe ConversationsController, type: :request do
     it "returns an error when the user_id is not provided" do
       message = @c1.all_messages.first
 
-      raw_api_call(:put, "/api/v1/conversations/restore",
-                   { controller: "conversations", action: "restore_message", format: "json",
-                     conversation_id: @c1.conversation_id, conversation_message_id: message.id })
+      raw_api_call(:put,
+                   "/api/v1/conversations/restore",
+                   { controller: "conversations",
+                     action: "restore_message",
+                     format: "json",
+                     conversation_id: @c1.conversation_id,
+                     conversation_message_id: message.id })
 
       expect(response).to have_http_status :bad_request
     end
@@ -2560,9 +2764,13 @@ describe ConversationsController, type: :request do
     it "returns an error when the conversation_id is not provided" do
       message = @c1.all_messages.first
 
-      raw_api_call(:put, "/api/v1/conversations/restore",
-                   { controller: "conversations", action: "restore_message", format: "json",
-                     user_id: @bob.id, conversation_message_id: message.id })
+      raw_api_call(:put,
+                   "/api/v1/conversations/restore",
+                   { controller: "conversations",
+                     action: "restore_message",
+                     format: "json",
+                     user_id: @bob.id,
+                     conversation_message_id: message.id })
 
       expect(response).to have_http_status :bad_request
     end
@@ -2570,9 +2778,14 @@ describe ConversationsController, type: :request do
     it "restores the message" do
       message = @c1.all_messages.first
 
-      api_call(:put, "/api/v1/conversations/restore",
-               { controller: "conversations", action: "restore_message", format: "json",
-                 user_id: @bob.id, message_id: message.id, conversation_id: @c1.conversation_id })
+      api_call(:put,
+               "/api/v1/conversations/restore",
+               { controller: "conversations",
+                 action: "restore_message",
+                 format: "json",
+                 user_id: @bob.id,
+                 message_id: message.id,
+                 conversation_id: @c1.conversation_id })
 
       expect(response).to have_http_status :ok
 
@@ -2587,9 +2800,14 @@ describe ConversationsController, type: :request do
 
       message = @c1.all_messages.first
 
-      api_call(:put, "/api/v1/conversations/restore",
-               { controller: "conversations", action: "restore_message", format: "json",
-                 user_id: @bob.id, message_id: message.id, conversation_id: @c1.conversation_id })
+      api_call(:put,
+               "/api/v1/conversations/restore",
+               { controller: "conversations",
+                 action: "restore_message",
+                 format: "json",
+                 user_id: @bob.id,
+                 message_id: message.id,
+                 conversation_id: @c1.conversation_id })
 
       expect(response).to have_http_status :ok
 

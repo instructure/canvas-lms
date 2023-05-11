@@ -73,7 +73,9 @@ describe "Api::V1::Assignment" do
 
     it "includes section-based counts when grading flag is passed" do
       allow(assignment.context).to receive(:grants_right?).and_return(true)
-      json = api.assignment_json(assignment, user, session,
+      json = api.assignment_json(assignment,
+                                 user,
+                                 session,
                                  { override_dates: false, needs_grading_count_by_section: true })
       expect(json["needs_grading_count"]).to eq(0)
       expect(json["needs_grading_count_by_section"]).to eq []
@@ -81,7 +83,9 @@ describe "Api::V1::Assignment" do
 
     it "includes an associated planner override when flag is passed" do
       po = planner_override_model(user: user, plannable: assignment)
-      json = api.assignment_json(assignment, user, session,
+      json = api.assignment_json(assignment,
+                                 user,
+                                 session,
                                  { include_planner_override: true })
       expect(json).to have_key("planner_override")
       expect(json["planner_override"]["id"]).to eq po.id
@@ -303,18 +307,24 @@ describe "Api::V1::Assignment" do
 
     it "excludes descriptions when exclude_response_fields flag is passed and includes 'description'" do
       assignment.description = "Foobers"
-      json = api.assignment_json(assignment, user, session,
+      json = api.assignment_json(assignment,
+                                 user,
+                                 session,
                                  { override_dates: false })
       expect(json).to be_a(Hash)
       expect(json).to have_key "description"
       expect(json["description"]).to eq(api.api_user_content("Foobers", @course, user, {}))
 
-      json = api.assignment_json(assignment, user, session,
+      json = api.assignment_json(assignment,
+                                 user,
+                                 session,
                                  { override_dates: false, exclude_response_fields: ["description"] })
       expect(json).to be_a(Hash)
       expect(json).not_to have_key "description"
 
-      json = api.assignment_json(assignment, user, session,
+      json = api.assignment_json(assignment,
+                                 user,
+                                 session,
                                  { override_dates: false })
       expect(json).to be_a(Hash)
       expect(json).to have_key "description"

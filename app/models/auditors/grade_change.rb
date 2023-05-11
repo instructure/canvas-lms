@@ -405,21 +405,30 @@ class Auditors::GradeChange
     course.shard.activate do
       if arguments[:assignment] && arguments[:grader] && arguments[:student]
         Auditors::GradeChange::Stream.for_course_assignment_grader_student(course,
-                                                                           arguments[:assignment], arguments[:grader], arguments[:student], options)
+                                                                           arguments[:assignment],
+                                                                           arguments[:grader],
+                                                                           arguments[:student],
+                                                                           options)
 
       elsif arguments[:assignment] && arguments[:grader]
-        Auditors::GradeChange::Stream.for_course_assignment_grader(course, arguments[:assignment],
-                                                                   arguments[:grader], options)
+        Auditors::GradeChange::Stream.for_course_assignment_grader(course,
+                                                                   arguments[:assignment],
+                                                                   arguments[:grader],
+                                                                   options)
 
       elsif arguments[:assignment] && arguments[:student]
-        Auditors::GradeChange::Stream.for_course_assignment_student(course, arguments[:assignment],
-                                                                    arguments[:student], options)
+        Auditors::GradeChange::Stream.for_course_assignment_student(course,
+                                                                    arguments[:assignment],
+                                                                    arguments[:student],
+                                                                    options)
 
       elsif arguments[:assignment]
         Auditors::GradeChange::Stream.for_course_assignment(course, arguments[:assignment], options)
 
       elsif arguments[:grader] && arguments[:student]
-        Auditors::GradeChange::Stream.for_course_grader_student(course, arguments[:grader], arguments[:student],
+        Auditors::GradeChange::Stream.for_course_grader_student(course,
+                                                                arguments[:grader],
+                                                                arguments[:student],
                                                                 options)
 
       elsif arguments[:grader]

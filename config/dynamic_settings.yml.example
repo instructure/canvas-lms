@@ -76,7 +76,7 @@ development:
         app_key: 'xyzzy'
     # another service
     inst-fs:
-      app-host: "http://api.instfs.docker"
+      app-host: "http://api.inst-fs.docker"
       # this is just "super-sekret-value", base64-encoded:
       secret: "c3VwZXItc2VrcmV0LXZhbHVlCg=="
     pandata:

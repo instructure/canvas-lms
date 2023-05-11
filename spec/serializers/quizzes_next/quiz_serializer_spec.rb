@@ -80,10 +80,18 @@ describe QuizzesNext::QuizSerializer do
   end
 
   %i[
-    id title description due_at lock_at unlock_at
+    id
+    title
+    description
+    due_at
+    lock_at
+    unlock_at
     points_possible
-    assignment_group_id migration_id only_visible_to_overrides
-    post_to_sis allowed_attempts
+    assignment_group_id
+    migration_id
+    only_visible_to_overrides
+    post_to_sis
+    allowed_attempts
     workflow_state
   ].each do |attribute|
     it "serializes #{attribute}" do

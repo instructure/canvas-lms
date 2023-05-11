@@ -135,8 +135,10 @@ module Importers
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/([^?]*)(\?.*)?}
         unresolved(:module_item, migration_id: $1, query: $2)
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/file_ref/([^/?#]+)(.*)}
-        unresolved(:file_ref, migration_id: $1, rest: $2,
-                              in_media_iframe: attr == "src" && ["iframe", "source"].include?(node.name) && node["data-media-id"])
+        unresolved(:file_ref,
+                   migration_id: $1,
+                   rest: $2,
+                   in_media_iframe: attr == "src" && ["iframe", "source"].include?(node.name) && node["data-media-id"])
       elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^?]*)(\?.*)?}
         unresolved(:object, type: $1, migration_id: $2, query: $3)
 

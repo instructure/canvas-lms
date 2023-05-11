@@ -468,7 +468,10 @@ class DiscussionTopicsController < ApplicationController
           mc_status = setup_master_course_restrictions(@topics, @context)
         end
         root_topic_fields = [:delayed_post_at, :lock_at]
-        render json: discussion_topics_api_json(@topics, @context, @current_user, session,
+        render json: discussion_topics_api_json(@topics,
+                                                @context,
+                                                @current_user,
+                                                session,
                                                 user_can_moderate: user_can_moderate,
                                                 plain_messages: value_to_boolean(params[:plain_messages]),
                                                 exclude_assignment_description: value_to_boolean(params[:exclude_assignment_descriptions]),
@@ -1246,13 +1249,34 @@ class DiscussionTopicsController < ApplicationController
     @user_can_moderate
   end
 
-  API_ALLOWED_TOPIC_FIELDS = %w[title message discussion_type delayed_post_at lock_at podcast_enabled
-                                podcast_has_student_posts require_initial_post pinned todo_date
-                                group_category_id allow_rating only_graders_can_rate sort_by_rating
-                                anonymous_state is_anonymous_author].freeze
+  API_ALLOWED_TOPIC_FIELDS = %w[title
+                                message
+                                discussion_type
+                                delayed_post_at
+                                lock_at
+                                podcast_enabled
+                                podcast_has_student_posts
+                                require_initial_post
+                                pinned
+                                todo_date
+                                group_category_id
+                                allow_rating
+                                only_graders_can_rate
+                                sort_by_rating
+                                anonymous_state
+                                is_anonymous_author].freeze
 
-  API_ALLOWED_TOPIC_FIELDS_FOR_GROUP = %w[title message discussion_type podcast_enabled pinned todo_date
-                                          allow_rating only_graders_can_rate sort_by_rating anonymous_state is_anonymous_author].freeze
+  API_ALLOWED_TOPIC_FIELDS_FOR_GROUP = %w[title
+                                          message
+                                          discussion_type
+                                          podcast_enabled
+                                          pinned
+                                          todo_date
+                                          allow_rating
+                                          only_graders_can_rate
+                                          sort_by_rating
+                                          anonymous_state
+                                          is_anonymous_author].freeze
 
   def set_sections
     if params[:specific_sections] == "all"

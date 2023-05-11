@@ -164,17 +164,17 @@ class MediaTracksController < ApplicationController
   # leave untouched any tracks with no content field,
   # and update or create tracks with a content field.
   #
-  # @argument include[] [String]
-  #   Retuns a listing of the resulting set of MediaTracks.
-  #   Like List Media Objects, use the include[] parameter to
-  #   add additional fields.
+  # @argument include[] [String, "content"|"webvtt_content"|"updated_at"|"created_at"]
+  #   By default, an update returns id, locale, kind, media_object_id, and user_id for each of the
+  #   result MediaTracks. Use include[] to
+  #   add additional fields. For example include[]=content
   #
   # @example_request
   #   curl -X PUT https://<canvas>/api/v1/media_objects/<media_object_id>/mediatracks?include[]=content \
   #     -H 'Authorization: Bearer <token>'
   #     -d '[{"locale": "en"}, {"locale": "af","content": "1\r\n00:00:00,000 --> 00:00:01,251\r\nThis is the content\r\n"}]'
   #
-  # @returns [MediaTrackk]
+  # @returns [MediaTrack]
   def update
     @media_object = MediaObject.active.by_media_id(params[:media_object_id]).first
     return render_unauthorized_action unless @media_object

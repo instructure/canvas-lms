@@ -38,7 +38,7 @@
 
         // Prefer @typescript-eslint/no-empty-function over no-empty-function
         "no-empty-function": "off",
-        "@typescript-eslint/no-empty-function": "error"
+        "@typescript-eslint/no-empty-function": "warn"
       }
     }
   ]

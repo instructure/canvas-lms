@@ -74,11 +74,13 @@ RSpec.describe GradingPeriodSetsController do
 
     describe "POST #create" do
       let(:post_create) do
-        post :create, params: {
-          account_id: root_account.to_param,
-          enrollment_term_ids: [enrollment_term.to_param],
-          grading_period_set: group_helper.valid_attributes(weighted: true)
-        }, session: valid_session
+        post :create,
+             params: {
+               account_id: root_account.to_param,
+               enrollment_term_ids: [enrollment_term.to_param],
+               grading_period_set: group_helper.valid_attributes(weighted: true)
+             },
+             session: valid_session
       end
 
       context "with valid params" do
@@ -110,11 +112,13 @@ RSpec.describe GradingPeriodSetsController do
         end
 
         it "returns a Not Found status code" do
-          post :create, params: {
-            account_id: root_account.to_param,
-            enrollment_term_ids: [sub_account_enrollment_term.id],
-            grading_period_set: group_helper.valid_attributes
-          }, session: valid_session
+          post :create,
+               params: {
+                 account_id: root_account.to_param,
+                 enrollment_term_ids: [sub_account_enrollment_term.id],
+                 grading_period_set: group_helper.valid_attributes
+               },
+               session: valid_session
           expect(response.status).to eql Rack::Utils.status_code(:not_found)
         end
       end
@@ -126,12 +130,14 @@ RSpec.describe GradingPeriodSetsController do
 
       context "with valid params" do
         let(:patch_update) do
-          patch :update, params: {
-            account_id: root_account.to_param,
-            id: grading_period_set.to_param,
-            enrollment_term_ids: [enrollment_term.to_param],
-            grading_period_set: new_attributes
-          }, session: valid_session
+          patch :update,
+                params: {
+                  account_id: root_account.to_param,
+                  id: grading_period_set.to_param,
+                  enrollment_term_ids: [enrollment_term.to_param],
+                  grading_period_set: new_attributes
+                },
+                session: valid_session
         end
 
         it "updates the requested grading_period_set" do
@@ -153,12 +159,14 @@ RSpec.describe GradingPeriodSetsController do
           expect(GradeCalculator).to receive(:recompute_final_score) do |_, course_id, _|
             course_id == course.id
           end
-          patch :update, params: {
-            account_id: root_account.to_param,
-            id: grading_period_set.to_param,
-            enrollment_term_ids: [],
-            grading_period_set: new_attributes
-          }, session: valid_session
+          patch :update,
+                params: {
+                  account_id: root_account.to_param,
+                  id: grading_period_set.to_param,
+                  enrollment_term_ids: [],
+                  grading_period_set: new_attributes
+                },
+                session: valid_session
         end
       end
 
@@ -180,12 +188,14 @@ RSpec.describe GradingPeriodSetsController do
         end
 
         it "returns a Not Found status code" do
-          patch :update, params: {
-            id: grading_period_set.to_param,
-            account_id: root_account.to_param,
-            enrollment_term_ids: [sub_account_enrollment_term.id],
-            grading_period_set: group_helper.valid_attributes
-          }, session: valid_session
+          patch :update,
+                params: {
+                  id: grading_period_set.to_param,
+                  account_id: root_account.to_param,
+                  enrollment_term_ids: [sub_account_enrollment_term.id],
+                  grading_period_set: group_helper.valid_attributes
+                },
+                session: valid_session
           expect(response.status).to eql Rack::Utils.status_code(:not_found)
         end
       end
@@ -195,10 +205,12 @@ RSpec.describe GradingPeriodSetsController do
       it "destroys the requested grading period set" do
         grading_period_set = group_helper.create_for_account(root_account)
         expect(grading_period_set.reload.workflow_state).to eq "active"
-        delete :destroy, params: {
-          account_id: Account.default,
-          id: grading_period_set.to_param
-        }, session: valid_session
+        delete :destroy,
+               params: {
+                 account_id: Account.default,
+                 id: grading_period_set.to_param
+               },
+               session: valid_session
         expect(grading_period_set.reload.workflow_state).to eq "deleted"
       end
     end

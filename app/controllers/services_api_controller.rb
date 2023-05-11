@@ -94,10 +94,20 @@ class ServicesApiController < ApplicationController
     if value_to_boolean(params[:include_upload_config])
       pseudonym = @context ? SisPseudonym.for(@current_user, @context) : @current_user.primary_pseudonym
       hash[:kaltura_setting] = CanvasKaltura::ClientV3.config.try(:slice,
-                                                                  "domain", "resource_domain", "rtmp_domain", "protocol",
-                                                                  "partner_id", "subpartner_id", "player_ui_conf",
-                                                                  "player_cache_st", "kcw_ui_conf", "upload_ui_conf",
-                                                                  "max_file_size_bytes", "do_analytics", "hide_rte_button", "js_uploader")
+                                                                  "domain",
+                                                                  "resource_domain",
+                                                                  "rtmp_domain",
+                                                                  "protocol",
+                                                                  "partner_id",
+                                                                  "subpartner_id",
+                                                                  "player_ui_conf",
+                                                                  "player_cache_st",
+                                                                  "kcw_ui_conf",
+                                                                  "upload_ui_conf",
+                                                                  "max_file_size_bytes",
+                                                                  "do_analytics",
+                                                                  "hide_rte_button",
+                                                                  "js_uploader")
       protocol = hash[:kaltura_setting][:protocol] || request.protocol.gsub(%r{://$}, "")
       base_url = "#{protocol}://#{hash[:kaltura_setting][:domain]}/index.php/partnerservices2"
       hash[:kaltura_setting][:uploadUrl] = "#{base_url}/upload"

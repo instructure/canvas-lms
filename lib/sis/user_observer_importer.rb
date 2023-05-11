@@ -39,7 +39,8 @@ module SIS
     end
 
     class Work
-      attr_accessor :success_count, :users_to_update_account_associations,
+      attr_accessor :success_count,
+                    :users_to_update_account_associations,
                     :user_observers_to_update_sis_batch_ids
 
       def initialize(batch, root_account, logger)

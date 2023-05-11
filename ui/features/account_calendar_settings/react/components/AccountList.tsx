@@ -53,13 +53,13 @@ type ComponentProps = {
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Item: FlexItem} = Flex as any
 
-export const AccountList: React.FC<ComponentProps> = ({
+export const AccountList = ({
   originAccountId,
   searchValue,
   filterValue,
   visibilityChanges,
   onAccountToggled,
-}) => {
+}: ComponentProps) => {
   const [accounts, setAccounts] = useState<Account[]>([])
   const [isLoading, setLoading] = useState(false)
   const {

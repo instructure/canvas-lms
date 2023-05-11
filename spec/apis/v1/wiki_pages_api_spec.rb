@@ -254,7 +254,8 @@ describe WikiPagesApiController, type: :request do
     end
 
     it "returns unauthorized if not a teacher" do
-      api_call_as_user(@student, :post,
+      api_call_as_user(@student,
+                       :post,
                        "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
                        { controller: "wiki_pages_api",
                          action: "duplicate",
@@ -267,7 +268,8 @@ describe WikiPagesApiController, type: :request do
     end
 
     it "can duplicate wiki non-assignment if teacher" do
-      json = api_call_as_user(@teacher, :post,
+      json = api_call_as_user(@teacher,
+                              :post,
                               "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
                               { controller: "wiki_pages_api",
                                 action: "duplicate",
@@ -282,7 +284,8 @@ describe WikiPagesApiController, type: :request do
 
     it "can duplicate wiki assignment if teacher" do
       wiki_page_assignment_model({ title: "Assignment Wiki" })
-      json = api_call_as_user(@teacher, :post,
+      json = api_call_as_user(@teacher,
+                              :post,
                               "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
                               { controller: "wiki_pages_api",
                                 action: "duplicate",

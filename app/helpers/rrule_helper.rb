@@ -166,7 +166,8 @@ module RruleHelper
       I18n.t({
                one: "Daily, %{times} times",
                other: "Every %{count} days, %{times} times"
-             }, {
+             },
+             {
                count: interval,
                times: times
              })
@@ -174,7 +175,8 @@ module RruleHelper
       I18n.t({
                one: "Daily until %{until}",
                other: "Every %{count} days until %{until}"
-             }, {
+             },
+             {
                count: interval,
                until: format_date(until_date)
              })
@@ -192,7 +194,8 @@ module RruleHelper
       I18n.t({
                one: "Weekly, %{times} times",
                other: "Every %{count} weeks, %{times} times"
-             }, {
+             },
+             {
                count: interval,
                times: times
              })
@@ -200,7 +203,8 @@ module RruleHelper
       I18n.t({
                one: "Weekly until %{until}",
                other: "Every %{count} weeks until %{until}"
-             }, {
+             },
+             {
                count: interval,
                until: format_date(until_date)
              })
@@ -217,7 +221,8 @@ module RruleHelper
       I18n.t({
                one: "Weekly on %{byday}, %{times} times",
                other: "Every %{count} weeks on %{byday}, %{times} times"
-             }, {
+             },
+             {
                count: interval,
                byday: by_day,
                times: times
@@ -226,7 +231,8 @@ module RruleHelper
       I18n.t({
                one: "Weekly on %{byday} until %{until}",
                other: "Every %{count} weeks on %{byday} until %{until}"
-             }, {
+             },
+             {
                count: interval,
                byday: by_day,
                until: format_date(until_date)
@@ -257,7 +263,8 @@ module RruleHelper
         I18n.t({
                  one: "Monthly every %{days}, %{times} times",
                  other: "Every %{count} months on %{days}, %{times} times"
-               }, {
+               },
+               {
                  count: interval,
                  days: days_of_week,
                  times: times
@@ -266,7 +273,8 @@ module RruleHelper
         I18n.t({
                  one: "Monthly on the %{ord} %{days}, %{times} times",
                  other: "Every %{count} months on the %{ord} %{days}, %{times} times"
-               }, {
+               },
+               {
                  count: interval,
                  ord: occurrence.ordinalize,
                  days: days_of_week,
@@ -278,7 +286,8 @@ module RruleHelper
         I18n.t({
                  one: "Monthly every %{days} until %{until}",
                  other: "Every %{count} months on %{days} until %{until}"
-               }, {
+               },
+               {
                  count: interval,
                  days: days_of_week,
                  until: format_date(until_date)
@@ -287,7 +296,8 @@ module RruleHelper
         I18n.t({
                  one: "Monthly on the %{ord} %{days} until %{until}",
                  other: "Every %{count} months on the %{ord} %{days} until %{until}"
-               }, {
+               },
+               {
                  count: interval,
                  ord: occurrence.ordinalize,
                  days: days_of_week,
@@ -308,7 +318,8 @@ module RruleHelper
         I18n.t({
                  one: "Monthly on day %{days}, %{times} times",
                  other: "Every %{count} months on day %{days}, %{times} times"
-               }, {
+               },
+               {
                  count: interval,
                  days: days_of_month[0],
                  times: times
@@ -317,7 +328,8 @@ module RruleHelper
         I18n.t({
                  one: "Monthly on days %{days}, %{times} times",
                  other: "Every %{count} months on days %{days}, %{times} times"
-               }, {
+               },
+               {
                  count: interval,
                  days: join_month_dys(days_of_month),
                  times: times
@@ -328,7 +340,8 @@ module RruleHelper
         I18n.t({
                  one: "Monthly on day %{days} until %{until}",
                  other: "Every %{count} months on day %{days} until %{until}"
-               }, {
+               },
+               {
                  count: interval,
                  days: days_of_month[0],
                  until: format_date(until_date)
@@ -337,7 +350,8 @@ module RruleHelper
         I18n.t({
                  one: "Monthly on days %{days} until %{until}",
                  other: "Every %{count} months on days %{days} until %{until}",
-               }, {
+               },
+               {
                  count: interval,
                  days: join_month_dys(days_of_month),
                  until: format_date(until_date)
@@ -355,7 +369,8 @@ module RruleHelper
       I18n.t({
                one: "Monthly, %{times} times",
                other: "Every %{count} months, %{times} times"
-             }, {
+             },
+             {
                count: interval,
                times: times
              })
@@ -363,7 +378,8 @@ module RruleHelper
       I18n.t({
                one: "Monthly until %{until}",
                other: "Every %{count} months until %{until}"
-             }, {
+             },
+             {
                count: interval,
                until: format_date(until_date)
              })
@@ -394,7 +410,8 @@ module RruleHelper
         I18n.t({
                  one: "Annually on the first %{days} of %{month}, %{times} times",
                  other: "Every %{count} years on the first %{days} of %{month}, %{times} times"
-               }, {
+               },
+               {
                  count: interval,
                  days: days_of_week,
                  month: month,
@@ -404,7 +421,8 @@ module RruleHelper
         I18n.t({
                  one: "Annualy on the %{ord} %{days} of %{month}, %{times} times",
                  other: "Every %{count} years on the %{ord} %{days} of %{month}, %{times} times"
-               }, {
+               },
+               {
                  count: interval,
                  ord: occurrence.ordinalize,
                  days: days_of_week,
@@ -417,7 +435,8 @@ module RruleHelper
         I18n.t({
                  one: "Annually on the first %{days} of %{month} until %{until}",
                  other: "Every %{count} years on the first %{days} of %{month} until %{until}"
-               }, {
+               },
+               {
                  count: interval,
                  days: days_of_week,
                  month: month,
@@ -427,7 +446,8 @@ module RruleHelper
         I18n.t({
                  one: "Annually on the %{ord} %{days} of %{month} until %{until}",
                  other: "Every %{count} years on the %{ord} %{days} of %{month} until %{until}"
-               }, {
+               },
+               {
                  count: interval,
                  ord: occurrence.ordinalize,
                  days: days_of_week,
@@ -450,7 +470,8 @@ module RruleHelper
       I18n.t({
                one: "Annually on %{date}, %{times} times",
                other: "Every %{count} years on %{date}, %{times} times"
-             }, {
+             },
+             {
                count: interval,
                date: date,
                times: times
@@ -459,7 +480,8 @@ module RruleHelper
       I18n.t({
                one: "Annually on %{date} until %{until}",
                other: "Every %{count} years on %{date} until %{until}"
-             }, {
+             },
+             {
                count: interval,
                date: date,
                until: format_date(until_date)

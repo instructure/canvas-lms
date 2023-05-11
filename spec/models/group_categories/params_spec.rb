@@ -129,7 +129,8 @@ module GroupCategories
     describe "#create_group_count" do
       it "passes through the count param when self signup is enabled" do
         params = build_params(enable_self_signup: true,
-                              restrict_self_signup: false, create_group_count: "3")
+                              restrict_self_signup: false,
+                              create_group_count: "3")
         expect(params.create_group_count).to eq 3
       end
 
@@ -185,13 +186,17 @@ module GroupCategories
 
       it "is false if create_group_count is empty" do
         params = build_params(enable_self_signup: false,
-                              split_groups: "1", create_group_count: nil, split_group_count: nil)
+                              split_groups: "1",
+                              create_group_count: nil,
+                              split_group_count: nil)
         expect(params.assign_unassigned_members).to be(false)
       end
 
       it "is true without self signup and with a split count" do
         params = build_params(enable_self_signup: false,
-                              split_groups: "1", create_group_count: nil, split_group_count: "3")
+                              split_groups: "1",
+                              create_group_count: nil,
+                              split_group_count: "3")
         expect(params.assign_unassigned_members).to be(true)
       end
     end

@@ -23,11 +23,13 @@ module Types
 
     alias_method :rules, :object
 
-    field :drop_lowest, Integer,
+    field :drop_lowest,
+          Integer,
           "The lowest N assignments are not included in grade calculations",
           null: true
 
-    field :drop_highest, Integer,
+    field :drop_highest,
+          Integer,
           "The highest N assignments are not included in grade calculations",
           null: true
 

@@ -221,8 +221,10 @@ describe ContextModule do
       module1.find_or_create_progression(@student)
       module1.save!
       module2 = @course.context_modules.create!(name: "some module")
-      url_item = module2.content_tags.create!(content_type: "ExternalUrl", context: @course,
-                                              title: "url", url: "https://www.google.com")
+      url_item = module2.content_tags.create!(content_type: "ExternalUrl",
+                                              context: @course,
+                                              title: "url",
+                                              url: "https://www.google.com")
       module2.completion_requirements = [{ id: url_item.id, type: "must_view" }]
       module2.prerequisites = [{ id: module1.id, type: "context_module", name: "some module" }]
       module2.save!
@@ -416,8 +418,11 @@ describe ContextModule do
     describe "when adding an LTI 1.3 external tool" do
       let(:tool) do
         @course.context_external_tools.create!(
-          name: "tool", consumer_key: "1", shared_secret: "1",
-          url: "http://example.com/", developer_key: DeveloperKey.create!,
+          name: "tool",
+          consumer_key: "1",
+          shared_secret: "1",
+          url: "http://example.com/",
+          developer_key: DeveloperKey.create!,
           lti_version: "1.3"
         )
       end
@@ -474,8 +479,10 @@ describe ContextModule do
             lookup_uuid = SecureRandom.uuid
             expect(Lti::ResourceLink).to receive(:find_or_initialize_for_context_and_lookup_uuid)
               .with(
-                context: @course, lookup_uuid: lookup_uuid,
-                custom: { "foo" => "bar" }, context_external_tool: tool,
+                context: @course,
+                lookup_uuid: lookup_uuid,
+                custom: { "foo" => "bar" },
+                context_external_tool: tool,
                 url: "http://example.com/"
               ).and_call_original
             tag = @module.add_item(
@@ -584,8 +591,12 @@ describe ContextModule do
       @module.add_item(type: "assignment", id: @assign.id)
       @module.insert_items([@page, @assign, @quiz])
       expect(@module.content_tags.pluck(:content_type)).to eq(
-        ["ContextModuleSubHeader", "ContextModuleSubHeader", "ContextModuleSubHeader",
-         "Assignment", "WikiPage", "Quizzes::Quiz"]
+        ["ContextModuleSubHeader",
+         "ContextModuleSubHeader",
+         "ContextModuleSubHeader",
+         "Assignment",
+         "WikiPage",
+         "Quizzes::Quiz"]
       )
     end
   end
@@ -718,7 +729,8 @@ describe ContextModule do
     it "sets progression to complete for a module with 'Complete One Item' requirement when one item complete" do
       course_module
       @module.requirement_count = 1
-      @quiz = @course.quizzes.build(title: "some quiz", quiz_type: "assignment",
+      @quiz = @course.quizzes.build(title: "some quiz",
+                                    quiz_type: "assignment",
                                     scoring_policy: "keep_highest")
       @quiz.workflow_state = "available"
       @quiz.save!
@@ -1117,7 +1129,8 @@ describe ContextModule do
         @quiz = @course.quizzes.build(title: "some quiz", quiz_type: "assignment", scoring_policy: "keep_highest")
         @quiz.workflow_state = "available"
         @quiz.save!
-        @q1 = @quiz.quiz_questions.create!(question_data: { :name => "question 1", :points_possible => 1,
+        @q1 = @quiz.quiz_questions.create!(question_data: { :name => "question 1",
+                                                            :points_possible => 1,
                                                             "question_type" => "multiple_choice_question",
                                                             "answers" => [{ "answer_text" => "1", "answer_weight" => "100" }, { "answer_text" => "2" }] })
         @quiz.generate_quiz_data(persist: true)

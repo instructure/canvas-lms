@@ -340,7 +340,6 @@ describe('CalendarEventDetailsForm', () => {
 
   it('can create a blackout date event for an account with course pacing enabled', async () => {
     ENV.FEATURES.account_level_blackout_dates = true
-    ENV.FEATURES.account_calendar_events = true
     defaultProps.event.contextInfo = accountContext
     testBlackoutDateSuccess()
   })

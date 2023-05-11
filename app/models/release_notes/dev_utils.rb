@@ -32,7 +32,8 @@ module ReleaseNotes
 
     def self.initialize_ddb_for_development!(recreate: false)
       ::Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(
-        :release_notes, ReleaseNote.ddb_table_name,
+        :release_notes,
+        ReleaseNote.ddb_table_name,
         recreate: recreate,
         schema: NOTES_SCHEMA,
         ddb: ReleaseNote.ddb_client

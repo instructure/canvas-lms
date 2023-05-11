@@ -115,7 +115,8 @@ describe Quizzes::QuizSubmissionZipper do
       student = @student
       quiz = course_quiz(true)
       question = quiz.quiz_questions.create! question_data: {
-        name: "q1", points_possible: 1,
+        name: "q1",
+        points_possible: 1,
         question_type: "file_upload_question",
         question_text: "ohai mark"
       }

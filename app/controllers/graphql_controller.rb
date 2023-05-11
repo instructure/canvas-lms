@@ -38,6 +38,7 @@ class GraphQLController < ApplicationController
   def execute
     result = execute_on(CanvasSchema)
     prep_page_view_for_submit
+    prep_page_view_for_create_discussion_entry
     render json: result
   end
 
@@ -111,5 +112,13 @@ class GraphQLController < ApplicationController
     assignment = ::Assignment.active.find(params[:variables][:assignmentLid])
     get_context
     log_asset_access(assignment, "assignments", nil, "participate")
+  end
+
+  def prep_page_view_for_create_discussion_entry
+    return unless params[:operationName] == "CreateDiscussionEntry"
+
+    topic = DiscussionTopic.find(params[:variables][:discussionTopicId])
+    get_context
+    log_asset_access(topic, "topics", "topics", "participate")
   end
 end

@@ -191,16 +191,24 @@ describe CollaborationsController, type: :request do
 
     it "requires :read_roster rights" do
       user_factory
-      api_call(:get, "/api/v1/courses/#{@course.id}/potential_collaborators",
-               { controller: "collaborations", action: "potential_collaborators",
-                 format: "json", course_id: @course.to_param },
-               {}, {}, expected_status: 401)
+      api_call(:get,
+               "/api/v1/courses/#{@course.id}/potential_collaborators",
+               { controller: "collaborations",
+                 action: "potential_collaborators",
+                 format: "json",
+                 course_id: @course.to_param },
+               {},
+               {},
+               expected_status: 401)
     end
 
     it "returns course members for course collaborations" do
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/potential_collaborators",
-                      { controller: "collaborations", action: "potential_collaborators",
-                        format: "json", course_id: @course.to_param })
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/potential_collaborators",
+                      { controller: "collaborations",
+                        action: "potential_collaborators",
+                        format: "json",
+                        course_id: @course.to_param })
       expect(json.pluck("id")).to match_array(@course.users.pluck(:id))
     end
 
@@ -213,9 +221,12 @@ describe CollaborationsController, type: :request do
       @course.enroll_user(ta, "TaEnrollment", section: second_section, limit_privileges_to_course_section: true)
       @course.enroll_user(student2, "StudentEnrollment", section: second_section)
 
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/potential_collaborators",
-                      { controller: "collaborations", action: "potential_collaborators",
-                        format: "json", course_id: @course.to_param })
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/potential_collaborators",
+                      { controller: "collaborations",
+                        action: "potential_collaborators",
+                        format: "json",
+                        course_id: @course.to_param })
 
       users_map = json.pluck("id")
 
@@ -231,9 +242,12 @@ describe CollaborationsController, type: :request do
       @course.enroll_student(@user).accept!
       @group.add_user(@user)
       collaboration_model(user: @user, context: @group)
-      json = api_call(:get, "/api/v1/groups/#{@group.id}/potential_collaborators",
-                      { controller: "collaborations", action: "potential_collaborators",
-                        format: "json", group_id: @group.to_param })
+      json = api_call(:get,
+                      "/api/v1/groups/#{@group.id}/potential_collaborators",
+                      { controller: "collaborations",
+                        action: "potential_collaborators",
+                        format: "json",
+                        group_id: @group.to_param })
       expect(json.pluck("id")).to match_array(@course.admins.pluck(:id) + @group.users.pluck(:id))
     end
   end

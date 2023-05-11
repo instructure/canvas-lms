@@ -1596,25 +1596,30 @@ describe SIS::CSV::UserImporter do
       sis_user = user_model
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user1@example.com,active", user: sis_user
+        "user_1,user1,User,Uno,user1@example.com,active",
+        user: sis_user
       )
       process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A001,,TestAccount1,active",
-        "A002,A001,TestAccount1A,active", user: sis_user
+        "A002,A001,TestAccount1A,active",
+        user: sis_user
       )
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
-        "C001,TC 101,Test Course 1,A002,,active,,", user: sis_user
+        "C001,TC 101,Test Course 1,A002,,active,,",
+        user: sis_user
       )
       process_csv_data_cleanly(
         "section_id,course_id,name,status,start_date,end_date",
-        "S001,C001,Test Course 1,active,,", user: sis_user
+        "S001,C001,Test Course 1,active,,",
+        user: sis_user
       )
       expect(@account.pseudonyms.where(sis_user_id: "user_1").first.user.user_account_associations.map(&:account_id)).to eq [@account.id]
       process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
-        "C001,user_1,teacher,,active,,,", user: sis_user
+        "C001,user_1,teacher,,active,,,",
+        user: sis_user
       )
       @pseudo1 = @account.pseudonyms.where(sis_user_id: "user_1").first
       expect(@pseudo1.user.user_account_associations.map(&:account_id).sort).to eq [@account.id, Account.where(sis_source_id: "A002").first.id, Account.where(sis_source_id: "A001").first.id].sort
@@ -1622,25 +1627,30 @@ describe SIS::CSV::UserImporter do
       @account = @account2
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user1@example.com,active", user: sis_user
+        "user_1,user1,User,Uno,user1@example.com,active",
+        user: sis_user
       )
       process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A101,,TestAccount1,active",
-        "A102,A101,TestAccount1A,active", user: sis_user
+        "A102,A101,TestAccount1A,active",
+        user: sis_user
       )
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
-        "C001,TC 101,Test Course 1,A102,,active,,", user: sis_user
+        "C001,TC 101,Test Course 1,A102,,active,,",
+        user: sis_user
       )
       process_csv_data_cleanly(
         "section_id,course_id,name,status,start_date,end_date",
-        "S001,C001,Test Course 1,active,,", user: sis_user
+        "S001,C001,Test Course 1,active,,",
+        user: sis_user
       )
       expect(@account.pseudonyms.where(sis_user_id: "user_1").first.user.user_account_associations.map(&:account_id)).to eq [@account.id]
       process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
-        "C001,user_1,teacher,,active,,,", user: sis_user
+        "C001,user_1,teacher,,active,,,",
+        user: sis_user
       )
       @pseudo2 = @account.pseudonyms.where(sis_user_id: "user_1").first
       expect(@pseudo2.user.user_account_associations.map(&:account_id).sort).to eq [@account.id, Account.where(sis_source_id: "A102").first.id, Account.where(sis_source_id: "A101").first.id].sort
@@ -1654,7 +1664,8 @@ describe SIS::CSV::UserImporter do
       @account = @account1
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user1@example.com,deleted", user: sis_user
+        "user_1,user1,User,Uno,user1@example.com,deleted",
+        user: sis_user
       )
       @account1.pseudonyms.where(sis_user_id: "user_1").first.tap do |pseudo|
         expect(pseudo.user.user_account_associations.map(&:account_id).sort).to eq [@account2.id, Account.where(sis_source_id: "A102").first.id, Account.where(sis_source_id: "A101").first.id].sort
@@ -1668,7 +1679,8 @@ describe SIS::CSV::UserImporter do
       end
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user1@example.com,active", user: sis_user
+        "user_1,user1,User,Uno,user1@example.com,active",
+        user: sis_user
       )
       @account1.pseudonyms.where(sis_user_id: "user_1").first.tap do |pseudo|
         expect(pseudo.user.user_account_associations.map(&:account_id).sort).to eq [@account2.id, Account.where(sis_source_id: "A102").first.id, Account.where(sis_source_id: "A101").first.id, @account1.id].sort

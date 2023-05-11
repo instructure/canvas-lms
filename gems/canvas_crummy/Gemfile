@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 source "https://rubygems.org"
-gem "simplecov", "0.14.1", require: false
+
 # Specify your gem's dependencies in canvas_crummy.gemspec
 gemspec

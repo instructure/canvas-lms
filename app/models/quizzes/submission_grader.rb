@@ -160,11 +160,12 @@ module Quizzes
       return questions, [] if bank_ids.empty?
 
       # equivalent to AssessmentQuestionBank#learning_outcome_alignments, but for multiple banks at once
-      [questions, ContentTag.learning_outcome_alignments.active.where(
-        content_type: "AssessmentQuestionBank",
-        content_id: bank_ids
-      )
-                            .preload(:learning_outcome, :context).to_a]
+      [questions,
+       ContentTag.learning_outcome_alignments.active.where(
+         content_type: "AssessmentQuestionBank",
+         content_id: bank_ids
+       )
+                 .preload(:learning_outcome, :context).to_a]
     end
   end
 end

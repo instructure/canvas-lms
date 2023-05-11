@@ -910,8 +910,13 @@ describe GradebookImporter do
     describe "simplified json output" do
       let(:top_level_keys) do
         %i[
-          assignments custom_columns missing_objects original_submissions
-          students unchanged_assignments warning_messages
+          assignments
+          custom_columns
+          missing_objects
+          original_submissions
+          students
+          unchanged_assignments
+          warning_messages
         ]
       end
 
@@ -947,7 +952,10 @@ describe GradebookImporter do
       end
 
       it "an assignment only has specified keys" do
-        keys = %i[grading_type id points_possible previous_id
+        keys = %i[grading_type
+                  id
+                  points_possible
+                  previous_id
                   title]
         expect(assignment.keys.sort).to eql(keys)
       end

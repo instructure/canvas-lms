@@ -183,7 +183,8 @@ describe "Group Categories API", type: :request do
       end
 
       before do
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+        json = api_call(:post,
+                        "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(action: "create",
                                                      course_id: @course.to_param),
                         { "name" => "category", "split_group_count" => 3 })
@@ -262,7 +263,8 @@ describe "Group Categories API", type: :request do
       end
 
       it "allows a teacher to update a category that creates groups" do
-        json = api_call :put, "/api/v1/group_categories/#{@category.id}",
+        json = api_call :put,
+                        "/api/v1/group_categories/#{@category.id}",
                         @category_path_options.merge(action: "update",
                                                      group_category_id: @category.to_param),
                         { :name => @name, :self_signup => "enabled", "create_group_count" => 3 }
@@ -276,17 +278,20 @@ describe "Group Categories API", type: :request do
         og_course = @course
         course = course_factory(course_name: "Math 101", account: @account, active_course: true)
         category2 = GroupCategory.student_organized_for(course)
-        json = api_call(:put, "/api/v1/group_categories/#{category2.id}",
+        json = api_call(:put,
+                        "/api/v1/group_categories/#{category2.id}",
                         @category_path_options.merge(action: "update", group_category_id: category2.to_param),
                         { :name => @name, :self_signup => "enabled", "create_group_count" => 3, :course_id => og_course.id },
-                        {}, { expected_status: 401 })
+                        {},
+                        { expected_status: 401 })
         expect(json["status"]).to eq "unauthorized"
         expect(category2.reload.name).to_not eq @name
       end
 
       it "allows a teacher to update a category and distribute students to new groups" do
         create_users_in_course(@course, 6)
-        json = api_call :put, "/api/v1/group_categories/#{@category.id}",
+        json = api_call :put,
+                        "/api/v1/group_categories/#{@category.id}",
                         @category_path_options.merge(action: "update",
                                                      group_category_id: @category.to_param),
                         { name: @name, split_group_count: 3 }
@@ -300,7 +305,8 @@ describe "Group Categories API", type: :request do
 
       it "creates group category/groups and split students between groups" do
         create_users_in_course(@course, 6)
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+        json = api_call(:post,
+                        "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(action: "create",
                                                      course_id: @course.to_param),
                         { "name" => @name, "split_group_count" => 3 })
@@ -313,7 +319,8 @@ describe "Group Categories API", type: :request do
       end
 
       it "creates self signup groups" do
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+        json = api_call(:post,
+                        "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(action: "create",
                                                      course_id: @course.to_param),
                         { "name" => @name, "self_signup" => "enabled", "create_group_count" => 3 })
@@ -324,7 +331,8 @@ describe "Group Categories API", type: :request do
       end
 
       it "creates restricted self sign up groups" do
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+        json = api_call(:post,
+                        "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(action: "create",
                                                      course_id: @course.to_param),
                         {
@@ -339,7 +347,8 @@ describe "Group Categories API", type: :request do
       end
 
       it "ignores 'split_group_count' if 'enable_self_signup'" do
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+        json = api_call(:post,
+                        "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(action: "create",
                                                      course_id: @course.to_param),
                         {
@@ -353,7 +362,8 @@ describe "Group Categories API", type: :request do
       end
 
       it "prefers 'split_group_count' over 'create_group_count' if not 'enable_self_signup'" do
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+        json = api_call(:post,
+                        "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(action: "create",
                                                      course_id: @course.to_param),
                         {
@@ -367,12 +377,15 @@ describe "Group Categories API", type: :request do
 
       describe "teacher actions with a group" do
         before :once do
-          @study_group = group_model(name: @name, group_category: @category,
-                                     context: @course, root_account_id: @account.id)
+          @study_group = group_model(name: @name,
+                                     group_category: @category,
+                                     context: @course,
+                                     root_account_id: @account.id)
         end
 
         it "allows listing all of a course's group categories for teachers" do
-          json = api_call(:get, "/api/v1/courses/#{@course.to_param}/group_categories.json",
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.to_param}/group_categories.json",
                           @category_path_options.merge(action: "index",
                                                        course_id: @course.to_param))
           expect(json.count).to eq 1
@@ -380,21 +393,24 @@ describe "Group Categories API", type: :request do
         end
 
         it "allows teachers to retrieve a group category" do
-          json = api_call(:get, "/api/v1/group_categories/#{@category.id}",
+          json = api_call(:get,
+                          "/api/v1/group_categories/#{@category.id}",
                           @category_path_options.merge(action: "show",
                                                        group_category_id: @category.to_param))
           expect(json["id"]).to eq @category.id
         end
 
         it "lists all groups in category for a teacher" do
-          json = api_call(:get, "/api/v1/group_categories/#{@category.id}/groups",
+          json = api_call(:get,
+                          "/api/v1/group_categories/#{@category.id}/groups",
                           @category_path_options.merge(action: "groups",
                                                        group_category_id: @category.to_param))
           expect(json.first["id"]).to eq @study_group.id
         end
 
         it "allows a teacher to update a category for a course" do
-          api_call :put, "/api/v1/group_categories/#{@category.id}",
+          api_call :put,
+                   "/api/v1/group_categories/#{@category.id}",
                    @category_path_options.merge(action: "update",
                                                 group_category_id: @category.to_param),
                    { name: @name }
@@ -403,7 +419,8 @@ describe "Group Categories API", type: :request do
         end
 
         it "allows a teacher to update a category to self_signup enabled for a course" do
-          api_call :put, "/api/v1/group_categories/#{@category.id}",
+          api_call :put,
+                   "/api/v1/group_categories/#{@category.id}",
                    @category_path_options.merge(action: "update",
                                                 group_category_id: @category.to_param),
                    { name: @name, self_signup: "enabled" }
@@ -413,7 +430,8 @@ describe "Group Categories API", type: :request do
         end
 
         it "allows a teacher to update a category to self_signup restricted for a course" do
-          api_call :put, "/api/v1/group_categories/#{@category.id}",
+          api_call :put,
+                   "/api/v1/group_categories/#{@category.id}",
                    @category_path_options.merge(action: "update",
                                                 group_category_id: @category.to_param),
                    { name: @name, self_signup: "restricted" }
@@ -427,7 +445,8 @@ describe "Group Categories API", type: :request do
           project_groups.name = @name
           project_groups.save
           expect(GroupCategory.find(project_groups.id)).not_to be_nil
-          api_call :delete, "/api/v1/group_categories/#{project_groups.id}",
+          api_call :delete,
+                   "/api/v1/group_categories/#{project_groups.id}",
                    @category_path_options.merge(action: "destroy",
                                                 group_category_id: project_groups.to_param)
           expect(GroupCategory.find(project_groups.id).deleted_at).not_to be_nil
@@ -439,7 +458,8 @@ describe "Group Categories API", type: :request do
           project_groups.role = "imported"
           project_groups.save
           expect(GroupCategory.find(project_groups.id)).not_to be_nil
-          api_call :delete, "/api/v1/group_categories/#{project_groups.id}",
+          api_call :delete,
+                   "/api/v1/group_categories/#{project_groups.id}",
                    @category_path_options.merge(action: "destroy",
                                                 group_category_id: project_groups.to_param)
           expect(GroupCategory.find(project_groups.id).deleted_at).not_to be_nil
@@ -451,15 +471,19 @@ describe "Group Categories API", type: :request do
           project_groups.role = "communities"
           project_groups.save
           expect(GroupCategory.find(project_groups.id)).not_to be_nil
-          api_call :delete, "/api/v1/group_categories/#{project_groups.id}",
+          api_call :delete,
+                   "/api/v1/group_categories/#{project_groups.id}",
                    @category_path_options.merge(action: "destroy",
                                                 group_category_id: project_groups.to_param),
-                   {}, {}, { expected_status: 401 }
+                   {},
+                   {},
+                   { expected_status: 401 }
           expect(GroupCategory.find(project_groups.id).deleted_at).to be_nil
         end
 
         it "allows a teacher to create a course group category" do
-          json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+          json = api_call(:post,
+                          "/api/v1/courses/#{@course.id}/group_categories",
                           @category_path_options.merge(action: "create",
                                                        course_id: @course.to_param),
                           { "name" => @name })
@@ -478,14 +502,16 @@ describe "Group Categories API", type: :request do
       end
 
       it "does not allow listing of a course's group categories for students" do
-        raw_api_call(:get, "/api/v1/courses/#{@course.to_param}/group_categories.json",
+        raw_api_call(:get,
+                     "/api/v1/courses/#{@course.to_param}/group_categories.json",
                      @category_path_options.merge(action: "index",
                                                   course_id: @course.to_param))
         expect(response.code).to eq "401"
       end
 
       it "does not list all groups in category for a student" do
-        raw_api_call(:get, "/api/v1/group_categories/#{@category.id}/groups",
+        raw_api_call(:get,
+                     "/api/v1/group_categories/#{@category.id}/groups",
                      @category_path_options.merge(action: "groups",
                                                   group_category_id: @category.to_param))
         expect(response.code).to eq "401"
@@ -493,7 +519,8 @@ describe "Group Categories API", type: :request do
 
       it "does not allow a student to create a course group category" do
         name = "Discussion Groups"
-        raw_api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
+        raw_api_call(:post,
+                     "/api/v1/courses/#{@course.id}/group_categories",
                      @category_path_options.merge(action: "create",
                                                   course_id: @course.to_param),
                      { "name" => name })
@@ -502,7 +529,8 @@ describe "Group Categories API", type: :request do
 
       it "does not allow a teacher to delete the student groups category" do
         expect(GroupCategory.find(@category.id)).not_to be_nil
-        raw_api_call :delete, "/api/v1/group_categories/#{@category.id}",
+        raw_api_call :delete,
+                     "/api/v1/group_categories/#{@category.id}",
                      @category_path_options.merge(action: "destroy",
                                                   group_category_id: @category.to_param)
         expect(response.code).to eq "401"
@@ -513,14 +541,16 @@ describe "Group Categories API", type: :request do
         project_groups.name = "Course Project Groups"
         project_groups.save
         expect(GroupCategory.find(project_groups.id)).not_to be_nil
-        raw_api_call :delete, "/api/v1/group_categories/#{project_groups.id}",
+        raw_api_call :delete,
+                     "/api/v1/group_categories/#{project_groups.id}",
                      @category_path_options.merge(action: "destroy",
                                                   group_category_id: project_groups.to_param)
         expect(response.code).to eq "401"
       end
 
       it "does not allow a student to update a category for a course" do
-        raw_api_call :put, "/api/v1/group_categories/#{@category.id}",
+        raw_api_call :put,
+                     "/api/v1/group_categories/#{@category.id}",
                      @category_path_options.merge(action: "update",
                                                   group_category_id: @category.to_param),
                      { name: "name" }
@@ -534,7 +564,8 @@ describe "Group Categories API", type: :request do
         @course.enroll_student(user_model)
         category = @course.group_categories.create(name: "Group Category")
 
-        raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
+        raw_api_call :post,
+                     "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                      @category_path_options.merge(action: "assign_unassigned_members",
                                                   group_category_id: category.to_param),
                      { "sync" => true }
@@ -545,7 +576,8 @@ describe "Group Categories API", type: :request do
         course_with_teacher_logged_in(active_all: true)
         category = @course.group_categories.create(name: "Group Category")
 
-        raw_api_call :post, "/api/v1/group_categories/#{category.id + 1}/assign_unassigned_members",
+        raw_api_call :post,
+                     "/api/v1/group_categories/#{category.id + 1}/assign_unassigned_members",
                      @category_path_options.merge(action: "assign_unassigned_members",
                                                   group_category_id: (category.id + 1).to_param),
                      { "sync" => true }
@@ -556,7 +588,8 @@ describe "Group Categories API", type: :request do
         course_with_teacher_logged_in(active_all: true)
         category = GroupCategory.student_organized_for(@course)
 
-        raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
+        raw_api_call :post,
+                     "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                      @category_path_options.merge(action: "assign_unassigned_members",
                                                   group_category_id: category.to_param),
                      { "sync" => true }
@@ -569,7 +602,8 @@ describe "Group Categories API", type: :request do
         category.configure_self_signup(true, true)
         category.save
 
-        raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
+        raw_api_call :post,
+                     "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                      @category_path_options.merge(action: "assign_unassigned_members",
                                                   group_category_id: category.to_param),
                      { "sync" => true }
@@ -578,7 +612,8 @@ describe "Group Categories API", type: :request do
         category.configure_self_signup(true, false)
         category.save
 
-        raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
+        raw_api_call :post,
+                     "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                      @category_path_options.merge(action: "assign_unassigned_members",
                                                   group_category_id: category.to_param),
                      { "sync" => true }
@@ -596,7 +631,8 @@ describe "Group Categories API", type: :request do
         group2.add_user(student1)
 
         @user = teacher
-        raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
+        raw_api_call :post,
+                     "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                      @category_path_options.merge(action: "assign_unassigned_members",
                                                   group_category_id: category.to_param)
 
@@ -612,7 +648,8 @@ describe "Group Categories API", type: :request do
         category = @course.group_categories.create(name: "Group Category")
 
         expect do
-          raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
+          raw_api_call :post,
+                       "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                        @category_path_options.merge(action: "assign_unassigned_members",
                                                     group_category_id: category.to_param)
 
@@ -636,7 +673,8 @@ describe "Group Categories API", type: :request do
       end
 
       it "allows listing all of an account's group categories for account admins" do
-        json = api_call(:get, "/api/v1/accounts/#{@account.to_param}/group_categories.json",
+        json = api_call(:get,
+                        "/api/v1/accounts/#{@account.to_param}/group_categories.json",
                         @category_path_options.merge(action: "index",
                                                      account_id: @account.to_param))
         expect(json.count).to eq 1
@@ -644,7 +682,8 @@ describe "Group Categories API", type: :request do
       end
 
       it "ignores 'split_group_count' for a non course group" do
-        json = api_call(:post, "/api/v1/accounts/#{@account.id}/group_categories",
+        json = api_call(:post,
+                        "/api/v1/accounts/#{@account.id}/group_categories",
                         @category_path_options.merge(action: "create",
                                                      account_id: @account.to_param),
                         {
@@ -656,14 +695,16 @@ describe "Group Categories API", type: :request do
       end
 
       it "allows admins to retrieve a group category" do
-        json = api_call(:get, "/api/v1/group_categories/#{@communities.id}",
+        json = api_call(:get,
+                        "/api/v1/group_categories/#{@communities.id}",
                         @category_path_options.merge(action: "show",
                                                      group_category_id: @communities.to_param))
         expect(json["id"]).to eq @communities.id
       end
 
       it "returns a 'not found' error if there is no group_category" do
-        raw_api_call(:get, "/api/v1/group_categories/9999999",
+        raw_api_call(:get,
+                     "/api/v1/group_categories/9999999",
                      @category_path_options.merge(action: "show",
                                                   group_category_id: "9999999"))
         expect(response.code).to eq "404"
@@ -671,15 +712,18 @@ describe "Group Categories API", type: :request do
 
       it "lists all groups in category for a admin" do
         @community = group_model(name: "Algebra Teacher",
-                                 group_category: @communities, context: @account)
-        json = api_call(:get, "/api/v1/group_categories/#{@communities.id}/groups",
+                                 group_category: @communities,
+                                 context: @account)
+        json = api_call(:get,
+                        "/api/v1/group_categories/#{@communities.id}/groups",
                         @category_path_options.merge(action: "groups",
                                                      group_category_id: @communities.to_param))
         expect(json.first["id"]).to eq @community.id
       end
 
       it "allows an admin to create an account group category" do
-        json = api_call(:post, "/api/v1/accounts/#{@account.id}/group_categories",
+        json = api_call(:post,
+                        "/api/v1/accounts/#{@account.id}/group_categories",
                         @category_path_options.merge(action: "create",
                                                      sis_group_category_id: "gc101",
                                                      account_id: @account.to_param),
@@ -692,7 +736,8 @@ describe "Group Categories API", type: :request do
       end
 
       it "allows an admin to update a category for an account" do
-        api_call :put, "/api/v1/group_categories/#{@communities.id}",
+        api_call :put,
+                 "/api/v1/group_categories/#{@communities.id}",
                  @category_path_options.merge(action: "update",
                                               sis_group_category_id: "gc101",
                                               group_category_id: @communities.to_param),
@@ -705,14 +750,16 @@ describe "Group Categories API", type: :request do
       it "allows an admin to delete a category for an account" do
         account_category = GroupCategory.create(name: "Groups", context: @account)
         expect(GroupCategory.find(@communities.id)).not_to be_nil
-        raw_api_call :delete, "/api/v1/group_categories/#{account_category.id}",
+        raw_api_call :delete,
+                     "/api/v1/group_categories/#{account_category.id}",
                      @category_path_options.merge(action: "destroy",
                                                   group_category_id: account_category.to_param)
         expect(GroupCategory.find(account_category.id).deleted_at).not_to be_nil
       end
 
       it "does not allow 'enable_self_signup' for a non course group" do
-        raw_api_call(:post, "/api/v1/accounts/#{@account.id}/group_categories",
+        raw_api_call(:post,
+                     "/api/v1/accounts/#{@account.id}/group_categories",
                      @category_path_options.merge(action: "create",
                                                   account_id: @account.to_param),
                      {
@@ -725,7 +772,8 @@ describe "Group Categories API", type: :request do
 
       describe "sis permissions" do
         let(:json) do
-          api_call(:get, "/api/v1/accounts/#{@account.to_param}/group_categories.json",
+          api_call(:get,
+                   "/api/v1/accounts/#{@account.to_param}/group_categories.json",
                    @category_path_options.merge(action: "index",
                                                 account_id: @account.to_param))
         end
@@ -757,14 +805,16 @@ describe "Group Categories API", type: :request do
     end
 
     it "does not allow non-admins to list an account's group categories" do
-      raw_api_call(:get, "/api/v1/accounts/#{@account.to_param}/group_categories.json",
+      raw_api_call(:get,
+                   "/api/v1/accounts/#{@account.to_param}/group_categories.json",
                    @category_path_options.merge(action: "index",
                                                 account_id: @account.to_param))
       expect(response.code).to eq "401"
     end
 
     it "does not allow non-admins to retrieve a group category" do
-      raw_api_call(:get, "/api/v1/group_categories/#{@communities.id}",
+      raw_api_call(:get,
+                   "/api/v1/group_categories/#{@communities.id}",
                    @category_path_options.merge(action: "show",
                                                 group_category_id: @communities.to_param))
       expect(response.code).to eq "401"
@@ -772,21 +822,24 @@ describe "Group Categories API", type: :request do
 
     it "does not allow a non-admin to delete a category for an account" do
       account_category = GroupCategory.create(name: "Groups", context: @account)
-      raw_api_call :delete, "/api/v1/group_categories/#{account_category.id}",
+      raw_api_call :delete,
+                   "/api/v1/group_categories/#{account_category.id}",
                    @category_path_options.merge(action: "destroy",
                                                 group_category_id: account_category.to_param)
       expect(response.code).to eq "401"
     end
 
     it "does not list all groups in category for a non-admin" do
-      raw_api_call(:get, "/api/v1/group_categories/#{@communities.id}/groups",
+      raw_api_call(:get,
+                   "/api/v1/group_categories/#{@communities.id}/groups",
                    @category_path_options.merge(action: "groups",
                                                 group_category_id: @communities.to_param))
       expect(response.code).to eq "401"
     end
 
     it "does not allow a non-admin to create an account group category" do
-      raw_api_call(:post, "/api/v1/accounts/#{@account.id}/group_categories",
+      raw_api_call(:post,
+                   "/api/v1/accounts/#{@account.id}/group_categories",
                    @category_path_options.merge(action: "create",
                                                 account_id: @account.to_param),
                    { "name" => "name" })
@@ -794,7 +847,8 @@ describe "Group Categories API", type: :request do
     end
 
     it "does not allow a non-admin to update a category for an account" do
-      raw_api_call :put, "/api/v1/group_categories/#{@communities.id}",
+      raw_api_call :put,
+                   "/api/v1/group_categories/#{@communities.id}",
                    @category_path_options.merge(action: "update",
                                                 group_category_id: @communities.to_param),
                    { name: "name" }

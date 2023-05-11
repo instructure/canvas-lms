@@ -60,9 +60,12 @@ class AccountNotification < ActiveRecord::Base
     thresholds = ObserverAlertThreshold.active.where(observer: User.of_account(account), alert_type: "institution_announcement")
                                        .where.not(id: ObserverAlert.where(context: self).select(:observer_alert_threshold_id))
     thresholds.find_each do |threshold|
-      ObserverAlert.create(student: threshold.student, observer: threshold.observer,
-                           observer_alert_threshold: threshold, context: self,
-                           alert_type: "institution_announcement", action_date: start_at,
+      ObserverAlert.create(student: threshold.student,
+                           observer: threshold.observer,
+                           observer_alert_threshold: threshold,
+                           context: self,
+                           alert_type: "institution_announcement",
+                           action_date: start_at,
                            title: I18n.t('Institution announcement: "%{announcement_title}"', {
                                            announcement_title: subject
                                          }))

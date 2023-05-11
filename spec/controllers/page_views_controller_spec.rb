@@ -121,8 +121,12 @@ describe PageViewsController do
             limit: 25
           )
           .and_return([])
-        get "index", params: { user_id: @user.id, start_time: "2016-03-14T12:25:55Z",
-                               end_time: "2016-03-15T00:00:00Z", per_page: 25 }, format: :json
+        get "index",
+            params: { user_id: @user.id,
+                      start_time: "2016-03-14T12:25:55Z",
+                      end_time: "2016-03-15T00:00:00Z",
+                      per_page: 25 },
+            format: :json
         expect(response).to be_successful
       end
 
@@ -139,8 +143,11 @@ describe PageViewsController do
             limit: 99
           )
           .and_return([])
-        get "index", params: { user_id: @user.id, start_time: "2016-03-14T12:25:55Z",
-                               end_time: "2016-03-15T00:00:00Z" }, format: :csv
+        get "index",
+            params: { user_id: @user.id,
+                      start_time: "2016-03-14T12:25:55Z",
+                      end_time: "2016-03-15T00:00:00Z" },
+            format: :csv
         expect(response).to be_successful
       end
     end

@@ -235,3 +235,10 @@ hide_zero_point_quizzes_option:
       state: allowed_on # enable for local development
     test:
       state: allowed_on # enable for the deployed 'test' environment
+student_grade_summary_upgrade:
+  state: hidden
+  display_name: Update grade summary table to use a modern framework
+  description: |-
+    This refactor will make this page more maintainable
+  applies_to: SiteAdmin
+

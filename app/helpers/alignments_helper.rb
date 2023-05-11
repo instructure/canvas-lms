@@ -52,13 +52,18 @@ module AlignmentsHelper
   def outcome_alignment_url(context, outcome, alignment = nil)
     if alignment.present?
       [
-        context_prefix(alignment.context_code), "outcomes",
-        outcome.id, "alignments", alignment.id
+        context_prefix(alignment.context_code),
+        "outcomes",
+        outcome.id,
+        "alignments",
+        alignment.id
       ].join("/")
     elsif !context.is_a?(Account)
       context_url(
-        context, :context_outcome_alignment_redirect_url,
-        outcome.id, "{{ id }}"
+        context,
+        :context_outcome_alignment_redirect_url,
+        outcome.id,
+        "{{ id }}"
       )
     else
       nil

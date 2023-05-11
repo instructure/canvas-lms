@@ -79,7 +79,9 @@ module Api::V1::AssignmentGroup
         assignment.context = group.context
         exclude_fields = opts[:exclude_response_fields] | ["in_closed_grading_period"] # array union
 
-        json = assignment_json(assignment, user, session,
+        json = assignment_json(assignment,
+                               user,
+                               session,
                                include_discussion_topic: includes.include?("discussion_topic"),
                                include_all_dates: includes.include?("all_dates"),
                                include_can_edit: includes.include?("can_edit"),

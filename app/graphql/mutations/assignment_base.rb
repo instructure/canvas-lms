@@ -116,7 +116,8 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
   argument :omit_from_final_grade, Boolean, required: false
   argument :anonymous_instructor_annotations, Boolean, required: false
   argument :post_to_sis, Boolean, required: false
-  argument :anonymous_grading, Boolean,
+  argument :anonymous_grading,
+           Boolean,
            "requires anonymous_marking course feature to be set to true",
            required: false
   argument :module_ids, [ID], required: false
@@ -167,8 +168,10 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
     if input_hash.key? :moderated_grading
       moderated_grading = input_hash.delete(:moderated_grading)
       input_hash[:moderated_grading] = moderated_grading[:enabled] if moderated_grading.key? :enabled
-      input_hash.merge!(moderated_grading.slice(:grader_count, :grader_comments_visible_to_graders,
-                                                :grader_names_visible_to_final_grader, :graders_anonymous_to_graders))
+      input_hash.merge!(moderated_grading.slice(:grader_count,
+                                                :grader_comments_visible_to_graders,
+                                                :grader_names_visible_to_final_grader,
+                                                :graders_anonymous_to_graders))
       if moderated_grading.key? :final_grader_id
         input_hash[:final_grader_id] = GraphQLHelpers.parse_relay_or_legacy_id(moderated_grading[:final_grader_id], "User")
       end

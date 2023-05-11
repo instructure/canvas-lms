@@ -23,8 +23,14 @@ class SetDefaultValuesForDiscussionTopics < ActiveRecord::Migration[4.2]
 
   def up
     fields = %i[
-      could_be_locked podcast_enabled podcast_has_student_posts
-      require_initial_post pinned locked allow_rating only_graders_can_rate
+      could_be_locked
+      podcast_enabled
+      podcast_has_student_posts
+      require_initial_post
+      pinned
+      locked
+      allow_rating
+      only_graders_can_rate
       sort_by_rating
     ]
     fields.each { |field| change_column_default(:discussion_topics, field, false) }
@@ -34,8 +40,14 @@ class SetDefaultValuesForDiscussionTopics < ActiveRecord::Migration[4.2]
 
   def down
     fields = %i[
-      could_be_locked podcast_enabled podcast_has_student_posts
-      require_initial_post pinned locked allow_rating only_graders_can_rate
+      could_be_locked
+      podcast_enabled
+      podcast_has_student_posts
+      require_initial_post
+      pinned
+      locked
+      allow_rating
+      only_graders_can_rate
       sort_by_rating
     ]
     fields.each { |field| change_column_null(:discussion_topics, field, true) }

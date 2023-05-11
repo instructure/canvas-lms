@@ -22,8 +22,17 @@ require_relative "da_homework_assignee_module"
 module DifferentiatedAssignments
   module Users
     class << self
-      attr_reader :first_student, :second_student, :third_student, :fourth_student, :teacher,
-                  :ta, :first_observer, :third_observer, :student_group_x, :student_group_y, :student_group_z
+      attr_reader :first_student,
+                  :second_student,
+                  :third_student,
+                  :fourth_student,
+                  :teacher,
+                  :ta,
+                  :first_observer,
+                  :third_observer,
+                  :student_group_x,
+                  :student_group_y,
+                  :student_group_z
 
       def initialize
         @first_student   = create_user("Student1")

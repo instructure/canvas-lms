@@ -28,8 +28,11 @@ class AddDefaultSectionsUniqueIndex < ActiveRecord::Migration[5.1]
       CourseSection.where(course_id: course_id, default_section: true)
                    .order(:id).offset(1).update_all(default_section: false)
     end
-    add_index :course_sections, :course_id, unique: true, where: "default_section = 't' AND workflow_state <> 'deleted'",
-                                            name: "index_course_sections_unique_default_section"
+    add_index :course_sections,
+              :course_id,
+              unique: true,
+              where: "default_section = 't' AND workflow_state <> 'deleted'",
+              name: "index_course_sections_unique_default_section"
   end
 
   def down

@@ -153,7 +153,8 @@ describe Quizzes::QuizExtension do
 
     it "has reasonable limits on extendable attributes" do
       extension = Quizzes::QuizExtension.new(@qs,
-                                             extra_attempts: 99_999_999, extra_time: 99_999_999)
+                                             extra_attempts: 99_999_999,
+                                             extra_time: 99_999_999)
 
       extension.extend_submission!
       expect(extension.extra_attempts).to eq 1000
