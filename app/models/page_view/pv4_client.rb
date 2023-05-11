@@ -43,7 +43,7 @@ class PageView
       params << "&limit=#{limit}" if limit
       response = CanvasHttp.get(
         @uri.merge("users/#{user_id}/page_views?#{params}").to_s,
-        "Authorization" => "Bearer #{@access_token}"
+        { "Authorization" => "Bearer #{@access_token}" }
       )
 
       json = JSON.parse(response.body)
