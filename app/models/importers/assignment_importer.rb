@@ -507,6 +507,11 @@ module Importers
 
           params[:client_id] = li[:client_id] unless tool
 
+          if Account.site_admin.feature_enabled?(:blueprint_line_item_support) && primary_line_item
+            params = clear_params_before_overwriting_child_li(params, primary_line_item, migration)
+            primary_line_item.mark_as_importing! migration
+          end
+
           if primary_line_item&.coupled && (li[:coupled] || !any_coupled_line_items)
             # Modify the default coupled line item if:
             # * We are processing a coupled line item (need to replace properties
@@ -543,6 +548,25 @@ module Importers
       attachment.update!(folder: context.student_annotation_documents_folder)
       attachment.move_to_bottom if attachment.saved_change_to_folder_id?
       assignment.annotatable_attachment = attachment
+    end
+
+    def self.clear_params_before_overwriting_child_li(params, primary_line_item, migration)
+      return params unless (child_tag = migration.master_course_subscription.content_tag_for(primary_line_item.assignment))
+      return params unless child_tag.downstream_changes.present?
+
+      primary_line_item.class.base_class.restricted_column_settings.each do |type, columns|
+        changed_columns = params.keys.map(&:to_s) & columns if child_tag.downstream_changes & ["lti_line_items_#{type}"] # changed restricted types
+
+        if changed_columns.any?
+          if primary_line_item.assignment.child_content_restrictions[type] # don't overwrite downstream changes _unless_ it's locked
+            child_tag.downstream_changes -= "lti_line_items_#{type}" # remove them from the downstream changes since we're going to overwrite
+            child_tag.save!
+          else
+            changed_columns.each { |cc| params.delete(cc.to_sym) } # if not locked then we should ignore the params in the category (content or settings)
+          end
+        end
+      end
+      params
     end
   end
 end
