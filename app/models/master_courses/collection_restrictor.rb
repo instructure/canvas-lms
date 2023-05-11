@@ -31,7 +31,7 @@ module MasterCourses::CollectionRestrictor
 
     klass.cattr_accessor :collection_owner_association # this is the association to find the quiz
 
-    klass.after_update :mark_downstream_changes, if: -> { klass != Lti::LineItem || Account.site_admin.feature_enabled?(:blueprint_line_item_support) }
+    klass.after_update :mark_downstream_changes
   end
 
   module ClassMethods

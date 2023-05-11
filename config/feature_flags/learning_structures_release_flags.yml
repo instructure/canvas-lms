@@ -125,8 +125,3 @@ auto_subscribe_account_calendars:
       state: allowed_on
     development:
       state: allowed_on
-blueprint_line_item_support:
-  state: hidden
-  display_name: 'Blueprint Resource ID Support'
-  description: Allows blueprint courses to keep track of assignment's resource id changes.
-  applies_to: SiteAdmin
