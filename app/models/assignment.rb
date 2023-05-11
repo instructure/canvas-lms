@@ -1206,9 +1206,13 @@ class Assignment < ActiveRecord::Base
         li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true, resource_id: line_item_resource_id, tag: line_item_tag)
         create_results_from_prior_grades(li)
       elsif saved_change_to_title? || saved_change_to_points_possible?
-        line_items
-          .find(&:assignment_line_item?)
-          &.update!(label: title, score_maximum: points_possible || 0, resource_id: line_item_resource_id, tag: line_item_tag)
+        if (li = line_items.find(&:assignment_line_item?))
+          li.label = title
+          li.score_maximum = points_possible || 0
+          li.tag = line_item_tag if line_item_tag
+          li.resource_id = line_item_resource_id if line_item_resource_id
+          li.save!
+        end
       end
 
       if lti_1_3_external_tool_tag?(lti_1_3_tool) && !lti_resource_links.empty?
