@@ -1404,7 +1404,7 @@ module ApplicationHelper
   end
 
   def find_heap_application_id
-    DynamicSettings.find(tree: :private)&.fetch([:heap_app_id])
+    DynamicSettings.find(tree: :private)&.fetch(:heap_app_id)
   end
 
   def load_heap?
