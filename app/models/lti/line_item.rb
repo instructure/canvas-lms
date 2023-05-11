@@ -51,10 +51,6 @@ class Lti::LineItem < ApplicationRecord
   AGS_EXT_SUBMISSION_TYPE = "#{AGS_EXT_PREFIX}submission_type"
   AGS_EXT_LAUNCH_URL = "#{AGS_EXT_PREFIX}launch_url"
 
-  include MasterCourses::CollectionRestrictor
-  self.collection_owner_association = :assignment
-  restrict_columns :content, [:resource_id]
-
   def assignment_line_item?
     assignment.line_items.order(:created_at).first.id == id
   end

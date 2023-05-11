@@ -169,26 +169,23 @@ describe MasterCourses::MasterMigration do
 
   describe "Assignment's external tools migration" do
     before :once do
-      developer_key = DeveloperKey.create!(account: Account.default)
-      tool = external_tool_model(context: Account.default, opts: { use_1_3: true, developer_key: developer_key })
-      tag = ContentTag.new(content: tool, url: "http://example.com/original", context: @original_assignment)
       account_admin_user(active_all: true)
       @copy_from = @course
-      @copy_to = course_factory
-      @sub = @template.add_child_course!(@copy_to)
-      @original_assignment = @copy_from.assignments.create!(title: "some assignment", submission_types: "external_tool", points_possible: 10)
-      @original_assignment.update!(external_tool_tag: tag)
-      @original_line_item = @original_assignment.line_items.first
-      @original_line_item.update!(resource_id: "some_resource_id")
     end
 
     before do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      @original_assignment = @copy_from.assignments.create!(title: "some assignment", submission_types: "external_tool")
+      @original_assignment.build_external_tool_tag(url: "http://example.com/original", new_tab: true)
+      @original_assignment.save!
+
       run_master_migration
-      @assignment_copy = @copy_to.assignments.where(migration_id: mig_id(@original_assignment)).first
-      @line_item_copy = @assignment_copy.line_items.last
     end
 
     it "copies external tool tag over" do
+      @assignment_copy = @copy_to.assignments.where(migration_id: mig_id(@original_assignment)).first
       expect(@assignment_copy.reload.external_tool_tag).to be_truthy
       expect(@assignment_copy.reload.external_tool_tag.url).to eq "http://example.com/original"
     end
@@ -202,62 +199,11 @@ describe MasterCourses::MasterMigration do
     end
 
     it "does not update associated course's external tool tag on blueprint update if the associated course had an independent update" do
+      @assignment_copy = @copy_to.assignments.where(migration_id: mig_id(@original_assignment)).first
       @assignment_copy.external_tool_tag.update!(url: "http://example.com/associated_updated", new_tab: true)
       @original_assignment.touch
       run_master_migration
       expect(@assignment_copy.reload.external_tool_tag.url).to eq "http://example.com/associated_updated"
-    end
-
-    context "with blueprint_line_item_support ON" do
-      it "respects line item downstream editing and assignment locking" do
-        Account.site_admin.enable_feature! :blueprint_line_item_support
-
-        @original_line_item.update!(resource_id: "updated_resource_id")
-        @original_assignment.update!(title: "updated assignment title")
-        run_master_migration
-        expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id")
-
-        @line_item_copy.update! resource_id: "downstream_resource_id"
-        @original_line_item.update!(resource_id: "updated_resource_id AGAIN")
-        @original_assignment.update!(title: "updated assignment title AGAIN")
-        @original_assignment.touch
-        run_master_migration
-
-        # The one line item downstream change stops assignment synch as a whole
-        expect(@assignment_copy.reload.title).to eq("updated assignment title")
-        expect(@line_item_copy.reload.label).to eq("updated assignment title")
-        expect(@line_item_copy.reload.resource_id).to eq("downstream_resource_id")
-
-        @template.content_tag_for(@original_assignment).update_attribute(:restrictions, { content: true })
-        run_master_migration
-
-        expect(@assignment_copy.reload.title).to eq("updated assignment title AGAIN")
-        expect(@line_item_copy.reload.label).to eq("updated assignment title AGAIN")
-        expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id AGAIN")
-      end
-    end
-
-    context "with blueprint_line_item_support OFF" do
-      it "respects line item downstream editing and assignment locking" do
-        Account.site_admin.disable_feature! :blueprint_line_item_support
-
-        expect(@original_line_item.resource_id).to eq("some_resource_id")
-
-        @original_line_item.update!(resource_id: "updated_resource_id")
-        @original_assignment.update!(title: "updated assignment title")
-        run_master_migration
-        expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id")
-
-        @line_item_copy.update! resource_id: "downstream_resource_id"
-        @original_line_item.update!(resource_id: "updated_resource_id AGAIN")
-        @original_assignment.update!(title: "updated assignment title AGAIN")
-        @original_assignment.touch
-        run_master_migration
-
-        expect(@assignment_copy.reload.title).to eq("updated assignment title AGAIN")
-        expect(@line_item_copy.reload.label).to eq("updated assignment title AGAIN")
-        expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id AGAIN")
-      end
     end
   end
 
