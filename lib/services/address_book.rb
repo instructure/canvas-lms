@@ -145,7 +145,7 @@ module Services
                                  "address_book"
                                end
         Canvas.timeout_protection(timeout_service_name) do
-          response = CanvasHttp.get(url, "Authorization" => "Bearer #{jwt}")
+          response = CanvasHttp.get(url, { "Authorization" => "Bearer #{jwt}" })
           if ![200, 202].include?(response.code.to_i)
             err = CanvasHttp::InvalidResponseCodeError.new(response.code.to_i)
             data = {

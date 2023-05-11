@@ -1539,7 +1539,9 @@ describe FilesController do
       it "creates a new attachment" do
         post "api_capture", params: params
         assert_status(201)
-        expect(folder.attachments.first).not_to be_nil
+        attachment = folder.attachments.first
+        expect(attachment).not_to be_nil
+        expect(attachment.workflow_state).to eq "processed"
       end
 
       it "populates the md5 column with the instfs sha512" do
