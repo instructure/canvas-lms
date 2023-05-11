@@ -163,7 +163,7 @@ module Factories
     name_prefix = options[:name_prefix] || "user"
     records = Array.new(records) { |i| { name: "#{name_prefix} #{@__create_user_count + i + 1}" } } if records.is_a?(Integer)
     now = Time.now.utc
-    records = records.map { |record| valid_user_attributes.merge(workflow_state: "registered", created_at: now, updated_at: now).merge(record) }
+    records = records.map { |record| valid_user_attributes.merge(workflow_state: "registered", created_at: now, updated_at: now, uuid: CanvasSlug.generate_securish_uuid).merge(record) }
     @__create_user_count += records.size
     create_records(User, records, options[:return_type])
   end

@@ -1941,6 +1941,14 @@ class User < ActiveRecord::Base
     read_attribute(:uuid)
   end
 
+  def heap_id
+    # this is called in read-only contexts where we can't create a missing uuid
+    # (uuid-less users should be rare in real life but they exist in specs and maybe unauthenticated requests)
+    return nil unless read_attribute(:uuid)
+
+    "uu-1-#{Digest::SHA256.hexdigest(uuid)}"
+  end
+
   def self.serialization_excludes
     %i[
       uuid
