@@ -21,7 +21,8 @@
  *
  * From assignments_controller.rb
  */
-export type EnvAssignments = Partial<EnvAssignmentsA2StudentView>
+export type EnvAssignments = Partial<EnvAssignmentsA2StudentView> &
+  Partial<EnvAssignmentsDefaultToolInfo>
 
 /**
  * A2-related ENV variables.
@@ -56,4 +57,14 @@ export interface EnvAssignmentsA2StudentView {
   ORIGINALITY_REPORTS_FOR_A2: boolean
   PREREQS: any
   SUBMISSION_ID: string | number
+}
+
+/**
+ * From From AssignmentsController#set_default_tool_env!
+ */
+export interface EnvAssignmentsDefaultToolInfo {
+  DEFAULT_ASSIGNMENT_TOOL_URL?: string
+  DEFAULT_ASSIGNMENT_TOOL_NAME?: string
+  DEFAULT_ASSIGNMENT_TOOL_BUTTON_TEXT?: string
+  DEFAULT_ASSIGNMENT_TOOL_INFO_MESSAGE?: string
 }
