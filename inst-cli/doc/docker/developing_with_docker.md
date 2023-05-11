@@ -18,11 +18,11 @@ Now do the following:
 2. In your terminal, run:
 
 ```bash
-gem install inst-private
+gem install inst inst-private
 inst config-file
 ```
 
-See the [`inst-cli-private`](https://gerrit.instructure.com/plugins/gitiles/inst-cli-private/+/refs/heads/master/README.md) and [`inst-cli`](https://gerrit.instructure.com/plugins/gitiles/inst-cli/+/refs/heads/master/README.md) repos for more details if you like.
+See the `inst-cli-private` and `inst-cli` repos for more details if you like.
 
 ## Automated setup script
 
