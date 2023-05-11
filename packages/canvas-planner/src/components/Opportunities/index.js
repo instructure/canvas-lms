@@ -24,6 +24,7 @@ import keycode from 'keycode'
 import {Tabs} from '@instructure/ui-tabs'
 import {CloseButton} from '@instructure/ui-buttons'
 import {array, bool, string, func, number, oneOfType} from 'prop-types'
+// eslint-disable-next-line import/no-named-as-default
 import Opportunity from '../Opportunity'
 import {specialFallbackFocusId} from '../../dynamic-ui/util'
 import {animatable} from '../../dynamic-ui'
@@ -45,13 +46,13 @@ export class Opportunities extends Component {
     maxHeight: oneOfType([number, string]),
     registerAnimatable: func,
     deregisterAnimatable: func,
-    isObserving: bool
+    isObserving: bool,
   }
 
   static defaultProps = {
     maxHeight: 'none',
     registerAnimatable: () => {},
-    deregisterAnimatable: () => {}
+    deregisterAnimatable: () => {},
   }
 
   constructor(props) {
@@ -59,15 +60,15 @@ export class Opportunities extends Component {
 
     this.state = {
       innerMaxHeight: 'auto',
-      selectedIndex: 0
+      selectedIndex: 0,
     }
     this.closeButtonRef = null
     this.tabPanelContentDiv = null
   }
 
-  handleTabChange = (event, {index, id}) => {
+  handleTabChange = (event, {index, _id}) => {
     this.setState({
-      selectedIndex: index
+      selectedIndex: index,
     })
   }
 
@@ -140,7 +141,7 @@ export class Opportunities extends Component {
             <Opportunity
               id={opportunity.id}
               dueAt={opportunity.due_at}
-              points={opportunity.points_possible}
+              points={opportunity.restrict_quantitative_data ? null : opportunity.points_possible}
               courseName={this.courseAttr(opportunity.course_id, 'shortName')}
               opportunityTitle={opportunity.name}
               timeZone={this.props.timeZone}
@@ -198,6 +199,7 @@ export class Opportunities extends Component {
   render() {
     const {selectedIndex} = this.state
     return (
+      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
         id="opportunities_parent"
         className={styles.root}
