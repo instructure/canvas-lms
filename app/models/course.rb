@@ -30,6 +30,7 @@ class Course < ActiveRecord::Base
   include TurnitinID
   include Courses::ItemVisibilityHelper
   include OutcomeImportContext
+  include MaterialChanges
 
   attr_accessor :teacher_names, :master_course, :primary_enrollment_role
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
@@ -434,7 +435,7 @@ class Course < ActiveRecord::Base
 
     # a lot of things can change the date logic here :/
     if ((saved_changes.keys & %w[restrict_enrollments_to_course_dates account_id enrollment_term_id]).any? ||
-       (restrict_enrollments_to_course_dates? && (saved_changes.keys & %w[start_at conclude_at]).any?) ||
+       (restrict_enrollments_to_course_dates? && saved_material_changes_to?(:start_at, :conclude_at)) ||
        (saved_change_to_workflow_state? && (completed? || workflow_state_before_last_save == "completed"))) &&
        enrollments.exists?
       EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", global_root_account_id])

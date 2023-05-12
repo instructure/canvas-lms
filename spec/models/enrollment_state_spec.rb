@@ -203,6 +203,31 @@ describe EnrollmentState do
       expect(enroll_state.state).to eq "pending_invited"
       expect(enroll_state.state_valid_until).to eq start_at
     end
+
+    it "doesn't recompute enrollment states due to course date truncation" do
+      student_in_course(active_all: true)
+      @course.restrict_enrollments_to_course_dates = true
+      @course.conclude_at = "2023-07-16T03:59:59.999999Z"
+      @course.save!
+
+      expect(EnrollmentState).not_to receive(:invalidate_states_for_course_or_section)
+      course = Course.find(@course.id)
+      course.conclude_at = "2023-07-16T03:59:59.999990Z"
+      course.save!
+    end
+
+    it "doesn't recompute enrollment states due to section date truncation" do
+      student_in_course(active_all: true)
+      section = @course.default_section
+      section.restrict_enrollments_to_section_dates = true
+      section.end_at = "2023-07-16T03:59:59.999999Z"
+      section.save!
+
+      expect(EnrollmentState).not_to receive(:invalidate_states_for_course_or_section)
+      section = CourseSection.find(section.id)
+      section.end_at = "2023-07-16T03:59:59.999990Z"
+      section.save!
+    end
   end
 
   describe "access invalidation" do
