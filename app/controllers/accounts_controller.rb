@@ -1435,11 +1435,9 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :view_statistics)
       add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
       if @account.grants_right?(@current_user, :read_course_list)
-        @recently_started_courses = @account.all_courses.recently_started
-        @recently_ended_courses = @account.all_courses.recently_ended
-        if @account == Account.default
-          @recently_created_courses = @account.all_courses.recently_created
-        end
+        @recently_started_courses = @account.associated_courses.active.recently_started
+        @recently_ended_courses = @account.associated_courses.active.recently_ended
+        @recently_created_courses = @account.associated_courses.active.recently_created
       end
       if @account.grants_right?(@current_user, :read_roster)
         @recently_logged_users = @account.all_users.recently_logged_in

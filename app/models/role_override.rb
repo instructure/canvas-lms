@@ -1638,7 +1638,7 @@ class RoleOverride < ActiveRecord::Base
       },
       read_reports: {
         label: -> { t("permissions.read_reports", "Manage account or course-level reports") },
-        label_v2: -> { t("Reports - manage") }, # Reports - manage is used by both Account and Console Roles in Permissions
+        label_v2: -> { t("Reports - manage") }, # Reports - manage is used by both Account and Course Roles in Permissions
         available_to: %w[
           TaEnrollment
           DesignerEnrollment

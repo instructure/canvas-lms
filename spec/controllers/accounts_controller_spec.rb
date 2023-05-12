@@ -1327,6 +1327,51 @@ describe AccountsController do
     end
   end
 
+  describe "#statistics" do
+    before do
+      @account = Account.create!
+      @sub1 = @account.sub_accounts.create!
+      @sub2 = @account.sub_accounts.create!
+      @ssub1 = @sub1.sub_accounts.create!
+      @cr = course_factory(account: @account, course_name: "root")
+      @c1 = course_factory(account: @sub1, course_name: "sc1")
+      @c2 = course_factory(account: @sub2, course_name: "sc2")
+      @c1_1 = course_factory(account: @ssub1, course_name: "ssc1")
+    end
+
+    it "does not allow sibling sub to view another siblings courses" do
+      admin_logged_in(@sub1)
+      get "statistics", params: { account_id: @sub1.id }
+      expect(assigns(:recently_created_courses).to_a).not_to eq([@c2])
+    end
+
+    it "does not allow child to see parents created courses" do
+      admin_logged_in(@sub2)
+      get "statistics", params: { account_id: @sub2.id }
+      expect(assigns(:recently_created_courses).to_a).to eq([@c2])
+      expect(assigns(:recently_created_courses).to_a).not_to eq([@cr])
+    end
+
+    it "returns courses created by children and grandchildren" do
+      admin_logged_in(@account)
+      get "statistics", params: { account_id: @account.id }
+      expect(assigns(:recently_created_courses).to_a).to match_array([@c1_1, @c1, @c2, @cr])
+    end
+
+    it "returns courses created by self and children" do
+      admin_logged_in(@sub1)
+      get "statistics", params: { account_id: @sub1.id }
+      expect(assigns(:recently_created_courses).to_a).to match_array([@c1, @c1_1])
+    end
+
+    it "does not return deleted courses" do
+      admin_logged_in(@sub1)
+      @c1.update!(workflow_state: "deleted")
+      get "statistics", params: { account_id: @sub1.id }
+      expect(assigns(:recently_created_courses).to_a).to match_array([@c1_1])
+    end
+  end
+
   describe "#account_courses" do
     before do
       @account = Account.create!

@@ -117,7 +117,6 @@
 <% end %>
 
 <% if can_do @account, @current_user, :read_course_list %>
-<% if @account == Account.default %>
 <h2><%= t(:recently_created_courses_title, "Recently Created Courses") %></h2>
 <ul id="recently_created_item_list" class="item_list">
   <% @recently_created_courses.each do |course| %>
@@ -137,11 +136,10 @@
       </div>
     </li>
   <% end %>
-  <% if @recently_started_courses.empty? %>
+  <% if @recently_created_courses.empty? %>
     <li><%= t(:none_message, "None to show") %></li>
   <% end %>
 </ul>
-<% end %>
 
 <h2><%= t(:recently_started_courses_title, "Recently Started Courses") %></h2>
 <ul id="recently_started_item_list" class="item_list">
