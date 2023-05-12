@@ -38,6 +38,7 @@ import {scopeToUser} from '@canvas/grading/EffectiveDueDates'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import StatusPill from '@canvas/grading-status-pill'
+import GradeSummaryManager from '../react/GradeSummary/GradeSummaryManager'
 import SelectMenuGroup from '../react/SelectMenuGroup'
 import SubmissionCommentsTray from '../react/SubmissionCommentsTray'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
@@ -610,6 +611,10 @@ function renderSelectMenuGroup() {
   )
 }
 
+function renderGradeSummaryTable() {
+  ReactDOM.render(<GradeSummaryManager />, document.getElementById('grade-summary-react'))
+}
+
 function handleSubmissionsCommentTray(assignmentId) {
   const {submissionTrayAssignmentId, submissionTrayOpen} = useStore.getState()
 
@@ -875,6 +880,7 @@ export default _.extend(GradeSummary, {
   formatPercentGrade,
   getSelectMenuGroupProps,
   renderSelectMenuGroup,
+  renderGradeSummaryTable,
   getSubmissionCommentsTrayProps,
   handleSubmissionsCommentTray,
   renderSubmissionCommentsTray,
