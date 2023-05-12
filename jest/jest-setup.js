@@ -184,6 +184,10 @@ if (!('ResizeObserver' in window)) {
       unobserve() {
         return null
       }
+
+      disconnect() {
+        return null
+      }
     },
   })
 }

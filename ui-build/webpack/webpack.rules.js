@@ -33,6 +33,9 @@ exports.instUIWorkaround =
     type: 'javascript/auto',
     include: [
       resolve(canvasDir, 'node_modules/@instructure'),
+      resolve(canvasDir, 'packages/canvas-media/node_modules/@instructure'),
+      resolve(canvasDir, 'packages/canvas-planner/node_modules/@instructure'),
+      resolve(canvasDir, 'packages/canvas-rce/node_modules/@instructure'),
       ...globPlugins('/node_modules/@instructure'),
     ],
   }

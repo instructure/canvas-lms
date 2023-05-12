@@ -54,7 +54,7 @@ export default function ExternalToolSelectionItem(props: LtiToolProps) {
         }}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        tabIndex="0"
+        tabIndex={0}
       >
         <span>{image != null && <img src={image} width="28" height="28" alt="" />}</span>
         <View as="span" className={css(styles.appTitle)} margin="none none none small">
