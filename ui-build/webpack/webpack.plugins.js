@@ -102,7 +102,7 @@ exports.setMoreEnvVars = new DefinePlugin({
   // referencing through the EnvironmentPlugin (below) and risk a hard
   // runtime error in case we didn't cover them all, or provide a sink like
   // this, which i'm gonna go with for now:
-  process: {env: {}},
+  process: {browser: true, env: {}},
 })
 
 // tries to load chunks if they fail to load

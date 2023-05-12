@@ -323,6 +323,7 @@
     "sass-direction": "^1",
     "script-loader": "^0.7",
     "sinon": "^7",
+    "stream-browserify": "^3",
     "style-loader": "^0.23",
     "stylelint": "^10",
     "terser-webpack-plugin": "5.3.3",
