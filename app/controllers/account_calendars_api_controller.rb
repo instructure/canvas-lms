@@ -181,7 +181,13 @@ class AccountCalendarsApiController < ApplicationController
 
     account.account_calendar_visible = value_to_boolean(params[:visible]) if params.include?(:visible)
     if params.include?(:auto_subscribe) && Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars)
-      account.account_calendar_subscription_type = value_to_boolean(params[:auto_subscribe]) ? "auto" : "manual"
+      auto_subscribe = value_to_boolean(params[:auto_subscribe])
+      account.account_calendar_subscription_type = auto_subscribe ? "auto" : "manual"
+      if auto_subscribe
+        InstStatsd::Statsd.gauge("account_calendars.auto_subscribing", 1)
+      else
+        InstStatsd::Statsd.gauge("account_calendars.manual_subscribing", 1)
+      end
     end
     account.save! if account.changed?
     render json: account_calendar_json(account, @current_user, session)
@@ -230,6 +236,9 @@ class AccountCalendarsApiController < ApplicationController
       ids_to_disable_auto_subscribe = data.select { |c| !value_to_boolean(c["auto_subscribe"]) && !c["auto_subscribe"].nil? }.pluck("id")
       account_scope.where(id: ids_to_enable_auto_subscribe).update_all(account_calendar_subscription_type: "auto")
       account_scope.where(id: ids_to_disable_auto_subscribe).update_all(account_calendar_subscription_type: "manual")
+
+      InstStatsd::Statsd.gauge("account_calendars.auto_subscribing", ids_to_enable_auto_subscribe.length)
+      InstStatsd::Statsd.gauge("account_calendars.manual_subscribing", ids_to_disable_auto_subscribe.length)
     end
 
     render json: { message: t({ one: "Updated 1 account", other: "Updated %{count} accounts" }, { count: account_ids.uniq.count }) }
