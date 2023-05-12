@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -18,6 +17,7 @@
  */
 
 import React from 'react'
+// @ts-expect-error
 import {connect} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {debounce, pick} from 'lodash'
@@ -32,6 +32,7 @@ import {
   IconPublishSolid,
   IconQuizLine,
   IconUnpublishedLine,
+  // @ts-expect-error
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
