@@ -183,6 +183,7 @@ export default class PostPolicies {
       onExited: () => {
         this._gradebook.postAssignmentGradesTrayOpenChanged({
           assignmentId: assignment.id,
+          isOpen: false,
         })
         onExited()
       },
@@ -193,6 +194,7 @@ export default class PostPolicies {
 
     this._gradebook.postAssignmentGradesTrayOpenChanged({
       assignmentId: assignment.id,
+      isOpen: true,
     })
   }
 
