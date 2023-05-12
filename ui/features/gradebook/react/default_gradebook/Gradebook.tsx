@@ -272,7 +272,6 @@ export type GradebookProps = {
   }
   fetchFinalGradeOverrides: () => Promise<void>
   fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
-  fetchStudentIds: () => Promise<string[]>
   loadDataForCustomColumn: (customColumnId: string) => Promise<CustomColumnData[]>
   finalGradeOverrides: FinalGradeOverrideMap
   flashAlerts: FlashAlertType[]
@@ -282,11 +281,9 @@ export type GradebookProps = {
   gradebookMenuNode: HTMLElement
   gradebookSettingsModalContainer: HTMLSpanElement
   gradingPeriodAssignments: GradingPeriodAssignmentMap
-  gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
   isCustomColumnsLoaded: boolean
   isFiltersLoading: boolean
-  isGradingPeriodAssignmentsLoading: boolean
   isGridLoaded: boolean
   isModulesLoading: boolean
   isStudentIdsLoading: boolean
@@ -4188,12 +4185,19 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  postAssignmentGradesTrayOpenChanged = ({assignmentId}: {assignmentId: string}) => {
+  postAssignmentGradesTrayOpenChanged = ({
+    assignmentId,
+    isOpen,
+  }: {
+    assignmentId: string
+    isOpen: boolean
+  }) => {
     const columnId = getAssignmentColumnId(assignmentId)
     const definition = this.gridData.columns.definitions[columnId]
     if (!(definition && definition.type === 'assignment')) {
       return
     }
+    definition.postAssignmentGradesTrayOpenForAssignmentId = isOpen
     this.updateGrid()
   }
 

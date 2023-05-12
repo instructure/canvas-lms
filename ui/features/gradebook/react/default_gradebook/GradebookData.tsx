@@ -38,7 +38,6 @@ type Props = {
   gradebookGridNode: HTMLElement
   gradebookMenuNode: HTMLElement
   gradebookSettingsModalContainer: HTMLSpanElement
-  gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
   locale: string
   settingsModalButtonContainer: HTMLElement
@@ -87,7 +86,6 @@ export default function GradebookData(props: Props) {
   const isStudentIdsLoading = useStore(state => state.isStudentIdsLoading)
   const recentlyLoadedStudents = useStore(state => state.recentlyLoadedStudents)
   const recentlyLoadedSubmissions = useStore(state => state.recentlyLoadedSubmissions)
-  const fetchStudentIds = useStore(state => state.fetchStudentIds)
   const loadStudentData = useStore(state => state.loadStudentData)
   const isStudentDataLoaded = useStore(state => state.isStudentDataLoaded)
   const isSubmissionDataLoaded = useStore(state => state.isSubmissionDataLoaded)
@@ -98,9 +96,6 @@ export default function GradebookData(props: Props) {
   const fetchSisOverrides = useStore(state => state.fetchSisOverrides)
 
   const gradingPeriodAssignments = useStore(state => state.gradingPeriodAssignments)
-  const isGradingPeriodAssignmentsLoading = useStore(
-    state => state.isGradingPeriodAssignmentsLoading
-  )
   const fetchGradingPeriodAssignments = useStore(state => state.fetchGradingPeriodAssignments)
   const loadAssignmentGroups = useStore(state => state.loadAssignmentGroups)
   const recentlyLoadedAssignmentGroups = useStore(state => state.recentlyLoadedAssignmentGroups)
@@ -196,13 +191,11 @@ export default function GradebookData(props: Props) {
       customColumns={customColumns}
       fetchFinalGradeOverrides={fetchFinalGradeOverrides}
       fetchGradingPeriodAssignments={fetchGradingPeriodAssignments}
-      fetchStudentIds={fetchStudentIds}
       finalGradeOverrides={finalGradeOverrides}
       flashAlerts={flashMessages}
       gradingPeriodAssignments={gradingPeriodAssignments}
       isCustomColumnsLoaded={isCustomColumnsLoaded}
       isFiltersLoading={isFiltersLoading}
-      isGradingPeriodAssignmentsLoading={isGradingPeriodAssignmentsLoading}
       isGridLoaded={false}
       isModulesLoading={isModulesLoading}
       isStudentDataLoaded={isStudentDataLoaded}
