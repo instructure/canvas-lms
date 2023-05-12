@@ -179,3 +179,42 @@ test('ensures yielded editor has call and focus methods', function (assert) {
   }
   RCELoader.loadOnTarget(this.$div, {}, cb)
 })
+
+test('populates externalToolsConfig without context_external_tool_resource_selection_url', () => {
+  window.ENV = {
+    LTI_LAUNCH_FRAME_ALLOWANCES: ['test allow'],
+    a2_student_view: true,
+    MAX_MRU_LTI_TOOLS: 892,
+  }
+
+  deepEqual(RCELoader.createRCEProps({}, {}).externalToolsConfig, {
+    ltiIframeAllowances: ['test allow'],
+    isA2StudentView: true,
+    maxMruTools: 892,
+    resourceSelectionUrlOverride: null,
+  })
+})
+
+test('populates externalToolsConfig with context_external_tool_resource_selection_url', () => {
+  window.ENV = {
+    LTI_LAUNCH_FRAME_ALLOWANCES: ['test allow'],
+    a2_student_view: true,
+    MAX_MRU_LTI_TOOLS: 892,
+  }
+
+  const a = document.createElement('a')
+  try {
+    a.id = 'context_external_tool_resource_selection_url'
+    a.href = 'http://www.example.com'
+    document.body.appendChild(a)
+
+    deepEqual(RCELoader.createRCEProps({}, {}).externalToolsConfig, {
+      ltiIframeAllowances: ['test allow'],
+      isA2StudentView: true,
+      maxMruTools: 892,
+      resourceSelectionUrlOverride: 'http://www.example.com',
+    })
+  } finally {
+    a.remove()
+  }
+})
