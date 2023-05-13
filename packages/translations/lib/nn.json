@@ -12,7 +12,7 @@
         "message": "Sjekk av universell utforming"
     },
     "action_to_take_b626a99a": {
-        "message": "Hanling å utføre:"
+        "message": "Handling å utføre:"
     },
     "add_8523c19b": {
         "message": "Legg til"
@@ -57,7 +57,7 @@
         "message": "Aleph"
     },
     "align_11050992": {
-        "message": "Juster"
+        "message": "Justér"
     },
     "alignment_and_lists_5cebcb69": {
         "message": "Justering og lister"
@@ -726,7 +726,7 @@
         "message": "Rediger emnelenke"
     },
     "edit_equation_f5279959": {
-        "message": "Endre likning"
+        "message": "Rediger likning"
     },
     "edit_existing_icon_maker_icon_5d0ebb3f": {
         "message": "Rediger eksisterande ikondesignar-ikon"
@@ -819,7 +819,7 @@
         "message": "Ekvivalensklasse"
     },
     "equivalent_identity_654b3ce5": {
-        "message": "Ekvivalent (Itentitet)"
+        "message": "Ekvivalent (Identitet)"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Feil under lasting av vurderingar"
@@ -966,7 +966,7 @@
         "message": "Format"
     },
     "format_as_a_list_142210c3": {
-        "message": "Formater som liste"
+        "message": "Formater som ei liste"
     },
     "formatting_5b143aa8": {
         "message": "Formatering"
@@ -1662,7 +1662,7 @@
         "message": "Inga vurdering"
     },
     "no_headers_9bc7dc7f": {
-        "message": "Ingen headers"
+        "message": "Ingen overskrifter"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Førehandsvising er ikkje tilgjengeleg for denne fila."
