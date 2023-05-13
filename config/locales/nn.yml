@@ -20068,7 +20068,7 @@ nn:
       I staden for å plassera manuelt oppretta emne automatisk i
       underkontoen for Manuelt oppretta emne så vil denne funksjonen når den er slått på la
       personar som kan opprette emne manuelt knytte desse til hvilken som helt underkonto
-      kor dei har ei rolle.
+      der dei har ei rolle.
   rating_description_db6adf39: Rangeringsskildring
   rating_max_score_eade1523: "Rangering maksresultat"
   rating_min_score_3d35a762: "Rangering minimumsresultat"
@@ -23362,13 +23362,13 @@ nn:
   text_entry_submission_7b0ae0c5: "Send inn teksten"
   text_entry_submission_cannot_be_empty_3d187cae: "Tekstboksen kan ikkje vere tom"
   text_input_d3480b8c: Tekstoppføring
-  text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Spørsmålstypen Utan Spørsmål har blitt gjort om til eit Stimulusspørsmål; ver god å legg til eit spørsmål så det kan visast i quizen."
+  text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Spørsmålstypen Utan Spørsmål har blitt gjort om til eit Stimulusspørsmål; ver god og legg til eit spørsmål så det kan visast i quizen."
   thai_8f9bc548: Thai
   thailand_66_5b3ef324: "Thailand (+66)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Brukarkontoen er sletta.  Kontakt systemansvarleg og få kontoen aktivert på nytt."
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "Korleis brukarar kan ta i mot varsel frå slack"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Konto-ID for kontoen der rapporteringsbrukaren tilhøyrer"
-  the_account_wide_sync_settings_were_changed_while__90c48497: "Dei kontorelaterte synkroniseringsinnstillingane vart endra under synkronisering. Ver god å prøv synkroniseringa på nytt. "
+  the_account_wide_sync_settings_were_changed_while__90c48497: "Dei kontorelaterte synkroniseringsinnstillingane vart endra under synkronisering. Ver god og prøv synkroniseringa på nytt. "
   the_active_directory_attribute_that_will_be_used_t_96f5824e: "Active Directory attributten som vil verte brukt for å koble ein Canvasbrukar med ein Microsoftbrukar"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "Algoritmen som brukast for å signere AuthnRequest-, LogoutRequest- og LogoutResponse-meldingar til autentiseringstenesta."
   the_analytics_feature_must_be_enabled_in_account_s_37b80011: "Funksjonsvalet analyse må vere slått på i kontoinnstillingar for å sjå sider med analysedata."
@@ -23820,7 +23820,7 @@ nn:
   this_course_does_not_allow_score_uploads_4b35fe07: "Dette emnet tillet ikkje opplasting av resultat."
   this_course_has_concluded_7995a84c: "Emnet er avslutta"
   this_course_has_too_many_enrolled_users_to_be_sync_1285484d: "Dette emnet har for mange medlemar til å kunne synkroniserast. Microsoft 365 tillet eit maks antal på %{max_allowed} i eit Team"
-  this_course_has_too_many_teachers_or_other_owner_t_ae499dc: "Dette emnet har for mange faglærarar eller andre eier-rollar til å kunne synkroniserast. Microsoft 365 tillet eit maks antal på %{max_allowed} eigarar i eit Team"
+  this_course_has_too_many_teachers_or_other_owner_t_ae499dc: "Dette emnet har for mange faglærarar eller andre eigar-rollar til å kunne synkroniserast. Microsoft 365 tillet eit maks antal på %{max_allowed} eigarar i eit Team"
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Emnet har ikkje starta enno. Du kan ikkje delta på emnet før %{date}."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Emnet er fullført og klargjort, men du må avslutte registreringsprosessen før du kan publisere det. Du skal ha mottatt ein e-post frå Canvas med ei lenke for å avslutte prosessen. Hugs å sjekke Søppelpost."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Emnet er synleg berre for faglærarar før det er publisert."
@@ -23863,7 +23863,7 @@ nn:
   this_file_9443cda1: "Denne fila"
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Denne fila må ha usage_rights klarert før ho kan publiserast."
   this_flag_allows_calendar_event_series_to_be_creat_cb8d5a60: "Denne funksjonen gjer at kalendarhendingar kan bli laga frå emnekalenderen i Canvas"
-  this_flag_updates_the_title_of_the_feature_flags_t_513820f8: "Dette merke oppdaterer tittelen til arkfanen for ny funksjonalitet til \"Feature Options\" og legg til ein \"Feature Preview\" merkelapp for forhansdsvisning av nye prosjekt. "
+  this_flag_updates_the_title_of_the_feature_flags_t_513820f8: "Dette merke oppdaterer tittelen til arkfana for ny funksjonalitet til \"Feature Options\" og legg til ein \"Feature Preview\" merkelapp for forhansdsvisning av nye prosjekt. "
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: "Merknadsflagget skal ikkje føre til endringar i oppførsel."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Denne mappa er låst og kan ikkje visast."
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Denne vurderinga er ulik vurderinga som er synleg for studentane fordi nokre oppgåver er skjulte"
@@ -23912,7 +23912,7 @@ nn:
   this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: "Dette er det nye brukargrensesnittet for førehandsvising av funksjonsval. Førebels er det kun lesbart. For å få tilbake det gamle brukargrensesnittet må du klikke på knappen. Då deaktiverast \"nytt funksjonsval-merknad\"-funksjonen og sida lastast på nytt. "
   this_is_where_students_can_see_their_groups_7dd2dae3: "Det er her studentane kan sjå gruppene sine."
   this_is_where_you_can_leave_a_comment_and_view_you_a2259ec8: "Det er her du kan legge att ein kommentar og sjå din instruktør si tilbakemelding."
-  this_is_where_you_ll_land_when_your_home_is_comple_8ab4d2b8: "Dette er kor du landar når heimesida er komplett."
+  this_is_where_you_ll_land_when_your_home_is_comple_8ab4d2b8: "Dette er der du landar når heimesida er komplett."
   this_is_your_anonymous_avatar_55211702: "Dette er din anonyme avatar"
   this_is_your_course_landing_page_33d445ec: "Dette er forsida til emnet ditt"
   this_is_your_current_theme_4331709b: "Dette er gjeldande tema"
@@ -24263,7 +24263,7 @@ nn:
     new_topic: "Nytt diskusjonsemne"
   title_52b8638d: "Tittel:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} avtalegruppe* Du kan **melde deg** på."
-  title_current_750a3c65: "%{title}(nåværande)"
+  title_current_750a3c65: "%{title}(noverande)"
   title_eb77c512: "%{title}"
   title_ee03d132: Tittel
   title_f8e03596: "* Tittel"
@@ -24327,15 +24327,15 @@ nn:
       
       Dersom løyvet er slått av medan 'Brukarar - vis innloggings-ID' er slått på, vil ein brukar sjå e-postadressar som innloggings-ID-ar.
   to_access_the_quizzes_index_page_course_content_vi_d9607c01: "For å få tilgang til quizoversikta må Emneinnhald - vis vere slått på."
-  to_access_the_student_interactions_report_courses__e8432cd0: "For å sjå rapporten om studentars interaksjon, må Emne - sjå bruksrapportar være aktivert."
-  to_access_the_student_interactions_report_grades_v_69105662: "For å sjå rapporten om studentars interaksjon, må Vurderingar - sjå alle vurderingar være aktivert."
-  to_act_as_other_users_users_act_as_must_also_be_en_cc96faf1: "For å kunne opptre som anna bruker må \"Brukarar - opptre som\" vere slått på"
+  to_access_the_student_interactions_report_courses__e8432cd0: "For å sjå rapporten om studentar sin interaksjon, må Emne - sjå bruksrapportar vere aktivert."
+  to_access_the_student_interactions_report_grades_v_69105662: "For å sjå rapporten om studentar sin interaksjon, må Vurderingar - sjå alle vurderingar vere aktivert."
+  to_act_as_other_users_users_act_as_must_also_be_en_cc96faf1: "For å kunne opptre som anna brukar må \"Brukarar - opptre som\" vere slått på"
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "For å aktivere SMS må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
   to_activate_this_communication_channel_enter_the_f_f465efc5: "For å aktivere denne kommunikasjonskanalen må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
   to_add_a_course_courses_add_must_also_be_enabled_8c2231d9: "For å legge til eit emne må \"Emne - legg til\" vere slått på"
-  to_add_a_course_group_to_a_collaboration_groups_ad_c26d8db0: "For å legge til ei gruppe i eit samarbeid må Gruppar - legg til vere slått på"
-  to_add_a_user_via_sis_id_sis_data_manage_must_also_30b6624a: "For å legge til ein brukar med SIS ID, SIS Data - administrer må være skrudd på."
-  to_add_account_level_groups_via_csv_sis_data_impor_b1a4ccf3: "For å legge til grupper på kontonivå via CSV må SIS Data - importer vere slått på."
+  to_add_a_course_group_to_a_collaboration_groups_ad_c26d8db0: "For å legge til ei gruppe i eit samarbeid må \"Grupper - legg til\" vere slått på"
+  to_add_a_user_via_sis_id_sis_data_manage_must_also_30b6624a: "For å legge til ein brukar med SIS ID, må \"SIS Data - administrer\" også vere skrudd på."
+  to_add_account_level_groups_via_csv_sis_data_impor_b1a4ccf3: "For å legge til grupper på kontonivå via CSV må \"SIS Data - importer\" vere slått på."
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "For å legge til kunngjeringar, må 'Diskusjonar - moderer' òg vere slått på. For å sjå dei siste kunngjeringane på forsida, må boksen 'Vis siste kunngjeringar på forsida til emnet' vere merka av i emneinnstillingar."
   to_add_announcements_discussions_moderate_must_als_a83fd681: "For å opprette kunngjeringar, må 'Diskusjonar - moderer' óg vere slått på."
   to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "For å legge til tilknytta emne, må 'Blueprint-emne - legg til / endre / slett' og 'Emne - legg til / endre / slett' óg vere slått på."
