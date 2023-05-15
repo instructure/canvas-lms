@@ -100,7 +100,7 @@ export interface EnvCommon {
   /**
    * In milliseconds
    */
-  flashAlertTimeout: number
+  flashAlertTimeout?: number
   KILL_JOY: boolean
   DIRECT_SHARE_ENABLED: boolean
   CAN_VIEW_CONTENT_SHARES: boolean

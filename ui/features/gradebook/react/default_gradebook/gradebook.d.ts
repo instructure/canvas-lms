@@ -255,10 +255,10 @@ export type InitialActionStates = {
   pendingGradeInfo: PendingGradeInfo[]
 }
 
-export type FlashAlertType = {
+export type FlashMessage = {
   key: string
   message: string
-  variant: string
+  variant?: 'error' | 'success' | 'warning' | 'info'
 }
 
 export type FilterType =
@@ -362,12 +362,6 @@ export type ProgressData = {
 export type FilteredContentInfo = {
   invalidAssignmentGroups: AssignmentGroup[]
   totalPointsPossible: number
-}
-
-export type FlashMessage = {
-  key: string
-  message: string
-  variant: string
 }
 
 export type AssignmentStudentMap = {

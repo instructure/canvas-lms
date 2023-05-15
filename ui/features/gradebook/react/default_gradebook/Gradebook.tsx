@@ -65,7 +65,7 @@ import type {
   CustomColumnData,
   Filter,
   FilteredContentInfo,
-  FlashAlertType,
+  FlashMessage,
   GradebookOptions,
   GradebookSettings,
   GradebookStudent,
@@ -274,7 +274,7 @@ export type GradebookProps = {
   fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
   loadDataForCustomColumn: (customColumnId: string) => Promise<CustomColumnData[]>
   finalGradeOverrides: FinalGradeOverrideMap
-  flashAlerts: FlashAlertType[]
+  flashAlerts: FlashMessage[]
   flashMessageContainer: HTMLElement
   gradebookEnv: GradebookOptions
   gradebookGridNode: HTMLElement
