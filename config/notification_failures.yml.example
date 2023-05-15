@@ -1,7 +1,6 @@
 development:
-  access_key_id: access_key
-  secret_access_key: secret_key
   region: us-east-1
+  vault_credential_path: sts/testaccount/sts/canvas-notification-service
   # notification_failure_queue_name: notification-service-failures
   # idle_timeout: 10
   # You can also specify the following values to be passed into the sqs queue's
