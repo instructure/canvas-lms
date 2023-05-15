@@ -917,6 +917,20 @@ test("sets the record's omit_from_final_grade boolean if args passed", () => {
   ok(assignment.omitFromFinalGrade())
 })
 
+QUnit.module('Assignment#hideInGradeBook')
+
+test("gets the record's hide_in_gradebook boolean", () => {
+  const assignment = new Assignment({name: 'foo'})
+  assignment.set('hide_in_gradebook', true)
+  ok(assignment.hideInGradebook())
+})
+
+test("sets the record's hide_in_gradebook boolean if args passed", () => {
+  const assignment = new Assignment({name: 'bar'})
+  assignment.hideInGradebook(true)
+  ok(assignment.hideInGradebook())
+})
+
 QUnit.module('Assignment#toView', {
   setup() {
     fakeENV.setup({current_user_roles: ['teacher']})

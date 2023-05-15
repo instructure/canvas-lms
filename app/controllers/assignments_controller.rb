@@ -1009,6 +1009,7 @@ class AssignmentsController < ApplicationController
                   :integration_id,
                   :moderated_grading,
                   :omit_from_final_grade,
+                  :hide_in_gradebook,
                   :intra_group_peer_reviews,
                   :important_dates,
                   allowed_extensions: strong_anything,

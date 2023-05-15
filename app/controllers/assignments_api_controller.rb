@@ -602,6 +602,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "hide_in_gradebook": {
+#           "description": "(Optional) If true, the assignment will not be shown in any gradebooks",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "moderated_grading": {
 #           "description": "Boolean indicating if the assignment is moderated.",
 #           "example": true,
@@ -1200,6 +1205,9 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[omit_from_final_grade] [Boolean]
   #   Whether this assignment is counted towards a student's final grade.
   #
+  # @argument assignment[hide_in_gradebook] [Boolean]
+  #   Whether this assignment is shown in the gradebook.
+  #
   # @argument assignment[quiz_lti] [Boolean]
   #   Whether this assignment should use the Quizzes 2 LTI tool. Sets the
   #   submission type to 'external_tool' and configures the external tool
@@ -1402,6 +1410,9 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[omit_from_final_grade] [Boolean]
   #   Whether this assignment is counted towards a student's final grade.
+  #
+  # @argument assignment[hide_in_gradebook] [Boolean]
+  #   Whether this assignment is shown in the gradebook.
   #
   # @argument assignment[moderated_grading] [Boolean]
   #   Whether this assignment is moderated.

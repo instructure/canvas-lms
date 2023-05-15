@@ -59,6 +59,7 @@ module Api::V1::Assignment
       group_category_id
       grading_standard_id
       moderated_grading
+      hide_in_gradebook
       omit_from_final_grade
       anonymous_instructor_annotations
       anonymous_grading
@@ -172,6 +173,8 @@ module Api::V1::Assignment
     end
 
     hash["omit_from_final_grade"] = assignment.omit_from_final_grade?
+
+    hash["hide_in_gradebook"] = assignment.hide_in_gradebook?
 
     if assignment.context&.turnitin_enabled?
       hash["turnitin_enabled"] = assignment.turnitin_enabled
@@ -515,6 +518,7 @@ module Api::V1::Assignment
     notify_of_update
     sis_assignment_id
     integration_id
+    hide_in_gradebook
     omit_from_final_grade
     anonymous_instructor_annotations
     allowed_attempts

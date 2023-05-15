@@ -119,22 +119,22 @@
     </div>
     {{#if hideZeroPointQuizzesOptionEnabled}}
       {{#if isQuizLTIAssignment}}
-          <div id="hide-from-gradebook-option">
-            <fieldset id="hide-from-gradebook-set">
+          <div id="assignment_hide_in_gradebook_option">
+            <fieldset id="hide-in-gradebook-set">
               <div class="form-column-left"></div>
-              <div id="hide-from-gradebook" class="form-column-right">
+              <div id="hide_in_gradebook" class="form-column-right">
                 <label class="checkbox">
                   {{#if inClosedGradingPeriod}}
-                    {{checkbox "hideFromGradebook"
-                      id="hide-from-gradebook-checkbox"
-                      name="hide-from-gradebook"
+                    {{checkbox "hideInGradebook"
+                      id="assignment_hide_in_gradebook"
+                      name="hide_in_gradebook"
                       readonly="readonly"
                       aria-readonly="true"
                     }}
                   {{else}}
-                    {{checkbox "hideFromGradebook"
-                      id="hide-from-gradebook-checkbox"
-                      name="hide-from-gradebook"
+                    {{checkbox "hideInGradebook"
+                      id="assignment_hide_in_gradebook"
+                      name="hide_in_gradebook"
                     }}
                   {{/if}}
                   {{#t}}Do not display in gradebook or the student's grade page{{/t}}

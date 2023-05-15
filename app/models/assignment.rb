@@ -69,6 +69,7 @@ class Assignment < ActiveRecord::Base
     final_grader_id
     grader_count
     omit_from_final_grade
+    hide_in_gradebook
     grader_names_visible_to_final_grader
     grader_comments_visible_to_graders
     graders_anonymous_to_graders
@@ -1006,6 +1007,7 @@ class Assignment < ActiveRecord::Base
       vericite_enabled
       moderated_grading
       omit_from_final_grade
+      hide_in_gradebook
       freeze_on_copy
       copied
       only_visible_to_overrides

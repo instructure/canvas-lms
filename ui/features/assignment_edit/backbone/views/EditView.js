@@ -109,8 +109,8 @@ const GROUP_CATEGORY_BOX = '#has_group_category'
 const CONDITIONAL_RELEASE_TARGET = '#conditional_release_target'
 const SIMILARITY_DETECTION_TOOLS = '#similarity_detection_tools'
 const ANONYMOUS_GRADING_BOX = '#assignment_anonymous_grading'
-const HIDE_ZERO_POINT_QUIZZES_BOX = '#hide-from-gradebook-checkbox'
-const HIDE_ZERO_POINT_QUIZZES_OPTION = '#hide-from-gradebook-option'
+const HIDE_ZERO_POINT_QUIZZES_BOX = '#assignment_hide_in_gradebook'
+const HIDE_ZERO_POINT_QUIZZES_OPTION = '#assignment_hide_in_gradebook_option'
 const OMIT_FROM_FINAL_GRADE_BOX = '#assignment_omit_from_final_grade'
 const ASSIGNMENT_EXTERNAL_TOOLS = '#assignment_external_tools'
 const USAGE_RIGHTS_CONTAINER = '#annotated_document_usage_rights_container'
@@ -489,13 +489,13 @@ EditView.prototype.handleAnonymousGradingChange = function () {
 
 EditView.prototype.handleHideZeroPointQuizChange = function () {
   if (this.$hideZeroPointQuizzesBox.prop('checked')) {
-    this.disableCheckbox(
+    this.$omitFromFinalGradeBox.prop('checked', true)
+    return this.disableCheckbox(
       this.$omitFromFinalGradeBox,
       I18n.t(
         'This is enabled by default as assignments can not be withheld from the gradebook and still count towards it.'
       )
     )
-    return this.$omitFromFinalGradeBox.prop('checked', true)
   } else {
     return this.enableCheckbox(this.$omitFromFinalGradeBox)
   }
