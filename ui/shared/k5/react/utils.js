@@ -220,6 +220,7 @@ export const getAssignmentGrades = (data, observedUserId) => {
           assignmentGroupId: group.id,
           pointsPossible: a.points_possible,
           gradingType: a.grading_type,
+          restrictQuantitativeData: a.restrict_quantitative_data,
           score: submission?.score,
           grade: submission?.grade,
           submissionDate: submission?.submitted_at,
