@@ -258,7 +258,7 @@ module PostgreSQLAdapterExtensions
   end
 
   def with_max_update_limit(limit)
-    if current_transaction
+    if transaction_open?
       execute("SET LOCAL inst.max_update_limit = #{limit}")
       ret = yield
       execute("SET LOCAL inst.max_update_limit = DEFAULT")
