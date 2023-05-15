@@ -870,12 +870,15 @@ class EnrollmentsApiController < ApplicationController
     end
   end
 
-  # @API Adds last attended date to student enrollment in course
+  # @API Add last attended date
+  # Add last attended date to student enrollment in course
+  #
+  # @argument date [Date]
+  #   The last attended date of a student enrollment in a course.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/user/:user_id/last_attended"
   #     -X PUT => date="Thu%20Dec%2021%202017%2000:00:00%20GMT-0700%20(MST)
-  #
   #
   # @returns Enrollment
   def last_attended
