@@ -270,5 +270,30 @@ describe "calendar2" do
         expect(event_popover_content).not_to contain_css("a")
       end
     end
+
+    context "auto subscription for an account calendar" do
+      before :once do
+        @subaccount1.account_calendar_subscription_type = "auto"
+        @subaccount1.save!
+      end
+
+      it "cannot uncheck auto-subscribed calendar on selection modal" do
+        @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+        user_session(@student)
+        get "/calendar2"
+
+        open_other_calendars_modal
+        expect(f(account_calendar_checkbox_selector(@subaccount1.id))).to be_disabled
+      end
+
+      it "can uncheck auto-subscribed calendar for viewing on calendar" do
+        @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+        user_session(@student)
+        get "/calendar2"
+
+        account_calendar_available_list_item.click
+        expect(account_calendar_available_list_item).not_to be_checked
+      end
+    end
   end
 end
