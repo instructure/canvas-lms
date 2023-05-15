@@ -175,6 +175,7 @@ function Assignment() {
   this.inPacedCourse = this.inPacedCourse.bind(this)
   this.courseID = this.courseID.bind(this)
   this.omitFromFinalGrade = this.omitFromFinalGrade.bind(this)
+  this.hideInGradebook = this.hideInGradebook.bind(this)
   this.gradingType = this.gradingType.bind(this)
   this.gradedSubmissionsExist = this.gradedSubmissionsExist.bind(this)
   this.inClosedGradingPeriod = this.inClosedGradingPeriod.bind(this)
@@ -427,6 +428,13 @@ Assignment.prototype.omitFromFinalGrade = function (omitFromFinalGradeBoolean) {
     return this.get('omit_from_final_grade')
   }
   return this.set('omit_from_final_grade', omitFromFinalGradeBoolean)
+}
+
+Assignment.prototype.hideInGradebook = function (hideInGradebookBoolean) {
+  if (!(arguments.length > 0)) {
+    return this.get('hide_in_gradebook')
+  }
+  return this.set('hide_in_gradebook', hideInGradebookBoolean)
 }
 
 Assignment.prototype.courseID = function () {
@@ -1200,6 +1208,7 @@ Assignment.prototype.toView = function () {
     'groupCategoryId',
     'hasDueDate',
     'hasPointsPossible',
+    'hideInGradebook',
     'htmlEditUrl',
     'htmlBuildUrl',
     'htmlUrl',
