@@ -101,7 +101,7 @@ Rails.application.config.after_initialize do
     require "jobs_autoscaling"
     actions = [JobsAutoscaling::LoggerAction.new]
     if config[:asg_name]
-      aws_config = config[:aws_config] || {}
+      aws_config = config[:aws_config].dup || {}
       aws_config[:credentials] ||= Canvas::AwsCredentialProvider.new("jobs_autoscaling_creds", config["vault_credential_path"])
       aws_config[:region] ||= ApplicationController.region
       actions << JobsAutoscaling::AwsAction.new(asg_name: config[:asg_name],
