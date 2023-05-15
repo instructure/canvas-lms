@@ -116,6 +116,26 @@ describe "calendar2" do
       expect(sidebar).not_to include_text("OTHER CALENDARS")
     end
 
+    it "the NEW pill is shown only for unseen account calendars" do
+      @student.set_preference(:viewed_auto_subscribed_account_calendars, [])
+      @subaccount2 = @root_account.sub_accounts.create!(name: "SA-2", account_calendar_visible: true, account_calendar_subscription_type: "auto")
+      course_with_student_logged_in(user: @student, account: @subaccount2)
+
+      # for some reason, if I don't get some other page first, this spec will fetch /calendar2
+      # twice at the top of this spec on subsequent runs when it's being run under the
+      # flakey_spec_catcher. This is the only way I could find that resolved that.
+      get "/"
+      wait_for_dom_ready
+
+      get "/calendar2"
+      expect(sidebar).to contain_css(other_calendars_new_pill_selector)
+
+      driver.navigate.refresh
+      wait_for_dom_ready
+
+      expect(sidebar).not_to contain_css(other_calendars_new_pill_selector)
+    end
+
     context "Add other calendars modal" do
       it "adds an account calendar to the list of other calendars and shows its calendar events" do
         account_admin_user(account: @subaccount1)

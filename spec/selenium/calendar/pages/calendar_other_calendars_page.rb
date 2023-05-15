@@ -109,6 +109,10 @@ module CalendarOtherCalendarsPage
     ".view_event_link"
   end
 
+  def other_calendars_new_pill_selector
+    "#other-calendars-list-holder .new-feature-pill"
+  end
+
   #------------------------- Elements ---------------------------
   def open_other_calendars_modal_btn
     f(open_other_calendars_modal_btn_selector)
