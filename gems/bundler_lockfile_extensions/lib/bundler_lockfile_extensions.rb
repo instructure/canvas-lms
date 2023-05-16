@@ -107,36 +107,39 @@ module BundlerLockfileExtensions
         enforce_pinned_additional_dependencies: enforce_pinned_additional_dependencies
       }.freeze)
 
-      # always use the default lockfile for `bundle check`, `bundle install`,
-      # `bundle lock`, and `bundle update`. `bundle cache` delegates to
-      # `bundle install`, but we want that to run as-normal.
-      set_lockfile = if (defined?(::Bundler::CLI::Check) ||
-                        defined?(::Bundler::CLI::Install) ||
-                        defined?(::Bundler::CLI::Lock) ||
-                        defined?(::Bundler::CLI::Update)) &&
-                        !defined?(::Bundler::CLI::Cache)
-                       prepare&.call if default
-                       default
-                     else
-                       current
-                     end
       # if BUNDLE_LOCKFILE is specified, explicitly use only that lockfile, regardless of the command
-      if ENV["BUNDLE_LOCKFILE"] && File.expand_path(ENV["BUNDLE_LOCKFILE"]) == lockfile_def[:lockfile].to_s
-        prepare&.call
-        set_lockfile = true
-        # we started evaluating the project's primary gemfile, but got told to use a lockfile
-        # associated with a different Gemfile. so we need to evaluate that Gemfile instead
-        if lockfile_def[:gemfile] != ::Bundler.default_gemfile
-          # share a cache between all lockfiles
-          ::Bundler.cache_root = ::Bundler.root
-          ENV["BUNDLE_GEMFILE"] = lockfile_def[:gemfile].to_s
-          ::Bundler.root = ::Bundler.default_gemfile.dirname
-          ::Bundler.default_lockfile = lockfile_def[:lockfile]
+      if ENV["BUNDLE_LOCKFILE"]
+        if File.expand_path(ENV["BUNDLE_LOCKFILE"]) == lockfile_def[:lockfile].to_s
+          prepare&.call
+          set_lockfile = true
+          # we started evaluating the project's primary gemfile, but got told to use a lockfile
+          # associated with a different Gemfile. so we need to evaluate that Gemfile instead
+          if lockfile_def[:gemfile] != ::Bundler.default_gemfile
+            # share a cache between all lockfiles
+            ::Bundler.cache_root = ::Bundler.root
+            ENV["BUNDLE_GEMFILE"] = lockfile_def[:gemfile].to_s
+            ::Bundler.root = ::Bundler.default_gemfile.dirname
+            ::Bundler.default_lockfile = lockfile_def[:lockfile]
 
-          builder.eval_gemfile(::Bundler.default_gemfile)
+            builder.eval_gemfile(::Bundler.default_gemfile)
 
-          return false
+            return false
+          end
         end
+      else
+        # always use the default lockfile for `bundle check`, `bundle install`,
+        # `bundle lock`, and `bundle update`. `bundle cache` delegates to
+        # `bundle install`, but we want that to run as-normal.
+        set_lockfile = if (defined?(::Bundler::CLI::Check) ||
+          defined?(::Bundler::CLI::Install) ||
+          defined?(::Bundler::CLI::Lock) ||
+          defined?(::Bundler::CLI::Update)) &&
+                          !defined?(::Bundler::CLI::Cache)
+                         prepare&.call if default
+                         default
+                       else
+                         current
+                       end
       end
       ::Bundler.default_lockfile = lockfile_def[:lockfile] if set_lockfile
       true
