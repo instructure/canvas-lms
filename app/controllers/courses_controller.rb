@@ -2690,8 +2690,8 @@ class CoursesController < ApplicationController
             root_account.enrollment_terms.where(id: enrollment_term_id).first
         end
       end
-      # :manage will be false for teachers in concluded courses
-      args[:enrollment_term] ||= @context.enrollment_term if @context.grants_right?(@current_user, session, :manage)
+      # :manage will be false for teachers in concluded courses (but they may have manage rights due to course dates)
+      args[:enrollment_term] ||= @context.enrollment_term if @context.grants_right?(@current_user, session, :manage) && !@context.restrict_enrollments_to_course_dates
       args[:abstract_course] = @context.abstract_course
       args[:account] = account
       @course = @context.account.courses.new
