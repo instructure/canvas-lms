@@ -17,6 +17,8 @@
  */
 
 import type {
+  Assignment,
+  AssignmentGroup,
   Enrollment,
   GradingType,
   LatePolicyStatus,
@@ -347,3 +349,23 @@ export type SubmissionState =
   | 'graded'
   | 'resubmitted'
   | 'not_submitted'
+
+export type AssignmentGradeCriteria = Pick<
+  Assignment,
+  | 'id'
+  | 'points_possible'
+  | 'submission_types'
+  | 'anonymize_students'
+  | 'omit_from_final_grade'
+  | 'workflow_state'
+>
+export type SubmissionGradeCriteria = Pick<
+  Submission,
+  'score' | 'grade' | 'assignment_id' | 'workflow_state' | 'excused' | 'id'
+>
+
+export type AssignmentGroupCriteriaMap = {
+  [id: string]: Omit<AssignmentGroup, 'assignments'> & {
+    assignments: AssignmentGradeCriteria[]
+  }
+}
