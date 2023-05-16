@@ -38,13 +38,71 @@ export const GradingStandard = {
   },
   mock: ({
     data = [
-      {letterGrade: 'A', baseValue: 90},
-      {letterGrade: 'F', baseValue: 0},
+      {
+        letterGrade: 'A',
+        baseValue: 0.94,
+        __typename: 'GradingStandardItem',
+      },
+      {
+        letterGrade: 'A-',
+        baseValue: 0.9,
+        __typename: 'GradingStandardItem',
+      },
+      {
+        letterGrade: 'B+',
+        baseValue: 0.87,
+        __typename: 'GradingStandardItem',
+      },
+      {
+        letterGrade: 'B',
+        baseValue: 0.84,
+        __typename: 'GradingStandardItem',
+      },
+      {
+        letterGrade: 'B-',
+        baseValue: 0.8,
+        __typename: 'GradingStandardItem',
+      },
+      {
+        letterGrade: 'C+',
+        baseValue: 0.77,
+        __typename: 'GradingStandardItem',
+      },
+      {
+        letterGrade: 'C',
+        baseValue: 0.74,
+        __typename: 'GradingStandardItem',
+      },
+      {
+        letterGrade: 'C-',
+        baseValue: 0.7,
+        __typename: 'GradingStandardItem',
+      },
+      {
+        letterGrade: 'D+',
+        baseValue: 0.67,
+        __typename: 'GradingStandardItem',
+      },
+      {
+        letterGrade: 'D',
+        baseValue: 0.64,
+        __typename: 'GradingStandardItem',
+      },
+      {
+        letterGrade: 'D-',
+        baseValue: 0.61,
+        __typename: 'GradingStandardItem',
+      },
+      {
+        letterGrade: 'F',
+        baseValue: 0,
+        __typename: 'GradingStandardItem',
+      },
     ],
     title = 'Letter Grade',
   } = {}) => ({
     data,
     title,
-    __typename: 'Course',
+    __typename: 'GradingStandard',
   }),
 }

@@ -118,7 +118,10 @@ export const getDisplayScore = (assignment, gradingStandard) => {
   }
 }
 
-export const scoreToLetterGrade = (score, gradingStandard) => {
+export const scorePercentageToLetterGrade = (score, gradingStandard) => {
+  if (score === null || score === undefined) return null
+  if (!Number.isFinite(score)) return null
+
   let letter = null
   gradingStandard?.data?.forEach(gradeLevel => {
     if (score / 100 >= gradeLevel.baseValue && !letter) {
@@ -144,7 +147,13 @@ export const getAssignmentPercentage = assignment => {
 }
 
 export const getAssignmentLetterGrade = (assignment, gradingStandard) => {
-  return scoreToLetterGrade(getAssignmentPercentage(assignment), gradingStandard)
+  if (
+    assignment?.submissionsConnection?.nodes === undefined ||
+    assignment?.submissionsConnection?.nodes.length === 0
+  )
+    return null
+
+  return scorePercentageToLetterGrade(getAssignmentPercentage(assignment), gradingStandard)
 }
 
 // **************** ASSIGNMENT GROUPS **********************************************
@@ -196,7 +205,7 @@ export const getAssignmentGroupPercentage = (assignmentGroup, assignments, apply
 }
 
 export const getAssignmentGroupLetterGrade = (assignmentGroup, assignments, gradingStandard) => {
-  return scoreToLetterGrade(
+  return scorePercentageToLetterGrade(
     getAssignmentGroupPercentage(assignmentGroup, assignments),
     gradingStandard
   )
@@ -249,7 +258,10 @@ export const getGradingPeriodPercentage = (gradingPeriod, assignments) => {
 }
 
 export const getGradingPeriodLetterGrade = (gradingPeriod, assignments, gradingStandard) => {
-  return scoreToLetterGrade(getGradingPeriodPercentage(gradingPeriod, assignments), gradingStandard)
+  return scorePercentageToLetterGrade(
+    getGradingPeriodPercentage(gradingPeriod, assignments),
+    gradingStandard
+  )
 }
 
 export const getGradingPeriodTotalWeighted = (gradingPeriods, assignments, assignmentGroups) => {
@@ -289,7 +301,7 @@ export const getCoursePercentage = assignments => {
 }
 
 export const getCourseLetterGrade = (course, assignments, gradingStandard) => {
-  return scoreToLetterGrade(getCoursePercentage(course, assignments), gradingStandard)
+  return scorePercentageToLetterGrade(getCoursePercentage(course, assignments), gradingStandard)
 }
 
 // **************** TOTAL *********************************************************

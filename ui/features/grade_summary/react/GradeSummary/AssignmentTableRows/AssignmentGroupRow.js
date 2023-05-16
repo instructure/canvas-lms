@@ -23,7 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {
   getAssignmentGroupPercentage,
   formatNumber,
-  scoreToLetterGrade,
+  scorePercentageToLetterGrade,
   getAssignmentGroupEarnedPoints,
   getAssignmentGroupTotalPoints,
   filteredAssignments,
@@ -48,7 +48,7 @@ export const assignmentGroupRow = (assignmentGroup, queryData) => {
       <Table.Cell textAlign="start">
         <Text weight="bold">
           {ENV.restrict_quantitative_data
-            ? scoreToLetterGrade(
+            ? scorePercentageToLetterGrade(
                 getAssignmentGroupPercentage(
                   assignmentGroup,
                   filteredAssignments(queryData),

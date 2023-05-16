@@ -22,7 +22,7 @@ import {Text} from '@instructure/ui-text'
 
 import {
   formatNumber,
-  scoreToLetterGrade,
+  scorePercentageToLetterGrade,
   getGradingPeriodTotalPoints,
   getGradingPeriodPercentage,
   getGradingPeriodTotalWeighted,
@@ -66,7 +66,7 @@ export const gradingPeriodRow = (gradingPeriod, queryData) => {
       <Table.Cell textAlign="start">
         <Text weight="bold">
           {ENV.restrict_quantitative_data
-            ? scoreToLetterGrade(weightedOrUnweighted, queryData?.gradingStandard)
+            ? scorePercentageToLetterGrade(weightedOrUnweighted, queryData?.gradingStandard)
             : `${
                 formatNumber(
                   getGradingPeriodEarnedPoints(gradingPeriod, filteredAssignments(queryData))
