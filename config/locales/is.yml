@@ -3458,7 +3458,7 @@ is:
   announcements_unlocked_successfully_1432da9d: "Tilkynningum var aflæst"
   announcements_view_1019d00d: "Tilkynningar - skoða"
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Gera allar athugasemdir kennara við innsendingar á þessu verkefni nafnlausar í SpeedGrader"
-  anonymize_all_annotations_made_by_instructors_on_s_5540bc09: "Gera allar textaskýringar frá leiðbeinendum við innsendingar fyrir þetta verkefni í Skjalaskoðun nafnlausar"
+  anonymize_all_annotations_made_by_instructors_on_s_5540bc09: "Fela nafn kennara í athugasemdum sem eru skráðar beint í skjal sem nemandi hefur skilað"
   anonymize_all_instructor_comments_and_annotations__713924c9: "Gera allar athugasemdir kennara nafnlausar innan SkjalaSkoðara"
   anonymous_assignments_are_hidden_by_default_and_wi_c8884e1e: "Nafnlaus verkefni eru sjálfvalið falin og þarf að birta handvirkt jafnvel þó að námskeiðið sé stillt á sjálfvirkt."
   anonymous_assignments_cannot_be_hidden_by_section_ca5991a3: "Nafnlaus verkefni er ekki hægt að fela eftir hluta."
@@ -3796,7 +3796,7 @@ is:
     name_is_required: "Þarf nafn!"
     points_possible_number: "Mögulegir punktar verða að vera tala"
     select_external_tool_dialog_title: "Stilla ytra tæki"
-    student_annotation: "Athugasemd nemanda"
+    student_annotation: "Skrá athugsemdir í skjal"
     submission_action_take_quiz: "Taka %{title}"
     submission_action_turn_in_assignment: "Skila %{title}"
     submission_types: 
@@ -4365,7 +4365,7 @@ is:
         allow_text_entry: Textafærsla
         allow_url: "Slóð vefsíðu"
         allowed_extensions: "Leyfðar skráaendingar"
-        allows_annotated_document: "Athugasemd nemanda"
+        allows_annotated_document: "Skrá athugsemdir í skjal"
         restrict_file_extensions: "Takmarka tegundir skráa fyrir upphleðslu"
       online_entry_options: "Færslukostir á netinu"
       submission_type: "Tegund skila"
@@ -4464,7 +4464,7 @@ is:
         syllabus_description: "Lýsing á kennsluáætlun"
       links: 
         edit_syllabus_description: Breyta
-        jump_to_today: "Fara á daginn í dag"
+        jump_to_today: "Sýna viðburði dagsins"
       titles: 
         course_syllabus: "Kennsluáætlun námskeiðs"
     titles: 
@@ -6605,7 +6605,7 @@ is:
   confirmation_code_required_22984955: "Staðfestingakóði (áskilinn)"
   confirmation_failed_please_try_again_ae566d37: "Staðfesting tókst ekki. Reyndu aftur."
   confused_panda_questioning_what_to_do_next_42941484: "Rugluð panda spyr hvað skal gera næst"
-  consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Íhugaðu að velja margar tegundir skila til að gera ráð fyrir nemendum sem geta hugsanlega ekki búið til athugasemdir."
+  consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Íhugaðu að velja fleiri tegundir skila þannig að nemendur sem geta hugsanlega ekki gert athugasemdir í skjalið, geti líka skilað."
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "Samræmd LTI AGS auðkenni byggð á aðalléni reikningsins"
   consortium_parent_keys_803547b: "Foreldralyklar samskeypu"
   consumer_key_6f94ba11: Neytandalykill
@@ -10044,7 +10044,7 @@ is:
       \x20               Vegna þess hversu stórt námskeiðið er verður þú að velja nemendahóp áður en þú ræsir\n\
       \x20               SpeedGrader.\n\
       \x20             "
-  duplicate_31cec192: Tvítaka
+  duplicate_31cec192: "Búa til afrit"
   duplicate_assignment_name_3ca7d753: "Tvítaka verkefni %{name}"
   duplicate_discussion_title_43b39959: "Afrita umræður %{title}"
   duplicate_discussion_title_6537ef4d: "Tvírita umræðu %{title}"
@@ -14903,7 +14903,7 @@ is:
   manual_syncs_are_available_every_cooldown_minutes__e47de0a8: "Hægt er að gera handvirkar samstillingar á %{coolDown} mínútna fresti. Hinkraðu í %{minutesRemaining} mínútur til að samstilla aftur."
   manually_9de23e1f: Handvirkt
   manually_mark_posts_as_read_afa5d035: "Merkja pósta handvirkt sem lesna"
-  manually_mark_replies_as_read_580adc59: "Handvirkt merkja svör sem lesin"
+  manually_mark_replies_as_read_580adc59: "Merkja lesin svör handvirkt"
   manually_post_grades_18248306: "Birta einkunnir handvirkt"
   maori_new_zealand_5380a95f: "Māori (Nýja-Sjáland)"
   march_2020_responsiveness_f810a65b: "Mars 2020 svörunarhæfni"
@@ -18147,7 +18147,7 @@ is:
   online_submission_type_file_uploads_24910d74: "Skilategund á netinu - upphleðsla skrár"
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Skilategund á netinu - upphleðsla skrár-takmarka upphleðslu skráartegunda"
   online_submission_type_media_recordings_9424bf34: "Skilategund á netinu - upptökur miðla"
-  online_submission_type_student_annotation_733641b5: "Gerð netskila - Athugasemd nemanda"
+  online_submission_type_student_annotation_733641b5: "Gerð netskila - Skrá athugsemdir í skjal"
   online_submission_type_text_entry_ac56d100: "Skilategund á netinu - textafærsla"
   online_submission_type_website_url_2c9df33d: "Skilategund á netinu - vefsvæðisslóð"
   online_text_entry_1d893ce: "Textafærsla á netinu"
@@ -23947,7 +23947,7 @@ is:
   student_analytics_614304ee: "Greining nemanda"
   student_annotation_assignments_are_not_currently_s_d840064b: "Verkefni nemenda með athugasemdum eru ekki studd fyrir hópverkefni"
   student_annotation_documents_c0f5c4ec: "Skjöl nemenda með athugasemdum"
-  student_annotation_f6810b5c: "Athugasemd nemanda"
+  student_annotation_f6810b5c: "Skrá athugsemdir í skjal"
   student_annotation_submission_d0025105: "Skil á athugasemd nemanda"
   student_annotation_submissions_4f8898d8: "Skil á athugasemd nemanda"
   student_annotation_submissions_require_an_annotata_6759f3e6: "Til að skila inn athugasemdum nemanda er þörf á annotatable_attachment_id"
@@ -25973,7 +25973,7 @@ is:
   to_check_for_other_broken_links_visit_the_course_l_ace6921d: "Til að leita að öðrum biluðum hlekkjum, skaltu fara á tenglastaðfestara námskeiðs"
   to_check_for_other_broken_links_visit_the_validato_ba3b3f1e: "Til að leita að öðrum biluðum hlekkjum, skaltu fara á %{validator_link}"
   to_check_for_other_broken_links_visit_validator_li_e350c852: "Til að leita að öðrum biluðum hlekkjum, skaltu fara á %{validator_link}"
-  to_close_comments_on_a_discussion_drag_a_discussio_85b27448: "Til að loka ummælum í umræðu skaltu draga umræðu hingað eða velja Loka fyrir athugasemdir úr umræðuskjávalsmyndinni."
+  to_close_comments_on_a_discussion_drag_a_discussio_85b27448: "Til þess að loka fyrir athugasemdir í umræðu skaltu draga hana hingað eða velja „Loka fyrir athugasemdir“ í stillingum umræðunnar."
   to_configure_an_openid_connect_provider_you_need_t_5c937249: |-
       Til að skilgreina OpenID Connect veitanda þarftu heimild, vefslóðir, auðkenni og
       aðgangskóð viðskiptamanns.
@@ -28197,7 +28197,7 @@ is:
   you_cannot_use_a_number_greater_than_the_number_of_af33e220: "Ekki er hægt að nota hærri tölu en sem nemur fjölda verkefna"
   you_created_an_announcement_in_course_c49e3d70: "Þú stofnaðir tilkynningu í %{course}"
   you_created_this_announcement_42d745a7: "Þú stofnaðir þessa tilkynningu:"
-  you_currently_have_no_discussions_with_closed_comm_366a9dab: "Þú hefur engar umræður með lokuðum athugasemdum"
+  you_currently_have_no_discussions_with_closed_comm_366a9dab: "Engar umræður eru lokaðar"
   you_currently_have_no_pinned_discussions_6f0078b8: "Þú hefur engar festar umræður"
   you_do_not_have_access_to_the_requested_announceme_a774d80a: "Þú hefur ekki aðgang að umbeðinni tilkynningu."
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "Þú hefur ekki aðgang að umbeðinni umræðu."
