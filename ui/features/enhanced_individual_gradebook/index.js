@@ -19,6 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import GradebookMenu from '@canvas/gradebook-menu'
+import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import EnhancedIndividualGradebookWrapper from './react/EnhancedIndividualGradebookWrapper'
 
 ReactDOM.render(
   <GradebookMenu
@@ -30,4 +32,16 @@ ReactDOM.render(
     variant="EnhancedIndividualGradebook"
   />,
   document.querySelector('[data-component="GradebookSelector"]')
+)
+
+const matches = window.location.pathname.match(/(.*\/gradebook)/)
+const baseUrl = (matches && matches[0]) || ''
+
+ReactDOM.render(
+  <BrowserRouter basename={baseUrl}>
+    <Routes>
+      <Route path="/" element={<EnhancedIndividualGradebookWrapper />} />
+    </Routes>
+  </BrowserRouter>,
+  document.querySelector('[data-component="EnhancedIndividualGradebook"]')
 )
