@@ -19,18 +19,18 @@
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {AssignmentConnectionResponse, UserConnectionResponse} from '../types'
+import {AssignmentConnection, UserConnectionResponse} from '../types'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
-  assignments: AssignmentConnectionResponse[]
+  assignments: AssignmentConnection[]
   students: UserConnectionResponse[]
   selectedStudentId?: string | null
   selectedAssignmentId?: string | null
-  onStudentChange: (student?: UserConnectionResponse) => void
-  onAssignmentChange: (assignment?: AssignmentConnectionResponse) => void
+  onStudentChange: (studentId?: string) => void
+  onAssignmentChange: (assignment?: AssignmentConnection) => void
 }
 
 // TODO: might want a map for quicker lookups
@@ -41,7 +41,7 @@ type DropDownOption<T> = {
 }
 
 type StudentDropdownOption = DropDownOption<UserConnectionResponse>[]
-type AssignmentDropdownOption = DropDownOption<AssignmentConnectionResponse>[]
+type AssignmentDropdownOption = DropDownOption<AssignmentConnection>[]
 
 const DEFAULT_STUDENT_DROPDOWN_TEXT = I18n.t('No Student Selected')
 const DEFAULT_ASSIGNMENT_DROPDOWN_TEXT = I18n.t('No Assignment Selected')
@@ -106,7 +106,7 @@ export default function ContentSelection({
     const selectedIndex = (event ? event.target.selectedIndex : newIndex) ?? 0
     setSelectedStudentIndex(selectedIndex)
     const selectedStudent = studentDropdownOptions[selectedIndex]?.data
-    onStudentChange(selectedStudent)
+    onStudentChange(selectedStudent?.id)
   }
 
   const handleChangeAssignment = (

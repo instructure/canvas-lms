@@ -22,13 +22,14 @@ import {useSearchParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 
+import {AssignmentGroupCriteriaMap} from '../../../shared/grading/grading.d'
 import AssignmentInformation from './AssignmentInformation'
 import ContentSelection from './ContentSelection'
 import GlobalSettings from './GlobalSettings'
 import GradingResults from './GradingResults'
 import StudentInformation from './StudentInformation'
 import {
-  AssignmentConnectionResponse,
+  AssignmentConnection,
   GradebookQueryResponse,
   SubmissionConnectionResponse,
   UserConnectionResponse,
@@ -43,15 +44,20 @@ const ASSIGNMENT_SEARCH_PARAM = 'assignment'
 export default function EnhancedIndividualGradebook() {
   const [submissions, setSubmissions] = useState<SubmissionConnectionResponse[]>([])
   const [students, setStudents] = useState<UserConnectionResponse[]>([])
-  const [assignments, setAssignments] = useState<AssignmentConnectionResponse[]>([])
+  const [assignments, setAssignments] = useState<AssignmentConnection[]>([])
 
-  const [selectedStudent, setSelectedStudent] = useState<UserConnectionResponse>()
-  const [selectedAssignment, setSelectedAssignment] = useState<AssignmentConnectionResponse>()
+  const [selectedAssignment, setSelectedAssignment] = useState<AssignmentConnection>()
   const [selectedSubmissions, setSelectedSubmissions] = useState<SubmissionConnectionResponse[]>([])
 
-  const courseId = ENV.GRADEBOOK_OPTIONS?.context_id // TODO: get from somewhere else?
+  const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || '' // TODO: get from somewhere else?
   const [searchParams, setSearhParams] = useSearchParams()
-  const selectedStudentId = searchParams.get(STUDENT_SEARCH_PARAM)
+  const studentIdQueryParam = searchParams.get(STUDENT_SEARCH_PARAM)
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null | undefined>(
+    studentIdQueryParam
+  )
+
+  const [assignmentGroupMap, setAssignmentGroupMap] = useState<AssignmentGroupCriteriaMap>({})
+
   const selectedAssignmentId = searchParams.get(ASSIGNMENT_SEARCH_PARAM)
 
   const {data, error} = useQuery<GradebookQueryResponse>(GRADEBOOK_QUERY, {
@@ -66,9 +72,43 @@ export default function EnhancedIndividualGradebook() {
     }
 
     if (data?.course) {
-      const {assignmentsConnection, enrollmentsConnection, submissionsConnection} = data.course
+      const {assignmentGroupsConnection, enrollmentsConnection, submissionsConnection} = data.course
 
-      setAssignments(assignmentsConnection.nodes)
+      const {assignments, assignmentGroupMap} = assignmentGroupsConnection.nodes.reduce(
+        (prev, curr) => {
+          prev.assignments.push(...curr.assignmentsConnection.nodes)
+
+          prev.assignmentGroupMap[curr.id] = {
+            name: curr.name,
+            assignments: curr.assignmentsConnection.nodes.map(assignment => {
+              return {
+                id: assignment.id,
+                name: assignment.name,
+                points_possible: assignment.pointsPossible,
+                submission_types: assignment.submissionTypes,
+                anonymize_students: assignment.anonymizeStudents,
+                omit_from_final_grade: assignment.omitFromFinalGrade,
+                workflow_state: assignment.workflowState,
+              }
+            }),
+            group_weight: curr.groupWeight,
+            rules: curr.rules,
+            id: curr.id,
+            position: curr.position,
+            integration_data: {},
+            sis_source_id: null,
+          }
+
+          return prev
+        },
+        {
+          assignments: [] as AssignmentConnection[],
+          assignmentGroupMap: {} as AssignmentGroupCriteriaMap,
+        }
+      )
+
+      setAssignmentGroupMap(assignmentGroupMap)
+      setAssignments(assignments)
       setSubmissions(submissionsConnection.nodes)
 
       const studentEnrollments = enrollmentsConnection.nodes.map(enrollment => enrollment.user)
@@ -79,17 +119,17 @@ export default function EnhancedIndividualGradebook() {
     }
   }, [data, error])
 
-  const handleStudentChange = (student?: UserConnectionResponse) => {
-    setSelectedStudent(student)
-    if (student) {
-      searchParams.set(STUDENT_SEARCH_PARAM, student?.id)
+  const handleStudentChange = (studentId?: string) => {
+    setSelectedStudentId(studentId)
+    if (studentId) {
+      searchParams.set(STUDENT_SEARCH_PARAM, studentId)
       setSearhParams(searchParams)
     } else {
       searchParams.delete(STUDENT_SEARCH_PARAM)
     }
   }
 
-  const handleAssignmentChange = (assignment?: AssignmentConnectionResponse) => {
+  const handleAssignmentChange = (assignment?: AssignmentConnection) => {
     setSelectedAssignment(assignment)
     setSelectedSubmissions(submissions.filter(s => s.assignment.id === assignment?.id))
     if (assignment) {
@@ -130,7 +170,11 @@ export default function EnhancedIndividualGradebook() {
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
-      <StudentInformation student={selectedStudent} />
+      <StudentInformation
+        courseId={courseId}
+        studentId={selectedStudentId}
+        assignmentGroupMap={assignmentGroupMap}
+      />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
