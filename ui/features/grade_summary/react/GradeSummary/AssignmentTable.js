@@ -39,9 +39,15 @@ const headers = [
   {key: 'score', value: I18n.t('Score'), id: nanoid()},
 ]
 
-const AssignmentTable = ({queryData, layout, setShowTray, setSelectedSubmission}) => {
+const AssignmentTable = ({
+  queryData,
+  layout,
+  setShowTray,
+  setSelectedSubmission,
+  handleReadStateChange,
+}) => {
   return (
-    <Table caption={I18n.t('Student Grade Summary')} layout={layout}>
+    <Table caption={I18n.t('Student Grade Summary')} layout={layout} hover={true}>
       <Table.Head>
         <Table.Row>
           {(headers || []).map(header => (
@@ -53,7 +59,13 @@ const AssignmentTable = ({queryData, layout, setShowTray, setSelectedSubmission}
       </Table.Head>
       <Table.Body>
         {queryData?.assignmentsConnection?.nodes?.map(assignment => {
-          return assignmentRow(assignment, queryData, setShowTray, setSelectedSubmission)
+          return assignmentRow(
+            assignment,
+            queryData,
+            setShowTray,
+            setSelectedSubmission,
+            handleReadStateChange
+          )
         })}
         {getGradingPeriodID() !== '0'
           ? queryData?.assignmentGroupsConnection?.nodes?.map(assignmentGroup => {
@@ -73,6 +85,7 @@ AssignmentTable.propTypes = {
   layout: PropTypes.string,
   setShowTray: PropTypes.func,
   setSelectedSubmission: PropTypes.func,
+  handleReadStateChange: PropTypes.func,
 }
 
 export default AssignmentTable

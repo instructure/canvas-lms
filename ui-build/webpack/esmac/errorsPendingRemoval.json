@@ -37,6 +37,12 @@
   },
   {
     "name": "SpecifierMismatchError",
+    "source": "ui/features/grade_summary/graphql/Mutations.js",
+    "target": "ui/shared/graphql/Error.js",
+    "request": "../../../shared/graphql/Error"
+  },
+  {
+    "name": "SpecifierMismatchError",
     "source": "ui/features/discussion_topics_post/react/components/DueDateTray/DueDateTray.js",
     "target": "ui/shared/datetime/dateHelper.js",
     "request": "../../../../../shared/datetime/dateHelper"

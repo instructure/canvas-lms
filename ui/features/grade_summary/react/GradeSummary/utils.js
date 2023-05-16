@@ -67,9 +67,9 @@ export const getDisplayStatus = assignment => {
     return <Pill>{I18n.t('Excused')}</Pill>
   } else if (assignment?.gradingType === 'not_graded') {
     return <Pill>{I18n.t('Not Graded')}</Pill>
-  } else if (assignment?.submissionsConnection?.nodes.length > 0 === 'missing') {
-    return getNoSubmissionStatus(assignment?.dueDate)
-  } else if (assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'late') {
+  } else if (assignment?.submissionsConnection?.nodes?.length === 0) {
+    return getNoSubmissionStatus(assignment?.dueAt)
+  } else if (assignment?.submissionsConnection?.nodes[0]?.late) {
     return <Pill color="warning">{I18n.t('Late')}</Pill>
   } else if (assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'graded') {
     return <Pill color="success">{I18n.t('Graded')}</Pill>
@@ -81,7 +81,7 @@ export const getDisplayStatus = assignment => {
 export const getNoSubmissionStatus = dueDate => {
   const assignmentDueDate = new Date(dueDate)
   const currentDate = new Date()
-  if (assignmentDueDate < currentDate) {
+  if (dueDate && assignmentDueDate < currentDate) {
     return <Pill color="danger">{I18n.t('Missing')}</Pill>
   } else {
     return <Pill>{I18n.t('Not Submitted')}</Pill>
@@ -90,8 +90,9 @@ export const getNoSubmissionStatus = dueDate => {
 
 export const getDisplayScore = (assignment, gradingStandard) => {
   if (
-    assignment?.submissionsConnection?.nodes[assignment?.submissionsConnection?.nodes.length - 1]
-      ?.gradingStatus === 'excused'
+    assignment?.submissionsConnection?.nodes?.length === 0 ||
+    assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'needs_grading' ||
+    assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused'
   ) {
     return '-'
   } else if (

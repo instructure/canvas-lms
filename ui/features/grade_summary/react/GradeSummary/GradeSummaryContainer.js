@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {useQuery} from 'react-apollo'
+import React, {useContext, useState, useEffect} from 'react'
+import {useQuery, useMutation} from 'react-apollo'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
@@ -31,6 +32,7 @@ import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 
 import {ASSIGNMENTS} from '../../graphql/queries'
+import {UPDATE_SUBMISSIONS_READ_STATE} from '../../graphql/Mutations'
 
 import AssignmentTable from './AssignmentTable'
 import SubmissionComment from './SubmissionComment'
@@ -39,8 +41,10 @@ import {getGradingPeriodID} from './utils'
 const I18n = useI18nScope('grade_summary')
 
 const GradeSummaryContainer = () => {
-  const [showTray, setShowTray] = React.useState(false)
-  const [selectedSubmission, setSelectedSubmission] = React.useState([])
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const [showTray, setShowTray] = useState(false)
+  const [selectedSubmission, setSelectedSubmission] = useState('')
+  const [submissionIdsForUpdate, setSubmissionIdsForUpdate] = useState([])
 
   const gradingPeriod = getGradingPeriodID()
 
@@ -51,6 +55,43 @@ const GradeSummaryContainer = () => {
       gradingPeriodID: gradingPeriod && gradingPeriod !== '0' ? gradingPeriod : null,
     },
   })
+
+  const [readStateChangeSubmission] = useMutation(UPDATE_SUBMISSIONS_READ_STATE, {
+    onCompleted(data) {
+      if (data.updateSubmissionsReadState.errors) {
+        setOnFailure(I18n.t('Read state change operation failed'))
+      } else {
+        setOnSuccess(
+          I18n.t(
+            {
+              one: 'Read state Changed!',
+              other: 'Read states Changed!',
+            },
+            {count: '1000'}
+          )
+        )
+        setSubmissionIdsForUpdate([])
+      }
+    },
+    onError() {
+      setOnFailure(I18n.t('Read state change failed'))
+    },
+  })
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (submissionIdsForUpdate.length > 0) {
+        readStateChangeSubmission({
+          variables: {
+            submissionIds: submissionIdsForUpdate,
+            read: true,
+          },
+        })
+      }
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [submissionIdsForUpdate, readStateChangeSubmission])
 
   if (assignmentQuery.loading) {
     return (
@@ -69,6 +110,16 @@ const GradeSummaryContainer = () => {
         errorSubject={I18n.t('Grade Summary initial query error')}
         errorCategory={I18n.t('Grade Summary Error Page')}
       />
+    )
+  }
+
+  const handleReadStateChange = submissionID => {
+    if (!submissionID) return
+    const arr = [...submissionIdsForUpdate, submissionID]
+    setSubmissionIdsForUpdate(
+      arr.filter(
+        (item, index) => item !== null && item !== undefined && arr.indexOf(item) === index
+      )
     )
   }
 
@@ -108,6 +159,7 @@ const GradeSummaryContainer = () => {
             layout={layout}
             setShowTray={setShowTray}
             setSelectedSubmission={setSelectedSubmission}
+            handleReadStateChange={handleReadStateChange}
           />
           <Tray
             label={I18n.t('Submission Comments Tray')}
