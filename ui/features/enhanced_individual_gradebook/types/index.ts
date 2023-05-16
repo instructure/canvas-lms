@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {WorkflowState} from '../../../api.d'
+
 /**
  * Temporarily generate types for GraphQL queries until we have automated generation setup
  */
@@ -34,9 +36,30 @@ export type UserConnectionResponse = {
   sortableName: string
 }
 
-export type AssignmentConnectionResponse = {
+export type AssignmentConnection = {
   id: string
   name: string
+  pointsPossible: number
+  submissionTypes: string[]
+  anonymizeStudents: boolean
+  omitFromFinalGrade: boolean
+  workflowState: WorkflowState
+}
+
+export type AssignmentGroupConnection = {
+  id: string
+  name: string
+  groupWeight: number
+  rules: {
+    drop_lowest?: number
+    drop_highest?: number
+    never_drop?: string[]
+  }
+  state: string
+  position: number
+  assignmentsConnection: {
+    nodes: AssignmentConnection[]
+  }
 }
 
 export type SubmissionConnectionResponse = {
@@ -49,6 +72,13 @@ export type SubmissionConnectionResponse = {
   grade: string
 }
 
+export type EnrollmentGrades = {
+  unpostedCurrentGrade: number
+  unpostedCurrentScore: number
+  unpostedFinalGrade: number
+  unpostedFinalScore: number
+}
+
 export type GradebookQueryResponse = {
   course: {
     enrollmentsConnection: {
@@ -59,8 +89,40 @@ export type GradebookQueryResponse = {
     submissionsConnection: {
       nodes: SubmissionConnectionResponse[]
     }
-    assignmentsConnection: {
-      nodes: AssignmentConnectionResponse[]
+    assignmentGroupsConnection: {
+      nodes: AssignmentGroupConnection[]
+    }
+  }
+}
+
+export type GradebookStudentDetails = {
+  enrollments: {
+    id: string
+    grades: EnrollmentGrades
+    section: {
+      id: string
+      name: string
+    }
+  }[]
+  loginId: string
+  name: string
+}
+
+export type GradebookUserSubmissionDetails = {
+  grade: string
+  id: string
+  score: number
+  assignmentId: string
+  workflowState: string
+}
+
+export type GradebookStudentQueryResponse = {
+  course: {
+    usersConnection: {
+      nodes: GradebookStudentDetails[]
+    }
+    submissionsConnection: {
+      nodes: GradebookUserSubmissionDetails[]
     }
   }
 }

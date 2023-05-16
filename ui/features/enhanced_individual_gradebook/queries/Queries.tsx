@@ -21,7 +21,7 @@ import gql from 'graphql-tag'
 export const GRADEBOOK_QUERY = gql`
   query GradebookQuery($courseId: ID!) {
     course(id: $courseId) {
-      enrollmentsConnection(filter: {types: StudentEnrollment}) {
+      enrollmentsConnection(filter: {types: [StudentEnrollment, StudentViewEnrollment]}) {
         nodes {
           user {
             id: _id
@@ -35,16 +35,67 @@ export const GRADEBOOK_QUERY = gql`
           grade
           id: _id
           score
-          assignment {
-            id: _id
-          }
+          assignmentId
         }
       }
-      assignmentsConnection {
+      assignmentGroupsConnection {
         nodes {
           id: _id
           name
-          pointsPossible
+          groupWeight
+          rules {
+            dropHighest
+            dropLowest
+          }
+          state
+          position
+          assignmentsConnection {
+            nodes {
+              pointsPossible
+              id: _id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GRADEBOOK_STUDENT_QUERY = gql`
+  query GradebookStudentQuery($courseId: ID!, $userIds: [ID!]) {
+    course(id: $courseId) {
+      usersConnection(
+        filter: {
+          enrollmentTypes: [StudentEnrollment, StudentViewEnrollment]
+          enrollmentStates: active
+          userIds: $userIds
+        }
+      ) {
+        nodes {
+          enrollments {
+            id: _id
+            grades {
+              unpostedCurrentGrade
+              unpostedCurrentScore
+              unpostedFinalGrade
+              unpostedFinalScore
+            }
+            section {
+              id: _id
+              name
+            }
+          }
+          loginId
+          name
+        }
+      }
+      submissionsConnection(studentIds: $userIds) {
+        nodes {
+          grade
+          id: _id
+          score
+          assignmentId
         }
       }
     }

@@ -19,12 +19,12 @@
 import React from 'react'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {AssignmentConnectionResponse, SubmissionConnectionResponse} from '../types'
+import {AssignmentConnection, SubmissionConnectionResponse} from '../types'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
-  assignment?: AssignmentConnectionResponse
+  assignment?: AssignmentConnection
   submissions?: SubmissionConnectionResponse[]
 }
 
