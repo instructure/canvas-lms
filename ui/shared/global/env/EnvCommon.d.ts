@@ -181,7 +181,6 @@ export type SiteAdminFeatureId =
  */
 export type RootAccountFeatureId =
   | 'product_tours'
-  | 'files_dnd'
   | 'usage_rights_discussion_topics'
   | 'granular_permissions_manage_users'
   | 'create_course_subaccount_picker'
