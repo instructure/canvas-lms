@@ -30,6 +30,8 @@ export const Submission = {
       score
       gradingPeriodId
       hideGradeFromStudent
+      readState
+      late
       updatedAt
       commentsConnection {
         nodes {
@@ -46,6 +48,8 @@ export const Submission = {
     score: float,
     gradingPeriodId: string,
     hideGradeFromStudent: bool,
+    readState: string,
+    late: bool,
     updatedAt: string,
     commentsConnection: arrayOf({
       nodes: arrayOf({
@@ -66,6 +70,8 @@ export const Submission = {
     score = 90,
     gradingPeriodId = '1',
     hideGradeFromStudent = false,
+    readState = 'read',
+    late = false,
     updatedAt = '2019-01-01T00:00:00Z',
     commentsConnection = {
       nodes: [
@@ -86,6 +92,8 @@ export const Submission = {
     score,
     gradingPeriodId,
     hideGradeFromStudent,
+    readState,
+    late,
     updatedAt,
     commentsConnection,
     __typename: 'Submission',

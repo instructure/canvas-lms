@@ -20,9 +20,11 @@ import React from 'react'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {IconButton} from '@instructure/ui-buttons'
+import {Badge} from '@instructure/ui-badge'
 import {Flex} from '@instructure/ui-flex'
 import {IconCommentLine, IconMutedLine} from '@instructure/ui-icons'
+import {IconButton} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -31,9 +33,22 @@ import {getDisplayStatus, getDisplayScore, submissionCommentsPresent} from '../u
 
 const I18n = useI18nScope('grade_summary')
 
-export const assignmentRow = (assignment, queryData, setShowTray, setSelectedSubmission) => {
+export const assignmentRow = (
+  assignment,
+  queryData,
+  setShowTray,
+  setSelectedSubmission,
+  handleReadStateChange
+) => {
   return (
-    <Table.Row key={assignment._id}>
+    <Table.Row
+      key={assignment._id}
+      onMouseEnter={() => {
+        if (assignment?.submissionsConnection?.nodes[0]?.readState !== 'read') {
+          handleReadStateChange(assignment?.submissionsConnection?.nodes[0]?._id)
+        }
+      }}
+    >
       <Table.Cell textAlign="start">
         <Flex direction="column">
           <Flex.Item>
@@ -54,7 +69,32 @@ export const assignmentRow = (assignment, queryData, setShowTray, setSelectedSub
             <IconMutedLine />
           </Tooltip>
         ) : (
-          getDisplayScore(assignment, queryData?.gradingStandard)
+          <Flex>
+            <Flex.Item>{getDisplayScore(assignment, queryData?.gradingStandard)}</Flex.Item>
+            {assignment?.submissionsConnection?.nodes.length > 0 &&
+              assignment?.submissionsConnection?.nodes[0]?.readState !== 'read' && (
+                <Flex.Item>
+                  <div
+                    style={{
+                      float: 'right',
+                      marginBottom: '1.5rem',
+                    }}
+                    data-testid="grade-is-unread"
+                  >
+                    <Badge
+                      type="notification"
+                      placement="start center"
+                      standalone={true}
+                      formatOutput={() => (
+                        <ScreenReaderContent>
+                          {I18n.t('Your grade has been updated')}
+                        </ScreenReaderContent>
+                      )}
+                    />
+                  </div>
+                </Flex.Item>
+              )}
+          </Flex>
         )}
       </Table.Cell>
       <Table.Cell textAlign="center">
