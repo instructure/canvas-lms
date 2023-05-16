@@ -71,8 +71,9 @@ module GemOverride
     if version.last.is_a?(Hash) && kwargs.empty?
       kwargs = version.pop
     end
-    if File.directory?("vendor/#{name}")
-      super(name, path: "vendor/#{name}", **kwargs)
+    vendor_path = File.expand_path("vendor/#{name}", __dir__)
+    if File.directory?(vendor_path)
+      super(name, path: vendor_path, **kwargs)
     else
       super(name, *version, path: path, **kwargs)
     end
