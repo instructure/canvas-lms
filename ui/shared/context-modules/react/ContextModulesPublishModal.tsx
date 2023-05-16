@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef} from 'react'
+import React from 'react'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -37,6 +37,7 @@ interface Props {
   readonly isOpen: boolean
   readonly onCancel: () => void
   readonly onClose: () => void
+  readonly onDismiss: () => void
   readonly onPublish: () => void
   readonly isCanceling: boolean
   readonly isPublishing: boolean
@@ -51,6 +52,7 @@ const ContextModulesPublishModal = ({
   isOpen,
   onCancel,
   onClose,
+  onDismiss,
   onPublish,
   isCanceling,
   isPublishing,
@@ -59,14 +61,11 @@ const ContextModulesPublishModal = ({
   progressCurrent,
   title,
 }: Props) => {
-  const closeButtonRef = useRef()
-
   const handlePublish = () => {
     if (isPublishing) {
       onCancel()
     } else {
       onPublish()
-      closeButtonRef.current.focus()
     }
   }
 
@@ -96,7 +95,8 @@ const ContextModulesPublishModal = ({
   return (
     <Modal
       open={isOpen}
-      onDismiss={onClose}
+      onClose={onClose}
+      onDismiss={onDismiss}
       size="small"
       label={title}
       shouldCloseOnDocumentClick={false}
@@ -105,9 +105,8 @@ const ContextModulesPublishModal = ({
         <CloseButton
           placement="end"
           offset="small"
-          onClick={onClose}
+          onClick={onDismiss}
           screenReaderLabel={I18n.t('Close')}
-          elementRef={el => (closeButtonRef.current = el)}
         />
         <Heading>{title}</Heading>
       </Modal.Header>
@@ -131,7 +130,7 @@ const ContextModulesPublishModal = ({
         {progressBar()}
       </Modal.Body>
       <Modal.Footer>
-        <Button data-testid="close-button" onClick={onClose} margin="0 x-small 0 0">
+        <Button data-testid="close-button" onClick={onDismiss} margin="0 x-small 0 0">
           {I18n.t('Close')}
         </Button>
         <Button
