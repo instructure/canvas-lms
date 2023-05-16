@@ -4,11 +4,6 @@ product_tours:
   applies_to: RootAccount
   display_name: "Product Tours"
   description: "In-product training walkthrough and tourpoints for admins, teachers, and students"
-files_dnd:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "Files Drag and Drop Enhancements"
-  description: "Improve discoverability of drag and drop in Files"
 conference_selection_lti_placement:
   state: hidden
   applies_to: SiteAdmin

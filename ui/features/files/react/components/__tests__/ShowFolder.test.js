@@ -57,9 +57,6 @@ describe('ShowFolder', () => {
     oldEnv = window.ENV
     window.ENV = {
       COURSE_ID: '101',
-      FEATURES: {
-        files_dnd: true,
-      },
       context_asset_string: 'course_17',
     }
     sandbox = sinon.createSandbox()
