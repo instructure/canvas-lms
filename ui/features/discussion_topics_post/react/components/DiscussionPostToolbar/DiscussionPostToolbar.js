@@ -141,8 +141,8 @@ export const DiscussionPostToolbar = props => {
                 )}
                 {/* Search */}
                 <Flex.Item
-                  shouldGrow={responsiveProps.search.shouldGrow}
-                  shouldShrink={responsiveProps.search.shouldShrink}
+                  shouldGrow={responsiveProps?.search?.shouldGrow}
+                  shouldShrink={responsiveProps?.search?.shouldShrink}
                   padding={responsiveProps.padding}
                 >
                   <span className="discussions-search-filter">
@@ -161,7 +161,7 @@ export const DiscussionPostToolbar = props => {
                       renderAfterInput={clearButton}
                       placeholder={I18n.t('Search entries or author...')}
                       shouldNotWrap={true}
-                      width={responsiveProps.search.width}
+                      width={responsiveProps?.search?.width}
                     />
                   </span>
                 </Flex.Item>
@@ -174,15 +174,15 @@ export const DiscussionPostToolbar = props => {
                 <Flex.Item
                   margin="0 small 0 0"
                   padding={responsiveProps.padding}
-                  shouldGrow={responsiveProps.filter.shouldGrow}
-                  shouldShrink={responsiveProps.filter.shouldShrink}
+                  shouldGrow={responsiveProps?.filter?.shouldGrow}
+                  shouldShrink={responsiveProps?.filter?.shouldShrink}
                 >
                   <span className="discussions-filter-by-menu">
                     <SimpleSelect
                       renderLabel={<ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>}
                       defaultValue={props.selectedView}
                       onChange={props.onViewFilter}
-                      width={responsiveProps.filter.width}
+                      width={responsiveProps?.filter?.width}
                     >
                       <SimpleSelect.Group renderLabel={I18n.t('View')}>
                         {Object.entries(getMenuConfig(props)).map(

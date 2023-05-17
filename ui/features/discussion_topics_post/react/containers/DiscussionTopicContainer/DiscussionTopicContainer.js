@@ -291,8 +291,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                 <Flex.Item>
                   <View
                     as="div"
-                    borderWidth={responsiveProps.border.width}
-                    borderRadius={responsiveProps.border.radius}
+                    borderWidth={responsiveProps?.border?.width}
+                    borderRadius={responsiveProps?.border?.radius}
                     borderStyle="solid"
                     borderColor="primary"
                     padding="xx-small 0 small"
@@ -301,11 +301,11 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                     {!props.discussionTopic.availableForUser ? (
                       <LockedDiscussion title={props.discussionTopic.title} />
                     ) : (
-                      <Flex direction="column" padding={responsiveProps.container.padding}>
+                      <Flex direction="column" padding={responsiveProps?.container?.padding}>
                         <Flex.Item
                           shouldShrink={true}
                           shouldGrow={true}
-                          margin={responsiveProps.discussionDetails.margin}
+                          margin={responsiveProps?.discussionDetails?.margin}
                         >
                           <DiscussionDetails
                             discussionTopic={props.discussionTopic}
@@ -438,11 +438,11 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                 <View
                                   as="div"
                                   padding="0"
-                                  display={responsiveProps.replyButton.display}
+                                  display={responsiveProps?.replyButton?.display}
                                 >
                                   <span className="discussion-topic-reply-button">
                                     <Button
-                                      display={responsiveProps.replyButton.display}
+                                      display={responsiveProps?.replyButton?.display}
                                       color="primary"
                                       onClick={() => {
                                         setExpandedReply(!expandedReply)
@@ -467,8 +467,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                 {podcast_url?.href && (
                                   <View
                                     as="div"
-                                    padding={responsiveProps.podcastButton.padding}
-                                    display={responsiveProps.replyButton.display}
+                                    padding={responsiveProps?.podcastButton?.padding}
+                                    display={responsiveProps?.replyButton?.display}
                                   >
                                     <PodcastFeed
                                       linkUrl={podcast_url.href}
@@ -485,8 +485,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                           shouldGrow={true}
                           padding={
                             expandedReply
-                              ? responsiveProps.RCE.paddingOpen
-                              : responsiveProps.RCE.paddingClosed
+                              ? responsiveProps?.RCE?.paddingOpen
+                              : responsiveProps?.RCE?.paddingClosed
                           }
                           overflowX="hidden"
                           overflowY="hidden"
