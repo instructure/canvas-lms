@@ -343,7 +343,6 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links
     lti_platform_storage
-    scale_equation_images
     calendar_series
     account_level_blackout_dates
     rce_ux_improvements
