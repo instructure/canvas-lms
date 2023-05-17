@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.6.16 - 2023-05-17
+
+### Fixed
+- Fullscreen issues with several select components
+- A significant number of missing translations across various locales
+
+### Changed
+- Restored previous mathjax delimiter config
+- Absorbed the `tinymce-a11y-checker` plugin
+- Updated the placeholders when inserting media, images, files, etc.
+- Adjusted toolbar overflow to slide rather than float
+- Moved MathML to one shared location
+
+### Added
+- Studio Media Options plugin
+- Equilibrium button to the Equation Editor
+- Icon support for iWork files
+
 ## 5.6.15 - 2023-03-10
 
 ### Changed
