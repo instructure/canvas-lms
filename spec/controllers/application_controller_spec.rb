@@ -2338,58 +2338,28 @@ RSpec.describe ApplicationController do
         expect(controller.send(:show_immersive_reader?)).to be false
       end
 
-      context "when more_immersive_reader feature flag is enabled" do
-        before do
-          Account.site_admin.enable_feature!(:more_immersive_reader)
-        end
-
-        it "is true for the assignments show page" do
-          controller.params[:controller] = "assignments"
-          controller.params[:action] = "show"
-          expect(controller.send(:show_immersive_reader?)).to be true
-        end
-
-        it "is true for the course page" do
-          controller.params[:controller] = "courses"
-          controller.params[:action] = "show"
-          expect(controller.send(:show_immersive_reader?)).to be true
-        end
-
-        it "is true for the syllabus page" do
-          controller.params[:controller] = "assignments"
-          controller.params[:action] = "syllabus"
-          expect(controller.send(:show_immersive_reader?)).to be true
-        end
-
-        it "is true for a wiki front page" do
-          controller.params[:controller] = "wiki_pages"
-          controller.params[:action] = "front_page"
-          expect(controller.send(:show_immersive_reader?)).to be true
-        end
+      it "is true for the assignments show page" do
+        controller.params[:controller] = "assignments"
+        controller.params[:action] = "show"
+        expect(controller.send(:show_immersive_reader?)).to be true
       end
 
-      context "when more_immersive_reader feature flag is disabled" do
-        before do
-          Account.site_admin.disable_feature!(:more_immersive_reader)
-        end
+      it "is true for the course page" do
+        controller.params[:controller] = "courses"
+        controller.params[:action] = "show"
+        expect(controller.send(:show_immersive_reader?)).to be true
+      end
 
-        it "is false for the assignments show page" do
-          controller.params[:controller] = "assignments"
-          controller.params[:action] = "show"
-          expect(controller.send(:show_immersive_reader?)).to be false
-        end
+      it "is true for the syllabus page" do
+        controller.params[:controller] = "assignments"
+        controller.params[:action] = "syllabus"
+        expect(controller.send(:show_immersive_reader?)).to be true
+      end
 
-        it "is false for the course page" do
-          controller.params[:controller] = "courses"
-          controller.params[:action] = "show"
-          expect(controller.send(:show_immersive_reader?)).to be false
-        end
-
-        it "is false for the syllabus page" do
-          controller.params[:controller] = "assignments"
-          controller.params[:action] = "syllabus"
-          expect(controller.send(:show_immersive_reader?)).to be false
-        end
+      it "is true for a wiki front page" do
+        controller.params[:controller] = "wiki_pages"
+        controller.params[:action] = "front_page"
+        expect(controller.send(:show_immersive_reader?)).to be true
       end
     end
 

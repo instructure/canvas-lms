@@ -3076,11 +3076,7 @@ class ApplicationController < ActionController::Base
     return false if @current_user.blank?
 
     controller_action = "#{params[:controller]}##{params[:action]}"
-    immersive_reader_pages = if Account.site_admin.feature_enabled?(:more_immersive_reader)
-                               ["assignments#show", "courses#show", "assignments#syllabus", "wiki_pages#front_page", "wiki_pages#show"].freeze
-                             else
-                               ["wiki_pages#show"].freeze
-                             end
+    immersive_reader_pages = %w[assignments#show courses#show assignments#syllabus wiki_pages#front_page wiki_pages#show].freeze
 
     return false unless immersive_reader_pages.include?(controller_action)
 

@@ -1920,7 +1920,6 @@ describe CoursesController do
       end
 
       it "sets ENV.SHOW_IMMERSIVE_READER when user flag is enabled" do
-        Account.site_admin.enable_feature!(:more_immersive_reader)
         @student.enable_feature!(:user_immersive_reader_wiki_pages)
         user_session(@student)
 
