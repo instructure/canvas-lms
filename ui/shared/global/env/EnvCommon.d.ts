@@ -160,7 +160,6 @@ export type SiteAdminFeatureId =
   | 'featured_help_links'
   | 'lti_platform_storage'
   | 'scale_equation_images'
-  | 'buttons_and_icons_cropper'
   | 'calendar_series'
   | 'account_level_blackout_dates'
   | 'account_calendar_events'
