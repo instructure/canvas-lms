@@ -49,7 +49,7 @@ if Plugin.installed?("bundler_lockfile_extensions")
                                             enforce_pinned_additional_dependencies: include_plugins)
     end
 
-    Dir["Gemfile.d/*.lock", "gems/*/Gemfile.lock"].each do |gem_lockfile_name|
+    Dir["Gemfile.d/*.lock", "gems/*/Gemfile.lock", base: Bundler.root].each do |gem_lockfile_name|
       return unless add_lockfile(gem_lockfile_name,
                                             gemfile: gem_lockfile_name.sub(/\.lock$/, ""),
                                             allow_mismatched_dependencies: false)

@@ -98,8 +98,8 @@ module BundlerLockfileExtensions
       end
 
       @lockfile_definitions << (lockfile_def = {
-        gemfile: (gemfile && Pathname.new(gemfile).expand_path) || ::Bundler.default_gemfile,
-        lockfile: (lockfile && Pathname.new(lockfile).expand_path) || ::Bundler.default_lockfile,
+        gemfile: (gemfile && ::Bundler.root.join(gemfile).expand_path) || ::Bundler.default_gemfile,
+        lockfile: (lockfile && ::Bundler.root.join(lockfile).expand_path) || ::Bundler.default_lockfile,
         default: default,
         current: current,
         prepare: prepare,
