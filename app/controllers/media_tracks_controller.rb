@@ -127,12 +127,25 @@ class MediaTracksController < ApplicationController
   #          -H 'Authorization: Bearer <token>'
   #
   def show
-    @media_track = MediaTrack.find params[:id]
-    @media_track.validate! # in case this somehow got saved to the database in the xss-vulnerable TTML format
-    if stale? etag: @media_track, last_modified: @media_track.updated_at.utc
-      render plain: @media_track.webvtt_content
+    @media_object = MediaObject.by_media_id(params[:media_object_id]).first
+    return render_unauthorized_action unless @media_object
+    return render_unauthorized_action unless @current_user
+    
+    # Check supplie params[:id] is the same as found in @media_object
+    # to prevent users from reading captions of unauthorized courses.
+    @media_object.media_tracks.ids.each do |id|
+    if id == params[:id].to_i
+      @media_track = MediaTrack.find params[:id]
+      @media_track.validate! # in case this somehow got saved to the database in the xss-vulnerable TTML format
+      if stale? etag: @media_track, last_modified: @media_track.updated_at.utc
+        render plain: @media_track.webvtt_content
+        return
+      end
     end
   end
+    
+  return render_unauthorized_action
+end
 
   # @{not an}API Delete a Media Track
   #
