@@ -49,6 +49,7 @@ export default createStore({
       'search_by',
       'page',
       'blueprint',
+      'public',
     ]
     propsToCleanUp.forEach(p => {
       if (!originalParams[p]) delete params[p]

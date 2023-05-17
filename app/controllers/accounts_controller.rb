@@ -561,6 +561,10 @@ class AccountsController < ApplicationController
   #   If true, include only courses that inherit content from a blueprint course.
   #   If false, exclude them. If not present, do not filter on this basis.
   #
+  # @argument public [Boolean]
+  #   If true, include only public courses. If false, exclude them.
+  #   If not present, do not filter on this basis.
+  #
   # @argument by_teachers[] [Integer]
   #   List of User IDs of teachers; if supplied, include only courses taught by
   #   one of the referenced users.
@@ -686,6 +690,12 @@ class AccountsController < ApplicationController
       @courses = @courses.associated_courses
     elsif !params[:blueprint_associated].nil?
       @courses = @courses.not_associated_courses
+    end
+
+    if value_to_boolean(params[:public])
+      @courses = @courses.public_courses
+    elsif !params[:public].nil?
+      @courses = @courses.not_public_courses
     end
 
     if value_to_boolean(params[:homeroom])
