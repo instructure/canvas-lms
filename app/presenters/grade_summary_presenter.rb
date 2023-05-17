@@ -165,6 +165,10 @@ class GradeSummaryPresenter
                     AssignmentGroup.visible_assignments(student, @context, all_groups, includes: includes)
                   end
 
+    if Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option)
+      assignments = assignments.not_hidden_in_gradebook
+    end
+
     assignments.where.not(submission_types: %w[not_graded wiki_page]).except(:order)
   end
 
