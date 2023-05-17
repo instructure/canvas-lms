@@ -2710,7 +2710,7 @@ class Submission < ActiveRecord::Base
   end
 
   def refresh_comment_read_state
-    unread_comments = visible_submission_comments.left_joins(:viewed_submission_comments).where.not(author: user).where(viewed_submission_comments: { id: nil }).exists?
+    unread_comments = visible_submission_comments.where.missing(:viewed_submission_comments).where.not(author: user).exists?
 
     if unread_comments
       mark_item_unread("comment")
