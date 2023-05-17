@@ -49,6 +49,8 @@ export const transformGrades = courses =>
       hasGradingPeriods,
       isHomeroom: course.homeroom_course,
       enrollments: course.enrollments,
+      gradingScheme: course.grading_scheme,
+      restrictQuantitativeData: course.restrict_quantitative_data,
     }
     return getCourseGrades(basicCourseInfo)
   })

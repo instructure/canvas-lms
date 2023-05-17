@@ -34,6 +34,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
 import k5Theme from '@canvas/k5/react/k5-theme'
 import {DEFAULT_COURSE_COLOR} from '@canvas/k5/react/utils'
+import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 
 const I18n = useI18nScope('grades_summary')
 
@@ -51,6 +52,8 @@ const GradeSummaryShape = {
   score: PropTypes.number,
   showTotalsForAllGradingPeriods: PropTypes.bool,
   showingAllGradingPeriods: PropTypes.bool,
+  gradingScheme: PropTypes.array,
+  restrictQuantitativeData: PropTypes.bool,
 }
 
 export const GradeCourseImage = ({onClick, courseImage, courseColor, size = DEFAULT_SIZE}) => (
@@ -94,10 +97,14 @@ export const GradeSummaryLine = ({
   score,
   showTotalsForAllGradingPeriods,
   showingAllGradingPeriods,
+  gradingScheme,
+  restrictQuantitativeData,
 }) => {
   let gradeText = grade
   let isPercentage = false
-  if (!grade) {
+  if (restrictQuantitativeData) {
+    gradeText = scoreToGrade(score, gradingScheme)
+  } else if (!grade) {
     if (score || score === 0) {
       gradeText = I18n.toPercentage(score, {
         precision: 0,
@@ -160,18 +167,20 @@ export const GradeSummaryLine = ({
             </Text>
             {['student', 'observer'].includes(enrollmentType) && (
               <>
-                <ProgressBar
-                  screenReaderLabel={I18n.t('Grade for %{course}', {course: courseName})}
-                  formatScreenReaderValue={() =>
-                    isPercentage
-                      ? I18n.t('%{percent} of points possible', {percent: gradeText})
-                      : gradeText
-                  }
-                  size="small"
-                  valueNow={score}
-                  valueMax={100}
-                  margin="small 0"
-                />
+                {!restrictQuantitativeData && (
+                  <ProgressBar
+                    screenReaderLabel={I18n.t('Grade for %{course}', {course: courseName})}
+                    formatScreenReaderValue={() =>
+                      isPercentage
+                        ? I18n.t('%{percent} of points possible', {percent: gradeText})
+                        : gradeText
+                    }
+                    size="small"
+                    valueNow={score}
+                    valueMax={100}
+                    margin="small 0"
+                  />
+                )}
                 <PresentationContent>
                   <Text weight="bold" data-automation="course_grade">
                     {gradeText}
