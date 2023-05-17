@@ -57,19 +57,6 @@ rce_show_studio_media_options:
    a new Studio Media Options tray
   applies_to: SiteAdmin
 
-rce_improved_placeholders:
-  state: hidden
-  display_name: Use improved placeholders for inserted content in the RCE.
-  description: Use new and better styled placeholders for inserted images, videos, and files in the RCE.
-  applies_to: SiteAdmin
-  environments:
-    development:
-      state: allowed_on
-    beta:
-      state: allowed_on
-    ci:
-      state: allowed_on
-
 rce_transform_loaded_content:
   state: hidden
   display_name: Transform RCE Content on Load
