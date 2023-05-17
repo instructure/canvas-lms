@@ -145,7 +145,7 @@ export const DiscussionEntryContainer = props => {
                 <Flex.Item
                   shouldGrow={true}
                   shouldShrink={true}
-                  padding={responsiveProps.authorInfo.padding}
+                  padding={responsiveProps?.authorInfo?.padding}
                 >
                   <AuthorInfo
                     author={props.author}
@@ -169,12 +169,12 @@ export const DiscussionEntryContainer = props => {
                 </Flex.Item>
               )}
               <Flex.Item
-                align={responsiveProps.postUtilities.align}
-                margin={hasAuthor ? responsiveProps.postUtilities.margin : '0'}
+                align={responsiveProps?.postUtilities?.align}
+                margin={hasAuthor ? responsiveProps?.postUtilities?.margin : '0'}
                 overflowX="hidden"
                 overflowY="hidden"
                 shouldGrow={!hasAuthor}
-                padding={responsiveProps.postUtilities.padding}
+                padding={responsiveProps?.postUtilities?.padding}
               >
                 {props.postUtilities}
               </Flex.Item>
@@ -183,10 +183,10 @@ export const DiscussionEntryContainer = props => {
           <Flex.Item
             padding={
               hasAuthor
-                ? responsiveProps.postMessage.padding
-                : responsiveProps.postMessage.paddingNoAuthor
+                ? responsiveProps?.postMessage?.padding
+                : responsiveProps?.postMessage?.paddingNoAuthor
             }
-            margin={props.isTopic ? '0' : responsiveProps.postMessage.margin}
+            margin={props.isTopic ? '0' : responsiveProps?.postMessage?.margin}
             overflowY="hidden"
             overflowX="hidden"
           >
