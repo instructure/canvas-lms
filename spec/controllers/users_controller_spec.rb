@@ -2470,7 +2470,7 @@ describe UsersController do
 
         get "media_download", params: { user_id: @student.id, entryId: "someMediaId", type: "mp4" }
 
-        expect(response.code).to eq "404"
+        expect(response).to have_http_status :not_found
         expect(response.body).to eq "Could not find download URL"
       end
     end

@@ -133,17 +133,17 @@ describe WikiPagesController do
 
         it "allows show" do
           get "show", params: { course_id: @course.id, id: @page.url }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         it "allows edit" do
           get "edit", params: { course_id: @course.id, id: @page.url }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         it "allows revisions" do
           get "revisions", params: { course_id: @course.id, wiki_page_id: @page.url }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         context "feature enabled" do
@@ -181,18 +181,18 @@ describe WikiPagesController do
 
         it "allows show" do
           get "show", params: { course_id: @course.id, id: @page.url }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         it "allows edit" do
           get "edit", params: { course_id: @course.id, id: @page.url }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
           expect(controller.js_env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to be false
         end
 
         it "allows revisions" do
           get "revisions", params: { course_id: @course.id, wiki_page_id: @page.url }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
       end
     end

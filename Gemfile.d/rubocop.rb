@@ -28,8 +28,8 @@ group :test do
 
   gem "rubocop-canvas", require: false, path: "../gems/rubocop-canvas"
   gem "rubocop-inst", "~> 1", require: false
-  gem "rubocop-graphql", "1.1.1", require: false
-  gem "rubocop-rails", "2.19.1", require: false
-  gem "rubocop-rake", "0.6.0", require: false
-  gem "rubocop-rspec", "2.19.0", require: false
+  gem "rubocop-graphql", "~> 1.1.1", require: false # 1.2.0 depends on Ruby 3.0
+  gem "rubocop-rails", "~> 2.19", require: false
+  gem "rubocop-rake", "~> 0.6", require: false
+  gem "rubocop-rspec", "~> 2.22", require: false
 end

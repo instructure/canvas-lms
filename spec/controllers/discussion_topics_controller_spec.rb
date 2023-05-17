@@ -1109,7 +1109,7 @@ describe DiscussionTopicsController do
       @course.update(is_public: true)
       course_topic
       get "show", params: { course_id: @course.id, id: @topic.id }
-      expect(response.code).to eq "302"
+      expect(response).to have_http_status :found
       expect(ErrorReport.last).to be_nil
     end
 
@@ -1462,7 +1462,7 @@ describe DiscussionTopicsController do
       assign = @course.assignments.create!(title: "Graded Topic 1", submission_types: "discussion_topic")
       topic = assign.discussion_topic
       put "update", params: { course_id: @course.id, topic_id: topic.id, todo_date: 1.day.from_now }, format: "json"
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
     end
 
     it "does not allow changing a topic to graded and adding a todo date" do
@@ -1473,7 +1473,7 @@ describe DiscussionTopicsController do
                     todo_date: 1.day.from_now,
                     assignment: { submission_types: ["discussion_topic"], name: "Graded Topic 1" } },
           format: "json"
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
     end
 
     it "allows a todo date when changing a topic from graded to ungraded" do
@@ -1487,7 +1487,7 @@ describe DiscussionTopicsController do
                     todo_date: todo_date.iso8601(6),
                     assignment: { set_assignment: false, name: "Graded Topic 1" } },
           format: "json"
-      expect(response.code).to eq "200"
+      expect(response).to have_http_status :ok
       expect(topic.reload.assignment).to be_nil
       expect(topic.todo_date).to eq todo_date
     end
@@ -1500,7 +1500,7 @@ describe DiscussionTopicsController do
                     topic_id: @topic.id,
                     assignment: { submission_types: ["discussion_topic"], name: "Graded Topic 1" } },
           format: "json"
-      expect(response.code).to eq "200"
+      expect(response).to have_http_status :ok
       expect(@topic.reload.assignment).to be_truthy
       expect(@topic.todo_date).to be_nil
     end

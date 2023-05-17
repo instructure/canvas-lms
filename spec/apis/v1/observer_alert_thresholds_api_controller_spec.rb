@@ -167,7 +167,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
                  format: "json" }
 
       api_call_as_user(user, :get, path, params)
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
   end
 
@@ -201,7 +201,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
                  action: "create",
                  format: "json" }
       api_call_as_user(@observer, :post, @path, params)
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
     end
 
     it "errors if users are not linked" do
@@ -214,7 +214,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
                  action: "create",
                  format: "json" }
       api_call_as_user(user, :post, path, params)
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
     end
 
     it "errors without required params" do
@@ -225,7 +225,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
                  action: "create",
                  format: "json" }
       api_call_as_user(@observer, :post, @path, params)
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
     end
 
     it "ignores improper params" do
@@ -240,7 +240,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
                  action: "create",
                  format: "json" }
       json = api_call_as_user(@observer, :post, @path, params)
-      expect(response.code).to eq "200"
+      expect(response).to have_http_status :ok
       expect(json["something_sneaky"]).to be_nil
     end
 
@@ -301,7 +301,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
       params = @params.merge({ user_id: user.to_param, threshold: "50" })
 
       api_call_as_user(user, :put, path, params)
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
   end
 
@@ -330,7 +330,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
       params = @params.merge({ user_id: user.to_param })
 
       api_call_as_user(user, :delete, path, params)
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
   end
 end

@@ -102,7 +102,7 @@ describe CommunicationChannelsController do
         }
       }
       expect(response).not_to be_successful
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
   end
 
@@ -1379,7 +1379,7 @@ describe CommunicationChannelsController do
 
     delete "destroy", params: { id: @pseudonym.communication_channel.id }
 
-    expect(response.code).to eq "401"
+    expect(response).to have_http_status :unauthorized
   end
 
   it "does not delete a required institutional channel" do
@@ -1390,7 +1390,7 @@ describe CommunicationChannelsController do
 
     delete "destroy", params: { id: @pseudonym.communication_channel.id }
 
-    expect(response.code).to eq "401"
+    expect(response).to have_http_status :unauthorized
   end
 
   context "push token deletion" do

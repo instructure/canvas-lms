@@ -1248,7 +1248,7 @@ describe GradebooksController do
           get :show, params: { course_id: @course.id }
 
           groupless_json = group_categories_json.find { |cat| cat["id"] == @groupless_category.id }
-          expect(groupless_json["groups"]).to match_array([])
+          expect(groupless_json["groups"]).to be_empty
         end
       end
 

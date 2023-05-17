@@ -69,14 +69,14 @@ describe "Folders API", type: :request do
         course_with_student(course: @course)
         raw_api_call(:get, @folders_path + "/#{@f4.id}/folders", @folders_path_options.merge(action: "api_index", id: @f4.id.to_param), {})
 
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
 
     it "404s for no folder found" do
       raw_api_call(:get, @folders_path + "/0/folders", @folders_path_options.merge(action: "api_index", id: "0"), {})
 
-      expect(response.code).to eq "404"
+      expect(response).to have_http_status :not_found
     end
 
     it "paginates" do
@@ -148,7 +148,7 @@ describe "Folders API", type: :request do
       @f1 = @root.sub_folders.create!(name: "folder1", context: @course, hidden: true)
       course_with_student(course: @course)
       raw_api_call(:get, @folders_path + "/#{@f1.id}", @folders_path_options.merge(action: "show", id: @f1.id.to_param), {})
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "404s for no folder found" do
@@ -389,7 +389,7 @@ describe "Folders API", type: :request do
       course_with_student(course: @course)
       @f1 = @root.sub_folders.create!(name: "folder1", context: @course)
       raw_api_call(:delete, @folders_path + "/#{@f1.id}", @folders_path_options.merge(action: "api_destroy", id: @f1.id.to_param), {})
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
       @f1.reload
       expect(@f1.workflow_state).to eq "visible"
     end

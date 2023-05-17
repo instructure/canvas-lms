@@ -67,18 +67,18 @@ describe CollaborationsController, type: :request do
     it "requires authorization" do
       user_factory
       raw_api_call(:get, url, url_options)
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "is unauthorized when trying to access a courses collaboration when they are not a member of the course" do
       user_with_pseudonym(active_all: true)
       raw_api_call(:get, url, url_options)
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "is unauthorized when trying to access a groups collaborations they are not a member of" do
       raw_api_call(:get, group_url, group_url_options)
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "doesnt return course collaborations for which the user is not a collaborator on" do
@@ -179,7 +179,7 @@ describe CollaborationsController, type: :request do
 
       it "receives a 401" do
         raw_api_call(:get, url, url_options)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end

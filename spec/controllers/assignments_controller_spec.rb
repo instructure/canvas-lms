@@ -2543,13 +2543,13 @@ describe AssignmentsController do
       allow(connection).to receive(:list_with_extension_filter).and_raise(ArgumentError)
       expect(Canvas::Errors).to receive(:capture_exception)
       get "list_google_docs", params: params, format: "json"
-      expect(response.code).to eq("200")
+      expect(response).to have_http_status(:ok)
     end
 
     it "gives appropriate error code to connection errors" do
       allow(connection).to receive(:list_with_extension_filter).and_raise(GoogleDrive::ConnectionException)
       get "list_google_docs", params: params, format: "json"
-      expect(response.code).to eq("504")
+      expect(response).to have_http_status(:gateway_timeout)
       expect(response.body).to include("Unable to connect to Google Drive")
     end
   end

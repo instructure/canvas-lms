@@ -46,7 +46,7 @@ describe "Conferences API", type: :request do
       @user = nil
       raw_api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options
         .merge(action: "index", course_id: @course.to_param))
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "lists all the conferences" do

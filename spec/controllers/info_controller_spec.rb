@@ -96,7 +96,7 @@ describe InfoController do
     it "responds with 503 if a system component is considered down" do
       allow(Delayed::Job.connection).to receive(:active?).and_return(false)
       get "readiness"
-      expect(response.code).to eq "503"
+      expect(response).to have_http_status :service_unavailable
       json = response.parsed_body
       expect(json["status"]).to eq 503
     end
@@ -112,7 +112,7 @@ describe InfoController do
         end
 
         get "readiness"
-        expect(response.code).to eq "503"
+        expect(response).to have_http_status :service_unavailable
         json = response.parsed_body
         expect(json["status"]).to eq 503
       end
@@ -122,7 +122,7 @@ describe InfoController do
       allow(MultiCache.cache).to receive(:fetch).with("readiness").and_raise(Redis::TimeoutError)
       expect(Canvas::Errors).to receive(:capture_exception).once
       get "readiness"
-      expect(response.code).to eq "503"
+      expect(response).to have_http_status :service_unavailable
       components = response.parsed_body["components"]
       ha_cache = components.find { |c| c["name"] == "ha_cache" }
       expect(ha_cache["status"]).to eq 503
@@ -134,7 +134,7 @@ describe InfoController do
         .at_least(:once)
         .with(:readiness_health_check, "Timeout::Error", :warn)
       get "readiness"
-      expect(response.code).to eq "503"
+      expect(response).to have_http_status :service_unavailable
       json = response.parsed_body
       expect(json["status"]).to eq 503
     end
@@ -196,7 +196,7 @@ describe InfoController do
     it "responds with 503 if a readiness system component is considered down" do
       allow(Delayed::Job.connection).to receive(:active?).and_return(false)
       get "deep"
-      expect(response.code).to eq "503"
+      expect(response).to have_http_status :service_unavailable
       json = response.parsed_body
       expect(json["status"]).to eq 503
     end
@@ -204,7 +204,7 @@ describe InfoController do
     it "returns 503 if critical dependency check fails and readiness response is 200" do
       allow(Shard.connection).to receive(:active?).and_return(false)
       get "deep"
-      expect(response.code).to eq "503"
+      expect(response).to have_http_status :service_unavailable
       json = response.parsed_body
       expect(json["status"]).to eq 503
     end
@@ -217,7 +217,7 @@ describe InfoController do
         .once
         .with(:deep_health_check, "Timeout::Error", :warn)
       get "deep"
-      expect(response.code).to eq "200"
+      expect(response).to have_http_status :ok
       secondary = response.parsed_body["secondary"]
       canvadocs = secondary.find { |c| c["name"] == "canvadocs" }
       expect(canvadocs["status"]).to eq 503
@@ -229,7 +229,7 @@ describe InfoController do
         .at_least(:once)
         .with(:deep_health_check, "Timeout::Error", :warn)
       get "deep"
-      expect(response.code).to eq "503"
+      expect(response).to have_http_status :service_unavailable
       json = response.parsed_body
       expect(json["status"]).to eq 503
     end

@@ -91,7 +91,7 @@ module Lti
         context "with user not active in context" do
           it "fails to process the request" do
             get :index, params: valid_params
-            expect(response.code).to eq "422"
+            expect(response).to have_http_status :unprocessable_entity
           end
         end
 
@@ -141,7 +141,7 @@ module Lti
 
           it "fails to process the request" do
             get :index, params: valid_params
-            expect(response.code).to eq "422"
+            expect(response).to have_http_status :unprocessable_entity
           end
         end
 
@@ -155,7 +155,7 @@ module Lti
 
           it "fails to find user" do
             get :index, params: valid_params
-            expect(response.code).to eq "422"
+            expect(response).to have_http_status :unprocessable_entity
             expect(response.parsed_body["errors"]["message"]).to eq("User not found in course or is not a student")
           end
 
@@ -163,7 +163,7 @@ module Lti
             User.where(id: user.id).update_all lti_id: some_lti_id
             get :index, params: valid_params
 
-            expect(response.code).to eq "200"
+            expect(response).to have_http_status :ok
             expect(parsed_response_body["user_id"]).to eq user.id
           end
         end
@@ -187,7 +187,7 @@ module Lti
             it "successfuly finds the active user using the user past lti id" do
               get :index, params: valid_params
 
-              expect(response.code).to eq "200"
+              expect(response).to have_http_status :ok
               expect(parsed_response_body["user_id"]).to eq user.id
             end
           end
@@ -200,7 +200,7 @@ module Lti
             it "successfuly finds the active user using the user past lti id" do
               get :index, params: valid_params
 
-              expect(response.code).to eq "200"
+              expect(response).to have_http_status :ok
               expect(parsed_response_body["user_id"]).to eq user.id
             end
           end
@@ -218,7 +218,7 @@ module Lti
 
           it "fails to find user" do
             get :index, params: valid_params
-            expect(response.code).to eq "422"
+            expect(response).to have_http_status :unprocessable_entity
             expect(response.parsed_body["errors"]["message"]).to eq("User not found in course or is not a student")
           end
         end
@@ -257,7 +257,7 @@ module Lti
 
           it "fails to match assignment tool" do
             get :index, params: valid_params
-            expect(response.code).to eq "422"
+            expect(response).to have_http_status :unprocessable_entity
             expect(parsed_response_body["errors"]["message"]).to eq("Resource link id points to Tool not associated with this Context")
           end
         end

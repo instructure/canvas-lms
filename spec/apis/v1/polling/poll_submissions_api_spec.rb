@@ -106,7 +106,7 @@ describe Polling::PollSubmissionsController, type: :request do
         student_in_course(active_all: true, course: @course)
         post_create({ filler: true }, true)
 
-        expect(response.code).to eq "404"
+        expect(response).to have_http_status :not_found
         expect(response.body).to match(/The specified resource does not exist/)
       end
 
@@ -119,7 +119,7 @@ describe Polling::PollSubmissionsController, type: :request do
 
         post_create({ poll_choice_id: @selected.id }, true)
 
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
         @session.reload
         expect(@session.poll_submissions.size).to be_zero
       end

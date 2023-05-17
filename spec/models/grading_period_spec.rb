@@ -525,12 +525,12 @@ describe GradingPeriod do
       end
 
       it "returns an empty array when the course has no grading periods groups" do
-        expect(GradingPeriod.for(@course)).to match_array([])
+        expect(GradingPeriod.for(@course)).to be_empty
       end
 
       it "returns an empty array when the course has no grading periods" do
         group_helper.legacy_create_for_course(@course)
-        expect(GradingPeriod.for(@course)).to match_array([])
+        expect(GradingPeriod.for(@course)).to be_empty
       end
 
       it "includes only 'active' grading periods from the course grading period group" do
@@ -560,7 +560,7 @@ describe GradingPeriod do
         period_2 = period_helper.create_with_weeks_for_group(group, 3, 1)
         period_2.workflow_state = :deleted
         period_2.save
-        expect(GradingPeriod.for(@course, inherit: false)).to match_array([])
+        expect(GradingPeriod.for(@course, inherit: false)).to be_empty
       end
     end
 
@@ -580,19 +580,19 @@ describe GradingPeriod do
       end
 
       it "returns an empty array when the account has no grading period groups" do
-        expect(GradingPeriod.for(@root_account)).to match_array([])
+        expect(GradingPeriod.for(@root_account)).to be_empty
       end
 
       it "returns an empty array when the account has no grading periods" do
         group_helper.create_for_account(@root_account)
-        expect(GradingPeriod.for(@root_account)).to match_array([])
+        expect(GradingPeriod.for(@root_account)).to be_empty
       end
 
       it "does not return grading periods on the course directly" do
         group = group_helper.legacy_create_for_course(@course)
         period_helper.create_with_weeks_for_group(group, 5, 3)
         period_helper.create_with_weeks_for_group(group, 3, 1)
-        expect(GradingPeriod.for(@root_account)).to match_array([])
+        expect(GradingPeriod.for(@root_account)).to be_empty
       end
 
       it "includes only 'active' grading periods from the account grading period group" do

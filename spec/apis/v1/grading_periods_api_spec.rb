@@ -122,7 +122,7 @@ describe GradingPeriodsController, type: :request do
       it "deletes a grading period successfully" do
         delete_destroy
 
-        expect(response.code).to eq "204"
+        expect(response).to have_http_status :no_content
         expect(@grading_period.reload).to be_deleted
       end
     end

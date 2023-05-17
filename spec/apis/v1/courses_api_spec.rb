@@ -1862,7 +1862,7 @@ describe CoursesController, type: :request do
             @term.grading_period_group = @grading_period_group
             @term.save!
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response.code).to eql "200"
+            expect(response).to have_http_status :ok
             @course.reload
             expect(@course.group_weighting_scheme).to eql("percent")
           end
@@ -1871,7 +1871,7 @@ describe CoursesController, type: :request do
             @new_values["course"].delete("enrollment_term_id")
             @new_values["course"].delete("term_id")
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response.code).to eql "200"
+            expect(response).to have_http_status :ok
             @course.reload
             expect(@course.group_weighting_scheme).to eql("percent")
           end
@@ -1882,7 +1882,7 @@ describe CoursesController, type: :request do
             @new_values["course"].delete("apply_assignment_group_weights")
             @new_values["course"]["group_weighting_scheme"] = "percent"
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response.code).to eql "200"
+            expect(response).to have_http_status :ok
             @course.reload
             expect(@course.group_weighting_scheme).to eql("percent")
           end
@@ -1893,7 +1893,7 @@ describe CoursesController, type: :request do
             @new_values["course"].delete("apply_assignment_group_weights")
             @new_values["course"]["group_weighting_scheme"] = "percent"
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response.code).to eql "200"
+            expect(response).to have_http_status :ok
             @course.reload
             expect(@course.group_weighting_scheme).to eql("percent")
           end
@@ -1903,7 +1903,7 @@ describe CoursesController, type: :request do
             @new_values["course"]["group_weighting_scheme"] = "percent"
             teacher_in_course(course: @course, active_all: true)
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response.code).to eql "401"
+            expect(response).to have_http_status :unauthorized
             @course.reload
             expect(@course.group_weighting_scheme).not_to eql("percent")
           end
@@ -2004,7 +2004,7 @@ describe CoursesController, type: :request do
             @term.grading_period_group = @grading_period_group
             @term.save!
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response.code).to eql "401"
+            expect(response).to have_http_status :unauthorized
             @course.reload
             expect(@course.group_weighting_scheme).to eql("equal")
           end
@@ -2013,7 +2013,7 @@ describe CoursesController, type: :request do
             @new_values["course"].delete("enrollment_term_id")
             @new_values["course"].delete("term_id")
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response.code).to eql "401"
+            expect(response).to have_http_status :unauthorized
             @course.reload
             expect(@course.group_weighting_scheme).to eql("equal")
           end
@@ -2024,7 +2024,7 @@ describe CoursesController, type: :request do
             @new_values["course"].delete("apply_assignment_group_weights")
             @new_values["course"]["group_weighting_scheme"] = "percent"
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response.code).to eql "401"
+            expect(response).to have_http_status :unauthorized
             @course.reload
             expect(@course.group_weighting_scheme).to eql("equal")
           end
@@ -2035,7 +2035,7 @@ describe CoursesController, type: :request do
             @new_values["course"].delete("apply_assignment_group_weights")
             @new_values["course"]["group_weighting_scheme"] = "percent"
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response.code).to eql "401"
+            expect(response).to have_http_status :unauthorized
             @course.reload
             expect(@course.group_weighting_scheme).to eql("equal")
           end
@@ -2043,7 +2043,7 @@ describe CoursesController, type: :request do
           it "succeeds when apply_assignment_group_weights is not changed" do
             @new_values["course"]["apply_assignment_group_weights"] = false
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response.code).to eql "200"
+            expect(response).to have_http_status :ok
             @course.reload
             expect(@course.group_weighting_scheme).to eql("equal")
           end
@@ -2052,7 +2052,7 @@ describe CoursesController, type: :request do
             @new_values["course"].delete("apply_assignment_group_weights")
             @new_values["course"]["group_weighting_scheme"] = "equal"
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response.code).to eql "200"
+            expect(response).to have_http_status :ok
             @course.reload
             expect(@course.group_weighting_scheme).to eql("equal")
           end
@@ -2060,7 +2060,7 @@ describe CoursesController, type: :request do
           it "ignores deleted assignments" do
             @assignment.destroy
             raw_api_call(:put, @path, @params, @new_values)
-            expect(response.code).to eql "200"
+            expect(response).to have_http_status :ok
             @course.reload
             expect(@course.group_weighting_scheme).to eql("percent")
           end
@@ -2072,7 +2072,7 @@ describe CoursesController, type: :request do
 
         it "returns 401 unauthorized" do
           raw_api_call(:put, @path, @params, @new_values)
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
         end
       end
     end
@@ -2114,7 +2114,7 @@ describe CoursesController, type: :request do
 
         it "returns 400 if params[:event] is missing" do
           raw_api_call(:delete, @path, @params)
-          expect(response.code).to eql "400"
+          expect(response).to have_http_status :bad_request
           expect(JSON.parse(response.body)).to eq({
                                                     "message" => 'Only "delete" and "conclude" events are allowed.'
                                                   })
@@ -2122,7 +2122,7 @@ describe CoursesController, type: :request do
 
         it "returns 400 if an unknown event type is used" do
           raw_api_call(:delete, @path, @params, { event: "rm -rf like a boss" })
-          expect(response.code).to eql "400"
+          expect(response).to have_http_status :bad_request
           expect(JSON.parse(response.body)).to eq({
                                                     "message" => 'Only "delete" and "conclude" events are allowed.'
                                                   })
@@ -2132,7 +2132,7 @@ describe CoursesController, type: :request do
           @course.enrollments.each(&:destroy)
           @course.update!(template: true)
           raw_api_call(:delete, @path, @params, { event: "delete" })
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
         end
       end
 
@@ -2140,7 +2140,7 @@ describe CoursesController, type: :request do
         it "returns 401" do
           @user = @student
           raw_api_call(:delete, @path, @params, { event: "conclude" })
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
         end
       end
     end
@@ -2192,7 +2192,7 @@ describe CoursesController, type: :request do
           @course.enrollments.each(&:destroy)
           @course.update!(template: true)
           raw_api_call(:post, @path, @params)
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
         end
       end
 
@@ -2200,7 +2200,7 @@ describe CoursesController, type: :request do
         it "returns 401" do
           @user = @student
           raw_api_call(:post, @path, @params)
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
         end
       end
     end
@@ -4084,7 +4084,7 @@ describe CoursesController, type: :request do
         api_call(:get,
                  "/api/v1/courses/#{@course1.id}/users/sis_user_id:#{pseudonym.sis_user_id}.json",
                  { controller: "courses", action: "user", course_id: @course1.id.to_s, id: "sis_user_id:#{pseudonym.sis_user_id}", format: "json" })
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
 
       it "does not show other course enrollments to other students" do

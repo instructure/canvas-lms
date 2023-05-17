@@ -283,7 +283,7 @@ describe "Account Notification API", type: :request do
     it "returns an error for missing required params" do
       missing = %w[subject message start_at end_at]
       raw_api_call(:post, @path, @api_params, { account_notification: { icon: "warning" } })
-      expect(response.code).to eql "400"
+      expect(response).to have_http_status :bad_request
       json = JSON.parse(response.body)
       errors = json["errors"].keys
       expect(missing - errors).to be_blank
@@ -300,7 +300,7 @@ describe "Account Notification API", type: :request do
                      message: "This is a notification",
                      icon: "information"
                    } })
-      expect(response.code).to eql "400"
+      expect(response).to have_http_status :bad_request
     end
 
     it "does not allow an end date to be before a start date" do
@@ -314,7 +314,7 @@ describe "Account Notification API", type: :request do
                      message: "This is a notification",
                      icon: "information"
                    } })
-      expect(response.code).to eql "400"
+      expect(response).to have_http_status :bad_request
       errors = JSON.parse(response.body)
       expect(errors["errors"].keys).to include "end_at"
     end

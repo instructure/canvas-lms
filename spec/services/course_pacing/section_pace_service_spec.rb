@@ -35,7 +35,7 @@ describe CoursePacing::SectionPaceService do
       section_pace.destroy!
       expect(
         CoursePacing::SectionPaceService.paces_in_course(course)
-      ).to match_array []
+      ).to be_empty
     end
   end
 

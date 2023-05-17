@@ -805,6 +805,7 @@ describe "Api::V1::Assignment" do
         end
       end
     end
+
     shared_examples "falls back to 'unpublished' state" do
       context "when the original assignment state is other than 'published' or 'unpublished'" do
         let(:original_assignment) { assignment_model }
