@@ -9,14 +9,6 @@ buttons_and_icons_root_account:
     production:
       state: hidden
 
-buttons_and_icons_cropper:
-  state: hidden
-  display_name: Cropper & Associated Features in Buttons & Icons
-  description: |-
-    When enabled, turns on the Button & Icons image cropper, course images
-    source, and upload image source.
-  applies_to: SiteAdmin
-
 rce_ux_improvements:
   state: hidden
   display_name: RCE UX Improvements

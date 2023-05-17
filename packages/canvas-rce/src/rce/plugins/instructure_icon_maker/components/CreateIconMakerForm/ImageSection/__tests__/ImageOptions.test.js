@@ -56,7 +56,6 @@ describe('ImageOptions', () => {
       embedImage: null,
     },
     dispatch: dispatchFn,
-    cropperEnabled: false,
     trayDispatch: trayDispatchFn,
   }
 
@@ -410,7 +409,7 @@ describe('ImageOptions', () => {
 
   describe('when the "Upload Image" mode is selected', () => {
     beforeEach(() => {
-      const component = subject({cropperEnabled: true})
+      const component = subject()
 
       fireEvent.click(component.getByText('Add Image'))
       fireEvent.click(component.getByText('Upload Image'))
@@ -423,7 +422,7 @@ describe('ImageOptions', () => {
 
   describe('when the "Course Images" mode is selected', () => {
     beforeEach(() => {
-      const component = subject({cropperEnabled: true})
+      const component = subject()
 
       fireEvent.click(component.getByText('Add Image'))
       fireEvent.click(component.getByText('Course Images'))

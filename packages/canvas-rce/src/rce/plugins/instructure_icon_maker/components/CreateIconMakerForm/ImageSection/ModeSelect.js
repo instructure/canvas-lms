@@ -26,7 +26,7 @@ import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Menu} from '@instructure/ui-menu'
 
-const ModeSelect = forwardRef(({dispatch, mountNode, onFocus, onBlur, cropperEnabled}, ref) => {
+const ModeSelect = forwardRef(({dispatch, mountNode, onFocus, onBlur}, ref) => {
   const menuFor = mode => (
     <Menu.Item
       key={mode.type}
@@ -59,10 +59,10 @@ const ModeSelect = forwardRef(({dispatch, mountNode, onFocus, onBlur, cropperEna
         </Button>
       }
     >
-      {cropperEnabled && menuFor(modes.uploadImages)}
+      {menuFor(modes.uploadImages)}
       {menuFor(modes.singleColorImages)}
       {menuFor(modes.multiColorImages)}
-      {cropperEnabled && menuFor(modes.courseImages)}
+      {menuFor(modes.courseImages)}
     </Menu>
   )
 })

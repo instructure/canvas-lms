@@ -126,7 +126,6 @@ describe('ImageSection', () => {
     editing: false,
     editor: {},
     onChange: jest.fn(),
-    cropperEnabled: false,
     canvasOrigin: 'https://canvas.instructor.com',
   }
 
@@ -341,29 +340,6 @@ describe('ImageSection', () => {
     })
   })
 
-  describe('when the cropper FF is off', () => {
-    let rendered
-
-    beforeEach(() => {
-      fetchMock.mock('/api/session', '{}')
-
-      rendered = subject({
-        editor: new FakeEditor(),
-      })
-      fireEvent.click(rendered.getByText('Add Image'))
-    })
-
-    afterEach(() => fetchMock.restore())
-
-    it('does not render the "Upload Image" button', () => {
-      expect(rendered.queryByText('Upload Image')).not.toBeInTheDocument()
-    })
-
-    it('does not render the "Course Images" button', () => {
-      expect(rendered.queryByText('Course Images')).not.toBeInTheDocument()
-    })
-  })
-
   describe('when no image is selected', () => {
     it('renders a "None Selected" message', () => {
       const {getByText} = subject()
@@ -379,7 +355,6 @@ describe('ImageSection', () => {
 
     beforeEach(() => {
       const rendered = subject({
-        cropperEnabled: true,
         settings: {size: Size.Small, shape: 'square'},
       })
 
@@ -513,7 +488,6 @@ describe('ImageSection', () => {
 
       rendered = subject({
         editor: new FakeEditor(),
-        cropperEnabled: true,
       })
 
       fireEvent.click(rendered.getByText('Add Image'))
@@ -544,7 +518,7 @@ describe('ImageSection', () => {
     let getByTestId, getByText
 
     beforeEach(() => {
-      const rendered = subject({cropperEnabled: true})
+      const rendered = subject()
 
       getByTestId = rendered.getByTestId
       getByText = rendered.getByText

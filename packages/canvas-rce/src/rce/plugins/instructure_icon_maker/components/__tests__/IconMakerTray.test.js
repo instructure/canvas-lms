@@ -54,7 +54,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   const defaults = {
     onUnmount: jest.fn(),
     editing: false,
-    cropperEnabled: false,
     canvasOrigin: 'http://canvas.instructor.com',
   }
 
@@ -467,7 +466,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         <IconMakerTray
           onClose={jest.fn()}
           editor={ed}
-          cropperEnabled={false}
           canvasOrigin="https://canvas.instructor.com"
         />
       )
@@ -503,7 +501,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
           onClose={jest.fn()}
           editing={true}
           editor={ed}
-          cropperEnabled={false}
           canvasOrigin="https://canvas.instructure.com"
         />
       )
