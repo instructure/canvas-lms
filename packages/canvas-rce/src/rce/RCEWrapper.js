@@ -21,7 +21,7 @@ import {Editor} from '@tinymce/tinymce-react'
 import _ from 'lodash'
 import {StoreProvider} from './plugins/shared/StoreContext'
 
-import themeable from '@instructure/ui-themeable' // eslint-disable-line  @typescript-eslint/no-unused-vars
+import themeable from '@instructure/ui-themeable'
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
@@ -54,16 +54,11 @@ import CanvasContentTray from './plugins/shared/CanvasContentTray'
 import StatusBar, {PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW, WYSIWYG_VIEW} from './StatusBar'
 import {VIEW_CHANGE} from './customEvents'
 import ShowOnFocusButton from './ShowOnFocusButton'
-import theme from '../skins/theme' // eslint-disable-line  @typescript-eslint/no-unused-vars
-import {isAudio, isImage, isVideo} from './plugins/shared/fileTypeUtils'
+import theme from '../skins/theme'
 import KeyboardShortcutModal from './KeyboardShortcutModal'
 import AlertMessageArea from './AlertMessageArea'
 import alertHandler from './alertHandler'
 import {isFileLink, isImageEmbed} from './plugins/shared/ContentSelection'
-import {
-  AUDIO_PLAYER_SIZE,
-  VIDEO_SIZE_DEFAULT,
-} from './plugins/instructure_record/VideoOptionsTray/TrayController'
 import {countShouldIgnore} from './plugins/instructure_wordcount/utils/countContent'
 import launchWordcountModal from './plugins/instructure_wordcount/clickCallback'
 import {determineOSDependentKey} from './userOS'
@@ -324,7 +319,6 @@ class RCEWrapper extends React.Component {
       rce_ux_improvements = false,
       rce_better_paste = false,
       rce_new_external_tool_dialog_in_canvas = false,
-      rce_improved_placeholders = false,
       explicit_latex_typesetting = false,
       rce_show_studio_media_options = false,
       rce_transform_loaded_content = false,
@@ -336,7 +330,6 @@ class RCEWrapper extends React.Component {
       rce_ux_improvements,
       rce_better_paste,
       rce_new_external_tool_dialog_in_canvas,
-      rce_improved_placeholders,
       explicit_latex_typesetting,
       rce_show_studio_media_options,
       rce_transform_loaded_content,
@@ -532,89 +525,11 @@ class RCEWrapper extends React.Component {
   }
 
   insertImagePlaceholder(fileMetaProps) {
-    if (this.props.features?.rce_improved_placeholders) {
-      return insertPlaceholder(
-        this.mceInstance(),
-        fileMetaProps.name,
-        placeholderInfoFor(fileMetaProps)
-      )
-    }
-
-    // wrap this in a promise primarily so specs can await on the placeholder to be in the DOM
-    const prom = new Promise((resolve, reject) => {
-      let width, height
-      let align = 'middle'
-      if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
-        const image = new Image()
-        image.onload = () => {
-          width = image.width
-          height = image.height
-
-          if (!fileMetaProps.domObject.preview) URL.revokeObjectURL(image.src)
-
-          // we constrain the <img> to max-width: 100%, so scale the size down if necessary
-          const maxWidth = Math.floor(
-            this.mceInstance().getBody().clientWidth ||
-              window.visualViewport?.width ||
-              Number.MAX_SAFE_INTEGER
-          )
-          if (width > maxWidth) {
-            height = Math.round((maxWidth / width) * height)
-            width = maxWidth
-          }
-          width = `${width}px`
-          height = `${height}px`
-
-          insertImagePlaceholderFRD(this.mceInstance(), fileMetaProps.name, width, height, align)
-          resolve()
-        }
-        image.onerror = () => {
-          if (!fileMetaProps.domObject.preview) URL.revokeObjectURL(image.src)
-          reject()
-        }
-        image.src = fileMetaProps.domObject.preview || URL.createObjectURL(fileMetaProps.domObject)
-      } else {
-        if (isVideo(fileMetaProps.contentType || fileMetaProps.type)) {
-          width = VIDEO_SIZE_DEFAULT.width
-          height = VIDEO_SIZE_DEFAULT.height
-          align = 'bottom'
-        } else if (isAudio(fileMetaProps.contentType || fileMetaProps.type)) {
-          width = AUDIO_PLAYER_SIZE.width
-          height = AUDIO_PLAYER_SIZE.height
-          align = 'bottom'
-        } else {
-          width = `${fileMetaProps.name.length}rem`
-          height = '1rem'
-        }
-        insertImagePlaceholderFRD(this.mceInstance(), fileMetaProps.name, width, height, align)
-        resolve()
-      }
-
-      function insertImagePlaceholderFRD(editor, imgName, imgWidth, imgHeight, imgAlign) {
-        // if you're wondering, the &nbsp; scatter about in the svg
-        // is because tinymce will strip empty elements
-        const markup = `
-<span
-  aria-label="${formatMessage('Loading')}"
-  data-placeholder-for="${encodeURIComponent(imgName)}"
-  style="width: ${imgWidth}; height: ${imgHeight}; vertical-align: ${imgAlign};"
->
-  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" height="100px" width="100px">
-    <g style="stroke-width:.5rem;fill:none;stroke-linecap:round;">&nbsp;
-      <circle class="c1" cx="50%" cy="50%" r="28px">&nbsp;</circle>
-      <circle class="c2" cx="50%" cy="50%" r="28px">&nbsp;</circle>
-      &nbsp;
-    </g>
-    &nbsp;
-  </svg>
-</span>`
-
-        editor.undoManager.ignore(() => {
-          editor.execCommand('mceInsertContent', false, markup)
-        })
-      }
-    })
-    return prom
+    return insertPlaceholder(
+      this.mceInstance(),
+      fileMetaProps.name,
+      placeholderInfoFor(fileMetaProps)
+    )
   }
 
   insertVideo(video) {
@@ -635,19 +550,7 @@ class RCEWrapper extends React.Component {
   }
 
   removePlaceholders(name) {
-    if (this.props.features?.rce_improved_placeholders) {
-      removePlaceholder(this.mceInstance(), name)
-    } else {
-      const placeholder = this.mceInstance().dom.doc.querySelector(
-        `[data-placeholder-for="${encodeURIComponent(name)}"]`
-      )
-      if (placeholder) {
-        const editor = this.mceInstance()
-        editor.undoManager.ignore(() => {
-          editor.dom.remove(placeholder)
-        })
-      }
-    }
+    removePlaceholder(this.mceInstance(), name)
   }
 
   insertLink(link) {
