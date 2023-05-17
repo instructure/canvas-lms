@@ -982,6 +982,9 @@ class Course < ActiveRecord::Base
   scope :associated_courses, -> { joins(:master_course_subscriptions).where.not(MasterCourses::ChildSubscription.table_name => { workflow_state: "deleted" }) }
   scope :not_associated_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'").where("mcs IS NULL") } # rubocop:disable Rails/WhereEquals mcs is a table, not a column
 
+  scope :public_courses, -> { where(is_public: true) }
+  scope :not_public_courses, -> { where(is_public: false) }
+
   scope :templates, -> { where(template: true) }
 
   scope :homeroom, -> { where(homeroom_course: true) }
