@@ -204,4 +204,13 @@ class ContentParticipation < ActiveRecord::Base
       .pluck(:content_id)
       .count
   end
+
+  def self.mark_all_as_read_for_user(user, contents, course)
+    content_participations = ContentParticipation.where(user: user, content: contents, workflow_state: "unread")
+    ids = content_participations.pluck(:id)
+    content_participations.update_all(workflow_state: "read")
+    cp_count = ContentParticipationCount.find_by(user: user, context: course)
+    cp_count.refresh_unread_count
+    ids
+  end
 end

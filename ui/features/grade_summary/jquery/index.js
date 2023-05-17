@@ -41,6 +41,7 @@ import StatusPill from '@canvas/grading-status-pill'
 import GradeSummaryManager from '../react/GradeSummary/GradeSummaryManager'
 import SelectMenuGroup from '../react/SelectMenuGroup'
 import SubmissionCommentsTray from '../react/SubmissionCommentsTray'
+import ClearBadgeCountsButton from '../react/ClearBadgeCountsButton'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 import useStore from '../react/stores'
 
@@ -667,6 +668,16 @@ function renderSubmissionCommentsTray() {
   )
 }
 
+function renderClearBadgeCountsButton() {
+  ReactDOM.unmountComponentAtNode(document.getElementById('ClearBadgeCountsButton'))
+  const userId = ENV.student_id
+  const courseId = ENV.course_id ?? ENV.context_asset_string.replace('course_', '')
+  ReactDOM.render(
+    <ClearBadgeCountsButton userId={userId} courseId={courseId} />,
+    document.getElementById('ClearBadgeCountsButton')
+  )
+}
+
 function setup() {
   $(document).ready(function () {
     GradeSummary.updateStudentGrades()
@@ -884,6 +895,7 @@ export default _.extend(GradeSummary, {
   getSubmissionCommentsTrayProps,
   handleSubmissionsCommentTray,
   renderSubmissionCommentsTray,
+  renderClearBadgeCountsButton,
   updateScoreForAssignment,
   updateStudentGrades,
 })
