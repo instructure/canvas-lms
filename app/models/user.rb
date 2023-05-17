@@ -1749,7 +1749,7 @@ class User < ActiveRecord::Base
       end.to_h
     end
 
-    return apply_contrast colors_hash if prefers_high_contrast? && uses_high_contrast_course_colors?
+    return apply_contrast colors_hash if prefers_high_contrast?
 
     colors_hash
   end
@@ -1859,10 +1859,6 @@ class User < ActiveRecord::Base
 
   def prefers_high_contrast?
     !!feature_enabled?(:high_contrast)
-  end
-
-  def uses_high_contrast_course_colors?
-    Account.site_admin.feature_enabled?(:high_contrast_course_colors)
   end
 
   def auto_show_cc?

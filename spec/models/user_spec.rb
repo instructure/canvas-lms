@@ -4029,12 +4029,11 @@ describe User do
   end
 
   describe "#custom_colors" do
-    context "user has high_contrast and high_contrast_course_colors enables" do
+    context "user has high_contrast enabled" do
       let(:user) { user_model }
 
       before do
         user.enable_feature!(:high_contrast)
-        Account.site_admin.enable_feature!(:high_contrast_course_colors)
       end
 
       it "sufficiently darkens colors with a contrast below 4.5" do

@@ -178,14 +178,6 @@ high_contrast:
       High Contrast enhances the color contrast of the UI (text, buttons, etc.), making those items more
       distinct and easier to identify. Note: Institution branding will be disabled.
   applies_to: User
-high_contrast_course_colors:
-  state: allowed
-  display_name: High Contrast Course Colors
-  description:
-    high_contrast_course_colors_description: |-
-      High Contrast Course Colors darkens system provided and color picker course colors
-      (not manually defined ones) to improve contrast ratio
-  applies_to: SiteAdmin
 include_byte_order_mark_in_gradebook_exports:
   type: setting
   state: allowed
