@@ -310,7 +310,7 @@ describe SupportHelpers::Tii do
       describe "#new" do
         it "finds no broken submissions" do
           fixer = SupportHelpers::Tii::AssignmentFixer.new("email", nil, @a1.id)
-          expect(fixer.broken_objects).to match_array []
+          expect(fixer.broken_objects).to be_empty
         end
       end
 

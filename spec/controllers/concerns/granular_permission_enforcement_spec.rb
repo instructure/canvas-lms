@@ -63,13 +63,13 @@ describe GranularPermissionEnforcement do
       it "is not authorized" do
         user_session(@student)
         get :index, params: { course: @course }
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "is authorized" do
         user_session(@teacher)
         get :index, params: { course: @course }
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
 
       it "raises error if current controller action is missing from provided actions" do

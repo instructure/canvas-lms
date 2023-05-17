@@ -67,7 +67,7 @@ module Lti
         it "doesn't allow student to register an app" do
           course_with_student_logged_in(active_all: true)
           post "registration", params: { course_id: @course.id, tool_consumer_url: "http://tool.consumer.url" }
-          expect(response.code).to eq "401"
+          expect(response).to have_http_status :unauthorized
         end
 
         it "includes the authorization URL when feature flag enabled" do
@@ -136,7 +136,7 @@ module Lti
           course_with_teacher_logged_in(active_all: true)
           course = @course
           get "reregistration", params: { course_id: course.id, tool_proxy_id: tool_proxy.id }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
           expect(launch_params[:lti_message_type])
@@ -195,13 +195,13 @@ module Lti
           course = @course
           default_resource_handler.message_handlers.first.destroy
           get "reregistration", params: { course_id: course.id, tool_proxy_id: tool_proxy.id }
-          expect(response.code).to eq "404"
+          expect(response).to have_http_status :not_found
         end
 
         it "doesn't allow a student to reregister an app" do
           course_with_student_logged_in(active_all: true)
           get "reregistration", params: { course_id: course_factory.id, tool_proxy_id: tool_proxy.id }
-          expect(response.code).to eq "404"
+          expect(response).to have_http_status :not_found
         end
       end
     end
@@ -464,7 +464,7 @@ module Lti
 
           it "returns the signed params" do
             get "basic_lti_launch_request", params: get_params
-            expect(response.code).to eq "200"
+            expect(response).to have_http_status :ok
 
             lti_launch = assigns[:lti_launch]
             expect(lti_launch.resource_url).to eq "https://www.samplelaunch.com/blti"
@@ -509,18 +509,18 @@ module Lti
                                                     message_handler_id: message_handler.id,
                                                     module_item_id: tag.id,
                                                     params: { tool_launch_context: "my_custom_context" } }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         it "sets the active tab" do
           get "basic_lti_launch_request", params: { account_id: account.id, message_handler_id: message_handler.id }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
           expect(assigns[:active_tab]).to eq message_handler.asset_string
         end
 
         it "returns a 404 when when no handler is found" do
           get "basic_lti_launch_request", params: { account_id: account.id, message_handler_id: 0 }
-          expect(response.code).to eq "404"
+          expect(response).to have_http_status :not_found
         end
 
         it "redirects to login page if there is no session" do
@@ -539,7 +539,7 @@ module Lti
           message_handler.save
 
           get "basic_lti_launch_request", params: { account_id: account.id, message_handler_id: message_handler.id }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
 
           params = assigns[:lti_launch].params.with_indifferent_access
           expect(params["custom_lti_link.custom.url"]).to include("api/lti/tool_settings/")
@@ -582,7 +582,7 @@ module Lti
                                                     message_handler_id: message_handler.id,
                                                     module_item_id: tag.id,
                                                     params: { tool_launch_context: "my_custom_context" } }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
 
           params = assigns[:lti_launch].params.with_indifferent_access
           expect(params["custom_canvas.module.id"]).to eq tag.context_module_id
@@ -597,7 +597,7 @@ module Lti
                                                     message_handler_id: message_handler.id,
                                                     module_item_id: tag.id,
                                                     params: { tool_launch_context: "my_custom_context" } }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
           expect(assigns[:lti_launch].launch_type).to eq "window"
         end
 
@@ -663,7 +663,7 @@ module Lti
           get "basic_lti_launch_request", params: { account_id: account.id,
                                                     message_handler_id: message_handler.id,
                                                     params: { tool_launch_context: "my_custom_context" } }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
 
           lti_launch = assigns[:lti_launch]
           params = lti_launch.params.with_indifferent_access
@@ -680,7 +680,7 @@ module Lti
             get "basic_lti_launch_request", params: { account_id: account.id,
                                                       message_handler_id: message_handler.id,
                                                       params: { tool_launch_context: "my_custom_context" } }
-            expect(response.code).to eq "200"
+            expect(response).to have_http_status :ok
 
             lti_launch = assigns[:lti_launch]
             params = lti_launch.params.with_indifferent_access
@@ -694,7 +694,7 @@ module Lti
             get "basic_lti_launch_request", params: { account_id: account.id,
                                                       message_handler_id: message_handler.id,
                                                       resource_link_fragment: "my_custom_postfix" }
-            expect(response.code).to eq "200"
+            expect(response).to have_http_status :ok
 
             lti_launch = assigns[:lti_launch]
             params = lti_launch.params.with_indifferent_access

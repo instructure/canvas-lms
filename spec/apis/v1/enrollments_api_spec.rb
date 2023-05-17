@@ -338,7 +338,7 @@ describe EnrollmentsApiController, type: :request do
                        }
                      }
 
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
         expect(JSON.parse(response.body)).to eq(
           { "errors" => { "associated_user_id" => [{ "attribute" => "associated_user_id", "type" => "Cannot observe yourself", "message" => "Cannot observe yourself" }] } }
         )
@@ -379,7 +379,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "throws an error if no params are given" do
         raw_api_call :post, @path, @path_options, { enrollment: {} }
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
         expect(JSON.parse(response.body)).to eq({
                                                   "message" => "No parameters given"
                                                 })
@@ -408,7 +408,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "returns an error if no user_id is given" do
         raw_api_call :post, @path, @path_options, { enrollment: { type: "StudentEnrollment" } }
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
         expect(JSON.parse(response.body)).to eq({
                                                   "message" => "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment"
                                                 })
@@ -778,7 +778,7 @@ describe EnrollmentsApiController, type: :request do
                          type: "StudentEnrollment"
                        }
                      }
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
 
@@ -801,7 +801,7 @@ describe EnrollmentsApiController, type: :request do
                          type: "StudentEnrollment"
                        }
                      }
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
 
@@ -826,7 +826,7 @@ describe EnrollmentsApiController, type: :request do
                          self_enrollment_code: @course.self_enrollment_code
                        }
                      }
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "requires a valid code and user" do
@@ -839,7 +839,7 @@ describe EnrollmentsApiController, type: :request do
                          self_enrollment_code: "invalid"
                        }
                      }
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
         json = JSON.parse(response.body)
         expect(json["message"]).to be_include "enrollment[self_enrollment_code] is invalid"
         expect(json["message"]).to be_include "enrollment[user_id] must be 'self' when self-enrolling"
@@ -851,7 +851,7 @@ describe EnrollmentsApiController, type: :request do
                      @path,
                      @path_options,
                      { enrollment: { user_id: "self", self_enrollment_code: @course.self_enrollment_code } }
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
         json = JSON.parse(response.body)
         expect(json["message"]).to be_include "course is not open for self-enrollment"
       end
@@ -887,7 +887,7 @@ describe EnrollmentsApiController, type: :request do
                          self_enrollment_code: @course.self_enrollment_code
                        }
                      }
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
       end
 
       it "does not allow self-enrollment in a concluded course" do
@@ -898,7 +898,7 @@ describe EnrollmentsApiController, type: :request do
                      @path,
                      @path_options,
                      { enrollment: { user_id: "self", self_enrollment_code: @course.self_enrollment_code } }
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
         expect(response.body).to include("concluded")
       end
 
@@ -2323,7 +2323,7 @@ describe EnrollmentsApiController, type: :request do
 
         it "returns a successful response" do
           api_call_as_user(observer, :get, "/api/v1/courses/#{course.id}/enrollments", request_params)
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         it "includes active enrollments for each observed student" do
@@ -2353,7 +2353,7 @@ describe EnrollmentsApiController, type: :request do
         it "returns unauthorized if the user has no non-deleted observer enrollments" do
           observer.observer_enrollments.destroy_all
           api_call_as_user(observer, :get, "/api/v1/courses/#{course.id}/enrollments", request_params)
-          expect(response.code).to eq "401"
+          expect(response).to have_http_status :unauthorized
         end
       end
 
@@ -2365,7 +2365,7 @@ describe EnrollmentsApiController, type: :request do
         it "returns a successful response" do
           request_params[:user_id] = observed_student.id
           api_call_as_user(observer, :get, "/api/v1/courses/#{course.id}/enrollments", request_params)
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
       end
 
@@ -2385,22 +2385,22 @@ describe EnrollmentsApiController, type: :request do
 
       it "returns 401 unauthorized for a course listing" do
         raw_api_call(:get, "/api/v1/courses/#{@course.id}/enrollments", @params.merge(course_id: @course.id.to_param))
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "returns 401 unauthorized for a user listing" do
         raw_api_call(:get, @user_path, @user_params)
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "returns 401 unauthorized for a user requesting an enrollment object by id" do
         raw_api_call(:get, "#{@enroll_path}/#{@enrollment.id}", @enroll_params)
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "returns 401 unauthorized for a course listing with a specific user_if provided" do
         raw_api_call(:get, @path, @params.merge(user_id: @course.students.active.first.id))
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "returns 404 for a user querying from the wrong account" do
@@ -2414,7 +2414,7 @@ describe EnrollmentsApiController, type: :request do
           format: "json"
         }
         raw_api_call(:get, bad_path, enroll_params)
-        expect(response.code).to eql "404"
+        expect(response).to have_http_status :not_found
       end
     end
 
@@ -2443,7 +2443,7 @@ describe EnrollmentsApiController, type: :request do
         path = "/api/v1/users/#{@other_student.id}/enrollments"
         params = { controller: "enrollments_api", action: "index", user_id: @other_student.id.to_param, format: "json" }
         raw_api_call(:get, path, params)
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
 
@@ -2778,7 +2778,7 @@ describe EnrollmentsApiController, type: :request do
                       format: "json" }
 
           raw_api_call(:delete, "#{@path}?task=delete", @params.merge(task: "delete"))
-          expect(response.code).to eql "404"
+          expect(response).to have_http_status :not_found
           expect(JSON.parse(response.body)["errors"]).to eq [{ "message" => "The specified resource does not exist." }]
         end
 
@@ -2834,7 +2834,7 @@ describe EnrollmentsApiController, type: :request do
 
           raw_api_call(:delete, "#{@path}?task=delete", @params)
 
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
           expect(JSON.parse(response.body)).to eq({
                                                     "errors" => [{ "message" => "user not authorized to perform that action" }],
                                                     "status" => "unauthorized"
@@ -2860,16 +2860,16 @@ describe EnrollmentsApiController, type: :request do
         it "returns 401" do
           @user = @student
           raw_api_call(:delete, @path, @params)
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
 
           raw_api_call(:delete, "#{@path}?task=delete", @params.merge(task: "delete"))
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
 
           raw_api_call(:delete, "#{@path}?task=inactivate", @params.merge(task: "inactivate"))
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
 
           raw_api_call(:delete, "#{@path}?task=deactivate", @params.merge(task: "deactivate"))
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
         end
       end
     end
@@ -2892,7 +2892,7 @@ describe EnrollmentsApiController, type: :request do
       it "requires authorization" do
         @user = @student
         raw_api_call(:put, @path, @params)
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "is able to reactivate an enrollment" do
@@ -3166,7 +3166,7 @@ describe EnrollmentsApiController, type: :request do
                                 course_id: @course.to_param,
                                 id: @enrollment.to_param,
                                 format: :json })
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
       expect(json["error"]).to eq "no current invitation"
     end
 
@@ -3183,7 +3183,7 @@ describe EnrollmentsApiController, type: :request do
                                 course_id: @course.to_param,
                                 id: @enrollment.to_param,
                                 format: :json })
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
       expect(json["error"]).to eq "no current invitation"
     end
 
@@ -3200,7 +3200,7 @@ describe EnrollmentsApiController, type: :request do
                                 course_id: @course.to_param,
                                 id: @enrollment.to_param,
                                 format: :json })
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
       expect(json["error"]).to eq "self enroll"
     end
 
@@ -3217,7 +3217,7 @@ describe EnrollmentsApiController, type: :request do
                                 course_id: @course.to_param,
                                 id: @enrollment.to_param,
                                 format: :json })
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
       expect(json["error"]).to eq "self enroll"
     end
 
@@ -3234,7 +3234,7 @@ describe EnrollmentsApiController, type: :request do
                                 course_id: @course.to_param,
                                 id: @enrollment.to_param,
                                 format: :json })
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
       expect(json["error"]).to eq "membership not activated"
     end
 
@@ -3251,7 +3251,7 @@ describe EnrollmentsApiController, type: :request do
                                 course_id: @course.to_param,
                                 id: @enrollment.to_param,
                                 format: :json })
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
       expect(json["error"]).to eq "membership not activated"
     end
   end

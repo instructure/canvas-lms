@@ -823,7 +823,7 @@ describe ContextModulesController do
         assignment = @course.assignments.create!(title: "hello")
         @mod1.add_item(type: "assignment", id: assignment.id)
         get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
-        expect(response.code).to eql "200"
+        expect(response).to have_http_status :ok
       end
     end
 

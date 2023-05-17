@@ -4361,7 +4361,7 @@ describe User do
       end
 
       it "returns auto-subscribed account calendars" do
-        expect(@user.enabled_account_calendars.pluck(:id)).to match_array([])
+        expect(@user.enabled_account_calendars.pluck(:id)).to be_empty
         @associated_subaccount.account_calendar_subscription_type = "auto"
         @associated_subaccount.save!
         expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id)

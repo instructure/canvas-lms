@@ -173,7 +173,7 @@ describe EpubExportsController do
       account = Account.default
       account.disable_feature!(:epub_export)
       get :index
-      expect(response.code).to eq "404"
+      expect(response).to have_http_status :not_found
     end
 
     it "returns 404 with the feature enabled and offline web enabled" do
@@ -182,7 +182,7 @@ describe EpubExportsController do
       account.settings[:enable_offline_web_export] = true
       account.save!
       get :index
-      expect(response.code).to eq "404"
+      expect(response).to have_http_status :not_found
     end
   end
 end

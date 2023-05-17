@@ -76,7 +76,7 @@ module Lti
       describe "POST 'authorize'" do
         it "responds with 200" do
           post auth_endpoint, params: params
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         it "includes an expiration" do
@@ -101,13 +101,13 @@ module Lti
           tool_proxy.raw_data["enabled_capability"] << "OAuth.splitSecret"
           tool_proxy.save!
           post auth_endpoint, params: params
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         it "renders a 400 if the JWT format is invalid" do
           params[:assertion] = "12ad3.4fgs56"
           post auth_endpoint, params: params
-          expect(response.code).to eq "400"
+          expect(response).to have_http_status :bad_request
         end
 
         it "renders a the correct json if the grant_type is invalid" do
@@ -193,7 +193,7 @@ module Lti
           it "accepts a valid reg_key" do
             enable_cache do
               post auth_endpoint, params: params
-              expect(response.code).to eq "200"
+              expect(response).to have_http_status :ok
             end
           end
         end
@@ -226,12 +226,12 @@ module Lti
 
           it "rejects the request if a valid reg_key isn't provided and grant_type is auth code" do
             post auth_endpoint, params: params.delete(:code)
-            expect(response.code).to eq "400"
+            expect(response).to have_http_status :bad_request
           end
 
           it "accepts a developer key with a reg key" do
             post auth_endpoint, params: params
-            expect(response.code).to eq "200"
+            expect(response).to have_http_status :ok
           end
         end
       end

@@ -868,7 +868,7 @@ describe "Roles API", type: :request do
       it "returns 401 unauthorized" do
         user_with_pseudonym
         raw_api_call(:put, @path, @path_options, @permissions)
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
 

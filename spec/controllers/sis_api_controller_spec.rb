@@ -32,7 +32,7 @@ describe SisApiController do
       get "sis_assignments", params: { course_id: course.id }
 
       parsed_json = json_parse(response.body)
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
       expect(parsed_json["code"]).to eq "not_enabled"
     end
 
@@ -45,7 +45,7 @@ describe SisApiController do
         get "sis_assignments", params: { course_id: course.id }
 
         parsed_json = json_parse(response.body)
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
         expect(parsed_json).to eq []
       end
 

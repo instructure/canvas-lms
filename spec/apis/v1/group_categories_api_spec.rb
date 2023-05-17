@@ -212,7 +212,7 @@ describe "Group Categories API", type: :request do
       it "returns 401 for users outside the group_category" do
         user_factory # ?
         raw_api_call(:get, api_url, api_route)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "returns an error when search_term is fewer than 2 characters" do
@@ -506,7 +506,7 @@ describe "Group Categories API", type: :request do
                      "/api/v1/courses/#{@course.to_param}/group_categories.json",
                      @category_path_options.merge(action: "index",
                                                   course_id: @course.to_param))
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "does not list all groups in category for a student" do
@@ -514,7 +514,7 @@ describe "Group Categories API", type: :request do
                      "/api/v1/group_categories/#{@category.id}/groups",
                      @category_path_options.merge(action: "groups",
                                                   group_category_id: @category.to_param))
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "does not allow a student to create a course group category" do
@@ -524,7 +524,7 @@ describe "Group Categories API", type: :request do
                      @category_path_options.merge(action: "create",
                                                   course_id: @course.to_param),
                      { "name" => name })
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "does not allow a teacher to delete the student groups category" do
@@ -533,7 +533,7 @@ describe "Group Categories API", type: :request do
                      "/api/v1/group_categories/#{@category.id}",
                      @category_path_options.merge(action: "destroy",
                                                   group_category_id: @category.to_param)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "does not allow a student to delete a category for a course" do
@@ -545,7 +545,7 @@ describe "Group Categories API", type: :request do
                      "/api/v1/group_categories/#{project_groups.id}",
                      @category_path_options.merge(action: "destroy",
                                                   group_category_id: project_groups.to_param)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "does not allow a student to update a category for a course" do
@@ -554,7 +554,7 @@ describe "Group Categories API", type: :request do
                      @category_path_options.merge(action: "update",
                                                   group_category_id: @category.to_param),
                      { name: "name" }
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
 
@@ -707,7 +707,7 @@ describe "Group Categories API", type: :request do
                      "/api/v1/group_categories/9999999",
                      @category_path_options.merge(action: "show",
                                                   group_category_id: "9999999"))
-        expect(response.code).to eq "404"
+        expect(response).to have_http_status :not_found
       end
 
       it "lists all groups in category for a admin" do
@@ -767,7 +767,7 @@ describe "Group Categories API", type: :request do
                        "enable_self_signup" => "1",
                        "create_group_count" => 3
                      })
-        expect(response.code).to eq "400"
+        expect(response).to have_http_status :bad_request
       end
 
       describe "sis permissions" do
@@ -809,7 +809,7 @@ describe "Group Categories API", type: :request do
                    "/api/v1/accounts/#{@account.to_param}/group_categories.json",
                    @category_path_options.merge(action: "index",
                                                 account_id: @account.to_param))
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "does not allow non-admins to retrieve a group category" do
@@ -817,7 +817,7 @@ describe "Group Categories API", type: :request do
                    "/api/v1/group_categories/#{@communities.id}",
                    @category_path_options.merge(action: "show",
                                                 group_category_id: @communities.to_param))
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "does not allow a non-admin to delete a category for an account" do
@@ -826,7 +826,7 @@ describe "Group Categories API", type: :request do
                    "/api/v1/group_categories/#{account_category.id}",
                    @category_path_options.merge(action: "destroy",
                                                 group_category_id: account_category.to_param)
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "does not list all groups in category for a non-admin" do
@@ -834,7 +834,7 @@ describe "Group Categories API", type: :request do
                    "/api/v1/group_categories/#{@communities.id}/groups",
                    @category_path_options.merge(action: "groups",
                                                 group_category_id: @communities.to_param))
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "does not allow a non-admin to create an account group category" do
@@ -843,7 +843,7 @@ describe "Group Categories API", type: :request do
                    @category_path_options.merge(action: "create",
                                                 account_id: @account.to_param),
                    { "name" => "name" })
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "does not allow a non-admin to update a category for an account" do
@@ -852,7 +852,7 @@ describe "Group Categories API", type: :request do
                    @category_path_options.merge(action: "update",
                                                 group_category_id: @communities.to_param),
                    { name: "name" }
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
   end
 end

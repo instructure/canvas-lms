@@ -372,7 +372,7 @@ describe Types::DiscussionEntryType do
       DiscussionEntry.where(id: parent).update_all(legacy: false)
 
       result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
-      expect(result).to match_array([])
+      expect(result).to be_empty
     end
 
     it "returns nil for subentries count on non root entries" do
@@ -390,7 +390,7 @@ describe Types::DiscussionEntryType do
       DiscussionEntry.where(id: parent).update_all(legacy: false)
 
       result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
-      expect(result).to match_array([])
+      expect(result).to be_empty
     end
 
     it "returns count for subentries count on non root entries" do
@@ -407,7 +407,7 @@ describe Types::DiscussionEntryType do
       DiscussionEntry.where(id: parent).update_all(legacy: false)
 
       result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
-      expect(result).to match_array([])
+      expect(result).to be_empty
     end
 
     it "returns count for subentries count on non root entries" do

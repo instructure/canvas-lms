@@ -7,7 +7,7 @@ module GraphQLHelpers
     include Api
     include UrlHelpers
 
-    attr :request, :user, :context
+    attr_reader :request, :user, :context
 
     # NOTE: context here is *not* referring to graphql context, it is
     # referring to a canvas context (typically a course)

@@ -36,7 +36,7 @@ describe CoursePacing::StudentEnrollmentPaceService do
       pace.destroy!
       expect(
         CoursePacing::StudentEnrollmentPaceService.paces_in_course(course)
-      ).to match_array []
+      ).to be_empty
     end
   end
 

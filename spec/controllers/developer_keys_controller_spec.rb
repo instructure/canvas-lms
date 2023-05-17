@@ -384,7 +384,7 @@ describe DeveloperKeysController do
 
         it "sets the scopes to empty if the scopes parameter is an empty string" do
           put "update", params: { id: developer_key.id, developer_key: { scopes: "" } }
-          expect(developer_key.reload.scopes).to match_array []
+          expect(developer_key.reload.scopes).to be_empty
         end
       end
     end

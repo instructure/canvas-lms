@@ -898,7 +898,7 @@ describe CommunicationChannel do
     let!(:sms_channel) { communication_channel(user, { username: "sms", path_type: CommunicationChannel::TYPE_SMS }) }
 
     it "filters sms channels" do
-      expect(CommunicationChannel.supported).to match_array []
+      expect(CommunicationChannel.supported).to be_empty
     end
   end
 end

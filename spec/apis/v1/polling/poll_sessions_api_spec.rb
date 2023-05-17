@@ -165,7 +165,7 @@ describe Polling::PollSessionsController, type: :request do
 
         get_show(true)
 
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
         @poll_session.reload
         expect(@poll_session.poll_submissions.size).to be_zero
       end
@@ -287,7 +287,7 @@ describe Polling::PollSessionsController, type: :request do
       it "returns an error if the supplied course section is invalid" do
         post_create({ course_section_id: @section.id + 666, course_id: @course.id }, true)
 
-        expect(response.code).to eq "404"
+        expect(response).to have_http_status :not_found
         expect(response.body).to match(/The specified resource does not exist/)
       end
     end
@@ -347,7 +347,7 @@ describe Polling::PollSessionsController, type: :request do
         put_update({ course_section_id: section.id }, true)
 
         @poll_session.reload
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
         expect(@poll_session.course_section.id).not_to eq section.id
         expect(@poll_session.course_section.id).to eq original_id
       end
@@ -394,7 +394,7 @@ describe Polling::PollSessionsController, type: :request do
 
           get_open
 
-          expect(response.code).to eq "401"
+          expect(response).to have_http_status :unauthorized
           @poll_session.reload
           expect(@poll_session.is_published).not_to be_truthy
         end
@@ -411,7 +411,7 @@ describe Polling::PollSessionsController, type: :request do
         get_open
 
         @poll_session.reload
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
         expect(@poll_session.is_published).not_to be_truthy
       end
     end
@@ -454,7 +454,7 @@ describe Polling::PollSessionsController, type: :request do
 
           get_close
 
-          expect(response.code).to eq "401"
+          expect(response).to have_http_status :unauthorized
           @poll_session.reload
           expect(@poll_session.is_published).not_to be_falsey
         end
@@ -468,7 +468,7 @@ describe Polling::PollSessionsController, type: :request do
         get_close
 
         @poll_session.reload
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
         expect(@poll_session.is_published).to be_truthy
       end
     end

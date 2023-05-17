@@ -67,7 +67,7 @@ describe Lti::AccountLookupController do
 
       it "returns a 404" do
         send_request
-        expect(response.code).to eq("404")
+        expect(response).to have_http_status(:not_found)
       end
     end
 
@@ -79,7 +79,7 @@ describe Lti::AccountLookupController do
       it "returns a 404" do
         expect(Shard.find_by(id: 198_765)).to be_nil
         send_request
-        expect(response.code).to eq("404")
+        expect(response).to have_http_status(:not_found)
       end
     end
 
