@@ -310,7 +310,9 @@ $(document).ready(function () {
   })
 
   function showSubmissionContent() {
-    $('#submit_assignment').show()
+    const el = $('#submit_assignment')
+    el.show()
+    el[0].scrollIntoView({behavior: 'smooth', block: 'end'})
     $('.submit_assignment_link').hide()
     createSubmitAssignmentTabs()
   }
