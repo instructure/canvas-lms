@@ -91,6 +91,12 @@ describe MediaTracksController do
       get "show", params: { media_object_id: @mo.media_id, id: track.id }
       expect(response).to have_http_status(:unprocessable_entity)
     end
+    
+    it "does not allow unauthorized users to view the track" do
+      track = @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "blah")
+      get "show", params: {media_object_id: @mo.media_id, id: 31337}
+      expect(response).to have_http_status(:unauthorized)
+    end
   end
 
   describe "#destroy" do
