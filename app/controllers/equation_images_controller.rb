@@ -21,7 +21,7 @@ class EquationImagesController < ApplicationController
   # Facade to codecogs API for gif generation or microservice MathMan for svg
   def show
     @latex = params[:id]
-    @scale = params[:scale] if Account.site_admin.feature_enabled?(:scale_equation_images)
+    @scale = params[:scale]
 
     # Usually, the latex string is stored in the db double escaped.  By the
     # time the value gets here as `params[:id]` it has been unescaped once.

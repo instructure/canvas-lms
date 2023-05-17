@@ -44,15 +44,8 @@ describe EquationImagesController do
     end
 
     it "includes scale param if present" do
-      Account.site_admin.enable_feature!(:scale_equation_images)
       get "show", params: { id: "foo", scale: 2 }
       expect(response).to redirect_to("http://latex.codecogs.com/gif.latex?foo&scale=2")
-    end
-
-    it "omits scale param if feature is off present" do
-      Account.site_admin.disable_feature!(:scale_equation_images)
-      get "show", params: { id: "foo", scale: 2 }
-      expect(response).to redirect_to("http://latex.codecogs.com/gif.latex?foo")
     end
 
     context "when using MathMan" do
