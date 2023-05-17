@@ -108,6 +108,7 @@ export type GradebookOptions = {
   default_grading_standard: GradingStandard[]
   download_assignment_submissions_url: string
   enhanced_gradebook_filters: boolean
+  hide_zero_point_quizzes: boolean
   enrollments_url: string
   enrollments_with_concluded_url: string
   export_gradebook_csv_url: string

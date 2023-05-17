@@ -166,17 +166,18 @@ export default function GradebookData(props: Props) {
       // eslint-disable-next-line promise/catch-or-return
       fetchGradingPeriodAssignments().then(() => {
         if (currentGradingPeriodId !== '0') {
-          loadAssignmentGroups(currentGradingPeriodId)
+          loadAssignmentGroups(props.gradebookEnv.hide_zero_point_quizzes, currentGradingPeriodId)
         }
       })
     } else {
-      loadAssignmentGroups()
+      loadAssignmentGroups(props.gradebookEnv.hide_zero_point_quizzes)
     }
   }, [
     gradingPeriodSet,
     currentGradingPeriodId,
     fetchGradingPeriodAssignments,
     loadAssignmentGroups,
+    props.gradebookEnv.hide_zero_point_quizzes,
   ])
 
   const reloadStudentData = useCallback(() => {
