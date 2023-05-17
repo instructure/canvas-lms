@@ -5679,6 +5679,50 @@ describe "Submissions API", type: :request do
     end
   end
 
+  context "clear unread submissions" do
+    before :once do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      assignment_model(course: @course)
+      @content = @assignment.submit_homework(@student)
+      @assignment2 = assignment_model(course: @course)
+      @content2 = @assignment2.submit_homework(@student)
+      @assignment.ensure_post_policy(post_manually: false)
+      @content.update_columns(posted_at: Time.now.utc, workflow_state: "graded", score: 10)
+      @assignment2.ensure_post_policy(post_manually: false)
+      @content2.update_columns(posted_at: Time.now.utc, workflow_state: "graded", score: 10)
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread", content_item: "grade")
+      ContentParticipation.participate(content: @content2, user: @student, workflow_state: "unread", content_item: "grade")
+    end
+
+    let(:endpoint) { "/api/v1/courses/#{@course.id}/submissions/#{@student.id}/clear_unread" }
+    let(:params) do
+      { course_id: @course.id.to_s,
+        user_id: @student.id.to_s,
+        action: "submissions_clear_unread",
+        controller: "submissions_api",
+        format: "json" }
+    end
+
+    it "marks submission grades as read" do
+      @site_admin_member = site_admin_user(name: "site admin", active_all: true)
+      content_participation_count = ContentParticipationCount.find_by(user: @student, context: @course)
+      content_participation_count.refresh_unread_count
+      expect(content_participation_count.unread_count).to eq(2)
+      @user = @site_admin_member
+      raw_api_call(:put, endpoint, params)
+      content_participation_count.reload
+      expect(content_participation_count.unread_count).to eq(0)
+    end
+
+    it "does not mark submission grade as read if user is not a Site Admin" do
+      @user = @teacher
+      raw_api_call(:put, endpoint, params)
+      assert_status(401)
+    end
+  end
+
   context "rubric comments read state" do
     before :once do
       course_with_student_and_submitted_homework

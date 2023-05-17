@@ -81,8 +81,12 @@ GradebookSummaryRouter.prototype.routes = {
 $(() => {
   GradeSummary.renderSelectMenuGroup()
   GradeSummary.renderSubmissionCommentsTray()
-  if (ENV.student_grade_summary_upgrade || ENV.restrict_quantitative_data)
+  if (ENV.student_grade_summary_upgrade || ENV.restrict_quantitative_data) {
     GradeSummary.renderGradeSummaryTable()
+  }
+  if (ENV.can_clear_badge_counts) {
+    GradeSummary.renderClearBadgeCountsButton()
+  }
 
   router = new GradebookSummaryRouter()
   Backbone.history.start()
