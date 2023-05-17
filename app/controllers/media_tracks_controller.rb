@@ -127,7 +127,8 @@ class MediaTracksController < ApplicationController
   #          -H 'Authorization: Bearer <token>'
   #
   def show
-    @media_track = MediaTrack.find params[:id]
+    @media_object = MediaObject.active.by_media_id(params[:media_object_id]).first
+    @media_track = @media_object.media_tracks.find(params[:id])
     @media_track.validate! # in case this somehow got saved to the database in the xss-vulnerable TTML format
     if stale? etag: @media_track, last_modified: @media_track.updated_at.utc
       render plain: @media_track.webvtt_content
