@@ -17,7 +17,6 @@
  */
 import React, {Component} from 'react'
 import {arrayOf, func, objectOf, shape, string, element, oneOfType} from 'prop-types'
-import formatMessage from 'format-message'
 import {StyleSheet, css} from 'aphrodite'
 import {Alert} from '@instructure/ui-alerts'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -26,6 +25,7 @@ import {IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import formatMessage from '../format-message'
 import CanvasSelect from '../shared/CanvasSelect'
 import {CC_FILE_MAX_BYTES} from '../shared/constants'
 
