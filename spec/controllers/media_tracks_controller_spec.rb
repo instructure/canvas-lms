@@ -91,6 +91,14 @@ describe MediaTracksController do
       get "show", params: { media_object_id: @mo.media_id, id: track.id }
       expect(response).to have_http_status(:unprocessable_entity)
     end
+
+    it "does not show tracks that belong to a different media object" do
+      mo2 = factory_with_protected_attributes(MediaObject, media_id: "0_abcdefghi", old_media_id: "1_012345678", context: @course)
+
+      track = mo2.media_tracks.create!(kind: "subtitles", locale: "en", content: "blah")
+      get "show", params: { media_object_id: @mo.media_id, id: track.id }
+      expect(response).to have_http_status(:not_found)
+    end
   end
 
   describe "#destroy" do
