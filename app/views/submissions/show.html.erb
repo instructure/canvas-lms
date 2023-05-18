@@ -188,9 +188,7 @@
              can_do(@assignment.rubric, @current_user, :read)
            )
         %>
-          <% unread_comments =
-               @context.root_account.feature_enabled?(:submission_feedback_indicators) &&
-               @current_user.unread_rubric_assessments?(@submission) %>
+          <% unread_comments = @current_user.unread_rubric_assessments?(@submission) %>
           <div class="submission-details-header__rubric <% if can_do(@assignment, @current_user, :grade) %>submission-details-header__rubric--can-grade<% end %>">
             <a href="#" class="assess_submission_link Button Button--small Button--link" tabindex='0' title="<%= unread_comments ? t('There are unread rubric comments.') : '' %>">
               <i class="icon-rubric" aria-hidden="true"></i><%= t('show_rubric', 'Show Rubric') %>
