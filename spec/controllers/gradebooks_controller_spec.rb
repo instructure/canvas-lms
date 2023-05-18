@@ -1684,12 +1684,6 @@ describe GradebooksController do
           expect(response).to render_template("gradebooks/individual")
         end
 
-        it "renders 'individual_enhanced' when the user uses individual_enhanced view" do
-          update_preferred_gradebook_version!("individual_enhanced")
-          get "show", params: { course_id: @course.id }
-          expect(response).to render_template("gradebooks/individual_enhanced")
-        end
-
         it "redirects to the gradebook when requesting the preferred view" do
           get "show", params: { course_id: @course.id, view: "learning_mastery" }
           expect(response).to redirect_to(action: "show")

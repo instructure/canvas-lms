@@ -19,12 +19,17 @@
 import React, {useEffect, useState} from 'react'
 
 import {ApolloProvider, createClient} from '@canvas/apollo'
+import GradebookMenu from '@canvas/gradebook-menu'
 import LoadingIndicator from '@canvas/loading-indicator'
 import EnhancedIndividualGradebook from './EnhancedIndividualGradebook'
 
 export default function EnhancedIndividualGradebookWrapper() {
   const [client, setClient] = useState<any>(null) // TODO: remove <any>
   const [loading, setLoading] = useState(true)
+
+  if (!ENV.GRADEBOOK_OPTIONS) {
+    throw new Error('ENV.GRADEBOOK_OPTIONS is not defined')
+  }
 
   useEffect(() => {
     const setupApolloClient = async () => {
@@ -42,8 +47,18 @@ export default function EnhancedIndividualGradebookWrapper() {
   }
 
   return (
-    <ApolloProvider client={client}>
-      <EnhancedIndividualGradebook />
-    </ApolloProvider>
+    <>
+      <GradebookMenu
+        courseUrl={ENV.GRADEBOOK_OPTIONS.context_url}
+        learningMasteryEnabled={Boolean(ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled)}
+        enhancedIndividualGradebookEnabled={Boolean(
+          ENV.GRADEBOOK_OPTIONS.individual_gradebook_enhancements
+        )}
+        variant="EnhancedIndividualGradebook"
+      />
+      <ApolloProvider client={client}>
+        <EnhancedIndividualGradebook />
+      </ApolloProvider>
+    </>
   )
 }
