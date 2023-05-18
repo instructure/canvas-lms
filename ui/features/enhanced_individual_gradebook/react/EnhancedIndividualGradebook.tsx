@@ -62,7 +62,7 @@ export default function EnhancedIndividualGradebook() {
 
   const {data, error} = useQuery<GradebookQueryResponse>(GRADEBOOK_QUERY, {
     variables: {courseId},
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'no-cache',
     skip: !courseId,
   })
 
@@ -74,41 +74,42 @@ export default function EnhancedIndividualGradebook() {
     if (data?.course) {
       const {assignmentGroupsConnection, enrollmentsConnection, submissionsConnection} = data.course
 
-      const {assignments, assignmentGroupMap} = assignmentGroupsConnection.nodes.reduce(
-        (prev, curr) => {
-          prev.assignments.push(...curr.assignmentsConnection.nodes)
+      const {resolvedAssignments, resolvedAssignmentGroupMap} =
+        assignmentGroupsConnection.nodes.reduce(
+          (prev, curr) => {
+            prev.resolvedAssignments.push(...curr.assignmentsConnection.nodes)
 
-          prev.assignmentGroupMap[curr.id] = {
-            name: curr.name,
-            assignments: curr.assignmentsConnection.nodes.map(assignment => {
-              return {
-                id: assignment.id,
-                name: assignment.name,
-                points_possible: assignment.pointsPossible,
-                submission_types: assignment.submissionTypes,
-                anonymize_students: assignment.anonymizeStudents,
-                omit_from_final_grade: assignment.omitFromFinalGrade,
-                workflow_state: assignment.workflowState,
-              }
-            }),
-            group_weight: curr.groupWeight,
-            rules: curr.rules,
-            id: curr.id,
-            position: curr.position,
-            integration_data: {},
-            sis_source_id: null,
+            prev.resolvedAssignmentGroupMap[curr.id] = {
+              name: curr.name,
+              assignments: curr.assignmentsConnection.nodes.map(assignment => {
+                return {
+                  id: assignment.id,
+                  name: assignment.name,
+                  points_possible: assignment.pointsPossible,
+                  submission_types: assignment.submissionTypes,
+                  anonymize_students: assignment.anonymizeStudents,
+                  omit_from_final_grade: assignment.omitFromFinalGrade,
+                  workflow_state: assignment.workflowState,
+                }
+              }),
+              group_weight: curr.groupWeight,
+              rules: curr.rules,
+              id: curr.id,
+              position: curr.position,
+              integration_data: {},
+              sis_source_id: null,
+            }
+
+            return prev
+          },
+          {
+            resolvedAssignments: [] as AssignmentConnection[],
+            resolvedAssignmentGroupMap: {} as AssignmentGroupCriteriaMap,
           }
+        )
 
-          return prev
-        },
-        {
-          assignments: [] as AssignmentConnection[],
-          assignmentGroupMap: {} as AssignmentGroupCriteriaMap,
-        }
-      )
-
-      setAssignmentGroupMap(assignmentGroupMap)
-      setAssignments(assignments)
+      setAssignmentGroupMap(resolvedAssignmentGroupMap)
+      setAssignments(resolvedAssignments)
       setSubmissions(submissionsConnection.nodes)
 
       const studentEnrollments = enrollmentsConnection.nodes.map(enrollment => enrollment.user)
@@ -174,6 +175,7 @@ export default function EnhancedIndividualGradebook() {
         courseId={courseId}
         studentId={selectedStudentId}
         assignmentGroupMap={assignmentGroupMap}
+        gradebookOptions={{}} // TODO: Empty object for now for default functionality
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />

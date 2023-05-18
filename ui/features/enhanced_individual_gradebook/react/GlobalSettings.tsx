@@ -68,7 +68,7 @@ export default function GlobalSettings() {
         <View as="div" className="span4">
           {/* {{!-- Intentionally left empty so this scales to smaller screens --}} */}
         </View>
-        <View as="div" className="span7">
+        <View as="div" className="span8">
           <div
             className="checkbox"
             style={{padding: 12, margin: '10px 0px', background: '#eee', borderRadius: 5}}
