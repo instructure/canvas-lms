@@ -1025,6 +1025,18 @@ describe "assignments" do
           expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: A"
         end
 
+        it "shows points possible for teachers on index page", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 10, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_teacher_logged_in(active_all: true, course: @course)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "10 pts"
+        end
+
         it "shows letter grade if percent type", priority: "2" do
           @assignment = @course.assignments.create! context: @course, title: "to publish"
           @assignment.update(points_possible: 10, grading_type: "percent")
