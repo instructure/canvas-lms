@@ -18,17 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class WikiPageLookup < ApplicationRecord
-  extend RootAccountResolver
+class ModifyWikiPageLookupWikiPageIdForeignKey < ActiveRecord::Migration[7.0]
+  tag :predeploy
+  disable_ddl_transaction!
 
-  belongs_to :wiki_page, inverse_of: :wiki_page_lookups
-  belongs_to :context, polymorphic: [:course, :group]
-  before_save :set_context
-
-  resolves_root_account through: :wiki_page
-
-  def set_context
-    self.context_type ||= wiki_page.context_type
-    self.context_id ||= wiki_page.context_id
+  def change
+    remove_foreign_key :wiki_page_lookups, :wiki_pages, column: :wiki_page_id, if_exists: true
+    add_foreign_key :wiki_page_lookups, :wiki_pages, column: :wiki_page_id, if_not_exists: true, deferrable: :deferred, on_delete: :cascade
   end
 end
