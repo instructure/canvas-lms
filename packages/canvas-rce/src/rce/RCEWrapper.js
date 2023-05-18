@@ -317,7 +317,6 @@ class RCEWrapper extends React.Component {
     const {
       new_math_equation_handling = false,
       rce_ux_improvements = false,
-      rce_better_paste = false,
       rce_new_external_tool_dialog_in_canvas = false,
       explicit_latex_typesetting = false,
       rce_show_studio_media_options = false,
@@ -328,7 +327,6 @@ class RCEWrapper extends React.Component {
     return {
       new_math_equation_handling,
       rce_ux_improvements,
-      rce_better_paste,
       rce_new_external_tool_dialog_in_canvas,
       explicit_latex_typesetting,
       rce_show_studio_media_options,
@@ -1455,10 +1453,7 @@ class RCEWrapper extends React.Component {
       canvasPlugins.push('instructure_studio_media_options')
     }
 
-    const pastePlugins =
-      rcsExists && this.props.features?.rce_better_paste
-        ? ['instructure_paste', 'paste']
-        : ['paste']
+    const pastePlugins = rcsExists ? ['instructure_paste', 'paste'] : ['paste']
 
     if (
       rcsExists &&

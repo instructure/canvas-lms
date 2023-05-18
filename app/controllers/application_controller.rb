@@ -349,7 +349,6 @@ class ApplicationController < ActionController::Base
     render_both_to_do_lists
     course_paces_redesign
     course_paces_for_students
-    rce_better_paste
     module_publish_menu
     explicit_latex_typesetting
     dev_key_oidc_alert
