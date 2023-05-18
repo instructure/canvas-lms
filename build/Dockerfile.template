@@ -1,5 +1,5 @@
 <%= generation_message %>
-ARG RUBY=2.7
+ARG RUBY=3.1
 
 <% if development? -%>
 FROM instructure/ruby-passenger:$RUBY

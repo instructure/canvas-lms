@@ -2,7 +2,7 @@
 # To update this file please edit the relevant template and run the generation
 # task `build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile`
 
-ARG RUBY=2.7
+ARG RUBY=3.1
 
 FROM instructure/ruby-passenger:$RUBY
 LABEL maintainer="Instructure"
