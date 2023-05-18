@@ -19,28 +19,27 @@
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {AssignmentConnection, UserConnectionResponse} from '../types'
+import {AssignmentConnection, UserConnection} from '../types'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   assignments: AssignmentConnection[]
-  students: UserConnectionResponse[]
+  students: UserConnection[]
   selectedStudentId?: string | null
   selectedAssignmentId?: string | null
   onStudentChange: (studentId?: string) => void
   onAssignmentChange: (assignment?: AssignmentConnection) => void
 }
 
-// TODO: might want a map for quicker lookups
 type DropDownOption<T> = {
   id: string
   name: string
   data?: T
 }
 
-type StudentDropdownOption = DropDownOption<UserConnectionResponse>[]
+type StudentDropdownOption = DropDownOption<UserConnection>[]
 type AssignmentDropdownOption = DropDownOption<AssignmentConnection>[]
 
 const DEFAULT_STUDENT_DROPDOWN_TEXT = I18n.t('No Student Selected')
