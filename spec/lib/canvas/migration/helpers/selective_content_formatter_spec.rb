@@ -224,6 +224,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     let(:top_level_items) do
       [{ type: "course_settings", property: "copy[all_course_settings]", title: "Course Settings" },
        { type: "syllabus_body", property: "copy[all_syllabus_body]", title: "Syllabus Body" },
+       { type: "blueprint_settings", property: "copy[all_blueprint_settings]", title: "Blueprint Settings" },
        { type: "context_modules", property: "copy[all_context_modules]", title: "Modules", count: 1, sub_items_url: "https://example.com?type=context_modules" },
        { type: "tool_profiles", property: "copy[all_tool_profiles]", title: "Tool Profiles", count: 1, sub_items_url: "https://example.com?type=tool_profiles" },
        { type: "discussion_topics", property: "copy[all_discussion_topics]", title: "Discussion Topics", count: 1, sub_items_url: "https://example.com?type=discussion_topics" },
@@ -365,7 +366,8 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
       it "ignores in top-level list" do
         expect(formatter.get_content_list).to eq [{ type: "course_settings", property: "copy[all_course_settings]", title: "Course Settings" },
-                                                  { type: "syllabus_body", property: "copy[all_syllabus_body]", title: "Syllabus Body" }]
+                                                  { type: "syllabus_body", property: "copy[all_syllabus_body]", title: "Syllabus Body" },
+                                                  { type: "blueprint_settings", property: "copy[all_blueprint_settings]", title: "Blueprint Settings" }]
       end
 
       it "ignores in specific item request" do
