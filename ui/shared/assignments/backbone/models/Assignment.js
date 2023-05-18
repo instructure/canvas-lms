@@ -58,7 +58,6 @@ const isStudent = function () {
 extend(Assignment, Model)
 
 function Assignment() {
-  this.restrictQuantitativeData = this.restrictQuantitativeData.bind(this)
   this.quizzesRespondusEnabled = this.quizzesRespondusEnabled.bind(this)
   this.showGradersAnonymousToGradersCheckbox = this.showGradersAnonymousToGradersCheckbox.bind(this)
   this.pollUntilFinished = this.pollUntilFinished.bind(this)
@@ -1265,7 +1264,7 @@ Assignment.prototype.toView = function () {
     is_master_course_child_content: this.get('is_master_course_child_content'),
     restricted_by_master_course: this.get('restricted_by_master_course'),
     master_course_restrictions: this.get('master_course_restrictions'),
-    restrict_quantitative_data: this.restrictQuantitativeData(),
+    restrict_quantitative_data: this.get('restrict_quantitative_data'),
   }
   for (let i = 0, len = fields.length; i < len; i++) {
     const field = fields[i]
@@ -1557,10 +1556,6 @@ Assignment.prototype.showGradersAnonymousToGradersCheckbox = function () {
 
 Assignment.prototype.quizzesRespondusEnabled = function () {
   return this.get('require_lockdown_browser') && this.isQuizLTIAssignment() && isStudent()
-}
-
-Assignment.prototype.restrictQuantitativeData = function () {
-  return this.get('restrict_quantitative_data')
 }
 
 export default Assignment

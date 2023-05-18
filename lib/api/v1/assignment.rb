@@ -452,7 +452,7 @@ module Api::V1::Assignment
                            (submission.nil? || submission.attempts_left.nil? || submission.attempts_left > 0)
     end
 
-    hash["restrict_quantitative_data"] = assignment.restrict_quantitative_data?(user) || false
+    hash["restrict_quantitative_data"] = assignment.restrict_quantitative_data?(user, true) || false
 
     hash
   end
