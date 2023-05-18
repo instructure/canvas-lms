@@ -19,13 +19,13 @@
 import React from 'react'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {AssignmentConnection, SubmissionConnectionResponse} from '../types'
+import {AssignmentConnection, SubmissionConnection} from '../types'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   assignment?: AssignmentConnection
-  submissions?: SubmissionConnectionResponse[]
+  submissions?: SubmissionConnection[]
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

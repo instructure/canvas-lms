@@ -31,10 +31,11 @@ import StudentInformation from './StudentInformation'
 import {
   AssignmentConnection,
   GradebookQueryResponse,
-  SubmissionConnectionResponse,
-  UserConnectionResponse,
+  SubmissionConnection,
+  UserConnection,
 } from '../types'
 import {GRADEBOOK_QUERY} from '../queries/Queries'
+import {mapAssignmentGroupQueryResults} from '../utils/gradebookUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -42,12 +43,12 @@ const STUDENT_SEARCH_PARAM = 'student'
 const ASSIGNMENT_SEARCH_PARAM = 'assignment'
 
 export default function EnhancedIndividualGradebook() {
-  const [submissions, setSubmissions] = useState<SubmissionConnectionResponse[]>([])
-  const [students, setStudents] = useState<UserConnectionResponse[]>([])
+  const [submissions, setSubmissions] = useState<SubmissionConnection[]>([])
+  const [students, setStudents] = useState<UserConnection[]>([])
   const [assignments, setAssignments] = useState<AssignmentConnection[]>([])
 
   const [selectedAssignment, setSelectedAssignment] = useState<AssignmentConnection>()
-  const [selectedSubmissions, setSelectedSubmissions] = useState<SubmissionConnectionResponse[]>([])
+  const [selectedSubmissions, setSelectedSubmissions] = useState<SubmissionConnection[]>([])
 
   const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || '' // TODO: get from somewhere else?
   const [searchParams, setSearhParams] = useSearchParams()
@@ -74,42 +75,12 @@ export default function EnhancedIndividualGradebook() {
     if (data?.course) {
       const {assignmentGroupsConnection, enrollmentsConnection, submissionsConnection} = data.course
 
-      const {resolvedAssignments, resolvedAssignmentGroupMap} =
-        assignmentGroupsConnection.nodes.reduce(
-          (prev, curr) => {
-            prev.resolvedAssignments.push(...curr.assignmentsConnection.nodes)
+      const {mappedAssignmentGroupMap, mappedAssignments} = mapAssignmentGroupQueryResults(
+        assignmentGroupsConnection.nodes
+      )
 
-            prev.resolvedAssignmentGroupMap[curr.id] = {
-              name: curr.name,
-              assignments: curr.assignmentsConnection.nodes.map(assignment => {
-                return {
-                  id: assignment.id,
-                  name: assignment.name,
-                  points_possible: assignment.pointsPossible,
-                  submission_types: assignment.submissionTypes,
-                  anonymize_students: assignment.anonymizeStudents,
-                  omit_from_final_grade: assignment.omitFromFinalGrade,
-                  workflow_state: assignment.workflowState,
-                }
-              }),
-              group_weight: curr.groupWeight,
-              rules: curr.rules,
-              id: curr.id,
-              position: curr.position,
-              integration_data: {},
-              sis_source_id: null,
-            }
-
-            return prev
-          },
-          {
-            resolvedAssignments: [] as AssignmentConnection[],
-            resolvedAssignmentGroupMap: {} as AssignmentGroupCriteriaMap,
-          }
-        )
-
-      setAssignmentGroupMap(resolvedAssignmentGroupMap)
-      setAssignments(resolvedAssignments)
+      setAssignmentGroupMap(mappedAssignmentGroupMap)
+      setAssignments(mappedAssignments)
       setSubmissions(submissionsConnection.nodes)
 
       const studentEnrollments = enrollmentsConnection.nodes.map(enrollment => enrollment.user)
