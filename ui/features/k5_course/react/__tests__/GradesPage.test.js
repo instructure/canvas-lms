@@ -58,6 +58,21 @@ const dtf = new Intl.DateTimeFormat('en', {
 const dateFormatter = d => dtf.format(d instanceof Date ? d : new Date(d))
 
 describe('GradesPage', () => {
+  const DEFAULT_GRADING_SCHEME = [
+    ['A', 0.94],
+    ['A-', 0.9],
+    ['B+', 0.87],
+    ['B', 0.84],
+    ['B-', 0.8],
+    ['C+', 0.77],
+    ['C', 0.74],
+    ['C-', 0.7],
+    ['D+', 0.67],
+    ['D', 0.64],
+    ['D-', 0.61],
+    ['F', 0.0],
+  ]
+
   const getProps = (overrides = {}) => ({
     courseId: '12',
     courseName: 'History',
@@ -167,6 +182,19 @@ describe('GradesPage', () => {
         )
         expect(getByText('Total: 89.39%')).toBeInTheDocument()
         expect(getByText('History Total: 89.39%')).toBeInTheDocument()
+      })
+
+      it('displays fetched course total Letter Grade when Restrict Quantitative Data', async () => {
+        const {getByText, queryByText} = render(
+          <GradesPage
+            {...getProps({gradingScheme: DEFAULT_GRADING_SCHEME, restrictQuantitativeData: true})}
+          />
+        )
+        await waitFor(() =>
+          expect(queryByText('Loading total grade for History')).not.toBeInTheDocument()
+        )
+        expect(getByText('Total: B+')).toBeInTheDocument()
+        expect(getByText('History Total: B+')).toBeInTheDocument()
       })
 
       it('displays button to expand assignment group totals', async () => {

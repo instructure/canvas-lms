@@ -62,6 +62,8 @@ ready(() => {
         tabContentOnly={ENV.TAB_CONTENT_ONLY}
         isMasterCourse={ENV.BLUEPRINT_COURSES_DATA?.isMasterCourse}
         showImmersiveReader={ENV.SHOW_IMMERSIVE_READER}
+        gradingScheme={ENV.GRADING_SCHEME}
+        restrictQuantitativeData={ENV.RESTRICT_QUANTITATIVE_DATA}
       />,
       courseContainer
     )
