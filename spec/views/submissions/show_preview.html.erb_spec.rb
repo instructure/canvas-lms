@@ -85,7 +85,6 @@ describe "submissions/show_preview" do
     end
 
     it "includes an indicator if unread annotations exist" do
-      @course.root_account.enable_feature! :submission_feedback_indicators
       assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_upload")
       submission = assignment.submit_homework(@user, attachments: [@attachment])
       assign(:assignment, assignment)

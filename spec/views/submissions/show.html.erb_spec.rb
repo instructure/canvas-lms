@@ -573,10 +573,6 @@ describe "submissions/show" do
       end
 
       context "submission_feedback_indicators" do
-        before :once do
-          @course.root_account.enable_feature! :submission_feedback_indicators
-        end
-
         it "adds an indicator if unread comments are present" do
           view_context(@course, @student)
           @student.mark_rubric_assessments_unread!(@submission)

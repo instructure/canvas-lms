@@ -145,14 +145,6 @@ create_course_subaccount_picker:
     people who can manually create courses to put those courses into any sub-account
     where they have enrollments.
 
-submission_feedback_indicators:
-  state: allowed
-  applies_to: RootAccount
-  display_name: Submission feedback indicators
-  description: |-
-    Adds visual indicators to the submission details page to tell students that unread
-    document annotations or rubric comments exist
-
 calendar_series:
   applies_to: SiteAdmin
   state: hidden
