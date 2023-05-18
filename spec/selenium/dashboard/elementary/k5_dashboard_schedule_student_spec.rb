@@ -117,6 +117,27 @@ describe "student k5 dashboard schedule" do
       expect(items_missing_exists?).to be_truthy
     end
 
+    it "does not display points possible if RQD is enabled" do
+      assignment1 = create_dated_assignment(@subject_course, "missing assignment", 1.day.ago(@now))
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # falsy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: false, locked: true }
+      Account.default.save!
+
+      get "/#schedule"
+      expect(fj(".PlannerItem-styles__score:contains('#{assignment1.points_possible.to_i}')")).to be_present
+
+      # now truthy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      Account.default.save!
+
+      get "/#schedule"
+
+      expect(f("body")).not_to contain_jqcss(".PlannerItem-styles__score:contains('#{assignment1.points_possible.to_i}')")
+    end
+
     it "shows the list of missing assignments in dropdown" do
       assignment1 = create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(@now))
       create_dated_assignment(@subject_course, "missing assignment2", 1.day.ago(@now))
