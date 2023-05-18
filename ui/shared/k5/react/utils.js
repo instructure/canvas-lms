@@ -24,6 +24,7 @@ import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
+import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 
 const I18n = useI18nScope('k5_utils')
 
@@ -244,7 +245,13 @@ export const getAssignmentGrades = (data, observedUserId) => {
 
 /* Formats course total score and grade (if applicable) into string from enrollments API
    response */
-export const getTotalGradeStringFromEnrollments = (enrollments, userId, observedUserId) => {
+export const getTotalGradeStringFromEnrollments = (
+  enrollments,
+  userId,
+  observedUserId,
+  restrictQuantitativeData = false,
+  gradingScheme = []
+) => {
   let grades
   if (observedUserId) {
     const enrollment = enrollments.find(
@@ -256,6 +263,9 @@ export const getTotalGradeStringFromEnrollments = (enrollments, userId, observed
   }
   if (grades?.current_score == null) {
     return I18n.t('n/a')
+  }
+  if (restrictQuantitativeData) {
+    return scoreToGrade(grades.current_score, gradingScheme)
   }
   const score = I18n.n(grades.current_score, {percentage: true, precision: 2})
   return grades.current_grade == null

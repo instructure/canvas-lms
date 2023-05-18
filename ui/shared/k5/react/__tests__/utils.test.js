@@ -558,6 +558,21 @@ describe('getAssignmentGrades', () => {
   })
 })
 
+const DEFAULT_GRADING_SCHEME = [
+  ['A', 0.94],
+  ['A-', 0.9],
+  ['B+', 0.87],
+  ['B', 0.84],
+  ['B-', 0.8],
+  ['C+', 0.77],
+  ['C', 0.74],
+  ['C-', 0.7],
+  ['D+', 0.67],
+  ['D', 0.64],
+  ['D-', 0.61],
+  ['F', 0.0],
+]
+
 describe('getTotalGradeStringFromEnrollments', () => {
   it("returns n/a if there's no score or grade", () => {
     const enrollments = [
@@ -572,6 +587,37 @@ describe('getTotalGradeStringFromEnrollments', () => {
     expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('n/a')
   })
 
+  it('returns just the B Letter Grade if Restrict Quantitative Data is true', () => {
+    const enrollments = [
+      {
+        user_id: '2',
+        grades: {
+          current_score: 84,
+          current_grade: null,
+        },
+      },
+    ]
+    expect(
+      getTotalGradeStringFromEnrollments(enrollments, '2', false, true, DEFAULT_GRADING_SCHEME)
+    ).toBe('B')
+  })
+
+  it('returns just the F Letter Grade if Restrict Quantitative Data is true', () => {
+    const enrollments = [
+      {
+        user_id: '2',
+        grades: {
+          current_score: 0,
+          current_grade: null,
+        },
+      },
+    ]
+
+    expect(
+      getTotalGradeStringFromEnrollments(enrollments, '2', false, true, DEFAULT_GRADING_SCHEME)
+    ).toBe('F')
+  })
+
   it("returns just the percent with 2 decimals if there's no grade", () => {
     const enrollments = [
       {
@@ -582,6 +628,7 @@ describe('getTotalGradeStringFromEnrollments', () => {
         },
       },
     ]
+
     expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('84.00%')
   })
 

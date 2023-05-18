@@ -44,6 +44,8 @@ export const GradesPage = ({
   showLearningMasteryGradebook,
   outcomeProficiency,
   observedUserId,
+  gradingScheme,
+  restrictQuantitativeData,
 }) => {
   const [loadingGradingPeriods, setLoadingGradingPeriods] = useState(true)
   const [error, setError] = useState(null)
@@ -116,6 +118,8 @@ export const GradesPage = ({
         loadingGradingPeriods={loadingGradingPeriods}
         userIsCourseAdmin={userIsCourseAdmin}
         observedUserId={observedUserId}
+        gradingScheme={gradingScheme}
+        restrictQuantitativeData={restrictQuantitativeData}
       />
     </>
   )
@@ -183,6 +187,8 @@ GradesPage.propTypes = {
   showLearningMasteryGradebook: PropTypes.bool.isRequired,
   outcomeProficiency: outcomeProficiencyShape,
   observedUserId: PropTypes.string,
+  gradingScheme: PropTypes.array,
+  restrictQuantitativeData: PropTypes.bool,
 }
 
 export default GradesPage
