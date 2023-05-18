@@ -34,7 +34,6 @@ describe "Account Calendar Settings" do
     @admin_user = account_admin_user(account: account, active_all: true)
     account_admin_user(account: @sub_account, user: @admin_user)
     account_admin_user(account: @sub_sub_account, user: @admin_user)
-    Account.site_admin.disable_feature!(:auto_subscribe_account_calendars)
   end
 
   before do
@@ -58,13 +57,13 @@ describe "Account Calendar Settings" do
 
       default_account_checkboxes = account_checkboxes(account.id)
       expect(default_account_checkboxes[0]).to include_text(account.name)
-      expect(default_account_checkboxes[1]).to include_text(@sub2_account.name)
+      expect(default_account_checkboxes[2]).to include_text(@sub2_account.name)
 
       click_account_folder(@sub1_account.id)
       sub1_account_checkboxes = account_checkboxes(@sub1_account.id)
 
       expect(sub1_account_checkboxes[0]).to include_text(@sub1_account.name)
-      expect(sub1_account_checkboxes[1]).to include_text(@sub_sub_account.name)
+      expect(sub1_account_checkboxes[2]).to include_text(@sub_sub_account.name)
     end
 
     context "with a non root origin account" do
@@ -77,7 +76,7 @@ describe "Account Calendar Settings" do
         sub1_account_checkboxes = account_checkboxes(@sub1_account.id)
 
         expect(sub1_account_checkboxes[0]).to include_text(@sub1_account.name)
-        expect(sub1_account_checkboxes[1]).to include_text(@sub_sub_account.name)
+        expect(sub1_account_checkboxes[2]).to include_text(@sub_sub_account.name)
       end
     end
 
@@ -95,7 +94,7 @@ describe "Account Calendar Settings" do
 
       expect(apply_changes_button).to be_disabled
 
-      click_account_checkbox(account_checkboxes(account.id)[1])
+      click_account_checkbox(account_checkboxes(account.id)[2])
 
       expect(apply_changes_button).to be_enabled
 
@@ -112,7 +111,7 @@ describe "Account Calendar Settings" do
 
       expect(apply_changes_button).to be_disabled
 
-      click_account_checkbox(account_checkboxes(account.id)[1])
+      click_account_checkbox(account_checkboxes(account.id)[2])
 
       expect(apply_changes_button).to be_enabled
 
@@ -131,7 +130,7 @@ describe "Account Calendar Settings" do
 
       expect(calendars_selected_text).to include_text("1 Account calendar selected")
 
-      click_account_checkbox(account_checkboxes(account.id)[1])
+      click_account_checkbox(account_checkboxes(account.id)[2])
 
       expect(calendars_selected_text).to include_text("2 Account calendars selected")
     end
@@ -182,6 +181,99 @@ describe "Account Calendar Settings" do
       calendars_shown = visible_account_calendar_text.map(&:text)
 
       expect(calendars_shown).to eq([@sub_sub_account.name, @sub1_account.name, @sub2_account.name])
+    end
+  end
+
+  context "account calendar auto subscribe selection" do
+    it "shows the auto-subscribe dropdown for selected account calendar" do
+      @sub2_account.account_calendar_visible = true
+      @sub2_account.save!
+
+      get("/accounts/#{account.id}/calendar_settings")
+
+      expect(auto_subscription_dropdowns[1]).to be_displayed
+      expect(auto_subscription_dropdowns[1].enabled?).to be_truthy
+      expect(auto_subscription_dropdowns[1].attribute("title")).to eq("Manual subscribe")
+    end
+
+    it "shows disabled auto-subscribe dropdown for non-selected account calendar" do
+      get("/accounts/#{account.id}/calendar_settings")
+
+      expect(auto_subscription_dropdowns[1]).to be_displayed
+      expect(auto_subscription_dropdowns[1]).to be_disabled
+    end
+
+    it "makes apply changes button available when auto subscribe is selected" do
+      @sub2_account.account_calendar_visible = true
+      @sub2_account.save!
+
+      get("/accounts/#{account.id}/calendar_settings")
+
+      click_INSTUI_Select_option(auto_subscription_dropdowns[1], "Auto subscribe")
+      expect(apply_changes_button).to be_enabled
+
+      click_INSTUI_Select_option(auto_subscription_dropdowns[1], "Manual subscribe")
+      expect(apply_changes_button).to be_disabled
+    end
+
+    it "provides confirmation modal to confirm auto subscribe changes" do
+      @sub2_account.account_calendar_visible = true
+      @sub2_account.save!
+
+      get("/accounts/#{account.id}/calendar_settings")
+
+      click_INSTUI_Select_option(auto_subscription_dropdowns[1], "Auto subscribe")
+      click_apply_changes_button
+      expect(auto_subscribe_confirm_modal).to be_displayed
+    end
+
+    it "does not provide confirmation modal to confirm change to manual subscribe" do
+      @sub2_account.account_calendar_visible = true
+      @sub2_account.account_calendar_subscription_type = "auto"
+      @sub2_account.save!
+
+      get("/accounts/#{account.id}/calendar_settings")
+
+      click_INSTUI_Select_option(auto_subscription_dropdowns[1], "Manual subscribe")
+      click_apply_changes_button
+      expect(element_exists?(auto_subscribe_confirm_modal_selector)).to be_falsey
+    end
+  end
+
+  context "auto-subscribe modal actions" do
+    before :once do
+      @sub2_account.account_calendar_visible = true
+      @sub2_account.save!
+    end
+
+    it "updates to auto subscribe when confirmed on modal and apply changes is disabled" do
+      get("/accounts/#{account.id}/calendar_settings")
+
+      click_INSTUI_Select_option(auto_subscription_dropdowns[1], "Auto subscribe")
+      click_apply_changes_button
+      click_auto_subscribe_confirm_button
+      expect(element_exists?(auto_subscribe_confirm_modal_selector)).to be_falsey
+      expect(apply_changes_button).to be_disabled
+    end
+
+    it "does not update when canceled on modal and apply changes is enabled" do
+      get("/accounts/#{account.id}/calendar_settings")
+
+      click_INSTUI_Select_option(auto_subscription_dropdowns[1], "Auto subscribe")
+      click_apply_changes_button
+      click_auto_subscribe_cancel_button
+      expect(element_exists?(auto_subscribe_confirm_modal_selector)).to be_falsey
+      expect(apply_changes_button).to be_enabled
+    end
+
+    it "does not update when modal X is pressed and apply changes is enabled" do
+      get("/accounts/#{account.id}/calendar_settings")
+
+      click_INSTUI_Select_option(auto_subscription_dropdowns[1], "Auto subscribe")
+      click_apply_changes_button
+      click_auto_subscribe_x_close_button
+      expect(element_exists?(auto_subscribe_confirm_modal_selector)).to be_falsey
+      expect(apply_changes_button).to be_enabled
     end
   end
 end
