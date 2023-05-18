@@ -138,3 +138,8 @@ export type UserSubmissionMap = {
     }
   }
 }
+
+// TODO: next commit will clean up types and move types to different files
+export type GradebookOptions = {
+  includeUngradedAssignments?: boolean
+}

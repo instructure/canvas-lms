@@ -23,6 +23,7 @@ import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {
+  GradebookOptions,
   GradebookStudentDetails,
   GradebookStudentQueryResponse,
   GradebookUserSubmissionDetails,
@@ -36,9 +37,15 @@ type Props = {
   courseId: string
   studentId?: string | null
   assignmentGroupMap: AssignmentGroupCriteriaMap
+  gradebookOptions: GradebookOptions // TODO: get this from gradebook settings
 }
 
-export default function StudentInformation({courseId, studentId, assignmentGroupMap}: Props) {
+export default function StudentInformation({
+  courseId,
+  studentId,
+  assignmentGroupMap,
+  gradebookOptions,
+}: Props) {
   const [selectedStudent, setSelectedStudent] = useState<GradebookStudentDetails>()
   const [studentSubmissions, setStudentSubmissions] = useState<GradebookUserSubmissionDetails[]>([])
   const {data, error} = useQuery<GradebookStudentQueryResponse>(GRADEBOOK_STUDENT_QUERY, {
@@ -85,74 +92,99 @@ export default function StudentInformation({courseId, studentId, assignmentGroup
       id: submission.id,
     }
   })
-  CourseGradeCalculator.calculate(submissions, assignmentGroupMap, 'points', true)
+
+  const scoreToPercentage = (score: number, possible: number, decimalPlaces = 2) => {
+    const percent = (score / possible) * 100.0
+    return percent % 1 === 0 ? percent : percent.toFixed(decimalPlaces)
+  }
+
+  // TODO: get weighting scheme from course & other options
+  const {final, assignmentGroups, current} = CourseGradeCalculator.calculate(
+    submissions,
+    assignmentGroupMap,
+    'points',
+    true
+  )
+  const {includeUngradedAssignments} = gradebookOptions
+  const gradeToDisplay = includeUngradedAssignments ? final : current
+  const finalGradePercent = scoreToPercentage(gradeToDisplay.score, gradeToDisplay.possible)
 
   return (
-    <div id="student_information">
-      <div className="row-fluid">
-        <div className="span4">
-          <h2>Student Information</h2>
-        </div>
-        <div className="span8">
-          <h3 className="student_selection">
+    <View as="div">
+      <View as="div" className="row-fluid">
+        <View as="div" className="span4">
+          <View as="h2">{I18n.t('Student Information')}</View>
+        </View>
+        <View as="div" className="span8">
+          <View as="h3" className="student_selection">
             <a href="studentUrl"> {selectedStudent.name}</a>
-          </h3>
+          </View>
 
-          <div>
-            <strong>
-              Secondary ID:
-              <span className="secondary_id"> {selectedStudent.loginId}</span>
-            </strong>
-          </div>
-          <div>
-            <strong>
-              Sections:{' '}
+          <View as="div">
+            <View as="strong">
+              {I18n.t('Secondary ID:')}
+              <View as="span" className="secondary_id">
+                {' '}
+                {selectedStudent.loginId}
+              </View>
+            </View>
+          </View>
+          <View as="div">
+            <View as="strong">
+              {I18n.t('Sections: ')}
               {selectedStudent.enrollments.map(enrollment => enrollment.section.name).join(', ')}
-            </strong>
-          </div>
+            </View>
+          </View>
 
-          <h4>Grades</h4>
+          <View as="h4">{I18n.t('Grades')}</View>
 
-          <div className="ic-Table-responsive-x-scroll">
+          <View as="div" className="ic-Table-responsive-x-scroll">
             <table className="ic-Table">
               <thead>
                 <tr>
-                  {/* {{#if subtotal_by_period}}
-                      <th scope="col">{{#t}}Grading Period{</th>
-                    {{else}}
-                      <th scope="col">{{#t}}Assignment Group{</th>
-                    {{/if}} */}
-                  <th scope="col">Assignment Group</th>
-                  <th scope="col">Grade</th>
-                  <th scope="col">Letter Grade</th>
-                  <th scope="col">% of Grade</th>
+                  <th scope="col">{I18n.t('Assignment Group')}</th>
+                  <th scope="col">{I18n.t('Grade')}</th>
+                  <th scope="col">{I18n.t('Letter Grade')}</th>
+                  <th scope="col">{I18n.t('% of Grade')}</th>
                 </tr>
               </thead>
               <tbody>
-                {/* {{#each assignment_subtotal in assignment_subtotals}}
-                      {{
-                        assignment-subtotal-grades
-                        subtotal=assignment_subtotal
-                        student=selectedStudent
-                        weightingScheme=weightingScheme
-                        gradingStandard=ENV.GRADEBOOK_OPTIONS.grading_standard
-                      }}
-                    {{/each}} */}
+                {Object.keys(assignmentGroups).map(assignmentGroupId => {
+                  const {name: groupName} = assignmentGroupMap[assignmentGroupId]
+                  const {final: groupFinal, current: groupCurrent} =
+                    assignmentGroups[assignmentGroupId]
+                  const groupGradeToDisplay = includeUngradedAssignments ? groupFinal : groupCurrent
+
+                  const percentScore = scoreToPercentage(
+                    groupGradeToDisplay.score,
+                    groupGradeToDisplay.possible,
+                    1
+                  )
+                  const percentScoreText = Number.isNaN(Number(percentScore))
+                    ? '-'
+                    : `${percentScore}% (${groupGradeToDisplay.score} / ${groupGradeToDisplay.possible})`
+                  return (
+                    <tr key={`group_final_scores_${assignmentGroupId}`}>
+                      <th>{groupName}</th>
+                      <td>{percentScoreText}</td>
+                      <td>-</td>
+                      <td>-</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
-          </div>
+          </View>
 
-          <h3>
-            Final Grade:
-            <span className="total-grade">
-              &nbsp;{selectedStudent.enrollments[0].grades.unpostedCurrentScore}% (
-              {studentSubmissions.reduce((a, b) => a + b.score ?? 0, 0)} / )
-            </span>
-          </h3>
-
-          {/* {{partial "student_information/assignment_subtotals"}} */}
-        </div>
-      </div>
-    </div>
+          <View as="h3">
+            {I18n.t('Final Grade:')}
+            <View as="span" className="total-grade">
+              {' '}
+              {finalGradePercent}% ({gradeToDisplay.score} / {gradeToDisplay.possible} points)
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
   )
 }
