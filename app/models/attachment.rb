@@ -350,8 +350,24 @@ class Attachment < ActiveRecord::Base
   end
 
   def media_tracks_include_originals
-    media_object_scope = MediaObject.where(media_id: media_entry_id).select("media_objects.id")
-    media_tracks.union(MediaTrack.where(media_object: media_object_scope).where.not(locale: media_tracks.select(:locale)))
+    Attachment.media_tracks_include_originals(id)
+  end
+
+  def self.media_tracks_include_originals(attachment_ids)
+    MediaTrack.from(
+      MediaTrack.select("*, ROW_NUMBER() OVER(PARTITION BY media_tracks_all.locale, media_tracks_all.media_object_id ORDER BY media_tracks_all.rank) AS row")
+        .from(<<~SQL.squish),
+          (
+            #{MediaTrack.select("*, 0 AS rank, attachment_id AS for_att_id").where(attachment_id: attachment_ids).to_sql}
+            UNION
+            #{MediaTrack.select("media_tracks.*, 1 AS rank, attachments_by_media_ids_media_objects.id AS for_att_id")
+              .joins(media_object: [:attachment, :attachments_by_media_id])
+              .where("media_tracks.attachment_id = attachments.id")
+              .where(media_objects: { attachments_by_media_ids_media_objects: { id: attachment_ids } }).to_sql}
+          ) AS media_tracks_all
+        SQL
+      :media_tracks
+    ).where(row: 1)
   end
 
   # this is here becase attachment_fu looks to make sure that parent_id is nil before it will create a thumbnail of something.
