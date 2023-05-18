@@ -85,6 +85,7 @@ export const AccountCalendarItem = ({
                 {I18n.t('Show account calendar for %{name}', {name: item.name})}
               </ScreenReaderContent>
             }
+            data-testid="account-calendar-checkbox"
             inline={true}
             checked={isVisible}
             onChange={e => onAccountToggled(item.id, e.target.checked)}

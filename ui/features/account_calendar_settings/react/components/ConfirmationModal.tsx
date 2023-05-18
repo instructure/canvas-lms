@@ -49,6 +49,7 @@ const ConfirmationModal: React.FC<ComponentProps> = ({isOpen, onCancel, onConfir
         <CloseButton
           placement="end"
           offset="small"
+          data-testid="x-close-button"
           onClick={onCancel}
           screenReaderLabel={I18n.t('Close')}
         />
