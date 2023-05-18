@@ -417,11 +417,6 @@ scheduled_page_publication:
   state: hidden
   display_name: Scheduled page publication
   description: Allows course pages to be published on a schedule
-copy_blueprint_settings:
-  applies_to: RootAccount
-  state: hidden
-  display_name: Copy Blueprint Course settings
-  description: Allows Blueprint Course settings to be exported and copied to another Blueprint Course
 send_usage_metrics:
   state: hidden
   display_name: Send usage metrics
