@@ -22,6 +22,10 @@ module BundlerLockfileExtensions
   module Bundler
     module Definition
       def initialize(lockfile, *args)
+        if ENV["BUNDLE_LOCKFILE"] && !::Bundler.instance_variable_get(:@default_lockfile)
+          raise ::Bundler::GemfileNotFound, "Could not locate lockfile #{ENV["BUNDLE_LOCKFILE"].inspect}"
+        end
+
         # we changed the default lockfile in BundlerLockfileExtensions.add_lockfile
         # since DSL.evaluate was called (re-entrantly); sub the proper value in
         if !lockfile.equal?(::Bundler.default_lockfile) && ::Bundler.default_lockfile(force_original: true) == lockfile
