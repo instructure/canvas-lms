@@ -254,3 +254,8 @@ fix_missing_policy_applicator_gradebook_history:
       state: allowed_on # enable for local development
     test:
       state: allowed_on # enable for the deployed 'test' environment
+grading_scheme_updates:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Improve Letter Grading Scheme Usability
+  description: Teachers and Account Managers will be able to more easily manage letter grading schemes for accounts, courses, and assignments.
