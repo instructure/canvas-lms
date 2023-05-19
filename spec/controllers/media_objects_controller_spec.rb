@@ -905,6 +905,9 @@ describe MediaObjectsController do
   describe "GET 'media_attachments_iframe'" do
     before do
       @obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
+        [{ url: "whatever man", bitrate: 12_345 }]
+      )
     end
 
     it "returns an error if the media is locked" do
@@ -914,6 +917,17 @@ describe MediaObjectsController do
 
       get "iframe_media_player", params: { attachment_id: attachment.id }
       assert_status(401)
+    end
+
+    it "finds a replaced file" do
+      user_session(@student)
+      old = @obj.attachment
+      old.file_state = "deleted"
+      old.replacement_attachment = attachment_model(media_entry_id: "0_deadbeef", filename: "blah.flv", media_object: @obj)
+      old.save!
+
+      get "iframe_media_player", params: { attachment_id: old.id }
+      assert_status(200)
     end
   end
 
