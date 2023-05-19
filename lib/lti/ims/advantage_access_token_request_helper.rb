@@ -29,8 +29,11 @@ module Lti
 
       REQUEST_ENV_KEY = "canvas.lti_advantage_token"
 
-      UNIVERSAL_GRANT_HOST = Canvas::Security.config["lti_grant_host"] ||
-                             "canvas.instructure.com"
+      # While we migrate over from using canvas.instructure.com as the universal host to sso.canvaslms.com,
+      # we have to include both of them. These are simply stored in the config as a comma-separated list.
+      # When the migration is done, this will go back to being a single host.
+      UNIVERSAL_GRANT_HOSTS = Canvas::Security.config["lti_grant_host"]&.split(",") ||
+                              ["canvas.instructure.com", "sso.canvaslms.com"]
 
       # Will only return a token if there is a valid one
       def token(request)
@@ -61,7 +64,7 @@ module Lti
         [
           request.host_with_port,
           *extra_expected_audience_hosts(request),
-          UNIVERSAL_GRANT_HOST
+          *UNIVERSAL_GRANT_HOSTS
         ].uniq.map do |h|
           Rails.application.routes.url_helpers.oauth2_token_url(host: h, protocol: request.protocol)
         end
