@@ -150,6 +150,12 @@ describe InfoController do
     end
   end
 
+  describe "GET 'internal/readiness'", type: :routing do
+    it "routes /internal/readiness to the info controller" do
+      expect(get("/internal/readiness")).to route_to("info#readiness")
+    end
+  end
+
   describe "GET 'deep'" do
     let(:success_response) { Net::HTTPSuccess.new(Net::HTTPOK, "200", "OK") }
 
