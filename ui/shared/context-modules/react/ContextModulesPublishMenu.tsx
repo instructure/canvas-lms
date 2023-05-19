@@ -314,6 +314,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
           progressId={progressId}
           progressCurrent={currentProgress}
           title={modalTitle()}
+          mode={shouldPublishModules ? 'publish' : 'unpublish'}
         />
       )}
     </View>

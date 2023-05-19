@@ -24,7 +24,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import formatMessage from '../../../format-message'
 import {showFlashAlert} from '../../../common/FlashAlert'
 
-const EDIT_MESSAGE = formatMessage('If left empty link, text will display as course link name')
+const EDIT_MESSAGE = formatMessage('If left empty, link text will display as course link name')
 
 export const LinkDisplay = ({
   linkText,
