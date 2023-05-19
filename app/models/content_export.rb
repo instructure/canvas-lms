@@ -144,7 +144,7 @@ class ContentExport < ActiveRecord::Base
       when ZIP
         export_zip(opts)
       when USER_DATA
-        export_user_data(opts)
+        export_user_data(**opts)
       when QUIZZES2
         return unless context.feature_enabled?(:quizzes_next)
 
