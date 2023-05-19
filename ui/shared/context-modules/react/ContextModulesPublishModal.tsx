@@ -45,6 +45,7 @@ interface Props {
   readonly progressId: string | number | null
   readonly progressCurrent?: ProgressResult
   readonly title: string
+  readonly mode: 'publish' | 'unpublish'
 }
 export const PUBLISH_STATUS_POLLING_MS = 1000
 
@@ -60,6 +61,7 @@ const ContextModulesPublishModal = ({
   progressId,
   progressCurrent,
   title,
+  mode = 'publish',
 }: Props) => {
   const handlePublish = () => {
     if (isPublishing) {
@@ -72,13 +74,16 @@ const ContextModulesPublishModal = ({
   const progressBar = () => {
     if (!progressId) return null
 
+    const labelText =
+      mode === 'publish' ? I18n.t('Publishing Progress') : I18n.t('Unpublish Progress')
+
     return (
       <View as="div" padding="medium none">
         <Text size="small" weight="bold">
-          {I18n.t('Publishing Progress')}
+          {labelText}
         </Text>
         <ProgressBar
-          screenReaderLabel={I18n.t('Publishing Progress')}
+          screenReaderLabel={labelText}
           formatScreenReaderValue={({valueNow, valueMax}) => {
             return I18n.t('%val percent', {val: Math.round((valueNow / valueMax) * 100)})
           }}
@@ -142,10 +147,8 @@ const ContextModulesPublishModal = ({
           {!isPublishing && isOpen ? (
             I18n.t('Continue')
           ) : (
-            <AccessibleContent
-              alt={I18n.t('Stop publishing button. Click to discontinue processing.')}
-            >
-              {I18n.t('Stop Publishing')}
+            <AccessibleContent alt={I18n.t('Stop button. Click to discontinue processing.')}>
+              {I18n.t('Stop')}
             </AccessibleContent>
           )}
         </Button>
