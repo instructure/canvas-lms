@@ -132,6 +132,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
         if target_child_group
           unless target_child_group.workflow_state == "active"
+            target_child_group.root_account_id = context.resolved_root_account_id
             target_child_group.workflow_state = "active"
             target_child_group.save!
           end

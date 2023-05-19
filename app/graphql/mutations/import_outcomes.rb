@@ -268,8 +268,14 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
     end
 
     def copy_or_get_existing_group!(source_group, destination_parent_group, target_group)
+      # Use resolved_root_account_ids to find the root_account_id because if the
+      # the target group's context is the Root Account, then root_account_id will return 0
+      # which is incorrect! resolved_root_account_id method will return the Account.id if the
+      # the context is the Root Account.
+
       # check if we have the group as a root group
       if (group = target_group.child_outcome_groups.find_by(source_outcome_group_id: source_group.id))
+        group.root_account_id = target_group.context.resolved_root_account_id
         group.learning_outcome_group_id = destination_parent_group.id
         group.workflow_state = "active"
         group.save!
@@ -279,6 +285,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
       # check if we already have the group inside the destination parent group
       if (group = destination_parent_group.child_outcome_groups.find_by(source_outcome_group_id: source_group.id))
         unless group.workflow_state == "active"
+          group.root_account_id = target_group.context.resolved_root_account_id
           group.workflow_state = "active"
           group.save!
         end
@@ -286,6 +293,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
       end
 
       group = source_group.clone
+      group.root_account_id = target_group.context.resolved_root_account_id
       group.learning_outcome_group_id = destination_parent_group.id
       group.source_outcome_group_id = source_group.id
       group.context = target_group.context

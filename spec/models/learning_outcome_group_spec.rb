@@ -359,6 +359,10 @@ describe LearningOutcomeGroup do
         title = group[:title]
         childs = group[:groups]
 
+        # root_account_id should match the context of the db_parent_group.context root_account_id
+        log_db_root_account_id = LearningOutcomeGroup.find_by(context: db_parent_group.context, title: title).root_account_id
+        expect(log_db_root_account_id).to eq(db_parent_group.context.resolved_root_account_id)
+
         db_group = db_parent_group.child_outcome_groups.find_by!(title: title)
 
         db_outcomes = db_group.child_outcome_links.map(&:content)
@@ -431,6 +435,7 @@ describe LearningOutcomeGroup do
       @course_group_a.sync_source_group
       group_d.reload
       expect(group_d.workflow_state).to eql("active")
+      expect(group_d.root_account_id).to eql(@course.resolved_root_account_id)
     end
   end
 end
