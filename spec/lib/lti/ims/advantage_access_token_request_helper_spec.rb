@@ -40,10 +40,11 @@ describe Lti::IMS::AdvantageAccessTokenRequestHelper do
         expect(described_class.token_error(request)).to be_nil
       end
 
-      it "uses the oauth url for request.host_with_port, and the default grant host, as possible audience values" do
+      it "uses the oauth url for request.host_with_port, and the default grant host(s), as possible audience values" do
         expected_auds = [
           "http://test.host/login/oauth2/token",
-          "http://canvas.instructure.com/login/oauth2/token"
+          "http://canvas.instructure.com/login/oauth2/token",
+          "http://sso.canvaslms.com/login/oauth2/token"
         ]
         described_class.token(request)
         expect(token).to have_received(:validate!).with(expected_auds)
@@ -143,6 +144,22 @@ describe Lti::IMS::AdvantageAccessTokenRequestHelper do
                   "`lti_advantage_route?` will fail"
         expect(path_spec).to start_with("/api/lti/"), err_msg
       end
+    end
+  end
+
+  describe ".expected_audiences" do
+    it "is able to handle multiple universal grant hosts from the configuration" do
+      allow(Canvas::Security).to receive(:config).and_return(
+        {
+          "lti_grant_host" => "canvas.instructure.com,sso.canvaslms.com"
+        }
+      )
+
+      expect(described_class.expected_audience(request)).to contain_exactly(
+        "http://test.host/login/oauth2/token",
+        "http://canvas.instructure.com/login/oauth2/token",
+        "http://sso.canvaslms.com/login/oauth2/token"
+      )
     end
   end
 end
