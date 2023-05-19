@@ -15,32 +15,32 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {Children, Component} from 'react'
-import {themeable} from '@instructure/ui-themeable'
-import {Children as ChildrenPropType} from '@instructure/ui-prop-types'
+import React, {Component} from 'react'
+import {Children} from '@instructure/ui-prop-types'
 import {Pill} from '@instructure/ui-pill'
+import buildStyle from './style'
 
-import styles from './styles.css'
-import theme from './theme'
-
-class BadgeList extends Component {
-  static propTypes = {
-    children: ChildrenPropType.oneOf([Pill])
+export default class BadgeList extends Component {
+  constructor(props) {
+    super(props)
+    this.style = buildStyle()
   }
 
-  renderChildren() {
-    return Children.map(this.props.children, child => {
-      return (
-        <li key={child.key} className={styles.item}>
-          {child}
-        </li>
-      )
-    })
-  }
+  renderChildren = () =>
+    React.Children.map(this.props.children, child => (
+      <li key={child.key} className={this.style.classNames.item}>
+        {child}
+      </li>
+    ))
 
-  render() {
-    return <ul className={styles.root}>{this.renderChildren()}</ul>
-  }
+  render = () => (
+    <>
+      <style>{this.style.css}</style>
+      <ul className={this.style.classNames.root}>{this.renderChildren()}</ul>
+    </>
+  )
 }
 
-export default themeable(theme, styles)(BadgeList)
+BadgeList.propTypes = {
+  children: Children.oneOf([Pill]),
+}
