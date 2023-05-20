@@ -5990,6 +5990,7 @@ sv:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Det går inte att åsidosätta inlämningsdatumet till ett datum i en stängd bedömningsperiod"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Det går inte att ställa in sis_account_id på ett root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Det  går inte att ställa in inlämningsdatumet till ett datum inom en stängd bedömningsperiod"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Det går inte att återställa ett underordnat ämne när rotkursämnet också är borttaget. Vänligen ångra borttagningen av rotkursämnet istället."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "kan inte använda reserverade namn i import av omdömesboken"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Det går inte att visa detaljerade rapporter för anonyma uppgifter förrän omdömen har tystats."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Det går inte att visa detaljerade rapporter för anonyma uppgifter tills omdömen publiceras."
@@ -6959,6 +6960,7 @@ sv:
   consortium_parent_keys_803547b: "Överordnade konsortiumnycklar"
   consumer_key_57d9fcf1: Konsumentnyckel
   consumer_key_6f94ba11: Konsumentnyckel
+  contact_info_8e3304d1: Kontaktinformation
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Kontakta din administratör om du vill ändra kursens synlighet."
   content_1440204b: Innehåll
   content_access_id_601d931e: "åtkomst-id till innehåll"
@@ -8478,10 +8480,10 @@ sv:
   course_pace_plan_c79cbffc: Kurstaktplan
   course_paces_4396b508: Kurstakter
   course_paces_description: |-
-      Kurstakt lägger till stöd för rullande registrering till Canvas.
-      Detta möjliggör en magisk distribution av inlämningsdatum för studenter med olika
-      startdatum som baseras på den takt som läraren har definierats. Läs mer och ge
-      feedback genom att gå med i *användargruppen Kurstakt*.
+      Kurstempo lägger till stöd för rullande registreringar till Canvas;
+      automatiskt distribuera förfallodatum för studenter med olika
+      startdatum baserat på en instruktörs definierade takt. Lär dig mer och ge
+      feedback genom att gå med i *Användargrupp för kurstempo*.
   course_paces_table_ce32db1c: Kurstaktstabell
   course_pacing_40c14b61: Kurstakt
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "Kurstakt lägger till stöd för rullande registrering i Canvas. Detta möjliggör en magisk distribution av inlämningsdatum för studenter med olika startdatum som baseras på den takt som läraren har definierat. Läs mer och få feedback i användargruppen Kurstakt."
@@ -10085,6 +10087,7 @@ sv:
     unnamed_tool: "Verktyg utan namn"
   developer_keys_d70ba44a: Utvecklarnycklar
   developer_keys_manage_806da2d: "Utvecklarnycklar – hantera "
+  developer_keys_report_4d041e62: "Rapport för utvecklarnycklar"
   developername_logo_88951d4: "%{developerName} Logga"
   developers_keys_table_69ae6b7e: "Tabell för utvecklarnycklar"
   dialog_form_wrapper: 
@@ -10779,6 +10782,7 @@ sv:
   duplicate_assignment_name_3ca7d753: "Duplicera uppgiften %{name}"
   duplicate_discussion_title_43b39959: "Duplicera diskussion %{title}"
   duplicate_discussion_title_6537ef4d: "Duplicera diskussion %{title}"
+  duplicate_ids_23b0a29e: "Dubbletter av ID"
   duplicate_item_339f54bb: "Kopiera objekt"
   duplicate_module_module_name_be40ad50: "Duplicerad modul %{module_name}"
   duplicate_module_name_ab26e5c3: "Kopiera %{module_name}"
@@ -11648,6 +11652,7 @@ sv:
   error_retrieving_assignment_configuration_tools_f7d75303: "Fel vid hämtning av konfigurationsverktyg för anvisning"
   error_retrieving_assignment_external_tools_9102d343: "Det gick inte att hämta externa verktyg för uppgiften"
   error_retrieving_content_c07ee76b: "Ett fel inträffade vid hämtning av innehåll"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Det gick inte att hämta innehåll från verktyget (dåligt innehållsobjekt)"
   error_retrieving_content_from_tool_e65ef3b7: "Det gick inte att hämta innehåll från verktyget"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Fel vid hämtning av verktyg för likhetsidentifiering"
   error_running_quizzes_2_export_cfecedba: "Fel vid körning av export av Quiz 2."
@@ -12561,6 +12566,7 @@ sv:
   for_each_late_62aecf41: "För varje sen"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*För utvecklare av LTI 1.3-verktyg:* Följ anvisningarna i sektionen ”Vad exakt behöver du ändra?” i Community-artikeln."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Uppgiften kan publiceras för manuellt publicerade uppgifter med inlämningskommentar från någon annan än inlämnaren. Tidigare krävdes ett omdöme innan publiceringen kunde göras."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "För mer information, se *Canvas API dokumentation*."
   for_name_d5684bfd: "För %{name}"
   for_students_who_d0fd45d0: "För studenter som ..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -12667,6 +12673,7 @@ sv:
   global_announcements_a78912c8: "Globala anslag"
   global_announcements_add_edit_delete_843ca4d2: "Globala anslag – lägg till/redigera/ta bort"
   global_branding_df1cae12: "Globalt varumärke"
+  global_id_ffe1be80: "Globalt ID"
   global_inherited_developer_keys_4a6c15de: "Globalt ärvda utvecklarnycklar"
   global_keys_40e1a451: "Globala nycklar"
   global_message_icons: 
@@ -14679,6 +14686,7 @@ sv:
       Om aktiverade kräver oEmbed-slutpunkter en
       verktygsgenererad token för att verifiera ursprunget
       för en oEmbed-resursbegäran.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Om det är aktiverat, fyller uppdragsformuläret i förväg med värden från djuplänksmeddelanden på sidan för att skapa/redigera uppdraget."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Om aktiverad kommer frågeparametrarna inte att kopieras till POST-texten under en LTI-lansering."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "Om alternativet är aktiverat valideras omfattningar vid API-begäranden om den utvecklarnyckel som används kräver omfattningar. "
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Om det är aktiverat, kommer Sourcedids som används av Canvas for grundläggande läromål att krypteras."
@@ -15113,6 +15121,7 @@ sv:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "Ärv – Vitlistan ärvs från det överordnade kontot.  Domäner kan läggas till men kommer inte att tvingas förrän du ändrar inställningen till På."
   inherited_d4d0bc33: Ärvd
   inherited_developer_keys_table_e4a65b67: "Tabell för ärvda utvecklarnycklar"
+  inherited_from_parent_account_4776070d: "Ärvt från föräldrakonto"
   initial_sync_incomplete_ec74fe8e: "Den initiala synkroniseringen är inte färdig"
   inner_box_background_6f9092f: "Inre rutans bakgrund"
   inner_box_border_d0524b03: "Inre rutans kantlinje"
@@ -15564,8 +15573,10 @@ sv:
   key_f2a919d5: Nyckel
   key_ff4089c5: "Nyckel:"
   key_name_7311d22: "Nyckelnamn:"
+  key_name_bc712026: Nyckelnamn
   key_settings_44df6a41: Nyckelinställningar
   key_state_for_the_current_account_d16b1cd5: "Nyckeltillstånd för det aktuella kontot"
+  key_type_6e8c0909: Nyckeltyp
   keyboard_instructions_e032939f: tangentbordsinstruktioner
   keyboard_nav_dialog: 
     esc_key_notification: "Tryck på esc-knappen innan du använder tangentbordsgenvägar i när du navigerar i omdömesboken."
@@ -16275,6 +16286,7 @@ sv:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id måste vara unika"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI-djuplänkning för modulindexmenyn"
   lti_deep_linking_line_items_5e0079f7: "Radartiklar för LTI-djuplänkning"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "LTI Deep Linking-rader på sidan för att skapa/redigera uppdrag"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Radobjekt för LTI-djuplänkning på redigeringssidan för uppgifter"
   lti_delete_ee5f1bef: "LTI – radera"
   lti_dynamic_registration_8592edb0: "Dynamisk LTI-registrering"
@@ -18289,9 +18301,11 @@ sv:
       email: 
         body: "Bedömningen av din uppgift %{assignment_title} har ändrats."
         excused: "Den här uppgiften har ursäktats: "
+        grade: "betyg: %{letter_grade}"
         html: 
           body: "Bedömningen av din uppgift %{assignment_title} har ändrats."
           excused: "Den här uppgiften har ursäktats: "
+          grade: "betyg: %{letter_grade}"
           link_message: "Du kan se över uppgiften här"
           no_date_set: "Inget datum har ställts in"
           not_applicable: "Ej tillämpbart"
@@ -18303,38 +18317,43 @@ sv:
         no_date_set: "Inget datum har ställts in"
         not_applicable: "Ej tillämpbart"
         regraded_date: "Ny bedömning: %{date}"
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending: "resultat väntar på att läraren granskar det"
         subject: "Omdöme har ändrats: %{assignment}, %{context}"
       sms: 
         body_sms: "Din omdöme för %{title} i %{context} ändrades nyss."
+        grade: "betyg: %{letter_grade}"
         more_info: "Mer information finns på %{url}"
         no_date_set: "Inget datum har ställts in"
         not_applicable: "Ej tillämpbart"
         regraded_date: "Ny bedömning: %{date}"
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending: "resultat väntar på att läraren granskar det"
       summary: 
+        grade: "betyg: %{letter_grade}"
         no_date_set: "Inget datum har ställts in"
         not_applicable: "Ej tillämpbart"
         regraded_date: "Ny bedömning: %{date}"
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending: "resultat väntar på att läraren granskar det"
         subject: "Omdöme har ändrats: %{title}, %{context}"
       twitter: 
+        grade: "betyg: %{letter_grade}"
         no_date_set: "Inget datum har ställts in"
         not_applicable: "Ej tillämpbart"
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending: "(väntar på recension)"
         tweet: "Canvas-notis – Omdömesändring: %{date}"
     submission_graded: 
       email: 
         body: "Din uppgift %{assignment} har bedömts."
         excused: "Den här uppgiften har ursäktats: "
+        grade: "betyg: %{letter_grade}"
         graded_date: "bedömd: %{date}"
         html: 
           body: "Din uppgift %{assignment} har bedömts."
           excused: "Den här uppgiften har ursäktats: "
+          grade: "betyg: %{letter_grade}"
           graded_date: "bedömd: %{date}"
           link_message: "Du kan se över uppgiften här"
           no_date_set: "Inget datum har ställts in"
@@ -18345,28 +18364,31 @@ sv:
         link_message: "Du kan se över uppgiften här:"
         no_date_set: "Inget datum har ställts in"
         not_applicable: "Ej tillämpbart"
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending_review: "resultat väntar på att läraren granskar det"
         subject: "Uppgift bedömd: %{assignment}, %{context}"
       sms: 
+        grade: "betyg: %{letter_grade}"
         graded_date: "bedömd: %{date}"
         more_info: "Mer information på %{url}"
         no_date_set: "Inget datum inställt"
         not_applicable: "Ej tillämpbart"
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending_review: "poängen väntar på att läraren ser över dem"
         sms_body: "%{assignment} har bedömts."
       summary: 
+        grade: "betyg: %{letter_grade}"
         graded_date: "bedömd: %{date}"
         no_date_set: "Inget datum har ställts in"
         not_applicable: "Ej tillämpbart"
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending_review: "resultat väntar på att läraren granskar det"
         subject: "Uppgift bedömd: %{assignment}, %{context}"
       twitter: 
+        grade: "betyg: %{letter_grade}"
         no_date_set: "Inget datum har ställts in"
         not_applicable: "Ej tillämpbart"
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending_review: "(väntar på granskning)"
         tweet: "Canvas-notis – Bedömd: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -18697,6 +18719,7 @@ sv:
   module_publish_menu_30b638dd: Modulpubliceringsmeny
   module_publish_menu_88b54c1b: Modulpubliceringsmeny
   module_published_80f0b9b8: "Modulen publicerades"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Modulpubliceringsalternativ"
   modules: 
     add: 
       assignment: 
@@ -20605,6 +20628,7 @@ sv:
   permissions_manage_9eea4f8f: "Behörigheter – hantera"
   permissions_v2_page_f96dde06: "Behörigheter/tillstånd V2-sida"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Tillåt användning av alla \"inkludera\"-parametrarna för den här utvecklarnyckeln. \"Inkludera\"-parametrar kan ge åtkomst till ytterligare data som inte inkluderats i omfången som valts nedan."
+  permitted_api_endpoints_b092c4cc: "Tillåtna API-slutpunkter"
   persian_a8cadb95: Persiska
   persists_the_used_authentication_provider_when_log_15113afc: "Kvarhåller den tidigare använda autentiseringsleverantören vid inloggning med standardinställningar för nya inloggningar till standardleverantören."
   personal_pronouns_7d271f52: "Personliga pronomen"
@@ -27976,6 +28000,7 @@ sv:
        Antalet räknas från början av dagen till slutet av dagen i den angivna tidszonen för kontot som kör rapporten.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Den här rapporten hämtar de senaste Nig Blues Rutton-konferenserna för ett konto."
   this_report_gets_the_submissions_for_courses_d83bb449: "Den här rapporten hämtar inlämningarna för en kurs."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Den här rapporten ger en lista över alla utvecklarnycklar som är tillgängliga för institutionen. Dessa nycklar kan antingen installeras direkt i rotkontot som rapporten körs från eller kan ärvas från överordnade rotkonton. Utvecklarnycklar kan antingen vara API- eller LTI-nycklar."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Den här rapporten tillhandahåller alla aktiva e-portföljer för den aktuella lärosätet. Du kan även välja ”Ta endast med e-portföljer från användare utan registreringar” för att minska omfånget för e-portföljsresultaten till endast de användare som inte har registreringar. Du kan även köra rapporten med ”Ta med borttagna objekt” för att endast ta med de e-portföljer som tagits bort."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Denna rapport visar alla läranderesultat som finns inom detta konto. Den resulterande csv-filen kommer att ha en rad per utfall, och kommer att visa detaljerna för alla associerade attribut med varje utfall."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -29378,6 +29403,7 @@ sv:
   update_domain_account_lookup_9c89440d: "Uppdatera kontouppslag för domän"
   update_failed_2c87428c: "Uppdateringen misslyckades"
   update_file_links_to_prefer_preview_not_download_94535382: "Uppdatera fillänkar för förhandsgranskning, inte nedladdning"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Uppdatera betygssammanfattningstabell för att använda ett modernt ramverk"
   update_how_we_process_sis_imports_8195bf77: "Uppdatera hur vi behandlar SIS-importen"
   update_important_info_bcc01d6a: "Uppdatera viktig information"
   update_inbox_page_to_use_react_instui_4d343fd: "Uppdatera inkorgssidan för att använda React/InstUI"
