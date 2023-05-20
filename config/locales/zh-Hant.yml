@@ -5990,6 +5990,7 @@ zh-Hant:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: 無法將重寫到期日設定為封閉評分期內的日期
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "無法設置 sis_account_id 在root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: 無法將到期日設定為封閉評分期內的日期
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: 在根課程主題也刪除時，無法取消刪除子項主題。請改為取消刪除根課程主題。
   cannot_use_gradebook_importer_reserved_names_8f3b5748: 無法使用成績單匯入器保留的名稱
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: 成績取消隱藏評分前，不能檢視匿名作業的詳細報告。
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: 成績公佈前，無法能檢視匿名作業的詳細報告。
@@ -6959,6 +6960,7 @@ zh-Hant:
   consortium_parent_keys_803547b: 聯盟上級金鑰
   consumer_key_57d9fcf1: 消費者密鑰
   consumer_key_6f94ba11: 消費者密鑰
+  contact_info_8e3304d1: 聯絡資料
   contact_your_administrator_if_you_need_to_change_c_9002a501: 如果您需要變更課程可見度，請聯絡您的管理員。
   content_1440204b: 內容
   content_access_id_601d931e: "內容存取 ID"
@@ -8478,8 +8480,8 @@ zh-Hant:
   course_paces_4396b508: 課程進度
   course_paces_description: |-
       「課程進度」添加點名註冊的支援到 Canvas 中；
-      根據導師規定的計畫允許不同
-      開始日期的學生的截止日期神奇分配。瞭解更多和
+      根據導師規定的進度，自動分配允許不同
+      開始日期的學生的截止日期。瞭解更多和
       加入*「課程進度使用者小組」*以提供反饋。
   course_paces_table_ce32db1c: 課程進度表
   course_pacing_40c14b61: 課程進度
@@ -10084,6 +10086,7 @@ zh-Hant:
     unnamed_tool: 未命名的工具
   developer_keys_d70ba44a: 開發人員金鑰
   developer_keys_manage_806da2d: "開發人員金鑰 - 管理"
+  developer_keys_report_4d041e62: 開發人員金鑰報告
   developername_logo_88951d4: "%{developerName}標誌"
   developers_keys_table_69ae6b7e: 開發人員金鑰表
   dialog_form_wrapper: 
@@ -10776,6 +10779,7 @@ zh-Hant:
   duplicate_assignment_name_3ca7d753: "重覆作業%{name}"
   duplicate_discussion_title_43b39959: "重複討論區%{title}"
   duplicate_discussion_title_6537ef4d: "重複討論區%{title}"
+  duplicate_ids_23b0a29e: "重複的 ID"
   duplicate_item_339f54bb: 重複的項目
   duplicate_module_module_name_be40ad50: "複製單元%{module_name}"
   duplicate_module_name_ab26e5c3: "重覆%{module_name}"
@@ -11643,6 +11647,7 @@ zh-Hant:
   error_retrieving_assignment_configuration_tools_f7d75303: 尋回作業配置工具出錯
   error_retrieving_assignment_external_tools_9102d343: 檢索作業外部工具時出錯
   error_retrieving_content_c07ee76b: 取回內容時發生錯誤
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: 從工具中取回內容時發生錯誤（錯誤的內容項目）
   error_retrieving_content_from_tool_e65ef3b7: 擷取來自工具的內容時發生錯誤
   error_retrieving_similarity_detection_tools_d6d4f9e9: 檢索相似性檢測工具錯誤
   error_running_quizzes_2_export_cfecedba: "運行測驗 2 導出時出錯。"
@@ -12554,6 +12559,7 @@ zh-Hant:
   for_each_late_62aecf41: 每一項遲交
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*對於 LTI 1.3 工具開發人員：*請遵照「社群」文章中的「 您的變更確切需要什麼」一節的指示。"
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: 針對手動公佈的作業，如果提交項目的評論不是由提交項目的自身使用者提交，將允許公佈作業。以往必須完成評分方容許公佈此類作業。
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "如需更多資訊，請參閱 *Canvas API 文件*。"
   for_name_d5684bfd: "對象：%{name}"
   for_students_who_d0fd45d0: 對於以下學生...
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -12660,6 +12666,7 @@ zh-Hant:
   global_announcements_a78912c8: 全域通告
   global_announcements_add_edit_delete_843ca4d2: "總體通告 - 添加 / 編輯 / 刪除"
   global_branding_df1cae12: 全局品牌推廣
+  global_id_ffe1be80: "全域 ID"
   global_inherited_developer_keys_4a6c15de: 全域繼承開發人員金鑰
   global_keys_40e1a451: 全琙金鑰
   global_message_icons: 
@@ -14663,6 +14670,7 @@ zh-Hant:
       啟用後，oEmbed 端點將要求您提供
       工具產生的許可證以驗證
       oEmbed 資源請求的來源。
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: 如果啟用，在建立/編輯頁面上，預先以來自深入連結訊息的值填寫作業表。
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "如果啟用此項，查詢參數將不會在 LTI 啓動時寫入 POST 主體部分。"
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "如果啟用，並如果正在使用的開發人員金鑰需要範圍，將需要在 API 請求上進行驗證。"
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "如果啟用，由 Canvas 用於基本學習成果的 Sourcedids 將被加密。"
@@ -15097,6 +15105,7 @@ zh-Hant:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "沿用 - 將沿用上一級帳戶的白名單。可以添加網域，但在您將此設定設為「開」後，方會執行此設定。"
   inherited_d4d0bc33: 繼承
   inherited_developer_keys_table_e4a65b67: 繼承的開發人員金鑰表
+  inherited_from_parent_account_4776070d: 繼承自父項帳戶
   initial_sync_incomplete_ec74fe8e: 初始同步未完成
   inner_box_background_6f9092f: 郵箱內背景
   inner_box_border_d0524b03: 郵箱內邊界
@@ -15548,8 +15557,10 @@ zh-Hant:
   key_f2a919d5: 金鑰
   key_ff4089c5: 金鑰：
   key_name_7311d22: 金鑰名稱：
+  key_name_bc712026: 金鑰名稱
   key_settings_44df6a41: 金鑰設定
   key_state_for_the_current_account_d16b1cd5: 目前帳戶的金鑰狀態
+  key_type_6e8c0909: 金鑰類型
   keyboard_instructions_e032939f: 鍵盤指引
   keyboard_nav_dialog: 
     esc_key_notification: "在瀏覽成績報告書網格時，在使用鍵盤快捷鍵前按下 ESC 鍵。"
@@ -16259,6 +16270,7 @@ zh-Hant:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id 應該是唯一的"
   lti_deep_linking_for_module_index_menu_881feeee: "單元指數的 LTI 深層連結選單"
   lti_deep_linking_line_items_5e0079f7: "LTI 深入連結細項"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "作業建立/編輯頁面上的 LTI 深入連結細項"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "作業編輯頁的 LTI 深入連結細項"
   lti_delete_ee5f1bef: "LTI - 刪除"
   lti_dynamic_registration_8592edb0: "LTI 動態註冊"
@@ -18273,9 +18285,11 @@ zh-Hant:
       email: 
         body: "您的作業 %{assignment_title} 的評分已遭更改。"
         excused: 此作業已被免除。
+        grade: "評分：%{letter_grade}"
         html: 
           body: "您的作業 %{assignment_title} 的評分已遭更改。"
           excused: 此作業已被免除。
+          grade: "評分：%{letter_grade}"
           link_message: 您可以在此處檢閱作業
           no_date_set: 沒有設置日期
           not_applicable: 不適用
@@ -18287,38 +18301,43 @@ zh-Hant:
         no_date_set: 沒有設置日期
         not_applicable: 不適用
         regraded_date: "已重新評分：%{date}"
-        score: "分數：%{score}；總分：%{total}"
+        score: "分數：得分：%{score}；總分：%{total}"
         score_pending: 待教師檢閱的分數
         subject: "成績已更改：%{assignment}，%{context}"
       sms: 
         body_sms: "您的 %{title}，%{context} 中的評分剛剛遭更改。"
+        grade: "評分：%{letter_grade}"
         more_info: "在 %{url} 上有更多資訊"
         no_date_set: 沒有設置日期
         not_applicable: 不適用
         regraded_date: "已重新評分：%{date}"
-        score: "分數：%{score}；總分：%{total}"
+        score: "分數：得分：%{score}；總分：%{total}"
         score_pending: 待教師檢閱的分數
       summary: 
+        grade: "評分：%{letter_grade}"
         no_date_set: 沒有設置日期
         not_applicable: 不適用
         regraded_date: "已重新評分：%{date}"
-        score: "分數：%{score}；總分：%{total}"
+        score: "分數：得分：%{score}；總分：%{total}"
         score_pending: 待教師檢閱的分數
         subject: "成績已更改：%{title}，%{context}"
       twitter: 
+        grade: "評分：%{letter_grade}"
         no_date_set: 沒有設置日期
         not_applicable: 不適用
-        score: "分數：%{score}；總分：%{total}"
+        score: "分數：得分：%{score}；總分：%{total}"
         score_pending: （待檢閱）
         tweet: "Canvas 提示 – 成績更改：%{date}"
     submission_graded: 
       email: 
         body: "您的作業 %{assignment} 已獲評分。"
         excused: 此作業已被免除。
+        grade: "評分：%{letter_grade}"
         graded_date: "已評分：%{date}"
         html: 
           body: "您的作業 %{assignment} 已獲評分。"
           excused: 此作業已被免除。
+          grade: "評分：%{letter_grade}"
           graded_date: "已評分：%{date}"
           link_message: 您可以在此處檢閱作業
           no_date_set: 沒有設置日期
@@ -18329,28 +18348,31 @@ zh-Hant:
         link_message: 您可以在此處檢閱作業：
         no_date_set: 沒有設置日期
         not_applicable: 不適用
-        score: "分數：%{score}；總分：%{total}"
+        score: "分數：得分：%{score}；總分：%{total}"
         score_pending_review: 待教師檢閱的分數
         subject: "作業已評分：%{assignment}, %{context}"
       sms: 
+        grade: "評分：%{letter_grade}"
         graded_date: "已評分：%{date}"
         more_info: "在 %{url} 上有更多資訊"
         no_date_set: 沒有設置日期
         not_applicable: 不適用
-        score: "分數：%{score}；總分：%{total}"
+        score: "分數：得分：%{score}；總分：%{total}"
         score_pending_review: 待教師檢閱的分數
         sms_body: "%{assignment} 已評分。"
       summary: 
+        grade: "評分：%{letter_grade}"
         graded_date: "已評分：%{date}"
         no_date_set: 沒有設置日期
         not_applicable: 不適用
-        score: "分數：%{score}；總分：%{total}"
+        score: "分數：得分：%{score}；總分：%{total}"
         score_pending_review: 待教師檢閱的分數
         subject: "作業已評分：%{assignment}, %{context}"
       twitter: 
+        grade: "評分：%{letter_grade}"
         no_date_set: 沒有設置日期
         not_applicable: 不適用
-        score: "分數：%{score}；總分：%{total}"
+        score: "分數：得分：%{score}；總分：%{total}"
         score_pending_review: （待檢閱）
         tweet: "Canvas 提示 – 已評分：%{assignment}, %{context}"
     submission_needs_grading: 
@@ -18681,6 +18703,7 @@ zh-Hant:
   module_publish_menu_30b638dd: 單元發佈選單
   module_publish_menu_88b54c1b: 單元發佈選單
   module_published_80f0b9b8: 單元已發佈
+  modulename_module_publish_options_69ef1ece: "%{moduleName} 單元發佈選項"
   modules: 
     add: 
       assignment: 
@@ -20589,6 +20612,7 @@ zh-Hant:
   permissions_manage_9eea4f8f: "權限 - 管理"
   permissions_v2_page_f96dde06: "權限 V2 頁面"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "允許對此開發人員金鑰使用所有 “includes” 參數 。\"Includes\" 參數可允許存取不包括在以下所選的範圍中的其他資料的權限。"
+  permitted_api_endpoints_b092c4cc: "允許的 API 端點"
   persian_a8cadb95: 波斯語
   persists_the_used_authentication_provider_when_log_15113afc: 登入時，保留使用的驗證提供者，並將新登入預設至預設的提供者
   personal_pronouns_7d271f52: 個人代詞
@@ -27963,6 +27987,7 @@ zh-Hant:
        在執行報告的帳戶的設計時區中，完成從一天開始到一天結束的計數。
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: 此報告取得帳戶的最近「大藍按鈕」會議。
   this_report_gets_the_submissions_for_courses_d83bb449: 此報告取得課程的提交項目。
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "此報告提供機構可用的所有開發人員金鑰的清單。這些金鑰可以直接在執行報告所在的根帳戶安裝或繼承自父項根帳戶。開發人員金鑰可以是 API 或 LTI 金鑰。"
   this_report_provides_all_active_eportfolios_for_th_f7432621: 此報告提供目前機構的所有啟用的電子學習檔案。選擇性的選取「僅包括來自沒有註冊的使用者的電子學習檔案」以縮小電子學習檔案結果的範圍至沒有註冊的使用者。您也可以使用「包括已刪除的物件」執行報告以僅包括已移除的電子學習檔案。
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "此報告顯示了此帳戶中存在的所有學習成果。生成的 csv 文檔將會每個成果一行，並將顯示每個成果的所有關聯屬性的詳細資料。"
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -29366,6 +29391,7 @@ zh-Hant:
   update_domain_account_lookup_9c89440d: 更新網域帳戶榻詢
   update_failed_2c87428c: 更新失敗
   update_file_links_to_prefer_preview_not_download_94535382: 更新檔案連結，優先顯示預覽而非下載
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: 更新評分摘要表以使用現代的架構
   update_how_we_process_sis_imports_8195bf77: "更新我們處理 SIS 匯入的方式"
   update_important_info_bcc01d6a: 更新重要資訊
   update_inbox_page_to_use_react_instui_4d343fd: "更新收件匣頁面後可使用 react/instui"
