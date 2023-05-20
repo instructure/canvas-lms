@@ -5987,6 +5987,7 @@ nl:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Kan de overschreven inleverdatum niet instellen op een datum binnen een afgesloten beoordelingsperiode"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Kan sis_account_id niet instellen voor een root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Kan de inleverdatum niet instellen op een datum binnen een afgesloten beoordelingsperiode"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Kan het verwijderen van een onderliggend onderwerp niet ongedaan maken wanneer ook het hoofdonderwerp van de cursus is verwijderd. Maak in plaats daarvan het verwijderen van het hoofdonderwerp van de cursus ongedaan."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "kan geen gereserveerde namen voor Cijferlijst importeren gebruiken"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Gedetailleerde rapporten voor anonieme opdrachten kunnen pas worden bekeken nadat het verbergen van cijfers is opgeheven."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Gedetailleerde rapporten voor anonieme opdrachten kunnen pas worden bekeken nadat cijfers zijn gepost."
@@ -6950,6 +6951,7 @@ nl:
   consortium_parent_keys_803547b: "Consortium bovenliggende sleutels"
   consumer_key_57d9fcf1: "Sleutel voor klant"
   consumer_key_6f94ba11: "Sleutel voor klant"
+  contact_info_8e3304d1: Contactgegevens
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Neem contact op met de beheerder als de zichtbaarheid van de cursus moet worden veranderd."
   content_1440204b: Inhoud
   content_access_id_601d931e: inhoudstoegang-ID
@@ -8469,9 +8471,9 @@ nl:
   course_pace_plan_c79cbffc: "Tempoplan van cursus"
   course_paces_4396b508: Cursustempo's
   course_paces_description: |-
-      Cursustempo voegt ondersteuning toe voor voortschrijdende inschrijvingen in Canvas;
-      toestaan van magische verdeling van inleverdatums voor cursisten met verschillende
-      startdatums gebaseerd op het tempo gedefinieerd door een cursusleider. Meer informatie verkrijgen en
+      Cursustempo voegt ondersteuning toe voor lopende inschrijvingen voor Canvas;
+      automatisch distribueren van inleverdatums voor studenten met verschillende
+      startdatums op basis van het door een docent bepaalde tempo. Meer informatie krijgen en
       feedback geven door deelname aan de *Gebruikersgroep voor cursustempo*.
   course_paces_table_ce32db1c: "Tabel Cursustempo's"
   course_pacing_40c14b61: Cursustempo
@@ -10072,6 +10074,7 @@ nl:
     unnamed_tool: "Tool zonder naam"
   developer_keys_d70ba44a: Ontwikkelaarssleutel
   developer_keys_manage_806da2d: "Ontwikkelaarssleutels - beheren "
+  developer_keys_report_4d041e62: "Rapport Ontwikkelaarssleutel"
   developername_logo_88951d4: "%{developerName} Logo"
   developers_keys_table_69ae6b7e: "Tabel Ontwikkelaarssleutels"
   dialog_form_wrapper: 
@@ -10767,6 +10770,7 @@ nl:
   duplicate_assignment_name_3ca7d753: "Opdracht dupliceren %{name}"
   duplicate_discussion_title_43b39959: "Discussie dupliceren %{title}"
   duplicate_discussion_title_6537ef4d: "Discussie dupliceren %{title}"
+  duplicate_ids_23b0a29e: "Dubbele ID's"
   duplicate_item_339f54bb: "Item dupliceren"
   duplicate_module_module_name_be40ad50: "Module dupliceren %{module_name}"
   duplicate_module_name_ab26e5c3: "Dupliceren %{module_name}"
@@ -11636,6 +11640,7 @@ nl:
   error_retrieving_assignment_configuration_tools_f7d75303: "Fout bij het ophalen van tools voor opdrachtconfiguratie"
   error_retrieving_assignment_external_tools_9102d343: "Fout bij het ophalen van externe tools voor opdrachten"
   error_retrieving_content_c07ee76b: "Fout bij ophalen van inhoud"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Fout bij ophalen van inhoud vanuit tool (probleem met inhoudsitem)"
   error_retrieving_content_from_tool_e65ef3b7: "Fout bij ophalen van inhoud vanaf de tool"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Fout bij het ophalen van tools voor vergelijkbaarheidsdetectie"
   error_running_quizzes_2_export_cfecedba: "Fout bij exporteren van Quizzes versie 2."
@@ -12549,6 +12554,7 @@ nl:
   for_each_late_62aecf41: "Voor elke datum"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Voor ontwikkelaars van LTI 1.3-tools:* Volg de aanwijzingen in de sectie \"Wat moet u precies wijzigen?\" van het Community-artikel."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Voor handmatig geposte opdrachten geldt dat de aanwezigheid van een opmerking bij een inlevering die niet afkomstig is van degene die de inlevering heeft gedaan, de opdracht kan worden gepost. Voorheen was er een cijfer nodig om te kunnen posten."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Ga naar de *Canvas API-documentatie* voor meer informatie."
   for_name_d5684bfd: "Voor %{name}"
   for_students_who_d0fd45d0: "Voor cursisten die..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -12655,6 +12661,7 @@ nl:
   global_announcements_a78912c8: "Algemene aankondigingen"
   global_announcements_add_edit_delete_843ca4d2: "Algemene aankondigingen - toevoegen/bewerken/verwijderen"
   global_branding_df1cae12: "Globale merknaam"
+  global_id_ffe1be80: "Globale ID"
   global_inherited_developer_keys_4a6c15de: "Globaal overgenomen ontwikkelaarssleutels"
   global_keys_40e1a451: "Globale sleutels"
   global_message_icons: 
@@ -14662,6 +14669,7 @@ nl:
       Indien ingeschakeld, hebben oEmbed-eindpunten een
       digitaal gegenereerde token nodig om de herkomst
       van een verzoek van een oEmbed-bron te verifiëren.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Als deze optie is ingeschakeld, wordt het opdrachtformulier vooraf ingevuld met waarden uit Deep Link-berichten op de pagina voor het maken of bewerken van opdrachten."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Indien ingeschakeld, worden query parameters niet gekopieerd naar de POST body tijdens een LTI-lancering."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "Indien ingeschakeld, worden toegangsrechten gevalideerd voor API-aanvragen als de ontwikkelaarssleutel wordt gebruikt die toegangsrechten vereist."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Indien ingeschakeld, worden Sourcedids versleuteld die Canvas gebruikt voor basisleerdoelen."
@@ -15097,6 +15105,7 @@ nl:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "Overnemen - Whitelist wordt overgenomen van het bovenliggende account.  Er kunnen domeinen worden toegevoegd, maar deze worden pas doorgevoerd nadat je deze instelling op Aan hebt gezet."
   inherited_d4d0bc33: Overgenomen
   inherited_developer_keys_table_e4a65b67: "Tabel Overgenomen ontwikkelaarssleutels"
+  inherited_from_parent_account_4776070d: "Overgenomen van bovenliggend account"
   initial_sync_incomplete_ec74fe8e: "Eerste synchronisatie niet voltooid"
   inner_box_background_6f9092f: "Achtergrond binnenveld"
   inner_box_border_d0524b03: "Rand binnenveld"
@@ -15545,8 +15554,10 @@ nl:
   key_f2a919d5: Sleutel
   key_ff4089c5: "Sleutel:"
   key_name_7311d22: "Naam van de sleutel:"
+  key_name_bc712026: Sleutelnaam
   key_settings_44df6a41: Sleutelinstellingen
   key_state_for_the_current_account_d16b1cd5: "Sleutelstatus voor het huidige account"
+  key_type_6e8c0909: Sleuteltype
   keyboard_instructions_e032939f: toetsenbordinstructies
   keyboard_nav_dialog: 
     esc_key_notification: "Druk op de escape-toets voor gebruik van de sneltoetsen bij het navigeren van het cijferlijst raster."
@@ -16256,6 +16267,7 @@ nl:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id moet uniek zijn"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI deeplinking voor module-indexmenu"
   lti_deep_linking_line_items_5e0079f7: "LTI Deep Linking-regelitems"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "LTI Deep Linking-regelitems op pagina voor maken of bewerken van opdrachten"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "LTI Deep Linking-regelitems op pagina Opdracht bewerken"
   lti_delete_ee5f1bef: "LTI - verwijderen"
   lti_dynamic_registration_8592edb0: "Dynamische LTI-registratie"
@@ -18270,9 +18282,11 @@ nl:
       email: 
         body: "Het cijfer voor je opdracht %{assignment_title} is gewijzigd."
         excused: "Deze opdracht is verwijderd."
+        grade: "cijfer: %{letter_grade}"
         html: 
           body: "Het cijfer voor je opdracht %{assignment_title} is gewijzigd."
           excused: "Deze opdracht is verwijderd."
+          grade: "cijfer: %{letter_grade}"
           link_message: "Je kunt de opdracht hier controleren"
           no_date_set: "Geen datum ingesteld"
           not_applicable: "Niet van toepassing"
@@ -18284,38 +18298,43 @@ nl:
         no_date_set: "Geen datum ingesteld"
         not_applicable: "Niet van toepassing"
         regraded_date: "opnieuw beoordeeld op: %{date}"
-        score: "score: %{score} van %{total}"
+        score: "score: %{score} van de %{total}"
         score_pending: "de docent moet score controleren"
         subject: "Cijfer gewijzigd: %{assignment}, %{context}"
       sms: 
         body_sms: "Je cijfer voor %{title} in %{context} is zojuist gewijzigd."
+        grade: "cijfer: %{letter_grade}"
         more_info: "Meer informatie op %{url}"
         no_date_set: "Geen datum ingesteld"
         not_applicable: "Niet van toepassing"
         regraded_date: "opnieuw beoordeeld op: %{date}"
-        score: "score: %{score} van %{total}"
+        score: "score: %{score} van de %{total}"
         score_pending: "de docent moet score controleren"
       summary: 
+        grade: "cijfer: %{letter_grade}"
         no_date_set: "Geen datum ingesteld"
         not_applicable: "Niet van toepassing"
         regraded_date: "opnieuw beoordeeld op: %{date}"
-        score: "score: %{score} van %{total}"
+        score: "score: %{score} van de %{total}"
         score_pending: "de docent moet score controleren"
         subject: "Cijfer gewijzigd: %{title}, %{context}"
       twitter: 
+        grade: "cijfer: %{letter_grade}"
         no_date_set: "Geen datum ingesteld"
         not_applicable: "Niet van toepassing"
-        score: "score: %{score} van %{total}"
+        score: "score: %{score} van de %{total}"
         score_pending: "(moet nagekeken worden)"
         tweet: "Canvas waarschuwing - Cijfer gewijzigd: %{date}"
     submission_graded: 
       email: 
         body: "Je opdracht %{assignment} is beoordeeld."
         excused: "Deze opdracht is verwijderd."
+        grade: "cijfer: %{letter_grade}"
         graded_date: "beoordeeld: %{date}"
         html: 
           body: "Je opdracht %{assignment} is beoordeeld."
           excused: "Deze opdracht is verwijderd."
+          grade: "cijfer: %{letter_grade}"
           graded_date: "beoordeeld: %{date}"
           link_message: "Je kunt de inzending hier controleren:"
           no_date_set: "Geen datum ingesteld"
@@ -18326,28 +18345,31 @@ nl:
         link_message: "Je kunt de opdracht hier controleren:"
         no_date_set: "Geen datum ingesteld"
         not_applicable: "Niet van toepassing"
-        score: "score: %{score} van %{total}"
+        score: "score: %{score} van de %{total}"
         score_pending_review: "de docent moet score controleren"
         subject: "Opdracht beoordeeld: %{assignment}, %{context}"
       sms: 
+        grade: "cijfer: %{letter_grade}"
         graded_date: "beoordeeld: %{date}"
         more_info: "Meer informatie op %{url}"
         no_date_set: "Geen datum ingesteld"
         not_applicable: "Niet van toepassing"
-        score: "score: %{score} van %{total}"
+        score: "score: %{score} van de %{total}"
         score_pending_review: "de docent moet score controleren"
         sms_body: "%{assignment} is beoordeeld."
       summary: 
+        grade: "cijfer: %{letter_grade}"
         graded_date: "beoordeeld: %{date}"
         no_date_set: "Geen datum ingesteld"
         not_applicable: "Niet van toepassing"
-        score: "score: %{score} van %{total}"
+        score: "score: %{score} van de %{total}"
         score_pending_review: "de docent moet score controleren"
         subject: "Opdracht beoordeeld: %{assignment}, %{context}"
       twitter: 
+        grade: "cijfer: %{letter_grade}"
         no_date_set: "Geen datum ingesteld"
         not_applicable: "Niet van toepassing"
-        score: "score: %{score} van %{total}"
+        score: "score: %{score} van de %{total}"
         score_pending_review: "(moet nagekeken worden)"
         tweet: "Canvas waarschuwing - Beoordeeld: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -18678,6 +18700,7 @@ nl:
   module_publish_menu_30b638dd: "Menu Module publiceren"
   module_publish_menu_88b54c1b: "Menu Module publiceren"
   module_published_80f0b9b8: "Module gepubliceerd"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Opties voor publiceren van modules"
   modules: 
     add: 
       assignment: 
@@ -20583,6 +20606,7 @@ nl:
   permissions_manage_9eea4f8f: "Machtigingen - beheren"
   permissions_v2_page_f96dde06: "Pagina Machtigingen V2"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Sta gebruik toe van alle “Include”-parameters voor deze ontwikkelaarssleutel. “Include\"-parameters kunnen toegang bieden naar extra gegevens die niet zijn opgenomen in de bereiken die hieronder zijn geselecteerd."
+  permitted_api_endpoints_b092c4cc: "Toegestane API-eindpunten"
   persian_a8cadb95: Perzisch
   persists_the_used_authentication_provider_when_log_15113afc: "Behoudt de gebruikte verificatieprovider bij inloggen en schakelt nieuwe logins naar de standaardprovider"
   personal_pronouns_7d271f52: "Persoonlijke voornaamwoorden"
@@ -27966,6 +27990,7 @@ nl:
        Tellingen worden gedaan vanaf het begin van de dag tot het einde van de dag in de ingestelde tijdzone van het account dat het rapport uitvoert.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Dit rapport haalt recente Big Blue Button-vergaderingen voor een account op."
   this_report_gets_the_submissions_for_courses_d83bb449: "Dit rapport haalt de inleveringen voor cursussen op."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Dit rapport bevat een lijst van alle ontwikkelaarssleutels die voor de onderwijsinstelling beschikbaar zijn. Deze sleutels kunnen rechtstreeks worden geïnstalleerd in het hoofdaccount van waaruit het rapport wordt uitgevoerd of ze kunnen worden overgenomen vanuit bovenliggende hoofdaccounts. Ontwikkelaarssleutels kunnen API- of LTI-sleutels zijn."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Dit rapport bevat alle actieve ePortfolio's voor het huidige instituut. Optioneel kan 'Alleen ePortfolio's van gebruikers met geen inschrijvingen' worden geselecteerd om de omvang van de ePortfolio-resultaten te verminderen tot alleen de gebruikers met geen inschrijvingen. Je kunt het rapport ook activeren met 'Inclusief verwijderde objecten' om alleen de ePortfolio's op te nemen die zijn verwijderd."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Dit rapport bevat alle leerdoelen binnen dit account. Het resulterende CSV-bestand bevat één rij per leerdoel en toont de details van alle aan elk leerdoel gekoppelde kenmerken."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -29367,6 +29392,7 @@ nl:
   update_domain_account_lookup_9c89440d: "Zoekopdracht voor domeinaccount bijwerken"
   update_failed_2c87428c: "Bijwerken mislukt"
   update_file_links_to_prefer_preview_not_download_94535382: "Update bestandslinks zodat er een voorkeur is voor een voorbeeld en niet voor downloaden"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Werk de tabel met het cijferoverzicht bij om een modern framework te gebruiken"
   update_how_we_process_sis_imports_8195bf77: "Bijwerken hoe SIS-importbewerkingen worden verwerkt"
   update_important_info_bcc01d6a: "Belangrijke informatie bijwerken"
   update_inbox_page_to_use_react_instui_4d343fd: "Updaten van inboxpagina voor gebruik van react/instui"
