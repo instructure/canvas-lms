@@ -5519,6 +5519,7 @@ da-x-k12:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Kan ikke indstille tilsidesæt forfaldsdatoen til en dato inden for en lukket vurderingsperiode"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Kan ikke sætte sis_account_id på en root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Kan ikke indstille forfaldsdatoen til en dato inden for en lukket vurderingperiode"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Kan ikke fortryde sletning af et underordnet emne, når rodfagets emne også er slettet. Fortryd sletningen af rodfagets emne i stedet."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "kan ikke bruge reserverede navne i vurderingsoversigt-importør"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Kan ikke se detaljerede rapporter for anonyme opgaver, før der offentliggøres feedback for opgaverne."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Kan ikke se detaljerede rapporter for anonyme opgaver, før der slås vurderinger op."
@@ -6412,6 +6413,7 @@ da-x-k12:
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "Konsistente LTI AGS-ID'er baseret på kontoens hoveddomæne"
   consortium_parent_keys_803547b: "Consortium overordnede nøgler"
   consumer_key_6f94ba11: Forbrugernøgle
+  contact_info_8e3304d1: Kontaktoplysninger
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Kontakt din administrator, hvis du vil ændre fagets synlighed."
   content_1440204b: Indhold
   content_access_id_601d931e: "indhold adgangs-id"
@@ -7755,8 +7757,8 @@ da-x-k12:
   course_pace_plan_c79cbffc: "Fagets tempoplan"
   course_paces_4396b508: Fagtempoer
   course_paces_description: |-
-      Fagtempo tilføjer support til rullende tilmeldinger til Canvas,
-      hvilket gør magisk fordeling af forfaldsdatoer muligt for elever med forskellige
+      Fagtempo tilføjer support for rullende tilmeldinger til Canvas,
+      hvilket automatisk fordeler afleveringsdatoer for elever med forskellige
       startdatoer baseret på en instruktørs definerede tempo. Lær mere, og giv
       feedback ved at deltage i *brugergruppen for Fagtempo*.
   course_paces_table_ce32db1c: "Fagtempoer - tabel"
@@ -9161,6 +9163,7 @@ da-x-k12:
     unnamed_tool: "Værktøj uden navn"
   developer_keys_d70ba44a: "Udvikler nøgler"
   developer_keys_manage_806da2d: "Udvikler-nøgle - administrer "
+  developer_keys_report_4d041e62: "Rapport om udvikler-nøgler"
   developers_keys_table_69ae6b7e: "Udvikler-nøgler tabel"
   dialog_form_wrapper: 
     cancel: Annuller
@@ -9781,6 +9784,7 @@ da-x-k12:
   duplicate_assignment_name_3ca7d753: "Duplikeret opgave %{name}"
   duplicate_discussion_title_43b39959: "Dupliker diskussion %{title}"
   duplicate_discussion_title_6537ef4d: "Dupliker diskussion %{title}"
+  duplicate_ids_23b0a29e: "Dublerede ID'er"
   duplicate_item_339f54bb: "Dupliker element"
   duplicate_module_module_name_be40ad50: "Duplikatforløb %{module_name}"
   duplicate_module_name_ab26e5c3: "Dupliker %{module_name}"
@@ -10583,6 +10587,7 @@ da-x-k12:
   error_reports_7d6c8b1e: Fejlrapporter
   error_retrieving_assignment_external_tools_9102d343: "Fejl ved hentning af opgavens eksterne værktøjer"
   error_retrieving_content_c07ee76b: "Fejl ved hentning af indhold"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Fejl ved hentning af indhold fra værktøj (dårligt indholdselement)"
   error_retrieving_content_from_tool_e65ef3b7: "Fejl ved hentning af indhold fra værktøjet"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Fejl ved hentning af ligheds-detektionsværktøjer"
   error_running_quizzes_2_export_cfecedba: "Fejl ved kørsel af quizzer til eksport."
@@ -11325,6 +11330,7 @@ da-x-k12:
   for_each_late_62aecf41: "For hver sen"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*For LTI 1.3-værktøjsudviklere:* Følg vejledningen i afsnittet \"Hvad præcist skal du ændre?\" i Community-artiklen."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Ved opgaver, der slås op manuelt, tillader tilstedeværelsen af en afleveringskommentar, som ikke er af afleveringens egen bruger, at slå opgaven op. Tidligere ville dette have krævet en vurdering, før opgaven kunne slås op."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "For mere information henvises der til *Canvas API-dokumentation*."
   for_name_d5684bfd: "For %{name}"
   for_students_who_d0fd45d0: "Til elever, som ..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -11427,6 +11433,7 @@ da-x-k12:
   global_announcements_a78912c8: "Generelle beskeder"
   global_announcements_add_edit_delete_843ca4d2: "Globale beskeder - tilføj / rediger / slet"
   global_branding_df1cae12: "Global branding"
+  global_id_ffe1be80: "Globalt ID"
   global_inherited_developer_keys_4a6c15de: "Globale nedarvede udvikler-nøgler"
   global_keys_40e1a451: "Globale nøgler"
   global_message_icons: 
@@ -12898,6 +12905,7 @@ da-x-k12:
       Hvis aktiveret, kræver oEmbed-slutpunkter et
       værktøjsgenereret token til at verificere oprindelsen
       af en anmodning om en oEmbed-ressource.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Hvis aktiveret, udfyldes opgaveformularen på forhånd med værdier fra beskeder med dybe links på siden for oprettelse/redigering af opgaven."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Hvis aktiveret vil disse parametre ikke kopieres til POST-teksten under igangsætning af LTI."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Hvis aktiveret, bliver Sourcedids, der bruges af Canvas til grundlæggende læringsudbytte, krypteret."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Hvis aktiveret, behandles afleveringshistorik for New Quizzes-quizzer separat."
@@ -13297,6 +13305,7 @@ da-x-k12:
   inherit_from_course_ed8bde8c: "Arv fra fag"
   inherited_d4d0bc33: Nedarvet
   inherited_developer_keys_table_e4a65b67: "Tabel over nedarvede udvikler-nøgler"
+  inherited_from_parent_account_4776070d: "Nedarvet fra overordnet konto"
   initial_sync_incomplete_ec74fe8e: "Indledende synkronisering ufuldstændig"
   inner_box_background_6f9092f: "Baggrund for invendigt felt"
   inner_box_border_d0524b03: "Kant til indre felt"
@@ -13728,8 +13737,10 @@ da-x-k12:
   key_api_key_68bf80ae: "Nøgle: *%{api_key}*"
   key_f2a919d5: Nøgle
   key_name_7311d22: "Kodenavn:"
+  key_name_bc712026: "Nøglenavn: "
   key_settings_44df6a41: Nøgleindstillinger
   key_state_for_the_current_account_d16b1cd5: "Nøglestatus for den aktuelle konto"
+  key_type_6e8c0909: Nøgletype
   keyboard_nav_dialog: 
     esc_key_notification: "Tryk på tasten Esc, inden du bruger genvejstaster, når du navigerer i vurderingsoversigtens gitter."
   keyboard_shortcut_for_missing_assignment_848aa9cd: "Tastaturgenvej til manglende opgave"
@@ -14375,6 +14386,7 @@ da-x-k12:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id skal være unik"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI dyblinkning til Forløbindeksmenu"
   lti_deep_linking_line_items_5e0079f7: "LTI Deep Linking linjeelementer"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "LTI dyblinkning-linjeelementer på opgavens opret/rediger side"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "LTI dyblinkning-linjeelementer på opgaveredigeringssiden"
   lti_delete_ee5f1bef: "LTI - slet"
   lti_dynamic_registration_8592edb0: "LTI dynamisk registrering"
@@ -16207,9 +16219,11 @@ da-x-k12:
       email: 
         body: "Vurderingen for din opgave %{assignment_title} er blevet ændret."
         excused: "Denne opgave er blevet fritaget."
+        grade: "vurdering: %{letter_grade}"
         html: 
           body: "Vurderingen for din opgave %{assignment_title} er blevet ændret."
           excused: "Denne opgave er blevet fritaget."
+          grade: "vurdering: %{letter_grade}"
           link_message: "Du kan gennemse opgaven her"
           no_date_set: "Ingen indstillet dato"
           not_applicable: N/A
@@ -16221,38 +16235,43 @@ da-x-k12:
         no_date_set: "Ingen indstillet dato"
         not_applicable: N/A
         regraded_date: "Ny vurdering: %{date}"
-        score: "resultat:  %{score} ud af %{total}"
+        score: "resultat: %{score} ud af %{total}"
         score_pending: "resultat afventer lærerens evaluering"
         subject: "Vurdering ændret: %{assignment}, %{context}"
       sms: 
         body_sms: "Din vurdering for %{title}, %{context} er lige blevet ændret."
+        grade: "vurdering: %{letter_grade}"
         more_info: "Yderligere oplysninger på %{url}"
         no_date_set: "Ingen indstillet dato"
         not_applicable: N/A
         regraded_date: "Ny vurdering: %{date}"
-        score: "resultat:  %{score} ud af %{total}"
+        score: "resultat: %{score} ud af %{total}"
         score_pending: "resultat afventer lærerens evaluering"
       summary: 
+        grade: "vurdering: %{letter_grade}"
         no_date_set: "Ingen indstillet dato"
         not_applicable: N/A
         regraded_date: "Ny vurdering: %{date}"
-        score: "resultat:  %{score} ud af %{total}"
+        score: "resultat: %{score} ud af %{total}"
         score_pending: "resultat afventer lærerens evaluering"
         subject: "Vurdering ændret: %{title}, %{context}"
       twitter: 
+        grade: "vurdering: %{letter_grade}"
         no_date_set: "Ingen indstillet dato"
         not_applicable: N/A
-        score: "resultat:  %{score} ud af %{total}"
+        score: "resultat: %{score} ud af %{total}"
         score_pending: "(afventer evaluering)"
         tweet: "Canvas-varsling - Vurderingsændring: %{date}"
     submission_graded: 
       email: 
         body: "Din opgave, %{assignment} er blevet bedømt."
         excused: "Denne opgave er blevet fritaget."
+        grade: "vurdering: %{letter_grade}"
         graded_date: "bedømt: %{date}"
         html: 
           body: "Din opgave, %{assignment} er blevet bedømt."
           excused: "Denne opgave er blevet fritaget."
+          grade: "vurdering: %{letter_grade}"
           graded_date: "bedømt: %{date}"
           link_message: "Du kan gennemse opgaven her"
           no_date_set: "Ingen indstillet dato"
@@ -16263,28 +16282,31 @@ da-x-k12:
         link_message: "Du kan gennemse opgaven her:"
         no_date_set: "Ingen indstillet dato"
         not_applicable: N/A
-        score: "resultat:  %{score} ud af %{total}"
+        score: "resultat: %{score} ud af %{total}"
         score_pending_review: "resultat afventer lærerens evaluering"
         subject: "Opgave bedømt: %{assignment}, %{context}"
       sms: 
+        grade: "vurdering: %{letter_grade}"
         graded_date: "bedømt: %{date}"
         more_info: "Yderligere oplysninger på %{url}"
         no_date_set: "Ingen indstillet dato"
         not_applicable: N/A
-        score: "resultat:  %{score} ud af %{total}"
+        score: "resultat: %{score} ud af %{total}"
         score_pending_review: "resultat  afventer lærerens evaluering"
         sms_body: "%{assignment} er blevet bedømt."
       summary: 
+        grade: "vurdering: %{letter_grade}"
         graded_date: "bedømt: %{date}"
         no_date_set: "Ingen indstillet dato"
         not_applicable: N/A
-        score: "resultat:  %{score} ud af %{total}"
+        score: "resultat: %{score} ud af %{total}"
         score_pending_review: "resultat afventer lærerens evaluering"
         subject: "Opgave bedømt: %{assignment}, %{context}"
       twitter: 
+        grade: "vurdering: %{letter_grade}"
         no_date_set: "Ingen indstillet dato"
         not_applicable: N/A
-        score: "resultat:  %{score} ud af %{total}"
+        score: "resultat: %{score} ud af %{total}"
         score_pending_review: "(afventer evaluering)"
         tweet: "Canvas-varsling - Bedømt: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -16596,6 +16618,7 @@ da-x-k12:
   module_publish_menu_30b638dd: "Forløb offentliggørelsesmenu"
   module_publish_menu_88b54c1b: "Forløb offentliggørelsesmenu"
   module_published_80f0b9b8: "Forløb offentliggjort"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Muligheder for offentliggørelse af forløb"
   modules: 
     assignments_to_grade: 
       one: "1 opgave har ikke bedømte afleveringer"
@@ -18263,6 +18286,7 @@ da-x-k12:
   permissions_365c49e: Tilladelser
   permissions_manage_9eea4f8f: "Tilladelser - administrer"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Tillad brug af alle parametrene “Inkluderer” for denne udvikler-nøgle. Parametrene ”Inkluderer” giver muligvis adgang til yderligere data, som ikke er inkluderet i de valgte områder nedenfor."
+  permitted_api_endpoints_b092c4cc: "Tilladte API-slutpunkter"
   persian_a8cadb95: Persisk
   persists_the_used_authentication_provider_when_log_15113afc: "Beholder den anvendte autentifikationsudbyder, når der logges på, og nye logins logges som standard ind på standardudbyderen"
   personal_pronouns_7d271f52: "Personlige pronomener"
@@ -24836,6 +24860,7 @@ da-x-k12:
        Tællinger udføres fra begyndelsen af dagen til slutningen af dagen i den indstillede tidszone på den konto, der kører rapporten.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Denne rapport henter seneste Big Blue Button-konferencer for en konto."
   this_report_gets_the_submissions_for_courses_d83bb449: "Denne rapport henter afleveringer for fag."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Denne rapport giver en liste over alle udvikler-nøgler, der er tilgængelige for institutionen. Disse nøgler kan enten installeres direkte i den rodkonto, rapporten køres fra, eller de kan nedarves fra overordnede rodkonti. Udvikler-nøgler kan enten være API- eller LTI-nøgler."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Denne rapport indeholder alle aktive ePortfolios for den nuværende institution. Vælg valgfrit 'Inkluder kun ePortfolios fra brugere uden tilmeldinger' for at reducere omfanget af ePortfolio-resultaterne til kun de brugere, der ikke har tilmeldinger. Du kan også køre rapporten med 'Inkluder slettede objekter' for kun at inkludere de ePortfolios, der er blevet fjernet."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Denne rapport viser alle læringsudbytter, der findes i denne konto. Den resulterende CSV-fil har en række pr. læringsudbytte og viser detaljerne for alle tilknyttede attributter med hvert læringsudbytte."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -26189,6 +26214,7 @@ da-x-k12:
   update_domain_account_lookup_9c89440d: "Opdater domænekontoopslag"
   update_failed_2c87428c: "Opdatering mislykkedes"
   update_file_links_to_prefer_preview_not_download_94535382: "Opdater fillinks til at foretrække forhåndsvisning, ikke download"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Opdater vurderingsoversigtstabellen for at bruge en moderne ramme"
   update_important_info_bcc01d6a: "Opdater vigtig info"
   update_inbox_page_to_use_react_instui_4d343fd: "Opdater siden Indbakke for at bruge react/instui"
   update_link_b7cab181: "Opdater link"
