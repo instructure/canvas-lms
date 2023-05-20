@@ -5753,6 +5753,7 @@ fr-CA:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Ne peut pas définir un surclassement de date d’échéance à une date au cours d'une période de notation fermée"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Impossible de définir sis_account_id sur un root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Ne peut pas définir la date d’échéance à une date au cours d'une période de notation fermée"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Impossible de restaurer un sujet subordonné lorsque le sujet du cours racine est également supprimé. Veuillez annuler la suppression du sujet du cours racine à la place."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "impossible d’utiliser les noms réservés de l’importateur de Carnet de notes"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Impossible d'afficher des rapports détaillés pour les tâches anonymes jusqu'à ce que les notes des tâches soient activées."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Impossible d’afficher les rapports détaillés pour les tâches anonymes jusqu’à ce que les notes soient affichées."
@@ -6679,6 +6680,7 @@ fr-CA:
   consortium_parent_keys_803547b: "Clés parent du consortium"
   consumer_key_57d9fcf1: "Code client"
   consumer_key_6f94ba11: "Code client"
+  contact_info_8e3304d1: "Informations de contact"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Contactez votre administrateur si vous avez besoin de modifier la visibilité du cours."
   content_1440204b: Contenu
   content_access_id_601d931e: "id d'accès au contenu"
@@ -8110,9 +8112,9 @@ fr-CA:
   course_pace_plan_c79cbffc: "Plan de cadence du cours"
   course_paces_4396b508: "Rythmes du cours"
   course_paces_description: |-
-      Les rythmes de cours ajoutent un soutien pour les inscriptions à Canvas;
-      permettant une distribution magique des dates d’échéance pour les étudiants avec des
-      dates de début différentes en fonction du rythme défini par un enseignant. En savoir plus et donner de la
+      Course Pacing ajoute la prise en charge des inscriptions continues à Canvas;
+      distribue automatiquement les dates d’échéance pour les étudiants avec des
+      dates de début différentes en fonction du rythme défini par un instructeur. En savoir plus et donner de la
       rétroactions en rejoignant le *groupe d’utilisateurs de rythme de cours*.
   course_paces_table_ce32db1c: "Tableau des rythmes de cours"
   course_pacing_40c14b61: "Rythme des cours"
@@ -9627,6 +9629,7 @@ fr-CA:
     unnamed_tool: "Outil sans nom"
   developer_keys_d70ba44a: "Clés de développeur"
   developer_keys_manage_806da2d: "Clés de développeur - gérer "
+  developer_keys_report_4d041e62: "Rapport sur les clés de développeur"
   developername_logo_88951d4: "%{developerName} Logo"
   developers_keys_table_69ae6b7e: "Table de clé de développeur"
   dialog_form_wrapper: 
@@ -10265,6 +10268,7 @@ fr-CA:
   duplicate_assignment_name_3ca7d753: "Dupliquer la tâche %{name}"
   duplicate_discussion_title_43b39959: "Dupliquer la discussion %{title}"
   duplicate_discussion_title_6537ef4d: "Dupliquer la discussion %{title}"
+  duplicate_ids_23b0a29e: "ID en double"
   duplicate_item_339f54bb: "Dupliquer l'élément"
   duplicate_module_module_name_be40ad50: "Module en double %{module_name}"
   duplicate_module_name_ab26e5c3: "Dupliquer %{module_name}"
@@ -10288,7 +10292,7 @@ fr-CA:
   duration_must_be_less_than_99_999_999_minutes_ec7b116d: "La durée doit être de moins de 99 999 999 minutes"
   dutch_6d05cee5: Néerlandais
   dynamic_concurrency_231dbdc5: "Concurrence dynamique"
-  dynamic_lti_1_1_environment_specific_override_urls_395db495: "URL de surclassement spécifiques à l’environnement Dynamic LTI 1.1"
+  dynamic_lti_1_1_environment_specific_override_urls_395db495: "URL de surclassement spécifiques à l’environnement Dynamic LTI 1.1"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "par ex., Durand, Jean"
   e_g_http_university_edu_helpdesk_acab04d6: "par exemple, http://university.edu/helpdesk"
@@ -11104,6 +11108,7 @@ fr-CA:
   error_retrieving_assignment_configuration_tools_f7d75303: "Erreur lors de la récupération des outils de configuration des tâches"
   error_retrieving_assignment_external_tools_9102d343: "Erreur lors de la récupération des outils externes des tâches"
   error_retrieving_content_c07ee76b: "Une erreur est survenue lors de l’extraction de contenu"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Erreur lors de la récupération du contenu de l’outil (mauvais élément de contenu)"
   error_retrieving_content_from_tool_e65ef3b7: "Une erreur est survenue lors de la récupération du contenu depuis l’outil"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Erreur lors de la récupération des outils de détection de similarité"
   error_running_quizzes_2_export_cfecedba: "Erreur lors de l’exportation des questionnaires 2."
@@ -11868,6 +11873,7 @@ fr-CA:
   for_each_late_62aecf41: "Pour chaque retard"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Pour les développeurs de l’outil LTI 1.3 :* Suivez les instructions de la section « Que devez-vous modifier exactement? » de l’article sur la Communauté."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Pour les tâches publiées manuellement, la présence d'un commentaire d’envoi non par le propre utilisateur de l’envoi permettra de publier la tâche. Auparavant, cela aurait exigé une note avant que la publication puisse avoir lieu."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Pour plus d’informations, consultez la *documentation de l’API Canvas*."
   for_name_d5684bfd: "Pour %{name}"
   for_students_who_d0fd45d0: "Pour les étudiants qui..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -11971,6 +11977,7 @@ fr-CA:
   global_announcements_a78912c8: "Annonces générales"
   global_announcements_add_edit_delete_843ca4d2: "Annonces générales - ajouter/modifier/supprimer"
   global_branding_df1cae12: "Marques mondiales"
+  global_id_ffe1be80: "ID mondial"
   global_inherited_developer_keys_4a6c15de: "Clés globales héritées du développeur"
   global_keys_40e1a451: "Clés globales"
   global_message_icons: 
@@ -13814,6 +13821,7 @@ fr-CA:
       Si activé, les points d’extrémité oEmbed nécessiteront un jeton
       généré par l’outil pour vérifier l’origine
       d’une demande de ressource oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Si cette option est activée, préremplit le formulaire de tâche avec les valeurs des messages de lien profond sur la page de création/modification de tâches."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Si l'option est activée, les paramètres de requête ne seront pas copiés dans le corps du billet lors d'un lancement LTI."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "Si cette option est activée, les champs d'application seront validés sur les demandes d'API si la clé de développeur utilisée nécessite des champs d'application."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Si activés, les Sourcedids utilisés par Canvas pour les résultats de base seront chiffrés."
@@ -14078,7 +14086,7 @@ fr-CA:
   important_dates_tray_fa41a025: "Plateau des dates importantes"
   important_info_3bda6406: "Informations importantes"
   important_info_for_course_baa4bce1: "Informations importantes pour %{course}"
-  important_note_educational_institutions_have_an_ob_c40b409f: "*Note importante : Les établissements d’enseignement ont l’obligation de rendre leur contenu aussi accessible que possible. Instructure recommande un rapport texte/couleur d’arrière-plan d’au moins 4.5:1 pour que votre texte reste lisible. Testez facilement vos rapports de contraste avec le **Vérificateur de contraste de couleur WebAIM***."
+  important_note_educational_institutions_have_an_ob_c40b409f: "*Note importante : Les établissements d’enseignement ont l’obligation de rendre leur contenu aussi accessible que possible. Instructure recommande un rapport texte/couleur d’arrière-plan d’au moins 4.5:1 pour que votre texte reste lisible. Testez facilement vos rapports de contraste avec le **Vérificateur de contraste de couleur WebAIM***."
   important_note_educational_institutions_have_an_ob_c9350304: "*Remarque importante : toutes les institutions éducationnelles ont l'obligation de rendre leurs contenus pédagogiques accessibles autant que possible. Instructure recommande un rapport de contraste de 3:1 pour la couleur du texte et celle du fond d'écran, afin d'avoir un texte bien lisible. Vous pouvez facilement tester votre rapport de contraste avec l'outil **WebAIM Color Contrast Checker***."
   imported_from_posttosisname_f7cc9258: "Importé de %{postToSISName}"
   imported_from_sis_3006b19c: "Importé de SIS"
@@ -14234,6 +14242,7 @@ fr-CA:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "Héritage - La liste blanche sera héritée du compte parent.  Les domaines peuvent être ajoutés, mais ne seront pas appliqués jusqu'à ce que vous changiez ce paramètre à activé."
   inherited_d4d0bc33: Hérité
   inherited_developer_keys_table_e4a65b67: "Table de clé de développeur héritée"
+  inherited_from_parent_account_4776070d: "Hérité du compte parent"
   initial_sync_incomplete_ec74fe8e: "Synchronisation initiale incomplète"
   inner_box_background_6f9092f: "Arrière plan de la boîte intérieure"
   inner_box_border_d0524b03: "Bordure de la boîte intérieure"
@@ -14671,8 +14680,10 @@ fr-CA:
   key_f2a919d5: Touches
   key_ff4089c5: "Clé :"
   key_name_7311d22: "Nom de la clé :"
+  key_name_bc712026: "Nom de la clé"
   key_settings_44df6a41: "Paramètres de clé"
   key_state_for_the_current_account_d16b1cd5: "Statut de la clé pour le compte actuel"
+  key_type_6e8c0909: "Type de clé"
   keyboard_instructions_e032939f: "Instructions clavier"
   keyboard_nav_dialog: 
     esc_key_notification: "Appuyer sur la touche ESC avant d'utiliser des raccourcis clavier lorsque vous naviguez la grille du relevé de notes."
@@ -15347,6 +15358,7 @@ fr-CA:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id doit être unique"
   lti_deep_linking_for_module_index_menu_881feeee: "Lien profond de LTI pour le menu d’index des modules"
   lti_deep_linking_line_items_5e0079f7: "Postes de liaison profonde LTI"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Éléments de ligne de liens profonds LTI sur la page de création/modification de tâche"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Éléments de liaison profonde LTI sur la page de modification des tâches"
   lti_delete_ee5f1bef: "LTI - supprimer"
   lti_dynamic_registration_8592edb0: "Inscription dynamique LTI"
@@ -17192,9 +17204,11 @@ fr-CA:
       email: 
         body: "La note de votre tâche %{assignment_title} a été modifiée."
         excused: "Cette tâche a été mis de côté."
+        grade: "note : %{letter_grade}"
         html: 
           body: "La note de votre tâche %{assignment_title} a été modifiée."
           excused: "Cette tâche a été mis de côté."
+          grade: "note : %{letter_grade}"
           link_message: "Vous pouvez consulter le tâche ici"
           no_date_set: "Aucune date définie"
           not_applicable: N/D
@@ -17206,38 +17220,43 @@ fr-CA:
         no_date_set: "Aucune date définie"
         not_applicable: N/D
         regraded_date: "renoté le : %{date}"
-        score: "note :  %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending: "note en attente de vérification par l’enseignant"
         subject: "Note modifiée : %{assignment}, %{context}"
       sms: 
         body_sms: "Votre note pour %{title} dans %{context} vient de changer."
+        grade: "note : %{letter_grade}"
         more_info: "Informations complémentaires sur %{url}"
         no_date_set: "Aucune date définie"
         not_applicable: N/D
         regraded_date: "renoté le : %{date}"
-        score: "note :  %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending: "note en attente de vérification par l’enseignant"
       summary: 
+        grade: "note : %{letter_grade}"
         no_date_set: "Aucune date définie"
         not_applicable: N/D
         regraded_date: "renoté le : %{date}"
-        score: "note :  %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending: "note en attente de vérification par l’enseignant"
         subject: "Note modifiée : %{title}, %{context}"
       twitter: 
+        grade: "note : %{letter_grade}"
         no_date_set: "Aucune date définie"
         not_applicable: N/D
-        score: "note :  %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending: "(révision en attente)"
         tweet: "Alerte Canvas - Modification de note : %{date}"
     submission_graded: 
       email: 
         body: "Votre tâche %{assignment} a été notée."
         excused: "Cette tâche a été mis de côté."
+        grade: "note : %{letter_grade}"
         graded_date: "noté le : %{date}"
         html: 
           body: "Votre tâche %{assignment} a été notée."
           excused: "Cette tâche a été mis de côté."
+          grade: "note : %{letter_grade}"
           graded_date: "noté le : %{date}"
           link_message: "Vous pouvez consulter le tâche ici"
           no_date_set: "Aucune date définie"
@@ -17248,28 +17267,31 @@ fr-CA:
         link_message: "Vous pouvez consulter la tâche ici :"
         no_date_set: "Aucune date définie"
         not_applicable: N/D
-        score: "note :  %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending_review: "note en attente de vérification par l’enseignant"
         subject: "Tâche notée : %{assignment}, %{context}"
       sms: 
+        grade: "note : %{letter_grade}"
         graded_date: "noté le : %{date}"
         more_info: "Informations complémentaires sur %{url}"
         no_date_set: "Aucune date définie"
         not_applicable: N/D
-        score: "note :  %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending_review: "note en attente de vérification par l’enseignant"
         sms_body: "%{assignment} a été noté."
       summary: 
+        grade: "note : %{letter_grade}"
         graded_date: "noté le : %{date}"
         no_date_set: "Aucune date définie"
         not_applicable: N/D
-        score: "note :  %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending_review: "note en attente de vérification par l’enseignant"
         subject: "Tâche notée : %{assignment}, %{context}"
       twitter: 
+        grade: "note : %{letter_grade}"
         no_date_set: "Aucune date définie"
         not_applicable: N/D
-        score: "note :  %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending_review: "(révision en attente)"
         tweet: "Alerte Canvas - Noté : %{assignment}, %{context}"
     submission_needs_grading: 
@@ -17585,6 +17607,7 @@ fr-CA:
   module_publish_menu_30b638dd: "Menu de publication du module"
   module_publish_menu_88b54c1b: "Menu de publication du module"
   module_published_80f0b9b8: "Module publié"
+  modulename_module_publish_options_69ef1ece: "Option de publication du module %{moduleName}"
   modules: 
     assignments_to_grade: 
       one: "1 tâche comporte des envois non notés"
@@ -19332,6 +19355,7 @@ fr-CA:
   permissions_manage_9eea4f8f: "Autorisations - gérer"
   permissions_v2_page_f96dde06: "Page d’autorisations V2"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Permettre l’utilisation de tous les paramètres « includes » pour cette clé de développeur. Les paramètres « Includes » peuvent accorder l’accès à des données supplémentaires non incluses dans les portées sélectionnées ci-dessous."
+  permitted_api_endpoints_b092c4cc: "Points de terminaison d’API autorisés"
   persian_a8cadb95: Perse
   persists_the_used_authentication_provider_when_log_15113afc: "Persiste le fournisseur d’authentification utilisé lors de l’ouverture de session et ouvre de nouvelles sessions par défaut avec le fournisseur par défaut"
   personal_pronouns_7d271f52: "Pronoms personnels"
@@ -20559,7 +20583,7 @@ fr-CA:
   publishing_pace_a65e4152: "Rythme de publication..."
   publishing_plan_b70186ed: "Plan de publication..."
   publishing_progress_5154a430: "Publication de la progression"
-  publishing_progress_is_progress_percent_complete_20482e3e: "La progression de la publication est terminée à %{progress} %"
+  publishing_progress_is_progress_percent_complete_20482e3e: "La progression de la publication est terminée à %{progress} %"
   pumpkin_904428d5: Citrouille
   purchases: 
     new: 
@@ -22242,7 +22266,7 @@ fr-CA:
       par une MathJax version traitée. Ce changement fournit une meilleure accessibilité
       et de nombreuses options pour que le lecteur puisse interagir avec l’équation sur la page.
   replaces_the_existing_update_external_tools_beta_r_308b8a71: |-
-      Remplace la tâche d’actualisation bêta existante « update_external_tools » (qui écrase
+      Remplace la tâche d’actualisation bêta existante « update_external_tools » (qui écrase
       toutes les URL d’un outil avec des URL de lancement spécifiques à la version bêta) par une recherche dynamique de
       l’URL de lancement correcte.
   replies_replies_unread_unread_dc7c982f: "%{replies} réponses, %{unread} non lues"
@@ -26201,6 +26225,7 @@ fr-CA:
        Les décomptes sont effectués du début à la fin de la journée dans le fuseau horaire du compte qui exécute le rapport.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Ce rapport obtient des conférences récentes de bouton Big blue pour un compte."
   this_report_gets_the_submissions_for_courses_d83bb449: "Ce rapport indique les envois pour les cours."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Ce rapport fournit une liste de toutes les clés de développeur disponibles pour l’institution. Ces clés peuvent être installées directement dans le compte racine à partir duquel le rapport est exécuté ou peuvent être héritées des comptes racines parents. Les clés de développeur peuvent être des clés API ou LTI."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Ce rapport fournit tous les ePortfolios actifs pour l'institution actuelle. Vous pouvez également sélectionner « Inclure uniquement les ePortfolios des utilisateurs sans inscription » pour réduire la portée des résultats des ePortfolios aux utilisateurs sans inscription. Vous pouvez également exécuter le rapport avec « Inclure les objets supprimés » pour n'inclure que les ePortfolios qui ont été supprimés."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Ce rapport présente tous les résultats d'apprentissage qui existent au sein de ce compte. Le fichier CSV résultant aura une ligne par résultat, et montre les détails de tous les attributs associés à chacun des résultats."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -26718,8 +26743,8 @@ fr-CA:
   to_differentiate_assignments_to_individual_student_6cc40fde: "Pour différencier les tâches à des étudiants à titre individuel, « Utilisateurs - voir la liste » doit également être activé."
   to_disallow_users_from_managing_sis_ids_at_the_cou_2058787b: "Pour interdire aux utilisateurs de gérer les ID SIS au niveau du cours, « Données SIS - gérer » ​et « Données SIS — lire » doivent tous les deux être désactivés."
   to_disallow_users_from_viewing_any_sis_ids_at_the__7e0cac1b: "Pour interdire aux utilisateurs de voir les ID SIS au niveau du cours, « Données SIS - gérer » ​et « Données SIS — lecture » doivent tous les deux être désactivés."
-  to_discontinue_processing_click_the_stop_button_no_989a959e: "Pour interrompre le traitement, cliquez sur le bouton Arrêter. Remarque : Les modules qui ont déjà été traités ne retrouveront pas leur état précédent lorsque le processus sera interrompu."
-  to_discontinue_processing_click_the_stop_button_no_fff71865: "Pour interrompre le traitement, cliquez sur le bouton Arrêter. Remarque : Les modules et les éléments qui ont déjà été traités ne retrouveront pas leur état précédent lorsque le processus sera interrompu."
+  to_discontinue_processing_click_the_stop_button_no_989a959e: "Pour interrompre le traitement, cliquez sur le bouton Arrêter. Remarque : Les modules qui ont déjà été traités ne retrouveront pas leur état précédent lorsque le processus sera interrompu."
+  to_discontinue_processing_click_the_stop_button_no_fff71865: "Pour interrompre le traitement, cliquez sur le bouton Arrêter. Remarque : Les modules et les éléments qui ont déjà été traités ne retrouveront pas leur état précédent lorsque le processus sera interrompu."
   to_do_1d554f36: "À faire"
   to_do_5526f10a: "À faire :"
   to_do_6ac7b2dc: "a faire :"
@@ -27586,6 +27611,7 @@ fr-CA:
   update_domain_account_lookup_9c89440d: "Mise à jour de la recherche de compte de domaine"
   update_failed_2c87428c: "Échec de la mise à jour"
   update_file_links_to_prefer_preview_not_download_94535382: "Mettre à jour les liens du fichier pour préférer l’aperçu, non le téléchargement"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Mettre à jour le tableau récapitulatif des notes pour utiliser un cadre moderne"
   update_how_we_process_sis_imports_8195bf77: "Mettre à jour comment nous traitons les importations SIS"
   update_important_info_bcc01d6a: "Mettre à jour les informations importantes"
   update_inbox_page_to_use_react_instui_4d343fd: "Mettre à jour la page Boîte de réception pour utiliser react/instui"
@@ -28558,7 +28584,7 @@ fr-CA:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Lorsque cette option est sélectionnée, le cours est dans l'état lecture seule en dehors de ces dates."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Lorsque cette option est sélectionnée, le cours est inaccessible en dehors des dates de cours. Si les dates du cours sont vides, ces dates de début et de fin s'appliquent aux dates du trimestre."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Lorsque cette option est sélectionnée, la section du cours est à l'état lecture seule en dehors de ces dates."
-  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "Lorsqu’elle est définie, une option pour ne pas afficher un nouveau questionnaire avec 0 point possible dans le carnet de notes sera disponible sous la forme d’une case à cocher lors de la création ou de la modification du questionnaire."
+  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "Lorsqu’elle est définie, une option pour ne pas afficher un nouveau questionnaire avec 0 point possible dans le carnet de notes sera disponible sous la forme d’une case à cocher lors de la création ou de la modification du questionnaire."
   when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Lorsqu’il est défini, détermine si l’état du flux de travail d’un nouveau questionnaire doit être défini comme noté ou pending_review si un utilisateur avait un précédent nouveau questionnaire pending_review, mais avait été réinscrit au cours."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Lorsque cet indicateur est activé, la navigation dans le cours reste réduite ou étendue
