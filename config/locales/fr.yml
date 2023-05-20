@@ -5990,6 +5990,7 @@ fr:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Impossible de fixer la date limite d'une substitution à une échéance située dans une période non ouverte à la notation"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Impossible de paramétrer sis_account_id sur un root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Impossible de déplacer la date limite dans une période non ouverte à la notation"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Impossible d'annuler la suppression d’un sujet de rang inférieur lorsque le sujet racine du cours a également été supprimé. Veuillez plutôt annuler la suppression du sujet racine du cours."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "ne peut utiliser les noms réservés de l’importateur de carnet de notes"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Impossible d'afficher les rapports détaillés pour les travaux anonymes tant que les notes ne sont pas désactivées."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Impossible d'afficher les rapports détaillés pour les travaux anonymes tant que les notes n’ont pas été publiées."
@@ -6959,6 +6960,7 @@ fr:
   consortium_parent_keys_803547b: "Clés parent de consortium"
   consumer_key_57d9fcf1: "Code client"
   consumer_key_6f94ba11: "Code client"
+  contact_info_8e3304d1: Coordonnées
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Contactez votre administrateur si vous avez besoin de modifier la visibilité du cours."
   content_1440204b: Contenu
   content_access_id_601d931e: "identifiant d'accès au contenu"
@@ -8477,9 +8479,9 @@ fr:
   course_pace_plan_c79cbffc: "Plan de gestion d'allure du cours"
   course_paces_4396b508: "Allures de cours"
   course_paces_description: |-
-      L'allure de cours apporte une prise en charge des inscriptions à date glissante dans Canvas ;
-      cela permet une distribution automatique des dates d'échéances pour les élèves ayant démarré à des dates
-      différentes, en suivant une allure définie par l’instructeur. Pour en savoir plus et donner vos
+      La gestion d'allures de cours ajoute la prise en charge des inscriptions à date flexible dans Canvas ;
+      elle distribue automatiquement les dates d'échéances aux élèves ayant démarré
+      à des dates différences, en tenant compte du rythme d'apprentissage défini par l’instructeur. Pour en savoir plus et donner vos
       commentaires, rejoignez le *groupe des utilisateurs de l'allure de cours*.
   course_paces_table_ce32db1c: "Tableau d'allures de cours"
   course_pacing_40c14b61: "Gestion d'allure de cours"
@@ -10084,6 +10086,7 @@ fr:
     unnamed_tool: "Outil sans nom"
   developer_keys_d70ba44a: "Clés de développeur"
   developer_keys_manage_806da2d: "Clés du développeur - gérer "
+  developer_keys_report_4d041e62: "Rapport sur les clés développeur"
   developername_logo_88951d4: "%{developerName} Logo"
   developers_keys_table_69ae6b7e: "Tableau des clés des développeurs"
   dialog_form_wrapper: 
@@ -10780,6 +10783,7 @@ fr:
   duplicate_assignment_name_3ca7d753: "Devoir dupliqué %{name}"
   duplicate_discussion_title_43b39959: "Dupliquer la discussion %{title}"
   duplicate_discussion_title_6537ef4d: "Dupliquer Discussion %{title}"
+  duplicate_ids_23b0a29e: "Identifiants en double"
   duplicate_item_339f54bb: "Élément en double"
   duplicate_module_module_name_be40ad50: "Dupliquer module %{module_name}"
   duplicate_module_name_ab26e5c3: "Dupliquer %{module_name}"
@@ -11649,6 +11653,7 @@ fr:
   error_retrieving_assignment_configuration_tools_f7d75303: "Erreur lors de la récupération des outils de configuration de devoirs"
   error_retrieving_assignment_external_tools_9102d343: "Outils externes de récupération d'erreur des travaux"
   error_retrieving_content_c07ee76b: "Erreur de récupération de contenu"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Une erreur est survenue lors de la récupération du contenu depuis l’outil (mauvais élément de contenu)"
   error_retrieving_content_from_tool_e65ef3b7: "Une erreur s'est produite lors de la récupération du contenu à partir de l'outil"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Erreur lors de la récupération des outils de détection de similitude."
   error_running_quizzes_2_export_cfecedba: "Erreur lors de l’exécution de l’export des Quiz 2."
@@ -12562,6 +12567,7 @@ fr:
   for_each_late_62aecf41: "Pour chaque retard"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Pour les développeurs d'outils LTI 1.3 :* Suivez les instructions de la section « Que devrez-vous modifier exactement ? » de l’article sur Community."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Pour les travaux affichés manuellement, la présence d'un commentaire de soumission publié par quelqu'un d'autre que  le propre utilisateur de la soumission permettra d'afficher le travail. Auparavant, il aurait fallu une note pour que l'affichage puisse avoir lieu."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Pour de plus amples informations, consultez la *documentation de l’API Canvas*."
   for_name_d5684bfd: "Pour %{name}"
   for_students_who_d0fd45d0: "Pour les élèves qui…"
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -12668,6 +12674,7 @@ fr:
   global_announcements_a78912c8: "Annonces générales"
   global_announcements_add_edit_delete_843ca4d2: "Annonces globales - ajouter / modifier / supprimer"
   global_branding_df1cae12: "Marquage global"
+  global_id_ffe1be80: "Identifiant global"
   global_inherited_developer_keys_4a6c15de: "Clés développeur héritées globales"
   global_keys_40e1a451: "Clés globales"
   global_message_icons: 
@@ -14670,6 +14677,7 @@ fr:
       S'ils sont activés, les terminaux oEmbed nécessiteront un
       jeton généré par un outil pour vérifier l'origine
       d'une demande de ressource oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Si cette option est activée, le formulaire de travail est prérempli à l’aide des valeurs des messages en lien profond sur la page de modification/création du travail."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Si l'option est activée, les paramètres de requête ne seront pas copiés dans le corps du billet lors d'un lancement LTI."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "Si cette option est activée, les portées seront validées sur les demandes d'API si la clé de développeur utilisée nécessite des portées."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Si activé, les SourcedIds utilisées par Canvas pour Basic Outcomes seront chiffrés"
@@ -14939,7 +14947,7 @@ fr:
   important_dates_tray_fa41a025: "Tiroir Dates importantes"
   important_info_3bda6406: "Informations importantes"
   important_info_for_course_baa4bce1: "Informations importantes pour %{course}"
-  important_note_educational_institutions_have_an_ob_c40b409f: "*Remarque importante : Les établissements éducatifs ont pour obligation de rendre leur contenu aussi accessible que possible. Instructure recommande un ratio texte/fond d'au moins 4,5 pour 1 afin que le texte reste lisible. Vous pouvez tester facilement le contraste à l’aide de **WebAIM Color Contrast Checker***."
+  important_note_educational_institutions_have_an_ob_c40b409f: "*Remarque importante : Les établissements éducatifs ont pour obligation de rendre leur contenu aussi accessible que possible. Instructure recommande un ratio texte/fond d'au moins 4,5 pour 1 afin que le texte reste lisible. Vous pouvez tester facilement le contraste à l’aide de **WebAIM Color Contrast Checker***."
   important_note_educational_institutions_have_an_ob_c9350304: "*Note importante : toutes les institutions éducationnelles ont l'obligation de rendre leurs contenus pédagogiques accessibles autant que possible. Instructure recommande un rapport de contraste de 3:1 pour la couleur du texte et celle du fond d'écran, afin d'avoir un texte bien lisible. Vous pouvez facilement tester votre rapport de contraste avec l'outil **WebAIM Color Contrast Checker***."
   imported_from_posttosisname_f7cc9258: "Importé depuis %{postToSISName}"
   imported_from_sis_3006b19c: "Importé depuis SIS"
@@ -15104,6 +15112,7 @@ fr:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "Héritage - La liste blanche sera héritée du compte parent.  Les domaines peuvent être ajoutés mais ne seront pas appliqués jusqu’à ce que vous changiez ce paramètre à Activé."
   inherited_d4d0bc33: Hérité
   inherited_developer_keys_table_e4a65b67: "Tableau des clés du développeur hérité"
+  inherited_from_parent_account_4776070d: "Hérité du compte parent"
   initial_sync_incomplete_ec74fe8e: "Synchronisation initiale incomplète"
   inner_box_background_6f9092f: "Arrière plan de la boîte intérieure"
   inner_box_border_d0524b03: "Bordure de la boîte intérieure"
@@ -15555,8 +15564,10 @@ fr:
   key_f2a919d5: Clé
   key_ff4089c5: "Clé :"
   key_name_7311d22: "Nom de la clé :"
+  key_name_bc712026: "Nom de la clé"
   key_settings_44df6a41: "Paramètres de clé"
   key_state_for_the_current_account_d16b1cd5: "État de la clé du compte actuel"
+  key_type_6e8c0909: "Type de clé"
   keyboard_instructions_e032939f: "Instructions clavier"
   keyboard_nav_dialog: 
     esc_key_notification: "Appuyer sur la touche ESC avant d'utiliser des raccourcis clavier lorsque vous naviguez la grille du relevé de notes."
@@ -16266,6 +16277,7 @@ fr:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id devrait être unique"
   lti_deep_linking_for_module_index_menu_881feeee: "Liens profonds LTI pour le menu d'index du module"
   lti_deep_linking_line_items_5e0079f7: "Éléments de ligne de lien profond LTI"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Éléments Ligne de lien profond LTI sur page de création/modification de travail"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Éléments de ligne de lien profond LTI sur la page de modification des travaux"
   lti_delete_ee5f1bef: "LTI – supprimer"
   lti_dynamic_registration_8592edb0: "Dynamic Registration LTI"
@@ -18280,9 +18292,11 @@ fr:
       email: 
         body: "La note de votre devoir %{assignment_title} a été modifiée."
         excused: "Ce devoir a été mis de côté."
+        grade: "note : %{letter_grade}"
         html: 
           body: "La note de votre devoir %{assignment_title} a été modifiée."
           excused: "Ce devoir a été excusé."
+          grade: "note : %{letter_grade}"
           link_message: "Vous pouvez consulter le travail ici"
           no_date_set: "Aucune date définie"
           not_applicable: NA
@@ -18294,38 +18308,43 @@ fr:
         no_date_set: "Aucune date définie"
         not_applicable: NA
         regraded_date: "renoté le : %{date}"
-        score: "note :  %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending: "révision en attente de la note par l’enseignant"
         subject: "Note modifiée : %{assignment}, %{context}"
       sms: 
         body_sms: "Votre note pour %{title} de %{context} vient de changer.."
+        grade: "note : %{letter_grade}"
         more_info: "Informations complémentaires sur %{url}"
         no_date_set: "Aucune date définie"
         not_applicable: NA
         regraded_date: "renoté le : %{date}"
-        score: "note : %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending: "révision en attente de la note par l’enseignant"
       summary: 
+        grade: "note : %{letter_grade}"
         no_date_set: "Aucune date définie"
         not_applicable: NA
         regraded_date: "renoté : %{date}"
-        score: "note : %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending: "révision en attente de la note par l’enseignant"
         subject: "Note modifiée : %{title}, %{context}"
       twitter: 
+        grade: "note : %{letter_grade}"
         no_date_set: "Aucune date définie"
         not_applicable: NA
-        score: "note : %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending: "(révision en attente)"
         tweet: "Alerte Canvas - Modification de note : %{date}"
     submission_graded: 
       email: 
         body: "Votre devoir %{assignment} a reçu sa note."
         excused: "Ce devoir a été excusé."
+        grade: "note : %{letter_grade}"
         graded_date: "noté le : %{date}"
         html: 
           body: "Votre devoir %{assignment} a reçu sa note."
           excused: "Ce devoir a été excusé."
+          grade: "note : %{letter_grade}"
           graded_date: "noté le : %{date}"
           link_message: "Vous pouvez consulter le travail ici"
           no_date_set: "Aucune date définie"
@@ -18336,28 +18355,31 @@ fr:
         link_message: "Vous pouvez consulter la tâche ici :"
         no_date_set: "Aucune date définie"
         not_applicable: NA
-        score: "note : %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending_review: "révision en attente de la note par l’enseignant"
         subject: "Tâche notée : %{assignment}, %{context}"
       sms: 
+        grade: "note : %{letter_grade}"
         graded_date: "noté le : %{date}"
         more_info: "Informations complémentaires sur %{url}"
         no_date_set: "Aucune date définie"
         not_applicable: NA
-        score: "note : %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending_review: "révision en attente de la note par l’enseignant"
         sms_body: "%{assignment} a été noté."
       summary: 
+        grade: "note : %{letter_grade}"
         graded_date: "noté le : %{date}"
         no_date_set: "Aucune date définie"
         not_applicable: NA
-        score: "note : %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending_review: "révision en attente de la note par l’enseignant"
         subject: "Travail noté : %{assignment}, %{context}"
       twitter: 
+        grade: "note : %{letter_grade}"
         no_date_set: "Aucune date définie"
         not_applicable: NA
-        score: "note : %{score} sur %{total}"
+        score: "score : %{score} sur %{total}"
         score_pending_review: "(révision en attente)"
         tweet: "Alerte Canvas - Noté : %{assignment}, %{context}"
     submission_needs_grading: 
@@ -18688,6 +18710,7 @@ fr:
   module_publish_menu_30b638dd: "Menu de publication de module"
   module_publish_menu_88b54c1b: "Menu de publication de module"
   module_published_80f0b9b8: "Module publié"
+  modulename_module_publish_options_69ef1ece: "Options de publication du module %{moduleName}"
   modules: 
     add: 
       assignment: 
@@ -20596,6 +20619,7 @@ fr:
   permissions_manage_9eea4f8f: "Permissions - gérer"
   permissions_v2_page_f96dde06: "Permissions V2 Page"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Autoriser l’utilisation de tous les paramètres « include » pour cette clé de développeur. Les paramètres « include » peuvent donner accès à des données supplémentaires qui ne font pas partie des ensembles sélectionnés ci-dessous."
+  permitted_api_endpoints_b092c4cc: "Points de terminaison d’API autorisés"
   persian_a8cadb95: Iranien
   persists_the_used_authentication_provider_when_log_15113afc: "Maintien le fournisseur d'authentification utilisé lors de la connexion, et propose par défaut le fournisseur par défaut pour les nouvelles connexions."
   personal_pronouns_7d271f52: "Pronoms personnels"
@@ -23805,7 +23829,7 @@ fr:
       par une version traitée MathJax. Cette modification offre une meilleure accessibilité
       ainsi que de nombreuses options permettant au lecteur d'interagir avec l’équation directement sur la page.
   replaces_the_existing_update_external_tools_beta_r_308b8a71: |-
-      Remplace la tâche d'actualisation « update_external_tools » de la bêta (qui réécrit
+      Remplace la tâche d'actualisation « update_external_tools » de la bêta (qui réécrit
       toutes les URL d’un outil avec des URL de lancement spécifiques à la bêta) par une vérification dynamique de la
       bonne URL de lancement.
   replies_replies_unread_unread_dc7c982f: "%{replies} réponses, %{unread} non lues"
@@ -27976,6 +28000,7 @@ fr:
        Le nombre est calculé du début de la journée à la fin de la journée dans le fuseau horaire paramétré chez le compte qui génère le rapport.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Ce rapport récupère les conférences BigBlueButton récentes pour un compte donné."
   this_report_gets_the_submissions_for_courses_d83bb449: "Ce rapport récupère les soumissions des cours."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Ce rapport fournit une liste de toutes les clés développeur disponibles pour l’établissement. Ces clés peuvent soit être installées directement sur le compte racine depuis lequel le rapport est exécuté, soit être héritées des comptes racines parents. Les clés développeurs peuvent être des clés LTI ou des clés d’API."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Ce rapport fournit tous les portefeuilles électroniques actifs pour l'institution actuelle. Vous pouvez sélectionner l'option « Inclure uniquement les portefeuilles électroniques des utilisateurs sans inscription » pour réduire la portée des résultats des portefeuilles électroniques aux utilisateurs sans inscription. Vous pouvez également exécuter le rapport avec l'option « Inclure les objets supprimés » pour n'inclure que les portefeuilles électroniques qui ont été supprimés."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Ce rapport présente tous les résultats d'apprentissage existant sur ce compte. Le fichier csv qui en résultera contiendra une rangée par résultat et affichera les détails de tous les attributs associés à chaque résultat."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -28497,8 +28522,8 @@ fr:
   to_differentiate_assignments_to_individual_student_6cc40fde: "Pour différencier les travaux des élèves individuels, Utilisateurs - afficher la liste doit également être activé."
   to_disallow_users_from_managing_sis_ids_at_the_cou_2058787b: "Pour empêcher les utilisateurs de gérer les ID SIS au niveau du cours, Données SIS - gérer et Données SIS - lire doivent être désactivés."
   to_disallow_users_from_viewing_any_sis_ids_at_the__7e0cac1b: "Pour empêcher les utilisateurs de visualiser les ID SIS au niveau du cours, Données SIS - gérer et Données SIS - lire doivent être désactivés."
-  to_discontinue_processing_click_the_stop_button_no_989a959e: "Pour arrêter le traitement, cliquez sur le bouton Stop. Remarque : Les modules déjà traités ne seront pas ramenés à leur état initial si le processus est interrompu."
-  to_discontinue_processing_click_the_stop_button_no_fff71865: "Pour arrêter le traitement, cliquez sur le bouton Stop. Remarque : Les modules et éléments déjà traités ne seront pas ramenés à leur état initial si le processus est interrompu."
+  to_discontinue_processing_click_the_stop_button_no_989a959e: "Pour arrêter le traitement, cliquez sur le bouton Stop. Remarque : Les modules déjà traités ne seront pas ramenés à leur état initial si le processus est interrompu."
+  to_discontinue_processing_click_the_stop_button_no_fff71865: "Pour arrêter le traitement, cliquez sur le bouton Stop. Remarque : Les modules et éléments déjà traités ne seront pas ramenés à leur état initial si le processus est interrompu."
   to_do_1d554f36: "À faire"
   to_do_5526f10a: "À faire :"
   to_do_6ac7b2dc: "à faire :"
@@ -29379,6 +29404,7 @@ fr:
   update_domain_account_lookup_9c89440d: "Mettre à jour la recherche de compte de domaine"
   update_failed_2c87428c: "Échec de la mise à jour"
   update_file_links_to_prefer_preview_not_download_94535382: "Mettre à jour les liens vers les fichiers de manière à privilégier les aperçus par rapport aux téléchargements"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Mettre à jour les tableaux de résumé des notes pour leur faire utiliser un framework moderne."
   update_how_we_process_sis_imports_8195bf77: "Mettre à jour la façon dont nous traitons les importations de SIS"
   update_important_info_bcc01d6a: "Mettre à jour les informations importantes"
   update_inbox_page_to_use_react_instui_4d343fd: "Mettre à jour la page de la boîte de réception pour utiliser react/instui"
