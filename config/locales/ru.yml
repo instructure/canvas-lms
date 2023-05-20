@@ -6079,6 +6079,7 @@ ru:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Невозможно задать новую дату истечения срока выполнения в закрытом периоде оценки успеваемости"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Невозможно настроить учетную запись sis_account_id для root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Невозможно выбрать дату истечения срока выполнения в закрытом периоде оценки успеваемости"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Невозможно удалить дочернюю тему, если корневая тема курса также удалена. Удалите корневую тему курса."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "невозможно использовать зарезервированные имена импортера журнала успеваемости"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Не удается просмотреть подробные отчеты по анонимным заданиям до тех пор, пока оценки не будут разблокированы."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Не удается просмотреть подробные отчеты по анонимным заданиям до тех пор, пока оценки не будут опубликованы."
@@ -7046,6 +7047,7 @@ ru:
   consortium_parent_keys_803547b: "Родительские ключи консорциума"
   consumer_key_57d9fcf1: "Пользовательский ключ"
   consumer_key_6f94ba11: "Пользовательский ключ"
+  contact_info_8e3304d1: "Контактная информация"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Обратитесь к своему администратору, если вам необходимо изменить видимость курса."
   content_1440204b: Содержимое
   content_access_id_601d931e: "идентификатор доступа к контенту"
@@ -8712,7 +8714,7 @@ ru:
   course_paces_4396b508: "Планы прохождения курсов"
   course_paces_description: |-
       Планирование прохождения курса добавляет поддержку повторяющихся зачислений в Canvas,
-      позволяя превосходным образом распределять сроки сдачи для учащихся с разными
+      осуществляя автоматическое определение сроков сдачи для учащихся с разными
       датами начала занятий на основе определенного преподавателем плана прохождения. Узнать больше и оставить
       отзыв можно, присоединившись к *Группе пользователей Планирование прохождения курса*.
   course_paces_table_ce32db1c: "Таблица планов прохождения курсов"
@@ -10358,6 +10360,7 @@ ru:
     unnamed_tool: "Безымянный инструмент"
   developer_keys_d70ba44a: "Ключи разработчиков"
   developer_keys_manage_806da2d: "Ключи программиста - управление "
+  developer_keys_report_4d041e62: "Отчет о ключах разработчиков"
   developername_logo_88951d4: "%{developerName} Логотип"
   developers_keys_table_69ae6b7e: "Таблица ключей программиста"
   dialog_form_wrapper: 
@@ -11068,6 +11071,7 @@ ru:
   duplicate_assignment_name_3ca7d753: "Дублировать задание %{name}"
   duplicate_discussion_title_43b39959: "Сделать дубликат дискуссии %{title}"
   duplicate_discussion_title_6537ef4d: "Дублировать обсуждение %{title}"
+  duplicate_ids_23b0a29e: "Дублировать идентификаторы"
   duplicate_item_339f54bb: "Дублировать элемент"
   duplicate_module_module_name_be40ad50: "Копировать модуль %{module_name}"
   duplicate_module_name_ab26e5c3: "Дубликат %{module_name}"
@@ -11947,6 +11951,7 @@ ru:
   error_retrieving_assignment_configuration_tools_f7d75303: "Возникла ошибка при считывании настроек инструментов конфигурирования заданий"
   error_retrieving_assignment_external_tools_9102d343: "Ошибка при получении внешних инструментов задания"
   error_retrieving_content_c07ee76b: "Ошибка при получении контента"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Ошибка при извлечении содержимого из инструмента (дефектный элемент содержимого)"
   error_retrieving_content_from_tool_e65ef3b7: "Ошибка при получении содержимого из инструмента"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Ошибка при считывании инструментов обнаружения сходства"
   error_running_quizzes_2_export_cfecedba: "При запуске экспорта Quizzes 2 возникла ошибка."
@@ -12910,6 +12915,7 @@ ru:
   for_each_late_62aecf41: "Для каждого опоздавшего"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Для разработчика инструмента LTI 1.3:* Следуйте указаниям в разделе «Что именно вам нужно изменить?» в статье сообщества."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Для размещаемых вручную заданий наличие комментария при отправке, сделанного не самим собственником отправки, означает наличие разрешения на размещение задания. Ранее для этого понадобилось бы выставление оценки, чтобы обеспечить возможность размещения."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Более подробная информация содержится в *документации Canvas API*."
   for_name_d5684bfd: "Для %{name}"
   for_students_who_d0fd45d0: "Для студентов, которые…"
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -13026,6 +13032,7 @@ ru:
   global_announcements_a78912c8: "Общие объявления"
   global_announcements_add_edit_delete_843ca4d2: "Глобальные объявления - добавить / редактировать / удалить"
   global_branding_df1cae12: "Глобальный Брендинг"
+  global_id_ffe1be80: "Глобальный идентификатор"
   global_inherited_developer_keys_4a6c15de: "Глобальные унаследованные ключи разработчиков"
   global_keys_40e1a451: "Глобальные ключи"
   global_message_icons: 
@@ -15078,6 +15085,7 @@ ru:
       Если активирован, конечные точки oEmbed будут требовать
       сгенерированный с помощью инструмента токен для подтверждения происхождения
       запроса источника oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Если включен, то форма задания заполняется значениями из сообщений глубоких ссылок на странице создания/редактирования задания."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "При включении, параметры запроса не будут скопированы в тело POST во время запуска LTI."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "В случае активации оценки будут подтверждены по API-запросам, если используемый ключ программиста требует выставления оценки."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Если выбран данный параметр, Sourcedids, используемые Canvas для основных результатов, будут зашифрованы."
@@ -15513,6 +15521,7 @@ ru:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "Наследование - Белый список будет унаследован от родительской учетной записи.  Домены могут быть добавлены, но это не будет выполняться принудительно до тех пор, пока вы не измените эту настройку на Вкл."
   inherited_d4d0bc33: Наследованная
   inherited_developer_keys_table_e4a65b67: "Наследованная таблица ключей программиста"
+  inherited_from_parent_account_4776070d: "Унаследовано из родительской учетной записи"
   inherited_tool_from_parent_context_f4c1c8c7: "Наследованный инструмент от родительского контекста."
   initial_sync_incomplete_ec74fe8e: "Начальная синхронизация не завершена"
   inner_box_background_6f9092f: "Фон внутреннего окна"
@@ -15978,8 +15987,10 @@ ru:
   key_f2a919d5: Ключ
   key_ff4089c5: "Ключ:"
   key_name_7311d22: "Ключевое имя:"
+  key_name_bc712026: "Имя ключа"
   key_settings_44df6a41: "Основные настройки"
   key_state_for_the_current_account_d16b1cd5: "Статус ключа для текущей учетной записи"
+  key_type_6e8c0909: "Тип ключа"
   keyboard_instructions_e032939f: "вводимые с клавиатуры команды"
   keyboard_nav_dialog: 
     esc_key_notification: "Нажмите клавишу Выход перед использованием сочетания клавиш при навигации по сетке Зачетной книжки."
@@ -16699,6 +16710,7 @@ ru:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id должен быть уникальным"
   lti_deep_linking_for_module_index_menu_881feeee: "Установка глубинных ссылок LTI Deep Linking для меню индекса модулей"
   lti_deep_linking_line_items_5e0079f7: "Элементы строки создания глубинных ссылок LTI"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Элементы строки установки внешних ссылок LTI на странице создания/редактирования заданий"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Элементы строки установки внешних ссылок LTI на странице редактирования заданий"
   lti_delete_ee5f1bef: "LTI - удалить"
   lti_dynamic_registration_8592edb0: "Регистрация LTI Dynamic"
@@ -18734,9 +18746,11 @@ ru:
       email: 
         body: "Оценка вашего задания %{assignment_title} была изменена."
         excused: "Это задание было пропущено по уважительной причине."
+        grade: "оценка: %{letter_grade}"
         html: 
           body: "Оценка вашего задания %{assignment_title} была изменена."
           excused: "Это задание было пропущено по уважительной причине."
+          grade: "оценка: %{letter_grade}"
           link_message: "Вы можете просмотреть задание здесь"
           no_date_set: "Дата не установлена"
           not_applicable: "Не применимо"
@@ -18748,38 +18762,43 @@ ru:
         no_date_set: "Дата не установлена"
         not_applicable: "Н/Д (недоступно)"
         regraded_date: "повторная оценка: %{date}"
-        score: "оценка:  %{score} из %{total}"
+        score: "оценка: %{score} из %{total}"
         score_pending: "оценка ожидает рассмотрения учителем"
         subject: "Оценка изменена: %{assignment}, %{context}"
       sms: 
         body_sms: "Ваша оценка для %{title} в %{context} только что изменена."
+        grade: "оценка: %{letter_grade}"
         more_info: "Дополнительные сведения доступны в %{url}"
         no_date_set: "Дата не установлена"
         not_applicable: "Н/Д (недоступно)"
         regraded_date: "повторная оценка: %{date}"
-        score: "оценка:  %{score} из %{total}"
+        score: "оценка: %{score} из %{total}"
         score_pending: "оценка ожидает рассмотрения учителем"
       summary: 
+        grade: "оценка: %{letter_grade}"
         no_date_set: "Дата не установлена"
         not_applicable: "Н/Д (недоступно)"
         regraded_date: "повторная оценка: %{date}"
-        score: "оценка:  %{score} из %{total}"
+        score: "оценка: %{score} из %{total}"
         score_pending: "оценка ожидает рассмотрения учителем"
         subject: "Оценка изменена: %{title}, %{context}"
       twitter: 
+        grade: "оценка: %{letter_grade}"
         no_date_set: "Дата не установлена"
         not_applicable: "Н/Д (недоступно)"
-        score: "оценка:  %{score} из %{total}"
+        score: "оценка: %{score} из %{total}"
         score_pending: "(ожидает рассмотрения)"
         tweet: "Уведомление Canvas - изменение оценки: %{date}"
     submission_graded: 
       email: 
         body: "Ваше задание %{assignment} было оценено."
         excused: "Это задание было пропущено по уважительной причине."
+        grade: "оценка: %{letter_grade}"
         graded_date: "оценено: %{date}"
         html: 
           body: "Ваше задание %{assignment} было оценено."
           excused: "Это задание было пропущено по уважительной причине."
+          grade: "оценка: %{letter_grade}"
           graded_date: "оценено: %{date}"
           link_message: "Вы можете просмотреть задание здесь"
           no_date_set: "Дата не установлена"
@@ -18790,28 +18809,31 @@ ru:
         link_message: "Задание можно просмотреть здесь:"
         no_date_set: "Дата не установлена"
         not_applicable: "Н/Д (недоступно)"
-        score: "оценка:  %{score} из %{total}"
+        score: "оценка: %{score} из %{total}"
         score_pending_review: "оценка ожидает рассмотрения учителем"
         subject: "Задание оценено: %{assignment}, %{context}"
       sms: 
+        grade: "оценка: %{letter_grade}"
         graded_date: "оценено: %{date}"
         more_info: "Дополнительные сведения доступны в %{url}"
         no_date_set: "Дата не установлена"
         not_applicable: "Н/Д (недоступно)"
-        score: "оценка:  %{score} из %{total}"
+        score: "оценка: %{score} из %{total}"
         score_pending_review: "оценка ожидает рассмотрения учителем"
         sms_body: "%{assignment} было оценено."
       summary: 
+        grade: "оценка: %{letter_grade}"
         graded_date: "оценено: %{date}"
         no_date_set: "Дата не установлена"
         not_applicable: "Н/Д (недоступно)"
-        score: "оценка:  %{score} из %{total}"
+        score: "оценка: %{score} из %{total}"
         score_pending_review: "оценка ожидает рассмотрения учителем"
         subject: "Задание оценено: %{assignment}, %{context}"
       twitter: 
+        grade: "оценка: %{letter_grade}"
         no_date_set: "Дата не установлена"
         not_applicable: "Н/Д (недоступно)"
-        score: "оценка:  %{score} из %{total}"
+        score: "оценка: %{score} из %{total}"
         score_pending_review: "(ожидает рассмотрения)"
         tweet: "Уведомление Canvas - оценено: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -19156,6 +19178,7 @@ ru:
   module_publish_menu_30b638dd: "Меню публикации модулей"
   module_publish_menu_88b54c1b: "Меню публикации модулей"
   module_published_80f0b9b8: "Модуль опубликована"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Варианты публикации модулей"
   modules: 
     add: 
       assignment: 
@@ -21084,6 +21107,7 @@ ru:
   permissions_manage_9eea4f8f: "Разрешения - управление"
   permissions_v2_page_f96dde06: "Страница разрешений V2"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Разрешение на использование всех параметров «включения» для этого ключа разработчика. Параметры «включения» могут обеспечивать доступ к дополнительным данным, не включенным в выбранный ниже диапазон."
+  permitted_api_endpoints_b092c4cc: "Разрешенные конечные точки API"
   persian_a8cadb95: Персидский
   persists_the_used_authentication_provider_when_log_15113afc: "При входе в систему сохраняется используемый поставщик аутентификации, и новые учетные данные по умолчанию присваиваются поставщику по умолчанию"
   personal_pronouns_7d271f52: "Личные местоимения"
@@ -28667,6 +28691,7 @@ ru:
        Подсчет ведется с начала дня до конца дня в установленном часовом поясе учетной записи, ведущей отчет.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "В этот отчет попадают недавние конференции Big blue button для учетной записи."
   this_report_gets_the_submissions_for_courses_d83bb449: "В этот отчет попадают сданные задания по курсам."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "В этом отчете представлен список всех ключей разработчика, доступных для учреждения. Эти ключи могут быть установлены непосредственно в корневой учетной записи, из которой запускается отчет, или могут быть унаследованы из родительских корневых учетных записей. Ключи разработчика могут быть либо API-, либо LTI-ключами."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "В этом отчете предоставлены все активные ePortfolio для текущего учебного заведения. Также можно выбрать «Показывать только ePortfolio пользователей без регистрации», чтобы в результатах ePortfolio отображались только пользователи без регистрации. Также вы можете запустить отчет с опцией «Включить удаленные объекты», чтобы показать только удаленные ePortfolio."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "В этом отчете представлены результаты обучения, существующие в этой учетной записи. Результирующий файл csv будет иметь один столбец на результат, и в нем будут отображаться данные всех ассоциированных атрибутов для каждого результата."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -30079,6 +30104,7 @@ ru:
   update_domain_account_lookup_9c89440d: "Обновление поиска учетной записи домена"
   update_failed_2c87428c: "Сбой обновления"
   update_file_links_to_prefer_preview_not_download_94535382: "Обновить ссылки на файлы для предварительного просмотра, а не для скачивания"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Обновление сводной таблицы оценок для использования современной структуры"
   update_how_we_process_sis_imports_8195bf77: "Обновите порядок обработки импорта SIS"
   update_important_info_bcc01d6a: "Обновить важную информацию"
   update_inbox_page_to_use_react_instui_4d343fd: "Обновить страницу Inbox для использования react/instui"
