@@ -5986,6 +5986,7 @@ nb:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Kan ikke sette forfallsdato for overstyring til en dato innenfor en stengt vurderingsperiode"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Kan ikke sette sis_account_id på en root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Kan ikke sette forfallsdatoen til en dato innenfor en stengt vurderingsperiode"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Kan ikke angre sletting av underordnet emne når rotemnet også er slettet. Angre sletting av rotemnet i stedet for"
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "kan ikke bruke reserverte navn for vurderingsimportøren"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Kan ikke vise detaljerte rapporter for anonyme oppgaver før karakterene er gjenåpnet."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Kan ikke vise detaljerte rapporter for anonyme oppgaver før vurderingene er lagt ut."
@@ -6955,6 +6956,7 @@ nb:
   consortium_parent_keys_803547b: "Consortium Parent-nøkler"
   consumer_key_57d9fcf1: "Forbruker nøkkel"
   consumer_key_6f94ba11: "Forbruker nøkkel"
+  contact_info_8e3304d1: Kontaktinformasjon
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Ta kontakt med administratoren din om du trenger å endre emnesynlighet."
   content_1440204b: Innhold
   content_access_id_601d931e: innholdstilgang-id
@@ -8478,7 +8480,7 @@ nb:
   course_paces_4396b508: Emnetempoer
   course_paces_description: |-
       Tempoplaner legger til støtte for løpende påmeldinger til Canvas,
-      noe som tillater magisk fordeling av forfallsdatoer for studenter med ulike
+      – automatisk fordeling av forfallsdatoer for studenter med ulike
       startdatoer basert på en faglærers definerte tempo. Lær mer og gi
       tilbakemelding ved å bli med i *brukergruppen emneplaner*.
   course_paces_table_ce32db1c: Emnetempo-tabell
@@ -10081,6 +10083,7 @@ nb:
     unnamed_tool: "Navnløst verktøy"
   developer_keys_d70ba44a: Utviklernøkler
   developer_keys_manage_806da2d: "Utviklernøkler - administrer "
+  developer_keys_report_4d041e62: "Rapporter for utviklernøkler"
   developername_logo_88951d4: "%{developerName} Logo"
   developers_keys_table_69ae6b7e: "Tabell til utviklernøkkelen"
   dialog_form_wrapper: 
@@ -10775,6 +10778,7 @@ nb:
   duplicate_assignment_name_3ca7d753: "Dupliser oppgave %{name}"
   duplicate_discussion_title_43b39959: "Dupliser Diskusjon %{title}"
   duplicate_discussion_title_6537ef4d: "Dupliser diskusjon %{title}"
+  duplicate_ids_23b0a29e: "Dupliserte ID-er"
   duplicate_item_339f54bb: "Dupliser element"
   duplicate_module_module_name_be40ad50: "Dupliser modul %{module_name}"
   duplicate_module_name_ab26e5c3: "Dupliser %{module_name}"
@@ -11646,6 +11650,7 @@ nb:
   error_retrieving_assignment_configuration_tools_f7d75303: "Feil ved gjenfinning av konfigurasjonsverktøyer for oppgaver"
   error_retrieving_assignment_external_tools_9102d343: "Feil ved henting av oppgavens eksterne verktøy"
   error_retrieving_content_c07ee76b: "Feil ved henting av innhold"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Feil ved henting av innhold fra verktøy"
   error_retrieving_content_from_tool_e65ef3b7: "Feil ved henting av innhold fra verktøy"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Feil ved henting av verktøy for likhetsgjenkjenning"
   error_running_quizzes_2_export_cfecedba: "Det oppsto en feil under Quizzes 2-eksport"
@@ -12561,6 +12566,7 @@ nb:
   for_each_late_62aecf41: "For hver gang etter fristen"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*For utviklere av LTI 1.3-verktøy:* Følg instruksjonene i «Hva er det du må endre?»-delen av Fellesskap-artikkelen."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Når det gjelder manuelt posterte oppdrag, kan ikke tilstedeværelsen av en innleveringkommentar som ikke er av innsenderens egen bruker tillate postering av oppgaven. Tidligere var det krav om å være vurdert før postering kunne skje."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "For mer informasjon, se *Canvas API-dokumentasjon*."
   for_name_d5684bfd: "For %{name}"
   for_students_who_d0fd45d0: "For studenter som …"
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -12667,6 +12673,7 @@ nb:
   global_announcements_a78912c8: "Globale kunngjøringer"
   global_announcements_add_edit_delete_843ca4d2: "Globale kunngjøringer - legg til / rediger / slett"
   global_branding_df1cae12: "Global merkevarebygging"
+  global_id_ffe1be80: "Global ID"
   global_inherited_developer_keys_4a6c15de: "Globale nedarvede utviklernøkler"
   global_keys_40e1a451: "Globale nøkler"
   global_message_icons: 
@@ -14683,6 +14690,7 @@ nb:
       Hvis den er aktivert, vil endepunktene til oEmbed kreve et
       verktøy-generert nøkkel for å bekrefte opphavet
       til en oEmbed-ressursforespørsel.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Hvis aktivert, forhåndsutfyller oppgaveskjemaet med verdier fra dyplenkemeldinger på opprett/rediger-siden."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Når aktivert, blir ikke søkeparametre kopiert til POST-body under en LTI-lansering."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "Når aktivert, valideres områder på API-forespørsler hvis utviklernøkkelen som brukes krever områder."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Hvis aktivert, vil Sourcedids brukt av Canvas for grunnleggende læringsmål bli kryptert."
@@ -15116,6 +15124,7 @@ nb:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "Arve - Hvitliste vil bli arvet fra foreldre-kontoen.  Domener kan bli lagt til, men vil ikke bli håndhevet før du endrer denne innstillingen til På."
   inherited_d4d0bc33: Arvet
   inherited_developer_keys_table_e4a65b67: "Arvet tabell til utviklernøkkelen"
+  inherited_from_parent_account_4776070d: "Arvet fra overordnet konto"
   initial_sync_incomplete_ec74fe8e: "Innledende synkronisering ufullstendig"
   inner_box_background_6f9092f: "Indre boksbakgrunn"
   inner_box_border_d0524b03: "Innerste boksramme"
@@ -15565,8 +15574,10 @@ nb:
   key_f2a919d5: Nøkkel
   key_ff4089c5: "Nøkkel:"
   key_name_7311d22: "Nøkkelnavn:"
+  key_name_bc712026: Nøkkelnavn
   key_settings_44df6a41: Nøkkelinnstillinger
   key_state_for_the_current_account_d16b1cd5: "Nøkkelstatus for gjeldende konto"
+  key_type_6e8c0909: Nøkkeltype
   keyboard_instructions_e032939f: tastaturinstruksjoner
   keyboard_nav_dialog: 
     esc_key_notification: "Vennligst trykk Esc-tasten før du bruker snarveier når du navigerer i vurderingsoversikt-nettverket."
@@ -16276,6 +16287,7 @@ nb:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id må være unik"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI dyp kobling for modulens indeksmeny"
   lti_deep_linking_line_items_5e0079f7: "LTI dyplenke-linjeelementer"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "LTI dyplenke-linjeelementer på opprett/rediger-siden for Oppgave"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "LTI dyplenke-linjeelementer på Oppgaveredigering-siden"
   lti_delete_ee5f1bef: "LTI – slett"
   lti_dynamic_registration_8592edb0: "LTI dynamisk registrering"
@@ -18288,9 +18300,11 @@ nb:
       email: 
         body: "Vurderingen på din oppgave %{assignment_title} har blitt endret."
         excused: "Denne oppgaven har blitt fritatt."
+        grade: "vurdering: %{letter_grade}"
         html: 
           body: "Vurderingen på din oppgave %{assignment_title} har blitt endret."
           excused: "Denne oppgaven har blitt fritatt."
+          grade: "vurdering: %{letter_grade}"
           link_message: "Du kan se gjennom oppgaven her"
           no_date_set: "Ingen dato satt"
           not_applicable: N/A
@@ -18302,38 +18316,43 @@ nb:
         no_date_set: "Ingen dato satt"
         not_applicable: N/A
         regraded_date: "endret vurdering: %{date}"
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending: "resultatet avhenger av gjennomgang fra faglærer"
         subject: "Vurdering endret: %{assignment}, %{context}"
       sms: 
         body_sms: "Vurderingen for %{title} i %{context} ble nettopp endret."
+        grade: "vurdering: %{letter_grade}"
         more_info: "Mer informasjon på %{url}"
         no_date_set: "Ingen dato satt"
         not_applicable: N/A
         regraded_date: "endret vurdering: %{date}"
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending: "resultatet avhenger av gjennomgang fra faglærer"
       summary: 
+        grade: "vurdering: %{letter_grade}"
         no_date_set: "Ingen dato satt"
         not_applicable: N/A
         regraded_date: "endret vurdering: %{date}"
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending: "resultatet avhenger av gjennomgang fra faglærer"
         subject: "Vurdering endret: %{title}, %{context}"
       twitter: 
+        grade: "vurdering: %{letter_grade}"
         no_date_set: "Ingen dato satt"
         not_applicable: N/A
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending: "(avventer gjennomgang)"
         tweet: "Canvas Alert - Vurderingsendring: %{date}"
     submission_graded: 
       email: 
         body: "Oppgaven din %{assignment} har blitt vurdert."
         excused: "Denne oppgaven har blitt fritatt."
+        grade: "vurdering: %{letter_grade}"
         graded_date: "vurdert: %{date}"
         html: 
           body: "Oppgaven din %{assignment} har blitt vurdert."
           excused: "Denne oppgaven har blitt fritatt."
+          grade: "vurdering: %{letter_grade}"
           graded_date: "vurdert: %{date}"
           link_message: "Du kan se gjennom oppgaven her"
           no_date_set: "Ingen dato satt"
@@ -18344,28 +18363,31 @@ nb:
         link_message: "Du kan se over oppgaven her:"
         no_date_set: "Ingen dato satt"
         not_applicable: N/A
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending_review: "resultatet avhenger av gjennomgang fra faglærer"
         subject: "Oppgave vurdert: %{assignment}, %{context}"
       sms: 
+        grade: "vurdering: %{letter_grade}"
         graded_date: "karaktersatt: %{date}"
         more_info: "Mer info på %{url}"
         no_date_set: "Ingen dato satt"
         not_applicable: N/A
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending_review: "resultatet avhenger av gjennomgang fra faglærer"
         sms_body: "%{assignment} er vurdert."
       summary: 
+        grade: "vurdering: %{letter_grade}"
         graded_date: "vurdert: %{date}"
         no_date_set: "Ingen dato satt"
         not_applicable: N/A
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending_review: "resultatet avhenger av gjennomgang fra faglærer"
         subject: "Oppgave vurdert: %{assignment}, %{context}"
       twitter: 
+        grade: "vurdering: %{letter_grade}"
         no_date_set: "Ingen dato satt"
         not_applicable: N/A
-        score: "resultat:  %{score} av %{total}"
+        score: "resultat: %{score} av %{total}"
         score_pending_review: "(avventer gjennomgang)"
         tweet: "Canvas Alert - Vurdert: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -18696,6 +18718,7 @@ nb:
   module_publish_menu_30b638dd: "Modulenes publiseringsmeny"
   module_publish_menu_88b54c1b: "Modulenes publiseringsmeny"
   module_published_80f0b9b8: "Modul publisert"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Modulens publiseringsalternativer"
   modules: 
     add: 
       assignment: 
@@ -20598,6 +20621,7 @@ nb:
   permissions_manage_9eea4f8f: "Rettigheter - administrer"
   permissions_v2_page_f96dde06: "Tillatelser V2-side"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Tillater bruk av alle “inkluder” parameter for denne utviklernøkkelen. “inkluderer” parametre kan gi tilgang til tilleggsdata som ikke er inkludert i omfanget valg nedenfor."
+  permitted_api_endpoints_b092c4cc: "Tillatte API-endepunkter"
   persian_a8cadb95: Persisk
   persists_the_used_authentication_provider_when_log_15113afc: "Vedvarer den brukte autentiseringsleverandøren når du logger inn, og innstiller nye pålogginger til standardleverandøren som standard"
   personal_pronouns_7d271f52: Pronomen
@@ -27987,6 +28011,7 @@ nb:
        Opptellingen gjøres fra begynnelsen av dagen til slutten av dagen i den angitte tidssonen til kontoen som kjører rapporten.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Denne rapporten får nylige Big blue button-videomøter for en konto."
   this_report_gets_the_submissions_for_courses_d83bb449: "Denne rapporten får innleveringer for emner."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Denne rapporten viser en liste over alle utviklernøkler som er tilgjengelige for institusjonen. Disse nøklene kan enten installeres direkte i rotkontoen rapporten kjøres fra, eller de kan arves fra overordnede rotkontoer. Utviklernøkler kan enten være API- eller LTI-nøkler."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Denne rapporten inneholder alle aktive e-porteføljer for den nåværende institusjonen. Velg alternativt ‘Bare inkluder e-porteføljer fra brukere uten påmeldinger’ for å redusere omfanget av e-porteføljeresultatene til de brukerne uten påmeldinger. Du kan også kjøre rapporten med ‘Inkluder slettede objekter’ for å bare inkludere de e-porteføljene som er slettet."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Denne rapporten viser alle læringsutbytter som eksisterer i denne kontoen. Den resulterende CSV-filen vil ha en rad per læringsmål og vil vise detaljene til alle assosierte attributter for hvert læringsmål."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -29387,6 +29412,7 @@ nb:
   update_domain_account_lookup_9c89440d: "Oppdater domenekonto-oppslag"
   update_failed_2c87428c: "Oppdatering mislyktes"
   update_file_links_to_prefer_preview_not_download_94535382: "Oppdater fillenker for å foretrekke forhåndsvisning, ikke nedlasting"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Oppdater vurderingsoppsummering-tabellen for å bruke et moderne rammeverk"
   update_how_we_process_sis_imports_8195bf77: "Oppdater hvordan vi behandler SIS-import"
   update_important_info_bcc01d6a: "Oppdater viktig info"
   update_inbox_page_to_use_react_instui_4d343fd: "Oppdater innbokssiden for å bruke react/instui"
