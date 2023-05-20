@@ -5609,6 +5609,7 @@ it:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Impossibile impostare la data di scadenza degli override su una data entro un periodo di valutazione chiuso"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Impossibile impostare sis_account_id su un root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Impossibile impostare la data di scadenza su una data entro un periodo di valutazione chiuso"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Impossibile annullare l’eliminazione di un argomento secondario quando viene eliminato anche l’argomento del corso principale. Annullare invece l’eliminazione dell’argomento del corso principale."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "impossibile utilizzare i nomi riservati degli importatori del registro dei voti"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Impossibile visualizzare report dettagliati per compiti anonimi fino a quando i voti non vengono ripristinati."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Impossibile visualizzare report dettagliati per compiti anonimi fino a quando i voti non vengono pubblicati."
@@ -6521,6 +6522,7 @@ it:
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "ID LTI AGS coerenti in base al dominio principale dell’account"
   consortium_parent_keys_803547b: "Chiavi principali consorzio"
   consumer_key_6f94ba11: "Chiave consumer"
+  contact_info_8e3304d1: "Informazioni contatto"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Contatta l'amministratore se devi cambiare la visibilità del corso."
   content_1440204b: Contenuto
   content_access_id_601d931e: "id accesso contenuto"
@@ -7901,9 +7903,9 @@ it:
   course_pace_plan_c79cbffc: "Programma di velocità corso"
   course_paces_4396b508: "Velocità corso"
   course_paces_description: |-
-      Il Ritmo corso aggiunge supporto per le iscrizioni graduali a Canvas,
-      consentendo una distribuzione meravigliosa delle date di scadenza per gli studenti con
-      date di inizio diverse in base alla velocità definita da un istruttore. Scopri ulteriori informazioni e fornisci
+      Il ritmo corso aggiunge supporto per le iscrizioni graduali a Canvas,
+      distribuendo automaticamente le date scadenza per gli studenti con
+      date di inizio diverse in base al ritmo definito da un istruttore. Scopri ulteriori informazioni e fornisci
       un feedback unendoti al *gruppo di utenti per il ritmo del corso*.
   course_paces_table_ce32db1c: "Tabella dei ritmo del corso"
   course_pacing_40c14b61: "Ritmo corso"
@@ -9327,6 +9329,7 @@ it:
     unnamed_tool: "Strumento senza nome"
   developer_keys_d70ba44a: "Chiavi sviluppatore"
   developer_keys_manage_806da2d: "Chiavi sviluppatore - gestisci "
+  developer_keys_report_4d041e62: "Report chiavi sviluppatore"
   developername_logo_88951d4: "%{developerName} Logo"
   developers_keys_table_69ae6b7e: "Tabella chiavi sviluppatore"
   dialog_form_wrapper: 
@@ -9956,6 +9959,7 @@ it:
   duplicate_assignment_name_3ca7d753: "Duplica compito %{name}"
   duplicate_discussion_title_43b39959: "Duplica discussione %{title}"
   duplicate_discussion_title_6537ef4d: "Duplica discussione %{title}"
+  duplicate_ids_23b0a29e: "ID duplicati"
   duplicate_item_339f54bb: "Duplica elemento"
   duplicate_module_module_name_be40ad50: "Duplica modulo %{module_name}"
   duplicate_module_name_ab26e5c3: "Duplica %{module_name}"
@@ -10772,6 +10776,7 @@ it:
   error_reports_7d6c8b1e: "Report errori"
   error_retrieving_assignment_external_tools_9102d343: "Errore recupero strumenti esterni compito"
   error_retrieving_content_c07ee76b: "Errore di recupero contenuto"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Errore di recupero contenuto da strumento (elemento contenuto sbagliato)"
   error_retrieving_content_from_tool_e65ef3b7: "Errore recupero contenuto da strumento"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Errore durante il recupero degli strumenti di rilevamento similarità"
   error_running_quizzes_2_export_cfecedba: "Errore durante l'esecuzione dell'esportazione dei quiz 2."
@@ -11523,6 +11528,7 @@ it:
   for_each_late_62aecf41: "Per ciascun ritardo"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Per gli sviluppatori di strumenti LTI 1.3:* Seguire le istruzioni riportate nella sezione \"Cosa dovrai cambiare esattamente?\" dell’articolo della Community."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Per compiti pubblicati manualmente, la presenza di un commento relativo alla consegna inserito da una persona diversa dall’utente della consegna permetterà di pubblicare il compito. Prima, per poter pubblicare, era necessario un voto"
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Per ulteriori informazioni, consultare la *documentazione API Canvas*."
   for_name_d5684bfd: "Per %{name}"
   for_students_who_d0fd45d0: "Per gli studenti che…"
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -11626,6 +11632,7 @@ it:
   global_announcements_a78912c8: "Annunci globali"
   global_announcements_add_edit_delete_843ca4d2: "Annunci globali - aggiungi/modifica/elimina"
   global_branding_df1cae12: "Branding globale"
+  global_id_ffe1be80: "ID globale"
   global_inherited_developer_keys_4a6c15de: "Chiavi sviluppatore ereditate globali"
   global_keys_40e1a451: "Chiavi globali"
   global_message_icons: 
@@ -13139,6 +13146,7 @@ it:
       Se abilitato, gli endpoint oEmbed richiedono un
       token generato da uno strumento per verificare l’origine
       di una richieste di risorsa oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Se abilitato, compila in anteprima il modulo del compito con i valori derivati dai messaggi di deep linking sulla pagina di creazione/modifica compito."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Se questa opzione è abilitata, i parametri di query non verranno copiati nel corpo della richiesta POST durante l'avvio di LTI."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "Se abilitata, gli ambiti verranno convalidati sulle richieste API se la chiave sviluppatore in uso richiede ambiti."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Se attivati, i sourcedid usati da Canvas per i risultati di base verranno criptati."
@@ -13544,6 +13552,7 @@ it:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "Eredita - L’elenco degli elementi consentiti sarà ereditato dall’account principale.  I domini possono essere aggiunti ma non saranno applicati finché non si mette questa impostazione su On."
   inherited_d4d0bc33: Ereditato
   inherited_developer_keys_table_e4a65b67: "Tabella chiavi sviluppatore ereditata"
+  inherited_from_parent_account_4776070d: "Ereditato da account principale"
   initial_sync_incomplete_ec74fe8e: "Sincronizzazione iniziale non completata"
   inner_box_background_6f9092f: "Sfondo riquadro interno"
   inner_box_border_d0524b03: "Bordo riquadro interno"
@@ -13979,8 +13988,10 @@ it:
   key_f2a919d5: Chiave
   key_ff4089c5: "Chiave:"
   key_name_7311d22: "Nome chiave:"
+  key_name_bc712026: "Nome chiave"
   key_settings_44df6a41: "Impostazioni chiave"
   key_state_for_the_current_account_d16b1cd5: "Stato della chiave per l'account attuale"
+  key_type_6e8c0909: "Tipo di chiave"
   keyboard_nav_dialog: 
     esc_key_notification: "Premi il tasto ESC prima di utilizzare le scelte rapide da tastiera durante la navigazione nella griglia del registro dei voti."
   keyboard_shortcut_for_missing_assignment_848aa9cd: "Tasti di scelta rapida da tastiera per compito mancante"
@@ -14638,6 +14649,7 @@ it:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id deve essere univoco"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI Deep Linking per menu indice modulo"
   lti_deep_linking_line_items_5e0079f7: "Elementi linea deep linking LTI"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Elementi linea di deep linking LTI nella pagina di creazione/modifica compito"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Elementi linea deep linking LTI nella pagina di modifica compito"
   lti_delete_ee5f1bef: "LTI - elimina"
   lti_dynamic_registration_8592edb0: "Registrazione dinamica LTI"
@@ -16474,9 +16486,11 @@ it:
       email: 
         body: "La valutazione del tuo compito %{assignment_title} è stata modificata."
         excused: "Questo compito è stato giustificato."
+        grade: "voto: %{letter_grade}"
         html: 
           body: "La valutazione del tuo compito %{assignment_title} è stata modificata."
           excused: "Questo compito è stato giustificato."
+          grade: "voto: %{letter_grade}"
           link_message: "Puoi esaminare il compito qui"
           no_date_set: "Nessuna data impostata"
           not_applicable: N/A
@@ -16488,38 +16502,43 @@ it:
         no_date_set: "Nessuna data impostata"
         not_applicable: N/A
         regraded_date: "rivalutato: %{date}"
-        score: "punteggio:  %{score} su %{total}"
+        score: "punteggio: %{score} su %{total}"
         score_pending: "punteggio in attesa di revisione da parte dell'insegnante"
         subject: "Voto modificato: %{assignment}, %{context}"
       sms: 
         body_sms: "La tua valutazione per %{title} in %{context} è stata appena modificata."
+        grade: "voto: %{letter_grade}"
         more_info: "Maggiori informazioni su %{url}"
         no_date_set: "Nessuna data impostata"
         not_applicable: N/A
         regraded_date: "rivalutato: %{date}"
-        score: "punteggio:  %{score} su %{total}"
+        score: "punteggio: %{score} su %{total}"
         score_pending: "punteggio in attesa di revisione da parte dell'insegnante"
       summary: 
+        grade: "voto: %{letter_grade}"
         no_date_set: "Nessuna data impostata"
         not_applicable: N/A
         regraded_date: "rivalutato: %{date}"
-        score: "punteggio:  %{score} su %{total}"
+        score: "punteggio: %{score} su %{total}"
         score_pending: "punteggio in attesa di revisione da parte dell'insegnante"
         subject: "Voto modificato: %{title}, %{context}"
       twitter: 
+        grade: "voto: %{letter_grade}"
         no_date_set: "Nessuna data impostata"
         not_applicable: N/A
-        score: "punteggio:  %{score} su %{total}"
+        score: "punteggio: %{score} su %{total}"
         score_pending: "(revisione in attesa)"
         tweet: "Avviso Canvas - Modifica voti: %{date}"
     submission_graded: 
       email: 
         body: "Il tuo compito %{assignment} è stato valutato."
         excused: "Questo compito è stato giustificato."
+        grade: "voto: %{letter_grade}"
         graded_date: "valutato: %{date}"
         html: 
           body: "Il tuo compito %{assignment} è stato valutato."
           excused: "Questo compito è stato giustificato."
+          grade: "voto: %{letter_grade}"
           graded_date: "valutato: %{date}"
           link_message: "Puoi esaminare il compito qui"
           no_date_set: "Nessuna data impostata"
@@ -16530,28 +16549,31 @@ it:
         link_message: "Puoi esaminare il compito qui:"
         no_date_set: "Nessuna data impostata"
         not_applicable: N/A
-        score: "punteggio:  %{score} su %{total}"
+        score: "punteggio: %{score} su %{total}"
         score_pending_review: "punteggio in attesa di revisione da parte dell'insegnante"
         subject: "Compito valutato: %{assignment}, %{context}"
       sms: 
+        grade: "voto: %{letter_grade}"
         graded_date: "valutato: %{date}"
         more_info: "Maggiori informazioni su %{url}"
         no_date_set: "Nessuna data impostata"
         not_applicable: N/A
-        score: "punteggio:  %{score} su %{total}"
+        score: "punteggio: %{score} su %{total}"
         score_pending_review: "punteggio in attesa di revisione da parte dell'insegnante"
         sms_body: "%{assignment} è stato valutato."
       summary: 
+        grade: "voto: %{letter_grade}"
         graded_date: "valutato: %{date}"
         no_date_set: "Nessuna data impostata"
         not_applicable: N/A
-        score: "punteggio:  %{score} su %{total}"
+        score: "punteggio: %{score} su %{total}"
         score_pending_review: "punteggio in attesa di revisione da parte dell'insegnante"
         subject: "Compito valutato: %{assignment}, %{context}"
       twitter: 
+        grade: "voto: %{letter_grade}"
         no_date_set: "Nessuna data impostata"
         not_applicable: N/A
-        score: "punteggio:  %{score} su %{total}"
+        score: "punteggio: %{score} su %{total}"
         score_pending_review: "(revisione in attesa)"
         tweet: "Avviso Canvas - Valutato: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -16866,6 +16888,7 @@ it:
   module_publish_menu_30b638dd: "Menu pubblicazione modulo"
   module_publish_menu_88b54c1b: "Menu pubblicazione modulo"
   module_published_80f0b9b8: "Modulo pubblicato"
+  modulename_module_publish_options_69ef1ece: "Opzioni pubblicazione modulo %{moduleName}"
   modules: 
     assignments_to_grade: 
       one: "1 compito ha consegne non valutate"
@@ -18571,6 +18594,7 @@ it:
   permissions_manage_9eea4f8f: "Autorizzazioni - gestisci"
   permissions_v2_page_f96dde06: "Pagina V2 autorizzazioni"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Consente l’utilizzo di tutti i parametri “Includi” per questa chiave sviluppatore. I parametri \"Includi\" possono consentire l’accesso a dati aggiuntivi non inclusi negli ambiti selezionati in precedenza."
+  permitted_api_endpoints_b092c4cc: "Endpoint API consentiti"
   persian_a8cadb95: Persiano
   persists_the_used_authentication_provider_when_log_15113afc: "All’accesso persiste il provider di autenticazione usato e imposta predefinitivamente nuovi accessi sul provider predefinito"
   personal_pronouns_7d271f52: "Pronomi personali"
@@ -25270,6 +25294,7 @@ it:
        Il numero viene calcolato dall’inizio del giorno alla fine del giorno nel fuso orario impostato dell’account che esegue il report.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Questo report riceve le conferenze recenti Big Blue Button per un account."
   this_report_gets_the_submissions_for_courses_d83bb449: "Questo report riceve gli invii per i corsi."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Questo report fornisce un elenco di tutte le chiavi sviluppatore disponibili nell’istituto. Queste chiavi possono essere installate direttamente nell’account principale da cui viene eseguito il report oppure possono essere ereditate dagli account principali. Le chiavi sviluppatore possono essere chiavi API o LTI."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Questo report fornisce tutti gli ePortfolio attivi per l'istituzione corrente. In alternativa, selezionare \"Includere solo gli ePortfolio degli utenti senza iscrizioni\" per ridurre il numero dei risultati dell'ePortfolio ai soli utenti senza iscrizioni. Il report può anche essere eseguito con 'Includi oggetti eliminati' in modo da includere solo gli ePortfolio che sono stati rimossi."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Questo report mostra tutti gli esiti di apprendimento presenti in questo account. Il file CSV risultante avrà una riga per ogni esito e mostrerà i dettagli di tutti gli attributi associati a ciascun esito."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -26644,6 +26669,7 @@ it:
   update_domain_account_lookup_9c89440d: "Aggiorna ricerca account dominio"
   update_failed_2c87428c: "Aggiornamento non riuscito"
   update_file_links_to_prefer_preview_not_download_94535382: "Aggiorna i link ai file per avere l’anteprima, non il download"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Aggiorna tabella di riepilogo voti per usare una struttura moderna"
   update_how_we_process_sis_imports_8195bf77: "Aggiorna modalità di elaborazione delle importazioni SIS"
   update_important_info_bcc01d6a: "Aggiorna info importanti"
   update_inbox_page_to_use_react_instui_4d343fd: "Aggiorna pagina Posta in arrivo per usare react/instui"
