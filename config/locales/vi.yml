@@ -4416,6 +4416,7 @@ vi:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Không thể đặt ngày đến hạn ghi đè thành một ngày trong khoảng thời gian phân loại điểm đã đóng"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Không thể đặt sis_account_id vào một root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Không thể đặt ngày đến hạn thành một ngày trong khoảng thời gian phân loại điểm đã đóng"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Không thể phục hồi chủ đề được nhân bản khi chủ đề khóa học gốc cũng bị xóa. Thay vào đó, vui lòng phục hồi chủ đề khóa học gốc."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "không thể sử dụng tên dành riêng cho người nhập sổ điểm"
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Không thể xem báo cáo chi tiết cho các bài tập ẩn danh cho đến khi điểm được đăng."
   canvas: 
@@ -5247,6 +5248,7 @@ vi:
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "Các ID LTI AGS nhất quán dựa trên miền chính của Tài Khoản"
   consortium_parent_keys_803547b: "Mã Khóa của Phụ Huynh trong Hội"
   consumer_key_6f94ba11: "Khóa Người Tiêu Dùng"
+  contact_info_8e3304d1: "Thông Tin Liên Hệ"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Liên hệ với quản trị viên của bạn nếu bạn cần thay đổi chế độ hiển thị của khóa học."
   content_1440204b: "Nội Dung"
   content_access_id_601d931e: "id truy cập nội dung"
@@ -6454,9 +6456,9 @@ vi:
   course_pace_plan_c79cbffc: "Kế Hoạch Tốc Độ Khóa Học"
   course_paces_4396b508: "Tốc Độ Khóa Học"
   course_paces_description: |-
-      Tiến Độ Khóa Học được thêm vào để hỗ trợ cho việc ghi danh vào Canvas;
-      cho phép phân phối các ngày đến hạn cho sinh viên có ngày bắt đầu
-      khác nhau dựa trên tiến độ xác định của người hướng dẫn. Tìm hiểu thêm và đưa ra
+      Tiến Độ Khóa Học bổ sung hỗ trợ cho việc chuyển tiếp ghi danh vào Canvas;
+      tự động phân phối ngày đến hạn cho học sinh có ngày bắt đầu
+      khác nhau dựa trên nhịp độ đã xác định của giáo viên. Tìm hiểu thêm và đưa ra
       phản hồi bằng cách tham gia vào *Nhóm Người Dùng về Tiến Độ Khóa Học*.
   course_paces_table_ce32db1c: "Bảng Thiết Kế Tiến Độ Khóa Học"
   course_pacing_40c14b61: "Thiết Kế Tiến Độ Khóa Học"
@@ -7585,6 +7587,7 @@ vi:
     unnamed_tool: "Công Cụ Chưa Được Đặt Tên"
   developer_keys_d70ba44a: "Mã ID Của Nhà Phát Triển"
   developer_keys_manage_806da2d: "Mã ID Của Nhà Phát Triển - quản lý "
+  developer_keys_report_4d041e62: "Báo Cáo Mã Khóa của Nhà Phát Triển"
   developers_keys_table_69ae6b7e: "Bảng Mã ID Của Nhà Phát Triển"
   dialog_form_wrapper: 
     cancel: Hủy
@@ -8086,6 +8089,7 @@ vi:
   duplicate_31cec192: "Nhân Bản"
   duplicate_assignment_name_3ca7d753: "Nhân Bản Bài Tập %{name}"
   duplicate_discussion_title_6537ef4d: "Nhân bản cuộc thảo luận %{title}"
+  duplicate_ids_23b0a29e: "ID Trùng Lặp"
   duplicate_item_339f54bb: "Nhân Bản Mục"
   duplicate_module_name_ab26e5c3: "Nhân Bản %{module_name}"
   duplicate_provider_provider_d9842134: "Nhân bản nhà cung cấp %{provider}"
@@ -8734,6 +8738,7 @@ vi:
   error_reports_7d6c8b1e: "Báo Cáo Lỗi"
   error_retrieving_assignment_external_tools_9102d343: "Lỗi khi truy xuất các công cụ ngoài của bài tập"
   error_retrieving_content_c07ee76b: "Lỗi khi truy xuất nội dung"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Lỗi khi truy xuất nội dung từ công cụ (mục nội dung xấu)"
   error_retrieving_content_from_tool_e65ef3b7: "Lỗi khi truy xuất nội dung từ công cụ"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Lỗi khi truy xuất các công cụ phát hiện sự giống nhau"
   error_running_quizzes_2_export_cfecedba: "Lỗi khi chạy xuất Câu Hỏi Kiểm Tra 2."
@@ -9386,6 +9391,7 @@ vi:
   for_canvas_admins_no_actions_or_configuration_chan_de50d145: "*Đối với Quản Trị Viên Canvas:* Bạn không cần thực hiện hành động hoặc thay đổi cấu hình nào. Bạn có thể hỏi các nhà phát triển công cụ 1.3 mà bạn đã cài đặt về trạng thái của các thay đổi cần thiết của họ."
   for_canvas_admins_no_actions_or_configuration_chan_f6fee50a: "*Đối với Quản Trị Viên Canvas:* Bạn không cần thực hiện hành động hoặc thay đổi cấu hình nào. Bạn có thể xác nhận với nhà phát triển công cụ 1.3 mà bạn đã cài đặt rằng họ đã thực hiện những thay đổi này."
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Đối với Nhà Phát Triển Công Cụ LTI 1.3:* Thực hiện theo các hướng dẫn ở phần \"Chính xác thì bạn cần thay đổi điều gì?\" trong bài viết Cộng Đồng."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Để biết thêm thông tin, xem *tài liệu API Canvas*."
   for_name_d5684bfd: "Cho %{name}"
   for_students_who_d0fd45d0: "Dành cho những sinh viên…"
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -9481,6 +9487,7 @@ vi:
   global_announcements_a78912c8: "Thông Báo Toàn Cầu"
   global_announcements_add_edit_delete_843ca4d2: "Thông Báo Toàn Cầu - thêm / chỉnh sửa / xóa"
   global_branding_df1cae12: "Xây Dựng Thương Hiệu Toàn Cầu"
+  global_id_ffe1be80: "ID Toàn Cầu"
   global_inherited_developer_keys_4a6c15de: "Mã Khóa của Nhà Phát Triển Kế Thừa Toàn Cầu"
   global_keys_40e1a451: "Mã Khóa Toàn Cầu"
   global_message_icons: 
@@ -10648,6 +10655,7 @@ vi:
       Nếu được bật, các điểm cuối oEmbed sẽ yêu cầu
       mã thông báo do công cụ tạo để xác minh nguồn gốc
       của một yêu cầu tài nguyên oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Nếu được bật, hãy điền trước biểu mẫu bài tập với các giá trị từ thông báo liên kết sâu trên trang tạo/chỉnh sửa bài tập."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Nếu được bật, các tham số truy vấn sẽ không được sao chép vào phần nội dung ĐĂNG trong quá trình khởi chạy LTI."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Nếu được bật, id Nguồn được Canvas sử dụng cho Kết Quả Cơ Bản sẽ được mã hóa."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Nếu được bật, lịch sử bài nộp cho các câu hỏi trong Câu Hỏi Kiểm Tra Mới sẽ được xử lý riêng."
@@ -10930,6 +10938,7 @@ vi:
   inherit_from_course_ed8bde8c: "Kế thừa từ Khóa Học"
   inherited_d4d0bc33: "Được thừa hưởng"
   inherited_developer_keys_table_e4a65b67: "Được Thừa Hưởng Bảng Mã ID Của Nhà Phát Triển"
+  inherited_from_parent_account_4776070d: "Kế thừa từ Tài Khoản Phụ Huynh"
   initial_sync_incomplete_ec74fe8e: "Đồng Bộ Hóa Ban Đầu Chưa Hoàn Thành"
   inner_box_background_6f9092f: "Nền Bên Trong Hộp"
   inner_box_border_d0524b03: "Đường Viền Bên Trong Hộp"
@@ -11283,8 +11292,10 @@ vi:
   key_api_key_68bf80ae: "Khóa: *%{api_key}*"
   key_f2a919d5: Khóa
   key_name_7311d22: "Tên Khóa:"
+  key_name_bc712026: "Tên Khóa"
   key_settings_44df6a41: "Cài Đặt Khóa"
   key_state_for_the_current_account_d16b1cd5: "Trạng thái chính cho tài khoản hiện tại"
+  key_type_6e8c0909: "Loại Khóa"
   keyboard_nav_dialog: 
     esc_key_notification: "Nhấn phím thoát trước khi sử dụng phím tắt khi điều hướng lưới sổ điểm."
   keyboard_shortcut_for_missing_assignment_848aa9cd: "Phím Tắt dành cho Bài Tập Bị Thiếu"
@@ -11895,6 +11906,7 @@ vi:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id phải riêng biệt"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI Liên Kết Sâu cho Menu Chỉ Mục Học Phần"
   lti_deep_linking_line_items_5e0079f7: "Các Mục Hàng Liên Kết Sâu LTI"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Các Mục Dòng Liên Kết Sâu LTI trên trang tạo/chỉnh sửa Bài Tập"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Mục Dòng Liên Kết Sâu LTI trên trang chỉnh sửa Bài Tập"
   lti_delete_ee5f1bef: "LTI - xóa"
   lti_dynamic_registration_8592edb0: "Đăng Ký Động LTI"
@@ -13570,9 +13582,11 @@ vi:
       email: 
         body: "Điểm trong bài tập của bạn %{assignment_title} đã được thay đổi."
         excused: "Bài tập này đã được miễn."
+        grade: "điểm: %{letter_grade}"
         html: 
           body: "Điểm trong bài tập của bạn %{assignment_title} đã được thay đổi."
           excused: "Bài tập này đã được miễn."
+          grade: "điểm: %{letter_grade}"
           link_message: "Bạn có thể xem lại bài tập tại đây"
           no_date_set: "Không Có Ngày Đặt"
           not_applicable: "Không Có"
@@ -13584,38 +13598,43 @@ vi:
         no_date_set: "Không Có Ngày Đặt"
         not_applicable: "Không Có"
         regraded_date: "chấm điểm lại: %{date}"
-        score: "điểm số:  %{score} trên %{total}"
+        score: "điểm số: %{score} trên tổng số %{total}"
         score_pending: "điểm đang chờ giáo viên đánh giá"
         subject: "Điểm Đã Thay Đổi: %{assignment}, %{context}"
       sms: 
         body_sms: "Điểm của bạn cho %{title} trong %{context} vừa mới thay đổi."
+        grade: "điểm: %{letter_grade}"
         more_info: "Thêm thông tin tại %{url}"
         no_date_set: "Không Có Ngày Đặt"
         not_applicable: "Không Có"
         regraded_date: "chấm điểm lại: %{date}"
-        score: "điểm số:  %{score} trên %{total}"
+        score: "điểm số: %{score} trên tổng số %{total}"
         score_pending: "điểm đang chờ giáo viên đánh giá"
       summary: 
+        grade: "điểm: %{letter_grade}"
         no_date_set: "Không Có Ngày Đặt"
         not_applicable: "Không Có"
         regraded_date: "chấm điểm lại: %{date}"
-        score: "điểm số:  %{score} trên %{total}"
+        score: "điểm số: %{score} trên tổng số %{total}"
         score_pending: "điểm đang chờ giáo viên đánh giá"
         subject: "Điểm Đã Thay Đổi: %{title}, %{context}"
       twitter: 
+        grade: "điểm: %{letter_grade}"
         no_date_set: "Không Có Ngày Đặt"
         not_applicable: "Không Có"
-        score: "điểm số:  %{score} trên %{total}"
+        score: "điểm số: %{score} trên tổng số %{total}"
         score_pending: "(đang chờ xem xét)"
         tweet: "Cảnh Báo Canvas - Thay Đổi Điểm: %{date}"
     submission_graded: 
       email: 
         body: "Bài tập của bạn %{assignment} đã được chấm điểm."
         excused: "Bài tập này đã được miễn."
+        grade: "điểm: %{letter_grade}"
         graded_date: "đã chấm điểm: %{date}"
         html: 
           body: "Bài tập của bạn %{assignment} đã được chấm điểm."
           excused: "Bài tập này đã được miễn."
+          grade: "điểm: %{letter_grade}"
           graded_date: "đã chấm điểm: %{date}"
           link_message: "Bạn có thể xem lại bài tập tại đây"
           no_date_set: "Không Có Ngày Đặt"
@@ -13626,24 +13645,27 @@ vi:
         link_message: "Bạn có thể đánh giá bài tập tại đây:"
         no_date_set: "Không Có Ngày Đặt"
         not_applicable: "Không Có"
-        score: "điểm số:  %{score} trên %{total}"
+        score: "điểm số: %{score} trên tổng số %{total}"
         score_pending_review: "điểm đang chờ giáo viên đánh giá"
         subject: "Bài Tập Được Chấm Điểm: %{assignment}, %{context}"
       sms: 
+        grade: "điểm: %{letter_grade}"
         not_applicable: "Không Có"
-        score: "điểm số:  %{score} trên %{total}"
+        score: "điểm số: %{score} trên tổng số %{total}"
         sms_body: "%{assignment} đã được chấm điểm."
       summary: 
+        grade: "điểm: %{letter_grade}"
         graded_date: "đã chấm điểm: %{date}"
         no_date_set: "Không Có Ngày Đặt"
         not_applicable: "Không Có"
-        score: "điểm số:  %{score} trên %{total}"
+        score: "điểm số: %{score} trên tổng số %{total}"
         score_pending_review: "điểm đang chờ giáo viên đánh giá"
         subject: "Bài Tập Được Chấm Điểm: %{assignment}, %{context}"
       twitter: 
+        grade: "điểm: %{letter_grade}"
         no_date_set: "Không Có Ngày Đặt"
         not_applicable: "Không Có"
-        score: "điểm số:  %{score} trên %{total}"
+        score: "điểm số: %{score} trên tổng số %{total}"
         score_pending_review: "(đang chờ xem xét)"
         tweet: "Cảnh Báo Canvas - Đã Chấm Điểm: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -13935,6 +13957,7 @@ vi:
   module_publish_menu_30b638dd: "Menu Phát Hành Học Phần"
   module_publish_menu_88b54c1b: "Menu phát hành học phần"
   module_published_80f0b9b8: "Đã phát hành học phần"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Tùy chọn phát hành mô-đun"
   modules: 
     assignments_to_grade: 
       one: "1 bài tập có bài nộp chưa được chấm điểm"
@@ -15403,6 +15426,7 @@ vi:
   permissions_365c49e: Quyền
   permissions_manage_9eea4f8f: "Quyền - quản lý"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Cho phép sử dụng tất cả thông số “bao gồm” cho mã ID của nhà phát triển này. Thông số \"Bao Gồm\" có thể cấp quyền truy cập vào dữ liệu bổ sung không có trong các phạm vi được chọn bên dưới."
+  permitted_api_endpoints_b092c4cc: "Đầu Cuối API Được Phép"
   persian_a8cadb95: "Tiếng Ba Tư"
   persists_the_used_authentication_provider_when_log_15113afc: "Duy trì nhà cung cấp xác thực đã được sử dụng khi đăng nhập và mặc định các thông tin đăng nhập mới cho nhà cung cấp mặc định"
   personal_pronouns_7d271f52: "Đại Từ Nhân Xưng"
@@ -21152,6 +21176,7 @@ vi:
        Những lần tổng hợp được thực hiện từ đầu ngày đến cuối ngày trong múi giờ đã đặt của tài khoản đang chạy báo cáo đó.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Báo cáo này nhận các buổi hội nghị Big blue button gần đây cho một tài khoản."
   this_report_gets_the_submissions_for_courses_d83bb449: "Báo cáo này nhận các bài nộp cho các khóa học."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Báo cáo này cung cấp danh sánh tất cả Mã Khóa của Nhà Phát Triển có sẵn cho tổ chức. Các mã khóa này có thể được cài đặt trực tiếp trong tài khoản gốc mà báo cáo được chạy từ đó hoặc có thể được kế thừa từ tài khoản gốc phụ huynh. Mã Khóa của Nhà Phát Triển có thể là khóa API hoặc LTI."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Báo cáo này cung cấp tất cả Hồ Sơ Điện Tử hoạt động cho tổ chức hiện tại. Tùy ý chọn ‘Chỉ bao gồm Hồ Sơ Điện Tử từ những người dùng không ghi danh’ để giảm phạm vi kết quả Hồ Sơ Điện Tử xuống thành chỉ những người dùng không ghi danh. Bạn cũng có thể chạy báo cáo với ‘Bao Gồm Đối Tượng Đã Xóa’ để chỉ bao gồm những Hồ Sơ Điện Tử đã bị gỡ."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Báo cáo này hiện thị tất cả kết quả học tập tồn tại trong tài khoản này. Tập tin csv kết quả sẽ có một hàng cho mỗi kết quả và sẽ hiển thị thông tin chi tiết của tất cả các thuộc tính liên quan với mỗi kết quả."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -22044,6 +22069,7 @@ vi:
   update_criterion_edcbd330: "Cập Nhật Tiêu Chí"
   update_domain_account_lookup_9c89440d: "Cập Nhật Tra Cứu Tài Khoản Miền"
   update_failed_2c87428c: "Cập nhật không thành công"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Cập nhật bảng tóm tắt điểm để sử dụng khung hiện đại"
   update_important_info_bcc01d6a: "Cập Nhật Thông Tin Quan Trọng"
   update_inbox_page_to_use_react_instui_4d343fd: "Cập Nhật trang Hộp Thư Đến để sử dụng react/instui"
   update_link_b7cab181: "Cập nhật liên kết"
