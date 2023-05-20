@@ -4835,6 +4835,7 @@ ca:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "No pot establir la data de lliurament de substitució en una data dins d'un període de qualificació tancat"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "No es pot establir sis_account_id en un root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "No pot establir la data de lliurament en una data dins d'un període de qualificació tancat"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "No es pot desfer la supressió d’un tema secundari quan també s’ha suprimit el tema de l’assignatura arrel. Primer desfeu la supressió del tema de l’assignatura arrel."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "no podeu utilitzar noms reservats per a importadors del llibre de qualificacions"
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Els informes detallats de les activitats anònimes no es poden visualitzar fins que es publiquin les notes."
   canvas: 
@@ -5698,6 +5699,7 @@ ca:
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "ID d’LTI AGS consistents basats en el domini principal del compte"
   consortium_parent_keys_803547b: "Claus principals del consorci"
   consumer_key_6f94ba11: "Clau de consumidor"
+  contact_info_8e3304d1: "Informació de contacte"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Poseu-vos en contacte amb l'administrador si necessiteu canviar la visibilitat de l'assignatura."
   content_1440204b: Contingut
   content_access_id_601d931e: "id d’accés al contingut"
@@ -6940,7 +6942,7 @@ ca:
   course_paces_4396b508: "Ritmes de l'assignatura"
   course_paces_description: |-
       Ritme de l’assignatura permet inscriure's al Canvas de manera escalonada,
-      així com una distribució màgica de les dates de lliurament d’estudiants amb diferents
+      així com una distribució automàtica de les dates de lliurament d’estudiants amb diferents
       dates d’inici en funció del ritme definit per un instructor. Inscriviu-vos al
       *Grup d’usuaris de Ritme de l’assignatura* per obtenir més informació i fer comentaris.
   course_paces_table_ce32db1c: "Taula de ritmes de l'assignatura"
@@ -8198,6 +8200,7 @@ ca:
     unnamed_tool: "Eina sense nom"
   developer_keys_d70ba44a: "Claus de desenvolupador"
   developer_keys_manage_806da2d: "Claus de desenvolupador - administra "
+  developer_keys_report_4d041e62: "Informe de claus de desenvolupador"
   developers_keys_table_69ae6b7e: "Taula de claus de desenvolupador"
   dialog_form_wrapper: 
     cancel: Cancel·la
@@ -8724,6 +8727,7 @@ ca:
   duplicate_31cec192: Duplica
   duplicate_assignment_name_3ca7d753: "Duplica l'activitat %{name}"
   duplicate_discussion_title_6537ef4d: "Duplica el fòrum %{title}"
+  duplicate_ids_23b0a29e: "Identificadors duplicats"
   duplicate_item_339f54bb: "Duplica l'element"
   duplicate_module_name_ab26e5c3: "Duplica %{module_name}"
   duplicate_modules_8ea35557: "Duplica els mòduls"
@@ -9481,6 +9485,7 @@ ca:
   error_reports_7d6c8b1e: "Informes d’errors"
   error_retrieving_assignment_external_tools_9102d343: "Error en recuperar les eines externes de l’activitat"
   error_retrieving_content_c07ee76b: "Error en recuperar el contingut"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "S’ha produït un error en recuperar contingut de l'eina (element amb contingut erroni)"
   error_retrieving_content_from_tool_e65ef3b7: "Error en recuperar contingut de l’eina"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Error en recuperar les eines de detecció de similitud"
   error_running_quizzes_2_export_cfecedba: "Error en executar l’exportació de les Proves 2."
@@ -10166,6 +10171,7 @@ ca:
   for_canvas_admins_no_actions_or_configuration_chan_f6fee50a: "*Per a administradors del Canvas:* No cal que realitzeu cap acció ni canvi de configuració. Podeu confirmar amb els desenvolupadors de les eines de la versió 1.3 que heu instal·lat que han dut a terme aquests canvis."
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Per a desenvolupadors de l’eina LTI 1.3:* Seguiu les instruccions de la secció “Què haureu de canviar exactament?” de l'article del Canvas Community."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Per a les tasques publicades manualment, la presència d'un comentari sobre l'entrega que no sigui del mateix usuari propietari de l'entrega permetrà la publicació de la tasca. Anteriorment, això requeria una qualificació abans que es pogués publicar."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Trobareu més informació a la *documentació de l’API del Canvas*."
   for_name_d5684bfd: "Per a %{name}"
   for_students_who_d0fd45d0: "Per a estudiants que…"
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -10264,6 +10270,7 @@ ca:
   global_announcements_a78912c8: "Anuncis globals"
   global_announcements_add_edit_delete_843ca4d2: "Anuncis globals - afegeix/edita/suprimeix"
   global_branding_df1cae12: "Marca global"
+  global_id_ffe1be80: "Identificador global"
   global_inherited_developer_keys_4a6c15de: "Claus de desenvolupador heretades globals"
   global_keys_40e1a451: "Claus globals"
   global_message_icons: 
@@ -11490,6 +11497,7 @@ ca:
       Si s'habilita, els extrems d’oEmbed requeriran un
       testimoni generat per l’eina per verificar l’origen
       d’una sol·licitud de recurs d’oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Si s’ha activat, emplena prèviament el formulari d’activitats amb valors de missatges amb enllaç profund a la pàgina de creació o edició d’activitats."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Si s'habilita, els paràmetres de consulta no es copiaran al cos del POST durant l'inici de la interoperabilitat d'eines d'aprenentatge (LTI)."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Si s'habilita, els Sourceids utilitzats pel Canvas per als resultats bàsics es xifraran."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Si s'habilita, l'historial d'entrega de les proves de Proves noves es gestionarà per separat."
@@ -11852,6 +11860,7 @@ ca:
   inherit_from_course_ed8bde8c: "Hereteu de l'assignatura"
   inherited_d4d0bc33: Heretades
   inherited_developer_keys_table_e4a65b67: "Taula de claus de desenvolupador heretades"
+  inherited_from_parent_account_4776070d: "Heretat del compte principal"
   initial_sync_incomplete_ec74fe8e: "Sincronització inicial incompleta"
   inner_box_background_6f9092f: "Fons del quadre interior"
   inner_box_border_d0524b03: "Vora del quadre interior"
@@ -12223,8 +12232,10 @@ ca:
   key_api_key_68bf80ae: "Clau: *%{api_key}*"
   key_f2a919d5: Clau
   key_name_7311d22: "Nom de la clau:"
+  key_name_bc712026: "Nom de la clau"
   key_settings_44df6a41: "Configuració de la clau"
   key_state_for_the_current_account_d16b1cd5: "Estat de la clau de l'usuari actual"
+  key_type_6e8c0909: "Tipus de clau"
   keyboard_nav_dialog: 
     esc_key_notification: "Premeu la tecla Esc abans d'utilitzar les dreceres del teclat quan navegueu per la quadrícula del llibre de notes."
   keyboard_shortcut_for_missing_assignment_848aa9cd: "Drecera del teclat per a una tasca no presentada"
@@ -12852,6 +12863,7 @@ ca:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id ha de ser únic"
   lti_deep_linking_for_module_index_menu_881feeee: "Enllaç profund a LTI ( interoperabilitat d'eines d'aprenentatge) per al menú de l’índex de continguts"
   lti_deep_linking_line_items_5e0079f7: "Elements de línia d’enllaç profund d’LTI, interoperabilitat d’eines d’aprenentatge"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Elements de línia d’enllaç profund d’LTI, interoperabilitat d’eines d’aprenentatge, a la pàgina de creació o edició d'activitats"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Elements de línia d’enllaç profund d’LTI, interoperabilitat d’eines d’aprenentatge, a la pàgina d’edició d'activitats"
   lti_delete_ee5f1bef: "LTI, interoperabilitat d'eines d'aprenentatge: suprimeix"
   lti_dynamic_registration_8592edb0: "Registre dinàmic d’LTI"
@@ -14540,9 +14552,11 @@ ca:
       email: 
         body: "S'han canviat la nota de la vostra activitat %{assignment_title}."
         excused: "Aquesta activitat s'ha excusat."
+        grade: "nota: %{letter_grade}"
         html: 
           body: "S'han canviat la nota de la vostra activitat %{assignment_title}."
           excused: "Aquesta activitat s'ha excusat."
+          grade: "nota: %{letter_grade}"
           link_message: "Podeu revisar l'activitat aquí"
           no_date_set: "No s'ha establert cap data"
           not_applicable: N/A
@@ -14554,38 +14568,43 @@ ca:
         no_date_set: "No s'ha establert cap data"
         not_applicable: N/A
         regraded_date: "requalificat: %{date}"
-        score: "puntuació:  %{score} de %{total}"
+        score: "puntuació: %{score} de %{total}"
         score_pending: "puntuació pendent de revisió per part del professor"
         subject: "S'ha canviat la nota: %{assignment}, %{context}"
       sms: 
         body_sms: "La vostra nota de %{title} a %{context} acaba de canviar."
+        grade: "nota: %{letter_grade}"
         more_info: "Més informació a %{url}"
         no_date_set: "No s'ha establert cap data"
         not_applicable: N/A
         regraded_date: "requalificat: %{date}"
-        score: "puntuació:  %{score} de %{total}"
+        score: "puntuació: %{score} de %{total}"
         score_pending: "puntuació pendent de revisió per part del professor"
       summary: 
+        grade: "nota: %{letter_grade}"
         no_date_set: "No s'ha establert cap data"
         not_applicable: N/A
         regraded_date: "requalificat: %{date}"
-        score: "puntuació:  %{score} de %{total}"
+        score: "puntuació: %{score} de %{total}"
         score_pending: "puntuació pendent de revisió per part del professor"
         subject: "S'ha canviat la nota: %{title}, %{context}"
       twitter: 
+        grade: "nota: %{letter_grade}"
         no_date_set: "No s'ha establert cap data"
         not_applicable: N/A
-        score: "puntuació:  %{score} de %{total}"
+        score: "puntuació: %{score} de %{total}"
         score_pending: "(pendent de revisió)"
         tweet: "Avís del Canvas - Canvi de nota: %{date}"
     submission_graded: 
       email: 
         body: "La vostra activitat %{assignment} s'ha qualificat."
         excused: "Aquesta activitat s'ha excusat."
+        grade: "nota: %{letter_grade}"
         graded_date: "qualificat: %{date}"
         html: 
           body: "La vostra activitat %{assignment} s'ha qualificat."
           excused: "Aquesta activitat s'ha excusat."
+          grade: "nota: %{letter_grade}"
           graded_date: "qualificat: %{date}"
           link_message: "Podeu revisar l'activitat aquí"
           no_date_set: "No s'ha establert cap data"
@@ -14596,24 +14615,27 @@ ca:
         link_message: "Podeu revisar l'activitat aquí:"
         no_date_set: "No s'ha establert cap data"
         not_applicable: N/A
-        score: "puntuació:  %{score} de %{total}"
+        score: "puntuació: %{score} de %{total}"
         score_pending_review: "puntuació pendent de revisió per part del professor"
         subject: "S'ha qualificat l'activitat: %{assignment}, %{context}"
       sms: 
+        grade: "nota: %{letter_grade}"
         not_applicable: N/A
-        score: "puntuació:  %{score} de %{total}"
+        score: "puntuació: %{score} de %{total}"
         sms_body: "%{assignment} s'ha qualificat."
       summary: 
+        grade: "nota: %{letter_grade}"
         graded_date: "qualificat: %{date}"
         no_date_set: "No s'ha establert cap data"
         not_applicable: N/A
-        score: "puntuació:  %{score} de %{total}"
+        score: "puntuació: %{score} de %{total}"
         score_pending_review: "puntuació pendent de revisió per part del professor"
         subject: "S'ha qualificat l'activitat: %{assignment}, %{context}"
       twitter: 
+        grade: "nota: %{letter_grade}"
         no_date_set: "No s'ha establert cap data"
         not_applicable: N/A
-        score: "puntuació:  %{score} de %{total}"
+        score: "puntuació: %{score} de %{total}"
         score_pending_review: "(pendent de revisió)"
         tweet: "Avís del Canvas - S'ha qualificat: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -14910,6 +14932,7 @@ ca:
   module_publish_menu_30b638dd: "Menú Publicació de continguts"
   module_publish_menu_88b54c1b: "Menú Publicació de continguts"
   module_published_80f0b9b8: "S’ha publicat el contingut"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Opcions de publicació de continguts"
   modules: 
     assignments_to_grade: 
       one: "Una activitat té entregues sense qualificar"
@@ -16456,6 +16479,7 @@ ca:
   permissions_365c49e: Permisos
   permissions_manage_9eea4f8f: "Permisos - administra"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Permet l'ús de tots els paràmetres d'\"inclusió\" per a aquesta clau de desenvolupador. Els paràmetres d'\"inclusió poden concedir accés a dades addicionals que no s'inclouen als abastos seleccionats a sota."
+  permitted_api_endpoints_b092c4cc: "Extrems de l’API permesos"
   persian_a8cadb95: Persa
   persists_the_used_authentication_provider_when_log_15113afc: "Manté el proveïdor d'autenticació utilitzat en iniciar la sessió, i porta per defecte els nous inicis de sessió al proveïdor per defecte"
   personal_pronouns_7d271f52: "Pronoms personals"
@@ -22480,6 +22504,7 @@ ca:
        Els recomptes es realitzen des del començament fins al final del dia en la zona horària establerta per a l'usuari en què s’executa l’informe.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "En aquest informe s’obtenen les conferències fetes recentment amb el botó blau gran per a un usuari."
   this_report_gets_the_submissions_for_courses_d83bb449: "En aquest informe s’obtenen les entregues per a les assignatures."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "En aquest informe es proporciona una llista de totes les claus de desenvolupador disponibles per a la institució. Aquestes claus es poden instal·lar directament al compte arrel en què s’executa l’informe o es poden heretar dels comptes arrel principals. Les claus de desenvolupador poden ser d’API o d’LTI."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Aquest informe proporciona tots els ePortfolios actius per a la institució actual. Opcionalment, seleccioneu “Inclou només els ePortfolios dels usuaris sense inscripcions” per reduir l’abast dels resultats del ePortfolio a només aquells usuaris sense inscripcions. També podeu executar l’informe amb “Inclou els objectes suprimits”, per incloure només els ePortfolios que s’han suprimit."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Aquest informe mostra tots els resultats d'aprenentatge que existeixen dins d'aquest usuari. El fitxer CSV resultant tindrà una fila per a cada resultat i mostrarà els detalls dels atributs associats amb cada resultat."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -23625,6 +23650,7 @@ ca:
   update_domain_account_lookup_9c89440d: "Actualitza la consulta de domini d'usuari"
   update_failed_2c87428c: "No s’ha pogut realitzar l’actualització"
   update_file_links_to_prefer_preview_not_download_94535382: "Actualitza els enllaços de fitxers per preferir la visualització prèvia enlloc de la baixada"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Actualitzeu la taula de resum de notes per utilitzar un marc de treball modern."
   update_important_info_bcc01d6a: "Actualitza la informació important"
   update_inbox_page_to_use_react_instui_4d343fd: "Actualitza la pàgina de la safata d'entrada per utilitzar react/instui"
   update_link_b7cab181: "Actualitza l'enllaç"
@@ -24216,7 +24242,7 @@ ca:
   users_with_this_permission_may_be_able_to_use_the__84394072: "Els usuaris amb aquest permís poden utilitzar la característica Actua com per administrar la configuració de l'usuari, visualitzar i ajustar notes, accedir a la informació de l’usuari, etc. Aquests permisos també permetran als administradors designats a un usuari secundari accedir a la configuració i a la informació fora del seu usuari secundari."
   utc_e44049af: UTC
   uuid_has_been_provisioned_ab0c6c9: "S’ha proporcionat l’UUID."
-  val_percent_c2ca6679: "%val per cent"
+  val_percent_c2ca6679: "%val per cent"
   validate: 
     is_required: "Aquest camp és obligatori"
   validate_links_in_content_b1630fba: "Valida els enllaços del contingut"
@@ -24489,7 +24515,7 @@ ca:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Si se selecciona, el curs tindrà l'estat de només lectura fora d'aquestes dates."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Si se selecciona, el curs serà inaccessible fora de les dates del curs. Si les dates del curs estan en blanc, aquestes dates d'inici i fi s'aplicaran a les dates del període acadèmic."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Si se selecciona, la secció de l'assignatura tindrà l'estat de només lectura fora d'aquestes dates."
-  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "Un cop establerta, una opció de no mostrar una prova nova amb 0 punts possibles al llibre de qualificacions estarà disponible en forma de casella de verificació en crear o editar la prova."
+  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "Un cop establerta, una opció de no mostrar una prova nova amb 0 punts possibles al llibre de qualificacions estarà disponible en forma de casella de verificació en crear o editar la prova."
   when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Un cop establert, determina si l'estat del flux de treball d’una prova nova s’ha d'establir com a qualificat o pending_review en cas que un usuari tingués una prova nova pending_review anterior, però s’hagi tornat a inscriure en l'assignatura."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Quan aquesta marca està habilitada, la navegació del curs romandrà contreta o desplegada
