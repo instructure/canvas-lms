@@ -6156,6 +6156,7 @@ ar:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "يتعذر تعيين تاريخ استحقاق إلغاء إلى تاريخ خلال فترة منح مغلقة لمنح العلامات"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "لا يمكن تعيين sis_account_id على root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "يتعذر تعيين تاريخ استحقاق إلى تاريخ خلال فترة منح مغلقة لمنح العلامات"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "يتعذر إلغاء حذف موضوع فرعي عند حذف موضوع المساق الجذري أيضًا. يرجى إلغاء حذف موضوع السبب الجذري بدلاً من ذلك."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "يتعذر استخدام الأسماء المحجوزة لمستورد دفتر الدرجات"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "يتعذر عرض تقارير تفصيلية للمهام مجهولة الهوية حتى يتم إلغاء إخفاء الدرجات."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "يتعذر عرض تقارير تفصيلية للمهام مجهولة الهوية حتى يتم نشر الدرجات."
@@ -7126,6 +7127,7 @@ ar:
   consortium_parent_keys_803547b: "مفاتيح المجمع الأصلية"
   consumer_key_57d9fcf1: "مفتاح العميل"
   consumer_key_6f94ba11: "مفتاح العميل"
+  contact_info_8e3304d1: "معلومات الاتصال"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "اتصل بمسؤولك إذا كنت بحاجة بتغيير رؤية المساق."
   content_1440204b: المحتوى
   content_access_id_601d931e: "معرف الوصول للمحتوى"
@@ -8936,7 +8938,7 @@ ar:
   course_paces_4396b508: "سرعات المساق"
   course_paces_description: |-
       تضيف سرعة المساق التسجيلات المستمرة إلى Canvas؛
-      للسماح للتوزيع السحري لتواريخ الاستحقاق للطلاب بتواريخ بدء مختلفة
+      للتوزيع التلقائي لتواريخ الاستحقاق للطلاب بتواريخ بدء مختلفة
       بناءً على سرعة محددة للمعلم. اعرف المزيد وقدم ملاحظات
       للانضمام إلى *مجموعة مستخدمي سرعة المساق*.
   course_paces_table_ce32db1c: "جدول سرعات المساق"
@@ -10628,6 +10630,7 @@ ar:
     unnamed_tool: "أداة غير مسماة"
   developer_keys_d70ba44a: "مفاتيح المطور"
   developer_keys_manage_806da2d: "مفاتيح المطورين - إدارة "
+  developer_keys_report_4d041e62: "تقرير مفاتيح المطور"
   developername_logo_88951d4: "%{developerName} شعار"
   developers_keys_table_69ae6b7e: "جدول مفاتيح المطورين"
   dialog_form_wrapper: 
@@ -11350,6 +11353,7 @@ ar:
   duplicate_assignment_name_3ca7d753: "تكرار المهمة %{name}"
   duplicate_discussion_title_43b39959: "تكرار المناقشة %{title}"
   duplicate_discussion_title_6537ef4d: "تكرار المناقشة %{title}"
+  duplicate_ids_23b0a29e: "معرفات مكررة"
   duplicate_item_339f54bb: "عنصر مكرر"
   duplicate_module_module_name_be40ad50: "تكرار الوحدة النمطية %{module_name}"
   duplicate_module_name_ab26e5c3: "تكرار %{module_name}"
@@ -12239,6 +12243,7 @@ ar:
   error_retrieving_assignment_configuration_tools_f7d75303: "خطأ أثناء استعادة أدوات تكوين المهمة"
   error_retrieving_assignment_external_tools_9102d343: "خطأ أثناء استعادة الأدوات الخارجية للمهمة"
   error_retrieving_content_c07ee76b: "حدث خطأ في استعادة المحتوى"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "خطأ أثناء استرداد المحتوى من الأداة (عنصر محتوى سيء)"
   error_retrieving_content_from_tool_e65ef3b7: "حدث خطأ أثناء استرداد محتوى من الأداة"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "خطأ أثناء استعادة أدوات اكتشاف التشابه"
   error_running_quizzes_2_export_cfecedba: "خطأ أثناء تشغيل تصدير اختبارات موجزة 2."
@@ -13252,6 +13257,7 @@ ar:
   for_each_late_62aecf41: "لكل تأخير"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*لمطوري أداة LTI 1.3:* اتبع الاتجاهات في قسم \"ماذا تريد تغييره بالضبط؟\" بمقال المجتمع."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "للمهام المنشورة يدويًا، سيؤدي تواجد تعليق إرسال من غير المستخدم مالك الإرسال إلى السماح بنشر المهمة. كان هذا يتطلب في السابق وجود تقدير قبل إمكانية النشر."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "للمزيد من المعلومات، انظر *وثائق واجهة برمجة تطبيقات Canvas*."
   for_name_d5684bfd: "بالنسبة لـ %{name}"
   for_students_who_d0fd45d0: "للطلاب الذين..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -13378,6 +13384,7 @@ ar:
   global_announcements_a78912c8: "الإعلانات العمومية"
   global_announcements_add_edit_delete_843ca4d2: "الإعلانات العامة - إضافة / تحرير / حذف"
   global_branding_df1cae12: "العلامات العامة"
+  global_id_ffe1be80: "معرف عمومي"
   global_inherited_developer_keys_4a6c15de: "مفاتيح المطور الموروث العمومي"
   global_keys_40e1a451: "المفاتيح العمومية"
   global_message_icons: 
@@ -15473,6 +15480,7 @@ ar:
       إذا تم تمكين هذا الخيار، ستتطلب نقاط نهاية oEmbed
       رمزًا مميزًا منشأ من أداة للتحقق من
       أصل طلب مورد oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "إذا تم التمكين، يعبئ مسبقًأ نموذج المهمة من القيم في رسائل الرابط العميق في صفحة إنشاء/تحرير المهام."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "في حال تمكين معلمات الاستعلام، لن يتم نسخها في نص المنشورة أثناء تشغيل LTI."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "في حالة التمكين، سيتم التحقق من النطاقات في طلبات API إذا احتاج مفتاح المطور المستخدم لنطاقات."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "إذا تم التمكين، سيتم تشفير معرفات المصدر المستخدمة بواسطة Canvas للنواتج الأساسية."
@@ -15907,6 +15915,7 @@ ar:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "مورث - سيتم توريث القائمة البيضاء من حساب ولي الأمر.  يمكن إضافة المجالات، لكن لن تُجبر على القيام بذلك إلا إذا قمت بتغيير هذا الإعداد إلى \"تشغيل\"."
   inherited_d4d0bc33: موروث
   inherited_developer_keys_table_e4a65b67: "جدول مفاتيح المطورين الموروث"
+  inherited_from_parent_account_4776070d: "موروث من الحساب الأصلي"
   initial_sync_incomplete_ec74fe8e: "المزامنة الأولية غير مكتملة"
   inner_box_background_6f9092f: "خلفية المربع الداخلي"
   inner_box_border_d0524b03: "حافة المربع الداخلي"
@@ -16358,8 +16367,10 @@ ar:
   key_f2a919d5: المفتاح
   key_ff4089c5: "المفتاح:"
   key_name_7311d22: "اسم المفتاح:"
+  key_name_bc712026: "اسم المفتاح"
   key_settings_44df6a41: "إعدادات المفتاح"
   key_state_for_the_current_account_d16b1cd5: "حالة المفتاح للحساب الحالي"
+  key_type_6e8c0909: "نوع المفتاح"
   keyboard_instructions_e032939f: "تعليمات لوحة المفاتيح"
   keyboard_nav_dialog: 
     esc_key_notification: "اضغط على Escape باستخدام اختصارات لوحة المفاتيح أثناء تصفح العرض الشبكي لدفتر الدرجات."
@@ -17086,6 +17097,7 @@ ar:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id يجب أن يكون فريدًا"
   lti_deep_linking_for_module_index_menu_881feeee: "الربط العميق لـ LTI لقائمة فهرس الوحدة النمطية"
   lti_deep_linking_line_items_5e0079f7: "عناصر بنود الارتباط الداخلي في LTI"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "عناصر بنود الارتباط الداخلي في LTI في صفحة إنشاء/تحرير المهام"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "عناصر بنود الارتباط الداخلي في LTI في صفحة  تحرير المهام"
   lti_delete_ee5f1bef: "LTI - حذف"
   lti_dynamic_registration_8592edb0: "التسجيل الديناميكي لـ LTI"
@@ -19140,9 +19152,11 @@ ar:
       email: 
         body: "لقد تم تغيير الدرجة الخاصة بمهمتك %{assignment_title}."
         excused: "هذه المهمة لم تعد إجبارية."
+        grade: "التقدير: %{letter_grade}"
         html: 
           body: "لقد تم تغيير الدرجة الخاصة بمهمتك %{assignment_title}."
           excused: "هذه المهمة لم تعد إجبارية."
+          grade: "التقدير: %{letter_grade}"
           link_message: "يمكنك مراجعة التقييم هنا"
           no_date_set: "لم يتم تعيين تاريخ"
           not_applicable: "لا يوجد"
@@ -19154,38 +19168,43 @@ ar:
         no_date_set: "لم يتم تعيين تاريخ"
         not_applicable: "لا يوجد"
         regraded_date: "تمت إعادة تقييم الدرجات: %{date}"
-        score: "النقاط:  %{score} من  %{total}"
+        score: "الدرجة: %{score} من أصل %{total}"
         score_pending: "مراجعة النقاط المعلقة بواسطة المعلم"
         subject: "الدرجة التي تم تغييرها: %{assignment}, %{context}"
       sms: 
         body_sms: "تغيرت درجتك للتو ل%{title} في %{context}."
+        grade: "التقدير: %{letter_grade}"
         more_info: "مزيد من المعلومات على %{url}"
         no_date_set: "لم يتم تعيين تاريخ"
         not_applicable: "لا يوجد"
         regraded_date: "تمت إعادة تقييم الدرجات: %{date}"
-        score: "النقاط:  %{score} من  %{total}"
+        score: "الدرجة: %{score} من أصل %{total}"
         score_pending: "مراجعة النقاط المعلقة بواسطة المعلم"
       summary: 
+        grade: "التقدير: %{letter_grade}"
         no_date_set: "لم يتم تعيين تاريخ"
         not_applicable: "لا يوجد"
         regraded_date: "تمت إعادة تقييم الدرجات: %{date}"
-        score: "النقاط:  %{score} من  %{total}"
+        score: "الدرجة: %{score} من أصل %{total}"
         score_pending: "مراجعة النقاط المعلقة بواسطة المعلم"
         subject: "الدرجة التي تغيرت: %{title}, %{context}"
       twitter: 
+        grade: "التقدير: %{letter_grade}"
         no_date_set: "لم يتم تعيين تاريخ"
         not_applicable: "لا يوجد"
-        score: "النقاط:  %{score} من  %{total}"
+        score: "الدرجة: %{score} من أصل %{total}"
         score_pending: "(تعليق المراجعة)"
         tweet: "تنبيه Canvas - تغيير الدرجة: %{date}"
     submission_graded: 
       email: 
         body: "تم تقدير درجة تقييمك %{assignment}."
         excused: "هذه المهمة لم تعد إجبارية."
+        grade: "التقدير: %{letter_grade}"
         graded_date: "تم تقييم الدرجات: %{date}"
         html: 
           body: "تم تقدير درجة تقييمك %{assignment}."
           excused: "هذه المهمة لم تعد إجبارية."
+          grade: "التقدير: %{letter_grade}"
           graded_date: "تم تقييم الدرجات: %{date}"
           link_message: "يمكنك مراجعة المهمة هنا"
           no_date_set: "لم يتم تعيين تاريخ"
@@ -19196,28 +19215,31 @@ ar:
         link_message: "يمكنك مراجعة المهمة هنا:"
         no_date_set: "لم يتم تعيين تاريخ"
         not_applicable: "لا يوجد"
-        score: "النقاط:  %{score} من  %{total}"
+        score: "الدرجة: %{score} من أصل %{total}"
         score_pending_review: "مراجعة النقاط المعلقة بواسطة المعلم"
         subject: "تم تقييم درجات للمهمة: %{assignment}, %{context}"
       sms: 
+        grade: "التقدير: %{letter_grade}"
         graded_date: "تم تقييم الدرجات: %{date}"
         more_info: "مزيد من المعلومات على %{url}"
         no_date_set: "لم يتم تعيين تاريخ"
         not_applicable: "لا يوجد"
-        score: "النقاط:  %{score} من  %{total}"
+        score: "الدرجة: %{score} من أصل %{total}"
         score_pending_review: "مراجعة النقاط المعلقة بواسطة المعلم"
         sms_body: "تم منح درجة لـ %{assignment}."
       summary: 
+        grade: "التقدير: %{letter_grade}"
         graded_date: "تم تقييم الدرجات: %{date}"
         no_date_set: "لم يتم تعيين تاريخ"
         not_applicable: "لا يوجد"
-        score: "النقاط:  %{score} من  %{total}"
+        score: "الدرجة: %{score} من أصل %{total}"
         score_pending_review: "مراجعة النقاط المعلقة بواسطة المعلم"
         subject: "خطأ ارتباط محتوى - %{assignment}, %{context}"
       twitter: 
+        grade: "التقدير: %{letter_grade}"
         no_date_set: "لم يتم تعيين تاريخ"
         not_applicable: "لا يوجد"
-        score: "النقاط:  %{score} من  %{total}"
+        score: "الدرجة: %{score} من أصل %{total}"
         score_pending_review: "(تعليق المراجعة)"
         tweet: "تنبيه Canvas - تم تقييم الدرجات: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -19576,6 +19598,7 @@ ar:
   module_publish_menu_30b638dd: "قائمة نشر الوحدة النمطية"
   module_publish_menu_88b54c1b: "قائمة نشر الوحدة النمطية"
   module_published_80f0b9b8: "تم نشر الوحدة النمطية"
+  modulename_module_publish_options_69ef1ece: "خيارات نشر الوحدة النمطية %{moduleName}"
   modules: 
     add: 
       assignment: 
@@ -21518,6 +21541,7 @@ ar:
   permissions_manage_9eea4f8f: "الأذونات - إدارة"
   permissions_v2_page_f96dde06: "صفحة الإصدار الثاني من الأذونات"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "السماح باستخدام كافة معلمات \"تضمين\" لمفتاح المطور هذا. قد تمنح معلمات \"تضمين\" إمكانية الوصول إلى بيانات إضافية غير مضمنة في النطاقات المحددة أدناه."
+  permitted_api_endpoints_b092c4cc: "نقاط نهاية API المسموح بها"
   persian_a8cadb95: الفارسية
   persists_the_used_authentication_provider_when_log_15113afc: "تصر على موفر المصادقة المستخدمة عند تسجيل الدخول، وتضع بيانات تسجيل دخول جديدة للموفر الافتراضي"
   personal_pronouns_7d271f52: "الضمائر الشخصية"
@@ -29277,6 +29301,7 @@ ar:
        تتم الأعداد من بداية اليوم إلى نهايته في المنطقة الزمنية المحددة للحساب الذي يجري التقرير.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "يحصل هذا التقرير على مؤتمرات BigBlueButton لأحد الحسابات."
   this_report_gets_the_submissions_for_courses_d83bb449: "يحصل هذا التقرير على إرسالات للمساقات."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "يقدم هذا التقرير قائمة تضم جميع مفاتيح المطور المتاحة للمؤسسة. يمكن إما تثبيت هذه المفاتيح مباشرة في الحساب الجذري الذي يعمل منه التقرير أو وراثتها من الحسابات الجذرية الأصلية. مفاتيح المطور إما أن تكون مفاتيح API أو LTI."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "يوفر هذا التقرير كافة المستعرضات الإلكترونية النشطة للمؤسسة التعليمية الحالية. يمكنك تحديد \"تضمين المستعرضات الإلكترونية من المستخدمين بدون تسجيلات فقط\" لقصر نطاق نتائج المستعرضة الإلكترونية على هؤلاء المستخدمين بدون تسجيلات. كما يمكنك أيضًا إجراء التقرير مع \"تضمين الكائنات المحذوفة\" لتضمين المستعرضات الإلكترونية التي أزيلت فقط."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "يظهر هذا التقرير كافة حصائل التعلم الموجودة داخل هذا الحساب. سيحتوي ملف csv الناتج على صف واحد لكل حصيلة، وسيظهر تفاصيل كافة السمات المقترنة بكل حصيلة."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -30701,6 +30726,7 @@ ar:
   update_domain_account_lookup_9c89440d: "تحديث البحث عن حساب المجال"
   update_failed_2c87428c: "تعذر التحديث"
   update_file_links_to_prefer_preview_not_download_94535382: "تحديث روابط الملفات لتفضيل المعاينة وليس التنزيل"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "تحديث جدول موجز التقديرات لاستخدام إطار حديث"
   update_how_we_process_sis_imports_8195bf77: "تحديث طريقة معالجة عمليات استيراد SIS"
   update_important_info_bcc01d6a: "تحديث المعلومات الهامة"
   update_inbox_page_to_use_react_instui_4d343fd: "تحديث صفحة علبة البريد لاستخدام التفاعل/المؤسسة"
