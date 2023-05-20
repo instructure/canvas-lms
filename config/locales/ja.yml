@@ -5993,6 +5993,7 @@ ja:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: 上書き締め切り日を終了した採点期間内の日付に設定することはできません
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: ～のsis_account_idを設定できませんroot_account.
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: 締め切り日を終了した採点期間内の日付に設定することはできません
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: ルートコーストピックも削除されている場合、子トピックの削除を解除できません。代わりにルートコースのトピックを削除してください。
   cannot_use_gradebook_importer_reserved_names_8f3b5748: 表定表インポーターの予約名を使用できません
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: 成績がミュート解除されるまで、匿名課題の詳細レポートは表示できません。
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: 評定が公開されるまで、匿名課題の詳細レポートは表示できません。
@@ -6955,6 +6956,7 @@ ja:
   consortium_parent_keys_803547b: コンソーシアムペアレント（上位）キー
   consumer_key_57d9fcf1: コンシューマ鍵
   consumer_key_6f94ba11: コンシューマ鍵
+  contact_info_8e3304d1: 連絡先情報
   contact_your_administrator_if_you_need_to_change_c_9002a501: コースの表示を変更する必要がある場合は、管理者に連絡してください。
   content_1440204b: コンテンツ
   content_access_id_601d931e: "コンテンツアクセス ID"
@@ -8473,9 +8475,9 @@ ja:
   course_pace_plan_c79cbffc: コースペース計画
   course_paces_4396b508: コースペース
   course_paces_description: |-
-      コースペーシングは、Canvas にローリング登録のサポートを追加します。
-      講師が定義するペースに基づいて、異なる開始日の学生に魔法
-      のように期日を分配することができます。*コースペースのユーザーグループ*
+      コースペーシングは、Canvasにローリングエンロールメントのサポートを追加します。
+      講師が定義したペースに基づいて、開始日が異なる
+      受講者の締切日を自動的に配分します。*コースペースのユーザーグループ*
       に参加して、詳細を知り、フィードバックを行ってください。
   course_paces_table_ce32db1c: コースペーシング表
   course_pacing_40c14b61: コースペーシング
@@ -10077,6 +10079,7 @@ ja:
     unnamed_tool: 名前のないツール
   developer_keys_d70ba44a: 開発者鍵
   developer_keys_manage_806da2d: "開発者キー - 管理"
+  developer_keys_report_4d041e62: 開発者キーレポート
   developername_logo_88951d4: "%{developerName}ロゴ"
   developers_keys_table_69ae6b7e: 開発者キーの表
   dialog_form_wrapper: 
@@ -10771,6 +10774,7 @@ ja:
   duplicate_assignment_name_3ca7d753: "重複する課題%{name}"
   duplicate_discussion_title_43b39959: "ディスカッションを複製する%{title}"
   duplicate_discussion_title_6537ef4d: "ディスカッションを複製する%{title}"
+  duplicate_ids_23b0a29e: 重複ID
   duplicate_item_339f54bb: 項目重複
   duplicate_module_module_name_be40ad50: "モジュールを複製%{module_name}"
   duplicate_module_name_ab26e5c3: "重複%{module_name}"
@@ -11642,6 +11646,7 @@ ja:
   error_retrieving_assignment_configuration_tools_f7d75303: 課題設定ツールの取得中にエラーが発生しました
   error_retrieving_assignment_external_tools_9102d343: 課題外部ツールの取得中にエラーが発生しました
   error_retrieving_content_c07ee76b: コンテンツを取得中にエラー
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: ツールからコンテンツを取得する際にエラーが発生（不良コンテンツアイテム）
   error_retrieving_content_from_tool_e65ef3b7: ツールからのコンテンツの取得中にエラーが発生しました
   error_retrieving_similarity_detection_tools_d6d4f9e9: 類似性検知ツールの取得中にエラーが発生しました
   error_running_quizzes_2_export_cfecedba: 小テスト2のエクスポートを実行中にエラーが発生しました。
@@ -12554,6 +12559,7 @@ ja:
   for_each_late_62aecf41: 遅延ごとに
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*LTI 1.3ツール開発者用：*コミュニティ記事の「実際に何を変更する必要がありますか」のセクションの指示に従ってください。"
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: 手動で投稿された課題の場合、投稿者自身のユーザー以外からの投稿コメントが存在すると、課題の投稿が許可されます。以前は、当校を行う前に成績が必要でした。
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "詳しくは、*Canvas APIのドキュメント*を参照してください。"
   for_name_d5684bfd: "対象%{name}"
   for_students_who_d0fd45d0: 次の状態の受講者に...
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -12660,6 +12666,7 @@ ja:
   global_announcements_a78912c8: "グローバル アナウンスメント"
   global_announcements_add_edit_delete_843ca4d2: "グローバルアナウンス - 追加/編集/削除"
   global_branding_df1cae12: グローバルブランディング
+  global_id_ffe1be80: グローバルID
   global_inherited_developer_keys_4a6c15de: グローバルに継承された開発者キー
   global_keys_40e1a451: グローバルキー
   global_message_icons: 
@@ -14668,6 +14675,7 @@ ja:
       有効にした場合、oEmbedエンドポイントは、
       oEmbedリソース要求の発信元を確認するために、
       ツールが生成したトークンを要求します。
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: 有効な場合、課題の作成/編集ページのディープリンクメッセージの値で課題フォームを事前記入します。
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: 有効にした場合、LTI起動中にクエリーパラメーターは、ポストボディーにはコピーされません。
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "有効にすると、使用されている開発者鍵に範囲が必要な場合、API リクエストで範囲が検証されます。"
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "有効にすると、Canvas が 基本的なアウトカムで使用する Sourcedids が暗号化されます。"
@@ -15101,6 +15109,7 @@ ja:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "継承 - ホワイトリストは親アカウントから継承されます。ドメインを追加することはできますが、この設定をオンに変更するまでドメインは適用されません。"
   inherited_d4d0bc33: 引き継がれた
   inherited_developer_keys_table_e4a65b67: 引き継がれた開発者キーの表
+  inherited_from_parent_account_4776070d: 親アカウントから継承された
   initial_sync_incomplete_ec74fe8e: 最初の同期が不完全
   inner_box_background_6f9092f: インナーボックスの背景
   inner_box_border_d0524b03: インナーボックスのボーダー
@@ -15552,8 +15561,10 @@ ja:
   key_f2a919d5: キー
   key_ff4089c5: キー：
   key_name_7311d22: "鍵名:"
+  key_name_bc712026: キー名
   key_settings_44df6a41: 鍵の設定
   key_state_for_the_current_account_d16b1cd5: 現在のアカウントの鍵の状態
+  key_type_6e8c0909: キータイプ
   keyboard_instructions_e032939f: キーボードのインストラクション
   keyboard_nav_dialog: 
     esc_key_notification: 評定表のグリッドをナビゲートする場合、キーボードショートカットを使用する前に、エスケープキーを押してください。
@@ -16263,6 +16274,7 @@ ja:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id は一意です"
   lti_deep_linking_for_module_index_menu_881feeee: モジュールインデックスメニューのLTIディープリンク
   lti_deep_linking_line_items_5e0079f7: "LTI ディープリンキングライン項目"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: LTI課題の作成/編集ページのディープリンク行項目
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: 課題編集ページでのLTIディープリンクラインアイテム
   lti_delete_ee5f1bef: "LTI - 削除"
   lti_dynamic_registration_8592edb0: "LTI ダイナミックレジストレーション"
@@ -18277,9 +18289,11 @@ ja:
       email: 
         body: "あなたの課題%{assignment_title}の評定が変更されました。"
         excused: この課題は免除されました
+        grade: "評定：%{letter_grade}"
         html: 
           body: "あなたの課題%{assignment_title}の評定が変更されました。"
           excused: この課題は免除されました
+          grade: "評定：%{letter_grade}"
           link_message: 課題はここでレビューできます
           no_date_set: 日付が設定されていません
           not_applicable: N/A
@@ -18291,38 +18305,43 @@ ja:
         no_date_set: 日付が設定されていません
         not_applicable: N/A
         regraded_date: "再評価日: %{date}"
-        score: "スコア:%{score} / 配点: %{total}"
+        score: "スコア：%{score} / %{total}"
         score_pending: 教員によるレビューが保留になっているスコア
         subject: "評定変更: %{assignment}、%{context}"
       sms: 
         body_sms: "あなたの%{title}の評定（%{context}内）がいま変更されました。"
+        grade: "評定：%{letter_grade}"
         more_info: "詳細は %{url} をご覧ください"
         no_date_set: 日付が設定されていません
         not_applicable: N/A
         regraded_date: "再評価日: %{date}"
-        score: "スコア:%{score} / 配点: %{total}"
+        score: "スコア：%{score} / %{total}"
         score_pending: 教員によるレビューが保留になっているスコア
       summary: 
+        grade: "評定：%{letter_grade}"
         no_date_set: 日付が設定されていません
         not_applicable: N/A
         regraded_date: "再評価日: %{date}"
-        score: "スコア:%{score} / 配点: %{total}"
+        score: "スコア：%{score} / %{total}"
         score_pending: 教員によるレビューが保留になっているスコア
         subject: "評定変更: %{title}、%{context}"
       twitter: 
+        grade: "評定：%{letter_grade}"
         no_date_set: 日付が設定されていません
         not_applicable: N/A
-        score: "スコア:%{score} / 配点: %{total}"
+        score: "スコア：%{score} / %{total}"
         score_pending: (レビュー保留中)
         tweet: "Canvas アラート - 評定変更: %{date}"
     submission_graded: 
       email: 
         body: "あなたの課題%{assignment}がいま採点されました。"
         excused: この課題は免除されました
+        grade: "評定：%{letter_grade}"
         graded_date: "採点日: %{date}"
         html: 
           body: "あなたの課題%{assignment}がいま採点されました。"
           excused: この課題は免除されました
+          grade: "評定：%{letter_grade}"
           graded_date: "採点日: %{date}"
           link_message: 課題はここでレビューできます
           no_date_set: 日付が設定されていません
@@ -18333,28 +18352,31 @@ ja:
         link_message: "課題はここでレビューできます:"
         no_date_set: 日付が設定されていません
         not_applicable: N/A
-        score: "スコア:%{score} / 配点: %{total}"
+        score: "スコア：%{score} / %{total}"
         score_pending_review: 教員によるレビューが保留になっているスコア
         subject: "課題が採点されました: %{assignment}、%{context}"
       sms: 
+        grade: "評定：%{letter_grade}"
         graded_date: "採点日: %{date}"
         more_info: "詳細は %{url} をご覧ください"
         no_date_set: 日付が設定されていません
         not_applicable: N/A
-        score: "スコア:%{score} / 配点: %{total}"
+        score: "スコア：%{score} / %{total}"
         score_pending_review: 講師によるレビューが保留になっているスコア
         sms_body: "%{assignment}が採点されました。"
       summary: 
+        grade: "評定：%{letter_grade}"
         graded_date: "採点日: %{date}"
         no_date_set: 日付が設定されていません
         not_applicable: N/A
-        score: "スコア:%{score} / 配点: %{total}"
+        score: "スコア：%{score} / %{total}"
         score_pending_review: 教員によるレビューが保留になっているスコア
         subject: "課題が採点されました: %{assignment}、%{context}"
       twitter: 
+        grade: "評定：%{letter_grade}"
         no_date_set: 日付が設定されていません
         not_applicable: N/A
-        score: "スコア:%{score} / 配点: %{total}"
+        score: "スコア：%{score} / %{total}"
         score_pending_review: (レビュー保留中)
         tweet: "Canvas アラート - 採点済み: %{assignment}、%{context}"
     submission_needs_grading: 
@@ -18685,6 +18707,7 @@ ja:
   module_publish_menu_30b638dd: モジュール公開メニュー
   module_publish_menu_88b54c1b: モジュール公開メニュー
   module_published_80f0b9b8: モジュールは公開
+  modulename_module_publish_options_69ef1ece: "%{moduleName}モジュール公開オプション"
   modules: 
     add: 
       assignment: 
@@ -20591,6 +20614,7 @@ ja:
   permissions_manage_9eea4f8f: "権限 - 管理"
   permissions_v2_page_f96dde06: 許可V2ページ
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: この開発者キーに対してすべての「含める」パラメーターの使用を許可します。「含める」パラメーターは、以下で選択した範囲に含まれない追加データへのアクセスを許可する場合があります。
+  permitted_api_endpoints_b092c4cc: 許可されたAPIエンドポイント
   persian_a8cadb95: ペルシャ語
   persists_the_used_authentication_provider_when_log_15113afc: ログイン時に使用されている認証プロバイダーを保持し、新しいログインをデフォルトのプロバイダーにデフォルト設定します
   personal_pronouns_7d271f52: 人称代名詞
@@ -27968,6 +27992,7 @@ ja:
        数は、レポートを実行しているアカウントの設定されたタイムゾーンの1日の始まりから終わりまで行われます。
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: このレポートは、あるアカウントの最近の「ビッグブルーボタンの会議」を取得します。
   this_report_gets_the_submissions_for_courses_d83bb449: このレポートは、コースへの提出を取得します。
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: このレポートは、組織が利用可能なすべての開発者キーのリストを提供するものです。これらのキーは、レポートが実行されるルートアカウントに直接インストールすることも、親ルートアカウントから継承することもできます。開発者キーは、APIキーまたはLTIキーのどちらかです。
   this_report_provides_all_active_eportfolios_for_th_f7432621: このレポートは、現在の機関のすべてのアクティブなeポートフォリオを提供します。オプションとして、「登録されていないユーザーからのePortfolioのみを含める」を選択して、ePortfolioの結果の範囲を登録されていないユーザーのみに縮小します。「削除されたオブジェクトを含める」を使用してレポートを実行し、削除されたeポートフォリオのみを含めることもできます。
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: このレポートには、このアカウント内に存在するすべての学習アウトカムが表示されています。アウトカムのCSVファイルはアウトカムごとに1つの行があり、各行に関連するすべての属性の詳細を各アウトカムと共に表示します。
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -29371,6 +29396,7 @@ ja:
   update_domain_account_lookup_9c89440d: "ドメイン アカウント ルックアップの更新"
   update_failed_2c87428c: 更新失敗
   update_file_links_to_prefer_preview_not_download_94535382: ダウンロードではなくプレビューを優先するようにファイルのリンクを更新する。
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: 最新のフレームワークを使用するために評定サマリー表を更新する
   update_how_we_process_sis_imports_8195bf77: SISインポートの処理方法を更新する
   update_important_info_bcc01d6a: 重要な情報を更新する
   update_inbox_page_to_use_react_instui_4d343fd: react/instuiを使用するように受信トレイページを更新します
