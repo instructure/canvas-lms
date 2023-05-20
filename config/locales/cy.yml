@@ -5496,6 +5496,7 @@ cy:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Does dim modd gosod y dyddiad diystyru i ddyddiad sydd o fewn cyfnod graddio sydd wedi dod i ben"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Does dim modd gosod sis_account_id ar gyfer root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Does dim modd gosod y dyddiad erbyn i ddyddiad sydd o fewn cyfnod graddio sydd wedi dod i ben"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Does dim modd dad-ddileu pwnc plentyn pan fo’r pwrs cwrs gwraidd yn cael ei ddileu hefyd. Ewch ati i ddad-ddileu’r pwnc cwrs gwraidd yn ei le."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "does dim modd defnyddio enwau sydd wedi’u dewis yn barod ar gyfer mewngludwr llyfr graddau"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Does dim modd gweld adroddiadau manwl o aseiniadau dienw nes bod y graddau wedi’u dad-dewi."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Does dim modd gweld adroddiadau manwl ar gyfer aseiniadau dienw nes bod y graddau’n cael eu postio."
@@ -6394,6 +6395,7 @@ cy:
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "IDs LTI AGS Cyson yn seiliedig ar brif barth y Cyfrif"
   consortium_parent_keys_803547b: "Allweddi rhiant ar gyfer consortiwm"
   consumer_key_6f94ba11: "Allwedd Defnyddiwr"
+  contact_info_8e3304d1: "Manylion Cyswllt"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Cysylltwch â’ch gweinyddwr os bydd angen i chi newid y gallu i weld y cwrs."
   content_1440204b: Cynnwys
   content_access_id_601d931e: "id mynediad cynnwys"
@@ -7875,9 +7877,9 @@ cy:
   course_paces_4396b508: "Cyflymderau'r Cwrs"
   course_paces_description: |-
       Mae Cyflymder y Cwrs yn ychwanegu cymorth ar gyfer ymrestriadau parhaus i Canvas.
-      Mae’n caniatáu dosbarthiad hudolus o ddyddiadau erbyn i fyfyrwyr â dyddiad dechrau
+      Mae’n caniatáu dosbarthiad awtomatig o ddyddiadau erbyn i fyfyrwyr â dyddiad dechrau
       gwahanol yn seiliedig ar gyflymder yr addysgwr. Gallwch ddysgu mwy a rhoi
-      fadborth drwy ymuno â *Grŵp Defnyddwyr Cyflymder y Cwrs*.
+      adborth drwy ymuno â *Grŵp Defnyddwyr Cyflymder y Cwrs*.
   course_paces_table_ce32db1c: "Tabl Cyflymderau Cwrs"
   course_pacing_40c14b61: "Cyflymder y Cwrs"
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "Mae Cyflymder y Cwrs yn ychwanegu cymorth ar gyfer ymrestriadau parhaus i Canvas. Mae’n caniatáu dosbarthiad hudolus o ddyddiadau erbyn i fyfyrwyr â dyddiad dechrau gwahanol yn seiliedig ar gyflymder yr addysgwr. Gallwch ddysgu mwy a rhoi adborth drwy ymuno â Grŵp Defnyddwyr Cyflymder y Cwrs."
@@ -9324,6 +9326,7 @@ cy:
     unnamed_tool: "Adnodd Dienw"
   developer_keys_d70ba44a: "Allweddi Datblygwyr"
   developer_keys_manage_806da2d: "Allweddi Datblygwyr - rheoli "
+  developer_keys_report_4d041e62: "Adroddiad Allweddi Datblygwyr"
   developername_logo_88951d4: "%{developerName} Logo"
   developers_keys_table_69ae6b7e: "Tabl Allweddi Datblygwyr"
   dialog_form_wrapper: 
@@ -9957,6 +9960,7 @@ cy:
   duplicate_assignment_name_3ca7d753: "Dyblygu Aseiniad %{name}"
   duplicate_discussion_title_43b39959: "Dyblygu Trafodaeth %{title}"
   duplicate_discussion_title_6537ef4d: "Dyblygu trafodaeth %{title}"
+  duplicate_ids_23b0a29e: "Dyblygu IDs"
   duplicate_item_339f54bb: "Dyblygu eitem"
   duplicate_module_module_name_be40ad50: "Dyblygu Modiwl %{module_name}"
   duplicate_module_name_ab26e5c3: "Dyblygu %{module_name}"
@@ -10771,6 +10775,7 @@ cy:
   error_reports_7d6c8b1e: "Adroddiadau ynghylch Gwallau"
   error_retrieving_assignment_external_tools_9102d343: "Gwall wrth adfer adnoddau allanol aseiniad"
   error_retrieving_content_c07ee76b: "Gwall wrth adfer cynnwys"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Gwall wrth adfer cynnwys o adnodd (eitem cynnwys drwg)"
   error_retrieving_content_from_tool_e65ef3b7: "Gwall wrth adfer cynnwys o adnodd"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Gwall wrth adfer adnoddau adnabod tebygrwydd"
   error_running_quizzes_2_export_cfecedba: "Gwall wrth allgludo Cwisiau 2."
@@ -11559,6 +11564,7 @@ cy:
   for_each_late_62aecf41: "Ar gyfer pob un sy’n hwyr"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Ar gyfer Datblygwyr Adnoddau LTI 1.3:* Dilynwch y cyfarwyddiadau yn adran \"Beth fydd angen i chi ei newid?\" yr erthygl Cymuned."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Ar gyfer aseiniadau sy’n cael eu postio gennych chi’ch hun, os bydd sylwadau ar y cyflwyniad gan rywun heblaw defnyddiwr y cyflwyniad, bydd hyn yn caniatáu postio’r aseiniad. Cyn hynny, byddai’n rhaid cael gradd cyn bod modd postio."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "I gael rhagor o wybodaeth, gweler *dogfennau API Canvas*."
   for_name_d5684bfd: "Ar gyfer %{name}"
   for_students_who_d0fd45d0: "Ar gyfer myfyrwyr sydd..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -11671,6 +11677,7 @@ cy:
   global_announcements_a78912c8: "Cyhoeddiadau Cyffredinol"
   global_announcements_add_edit_delete_843ca4d2: "Cyhoeddiadau Cyffredinol  - ychwanegu / golygu / dileu"
   global_branding_df1cae12: "Brand Cyffredinol"
+  global_id_ffe1be80: "ID Cyffredinol"
   global_inherited_developer_keys_4a6c15de: "Allweddi Datblygwyr Cyffredinol wedi’u Hetifeddu"
   global_keys_40e1a451: "Allweddi Cyffredinol"
   global_message_icons: 
@@ -13170,6 +13177,7 @@ cy:
       Os ydyn nhw wedi’u galluogi, bydd pwyntiau gorffen oEmbed angen
       tocyn wedi’i greu gan adnodd i wirio tarddiad
       cais am adnodd oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Os yw wedi’i alluogi, mae’n llenwi’r ffurflen aseiniad yn awtomatig gyda gwerthoedd o negeseuon dolen ddofn ar dudalen creu/golygu aseiniad."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Os yw’r nodwedd hon wedi’i galluogi, fydd paramedrau ymholiad ddim yn cael eu copïo i gorff POST wrth lansio LTI."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "Os yw’r nodwedd hon wedi’i galluogi, bydd y sgôp yn cael ei ddilysu ar geisiadau API os oes angen sgôp ar yr allwedd datblygwr sy’n cael ei defnyddio."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Os yw’r nodwedd hon wedi’i galluogi, bydd Souredid sy’n cael ei ddefnyddio gan Canvas ar gyfer Deilliannau Sylfaenol yn cael ei amgryptio."
@@ -13574,6 +13582,7 @@ cy:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "Etifeddu - bydd y rhestr o gyfeiriadau wedi’u caniatáu yn cael ei etifeddu o'r cyfrif rhiant.  Mae modd ychwanegu parthau ond ni fyddant yn cael eu rhoi ar waith nes eich bod yn newid y gosodiad i Ymlaen."
   inherited_d4d0bc33: Etifeddwyd
   inherited_developer_keys_table_e4a65b67: "Tabl Allweddi Datblygwyr wedi’u Hetifeddu"
+  inherited_from_parent_account_4776070d: "Wedi’i Etifeddu o’r Cyfrif Rhiant"
   inherited_tool_from_parent_context_f4c1c8c7: "Wedi etifeddu adnodd o'r cynnwys rhiant."
   initial_sync_incomplete_ec74fe8e: "Cysoniad Cychwynnol heb ei Gwblhau"
   inner_box_background_6f9092f: "Cefndir blwch mewnol"
@@ -14006,8 +14015,10 @@ cy:
   key_api_key_68bf80ae: "Allwedd: *%{api_key}*"
   key_f2a919d5: Allwedd
   key_name_7311d22: "Enw’r Allwedd:"
+  key_name_bc712026: "Enw’r Allwedd"
   key_settings_44df6a41: "Gosodiadau Allwedd"
   key_state_for_the_current_account_d16b1cd5: "Cyflwr allwedd ar gyfer y cyfrif dan sylw"
+  key_type_6e8c0909: "Math o Allwedd"
   keyboard_nav_dialog: 
     esc_key_notification: "Pwyswch y fysell escape cyn defnyddio bysellau hwylus wrth symud ar hyd y grid llyfr graddau."
   keyboard_shortcut_for_missing_assignment_848aa9cd: "Bysell Hwylus ar gyfer Aseiniad ar Goll"
@@ -14666,6 +14677,7 @@ cy:
   lti_context_id_should_be_unique_7437a74d: "Dylai lti_context_id fod yn unigryw"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI Deep Linking ar gyfer Dewislen Mynegai Modiwlau"
   lti_deep_linking_line_items_5e0079f7: "Eitemau Llinell LTI Deep Linking"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Eitemau Llinell LTI Deep Linking ar dudalen creu/golygu aseiniad"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Eitemau Llinell LTI Deep Linking ar dudalen golygu aseiniad"
   lti_delete_ee5f1bef: "LTI - dileu"
   lti_dynamic_registration_8592edb0: "Cofrestru Dynamig LTI"
@@ -16521,9 +16533,11 @@ cy:
       email: 
         body: "Mae'r radd ar eich aseiniad %{assignment_title} wedi cael ei newid."
         excused: "Mae’r aseiniad hwn wedi’i esgusodi."
+        grade: "gradd: %{letter_grade}"
         html: 
           body: "Mae'r radd ar eich aseiniad %{assignment_title} wedi cael ei newid."
           excused: "Mae’r aseiniad hwn wedi’i esgusodi."
+          grade: "gradd: %{letter_grade}"
           link_message: "Mae modd i chi adolygu'r aseiniad yma"
           no_date_set: "Dim Dyddiad wedi'i Osod"
           not_applicable: Amherthnasol
@@ -16535,38 +16549,43 @@ cy:
         no_date_set: "Dim Dyddiad wedi'i Osod"
         not_applicable: Amherthnasol
         regraded_date: "graddau newydd: %{date}"
-        score: "sgôr:  %{score} allan o %{total}"
+        score: "sgôr: %{score} allan o %{total}"
         score_pending: "sgôr nes ceir adolygiad yr athro"
         subject: "Gradd wedi'i newid: %{assignment}, %{context}"
       sms: 
         body_sms: "Mae eich gradd ar gyfer %{title} yn %{context} newydd newid."
+        grade: "gradd: %{letter_grade}"
         more_info: "Rhagor o wybodaeth yn %{url}"
         no_date_set: "Dim Dyddiad wedi'i Osod"
         not_applicable: Amherthnasol
         regraded_date: "graddau newydd: %{date}"
-        score: "sgôr:  %{score} allan o %{total}"
+        score: "sgôr: %{score} allan o %{total}"
         score_pending: "sgôr nes ceir adolygiad yr athro"
       summary: 
+        grade: "gradd: %{letter_grade}"
         no_date_set: "Dim Dyddiad wedi'i Osod"
         not_applicable: Amherthnasol
         regraded_date: "graddau newydd: %{date}"
-        score: "sgôr:  %{score} allan o %{total}"
+        score: "sgôr: %{score} allan o %{total}"
         score_pending: "sgôr nes ceir adolygiad yr athro"
         subject: "Gradd wedi'i newid: %{title}, %{context}"
       twitter: 
+        grade: "gradd: %{letter_grade}"
         no_date_set: "Dim Dyddiad wedi'i Osod"
         not_applicable: Amherthnasol
-        score: "sgôr:  %{score} allan o %{total}"
+        score: "sgôr: %{score} allan o %{total}"
         score_pending: "(nes ceir adolygiad)"
         tweet: "Neges Hysbysu Canvas - Newid Gradd: %{date}"
     submission_graded: 
       email: 
         body: "Mae'ch aseiniad %{assignment} wedi'i raddio."
         excused: "Mae’r aseiniad hwn wedi’i esgusodi."
+        grade: "gradd: %{letter_grade}"
         graded_date: "wedi'i raddio: %{date}"
         html: 
           body: "Mae'ch aseiniad %{assignment} wedi'i raddio."
           excused: "Mae’r aseiniad hwn wedi’i esgusodi."
+          grade: "gradd: %{letter_grade}"
           graded_date: "wedi'i raddio: %{date}"
           link_message: "Mae modd i chi adolygu'r aseiniad yma"
           no_date_set: "Dim Dyddiad wedi'i Osod"
@@ -16577,28 +16596,31 @@ cy:
         link_message: "Mae modd i chi adolygu'r aseiniad yma:"
         no_date_set: "Dim Dyddiad wedi'i Osod"
         not_applicable: Amherthnasol
-        score: "sgôr:  %{score} allan o %{total}"
+        score: "sgôr: %{score} allan o %{total}"
         score_pending_review: "sgôr nes ceir adolygiad yr athro"
         subject: "Aseiniad wedi’i raddio: %{assignment}, %{context}"
       sms: 
+        grade: "gradd: %{letter_grade}"
         graded_date: "wedi'i raddio: %{date}"
         more_info: "Rhagor o wybodaeth yn %{url}"
         no_date_set: "Dim Dyddiad wedi'i Osod"
         not_applicable: Amherthnasol
-        score: "sgôr:  %{score} allan o %{total}"
+        score: "sgôr: %{score} allan o %{total}"
         score_pending_review: "sgôr nes ceir adolygiad yr athro"
         sms_body: "%{assignment} wedi'i raddio."
       summary: 
+        grade: "gradd: %{letter_grade}"
         graded_date: "wedi'i raddio: %{date}"
         no_date_set: "Dim Dyddiad wedi'i Osod"
         not_applicable: Amherthnasol
-        score: "sgôr:  %{score} allan o %{total}"
+        score: "sgôr: %{score} allan o %{total}"
         score_pending_review: "sgôr nes ceir adolygiad yr athro"
         subject: "Aseiniad wedi’i raddio: %{assignment}, %{context}"
       twitter: 
+        grade: "gradd: %{letter_grade}"
         no_date_set: "Dim Dyddiad wedi'i Osod"
         not_applicable: Amherthnasol
-        score: "sgôr:  %{score} allan o %{total}"
+        score: "sgôr: %{score} allan o %{total}"
         score_pending_review: "(nes ceir adolygiad)"
         tweet: "Neges Hysbysu Canvas - Wedi'i raddio: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -16924,6 +16946,7 @@ cy:
   module_publish_menu_30b638dd: "Dewislen Cyhoeddi Modiwlau"
   module_publish_menu_88b54c1b: "Dewislen cyhoeddi modiwlau"
   module_published_80f0b9b8: "Modiwl wedi’i gyhoeddi"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Opsiynau cyhoeddi modiwlau"
   modules: 
     assignments_to_grade: 
       many: "%{count} aseiniad â chyflwyniadau heb eu graddio"
@@ -18607,6 +18630,7 @@ cy:
   permissions_365c49e: Hawliau
   permissions_manage_9eea4f8f: "Hawliau - rheoli"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Caniatáu defnyddio pob paramedr \"cynnwys\" ar gyfer yr allwedd datblygwr hon. Gall paramedrau \"cynnwys\" ganiatáu mynediad at ddata ychwanegol sydd ddim wedi'i gynnwys yn y cwmpasau a ddewiswyd isod."
+  permitted_api_endpoints_b092c4cc: "Pwyntiau Gorffen API a Ganiateir"
   persian_a8cadb95: Persieg
   persists_the_used_authentication_provider_when_log_15113afc: "Yn parhau â’r darparwr awthentigeiddio a ddefnyddiwyd wrth fewngofnodi, ac yn defnyddio’r darparwr diofyn ar gyfer mewngofnodiadau newydd yn ddiofyn"
   personal_pronouns_7d271f52: "Rhagenwau Personol"
@@ -25378,6 +25402,7 @@ cy:
        Mae cyfrifon yn cael eu gwneud o ddechrau’r diwrnod i ddiwedd y diwrnod yng nghylched amser benodol y cyfrif sy’n rhedeg yr adroddiad.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Mae’r adroddiad hwn yn cael cynadleddau Big blue button diweddar ar gyfer cyfrif."
   this_report_gets_the_submissions_for_courses_d83bb449: "Mae’r adroddiad hwn yn cael y cyflwyniadau ar gyfer cyrsiau."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Mae'r adroddiad hwn yn darparu rhestr o’r holl Allweddi Datblygwyr sydd ar gael i’r sefydliad. Gellir gosod yr allweddi hyn yn uniongyrchol yn y cyfrif gwraidd y mae’r adroddiad yn cael ei redeg ohono neu gellir ei etifeddu o gyfrifon gwraidd rhiant. Gall Allweddi Datblygwyr fod yn allweddi API neu LTI."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Mae’r adroddiad hwn yn darparu pob eBortffolio gweithredol ar gyfer y sefydliad presennol. Yn opsiynol dewiswch ‘Dim ond cynnwys eBortffolios gan ddefnyddwyr heb ymrestriadau’ i leihau cwmpas y canlyniadau eBortffolio i’r defnyddwyr hynny heb ymrestriadau Gallwch chi hefyd redeg yr adroddiad gyda ‘Cynnwys Gwrthrychau wedi’u Dileu’ i gynnwys dim ond yr eBortffolios hynny sydd wedi cael eu tynnu."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Mae'r adroddiad hwn yn dangos pob deilliant dysgu sy’n bodoli yn y cyfrif hwn. Bydd gan y ffeil csv a gaiff ei chreu yn sgil hynny un rhes am bob deilliant, a bydd yn dangos yr holl briodoleddau cysylltiedig ar gyfer pob deilliant."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -26755,6 +26780,7 @@ cy:
   update_domain_account_lookup_9c89440d: "Diweddaru Chwilio am Gyfrif Parth"
   update_failed_2c87428c: "Wedi methu diweddaru"
   update_file_links_to_prefer_preview_not_download_94535382: "Diweddaru dolenni ffeiliau i ddewis rhagolwg, nid llwytho i lawr"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Diweddaru’r tabl crynodeb gradd i ddefnyddio fframwaith newydd"
   update_important_info_bcc01d6a: "Diweddaru Gwybodaeth Bwysig"
   update_inbox_page_to_use_react_instui_4d343fd: "Diweddaru’r dudalen Blwch Derbyn i ddefnyddio react/instui"
   update_link_b7cab181: "Diweddaru dolen"
