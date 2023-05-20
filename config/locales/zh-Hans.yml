@@ -5984,6 +5984,7 @@ zh-Hans:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: 无法把置换项截止日期设置为关闭评分周期内的日期
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "无法设置 sis_account_id root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: 无法把截止日期设置为关闭评分周期内的日期
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: 如果根课程主题也已删除，则无法取消删除子主题。请改为取消删除根课程主题。
   cannot_use_gradebook_importer_reserved_names_8f3b5748: 无法使用成绩单导入者预留的名称
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: 在取消禁用评分前，无法查看匿名作业的详细报告。
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: 在发布评分前，无法查看匿名作业的详细报告。
@@ -6946,6 +6947,7 @@ zh-Hans:
   consortium_parent_keys_803547b: 联合体父密钥
   consumer_key_57d9fcf1: 用户密钥
   consumer_key_6f94ba11: 用户密钥
+  contact_info_8e3304d1: 联系信息
   contact_your_administrator_if_you_need_to_change_c_9002a501: 如果您需要更改课程可见性，请联络您的管理员。
   content_1440204b: 内容
   content_access_id_601d931e: "内容访问 id"
@@ -8464,9 +8466,9 @@ zh-Hans:
   course_pace_plan_c79cbffc: 课程进度计划
   course_paces_4396b508: 课程进度
   course_paces_description: |-
-      课程节奏增加向 Canvas 推送注册学生的支持；
-      允许根据讲师定义的节奏，
-      向具有不同开始日期的学生智能分配截止日期。了解详情并
+      “课程节奏”增加了向 Canvas 添加滚动注册的支持；
+      根据讲师定义的进度为具有不同开始日期的学生
+      自动分配截止日期。了解详情并
       通过加入*课程节奏用户组*提供反馈。
   course_paces_table_ce32db1c: 课程进度表
   course_pacing_40c14b61: 课程进度
@@ -10066,6 +10068,7 @@ zh-Hans:
     unnamed_tool: 未命名的工具
   developer_keys_d70ba44a: 开发人员密钥
   developer_keys_manage_806da2d: "开发人员密钥 - 管理"
+  developer_keys_report_4d041e62: 开发人员密钥报告
   developername_logo_88951d4: "%{developerName}徽标"
   developers_keys_table_69ae6b7e: 开发人员密钥表
   dialog_form_wrapper: 
@@ -10760,6 +10763,7 @@ zh-Hans:
   duplicate_assignment_name_3ca7d753: "复制作业%{name}"
   duplicate_discussion_title_43b39959: "重复讨论%{title}"
   duplicate_discussion_title_6537ef4d: "复制讨论%{title}"
+  duplicate_ids_23b0a29e: "重复的 ID"
   duplicate_item_339f54bb: 复制项目
   duplicate_module_module_name_be40ad50: "复制单元%{module_name}"
   duplicate_module_name_ab26e5c3: "复制%{module_name}"
@@ -11629,6 +11633,7 @@ zh-Hans:
   error_retrieving_assignment_configuration_tools_f7d75303: 检索作业配置工具时出错
   error_retrieving_assignment_external_tools_9102d343: 提取作业外部工具时出错
   error_retrieving_content_c07ee76b: 提取内容时出错
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: 从工具检索内容时出错（不良内容项目）
   error_retrieving_content_from_tool_e65ef3b7: 获取工具的内容时发生错误
   error_retrieving_similarity_detection_tools_d6d4f9e9: 检索相似性检测工具时发生错误
   error_running_quizzes_2_export_cfecedba: "运行测验 2 导出时出现错误。"
@@ -12542,6 +12547,7 @@ zh-Hans:
   for_each_late_62aecf41: 用于每次迟交
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*对于 LTI 1.3 工具开发人员：*请遵循社区文章中“您究竟需要更改什么？”部分中的指令。"
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: 关于手动发布的作业，如果存在不是由提交项本身的用户发布的提交项评论，则表示准许发布作业。此前，这要求在发布前评分。
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "有关更多信息，请查看 *Canvas API 文档*。"
   for_name_d5684bfd: "用于%{name}"
   for_students_who_d0fd45d0: 对于符合以下条件的学生...
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -12648,6 +12654,7 @@ zh-Hans:
   global_announcements_a78912c8: 全局公告
   global_announcements_add_edit_delete_843ca4d2: "全局公告 - 添加/编辑/删除"
   global_branding_df1cae12: 全球品牌
+  global_id_ffe1be80: "全局 ID"
   global_inherited_developer_keys_4a6c15de: 全局继承的开发人员密钥
   global_keys_40e1a451: 全局密钥
   global_message_icons: 
@@ -14654,6 +14661,7 @@ zh-Hans:
       如果启用，oEmbed 端点将要求提供
       工具生成的令牌以确认
       oEmbed 资源请求的来源。
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: 如果启用，使用作业创建/编辑页面的深度链接消息的值预填充分配表。
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "如果启用，查询参数不会在一个LTI 发送中复制到POST主体。"
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "如果启用，当使用的开发人员密钥要求提供作用域时，要求对 API 请求验证作用域。"
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: 如果启用，Canvas使用的适用于基本结果的Sourcedids将加密。
@@ -15086,6 +15094,7 @@ zh-Hans:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "继承 - 将继承父帐户的白名单。可以添加域，但除非您将此设置更改为“打开”，否则不会执行。"
   inherited_d4d0bc33: 继承
   inherited_developer_keys_table_e4a65b67: 继承的开发人员密钥表
+  inherited_from_parent_account_4776070d: 从父帐户继承
   initial_sync_incomplete_ec74fe8e: 初始同步未完成
   inner_box_background_6f9092f: 内盒背景
   inner_box_border_d0524b03: 盒内边距
@@ -15534,8 +15543,10 @@ zh-Hans:
   key_f2a919d5: 密钥
   key_ff4089c5: 图例：
   key_name_7311d22: "密钥名称:"
+  key_name_bc712026: 密钥名称
   key_settings_44df6a41: 密钥设置
   key_state_for_the_current_account_d16b1cd5: 当前帐户的密钥状态
+  key_type_6e8c0909: 密钥类型
   keyboard_instructions_e032939f: 键盘指令
   keyboard_nav_dialog: 
     esc_key_notification: 当导航评分册的表格时，在使用键盘捷径前，按esc键。
@@ -16245,6 +16256,7 @@ zh-Hans:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id 应为唯一"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI 单元索引菜单深度链接"
   lti_deep_linking_line_items_5e0079f7: "LTI 深度链接行项目"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "作业创建/编辑页面的 LTI 深度链接行项目"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "“作业编辑”页面上的 LTI 深层链接行项目"
   lti_delete_ee5f1bef: "LTI - 删除"
   lti_dynamic_registration_8592edb0: "LTI 动态注册"
@@ -18259,9 +18271,11 @@ zh-Hans:
       email: 
         body: "作业%{assignment_title}上的评分已更改。"
         excused: 这个作业已被免除。
+        grade: "等级：%{letter_grade}"
         html: 
           body: "作业%{assignment_title}上的评分已更改。"
           excused: 这个作业已被免除。
+          grade: "等级：%{letter_grade}"
           link_message: 您可以在此处审阅作业
           no_date_set: 未设置日期
           not_applicable: 不适用
@@ -18273,38 +18287,43 @@ zh-Hans:
         no_date_set: 未设置日期
         not_applicable: 不适用
         regraded_date: "重新计分日期: %{date}"
-        score: "分数:%{score}，满分 %{total} 分"
+        score: "分数：%{score} 次，共 %{total} 次"
         score_pending: 教师待审阅的分数
         subject: "分数已更改:%{assignment}，%{context}"
       sms: 
         body_sms: "您在%{context}上给%{title}的评分已更改。"
+        grade: "等级：%{letter_grade}"
         more_info: "更多信息请访问 %{url}"
         no_date_set: 未设置日期
         not_applicable: 不适用
         regraded_date: "重新计分日期: %{date}"
-        score: "分数:%{score}，满分 %{total} 分"
+        score: "分数：%{score} 次，共 %{total} 次"
         score_pending: 教师待审阅的分数
       summary: 
+        grade: "等级：%{letter_grade}"
         no_date_set: 未设置日期
         not_applicable: 不适用
         regraded_date: "重新计分日期: %{date}"
-        score: "分数:%{score}，满分 %{total} 分"
+        score: "分数：%{score} 次，共 %{total} 次"
         score_pending: 教师待审阅的分数
         subject: "分数已更改:%{title}，%{context}"
       twitter: 
+        grade: "等级：%{letter_grade}"
         no_date_set: 未设置日期
         not_applicable: 不适用
-        score: "分数:%{score}，满分 %{total} 分"
+        score: "分数：%{score} 次，共 %{total} 次"
         score_pending: （待审阅）
         tweet: "Canvas 警报 - 评分更改: %{date}"
     submission_graded: 
       email: 
         body: "您的作业%{assignment}已评分。"
         excused: 这个作业已被免除。
+        grade: "等级：%{letter_grade}"
         graded_date: "计分日期: %{date}"
         html: 
           body: "您的作业%{assignment}已评分。"
           excused: 这个作业已被免除。
+          grade: "等级：%{letter_grade}"
           graded_date: "计分日期: %{date}"
           link_message: 您可以在此处审阅作业
           no_date_set: 未设置日期
@@ -18315,28 +18334,31 @@ zh-Hans:
         link_message: "您可在此处审阅作业:"
         no_date_set: 未设置日期
         not_applicable: 不适用
-        score: "分数:%{score}，满分 %{total} 分"
+        score: "分数：%{score} 次，共 %{total} 次"
         score_pending_review: 教师待审阅的分数
         subject: "作业已计分:%{assignment}，%{context}"
       sms: 
+        grade: "等级：%{letter_grade}"
         graded_date: "计分日期: %{date}"
         more_info: "更多信息请访问 %{url}"
         no_date_set: 未设置日期
         not_applicable: 不适用
-        score: "分数:%{score}，满分 %{total} 分"
+        score: "分数：%{score} 次，共 %{total} 次"
         score_pending_review: 教师待审阅的分数
         sms_body: "%{assignment} 已评分。"
       summary: 
+        grade: "等级：%{letter_grade}"
         graded_date: "计分日期: %{date}"
         no_date_set: 未设置日期
         not_applicable: 不适用
-        score: "分数:%{score}，满分 %{total} 分"
+        score: "分数：%{score} 次，共 %{total} 次"
         score_pending_review: 教师待审阅的分数
         subject: "作业已计分:%{assignment}，%{context}"
       twitter: 
+        grade: "等级：%{letter_grade}"
         no_date_set: 未设置日期
         not_applicable: 不适用
-        score: "分数:%{score}，满分 %{total} 分"
+        score: "分数：%{score} 次，共 %{total} 次"
         score_pending_review: （待审阅）
         tweet: "Canvas 警报 - 已计分:%{assignment}，%{context}"
     submission_needs_grading: 
@@ -18667,6 +18689,7 @@ zh-Hans:
   module_publish_menu_30b638dd: 单元发布菜单
   module_publish_menu_88b54c1b: 单元发布菜单
   module_published_80f0b9b8: 已发布单元
+  modulename_module_publish_options_69ef1ece: "%{moduleName} 模块发布选项"
   modules: 
     add: 
       assignment: 
@@ -20572,6 +20595,7 @@ zh-Hans:
   permissions_manage_9eea4f8f: "权限 - 管理"
   permissions_v2_page_f96dde06: "权限 V2 页面"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: 本开发人员密钥允许使用所有“包含”参数。“包含参数”可授权访问下列选定范围内未包含的内容。
+  permitted_api_endpoints_b092c4cc: "允许的 API 端点"
   persian_a8cadb95: 波斯语
   persists_the_used_authentication_provider_when_log_15113afc: 登录时继续使用已使用的身份验证提供商，新登录默认使用默认提供商
   personal_pronouns_7d271f52: 人称代词
@@ -27940,6 +27964,7 @@ zh-Hans:
        计数范围为在运行报告的帐户设定的时区中从某一天的开始到这一天的结束。
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: 此报告获取帐户最近的大蓝按钮会议。
   this_report_gets_the_submissions_for_courses_d83bb449: 此报告获取课程的提交项。
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "此报告提供适用于机构的所有开发人员密钥的列表。这些密钥可以直接安装在从中运行报告的根帐户中，也可以从父级根帐户集成。开发人员密钥可以是 API 或 LTI 密钥。"
   this_report_provides_all_active_eportfolios_for_th_f7432621: 该报告提供当前机构的所有活跃的电子档案。可以选择“仅包括无注册学员的用户的电子档案”，以将电子档案的结果范围缩小至无注册学员的用户。您还可以使用“包括删除的对象”运行报告，以仅包括已经被删除的电子档案。
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: 此报告显示在该帐户中存在的所有学习结果。生成的csv文件每个结果都将有一行，并将显示每个结果所有相关属性的详细信息。
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -29340,6 +29365,7 @@ zh-Hans:
   update_domain_account_lookup_9c89440d: 更新域帐户查找
   update_failed_2c87428c: 更新失败
   update_file_links_to_prefer_preview_not_download_94535382: 更新文件链接以首选预览，而不是下载
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: 更新等级汇总表以使用现代框架
   update_how_we_process_sis_imports_8195bf77: 更新我们处理SIS导入的方式
   update_important_info_bcc01d6a: 更新重要信息
   update_inbox_page_to_use_react_instui_4d343fd: 更新收件箱页面以使用反应/instui
