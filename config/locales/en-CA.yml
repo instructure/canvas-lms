@@ -5624,6 +5624,7 @@ en-CA:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Cannot set override due date to a date within a closed grading period"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Cannot set sis_account_id on a root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Cannot set the due date to a date within a closed grading period"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Cannot undelete a child topic when the root course topic is also deleted. Please undelete the root course topic instead."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "cannot use gradebook importer reserved names"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Cannot view detailed reports for anonymous assignments until grades are unmuted."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Cannot view detailed reports for anonymous assignments until grades are posted."
@@ -6544,6 +6545,7 @@ en-CA:
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "Consistent LTI AGS IDs based on Account's principal domain"
   consortium_parent_keys_803547b: "Consortium Parent Keys"
   consumer_key_6f94ba11: "Consumer Key"
+  contact_info_8e3304d1: "Contact Info"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Contact your administrator if you need to change course visibility."
   content_1440204b: Content
   content_access_id_601d931e: "content access id"
@@ -7925,7 +7927,7 @@ en-CA:
   course_paces_4396b508: "Course Paces"
   course_paces_description: |-
       Course Pacing adds support for rolling enrollments to Canvas;
-      allowing magical distribution of due dates for students with different
+      automatically distributing due dates for students with different
       start dates based on an instructor's defined pace. Learn more and give
       feedback by joining the *Course Pacing User Group*.
   course_paces_table_ce32db1c: "Course Paces Table"
@@ -9351,6 +9353,7 @@ en-CA:
     unnamed_tool: "Unnamed Tool"
   developer_keys_d70ba44a: "Developer Keys"
   developer_keys_manage_806da2d: "Developer Keys - manage "
+  developer_keys_report_4d041e62: "Developer Keys Report"
   developername_logo_88951d4: "%{developerName} Logo"
   developers_keys_table_69ae6b7e: "Developers Keys Table"
   dialog_form_wrapper: 
@@ -9986,6 +9989,7 @@ en-CA:
   duplicate_assignment_name_3ca7d753: "Duplicate Assignment %{name}"
   duplicate_discussion_title_43b39959: "Duplicate Discussion %{title}"
   duplicate_discussion_title_6537ef4d: "Duplicate discussion %{title}"
+  duplicate_ids_23b0a29e: "Duplicate IDs"
   duplicate_item_339f54bb: "Duplicate Item"
   duplicate_module_module_name_be40ad50: "Duplicate Module %{module_name}"
   duplicate_module_name_ab26e5c3: "Duplicate %{module_name}"
@@ -10802,6 +10806,7 @@ en-CA:
   error_reports_7d6c8b1e: "Error Reports"
   error_retrieving_assignment_external_tools_9102d343: "Error retrieving assignment external tools"
   error_retrieving_content_c07ee76b: "Error retrieving content"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Error retrieving content from tool (bad content item)"
   error_retrieving_content_from_tool_e65ef3b7: "Error retrieving content from tool"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Error retrieving similarity detection tools"
   error_running_quizzes_2_export_cfecedba: "Error running Quizzes 2 export."
@@ -11555,6 +11560,7 @@ en-CA:
   for_each_late_62aecf41: "For each late"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*For LTI 1.3 Tool Developers:* Follow the directions in the \"What exactly will you need to change?\" section of the Community article."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "For manually posted assignments, the presence of a submission comment not by the submission's own user will allow posting the assignment. Previously, this would have required a grade before posting could occur."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "For more information, see the *Canvas API documentation*."
   for_name_d5684bfd: "For %{name}"
   for_students_who_d0fd45d0: "For students who…"
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -11658,6 +11664,7 @@ en-CA:
   global_announcements_a78912c8: "Global Announcements"
   global_announcements_add_edit_delete_843ca4d2: "Global Announcements - add / edit / delete"
   global_branding_df1cae12: "Global Branding"
+  global_id_ffe1be80: "Global ID"
   global_inherited_developer_keys_4a6c15de: "Global Inherited Developer Keys"
   global_keys_40e1a451: "Global Keys"
   global_message_icons: 
@@ -13175,6 +13182,7 @@ en-CA:
       If enabled, oEmbed endpoints will require a
       tool-generated token to verify the origin
       of an oEmbed resource request.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "If enabled, prefills the assignment form with values from deep link messages on the assignment create/edit page."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "If enabled, query parameters will not be copied to the POST body during an LTI launch."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "If enabled, scopes will be validated on API requests if the developer key being used requires scopes."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "If enabled, Sourcedids used by Canvas for Basic Outcomes will be encrypted."
@@ -13580,6 +13588,7 @@ en-CA:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "Inherit - Whitelist will be inherited from the parent account.  Domains can be added but will not be enforced until you change this setting to On."
   inherited_d4d0bc33: Inherited
   inherited_developer_keys_table_e4a65b67: "Inherited Developer Keys Table"
+  inherited_from_parent_account_4776070d: "Inherited from Parent Account"
   inherited_tool_from_parent_context_f4c1c8c7: "Inherited tool from parent context."
   initial_sync_incomplete_ec74fe8e: "Initial Sync Incomplete"
   inner_box_background_6f9092f: "Inner Box Background"
@@ -14033,8 +14042,10 @@ en-CA:
   key_f2a919d5: Key
   key_ff4089c5: "Key:"
   key_name_7311d22: "Key Name:"
+  key_name_bc712026: "Key Name"
   key_settings_44df6a41: "Key Settings"
   key_state_for_the_current_account_d16b1cd5: "Key state for the current account"
+  key_type_6e8c0909: "Key Type"
   keyboard_nav_dialog: 
     esc_key_notification: "Press the escape key before using keyboard shortcuts when navigating the gradebook grid."
   keyboard_shortcut_for_missing_assignment_848aa9cd: "Keyboard Shortcut for Missing Assignment"
@@ -14693,6 +14704,7 @@ en-CA:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id should be unique"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI Deep Linking for Module Index Menu"
   lti_deep_linking_line_items_5e0079f7: "LTI Deep Linking Line Items"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "LTI Deep Linking Line Items on Assignment create/edit page"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "LTI Deep Linking Line Items on Assignment edit page"
   lti_delete_ee5f1bef: "LTI - delete"
   lti_dynamic_registration_8592edb0: "LTI Dynamic Registration"
@@ -16530,9 +16542,11 @@ en-CA:
       email: 
         body: "The grade on your assignment %{assignment_title} has been changed."
         excused: "This assignment has been excused."
+        grade: "grade: %{letter_grade}"
         html: 
           body: "The grade on your assignment %{assignment_title} has been changed."
           excused: "This assignment has been excused."
+          grade: "grade: %{letter_grade}"
           link_message: "You can review the assignment here"
           no_date_set: "No Date Set"
           not_applicable: N/A
@@ -16544,38 +16558,43 @@ en-CA:
         no_date_set: "No Date Set"
         not_applicable: N/A
         regraded_date: "re-graded: %{date}"
-        score: "score:  %{score} out of %{total}"
+        score: "score: %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
         subject: "Grade Changed: %{assignment}, %{context}"
       sms: 
         body_sms: "Your grade for %{title} in %{context} just changed."
+        grade: "grade: %{letter_grade}"
         more_info: "More info at %{url}"
         no_date_set: "No Date Set"
         not_applicable: N/A
         regraded_date: "re-graded: %{date}"
-        score: "score:  %{score} out of %{total}"
+        score: "score: %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
       summary: 
+        grade: "grade: %{letter_grade}"
         no_date_set: "No Date Set"
         not_applicable: N/A
         regraded_date: "re-graded: %{date}"
-        score: "score:  %{score} out of %{total}"
+        score: "score: %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
         subject: "Grade Changed: %{title}, %{context}"
       twitter: 
+        grade: "grade: %{letter_grade}"
         no_date_set: "No Date Set"
         not_applicable: N/A
-        score: "score:  %{score} out of %{total}"
+        score: "score: %{score} out of %{total}"
         score_pending: "(pending review)"
         tweet: "Canvas Alert - Grade Change: %{date}"
     submission_graded: 
       email: 
         body: "Your assignment %{assignment} has been graded."
         excused: "This assignment has been excused."
+        grade: "grade: %{letter_grade}"
         graded_date: "graded: %{date}"
         html: 
           body: "Your assignment %{assignment} has been graded."
           excused: "This assignment has been excused."
+          grade: "grade: %{letter_grade}"
           graded_date: "graded: %{date}"
           link_message: "You can review the assignment here"
           no_date_set: "No Date Set"
@@ -16586,28 +16605,31 @@ en-CA:
         link_message: "You can review the assignment here:"
         no_date_set: "No Date Set"
         not_applicable: N/A
-        score: "score:  %{score} out of %{total}"
+        score: "score: %{score} out of %{total}"
         score_pending_review: "score pending review by the teacher"
         subject: "Assignment Graded: %{assignment}, %{context}"
       sms: 
+        grade: "grade: %{letter_grade}"
         graded_date: "graded: %{date}"
         more_info: "More info at %{url}"
         no_date_set: "No Date Set"
         not_applicable: N/A
-        score: "score:  %{score} out of %{total}"
+        score: "score: %{score} out of %{total}"
         score_pending_review: "score pending review by the teacher"
         sms_body: "%{assignment} has been graded."
       summary: 
+        grade: "grade: %{letter_grade}"
         graded_date: "graded: %{date}"
         no_date_set: "No Date Set"
         not_applicable: N/A
-        score: "score:  %{score} out of %{total}"
+        score: "score: %{score} out of %{total}"
         score_pending_review: "score pending review by the teacher"
         subject: "Assignment Graded: %{assignment}, %{context}"
       twitter: 
+        grade: "grade: %{letter_grade}"
         no_date_set: "No Date Set"
         not_applicable: N/A
-        score: "score:  %{score} out of %{total}"
+        score: "score: %{score} out of %{total}"
         score_pending_review: "(pending review)"
         tweet: "Canvas Alert - Graded: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -16922,6 +16944,7 @@ en-CA:
   module_publish_menu_30b638dd: "Module Publish Menu"
   module_publish_menu_88b54c1b: "Module publish menu"
   module_published_80f0b9b8: "Module published"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Module publish options"
   modules: 
     assignments_to_grade: 
       one: "1 assignment has ungraded submissions"
@@ -18631,6 +18654,7 @@ en-CA:
   permissions_manage_9eea4f8f: "Permissions - manage"
   permissions_v2_page_f96dde06: "Permissions V2 Page"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Permit usage of all “includes” parameters for this developer key. \"Includes\" parameters may grant access to additional data not included in the scopes selected below."
+  permitted_api_endpoints_b092c4cc: "Permitted API Endpoints"
   persian_a8cadb95: Persian
   persists_the_used_authentication_provider_when_log_15113afc: "Persists the used authentication provider when logging in, and defaults new logins to the default provider"
   personal_pronouns_7d271f52: "Personal Pronouns"
@@ -25354,6 +25378,7 @@ en-CA:
        Counts are done from the beginning of the day to the end of the day in the set timezone of the account running the report.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "This report gets recent Big blue button conferences for an account."
   this_report_gets_the_submissions_for_courses_d83bb449: "This report gets the submissions for courses."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "This report provides a list of all Developer Keys available to the institution. These keys can either be installed directly in the root account the report is run from or can be inherited from parent root accounts. Developer Keys can either be API or LTI keys."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "This report provides all active ePortfolios for the current institution. Optionally select 'Only include ePortfolios from users with no enrollments' to reduce the scope of the ePortfolio results to just those users with no enrollments. You can also run the report with 'Include Deleted Objects' to only include those ePortfolios that have been removed."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "This report shows all learning outcomes that exist within this account. The resulting csv file will have one row per outcome, and will show the details of all associated attributes with each outcome."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -26729,6 +26754,7 @@ en-CA:
   update_domain_account_lookup_9c89440d: "Update Domain Account Lookup"
   update_failed_2c87428c: "Update failed"
   update_file_links_to_prefer_preview_not_download_94535382: "Update file links to prefer preview, not download"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Update grade summary table to use a modern framework"
   update_how_we_process_sis_imports_8195bf77: "Update how we process SIS imports"
   update_important_info_bcc01d6a: "Update Important Info"
   update_inbox_page_to_use_react_instui_4d343fd: "Update Inbox page to use react/instui"
