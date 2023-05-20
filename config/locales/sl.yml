@@ -4943,6 +4943,7 @@ sl:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Ni mogoče nastaviti roka preglasitve na datum v zaprtem ocenjevalnem obdobju."
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Ni mogoče nastaviti računa sis_account_id na root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Ni mogoče nastaviti roka na datum v zaprtem ocenjevalnem obdobju."
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Ni mogoče razveljaviti odstranitve podrejene teme, če je odstranjena tudi korenska tema predmeta. Namesto tega razveljavite odstranitev korenske teme predmeta."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "ne more uporabljati pridržanih imen uvoznika redovalnice"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Ni si mogoče ogledati podrobnih poročil za anonimne naloge, dokler ocene niso spremenjene v ocene s sprotnim obveščanjem."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Ni si mogoče ogledati podrobnih poročil za anonimne naloge, dokler ocene niso objavljene."
@@ -5797,6 +5798,7 @@ sl:
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "Dosledni ID-ji AGS LTI, ki temeljijo na glavni domeni računa"
   consortium_parent_keys_803547b: "Ključi staršev v konzorciju"
   consumer_key_6f94ba11: "Potrošniški ključ"
+  contact_info_8e3304d1: "Kontaktni podatki"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Če želite spremeniti vidnost predmeta, se obrnite na skrbnika."
   content_1440204b: Vsebina
   content_access_id_601d931e: "ID dostopa do vsebine"
@@ -7057,7 +7059,7 @@ sl:
   course_paces_4396b508: "Hitrosti napredovanja pri predmetu"
   course_paces_description: |-
       Funkcija hitrosti napredovanja pri predmetu sistemu Canvas doda podporo za tekoče vpise;
-      omogoča čarobno porazdelitev rokov za študente z različnimi
+      samodejno porazdeli roke za študente z različnimi
       začetnimi datumi glede na izvajalčevo opredeljeno hitrost. Več informacij in
       povratne informacije z včlanitvijo v *skupino uporabnikov zadevne hitrosti napredovanja pri predmetu*.
   course_paces_table_ce32db1c: "Preglednica hitrosti napredovanja pri predmetu"
@@ -8317,6 +8319,7 @@ sl:
     unnamed_tool: "Neimenovano orodje"
   developer_keys_d70ba44a: "Razvijalski ključi"
   developer_keys_manage_806da2d: "Razvijalski ključi – urejaj "
+  developer_keys_report_4d041e62: "Poročilo o razvijalskih ključih"
   developers_keys_table_69ae6b7e: "Preglednica razvijalskih ključev"
   dialog_form_wrapper: 
     cancel: Prekliči
@@ -8839,6 +8842,7 @@ sl:
   duplicate_31cec192: Podvoji
   duplicate_assignment_name_3ca7d753: "Podvoji nalogo %{name}"
   duplicate_discussion_title_6537ef4d: "Podvoji razpravo %{title}"
+  duplicate_ids_23b0a29e: "Podvojeni ID-ji"
   duplicate_item_339f54bb: "Podvoji element"
   duplicate_module_name_ab26e5c3: "Podvoji %{module_name}"
   duplicate_modules_8ea35557: "Podvoji module"
@@ -9545,6 +9549,7 @@ sl:
   error_reports_7d6c8b1e: "Poročila o napakah"
   error_retrieving_assignment_external_tools_9102d343: "Napaka pri pridobivanju zunanjih orodij za nalogo"
   error_retrieving_content_c07ee76b: "Napaka pri pridobivanju vsebine"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Napaka pri pridobivanju vsebine iz orodja (predmet slabe vsebine)"
   error_retrieving_content_from_tool_e65ef3b7: "Napaka pri pridobivanju vsebine iz orodja"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Napaka pri pridobivanju orodij za zaznavanje ujemanja"
   error_running_quizzes_2_export_cfecedba: "Napaka pri izvažanju kvizov 2"
@@ -10230,6 +10235,7 @@ sl:
   for_canvas_admins_no_actions_or_configuration_chan_f6fee50a: "*Za skrbnike Canvas:* Z vaše strani niso potrebna nobena dejanja ali spremembe konfiguracije. Pri programerjih orodij 1.3, ki ste jih namestili, lahko preverite, ali so te spremembe izvedli."
   for_course_level_users_deleting_a_course_is_part_o_932f7a98: "Pri uporabnikih na ravni predmeta je brisanje predmeta del možnosti »Stanje predmeta – urejaj dovoljenje«. Pri uporabnikih na ravni računa pa je za brisanje predmeta potrebno to dovoljenje in možnost »Predmet – dodaj/uredi/izbriši«. "
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Za programerje orodij LTI 1.3:* Upoštevajte navodila v razdelku »Kaj točno boste morali spremeniti?« članka skupnosti."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Za več informacij glejte *Dokumentacija Canvas API*."
   for_name_d5684bfd: "Za %{name}"
   for_students_who_d0fd45d0: "Za študente, ki …"
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -10326,6 +10332,7 @@ sl:
   global_announcements_a78912c8: "Splošna obvestila"
   global_announcements_add_edit_delete_843ca4d2: "Splošna obvestila – dodaj/uredi/izbriši"
   global_branding_df1cae12: "Splošno označevanje z znamkami"
+  global_id_ffe1be80: "Globalni ID"
   global_inherited_developer_keys_4a6c15de: "Globalni podedovani razvijalski ključi"
   global_keys_40e1a451: "Globalni ključi"
   global_message_icons: 
@@ -11693,6 +11700,7 @@ sl:
       Naslov storitve oEmbed, če je to omogočeno, bo zahteval
       žeton, ustvarjen v orodju, za preverjanje izvora
       zahtevka za vir oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Če je to omogočeno, funkcija vnaprej izpolni obrazec naloge z vrednostmi iz sporočil globokih povezav na strani za ustvarjanje/urejanje naloge."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Če je omogočena, parametri poizvedbe med zagonom specifikacij ne bodo kopirani v telo zahteve POST."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Če je omogočena, bodo polja Sourcedids, ki jih sistem Canvas uporablja za osnovne učne izide, šifrirana."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Če je ta možnost omogočena, se zgodovina oddaj za kvize New Quizzes obravnava ločeno."
@@ -11997,6 +12005,7 @@ sl:
   inherit_from_course_ed8bde8c: "Podeduj od predmeta"
   inherited_d4d0bc33: Podedovano
   inherited_developer_keys_table_e4a65b67: "Podedovana preglednica razvijalskih ključev"
+  inherited_from_parent_account_4776070d: "Podedovano od nadrejenega računa"
   initial_sync_incomplete_ec74fe8e: "Začetna sinhronizacija ni končana"
   inner_box_background_6f9092f: "Ozadje okna"
   inner_box_border_d0524b03: "Obroba okna"
@@ -12416,8 +12425,10 @@ sl:
   key_api_key_68bf80ae: "Tipka: *%{api_key}*"
   key_f2a919d5: Tipka
   key_name_7311d22: "Ime tipke:"
+  key_name_bc712026: "Ime ključa"
   key_settings_44df6a41: "Nastavitve tipke"
   key_state_for_the_current_account_d16b1cd5: "Stanje tipke za trenutni račun"
+  key_type_6e8c0909: "Vrsta ključa"
   keyboard_nav_dialog: 
     esc_key_notification: "Preden pri navigaciji po mreži redovalnice uporabite bližnjice, pritisnite tipko Esc."
   keyboard_shortcut_for_missing_assignment_848aa9cd: "Bližnjica na tipkovnici za manjkajočo nalogo"
@@ -13046,6 +13057,7 @@ sl:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id mora biti edinstven"
   lti_deep_linking_for_module_index_menu_881feeee: "Globoko povezovanje LTI za meni kazala modula"
   lti_deep_linking_line_items_5e0079f7: "Elementi linije globokih povezav LTI"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Vrstični elementi globokih povezav LTI na strani za ustvarjanje/urejanje nalog"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Vrstični elementi globokih povezav LTI na strani za urejanje nalog"
   lti_delete_ee5f1bef: "LTI – odstrani"
   lti_dynamic_registration_8592edb0: "Dinamična registracija LTI"
@@ -14845,9 +14857,11 @@ sl:
       email: 
         body: "Ocena vaše naloge %{assignment_title} je spremenjena."
         excused: "Ta naloga je opravičena."
+        grade: "ocena: %{letter_grade}"
         html: 
           body: "Ocena vaše naloge %{assignment_title} je spremenjena."
           excused: "Ta naloga je opravičena."
+          grade: "ocena: %{letter_grade}"
           link_message: "Nalogo si lahko ogledate tukaj."
           no_date_set: "Datum ni nastavljen."
           not_applicable: "Ni na voljo"
@@ -14859,38 +14873,43 @@ sl:
         no_date_set: "Datum ni nastavljen."
         not_applicable: "Ni na voljo"
         regraded_date: "ponovno ocenjeno: %{date}"
-        score: "rezultat:  %{score} od %{total}"
+        score: "rezultat: %{score} od %{total}"
         score_pending: "rezultat, ki čaka na pregled izvajalca"
         subject: "Ocena je spremenjena: %{assignment}, %{context}"
       sms: 
         body_sms: "Vaša ocena za %{title}, %{context} se je pravkar spremenila."
+        grade: "ocena: %{letter_grade}"
         more_info: "Več informacij na %{url}"
         no_date_set: "Datum ni nastavljen."
         not_applicable: "Ni na voljo"
         regraded_date: "ponovno ocenjeno: %{date}"
-        score: "rezultat:  %{score} od %{total}"
+        score: "rezultat: %{score} od %{total}"
         score_pending: "rezultat, ki čaka na pregled izvajalca"
       summary: 
+        grade: "ocena: %{letter_grade}"
         no_date_set: "Datum ni nastavljen."
         not_applicable: "Ni na voljo"
         regraded_date: "ponovno ocenjeno: %{date}"
-        score: "rezultat:  %{score} od %{total}"
+        score: "rezultat: %{score} od %{total}"
         score_pending: "rezultat, ki čaka na pregled izvajalca"
         subject: "Ocena je spremenjena: %{title}, %{context}"
       twitter: 
+        grade: "ocena: %{letter_grade}"
         no_date_set: "Datum ni nastavljen."
         not_applicable: "Ni na voljo"
-        score: "rezultat:  %{score} od %{total}"
+        score: "rezultat: %{score} od %{total}"
         score_pending: "(čaka na pregled)"
         tweet: "Opozorilo sistema Canvas – sprememba ocene: %{date}"
     submission_graded: 
       email: 
         body: "Vaša naloga %{assignment} je ocenjena."
         excused: "Ta naloga je opravičena."
+        grade: "ocena: %{letter_grade}"
         graded_date: "ocenjeno: %{date}"
         html: 
           body: "Vaša naloga %{assignment} je ocenjena."
           excused: "Ta naloga je opravičena."
+          grade: "ocena: %{letter_grade}"
           graded_date: "ocenjeno: %{date}"
           link_message: "Nalogo si lahko ogledate tukaj."
           no_date_set: "Datum ni nastavljen."
@@ -14901,28 +14920,31 @@ sl:
         link_message: "Nalogo si lahko ogledate tukaj:"
         no_date_set: "Datum ni nastavljen."
         not_applicable: "Ni na voljo"
-        score: "rezultat:  %{score} od %{total}"
+        score: "rezultat: %{score} od %{total}"
         score_pending_review: "rezultat, ki čaka na pregled izvajalca"
         subject: "Naloga je ocenjena: %{assignment}, %{context}"
       sms: 
+        grade: "ocena: %{letter_grade}"
         graded_date: "ocenjeno: %{date}"
         more_info: "Več informacij na %{url}"
         no_date_set: "Datum ni nastavljen."
         not_applicable: "Ni na voljo"
-        score: "rezultat:  %{score} od %{total}"
+        score: "rezultat: %{score} od %{total}"
         score_pending_review: "rezultat, ki čaka na pregled izvajalca"
         sms_body: "%{assignment} je ocenjena."
       summary: 
+        grade: "ocena: %{letter_grade}"
         graded_date: "ocenjeno: %{date}"
         no_date_set: "Datum ni nastavljen."
         not_applicable: "Ni na voljo"
-        score: "rezultat:  %{score} od %{total}"
+        score: "rezultat: %{score} od %{total}"
         score_pending_review: "rezultat, ki čaka na pregled izvajalca"
         subject: "Napake pri referencah – %{assignment}, %{context}"
       twitter: 
+        grade: "ocena: %{letter_grade}"
         no_date_set: "Datum ni nastavljen."
         not_applicable: "Ni na voljo"
-        score: "rezultat:  %{score} od %{total}"
+        score: "rezultat: %{score} od %{total}"
         score_pending_review: "(čaka na pregled)"
         tweet: "Opozorilo sistema Canvas – ocenjeno: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -15216,6 +15238,7 @@ sl:
   module_publish_menu_30b638dd: "Meni za objavo modulov"
   module_publish_menu_88b54c1b: "Meni za objavo modulov"
   module_published_80f0b9b8: "Modul je objavljen"
+  modulename_module_publish_options_69ef1ece: "Možnosti za objavo modula %{moduleName}"
   modules: 
     assignments_to_grade: 
       one: "1 naloga ima neocenjene oddaje."
@@ -16787,6 +16810,7 @@ sl:
   permissions_365c49e: Dovoljenja
   permissions_manage_9eea4f8f: "Dovoljenja – urejaj"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Dovolim vse parametre za vključitev za ta razvijalski ključ. Parametri za vključitev lahko omogočijo dostop do dodatnih podatkov, ki niso vključeni v spodaj izbrane obsege."
+  permitted_api_endpoints_b092c4cc: "Dovoljeni naslovi storitve API"
   persian_a8cadb95: perzijščina
   persists_the_used_authentication_provider_when_log_15113afc: "Pri prijavi vztraja pri uporabljenem ponudniku overitve in privzetemu ponudniku privzeto dodeli nove prijave"
   personal_pronouns_7d271f52: "Osebni zaimki"
@@ -23007,6 +23031,7 @@ sl:
        Štetje se izvaja od začetka do konca dneva v nastavljenem časovnem razponu računa, v katerem se izvaja poročilo.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "V to poročilo bodo vključene nedavne konference Big Blue Button zadevnega računa."
   this_report_gets_the_submissions_for_courses_d83bb449: "V to poročilo bodo vključene oddaje za predmete."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "To poročilo vsebuje seznam vseh razvijalskih ključev, ki so na voljo ustanovi. Te ključe je mogoče namestiti neposredno v korenski račun, iz katerega se izvaja poročilo, ali pa jih je mogoče podedovati od nadrejenih korenskih računov. Razvijalski ključi so lahko ključi API ali LTI."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "To poročilo vsebuje vse aktivne ePortfelje za trenutno ustanovo. Neobvezno lahko izberete »Vključi samo e-portfelje uporabnikov brez vpisov«, da obseg rezultatov za ePortfelje omejite samo na uporabnike brez vpisov. Poročilo lahko zaženete tudi z možnostjo »Vključi izbrisane predmete«, da vključite samo odstranjene ePortfelje."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "V tem poročilu so prikazani vsi učni cilji, ki obstajajo v tem računu. V izhodni datoteki .csv bodo po ena vrstica na izid, prikazane pa bodo podrobnosti o vseh lastnostih, povezanih z vsakim izidom."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -24107,6 +24132,7 @@ sl:
   update_criterion_edcbd330: "Posodobi merilo"
   update_domain_account_lookup_9c89440d: "Posodobite iskanje računa domene"
   update_failed_2c87428c: "Posodobitev ni uspela"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Posodobite preglednico s povzetkom ocen za uporabo sodobnega ogrodja"
   update_important_info_bcc01d6a: "Posodobi pomembne informacije"
   update_inbox_page_to_use_react_instui_4d343fd: "Za uporabo react/instui posodobite stran Pošta"
   update_link_b7cab181: "Posodobi povezavo"
