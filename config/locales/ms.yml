@@ -4327,6 +4327,7 @@ ms:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Tidak boleh menetapkan tarikh siap gantian untuk tarikh dalam tempoh penggredan tertutup"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Tidak boleh menetapkan sis_account_id pada root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Tidak boleh menetapkan tarikh siap untuk tarikh dalam tempoh penggredan tertutup"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Tidak dapat menyahpadamkan topik anak apabila topik kursus akar juga dipadamkan. Sebaliknya, sila nyahpadam topik kursus akar."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "tidak boleh menggunakan nama simpanan pengimport buku gred"
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Tidak boleh melihat laporan terperinci untuk tugasan tanpa nama sehingga gred disiarkan"
   canvas: 
@@ -5135,6 +5136,7 @@ ms:
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "ID AGS LTI yang konsisten berdasarkan domain utama Akaun"
   consortium_parent_keys_803547b: "Kunci induk konsortium"
   consumer_key_6f94ba11: "Kunci Konsumer"
+  contact_info_8e3304d1: "Maklumat Hubungan"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Hubungi pentadbir anda jika anda perlu mengubah kebolehlihatan kursus."
   content_1440204b: Kandungan
   content_access_id_601d931e: "id akses kandungan"
@@ -6314,7 +6316,7 @@ ms:
   course_pace_4dfc7ef3: "Pergerakan Kursus"
   course_paces_description: |-
       Pergerakan Kursus menambah sokongan bagi pendaftaran bergerak untuk Canvas;
-      membolehkan peredaran tarikh siap yang ajaib untuk pelajar yang memiliki tarikh mula
+      secara automatik membuat peredaran  tarikh siap untuk pelajar dengan tarikh mula
       yang berbeza berdasarkan pergerakan yang ditakrifkan oleh pengajar. Ketahui lebih lanjut dan berikan
       maklum balas dengan menyertai *Kumpulan Pengguna Pergerakan Kursus*.
   course_pacing_40c14b61: "Pergerakan Kursus"
@@ -7382,6 +7384,7 @@ ms:
       title: "Kunci Pembangun"
   developer_keys_d70ba44a: "Kunci Pembangun"
   developer_keys_manage_806da2d: "Kunci Pembangun - urus "
+  developer_keys_report_4d041e62: "Laporan Kunci Pembangun"
   dialog_form_wrapper: 
     cancel: Batal
     save_settings: "Simpan Tetapan"
@@ -7867,6 +7870,7 @@ ms:
   duplicate_31cec192: Duplikasikan
   duplicate_assignment_name_3ca7d753: "Duplikasikan Tugasan %{name}"
   duplicate_discussion_title_6537ef4d: "Duplikasikan perbincangan %{title}"
+  duplicate_ids_23b0a29e: "ID Pendua"
   duplicate_item_339f54bb: "Duplikasikan Item"
   duplicate_module_name_ab26e5c3: "Duplikasikan %{module_name}"
   duplicate_provider_provider_d9842134: "Duplikasikan penyedia %{provider}"
@@ -8483,6 +8487,7 @@ ms:
   error_reports_7d6c8b1e: "Laporan Ralat"
   error_retrieving_assignment_external_tools_9102d343: "Ralat semasa mengambil alat luar tugasan"
   error_retrieving_content_c07ee76b: "Ralat semasa mengambil kandungan"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Ralat mengambil kandungan daripada alat (item kandungan yang tidak elok)"
   error_retrieving_content_from_tool_e65ef3b7: "Ralat semasa mengambil kandungan daripada alat"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Ralat semasa mengambil alat pengesanan keserupaan"
   error_running_quizzes_2_export_cfecedba: "Ralat semasa menjalankan eksport Kuiz 2."
@@ -9100,6 +9105,7 @@ ms:
   for_canvas_admins_no_actions_or_configuration_chan_de50d145: "*Untuk Pentadbir Canvas:* Tiada tindakan atau perubahan konfigurasi diperlukan dari pihak anda. Anda boleh bertanyakan pembangun alat 1.3 yang telah anda pasang mengenai status perubahan yang diperlukan oleh alat tersebut."
   for_canvas_admins_no_actions_or_configuration_chan_f6fee50a: "*Untuk Pentadbir Canvas:* Tiada tindakan atau perubahan konfigurasi diperlukan dari pihak anda. Anda boleh mengesahkan dengan pembangun alat 1.3 yang telah anda pasang sama ada mereka telah membuat perubahan ini atau tidak."
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Untuk Pembangun Alat LTI 1.3:* Ikuti arahan dalam bahagian \"Apakah yang perlu anda tukar?\" dalam artikel Komuniti."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Untuk maklumat lanjut, lihat *dokumentasi API Canvas*."
   for_name_d5684bfd: "Untuk %{name}"
   for_students_who_d0fd45d0: "Untuk pelajar yang..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -9189,6 +9195,7 @@ ms:
   global_announcements_a78912c8: "Pengumuman Keseluruhan"
   global_announcements_add_edit_delete_843ca4d2: "Pengumuman Global - tambah / edit / padam"
   global_branding_df1cae12: "Penjenamaan Global"
+  global_id_ffe1be80: "ID Global"
   global_inherited_developer_keys_4a6c15de: "Kunci Pembangun Diwarisi Global"
   global_keys_40e1a451: "Kunci Global"
   global_message_icons: 
@@ -10300,6 +10307,7 @@ ms:
       Jika didayakan, alat LTI yang dipasang dalam akaun induk bersekutu akan
       tersedia / kelihatan dalam akaun anak.
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Jika didayakan, pendaftaran OAuth 1.0a boleh digunakan oleh alat LTI untuk mengakses API Perkhidmatan Keahlian."
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Jika didayakan, akan melakukan pra-isi borang tugasan dengan nilai daripada mesej pautan dalam di halaman cipta/edit tugasan."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Jika didayakan, parameter pertanyaan tidak akan disalin ke isi POST semasa pelancaran LTI."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Jika didayakan, Sourcedids yang digunakan oleh Canvas untuk Hasil Asas akan disulitkan."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Jika didayakan, sejarah serahan untuk kuiz Kuiz Baharu ditangani secara berasingan."
@@ -10561,6 +10569,7 @@ ms:
   inherit_course_name_b40df46: "Warisi (%{course_name})"
   inherit_from_course_ed8bde8c: "Warisi daripada Kursus"
   inherited_d4d0bc33: Diwarisi
+  inherited_from_parent_account_4776070d: "Diwarisi daripada Akaun Induk"
   initial_sync_incomplete_ec74fe8e: "Penyegerakan Awal Tidak Lengkap"
   inner_box_background_6f9092f: "Latar Belakang Kotak Bahagian Dalam"
   inner_box_border_d0524b03: "Sempadan Kotak Bahagian Dalam"
@@ -10890,8 +10899,10 @@ ms:
   kenya_254_2945663a: "Kenya (+254)"
   key_f2a919d5: Kunci
   key_name_7311d22: "Nama Kunci:"
+  key_name_bc712026: "Nama Kunci"
   key_settings_44df6a41: "Tetapan Kunci"
   key_state_for_the_current_account_d16b1cd5: "Keadaan kunci untuk akaun semasa"
+  key_type_6e8c0909: "Jenis Kunci"
   keyboard_nav_dialog: 
     esc_key_notification: "Tekan kunci Escape sebelum menggunakan pintasan papan kekunci apabila menavigasi grid buku gred."
   keyboard_shortcut_for_missing_assignment_848aa9cd: "Pintasan Papan Kekunci untuk Tugasan yang Tiada"
@@ -11483,6 +11494,7 @@ ms:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id sepatutnya unik"
   lti_deep_linking_for_module_index_menu_881feeee: "Pemautan Khusus untuk Menu Indeks Modul LTI"
   lti_deep_linking_line_items_5e0079f7: "Item Baris Pemautan Khusus LTI"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Item Baris Pemautan Dalam LTI di halaman cipta/edit Tugasan"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Item Baris Pemautan Khusus pada halaman edit Tugasan LTI"
   lti_delete_ee5f1bef: "LTI - padam"
   lti_dynamic_registration_8592edb0: "Pendaftaran Dinamik LTI"
@@ -13116,9 +13128,11 @@ ms:
       email: 
         body: "Gred pada tugasan anda %{assignment_title} telah diubah."
         excused: "Tugasan ini telah dimaafkan."
+        grade: "gred: %{letter_grade}"
         html: 
           body: "Gred pada tugasan anda %{assignment_title} telah diubah."
           excused: "Tugasan ini telah dimaafkan."
+          grade: "gred: %{letter_grade}"
           link_message: "Anda boleh menyemak tugasan di sini"
           no_date_set: "Tiada Tarikh Ditetapkan"
           not_applicable: T/B
@@ -13130,38 +13144,43 @@ ms:
         no_date_set: "Tiada Tarikh Ditetapkan"
         not_applicable: T/B
         regraded_date: "digred semula: %{date}"
-        score: "skor:  %{score} daripada %{total}"
+        score: "skor: %{score} daripada %{total}"
         score_pending: "skor menunggu semakan oleh guru"
         subject: "Gred Diubah: %{assignment}, %{context}"
       sms: 
         body_sms: "Gred anda untuk %{title} dalam %{context} baru sahaja diubah."
+        grade: "gred: %{letter_grade}"
         more_info: "Maklumat lanjut di %{url}"
         no_date_set: "Tiada Tarikh Ditetapkan"
         not_applicable: T/B
         regraded_date: "digred semula: %{date}"
-        score: "skor:  %{score} daripada %{total}"
+        score: "skor: %{score} daripada %{total}"
         score_pending: "skor menunggu semakan oleh guru"
       summary: 
+        grade: "gred: %{letter_grade}"
         no_date_set: "Tiada Tarikh Ditetapkan"
         not_applicable: T/B
         regraded_date: "digred semula: %{date}"
-        score: "skor:  %{score} daripada %{total}"
+        score: "skor: %{score} daripada %{total}"
         score_pending: "skor menunggu semakan oleh guru"
         subject: "Gred Diubah: %{title}, %{context}"
       twitter: 
+        grade: "gred: %{letter_grade}"
         no_date_set: "Tiada Tarikh Ditetapkan"
         not_applicable: T/B
-        score: "skor:  %{score} daripada %{total}"
+        score: "skor: %{score} daripada %{total}"
         score_pending: "(menunggu semakan)"
         tweet: "Isyarat Canvas - Perubahan Gred: %{date}"
     submission_graded: 
       email: 
         body: "Tugasan anda %{assignment} telah digredkan."
         excused: "Tugasan ini telah dimaafkan."
+        grade: "gred: %{letter_grade}"
         graded_date: "digredkan: %{date}"
         html: 
           body: "Tugasan anda %{assignment} telah digredkan."
           excused: "Tugasan ini telah dimaafkan."
+          grade: "gred: %{letter_grade}"
           graded_date: "digredkan: %{date}"
           link_message: "Anda boleh menyemak tugasan di sini"
           no_date_set: "Tiada Tarikh Ditetapkan"
@@ -13172,24 +13191,27 @@ ms:
         link_message: "Anda boleh menyemak tugasan di sini:"
         no_date_set: "Tiada Tarikh Ditetapkan"
         not_applicable: T/B
-        score: "skor:  %{score} daripada %{total}"
+        score: "skor: %{score} daripada %{total}"
         score_pending_review: "skor menunggu semakan oleh guru"
         subject: "Tugasan Bergred: %{assignment}, %{context}"
       sms: 
+        grade: "gred: %{letter_grade}"
         not_applicable: T/B
-        score: "skor:  %{score} daripada %{total}"
+        score: "skor: %{score} daripada %{total}"
         sms_body: "%{assignment} telah digredkan."
       summary: 
+        grade: "gred: %{letter_grade}"
         graded_date: "digredkan: %{date}"
         no_date_set: "Tiada Tarikh Ditetapkan"
         not_applicable: T/B
-        score: "skor:  %{score} daripada %{total}"
+        score: "skor: %{score} daripada %{total}"
         score_pending_review: "skor menunggu semakan oleh guru"
         subject: "Tugasan Bergred: %{assignment}, %{context}"
       twitter: 
+        grade: "gred: %{letter_grade}"
         no_date_set: "Tiada Tarikh Ditetapkan"
         not_applicable: T/B
-        score: "skor:  %{score} daripada %{total}"
+        score: "skor: %{score} daripada %{total}"
         score_pending_review: "(menunggu semakan)"
         tweet: "Isyarat Canvas - Bergred: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -13475,6 +13497,7 @@ ms:
   module_publish_menu_30b638dd: "Menu Terbit Modul"
   module_publish_menu_88b54c1b: "Menu terbit modul"
   module_published_80f0b9b8: "Modul diterbitkan"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Pilihan terbit modul"
   modules: 
     assignments_to_grade: 
       one: "1 tugasan mempunyai serahan tidak bergred"
@@ -14917,6 +14940,7 @@ ms:
   permissions_365c49e: Keizinan
   permissions_manage_9eea4f8f: "Keizinan - urus"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Izinkan penggunaan semua parameter \"include\" untuk kunci pembangun ini. Parameter \"include\" boleh memberikan akses kepada data tambahan yang tidak termasuk dalam skop yang dipilih di bawah."
+  permitted_api_endpoints_b092c4cc: "Titik akhir API yang diizinkan"
   persists_the_used_authentication_provider_when_log_15113afc: "Meneruskan penyedia pengesahan yang digunakan apabila log masuk, dan melalaikan log masuk baharu kepada penyedia lalai"
   personal_pronouns_7d271f52: "Ganti Diri Peribadi"
   philippines_63_a4f62138: "Filipina (+63)"
@@ -20527,6 +20551,7 @@ ms:
        Pengiraan dibuat dari permulaan hari hingga penghujung hari dalam zon masa yang ditetapkan pada akaun yang menjalankan laporan.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Laporan ini mendapat persidangan Big Blue Button yang terkini untuk akaun."
   this_report_gets_the_submissions_for_courses_d83bb449: "Laporan ini mendapat serahan untuk kursus."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Laporan ini menyediakan senarai semua Kunci Pembangun yang tersedia untuk institusi. Kunci ini sama ada dapat terus dipasang dalam akaun akar yang menjalankan laporan atau boleh diwarisi daripada akaun akar induk. Pilihan Kunci Pembangun adalah sama ada kunci API atau LTI."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Laporan ini menyediakan semua ePortfolio yang aktif untuk institusi semasa. Sebagai pilihan pilih 'Hanya termasuk ePortfolio daripada pengguna yang tidak berdaftar' untuk mengurangkan skop hasil ePortfolio hanya kepada pengguna yang tidak berdaftar tersebut. Anda juga boleh menjalankan laporan dengan 'Termasuk Objek Dipadamkan' untuk hanya memasukkan ePortfolio yang telah dialih keluar tersebut."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Laporan ini menunjukkan semua hasil pembelajaran yang wujud dalam akaun ini. Fail CSV yang terhasil akan mempunyai satu baris bagi setiap hasil dan akan menunjukkan butiran semua atribut berkaitan bagi setiap hasil."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -21395,6 +21420,7 @@ ms:
   update_criterion_edcbd330: "Kemas Kini Kriteria"
   update_domain_account_lookup_9c89440d: "Kemas Kini Carian Akaun Domain"
   update_failed_2c87428c: "Kemas Kini gagal"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Kemas kini jadual rumusan gred untuk menggunakan rangka kerja moden."
   update_important_info_bcc01d6a: "Kemas Kini Maklumat Penting"
   update_inbox_page_to_use_react_instui_4d343fd: "Kemas Kini halaman Peti Masuk untuk menggunakan react/instui"
   update_link_b7cab181: "Kemas kini pautan"
