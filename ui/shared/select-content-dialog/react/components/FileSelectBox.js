@@ -131,15 +131,6 @@ export default class FileSelectBox extends React.Component {
   }
 
   render() {
-    const newQuizzesModulesSupport = window?.ENV?.new_quizzes_modules_support
-    const ariaLabel = newQuizzesModulesSupport
-      ? I18n.t(
-          'Select the files you want to associate, or add files by selecting "Create File(s)".'
-        )
-      : I18n.t('Select the files you want to associate, or add files by selecting "New File(s)".')
-    const newFile = newQuizzesModulesSupport
-      ? I18n.t('[ Create File(s) ]')
-      : I18n.t('[ New File(s) ]')
     return (
       <div>
         <select
@@ -148,10 +139,12 @@ export default class FileSelectBox extends React.Component {
           }}
           aria-busy={this.isLoading()}
           className="module_item_select"
-          aria-label={ariaLabel}
+          aria-label={I18n.t(
+            'Select the files you want to associate, or add files by selecting "Create File(s)".'
+          )}
           multiple={true}
         >
-          <option value="new">{newFile}</option>
+          <option value="new">{I18n.t('[ Create File(s) ]')}</option>
           {this.renderFilesAndFolders()}
         </select>
       </div>

@@ -845,7 +845,7 @@ describe "assignments" do
       course_with_teacher_logged_in
       @new_group = "fine_leather_jacket"
       get "/courses/#{@course.id}/assignments/new"
-      click_option("#assignment_group_id", "[ New Group ]")
+      click_option("#assignment_group_id", "[ Create Group ]")
 
       # type something in here so you can check to make sure it was not added
       fj("div.controls > input:visible").send_keys(@new_group)

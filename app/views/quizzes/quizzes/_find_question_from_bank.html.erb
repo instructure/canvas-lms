@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% new_quizzes_modules_support = !!Account.site_admin.feature_enabled?(:new_quizzes_modules_support) %>
-
 <div id="find_question_dialog" style="display: none;">
   <a href="<%= context_url(@context, :context_question_banks_url, :include_bookmarked => '1', :inherited => '1') %>" class="find_question_banks_url" style="display: none;">&nbsp;</a>
   <a href="/<%= @quiz.context_url_prefix %>/question_banks/{{ question_bank_id }}/questions?inherited=1" class="question_bank_questions_url" style="display: none;">&nbsp;</a>
@@ -64,13 +62,7 @@
               <label for="quiz_group_select"><%= before_label(:add_questions_to_group, "Add questions to the question group") %></label>
               <select class="quiz_group_select" id="quiz_group_select">
                 <option value="none"><%= t('options.no_group', "[ No Group ]") %></option>
-                <option class="bottom" value="new">
-                  <% if new_quizzes_modules_support %>
-                    <%= t('options.create_group', "[ Create Group ]") %>
-                  <% else %>
-                    <%= t('options.new_group', "[ New Group ]") %>
-                  <% end %>
-                </option>
+                <option class="bottom" value="new"><%= t('options.create_group', "[ Create Group ]") %></option>
               </select>
             </div>
             <div class="button-container" style="margin-bottom: 5px;">

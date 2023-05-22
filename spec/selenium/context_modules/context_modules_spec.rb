@@ -391,7 +391,7 @@ describe "context modules" do
         file_names.each { |item_name| expect(fj(".context_module_item:contains(#{item_name.inspect})")).to be_displayed }
       end
 
-      it "uploads mutiple files to add items to a module" do
+      it "uploads multiple files to add items to a module" do
         get "/courses/#{@course.id}/modules"
 
         filename, fullpath, _data = get_file("testfile1.txt")

@@ -1064,28 +1064,14 @@ test('includes htmlUrl', () => {
   equal(json.htmlUrl, 'http://example.com/assignments/1')
 })
 
-test('uses edit url for htmlUrl when managing a quiz_lti assignment and new_quizzes_modules_support enabled', () => {
+test('uses edit url for htmlUrl when managing a quiz_lti assignment', () => {
   const assignment = new Assignment({
     html_url: 'http://example.com/assignments/1',
     is_quiz_lti_assignment: true,
   })
   ENV.PERMISSIONS = {manage: true}
-  ENV.FLAGS = {new_quizzes_modules_support: true}
   const json = assignment.toView()
   equal(json.htmlUrl, 'http://example.com/assignments/1/edit?quiz_lti')
-  ENV.PERMISSIONS = {}
-  ENV.FLAGS = {}
-})
-
-test('uses htmlUrl when managing a quiz_lti assignment and new_quizzes_modules_support disabled', () => {
-  const assignment = new Assignment({
-    html_url: 'http://example.com/assignments/1',
-    is_quiz_lti_assignment: true,
-  })
-  ENV.PERMISSIONS = {manage: true}
-  ENV.FLAGS = {new_quizzes_modules_support: false}
-  const json = assignment.toView()
-  equal(json.htmlUrl, 'http://example.com/assignments/1')
   ENV.PERMISSIONS = {}
   ENV.FLAGS = {}
 })
@@ -1096,7 +1082,6 @@ test('uses htmlUrl when not managing a quiz_lti assignment', () => {
     is_quiz_lti_assignment: true,
   })
   ENV.PERMISSIONS = {manage: false}
-  ENV.FLAGS = {new_quizzes_modules_support: true}
   const json = assignment.toView()
   equal(json.htmlUrl, 'http://example.com/assignments/1')
   ENV.PERMISSIONS = {}

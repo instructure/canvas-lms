@@ -33,11 +33,6 @@ require_migration_to_new_quizzes:
   environments:
     production:
       state: hidden
-new_quizzes_modules_support:
-  display_name: New Quizzes support for Modules
-  description: Improved New Quizzes support with Modules including creating New Quizzes from Modules
-  applies_to: SiteAdmin
-  state: hidden
 new_quizzes_assignment_build_button:
   display_name: New Quizzes Assignment Build Button
   description: Add a Build button on the Assignment edit page for New Quizzes Assignments

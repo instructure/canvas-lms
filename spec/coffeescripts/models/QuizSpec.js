@@ -231,11 +231,10 @@ test('#initialize should set deletion_url from html url', function () {
   equal(this.quiz.get('deletion_url'), 'http://localhost:3000/courses/1/assignments/7')
 })
 
-QUnit.module('Quiz.Next with manage and new_quizzes_modules_support enabled', {
+QUnit.module('Quiz.Next with manage enabled', {
   setup() {
     fakeENV.setup({
       PERMISSIONS: {manage: true},
-      FLAGS: {new_quizzes_modules_support: true},
     })
     this.quiz = new Quiz({
       id: 7,
