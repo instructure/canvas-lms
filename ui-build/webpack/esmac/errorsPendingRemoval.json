@@ -12,12 +12,6 @@
     "request": "@canvas/i18n/rtlHelper"
   },
   {
-    "name": "SpecifierMismatchError",
-    "source": "ui/features/assignment_show/index.js",
-    "target": "ui/shared/immersive-reader/ImmersiveReader.js",
-    "request": "../../shared/immersive-reader/ImmersiveReader"
-  },
-  {
     "name": "AccessViolationError",
     "source": "ui/features/assignments_show_student/react/components/AttemptType/MediaAttempt.js",
     "target": "ui/features/media_player_iframe_content/react/CanvasMediaPlayer.js",
@@ -154,12 +148,6 @@
     "source": "ui/shared/outcomes/react/hooks/useOutcomesImport.js",
     "target": "ui/shared/outcomes/react/hooks/useCanvasContext.js",
     "request": "@canvas/outcomes/react/hooks/useCanvasContext"
-  },
-  {
-    "name": "SpecifierMismatchError",
-    "source": "ui/features/assignments_show_student/react/components/StudentContent.js",
-    "target": "ui/shared/immersive-reader/ImmersiveReader.js",
-    "request": "../../../../shared/immersive-reader/ImmersiveReader"
   },
   {
     "name": "SpecifierMismatchError",
