@@ -51,7 +51,7 @@ export const AssignmentGroup = {
   mock: ({
     _id = '1',
     name = 'Group 1',
-    groupWeight = 0.5,
+    groupWeight = 50,
     gradesConnection = {
       nodes: [
         {
@@ -59,12 +59,6 @@ export const AssignmentGroup = {
           currentScore: 90,
           overrideGrade: 'B',
           overrideScore: 80,
-        },
-        {
-          currentGrade: 'B',
-          currentScore: 80,
-          overrideGrade: 'C',
-          overrideScore: 70,
         },
       ],
     },

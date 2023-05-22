@@ -20,7 +20,10 @@ import React from 'react'
 
 import {Pill} from '@instructure/ui-pill'
 
+import {Assignment} from '../../../graphql/Assignment'
+import {AssignmentGroup} from '../../../graphql/AssignmentGroup'
 import {GradingStandard} from '../../../graphql/GradingStandard'
+import {Submission} from '../../../graphql/Submission'
 import {
   getAssignmentGroupScore,
   formatNumber,
@@ -32,7 +35,29 @@ import {
   getAssignmentEarnedPoints,
   getAssignmentPercentage,
   getAssignmentLetterGrade,
+  getAssignmentGroupTotalPoints,
+  getAssignmentGroupEarnedPoints,
+  getAssignmentGroupPercentage,
+  getAssignmentGroupLetterGrade,
 } from '../utils'
+
+const createAssignment = (score, pointsPossible) => {
+  return Assignment.mock({
+    pointsPossible,
+    submissionsConnection: {nodes: [Submission.mock({score})]},
+  })
+}
+
+const mockAssignments = (possibleScores = []) => {
+  return possibleScores.length === 0
+    ? [
+        createAssignment(10, 10),
+        createAssignment(8, 10),
+        createAssignment(7, 10),
+        createAssignment(6, 10),
+      ]
+    : possibleScores.map(score => createAssignment(10, score))
+}
 
 const getTime = past => {
   const date = new Date()
@@ -353,6 +378,108 @@ describe('util', () => {
       it('should return null when letter grade cannot be determined', () => {
         const assignment = {}
         expect(getAssignmentLetterGrade(assignment, gradingStandard)).toBeNull()
+      })
+    })
+  })
+
+  describe('Assignment Groups', () => {
+    describe('getAssignmentGroupTotalPoints', () => {
+      it('should return the points possible for the assignment group', () => {
+        const assignmentGroup = AssignmentGroup.mock()
+        const assignments = mockAssignments()
+        expect(getAssignmentGroupTotalPoints(assignmentGroup, assignments)).toBe(40)
+      })
+
+      it('should return 0 when points possible is not provided', () => {
+        const assignmentGroup = {}
+        const assignments = []
+        expect(getAssignmentGroupTotalPoints(assignmentGroup, assignments)).toBe(0)
+      })
+
+      it('should return undefined when assignments are not provided', () => {
+        const assignmentGroup = {}
+        expect(getAssignmentGroupTotalPoints(assignmentGroup)).toBe(undefined)
+      })
+    })
+
+    describe('getAssignmentGroupEarnedPoints', () => {
+      it('should return the earned points for the assignment group', () => {
+        const assignmentGroup = AssignmentGroup.mock()
+        const assignments = mockAssignments()
+        expect(getAssignmentGroupEarnedPoints(assignmentGroup, assignments)).toBe(31)
+      })
+
+      it('should return 0 when earned points is not provided', () => {
+        const assignmentGroup = {}
+        const assignments = []
+        expect(getAssignmentGroupEarnedPoints(assignmentGroup, assignments)).toBe(0)
+      })
+
+      it('should return undefined when assignments are not provided', () => {
+        const assignmentGroup = {}
+        expect(getAssignmentGroupEarnedPoints(assignmentGroup)).toBe(undefined)
+      })
+    })
+
+    describe('getAssignmentGroupPercentage', () => {
+      describe('when the assignment group is not weighted', () => {
+        it('should return the correct percentage for the assignment group', () => {
+          const assignmentGroup = AssignmentGroup.mock()
+          const assignments = mockAssignments()
+          expect(getAssignmentGroupPercentage(assignmentGroup, assignments, false)).toBe(77.5)
+        })
+
+        it('should return 0 when total points is not provided', () => {
+          const assignmentGroup = {}
+          const assignments = []
+          expect(getAssignmentGroupPercentage(assignmentGroup, assignments, false)).toBe(0)
+        })
+
+        it('should return 0 when assignments are not provided', () => {
+          const assignmentGroup = {}
+          expect(getAssignmentGroupPercentage(assignmentGroup, undefined, false)).toBe(0)
+        })
+      })
+
+      describe('when the assignment group is weighted', () => {
+        it('should return the correct percentage for the assignment group', () => {
+          const assignmentGroup = AssignmentGroup.mock()
+          const assignments = mockAssignments()
+          expect(getAssignmentGroupPercentage(assignmentGroup, assignments, true)).toBe(
+            77.5 * (assignmentGroup?.groupWeight / 100)
+          )
+        })
+
+        it('should return 0 when total points is not provided', () => {
+          const assignmentGroup = {}
+          const assignments = []
+          expect(getAssignmentGroupPercentage(assignmentGroup, assignments, true)).toBe(0)
+        })
+
+        it('should return 0 when assignments are not provided', () => {
+          const assignmentGroup = {}
+          expect(getAssignmentGroupPercentage(assignmentGroup, undefined, true)).toBe(0)
+        })
+      })
+    })
+
+    describe('getAssignmentGroupLetterGrade', () => {
+      const gradingStandard = GradingStandard.mock()
+
+      it('should return the correct letter grade for the assignment group', () => {
+        const assignmentGroup = AssignmentGroup.mock()
+        const assignments = mockAssignments()
+        expect(getAssignmentGroupLetterGrade(assignmentGroup, assignments, gradingStandard)).toBe(
+          'C+'
+        )
+      })
+
+      it('should return null when letter grade cannot be determined', () => {
+        const assignmentGroup = {}
+        const assignments = []
+        expect(getAssignmentGroupLetterGrade(assignmentGroup, assignments, gradingStandard)).toBe(
+          'N/A'
+        )
       })
     })
   })
