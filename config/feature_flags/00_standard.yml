@@ -65,12 +65,6 @@ common_cartridge_page_conversion:
   description: If enabled, Common Cartridge importers will convert HTML files into
     Pages
   applies_to: Course
-commons_favorites:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Import Commons Favorites
-  description: If Commons is installed, allows importing favorited content items from
-    within Canvas.
 compact_live_event_payloads:
   state: allowed
   applies_to: RootAccount

@@ -2878,16 +2878,8 @@ class ApplicationController < ActionController::Base
              HAS_GRADING_PERIODS: @context.grading_periods?,
              VALID_DATE_RANGE: CourseDateRange.new(@context),
              assignment_menu_tools: external_tools_display_hashes(:assignment_menu),
-             assignment_index_menu_tools: (if @domain_root_account&.feature_enabled?(:commons_favorites)
-                                             external_tools_display_hashes(:assignment_index_menu)
-                                           else
-                                             []
-                                           end),
-             assignment_group_menu_tools: (if @domain_root_account&.feature_enabled?(:commons_favorites)
-                                             external_tools_display_hashes(:assignment_group_menu)
-                                           else
-                                             []
-                                           end),
+             assignment_index_menu_tools: external_tools_display_hashes(:assignment_index_menu),
+             assignment_group_menu_tools: external_tools_display_hashes(:assignment_group_menu),
              discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
              quiz_menu_tools: external_tools_display_hashes(:quiz_menu),
              current_user_has_been_observer_in_this_course: current_user_has_been_observer_in_this_course,

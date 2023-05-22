@@ -74,25 +74,11 @@ describe WikiPagesController do
       end
     end
 
-    context "placements for Commons Favorites Import" do
-      before do
-        allow(controller).to receive(:external_tools_display_hashes).and_return(["tool 1", "tool 2"])
-      end
-
-      it "js_env has no placements when feature is disabled" do
-        @course.root_account.disable_feature! :commons_favorites
-        get "show", params: { course_id: @course.id, id: @page.url }
-        expect(response).to be_successful
-        expect(controller.external_tools_display_hashes(:wiki_index_menu)).to eq ["tool 1", "tool 2"]
-        expect(controller.js_env[:wiki_index_menu_tools]).to eq []
-      end
-
-      it "js_env has placements when feature is enabled" do
-        @course.root_account.enable_feature! :commons_favorites
-        get "show", params: { course_id: @course.id, id: @page.url }
-        expect(response).to be_successful
-        expect(controller.js_env[:wiki_index_menu_tools]).to eq ["tool 1", "tool 2"]
-      end
+    it "js_env has placements for Commons Favorites Import" do
+      allow(controller).to receive(:external_tools_display_hashes).and_return(["tool 1", "tool 2"])
+      get "show", params: { course_id: @course.id, id: @page.url }
+      expect(response).to be_successful
+      expect(controller.js_env[:wiki_index_menu_tools]).to eq ["tool 1", "tool 2"]
     end
 
     context "when K5 mode is enabled and user is a student" do

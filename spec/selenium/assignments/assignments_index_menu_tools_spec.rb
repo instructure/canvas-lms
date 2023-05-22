@@ -40,8 +40,6 @@ describe "assignments index menu tool placement" do
     @course.assignments.create(name: "test assignment", assignment_group: @agroup1)
     @assignment1 = @course.assignments.first
     @agroup2 = @course.assignment_groups.create!(name: "assignments group2")
-
-    Account.default.enable_feature!(:commons_favorites)
   end
 
   it "is able to launch the index menu tool via the tray", custom_timeout: 30 do

@@ -167,20 +167,8 @@ describe ContextModulesController do
         subject
       end
 
-      context "when commons favorites FF is off" do
-        it "ignores tray placement tools" do
-          expect(tool_definitions[:module_index_menu]).to eq []
-        end
-      end
-
-      context "when commons favorites FF is on" do
-        before :once do
-          @course.root_account.enable_feature! :commons_favorites
-        end
-
-        it "sends tray placement tool definitions" do
-          expect(tool_definitions[:module_index_menu].first[:id]).to eq tool.id
-        end
+      it "sends tray placement tool definitions" do
+        expect(tool_definitions[:module_index_menu].first[:id]).to eq tool.id
       end
 
       it "sends modal placement tool definitions" do

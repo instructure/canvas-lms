@@ -117,12 +117,6 @@ class ContextModulesController < ApplicationController
         @menu_tools[p] = tools.select { |t| t.has_placement? p }
       end
 
-      # only show tray tools when feature flag is enabled
-      unless @domain_root_account&.feature_enabled?(:commons_favorites)
-        @menu_tools[:module_index_menu] = []
-        @menu_tools[:module_group_menu] = []
-      end
-
       if @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
         module_file_details = load_module_file_details
       end
