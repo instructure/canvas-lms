@@ -84,10 +84,18 @@ module BundlerLockfileExtensions
             end
 
             next unless default_spec
-            next if default_spec.version == spec.version
+
+            # have to ensure Path sources are relative to their lockfile before comparing
+            same_source = if [default_spec.source, spec.source].grep(::Bundler::Source::Path).length == 2
+                            lockfile_definition[:lockfile].dirname.join(spec.source.path).ascend.any?(::Bundler.default_lockfile.dirname.join(default_spec.source.path))
+                          else
+                            default_spec.source == spec.source
+                          end
+
+            next if default_spec.version == spec.version && same_source
             next if lockfile_definition[:allow_mismatched_dependencies] && transitive_dependencies.include?(spec.name)
 
-            ::Bundler.ui.error("#{spec} in #{lockfile_definition[:lockfile].relative_path_from(Dir.pwd)} does not match the default lockfile's version (@#{default_spec.version}); this may be due to a conflicting requirement, which would require manual resolution.")
+            ::Bundler.ui.error("#{spec}#{spec.git_version} in #{lockfile_definition[:lockfile].relative_path_from(Dir.pwd)} does not match the default lockfile's version (@#{default_spec.version}#{default_spec.git_version}); this may be due to a conflicting requirement, which would require manual resolution.")
             success = false
           end
 
