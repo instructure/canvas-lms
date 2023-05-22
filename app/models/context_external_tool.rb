@@ -1408,18 +1408,15 @@ class ContextExternalTool < ActiveRecord::Base
     delay_if_production(priority: Delayed::LOW_PRIORITY).prepare_for_ags(matching_1_1_tool.id)
   end
 
-  def prepare_for_ags(matching_1_1_tool_id)
-    related_assignments(matching_1_1_tool_id).each do |a|
-      a.prepare_for_ags_if_needed!(self, use_tool: true)
-    end
-  end
-
   # finds all assignments related to a tool, whether directly through a
   # ContentTag with a ContextExternalTool as its `content`, or indirectly
   # through a ContentTag with a `url` that matches a ContextExternalTool.
-  # accepts a `tool_id` parameter that specifies the tool to search for.
+  # accepts a `tool_id` parameter that specifies the matching 1.1 tool.
   # if this isn't provided, searches for self.
-  def related_assignments(tool_id = nil)
+  #
+  # Loads assignments in batches and kicks off smaller jobs that perform
+  # the actual work of creating LTI records for the assignments.
+  def prepare_for_ags(tool_id)
     tool_id ||= id
     scope = Assignment.active.joins(:external_tool_tag)
 
@@ -1431,21 +1428,65 @@ class ContextExternalTool < ActiveRecord::Base
       scope = scope.where(root_account_id: root_account_id, content_tags: { root_account_id: root_account_id })
     end
 
-    directly_associated = scope.where(content_tags: { content_id: tool_id })
-    indirectly_associated = []
-    scope
-      .where(content_tags: { content_id: nil })
+    GuardRail.activate(:secondary) do
+      # directly associated
+      scope
+        .where(content_tags: { content_id: tool_id })
+        .find_ids_in_batches do |ids|
+          delay_if_production(
+            priority: Delayed::LOW_PRIORITY,
+            n_strand: ["ContextExternalTool#prepare_batch_for_ags", tool_id]
+          ).prepare_direct_batch_for_ags(ids)
+        end
+
+      # indirectly associated
+      # TODO: this does not account for assignments that _are_ linked to a
+      # tool and the tag has a content_id, but the content_id doesn't match
+      # the current tool
+      scope
+        .where(content_tags: { content_id: nil })
+        .find_ids_in_batches do |ids|
+          delay_if_production(
+            priority: Delayed::LOW_PRIORITY,
+            n_strand: ["ContextExternalTool#prepare_batch_for_ags", tool_id]
+          ).prepare_indirect_batch_for_ags(tool_id, ids)
+        end
+    end
+  end
+
+  # Creates LTI 1.3 records (ResourceLink and LineItem) for
+  # assignments directly associated with the 1.1 tool that
+  # matches this 1.3 tool, as part of the 1.1 -> 1.3 migration.
+  # Direct association: Assignment -> external_tool_tag -> content
+  def prepare_direct_batch_for_ags(assignment_ids)
+    Assignment.where(id: assignment_ids).find_each do |a|
+      prepare_assignment_for_ags(a)
+    end
+  end
+
+  # Creates LTI 1.3 records (ResourceLink and LineItem) for
+  # assignments indirectly associated with the 1.1 tool that
+  # matches this 1.3 tool, as part of the 1.1 -> 1.3 migration.
+  # Indirect association: Assignment -> external_tool_tag -> url ->
+  # find_external_tool. Commonly needed when directly linked tool
+  # is deleted/reinstalled.
+  def prepare_indirect_batch_for_ags(tool_id, assignment_ids)
+    Assignment
+      .where(id: assignment_ids)
+      .joins(:external_tool_tag)
       .select("assignments.*", "content_tags.url as tool_url")
-      .each do |a|
+      .find_each do |a|
         # again, look for the 1.1 tool by excluding self from this query.
-        # an unavoidable N+1, sadly
+        # a (currently) unavoidable N+1, sadly
         a_tool = self.class.find_external_tool(a.tool_url, a, nil, id)
         next if a_tool.nil? || a_tool.id != tool_id
 
-        indirectly_associated << a
+        prepare_assignment_for_ags(a)
       end
+  end
 
-    directly_associated + indirectly_associated
+  def prepare_assignment_for_ags(assignment)
+    assignment.prepare_for_ags_if_needed!(self, use_tool: true)
   end
 
   # Intended to return true only for Instructure-owned tools that have been

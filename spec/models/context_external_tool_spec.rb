@@ -3308,9 +3308,39 @@ describe ContextExternalTool do
       end
     end
 
-    context "#related_assignments" do
+    describe "#prepare_for_ags" do
+      subject { tool.prepare_for_ags(old_tool.id) }
+
       let(:course) { course_model(account: account) }
       let(:account) { account_model }
+      let(:direct) do
+        a = assignment_model(context: course, title: "direct", submission_types: "external_tool")
+        a.external_tool_tag = ContentTag.create!(context: a, content: old_tool)
+        a.save!
+        a
+      end
+      let(:indirect) do
+        a = assignment_model(context: course, title: "indirect", submission_types: "external_tool")
+        a.external_tool_tag = ContentTag.create!(context: a, content: old_tool)
+        a.save!
+        a
+      end
+      let(:old_tool) { external_tool_model(context: course, opts: { url: "https://special.url" }) }
+      let(:tool) do
+        t = old_tool.dup
+        t.lti_version = "1.3"
+        t.developer_key = DeveloperKey.create!
+        t.save!
+        t
+      end
+
+      it "calls assignment#prepare_for_ags_if_needed!" do
+        expect(direct.line_items.count).to eq 0
+        expect(indirect.line_items.count).to eq 0
+        subject
+        expect(direct.line_items.count).to eq 1
+        expect(indirect.line_items.count).to eq 1
+      end
 
       shared_examples_for "finds related assignments" do
         before do
@@ -3324,18 +3354,32 @@ describe ContextExternalTool do
           other_tool = external_tool_model(opts: { url: "https://different.url" })
           diff_url = assignment_model(context: course)
           ContentTag.create!(context: diff_url, url: other_tool.url)
+
+          allow(tool).to receive(:prepare_assignment_for_ags)
         end
 
         it "finds assignments using tool id" do
           direct = assignment_model(context: course, title: "direct")
           ContentTag.create!(context: direct, content: old_tool)
-          expect(tool.related_assignments(old_tool.id)).to eq([direct])
+          subject
+          expect(tool).to have_received(:prepare_assignment_for_ags).with(direct)
         end
 
         it "finds assignments using tool url" do
           indirect = assignment_model(context: course, title: "indirect")
           ContentTag.create!(context: indirect, url: old_tool.url)
-          expect(tool.related_assignments(old_tool.id)).to eq([indirect])
+          subject
+          expect(tool).to have_received(:prepare_assignment_for_ags).with(indirect)
+        end
+
+        it "finds both direct and indirect assignments" do
+          direct = assignment_model(context: course, title: "direct")
+          ContentTag.create!(context: direct, content: old_tool)
+          indirect = assignment_model(context: course, title: "indirect")
+          ContentTag.create!(context: indirect, url: old_tool.url)
+          subject
+          expect(tool).to have_received(:prepare_assignment_for_ags).with(direct)
+          expect(tool).to have_received(:prepare_assignment_for_ags).with(indirect)
         end
       end
 
