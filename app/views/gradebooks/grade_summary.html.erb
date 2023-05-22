@@ -30,6 +30,7 @@
   assignments_2_student_enabled = @context.feature_enabled?(:assignments_2_student)
   js_env visibility_feedback_enabled: feedback_visibility_enabled
   js_env assignments_2_student_enabled: assignments_2_student_enabled
+  js_env restrict_quantitative_data: @context.restrict_quantitative_data?(@current_user)
 %>
 <div id="grade-summary-content" style="display: none;">
   <% provide :right_side do %>
@@ -40,9 +41,14 @@
         </div>
       <% else %>
         <div class="student_assignment final_grade">
-          <%= before_label(:total, "Total") %> <span class="grade"></span>
-          <% if @context.grading_standard_enabled? %>
-            (<span class="letter_grade" id="final_letter_grade_text">–</span>)
+          <%= before_label(:total, "Total") %>
+          <% if !@context.restrict_quantitative_data?(@current_user) %>
+            <span class="grade"></span>
+            <% if @context.grading_standard_enabled? %>
+              (<span class="letter_grade" id="final_letter_grade_text">–</span>)
+            <% end %>
+          <% else %>
+            <span class="letter_grade" id="final_letter_grade_text">–</span>
           <% end %>
         </div>
       <% end %>
@@ -123,7 +129,7 @@
   <% end %>
 
   <div id="assignments">
-    <% if Account.site_admin.feature_enabled?(:student_grade_summary_upgrade) || @domain_root_account.feature_enabled?(:restrict_quantitative_data) %>
+    <% if Account.site_admin.feature_enabled?(:student_grade_summary_upgrade) || @context.restrict_quantitative_data?(@current_user) %>
       <div id="grade-summary-react"></div>
     <% else %>
       <span id="aria-announcer" class="hide-text affix" aria-live="polite"></span>
