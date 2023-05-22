@@ -64,6 +64,13 @@ end
 # phase to prevent that from happening.
 return if method(:source).owner == Bundler::Plugin::DSL
 
+module PreferGlobalRubyGemsSource
+  def rubygems_sources
+    [global_rubygems_source] + non_global_rubygems_sources
+  end
+end
+::Bundler::SourceList.prepend(PreferGlobalRubyGemsSource)
+
 module GemOverride
   def gem(name, *version, path: nil, **kwargs)
     # Bundler calls `gem` internally by passing a splat with a hash as the
