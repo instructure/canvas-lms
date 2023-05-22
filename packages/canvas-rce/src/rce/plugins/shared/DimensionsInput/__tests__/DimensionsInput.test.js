@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen, within} from '@testing-library/react'
 
 import DimensionsInput, {useDimensionsState} from '..'
 import DimensionsInputDriver from './DimensionsInputDriver'
@@ -51,6 +51,7 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
       minWidth: 30,
       minHeight: 60,
       minPercentage: 10,
+      hidePercentage: false,
     }
   })
 
@@ -1398,6 +1399,49 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
           expect(dimensionsState.percentage).toBeNaN()
         })
       })
+    })
+  })
+  describe('When hidePercentage is false', () => {
+    let percentageRadio
+    let pixelsRadio
+
+    beforeEach(() => {
+      initialState.usePercentageUnits = true
+      renderComponent()
+      const container = screen.getByTestId('dimension-type')
+      percentageRadio = within(container).getByLabelText('Percentage')
+      pixelsRadio = within(container).getByLabelText('Pixels')
+    })
+
+    it('The radio input group for Percentage and Pixels is displayed', () => {
+      const radioInputGroup = screen.getByRole('group', {name: /Dimension Type/i})
+      expect(radioInputGroup).toBeVisible()
+    })
+    it('The "Percentage" radio input is checked', () => {
+      expect(percentageRadio).toBeChecked()
+      expect(pixelsRadio).not.toBeChecked()
+    })
+    it('The dimension input for width is not rendered', () => {
+      const widthInput = screen.queryByLabelText('Width')
+      expect(widthInput).not.toBeInTheDocument()
+    })
+    it('The dimension input for height is not rendered', () => {
+      const heightInput = screen.queryByLabelText('Height')
+      expect(heightInput).not.toBeInTheDocument()
+    })
+  })
+  describe('When hidePercentage is true', () => {
+    beforeEach(() => {
+      props.hidePercentage = true
+      renderComponent()
+    })
+    it('The radio input group for Percentage and Pixels is not displayed', () => {
+      const radioInputGroup = screen.queryByRole('group', {name: /Dimension Type/i})
+      expect(radioInputGroup).toBeNull()
+    })
+    it('The custom text description is displayed', () => {
+      const label = screen.getByText('Custom width and height (Pixels)')
+      expect(label).toBeVisible()
     })
   })
 })
