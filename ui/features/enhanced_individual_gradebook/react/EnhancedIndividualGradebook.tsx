@@ -47,11 +47,8 @@ export default function EnhancedIndividualGradebook() {
   const [students, setStudents] = useState<UserConnection[]>([])
   const [assignments, setAssignments] = useState<AssignmentConnection[]>([])
 
-  const [selectedAssignment, setSelectedAssignment] = useState<AssignmentConnection>()
-  const [selectedSubmissions, setSelectedSubmissions] = useState<SubmissionConnection[]>([])
-
   const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || '' // TODO: get from somewhere else?
-  const [searchParams, setSearhParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const studentIdQueryParam = searchParams.get(STUDENT_SEARCH_PARAM)
   const [selectedStudentId, setSelectedStudentId] = useState<string | null | undefined>(
     studentIdQueryParam
@@ -59,7 +56,14 @@ export default function EnhancedIndividualGradebook() {
 
   const [assignmentGroupMap, setAssignmentGroupMap] = useState<AssignmentGroupCriteriaMap>({})
 
-  const selectedAssignmentId = searchParams.get(ASSIGNMENT_SEARCH_PARAM)
+  const assignmentIdQueryParam = searchParams.get(ASSIGNMENT_SEARCH_PARAM)
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null | undefined>(
+    assignmentIdQueryParam
+  )
+  const selectedAssignment = assignments.find(assignment => assignment.id === selectedAssignmentId)
+  const submissionsForSelectedAssignment = submissions.filter(
+    submission => submission.assignmentId === selectedAssignmentId
+  )
 
   const {data, error} = useQuery<GradebookQueryResponse>(GRADEBOOK_QUERY, {
     variables: {courseId},
@@ -95,21 +99,20 @@ export default function EnhancedIndividualGradebook() {
     setSelectedStudentId(studentId)
     if (studentId) {
       searchParams.set(STUDENT_SEARCH_PARAM, studentId)
-      setSearhParams(searchParams)
     } else {
       searchParams.delete(STUDENT_SEARCH_PARAM)
     }
+    setSearchParams(searchParams)
   }
 
-  const handleAssignmentChange = (assignment?: AssignmentConnection) => {
-    setSelectedAssignment(assignment)
-    setSelectedSubmissions(submissions.filter(s => s.assignment.id === assignment?.id))
-    if (assignment) {
-      searchParams.set(ASSIGNMENT_SEARCH_PARAM, assignment?.id)
-      setSearhParams(searchParams)
+  const handleAssignmentChange = (assignmentId?: string) => {
+    setSelectedAssignmentId(assignmentId)
+    if (assignmentId) {
+      searchParams.set(ASSIGNMENT_SEARCH_PARAM, assignmentId)
     } else {
       searchParams.delete(ASSIGNMENT_SEARCH_PARAM)
     }
+    setSearchParams(searchParams)
   }
 
   return (
@@ -151,7 +154,13 @@ export default function EnhancedIndividualGradebook() {
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
-      <AssignmentInformation assignment={selectedAssignment} submissions={selectedSubmissions} />
+      <AssignmentInformation
+        assignment={selectedAssignment}
+        gradebookOptions={{}}
+        submissions={submissionsForSelectedAssignment}
+      />
+
+      <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
     </View>
   )
 }

@@ -51,9 +51,13 @@ export const GRADEBOOK_QUERY = gql`
           position
           assignmentsConnection {
             nodes {
-              pointsPossible
+              anonymizeStudents
               id: _id
+              muted
               name
+              omitFromFinalGrade
+              pointsPossible
+              submissionTypes
             }
           }
         }

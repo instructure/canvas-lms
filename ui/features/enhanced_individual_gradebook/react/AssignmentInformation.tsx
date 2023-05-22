@@ -17,31 +17,188 @@
  */
 
 import React from 'react'
-import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {AssignmentConnection, SubmissionConnection} from '../types'
+import {View} from '@instructure/ui-view'
+import {Link} from '@instructure/ui-link'
+import {AssignmentConnection, GradebookOptions, SubmissionConnection} from '../types'
+import {computeAssignmentDetailText} from '../utils/gradebookUtils'
+import {Button} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   assignment?: AssignmentConnection
   submissions?: SubmissionConnection[]
+  gradebookOptions: GradebookOptions // TODO: get this from gradebook settings
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function AssignmentInformation({assignment, submissions}: Props) {
+export default function AssignmentInformation({
+  assignment,
+  gradebookOptions,
+  submissions = [],
+}: Props) {
+  if (!assignment) {
+    return (
+      <View as="div">
+        <View as="div" className="row-fluid">
+          <View as="div" className="span4">
+            <View as="h2">{I18n.t('Assignment Information')}</View>
+          </View>
+          <View as="div" className="span8 pad-box top-only">
+            <View as="p" className="submission_selection">
+              {I18n.t('Select an assignment to view additional information here.')}
+            </View>
+          </View>
+        </View>
+      </View>
+    )
+  }
+
+  const gradedSubmissions = submissions.filter(s => s.score !== null && s.score !== undefined)
+  const scores = gradedSubmissions.map(s => s.score)
+
   return (
     <View as="div">
       <View as="div" className="row-fluid">
         <View as="div" className="span4">
-          <View as="h2">{I18n.t('Assignment Information')}</View>
+          <View as="h2">Assignment Information</View>
         </View>
-        <View as="div" className="span8 pad-box top-only">
-          <View as="p" className="submission_selection">
-            {I18n.t('Select an assignment to view additional information here.')}
+        <View as="div" className="span8">
+          <View as="h3" className="assignment_selection">
+            <Link href="#" isWithinText={false}>
+              {assignment.name}
+            </Link>
           </View>
+          {assignment.omitFromFinalGrade && (
+            <>
+              <i className="icon-warning">
+                <View as="span" className="screenreader-only">
+                  {I18n.t('Warning')}
+                </View>
+              </i>{' '}
+              {I18n.t('This assignment does not count toward the final grade.')}
+            </>
+          )}
+          {/* {{#if showAssignmentPointsWarning}}
+                <span className="text-error">
+                  <a {{bind-attr href="selectedAssignment.html_url"}}>
+                    <i className="icon-warning"><span className="screenreader-only">{{#t}}Warning{{/t}}</span></i>
+                    {{#t}}Assignments in this group have no points possible and cannot be included in grade calculation.{{/t}}
+                  </a>
+                </span>
+              {{/if}}
+            {{/if}} */}
+          <View as="div">
+            <Link href="#" isWithinText={false}>
+              {I18n.t('See this assignment in speedgrader')}
+            </Link>
+          </View>
+          {/* {{#if showDownloadSubmissionsButton}}
+              <View as="div" className="pad-box no-sides">
+                {{
+                  ic-submission-download-dialog
+                  submissionsDownloadUrl=selectedAssignment.submissions_download_url
+                }}
+              </div>
+            {{/if}} */}
+          <View as="div" className="pad-box no-sides">
+            <View as="p">
+              <View as="strong">
+                {I18n.t('Submission types:')} {assignment.submissionTypes}
+              </View>
+            </View>
+            <View as="p">
+              <View as="strong">
+                {I18n.t('Graded submissions:')} {gradedSubmissions.length}
+              </View>
+            </View>
+          </View>
+
+          <AssignmentScoreDetails assignment={assignment} scores={scores} />
+
+          <AssignmentActions assignment={assignment} gradebookOptions={gradebookOptions} />
         </View>
       </View>
     </View>
+  )
+}
+
+type AssignmentScoreDetailsProps = {
+  assignment: AssignmentConnection
+  scores: number[]
+}
+function AssignmentScoreDetails({assignment, scores}: AssignmentScoreDetailsProps) {
+  // TODO: memorize this
+  const {average, max, min} = computeAssignmentDetailText(assignment, scores)
+  return (
+    <View as="div" className="pad-box bottom-only ic-Table-responsive-x-scroll">
+      <table className="ic-Table">
+        <thead>
+          <tr>
+            <th>{I18n.t('Points possible')}</th>
+            <th>{I18n.t('Average Score')}</th>
+            <th>{I18n.t('High Score')}</th>
+            <th>{I18n.t('Low Score')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              {assignment.pointsPossible ? assignment.pointsPossible : I18n.t('No points possible')}
+            </td>
+            <td>{average}</td>
+            <td>{max}</td>
+            <td>{min}</td>
+          </tr>
+        </tbody>
+      </table>
+    </View>
+  )
+}
+
+type AssignmentActionsProps = {
+  assignment: AssignmentConnection
+  gradebookOptions: GradebookOptions
+}
+function AssignmentActions({assignment, gradebookOptions}: AssignmentActionsProps) {
+  return (
+    <>
+      <div
+        className="checkbox"
+        style={{padding: '12px', margin: '10px 0px', background: '#eee', borderRadius: '5px'}}
+      >
+        <label className="checkbox" htmlFor="muted-checkbox">
+          {I18n.t('Muted?')}
+          <input
+            id="muted-checkbox"
+            type="checkbox"
+            aria-label="Click to unmute."
+            checked={assignment.muted}
+            readOnly={true}
+          />
+        </label>
+      </div>
+      {!gradebookOptions.anonymizeStudents && (
+        <View as="div" className="pad-box no-sides">
+          <Button color="secondary">{I18n.t('Message students who...')}</Button>
+        </View>
+      )}
+      <View as="div" className="pad-box no-sides">
+        <Button color="secondary">{I18n.t('Set default grade')}</Button>
+        {/* {{#if disableAssignmentGrading}}
+          {{#t}}Unable to set default grade because this assignment is due in a closed grading period for at least one student{{/t}}
+          {{/if}} */}
+      </View>
+      <View as="div" className="pad-box no-sides">
+        {assignment.pointsPossible ? (
+          <Button color="secondary">{I18n.t('Curve Grades')}</Button>
+        ) : null}
+
+        {/* {{#if disableAssignmentGrading}}
+            {{#t}}Unable to curve grades because this assignment is due in a closed grading period for at least one student{{/t}}
+            {{/if}}
+          {{/if}} */}
+      </View>
+    </>
   )
 }

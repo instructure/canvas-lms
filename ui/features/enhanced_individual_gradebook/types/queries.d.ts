@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {WorkflowState} from '../../../api.d'
+import {WorkflowState} from '../../../api'
 
 export type UserConnection = {
   enrollments: {
@@ -40,6 +40,7 @@ export type AssignmentConnection = {
   anonymizeStudents: boolean
   omitFromFinalGrade: boolean
   workflowState: WorkflowState
+  muted: boolean
 }
 
 export type AssignmentGroupConnection = {
@@ -59,9 +60,7 @@ export type AssignmentGroupConnection = {
 }
 
 export type SubmissionConnection = {
-  assignment: {
-    id: string
-  }
+  assignmentId: string
   user: UserConnection
   id: string
   score: number

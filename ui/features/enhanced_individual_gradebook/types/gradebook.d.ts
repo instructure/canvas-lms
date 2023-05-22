@@ -18,4 +18,15 @@
 
 export type GradebookOptions = {
   includeUngradedAssignments?: boolean
+  anonymizeStudents?: boolean
+}
+
+export type AssignmentDetailCalculationText = {
+  max: string
+  min: string
+  pointsPossible: string
+  average: string
+  median: string
+  lowerQuartile: string
+  upperQuartile: string
 }
