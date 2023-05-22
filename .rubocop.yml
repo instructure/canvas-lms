@@ -90,6 +90,8 @@ Performance/MethodObjectAsBlock:
 
 Rails:
   Severity: error
+  Exclude:
+    - "bin/**/*"
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/Blank:
