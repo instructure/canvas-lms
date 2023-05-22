@@ -135,8 +135,7 @@ class ContextModulesController < ApplicationController
                manage_files_edit: @context.grants_right?(@current_user, session, :manage_files_edit)
              },
              MODULE_TOOLS: module_tool_definitions,
-             DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
-             new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support)
+             DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account)
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
       is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)

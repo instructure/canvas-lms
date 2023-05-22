@@ -38,7 +38,6 @@ export interface EnvContextModules {
   }
   MODULE_TOOLS: Record<string, unknown>
   DEFAULT_POST_TO_SIS: boolean
-  new_quizzes_modules_support: boolean
 
   MASTER_COURSE_SETTINGS?: {
     IS_MASTER_COURSE: boolean

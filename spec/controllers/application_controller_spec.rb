@@ -849,20 +849,19 @@ RSpec.describe ApplicationController do
         controller.send(:content_tag_redirect, Account.default, tag, nil)
       end
 
-      it "redirects for an assignment" do
-        tag = create_tag(content_type: "Assignment")
-        expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, { module_item_id: 42 }).and_return("nil")
-        allow(controller).to receive(:redirect_to)
-        controller.send(:content_tag_redirect, Account.default, tag, nil)
-      end
-
-      context "when manage and new_quizzes_modules_support enabled" do
+      context "when manage enabled" do
         let(:course) { course_model }
 
         before do
           controller.instance_variable_set(:@context, course)
           allow(course).to receive(:grants_right?).and_return true
-          Account.site_admin.enable_feature!(:new_quizzes_modules_support)
+        end
+
+        it "redirects for an assignment" do
+          tag = create_tag(content_type: "Assignment")
+          expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, { module_item_id: 42 }).and_return("nil")
+          allow(controller).to receive(:redirect_to)
+          controller.send(:content_tag_redirect, Account.default, tag, nil)
         end
 
         it "redirects to edit for a quiz_lti assignment" do
@@ -930,6 +929,9 @@ RSpec.describe ApplicationController do
       end
 
       it "redirects for an alignment" do
+        course = course_model
+        controller.instance_variable_set(:@context, course)
+        allow(course).to receive(:grants_right?).and_return true
         tag = create_tag(content_type: "Assignment", tag_type: "learning_outcome")
         expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, {}).and_return("nil")
         allow(controller).to receive(:redirect_to)

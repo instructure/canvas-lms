@@ -959,12 +959,7 @@ Assignment.prototype.objectTypeDisplayName = function () {
 }
 
 Assignment.prototype.htmlUrl = function () {
-  if (
-    this.isQuizLTIAssignment() &&
-    canManage() &&
-    ENV.FLAGS &&
-    ENV.FLAGS.new_quizzes_modules_support
-  ) {
+  if (this.isQuizLTIAssignment() && canManage()) {
     return this.htmlEditUrl() + '?quiz_lti'
   } else {
     return this.get('html_url')

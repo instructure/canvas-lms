@@ -213,7 +213,7 @@ module ContextModulesCommon
     wait_for_ajaximations
     select_module_item("#add_module_item_select", "File")
 
-    select_module_item(item_select_selector + " .module_item_select", "[ New File(s) ]")
+    select_module_item(item_select_selector + " .module_item_select", "[ Create File(s) ]")
     wait_for_ajaximations
 
     f("#module_attachment_uploaded_data").send_keys(filepath)
@@ -229,7 +229,7 @@ module ContextModulesCommon
     wait_for_ajaximations
     select_module_item("#add_module_item_select", "File")
 
-    select_module_item(item_select_selector + " .module_item_select", "[ New File(s) ]")
+    select_module_item(item_select_selector + " .module_item_select", "[ Create File(s) ]")
     wait_for_ajaximations
 
     # the folder options have &nbsp; entities in them and I cannot
