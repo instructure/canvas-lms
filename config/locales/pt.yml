@@ -5996,6 +5996,7 @@ pt:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Não é possível definir a data limite de substituição para uma data dentro de um período de classificação fechado"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Não é possível sis_account_id root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Não é possível definir a data limite para uma data dentro de um período de classificação fechado"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Não é possível anular a eliminação de um tópico secundário quando o tópico principal da disciplina também é eliminado. Em vez disso, anula a eliminação do tópico principal da disciplina."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "não podes utilizar os nomes reservados do importador do livro de classificação"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Não é possível visualizar relatórios detalhados para atribuições anónimas até que as classificações sejam ativadas."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Não é possível visualizar relatórios detalhados para tarefas anónimas até que as notas sejam lançadas."
@@ -6966,6 +6967,7 @@ pt:
   consortium_parent_keys_803547b: "Chaves dos Pais do Consórcio"
   consumer_key_57d9fcf1: "Chave do cliente"
   consumer_key_6f94ba11: "Chave do cliente"
+  contact_info_8e3304d1: "Informações de contacto"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Contacte o seu administrador se precisar de alterar a visibilidade da disciplina."
   content_1440204b: Conteúdo
   content_access_id_601d931e: "ID de acesso ao conteúdo"
@@ -8485,9 +8487,9 @@ pt:
   course_pace_plan_c79cbffc: "Planos de Pausa de Disciplina"
   course_paces_4396b508: Percursos
   course_paces_description: |-
-      O Curso Pacing adiciona apoio para inscrições no Canvas;
-      que permite a distribuição mágica de datas de início para alunos com
-      datas de início diferentes com base no ritmo definido por um instrutor. Aprenda mais e dê
+      O ritmo da disciplina adiciona suporte para inscrições contínuas ao Canvas;
+      distribui automaticamente as datas de entrega para alunos com datas de início
+      diferentes com base no ritmo definido por um instrutor. Aprenda mais e dê
       feedback juntando-se ao *Grupo de Utilizadores do Pacote de Disciplina*.
   course_paces_table_ce32db1c: "Tabela de Ritmo s da Disciplina"
   course_pacing_40c14b61: "Ritmo da Disciplina"
@@ -10092,6 +10094,7 @@ pt:
     unnamed_tool: "Ferramenta sem nome"
   developer_keys_d70ba44a: "Chaves de desenvolvedor"
   developer_keys_manage_806da2d: "Chaves de desenvolvedor - gerir "
+  developer_keys_report_4d041e62: "Relatório de chaves de desenvolvedor"
   developername_logo_88951d4: "%{developerName} Logotipo"
   developers_keys_table_69ae6b7e: "Tabela de Chaves de Desenvolvedores"
   dialog_form_wrapper: 
@@ -10788,6 +10791,7 @@ pt:
   duplicate_assignment_name_3ca7d753: "Tarefa duplicada %{name}"
   duplicate_discussion_title_43b39959: "Discussão Duplicada %{title}"
   duplicate_discussion_title_6537ef4d: "Duplicar discussão %{title}"
+  duplicate_ids_23b0a29e: "IDs duplicados"
   duplicate_item_339f54bb: "Item duplicado"
   duplicate_module_module_name_be40ad50: "Módulo Duplicado %{module_name}"
   duplicate_module_name_ab26e5c3: "Duplicado %{module_name}"
@@ -11654,6 +11658,7 @@ pt:
   error_retrieving_assignment_configuration_tools_f7d75303: "Erro ao recuperar ferramentas de configuração de atribuição"
   error_retrieving_assignment_external_tools_9102d343: "Erro ao recuperar ferramentas externas de tarefa"
   error_retrieving_content_c07ee76b: "Erro ao recuperar o conteúdo"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Erro na recuperação de conteúdo da ferramenta (item de conteúdo incorreto)"
   error_retrieving_content_from_tool_e65ef3b7: "Erro na recuperação de conteúdo da ferramenta"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Erro ao recuperar ferramentas de detecção de similaridade"
   error_running_quizzes_2_export_cfecedba: "Erro ao exportar os Quizzes 2."
@@ -12567,6 +12572,7 @@ pt:
   for_each_late_62aecf41: "Para cada tardio"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Para Desenvolvedores de Ferramentas LTI 1.3:* Siga as instruções na secção \"O que exatamente precisa de mudar?\" do artigo da Comunidade."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Para trabalhos publicados manualmente, a presença de um comentário de submissão não pelo próprio utilizador do trabalho permitirá a publicação do trabalho. Anteriormente, isso teria exigido uma nota antes que o lançamento pudesse ocorrer."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Para obter mais informações, consulte a *documentação da API do Canvas*."
   for_name_d5684bfd: "Para %{name}"
   for_students_who_d0fd45d0: "Para alunos que..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -12673,6 +12679,7 @@ pt:
   global_announcements_a78912c8: "Anúncios globais"
   global_announcements_add_edit_delete_843ca4d2: "Anúncios globais - adicionar/editar/eliminar"
   global_branding_df1cae12: "Marcas globais"
+  global_id_ffe1be80: "ID global"
   global_inherited_developer_keys_4a6c15de: "Chaves de Desenvolvedor Herdado Global"
   global_keys_40e1a451: "Chaves globais"
   global_message_icons: 
@@ -14685,6 +14692,7 @@ pt:
       Se ativado, os pontos finais oEmbed exigirão um
       token  gerado por ferramenta para verificar a origem
       de um pedido de recurso oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Se ativado, preenche previamente o formulário de atribuição com valores de mensagens da ligação profunda na página de criação/edição de atribuição."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Quando ligado, o parâmetros de pesquisa não serão copiados para o corpo da PUBLICAÇÃO durante um lançamento LTI."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "Se ativado, os escopos serão validados nas solicitações de API se a chave do desenvolvedor que está a ser usada exigir escopos."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Se ativado, os Sourcedids usados pelo Canvas para Resultados Básicos serão criptografados."
@@ -15120,6 +15128,7 @@ pt:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "Herdar - a Whitelist será herdada da conta principal.  Os domínios podem ser adicionados, mas não serão aplicados até que você altere essa definição para Ativado."
   inherited_d4d0bc33: Herdado
   inherited_developer_keys_table_e4a65b67: "Tabela de Chaves do Desenvolvedor Herdado"
+  inherited_from_parent_account_4776070d: "Herdado da conta principal"
   inherited_tool_from_parent_context_f4c1c8c7: "Ferramenta herdada do contexto pai."
   initial_sync_incomplete_ec74fe8e: "Sincronização Inicial Incompleta"
   inner_box_background_6f9092f: "Fundo da Caixa Inicial"
@@ -15573,8 +15582,10 @@ pt:
   key_f2a919d5: Chave
   key_ff4089c5: "Chave:"
   key_name_7311d22: "Nome da chave:"
+  key_name_bc712026: "Nome da chave"
   key_settings_44df6a41: "Configurações de chave"
   key_state_for_the_current_account_d16b1cd5: "Estado-chave da conta corrente"
+  key_type_6e8c0909: "Tipo de chave"
   keyboard_instructions_e032939f: "instruções teclado"
   keyboard_nav_dialog: 
     esc_key_notification: "Pressione a tecla Esc antes de utilizar os atalhos do teclado quando estiver a navegar na grelha de notas."
@@ -16284,6 +16295,7 @@ pt:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id deve ser único"
   lti_deep_linking_for_module_index_menu_881feeee: "Ligação profunda LTI para Menu Índice de Módulos"
   lti_deep_linking_line_items_5e0079f7: "Itens de linha de ligação direta de LTI"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Itens de linha de ligação direta LTI na página de criação/edição de trabalhos de campo"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Itens de linha de ligações diretas de LTI na página de edição de Atribuição"
   lti_delete_ee5f1bef: "LTI - eliminar"
   lti_dynamic_registration_8592edb0: "Registo Dinâmico LTI"
@@ -18297,9 +18309,11 @@ pt:
       email: 
         body: "A classificação da sua tarefa %{assignment_title} foi alterada."
         excused: "Esta tarefa foi dispensada."
+        grade: "classificação: %{letter_grade}"
         html: 
           body: "A classificação da sua tarefa %{assignment_title} foi alterada."
           excused: "Esta tarefa foi dispensada ."
+          grade: "classificação: %{letter_grade}"
           link_message: "Reveja a sua tarefa aqui:"
           no_date_set: "Nenhuma data definida"
           not_applicable: ND
@@ -18311,38 +18325,43 @@ pt:
         no_date_set: "Nenhuma data definida"
         not_applicable: ND
         regraded_date: "reavaliação de nota: %{date}"
-        score: "pontuação:  %{score} de %{total}"
+        score: "pontuação: %{score} fora de %{total}"
         score_pending: "pontuação aguardando revisão do professor"
         subject: "Nota alterada: %{assignment}, %{context}"
       sms: 
         body_sms: "Sua classificação por %{title} em %{context} apenas mudou."
+        grade: "classificação: %{letter_grade}"
         more_info: "Mais informações em %{url}"
         no_date_set: "Nenhuma data definida"
         not_applicable: ND
         regraded_date: "reavaliação de nota: %{date}"
-        score: "pontuação:  %{score} de %{total}"
+        score: "pontuação: %{score} fora de %{total}"
         score_pending: "pontuação aguardando revisão do professor"
       summary: 
+        grade: "classificação: %{letter_grade}"
         no_date_set: "Nenhuma data definida"
         not_applicable: ND
         regraded_date: "reavaliação de nota: %{date}"
-        score: "pontuação:  %{score} de %{total}"
+        score: "pontuação: %{score} fora de %{total}"
         score_pending: "pontuação aguardando revisão do professor"
         subject: "Nota alterada: %{title}, %{context}"
       twitter: 
+        grade: "classificação: %{letter_grade}"
         no_date_set: "Nenhuma data definida"
         not_applicable: ND
-        score: "pontuação:  %{score} de %{total}"
+        score: "pontuação: %{score} fora de %{total}"
         score_pending: "(aguardando revisão)"
         tweet: "Alerta do Canvas - alteração de nota: %{date}"
     submission_graded: 
       email: 
         body: "Sua classificação %{assignment} foi classificada."
         excused: "Esta tarefa foi dispensada ."
+        grade: "classificação: %{letter_grade}"
         graded_date: "avaliado: %{date}"
         html: 
           body: "Sua classificação %{assignment} foi classificada."
           excused: "Esta tarefa foi dispensada ."
+          grade: "classificação: %{letter_grade}"
           graded_date: "avaliado: %{date}"
           link_message: "Reveja a sua tarefa aqui:"
           no_date_set: "Nenhuma data definida"
@@ -18353,28 +18372,31 @@ pt:
         link_message: "Reveja a sua tarefa aqui:"
         no_date_set: "Nenhuma data definida"
         not_applicable: ND
-        score: "pontuação:  %{score} de %{total}"
+        score: "pontuação: %{score} fora de %{total}"
         score_pending_review: "pontuação aguardando revisão do professor"
         subject: "Tarefa avaliada: %{assignment}, %{context}"
       sms: 
+        grade: "classificação: %{letter_grade}"
         graded_date: "avaliado: %{date}"
         more_info: "Mais informações em %{url}"
         no_date_set: "Nenhuma data definida"
         not_applicable: ND
-        score: "pontuação:  %{score} de %{total}"
+        score: "pontuação: %{score} fora de %{total}"
         score_pending_review: "pontuação aguardando revisão do professor"
         sms_body: "%{assignment} foi classificado."
       summary: 
+        grade: "classificação: %{letter_grade}"
         graded_date: "avaliado: %{date}"
         no_date_set: "Nenhuma data definida"
         not_applicable: ND
-        score: "pontuação:  %{score} de %{total}"
+        score: "pontuação: %{score} fora de %{total}"
         score_pending_review: "pontuação aguardando revisão do professor"
         subject: "Tarefa avaliada: %{assignment}, %{context}"
       twitter: 
+        grade: "classificação: %{letter_grade}"
         no_date_set: "Nenhuma data definida"
         not_applicable: ND
-        score: "pontuação:  %{score} de %{total}"
+        score: "pontuação: %{score} fora de %{total}"
         score_pending_review: "(aguardando revisão)"
         tweet: "Alerta do Canvas - avaliação: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -18705,6 +18727,7 @@ pt:
   module_publish_menu_30b638dd: "Menu de Publicação do Módulo"
   module_publish_menu_88b54c1b: "Menu de publicação do módulo"
   module_published_80f0b9b8: "Módulo publicado"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Opções de publicação do módulo"
   modules: 
     add: 
       assignment: 
@@ -20615,6 +20638,7 @@ pt:
   permissions_manage_9eea4f8f: "Permissões - gerir"
   permissions_v2_page_f96dde06: "Página de permissões V2"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Permitir a utilização de todos os parâmetros \"inclui\" para esta chave de desenvolvimento. Os parâmetros \"inclui\" podem permitir o acesso a dados adicionais não incluídos nos âmbitos selecionados abaixo."
+  permitted_api_endpoints_b092c4cc: "Pontos de extremidade de API permitidos"
   persian_a8cadb95: Persa
   persists_the_used_authentication_provider_when_log_15113afc: "Persiste o fornecedor de autenticação utilizado ao iniciar sessão, e por defeito novos logins para o fornecedor padrão"
   personal_pronouns_7d271f52: "Pronomes pessoais"
@@ -28013,6 +28037,7 @@ pt:
        As contagens são feitas desde o início do dia até ao fim do dia no fuso horário definido da conta que executa o relatório.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Este relatório recebe as conferências recentes do botão azul Grande para uma conta."
   this_report_gets_the_submissions_for_courses_d83bb449: "Este relatório recebe as submissões para as disciplinas."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Este relatório fornece uma lista de todas as Chaves de desenvolvedor disponíveis para a instituição. Essas chaves podem ser instaladas diretamente na conta raiz a partir da qual o relatório é executado ou podem ser herdadas de contas raiz pai. As Chaves de desenvolvedor podem ser chaves de API ou LTI."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Este relatório fornece a todos os ePortfolios activos para a instituição atual. Opcionalmente, selecione 'Incluir ePortfolios apenas de utilizadores sem inscrições' para reduzir o âmbito dos resultados do ePortfolio apenas para os utilizadores sem inscrições. Também pode executar o relatório com 'Incluir Objetos Eliminados' para incluir apenas os ePortfolios que tenham sido eliminados."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Este relatório mostra todos os resultados de aprendizagem existentes nesta conta. O ficheiro csv resultante terá uma linha por resultado e mostrará os detalhes de todos os atributos associados com cada resultado."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -29416,6 +29441,7 @@ pt:
   update_domain_account_lookup_9c89440d: "Atualizar Conta de Domínio Lookup"
   update_failed_2c87428c: "Atualização falhada"
   update_file_links_to_prefer_preview_not_download_94535382: "Atualizar ligações de ficheiros para preferir a pré-visualização, não descarregar"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Atualiza a tabela de resumo de notas para usar uma estrutura moderna"
   update_how_we_process_sis_imports_8195bf77: "Atualize como processamos as importações do SIS"
   update_important_info_bcc01d6a: "Atualizar Informação Importante"
   update_inbox_page_to_use_react_instui_4d343fd: "Atualizar a página da caixa de entrada para utilizar o react/instui"

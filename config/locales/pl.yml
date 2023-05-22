@@ -6075,6 +6075,7 @@ pl:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Nie można ustawić zastępowanego terminu na datę w zamkniętym okresie oceniania"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Nie można ustawić sis_account_id na root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Nie można ustawić terminu na datę w zamkniętym okresie oceniania"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Nie można usunąć tematu podrzędnego, gdy usunięty jest temat nadrzędny kursu. Cofnij usunięcie tematu nadrzędnego kursu."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "nie może używać zastrzeżonych nazw importera dziennika ocen"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Nie można wyświetlić szczegółowych raportów dla anonimowych zadań – wymagane jest włączenie ocen."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Nie można wyświetlić szczegółowych raportów dla anonimowych zadań – wymagane jest opublikowanie ocen."
@@ -7048,6 +7049,7 @@ pl:
   consortium_parent_keys_803547b: "Klucze nadrzędne konsorcjum"
   consumer_key_57d9fcf1: "Klucz klienta"
   consumer_key_6f94ba11: "Klucz klienta"
+  contact_info_8e3304d1: "Dane kontaktowe"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "W celu zmiany widoczności kursu skontaktuj się z administratorem."
   content_1440204b: Zawartość
   content_access_id_601d931e: "Identyfikator dostępu do zawartości"
@@ -8712,7 +8714,7 @@ pl:
   course_paces_4396b508: "Tempa kursów"
   course_paces_description: |-
       Konfigurowanie tempa kursu dodaje obsługę trwających rejestracji w Canvas;
-      umożliwia sprawną dystrybucje terminów dla uczestników z różnymi datami początkowymi
+      umożliwia automatyczną dystrybucję terminów dla uczestników z różnymi datami początkowymi
       w oparciu o określone przez instruktora tempo. Dowiedz się więcej i
       przekaż opinię, dołączając do *Grupy użytkowników konfigurowania tempa kursu*.
   course_paces_table_ce32db1c: "Tabela tempa kursów"
@@ -10361,6 +10363,7 @@ pl:
     unnamed_tool: "Nienazwane Narzędzie"
   developer_keys_d70ba44a: "Klucze Dewelopera"
   developer_keys_manage_806da2d: "Klucze programisty - zarządzaj "
+  developer_keys_report_4d041e62: "Raport z kluczy dewelopera"
   developername_logo_88951d4: "%{developerName} Logo"
   developers_keys_table_69ae6b7e: "Tablica kluczy programisty"
   dialog_form_wrapper: 
@@ -11066,6 +11069,7 @@ pl:
   duplicate_assignment_name_3ca7d753: "Duplikuj zadanie %{name}"
   duplicate_discussion_title_43b39959: "Duplikuj dyskusję %{title}"
   duplicate_discussion_title_6537ef4d: "Duplikuj dyskusję %{title}"
+  duplicate_ids_23b0a29e: "Duplikaty identyfikatorów"
   duplicate_item_339f54bb: "Duplikuj element"
   duplicate_module_module_name_be40ad50: "Duplikuj moduł %{module_name}"
   duplicate_module_name_ab26e5c3: "Duplikuj %{module_name}"
@@ -11945,6 +11949,7 @@ pl:
   error_retrieving_assignment_configuration_tools_f7d75303: "Błąd pobierania narzędzi konfiguracji zadań"
   error_retrieving_assignment_external_tools_9102d343: "Błąd pobierania zewnętrznych narzędzi do zadań"
   error_retrieving_content_c07ee76b: "Błąd podczas pobierania treści"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Błąd podczas przesyłania zawartości z narzędzia (nieprawidłowa pozycja)"
   error_retrieving_content_from_tool_e65ef3b7: "Błąd podczas pobierania zawartości z narzędzia"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Błąd pobierania narzędzi do wykrywania podobieństw"
   error_running_quizzes_2_export_cfecedba: "Błąd podczas uruchamiania eksportu Quizy 2."
@@ -12907,6 +12912,7 @@ pl:
   for_each_late_62aecf41: "Dla każdego opóźnienia"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Dla programistów narzędzia LTI 1.3:* Wykonaj polecenia zawarte w sekcji „Co dokładnie należy zmienić?” artykułu społeczności."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "W przypadku ręcznie publikowanych zadań obecność komentarza do przesyłki dodana przez użytkownika niebędącego jego autorem pozwoli opublikować zadanie. Wcześniej, przed opublikowaniem, wymagana była ocena."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Aby uzyskać więcej informacji, patrz *Dokumentacja dot. interfejsu API w Canvas*."
   for_name_d5684bfd: "Dla %{name}"
   for_students_who_d0fd45d0: "Powiadom uczestników, którzy..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -13023,6 +13029,7 @@ pl:
   global_announcements_a78912c8: "Ogłoszenia globalne"
   global_announcements_add_edit_delete_843ca4d2: "Globalne ogłoszenia - dodaj / edytuj / usuń"
   global_branding_df1cae12: "Globalny branding"
+  global_id_ffe1be80: "Globalny identyfikator"
   global_inherited_developer_keys_4a6c15de: "Globalne odziedziczone klucze programisty"
   global_keys_40e1a451: "Globalne klucze"
   global_message_icons: 
@@ -15070,6 +15077,7 @@ pl:
       Jeśli funkcja jest włączona, punkty końcowe oEmbed będą
        wymagać wygenerowanego przez narzędzie tokena w celu sprawdzenia 
       żądania dot. zasobu oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Po włączeniu, funkcja ta wstępnie wypełnia formularz zadania wartościami z wiadomości Deep Link na stronie tworzenia/edytowania zadań."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Jeśli włączone, parametry zapytania nie zostaną skopiowanie do części POST podczas uruchomienia LTI."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "W przypadku włączenia, zakresy będą weryfikowane na żądanie API, jeśli używany klucz programisty wymaga zakresów."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "W przypadku włączenia tej opcji, Sourcedids używane przez Canvas for Basic Outcomes będą szyfrowane."
@@ -15505,6 +15513,7 @@ pl:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "Dziedzicz – Biała lista zostanie odziedziczona z konta nadrzędnego.  Domeny można dodać, ale nie zostaną wymuszone aż do zmiany tego ustawienia na Wł."
   inherited_d4d0bc33: Odziedziczona
   inherited_developer_keys_table_e4a65b67: "Odziedziczona tablica kluczy programisty"
+  inherited_from_parent_account_4776070d: "Odziedziczone z konta nadrzędnego"
   inherited_tool_from_parent_context_f4c1c8c7: "Odziedziczone narzędzie z nadrzędnego kontekstu."
   initial_sync_incomplete_ec74fe8e: "Nie ukończono początkowej synchronizacji"
   inner_box_background_6f9092f: "Tło pola wewnętrznego"
@@ -15958,8 +15967,10 @@ pl:
   key_f2a919d5: Klucz
   key_ff4089c5: "Klucz:"
   key_name_7311d22: "Nazwa klucza:"
+  key_name_bc712026: "Nazwa klucza"
   key_settings_44df6a41: "Ustawienia klucza"
   key_state_for_the_current_account_d16b1cd5: "Status klucza dla bieżącego konta"
+  key_type_6e8c0909: "Typ klucza"
   keyboard_instructions_e032939f: "Instrukcja dot. klawiatury"
   keyboard_nav_dialog: 
     esc_key_notification: "Naciśnij klawisz Escape przed użyciem skrótów klawiaturowych, podczas nawigacji przez sieć dziennika ocen."
@@ -16679,6 +16690,7 @@ pl:
   lti_context_id_should_be_unique_7437a74d: "Identyfikator lti_context_id musi być unikalny"
   lti_deep_linking_for_module_index_menu_881feeee: "Deep Linking zawartości LTI dla menu indeksu modułów"
   lti_deep_linking_line_items_5e0079f7: "Elementy wiersza Deep Linking LTI"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Pozycje wiersza LTI Deep Linking na stronie tworzenia/edytowania zadań"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Pozycje linii głębokiego linkowania LTO na stronie edytowania zadania"
   lti_delete_ee5f1bef: "LTI - Usuń"
   lti_dynamic_registration_8592edb0: "Rejestracja dynamiczna narzędzi LTI"
@@ -18713,9 +18725,11 @@ pl:
       email: 
         body: "Ocena Twojego zadania %{assignment_title} została zmieniona."
         excused: "To zadanie zostało usprawiedliwione."
+        grade: "ocena: %{letter_grade}"
         html: 
           body: "Ocena Twojego zadania %{assignment_title} została zmieniona."
           excused: "To zadanie zostało usprawiedliwione."
+          grade: "ocena: %{letter_grade}"
           link_message: "Zadanie można przejrzeć tutaj"
           no_date_set: "Nie ustawiono daty"
           not_applicable: "Brak danych"
@@ -18727,38 +18741,43 @@ pl:
         no_date_set: "Nie ustawiono daty"
         not_applicable: "Brak danych"
         regraded_date: "ponownie ocenione: %{date}"
-        score: "wynik punktowy:  %{score} na %{total} możliwych"
+        score: "wynik: %{score} z %{total}"
         score_pending: "oczekuje sprawdzenia punktów przez instruktora"
         subject: "Ocena została zmieniona: %{assignment}, %{context}"
       sms: 
         body_sms: "Twoja ocena za zadanie %{title}, %{context} właśnie została zmieniona."
+        grade: "ocena: %{letter_grade}"
         more_info: "Więcej informacji pod adresem %{url}"
         no_date_set: "Nie ustawiono daty"
         not_applicable: "Brak danych"
         regraded_date: "ponownie ocenione: %{date}"
-        score: "wynik punktowy:  %{score} na %{total} możliwych"
+        score: "wynik: %{score} z %{total}"
         score_pending: "oczekuje sprawdzenia punktów przez instruktora"
       summary: 
+        grade: "ocena: %{letter_grade}"
         no_date_set: "Nie ustawiono daty"
         not_applicable: "Brak danych"
         regraded_date: "ponownie ocenione: %{date}"
-        score: "wynik punktowy:  %{score} na %{total} możliwych"
+        score: "wynik: %{score} z %{total}"
         score_pending: "oczekuje sprawdzenia punktów przez instruktora"
         subject: "Ocena została zmieniona: %{title}, %{context}"
       twitter: 
+        grade: "ocena: %{letter_grade}"
         no_date_set: "Nie ustawiono daty"
         not_applicable: "Brak danych"
-        score: "wynik punktowy:  %{score} na %{total} możliwych"
+        score: "wynik: %{score} z %{total}"
         score_pending: "(trwa sprawdzanie)"
         tweet: "Alert systemu Canvas — zmiana oceny: %{date}"
     submission_graded: 
       email: 
         body: "Zadanie %{assignment} zostało ocenione."
         excused: "To zadanie zostało usprawiedliwione."
+        grade: "ocena: %{letter_grade}"
         graded_date: "oceniono: %{date}"
         html: 
           body: "Zadanie %{assignment} zostało ocenione."
           excused: "To zadanie zostało usprawiedliwione."
+          grade: "ocena: %{letter_grade}"
           graded_date: "oceniono: %{date}"
           link_message: "Zadanie można przejrzeć tutaj"
           no_date_set: "Nie ustawiono daty"
@@ -18769,28 +18788,31 @@ pl:
         link_message: "Zadanie można przejrzeć tutaj:"
         no_date_set: "Nie ustawiono daty"
         not_applicable: "Brak danych"
-        score: "wynik punktowy:  %{score} na %{total} możliwych"
+        score: "wynik: %{score} z %{total}"
         score_pending_review: "oczekuje sprawdzenia punktów przez instruktora"
         subject: "Zadanie ocenione: %{assignment}, %{context}"
       sms: 
+        grade: "ocena: %{letter_grade}"
         graded_date: "oceniono: %{date}"
         more_info: "Więcej informacji pod adresem %{url}"
         no_date_set: "Nie ustawiono daty"
         not_applicable: "Brak danych"
-        score: "wynik punktowy:  %{score} na %{total} możliwych"
+        score: "wynik: %{score} z %{total}"
         score_pending_review: "oczekuje sprawdzenia punktów przez instruktora"
         sms_body: "%{assignment} zostało ocenione."
       summary: 
+        grade: "ocena: %{letter_grade}"
         graded_date: "oceniono: %{date}"
         no_date_set: "Nie ustawiono daty"
         not_applicable: "Brak danych"
-        score: "wynik punktowy:  %{score} na %{total} możliwych"
+        score: "wynik: %{score} z %{total}"
         score_pending_review: "oczekuje sprawdzenia punktów przez instruktora"
         subject: "Zadanie ocenione: %{assignment}, %{context}"
       twitter: 
+        grade: "ocena: %{letter_grade}"
         no_date_set: "Nie ustawiono daty"
         not_applicable: "Brak danych"
-        score: "wynik punktowy:  %{score} na %{total} możliwych"
+        score: "wynik: %{score} z %{total}"
         score_pending_review: "(trwa sprawdzanie)"
         tweet: "Alert systemu Canvas — ocena: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -19135,6 +19157,7 @@ pl:
   module_publish_menu_30b638dd: "Menu publikowania modułu"
   module_publish_menu_88b54c1b: "Menu publikowania modułu"
   module_published_80f0b9b8: "Opublikowano moduł"
+  modulename_module_publish_options_69ef1ece: "Opcje publikowania modułu %{moduleName}"
   modules: 
     add: 
       assignment: 
@@ -21065,6 +21088,7 @@ pl:
   permissions_manage_9eea4f8f: "Zezwolenia - zarządzaj"
   permissions_v2_page_f96dde06: "Strona zezwoleń V2"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Zezwala na użycie wszystkich parametrów włączenia („includes”) dla tego klucza programisty. Parametry włączenia („includes”) mogą zapewniać dostęp do dodatkowych danych, które nie są zawarte w poniżej wybranych zakresach."
+  permitted_api_endpoints_b092c4cc: "Dozwolone punkty końcowe API"
   persian_a8cadb95: Perski
   persists_the_used_authentication_provider_when_log_15113afc: "Zachowuje dostawcę używanego uwierzytelnienia podczas logowania i domyślnie konfiguruje nowe loginy dla domyślnego dostawcy"
   personal_pronouns_7d271f52: "Zaimki osobowe"
@@ -28625,6 +28649,7 @@ pl:
        Liczby są obliczane od początku dnia do końca dnia w ustawionej strefie czasowej konta generującego raport.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Ten raport zawiera przycisk Big Blue ostatnich konferencji dla konta."
   this_report_gets_the_submissions_for_courses_d83bb449: "Ten raport zawiera przesyłki dla kursów."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Raport ten zawiera listę wszystkich kluczy dewelopera dostępnych dla tej instytucji. Klucze można zainstalować bezpośrednio w koncie nadrzędnym, na którym uruchomiono raport, lub mogą być dziedziczone z kont nadrzędnych. Kluczami dewelopera mogą być klucze API lub LTI."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Ten raport zapewnia wszystkie aktywne ePortfolia dla bieżącej instytucji. Opcjonalnie wybierz \"Uwzględnij tylko ePortfolia od użytkowników niezapisanych an kursy\", aby ograniczyć zakres wyników ePortfoliów do tylko użytkowników bez zapisów. Można także uruchomić raport z opcją \"Dołącz usunięte obiekty\", aby uwzględnić tylko usunięte ePortfolia."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Raport ten przedstawia wszystkie wyniki nauki istniejące na tym koncie. Wynikowy plik CSV będzie zawierać jeden wiersz na wynik oraz szczegóły wszystkich powiązanych atrybutów dla każdego wyniku."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -30038,6 +30063,7 @@ pl:
   update_domain_account_lookup_9c89440d: "Zaktualizuj kontrolę konta domeny"
   update_failed_2c87428c: "Aktualizacja nie powiodła się"
   update_file_links_to_prefer_preview_not_download_94535382: "Aktualizuj łącza do plików z preferencją ich podglądu (zamiast pobrania)"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Zaktualizuj tabelę podsumowania ocen, aby używać nowoczesnego formatu"
   update_how_we_process_sis_imports_8195bf77: "Zaktualizuj sposób przetwarzania importów SIS"
   update_important_info_bcc01d6a: "Aktualizuj ważne informacje"
   update_inbox_page_to_use_react_instui_4d343fd: "Aktualizacja strony skrzynki odbiorczej do wykorzystania reakcji / instui"

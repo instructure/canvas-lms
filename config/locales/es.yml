@@ -5990,6 +5990,7 @@ es:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "No se puede establecer una anulación de fecha de entrega a una fecha dentro de un período de calificación cerrado"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "No puede configurarse sis_account_id en root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "No se puede establecer la fecha de entrega a una fecha dentro de un período de calificación cerrado"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "No se puede deshacer la eliminación de un tema secundario cuando el tema raíz del curso también se ha eliminado. Deshaga la eliminación del tema raíz del curso."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "no puede usar los nombres reservados del libro de calificaciones del importador"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "No pueden verse informes detallados de tareas anónimas hasta que las calificaciones dejen de estar silenciadas."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "No se pueden ver los reportes detallados de tareas anónimas hasta que se publiquen las calificaciones."
@@ -6959,6 +6960,7 @@ es:
   consortium_parent_keys_803547b: "Claves principales del consorcio"
   consumer_key_57d9fcf1: "Código del consumidor"
   consumer_key_6f94ba11: "Clave de consumidor"
+  contact_info_8e3304d1: "Información de contacto"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Comuníquese con su administrador si debe cambiar la visibilidad del curso."
   content_1440204b: Contenido
   content_access_id_601d931e: "identificador de acceso de contenido"
@@ -8477,9 +8479,9 @@ es:
   course_pace_plan_c79cbffc: "Pace Plan del curso"
   course_paces_4396b508: "Ritmos del curso"
   course_paces_description: |-
-      El ritmo del curso agrega compatibilidad con las inscripciones continuas en Canvas,
-      lo que permite una distribución mágica de las fechas de vencimiento para los estudiantes con diferentes
-      fechas de inicio según el ritmo definido por el profesor. Obtenga más información y brinde sus
+      El Ritmo del curso agrega a Canvas soporte para las inscripciones continuas,
+      distribuyendo de manera automática las fechas de entrega para los estudiantes con diferentes
+      fechas de inicio en función del ritmo definido por el profesor. Obtenga más información y brinde sus
       comentarios uniéndose al *grupo de usuarios de ritmo del curso*.
   course_paces_table_ce32db1c: "Tabla de ritmos del curso"
   course_pacing_40c14b61: "Course Pacing"
@@ -10084,6 +10086,7 @@ es:
     unnamed_tool: "Herramienta sin nombre"
   developer_keys_d70ba44a: "Claves del desarrollador"
   developer_keys_manage_806da2d: "Claves del desarrollador: administrar "
+  developer_keys_report_4d041e62: "Reporte sobre claves del desarrollador"
   developername_logo_88951d4: "%{developerName} Logo"
   developers_keys_table_69ae6b7e: "Tabla de la clave del desarrollador"
   dialog_form_wrapper: 
@@ -10777,6 +10780,7 @@ es:
   duplicate_assignment_name_3ca7d753: "Tarea duplicada %{name}"
   duplicate_discussion_title_43b39959: "Duplicar foro %{title}"
   duplicate_discussion_title_6537ef4d: "Duplicar foro de discusión %{title}"
+  duplicate_ids_23b0a29e: "Identificaciones duplicadas"
   duplicate_item_339f54bb: "Item duplicado"
   duplicate_module_module_name_be40ad50: "Duplicar módulo %{module_name}"
   duplicate_module_name_ab26e5c3: "Duplicado %{module_name}"
@@ -11644,6 +11648,7 @@ es:
   error_retrieving_assignment_configuration_tools_f7d75303: "Error al recuperar las herramientas de configuración de la tarea"
   error_retrieving_assignment_external_tools_9102d343: "Error al recuperar las herramientas externas de la tarea"
   error_retrieving_content_c07ee76b: "Error al recuperar el contenido"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Error al recuperar el contenido de la herramienta (ítem de contenido incorrecto)"
   error_retrieving_content_from_tool_e65ef3b7: "Error al recuperar contenido de la herramienta"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Error al consultar las herramientas de detección de similitud"
   error_running_quizzes_2_export_cfecedba: "Error al ejecutar la exportación a Evaluaciones 2."
@@ -12555,6 +12560,7 @@ es:
   for_each_late_62aecf41: "Por cada retraso"
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Para desarrolladores de la herramienta LTI 1.3:* Siga las instrucciones detalladas en la sección \"¿Qué necesitará exactamente para realizar el cambio?\" del artículo de la Comunidad."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Para tareas publicadas manualmente, la presencia de un comentario sobre la entrega que no sea del propio usuario de la entrega permitirá la publicación de la tarea. Anteriormente, esto hubiera requerido una calificación antes de que pudiera realizarse la publicación."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Para obtener más información, consulte la *documentación de API de Canvas*."
   for_name_d5684bfd: "Para %{name}"
   for_students_who_d0fd45d0: "Para estudiantes que..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -12661,6 +12667,7 @@ es:
   global_announcements_a78912c8: "Anuncios globales"
   global_announcements_add_edit_delete_843ca4d2: "Anuncios globales: agregar/editar/eliminar"
   global_branding_df1cae12: "Marca global"
+  global_id_ffe1be80: "Identificación general"
   global_inherited_developer_keys_4a6c15de: "Claves del desarrollador heredadas globales"
   global_keys_40e1a451: "Claves globales"
   global_message_icons: 
@@ -14667,6 +14674,7 @@ es:
       Cuando estén habilitados, los terminales de oEmbed requerirán un
       token generado por la herramienta para verificar el origen
       de una solicitud de recurso oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Si se activa, rellene previamente el formulario de tarea con los valores de los mensajes de enlace profundo de la página de creación/edición de tareas."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Si está habilitado, los parámetros de consulta no serán copiados al cuerpo de POSTEAR durante el lanzamiento de LTI."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "Si está habilitado, se validará el alcance en las solicitudes de API si la clave del desarrollador que se utiliza así lo requiere."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Si se habilita, se encriptarán las identificaciones de origen utilizadas por Canvas para los resultados básicos."
@@ -15101,6 +15109,7 @@ es:
   inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "Heredar - La lista blanca se heredará de la cuenta principal.  Se podrá agregar dominios pero no se aplicarán hasta que cambie esta configuración a Activado."
   inherited_d4d0bc33: Heredada
   inherited_developer_keys_table_e4a65b67: "Tabla de la clave del desarrollador heredada"
+  inherited_from_parent_account_4776070d: "Heredado de la cuenta principal"
   initial_sync_incomplete_ec74fe8e: "Sincronización inicial incompleta"
   inner_box_background_6f9092f: "Fondo interior de la caja"
   inner_box_border_d0524b03: "Borde interior de la caja"
@@ -15552,8 +15561,10 @@ es:
   key_f2a919d5: Clave
   key_ff4089c5: "Clave:"
   key_name_7311d22: "Nombre de la clave:"
+  key_name_bc712026: "Nombre de la clave"
   key_settings_44df6a41: "Configuraciones clave"
   key_state_for_the_current_account_d16b1cd5: "Estado clave de la cuenta actual"
+  key_type_6e8c0909: "Tipo de clave"
   keyboard_instructions_e032939f: "instrucciones del teclado"
   keyboard_nav_dialog: 
     esc_key_notification: "Presione la tecla de escape antes de usar atajos en el teclado al navegar por la red del Libro de calificaciones."
@@ -16263,6 +16274,7 @@ es:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id debe ser un valor único"
   lti_deep_linking_for_module_index_menu_881feeee: "Enlace profundo LTI para el menú de índice del módulo"
   lti_deep_linking_line_items_5e0079f7: "Elementos de línea de enlace profundo de LTI"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Ítems de enlace profundo LTI en la página de creación/edición de tareas"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Elementos de línea de enlace profundo de LTI en la página de edición de tareas"
   lti_delete_ee5f1bef: "LTI: eliminar"
   lti_dynamic_registration_8592edb0: "Registro dinámico de LTI"
@@ -18277,9 +18289,11 @@ es:
       email: 
         body: "Se modificó la calificación de su tarea %{assignment_title}."
         excused: "Esta tarea ha sido justificada."
+        grade: "calificación: %{letter_grade}"
         html: 
           body: "Se modificó la calificación de su tarea %{assignment_title}."
           excused: "Esta tarea ha sido justificada."
+          grade: "calificación: %{letter_grade}"
           link_message: "Haga clic aquí para revisar la tarea"
           no_date_set: "Sin fecha establecida"
           not_applicable: "N. a."
@@ -18291,38 +18305,43 @@ es:
         no_date_set: "Sin fecha establecida"
         not_applicable: "N. a."
         regraded_date: "recalificado: %{date}"
-        score: "puntaje:  %{score} de %{total}"
+        score: "puntaje: %{score} de %{total}"
         score_pending: "El profesor tiene pendiente la revisión del puntaje"
         subject: "Calificación cambió: %{assignment}, %{context}"
       sms: 
         body_sms: "Su calificación de %{title} en %{context} acaba de cambiar."
+        grade: "calificación: %{letter_grade}"
         more_info: "Más información en %{url}"
         no_date_set: "Sin fecha establecida"
         not_applicable: "N. a."
         regraded_date: "recalificado: %{date}"
-        score: "puntaje:  %{score} de %{total}"
+        score: "puntaje: %{score} de %{total}"
         score_pending: "El profesor tiene pendiente la revisión del puntaje"
       summary: 
+        grade: "calificación: %{letter_grade}"
         no_date_set: "Sin fecha establecida"
         not_applicable: "N. a."
         regraded_date: "recalificado: %{date}"
-        score: "puntaje:  %{score} de %{total}"
+        score: "puntaje: %{score} de %{total}"
         score_pending: "El profesor tiene pendiente la revisión del puntaje"
         subject: "Calificación cambió: %{title}, %{context}"
       twitter: 
+        grade: "calificación: %{letter_grade}"
         no_date_set: "Sin fecha establecida"
         not_applicable: "N. a."
-        score: "puntaje:  %{score} de %{total}"
+        score: "puntaje: %{score} de %{total}"
         score_pending: "(revisión pendiente)"
         tweet: "Alerta de Canvas: cambio de calificación %{date}"
     submission_graded: 
       email: 
         body: "Su tarea %{assignment} ha sido calificada."
         excused: "Esta tarea ha sido justificada."
+        grade: "calificación: %{letter_grade}"
         graded_date: "calificado: %{date}"
         html: 
           body: "Su tarea %{assignment} ha sido calificada."
           excused: "Esta tarea ha sido justificada."
+          grade: "calificación: %{letter_grade}"
           graded_date: "calificado: %{date}"
           link_message: "Haga clic aquí para revisar la tarea"
           no_date_set: "Sin fecha establecida"
@@ -18333,28 +18352,31 @@ es:
         link_message: "Puede revisar la tarea aquí:"
         no_date_set: "Sin fecha establecida"
         not_applicable: "N. a."
-        score: "puntaje:  %{score} de %{total}"
+        score: "puntaje: %{score} de %{total}"
         score_pending_review: "El profesor tiene pendiente la revisión del puntaje"
         subject: "Tarea calificada: %{assignment}, %{context}"
       sms: 
+        grade: "calificación: %{letter_grade}"
         graded_date: "calificado: %{date}"
         more_info: "Más información en %{url}"
         no_date_set: "fin fechas disponibles"
         not_applicable: "N. a."
-        score: "puntaje:  %{score} de %{total}"
+        score: "puntaje: %{score} de %{total}"
         score_pending_review: "El profesor tiene pendiente la revisión del puntaje"
         sms_body: "%{assignment} ha sido calificada."
       summary: 
+        grade: "calificación: %{letter_grade}"
         graded_date: "calificado: %{date}"
         no_date_set: "Sin fecha establecida"
         not_applicable: "N. a."
-        score: "puntaje:  %{score} de %{total}"
+        score: "puntaje: %{score} de %{total}"
         score_pending_review: "El profesor tiene pendiente la revisión del puntaje"
         subject: "Tarea calificada: %{assignment}, %{context}"
       twitter: 
+        grade: "calificación: %{letter_grade}"
         no_date_set: "Sin fecha establecida"
         not_applicable: "N. a."
-        score: "puntaje:  %{score} de %{total}"
+        score: "puntaje: %{score} de %{total}"
         score_pending_review: "(revisión pendiente)"
         tweet: "Alerta de Canvas: calificada: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -18685,6 +18707,7 @@ es:
   module_publish_menu_30b638dd: "Menú de publicación del módulo"
   module_publish_menu_88b54c1b: "Menú de publicación del módulo"
   module_published_80f0b9b8: "Módulo publicado"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Opciones de publicación de módulos"
   modules: 
     add: 
       assignment: 
@@ -20595,6 +20618,7 @@ es:
   permissions_manage_9eea4f8f: "Permisos: administrar"
   permissions_v2_page_f96dde06: "Página V2 de permisos"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Permitir el uso de todos los parámetros de inclusión para esta clave del desarrollador. Los parámetros de inclusión pueden dar acceso a datos adicionales no incluidos en los alcances seleccionados a continuación."
+  permitted_api_endpoints_b092c4cc: "Terminales de API permitidos"
   persian_a8cadb95: Persa
   persists_the_used_authentication_provider_when_log_15113afc: "Mantiene el proveedor de autenticación usado al iniciar sesión y deja, de forma predeterminada, los nuevos inicios de sesión con el proveedor predeterminado"
   personal_pronouns_7d271f52: "Pronombres personales"
@@ -27962,6 +27986,7 @@ es:
        Los conteos se hacen a partir del comienzo del día al final del día en la zona horaria configurada de la cuenta que ejecuta el reporte.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Este reporte obtiene conferencias recientes de BigBlueButton para una cuenta."
   this_report_gets_the_submissions_for_courses_d83bb449: "Este reporte obtiene las entregas para los cursos."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "En este reporte, se enumeran todas las claves del desarrollador disponibles para la institución. Estas claves pueden instalarse directamente en la cuenta raíz desde la que se ejecuta el reporte o pueden heredarse de cuentas raíz superiores. Las claves del desarrollador pueden ser claves API o LTI."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Este informe brinda todos los ePortfolios activos de la institución actual. De manera opcional, seleccione \"Solo incluir ePortfolios de usuarios sin inscripciones\" para reducir el alcance de los resultados de ePortfolio a solo aquellos usuarios que no tengan inscripciones. También puede ejecutar el informe con \"Incluir Objetos Eliminados\" para solo incluir aquellos ePortfolios que fueron eliminados."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Este reporte muestra todos los resultados del aprendizaje que existen en esta cuenta. El archivo CSV resultante tendrá una fila por competencia y mostrará los detalles de todos los atributos asociados con cada resultado."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -29365,6 +29390,7 @@ es:
   update_domain_account_lookup_9c89440d: "Actualizar la búsqueda de cuenta de dominio"
   update_failed_2c87428c: "Error al actualizar"
   update_file_links_to_prefer_preview_not_download_94535382: "Actualizar los enlaces a archivos para preferir la vista previa en vez de la descarga"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Actualizar la tabla resumen de calificaciones para usar un marco moderno"
   update_how_we_process_sis_imports_8195bf77: "Actualizar cómo procesamos las importaciones de SIS"
   update_important_info_bcc01d6a: "Actualizar información importante"
   update_inbox_page_to_use_react_instui_4d343fd: "Actualizar página de la Bandeja de entrada para usar react/instui"
@@ -30380,7 +30406,7 @@ es:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Cuando se selecciona, el curso se encuentra en un estado de solo lectura fuera de estas fechas."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Cuando se selecciona, el curso es inaccesible fuera de las fechas del curso. Si las fechas del curso están en blanco, estas fechas de inicio y finalización se aplican a las fechas de los períodos."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Cuando se selecciona, la sección del curso se encuentra en un estado de solo lectura fuera de estas fechas."
-  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "Cuando se establece, la opción de no mostrar un nuevo cuestionario con 0 puntos posibles en el libro de calificaciones estará disponible en forma de casilla de verificación al crear o editar el cuestionario."
+  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "Cuando se establece, la opción de no mostrar un nuevo cuestionario con 0 puntos posibles en el libro de calificaciones estará disponible en forma de casilla de verificación al crear o editar el cuestionario."
   when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Cuando se establece, determina si el estado del flujo de trabajo de un nuevo examen debe establecerse como calificado o pending_review si un usuario tuvo un examen pending_review nuevo previo, pero lo volvieron a inscribir en el curso."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Cuando se activa esta marca, la navegación del curso permanecerá colapsada o expandida

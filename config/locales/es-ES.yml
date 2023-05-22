@@ -4461,6 +4461,7 @@ es-ES:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "No se puede establecer una anulación de fecha de entrega como una fecha dentro de un período de evaluación cerrado"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "No se puede establecer sis_account_id en una root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "No se puede establecer la fecha de entrega como una fecha dentro de un período de evaluación cerrado"
+  cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "No se puede recuperar un tema subordinado si el tema de la asignatura principal también se ha eliminado. Recuperar el tema de la asignatura principal."
   cannot_use_gradebook_importer_reserved_names_8f3b5748: "no se pueden utilizar nombres reservados para la importación del libro de notas"
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "No se pueden ver los informes detallados de actividades anónimas hasta que se publiquen las notas."
   canvas: 
@@ -5298,6 +5299,7 @@ es-ES:
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "Identificadores en la herramienta AGS LTI coherentes con el dominio principal de la cuenta."
   consortium_parent_keys_803547b: "Claves de los padres de Consortium"
   consumer_key_6f94ba11: "Clave de consumidor"
+  contact_info_8e3304d1: "Información de contacto"
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Ponte en contacto con tu administrador si debes cambiar la visibilidad de la asignatura."
   content_1440204b: Contenido
   content_access_id_601d931e: "identificación de acceso al contenido"
@@ -6515,7 +6517,7 @@ es-ES:
   course_paces_4396b508: "Ritmo de la asignatura"
   course_paces_description: |-
       El ritmo de avance de la asignatura ofrece ayuda para las inscripciones en Canvas;
-      permite una mágica distribución de las fechas de entrega de los estudiantes con fechas de inicio diferentes
+      automáticamente distribuye las fechas de entrega de los estudiantes con fechas de inicio diferentes
       según el ritmo definido por el profesor. Aprende más y proporciona
       comentarios uniéndote al * Grupo de usuarios del ritmo de avance de la asignatura*.
   course_paces_table_ce32db1c: "Tabla de ritmos de la asignatura"
@@ -7669,6 +7671,7 @@ es-ES:
     unnamed_tool: "Herramienta sin nombre"
   developer_keys_d70ba44a: "Claves del desarrollador"
   developer_keys_manage_806da2d: "Claves del desarrollador: administrar "
+  developer_keys_report_4d041e62: "Informe de las claves del desarrollador"
   developers_keys_table_69ae6b7e: "Tabla de la clave del desarrollador"
   dialog_form_wrapper: 
     cancel: Cancelar
@@ -8172,6 +8175,7 @@ es-ES:
   duplicate_31cec192: Duplicado
   duplicate_assignment_name_3ca7d753: "Duplicar actividad %{name}"
   duplicate_discussion_title_6537ef4d: "Duplicar foro de discusión %{title}"
+  duplicate_ids_23b0a29e: "Identificadores duplicados"
   duplicate_item_339f54bb: "Duplicar ítem"
   duplicate_module_name_ab26e5c3: "Duplicar %{module_name}"
   duplicate_modules_8ea35557: "Duplicar módulos"
@@ -8839,6 +8843,7 @@ es-ES:
   error_reports_7d6c8b1e: "Informes del error"
   error_retrieving_assignment_external_tools_9102d343: "Ha habido un error al recuperar las herramientas externas de la actividad"
   error_retrieving_content_c07ee76b: "Ha habido un error al recuperar el contenido"
+  error_retrieving_content_from_tool_bad_content_ite_1281b87: "Ha habido un error al obtener el contenido desde la herramienta (ítem de contenido erróneo)"
   error_retrieving_content_from_tool_e65ef3b7: "Ha habido un error al recuperar contenido de la herramienta"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Ha habido un error al consultar las herramientas de detección de similitud"
   error_running_quizzes_2_export_cfecedba: "Ha habido un error al ejecutar la exportación a Pruebas 2."
@@ -9494,6 +9499,7 @@ es-ES:
   for_canvas_admins_no_actions_or_configuration_chan_de50d145: "*Para los administradores de Canvas:* No es necesaria ninguna acción ni cambio de configuración. Puedes preguntar a los desarrolladores de las herramientas 1.3 que has instalado sobre el estado de los cambios necesarios."
   for_canvas_admins_no_actions_or_configuration_chan_f6fee50a: "*Para los administradores de Canvas:* No es necesaria ninguna acción ni cambio de configuración. Puedes confirmar con los desarrolladores de las herramientas 1.3 que has instalado que han realizado estos cambios."
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Para los desarrolladores de LTI 1.3:* Sigue las instrucciones que encuentres en la sección «¿Qué hay que cambiar exactamente?» del artículo en la Comunidad."
+  for_more_information_see_the_canvas_api_documentat_f07307bf: "Para más información, consulte la *documentación Canvas de la API*."
   for_name_d5684bfd: "Para %{name}"
   for_students_who_d0fd45d0: "Para estudiantes que..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -9589,6 +9595,7 @@ es-ES:
   global_announcements_a78912c8: "Anuncios globales"
   global_announcements_add_edit_delete_843ca4d2: "Anuncios globales: añadir/editar/eliminar"
   global_branding_df1cae12: "Marca global"
+  global_id_ffe1be80: "Identificador Global"
   global_inherited_developer_keys_4a6c15de: "Utilizar la clave del desarrollador de la categoría global"
   global_keys_40e1a451: "Claves globales"
   global_message_icons: 
@@ -10763,6 +10770,7 @@ es-ES:
       Si se habilita, los terminales de oEmbed requerirán un
       token generado por la herramienta para verificar el origen
       de una solicitud de recurso oEmbed.
+  if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Si se habilita esta opción, el formulario de actividad se rellena con los valores procedentes de mensajes de enlaces profundos en la página para crear/editar la actividad."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Si se habilita, los parámetros de consulta no se copiarán en el cuerpo de POST durante el lanzamiento de LTI."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Si se habilita, se encriptarán las identificaciones de origen utilizadas por Canvas para las competencias básicas."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Cuando está habilitado, el historial de entregas de pruebas en Nuevas pruebas se gestiona por separado."
@@ -11052,6 +11060,7 @@ es-ES:
   inherit_from_course_ed8bde8c: "Heredar del curso"
   inherited_d4d0bc33: Heredada
   inherited_developer_keys_table_e4a65b67: "Tabla de la clave del desarrollador recibida"
+  inherited_from_parent_account_4776070d: "Procedentes de la cuenta principal"
   initial_sync_incomplete_ec74fe8e: "Sincronización inicial incompleta"
   inner_box_background_6f9092f: "Fondo del cuadro interno"
   inner_box_border_d0524b03: "Borde del cuadro interno"
@@ -11406,8 +11415,10 @@ es-ES:
   key_api_key_68bf80ae: "Clave: *%{api_key}*"
   key_f2a919d5: Clave
   key_name_7311d22: "Nombre de la clave:"
+  key_name_bc712026: "Nombre de la clave"
   key_settings_44df6a41: "Configuraciones clave"
   key_state_for_the_current_account_d16b1cd5: "Estado clave de la cuenta actual"
+  key_type_6e8c0909: "Tipo de la clave"
   keyboard_nav_dialog: 
     esc_key_notification: "Pulsa la tecla de escape antes de métodos abreviados de teclado al navegar por la red del Libro de notas."
   keyboard_shortcut_for_missing_assignment_848aa9cd: "Acceso directo del teclado para actividades faltantes"
@@ -12020,6 +12031,7 @@ es-ES:
   lti_context_id_should_be_unique_7437a74d: "lti_context_id debe ser único"
   lti_deep_linking_for_module_index_menu_881feeee: "Enlaces profundos de LTI para el menú de índice de contenidos"
   lti_deep_linking_line_items_5e0079f7: "Ítems de línea de enlace profundo de LTI"
+  lti_deep_linking_line_items_on_assignment_create_e_30ccfc99: "Ítems de la línea de enlace profundo de LTI en la página de creación/edición de actividades."
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "Ítems de la línea de enlace profundo de LTI en la página de edición de actividades."
   lti_delete_ee5f1bef: "LTI: eliminar"
   lti_dynamic_registration_8592edb0: "Registro dinámico en LTI"
@@ -13695,9 +13707,11 @@ es-ES:
       email: 
         body: "Se ha modificado la nota de tu actividad %{assignment_title}."
         excused: "Esta actividad ha sido justificada."
+        grade: "nota: %{letter_grade}"
         html: 
           body: "Se ha modificado la nota de tu actividad %{assignment_title}."
           excused: "Esta actividad ha sido justificada."
+          grade: "nota: %{letter_grade}"
           link_message: "Haz clic aquí para revisar la actividad"
           no_date_set: "No se ha establecido la fecha"
           not_applicable: N/A
@@ -13709,38 +13723,43 @@ es-ES:
         no_date_set: "No se ha establecido la fecha"
         not_applicable: N/A
         regraded_date: "reevaluado: %{date}"
-        score: "puntuación:  %{score} de %{total}"
+        score: "puntuación: %{score} de %{total}"
         score_pending: "El profesor tiene pendiente la revisión de la puntuación"
         subject: "La nota ha cambiado: %{assignment}, %{context}"
       sms: 
         body_sms: "tu nota de %{title} en %{context} acaba de cambiar."
+        grade: "nota: %{letter_grade}"
         more_info: "Más información en %{url}"
         no_date_set: "No se ha establecido la fecha"
         not_applicable: N/A
         regraded_date: "reevaluado: %{date}"
-        score: "puntuación:  %{score} de %{total}"
+        score: "puntuación: %{score} de %{total}"
         score_pending: "El profesor tiene pendiente la revisión de la puntuación"
       summary: 
+        grade: "nota: %{letter_grade}"
         no_date_set: "No se ha establecido la fecha"
         not_applicable: N/A
         regraded_date: "reevaluado: %{date}"
-        score: "puntuación:  %{score} de %{total}"
+        score: "puntuación: %{score} de %{total}"
         score_pending: "El profesor tiene pendiente la revisión de la puntuación"
         subject: "La nota ha cambiado: %{title}, %{context}"
       twitter: 
+        grade: "nota: %{letter_grade}"
         no_date_set: "No se ha establecido la fecha"
         not_applicable: N/A
-        score: "puntuación:  %{score} de %{total}"
+        score: "puntuación: %{score} de %{total}"
         score_pending: "(revisión pendiente)"
         tweet: "Alerta de Canvas: cambio de nota %{date}"
     submission_graded: 
       email: 
         body: "Tu actividad %{assignment} ha sido evaluada."
         excused: "Esta actividad ha sido justificada."
+        grade: "nota: %{letter_grade}"
         graded_date: "evaluado: %{date}"
         html: 
           body: "Tu actividad %{assignment} ha sido evaluada."
           excused: "Esta actividad ha sido justificada."
+          grade: "nota: %{letter_grade}"
           graded_date: "evaluado: %{date}"
           link_message: "Haz clic aquí para revisar la actividad"
           no_date_set: "No se ha establecido la fecha"
@@ -13751,24 +13770,27 @@ es-ES:
         link_message: "Puedes revisar la actividad aquí:"
         no_date_set: "No se ha establecido la fecha"
         not_applicable: N/A
-        score: "puntuación:  %{score} de %{total}"
+        score: "puntuación: %{score} de %{total}"
         score_pending_review: "El profesor tiene pendiente la revisión de la puntuación"
         subject: "Actividad evaluada: %{assignment}, %{context}"
       sms: 
+        grade: "nota: %{letter_grade}"
         not_applicable: N/A
-        score: "puntuación:  %{score} de %{total}"
+        score: "puntuación: %{score} de %{total}"
         sms_body: "%{assignment} se ha evaluado."
       summary: 
+        grade: "nota: %{letter_grade}"
         graded_date: "evaluado: %{date}"
         no_date_set: "No se ha establecido la fecha"
         not_applicable: N/A
-        score: "puntuación:  %{score} de %{total}"
+        score: "puntuación: %{score} de %{total}"
         score_pending_review: "El profesor tiene pendiente la revisión de la puntuación"
         subject: "Actividad evaluada: %{assignment}, %{context}"
       twitter: 
+        grade: "nota: %{letter_grade}"
         no_date_set: "No se ha establecido la fecha"
         not_applicable: N/A
-        score: "puntuación:  %{score} de %{total}"
+        score: "puntuación: %{score} de %{total}"
         score_pending_review: "(revisión pendiente)"
         tweet: "Alerta de Canvas: evaluada: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -14060,6 +14082,7 @@ es-ES:
   module_publish_menu_30b638dd: "Menú de publicación de módulos"
   module_publish_menu_88b54c1b: "Menú de publicación de módulos"
   module_published_80f0b9b8: "Módulo publicado"
+  modulename_module_publish_options_69ef1ece: "%{moduleName} Opciones de publicación de módulos"
   modules: 
     assignments_to_grade: 
       one: "1 actividad tiene entregas sin evaluar"
@@ -15538,6 +15561,7 @@ es-ES:
   permissions_365c49e: Permisos
   permissions_manage_9eea4f8f: "Permisos: administrar"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Permitir el uso de todos los parámetros de inclusión para esta clave del desarrollador. Los parámetros de inclusión pueden dar acceso a datos adicionales no incluidos en los alcances seleccionados a continuación."
+  permitted_api_endpoints_b092c4cc: "Puntos finales permitidos de la API"
   persian_a8cadb95: Persa
   persists_the_used_authentication_provider_when_log_15113afc: "Mantener el proveedor de autentificación usado al iniciar sesión y dejar, de forma predeterminada, los nuevos inicios de sesión con el proveedor predeterminado"
   personal_pronouns_7d271f52: "Pronombres personales"
@@ -21323,6 +21347,7 @@ es-ES:
        Los recuentos se realizan desde el principio al final del día en la zona horaria establecida de la cuenta que ejecuta el informe.
   this_report_gets_recent_big_blue_button_conference_5d7dcddb: "Este informe muestra conferencias de botón azul Big para una cuenta."
   this_report_gets_the_submissions_for_courses_d83bb449: "Este informe muestra las entregas de las asignaturas."
+  this_report_provides_a_list_of_all_developer_keys__dd2bfadf: "Este informe proporciona una lista de todas las claves del desarrollador disponibles para la empresa. Pueden instalarse estas claves directamente en la cuenta principal en la que se ejecuta el informe o también pueden utilizarse las de cuentas principales superiores. Las claves del desarrollador pueden ser de tipo API o LTI."
   this_report_provides_all_active_eportfolios_for_th_f7432621: "Este informe brinda todos los ePortfolios activos de la institución actual. De manera opcional, selecciona “Solo incluir ePortfolios de usuarios sin inscripciones” para reducir el alcance de los resultados de ePortfolio a solo aquellos usuarios que no tengan inscripciones. También puedes ejecutar el informe con “Incluir objetos eliminados” para incluir solo aquellos ePortfolios que hayan sido eliminados."
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Este informe muestra todas las competencias de aprendizaje que existen en esta cuenta. El archivo CSV resultante tendrá una fila por competencia, y mostrará los detalles de todos los atributos asociados con cada competencia."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
@@ -22329,6 +22354,7 @@ es-ES:
   update_criterion_edcbd330: "Actualizar criterio"
   update_domain_account_lookup_9c89440d: "Actualizar búsqueda del dominio de la cuenta"
   update_failed_2c87428c: "No se ha podido actualizar"
+  update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Actualizar la tabla con el resumen de las notas para utilizar un marco moderno."
   update_important_info_bcc01d6a: "Actualizar información importante"
   update_inbox_page_to_use_react_instui_4d343fd: "Actualizar página de la Bandeja de entrada para usar react/instui"
   update_link_b7cab181: "Actualizar enlace"
@@ -23154,7 +23180,7 @@ es-ES:
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "Cuando se publiquen las notas de las actividades anónimas, las notas se publicarán para todos los integrantes de la asignatura. Se eliminará el anonimato."
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: "Cuando la ejecución del alcance se deshabilite, los autentificadores tendrán acceso a todos los puntos finales para el usuario autorizado."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Cuando se selecciona, la sección de la asignatura se encuentra en un estado de solo lectura fuera de estas fechas."
-  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "Si se establece esta opción, en el formulario de una casilla de verificación habrá una opción de no mostrar una nueva prueba con 0 puntos posibles en el libro de notas cuando se cree o edite la prueba."
+  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "Si se establece esta opción, en el formulario de una casilla de verificación habrá una opción de no mostrar una nueva prueba con 0 puntos posibles en el libro de notas cuando se cree o edite la prueba."
   when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Si se activa esta opción, se determina si el estado del flujo de trabajo de un examen nuevo debe establecerse como evaluado o pending_review si el usuario tenía un nuevo examen pending_review anterior, pero se ha vuelto a inscribir en la asignatura."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Cuando se habilita este aviso, la navegación de la asignatura seguirá colapsada o expandida
