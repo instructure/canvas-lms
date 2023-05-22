@@ -65,7 +65,7 @@ export default function StudentInformation({
     }
   }, [data, error])
 
-  if (!selectedStudent) {
+  if (!selectedStudent || !studentId) {
     return (
       <View as="div">
         <View as="div" className="row-fluid">

@@ -30,7 +30,7 @@ type Props = {
   selectedStudentId?: string | null
   selectedAssignmentId?: string | null
   onStudentChange: (studentId?: string) => void
-  onAssignmentChange: (assignment?: AssignmentConnection) => void
+  onAssignmentChange: (assignmentId?: string) => void
 }
 
 type DropDownOption<T> = {
@@ -115,7 +115,7 @@ export default function ContentSelection({
     const selectedIndex = (event ? event.target.selectedIndex : newIndex) ?? 0
     setSelectedAssignmentIndex(selectedIndex)
     const selectedAssignment = assignmentDropdownOptions[selectedIndex]?.data
-    onAssignmentChange(selectedAssignment)
+    onAssignmentChange(selectedAssignment?.id)
   }
 
   return (

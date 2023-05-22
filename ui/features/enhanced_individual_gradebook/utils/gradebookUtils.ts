@@ -15,8 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import round from '@canvas/round'
 
-import {AssignmentConnection, AssignmentGroupConnection} from '../types'
+import {
+  AssignmentConnection,
+  AssignmentDetailCalculationText,
+  AssignmentGroupConnection,
+} from '../types'
 import {AssignmentGroupCriteriaMap} from '../../../shared/grading/grading.d'
 
 export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupConnection[]): {
@@ -55,4 +60,31 @@ export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupC
       mappedAssignmentGroupMap: {} as AssignmentGroupCriteriaMap,
     }
   )
+}
+
+// This logic was taken directly from ui/features/screenreader_gradebook/jquery/AssignmentDetailsDialog.js
+export function computeAssignmentDetailText(
+  assignment: AssignmentConnection,
+  scores: number[]
+): AssignmentDetailCalculationText {
+  return {
+    max: nonNumericGuard(Math.max(...scores)),
+    min: nonNumericGuard(Math.min(...scores)),
+    pointsPossible: nonNumericGuard(assignment.pointsPossible, 'N/A'),
+    average: nonNumericGuard(round(scores.reduce((a, b) => a + b, 0) / scores.length, 2)),
+    median: nonNumericGuard(percentile(scores, 0.5)),
+    lowerQuartile: nonNumericGuard(percentile(scores, 0.25)),
+    upperQuartile: nonNumericGuard(percentile(scores, 0.75)),
+  }
+}
+
+function nonNumericGuard(value: number, message = 'No graded submissions'): string {
+  return Number.isFinite(value) && !Number.isNaN(value) ? value.toString() : message
+}
+
+function percentile(values: number[], percentileValue: number): number {
+  const k = Math.floor(percentileValue * (values.length - 1) + 1) - 1
+  const f = (percentileValue * (values.length - 1) + 1) % 1
+
+  return values[k] + f * (values[k + 1] - values[k])
 }
