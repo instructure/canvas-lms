@@ -54,11 +54,6 @@ new_quizzes_account_course_level_item_banks:
     banks owned by specific courses and the root account in new quizzes.
   applies_to: SiteAdmin
   state: hidden
-new_quizzes_skip_to_build_module_button:
-  display_name: New Quizzes Build Button On List Views
-  description: Provides a button which navigates straight to the Build screen in the kebab menu for New Quizzes items on the Modules page, Assignments page, and Quizzes page.
-  applies_to: SiteAdmin
-  state: hidden
 new_quizzes_by_default:
   state: allowed
   display_name: Default to New Quizzes

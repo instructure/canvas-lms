@@ -81,7 +81,6 @@ class AssignmentsController < ApplicationController
           SHOW_SPEED_GRADER_LINK: @current_user.present? && context.allows_speed_grader? && context.grants_any_right?(@current_user, :manage_grades, :view_all_grades),
           FLAGS: {
             newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
-            new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
             show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
           },
           grading_scheme: @context.grading_standard_or_default.data
