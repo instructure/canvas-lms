@@ -145,11 +145,7 @@ class Quizzes::QuizzesController < ApplicationController
           DIRECT_SHARE_ENABLED: @context.grants_right?(@current_user, session, :direct_share)
         },
         quiz_menu_tools: external_tools_display_hashes(:quiz_menu),
-        quiz_index_menu_tools: (if @domain_root_account&.feature_enabled?(:commons_favorites)
-                                  external_tools_display_hashes(:quiz_index_menu)
-                                else
-                                  []
-                                end),
+        quiz_index_menu_tools: external_tools_display_hashes(:quiz_index_menu),
         SIS_NAME: sis_name,
         MAX_NAME_LENGTH: max_name_length,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,

@@ -29,8 +29,6 @@ describe "files page with tools" do
       @tool = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @tool.file_index_menu = { url: "http://www.example.com", text: "Import Stuff" }
       @tool.save!
-
-      Account.default.enable_feature!(:commons_favorites)
     end
 
     it "is able to launch the index menu tool via the tray", custom_timeout: 60 do
