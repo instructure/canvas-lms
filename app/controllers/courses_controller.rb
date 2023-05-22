@@ -2273,7 +2273,6 @@ class CoursesController < ApplicationController
               @context.quiz_lti_tool.present?,
             FLAGS: {
               newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
-              new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
             }
           )
           js_env(COURSE_HOME: true)

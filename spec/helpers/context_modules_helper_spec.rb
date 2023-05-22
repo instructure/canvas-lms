@@ -362,20 +362,4 @@ describe ContextModulesHelper do
       expect(cyoe_able?(item)).to be false
     end
   end
-
-  describe "module_item_new_quizzes_build_button_enabled?" do
-    it "returns true when the feature flag is on" do
-      allow(Account.site_admin).to receive(:feature_enabled?)
-        .with(:new_quizzes_skip_to_build_module_button)
-        .and_return(true)
-      expect(module_item_new_quizzes_build_button_enabled?).to be true
-    end
-
-    it "returns false when the feature flag is off" do
-      allow(Account.site_admin).to receive(:feature_enabled?)
-        .with(:new_quizzes_skip_to_build_module_button)
-        .and_return(false)
-      expect(module_item_new_quizzes_build_button_enabled?).to be false
-    end
-  end
 end

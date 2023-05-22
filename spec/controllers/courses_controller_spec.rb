@@ -1599,7 +1599,7 @@ describe CoursesController do
       @course.default_view = "assignments"
       @course.save!
       get "show", params: { id: @course.id }
-      expect(assigns(:js_env)[:FLAGS].keys).to eq %i[newquizzes_on_quiz_page new_quizzes_skip_to_build_module_button]
+      expect(assigns(:js_env)[:FLAGS].keys).to eq %i[newquizzes_on_quiz_page]
     end
 
     it "redirects html to settings page when user can :read_as_admin, but not :read" do
