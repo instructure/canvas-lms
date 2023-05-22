@@ -7,6 +7,14 @@ GIT
       simple_uuid (>= 0.2.0)
       thrift_client (>= 0.7.1, < 0.10)
 
+GIT
+  remote: https://github.com/twitter/thrift_client.git
+  revision: 5c10d59881825cb8e26ab1aa8f1d2738e88c0e83
+  ref: 5c10d59881825cb8e26ab1aa8f1d2738e88c0e83
+  specs:
+    thrift_client (0.9.3)
+      thrift (~> 0.9.0)
+
 PATH
   remote: ../bookmarked_collection
   specs:
@@ -234,8 +242,6 @@ GEM
     strscan (3.0.6)
     thor (1.2.1)
     thrift (0.9.3.0)
-    thrift_client (0.9.3)
-      thrift (~> 0.9.0)
     timeout (0.3.2)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
@@ -263,6 +269,7 @@ DEPENDENCIES
   rspec (~> 3.12)
   simplecov (~> 0.22)
   sqlite3
+  thrift_client (= 0.9.3)!
 
 BUNDLED WITH
    2.3.26

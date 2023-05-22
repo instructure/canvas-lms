@@ -6,3 +6,5 @@ gemspec
 
 gem "i18n_extraction", path: "../i18n_extraction"
 gem "utf8_cleaner", path: "../utf8_cleaner"
+
+gem "i18nliner", "0.2.2", github: "instructure/i18nliner", ref: "ruby3"

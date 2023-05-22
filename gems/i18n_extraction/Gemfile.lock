@@ -1,3 +1,19 @@
+GIT
+  remote: https://github.com/instructure/i18nliner.git
+  revision: 05084d8bdecbe6765e47a53486ad2b3b189a4356
+  ref: ruby3
+  specs:
+    i18nliner (0.2.2)
+      activesupport (>= 6.0)
+      erubi (~> 1.7)
+      globby (>= 0.1.1)
+      i18n (>= 1.8.6)
+      nokogiri (>= 1.5.0)
+      ruby2ruby (~> 2.4)
+      ruby_parser (~> 3.10)
+      sexp_processor (~> 4.10)
+      ya2yaml (= 0.31)
+
 PATH
   remote: .
   specs:
@@ -21,15 +37,6 @@ GEM
     globby (0.1.2)
     i18n (1.13.0)
       concurrent-ruby (~> 1.0)
-    i18nliner (0.2.2)
-      activesupport (>= 6.0)
-      erubi (~> 1.7)
-      globby (>= 0.1.1)
-      nokogiri (>= 1.5.0)
-      ruby2ruby (~> 2.4)
-      ruby_parser (~> 3.10)
-      sexp_processor (~> 4.10)
-      ya2yaml (= 0.31)
     minitest (5.18.0)
     nokogiri (1.13.10-aarch64-linux)
       racc (~> 1.4)
@@ -73,6 +80,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 2.2)
   i18n_extraction!
+  i18nliner (= 0.2.2)!
   rake
   rspec (~> 3.12)
 
