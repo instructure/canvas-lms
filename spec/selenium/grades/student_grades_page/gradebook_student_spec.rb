@@ -150,7 +150,7 @@ describe "Student Gradebook" do
     it_behaves_like "Student Gradebook View"
   end
 
-  it "calculates grades based on graded assignments", priority: "1" do
+  it "calculates percentage only based on graded assignments when course is not using a grading standard", priority: "1" do
     init_course_with_students
     user_session(@teacher)
 
@@ -158,10 +158,51 @@ describe "Student Gradebook" do
     assignments[1].grade_student @students[0], grade: 20, grader: @teacher
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
-    expect(f(".final_grade .grade")).to include_text "100%"
+    expect(f(".final_grade").text).to eq "Total\n100%\n40.00 / 40.00"
 
     f("#only_consider_graded_assignments_wrapper").click
-    expect(f(".final_grade .grade")).to include_text "66.67%"
+    expect(f(".final_grade").text).to eq "Total\n66.67%\n40.00 / 60.00"
+  end
+
+  it "shows both percentage and letter-grade when course uses grading standards" do
+    init_course_with_students
+    @course.update_attribute :grading_standard_id, 0
+    @course.save!
+
+    assignments[0].grade_student @students[0], grade: 20, grader: @teacher
+    assignments[1].grade_student @students[0], grade: 20, grader: @teacher
+
+    user_session(@teacher)
+
+    get "/courses/#{@course.id}/grades/#{@students[0].id}"
+    expect(f(".final_grade").text).to eq "Total\n100%\n40.00 / 40.00"
+    expect(f("#final_letter_grade_text").text).to eq "A"
+
+    f("#only_consider_graded_assignments_wrapper").click
+    expect(f(".final_grade").text).to eq "Total\n66.67%\n40.00 / 60.00"
+    expect(f("#final_letter_grade_text").text).to eq "D"
+  end
+
+  it "coerces total to letter-grade when user is quantitative data restricted" do
+    # truthy feature flag
+    Account.default.enable_feature! :restrict_quantitative_data
+
+    # truthy setting
+    Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+    Account.default.save!
+
+    # truthy permission(since enabled is being "not"ed)
+    Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+    Account.default.reload
+
+    init_course_with_students
+    user_session(@teacher)
+
+    assignments[0].grade_student @students[0], grade: 20, grader: @teacher
+    assignments[1].grade_student @students[0], grade: 20, grader: @teacher
+
+    get "/courses/#{@course.id}/grades/#{@students[0].id}"
+    expect(f(".final_grade").text).to eq("Total: A")
   end
 
   it "follows grade dropping rules", priority: "1" do

@@ -439,7 +439,7 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
   let finalGrade
   let teaserText
 
-  if (gradingSchemeEnabled()) {
+  if (gradingSchemeEnabled() || ENV.restrict_quantitative_data) {
     const scoreToUse = overrideScorePresent()
       ? ENV.effective_final_score
       : calculatePercentGrade(finalScore, finalPossible)
