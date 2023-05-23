@@ -932,10 +932,6 @@ class RCEWrapper extends React.Component {
     }
   }
 
-  handleExternalClick = () => {
-    debounce(this.checkAccessibility, 1000)()
-  }
-
   handleInputChange = () => {
     this.checkAccessibility()
   }
@@ -951,9 +947,6 @@ class RCEWrapper extends React.Component {
     // start with the textarea and tinymce in sync
     textarea.value = this.getCode()
     textarea.style.height = this.state.height
-
-    // Capture click events outside the iframe
-    document.addEventListener('click', this.handleExternalClick)
 
     if (document.body.classList.contains('Underline-All-Links__enabled')) {
       this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
@@ -1223,7 +1216,8 @@ class RCEWrapper extends React.Component {
       }
       this.storage.removeItem(this.autoSaveKey)
     })
-    this.checkAccessibility()
+    // let the content be restored
+    debounce(this.checkAccessibility, 1000)()
   }
 
   // if a placeholder image shows up in autosaved content, we have to remove it
@@ -1329,6 +1323,11 @@ class RCEWrapper extends React.Component {
 
   onEditorChange = (content, _editor) => {
     this.props.onContentChange?.(content)
+    // check accessibility when clearing the editor,
+    // all other times should be checked by handleInputChange
+    if (content === '') {
+      this.checkAccessibility()
+    }
   }
 
   onResize = (_e, coordinates) => {
