@@ -189,6 +189,7 @@ export type RootAccountFeatureId =
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
   | 'rce_transform_loaded_content'
+  | 'mobile_offline_mode'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
