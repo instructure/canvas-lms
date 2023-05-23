@@ -22,6 +22,7 @@ import {saveClosedCaptions, CONSTANTS} from '@instructure/canvas-media'
 import {downloadToWrap, fixupFileUrl} from '../common/fileUrl'
 import alertHandler from '../rce/alertHandler'
 import buildError from './buildError'
+import RCEGlobals from '../rce/RCEGlobals'
 
 export function headerFor(jwt) {
   return {Authorization: 'Bearer ' + jwt}
@@ -181,6 +182,18 @@ class RceApiSource {
   fetchMedia(props) {
     const media = props.media[props.contextType]
     const uri = media.bookmark || this.uriFor('media', props)
+
+    if (RCEGlobals.getFeatures()?.media_links_use_attachment_id) {
+      return this.apiFetch(uri, headerFor(this.jwt)).then(({bookmark, files}) => {
+        return {
+          bookmark,
+          files: files.map(f =>
+            fixupFileUrl(props.contextType, props.contextId, f, this.canvasOrigin)
+          ),
+        }
+      })
+    }
+
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
