@@ -159,6 +159,18 @@ class SubmissionComment < ActiveRecord::Base
     media_comment_id && media_comment_type
   end
 
+  def self.serialize_media_comment(media_comment_id)
+    media_object = MediaObject.by_media_id(media_comment_id).first
+    media_tracks = media_object&.media_tracks&.map { |media_track| media_track.as_json(only: %i[id locale content kind], include_root: false) }
+    media_sources = media_object.media_sources
+    {
+      id: media_object.media_id,
+      media_tracks: media_tracks,
+      media_sources: media_sources,
+      title: media_object.title,
+    }
+  end
+
   def check_for_media_object
     if media_comment? && saved_change_to_media_comment_id?
       MediaObject.ensure_media_object(media_comment_id,

@@ -128,7 +128,7 @@ class GradebooksController < ApplicationController
 
       if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
         json[:submission_comments] = submission.visible_submission_comments.map do |comment|
-          {
+          comment_map = {
             id: comment.id,
             attachments: comment.cached_attachments.map do |attachment|
               {
@@ -145,8 +145,10 @@ class GradebooksController < ApplicationController
             updated_at: comment.updated_at,
             comment: comment.comment,
             display_updated_at: datetime_string(comment.updated_at),
-            is_read: comment.read?(@current_user) || (!@presenter.student_is_user? && !@presenter.user_an_observer_of_student?)
+            is_read: comment.read?(@current_user) || (!@presenter.student_is_user? && !@presenter.user_an_observer_of_student?),
           }
+          comment_map[:media_object] = SubmissionComment.serialize_media_comment(comment.media_comment_id) if comment.media_comment?
+          comment_map
         end.as_json
         json[:assignment_url] = context_url(@context, :context_assignment_url, submission.assignment_id)
       end
