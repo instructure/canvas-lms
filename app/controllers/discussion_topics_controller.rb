@@ -1377,6 +1377,14 @@ class DiscussionTopicsController < ApplicationController
       verify_specific_section_visibilities # Make sure user actually has perms to modify this
     end
 
+    if params.include?(:assignment)
+      if is_new || @topic.assignment_id.nil?
+        return unless authorized_action(@context.assignments.temp_record, @current_user, :create)
+      else
+        return unless authorized_action(@topic.assignment, @current_user, :update)
+      end
+    end
+
     # It's possible customers already are using this API and haven't updated to
     # use the `specific_sections` key yet. In this case, we don't want to nuke
     # any specific setions out from under them when their existing scrit runs.
