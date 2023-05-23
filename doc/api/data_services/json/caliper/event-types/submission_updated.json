@@ -10,6 +10,9 @@
     "data[0].object.extensions[\"com.instructure.canvas\"]": {
       "entity_id": "Canvas global ID of the object affected by the event",
       "submission_type": "The types of submission (basic_lti_launch, discussion_topic, media_recording, online_quiz, online_text_entry, online_upload, online_url)"
+    },
+    "data[0].object": {
+      "type": "Attempt"
     }
   },
   "examples": [

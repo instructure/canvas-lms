@@ -11,6 +11,9 @@
       "entity_id": "Canvas global ID of the object affected by the event",
       "lock_at": "The lock date (assignment is locked after this date)",
       "workflow_state": "1. Workflow state of the assignment when used in the assignment context (deleted, duplicating, failed_to_import, failed_to_duplicate, failed_to_migrate, importing, published, unpublished)\n2. Workflow state of the enrollment when used in the enrollment context (active, completed, creation_pending, deleted, inactive, invited)"
+    },
+    "data[0].object": {
+      "type": "AssignableDigitalResource"
     }
   },
   "examples": [
