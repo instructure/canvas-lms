@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
-import EnhancedIndividualGradebookWrapper from './react/EnhancedIndividualGradebookWrapper'
+import EnhancedIndividualGradebookWrapper from './react/components/EnhancedIndividualGradebookWrapper'
 
 const matches = window.location.pathname.match(/(.*\/gradebook)/)
 const baseUrl = (matches && matches[0]) || ''

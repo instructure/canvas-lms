@@ -41,6 +41,7 @@ export type AssignmentConnection = {
   omitFromFinalGrade: boolean
   workflowState: WorkflowState
   muted: boolean
+  gradingType: string
 }
 
 export type AssignmentGroupConnection = {
@@ -99,8 +100,13 @@ export type GradebookUserSubmissionDetails = {
   grade: string
   id: string
   score: number
+  enteredScore: number
   assignmentId: string
-  workflowState: string
+  submissionType: string
+  proxySubmitter: string
+  submittedAt: string
+  state: string
+  excused: boolean
 }
 
 export type GradebookStudentQueryResponse = {
