@@ -164,13 +164,25 @@ describe('fileTypeUtils', () => {
         RCEGlobals.getFeatures.mockRestore()
       })
 
-      it('uses attachment route if feature flag on', () => {
+      it('uses attachment route if id is present', () => {
         const file = {
           id: '123',
           type: 'video/mov',
         }
         const url = mediaPlayerURLFromFile(file)
         expect(url).toBe('/media_attachments_iframe/123?type=video&embedded=true')
+      })
+
+      it('uses the file verifier if present', () => {
+        const file = {
+          id: '123',
+          type: 'video/mov',
+          url: 'host?verifier=something',
+        }
+        const url = mediaPlayerURLFromFile(file)
+        expect(url).toBe(
+          '/media_attachments_iframe/123?type=video&verifier=something&embedded=true'
+        )
       })
 
       it('uses media_object route if no attachmentId exists', () => {
