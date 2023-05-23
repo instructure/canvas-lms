@@ -468,9 +468,6 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Pré-visualização de Ícones" },
   "icon_shape_30b61e7": { "message": "Forma de Ícone" },
   "icon_size_9353edea": { "message": "Tamanho do Ícone" },
-  "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-    "message": "Se for deixada uma ligação vazia, o texto será exibido como nome da ligação da disciplina"
-  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Se os Direitos de Utilização forem necessários, o ficheiro não será publicado até ser ativado na página Ficheiros."
   },
