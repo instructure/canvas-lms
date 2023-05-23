@@ -425,9 +425,6 @@
   "icon_preview_1782a1d9": { "message": "Forskoðun tákns" },
   "icon_shape_30b61e7": { "message": "Form tákns" },
   "icon_size_9353edea": { "message": "Stærð tákns" },
-  "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-    "message": "Ef tengillinn er skilinn eftir tómur birtist texti sem heiti námskeiðstengils"
-  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Ef þörf er á notkunarrétti birtist skráin ekki fyrr en hún er virk á síðunni Skrár."
   },

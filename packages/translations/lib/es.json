@@ -1208,9 +1208,6 @@
     "icon_size_9353edea": {
         "message": "Tamaño del ícono"
     },
-    "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-        "message": "Si se deja el enlace vacío, el texto se mostrará como nombre del enlace del curso"
-    },
     "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
         "message": "Si se requieren derechos de uso, no se publicará el archivo hasta que esté habilitado en la página de Archivos."
     },
