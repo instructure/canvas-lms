@@ -22,7 +22,7 @@ import {useSearchParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 
-import {AssignmentGroupCriteriaMap} from '../../../shared/grading/grading.d'
+import {AssignmentGroupCriteriaMap} from '../../../../shared/grading/grading.d'
 import AssignmentInformation from './AssignmentInformation'
 import ContentSelection from './ContentSelection'
 import GlobalSettings from './GlobalSettings'
@@ -33,9 +33,9 @@ import {
   GradebookQueryResponse,
   SubmissionConnection,
   UserConnection,
-} from '../types'
-import {GRADEBOOK_QUERY} from '../queries/Queries'
-import {mapAssignmentGroupQueryResults} from '../utils/gradebookUtils'
+} from '../../types'
+import {GRADEBOOK_QUERY} from '../../queries/Queries'
+import {mapAssignmentGroupQueryResults} from '../../utils/gradebookUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -141,7 +141,12 @@ export default function EnhancedIndividualGradebook() {
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
-      <GradingResults />
+      <GradingResults
+        assignment={selectedAssignment}
+        courseId={courseId}
+        studentId={selectedStudentId}
+        gradebookOptions={{}}
+      />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 

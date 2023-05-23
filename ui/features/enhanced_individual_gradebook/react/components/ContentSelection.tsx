@@ -19,7 +19,7 @@
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {AssignmentConnection, UserConnection} from '../types'
+import {AssignmentConnection, UserConnection} from '../../types'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')

@@ -16,20 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
-import {useQuery} from 'react-apollo'
+import React from 'react'
 import {View} from '@instructure/ui-view'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {
-  GradebookOptions,
-  GradebookStudentDetails,
-  GradebookStudentQueryResponse,
-  GradebookUserSubmissionDetails,
-} from '../types'
-import {GRADEBOOK_STUDENT_QUERY} from '../queries/Queries'
+import {GradebookOptions} from '../../types'
 import {AssignmentGroupCriteriaMap, SubmissionGradeCriteria} from '@canvas/grading/grading'
+import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -46,26 +40,9 @@ export default function StudentInformation({
   assignmentGroupMap,
   gradebookOptions,
 }: Props) {
-  const [selectedStudent, setSelectedStudent] = useState<GradebookStudentDetails>()
-  const [studentSubmissions, setStudentSubmissions] = useState<GradebookUserSubmissionDetails[]>([])
-  const {data, error} = useQuery<GradebookStudentQueryResponse>(GRADEBOOK_STUDENT_QUERY, {
-    variables: {courseId, userIds: studentId},
-    fetchPolicy: 'cache-and-network',
-    skip: !studentId,
-  })
+  const {currentStudent, studentSubmissions} = useCurrentStudentInfo(courseId, studentId)
 
-  useEffect(() => {
-    if (error) {
-      // TODO: handle error
-    }
-
-    if (data?.course) {
-      setSelectedStudent(data.course.usersConnection.nodes[0])
-      setStudentSubmissions(data.course.submissionsConnection.nodes)
-    }
-  }, [data, error])
-
-  if (!selectedStudent || !studentId) {
+  if (!currentStudent || !studentId) {
     return (
       <View as="div">
         <View as="div" className="row-fluid">
@@ -117,7 +94,7 @@ export default function StudentInformation({
         </View>
         <View as="div" className="span8">
           <View as="h3" className="student_selection">
-            <a href="studentUrl"> {selectedStudent.name}</a>
+            <a href="studentUrl"> {currentStudent.name}</a>
           </View>
 
           <View as="div">
@@ -125,14 +102,14 @@ export default function StudentInformation({
               {I18n.t('Secondary ID:')}
               <View as="span" className="secondary_id">
                 {' '}
-                {selectedStudent.loginId}
+                {currentStudent.loginId}
               </View>
             </View>
           </View>
           <View as="div">
             <View as="strong">
               {I18n.t('Sections: ')}
-              {selectedStudent.enrollments.map(enrollment => enrollment.section.name).join(', ')}
+              {currentStudent.enrollments.map(enrollment => enrollment.section.name).join(', ')}
             </View>
           </View>
 

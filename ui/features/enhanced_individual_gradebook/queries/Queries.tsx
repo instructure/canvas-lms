@@ -52,6 +52,7 @@ export const GRADEBOOK_QUERY = gql`
           assignmentsConnection {
             nodes {
               anonymizeStudents
+              gradingType
               id: _id
               muted
               name
@@ -99,7 +100,13 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           grade
           id: _id
           score
+          enteredScore
           assignmentId
+          submissionType
+          submittedAt
+          state
+          proxySubmitter
+          excused
         }
       }
     }
