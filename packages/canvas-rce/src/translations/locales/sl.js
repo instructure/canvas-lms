@@ -462,9 +462,6 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Predogled ikon" },
   "icon_shape_30b61e7": { "message": "Oblika ikone" },
   "icon_size_9353edea": { "message": "Velikost ikone" },
-  "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-    "message": "Če povezavo pustite prazno, bo besedilo prikazano kot ime povezave na predmet"
-  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Če so zahtevane pravice uporabe, datoteka ne bo objavljena, dokler to ni omogočeno na strani Datoteke."
   },

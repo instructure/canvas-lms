@@ -456,9 +456,6 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Symbol-Vorschau" },
   "icon_shape_30b61e7": { "message": "Symbolform" },
   "icon_size_9353edea": { "message": "Symbolgröße" },
-  "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-    "message": "Wenn der Link leer bleibt, wird der Text als Name für den Kurs-Link angezeigt"
-  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Wenn Nutzungsrechte erforderlich sind, wird die Datei erst veröffentlicht, wenn sie auf der Seite Dateien aktiviert wurde."
   },

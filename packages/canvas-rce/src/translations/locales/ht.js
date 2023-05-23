@@ -431,9 +431,6 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Apèsi ikòn" },
   "icon_shape_30b61e7": { "message": "Fòm Ikòn" },
   "icon_size_9353edea": { "message": "Gwosè Ikòn" },
-  "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-    "message": "Si w kite lyen an vid, tèks la ap parèt tankou non lyen kou a"
-  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Si yo egzije Dwa itilizasyon, fichye a pa p pibliye tout tan li pa aktive sou paj Fichye yo."
   },
