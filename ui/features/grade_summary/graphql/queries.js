@@ -21,6 +21,7 @@ import gql from 'graphql-tag'
 import {AssignmentGroup} from './AssignmentGroup'
 import {Assignment} from './Assignment'
 import {GradingStandard} from './GradingStandard'
+import {GradingPeriod} from './GradingPeriod'
 
 export const ASSIGNMENTS = gql`
   query GetAssignments($courseID: ID!, $gradingPeriodID: ID) {
@@ -44,9 +45,7 @@ export const ASSIGNMENTS = gql`
         }
         gradingPeriodsConnection {
           nodes {
-            _id
-            title
-            weight
+            ...GradingPeriod
           }
         }
       }
@@ -55,4 +54,5 @@ export const ASSIGNMENTS = gql`
   ${AssignmentGroup.fragment}
   ${Assignment.fragment}
   ${GradingStandard.fragment}
+  ${GradingPeriod.fragment}
 `

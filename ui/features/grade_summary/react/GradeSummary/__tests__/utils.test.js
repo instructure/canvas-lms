@@ -23,6 +23,7 @@ import {Pill} from '@instructure/ui-pill'
 import {Assignment} from '../../../graphql/Assignment'
 import {AssignmentGroup} from '../../../graphql/AssignmentGroup'
 import {GradingStandard} from '../../../graphql/GradingStandard'
+import {GradingPeriod} from '../../../graphql/GradingPeriod'
 import {Submission} from '../../../graphql/Submission'
 import {
   getAssignmentGroupScore,
@@ -39,6 +40,9 @@ import {
   getAssignmentGroupEarnedPoints,
   getAssignmentGroupPercentage,
   getAssignmentGroupLetterGrade,
+  getGradingPeriodTotalPoints,
+  getGradingPeriodEarnedPoints,
+  getGradingPeriodPercentage,
 } from '../utils'
 
 const createAssignment = (score, pointsPossible) => {
@@ -480,6 +484,92 @@ describe('util', () => {
         expect(getAssignmentGroupLetterGrade(assignmentGroup, assignments, gradingStandard)).toBe(
           'N/A'
         )
+      })
+    })
+  })
+
+  describe('Grading Periods', () => {
+    describe('getGradingPeriodTotalPoints', () => {
+      it('should return the points possible for the grading period', () => {
+        const gradingPeriod = GradingPeriod.mock()
+        const assignments = mockAssignments()
+        expect(getGradingPeriodTotalPoints(gradingPeriod, assignments)).toBe(40)
+      })
+
+      it('should return 0 when points possible is not provided', () => {
+        const gradingPeriod = {}
+        const assignments = []
+        expect(getGradingPeriodTotalPoints(gradingPeriod, assignments)).toBe(0)
+      })
+
+      it('should return 0 when assignments are not provided', () => {
+        const gradingPeriod = {}
+        expect(getGradingPeriodTotalPoints(gradingPeriod)).toBe(0)
+      })
+    })
+
+    describe('getGradingPeriodEarnedPoints', () => {
+      it('should return the earned points for the grading period', () => {
+        const gradingPeriod = GradingPeriod.mock()
+        const assignments = mockAssignments()
+        expect(getGradingPeriodEarnedPoints(gradingPeriod, assignments)).toBe(31)
+      })
+
+      it('should return 0 when earned points is not provided', () => {
+        const gradingPeriod = {}
+        const assignments = []
+        expect(getGradingPeriodEarnedPoints(gradingPeriod, assignments)).toBe(0)
+      })
+
+      it('should return 0 when assignments are not provided', () => {
+        const gradingPeriod = {}
+        expect(getGradingPeriodEarnedPoints(gradingPeriod)).toBe(0)
+      })
+    })
+
+    describe('getGradingPeriodPercentage', () => {
+      describe('when the grading period is not weighted', () => {
+        it('should return the correct percentage for the grading period', () => {
+          const gradingPeriod = GradingPeriod.mock()
+          const assignments = mockAssignments()
+          expect(getGradingPeriodPercentage(gradingPeriod, assignments, false)).toBe(77.5)
+        })
+
+        it('should return 0 when total points is not provided', () => {
+          const gradingPeriod = {}
+          const assignments = []
+          expect(getGradingPeriodPercentage(gradingPeriod, assignments, false)).toBe(0)
+        })
+
+        it('should return 0 when assignments are not provided', () => {
+          const gradingPeriod = {}
+          expect(getGradingPeriodPercentage(gradingPeriod, undefined, false)).toBe(0)
+        })
+      })
+
+      describe('when the grading period is weighted', () => {
+        it('should return the correct percentage for the grading period', () => {
+          const gradingPeriod = GradingPeriod.mock()
+          const assignments = mockAssignments()
+          const assignmentGroup = AssignmentGroup.mock()
+          expect(
+            getGradingPeriodPercentage(gradingPeriod, assignments, [assignmentGroup], true)
+          ).toBe(77.5 * 0.5)
+        })
+
+        it('should return 0 when total points is not provided', () => {
+          const gradingPeriod = {}
+          const assignments = []
+          const assignmentGroup = AssignmentGroup.mock()
+          expect(
+            getGradingPeriodPercentage(gradingPeriod, assignments, [assignmentGroup], true)
+          ).toBe(0)
+        })
+
+        it('should return 0 when assignments are not provided', () => {
+          const gradingPeriod = {}
+          expect(getGradingPeriodPercentage(gradingPeriod, undefined, undefined, true)).toBe(0)
+        })
       })
     })
   })

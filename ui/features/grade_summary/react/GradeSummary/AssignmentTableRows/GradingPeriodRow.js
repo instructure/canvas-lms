@@ -25,7 +25,6 @@ import {
   scorePercentageToLetterGrade,
   getGradingPeriodTotalPoints,
   getGradingPeriodPercentage,
-  getGradingPeriodTotalWeighted,
   getGradingPeriodEarnedPoints,
   filteredAssignments,
 } from '../utils'
@@ -35,21 +34,12 @@ export const gradingPeriodRow = (gradingPeriod, queryData) => {
     return assignment?.submissionsConnection?.nodes[0]?.gradingPeriodId === gradingPeriod?._id
   })
 
-  const periodPercentage = queryData?.applyGroupWeights
-    ? getGradingPeriodTotalWeighted(
-        [gradingPeriod],
-        filterByGradingPeriod,
-        queryData?.assignmentGroupsConnection?.nodes
-      )
-    : getGradingPeriodPercentage(gradingPeriod, filteredAssignments(queryData))
-
-  const weightedOrUnweighted = queryData?.applyGroupWeights
-    ? getGradingPeriodTotalWeighted(
-        [gradingPeriod],
-        filterByGradingPeriod,
-        queryData?.assignmentGroupsConnection?.nodes
-      )
-    : getGradingPeriodPercentage(gradingPeriod, filteredAssignments(queryData))
+  const periodPercentage = getGradingPeriodPercentage(
+    gradingPeriod,
+    filterByGradingPeriod,
+    queryData?.assignmentGroupsConnection?.nodes,
+    queryData?.applyGroupWeights
+  )
 
   return (
     <Table.Row key={gradingPeriod._id}>
@@ -66,15 +56,13 @@ export const gradingPeriodRow = (gradingPeriod, queryData) => {
       <Table.Cell textAlign="start">
         <Text weight="bold">
           {ENV.restrict_quantitative_data
-            ? scorePercentageToLetterGrade(weightedOrUnweighted, queryData?.gradingStandard)
+            ? scorePercentageToLetterGrade(periodPercentage, queryData?.gradingStandard)
             : `${
-                formatNumber(
-                  getGradingPeriodEarnedPoints(gradingPeriod, filteredAssignments(queryData))
-                ) || '-'
+                formatNumber(getGradingPeriodEarnedPoints(gradingPeriod, filterByGradingPeriod)) ||
+                '-'
               }/${
-                formatNumber(
-                  getGradingPeriodTotalPoints(gradingPeriod, filteredAssignments(queryData))
-                ) || '-'
+                formatNumber(getGradingPeriodTotalPoints(gradingPeriod, filterByGradingPeriod)) ||
+                '-'
               }`}
         </Text>
       </Table.Cell>
