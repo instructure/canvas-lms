@@ -68,19 +68,27 @@ function addUploaderFileErrorEventListeners(uploader, done, file) {
   })
 }
 
+// See the method of the same name in kaltura_client_v3.rb
+function mediaTypeToSymbol(type) {
+  switch (type) {
+    case '2':
+      'image'
+      break
+    case '5':
+      'audio'
+      break
+    default: // 1
+      'video'
+  }
+}
+
 function addUploaderFileCompleteEventListeners(uploader, rcsConfig, file, done, onProgress) {
   uploader.addEventListener('K5.complete', async mediaServerMediaObject => {
-    mediaServerMediaObject.contextCode = `${rcsConfig.contextType}_${rcsConfig.contextId}`
-    mediaServerMediaObject.type = `${rcsConfig.contextType}_${rcsConfig.contextId}`
-
+    const type = mediaTypeToSymbol(mediaServerMediaObject.mediaType || mediaServerMediaObject.type)
     const body = {
       id: mediaServerMediaObject.entryId,
-      type:
-        {2: 'image', 5: 'audio'}[mediaServerMediaObject.mediaType] ||
-        mediaServerMediaObject.type.includes('audio')
-          ? 'audio'
-          : 'video',
-      context_code: mediaServerMediaObject.contextCode,
+      type: file.type || type,
+      context_code: `${rcsConfig.contextType}_${rcsConfig.contextId}`,
       title: file.name,
       user_entered_title: file.userEnteredTitle || file.name,
     }

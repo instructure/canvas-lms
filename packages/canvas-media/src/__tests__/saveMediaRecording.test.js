@@ -169,6 +169,26 @@ describe('saveMediaRecording', () => {
     })
   })
 
+  it('uploads with the content type from the file', () => {
+    moxios.stubRequest('http://host:port/api/v1/services/kaltura_session?include_upload_config=1', {
+      status: 200,
+      response: mediaServerSession()
+    })
+    moxios.stubRequest('http://host:port/api/media_objects', {
+      status: 200,
+      response: {data: 'media object data'}
+    })
+    const doneFunction2 = jest.fn()
+    const progressFunction = jest.fn()
+    return saveMediaRecording({file: 'thing', type: "video/mp4"}, rcsConfig, doneFunction2, progressFunction).then(
+      async uploader => {
+        uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
+        await new Promise(setTimeout)
+        expect(JSON.parse(moxios.requests.mostRecent().config.data).type).toEqual("video/mp4")
+      }
+    )
+  })
+
   it('k5.complete calls done with canvasMediaObject data if succeeds', () => {
     moxios.stubRequest('http://host:port/api/v1/services/kaltura_session?include_upload_config=1', {
       status: 200,
