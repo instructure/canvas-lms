@@ -1208,9 +1208,6 @@
     "icon_size_9353edea": {
         "message": "حجم الأيقونة"
     },
-    "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-        "message": "إذا ترك الارتباط فارغًا، سيُعرض النص كاسم ارتباط المساق"
-    },
     "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
         "message": "إذا تتطلب الأمر حقوق استخدام، لن يتم نشر الملف حتى تمكينه في صفحة الملفات."
     },

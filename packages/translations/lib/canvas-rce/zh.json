@@ -383,9 +383,6 @@
   "icon_preview_1782a1d9": { "message": "图标预览" },
   "icon_shape_30b61e7": { "message": "图标形状" },
   "icon_size_9353edea": { "message": "图标大小" },
-  "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-    "message": "如果链接为空，文本将显示为课程链接名称"
-  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "如需使用权限，则在“文件”页面中启用文件之前，不会发布文件。"
   },
