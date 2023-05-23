@@ -34,6 +34,7 @@ export const totalRow = queryData => {
       queryData?.applyGroupWeights
     )
   )
+
   return (
     <Table.Row>
       <Table.Cell textAlign="start" colSpan="3">
