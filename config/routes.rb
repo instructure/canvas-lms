@@ -501,8 +501,15 @@ CanvasRails::Application.routes.draw do
     delete "test_student" => "courses#reset_test_student"
     get "content_migrations" => "content_migrations#index"
     get "link_validator" => "courses#link_validator", :as => :link_validator
-  end
 
+    get "grading_schemes" => "grading_schemes_json#detail_list"
+    get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
+    post "grading_schemes" => "grading_schemes_json#create"
+    delete "grading_schemes/:id" => "grading_schemes_json#destroy"
+    put "grading_schemes/:id" => "grading_schemes_json#update"
+    get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
+    get "grading_schemes/:id" => "grading_schemes_json#show"
+  end
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
 
   resources :page_views, only: :update
@@ -772,6 +779,14 @@ CanvasRails::Application.routes.draw do
     get "release_notes" => "release_notes#manage", :as => :release_notes_manage
 
     get "blackout_dates" => "blackout_dates#index"
+
+    get "grading_schemes" => "grading_schemes_json#detail_list"
+    get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
+    post "grading_schemes" => "grading_schemes_json#create"
+    delete "grading_schemes/:id" => "grading_schemes_json#destroy"
+    put "grading_schemes/:id" => "grading_schemes_json#update"
+    get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
+    get "grading_schemes/:id" => "grading_schemes_json#show"
   end
 
   get "images/users/:user_id" => "users#avatar_image", :as => :avatar_image
