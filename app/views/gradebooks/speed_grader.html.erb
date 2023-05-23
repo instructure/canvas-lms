@@ -23,7 +23,9 @@
     :RUBRIC_ASSESSMENT => {
       :assessor_id => @current_user.id.to_s,
       :assessment_type => can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review"
-    }
+    },
+    restrict_quantitative_data: @assignment.restrict_quantitative_data?(@current_user),
+    grading_scheme: @context.grading_standard_or_default.data
   })
   @show_left_side = false
   @show_embedded_chat = false
