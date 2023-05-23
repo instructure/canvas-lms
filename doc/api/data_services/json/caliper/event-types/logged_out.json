@@ -3,6 +3,9 @@
   "definition": "The event is emitted anytime an end user logs out of Canvas",
   "trigger": "Triggered when a user has logged out.",
   "schema": {
+    "data[0].object": {
+      "type": "SoftwareApplication"
+    }
   },
   "examples": [
     {

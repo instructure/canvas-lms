@@ -3,6 +3,9 @@
   "definition": "The event is emitted anytime a syllabus is changed in a course by an end user or API request. Only changes to the fields included in the body of the event payload will emit the `updated` event.",
   "trigger": "Triggered when a course syllabus gets updated.",
   "schema": {
+    "data[0].object": {
+      "type": "Document"
+    }
   },
   "examples": [
     {

@@ -6,6 +6,9 @@
     "data[0].object.extensions[\"com.instructure.canvas\"]": {
       "is_admin": "Indicates whether a user has an administrator role",
       "user_id": "The Canvas id of the currently logged in user"
+    },
+    "data[0].object": {
+      "type": "Entity"
     }
   },
   "examples": [
