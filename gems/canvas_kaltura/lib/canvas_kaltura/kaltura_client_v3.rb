@@ -229,6 +229,7 @@ module CanvasKaltura
       getRequest(:media, :delete, hash)
     end
 
+    # See the method of the same name in saveMediaRecording.js
     def mediaTypeToSymbol(type)
       case type.to_i
       when 2
