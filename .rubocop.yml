@@ -129,6 +129,8 @@ Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
 Rails/WhereExists:
   EnforcedStyle: where
+Rails/WhereNotWithMultipleConditions:
+  Enabled: false # We're firmly on Rails 6.1+; no need to worry about legacy behavior
 
 RSpec:
   Severity: error
