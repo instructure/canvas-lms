@@ -36,21 +36,61 @@ describe "speed grader - grade display" do
       course_with_teacher_logged_in
       create_and_enroll_students(2)
       @assignment = @course.assignments.create(name: "assignment", points_possible: points)
-      @assignment.grade_student(@students[0], grade: grade, grader: @teacher)
-      Speedgrader.visit(@course.id, @assignment.id)
     end
 
     it "displays the score on the sidebar", priority: "1" do
+      @assignment.grade_student(@students[0], grade: grade, grader: @teacher)
+      Speedgrader.visit(@course.id, @assignment.id)
       expect(Speedgrader.grade_value).to eq grade.to_int.to_s
     end
 
     it "displays total number of graded assignments to students", priority: "1" do
+      @assignment.grade_student(@students[0], grade: grade, grader: @teacher)
+      Speedgrader.visit(@course.id, @assignment.id)
       expect(Speedgrader.fraction_graded).to include_text("1/2")
     end
 
     it "displays average submission grade for total assignment submissions", priority: "1" do
+      @assignment.grade_student(@students[0], grade: grade, grader: @teacher)
+      Speedgrader.visit(@course.id, @assignment.id)
       average = (grade / points * 100).to_int
       expect(Speedgrader.average_grade).to include_text("#{grade.to_int} / #{points.to_int} (#{average}%)")
+    end
+
+    it "coerces average score to letter grade when user is quantitative data restricted" do
+      @assignment.grade_student(@students[0], grade: "9", grader: @teacher)
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # truthy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      Account.default.save!
+
+      # truthy permission(since enabled is being "not"ed)
+      Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+      Account.default.reload
+
+      Speedgrader.visit(@course.id, @assignment.id)
+      expect(Speedgrader.average_grade.text).to eq "A-"
+    end
+
+    it "does not show average when user is quantitative data and points possible is falsy" do
+      @assignment.points_possible = 0
+      @assignment.save!
+      @assignment.grade_student(@students[0], grade: "9", grader: @teacher)
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # truthy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      Account.default.save!
+
+      # truthy permission(since enabled is being "not"ed)
+      Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+      Account.default.reload
+
+      Speedgrader.visit(@course.id, @assignment.id)
+      expect(Speedgrader.average_grade.text).to eq ""
     end
   end
 
