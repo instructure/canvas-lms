@@ -30,6 +30,26 @@ describe('SubmissionAttempts', () => {
           author_name: 'user 123',
           display_updated_at: 'Saturday December 1st',
           attachments: [],
+          media_object: {
+            id: 'm-someid',
+            media_sources: [
+              {
+                height: '1080',
+                width: '1920',
+                url: 'https://www.youtube.com/watch?v=123',
+                content_type: 'video/mp4',
+              },
+            ],
+            media_tracks: [
+              {
+                id: '1',
+                content: 'English',
+                kind: 'subtitles',
+                locale: 'en',
+              },
+            ],
+            title: 'test',
+          },
         },
       ],
       3: [
@@ -54,6 +74,26 @@ describe('SubmissionAttempts', () => {
               display_name: 'test.pdf',
             },
           ],
+          media_object: {
+            id: 'm-someid',
+            media_sources: [
+              {
+                height: '1080',
+                width: '1920',
+                url: 'https://www.youtube.com/watch?v=123',
+                content_type: 'video/mp4',
+              },
+            ],
+            media_tracks: [
+              {
+                id: '1',
+                content: 'English',
+                kind: 'subtitles',
+                locale: 'en',
+              },
+            ],
+            title: 'test',
+          },
         },
       ],
       2: [
@@ -87,5 +127,7 @@ describe('SubmissionAttempts', () => {
     const attachmentSection = queryAllByTestId('attachment-10')
     expect(attachmentSection).toHaveLength(1)
     expect(attachmentSection[0]).toHaveTextContent('test.pdf')
+    const mediaObjectSection = queryAllByTestId('submission-comment-media')
+    expect(mediaObjectSection).toHaveLength(2)
   })
 })
