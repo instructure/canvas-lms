@@ -50,6 +50,8 @@ class ConversationMessage < ActiveRecord::Base
   scope :with_media_comments, -> { where("has_media_objects") }
   scope :by_user, ->(user_or_id) { where(author_id: user_or_id) }
 
+  sanitize_field :body, CanvasSanitize::SANITIZE
+
   def self.preload_latest(conversation_participants, author = nil)
     return unless conversation_participants.present?
 
