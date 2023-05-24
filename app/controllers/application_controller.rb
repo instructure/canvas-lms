@@ -2109,6 +2109,11 @@ class ApplicationController < ActionController::Base
           add_crumb(@resource_title)
           @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
           @prepend_template = "assignments/lti_header" if render_external_tool_prepend_template?
+
+          can_read_submissions = @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
+          if can_read_submissions
+            @assigned_assessments = @current_user_submission&.assigned_assessments&.select { |request| request.submission.grants_right?(@current_user, session, :read) } || []
+          end
           begin
             @lti_launch.params = lti_launch_params(adapter)
           rescue Lti::IMS::AdvantageErrors::InvalidLaunchError
