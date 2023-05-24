@@ -313,6 +313,7 @@ describe PlannerController do
 
       describe "account calendars" do
         before do
+          Account.site_admin.enable_feature!(:account_calendars_planner_support)
           Account.default.account_calendar_visible = true
           Account.default.save!
           @sub_account1 = Account.default.sub_accounts.create!(name: "SA-1", account_calendar_visible: true)
@@ -334,6 +335,13 @@ describe PlannerController do
           expect(response_json.length).to eq 2
           expect(sub_account_event["plannable"]["title"]).to eq @sub_account_event.title
           expect(default_account_event["plannable"]["title"]).to eq @default_account_event.title
+        end
+
+        it "does not show account calendar events if the feature flag is disabledd" do
+          Account.site_admin.disable_feature!(:account_calendars_planner_support)
+          get :index
+          response_json = json_parse(response.body)
+          expect(response_json).to eq []
         end
 
         it "does not show calendar events for hidden account calendars" do

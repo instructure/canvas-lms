@@ -213,3 +213,9 @@ permanent_page_links:
   description: |-
     When the title to a page is changed, old links to that page will link to the correct page.
   applies_to: SiteAdmin
+
+account_calendars_planner_support:
+  state: hidden
+  display_name: 'Planner support for account calendars'
+  description: This flag allows events from account calendars to be displayed on the canvas planner.
+  applies_to: SiteAdmin
