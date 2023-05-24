@@ -33,10 +33,10 @@ import {assignmentRow} from './AssignmentTableRows/AssignmentRow'
 const I18n = useI18nScope('grade_summary')
 
 const headers = [
-  {key: 'name', value: I18n.t('Name'), id: nanoid()},
-  {key: 'dueAt', value: I18n.t('Due Date'), id: nanoid()},
-  {key: 'status', value: I18n.t('Status'), id: nanoid()},
-  {key: 'score', value: I18n.t('Score'), id: nanoid()},
+  {key: 'name', value: I18n.t('Name'), id: nanoid(), alignment: 'start', width: '30%'},
+  {key: 'dueAt', value: I18n.t('Due Date'), id: nanoid(), alignment: 'start', width: '20%'},
+  {key: 'status', value: I18n.t('Status'), id: nanoid(), alignment: 'center', width: '10%'},
+  {key: 'score', value: I18n.t('Score'), id: nanoid(), alignment: 'center', width: '10%'},
 ]
 
 const AssignmentTable = ({
@@ -51,7 +51,12 @@ const AssignmentTable = ({
       <Table.Head>
         <Table.Row>
           {(headers || []).map(header => (
-            <Table.ColHeader key={header?.key} id={header?.id}>
+            <Table.ColHeader
+              key={header?.key}
+              id={header?.id}
+              textAlign={header?.alignment}
+              width={header?.width}
+            >
               {header?.value}
             </Table.ColHeader>
           ))}

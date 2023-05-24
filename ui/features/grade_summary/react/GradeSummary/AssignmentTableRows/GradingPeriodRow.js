@@ -47,13 +47,13 @@ export const gradingPeriodRow = (gradingPeriod, queryData) => {
         <Text weight="bold">{gradingPeriod.title}</Text>
       </Table.Cell>
       {!ENV.restrict_quantitative_data && (
-        <Table.Cell textAlign="start">
+        <Table.Cell textAlign="center">
           <Text weight="bold">
             {Number.isNaN(periodPercentage) ? 'N/A' : `${formatNumber(periodPercentage)}%`}
           </Text>
         </Table.Cell>
       )}
-      <Table.Cell textAlign="start">
+      <Table.Cell textAlign="center">
         <Text weight="bold">
           {ENV.restrict_quantitative_data
             ? scorePercentageToLetterGrade(periodPercentage, queryData?.gradingStandard)
