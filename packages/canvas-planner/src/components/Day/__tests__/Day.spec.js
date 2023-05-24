@@ -33,13 +33,17 @@ for (const [timeZoneDesc, timeZoneName] of [
 ]) {
   // eslint-disable-next-line jest/valid-describe
   describe(timeZoneDesc, () => {
+    beforeAll(() => {
+      moment.tz.setDefault(timeZoneName)
+    })
+
     it('renders the base component with required props', () => {
       const wrapper = shallow(<Day {...defaultProps} timeZone={timeZoneName} day="2017-04-25" />)
       expect(wrapper).toMatchSnapshot()
     })
 
     it('renders the friendly name in large text and rest of the date on a second line when it is today', () => {
-      const today = moment().tz(timeZoneName)
+      const today = moment()
       const wrapper = shallow(
         <Day {...defaultProps} timeZone={timeZoneName} day={today.format('YYYY-MM-DD')} />
       )
@@ -51,7 +55,7 @@ for (const [timeZoneDesc, timeZoneName] of [
     })
 
     it('renders the full date with friendly name on one line when it is not today', () => {
-      const yesterday = moment().tz(timeZoneName).subtract(1, 'days')
+      const yesterday = moment().subtract(1, 'days')
       const wrapper = shallow(
         <Day {...defaultProps} timeZone={timeZoneName} day={yesterday.format('YYYY-MM-DD')} />
       )
@@ -61,7 +65,7 @@ for (const [timeZoneDesc, timeZoneName] of [
     })
 
     it('renders missing assignments if showMissingAssignments is true and it is today', () => {
-      const today = moment().tz(timeZoneName)
+      const today = moment()
       const wrapper = shallow(
         <Day
           {...defaultProps}
@@ -74,7 +78,7 @@ for (const [timeZoneDesc, timeZoneName] of [
     })
 
     it('does not render missing assignments if it is not today', () => {
-      const yesterday = moment().tz(timeZoneName).subtract(1, 'days')
+      const yesterday = moment().subtract(1, 'days')
       const wrapper = shallow(
         <Day
           {...defaultProps}
@@ -87,7 +91,7 @@ for (const [timeZoneDesc, timeZoneName] of [
     })
 
     it('only renders the year when the date is not in the current year', () => {
-      const lastYear = moment().tz(timeZoneName).subtract(1, 'year')
+      const lastYear = moment().subtract(1, 'year')
       const wrapper = shallow(
         <Day {...defaultProps} timeZone={timeZoneName} day={lastYear.format('YYYY-MM-DD')} />
       )
