@@ -172,6 +172,8 @@ class Header extends React.Component {
       gradingType: assignment.gradingType,
       pointsPossible: assignment.pointsPossible,
       score: ENV.restrict_quantitative_data && submission.score != null ? submission.score : null,
+      restrict_quantitative_data: ENV.restrict_quantitative_data,
+      grading_scheme: ENV.grading_scheme,
     })
 
     const textProps =
