@@ -73,6 +73,13 @@ GIT
     thrift_client (0.9.3)
       thrift (~> 0.9.0)
 
+GIT
+  remote: https://github.com/wrapbook/crystalball.git
+  revision: 59837f892594816705b7bb6611191a7bda0c3fb5
+  specs:
+    crystalball (0.7.0)
+      git
+
 PATH
   remote: gems/canvas_cassandra
   specs:
@@ -510,8 +517,6 @@ GEM
     crass (1.0.6)
     crocodoc-ruby (0.0.1)
       json
-    crystalball (0.7.0)
-      git
     database_cleaner (2.0.2)
       database_cleaner-active_record (>= 2, < 3)
     database_cleaner-active_record (2.1.0)
@@ -1203,7 +1208,7 @@ DEPENDENCIES
   chunky_png (= 1.4.0)
   config_file!
   crocodoc-ruby (= 0.0.1)
-  crystalball (= 0.7.0)
+  crystalball!
   csv_diff!
   database_cleaner (~> 2.0)
   db-query-matchers (= 0.11.0)

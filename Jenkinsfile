@@ -438,6 +438,8 @@ pipeline {
 
                       def crystalballStep = '''
                         diffFrom=$(git --git-dir $LOCAL_WORKDIR/.git rev-parse $GERRIT_PATCHSET_REVISION^1)
+                        # crystalball will fail without adding /usr/src/app to safe.directory
+                        docker exec -t general-build-container bash -c 'git config --global --add safe.directory /usr/src/app'
                         docker exec -dt \
                                         -e CRYSTALBALL_DIFF_FROM=$diffFrom \
                                         -e CRYSTALBALL_DIFF_TO=$GERRIT_PATCHSET_REVISION \
@@ -486,6 +488,7 @@ pipeline {
                             sleep 0.1
                           done
 
+                          docker exec -t general-build-container bash -c 'cat log/crystalball.log'
                           docker cp \$(docker ps -qa -f name=general-build-container):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
                         '''
                         archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_spec_list.txt'
