@@ -167,7 +167,13 @@ const getSubmission = (assignment, observedUserId) =>
 /* Takes raw response from assignment_groups API and returns an array of objects with each
    assignment group's id, name, and total score. If gradingPeriodId is passed, only return
    totals for assignment groups which have assignments in the provided grading period. */
-export const getAssignmentGroupTotals = (data, gradingPeriodId, observedUserId) => {
+export const getAssignmentGroupTotals = (
+  data,
+  gradingPeriodId,
+  observedUserId,
+  restrictQuantitativeData = false,
+  gradingScheme = []
+) => {
   if (gradingPeriodId) {
     data = data.filter(group =>
       group.assignments?.some(a => {
@@ -193,16 +199,21 @@ export const getAssignmentGroupTotals = (data, gradingPeriodId, observedUserId) 
       {...group, assignments},
       false
     )
+
+    let score
+    if (groupScores.current.possible === 0) {
+      score = I18n.t('n/a')
+    } else {
+      const tempScore = (groupScores.current.score / groupScores.current.possible) * 100
+      score = restrictQuantitativeData
+        ? scoreToGrade(tempScore, gradingScheme)
+        : I18n.n(tempScore, {percentage: true, precision: 2})
+    }
+
     return {
       id: group.id,
       name: group.name,
-      score:
-        groupScores.current.possible === 0
-          ? I18n.t('n/a')
-          : I18n.n((groupScores.current.score / groupScores.current.possible) * 100, {
-              percentage: true,
-              precision: 2,
-            }),
+      score,
     }
   })
 }

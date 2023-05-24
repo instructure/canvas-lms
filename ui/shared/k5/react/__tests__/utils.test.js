@@ -46,6 +46,21 @@ const APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[
 const CONVERSATIONS_URL = '/api/v1/conversations'
 const getSyllabusUrl = courseId => encodeURI(`/api/v1/courses/${courseId}?include[]=syllabus_body`)
 
+const DEFAULT_GRADING_SCHEME = [
+  ['A', 0.94],
+  ['A-', 0.9],
+  ['B+', 0.87],
+  ['B', 0.84],
+  ['B-', 0.8],
+  ['C+', 0.77],
+  ['C', 0.74],
+  ['C-', 0.7],
+  ['D+', 0.67],
+  ['D', 0.64],
+  ['D-', 0.61],
+  ['F', 0.0],
+]
+
 afterEach(() => {
   fetchMock.restore()
 })
@@ -403,6 +418,50 @@ describe('getAssignmentGroupTotals', () => {
     expect(totals[0].score).toBe('80.00%')
   })
 
+  it('returns an array of objects that have id, name, and letter grade as score when Restrict Quantitative Data', () => {
+    const data = [
+      {
+        id: '49',
+        name: 'Assignments',
+        rules: {},
+        group_weight: 0.0,
+        assignments: [
+          {
+            id: 149,
+            name: '1',
+            points_possible: 10.0,
+            grading_type: 'points',
+            submission: {
+              score: 7.0,
+              grade: '7.0',
+              late: false,
+              excused: false,
+              missing: false,
+            },
+          },
+          {
+            id: 150,
+            name: '2',
+            points_possible: 5.0,
+            grading_type: 'points',
+            submission: {
+              score: 5.0,
+              grade: '5.0',
+              late: false,
+              excused: false,
+              missing: false,
+            },
+          },
+        ],
+      },
+    ]
+    const totals = getAssignmentGroupTotals(data, null, null, true, DEFAULT_GRADING_SCHEME)
+    expect(totals.length).toBe(1)
+    expect(totals[0].id).toBe('49')
+    expect(totals[0].name).toBe('Assignments')
+    expect(totals[0].score).toBe('B-')
+  })
+
   it('returns n/a for assignment groups with no assignments', () => {
     const data = [
       {
@@ -557,21 +616,6 @@ describe('getAssignmentGrades', () => {
     expect(totals.find(({id}) => id === 151).hasComments).toBe(false)
   })
 })
-
-const DEFAULT_GRADING_SCHEME = [
-  ['A', 0.94],
-  ['A-', 0.9],
-  ['B+', 0.87],
-  ['B', 0.84],
-  ['B-', 0.8],
-  ['C+', 0.77],
-  ['C', 0.74],
-  ['C-', 0.7],
-  ['D+', 0.67],
-  ['D', 0.64],
-  ['D-', 0.61],
-  ['F', 0.0],
-]
 
 describe('getTotalGradeStringFromEnrollments', () => {
   it("returns n/a if there's no score or grade", () => {
