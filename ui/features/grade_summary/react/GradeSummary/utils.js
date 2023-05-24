@@ -264,35 +264,36 @@ export const getGradingPeriodPercentage = (
 // **************** COURSES *******************************************************
 
 export const getCourseTotalPoints = assignments => {
-  return assignments.reduce((total, assignment) => {
-    if (
-      !(assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused') &&
-      assignment?.submissionsConnection?.nodes.length > 0
-    ) {
-      total += getAssignmentTotalPoints(assignment)
-    }
-    return total
-  }, 0)
+  return (
+    assignments?.reduce((total, assignment) => {
+      if (
+        !(assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused') &&
+        assignment?.submissionsConnection?.nodes.length > 0
+      ) {
+        total += getAssignmentTotalPoints(assignment)
+      }
+      return total
+    }, 0) || 0
+  )
 }
 
-export const getCourseEarnedPoints = assignments => {
-  return assignments.reduce((total, assignment) => {
-    if (
-      !(assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused') &&
-      assignment?.submissionsConnection?.nodes.length > 0
-    ) {
-      total += getAssignmentEarnedPoints(assignment)
-    }
-    return total
-  }, 0)
+export const getCourseEarnedPoints = (assignments = []) => {
+  return (
+    assignments?.reduce((total, assignment) => {
+      if (
+        !(assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused') &&
+        assignment?.submissionsConnection?.nodes.length > 0
+      ) {
+        total += getAssignmentEarnedPoints(assignment)
+      }
+      return total
+    }, 0) || 0
+  )
 }
 
-export const getCoursePercentage = assignments => {
+export const getCoursePercentage = (assignments = []) => {
+  if (!getCourseTotalPoints(assignments)) return 0
   return (getCourseEarnedPoints(assignments) / getCourseTotalPoints(assignments)) * 100
-}
-
-export const getCourseLetterGrade = (course, assignments, gradingStandard) => {
-  return scorePercentageToLetterGrade(getCoursePercentage(course, assignments), gradingStandard)
 }
 
 // **************** TOTAL *********************************************************
@@ -300,34 +301,37 @@ export const getCourseLetterGrade = (course, assignments, gradingStandard) => {
 export const getTotal = (assignments, assignmentGroups, gradingPeriods, applyWeights) => {
   let returnTotal = 0
   if (getGradingPeriodID() === '0' && applyWeights) {
-    returnTotal = gradingPeriods.reduce((total, period) => {
-      return (
-        total +
-        getGradingPeriodPercentage(
-          period,
-          assignments.filter(assignment => {
-            return assignment?.submissionsConnection?.nodes[0]?.gradingPeriodId === period?._id
-          }),
-          assignmentGroups,
-          applyWeights
-        ) *
-          (period?.weight / 100)
-      )
-    }, 0)
+    returnTotal =
+      gradingPeriods?.reduce((total, period) => {
+        return (
+          total +
+          getGradingPeriodPercentage(
+            period,
+            assignments?.filter(assignment => {
+              return assignment?.submissionsConnection?.nodes[0]?.gradingPeriodId === period?._id
+            }),
+            assignmentGroups,
+            applyWeights
+          ) *
+            (period?.weight / 100)
+        )
+      }, 0) || 0
   } else if (getGradingPeriodID() === '0') {
-    returnTotal = gradingPeriods.reduce((total, gradingPeriod) => {
-      if (!getGradingPeriodTotalPoints(gradingPeriod, assignments)) return total
-      return (
-        total +
-        (getGradingPeriodEarnedPoints(gradingPeriod, assignments) /
-          getGradingPeriodTotalPoints(gradingPeriod, assignments)) *
-          gradingPeriod?.weight
-      )
-    }, 0)
+    returnTotal =
+      gradingPeriods?.reduce((total, gradingPeriod) => {
+        if (!getGradingPeriodTotalPoints(gradingPeriod, assignments)) return total
+        return (
+          total +
+          (getGradingPeriodEarnedPoints(gradingPeriod, assignments) /
+            getGradingPeriodTotalPoints(gradingPeriod, assignments)) *
+            gradingPeriod?.weight
+        )
+      }, 0) || 0
   } else if (applyWeights) {
-    returnTotal = assignmentGroups.reduce((total, assignmentGroup) => {
-      return total + getAssignmentGroupPercentage(assignmentGroup, assignments, applyWeights)
-    }, 0)
+    returnTotal =
+      assignmentGroups?.reduce((total, assignmentGroup) => {
+        return total + getAssignmentGroupPercentage(assignmentGroup, assignments, applyWeights)
+      }, 0) || 0
   } else {
     returnTotal = getCoursePercentage(assignments)
   }
