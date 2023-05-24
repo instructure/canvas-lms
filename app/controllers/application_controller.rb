@@ -356,6 +356,7 @@ class ApplicationController < ActionController::Base
     rce_show_studio_media_options
     media_links_use_attachment_id
     auto_subscribe_account_calendars
+    account_calendars_planner_support
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours

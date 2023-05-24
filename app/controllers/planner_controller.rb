@@ -364,8 +364,15 @@ class PlannerController < ApplicationController
     @per_page = params[:per_page] || 50
     @page = params[:page] || "first"
     @include_concluded = includes.include? "concluded"
-    @include_account_calendars = includes.include? "account_calendars"
-    @enabled_account_calendars = @user&.enabled_account_calendars&.map(&:id) || []
+    account_calendars_support_enabled = Account.site_admin.feature_enabled?(:account_calendars_planner_support)
+    if account_calendars_support_enabled
+      @include_account_calendars = includes.include? "account_calendars"
+      @enabled_account_calendars = @user&.enabled_account_calendars&.map(&:id) || []
+    else
+      @include_account_calendars = false
+      @enabled_account_calendars = []
+    end
+
     # for specs, that do multiple requests in a single spec, we have to reset these ivars
     @course_ids = @group_ids = @user_ids = @account_ids = nil
     if params[:context_codes].present?
@@ -373,7 +380,7 @@ class PlannerController < ApplicationController
       @course_ids = context_ids["Course"] || []
       @group_ids = context_ids["Group"] || []
       @user_ids = context_ids["User"] || []
-      @account_ids = context_ids["Account"] || []
+      @account_ids = account_calendars_support_enabled ? context_ids["Account"] || [] : []
       # needed for all_ungraded_todo_items, but otherwise we don't need to load the actual
       # objects
       @contexts = Context.find_all_by_asset_string(context_ids) if public_access?
@@ -441,7 +448,7 @@ class PlannerController < ApplicationController
     @context_codes = @local_course_ids.map { |id| "course_#{id}" }
     @context_codes.concat(@local_group_ids.map { |id| "group_#{id}" })
     @context_codes.concat(@local_user_ids.map { |id| "user_#{id}" })
-    @context_codes.concat(@local_account_ids.map { |id| "account_#{id}" })
+    @context_codes.concat(@local_account_ids.map { |id| "account_#{id}" }) if account_calendars_support_enabled
   end
 
   def contexts_cache_key
