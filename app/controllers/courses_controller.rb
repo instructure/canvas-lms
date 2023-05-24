@@ -3231,6 +3231,16 @@ class CoursesController < ApplicationController
         visibility_configuration(params[:course])
       end
 
+      if params[:course][:homeroom_course].present? && value_to_boolean(params[:course][:homeroom_course]) && @course.enable_course_paces
+        homeroom_message = t("Homeroom Course cannot be used with Course Pacing")
+        @course.errors.add(:homeroom_course, homeroom_message)
+      end
+
+      if params[:course][:enable_course_paces].present? && value_to_boolean(params[:course][:enable_course_paces]) && @course.homeroom_course
+        pacing_message = t("Course Pacing cannot be used with Homeroom Course")
+        @course.errors.add(:enable_course_paces, pacing_message)
+      end
+
       changes = changed_settings(@course.changes, @course.settings, old_settings)
       changes.delete(:start_at) if changes.dig(:start_at, 0)&.to_s == changes.dig(:start_at, 1)&.to_s
       changes.delete(:conclude_at) if changes.dig(:conclude_at, 0)&.to_s == changes.dig(:conclude_at, 1)&.to_s
