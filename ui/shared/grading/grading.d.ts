@@ -313,6 +313,8 @@ export type FormatGradeOptions = {
   precision?: number
   pointsPossible?: number
   score?: number
+  restrict_quantitative_data?: boolean
+  grading_scheme?: GradingScheme[]
 }
 
 export type GradingStandard = [string, number]

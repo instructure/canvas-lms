@@ -25,7 +25,7 @@ const I18n = useI18nScope('sharedGradeFormatHelper')
 QUnit.module('GradeFormatHelper#formatGrade', {
   setup() {
     this.translateString = I18n.t
-    sandbox.stub(numberHelper, 'validate').callsFake(val => !isNaN(parseFloat(val)))
+    sandbox.stub(numberHelper, 'validate').callsFake(val => !Number.isNaN(parseFloat(val)))
     sandbox.stub(I18n.constructor.prototype, 't').callsFake(this.translateString)
   },
 })
@@ -184,7 +184,7 @@ QUnit.module('GradeFormatHelper#delocalizeGrade')
 
 test('returns input value when input is not a string', () => {
   strictEqual(GradeFormatHelper.delocalizeGrade(1), 1)
-  ok(isNaN(GradeFormatHelper.delocalizeGrade(NaN)))
+  ok(Number.isNaN(GradeFormatHelper.delocalizeGrade(NaN)))
   strictEqual(GradeFormatHelper.delocalizeGrade(null), null)
   strictEqual(GradeFormatHelper.delocalizeGrade(undefined), undefined)
   strictEqual(GradeFormatHelper.delocalizeGrade(true), true)
@@ -304,7 +304,7 @@ QUnit.module('GradeFormatHelper', suiteHooks => {
   const translateString = I18n.t
 
   suiteHooks.beforeEach(() => {
-    sinon.stub(numberHelper, 'validate').callsFake(val => !isNaN(parseFloat(val)))
+    sinon.stub(numberHelper, 'validate').callsFake(val => !Number.isNaN(parseFloat(val)))
     sinon.stub(I18n.constructor.prototype, 't').callsFake(translateString)
   })
 
@@ -777,5 +777,83 @@ QUnit.module('GradeFormatHelper', suiteHooks => {
         })
       }
     )
+  })
+
+  QUnit.module('.formatGrade() with Restrict_quantitative_data', () => {
+    const scheme = [
+      ['A', 0.9],
+      ['B', 0.8],
+      ['C', 0.7],
+      ['D', 0.6],
+      ['F', 0.5],
+    ]
+
+    const defaultProps = ({
+      pointsPossible = 100,
+      restrict_quantitative_data = true,
+      score = null,
+      grading_scheme = scheme,
+    } = {}) => ({
+      pointsPossible,
+      restrict_quantitative_data,
+      grading_scheme,
+      score,
+    })
+
+    function formatGrade(grade, options = defaultProps()) {
+      return GradeFormatHelper.formatGrade(grade, options)
+    }
+
+    test('returns the set grade value if it is already a letter_grade', () => {
+      strictEqual(formatGrade('C+'), 'C+')
+    })
+
+    test('returns the set grade value if score and points possible are 0', () => {
+      const gradeOptions = defaultProps({score: 0, pointsPossible: 0})
+      strictEqual(formatGrade('C+', gradeOptions), 'C+')
+    })
+
+    test('returns the correct value for complete/incomplete grade', () => {
+      const gradeOptions = defaultProps({score: 10, pointsPossible: 0})
+      strictEqual(formatGrade('complete', gradeOptions), 'complete')
+    })
+
+    test('returns excused if the grade is excused but graded', () => {
+      const gradeOptions = defaultProps({score: 50})
+      strictEqual(formatGrade('EX', gradeOptions), 'Excused')
+    })
+
+    test('returns null if points possible is 0, and grade is null', () => {
+      const gradeOptions = defaultProps({score: null, pointsPossible: 0})
+      strictEqual(formatGrade(null, gradeOptions), null)
+    })
+
+    test('returns A if points possible is 0, and the score is greater than 0', () => {
+      const gradeOptions = defaultProps({score: 1, pointsPossible: 0})
+      strictEqual(formatGrade('1', gradeOptions), 'A')
+    })
+
+    test('converts percentage to letter-grade', () => {
+      const gradeOptions = defaultProps({score: 8.5, pointsPossible: 10})
+      strictEqual(formatGrade('85%', gradeOptions), 'B')
+    })
+
+    test('returns the correct grading scheme based on points and score', () => {
+      const gradeOptions = defaultProps({score: 50})
+      strictEqual(formatGrade('50', gradeOptions), 'F')
+      gradeOptions.score = 60
+      strictEqual(formatGrade('60', gradeOptions), 'D')
+      gradeOptions.score = 70
+      strictEqual(formatGrade('70', gradeOptions), 'C')
+      gradeOptions.score = 80
+      strictEqual(formatGrade('80', gradeOptions), 'B')
+      gradeOptions.score = 90
+      strictEqual(formatGrade('90', gradeOptions), 'A')
+    })
+
+    test('returns the correct letter grade based on different points possible', () => {
+      const gradeOptions = defaultProps({score: 5, pointsPossible: 3})
+      strictEqual(formatGrade('5', gradeOptions), 'A')
+    })
   })
 })
