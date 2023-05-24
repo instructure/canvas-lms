@@ -40,7 +40,7 @@ export const totalRow = queryData => {
       <Table.Cell textAlign="start" colSpan="3">
         <Text weight="bold">{I18n.t('Total')}</Text>
       </Table.Cell>
-      <Table.Cell textAlign="start">
+      <Table.Cell textAlign="center">
         <Text weight="bold">
           {ENV.restrict_quantitative_data
             ? scorePercentageToLetterGrade(formattedTotal, queryData?.gradingStandard)

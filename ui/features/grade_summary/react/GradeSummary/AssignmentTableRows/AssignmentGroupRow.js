@@ -36,7 +36,7 @@ export const assignmentGroupRow = (assignmentGroup, queryData) => {
         <Text weight="bold">{assignmentGroup?.name}</Text>
       </Table.Cell>
       {!ENV.restrict_quantitative_data && (
-        <Table.Cell textAlign="start">
+        <Table.Cell textAlign="end">
           <Text weight="bold">
             {formatNumber(
               getAssignmentGroupPercentage(assignmentGroup, filteredAssignments(queryData), false)
@@ -45,7 +45,7 @@ export const assignmentGroupRow = (assignmentGroup, queryData) => {
           </Text>
         </Table.Cell>
       )}
-      <Table.Cell textAlign="start">
+      <Table.Cell textAlign="end">
         <Text weight="bold">
           {ENV.restrict_quantitative_data
             ? scorePercentageToLetterGrade(

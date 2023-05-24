@@ -62,14 +62,14 @@ export const assignmentRow = (
       <Table.Cell textAlign="start">
         {DateHelper.formatDatetimeForDisplay(assignment.dueAt)}
       </Table.Cell>
-      <Table.Cell textAlign="start">{getDisplayStatus(assignment)}</Table.Cell>
-      <Table.Cell textAlign="start">
+      <Table.Cell textAlign="center">{getDisplayStatus(assignment)}</Table.Cell>
+      <Table.Cell textAlign="center">
         {assignment?.submissionsConnection?.nodes[0]?.hideGradeFromStudent ? (
           <Tooltip renderTip={I18n.t('This assignment is muted')}>
             <IconMutedLine />
           </Tooltip>
         ) : (
-          <Flex>
+          <Flex justifyItems="center">
             <Flex.Item>{getDisplayScore(assignment, queryData?.gradingStandard)}</Flex.Item>
             {assignment?.submissionsConnection?.nodes.length > 0 &&
               assignment?.submissionsConnection?.nodes[0]?.readState !== 'read' && (
@@ -97,7 +97,7 @@ export const assignmentRow = (
           </Flex>
         )}
       </Table.Cell>
-      <Table.Cell textAlign="center">
+      <Table.Cell textAlign="end">
         {submissionCommentsPresent(assignment) && (
           <IconButton
             margin="0 small"
