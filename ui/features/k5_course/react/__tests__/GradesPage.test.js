@@ -214,6 +214,18 @@ describe('GradesPage', () => {
         expect(getByText('Reports: 95.00%')).toBeInTheDocument()
       })
 
+      it('displays assignment group totals Letter Grade when expanded and Restrict Quantitative Data', async () => {
+        const {getByText, findByText, queryByText} = render(
+          <GradesPage
+            {...getProps({gradingScheme: DEFAULT_GRADING_SCHEME, restrictQuantitativeData: true})}
+          />
+        )
+        const totalsButton = await findByText('View Assignment Group Totals')
+        expect(queryByText('Reports: A')).not.toBeInTheDocument()
+        act(() => totalsButton.click())
+        expect(getByText('Reports: A')).toBeInTheDocument()
+      })
+
       it("doesn't show any totals if hideFinalGrades is set", async () => {
         const {queryByText} = render(<GradesPage {...getProps({hideFinalGrades: true})} />)
         await waitFor(() => {

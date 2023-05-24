@@ -72,7 +72,9 @@ const GradeDetails = ({
   const assignmentGroupTotals = getAssignmentGroupTotals(
     assignmentGroups,
     selectedGradingPeriodId,
-    observedUserId
+    observedUserId,
+    restrictQuantitativeData,
+    gradingScheme
   )
   const grades = getAssignmentGrades(assignmentGroups, observedUserId)
   const totalGrade = getTotalGradeStringFromEnrollments(
