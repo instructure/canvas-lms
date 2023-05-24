@@ -18374,6 +18374,7 @@ hu:
         wiki_page_name: "Oldal neve"
         wiki_page_namem: "Feladat neve"
       loading: Töltődik...
+      new_assignment_notice: "Válassza ki a feladatot, amelyet fel szeretne venni a modulba, vagy adjon hozzá “Új feladat”-ot!"
       new_assignment_option: "[ Új feladat ]"
       new_page_option: "[ Új oldal ]"
       new_quiz_notice: "Válassza ki a kvízt, amelyet ehhez a *modul*-hoz szeretne társítani, vagy adjon hozzá \"Új kvíz\"-t."
