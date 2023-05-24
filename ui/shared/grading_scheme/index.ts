@@ -20,4 +20,15 @@ export type {
   GradingScheme,
   GradingSchemeTemplate,
   GradingSchemeDataRow,
+  GradingSchemeUpdateRequest,
+  GradingSchemeSummary,
 } from './gradingSchemeApiModel'
+
+export type {ApiCallStatus} from './react/hooks/ApiCallStatus'
+export {useGradingSchemes} from './react/hooks/useGradingSchemes'
+export {useGradingScheme} from './react/hooks/useGradingScheme'
+export {useDefaultGradingScheme} from './react/hooks/useDefaultGradingScheme'
+export {useGradingSchemeCreate} from './react/hooks/useGradingSchemeCreate'
+export {useGradingSchemeUpdate} from './react/hooks/useGradingSchemeUpdate'
+export {useGradingSchemeDelete} from './react/hooks/useGradingSchemeDelete'
+export {useGradingSchemeSummaries} from './react/hooks/useGradingSchemeSummaries'

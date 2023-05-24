@@ -15,34 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export interface GradingSchemeTemplate {
-  title: string
-  data: GradingSchemeDataRow[]
-}
 
-export interface GradingScheme {
-  id: string
-  title: string
-  data: GradingSchemeDataRow[]
-  context_type: 'Account' | 'Course'
-  context_id: string
-  context_name: string
-  permissions: {manage: boolean}
-  assessed_assignment: boolean
-}
-
-export interface GradingSchemeUpdateRequest {
-  id: string
-  title: string
-  data: GradingSchemeDataRow[]
-}
-
-export interface GradingSchemeDataRow {
-  name: string
-  value: number
-}
-
-export interface GradingSchemeSummary {
-  name: string
-  id: string
+export function buildContextPath(contextType: 'Account' | 'Course', contextId: string) {
+  let contextPath: string
+  switch (contextType) {
+    case 'Course': {
+      contextPath = `/courses/${contextId}`
+      break
+    }
+    case 'Account': {
+      contextPath = `/accounts/${contextId}`
+      break
+    }
+  }
+  return contextPath
 }
