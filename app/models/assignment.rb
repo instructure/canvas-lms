@@ -168,10 +168,11 @@ class Assignment < ActiveRecord::Base
   scope :auditable, -> { anonymous.or(moderated) }
   scope :type_quiz_lti, lambda {
     all.primary_shard.activate do
+      # the offsets in this query are important hints to the PG query planner to execute this efficiently
       where(ContentTag.where("content_tags.context_id=assignments.id")
                       .where(context_type: "Assignment", content_type: "ContextExternalTool")
-                      .where(ContextExternalTool.where("context_external_tools.id=content_tags.content_id").quiz_lti.arel.exists)
-                .arel.exists)
+                      .where(ContextExternalTool.where("context_external_tools.id=content_tags.content_id").quiz_lti.offset(0).arel.exists)
+                      .offset(0).arel.exists)
     end
   }
   scope :not_type_quiz_lti, -> { where.not(id: type_quiz_lti) }
