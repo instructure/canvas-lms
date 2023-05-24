@@ -250,7 +250,8 @@ module MicrosoftSync
                         "Skipping #{type} for #{n_total}: #{change_result.to_json}")
       InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}",
                                    tags: { sync_type: sync_type })
-      InstStatsd::Statsd.count("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}", n_total,
+      InstStatsd::Statsd.count("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}",
+                               n_total,
                                tags: { sync_type: sync_type })
     end
 

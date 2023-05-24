@@ -46,9 +46,22 @@ module SIS
             course_format = row.key?("course_format") && (row["course_format"] || "not_set")
             grade_passback_setting = row.key?("grade_passback_setting") && (row["grade_passback_setting"] || "not_set")
             begin
-              importer.add_course(row["course_id"], row["term_id"], row["account_id"], row["fallback_account_id"], row["status"], start_date, end_date,
-                                  row["abstract_course_id"], row["short_name"], row["long_name"], row["integration_id"], course_format, row["blueprint_course_id"],
-                                  grade_passback_setting, row["homeroom_course"], row["friendly_name"])
+              importer.add_course(row["course_id"],
+                                  row["term_id"],
+                                  row["account_id"],
+                                  row["fallback_account_id"],
+                                  row["status"],
+                                  start_date,
+                                  end_date,
+                                  row["abstract_course_id"],
+                                  row["short_name"],
+                                  row["long_name"],
+                                  row["integration_id"],
+                                  course_format,
+                                  row["blueprint_course_id"],
+                                  grade_passback_setting,
+                                  row["homeroom_course"],
+                                  row["friendly_name"])
             rescue ImportError => e
               messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row["lineno"], row_info: row)
             end

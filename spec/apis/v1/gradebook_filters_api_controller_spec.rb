@@ -68,8 +68,10 @@ describe GradebookFiltersApiController, type: :request do
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: "First filter", payload: { foo: :bar })
 
       @path = "/api/v1/courses/#{@course.id}/gradebook_filters"
-      @params = { course_id: @course.id, controller: "gradebook_filters_api",
-                  action: "create", format: "json" }
+      @params = { course_id: @course.id,
+                  controller: "gradebook_filters_api",
+                  action: "create",
+                  format: "json" }
     end
 
     it "creates sucessfully a new gradebook filter with given params" do
@@ -104,8 +106,11 @@ describe GradebookFiltersApiController, type: :request do
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: "First filter", payload: { foo: :bar })
 
       @path = "/api/v1/courses/#{@course.id}/gradebook_filters/#{@gradebook_filter.id}"
-      @params = { id: @gradebook_filter.id, course_id: @course.id,
-                  controller: "gradebook_filters_api", action: "update", format: "json" }
+      @params = { id: @gradebook_filter.id,
+                  course_id: @course.id,
+                  controller: "gradebook_filters_api",
+                  action: "update",
+                  format: "json" }
     end
 
     it "updates the name" do
@@ -142,8 +147,11 @@ describe GradebookFiltersApiController, type: :request do
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: "First filter", payload: { foo: :bar })
 
       @path = "/api/v1/courses/#{@course.id}/gradebook_filters/#{@gradebook_filter.id}"
-      @params = { id: @gradebook_filter.id, course_id: @course.id,
-                  controller: "gradebook_filters_api", action: "show", format: "json" }
+      @params = { id: @gradebook_filter.id,
+                  course_id: @course.id,
+                  controller: "gradebook_filters_api",
+                  action: "show",
+                  format: "json" }
     end
 
     it "returns correct attributes" do
@@ -177,8 +185,11 @@ describe GradebookFiltersApiController, type: :request do
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: "First filter", payload: { foo: :bar })
 
       @path = "/api/v1/courses/#{@course.id}/gradebook_filters/#{@gradebook_filter.id}"
-      @params = { id: @gradebook_filter.id, course_id: @course.id,
-                  controller: "gradebook_filters_api", action: "destroy", format: "json" }
+      @params = { id: @gradebook_filter.id,
+                  course_id: @course.id,
+                  controller: "gradebook_filters_api",
+                  action: "destroy",
+                  format: "json" }
     end
 
     it "deletes an gradebook_filter successfully" do

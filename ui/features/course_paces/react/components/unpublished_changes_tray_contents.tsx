@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -88,14 +89,14 @@ interface PassedProps {
 
 type ComponentProps = StoreProps & DispatchProps & PassedProps
 
-export const UnpublishedChangesTrayContents: React.FC<ComponentProps> = ({
+export const UnpublishedChangesTrayContents = ({
   autoSaving,
   isSyncing,
   showLoadingOverlay,
   onResetPace,
   unpublishedChanges,
   handleTrayDismiss,
-}) => {
+}: ComponentProps) => {
   const [isResetWarningModalOpen, setResetWarningModalOpen] = useState(false)
   const cancelDisabled =
     autoSaving || isSyncing || showLoadingOverlay || unpublishedChanges.length === 0

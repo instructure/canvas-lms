@@ -106,11 +106,14 @@ class Submission < ActiveRecord::Base
   has_many :attachment_associations, as: :context, inverse_of: :context
   has_many :provisional_grades, class_name: "ModeratedGrading::ProvisionalGrade"
   has_many :originality_reports
-  has_one :rubric_assessment, lambda {
-    joins(:rubric_association)
-      .where(assessment_type: "grading")
-      .where(rubric_associations: { workflow_state: "active" })
-  }, as: :artifact, inverse_of: :artifact
+  has_one :rubric_assessment,
+          lambda {
+            joins(:rubric_association)
+              .where(assessment_type: "grading")
+              .where(rubric_associations: { workflow_state: "active" })
+          },
+          as: :artifact,
+          inverse_of: :artifact
   has_one :lti_result, inverse_of: :submission, class_name: "Lti::Result", dependent: :destroy
   has_many :submission_drafts, inverse_of: :submission, dependent: :destroy
 
@@ -166,7 +169,7 @@ class Submission < ActiveRecord::Base
     end
   }
   scope :with_hidden_comments, lambda {
-    where("EXISTS (?)", SubmissionComment.where("submission_id = submissions.id AND hidden = true"))
+    where(SubmissionComment.where("submission_id = submissions.id AND hidden = true").arel.exists)
   }
 
   # This should only be used in the course drop down to show assignments recently graded.
@@ -865,7 +868,8 @@ class Submission < ActiveRecord::Base
       WHEN workflow_state = 'scored' THEN 0
       WHEN workflow_state = 'error' THEN 1
       WHEN workflow_state = 'pending' THEN 2
-      END"), updated_at: :desc).first
+      END"),
+                                                                 updated_at: :desc).first
     report&.report_launch_path
   end
 
@@ -2060,6 +2064,7 @@ class Submission < ActiveRecord::Base
   scope :with_assignment, -> { joins(:assignment).merge(Assignment.active) }
 
   scope :graded, -> { where("(submissions.score IS NOT NULL AND submissions.workflow_state = 'graded') or submissions.excused = true") }
+  scope :not_submitted_or_graded, -> { where(submission_type: nil).where("(submissions.score IS NULL OR submissions.workflow_state <> 'graded') AND submissions.excused IS NOT TRUE") }
 
   scope :ungraded, -> { where(grade: nil).preload(:assignment) }
 
@@ -2254,9 +2259,18 @@ class Submission < ActiveRecord::Base
     else
       touch
     end
-    valid_keys = %i[comment author media_comment_id media_comment_type
-                    group_comment_id assessment_request attachments
-                    anonymous hidden provisional_grade_id draft attempt]
+    valid_keys = %i[comment
+                    author
+                    media_comment_id
+                    media_comment_type
+                    group_comment_id
+                    assessment_request
+                    attachments
+                    anonymous
+                    hidden
+                    provisional_grade_id
+                    draft
+                    attempt]
     if opts[:comment].present? || opts[:media_comment_id]
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end
@@ -2695,6 +2709,16 @@ class Submission < ActiveRecord::Base
     change_item_read_state("unread", content_item)
   end
 
+  def refresh_comment_read_state
+    unread_comments = visible_submission_comments.left_joins(:viewed_submission_comments).where.not(author: user).where(viewed_submission_comments: { id: nil }).exists?
+
+    if unread_comments
+      mark_item_unread("comment")
+    else
+      mark_item_read("comment")
+    end
+  end
+
   def mark_submission_comments_read(current_user)
     timestamp = Time.now.utc
     viewed_comments = visible_submission_comments.pluck(:id).map do |id|
@@ -2880,10 +2904,12 @@ class Submission < ActiveRecord::Base
             submission = preloaded_submissions[user_id.to_i].first if preloaded_submissions[user_id.to_i]
             if !submission || user_data.key?(:posted_grade) || user_data.key?(:excuse)
               submissions =
-                assignment.grade_student(user, grader: grader,
-                                               grade: user_data[:posted_grade],
-                                               excuse: Canvas::Plugin.value_to_boolean(user_data[:excuse]),
-                                               skip_grade_calc: true, return_if_score_unchanged: true)
+                assignment.grade_student(user,
+                                         grader: grader,
+                                         grade: user_data[:posted_grade],
+                                         excuse: Canvas::Plugin.value_to_boolean(user_data[:excuse]),
+                                         skip_grade_calc: true,
+                                         return_if_score_unchanged: true)
               submissions.each { |s| graded_user_ids << s.user_id unless s.score_unchanged }
               submission = submissions.first
             end
@@ -2897,7 +2923,9 @@ class Submission < ActiveRecord::Base
                 "criterion_#{crit_name}"
               end
               assignment.rubric_association.assess(
-                assessor: grader, user: user, artifact: submission,
+                assessor: grader,
+                user: user,
+                artifact: submission,
                 assessment: assessment.merge(assessment_type: "grading")
               )
             end

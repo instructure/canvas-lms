@@ -28,11 +28,13 @@ module MicrosoftSync
           quota: [1, 0],
           special_cases: [
             SpecialCase.new(
-              400, /Education_ObjectType.*does not exist as.*property/,
+              400,
+              /Education_ObjectType.*does not exist as.*property/,
               result: Errors::NotEducationTenant
             )
           ],
-          **options, &blk
+          **options,
+          &blk
         )
       end
 

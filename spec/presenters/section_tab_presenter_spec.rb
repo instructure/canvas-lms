@@ -135,14 +135,16 @@ describe SectionTabPresenter do
       string_arg = "blah"
       path_args = SectionTabPresenter.new(assignments_tab.merge({
                                                                   args: string_arg
-                                                                }), course).path_args
+                                                                }),
+                                          course).path_args
       expect(path_args).to eq string_arg
     end
 
     it "returns empty array if tab no_args is present" do
       path_args = SectionTabPresenter.new(assignments_tab.merge({
                                                                   no_args: true
-                                                                }), course).path_args
+                                                                }),
+                                          course).path_args
       expect(path_args).to be_a Array
       expect(path_args).to be_empty
     end
@@ -156,7 +158,8 @@ describe SectionTabPresenter do
     it "includes icon, path & label" do
       h = SectionTabPresenter.new(tab.merge({
                                               icon: "icon-home"
-                                            }), course).to_h
+                                            }),
+                                  course).to_h
       expect(h.keys).to include(:icon, :hidden, :path, :label)
     end
   end

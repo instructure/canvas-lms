@@ -39,11 +39,11 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
       Submission
       .where(id: submission_ids)
       .joins(:submission_comments)
-      .where(
-        "NOT EXISTS (?)",
+      .where.not(
         ViewedSubmissionComment
           .where("viewed_submission_comments.submission_comment_id=submission_comments.id")
           .where(user_id: @current_user)
+          .arel.exists
       )
       .group(:submission_id, "submission_comments.attempt")
       .count

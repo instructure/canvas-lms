@@ -845,8 +845,10 @@ describe RubricsController do
     describe "with a valid rubric" do
       before do
         @r = Rubric.create! user: @teacher, context: Account.default
-        RubricAssociation.create! rubric: @r, context: @course,
-                                  purpose: :bookmark, association_object: @course
+        RubricAssociation.create! rubric: @r,
+                                  context: @course,
+                                  purpose: :bookmark,
+                                  association_object: @course
       end
 
       it "works" do

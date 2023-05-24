@@ -605,8 +605,11 @@ describe "Canvas Cartridge importing" do
         let(:tool) { external_tool_1_3_model(context: @copy_from, opts: { developer_key: developer_key }) }
         let(:developer_key) { DeveloperKey.create!(account: @copy_from.root_account) }
         let(:content_tag) do
-          context_module.add_item({ name: "Test Tool", content: tool, url: tool.url,
-                                    type: "context_external_tool", custom_params: custom_params,
+          context_module.add_item({ name: "Test Tool",
+                                    content: tool,
+                                    url: tool.url,
+                                    type: "context_external_tool",
+                                    custom_params: custom_params,
                                     id: tool.id })
         end
         let(:resource_link) { content_tag.associated_asset }
@@ -641,7 +644,8 @@ describe "Canvas Cartridge importing" do
           content_tag
           Importers::CourseContentImporter.import_content(@copy_to,
                                                           data,
-                                                          nil, @migration)
+                                                          nil,
+                                                          @migration)
           copied_module = @copy_to.context_modules.find_by(migration_id: CC::CCHelper.create_key(context_module))
           copied_content_tag = copied_module.content_tags.find_by(migration_id: CC::CCHelper.create_key(content_tag))
           expect(copied_content_tag.associated_asset.lookup_uuid).to eq resource_link.lookup_uuid
@@ -684,7 +688,8 @@ describe "Canvas Cartridge importing" do
   it "translates media file links on import" do
     att = Attachment.create!(filename: "video.mp4",
                              uploaded_data: StringIO.new("stuff"),
-                             folder: Folder.root_folders(@copy_to).first, context: @copy_to)
+                             folder: Folder.root_folders(@copy_to).first,
+                             context: @copy_to)
     att.migration_id = "stuff"
     att.content_type = "video/mp4"
     att.save!
@@ -720,7 +725,8 @@ describe "Canvas Cartridge importing" do
   it "translates new RCE media iframes on import" do
     att = Attachment.create!(filename: "video.mp4",
                              uploaded_data: StringIO.new("stuff"),
-                             folder: Folder.root_folders(@copy_to).first, context: @copy_to)
+                             folder: Folder.root_folders(@copy_to).first,
+                             context: @copy_to)
     att.migration_id = "stuff"
     att.content_type = "video/mp4"
     att.save!
@@ -750,7 +756,8 @@ describe "Canvas Cartridge importing" do
   it "translates media sources on import" do
     att = Attachment.create!(filename: "video.mp4",
                              uploaded_data: StringIO.new("stuff"),
-                             folder: Folder.root_folders(@copy_to).first, context: @copy_to)
+                             folder: Folder.root_folders(@copy_to).first,
+                             context: @copy_to)
     att.migration_id = "stuff"
     att.content_type = "video/mp4"
     att.save!

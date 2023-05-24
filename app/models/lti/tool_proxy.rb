@@ -84,7 +84,10 @@ module Lti
                            AND lti_tool_proxy_bindings.context_id = x.context_id")
                  .where("(lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id = ?)
                          OR (lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id IN (?))",
-                        context.class.name, context.id, "Account", account_ids)
+                        context.class.name,
+                        context.id,
+                        "Account",
+                        account_ids)
                  .order("lti_tool_proxy_bindings.tool_proxy_id, x.ordering").to_sql
       tools = joins("JOIN (#{subquery}) bindings on lti_tool_proxies.id = bindings.tool_proxy_id")
               .select("lti_tool_proxies.*, bindings.enabled AS binding_enabled")

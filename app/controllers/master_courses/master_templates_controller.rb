@@ -491,7 +491,12 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                        # OUT-5483: We only want ContentTags for account-level outcomes that have been deleted from the blueprint course
                        ContentTag.joins("INNER JOIN #{LearningOutcome.quoted_table_name} ON #{ContentTag.quoted_table_name}.content_id=#{LearningOutcome.quoted_table_name}.id")
                                  .where("#{ContentTag.quoted_table_name}.context_id=? AND #{ContentTag.quoted_table_name}.context_type=? AND #{ContentTag.quoted_table_name}.content_type=?
-                                  AND #{ContentTag.quoted_table_name}.workflow_state=? AND #{LearningOutcome.quoted_table_name}.context_type=?", @course.id, "Course", "LearningOutcome", "deleted", "Account")
+                                  AND #{ContentTag.quoted_table_name}.workflow_state=? AND #{LearningOutcome.quoted_table_name}.context_type=?",
+                                        @course.id,
+                                        "Course",
+                                        "LearningOutcome",
+                                        "deleted",
+                                        "Account")
                      else
                        klass.constantize.where(context_id: @course, context_type: "Course")
                      end
@@ -615,9 +620,11 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     migrations = Api.paginate(migrations, self, api_v1_course_blueprint_imports_url)
     ActiveRecord::Associations.preload(migrations, :user)
     render json: migrations.map { |migration|
-                   master_migration_json(migration.master_migration, @current_user,
-                                         session, child_migration: migration,
-                                                  subscription: @subscription)
+                   master_migration_json(migration.master_migration,
+                                         @current_user,
+                                         session,
+                                         child_migration: migration,
+                                         subscription: @subscription)
                  }
   end
 
@@ -636,8 +643,11 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     migration = @course.content_migrations
                        .where(migration_type: "master_course_import", child_subscription_id: @subscription)
                        .find(params[:id])
-    render json: master_migration_json(migration.master_migration, @current_user, session,
-                                       child_migration: migration, subscription: @subscription)
+    render json: master_migration_json(migration.master_migration,
+                                       @current_user,
+                                       session,
+                                       child_migration: migration,
+                                       subscription: @subscription)
   end
 
   # @API Get import details
@@ -737,8 +747,11 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       tags.each do |tag|
         next if %w[AssignmentGroup ContentTag].include?(tag.content_type) # these are noise, since they're touched with each assignment
 
-        changes << changed_asset_json(tag.content, action, restricted_ids.include?(tag.migration_id),
-                                      tag.migration_id, exceptions)
+        changes << changed_asset_json(tag.content,
+                                      action,
+                                      restricted_ids.include?(tag.migration_id),
+                                      tag.migration_id,
+                                      exceptions)
       end
     end
     changes << changed_syllabus_json(@course, exceptions) if updated_syllabus

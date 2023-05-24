@@ -28,8 +28,10 @@ describe ContentMigration do
       account_admin_user user: @cm.user, account: @account
 
       # account external tool in module item, course navigation, and assignment submission
-      @tool = @account.context_external_tools.build name: "blah", url: "https://blah.example.com",
-                                                    shared_secret: "123", consumer_key: "456"
+      @tool = @account.context_external_tools.build name: "blah",
+                                                    url: "https://blah.example.com",
+                                                    shared_secret: "123",
+                                                    consumer_key: "456"
       @tool.course_navigation = { enabled: "true" }
       @tool.homework_submission = { url: "https://blah.example.com/sub" }
       @tool.save!

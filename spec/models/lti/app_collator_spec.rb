@@ -83,8 +83,10 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq(example_definition(external_tool, lti_version: "1.1", deployment_id: external_tool.deployment_id,
-                                                                   editor_button_settings: external_tool.editor_button))
+        expect(definition).to eq(example_definition(external_tool,
+                                                    lti_version: "1.1",
+                                                    deployment_id: external_tool.deployment_id,
+                                                    editor_button_settings: external_tool.editor_button))
       end
 
       it "returns an external tool app definition as 1.3 tool" do
@@ -96,8 +98,10 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq(example_definition(external_tool, lti_version: "1.3", deployment_id: external_tool.deployment_id,
-                                                                   editor_button_settings: external_tool.editor_button))
+        expect(definition).to eq(example_definition(external_tool,
+                                                    lti_version: "1.3",
+                                                    deployment_id: external_tool.deployment_id,
+                                                    editor_button_settings: external_tool.editor_button))
       end
 
       it "returns definition with rce_favorite when editor_button placement is present" do
@@ -109,10 +113,11 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq(example_definition(external_tool, lti_version: "1.1",
-                                                                   deployment_id: external_tool.deployment_id,
-                                                                   editor_button_settings: external_tool.editor_button,
-                                                                   is_rce_favorite: false))
+        expect(definition).to eq(example_definition(external_tool,
+                                                    lti_version: "1.1",
+                                                    deployment_id: external_tool.deployment_id,
+                                                    editor_button_settings: external_tool.editor_button,
+                                                    is_rce_favorite: false))
       end
 
       it "returns an external tool and a tool proxy" do

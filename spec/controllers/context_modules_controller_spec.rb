@@ -358,7 +358,10 @@ describe ContextModulesController do
 
         @module = @course.context_modules.create!
         @tool = @course.context_external_tools.create!(
-          name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret",
+          name: "a",
+          url: "http://www.google.com",
+          consumer_key: "12345",
+          shared_secret: "secret",
           custom_fields: { "canvas_module_id" => "$Canvas.module.id", "canvas_module_item_id" => "$Canvas.moduleItem.id" }
         )
 
@@ -1109,9 +1112,12 @@ describe ContextModulesController do
       course_with_teacher_logged_in(active_all: true)
       @tool = factory_with_protected_attributes(@course.context_external_tools,
                                                 url: "http://www.justanexamplenotarealwebsite.com/tool1",
-                                                shared_secret: "test123", consumer_key: "test123", name: "mytool")
+                                                shared_secret: "test123",
+                                                consumer_key: "test123",
+                                                name: "mytool")
       @mod = @course.context_modules.create!
-      @assign = @course.assignments.create! title: "WHAT", submission_types: "external_tool",
+      @assign = @course.assignments.create! title: "WHAT",
+                                            submission_types: "external_tool",
                                             external_tool_tag_attributes: { content: @tool, url: @tool.url, external_data: ext_data.to_json }
       @tag = @mod.add_item(type: "assignment", id: @assign.id)
 
@@ -1317,8 +1323,11 @@ describe ContextModulesController do
     end
 
     it "redirects to the assignment edit mastery paths page for new quizzes" do
-      @course.context_external_tools.create! tool_id: ContextExternalTool::QUIZ_LTI, name: "Q.N",
-                                             consumer_key: "1", shared_secret: "1", domain: "quizzes.example.com"
+      @course.context_external_tools.create! tool_id: ContextExternalTool::QUIZ_LTI,
+                                             name: "Q.N",
+                                             consumer_key: "1",
+                                             shared_secret: "1",
+                                             domain: "quizzes.example.com"
       assignment = @course.assignments.create!
       assignment.quiz_lti!
       assignment.save!

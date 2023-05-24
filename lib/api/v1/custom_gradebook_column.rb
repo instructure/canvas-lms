@@ -22,8 +22,11 @@ module Api::V1::CustomGradebookColumn
   include Api::V1::Json
 
   def custom_gradebook_column_json(column, user, session)
-    json = api_json column, user, session, only: %w[id title position
-                                                    teacher_notes read_only]
+    json = api_json column, user, session, only: %w[id
+                                                    title
+                                                    position
+                                                    teacher_notes
+                                                    read_only]
     json[:hidden] = column.hidden?
     json
   end

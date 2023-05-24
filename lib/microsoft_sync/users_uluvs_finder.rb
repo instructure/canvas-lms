@@ -108,7 +108,7 @@ module MicrosoftSync
       # prefer the current shard
       (local_results + other_results)
         # prefer the current root account
-        .sort_by { |ps| ps.root_account_id == root_account.id ? 0 : 1 }
+        .sort_by { |ps| (ps.root_account_id == root_account.id) ? 0 : 1 }
         .map { |ps| [ps.user_id, ps[field]] }
     end
 

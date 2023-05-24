@@ -13,9 +13,6 @@ development:
       address-book:
         app-host: "http://address-book.docker"
         secret: "opensesame"
-      canvas:
-        encryption-secret: "astringthatisactually32byteslong"
-        signing-secret: "astringthatisactually32byteslong"
       live-events:
         aws_endpoint: http://kinesis.canvaslms.docker
         kinesis_stream_name: live-events
@@ -36,7 +33,7 @@ development:
         app-host: "http://rce.canvas.docker:3000"
     # another service
     inst-fs:
-      app-host: "http://api.instfs.docker"
+      app-host: "http://api.inst-fs.docker"
       # this is just "super-sekret-value", base64-encoded:
       secret: "c3VwZXItc2VrcmV0LXZhbHVlCg=="
     pandata:

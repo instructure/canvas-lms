@@ -314,9 +314,10 @@ describe "Common Cartridge exporting" do
         question_text: "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
         answers: [{
           migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080
-        }, {
-          migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279
-        }]
+        },
+                  {
+                    migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279
+                  }]
       }.with_indifferent_access
       qq.write_attribute(:question_data, data)
       qq.save!
@@ -391,9 +392,10 @@ describe "Common Cartridge exporting" do
         question_text: "<p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"/media_objects/some-kaltura-id\"></a></p>",
         answers: [{
           migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080
-        }, {
-          migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279
-        }]
+        },
+                  {
+                    migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279
+                  }]
       }.with_indifferent_access
       qq.write_attribute(:question_data, data)
       qq.save!
@@ -518,7 +520,9 @@ describe "Common Cartridge exporting" do
       @course.syllabus_body = link_thing
       @course.save!
       @ag = @course.assignment_groups.create!(name: "group1")
-      @asmnt = @course.assignments.create!(title: "Assignment 1", points_possible: 10, assignment_group: @ag,
+      @asmnt = @course.assignments.create!(title: "Assignment 1",
+                                           points_possible: 10,
+                                           assignment_group: @ag,
                                            description: link_thing)
       @ag2 = @course.assignment_groups.create!(name: "group2")
       @asmnt2 = @course.assignments.create!(title: "Assignment 2", points_possible: 10, assignment_group: @ag2)
@@ -644,7 +648,9 @@ describe "Common Cartridge exporting" do
 
     it "exports CC 1.3 assignments" do
       @file = Attachment.create!(filename: "test.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
-      @course.assignments.create! name: "test assignment", description: %(<a href="/courses/#{@course.id}/files/#{@file.id}/preview">what?</a>), points_possible: 11,
+      @course.assignments.create! name: "test assignment",
+                                  description: %(<a href="/courses/#{@course.id}/files/#{@file.id}/preview">what?</a>),
+                                  points_possible: 11,
                                   submission_types: "online_text_entry,online_upload,online_url"
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       @ce.save!

@@ -40,9 +40,15 @@ describe "Student Gradebook" do
   end
 
   grades = [
-    5, 10, 15,
-    19, 15, 10,
-    4,  6, 17
+    5,
+    10,
+    15,
+    19,
+    15,
+    10,
+    4,
+    6,
+    17
   ]
 
   shared_examples "Student Gradebook View" do |role|

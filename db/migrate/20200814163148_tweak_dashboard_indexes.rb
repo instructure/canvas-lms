@@ -23,12 +23,18 @@ class TweakDashboardIndexes < ActiveRecord::Migration[5.2]
 
   def up
     remove_index :assignments, algorithm: :concurrently, name: "index_assignments_with_submissions", if_exists: true
-    add_index :assignments, :context_id,
+    add_index :assignments,
+              :context_id,
               where: "context_type='Course' AND workflow_state<>'deleted'",
-              algorithm: :concurrently, name: "index_assignments_active", if_not_exists: true
-    add_index :submissions, [:user_id, :course_id],
+              algorithm: :concurrently,
+              name: "index_assignments_active",
+              if_not_exists: true
+    add_index :submissions,
+              [:user_id, :course_id],
               where: "(score IS NOT NULL OR grade IS NOT NULL) AND workflow_state<>'deleted'",
-              algorithm: :concurrently, name: "index_submissions_with_grade", if_not_exists: true
+              algorithm: :concurrently,
+              name: "index_submissions_with_grade",
+              if_not_exists: true
   end
 
   def down

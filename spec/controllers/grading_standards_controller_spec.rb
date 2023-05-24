@@ -27,9 +27,18 @@ describe GradingStandardsController do
     end
 
     let(:default_grading_standard) do
-      [["A", 0.94], ["A-", 0.9], ["B+", 0.87], ["B", 0.84],
-       ["B-", 0.8], ["C+", 0.77], ["C", 0.74], ["C-", 0.7],
-       ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
+      [["A", 0.94],
+       ["A-", 0.9],
+       ["B+", 0.87],
+       ["B", 0.84],
+       ["B-", 0.8],
+       ["C+", 0.77],
+       ["C", 0.74],
+       ["C-", 0.7],
+       ["D+", 0.67],
+       ["D", 0.64],
+       ["D-", 0.61],
+       ["F", 0]]
     end
 
     let!(:teacher_session) { user_session(@teacher) }

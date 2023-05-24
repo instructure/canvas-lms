@@ -689,7 +689,8 @@ module Lti
                                 }
                               ]
                             }
-                          }, context: account_model)
+                          },
+                          context: account_model)
       end
 
       it "creates subscriptions for Plagiarism ToolProxies" do
@@ -764,7 +765,8 @@ module Lti
                                 }
                               ]
                             }
-                          }, context: account_model)
+                          },
+                          context: account_model)
       end
 
       it "deletes subscriptions" do

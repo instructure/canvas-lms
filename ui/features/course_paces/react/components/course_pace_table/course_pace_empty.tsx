@@ -44,10 +44,10 @@ interface PassedProps {
   readonly responsiveSize: ResponsiveSizes
 }
 
-export const CoursePaceEmpty: React.FC<DispatchProps & PassedProps> = ({
+export const CoursePaceEmpty = ({
   setSelectedPaceContext,
   responsiveSize,
-}) => {
+}: DispatchProps & PassedProps) => {
   return (
     <View>
       <Flex

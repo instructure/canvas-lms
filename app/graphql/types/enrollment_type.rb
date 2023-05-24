@@ -44,7 +44,8 @@ module Types
     graphql_name "EnrollmentFilterInput"
 
     argument :types, [EnrollmentTypeType], required: false, default_value: nil
-    argument :associated_user_ids, [ID],
+    argument :associated_user_ids,
+             [ID],
              prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
              required: false,
              default_value: []
@@ -87,7 +88,8 @@ module Types
     field :type, EnrollmentTypeType, null: false
 
     field :grades, GradesType, null: true do
-      argument :grading_period_id, ID,
+      argument :grading_period_id,
+               ID,
                "The grading period to return grades for. If not specified, will use the current grading period (or the course grade for courses that don't use grading periods)",
                required: false,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("GradingPeriod")

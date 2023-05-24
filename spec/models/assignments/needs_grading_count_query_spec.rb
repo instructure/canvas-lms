@@ -61,8 +61,12 @@ module Assignments
         expect(NeedsGradingCountQuery.new(@assignment, @ta).count).to be(0)
 
         # test limited enrollment in multiple sections
-        @course.enroll_user(@ta, "TaEnrollment", enrollment_state: "active", section: @section,
-                                                 allow_multiple_enrollments: true, limit_privileges_to_course_section: true)
+        @course.enroll_user(@ta,
+                            "TaEnrollment",
+                            enrollment_state: "active",
+                            section: @section,
+                            allow_multiple_enrollments: true,
+                            limit_privileges_to_course_section: true)
         @assignment.reload
         expect(NeedsGradingCountQuery.new(@assignment, @ta).count).to be(1)
       end

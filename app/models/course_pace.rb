@@ -135,11 +135,14 @@ class CoursePace < ActiveRecord::Base
 
   def create_publish_progress(run_at: Setting.get("course_pace_publish_interval", "300").to_i.seconds.from_now, enrollment_ids: nil)
     progress = Progress.create!(context: self, tag: "course_pace_publish")
-    progress.process_job(self, :publish, {
+    progress.process_job(self,
+                         :publish,
+                         {
                            run_at: run_at,
                            singleton: "course_pace_publish:#{global_id}",
                            on_conflict: :overwrite
-                         }, enrollment_ids: enrollment_ids)
+                         },
+                         enrollment_ids: enrollment_ids)
     progress
   end
 

@@ -400,11 +400,14 @@ describe ContentMigration do
     it "does not copy plain text question comments as html" do
       bank1 = @copy_from.assessment_question_banks.create!(title: "bank")
       bank1.assessment_questions.create!(question_data: {
-                                           "question_type" => "multiple_choice_question", "name" => "test question",
+                                           "question_type" => "multiple_choice_question",
+                                           "name" => "test question",
                                            "answers" => [{ "id" => 1, "text" => "Correct", "weight" => 100, "comments" => "another comment" },
                                                          { "id" => 2, "text" => "inorrect", "weight" => 0 }],
-                                           "correct_comments" => "Correct answer comment", "incorrect_comments" => "Incorrect answer comment",
-                                           "neutral_comments" => "General Comment", "more_comments" => "even more comments"
+                                           "correct_comments" => "Correct answer comment",
+                                           "incorrect_comments" => "Incorrect answer comment",
+                                           "neutral_comments" => "General Comment",
+                                           "more_comments" => "even more comments"
                                          })
 
       run_course_copy
@@ -842,9 +845,11 @@ describe ContentMigration do
       data = { question_type: "numerical_question",
                question_text: "how many problems does QTI cause?",
                answers: [{
-                 text: "answer_text", weight: 100,
+                 text: "answer_text",
+                 weight: 100,
                  numerical_answer_type: "precision_answer",
-                 answer_approximate: 99_000_000, answer_precision: 2
+                 answer_approximate: 99_000_000,
+                 answer_precision: 2
                }] }.with_indifferent_access
       q.quiz_questions.create!(question_data: data)
 
@@ -1041,7 +1046,8 @@ describe ContentMigration do
       html = "<a href=\"/courses/%s/quizzes/%s\">linky</a>"
 
       bank = @copy_from.assessment_question_banks.create!(title: "bank")
-      data = { "question_name" => "test question", "question_type" => "essay_question",
+      data = { "question_name" => "test question",
+               "question_type" => "essay_question",
                "question_text" => (html % [@copy_from.id, link_quiz.id]) }
       aq = bank.assessment_questions.create!(question_data: data)
 
@@ -1073,7 +1079,8 @@ describe ContentMigration do
       html = "<a href=\"/courses/%s/quizzes/%s\">linky</a>"
 
       bank = @copy_from.assessment_question_banks.create!(title: "bank")
-      data = { "question_name" => "test question", "question_type" => "essay_question",
+      data = { "question_name" => "test question",
+               "question_type" => "essay_question",
                "question_text" => (html % [@copy_from.id, link_quiz.id]) }
       bank.assessment_questions.create!(question_data: data)
 
@@ -1103,7 +1110,8 @@ describe ContentMigration do
       bank1 = @copy_from.assessment_question_banks.create!(title: "bank")
       text = "&lt;braaackets&gt;"
       bank1.assessment_questions.create!(question_data: {
-                                           "question_type" => "multiple_choice_question", "name" => "test question",
+                                           "question_type" => "multiple_choice_question",
+                                           "name" => "test question",
                                            "answers" => [{ "id" => 1, "text" => "Correct", "weight" => 100, "comments_html" => text },
                                                          { "id" => 2, "text" => "inorrect", "weight" => 0 }],
                                            "correct_comments_html" => text
@@ -1172,7 +1180,8 @@ describe ContentMigration do
     it "does not destroy assessment questions when copying twice" do
       bank1 = @copy_from.assessment_question_banks.create!(title: "bank")
       data = {
-        "question_type" => "multiple_choice_question", "name" => "test question",
+        "question_type" => "multiple_choice_question",
+        "name" => "test question",
         "answers" => [{ "id" => 1, "text" => "Correct", "weight" => 100 },
                       { "id" => 2, "text" => "inorrect", "weight" => 0 }],
       }
@@ -1189,7 +1198,8 @@ describe ContentMigration do
     it "does not remove outer tags with style tags from questions" do
       html = "<p style=\"text-align: center;\">This is aligned to the center</p>"
       q = @copy_from.quizzes.create!(title: "q")
-      data = { "question_name" => "test question", "question_type" => "essay_question",
+      data = { "question_name" => "test question",
+               "question_type" => "essay_question",
                "question_text" => html }
       q.quiz_questions.create!(question_data: data)
 

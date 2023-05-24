@@ -414,7 +414,8 @@ describe "assignments_2 feature flag and parameter" do
         @observer,
         "ObserverEnrollment",
         section: @course.course_sections.first,
-        enrollment_state: "active", allow_multiple_enrollments: true
+        enrollment_state: "active",
+        allow_multiple_enrollments: true
       )
       add_linked_observer(@student, @observer)
     end

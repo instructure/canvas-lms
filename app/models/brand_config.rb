@@ -249,20 +249,20 @@ class BrandConfig < ActiveRecord::Base
 
     unused_brand_config = BrandConfig
                           .where(md5: md5)
-                          .where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5"))
-                          .where("NOT EXISTS (?)", SharedBrandConfig.where("brand_config_md5=brand_configs.md5"))
+                          .where.not(Account.where("brand_config_md5=brand_configs.md5").arel.exists)
+                          .where.not(SharedBrandConfig.where("brand_config_md5=brand_configs.md5").arel.exists)
                           .first
     unused_brand_config&.destroy
   end
 
   def self.clean_unused_from_db!
     BrandConfig
-      .where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5"))
-      .where("NOT EXISTS (?)", SharedBrandConfig.where("brand_config_md5=brand_configs.md5")).
       # When someone is actively working in the theme editor, it just saves one
       # in their session, so only delete stuff that is more than a week old,
       # to not clear out a theme someone was working on.
-      where(["created_at < ?", 1.week.ago])
+      .where(["created_at < ?", 1.week.ago])
+      .where.not(Account.where("brand_config_md5=brand_configs.md5").arel.exists)
+      .where.not(SharedBrandConfig.where("brand_config_md5=brand_configs.md5").arel.exists)
       .delete_all
   end
 end

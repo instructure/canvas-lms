@@ -257,7 +257,8 @@ describe SubmissionsController do
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
       att1 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", true))
       att2 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/txt.txt", "application/vnd.ms-excel", true))
-      post "create", params: { course_id: @course.id, assignment_id: @assignment.id,
+      post "create", params: { course_id: @course.id,
+                               assignment_id: @assignment.id,
                                submission: { submission_type: "online_upload", attachment_ids: [att1.id, att2.id].join(",") },
                                attachments: { "0" => { uploaded_data: "doc.doc" }, "1" => { uploaded_data: "txt.txt" } } }
       expect(response).to be_redirect
@@ -630,7 +631,8 @@ describe SubmissionsController do
         expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
 
         expect(google_docs).to receive(:download).and_return([Net::HTTPOK.new(200, {}, ""), "title", "pdf"])
-        post(:create, params: { course_id: @course.id, assignment_id: @assignment.id,
+        post(:create, params: { course_id: @course.id,
+                                assignment_id: @assignment.id,
                                 submission: { submission_type: "google_doc" },
                                 google_doc: { document_id: "12345" } })
         expect(response).to be_redirect
@@ -654,7 +656,8 @@ describe SubmissionsController do
         google_docs = double
         expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
         expect(google_docs).to receive(:download).and_raise(GoogleDrive::ConnectionException, "fake conn timeout")
-        post(:create, params: { course_id: @course.id, assignment_id: @assignment.id,
+        post(:create, params: { course_id: @course.id,
+                                assignment_id: @assignment.id,
                                 submission: { submission_type: "google_doc" },
                                 google_doc: { document_id: "12345" } })
         expect(response).to be_redirect
@@ -669,7 +672,8 @@ describe SubmissionsController do
         google_docs = double
         expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
         expect(google_docs).to receive(:download).and_raise(GoogleDrive::WorkflowError, "fake bad entry")
-        post(:create, params: { course_id: @course.id, assignment_id: @assignment.id,
+        post(:create, params: { course_id: @course.id,
+                                assignment_id: @assignment.id,
                                 submission: { submission_type: "google_doc" },
                                 google_doc: { document_id: "12345" } })
         expect(response).to be_redirect
@@ -1137,13 +1141,19 @@ describe SubmissionsController do
           expect(submission2.id).to eq(submission.id) # submission2 is updated/reloaded with new version (last attempt number)
           expect(submission2.attempt).to be > submission.attempt
           get "originality_report", params: {
-            course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id,
-            asset_string: submission.asset_string, attempt: 1
+            course_id: assignment.context_id,
+            assignment_id: assignment.id,
+            submission_id: test_student.id,
+            asset_string: submission.asset_string,
+            attempt: 1
           }
           expect(response).to redirect_to originality_report.originality_report_url
           get "originality_report", params: {
-            course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id,
-            asset_string: submission.asset_string, attempt: 2
+            course_id: assignment.context_id,
+            assignment_id: assignment.id,
+            submission_id: test_student.id,
+            asset_string: submission.asset_string,
+            attempt: 2
           }
           expect(response).to redirect_to originality_report2.originality_report_url
         end

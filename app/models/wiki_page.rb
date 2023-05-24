@@ -73,7 +73,7 @@ class WikiPage < ActiveRecord::Base
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where("NOT EXISTS (?)", Ignore.where(asset_type: "WikiPage", user_id: user, purpose: purpose).where("asset_id=wiki_pages.id"))
+    where.not(Ignore.where(asset_type: "WikiPage", user_id: user, purpose: purpose).where("asset_id=wiki_pages.id").arel.exists)
   }
   scope :todo_date_between, ->(starting, ending) { where(todo_date: starting...ending) }
   scope :for_courses_and_groups, lambda { |course_ids, group_ids|

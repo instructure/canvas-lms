@@ -64,7 +64,8 @@ class CourseLinkValidator
     # Course card image
     if course.image_url.present?
       find_invalid_link(course.image_url) do |link|
-        issues << { name: I18n.t("Course Card Image"), type: :course_card_image,
+        issues << { name: I18n.t("Course Card Image"),
+                    type: :course_card_image,
                     content_url: "/courses/#{course.id}/settings",
                     invalid_links: [link.merge(image: true)] }
       end
@@ -73,7 +74,8 @@ class CourseLinkValidator
 
     # Syllabus
     find_invalid_links(course.syllabus_body) do |links|
-      issues << { name: I18n.t(:syllabus, "Course Syllabus"), type: :syllabus,
+      issues << { name: I18n.t(:syllabus, "Course Syllabus"),
+                  type: :syllabus,
                   content_url: "/courses/#{course.id}/assignments/syllabus" }.merge(invalid_links: links)
     end
     progress.update_completion! 5
@@ -91,7 +93,8 @@ class CourseLinkValidator
       next if assignment.quiz || assignment.discussion_topic
 
       find_invalid_links(assignment.description) do |links|
-        issues << { name: assignment.title, type: :assignment,
+        issues << { name: assignment.title,
+                    type: :assignment,
                     content_url: "/courses/#{course.id}/assignments/#{assignment.id}" }.merge(invalid_links: links)
       end
     end
@@ -100,7 +103,8 @@ class CourseLinkValidator
     # Calendar events
     course.calendar_events.active.each do |event|
       find_invalid_links(event.description) do |links|
-        issues << { name: event.title, type: :calendar_event,
+        issues << { name: event.title,
+                    type: :calendar_event,
                     content_url: "/courses/#{course.id}/calendar_events/#{event.id}" }.merge(invalid_links: links)
       end
     end
@@ -109,7 +113,8 @@ class CourseLinkValidator
     # Discussion topics
     course.discussion_topics.active.each do |topic|
       find_invalid_links(topic.message) do |links|
-        issues << { name: topic.title, type: :discussion_topic,
+        issues << { name: topic.title,
+                    type: :discussion_topic,
                     content_url: "/courses/#{course.id}/discussion_topics/#{topic.id}" }.merge(invalid_links: links)
       end
     end
@@ -123,7 +128,8 @@ class CourseLinkValidator
       end
     end
     invalid_module_links.each do |mod, links|
-      issues << { name: mod.name, type: :module,
+      issues << { name: mod.name,
+                  type: :module,
                   content_url: "/courses/#{course.id}/modules#module_#{mod.id}" }.merge(invalid_links: links)
     end
 
@@ -132,7 +138,8 @@ class CourseLinkValidator
     # Quizzes
     course.quizzes.active.each do |quiz|
       find_invalid_links(quiz.description) do |links|
-        issues << { name: quiz.title, type: :quiz,
+        issues << { name: quiz.title,
+                    type: :quiz,
                     content_url: "/courses/#{course.id}/quizzes/#{quiz.id}" }.merge(invalid_links: links)
       end
       quiz.quiz_questions.active.each do |qq|
@@ -144,7 +151,8 @@ class CourseLinkValidator
     # Wiki pages
     course.wiki_pages.not_deleted.each do |page|
       find_invalid_links(page.body) do |links|
-        issues << { name: page.title, type: :wiki_page,
+        issues << { name: page.title,
+                    type: :wiki_page,
                     content_url: "/courses/#{course.id}/pages/#{page.url}" }.merge(invalid_links: links)
       end
     end

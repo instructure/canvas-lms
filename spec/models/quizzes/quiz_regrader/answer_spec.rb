@@ -21,9 +21,10 @@ describe Quizzes::QuizRegrader::Answer do
   let(:points) { 15 }
 
   let(:question) do
-    double(id: 1, question_data: { id: 1,
-                                   regrade_option: "full_credit",
-                                   points_possible: points },
+    double(id: 1,
+           question_data: { id: 1,
+                            regrade_option: "full_credit",
+                            points_possible: points },
            quiz_group: nil)
   end
 

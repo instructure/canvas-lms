@@ -109,8 +109,11 @@ module Qti
 
         selectors = ["itemBody > div", "itemBody > p"]
         type = @opts[:custom_type] || @migration_type || @type
-        unless %w[fill_in_multiple_blanks_question canvas_matching matching_question
-                  multiple_dropdowns_question respondus_matching].include?(type)
+        unless %w[fill_in_multiple_blanks_question
+                  canvas_matching
+                  matching_question
+                  multiple_dropdowns_question
+                  respondus_matching].include?(type)
           selectors << "itemBody choiceInteraction > prompt"
           selectors << "itemBody > extendedTextInteraction > prompt"
         end

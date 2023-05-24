@@ -226,22 +226,28 @@ describe "report helper" do
       @enrollment_term2.root_account_id = account.id
       @enrollment_term2.save!
 
-      @course1 = Course.new(name: "English 101", course_code: "ENG101",
-                            start_at: 1.day.ago, conclude_at: 4.months.from_now,
+      @course1 = Course.new(name: "English 101",
+                            course_code: "ENG101",
+                            start_at: 1.day.ago,
+                            conclude_at: 4.months.from_now,
                             account: @sub_account1)
       @course1.enrollment_term = @enrollment_term
       @course1.sis_source_id = "SIS_COURSE_ID_1"
       @course1.save!
 
-      @course2 = Course.new(name: "English 102", course_code: "ENG102",
-                            start_at: 1.day.ago, conclude_at: 4.months.from_now,
+      @course2 = Course.new(name: "English 102",
+                            course_code: "ENG102",
+                            start_at: 1.day.ago,
+                            conclude_at: 4.months.from_now,
                             account: @sub_account1)
       @course2.enrollment_term = @enrollment_term
       @course2.sis_source_id = "SIS_COURSE_ID_2"
       @course2.save!
 
-      @course3 = Course.new(name: "English 103", course_code: "ENG103",
-                            start_at: 1.day.ago, conclude_at: 4.months.from_now,
+      @course3 = Course.new(name: "English 103",
+                            course_code: "ENG103",
+                            start_at: 1.day.ago,
+                            conclude_at: 4.months.from_now,
                             account: @sub_account2)
       @course3.enrollment_term = @enrollment_term2
       @course2.sis_source_id = "SIS_COURSE_ID_3"

@@ -27,11 +27,17 @@ module BroadcastPolicies
     end
     let(:assignment) do
       double(context: context,
-             published?: true, muted?: false, created_at: 4.hours.ago,
-             changed_in_state: true, due_at: Time.zone.now,
-             points_possible: 100, assignment_changed: false,
-             just_created: false, workflow_state: "published",
-             due_at_before_last_save: 7.days.ago, saved_change_to_points_possible?: true,
+             published?: true,
+             muted?: false,
+             created_at: 4.hours.ago,
+             changed_in_state: true,
+             due_at: Time.zone.now,
+             points_possible: 100,
+             assignment_changed: false,
+             just_created: false,
+             workflow_state: "published",
+             due_at_before_last_save: 7.days.ago,
+             saved_change_to_points_possible?: true,
              saved_change_to_workflow_state?: false,
              workflow_state_before_last_save: "published")
     end

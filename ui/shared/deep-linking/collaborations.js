@@ -51,11 +51,15 @@ export function onExternalContentReady(e, data) {
  */
 export const handleDeepLinking = async event => {
   try {
-    const item = await processSingleContentItem(event)
-    onExternalContentReady(event, {
-      service_id: item.service_id,
-      contentItems: [item],
-    })
+    const item = processSingleContentItem(event)
+    if (typeof item !== 'object') {
+      $.flashError(I18n.t('Error retrieving content from tool (bad content item)'))
+    } else {
+      onExternalContentReady(event, {
+        service_id: event.data?.service_id,
+        contentItems: [item],
+      })
+    }
   } catch (e) {
     $.flashError(I18n.t('Error retrieving content from tool'))
   }

@@ -108,7 +108,8 @@ describe "API", type: :request do
                          "file_ids" => [a1.id, a2.id]
                        } }
       post "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions",
-           params: json_request.to_json, headers: { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
+           params: json_request.to_json,
+           headers: { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_successful
       expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
 
@@ -124,9 +125,11 @@ describe "API", type: :request do
     it "stringifies fields with Accept header" do
       account = Account.default.sub_accounts.create!
       account_admin_user(active_all: true, account: account)
-      json = api_call(:get, "/api/v1/accounts/#{account.id}",
+      json = api_call(:get,
+                      "/api/v1/accounts/#{account.id}",
                       { controller: "accounts", action: "show", id: account.to_param, format: "json" },
-                      {}, { "Accept" => "application/json+canvas-string-ids" })
+                      {},
+                      { "Accept" => "application/json+canvas-string-ids" })
       expect(json["id"]).to eq account.id.to_s
       expect(json["root_account_id"]).to eq Account.default.id.to_s
     end
@@ -134,7 +137,8 @@ describe "API", type: :request do
     it "does not stringify fields without Accept header" do
       account = Account.default.sub_accounts.create!
       account_admin_user(active_all: true, account: account)
-      json = api_call(:get, "/api/v1/accounts/#{account.id}",
+      json = api_call(:get,
+                      "/api/v1/accounts/#{account.id}",
                       { controller: "accounts", action: "show", id: account.to_param, format: "json" })
       expect(json["id"]).to eq account.id
       expect(json["root_account_id"]).to eq Account.default.id

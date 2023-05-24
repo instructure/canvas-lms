@@ -144,7 +144,9 @@ class ApplicationController < ActionController::Base
     HTML
 
     crumb.html_safe
-  end, :root_path, class: "home")
+  end,
+            :root_path,
+            class: "home")
 
   def clear_js_env
     @js_env = nil
@@ -339,17 +341,39 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
-    featured_help_links lti_platform_storage scale_equation_images buttons_and_icons_cropper calendar_series
-    account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
-    course_paces_redesign course_paces_for_students rce_better_paste module_publish_menu explicit_latex_typesetting
-    dev_key_oidc_alert rce_new_external_tool_dialog_in_canvas rce_show_studio_media_options rce_improved_placeholders
+    featured_help_links
+    lti_platform_storage
+    scale_equation_images
+    buttons_and_icons_cropper
+    calendar_series
+    account_level_blackout_dates
+    rce_ux_improvements
+    render_both_to_do_lists
+    course_paces_redesign
+    course_paces_for_students
+    rce_better_paste
+    module_publish_menu
+    explicit_latex_typesetting
+    dev_key_oidc_alert
+    rce_new_external_tool_dialog_in_canvas
+    rce_show_studio_media_options
+    rce_improved_placeholders
     media_links_use_attachment_id
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
-    product_tours files_dnd usage_rights_discussion_topics
-    granular_permissions_manage_users create_course_subaccount_picker
-    lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking buttons_and_icons_root_account
-    extended_submission_state scheduled_page_publication send_usage_metrics rce_transform_loaded_content
+    product_tours
+    files_dnd
+    usage_rights_discussion_topics
+    granular_permissions_manage_users
+    create_course_subaccount_picker
+    lti_deep_linking_module_index_menu_modal
+    lti_multiple_assignment_deep_linking
+    buttons_and_icons_root_account
+    extended_submission_state
+    scheduled_page_publication
+    send_usage_metrics
+    rce_transform_loaded_content
+    lti_assignment_page_line_items
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -357,8 +381,10 @@ class ApplicationController < ActionController::Base
   JS_ENV_FEATURES_HASH = Digest::SHA256.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES + JS_ENV_BRAND_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
     # can be invalidated by a flag change on site admin, the domain root account, or the brand config account
-    MultiCache.fetch(["js_env_account_features", JS_ENV_FEATURES_HASH,
-                      Account.site_admin.cache_key(:feature_flags), @domain_root_account&.cache_key(:feature_flags),
+    MultiCache.fetch(["js_env_account_features",
+                      JS_ENV_FEATURES_HASH,
+                      Account.site_admin.cache_key(:feature_flags),
+                      @domain_root_account&.cache_key(:feature_flags),
                       brand_config_account&.cache_key(:feature_flags)].cache_key) do
       results = {}
       JS_ENV_SITE_ADMIN_FEATURES.each do |f|
@@ -444,7 +470,8 @@ class ApplicationController < ActionController::Base
     context = context.account if context.is_a?(User)
     tools = GuardRail.activate(:secondary) do
       Lti::ContextToolFinder.all_tools_for(context, { placements: type,
-                                                      root_account: @domain_root_account, current_user: @current_user,
+                                                      root_account: @domain_root_account,
+                                                      current_user: @current_user,
                                                       tool_ids: tool_ids }).to_a
     end
 
@@ -1014,9 +1041,10 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.json do
         render json: {
-          status: "unverified",
-          errors: [{ message: json_message }]
-        }, status: :unauthorized
+                 status: "unverified",
+                 errors: [{ message: json_message }]
+               },
+               status: :unauthorized
       end
       format.all do
         flash[:warning] = flash_message
@@ -1069,6 +1097,8 @@ class ApplicationController < ActionController::Base
 
   MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS = 3
 
+  GET_CONTEXT_GRAPHQL_OPERATION_NAMES = %w[CreateSubmission CreateDiscussionEntry].freeze
+
   # Can be used as a before_action, or just called from controller code.
   # Assigns the variable @context to whatever context the url is scoped
   # to.  So /courses/5/assignments would have a @context=Course.find(5).
@@ -1077,9 +1107,11 @@ class ApplicationController < ActionController::Base
   def get_context(user_scope: nil)
     GuardRail.activate(:secondary) do
       unless @context
-        if params[:course_id] || (request.url.include?("/graphql") && params[:operationName] == "CreateSubmission")
+        if params[:course_id] || (request.url.include?("/graphql") && GET_CONTEXT_GRAPHQL_OPERATION_NAMES.include?(params[:operationName]))
 
           @context = params[:course_id] ? api_find(Course.active, params[:course_id]) : pull_context_course
+          return if @context.nil? # When doing pull_context_course it's possible to get a nil context, if that happen, we don't want to continue.
+
           @context.root_account = @domain_root_account if @context.root_account_id == @domain_root_account.id # no sense in refetching it
           params[:context_id] = params[:course_id]
           params[:context_type] = "Course"
@@ -1295,23 +1327,22 @@ class ApplicationController < ActionController::Base
   end
 
   def get_upcoming_assignments(course)
-    assignments = AssignmentGroup.visible_assignments(
+    visible_assignments = AssignmentGroup.visible_assignments(
       @current_user,
       course,
       course.assignment_groups.active
-    ).to_a
+    )
 
     log_course(course)
-
-    assignments.map! { |a| a.overridden_for(@current_user) }
-    sorted = SortsAssignments.by_due_date({
-                                            assignments: assignments,
-                                            user: @current_user,
-                                            session: session,
-                                            upcoming_limit: 1.week.from_now
-                                          })
-
-    sorted.upcoming.call.sort
+    sorter = SortsAssignments.new(
+      assignments_scope: visible_assignments,
+      user: @current_user,
+      session: session,
+      course: course
+    )
+    sorter.assignments(:upcoming) do |assignments|
+      assignments.group("assignments.id").order("MIN(submissions.cached_due_date) ASC").to_a
+    end
   end
 
   def log_course(course)
@@ -1598,8 +1629,12 @@ class ApplicationController < ActionController::Base
         }
       end
 
-      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level,
-                                      context: context, context_membership: @context_membership)
+      Canvas::LiveEvents.asset_access(asset,
+                                      asset_category,
+                                      membership_type,
+                                      level,
+                                      context: context,
+                                      context_membership: @context_membership)
 
       @accessed_asset
     end
@@ -2029,7 +2064,7 @@ class ApplicationController < ActionController::Base
         end
 
         opts = {
-          launch_url: @tool.login_or_launch_url(content_tag_uri: @resource_url),
+          launch_url: @tool.login_or_launch_url(preferred_launch_url: @resource_url),
           link_code: @opaque_id,
           overrides: { "resource_link_title" => @resource_title },
           domain: HostUrl.context_host(@domain_root_account, request.host),
@@ -2091,7 +2126,7 @@ class ApplicationController < ActionController::Base
           @lti_launch.params = adapter.generate_post_payload
         end
 
-        @lti_launch.resource_url = @tool.login_or_launch_url(content_tag_uri: @resource_url)
+        @lti_launch.resource_url = @tool.login_or_launch_url(preferred_launch_url: @resource_url)
         @lti_launch.link_text = @resource_title
         @lti_launch.analytics_id = @tool.tool_id
         InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: @tool.lti_version, type: :content_tag_redirect })
@@ -2387,7 +2422,8 @@ class ApplicationController < ActionController::Base
 
   def verified_file_download_url(attachment, context = nil, permission_map_id = nil, *opts)
     verifier = Attachments::Verification.new(attachment).verifier_for_user(@current_user,
-                                                                           context: context.try(:asset_string), permission_map_id: permission_map_id)
+                                                                           context: context.try(:asset_string),
+                                                                           permission_map_id: permission_map_id)
     file_download_url(attachment, { verifier: verifier }, *opts)
   end
   helper_method :verified_file_download_url
@@ -2807,10 +2843,11 @@ class ApplicationController < ActionController::Base
       permissions[:manage] = permissions[:manage_assignments]
     end
     permissions[:by_assignment_id] = @context.assignments.to_h do |assignment|
-      [assignment.id, {
-        update: assignment.user_can_update?(@current_user, session),
-        delete: assignment.grants_right?(@current_user, :delete)
-      }]
+      [assignment.id,
+       {
+         update: assignment.user_can_update?(@current_user, session),
+         delete: assignment.grants_right?(@current_user, :delete)
+       }]
     end
 
     current_user_has_been_observer_in_this_course = @context.user_has_been_observer?(@current_user)
@@ -2828,7 +2865,8 @@ class ApplicationController < ActionController::Base
                    exclude_assignment_submission_types: ["wiki_page"],
                    override_assignment_dates: !permissions[:manage],
                    per_page: ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX
-                 ), id: "assignment_groups_url")
+                 ),
+                 id: "assignment_groups_url")
 
     js_env({
              COURSE_ID: @context.id.to_s,
@@ -3073,8 +3111,15 @@ class ApplicationController < ActionController::Base
   helper_method :use_classic_font?
 
   def pull_context_course
-    assignment_id = params[:variables][:assignmentLid]
-    ::Assignment.active.find(assignment_id).course
+    if params[:operationName] == "CreateSubmission"
+      assignment_id = params[:variables][:assignmentLid]
+      return ::Assignment.active.find(assignment_id).course
+    elsif params[:operationName] == "CreateDiscussionEntry"
+      discussion_topic_id = params[:variables][:discussionTopicId]
+      return DiscussionTopic.find(discussion_topic_id).course
+    end
+
+    nil
   end
 
   def react_discussions_post_enabled_for_preferences_use?

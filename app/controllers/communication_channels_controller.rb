@@ -98,7 +98,8 @@ class CommunicationChannelsController < ApplicationController
     @user = api_find(User, params[:user_id])
     return unless authorized_action(@user, @current_user, :read)
 
-    channels = Api.paginate(@user.communication_channels.unretired, self,
+    channels = Api.paginate(@user.communication_channels.unretired,
+                            self,
                             api_v1_communication_channels_url).map do |cc|
       communication_channel_json(cc, @current_user, session)
     end
@@ -300,9 +301,10 @@ class CommunicationChannelsController < ApplicationController
               p.user = user
               (account_to_pseudonyms_hash[p.account] ||= []) << p
             end
-            @merge_opportunities << [user, account_to_pseudonyms_hash.each_value.map do |pseudonyms|
-              pseudonyms.detect(&:sis_user_id) || pseudonyms.min_by(&:position)
-            end]
+            @merge_opportunities << [user,
+                                     account_to_pseudonyms_hash.each_value.map do |pseudonyms|
+                                       pseudonyms.detect(&:sis_user_id) || pseudonyms.min_by(&:position)
+                                     end]
             @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
           end
         end
@@ -394,11 +396,12 @@ class CommunicationChannelsController < ApplicationController
             ps_errors = @pseudonym.errors.as_json[:errors]
             ps_errors.delete(:password_confirmation) unless params[:pseudonym][:password_confirmation]
             return render json: {
-              errors: {
-                user: @user.errors.as_json[:errors],
-                pseudonym: ps_errors
-              }
-            }, status: :bad_request
+                            errors: {
+                              user: @user.errors.as_json[:errors],
+                              pseudonym: ps_errors
+                            }
+                          },
+                          status: :bad_request
           end
 
           # They may have switched e-mail address when they logged in; create a CC if so

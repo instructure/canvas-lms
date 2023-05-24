@@ -39,12 +39,14 @@ module AnnouncementHelpers
 
   def disable_view_announcements(course, context_role)
     course.root_account.role_overrides.create!(permission: "read_announcements",
-                                               role: context_role, enabled: false)
+                                               role: context_role,
+                                               enabled: false)
   end
 
   def enable_view_announcements(course, context_role)
     course.root_account.role_overrides.create!(permission: "read_announcements",
-                                               role: context_role, enabled: true)
+                                               role: context_role,
+                                               enabled: true)
   end
 
   def view_announcement_detail

@@ -190,7 +190,8 @@ describe "quizzes" do
     before do
       quiz_with_submission
       @quiz.update(show_correct_answers: true,
-                   show_correct_answers_last_attempt: true, allowed_attempts: 2)
+                   show_correct_answers_last_attempt: true,
+                   allowed_attempts: 2)
       @quiz.save!
     end
 

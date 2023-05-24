@@ -41,7 +41,7 @@ GEM
       rexml
     diff-lcs (1.5.0)
     hashdiff (1.0.1)
-    i18n (1.12.0)
+    i18n (1.13.0)
       concurrent-ruby (~> 1.0)
     json-jwt (1.13.0)
       activesupport (>= 4.2)
@@ -76,7 +76,10 @@ GEM
       hashdiff (>= 0.4.0, < 2.0.0)
 
 PLATFORMS
-  arm64-darwin-21
+  aarch64-linux
+  arm64-darwin
+  x86_64-darwin
+  x86_64-linux
 
 DEPENDENCIES
   bundler (>= 1.5, < 3)

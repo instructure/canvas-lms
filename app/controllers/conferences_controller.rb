@@ -236,14 +236,14 @@ class ConferencesController < ApplicationController
 
     courses_collection = ShardedBookmarkedCollection.build(UserConferencesBookmarker, @current_user.enrollments) do |enrollments_scope|
       conference_scope = WebConference.active.where(context_type: "Course", context_id: enrollments_scope.active.select(:course_id))
-                                      .where("EXISTS (?)", WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id))
+                                      .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
       conference_scope = conference_scope.live if params[:state] == "live"
       conference_scope.order("created_at DESC, id DESC")
     end
 
     groups_collection = ShardedBookmarkedCollection.build(UserConferencesBookmarker, @current_user.groups) do |groups_scope|
       conference_scope = WebConference.active.where(context_type: "Group", context_id: groups_scope.active.select(:id))
-                                      .where("EXISTS (?)", WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id))
+                                      .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
       conference_scope = conference_scope.live if params[:state] == "live"
       conference_scope.order("created_at DESC, id DESC")
     end

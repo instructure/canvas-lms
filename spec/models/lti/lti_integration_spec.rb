@@ -160,7 +160,9 @@ describe "LTI integration tests" do
     before :once do
       course_with_teacher(active_all: true)
       @tool = @course.context_external_tools.create!(domain: "yahoo.com",
-                                                     consumer_key: "12345", shared_secret: "secret", name: "tool")
+                                                     consumer_key: "12345",
+                                                     shared_secret: "secret",
+                                                     name: "tool")
     end
 
     it "generates correct parameters" do

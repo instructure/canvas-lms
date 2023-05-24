@@ -67,7 +67,8 @@ class PseudonymsController < ApplicationController
       scope = @context.pseudonyms.active.where(user_id: @user)
       @pseudonyms = Api.paginate(
         scope,
-        self, api_v1_account_pseudonyms_url
+        self,
+        api_v1_account_pseudonyms_url
       )
     else
       bookmark = BookmarkedCollection::SimpleBookmarker.new(Pseudonym, :id)

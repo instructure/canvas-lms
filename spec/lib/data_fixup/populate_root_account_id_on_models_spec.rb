@@ -471,9 +471,12 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
       let(:outcome_result) do
         LearningOutcomeResult.create!(
-          context: course2, association_type: "RubricAssociation",
+          context: course2,
+          association_type: "RubricAssociation",
           association_id: rubric_association.id,
-          learning_outcome: outcome, user: @user, alignment: alignment
+          learning_outcome: outcome,
+          user: @user,
+          alignment: alignment
         )
       end
       let(:course2) { course_model(account: account_model(root_account_id: nil)) }
@@ -571,8 +574,11 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         it_behaves_like "a datafixup that populates root_account_id" do
           let(:record) do
             MasterCourses::MigrationResult.create!(
-              master_migration: master_migration, content_migration: content_migration,
-              child_subscription: child_subscription, import_type: :full, state: :queued
+              master_migration: master_migration,
+              content_migration: content_migration,
+              child_subscription: child_subscription,
+              import_type: :full,
+              state: :queued
             )
           end
           let(:reference_record) { master_migration }
@@ -679,8 +685,10 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         let(:assignment) { assignment_model }
         let(:record) do
           SubmissionVersion.create!(
-            course: @course, version: Version.create!(versionable: assignment),
-            assignment: assignment_model, user_id: @user.id
+            course: @course,
+            version: Version.create!(versionable: assignment),
+            assignment: assignment_model,
+            user_id: @user.id
           )
         end
         let(:reference_record) { @course }

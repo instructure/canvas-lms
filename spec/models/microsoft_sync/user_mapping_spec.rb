@@ -50,8 +50,10 @@ describe MicrosoftSync::UserMapping do
         end
 
         it "returns the user ids of enrolled users without mappings in batches" do
-          described_class.create!(user: users[2], root_account: course.root_account,
-                                  aad_id: "manual2", needs_updating: true)
+          described_class.create!(user: users[2],
+                                  root_account: course.root_account,
+                                  aad_id: "manual2",
+                                  needs_updating: true)
           expect(calls_results.flatten.sort).to eq((users - [users[1]]).map(&:id))
           expect(calls_results.length).to eq(2)
         end

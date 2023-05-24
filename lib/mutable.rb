@@ -96,7 +96,8 @@ module Mutable
       Submission.where(id: submission_id_slice)
                 .update_all(["submission_comments_count = (SELECT COUNT(*) FROM #{SubmissionComment.quoted_table_name} WHERE
             submissions.id = submission_comments.submission_id AND submission_comments.hidden = ? AND
-            submission_comments.draft IS NOT TRUE AND submission_comments.provisional_grade_id IS NULL)", false])
+            submission_comments.draft IS NOT TRUE AND submission_comments.provisional_grade_id IS NULL)",
+                             false])
     end
   end
 

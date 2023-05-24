@@ -43,7 +43,8 @@ module Services
         domain = double("domain")
         ctx = double("ctx", grants_right?: true)
         jwt = double("jwt")
-        allow(CanvasSecurity::ServicesJwt).to receive(:for_user).with(domain, user,
+        allow(CanvasSecurity::ServicesJwt).to receive(:for_user).with(domain,
+                                                                      user,
                                                                       include(workflows: [:rich_content, :ui],
                                                                               context: ctx)).and_return(jwt)
         env = described_class.env_for(user: user, domain: domain, context: ctx)

@@ -368,8 +368,10 @@ describe LtiOutbound::ToolLaunch do
     end
 
     it "does not copy query params to POST body if disable_lti_post_only feature flag is set" do
-      tool.settings = { editor_button: { selection_width: 1000, selection_height: 300,
-                                         icon_url: "www.example.com/icon", url: "www.example.com" } }
+      tool.settings = { editor_button: { selection_width: 1000,
+                                         selection_height: 300,
+                                         icon_url: "www.example.com/icon",
+                                         url: "www.example.com" } }
       hash = LtiOutbound::ToolLaunch.new(url: "http://www.instructure.com?first=weston&last=dransfield",
                                          tool: tool,
                                          user: user,

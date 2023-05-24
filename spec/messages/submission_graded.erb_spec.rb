@@ -47,4 +47,52 @@ describe "submission_graded" do
     message = generate_message(:submission_graded, :twitter, asset, user: observer)
     expect(message.body).to match(@submission.user.name)
   end
+
+  context "with a graded submission and sending scores in emails is allowed" do
+    before do
+      @assignment.points_possible = 100
+      @assignment.save!
+      @submission.score = 99
+      @submission.workflow_state = "graded"
+      @submission.save!
+      @student.preferences[:send_scores_in_emails] = true
+      @student.save!
+    end
+
+    it "shows score" do
+      summary = generate_message(:submission_graded, :summary, asset, user: @student)
+      expect(summary.body).to include("score: #{@submission.score} out of #{@assignment.points_possible}")
+      email = generate_message(:submission_graded, :email, asset, user: @student)
+      expect(email.body).to include("score: #{@submission.score} out of #{@assignment.points_possible}")
+      expect(email.html_body).to include("score: #{@submission.score} out of #{@assignment.points_possible}")
+      twitter = generate_message(:submission_graded, :twitter, asset, user: @student)
+      expect(twitter.body).to include("score: #{@submission.score} out of #{@assignment.points_possible}")
+      sms = generate_message(:submission_graded, :sms, asset, user: @student)
+      expect(sms.body).to include("score: #{@submission.score} out of #{@assignment.points_possible}")
+    end
+
+    it "shows grade instead when user is quantitative data restricted" do
+      course_root_account = @assignment.course.root_account
+      # truthy feature flag
+      course_root_account.enable_feature! :restrict_quantitative_data
+
+      # truthy setting
+      course_root_account.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      course_root_account.save!
+
+      # truthy permission(since enabled is being "not"ed)
+      course_root_account.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+      course_root_account.reload
+
+      summary = generate_message(:submission_graded, :summary, asset, user: @student)
+      expect(summary.body).to include("grade: A")
+      email = generate_message(:submission_graded, :email, asset, user: @student)
+      expect(email.body).to include("grade: A")
+      expect(email.html_body).to include("grade: A")
+      twitter = generate_message(:submission_graded, :twitter, asset, user: @student)
+      expect(twitter.body).to include("grade: A")
+      sms = generate_message(:submission_graded, :sms, asset, user: @student)
+      expect(sms.body).to include("grade: A")
+    end
+  end
 end

@@ -70,8 +70,12 @@ PactConfig::Consumers::ALL.each do |consumer|
         )
 
         # Create Topic 1: section specific, has an entry with ratings
-        topic1 = course.discussion_topics.create!(title: "title", message: "message", user: student,
-                                                  discussion_type: "threaded", podcast_enabled: true, position: 0)
+        topic1 = course.discussion_topics.create!(title: "title",
+                                                  message: "message",
+                                                  user: student,
+                                                  discussion_type: "threaded",
+                                                  podcast_enabled: true,
+                                                  position: 0)
         topic1.lock_at = 2.days.from_now
         topic1.is_section_specific = true
         topic1.course_sections = [section]
@@ -87,8 +91,13 @@ PactConfig::Consumers::ALL.each do |consumer|
         view.update_materialized_view(synchronous: true)
 
         # Create Topic 2: locked, delayed, assignment-specific, requires initial post
-        topic2 = course.discussion_topics.create!(title: "title", message: "message", user: student,
-                                                  discussion_type: "threaded", require_initial_post: true, podcast_enabled: true, position: 1)
+        topic2 = course.discussion_topics.create!(title: "title",
+                                                  message: "message",
+                                                  user: student,
+                                                  discussion_type: "threaded",
+                                                  require_initial_post: true,
+                                                  podcast_enabled: true,
+                                                  position: 1)
         topic2.lock_at = 2.days.ago
         topic2.assignment_id = assignment.id
         topic2.delayed_post_at = 2.days.from_now

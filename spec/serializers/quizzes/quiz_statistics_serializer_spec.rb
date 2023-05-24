@@ -80,8 +80,11 @@ describe Quizzes::QuizStatisticsSerializer do
   end
 
   %w[
-    question_statistics submission_statistics multiple_attempts_exist
-    includes_all_versions generated_at
+    question_statistics
+    submission_statistics
+    multiple_attempts_exist
+    includes_all_versions
+    generated_at
   ].each do |attr|
     it "serializes #{attr}" do
       expect(@json).to have_key(attr)

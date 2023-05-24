@@ -52,8 +52,11 @@ describe AssessmentRequestHelper do
                                                       user: @student1,
                                                       rubric_association: @rubric_assoc
                                                     })
-      @assessment_request = AssessmentRequest.create!(rubric_assessment: @rubric_assessment, user: @student1,
-                                                      asset: @submission, assessor_asset: submission2, assessor: @student2)
+      @assessment_request = AssessmentRequest.create!(rubric_assessment: @rubric_assessment,
+                                                      user: @student1,
+                                                      asset: @submission,
+                                                      assessor_asset: submission2,
+                                                      assessor: @student2)
     end
 
     it "returns assessment user name" do

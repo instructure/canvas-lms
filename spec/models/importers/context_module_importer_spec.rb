@@ -79,7 +79,8 @@ describe "Importing modules" do
   end
 
   it "links to translated external tool urls" do
-    data = { migration_id: "1", title: "derp",
+    data = { migration_id: "1",
+             title: "derp",
              items: [{
                migration_id: "mig1",
                type: "linked_resource",
@@ -98,10 +99,14 @@ describe "Importing modules" do
                      }] }
 
     course_model
-    tool1 = @course.context_external_tools.create!(name: "somethin", domain: "exmpale.com",
-                                                   shared_secret: "fake", consumer_key: "fake")
-    tool2 = @course.context_external_tools.create!(name: "somethin2", domain: "exmpale2.com",
-                                                   shared_secret: "fake", consumer_key: "fake")
+    tool1 = @course.context_external_tools.create!(name: "somethin",
+                                                   domain: "exmpale.com",
+                                                   shared_secret: "fake",
+                                                   consumer_key: "fake")
+    tool2 = @course.context_external_tools.create!(name: "somethin2",
+                                                   domain: "exmpale2.com",
+                                                   shared_secret: "fake",
+                                                   consumer_key: "fake")
     migration = ContentMigration.new
     migration.add_external_tool_translation("2", tool1, { "heresacustomfields" => "hooray and stuff" })
     migration.add_external_tool_translation("3", tool1, { "different" => "field" })
@@ -120,7 +125,8 @@ describe "Importing modules" do
   end
 
   it "does not create a blank tag if the content is not found" do
-    data = { migration_id: "1", title: "derp",
+    data = { migration_id: "1",
+             title: "derp",
              items: [{
                migration_id: "mig1",
                type: "linked_resource",
@@ -204,7 +210,8 @@ describe "Importing modules" do
 
   it "includes link_settings in lti module items" do
     link_settings = { selection_height: 123, selection_width: 456 }
-    data = { migration_id: "1", title: "derp",
+    data = { migration_id: "1",
+             title: "derp",
              items: [{
                migration_id: "mig1",
                type: "linked_resource",
@@ -215,8 +222,10 @@ describe "Importing modules" do
              }] }
 
     course_model
-    tool1 = @course.context_external_tools.create!(name: "somethin", domain: "exmpale.com",
-                                                   shared_secret: "fake", consumer_key: "fake")
+    tool1 = @course.context_external_tools.create!(name: "somethin",
+                                                   domain: "exmpale.com",
+                                                   shared_secret: "fake",
+                                                   consumer_key: "fake")
 
     migration = ContentMigration.new
     migration.add_external_tool_translation("1", tool1, {})

@@ -22,9 +22,20 @@ require "oauth"
 
 module LtiOutbound
   class ToolLaunch
-    attr_reader :url, :tool, :user, :context, :link_code, :return_url, :account,
-                :resource_type, :consumer_instance, :hash, :assignment,
-                :outgoing_email_address, :selected_html, :variable_expander,
+    attr_reader :url,
+                :tool,
+                :user,
+                :context,
+                :link_code,
+                :return_url,
+                :account,
+                :resource_type,
+                :consumer_instance,
+                :hash,
+                :assignment,
+                :outgoing_email_address,
+                :selected_html,
+                :variable_expander,
                 :post_only
 
     def initialize(options)

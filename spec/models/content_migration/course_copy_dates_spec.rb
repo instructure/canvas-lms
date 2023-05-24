@@ -34,7 +34,8 @@ describe ContentMigration do
                                        lock_at: @old_start + 3.days,
                                        peer_reviews_due_at: @old_start + 4.days)
 
-        att = Attachment.create!(context: @copy_from, filename: "hi.txt",
+        att = Attachment.create!(context: @copy_from,
+                                 filename: "hi.txt",
                                  uploaded_data: StringIO.new("stuff"),
                                  folder: Folder.unfiled_folder(@copy_from))
         att.unlock_at = @old_start - 2.days
@@ -512,7 +513,8 @@ describe ContentMigration do
       @new_start = Time.zone.parse("05 Aug 2012 06:00:00 UTC +00:00")
 
       all_day_event = @copy_from.calendar_events.create!(title: "an event",
-                                                         start_at: @old_start + 4.days, all_day: true)
+                                                         start_at: @old_start + 4.days,
+                                                         all_day: true)
 
       options = {
         everything: true,
@@ -540,7 +542,8 @@ describe ContentMigration do
       @old_start = Time.zone.parse("01 Jul 2012 06:00:00 UTC +00:00")
 
       all_day_event = @copy_from.calendar_events.create!(title: "an event",
-                                                         start_at: @old_start + 4.days, all_day: true)
+                                                         start_at: @old_start + 4.days,
+                                                         all_day: true)
 
       options = {
         everything: true,

@@ -38,10 +38,14 @@ describe MasterCourses::FolderHelper do
     unlocked_parent_folder = child_root.sub_folders.create!(name: "unlocked parent", context: @copy_to)
     unlocked_child_folder = unlocked_parent_folder.sub_folders.create!(name: "unlocked child", context: @copy_to)
 
-    attachment_model(context: @copy_to, folder: locked_child_folder,
-                     filename: "lockedfile.txt", migration_id: locked_master_tag.migration_id)
-    attachment_model(context: @copy_to, folder: unlocked_child_folder,
-                     filename: "unlockedfile.txt", migration_id: unlocked_master_tag.migration_id)
+    attachment_model(context: @copy_to,
+                     folder: locked_child_folder,
+                     filename: "lockedfile.txt",
+                     migration_id: locked_master_tag.migration_id)
+    attachment_model(context: @copy_to,
+                     folder: unlocked_child_folder,
+                     filename: "unlockedfile.txt",
+                     migration_id: unlocked_master_tag.migration_id)
 
     expect(MasterCourses::FolderHelper.locked_folder_ids_for_course(@copy_to))
       .to match_array([child_root, locked_parent_folder, locked_child_folder].map(&:id))

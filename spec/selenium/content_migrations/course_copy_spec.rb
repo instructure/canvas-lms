@@ -96,8 +96,10 @@ describe "course copy" do
     expect(opts["shift_dates"]).to eq "1"
     expect(opts["day_substitutions"]).to eq({ "1" => "2" })
     expected = {
-      "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
-      "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+      "old_start_date" => "Jul 1, 2012",
+      "old_end_date" => "Jul 11, 2012",
+      "new_start_date" => "Aug 5, 2012",
+      "new_end_date" => "Aug 15, 2012"
     }
     expected.each do |k, v|
       expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)

@@ -92,7 +92,8 @@ describe "Files API", type: :request do
     context "as teacher having manage_files_add permission" do
       it "creates a course file" do
         api_call(
-          :post, "/api/v1/courses/#{@course.id}/files",
+          :post,
+          "/api/v1/courses/#{@course.id}/files",
           {
             controller: "courses",
             action: "create_file",
@@ -123,7 +124,8 @@ describe "Files API", type: :request do
 
       it "disallows creating a course file" do
         api_call(
-          :post, "/api/v1/courses/#{@course.id}/files",
+          :post,
+          "/api/v1/courses/#{@course.id}/files",
           {
             controller: "courses",
             action: "create_file",
@@ -148,7 +150,8 @@ describe "Files API", type: :request do
 
       it "returns unauthorized error" do
         api_call(
-          :post, "/api/v1/courses/#{@course.id}/files",
+          :post,
+          "/api/v1/courses/#{@course.id}/files",
           {
             controller: "courses",
             action: "create_file",
@@ -326,7 +329,8 @@ describe "Files API", type: :request do
                                                                              content_length: 1234,
                                                                            })
 
-      raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
+      raw_api_call(:post,
+                   "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
                    { controller: "files", action: "api_create_success", format: "json", id: @attachment.to_param, uuid: @attachment.uuid })
       expect(response.headers[content_type_key]).to eq "text/html; charset=utf-8"
       expect(response.body).not_to include "verifier="
@@ -334,7 +338,8 @@ describe "Files API", type: :request do
 
     it "fails for an incorrect uuid" do
       upload_data
-      raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=abcde",
+      raw_api_call(:post,
+                   "/api/v1/files/#{@attachment.id}/create_success?uuid=abcde",
                    { controller: "files", action: "api_create_success", format: "json", id: @attachment.to_param, uuid: "abcde" })
       assert_status(400)
     end
@@ -342,7 +347,8 @@ describe "Files API", type: :request do
     it "fails if the attachment is already available" do
       upload_data
       @attachment.update_attribute(:file_state, "available")
-      raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
+      raw_api_call(:post,
+                   "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
                    { controller: "files", action: "api_create_success", format: "json", id: @attachment.to_param, uuid: @attachment.uuid })
       assert_status(400)
     end
@@ -418,14 +424,16 @@ describe "Files API", type: :request do
 
     it "is not available without the InstFS feature" do
       allow(InstFS).to receive(:enabled?).and_return false
-      raw_api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
+      raw_api_call(:post,
+                   "/api/v1/files/capture?#{base_params.to_query}",
                    base_params.merge(controller: "files", action: "api_capture", format: "json"))
       assert_status(404)
     end
 
     it "requires a service JWT to authorize" do
       params = base_params.merge(token: nil)
-      raw_api_call(:post, "/api/v1/files/capture?#{params.to_query}",
+      raw_api_call(:post,
+                   "/api/v1/files/capture?#{params.to_query}",
                    params.merge(controller: "files", action: "api_capture", format: "json"))
       assert_status(403)
     end
@@ -434,7 +442,8 @@ describe "Files API", type: :request do
       @course.storage_quota = base_params[:size] / 2
       @course.save!
       params = base_params.merge(quota_exempt: false)
-      json = api_call(:post, "/api/v1/files/capture?#{params.to_query}",
+      json = api_call(:post,
+                      "/api/v1/files/capture?#{params.to_query}",
                       params.merge(controller: "files", action: "api_capture", format: "json"),
                       expected_status: 400)
       expect(json["message"]).to eq "file size exceeds quota limits"
@@ -444,7 +453,8 @@ describe "Files API", type: :request do
       @course.storage_quota = base_params[:size] / 2
       @course.save!
       params = base_params.merge(quota_exempt: true)
-      raw_api_call(:post, "/api/v1/files/capture?#{params.to_query}",
+      raw_api_call(:post,
+                   "/api/v1/files/capture?#{params.to_query}",
                    params.merge(controller: "files", action: "api_capture", format: "json"))
       assert_status(201)
     end
@@ -452,7 +462,8 @@ describe "Files API", type: :request do
     it "creates file locked when usage rights required" do
       @course.usage_rights_required = true
       @course.save!
-      api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
+      api_call(:post,
+               "/api/v1/files/capture?#{base_params.to_query}",
                base_params.merge(controller: "files", action: "api_capture", format: "json"))
       attachment = Attachment.where(instfs_uuid: instfs_uuid).first
       expect(attachment.locked).to be true
@@ -461,7 +472,8 @@ describe "Files API", type: :request do
     it "creates file unlocked when usage rights not required" do
       @course.usage_rights_required = false
       @course.save!
-      api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
+      api_call(:post,
+               "/api/v1/files/capture?#{base_params.to_query}",
                base_params.merge(controller: "files", action: "api_capture", format: "json"))
       attachment = Attachment.where(instfs_uuid: instfs_uuid).first
       expect(attachment.locked).to be false
@@ -476,7 +488,8 @@ describe "Files API", type: :request do
         filename: params[:name],
         display_name: params[:name]
       )
-      api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
+      api_call(:post,
+               "/api/v1/files/capture?#{base_params.to_query}",
                base_params.merge(controller: "files", action: "api_capture", format: "json"))
       existing.reload
       attachment = Attachment.where(instfs_uuid: instfs_uuid).first
@@ -680,7 +693,8 @@ describe "Files API", type: :request do
       end
 
       it "matches multiple content-types" do
-        json = api_call(:get, @files_path + "?content_types[]=text&content_types[]=image/gif",
+        json = api_call(:get,
+                        @files_path + "?content_types[]=text&content_types[]=image/gif",
                         @files_path_options.merge(content_types: ["text", "image/gif"]))
         res = json.pluck("display_name")
         expect(res).to eq %w[atest3.txt mtest2.txt thing.gif ztest.txt]
@@ -955,7 +969,8 @@ describe "Files API", type: :request do
       end
 
       it "matches multiple content-types" do
-        json = api_call(:get, @files_path + "?content_types[]=text&content_types[]=image/gif",
+        json = api_call(:get,
+                        @files_path + "?content_types[]=text&content_types[]=image/gif",
                         @files_path_options.merge(content_types: ["text", "image/gif"]))
         res = json.pluck("display_name")
         expect(res).to eq %w[atest3.txt mtest2.txt thing.gif ztest.txt]
@@ -1317,8 +1332,12 @@ describe "Files API", type: :request do
     end
 
     it "finds a file by migration_id" do
-      json = api_call(:get, "/api/v1/courses/#{@course.to_param}/files/file_ref/#{@mig_id}",
-                      controller: "files", action: "file_ref", format: "json", course_id: @course.to_param,
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.to_param}/files/file_ref/#{@mig_id}",
+                      controller: "files",
+                      action: "file_ref",
+                      format: "json",
+                      course_id: @course.to_param,
                       migration_id: @mig_id)
       expect(json["id"]).to eq @attachment.id
       expect(json["display_name"]).to eq @attachment.display_name
@@ -1326,15 +1345,29 @@ describe "Files API", type: :request do
 
     it "requires permissions" do
       user_factory
-      api_call(:get, "/api/v1/courses/#{@course.to_param}/files/file_ref/#{@mig_id}",
-               { controller: "files", action: "file_ref", format: "json", course_id: @course.to_param,
-                 migration_id: @mig_id }, {}, {}, { expected_status: 401 })
+      api_call(:get,
+               "/api/v1/courses/#{@course.to_param}/files/file_ref/#{@mig_id}",
+               { controller: "files",
+                 action: "file_ref",
+                 format: "json",
+                 course_id: @course.to_param,
+                 migration_id: @mig_id },
+               {},
+               {},
+               { expected_status: 401 })
     end
 
     it "404s if given a bad migration id" do
-      api_call(:get, "/api/v1/courses/#{@course.to_param}/files/file_ref/lolcats",
-               { controller: "files", action: "file_ref", format: "json", course_id: @course.to_param,
-                 migration_id: "lolcats" }, {}, {}, { expected_status: 404 })
+      api_call(:get,
+               "/api/v1/courses/#{@course.to_param}/files/file_ref/lolcats",
+               { controller: "files",
+                 action: "file_ref",
+                 format: "json",
+                 course_id: @course.to_param,
+                 migration_id: "lolcats" },
+               {},
+               {},
+               { expected_status: 404 })
     end
   end
 
@@ -1415,8 +1448,12 @@ describe "Files API", type: :request do
       it "disallows deleting a file" do
         course_with_teacher(active_all: true, user: user_with_pseudonym, course: @course)
         @file_path_options[:replace] = false
-        api_call(:delete, @file_path, @file_path_options,
-                 {}, {}, expected_status: 401)
+        api_call(:delete,
+                 @file_path,
+                 @file_path_options,
+                 {},
+                 {},
+                 expected_status: 401)
       end
     end
   end
@@ -1425,8 +1462,13 @@ describe "Files API", type: :request do
     context "instfs file" do
       before do
         @root = Folder.root_folders(@course).first
-        @icon = Attachment.create!(filename: "icon.svg", display_name: "icon.svg", uploaded_data: File.open("spec/fixtures/icon.svg"),
-                                   folder: @root, context: @course, category: Attachment::ICON_MAKER_ICONS, instfs_uuid: "yes")
+        @icon = Attachment.create!(filename: "icon.svg",
+                                   display_name: "icon.svg",
+                                   uploaded_data: File.open("spec/fixtures/icon.svg"),
+                                   folder: @root,
+                                   context: @course,
+                                   category: Attachment::ICON_MAKER_ICONS,
+                                   instfs_uuid: "yes")
         @file_path = "/api/v1/files/#{@icon.id}/icon_metadata"
         @file_path_options = { controller: "files", action: "icon_metadata", format: "json", id: @icon.id.to_param }
         allow(InstFS).to receive(:authenticated_url).and_return(@icon.authenticated_s3_url)
@@ -1500,8 +1542,12 @@ describe "Files API", type: :request do
     context "local file" do
       before do
         @root = Folder.root_folders(@course).first
-        @icon = Attachment.create!(filename: "icon.svg", display_name: "icon.svg", uploaded_data: File.open("spec/fixtures/icon.svg"),
-                                   folder: @root, context: @course, category: Attachment::ICON_MAKER_ICONS)
+        @icon = Attachment.create!(filename: "icon.svg",
+                                   display_name: "icon.svg",
+                                   uploaded_data: File.open("spec/fixtures/icon.svg"),
+                                   folder: @root,
+                                   context: @course,
+                                   category: Attachment::ICON_MAKER_ICONS)
         @file_path = "/api/v1/files/#{@icon.id}/icon_metadata"
         @file_path_options = { controller: "files", action: "icon_metadata", format: "json", id: @icon.id.to_param }
         allow(CanvasHttp).to receive(:validate_url).and_return([@icon.authenticated_s3_url, URI.parse(@icon.authenticated_s3_url)])
@@ -1657,17 +1703,23 @@ describe "Files API", type: :request do
       end
 
       it "does not move a file into a submissions folder" do
-        api_call_as_user(@student, :put, "/api/v1/files/#{@file.id}",
+        api_call_as_user(@student,
+                         :put,
+                         "/api/v1/files/#{@file.id}",
                          { controller: "files", action: "api_update", format: "json", id: @file.to_param },
                          { parent_folder_id: @sub_folder.to_param },
-                         {}, { expected_status: 401 })
+                         {},
+                         { expected_status: 401 })
       end
 
       it "does not move a file out of a submissions folder" do
-        api_call_as_user(@student, :put, "/api/v1/files/#{@sub_file.id}",
+        api_call_as_user(@student,
+                         :put,
+                         "/api/v1/files/#{@sub_file.id}",
                          { controller: "files", action: "api_update", format: "json", id: @sub_file.to_param },
                          { parent_folder_id: @root_folder.to_param },
-                         {}, { expected_status: 401 })
+                         {},
+                         { expected_status: 401 })
       end
     end
 
@@ -1759,31 +1811,48 @@ describe "Files API", type: :request do
     end
 
     it "returns total and used quota" do
-      json = api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/files/quota", controller: "files",
-                                                                                             action: "api_quota", format: "json", course_id: t_course.to_param)
+      json = api_call_as_user(t_teacher,
+                              :get,
+                              "/api/v1/courses/#{t_course.id}/files/quota",
+                              controller: "files",
+                              action: "api_quota",
+                              format: "json",
+                              course_id: t_course.to_param)
       expect(json).to eql({ "quota" => 111.megabytes, "quota_used" => 33.megabytes })
     end
 
     it "requires manage_files permissions" do
       student_in_course course: t_course, active_all: true
-      api_call_as_user(@student, :get, "/api/v1/courses/#{t_course.id}/files/quota",
+      api_call_as_user(@student,
+                       :get,
+                       "/api/v1/courses/#{t_course.id}/files/quota",
                        { controller: "files", action: "api_quota", format: "json", course_id: t_course.to_param },
-                       {}, {}, { expected_status: 401 })
+                       {},
+                       {},
+                       { expected_status: 401 })
     end
 
     it "operates on groups" do
       group = Account.default.groups.create!
       attachment_model context: group, size: 13.megabytes
       account_admin_user
-      json = api_call(:get, "/api/v1/groups/#{group.id}/files/quota", controller: "files", action: "api_quota",
-                                                                      format: "json", group_id: group.to_param)
+      json = api_call(:get,
+                      "/api/v1/groups/#{group.id}/files/quota",
+                      controller: "files",
+                      action: "api_quota",
+                      format: "json",
+                      group_id: group.to_param)
       expect(json).to eql({ "quota" => group.quota, "quota_used" => 13.megabytes })
     end
 
     it "operates on users" do
       course_with_student active_all: true
-      json = api_call(:get, "/api/v1/users/self/files/quota", controller: "files", action: "api_quota",
-                                                              format: "json", user_id: "self")
+      json = api_call(:get,
+                      "/api/v1/users/self/files/quota",
+                      controller: "files",
+                      action: "api_quota",
+                      format: "json",
+                      user_id: "self")
       expect(json).to eql({ "quota" => @student.quota, "quota_used" => 0 })
     end
   end

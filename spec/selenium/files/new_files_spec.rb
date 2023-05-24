@@ -51,7 +51,8 @@ describe "better_file_browsing" do
     before(:once) do
       course_with_teacher(active_all: true)
       add_file(fixture_file_upload("example.pdf", "application/pdf"),
-               @course, "example.pdf")
+               @course,
+               "example.pdf")
     end
 
     before do
@@ -311,7 +312,8 @@ describe "better_file_browsing" do
     before(:once) do
       course_with_teacher(active_all: true)
       add_file(fixture_file_upload("a_file.txt", "text/plain"),
-               @course, "a_file.txt")
+               @course,
+               "a_file.txt")
     end
 
     before do
@@ -336,9 +338,11 @@ describe "better_file_browsing" do
     before do
       course_with_teacher_logged_in
       add_file(fixture_file_upload("a_file.txt", "text/plain"),
-               @course, "a_file.txt")
+               @course,
+               "a_file.txt")
       add_file(fixture_file_upload("b_file.txt", "text/plain"),
-               @course, "b_file.txt")
+               @course,
+               "b_file.txt")
       get "/courses/#{@course.id}/files"
     end
 
@@ -393,11 +397,14 @@ describe "better_file_browsing" do
       @course.usage_rights_required = true
       @course.save!
       add_file(fixture_file_upload("a_file.txt", "text/plan"),
-               @course, "a_file.txt")
+               @course,
+               "a_file.txt")
       add_file(fixture_file_upload("amazing_file.txt", "text/plan"),
-               @user, "amazing_file.txt")
+               @user,
+               "amazing_file.txt")
       add_file(fixture_file_upload("a_file.txt", "text/plan"),
-               @user, "a_file.txt")
+               @user,
+               "a_file.txt")
     end
 
     before do

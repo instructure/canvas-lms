@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -37,7 +38,7 @@ interface PassedProps {
   readonly onSave: (blackoutDates: BlackoutDate[]) => any
 }
 
-const BlackoutDatesModal: React.FC<PassedProps> = ({open, blackoutDates, onCancel, onSave}) => {
+const BlackoutDatesModal = ({open, blackoutDates, onCancel, onSave}: PassedProps) => {
   const [updatedBlackoutDates, setUpdatedBlackoutDates] = useState(blackoutDates)
 
   const handleChange = useCallback((newBlackoutDates: BlackoutDate[]): void => {

@@ -40,10 +40,12 @@ module Types
     global_id_field :id
 
     field :name, String, null: true
-    field :sortable_name, String,
+    field :sortable_name,
+          String,
           "The name of the user that is should be used for sorting groups of users, such as in the gradebook.",
           null: true
-    field :short_name, String,
+    field :short_name,
+          String,
           "A short name the user has selected, for use in conversations or other less formal places through the site.",
           null: true
 
@@ -84,8 +86,12 @@ module Types
         Loaders::AssociationLoader.for(User, :pseudonyms)
                                   .load(object)
                                   .then do
-          pseudonym = SisPseudonym.for(object, domain_root_account, type: :implicit, require_sis: false,
-                                                                    root_account: domain_root_account, in_region: true)
+          pseudonym = SisPseudonym.for(object,
+                                       domain_root_account,
+                                       type: :implicit,
+                                       require_sis: false,
+                                       root_account: domain_root_account,
+                                       in_region: true)
           pseudonym&.sis_user_id
         end
       end
@@ -99,25 +105,33 @@ module Types
         Loaders::AssociationLoader.for(User, :pseudonyms)
                                   .load(object)
                                   .then do
-          pseudonym = SisPseudonym.for(object, domain_root_account, type: :implicit, require_sis: false,
-                                                                    root_account: domain_root_account, in_region: true)
+          pseudonym = SisPseudonym.for(object,
+                                       domain_root_account,
+                                       type: :implicit,
+                                       require_sis: false,
+                                       root_account: domain_root_account,
+                                       in_region: true)
           pseudonym&.integration_id
         end
       end
     end
 
     field :enrollments, [EnrollmentType], null: false do
-      argument :course_id, ID,
+      argument :course_id,
+               ID,
                "only return enrollments for this course",
                required: false,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
-      argument :current_only, Boolean,
+      argument :current_only,
+               Boolean,
                "Whether or not to restrict results to `active` enrollments in `available` courses",
                required: false
-      argument :order_by, [String],
+      argument :order_by,
+               [String],
                "The fields to order the results by",
                required: false
-      argument :exclude_concluded, Boolean,
+      argument :exclude_concluded,
+               Boolean,
                "Whether or not to exclude `completed` enrollments",
                required: false
     end
@@ -320,7 +334,8 @@ module Types
     end
 
     field :summary_analytics, StudentSummaryAnalyticsType, null: true do
-      argument :course_id, ID,
+      argument :course_id,
+               ID,
                "returns summary analytics for this course",
                required: true,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
@@ -329,7 +344,8 @@ module Types
     def summary_analytics(course_id:)
       Loaders::CourseStudentAnalyticsLoader.for(
         course_id,
-        current_user: context[:current_user], session: context[:session]
+        current_user: context[:current_user],
+        session: context[:session]
       ).load(object)
     end
 

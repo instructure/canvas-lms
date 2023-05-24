@@ -430,8 +430,10 @@ describe Course do
       course_factory
       @course.root_account.default_time_zone = Time.zone
       options = Importers::CourseContentImporter.shift_date_options(@course, {
-                                                                      old_start_date: "2014-3-2", old_end_date: "2014-4-26",
-                                                                      new_start_date: "2014-5-11", new_end_date: "2014-7-5"
+                                                                      old_start_date: "2014-3-2",
+                                                                      old_end_date: "2014-4-26",
+                                                                      new_start_date: "2014-5-11",
+                                                                      new_end_date: "2014-7-5"
                                                                     })
       unlock_at = DateTime.new(2014, 3, 23, 0, 0)
       due_at    = DateTime.new(2014, 3, 29, 23, 59)

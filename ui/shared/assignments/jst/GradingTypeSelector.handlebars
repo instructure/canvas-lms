@@ -12,27 +12,27 @@
     <select id="assignment_grading_type"
       name="{{#if nested}}assignment[grading_type]{{else}}grading_type{{/if}}"
       aria-controls="graded_assignment_fields view-grading-levels">
-      {{#unless restrictQuantitativeData}}
+
         <option value="percent" {{selectedIf gradingType "percent"}}>
           {{gradingTypeMap.percent}}
         </option>
-      {{/unless}}
+
       <option value="pass_fail" {{selectedIf gradingType "pass_fail" }}>
         {{gradingTypeMap.pass_fail}}
       </option>
-      {{#unless restrictQuantitativeData}}
+
         <option value="points" {{selectedIf gradingType "points"}}>
           {{gradingTypeMap.points}}
         </option>
-      {{/unless}}
+
       <option value="letter_grade" {{selectedIf gradingType "letter_grade"}}>
         {{gradingTypeMap.letter_grade}}
       </option>
-      {{#unless restrictQuantitativeData}}
+
         <option value="gpa_scale" {{selectedIf gradingType "gpa_scale"}}>
           {{gradingTypeMap.gpa_scale}}
         </option>
-      {{/unless}}
+
       {{#unless preventNotGraded}}
         <option value="not_graded" {{selectedIf isNotGraded}}>
           {{gradingTypeMap.not_graded}}

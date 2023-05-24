@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -18,6 +19,7 @@
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
+declare const INST: any
 
 class SafeString {
   'string': string
@@ -70,7 +72,6 @@ export default function escape<T>(strOrObject: string | SafeString | Object) {
 escape.SafeString = SafeString
 
 // tinymce plugins use this and they need it global :(
-// @ts-expect-error
 INST.htmlEscape = escape
 
 const UNESCAPE_ENTITIES = Object.keys(ENTITIES).reduce((map, key) => {
@@ -82,7 +83,7 @@ const UNESCAPE_ENTITIES = Object.keys(ENTITIES).reduce((map, key) => {
 const unescapeSource = `(?:${Object.keys(UNESCAPE_ENTITIES).join('|')})`
 const UNESCAPE_REGEX = new RegExp(unescapeSource, 'g')
 
-function unescape(str: string) {
+export function unescape(str: string) {
   return str.replace(UNESCAPE_REGEX, match => UNESCAPE_ENTITIES[match])
 }
 

@@ -35,8 +35,9 @@ class CreateMicrosoftSyncGroups < ActiveRecord::Migration[6.0]
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
       t.timestamps
 
-      t.index [:root_account_id, :id], unique: true,
-                                       name: "index_microsoft_sync_groups_replica_identity"
+      t.index [:root_account_id, :id],
+              unique: true,
+              name: "index_microsoft_sync_groups_replica_identity"
     end
     set_replica_identity(:microsoft_sync_groups, :index_microsoft_sync_groups_replica_identity)
   end

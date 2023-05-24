@@ -24,7 +24,8 @@ class SplitUsers
     { table: "asset_user_accesses",
       scope: -> { where(context_type: "Course") } }.freeze,
     { table: "asset_user_accesses",
-      scope: -> { joins(:context_group).where(groups: { context_type: "Course" }) }, context_id: "groups.context_id" }.freeze,
+      scope: -> { joins(:context_group).where(groups: { context_type: "Course" }) },
+      context_id: "groups.context_id" }.freeze,
     { table: "calendar_events",
       scope: -> { where(context_type: "Course") } }.freeze,
     { table: "calendar_events",
@@ -44,10 +45,12 @@ class SplitUsers
     { table: "discussion_entries",
       scope: -> { joins({ discussion_topic: :group }).where(groups: { context_type: "Course" }) },
       context_id: "groups.context_id" }.freeze,
-    { table: "discussion_entries", foreign_key: :editor_id,
+    { table: "discussion_entries",
+      foreign_key: :editor_id,
       scope: -> { joins(:discussion_topic).where(discussion_topics: { context_type: "Course" }) },
       context_id: "discussion_topics.context_id" }.freeze,
-    { table: "discussion_entries", foreign_key: :editor_id,
+    { table: "discussion_entries",
+      foreign_key: :editor_id,
       scope: -> { joins({ discussion_topic: :group }).where(groups: { context_type: "Course" }) },
       context_id: "groups.context_id" }.freeze,
     { table: "discussion_topics",
@@ -55,9 +58,11 @@ class SplitUsers
     { table: "discussion_topics",
       scope: -> { joins(:group).where(groups: { context_type: "Course" }) },
       context_id: "groups.context_id" }.freeze,
-    { table: "discussion_topics", foreign_key: :editor_id,
+    { table: "discussion_topics",
+      foreign_key: :editor_id,
       scope: -> { where(context_type: "Course") } }.freeze,
-    { table: "discussion_topics", foreign_key: :editor_id,
+    { table: "discussion_topics",
+      foreign_key: :editor_id,
       scope: -> { joins(:group).where(groups: { context_type: "Course" }) },
       context_id: "groups.context_id" }.freeze,
     { table: "page_views",
@@ -65,7 +70,8 @@ class SplitUsers
     { table: "rubric_assessments",
       scope: -> { joins({ submission: :assignment }) },
       context_id: "assignments.context_id" }.freeze,
-    { table: "rubric_assessments", foreign_key: :assessor_id,
+    { table: "rubric_assessments",
+      foreign_key: :assessor_id,
       scope: -> { joins({ submission: :assignment }) },
       context_id: "assignments.context_id" }.freeze,
     { table: "submission_comments", foreign_key: :author_id }.freeze,
@@ -265,7 +271,9 @@ class SplitUsers
     # passing the array to update_all so we can get postgres to add the position for us.
     unless scope.empty?
       scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'",
-                        restored_user.id, max_position, restored_user.root_account_ids])
+                        restored_user.id,
+                        max_position,
+                        restored_user.root_account_ids])
     end
 
     cc_records.where.not(previous_workflow_state: "non existent").each do |cr|

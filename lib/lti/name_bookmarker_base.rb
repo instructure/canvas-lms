@@ -62,7 +62,9 @@ module Lti
         scope = scope.where(
           " (#{name_collation_key} = #{placeholder_collation_key} AND #{id_field} #{comparison} ?) " \
           "OR #{name_collation_key} #{comparison} #{placeholder_collation_key}",
-          bookmark[2], bookmark[1], bookmark[2]
+          bookmark[2],
+          bookmark[1],
+          bookmark[2]
         )
       end
 

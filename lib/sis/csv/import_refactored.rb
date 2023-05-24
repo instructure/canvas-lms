@@ -23,8 +23,14 @@ require "zip"
 module SIS
   module CSV
     class ImportRefactored
-      attr_accessor :root_account, :batch, :finished, :counts,
-                    :override_sis_stickiness, :add_sis_stickiness, :clear_sis_stickiness, :logger
+      attr_accessor :root_account,
+                    :batch,
+                    :finished,
+                    :counts,
+                    :override_sis_stickiness,
+                    :add_sis_stickiness,
+                    :clear_sis_stickiness,
+                    :logger
 
       IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i.freeze
 
@@ -33,9 +39,22 @@ module SIS
       #  * Course must be imported before Section
       #  * Course and Section must be imported before Xlist
       #  * Course, Section, and User must be imported before Enrollment
-      IMPORTERS = %i[change_sis_id account term abstract_course course section
-                     xlist user login enrollment admin group_category group group_membership
-                     grade_publishing_results user_observer].freeze
+      IMPORTERS = %i[change_sis_id
+                     account
+                     term
+                     abstract_course
+                     course
+                     section
+                     xlist
+                     user
+                     login
+                     enrollment
+                     admin
+                     group_category
+                     group
+                     group_membership
+                     grade_publishing_results
+                     user_observer].freeze
 
       HEADERS_TO_EXCLUDE_FOR_DOWNLOAD = %w[password ssha_password].freeze
 
@@ -278,7 +297,8 @@ module SIS
                                           during_tests: false
                                         })[:error_report]
         error_message = I18n.t("Error while importing CSV. Please contact support. " \
-                               "(Error report %{number})", number: err_id.to_s)
+                               "(Error report %{number})",
+                               number: err_id.to_s)
         @batch.shard.activate do
           SisBatch.add_error(csv, error_message, sis_batch: @batch, failure: true, backtrace: e.try(:backtrace))
           @batch.workflow_state = :failed_with_messages

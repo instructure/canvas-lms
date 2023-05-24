@@ -1304,8 +1304,10 @@ describe Enrollment do
     it "grants read rights to account members with the ability to read_roster" do
       role = Role.get_built_in_role("AccountMembership", root_account_id: Account.default.id)
       user = account_admin_user(role: role)
-      RoleOverride.create!(context: Account.default, permission: :read_roster,
-                           role: role, enabled: true)
+      RoleOverride.create!(context: Account.default,
+                           permission: :read_roster,
+                           role: role,
+                           enabled: true)
       @enrollment.save
 
       expect(@enrollment.user.grants_right?(user, :read)).to be false

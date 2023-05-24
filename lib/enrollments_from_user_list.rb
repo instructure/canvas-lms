@@ -86,7 +86,8 @@ class EnrollmentsFromUserList
     return if @enrolled_users.key?(user.id)
 
     @enrolled_users[user.id] = true
-    enrollment = @course.enroll_user(user, @enrollment_type,
+    enrollment = @course.enroll_user(user,
+                                     @enrollment_type,
                                      section: @section,
                                      limit_privileges_to_course_section: @limit_privileges_to_course_section,
                                      allow_multiple_enrollments: true,

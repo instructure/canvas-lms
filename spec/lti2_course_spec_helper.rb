@@ -98,7 +98,8 @@ RSpec.shared_context "lti2_course_spec_helper", shared_context: :metadata do
       },
       lti_version: "1"
     )
-    Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
+    Lti::ToolProxyBinding.where(context_id: account,
+                                context_type: account.class.to_s,
                                 tool_proxy_id: tp).first_or_create!
     tp
   end
@@ -118,7 +119,8 @@ RSpec.shared_context "lti2_course_spec_helper", shared_context: :metadata do
     )
   end
   let(:tool_proxy_binding) do
-    Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
+    Lti::ToolProxyBinding.where(context_id: account,
+                                context_type: account.class.to_s,
                                 tool_proxy_id: tool_proxy).first_or_create!
   end
 end

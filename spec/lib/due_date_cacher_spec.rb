@@ -146,7 +146,8 @@ describe DueDateCacher do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(
-          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:UpdateGrades:0", max_attempts: 10,
+          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:UpdateGrades:0",
+          max_attempts: 10,
           strand: "cached_due_date:calculator:Course:#{@course.global_id}"
         )
         .and_return(@instance)
@@ -181,7 +182,8 @@ describe DueDateCacher do
         .and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(
-          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:UpdateGrades:0", max_attempts: 10,
+          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:UpdateGrades:0",
+          max_attempts: 10,
           strand: "cached_due_date:calculator:Course:#{@course.global_id}"
         )
         .and_return(@instance)
@@ -267,7 +269,9 @@ describe DueDateCacher do
 
       it "passes along the whole user array" do
         expect(DueDateCacher).to receive(:new).and_return(instance)
-                                              .with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
+                                              .with(@course,
+                                                    Assignment.active.where(context: @course).pluck(:id),
+                                                    student_ids,
                                                     hash_including(update_grades: false))
         DueDateCacher.recompute_users_for_course(student_ids, @course)
       end
@@ -296,7 +300,9 @@ describe DueDateCacher do
 
       it "handles being called with a course id" do
         expect(DueDateCacher).to receive(:new).and_return(instance)
-                                              .with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
+                                              .with(@course,
+                                                    Assignment.active.where(context: @course).pluck(:id),
+                                                    student_ids,
                                                     hash_including(update_grades: false))
         DueDateCacher.recompute_users_for_course(student_ids, @course.id)
       end

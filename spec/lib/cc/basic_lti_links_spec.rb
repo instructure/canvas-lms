@@ -89,10 +89,30 @@ describe CC::BasicLTILinks do
     end
 
     it "add an icon element if found in the tool settings" do
-      tool.settings[:icon_url] = "http://example.com/icon"
+      tool.icon_url = "http://example.com/icon"
       subject.create_blti_link(tool, lti_doc)
       xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
-      expect(xml_doc.at_xpath("//blti:icon").text).to eq tool.settings[:icon_url]
+      expect(xml_doc.at_xpath("//blti:icon").text).to eq tool.icon_url
+    end
+
+    context "with environment-specific overrides" do
+      before do
+        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        tool.settings[:environments] = {
+          domain: "example-beta.com"
+        }
+      end
+
+      let(:icon_url) { "https://example.com/lti/icon" }
+      let(:override_icon_url) { "https://example-beta.com/lti/icon" }
+
+      it "add an icon element if found in the tool settings" do
+        tool.icon_url = icon_url
+        subject.create_blti_link(tool, lti_doc)
+        xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+        expect(xml_doc.at_xpath("//blti:icon").text).to eq override_icon_url
+      end
     end
 
     it "sets the vendor code to 'unknown'" do

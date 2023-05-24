@@ -33,7 +33,8 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     import.save!
     progress = Progress.create!(context: group_category, tag: "course_group_import", completion: 0.0)
 
-    progress.process_job(import, :import_groups_from_attachment,
+    progress.process_job(import,
+                         :import_groups_from_attachment,
                          { strand: ["import_groups_from_attachment", group_category.context.global_id] })
     progress
   end

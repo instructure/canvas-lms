@@ -36,12 +36,19 @@ class AssessmentQuestion < ActiveRecord::Base
   validates :workflow_state, :assessment_question_bank_id, presence: true
   resolves_root_account through: :context
 
-  ALL_QUESTION_TYPES = %w[multiple_answers_question fill_in_multiple_blanks_question
-                          matching_question missing_word_question
-                          multiple_choice_question numerical_question
-                          text_only_question short_answer_question
-                          multiple_dropdowns_question calculated_question
-                          essay_question true_false_question file_upload_question].freeze
+  ALL_QUESTION_TYPES = %w[multiple_answers_question
+                          fill_in_multiple_blanks_question
+                          matching_question
+                          missing_word_question
+                          multiple_choice_question
+                          numerical_question
+                          text_only_question
+                          short_answer_question
+                          multiple_dropdowns_question
+                          calculated_question
+                          essay_question
+                          true_false_question
+                          file_upload_question].freeze
 
   serialize :question_data
 
@@ -71,7 +78,8 @@ class AssessmentQuestion < ActiveRecord::Base
   def user_can_see_through_quiz_question?(user, session = nil)
     shard.activate do
       quiz_ids = quiz_questions.distinct.pluck(:quiz_id)
-      quiz_ids.any? && Quizzes::Quiz.where(id: quiz_ids, context_type: "Course",
+      quiz_ids.any? && Quizzes::Quiz.where(id: quiz_ids,
+                                           context_type: "Course",
                                            context_id: Enrollment.where(user_id: user).active.select(:course_id)).to_a.any? { |q| q.grants_right?(user, session, :read) }
     end
   end
@@ -330,11 +338,25 @@ class AssessmentQuestion < ActiveRecord::Base
                     end.with_indifferent_access
 
     data = previous_data.merge(qdata.compact).slice(
-      :id, :regrade_option, :points_possible, :correct_comments, :incorrect_comments,
-      :neutral_comments, :question_type, :question_name, :question_text, :answers,
-      :formulas, :variables, :answer_tolerance, :formula_decimal_places,
-      :matching_answer_incorrect_matches, :matches,
-      :correct_comments_html, :incorrect_comments_html, :neutral_comments_html
+      :id,
+      :regrade_option,
+      :points_possible,
+      :correct_comments,
+      :incorrect_comments,
+      :neutral_comments,
+      :question_type,
+      :question_name,
+      :question_text,
+      :answers,
+      :formulas,
+      :variables,
+      :answer_tolerance,
+      :formula_decimal_places,
+      :matching_answer_incorrect_matches,
+      :matches,
+      :correct_comments_html,
+      :incorrect_comments_html,
+      :neutral_comments_html
     )
 
     [

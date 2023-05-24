@@ -92,7 +92,8 @@ describe "Gradebook - post grades to SIS" do
     end
 
     it "does not show assignment errors when clicking the post grades button if all " \
-       "assignments have due dates for each section", priority: "1" do
+       "assignments have due dates for each section",
+       priority: "1" do
       mock_feature_flag(:post_grades, true)
 
       @course.update!(sis_source_id: "xyz")
@@ -137,7 +138,8 @@ describe "Gradebook - post grades to SIS" do
     end
 
     it "does not show assignment errors when clicking the post grades button if all " \
-       "assignments have due dates for each section", priority: "1" do
+       "assignments have due dates for each section",
+       priority: "1" do
       mock_feature_flag(:post_grades, true)
 
       @course.update!(sis_source_id: "xyz")

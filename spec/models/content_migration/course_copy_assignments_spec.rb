@@ -195,10 +195,19 @@ describe ContentMigration do
       expect_any_instantiation_of(@copy_to).to receive(:turnitin_enabled?).at_least(1).and_return(true)
       expect_any_instantiation_of(@copy_to).to receive(:vericite_enabled?).at_least(1).and_return(true)
 
-      attrs = %i[turnitin_enabled vericite_enabled turnitin_settings peer_reviews
-                 automatic_peer_reviews anonymous_peer_reviews
-                 grade_group_students_individually allowed_extensions
-                 position peer_review_count omit_from_final_grade post_to_sis allowed_attempts]
+      attrs = %i[turnitin_enabled
+                 vericite_enabled
+                 turnitin_settings
+                 peer_reviews
+                 automatic_peer_reviews
+                 anonymous_peer_reviews
+                 grade_group_students_individually
+                 allowed_extensions
+                 position
+                 peer_review_count
+                 omit_from_final_grade
+                 post_to_sis
+                 allowed_attempts]
 
       run_course_copy
 
@@ -236,8 +245,11 @@ describe ContentMigration do
     end
 
     it "unsets allowed extensions" do
-      assignment_model(course: @copy_from, points_possible: 40, submission_types: "file_upload",
-                       grading_type: "points", allowed_extensions: ["txt", "doc"])
+      assignment_model(course: @copy_from,
+                       points_possible: 40,
+                       submission_types: "file_upload",
+                       grading_type: "points",
+                       allowed_extensions: ["txt", "doc"])
 
       run_course_copy
 
@@ -325,8 +337,12 @@ describe ContentMigration do
       run_course_copy
 
       new_assignment.reload
-      %i[moderated_grading grader_count grader_comments_visible_to_graders
-         anonymous_grading graders_anonymous_to_graders grader_names_visible_to_final_grader
+      %i[moderated_grading
+         grader_count
+         grader_comments_visible_to_graders
+         anonymous_grading
+         graders_anonymous_to_graders
+         grader_names_visible_to_final_grader
          anonymous_instructor_annotations].each do |attr|
         expect(new_assignment.send(attr)).to eq @assignment.send(attr)
       end
@@ -458,8 +474,10 @@ describe ContentMigration do
     end
 
     it "copies group assignment setting" do
-      assignment_model(course: @copy_from, points_possible: 40,
-                       submission_types: "file_upload", grading_type: "points")
+      assignment_model(course: @copy_from,
+                       points_possible: 40,
+                       submission_types: "file_upload",
+                       grading_type: "points")
 
       group_category = @copy_from.group_categories.create!(name: "category")
       @assignment.group_category = group_category
@@ -800,10 +818,14 @@ describe ContentMigration do
         account.settings[:conditional_release] = { value: true }
         account.save!
         assignment_override_model(assignment: @assignment, set_type: "ADHOC")
-        assignment_override_model(assignment: @assignment, set_type: AssignmentOverride::SET_TYPE_NOOP,
-                                  set_id: AssignmentOverride::NOOP_MASTERY_PATHS, title: "Tag 1")
-        assignment_override_model(assignment: @assignment, set_type: AssignmentOverride::SET_TYPE_NOOP,
-                                  set_id: nil, title: "Tag 2")
+        assignment_override_model(assignment: @assignment,
+                                  set_type: AssignmentOverride::SET_TYPE_NOOP,
+                                  set_id: AssignmentOverride::NOOP_MASTERY_PATHS,
+                                  title: "Tag 1")
+        assignment_override_model(assignment: @assignment,
+                                  set_type: AssignmentOverride::SET_TYPE_NOOP,
+                                  set_id: nil,
+                                  title: "Tag 2")
         @assignment.only_visible_to_overrides = true
         @assignment.save!
         run_course_copy
@@ -832,8 +854,11 @@ describe ContentMigration do
         account.settings[:conditional_release] = { value: true }
         account.save!
         due_at = 1.hour.from_now.round
-        assignment_override_model(assignment: @assignment, set_type: "Noop",
-                                  set_id: 1, title: "Tag 1", due_at: due_at)
+        assignment_override_model(assignment: @assignment,
+                                  set_type: "Noop",
+                                  set_id: 1,
+                                  title: "Tag 1",
+                                  due_at: due_at)
         run_course_copy
         to_override = @copy_to.assignments.first.assignment_overrides.first
         expect(to_override.title).to eq "Tag 1"

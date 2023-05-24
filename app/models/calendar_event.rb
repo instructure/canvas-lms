@@ -43,16 +43,29 @@ class CalendarEvent < ActiveRecord::Base
 
   include Workflow
 
-  PERMITTED_ATTRIBUTES = %i[title description start_at end_at location_name location_address
-                            time_zone_edited cancel_reason participants_per_appointment
-                            remove_child_events all_day comments important_dates series_uuid
-                            rrule blackout_date].freeze
+  PERMITTED_ATTRIBUTES = %i[title
+                            description
+                            start_at
+                            end_at
+                            location_name
+                            location_address
+                            time_zone_edited
+                            cancel_reason
+                            participants_per_appointment
+                            remove_child_events
+                            all_day
+                            comments
+                            important_dates
+                            series_uuid
+                            rrule
+                            blackout_date].freeze
   def self.permitted_attributes
     PERMITTED_ATTRIBUTES
   end
 
-  belongs_to :context, polymorphic: %i[course user group appointment_group course_section account],
-                       polymorphic_prefix: true
+  belongs_to :context,
+             polymorphic: %i[course user group appointment_group course_section account],
+             polymorphic_prefix: true
   belongs_to :user
   belongs_to :parent_event, class_name: "CalendarEvent", foreign_key: :parent_calendar_event_id, inverse_of: :child_events
   has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: "CalendarEvent", foreign_key: :parent_calendar_event_id, inverse_of: :parent_event

@@ -21,7 +21,8 @@ class IndexContextExternalToolsOnIdentityHash < ActiveRecord::Migration[6.0]
   tag :predeploy
   disable_ddl_transaction!
   def change
-    add_index :context_external_tools, :identity_hash,
+    add_index :context_external_tools,
+              :identity_hash,
               where: "identity_hash <> 'duplicate'",
               algorithm: :concurrently,
               if_not_exists: true

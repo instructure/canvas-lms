@@ -178,6 +178,30 @@ describe CanvasSanitize do
     Timeout.timeout(1) { Sanitize.clean(str, CanvasSanitize::SANITIZE) }
   end
 
+  it "allows data sources for audio tags" do
+    str = %(<audio controls="" src="data:audio/mp3;base64,aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ=="></audio>)
+    res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+    expect(res).to eq str
+  end
+
+  it "allows data sources for video tags" do
+    str = %(<video controls="" src="data:video/mp4;base64,aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ=="></video>)
+    res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+    expect(res).to eq str
+  end
+
+  it "allows data sources for source tags" do
+    str = %(<source type="audio/mp3" src="data:audio/mp3;base64,aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==">)
+    res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+    expect(res).to eq str
+  end
+
+  it "allows data sources for track tags" do
+    str = %(<track kind="subtitles" srclang="en" label="English" src="data:audio/mp3;base64,aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==">)
+    res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
+    expect(res).to eq str
+  end
+
   Dir.glob(File.expand_path(File.join(__FILE__, "..", "..", "fixtures", "xss", "*.xss"))) do |filename|
     name = File.split(filename).last
     it "sanitizes xss attempts for #{name}" do

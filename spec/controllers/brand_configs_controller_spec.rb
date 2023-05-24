@@ -123,11 +123,12 @@ describe BrandConfigsController do
 
     it "returns an existing brand config" do
       user_session(admin)
-      post "create", params: { account_id: @account.id, brand_config: {
-        variables: {
-          "ic-brand-primary" => "#321"
-        }
-      } }
+      post "create", params: { account_id: @account.id,
+                               brand_config: {
+                                 variables: {
+                                   "ic-brand-primary" => "#321"
+                                 }
+                               } }
       assert_status(200)
       json = response.parsed_body
       expect(json["brand_config"]["md5"]).to eq @bc.md5

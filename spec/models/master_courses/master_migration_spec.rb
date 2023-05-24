@@ -369,8 +369,11 @@ describe MasterCourses::MasterMigration do
       bank.assessment_questions.create!(question_data: { "question_name" => "test question", "question_type" => "essay_question" })
       file = @copy_from.attachments.create!(filename: "blah", uploaded_data: default_uploaded_data)
       event = @copy_from.calendar_events.create!(title: "thing", description: "blargh", start_at: 1.day.from_now)
-      tool = @copy_from.context_external_tools.create!(name: "new tool", consumer_key: "key",
-                                                       shared_secret: "secret", custom_fields: { "a" => "1", "b" => "2" }, url: "http://www.example.com")
+      tool = @copy_from.context_external_tools.create!(name: "new tool",
+                                                       consumer_key: "key",
+                                                       shared_secret: "secret",
+                                                       custom_fields: { "a" => "1", "b" => "2" },
+                                                       url: "http://www.example.com")
 
       run_master_migration
 
@@ -1175,10 +1178,14 @@ describe MasterCourses::MasterMigration do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
 
-      att1 = Attachment.create!(filename: "file1.txt", uploaded_data: StringIO.new("1"),
-                                folder: Folder.root_folders(@copy_from).first, context: @copy_from)
-      att2 = Attachment.create!(filename: "file2.txt", uploaded_data: StringIO.new("2"),
-                                folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+      att1 = Attachment.create!(filename: "file1.txt",
+                                uploaded_data: StringIO.new("1"),
+                                folder: Folder.root_folders(@copy_from).first,
+                                context: @copy_from)
+      att2 = Attachment.create!(filename: "file2.txt",
+                                uploaded_data: StringIO.new("2"),
+                                folder: Folder.root_folders(@copy_from).first,
+                                context: @copy_from)
 
       run_master_migration
 
@@ -1213,8 +1220,10 @@ describe MasterCourses::MasterMigration do
 
       @root_folder = Folder.root_folders(@copy_from).first
       @folder_to_delete = @root_folder.sub_folders.create!(name: "nowyouseeme", context: @copy_from)
-      @att1 = Attachment.create!(filename: "file1.txt", uploaded_data: StringIO.new("1"),
-                                 folder: @folder_to_delete, context: @copy_from)
+      @att1 = Attachment.create!(filename: "file1.txt",
+                                 uploaded_data: StringIO.new("1"),
+                                 folder: @folder_to_delete,
+                                 context: @copy_from)
 
       run_master_migration
       @att1_to = @copy_to.attachments.where(migration_id: mig_id(@att1)).first
@@ -1289,8 +1298,11 @@ describe MasterCourses::MasterMigration do
       aq = bank.assessment_questions.create!(question_data: { "question_name" => "test question", "question_type" => "essay_question" })
       file = @copy_from.attachments.create!(filename: "blah", uploaded_data: default_uploaded_data)
       event = @copy_from.calendar_events.create!(title: "thing", description: "blargh", start_at: 1.day.from_now)
-      tool = @copy_from.context_external_tools.create!(name: "new tool", consumer_key: "key",
-                                                       shared_secret: "secret", custom_fields: { "a" => "1", "b" => "2" }, url: "http://www.example.com")
+      tool = @copy_from.context_external_tools.create!(name: "new tool",
+                                                       consumer_key: "key",
+                                                       shared_secret: "secret",
+                                                       custom_fields: { "a" => "1", "b" => "2" },
+                                                       url: "http://www.example.com")
 
       # TODO: make sure that we skip the validations on each importer when we add the Restrictor and
       # probably add more content here
@@ -1311,8 +1323,15 @@ describe MasterCourses::MasterMigration do
       copied_event = @copy_to.calendar_events.where(migration_id: mig_id(event)).first
       copied_tool = @copy_to.context_external_tools.where(migration_id: mig_id(tool)).first
 
-      copied_things = [copied_assmt, copied_topic, copied_ann, copied_page, copied_quiz,
-                       copied_bank, copied_file, copied_event, copied_tool]
+      copied_things = [copied_assmt,
+                       copied_topic,
+                       copied_ann,
+                       copied_page,
+                       copied_quiz,
+                       copied_bank,
+                       copied_file,
+                       copied_event,
+                       copied_tool]
       copied_things.each do |copy|
         expect(MasterCourses::ChildContentTag.where(content: copy).first.migration_id).to eq copy.migration_id
       end
@@ -2371,8 +2390,12 @@ describe MasterCourses::MasterMigration do
 
       Timecop.freeze(1.minute.from_now) do
         @lo = @copy_from.created_learning_outcomes.new(context: @copy_from, short_description: "whee", workflow_state: "active")
-        @lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 },
-                                                                      { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
+        @lo.data = { rubric_criterion: { mastery_points: 2,
+                                         ratings: [{ description: "e", points: 50 },
+                                                   { description: "me", points: 2 },
+                                                   { description: "Does Not Meet Expectations", points: 0.5 }],
+                                         description: "First outcome",
+                                         points_possible: 5 } }
         @lo.save!
         log.reload.add_outcome(@lo)
       end
@@ -2389,8 +2412,12 @@ describe MasterCourses::MasterMigration do
 
       default = @copy_from.root_outcome_group
       @lo = @copy_from.created_learning_outcomes.new(context: @copy_from, short_description: "whee", workflow_state: "active")
-      @lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 },
-                                                                    { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
+      @lo.data = { rubric_criterion: { mastery_points: 2,
+                                       ratings: [{ description: "e", points: 50 },
+                                                 { description: "me", points: 2 },
+                                                 { description: "Does Not Meet Expectations", points: 0.5 }],
+                                       description: "First outcome",
+                                       points_possible: 5 } }
       @lo.save!
       default.add_outcome(@lo)
 
@@ -2421,8 +2448,12 @@ describe MasterCourses::MasterMigration do
       @copy_from.root_outcome_group.adopt_outcome_group(@og)
 
       @lo = @copy_from.account.created_learning_outcomes.new(context: @copy_from.account, short_description: "whee", workflow_state: "active")
-      @lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 },
-                                                                    { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
+      @lo.data = { rubric_criterion: { mastery_points: 2,
+                                       ratings: [{ description: "e", points: 50 },
+                                                 { description: "me", points: 2 },
+                                                 { description: "Does Not Meet Expectations", points: 0.5 }],
+                                       description: "First outcome",
+                                       points_possible: 5 } }
       @lo.save!
       @og.add_outcome(@lo)
 
@@ -2555,8 +2586,10 @@ describe MasterCourses::MasterMigration do
       # this was 'fun' to debug - i'm still not quite sure how it came about
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
-      att1 = Attachment.create!(filename: "first.txt", uploaded_data: StringIO.new("ohai"),
-                                folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
+      att1 = Attachment.create!(filename: "first.txt",
+                                uploaded_data: StringIO.new("ohai"),
+                                folder: Folder.unfiled_folder(@copy_from),
+                                context: @copy_from)
 
       run_master_migration
 
@@ -2567,8 +2600,11 @@ describe MasterCourses::MasterMigration do
 
       @copy_from2 = course_factory
       @template2 = MasterCourses::MasterTemplate.set_as_master_course(@copy_from2)
-      att2 = Attachment.create!(filename: "first.txt", uploaded_data: StringIO.new("ohai"),
-                                folder: Folder.unfiled_folder(@copy_from2), context: @copy_from2, cloned_item_id: att1.cloned_item_id)
+      att2 = Attachment.create!(filename: "first.txt",
+                                uploaded_data: StringIO.new("ohai"),
+                                folder: Folder.unfiled_folder(@copy_from2),
+                                context: @copy_from2,
+                                cloned_item_id: att1.cloned_item_id)
       @template2.add_child_course!(@copy_to)
 
       MasterCourses::MasterMigration.start_new_migration!(@template2, @admin)
@@ -2584,8 +2620,12 @@ describe MasterCourses::MasterMigration do
       @template.add_child_course!(@copy_to)
 
       lo = @copy_from.created_learning_outcomes.new(context: @copy_from, short_description: "whee", workflow_state: "active")
-      lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 },
-                                                                   { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
+      lo.data = { rubric_criterion: { mastery_points: 2,
+                                      ratings: [{ description: "e", points: 50 },
+                                                { description: "me", points: 2 },
+                                                { description: "Does Not Meet Expectations", points: 0.5 }],
+                                      description: "First outcome",
+                                      points_possible: 5 } }
       lo.save!
       from_root = @copy_from.root_outcome_group
       from_root.add_outcome(lo)
@@ -2598,8 +2638,11 @@ describe MasterCourses::MasterMigration do
 
       rub = Rubric.new(context: @copy_from)
       rub.data = [{
-        points: 3, description: "Outcome row", id: 2,
-        ratings: [{ points: 3, description: "meep", criterion_id: 2, id: 3 }], ignore_for_scoring: true,
+        points: 3,
+        description: "Outcome row",
+        id: 2,
+        ratings: [{ points: 3, description: "meep", criterion_id: 2, id: 3 }],
+        ignore_for_scoring: true,
         learning_outcome_id: lo.id
       }]
       rub.save!
@@ -2889,8 +2932,10 @@ describe MasterCourses::MasterMigration do
         a.touch
       end
 
-      tool = @copy_to.context_external_tools.create!(name: "some tool", consumer_key: "test_key",
-                                                     shared_secret: "test_secret", url: "http://example.com/launch")
+      tool = @copy_to.context_external_tools.create!(name: "some tool",
+                                                     consumer_key: "test_key",
+                                                     shared_secret: "test_secret",
+                                                     url: "http://example.com/launch")
       a_to.update(submission_types: "external_tool", external_tool_tag_attributes: { content: tool })
       tag = a_to.external_tool_tag
 
@@ -2969,8 +3014,11 @@ describe MasterCourses::MasterMigration do
 
     context "attachment migration id preservation" do
       def run_course_copy(copy_from, copy_to)
-        @cm = ContentMigration.new(context: copy_to, user: @user, source_course: copy_from,
-                                   migration_type: "course_copy_importer", copy_options: { everything: "1" })
+        @cm = ContentMigration.new(context: copy_to,
+                                   user: @user,
+                                   source_course: copy_from,
+                                   migration_type: "course_copy_importer",
+                                   copy_options: { everything: "1" })
         @cm.migration_settings[:import_immediately] = true
         @cm.set_default_settings
         @cm.save!

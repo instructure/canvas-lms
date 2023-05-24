@@ -19,10 +19,21 @@
 #
 
 class Feature
-  ATTRS = %i[feature display_name description applies_to state
-             root_opt_in beta type shadow
-             release_notes_url custom_transition_proc visible_on
-             after_state_change_proc autoexpand touch_context].freeze
+  ATTRS = %i[feature
+             display_name
+             description
+             applies_to
+             state
+             root_opt_in
+             beta
+             type
+             shadow
+             release_notes_url
+             custom_transition_proc
+             visible_on
+             after_state_change_proc
+             autoexpand
+             touch_context].freeze
   attr_reader(*ATTRS)
 
   def initialize(opts = {})

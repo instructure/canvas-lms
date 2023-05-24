@@ -236,37 +236,43 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     {
       [ignored_type, :success, :error400, :success] => {
         throttled: false,
-        bad_codes: [400], bad_bodies: %w[bad],
+        bad_codes: [400],
+        bad_bodies: %w[bad],
         statsd_codes: { success: [204, 204], error: 400, ignored: ignored_code }
       },
       # Mixed error types:
       %i[success error400 error400 error500] => {
         throttled: false,
-        bad_codes: [400, 400, 500], bad_bodies: %w[bad bad bad2],
+        bad_codes: [400, 400, 500],
+        bad_bodies: %w[bad bad bad2],
         statsd_codes: { success: [204], error: [400, 400, 500] },
       },
       [ignored_type, :throttled, :throttled, :success] => {
         throttled: true,
-        bad_codes: [429, 429], bad_bodies: %w[badthrottled badthrottled],
+        bad_codes: [429, 429],
+        bad_bodies: %w[badthrottled badthrottled],
         statsd_codes: { success: 204, throttled: [429, 429], ignored: ignored_code },
         retry_delay: nil
       },
       [ignored_type, :throttled, :throttled123, :success] => {
         throttled: true,
-        bad_codes: [429, 429], bad_bodies: %w[badthrottled badthrottled],
+        bad_codes: [429, 429],
+        bad_bodies: %w[badthrottled badthrottled],
         statsd_codes: { success: 204, throttled: [429, 429], ignored: ignored_code },
         retry_delay: 123
       },
       [ignored_type, :throttled123, :throttled456, :success] => {
         throttled: true,
-        bad_codes: [429, 429], bad_bodies: %w[badthrottled badthrottled],
+        bad_codes: [429, 429],
+        bad_bodies: %w[badthrottled badthrottled],
         statsd_codes: { success: 204, throttled: [429, 429], ignored: ignored_code },
         # Uses the greater retry delay:
         retry_delay: 456
       },
       [ignored_type, :error400, :throttled, :success] => {
         throttled: true,
-        bad_codes: [400, 429], bad_bodies: %w[bad badthrottled],
+        bad_codes: [400, 429],
+        bad_bodies: %w[bad badthrottled],
         statsd_codes: { success: 204, error: 400, throttled: 429, ignored: ignored_code },
       },
     }.each do |response_types, params|
@@ -324,22 +330,30 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     let(:batch_requests) do
       [
         {
-          id: "members_m1", url: "/groups/msgroupid/members/$ref", method: "POST",
+          id: "members_m1",
+          url: "/groups/msgroupid/members/$ref",
+          method: "POST",
           body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/m1" },
           headers: { "Content-Type": "application/json" }
         },
         {
-          id: "members_m2", url: "/groups/msgroupid/members/$ref", method: "POST",
+          id: "members_m2",
+          url: "/groups/msgroupid/members/$ref",
+          method: "POST",
           body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/m2" },
           headers: { "Content-Type": "application/json" }
         },
         {
-          id: "owners_o1", url: "/groups/msgroupid/owners/$ref", method: "POST",
+          id: "owners_o1",
+          url: "/groups/msgroupid/owners/$ref",
+          method: "POST",
           body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/o1" },
           headers: { "Content-Type": "application/json" }
         },
         {
-          id: "owners_o2", url: "/groups/msgroupid/owners/$ref", method: "POST",
+          id: "owners_o2",
+          url: "/groups/msgroupid/owners/$ref",
+          method: "POST",
           body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/o2" },
           headers: { "Content-Type": "application/json" }
         },
@@ -352,7 +366,8 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     let(:request_ids) { %w[members_m1 members_m2 owners_o1 owners_o2] }
 
     it_behaves_like "a members/owners batch request that can fail",
-                    ignored_type: :add_duplicate, endpoint_name: "group_add_users"
+                    ignored_type: :add_duplicate,
+                    endpoint_name: "group_add_users"
 
     it "passes along the quota used to run_batch" do
       expect(endpoints.http).to receive(:run_batch)
@@ -426,7 +441,8 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     let(:batch_response_types) { [] }
 
     it_behaves_like "a members/owners batch request that can fail",
-                    ignored_type: :remove_missing, endpoint_name: "group_remove_users"
+                    ignored_type: :remove_missing,
+                    endpoint_name: "group_remove_users"
 
     it "passes along the quota used to run_batch" do
       expect(endpoints.http).to receive(:run_batch)

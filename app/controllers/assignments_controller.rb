@@ -438,10 +438,11 @@ class AssignmentsController < ApplicationController
         mastery_scales_js_env
 
         render locals: {
-          eula_url: tool_eula_url,
-          show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user),
-          show_confetti: params[:confetti] == "true" && @domain_root_account&.feature_enabled?(:confetti_for_assignments)
-        }, stream: can_stream_template?
+                 eula_url: tool_eula_url,
+                 show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user),
+                 show_confetti: params[:confetti] == "true" && @domain_root_account&.feature_enabled?(:confetti_for_assignments)
+               },
+               stream: can_stream_template?
       end
     end
   end
@@ -601,8 +602,10 @@ class AssignmentsController < ApplicationController
       @current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
     )
     @course_home_sub_navigation_tools = Lti::ContextToolFinder.new(
-      @context, type: :course_home_sub_navigation,
-                root_account: @domain_root_account, current_user: @current_user
+      @context,
+      type: :course_home_sub_navigation,
+      root_account: @domain_root_account,
+      current_user: @current_user
     ).all_tools_sorted_array(exclude_admin_visibility: !can_see_admin_tools)
 
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
@@ -806,7 +809,8 @@ class AssignmentsController < ApplicationController
       hash[:ANONYMOUS_GRADING_ENABLED] = @context.feature_enabled?(:anonymous_marking)
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
       hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
-      hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(:submission_type_selection, @context,
+      hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(:submission_type_selection,
+                                                                             @context,
                                                                              %i[base_title external_url selection_width selection_height])
 
       append_sis_data(hash)
@@ -971,15 +975,42 @@ class AssignmentsController < ApplicationController
 
   def strong_assignment_params
     params.require(:assignment)
-          .permit(:title, :name, :description, :due_at, :points_possible,
-                  :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
-                  :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
-                  :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
-                  :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
-                  :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
-                  :context, :position, :external_tool_tag_attributes, :freeze_on_copy,
-                  :only_visible_to_overrides, :post_to_sis, :sis_assignment_id, :integration_id, :moderated_grading,
-                  :omit_from_final_grade, :intra_group_peer_reviews, :important_dates,
+          .permit(:title,
+                  :name,
+                  :description,
+                  :due_at,
+                  :points_possible,
+                  :grading_type,
+                  :submission_types,
+                  :assignment_group,
+                  :unlock_at,
+                  :lock_at,
+                  :group_category,
+                  :group_category_id,
+                  :peer_review_count,
+                  :anonymous_peer_reviews,
+                  :peer_reviews_due_at,
+                  :peer_reviews_assign_at,
+                  :grading_standard_id,
+                  :peer_reviews,
+                  :automatic_peer_reviews,
+                  :grade_group_students_individually,
+                  :notify_of_update,
+                  :time_zone_edited,
+                  :turnitin_enabled,
+                  :vericite_enabled,
+                  :context,
+                  :position,
+                  :external_tool_tag_attributes,
+                  :freeze_on_copy,
+                  :only_visible_to_overrides,
+                  :post_to_sis,
+                  :sis_assignment_id,
+                  :integration_id,
+                  :moderated_grading,
+                  :omit_from_final_grade,
+                  :intra_group_peer_reviews,
+                  :important_dates,
                   allowed_extensions: strong_anything,
                   turnitin_settings: strong_anything,
                   integration_data: strong_anything)

@@ -17,19 +17,19 @@
  */
 import moment from 'moment-timezone'
 import {
+  dateRangeString,
+  dateTimeString,
   formatDayKey,
-  isToday,
-  isInFuture,
-  getFriendlyDate,
   getDynamicFullDate,
   getDynamicFullDateAndTime,
   getFirstLoadedMoment,
-  getLastLoadedMoment,
+  getFriendlyDate,
   getFullDateAndTime,
-  dateRangeString,
+  getLastLoadedMoment,
+  isInFuture,
+  isThisWeek,
+  isToday,
   timeString,
-  dateTimeString,
-  isThisWeek
 } from '../dateUtils'
 
 const TZ = 'Asia/Tokyo'
@@ -71,6 +71,13 @@ describe('getFriendlyDate', () => {
   it('returns the day of the week for any other date', () => {
     const date = moment().add(3, 'days')
     expect(getFriendlyDate(date)).toBe(date.format('dddd'))
+  })
+
+  it('allows using a custom today', () => {
+    const date = moment().tz(TZ).add(3, 'days')
+    const today = date.clone().add(1, 'day')
+
+    expect(getFriendlyDate(date, today)).toBe('Yesterday')
   })
 })
 
@@ -220,10 +227,12 @@ describe('dateRangeString', () => {
 
 describe('isThisWeek', () => {
   it('returns true when given day is during this week', () => {
+    // eslint-disable-next-line new-cap
     const wednesday = new moment().startOf('week').add(3, 'days')
     expect(isThisWeek(wednesday)).toEqual(true)
   })
   it('return false when given day is not during this week', () => {
+    // eslint-disable-next-line new-cap
     const lastFriday = new moment().startOf('week').add(-2, 'days')
     expect(isThisWeek(lastFriday)).toEqual(false)
   })

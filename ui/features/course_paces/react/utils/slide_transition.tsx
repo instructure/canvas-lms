@@ -28,7 +28,7 @@ interface ComponentProps {
   readonly size: string | number
 }
 
-const SlideTransition: React.FC<ComponentProps> = ({children, direction, expanded, size}) => {
+const SlideTransition = ({children, direction, expanded, size}: ComponentProps) => {
   const horizontalProps =
     direction === 'horizontal'
       ? {

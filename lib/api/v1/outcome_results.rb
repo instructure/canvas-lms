@@ -89,7 +89,8 @@ module Api::V1::OutcomeResults
     outcomes.map do |o|
       hash = outcome_json(
         o,
-        @current_user, session,
+        @current_user,
+        session,
         assessed_outcomes: assessed_outcomes,
         rating_percents: percents[o.id],
         context: context,

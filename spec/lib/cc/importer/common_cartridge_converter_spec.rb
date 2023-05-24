@@ -638,8 +638,10 @@ describe "other cc files" do
     @migration.migration_type = "common_cartridge_importer"
     @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
 
-    converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: "oi",
-                                                      base_download_dir: unzipped_file_path, content_migration: @migration)
+    converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path,
+                                                      course_name: "oi",
+                                                      base_download_dir: unzipped_file_path,
+                                                      content_migration: @migration)
     converter.export
     @course_data = converter.course.with_indifferent_access
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)

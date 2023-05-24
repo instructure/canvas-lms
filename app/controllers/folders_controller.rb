@@ -422,8 +422,9 @@ class FoldersController < ApplicationController
       parent_folder = @context.folders.active.find_by(id: folder_params.delete(:parent_folder_id))
       if parent_folder.nil?
         return render json: {
-          errors: [{ message: t("The specified resource does not exist.") }]
-        }, status: :not_found
+                        errors: [{ message: t("The specified resource does not exist.") }]
+                      },
+                      status: :not_found
       end
     elsif @context.respond_to?(:folders) && folder_params[:parent_folder_path].is_a?(String)
       root = Folder.root_folders(@context).first
@@ -464,9 +465,18 @@ class FoldersController < ApplicationController
 
   def process_folder_params(parameters, api_request)
     folder_params = (api_request ? parameters : parameters[:folder]) || {}
-    folder_params.permit(:name, :parent_folder_id, :parent_folder_path, :folder_id,
-                         :source_folder_id, :lock_at, :unlock_at, :locked,
-                         :hidden, :context, :position, :just_hide)
+    folder_params.permit(:name,
+                         :parent_folder_id,
+                         :parent_folder_path,
+                         :folder_id,
+                         :source_folder_id,
+                         :lock_at,
+                         :unlock_at,
+                         :locked,
+                         :hidden,
+                         :context,
+                         :position,
+                         :just_hide)
   end
   private :process_folder_params
 

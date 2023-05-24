@@ -27,6 +27,7 @@
 require "broadcast_policy"
 require_relative "support/mock_notifier"
 require_relative "support/mock_notification_finder"
+require_relative "support/mock_suspended_user"
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true

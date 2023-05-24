@@ -168,13 +168,15 @@ module CollaborationsSpecsCommon
   def display_new_form_if_none_exist(type)
     ensure_plugin(type)
     validate_collaborations(%W[/courses/#{@course.id}/collaborations
-                               /courses/#{@course.id}/collaborations#add_collaboration], true)
+                               /courses/#{@course.id}/collaborations#add_collaboration],
+                            true)
   end
 
   def hide_new_form_if_exists(type, title)
     create_collaboration!(type, title)
     validate_collaborations(%W[/courses/#{@course.id}/collaborations
-                               /courses/#{@course.id}/collaborations#add_collaboration], false)
+                               /courses/#{@course.id}/collaborations#add_collaboration],
+                            false)
   end
 
   def open_form_if_last_was_deleted(type, title)
@@ -208,7 +210,9 @@ module CollaborationsSpecsCommon
   def leave_new_form_open_when_last_is_deleted(type, title)
     create_collaboration!(type, title)
     validate_collaborations(%W[/courses/#{@course.id}/collaborations
-                               /courses/#{@course.id}/collaborations#add_collaboration], false, true)
+                               /courses/#{@course.id}/collaborations#add_collaboration],
+                            false,
+                            true)
     f(".add_collaboration_link").click
     delete_collaboration(@collaboration, type)
     expect_form_to_be_visible

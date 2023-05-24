@@ -41,14 +41,19 @@ class UpdateCollationKeyIndexes < ActiveRecord::Migration[5.0]
     end
 
     rename_index :users, :index_users_on_sortable_name, :index_users_on_sortable_name_old
-    rename_index :attachments, :index_attachments_on_folder_id_and_file_state_and_display_name,
+    rename_index :attachments,
+                 :index_attachments_on_folder_id_and_file_state_and_display_name,
                  :index_attachments_on_folder_id_and_file_state_and_display_name1
 
-    add_index :users, "#{collkey}.collkey(sortable_name, 'root', false, 3, true)",
-              algorithm: :concurrently, name: :index_users_on_sortable_name
+    add_index :users,
+              "#{collkey}.collkey(sortable_name, 'root', false, 3, true)",
+              algorithm: :concurrently,
+              name: :index_users_on_sortable_name
 
-    add_index :attachments, "folder_id, file_state, #{collkey}.collkey(display_name, 'root', false, 3, true)",
-              algorithm: :concurrently, name: :index_attachments_on_folder_id_and_file_state_and_display_name,
+    add_index :attachments,
+              "folder_id, file_state, #{collkey}.collkey(display_name, 'root', false, 3, true)",
+              algorithm: :concurrently,
+              name: :index_attachments_on_folder_id_and_file_state_and_display_name,
               where: "folder_id IS NOT NULL"
   end
 end

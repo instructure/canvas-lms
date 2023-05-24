@@ -93,8 +93,12 @@ describe Quizzes::QuizReportSerializer do
 
   context "format independent" do
     %w[
-      report_type readable_type includes_all_versions anonymous
-      created_at updated_at
+      report_type
+      readable_type
+      includes_all_versions
+      anonymous
+      created_at
+      updated_at
     ].each do |attr|
       it "serializes #{attr}" do
         expect(json[attr]).to eq statistics.send(attr)

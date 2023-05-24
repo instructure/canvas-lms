@@ -275,8 +275,11 @@ describe LiveEventsObserver do
     it "posts a create event when a submission is first created in an submitted state" do
       expect(Canvas::LiveEvents).to receive(:submission_created).once
       Submission.create!(
-        assignment: assignment_model, user: user_model, workflow_state: "submitted",
-        submitted_at: Time.zone.now, submission_type: "online_url"
+        assignment: assignment_model,
+        user: user_model,
+        workflow_state: "submitted",
+        submitted_at: Time.zone.now,
+        submission_type: "online_url"
       )
     end
 

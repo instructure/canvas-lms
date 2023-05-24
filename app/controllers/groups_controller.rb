@@ -151,8 +151,15 @@ class GroupsController < ApplicationController
   include K5Mode
 
   SETTABLE_GROUP_ATTRIBUTES = %w[
-    name description join_level is_public group_category avatar_attachment
-    storage_quota_mb max_membership leader
+    name
+    description
+    join_level
+    is_public
+    group_category
+    avatar_attachment
+    storage_quota_mb
+    max_membership
+    leader
   ].freeze
 
   include TextHelper
@@ -356,8 +363,11 @@ class GroupsController < ApplicationController
         @paginated_groups = Api.paginate(all_groups, self, path)
         render json: @paginated_groups.map { |g|
           include_inactive_users = value_to_boolean(params[:include_inactive_users])
-          group_json(g, @current_user, session, include: Array(params[:include]),
-                                                include_inactive_users: include_inactive_users)
+          group_json(g,
+                     @current_user,
+                     session,
+                     include: Array(params[:include]),
+                     include_inactive_users: include_inactive_users)
         }
       end
     end
@@ -593,8 +603,15 @@ class GroupsController < ApplicationController
   def update
     find_group
     group_params = api_request? ? params : params.require(:group)
-    attrs = group_params.permit(:name, :description, :join_level, :is_public, :avatar_id, :storage_quota_mb, :max_membership,
-                                leader: strong_anything, members: strong_anything)
+    attrs = group_params.permit(:name,
+                                :description,
+                                :join_level,
+                                :is_public,
+                                :avatar_id,
+                                :storage_quota_mb,
+                                :max_membership,
+                                leader: strong_anything,
+                                members: strong_anything)
     attrs[:leader] = nil if group_params.key?(:leader) && group_params[:leader].blank?
 
     if !api_request? && params[:group][:group_category_id]

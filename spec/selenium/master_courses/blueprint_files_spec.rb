@@ -29,15 +29,19 @@ describe "blueprint courses - file locking" do
       @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @filename = "file.txt"
-      @original_file = Attachment.create!(filename: @filename, uploaded_data: StringIO.new("1"),
-                                          folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+      @original_file = Attachment.create!(filename: @filename,
+                                          uploaded_data: StringIO.new("1"),
+                                          folder: Folder.root_folders(@copy_from).first,
+                                          context: @copy_from)
       @tag = @template.create_content_tag_for!(@original_file)
 
       course_with_teacher(active_all: true)
       @copy_to = @course
       @template.add_child_course!(@copy_to)
-      @file_copy = Attachment.create!(filename: @filename, uploaded_data: StringIO.new("1"),
-                                      folder: Folder.root_folders(@copy_to).first, context: @copy_to,
+      @file_copy = Attachment.create!(filename: @filename,
+                                      uploaded_data: StringIO.new("1"),
+                                      folder: Folder.root_folders(@copy_to).first,
+                                      context: @copy_to,
                                       migration_id: @tag.migration_id)
     end
 
@@ -108,8 +112,10 @@ describe "blueprint courses - file locking" do
       @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @filename = "file.txt"
-      @original_file = Attachment.create!(filename: @filename, uploaded_data: StringIO.new("1"),
-                                          folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+      @original_file = Attachment.create!(filename: @filename,
+                                          uploaded_data: StringIO.new("1"),
+                                          folder: Folder.root_folders(@copy_from).first,
+                                          context: @copy_from)
       @tag = @template.create_content_tag_for!(@original_file)
     end
 

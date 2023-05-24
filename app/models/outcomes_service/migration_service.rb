@@ -123,7 +123,8 @@ module OutcomesService
         if /^2/.match?(response.code.to_s)
           json = JSON.parse(response.body)
           json["missing_alignments"]&.each do |missing_alignment|
-            page = lookup_artifact(missing_alignment["artifact_type"], missing_alignment["artifact_id"],
+            page = lookup_artifact(missing_alignment["artifact_type"],
+                                   missing_alignment["artifact_id"],
                                    import_data[:course])
             if page.nil?
               import_data[:content_migration].add_warning(I18n.t("Unable to align some outcomes to a page"))

@@ -109,7 +109,9 @@ describe "better_file_browsing" do
       before :once do
         @folder = folder_model(name: "restricted_folder", context: @course)
         @file = add_file(fixture_file_upload("example.pdf", "application/pdf"),
-                         @course, "example.pdf", @folder)
+                         @course,
+                         "example.pdf",
+                         @folder)
       end
 
       it "does not return files from hidden folders in search results", priority: "1" do

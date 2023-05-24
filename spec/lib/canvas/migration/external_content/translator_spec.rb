@@ -99,8 +99,11 @@ describe Canvas::Migration::ExternalContent::Translator do
       template = MasterCourses::MasterTemplate.create!(course: @course)
       mm = template.master_migrations.create!
       @cm = @course.content_migrations.create!
-      ce = ContentExport.create!(export_type: ContentExport::MASTER_COURSE_COPY, content_migration: @cm,
-                                 context: @course, workflow_state: "active", settings: { master_migration_id: mm.id })
+      ce = ContentExport.create!(export_type: ContentExport::MASTER_COURSE_COPY,
+                                 content_migration: @cm,
+                                 context: @course,
+                                 workflow_state: "active",
+                                 settings: { master_migration_id: mm.id })
       @translator = described_class.new(content_export: ce)
     end
 

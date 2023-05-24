@@ -41,9 +41,12 @@ module SIS
     end
 
     class Work
-      attr_accessor :success_count, :users_to_set_sis_batch_ids,
-                    :pseudos_to_set_sis_batch_ids, :users_to_add_account_associations,
-                    :users_to_update_account_associations, :roll_back_data
+      attr_accessor :success_count,
+                    :users_to_set_sis_batch_ids,
+                    :pseudos_to_set_sis_batch_ids,
+                    :users_to_add_account_associations,
+                    :users_to_update_account_associations,
+                    :roll_back_data
 
       def initialize(batch, root_account, logger, messages)
         @batch = batch

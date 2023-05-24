@@ -29,11 +29,13 @@ ready(() => {
   Array.from(menuElements).forEach(el => {
     const courseId = el.getAttribute('data-course-id')
     const moduleId = el.getAttribute('data-module-id')
+    const moduleName = el.closest('.context_module').querySelector('.ig-header-title').textContent
     const published = el.getAttribute('data-published') === 'true'
     ReactDOM.render(
       <ContextModulesPublishIcon
         courseId={courseId}
         moduleId={moduleId}
+        moduleName={moduleName}
         published={published}
         isPublishing={false}
         disabled={false}

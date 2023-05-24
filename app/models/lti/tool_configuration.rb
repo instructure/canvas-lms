@@ -54,7 +54,7 @@ module Lti
         false
       )
       tool.developer_key = developer_key
-      tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || canvas_extensions["privacy_level"] || DEFAULT_PRIVACY_LEVEL
+      tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || privacy_level || DEFAULT_PRIVACY_LEVEL
       tool
     end
 
@@ -88,6 +88,12 @@ module Lti
           disabled_placements: tool_configuration_params[:disabled_placements]
         )
       end
+    end
+
+    # temporary measure since the actual privacy_level column is currently unused
+    # remove in INTEROP-8055 after backfilling the column
+    def privacy_level
+      canvas_extensions["privacy_level"] || self[:privacy_level]
     end
 
     private

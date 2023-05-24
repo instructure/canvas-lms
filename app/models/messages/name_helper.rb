@@ -46,6 +46,9 @@ module Messages
     end
 
     def anonymized_user_name
+      # for anonymous discussions, just return the author name, since that is already anonymized
+      return asset.author_name if asset.is_a?(DiscussionEntry) && asset.discussion_topic.anonymous?
+
       return source_user&.short_name unless anonymized_asset?
 
       anonymous_name = I18n.t("Anonymous User")

@@ -222,11 +222,12 @@ class InfoController < ApplicationController
     HealthChecks.send_to_statsd(response, { cluster: Shard.current.database_server_id })
 
     render json: {
-      status: status,
-      readiness: readiness_response,
-      critical: components_to_hash(critical),
-      secondary: components_to_hash(secondary),
-    }, status: status
+             status: status,
+             readiness: readiness_response,
+             critical: components_to_hash(critical),
+             secondary: components_to_hash(secondary),
+           },
+           status: status
   end
 
   def components_to_hash(components)

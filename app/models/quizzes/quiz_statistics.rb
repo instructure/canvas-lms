@@ -25,8 +25,10 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   self.table_name = :quiz_statistics
 
   belongs_to :quiz, class_name: "Quizzes::Quiz"
-  has_one :csv_attachment, class_name: "Attachment", as: "context",
-                           dependent: :destroy
+  has_one :csv_attachment,
+          class_name: "Attachment",
+          as: "context",
+          dependent: :destroy
   has_one :progress, as: "context", dependent: :destroy
 
   scope :report_type, ->(type) { where(report_type: type) }

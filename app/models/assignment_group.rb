@@ -42,13 +42,18 @@ class AssignmentGroup < ActiveRecord::Base
   has_many :scores, -> { active }
   has_many :assignments, -> { order("position, due_at, title") }
 
-  has_many :active_assignments, lambda {
-    where("assignments.workflow_state<>'deleted'").order("assignments.position, assignments.due_at, assignments.title")
-  }, class_name: "Assignment", dependent: :destroy
+  has_many :active_assignments,
+           lambda {
+             where("assignments.workflow_state<>'deleted'").order("assignments.position, assignments.due_at, assignments.title")
+           },
+           class_name: "Assignment",
+           dependent: :destroy
 
-  has_many :published_assignments, lambda {
-    where(workflow_state: "published").order("assignments.position, assignments.due_at, assignments.title")
-  }, class_name: "Assignment"
+  has_many :published_assignments,
+           lambda {
+             where(workflow_state: "published").order("assignments.position, assignments.due_at, assignments.title")
+           },
+           class_name: "Assignment"
 
   validates :context_id, :context_type, :workflow_state, presence: true
   validates :rules, length: { maximum: maximum_text_length }, allow_blank: true

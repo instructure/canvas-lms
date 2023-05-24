@@ -31,32 +31,44 @@ describe SupportHelpers::Crocodoc::CrocodocFixer do
                                     submission_types: "online_text_entry,online_upload")
   end
   let!(:submission) do
-    assignment.submit_homework(student, submission_type: "online_upload",
-                                        attachments: [shardattachment])
+    assignment.submit_homework(student,
+                               submission_type: "online_upload",
+                               attachments: [shardattachment])
   end
 
   let!(:submission2) do
-    assignment.submit_homework(student, submission_type: "online_upload",
-                                        attachments: [shardattachment2])
+    assignment.submit_homework(student,
+                               submission_type: "online_upload",
+                               attachments: [shardattachment2])
   end
 
   let!(:submission3) do
-    assignment2.submit_homework(student, submission_type: "online_upload",
-                                         attachments: [shardattachment3])
+    assignment2.submit_homework(student,
+                                submission_type: "online_upload",
+                                attachments: [shardattachment3])
   end
 
   let(:shardattachment) do
-    Attachment.create!(filename: "terrible.txt", uploaded_data: StringIO.new("yo, what up?"),
-                       user: student, content_type: "application/msword", context: student)
+    Attachment.create!(filename: "terrible.txt",
+                       uploaded_data: StringIO.new("yo, what up?"),
+                       user: student,
+                       content_type: "application/msword",
+                       context: student)
   end
   let(:shardattachment2) do
-    Attachment.create!(filename: "terrible.txt", uploaded_data: StringIO.new("yo, what up?"),
-                       user: student, content_type: "application/msword", context: student)
+    Attachment.create!(filename: "terrible.txt",
+                       uploaded_data: StringIO.new("yo, what up?"),
+                       user: student,
+                       content_type: "application/msword",
+                       context: student)
   end
 
   let(:shardattachment3) do
-    Attachment.create!(filename: "terrible.txt", uploaded_data: StringIO.new("yo, what up?"),
-                       user: student, content_type: "application/msword", context: student)
+    Attachment.create!(filename: "terrible.txt",
+                       uploaded_data: StringIO.new("yo, what up?"),
+                       user: student,
+                       content_type: "application/msword",
+                       context: student)
   end
 
   let!(:crocodocument) do

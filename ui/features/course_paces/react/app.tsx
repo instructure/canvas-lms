@@ -75,7 +75,7 @@ type ResponsiveComponentProps = ComponentProps & {
   readonly responsiveSize: ResponsiveSizes
 }
 
-export const App: React.FC<ResponsiveComponentProps> = ({
+export const App = ({
   loadingMessage,
   setResponsiveSize,
   setBlueprintLocked,
@@ -86,7 +86,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
   pollForPublishStatus,
   unpublishedChanges,
   coursePace,
-}) => {
+}: ResponsiveComponentProps) => {
   const [trayOpen, setTrayOpen] = useState(false)
 
   // Start polling for publish status on mount if applicable
@@ -180,7 +180,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
   )
 }
 
-export const ResponsiveApp: React.FC<ComponentProps> = props => (
+export const ResponsiveApp = (props: ComponentProps) => (
   <Responsive
     query={{
       small: {maxWidth: '40rem'},
