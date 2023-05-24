@@ -611,6 +611,42 @@ describe "student planner" do
     end
   end
 
+  context "My Grades tray" do
+    before :once do
+      @course2 = course_factory(active_all: true)
+      @course2.enroll_student(@student1).accept!
+      @course2_assignment = @course2.assignments.create!(name: "Course 2 Assignment", points_possible: 20, submission_types: "online_text_entry")
+      @course2_assignment.grade_student(@student1, grader: @teacher, score: 14)
+    end
+
+    it "shows effective grades for student courses" do
+      user_session(@student1)
+      go_to_list_view
+      fj("button:contains('Show My Grades')").click
+      shown_grades = ff("[data-testid='my-grades-score']")
+      expect(shown_grades.map(&:text)).to eq ["No Grade", "70.00%"]
+    end
+
+    it "shows letter grades when user is quantitative data restricted" do
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # truthy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      Account.default.save!
+
+      # truthy permission(since enabled is being "not"ed)
+      Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+      Account.default.reload
+
+      user_session(@student1)
+      go_to_list_view
+      fj("button:contains('Show My Grades')").click
+      shown_grades = ff("[data-testid='my-grades-score']")
+      expect(shown_grades.map(&:text)).to eq ["No Grade", "C-"]
+    end
+  end
+
   context "interaction with ToDoSidebar" do
     before do
       user_session(@student1)

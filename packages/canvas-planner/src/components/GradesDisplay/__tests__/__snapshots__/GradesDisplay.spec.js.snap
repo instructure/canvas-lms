@@ -84,6 +84,7 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
     </div>
     <Text
       as="div"
+      data-testid="my-grades-score"
       letterSpacing="normal"
       size="large"
       weight="light"
@@ -293,6 +294,7 @@ exports[`renders some course grades 1`] = `
     </div>
     <Text
       as="div"
+      data-testid="my-grades-score"
       letterSpacing="normal"
       size="large"
       weight="light"
@@ -344,6 +346,7 @@ exports[`renders some course grades 1`] = `
     </div>
     <Text
       as="div"
+      data-testid="my-grades-score"
       letterSpacing="normal"
       size="large"
       weight="light"
@@ -395,6 +398,7 @@ exports[`renders some course grades 1`] = `
     </div>
     <Text
       as="div"
+      data-testid="my-grades-score"
       letterSpacing="normal"
       size="large"
       weight="light"

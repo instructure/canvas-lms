@@ -92,6 +92,10 @@ module Api
                   expect(json_enrollment.fetch(:computed_current_score)).to be 99.0
                 end
 
+                it "sets computed_current_letter_grade to the letter grade equivalent of the override score" do
+                  expect(json_enrollment.fetch(:computed_current_letter_grade)).to eq "A"
+                end
+
                 it "sets computed_final_grade to the override grade" do
                   expect(json_enrollment.fetch(:computed_final_grade)).to eq "A"
                 end
@@ -120,6 +124,10 @@ module Api
                   expect(json_enrollment.fetch(:computed_current_score)).to be 63.0
                 end
 
+                it "sets computed_current_letter_grade to the letter grade equivalent of the computed current score" do
+                  expect(json_enrollment.fetch(:computed_current_letter_grade)).to eq "D-"
+                end
+
                 it "sets computed_final_grade to the computed final grade" do
                   expect(json_enrollment.fetch(:computed_final_grade)).to eq "C-"
                 end
@@ -141,6 +149,10 @@ module Api
                 expect(json_enrollment.fetch(:computed_current_score)).to be 63.0
               end
 
+              it "sets computed_current_letter_grade to the letter grade equivalent of the computed current score" do
+                expect(json_enrollment.fetch(:computed_current_letter_grade)).to eq "D-"
+              end
+
               it "sets computed_final_grade to the computed final grade" do
                 expect(json_enrollment.fetch(:computed_final_grade)).to eq "C-"
               end
@@ -159,6 +171,10 @@ module Api
 
               it "sets computed_current_score to the computed current score" do
                 expect(json_enrollment.fetch(:computed_current_score)).to be 63.0
+              end
+
+              it "sets computed_current_letter_grade to the letter grade equivalent of the computed current score" do
+                expect(json_enrollment.fetch(:computed_current_letter_grade)).to eq "D-"
               end
 
               it "sets computed_final_grade to the computed final grade" do

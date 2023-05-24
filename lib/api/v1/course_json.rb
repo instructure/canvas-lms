@@ -200,6 +200,9 @@ module Api::V1
       else
         scores[:computed_current_grade] = student_enrollment.effective_current_grade
         scores[:computed_current_score] = student_enrollment.effective_current_score
+        # score_to_grade will return nil if user is not quantitative data restricted.
+        # consumers can continue using :computed_current_grade instead
+        scores[:computed_current_letter_grade] = @course.score_to_grade(student_enrollment.effective_current_score, user: @user)
         scores[:computed_final_grade] = student_enrollment.effective_final_grade
         scores[:computed_final_score] = student_enrollment.effective_final_score
       end
