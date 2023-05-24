@@ -35,18 +35,18 @@ export class GradesDisplay extends React.Component {
   static propTypes = {
     loading: bool,
     loadingError: string,
-    courses: arrayOf(shape(courseShape)).isRequired
+    courses: arrayOf(shape(courseShape)).isRequired,
   }
 
   static defaultProps = {
-    loading: false
+    loading: false,
   }
 
-  scoreString(score) {
+  scoreString(score, useThisCoercedLetterGradeInstead = null) {
     const fixedScore = parseFloat(score)
     // eslint-disable-next-line no-restricted-globals
     if (isNaN(fixedScore)) return formatMessage('No Grade')
-    return `${fixedScore.toFixed(2)}%`
+    return useThisCoercedLetterGradeInstead || `${fixedScore.toFixed(2)}%`
   }
 
   renderSpinner() {
@@ -75,7 +75,7 @@ export class GradesDisplay extends React.Component {
     return this.props.courses.map(course => {
       const courseNameStyles = {
         borderBottom: `solid thin`,
-        borderBottomColor: course.color
+        borderBottomColor: course.color,
       }
 
       return (
@@ -85,8 +85,10 @@ export class GradesDisplay extends React.Component {
               <Text transform="uppercase">{course.shortName}</Text>
             </Link>
           </div>
-          <Text as="div" size="large" weight="light">
-            {this.scoreString(course.score)}
+          <Text as="div" size="large" weight="light" data-testid="my-grades-score">
+            {course.restrictQuantitativeData
+              ? this.scoreString(course.score, course.scoreThasWasCoercedToLetterGrade)
+              : this.scoreString(course.score)}
           </Text>
         </View>
       )

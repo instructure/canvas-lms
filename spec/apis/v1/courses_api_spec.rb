@@ -205,6 +205,7 @@ describe Api::V1::Course do
           "enrollment_state" => "active",
           "limit_privileges_to_course_section" => false,
           "computed_current_score" => 95.0,
+          "computed_current_letter_grade" => nil, # this is nil because restrict_quantitative_data is off for user
           "computed_final_score" => 85.0,
           "computed_current_grade" => "A",
           "computed_final_grade" => "B",
@@ -220,22 +221,35 @@ describe Api::V1::Course do
                                                })
       end
 
+      let(:expected_result_without_unposted_with_rqd_enabled) do
+        expected_result_without_unposted.merge({ "computed_current_letter_grade" => "A" })
+      end
+
+      let(:expected_result_without_unposted_without_letter_grade) do
+        expected_result_without_unposted.except("computed_current_letter_grade")
+      end
+
+      let(:expected_result_with_unposted_without_letter_grade) do
+        expected_result_with_unposted.except("computed_current_letter_grade")
+      end
+
       it "includes computed scores" do
-        expect(json["enrollments"]).to eq [expected_result_with_unposted]
+        # since this user is a teacher, they will not get computed_current_letter_grade with their default permissions
+        expect(json["enrollments"]).to eq [expected_result_with_unposted_without_letter_grade]
       end
 
       it "includes unposted scores if user has :manage_grades" do
         @course.root_account.role_overrides.create!(permission: "view_all_grades", role: teacher_role, enabled: false)
         @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: true)
 
-        expect(json["enrollments"]).to eq [expected_result_with_unposted]
+        expect(json["enrollments"]).to eq [expected_result_with_unposted_without_letter_grade]
       end
 
       it "includes unposted scores if user has :view_all_grades" do
         @course.root_account.role_overrides.create!(permission: "view_all_grades", role: teacher_role, enabled: true)
         @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
 
-        expect(json["enrollments"]).to eq [expected_result_with_unposted]
+        expect(json["enrollments"]).to eq [expected_result_with_unposted_without_letter_grade]
       end
 
       it "does not include unposted scores if user does not have permission" do
@@ -243,6 +257,24 @@ describe Api::V1::Course do
         @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
 
         expect(json["enrollments"]).to eq [expected_result_without_unposted]
+      end
+
+      it "includes computed_current_letter_grade for rqd enabled user who does not have instructor typical permissions" do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+
+        @course.root_account.role_overrides.create!(permission: "view_all_grades", role: teacher_role, enabled: false)
+        @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
+
+        expect(json["enrollments"]).to eq [expected_result_without_unposted_with_rqd_enabled]
       end
     end
 

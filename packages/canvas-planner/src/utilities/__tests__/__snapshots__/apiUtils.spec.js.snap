@@ -5,7 +5,9 @@ Object {
   "courseId": "42",
   "grade": "D",
   "hasGradingPeriods": true,
+  "restrictQuantitativeData": undefined,
   "score": 42.34,
+  "scoreThasWasCoercedToLetterGrade": undefined,
 }
 `;
 
@@ -14,7 +16,9 @@ Object {
   "courseId": "42",
   "grade": "F",
   "hasGradingPeriods": false,
+  "restrictQuantitativeData": undefined,
   "score": 34.42,
+  "scoreThasWasCoercedToLetterGrade": undefined,
 }
 `;
 
