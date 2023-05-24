@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {CanvasId} from './types'
-// @ts-ignore
+
 import {IconMiniArrowDownLine, IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
@@ -31,9 +30,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('context_modules_publish_icon')
 
 interface Props {
-  readonly courseId: CanvasId
-  readonly moduleId: CanvasId
-  readonly moduleName: string
+  readonly courseId: string | number
+  readonly moduleId: string | number
   readonly published: boolean | undefined
   readonly isPublishing: boolean
   readonly loadingMessage?: string
@@ -42,14 +40,13 @@ interface Props {
 // TODO: remove and replace MenuItem with Menu.Item below when on v8
 const {Item: MenuItem} = Menu as any
 
-const ContextModulesPublishIcon = ({
+const ContextModulesPublishIcon: React.FC<Props> = ({
   courseId,
   moduleId,
-  moduleName,
   published,
   isPublishing,
   loadingMessage,
-}: Props) => {
+}) => {
   const statusIcon = () => {
     const iconStyles = {
       paddingLeft: '0.25rem',
@@ -94,10 +91,7 @@ const ContextModulesPublishIcon = ({
         placement="bottom"
         show={isPublishing ? false : undefined}
         trigger={
-          <IconButton
-            withBorder={false}
-            screenReaderLabel={I18n.t('%{moduleName} Module publish options', {moduleName})}
-          >
+          <IconButton withBorder={false} screenReaderLabel={I18n.t('Module publish menu')}>
             {statusIcon()}
           </IconButton>
         }

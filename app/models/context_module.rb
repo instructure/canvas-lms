@@ -91,7 +91,7 @@ class ContextModule < ActiveRecord::Base
       progression_scope = context_module_progressions.where(current: true).where.not(workflow_state: "locked")
       progression_scope = progression_scope.where(user_id: student_ids) if student_ids
 
-      if progression_scope.in_batches(of: 10_000).update_all(["workflow_state = 'locked', lock_version = lock_version + 1, current = ?", false]) > 0
+      if progression_scope.update_all(["workflow_state = 'locked', lock_version = lock_version + 1, current = ?", false]) > 0
         delay_if_production(n_strand: ["evaluate_module_progressions", global_context_id],
                             singleton: "evaluate_module_progressions:#{global_id}")
           .evaluate_all_progressions
@@ -105,7 +105,7 @@ class ContextModule < ActiveRecord::Base
 
   def invalidate_progressions
     self.class.connection.after_transaction_commit do
-      if context_module_progressions.where(current: true).in_batches(of: 10_000).update_all(current: false) > 0
+      if context_module_progressions.where(current: true).update_all(current: false) > 0
         # don't queue a job unless necessary
         delay_if_production(n_strand: ["evaluate_module_progressions", global_context_id],
                             singleton: "evaluate_module_progressions:#{global_id}")
@@ -787,13 +787,9 @@ class ContextModule < ActiveRecord::Base
       next if tags.any? { |tag| tag.content_type == item.class_name && tag.content_id == item.id }
 
       state = (item.respond_to?(:published?) && !item.published?) ? "unpublished" : "active"
-      new_tags << content_tags.create!(context: context,
-                                       title: Context.asset_name(item),
-                                       content: item,
-                                       tag_type: "context_module",
-                                       indent: 0,
-                                       position: next_pos,
-                                       workflow_state: state)
+      new_tags << content_tags.create!(context: context, title: Context.asset_name(item), content: item,
+                                       tag_type: "context_module", indent: 0,
+                                       position: next_pos, workflow_state: state)
       next_pos += 1
     end
 

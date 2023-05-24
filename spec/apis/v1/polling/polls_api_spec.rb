@@ -89,11 +89,8 @@ describe Polling::PollsController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}",
-                  { controller: "polling/polls",
-                    action: "show",
-                    format: "json",
-                    id: @poll.id.to_s },
-                  data)
+                  { controller: "polling/polls", action: "show", format: "json",
+                    id: @poll.id.to_s }, data)
     end
 
     it "retrieves the poll specified" do
@@ -161,9 +158,7 @@ describe Polling::PollsController, type: :request do
       helper.call(:post,
                   "/api/v1/polls",
                   { controller: "polling/polls", action: "create", format: "json" },
-                  { polls: [params] },
-                  {},
-                  {})
+                  { polls: [params] }, {}, {})
     end
 
     context "as a teacher" do
@@ -193,13 +188,9 @@ describe Polling::PollsController, type: :request do
 
       helper.call(:put,
                   "/api/v1/polls/#{@poll.id}",
-                  { controller: "polling/polls",
-                    action: "update",
-                    format: "json",
+                  { controller: "polling/polls", action: "update", format: "json",
                     id: @poll.id.to_s },
-                  { polls: [params] },
-                  {},
-                  {})
+                  { polls: [params] }, {}, {})
     end
 
     context "as a teacher" do
@@ -236,13 +227,9 @@ describe Polling::PollsController, type: :request do
     def delete_destroy
       raw_api_call(:delete,
                    "/api/v1/polls/#{@poll.id}",
-                   { controller: "polling/polls",
-                     action: "destroy",
-                     format: "json",
+                   { controller: "polling/polls", action: "destroy", format: "json",
                      id: @poll.id.to_s },
-                   {},
-                   {},
-                   {})
+                   {}, {}, {})
     end
 
     context "as a teacher" do

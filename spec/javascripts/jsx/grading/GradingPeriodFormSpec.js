@@ -27,8 +27,6 @@ import timezone from 'timezone'
 import fakeENV from 'helpers/fakeENV'
 import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
-const dateTimeFormatter = new Intl.DateTimeFormat('en', {second: 'numeric'})
-
 QUnit.module('GradingPeriodForm', suiteHooks => {
   let gradingPeriod
   let props
@@ -288,7 +286,8 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
       setDateInputValue('Close Date', 'Dec 31, 2015 11pm')
 
       const closeDate = tz.parse(wrapper.state().period.closeDate)
-      strictEqual(dateTimeFormatter.format(closeDate), '59')
+      const fmtr = new Intl.DateTimeFormat('en', {second: 'numeric'})
+      strictEqual(fmtr.format(closeDate), '59')
     })
   })
 

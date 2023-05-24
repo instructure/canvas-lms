@@ -35,8 +35,14 @@ end
 RSpec.shared_context "JWT setup" do
   include_context "services JWT wrapper"
 
-  let(:fake_encryption_secret) { "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;" }
   let(:fake_signing_secret) { "asdfasdfasdfasdfasdfasdfasdfasdf" }
+  let(:fake_encryption_secret) { "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;" }
+  let(:fake_secrets) do
+    {
+      "signing-secret" => fake_signing_secret,
+      "encryption-secret" => fake_encryption_secret
+    }
+  end
   let(:fallback_proxy) do
     DynamicSettings::FallbackProxy.new({
                                          CanvasSecurity::KeyStorage::PAST => CanvasSecurity::KeyStorage.new_key,
@@ -46,12 +52,8 @@ RSpec.shared_context "JWT setup" do
   end
 
   before do
-    allow(Rails).to receive(:application).and_return(instance_double("Rails::Application", credentials: {})) unless Rails.application.present?
-
-    allow(Rails.application.credentials).to receive(:dig).and_call_original
-    allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :encryption_secret).and_return(fake_encryption_secret)
-    allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :signing_secret).and_return(fake_signing_secret)
-
+    allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+    allow(DynamicSettings).to receive(:find).with("canvas").and_return(fake_secrets)
     allow(DynamicSettings).to receive(:kv_proxy).and_return(fallback_proxy)
   end
 
@@ -67,17 +69,20 @@ end
 RSpec.shared_context "JWT setup with deprecated secret" do
   include_context "services JWT wrapper"
 
-  let(:fake_encryption_secret) { "qrstuvwxyzqrstuvwxyzqrstuvwxyzqr" }
   let(:fake_signing_secret) { "abcdefghijklmnopabcdefghijklmnop" }
-  let(:fake_signing_secret_deprecated) { "nowiknowmyabcsnexttimewontyou..." }
+  let(:fake_encryption_secret) { "qrstuvwxyzqrstuvwxyzqrstuvwxyzqr" }
+  let(:fake_deprecated_signing_secret) { "nowiknowmyabcsnexttimewontyou..." }
+  let(:fake_secrets) do
+    {
+      "signing-secret" => fake_signing_secret,
+      "encryption-secret" => fake_encryption_secret,
+      "signing-secret-deprecated" => fake_deprecated_signing_secret
+    }
+  end
 
   before do
-    allow(Rails).to receive(:application).and_return(instance_double("Rails::Application", credentials: {})) unless Rails.application.present?
-
-    allow(Rails.application.credentials).to receive(:dig).and_call_original
-    allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :encryption_secret).and_return(fake_encryption_secret)
-    allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :signing_secret).and_return(fake_signing_secret)
-    allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :signing_secret_deprecated).and_return(fake_signing_secret_deprecated)
+    allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+    allow(DynamicSettings).to receive(:find).with("canvas").and_return(fake_secrets)
   end
 
   after do

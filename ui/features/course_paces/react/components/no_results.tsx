@@ -30,7 +30,7 @@ const I18n = useI18nScope('course_paces_no_results')
 
 const {Item: FlexItem} = Flex as any
 
-const NoResults = () => (
+const NoResults: React.FC = () => (
   <Flex direction="column" alignItems="center" justifyItems="center" padding="xx-large medium">
     <FlexItem margin="0 0 medium">
       <Img src={SpacePandaUrl} />

@@ -76,8 +76,7 @@ module MicrosoftSync
       MembershipDiff.in_slices_of(
         aads_with_action(:add_owner),
         aads_with_action(:add_member),
-        slice_size,
-        &blk
+        slice_size, &blk
       )
     end
 
@@ -85,8 +84,7 @@ module MicrosoftSync
       MembershipDiff.in_slices_of(
         aads_with_action(:remove_owner),
         aads_with_action(:remove_member),
-        slice_size,
-        &blk
+        slice_size, &blk
       )
     end
 

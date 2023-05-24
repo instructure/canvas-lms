@@ -143,12 +143,8 @@ describe "API Authentication", type: :request do
           expect(response).to be_successful
           json = JSON.parse(response.body)
           expect(json.size).to eq 1
-          expect(json.first["enrollments"]).to eq [{ "type" => "teacher",
-                                                     "role" => "TeacherEnrollment",
-                                                     "role_id" => teacher_role.id,
-                                                     "user_id" => @user.id,
-                                                     "enrollment_state" => "invited",
-                                                     "limit_privileges_to_course_section" => false }]
+          expect(json.first["enrollments"]).to eq [{ "type" => "teacher", "role" => "TeacherEnrollment", "role_id" => teacher_role.id,
+                                                     "user_id" => @user.id, "enrollment_state" => "invited", "limit_privileges_to_course_section" => false }]
           expect(AccessToken.authenticate(token)).to eq AccessToken.last
           expect(AccessToken.last.purpose).to eq "fun"
 
@@ -403,9 +399,8 @@ describe "API Authentication", type: :request do
               expect(code).to be_present
 
               # exchange the code for the token
-              post "/login/oauth2/token",
-                   params: { code: code },
-                   headers: { "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
+              post "/login/oauth2/token", params: { code: code },
+                                          headers: { "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
               expect(response).to be_successful
               expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
               json = JSON.parse(response.body)
@@ -417,12 +412,8 @@ describe "API Authentication", type: :request do
               expect(response).to be_successful
               json = JSON.parse(response.body)
               expect(json.size).to eq 1
-              expect(json.first["enrollments"]).to eq [{ "type" => "teacher",
-                                                         "role" => "TeacherEnrollment",
-                                                         "role_id" => teacher_role.id,
-                                                         "user_id" => @user.id,
-                                                         "enrollment_state" => "invited",
-                                                         "limit_privileges_to_course_section" => false }]
+              expect(json.first["enrollments"]).to eq [{ "type" => "teacher", "role" => "TeacherEnrollment", "role_id" => teacher_role.id,
+                                                         "user_id" => @user.id, "enrollment_state" => "invited", "limit_privileges_to_course_section" => false }]
               expect(AccessToken.last).to eq AccessToken.authenticate(token)
             end
           end
@@ -484,9 +475,8 @@ describe "API Authentication", type: :request do
               expect(code).to be_present
 
               # exchange the code for the token
-              post "/login/oauth2/token",
-                   params: { code: code },
-                   headers: { "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
+              post "/login/oauth2/token", params: { code: code },
+                                          headers: { "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
               expect(response).to be_successful
               expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
               JSON.parse(response.body)
@@ -876,13 +866,8 @@ describe "API Authentication", type: :request do
       account_admin_user(account: Account.site_admin)
       user_with_pseudonym(user: @user)
 
-      json = api_call(:get,
-                      "/api/v1/users/self/profile?as_user_id=#{@student.id}",
-                      controller: "profile",
-                      action: "settings",
-                      user_id: "self",
-                      format: "json",
-                      as_user_id: @student.id.to_param)
+      json = api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@student.id}",
+                      controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: @student.id.to_param)
       expect(assigns["current_user"]).to eq @student
       expect(assigns["current_pseudonym"]).to eq @student_pseudonym
       expect(assigns["real_current_user"]).to eq @user
@@ -908,13 +893,8 @@ describe "API Authentication", type: :request do
       # as_user_id is ignored if it's not allowed
       @user = @student
       user_with_pseudonym(user: @user, username: "nobody2@example.com")
-      raw_api_call(:get,
-                   "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
-                   controller: "profile",
-                   action: "settings",
-                   user_id: "self",
-                   format: "json",
-                   as_user_id: @admin.id.to_param)
+      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
+                   controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: @admin.id.to_param)
       expect(assigns["current_user"]).to eq @student
       expect(assigns["real_current_user"]).to be_nil
       expect(json).to eq({
@@ -936,13 +916,8 @@ describe "API Authentication", type: :request do
                          })
 
       # as_user_id is ignored if it's blank
-      raw_api_call(:get,
-                   "/api/v1/users/self/profile?as_user_id=",
-                   controller: "profile",
-                   action: "settings",
-                   user_id: "self",
-                   format: "json",
-                   as_user_id: "")
+      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=",
+                   controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: "")
       expect(assigns["current_user"]).to eq @student
       expect(assigns["real_current_user"]).to be_nil
       expect(json).to eq({
@@ -969,13 +944,8 @@ describe "API Authentication", type: :request do
       user_with_pseudonym(user: @user)
       @student_pseudonym.update_attribute(:sis_user_id, "1234")
 
-      json = api_call(:get,
-                      "/api/v1/users/self/profile?as_user_id=sis_user_id:#{@student.pseudonym.sis_user_id}",
-                      controller: "profile",
-                      action: "settings",
-                      user_id: "self",
-                      format: "json",
-                      as_user_id: "sis_user_id:#{@student.pseudonym.sis_user_id.to_param}")
+      json = api_call(:get, "/api/v1/users/self/profile?as_user_id=sis_user_id:#{@student.pseudonym.sis_user_id}",
+                      controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: "sis_user_id:#{@student.pseudonym.sis_user_id.to_param}")
       expect(assigns["current_user"]).to eq @student
       expect(assigns["real_current_pseudonym"]).to eq @pseudonym
       expect(assigns["real_current_user"]).to eq @user
@@ -1004,13 +974,8 @@ describe "API Authentication", type: :request do
       @student_pseudonym.update_attribute(:integration_id, "1234")
       @student_pseudonym.update_attribute(:sis_user_id, "1234")
 
-      json = api_call(:get,
-                      "/api/v1/users/self/profile?as_user_id=sis_integration_id:#{@student.pseudonym.integration_id}",
-                      controller: "profile",
-                      action: "settings",
-                      user_id: "self",
-                      format: "json",
-                      as_user_id: "sis_integration_id:#{@student.pseudonym.integration_id.to_param}")
+      json = api_call(:get, "/api/v1/users/self/profile?as_user_id=sis_integration_id:#{@student.pseudonym.integration_id}",
+                      controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: "sis_integration_id:#{@student.pseudonym.integration_id.to_param}")
       expect(assigns["current_user"]).to eq @student
       expect(assigns["real_current_pseudonym"]).to eq @pseudonym
       expect(assigns["real_current_user"]).to eq @user
@@ -1037,13 +1002,8 @@ describe "API Authentication", type: :request do
       account_admin_user(account: Account.site_admin)
       user_with_pseudonym(user: @user)
 
-      raw_api_call(:get,
-                   "/api/v1/users/self/profile?as_user_id=sis_user_id:bogus",
-                   controller: "profile",
-                   action: "settings",
-                   user_id: "self",
-                   format: "json",
-                   as_user_id: "sis_user_id:bogus")
+      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=sis_user_id:bogus",
+                   controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: "sis_user_id:bogus")
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ "errors" => "Invalid as_user_id" })
     end
@@ -1052,13 +1012,8 @@ describe "API Authentication", type: :request do
       account_admin_user(account: Account.site_admin)
 
       @user = @student
-      raw_api_call(:get,
-                   "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
-                   controller: "profile",
-                   action: "settings",
-                   user_id: "self",
-                   format: "json",
-                   as_user_id: @admin.id.to_param)
+      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
+                   controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: @admin.id.to_param)
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ "errors" => "Invalid as_user_id" })
     end
@@ -1070,13 +1025,8 @@ describe "API Authentication", type: :request do
       admin = @user
       user_with_pseudonym(user: admin)
 
-      raw_api_call(:get,
-                   "/api/v1/users/self/profile?as_user_id=#{deleted.id}",
-                   controller: "profile",
-                   action: "settings",
-                   user_id: "self",
-                   format: "json",
-                   as_user_id: deleted.id.to_s)
+      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{deleted.id}",
+                   controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: deleted.id.to_s)
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ "errors" => "Invalid as_user_id" })
     end
@@ -1088,13 +1038,8 @@ describe "API Authentication", type: :request do
 
       account_admin_user(account: Account.site_admin)
 
-      raw_api_call(:get,
-                   "/api/v1/users/self/profile?as_user_id=#{from_user.id}",
-                   controller: "profile",
-                   action: "settings",
-                   user_id: "self",
-                   format: "json",
-                   as_user_id: from_user.id.to_s)
+      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{from_user.id}",
+                   controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: from_user.id.to_s)
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ "errors" => "Invalid as_user_id", "merged_into_user_id" => to_user.id })
     end

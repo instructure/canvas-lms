@@ -175,9 +175,7 @@ module Outcomes
         if prior.present? && prior < points
           raise InvalidDataError, I18n.t(
             "Points for tier %{index} must be less than points for prior tier (%{points} is greater than %{prior})",
-            index: index,
-            prior: prior,
-            points: points
+            index: index, prior: prior, points: points
           )
         end
 

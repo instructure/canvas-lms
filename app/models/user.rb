@@ -40,18 +40,8 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
-  self.ignored_columns += %i[type
-                             creation_unique_id
-                             creation_sis_batch_id
-                             creation_email
-                             sis_name
-                             bio
-                             merge_to
-                             unread_inbox_items_count
-                             visibility
-                             account_pronoun_id
-                             gender
-                             birthdate]
+  self.ignored_columns += %i[type creation_unique_id creation_sis_batch_id creation_email
+                             sis_name bio merge_to unread_inbox_items_count visibility account_pronoun_id gender birthdate]
 
   include Context
   include ModelCache
@@ -94,44 +84,20 @@ class User < ActiveRecord::Base
 
   has_many :observer_pairing_codes, -> { where("workflow_state<>'deleted' AND expires_at > ?", Time.zone.now) }, dependent: :destroy, inverse_of: :user
 
-  has_many :as_student_observation_links,
-           -> { where.not(workflow_state: "deleted") },
-           class_name: "UserObservationLink",
-           foreign_key: :user_id,
-           dependent: :destroy,
-           inverse_of: :student
-  has_many :as_observer_observation_links,
-           -> { where.not(workflow_state: "deleted") },
-           class_name: "UserObservationLink",
-           foreign_key: :observer_id,
-           dependent: :destroy,
-           inverse_of: :observer
+  has_many :as_student_observation_links, -> { where.not(workflow_state: "deleted") }, class_name: "UserObservationLink",
+                                                                                       foreign_key: :user_id, dependent: :destroy, inverse_of: :student
+  has_many :as_observer_observation_links, -> { where.not(workflow_state: "deleted") }, class_name: "UserObservationLink",
+                                                                                        foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
 
-  has_many :as_student_observer_alert_thresholds,
-           -> { where.not(workflow_state: "deleted") },
-           class_name: "ObserverAlertThreshold",
-           foreign_key: :user_id,
-           dependent: :destroy,
-           inverse_of: :student
-  has_many :as_student_observer_alerts,
-           -> { where.not(workflow_state: "deleted") },
-           class_name: "ObserverAlert",
-           foreign_key: :user_id,
-           dependent: :destroy,
-           inverse_of: :student
+  has_many :as_student_observer_alert_thresholds, -> { where.not(workflow_state: "deleted") }, class_name: "ObserverAlertThreshold",
+                                                                                               foreign_key: :user_id, dependent: :destroy, inverse_of: :student
+  has_many :as_student_observer_alerts, -> { where.not(workflow_state: "deleted") }, class_name: "ObserverAlert",
+                                                                                     foreign_key: :user_id, dependent: :destroy, inverse_of: :student
 
-  has_many :as_observer_observer_alert_thresholds,
-           -> { where.not(workflow_state: "deleted") },
-           class_name: "ObserverAlertThreshold",
-           foreign_key: :observer_id,
-           dependent: :destroy,
-           inverse_of: :observer
-  has_many :as_observer_observer_alerts,
-           -> { where.not(workflow_state: "deleted") },
-           class_name: "ObserverAlert",
-           foreign_key: :observer_id,
-           dependent: :destroy,
-           inverse_of: :observer
+  has_many :as_observer_observer_alert_thresholds, -> { where.not(workflow_state: "deleted") }, class_name: "ObserverAlertThreshold",
+                                                                                                foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
+  has_many :as_observer_observer_alerts, -> { where.not(workflow_state: "deleted") }, class_name: "ObserverAlert",
+                                                                                      foreign_key: :observer_id, dependent: :destroy, inverse_of: :observer
 
   has_many :linked_observers, -> { distinct }, through: :as_student_observation_links, source: :observer, class_name: "User"
   has_many :linked_students, -> { distinct }, through: :as_observer_observation_links, source: :student, class_name: "User"
@@ -214,8 +180,7 @@ class User < ActiveRecord::Base
   has_many :content_migrations, as: :context, inverse_of: :context
   has_many :content_exports, as: :context, inverse_of: :context
   has_many :usage_rights,
-           as: :context,
-           inverse_of: :context,
+           as: :context, inverse_of: :context,
            class_name: "UsageRights",
            dependent: :destroy
   has_many :gradebook_csvs, dependent: :destroy, class_name: "GradebookCSV"
@@ -313,9 +278,9 @@ class User < ActiveRecord::Base
   scope :has_created_account, -> { where("users.workflow_state NOT IN ('creation_pending', 'deleted')") }
 
   scope :has_current_student_enrollments, lambda {
-    where(Enrollment.joins("JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id AND courses.workflow_state='available'")
-              .where("enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment'")
-              .arel.exists)
+    where("EXISTS (?)",
+          Enrollment.joins("JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id AND courses.workflow_state='available'")
+              .where("enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment'"))
   }
 
   scope :not_fake_student, -> { where("enrollments.type <> 'StudentViewEnrollment'") }
@@ -450,13 +415,9 @@ class User < ActiveRecord::Base
     scope.group("users.id")
   }
 
-  attr_accessor :require_acceptance_of_terms,
-                :require_presence_of_name,
-                :require_self_enrollment_code,
-                :self_enrollment_code,
-                :self_enrollment_course,
-                :validation_root_account,
-                :sortable_name_explicitly_set
+  attr_accessor :require_acceptance_of_terms, :require_presence_of_name,
+                :require_self_enrollment_code, :self_enrollment_code,
+                :self_enrollment_course, :validation_root_account, :sortable_name_explicitly_set
   attr_reader :self_enrollment
 
   validates :name, length: { maximum: maximum_string_length, allow_nil: true }
@@ -2076,8 +2037,7 @@ class User < ActiveRecord::Base
       enrollments = shard.activate do
         res = Rails.cache.fetch_with_batched_keys(
           ["current_enrollments4", opts[:include_future], ApplicationController.region].cache_key,
-          batch_object: self,
-          batched_keys: :enrollments
+          batch_object: self, batched_keys: :enrollments
         ) do
           scope = (opts[:include_future] ? self.enrollments.current_and_future : self.enrollments.current_and_invited)
           scope.shard(in_region_associated_shards).to_a
@@ -2880,10 +2840,6 @@ class User < ActiveRecord::Base
     accounts.any?(&:users_can_edit_comm_channels?)
   end
 
-  def suspended?
-    pseudonyms.shard(self).active.any?(&:suspended?)
-  end
-
   def limit_parent_app_web_access?
     pseudonyms.shard(self).active.map(&:account).any?(&:limit_parent_app_web_access?)
   end
@@ -3403,10 +3359,7 @@ class User < ActiveRecord::Base
   end
 
   def enabled_account_calendars
-    acct_cals = all_account_calendars
-    auto_sub = {
-      account_calendar_subscription_type: Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars) ? "auto" : nil
-    }
-    acct_cals.where(id: get_preference(:enabled_account_calendars) || []).or(acct_cals.where(auto_sub))
+    enabled_account_ids = get_preference(:enabled_account_calendars) || []
+    all_account_calendars.where(id: enabled_account_ids)
   end
 end

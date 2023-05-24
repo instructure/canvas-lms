@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -93,7 +92,7 @@ type Props = {
   variant: string
 }
 
-const GradebookMenu = ({courseUrl, learningMasteryEnabled, variant}: Props) => {
+const GradebookMenu: React.FC<Props> = ({courseUrl, learningMasteryEnabled, variant}) => {
   const selectedItem = variants[variant] as ActiveVariantConfig
   if (selectedItem == null) {
     return null

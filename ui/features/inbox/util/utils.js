@@ -46,7 +46,6 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
       if (isSubmissionComments) {
         const newestSubmissionComment = conversation?.commentsConnection?.nodes[0]
         inboxConversation.workflowState = conversation?.readState
-        inboxConversation.id = conversation?.id
         inboxConversation._id = conversation?._id
         inboxConversation.subject =
           newestSubmissionComment?.course.contextName +
@@ -60,7 +59,6 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
         )
         inboxConversation.messages = conversation?.commentsConnection.nodes
       } else {
-        inboxConversation.id = conversation?.id
         inboxConversation._id = conversation?.conversation?._id
         inboxConversation.subject = conversation?.conversation?.subject || ''
         inboxConversation.lastMessageCreatedAt =

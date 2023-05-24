@@ -63,10 +63,7 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
         ON CONFLICT (user_id, course_id, enrollment_type) DO UPDATE
         SET updated_at=NOW()
       ),
-      enrollment.user_id,
-      enrollment.course_id,
-      e_type,
-      enrollment.root_account_id
+      enrollment.user_id, enrollment.course_id, e_type, enrollment.root_account_id
     ]
   end
 

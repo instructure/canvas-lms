@@ -64,9 +64,7 @@ describe WillPaginateHelper do
       it "when linking to previous page" do
         link = @renderer.send(
           :previous_or_next_page,
-          2,
-          "Previous",
-          "previous_page"
+          2, "Previous", "previous_page"
         )
         expect(link).to match('aria-label="Previous Page"')
         expect(link).to match('class="previous_page"')
@@ -77,9 +75,7 @@ describe WillPaginateHelper do
       it "when linking to next page" do
         link = @renderer.send(
           :previous_or_next_page,
-          4,
-          "Next",
-          "next_page"
+          4, "Next", "next_page"
         )
         expect(link).to match('aria-label="Next Page"')
         expect(link).to match('class="next_page"')
@@ -90,9 +86,7 @@ describe WillPaginateHelper do
       it "when linking to previous page without page number" do
         link = @renderer.send(
           :previous_or_next_page,
-          nil,
-          "Previous",
-          "previous_page"
+          nil, "Previous", "previous_page"
         )
         expect(link).to match('aria-label="Previous Page"')
         expect(link).to match('class="previous_page disabled"')
@@ -103,9 +97,7 @@ describe WillPaginateHelper do
       it "when linking to next page without page number" do
         link = @renderer.send(
           :previous_or_next_page,
-          nil,
-          "Next",
-          "next_page"
+          nil, "Next", "next_page"
         )
         expect(link).to match('aria-label="Next Page"')
         expect(link).to match('class="next_page disabled"')

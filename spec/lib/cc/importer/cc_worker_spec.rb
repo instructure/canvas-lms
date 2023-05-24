@@ -21,8 +21,7 @@
 describe CC::Importer::CCWorker do
   it "sets the worker_class on the migration" do
     cm = ContentMigration.create!(migration_settings: { converter_class: CC::Importer::Canvas::Converter,
-                                                        no_archive_file: true },
-                                  context: course_factory)
+                                                        no_archive_file: true }, context: course_factory)
     cm.reset_job_progress
     expect_any_instance_of(CC::Importer::Canvas::Converter).to receive(:export).and_return({})
     worker = CC::Importer::CCWorker.new(cm.id)
@@ -32,9 +31,7 @@ describe CC::Importer::CCWorker do
 
   it "honors skip_job_progress" do
     cm = ContentMigration.create!(migration_settings: { converter_class: CC::Importer::Canvas::Converter,
-                                                        no_archive_file: true,
-                                                        skip_job_progress: true },
-                                  context: course_factory)
+                                                        no_archive_file: true, skip_job_progress: true }, context: course_factory)
     expect_any_instance_of(CC::Importer::Canvas::Converter).to receive(:export).and_return({})
     worker = CC::Importer::CCWorker.new(cm.id)
     expect(worker.perform).to be true

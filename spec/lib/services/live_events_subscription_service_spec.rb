@@ -47,10 +47,12 @@ module Services
           .and_return({
                         "app-host" => "http://example.com",
                       })
-
-        allow(Rails.application.credentials).to receive(:dig).and_call_original
-        allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :signing_secret).and_return("astringthatisactually32byteslong")
-        allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :encryption_secret).and_return("astringthatisactually32byteslong")
+        allow(DynamicSettings).to receive(:find)
+          .with("canvas")
+          .and_return({
+                        "signing-secret" => "astringthatisactually32byteslong",
+                        "encryption-secret" => "astringthatisactually32byteslong"
+                      })
       end
 
       let(:developer_key) do

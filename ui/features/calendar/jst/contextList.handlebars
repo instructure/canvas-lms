@@ -8,14 +8,12 @@
     </label>
     <div class="buttons-wrapper">
     {{#ifEqual type 'account'}}
-      {{#unless auto_subscribe}}
-        <button type="button" tabindex="0" class="Button Button--icon-action ContextList__DeleteBtn">
-          <span aria-hidden="true"><i class="icon-x"></i></span>
-          <span class="screenreader-only">
-            {{#t}}Remove {{name}} Calendar{{/t}}
-          </span>
-        </button>
-      {{/unless}}
+    <button type="button" tabindex="0" class="Button Button--icon-action ContextList__DeleteBtn">
+      <span aria-hidden="true"><i class="icon-x"></i></span>
+      <span class="screenreader-only">
+        {{#t}}Remove {{name}} Calendar{{/t}}
+      </span>
+    </button>
     {{/ifEqual}}
     <button type="button" tabindex="0" class="Button Button--icon-action ContextList__MoreBtn">
       <i class="icon-more" aria-hidden="true"></i>

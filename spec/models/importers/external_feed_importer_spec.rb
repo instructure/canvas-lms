@@ -48,8 +48,7 @@ describe Importers::ExternalFeedImporter do
     it "finds a feed by migration id" do
       found = Importers::ExternalFeedImporter.find_or_initialize_from_migration({
                                                                                   migration_id: "12345"
-                                                                                },
-                                                                                @course)
+                                                                                }, @course)
       expect(found.id).to eq @feed.id
     end
 
@@ -59,8 +58,7 @@ describe Importers::ExternalFeedImporter do
                                                                                   url: @feed.url,
                                                                                   header_match: @feed.header_match,
                                                                                   verbosity: @feed.verbosity
-                                                                                },
-                                                                                @course)
+                                                                                }, @course)
       expect(found.id).to eq @feed.id
     end
 
@@ -70,8 +68,7 @@ describe Importers::ExternalFeedImporter do
                                                                                   url: @feed.url + "xxx",
                                                                                   header_match: @feed.header_match,
                                                                                   verbosity: @feed.verbosity
-                                                                                },
-                                                                                @course)
+                                                                                }, @course)
       expect(found).to be_new_record
     end
   end

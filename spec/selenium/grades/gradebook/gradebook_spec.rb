@@ -399,8 +399,7 @@ describe "Gradebook" do
     it 'displays the "needs grading" icon for file_upload questions', priority: "1" do
       file_submission.attachments.create!({
                                             filename: "doc.doc",
-                                            display_name: "doc.doc",
-                                            user: @user,
+                                            display_name: "doc.doc", user: @user,
                                             uploaded_data: dummy_io
                                           })
       file_submission.complete!

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -53,14 +52,14 @@ export interface PassedProps {
 
 type ComponentProps = StoreProps & DispatchProps & PassedProps
 
-export const Search = ({
+export const Search: React.FC<ComponentProps> = ({
   searchTerm,
   fetchPaceContexts,
   setSearchTerm,
   contextType,
   currentOrderType,
   currentSortBy,
-}: ComponentProps) => {
+}) => {
   const handleClear = e => {
     e.stopPropagation()
     setSearchTerm('')

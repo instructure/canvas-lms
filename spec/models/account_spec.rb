@@ -27,10 +27,6 @@ describe Account do
     it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
   end
 
-  describe "validations" do
-    it { is_expected.to validate_inclusion_of(:account_calendar_subscription_type).in_array(Account::CALENDAR_SUBSCRIPTION_TYPES) }
-  end
-
   context "BASIC_COLUMNS_FOR_CALLBACKS" do
     it "can save a minimal object" do
       a = Account.select(*Account::BASIC_COLUMNS_FOR_CALLBACKS).find(Account.default.id)
@@ -381,19 +377,9 @@ describe Account do
     context "fast list" do
       it "lists associated courses" do
         expect(@account.fast_all_courses.map(&:sis_source_id).sort).to eq %w[
-          C001
-          C005
-          C006
-          C007
-          C008
-          C009
+          C001 C005 C006 C007 C008 C009
 
-          C001S
-          C005S
-          C006S
-          C007S
-          C008S
-          C009S
+          C001S C005S C006S C007S C008S C009S
         ].sort
       end
 
@@ -1190,9 +1176,7 @@ describe Account do
     end
 
     it "uses localized labels" do
-      tool = @account.context_external_tools.new(name: "bob",
-                                                 consumer_key: "test",
-                                                 shared_secret: "secret",
+      tool = @account.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret",
                                                  url: "http://example.com")
 
       account_navigation = {
@@ -1234,6 +1218,10 @@ describe Account do
     end
 
     describe "account calendars tab" do
+      before :once do
+        Account.site_admin.enable_feature! :account_calendar_events
+      end
+
       it "is shown if the user has manage_account_calendar_visibility permission" do
         account_admin_user_with_role_changes(account: @account)
         expect(@account.tabs_available(@admin).pluck(:id)).to include(Account::TAB_ACCOUNT_CALENDARS)
@@ -1241,6 +1229,12 @@ describe Account do
 
       it "is not shown if the user lacks manage_account_calendar_visibility permission" do
         account_admin_user_with_role_changes(account: @account, role_changes: { manage_account_calendar_visibility: false })
+        expect(@account.tabs_available(@admin).pluck(:id)).not_to include(Account::TAB_ACCOUNT_CALENDARS)
+      end
+
+      it "is not shown if the :account_calendar_events flag is disabled" do
+        Account.site_admin.disable_feature! :account_calendar_events
+        account_admin_user_with_role_changes(account: @account)
         expect(@account.tabs_available(@admin).pluck(:id)).not_to include(Account::TAB_ACCOUNT_CALENDARS)
       end
     end
@@ -1366,6 +1360,7 @@ describe Account do
 
     context "view_account_calendar_details permission" do
       before :once do
+        Account.site_admin.enable_feature! :account_calendar_events
         @account = Account.default
       end
 
@@ -1384,15 +1379,13 @@ describe Account do
       it "is true for an account admin without :manage_account_calendar_visibility on a visible calendar" do
         @account.account_calendar_visible = true
         @account.save!
-        account_admin_user_with_role_changes(active_all: true,
-                                             account: @account,
+        account_admin_user_with_role_changes(active_all: true, account: @account,
                                              role_changes: { manage_account_calendar_visibility: false })
         expect(@account.grants_right?(@admin, :view_account_calendar_details)).to be_truthy
       end
 
       it "is false for an account admin without :manage_account_calendar_visibility on a hidden calendar" do
-        account_admin_user_with_role_changes(active_all: true,
-                                             account: @account,
+        account_admin_user_with_role_changes(active_all: true, account: @account,
                                              role_changes: { manage_account_calendar_visibility: false })
         expect(@account.grants_right?(@admin, :view_account_calendar_details)).to be_falsey
       end

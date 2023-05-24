@@ -14,6 +14,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "i18n"
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "~> 3.12"
-  spec.add_development_dependency "simplecov", "~> 0.22"
+  spec.add_development_dependency "rspec", "~> 3.5.0"
 end

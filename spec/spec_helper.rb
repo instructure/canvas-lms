@@ -130,12 +130,10 @@ module SpecTransactionWrapper
     raise exception if exception
   end
 end
-ActionController::Base.set_callback(:process_action,
-                                    :around,
+ActionController::Base.set_callback(:process_action, :around,
                                     ->(_r, block) { SpecTransactionWrapper.wrap_block_in_transaction(block) })
 
-ActionController::Base.set_callback(:process_action,
-                                    :before,
+ActionController::Base.set_callback(:process_action, :before,
                                     ->(_r) { @streaming_template = false })
 
 module RSpec::Core::Hooks
@@ -501,7 +499,6 @@ RSpec.configure do |config|
   Onceler.configure do |c|
     c.before :record do
       reset_all_the_things!
-      Canvas::DynamoDB::DatabaseBuilder.reset
     end
   end
 
@@ -536,7 +533,6 @@ RSpec.configure do |config|
 
   config.before do
     allow(AttachmentFu::Backends::S3Backend).to receive(:load_s3_config) { StubS3::AWS_CONFIG.dup }
-    allow(Canvas::Vault).to receive(:read) { StubVault::AWS_CONFIG.dup }
   end
 
   # flush redis before the first spec, and before each spec that comes after
@@ -825,14 +821,6 @@ RSpec.configure do |config|
 
       super
     end
-  end
-
-  module StubVault
-    AWS_CONFIG = {
-      access_key: "stub_access_key",
-      secret_key: "stub_secret_key",
-      security_token: "stub_security_token"
-    }.freeze
   end
 
   def s3_storage!(opts = { stubs: true })

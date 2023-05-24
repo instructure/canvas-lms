@@ -79,7 +79,7 @@ export const ConversationListItem = ({...props}) => {
     if (e.target.getAttribute('aria-hidden') === 'true') {
       return
     }
-    props.onStar(!props.isStarred, [props.conversation])
+    props.onStar(!props.isStarred, props.conversation._id)
   }
 
   return useMemo(() => {
@@ -175,8 +175,8 @@ export const ConversationListItem = ({...props}) => {
                         onClick={e => {
                           e.stopPropagation()
                           props.isUnread
-                            ? props.onMarkAsRead(props.conversation)
-                            : props.onMarkAsUnread(props.conversation)
+                            ? props.onMarkAsRead(props.conversation._id)
+                            : props.onMarkAsUnread(props.conversation._id)
                         }}
                         screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
                         size="small"

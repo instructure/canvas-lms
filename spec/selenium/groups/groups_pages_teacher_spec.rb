@@ -75,8 +75,7 @@ describe "groups" do
       it "allows teachers to create an announcement" do
         # Checks that initial user can create an announcement
         AnnouncementNewEdit.create_group_announcement(@testgroup.first,
-                                                      "Announcement by #{@teacher.name}",
-                                                      "sup")
+                                                      "Announcement by #{@teacher.name}", "sup")
         get announcements_page
         expect(ff(".ic-announcement-row").size).to eq 1
       end
@@ -99,8 +98,7 @@ describe "groups" do
         skip_if_safari(:alert)
         @testgroup.first.announcements.create!(
           title: "Student Announcement",
-          message: "test message",
-          user:
+          message: "test message", user:
           @students.first
         )
 
@@ -144,8 +142,7 @@ describe "groups" do
           message: "The Force Awakens",
           user: @teacher
         )
-        AnnouncementNewEdit.edit_group_announcement(@testgroup.first,
-                                                    announcement,
+        AnnouncementNewEdit.edit_group_announcement(@testgroup.first, announcement,
                                                     "Canvas will be rewritten in chicken")
         announcement.reload
         # Editing *appends* to existing message, and the resulting announcement's
@@ -177,8 +174,7 @@ describe "groups" do
           message: "The Force Awakens",
           user: @students.first
         )
-        AnnouncementNewEdit.edit_group_announcement(@testgroup.first,
-                                                    announcement,
+        AnnouncementNewEdit.edit_group_announcement(@testgroup.first, announcement,
                                                     "Canvas will be rewritten in chicken")
         announcement.reload
         # Editing *appends* to existing message, and the resulting announcement's
@@ -231,10 +227,8 @@ describe "groups" do
       end
 
       it "allows teachers to access a discussion", priority: "1" do
-        dt = DiscussionTopic.create!(context: @testgroup.first,
-                                     user: @students.first,
-                                     title: "Discussion Topic",
-                                     message: "hi dudes")
+        dt = DiscussionTopic.create!(context: @testgroup.first, user: @students.first,
+                                     title: "Discussion Topic", message: "hi dudes")
         get discussions_page
         # Verifies teacher can access the group discussion & that it's the correct discussion
         expect_new_page_load { f("[data-testid='discussion-link-#{dt.id}']").click }
@@ -243,10 +237,8 @@ describe "groups" do
 
       it "allows teachers to delete their group discussions", ignore_js_errors: true, priority: "1" do
         skip_if_safari(:alert)
-        dt = DiscussionTopic.create!(context: @testgroup.first,
-                                     user: @teacher,
-                                     title: "Group Discussion",
-                                     message: "Group")
+        dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
+                                     title: "Group Discussion", message: "Group")
         get discussions_page
         expect(f("[data-testid='discussion-link-#{dt.id}']")).to be_truthy
         f(".discussions-index-manage-menu").click

@@ -142,10 +142,8 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       #
       # Also skip audit logs for internal setting mutations, which can only
       # be executed by siteadmins.
-      next if [Mutations::CreateDiscussionEntryDraft,
-               Mutations::CreateInternalSetting,
-               Mutations::UpdateInternalSetting,
-               Mutations::DeleteInternalSetting].include? mutation
+      next if [Mutations::CreateDiscussionEntryDraft, Mutations::CreateInternalSetting,
+               Mutations::UpdateInternalSetting, Mutations::DeleteInternalSetting].include? mutation
 
       logger = Logger.new(mutation, context, arguments)
 

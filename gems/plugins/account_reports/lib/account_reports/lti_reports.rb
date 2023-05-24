@@ -29,16 +29,8 @@ module AccountReports
     end
 
     def lti_report
-      headers = %w[context_type
-                   context_id
-                   account_name
-                   course_name
-                   tool_type_name
-                   tool_type_id
-                   tool_created_at
-                   privacy_level
-                   launch_url
-                   custom_fields]
+      headers = %w[context_type context_id account_name course_name tool_type_name
+                   tool_type_id tool_created_at privacy_level launch_url custom_fields]
 
       write_report headers do |csv|
         courses = add_course_sub_account_scope(root_account.all_courses).joins(:account).select(:id)
@@ -62,17 +54,14 @@ module AccountReports
                 .select("context_external_tools.*, courses.name AS course_name, accounts.name AS account_name")
         tools = tools.active unless @include_deleted
 
-        subquery = ContextExternalTool.where(courses: { id: courses })
-        subquery = if account.root_account?
-                     subquery
-                       .or(ContextExternalTool.where(accounts: { root_account_id: root_account }))
-                       .or(ContextExternalTool.where(accounts: { id: root_account }))
-                   else
-                     subquery
-                       .or(ContextExternalTool.where("accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})"))
-                       .or(ContextExternalTool.where(accounts: { id: account }))
-                   end
-        tools = tools.merge(subquery)
+        if account.root_account?
+          tools.where!("courses.id IN (:courses) OR
+                        accounts.root_account_id = :root OR accounts.id = :root", { root: root_account, courses: courses })
+        else
+          tools.where!("accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                        OR accounts.id=?
+                        OR courses.id IN (?)", account, courses)
+        end
 
         tools.find_each do |t|
           row = []

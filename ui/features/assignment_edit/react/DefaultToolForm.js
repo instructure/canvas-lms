@@ -22,7 +22,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useState, useEffect} from 'react'
 
-import {Events as SelectContentDialogEvents} from '@canvas/select-content-dialog'
+import SelectContentDialog from '@canvas/select-content-dialog'
 import usePostMessage from './hooks/usePostMessage'
 
 import {Alert} from '@instructure/ui-alerts'
@@ -61,7 +61,7 @@ const DefaultToolForm = props => {
   }, [defaultToolData, launchDefinitions])
 
   const handleLaunchButton = event => {
-    SelectContentDialogEvents.onContextExternalToolSelect(event, $('#default-tool'))
+    SelectContentDialog.Events.onContextExternalToolSelect(event, $('#default-tool'))
   }
 
   if (!defaultToolData && launchDefinitions.length > 0) {

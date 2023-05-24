@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -166,4 +165,5 @@ export type DeepMocked<T> = {
     : T[P] extends object | null | undefined
     ? DeepMocked<T[P]>
     : T[P]
-} & T & {mockClear(): void}
+} &
+  T & {mockClear(): void}

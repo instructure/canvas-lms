@@ -289,6 +289,7 @@ describe "calendar2" do
 
       context "with account level calendars" do
         before do
+          Account.site_admin.enable_feature! :account_calendar_events # if needed
           account = Account.default # or (Account.create!)
           account.account_calendar_visible = true
           account.save!

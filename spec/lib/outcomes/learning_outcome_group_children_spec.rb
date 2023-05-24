@@ -247,18 +247,9 @@ describe Outcomes::LearningOutcomeGroupChildren do
       r_outcomes = subject.suboutcomes_by_group_id(g0.id).map(&:learning_outcome_content).map(&:short_description)
       expect(r_outcomes).to match_array(
         [
-          "Outcome 1",
-          "Outcome 2.1",
-          "Outcome 2.2",
-          "Outcome 3",
-          "Outcome 4.1",
-          "Outcome 4.2",
-          "Outcome 4.3",
-          "Outcome 5",
-          "Outcome 6",
-          "Outcome 7.1",
-          "Outcome 7.2",
-          "Outcome 7.3 mathematic"
+          "Outcome 1", "Outcome 2.1", "Outcome 2.2", "Outcome 3", "Outcome 4.1",
+          "Outcome 4.2", "Outcome 4.3", "Outcome 5", "Outcome 6", "Outcome 7.1",
+          "Outcome 7.2", "Outcome 7.3 mathematic"
         ]
       )
     end
@@ -268,15 +259,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
       outcomes = subject.suboutcomes_by_group_id(g1.id).map(&:learning_outcome_content).map(&:short_description)
       expect(outcomes).to match_array(
         [
-          "Outcome 5",
-          "Outcome 2.1",
-          "Outcome 2.2",
-          "Outcome 4.3",
-          "Outcome 4.1",
-          "Outcome 4.2",
-          "Outcome 7.1",
-          "Outcome 7.2",
-          "Outcome 7.3 mathematic"
+          "Outcome 5", "Outcome 2.1", "Outcome 2.2", "Outcome 4.3", "Outcome 4.1",
+          "Outcome 4.2", "Outcome 7.1", "Outcome 7.2", "Outcome 7.3 mathematic"
         ]
       )
     end
@@ -288,18 +272,9 @@ describe Outcomes::LearningOutcomeGroupChildren do
         outcomes = subject.suboutcomes_by_group_id(g0.id).map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to match_array(
           [
-            "Outcome 3",
-            "Outcome 1",
-            "Outcome 2.1",
-            "Outcome 2.2",
-            "Outcome 4.1",
-            "Outcome 4.2",
-            "Outcome 4.3",
-            "Outcome 5",
-            "Outcome 6",
-            "Outcome 7.1",
-            "Outcome 7.2",
-            "Outcome 7.3 mathematic"
+            "Outcome 3", "Outcome 1", "Outcome 2.1", "Outcome 2.2", "Outcome 4.1",
+            "Outcome 4.2", "Outcome 4.3", "Outcome 5", "Outcome 6", "Outcome 7.1",
+            "Outcome 7.2", "Outcome 7.3 mathematic"
           ]
         )
       end
@@ -314,15 +289,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
         outcomes = subject.suboutcomes_by_group_id(g1.id).map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to match_array(
           [
-            "Outcome 2.1",
-            "Outcome 2.2",
-            "A Outcome 4.2",
-            "Outcome 4.1",
-            "Outcome 4.3",
-            "Outcome 5",
-            "Outcome 7.1",
-            "Outcome 7.2",
-            "Outcome 7.3 mathematic"
+            "Outcome 2.1", "Outcome 2.2", "A Outcome 4.2", "Outcome 4.1", "Outcome 4.3",
+            "Outcome 5", "Outcome 7.1", "Outcome 7.2", "Outcome 7.3 mathematic"
           ]
         )
       end
@@ -338,15 +306,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
         outcomes = subject.suboutcomes_by_group_id(g1.id).map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to match_array(
           [
-            "Outcome 5",
-            "Outcome 2.1",
-            "Outcome 2.2",
-            "A Outcome 4.3",
-            "Outcome 4.1",
-            "Outcome 4.2",
-            "Outcome 7.1",
-            "Outcome 7.2",
-            "Outcome 7.3 mathematic"
+            "Outcome 5", "Outcome 2.1", "Outcome 2.2", "A Outcome 4.3", "Outcome 4.1",
+            "Outcome 4.2", "Outcome 7.1", "Outcome 7.2", "Outcome 7.3 mathematic"
           ]
         )
       end

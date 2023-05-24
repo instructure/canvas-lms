@@ -78,8 +78,7 @@ module Types
 
     field :title, String, null: true
 
-    field :set,
-          AssignmentOverrideSetUnion,
+    field :set, AssignmentOverrideSetUnion,
           "This object specifies what students this override applies to",
           null: true
     def set

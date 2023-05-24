@@ -300,8 +300,7 @@ describe Canvas::LiveEvents do
       expect_event("conversation_forwarded",
                    hash_including(
                      conversation_id: @convo.id.to_s
-                   ),
-                   { compact_live_events: true }).once
+                   ), { compact_live_events: true }).once
       Canvas::LiveEvents.conversation_forwarded(@convo)
     end
   end
@@ -342,37 +341,24 @@ describe Canvas::LiveEvents do
     it "includes the course context, current scores and old scores" do
       enrollment_model
       score = Score.new(
-        course_score: true,
-        enrollment: @enrollment,
-        current_score: 5.0,
-        final_score: 4.0,
-        unposted_current_score: 3.0,
-        unposted_final_score: 2.0
+        course_score: true, enrollment: @enrollment,
+        current_score: 5.0, final_score: 4.0, unposted_current_score: 3.0, unposted_final_score: 2.0
       )
 
       expected_body = hash_including(
-        current_score: 5.0,
-        final_score: 4.0,
-        unposted_current_score: 3.0,
-        unposted_final_score: 2.0,
-        old_current_score: 1.0,
-        old_final_score: 2.0,
-        old_unposted_current_score: 3.0,
-        old_unposted_final_score: 4.0,
-        course_id: @enrollment.course_id.to_s,
-        user_id: @enrollment.user_id.to_s,
+        current_score: 5.0, final_score: 4.0, unposted_current_score: 3.0, unposted_final_score: 2.0,
+        old_current_score: 1.0, old_final_score: 2.0, old_unposted_current_score: 3.0, old_unposted_final_score: 4.0,
+        course_id: @enrollment.course_id.to_s, user_id: @enrollment.user_id.to_s,
         workflow_state: "active"
       )
       expect_event("course_grade_change", expected_body, course_context)
 
-      Canvas::LiveEvents.course_grade_change(score,
-                                             {
+      Canvas::LiveEvents.course_grade_change(score, {
                                                current_score: 1.0,
                                                final_score: 2.0,
                                                unposted_current_score: 3.0,
                                                unposted_final_score: 4.0
-                                             },
-                                             score.enrollment)
+                                             }, score.enrollment)
     end
   end
 
@@ -380,16 +366,14 @@ describe Canvas::LiveEvents do
     it "sets the grader to nil for an autograded quiz" do
       quiz_with_graded_submission([])
 
-      expect_event("grade_change",
-                   hash_including({
-                     submission_id: @quiz_submission.submission.global_id.to_s,
-                     assignment_id: @quiz_submission.submission.global_assignment_id.to_s,
-                     assignment_name: @quiz_submission.submission.assignment.name,
-                     grader_id: nil,
-                     student_id: @quiz_submission.user.global_id.to_s,
-                     user_id: @quiz_submission.user.global_id.to_s
-                   }.compact!),
-                   course_context)
+      expect_event("grade_change", hash_including({
+        submission_id: @quiz_submission.submission.global_id.to_s,
+        assignment_id: @quiz_submission.submission.global_assignment_id.to_s,
+        assignment_name: @quiz_submission.submission.assignment.name,
+        grader_id: nil,
+        student_id: @quiz_submission.user.global_id.to_s,
+        user_id: @quiz_submission.user.global_id.to_s
+      }.compact!), course_context)
 
       Canvas::LiveEvents.grade_changed(@quiz_submission.submission, @quiz_submission.submission.versions.current.model)
     end
@@ -398,16 +382,14 @@ describe Canvas::LiveEvents do
       course_with_student_submissions
       submission = @course.assignments.first.submissions.first
 
-      expect_event("grade_change",
-                   hash_including(
-                     submission_id: submission.global_id.to_s,
-                     assignment_id: submission.global_assignment_id.to_s,
-                     assignment_name: submission.assignment.name,
-                     grader_id: @teacher.global_id.to_s,
-                     student_id: @student.global_id.to_s,
-                     user_id: @student.global_id.to_s
-                   ),
-                   course_context)
+      expect_event("grade_change", hash_including(
+                                     submission_id: submission.global_id.to_s,
+                                     assignment_id: submission.global_assignment_id.to_s,
+                                     assignment_name: submission.assignment.name,
+                                     grader_id: @teacher.global_id.to_s,
+                                     student_id: @student.global_id.to_s,
+                                     user_id: @student.global_id.to_s
+                                   ), course_context)
 
       submission.grader = @teacher
       submission.grade = "10"
@@ -426,8 +408,7 @@ describe Canvas::LiveEvents do
                      user_id: @student.global_id.to_s,
                      student_id: @student.global_id.to_s,
                      student_sis_id: nil
-                   }.compact!),
-                   course_context)
+                   }.compact!), course_context)
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
 
@@ -441,8 +422,7 @@ describe Canvas::LiveEvents do
       expect_event("grade_change",
                    hash_including(
                      student_sis_id: "sis-id-1"
-                   ),
-                   course_context)
+                   ), course_context)
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
 
@@ -455,8 +435,7 @@ describe Canvas::LiveEvents do
                    hash_including(
                      score: 9000,
                      old_score: 5
-                   ),
-                   course_context)
+                   ), course_context)
       Canvas::LiveEvents.grade_changed(submission, submission.versions.current.model)
     end
 
@@ -473,8 +452,7 @@ describe Canvas::LiveEvents do
                    hash_including(
                      points_possible: 99,
                      old_points_possible: 5
-                   ),
-                   course_context)
+                   ), course_context)
       Canvas::LiveEvents.grade_changed(submission, submission, assignment.versions.current.model)
     end
 
@@ -511,11 +489,9 @@ describe Canvas::LiveEvents do
       let(:submission) { @course.assignments.first.submissions.first }
 
       it "is false when submission is not graded" do
-        expect_event("grade_change",
-                     hash_including(
-                       grading_complete: false
-                     ),
-                     course_context)
+        expect_event("grade_change", hash_including(
+                                       grading_complete: false
+                                     ), course_context)
         Canvas::LiveEvents.grade_changed(submission)
       end
 
@@ -523,11 +499,9 @@ describe Canvas::LiveEvents do
         submission.score = 0
         submission.workflow_state = "graded"
 
-        expect_event("grade_change",
-                     hash_including(
-                       grading_complete: true
-                     ),
-                     course_context)
+        expect_event("grade_change", hash_including(
+                                       grading_complete: true
+                                     ), course_context)
         Canvas::LiveEvents.grade_changed(submission)
       end
 
@@ -535,11 +509,9 @@ describe Canvas::LiveEvents do
         submission.score = 0
         submission.workflow_state = "pending_review"
 
-        expect_event("grade_change",
-                     hash_including(
-                       grading_complete: false
-                     ),
-                     course_context)
+        expect_event("grade_change", hash_including(
+                                       grading_complete: false
+                                     ), course_context)
         Canvas::LiveEvents.grade_changed(submission)
       end
     end
@@ -558,22 +530,18 @@ describe Canvas::LiveEvents do
         end
 
         it "is not called when a grade is changed for a submission that is not posted" do
-          expect_event("grade_change",
-                       hash_including(
-                         muted: true
-                       ),
-                       course_context)
+          expect_event("grade_change", hash_including(
+                                         muted: true
+                                       ), course_context)
           Canvas::LiveEvents.grade_changed(submission)
         end
 
         it "is false when the grade is changed for a submission that is posted" do
           assignment.post_submissions
 
-          expect_event("grade_change",
-                       hash_including(
-                         muted: false
-                       ),
-                       course_context)
+          expect_event("grade_change", hash_including(
+                                         muted: false
+                                       ), course_context)
           Canvas::LiveEvents.grade_changed(submission)
         end
       end
@@ -581,11 +549,9 @@ describe Canvas::LiveEvents do
       context "with post policies disabled" do
         it "is true when assignment is muted" do
           submission.assignment.mute!
-          expect_event("grade_change",
-                       hash_including(
-                         muted: true
-                       ),
-                       course_context)
+          expect_event("grade_change", hash_including(
+                                         muted: true
+                                       ), course_context)
           Canvas::LiveEvents.grade_changed(submission)
         end
       end
@@ -682,8 +648,7 @@ describe Canvas::LiveEvents do
 
         it "does not include the associated_integration_id if there is no longer an installed tool with that id" do
           submission.assignment.assignment_configuration_tool_lookups.create!(tool_product_code: "turnitin-lti",
-                                                                              tool_vendor_code: "turnitin.com",
-                                                                              tool_type: "Lti::MessageHandler")
+                                                                              tool_vendor_code: "turnitin.com", tool_type: "Lti::MessageHandler")
 
           expect_event(
             event_name,
@@ -748,8 +713,7 @@ describe Canvas::LiveEvents do
         expect_event("submission_updated",
                      hash_including(
                        :submission_id
-                     ),
-                     course_context).exactly(3).times
+                     ), course_context).exactly(3).times
 
         Canvas::LiveEvents.submissions_bulk_updated(submissions)
       end
@@ -759,18 +723,15 @@ describe Canvas::LiveEvents do
           expect_event("submission_updated",
                        hash_including(
                          submission_id: submissions.first.global_id.to_s
-                       ),
-                       course_context).ordered
+                       ), course_context).ordered
           expect_event("submission_updated",
                        hash_including(
                          submission_id: submissions.second.global_id.to_s
-                       ),
-                       course_context).ordered
+                       ), course_context).ordered
           expect_event("submission_updated",
                        hash_including(
                          submission_id: submissions.third.global_id.to_s
-                       ),
-                       course_context).ordered
+                       ), course_context).ordered
 
           Canvas::LiveEvents.submissions_bulk_updated(submissions)
         end
@@ -781,8 +742,7 @@ describe Canvas::LiveEvents do
       it "triggers a submission comment created live event" do
         comment = submission.submission_comments.create!(
           comment: "here is a comment",
-          submission_id: submission.id,
-          author_id: @student.id
+          submission_id: submission.id, author_id: @student.id
         )
         expect_event("submission_comment_created", {
                        user_id: comment.author_id.to_s,
@@ -805,17 +765,15 @@ describe Canvas::LiveEvents do
     it "triggers a live event without an asset subtype" do
       course_factory
 
-      expect_event("asset_accessed",
-                   {
-                     asset_name: "Unnamed Course",
-                     asset_type: "course",
-                     asset_id: @course.global_id.to_s,
-                     asset_subtype: nil,
-                     category: "category",
-                     role: "role",
-                     level: "participation"
-                   }.compact!,
-                   { compact_live_events: true }).once
+      expect_event("asset_accessed", {
+        asset_name: "Unnamed Course",
+        asset_type: "course",
+        asset_id: @course.global_id.to_s,
+        asset_subtype: nil,
+        category: "category",
+        role: "role",
+        level: "participation"
+      }.compact!, { compact_live_events: true }).once
 
       Canvas::LiveEvents.asset_access(@course, "category", "role", "participation")
     end
@@ -823,8 +781,7 @@ describe Canvas::LiveEvents do
     it "triggers a live event with an asset subtype" do
       course_factory
 
-      expect_event("asset_accessed",
-                   {
+      expect_event("asset_accessed", {
                      asset_name: "Unnamed Course",
                      asset_type: "course",
                      asset_id: @course.global_id.to_s,
@@ -832,8 +789,7 @@ describe Canvas::LiveEvents do
                      category: "category",
                      role: "role",
                      level: "participation"
-                   },
-                   { compact_live_events: true }).once
+                   }, { compact_live_events: true }).once
 
       Canvas::LiveEvents.asset_access(["assignments", @course], "category", "role", "participation")
     end
@@ -842,16 +798,14 @@ describe Canvas::LiveEvents do
       course_with_teacher
       @page = @course.wiki_pages.create(title: "old title", body: "old body")
 
-      expect_event("asset_accessed",
-                   {
+      expect_event("asset_accessed", {
                      asset_name: "old title",
                      asset_type: "wiki_page",
                      asset_id: @page.global_id.to_s,
                      category: "category",
                      role: "role",
                      level: "participation"
-                   },
-                   { compact_live_events: true }).once
+                   }, { compact_live_events: true }).once
 
       Canvas::LiveEvents.asset_access(@page, "category", "role", "participation")
     end
@@ -859,19 +813,17 @@ describe Canvas::LiveEvents do
     it "includes filename and display_name if asset is an attachment" do
       attachment_model
 
-      expect_event("asset_accessed",
-                   {
-                     asset_name: "unknown.example",
-                     asset_type: "attachment",
-                     asset_id: @attachment.global_id.to_s,
-                     asset_subtype: nil,
-                     category: "files",
-                     role: "role",
-                     level: "participation",
-                     filename: @attachment.filename,
-                     display_name: @attachment.display_name
-                   }.compact!,
-                   { compact_live_events: true }).once
+      expect_event("asset_accessed", {
+        asset_name: "unknown.example",
+        asset_type: "attachment",
+        asset_id: @attachment.global_id.to_s,
+        asset_subtype: nil,
+        category: "files",
+        role: "role",
+        level: "participation",
+        filename: @attachment.filename,
+        display_name: @attachment.display_name
+      }.compact!, { compact_live_events: true }).once
 
       Canvas::LiveEvents.asset_access(@attachment, "files", "role", "participation")
     end
@@ -880,18 +832,17 @@ describe Canvas::LiveEvents do
       attachment_model
       context = OpenStruct.new(global_id: "1")
 
-      expect_event("asset_accessed",
-                   {
-                     asset_name: "unknown.example",
-                     asset_type: "attachment",
-                     asset_id: @attachment.global_id.to_s,
-                     asset_subtype: nil,
-                     category: "files",
-                     role: "role",
-                     level: "participation",
-                     filename: @attachment.filename,
-                     display_name: @attachment.display_name
-                   }.compact!,
+      expect_event("asset_accessed", {
+        asset_name: "unknown.example",
+        asset_type: "attachment",
+        asset_id: @attachment.global_id.to_s,
+        asset_subtype: nil,
+        category: "files",
+        role: "role",
+        level: "participation",
+        filename: @attachment.filename,
+        display_name: @attachment.display_name
+      }.compact!,
                    {
                      compact_live_events: true,
                      context_account_id: context.account&.global_id&.to_s,
@@ -905,8 +856,7 @@ describe Canvas::LiveEvents do
     it "includes enrollment data if provided" do
       course_with_student
 
-      expect_event("asset_accessed",
-                   {
+      expect_event("asset_accessed", {
                      asset_name: "Unnamed Course",
                      asset_type: "course",
                      asset_id: @course.global_id.to_s,
@@ -916,15 +866,10 @@ describe Canvas::LiveEvents do
                      level: "participation",
                      enrollment_id: @enrollment.id.to_s,
                      section_id: @enrollment.course_section_id.to_s
-                   },
-                   { compact_live_events: true }).once
+                   }, { compact_live_events: true }).once
 
-      Canvas::LiveEvents.asset_access(["assignments", @course],
-                                      "category",
-                                      "role",
-                                      "participation",
-                                      context: nil,
-                                      context_membership: @enrollment)
+      Canvas::LiveEvents.asset_access(["assignments", @course], "category", "role", "participation",
+                                      context: nil, context_membership: @enrollment)
     end
   end
 
@@ -1207,8 +1152,7 @@ describe Canvas::LiveEvents do
 
       it "does not include the associated_integration_id if there is no longer an installed tool with that id" do
         @assignment.assignment_configuration_tool_lookups.create!(tool_product_code: "turnitin-lti",
-                                                                  tool_vendor_code: "turnitin.com",
-                                                                  tool_type: "Lti::MessageHandler")
+                                                                  tool_vendor_code: "turnitin.com", tool_type: "Lti::MessageHandler")
 
         expect_event(
           "assignment_updated",
@@ -1603,10 +1547,8 @@ describe Canvas::LiveEvents do
       expected_event_body = {
         progress: CourseProgress.new(course, user, read_only: true).to_json,
         user: { id: user.id.to_s, name: user.name, email: user.email },
-        course: { id: course.id.to_s,
-                  name: course.name,
-                  account_id: course.account_id.to_s,
-                  sis_source_id: "abc123" }
+        course: { id: course.id.to_s, name: course.name,
+                  account_id: course.account_id.to_s, sis_source_id: "abc123" }
       }
 
       expect_event("course_completed", expected_event_body).once
@@ -1626,10 +1568,8 @@ describe Canvas::LiveEvents do
       expected_event_body = {
         progress: CourseProgress.new(course, user, read_only: true).to_json,
         user: { id: user.id.to_s, name: user.name, email: user.email },
-        course: { id: course.id.to_s,
-                  name: course.name,
-                  account_id: course.account_id.to_s,
-                  sis_source_id: "abc123" }
+        course: { id: course.id.to_s, name: course.name,
+                  account_id: course.account_id.to_s, sis_source_id: "abc123" }
       }
 
       expect_event("course_progress", expected_event_body).once
@@ -2602,48 +2542,6 @@ describe Canvas::LiveEvents do
       it "sets region to Canvas.region" do
         expect_event("heartbeat", { region: region, environment: "test", region_code: region_code })
         Canvas::LiveEvents.heartbeat
-      end
-    end
-
-    context "environment" do
-      context "in development" do
-        let(:environment) { "development" }
-
-        before do
-          allow(Canvas).to receive(:environment).and_return environment
-        end
-
-        it "sets environment to development" do
-          expect_event("heartbeat", { region: "not_configured", environment: environment, region_code: "not_configured" })
-          Canvas::LiveEvents.heartbeat
-        end
-      end
-
-      context "in beta" do
-        let(:environment) { "beta" }
-
-        before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return true
-          allow(ApplicationController).to receive(:test_cluster_name).and_return environment
-        end
-
-        it "sets environment to beta" do
-          expect_event("heartbeat", { region: "not_configured", environment: environment, region_code: "not_configured" })
-          Canvas::LiveEvents.heartbeat
-        end
-      end
-
-      context "in prod" do
-        let(:environment) { "prod" }
-
-        before do
-          allow(Canvas).to receive(:environment).and_return environment
-        end
-
-        it "sets environment to prod" do
-          expect_event("heartbeat", { region: "not_configured", environment: environment, region_code: "not_configured" })
-          Canvas::LiveEvents.heartbeat
-        end
       end
     end
   end

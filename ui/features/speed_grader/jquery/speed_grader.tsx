@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -1162,6 +1161,7 @@ $.extend(INST, {
   refreshQuizSubmissionSnapshot(data) {
     snapshotCache[`${data.user_id}_${data.version_number}`] = data
     if (data.last_question_touched) {
+      // @ts-expect-error
       INST.lastQuestionTouched = data.last_question_touched
     }
   },
@@ -1782,6 +1782,7 @@ EG = {
 
     // On the switch to a new student, clear the state of the last
     // question touched on the previous student.
+    // @ts-expect-error
     INST.lastQuestionTouched = null
 
     if (

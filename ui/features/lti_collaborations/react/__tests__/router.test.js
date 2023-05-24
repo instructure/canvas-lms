@@ -73,19 +73,18 @@ describe('router', () => {
       })
 
       it('sends externalContentReady action for valid message', async () => {
-        const item = {hello: 'world'}
+        const item = {service_id: 1, hello: 'world'}
         window.postMessage(
           {
             subject: 'LtiDeepLinkingResponse',
             content_items: [item],
-            service_id: 123,
           },
           ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
         )
         await sleep(100)
 
         expect(actions.externalContentReady).toHaveBeenCalledWith({
-          service_id: 123,
+          service_id: item.service_id,
           contentItems: [item],
         })
         expect(actions.externalContentRetrievalFailed).not.toHaveBeenCalled()

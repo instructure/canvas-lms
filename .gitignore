@@ -49,7 +49,6 @@ npm-debug.log
 yarn-error.log
 dump.rdb
 .eslintcache
-tsconfig.tsbuildinfo
 
 # canvas-gems
 /gems/*/coverage

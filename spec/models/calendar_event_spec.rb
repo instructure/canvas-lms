@@ -635,9 +635,7 @@ describe CalendarEvent do
     end
 
     it "allows multiple participants in an appointment, up to the limit" do
-      ag = AppointmentGroup.create(title: "test",
-                                   contexts: [@course],
-                                   participants_per_appointment: 2,
+      ag = AppointmentGroup.create(title: "test", contexts: [@course], participants_per_appointment: 2,
                                    new_appointments: [["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
       ag.publish!
       appointment = ag.appointments.first
@@ -718,9 +716,7 @@ describe CalendarEvent do
     end
 
     it "cancels existing reservations if cancel_existing = true and the appointment is in the future" do
-      ag = AppointmentGroup.create(title: "test",
-                                   contexts: [@course],
-                                   max_appointments_per_participant: 1,
+      ag = AppointmentGroup.create(title: "test", contexts: [@course], max_appointments_per_participant: 1,
                                    new_appointments: [[1.hour.from_now, 2.hours.from_now], [3.hours.from_now, 4.hours.from_now]])
       ag.publish!
       appointment = ag.appointments.first
@@ -732,9 +728,7 @@ describe CalendarEvent do
     end
 
     it "refuses to cancel existing reservations if cancel_existing = true and the appointment is in the past" do
-      ag = AppointmentGroup.create(title: "test",
-                                   contexts: [@course],
-                                   max_appointments_per_participant: 1,
+      ag = AppointmentGroup.create(title: "test", contexts: [@course], max_appointments_per_participant: 1,
                                    new_appointments: [[2.hours.ago, 1.hour.ago], [1.hour.from_now, 2.hours.from_now]])
       ag.publish!
       appointment = ag.appointments.first
@@ -746,8 +740,7 @@ describe CalendarEvent do
     end
 
     it "saves comments with appointment" do
-      ag = AppointmentGroup.create(title: "test",
-                                   contexts: [@course],
+      ag = AppointmentGroup.create(title: "test", contexts: [@course],
                                    max_appointments_per_participant: 1,
                                    new_appointments: [["2012-01-01 12:00:00",
                                                        "2012-01-01 13:00:00"],
@@ -761,8 +754,7 @@ describe CalendarEvent do
     end
 
     it "enforces the section" do
-      ag = AppointmentGroup.create(title: "test",
-                                   contexts: [@course.course_sections.create],
+      ag = AppointmentGroup.create(title: "test", contexts: [@course.course_sections.create],
                                    new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
       ag.publish!
       appointment = ag.appointments.first
@@ -778,9 +770,7 @@ describe CalendarEvent do
       c2 = group_category(name: "bar")
       g2 = c2.groups.create(context: @course)
 
-      ag = AppointmentGroup.create(title: "test",
-                                   contexts: [@course],
-                                   sub_context_codes: [c1.asset_string],
+      ag = AppointmentGroup.create(title: "test", contexts: [@course], sub_context_codes: [c1.asset_string],
                                    new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
       appointment = ag.appointments.first
       ag.publish!
@@ -813,9 +803,7 @@ describe CalendarEvent do
     end
 
     it "unlocks the appointment when the last reservation is canceled" do
-      ag = AppointmentGroup.create(title: "test",
-                                   contexts: [@course],
-                                   participants_per_appointment: 2,
+      ag = AppointmentGroup.create(title: "test", contexts: [@course], participants_per_appointment: 2,
                                    new_appointments: [["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
       appointment = ag.appointments.first
       student_in_course(course: @course, active_all: true)
@@ -832,9 +820,7 @@ describe CalendarEvent do
     end
 
     it "copies the group attributes to the initial appointments" do
-      ag = AppointmentGroup.create(title: "test",
-                                   contexts: [@course],
-                                   description: "hello world",
+      ag = AppointmentGroup.create(title: "test", contexts: [@course], description: "hello world",
                                    new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
       e = ag.appointments.first
       expect(e.title).to eql "test"
@@ -876,9 +862,7 @@ describe CalendarEvent do
     end
 
     it "allows a user to re-reserve a slot after canceling" do
-      ag = AppointmentGroup.create(title: "test",
-                                   contexts: [@course],
-                                   participants_per_appointment: 1,
+      ag = AppointmentGroup.create(title: "test", contexts: [@course], participants_per_appointment: 1,
                                    new_appointments: [["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
       appointment = ag.appointments.first
 

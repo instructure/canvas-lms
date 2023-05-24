@@ -86,8 +86,7 @@ describe MicrosoftSync::Errors do
 
       it "returns a JSON blob with error class and message" do
         expect(subject).to eq(
-          "class" => "MicrosoftSync::TestErrorNotPublic",
-          "message" => "abc",
+          "class" => "MicrosoftSync::TestErrorNotPublic", "message" => "abc",
           "extra_metadata" => {}
         )
       end

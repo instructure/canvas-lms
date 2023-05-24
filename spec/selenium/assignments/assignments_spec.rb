@@ -612,10 +612,8 @@ describe "assignments" do
       let(:assignment) do
         @course.assignment_groups.first.assignments.create!(title: "custom params",
                                                             lti_resource_link_custom_params: custom_params,
-                                                            submission_types: "external_tool",
-                                                            context: @course,
-                                                            points_possible: 10,
-                                                            external_tool_tag: content_tag,
+                                                            submission_types: "external_tool", context: @course,
+                                                            points_possible: 10, external_tool_tag: content_tag,
                                                             workflow_state: "unpublished")
       end
 
@@ -875,6 +873,7 @@ describe "assignments" do
 
   context "with restrict_quantitative_data" do
     all_options = ["Percentage", "Complete/Incomplete", "Points", "Letter Grade", "GPA Scale", "Not Graded"]
+    qualitative_options = ["Complete/Incomplete", "Letter Grade", "Not Graded"]
 
     before do
       course_with_teacher_logged_in
@@ -1111,11 +1110,11 @@ describe "assignments" do
       end
 
       context "creation and edit" do
-        it "show all options on create" do
+        it "show only qualitative options on create" do
           get "/courses/#{@course.id}/assignments/new"
           wait_for_ajaximations
 
-          expect(get_options("#assignment_grading_type").map(&:text)).to eq all_options
+          expect(get_options("#assignment_grading_type").map(&:text)).to eq qualitative_options
         end
 
         it "show only qualitative options on edit" do
@@ -1123,7 +1122,7 @@ describe "assignments" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
           wait_for_ajaximations
 
-          expect(get_options("#assignment_grading_type").map(&:text)).to eq all_options
+          expect(get_options("#assignment_grading_type").map(&:text)).to eq qualitative_options
         end
       end
 

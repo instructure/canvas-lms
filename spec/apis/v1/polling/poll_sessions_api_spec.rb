@@ -38,12 +38,8 @@ describe Polling::PollSessionsController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_sessions",
-                  { controller: "polling/poll_sessions",
-                    action: "index",
-                    format: "json",
-                    poll_id: @poll.id.to_s },
-                  data,
-                  header)
+                  { controller: "polling/poll_sessions", action: "index", format: "json",
+                    poll_id: @poll.id.to_s }, data, header)
     end
 
     it "returns all existing poll sessions" do
@@ -96,12 +92,9 @@ describe Polling::PollSessionsController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}",
-                  { controller: "polling/poll_sessions",
-                    action: "show",
-                    format: "json",
+                  { controller: "polling/poll_sessions", action: "show", format: "json",
                     poll_id: @poll.id.to_s,
-                    id: @poll_session.id.to_s },
-                  data)
+                    id: @poll_session.id.to_s }, data)
     end
 
     it "retrieves the poll session specified" do
@@ -260,13 +253,9 @@ describe Polling::PollSessionsController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/polls/#{@poll.id}/poll_sessions",
-                  { controller: "polling/poll_sessions",
-                    action: "create",
-                    format: "json",
+                  { controller: "polling/poll_sessions", action: "create", format: "json",
                     poll_id: @poll.id.to_s },
-                  { poll_sessions: [params] },
-                  {},
-                  {})
+                  { poll_sessions: [params] }, {}, {})
     end
 
     context "as a teacher" do
@@ -304,14 +293,10 @@ describe Polling::PollSessionsController, type: :request do
 
       helper.call(:put,
                   "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}",
-                  { controller: "polling/poll_sessions",
-                    action: "update",
-                    format: "json",
+                  { controller: "polling/poll_sessions", action: "update", format: "json",
                     poll_id: @poll.id.to_s,
                     id: @poll_session.id.to_s },
-                  { poll_sessions: [params] },
-                  {},
-                  {})
+                  { poll_sessions: [params] }, {}, {})
     end
 
     context "as a teacher" do
@@ -363,14 +348,10 @@ describe Polling::PollSessionsController, type: :request do
     def get_open
       raw_api_call(:get,
                    "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}/open",
-                   { controller: "polling/poll_sessions",
-                     action: "open",
-                     format: "json",
+                   { controller: "polling/poll_sessions", action: "open", format: "json",
                      poll_id: @poll.id.to_s,
                      id: @poll_session.id.to_s },
-                   {},
-                   {},
-                   {})
+                   {}, {}, {})
     end
 
     context "as a teacher" do
@@ -427,14 +408,10 @@ describe Polling::PollSessionsController, type: :request do
     def get_close
       raw_api_call(:get,
                    "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}/close",
-                   { controller: "polling/poll_sessions",
-                     action: "close",
-                     format: "json",
+                   { controller: "polling/poll_sessions", action: "close", format: "json",
                      poll_id: @poll.id.to_s,
                      id: @poll_session.id.to_s },
-                   {},
-                   {},
-                   {})
+                   {}, {}, {})
     end
 
     context "as a teacher" do
@@ -488,8 +465,7 @@ describe Polling::PollSessionsController, type: :request do
       api_call(:get,
                "/api/v1/poll_sessions/opened",
                { controller: "polling/poll_sessions", action: "opened", format: "json" },
-               {},
-               headers)
+               {}, headers)
     end
 
     it "returns all poll sessions available to the current user that are published" do
@@ -560,8 +536,7 @@ describe Polling::PollSessionsController, type: :request do
       api_call(:get,
                "/api/v1/poll_sessions/closed",
                { controller: "polling/poll_sessions", action: "closed", format: "json" },
-               {},
-               headers)
+               {}, headers)
     end
 
     it "returns all poll sessions available to the current user that are closed" do

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -27,7 +26,6 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {unescape} from 'html-escape'
 import type {FilterDrilldownData, FilterDrilldownMenuItem} from '../gradebook.d'
 
 const I18n = useI18nScope('gradebook')
@@ -243,13 +241,10 @@ const FilterDropdown = ({
                     }}
                   >
                     {itemGroup.items.map((item: any) => {
-                      // TODO: remove this when we stop recursively mutating and escaping objects in Gradebook.tsx
-                      // (-_-)
-                      const unescapedName = unescape(item.name)
                       return (
                         <MenuItem key={item.id} as="div">
                           <Flex as="div" justifyItems="space-between">
-                            <TruncateText position="middle">{unescapedName}</TruncateText>
+                            <TruncateText position="middle">{item.name}</TruncateText>
                           </Flex>
                         </MenuItem>
                       )

@@ -28,8 +28,7 @@ module Interfaces::AssignmentsConnectionInterface
     end
   end
 
-  field :assignments_connection,
-        ::Types::AssignmentType.connection_type,
+  field :assignments_connection, ::Types::AssignmentType.connection_type,
         <<~MD,
           returns a list of assignments.
 

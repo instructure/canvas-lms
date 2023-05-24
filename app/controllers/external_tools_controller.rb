@@ -574,7 +574,6 @@ class ExternalToolsController < ApplicationController
       opts[:content_item_id] = content_item_id if content_item_id
       content_item_selection_request(tool, selection_type, opts)
     else
-      opts[:content_item_id] = content_item_id if content_item_id
       basic_lti_launch_request(tool, selection_type, opts)
     end
   rescue Lti::Errors::UnauthorizedError => e
@@ -635,10 +634,6 @@ class ExternalToolsController < ApplicationController
     end
   end
 
-  # This handles non-content item 1.1 launches, and 1.3 launches including deep linking requests.
-  # LtiAdvantageAdapter#generate_lti_params (called via
-  # adapter.generate_post_payload) determines whether or not an LTI 1.3 launch
-  # is a deep linking request
   def basic_lti_launch_request(tool, selection_type = nil, opts = {})
     lti_launch = tool.settings["post_only"] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     default_opts = {
@@ -648,7 +643,6 @@ class ExternalToolsController < ApplicationController
     }
 
     opts = default_opts.merge(opts)
-    opts[:launch_url] = tool.url_with_environment_overrides(opts[:launch_url])
 
     assignment = api_find(@context.assignments.active, params[:assignment_id]) if params[:assignment_id]
 
@@ -660,22 +654,11 @@ class ExternalToolsController < ApplicationController
     # resource_link_id in regular QN launches is assignment.lti_resource_link_id
     opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag) if assignment.present? && assignment.quiz_lti?
 
-    # This is only for 1.3: editing collaborations for 1.1 goes thru content_item_selection_request()
-    if selection_type == "collaboration"
-      collaboration = opts[:content_item_id].presence&.then { ExternalToolCollaboration.find _1 }
-      collaboration = nil unless collaboration&.update_url == params[:url]
-    end
-
-    expander = variable_expander(
-      assignment: assignment,
-      tool: tool,
-      launch: lti_launch,
-      post_message_token: opts[:launch_token],
-      secure_params: params[:secure_params],
-      placement: opts[:resource_type],
-      launch_url: opts[:launch_url],
-      collaboration: collaboration
-    )
+    expander = variable_expander(assignment: assignment,
+                                 tool: tool, launch: lti_launch,
+                                 post_message_token: opts[:launch_token],
+                                 secure_params: params[:secure_params],
+                                 placement: opts[:resource_type], launch_url: opts[:launch_url])
 
     adapter = if tool.use_1_3?
                 a = Lti::LtiAdvantageAdapter.new(
@@ -745,7 +728,7 @@ class ExternalToolsController < ApplicationController
       media_types.to_unsafe_h,
       params["export_type"]
     )
-    launch_url = tool.launch_url(extension_type: placement, preferred_launch_url: opts[:launch_url])
+    launch_url = opts[:launch_url] || tool.extension_setting(placement, :url)
     params = Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user)
                                              .merge({
                                                       # required params
@@ -791,7 +774,7 @@ class ExternalToolsController < ApplicationController
 
     opts = {
       post_only: @tool.settings["post_only"].present?,
-      launch_url: tool.launch_url(extension_type: placement, preferred_launch_url: opts[:launch_url]),
+      launch_url: opts[:launch_url] || tool.extension_setting(placement, :url),
       content_item_id: opts[:content_item_id],
       assignment: assignment,
       parent_frame_context: opts[:parent_frame_context]
@@ -1483,7 +1466,7 @@ class ExternalToolsController < ApplicationController
     else
       # generate the launch
       opts = {
-        launch_url: @tool.url_with_environment_overrides(launch_url),
+        launch_url: launch_url,
         resource_type: launch_type
       }
       if module_item || assignment
@@ -1548,25 +1531,9 @@ class ExternalToolsController < ApplicationController
 
   def set_tool_attributes(tool, params)
     attrs = Lti::ResourcePlacement.valid_placements(@domain_root_account)
-    attrs += %i[name
-                description
-                url
-                icon_url
-                canvas_icon_class
-                domain
-                privacy_level
-                consumer_key
-                shared_secret
-                custom_fields
-                custom_fields_string
-                text
-                config_type
-                config_url
-                config_xml
-                not_selectable
-                app_center_id
-                oauth_compliant
-                is_rce_favorite]
+    attrs += %i[name description url icon_url canvas_icon_class domain privacy_level consumer_key shared_secret
+                custom_fields custom_fields_string text config_type config_url config_xml not_selectable app_center_id
+                oauth_compliant is_rce_favorite]
     attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
 
     attrs.each do |prop|

@@ -34,8 +34,7 @@ describe "Admins API", type: :request do
     end
 
     it "flags the user as an admin for the account" do
-      api_call(:post,
-               "/api/v1/accounts/#{@admin.account.id}/admins",
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                { user_id: @new_user.id })
       @new_user.reload
@@ -45,8 +44,7 @@ describe "Admins API", type: :request do
     end
 
     it "defaults the role of the admin association to AccountAdmin" do
-      api_call(:post,
-               "/api/v1/accounts/#{@admin.account.id}/admins",
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                { user_id: @new_user.id })
       @new_user.reload
@@ -56,8 +54,7 @@ describe "Admins API", type: :request do
 
     it "respects the provided role, if any" do
       role = custom_account_role("CustomAccountUser", account: @admin.account)
-      api_call(:post,
-               "/api/v1/accounts/#{@admin.account.id}/admins",
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                { user_id: @new_user.id, role_id: role.id })
       @new_user.reload
@@ -67,8 +64,7 @@ describe "Admins API", type: :request do
 
     it "is able to find a role by name (though deprecated)" do
       role = custom_account_role("CustomAccountUser", account: @admin.account)
-      api_call(:post,
-               "/api/v1/accounts/#{@admin.account.id}/admins",
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                { user_id: @new_user.id, role: "CustomAccountUser" })
       @new_user.reload
@@ -77,8 +73,7 @@ describe "Admins API", type: :request do
     end
 
     it "returns json of the new admin association" do
-      json = api_call(:post,
-                      "/api/v1/accounts/#{@admin.account.id}/admins",
+      json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                       { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                       { user_id: @new_user.id })
       @new_user.reload
@@ -106,11 +101,8 @@ describe "Admins API", type: :request do
       expect_any_instance_of(AccountUser).not_to receive(:account_user_notification!)
       expect_any_instance_of(AccountUser).not_to receive(:account_user_registration!)
 
-      api_call(:post,
-               "/api/v1/accounts/#{@admin.account.id}/admins",
-               { controller: "admins",
-                 action: "create",
-                 format: "json",
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+               { controller: "admins", action: "create", format: "json",
                  account_id: @admin.account.to_param },
                { user_id: @new_user.to_param, send_confirmation: "0" })
 
@@ -121,11 +113,8 @@ describe "Admins API", type: :request do
       expect_any_instance_of(AccountUser).not_to receive(:account_user_notification!)
       expect_any_instance_of(AccountUser).not_to receive(:account_user_registration!)
 
-      api_call(:post,
-               "/api/v1/accounts/#{@admin.account.id}/admins",
-               { controller: "admins",
-                 action: "create",
-                 format: "json",
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+               { controller: "admins", action: "create", format: "json",
                  account_id: @admin.account.to_param },
                { user_id: @new_user.to_param, send_confirmation: "false" })
 
@@ -135,11 +124,8 @@ describe "Admins API", type: :request do
     it "sends a notification email if 'send_confirmation' isn't set" do
       expect_any_instance_of(AccountUser).to receive(:account_user_registration!).once
 
-      api_call(:post,
-               "/api/v1/accounts/#{@admin.account.id}/admins",
-               { controller: "admins",
-                 action: "create",
-                 format: "json",
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+               { controller: "admins", action: "create", format: "json",
                  account_id: @admin.account.to_param },
                { user_id: @new_user.to_param })
 
@@ -148,8 +134,7 @@ describe "Admins API", type: :request do
 
     it "does not allow you to add a random user" do
       @new_user.pseudonym.destroy
-      raw_api_call(:post,
-                   "/api/v1/accounts/#{@admin.account.id}/admins",
+      raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                    { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                    { user_id: @new_user.id })
       expect(response.code).to eq "404"
@@ -163,11 +148,8 @@ describe "Admins API", type: :request do
       @user = @admin
       @base_path = "/api/v1/accounts/#{@account.id}/admins/"
       @path = @base_path + @new_user.id.to_s
-      @path_opts = { controller: "admins",
-                     action: "destroy",
-                     format: "json",
-                     account_id: @account.to_param,
-                     user_id: @new_user.to_param }
+      @path_opts = { controller: "admins", action: "destroy", format: "json",
+                     account_id: @account.to_param, user_id: @new_user.to_param }
     end
 
     context "unauthorized caller" do
@@ -204,17 +186,12 @@ describe "Admins API", type: :request do
         temp_user = User.create!
         bad_id = temp_user.to_param
         temp_user.destroy_permanently!
-        api_call(:delete,
-                 @base_path + bad_id,
-                 @path_opts.merge(user_id: bad_id),
-                 {},
-                 {},
-                 expected_status: 404)
+        api_call(:delete, @base_path + bad_id, @path_opts.merge(user_id: bad_id),
+                 {}, {}, expected_status: 404)
       end
 
       it "works by sis user id" do
-        api_call(:delete,
-                 @base_path + "sis_user_id:badmin",
+        api_call(:delete, @base_path + "sis_user_id:badmin",
                  @path_opts.merge(user_id: "sis_user_id:badmin"))
         expect(@account.account_users.active.where(user_id: @new_user)).not_to be_exists
       end

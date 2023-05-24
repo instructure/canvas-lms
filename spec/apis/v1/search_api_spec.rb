@@ -52,8 +52,7 @@ describe SearchController, type: :request do
     end
 
     it "returns recipients" do
-      json = api_call(:get,
-                      "/api/v1/search/recipients.json?search=o",
+      json = api_call(:get, "/api/v1/search/recipients.json?search=o",
                       { controller: "search", action: "recipients", format: "json", search: "o" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
@@ -69,8 +68,7 @@ describe SearchController, type: :request do
     end
 
     it "returns recipients for a given course" do
-      json = api_call(:get,
-                      "/api/v1/search/recipients.json?context=course_#{@course.id}",
+      json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}",
                       { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
@@ -84,8 +82,7 @@ describe SearchController, type: :request do
     end
 
     it "returns recipients for a given group" do
-      json = api_call(:get,
-                      "/api/v1/search/recipients.json?context=group_#{@group.id}",
+      json = api_call(:get, "/api/v1/search/recipients.json?context=group_#{@group.id}",
                       { controller: "search", action: "recipients", format: "json", context: "group_#{@group.id}" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
@@ -100,15 +97,13 @@ describe SearchController, type: :request do
       @group2.users = [@bob]
       @group2.save!
 
-      json = api_call(:get,
-                      "/api/v1/search/recipients.json?context=group_#{@group.id}",
+      json = api_call(:get, "/api/v1/search/recipients.json?context=group_#{@group.id}",
                       { controller: "search", action: "recipients", format: "json", context: "group_#{@group.id}" })
       expect(json.pluck("id")).to match_array([@joe.id, @me.id, @bob.id])
     end
 
     it "returns recipients for a given section" do
-      json = api_call(:get,
-                      "/api/v1/search/recipients.json?context=section_#{@course.default_section.id}",
+      json = api_call(:get, "/api/v1/search/recipients.json?context=section_#{@course.default_section.id}",
                       { controller: "search", action: "recipients", format: "json", context: "section_#{@course.default_section.id}" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
@@ -121,8 +116,7 @@ describe SearchController, type: :request do
     end
 
     it "returns recipients found by id" do
-      json = api_call(:get,
-                      "/api/v1/search/recipients?user_id=#{@bob.id}",
+      json = api_call(:get, "/api/v1/search/recipients?user_id=#{@bob.id}",
                       { controller: "search", action: "recipients", format: "json", user_id: @bob.id.to_s })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
@@ -134,8 +128,7 @@ describe SearchController, type: :request do
       p = Pseudonym.create(account: @account, user: @bob, unique_id: "bob@example.com")
       p.sis_user_id = "abc123"
       p.save!
-      json = api_call(:get,
-                      "/api/v1/search/recipients?user_id=sis_user_id:abc123",
+      json = api_call(:get, "/api/v1/search/recipients?user_id=sis_user_id:abc123",
                       { controller: "search", action: "recipients", format: "json", user_id: "sis_user_id:abc123" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
@@ -144,8 +137,7 @@ describe SearchController, type: :request do
     end
 
     it "ignores other parameters when searching by id" do
-      json = api_call(:get,
-                      "/api/v1/search/recipients?user_id=#{@bob.id}&search=asdf",
+      json = api_call(:get, "/api/v1/search/recipients?user_id=#{@bob.id}&search=asdf",
                       { controller: "search", action: "recipients", format: "json", user_id: @bob.id.to_s, search: "asdf" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
@@ -155,19 +147,16 @@ describe SearchController, type: :request do
 
     it "returns recipients by id if contactable, or if a shared conversation is referenced" do
       other = User.create(name: "other personage")
-      json = api_call(:get,
-                      "/api/v1/search/recipients?user_id=#{other.id}",
+      json = api_call(:get, "/api/v1/search/recipients?user_id=#{other.id}",
                       { controller: "search", action: "recipients", format: "json", user_id: other.id.to_s })
       expect(json).to eq []
       # now they have a conversation in common
       conversation = Conversation.initiate([@user, other], true)
-      json = api_call(:get,
-                      "/api/v1/search/recipients?user_id=#{other.id}",
+      json = api_call(:get, "/api/v1/search/recipients?user_id=#{other.id}",
                       { controller: "search", action: "recipients", format: "json", user_id: other.id.to_s })
       expect(json).to eq []
       # ... but it has to be explicity referenced via from_conversation_id
-      json = api_call(:get,
-                      "/api/v1/search/recipients?user_id=#{other.id}&from_conversation_id=#{conversation.id}",
+      json = api_call(:get, "/api/v1/search/recipients?user_id=#{other.id}&from_conversation_id=#{conversation.id}",
                       { controller: "search", action: "recipients", format: "json", user_id: other.id.to_s, from_conversation_id: conversation.id.to_s })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
@@ -193,8 +182,7 @@ describe SearchController, type: :request do
       end
 
       it "shows all observers to a teacher" do
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?context=course_#{@course.id}",
+        json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}",
                         { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
@@ -210,9 +198,7 @@ describe SearchController, type: :request do
       end
 
       it "does not show non-linked students to observers" do
-        json = api_call_as_user(@bobs_mom,
-                                :get,
-                                "/api/v1/search/recipients.json?context=course_#{@course.id}",
+        json = api_call_as_user(@bobs_mom, :get, "/api/v1/search/recipients.json?context=course_#{@course.id}",
                                 { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
@@ -221,9 +207,7 @@ describe SearchController, type: :request do
           { "id" => @bob.id, "pronouns" => nil, "name" => "bob", "full_name" => "robert", "common_courses" => { @course.id.to_s => ["StudentEnrollment"] }, "common_groups" => {} }
         ]
 
-        json = api_call_as_user(@lonely,
-                                :get,
-                                "/api/v1/search/recipients.json?context=course_#{@course.id}",
+        json = api_call_as_user(@lonely, :get, "/api/v1/search/recipients.json?context=course_#{@course.id}",
                                 { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
@@ -233,9 +217,7 @@ describe SearchController, type: :request do
       end
 
       it "does not show non-linked observers to students" do
-        json = api_call_as_user(@bob,
-                                :get,
-                                "/api/v1/search/recipients.json?context=course_#{@course.id}",
+        json = api_call_as_user(@bob, :get, "/api/v1/search/recipients.json?context=course_#{@course.id}",
                                 { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
@@ -249,9 +231,7 @@ describe SearchController, type: :request do
           { "id" => @tommy.id, "name" => "tommy", "full_name" => "tommy", "pronouns" => nil, "common_courses" => { @course.id.to_s => ["StudentEnrollment"] }, "common_groups" => {} }
         ]
 
-        json = api_call_as_user(@billy,
-                                :get,
-                                "/api/v1/search/recipients.json?context=course_#{@course.id}",
+        json = api_call_as_user(@billy, :get, "/api/v1/search/recipients.json?context=course_#{@course.id}",
                                 { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
@@ -269,8 +249,7 @@ describe SearchController, type: :request do
 
     context "synthetic contexts" do
       it "returns synthetic contexts within a course" do
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?context=course_#{@course.id}&synthetic_contexts=1",
+        json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}&synthetic_contexts=1",
                         { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}", synthetic_contexts: "1" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
@@ -282,8 +261,7 @@ describe SearchController, type: :request do
       end
 
       it "returns synthetic contexts within a section" do
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?context=section_#{@course.default_section.id}&synthetic_contexts=1",
+        json = api_call(:get, "/api/v1/search/recipients.json?context=section_#{@course.default_section.id}&synthetic_contexts=1",
                         { controller: "search", action: "recipients", format: "json", context: "section_#{@course.default_section.id}", synthetic_contexts: "1" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
@@ -293,8 +271,7 @@ describe SearchController, type: :request do
       end
 
       it "returns groups within a course" do
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
+        json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
                         { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}_groups", synthetic_contexts: "1" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
@@ -303,8 +280,7 @@ describe SearchController, type: :request do
       end
 
       it "returns sections within a course" do
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?context=course_#{@course.id}_sections&synthetic_contexts=1",
+        json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}_sections&synthetic_contexts=1",
                         { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}_sections", synthetic_contexts: "1" })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
@@ -316,8 +292,7 @@ describe SearchController, type: :request do
 
     context "permissions" do
       it "returns valid permission data" do
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?search=the%20o&permissions[]=send_messages_all",
+        json = api_call(:get, "/api/v1/search/recipients.json?search=the%20o&permissions[]=send_messages_all",
                         { controller: "search", action: "recipients", format: "json", search: "the o", permissions: ["send_messages_all"] })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
@@ -329,8 +304,7 @@ describe SearchController, type: :request do
       end
 
       it "does not return invalid permission data" do
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?search=the%20o&permissions[]=foo_bar",
+        json = api_call(:get, "/api/v1/search/recipients.json?search=the%20o&permissions[]=foo_bar",
                         { controller: "search", action: "recipients", format: "json", search: "the o", permissions: ["foo_bar"] })
         json.each { |c| c.delete("avatar_url") }
         expect(json).to eql [
@@ -346,8 +320,7 @@ describe SearchController, type: :request do
       it "paginates even if no type is specified" do
         create_users_in_course(@course, Array.new(4) { { name: "cletus", sortable_name: "cletus" } })
 
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?search=cletus&per_page=3",
+        json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&per_page=3",
                         { controller: "search", action: "recipients", format: "json", search: "cletus", per_page: "3" })
         expect(json.size).to be 3
         expect(response.headers["Link"]).not_to be_nil
@@ -356,8 +329,7 @@ describe SearchController, type: :request do
       it "paginates users and return proper pagination headers" do
         create_users_in_course(@course, Array.new(4) { { name: "cletus", sortable_name: "cletus" } })
 
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?search=cletus&type=user&per_page=3",
+        json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=3",
                         { controller: "search", action: "recipients", format: "json", search: "cletus", type: "user", per_page: "3" })
         expect(json.size).to be 3
         links = Api.parse_pagination_links(response.headers["Link"])
@@ -387,8 +359,7 @@ describe SearchController, type: :request do
       it "paginates contexts and return proper pagination headers" do
         create_courses(Array.new(4) { { name: "ofcourse" } }, enroll_user: @user)
 
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?search=ofcourse&type=context&per_page=3",
+        json = api_call(:get, "/api/v1/search/recipients.json?search=ofcourse&type=context&per_page=3",
                         { controller: "search", action: "recipients", format: "json", search: "ofcourse", type: "context", per_page: "3" })
         expect(json.size).to be 3
         links = Api.parse_pagination_links(response.headers["Link"])
@@ -418,8 +389,7 @@ describe SearchController, type: :request do
       it "ignores invalid per_page" do
         create_users_in_course(@course, Array.new(11) { { name: "cletus", sortable_name: "cletus" } })
 
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?search=cletus&type=user&per_page=-1",
+        json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=-1",
                         { controller: "search", action: "recipients", format: "json", search: "cletus", type: "user", per_page: "-1" })
         expect(json.size).to be 10
         links = Api.parse_pagination_links(response.headers["Link"])
@@ -455,8 +425,7 @@ describe SearchController, type: :request do
           user_ids.concat create_users_in_course(course, [{ name: "term", sortable_name: "term" }])
         end
 
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?search=term&per_page=4",
+        json = api_call(:get, "/api/v1/search/recipients.json?search=term&per_page=4",
                         { controller: "search", action: "recipients", format: "json", search: "term", per_page: "4" })
         expect(json.size).to be 4
         expect(json.pluck("id")).to eq course_ids[0...4]
@@ -510,8 +479,7 @@ describe SearchController, type: :request do
         course2 = @course
         course2.update_attribute(:name, "Context Beta")
 
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?type=context&search=Context&include_inactive=1",
+        json = api_call(:get, "/api/v1/search/recipients.json?type=context&search=Context&include_inactive=1",
                         { controller: "search", action: "recipients", format: "json", type: "context", search: "Context", include_inactive: "1" })
         expect(json.pluck("id")).to eq [course2.asset_string, course1.asset_string]
       end
@@ -519,8 +487,7 @@ describe SearchController, type: :request do
       it "sorts contexts by type second when searching" do
         @course.update_attribute(:name, "Context Beta")
         @group.update_attribute(:name, "Context Alpha")
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?type=context&search=Context",
+        json = api_call(:get, "/api/v1/search/recipients.json?type=context&search=Context",
                         { controller: "search", action: "recipients", format: "json", type: "context", search: "Context" })
         expect(json.pluck("id")).to eq [@course.asset_string, @group.asset_string]
       end
@@ -534,8 +501,7 @@ describe SearchController, type: :request do
         course1.update_attribute(:name, "Context Beta")
         course2.update_attribute(:name, "Context Alpha")
 
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?type=context&search=Context",
+        json = api_call(:get, "/api/v1/search/recipients.json?type=context&search=Context",
                         { controller: "search", action: "recipients", format: "json", type: "context", search: "Context" })
         expect(json.pluck("id")).to eq [course2.asset_string, course1.asset_string]
       end
@@ -546,15 +512,13 @@ describe SearchController, type: :request do
 
       it "shows new groups in existing categories" do
         skip("investigate cause for failures beginning 05/05/21 FOO-1950")
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
+        json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
                         { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}_groups", synthetic_contexts: "1" })
         expect(json.pluck("id")).to eq ["group_#{@group.id}"]
 
         Timecop.freeze(1.minute.from_now) do
           group2 = @course.groups.create(name: "whee new group", group_category: @group.group_category)
-          json2 = api_call(:get,
-                           "/api/v1/search/recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
+          json2 = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
                            { controller: "search", action: "recipients", format: "json", context: "course_#{@course.id}_groups", synthetic_contexts: "1" })
           expect(json2.pluck("id")).to match_array ["group_#{@group.id}", "group_#{group2.id}"]
 
@@ -563,8 +527,7 @@ describe SearchController, type: :request do
           group2.add_user(new_student)
 
           # show group members too
-          json3 = api_call(:get,
-                           "/api/v1/search/recipients.json?context=group_#{group2.id}",
+          json3 = api_call(:get, "/api/v1/search/recipients.json?context=group_#{group2.id}",
                            { controller: "search", action: "recipients", format: "json", context: "group_#{group2.id}" })
           expect(json3.pluck("id")).to eq [new_student.id]
         end
@@ -594,8 +557,7 @@ describe SearchController, type: :request do
           group2.save!
         end
 
-        json = api_call(:get,
-                        "/api/v1/search/recipients.json?type=group&search=group",
+        json = api_call(:get, "/api/v1/search/recipients.json?type=group&search=group",
                         { controller: "search", action: "recipients", format: "json", type: "group", search: "group" })
         ids = json.pluck("id")
         expect(ids).to include(group1.asset_string)

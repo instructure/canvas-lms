@@ -83,7 +83,7 @@ module SpeedGrader
 
     def first_group_containing_students
       course.groups.active.joins(:group_memberships)
-            .where(GroupMembership.active.where("group_id = groups.id AND moderator IS NOT TRUE").arel.exists)
+            .where("EXISTS (?)", GroupMembership.active.where("group_id = groups.id AND moderator IS NOT TRUE"))
             .order(:id)
             .first
     end

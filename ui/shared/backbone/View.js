@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable react/no-this-in-sfc */
 /* eslint-disable no-void */
 
 import {extend} from './utils'

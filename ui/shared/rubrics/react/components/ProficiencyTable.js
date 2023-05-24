@@ -81,6 +81,7 @@ export default class ProficiencyTable extends React.Component {
 
   componentDidUpdate() {
     if (this.fieldWithFocus()) {
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState(oldState => {
         const rows = oldState.rows.map(row => row.delete('focusField'))
         return {rows}

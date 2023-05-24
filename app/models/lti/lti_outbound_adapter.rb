@@ -146,7 +146,7 @@ module Lti
     private
 
     def default_launch_url(resource_type = nil)
-      @tool.launch_url(extension_type: resource_type)
+      resource_type ? @tool.extension_setting(resource_type, :url) : @tool.url
     end
 
     def default_link_code

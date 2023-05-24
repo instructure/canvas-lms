@@ -18,16 +18,18 @@
 
 import $ from 'jquery'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {
-  CanvasProgress,
-  CanvasProgressAPIResult,
-  DoFetchModuleWithItemsResponse,
-} from '../react/types'
+
 import {
   renderContextModulesPublishIcon,
   updateModuleItemPublishedState,
   updateModuleItemsPublishedStates,
 } from './publishOneModuleHelper'
+
+export type ProgressResult = {
+  id: string
+  completion: number
+  workflow_state: 'queued' | 'running' | 'completed' | 'failed'
+}
 
 const PUBLISH_STATUS_POLLING_MS = 1000
 
@@ -56,12 +58,8 @@ export function batchUpdateAllModulesApiCall(
   })
 }
 
-export function monitorProgress(
-  progressId: string,
-  setCurrentProgress: (progress: CanvasProgress) => void,
-  onProgressFail: (error: Error) => void
-) {
-  let progress: CanvasProgress
+export function monitorProgress(progressId, setCurrentProgress, onProgressFail) {
+  let progress
 
   const pollBatchApiProgress = () => {
     if (!progressId) return
@@ -75,14 +73,14 @@ export function monitorProgress(
       doFetchApi({
         path: `/api/v1/progress/${progressId}`,
       })
-        .then((result: CanvasProgressAPIResult) => {
+        .then(result => {
           progress = result.json
           if (!['completed', 'failed'].includes(progress.workflow_state)) {
             window.setTimeout(pollingLoop, PUBLISH_STATUS_POLLING_MS)
           }
           setCurrentProgress(progress)
         })
-        .catch((error: Error) => {
+        .catch(error => {
           onProgressFail(error)
         })
     }
@@ -91,22 +89,18 @@ export function monitorProgress(
   pollBatchApiProgress()
 }
 
-export function cancelBatchUpdate(
-  progress: CanvasProgress,
-  onCancelComplete: (error?: Error) => void
-) {
+export function cancelBatchUpdate(progress, onCancelComplete) {
   if (!progress) return
   if (progress.workflow_state === 'completed' || progress.workflow_state === 'failed') return
 
   doFetchApi({
     path: `/api/v1/progress/${progress.id}/cancel`,
     method: 'POST',
-    body: {message: 'canceled'},
   })
-    .then((_result: CanvasProgressAPIResult) => {
+    .then(_result => {
       onCancelComplete()
     })
-    .catch((error: Error) => {
+    .catch(error => {
       onCancelComplete(error)
     })
 }
@@ -115,8 +109,7 @@ export function fetchAllItemPublishedStates(courseId: string | number, nextLink?
   return doFetchApi({
     path: nextLink || `/api/v1/courses/${courseId}/modules?include[]=items`,
     method: 'GET',
-  }).then((response: DoFetchModuleWithItemsResponse) => {
-    const {json, link} = response
+  }).then(({json, link}) => {
     json.forEach((module: any) => {
       updateModulePublishedState(module.id, module.published, false)
       module.items.forEach((item: any) => {

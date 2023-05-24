@@ -44,7 +44,7 @@ type ComponentProps = {
 const BORDER_WIDTH = 'small'
 const BOTTOM_PADDING_OFFSET = 30
 
-export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
+export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) => {
   const [visibilityChanges, setVisibilityChanges] = useState<VisibilityChange[]>([])
   const [isSaving, setSaving] = useState(false)
   const [searchValue, setSearchValue] = useState('')

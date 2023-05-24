@@ -322,15 +322,15 @@ module CanvasSecurity
 
   class << self
     def services_encryption_secret
-      Rails.application&.credentials&.dig(:canvas_security, :encryption_secret)
+      DynamicSettings.find("canvas")["encryption-secret"]
     end
 
     def services_signing_secret
-      Rails.application&.credentials&.dig(:canvas_security, :signing_secret)
+      DynamicSettings.find("canvas")["signing-secret"]
     end
 
     def services_previous_signing_secret
-      Rails.application&.credentials&.dig(:canvas_security, :signing_secret_deprecated)
+      DynamicSettings.find("canvas")["signing-secret-deprecated"]
     end
 
     private

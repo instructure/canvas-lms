@@ -86,7 +86,7 @@ interface PassedProps {
 
 type ComponentProps = StoreProps & DispatchProps & PassedProps
 
-export const Footer = ({
+export const Footer: React.FC<ComponentProps> = ({
   autoSaving,
   pacePublishing,
   blackoutDatesSyncing,
@@ -107,7 +107,7 @@ export const Footer = ({
   isUnpublishedNewPace,
   paceName,
   blueprintLocked,
-}: ComponentProps) => {
+}) => {
   const [isRemovePaceModalOpen, setRemovePaceModalOpen] = useState(false)
   const useRedesign = window.ENV.FEATURES.course_paces_redesign
   const userIsMasquerading = window.ENV.IS_MASQUERADING

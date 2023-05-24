@@ -19,6 +19,6 @@
 import React from 'react'
 import CoursePaceTable from './course_pace_table/course_pace_table'
 
-const Body = () => <CoursePaceTable />
+const Body: React.FC = () => <CoursePaceTable />
 
 export default Body

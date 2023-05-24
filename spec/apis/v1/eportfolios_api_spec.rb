@@ -33,19 +33,16 @@ describe "EportfoliosApi", type: :request do
     @deleted_eportfolio = eportfolio_model(user: @eportfolio_user, name: "Deletasaur", workflow_state: "deleted")
     @eportfolio = nil # avoid accidents
 
-    EportfolioEntry.create!(name: "Nuts",
-                            eportfolio: @active_eportfolio,
+    EportfolioEntry.create!(name: "Nuts", eportfolio: @active_eportfolio,
                             eportfolio_category: @active_eportfolio.eportfolio_categories.first)
-    EportfolioEntry.create!(name: "NestEgg",
-                            eportfolio: @deleted_eportfolio,
+    EportfolioEntry.create!(name: "NestEgg", eportfolio: @deleted_eportfolio,
                             eportfolio_category: @deleted_eportfolio.eportfolio_categories.first)
   end
 
   describe "#index" do
     it "lists eportfolios" do
       @user = @eportfolio_user
-      json = api_call(:get,
-                      "/api/v1/users/#{@eportfolio_user.id}/eportfolios",
+      json = api_call(:get, "/api/v1/users/#{@eportfolio_user.id}/eportfolios",
                       controller: "eportfolios_api",
                       action: "index",
                       format: "json",
@@ -58,8 +55,7 @@ describe "EportfoliosApi", type: :request do
     context "as an admin" do
       it "allows listing deleted eportfolios" do
         @user = @admin
-        json = api_call(:get,
-                        "/api/v1/users/#{@eportfolio_user.id}/eportfolios?include[]=deleted",
+        json = api_call(:get, "/api/v1/users/#{@eportfolio_user.id}/eportfolios?include[]=deleted",
                         controller: "eportfolios_api",
                         action: "index",
                         format: "json",
@@ -74,8 +70,7 @@ describe "EportfoliosApi", type: :request do
     context "as self" do
       it "ignores listing deleted eportfolios" do
         @user = @eportfolio_user
-        json = api_call(:get,
-                        "/api/v1/users/self/eportfolios?include[]=deleted",
+        json = api_call(:get, "/api/v1/users/self/eportfolios?include[]=deleted",
                         controller: "eportfolios_api",
                         action: "index",
                         format: "json",
@@ -90,17 +85,12 @@ describe "EportfoliosApi", type: :request do
     context "as a random other user" do
       it "is unauthorized" do
         @user = @other_user
-        api_call(:get,
-                 "/api/v1/users/#{@eportfolio_user.id}/eportfolios",
-                 {
+        api_call(:get, "/api/v1/users/#{@eportfolio_user.id}/eportfolios", {
                    controller: "eportfolios_api",
                    action: "index",
                    format: "json",
                    user_id: @eportfolio_user.id
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
   end
@@ -109,8 +99,7 @@ describe "EportfoliosApi", type: :request do
     context "as an admin" do
       it "shows eportfolio details" do
         @user = @admin
-        json = api_call(:get,
-                        "/api/v1/eportfolios/#{@active_eportfolio.id}",
+        json = api_call(:get, "/api/v1/eportfolios/#{@active_eportfolio.id}",
                         controller: "eportfolios_api",
                         action: "show",
                         format: "json",
@@ -129,25 +118,19 @@ describe "EportfoliosApi", type: :request do
 
       it "is unauthorized for a deleted eportfolio" do
         @user = @admin
-        api_call(:get,
-                 "/api/v1/eportfolios/#{@deleted_eportfolio.id}",
-                 {
+        api_call(:get, "/api/v1/eportfolios/#{@deleted_eportfolio.id}", {
                    controller: "eportfolios_api",
                    action: "show",
                    format: "json",
                    id: @deleted_eportfolio.id
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
 
     context "as self" do
       it "shows eportfolio details" do
         @user = @eportfolio_user
-        json = api_call(:get,
-                        "/api/v1/eportfolios/#{@active_eportfolio.id}",
+        json = api_call(:get, "/api/v1/eportfolios/#{@active_eportfolio.id}",
                         controller: "eportfolios_api",
                         action: "show",
                         format: "json",
@@ -166,34 +149,24 @@ describe "EportfoliosApi", type: :request do
 
       it "is unauthorized for a deleted eportfolio" do
         @user = @other_user
-        api_call(:get,
-                 "/api/v1/eportfolios/#{@deleted_eportfolio.id}",
-                 {
+        api_call(:get, "/api/v1/eportfolios/#{@deleted_eportfolio.id}", {
                    controller: "eportfolios_api",
                    action: "show",
                    format: "json",
                    id: @deleted_eportfolio.id
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
 
     context "as a random other user" do
       it "is unauthorized" do
         @user = @other_user
-        api_call(:get,
-                 "/api/v1/eportfolios/#{@active_eportfolio.id}",
-                 {
+        api_call(:get, "/api/v1/eportfolios/#{@active_eportfolio.id}", {
                    controller: "eportfolios_api",
                    action: "show",
                    format: "json",
                    id: @active_eportfolio.id
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
   end
@@ -202,8 +175,7 @@ describe "EportfoliosApi", type: :request do
     context "as an admin" do
       it "deletes an eportfolio" do
         @user = @admin
-        json = api_call(:delete,
-                        "/api/v1/eportfolios/#{@active_eportfolio.id}",
+        json = api_call(:delete, "/api/v1/eportfolios/#{@active_eportfolio.id}",
                         controller: "eportfolios_api",
                         action: "delete",
                         format: "json",
@@ -217,8 +189,7 @@ describe "EportfoliosApi", type: :request do
     context "as self" do
       it "deletes an eportfolio" do
         @user = @eportfolio_user
-        json = api_call(:delete,
-                        "/api/v1/eportfolios/#{@active_eportfolio.id}",
+        json = api_call(:delete, "/api/v1/eportfolios/#{@active_eportfolio.id}",
                         controller: "eportfolios_api",
                         action: "delete",
                         format: "json",
@@ -232,17 +203,12 @@ describe "EportfoliosApi", type: :request do
     context "as a random other user" do
       it "is unauthorized" do
         @user = @other_user
-        api_call(:delete,
-                 "/api/v1/eportfolios/#{@active_eportfolio.id}",
-                 {
+        api_call(:delete, "/api/v1/eportfolios/#{@active_eportfolio.id}", {
                    controller: "eportfolios_api",
                    action: "delete",
                    format: "json",
                    id: @active_eportfolio.id
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
   end
@@ -251,8 +217,7 @@ describe "EportfoliosApi", type: :request do
     context "as an admin" do
       it "returns eportfolio pages" do
         @user = @admin
-        json = api_call(:get,
-                        "/api/v1/eportfolios/#{@active_eportfolio.id}/pages",
+        json = api_call(:get, "/api/v1/eportfolios/#{@active_eportfolio.id}/pages",
                         controller: "eportfolios_api",
                         action: "pages",
                         format: "json",
@@ -263,25 +228,19 @@ describe "EportfoliosApi", type: :request do
 
       it "is unauthorized for a deleted eportfolio" do
         @user = @admin
-        api_call(:get,
-                 "/api/v1/eportfolios/#{@deleted_eportfolio.id}/pages",
-                 {
+        api_call(:get, "/api/v1/eportfolios/#{@deleted_eportfolio.id}/pages", {
                    controller: "eportfolios_api",
                    action: "pages",
                    format: "json",
                    eportfolio_id: @deleted_eportfolio.id
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
 
     context "as self" do
       it "returns eportfolio_pages" do
         @user = @eportfolio_user
-        json = api_call(:get,
-                        "/api/v1/eportfolios/#{@active_eportfolio.id}/pages",
+        json = api_call(:get, "/api/v1/eportfolios/#{@active_eportfolio.id}/pages",
                         controller: "eportfolios_api",
                         action: "pages",
                         format: "json",
@@ -292,34 +251,24 @@ describe "EportfoliosApi", type: :request do
 
       it "is unauthorized for a deleted eportfolio" do
         @user = @eportfolio_user
-        api_call(:get,
-                 "/api/v1/eportfolios/#{@deleted_eportfolio.id}/pages",
-                 {
+        api_call(:get, "/api/v1/eportfolios/#{@deleted_eportfolio.id}/pages", {
                    controller: "eportfolios_api",
                    action: "pages",
                    format: "json",
                    eportfolio_id: @deleted_eportfolio.id
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
 
     context "as a random other user" do
       it "is unauthorized" do
         @user = @other_user
-        api_call(:get,
-                 "/api/v1/eportfolios/#{@active_eportfolio.id}/pages",
-                 {
+        api_call(:get, "/api/v1/eportfolios/#{@active_eportfolio.id}/pages", {
                    controller: "eportfolios_api",
                    action: "pages",
                    format: "json",
                    eportfolio_id: @active_eportfolio.id
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
   end
@@ -328,8 +277,7 @@ describe "EportfoliosApi", type: :request do
     context "as an admin" do
       it "updates the spam status for the eportfolio" do
         @user = @admin
-        api_call(:put,
-                 "/api/v1/eportfolios/#{@active_eportfolio.id}/moderate?spam_status=marked_as_spam",
+        api_call(:put, "/api/v1/eportfolios/#{@active_eportfolio.id}/moderate?spam_status=marked_as_spam",
                  controller: "eportfolios_api",
                  action: "moderate",
                  format: "json",
@@ -341,70 +289,50 @@ describe "EportfoliosApi", type: :request do
 
       it "is not allowed for a deleted eportfolio" do
         @user = @admin
-        api_call(:put,
-                 "/api/v1/eportfolios/#{@deleted_eportfolio.id}/moderate?spam_status=marked_as_spam",
-                 {
+        api_call(:put, "/api/v1/eportfolios/#{@deleted_eportfolio.id}/moderate?spam_status=marked_as_spam", {
                    controller: "eportfolios_api",
                    action: "moderate",
                    format: "json",
                    eportfolio_id: @deleted_eportfolio.id,
                    spam_status: "marked_as_spam"
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
 
       it "is not allowed for an invalid spam_status" do
         @user = @admin
-        api_call(:put,
-                 "/api/v1/eportfolios/#{@active_eportfolio.id}/moderate?spam_status=spam_it_up",
-                 {
+        api_call(:put, "/api/v1/eportfolios/#{@active_eportfolio.id}/moderate?spam_status=spam_it_up", {
                    controller: "eportfolios_api",
                    action: "moderate",
                    format: "json",
                    eportfolio_id: @active_eportfolio.id,
                    spam_status: "spam_it_up"
-                 },
-                 {},
-                 {},
-                 { expected_status: 400 })
+                 }, {}, {}, { expected_status: 400 })
       end
     end
 
     context "as self" do
       it "is unauthorized" do
         @user = @eportfolio_user
-        api_call(:put,
-                 "/api/v1/eportfolios/#{@active_eportfolio.id}/moderate?spam_status=marked_as_spam",
-                 {
+        api_call(:put, "/api/v1/eportfolios/#{@active_eportfolio.id}/moderate?spam_status=marked_as_spam", {
                    controller: "eportfolios_api",
                    action: "moderate",
                    format: "json",
                    eportfolio_id: @active_eportfolio.id,
                    spam_status: "marked_as_spam"
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
 
     context "as a random other user" do
       it "is unauthorized" do
         @user = @other_user
-        api_call(:put,
-                 "/api/v1/eportfolios/#{@active_eportfolio.id}/moderate?spam_status=marked_as_spam",
-                 {
+        api_call(:put, "/api/v1/eportfolios/#{@active_eportfolio.id}/moderate?spam_status=marked_as_spam", {
                    controller: "eportfolios_api",
                    action: "moderate",
                    format: "json",
                    eportfolio_id: @active_eportfolio.id,
                    spam_status: "marked_as_spam"
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
   end
@@ -413,8 +341,7 @@ describe "EportfoliosApi", type: :request do
     context "as an admin" do
       it "updates the spam status for all active eportfolios" do
         @user = @admin
-        api_call(:put,
-                 "/api/v1/users/#{@eportfolio_user.id}/eportfolios?spam_status=marked_as_spam",
+        api_call(:put, "/api/v1/users/#{@eportfolio_user.id}/eportfolios?spam_status=marked_as_spam",
                  controller: "eportfolios_api",
                  action: "moderate_all",
                  format: "json",
@@ -430,54 +357,39 @@ describe "EportfoliosApi", type: :request do
 
       it "is not allowed for an invalid spam_status" do
         @user = @admin
-        api_call(:put,
-                 "/api/v1/users/#{@eportfolio_user.id}/eportfolios?spam_status=spamorific",
-                 {
+        api_call(:put, "/api/v1/users/#{@eportfolio_user.id}/eportfolios?spam_status=spamorific", {
                    controller: "eportfolios_api",
                    action: "moderate_all",
                    format: "json",
                    user_id: @eportfolio_user.id,
                    spam_status: "spamorific"
-                 },
-                 {},
-                 {},
-                 { expected_status: 400 })
+                 }, {}, {}, { expected_status: 400 })
       end
     end
 
     context "as self" do
       it "is unauthorized" do
         @user = @eportfolio_user
-        api_call(:put,
-                 "/api/v1/users/#{@eportfolio_user.id}/eportfolios?spam_status=marked_as_spam",
-                 {
+        api_call(:put, "/api/v1/users/#{@eportfolio_user.id}/eportfolios?spam_status=marked_as_spam", {
                    controller: "eportfolios_api",
                    action: "moderate_all",
                    format: "json",
                    user_id: @eportfolio_user.id,
                    spam_status: "marked_as_spam"
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
 
     context "as a random other user" do
       it "is unauthorized" do
         @user = @other_user
-        api_call(:put,
-                 "/api/v1/users/#{@eportfolio_user.id}/eportfolios?spam_status=marked_as_spam",
-                 {
+        api_call(:put, "/api/v1/users/#{@eportfolio_user.id}/eportfolios?spam_status=marked_as_spam", {
                    controller: "eportfolios_api",
                    action: "moderate_all",
                    format: "json",
                    user_id: @eportfolio_user.id,
                    spam_status: "marked_as_spam"
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
   end
@@ -486,8 +398,7 @@ describe "EportfoliosApi", type: :request do
     context "as an admin" do
       it "restores the eportfolio" do
         @user = @admin
-        json = api_call(:put,
-                        "/api/v1/eportfolios/#{@deleted_eportfolio.id}/restore",
+        json = api_call(:put, "/api/v1/eportfolios/#{@deleted_eportfolio.id}/restore",
                         controller: "eportfolios_api",
                         action: "restore",
                         format: "json",
@@ -501,34 +412,24 @@ describe "EportfoliosApi", type: :request do
     context "as self" do
       it "is unauthorized" do
         @user = @eportfolio_user
-        api_call(:put,
-                 "/api/v1/eportfolios/#{@deleted_eportfolio.id}/restore",
-                 {
+        api_call(:put, "/api/v1/eportfolios/#{@deleted_eportfolio.id}/restore", {
                    controller: "eportfolios_api",
                    action: "restore",
                    format: "json",
                    eportfolio_id: @deleted_eportfolio.id
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
 
     context "as a random other user" do
       it "is unauthorized" do
         @user = @other_user
-        api_call(:put,
-                 "/api/v1/eportfolios/#{@deleted_eportfolio.id}/restore",
-                 {
+        api_call(:put, "/api/v1/eportfolios/#{@deleted_eportfolio.id}/restore", {
                    controller: "eportfolios_api",
                    action: "restore",
                    format: "json",
                    eportfolio_id: @deleted_eportfolio.id
-                 },
-                 {},
-                 {},
-                 { expected_status: 401 })
+                 }, {}, {}, { expected_status: 401 })
       end
     end
   end

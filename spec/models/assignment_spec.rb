@@ -635,43 +635,6 @@ describe Assignment do
     end
   end
 
-  describe "scope: expecting_submission" do
-    it "includes assignments expecting online submissions" do
-      assignment_model(submission_types: "online_text_entry,online_url,online_upload", course: @course)
-      expect(Assignment.expecting_submission).not_to be_empty
-    end
-
-    it "includes submissions for assignments expecting external_tool submissions" do
-      assignment_model(submission_types: "external_tool", course: @course)
-      expect(Assignment.expecting_submission).not_to be_empty
-    end
-
-    it "optionally excludes other assignment types" do
-      assignment_model(submission_types: "external_tool", course: @course)
-      expect(Assignment.expecting_submission(additional_excludes: "external_tool")).to be_empty
-    end
-
-    it "excludes submissions for assignments expecting on_paper submissions" do
-      assignment_model(submission_types: "on_paper", course: @course)
-      expect(Assignment.expecting_submission).to be_empty
-    end
-
-    it "excludes submissions for assignments expecting wiki_page submissions" do
-      assignment_model(submission_types: "wiki_page", course: @course)
-      expect(Assignment.expecting_submission).to be_empty
-    end
-
-    it "excludes submissions for assignments not expecting submissions" do
-      assignment_model(submission_types: "none", course: @course)
-      expect(Assignment.expecting_submission).to be_empty
-    end
-
-    it "excludes submissions for not graded assignments" do
-      assignment_model(submission_types: "not_graded", course: @course)
-      expect(Assignment.expecting_submission).to be_empty
-    end
-  end
-
   describe "#visible_to_students_in_course_with_da" do
     let(:student_enrollment) { @course.enrollments.find_by(user: @student) }
     let(:visible_assignments) do
@@ -1569,17 +1532,11 @@ describe Assignment do
     it "does not explode duplicating a mismatched rubric association" do
       assmt = @course.assignments.create!(title: "assmt", points_possible: 3)
       rubric = @course.rubrics.new(title: "rubric")
-      rubric.update_with_association(@teacher,
-                                     {
+      rubric.update_with_association(@teacher, {
                                        criteria: { "0" => { description: "correctness", points: 15, ratings: { "0" => { points: 15, description: "a description" } }, }, },
-                                     },
-                                     @course,
-                                     {
-                                       association_object: assmt,
-                                       update_if_existing: true,
-                                       use_for_grading: "1",
-                                       purpose: "grading",
-                                       skip_updating_points_possible: true
+                                     }, @course, {
+                                       association_object: assmt, update_if_existing: true,
+                                       use_for_grading: "1", purpose: "grading", skip_updating_points_possible: true
                                      })
       new_assmt = assmt.reload.duplicate
       new_assmt.save!
@@ -3847,17 +3804,15 @@ describe Assignment do
         late_policy_status: "late",
         seconds_late_override: 120
       )
-      s = @a.submit_homework(@user,
-                             submission_type: "online_url",
-                             url: "http://example.com")
+      s = @a.submit_homework(@user, submission_type: "online_url",
+                                    url: "http://example.com")
       expect(s.submission_type).to eq "online_url"
       expect(s.url).to eq "http://example.com"
       expect(s.late_policy_status).to be_nil
       expect(s.seconds_late_override).to be_nil
 
-      s2 = @a.submit_homework(@user,
-                              submission_type: "online_text_entry",
-                              body: "blah blah blah blah blah blah blah")
+      s2 = @a.submit_homework(@user, submission_type: "online_text_entry",
+                                     body: "blah blah blah blah blah blah blah")
       expect(s2.submission_type).to eq "online_text_entry"
       expect(s2.body).to eq "blah blah blah blah blah blah blah"
       expect(s2.url).to be_nil
@@ -6584,8 +6539,7 @@ describe Assignment do
       s1, s2 = n_students_in_course(2)
 
       section = @course.course_sections.create! name: "some section"
-      e = @course.enroll_user s1,
-                              "StudentEnrollment",
+      e = @course.enroll_user s1, "StudentEnrollment",
                               section: section,
                               allow_multiple_enrollments: true
       e.update_attribute :workflow_state, "active"
@@ -7027,8 +6981,7 @@ describe Assignment do
 
     it "refreshes the course participation counts" do
       expect_any_instance_of(Progress).to receive(:process_job)
-        .with(@assignment.context,
-              :refresh_content_participation_counts,
+        .with(@assignment.context, :refresh_content_participation_counts,
               singleton: "refresh_content_participation_counts:#{@assignment.context.global_id}")
       @assignment.destroy
     end
@@ -7709,8 +7662,7 @@ describe Assignment do
       assignment = assignment_model(course: @course)
       assignment.destroy
       expect_any_instance_of(Progress).to receive(:process_job)
-        .with(assignment.context,
-              :refresh_content_participation_counts,
+        .with(assignment.context, :refresh_content_participation_counts,
               singleton: "refresh_content_participation_counts:#{assignment.context.global_id}")
         .once
       assignment.restore
@@ -8316,10 +8268,8 @@ describe Assignment do
       end
 
       it "is valid if a deleted existing override does not have a due date" do
-        create_section_override_for_assignment(@assignment,
-                                               due_at: nil,
-                                               due_at_overridden: false,
-                                               workflow_state: "deleted")
+        create_section_override_for_assignment(@assignment, due_at: nil, due_at_overridden: false,
+                                                            workflow_state: "deleted")
         expect { @assignment.validate_overrides_for_sis(@overrides) }.not_to raise_error
       end
 
@@ -11026,9 +10976,8 @@ describe Assignment do
     a = Attachment.create! context: file_context,
                            filename: "homework.pdf",
                            uploaded_data: StringIO.new("blah blah blah")
-    @assignment.submit_homework(student,
-                                attachments: [a],
-                                submission_type: "online_upload")
+    @assignment.submit_homework(student, attachments: [a],
+                                         submission_type: "online_upload")
     a
   end
 

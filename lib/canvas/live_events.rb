@@ -67,8 +67,7 @@ module Canvas::LiveEvents
   end
 
   def self.conversation_forwarded(conversation)
-    post_event_stringified("conversation_forwarded",
-                           {
+    post_event_stringified("conversation_forwarded", {
                              conversation_id: conversation.id,
                              updated_at: conversation.updated_at
                            },
@@ -520,11 +519,9 @@ module Canvas::LiveEvents
     ctx[:user_account_id] = pseudonym.account.global_id
     ctx[:user_sis_id] = pseudonym.sis_user_id
     ctx[:session_id] = session[:session_id] if session[:session_id]
-    post_event_stringified("logged_in",
-                           {
+    post_event_stringified("logged_in", {
                              redirect_url: session[:return_to]
-                           },
-                           ctx)
+                           }, ctx)
   end
 
   def self.logged_out
@@ -599,8 +596,7 @@ module Canvas::LiveEvents
       SisPseudonym.for(submission.user, submission.assignment.context, type: :trusted, require_sis: false)
     end
 
-    post_event_stringified("grade_change",
-                           {
+    post_event_stringified("grade_change", {
                              submission_id: submission.global_id,
                              assignment_id: submission.global_assignment_id,
                              assignment_name: submission.assignment.name,
@@ -616,8 +612,7 @@ module Canvas::LiveEvents
                              user_id: submission.global_user_id,
                              grading_complete: submission.graded?,
                              muted: !submission.posted?
-                           },
-                           amended_context(submission.assignment.context))
+                           }, amended_context(submission.assignment.context))
   end
 
   def self.asset_access(asset, category, role, level, context: nil, context_membership: nil)
@@ -1107,14 +1102,8 @@ module Canvas::LiveEvents
   end
 
   def self.heartbeat
-    environment = if ApplicationController.test_cluster?
-                    ApplicationController.test_cluster_name
-                  else
-                    Canvas.environment
-                  end
-
     data = {
-      environment: environment,
+      environment: Canvas.environment,
       region_code: Canvas.region_code || "not_configured",
       region: Canvas.region || "not_configured"
     }

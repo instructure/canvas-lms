@@ -42,10 +42,8 @@ describe UsersController, type: :request do
     end
 
     it "gets an empty list of upcoming events" do
-      json = api_call(:get,
-                      "/api/v1/users/self/upcoming_events",
-                      controller: "users",
-                      action: "upcoming_events",
+      json = api_call(:get, "/api/v1/users/self/upcoming_events",
+                      controller: "users", action: "upcoming_events",
                       format: "json")
       expect(json).to eq []
     end
@@ -59,10 +57,8 @@ describe UsersController, type: :request do
       end
 
       it "gets the event" do
-        json = api_call(:get,
-                        "/api/v1/users/self/upcoming_events",
-                        controller: "users",
-                        action: "upcoming_events",
+        json = api_call(:get, "/api/v1/users/self/upcoming_events",
+                        controller: "users", action: "upcoming_events",
                         format: "json")
         expect(json.pluck("title")).to eq ["Upcoming Event"]
       end
@@ -82,10 +78,8 @@ describe UsersController, type: :request do
       end
 
       it "gets the events" do
-        json = api_call(:get,
-                        "/api/v1/users/self/upcoming_events",
-                        controller: "users",
-                        action: "upcoming_events",
+        json = api_call(:get, "/api/v1/users/self/upcoming_events",
+                        controller: "users", action: "upcoming_events",
                         format: "json")
         expect(json.pluck("title")).to eq [
           "Upcoming Course Event",
@@ -95,10 +89,8 @@ describe UsersController, type: :request do
 
       it "doesn't gets the events if the course is unpublished and the user is a teacher" do
         @course.claim!
-        json = api_call(:get,
-                        "/api/v1/users/self/upcoming_events",
-                        controller: "users",
-                        action: "upcoming_events",
+        json = api_call(:get, "/api/v1/users/self/upcoming_events",
+                        controller: "users", action: "upcoming_events",
                         format: "json")
         expect(json.pluck("title")).to eq [
           "Upcoming Course Event",
@@ -109,10 +101,8 @@ describe UsersController, type: :request do
       it "doesn't gets the events if the course is unpublished and the user is a student" do
         student_in_course(active_all: true, course: @course)
         @course.claim!
-        json = api_call(:get,
-                        "/api/v1/users/self/upcoming_events",
-                        controller: "users",
-                        action: "upcoming_events",
+        json = api_call(:get, "/api/v1/users/self/upcoming_events",
+                        controller: "users", action: "upcoming_events",
                         format: "json")
         expect(json).to be_blank
       end

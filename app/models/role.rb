@@ -30,11 +30,7 @@ class Role < ActiveRecord::Base
   KNOWN_TYPES = (BASE_TYPES +
     %w[StudentViewEnrollment
        NilEnrollment
-       teacher
-       ta
-       designer
-       student
-       observer]).freeze
+       teacher ta designer student observer]).freeze
 
   module AssociationHelper
     # this is an override to take advantage of built-in role caching since those are by far the most common
@@ -221,9 +217,7 @@ class Role < ActiveRecord::Base
       WHERE role_overrides.role_id = roles.id
         AND role_overrides.permission = ?
         AND role_overrides.enabled = ?
-    )",
-             permission,
-             true)
+    )", permission, true)
   }
 
   # Returns a list of hashes for each base enrollment type, and each will have a

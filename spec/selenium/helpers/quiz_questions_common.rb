@@ -43,11 +43,8 @@ module QuizQuestionsCommon
       { weight: 0, answer_text: "B", answer_comments: "", id: 1020 },
       { weight: 0, answer_text: "C", answer_comments: "", id: 7051 }
     ]
-    data = { question_name: name,
-             points_possible: 1,
-             question_text: question,
-             answers: answers,
-             question_type: "multiple_choice_question" }
+    data = { question_name: name, points_possible: 1, question_text: question,
+             answers: answers, question_type: "multiple_choice_question" }
 
     @quiz.quiz_questions.create!(question_data: data)
   end

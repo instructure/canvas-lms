@@ -105,10 +105,8 @@ describe "Notifications" do
       context "observer notifications" do
         before :once do
           @observer = user_with_pseudonym(username: "observer@example.com", active_all: 1)
-          @course.enroll_user(@observer,
-                              "ObserverEnrollment",
-                              enrollment_state: "active",
-                              associated_user_id: @student.id)
+          @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active",
+                                                               associated_user_id: @student.id)
           setup_notification(@observer, name: "Submission Graded")
           setup_notification(@observer, name: "Submission Comment")
         end
@@ -176,10 +174,8 @@ describe "Notifications" do
       context "Observer notifications" do
         before :once do
           @observer = user_with_pseudonym(username: "observer@example.com", active_all: 1)
-          @course.enroll_user(@observer,
-                              "ObserverEnrollment",
-                              enrollment_state: "active",
-                              associated_user_id: @student.id)
+          @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active",
+                                                               associated_user_id: @student.id)
           setup_notification(@student, name: "Grade Weight Changed")
         end
 
@@ -202,10 +198,8 @@ describe "Notifications" do
       context "observer notifications" do
         before :once do
           @observer = user_with_pseudonym(username: "observer@example.com", active_all: 1)
-          @course.enroll_user(@observer,
-                              "ObserverEnrollment",
-                              enrollment_state: "active",
-                              associated_user_id: @student.id)
+          @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active",
+                                                               associated_user_id: @student.id)
           setup_notification(@student, name: "New Event Created")
           setup_notification(@student, name: "Event Date Changed")
         end

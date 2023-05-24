@@ -32,8 +32,7 @@ module SupportHelpers
     def submission
       if params[:assignment_id] && params[:user_id]
         run_fixer(SupportHelpers::Crocodoc::SubmissionFixer,
-                  params[:assignment_id].to_i,
-                  params[:user_id].to_i)
+                  params[:assignment_id].to_i, params[:user_id].to_i)
       else
         render plain: "Missing either assignment and/or user id parameters", status: :bad_request
       end

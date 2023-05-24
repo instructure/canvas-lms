@@ -11,6 +11,31 @@ SCRIPTPATH="$(
 CANVAS=$(dirname $SCRIPTPATH)
 
 if [ $(pwd -P) = $CANVAS ]; then
+  # if .ts or .tsx files have changed (excluding those in packages/), run tsc
+  if git diff --cached --name-only | grep -qE '\.(ts|tsx|js)$'; then
+    if [ -f node_modules/.bin/tsc ]; then
+      echo 'Checking TypeScript...'
+      NODE_OPTIONS=--max-old-space-size=4096 node_modules/.bin/tsc -p tsconfig.json
+      if [ $? -ne 0 ]; then
+        echo 'TypeScript errors found, aborting commit'
+        exit 1
+      fi
+
+      echo 'Checking TypeScript (strict)...'
+      NODE_OPTIONS=--max-old-space-size=4096 node_modules/.bin/tsc -p tsconfig-strict.json
+      if [ $? -ne 0 ]; then
+        echo 'TypeScript errors found, aborting commit'
+        exit 1
+      fi
+    else
+      echo 'Trying to run tsc inside Docker. If you want things quicker yarn install locally.'
+      docker-compose exec -T web node_modules/.bin/tsc -p tsconfig.json ||
+        echo "You should run yarn locally or check to make sure docker is running."
+      docker-compose exec -T web node_modules/.bin/tsc -p tsconfig-strict.json ||
+        echo "You should run yarn locally or check to make sure docker is running."
+    fi
+  fi
+
   # if .js, .ts, or .tsx files have changed, run eslint
   if [ -f node_modules/.bin/lint-staged ]; then
     echo 'Running ESLint...'
@@ -25,7 +50,22 @@ if [ $(pwd -P) = $CANVAS ]; then
       echo "You should run yarn locally or check to make sure docker is running."
   fi
 
-  if git diff --cached --name-only | grep -q 'Gemfile\S*.lock'; then
+  # per-package pre-commit hooks
+  git diff --cached --name-only | grep -E -o '^(packages/[^/]+)' | sort | uniq | while read -r PACKAGE; do
+    # check if CHANGED_PACKAGES/pre-commit-hook.sh exists and run it
+    if [ -f "$PACKAGE/pre-commit-hook.sh" ]; then
+      echo "Running pre-commit hook for $PACKAGE"
+
+      (cd "$PACKAGE" && "./pre-commit-hook.sh")
+
+      if [ $? -ne 0 ]; then
+        echo "Pre-commit hook for $PACKAGE failed, aborting commit"
+        exit 1
+      fi
+    fi
+  done || exit 1
+
+  if git diff --cached --name-only | grep -q Gemfile.lock; then
     echo "Checking lockfiles..."
     script/sync_lockfiles.rb
   fi

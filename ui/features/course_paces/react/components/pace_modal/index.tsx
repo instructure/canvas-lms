@@ -103,11 +103,11 @@ type ResponsiveComponentProps = ComponentProps & {
   readonly outerResponsiveSize: ResponsiveSizes
 }
 
-export const PaceModal = ({
+export const PaceModal: React.FC<ResponsiveComponentProps> = ({
   outerResponsiveSize,
   setOuterResponsiveSize,
   ...props
-}: ResponsiveComponentProps) => {
+}) => {
   const [pendingContext, setPendingContext] = useState('')
   const [trayOpen, setTrayOpen] = useState(false)
   const closeButtonRef = useRef<HTMLElement | null>(null)
@@ -262,7 +262,7 @@ export const PaceModal = ({
   )
 }
 
-export const ResponsivePaceModal = (props: ComponentProps) => (
+export const ResponsivePaceModal: React.FC<ComponentProps> = props => (
   <Responsive
     match="media"
     query={{

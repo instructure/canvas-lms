@@ -106,8 +106,6 @@ class Assignment < ActiveRecord::Base
   serialize :lti_resource_link_custom_params, JSON
   attribute :lti_resource_link_lookup_uuid, :string, default: nil
   attribute :lti_resource_link_url, :string, default: nil
-  attribute :line_item_resource_id, :string, default: nil
-  attribute :line_item_tag, :string, default: nil
 
   has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
   has_many :all_submissions, class_name: "Submission", dependent: :delete_all
@@ -167,10 +165,9 @@ class Assignment < ActiveRecord::Base
   scope :auditable, -> { anonymous.or(moderated) }
   scope :type_quiz_lti, lambda {
     all.primary_shard.activate do
-      where(ContentTag.where("content_tags.context_id=assignments.id")
-                      .where(context_type: "Assignment", content_type: "ContextExternalTool")
-                      .where(ContextExternalTool.where("context_external_tools.id=content_tags.content_id").quiz_lti.arel.exists)
-                .arel.exists)
+      where("EXISTS (?)",
+            ContentTag.where("content_tags.context_id=assignments.id").where(context_type: "Assignment", content_type: "ContextExternalTool")
+                .where("EXISTS (?)", ContextExternalTool.where("context_external_tools.id=content_tags.content_id").quiz_lti.offset(0)).offset(0))
     end
   }
   scope :not_type_quiz_lti, -> { where.not(id: type_quiz_lti) }
@@ -326,12 +323,8 @@ class Assignment < ActiveRecord::Base
     result.ignores.clear
     result.moderated_grading_selections.clear
     result.grades_published_at = nil
-    %i[migration_id
-       lti_context_id
-       turnitin_id
-       discussion_topic
-       integration_id
-       integration_data].each do |attr|
+    %i[migration_id lti_context_id turnitin_id
+       discussion_topic integration_id integration_data].each do |attr|
       result.send(:"#{attr}=", nil)
     end
     result.peer_review_count = 0
@@ -995,23 +988,11 @@ class Assignment < ActiveRecord::Base
     end
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
     %i[
-      all_day
-      could_be_locked
-      grade_group_students_individually
-      anonymous_peer_reviews
-      turnitin_enabled
-      vericite_enabled
-      moderated_grading
-      omit_from_final_grade
-      freeze_on_copy
-      copied
-      only_visible_to_overrides
-      post_to_sis
-      peer_reviews_assigned
-      peer_reviews
-      automatic_peer_reviews
-      muted
-      intra_group_peer_reviews
+      all_day could_be_locked grade_group_students_individually
+      anonymous_peer_reviews turnitin_enabled vericite_enabled
+      moderated_grading omit_from_final_grade freeze_on_copy
+      copied only_visible_to_overrides post_to_sis peer_reviews_assigned
+      peer_reviews automatic_peer_reviews muted intra_group_peer_reviews
       anonymous_grading
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self.graders_anonymous_to_graders = false unless grader_comments_visible_to_graders
@@ -1203,12 +1184,12 @@ class Assignment < ActiveRecord::Base
           url: lti_resource_link_url
         )
 
-        li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true, resource_id: line_item_resource_id, tag: line_item_tag)
+        li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true)
         create_results_from_prior_grades(li)
       elsif saved_change_to_title? || saved_change_to_points_possible?
         line_items
           .find(&:assignment_line_item?)
-          &.update!(label: title, score_maximum: points_possible || 0, resource_id: line_item_resource_id, tag: line_item_tag)
+          &.update!(label: title, score_maximum: points_possible || 0)
       end
 
       if lti_1_3_external_tool_tag?(lti_1_3_tool) && !lti_resource_links.empty?
@@ -1690,16 +1671,16 @@ class Assignment < ActiveRecord::Base
 
     # Ignore test student enrollments so that adding a test student doesn't
     # inadvertently flip a posted anonymous assignment back to unposted
-    assignment_ids_with_unposted_anonymous_submissions =
-      Assignment
-      .where(id: assignments, anonymous_grading: true)
-      .where(Submission.active.unposted.joins(user: :enrollments)
-            .where("submissions.user_id = users.id")
-            .where("submissions.assignment_id = assignments.id")
-            .where("enrollments.course_id = assignments.context_id")
-            .merge(Enrollment.of_student_type.where(workflow_state: "active"))
-            .arel.exists)
-      .pluck(:id).to_set
+    assignment_ids_with_unposted_anonymous_submissions = Assignment
+                                                         .where(id: assignments, anonymous_grading: true)
+                                                         .where(
+                                                           "EXISTS (?)", Submission.active.unposted.joins(user: :enrollments)
+          .where("submissions.user_id = users.id")
+          .where("submissions.assignment_id = assignments.id")
+          .where("enrollments.course_id = assignments.context_id")
+          .merge(Enrollment.of_student_type.where(workflow_state: "active"))
+                                                         )
+                                                         .pluck(:id).to_set
 
     assignments.each do |assignment|
       assignment.unposted_anonymous_submissions = assignment_ids_with_unposted_anonymous_submissions.include?(assignment.id)
@@ -3012,7 +2993,7 @@ class Assignment < ActiveRecord::Base
                                            .where(due_at_overridden: true, due_at: start..ending)
 
     scope1 = where(due_at: start..ending)
-    scope2 = where(overrides_subquery.arel.exists)
+    scope2 = where("EXISTS (?)", overrides_subquery)
     if group_values.present?
       # subquery strategy doesn't work with GROUP BY
       scope1.or(scope2)
@@ -3053,10 +3034,10 @@ class Assignment < ActiveRecord::Base
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where.not(Ignore.where(asset_type: "Assignment",
-                           user_id: user,
-                           purpose: purpose).where("asset_id=assignments.id")
-                       .arel.exists)
+    where("NOT EXISTS (?)",
+          Ignore.where(asset_type: "Assignment",
+                       user_id: user,
+                       purpose: purpose).where("asset_id=assignments.id"))
   }
 
   # This should only be used in the course drop down to show assignments needing a submission
@@ -3065,9 +3046,7 @@ class Assignment < ActiveRecord::Base
             WHERE assignment_id = assignments.id
             AND submissions.workflow_state <> 'deleted'
             AND (submission_type IS NOT NULL OR excused = ?)
-            AND user_id = ?)",
-                  true,
-                  user_id)
+            AND user_id = ?)", true, user_id)
             .limit(limit)
             .order("assignments.due_at")
 
@@ -3077,8 +3056,8 @@ class Assignment < ActiveRecord::Base
     chain.preload(:context)
   }
 
-  scope :expecting_submission, lambda { |additional_excludes: []|
-    where.not(submission_types: [nil, ""] + Array(additional_excludes) + %w[none not_graded on_paper wiki_page])
+  scope :expecting_submission, lambda {
+    where.not(submission_types: [nil, ""] + %w[none not_graded on_paper wiki_page])
   }
 
   scope :gradeable, -> { where.not(submission_types: %w[not_graded wiki_page]) }
@@ -3258,18 +3237,9 @@ class Assignment < ActiveRecord::Base
   end
   protected :infer_comment_context_from_filename
 
-  FREEZABLE_ATTRIBUTES = %w[title
-                            description
-                            lock_at
-                            points_possible
-                            grading_type
-                            submission_types
-                            assignment_group_id
-                            allowed_extensions
-                            group_category_id
-                            notify_of_update
-                            peer_reviews
-                            workflow_state].freeze
+  FREEZABLE_ATTRIBUTES = %w[title description lock_at points_possible grading_type
+                            submission_types assignment_group_id allowed_extensions
+                            group_category_id notify_of_update peer_reviews workflow_state].freeze
   def frozen?
     !!(freeze_on_copy && copied &&
        PluginSetting.settings_for_plugin(:assignment_freezer))
@@ -3463,7 +3433,7 @@ class Assignment < ActiveRecord::Base
 
   def self.assignment_ids_with_submissions(assignment_ids)
     Submission.from(sanitize_sql(["unnest('{?}'::int8[]) as subs (assignment_id)", assignment_ids]))
-              .where(Submission.active.having_submission.where("submissions.assignment_id=subs.assignment_id").arel.exists)
+              .where("EXISTS (?)", Submission.active.having_submission.where("submissions.assignment_id=subs.assignment_id"))
               .distinct.pluck("subs.assignment_id")
   end
 

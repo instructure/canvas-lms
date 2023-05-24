@@ -313,10 +313,7 @@ module AttachmentFu # :nodoc:
     end
 
     # Returns true if the attachment data will be written to the storage system on the next save
-    # This only works if temp_path is set by something else, which happens in the local file
-    # system and with s3 files when creating an image thumbnail (but not with regular s3 file uploads
-    # or instfs uploads of any kind)
-    def save_attachment_from_temp_path?
+    def save_attachment?
       if is_a?(Attachment)
         if root_attachment_id && new_record?
           return false
@@ -466,7 +463,7 @@ module AttachmentFu # :nodoc:
 
     # Gets the data from the latest temp file.  This will read the file into memory.
     def temp_data
-      save_attachment_from_temp_path? ? File.read(temp_path) : nil
+      save_attachment? ? File.read(temp_path) : nil
     end
 
     # Writes the given data to a Tempfile and adds it to the collection of temp files.
@@ -517,7 +514,7 @@ module AttachmentFu # :nodoc:
 
     # before_validation callback.
     def set_size_from_temp_path
-      self.size = File.size(temp_path) if save_attachment_from_temp_path?
+      self.size = File.size(temp_path) if save_attachment?
     end
 
     # validates the size and content_type attributes according to the current model's options
@@ -537,7 +534,7 @@ module AttachmentFu # :nodoc:
 
     # Stub for a #process_attachment method in a processor
     def process_attachment
-      @saved_attachment = save_attachment_from_temp_path?
+      @saved_attachment = save_attachment?
       run_before_attachment_saved if @saved_attachment && respond_to?(:run_before_attachment_saved)
       @saved_attachment
     end

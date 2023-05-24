@@ -135,7 +135,7 @@ module DataFixup
     def self.all_configured_submissions(start_time, end_time)
       Submission.active
                 .where(submitted_at: start_time...end_time)
-                .where(AssignmentConfigurationToolLookup.where("assignment_id = submissions.assignment_id").arel.exists)
+                .where("EXISTS(?)", AssignmentConfigurationToolLookup.where("assignment_id = submissions.assignment_id"))
     end
     private_class_method :all_configured_submissions
 

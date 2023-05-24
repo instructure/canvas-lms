@@ -21,8 +21,7 @@
 describe DelayedMessageScrubber do
   # Helpers
   def delayed_message(send_at)
-    message = DelayedMessage.new(notification: @notification,
-                                 context: @context,
+    message = DelayedMessage.new(notification: @notification, context: @context,
                                  communication_channel: @recipient.communication_channel)
     message.send_at = send_at
     message.save!

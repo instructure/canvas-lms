@@ -281,40 +281,6 @@ describe ExternalToolsController do
         expect(response).to be_redirect
         expect(flash[:error]).to match(/find valid settings/)
       end
-
-      context "with environment-specific overrides" do
-        let(:override_url) { "http://www.example-beta.com/basic_lti" }
-        let(:domain) { "www.example-beta.com" }
-
-        before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
-          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
-
-          tool.course_navigation = { enabled: true }
-          tool.settings[:environments] = {
-            domain: domain
-          }
-          tool.save!
-        end
-
-        it "uses override for resource_url" do
-          get :show, params: { course_id: @course.id, id: tool.id }
-
-          expect(assigns[:lti_launch].resource_url).to eq override_url
-        end
-
-        context "when launch_url is passed in params" do
-          let(:launch_url) { "https://www.example.com/other_lti_launch" }
-          let(:override_launch_url) { "https://www.example-beta.com/other_lti_launch" }
-
-          it "uses overridden launch_url for resource_url" do
-            get :show, params: { course_id: @course.id, id: tool.id, launch_url: launch_url }
-
-            expect(assigns[:lti_launch].resource_url).to eq override_launch_url
-          end
-        end
-      end
     end
 
     context "ContentItemSelectionResponse" do
@@ -522,52 +488,6 @@ describe ExternalToolsController do
         expect(response).to be_redirect
         expect(flash[:error]).to match(/error generating the tool launch/)
       end
-
-      context "when launch_url is passed in params" do
-        let(:launch_url) { "https://www.example.com/other_lti_launch" }
-
-        it "uses provided launch_url" do
-          user_session(@teacher)
-          get :show, params: { course_id: @course.id, id: @tool.id, launch_url: launch_url }
-
-          expect(assigns[:lti_launch].resource_url).to eq launch_url
-        end
-      end
-
-      context "with environment-specific overrides" do
-        let(:override_url) { "http://www.example-beta.com/basic_lti" }
-        let(:domain) { "www.example-beta.com" }
-
-        before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
-          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
-
-          @tool.settings[:environments] = {
-            domain: domain
-          }
-          @tool.save!
-        end
-
-        it "uses override for resource_url" do
-          user_session(@teacher)
-          get :show, params: { course_id: @course.id, id: @tool.id }
-
-          expect(assigns[:lti_launch].resource_url).to eq override_url
-        end
-
-        context "when launch_url is passed in params" do
-          let(:launch_url) { "https://www.example.com/other_lti_launch" }
-          let(:override_launch_url) { "https://www.example-beta.com/other_lti_launch" }
-
-          it "uses overridden launch_url for resource_url" do
-            user_session(@teacher)
-            get :show, params: { course_id: @course.id, id: @tool.id, launch_url: launch_url }
-
-            expect(assigns[:lti_launch].resource_url).to eq override_launch_url
-          end
-        end
-      end
     end
 
     context "ContentItemSelectionRequest" do
@@ -638,10 +558,8 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.submission_types = "online_upload"
           assignment.save!
-          get :show, params: { course_id: @course.id,
-                               id: @tool.id,
-                               launch_type: "homework_submission",
-                               assignment_id: assignment.id }
+          get :show, params: { course_id: @course.id, id: @tool.id,
+                               launch_type: "homework_submission", assignment_id: assignment.id }
           expect(response).to be_successful
 
           lti_launch = assigns[:lti_launch]
@@ -654,9 +572,7 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.submission_types = "online_text_entry"
           assignment.save!
-          get :show, params: { course_id: @course.id,
-                               id: @tool.id,
-                               launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
                                assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params["accept_copy_advice"]).to eq "false"
@@ -668,9 +584,7 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.submission_types = "online_upload"
           assignment.save!
-          get :show, params: { course_id: @course.id,
-                               id: @tool.id,
-                               launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
                                assignment_id: assignment.id }
           expect(response).to be_successful
 
@@ -684,9 +598,7 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.submission_types = "online_upload"
           assignment.save!
-          get :show, params: { course_id: @course.id,
-                               id: @tool.id,
-                               launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
                                assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params["ext_content_file_extensions"]).to eq "pdf,jpeg"
@@ -698,9 +610,7 @@ describe ExternalToolsController do
           assignment.submission_types = "online_text_entry"
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.save!
-          get :show, params: { course_id: @course.id,
-                               id: @tool.id,
-                               launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
                                assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params).not_to have_key("ext_content_file_extensions")
@@ -711,9 +621,7 @@ describe ExternalToolsController do
           assignment = @course.assignments.new(name: "an assignment")
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.save!
-          get :show, params: { course_id: @course.id,
-                               id: @tool.id,
-                               launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
                                assignment_id: assignment.id }
           expect(response).to be_successful
 
@@ -726,9 +634,7 @@ describe ExternalToolsController do
           assignment = @course.assignments.new(name: "an assignment")
           assignment.submission_types = "online_url"
           assignment.save!
-          get :show, params: { course_id: @course.id,
-                               id: @tool.id,
-                               launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
                                assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params["accept_presentation_document_targets"]).to include "window"
@@ -739,9 +645,7 @@ describe ExternalToolsController do
           assignment = @course.assignments.new(name: "an assignment")
           assignment.submission_types = "online_url"
           assignment.save!
-          get :show, params: { course_id: @course.id,
-                               id: @tool.id,
-                               launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
                                assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.params["accept_presentation_document_targets"]).not_to include "none"
@@ -753,9 +657,7 @@ describe ExternalToolsController do
           assignment.allowed_extensions += ["pdf", "jpeg"]
           assignment.submission_types = "online_upload,online_url"
           assignment.save!
-          get :show, params: { course_id: @course.id,
-                               id: @tool.id,
-                               launch_type: "homework_submission",
+          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "homework_submission",
                                assignment_id: assignment.id }
           expect(response).to be_successful
 
@@ -795,41 +697,6 @@ describe ExternalToolsController do
         get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "migration_selection" }
         expect(assigns[:lti_launch].params["first"]).to be_nil
       end
-
-      context "with environment-specific overrides" do
-        let(:override_url) { "http://www.example-beta.com/basic_lti" }
-        let(:domain) { "www.example-beta.com" }
-
-        before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
-          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
-
-          @tool.settings[:environments] = {
-            domain: domain
-          }
-          @tool.save!
-        end
-
-        it "uses override for resource_url" do
-          user_session(@teacher)
-          get :show, params: { course_id: @course.id, id: @tool.id, launch_type: "migration_selection" }
-
-          expect(assigns[:lti_launch].resource_url).to eq override_url
-        end
-
-        context "when launch_url is passed in params" do
-          let(:launch_url) { "https://www.example.com/other_lti_launch" }
-          let(:override_launch_url) { "https://www.example-beta.com/other_lti_launch" }
-
-          it "uses overridden launch_url for resource_url" do
-            user_session(@teacher)
-            get :show, params: { course_id: @course.id, id: @tool.id, launch_url: launch_url, launch_type: "migration_selection" }
-
-            expect(assigns[:lti_launch].resource_url).to eq override_launch_url
-          end
-        end
-      end
     end
   end
 
@@ -868,8 +735,7 @@ describe ExternalToolsController do
       end
 
       let(:lti_1_3_tool) do
-        tool = @course.context_external_tools.new(name: "test",
-                                                  consumer_key: "key",
+        tool = @course.context_external_tools.new(name: "test", consumer_key: "key",
                                                   shared_secret: "secret")
         tool.url = "http://www.example.com/launch"
         tool.use_1_3 = true
@@ -975,11 +841,8 @@ describe ExternalToolsController do
 
         it "does not include custom params if the resource_link is for the wrong tool" do
           tool2 = @course.context_external_tools.create!(
-            name: "test",
-            consumer_key: "key",
-            shared_secret: "secret",
-            url: "http://www.example2.com/launch",
-            use_1_3: true,
+            name: "test", consumer_key: "key", shared_secret: "secret",
+            url: "http://www.example2.com/launch", use_1_3: true,
             developer_key: DeveloperKey.create!
           )
           rl.update(context_external_tool: tool2)
@@ -989,11 +852,8 @@ describe ExternalToolsController do
 
         it "succeeds if the resource_link is for a tool with the same host" do
           tool2 = @course.account.context_external_tools.create!(
-            name: "test",
-            consumer_key: "key",
-            shared_secret: "secret",
-            url: "http://www.example.com/launch",
-            use_1_3: true,
+            name: "test", consumer_key: "key", shared_secret: "secret",
+            url: "http://www.example.com/launch", use_1_3: true,
             developer_key: lti_1_3_tool.developer_key
           )
           rl.update(context_external_tool: tool2)
@@ -1028,62 +888,6 @@ describe ExternalToolsController do
           jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
           get :show, params: { course_id: @course.id, id: lti_1_3_tool.id, secure_params: jwt, launch_type: "assignment_selection" }
           expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]["assignment_id"]).to eq(lti_assignment_id)
-        end
-      end
-
-      context "tool is used to edit an existing collaboration" do
-        let(:collab) do
-          ExternalToolCollaboration.create!(
-            title: "my collab",
-            user: @teacher,
-            url: "http://www.example.com/launch",
-            context: @course,
-            data: {
-              "updateUrl" => "http://www.example.com/launch?abc=def"
-            }
-          )
-        end
-
-        let(:launch_params) do
-          JSON.parse(fetch_and_delete_launch(@course, decoded_jwt["verifier"]))
-        end
-
-        # it "it passes collaboration into the expander" do
-        #   get :retrieve, params: { course_id: @course.id, url: collab.update_url, launch_type: "collaboration", content_item_id: collab.id }
-        #   expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]["assignment_id"]).to eq(lti_assignment_id)
-        # end
-
-        let(:jwt) do
-          deep_link_return_url = launch_params["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
-          return_jwt = deep_link_return_url.match(/data=([^&]*)/)[1]
-          JSON::JWT.decode(return_jwt, :skip_verification)
-        end
-
-        before do
-          lti_1_3_tool.collaboration = {
-            "enabled" => true,
-            "message_type" => "LtiDeepLinkingRequest",
-            "placement" => "collaboration",
-            "text" => "tool",
-          }
-          lti_1_3_tool.save!
-        end
-
-        it "adds content_item_id to the data JWT" do
-          get :retrieve, params: { course_id: @course.id, url: collab.update_url, launch_type: "collaboration", content_item_id: collab.id }
-          expect(jwt[:content_item_id]).to eq(collab.id)
-        end
-
-        context "when the update_url in the collaboration given by content_item_id does not match up with the given launch URL" do
-          it "does not add content_item_id to the data JWT" do
-            get :retrieve, params: {
-              course_id: @course.id,
-              url: collab.update_url + "&mismatch",
-              launch_type: "collaboration",
-              content_item_id: collab.id
-            }
-            expect(jwt[:content_item_id]).to be_nil
-          end
         end
       end
 
@@ -1240,8 +1044,7 @@ describe ExternalToolsController do
     it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
       subject do
         get :retrieve, params: {
-          url: tool.url,
-          course_id: @course.id,
+          url: tool.url, course_id: @course.id,
           parent_frame_context: pfc_tool.id
         }
       end
@@ -1920,19 +1723,17 @@ describe ExternalToolsController do
 
     it "accepts is_rce_favorite parameter" do
       user_session(account_admin_user)
-      post "create",
-           params: {
-             account_id: @course.account.id,
-             external_tool: {
-               name: "tool name",
-               url: "http://example.com",
-               consumer_key: "key",
-               shared_secret: "secret",
-               editor_button: { url: "http://example.com", enabled: true },
-               is_rce_favorite: true
-             }
-           },
-           format: "json"
+      post "create", params: {
+        account_id: @course.account.id,
+        external_tool: {
+          name: "tool name",
+          url: "http://example.com",
+          consumer_key: "key",
+          shared_secret: "secret",
+          editor_button: { url: "http://example.com", enabled: true },
+          is_rce_favorite: true
+        }
+      }, format: "json"
       expect(response).to be_successful
       expect(assigns[:tool].is_rce_favorite).to be true
     end
@@ -2122,15 +1923,9 @@ describe ExternalToolsController do
     it "fails gracefully trying to retrieve from localhost" do
       expect(CanvasHttp).to receive(:insecure_host?).with("localhost").and_return(true)
       user_session(@teacher)
-      post "create",
-           params: { course_id: @course.id,
-                     external_tool: { name: "tool name",
-                                      url: "http://example.com",
-                                      consumer_key: "key",
-                                      shared_secret: "secret",
-                                      config_type: "by_url",
-                                      config_url: "http://localhost:9001" } },
-           format: "json"
+      post "create", params: { course_id: @course.id, external_tool: { name: "tool name", url: "http://example.com",
+                                                                       consumer_key: "key", shared_secret: "secret", config_type: "by_url",
+                                                                       config_url: "http://localhost:9001" } }, format: "json"
       expect(response).not_to be_successful
       expect(assigns[:tool]).to be_new_record
       json = json_parse(response.body)
@@ -2141,16 +1936,9 @@ describe ExternalToolsController do
       expect(CanvasHttp).to receive(:insecure_host?).with("localhost").and_return(true)
       user_session(@teacher)
 
-      post "create",
-           params: { course_id: @course.id,
-                     external_tool: { name: "tool name",
-                                      url: "http://example.com",
-                                      consumer_key: "key",
-                                      shared_secret: "secret",
-                                      config_type: "by_url",
-                                      config_url: "http://localhost:9001",
-                                      course_navigation: { enabled: true } } },
-           format: "json"
+      post "create", params: { course_id: @course.id, external_tool: { name: "tool name", url: "http://example.com",
+                                                                       consumer_key: "key", shared_secret: "secret", config_type: "by_url",
+                                                                       config_url: "http://localhost:9001", course_navigation: { enabled: true } } }, format: "json"
       expect(assigns[:tool].settings).to have_key "course_navigation"
     end
 
@@ -2456,50 +2244,6 @@ describe ExternalToolsController do
       expect(tool_settings["custom_canvas_user_id"]).to eq @user.id.to_s
       expect(tool_settings["resource_link_id"]).to eq opaque_id(@assignment.external_tool_tag)
       expect(tool_settings["resource_link_title"]).to eq "tool assignment"
-    end
-
-    context "when url is provided in params" do
-      let(:provided_url) { "https://www.example.com/sessionless_launch" }
-
-      it "uses it for launch_url" do
-        get :generate_sessionless_launch, params: { course_id: @course.id, id: tool.id, url: provided_url }
-        expect(response).to be_successful
-        expect(launch_settings["launch_url"]).to eq provided_url
-      end
-    end
-
-    context "with environment-specific overrides" do
-      let(:override_url) { "http://www.example-beta.com/basic_lti" }
-      let(:domain) { "www.example-beta.com" }
-
-      before do
-        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
-        Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
-        user_session(account_admin_user)
-
-        tool.settings[:environments] = {
-          domain: domain
-        }
-        tool.save!
-      end
-
-      it "uses override for resource_url" do
-        get :generate_sessionless_launch, params: { course_id: @course.id, id: tool.id }
-        expect(response).to be_successful
-        expect(launch_settings["launch_url"]).to eq override_url
-      end
-
-      context "when launch_url is passed in params" do
-        let(:launch_url) { "https://www.example.com/other_lti_launch" }
-        let(:override_launch_url) { "https://www.example-beta.com/other_lti_launch" }
-
-        it "uses overridden launch_url for resource_url" do
-          get :generate_sessionless_launch, params: { course_id: @course.id, id: tool.id, url: launch_url }
-          expect(response).to be_successful
-          expect(launch_settings["launch_url"]).to eq override_launch_url
-        end
-      end
     end
 
     it "passes whitelisted `platform` query param to lti launch body" do

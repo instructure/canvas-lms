@@ -35,8 +35,6 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 
 const I18n = useI18nScope('handlebars_helpers')
 
-const listFormatter = new Intl.ListFormat(ENV.LOCALE || navigator.language)
-
 const Handlebars = _Handlebars.default
 
 const object = {
@@ -579,10 +577,10 @@ const object = {
     return inverse(this)
   },
 
-  // evaluates the block for each item in context and passes the result to list formatter
+  // evaluates the block for each item in context and passes the result to $.toSentence
   toSentence(context, options) {
     const results = _.map(context, c => options.fn(c))
-    return listFormatter.format(results)
+    return $.toSentence(results)
   },
 
   dateSelect(name, options) {

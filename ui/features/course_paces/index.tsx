@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -25,7 +24,7 @@ import ready from '@instructure/ready'
 import App from './react/app'
 import createStore from './react/shared/create_store'
 
-const CoursePage = () => (
+const CoursePage: React.FC = () => (
   <Provider store={createStore()}>
     <App />
   </Provider>

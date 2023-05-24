@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -66,12 +65,12 @@ const FILTER_OPTIONS = [
   },
 ]
 
-export const FilterControls = ({
+export const FilterControls: React.FC<ComponentProps> = ({
   searchValue,
   filterValue,
   setSearchValue,
   setFilterValue,
-}: ComponentProps) => {
+}) => {
   const clearSearchButton = (
     <IconButton
       renderIcon={IconXLine}

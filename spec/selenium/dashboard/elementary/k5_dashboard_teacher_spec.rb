@@ -361,8 +361,7 @@ describe "teacher k5 dashboard" do
     end
 
     it "creates course with account name and course name",
-       custom_timeout: 30,
-       ignore_js_errors: true do
+       custom_timeout: 30, ignore_js_errors: true do
       @sub_account = @account.sub_accounts.create!(name: "test")
       course_with_teacher(
         account: @sub_account,
@@ -385,8 +384,7 @@ describe "teacher k5 dashboard" do
     end
 
     it "allows for sync of course to selected homeroom",
-       custom_timeout: 30,
-       ignore_js_errors: true do
+       custom_timeout: 30, ignore_js_errors: true do
       second_homeroom_course_name = "Second homeroom course"
 
       course_with_teacher(

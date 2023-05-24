@@ -86,9 +86,7 @@ class Enrollment::BatchStateUpdater
     EnrollmentState.where(enrollment_id: batch).update_all_locked_in_order(state: "deleted", state_valid_until: nil, updated_at: Time.now.utc)
     # we need the order to match the queries in GradeCalculator's save_course_and_grading_period_scores and save_assignment_group_scores,
     # _and_ the fact that the former runs first
-    Score.transaction do
-      Score.where(enrollment_id: batch).order(Arel.sql("assignment_group_id NULLS FIRST, enrollment_id")).in_batches(of: 10_000).update_all_locked_in_order(workflow_state: "deleted", updated_at: Time.zone.now)
-    end
+    Score.where(enrollment_id: batch).order(Arel.sql("assignment_group_id NULLS FIRST, enrollment_id")).update_all_locked_in_order(workflow_state: "deleted", updated_at: Time.zone.now)
     data
   end
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -37,7 +36,6 @@ interface Props {
   readonly isOpen: boolean
   readonly onCancel: () => void
   readonly onClose: () => void
-  readonly onDismiss: () => void
   readonly onPublish: () => void
   readonly isCanceling: boolean
   readonly isPublishing: boolean
@@ -48,11 +46,10 @@ interface Props {
 }
 export const PUBLISH_STATUS_POLLING_MS = 1000
 
-const ContextModulesPublishModal = ({
+const ContextModulesPublishModal: React.FC<Props> = ({
   isOpen,
   onCancel,
   onClose,
-  onDismiss,
   onPublish,
   isCanceling,
   isPublishing,
@@ -60,7 +57,7 @@ const ContextModulesPublishModal = ({
   progressId,
   progressCurrent,
   title,
-}: Props) => {
+}) => {
   const handlePublish = () => {
     if (isPublishing) {
       onCancel()
@@ -95,8 +92,7 @@ const ContextModulesPublishModal = ({
   return (
     <Modal
       open={isOpen}
-      onClose={onClose}
-      onDismiss={onDismiss}
+      onDismiss={onClose}
       size="small"
       label={title}
       shouldCloseOnDocumentClick={false}
@@ -105,7 +101,7 @@ const ContextModulesPublishModal = ({
         <CloseButton
           placement="end"
           offset="small"
-          onClick={onDismiss}
+          onClick={onClose}
           screenReaderLabel={I18n.t('Close')}
         />
         <Heading>{title}</Heading>
@@ -130,7 +126,7 @@ const ContextModulesPublishModal = ({
         {progressBar()}
       </Modal.Body>
       <Modal.Footer>
-        <Button data-testid="close-button" onClick={onDismiss} margin="0 x-small 0 0">
+        <Button data-testid="close-button" onClick={onClose} margin="0 x-small 0 0">
           {I18n.t('Close')}
         </Button>
         <Button

@@ -255,8 +255,7 @@ describe QuizzesHelper do
         answer_list: [
           { blank_id: "color1", answer: "red" },
           { blank_id: "color2", answer: "black" }
-        ],
-        answers: @answers
+        ], answers: @answers
       )
       expect(html).not_to match "{{"
     end
@@ -545,8 +544,7 @@ describe QuizzesHelper do
     it "adds MathML if appropriate" do
       comment = comment_get({
                               foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
-                            },
-                            "foo")
+                            }, "foo")
       expect(comment).to match(/MathML/)
       expect(comment).to match(/∐/)
     end
@@ -557,8 +555,7 @@ describe QuizzesHelper do
       end
       comment = comment_get({
                               foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
-                            },
-                            "foo")
+                            }, "foo")
       expect(comment).to eq('<img class="equation_image" data-equation-content="\\coprod">')
     end
   end

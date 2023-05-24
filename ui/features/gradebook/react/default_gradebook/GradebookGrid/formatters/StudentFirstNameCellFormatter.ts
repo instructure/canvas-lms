@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -18,6 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
+import '@canvas/jquery/jquery.instructure_misc_helpers' // $.toSentence
 import {getEnrollmentLabel, renderCell} from './StudentCellFormatter.utils'
 import type Gradebook from '../../Gradebook'
 

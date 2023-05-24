@@ -79,8 +79,7 @@ class AssignmentOverride < ActiveRecord::Base
       next if s.valid?
 
       s.errors.each do |_, error|
-        record.errors.add(:assignment_override_students,
-                          error.type,
+        record.errors.add(:assignment_override_students, error.type,
                           message: error.message)
       end
     end

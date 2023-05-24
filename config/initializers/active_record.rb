@@ -557,8 +557,7 @@ class ActiveRecord::Base
     specifics.each do |(name, class_name)|
       # ensure we capture this class's table name
       table_name = self.table_name
-      belongs_to :"#{prefix}#{name}",
-                 -> { where(table_name => { reflection.foreign_type => class_name }) },
+      belongs_to :"#{prefix}#{name}", -> { where(table_name => { reflection.foreign_type => class_name }) },
                  foreign_key: reflection.foreign_key,
                  class_name: class_name # rubocop:disable Rails/ReflectionClassName
 
@@ -1036,7 +1035,7 @@ module UsefulFindInBatches
 
         base_class = klass.base_class
         base_class.unscoped do
-          batch_relation = base_class.from("#{connection.quote_column_name(table)} as #{connection.quote_column_name(base_class.table_name)}").limit(of).preload(includes_values + preload_values)
+          batch_relation = base_class.from(table).select("*").limit(of).preload(includes_values + preload_values)
           batch_relation = batch_relation.order(Arel.sql(connection.quote_column_name(index))) if index
           yielded_relation = batch_relation
           loop do
@@ -1936,8 +1935,7 @@ module ExplainAnalyze
         # fold in switchman's override
         activate { |relation| relation.send(:exec_queries) }
       end
-    end,
-                 analyze: analyze)
+    end, analyze: analyze)
   end
 end
 ActiveRecord::Relation.prepend(ExplainAnalyze)

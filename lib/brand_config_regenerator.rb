@@ -35,8 +35,7 @@ class BrandConfigRegenerator
       progress.process_job(BrandConfigRegenerator,
                            :process_sync,
                            { priority: Delayed::HIGH_PRIORITY, singleton: progress.tag.to_s },
-                           account,
-                           new_brand_config)
+                           account, new_brand_config)
       progress
     end
 

@@ -24,8 +24,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
-import {ContentItem} from '@canvas/deep-linking/models/ContentItem'
-import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
+import {ContentItem, DeepLinkResponse} from '@canvas/deep-linking/types'
 import {Pill} from '@instructure/ui-pill'
 import {View} from '@instructure/ui-view'
 
@@ -90,7 +89,7 @@ const renderContentItem = (item: ContentItemDisplay) => {
 }
 
 const buildContentItems = (items: ContentItem[]) =>
-  items.reduce<ContentItemDisplay[]>((acc, item) => {
+  items.reduce((acc, item) => {
     if (item.errors) {
       const errorItems = Object.entries(item.errors).map(
         ([field, message]) =>
@@ -108,7 +107,7 @@ const buildContentItems = (items: ContentItem[]) =>
         title: item.title,
       } as ContentItemDisplay,
     ]
-  }, [])
+  }, [] as ContentItemDisplay[])
 
 type RetrievingContentProps = {
   environment: Environment

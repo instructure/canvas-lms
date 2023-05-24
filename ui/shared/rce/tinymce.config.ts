@@ -1,4 +1,5 @@
 // @ts-nocheck
+
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -20,27 +21,29 @@
 import {getDirection} from '@canvas/i18n/rtlHelper'
 
 export default class EditorConfig {
-  public baseURL: string
-
-  public extraButtons: object[]
-
   /**
    * Create an editor config instance, with some internal state passed in
    *   so the object knows how to generate a dynamic hash of default
    *   configuration parameters.  May get overridden by merging
    *   with another hash of overwriting config parameters.
    *
-   *  @param tinymce the tinymce global which we use to pull
+   *  @param {tinymce} tinymce the tinymce global which we use to pull
    *    some config info off of like the BaseURL for refrencing the skin css
-   *  @param instConfig a config hash defined in public/javascripts/INST.js,
+   *  @param {INST} inst a config hash defined in public/javascripts/INST.js,
    *    provides feature information like whether notorious is enabled for
    *    their account.  Generally you can just pass it in after requiring it.
-   *  @param idAttribute the "id" attribute of the element that's going
+   *  @param {string} domId the "id" attribute of the element that's going
    *    to be transformed with a tinymce editor
+   *
+   *  @exports
+   *  @constructor
+   *  @return {EditorConfig}
    */
-  constructor(tinymce, public readonly instConfig: any, public readonly idAttribute: string) {
+  constructor(tinymce, inst, domId) {
     this.baseURL = tinymce.baseURL
-    this.extraButtons = instConfig.editorButtons || []
+    this.extraButtons = inst.editorButtons
+    this.instConfig = inst
+    this.idAttribute = domId
   }
 
   /**

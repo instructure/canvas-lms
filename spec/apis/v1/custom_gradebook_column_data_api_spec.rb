@@ -34,10 +34,8 @@ describe CustomGradebookColumnDataApiController, type: :request do
     s2.enroll_user @student2, "StudentEnrollment", "active"
 
     @ta = user_factory(active_all: true)
-    @course.enroll_user @ta,
-                        "TaEnrollment",
-                        workflow_state: "active",
-                        section: s2,
+    @course.enroll_user @ta, "TaEnrollment",
+                        workflow_state: "active", section: s2,
                         limit_privileges_to_course_section: true
 
     @user = @teacher
@@ -60,11 +58,8 @@ describe CustomGradebookColumnDataApiController, type: :request do
       @user = @student1
       raw_api_call :get,
                    "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data",
-                   course_id: @course.to_param,
-                   id: @col.to_param,
-                   action: "index",
-                   controller: "custom_gradebook_column_data_api",
-                   format: "json"
+                   course_id: @course.to_param, id: @col.to_param, action: "index",
+                   controller: "custom_gradebook_column_data_api", format: "json"
       assert_status(401)
     end
 
@@ -72,11 +67,8 @@ describe CustomGradebookColumnDataApiController, type: :request do
       @user = @ta
       json = api_call :get,
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data",
-                      course_id: @course.to_param,
-                      id: @col.to_param,
-                      action: "index",
-                      controller: "custom_gradebook_column_data_api",
-                      format: "json"
+                      course_id: @course.to_param, id: @col.to_param, action: "index",
+                      controller: "custom_gradebook_column_data_api", format: "json"
       expect(response).to be_successful
       d = @col.custom_gradebook_column_data.where(user_id: @student2.id).first
       expect(json).to eq [custom_gradebook_column_datum_json(d, @user, session)]
@@ -89,11 +81,8 @@ describe CustomGradebookColumnDataApiController, type: :request do
       @user = @teacher
       json = api_call :get,
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data",
-                      course_id: @course.to_param,
-                      id: @col.to_param,
-                      action: "index",
-                      controller: "custom_gradebook_column_data_api",
-                      format: "json"
+                      course_id: @course.to_param, id: @col.to_param, action: "index",
+                      controller: "custom_gradebook_column_data_api", format: "json"
       expect(response).to be_successful
       expect(json.pluck("user_id")).to include student.id
     end
@@ -105,11 +94,8 @@ describe CustomGradebookColumnDataApiController, type: :request do
       @user = @teacher
       json = api_call :get,
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data",
-                      course_id: @course.to_param,
-                      id: @col.to_param,
-                      action: "index",
-                      controller: "custom_gradebook_column_data_api",
-                      format: "json"
+                      course_id: @course.to_param, id: @col.to_param, action: "index",
+                      controller: "custom_gradebook_column_data_api", format: "json"
       expect(response).to be_successful
       expect(json.pluck("user_id")).to include student.id
     end
@@ -117,11 +103,8 @@ describe CustomGradebookColumnDataApiController, type: :request do
     it "returns the column data" do
       json = api_call :get,
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data",
-                      course_id: @course.to_param,
-                      id: @col.to_param,
-                      action: "index",
-                      controller: "custom_gradebook_column_data_api",
-                      format: "json"
+                      course_id: @course.to_param, id: @col.to_param, action: "index",
+                      controller: "custom_gradebook_column_data_api", format: "json"
       expect(response).to be_successful
       expect(json).to match_array(@col.custom_gradebook_column_data.map do |d|
         custom_gradebook_column_datum_json(d, @user, session)
@@ -131,11 +114,8 @@ describe CustomGradebookColumnDataApiController, type: :request do
     it "can paginate" do
       json = api_call :get,
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data?per_page=1",
-                      course_id: @course.to_param,
-                      id: @col.to_param,
-                      per_page: "1",
-                      action: "index",
-                      controller: "custom_gradebook_column_data_api",
+                      course_id: @course.to_param, id: @col.to_param, per_page: "1",
+                      action: "index", controller: "custom_gradebook_column_data_api",
                       format: "json"
       expect(response).to be_successful
       expect(json.size).to eq 1
@@ -146,12 +126,9 @@ describe CustomGradebookColumnDataApiController, type: :request do
     def update(student, content)
       api_call :put,
                "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data/#{student.id}",
-               { course_id: @course.to_param,
-                 id: @col.to_param,
-                 user_id: student.to_param,
-                 action: "update",
-                 controller: "custom_gradebook_column_data_api",
-                 format: "json" },
+               { course_id: @course.to_param, id: @col.to_param,
+                 user_id: student.to_param, action: "update",
+                 controller: "custom_gradebook_column_data_api", format: "json" },
                "column_data[content]" => content
     end
 
@@ -159,12 +136,9 @@ describe CustomGradebookColumnDataApiController, type: :request do
       @user = @student1
       raw_api_call :put,
                    "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data/#{@student1.id}",
-                   { course_id: @course.to_param,
-                     id: @col.to_param,
-                     user_id: @student1.to_param,
-                     action: "update",
-                     controller: "custom_gradebook_column_data_api",
-                     format: "json" },
+                   { course_id: @course.to_param, id: @col.to_param,
+                     user_id: @student1.to_param, action: "update",
+                     controller: "custom_gradebook_column_data_api", format: "json" },
                    "column_data[content]" => "haha"
 
       assert_status(401)
@@ -178,12 +152,9 @@ describe CustomGradebookColumnDataApiController, type: :request do
 
       raw_api_call :put,
                    "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}/data/#{@student1.id}",
-                   { course_id: @course.to_param,
-                     id: @col.to_param,
-                     user_id: @student1.to_param,
-                     action: "update",
-                     controller: "custom_gradebook_column_data_api",
-                     format: "json" },
+                   { course_id: @course.to_param, id: @col.to_param,
+                     user_id: @student1.to_param, action: "update",
+                     controller: "custom_gradebook_column_data_api", format: "json" },
                    "column_data[content]" => "jkl;"
       assert_status(404)
     end
@@ -244,8 +215,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
                {
                  course_id: @course.to_param,
                  action: "bulk_update",
-                 controller: "custom_gradebook_column_data_api",
-                 format: "json"
+                 controller: "custom_gradebook_column_data_api", format: "json"
                },
                {
                  "column_data" => [
@@ -292,8 +262,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
                       {
                         course_id: @course.to_param,
                         action: "bulk_update",
-                        controller: "custom_gradebook_column_data_api",
-                        format: "json"
+                        controller: "custom_gradebook_column_data_api", format: "json"
                       },
                       {
                         "column_data" => [
@@ -334,10 +303,8 @@ describe CustomGradebookColumnDataApiController, type: :request do
                {
                  course_id: @course.to_param,
                  action: "bulk_update",
-                 controller: "custom_gradebook_column_data_api",
-                 format: "json"
-               },
-               {}
+                 controller: "custom_gradebook_column_data_api", format: "json"
+               }, {}
 
       assert_status(400)
     end
@@ -350,8 +317,7 @@ describe CustomGradebookColumnDataApiController, type: :request do
                {
                  course_id: @course.to_param,
                  action: "bulk_update",
-                 controller: "custom_gradebook_column_data_api",
-                 format: "json"
+                 controller: "custom_gradebook_column_data_api", format: "json"
                },
                { "column_data" => [] }
 

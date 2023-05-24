@@ -174,8 +174,7 @@ module IncomingMailProcessor
         IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new do
                                                                                        content_type "text/plain; charset=UTF-8"
                                                                                        body (+"he\xffllo").force_encoding(Encoding::BINARY)
-                                                                                     end,
-                                                                                     "")
+                                                                                     end, "")
 
         expect(message_handler.body).to eq("hello")
         expect(message_handler.html_body).to eq("hello")
@@ -185,8 +184,7 @@ module IncomingMailProcessor
         IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new do
                                                                                        content_type "text/plain; charset=Shift_JIS"
                                                                                        body (+"\x83\x40").force_encoding(Encoding::BINARY)
-                                                                                     end,
-                                                                                     "")
+                                                                                     end, "")
 
         comparison_string = +"\xe3\x82\xa1"
         comparison_string.force_encoding("UTF-8")
@@ -203,8 +201,7 @@ module IncomingMailProcessor
                                                                                          content_type "text/html; charset=UTF-8"
                                                                                          body "<h1>This is HTML</h1>"
                                                                                        end
-                                                                                     end,
-                                                                                     "")
+                                                                                     end, "")
         expect(message_handler.body).to eq("This is plain text")
         expect(message_handler.html_body).to eq("<h1>This is HTML</h1>")
       end
@@ -222,8 +219,7 @@ module IncomingMailProcessor
         IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new do
                                                                                        content_type "text/html; charset=UTF-8"
                                                                                        body "<h1>This is HTML</h1>"
-                                                                                     end,
-                                                                                     "")
+                                                                                     end, "")
         expect(message_handler.body).to eq("************\nThis is HTML\n************")
         expect(message_handler.html_body).to eq("<h1>This is HTML</h1>")
       end
@@ -234,8 +230,7 @@ module IncomingMailProcessor
                                                                                          content_type "text/html; charset=UTF-8"
                                                                                          body "<h1>This is HTML</h1>"
                                                                                        end
-                                                                                     end,
-                                                                                     "")
+                                                                                     end, "")
         expect(message_handler.body).to eq("************\nThis is HTML\n************")
         expect(message_handler.html_body).to eq("<h1>This is HTML</h1>")
       end
@@ -260,8 +255,7 @@ module IncomingMailProcessor
         IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new do
                                                                                        content_type nil
                                                                                        body "hello"
-                                                                                     end,
-                                                                                     "")
+                                                                                     end, "")
 
         expect(message_handler.body).to eq("hello")
         expect(message_handler.html_body).to eq("hello")
@@ -279,8 +273,7 @@ module IncomingMailProcessor
         it "reports the age based on the date header" do
           Timecop.freeze do
             message.date = 10.minutes.ago
-            expect(InstStatsd::Statsd).to receive(:timing).once.with("incoming_mail_processor.message_age.",
-                                                                     10 * 60 * 1000,
+            expect(InstStatsd::Statsd).to receive(:timing).once.with("incoming_mail_processor.message_age.", 10 * 60 * 1000,
                                                                      { short_stat: "incoming_mail_processor.message_age",
                                                                        tags: { mailbox: nil } })
             IncomingMessageProcessor.new(message_handler, error_reporter).process_single(message, "")

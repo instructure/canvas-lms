@@ -100,26 +100,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
   restrict_columns :settings, %i[
-    quiz_type
-    assignment_group_id
-    shuffle_answers
-    time_limit
-    disable_timer_autosubmission
-    anonymous_submissions
-    scoring_policy
-    allowed_attempts
-    hide_results
-    one_time_results
-    show_correct_answers
-    show_correct_answers_last_attempt
-    show_correct_answers_at
-    hide_correct_answers_at
-    one_question_at_a_time
-    cant_go_back
-    access_code
-    ip_filter
-    require_lockdown_browser
-    require_lockdown_browser_for_results
+    quiz_type assignment_group_id shuffle_answers time_limit disable_timer_autosubmission
+    anonymous_submissions scoring_policy allowed_attempts hide_results
+    one_time_results show_correct_answers show_correct_answers_last_attempt
+    show_correct_answers_at hide_correct_answers_at one_question_at_a_time
+    cant_go_back access_code ip_filter require_lockdown_browser require_lockdown_browser_for_results
   ]
   restrict_assignment_columns
   restrict_columns :state, [:workflow_state]
@@ -170,18 +155,10 @@ class Quizzes::Quiz < ActiveRecord::Base
     @stored_questions = nil
 
     %i[
-      shuffle_answers
-      disable_timer_autosubmission
-      could_be_locked
-      anonymous_submissions
-      require_lockdown_browser
-      require_lockdown_browser_for_results
-      one_question_at_a_time
-      cant_go_back
-      require_lockdown_browser_monitor
-      only_visible_to_overrides
-      one_time_results
-      show_correct_answers_last_attempt
+      shuffle_answers disable_timer_autosubmission could_be_locked anonymous_submissions
+      require_lockdown_browser require_lockdown_browser_for_results
+      one_question_at_a_time cant_go_back require_lockdown_browser_monitor
+      only_visible_to_overrides one_time_results show_correct_answers_last_attempt
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self[:show_correct_answers] = true if self[:show_correct_answers].nil?
   end
@@ -1208,11 +1185,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       .group("quizzes.id")
       .where('quizzes.due_at BETWEEN ? AND ?
           OR assignment_overrides.due_at_overridden AND
-          assignment_overrides.due_at BETWEEN ? AND ?',
-             start,
-             ending,
-             start,
-             ending)
+          assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)
   }
 
   scope :ungraded_with_user_due_date, lambda { |user|
@@ -1260,8 +1233,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     where("(SELECT COUNT(id) FROM #{Quizzes::QuizSubmission.quoted_table_name}
             WHERE quiz_id = quizzes.id
             AND workflow_state = 'complete'
-            AND user_id = ?) = 0",
-          user_id)
+            AND user_id = ?) = 0", user_id)
       .limit(limit)
       .order("quizzes.due_at")
       .preload(:context)
@@ -1273,10 +1245,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where.not(Ignore.where(asset_type: "Quizzes::Quiz",
-                           user_id: user,
-                           purpose: purpose).where("asset_id=quizzes.id")
-                       .arel.exists)
+    where("NOT EXISTS (?)",
+          Ignore.where(asset_type: "Quizzes::Quiz",
+                       user_id: user,
+                       purpose: purpose).where("asset_id=quizzes.id"))
   }
 
   def peer_reviews_due_at
@@ -1390,7 +1362,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     quiz_ids_with_subs = Quizzes::QuizSubmission
                          .from(constant_table)
-                         .where(filter.arel.exists)
+                         .where("EXISTS (?)", filter)
                          .pluck("s.quiz_id")
 
     quizzes.each do |quiz|

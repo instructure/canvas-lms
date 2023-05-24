@@ -39,10 +39,9 @@ class CoursePacing::PacesApiController < ApplicationController
     return not_found if pace.nil?
 
     render json: {
-             pace: pacing_presenter.new(pace).as_json,
-             progress: progress_json(pacing_service.progress(pace), @current_user, session)
-           },
-           status: :created
+      pace: pacing_presenter.new(pace).as_json,
+      progress: progress_json(pacing_service.progress(pace), @current_user, session)
+    }, status: :created
   end
 
   def update

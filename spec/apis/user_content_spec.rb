@@ -38,11 +38,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
+                    { controller: "assignments_api", action: "show",
+                      format: "json", course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json["description"])
     expect(doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
@@ -61,11 +58,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/groups/#{@group.id}/discussion_topics/#{@group_topic.id}",
-                    { controller: "discussion_topics_api",
-                      action: "show",
-                      format: "json",
-                      group_id: @group.id.to_s,
-                      topic_id: @group_topic.id.to_s })
+                    { controller: "discussion_topics_api", action: "show",
+                      format: "json", group_id: @group.id.to_s, topic_id: @group_topic.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json["message"])
     expect(doc.at_css("img")["src"]).to eq "http://www.example.com/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
@@ -85,11 +79,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
+                    { controller: "assignments_api", action: "show",
+                      format: "json", course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json["description"])
     expect(doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{attachment2.id}/download?verifier=#{attachment2.uuid}"
@@ -105,11 +96,8 @@ describe UserContent, type: :request do
     HTML
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                    { controller: "discussion_topics_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      topic_id: @topic.id.to_s })
+                    { controller: "discussion_topics_api", action: "show",
+                      format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s })
     doc = Nokogiri::HTML5.fragment(json["message"])
     expect(doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
@@ -124,11 +112,8 @@ describe UserContent, type: :request do
     HTML
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                    { controller: "discussion_topics_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      topic_id: @topic.id.to_s })
+                    { controller: "discussion_topics_api", action: "show",
+                      format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s })
     doc = Nokogiri::HTML5.fragment(json["message"])
     expect(doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}&wrap=1"
   end
@@ -143,11 +128,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
+                    { controller: "assignments_api", action: "show",
+                      format: "json", course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json["description"])
     expect(doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}"
@@ -163,11 +145,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
+                    { controller: "assignments_api", action: "show",
+                      format: "json", course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json["description"])
     video = doc.at_css("video")
@@ -194,11 +173,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
+                    { controller: "assignments_api", action: "show",
+                      format: "json", course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json["description"])
     audio = doc.at_css("audio")
@@ -228,11 +204,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
+                    { controller: "assignments_api", action: "show",
+                      format: "json", course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json["description"])
     expect(doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview"
@@ -252,11 +225,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-                    { controller: "assignments_api",
-                      action: "show",
-                      format: "json",
-                      course_id: @course.id.to_s,
-                      id: @assignment.id.to_s })
+                    { controller: "assignments_api", action: "show",
+                      format: "json", course_id: @course.id.to_s, id: @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json["description"])
     expect(doc.at_css("img")["src"]).to eq "http://www.example.com/equation_images/1234"
@@ -273,13 +243,9 @@ describe UserContent, type: :request do
     @wiki_page.body = "<a href='mailto:djmankiewicz@homestarrunner,com'>e-nail</a>"
     @wiki_page.workflow_state = "active"
     @wiki_page.save!
-    api_call(:get,
-             "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
-             { controller: "wiki_pages_api",
-               action: "show",
-               format: "json",
-               course_id: @course.id.to_s,
-               url_or_id: @wiki_page.url })
+    api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
+             { controller: "wiki_pages_api", action: "show",
+               format: "json", course_id: @course.id.to_s, url_or_id: @wiki_page.url })
     assert_status(200)
   end
 
@@ -312,13 +278,9 @@ describe UserContent, type: :request do
         @wiki_page.workflow_state = "active"
         @wiki_page.save!
 
-        json = api_call(:get,
-                        "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
-                        { controller: "wiki_pages_api",
-                          action: "show",
-                          format: "json",
-                          course_id: @course.id.to_s,
-                          url_or_id: @wiki_page.url })
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
+                        { controller: "wiki_pages_api", action: "show",
+                          format: "json", course_id: @course.id.to_s, url_or_id: @wiki_page.url })
         doc = Nokogiri::HTML5.fragment(json["body"])
         expect(doc.css("a").pluck("data-api-endpoint")).to eq [
           "http://www.example.com/api/v1/courses/#{@course.id}/assignments",
@@ -365,13 +327,9 @@ describe UserContent, type: :request do
         @wiki_page.workflow_state = "active"
         @wiki_page.save!
 
-        json = api_call(:get,
-                        "/api/v1/groups/#{@group.id}/pages/#{@wiki_page.url}",
-                        { controller: "wiki_pages_api",
-                          action: "show",
-                          format: "json",
-                          group_id: @group.id.to_s,
-                          url_or_id: @wiki_page.url })
+        json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{@wiki_page.url}",
+                        { controller: "wiki_pages_api", action: "show",
+                          format: "json", group_id: @group.id.to_s, url_or_id: @wiki_page.url })
         doc = Nokogiri::HTML5.fragment(json["body"])
         expect(doc.css("a").pluck("data-api-endpoint")).to eq [
           "http://www.example.com/api/v1/groups/#{@group.id}/pages",
@@ -396,13 +354,9 @@ describe UserContent, type: :request do
           <a href='/users/#{@teacher.id}/files/789/preview'>file</a>
         HTML
 
-        json = api_call(:get,
-                        "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                        controller: "discussion_topics_api",
-                        action: "show",
-                        format: "json",
-                        course_id: @course.id.to_s,
-                        topic_id: @topic.id.to_s)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                        controller: "discussion_topics_api", action: "show", format: "json",
+                        course_id: @course.id.to_s, topic_id: @topic.id.to_s)
         doc = Nokogiri::HTML5.fragment(json["message"])
         expect(doc.css("a").pluck("data-api-endpoint")).to eq [
           "http://www.example.com/api/v1/users/#{@teacher.id}/folders/root",

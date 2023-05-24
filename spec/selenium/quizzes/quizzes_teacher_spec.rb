@@ -316,8 +316,7 @@ describe "quizzes" do
                                             "question_type" => "multiple_choice_question",
                                             "answers" => answers,
                                             :points_possible => 1
-                                          },
-                                          assessment_question: a)
+                                          }, assessment_question: a)
 
       q.generate_quiz_data
       q.time_limit = 10
@@ -383,8 +382,7 @@ describe "quizzes" do
                                              "question_text" => "file upload question maaaan",
                                              "answers" => answers,
                                              :points_possible => 1
-                                           },
-                                           assessment_question: a)
+                                           }, assessment_question: a)
       q.generate_quiz_data
       q.save!
       _filename, @fullpath, _data = get_file "testfile1.txt"

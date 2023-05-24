@@ -71,30 +71,6 @@ describe Types::SubmissionType do
     end
   end
 
-  describe "hide_grade_from_student" do
-    it "returns true for hide_grade_from_student" do
-      @assignment.mute!
-      expect(submission_type.resolve("hideGradeFromStudent")).to be true
-    end
-
-    it "returns false for hide_grade_from_student" do
-      expect(submission_type.resolve("hideGradeFromStudent")).to be false
-    end
-  end
-
-  describe "grading period id" do
-    it "returns the grading period id" do
-      grading_period_group = GradingPeriodGroup.create!(title: "foo", course_id: @course.id)
-      grading_period = GradingPeriod.create!(title: "foo", start_date: 1.day.ago, end_date: 1.day.from_now, grading_period_group_id: grading_period_group.id)
-      assignment = @course.assignments.create! name: "asdf", points_possible: 10
-      submission = assignment.grade_student(@student, score: 8, grader: @teacher).first
-      submission.update!(grading_period_id: grading_period.id)
-      submission_type = GraphQLTypeTester.new(submission, current_user: @teacher)
-
-      expect(submission_type.resolve("gradingPeriodId")).to eq grading_period.id.to_s
-    end
-  end
-
   describe "unread_comment_count" do
     let(:valid_submission_comment_attributes) { { comment: "some comment" } }
 

@@ -304,9 +304,7 @@ describe GradingStandard do
     context "with assignment link" do
       before(:once) do
         @assignment = @course.assignments.create!(title: "hi",
-                                                  grading_type: "letter_grade",
-                                                  grading_standard_id: @gs.id,
-                                                  submission_types: ["online_text_entry"])
+                                                  grading_type: "letter_grade", grading_standard_id: @gs.id, submission_types: ["online_text_entry"])
       end
 
       context "without submissions" do

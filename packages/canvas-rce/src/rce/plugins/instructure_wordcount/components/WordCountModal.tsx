@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -60,7 +59,7 @@ export type WordCountModalProps = {
   readonly onDismiss: () => void
 }
 
-export const WordCountModal = ({headers, rows, onDismiss}: WordCountModalProps) => {
+export const WordCountModal: React.FC<WordCountModalProps> = ({headers, rows, onDismiss}) => {
   return (
     <Modal
       label={formatMessage('Word Count')}

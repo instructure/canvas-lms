@@ -115,21 +115,9 @@ module InstFS
       false
     end
 
-    def upload_preflight_json(context:,
-                              root_account:,
-                              user:,
-                              acting_as:,
-                              access_token:,
-                              folder:,
-                              filename:,
-                              content_type:,
-                              quota_exempt:,
-                              on_duplicate:,
-                              capture_url:,
-                              target_url: nil,
-                              progress_json: nil,
-                              include_param: nil,
-                              additional_capture_params: {})
+    def upload_preflight_json(context:, root_account:, user:, acting_as:, access_token:, folder:, filename:,
+                              content_type:, quota_exempt:, on_duplicate:, capture_url:, target_url: nil,
+                              progress_json: nil, include_param: nil, additional_capture_params: {})
       raise ArgumentError unless !!target_url == !!progress_json # these params must both be present or both absent
 
       token = upload_jwt(
@@ -428,8 +416,7 @@ module InstFS
                     user_id: nil,
                     host: "canvas",
                     resource: "/files",
-                  },
-                  expires_in)
+                  }, expires_in)
     end
 
     def session_jwt(user, host)
@@ -439,8 +426,7 @@ module InstFS
                     user_id: user.global_id&.to_s,
                     host: host,
                     resource: "/session/ensure"
-                  },
-                  expires_in)
+                  }, expires_in)
     end
 
     def logout_jwt(user)
@@ -449,8 +435,7 @@ module InstFS
                     iat: Time.now.utc.to_i,
                     user_id: user.global_id&.to_s,
                     resource: "/session"
-                  },
-                  expires_in)
+                  }, expires_in)
     end
 
     def export_references_jwt
@@ -458,8 +443,7 @@ module InstFS
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/references"
-                  },
-                  expires_in)
+                  }, expires_in)
     end
 
     def duplicate_file_jwt(instfs_uuid)
@@ -467,8 +451,7 @@ module InstFS
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/files/#{instfs_uuid}/duplicate"
-                  },
-                  expires_in)
+                  }, expires_in)
     end
 
     def delete_file_jwt(instfs_uuid)
@@ -476,8 +459,7 @@ module InstFS
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/files/#{instfs_uuid}"
-                  },
-                  expires_in)
+                  }, expires_in)
     end
 
     def parse_original_url(url)

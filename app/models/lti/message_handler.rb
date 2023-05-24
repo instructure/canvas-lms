@@ -44,9 +44,9 @@ module Lti
     }
 
     scope :has_placements, lambda { |*placements|
-      where(Lti::ResourcePlacement.where(placement: placements)
-                .where("lti_message_handlers.id = lti_resource_placements.message_handler_id")
-                .arel.exists)
+      where("EXISTS (?)",
+            Lti::ResourcePlacement.where(placement: placements)
+                .where("lti_message_handlers.id = lti_resource_placements.message_handler_id"))
     }
 
     def self.lti_apps_tabs(context, placements, _opts)

@@ -53,6 +53,8 @@ const ignoredErrors = [
   /contextType was defined as an instance property on %s/,
   /Function components cannot be given refs/,
   /Invalid prop `children` supplied to `(Option)`/,
+  /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
+  /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
   /Invariant Violation/,
   /Prop `children` should be supplied unless/, // https://instructure.atlassian.net/browse/FOO-3407
@@ -230,9 +232,3 @@ Object.defineProperty(window, 'location', {
   // Prevents JSDOM errors from doing window.location = ...
   set: () => {},
 })
-
-if (!('structuredClone' in window)) {
-  Object.defineProperty(window, 'structuredClone', {
-    value: obj => JSON.parse(JSON.stringify(obj)),
-  })
-}

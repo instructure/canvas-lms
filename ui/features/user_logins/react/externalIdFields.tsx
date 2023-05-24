@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -82,7 +81,11 @@ interface ExternalIdsProps {
   sisUserIdLabel?: string
   jqInterface: JQInterface
 }
-const ExternalIds = ({integrationIdLabel, jqInterface, sisUserIdLabel}: ExternalIdsProps) => {
+const ExternalIds: React.FC<ExternalIdsProps> = ({
+  integrationIdLabel,
+  jqInterface,
+  sisUserIdLabel,
+}: ExternalIdsProps) => {
   const [canEditSisUserId, setCanEditSisUserId] = useState<boolean | undefined>(false)
   const [integrationId, setIntegrationId] = useState<number | undefined>()
   const [sisUserId, setSisUserId] = useState<number | undefined>()

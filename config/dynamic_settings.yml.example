@@ -11,6 +11,8 @@ development:
     canvas:
       # environment
       canvas:
+        encryption-secret: "astringthatisactually32byteslong"
+        signing-secret: "astringthatisactually32byteslong"
         # regexes for matching online meeting urls in calendar events
         # one per line. will get | or'd together to form the regex
         # that's eventually used.
@@ -74,7 +76,7 @@ development:
         app_key: 'xyzzy'
     # another service
     inst-fs:
-      app-host: "http://api.inst-fs.docker"
+      app-host: "http://api.instfs.docker"
       # this is just "super-sekret-value", base64-encoded:
       secret: "c3VwZXItc2VrcmV0LXZhbHVlCg=="
     pandata:

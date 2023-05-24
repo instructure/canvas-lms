@@ -153,8 +153,7 @@ describe Quizzes::QuizRegrader::Submission do
         Quizzes::QuizQuestionBuilder.decorate_question_for_submission({
                                                                         id: key,
                                                                         points_possible: question_group.question_points
-                                                                      },
-                                                                      key)
+                                                                      }, key)
       end
     end
 

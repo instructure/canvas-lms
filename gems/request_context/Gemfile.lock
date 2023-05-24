@@ -110,7 +110,8 @@ GEM
     after_transaction_commit (2.2.2)
       activerecord (>= 5.2)
     aroi (0.0.7)
-      rails (>= 3.2)
+      activerecord (>= 5.2)
+      activesupport (>= 5.2)
     bindata (2.4.14)
     builder (3.2.4)
     byebug (11.1.3)
@@ -138,7 +139,7 @@ GEM
     guardrail (3.0.2)
       activerecord (>= 6.1, < 7.1)
       railties (>= 6.1, < 7.1)
-    i18n (1.13.0)
+    i18n (1.12.0)
       concurrent-ruby (~> 1.0)
     inst-jobs (3.1.10)
       activerecord (>= 6.0)
@@ -181,19 +182,13 @@ GEM
       net-protocol
       timeout
     nio4r (2.5.9)
-    nokogiri (1.13.10-aarch64-linux)
-      racc (~> 1.4)
-    nokogiri (1.13.10-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.13.10-x86_64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.13.10-x86_64-linux)
+    nokogiri (1.13.8-arm64-darwin)
       racc (~> 1.4)
     raabro (1.4.0)
     racc (1.6.2)
-    rack (2.2.7)
+    rack (2.2.3)
     rack-test (1.1.0)
-      rack (>= 1.0, < 3)
+      rack (>= 1.3)
     rails (7.0.4.3)
       actioncable (= 7.0.4.3)
       actionmailbox (= 7.0.4.3)
@@ -252,13 +247,10 @@ GEM
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    zeitwerk (2.6.8)
+    zeitwerk (2.6.7)
 
 PLATFORMS
-  aarch64-linux
-  arm64-darwin
-  x86_64-darwin
-  x86_64-linux
+  arm64-darwin-21
 
 DEPENDENCIES
   bundler
@@ -272,4 +264,4 @@ DEPENDENCIES
   timecop
 
 BUNDLED WITH
-   2.3.26
+   2.4.10

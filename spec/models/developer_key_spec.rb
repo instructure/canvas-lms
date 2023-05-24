@@ -284,7 +284,7 @@ describe DeveloperKey do
 
       before do
         developer_key
-        @shard1.activate { tool_configuration }
+        @shard1.activate { tool_configuration.update!(privacy_level: "anonymous") }
         shard_1_tool.update!(workflow_state: "disabled")
         shard_2_tool.update!(workflow_state: "disabled")
         subject
@@ -294,11 +294,11 @@ describe DeveloperKey do
         let(:account) { Account.site_admin }
 
         it "enables tools on shard 1" do
-          expect(shard_1_tool.reload.workflow_state).to eq "public"
+          expect(shard_1_tool.reload.workflow_state).to eq "anonymous"
         end
 
         it "enables tools on shard 2" do
-          expect(shard_2_tool.reload.workflow_state).to eq "public"
+          expect(shard_2_tool.reload.workflow_state).to eq "anonymous"
         end
       end
 
@@ -306,24 +306,11 @@ describe DeveloperKey do
         let(:account) { shard_1_tool.root_account }
 
         it "enables tools on shard 1" do
-          expect(shard_1_tool.reload.workflow_state).to eq "public"
+          expect(shard_1_tool.reload.workflow_state).to eq "anonymous"
         end
 
         it "does not enable tools on shard 2" do
           expect(shard_2_tool.reload.workflow_state).to eq "disabled"
-        end
-      end
-
-      context "privacy_level is not set on tool_configuration" do
-        let(:account) { shard_1_tool.root_account }
-        let(:tool_configuration) do
-          tc = super()
-          tc.update!(privacy_level: nil)
-          tc
-        end
-
-        it "still correctly uses privacy_level from extensions" do
-          expect(shard_1_tool.reload.workflow_state).to eq "public"
         end
       end
     end

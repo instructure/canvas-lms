@@ -240,10 +240,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/courses/#{@course.id}/outcome_proficiency",
             {
-              controller: "outcome_proficiency_api",
-              action: "show",
-              format: "json",
-              course_id: @course.id.to_s
+              controller: "outcome_proficiency_api", action: "show",
+              format: "json", course_id: @course.id.to_s
             }
           )
         end
@@ -264,10 +262,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/courses/#{@course.id}/outcome_proficiency",
             {
-              controller: "outcome_proficiency_api",
-              action: "show",
-              format: "json",
-              course_id: @course.id.to_s
+              controller: "outcome_proficiency_api", action: "show",
+              format: "json", course_id: @course.id.to_s
             }
           )
           assert_status(404)
@@ -279,10 +275,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/courses/#{@course.id}/outcome_proficiency",
             {
-              controller: "outcome_proficiency_api",
-              action: "show",
-              format: "json",
-              course_id: @course.id.to_s
+              controller: "outcome_proficiency_api", action: "show",
+              format: "json", course_id: @course.id.to_s
             }
           )
           expect(@json).to eq OutcomeProficiency.find_or_create_default!(@account).as_json
@@ -299,10 +293,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/courses/#{@course.id}/outcome_proficiency",
             {
-              controller: "outcome_proficiency_api",
-              action: "show",
-              format: "json",
-              course_id: @course.id.to_s
+              controller: "outcome_proficiency_api", action: "show",
+              format: "json", course_id: @course.id.to_s
             }
           )
         end
@@ -378,10 +370,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/accounts/#{@account.id}/outcome_proficiency",
             {
-              controller: "outcome_proficiency_api",
-              action: "show",
-              format: "json",
-              account_id: @account.id.to_s
+              controller: "outcome_proficiency_api", action: "show",
+              format: "json", account_id: @account.id.to_s
             }
           )
         end
@@ -402,10 +392,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/accounts/#{@account.id}/outcome_proficiency",
             {
-              controller: "outcome_proficiency_api",
-              action: "show",
-              format: "json",
-              account_id: @account.id.to_s
+              controller: "outcome_proficiency_api", action: "show",
+              format: "json", account_id: @account.id.to_s
             }
           )
           assert_status(404)
@@ -417,10 +405,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/accounts/#{@account.id}/outcome_proficiency",
             {
-              controller: "outcome_proficiency_api",
-              action: "show",
-              format: "json",
-              account_id: @account.id.to_s
+              controller: "outcome_proficiency_api", action: "show",
+              format: "json", account_id: @account.id.to_s
             }
           )
           expect(@json).to eq OutcomeProficiency.find_or_create_default!(@account).as_json
@@ -437,10 +423,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/accounts/#{@account.id}/outcome_proficiency",
             {
-              controller: "outcome_proficiency_api",
-              action: "show",
-              format: "json",
-              account_id: @account.id.to_s
+              controller: "outcome_proficiency_api", action: "show",
+              format: "json", account_id: @account.id.to_s
             }
           )
         end

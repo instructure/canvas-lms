@@ -313,57 +313,6 @@ describe "course settings" do
       expect(element_exists?("#course_hide_distribution_graphs")).to be_falsey
       expect(element_exists?("#course_lock_all_announcements")).to be_falsey
     end
-
-    context "restrict_quantitative_data dependent settings" do
-      it "shows by default" do
-        get "/courses/#{@course.id}/settings"
-        more_options_link = f(".course_form_more_options_link")
-        more_options_link.click
-        wait_for_ajaximations
-        expect(f("#course_hide_distribution_graphs")).to be_present
-        expect(f("#course_hide_final_grades")).to be_present
-      end
-
-      it "is not shown when both restrict_quantitative_data course setting and feature flags are ON" do
-        @course.root_account.enable_feature! :restrict_quantitative_data
-        @course.restrict_quantitative_data = true
-        @course.save!
-
-        get "/courses/#{@course.id}/settings"
-        more_options_link = f(".course_form_more_options_link")
-        more_options_link.click
-        wait_for_ajaximations
-        expect(f("body")).not_to contain_jqcss("#course_hide_distribution_graphs")
-        expect(f("body")).not_to contain_jqcss("#course_hide_final_grades")
-      end
-
-      it "is not shown when both restrict_quantitative_data account locked setting and feature flags are ON" do
-        root_account = @course.root_account
-        root_account.enable_feature! :restrict_quantitative_data
-        root_account.settings[:restrict_quantitative_data] = { value: true, locked: true }
-        root_account.save!
-
-        get "/courses/#{@course.id}/settings"
-        more_options_link = f(".course_form_more_options_link")
-        more_options_link.click
-        wait_for_ajaximations
-        expect(f("body")).not_to contain_jqcss("#course_hide_distribution_graphs")
-        expect(f("body")).not_to contain_jqcss("#course_hide_final_grades")
-      end
-
-      it "is shown when restrict_quantitative_data feature flag is on but course setting is off" do
-        @course.root_account.enable_feature! :restrict_quantitative_data
-        @course.restrict_quantitative_data = false
-        @course.save!
-
-        get "/courses/#{@course.id}/settings"
-        more_options_link = f(".course_form_more_options_link")
-        more_options_link.click
-        wait_for_ajaximations
-        expect(f("#course_hide_distribution_graphs")).to be_present
-        expect(f("#course_hide_final_grades")).to be_present
-      end
-    end
   end
 
   describe "course items" do
@@ -616,8 +565,7 @@ describe "course settings" do
 
       bank = @course.assessment_question_banks.create!(title: "bank")
       aq = bank.assessment_questions.create!(question_data: { "question_name" => "test question",
-                                                              "question_text" => html,
-                                                              "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+                                                              "question_text" => html, "answers" => [{ "id" => 1 }, { "id" => 2 }] })
 
       assmnt = @course.assignments.create!(title: "assignment", description: html)
       event = @course.calendar_events.create!(title: "event", description: html)

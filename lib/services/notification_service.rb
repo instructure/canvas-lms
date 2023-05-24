@@ -49,7 +49,6 @@ module Services
 
         @notification_sqs ||= begin
           conf = Canvas::AWS.validate_v2_config(config, "notification_service")
-          conf["credentials"] ||= Canvas::AwsCredentialProvider.new("notification_service_creds", conf["vault_credential_path"])
           sqs = Aws::SQS::Client.new(conf.except(*QUEUE_NAME_KEYS.values, "vault_credential_path"))
           @queue_urls = {}
           QUEUE_NAME_KEYS.each do |key, queue_name_key|
@@ -71,8 +70,9 @@ module Services
 
       def config
         config_file = ConfigFile.load("notification_service") || {}
+        creds = Rails.application.credentials.notification_service_creds || {}
 
-        config_file.dup
+        config_file.merge(creds).dup
       end
     end
   end

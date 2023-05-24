@@ -29,35 +29,11 @@ describe CalendarEventsApiController, type: :request do
 
   context "events" do
     expected_fields = %w[
-      all_context_codes
-      all_day
-      all_day_date
-      blackout_date
-      child_events
-      child_events_count
-      comments
-      context_code
-      created_at
-      description
-      duplicates
-      end_at
-      hidden
-      html_url
-      id
-      location_address
-      location_name
-      parent_event_id
-      start_at
-      title
-      type
-      updated_at
-      url
-      workflow_state
-      context_name
-      context_color
-      important_dates
-      series_uuid
-      rrule
+      all_context_codes all_day all_day_date blackout_date child_events child_events_count
+      comments context_code created_at description duplicates end_at hidden html_url
+      id location_address location_name parent_event_id start_at
+      title type updated_at url workflow_state context_name context_color important_dates
+      series_uuid rrule
     ]
     expected_slot_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code])
     expected_reservation_event_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type])
@@ -71,12 +47,8 @@ describe CalendarEventsApiController, type: :request do
       @course.calendar_events.create(title: "3", start_at: "2012-01-19 12:00:00")
 
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: ["course_#{@course.id}"],
-                        start_date: "2012-01-08",
-                        end_date: "2012-01-08"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: ["course_#{@course.id}"], start_date: "2012-01-08", end_date: "2012-01-08"
                       })
       expect(json.size).to be 1
       expect(json.first.keys).to match_array expected_fields
@@ -95,12 +67,8 @@ describe CalendarEventsApiController, type: :request do
       )
 
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: ["course_#{@course.id}"],
-                        start_date: "2012-01-08",
-                        end_date: "2012-01-08"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: ["course_#{@course.id}"], start_date: "2012-01-08", end_date: "2012-01-08"
                       })
       expect(json.first.slice("location_address", "location_name")).to eql({})
     end
@@ -114,12 +82,8 @@ describe CalendarEventsApiController, type: :request do
         location_name: "steven house"
       )
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: ["course_#{@course.id}"],
-                        start_date: "2012-01-08",
-                        end_date: "2012-01-08"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: ["course_#{@course.id}"], start_date: "2012-01-08", end_date: "2012-01-08"
                       })
       expect(json.first.slice("location_address", "location_name")).to eql({ "location_address" => evt.location_address, "location_name" => evt.location_name })
     end
@@ -130,12 +94,8 @@ describe CalendarEventsApiController, type: :request do
       @course.calendar_events.create(title: "third", start_at: "2012-01-19 12:00:00")
 
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: ["course_#{@course.id}"],
-                        start_date: "2012-01-07",
-                        end_date: "2012-01-19"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-19"
                       })
       expect(json.size).to be 3
       expect(json.first.keys).to match_array expected_fields
@@ -161,12 +121,9 @@ describe CalendarEventsApiController, type: :request do
     it "does not allow user to create calendar events" do
       testCourse = course_with_teacher(active_all: true, user: user_with_pseudonym(active_user: true))
       testCourse.context.destroy!
-      json = api_call(:post,
-                      "/api/v1/calendar_events.json",
-                      {
+      json = api_call(:post, "/api/v1/calendar_events.json", {
                         controller: "calendar_events_api", action: "create", format: "json"
-                      },
-                      {
+                      }, {
                         calendar_event: {
                           context_code: "course_#{testCourse.course_id}",
                           title: "API Test",
@@ -207,12 +164,8 @@ describe CalendarEventsApiController, type: :request do
                    })
 
           json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-28&end_date=2012-01-29&context_codes[]=user_#{@user.id}", {
-                            controller: "calendar_events_api",
-                            action: "index",
-                            format: "json",
-                            context_codes: ["user_#{@user.id}"],
-                            start_date: "2012-01-28",
-                            end_date: "2012-01-29"
+                            controller: "calendar_events_api", action: "index", format: "json",
+                            context_codes: ["user_#{@user.id}"], start_date: "2012-01-28", end_date: "2012-01-29"
                           })
           expect(json.size).to be 2
           expect(json[0].keys).to match_array expected_fields
@@ -228,36 +181,22 @@ describe CalendarEventsApiController, type: :request do
       ids = dated.reverse + undated
 
       json = api_call(:get, "/api/v1/calendar_events?all_events=1&context_codes[]=course_#{@course.id}&per_page=10", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: ["course_#{@course.id}"],
-                        all_events: 1,
-                        per_page: "10"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: ["course_#{@course.id}"], all_events: 1, per_page: "10"
                       })
       expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="last"})
       expect(json.pluck("id")).to eql ids[0...10]
 
       json = api_call(:get, "/api/v1/calendar_events?all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=2", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: ["course_#{@course.id}"],
-                        all_events: 1,
-                        per_page: "10",
-                        page: "2"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: ["course_#{@course.id}"], all_events: 1, per_page: "10", page: "2"
                       })
       expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="next",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="last"})
       expect(json.pluck("id")).to eql ids[10...20]
 
       json = api_call(:get, "/api/v1/calendar_events?all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=3", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: ["course_#{@course.id}"],
-                        all_events: 1,
-                        per_page: "10",
-                        page: "3"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: ["course_#{@course.id}"], all_events: 1, per_page: "10", page: "3"
                       })
       expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events\?.*page=2.*>; rel="prev",<http://www.example.com/api/v1/calendar_events\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events\?.*page=3.*>; rel="last"})
       expect(json.pluck("id")).to eql ids[20...25]
@@ -266,12 +205,8 @@ describe CalendarEventsApiController, type: :request do
     it "ignores invalid end_dates" do
       @course.calendar_events.create(title: "e", start_at: "2012-01-08 12:00:00")
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: ["course_#{@course.id}"],
-                        start_date: "2012-01-08",
-                        end_date: "2012-01-07"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: ["course_#{@course.id}"], start_date: "2012-01-08", end_date: "2012-01-07"
                       })
       expect(json.size).to be 1
     end
@@ -283,13 +218,8 @@ describe CalendarEventsApiController, type: :request do
       create_records(CalendarEvent, course_ids.map { |id| { context_id: id, context_type: "Course", context_code: "course_#{id}", title: id, start_at: "2012-01-08 12:00:00", workflow_state: "active", created_at: now, updated_at: now } })
       contexts.concat(course_ids.map { |id| "course_#{id}" })
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: contexts,
-                        start_date: "2012-01-08",
-                        end_date: "2012-01-07",
-                        per_page: "25"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: contexts, start_date: "2012-01-08", end_date: "2012-01-07", per_page: "25"
                       })
       expect(json.size).to be 9 # first context has no events
     end
@@ -303,13 +233,8 @@ describe CalendarEventsApiController, type: :request do
       create_records(CalendarEvent, course_ids.map { |id| { context_id: id, context_type: "Course", context_code: "course_#{id}", title: id, start_at: "2012-01-08 12:00:00", workflow_state: "active", created_at: now, updated_at: now } })
       contexts.concat(course_ids.map { |id| "course_#{id}" })
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: contexts,
-                        start_date: "2012-01-08",
-                        end_date: "2012-01-07",
-                        per_page: "25"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: contexts, start_date: "2012-01-08", end_date: "2012-01-07", per_page: "25"
                       })
       expect(json.size).to be 14 # first context has no events
     end
@@ -322,13 +247,8 @@ describe CalendarEventsApiController, type: :request do
       contexts = [@course, group1].map(&:asset_string)
       student_in_course active_all: true
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-02&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: contexts,
-                        start_date: "2012-01-01",
-                        end_date: "2012-01-02",
-                        per_page: "25"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: contexts, start_date: "2012-01-01", end_date: "2012-01-02", per_page: "25"
                       })
       slot = json.detect { |thing| thing["appointment_group_id"] == group1.id }
       expect(slot).not_to be_nil
@@ -343,13 +263,8 @@ describe CalendarEventsApiController, type: :request do
       ag_id_list = ags.map(&:id).join(",")
       student_in_course active_all: true
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-02&per_page=25&appointment_group_ids=" + ag_id_list, {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        appointment_group_ids: ag_id_list,
-                        start_date: "2012-01-01",
-                        end_date: "2012-01-02",
-                        per_page: "25"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        appointment_group_ids: ag_id_list, start_date: "2012-01-01", end_date: "2012-01-02", per_page: "25"
                       })
       expect(json.pluck("appointment_group_id")).to match_array(ags.map(&:id))
       expect(response.headers["Link"]).to include "appointment_group_ids="
@@ -363,20 +278,11 @@ describe CalendarEventsApiController, type: :request do
       @course.calendar_events.create(title: "unauthorized_course", start_at: "2012-01-08 12:00:00")
       contexts.push(@course.asset_string)
 
-      api_call(:get,
-               "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=#{contexts.join("&context_codes[]=")}",
-               {
-                 controller: "calendar_events_api",
-                 action: "index",
-                 format: "json",
-                 context_codes: contexts,
-                 start_date: "2012-01-08",
-                 end_date: "2012-01-07",
-                 per_page: "25"
+      api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=#{contexts.join("&context_codes[]=")}", {
+                 controller: "calendar_events_api", action: "index", format: "json",
+                 context_codes: contexts, start_date: "2012-01-08", end_date: "2012-01-07", per_page: "25"
                },
-               {},
-               {},
-               { expected_status: 401 })
+               {}, {}, { expected_status: 401 })
     end
 
     it "allows specifying an unenrolled but accessible context" do
@@ -384,8 +290,7 @@ describe CalendarEventsApiController, type: :request do
       Account.default.account_users.create!(user: @user)
       CalendarEvent.create!(title: "from unrelated one", start_at: Time.now, end_at: 5.hours.from_now) { |c| c.context = unrelated_course }
 
-      json = api_call(:get,
-                      "/api/v1/calendar_events",
+      json = api_call(:get, "/api/v1/calendar_events",
                       { controller: "calendar_events_api", action: "index", format: "json", },
                       { start_date: 2.days.ago.strftime("%Y-%m-%d"), end_date: 2.days.from_now.strftime("%Y-%m-%d"), context_codes: ["course_#{unrelated_course.id}"] })
       expect(json.size).to eq 1
@@ -399,12 +304,8 @@ describe CalendarEventsApiController, type: :request do
       account_admin_user(active_all: true)
 
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: ["course_#{@course.id}"],
-                        start_date: "2012-01-07",
-                        end_date: "2012-01-19"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-19"
                       })
 
       expect(json.detect { |e| e["id"] == event.child_events.first.id && e["hidden"] == false }).to be_present
@@ -428,12 +329,8 @@ describe CalendarEventsApiController, type: :request do
       @student1_enrollment = StudentEnrollment.create!(user: @student1, workflow_state: "active", course_section: @course.default_section, course: @course, limit_privileges_to_course_section: true)
 
       json = api_call_as_user(@student1, :get, "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}", {
-                                controller: "calendar_events_api",
-                                action: "index",
-                                format: "json",
-                                context_codes: ["course_#{@course.id}"],
-                                start_date: "2012-01-07",
-                                end_date: "2012-01-19"
+                                controller: "calendar_events_api", action: "index", format: "json",
+                                context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-19"
                               })
 
       expect(@course.grants_right?(@student1, :read_roster)).to be_falsey
@@ -450,19 +347,10 @@ describe CalendarEventsApiController, type: :request do
       sub_account2 = Account.default.sub_accounts.create!
       account_admin_user(active_all: true, account: sub_account2)
 
-      api_call(:get,
-               "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}",
-               {
-                 controller: "calendar_events_api",
-                 action: "index",
-                 format: "json",
-                 context_codes: ["course_#{@course.id}"],
-                 start_date: "2012-01-07",
-                 end_date: "2012-01-19"
-               },
-               {},
-               {},
-               { expected_status: 401 })
+      api_call(:get, "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}", {
+                 controller: "calendar_events_api", action: "index", format: "json",
+                 context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-19"
+               }, {}, {}, { expected_status: 401 })
     end
 
     def public_course_query(options = {})
@@ -473,39 +361,19 @@ describe CalendarEventsApiController, type: :request do
       # both calls are made on a public syllabus access
       # events
       @course.calendar_events.create! title: "some event", start_at: 1.month.from_now
-      api_call(:get,
-               "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=course_#{@course.id}&type=event&all_events=1",
-               {
-                 controller: "calendar_events_api",
-                 action: "index",
-                 format: "json",
-                 type: "event",
-                 all_events: "1",
-                 context_codes: ["course_#{@course.id}"],
-                 start_date: "2012-01-01",
-                 end_date: "2012-01-31"
+      api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=course_#{@course.id}&type=event&all_events=1", {
+                 controller: "calendar_events_api", action: "index", format: "json", type: "event", all_events: "1",
+                 context_codes: ["course_#{@course.id}"], start_date: "2012-01-01", end_date: "2012-01-31"
                },
-               options[:body_params] || {},
-               options[:headers] || {},
-               options[:opts] || {})
+               options[:body_params] || {}, options[:headers] || {}, options[:opts] || {})
 
       # assignments
       @course.assignments.create! title: "teh assignment", due_at: 1.month.from_now
-      api_call(:get,
-               "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=course_#{@course.id}&type=assignment&all_events=1",
-               {
-                 controller: "calendar_events_api",
-                 action: "index",
-                 format: "json",
-                 type: "assignment",
-                 all_events: "1",
-                 context_codes: ["course_#{@course.id}"],
-                 start_date: "2012-01-01",
-                 end_date: "2012-01-31"
+      api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=course_#{@course.id}&type=assignment&all_events=1", {
+                 controller: "calendar_events_api", action: "index", format: "json", type: "assignment", all_events: "1",
+                 context_codes: ["course_#{@course.id}"], start_date: "2012-01-01", end_date: "2012-01-31"
                },
-               options[:body_params] || {},
-               options[:headers] || {},
-               options[:opts] || {})
+               options[:body_params] || {}, options[:headers] || {}, options[:opts] || {})
     end
 
     it "does not allow anonymous users to access a non-public context" do
@@ -539,11 +407,8 @@ describe CalendarEventsApiController, type: :request do
       @course.calendar_events.create(title: "undated")
       @course.calendar_events.create(title: "dated", start_at: "2012-01-08 12:00:00")
       json = api_call(:get, "/api/v1/calendar_events?undated=1&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: ["course_#{@course.id}"],
-                        undated: "1"
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: ["course_#{@course.id}"], undated: "1"
                       })
       expect(json.size).to be 1
       expect(json.first["start_at"]).to be_nil
@@ -557,9 +422,7 @@ describe CalendarEventsApiController, type: :request do
 
       it "returns all events" do
         json = api_call(:get, "/api/v1/calendar_events?all_events=1&context_codes[]=course_#{@course.id}", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
+                          controller: "calendar_events_api", action: "index", format: "json",
                           context_codes: ["course_#{@course.id}"],
                           all_events: "1"
                         })
@@ -568,25 +431,18 @@ describe CalendarEventsApiController, type: :request do
 
       it "returns all events, ignoring the undated flag" do
         json = api_call(:get, "/api/v1/calendar_events?all_events=1&undated=1&context_codes[]=course_#{@course.id}", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
+                          controller: "calendar_events_api", action: "index", format: "json",
                           context_codes: ["course_#{@course.id}"],
-                          all_events: "1",
-                          undated: "1"
+                          all_events: "1", undated: "1"
                         })
         expect(json.size).to be 2
       end
 
       it "returns all events, ignoring the start_date and end_date" do
         json = api_call(:get, "/api/v1/calendar_events?all_events=1&start_date=2012-02-01&end_date=2012-02-01&context_codes[]=course_#{@course.id}", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
+                          controller: "calendar_events_api", action: "index", format: "json",
                           context_codes: ["course_#{@course.id}"],
-                          all_events: "1",
-                          start_date: "2012-02-01",
-                          end_date: "2012-02-01"
+                          all_events: "1", start_date: "2012-02-01", end_date: "2012-02-01"
                         })
         expect(json.size).to be 2
       end
@@ -617,12 +473,8 @@ describe CalendarEventsApiController, type: :request do
 
         @user = @me
         json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{@course.asset_string}", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
-                          context_codes: [@course.asset_string],
-                          start_date: "2012-01-01",
-                          end_date: "2012-01-31"
+                          controller: "calendar_events_api", action: "index", format: "json",
+                          context_codes: [@course.asset_string], start_date: "2012-01-01", end_date: "2012-01-31"
                         })
         expect(json.size).to be 2
         json.sort_by! { |e| e["id"] }
@@ -674,12 +526,8 @@ describe CalendarEventsApiController, type: :request do
 
           @user = @me
           json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{group1.asset_string}&context_codes[]=#{group2.asset_string}", {
-                            controller: "calendar_events_api",
-                            action: "index",
-                            format: "json",
-                            context_codes: [group1.asset_string, group2.asset_string],
-                            start_date: "2012-01-01",
-                            end_date: "2012-01-31"
+                            controller: "calendar_events_api", action: "index", format: "json",
+                            context_codes: [group1.asset_string, group2.asset_string], start_date: "2012-01-01", end_date: "2012-01-31"
                           })
           expect(json.size).to be 2
           json.sort_by! { |e| e["id"] }
@@ -707,12 +555,8 @@ describe CalendarEventsApiController, type: :request do
 
           @user = @me
           json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{group.asset_string}", {
-                            controller: "calendar_events_api",
-                            action: "index",
-                            format: "json",
-                            context_codes: [group.asset_string],
-                            start_date: "2012-01-01",
-                            end_date: "2012-01-31"
+                            controller: "calendar_events_api", action: "index", format: "json",
+                            context_codes: [group.asset_string], start_date: "2012-01-01", end_date: "2012-01-31"
                           })
           expect(json.size).to be 1
           ejson = json.first
@@ -731,12 +575,8 @@ describe CalendarEventsApiController, type: :request do
 
           @user = @me
           json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{group.asset_string}", {
-                            controller: "calendar_events_api",
-                            action: "index",
-                            format: "json",
-                            context_codes: [group.asset_string],
-                            start_date: "2012-01-01",
-                            end_date: "2012-01-31"
+                            controller: "calendar_events_api", action: "index", format: "json",
+                            context_codes: [group.asset_string], start_date: "2012-01-01", end_date: "2012-01-31"
                           })
           expect(json.size).to be 1
           ejson = json.first
@@ -779,12 +619,8 @@ describe CalendarEventsApiController, type: :request do
 
           @user = @me
           json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{@course.asset_string}", {
-                            controller: "calendar_events_api",
-                            action: "index",
-                            format: "json",
-                            context_codes: [@course.asset_string],
-                            start_date: "2012-01-01",
-                            end_date: "2012-01-31"
+                            controller: "calendar_events_api", action: "index", format: "json",
+                            context_codes: [@course.asset_string], start_date: "2012-01-01", end_date: "2012-01-31"
                           })
           # the group appointment won't show on the course calendar
           expect(json.size).to be 1
@@ -793,12 +629,8 @@ describe CalendarEventsApiController, type: :request do
           expect(json.first["id"]).to eql my_personal_appointment.id
 
           json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{mygroup.asset_string}", {
-                            controller: "calendar_events_api",
-                            action: "index",
-                            format: "json",
-                            context_codes: [mygroup.asset_string],
-                            start_date: "2012-01-01",
-                            end_date: "2012-01-31"
+                            controller: "calendar_events_api", action: "index", format: "json",
+                            context_codes: [mygroup.asset_string], start_date: "2012-01-01", end_date: "2012-01-31"
                           })
           expect(json.size).to be 1
           expect(json.first.keys).to match_array(expected_reservation_event_fields - ["effective_context_code"])
@@ -806,12 +638,8 @@ describe CalendarEventsApiController, type: :request do
 
           # if we go look at those appointment slots, they now show as reserved
           json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{ag1.asset_string}&context_codes[]=#{ag2.asset_string}", {
-                            controller: "calendar_events_api",
-                            action: "index",
-                            format: "json",
-                            context_codes: [ag1.asset_string, ag2.asset_string],
-                            start_date: "2012-01-01",
-                            end_date: "2012-01-31"
+                            controller: "calendar_events_api", action: "index", format: "json",
+                            context_codes: [ag1.asset_string, ag2.asset_string], start_date: "2012-01-01", end_date: "2012-01-31"
                           })
           expect(json.size).to be 2
           json.sort_by! { |e| e["id"] }
@@ -833,8 +661,7 @@ describe CalendarEventsApiController, type: :request do
           @course2 = course_with_teacher(user: @teacher, active_all: true).course
           @student1 = student_in_course(course: @course1, active_all: true).user
           @student2 = student_in_course(course: @course2, active_all: true).user
-          @ag = AppointmentGroup.create!(title: "something",
-                                         participants_per_appointment: 1,
+          @ag = AppointmentGroup.create!(title: "something", participants_per_appointment: 1,
                                          new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
                                                             ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]],
                                          contexts: [@course1, @course2])
@@ -845,12 +672,8 @@ describe CalendarEventsApiController, type: :request do
 
         it "returns signups in multi-context appointment groups in the student's context" do
           json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{@course1.asset_string}&context_codes[]=#{@course2.asset_string}", {
-                                    controller: "calendar_events_api",
-                                    action: "index",
-                                    format: "json",
-                                    context_codes: [@course1.asset_string, @course2.asset_string],
-                                    start_date: "2012-01-01",
-                                    end_date: "2012-01-31"
+                                    controller: "calendar_events_api", action: "index", format: "json",
+                                    context_codes: [@course1.asset_string, @course2.asset_string], start_date: "2012-01-01", end_date: "2012-01-31"
                                   })
           expect(json.map { |event| [event["context_code"], event["child_events"][0]["user"]["id"]] }).to match_array(
             [[@course1.asset_string, @student1.id], [@course2.asset_string, @student2.id]]
@@ -859,12 +682,8 @@ describe CalendarEventsApiController, type: :request do
 
         it "counts other contexts' signups when calculating available_slots for students" do
           json = api_call_as_user(@student1, :get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{@ag.asset_string}", {
-                                    controller: "calendar_events_api",
-                                    action: "index",
-                                    format: "json",
-                                    context_codes: [@ag.asset_string],
-                                    start_date: "2012-01-01",
-                                    end_date: "2012-01-31"
+                                    controller: "calendar_events_api", action: "index", format: "json",
+                                    context_codes: [@ag.asset_string], start_date: "2012-01-01", end_date: "2012-01-31"
                                   })
           expect(json.pluck("available_slots")).to eq([0, 0])
         end
@@ -875,20 +694,15 @@ describe CalendarEventsApiController, type: :request do
         te2 = course_with_teacher(active_all: true)
         student1 = student_in_course(course: te1.course, active_all: true).user
         student2 = student_in_course(course: te2.course, active_all: true).user
-        ag = AppointmentGroup.create!(title: "something",
-                                      participants_per_appointment: 1,
+        ag = AppointmentGroup.create!(title: "something", participants_per_appointment: 1,
                                       new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
                                                          ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]],
                                       contexts: [te1.course, te2.course])
         ag.appointments.first.reserve_for(student1, te1.user)
         ag.appointments.last.reserve_for(student2, te2.user)
         json = api_call_as_user(te1.user, :get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{te1.course.asset_string}", {
-                                  controller: "calendar_events_api",
-                                  action: "index",
-                                  format: "json",
-                                  context_codes: [te1.course.asset_string],
-                                  start_date: "2012-01-01",
-                                  end_date: "2012-01-31"
+                                  controller: "calendar_events_api", action: "index", format: "json",
+                                  context_codes: [te1.course.asset_string], start_date: "2012-01-01", end_date: "2012-01-31"
                                 })
 
         a1 = json.detect { |h| h["id"] == ag.appointments.first.id }
@@ -1033,9 +847,7 @@ describe CalendarEventsApiController, type: :request do
 
             reservation = CalendarEvent.find(json["id"])
 
-            raw_api_call(:delete,
-                         "/api/v1/calendar_events/#{reservation.id}",
-                         {
+            raw_api_call(:delete, "/api/v1/calendar_events/#{reservation.id}", {
                            controller: "calendar_events_api",
                            action: "destroy",
                            format: "json",
@@ -1057,42 +869,29 @@ describe CalendarEventsApiController, type: :request do
             end
 
             it "does not allow a student to reserve a time slot in the past" do
-              json = api_call(:post,
-                              "/api/v1/calendar_events/#{@past_slot.id}/reservations",
-                              {
+              json = api_call(:post, "/api/v1/calendar_events/#{@past_slot.id}/reservations", {
                                 controller: "calendar_events_api", action: "reserve", format: "json", id: @past_slot.id.to_s
                               },
-                              {},
-                              {},
-                              { expected_status: 403 })
+                              {}, {}, { expected_status: 403 })
               expect(json["message"]).to eq("Cannot create or change reservation for past appointment")
             end
 
             it "does not allow a student to delete a past reservation" do
               reservation = @past_slot.reserve_for(@user, @teacher)
-              json = api_call(:delete,
-                              "/api/v1/calendar_events/#{reservation.id}",
-                              {
+              json = api_call(:delete, "/api/v1/calendar_events/#{reservation.id}", {
                                 controller: "calendar_events_api", action: "destroy", format: "json", id: reservation.id.to_s
                               },
-                              {},
-                              {},
-                              { expected_status: 403 })
+                              {}, {}, { expected_status: 403 })
               expect(json["message"]).to eq("Cannot create or change reservation for past appointment")
               expect(reservation.reload).not_to be_deleted
             end
 
             it "allows a teacher to delete a student's past reservation" do
               reservation = @past_slot.reserve_for(@user, @teacher)
-              api_call_as_user(@teacher,
-                               :delete,
-                               "/api/v1/calendar_events/#{reservation.id}",
-                               {
+              api_call_as_user(@teacher, :delete, "/api/v1/calendar_events/#{reservation.id}", {
                                  controller: "calendar_events_api", action: "destroy", format: "json", id: reservation.id.to_s
                                },
-                               {},
-                               {},
-                               { expected_status: 200 })
+                               {}, {}, { expected_status: 200 })
               expect(reservation.reload).to be_deleted
             end
           end
@@ -1144,17 +943,13 @@ describe CalendarEventsApiController, type: :request do
           end
 
           it "returns a permission error for students accessing participants" do
-            api_call_as_user(@student1,
-                             :get,
-                             "/api/v1/calendar_events/#{@parent_event.id}/participants",
+            api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@parent_event.id}/participants",
                              { controller: "calendar_events_api", action: "participants", id: @parent_event.id.to_s, format: "json" })
             expect(response.code).to eq "401"
           end
 
           it "returns empty participants for a teacher" do
-            json = api_call_as_user(@teacher,
-                                    :get,
-                                    "/api/v1/calendar_events/#{@parent_event.id}/participants",
+            json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events/#{@parent_event.id}/participants",
                                     { controller: "calendar_events_api", action: "participants", id: @parent_event.id.to_s, format: "json" })
             expect(json).to eq []
           end
@@ -1163,12 +958,9 @@ describe CalendarEventsApiController, type: :request do
         describe "appointment groups" do
           before do
             course_with_teacher(active_all: true)
-            @ag = AppointmentGroup.create!(title: "something",
-                                           participants_per_appointment: 4,
-                                           contexts: [@course],
-                                           participant_visibility: "protected",
-                                           new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
-                                                              ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
+            @ag = AppointmentGroup.create!(title: "something", participants_per_appointment: 4, contexts: [@course],
+                                           participant_visibility: "protected", new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
+                                                                                                   ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
             @ag.publish!
             @event = @ag.appointments.first
             course_with_student(course: @course, active_all: true)
@@ -1180,9 +972,7 @@ describe CalendarEventsApiController, type: :request do
           end
 
           it "returns participants in the same appointment group slot for a student" do
-            json = api_call_as_user(@student1,
-                                    :get,
-                                    "/api/v1/calendar_events/#{@event.id}/participants",
+            json = api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
                                     { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
             expect(json).to eq [
               {
@@ -1205,9 +995,7 @@ describe CalendarEventsApiController, type: :request do
           end
 
           it "returns participants in the same appointment group slot for a teacher" do
-            json = api_call_as_user(@teacher,
-                                    :get,
-                                    "/api/v1/calendar_events/#{@event.id}/participants",
+            json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events/#{@event.id}/participants",
                                     { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
             expect(json).to eq [
               {
@@ -1237,12 +1025,10 @@ describe CalendarEventsApiController, type: :request do
               student = User.find(student_id)
               @event.reserve_for(student, student)
             end
-            json = api_call(:get,
-                            "/api/v1/calendar_events/#{@event.id}/participants",
+            json = api_call(:get, "/api/v1/calendar_events/#{@event.id}/participants",
                             { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
             expect(json.length).to eq 10
-            json = api_call(:get,
-                            "/api/v1/calendar_events/#{@event.id}/participants?page=2",
+            json = api_call(:get, "/api/v1/calendar_events/#{@event.id}/participants?page=2",
                             { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json", page: 2 })
             expect(json.length).to eq 2
           end
@@ -1251,9 +1037,7 @@ describe CalendarEventsApiController, type: :request do
             course_with_student(course: @course, active_all: true)
             event2 = @ag.appointments.last
             event2.reserve_for(@student, @student)
-            json = api_call_as_user(@student1,
-                                    :get,
-                                    "/api/v1/calendar_events/#{@event.id}/participants",
+            json = api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
                                     { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
             expect(json).to eq [
               {
@@ -1273,8 +1057,7 @@ describe CalendarEventsApiController, type: :request do
                 "pronouns" => nil
               }
             ]
-            json = api_call(:get,
-                            "/api/v1/calendar_events/#{event2.id}/participants",
+            json = api_call(:get, "/api/v1/calendar_events/#{event2.id}/participants",
                             { controller: "calendar_events_api", action: "participants", id: event2.id.to_s, format: "json" })
             expect(json).to eq [
               {
@@ -1291,9 +1074,7 @@ describe CalendarEventsApiController, type: :request do
           it "returns 401 if not allowed to view participants" do
             @ag.participant_visibility = "private"
             @ag.save!
-            api_call_as_user(@student1,
-                             :get,
-                             "/api/v1/calendar_events/#{@event.id}/participants",
+            api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
                              { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
             expect(response.code).to eq "401"
           end
@@ -1319,8 +1100,7 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it "creates a new event" do
-      json = api_call(:post,
-                      "/api/v1/calendar_events",
+      json = api_call(:post, "/api/v1/calendar_events",
                       { controller: "calendar_events_api", action: "create", format: "json" },
                       { calendar_event: { context_code: @course.asset_string, title: "ohai" } })
       assert_status(201)
@@ -1329,22 +1109,21 @@ describe CalendarEventsApiController, type: :request do
     end
 
     context "account calendars" do
+      before :once do
+        Account.site_admin.enable_feature! :account_calendar_events
+      end
+
       it "does not allow view-only users to create account calendar events" do
         @user = account_admin_user_with_role_changes(account: Account.default, role_changes: { manage_account_calendar_visibility: true, manage_account_calendar_events: false })
-        api_call(:post,
-                 "/api/v1/calendar_events",
-                 { controller: "calendar_events_api", action: "create", format: "json" },
-                 { calendar_event: { context_code: "account_#{Account.default.id}", title: "API Test" } },
-                 {},
-                 { expected_status: 401 })
+        api_call(:post, "/api/v1/calendar_events", { controller: "calendar_events_api", action: "create", format: "json" },
+                 { calendar_event: { context_code: "account_#{Account.default.id}", title: "API Test" } }, {}, { expected_status: 401 })
       end
     end
 
     it "creates recurring events if options have been specified" do
       start_at = Time.zone.now.utc.change(hour: 0, min: 1) # For pre-Normandy bug with all_day method in calendar_event.rb
       end_at = Time.zone.now.utc.change(hour: 23)
-      json = api_call(:post,
-                      "/api/v1/calendar_events",
+      json = api_call(:post, "/api/v1/calendar_events",
                       { controller: "calendar_events_api", action: "create", format: "json" },
                       { calendar_event: {
                         context_code: @course.asset_string,
@@ -1376,8 +1155,7 @@ describe CalendarEventsApiController, type: :request do
     it "respects recurring event limit" do
       start_at = Time.zone.now.utc.change(hour: 0, min: 1)
       end_at = Time.zone.now.utc.change(hour: 23)
-      api_call(:post,
-               "/api/v1/calendar_events",
+      api_call(:post, "/api/v1/calendar_events",
                { controller: "calendar_events_api", action: "create", format: "json" },
                { calendar_event: {
                  context_code: @course.asset_string,
@@ -1419,8 +1197,7 @@ describe CalendarEventsApiController, type: :request do
 
     it "processes html content in description on create" do
       should_process_incoming_user_content(@course) do |content|
-        json = api_call(:post,
-                        "/api/v1/calendar_events",
+        json = api_call(:post, "/api/v1/calendar_events",
                         { controller: "calendar_events_api", action: "create", format: "json" },
                         { calendar_event: { context_code: @course.asset_string, title: "ohai", description: content } })
 
@@ -1433,8 +1210,7 @@ describe CalendarEventsApiController, type: :request do
       it "emits calendar.calendar_event.create with single tag when creating a new event" do
         course_with_student(course: @course, user: @user, active_all: true)
         allow(InstStatsd::Statsd).to receive(:increment)
-        api_call(:post,
-                 "/api/v1/calendar_events",
+        api_call(:post, "/api/v1/calendar_events",
                  { controller: "calendar_events_api", action: "create", format: "json" },
                  { calendar_event: { context_code: @course.asset_string, title: "single event" } })
         expect(InstStatsd::Statsd).to have_received(:increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment enrollment_type:StudentEnrollment calendar_event_type:single])
@@ -1444,11 +1220,9 @@ describe CalendarEventsApiController, type: :request do
         start_at = Time.zone.now.utc.change(hour: 0, min: 1)
         end_at = Time.zone.now.utc.change(hour: 23)
         allow(InstStatsd::Statsd).to receive(:increment)
-        api_call(:post,
-                 "/api/v1/calendar_events",
+        api_call(:post, "/api/v1/calendar_events",
                  { controller: "calendar_events_api", action: "create", format: "json" },
-                 { calendar_event: { context_code: @course.asset_string,
-                                     title: "recurring event",
+                 { calendar_event: { context_code: @course.asset_string, title: "recurring event",
                                      start_at: start_at.iso8601,
                                      end_at: end_at.iso8601,
                                      duplicate: {
@@ -1464,8 +1238,7 @@ describe CalendarEventsApiController, type: :request do
         start_at = Time.zone.now.utc.change(hour: 0, min: 1)
         end_at = Time.zone.now.utc.change(hour: 23)
         allow(InstStatsd::Statsd).to receive(:increment)
-        api_call(:post,
-                 "/api/v1/calendar_events",
+        api_call(:post, "/api/v1/calendar_events",
                  { controller: "calendar_events_api", action: "create", format: "json" },
                  { calendar_event: { context_code: @course.asset_string,
                                      title: "series",
@@ -1479,8 +1252,7 @@ describe CalendarEventsApiController, type: :request do
     it "updates an event" do
       event = @course.calendar_events.create(title: "event", start_at: "2012-01-08 12:00:00")
 
-      json = api_call(:put,
-                      "/api/v1/calendar_events/#{event.id}",
+      json = api_call(:put, "/api/v1/calendar_events/#{event.id}",
                       { controller: "calendar_events_api", action: "update", id: event.id.to_s, format: "json" },
                       { calendar_event: { start_at: "2012-01-09 12:00:00", title: "ohai" } })
       expect(json.keys).to match_array expected_fields
@@ -1491,8 +1263,7 @@ describe CalendarEventsApiController, type: :request do
     it "does not update event if all_day, start_at, and end_at are provided in a request" do
       event = @course.calendar_events.create(title: "event", start_at: "2012-01-08 12:00:00")
 
-      json = api_call(:put,
-                      "/api/v1/calendar_events/#{event.id}",
+      json = api_call(:put, "/api/v1/calendar_events/#{event.id}",
                       { controller: "calendar_events_api", action: "update", id: event.id.to_s, format: "json" },
                       { calendar_event: { start_at: "2012-01-08 12:00:00", end_at: "2012-01-09 12:00:00", all_day: true, title: "ohai" } })
       expect(json["all_day"]).to be true
@@ -1503,8 +1274,7 @@ describe CalendarEventsApiController, type: :request do
       event = @course.calendar_events.create(title: "event", start_at: "2012-01-08 12:00:00")
 
       should_process_incoming_user_content(@course) do |content|
-        api_call(:put,
-                 "/api/v1/calendar_events/#{event.id}",
+        api_call(:put, "/api/v1/calendar_events/#{event.id}",
                  { controller: "calendar_events_api", action: "update", id: event.id.to_s, format: "json" },
                  { calendar_event: { start_at: "2012-01-09 12:00:00", description: content } })
 
@@ -1680,8 +1450,7 @@ describe CalendarEventsApiController, type: :request do
           series_count = @event_series["duplicates"].length + 1
           series_uuid = @event_series["series_uuid"]
 
-          json = api_call(:delete,
-                          "/api/v1/calendar_events/#{target_event_id}?which=one",
+          json = api_call(:delete, "/api/v1/calendar_events/#{target_event_id}?which=one",
                           { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "one", format: "json" })
           assert_status(200)
           expect(json.length).to eq 1
@@ -1697,8 +1466,7 @@ describe CalendarEventsApiController, type: :request do
           series_count = @event_series["duplicates"].length + 1
           series_uuid = @event_series["series_uuid"]
 
-          json = api_call(:delete,
-                          "/api/v1/calendar_events/#{target_event_id}?which=following",
+          json = api_call(:delete, "/api/v1/calendar_events/#{target_event_id}?which=following",
                           { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "following", format: "json" })
           assert_status(200)
           expect(json.length).to eq 2
@@ -1714,8 +1482,7 @@ describe CalendarEventsApiController, type: :request do
           target_event_id = @event_series["duplicates"][0]["calendar_event"]["id"] # middle event in the series
           series_uuid = @event_series["series_uuid"]
 
-          json = api_call(:delete,
-                          "/api/v1/calendar_events/#{target_event_id}?which=all",
+          json = api_call(:delete, "/api/v1/calendar_events/#{target_event_id}?which=all",
                           { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "all", format: "json" })
           assert_status(200)
           expect(json.length).to eq 3
@@ -1727,8 +1494,7 @@ describe CalendarEventsApiController, type: :request do
         it "returns an error for invalid 'which' parameter" do
           target_event_id = @event_series["id"]
 
-          json = api_call(:delete,
-                          "/api/v1/calendar_events/#{target_event_id}?which=bogus",
+          json = api_call(:delete, "/api/v1/calendar_events/#{target_event_id}?which=bogus",
                           { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "bogus", format: "json" })
           assert_status(400)
           expect(json.length).to eq 1
@@ -1761,8 +1527,7 @@ describe CalendarEventsApiController, type: :request do
           target_event_id = target_event["id"]
           new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
 
-          json = api_call(:put,
-                          "/api/v1/calendar_events/#{target_event_id}",
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
                           { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
                           { calendar_event: { start_at: new_start_at, title: "this is different" } })
           expect(json.keys).to match_array expected_series_fields
@@ -1778,8 +1543,7 @@ describe CalendarEventsApiController, type: :request do
           new_title = "a new title"
           new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
 
-          json = api_call(:put,
-                          "/api/v1/calendar_events/#{target_event_id}",
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
                           { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
                           { calendar_event: { start_at: new_start_at, title: new_title }, which: "all" })
           assert_status(200)
@@ -1801,8 +1565,7 @@ describe CalendarEventsApiController, type: :request do
           new_title = "a new title"
           new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
 
-          json = api_call(:put,
-                          "/api/v1/calendar_events/#{target_event_id}",
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
                           { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
                           { calendar_event: { start_at: new_start_at, title: new_title }, which: "following" })
           assert_status(200)
@@ -1822,8 +1585,7 @@ describe CalendarEventsApiController, type: :request do
 
         it "returns an error when which='one' and the rrule changed" do
           target_event_id = @event_series["duplicates"][0]["calendar_event"]["id"].to_s
-          json = api_call(:put,
-                          "/api/v1/calendar_events/#{target_event_id}",
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
                           { controller: "calendar_events_api", action: "update", id: target_event_id, format: "json" },
                           { calendar_event: { title: "new title", rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=4" }, which: "one" })
           assert_status(400)
@@ -1835,8 +1597,7 @@ describe CalendarEventsApiController, type: :request do
           target_event_id = target_event["id"].to_s
           new_start_at = (Time.parse(target_event["start_at"]) + 1.day).iso8601
 
-          json = api_call(:put,
-                          "/api/v1/calendar_events/#{target_event_id}",
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
                           { controller: "calendar_events_api", action: "update", id: target_event_id, format: "json" },
                           { calendar_event: { title: "new title", start_at: new_start_at }, which: "all" })
           assert_status(400)
@@ -1852,8 +1613,7 @@ describe CalendarEventsApiController, type: :request do
           new_title = "a new title"
           new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
 
-          json = api_call(:put,
-                          "/api/v1/calendar_events/#{target_event_id}",
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
                           { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
                           { calendar_event: { start_at: new_start_at, title: new_title, rrule: rrule }, which: "following" })
           assert_status(200)
@@ -1883,8 +1643,7 @@ describe CalendarEventsApiController, type: :request do
           new_title = "a new title"
           new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
 
-          json = api_call(:put,
-                          "/api/v1/calendar_events/#{target_event_id}",
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
                           { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
                           { calendar_event: { start_at: new_start_at, title: new_title, rrule: rrule }, which: "all" })
           assert_status(200)
@@ -1903,8 +1662,7 @@ describe CalendarEventsApiController, type: :request do
     describe "moving events between calendars" do
       it "moves an event from a user to a course" do
         event = @user.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00")
-        json = api_call(:put,
-                        "/api/v1/calendar_events/#{event.id}",
+        json = api_call(:put, "/api/v1/calendar_events/#{event.id}",
                         { controller: "calendar_events_api", action: "update", id: event.to_param, format: "json" },
                         { calendar_event: { context_code: @course.asset_string } })
         expect(json["context_code"]).to eq @course.asset_string
@@ -1913,8 +1671,7 @@ describe CalendarEventsApiController, type: :request do
 
       it "moves an event from a course to a user" do
         event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00")
-        json = api_call(:put,
-                        "/api/v1/calendar_events/#{event.id}",
+        json = api_call(:put, "/api/v1/calendar_events/#{event.id}",
                         { controller: "calendar_events_api", action: "update", id: event.to_param, format: "json" },
                         { calendar_event: { context_code: @user.asset_string } })
         expect(json["context_code"]).to eq @user.asset_string
@@ -1929,30 +1686,23 @@ describe CalendarEventsApiController, type: :request do
         end
 
         it "refuses to move a parent event" do
-          json = api_call(:put,
-                          "/api/v1/calendar_events/#{@event.id}",
+          json = api_call(:put, "/api/v1/calendar_events/#{@event.id}",
                           { controller: "calendar_events_api", action: "update", id: @event.to_param, format: "json" },
-                          { calendar_event: { context_code: @user.asset_string } },
-                          {},
-                          { expected_status: 400 })
+                          { calendar_event: { context_code: @user.asset_string } }, {}, { expected_status: 400 })
           expect(json["message"]).to include "Cannot move events with section-specific times"
         end
 
         it "refuses to move a child event" do
           child_event = @event.child_events.first
           expect(child_event).to be_present
-          json = api_call(:put,
-                          "/api/v1/calendar_events/#{child_event.id}",
+          json = api_call(:put, "/api/v1/calendar_events/#{child_event.id}",
                           { controller: "calendar_events_api", action: "update", id: child_event.to_param, format: "json" },
-                          { calendar_event: { context_code: @user.asset_string } },
-                          {},
-                          { expected_status: 400 })
+                          { calendar_event: { context_code: @user.asset_string } }, {}, { expected_status: 400 })
           expect(json["message"]).to include "Cannot move events with section-specific times"
         end
 
         it "doesn't complain if you 'move' the event into the calendar it's already in" do
-          api_call(:put,
-                   "/api/v1/calendar_events/#{@event.id}",
+          api_call(:put, "/api/v1/calendar_events/#{@event.id}",
                    { controller: "calendar_events_api", action: "update", id: @event.to_param, format: "json" },
                    { calendar_event: { context_code: @course.asset_string } })
           expect(response).to be_successful
@@ -1963,31 +1713,24 @@ describe CalendarEventsApiController, type: :request do
         ag = AppointmentGroup.create!(title: "something", participants_per_appointment: 4, new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], contexts: [@course])
         ag.publish!
         appointment = ag.appointments.first
-        json = api_call(:put,
-                        "/api/v1/calendar_events/#{appointment.id}",
+        json = api_call(:put, "/api/v1/calendar_events/#{appointment.id}",
                         { controller: "calendar_events_api", action: "update", id: appointment.to_param, format: "json" },
-                        { calendar_event: { context_code: @user.asset_string } },
-                        {},
-                        { expected_status: 400 })
+                        { calendar_event: { context_code: @user.asset_string } }, {}, { expected_status: 400 })
         expect(json["message"]).to include "Cannot move Scheduler appointments"
       end
 
       it "verifies the caller has permission to create the event in the destination context" do
         other_course = Course.create!
         event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00")
-        api_call(:put,
-                 "/api/v1/calendar_events/#{event.id}",
+        api_call(:put, "/api/v1/calendar_events/#{event.id}",
                  { controller: "calendar_events_api", action: "update", id: event.to_param, format: "json" },
-                 { calendar_event: { context_code: other_course.asset_string } },
-                 {},
-                 { expected_status: 401 })
+                 { calendar_event: { context_code: other_course.asset_string } }, {}, { expected_status: 401 })
       end
     end
 
     it "deletes an event" do
       event = @course.calendar_events.create(title: "event", start_at: "2012-01-08 12:00:00")
-      json = api_call(:delete,
-                      "/api/v1/calendar_events/#{event.id}",
+      json = api_call(:delete, "/api/v1/calendar_events/#{event.id}",
                       { controller: "calendar_events_api", action: "destroy", id: event.id.to_s, format: "json" })
       expect(json.keys).to match_array expected_fields
       expect(event.reload).to be_deleted
@@ -1996,16 +1739,14 @@ describe CalendarEventsApiController, type: :request do
     it "deletes the appointment group if it has no appointments" do
       time = Time.utc(Time.now.year, Time.now.month, Time.now.day, 4, 20)
       @appointment_group = AppointmentGroup.create!(
-        title: "appointment group",
-        participants_per_appointment: 4,
+        title: "appointment group", participants_per_appointment: 4,
         new_appointments: [
           [time + 3.days, time + 3.days + 1.hour]
         ],
         contexts: [@course]
       )
 
-      api_call(:delete,
-               "/api/v1/calendar_events/#{@appointment_group.appointments.first.id}",
+      api_call(:delete, "/api/v1/calendar_events/#{@appointment_group.appointments.first.id}",
                { controller: "calendar_events_api", action: "destroy", id: @appointment_group.appointments.first.id.to_s, format: "json" })
       expect(@appointment_group.reload).to be_deleted
     end
@@ -2013,11 +1754,8 @@ describe CalendarEventsApiController, type: :request do
     it "apis translate event descriptions" do
       should_translate_user_content(@course) do |content|
         event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00", description: content)
-        json = api_call(:get,
-                        "/api/v1/calendar_events/#{event.id}",
-                        controller: "calendar_events_api",
-                        action: "show",
-                        format: "json",
+        json = api_call(:get, "/api/v1/calendar_events/#{event.id}",
+                        controller: "calendar_events_api", action: "show", format: "json",
                         id: event.id.to_s)
         json["description"]
       end
@@ -2027,12 +1765,8 @@ describe CalendarEventsApiController, type: :request do
       allow(HostUrl).to receive(:default_host).and_return("www.example.com")
       should_translate_user_content(@course, false) do |content|
         @course.calendar_events.create!(description: content, start_at: Time.now + 1.hour, end_at: Time.now + 2.hours)
-        json = api_call(:get,
-                        "/api/v1/courses/#{@course.id}",
-                        controller: "courses",
-                        action: "show",
-                        format: "json",
-                        id: @course.id.to_s)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}",
+                        controller: "courses", action: "show", format: "json", id: @course.id.to_s)
         get json["calendar"]["ics"]
         expect(response).to be_successful
         cal = Icalendar::Calendar.parse(response.body.dup)[0]
@@ -2069,32 +1803,22 @@ describe CalendarEventsApiController, type: :request do
 
       it "lists child events by default" do
         json = api_call(:get, "/api/v1/calendar_events?context_codes[]=course_#{@course.id}&start_date=2011-12-31&end_date=2012-01-02", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
-                          context_codes: ["course_#{@course.id}"],
-                          start_date: Date.parse("2011-12-31"),
-                          end_date: Date.parse("2012-01-02")
+                          controller: "calendar_events_api", action: "index", format: "json",
+                          context_codes: ["course_#{@course.id}"], start_date: Date.parse("2011-12-31"), end_date: Date.parse("2012-01-02")
                         })
         expect(json[0]["child_events"].length).to be 1
       end
 
       it "excludes child events when asked to" do
         json = api_call(:get, "/api/v1/calendar_events?context_codes[]=course_#{@course.id}&start_date=2011-12-31&end_date=2012-01-02&excludes[]=child_events", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
-                          context_codes: ["course_#{@course.id}"],
-                          start_date: Date.parse("2011-12-31"),
-                          end_date: Date.parse("2012-01-02"),
-                          excludes: ["child_events"]
+                          controller: "calendar_events_api", action: "index", format: "json",
+                          context_codes: ["course_#{@course.id}"], start_date: Date.parse("2011-12-31"), end_date: Date.parse("2012-01-02"), excludes: ["child_events"]
                         })
         expect(json[0]["child_events"]).to be_nil
       end
 
       it "creates an event with child events" do
-        json = api_call(:post,
-                        "/api/v1/calendar_events",
+        json = api_call(:post, "/api/v1/calendar_events",
                         { controller: "calendar_events_api", action: "create", format: "json" },
                         { calendar_event: { context_code: @course.asset_string, title: "ohai", child_event_data: { "0" => { start_at: "2012-01-01 12:00:00", end_at: "2012-01-01 13:00:00", context_code: @course.default_section.asset_string } } } })
         assert_status(201)
@@ -2107,8 +1831,7 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "updates an event with child events" do
-        json = api_call(:put,
-                        "/api/v1/calendar_events/#{event.id}",
+        json = api_call(:put, "/api/v1/calendar_events/#{event.id}",
                         { controller: "calendar_events_api", action: "update", id: event.id.to_s, format: "json" },
                         { calendar_event: { title: "ohai", child_event_data: { "0" => { start_at: "2012-01-01 13:00:00", end_at: "2012-01-01 14:00:00", context_code: @course.default_section.asset_string } } } })
         expect(json.keys).to match_array expected_fields
@@ -2120,8 +1843,7 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "removes all child events" do
-        json = api_call(:put,
-                        "/api/v1/calendar_events/#{event.id}",
+        json = api_call(:put, "/api/v1/calendar_events/#{event.id}",
                         { controller: "calendar_events_api", action: "update", id: event.id.to_s, format: "json" },
                         { calendar_event: { title: "ohai", remove_child_events: "1" } })
         expect(json.keys).to match_array expected_fields
@@ -2134,8 +1856,7 @@ describe CalendarEventsApiController, type: :request do
 
       it "adds the section name to a child event's title" do
         child_event_id = event.child_event_ids.first
-        json = api_call(:get,
-                        "/api/v1/calendar_events/#{child_event_id}",
+        json = api_call(:get, "/api/v1/calendar_events/#{child_event_id}",
                         { controller: "calendar_events_api", action: "show", id: child_event_id.to_s, format: "json" })
         expect(json.keys).to match_array((expected_fields + ["effective_context_code"]))
         expect(json["title"]).to eql "event (#{@course.default_section.name})"
@@ -2148,17 +1869,13 @@ describe CalendarEventsApiController, type: :request do
         end
 
         it "includes children of hidden events for teachers" do
-          json = api_call_as_user(@teacher,
-                                  :get,
-                                  "/api/v1/calendar_events/#{event.id}",
+          json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events/#{event.id}",
                                   { controller: "calendar_events_api", action: "show", id: event.to_param, format: "json" })
           expect(json["child_events"].pluck("id")).to match_array(event.child_events.map(&:id))
         end
 
         it "omits children of hidden events for students" do
-          json = api_call_as_user(@student,
-                                  :get,
-                                  "/api/v1/calendar_events/#{event.id}",
+          json = api_call_as_user(@student, :get, "/api/v1/calendar_events/#{event.id}",
                                   { controller: "calendar_events_api", action: "show", id: event.to_param, format: "json" })
           expect(json["child_events"]).to be_empty
         end
@@ -2168,8 +1885,7 @@ describe CalendarEventsApiController, type: :request do
         event.description = '<a href="/media_objects/abcde" class="instructure_inline_media_comment audio_comment" id="media_comment_abcde"><img></a>'
         event.save!
         child_event_id = event.child_event_ids.first
-        api_call(:get,
-                 "/api/v1/calendar_events/#{child_event_id}",
+        api_call(:get, "/api/v1/calendar_events/#{child_event_id}",
                  { controller: "calendar_events_api", action: "show", id: child_event_id.to_s, format: "json" })
         expect(response).to be_successful
       end
@@ -2183,8 +1899,7 @@ describe CalendarEventsApiController, type: :request do
 
       let_once(:conference) { WebConference.create(context: @course, user: @user, conference_type: "BigBlueButton") }
       let_once(:event_with_conference) do
-        @course.calendar_events.create(title: "event with conference",
-                                       workflow_state: "active",
+        @course.calendar_events.create(title: "event with conference", workflow_state: "active",
                                        web_conference: conference)
       end
 
@@ -2196,12 +1911,9 @@ describe CalendarEventsApiController, type: :request do
         end
 
         it "sends only one conference invite notification for created web conference" do
-          api_call(:post,
-                   "/api/v1/calendar_events.json",
-                   {
+          api_call(:post, "/api/v1/calendar_events.json", {
                      controller: "calendar_events_api", action: "create", format: "json"
-                   },
-                   {
+                   }, {
                      calendar_event: {
                        context_code: "course_#{@course.id}",
                        title: "API Test",
@@ -2224,10 +1936,7 @@ describe CalendarEventsApiController, type: :request do
 
       it "shows web conferences when include specified" do
         json = api_call(:get, "/api/v1/calendar_events/#{event_with_conference.id}?include[]=web_conference", {
-                          controller: "calendar_events_api",
-                          action: "show",
-                          format: "json",
-                          id: event_with_conference.id,
+                          controller: "calendar_events_api", action: "show", format: "json", id: event_with_conference.id,
                           include: ["web_conference"]
                         })
         expect(json).to have_key "web_conference"
@@ -2235,12 +1944,9 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "creates with existing web_conference" do
-        json = api_call(:post,
-                        "/api/v1/calendar_events.json",
-                        {
+        json = api_call(:post, "/api/v1/calendar_events.json", {
                           controller: "calendar_events_api", action: "create", format: "json"
-                        },
-                        {
+                        }, {
                           calendar_event: {
                             context_code: "course_#{@course.id}",
                             title: "API Test",
@@ -2251,12 +1957,9 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "creates with new web_conference" do
-        json = api_call(:post,
-                        "/api/v1/calendar_events.json",
-                        {
+        json = api_call(:post, "/api/v1/calendar_events.json", {
                           controller: "calendar_events_api", action: "create", format: "json"
-                        },
-                        {
+                        }, {
                           calendar_event: {
                             context_code: "course_#{@course.id}",
                             title: "API Test",
@@ -2267,12 +1970,9 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "sets defaults for new web_conference" do
-        json = api_call(:post,
-                        "/api/v1/calendar_events.json",
-                        {
+        json = api_call(:post, "/api/v1/calendar_events.json", {
                           controller: "calendar_events_api", action: "create", format: "json"
-                        },
-                        {
+                        }, {
                           calendar_event: {
                             context_code: "course_#{@course.id}",
                             title: "API Test",
@@ -2285,12 +1985,9 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "does not fail with blank titles" do
-        json = api_call(:post,
-                        "/api/v1/calendar_events.json",
-                        {
+        json = api_call(:post, "/api/v1/calendar_events.json", {
                           controller: "calendar_events_api", action: "create", format: "json"
-                        },
-                        {
+                        }, {
                           calendar_event: {
                             context_code: "course_#{@course.id}",
                             title: "",
@@ -2303,12 +2000,9 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "fails to create with invald web_conference" do
-        json = api_call(:post,
-                        "/api/v1/calendar_events.json",
-                        {
+        json = api_call(:post, "/api/v1/calendar_events.json", {
                           controller: "calendar_events_api", action: "create", format: "json"
-                        },
-                        {
+                        }, {
                           calendar_event: {
                             context_code: "course_#{@course.id}",
                             title: "API Test",
@@ -2320,12 +2014,9 @@ describe CalendarEventsApiController, type: :request do
 
       it "updates with existing web_conference" do
         event = @course.calendar_events.create(title: "to update", workflow_state: "active")
-        api_call(:put,
-                 "/api/v1/calendar_events/#{event.id}",
-                 {
+        api_call(:put, "/api/v1/calendar_events/#{event.id}", {
                    controller: "calendar_events_api", action: "update", format: "json", id: event.id
-                 },
-                 {
+                 }, {
                    calendar_event: {
                      web_conference: { id: conference.id }
                    }
@@ -2335,12 +2026,9 @@ describe CalendarEventsApiController, type: :request do
 
       it "updates with new web conference" do
         event = @course.calendar_events.create(title: "to update", workflow_state: "active", web_conference: conference)
-        api_call(:put,
-                 "/api/v1/calendar_events/#{event.id}",
-                 {
+        api_call(:put, "/api/v1/calendar_events/#{event.id}", {
                    controller: "calendar_events_api", action: "update", format: "json", id: event.id
-                 },
-                 {
+                 }, {
                    calendar_event: {
                      web_conference: { conference_type: "BigBlueButton", title: "My Other BBB Conference" }
                    }
@@ -2350,12 +2038,9 @@ describe CalendarEventsApiController, type: :request do
 
       it "fails to update with invalid web_conference" do
         event = @course.calendar_events.create(title: "to update", workflow_state: "active")
-        json = api_call(:put,
-                        "/api/v1/calendar_events/#{event.id}",
-                        {
+        json = api_call(:put, "/api/v1/calendar_events/#{event.id}", {
                           controller: "calendar_events_api", action: "update", format: "json", id: event.id
-                        },
-                        {
+                        }, {
                           calendar_event: {
                             web_conference: { title: "Bad" }
                           }
@@ -2365,12 +2050,9 @@ describe CalendarEventsApiController, type: :request do
 
       it "removes a web conference if empty argument provided" do
         event = @course.calendar_events.create(title: "to update", workflow_state: "active", web_conference: conference)
-        api_call(:put,
-                 "/api/v1/calendar_events/#{event.id}",
-                 {
+        api_call(:put, "/api/v1/calendar_events/#{event.id}", {
                    controller: "calendar_events_api", action: "update", format: "json", id: event.id
-                 },
-                 {
+                 }, {
                    calendar_event: {
                      web_conference: ""
                    }
@@ -2380,12 +2062,9 @@ describe CalendarEventsApiController, type: :request do
 
       it "does not remove a web conference if no argument provided" do
         event = @course.calendar_events.create(title: "to update", workflow_state: "active", web_conference: conference)
-        api_call(:put,
-                 "/api/v1/calendar_events/#{event.id}",
-                 {
+        api_call(:put, "/api/v1/calendar_events/#{event.id}", {
                    controller: "calendar_events_api", action: "update", format: "json", id: event.id
-                 },
-                 {
+                 }, {
                    calendar_event: {
                      location: "foo"
                    }
@@ -2403,11 +2082,8 @@ describe CalendarEventsApiController, type: :request do
 
       it "returns calendar events that have a date with important dates if the param is sent" do
         json = api_call(:get, "/api/v1/calendar_events?important_dates=true&context_codes[]=course_#{@course.id}", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
-                          context_codes: ["course_#{@course.id}"],
-                          important_dates: true
+                          controller: "calendar_events_api", action: "index", format: "json",
+                          context_codes: ["course_#{@course.id}"], important_dates: true
                         })
         expect(json.size).to be 1
         expect(json[0]["important_dates"]).to be true
@@ -2423,11 +2099,8 @@ describe CalendarEventsApiController, type: :request do
 
       it "returns calendar events that have a date with blackout date if the param is sent" do
         json = api_call(:get, "/api/v1/calendar_events?blackout_date=true&context_codes[]=course_#{@course.id}", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
-                          context_codes: ["course_#{@course.id}"],
-                          blackout_date: true
+                          controller: "calendar_events_api", action: "index", format: "json",
+                          context_codes: ["course_#{@course.id}"], blackout_date: true
                         })
         expect(json.size).to be 1
         expect(json[0]["blackout_date"]).to be true
@@ -2437,24 +2110,9 @@ describe CalendarEventsApiController, type: :request do
 
   context "assignments" do
     expected_fields = %w[
-      all_day
-      all_day_date
-      assignment
-      context_code
-      created_at
-      description
-      end_at
-      html_url
-      id
-      start_at
-      title
-      type
-      updated_at
-      url
-      workflow_state
-      context_name
-      context_color
-      important_dates
+      all_day all_day_date assignment context_code created_at
+      description end_at html_url id start_at title type updated_at
+      url workflow_state context_name context_color important_dates
       submission_types
     ]
 
@@ -2464,13 +2122,8 @@ describe CalendarEventsApiController, type: :request do
       @course.assignments.create(title: "3", due_at: "2012-01-19 12:00:00")
 
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        start_date: "2012-01-08",
-                        end_date: "2012-01-08"
+                        controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                        context_codes: ["course_#{@course.id}"], start_date: "2012-01-08", end_date: "2012-01-08"
                       })
       expect(json.size).to be 1
       expect(json.first.keys).to match_array expected_fields
@@ -2483,13 +2136,8 @@ describe CalendarEventsApiController, type: :request do
       @course.assignments.create(title: "3", due_at: "2012-01-19 12:00:00")
 
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        start_date: "2012-01-07",
-                        end_date: "2012-01-19"
+                        controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                        context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-19"
                       })
       expect(json.size).to be 3
       expect(json.first.keys).to match_array expected_fields
@@ -2502,12 +2150,8 @@ describe CalendarEventsApiController, type: :request do
       @course.assignments.create(description: "foo", unlock_at: 1.day.from_now)
 
       json = api_call_as_user(student, :get, "/api/v1/calendar_events", {
-                                controller: "calendar_events_api",
-                                action: "index",
-                                format: "json",
-                                type: "assignment",
-                                context_codes: ["course_#{@course.id}"],
-                                all_events: true
+                                controller: "calendar_events_api", action: "index", format: "json",
+                                type: "assignment", context_codes: ["course_#{@course.id}"], all_events: true
                               })
       expect(json.first).to have_key("description")
       expect(json.first["description"]).to be_nil
@@ -2519,39 +2163,22 @@ describe CalendarEventsApiController, type: :request do
       ids = dated.reverse + undated
 
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        all_events: 1,
-                        per_page: "10"
+                        controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                        context_codes: ["course_#{@course.id}"], all_events: 1, per_page: "10"
                       })
       expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
       expect(json.pluck("id")).to eql(ids[0...10].map { |id| "assignment_#{id}" })
 
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=2", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        all_events: 1,
-                        per_page: "10",
-                        page: "2"
+                        controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                        context_codes: ["course_#{@course.id}"], all_events: 1, per_page: "10", page: "2"
                       })
       expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="prev",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
       expect(json.pluck("id")).to eql(ids[10...20].map { |id| "assignment_#{id}" })
 
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=3", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        all_events: 1,
-                        per_page: "10",
-                        page: "3"
+                        controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                        context_codes: ["course_#{@course.id}"], all_events: 1, per_page: "10", page: "3"
                       })
       expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="prev",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
       expect(json.pluck("id")).to eql(ids[20...25].map { |id| "assignment_#{id}" })
@@ -2560,26 +2187,16 @@ describe CalendarEventsApiController, type: :request do
     it "ignores invalid end_dates" do
       @course.assignments.create(title: "a", due_at: "2012-01-08 12:00:00")
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-08&end_date=2012-01-07&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        start_date: "2012-01-08",
-                        end_date: "2012-01-07"
+                        controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                        context_codes: ["course_#{@course.id}"], start_date: "2012-01-08", end_date: "2012-01-07"
                       })
       expect(json.size).to be 1
     end
 
     it "400s for bad dates" do
       raw_api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=201-201-208&end_date=201-201-209&context_codes[]=course_#{@course.id}", {
-                     controller: "calendar_events_api",
-                     action: "index",
-                     format: "json",
-                     type: "assignment",
-                     context_codes: ["course_#{@course.id}"],
-                     start_date: "201-201-208",
-                     end_date: "201-201-209"
+                     controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                     context_codes: ["course_#{@course.id}"], start_date: "201-201-208", end_date: "201-201-209"
                    })
       expect(response.code).to eql "400"
       json = JSON.parse response.body
@@ -2593,14 +2210,8 @@ describe CalendarEventsApiController, type: :request do
       create_assignments(course_ids, 1, due_at: "2012-01-08 12:00:00")
       contexts.concat(course_ids.map { |id| "course_#{id}" })
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: contexts,
-                        start_date: "2012-01-08",
-                        end_date: "2012-01-07",
-                        per_page: "25"
+                        controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                        context_codes: contexts, start_date: "2012-01-08", end_date: "2012-01-07", per_page: "25"
                       })
       expect(json.size).to be 9 # first context has no events
     end
@@ -2609,12 +2220,8 @@ describe CalendarEventsApiController, type: :request do
       @course.assignments.create(title: "undated")
       @course.assignments.create(title: "dated", due_at: "2012-01-08 12:00:00")
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&undated=1&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: ["course_#{@course.id}"],
-                        undated: "1"
+                        controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                        context_codes: ["course_#{@course.id}"], undated: "1"
                       })
       expect(json.size).to be 1
       expect(json.first["due_at"]).to be_nil
@@ -2632,13 +2239,8 @@ describe CalendarEventsApiController, type: :request do
 
       it "marks assignments with user_submitted" do
         json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-06&end_date=2012-01-09&context_codes[]=course_#{@course.id}", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
-                          type: "assignment",
-                          context_codes: ["course_#{@course.id}"],
-                          start_date: "2012-01-06",
-                          end_date: "2012-01-09"
+                          controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                          context_codes: ["course_#{@course.id}"], start_date: "2012-01-06", end_date: "2012-01-09"
                         })
 
         expect(json.size).to be 2
@@ -2659,13 +2261,8 @@ describe CalendarEventsApiController, type: :request do
             sub.save!
 
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-06&end_date=2012-01-09&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-06",
-                              end_date: "2012-01-09"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-06", end_date: "2012-01-09"
                             })
 
             expect(json.size).to be 2
@@ -2700,14 +2297,9 @@ describe CalendarEventsApiController, type: :request do
       context "for teachers" do
         it "returns all assignments" do
           json = api_call_as_user(@teacher,
-                                  :get,
-                                  "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course1.id}&context_codes[]=course_#{@course2.id}",
-                                  controller: "calendar_events_api",
-                                  action: "index",
-                                  format: "json",
-                                  type: "assignment",
-                                  all_events: "1",
-                                  context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"])
+                                  :get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course1.id}&context_codes[]=course_#{@course2.id}",
+                                  controller: "calendar_events_api", action: "index", format: "json",
+                                  type: "assignment", all_events: "1", context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"])
 
           expect(json.pluck("title")).to match_array [
             "published assignment 1",
@@ -2729,14 +2321,9 @@ describe CalendarEventsApiController, type: :request do
 
         it "returns published assignments and all assignments for teacher contexts" do
           json = api_call_as_user(@teacher_student,
-                                  :get,
-                                  "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course1.id}&context_codes[]=course_#{@course2.id}",
-                                  controller: "calendar_events_api",
-                                  action: "index",
-                                  format: "json",
-                                  type: "assignment",
-                                  all_events: "1",
-                                  context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"])
+                                  :get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course1.id}&context_codes[]=course_#{@course2.id}",
+                                  controller: "calendar_events_api", action: "index", format: "json",
+                                  type: "assignment", all_events: "1", context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"])
 
           expect(json.pluck("title")).to match_array [
             "published assignment 1",
@@ -2755,14 +2342,9 @@ describe CalendarEventsApiController, type: :request do
 
         it "returns only published assignments" do
           json = api_call_as_user(@teacher_student,
-                                  :get,
-                                  "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course1.id}&context_codes[]=course_#{@course2.id}",
-                                  controller: "calendar_events_api",
-                                  action: "index",
-                                  format: "json",
-                                  type: "assignment",
-                                  all_events: "1",
-                                  context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"])
+                                  :get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course1.id}&context_codes[]=course_#{@course2.id}",
+                                  controller: "calendar_events_api", action: "index", format: "json",
+                                  type: "assignment", all_events: "1", context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"])
 
           expect(json.pluck("title")).to match_array [
             "published assignment 1",
@@ -2799,24 +2381,14 @@ describe CalendarEventsApiController, type: :request do
       context "as a student" do
         it "only shows events for visible assignments" do
           json = api_call_as_user(@student_in_overriden_section, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2099-01-08&context_codes[]=course_#{@course.id}", {
-                                    controller: "calendar_events_api",
-                                    action: "index",
-                                    format: "json",
-                                    type: "assignment",
-                                    context_codes: ["course_#{@course.id}"],
-                                    start_date: "2011-01-08",
-                                    end_date: "2099-01-08"
+                                    controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                    context_codes: ["course_#{@course.id}"], start_date: "2011-01-08", end_date: "2099-01-08"
                                   })
           expect(json.size).to be 2
 
           json = api_call_as_user(@student_in_general_section, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2099-01-08&context_codes[]=course_#{@course.id}", {
-                                    controller: "calendar_events_api",
-                                    action: "index",
-                                    format: "json",
-                                    type: "assignment",
-                                    context_codes: ["course_#{@course.id}"],
-                                    start_date: "2011-01-08",
-                                    end_date: "2099-01-08"
+                                    controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                    context_codes: ["course_#{@course.id}"], start_date: "2011-01-08", end_date: "2099-01-08"
                                   })
           expect(json.size).to be 1
         end
@@ -2833,13 +2405,8 @@ describe CalendarEventsApiController, type: :request do
 
           it "only shows events for assignments visible to that student" do
             json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2099-01-08&context_codes[]=course_#{@course.id}", {
-                                      controller: "calendar_events_api",
-                                      action: "index",
-                                      format: "json",
-                                      type: "assignment",
-                                      context_codes: ["course_#{@course.id}"],
-                                      start_date: "2011-01-08",
-                                      end_date: "2099-01-08"
+                                      controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                      context_codes: ["course_#{@course.id}"], start_date: "2011-01-08", end_date: "2099-01-08"
                                     })
             expect(json.size).to be 2
           end
@@ -2854,13 +2421,8 @@ describe CalendarEventsApiController, type: :request do
 
           it "doesnt show duplicate events" do
             json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2099-01-08&context_codes[]=course_#{@course.id}", {
-                                      controller: "calendar_events_api",
-                                      action: "index",
-                                      format: "json",
-                                      type: "assignment",
-                                      context_codes: ["course_#{@course.id}"],
-                                      start_date: "2011-01-08",
-                                      end_date: "2099-01-08"
+                                      controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                      context_codes: ["course_#{@course.id}"], start_date: "2011-01-08", end_date: "2099-01-08"
                                     })
             expect(json.size).to be 2
           end
@@ -2871,13 +2433,8 @@ describe CalendarEventsApiController, type: :request do
 
           it "only shows events for assignments visible to that student" do
             json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2099-01-08&context_codes[]=course_#{@course.id}", {
-                                      controller: "calendar_events_api",
-                                      action: "index",
-                                      format: "json",
-                                      type: "assignment",
-                                      context_codes: ["course_#{@course.id}"],
-                                      start_date: "2011-01-08",
-                                      end_date: "2099-01-08"
+                                      controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                      context_codes: ["course_#{@course.id}"], start_date: "2011-01-08", end_date: "2099-01-08"
                                     })
             expect(json.size).to be 1
           end
@@ -2886,13 +2443,8 @@ describe CalendarEventsApiController, type: :request do
         context "in a section only" do
           it "shows events for all active assignment" do
             json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2099-01-08&context_codes[]=course_#{@course.id}", {
-                                      controller: "calendar_events_api",
-                                      action: "index",
-                                      format: "json",
-                                      type: "assignment",
-                                      context_codes: ["course_#{@course.id}"],
-                                      start_date: "2011-01-08",
-                                      end_date: "2099-01-08"
+                                      controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                      context_codes: ["course_#{@course.id}"], start_date: "2011-01-08", end_date: "2099-01-08"
                                     })
             expect(json.size).to be 2
           end
@@ -2902,13 +2454,8 @@ describe CalendarEventsApiController, type: :request do
       context "as a teacher" do
         it "shows events for all active assignment" do
           json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2099-01-08&context_codes[]=course_#{@course.id}", {
-                                    controller: "calendar_events_api",
-                                    action: "index",
-                                    format: "json",
-                                    type: "assignment",
-                                    context_codes: ["course_#{@course.id}"],
-                                    start_date: "2011-01-08",
-                                    end_date: "2099-01-08"
+                                    controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                    context_codes: ["course_#{@course.id}"], start_date: "2011-01-08", end_date: "2099-01-08"
                                   })
           expect(json.size).to be 2
         end
@@ -2923,10 +2470,7 @@ describe CalendarEventsApiController, type: :request do
 
       it "returns all assignments" do
         json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
-                          type: "assignment",
+                          controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
                           context_codes: ["course_#{@course.id}"],
                           all_events: "1"
                         })
@@ -2935,27 +2479,18 @@ describe CalendarEventsApiController, type: :request do
 
       it "returns all assignments, ignoring the undated flag" do
         json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&undated=1&context_codes[]=course_#{@course.id}", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
-                          type: "assignment",
+                          controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
                           context_codes: ["course_#{@course.id}"],
-                          all_events: "1",
-                          undated: "1"
+                          all_events: "1", undated: "1"
                         })
         expect(json.size).to be 2
       end
 
       it "returns all assignments, ignoring the start_date and end_date" do
         json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&start_date=2012-02-01&end_date=2012-02-01&context_codes[]=course_#{@course.id}", {
-                          controller: "calendar_events_api",
-                          action: "index",
-                          format: "json",
-                          type: "assignment",
+                          controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
                           context_codes: ["course_#{@course.id}"],
-                          all_events: "1",
-                          start_date: "2012-02-01",
-                          end_date: "2012-02-01"
+                          all_events: "1", start_date: "2012-02-01", end_date: "2012-02-01"
                         })
         expect(json.size).to be 2
       end
@@ -2981,8 +2516,7 @@ describe CalendarEventsApiController, type: :request do
     it "updates assignment due dates" do
       assignment = @course.assignments.create(title: "undated")
 
-      json = api_call(:put,
-                      "/api/v1/calendar_events/assignment_#{assignment.id}",
+      json = api_call(:put, "/api/v1/calendar_events/assignment_#{assignment.id}",
                       { controller: "calendar_events_api", action: "update", id: "assignment_#{assignment.id}", format: "json" },
                       { calendar_event: { start_at: "2012-01-09 12:00:00" } })
       expect(json.keys).to match_array expected_fields
@@ -3021,21 +2555,14 @@ describe CalendarEventsApiController, type: :request do
             expect(@default_assignment.all_day).to be_falsey
             expect(@default_assignment.all_day_date).to eq DateTime.parse("2012-01-12 04:42:00").to_date
 
-            assignment_override_model(assignment: @default_assignment,
-                                      set: @course.default_section,
+            assignment_override_model(assignment: @default_assignment, set: @course.default_section,
                                       due_at: DateTime.parse("2012-01-21 23:59:00"))
             expect(@override.all_day).to be_truthy
             expect(@override.all_day_date).to eq DateTime.parse("2012-01-21 23:59:00").to_date
 
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-01&end_date=2012-01-31&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-01",
-                              end_date: "2012-01-31",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-01", end_date: "2012-01-31", per_page: "25"
                             })
             expect(json.size).to eq 1
             expect(json.first["id"]).to eq "assignment_#{@default_assignment.id}"
@@ -3050,21 +2577,14 @@ describe CalendarEventsApiController, type: :request do
             expect(@default_assignment.all_day).to be_truthy
             expect(@default_assignment.all_day_date).to eq DateTime.parse("2012-01-12 23:59:00").to_date
 
-            assignment_override_model(assignment: @default_assignment,
-                                      set: @course.default_section,
+            assignment_override_model(assignment: @default_assignment, set: @course.default_section,
                                       due_at: DateTime.parse("2012-01-21 04:42:00"))
             expect(@override.all_day).to be_falsey
             expect(@override.all_day_date).to eq DateTime.parse("2012-01-21 04:42:00").to_date
 
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-01&end_date=2012-01-31&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-01",
-                              end_date: "2012-01-31",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-01", end_date: "2012-01-31", per_page: "25"
                             })
             expect(json.size).to eq 1
             expect(json.first["id"]).to eq "assignment_#{@default_assignment.id}"
@@ -3075,14 +2595,8 @@ describe CalendarEventsApiController, type: :request do
 
           it "returns a non-overridden assignment" do
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 1 # 1 assignment
             expect(json.first["end_at"]).to eq "2012-01-12T12:00:00Z"
@@ -3093,18 +2607,11 @@ describe CalendarEventsApiController, type: :request do
           it "returns an override when present" do
             @default_assignment.due_at = DateTime.parse("2012-01-08 12:00:00")
             @default_assignment.save!
-            assignment_override_model(assignment: @default_assignment,
-                                      set: @course.default_section,
+            assignment_override_model(assignment: @default_assignment, set: @course.default_section,
                                       due_at: DateTime.parse("2012-01-14 12:00:00"))
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 1 # 1 assignment
             expect(json.first["id"]).to eq "assignment_#{@default_assignment.id}"
@@ -3115,36 +2622,22 @@ describe CalendarEventsApiController, type: :request do
           it "returns assignment when override is in range but assignment is not" do
             @default_assignment.due_at = DateTime.parse("2012-01-01 12:00:00") # out of range
             @default_assignment.save!
-            assignment_override_model(assignment: @default_assignment,
-                                      set: @course.default_section,
+            assignment_override_model(assignment: @default_assignment, set: @course.default_section,
                                       due_at: DateTime.parse("2012-01-08 12:00:00")) # in range
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 1 # 1 assignment
             expect(json.first["end_at"]).to eq "2012-01-08T12:00:00Z"
           end
 
           it "does not return an assignment when assignment due_at in range but override is out" do
-            assignment_override_model(assignment: @default_assignment,
-                                      set: @course.default_section,
+            assignment_override_model(assignment: @default_assignment, set: @course.default_section,
                                       due_at: DateTime.parse("2012-01-17 12:00:00")) # out of range
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 0 # nothing returned
           end
@@ -3154,14 +2647,8 @@ describe CalendarEventsApiController, type: :request do
                                                  due_at: DateTime.parse("2012-01-12 12:00:00"))
             override.assignment_override_students.create!(user: @user)
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 1
             expect(json.first["end_at"]).to eq "2012-01-12T12:00:00Z"
@@ -3177,14 +2664,8 @@ describe CalendarEventsApiController, type: :request do
 
           it "returns a non-overridden assignment" do
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 1 # 1 assignment
             expect(json.first["end_at"]).to eq "2012-01-12T12:00:00Z"
@@ -3199,14 +2680,8 @@ describe CalendarEventsApiController, type: :request do
             override.set = @section2
             override.save!
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 1 # 1 assignment
             expect(json.first["id"]).to eq "assignment_#{@default_assignment.id}"
@@ -3215,21 +2690,13 @@ describe CalendarEventsApiController, type: :request do
 
           it "returns 1 assignment for latest date" do
             # Setup assignment
-            assignment_override_model(assignment: @default_assignment,
-                                      set: @section1,
+            assignment_override_model(assignment: @default_assignment, set: @section1,
                                       due_at: DateTime.parse("2012-01-12 12:00:00")) # later than assignment
-            assignment_override_model(assignment: @default_assignment,
-                                      set: @section2,
+            assignment_override_model(assignment: @default_assignment, set: @section2,
                                       due_at: DateTime.parse("2012-01-14 12:00:00")) # latest
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 1
             expect(json.first["end_at"]).to eq "2012-01-14T12:00:00Z"
@@ -3277,14 +2744,8 @@ describe CalendarEventsApiController, type: :request do
       context "as teacher" do
         it "returns 1 assignment when no overrides" do
           json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                            controller: "calendar_events_api",
-                            action: "index",
-                            format: "json",
-                            type: "assignment",
-                            context_codes: ["course_#{@course.id}"],
-                            start_date: "2012-01-07",
-                            end_date: "2012-01-16",
-                            per_page: "25"
+                            controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                            context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                           })
           expect(json.size).to eq 1 # 1 assignment
           expect(json.first["id"]).to eq "assignment_#{@default_assignment.id}"
@@ -3294,8 +2755,7 @@ describe CalendarEventsApiController, type: :request do
 
         it "gets explicit assignment with override info" do
           skip "not sure what the desired behavior here is"
-          override = assignment_override_model(assignment: @default_assignment,
-                                               set: @course.default_section,
+          override = assignment_override_model(assignment: @default_assignment, set: @course.default_section,
                                                due_at: DateTime.parse("2012-01-14 12:00:00"))
           json = api_call(:get, "/api/v1/calendar_events/assignment_#{@default_assignment.id}", {
                             controller: "calendar_events_api", action: "show", id: "assignment_#{@default_assignment.id}", format: "json"
@@ -3318,21 +2778,13 @@ describe CalendarEventsApiController, type: :request do
 
           it "returns 1 entry for each instance" do
             # Setup assignment
-            override1 = assignment_override_model(assignment: @default_assignment,
-                                                  set: @section1,
+            override1 = assignment_override_model(assignment: @default_assignment, set: @section1,
                                                   due_at: DateTime.parse("2012-01-14 12:00:00"))
-            override2 = assignment_override_model(assignment: @default_assignment,
-                                                  set: @section2,
+            override2 = assignment_override_model(assignment: @default_assignment, set: @section2,
                                                   due_at: DateTime.parse("2012-01-18 12:00:00"))
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-19&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-19",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-19", per_page: "25"
                             })
             expect(json.size).to eq 3
             # sort results locally by end_at
@@ -3350,21 +2802,13 @@ describe CalendarEventsApiController, type: :request do
             @default_assignment.due_at = DateTime.parse("2012-01-01 12:00:00") # outside range
             @default_assignment.save!
             # Setup overrides
-            override1 = assignment_override_model(assignment: @default_assignment,
-                                                  set: @section1,
+            override1 = assignment_override_model(assignment: @default_assignment, set: @section1,
                                                   due_at: DateTime.parse("2012-01-12 12:00:00")) # in range
-            assignment_override_model(assignment: @default_assignment,
-                                      set: @section2,
+            assignment_override_model(assignment: @default_assignment, set: @section2,
                                       due_at: DateTime.parse("2012-01-18 12:00:00")) # outside range
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 1
             expect(json.first["assignment_overrides"][0]["id"]).to eq override1.id
@@ -3385,14 +2829,8 @@ describe CalendarEventsApiController, type: :request do
 
           it "returns a non-overridden assignment" do
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 1 # 1 assignment
             expect(json.first["end_at"]).to eq "2012-01-12T12:00:00Z"
@@ -3403,18 +2841,11 @@ describe CalendarEventsApiController, type: :request do
           it "returns override when present" do
             @default_assignment.due_at = Time.zone.parse("2012-01-08 12:00:00")
             @default_assignment.save!
-            assignment_override_model(assignment: @default_assignment,
-                                      set: @course.default_section,
+            assignment_override_model(assignment: @default_assignment, set: @course.default_section,
                                       due_at: Time.zone.parse("2012-01-14 12:00:00"))
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 1 # should only return the overridden assignment if all sections have an override
             expect(json[0].keys).to include("assignment_overrides")
@@ -3435,21 +2866,13 @@ describe CalendarEventsApiController, type: :request do
           it "receives all assignments including other sections" do
             @default_assignment.due_at = DateTime.parse("2012-01-08 12:00:00")
             @default_assignment.save!
-            override1 = assignment_override_model(assignment: @default_assignment,
-                                                  set: @section1,
+            override1 = assignment_override_model(assignment: @default_assignment, set: @section1,
                                                   due_at: DateTime.parse("2012-01-12 12:00:00"))
-            override2 = assignment_override_model(assignment: @default_assignment,
-                                                  set: @section2,
+            override2 = assignment_override_model(assignment: @default_assignment, set: @section2,
                                                   due_at: DateTime.parse("2012-01-14 12:00:00"))
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 3 # all versions
             json.sort_by! { |a| a["end_at"] }
@@ -3483,14 +2906,8 @@ describe CalendarEventsApiController, type: :request do
                                       due_at: Time.zone.parse("2012-01-14 12:00:00"))
 
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 1
             expect(json.first["end_at"]).to eq "2012-01-12T12:00:00Z"
@@ -3501,14 +2918,8 @@ describe CalendarEventsApiController, type: :request do
           it "returns assignments with no override" do
             @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active")
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 1 # 1 assignment
             expect(json.first["id"]).to eq "assignment_#{@default_assignment.id}"
@@ -3523,18 +2934,11 @@ describe CalendarEventsApiController, type: :request do
             end
 
             it "returns student specific overrides" do
-              assignment_override_model(assignment: @default_assignment,
-                                        set: @course.default_section,
+              assignment_override_model(assignment: @default_assignment, set: @course.default_section,
                                         due_at: DateTime.parse("2012-01-13 12:00:00"))
               json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                                controller: "calendar_events_api",
-                                action: "index",
-                                format: "json",
-                                type: "assignment",
-                                context_codes: ["course_#{@course.id}"],
-                                start_date: "2012-01-07",
-                                end_date: "2012-01-16",
-                                per_page: "25"
+                                controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                               })
               expect(json.size).to eq 1 # only 1
               expect(json.first["end_at"]).to eq "2012-01-13T12:00:00Z"
@@ -3542,14 +2946,8 @@ describe CalendarEventsApiController, type: :request do
 
             it "returns standard assignment" do
               json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                                controller: "calendar_events_api",
-                                action: "index",
-                                format: "json",
-                                type: "assignment",
-                                context_codes: ["course_#{@course.id}"],
-                                start_date: "2012-01-07",
-                                end_date: "2012-01-16",
-                                per_page: "25"
+                                controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                               })
               expect(json.size).to eq 1 # only 1
               expect(json.first["end_at"]).to eq "2012-01-12T12:00:00Z"
@@ -3568,40 +2966,25 @@ describe CalendarEventsApiController, type: :request do
 
           context "observing single student" do
             it "returns linked student specific override" do
-              assignment_override_model(assignment: @default_assignment,
-                                        set: @section1,
+              assignment_override_model(assignment: @default_assignment, set: @section1,
                                         due_at: DateTime.parse("2012-01-13 12:00:00"))
               json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                                controller: "calendar_events_api",
-                                action: "index",
-                                format: "json",
-                                type: "assignment",
-                                context_codes: ["course_#{@course.id}"],
-                                start_date: "2012-01-07",
-                                end_date: "2012-01-16",
-                                per_page: "25"
+                                controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                               })
               expect(json.size).to eq 1
               expect(json.first["end_at"]).to eq "2012-01-13T12:00:00Z"
             end
 
             it "returns only override for student section" do
-              assignment_override_model(assignment: @default_assignment,
-                                        set: @section1,
+              assignment_override_model(assignment: @default_assignment, set: @section1,
                                         due_at: DateTime.parse("2012-01-13 12:00:00"))
-              assignment_override_model(assignment: @default_assignment,
-                                        set: @section2,
+              assignment_override_model(assignment: @default_assignment, set: @section2,
                                         due_at: DateTime.parse("2012-01-14 12:00:00"))
 
               json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                                controller: "calendar_events_api",
-                                action: "index",
-                                format: "json",
-                                type: "assignment",
-                                context_codes: ["course_#{@course.id}"],
-                                start_date: "2012-01-07",
-                                end_date: "2012-01-16",
-                                per_page: "25"
+                                controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                               })
               expect(json.size).to eq 1
               expect(json.first["end_at"]).to eq "2012-01-13T12:00:00Z"
@@ -3627,18 +3010,11 @@ describe CalendarEventsApiController, type: :request do
 
               it "returns a single assignment event" do
                 @user = @observer
-                assignment_override_model(assignment: @default_assignment,
-                                          set: @section1,
+                assignment_override_model(assignment: @default_assignment, set: @section1,
                                           due_at: DateTime.parse("2012-01-14 12:00:00"))
                 json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-01&end_date=2012-01-30&per_page=25&context_codes[]=course_#{@course.id}", {
-                                  controller: "calendar_events_api",
-                                  action: "index",
-                                  format: "json",
-                                  type: "assignment",
-                                  context_codes: ["course_#{@course.id}"],
-                                  start_date: "2012-01-01",
-                                  end_date: "2012-01-30",
-                                  per_page: "25"
+                                  controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                  context_codes: ["course_#{@course.id}"], start_date: "2012-01-01", end_date: "2012-01-30", per_page: "25"
                                 })
                 expect(json.size).to eq 1
                 expect(json.first["end_at"]).to eq "2012-01-14T12:00:00Z"
@@ -3658,21 +3034,13 @@ describe CalendarEventsApiController, type: :request do
 
               it "returns two assignments one for each section" do
                 @user = @observer
-                assignment_override_model(assignment: @default_assignment,
-                                          set: @section1,
+                assignment_override_model(assignment: @default_assignment, set: @section1,
                                           due_at: DateTime.parse("2012-01-14 12:00:00"))
-                assignment_override_model(assignment: @default_assignment,
-                                          set: @section2,
+                assignment_override_model(assignment: @default_assignment, set: @section2,
                                           due_at: DateTime.parse("2012-01-15 12:00:00"))
                 json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                                  controller: "calendar_events_api",
-                                  action: "index",
-                                  format: "json",
-                                  type: "assignment",
-                                  context_codes: ["course_#{@course.id}"],
-                                  start_date: "2012-01-07",
-                                  end_date: "2012-01-16",
-                                  per_page: "25"
+                                  controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                  context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                                 })
                 expect(json.size).to eq 2
                 json.sort_by! { |a| a["end_at"] }
@@ -3705,14 +3073,8 @@ describe CalendarEventsApiController, type: :request do
                 assignment_override_model(assignment: @assignment2, set: @course2.default_section, due_at: DateTime.parse("2012-01-15 12:00:00"))
 
                 json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course1.id}&context_codes[]=course_#{@course2.id}", {
-                                  controller: "calendar_events_api",
-                                  action: "index",
-                                  format: "json",
-                                  type: "assignment",
-                                  context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
-                                  start_date: "2012-01-07",
-                                  end_date: "2012-01-16",
-                                  per_page: "25"
+                                  controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                  context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                                 })
 
                 expect(json.size).to eq 2
@@ -3738,13 +3100,8 @@ describe CalendarEventsApiController, type: :request do
         context "when viewing own calendar" do
           it "returns 0 course assignments" do
             json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 0 # 0 assignments returned
           end
@@ -3756,14 +3113,8 @@ describe CalendarEventsApiController, type: :request do
                                                  due_at: DateTime.parse("2012-01-15 12:00:00"),
                                                  set: @section2)
             json = api_call(:get, "/api/v1/calendar_events?&type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
-                              controller: "calendar_events_api",
-                              action: "index",
-                              format: "json",
-                              type: "assignment",
-                              context_codes: ["course_#{@course.id}"],
-                              start_date: "2012-01-07",
-                              end_date: "2012-01-16",
-                              per_page: "25"
+                              controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                              context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-16", per_page: "25"
                             })
             expect(json.size).to eq 2
             # Should include the default and override in return
@@ -3794,15 +3145,9 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "paginates assignments from multiple shards correctly" do
-        json = api_call(:get,
-                        "/api/v1/calendar_events?type=assignment&context_codes[]=course_#{@c0.id}&context_codes[]=course_#{@c1.id}&all_events=1&per_page=1",
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: [@c0.asset_string, @c1.global_asset_string],
-                        all_events: 1,
-                        per_page: 1)
+        json = api_call(:get, "/api/v1/calendar_events?type=assignment&context_codes[]=course_#{@c0.id}&context_codes[]=course_#{@c1.id}&all_events=1&per_page=1",
+                        controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                        context_codes: [@c0.asset_string, @c1.global_asset_string], all_events: 1, per_page: 1)
         expect(json.size).to eq 1
         expect(json[0]["id"]).to eq @a0.asset_string
 
@@ -3810,16 +3155,9 @@ describe CalendarEventsApiController, type: :request do
         next_link = links.detect { |link| link[:rel] == "next" }
         expect(next_link).not_to be_nil
 
-        json = api_call(:get,
-                        next_link[:uri].to_s,
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        type: "assignment",
-                        context_codes: [@c0.asset_string, @c1.global_asset_string],
-                        all_events: 1,
-                        per_page: 1,
-                        page: next_link["page"])
+        json = api_call(:get, next_link[:uri].to_s, controller: "calendar_events_api", action: "index",
+                                                    format: "json", type: "assignment", context_codes: [@c0.asset_string, @c1.global_asset_string],
+                                                    all_events: 1, per_page: 1, page: next_link["page"])
         expect(json.size).to eq 1
         expect(json[0]["id"]).to eq @a1.asset_string
 
@@ -3828,15 +3166,9 @@ describe CalendarEventsApiController, type: :request do
       end
 
       it "paginates events from multiple shards correctly" do
-        json = api_call(:get,
-                        "/api/v1/calendar_events?context_codes[]=course_#{@c0.id}&context_codes[]=course_#{@c1.id}&all_events=1&per_page=1&include[]=web_conference",
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        include: ["web_conference"],
-                        context_codes: [@c0.asset_string, @c1.global_asset_string],
-                        all_events: 1,
-                        per_page: 1)
+        json = api_call(:get, "/api/v1/calendar_events?context_codes[]=course_#{@c0.id}&context_codes[]=course_#{@c1.id}&all_events=1&per_page=1&include[]=web_conference",
+                        controller: "calendar_events_api", action: "index", format: "json", include: ["web_conference"],
+                        context_codes: [@c0.asset_string, @c1.global_asset_string], all_events: 1, per_page: 1)
         expect(json.size).to eq 1
         expect(json[0]["id"]).to eq @e0.id
 
@@ -3844,16 +3176,9 @@ describe CalendarEventsApiController, type: :request do
         next_link = links.detect { |link| link[:rel] == "next" }
         expect(next_link).not_to be_nil
 
-        json = api_call(:get,
-                        next_link[:uri].to_s,
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: [@c0.asset_string, @c1.global_asset_string],
-                        include: ["web_conference"],
-                        all_events: 1,
-                        per_page: 1,
-                        page: next_link["page"])
+        json = api_call(:get, next_link[:uri].to_s, controller: "calendar_events_api", action: "index",
+                                                    format: "json", context_codes: [@c0.asset_string, @c1.global_asset_string],
+                                                    include: ["web_conference"], all_events: 1, per_page: 1, page: next_link["page"])
         expect(json.size).to eq 1
         expect(json[0]["id"]).to eq @e1.id
 
@@ -3864,14 +3189,9 @@ describe CalendarEventsApiController, type: :request do
       it "returns important dates over multiple shards" do
         @e0.update important_dates: true
         @e1.update important_dates: true
-        json = api_call(:get,
-                        "/api/v1/calendar_events?context_codes[]=course_#{@c0.id}&context_codes[]=course_#{@c1.id}&all_events=1&important_dates=1",
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: [@c0.asset_string, @c1.global_asset_string],
-                        all_events: 1,
-                        important_dates: 1)
+        json = api_call(:get, "/api/v1/calendar_events?context_codes[]=course_#{@c0.id}&context_codes[]=course_#{@c1.id}&all_events=1&important_dates=1",
+                        controller: "calendar_events_api", action: "index", format: "json",
+                        context_codes: [@c0.asset_string, @c1.global_asset_string], all_events: 1, important_dates: 1)
         expect(json.size).to eq 2
         expect(json.pluck("id")).to match_array([@e0.id, @e1.id])
       end
@@ -3896,12 +3216,8 @@ describe CalendarEventsApiController, type: :request do
 
       it "returns all assignments with important dates if the user is a teacher" do
         json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
-                                  controller: "calendar_events_api",
-                                  action: "index",
-                                  format: "json",
-                                  type: "assignment",
-                                  context_codes: ["course_#{@course.id}"],
-                                  important_dates: true
+                                  controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                  context_codes: ["course_#{@course.id}"], important_dates: true
                                 })
         expect(json.size).to be 4
         expect(json[0]["important_dates"]).to be true
@@ -3909,12 +3225,8 @@ describe CalendarEventsApiController, type: :request do
 
       it "returns assignments with dates for the user with important dates if the param is sent" do
         json = api_call_as_user(@other_student, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
-                                  controller: "calendar_events_api",
-                                  action: "index",
-                                  format: "json",
-                                  type: "assignment",
-                                  context_codes: ["course_#{@course.id}"],
-                                  important_dates: true
+                                  controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                  context_codes: ["course_#{@course.id}"], important_dates: true
                                 })
         expect(json.size).to be 3
         expect(json[0]["important_dates"]).to be true
@@ -3922,12 +3234,8 @@ describe CalendarEventsApiController, type: :request do
 
       it "returns assignments with important dates if the param is sent" do
         json = api_call_as_user(@student, :get, "/api/v1/calendar_events?important_dates=true&type=assignment&context_codes[]=course_#{@course.id}", {
-                                  controller: "calendar_events_api",
-                                  action: "index",
-                                  format: "json",
-                                  type: "assignment",
-                                  context_codes: ["course_#{@course.id}"],
-                                  important_dates: true
+                                  controller: "calendar_events_api", action: "index", format: "json", type: "assignment",
+                                  context_codes: ["course_#{@course.id}"], important_dates: true
                                 })
         expect(json.size).to be 2
         expect(json[0]["important_dates"]).to be true
@@ -3957,14 +3265,9 @@ describe CalendarEventsApiController, type: :request do
         @course.calendar_events.create(title: "event #{idx}", workflow_state: "active")
       end
       json = api_call(:get,
-                      "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=#{@ctx_str}",
-                      {
-                        controller: "calendar_events_api",
-                        action: "user_index",
-                        format: "json",
-                        context_codes: @contexts,
-                        all_events: true,
-                        user_id: @student.id
+                      "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=#{@ctx_str}", {
+                        controller: "calendar_events_api", action: "user_index", format: "json",
+                        context_codes: @contexts, all_events: true, user_id: @student.id
                       })
       expect(json.length).to be 3
     end
@@ -3976,14 +3279,8 @@ describe CalendarEventsApiController, type: :request do
         :get,
         "/api/v1/users/#{@student.id}/calendar_events?all_events=true&type=assignment&include[]=submission&context_codes[]=#{@ctx_str}",
         {
-          controller: "calendar_events_api",
-          action: "user_index",
-          format: "json",
-          type: "assignment",
-          include: ["submission"],
-          context_codes: @contexts,
-          all_events: true,
-          user_id: @student.id
+          controller: "calendar_events_api", action: "user_index", format: "json", type: "assignment", include: ["submission"],
+          context_codes: @contexts, all_events: true, user_id: @student.id
         }
       )
       expect(json.first["assignment"]["submission"]).not_to be_nil
@@ -4001,14 +3298,8 @@ describe CalendarEventsApiController, type: :request do
         :get,
         "/api/v1/users/#{@student.id}/calendar_events",
         {
-          controller: "calendar_events_api",
-          action: "user_index",
-          format: "json",
-          type: "assignment",
-          context_codes: @contexts,
-          all_events: true,
-          user_id: @student.id,
-          submission_types: ["wiki_page"]
+          controller: "calendar_events_api", action: "user_index", format: "json", type: "assignment",
+          context_codes: @contexts, all_events: true, user_id: @student.id, submission_types: ["wiki_page"]
         }
       )
       expect(json.map { |a| a.dig("assignment", "id") }).to match_array [wiki_assignment.id]
@@ -4026,14 +3317,8 @@ describe CalendarEventsApiController, type: :request do
         :get,
         "/api/v1/users/#{@student.id}/calendar_events",
         {
-          controller: "calendar_events_api",
-          action: "user_index",
-          format: "json",
-          type: "assignment",
-          context_codes: @contexts,
-          all_events: true,
-          user_id: @student.id,
-          exclude_submission_types: ["wiki_page"]
+          controller: "calendar_events_api", action: "user_index", format: "json", type: "assignment",
+          context_codes: @contexts, all_events: true, user_id: @student.id, exclude_submission_types: ["wiki_page"]
         }
       )
       expect(json.map { |a| a.dig("assignment", "id") }).to match_array [text_assignment.id, ungraded_assignment.id]
@@ -4046,37 +3331,25 @@ describe CalendarEventsApiController, type: :request do
         3.times do |idx|
           conference = WebConference.create!(context: @course, user: @user, conference_type: "BigBlueButton")
           conference.add_initiator(@user)
-          @course.calendar_events.create!(title: "event #{idx}",
-                                          workflow_state: "active",
+          @course.calendar_events.create!(title: "event #{idx}", workflow_state: "active",
                                           web_conference: conference)
         end
       end
 
       it "does not return web conferences by default" do
         json = api_call(:get,
-                        "/api/v1/users/#{@user.id}/calendar_events?all_events=true&context_codes[]=#{@ctx_str}",
-                        {
-                          controller: "calendar_events_api",
-                          action: "user_index",
-                          format: "json",
-                          context_codes: @contexts,
-                          all_events: true,
-                          user_id: @user.id
+                        "/api/v1/users/#{@user.id}/calendar_events?all_events=true&context_codes[]=#{@ctx_str}", {
+                          controller: "calendar_events_api", action: "user_index", format: "json",
+                          context_codes: @contexts, all_events: true, user_id: @user.id
                         })
         expect(json.any? { |e| e.key?("web_conference") }).to be false
       end
 
       it "includes web conferences when include specified" do
         json = api_call(:get,
-                        "/api/v1/users/#{@user.id}/calendar_events?all_events=true&context_codes[]=#{@ctx_str}&include[]=web_conference",
-                        {
-                          controller: "calendar_events_api",
-                          action: "user_index",
-                          format: "json",
-                          context_codes: @contexts,
-                          all_events: true,
-                          user_id: @user.id,
-                          include: ["web_conference"]
+                        "/api/v1/users/#{@user.id}/calendar_events?all_events=true&context_codes[]=#{@ctx_str}&include[]=web_conference", {
+                          controller: "calendar_events_api", action: "user_index", format: "json",
+                          context_codes: @contexts, all_events: true, user_id: @user.id, include: ["web_conference"]
                         })
         expect(json.pluck("web_conference").compact.length).to be 3
       end
@@ -4089,10 +3362,8 @@ describe CalendarEventsApiController, type: :request do
       @student = user_factory(active_all: true, active_state: "active")
       @observed_course.enroll_student(@student, enrollment_state: "active")
       @observer = user_factory(active_all: true, active_state: "active")
-      @observed_course.enroll_user(@observer,
-                                   "ObserverEnrollment",
-                                   enrollment_state: "active",
-                                   associated_user_id: @student.id)
+      @observed_course.enroll_user(@observer, "ObserverEnrollment",
+                                   enrollment_state: "active", associated_user_id: @student.id)
 
       @observed_event = @observed_course.calendar_events.create!(title: "observed", workflow_state: "active")
 
@@ -4104,14 +3375,9 @@ describe CalendarEventsApiController, type: :request do
 
     it "returns observee's calendar events in the observed course" do
       json = api_call(:get,
-                      "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=course_#{@observed_course.id}",
-                      {
-                        controller: "calendar_events_api",
-                        action: "user_index",
-                        format: "json",
-                        all_events: true,
-                        user_id: @student.id,
-                        context_codes: ["course_#{@observed_course.id}"]
+                      "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=course_#{@observed_course.id}", {
+                        controller: "calendar_events_api", action: "user_index", format: "json",
+                        all_events: true, user_id: @student.id, context_codes: ["course_#{@observed_course.id}"]
                       })
       expect(json.length).to be 1
       expect(json.first["id"]).to eq @observed_event.id
@@ -4119,18 +3385,11 @@ describe CalendarEventsApiController, type: :request do
 
     it "fails trying to get calendar events in a course the observer isn't in observing them in" do
       api_call(:get,
-               "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=course_#{@observed_course.id}&context_codes[]=course_#{@unobserved_course.id}",
-               {
-                 controller: "calendar_events_api",
-                 action: "user_index",
-                 format: "json",
-                 all_events: true,
-                 user_id: @student.id,
-                 context_codes: ["course_#{@observed_course.id}", "course_#{@unobserved_course.id}"]
+               "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=course_#{@observed_course.id}&context_codes[]=course_#{@unobserved_course.id}", {
+                 controller: "calendar_events_api", action: "user_index", format: "json",
+                 all_events: true, user_id: @student.id, context_codes: ["course_#{@observed_course.id}", "course_#{@unobserved_course.id}"]
                },
-               {},
-               {},
-               { expected_status: 401 })
+               {}, {}, { expected_status: 401 })
     end
 
     it "returns observee's calendar events in a group in the observed course" do
@@ -4138,14 +3397,9 @@ describe CalendarEventsApiController, type: :request do
       group.add_user(@student)
       event = group.calendar_events.create!(title: "group", workflow_state: "active")
       json = api_call(:get,
-                      "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=group_#{group.id}",
-                      {
-                        controller: "calendar_events_api",
-                        action: "user_index",
-                        format: "json",
-                        all_events: true,
-                        user_id: @student.id,
-                        context_codes: ["group_#{group.id}"]
+                      "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=group_#{group.id}", {
+                        controller: "calendar_events_api", action: "user_index", format: "json",
+                        all_events: true, user_id: @student.id, context_codes: ["group_#{group.id}"]
                       })
       expect(json.length).to be 1
       expect(json.first["id"]).to eq event.id
@@ -4155,18 +3409,11 @@ describe CalendarEventsApiController, type: :request do
       group = @unobserved_course.groups.create!
       group.add_user(@student)
       api_call(:get,
-               "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=group_#{group.id}",
-               {
-                 controller: "calendar_events_api",
-                 action: "user_index",
-                 format: "json",
-                 all_events: true,
-                 user_id: @student.id,
-                 context_codes: ["group_#{group.id}"]
+               "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=group_#{group.id}", {
+                 controller: "calendar_events_api", action: "user_index", format: "json",
+                 all_events: true, user_id: @student.id, context_codes: ["group_#{group.id}"]
                },
-               {},
-               {},
-               { expected_status: 401 })
+               {}, {}, { expected_status: 401 })
     end
   end
 
@@ -4185,8 +3432,7 @@ describe CalendarEventsApiController, type: :request do
       )
 
       @appointment_group = AppointmentGroup.create!(
-        title: "appointment group",
-        participants_per_appointment: 4,
+        title: "appointment group", participants_per_appointment: 4,
         new_appointments: [
           [time + 3.days, time + 3.days + 1.hour],
           [time + 3.days + 1.hour, time + 3.days + 2.hours],
@@ -4209,10 +3455,8 @@ describe CalendarEventsApiController, type: :request do
       expect(response).to be_successful
 
       expect(response.body.scan(/UID:\s*event-([^\n]*)/).flatten.map(&:strip)).to match_array [
-        "assignment-override-#{@override.id}",
-        "calendar-event-#{@event.id}",
-        "calendar-event-#{@appointment_event.id}",
-        "calendar-event-#{@appointment_event2.id}"
+        "assignment-override-#{@override.id}", "calendar-event-#{@event.id}",
+        "calendar-event-#{@appointment_event.id}", "calendar-event-#{@appointment_event2.id}"
       ]
     end
 
@@ -4438,38 +3682,24 @@ describe CalendarEventsApiController, type: :request do
 
     it "checks for valid options" do
       timetables = { "all" => [{ weekdays: "moonday", start_time: "not a real time", end_time: "this either" }] }
-      json = api_call(:post,
-                      @path,
-                      {
-                        course_id: @course.id.to_param,
-                        controller: "calendar_events_api",
-                        action: "set_course_timetable",
-                        format: "json"
-                      },
-                      { timetables: timetables },
-                      {},
-                      { expected_status: 400 })
+      json = api_call(:post, @path, {
+                        course_id: @course.id.to_param, controller: "calendar_events_api",
+                        action: "set_course_timetable", format: "json"
+                      }, { timetables: timetables }, {}, { expected_status: 400 })
 
       expect(json["errors"]).to match_array(["invalid start time(s)", "invalid end time(s)", "weekdays are not valid"])
     end
 
     it "creates course-level events" do
       location_name = "best place evr"
-      timetables = { "all" => [{ weekdays: "monday, thursday",
-                                 start_time: "2:00 pm",
-                                 end_time: "3:30 pm",
-                                 location_name: location_name }] }
+      timetables = { "all" => [{ weekdays: "monday, thursday", start_time: "2:00 pm",
+                                 end_time: "3:30 pm", location_name: location_name }] }
 
       expect do
-        api_call(:post,
-                 @path,
-                 {
-                   course_id: @course.id.to_param,
-                   controller: "calendar_events_api",
-                   action: "set_course_timetable",
-                   format: "json"
-                 },
-                 { timetables: timetables })
+        api_call(:post, @path, {
+                   course_id: @course.id.to_param, controller: "calendar_events_api",
+                   action: "set_course_timetable", format: "json"
+                 }, { timetables: timetables })
       end.to change(Delayed::Job, :count).by(1)
 
       run_jobs
@@ -4497,15 +3727,10 @@ describe CalendarEventsApiController, type: :request do
       }
 
       expect do
-        api_call(:post,
-                 @path,
-                 {
-                   course_id: @course.id.to_param,
-                   controller: "calendar_events_api",
-                   action: "set_course_timetable",
-                   format: "json"
-                 },
-                 { timetables: timetables })
+        api_call(:post, @path, {
+                   course_id: @course.id.to_param, controller: "calendar_events_api",
+                   action: "set_course_timetable", format: "json"
+                 }, { timetables: timetables })
       end.to change(Delayed::Job, :count).by(2)
 
       run_jobs
@@ -4529,28 +3754,18 @@ describe CalendarEventsApiController, type: :request do
       timetables = { "all" => [{ weekdays: "monday, thursday", start_time: "2:00 pm", end_time: "3:30 pm" }] }
 
       # set the timetables
-      api_call(:post,
-               @path,
-               {
-                 course_id: @course.id.to_param,
-                 controller: "calendar_events_api",
-                 action: "set_course_timetable",
-                 format: "json"
-               },
-               { timetables: timetables })
+      api_call(:post, @path, {
+                 course_id: @course.id.to_param, controller: "calendar_events_api",
+                 action: "set_course_timetable", format: "json"
+               }, { timetables: timetables })
 
       json = api_call(:get, @path, {
-                        course_id: @course.id.to_param,
-                        controller: "calendar_events_api",
-                        action: "get_course_timetable",
-                        format: "json"
+                        course_id: @course.id.to_param, controller: "calendar_events_api",
+                        action: "get_course_timetable", format: "json"
                       })
 
-      expected = { "all" => [{ "weekdays" => "Mon,Thu",
-                               "start_time" => "2:00 pm",
-                               "end_time" => "3:30 pm",
-                               "course_start_at" => @course.start_at.iso8601,
-                               "course_end_at" => @course.end_at.iso8601 }] }
+      expected = { "all" => [{ "weekdays" => "Mon,Thu", "start_time" => "2:00 pm", "end_time" => "3:30 pm",
+                               "course_start_at" => @course.start_at.iso8601, "course_end_at" => @course.end_at.iso8601 }] }
       expect(json).to eq expected
     end
   end
@@ -4566,15 +3781,10 @@ describe CalendarEventsApiController, type: :request do
 
     it "is able to create a bunch of events directly from a list" do
       expect do
-        api_call(:post,
-                 @path,
-                 {
-                   course_id: @course.id.to_param,
-                   controller: "calendar_events_api",
-                   action: "set_course_timetable_events",
-                   format: "json"
-                 },
-                 { events: @events })
+        api_call(:post, @path, {
+                   course_id: @course.id.to_param, controller: "calendar_events_api",
+                   action: "set_course_timetable_events", format: "json"
+                 }, { events: @events })
       end.to change(Delayed::Job, :count).by(1)
 
       run_jobs
@@ -4586,15 +3796,10 @@ describe CalendarEventsApiController, type: :request do
     it "is able to create events for a course section" do
       section = @course.course_sections.create!
       expect do
-        api_call(:post,
-                 @path,
-                 {
-                   course_id: @course.id.to_param,
-                   controller: "calendar_events_api",
-                   action: "set_course_timetable_events",
-                   format: "json"
-                 },
-                 { events: @events, course_section_id: section.id.to_param })
+        api_call(:post, @path, {
+                   course_id: @course.id.to_param, controller: "calendar_events_api",
+                   action: "set_course_timetable_events", format: "json"
+                 }, { events: @events, course_section_id: section.id.to_param })
       end.to change(Delayed::Job, :count).by(1)
 
       run_jobs

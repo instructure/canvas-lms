@@ -108,12 +108,9 @@ namespace :i18n do
 
   task extract_js: [] do
     exit 1 unless system(
-      js_i18nliner_path,
-      "export",
-      "--translationsFile",
-      js_translations_file,
-      "--indexFile",
-      js_index_file
+      js_i18nliner_path, "export",
+      "--translationsFile", js_translations_file,
+      "--indexFile", js_index_file
     )
   end
 

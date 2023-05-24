@@ -52,12 +52,11 @@ if Plugin.installed?("bundler_lockfile_extensions")
       ::CANVAS_RAILS = x # rubocop:disable Style/RedundantConstantBase
     end
 
-    ["#{base_gemfile}.rails#{x.delete(".")}.lock",
-     {
-       default: x == CANVAS_RAILS,
-       install_filter: install_filter,
-       prepare_environment: prepare_environment,
-     }]
+    ["#{base_gemfile}.rails#{x.delete(".")}.lock", {
+      default: x == CANVAS_RAILS,
+      install_filter: install_filter,
+      prepare_environment: prepare_environment,
+    }]
   end
 
   BundlerLockfileExtensions.enable(lockfile_defs)
@@ -68,17 +67,6 @@ end
 # never exist there. Short-circuit it here if we're in the plugin-specific DSL
 # phase to prevent that from happening.
 return if method(:source).owner == Bundler::Plugin::DSL
-
-module GemOverride
-  def gem(name, *version, path: nil, **kwargs)
-    if File.directory?("vendor/#{name}")
-      super(name, path: "vendor/#{name}", **kwargs)
-    else
-      super(name, *version, path: path, **kwargs)
-    end
-  end
-end
-Bundler::Dsl.prepend(GemOverride)
 
 Dir[File.join(File.dirname(__FILE__), "gems/plugins/*/Gemfile.d/_before.rb")].each do |file|
   eval(File.read(file), nil, file) # rubocop:disable Security/Eval

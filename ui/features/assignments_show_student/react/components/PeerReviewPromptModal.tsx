@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -106,7 +105,7 @@ export default ({
             </Text>
           </View>
           <View as="div" margin="x-small 0" textAlign="center">
-            <img alt="" src={successSVG} />
+            <img alt={I18n.t('SUCCESS!')} src={successSVG} />
           </View>
           <View
             as="div"

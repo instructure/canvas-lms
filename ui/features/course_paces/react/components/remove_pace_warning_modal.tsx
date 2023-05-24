@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -45,13 +44,13 @@ const MODAL_HEADER_TEXT = {
   Enrollment: I18n.t('Remove this Student Pace?'),
 }
 
-export const RemovePaceWarningModal = ({
+export const RemovePaceWarningModal: React.FC<ComponentProps> = ({
   open,
   onCancel,
   onConfirm,
   contextType,
   paceName,
-}: ComponentProps) => {
+}) => {
   const renderModalBodyText = () =>
     contextType === 'Section'
       ? I18n.t(

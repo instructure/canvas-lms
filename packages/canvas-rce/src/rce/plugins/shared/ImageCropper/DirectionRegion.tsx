@@ -47,7 +47,7 @@ type ComponentProps = {
   readonly direction: Direction
 }
 
-export const DirectionRegion = ({direction}: ComponentProps) => {
+export const DirectionRegion: React.FC<ComponentProps> = ({direction}) => {
   const directionWord = directionToWord(direction)
   const directionMessage = directionWord
     ? formatMessage('Moving image to crop {directionWord}', {directionWord})

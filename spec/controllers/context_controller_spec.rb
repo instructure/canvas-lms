@@ -72,27 +72,6 @@ describe ContextController do
       expect(teacher_ids & [active_teacher.id, inactive_teacher.id]).to eq [active_teacher.id]
     end
 
-    it "only shows instructors in the same section as section-restricted student" do
-      my_course = create_course
-      my_student = user_factory(name: "mystudent")
-      my_teacher = user_factory(name: "myteacher")
-      other_teacher = user_factory(name: "otherteacher")
-      section1 = my_course.course_sections.create!(name: "Section 1")
-      section2 = my_course.course_sections.create!(name: "Section 2")
-      my_course.enroll_user(my_student, "StudentEnrollment", section: section1, enrollment_state: "active", limit_privileges_to_course_section: true)
-      my_course.enroll_user(my_teacher, "TeacherEnrollment", section: section1, enrollment_state: "active")
-      my_course.enroll_user(other_teacher, "TeacherEnrollment", section: section2, enrollment_state: "active")
-
-      my_group = my_course.groups.create!
-      my_group.add_user(my_student, "accepted")
-
-      user_session(my_student)
-      get "roster", params: { group_id: my_group.id }
-      teacher_ids = assigns[:secondary_users].each_value.first.map(&:id)
-      expect(teacher_ids).to eq [my_teacher.id]
-      expect(teacher_ids).not_to include other_teacher.id
-    end
-
     it "shows all group members to admins" do
       active_student = user_factory
       @course.enroll_student(active_student).accept!
@@ -268,8 +247,7 @@ describe ContextController do
         @other_student = user_factory
         @course.enroll_student(
           @other_student,
-          section: @other_section,
-          limit_privileges_to_course_section: true
+          section: @other_section, limit_privileges_to_course_section: true
         )
                .accept!
       end
@@ -444,17 +422,6 @@ describe ContextController do
       expect(assigns[:deleted_items]).to include(g1)
     end
 
-    it "does now show group discussions that are not restorable" do
-      group_assignment_discussion(course: @course)
-
-      @root_topic.destroy
-      user_session(@teacher)
-      get :undelete_index, params: { group_id: @group }
-
-      expect(response).to be_successful
-      expect(assigns[:deleted_items]).not_to include(@topic)
-    end
-
     describe "Rubric Associations" do
       before(:once) do
         assignment = assignment_model(course: @course)
@@ -518,17 +485,6 @@ describe ContextController do
       expect_any_instantiation_of(@course).not_to receive(:teacher_names)
       post :undelete_item, params: { course_id: @course.id, asset_string: "teacher_name_1" }
       expect(response).to have_http_status :internal_server_error
-    end
-
-    it "does not allow restoring unrestorable discussion topics" do
-      group_assignment_discussion(course: @course)
-      @root_topic.destroy
-
-      expect(@topic.reload.restorable?).to be(false)
-
-      user_session(@teacher)
-      post :undelete_item, params: { group_id: @group.id, asset_string: @topic.asset_string }
-      expect(response).to have_http_status :forbidden
     end
 
     it 'allows undeleting a "normal" association' do

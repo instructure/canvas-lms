@@ -146,8 +146,7 @@ describe "calendar2" do
     end
 
     it "creates a calendar event for non graded discussions with to do date" do
-      discussion = @course.discussion_topics.create!(user: @teacher,
-                                                     title: "topic 1",
+      discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
                                                      message: "somebody topic message",
                                                      todo_date: 30.seconds.from_now)
       get "/calendar2"
@@ -195,8 +194,7 @@ describe "calendar2" do
     end
 
     it "edits a todo discussion" do
-      discussion = @course.discussion_topics.create!(user: @teacher,
-                                                     title: "topic 1",
+      discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
                                                      message: "somebody topic message",
                                                      todo_date: Date.today)
       get "/calendar2"
@@ -213,8 +211,7 @@ describe "calendar2" do
     end
 
     it "deletes a todo discussion" do
-      discussion = @course.discussion_topics.create!(user: @teacher,
-                                                     title: "topic 1",
+      discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
                                                      message: "somebody topic message",
                                                      todo_date: Date.today)
       get "/calendar2"

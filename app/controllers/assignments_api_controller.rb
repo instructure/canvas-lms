@@ -833,14 +833,13 @@ class AssignmentsApiController < ApplicationController
       include_params = Array(params[:include])
 
       if params[:bucket]
-        args = { assignments_scope: scope, user: @current_user, session: session, course: @context }
-        args[:requested_user] = user if @current_user != user
-        sorter = SortsAssignments.new(**args)
-        begin
-          scope = sorter.assignments(params[:bucket].to_sym)
-        rescue SortsAssignments::InvalidBucketError
-          return invalid_bucket_error
-        end
+        return invalid_bucket_error unless SortsAssignments::VALID_BUCKETS.include?(params[:bucket].to_sym)
+
+        users = current_user_and_observed(
+          include_observed: include_params.include?("observed_users")
+        )
+        submissions_for_user = scope.with_submissions_for_user(users).flat_map(&:submissions)
+        scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, user, @current_user, @context, submissions_for_user)
       end
 
       scope = scope.where(post_to_sis: value_to_boolean(params[:post_to_sis])) if params[:post_to_sis]
@@ -878,7 +877,7 @@ class AssignmentsApiController < ApplicationController
         return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(",")}" }, status: :bad_request
       end
 
-      submissions = submissions_hash(include_params, assignments)
+      submissions = submissions_hash(include_params, assignments, submissions_for_user)
 
       include_all_dates = include_params.include?("all_dates")
       include_override_objects = include_params.include?("overrides") && @context.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
@@ -929,11 +928,8 @@ class AssignmentsApiController < ApplicationController
                                        nil
                                      end
 
-        assignment_json(assignment,
-                        user,
-                        session,
-                        submission: submission,
-                        override_dates: override_dates,
+        assignment_json(assignment, user, session,
+                        submission: submission, override_dates: override_dates,
                         include_visibility: include_visibility,
                         assignment_visibilities: visibility_array,
                         needs_grading_count_by_section: needs_grading_count_by_section,
@@ -1191,10 +1187,7 @@ class AssignmentsApiController < ApplicationController
     @assignment.workflow_state = "unpublished"
     if authorized_action(@assignment, @current_user, :create)
       @assignment.content_being_saved_by(@current_user)
-      result = create_api_assignment(@assignment,
-                                     params.require(:assignment),
-                                     @current_user,
-                                     @context,
+      result = create_api_assignment(@assignment, params.require(:assignment), @current_user, @context,
                                      calculate_grades: params.delete(:calculate_grades))
       render_create_or_update_result(result)
     end

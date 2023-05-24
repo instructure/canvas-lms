@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -115,6 +114,7 @@ class CanvasSelect extends React.Component<Props, State> {
   componentDidUpdate(prevProps) {
     if (this.props.value !== prevProps.value || !isEqual(this.props.children, prevProps.children)) {
       const option = this.getOptionByFieldValue('value', this.props.value)
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({
         inputValue: option ? option.props.children : '',
         selectedOptionId: option ? option.props.id : '',
