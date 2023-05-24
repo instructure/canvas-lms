@@ -963,7 +963,10 @@ CanvasRails::Application.routes.draw do
 
   get "health_check" => "info#health_check"
   get "health_prognosis" => "info#health_prognosis"
+  # To be used for uptime reporting
   get "readiness" => "info#readiness"
+  # To be used by ALB
+  get "internal/readiness" => "info#readiness"
   get "deep" => "info#deep"
 
   get "web-app-manifest/manifest.json" => "info#web_app_manifest"
