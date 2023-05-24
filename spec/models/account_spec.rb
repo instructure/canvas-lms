@@ -2506,6 +2506,111 @@ describe Account do
     end
   end
 
+  describe "#multi_parent_sub_accounts_recursive" do
+    subject { Account.multi_parent_sub_accounts_recursive(parent_account_ids) }
+
+    let_once(:root_account) { Account.create! }
+
+    let_once(:level_one_sub_accounts) do
+      3.times do |i|
+        root_account.sub_accounts.create!(name: "Level 1 - Sub-account #{i}")
+      end
+
+      root_account.sub_accounts
+    end
+
+    let_once(:level_two_sub_accounts) do
+      level_two_sub_accounts = []
+
+      root_account.sub_accounts.each do |sa|
+        level_two_sub_accounts << sa.sub_accounts.create!(name: "Level 2 - Sub account")
+      end
+
+      level_two_sub_accounts
+    end
+
+    context "with empty parent account ids" do
+      let(:parent_account_ids) { [] }
+
+      it { is_expected.to match_array [] }
+    end
+
+    context "with a single root account id" do
+      let(:parent_account_ids) { [root_account.id] }
+
+      it "returns all sub-accounts" do
+        expect(subject).to match_array(
+          level_one_sub_accounts + level_two_sub_accounts + [root_account]
+        )
+      end
+    end
+
+    context "with a single sub-account parent account id" do
+      let(:parent_sub_account) { level_two_sub_accounts.first }
+      let(:parent_account_ids) { [parent_sub_account.id] }
+
+      it "returns all sub-accounts that belong to the parent account" do
+        expect(subject).to match_array(
+          parent_sub_account.sub_accounts + [parent_sub_account]
+        )
+      end
+    end
+
+    context "with multiple parent account ids" do
+      let(:parent_account_one) { level_one_sub_accounts.first }
+      let(:parent_account_two) { level_one_sub_accounts.second }
+      let(:parent_account_ids) { [parent_account_one.id, parent_account_two.id] }
+
+      it "returns all sub-accounts that belong to the parent accounts" do
+        expect(subject).to match_array(
+          parent_account_one.sub_accounts + parent_account_two.sub_accounts + [parent_account_one, parent_account_two]
+        )
+      end
+
+      context "and not all parent account IDs are on the same shard" do
+        specs_require_sharding
+
+        let(:cross_shard_parent_account) { @shard1.activate { Account.create! } }
+        let(:parent_account_ids) { [root_account.id, cross_shard_parent_account.id] }
+
+        it "raises an argument error" do
+          expect { subject }.to raise_error(
+            ArgumentError,
+            "all parent_account_ids must be in the same shard"
+          )
+        end
+      end
+
+      context "and another shard is active" do
+        specs_require_sharding
+
+        subject { @shard1.activate { Account.multi_parent_sub_accounts_recursive(parent_account_ids) } }
+
+        let(:parent_account_one) { level_one_sub_accounts.first }
+        let(:parent_account_two) { level_one_sub_accounts.second }
+        let(:parent_account_ids) { [parent_account_one.global_id, parent_account_two.global_id] }
+
+        it "returns all sub-accounts that belong to the parent accounts" do
+          expect(subject).to match_array(
+            parent_account_one.sub_accounts + parent_account_two.sub_accounts + [parent_account_one, parent_account_two]
+          )
+        end
+      end
+
+      context "and there is overlap in the sub accounts" do
+        let(:parent_account_one) { root_account }
+        let(:parent_account_two) { level_one_sub_accounts.first }
+        let(:parent_account_ids) { [parent_account_one.id, parent_account_two.id] }
+
+        it "Does not include duplicate accounts" do
+          expect(subject).to match_array(
+            level_one_sub_accounts + level_two_sub_accounts + [root_account]
+          )
+        end
+      end
+    end
+  end
+
   describe "#effective_course_template" do
     let(:root_account) { Account.create! }
     let(:sub_account) { root_account.sub_accounts.create! }
