@@ -301,6 +301,7 @@ class Course < ActiveRecord::Base
   after_update :log_course_pacing_publish_update, if: :saved_change_to_workflow_state?
   after_update :log_course_format_publish_update, if: :saved_change_to_workflow_state?
   after_update :log_course_pacing_settings_update, if: :change_to_logged_settings?
+  after_update :log_rqd_setting_enable_or_disable
 
   before_update :handle_syllabus_changes_for_master_migration
 
@@ -4454,5 +4455,21 @@ class Course < ActiveRecord::Base
 
     statsd_bucket = new_enable_paces_setting ? "paced" : "unpaced"
     InstStatsd::Statsd.increment("course.#{statsd_bucket}.#{new_stats_course_format}")
+  end
+
+  def log_rqd_setting_enable_or_disable
+    return unless saved_changes.key?("settings") # Skip if no settings were changed
+
+    setting_changes = saved_changes[:settings]
+    old_rqd_setting = setting_changes[0].fetch(:restrict_quantitative_data, false)
+    new_rqd_setting = setting_changes[1].fetch(:restrict_quantitative_data, false)
+
+    return unless old_rqd_setting != new_rqd_setting # Skip if RQD setting was not changed
+
+    if old_rqd_setting == false && new_rqd_setting == true
+      InstStatsd::Statsd.increment("course.settings.restrict_quantitative_data.enabled")
+    elsif old_rqd_setting == true && new_rqd_setting == false
+      InstStatsd::Statsd.increment("course.settings.restrict_quantitative_data.disabled")
+    end
   end
 end

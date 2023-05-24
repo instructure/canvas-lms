@@ -7838,6 +7838,57 @@ describe Course do
         @root.enable_feature!(:restrict_quantitative_data)
       end
 
+      describe "updates metric if setting is enabled/disabled" do
+        before do
+          allow(InstStatsd::Statsd).to receive(:increment)
+        end
+
+        it "increments enabled log when setting is turned on" do
+          expect(@course.restrict_quantitative_data).to be false
+          @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+          @course.save!
+          expect(@course.restrict_quantitative_data).to be true
+
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled").once
+        end
+
+        it "increments disabled log when setting is turned off" do
+          expect(@course.restrict_quantitative_data).to be false
+          @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+          @course.save!
+          expect(@course.restrict_quantitative_data).to be true
+          @course.settings = @course.settings.merge(restrict_quantitative_data: false)
+          @course.save!
+          expect(@course.restrict_quantitative_data).to be false
+
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled").once.ordered
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course.settings.restrict_quantitative_data.disabled").once.ordered
+        end
+
+        it "doesn't increment either log when settings update but RQD setting is unchanged" do
+          expect(@course.hide_final_grade).to be false
+          @course.settings = @course.settings.merge(hide_final_grade: true)
+          @course.save!
+          expect(@course.hide_final_grade).to be true
+
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled")
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.disabled")
+        end
+
+        it "doesn't increment when account setting propagates enabled" do
+          expect(@course.restrict_quantitative_data).to be false
+          @root.settings[:restrict_quantitative_data] = { locked: true, value: true }
+          @root.save!
+          expect(@course.restrict_quantitative_data).to be true
+          @root.settings[:restrict_quantitative_data] = { locked: true, value: false }
+          @root.save!
+          expect(@course.restrict_quantitative_data).to be false
+
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled")
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.disabled")
+        end
+      end
+
       describe "with setting turned on" do
         before do
           @course.settings = @course.settings.merge(restrict_quantitative_data: true)
