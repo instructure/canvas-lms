@@ -17520,6 +17520,7 @@ he:
         wiki_page_name: "שם העמוד"
         wiki_page_namem: "שם משימה"
       loading: טוען...
+      new_assignment_notice: "בחירת המשימה אותה רוצים לשייך למודול זה, או הוספת משימה ע\"י בחירת \"משימה חדשה\"."
       new_assignment_option: "[ משימה חדשה ]"
       new_page_option: "[ דף חדש ]"
       new_quiz_notice: "בחירת הבוחן שאת/ה רוצה לשייך ל*מודול* זה, או הוספת חדש ע\"י בחירת \"בוחן חדש\"."
