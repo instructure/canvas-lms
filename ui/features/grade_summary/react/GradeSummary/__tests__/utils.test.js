@@ -26,7 +26,6 @@ import {GradingStandard} from '../../../graphql/GradingStandard'
 import {GradingPeriod} from '../../../graphql/GradingPeriod'
 import {Submission} from '../../../graphql/Submission'
 import {
-  getAssignmentGroupScore,
   formatNumber,
   submissionCommentsPresent,
   getDisplayStatus,
@@ -36,6 +35,7 @@ import {
   getAssignmentEarnedPoints,
   getAssignmentPercentage,
   getAssignmentLetterGrade,
+  getAssignmentGroupScore,
   getAssignmentGroupTotalPoints,
   getAssignmentGroupEarnedPoints,
   getAssignmentGroupPercentage,
@@ -43,6 +43,10 @@ import {
   getGradingPeriodTotalPoints,
   getGradingPeriodEarnedPoints,
   getGradingPeriodPercentage,
+  getCourseTotalPoints,
+  getCourseEarnedPoints,
+  getCoursePercentage,
+  getTotal,
 } from '../utils'
 
 const createAssignment = (score, pointsPossible) => {
@@ -569,6 +573,154 @@ describe('util', () => {
         it('should return 0 when assignments are not provided', () => {
           const gradingPeriod = {}
           expect(getGradingPeriodPercentage(gradingPeriod, undefined, undefined, true)).toBe(0)
+        })
+      })
+    })
+  })
+
+  describe('Course', () => {
+    describe('getCourseTotalPoints', () => {
+      it('should return the points possible for the course', () => {
+        const assignments = mockAssignments()
+        expect(getCourseTotalPoints(assignments)).toBe(40)
+      })
+
+      it('should return 0 when points possible is not provided', () => {
+        const assignments = []
+        expect(getCourseTotalPoints(assignments)).toBe(0)
+      })
+
+      it('should return 0 when assignments are not provided', () => {
+        expect(getCourseTotalPoints(undefined)).toBe(0)
+      })
+    })
+
+    describe('getCourseEarnedPoints', () => {
+      it('should return the earned points for the course', () => {
+        const assignments = mockAssignments()
+        expect(getCourseEarnedPoints(assignments)).toBe(31)
+      })
+
+      it('should return 0 when earned points is not provided', () => {
+        const assignments = []
+        expect(getCourseEarnedPoints(assignments)).toBe(0)
+      })
+
+      it('should return 0 when assignments are not provided', () => {
+        expect(getCourseEarnedPoints(undefined)).toBe(0)
+      })
+    })
+
+    describe('getCoursePercentage', () => {
+      it('should return the correct percentage for the course', () => {
+        const assignments = mockAssignments()
+        expect(getCoursePercentage(assignments)).toBe(77.5)
+      })
+
+      it('should return 0 when total points is not provided', () => {
+        const assignments = []
+        expect(getCoursePercentage(assignments)).toBe(0)
+      })
+
+      it('should return 0 when assignments are not provided', () => {
+        expect(getCoursePercentage(undefined)).toBe(0)
+      })
+    })
+  })
+
+  describe('Course final total', () => {
+    describe('getTotal', () => {
+      describe('when the course is not weighted and there are no grading periods', () => {
+        it('should return the correct total', () => {
+          const assignments = mockAssignments()
+          expect(getTotal(assignments, undefined, undefined, false)).toBe(77.5)
+        })
+
+        it('should return 0 when total points is not provided', () => {
+          const assignments = []
+          expect(getTotal(assignments, undefined, undefined, false)).toBe(0)
+        })
+
+        it('should return 0 when assignments are not provided', () => {
+          expect(getTotal(undefined, undefined, undefined, false)).toBe(0)
+        })
+      })
+
+      describe('when the course is weighted and there are no grading periods', () => {
+        it('should return the correct total', () => {
+          const assignments = mockAssignments()
+          const assignmentGroup = AssignmentGroup.mock()
+          expect(getTotal(assignments, [assignmentGroup], undefined, true)).toBe(77.5 * 0.5)
+        })
+
+        it('should return 0 when total points is not provided', () => {
+          const assignments = []
+          const assignmentGroup = AssignmentGroup.mock()
+          expect(getTotal(assignments, [assignmentGroup], undefined, true)).toBe(0)
+        })
+
+        it('should return 0 when assignments are not provided', () => {
+          expect(getTotal(undefined, undefined, undefined, true)).toBe(0)
+        })
+      })
+
+      describe('when the course is not weighted and there are grading periods', () => {
+        beforeEach(() => {
+          const mockSearch = '?param1=value1&grading_period_id=0&param2=value2'
+          Object.defineProperty(window, 'location', {
+            value: {search: mockSearch},
+            writable: true,
+          })
+        })
+
+        it('should return the correct total', () => {
+          const assignments = mockAssignments()
+          const gradingPeriods = [GradingPeriod.mock()]
+          expect(getTotal(assignments, undefined, gradingPeriods, false)).toBe(
+            77.5 * (GradingPeriod.mock().weight / 100)
+          )
+        })
+
+        it('should return 0 when total points is not provided', () => {
+          const assignments = []
+          const gradingPeriods = [GradingPeriod.mock()]
+          expect(getTotal(assignments, undefined, gradingPeriods, false)).toBe(0)
+        })
+
+        it('should return 0 when assignments are not provided', () => {
+          const gradingPeriods = [GradingPeriod.mock()]
+          expect(getTotal(undefined, undefined, gradingPeriods, false)).toBe(0)
+        })
+      })
+
+      describe('when the course is weighted and there are grading periods', () => {
+        beforeEach(() => {
+          const mockSearch = '?param1=value1&grading_period_id=0&param2=value2'
+          Object.defineProperty(window, 'location', {
+            value: {search: mockSearch},
+            writable: true,
+          })
+        })
+
+        it('should return the correct total', () => {
+          const assignments = mockAssignments()
+          const gradingPeriods = [GradingPeriod.mock()]
+          const assignmentGroup = AssignmentGroup.mock()
+          expect(getTotal(assignments, [assignmentGroup], gradingPeriods, true)).toBe(
+            77.5 * (assignmentGroup.groupWeight / 100) * (GradingPeriod.mock().weight / 100)
+          )
+        })
+
+        it('should return 0 when assignments is an empty array', () => {
+          const assignments = []
+          const gradingPeriods = [GradingPeriod.mock()]
+          const assignmentGroup = AssignmentGroup.mock()
+          expect(getTotal(assignments, [assignmentGroup], gradingPeriods, true)).toBe(0)
+        })
+
+        it('should return 0 when assignments are not provided', () => {
+          const gradingPeriods = [GradingPeriod.mock()]
+          expect(getTotal(undefined, undefined, gradingPeriods, true)).toBe(0)
         })
       })
     })
