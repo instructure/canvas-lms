@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/grading-scheme",
+  "private": true,
+  "version": "1.0.0",
+  "author": "Jen Smith",
+  "main": "index.ts"
+}
