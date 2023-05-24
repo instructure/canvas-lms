@@ -43,7 +43,7 @@ module IncomingMailProcessor
 
     def disconnect; end
 
-    def each_message(**)
+    def each_message(*)
       start_time = Time.now
       iteration_high_water = config[:iteration_high_water] || 300
       @incoming_mail_queue.before_request do |_stats|
