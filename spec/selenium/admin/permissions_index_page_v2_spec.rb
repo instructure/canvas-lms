@@ -30,9 +30,14 @@ describe "permissions index" do
   end
 
   def create_role_override(permission_name, role, account, opts)
-    new_role = RoleOverride.create!(permission: permission_name, enabled: opts[:enabled],
-                                    locked: opts[:locked], context: account, applies_to_self: true, applies_to_descendants: true,
-                                    role_id: role.id, context_type: "Account")
+    new_role = RoleOverride.create!(permission: permission_name,
+                                    enabled: opts[:enabled],
+                                    locked: opts[:locked],
+                                    context: account,
+                                    applies_to_self: true,
+                                    applies_to_descendants: true,
+                                    role_id: role.id,
+                                    context_type: "Account")
     new_role.id
   end
 

@@ -27,8 +27,10 @@ class PartitionMigrationGenerator < ActiveRecord::Generators::MigrationGenerator
   source_root File.expand_path("templates", __dir__)
 
   remove_argument :attributes
-  argument :model, type: :string, required: false,
-                   desc: "Name of the model whose partitions will be modified."
+  argument :model,
+           type: :string,
+           required: false,
+           desc: "Name of the model whose partitions will be modified."
 
   def create_migration_file
     unless /^[_a-z0-9]+$/.match?(file_name)

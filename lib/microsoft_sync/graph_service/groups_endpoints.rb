@@ -40,15 +40,18 @@ module MicrosoftSync
 
       BATCH_REMOVE_USERS_SPECIAL_CASES = [
         SpecialCase.new(
-          404, /does not exist or one of its queried reference-property objects are not present/i,
+          404,
+          /does not exist or one of its queried reference-property objects are not present/i,
           result: :ignored
         ),
         SpecialCase.new(
-          400, /One or more removed object references do not exist for the following modified/i,
+          400,
+          /One or more removed object references do not exist for the following modified/i,
           result: :ignored
         ),
         SpecialCase.new(
-          400, /must have at least one owner, hence this owner cannot be removed/i,
+          400,
+          /must have at least one owner, hence this owner cannot be removed/i,
           result: Errors::MissingOwners
         ),
       ].freeze
@@ -76,15 +79,18 @@ module MicrosoftSync
 
       BATCH_ADD_USERS_SPECIAL_CASES = [
         SpecialCase.new(
-          400, /One or more added object references already exist/i,
+          400,
+          /One or more added object references already exist/i,
           result: :already_in_group
         ),
         SpecialCase.new(
-          403, /would exceed the maximum quota count.*for forward-link.*owners/i,
+          403,
+          /would exceed the maximum quota count.*for forward-link.*owners/i,
           result: Errors::OwnersQuotaExceeded
         ),
         SpecialCase.new(
-          403, /would exceed the maximum quota count.*for forward-link.*members/i,
+          403,
+          /would exceed the maximum quota count.*for forward-link.*members/i,
           result: Errors::MembersQuotaExceeded
         ),
         SpecialCase.new(404, result: GroupMembershipChangeResult::NONEXISTENT_USER) do |response|
@@ -111,7 +117,8 @@ module MicrosoftSync
 
       ADD_USERS_SPECIAL_CASES = [
         SpecialCase.new(
-          400, /One or more added object references already exist/i,
+          400,
+          /One or more added object references already exist/i,
           result: :fallback_to_batch
         ),
         # If a group has 81 owners, and we try to add 20 owners, but some or all
@@ -121,7 +128,8 @@ module MicrosoftSync
         # push the total number over the maximum (100). In that case, fallback to
         # batch requests, which do not have this problem.
         SpecialCase.new(
-          403, /would exceed the maximum quota count.*for forward-link.*(owners|members)/i,
+          403,
+          /would exceed the maximum quota count.*for forward-link.*(owners|members)/i,
           result: :fallback_to_batch
         ),
         # There is one additional dynamic special case in add_users_special_cases()
@@ -142,7 +150,8 @@ module MicrosoftSync
         # Irregular write cost of adding members, about users_added/3, according to Microsoft.
         write_quota = ((members.length + owners.length) / 3.0).ceil
         response = request(
-          :patch, "groups/#{group_id}",
+          :patch,
+          "groups/#{group_id}",
           body: body,
           quota: [1, write_quota],
           special_cases: add_users_special_cases(group_id)
@@ -158,7 +167,8 @@ module MicrosoftSync
       def add_users_special_cases(group_id)
         ADD_USERS_SPECIAL_CASES + [
           SpecialCase.new(
-            404, /does not exist or one of its queried reference/,
+            404,
+            /does not exist or one of its queried reference/,
             result: Errors::GroupNotFound
           ) { |response| response.body.include?(group_id) },
           # 404 referencing some ID which is NOT the group ID. Probably one of

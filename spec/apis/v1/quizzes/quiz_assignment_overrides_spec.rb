@@ -34,7 +34,8 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
     it "requires authorization" do
       user_factory(active_all: true) # not enrolled
 
-      raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides",
+      raw_api_call(:get,
+                   "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides",
                    { controller: "quizzes/quiz_assignment_overrides", action: "index", format: "json", course_id: @course.id.to_s },
                    { quiz_assignment_overrides: [{ quiz_ids: [@quiz.id] }] })
 
@@ -52,12 +53,15 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
 
       expect(@quiz.reload.assignment_overrides.count).to eq 1
 
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides", {
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides",
+                      {
                         controller: "quizzes/quiz_assignment_overrides",
                         action: "index",
                         format: "json",
                         course_id: @course.id.to_s
-                      }, {
+                      },
+                      {
                         quiz_assignment_overrides: [{
                           quiz_ids: [@quiz].map(&:id).map(&:to_s)
                         }]
@@ -90,12 +94,15 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
 
       expect(@quiz.reload.assignment_overrides.count).to eq 1
 
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides", {
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides",
+                      {
                         controller: "quizzes/quiz_assignment_overrides",
                         action: "index",
                         format: "json",
                         course_id: @course.id.to_s
-                      }, {
+                      },
+                      {
                         quiz_assignment_overrides: [{
                           quiz_ids: [@quiz].map(&:id).map(&:to_s)
                         }]
@@ -130,7 +137,8 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
     it "requires authorization" do
       user_factory(active_all: true) # not enrolled
 
-      raw_api_call(:get, "/api/v1/courses/#{@course.id}/new_quizzes/assignment_overrides",
+      raw_api_call(:get,
+                   "/api/v1/courses/#{@course.id}/new_quizzes/assignment_overrides",
                    { controller: "quizzes/quiz_assignment_overrides", action: "new_quizzes", format: "json", course_id: @course.id.to_s },
                    { quiz_assignment_overrides: [{ quiz_ids: [@quiz.id] }] })
 
@@ -147,12 +155,15 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
                                 })
 
       expect(@quiz.reload.assignment_overrides.count).to eq 1
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/new_quizzes/assignment_overrides", {
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/new_quizzes/assignment_overrides",
+                      {
                         controller: "quizzes/quiz_assignment_overrides",
                         action: "new_quizzes",
                         format: "json",
                         course_id: @course.id.to_s
-                      }, {
+                      },
+                      {
                         quiz_assignment_overrides: [{
                           quiz_ids: [@quiz].map(&:id).map(&:to_s)
                         }]

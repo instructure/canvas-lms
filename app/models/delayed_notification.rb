@@ -21,11 +21,29 @@
 class DelayedNotification < ActiveRecord::Base
   include Workflow
 
-  belongs_to :asset, polymorphic:
-    [:assessment_request, :attachment, :content_migration, :content_export, :collaborator, :submission,
-     :assignment, :communication_channel, :calendar_event, :conversation_message, :discussion_entry,
-     :submission_comment, { quiz_submission: "Quizzes::QuizSubmission" }, :discussion_topic, :course, :enrollment,
-     :wiki_page, :group_membership, :web_conference], polymorphic_prefix: true, exhaustive: false
+  belongs_to :asset,
+             polymorphic:
+                 [:assessment_request,
+                  :attachment,
+                  :content_migration,
+                  :content_export,
+                  :collaborator,
+                  :submission,
+                  :assignment,
+                  :communication_channel,
+                  :calendar_event,
+                  :conversation_message,
+                  :discussion_entry,
+                  :submission_comment,
+                  { quiz_submission: "Quizzes::QuizSubmission" },
+                  :discussion_topic,
+                  :course,
+                  :enrollment,
+                  :wiki_page,
+                  :group_membership,
+                  :web_conference],
+             polymorphic_prefix: true,
+             exhaustive: false
   include NotificationPreloader
 
   attr_accessor :data

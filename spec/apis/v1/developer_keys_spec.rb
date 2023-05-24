@@ -63,9 +63,13 @@ describe DeveloperKeysController, type: :request do
     it "stringifies the nested stuff" do
       admin_session
       key = DeveloperKey.create!
-      json = api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+      json = api_call(:get,
+                      "/api/v1/accounts/#{sa_id}/developer_keys.json",
+                      {
                         controller: "developer_keys", action: "index", format: "json", account_id: sa_id.to_s
-                      }, {}, { "Accept" => "application/json+canvas-string-ids" })
+                      },
+                      {},
+                      { "Accept" => "application/json+canvas-string-ids" })
       row = json.detect { |r| r["id"] == key.global_id.to_s }
       expect(row["developer_key_account_binding"]["developer_key_id"]).to eq key.global_id.to_s
     end
@@ -193,12 +197,15 @@ describe DeveloperKeysController, type: :request do
 
   describe "POST 'create'" do
     it "requires authorization" do
-      unauthorized_api_call(:post, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+      unauthorized_api_call(:post,
+                            "/api/v1/accounts/#{sa_id}/developer_keys.json",
+                            {
                               controller: "developer_keys",
                               action: "create",
                               format: "json",
                               account_id: sa_id.to_s
-                            }, { developer_key: {} })
+                            },
+                            { developer_key: {} })
     end
 
     it "creates a new developer key" do
@@ -209,12 +216,15 @@ describe DeveloperKeysController, type: :request do
   describe "PUT 'update'" do
     it "requires authorization" do
       key = DeveloperKey.create!
-      unauthorized_api_call(:put, "/api/v1/developer_keys/#{key.id}.json", {
+      unauthorized_api_call(:put,
+                            "/api/v1/developer_keys/#{key.id}.json",
+                            {
                               controller: "developer_keys",
                               action: "update",
                               id: key.id.to_s,
                               format: "json"
-                            }, { developer_key: {} })
+                            },
+                            { developer_key: {} })
     end
 
     it "updates an existing developer key" do
@@ -247,12 +257,15 @@ describe DeveloperKeysController, type: :request do
     post_hash = { developer_key: { name: "cool tool", icon_url: "" } }
     # make sure this key is created
     DeveloperKey.default
-    json = api_call(:post, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+    json = api_call(:post,
+                    "/api/v1/accounts/#{sa_id}/developer_keys.json",
+                    {
                       controller: "developer_keys",
                       action: "create",
                       format: "json",
                       account_id: sa_id.to_s
-                    }, post_hash)
+                    },
+                    post_hash)
 
     expect(DeveloperKey.count).to eq 2
     confirm_valid_key_in_json([json], DeveloperKey.last)
@@ -262,12 +275,15 @@ describe DeveloperKeysController, type: :request do
     admin_session
     key = DeveloperKey.create!
     post_hash = { developer_key: { name: "cool tool" } }
-    json = api_call(:put, "/api/v1/developer_keys/#{key.id}.json", {
+    json = api_call(:put,
+                    "/api/v1/developer_keys/#{key.id}.json",
+                    {
                       controller: "developer_keys",
                       action: "update",
                       format: "json",
                       id: key.id.to_s
-                    }, post_hash)
+                    },
+                    post_hash)
 
     key.reload
     confirm_valid_key_in_json([json], key)

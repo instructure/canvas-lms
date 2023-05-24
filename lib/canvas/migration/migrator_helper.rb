@@ -169,8 +169,10 @@ module Canvas::Migration
 
     # still used by standard/quiz_converter
     def self.prepend_id_to_questions(questions, prepend_value, existing_ids = nil)
-      key_types = { migration_id: :assessment_questions, question_bank_id: :assessment_question_banks,
-                    question_bank_migration_id: :assessment_question_banks, assessment_question_migration_id: :assessment_questions }
+      key_types = { migration_id: :assessment_questions,
+                    question_bank_id: :assessment_question_banks,
+                    question_bank_migration_id: :assessment_question_banks,
+                    assessment_question_migration_id: :assessment_questions }
 
       questions.each do |q|
         key_types.each do |key, type|

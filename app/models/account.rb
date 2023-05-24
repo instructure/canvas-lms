@@ -28,7 +28,8 @@ class Account < ActiveRecord::Base
 
   INSTANCE_GUID_SUFFIX = "canvas-lms"
   # a list of columns necessary for validation and save callbacks to work on a slim object
-  BASIC_COLUMNS_FOR_CALLBACKS = %i[id parent_account_id root_account_id name workflow_state settings].freeze
+  BASIC_COLUMNS_FOR_CALLBACKS = %i[id parent_account_id root_account_id name workflow_state settings account_calendar_subscription_type].freeze
+  CALENDAR_SUBSCRIPTION_TYPES = %w[manual auto].freeze
 
   include Workflow
   include BrandConfigHelpers
@@ -186,6 +187,7 @@ class Account < ActiveRecord::Base
   validate :no_active_sub_accounts, if: ->(a) { a.workflow_state_changed? && !a.active? }
   validate :validate_help_links, if: ->(a) { a.settings_changed? }
   validate :validate_course_template, if: ->(a) { a.has_attribute?(:course_template_id) && a.course_template_id_changed? }
+  validates :account_calendar_subscription_type, inclusion: { in: CALENDAR_SUBSCRIPTION_TYPES }
 
   include StickySisFields
   are_sis_sticky :name, :parent_account_id
@@ -744,11 +746,13 @@ class Account < ActiveRecord::Base
     else
       shard.activate do
         if opts[:include_crosslisted_courses]
-          Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self)
-            .where("course_id=courses.id"))
+          Course.where(CourseAccountAssociation.where(account_id: self)
+            .where("course_id=courses.id")
+            .arel.exists)
         else
-          Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self, course_section_id: nil)
-            .where("course_id=courses.id"))
+          Course.where(CourseAccountAssociation.where(account_id: self, course_section_id: nil)
+            .where("course_id=courses.id")
+            .arel.exists)
         end
       end
     end
@@ -1266,7 +1270,9 @@ class Account < ActiveRecord::Base
               SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
             )
             SELECT id FROM t
-          )", id, id)
+          )",
+                                      id,
+                                      id)
                    else
                      role_scope.where(account_id: account_chain.map(&:id))
                    end
@@ -1354,7 +1360,9 @@ class Account < ActiveRecord::Base
                                                account_users_for(user) # has own cache
                                              else
                                                Rails.cache.fetch_with_batched_keys(["account_users_for_user", user.cache_key(:account_users)].cache_key,
-                                                                                   batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true) do
+                                                                                   batch_object: self,
+                                                                                   batched_keys: :account_chain,
+                                                                                   skip_cache_if_disabled: true) do
                                                  account_users_for(user).each(&:clear_association_cache)
                                                end
                                              end
@@ -1376,7 +1384,9 @@ class Account < ActiveRecord::Base
 
     Rails.cache.fetch_with_batched_keys(
       ["all_account_users_for_user", user.cache_key(:account_users)].cache_key,
-      batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true
+      batch_object: self,
+      batched_keys: :account_chain,
+      skip_cache_if_disabled: true
     ) { all_account_users_for(user) }
   end
 
@@ -1397,8 +1407,15 @@ class Account < ActiveRecord::Base
 
     given { |user| !cached_account_users_for(user).empty? }
     can %i[
-      read read_as_admin manage update delete
-      read_outcomes read_terms read_files launch_external_tool
+      read
+      read_as_admin
+      manage
+      update
+      delete
+      read_outcomes
+      read_terms
+      read_files
+      launch_external_tool
     ]
 
     given { |user| root_account? && cached_all_account_users_for(user).any? }
@@ -1770,7 +1787,8 @@ class Account < ActiveRecord::Base
 
     if turnitin_account_id.present? && turnitin_shared_secret.present?
       if settings[:enable_turnitin]
-        @turnitin_settings = [turnitin_account_id, turnitin_shared_secret,
+        @turnitin_settings = [turnitin_account_id,
+                              turnitin_shared_secret,
                               turnitin_host]
       end
     else
@@ -1870,8 +1888,10 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_TERMS, label: t("#account.tab_terms", "Terms"), css_class: "terms", href: :account_terms_path } if root_account? && manage_settings
       tabs << { id: TAB_AUTHENTICATION, label: t("#account.tab_authentication", "Authentication"), css_class: "authentication", href: :account_authentication_providers_path } if root_account? && manage_settings
       if root_account? && allow_sis_import && user && grants_any_right?(user, :manage_sis, :import_sis)
-        tabs << { id: TAB_SIS_IMPORT, label: t("#account.tab_sis_import", "SIS Import"),
-                  css_class: "sis_import", href: :account_sis_import_path }
+        tabs << { id: TAB_SIS_IMPORT,
+                  label: t("#account.tab_sis_import", "SIS Import"),
+                  css_class: "sis_import",
+                  href: :account_sis_import_path }
       end
     end
 
@@ -2097,6 +2117,7 @@ class Account < ActiveRecord::Base
   scope :processing_sis_batch, -> { where.not(accounts: { current_sis_batch_id: nil }).order(:updated_at) }
   scope :name_like, ->(name) { where(wildcard("accounts.name", name)) }
   scope :active, -> { where("accounts.workflow_state<>'deleted'") }
+  scope :auto_subscribe_calendar, -> { where(account_calendar_subscription_type: "auto") }
 
   def self.resolved_root_account_id_sql(table = table_name)
     quoted_table_name = connection.quote_local_table_name(table)

@@ -32,7 +32,8 @@ module Lti
         it "marks a tool proxy as deleted from a course" do
           course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
           tp = create_tool_proxy(context: @course)
-          api_call(:delete, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
+          api_call(:delete,
+                   "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
                    { controller: "lti/tool_proxy", action: "destroy", format: "json", course_id: @course.id.to_s, tool_proxy_id: tp.id })
           expect(tp.reload.workflow_state).to eq "deleted"
         end
@@ -40,7 +41,8 @@ module Lti
         it "doesn't allow a student to delete tool proxies" do
           course_with_student(active_all: true, user: user_with_pseudonym, account: account)
           tp = create_tool_proxy(context: @course)
-          raw_api_call(:delete, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
+          raw_api_call(:delete,
+                       "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
                        { controller: "lti/tool_proxy", action: "destroy", format: "json", course_id: @course.id.to_s, tool_proxy_id: tp.id })
           assert_status(401)
           expect(tp.reload.workflow_state).to eq "active"
@@ -51,7 +53,8 @@ module Lti
         it "marks a tool proxy as deleted from a account" do
           account_admin_user(account: account)
           tp = create_tool_proxy(context: account)
-          api_call(:delete, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
+          api_call(:delete,
+                   "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
                    { controller: "lti/tool_proxy", action: "destroy", format: "json", account_id: account.id.to_s, tool_proxy_id: tp.id })
           expect(tp.reload.workflow_state).to eq "deleted"
         end
@@ -59,7 +62,8 @@ module Lti
         it "doesn't allow a non-admin to delete tool proxies" do
           user_with_pseudonym(account: account)
           tp = create_tool_proxy(context: account)
-          raw_api_call(:delete, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
+          raw_api_call(:delete,
+                       "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
                        { controller: "lti/tool_proxy", action: "destroy", format: "json", account_id: account.id.to_s, tool_proxy_id: tp.id })
           assert_status(401)
           expect(tp.reload.workflow_state).to eq "active"
@@ -72,7 +76,8 @@ module Lti
         it "updates a tools workflow state" do
           course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
           tp = create_tool_proxy(context: @course)
-          api_call(:put, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
+          api_call(:put,
+                   "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
                    { controller: "lti/tool_proxy", action: "update", format: "json", course_id: @course.id.to_s, tool_proxy_id: tp.id, workflow_state: "disabled" })
           expect(tp.reload.workflow_state).to eq "disabled"
         end
@@ -80,7 +85,8 @@ module Lti
         it "doesn't allow a student to update" do
           course_with_student(active_all: true, user: user_with_pseudonym, account: account)
           tp = create_tool_proxy(context: @course)
-          raw_api_call(:put, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
+          raw_api_call(:put,
+                       "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
                        { controller: "lti/tool_proxy", action: "update", format: "json", course_id: @course.id.to_s, tool_proxy_id: tp.id, workflow_state: "disabled" })
           assert_status(401)
           expect(tp.reload.workflow_state).to eq "active"
@@ -91,7 +97,8 @@ module Lti
         it "updates a tools workflow state" do
           account_admin_user(account: account)
           tp = create_tool_proxy(context: account)
-          api_call(:put, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
+          api_call(:put,
+                   "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
                    { controller: "lti/tool_proxy", action: "update", format: "json", account_id: account.id.to_s, tool_proxy_id: tp.id, workflow_state: "disabled" })
           expect(tp.reload.workflow_state).to eq "disabled"
         end
@@ -99,7 +106,8 @@ module Lti
         it "doesn't allow a non-admin to update workflow_state" do
           user_with_pseudonym(account: account)
           tp = create_tool_proxy(context: account)
-          raw_api_call(:put, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
+          raw_api_call(:put,
+                       "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
                        { controller: "lti/tool_proxy", action: "update", format: "json", account_id: account.id.to_s, tool_proxy_id: tp.id, workflow_state: "disabled" })
           assert_status(401)
           expect(tp.reload.workflow_state).to eq "active"
@@ -130,7 +138,8 @@ module Lti
             stub_request(:put, "http://awesome.dev/face.html")
               .to_return(status: 200, body: "", headers: {})
 
-            api_call(:put, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}/update",
+            api_call(:put,
+                     "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}/update",
                      {
                        controller: "lti/tool_proxy",
                        action: "accept_update",
@@ -233,7 +242,8 @@ module Lti
             stub_request(:delete, "http://awesome.dev/face.html")
               .to_return(status: 200, body: "", headers: {})
 
-            api_call(:delete, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}/update",
+            api_call(:delete,
+                     "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}/update",
                      {
                        controller: "lti/tool_proxy",
                        action: "dismiss_update",
@@ -264,8 +274,12 @@ module Lti
             create_message_handler(resource)
             message_handler = resource.message_handlers.where(message_type: "basic-lti-launch-request").first
             message_handler.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
-            api_call(:put, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
-                     { controller: "lti/tool_proxy", action: "update", format: "json", account_id: account.id.to_s, tool_proxy_id: tp.id, workflow_state: "disabled" }, {}, {}, { domain_root_account: account })
+            api_call(:put,
+                     "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
+                     { controller: "lti/tool_proxy", action: "update", format: "json", account_id: account.id.to_s, tool_proxy_id: tp.id, workflow_state: "disabled" },
+                     {},
+                     {},
+                     { domain_root_account: account })
 
             expect(nav_cache.cache_key).to_not eq cache_key
           end
@@ -278,7 +292,8 @@ module Lti
 
             account_admin_user(account: account)
             tp = create_tool_proxy(context: account)
-            api_call(:put, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
+            api_call(:put,
+                     "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
                      { controller: "lti/tool_proxy", action: "update", format: "json", account_id: account.id.to_s, tool_proxy_id: tp.id, workflow_state: "disabled" })
 
             expect(nav_cache.cache_key).to eq cache_key

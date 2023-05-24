@@ -63,7 +63,7 @@ describe MediaObjectsController do
     it "retrieves info about a 'deleted' MediaObject" do
       deleted_media_id = "0_deadbeef"
       course_factory
-      mo = media_object = course_factory.media_objects.build media_id: deleted_media_id
+      media_object = course_factory.media_objects.build media_id: deleted_media_id
       media_object.workflow_state = "deleted"
       media_object.save!
 
@@ -71,7 +71,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to eq(
         {
           "can_add_captions" => false,
-          "created_at" => mo.created_at.as_json,
+          "created_at" => media_object.created_at.as_json,
           "media_id" => deleted_media_id,
           "title" => "Untitled",
           "media_type" => nil,

@@ -24,19 +24,24 @@ class AddContentItemToContentParticipations < ActiveRecord::Migration[6.1]
   disable_ddl_transaction!
 
   def change
-    add_column :content_participations, :content_item, :string, null: false,
-                                                                default: "grade",
-                                                                if_not_exists: true
+    add_column :content_participations,
+               :content_item,
+               :string,
+               null: false,
+               default: "grade",
+               if_not_exists: true
 
-    add_index :content_participations, %w[content_id content_type user_id content_item],
+    add_index :content_participations,
+              %w[content_id content_type user_id content_item],
               name: "index_content_participations_by_type_uniquely",
               unique: true,
               algorithm: :concurrently,
               if_not_exists: true
 
-    remove_index :content_participations, column: %w[content_id content_type user_id],
-                                          name: "index_content_participations_uniquely",
-                                          algorithm: :concurrently,
-                                          if_exists: true
+    remove_index :content_participations,
+                 column: %w[content_id content_type user_id],
+                 name: "index_content_participations_uniquely",
+                 algorithm: :concurrently,
+                 if_exists: true
   end
 end

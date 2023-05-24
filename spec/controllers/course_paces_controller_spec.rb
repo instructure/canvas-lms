@@ -720,13 +720,15 @@ describe CoursePacesController do
     it "prefers incoming blackout dates over what is already on the course" do
       # course starts at 2021-09-30
       course_pace_params = @valid_params.merge(end_date: @course_pace.start_date + 5.days)
-      post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params, blackout_dates: [
-        {
-          event_title: "blackout dates 2",
-          start_date: "2021-09-30", # thurs
-          end_date: "2021-10-01" # fri
-        }
-      ] }
+      post :compress_dates, params: { course_id: @course.id,
+                                      course_pace: course_pace_params,
+                                      blackout_dates: [
+                                        {
+                                          event_title: "blackout dates 2",
+                                          start_date: "2021-09-30", # thurs
+                                          end_date: "2021-10-01" # fri
+                                        }
+                                      ] }
       expect(response).to be_successful
       json_response = response.parsed_body
       # skip the weekend, then due dates are mon and tues

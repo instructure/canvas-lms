@@ -1394,8 +1394,10 @@ describe User do
     end
 
     it "does not let users message the entire class if they cannot send_messages" do
-      RoleOverride.create!(context: @course.account, permission: "send_messages",
-                           role: student_role, enabled: false)
+      RoleOverride.create!(context: @course.account,
+                           permission: "send_messages",
+                           role: student_role,
+                           enabled: false)
       @course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
 
       # can only message self or the admins
@@ -3778,14 +3780,16 @@ describe User do
     before do
       # restricts view of this course when it is in the past (it IS in the past)
       @restricted = Account.default.courses.create!(
-        start_at: 2.months.ago, conclude_at: 1.month.ago,
+        start_at: 2.months.ago,
+        conclude_at: 1.month.ago,
         restrict_enrollments_to_course_dates: true,
         name: "Restricted",
         restrict_student_past_view: true
       )
       # doesnt restrict view of this course when it is in the past (it IS in the past)
       @unrestricted = Account.default.courses.create!(
-        start_at: 2.months.ago, conclude_at: 1.month.ago,
+        start_at: 2.months.ago,
+        conclude_at: 1.month.ago,
         restrict_enrollments_to_course_dates: true,
         name: "Unrestricted",
         restrict_student_past_view: false
@@ -4317,7 +4321,6 @@ describe User do
 
   context "account_calendars" do
     before :once do
-      Account.site_admin.enable_feature! :account_calendar_events
       user_factory(active_all: true)
       @root_account = Account.default
       @root_account.account_calendar_visible = false
@@ -4354,6 +4357,34 @@ describe User do
         @root_account.account_calendar_visible = true
         @root_account.save!
         @user.set_preference(:enabled_account_calendars, [@root_account.id])
+        expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@root_account.id)
+      end
+
+      it "returns auto-subscribed account calendars" do
+        expect(@user.enabled_account_calendars.pluck(:id)).to match_array([])
+        @associated_subaccount.account_calendar_subscription_type = "auto"
+        @associated_subaccount.save!
+        expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id)
+      end
+
+      it "returns subscribed and auto-subscribed account calendars" do
+        @root_account.account_calendar_visible = true
+        @root_account.save!
+        @user.set_preference(:enabled_account_calendars, [@root_account.id])
+
+        @associated_subaccount.account_calendar_subscription_type = "auto"
+        @associated_subaccount.save!
+        expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@root_account.id, @associated_subaccount.id)
+      end
+
+      it "returns subscribed account calendars only if the feature flag is off" do
+        Account.site_admin.disable_feature!(:auto_subscribe_account_calendars)
+        @root_account.account_calendar_visible = true
+        @root_account.save!
+        @user.set_preference(:enabled_account_calendars, [@root_account.id])
+
+        @associated_subaccount.account_calendar_subscription_type = "auto"
+        @associated_subaccount.save!
         expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@root_account.id)
       end
     end

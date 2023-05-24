@@ -34,8 +34,11 @@ module SIS
       def process(csv, index = nil, count = nil)
         SIS::AccountImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
-            importer.add_account(row["account_id"], row["parent_account_id"],
-                                 row["status"], row["name"], row["integration_id"])
+            importer.add_account(row["account_id"],
+                                 row["parent_account_id"],
+                                 row["status"],
+                                 row["name"],
+                                 row["integration_id"])
           rescue ImportError => e
             SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row["lineno"], row_info: row)
           end

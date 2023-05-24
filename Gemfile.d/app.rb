@@ -19,26 +19,20 @@
 
 # NOTE: Indented gems are meant to indicate optional dependencies of parent gems
 
-def gem_override(name, version)
-  if File.directory?("vendor/#{name}")
-    gem name, path: "vendor/#{name}"
-  else
-    gem name, version
-  end
-end
-
 gem "bootsnap", "1.13.0", require: false
 gem "rails", "~> 7.0.4"
 gem "tzinfo", "2.0.4"
-gem_override "switchman", "3.4.2"
+gem "switchman", "~> 3.5"
 gem "guardrail", "3.0.2"
-gem_override "switchman-inst-jobs", "4.0.13"
+gem "switchman-inst-jobs", "4.0.13"
 gem "irb", "1.4.1"
 
 gem "academic_benchmarks", "1.1.2", require: false
 gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
-gem "active_model_serializers", "0.9.0alpha1",
-    github: "rails-api/active_model_serializers", ref: "61882e1e4127facfe92e49057aec71edbe981829"
+gem "active_model_serializers",
+    "0.9.0alpha1",
+    github: "rails-api/active_model_serializers",
+    ref: "61882e1e4127facfe92e49057aec71edbe981829"
 gem "activerecord-pg-extensions", "0.4.4"
 gem "addressable", "~> 2.8", require: false
 gem "after_transaction_commit", "2.2.2"
@@ -72,7 +66,7 @@ gem "graphql", "1.12.14"
 gem "graphql-batch", "0.4.3"
 gem "hashery", "2.1.2", require: false
 gem "highline", "2.0.3", require: false
-gem "httparty", "0.18.1"
+gem "httparty", "~> 0.21"
 gem "i18n", "~> 1.12"
 gem "i18nliner", "0.2.2", github: "instructure/i18nliner", ref: "ruby3"
 gem "icalendar", "2.7.0", require: false
@@ -82,7 +76,7 @@ gem "rrule", "0.4.4", require: false
 
 gem "inst_access", "0.1.1"
 gem "inst_statsd", "2.2.0"
-gem_override "inst-jobs", "~> 3.1"
+gem "inst-jobs", "~> 3.1"
 gem "inst-jobs-autoscaling", "2.1.1"
 gem "inst-jobs-statsd", "2.2.0"
 # if updating json gem it will need to be hotfixed because if a newer version of
@@ -101,24 +95,26 @@ gem "net-ldap", "0.16.3", require: false
 gem "net-imap", "0.2.3", require: false
 gem "net-pop", "0.1.1", require: false
 gem "net-smtp", "0.3.1", require: false
-gem "nokogiri", "1.13.8", require: false
-gem "oauth", "0.5.4", require: false
+gem "nokogiri", "~> 1.13.8", require: false # 1.14 breaks nokogiri-xmlsec
+gem "oauth", "~> 1.1", require: false
 gem "oauth2", "1.4.4", require: false
 gem "oj", "3.10.16"
 gem "outrigger", "3.0.1"
+gem "parallel", "1.22.1", require: false
 gem "pdf-reader", "2.5.0"
 gem "pg_query", "2.2.0"
 gem "prawn-emoji", "~> 5.3", require: false
 gem "prawn-rails", "1.3.0"
   gem "matrix", "0.4.2" # Used to be a default gem but is no more, but prawn depends on it implicitly
 gem "prosopite", "~> 1.3"
-gem "rack", "2.2.3"
+gem "rack", "~> 2.2"
 gem "rack-brotli", "1.0.0"
 gem "rack-test", "1.1.0"
 gem "rake", "~> 13.0"
 gem "rails-observers", "0.1.5"
 gem "ratom-nokogiri", "0.10.11", require: false
-gem "redcarpet", "3.5.0", require: false
+gem "redcarpet", "~> 3.6", require: false
+gem "regexp_parser", "2.7.0", require: false
 gem "retriable", "1.4.1"
 gem "ritex", "1.0.1", require: false
 gem "rotp", "6.2.0", require: false
@@ -129,7 +125,7 @@ gem "rubycas-client", "2.3.9", require: false
 gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "2.3.0", require: "zip"
 gem "saml2", "3.1.2"
-gem "sanitize", "6.0.0", require: false
+gem "sanitize", "~> 6.0", require: false
 gem "sentry-ruby", "5.1.0"
 gem "sentry-rails", "5.1.0"
 gem "sentry-inst_jobs", "1.0.2"
@@ -138,8 +134,10 @@ gem "twilio-ruby", "5.36.0", require: false
 gem "vault", "0.15.0", require: false
 gem "vericite_api", "1.5.3"
 gem "wcag_color_contrast", "0.1.0"
-gem "week_of_month", "1.2.5",
-    github: "instructure/week-of-month", ref: "b3013639e9474f302b5a6f27e4e45313e8d24902"
+gem "week_of_month",
+    "1.2.5",
+    github: "instructure/week-of-month",
+    ref: "b3013639e9474f302b5a6f27e4e45313e8d24902"
 gem "will_paginate", "3.3.0", require: false # required for folio-pagination
 
 gem "faraday", "0.17.4"

@@ -54,8 +54,11 @@ describe UserLearningObjectScopes do
     context "as observer" do
       before do
         @observer = User.create
-        @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @section2,
-                                                                                    enrollment_state: "active", allow_multiple_enrollments: true)
+        @observer_enrollment = @course.enroll_user(@observer,
+                                                   "ObserverEnrollment",
+                                                   section: @section2,
+                                                   enrollment_state: "active",
+                                                   allow_multiple_enrollments: true)
       end
 
       context "observer watching student with visibility" do
@@ -522,10 +525,16 @@ describe UserLearningObjectScopes do
       @reviewee = course_with_student(course: @course, active_all: true).user
 
       add_section("section1")
-      @course.enroll_user(@reviewer, "StudentEnrollment",
-                          section: @course_section, enrollment_state: "active", allow_multiple_enrollments: true)
-      @course.enroll_user(@reviewee, "StudentEnrollment",
-                          section: @course_section, enrollment_state: "active", allow_multiple_enrollments: true)
+      @course.enroll_user(@reviewer,
+                          "StudentEnrollment",
+                          section: @course_section,
+                          enrollment_state: "active",
+                          allow_multiple_enrollments: true)
+      @course.enroll_user(@reviewee,
+                          "StudentEnrollment",
+                          section: @course_section,
+                          enrollment_state: "active",
+                          allow_multiple_enrollments: true)
 
       assignment_model(course: @course, peer_reviews: true)
 
@@ -553,8 +562,11 @@ describe UserLearningObjectScopes do
       # since the reviewee is no longer assigned @assignment, the reviewer should
       # have nothing to do.
       add_section("section2")
-      @course.enroll_user(@reviewer, "StudentEnrollment",
-                          section: @course_section, enrollment_state: "active", allow_multiple_enrollments: true)
+      @course.enroll_user(@reviewer,
+                          "StudentEnrollment",
+                          section: @course_section,
+                          enrollment_state: "active",
+                          allow_multiple_enrollments: true)
       override = @assignment.assignment_overrides.build
       override.set = @course_section
       override.save!
@@ -649,8 +661,12 @@ describe UserLearningObjectScopes do
       expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
 
       # but if we enroll the TA in both sections of course1, it should be accessible
-      @course1.enroll_user(@ta, "TaEnrollment", enrollment_state: "active", section: @section1b,
-                                                allow_multiple_enrollments: true, limit_privileges_to_course_section: true)
+      @course1.enroll_user(@ta,
+                           "TaEnrollment",
+                           enrollment_state: "active",
+                           section: @section1b,
+                           allow_multiple_enrollments: true,
+                           limit_privileges_to_course_section: true)
       @ta = User.find(@ta.id)
       expect(@ta.assignments_needing_grading.size).to be 2
       expect(@ta.assignments_needing_grading(scope_only: true).to_a.size).to be 2

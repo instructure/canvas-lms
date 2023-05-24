@@ -2613,7 +2613,8 @@ describe Submission do
         end
         let(:other_report) do
           OriginalityReport.create!(attachment: attachment,
-                                    submission: submission, workflow_state: other_state,
+                                    submission: submission,
+                                    workflow_state: other_state,
                                     originality_score: (other_state == "scored") ? 2 : nil)
         end
 
@@ -2917,9 +2918,11 @@ describe Submission do
             other_report
 
             expect(other_submission.attempt).to be > submission.attempt
-            expect(submission.originality_report_url(submission.asset_string, test_teacher,
+            expect(submission.originality_report_url(submission.asset_string,
+                                                     test_teacher,
                                                      submission.attempt.to_s)).to eq report_url
-            expect(submission.originality_report_url(submission.asset_string, test_teacher,
+            expect(submission.originality_report_url(submission.asset_string,
+                                                     test_teacher,
                                                      other_submission.attempt.to_s)).to eq(other_report_url)
           end
         end
@@ -2928,19 +2931,23 @@ describe Submission do
           let(:other_attachment) { attachment_model(filename: "submission-b.doc", context: test_student) }
           let(:other_report_url) { "http://another-report.com" }
           let(:other_report) do
-            OriginalityReport.create!(attachment: other_attachment, submission: submission,
-                                      originality_score: 0.4, originality_report_url: other_report_url)
+            OriginalityReport.create!(attachment: other_attachment,
+                                      submission: submission,
+                                      originality_score: 0.4,
+                                      originality_report_url: other_report_url)
           end
 
           it "considers all attachments in submission history valid" do
             Timecop.freeze(2.days.ago) do
-              assignment.submit_homework(test_student, submission_type: "online_upload",
-                                                       attachments: [attachment])
+              assignment.submit_homework(test_student,
+                                         submission_type: "online_upload",
+                                         attachments: [attachment])
             end
 
             Timecop.freeze(1.day.ago) do
-              assignment.submit_homework(test_student, submission_type: "online_upload",
-                                                       attachments: [other_attachment])
+              assignment.submit_homework(test_student,
+                                         submission_type: "online_upload",
+                                         attachments: [other_attachment])
             end
 
             originality_report
@@ -2952,8 +2959,9 @@ describe Submission do
           end
 
           it "gives the correct url for each attachment" do
-            assignment.submit_homework(test_student, submission_type: "online_upload",
-                                                     attachments: [attachment, other_attachment])
+            assignment.submit_homework(test_student,
+                                       submission_type: "online_upload",
+                                       attachments: [attachment, other_attachment])
             originality_report
             other_report
             expect(submission.originality_report_url(attachment.asset_string, test_teacher))
@@ -2966,14 +2974,16 @@ describe Submission do
           context "with some duplicate reports for an attachment" do
             let(:duplicate_url) { "http://duplicate.com" }
             let(:duplicate_report) do
-              OriginalityReport.create!(attachment: attachment, submission: submission,
+              OriginalityReport.create!(attachment: attachment,
+                                        submission: submission,
                                         workflow_state: "pending",
                                         originality_report_url: duplicate_url)
             end
 
             before do
-              assignment.submit_homework(test_student, submission_type: "online_upload",
-                                                       attachments: [attachment, other_attachment])
+              assignment.submit_homework(test_student,
+                                         submission_type: "online_upload",
+                                         attachments: [attachment, other_attachment])
             end
 
             it "uses the scored report's URL" do
@@ -3664,6 +3674,129 @@ describe Submission do
       expect(@submission.unread?(@user)).to be_truthy
     end
 
+    it "is read after submission is commented on by teacher and then teacher deletes comment (ff on)" do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      student = @user
+      submission = @assignment.submission_for_student(@student)
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+
+      comment = submission.submission_comments.first
+
+      expect do
+        comment.updating_user = @current_user
+        comment.destroy!
+      end.to change { SubmissionComment.count }.from(1).to(0)
+
+      expect(submission.read?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 0
+    end
+
+    it "is read after submission is commented on twice by teacher and then teacher deletes the first comment" do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      student = @user
+      submission = @assignment.submission_for_student(student)
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+
+      comment = submission.submission_comments.first
+
+      expect do
+        comment.updating_user = @current_user
+        comment.destroy!
+      end.to change { SubmissionComment.count }.from(2).to(1)
+
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+    end
+
+    it "is read after submission is commented on by teacher, student views comment, teacher comments again, and then teacher deletes the not viewed comment" do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      student = @user
+      submission = @assignment.submission_for_student(student)
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+
+      submission.mark_submission_comments_read(student)
+      submission.mark_item_read("comment")
+      expect(submission.read?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 0
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+      expect(submission.unread?(student)).to be_truthy
+
+      comment = submission.submission_comments[1]
+
+      expect do
+        comment.updating_user = @current_user
+        comment.destroy!
+      end.to change { SubmissionComment.count }.from(2).to(1)
+
+      expect(submission.read?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 0
+    end
+
+    it "is unread after submission is commented on by teacher, student views comment, teacher comments again, and then teacher deletes the viewed comment" do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      student = @user
+      submission = @assignment.submission_for_student(student)
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+
+      submission.mark_submission_comments_read(student)
+      submission.mark_item_read("comment")
+      expect(submission.read?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: @student.id).first
+      expect(content_participation_count.unread_count).to eq 0
+
+      submission.add_comment(author: @teacher, comment: "some comment")
+      expect(submission.unread?(student)).to be_truthy
+
+      comment = submission.submission_comments.first
+
+      expect do
+        comment.updating_user = @current_user
+        comment.destroy!
+      end.to change { SubmissionComment.count }.from(2).to(1)
+
+      expect(submission.unread?(student)).to be_truthy
+
+      content_participation_count = ContentParticipationCount.where(user_id: student.id).first
+      expect(content_participation_count.unread_count).to eq 1
+    end
+
     it "is read if other submission fields change" do
       @submission = @assignment.submit_homework(@user)
       @submission.workflow_state = "graded"
@@ -3930,6 +4063,32 @@ describe Submission do
       @submission.submitted_at = 1.day.ago
       @submission.cached_due_date = 2.days.ago
       expect(@submission).to be_late
+    end
+  end
+
+  describe "scope: not_submitted_or_graded" do
+    before do
+      @assignment = @course.assignments.create!(submission_types: "online_text_entry")
+      @submission = @assignment.submissions.find_by(user: @student)
+    end
+
+    it "includes submissions where the student has not submitted and has not been graded" do
+      expect(Submission.not_submitted_or_graded).to include @submission
+    end
+
+    it "excludes submissions where the student has submitted" do
+      @assignment.submit_homework(@student, body: "hi")
+      expect(Submission.not_submitted_or_graded).not_to include @submission
+    end
+
+    it "excludes submissions where the student has been graded" do
+      @assignment.grade_student(@student, grader: @teacher, grade: 10)
+      expect(Submission.not_submitted_or_graded).not_to include @submission
+    end
+
+    it "excludes excused submissions" do
+      @assignment.grade_student(@student, grader: @teacher, excused: true)
+      expect(Submission.not_submitted_or_graded).not_to include @submission
     end
   end
 
@@ -4781,8 +4940,9 @@ describe Submission do
         student_in_course(active_all: true)
         attachments = [attachment_model(filename: "submission-a.doc", context: @student)]
         Timecop.freeze(10.seconds.ago) do
-          @assignment.submit_homework(@student, submission_type: "online_upload",
-                                                attachments: [attachments[0]])
+          @assignment.submit_homework(@student,
+                                      submission_type: "online_upload",
+                                      attachments: [attachments[0]])
         end
 
         attachments << attachment_model(filename: "submission-b.doc", context: @student)
@@ -5162,7 +5322,10 @@ describe Submission do
 
     it "maintains grade when only updating comments" do
       @a1.grade_student(@u1, grade: 3, grader: @teacher)
-      Submission.process_bulk_update(@progress, @course, nil, @teacher,
+      Submission.process_bulk_update(@progress,
+                                     @course,
+                                     nil,
+                                     @teacher,
                                      {
                                        @a1.id => {
                                          @u1.id => { text_comment: "comment" }
@@ -5174,7 +5337,10 @@ describe Submission do
 
     it "nils grade when receiving empty posted_grade" do
       @a1.grade_student(@u1, grade: 3, grader: @teacher)
-      Submission.process_bulk_update(@progress, @course, nil, @teacher,
+      Submission.process_bulk_update(@progress,
+                                     @course,
+                                     nil,
+                                     @teacher,
                                      {
                                        @a1.id => {
                                          @u1.id => { posted_grade: nil }
@@ -5201,7 +5367,10 @@ describe Submission do
     end
 
     it "does not update grader_id if submission is blank or missing with -" do
-      Submission.process_bulk_update(@progress, @course, nil, @teacher,
+      Submission.process_bulk_update(@progress,
+                                     @course,
+                                     nil,
+                                     @teacher,
                                      {
                                        @a1.id => {
                                          @u1.id => { posted_grade: nil }
@@ -7457,16 +7626,18 @@ describe Submission do
 
   describe "#plagiarism_service_to_use" do
     it "returns nil when no service is configured" do
-      submission = @assignment.submit_homework(@student, submission_type: "online_text_entry",
-                                                         body: "whee")
+      submission = @assignment.submit_homework(@student,
+                                               submission_type: "online_text_entry",
+                                               body: "whee")
 
       expect(submission.plagiarism_service_to_use).to be_nil
     end
 
     it "returns :turnitin when only turnitin is configured" do
       setup_account_for_turnitin(@context.account)
-      submission = @assignment.submit_homework(@student, submission_type: "online_text_entry",
-                                                         body: "whee")
+      submission = @assignment.submit_homework(@student,
+                                               submission_type: "online_text_entry",
+                                               body: "whee")
 
       expect(submission.plagiarism_service_to_use).to eq(:turnitin)
     end
@@ -7475,8 +7646,9 @@ describe Submission do
       plugin = Canvas::Plugin.find(:vericite)
       PluginSetting.create!(name: plugin.id, settings: plugin.default_settings, disabled: false)
 
-      submission = @assignment.submit_homework(@student, submission_type: "online_text_entry",
-                                                         body: "whee")
+      submission = @assignment.submit_homework(@student,
+                                               submission_type: "online_text_entry",
+                                               body: "whee")
 
       expect(submission.plagiarism_service_to_use).to eq(:vericite)
     end
@@ -7486,8 +7658,9 @@ describe Submission do
       plugin = Canvas::Plugin.find(:vericite)
       PluginSetting.create!(name: plugin.id, settings: plugin.default_settings, disabled: false)
 
-      submission = @assignment.submit_homework(@student, submission_type: "online_text_entry",
-                                                         body: "whee")
+      submission = @assignment.submit_homework(@student,
+                                               submission_type: "online_text_entry",
+                                               body: "whee")
 
       expect(submission.plagiarism_service_to_use).to eq(:vericite)
     end
@@ -7498,8 +7671,9 @@ describe Submission do
       plugin = Canvas::Plugin.find(:vericite)
       PluginSetting.create!(name: plugin.id, settings: plugin.default_settings, disabled: false)
 
-      submission = @assignment.submit_homework(@student, submission_type: "online_text_entry",
-                                                         body: "whee")
+      submission = @assignment.submit_homework(@student,
+                                               submission_type: "online_text_entry",
+                                               body: "whee")
 
       expect(submission).to receive(:submit_to_plagiarism_later).once
       submission.resubmit_to_vericite

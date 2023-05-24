@@ -149,8 +149,11 @@ module Importers
       end
 
       if (id = hash["assessment_question_id"])
-        AssessmentQuestion.where(id: id).update_all(name: hash[:question_name], question_data: hash,
-                                                    workflow_state: "active", created_at: Time.now.utc, updated_at: Time.now.utc,
+        AssessmentQuestion.where(id: id).update_all(name: hash[:question_name],
+                                                    question_data: hash,
+                                                    workflow_state: "active",
+                                                    created_at: Time.now.utc,
+                                                    updated_at: Time.now.utc,
                                                     assessment_question_bank_id: bank.id)
       else
         sql = <<~SQL.squish
@@ -162,8 +165,11 @@ module Importers
           [sql, hash[:question_name], hash.to_yaml, Time.now.utc, Time.now.utc, bank.id, hash[:migration_id], bank.root_account_id]
         )
         GuardRail.activate(:primary) do
-          id = AssessmentQuestion.connection.insert(query, "#{name} Create",
-                                                    AssessmentQuestion.primary_key, nil, AssessmentQuestion.sequence_name)
+          id = AssessmentQuestion.connection.insert(query,
+                                                    "#{name} Create",
+                                                    AssessmentQuestion.primary_key,
+                                                    nil,
+                                                    AssessmentQuestion.sequence_name)
           hash["assessment_question_id"] = id
         end
       end

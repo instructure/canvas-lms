@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
+import PropTypes, {InferType} from 'prop-types'
 import {trayPropTypes} from './plugins/shared/CanvasContentTray'
 import {PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW, WYSIWYG_VIEW} from './StatusBar'
 
@@ -39,6 +39,8 @@ export const toolbarPropType = PropTypes.arrayOf(
   })
 )
 
+export type ToolbarPropType = InferType<typeof toolbarPropType>
+
 export const menuPropType = PropTypes.objectOf(
   // the key is the name of the menu item a plugin has
   // registered with tinymce. If it does not exist in the
@@ -52,6 +54,8 @@ export const menuPropType = PropTypes.objectOf(
     items: PropTypes.string.isRequired,
   })
 )
+
+export type MenuPropType = InferType<typeof menuPropType>
 
 export const ltiToolsPropType = PropTypes.arrayOf(
   PropTypes.shape({
@@ -67,9 +71,19 @@ export const ltiToolsPropType = PropTypes.arrayOf(
     height: PropTypes.number,
     width: PropTypes.number,
     use_tray: PropTypes.bool,
-    canvas_icon_class: PropTypes.string,
+    canvas_icon_class: PropTypes.oneOfType([
+      PropTypes.string,
+
+      // Sometimes this is an object with an icon_url. Not sure why, see MAT-1354
+      PropTypes.shape({
+        icon_url: PropTypes.string,
+      }),
+      PropTypes.any,
+    ]),
   })
 )
+
+export type LtiToolsPropType = InferType<typeof ltiToolsPropType>
 
 export const editorOptionsPropType = PropTypes.shape({
   // height of the RCE.
@@ -89,7 +103,12 @@ export const editorOptionsPropType = PropTypes.shape({
   plugins: PropTypes.arrayOf(PropTypes.string),
   // is this RCE readonly?
   readonly: PropTypes.bool,
+
+  selector: PropTypes.string,
+  init_instance_callback: PropTypes.func,
 })
+
+export type EditorOptionsPropType = InferType<typeof editorOptionsPropType>
 
 export const externalToolsConfigPropType = PropTypes.shape({
   // List of iframe allow statements to used with LTI iframes.
@@ -104,6 +123,8 @@ export const externalToolsConfigPropType = PropTypes.shape({
   isA2StudentView: PropTypes.bool,
   maxMruTools: PropTypes.number,
 })
+
+export type ExternalToolsConfigPropType = InferType<typeof externalToolsConfigPropType>
 
 export const rceWrapperPropTypes = {
   autosave: PropTypes.shape({

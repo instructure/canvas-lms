@@ -83,9 +83,11 @@ class AssessmentRequest < ActiveRecord::Base
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where("NOT EXISTS (?)",
-          Ignore.where("asset_id=assessment_requests.id")
-              .where(asset_type: "AssessmentRequest", user_id: user, purpose: purpose))
+    where.not(
+      Ignore.where("asset_id=assessment_requests.id")
+          .where(asset_type: "AssessmentRequest", user_id: user, purpose: purpose)
+          .arel.exists
+    )
   }
 
   set_policy do

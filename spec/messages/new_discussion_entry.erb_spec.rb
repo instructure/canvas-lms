@@ -57,13 +57,19 @@ describe "new_discussion_entry" do
 
       before :once do
         @user = user_model(name: "Chawn Neal")
-        @object = anonymous_topic.discussion_entries.create!(user: @user)
+        @anon_object = anonymous_topic.discussion_entries.create!(user: @user)
       end
 
       it "does not render user name" do
-        msg = generate_message(notification_name, path_type, @object)
+        msg = generate_message(notification_name, path_type, @anon_object)
         expect(msg.body).to match(/Anonymous\s\w+\sreplied\sto/)
         expect(msg.body).not_to include(@user.short_name)
+        expect(msg.html_body).to match(/Anonymous\s\w+\sreplied\sto/)
+        expect(msg.html_body).not_to include(@user.short_name)
+
+        message = message_model(context: @anon_object, notification_name: "New Discussion Entry")
+        expect(message.from_name).to start_with("Anonymous ")
+        expect(message.reply_to_name).to start_with("Anonymous ")
       end
     end
   end

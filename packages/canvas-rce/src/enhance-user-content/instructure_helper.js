@@ -89,7 +89,7 @@ export function showFilePreviewInOverlay(event, canvasOrigin) {
   } else if (event.currentTarget?.href) {
     target = event.currentTarget
   }
-  const matches = target?.href.match(/\/files\/(\d+)/)
+  const matches = target?.href.match(/\/files\/(\d+~\d+|\d+)/)
   if (matches) {
     if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
       // if any modifier keys are pressed, do the browser default thing

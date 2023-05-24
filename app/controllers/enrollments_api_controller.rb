@@ -510,14 +510,16 @@ class EnrollmentsApiController < ApplicationController
         if use_bookmarking?
           enrollments = enrollments.select("users.sortable_name AS sortable_name")
           bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment,
-                                                                  { type: { skip_collation: true }, sortable_name: { type: :string, null: false } }, :id)
+                                                                  { type: { skip_collation: true }, sortable_name: { type: :string, null: false } },
+                                                                  :id)
           ShardedBookmarkedCollection.build(bookmarker, enrollments, always_use_bookmarks: true)
         else
           enrollments.order(:type, User.sortable_name_order_by_clause("users"), :id)
         end
       enrollments = Api.paginate(
         collection,
-        self, send("api_v1_#{endpoint_scope}_enrollments_url")
+        self,
+        send("api_v1_#{endpoint_scope}_enrollments_url")
       )
 
       ActiveRecord::Associations.preload(enrollments, %i[user course course_section root_account sis_pseudonym])
@@ -527,8 +529,11 @@ class EnrollmentsApiController < ApplicationController
       user_json_preloads(enrollments.map(&:user), false, { group_memberships: include_group_ids })
 
       render json: enrollments.map { |e|
-        enrollment_json(e, @current_user, session, includes: includes,
-                                                   opts: { grading_period: grading_period })
+        enrollment_json(e,
+                        @current_user,
+                        session,
+                        includes: includes,
+                        opts: { grading_period: grading_period })
       }
     end
   end

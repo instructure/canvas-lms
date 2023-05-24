@@ -39,11 +39,15 @@ class DropOldCollationKeyIndexes < ActiveRecord::Migration[5.0]
     collkey = connection.extension(:pg_collkey)&.schema
     return unless collkey
 
-    add_index :attachments, "folder_id, file_state, #{collkey}.collkey(display_name, 'root', false, 0, true)",
-              algorithm: :concurrently, name: :index_attachments_on_folder_id_and_file_state_and_display_name1,
+    add_index :attachments,
+              "folder_id, file_state, #{collkey}.collkey(display_name, 'root', false, 0, true)",
+              algorithm: :concurrently,
+              name: :index_attachments_on_folder_id_and_file_state_and_display_name1,
               where: "folder_id IS NOT NULL"
 
-    add_index :users, "#{collkey}.collkey(sortable_name, 'root', false, 0, true)",
-              algorithm: :concurrently, name: :index_users_on_sortable_name_old
+    add_index :users,
+              "#{collkey}.collkey(sortable_name, 'root', false, 0, true)",
+              algorithm: :concurrently,
+              name: :index_users_on_sortable_name_old
   end
 end

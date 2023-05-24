@@ -29,8 +29,9 @@ module Lti
     let(:service_name) { SubmissionsApiController::SUBMISSION_SERVICE }
 
     let(:submission) do
-      assignment.submit_homework(student, submission_type: "online_upload",
-                                          attachments: [attachment])
+      assignment.submit_homework(student,
+                                 submission_type: "online_upload",
+                                 attachments: [attachment])
     end
 
     let(:mock_file) do
@@ -216,8 +217,9 @@ module Lti
       it "sends back versioned attachments" do
         attachments = [attachment_model(filename: "submission-a.doc", context: student)]
         Timecop.freeze(10.seconds.ago) do
-          assignment.submit_homework(student, submission_type: "online_upload",
-                                              attachments: [attachments[0]])
+          assignment.submit_homework(student,
+                                     submission_type: "online_upload",
+                                     attachments: [attachments[0]])
         end
 
         attachments << attachment_model(filename: "submission-b.doc", context: student)

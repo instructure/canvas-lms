@@ -408,8 +408,18 @@ class SisImportsApiController < ApplicationController
         scope = scope.where("created_at < ?", created_before)
       end
 
-      state = Array(params[:workflow_state]) & %w[initializing created importing cleanup_batch imported imported_with_messages
-                                                  aborted failed failed_with_messages restoring partially_restored restored]
+      state = Array(params[:workflow_state]) & %w[initializing
+                                                  created
+                                                  importing
+                                                  cleanup_batch
+                                                  imported
+                                                  imported_with_messages
+                                                  aborted
+                                                  failed
+                                                  failed_with_messages
+                                                  restoring
+                                                  partially_restored
+                                                  restored]
       scope = scope.where(workflow_state: state) if state.present?
 
       # we don't need to know how many there are

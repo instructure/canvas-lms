@@ -71,31 +71,35 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   def self.debugging_keys
     [{
       debugging: -> { t("Testing state") },
-    }, {
-      request_id: -> { t("Request ID") },
-      to_idp_url: -> { t("LoginRequest encoded URL") },
-      to_idp_xml: -> { t("LoginRequest XML sent to IdP") },
-    }, {
-      idp_in_response_to: -> { t("IdP InResponseTo") },
-      idp_login_destination: -> { t("IdP LoginResponse destination") },
-      is_valid_login_response: -> { t("Canvas thinks response is valid") },
-      login_response_validation_error: -> { t("Validation Error") },
-      login_to_canvas_success: -> { t("User succesfully logged into Canvas") },
-      canvas_login_fail_message: -> { t("Canvas Login failure message") },
-      logged_in_user_id: -> { t("Logged in user id") },
-      idp_response_encoded: -> { t("IdP LoginResponse encoded") },
-      idp_response_xml_encrypted: -> { t("IdP LoginResponse encrypted") },
-      idp_response_xml_decrypted: -> { t("IdP LoginResponse Decrypted") },
-    }, {
-      logout_request_id: -> { t("Logout request id") },
-      logout_to_idp_url: -> { t("LogoutRequest encoded URL") },
-      logout_to_idp_xml: -> { t("LogoutRequest XML sent to IdP") },
-    }, {
-      idp_logout_in_response_to: -> { t("IdP Logout InResponseTo") },
-      idp_logout_destination: -> { t("IdP LogoutResponse Destination") },
-      idp_logout_response_encoded: -> { t("IdP LogoutResponse encoded") },
-      idp_logout_response_xml_encrypted: -> { t("IdP LogoutResponse XML") },
-    }]
+    },
+     {
+       request_id: -> { t("Request ID") },
+       to_idp_url: -> { t("LoginRequest encoded URL") },
+       to_idp_xml: -> { t("LoginRequest XML sent to IdP") },
+     },
+     {
+       idp_in_response_to: -> { t("IdP InResponseTo") },
+       idp_login_destination: -> { t("IdP LoginResponse destination") },
+       is_valid_login_response: -> { t("Canvas thinks response is valid") },
+       login_response_validation_error: -> { t("Validation Error") },
+       login_to_canvas_success: -> { t("User succesfully logged into Canvas") },
+       canvas_login_fail_message: -> { t("Canvas Login failure message") },
+       logged_in_user_id: -> { t("Logged in user id") },
+       idp_response_encoded: -> { t("IdP LoginResponse encoded") },
+       idp_response_xml_encrypted: -> { t("IdP LoginResponse encrypted") },
+       idp_response_xml_decrypted: -> { t("IdP LoginResponse Decrypted") },
+     },
+     {
+       logout_request_id: -> { t("Logout request id") },
+       logout_to_idp_url: -> { t("LogoutRequest encoded URL") },
+       logout_to_idp_xml: -> { t("LogoutRequest XML sent to IdP") },
+     },
+     {
+       idp_logout_in_response_to: -> { t("IdP Logout InResponseTo") },
+       idp_logout_destination: -> { t("IdP LogoutResponse Destination") },
+       idp_logout_response_encoded: -> { t("IdP LogoutResponse encoded") },
+       idp_logout_response_xml_encrypted: -> { t("IdP LogoutResponse XML") },
+     }]
   end
 
   SENSITIVE_PARAMS = [:metadata].freeze
@@ -168,7 +172,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
         entity = federation.metadata[idp_entity_id]
         unless entity
           errors.add(:idp_entity_id, t("Entity %{entity_id} not found in %{federation_name} Metadata",
-                                       entity_id: idp_entity_id, federation_name: federation.class_name))
+                                       entity_id: idp_entity_id,
+                                       federation_name: federation.class_name))
           return
         end
         populate_from_metadata(entity)

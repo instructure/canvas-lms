@@ -37,7 +37,8 @@ module Types
     class GradesEnrollmentFilterInputType < Types::BaseInputObject
       graphql_name "GradesEnrollmentFilter"
 
-      argument :enrollment_ids, [ID],
+      argument :enrollment_ids,
+               [ID],
                "only include users with the given enrollment ids",
                prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Enrollment"),
                required: false

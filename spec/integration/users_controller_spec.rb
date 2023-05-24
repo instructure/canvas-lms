@@ -172,8 +172,10 @@ describe UsersController do
       student_in_course(account: @account)
 
       role = custom_account_role("custom", account: @account)
-      RoleOverride.create!(context: @account, permission: "read_roster",
-                           role: role, enabled: true)
+      RoleOverride.create!(context: @account,
+                           permission: "read_roster",
+                           role: role,
+                           enabled: true)
       @account.account_users.create!(user: user_factory, role: role)
       user_session(@user)
 
@@ -185,8 +187,10 @@ describe UsersController do
       account_model
       student_in_course(account: @account)
       role = custom_account_role("custom", account: @account)
-      RoleOverride.create!(context: @account, permission: "read_roster",
-                           role: role, enabled: true)
+      RoleOverride.create!(context: @account,
+                           permission: "read_roster",
+                           role: role,
+                           enabled: true)
       @account.account_users.create!(user: user_factory, role: role)
       user_session(@user)
 

@@ -77,8 +77,11 @@ module Canvas
     alias_method :user, :scope
     alias_method :current_user, :user
 
-    def_delegators :@controller, :polymorphic_url,
-                   :accepts_jsonapi?, :session, :context
+    def_delegators :@controller,
+                   :polymorphic_url,
+                   :accepts_jsonapi?,
+                   :session,
+                   :context
 
     # See ActiveModel::Serializer's documentation for options.
     #

@@ -205,7 +205,9 @@ class MessageableUser < User
             #{User.sortable_name_order_by_clause} > ? OR
             #{User.sortable_name_order_by_clause} = ? AND users.id > ?
           SQL
-          name, name, id
+          name,
+          name,
+          id
         ]
 
         if pager.include_bookmark

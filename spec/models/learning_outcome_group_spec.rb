@@ -379,16 +379,19 @@ describe LearningOutcomeGroup do
                                groups: [{
                                  title: "Group D",
                                  outcomes: 1
-                               }, {
-                                 title: "Group E",
-                                 outcomes: 1
-                               }]
+                               },
+                                        {
+                                          title: "Group E",
+                                          outcomes: 1
+                                        }]
                              }]
-                           }, Account.default)
+                           },
+                           Account.default)
 
       group_a = LearningOutcomeGroup.find_by(title: "Group A")
       @course_group_a = LearningOutcomeGroup.create!(
-        title: "Group A", context: @course,
+        title: "Group A",
+        context: @course,
         source_outcome_group: group_a
       )
     end
@@ -397,7 +400,8 @@ describe LearningOutcomeGroup do
       assert_tree_exists([{
                            title: "Group A",
                            outcomes: []
-                         }], @root)
+                         }],
+                         @root)
 
       @course_group_a.sync_source_group
 
@@ -410,12 +414,14 @@ describe LearningOutcomeGroup do
                              groups: [{
                                title: "Group D",
                                outcomes: ["0 Group D outcome"]
-                             }, {
-                               title: "Group E",
-                               outcomes: ["0 Group E outcome"]
-                             }]
+                             },
+                                      {
+                                        title: "Group E",
+                                        outcomes: ["0 Group E outcome"]
+                                      }]
                            }]
-                         }], @root)
+                         }],
+                         @root)
     end
 
     it "restore previous deleted group" do

@@ -48,8 +48,17 @@ class ContextModulesController < ApplicationController
     def modules_cache_key
       @modules_cache_key ||= begin
         visible_assignments = @current_user.try(:assignment_and_quiz_visibilities, @context)
-        cache_key_items = [@context.cache_key, @can_view, @can_add, @can_edit, @can_delete, @is_student, @can_view_unpublished, "all_context_modules_draft_10",
-                           collection_cache_key(@modules), Time.zone, Digest::SHA256.hexdigest([visible_assignments, @section_visibility].join("/"))]
+        cache_key_items = [@context.cache_key,
+                           @can_view,
+                           @can_add,
+                           @can_edit,
+                           @can_delete,
+                           @is_student,
+                           @can_view_unpublished,
+                           "all_context_modules_draft_10",
+                           collection_cache_key(@modules),
+                           Time.zone,
+                           Digest::SHA256.hexdigest([visible_assignments, @section_visibility].join("/"))]
         cache_key = cache_key_items.join("/")
         cache_key = add_menu_tools_to_cache_key(cache_key)
         add_mastery_paths_to_cache_key(cache_key, @context, @current_user)
@@ -96,8 +105,10 @@ class ContextModulesController < ApplicationController
       ]
       tools = GuardRail.activate(:secondary) do
         Lti::ContextToolFinder.new(
-          @context, placements: placements,
-                    root_account: @domain_root_account, current_user: @current_user
+          @context,
+          placements: placements,
+          root_account: @domain_root_account,
+          current_user: @current_user
         ).all_tools_sorted_array
       end
 
@@ -407,7 +418,8 @@ class ContextModulesController < ApplicationController
       submitted_assignment_ids = if @current_user && assignment_ids.any?
                                    assignments_key = Digest::SHA256.hexdigest(assignment_ids.sort.join(","))
                                    Rails.cache.fetch_with_batched_keys("submitted_assignment_ids/#{assignments_key}",
-                                                                       batch_object: @current_user, batched_keys: :submissions) do
+                                                                       batch_object: @current_user,
+                                                                       batched_keys: :submissions) do
                                      @current_user.submissions.shard(@context.shard)
                                                   .having_submission.where(assignment_id: assignment_ids).pluck(:assignment_id)
                                    end
@@ -420,11 +432,15 @@ class ContextModulesController < ApplicationController
       submitted_quiz_ids ||= []
       all_tags.each do |tag|
         info[tag.id] = if tag.can_have_assignment? && tag.assignment
-                         tag.assignment.context_module_tag_info(@current_user, @context,
-                                                                user_is_admin: user_is_admin, has_submission: submitted_assignment_ids.include?(tag.assignment.id))
+                         tag.assignment.context_module_tag_info(@current_user,
+                                                                @context,
+                                                                user_is_admin: user_is_admin,
+                                                                has_submission: submitted_assignment_ids.include?(tag.assignment.id))
                        elsif tag.content_type_quiz?
-                         tag.content.context_module_tag_info(@current_user, @context,
-                                                             user_is_admin: user_is_admin, has_submission: submitted_quiz_ids.include?(tag.content.id))
+                         tag.content.context_module_tag_info(@current_user,
+                                                             @context,
+                                                             user_is_admin: user_is_admin,
+                                                             has_submission: submitted_quiz_ids.include?(tag.content.id))
                        else
                          { points_possible: nil, due_date: nil }
                        end
@@ -827,8 +843,13 @@ class ContextModulesController < ApplicationController
   end
 
   def context_module_params
-    params.require(:context_module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade, :requirement_count,
-                                           completion_requirements: strong_anything, prerequisites: strong_anything)
+    params.require(:context_module).permit(:name,
+                                           :unlock_at,
+                                           :require_sequential_progress,
+                                           :publish_final_grade,
+                                           :requirement_count,
+                                           completion_requirements: strong_anything,
+                                           prerequisites: strong_anything)
   end
 
   def update_module_link_default_tab(tag)

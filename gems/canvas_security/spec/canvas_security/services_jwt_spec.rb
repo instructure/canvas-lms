@@ -320,7 +320,7 @@ module CanvasSecurity
       it "has secrets accessors" do
         expect(ServicesJwt.encryption_secret).to eq(fake_encryption_secret)
         expect(ServicesJwt.signing_secret).to eq(fake_signing_secret)
-        expect(ServicesJwt.previous_signing_secret).to eq(fake_deprecated_signing_secret)
+        expect(ServicesJwt.previous_signing_secret).to eq(fake_signing_secret_deprecated)
       end
 
       it "defers direct secrets access to the security module" do
@@ -332,7 +332,7 @@ module CanvasSecurity
         it "can decode tokens built with either key" do
           user_id = 84
           base64_encoded_wrapper_new_key = build_wrapped_token(user_id, encoding_secret: fake_signing_secret)
-          base64_encoded_wrapper_old_key = build_wrapped_token(user_id, encoding_secret: fake_deprecated_signing_secret)
+          base64_encoded_wrapper_old_key = build_wrapped_token(user_id, encoding_secret: fake_signing_secret_deprecated)
           base64_encoded_wrapper_non_key = build_wrapped_token(user_id, encoding_secret: "aint-a-used-secret-but-ok-length")
           jwt_new_key = ServicesJwt.new(base64_encoded_wrapper_new_key)
           jwt_old_key = ServicesJwt.new(base64_encoded_wrapper_old_key)

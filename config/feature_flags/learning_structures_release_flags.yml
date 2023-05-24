@@ -37,7 +37,7 @@ course_paces:
     wrapper: <a href="https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing">\1</a>
     course_paces_description: |-
       Course Pacing adds support for rolling enrollments to Canvas;
-      allowing magical distribution of due dates for students with different
+      automatically distributing due dates for students with different
       start dates based on an instructor's defined pace. Learn more and give
       feedback by joining the *Course Pacing User Group*.
   applies_to: Account
@@ -58,13 +58,6 @@ create_course_subaccount_picker:
     "Manually Created Courses" sub-account, when enabled, this feature allows
     people who can manually create courses to put those courses into any sub-account
     where they have enrollments.
-account_calendar_events:
-  applies_to: SiteAdmin
-  state: hidden
-  display_name: Account-level calendars
-  description: |-
-    Allows admins to create events in root- and sub-account calendars that everyone in
-    the account can see.
 submission_feedback_indicators:
   state: allowed
   applies_to: RootAccount
@@ -122,3 +115,13 @@ k5_font_selection:
     Adds an account setting to select the classic (Lato) or elementary (Balsamiq Sans) font in Canvas for Elementary
     accounts.
   applies_to: SiteAdmin
+auto_subscribe_account_calendars:
+  state: hidden
+  display_name: 'Allow auto-subscription to account calendars'
+  description: Allow admins to configure subscription preferences on account calendars.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on

@@ -145,8 +145,20 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
     ([login_attribute] + federated_attributes.map { |_canvas_attribute, details| details["attribute"] }).uniq
   end
 
-  PROFILE_CLAIMS = %w[name family_name given_name middle_name nickname preferred_username
-                      profile picture website gender birthdate zoneinfo locale updated_at].freeze
+  PROFILE_CLAIMS = %w[name
+                      family_name
+                      given_name
+                      middle_name
+                      nickname
+                      preferred_username
+                      profile
+                      picture
+                      website
+                      gender
+                      birthdate
+                      zoneinfo
+                      locale
+                      updated_at].freeze
   def scope_for_options
     result = (scope || "").split
 

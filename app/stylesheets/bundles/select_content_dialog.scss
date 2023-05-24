@@ -48,7 +48,7 @@
         }
         &.resource_selection {
           .name {
-            margin-#{direction(right)}: 20px;
+            padding-#{direction(right)}: 20px;
             background: url(/images/find.png) no-repeat right center;
           }
         }

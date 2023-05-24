@@ -603,14 +603,18 @@ class ContentExport < ActiveRecord::Base
   scope :course_copy, -> { where(export_type: COURSE_COPY) }
   scope :running, -> { where(workflow_state: ["created", "exporting"]) }
   scope :admin, lambda { |user|
-    where("content_exports.export_type NOT IN (?) OR content_exports.user_id=?", [
+    where("content_exports.export_type NOT IN (?) OR content_exports.user_id=?",
+          [
             ZIP, USER_DATA
-          ], user)
+          ],
+          user)
   }
   scope :non_admin, lambda { |user|
-    where("content_exports.export_type IN (?) AND content_exports.user_id=?", [
+    where("content_exports.export_type IN (?) AND content_exports.user_id=?",
+          [
             ZIP, USER_DATA
-          ], user)
+          ],
+          user)
   }
   scope :without_epub, -> { eager_load(:epub_export).where(epub_exports: { id: nil }) }
   scope :expired, lambda {

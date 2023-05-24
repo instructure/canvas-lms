@@ -25,7 +25,7 @@ import {
   observedUserId,
   observedUserContextCodes,
   buildURL,
-  getContextCodesFromState
+  getContextCodesFromState,
 } from '../apiUtils'
 
 const courses = [
@@ -33,8 +33,8 @@ const courses = [
     id: '1',
     shortName: 'blah',
     image: 'blah_url',
-    color: '#abffaa'
-  }
+    color: '#abffaa',
+  },
 ]
 const groups = [
   {
@@ -42,8 +42,8 @@ const groups = [
     assetString: 'group_9',
     name: 'group9',
     color: '#ffeeee',
-    url: '/groups/9'
-  }
+    url: '/groups/9',
+  },
 ]
 
 const addContextInfo = resp =>
@@ -51,7 +51,7 @@ const addContextInfo = resp =>
     ? {
         context_name: `course name for course id ${resp.course_id}`,
         context_image: `https://example.com/course/${resp.course_id}/image`,
-        ...resp
+        ...resp,
       }
     : resp
 
@@ -69,7 +69,7 @@ function makeApiResponse(overrides = {}, assignmentOverrides = {}) {
     submissions: false,
     new_activity: false,
     plannable_date: '2018-03-27T18:58:51Z',
-    ...overrides
+    ...overrides,
   })
 }
 
@@ -84,7 +84,7 @@ function makePlannerNoteApiResponse(overrides = {}) {
     workflow_state: 'active',
     created_at: '2017-06-21T18:58:57Z',
     updated_at: '2017-06-21T18:58:57Z',
-    ...overrides
+    ...overrides,
   })
 }
 
@@ -96,7 +96,7 @@ function makePlannerNote(overrides = {}) {
     details: 'Some To Do Note Details :)',
     user_id: '1',
     course_id: '1',
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -108,7 +108,8 @@ function makeAssignment(overrides = {}) {
     created_at: '2017-05-15T14:36:03Z',
     updated_at: '2017-05-15T16:20:35Z',
     title: '',
-    ...overrides
+    restrict_quantitative_data: false,
+    ...overrides,
   }
 }
 
@@ -118,7 +119,7 @@ function makeDiscussionTopic(overrides = {}) {
     title: '',
     assignment_id: 9,
     unread_count: 0,
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -129,7 +130,7 @@ function makeGradedDiscussionTopic(overrides = {}) {
     assignment_id: 10,
     due_at: '2017-05-15T16:32:34Z',
     unread_count: 0,
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -141,7 +142,7 @@ function makeWikiPage(overrides = {}) {
     url: 'wiki-page-title',
     todo_date: '2017-06-16 10:08:00Z',
     updated_at: '2017-06-16 10:08:00Z',
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -155,13 +156,13 @@ function makeCalendarEvent(overrides = {}) {
     start_at: '2018-05-04 19:00:00Z',
     description: 'calendar event description',
     all_day: false,
-    ...overrides
+    ...overrides,
   }
 }
 
 function makeAssessmentRequest(_overrides = {}) {
   return {
-    workflow_state: 'assigned'
+    workflow_state: 'assigned',
   }
 }
 
@@ -170,15 +171,15 @@ describe('transformApiToInternalItem', () => {
     const apiResponse = makeApiResponse({
       submissions: {
         graded: true,
-        has_feedback: true
-      }
+        has_feedback: true,
+      },
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
 
     expect(result.status).toEqual({
       graded: true,
-      has_feedback: true
+      has_feedback: true,
     })
   })
 
@@ -186,9 +187,9 @@ describe('transformApiToInternalItem', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'quiz',
       plannable: makeAssignment({
-        title: 'How to make friends'
+        title: 'How to make friends',
       }),
-      html_url: '/courses/1/assignments/10'
+      html_url: '/courses/1/assignments/10',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
     expect(result).toMatchSnapshot()
@@ -198,9 +199,9 @@ describe('transformApiToInternalItem', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'discussion_topic',
       plannable: makeGradedDiscussionTopic({
-        title: 'How to make friends part 2'
+        title: 'How to make friends part 2',
       }),
-      html_url: '/courses/1/discussion_topics/10'
+      html_url: '/courses/1/discussion_topics/10',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
     expect(result).toMatchSnapshot()
@@ -212,9 +213,9 @@ describe('transformApiToInternalItem', () => {
       plannable: makeDiscussionTopic({
         title: 'How to make enemies',
         points_possible: 40,
-        todo_date: '2017-05-19T05:59:59Z'
+        todo_date: '2017-05-19T05:59:59Z',
       }),
-      html_url: '/courses/1/discussion_topics/10'
+      html_url: '/courses/1/discussion_topics/10',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
     expect(result).toMatchSnapshot()
@@ -228,9 +229,9 @@ describe('transformApiToInternalItem', () => {
         title: 'How to make enemies',
         points_possible: 40,
         unread_count: 10,
-        todo_date: undefined
+        todo_date: undefined,
       }),
-      html_url: '/courses/1/discussion_topics/10'
+      html_url: '/courses/1/discussion_topics/10',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
     expect(result).toMatchSnapshot()
@@ -243,9 +244,9 @@ describe('transformApiToInternalItem', () => {
       plannable: makeDiscussionTopic({
         title: 'How to make enemies',
         todo_date: '2017-05-19T05:59:59Z',
-        unread_count: 10
+        unread_count: 10,
       }),
-      html_url: '/courses/1/discussion_topics/10'
+      html_url: '/courses/1/discussion_topics/10',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
     expect(result).toMatchSnapshot()
@@ -259,8 +260,8 @@ describe('transformApiToInternalItem', () => {
       plannable: makeDiscussionTopic({
         title: 'How to make enemies',
         todo_date: '2017-05-19T05:59:59Z',
-        unread_count: 0
-      })
+        unread_count: 0,
+      }),
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
     expect(result).toMatchObject({newActivity: false})
@@ -272,9 +273,9 @@ describe('transformApiToInternalItem', () => {
       plannable: makeAssignment({
         points_possible: 50,
         title: 'How to be neutral',
-        todo_date: undefined
+        todo_date: undefined,
       }),
-      html_url: '/courses/1/assignments/10'
+      html_url: '/courses/1/assignments/10',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
     expect(result).toMatchSnapshot()
@@ -285,7 +286,7 @@ describe('transformApiToInternalItem', () => {
       context_type: undefined,
       course_id: undefined,
       plannable_type: 'planner_note',
-      plannable: makePlannerNote()
+      plannable: makePlannerNote(),
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
@@ -298,8 +299,8 @@ describe('transformApiToInternalItem', () => {
       course_id: undefined,
       plannable_type: 'planner_note',
       plannable: makePlannerNote({
-        course_id: undefined
-      })
+        course_id: undefined,
+      }),
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
@@ -309,7 +310,7 @@ describe('transformApiToInternalItem', () => {
   it('extracts and transforms the ID for a wiki page repsonse', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'wiki_page',
-      plannable: makeWikiPage({})
+      plannable: makeWikiPage({}),
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
     expect(result.id).toEqual('1')
@@ -319,7 +320,7 @@ describe('transformApiToInternalItem', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'calendar_event',
       plannable: makeCalendarEvent(),
-      html_url: '/calendar?event_id=1&include_contexts=course_1'
+      html_url: '/calendar?event_id=1&include_contexts=course_1',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
     expect(result).toMatchSnapshot()
@@ -329,7 +330,7 @@ describe('transformApiToInternalItem', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'calendar_event',
       plannable: makeCalendarEvent({all_day: true}),
-      html_url: '/calendar?event_id=1&include_contexts=course_1'
+      html_url: '/calendar?event_id=1&include_contexts=course_1',
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
@@ -342,8 +343,8 @@ describe('transformApiToInternalItem', () => {
       plannable_type: 'assessment_request',
       plannable: {
         id: '1',
-        title: 'review me'
-      }
+        title: 'review me',
+      },
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
@@ -355,8 +356,8 @@ describe('transformApiToInternalItem', () => {
       plannable_type: 'assignment',
       plannable_date: moment.tz('2017-05-24', 'Asia/Tokyo'),
       plannable: makeAssignment({
-        due_at: moment.tz('2018-03-28', 'Asia/Tokyo')
-      })
+        due_at: moment.tz('2018-03-28', 'Asia/Tokyo'),
+      }),
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'Europe/Paris')
     const expectedBucket = moment.tz('2017-05-23', 'Europe/Paris')
@@ -381,8 +382,8 @@ describe('transformApiToInternalItem', () => {
       course_id: 999,
       plannable_type: 'planner_note',
       plannable: makePlannerNote({
-        course_id: 999
-      })
+        course_id: 999,
+      }),
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
@@ -396,7 +397,7 @@ describe('transformApiToInternalItem', () => {
       plannable_date: '2018-01-12T05:00:00Z',
       plannable_type: 'wiki_page',
       plannable: makeWikiPage({id: '25', html_url: '/groups/9/pages/25'}),
-      html_url: '/groups/9/pages/25'
+      html_url: '/groups/9/pages/25',
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
@@ -406,8 +407,8 @@ describe('transformApiToInternalItem', () => {
   it('handles feedback', () => {
     const apiResponse = makeApiResponse({
       submissions: {
-        feedback: 'hello world'
-      }
+        feedback: 'hello world',
+      },
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
@@ -420,10 +421,10 @@ describe('transformApiToInternalItem', () => {
       plannable_date: '2018-01-12T05:00:00Z',
       plannable: makeCalendarEvent({
         end_at: '2018-01-12T07:00:00Z',
-        location_name: 'A galaxy far far away'
+        location_name: 'A galaxy far far away',
       }),
       dateStyle: 'none',
-      html_url: '/calendar?event_id=1&include_contexts=course_1'
+      html_url: '/calendar?event_id=1&include_contexts=course_1',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
     expect(result).toMatchSnapshot()
@@ -434,8 +435,8 @@ describe('transformApiToInternalItem', () => {
       plannable_type: 'calendar_event',
       plannable_date: '2018-01-12T05:00:00Z',
       plannable: makeCalendarEvent({
-        all_day: true
-      })
+        all_day: true,
+      }),
     })
     let result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
     expect(result.allDay).toBeTruthy()
@@ -449,8 +450,8 @@ describe('transformApiToInternalItem', () => {
     const apiResponse = makeApiResponse({
       submissions: {
         graded: true,
-        has_feedback: true
-      }
+        has_feedback: true,
+      },
     })
     // graded => not complete
     let result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
@@ -514,26 +515,26 @@ describe('transformInternalToApiItem', () => {
       id: '42',
       date: '2017-05-25',
       title: 'an item',
-      details: 'item details'
+      details: 'item details',
     }
     const result = transformInternalToApiItem(internalItem)
     expect(result).toMatchObject({
       id: '42',
       todo_date: '2017-05-25',
       title: 'an item',
-      details: 'item details'
+      details: 'item details',
     })
   })
 
   it('transforms context information', () => {
     const internalItem = {
       context: {
-        id: '42'
-      }
+        id: '42',
+      },
     }
     expect(transformInternalToApiItem(internalItem)).toMatchObject({
       context_type: 'Course',
-      course_id: '42'
+      course_id: '42',
     })
   })
 })
@@ -544,7 +545,7 @@ describe('transformInternalToApiOverride', () => {
       id: '42',
       overrideId: '52',
       type: 'Assignment',
-      completed: false
+      completed: false,
     }
     const result = transformInternalToApiOverride(internalItem, '1')
     expect(result).toMatchObject({
@@ -552,7 +553,7 @@ describe('transformInternalToApiOverride', () => {
       plannable_id: '42',
       plannable_type: 'assignment',
       user_id: '1',
-      marked_complete: false
+      marked_complete: false,
     })
   })
 
@@ -562,7 +563,7 @@ describe('transformInternalToApiOverride', () => {
       overrideId: null,
       type: 'DiscussionTopic',
       overrideAssignId: '10',
-      completed: false
+      completed: false,
     }
     const result = transformInternalToApiOverride(internalItem, '1')
     expect(result).toMatchObject({
@@ -570,7 +571,7 @@ describe('transformInternalToApiOverride', () => {
       plannable_id: '10',
       plannable_type: 'assignment',
       user_id: '1',
-      marked_complete: false
+      marked_complete: false,
     })
   })
 
@@ -580,7 +581,7 @@ describe('transformInternalToApiOverride', () => {
       overrideId: null,
       type: 'Discussion',
       overrideAssignId: null,
-      completed: false
+      completed: false,
     }
     const result = transformInternalToApiOverride(internalItem, '1')
     expect(result).toMatchObject({
@@ -588,7 +589,7 @@ describe('transformInternalToApiOverride', () => {
       plannable_id: '42',
       plannable_type: 'discussion_topic',
       user_id: '1',
-      marked_complete: false
+      marked_complete: false,
     })
   })
 })
@@ -618,9 +619,9 @@ describe('transformApiToInternalGrade', () => {
             computed_current_score: 34.42,
             computed_current_grade: 'F',
             current_period_computed_current_score: 42.34,
-            current_period_computed_current_grade: 'D'
-          }
-        ]
+            current_period_computed_current_grade: 'D',
+          },
+        ],
       })
     ).toMatchSnapshot()
   })
@@ -635,9 +636,9 @@ describe('transformApiToInternalGrade', () => {
             computed_current_score: 34.42,
             computed_current_grade: 'F',
             current_period_computed_current_score: 42.34,
-            current_period_computed_current_grade: 'D'
-          }
-        ]
+            current_period_computed_current_grade: 'D',
+          },
+        ],
       })
     ).toMatchSnapshot()
   })
@@ -646,7 +647,7 @@ describe('transformApiToInternalGrade', () => {
 describe('observedUserId', () => {
   const defaultState = {
     currentUser: {id: '3'},
-    selectedObservee: null
+    selectedObservee: null,
   }
 
   it('returns null if selectedObservee does not exist', () => {
@@ -669,7 +670,7 @@ describe('observedUserContextCodes', () => {
     expect(
       observedUserContextCodes({
         currentUser: {id: '3'},
-        selectedObservee: '3'
+        selectedObservee: '3',
       })
     ).toBeUndefined()
   })
@@ -679,7 +680,7 @@ describe('observedUserContextCodes', () => {
       observedUserContextCodes({
         currentUser: {id: '3'},
         selectedObservee: '17',
-        courses: [{id: '20'}, {id: '4'}]
+        courses: [{id: '20'}, {id: '4'}],
       })
     ).toStrictEqual(['course_4', 'course_20'])
   })
@@ -696,7 +697,7 @@ describe('buildURL', () => {
       filter: 'c',
       include: 'i',
       end_date: 'b',
-      start_date: 'a'
+      start_date: 'a',
     })
     expect(url).toStrictEqual(
       '/here/there?start_date=a&end_date=b&include=i&filter=c&order=d&per_page=e&observed_user_id=f&context_codes%5B%5D=g_5&context_codes%5B%5D=g_30&course_ids%5B%5D=7&course_ids%5B%5D=50'
@@ -707,13 +708,13 @@ describe('buildURL', () => {
     const url1 = buildURL('/here/there', {
       filter: 'c',
       start_date: 'a',
-      foo: 'bar'
+      foo: 'bar',
     })
     expect(url1).toStrictEqual('/here/there?start_date=a&filter=c&foo=bar')
     const url2 = buildURL('/here/there', {
       filter: 'c',
       start_date: 'a',
-      foo: ['bar', 'baz']
+      foo: ['bar', 'baz'],
     })
     expect(url2).toStrictEqual('/here/there?start_date=a&filter=c&foo%5B%5D=bar&foo%5B%5D=baz')
   })
@@ -721,12 +722,12 @@ describe('buildURL', () => {
   it('omits undefined and null params', () => {
     const url1 = buildURL('/here/there', {
       filter: undefined,
-      start_date: 'a'
+      start_date: 'a',
     })
     expect(url1).toStrictEqual('/here/there?start_date=a')
     const url2 = buildURL('/here/there', {
       foo: null,
-      start_date: 'a'
+      start_date: 'a',
     })
     expect(url2).toStrictEqual('/here/there?start_date=a')
   })
@@ -736,7 +737,7 @@ describe('getContextCodesFromState', () => {
   it('returns context codes in sorted order', () => {
     expect(
       getContextCodesFromState({
-        courses: [{id: '20'}, {id: '4'}]
+        courses: [{id: '20'}, {id: '4'}],
       })
     ).toStrictEqual(['course_4', 'course_20'])
   })

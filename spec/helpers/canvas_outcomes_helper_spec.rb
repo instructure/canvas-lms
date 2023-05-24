@@ -163,7 +163,9 @@ describe CanvasOutcomesHelper do
 
     describe "if ApplicationController.test_cluster_name is specified" do
       it "returns a domain using the test_cluster_name domain" do
-        settings = { consumer_key: "key", jwt_secret: "secret", domain: "domain",
+        settings = { consumer_key: "key",
+                     jwt_secret: "secret",
+                     domain: "domain",
                      beta_domain: "beta.domain" }
         account.settings[:provision] = { "outcomes" => settings }
         account.save!

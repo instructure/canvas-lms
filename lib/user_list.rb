@@ -42,8 +42,10 @@ class UserList
   #                         is used. otherwise a temporary user is created
   # * <tt>:infer</tt> - uses :open or :closed according to root_account.open_registration
   #
-  def initialize(list_in, root_account: Account.default,
-                 search_method: :infer, initial_type: nil,
+  def initialize(list_in,
+                 root_account: Account.default,
+                 search_method: :infer,
+                 initial_type: nil,
                  current_user: nil)
     @addresses = []
     @errors = []

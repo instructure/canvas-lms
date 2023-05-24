@@ -119,8 +119,12 @@ describe "student groups" do
         fj(".student-group-title").click
         wait_for_ajaximations
 
-        expected_student_list = ["nobody@example.com", "Test Student 1", "Test Student 2",
-                                 "Test Student 3", "Test Student 4", "Test Student 5"]
+        expected_student_list = ["nobody@example.com",
+                                 "Test Student 1",
+                                 "Test Student 2",
+                                 "Test Student 3",
+                                 "Test Student 4",
+                                 "Test Student 5"]
         student_list = ff("[role=listitem]")
 
         # first item in the student_list array is the group name

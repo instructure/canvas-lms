@@ -27,7 +27,8 @@ module Types
     global_id_field :id
 
     field :parent_outcome_group, Types::LearningOutcomeGroupType, null: true
-    field :child_groups, Types::LearningOutcomeGroupType.connection_type,
+    field :child_groups,
+          Types::LearningOutcomeGroupType.connection_type,
           null: true
     def child_groups
       active_child_groups

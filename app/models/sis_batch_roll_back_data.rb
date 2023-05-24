@@ -19,19 +19,37 @@
 #
 class SisBatchRollBackData < ActiveRecord::Base
   belongs_to :sis_batch, inverse_of: :roll_back_data
-  belongs_to :context, polymorphic: %i[abstract_course account account_user
-                                       communication_channel course
-                                       course_section enrollment enrollment_term
-                                       group group_category group_membership
-                                       pseudonym user_observer]
+  belongs_to :context, polymorphic: %i[abstract_course
+                                       account
+                                       account_user
+                                       communication_channel
+                                       course
+                                       course_section
+                                       enrollment
+                                       enrollment_term
+                                       group
+                                       group_category
+                                       group_membership
+                                       pseudonym
+                                       user_observer]
 
   scope :expired_data, -> { where("created_at < ?", 30.days.ago) }
   scope :active, -> { where(workflow_state: "active") }
   scope :restored, -> { where(workflow_state: "restored") }
 
-  RESTORE_ORDER = %w[Account EnrollmentTerm AbstractCourse Course CourseSection
-                     GroupCategory Group Pseudonym CommunicationChannel
-                     Enrollment GroupMembership UserObserver AccountUser].freeze
+  RESTORE_ORDER = %w[Account
+                     EnrollmentTerm
+                     AbstractCourse
+                     Course
+                     CourseSection
+                     GroupCategory
+                     Group
+                     Pseudonym
+                     CommunicationChannel
+                     Enrollment
+                     GroupMembership
+                     UserObserver
+                     AccountUser].freeze
 
   def self.cleanup_expired_data
     expired_data.in_batches(of: 10_000).delete_all

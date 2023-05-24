@@ -59,8 +59,13 @@ module CC
 
           migration_id = create_key(rubric)
           rubrics_node.rubric(identifier: migration_id) do |r_node|
-            atts = %i[read_only title reusable public points_possible
-                      hide_score_total free_form_criterion_comments]
+            atts = %i[read_only
+                      title
+                      reusable
+                      public
+                      points_possible
+                      hide_score_total
+                      free_form_criterion_comments]
             if rubric.context != @course
               r_node.external_identifier rubric.id
             end

@@ -237,7 +237,8 @@ class RubricAssessmentsController < ApplicationController
     @association_object.ensure_grader_can_adjudicate(
       grader: @current_user,
       provisional: provisional,
-      occupy_slot: true, &block
+      occupy_slot: true,
+&block
     )
   end
 end

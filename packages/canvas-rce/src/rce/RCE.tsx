@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 // @ts-nocheck
 
 /*
@@ -20,13 +19,13 @@
  */
 
 import React, {forwardRef, useState} from 'react'
-import {arrayOf, bool, func, number, objectOf, oneOfType, shape, string} from 'prop-types'
+import {InferType} from 'prop-types'
 import formatMessage from '../format-message'
 import RCEWrapper from './RCEWrapper'
 import {
-  editorOptionsPropType,
+  EditorOptionsPropType,
   externalToolsConfigPropType,
-  ltiToolsPropType,
+  LtiToolsPropType,
 } from './RCEWrapperProps'
 import {trayPropTypes} from './plugins/shared/CanvasContentTray'
 import editorLanguage from './editorLanguage'
@@ -35,6 +34,7 @@ import wrapInitCb from './wrapInitCb'
 import tinyRCE from './tinyRCE'
 import getTranslations from '../getTranslations'
 import '@instructure/canvas-theme'
+import {Editor} from 'tinymce'
 
 if (!process?.env?.BUILD_LOCALE) {
   formatMessage.setup({
@@ -47,7 +47,7 @@ if (!process?.env?.BUILD_LOCALE) {
 // forward rceRef to it refs the RCEWrapper where clients can call getCode etc. on it.
 // You probably shouldn't use it until onInit has been called. Until then tinymce
 // is not initialized.
-const RCE = forwardRef(function RCE(props, rceRef) {
+const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
   const {
     autosave,
     canvasOrigin,
@@ -75,7 +75,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
   useState(() => {
     formatMessage.setup({locale: normalizeLocale(props.language)})
   })
-  const [translations, setTranslations] = useState(() => {
+  const [translations, setTranslations] = useState<Promise<void> | boolean>(() => {
     const locale = normalizeLocale(props.language)
     const p = getTranslations(locale)
       .then(() => {
@@ -111,7 +111,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
       features,
       editorOptions: {
         ...editorOptions,
-        selector: editorOptions.selector || `#${textareaId}`,
+        selector: editorOptions?.selector || `#${textareaId}`,
         height,
         language: editorLanguage(props.language),
       },
@@ -122,7 +122,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
   })
 
   if (typeof translations !== 'boolean') {
-    return formatMessage('Loading...')
+    return <>{formatMessage('Loading...')}</>
   } else {
     return (
       <RCEWrapper
@@ -140,76 +140,139 @@ const RCE = forwardRef(function RCE(props, rceRef) {
   }
 })
 
-export default RCE
+export interface RCEPropTypes {
+  /**
+   * do you want the rce to autosave content to localStorage, and
+   * how long should it be until it's deleted.
+   * If autosave is enabled, call yourRef.RCEClosed() if the user
+   * exits the page normally (e.g. via Cancel or Save)
+   */
+  autosave?: {
+    enabled?: boolean
+    maxAge?: number
+    interval?: number
+  }
 
-RCE.propTypes = {
-  // do you want the rce to autosave content to localStorage, and
-  // how long should it be until it's deleted.
-  // If autosave is enabled, call yourRef.RCEClosed() if the user
-  // exits the page normally (e.g. via Cancel or Save)
-  autosave: shape({enabled: bool, maxAge: number}),
-  // the protocol://domain:port for this RCE's canvas
-  canvasOrigin: string,
-  // the initial content
-  defaultContent: string,
-  // tinymce configuration. See defaultTinymceConfig for all the defaults
-  // and RCEWrapper.editorOptionsPropType for stuff you may want to include
-  editorOptions: editorOptionsPropType,
-  // there's an open bug when RCE is rendered in a Modal form
-  // and the user navigates to the KB Shortcut Helper Button using
-  // Apple VoiceOver navigation keys (VO+arrows)
-  // as a workaround, the KB Shortcut Helper Button may be supressed
-  // setting renderKBShortcutModal to false
-  renderKBShortcutModal: bool,
-  //
-  // height of the RCE. if a number, in px
-  height: oneOfType([number, string]),
-  // array of URLs to high-contrast css
-  highContrastCSS: arrayOf(string),
-  // if true, do not load the plugin that provides the media toolbar and menu items
-  instRecordDisabled: bool,
-  // locale of the user's language
-  language: string,
-  // function that returns the element where screenreader alerts go
-  liveRegion: func,
-  // array of lti tools available to the user
-  // {id, favorite} are all that's required, ther fields are ignored
-  ltiTools: ltiToolsPropType,
-  // The maximum number of RCEs that will render on page load.
-  // Any more than this will be deferred until it is nearly
-  // scrolled into view.
-  // if isNaN or <=0, render them all
-  maxInitRenderedRCEs: number,
-  // name:value pairs of attributes to add to the textarea
-  // tinymce creates as the backing store of the RCE
-  mirroredAttrs: objectOf(string),
-  // is this RCE readonly?
-  readOnly: bool,
-  // id put on the generated textarea
-  textareaId: string.isRequired,
-  // class name added to the generated textarea
-  textareaClassName: string,
-  // properties necessary for the RCE to us the RCS
-  // if missing, RCE features that require the RCS are omitted
-  rcsProps: trayPropTypes,
-  // enable the custom icon maker feature (temporary until the feature is forced on)
-  use_rce_icon_maker: bool,
-  // record of feature statuses from containing page
-  features: objectOf(bool),
-  // configurable default timeout value for flash alerts
-  flashAlertTimeout: number,
-  // user's timezone
-  timezone: string,
-  // event handlers
-  onFocus: func, // f(RCEWrapper component)
-  onBlur: func, // f(event)
-  onInit: func, // f(tinymce_editor)
-  onContentChange: func, // f(content), don't mistake this as an indication RCE is a controlled component
+  /**
+   * the protocol://domain:port for this RCE's canvas
+   */
+  canvasOrigin?: string
 
-  externalToolsConfig: externalToolsConfigPropType,
+  /**
+   * the initial content
+   */
+  defaultContent?: string
+
+  /**
+   * tinymce configuration. See defaultTinymceConfig for all the defaults
+   * and RCEWrapper.editorOptionsPropType for stuff you may want to include
+   */
+  editorOptions?: EditorOptionsPropType
+
+  /**
+   * there's an open bug when RCE is rendered in a Modal form
+   * and the user navigates to the KB Shortcut Helper Button using
+   * Apple VoiceOver navigation keys (VO+arrows)
+   * as a workaround, the KB Shortcut Helper Button may be supressed
+   * setting renderKBShortcutModal to false
+   */
+  renderKBShortcutModal?: boolean
+
+  /**
+   * height of the RCE. if a number, in px
+   */
+  height?: number | string
+
+  /**
+   * array of URLs to high-contrast css
+   */
+  highContrastCSS?: string[]
+
+  /**
+   * if true, do not load the plugin that provides the media toolbar and menu items
+   */
+  instRecordDisabled?: boolean
+
+  /**
+   * locale of the user's language
+   */
+  language?: string
+
+  /**
+   * function that returns the element where screenreader alerts go
+   */
+  liveRegion?: () => HTMLElement | null | undefined
+
+  /**
+   * array of lti tools available to the user
+   * {id, favorite} are all that's required, ther fields are ignored
+   */
+  ltiTools?: LtiToolsPropType
+
+  /**
+   * The maximum number of RCEs that will render on page load.
+   * Any more than this will be deferred until it is nearly
+   * scrolled into view.
+   * if isNaN or <=0, render them all
+   */
+  maxInitRenderedRCEs?: number
+
+  /**
+   * name:value pairs of attributes to add to the textarea
+   * tinymce creates as the backing store of the RCE
+   */
+  mirroredAttrs?: {[key: string]: string}
+
+  /**
+   * is this RCE readonly?
+   */
+  readOnly?: boolean
+
+  /**
+   * id put on the generated textarea
+   */
+  textareaId: string
+
+  /**
+   * class name added to the generated textarea
+   */
+  textareaClassName?: string
+
+  /**
+   * properties necessary for the RCE to us the RCS
+   * if missing, RCE features that require the RCS are omitted
+   */
+  rcsProps?: InferType<typeof trayPropTypes>
+
+  /**
+   * enable the custom icon maker feature (temporary until the feature is forced on)
+   */
+  use_rce_icon_maker?: boolean
+
+  /**
+   * record of feature statuses from containing page
+   */
+  features?: {[key: string]: boolean}
+
+  /**
+   * configurable default timeout value for flash alerts
+   */
+  flashAlertTimeout?: number
+
+  /**
+   * user's timezone
+   */
+  timezone?: string
+
+  onFocus?: (rce: RCEWrapper) => void
+  onBlur?: (event: Event) => void
+  onInit?: (editor: Editor) => void
+  onContentChange?: (content: string) => void
+
+  externalToolsConfig?: InferType<typeof externalToolsConfigPropType>
 }
 
-RCE.defaultProps = {
+const defaultProps = {
   autosave: {enabled: false, maxAge: 3600000},
   defaultContent: '',
   editorOptions: {},
@@ -222,8 +285,12 @@ RCE.defaultProps = {
   mirroredAttrs: {},
   readOnly: false,
   use_rce_icon_maker: true,
-  onFocus: () => {},
-  onBlur: () => {},
-  onContentChange: () => {},
-  onInit: () => {},
+  onFocus: () => undefined,
+  onBlur: () => undefined,
+  onContentChange: () => undefined,
+  onInit: () => undefined,
 }
+
+RCE.defaultProps = defaultProps
+
+export default RCE

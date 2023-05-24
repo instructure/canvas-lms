@@ -30,9 +30,17 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
 
   def self.recognized_params
     super +
-      %i[auth_host auth_port auth_over_tls auth_base
-         auth_filter auth_username auth_password
-         identifier_format jit_provisioning internal_ca verify_tls_cert_opt_in].freeze
+      %i[auth_host
+         auth_port
+         auth_over_tls
+         auth_base
+         auth_filter
+         auth_username
+         auth_password
+         identifier_format
+         jit_provisioning
+         internal_ca
+         verify_tls_cert_opt_in].freeze
   end
 
   SENSITIVE_PARAMS = [:auth_password].freeze

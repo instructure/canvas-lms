@@ -468,7 +468,8 @@ describe "submissions" do
         local_storage!
 
         add_file(fixture_file_upload("html-editing-test.html", "text/html"),
-                 @student, "html-editing-test.html")
+                 @student,
+                 "html-editing-test.html")
         File.read(fixture_file_path("files/html-editing-test.html"))
         assignment = @course.assignments.create!(title: "assignment 1",
                                                  name: "assignment 1",
@@ -497,7 +498,8 @@ describe "submissions" do
         local_storage!
 
         add_file(fixture_file_upload(filename, "application/x-sh"),
-                 @student, filename)
+                 @student,
+                 filename)
         File.read(fixture_file_path(fixture_fn))
         assignment = @course.assignments.create!(title: "assignment 1",
                                                  name: "assignment 1",

@@ -696,8 +696,12 @@ describe GradebookUserIds do
 
       it "includes concluded students ids if the course is concluded" do
         @course.complete!
-        all_students = [@student1.id, @student2.id, @student4.id, @student3.id,
-                        @concluded_student.id, @fake_student.id]
+        all_students = [@student1.id,
+                        @student2.id,
+                        @student4.id,
+                        @student3.id,
+                        @concluded_student.id,
+                        @fake_student.id]
         expect(gradebook_user_ids.user_ids).to eq(all_students)
       end
     end
@@ -721,8 +725,12 @@ describe GradebookUserIds do
 
       it "includes concluded students ids if the course is concluded" do
         @course.complete!
-        all_students = [@student2.id, @student1.id, @student4.id, @student3.id,
-                        @concluded_student.id, @fake_student.id]
+        all_students = [@student2.id,
+                        @student1.id,
+                        @student4.id,
+                        @student3.id,
+                        @concluded_student.id,
+                        @fake_student.id]
         expect(gradebook_user_ids.user_ids).to eq(all_students)
       end
     end

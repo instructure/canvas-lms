@@ -378,8 +378,10 @@ describe "quizzes question banks" do
       51.times do |o|
         assessment_question[o] = source_bank.assessment_questions.create!
         @quiz_question.push(@q.quiz_questions.create!(question_data:
-                                                   { :name => "question #{o}", :question_type => "multiple_choice_question",
-                                                     "answers" => answers, :points_possible => 1 },
+                                                   { :name => "question #{o}",
+                                                     :question_type => "multiple_choice_question",
+                                                     "answers" => answers,
+                                                     :points_possible => 1 },
                                                       assessment_question: assessment_question[o]))
       end
       get "/courses/#{@course.id}/question_banks/#{source_bank.id}"

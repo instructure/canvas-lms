@@ -23,8 +23,10 @@ class CreateNotificationPolicyOverrides < ActiveRecord::Migration[5.2]
 
   def change
     create_table :notification_policy_overrides do |t|
-      t.belongs_to :context, polymorphic: { default: "Course" },
-                             null: false, index: { name: "index_notification_policy_overrides_on_context" }
+      t.belongs_to :context,
+                   polymorphic: { default: "Course" },
+                   null: false,
+                   index: { name: "index_notification_policy_overrides_on_context" }
       t.belongs_to :communication_channel, null: false, foreign_key: true
       t.belongs_to :notification, index: true
       t.string :workflow_state, default: "active", null: false, index: true
@@ -32,13 +34,18 @@ class CreateNotificationPolicyOverrides < ActiveRecord::Migration[5.2]
       t.timestamps
     end
 
-    add_index :notification_policy_overrides, %i[communication_channel_id notification_id],
+    add_index :notification_policy_overrides,
+              %i[communication_channel_id notification_id],
               name: "index_notification_policies_overrides_on_cc_id_and_notification"
-    add_index :notification_policy_overrides, %i[context_id context_type communication_channel_id notification_id],
+    add_index :notification_policy_overrides,
+              %i[context_id context_type communication_channel_id notification_id],
               where: "notification_id IS NOT NULL",
-              unique: true, name: "index_notification_policies_overrides_uniq_context_notification"
-    add_index :notification_policy_overrides, %i[context_id context_type communication_channel_id],
+              unique: true,
+              name: "index_notification_policies_overrides_uniq_context_notification"
+    add_index :notification_policy_overrides,
+              %i[context_id context_type communication_channel_id],
               where: "notification_id IS NULL",
-              unique: true, name: "index_notification_policies_overrides_uniq_context_and_cc"
+              unique: true,
+              name: "index_notification_policies_overrides_uniq_context_and_cc"
   end
 end

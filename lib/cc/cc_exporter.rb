@@ -77,7 +77,8 @@ module CC
             # if it's selective, we have to wait until we've completed the rest of the export
             # before we really know what we exported. because magic
             @pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course,
-                                                                                          selective: true, exported_assets: @content_export.exported_assets.to_a)
+                                                                                          selective: true,
+                                                                                          exported_assets: @content_export.exported_assets.to_a)
           end
           external_content = Canvas::Migration::ExternalContent::Migrator.retrieve_exported_content(@content_export, @pending_exports)
           write_external_content(external_content)

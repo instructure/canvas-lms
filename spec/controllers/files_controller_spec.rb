@@ -690,7 +690,9 @@ describe FilesController do
         quiz_model
         file = @quiz.statistics_csv("student_analysis").csv_attachment
         get "show", params: { quiz_statistics_id: file.reload.context.id,
-                              file_id: file.id, download: "1", verifier: file.uuid }
+                              file_id: file.id,
+                              download: "1",
+                              verifier: file.uuid }
         expect(response).to be_redirect
       end
 
@@ -891,11 +893,19 @@ describe FilesController do
       it "prioritizes matches on display name vs. filename" do
         display_name = "file.txt"
         # make a file with an original filename matching the other file's display_name
-        Attachment.create!(context: @course, uploaded_data: StringIO.new("blah1"), folder: Folder.root_folders(@course).first,
-                           filename: display_name, display_name: "something_else.txt")
-        file2 = Attachment.create!(context: @course, uploaded_data: StringIO.new("blah2"), folder: Folder.root_folders(@course).first,
-                                   filename: "still_something_else.txt", display_name: display_name)
-        other_file = Attachment.create!(context: @course, uploaded_data: StringIO.new("blah3"), folder: Folder.root_folders(@course).first,
+        Attachment.create!(context: @course,
+                           uploaded_data: StringIO.new("blah1"),
+                           folder: Folder.root_folders(@course).first,
+                           filename: display_name,
+                           display_name: "something_else.txt")
+        file2 = Attachment.create!(context: @course,
+                                   uploaded_data: StringIO.new("blah2"),
+                                   folder: Folder.root_folders(@course).first,
+                                   filename: "still_something_else.txt",
+                                   display_name: display_name)
+        other_file = Attachment.create!(context: @course,
+                                        uploaded_data: StringIO.new("blah3"),
+                                        folder: Folder.root_folders(@course).first,
                                         filename: "totallydifferent.html")
 
         get "show_relative", params: { file_id: other_file.id, course_id: @course.id, file_path: file2.full_display_path }
@@ -1188,11 +1198,12 @@ describe FilesController do
       @assignment = @course.assignments.create!(title: "upload_assignment", submission_types: "online_upload")
       Setting.set("user_default_quota", -1)
       post "create_pending", params: { attachment: {
-        context_code: @assignment.context_code,
-        asset_string: @assignment.asset_string,
-        intent: "submit",
-        filename: "bob.txt"
-      }, format: :json }
+                                         context_code: @assignment.context_code,
+                                         asset_string: @assignment.asset_string,
+                                         intent: "submit",
+                                         filename: "bob.txt"
+                                       },
+                                       format: :json }
       expect(response).to be_successful
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment].id).not_to be_nil
@@ -1210,11 +1221,12 @@ describe FilesController do
       @assignment = @course.assignments.create!(title: "discussion assignment", submission_types: "discussion_topic")
       Setting.set("user_default_quota", -1)
       post "create_pending", params: { attachment: {
-        context_code: @assignment.context_code,
-        asset_string: @assignment.asset_string,
-        intent: "submit",
-        filename: "bob.txt"
-      }, format: :json }
+                                         context_code: @assignment.context_code,
+                                         asset_string: @assignment.asset_string,
+                                         intent: "submit",
+                                         filename: "bob.txt"
+                                       },
+                                       format: :json }
       expect(response).to be_successful
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment].id).not_to be_nil

@@ -31,10 +31,22 @@ module SIS
         @course_pace = course_pace_model(course: @course)
 
         importer = SIS::CourseImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, nil, nil, [], nil, {})
-        importer.add_course("SIS_ID", EnrollmentTerm.first.id, @account.sis_source_id, "fallback_account_id",
-                            "active", "start_date", "end_date", "abstract_course_id", "C001", "long_name",
-                            "integration_id", "on_campus", "blueprint_course_id", "not_set",
-                            "homeroom_course", "friendly_name")
+        importer.add_course("SIS_ID",
+                            EnrollmentTerm.first.id,
+                            @account.sis_source_id,
+                            "fallback_account_id",
+                            "active",
+                            "start_date",
+                            "end_date",
+                            "abstract_course_id",
+                            "C001",
+                            "long_name",
+                            "integration_id",
+                            "on_campus",
+                            "blueprint_course_id",
+                            "not_set",
+                            "homeroom_course",
+                            "friendly_name")
 
         expect(Progress.find_by(context: @course_pace)).to be_queued
       end

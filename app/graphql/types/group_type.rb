@@ -48,7 +48,8 @@ module Types
     end
 
     field :member, GroupMembershipType, null: true do
-      argument :user_id, ID,
+      argument :user_id,
+               ID,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("User"),
                required: true
     end

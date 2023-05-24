@@ -234,7 +234,8 @@ describe UserList do
 
   it "works with a list of paths" do
     ul = UserList.new(["leonard@example.com", "sheldon@example.com"],
-                      root_account: @account, search_method: :preferred)
+                      root_account: @account,
+                      search_method: :preferred)
     expect(ul.addresses.count).to eq 2
     expect { ul.users }.to change(User, :count).by(2)
   end

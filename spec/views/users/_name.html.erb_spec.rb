@@ -79,8 +79,10 @@ describe "users/name" do
     end
 
     it "does not include it if the permission is denied" do
-      RoleOverride.create!(context: Account.default, permission: "read_email_addresses",
-                           role: teacher_role, enabled: false)
+      RoleOverride.create!(context: Account.default,
+                           permission: "read_email_addresses",
+                           role: teacher_role,
+                           enabled: false)
       view_context(@course, @teacher)
       assign(:user, @student)
       assign(:enrollments, [])

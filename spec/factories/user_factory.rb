@@ -112,9 +112,11 @@ module Factories
 
   def student_in_section(section, opts = {})
     student = opts.fetch(:user) { user_factory }
-    enrollment = section.course.enroll_user(student, "StudentEnrollment", section: section,
-                                                                          force_update: true,
-                                                                          allow_multiple_enrollments: opts[:allow_multiple_enrollments])
+    enrollment = section.course.enroll_user(student,
+                                            "StudentEnrollment",
+                                            section: section,
+                                            force_update: true,
+                                            allow_multiple_enrollments: opts[:allow_multiple_enrollments])
     student.save!
     enrollment.workflow_state = "active"
     enrollment.save!
@@ -134,9 +136,12 @@ module Factories
   def teacher_in_section(section, opts = {})
     teacher = opts.fetch(:user) { user_factory }
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
-    enrollment = section.course.enroll_user(teacher, "TeacherEnrollment", section: section,
-                                                                          force_update: true, limit_privileges_to_course_section: limit_privileges_to_course_section,
-                                                                          allow_multiple_enrollments: opts[:allow_multiple_enrollments])
+    enrollment = section.course.enroll_user(teacher,
+                                            "TeacherEnrollment",
+                                            section: section,
+                                            force_update: true,
+                                            limit_privileges_to_course_section: limit_privileges_to_course_section,
+                                            allow_multiple_enrollments: opts[:allow_multiple_enrollments])
     teacher.save!
     enrollment.workflow_state = "active"
     enrollment.save!

@@ -2625,9 +2625,14 @@ describe GradebooksController do
         other_teacher = teacher_in_course(course: @course, active_all: true).user
         @assignment.grade_student(@student, grade: 2, grader: other_teacher, provisional: true)
 
-        post "update_submission", params: { course_id: @course.id,
-                                            submission: { score: 100, comment: "provisional!", assignment_id: @assignment.id,
-                                                          user_id: @student.id, provisional: true } }, format: :json
+        post "update_submission",
+             params: { course_id: @course.id,
+                       submission: { score: 100,
+                                     comment: "provisional!",
+                                     assignment_id: @assignment.id,
+                                     user_id: @student.id,
+                                     provisional: true } },
+             format: :json
         expect(response).to_not be_successful
         expect(response.body).to include("The maximum number of graders has been reached for this assignment")
       end
@@ -2637,9 +2642,14 @@ describe GradebooksController do
         other_teacher = teacher_in_course(course: @course, active_all: true).user
         submission.find_or_create_provisional_grade!(other_teacher)
 
-        post "update_submission", params: { course_id: @course.id,
-                                            submission: { score: 100, comment: "provisional!", assignment_id: @assignment.id,
-                                                          user_id: @student.id, provisional: true } }, format: :json
+        post "update_submission",
+             params: { course_id: @course.id,
+                       submission: { score: 100,
+                                     comment: "provisional!",
+                                     assignment_id: @assignment.id,
+                                     user_id: @student.id,
+                                     provisional: true } },
+             format: :json
         expect(response).to be_successful
       end
 
@@ -3110,7 +3120,8 @@ describe GradebooksController do
 
       context "when a section has previously been selected" do
         before do
-          @teacher.set_preference(:gradebook_settings, @course.global_id,
+          @teacher.set_preference(:gradebook_settings,
+                                  @course.global_id,
                                   { filter_rows_by: { section_id: @course.course_sections.first.id } })
         end
 

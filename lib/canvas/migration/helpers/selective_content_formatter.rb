@@ -408,11 +408,13 @@ module Canvas::Migration::Helpers
       if item.is_a?(Assignment)
         if item.quiz
           lr = course_item_hash("quizzes", item.quiz, false)
-          lr[:message] = I18n.t("linked_quiz_message", "linked with Quiz '%{title}'",
+          lr[:message] = I18n.t("linked_quiz_message",
+                                "linked with Quiz '%{title}'",
                                 title: item.quiz.title)
         elsif item.discussion_topic
           lr = course_item_hash("discussion_topics", item.discussion_topic, false)
-          lr[:message] = I18n.t("linked_discussion_topic_message", "linked with Discussion Topic '%{title}'",
+          lr[:message] = I18n.t("linked_discussion_topic_message",
+                                "linked with Discussion Topic '%{title}'",
                                 title: item.discussion_topic.title)
         elsif item.wiki_page
           lr = course_item_hash("wiki_pages", item.wiki_page, false)
@@ -421,7 +423,8 @@ module Canvas::Migration::Helpers
         end
       elsif [DiscussionTopic, WikiPage, Quizzes::Quiz].any? { |t| item.is_a?(t) } && item.assignment
         lr = course_item_hash("assignments", item.assignment, false)
-        lr[:message] = I18n.t("linked_assignment_message", "linked with Assignment '%{title}'",
+        lr[:message] = I18n.t("linked_assignment_message",
+                              "linked with Assignment '%{title}'",
                               title: item.assignment.title)
       end
       if lr

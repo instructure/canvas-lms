@@ -47,9 +47,12 @@ describe "AuthenticationProviders API", type: :request do
 
   context "/index" do
     def call_index(status = 200)
-      api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers",
+      api_call(:get,
+               "/api/v1/accounts/#{@account.id}/authentication_providers",
                { controller: "authentication_providers", action: "index", account_id: @account.id.to_s, format: "json" },
-               {}, {}, expected_status: status)
+               {},
+               {},
+               expected_status: status)
     end
 
     it "returns all aacs in position order" do
@@ -74,9 +77,12 @@ describe "AuthenticationProviders API", type: :request do
     # the deprecated mass-update/create is tested in account_authorization_configs_deprecated_api_spec.rb
 
     def call_create(params, status = 200)
-      json = api_call(:post, "/api/v1/accounts/#{@account.id}/authentication_providers",
+      json = api_call(:post,
+                      "/api/v1/accounts/#{@account.id}/authentication_providers",
                       { controller: "authentication_providers", action: "create", account_id: @account.id.to_s, format: "json" },
-                      params, {}, expected_status: status)
+                      params,
+                      {},
+                      expected_status: status)
       @account.reload
       json
     end
@@ -231,7 +237,8 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "allows updating without auth type" do
-      json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{@aac.id}",
+      json = api_call(:put,
+                      "/api/v1/accounts/#{@account.id}/authentication_providers/#{@aac.id}",
                       { controller: "authentication_providers",
                         action: "update",
                         account_id: @account.id.to_s,
@@ -242,7 +249,8 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "errors when changing the type" do
-      json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{@aac.id}",
+      json = api_call(:put,
+                      "/api/v1/accounts/#{@account.id}/authentication_providers/#{@aac.id}",
                       { controller: "authentication_providers",
                         action: "update",
                         account_id: @account.id.to_s,
@@ -255,9 +263,12 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     def call_update(id, params, status = 200)
-      json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
+      json = api_call(:put,
+                      "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
                       { controller: "authentication_providers", action: "update", account_id: @account.id.to_s, id: id.to_param, format: "json" },
-                      params, {}, expected_status: status)
+                      params,
+                      {},
+                      expected_status: status)
       @account.reload
       json
     end
@@ -280,8 +291,9 @@ describe "AuthenticationProviders API", type: :request do
 
     it "updates federated attributes" do
       aac = @account.authentication_providers.create!(@saml_hash)
-      json = call_update(aac.id, "auth_type" => "saml",
-                                 "federated_attributes" => { "integration_id" => "internal_id" })
+      json = call_update(aac.id,
+                         "auth_type" => "saml",
+                         "federated_attributes" => { "integration_id" => "internal_id" })
       # jit provisioning off; short form output
       expect(json["federated_attributes"]).to eq("integration_id" => "internal_id")
       aac.reload
@@ -357,9 +369,12 @@ describe "AuthenticationProviders API", type: :request do
 
   context "/show" do
     def call_show(id, status = 200)
-      api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
+      api_call(:get,
+               "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
                { controller: "authentication_providers", action: "show", account_id: @account.id.to_s, id: id.to_param, format: "json" },
-               {}, {}, expected_status: status)
+               {},
+               {},
+               expected_status: status)
     end
 
     it "returns saml aac" do
@@ -432,9 +447,12 @@ describe "AuthenticationProviders API", type: :request do
 
   context "/destroy" do
     def call_destroy(id, status = 200)
-      json = api_call(:delete, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
+      json = api_call(:delete,
+                      "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
                       { controller: "authentication_providers", action: "destroy", account_id: @account.id.to_s, id: id.to_param, format: "json" },
-                      {}, {}, expected_status: status)
+                      {},
+                      {},
+                      expected_status: status)
       @account.reload
       json
     end
@@ -558,7 +576,9 @@ describe "AuthenticationProviders API", type: :request do
                               action: "show_sso_settings",
                               account_id: @account.id.to_s,
                               format: "json"
-                            }, {}, {},
+                            },
+                            {},
+                            {},
                             expected_status: 200)
 
         expect(response["sso_settings"]["login_handle_name"])

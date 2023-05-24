@@ -31,7 +31,8 @@ class Mutations::UpdateDiscussionThreadReadState < Mutations::BaseMutation
 
     read_state = input[:read] ? "read" : "unread"
 
-    DiscussionEntryParticipant.upsert_for_root_entry_and_descendants(root_entry, current_user,
+    DiscussionEntryParticipant.upsert_for_root_entry_and_descendants(root_entry,
+                                                                     current_user,
                                                                      new_state: read_state,
                                                                      forced: true)
 

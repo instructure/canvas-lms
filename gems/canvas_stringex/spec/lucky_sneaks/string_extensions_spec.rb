@@ -19,29 +19,6 @@
 require "spec_helper"
 
 describe "StringExtensions" do
-  it "to_html" do
-    require "RedCloth"
-    {
-      "h1. A Solution" => "<h1>A Solution</h1>",
-      "I hated wrapping textilize around a string.\n\nIt always felt dirty." =>
-        "<p>I hated wrapping textilize around a string.</p>\n<p>It always felt dirty.</p>",
-      "I think _this_ is awesome" => "<p>I think <em>this</em> is awesome</p>",
-      "Um... _*really*_, man" => "<p>Um&#8230; <em><strong>really</strong></em>, man</p>"
-    }.each do |plain, html|
-      expect(html).to eq plain.to_html
-    end
-  end
-
-  it "to_html_lite" do
-    require "RedCloth"
-    {
-      "I have no pee on me" => "I have no pee on me",
-      "But I _do_ get Textile!" => "But I <em>do</em> get Textile!"
-    }.each do |plain, html|
-      expect(html).to eq plain.to_html(:lite)
-    end
-  end
-
   it "to_url" do
     {
       "<p>This has 100% too much    <em>formatting</em></p>" =>

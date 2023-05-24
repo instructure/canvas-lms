@@ -84,13 +84,16 @@ module SchedulerCommon
   def create_appointment_groups_for_courses
     time = Time.zone.now
     time += 1.hour if time.hour == 23 # ensure the appointments are on the same day
-    @app1 = AppointmentGroup.create!(title: "Appointment 1", contexts: [@course1],
+    @app1 = AppointmentGroup.create!(title: "Appointment 1",
+                                     contexts: [@course1],
                                      participant_visibility: "protected",
                                      new_appointments: [[time, time + 30.minutes],
                                                         [time + 30.minutes, time + 1.hour]],
-                                     participants_per_appointment: 1, max_appointments_per_participant: 1)
+                                     participants_per_appointment: 1,
+                                     max_appointments_per_participant: 1)
     @app1.publish!
-    @app3 = AppointmentGroup.create!(title: "Appointment 3", contexts: [@course1, @course2],
+    @app3 = AppointmentGroup.create!(title: "Appointment 3",
+                                     contexts: [@course1, @course2],
                                      new_appointments: [[time + 1.hour, time + 1.hour + 30.minutes]])
     @app3.publish!
   end

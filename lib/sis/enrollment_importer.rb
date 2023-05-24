@@ -23,8 +23,10 @@ module SIS
     def process(messages)
       i = Work.new(@batch, @root_account, @logger, messages)
 
-      Enrollment.suspend_callbacks(:set_update_cached_due_dates, :add_to_favorites_later,
-                                   :recache_course_grade_distribution, :update_user_account_associations_if_necessary) do
+      Enrollment.suspend_callbacks(:set_update_cached_due_dates,
+                                   :add_to_favorites_later,
+                                   :recache_course_grade_distribution,
+                                   :update_user_account_associations_if_necessary) do
         User.skip_updating_account_associations do
           Enrollment.process_as_sis(@sis_options) do
             yield i
@@ -89,10 +91,17 @@ module SIS
     end
 
     class Work
-      attr_accessor :enrollments_to_update_sis_batch_ids, :courses_to_touch_ids,
-                    :incrementally_update_account_associations_user_ids, :update_account_association_user_ids,
-                    :account_chain_cache, :users_to_touch_ids, :success_count, :courses_to_recache_due_dates,
-                    :enrollments_to_add_to_favorites, :roll_back_data, :enrollments_to_delete
+      attr_accessor :enrollments_to_update_sis_batch_ids,
+                    :courses_to_touch_ids,
+                    :incrementally_update_account_associations_user_ids,
+                    :update_account_association_user_ids,
+                    :account_chain_cache,
+                    :users_to_touch_ids,
+                    :success_count,
+                    :courses_to_recache_due_dates,
+                    :enrollments_to_add_to_favorites,
+                    :roll_back_data,
+                    :enrollments_to_delete
 
       def initialize(batch, root_account, logger, messages)
         @batch = batch

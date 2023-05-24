@@ -115,8 +115,10 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   def queue_export_job(priority: Delayed::LOW_PRIORITY)
     expires_at = hours_until_expire.hours.from_now
     queue_opts = {
-      priority: priority, max_attempts: 1,
-      expires_at: expires_at, on_permanent_failure: :fail_export_with_error!,
+      priority: priority,
+      max_attempts: 1,
+      expires_at: expires_at,
+      on_permanent_failure: :fail_export_with_error!,
       n_strand: ["master_course_exports", master_template.course.global_root_account_id]
       # we may need to raise the n_strand limit (in the settings) for this key since it'll default to 1 at a time
     }

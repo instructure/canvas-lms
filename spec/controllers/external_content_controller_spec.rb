@@ -316,7 +316,9 @@ describe ExternalContentController do
   describe "#content_items_for_canvas" do
     it "sets default placement advice" do
       c = course_factory
-      post(:success, params: { service: "external_tool_dialog", course_id: c.id, lti_message_type: "ContentItemSelection",
+      post(:success, params: { service: "external_tool_dialog",
+                               course_id: c.id,
+                               lti_message_type: "ContentItemSelection",
                                lti_version: "LTI-1p0",
                                data: "",
                                content_items: Rails.root.join("spec/fixtures/lti/content_items_2.json").read,
@@ -336,7 +338,9 @@ describe ExternalContentController do
       json = JSON.parse(Rails.root.join("spec/fixtures/lti/content_items_2.json").read)
       json["@graph"][0].delete("url")
       launch_url = "http://example.com/launch"
-      post(:success, params: { service: "external_tool_dialog", course_id: c.id, lti_message_type: "ContentItemSelection",
+      post(:success, params: { service: "external_tool_dialog",
+                               course_id: c.id,
+                               lti_message_type: "ContentItemSelection",
                                lti_version: "LTI-1p0",
                                data: Canvas::Security.create_jwt({ default_launch_url: launch_url }),
                                content_items: json.to_json,
@@ -353,7 +357,9 @@ describe ExternalContentController do
       it "generates a canvas tool launch url" do
         c = course_factory
         json = JSON.parse(Rails.root.join("spec/fixtures/lti/content_items.json").read)
-        post(:success, params: { service: "external_tool_dialog", course_id: c.id, lti_message_type: "ContentItemSelection",
+        post(:success, params: { service: "external_tool_dialog",
+                                 course_id: c.id,
+                                 lti_message_type: "ContentItemSelection",
                                  lti_version: "LTI-1p0",
                                  content_items: json.to_json })
 
@@ -366,7 +372,9 @@ describe ExternalContentController do
         c = course_factory
         json = JSON.parse(Rails.root.join("spec/fixtures/lti/content_items.json").read)
         json["@graph"][0]["placementAdvice"]["presentationDocumentTarget"] = "iframe"
-        post(:success, params: { service: "external_tool_dialog", course_id: c.id, lti_message_type: "ContentItemSelection",
+        post(:success, params: { service: "external_tool_dialog",
+                                 course_id: c.id,
+                                 lti_message_type: "ContentItemSelection",
                                  lti_version: "LTI-1p0",
                                  content_items: json.to_json })
 
@@ -378,7 +386,9 @@ describe ExternalContentController do
         c = course_factory
         json = JSON.parse(Rails.root.join("spec/fixtures/lti/content_items.json").read)
         json["@graph"][0]["placementAdvice"]["presentationDocumentTarget"] = "window"
-        post(:success, params: { service: "external_tool_dialog", course_id: c.id, lti_message_type: "ContentItemSelection",
+        post(:success, params: { service: "external_tool_dialog",
+                                 course_id: c.id,
+                                 lti_message_type: "ContentItemSelection",
                                  lti_version: "LTI-1p0",
                                  content_items: json.to_json })
 

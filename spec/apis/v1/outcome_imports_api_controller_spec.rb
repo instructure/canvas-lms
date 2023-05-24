@@ -40,8 +40,11 @@ describe OutcomeImportsApiController, type: :request do
   it "returns 404 when no latest import is available" do
     raw_api_call(:get,
                  "/api/v1/accounts/#{@account.id}/outcome_imports/latest",
-                 { controller: "outcome_imports_api", action: "show",
-                   format: "json", account_id: @account.id.to_s, id: "latest" })
+                 { controller: "outcome_imports_api",
+                   action: "show",
+                   format: "json",
+                   account_id: @account.id.to_s,
+                   id: "latest" })
     assert_status(404)
   end
 
@@ -51,8 +54,10 @@ describe OutcomeImportsApiController, type: :request do
     expect do
       json = api_call(:post,
                       "/api/v1/accounts/#{@account.id}/outcome_imports",
-                      { controller: "outcome_imports_api", action: "create",
-                        format: "json", account_id: @account.id.to_s },
+                      { controller: "outcome_imports_api",
+                        action: "create",
+                        format: "json",
+                        account_id: @account.id.to_s },
                       { import_type: "instructure_csv",
                         attachment: fixture_file_upload("outcomes/test_outcomes_1.csv", "text/csv") })
     end.to change { Delayed::Job.strand_size(strand) }.by(1)
@@ -74,9 +79,13 @@ describe OutcomeImportsApiController, type: :request do
     expect(LearningOutcomeGroup.count).to eq @group_count + 3
     expect(LearningOutcome.last.title).to eq "C"
 
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}",
-                    { controller: "outcome_imports_api", action: "show", format: "json",
-                      account_id: @account.id.to_s, id: import.id.to_s })
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}",
+                    { controller: "outcome_imports_api",
+                      action: "show",
+                      format: "json",
+                      account_id: @account.id.to_s,
+                      id: import.id.to_s })
     expect(json).to be_truthy
     remaining_json = expect_keys(json, %w[created_at updated_at ended_at user])
 
@@ -93,9 +102,13 @@ describe OutcomeImportsApiController, type: :request do
     let(:group) { LearningOutcomeGroup.create!(title: "test", context: @account) }
 
     let(:make_api_call) do
-      api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_imports/group/#{group.id}",
-               { controller: "outcome_imports_api", action: "create", format: "json",
-                 account_id: @account.id.to_s, learning_outcome_group_id: group.id.to_s },
+      api_call(:post,
+               "/api/v1/accounts/#{@account.id}/outcome_imports/group/#{group.id}",
+               { controller: "outcome_imports_api",
+                 action: "create",
+                 format: "json",
+                 account_id: @account.id.to_s,
+                 learning_outcome_group_id: group.id.to_s },
                { import_type: "instructure_csv",
                  attachment: fixture_file_upload("outcomes/test_outcomes_no_groups.csv", "text/csv") })
 
@@ -114,8 +127,11 @@ describe OutcomeImportsApiController, type: :request do
 
   describe "returns error for created group ids query" do
     before do
-      api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_imports",
-               { controller: "outcome_imports_api", action: "create", format: "json",
+      api_call(:post,
+               "/api/v1/accounts/#{@account.id}/outcome_imports",
+               { controller: "outcome_imports_api",
+                 action: "create",
+                 format: "json",
                  account_id: @account.id.to_s },
                { import_type: "instructure_csv",
                  attachment: fixture_file_upload("outcomes/test_outcomes_with_errors.csv", "text/csv") })
@@ -124,9 +140,13 @@ describe OutcomeImportsApiController, type: :request do
     it "if import is still being processed" do
       import = OutcomeImport.order(:id).last
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}/created_group_ids",
-                      { controller: "outcome_imports_api", action: "created_group_ids", format: "json",
-                        account_id: @account.id.to_s, id: import.id.to_s })
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}/created_group_ids",
+                      { controller: "outcome_imports_api",
+                        action: "created_group_ids",
+                        format: "json",
+                        account_id: @account.id.to_s,
+                        id: import.id.to_s })
 
       expect(json["message"]).to eq("Import is still being processed")
     end
@@ -136,9 +156,13 @@ describe OutcomeImportsApiController, type: :request do
 
       import = OutcomeImport.order(:id).last
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}/created_group_ids",
-                      { controller: "outcome_imports_api", action: "created_group_ids", format: "json",
-                        account_id: @account.id.to_s, id: import.id.to_s })
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}/created_group_ids",
+                      { controller: "outcome_imports_api",
+                        action: "created_group_ids",
+                        format: "json",
+                        account_id: @account.id.to_s,
+                        id: import.id.to_s })
 
       expect(json["message"]).to eq("Import has failed")
     end
@@ -146,8 +170,11 @@ describe OutcomeImportsApiController, type: :request do
 
   describe "returns created group ids" do
     it do
-      api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_imports",
-               { controller: "outcome_imports_api", action: "create", format: "json",
+      api_call(:post,
+               "/api/v1/accounts/#{@account.id}/outcome_imports",
+               { controller: "outcome_imports_api",
+                 action: "create",
+                 format: "json",
                  account_id: @account.id.to_s },
                { import_type: "instructure_csv",
                  attachment: fixture_file_upload("outcomes/test_outcomes_1.csv", "text/csv") })
@@ -157,9 +184,13 @@ describe OutcomeImportsApiController, type: :request do
       import = OutcomeImport.order(:id).last
       imported_group_ids = LearningOutcomeGroup.where(outcome_import_id: import.id).pluck(:id).map(&:to_s)
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}/created_group_ids",
-                      { controller: "outcome_imports_api", action: "created_group_ids", format: "json",
-                        account_id: @account.id.to_s, id: import.id.to_s })
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}/created_group_ids",
+                      { controller: "outcome_imports_api",
+                        action: "created_group_ids",
+                        format: "json",
+                        account_id: @account.id.to_s,
+                        id: import.id.to_s })
 
       expect(imported_group_ids.sort).to eq(json.sort)
     end
@@ -170,7 +201,8 @@ describe OutcomeImportsApiController, type: :request do
     # post work. However, long ago we added code to make it work even without the header,
     # so we are going to maintain that behavior.
     post "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
-         params: "\xffab=\xffcd", headers: { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
+         params: "\xffab=\xffcd",
+         headers: { "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" }
     import = OutcomeImport.last
     expect(import.attachment.filename).to eq "outcome_import.csv"
     expect(import.attachment.content_type).to eq "application/x-www-form-urlencoded"
@@ -180,9 +212,12 @@ describe OutcomeImportsApiController, type: :request do
   it "allows raw post without charset" do
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
-             { controller: "outcome_imports_api", action: "create",
-               format: "json", account_id: @account.id.to_s,
-               import_type: "instructure_csv", attachment: "blah" },
+             { controller: "outcome_imports_api",
+               action: "create",
+               format: "json",
+               account_id: @account.id.to_s,
+               import_type: "instructure_csv",
+               attachment: "blah" },
              {},
              { "CONTENT_TYPE" => "text/csv" })
     import = OutcomeImport.last
@@ -193,9 +228,12 @@ describe OutcomeImportsApiController, type: :request do
   it "handles raw post content-types with attributes" do
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
-             { controller: "outcome_imports_api", action: "create",
-               format: "json", account_id: @account.id.to_s,
-               import_type: "instructure_csv", attachment: "blah" },
+             { controller: "outcome_imports_api",
+               action: "create",
+               format: "json",
+               account_id: @account.id.to_s,
+               import_type: "instructure_csv",
+               attachment: "blah" },
              {},
              { "CONTENT_TYPE" => "text/csv; charset=utf-8" })
     import = OutcomeImport.last
@@ -206,8 +244,10 @@ describe OutcomeImportsApiController, type: :request do
   it "rejects non-utf-8 encodings on content-type" do
     raw_api_call(:post,
                  "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
-                 { controller: "outcome_imports_api", action: "create",
-                   format: "json", account_id: @account.id.to_s,
+                 { controller: "outcome_imports_api",
+                   action: "create",
+                   format: "json",
+                   account_id: @account.id.to_s,
                    import_type: "instructure_csv" },
                  {},
                  { "CONTENT_TYPE" => "text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1" })
@@ -219,8 +259,10 @@ describe OutcomeImportsApiController, type: :request do
     account_admin_user_with_role_changes(account: @account, role_changes: { manage_outcomes: true, import_outcomes: false })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/outcome_imports",
-             { controller: "outcome_imports_api", action: "create",
-               format: "json", account_id: @account.id.to_s },
+             { controller: "outcome_imports_api",
+               action: "create",
+               format: "json",
+               account_id: @account.id.to_s },
              { import_type: "instructure_csv",
                attachment: fixture_file_upload("outcomes/test_outcomes_1.csv", "text/csv") },
              {},
@@ -231,8 +273,10 @@ describe OutcomeImportsApiController, type: :request do
     account_admin_user_with_role_changes(user: @user, role_changes: { manage_outcomes: false, import_outcomes: true })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/outcome_imports",
-             { controller: "outcome_imports_api", action: "create",
-               format: "json", account_id: @account.id.to_s },
+             { controller: "outcome_imports_api",
+               action: "create",
+               format: "json",
+               account_id: @account.id.to_s },
              { import_type: "instructure_csv",
                attachment: fixture_file_upload("outcomes/test_outcomes_1.csv", "text/csv") },
              {},
@@ -245,9 +289,13 @@ describe OutcomeImportsApiController, type: :request do
       import.outcome_import_errors.create(message: "some error #{i}")
     end
 
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}",
-                    { controller: "outcome_imports_api", action: "show", format: "json",
-                      account_id: @account.id.to_s, id: import.id.to_s })
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}",
+                    { controller: "outcome_imports_api",
+                      action: "show",
+                      format: "json",
+                      account_id: @account.id.to_s,
+                      id: import.id.to_s })
     expect(json).to be_key "processing_errors"
   end
 end

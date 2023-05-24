@@ -123,9 +123,21 @@ module Api::V1::QuizQuestion
 
     # whitelist question details for students
     attr_whitelist = %w[
-      id position quiz_group_id quiz_id assessment_question_id
-      assessment_question question_name question_type question_text answers matches
-      formulas variables answer_tolerance formula_decimal_places
+      id
+      position
+      quiz_group_id
+      quiz_id
+      assessment_question_id
+      assessment_question
+      question_name
+      question_type
+      question_text
+      answers
+      matches
+      formulas
+      variables
+      answer_tolerance
+      formula_decimal_places
     ]
     question_data.keep_if { |k, _v| attr_whitelist.include?(k.to_s) }
 

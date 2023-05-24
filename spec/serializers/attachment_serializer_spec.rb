@@ -66,8 +66,20 @@ describe AttachmentSerializer do
 
   it "includes the output of the legacy serializer" do
     expected_keys = %w[
-      id content-type display_name filename url size created_at updated_at
-      unlock_at locked hidden lock_at hidden_for_user thumbnail_url
+      id
+      content-type
+      display_name
+      filename
+      url
+      size
+      created_at
+      updated_at
+      unlock_at
+      locked
+      hidden
+      lock_at
+      hidden_for_user
+      thumbnail_url
     ]
 
     expect(json.keys.map(&:to_s) & expected_keys).to match_array expected_keys

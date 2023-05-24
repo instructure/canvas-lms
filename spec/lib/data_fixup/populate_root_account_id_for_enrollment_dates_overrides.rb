@@ -26,7 +26,8 @@ describe DataFixup::PopulateRootAccountIdForEnrollmentDatesOverrides do
       term = @course.enrollment_term
       override = term.enrollment_dates_overrides.create!(
         enrollment_type: "TeacherEnrollment",
-        end_at: 1.week.from_now, context: account
+        end_at: 1.week.from_now,
+        context: account
       )
       # callbacks / validations skipped
       override.update_column(:root_account_id, nil)

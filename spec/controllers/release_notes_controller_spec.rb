@@ -76,18 +76,20 @@ describe ReleaseNotesController do
 
   describe "create" do
     it "creates a note with the expected values" do
-      post "create", params: {
-        target_roles: ["user"],
-        show_ats: { "test" => show_at },
-        published: true,
-        langs: {
-          en: {
-            title: "A great title",
-            description: "A great description",
-            url: "https://example.com/note1"
-          }
-        }
-      }, as: :json
+      post "create",
+           params: {
+             target_roles: ["user"],
+             show_ats: { "test" => show_at },
+             published: true,
+             langs: {
+               en: {
+                 title: "A great title",
+                 description: "A great description",
+                 url: "https://example.com/note1"
+               }
+             }
+           },
+           as: :json
       res = response.parsed_body
       the_note = ReleaseNote.find(res["id"])
       expect(the_note.target_roles).to eq(["user"])
@@ -103,19 +105,21 @@ describe ReleaseNotesController do
     it "updates an existing note in the expected way" do
       the_note = ReleaseNote.find(note.id)
       expect(the_note.target_roles).to_not be_nil
-      put "update", params: {
-        id: the_note.id,
-        target_roles: ["user"],
-        show_ats: { "test" => show_at + 35.minutes },
-        published: true,
-        langs: {
-          en: {
-            title: "A great title",
-            description: "A great description",
-            url: "https://example.com/note1"
-          }
-        }
-      }, as: :json
+      put "update",
+          params: {
+            id: the_note.id,
+            target_roles: ["user"],
+            show_ats: { "test" => show_at + 35.minutes },
+            published: true,
+            langs: {
+              en: {
+                title: "A great title",
+                description: "A great description",
+                url: "https://example.com/note1"
+              }
+            }
+          },
+          as: :json
       the_note = ReleaseNote.find(note.id)
       expect(the_note.target_roles).to eq(["user"])
       expect(the_note.show_ats["test"]).to eq(show_at + 35.minutes)

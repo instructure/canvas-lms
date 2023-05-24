@@ -7,6 +7,10 @@
   <%= t :tweet, "Canvas Alert - Grade Change: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %>
 <% end %>
 
-<% if asset.score -%>
-<%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>
+<% if asset.score && user.try(:send_scores_in_emails?, asset.assignment.context) %>
+  <% if asset.assignment.restrict_quantitative_data?(user)%>
+    <%=t :grade, "grade: %{letter_grade}", :letter_grade => asset.assignment.score_to_grade(asset.score, asset.grade, true)%>
+  <% else %>
+    <%= t :score, "score: %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>
+  <% end %>
 <% end -%> <%= t(:score_pending, "(pending review)") if asset.pending_review? %>

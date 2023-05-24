@@ -30,7 +30,9 @@ describe "CommunicationChannels API", type: :request do
 
       @path = "/api/v1/users/#{@someone.id}/communication_channels"
       @path_options = { controller: "communication_channels",
-                        action: "index", format: "json", user_id: @someone.id.to_param }
+                        action: "index",
+                        format: "json",
+                        user_id: @someone.id.to_param }
     end
 
     context "an authorized user" do
@@ -99,7 +101,8 @@ describe "CommunicationChannels API", type: :request do
 
       @path = "/api/v1/users/#{@someone.id}/communication_channels"
       @path_options = { controller: "communication_channels",
-                        action: "create", format: "json",
+                        action: "create",
+                        format: "json",
                         user_id: @someone.id.to_param, }
       @post_params = { communication_channel: {
         address: "new+api@example.com", type: "email"
@@ -230,8 +233,10 @@ describe "CommunicationChannels API", type: :request do
       end
 
       it "is not able to create channels for others" do
-        raw_api_call(:post, "/api/v1/users/#{@admin.id}/communication_channels",
-                     @path_options.merge(user_id: @admin.to_param), @post_params)
+        raw_api_call(:post,
+                     "/api/v1/users/#{@admin.id}/communication_channels",
+                     @path_options.merge(user_id: @admin.to_param),
+                     @post_params)
 
         expect(response.code).to eql "401"
       end
@@ -314,7 +319,9 @@ describe "CommunicationChannels API", type: :request do
     let(:path) { "/api/v1/users/#{someone.id}/communication_channels/#{channel.id}" }
     let(:path_options) do
       { controller: "communication_channels",
-        action: "destroy", user_id: someone.to_param, format: "json",
+        action: "destroy",
+        user_id: someone.to_param,
+        format: "json",
         id: channel.to_param }
     end
 
@@ -361,29 +368,42 @@ describe "CommunicationChannels API", type: :request do
 
       it "is not able to delete others' channels" do
         admin_channel = admin.communication_channel
-        raw_api_call(:delete, "/api/v1/users/#{admin.id}/communication_channels/#{admin_channel.id}",
+        raw_api_call(:delete,
+                     "/api/v1/users/#{admin.id}/communication_channels/#{admin_channel.id}",
                      path_options.merge(user_id: admin.to_param, id: admin_channel.to_param))
 
         expect(response.code).to eql "401"
       end
 
       it "is able to delete by path, instead of id" do
-        api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI::DEFAULT_PARSER.escape(channel.path)}",
+        api_call(:delete,
+                 "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI::DEFAULT_PARSER.escape(channel.path)}",
                  controller: "communication_channels",
-                 action: "destroy", user_id: someone.to_param, format: "json",
-                 type: channel.path_type, address: channel.path)
+                 action: "destroy",
+                 user_id: someone.to_param,
+                 format: "json",
+                 type: channel.path_type,
+                 address: channel.path)
         expect(CommunicationChannel.find(channel.id)).to be_retired # for some reason, .reload on a let() bound model returns nil
       end
 
       it "404s if already deleted by path" do
-        api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI::DEFAULT_PARSER.escape(channel.path)}",
+        api_call(:delete,
+                 "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI::DEFAULT_PARSER.escape(channel.path)}",
                  controller: "communication_channels",
-                 action: "destroy", user_id: someone.to_param, format: "json",
-                 type: channel.path_type, address: channel.path)
-        raw_api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI::DEFAULT_PARSER.escape(channel.path)}",
+                 action: "destroy",
+                 user_id: someone.to_param,
+                 format: "json",
+                 type: channel.path_type,
+                 address: channel.path)
+        raw_api_call(:delete,
+                     "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI::DEFAULT_PARSER.escape(channel.path)}",
                      controller: "communication_channels",
-                     action: "destroy", user_id: someone.to_param, format: "json",
-                     type: channel.path_type, address: channel.path)
+                     action: "destroy",
+                     user_id: someone.to_param,
+                     format: "json",
+                     type: channel.path_type,
+                     address: channel.path)
         expect(response.code).to eq "404"
       end
     end

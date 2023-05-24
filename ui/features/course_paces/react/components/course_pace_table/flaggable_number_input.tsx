@@ -48,7 +48,7 @@ interface ComponentProps {
   readonly showFlag?: boolean
 }
 
-export const FlaggableNumberInput: React.FC<ComponentProps> = ({
+export const FlaggableNumberInput = ({
   label,
   interaction,
   value,
@@ -58,7 +58,7 @@ export const FlaggableNumberInput: React.FC<ComponentProps> = ({
   onIncrement,
   showTooltipOn,
   showFlag = false,
-}) => {
+}: ComponentProps) => {
   return (
     <Flex as="div" wrap="no-wrap" justifyItems="end">
       {showFlag && (

@@ -55,8 +55,12 @@ describe DataFixup::CleanupCrossShardDeveloperKeys do
     user_model.update(workflow_state: "deleted")
     at = AccessToken.create!(user: @user, developer_key: @dk)
     dkab = DeveloperKeyAccountBinding.create!(developer_key: @dk, account: account_model)
-    cet = ContextExternalTool.create!(developer_key: @dk, account: Account.default, name: "hi",
-                                      consumer_key: "do", shared_secret: "you", url: "https://knowwherethebathroomis.com")
+    cet = ContextExternalTool.create!(developer_key: @dk,
+                                      account: Account.default,
+                                      name: "hi",
+                                      consumer_key: "do",
+                                      shared_secret: "you",
+                                      url: "https://knowwherethebathroomis.com")
     cetp = ContextExternalToolPlacement.create!(context_external_tool: cet, placement_type: "course_navigation")
 
     DataFixup::CleanupCrossShardDeveloperKeys.run

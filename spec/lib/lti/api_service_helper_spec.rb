@@ -50,9 +50,14 @@ module Lti
 
     before do
       @tool_proxy = ToolProxy.create!(
-        guid: "key", shared_secret: "secret", product_version: 1,
-        lti_version: "LTIv2p0", workflow_state: "active", raw_data: "{}",
-        product_family: product_family, context: course
+        guid: "key",
+        shared_secret: "secret",
+        product_version: 1,
+        lti_version: "LTIv2p0",
+        workflow_state: "active",
+        raw_data: "{}",
+        product_family: product_family,
+        context: course
       )
       allow(OAuth::Helper).to receive_messages(parse_header: {})
     end

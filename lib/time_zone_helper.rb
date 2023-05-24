@@ -57,10 +57,24 @@ module TimeZoneHelper
     @reverse_map ||= ActiveSupport::TimeZone.all.filter_map do |z|
       # Rails allows several aliases that map to the same IANA zone; on the reverse
       # mapping, exclude the aliases so that America/Lima doesn't come back as Quito
-      next if ["International Date Line West", "Guadalajara", "Quito",
-               "Edinburgh", "Bern", "St. Petersburg", "Volgograd", "Abu Dhabi",
-               "Islamabad", "Chennai", "Mumbai", "New Delhi", "Astana",
-               "Hanoi", "Osaka", "Sapporo", "Canberra", "Solomon Is.",
+      next if ["International Date Line West",
+               "Guadalajara",
+               "Quito",
+               "Edinburgh",
+               "Bern",
+               "St. Petersburg",
+               "Volgograd",
+               "Abu Dhabi",
+               "Islamabad",
+               "Chennai",
+               "Mumbai",
+               "New Delhi",
+               "Astana",
+               "Hanoi",
+               "Osaka",
+               "Sapporo",
+               "Canberra",
+               "Solomon Is.",
                "Wellington"].include?(z.name)
 
       [z.tzinfo.name, z]

@@ -68,9 +68,17 @@ module MasterCourses::Restrictor
       end
 
       def restrict_assignment_columns
-        restrict_columns :settings, %i[assignment_group_id grading_type omit_from_final_grade submission_types
-                                       group_category group_category_id grade_group_students_individually
-                                       peer_reviews moderated_grading peer_reviews_due_at allowed_attempts]
+        restrict_columns :settings, %i[assignment_group_id
+                                       grading_type
+                                       omit_from_final_grade
+                                       submission_types
+                                       group_category
+                                       group_category_id
+                                       grade_group_students_individually
+                                       peer_reviews
+                                       moderated_grading
+                                       peer_reviews_due_at
+                                       allowed_attempts]
         restrict_columns :due_dates, [:due_at]
         restrict_columns :availability_dates, [:lock_at, :unlock_at]
         restrict_columns :points, [:points_possible]

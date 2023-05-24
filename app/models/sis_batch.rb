@@ -147,7 +147,8 @@ class SisBatch < ActiveRecord::Base
   class Aborted < RuntimeError; end
 
   def self.queue_job_for_account(account, run_at = nil)
-    job_args = { priority: Delayed::LOW_PRIORITY, max_attempts: 1,
+    job_args = { priority: Delayed::LOW_PRIORITY,
+                 max_attempts: 1,
                  singleton: strand_for_account(account) }
 
     if run_at
@@ -707,7 +708,9 @@ class SisBatch < ActiveRecord::Base
 
   def change_detected_message(count, type)
     t("%{count} %{type} would be deleted and exceeds the set threshold of %{change_threshold}%",
-      count: count, type: type, change_threshold: change_threshold)
+      count: count,
+      type: type,
+      change_threshold: change_threshold)
   end
 
   def as_json(*)
@@ -894,9 +897,12 @@ class SisBatch < ActiveRecord::Base
   def restore_states_later(batch_mode: nil, undelete_only: false, unconclude_only: false)
     shard.activate do
       restore_progress = Progress.create! context: self, tag: "sis_batch_state_restore", completion: 0.0
-      restore_progress.process_job(self, :restore_states_for_batch,
+      restore_progress.process_job(self,
+                                   :restore_states_for_batch,
                                    { n_strand: ["restore_states_for_batch", account.global_id] },
-                                   batch_mode: batch_mode, undelete_only: undelete_only, unconclude_only: unconclude_only)
+                                   batch_mode: batch_mode,
+                                   undelete_only: undelete_only,
+                                   unconclude_only: unconclude_only)
       restore_progress
     end
   end

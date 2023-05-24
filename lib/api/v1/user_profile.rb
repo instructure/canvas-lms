@@ -29,8 +29,16 @@ module Api::V1::UserProfile
 
     json = user_json(user, current_user, session, "avatar_url", context)
     # don't unintentionally include stuff added to user_json
-    json.slice! :id, :name, :short_name, :sortable_name, :sis_user_id,
-                :sis_login_id, :login_id, :avatar_url, :integration_id, :pronouns
+    json.slice! :id,
+                :name,
+                :short_name,
+                :sortable_name,
+                :sis_user_id,
+                :sis_login_id,
+                :login_id,
+                :avatar_url,
+                :integration_id,
+                :pronouns
 
     json[:title] = profile.title
     json[:bio] = profile.bio
@@ -74,7 +82,9 @@ module Api::V1::UserProfile
   end
 
   def user_service_json(user_service, current_user, session)
-    api_json(user_service, current_user, session,
+    api_json(user_service,
+             current_user,
+             session,
              only: %w[service visible],
              methods: %(service_user_link))
   end

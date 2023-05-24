@@ -40,8 +40,12 @@ describe MediaObjectsController, type: :request do
       @original_count = @user.media_objects.count
       allow_any_instance_of(MediaObject).to receive(:media_sources).and_return("stub")
 
-      json = api_call(:post, "/api/v1/media_objects",
-                      { controller: "media_objects", action: "create_media_object", format: "json", context_code: "user_#{@user.id}",
+      json = api_call(:post,
+                      "/api/v1/media_objects",
+                      { controller: "media_objects",
+                        action: "create_media_object",
+                        format: "json",
+                        context_code: "user_#{@user.id}",
                         id: "new_object",
                         type: "audio",
                         title: "title" })

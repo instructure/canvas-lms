@@ -281,9 +281,18 @@ class SubmissionsController < SubmissionsBaseController
     return unless valid_resource_link_lookup_uuid?
 
     submission_params = params[:submission].permit(
-      :body, :url, :submission_type, :submitted_at, :comment, :group_comment,
-      :media_comment_type, :media_comment_id, :eula_agreement_timestamp,
-      :resource_link_lookup_uuid, :annotatable_attachment_id, attachment_ids: []
+      :body,
+      :url,
+      :submission_type,
+      :submitted_at,
+      :comment,
+      :group_comment,
+      :media_comment_type,
+      :media_comment_id,
+      :eula_agreement_timestamp,
+      :resource_link_lookup_uuid,
+      :annotatable_attachment_id,
+      attachment_ids: []
     )
     submission_params[:group_comment] = value_to_boolean(submission_params[:group_comment])
     submission_params[:attachments] = Attachment.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)
@@ -332,7 +341,8 @@ class SubmissionsController < SubmissionsBaseController
                    status: :created,
                    location: api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
           else
-            render json: @submission.as_json(include: :submission_comments, methods: :late), status: :created,
+            render json: @submission.as_json(include: :submission_comments, methods: :late),
+                   status: :created,
                    location: course_gradebook_url(@submission.assignment.context)
           end
         end
@@ -379,11 +389,12 @@ class SubmissionsController < SubmissionsBaseController
     respond_to do |format|
       format.json do
         render json: {
-          audit_events: audit_events.as_json(include_root: false),
-          users: audit_event_data(data: user_data, submission: submission),
-          tools: audit_event_data(data: tool_data, role: "grader"),
-          quizzes: audit_event_data(data: quiz_data, role: "grader", name_field: :title),
-        }, status: :ok
+                 audit_events: audit_events.as_json(include_root: false),
+                 users: audit_event_data(data: user_data, submission: submission),
+                 tools: audit_event_data(data: tool_data, role: "grader"),
+                 quizzes: audit_event_data(data: quiz_data, role: "grader", name_field: :title),
+               },
+               status: :ok
       end
     end
   end
@@ -475,7 +486,8 @@ class SubmissionsController < SubmissionsBaseController
       render(json: {
                message: "Invalid parameters for submission_type #{submission_type}. " \
                         "Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ")}"
-             }, status: :bad_request)
+             },
+             status: :bad_request)
       return false
     end
     params[:submission][:comment] = params[:comment].try(:delete, :text_comment)

@@ -274,4 +274,13 @@ Rails.application.config.after_initialize do
 
   # TODO: fix canvas so we don't need this because this is not good
   Switchman.config[:writable_shadow_records] = true
+
+  Switchman::Deprecation.behavior = [
+    :log,
+    lambda do |message, callstack, _deprecation_horizon, _gem_name|
+      e = ActiveSupport::DeprecationException.new(message)
+      e.set_backtrace(callstack.map(&:to_s))
+      Sentry.capture_exception(e, level: :warning)
+    end
+  ]
 end

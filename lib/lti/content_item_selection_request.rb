@@ -34,7 +34,7 @@ module Lti
 
     def generate_lti_launch(placement:, opts: {}, expanded_variables: {})
       lti_launch = Lti::Launch.new(opts)
-      lti_launch.resource_url = opts[:launch_url] || @tool.extension_setting(placement, :url)
+      lti_launch.resource_url = @tool.launch_url(extension_type: placement, preferred_launch_url: opts[:launch_url])
       lti_launch.link_text = @tool.label_for(placement.to_sym, I18n.locale)
       lti_launch.analytics_id = @tool.tool_id
       lti_launch.params = launch_params(

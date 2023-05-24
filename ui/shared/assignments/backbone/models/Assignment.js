@@ -822,6 +822,23 @@ Assignment.prototype.externalToolCustomParamsStringified = function () {
   return ''
 }
 
+Assignment.prototype.externalToolLineItem = function (line_item) {
+  const tagAttributes = this.get('external_tool_tag_attributes') || {}
+  if (!(arguments.length > 0)) {
+    return tagAttributes.line_item
+  }
+  tagAttributes.line_item = line_item
+  return this.set('external_tool_tag_attributes', tagAttributes)
+}
+
+Assignment.prototype.externalToolLineItemStringified = function () {
+  const data = this.externalToolLineItem()
+  if (data) {
+    return JSON.stringify(data)
+  }
+  return ''
+}
+
 Assignment.prototype.isMasteryConnectTool = function () {
   let ref
   const tagAttributes = this.get('external_tool_tag_attributes') || {}
@@ -1165,6 +1182,8 @@ Assignment.prototype.toView = function () {
     'externalToolCustomParams',
     'externalToolCustomParamsStringified',
     'externalToolData',
+    'externalToolLineItem',
+    'externalToolLineItemStringified',
     'externalToolDataStringified',
     'externalToolDataStudentLabelText',
     'externalToolNewTab',

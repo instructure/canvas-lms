@@ -161,26 +161,28 @@ module SearchHelper
     exclude_users, exclude_contexts = AddressBook.partition_recipients(options[:exclude] || [])
 
     if types[:context]
-      collections << ["contexts", search_messageable_contexts(
-        search: options[:search],
-        context: options[:context],
-        synthetic_contexts: options[:synthetic_contexts],
-        include_inactive: options[:include_inactive],
-        messageable_only: options[:messageable_only],
-        exclude_ids: exclude_contexts,
-        search_all_contexts: options[:search_all_contexts],
-        types: types[:context],
-        base_url: options[:base_url]
-      )]
+      collections << ["contexts",
+                      search_messageable_contexts(
+                        search: options[:search],
+                        context: options[:context],
+                        synthetic_contexts: options[:synthetic_contexts],
+                        include_inactive: options[:include_inactive],
+                        messageable_only: options[:messageable_only],
+                        exclude_ids: exclude_contexts,
+                        search_all_contexts: options[:search_all_contexts],
+                        types: types[:context],
+                        base_url: options[:base_url]
+                      )]
     end
 
     if types[:user] && !@skip_users
-      collections << ["participants", @current_user.address_book.search_users(
-        search: options[:search],
-        exclude_ids: exclude_users,
-        context: options[:context],
-        weak_checks: options[:skip_visibility_checks]
-      )]
+      collections << ["participants",
+                      @current_user.address_book.search_users(
+                        search: options[:search],
+                        exclude_ids: exclude_users,
+                        context: options[:context],
+                        weak_checks: options[:skip_visibility_checks]
+                      )]
     end
 
     collections

@@ -186,7 +186,8 @@ RSpec.shared_context "microsoft_sync_graph_service_endpoints" do
       expect(InstStatsd::Statsd).to have_received(:increment).with(
         "microsoft_sync.graph_service.success", tags: {
           msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
-          extra_tag: "abc", status_code: /^20.$/,
+          extra_tag: "abc",
+          status_code: /^20.$/,
         }
       )
     end
@@ -228,7 +229,8 @@ RSpec.shared_context "microsoft_sync_graph_service_endpoints" do
       context "when a filter and select are used" do
         subject do
           endpoints.send(
-            method_name, *method_args,
+            method_name,
+            *method_args,
             filter: { userPrincipalName: %w[user1@domain.com user2@domain.com] },
             select: %w[id userPrincipalName]
           )

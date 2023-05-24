@@ -100,9 +100,13 @@ class CanvasSchema < GraphQL::Schema
                  graphql_type: error.type.graphql_name)
   end
 
-  orphan_types [Types::PageType, Types::FileType, Types::ExternalUrlType,
-                Types::ExternalToolType, Types::ModuleExternalToolType,
-                Types::ProgressType, Types::ModuleSubHeaderType,
+  orphan_types [Types::PageType,
+                Types::FileType,
+                Types::ExternalUrlType,
+                Types::ExternalToolType,
+                Types::ModuleExternalToolType,
+                Types::ProgressType,
+                Types::ModuleSubHeaderType,
                 Types::InternalSettingType]
 
   def self.for_federation

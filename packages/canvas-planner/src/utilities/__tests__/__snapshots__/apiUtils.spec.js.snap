@@ -340,6 +340,7 @@ Object {
   "overrideAssignId": undefined,
   "overrideId": null,
   "points": 50,
+  "restrict_quantitative_data": false,
   "status": false,
   "title": "How to be neutral",
   "toggleAPIPending": false,

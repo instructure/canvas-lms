@@ -206,7 +206,8 @@ describe HealthChecks do
         readiness: {
           readiness_check_name_error: { time: 1, status: false },
         },
-      }, { cluster: "C1" }
+      },
+      { cluster: "C1" }
     )
 
     expect(InstStatsd::Statsd).to have_received(:gauge).with("canvas.health_checks.status", 0, tags: { type: :readiness, key: :readiness_check_name_error, cluster: "C1" })

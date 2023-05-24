@@ -73,7 +73,8 @@ describe OutcomeProficiency do
       root_account_2 = account_model
       rating1 = OutcomeProficiencyRating.new(description: "best", points: 10, mastery: true, color: "00ff00")
       rating2 = OutcomeProficiencyRating.new(description: "worst", points: 0, mastery: false, color: "ff0000")
-      proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1, rating2], context: root_account_1,
+      proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1, rating2],
+                                               context: root_account_1,
                                                root_account_id: root_account_2.resolved_root_account_id)
       expect(proficiency.root_account_id).to be(root_account_2.resolved_root_account_id)
     end

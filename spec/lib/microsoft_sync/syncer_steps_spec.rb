@@ -133,7 +133,8 @@ describe MicrosoftSync::SyncerSteps do
       it "returns a Retry object" do
         expect(graph_service.http).to receive(:request).and_raise(new_http_error(500))
         expect_retry(subject,
-                     error_class: MicrosoftSync::Errors::HTTPInternalServerError, **retry_args)
+                     error_class: MicrosoftSync::Errors::HTTPInternalServerError,
+                     **retry_args)
       end
     end
 
@@ -142,7 +143,8 @@ describe MicrosoftSync::SyncerSteps do
         it "goes back to step_generate_diff with a delay" do
           expect(graph_service.http).to receive(:request).and_raise(new_http_error(404))
           expect_retry(subject,
-                       error_class: MicrosoftSync::Errors::HTTPNotFound, **retry_args)
+                       error_class: MicrosoftSync::Errors::HTTPNotFound,
+                       **retry_args)
         end
       end
     end
@@ -184,7 +186,8 @@ describe MicrosoftSync::SyncerSteps do
         it "returns a Retry object with our default retry times" do
           expect(graph_service.http).to receive(:request).and_raise(new_http_error(429))
           expect_retry(subject,
-                       error_class: MicrosoftSync::Errors::HTTPTooManyRequests, **retry_args)
+                       error_class: MicrosoftSync::Errors::HTTPTooManyRequests,
+                       **retry_args)
         end
       end
     end
@@ -675,7 +678,8 @@ describe MicrosoftSync::SyncerSteps do
           tags: { sync_type: sync_type_statsd_tag }
         )
         expect(InstStatsd::Statsd).to have_received(:count).twice.with(
-          "microsoft_sync.syncer_steps.skipped_total.add", 3,
+          "microsoft_sync.syncer_steps.skipped_total.add",
+          3,
           tags: { sync_type: sync_type_statsd_tag }
         )
       end
@@ -730,7 +734,8 @@ describe MicrosoftSync::SyncerSteps do
           tags: { sync_type: sync_type_statsd_tag }
         )
         expect(InstStatsd::Statsd).to have_received(:count).twice.with(
-          "microsoft_sync.syncer_steps.skipped_total.remove", 2,
+          "microsoft_sync.syncer_steps.skipped_total.remove",
+          2,
           tags: { sync_type: sync_type_statsd_tag }
         )
       end
@@ -761,9 +766,12 @@ describe MicrosoftSync::SyncerSteps do
 
     let(:diff) do
       instance_double(
-        MicrosoftSync::MembershipDiff, local_owners: Set.new(%w[o3]),
-                                       max_enrollment_members_reached?: false, max_enrollment_owners_reached?: false,
-                                       additions_in_slices_of: nil, removals_in_slices_of: nil
+        MicrosoftSync::MembershipDiff,
+        local_owners: Set.new(%w[o3]),
+        max_enrollment_members_reached?: false,
+        max_enrollment_owners_reached?: false,
+        additions_in_slices_of: nil,
+        removals_in_slices_of: nil
       )
     end
 
@@ -930,8 +938,10 @@ describe MicrosoftSync::SyncerSteps do
 
       before do
         students.each_with_index do |student, index|
-          communication_channel(student, path_type: "email", username: "s#{index}@example.com",
-                                         active_cc: true)
+          communication_channel(student,
+                                path_type: "email",
+                                username: "s#{index}@example.com",
+                                active_cc: true)
         end
         communication_channel(teacher, path_type: "email", username: "t@example.com", active_cc: true)
 
@@ -988,8 +998,11 @@ describe MicrosoftSync::SyncerSteps do
         let(:diff) do
           instance_double(
             MicrosoftSync::PartialMembershipDiff,
-            set_local_member: nil, set_member_mapping: nil,
-            log_all_actions: nil, additions_in_slices_of: nil, removals_in_slices_of: nil
+            set_local_member: nil,
+            set_member_mapping: nil,
+            log_all_actions: nil,
+            additions_in_slices_of: nil,
+            removals_in_slices_of: nil
           )
         end
 
@@ -1020,7 +1033,8 @@ describe MicrosoftSync::SyncerSteps do
         it "builds a partial membership diff" do
           subject
           expect(MicrosoftSync::PartialMembershipDiff).to have_received(:new).with(
-            students[0].id => ["member"], students[2].id => ["member", "owner"],
+            students[0].id => ["member"],
+            students[2].id => ["member", "owner"],
             teacher.id => ["owner"]
           )
           expect(diff).to have_received(:set_local_member).with(students[0].id, "StudentEnrollment")
@@ -1052,7 +1066,8 @@ describe MicrosoftSync::SyncerSteps do
           # to trigger requests that can cause an intermittent error
 
           it_behaves_like "a step that returns retry on intermittent error",
-                          except_throttled: true, except_group_not_found: true do
+                          except_throttled: true,
+                          except_group_not_found: true do
             context "when a request is throttled" do
               before do
                 allow(graph_service.http).to receive(:request)
@@ -1081,8 +1096,9 @@ describe MicrosoftSync::SyncerSteps do
 
               it "retries but with a GracefulCancelError so it will eventually quietly fail" do
                 expect_retry(
-                  subject, error_class: MicrosoftSync::Errors::GroupNotFoundGracefulCancelError,
-                           delay_amount: [15, 60, 300]
+                  subject,
+                  error_class: MicrosoftSync::Errors::GroupNotFoundGracefulCancelError,
+                  delay_amount: [15, 60, 300]
                 )
                 expect(MicrosoftSync::Errors::GroupNotFoundGracefulCancelError.superclass)
                   .to eq(MicrosoftSync::Errors::GracefulCancelError)

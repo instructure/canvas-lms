@@ -91,6 +91,19 @@ describe Lti::Messages::DeepLinkingRequest do
         let(:auto_create) { true }
         let(:accept_multiple) { false }
       end
+
+      context "when editing an existing collaboration (expander.collaboration != nil)" do
+        let(:collaboration) do
+          ExternalToolCollaboration.create! context: course, title: "foo", url: "http://notneededhere.example.com"
+        end
+
+        it "includes the content_item_id in the deep linking return URL's data JWT" do
+          expect(Lti::DeepLinkingData).to receive(:jwt_from) do |claims|
+            expect(claims[:content_item_id]).to eq(collaboration.id)
+          end
+          subject
+        end
+      end
     end
 
     context 'when resource type is "link_selection"' do

@@ -176,8 +176,12 @@ class Announcement < DiscussionTopic
       threshold = ObserverAlertThreshold.where(observer: observer, alert_type: "course_announcement", student: student).first
       next unless threshold
 
-      ObserverAlert.create!(observer: observer, student: student, observer_alert_threshold: threshold,
-                            context: self, alert_type: "course_announcement", action_date: updated_at,
+      ObserverAlert.create!(observer: observer,
+                            student: student,
+                            observer_alert_threshold: threshold,
+                            context: self,
+                            alert_type: "course_announcement",
+                            action_date: updated_at,
                             title: I18n.t("Course announcement: \"%{title}\" in %{course_code}", {
                                             title: self.title,
                                             course_code: course.course_code

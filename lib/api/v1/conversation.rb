@@ -103,7 +103,9 @@ module Api::V1::Conversation
     include_avatars = should_include_participant_avatars?(recipients.count)
     recipients.map do |recipient|
       if recipient.is_a?(User)
-        conversation_user_json(recipient, current_user, session,
+        conversation_user_json(recipient,
+                               current_user,
+                               session,
                                include_participant_avatars: include_avatars,
                                include_participant_contexts: true)
       else

@@ -261,8 +261,11 @@ describe CourseSection, "moving to new course" do
     course = course_factory({ course_name: "Course 1", active_all: true })
     section = course.course_sections.create!
     course.save!
-    announcement1 = Announcement.create!(title: "some topic", message: "blah",
-                                         context: course, is_section_specific: true, course_sections: [section])
+    announcement1 = Announcement.create!(title: "some topic",
+                                         message: "blah",
+                                         context: course,
+                                         is_section_specific: true,
+                                         course_sections: [section])
     visibility = announcement1.reload.discussion_topic_section_visibilities.first
 
     course2 = course_factory
@@ -635,8 +638,10 @@ describe CourseSection, "moving to new course" do
     end
 
     it "invalidates access if section is cross-listed" do
-      @course.update(workflow_state: "available", restrict_student_future_view: true,
-                     restrict_enrollments_to_course_dates: true, start_at: 1.day.from_now)
+      @course.update(workflow_state: "available",
+                     restrict_student_future_view: true,
+                     restrict_enrollments_to_course_dates: true,
+                     start_at: 1.day.from_now)
       expect(@enrollment.enrollment_state.reload.restricted_access?).to be true
 
       other_course = course_factory(active_all: true)

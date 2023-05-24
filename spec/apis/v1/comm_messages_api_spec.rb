@@ -33,7 +33,9 @@ describe CommMessagesApiController, type: :request do
           Message.create!(user: @test_user, body: "site admin message", root_account_id: Account.site_admin.id)
           Message.create!(user: @test_user, body: "account message", root_account_id: Account.default.id)
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
-                            controller: "comm_messages_api", action: "index", format: "json",
+                            controller: "comm_messages_api",
+                            action: "index",
+                            format: "json",
                             user_id: @test_user.to_param
                           })
           expect(json.size).to be 2
@@ -49,7 +51,9 @@ describe CommMessagesApiController, type: :request do
           expect(response.code).to eql "404"
 
           raw_api_call(:get, "/api/v1/comm_messages?user_id=0", {
-                         controller: "comm_messages_api", action: "index", format: "json",
+                         controller: "comm_messages_api",
+                         action: "index",
+                         format: "json",
                          user_id: "0"
                        })
           expect(response.code).to eql "404"
@@ -64,8 +68,12 @@ describe CommMessagesApiController, type: :request do
           start_time = 1.hour.ago.iso8601
           end_time = 1.hour.from_now.iso8601
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}&start_time=#{start_time}&end_time=#{end_time}", {
-                            controller: "comm_messages_api", action: "index", format: "json",
-                            user_id: @test_user.to_param, start_time: start_time, end_time: end_time
+                            controller: "comm_messages_api",
+                            action: "index",
+                            format: "json",
+                            user_id: @test_user.to_param,
+                            start_time: start_time,
+                            end_time: end_time
                           })
           expect(json.length).to eq 1
           expect(json.first["id"]).to eq m2.id
@@ -76,20 +84,31 @@ describe CommMessagesApiController, type: :request do
             Message.create!(user: @test_user, body: "body #{v}", root_account_id: Account.default.id)
           end
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}&per_page=2", {
-                            controller: "comm_messages_api", action: "index", format: "json",
-                            user_id: @test_user.to_param, per_page: "2"
+                            controller: "comm_messages_api",
+                            action: "index",
+                            format: "json",
+                            user_id: @test_user.to_param,
+                            per_page: "2"
                           })
           expect(json.size).to be 2
 
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}&per_page=2&page=2", {
-                            controller: "comm_messages_api", action: "index", format: "json",
-                            user_id: @test_user.to_param, per_page: "2", page: "2"
+                            controller: "comm_messages_api",
+                            action: "index",
+                            format: "json",
+                            user_id: @test_user.to_param,
+                            per_page: "2",
+                            page: "2"
                           })
           expect(json.size).to be 2
 
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}&per_page=2&page=3", {
-                            controller: "comm_messages_api", action: "index", format: "json",
-                            user_id: @test_user.to_param, per_page: "2", page: "3"
+                            controller: "comm_messages_api",
+                            action: "index",
+                            format: "json",
+                            user_id: @test_user.to_param,
+                            per_page: "2",
+                            page: "3"
                           })
           expect(json.size).to be 1
         end
@@ -104,7 +123,9 @@ describe CommMessagesApiController, type: :request do
 
         it "receives unauthorized" do
           raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
-                         controller: "comm_messages_api", action: "index", format: "json",
+                         controller: "comm_messages_api",
+                         action: "index",
+                         format: "json",
                          user_id: @test_user.to_param
                        })
           expect(response.code).to eql "401"
@@ -124,7 +145,9 @@ describe CommMessagesApiController, type: :request do
           Account.default.settings[:admins_can_view_notifications] = false
           Account.default.save!
           raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
-                         controller: "comm_messages_api", action: "index", format: "json",
+                         controller: "comm_messages_api",
+                         action: "index",
+                         format: "json",
                          user_id: @test_user.to_param
                        })
           expect(response.code).to eql "401"
@@ -136,7 +159,9 @@ describe CommMessagesApiController, type: :request do
           Message.create!(user: @test_user, body: "site admin message", root_account_id: Account.site_admin.id)
           Message.create!(user: @test_user, body: "account message", root_account_id: Account.default.id)
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
-                            controller: "comm_messages_api", action: "index", format: "json",
+                            controller: "comm_messages_api",
+                            action: "index",
+                            format: "json",
                             user_id: @test_user.to_param
                           })
           expect(json.size).to be 1
@@ -153,7 +178,9 @@ describe CommMessagesApiController, type: :request do
 
         it "receives unauthorized" do
           raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
-                         controller: "comm_messages_api", action: "index", format: "json",
+                         controller: "comm_messages_api",
+                         action: "index",
+                         format: "json",
                          user_id: @test_user.to_param
                        })
           expect(response.code).to eql "401"
@@ -169,7 +196,9 @@ describe CommMessagesApiController, type: :request do
 
       it "receives unauthorized" do
         raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
-                       controller: "comm_messages_api", action: "index", format: "json",
+                       controller: "comm_messages_api",
+                       action: "index",
+                       format: "json",
                        user_id: @test_user.to_param
                      })
         expect(response.code).to eql "401"

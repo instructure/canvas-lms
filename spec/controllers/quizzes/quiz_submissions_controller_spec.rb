@@ -85,8 +85,10 @@ describe Quizzes::QuizSubmissionsController do
       @submission.attempt = 1
       @submission.save!
 
-      post "create", params: { course_id: @quiz.context_id, quiz_id: @quiz.id,
-                               question_128: "bye", validation_token: @submission.validation_token,
+      post "create", params: { course_id: @quiz.context_id,
+                               quiz_id: @quiz.id,
+                               question_128: "bye",
+                               validation_token: @submission.validation_token,
                                attempt: 1 }
       events = Quizzes::QuizSubmissionEvent.where(quiz_submission_id: @submission.id)
       expect(events.size).to be_equal(1)

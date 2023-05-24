@@ -351,7 +351,8 @@ describe Rubric do
       expect(@rubric).to be_new_record
       # need to run the test 2x because the code path is different for new rubrics
       2.times do
-        @rubric.update_with_association(@teacher, {
+        @rubric.update_with_association(@teacher,
+                                        {
                                           id: @rubric.id,
                                           title: @rubric.title,
                                           criteria: {
@@ -361,7 +362,9 @@ describe Rubric do
                                               ratings: { "0" => { points: 15, description: "asdf" } },
                                             },
                                           },
-                                        }, @course, {
+                                        },
+                                        @course,
+                                        {
                                           association_object: @assignment,
                                           update_if_existing: true,
                                           use_for_grading: "1",

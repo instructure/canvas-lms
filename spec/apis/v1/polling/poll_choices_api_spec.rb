@@ -39,8 +39,12 @@ describe Polling::PollChoicesController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_choices",
-                  { controller: "polling/poll_choices", action: "index", format: "json",
-                    poll_id: @poll.id.to_s }, data, headers)
+                  { controller: "polling/poll_choices",
+                    action: "index",
+                    format: "json",
+                    poll_id: @poll.id.to_s },
+                  data,
+                  headers)
     end
 
     it "returns all existing poll choices" do
@@ -110,9 +114,12 @@ describe Polling::PollChoicesController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_choices/#{@poll_choice.id}",
-                  { controller: "polling/poll_choices", action: "show", format: "json",
+                  { controller: "polling/poll_choices",
+                    action: "show",
+                    format: "json",
                     poll_id: @poll.id.to_s,
-                    id: @poll_choice.id.to_s }, data)
+                    id: @poll_choice.id.to_s },
+                  data)
     end
 
     it "retrieves the poll specified" do
@@ -175,9 +182,13 @@ describe Polling::PollChoicesController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/polls/#{@poll.id}/poll_choices",
-                  { controller: "polling/poll_choices", action: "create", format: "json",
+                  { controller: "polling/poll_choices",
+                    action: "create",
+                    format: "json",
                     poll_id: @poll.id.to_s },
-                  { poll_choices: [params] }, {}, {})
+                  { poll_choices: [params] },
+                  {},
+                  {})
     end
 
     context "as a teacher" do
@@ -214,10 +225,14 @@ describe Polling::PollChoicesController, type: :request do
 
       helper.call(:put,
                   "/api/v1/polls/#{@poll.id}/poll_choices/#{@poll_choice.id}",
-                  { controller: "polling/poll_choices", action: "update", format: "json",
+                  { controller: "polling/poll_choices",
+                    action: "update",
+                    format: "json",
                     poll_id: @poll.id.to_s,
                     id: @poll_choice.id.to_s },
-                  { poll_choices: [params] }, {}, {})
+                  { poll_choices: [params] },
+                  {},
+                  {})
     end
 
     context "as a teacher" do
@@ -253,10 +268,14 @@ describe Polling::PollChoicesController, type: :request do
     def delete_destroy
       raw_api_call(:delete,
                    "/api/v1/polls/#{@poll.id}/poll_choices/#{@poll_choice.id}",
-                   { controller: "polling/poll_choices", action: "destroy", format: "json",
+                   { controller: "polling/poll_choices",
+                     action: "destroy",
+                     format: "json",
                      poll_id: @poll.id.to_s,
                      id: @poll_choice.id.to_s },
-                   {}, {}, {})
+                   {},
+                   {},
+                   {})
     end
 
     context "as a teacher" do

@@ -29,6 +29,11 @@ import OutcomeResultCollection from '../collections/OutcomeResultCollection'
 import d3 from 'd3/d3'
 import accessibleTemplate from '../../jst/accessibleLineGraph.handlebars'
 
+const dateTimeFormatter = Intl.DateTimeFormat(I18n.currentLocale(), {
+  day: 'numeric',
+  month: 'numeric',
+})
+
 const first = array => array.at(0)
 const last = array => array.at(-1)
 
@@ -263,9 +268,7 @@ class OutcomeLineGraphView extends Backbone.View {
       .axis()
       .scale(this.xTimeScale)
       .tickValues([first(this.data()).date, last(this.data()).date])
-      .tickFormat(d =>
-        Intl.DateTimeFormat(I18n.currentLocale(), {day: 'numeric', month: 'numeric'}).format(d)
-      )
+      .tickFormat(d => dateTimeFormatter.format(d))
     this.yAxis = d3.svg
       .axis()
       .scale(this.y)

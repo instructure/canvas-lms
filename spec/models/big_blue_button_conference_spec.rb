@@ -278,8 +278,10 @@ describe BigBlueButtonConference do
 
     it "properly serializes a response with no recordings" do
       allow(@bbb).to receive(:conference_key).and_return("12345")
-      response = { returncode: "SUCCESS", recordings: "\n  ",
-                   messageKey: "noRecordings", message: "There are no recordings for the meeting(s)." }
+      response = { returncode: "SUCCESS",
+                   recordings: "\n  ",
+                   messageKey: "noRecordings",
+                   message: "There are no recordings for the meeting(s)." }
       allow(@bbb).to receive(:send_request).and_return(response)
       expect(@bbb.recordings).to eq []
     end

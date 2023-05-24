@@ -27,7 +27,9 @@ describe "appointment_canceled_by_user.sms" do
     user = user_model
     appointment_participant_model(participant: user)
 
-    generate_message(:appointment_canceled_by_user, :sms, @event,
+    generate_message(:appointment_canceled_by_user,
+                     :sms,
+                     @event,
                      data: { updating_user_name: user.name,
                              cancel_reason: "just because" })
 
@@ -44,7 +46,9 @@ describe "appointment_canceled_by_user.sms" do
     appointment_participant_model(participant: @group, course: @course)
     @event.cancel_reason = "just because"
 
-    generate_message(:appointment_canceled_by_user, :sms, @event,
+    generate_message(:appointment_canceled_by_user,
+                     :sms,
+                     @event,
                      data: { updating_user_name: user.name,
                              cancel_reason: "just because" })
 

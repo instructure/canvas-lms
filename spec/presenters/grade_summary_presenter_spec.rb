@@ -590,8 +590,11 @@ describe GradeSummaryPresenter do
 
           it "handles comparing discussions, quizzes, and assignments to each other" do
             expected_id_order = [
-              assignment3.id, assignment2.id, assignment_owning_quiz.id,
-              assignment_owning_discussion_topic.id, assignment1.id
+              assignment3.id,
+              assignment2.id,
+              assignment_owning_quiz.id,
+              assignment_owning_discussion_topic.id,
+              assignment1.id
             ]
             expect(ordered_assignment_ids).to eq(expected_id_order)
           end

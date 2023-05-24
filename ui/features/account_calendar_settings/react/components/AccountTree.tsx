@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -39,11 +40,11 @@ type ComponentProps = {
   readonly onAccountToggled: (id: number, visible: boolean) => void
 }
 
-export const AccountTree: React.FC<ComponentProps> = ({
+export const AccountTree = ({
   originAccountId,
   visibilityChanges,
   onAccountToggled,
-}) => {
+}: ComponentProps) => {
   const [collections, setCollections] = useState<Collection>({})
   const [loadingCollectionIds, setLoadingCollectionIds] = useState<number[]>([originAccountId])
 

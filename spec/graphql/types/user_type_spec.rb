@@ -134,9 +134,10 @@ describe Types::UserType do
     context "as admin" do
       let(:admin) { account_admin_user }
       let(:user_type_as_admin) do
-        GraphQLTypeTester.new(@student, current_user: admin,
-                                        domain_root_account: @course.account.root_account,
-                                        request: ActionDispatch::TestRequest.create)
+        GraphQLTypeTester.new(@student,
+                              current_user: admin,
+                              domain_root_account: @course.account.root_account,
+                              request: ActionDispatch::TestRequest.create)
       end
 
       it "returns the sis user id if the user has permissions to read it" do
@@ -145,9 +146,10 @@ describe Types::UserType do
 
       it "returns nil if the user does not have permission to read the sis user id" do
         account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: false })
-        admin_type = GraphQLTypeTester.new(@student, current_user: @admin,
-                                                     domain_root_account: @course.account.root_account,
-                                                     request: ActionDispatch::TestRequest.create)
+        admin_type = GraphQLTypeTester.new(@student,
+                                           current_user: @admin,
+                                           domain_root_account: @course.account.root_account,
+                                           request: ActionDispatch::TestRequest.create)
         expect(admin_type.resolve("sisId")).to be_nil
       end
     end
@@ -178,9 +180,10 @@ describe Types::UserType do
     context "as admin" do
       let(:admin) { account_admin_user }
       let(:user_type_as_admin) do
-        GraphQLTypeTester.new(@student, current_user: admin,
-                                        domain_root_account: @course.account.root_account,
-                                        request: ActionDispatch::TestRequest.create)
+        GraphQLTypeTester.new(@student,
+                              current_user: admin,
+                              domain_root_account: @course.account.root_account,
+                              request: ActionDispatch::TestRequest.create)
       end
 
       it "returns the integration id if admin user has permissions to read SIS info" do
@@ -189,9 +192,10 @@ describe Types::UserType do
 
       it "returns null for integration id if admin user does not have permission to read SIS info" do
         account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: false })
-        admin_type = GraphQLTypeTester.new(@student, current_user: @admin,
-                                                     domain_root_account: @course.account.root_account,
-                                                     request: ActionDispatch::TestRequest.create)
+        admin_type = GraphQLTypeTester.new(@student,
+                                           current_user: @admin,
+                                           domain_root_account: @course.account.root_account,
+                                           request: ActionDispatch::TestRequest.create)
         expect(admin_type.resolve("integrationId")).to be_nil
       end
     end
@@ -275,7 +279,8 @@ describe Types::UserType do
           course {
             _id
           }
-        }', current_user: @student).map(&:to_i)).to eq [@course2.id, @course1.id]
+        }',
+                               current_user: @student).map(&:to_i)).to eq [@course2.id, @course1.id]
     end
 
     it "doesn't return enrollments for courses the user doesn't have permission for" do

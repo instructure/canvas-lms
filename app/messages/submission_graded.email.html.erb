@@ -26,9 +26,13 @@
 
 <% if user.try(:send_scores_in_emails?, asset.assignment.context) %>
   <% if asset.excused? %>
-    <p><%= t :excused, "This assignment has been excused." %>
+    <p><%= t :excused, "This assignment has been excused." %></p>
   <% elsif asset.score %>
-    <p><%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>
+    <% if asset.assignment.restrict_quantitative_data?(user)%>
+      <p><%=t :grade, "grade: %{letter_grade}", :letter_grade => asset.assignment.score_to_grade(asset.score, asset.grade, true)%></p>
+    <% else %>
+      <p><%= t :score, "score: %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %></p>
+    <% end %>
   <% end %>
 <% end %>
 

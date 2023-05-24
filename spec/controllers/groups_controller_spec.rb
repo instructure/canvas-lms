@@ -141,8 +141,11 @@ describe GroupsController do
       g.add_user(student2)
       student2.enrollments.first.deactivate
       user_session(student1)
-      get "index", params: { course_id: @course.id, include: "users",
-                             include_inactive_users: true }, format: :json
+      get "index",
+          params: { course_id: @course.id,
+                    include: "users",
+                    include_inactive_users: true },
+          format: :json
       parsed_json = json_parse(response.body)
       expect(parsed_json.length).to eq 1
       users_json = parsed_json.first["users"]

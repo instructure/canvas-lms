@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -56,8 +57,8 @@ describe('publishAllModulesHelper', () => {
 
   describe('batchUpdateAllModulesApiCall', () => {
     beforeEach(() => {
-      makeModuleWithItems(1, [117, 119], false)
-      makeModuleWithItems(2, [217, 219], true)
+      makeModuleWithItems(1, 'Lesson 2', [117, 119], false)
+      makeModuleWithItems(2, 'Lesson 2', [217, 219], true)
     })
 
     it('PUTS the batch request', async () => {
@@ -202,7 +203,11 @@ describe('publishAllModulesHelper', () => {
       const onCancelComplete = jest.fn()
       cancelBatchUpdate({id: '17', workflow_state: 'running'}, onCancelComplete)
       expect(doFetchApi).toHaveBeenCalledTimes(1)
-      expect(doFetchApi).toHaveBeenCalledWith({method: 'POST', path: '/api/v1/progress/17/cancel'})
+      expect(doFetchApi).toHaveBeenCalledWith({
+        method: 'POST',
+        path: '/api/v1/progress/17/cancel',
+        body: {message: 'canceled'},
+      })
       await waitFor(() => expect(onCancelComplete).toHaveBeenCalled())
       expect(onCancelComplete).toHaveBeenCalledTimes(1)
       expect(onCancelComplete).toHaveBeenCalledWith()
@@ -213,7 +218,11 @@ describe('publishAllModulesHelper', () => {
       const onCancelComplete = jest.fn()
       cancelBatchUpdate({id: '17', workflow_state: 'running'}, onCancelComplete)
       expect(doFetchApi).toHaveBeenCalledTimes(1)
-      expect(doFetchApi).toHaveBeenCalledWith({method: 'POST', path: '/api/v1/progress/17/cancel'})
+      expect(doFetchApi).toHaveBeenCalledWith({
+        method: 'POST',
+        path: '/api/v1/progress/17/cancel',
+        body: {message: 'canceled'},
+      })
       await waitFor(() => expect(onCancelComplete).toHaveBeenCalled())
       expect(onCancelComplete).toHaveBeenCalledTimes(1)
       expect(onCancelComplete).toHaveBeenCalledWith('whoops')
@@ -257,8 +266,8 @@ describe('publishAllModulesHelper', () => {
   describe('updateModulePendingPublishedStates', () => {
     let updateModuleSpy, updateItemsSpy
     beforeEach(() => {
-      makeModuleWithItems(1, [117, 119], false)
-      makeModuleWithItems(2, [217, 219], true)
+      makeModuleWithItems(1, 'Lesson 2', [117, 119], false)
+      makeModuleWithItems(2, 'Lesson 2', [217, 219], true)
     })
     afterEach(() => {
       updateModuleSpy?.mockRestore()
@@ -278,8 +287,8 @@ describe('publishAllModulesHelper', () => {
   describe('updateModulePublishedState', () => {
     let spy
     beforeEach(() => {
-      makeModuleWithItems(1, [117, 119], false)
-      makeModuleWithItems(2, [217, 219], true)
+      makeModuleWithItems(1, 'Lesson 2', [117, 119], false)
+      makeModuleWithItems(2, 'Lesson 2', [217, 219], true)
     })
     afterEach(() => {
       spy?.mockRestore()

@@ -71,10 +71,14 @@ describe Lti::ContextToolFinder do
       course_with_student(active_all: true, user: user_with_pseudonym, account: @account)
       @tools = [
         create_tool(@root_account, "f", domain: "google.com"),
-        create_tool(@course, "d", domain: "google.com",
-                                  settings: { assignment_view: { visibility: "admins" } }),
-        create_tool(@course, "a", url: "http://www.google.com",
-                                  settings: { assignment_view: { visibility: "members" } })
+        create_tool(@course,
+                    "d",
+                    domain: "google.com",
+                    settings: { assignment_view: { visibility: "admins" } }),
+        create_tool(@course,
+                    "a",
+                    url: "http://www.google.com",
+                    settings: { assignment_view: { visibility: "members" } })
       ]
 
       tools = method_returning_scope.call(@course)
@@ -129,16 +133,22 @@ describe Lti::ContextToolFinder do
     context "when exclude_admin_visibility is true" do
       it "doesn't include admin tools of type options[:type]" do
         create_tool(
-          @account, "1",
-          domain: "google.com", settings: { assignment_view: { visibility: "admins" } }
+          @account,
+          "1",
+          domain: "google.com",
+          settings: { assignment_view: { visibility: "admins" } }
         )
         tool2 = create_tool(
-          @account, "2",
-          url: "http://www.google.com", settings: { assignment_view: { visibility: "members" } }
+          @account,
+          "2",
+          url: "http://www.google.com",
+          settings: { assignment_view: { visibility: "members" } }
         )
         create_tool(
-          @account, "3",
-          url: "http://www.google.com", settings: { course_navigation: { visibility: "members" } }
+          @account,
+          "3",
+          url: "http://www.google.com",
+          settings: { course_navigation: { visibility: "members" } }
         )
 
         finder = described_class.new(@course, type: :assignment_view)

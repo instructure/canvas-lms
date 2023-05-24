@@ -28,9 +28,10 @@ module Lti
 
       rescue_from ActiveRecord::RecordNotFound do
         render json: {
-          status: I18n.t("lib.auth.api.not_found_status", "not_found"),
-          errors: [{ message: I18n.t("lib.auth.api.not_found_message", "not_found") }]
-        }, status: :not_found
+                 status: I18n.t("lib.auth.api.not_found_status", "not_found"),
+                 errors: [{ message: I18n.t("lib.auth.api.not_found_message", "not_found") }]
+               },
+               status: :not_found
       end
 
       TOOL_SETTINGS_SERVICE = "ToolProxySettings"

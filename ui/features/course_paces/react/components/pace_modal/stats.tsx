@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -68,7 +69,7 @@ interface PassedProps {
   readonly appliedPace: Pace
 }
 
-export const PaceModalStats: React.FC<PassedProps> = ({
+export const PaceModalStats = ({
   coursePace,
   assignments,
   paceDuration,
@@ -78,7 +79,7 @@ export const PaceModalStats: React.FC<PassedProps> = ({
   compression,
   responsiveSize,
   appliedPace,
-}) => {
+}: PassedProps) => {
   const [dateFormatter, setDateFormat] = useState(coursePaceDateFormatter)
   const [shrink, setShrink] = useState(responsiveSize !== 'large')
   const enrollmentType = coursePace.context_type === 'Enrollment'

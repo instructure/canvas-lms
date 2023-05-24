@@ -104,7 +104,10 @@ module Api::V1::Course
       return { "id" => course.id, "access_restricted_by_date" => true }
     end
 
-    Api::V1::CourseJson.to_hash(course, user, includes, enrollments,
+    Api::V1::CourseJson.to_hash(course,
+                                user,
+                                includes,
+                                enrollments,
                                 precalculated_permissions: precalculated_permissions) do |builder, allowed_attributes, methods, permissions_to_include|
       hash = api_json(course, user, session, { only: allowed_attributes, methods: methods }, permissions_to_include)
       hash["term"] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?("term")

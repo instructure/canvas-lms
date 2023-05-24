@@ -23,8 +23,11 @@ module MicrosoftSync
   # primary use is in the Accounts controller.
   class SettingsValidator
     # A list of all sync settings, as a final source of truth.
-    SYNC_SETTINGS = %i[microsoft_sync_enabled microsoft_sync_tenant microsoft_sync_login_attribute
-                       microsoft_sync_login_attribute_suffix microsoft_sync_remote_attribute].freeze
+    SYNC_SETTINGS = %i[microsoft_sync_enabled
+                       microsoft_sync_tenant
+                       microsoft_sync_login_attribute
+                       microsoft_sync_login_attribute_suffix
+                       microsoft_sync_remote_attribute].freeze
     VALID_SYNC_LOGIN_ATTRIBUTES = %w[email preferred_username sis_user_id integration_id].freeze
     VALID_SYNC_REMOTE_ATTRIBUTES = %w[userPrincipalName mail mailNickname].freeze
 

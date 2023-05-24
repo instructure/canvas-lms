@@ -35,9 +35,12 @@ module SIS
         messages = []
         count = SIS::AdminImporter.new(@root_account, importer_opts).process do |i|
           csv_rows(csv, index, count) do |row|
-            i.process_admin(user_id: row["user_id"], account_id: row["account_id"],
-                            role_id: row["role_id"], role: row["role"],
-                            status: row["status"], root_account: row["root_account"])
+            i.process_admin(user_id: row["user_id"],
+                            account_id: row["account_id"],
+                            role_id: row["role_id"],
+                            role: row["role"],
+                            status: row["status"],
+                            root_account: row["root_account"])
           rescue ImportError => e
             messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row["lineno"], row_info: row)
           end

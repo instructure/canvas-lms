@@ -23,7 +23,10 @@ class AddAssignmentOverrideIndexes < ActiveRecord::Migration[5.2]
 
   def change
     add_index :assignment_override_students, :assignment_id, algorithm: :concurrently
-    add_index :assignment_overrides, :due_at, name: "index_assignment_overrides_due_at_when_overridden",
-                                              where: "due_at_overridden", algorithm: :concurrently
+    add_index :assignment_overrides,
+              :due_at,
+              name: "index_assignment_overrides_due_at_when_overridden",
+              where: "due_at_overridden",
+              algorithm: :concurrently
   end
 end

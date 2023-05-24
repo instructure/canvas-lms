@@ -100,9 +100,12 @@ module MicrosoftSync
       # "expected", not "error"). This is useful if there are non-200s expected
       # and you don't want to raise an HTTP error / count those these as errors
       # in the stats.
-      def request(method, path,
-                  quota: nil, retries: DEFAULT_N_INTERMITTENT_RETRIES,
-                  special_cases: [], **options)
+      def request(method,
+                  path,
+                  quota: nil,
+                  retries: DEFAULT_N_INTERMITTENT_RETRIES,
+                  special_cases: [],
+                  **options)
         statsd_tags = statsd_tags_for_request(method, path)
         increment_statsd_quota_points(quota, options, statsd_tags)
 
@@ -114,7 +117,8 @@ module MicrosoftSync
 
         special_case_value = SpecialCase.match(
           special_cases,
-          status_code: response.code, body: response.body
+          status_code: response.code,
+          body: response.body
         )
         if special_case_value
           log_and_increment(method, path, statsd_tags, :expected, response.code)
@@ -350,7 +354,8 @@ module MicrosoftSync
         grouped = responses.group_by do |subresponse|
           special_case_value = SpecialCase.match(
             special_cases,
-            status_code: subresponse["status"], body: subresponse["body"].to_json,
+            status_code: subresponse["status"],
+            body: subresponse["body"].to_json,
             batch_request_id: subresponse["id"]
           )
 

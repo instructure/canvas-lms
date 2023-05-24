@@ -48,14 +48,14 @@ type Props = {
   readonly delUrl: string
   readonly isRepeating: boolean
 }
-const DeleteCalendarEventDialog: React.FC<Props> = ({
+const DeleteCalendarEventDialog = ({
   isOpen,
   onCancel,
   onDeleting,
   onDeleted,
   delUrl,
   isRepeating,
-}) => {
+}: Props) => {
   const [which, setWhich] = useState<Which>('one')
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
 

@@ -335,7 +335,8 @@ module Api::V1::Assignment
         assignment.discussion_topic.context,
         user,
         session,
-        include_assignment: false, exclude_messages: opts[:exclude_response_fields].include?("description")
+        include_assignment: false,
+        exclude_messages: opts[:exclude_response_fields].include?("description")
       )
     end
 
@@ -889,22 +890,14 @@ module Api::V1::Assignment
     vericite_settings.to_unsafe_h
   end
 
-  def submissions_hash(include_params, assignments, submissions_for_user = nil)
+  def submissions_hash(include_params, assignments)
     return {} unless include_params.include?("submission")
 
     has_observed_users = include_params.include?("observed_users")
-
-    subs_list = if submissions_for_user
-                  assignment_ids = assignments.to_set(&:id)
-                  submissions_for_user.select do |s|
-                    assignment_ids.include?(s.assignment_id)
-                  end
-                else
-                  users = current_user_and_observed(include_observed: has_observed_users)
-                  @context.submissions
-                          .where(assignment_id: assignments.map(&:id))
-                          .for_user(users)
-                end
+    users = current_user_and_observed(include_observed: has_observed_users)
+    subs_list = @context.submissions
+                        .where(assignment_id: assignments.map(&:id))
+                        .for_user(users)
 
     if has_observed_users
       # assignment id -> array. even if <2 results for a given
@@ -1006,6 +999,12 @@ module Api::V1::Assignment
 
     if assignment.external_tool?
       assignment.peer_reviews = false
+    end
+
+    line_item = assignment_params.dig(:external_tool_tag_attributes, :line_item)
+    if line_item.respond_to?(:dig)
+      assignment.line_item_resource_id = line_item[:resourceId]
+      assignment.line_item_tag = line_item[:tag]
     end
 
     {

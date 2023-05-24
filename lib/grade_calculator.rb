@@ -209,9 +209,12 @@ class GradeCalculator
       next unless threshold.did_pass_threshold(old_score.current_score, score.current_score)
       next unless observer_ids.include?(threshold.observer_id)
 
-      ObserverAlert.create(observer_id: threshold.observer_id, user_id: threshold.user_id,
+      ObserverAlert.create(observer_id: threshold.observer_id,
+                           user_id: threshold.user_id,
                            observer_alert_threshold: threshold,
-                           context: @course, action_date: score.updated_at, alert_type: threshold.alert_type,
+                           context: @course,
+                           action_date: score.updated_at,
+                           alert_type: threshold.alert_type,
                            title: I18n.t("Course grade: %{grade}% in %{course_code}", {
                                            grade: score.current_score,
                                            course_code: @course.course_code
@@ -574,33 +577,35 @@ class GradeCalculator
                       end
 
     # Update existing course and grading period Scores or create them if needed.
-    Score.connection.execute(<<~SQL.squish)
-      INSERT INTO #{Score.quoted_table_name}
-          (
-            enrollment_id, grading_period_id,
-            #{columns_to_insert_or_update[:columns].join(", ")},
-            course_score, root_account_id, created_at, updated_at
-          )
-          SELECT
-            enrollments.id as enrollment_id,
-            #{@grading_period.try(:id) || "NULL"} as grading_period_id,
-            #{columns_to_insert_or_update[:insert_values].join(", ")},
-            #{@grading_period ? "FALSE" : "TRUE"} AS course_score,
-            #{@course.root_account_id} AS root_account_id,
-            #{updated_at} as created_at,
-            #{updated_at} as updated_at
-          FROM #{Enrollment.quoted_table_name} enrollments
-          WHERE
-            enrollments.id IN (#{joined_enrollment_ids})
-          ORDER BY enrollment_id
-      ON CONFLICT #{conflict_target}
-      DO UPDATE SET
-          #{columns_to_insert_or_update[:update_values].join(", ")},
-          updated_at = excluded.updated_at,
-          root_account_id = #{@course.root_account_id},
-          /* if workflow_state was previously deleted for some reason, update it to active */
-          workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
-    SQL
+    Score.connection.with_max_update_limit(enrollments.length) do
+      Score.connection.execute(<<~SQL.squish)
+        INSERT INTO #{Score.quoted_table_name}
+            (
+              enrollment_id, grading_period_id,
+              #{columns_to_insert_or_update[:columns].join(", ")},
+              course_score, root_account_id, created_at, updated_at
+            )
+            SELECT
+              enrollments.id as enrollment_id,
+              #{@grading_period.try(:id) || "NULL"} as grading_period_id,
+              #{columns_to_insert_or_update[:insert_values].join(", ")},
+              #{@grading_period ? "FALSE" : "TRUE"} AS course_score,
+              #{@course.root_account_id} AS root_account_id,
+              #{updated_at} as created_at,
+              #{updated_at} as updated_at
+            FROM #{Enrollment.quoted_table_name} enrollments
+            WHERE
+              enrollments.id IN (#{joined_enrollment_ids})
+            ORDER BY enrollment_id
+        ON CONFLICT #{conflict_target}
+        DO UPDATE SET
+            #{columns_to_insert_or_update[:update_values].join(", ")},
+            updated_at = excluded.updated_at,
+            root_account_id = #{@course.root_account_id},
+            /* if workflow_state was previously deleted for some reason, update it to active */
+            workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
+      SQL
+    end
   rescue ActiveRecord::Deadlocked => e
     Canvas::Errors.capture_exception(:grade_calcuator, e, :warn)
     raise Delayed::RetriableError, "Deadlock in upserting course or grading period scores"

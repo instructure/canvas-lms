@@ -37,15 +37,28 @@ describe SisImportsApiController, type: :request do
   end
 
   it "shows errors for a sis_batch" do
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/#{@batch.id}/errors",
-                    { controller: "sis_import_errors_api", action: "index",
-                      format: "json", account_id: @account.id.to_s, id: @batch.id.to_s })
-    expect(json["sis_import_errors"]).to eq [{ "sis_import_id" => @batch.id, "file" => "users.csv",
-                                               "message" => "some error message 2", "row_info" => nil, "row" => 2 },
-                                             { "sis_import_id" => @batch.id, "file" => "users.csv",
-                                               "message" => "some error message 1", "row_info" => nil, "row" => 1 },
-                                             { "sis_import_id" => @batch.id, "file" => "users.csv",
-                                               "message" => "some error message 0", "row_info" => nil, "row" => 0 }]
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports/#{@batch.id}/errors",
+                    { controller: "sis_import_errors_api",
+                      action: "index",
+                      format: "json",
+                      account_id: @account.id.to_s,
+                      id: @batch.id.to_s })
+    expect(json["sis_import_errors"]).to eq [{ "sis_import_id" => @batch.id,
+                                               "file" => "users.csv",
+                                               "message" => "some error message 2",
+                                               "row_info" => nil,
+                                               "row" => 2 },
+                                             { "sis_import_id" => @batch.id,
+                                               "file" => "users.csv",
+                                               "message" => "some error message 1",
+                                               "row_info" => nil,
+                                               "row" => 1 },
+                                             { "sis_import_id" => @batch.id,
+                                               "file" => "users.csv",
+                                               "message" => "some error message 0",
+                                               "row_info" => nil,
+                                               "row" => 0 }]
   end
 
   it "shows errors for a root_account" do
@@ -56,18 +69,36 @@ describe SisImportsApiController, type: :request do
                                     message: "some error message #{i}",
                                     row: i)
     end
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_import_errors",
-                    { controller: "sis_import_errors_api", action: "index",
-                      format: "json", account_id: @account.id.to_s })
-    expect(json["sis_import_errors"]).to eq [{ "sis_import_id" => batch.id, "file" => "courses.csv",
-                                               "message" => "some error message 1", "row_info" => nil, "row" => 1 },
-                                             { "sis_import_id" => batch.id, "file" => "courses.csv",
-                                               "message" => "some error message 0", "row_info" => nil, "row" => 0 },
-                                             { "sis_import_id" => @batch.id, "file" => "users.csv",
-                                               "message" => "some error message 2", "row_info" => nil, "row" => 2 },
-                                             { "sis_import_id" => @batch.id, "file" => "users.csv",
-                                               "message" => "some error message 1", "row_info" => nil, "row" => 1 },
-                                             { "sis_import_id" => @batch.id, "file" => "users.csv",
-                                               "message" => "some error message 0", "row_info" => nil, "row" => 0 }]
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_import_errors",
+                    { controller: "sis_import_errors_api",
+                      action: "index",
+                      format: "json",
+                      account_id: @account.id.to_s })
+    expect(json["sis_import_errors"]).to eq [{ "sis_import_id" => batch.id,
+                                               "file" => "courses.csv",
+                                               "message" => "some error message 1",
+                                               "row_info" => nil,
+                                               "row" => 1 },
+                                             { "sis_import_id" => batch.id,
+                                               "file" => "courses.csv",
+                                               "message" => "some error message 0",
+                                               "row_info" => nil,
+                                               "row" => 0 },
+                                             { "sis_import_id" => @batch.id,
+                                               "file" => "users.csv",
+                                               "message" => "some error message 2",
+                                               "row_info" => nil,
+                                               "row" => 2 },
+                                             { "sis_import_id" => @batch.id,
+                                               "file" => "users.csv",
+                                               "message" => "some error message 1",
+                                               "row_info" => nil,
+                                               "row" => 1 },
+                                             { "sis_import_id" => @batch.id,
+                                               "file" => "users.csv",
+                                               "message" => "some error message 0",
+                                               "row_info" => nil,
+                                               "row" => 0 }]
   end
 end

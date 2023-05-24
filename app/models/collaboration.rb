@@ -68,7 +68,9 @@ class Collaboration < ActiveRecord::Base
              .joins("INNER JOIN #{GroupMembership.quoted_table_name} ON collaborators.group_id = group_memberships.group_id")
              .where('collaborators.group_id IS NOT NULL AND
                             group_memberships.user_id = ? AND
-                            collaborators.collaboration_id = ?', user, self).exists?)
+                            collaborators.collaboration_id = ?',
+                    user,
+                    self).exists?)
     end
     can :read
 

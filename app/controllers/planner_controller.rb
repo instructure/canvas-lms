@@ -30,7 +30,10 @@ class PlannerController < ApplicationController
   before_action :set_date_range
   before_action :set_params, only: [:index]
 
-  attr_reader :start_date, :end_date, :page, :per_page,
+  attr_reader :start_date,
+              :end_date,
+              :page,
+              :per_page,
               :include_concluded
 
   # @API List planner items
@@ -244,7 +247,9 @@ class PlannerController < ApplicationController
 
       collections << item_collection(scope_name.to_s,
                                      scope,
-                                     Assignment, %i[user_due_date due_at created_at], :id)
+                                     Assignment,
+                                     %i[user_due_date due_at created_at],
+                                     :id)
     end
     collections
   end
@@ -252,14 +257,18 @@ class PlannerController < ApplicationController
   def ungraded_quiz_collection
     item_collection("ungraded_quizzes",
                     @user.ungraded_quizzes(**default_opts),
-                    Quizzes::Quiz, %i[user_due_date due_at created_at], :id)
+                    Quizzes::Quiz,
+                    %i[user_due_date due_at created_at],
+                    :id)
   end
 
   def unread_discussion_topic_collection
     item_collection("unread_discussion_topics",
                     @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked))
                     .unread_for(@user),
-                    DiscussionTopic, %i[todo_date posted_at delayed_post_at created_at], :id)
+                    DiscussionTopic,
+                    %i[todo_date posted_at delayed_post_at created_at],
+                    :id)
   end
 
   def unread_assignment_collection
@@ -275,7 +284,9 @@ class PlannerController < ApplicationController
                         ).due_between_for_user(start_date, end_date, @user)
     item_collection("unread_assignment_submissions",
                     scope,
-                    Assignment, %i[user_due_date due_at created_at], :id)
+                    Assignment,
+                    %i[user_due_date due_at created_at],
+                    :id)
   end
 
   def planner_note_collection
@@ -285,31 +296,44 @@ class PlannerController < ApplicationController
     course_ids += [nil] if @user_ids.present?
     item_collection("planner_notes",
                     shard.activate { PlannerNote.active.where(user: user, todo_date: @start_date..@end_date, course_id: course_ids) },
-                    PlannerNote, [:todo_date, :created_at], :id)
+                    PlannerNote,
+                    [:todo_date, :created_at],
+                    :id)
   end
 
   def page_collection
-    item_collection("pages", @user.wiki_pages_needing_viewing(**default_opts.except(:include_locked)),
-                    WikiPage, [:todo_date, :created_at], :id)
+    item_collection("pages",
+                    @user.wiki_pages_needing_viewing(**default_opts.except(:include_locked)),
+                    WikiPage,
+                    [:todo_date, :created_at],
+                    :id)
   end
 
   def ungraded_discussion_collection
-    item_collection("ungraded_discussions", @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked)),
-                    DiscussionTopic, %i[todo_date posted_at created_at], :id)
+    item_collection("ungraded_discussions",
+                    @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked)),
+                    DiscussionTopic,
+                    %i[todo_date posted_at created_at],
+                    :id)
   end
 
   def calendar_events_collection
     item_collection("calendar_events",
                     CalendarEvent.active.not_hidden.for_user_and_context_codes(@user, @context_codes)
                        .between(@start_date, @end_date),
-                    CalendarEvent, [:start_at, :created_at], :id)
+                    CalendarEvent,
+                    [:start_at, :created_at],
+                    :id)
   end
 
   def peer_reviews_collection
     item_collection("peer_reviews",
                     @user.submissions_needing_peer_review(**default_opts.except(:include_locked)),
-                    AssessmentRequest, [{ submission: { assignment: :peer_reviews_due_at } },
-                                        { assessor_asset: :cached_due_date }, :created_at], :id)
+                    AssessmentRequest,
+                    [{ submission: { assignment: :peer_reviews_due_at } },
+                     { assessor_asset: :cached_due_date },
+                     :created_at],
+                    :id)
   end
 
   def item_collection(label, scope, base_model, *order_by)

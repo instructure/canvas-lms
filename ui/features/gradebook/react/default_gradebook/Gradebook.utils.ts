@@ -61,6 +61,12 @@ import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 
 const I18n = useI18nScope('gradebook')
 
+const dateTimeFormatter = Intl.DateTimeFormat(I18n.currentLocale(), {
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+})
+
 const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
 
 export function compareAssignmentDueDates(assignment1: GridColumn, assignment2: GridColumn) {
@@ -366,22 +372,12 @@ export const getLabelForFilter = (
       throw new Error('invalid submissions filter value')
     }
   } else if (filter.type === 'start-date') {
-    const options: any = {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-    }
     if (typeof filter.value !== 'string') throw new Error('invalid start-date value')
-    const value = Intl.DateTimeFormat(I18n.currentLocale(), options).format(new Date(filter.value))
+    const value = dateTimeFormatter.format(new Date(filter.value))
     return I18n.t('Start Date %{value}', {value})
   } else if (filter.type === 'end-date') {
-    const options: any = {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-    }
     if (typeof filter.value !== 'string') throw new Error('invalid end-date value')
-    const value = Intl.DateTimeFormat(I18n.currentLocale(), options).format(new Date(filter.value))
+    const value = dateTimeFormatter.format(new Date(filter.value))
     return I18n.t('End Date %{value}', {value})
   }
 

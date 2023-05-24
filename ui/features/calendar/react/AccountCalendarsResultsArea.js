@@ -119,6 +119,7 @@ const AccountCalendarResultsArea = ({
                   <Checkbox
                     data-testid={`account-${r.id}-checkbox`}
                     checked={!!selectedCalendars.find(sC => sC.id === r.id)}
+                    disabled={r.auto_subscribe}
                     label=""
                     title={`${r.name} ${I18n.t('account')}`}
                     value={r.id}

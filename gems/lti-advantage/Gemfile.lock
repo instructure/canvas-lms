@@ -19,7 +19,7 @@ GEM
     bindata (2.4.14)
     concurrent-ruby (1.2.2)
     diff-lcs (1.5.0)
-    i18n (1.12.0)
+    i18n (1.13.0)
       concurrent-ruby (~> 1.0)
     json-jwt (1.13.0)
       activesupport (>= 4.2)
@@ -27,7 +27,7 @@ GEM
       bindata
     minitest (5.18.0)
     rake (13.0.6)
-    redcarpet (3.5.0)
+    redcarpet (3.6.0)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)
@@ -45,14 +45,17 @@ GEM
       concurrent-ruby (~> 1.0)
 
 PLATFORMS
-  arm64-darwin-21
+  aarch64-linux
+  arm64-darwin
+  x86_64-darwin
+  x86_64-linux
 
 DEPENDENCIES
   bundler (~> 2.2)
   lti-advantage!
-  rake (~> 10.0)
+  rake
   redcarpet
   rspec (~> 3.0)
 
 BUNDLED WITH
-   2.4.10
+   2.3.26

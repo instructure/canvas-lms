@@ -24,9 +24,12 @@ describe ContentMigration do
     include_context "course copy"
 
     it "copies discussion topic attributes" do
-      topic = @copy_from.discussion_topics.create!(title: "topic", message: "<p>bloop</p>",
-                                                   pinned: true, discussion_type: "threaded",
-                                                   require_initial_post: true, locked: true)
+      topic = @copy_from.discussion_topics.create!(title: "topic",
+                                                   message: "<p>bloop</p>",
+                                                   pinned: true,
+                                                   discussion_type: "threaded",
+                                                   require_initial_post: true,
+                                                   locked: true)
       todo_date = 1.day.from_now
       topic.todo_date = todo_date
       topic.posted_at = 2.days.ago
@@ -49,7 +52,8 @@ describe ContentMigration do
     end
 
     it "copies discussion topic full_anonymity anonymous_state" do
-      topic = @copy_from.discussion_topics.create!(title: "full_anonymity topic", message: "<p>bloop</p>",
+      topic = @copy_from.discussion_topics.create!(title: "full_anonymity topic",
+                                                   message: "<p>bloop</p>",
                                                    anonymous_state: "full_anonymity")
 
       run_course_copy
@@ -81,11 +85,15 @@ describe ContentMigration do
     end
 
     it "copies rating settings" do
-      topic1 = @copy_from.discussion_topics.create!(title: "blah", message: "srsly",
-                                                    allow_rating: true, only_graders_can_rate: true,
+      topic1 = @copy_from.discussion_topics.create!(title: "blah",
+                                                    message: "srsly",
+                                                    allow_rating: true,
+                                                    only_graders_can_rate: true,
                                                     sort_by_rating: false)
-      topic2 = @copy_from.discussion_topics.create!(title: "bleh", message: "srsly",
-                                                    allow_rating: true, only_graders_can_rate: false,
+      topic2 = @copy_from.discussion_topics.create!(title: "bleh",
+                                                    message: "srsly",
+                                                    allow_rating: true,
+                                                    only_graders_can_rate: false,
                                                     sort_by_rating: true)
       run_course_copy
 
@@ -222,8 +230,11 @@ describe ContentMigration do
     end
 
     it "implicitly copies files attached to topics" do
-      att = Attachment.create!(filename: "test.txt", display_name: "testing.txt", uploaded_data: StringIO.new("file"),
-                               folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+      att = Attachment.create!(filename: "test.txt",
+                               display_name: "testing.txt",
+                               uploaded_data: StringIO.new("file"),
+                               folder: Folder.root_folders(@copy_from).first,
+                               context: @copy_from)
       topic = @copy_from.discussion_topics.new(message: "howdy", title: "title")
       topic.attachment = att
       topic.save!

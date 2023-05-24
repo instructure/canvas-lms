@@ -299,7 +299,8 @@ describe AccountNotification do
 
       other_sub_account = Account.default.sub_accounts.create!
       course_with_student(user: @user, account: other_sub_account, active_all: true)
-      other_sub_announcement = sub_account_notification(subject: "blah", account: other_sub_account,
+      other_sub_announcement = sub_account_notification(subject: "blah",
+                                                        account: other_sub_account,
                                                         role_ids: [teacher_role.id])
       # should not show to user because they're not a teacher in this subaccount
 
@@ -309,7 +310,8 @@ describe AccountNotification do
     it "still shows to roles nested within the sub-accounts" do
       sub_sub_account = @sub_account.sub_accounts.create!
       course_with_teacher(user: @user, account: sub_sub_account, active_all: true)
-      sub_announcement = sub_account_notification(subject: "blah", account: @sub_account,
+      sub_announcement = sub_account_notification(subject: "blah",
+                                                  account: @sub_account,
                                                   role_ids: [teacher_role.id])
 
       expect(AccountNotification.for_user_and_account(@user, Account.default)).to include(sub_announcement)
@@ -527,8 +529,10 @@ describe AccountNotification do
       end
 
       it "queues a job to send_message when announcement starts" do
-        an = account_notification(account: Account.default, send_message: true,
-                                  start_at: 1.day.from_now, end_at: 2.days.from_now)
+        an = account_notification(account: Account.default,
+                                  send_message: true,
+                                  start_at: 1.day.from_now,
+                                  end_at: 2.days.from_now)
         job = Delayed::Job.where(tag: "AccountNotification#broadcast_messages").last
         expect(job.singleton).to include(an.global_id.to_s)
         expect(job.run_at.to_i).to eq an.start_at.to_i

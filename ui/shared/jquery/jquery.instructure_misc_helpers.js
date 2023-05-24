@@ -16,13 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 
 if (!('INST' in window)) window.INST = {}
-
-const I18n = useI18nScope('instructure')
 
 // Return the first value which passes a truth test
 $.detect = function (collection, callback) {
@@ -113,41 +110,6 @@ $.fileSize = function (bytes) {
     return parseInt(bytes / factor, 10) + 'KB'
   } else {
     return Math.round((10.0 * bytes) / factor / factor) / 10.0 + 'MB'
-  }
-}
-
-$.toSentence = function (array, options) {
-  if (typeof options === 'undefined') {
-    options = {}
-  } else if (options === 'or') {
-    options = {
-      two_words_connector: I18n.t('#support.array.or.two_words_connector'),
-      last_word_connector: I18n.t('#support.array.or.last_word_connector'),
-    }
-  }
-
-  options = $.extend(
-    {
-      words_connector: I18n.t('#support.array.words_connector'),
-      two_words_connector: I18n.t('#support.array.two_words_connector'),
-      last_word_connector: I18n.t('#support.array.last_word_connector'),
-    },
-    options
-  )
-
-  switch (array.length) {
-    case 0:
-      return ''
-    case 1:
-      return '' + array[0]
-    case 2:
-      return array[0] + options.two_words_connector + array[1]
-    default:
-      return (
-        array.slice(0, -1).join(options.words_connector) +
-        options.last_word_connector +
-        array[array.length - 1]
-      )
   }
 }
 

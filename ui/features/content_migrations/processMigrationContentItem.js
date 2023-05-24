@@ -31,24 +31,24 @@ export default function processMigrationContentItem(event) {
     return
   }
 
-  processSingleContentItem(event)
-    .then(result => {
-      if (result.type !== 'file') {
-        throw new Error(`Expected type "file" but received "${result.type}"`)
-      }
+  try {
+    const result = processSingleContentItem(event)
+    if (result.type !== 'file') {
+      throw new Error(`Expected type "file" but received "${result.type}"`)
+    }
 
-      $(window).trigger('externalContentReady', {
-        contentItems: [
-          {
-            text: result.text,
-            url: result.url,
-          },
-        ],
-      })
+    $(window).trigger('externalContentReady', {
+      contentItems: [
+        {
+          text: result.text,
+          url: result.url,
+        },
+      ],
     })
-    .catch(error => {
-      $.flashError(I18n.t('Error retrieving content'))
-      $(window).trigger('externalContentCancel')
-      console.error(error)
-    })
+  } catch (error) {
+    $.flashError(I18n.t('Error retrieving content'))
+    $(window).trigger('externalContentCancel')
+    // eslint-disable-next-line no-console
+    console.error(error)
+  }
 }

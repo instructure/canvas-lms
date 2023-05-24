@@ -111,8 +111,10 @@ module CC::Importer::Standard
         if full_path && File.exist?(full_path)
           # try to make it work even if the file wasn't technically included in the manifest :/
           mig_id = Digest::MD5.hexdigest(path)
-          file = { path_name: path, migration_id: mig_id,
-                   file_name: File.basename(path), type: "FILE_TYPE" }
+          file = { path_name: path,
+                   migration_id: mig_id,
+                   file_name: File.basename(path),
+                   type: "FILE_TYPE" }
           add_course_file(file)
         end
       end

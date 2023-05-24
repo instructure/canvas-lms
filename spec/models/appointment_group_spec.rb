@@ -272,8 +272,11 @@ describe AppointmentGroup do
       create_enrollment @course, @student
       create_enrollment @course, @student_in_section2, section: section2
       create_enrollment @course, @student_in_section3, section: section3
-      create_enrollment @course, @ta, enrollment_type: "TaEnrollment", section: section2,
-                                      limit_privileges_to_course_section: true
+      create_enrollment @course,
+                        @ta,
+                        enrollment_type: "TaEnrollment",
+                        section: section2,
+                        limit_privileges_to_course_section: true
       create_enrollment @course2, @teacher2, enrollment_type: "TeacherEnrollment"
       create_enrollment @course3, @teacher2, enrollment_type: "TeacherEnrollment"
       create_enrollment @course3, @teacher3, enrollment_type: "TeacherEnrollment"
@@ -704,7 +707,8 @@ describe AppointmentGroup do
       @group1.participating_users << @users
       @group1.save!
       @gc = @group1.group_category
-      @ag = AppointmentGroup.create!(title: "test", contexts: [@course],
+      @ag = AppointmentGroup.create!(title: "test",
+                                     contexts: [@course],
                                      participants_per_appointment: 2,
                                      new_appointments: [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
     end

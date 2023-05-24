@@ -261,7 +261,8 @@ class SubmissionsApiController < ApplicationController
                       @assignment.representatives(user: @current_user).map(&:id)
                     else
                       @context.apply_enrollment_visibility(@context.student_enrollments,
-                                                           @current_user, section_ids)
+                                                           @current_user,
+                                                           section_ids)
                               .pluck(:user_id)
                     end
       submissions = @assignment.submissions.where(user_id: student_ids).preload(:originality_reports)
@@ -276,7 +277,8 @@ class SubmissionsApiController < ApplicationController
                submissions = submissions.preload(:quiz_submission) unless params[:exclude_response_fields]&.include?("preview_url")
                submissions = submissions.preload(:attachment) unless params[:exclude_response_fields]&.include?("attachments")
 
-               submissions = Api.paginate(submissions, self,
+               submissions = Api.paginate(submissions,
+                                          self,
                                           polymorphic_url([:api_v1, @section || @context, @assignment, :submissions]))
                bulk_load_attachments_and_previews(submissions)
 
@@ -677,7 +679,8 @@ class SubmissionsApiController < ApplicationController
     permission = :grade if @user != @current_user
     if authorized_action(@assignment, @current_user, permission)
       api_attachment_preflight(
-        @user, request,
+        @user,
+        request,
         check_quota: false, # we don't check quota when uploading a file for assignment submission
         folder: @user.submissions_folder(@context), # organize attachment into the course submissions folder
         assignment: @assignment,

@@ -69,7 +69,8 @@ module CC::Exporter::Epub::Converters
 
     def object_path_selector
       [
-        "a", [
+        "a",
+        [
           "[href*='#{OBJECT_TOKEN.delete("$")}']",
           "[href*='#{WIKI_TOKEN.delete("$")}']"
         ].join(",")

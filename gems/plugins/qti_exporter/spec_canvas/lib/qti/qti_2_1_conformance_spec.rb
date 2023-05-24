@@ -71,8 +71,12 @@ if Qti.migration_executable
       expect(q.name).to eq "QTI v2.1 Entry Profile Single MC/SR Item Test Instance"
 
       ["<img id=\"figure1\" height=\"165\" width=\"250\" src=\"/assessment_questions/#{q.id}/files/#{att.id}/download?verifier=#{att.uuid}\" alt=\"Figure showing Rectangle ABCD divided into 12 equal boxes. 4 of the boxes are shaded.\">",
-       "<span id=\"labelA\">A</span>", "<span id=\"labelB\">B</span>", "<span id=\"labelC\">C</span>", "<span id=\"labelD\">D</span>",
-       "In the figure above, what fraction of the rectangle <em>ABCD</em> is", "shaded?"].each do |text|
+       "<span id=\"labelA\">A</span>",
+       "<span id=\"labelB\">B</span>",
+       "<span id=\"labelC\">C</span>",
+       "<span id=\"labelD\">D</span>",
+       "In the figure above, what fraction of the rectangle <em>ABCD</em> is",
+       "shaded?"].each do |text|
         expect(q.question_data["question_text"]).to include(text)
       end
 
@@ -93,7 +97,8 @@ if Qti.migration_executable
         "<span id=\"a\">Ms. Smith's class contains 24 students. </span>",
         "<span id=\"b\">Each student voted for his or her favorite color. </span>",
         "<span id=\"c\">The result of the class vote is shown </span>",
-        "<span id=\"z\">in the table below.</span>", "<br>",
+        "<span id=\"z\">in the table below.</span>",
+        "<br>",
         "Indicate which of the following statements are accurate."
       ]
 
@@ -160,8 +165,13 @@ if Qti.migration_executable
       expect(q.name).to eq "QTI v2.1 Core Profile Single Pattern Match Item Test Instance"
       expect(q.question_data["question_text"].split("\n").map(&:strip).reject(&:empty?)).to eq [
         "Match the following characters to the Shakespeare play they appeared in:",
-        "Capulet", "Demetrius", "Lysander", "Prospero",
-        "A Midsummer-Night's Dream", "Romeo and Juliet", "The Tempest"
+        "Capulet",
+        "Demetrius",
+        "Lysander",
+        "Prospero",
+        "A Midsummer-Night's Dream",
+        "Romeo and Juliet",
+        "The Tempest"
       ]
 
       expect(q.question_data["question_type"]).to eq "matching_question"
@@ -288,8 +298,12 @@ if Qti.migration_executable
 
       questions = quiz.quiz_questions.sort_by(&:position)
       expect(questions.map { |q| q.question_data["question_type"] }).to eq %w[
-        text_only_question multiple_choice_question multiple_choice_question
-        multiple_answers_question fill_in_multiple_blanks_question essay_question
+        text_only_question
+        multiple_choice_question
+        multiple_choice_question
+        multiple_answers_question
+        fill_in_multiple_blanks_question
+        essay_question
       ]
       expect(questions.select { |q| q.position > 1 }.map(&:assessment_question_id).sort).to eq @course.assessment_questions.map(&:id).sort
     end

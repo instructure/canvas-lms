@@ -29,8 +29,9 @@ class AddCommentBankItems < ActiveRecord::Migration[6.0]
       t.text :comment, null: false
       t.timestamps null: false
       t.string :workflow_state, null: false, default: "active"
-      t.index [:root_account_id, :id], unique: true,
-                                       name: "index_comment_bank_items_replica_identity"
+      t.index [:root_account_id, :id],
+              unique: true,
+              name: "index_comment_bank_items_replica_identity"
     end
 
     set_replica_identity(:comment_bank_items, :index_comment_bank_items_replica_identity)

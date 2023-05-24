@@ -335,17 +335,19 @@ describe GradingPeriodsController do
           end
 
           it "can update a single grading period" do
-            patch :batch_update, params: { set_id: group.id, grading_periods: [
-              period_1_params.merge(id: period_1.id, title: "Updated Title")
-            ] }
+            patch :batch_update, params: { set_id: group.id,
+                                           grading_periods: [
+                                             period_1_params.merge(id: period_1.id, title: "Updated Title")
+                                           ] }
             expect(group.reload.grading_periods.find(period_1.id).title).to eq "Updated Title"
           end
 
           it "can update multiple grading periods" do
-            patch :batch_update, params: { set_id: group.id, grading_periods: [
-              period_1_params.merge(id: period_1.id, title: "Original Title"),
-              period_2_params.merge(id: period_2.id, title: "Updated Title")
-            ] }
+            patch :batch_update, params: { set_id: group.id,
+                                           grading_periods: [
+                                             period_1_params.merge(id: period_1.id, title: "Original Title"),
+                                             period_2_params.merge(id: period_2.id, title: "Updated Title")
+                                           ] }
             expect(group.reload.grading_periods.find(period_1.id).title).to eql("Original Title")
             expect(group.reload.grading_periods.find(period_2.id).title).to eql("Updated Title")
           end
@@ -353,10 +355,11 @@ describe GradingPeriodsController do
           it "can create and update multiple grading periods" do
             period_1 = group.grading_periods.create!(period_1_params)
             expect do
-              patch :batch_update, params: { set_id: group.id, grading_periods: [
-                period_1_params.merge(id: period_1.id, title: "A Different Title"),
-                period_2_params
-              ] }
+              patch :batch_update, params: { set_id: group.id,
+                                             grading_periods: [
+                                               period_1_params.merge(id: period_1.id, title: "A Different Title"),
+                                               period_2_params
+                                             ] }
             end.to change { group.grading_periods.count }.by 1
             expect(group.reload.grading_periods.find(period_1.id).title).to eql("A Different Title")
           end
@@ -379,17 +382,19 @@ describe GradingPeriodsController do
         end
 
         it "cannot update any grading periods" do
-          patch :batch_update, params: { set_id: group.id, grading_periods: [
-            period_1_params.merge(id: period_1.id, title: "Updated Title")
-          ] }
+          patch :batch_update, params: { set_id: group.id,
+                                         grading_periods: [
+                                           period_1_params.merge(id: period_1.id, title: "Updated Title")
+                                         ] }
           expect(period_1.reload.title).to eql("Original Title")
           expect(GradingPeriod.for(course).find(period_1.id).title).to eql("Original Title")
         end
 
         it "responds with 404 not found upon failure" do
-          patch :batch_update, params: { set_id: group.id, grading_periods: [
-            period_1_params.merge(id: period_1.id, title: "Updated Title")
-          ] }
+          patch :batch_update, params: { set_id: group.id,
+                                         grading_periods: [
+                                           period_1_params.merge(id: period_1.id, title: "Updated Title")
+                                         ] }
           expect(response).to be_not_found
         end
       end
@@ -467,17 +472,19 @@ describe GradingPeriodsController do
           end
 
           it "can update a single grading period" do
-            patch :batch_update, params: { course_id: course.id, grading_periods: [
-              period_1_params.merge(id: period_1.id, title: "Original Title")
-            ] }
+            patch :batch_update, params: { course_id: course.id,
+                                           grading_periods: [
+                                             period_1_params.merge(id: period_1.id, title: "Original Title")
+                                           ] }
             expect(course.grading_periods.find(period_1.id).title).to eql("Original Title")
           end
 
           it "can update multiple grading periods" do
-            patch :batch_update, params: { course_id: course.id, grading_periods: [
-              period_1_params.merge(id: period_1.id, title: "Original Title"),
-              period_2_params.merge(id: period_2.id, title: "Updated Title")
-            ] }
+            patch :batch_update, params: { course_id: course.id,
+                                           grading_periods: [
+                                             period_1_params.merge(id: period_1.id, title: "Original Title"),
+                                             period_2_params.merge(id: period_2.id, title: "Updated Title")
+                                           ] }
             expect(course.grading_periods.find(period_1.id).title).to eql("Original Title")
             expect(course.grading_periods.find(period_2.id).title).to eql("Updated Title")
           end
@@ -485,10 +492,11 @@ describe GradingPeriodsController do
           it "cannot create and update multiple grading periods" do
             period_1 = group.grading_periods.create!(period_1_params)
             expect do
-              patch :batch_update, params: { course_id: course.id, grading_periods: [
-                period_1_params.merge(id: period_1.id, title: "Original Title"),
-                period_2_params
-              ] }
+              patch :batch_update, params: { course_id: course.id,
+                                             grading_periods: [
+                                               period_1_params.merge(id: period_1.id, title: "Original Title"),
+                                               period_2_params
+                                             ] }
             end.not_to change { course.grading_periods.count }
             expect(course.grading_periods.find(period_1.id).title).not_to eql("Original Title")
           end
@@ -516,17 +524,19 @@ describe GradingPeriodsController do
           end
 
           it "can update a single grading period" do
-            patch :batch_update, params: { course_id: course.id, grading_periods: [
-              period_1_params.merge(id: period_1.id, title: "Original Title")
-            ] }
+            patch :batch_update, params: { course_id: course.id,
+                                           grading_periods: [
+                                             period_1_params.merge(id: period_1.id, title: "Original Title")
+                                           ] }
             expect(course.grading_periods.find(period_1.id).title).to eql("Original Title")
           end
 
           it "can update multiple grading periods" do
-            patch :batch_update, params: { course_id: course.id, grading_periods: [
-              period_1_params.merge(id: period_1.id, title: "Original Title"),
-              period_2_params.merge(id: period_2.id, title: "Updated Title")
-            ] }
+            patch :batch_update, params: { course_id: course.id,
+                                           grading_periods: [
+                                             period_1_params.merge(id: period_1.id, title: "Original Title"),
+                                             period_2_params.merge(id: period_2.id, title: "Updated Title")
+                                           ] }
             expect(course.grading_periods.find(period_1.id).title).to eql("Original Title")
             expect(course.grading_periods.find(period_2.id).title).to eql("Updated Title")
           end
@@ -534,10 +544,11 @@ describe GradingPeriodsController do
           it "cannot create and update multiple grading periods" do
             period_1 = group.grading_periods.create!(period_1_params)
             expect do
-              patch :batch_update, params: { course_id: course.id, grading_periods: [
-                period_1_params.merge(id: period_1.id, title: "Original Title"),
-                period_2_params
-              ] }
+              patch :batch_update, params: { course_id: course.id,
+                                             grading_periods: [
+                                               period_1_params.merge(id: period_1.id, title: "Original Title"),
+                                               period_2_params
+                                             ] }
             end.not_to change { course.grading_periods.count }
             expect(course.grading_periods.find(period_1.id).title).not_to eql("Original Title")
           end
@@ -561,17 +572,19 @@ describe GradingPeriodsController do
         end
 
         it "cannot update any grading periods" do
-          patch :batch_update, params: { course_id: course.id, grading_periods: [
-            period_1_params.merge(id: period_1.id, title: "Updated Title")
-          ] }
+          patch :batch_update, params: { course_id: course.id,
+                                         grading_periods: [
+                                           period_1_params.merge(id: period_1.id, title: "Updated Title")
+                                         ] }
           expect(period_1.reload.title).to eql("Original Title")
           expect(GradingPeriod.for(course).find(period_1.id).title).to eql("Original Title")
         end
 
         it "responds with json upon failure" do
-          patch :batch_update, params: { course_id: course.id, grading_periods: [
-            period_1_params.merge(id: period_1.id, title: "Updated Title")
-          ] }
+          patch :batch_update, params: { course_id: course.id,
+                                         grading_periods: [
+                                           period_1_params.merge(id: period_1.id, title: "Updated Title")
+                                         ] }
           expect(response.status).to eql(Rack::Utils.status_code(:not_found))
           json = response.parsed_body
           expect(json["errors"]).to be_present

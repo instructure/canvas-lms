@@ -31,8 +31,12 @@ describe ObserverAlert do
     end
 
     it "can link to a threshold and observer and student" do
-      alert = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @threshold,
-                                   context: @assignment, alert_type: "assignment_missing", action_date: Time.zone.now,
+      alert = ObserverAlert.create(student: @student,
+                                   observer: @observer,
+                                   observer_alert_threshold: @threshold,
+                                   context: @assignment,
+                                   alert_type: "assignment_missing",
+                                   action_date: Time.zone.now,
                                    title: "Assignment missing")
 
       expect(alert.valid?).to be true
@@ -42,15 +46,25 @@ describe ObserverAlert do
     end
 
     it "observer must be linked to student" do
-      alert = ObserverAlert.create(student: user_model, observer: @observer, observer_alert_threshold: @threshold,
-                                   context: @assignment, alert_type: "assignment_missing", action_date: Time.zone.now, title: "Assignment missing")
+      alert = ObserverAlert.create(student: user_model,
+                                   observer: @observer,
+                                   observer_alert_threshold: @threshold,
+                                   context: @assignment,
+                                   alert_type: "assignment_missing",
+                                   action_date: Time.zone.now,
+                                   title: "Assignment missing")
 
       expect(alert.valid?).to be false
     end
 
     it "wont allow random alert_type" do
-      alert = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @threshold,
-                                   context: @assignment, alert_type: "jigglypuff", action_date: Time.zone.now, title: "Assignment missing")
+      alert = ObserverAlert.create(student: @student,
+                                   observer: @observer,
+                                   observer_alert_threshold: @threshold,
+                                   context: @assignment,
+                                   alert_type: "jigglypuff",
+                                   action_date: Time.zone.now,
+                                   title: "Assignment missing")
 
       expect(alert.valid?).to be false
     end
@@ -229,11 +243,20 @@ describe ObserverAlert do
   describe "clean_up_old_alerts" do
     it "deletes alerts older than 6 months ago but leaves newer ones" do
       observer_alert_threshold_model(alert_type: "institution_announcement")
-      a1 = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @observer_alert_threshold,
-                                context: @account, alert_type: "institution_announcement", title: "announcement",
-                                action_date: Time.zone.now, created_at: 6.months.ago)
-      a2 = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @observer_alert_threshold,
-                                context: @account, alert_type: "institution_announcement", title: "announcement",
+      a1 = ObserverAlert.create(student: @student,
+                                observer: @observer,
+                                observer_alert_threshold: @observer_alert_threshold,
+                                context: @account,
+                                alert_type: "institution_announcement",
+                                title: "announcement",
+                                action_date: Time.zone.now,
+                                created_at: 6.months.ago)
+      a2 = ObserverAlert.create(student: @student,
+                                observer: @observer,
+                                observer_alert_threshold: @observer_alert_threshold,
+                                context: @account,
+                                alert_type: "institution_announcement",
+                                title: "announcement",
                                 action_date: Time.zone.now)
 
       ObserverAlert.clean_up_old_alerts

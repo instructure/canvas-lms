@@ -800,8 +800,10 @@ describe ContentTag do
 
   it "syncs tag published state with attachment locked state" do
     course_factory
-    att = Attachment.create!(filename: "blah.txt", uploaded_data: StringIO.new("blah"),
-                             folder: Folder.unfiled_folder(@course), context: @course)
+    att = Attachment.create!(filename: "blah.txt",
+                             uploaded_data: StringIO.new("blah"),
+                             folder: Folder.unfiled_folder(@course),
+                             context: @course)
     att.locked = true
     att.save!
 

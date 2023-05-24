@@ -25,8 +25,11 @@ describe "master courses - child courses - external tool locking" do
   before :once do
     @copy_from = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
-    attributes = { name: "new tool", consumer_key: "key",
-                   shared_secret: "secret", custom_fields: { "a" => "1", "b" => "2" }, url: "http://www.example.com" }
+    attributes = { name: "new tool",
+                   consumer_key: "key",
+                   shared_secret: "secret",
+                   custom_fields: { "a" => "1", "b" => "2" },
+                   url: "http://www.example.com" }
     @original_tool = @copy_from.context_external_tools.create!(attributes)
     @tag = @template.create_content_tag_for!(@original_tool)
 

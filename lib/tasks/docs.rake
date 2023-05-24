@@ -25,14 +25,24 @@ begin
       ]
 
       t.options = %W[
-        -e doc/api/api_routes.rb
-        --title "Canvas REST API"
-        -p doc
-        -t api
-        --readme doc/api/README.md
-        -o #{API_DOC_DIR}
-        --asset doc/images:images
-        --asset doc/examples:examples
+        -e
+        doc/api/api_routes.rb
+        --title
+        "Canvas
+        REST
+        API"
+        -p
+        doc
+        -t
+        api
+        --readme
+        doc/api/README.md
+        -o
+        #{API_DOC_DIR}
+        --asset
+        doc/images:images
+        --asset
+        doc/examples:examples
       ]
 
       # t.options << '--verbose'
