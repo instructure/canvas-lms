@@ -630,6 +630,15 @@ $(document).ready(function () {
   $('#course_enable_course_paces')
     .change(function () {
       $('#course_paces_caution_text').toggleClass('shown', this.checked)
+      $('#homeroom_disabled_tooltip').toggleClass('shown', this.checked)
+      $('#course_homeroom_course').prop('disabled', $(this).prop('checked'))
+    })
+    .trigger('change')
+
+  $('#course_homeroom_course')
+    .change(function () {
+      $('#pacing_disabled_tooltip').toggleClass('shown', this.checked)
+      $('#course_enable_course_paces').prop('disabled', $(this).prop('checked'))
     })
     .trigger('change')
 

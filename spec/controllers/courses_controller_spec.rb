@@ -3285,6 +3285,29 @@ describe CoursesController do
         put "update", params: { id: @course.id, course: { name: "course paces" } }
         expect(Progress.find_by(context: @course_pace)).to be_nil
       end
+
+      it "does not allow course to be made a homeroom course" do
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { homeroom_course: "true" }, format: :json }
+        expect(response).to have_http_status :bad_request
+        json = response.parsed_body
+        expect(json["errors"].keys).to include "homeroom_course"
+        expect(@course.reload.homeroom_course).to be_falsey
+      end
+    end
+
+    it "does not allow homeroom course to enable course pacing" do
+      toggle_k5_setting(@course.account, true)
+      homeroom = course_factory(active_all: true, account: @course.account)
+      homeroom.homeroom_course = true
+      homeroom.save!
+      user_session(@teacher)
+
+      put "update", params: { id: homeroom.id, course: { enable_course_paces: "true" }, format: :json }
+      expect(response).to have_http_status :bad_request
+      json = response.parsed_body
+      expect(json["errors"].keys).to include "enable_course_paces"
+      expect(@course.reload.enable_course_paces).to be_falsey
     end
 
     it "returns an error if syllabus_body content is nested too deeply" do

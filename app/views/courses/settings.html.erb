@@ -548,8 +548,13 @@
         <div class="form-row">
           <div class="form-label nobr"><%= f.blabel :homeroom_course_header, :en => "Homeroom Course" %></div>
           <div class="nobr">
-            <%= f.check_box :homeroom_course, :disabled => !can_manage %>
-            <%= f.label :homeroom_course, :en => "Enable as homeroom course" %><br/>
+            <%= f.check_box :homeroom_course, :disabled => !can_manage || @context.enable_course_paces %>
+            <%= f.label :homeroom_course, :en => "Enable as homeroom course" %>
+            <a class="icon-question disabled-warning"
+              id="homeroom_disabled_tooltip"
+              data-tooltip
+              title= "<%= t("Homeroom Course cannot be used with Course Pacing")%>">
+            </a><br/>
           </div>
         </div>
       <% end %>
@@ -558,8 +563,13 @@
           <div class="form-label nobr"><%= f.blabel :course_paces, :en => "Course Pacing" %></div>
           <div class="tall-row">
             <div class="nobr">
-              <%= f.check_box :enable_course_paces, :disabled => !can_manage %>
-              <%= f.label :enable_course_paces, :en => "Enable Course Pacing" %><br/>
+              <%= f.check_box :enable_course_paces, :disabled => !can_manage || @context.homeroom_course%>
+              <%= f.label :enable_course_paces, :en => "Enable Course Pacing" %>
+              <a class="icon-question disabled-warning"
+                id="pacing_disabled_tooltip"
+                data-tooltip
+                title= "<%= t("Course Pacing cannot be used with Homeroom Course")%>">
+              </a><br/>
             </div>
             <div id="course_paces_caution_text" class="aside palign caution-text">
               <i class='icon-warning-borderless'></i>
