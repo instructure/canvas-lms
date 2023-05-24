@@ -1142,8 +1142,8 @@ class Account < ActiveRecord::Base
     original_shard = Shard.current
     result = Shard.shard_for(parent_account_id).activate do
       parent_account_id = Shard.relative_id_for(parent_account_id, original_shard, Shard.current)
-      guard_rail_env = (Account.connection.open_transactions == 0) ? :secondary : GuardRail.environment
-      GuardRail.activate(guard_rail_env) do
+
+      with_secondary_role_if_possible do
         sql = Account.sub_accounts_recursive_sql(parent_account_id)
         if pluck
           Account.connection.select_all(sql).map do |row|
@@ -1168,6 +1168,32 @@ class Account < ActiveRecord::Base
     result
   end
 
+  def self.multi_parent_sub_accounts_recursive(parent_account_ids)
+    return [] if parent_account_ids.blank?
+
+    # Validate all parent_account_ids are on the same shard
+    account_shards = parent_account_ids.map do |parent_account_id|
+      Shard.shard_for(parent_account_id)
+    end.uniq
+    raise ArgumentError, "all parent_account_ids must be in the same shard" if account_shards.length > 1
+
+    account_shards.first.activate do
+      with_secondary_role_if_possible do
+        Account.find_by_sql(
+          # Switchman will make the IDs in parent_account_ids
+          # relative to the currently activated shard
+          Account.sub_accounts_recursive_sql(parent_account_ids, include_parents: true)
+        )
+      end
+    end
+  end
+
+  def self.with_secondary_role_if_possible(&)
+    guard_rail_env = (Account.connection.open_transactions == 0) ? :secondary : GuardRail.environment
+
+    GuardRail.activate(guard_rail_env, &)
+  end
+
   # a common helper
   def self.sub_account_ids_recursive(parent_account_id)
     active.select(:id).sub_accounts_recursive(parent_account_id, :pluck)
@@ -1180,7 +1206,7 @@ class Account < ActiveRecord::Base
 
   # the default ordering will have each tier in a group, followed by the next tier, etc.
   # if an order is set on the relation, that order is only applied within each group
-  def self.sub_accounts_recursive_sql(parent_account_id)
+  def self.sub_accounts_recursive_sql(parent_account_id, include_parents: false)
     relation = except(:group, :having, :limit, :offset).shard(Shard.current)
     relation_with_ids = if relation.select_values.empty? || (relation.select_values & [:id, :parent_account_id]).length == 2
                           relation
@@ -1191,8 +1217,11 @@ class Account < ActiveRecord::Base
     relation_with_select = all
     relation_with_select = relation_with_select.select("*") if relation_with_select.select_values.empty?
 
+    scope = relation_with_ids.where(parent_account_id:)
+    scope = relation_with_ids.where(id: parent_account_id) if include_parents
+
     "WITH RECURSIVE t AS (
-       #{relation_with_ids.where(parent_account_id:).to_sql}
+       #{scope.to_sql}
        UNION
        #{relation_with_ids.joins("INNER JOIN t ON accounts.parent_account_id=t.id").to_sql}
      )
