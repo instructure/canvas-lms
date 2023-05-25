@@ -701,7 +701,7 @@ describe Types::UserType do
       expect(result[0]).to eq(known_users.first.id.to_s)
 
       result = type.resolve('recipients(search: "morty") { usersConnection { nodes { _id } } }')
-      expect(result).to match_array([])
+      expect(result).to be_empty
     end
 
     it "searches contexts" do
@@ -709,7 +709,7 @@ describe Types::UserType do
       expect(result[0]).to eq(@course.name)
 
       result = type.resolve('recipients(search: "Lemon") { contextsConnection { nodes { name } } }')
-      expect(result).to match_array([])
+      expect(result).to be_empty
     end
 
     it "filters results based on context" do

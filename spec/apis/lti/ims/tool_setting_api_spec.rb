@@ -70,7 +70,7 @@ module Lti
           get "/api/lti/tool_settings/3.json",
               params: { tool_setting_id: "3" },
               headers: { "HTTP_ACCEPT" => "application/vnd.ims.lti.v2.toolsettings+json", "Authorization" => "oauth_token" }
-          expect(response.code).to eq "404"
+          expect(response).to have_http_status :not_found
           expect(response.body).to eq '{"status":"not_found","errors":[{"message":"not_found"}]}'
         end
 
@@ -78,14 +78,14 @@ module Lti
           get "/api/lti/tool_settings/#{@link_setting.id}.json",
               params: { tool_setting_id: @link_setting, bubble: "pop" },
               headers: { "HTTP_ACCEPT" => "application/vnd.ims.lti.v2.toolsettings+json", "Authorization" => "oauth_token" }
-          expect(response.code).to eq "400"
+          expect(response).to have_http_status :bad_request
         end
 
         it 'returns as a bad request when bubble is "all" and the accept type is "simple"' do
           get "/api/lti/tool_settings/#{@link_setting.id}.json",
               params: { tool_setting_id: @link_setting, bubble: "all" },
               headers: { "HTTP_ACCEPT" => "application/vnd.ims.lti.v2.toolsettings.simple+json", "Authorization" => "oauth_token" }
-          expect(response.code).to eq "400"
+          expect(response).to have_http_status :bad_request
         end
 
         context "lti_link" do
@@ -269,7 +269,7 @@ module Lti
               headers: { "CONTENT_TYPE" => "application/vnd.ims.lti.v2.toolsettings.simple+json",
                          "HTTP_ACCEPT" => "application/vnd.ims.lti.v2.toolsettings.simple+json",
                          "Authorization" => "oauth_token" }
-          expect(response.code).to eq "400"
+          expect(response).to have_http_status :bad_request
         end
 
         it "returns as a bad request when there is more than one @graph item" do
@@ -294,7 +294,7 @@ module Lti
               headers: { "CONTENT_TYPE" => "application/vnd.ims.lti.v2.toolsettings+json",
                          "HTTP_ACCEPT" => "application/vnd.ims.lti.v2.toolsettings.simple+json",
                          "Authorization" => "oauth_token" }
-          expect(response.code).to eq "400"
+          expect(response).to have_http_status :bad_request
         end
 
         it "updates a tool_setting with a single graph element" do

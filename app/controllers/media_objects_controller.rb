@@ -127,28 +127,37 @@ class MediaObjectsController < ApplicationController
   #
   # @returns [MediaObject]
   def index
-    if params[:course_id]
-      context = Course.find(params[:course_id])
-      url = api_v1_course_media_objects_url
-    elsif params[:group_id]
-      context = Group.find(params[:group_id])
-      url = api_v1_group_media_objects_url
-    end
-    if context
-      root_folder = Folder.root_folders(context).first
+    media_attachment = Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
+    url = if params[:course_id]
+            context = Course.find(params[:course_id])
+            media_attachment ? api_v1_course_media_attachments_url : api_v1_course_media_objects_url
+          elsif params[:group_id]
+            context = Group.find(params[:group_id])
+            media_attachment ? api_v1_group_media_attachments_url : api_v1_group_media_objects_url
+          else
+            media_attachment ? api_v1_media_attachments_url : api_v1_media_objects_url
+          end
+    scope = if context
+              root_folder = Folder.root_folders(context).first
 
-      if root_folder.grants_right?(@current_user, :read_contents)
-        # if the user has access to the context's root folder, let's
-        # assume they have access to the context's media, even if it's
-        # media not associated with an Attachment in there
-        scope = MediaObject.active.where(context: context)
-      else
-        return render_unauthorized_action # not allowed to view files in the context
-      end
-    else
-      scope = MediaObject.active.where(context: @current_user)
-      url = api_v1_media_objects_url
-    end
+              if root_folder.grants_right?(@current_user, :read_contents)
+                if media_attachment
+                  attachment_scope = Attachment.not_deleted.is_media_object.where(context: context)
+                  attachment_scope = attachment_scope.select { |att| access_allowed(att, @current_user, :download) }
+
+                  MediaObject.by_media_id(attachment_scope.pluck(:media_entry_id))
+                else
+                  MediaObject.active.where(context: context)
+                end
+              else
+                render_unauthorized_action # not allowed to view files in the context
+              end
+            elsif media_attachment
+              attachment_scope = Attachment.not_deleted.is_media_object.where(context: @current_user)
+              MediaObject.by_media_id(attachment_scope.pluck(:media_entry_id))
+            else
+              MediaObject.active.where(context: @current_user)
+            end
 
     order_dir = (params[:order] == "desc") ? "desc" : "asc"
     order_by = params[:sort] || "title"

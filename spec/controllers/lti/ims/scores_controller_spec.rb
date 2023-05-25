@@ -806,7 +806,7 @@ module Lti::IMS
 
                     it "returns 504 and specific error message" do
                       send_request
-                      expect(response.code).to eq "504"
+                      expect(response).to have_http_status :gateway_timeout
                       expect(response.body).to include("file url timed out")
                     end
                   end
@@ -820,7 +820,7 @@ module Lti::IMS
 
                     it "returns 504 and specific error message" do
                       send_request
-                      expect(response.code).to eq "504"
+                      expect(response).to have_http_status :gateway_timeout
                       expect(response.body).to include("file url timed out")
                     end
                   end

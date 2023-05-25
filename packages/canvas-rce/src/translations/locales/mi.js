@@ -461,9 +461,6 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Arokite Ata" },
   "icon_shape_30b61e7": { "message": "Tohu Hanga" },
   "icon_size_9353edea": { "message": "Tohu Rahi" },
-  "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-    "message": "Ki te waiho te hono kau, ka whakaatu te kuputuhi hei ingoa hono akoranga"
-  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Mena ka hiahiatia nga motika whakamahi, karekau te konae e whakaputa kia taea ra ano ki te wharangi Kōnae."
   },

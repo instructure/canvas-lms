@@ -2273,8 +2273,6 @@ class CoursesController < ApplicationController
               @context.quiz_lti_tool.present?,
             FLAGS: {
               newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
-              new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
-              new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
             }
           )
           js_env(COURSE_HOME: true)
@@ -2385,7 +2383,9 @@ class CoursesController < ApplicationController
             TABS: @context.tabs_available(@current_user, course_subject_tabs: true, session: session),
             OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
             TAB_CONTENT_ONLY: embed_mode,
-            SHOW_IMMERSIVE_READER: show_immersive_reader?
+            SHOW_IMMERSIVE_READER: show_immersive_reader?,
+            GRADING_SCHEME: @context.grading_standard_or_default.data,
+            RESTRICT_QUANTITATIVE_DATA: @context.restrict_quantitative_data?(@current_user)
           )
 
           self_enrollment_option = visible_self_enrollment_option
@@ -2690,8 +2690,8 @@ class CoursesController < ApplicationController
             root_account.enrollment_terms.where(id: enrollment_term_id).first
         end
       end
-      # :manage will be false for teachers in concluded courses
-      args[:enrollment_term] ||= @context.enrollment_term if @context.grants_right?(@current_user, session, :manage)
+      # :manage will be false for teachers in concluded courses (but they may have manage rights due to course dates)
+      args[:enrollment_term] ||= @context.enrollment_term if @context.grants_right?(@current_user, session, :manage) && !@context.restrict_enrollments_to_course_dates
       args[:abstract_course] = @context.abstract_course
       args[:account] = account
       @course = @context.account.courses.new

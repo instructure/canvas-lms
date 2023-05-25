@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
@@ -91,8 +89,6 @@ AssignmentGroupSelector.prototype.toJSON = function () {
     assignmentGroupId: this.parentModel.assignmentGroupId(),
     frozenAttributes: this.parentModel.frozenAttributes(),
     nested: this.nested,
-    new_quizzes_modules_support:
-      typeof ENV !== 'undefined' && ENV !== null ? ENV.new_quizzes_modules_support : void 0,
     inClosedGradingPeriod: this.parentModel.inClosedGradingPeriod(),
   }
 }

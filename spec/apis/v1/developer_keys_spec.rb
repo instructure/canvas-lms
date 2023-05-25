@@ -304,7 +304,7 @@ describe DeveloperKeysController, type: :request do
 
   def unauthorized_api_call(*args)
     raw_api_call(*args)
-    expect(response.code).to eq "401"
+    expect(response).to have_http_status :unauthorized
   end
 
   def confirm_valid_key_in_json(json, key)

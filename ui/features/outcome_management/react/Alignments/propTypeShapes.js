@@ -26,8 +26,15 @@ export const alignmentShape = PropTypes.shape({
   moduleTitle: PropTypes.string,
   moduleUrl: PropTypes.string,
   moduleWorkflowState: PropTypes.string,
-  assignmentContentType: PropTypes.oneOf(['assignment', 'discussion', 'quiz']),
+  assignmentContentType: PropTypes.oneOf(['assignment', 'discussion', 'quiz', 'new_quiz']),
   assignmentWorkflowState: PropTypes.string,
+  quizItems: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+    })
+  ),
+  alignmentsCount: PropTypes.number.isRequired,
 })
 
 export const outcomeWithAlignmentShape = PropTypes.shape({

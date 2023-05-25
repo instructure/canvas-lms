@@ -53,7 +53,7 @@ describe Lti::IMS::DynamicRegistrationController do
       it "returns a 404" do
         @admin.account.disable_feature! :lti_dynamic_registration
         subject
-        expect(response.code).to eq("404")
+        expect(response).to have_http_status(:not_found)
       end
     end
 
@@ -62,7 +62,7 @@ describe Lti::IMS::DynamicRegistrationController do
         subject
         parsed_redirect_uri = Addressable::URI.parse(response.headers["Location"])
         expect(parsed_redirect_uri.omit(:query).to_s).to eq("https://example.com")
-        expect(response.code).to eq("302")
+        expect(response).to have_http_status(:found)
       end
 
       it "gives the oidc url in the response" do

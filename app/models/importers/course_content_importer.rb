@@ -118,10 +118,12 @@ module Importers
               migration.add_error(error_message, error_report_id: er)
             end
           end
-          if migration.canvas_import?
-            migration.update_import_progress(30)
-            Importers::MediaTrackImporter.process_migration(data[:media_tracks], migration)
-          end
+        end
+
+        if (!migration.for_course_copy? || Account.site_admin.feature_enabled?(:media_links_use_attachment_id)) &&
+           (migration.canvas_import? || migration.for_master_course_import?)
+          migration.update_import_progress(30)
+          Importers::MediaTrackImporter.process_migration(data[:media_tracks], migration)
         end
 
         migration.update_import_progress(35)
@@ -412,7 +414,7 @@ module Importers
       assignments = migration.imported_migration_items_by_class(Assignment).select(&:needs_update_cached_due_dates)
       if assignments.any?
         Assignment.clear_cache_keys(assignments, :availability)
-        DueDateCacher.recompute_course(migration.context, assignments: assignments, update_grades: true, executing_user: migration.user)
+        DueDateCacher.recompute_course(migration.context, assignments: assignments, update_grades: true, executing_user: migration.user, skip_late_policy_applicator: !!migration.date_shift_options)
       end
       quizzes = migration.imported_migration_items_by_class(Quizzes::Quiz).select(&:should_clear_availability_cache)
       Quizzes::Quiz.clear_cache_keys(quizzes, :availability) if quizzes.any?

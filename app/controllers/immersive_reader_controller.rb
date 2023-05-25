@@ -18,9 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# @API Immersive Reader
-# @beta
-#
 # This API requires Immersive Reader to be configured
 
 class ImmersiveReaderController < ApplicationController

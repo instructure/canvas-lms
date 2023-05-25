@@ -204,64 +204,73 @@ relevance of each field.
 Some examples of JSON configuration snippets and placement-specific settings are
 also found in the placements sub-menu in the left-navigation of this documentation.
 
-```
+```json
 {
-   "title":"The Best Tool",
-   "description":"1.3 Test Tool used for documentation purposes.",
-   "oidc_initiation_url":"https://your.oidc_initiation_url",
-   "target_link_uri":"https://your.target_link_uri",
-   "scopes":[
-       "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
-       "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
-    ],
-   "extensions":[
-      {
-         "domain":"thebesttool.com",
-         "tool_id":"the-best-tool",
-         "platform":"canvas.instructure.com",
-         "privacy_level":"public",
-         "settings":{
-            "text":"Launch The Best Tool",
-            "icon_url":"https://some.icon.url/tool-level.png",
-            "selection_height": 800,
-            "selection_width": 800,
-            "placements":[
-               {
-                  "text":"User Navigation Placement",
-                  "icon_url":"https://some.icon.url/my_dashboard.png",
-                  "placement":"user_navigation",
-                  "message_type":"LtiResourceLinkRequest",
-                  "target_link_uri":"https://your.target_link_uri/my_dashboard",
-                  "canvas_icon_class":"icon-lti",
-                  "custom_fields":{
-                     "foo":"$Canvas.user.id"
-                   }
-               },
-               {
-                  "text":"Editor Button Placement",
-                  "icon_url":"https://some.icon.url/editor_tool.png",
-                  "placement":"editor_button",
-                  "message_type":"LtiDeepLinkingRequest",
-                  "target_link_uri":"https://your.target_link_uri/content_selector",
-                  "selection_height": 500,
-                  "selection_width": 500
-               }
-            ]
-         }
+  "title": "The Best Tool",
+  "description": "1.3 Test Tool used for documentation purposes.",
+  "oidc_initiation_url": "https://your.oidc_initiation_url",
+  "target_link_uri": "https://your.target_link_uri",
+  "scopes": [
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
+  ],
+  "extensions": [
+    {
+      "domain": "thebesttool.com",
+      "tool_id": "the-best-tool",
+      "platform": "canvas.instructure.com",
+      "privacy_level": "public",
+      "settings": {
+        "text": "Launch The Best Tool",
+        "icon_url": "https://some.icon.url/tool-level.png",
+        "selection_height": 800,
+        "selection_width": 800,
+        "placements": [
+          {
+            "text": "User Navigation Placement",
+            "icon_url": "https://some.icon.url/my_dashboard.png",
+            "placement": "user_navigation",
+            "message_type": "LtiResourceLinkRequest",
+            "target_link_uri": "https://your.target_link_uri/my_dashboard",
+            "canvas_icon_class": "icon-lti",
+            "custom_fields": {
+              "foo": "$Canvas.user.id"
+            }
+          },
+          {
+            "text": "Editor Button Placement",
+            "icon_url": "https://some.icon.url/editor_tool.png",
+            "placement": "editor_button",
+            "message_type": "LtiDeepLinkingRequest",
+            "target_link_uri": "https://your.target_link_uri/content_selector",
+            "selection_height": 500,
+            "selection_width": 500
+          },
+          {
+            "text": "Course Navigation Placement",
+            "icon_url": "https://static.thenounproject.com/png/131630-200.png",
+            "placement": "course_navigation",
+            "message_type": "LtiResourceLinkRequest",
+            "target_link_uri": "https://your.target_link_uri/launch?placement=course_navigation",
+            "required_permissions": "manage_calendar",
+            "selection_height": 500,
+            "selection_width": 500
+          }
+        ]
       }
-   ],
-   "public_jwk":{
-      "kty":"RSA",
-      "alg":"RS256",
-      "e":"AQAB",
-      "kid":"8f796169-0ac4-48a3-a202-fa4f3d814fcd",
-      "n":"nZD7QWmIwj-3N_RZ1qJjX6CdibU87y2l02yMay4KunambalP9g0fU9yZLwLX9WYJINcXZDUf6QeZ-SSbblET-h8Q4OvfSQ7iuu0WqcvBGy8M0qoZ7I-NiChw8dyybMJHgpiP_AyxpCQnp3bQ6829kb3fopbb4cAkOilwVRBYPhRLboXma0cwcllJHPLvMp1oGa7Ad8osmmJhXhM9qdFFASg_OCQdPnYVzp8gOFeOGwlXfSFEgt5vgeU25E-ycUOREcnP7BnMUk7wpwYqlE537LWGOV5z_1Dqcqc9LmN-z4HmNV7b23QZW4_mzKIOY4IqjmnUGgLU9ycFj5YGDCts7Q",
-      "use":"sig"
-   },
-   "custom_fields":{
-      "bar":"$Canvas.user.sisid"
-   }
-
+    }
+  ],
+  "public_jwk": {
+    "kty": "RSA",
+    "alg": "RS256",
+    "e": "AQAB",
+    "kid": "8f796169-0ac4-48a3-a202-fa4f3d814fcd",
+    "n": "nZD7QWmIwj-3N_RZ1qJjX6CdibU87y2l02yMay4KunambalP9g0fU9yZLwLX9WYJINcXZDUf6QeZ-SSbblET-h8Q4OvfSQ7iuu0WqcvBGy8M0qoZ7I-NiChw8dyybMJHgpiP_AyxpCQnp3bQ6829kb3fopbb4cAkOilwVRBYPhRLboXma0cwcllJHPLvMp1oGa7Ad8osmmJhXhM9qdFFASg_OCQdPnYVzp8gOFeOGwlXfSFEgt5vgeU25E-ycUOREcnP7BnMUk7wpwYqlE537LWGOV5z_1Dqcqc9LmN-z4HmNV7b23QZW4_mzKIOY4IqjmnUGgLU9ycFj5YGDCts7Q",
+    "use": "sig"
+  },
+  "custom_fields": {
+    "bar": "$Canvas.user.sisid"
+  }
 }
 ```
 
@@ -617,6 +626,27 @@ object for placement-specific target_link_uri's</p>
       </td>
     </tr>
 
+<!-- required_permissions -->
+
+    <tr class="request-param ">
+      <td>required_permissions</td>
+      <td>
+
+      </td>
+      <td>string</td>
+
+
+
+      <td class="param-desc">
+
+        <p>Allows role-based access control based on the built-in Canvas user roles AND the custom roles that you may have created in Canvas. This parameter can be a comma-separated string of one or more required permissions. As expected, if "required_permissions" is included in the configuration, the user will need to have the role listed (or all the roles listed, if multiple) to access the tool. To learn more about roles and to see the roles available for this parameter visit the <a href="roles.html" target="blank">Roles API docs</a>. 
+        </p>
+
+
+      </td>
+    </tr>
+
+
 <!-- environments -->
 
     <tr class="request-param ">
@@ -627,7 +657,7 @@ object for placement-specific target_link_uri's</p>
       <td>JSON object</td>
 
       <td class="param-desc">
-        <p>LTI 1.1 tools <a href="file.tools_xml.html">support enviroment-specific domains and launch urls</a>, used for launching
+        <p>LTI 1.1 tools <a href="file.tools_xml.html">support environment-specific domains and launch urls</a>, used for launching
         from beta or test instances of Canvas. This config option is not supported for LTI 1.3. Tools instead should use the
         <code>canvas_environment</code> parameter of the OIDC Login request to redirect to environment-specific launch urls or
         instances of the tool, as specified in <a href="file.lti_dev_key_config.html#login-redirect">Step 1.5</a> above.

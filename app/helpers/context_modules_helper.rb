@@ -187,8 +187,4 @@ module ContextModulesHelper
 
     translated_content_type(item.content_type.to_sym)
   end
-
-  def module_item_new_quizzes_build_button_enabled?
-    Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button)
-  end
 end

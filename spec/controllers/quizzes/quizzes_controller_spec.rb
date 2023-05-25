@@ -173,20 +173,6 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:FLAGS][:quiz_lti_enabled]).to be false
     end
 
-    it "js_env FLAGS/new_quizzes_modules_support is true if new_quizzes_modules_support enabled" do
-      user_session(@teacher)
-      Account.site_admin.enable_feature!(:new_quizzes_modules_support)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to be true
-    end
-
-    it "js_env FLAGS/new_quizzes_modules_support is false if new_quizzes_modules_support disabled" do
-      user_session(@teacher)
-      Account.site_admin.disable_feature!(:new_quizzes_modules_support)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to be false
-    end
-
     it "js_env quiz_lti_enabled is false when quizzes_next is disabled" do
       user_session(@teacher)
       @course.context_external_tools.create!(

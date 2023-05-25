@@ -20,6 +20,7 @@
 
 class CourseSection < ActiveRecord::Base
   include Workflow
+  include MaterialChanges
 
   belongs_to :course, inverse_of: :course_sections
   belongs_to :nonxlist_course, class_name: "Course"
@@ -201,7 +202,7 @@ class CourseSection < ActiveRecord::Base
 
   def update_account_associations_if_changed
     if (saved_change_to_course_id? || saved_change_to_nonxlist_course_id?) && !Course.skip_updating_account_associations?
-      Course.delay_if_production(n_strand: ["update_account_associations", root_account_id])
+      Course.delay_if_production(n_strand: ["update_account_associations", global_root_account_id])
             .update_account_associations([course_id, course_id_before_last_save, nonxlist_course_id, nonxlist_course_id_before_last_save].compact.uniq)
     end
   end
@@ -412,7 +413,8 @@ class CourseSection < ActiveRecord::Base
   end
 
   def update_enrollment_states_if_necessary
-    if saved_change_to_restrict_enrollments_to_section_dates? || (restrict_enrollments_to_section_dates? && (saved_changes.keys & %w[start_at end_at]).any?)
+    if saved_change_to_restrict_enrollments_to_section_dates? ||
+       (restrict_enrollments_to_section_dates? && saved_material_changes_to?(:start_at, :end_at))
       EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", global_root_account_id])
                      .invalidate_states_for_course_or_section(self)
     end

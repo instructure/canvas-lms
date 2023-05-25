@@ -45,9 +45,18 @@ import '@canvas/util/templateData'
 import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 import {contentItemProcessorPrechecks} from '@canvas/deep-linking/ContentItemProcessor'
 import {ResourceLinkContentItem} from '@canvas/deep-linking/models/ResourceLinkContentItem'
+import {EnvContextModules} from '@canvas/global/env/EnvContextModules'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
+
+// Allow unchecked access to ENV variables that should exist in this context
+declare const ENV: GlobalEnv &
+  EnvContextModules & {
+    // From app/views/shared/_select_content_dialog.html.erb
+    NEW_QUIZZES_BY_DEFAULT: boolean
+  }
 
 type LtiLaunchPlacement = {
   message_type:

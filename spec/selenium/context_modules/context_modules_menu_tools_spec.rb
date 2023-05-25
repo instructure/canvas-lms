@@ -35,8 +35,6 @@ describe "context modules" do
       @tool.save!
       @module1 = @course.context_modules.create!(name: "module1")
       @module2 = @course.context_modules.create!(name: "module2")
-
-      Account.default.enable_feature!(:commons_favorites)
     end
 
     it "is able to launch the index menu tool via the tray", custom_timeout: 30 do

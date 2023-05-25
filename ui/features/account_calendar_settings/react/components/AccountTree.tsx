@@ -30,20 +30,26 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 import {addAccountsToTree} from '../utils'
 import {AccountCalendarItemToggleGroup} from './AccountCalendarItemToggleGroup'
-import {Account, Collection, AccountData, VisibilityChange} from '../types'
+import {Account, Collection, AccountData, VisibilityChange, SubscriptionChange} from '../types'
 
 const I18n = useI18nScope('account_calendar_settings_account_tree')
 
 type ComponentProps = {
   readonly originAccountId: number
   readonly visibilityChanges: VisibilityChange[]
+  readonly subscriptionChanges: SubscriptionChange[]
   readonly onAccountToggled: (id: number, visible: boolean) => void
+  readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
+  readonly autoSubscriptionEnabled: boolean
 }
 
 export const AccountTree = ({
   originAccountId,
   visibilityChanges,
+  subscriptionChanges,
   onAccountToggled,
+  onAccountSubscriptionToggled,
+  autoSubscriptionEnabled,
 }: ComponentProps) => {
   const [collections, setCollections] = useState<Collection>({})
   const [loadingCollectionIds, setLoadingCollectionIds] = useState<number[]>([originAccountId])
@@ -111,7 +117,10 @@ export const AccountTree = ({
             collections={collections}
             handleToggle={handleToggle}
             visibilityChanges={visibilityChanges}
+            subscriptionChanges={subscriptionChanges}
             onAccountToggled={onAccountToggled}
+            onAccountSubscriptionToggled={onAccountSubscriptionToggled}
+            autoSubscriptionEnabled={autoSubscriptionEnabled}
           />
         </div>
       </ApplyTheme>

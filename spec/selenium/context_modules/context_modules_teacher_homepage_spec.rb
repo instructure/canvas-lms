@@ -104,7 +104,7 @@ describe "context modules" do
       end
 
       it "adds an assignment to a module", priority: "1" do
-        add_new_module_item("#assignments_select", "Assignment", "[ New Assignment ]", "New Assignment Title")
+        add_new_module_item("#assignments_select", "Assignment", "[ Create Assignment ]", "New Assignment Title")
         expect(fln("New Assignment Title")).to be_displayed
       end
 

@@ -118,7 +118,7 @@ class Attachment < ActiveRecord::Base
   has_one :group_and_membership_importer, inverse_of: :attachment
   has_one :media_object
   belongs_to :media_object_by_media_id, class_name: "MediaObject", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :attachments_by_media_id
-  has_many :media_tracks
+  has_many :media_tracks, dependent: :destroy
   has_many :submission_draft_attachments, inverse_of: :attachment
   has_many :submissions, -> { active }
   has_many :attachment_associations
@@ -350,8 +350,24 @@ class Attachment < ActiveRecord::Base
   end
 
   def media_tracks_include_originals
-    media_object_scope = MediaObject.where(media_id: media_entry_id).select("media_objects.id")
-    media_tracks.union(MediaTrack.where(media_object: media_object_scope).where.not(locale: media_tracks.select(:locale)))
+    Attachment.media_tracks_include_originals(id)
+  end
+
+  def self.media_tracks_include_originals(attachment_ids)
+    MediaTrack.from(
+      MediaTrack.select("*, ROW_NUMBER() OVER(PARTITION BY media_tracks_all.locale, media_tracks_all.media_object_id ORDER BY media_tracks_all.rank) AS row")
+        .from(<<~SQL.squish),
+          (
+            #{MediaTrack.select("*, 0 AS rank, attachment_id AS for_att_id").where(attachment_id: attachment_ids).to_sql}
+            UNION
+            #{MediaTrack.select("media_tracks.*, 1 AS rank, attachments_by_media_ids_media_objects.id AS for_att_id")
+              .joins(media_object: [:attachment, :attachments_by_media_id])
+              .where("media_tracks.attachment_id = attachments.id")
+              .where(media_objects: { attachments_by_media_ids_media_objects: { id: attachment_ids } }).to_sql}
+          ) AS media_tracks_all
+        SQL
+      :media_tracks
+    ).where(row: 1)
   end
 
   # this is here becase attachment_fu looks to make sure that parent_id is nil before it will create a thumbnail of something.
@@ -1410,6 +1426,11 @@ class Attachment < ActiveRecord::Base
   end
 
   set_policy do
+    # The "read" permission doesn't act quite like you'd expect for files
+    # It gives access to read the metadata of a file (basically you can
+    # know it exists), but to actually read the contents of the file,
+    # you need download permissions.
+    # TODO: Fix permissions to be more descriptive of what they actually do
     given do |user, session|
       context&.grants_right?(user, session, :manage_files_edit) &&
         !associated_with_submission? &&
@@ -1578,7 +1599,7 @@ class Attachment < ActiveRecord::Base
   end
 
   scope :visible, -> { where(["attachments.file_state in (?, ?)", "available", "public"]) }
-  scope :not_deleted, -> { where("attachments.file_state<>'deleted'") }
+  scope :not_deleted, -> { where.not(file_state: "deleted") }
 
   scope :not_hidden, -> { where("attachments.file_state<>'hidden'") }
   scope :uncategorized, -> { where(category: UNCATEGORIZED) }
@@ -1613,6 +1634,7 @@ class Attachment < ActiveRecord::Base
 
     where(visibility_level: vlevels)
   }
+  scope :is_media_object, -> { where.not(media_entry_id: nil) }
 
   def self.build_content_types_sql(types)
     clauses = []
@@ -2435,7 +2457,20 @@ class Attachment < ActiveRecord::Base
                               end
                               new_attachment
                             end
-        change_attachment.folder = Folder.assert_path(attachment.folder_path, to_context)
+        change_attachment.folder = if attachment.folder.submission_context_code
+                                     # source folder is a submissions folder; find the corresponding submissions
+                                     # folder in the destination context
+                                     submission_context = from_context.shard.activate do
+                                       Context.find_by_asset_string(attachment.folder.submission_context_code)
+                                     end
+                                     to_context.submissions_folder(submission_context)
+                                   else
+                                     # source folder is _not_ a submissions folder; ensure the file
+                                     # doesn't get placed in a submissions folder in the destination
+                                     Folder.assert_path(attachment.folder_path,
+                                                        to_context,
+                                                        conditions: { submission_context_code: nil })
+                                   end
         change_attachment.save_without_broadcasting!
         if match
           change_attachment.folder.reload

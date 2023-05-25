@@ -210,8 +210,7 @@ describe('ContextModulesPublishMenu', () => {
 
   describe('Modal actions', () => {
     it('closes the modal when stopping an action', () => {
-      const stopButtonText =
-        'Stop publishing button. Click to discontinue processing.Stop Publishing'
+      const stopButtonText = 'Stop button. Click to discontinue processing.Stop'
       const {queryByRole, getByRole, getByText, getByTestId} = render(
         <ContextModulesPublishMenu {...defaultProps} />
       )

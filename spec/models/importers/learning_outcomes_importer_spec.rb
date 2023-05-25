@@ -223,6 +223,30 @@ describe "Importing Learning Outcomes" do
     expect(@context.learning_outcomes.count).to eq 2 # lo1 is not duplicated
   end
 
+  it "does not duplicate learning outcomes with vendor_guid on common cartidge import" do
+    context2 = course_model
+    outcome1 = context2.created_learning_outcomes.create!({ title: "cci outcome 1", description: "cci outcome 1: desc", vendor_guid: "xyz" })
+
+    mig = ContentMigration.create!(context: context2).tap do |m|
+      m.migration_ids_to_import = { copy: { everything: true } }
+      m.migration_type = "common_cartridge_importer"
+    end
+
+    course_content = { "learning_outcomes" =>
+      [
+        {
+          "migration_id" => "z",
+          "title" => outcome1.title,
+          "description" => outcome1.description,
+          "vendor_guid" => outcome1.vendor_guid,
+          "copied_from_outcome_id" => outcome1.id
+        },
+      ] }
+    Importers::LearningOutcomeImporter.process_migration(course_content, mig)
+    duplicate_check = LearningOutcome.where(vendor_guid: outcome1.vendor_guid)
+    expect(duplicate_check.count).to eq 1
+  end
+
   describe "with the outcome_alignments_course_migration FF enabled" do
     before(:once) { @context.root_account.enable_feature!(:outcome_alignments_course_migration) }
 

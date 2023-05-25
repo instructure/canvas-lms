@@ -48,7 +48,7 @@ describe CommMessagesApiController, type: :request do
           raw_api_call(:get, "/api/v1/comm_messages", {
                          controller: "comm_messages_api", action: "index", format: "json"
                        })
-          expect(response.code).to eql "404"
+          expect(response).to have_http_status :not_found
 
           raw_api_call(:get, "/api/v1/comm_messages?user_id=0", {
                          controller: "comm_messages_api",
@@ -56,7 +56,7 @@ describe CommMessagesApiController, type: :request do
                          format: "json",
                          user_id: "0"
                        })
-          expect(response.code).to eql "404"
+          expect(response).to have_http_status :not_found
         end
 
         it "uses start_time and end_time parameters to limit results" do
@@ -128,7 +128,7 @@ describe CommMessagesApiController, type: :request do
                          format: "json",
                          user_id: @test_user.to_param
                        })
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
         end
       end
     end
@@ -150,7 +150,7 @@ describe CommMessagesApiController, type: :request do
                          format: "json",
                          user_id: @test_user.to_param
                        })
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
         end
 
         it "is only able to see associated account's messages" do
@@ -183,7 +183,7 @@ describe CommMessagesApiController, type: :request do
                          format: "json",
                          user_id: @test_user.to_param
                        })
-          expect(response.code).to eql "401"
+          expect(response).to have_http_status :unauthorized
         end
       end
     end
@@ -201,7 +201,7 @@ describe CommMessagesApiController, type: :request do
                        format: "json",
                        user_id: @test_user.to_param
                      })
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end

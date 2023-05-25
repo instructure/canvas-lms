@@ -18,12 +18,14 @@
 
 import React, {useEffect} from 'react'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
+import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {Spinner} from '@instructure/ui-spinner'
-import {IconCalendarMonthLine} from '@instructure/ui-icons'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {IconCalendarMonthLine, IconQuestionLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {Checkbox} from '@instructure/ui-checkbox'
 import SVGWrapper from '@canvas/svg-wrapper'
@@ -129,9 +131,25 @@ const AccountCalendarResultsArea = ({
                 <Flex.Item margin="0 xx-small xx-small 0">
                   <IconCalendarMonthLine />
                 </Flex.Item>
-                <Flex.Item>
+                <Flex.Item shouldGrow={true}>
                   <Text>{r.name}</Text>{' '}
                 </Flex.Item>
+                {r.auto_subscribe && (
+                  <Flex.Item textAlign="end">
+                    <Tooltip
+                      renderTip={I18n.t('Calendars added by the admin cannot be removed')}
+                      on={['click', 'focus', 'hover']}
+                    >
+                      <IconButton
+                        renderIcon={IconQuestionLine}
+                        screenReaderLabel={I18n.t('help')}
+                        size="small"
+                        withBackground={false}
+                        withBorder={false}
+                      />
+                    </Tooltip>
+                  </Flex.Item>
+                )}
               </Flex>
             </View>
           </List.Item>

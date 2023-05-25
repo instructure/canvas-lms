@@ -1378,6 +1378,37 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
+  # @API Clear unread status for all submissions.
+  #
+  # Site-admin-only endpoint.
+  #
+  # No request fields are necessary.
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/submissions/<user_id>/clear_unread.json' \
+  #        -X PUT \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Length: 0"
+  #
+  def submissions_clear_unread
+    return render_unauthorized_action unless Account.site_admin.grants_right?(@current_user, :manage_students)
+
+    user_id = params[:user_id]
+    course_id = params[:course_id]
+    user = User.find(user_id)
+    course = Course.find(course_id)
+    submissions = course.submissions.where(user: user)
+    ids = ContentParticipation.mark_all_as_read_for_user(user, submissions, course)
+
+    opts = { type: :submissions_clear_unread }
+    error_info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts).to_h
+    error_info[:extra][:ids] = ids
+    Canvas::Errors.capture("Notification Badge Count mismatch, Site Admin is clearing Notification Badge Count for User ID - #{user_id} for Course ID - #{course_id}", error_info, :warn)
+  end
+
   # @API Get rubric assessments read state
   #
   # Return whether new rubric comments/grading made on a submission have been seen by the student being assessed.

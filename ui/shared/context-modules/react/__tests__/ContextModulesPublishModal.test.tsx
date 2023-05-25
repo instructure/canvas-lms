@@ -36,6 +36,7 @@ const defaultProps = {
   isCanceling: false,
   isPublishing: false,
   skippingItems: false,
+  mode: 'publish' as const,
 }
 
 beforeAll(() => {
@@ -110,9 +111,7 @@ describe('ContextModulesPublishModal', () => {
     const publishButton = getByTestId('publish-button')
     expect(publishButton.textContent).toBe('Continue')
     rerender(<ContextModulesPublishModal {...defaultProps} isPublishing={true} />)
-    expect(publishButton.textContent).toBe(
-      'Stop publishing button. Click to discontinue processing.Stop Publishing'
-    )
+    expect(publishButton.textContent).toBe('Stop button. Click to discontinue processing.Stop')
   })
 
   it('disables the stop button if canceling', () => {
@@ -120,9 +119,28 @@ describe('ContextModulesPublishModal', () => {
       <ContextModulesPublishModal {...defaultProps} isPublishing={true} isCanceling={true} />
     )
     const publishButton = getByTestId('publish-button')
-    expect(publishButton.textContent).toBe(
-      'Stop publishing button. Click to discontinue processing.Stop Publishing'
-    )
+    expect(publishButton.textContent).toBe('Stop button. Click to discontinue processing.Stop')
     expect(publishButton).toBeDisabled()
+  })
+
+  it('displays publishing progress message when mode is publish', () => {
+    const {getByText, queryByText} = render(
+      <ContextModulesPublishModal {...defaultProps} isPublishing={true} progressId={8} />
+    )
+    expect(queryByText('Unpublish Progress')).not.toBeInTheDocument()
+    expect(getByText('Publishing Progress')).toBeInTheDocument()
+  })
+
+  it('displays unpublish progress message when mode is unpublish', () => {
+    const {getByText, queryByText} = render(
+      <ContextModulesPublishModal
+        {...defaultProps}
+        isPublishing={true}
+        progressId={8}
+        mode="unpublish"
+      />
+    )
+    expect(getByText('Unpublish Progress')).toBeInTheDocument()
+    expect(queryByText('Publishing Progress')).not.toBeInTheDocument()
   })
 })

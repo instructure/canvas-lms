@@ -2235,7 +2235,7 @@ describe AssignmentsApiController, type: :request do
 
       api_create_assignment_in_course(@course, { "description" => "description",
                                                  "secure_params" => jwt })
-      expect(response.code).to eq "201"
+      expect(response).to have_http_status :created
 
       api_create_assignment_in_course(@course, { "description" => "description",
                                                  "secure_params" => jwt })
@@ -2689,7 +2689,7 @@ describe AssignmentsApiController, type: :request do
                        "on_papers"
                      ]
                    } })
-      expect(response.code).to eql "400"
+      expect(response).to have_http_status :bad_request
     end
 
     it "calls DueDateCacher only once" do
@@ -3185,7 +3185,7 @@ describe AssignmentsApiController, type: :request do
                          "title" => "some assignment"
                        }
                      } })
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
       end
     end
 
@@ -3531,7 +3531,7 @@ describe AssignmentsApiController, type: :request do
 
       api_update_assignment_call(@course, @assignment, { points_possible: 10 })
 
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "allows user with grading rights to update assignment grading type" do
@@ -3653,7 +3653,7 @@ describe AssignmentsApiController, type: :request do
                                 @assignment,
                                 { "peer_reviews_assign_at" => "1/1/2013" })
       expect(response).not_to be_successful
-      expect(response.code).to eql "400"
+      expect(response).to have_http_status :bad_request
       json = JSON.parse response.body
       expect(json["errors"]["assignment[peer_reviews_assign_at]"].first["message"])
         .to eq "Invalid datetime for peer_reviews_assign_at"
@@ -4716,7 +4716,7 @@ describe AssignmentsApiController, type: :request do
         raw_api_update_assignment(@course, @assignment, {
                                     name: "should not change!"
                                   })
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
         expect(@assignment.reload.title).to eq title_before_update
       end
 
@@ -4906,7 +4906,7 @@ describe AssignmentsApiController, type: :request do
                                   })
         @assignment.reload
         expect(@assignment.group_category).to be_nil
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
       end
     end
 
@@ -6058,7 +6058,7 @@ describe AssignmentsApiController, type: :request do
                      })
 
         # should be authorization error
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "shows an unpublished assignment to teachers" do

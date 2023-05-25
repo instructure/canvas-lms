@@ -64,7 +64,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Reports (Account Settings)'),
       description: I18n.t(
-        'To view the Reports tab, Courses - view usage reports must also be enabled.'
+        'To view the Reports tab, Reports - manage must also be enabled.'
       ),
     },
     {

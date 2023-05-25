@@ -750,8 +750,16 @@ describe ContentMigration do
       expect(@copy_to.reload.syllabus_body).to include "/courses/#{@copy_to.id}/pages/#{page2.url}"
     end
 
-    it "re-uses kaltura media objects" do
-      expect do
+    context "kaltura media objects" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return true
+        allow(CanvasKaltura::ClientV3).to receive(:config).and_return(true)
+        kaltura_double = double("kaltura")
+        allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_double)
+        allow(kaltura_double).to receive(:startSession)
+      end
+
+      it "re-uses kaltura media objects" do
         media_id = "0_deadbeef"
         @copy_from.media_objects.create!(media_id: media_id)
         att = Attachment.create!(filename: "video.mp4", uploaded_data: StringIO.new("pixels and frames and stuff"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
@@ -759,10 +767,48 @@ describe ContentMigration do
         att.content_type = "video/mp4"
         att.save!
 
-        run_course_copy
+        expect do
+          run_course_copy
 
-        expect(@copy_to.attachments.where(migration_id: mig_id(att)).first.media_entry_id).to eq media_id
-      end.to change { Delayed::Job.jobs_count(:tag, "MediaObject.add_media_files") }.by(0)
+          expect(@copy_to.attachments.where(migration_id: mig_id(att)).first.media_entry_id).to eq media_id
+        end.to change { Delayed::Job.jobs_count(:tag, "MediaObject.add_media_files") }.by(0)
+      end
+
+      it "copies media tracks without creating new media objects" do
+        media_id = "0_deadbeef"
+        media_object = @copy_from.media_objects.create!(media_id: media_id)
+        copy_from_track = media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
+
+        expect do
+          run_course_copy
+
+          copy_to_attach = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
+          expect(copy_to_attach.media_entry_id).to eq media_id
+          copy_to_track = copy_to_attach.media_tracks.first
+          expect(copy_to_track.slice(:media_object_id, :locale).values).to eq [media_object.id, "en"]
+          expect(copy_to_track.id).not_to eq(copy_from_track.id)
+        end.to change { MediaTrack.count }.by(1)
+      end
+
+      it "copies media tracks from non-default media object attachments" do
+        media_id = "0_deadbeef"
+        media_object = course_factory.media_objects.create!(media_id: media_id)
+        att = Attachment.create!(filename: "video.mp4", uploaded_data: StringIO.new("pixels and frames and stuff"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+        att.media_entry_id = media_id
+        att.content_type = "video/mp4"
+        att.save!
+        media_track = att.media_tracks.create!(content: "en subs", media_object_id: media_object, kind: "subtitles", locale: "en", user_id: att.user_id)
+
+        expect do
+          run_course_copy
+
+          copy_to_media_track = @copy_to.attachments.where(migration_id: mig_id(att)).first.media_tracks.first
+          expect(copy_to_media_track.id).not_to eq media_track.id
+          expect(copy_to_media_track.content).to eq "en subs"
+          expect(copy_to_media_track.media_object_id).to eq media_track.media_object_id
+          expect(MediaObject.where(media_id: media_id).count).to eq 1
+        end.to change { MediaTrack.count }.by(1)
+      end
     end
 
     it "imports calendar events" do

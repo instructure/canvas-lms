@@ -132,9 +132,14 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jquery-selectmenu'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/util/jquery/fixDialogButtons'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
+
+// Allow unchecked access to module-specific ENV variables
+declare const ENV: GlobalEnv & EnvGradebookSpeedGrader
 
 const I18n = useI18nScope('speed_grader')
 
@@ -517,6 +522,7 @@ function handleStudentOrSectionSelected(
 
 function initDropdown() {
   const hideStudentNames = utils.shouldHideStudentNames()
+  // @ts-expect-error
   $('#hide_student_names').attr('checked', hideStudentNames)
 
   const optionsArray = window.jsonData.studentsWithSubmissions.map(student => {
@@ -1027,7 +1033,7 @@ function initRubricStuff() {
     } else {
       data.graded_anonymously = utils.shouldHideStudentNames()
     }
-    const url = ENV.update_rubric_assessment_url
+    const url = ENV.update_rubric_assessment_url!
     const method = 'POST'
     EG.toggleFullRubric('close')
 
@@ -1046,7 +1052,6 @@ function initRubricStuff() {
         if (response.id === assessedStudent.rubric_assessments[i].id) {
           $.extend(true, assessedStudent.rubric_assessments[i], response)
           found = true
-          continue
         }
       }
       if (!found) {
@@ -1479,7 +1484,9 @@ EG = {
 
       if (ENV.student_group_reason_for_change != null) {
         SpeedGraderAlerts.showStudentGroupChangeAlert({
+          // @ts-expect-error
           selectedStudentGroup: ENV.selected_student_group,
+          // @ts-expect-error
           reasonForChange: ENV.student_group_reason_for_change,
         })
       }
@@ -3973,6 +3980,7 @@ EG = {
         const displayName = grade.anonymous_grader_id
           ? ENV.anonymous_identities[grade.anonymous_grader_id].name
           : grade.scorer_name
+        // @ts-expect-error
         provisionalGraderDisplayNames[grade.provisional_grade_id] = displayName
       }
     })

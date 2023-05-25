@@ -219,6 +219,36 @@ describe('Other Calendars modal ', () => {
       expect(getByTestId(`account-${page1Results[1].id}-checkbox`).checked).toBe(true)
       expect(getByTestId(`account-${page1Results[1].id}-checkbox`).disabled).toBe(true)
     })
+
+    it('includes a tooltip for auto-subscribed calendars', async () => {
+      const searchResponse = structuredClone(accountCalendarsAPIPage1Response)
+      searchResponse.account_calendars[1].auto_subscribe = true
+      fetchMock.get(
+        SEARCH_ENDPOINT.concat('?per_page=2'),
+        {
+          body: searchResponse,
+          headers: {
+            Link: '</api/v1/account_calendars?&per_page=2&page=2>; rel="next"',
+          },
+        },
+        {overwriteRoutes: true}
+      )
+      const {getByTestId, getByText, findByText} = render(
+        <AccountCalendarsModal
+          {...getProps({
+            getSelectedOtherCalendars: () => searchResponse.account_calendars,
+          })}
+        />
+      )
+      const addCalendarButton = getByTestId('add-other-calendars-button')
+      openModal(addCalendarButton)
+      // assert the modal is open
+      expect(await findByText('Select Calendars')).toBeInTheDocument()
+      const helpButton = getByText('help').closest('button')
+      expect(helpButton).toBeInTheDocument()
+      act(() => helpButton.click())
+      expect(getByText('Calendars added by the admin cannot be removed')).toBeInTheDocument()
+    })
   })
 
   describe('Search bar ', () => {

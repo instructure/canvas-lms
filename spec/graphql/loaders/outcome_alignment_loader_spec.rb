@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../../outcome_alignments_spec_helper"
+
 describe Loaders::OutcomeAlignmentLoader do
   before :once do
     course_model
@@ -64,18 +66,6 @@ describe Loaders::OutcomeAlignmentLoader do
 
   def module_url(alignment)
     [base_url, "modules", alignment[:module_id]].join("/") if alignment[:module_id]
-  end
-
-  def mock_os_aligned_outcomes(outcomes, associated_asset_id)
-    (outcomes || []).to_h do |o|
-      [o.id.to_s,
-       [{
-         artifact_type: "quizzes.quiz",
-         artifact_id: "1",
-         associated_asset_type: "canvas.assignment.quizzes",
-         associated_asset_id: associated_asset_id.to_s
-       }]]
-    end
   end
 
   it "resolves to nil if context is invalid" do
@@ -169,6 +159,8 @@ describe Loaders::OutcomeAlignmentLoader do
           expect(alignment[:module_workflow_state]).to eq module_workflow_state
           expect(alignment[:assignment_content_type]).to eq assignment_content_type
           expect(alignment[:assignment_workflow_state]).to eq assignment_workflow_state
+          expect(alignment[:quiz_items]).to be_nil
+          expect(alignment[:alignments_count]).to eq 1
         end
       end
     end
@@ -181,7 +173,7 @@ describe Loaders::OutcomeAlignmentLoader do
       @module1.add_item type: "assignment", id: @new_quiz.id
       allow_any_instance_of(OutcomesServiceAlignmentsHelper)
         .to receive(:get_os_aligned_outcomes)
-        .and_return(mock_os_aligned_outcomes([@outcome], @new_quiz.id))
+        .and_return(OutcomeAlignmentsSpecHelper.mock_os_aligned_outcomes([@outcome], @new_quiz.id))
     end
 
     it "resolves outcome alignments to new quiz in Outcomes-Service" do
@@ -210,6 +202,8 @@ describe Loaders::OutcomeAlignmentLoader do
             expect(alignment[:module_workflow_state]).to eq "active"
             expect(alignment[:assignment_content_type]).to eq "new_quiz"
             expect(alignment[:assignment_workflow_state]).to eq "published"
+            expect(alignment[:quiz_items]).to eq []
+            expect(alignment[:alignments_count]).to eq 1
           end
         end
       end
@@ -229,6 +223,80 @@ describe Loaders::OutcomeAlignmentLoader do
         end
       end
       expect(count).to eq 2
+    end
+
+    it "resolves outcome alignments to both new quiz and to quiz questions in Outcomes-Service" do
+      allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+        .to receive(:get_os_aligned_outcomes)
+        .and_return(OutcomeAlignmentsSpecHelper.mock_os_aligned_outcomes([@outcome], @new_quiz.id, with_items: true))
+      count = 0
+      GraphQL::Batch.batch do
+        Loaders::OutcomeAlignmentLoader.for(
+          @course
+        ).load(@outcome).then do |alignments|
+          alignments.each do |alignment|
+            next unless alignment[:assignment_content_type] == "new_quiz"
+
+            count += 1
+            module_url = [base_url, "modules", alignment[:module_id]].join("/") if alignment[:module_id]
+
+            expect(alignment[:_id]).not_to be_nil
+            expect(alignment[:content_id]).to eq @new_quiz.id
+            expect(alignment[:content_type]).to eq "Assignment"
+            expect(alignment[:context_id]).to eq @course.id
+            expect(alignment[:context_type]).to eq "Course"
+            expect(alignment[:title]).to eq @new_quiz.title
+            expect(alignment[:url]).to eq url(alignment)
+            expect(alignment[:learning_outcome_id]).to eq @outcome.id
+            expect(alignment[:module_id]).to eq @module1.id
+            expect(alignment[:module_name]).to eq @module1.name
+            expect(alignment[:module_url]).to eq module_url
+            expect(alignment[:module_workflow_state]).to eq "active"
+            expect(alignment[:assignment_content_type]).to eq "new_quiz"
+            expect(alignment[:assignment_workflow_state]).to eq "published"
+            expect(alignment[:quiz_items]).to match_array([{ _id: "101", title: "Question Number 101" }, { _id: "102", title: "Question Number 102" }])
+            expect(alignment[:alignments_count]).to eq 3
+          end
+        end
+      end
+      expect(count).to eq 1
+    end
+
+    it "resolves outcome alignments to quiz questions in Outcomes-Service" do
+      allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+        .to receive(:get_os_aligned_outcomes)
+        .and_return(OutcomeAlignmentsSpecHelper.mock_os_aligned_outcomes([@outcome], @new_quiz.id, with_quiz: false, with_items: true))
+      count = 0
+      GraphQL::Batch.batch do
+        Loaders::OutcomeAlignmentLoader.for(
+          @course
+        ).load(@outcome).then do |alignments|
+          alignments.each do |alignment|
+            next unless alignment[:assignment_content_type] == "new_quiz"
+
+            count += 1
+            module_url = [base_url, "modules", alignment[:module_id]].join("/") if alignment[:module_id]
+
+            expect(alignment[:_id]).not_to be_nil
+            expect(alignment[:content_id]).to eq @new_quiz.id
+            expect(alignment[:content_type]).to eq "Assignment"
+            expect(alignment[:context_id]).to eq @course.id
+            expect(alignment[:context_type]).to eq "Course"
+            expect(alignment[:title]).to eq @new_quiz.title
+            expect(alignment[:url]).to eq url(alignment)
+            expect(alignment[:learning_outcome_id]).to eq @outcome.id
+            expect(alignment[:module_id]).to eq @module1.id
+            expect(alignment[:module_name]).to eq @module1.name
+            expect(alignment[:module_url]).to eq module_url
+            expect(alignment[:module_workflow_state]).to eq "active"
+            expect(alignment[:assignment_content_type]).to eq "new_quiz"
+            expect(alignment[:assignment_workflow_state]).to eq "published"
+            expect(alignment[:quiz_items]).to match_array([{ _id: "101", title: "Question Number 101" }, { _id: "102", title: "Question Number 102" }])
+            expect(alignment[:alignments_count]).to eq 2
+          end
+        end
+      end
+      expect(count).to eq 1
     end
   end
 

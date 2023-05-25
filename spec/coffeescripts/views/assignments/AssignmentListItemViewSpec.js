@@ -978,9 +978,6 @@ QUnit.module('AssignmentListItemViewSpec - skip to build screen button', functio
       current_user_roles: ['teacher'],
       URLS: {assignment_sort_base_url: 'test'},
       QUIZ_LTI_ENABLED: true,
-      FLAGS: {
-        new_quizzes_skip_to_build_module_button: true,
-      },
     })
   })
 
@@ -989,7 +986,7 @@ QUnit.module('AssignmentListItemViewSpec - skip to build screen button', functio
     genTeardown.call(this)
   })
 
-  test('canShowBuildLink is true if QUIZ_LTI_ENABLED and the skip to build button are enabled', function () {
+  test('canShowBuildLink is true if QUIZ_LTI_ENABLED', function () {
     const view = createView(
       buildAssignment({
         id: 1,
@@ -997,27 +994,8 @@ QUnit.module('AssignmentListItemViewSpec - skip to build screen button', functio
         is_quiz_lti_assignment: true,
       })
     )
-    ENV.FLAGS = {
-      new_quizzes_skip_to_build_module_button: true,
-    }
     const json = view.toJSON()
     strictEqual(json.canShowBuildLink, true)
-  })
-
-  test('canShowBuildLink is false if new_quizzes_skip_to_build_module_button is false', function () {
-    ENV.FLAGS = {
-      new_quizzes_skip_to_build_module_button: false,
-    }
-    const view = createView(
-      buildAssignment({
-        id: 1,
-        title: 'Foo',
-        is_quiz_lti_assignment: true,
-      })
-    )
-
-    const json = view.toJSON()
-    strictEqual(json.canShowBuildLink, false)
   })
 
   test('canShowBuildLink is false if the assignment is not a new quiz', function () {

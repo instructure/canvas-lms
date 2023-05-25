@@ -310,6 +310,24 @@ describe AccountCalendarsApiController do
       put :update, params: { account_id: @root_account, auto_subscribe: true }
       expect(@root_account.reload.account_calendar_subscription_type).to eq "manual"
     end
+
+    describe "metrics collection" do
+      before do
+        account_admin_user(active_all: true, account: @root_account, user: @user)
+        user_session(@user)
+        allow(InstStatsd::Statsd).to receive(:gauge)
+      end
+
+      it "collects auto-subscribe on data" do
+        put :update, params: { account_id: @root_account, auto_subscribe: true }
+        expect(InstStatsd::Statsd).to have_received(:gauge).once.with("account_calendars.auto_subscribing", 1)
+      end
+
+      it "collects auto-subscribe off data" do
+        put :update, params: { account_id: @root_account, auto_subscribe: false }
+        expect(InstStatsd::Statsd).to have_received(:gauge).once.with("account_calendars.manual_subscribing", 1)
+      end
+    end
   end
 
   describe "PUT 'bulk_update'" do
@@ -417,6 +435,27 @@ describe AccountCalendarsApiController do
       expect(@root_account.account_calendar_subscription_type).to eq "auto"
       expect(@subaccount1.reload.account_calendar_visible).to be_truthy
       expect(@subaccount1.account_calendar_subscription_type).to eq "auto"
+    end
+
+    describe "metrics collection" do
+      before do
+        account_admin_user(active_all: true, account: @root_account, user: @user)
+        user_session(@user)
+        allow(InstStatsd::Statsd).to receive(:gauge)
+      end
+
+      it "collects auto-subscribe data`" do
+        put :bulk_update, params: {
+          account_id: @root_account,
+          _json: [
+            { id: @root_account.id, auto_subscribe: true },
+            { id: @subaccount1.id, auto_subscribe: true },
+            { id: @subaccount2.id, auto_subscribe: false }
+          ]
+        }
+        expect(InstStatsd::Statsd).to have_received(:gauge).once.with("account_calendars.auto_subscribing", 2)
+        expect(InstStatsd::Statsd).to have_received(:gauge).once.with("account_calendars.manual_subscribing", 1)
+      end
     end
   end
 

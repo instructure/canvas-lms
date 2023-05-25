@@ -151,7 +151,7 @@ export default class Quiz extends Backbone.Model {
   }
 
   url() {
-    if (this.isQuizzesNext() && ENV.PERMISSIONS?.manage && ENV.FLAGS?.new_quizzes_modules_support) {
+    if (this.isQuizzesNext() && ENV.PERMISSIONS?.manage) {
       return this.edit_url()
     }
     return this.build_url()

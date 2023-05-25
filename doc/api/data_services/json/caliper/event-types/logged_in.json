@@ -5,6 +5,9 @@
   "schema": {
     "data[0].object.extensions[\"com.instructure.canvas\"]": {
       "redirect_url": "The URL the user was redirected to after logging in. Is set when the user logs in after clicking a deep link into Canvas"
+    },
+    "data[0].object": {
+      "type": "SoftwareApplication"
     }
   },
   "examples": [

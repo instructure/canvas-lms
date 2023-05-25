@@ -184,7 +184,7 @@ describe AuthenticationProvidersController do
       account.authentication_providers.create!(linkedin)
 
       post "create", format: :json, params: { account_id: account.id }.merge(linkedin)
-      expect(response.code).to eq "422"
+      expect(response).to have_http_status :unprocessable_entity
     end
 
     it "allows multiple non-singleton types" do

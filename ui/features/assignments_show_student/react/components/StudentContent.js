@@ -197,7 +197,7 @@ function StudentContent(props) {
         return
       }
 
-      import('../../../../shared/immersive-reader/ImmersiveReader')
+      import('@canvas/immersive-reader/ImmersiveReader')
         .then(ImmersiveReader => {
           mountPoints.forEach(mountPoint => {
             ImmersiveReader.initializeReaderButton(mountPoint, {

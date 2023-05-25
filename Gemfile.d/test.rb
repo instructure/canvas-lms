@@ -66,5 +66,5 @@ group :test do
   # performance tools for instrumenting rspec tests
   gem "stackprof", "~> 0.2"
 
-  gem "crystalball", "0.7.0", require: false
+  gem "crystalball", github: "wrapbook/crystalball", require: false
 end

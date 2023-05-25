@@ -343,26 +343,23 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links
     lti_platform_storage
-    scale_equation_images
-    buttons_and_icons_cropper
     calendar_series
     account_level_blackout_dates
     rce_ux_improvements
     render_both_to_do_lists
     course_paces_redesign
     course_paces_for_students
-    rce_better_paste
     module_publish_menu
     explicit_latex_typesetting
     dev_key_oidc_alert
     rce_new_external_tool_dialog_in_canvas
     rce_show_studio_media_options
-    rce_improved_placeholders
     media_links_use_attachment_id
+    auto_subscribe_account_calendars
+    account_calendars_planner_support
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
-    files_dnd
     usage_rights_discussion_topics
     granular_permissions_manage_users
     create_course_subaccount_picker
@@ -374,6 +371,7 @@ class ApplicationController < ActionController::Base
     send_usage_metrics
     rce_transform_loaded_content
     lti_assignment_page_line_items
+    mobile_offline_mode
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -1974,10 +1972,7 @@ class ApplicationController < ActionController::Base
   def content_tag_redirect(context, tag, error_redirect_symbol, tag_type = nil)
     url_params = (tag.tag_type == "context_module") ? { module_item_id: tag.id } : {}
     if tag.content_type == "Assignment"
-      use_edit_url = params[:build].nil? &&
-                     Account.site_admin.feature_enabled?(:new_quizzes_modules_support) &&
-                     @context.grants_right?(@current_user, :manage) &&
-                     tag.quiz_lti
+      use_edit_url = params[:build].nil? && @context.grants_right?(@current_user, :manage) && tag.quiz_lti
       url_params[:quiz_lti] = true if use_edit_url
       redirect_symbol = use_edit_url ? :edit_context_assignment_url : :context_assignment_url
       redirect_to named_context_url(context, redirect_symbol, tag.content_id, url_params)
@@ -2884,16 +2879,8 @@ class ApplicationController < ActionController::Base
              HAS_GRADING_PERIODS: @context.grading_periods?,
              VALID_DATE_RANGE: CourseDateRange.new(@context),
              assignment_menu_tools: external_tools_display_hashes(:assignment_menu),
-             assignment_index_menu_tools: (if @domain_root_account&.feature_enabled?(:commons_favorites)
-                                             external_tools_display_hashes(:assignment_index_menu)
-                                           else
-                                             []
-                                           end),
-             assignment_group_menu_tools: (if @domain_root_account&.feature_enabled?(:commons_favorites)
-                                             external_tools_display_hashes(:assignment_group_menu)
-                                           else
-                                             []
-                                           end),
+             assignment_index_menu_tools: external_tools_display_hashes(:assignment_index_menu),
+             assignment_group_menu_tools: external_tools_display_hashes(:assignment_group_menu),
              discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
              quiz_menu_tools: external_tools_display_hashes(:quiz_menu),
              current_user_has_been_observer_in_this_course: current_user_has_been_observer_in_this_course,
@@ -3075,11 +3062,7 @@ class ApplicationController < ActionController::Base
     return false if @current_user.blank?
 
     controller_action = "#{params[:controller]}##{params[:action]}"
-    immersive_reader_pages = if Account.site_admin.feature_enabled?(:more_immersive_reader)
-                               ["assignments#show", "courses#show", "assignments#syllabus", "wiki_pages#front_page", "wiki_pages#show"].freeze
-                             else
-                               ["wiki_pages#show"].freeze
-                             end
+    immersive_reader_pages = %w[assignments#show courses#show assignments#syllabus wiki_pages#front_page wiki_pages#show].freeze
 
     return false unless immersive_reader_pages.include?(controller_action)
 

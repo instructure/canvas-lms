@@ -159,8 +159,8 @@ module AssignmentsIndexPage
     f("#assignment_student_peer_review_#{assignment_id}")
   end
 
-  def assessment_request(index)
-    f("a[title='Required Peer Review #{index}']")
+  def assessment_request(index, assignment_name)
+    f("a[aria-label='Required Peer Review #{index} for #{assignment_name}']")
   end
 
   #------------------------------ Actions --------------------------------

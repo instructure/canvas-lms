@@ -458,7 +458,8 @@ describe "student planner" do
       @assignment_opportunity = @course.assignments.create!(name: "assignmentThatHasToBeDoneNow",
                                                             description: "This will take a long time",
                                                             submission_types: "online_text_entry",
-                                                            due_at: 2.days.ago)
+                                                            due_at: 2.days.ago,
+                                                            points_possible: 132)
     end
 
     it "closes the opportunities dropdown.", priority: "1" do
@@ -478,10 +479,28 @@ describe "student planner" do
     it "links opportunity to the correct assignment page.", priority: "1" do
       go_to_list_view
       open_opportunities_dropdown
+      expect(fj(".Opportunity-styles__points:contains('132')")).to be_present
       click_opportunity(@assignment_opportunity.name)
 
       expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@assignment_opportunity.id}"
       expect(AssignmentPage.assignment_description.text).to eq @assignment_opportunity.description
+    end
+
+    it "does not show points possible when restrict_quantitative_data is true" do
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # truthy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      Account.default.save!
+
+      # truthy permission(since enabled is being "not"ed)
+      Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+      Account.default.reload
+
+      go_to_list_view
+      open_opportunities_dropdown
+      expect(f("body")).not_to contain_jqcss(".Opportunity-styles__points:contains('132')")
     end
 
     it "dismisses assignment from opportunity dropdown.", priority: "1" do

@@ -134,22 +134,7 @@ test('it should show the loading state while files are loading', function () {
   equal(loading.length, 0)
 })
 
-QUnit.module('FileSelectBox with new_quizzes_modules_support enabled', {
-  setup() {
-    this.reset_env = window.ENV
-    window.ENV = {new_quizzes_modules_support: true}
-    wrapper = document.getElementById('fixtures')
-    this.server = setupServer()
-    this.component = renderComponent()
-  },
-
-  teardown() {
-    window.ENV = this.reset_env
-    ReactDOM.unmountComponentAtNode(wrapper)
-  },
-})
-
-test('it renders Create instead of New', function () {
+test('it renders Create', function () {
   ReactDOM.unmountComponentAtNode(wrapper)
   this.component = renderComponent()
   ok(wrapper.innerText.match(/\[ Create File\(s\) \]/))

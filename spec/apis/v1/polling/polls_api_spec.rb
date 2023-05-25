@@ -142,7 +142,7 @@ describe Polling::PollsController, type: :request do
         @poll.poll_sessions.create!(course: @course)
 
         get_show(true)
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
 
       it "is unauthorized if there are no sessions that belong to a course or course section the user is enrolled in" do
@@ -150,7 +150,7 @@ describe Polling::PollsController, type: :request do
         unenrolled = Course.create!(name: "Unenrolled Course")
         @poll.poll_sessions.create!(course: unenrolled)
         get_show(true)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -178,7 +178,7 @@ describe Polling::PollsController, type: :request do
       it "is unauthorized" do
         student_in_course(active_all: true, course: @course)
         post_create({ question: "New Title" }, true)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -213,7 +213,7 @@ describe Polling::PollsController, type: :request do
       it "is unauthorized" do
         student_in_course(active_all: true, course: @course)
         put_update({ question: "New Title" }, true)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -250,7 +250,7 @@ describe Polling::PollsController, type: :request do
         @user = @teacher
         delete_destroy
 
-        expect(response.code).to eq "204"
+        expect(response).to have_http_status :no_content
         expect(Polling::Poll.where(id: @poll)).not_to be_exists
       end
 
@@ -260,7 +260,7 @@ describe Polling::PollsController, type: :request do
 
         @user = @teacher
         delete_destroy
-        expect(response.code).to eq "204"
+        expect(response).to have_http_status :no_content
         expect(Polling::PollChoice.where(id: choice_a)).not_to be_exists
         expect(Polling::PollChoice.where(id: choice_b)).not_to be_exists
       end
@@ -270,7 +270,7 @@ describe Polling::PollsController, type: :request do
       it "is unauthorized" do
         student_in_course(active_all: true, course: @course)
         delete_destroy
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
         expect(Polling::Poll.where(id: @poll).first).to eq @poll
       end
     end

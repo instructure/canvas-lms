@@ -464,9 +464,6 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Pictogramvoorbeeld" },
   "icon_shape_30b61e7": { "message": "Pictogramvorm" },
   "icon_size_9353edea": { "message": "Pictogramgrootte" },
-  "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-    "message": "Als de link leeg wordt gelaten, wordt de naam van de cursuslink als tekst weergegeven"
-  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Als er Gebruiksrechten vereist zijn, wordt het bestand pas gepubliceerd nadat dit op de pagina Bestanden is ingeschakeld."
   },

@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import {arrayOf, func, number, shape, string} from 'prop-types'
+import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {connect} from 'react-redux'
 import classnames from 'classnames'
 import moment from 'moment-timezone'
@@ -76,7 +76,8 @@ function MissingAssignment({
   submission_types,
   timeZone,
   course = {},
-  responsiveSize = 'large'
+  responsiveSize = 'large',
+  restrict_quantitative_data = false,
 }) {
   return (
     <PlannerItem
@@ -85,13 +86,13 @@ function MissingAssignment({
       title={name}
       courseName={course.originalName}
       color={course.color}
-      points={points_possible}
+      points={restrict_quantitative_data ? null : points_possible}
       html_url={html_url}
       date={due_at && moment(due_at).tz(timeZone)}
       timeZone={timeZone}
       associated_item={convertSubmissionType(submission_types)}
-      simplifiedControls
-      isMissingItem
+      simplifiedControls={true}
+      isMissingItem={true}
       responsiveSize={responsiveSize}
     />
   )
@@ -106,7 +107,8 @@ MissingAssignment.propTypes = {
   submission_types: arrayOf(string).isRequired,
   timeZone: string.isRequired,
   course: shape(courseShape),
-  responsiveSize: sizeShape
+  responsiveSize: sizeShape,
+  restrict_quantitative_data: bool,
 }
 
 // Themeable doesn't support pure functional components
@@ -118,7 +120,7 @@ export class MissingAssignments extends Component {
     opportunities: shape(opportunityShape).isRequired,
     timeZone: string.isRequired,
     toggleMissing: func.isRequired,
-    responsiveSize: string
+    responsiveSize: string,
   }
 
   render() {
@@ -143,7 +145,7 @@ export class MissingAssignments extends Component {
           id="MissingAssignments"
           expanded={expanded}
           data-testid="missing-item-info"
-          fluidWidth
+          fluidWidth={true}
           onToggle={() => toggleMissing()}
           summary={
             <View data-testid="missing-data" margin="0 0 0 small">
@@ -170,7 +172,7 @@ export class MissingAssignments extends Component {
 
 const mapStateToProps = ({courses, opportunities}) => ({
   courses,
-  opportunities
+  opportunities,
 })
 
 const mapDispatchToProps = {toggleMissing: toggleMissingItems}

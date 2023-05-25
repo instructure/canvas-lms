@@ -10,6 +10,9 @@
     "data[0].object.extensions[\"com.instructure.canvas\"]": {
       "entity_id": "Canvas global ID of the object affected by the event",
       "lock_at": "The lock date (assignment is locked after this date)"
+    },
+    "data[0].object": {
+      "type": "AssignableDigitalResource"
     }
   },
   "examples": [

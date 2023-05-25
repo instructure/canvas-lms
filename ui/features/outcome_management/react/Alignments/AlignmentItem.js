@@ -24,6 +24,7 @@ import {
   IconAssignmentLine,
   IconRubricLine,
   IconQuizLine,
+  IconQuizSolid,
   IconDiscussionLine,
   IconBankLine,
 } from '@instructure/ui-icons'
@@ -43,6 +44,7 @@ const AlignmentItem = ({
   moduleWorkflowState,
   assignmentContentType,
   assignmentWorkflowState,
+  quizItems,
 }) => {
   const renderIcon = () => {
     let icon
@@ -59,6 +61,9 @@ const AlignmentItem = ({
     } else if (assignmentContentType === 'discussion') {
       icon = <IconDiscussionLine data-testid="alignment-item-discussion-icon" />
       screenReaderText = I18n.t('Discussion')
+    } else if (assignmentContentType === 'new_quiz') {
+      icon = <IconQuizSolid data-testid="alignment-item-new-quiz-icon" />
+      screenReaderText = I18n.t('New Quiz')
     } else {
       // by default we show Assignment icon
       icon = <IconAssignmentLine data-testid="alignment-item-assignment-icon" />
@@ -80,6 +85,36 @@ const AlignmentItem = ({
       </div>
     )
   }
+
+  const shouldRenderQuizItems = assignmentContentType === 'new_quiz' && quizItems?.length > 0
+
+  const renderQuizItems = items => (
+    <Flex as="div" direction="column" padding="xxx-small" alignItems="start">
+      <Flex.Item as="div">
+        <div style={{paddingTop: '0.14rem'}}>
+          <Text size="small" weight="bold">
+            {I18n.t('Aligned Questions')}
+          </Text>
+        </div>
+      </Flex.Item>
+      {items.map(({_id, title}, ind) => (
+        <Flex.Item as="div" key={`${_id}`}>
+          <Flex as="div" padding="xxx-small" alignItems="start">
+            <Flex.Item size="1.5rem">
+              <Text size="small" weight="bold">{`${ind + 1}.`}</Text>
+            </Flex.Item>
+            <Flex.Item as="div" size="50%" shouldGrow={true}>
+              <div style={{paddingTop: '0.14rem'}}>
+                <Text size="small">
+                  <TruncateText>{title}</TruncateText>
+                </Text>
+              </div>
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+      ))}
+    </Flex>
+  )
 
   return (
     <Flex key={id} as="div" alignItems="start" padding="x-small 0 0" data-testid="alignment-item">
@@ -125,6 +160,7 @@ const AlignmentItem = ({
               </Flex.Item>
             </Flex>
           </Flex.Item>
+          {shouldRenderQuizItems && renderQuizItems(quizItems)}
         </Flex>
       </Flex.Item>
     </Flex>

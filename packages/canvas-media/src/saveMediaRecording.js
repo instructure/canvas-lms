@@ -27,6 +27,12 @@ function mediaObjectsUrl(rcsConfig) {
   return rcsConfig.origin ? `${rcsConfig.origin}/api/media_objects` : '/api/v1/media_objects'
 }
 
+function mediaAttachmentsUrl(rcsConfig) {
+  return rcsConfig.origin
+    ? `${rcsConfig.origin}/api/media_attachments`
+    : '/api/v1/media_attachments'
+}
+
 function generateUploadOptions(mediatypes, sessionData) {
   const sessionDataCopy = JSON.parse(JSON.stringify(sessionData))
   delete sessionDataCopy.kaltura_setting
@@ -37,8 +43,8 @@ function generateUploadOptions(mediatypes, sessionData) {
     entryUrl: sessionData.kaltura_setting.entryUrl,
     uiconfUrl: sessionData.kaltura_setting.uiconfUrl,
     entryDefaults: {
-      partnerData: sessionData.kaltura_setting.partner_data
-    }
+      partnerData: sessionData.kaltura_setting.partner_data,
+    },
   }
 }
 
@@ -76,7 +82,7 @@ function addUploaderFileCompleteEventListeners(uploader, rcsConfig, file, done, 
           : 'video',
       context_code: mediaServerMediaObject.contextCode,
       title: file.name,
-      user_entered_title: file.userEnteredTitle || file.name
+      user_entered_title: file.userEnteredTitle || file.name,
     }
 
     try {
@@ -89,7 +95,7 @@ function addUploaderFileCompleteEventListeners(uploader, rcsConfig, file, done, 
             onProgress(startingValue + percentUploaded)
           }
         },
-        headers: rcsConfig.headers
+        headers: rcsConfig.headers,
       }
 
       const canvasMediaObject = await axios.post(mediaObjectsUrl(rcsConfig), body, config)
@@ -113,7 +119,7 @@ export default async function saveMediaRecording(file, rcsConfig, done, onProgre
     const mediaServerSession = await axios({
       method: 'POST',
       url: `${rcsConfig.origin || ''}/api/v1/services/kaltura_session?include_upload_config=1`,
-      headers: rcsConfig.headers
+      headers: rcsConfig.headers,
     })
     if (onProgress) {
       onProgress(STARTING_PROGRESS_VALUE)
@@ -142,53 +148,25 @@ export default async function saveMediaRecording(file, rcsConfig, done, onProgre
  * @maxBytes: The max bytes allowed for the caption file
  */
 export async function saveClosedCaptions(media_object_id, subtitles, rcsConfig, maxBytes) {
+  const url = `${mediaObjectsUrl(rcsConfig)}/${media_object_id}/media_tracks`
+  return executeSubtitlesRequests({subtitles, url, rcsConfig, maxBytes})
+}
+
+/*
+ * @attachmentId: id of the media attachment we're assigning CC to
+ * @subtitles: [{locale: string locale, file: JS File object}]
+ * @rcsConfig: {origin, headers, method} where method=PUT for update or POST for create
+ * @maxBytes: The max bytes allowed for the caption file
+ */
+export async function saveClosedCaptionsForAttachment(
+  attachmentId,
+  subtitles,
+  rcsConfig,
+  maxBytes
+) {
   // read all the subtitle files' contents
-  const file_promises = []
-
-  subtitles.forEach(st => {
-    if (st.isNew) {
-      const p = new Promise((resolve, reject) => {
-        if (maxBytes && st.file.size > maxBytes) {
-          reject(new FileSizeError({maxBytes, actualBytes: st.file.size}))
-        }
-
-        const reader = new FileReader()
-        reader.onload = function (e) {
-          resolve({locale: st.locale, content: e.target.result})
-        }
-        reader.onerror = function (e) {
-          e.target.abort()
-          reject(e.target.error || e)
-        }
-        reader.readAsText(st.file)
-      })
-      file_promises.push(p)
-    } else {
-      file_promises.push(Promise.resolve({locale: st.locale}))
-    }
-  })
-
-  // once all the promises from reading the subtitles' files
-  // have resolved, PUT/POST the resulting subtitle objects to the RCS
-  // when that completes, the update_promise will resolve
-  const update_promise = new Promise((resolve, reject) => {
-    Promise.all(file_promises)
-      .then(closed_captions => {
-        const url = `${mediaObjectsUrl(rcsConfig)}/${media_object_id}/media_tracks`
-        axios({
-          method: rcsConfig.method || 'PUT',
-          url,
-          headers: rcsConfig.headers,
-          data: closed_captions
-        })
-          .then(resolve)
-          .catch(e => {
-            reject(e)
-          })
-      })
-      .catch(e => reject(e))
-  })
-  return update_promise
+  const url = `${mediaAttachmentsUrl(rcsConfig)}/${attachmentId}/media_tracks`
+  return executeSubtitlesRequests({subtitles, url, rcsConfig, maxBytes})
 }
 
 function doDone(done, ...rest) {
@@ -199,4 +177,49 @@ function doDone(done, ...rest) {
 function handleUnloadWhileUploading(e) {
   e.preventDefault()
   e.returnValue = ''
+}
+
+function subtitleToPromise(subtitle, maxBytes) {
+  if (subtitle.isNew) {
+    return new Promise((resolve, reject) => {
+      if (maxBytes && subtitle.file.size > maxBytes) {
+        reject(new FileSizeError({maxBytes, actualBytes: subtitle.file.size}))
+      }
+
+      const reader = new FileReader()
+      reader.onload = function (e) {
+        resolve({locale: subtitle.locale, content: e.target.result})
+      }
+      reader.onerror = function (e) {
+        e.target.abort()
+        reject(e.target.error || e)
+      }
+      reader.readAsText(subtitle.file)
+    })
+  } else {
+    return Promise.resolve({locale: subtitle.locale})
+  }
+}
+
+function executeSubtitlesRequests({url, subtitles, rcsConfig, maxBytes}) {
+  // once all the promises from reading the subtitles' files
+  // have resolved, PUT/POST the resulting subtitle objects to the RCS
+  // when that completes, the update_promise will resolve
+  const subtitlesPromises = subtitles.map(st => subtitleToPromise(st, maxBytes))
+  return new Promise((resolve, reject) => {
+    Promise.all(subtitlesPromises)
+      .then(closed_captions => {
+        axios({
+          method: rcsConfig.method || 'PUT',
+          url,
+          headers: rcsConfig.headers,
+          data: closed_captions,
+        })
+          .then(resolve)
+          .catch(e => {
+            reject(e)
+          })
+      })
+      .catch(e => reject(e))
+  })
 }

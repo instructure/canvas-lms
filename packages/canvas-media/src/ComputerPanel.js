@@ -28,7 +28,6 @@ import {
   string,
   element,
 } from 'prop-types'
-import formatMessage from 'format-message'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
@@ -42,6 +41,7 @@ import {Text} from '@instructure/ui-text'
 import {px} from '@instructure/ui-utils'
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {TextInput} from '@instructure/ui-text-input'
+import formatMessage from './format-message'
 
 import LoadingIndicator from './shared/LoadingIndicator'
 import RocketSVG from './RocketSVG'

@@ -451,9 +451,6 @@
   "icon_preview_1782a1d9": { "message": "Anteprima icone" },
   "icon_shape_30b61e7": { "message": "Forma icona" },
   "icon_size_9353edea": { "message": "Dimensione icona" },
-  "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-    "message": "Se il link viene lasciato vuoto, il testo verrà visualizzato come nome del link del corso"
-  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Se sono necessari i Diritti di utilizzo, il file non sarà pubblicato finché abilitato nella pagina File."
   },

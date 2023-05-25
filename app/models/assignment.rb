@@ -69,6 +69,7 @@ class Assignment < ActiveRecord::Base
     final_grader_id
     grader_count
     omit_from_final_grade
+    hide_in_gradebook
     grader_names_visible_to_final_grader
     grader_comments_visible_to_graders
     graders_anonymous_to_graders
@@ -559,6 +560,9 @@ class Assignment < ActiveRecord::Base
   validates :description, length: { maximum: maximum_long_text_length, allow_blank: true }
   validate :frozen_atts_not_altered, if: :frozen?, on: :update
   validates :grading_type, inclusion: { in: ALLOWED_GRADING_TYPES }
+  validates :hide_in_gradebook, inclusion: { in: [true, false] }
+  validates :hide_in_gradebook, comparison: { equal_to: :omit_from_final_grade }, if: :hide_in_gradebook?
+  validates :hide_in_gradebook, inclusion: { in: [false] }, if: -> { points_possible.present? && points_possible > 0 }
 
   acts_as_list scope: :assignment_group
   simply_versioned keep: 5
@@ -1004,6 +1008,7 @@ class Assignment < ActiveRecord::Base
       vericite_enabled
       moderated_grading
       omit_from_final_grade
+      hide_in_gradebook
       freeze_on_copy
       copied
       only_visible_to_overrides
@@ -1207,9 +1212,13 @@ class Assignment < ActiveRecord::Base
         li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true, resource_id: line_item_resource_id, tag: line_item_tag)
         create_results_from_prior_grades(li)
       elsif saved_change_to_title? || saved_change_to_points_possible?
-        line_items
-          .find(&:assignment_line_item?)
-          &.update!(label: title, score_maximum: points_possible || 0, resource_id: line_item_resource_id, tag: line_item_tag)
+        if (li = line_items.find(&:assignment_line_item?))
+          li.label = title
+          li.score_maximum = points_possible || 0
+          li.tag = line_item_tag if line_item_tag
+          li.resource_id = line_item_resource_id if line_item_resource_id
+          li.save!
+        end
       end
 
       if lti_1_3_external_tool_tag?(lti_1_3_tool) && !lti_resource_links.empty?
@@ -2940,6 +2949,8 @@ class Assignment < ActiveRecord::Base
   scope :no_submittables, -> { where.not(submission_types: SUBMITTABLE_TYPES) }
 
   scope :with_submissions, -> { preload(:submissions) }
+
+  scope :not_hidden_in_gradebook, -> { where(hide_in_gradebook: false) }
 
   scope :with_submissions_for_user, lambda { |user|
     joins(:submissions).where(submissions: { user_id: user })

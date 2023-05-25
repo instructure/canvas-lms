@@ -1062,7 +1062,7 @@ describe "Users API", type: :request do
       @account = @student.account
       @user    = @student
       raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", controller: "users", action: "api_index", account_id: @account.id.to_param, format: "json")
-      expect(response.code).to eql "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "returns an error when search_term is fewer than 2 characters" do
@@ -1982,7 +1982,7 @@ describe "Users API", type: :request do
             test_pronoun = "He/Him"
             raw_api_call(:put, @path, @path_options, { user: { pronouns: test_pronoun } })
             json = JSON.parse(response.body)
-            expect(response.code).to eq "401"
+            expect(response).to have_http_status :unauthorized
             expect(json["status"]).to eq "unauthorized"
             expect(json["errors"][0]["message"]).to eq "user not authorized to perform that action"
             expect(@student.reload.pronouns).to eq original_pronoun
@@ -2183,7 +2183,7 @@ describe "Users API", type: :request do
           test_pronoun = "He/Him"
           raw_api_call(:put, @path, @path_options, { user: { pronouns: test_pronoun } })
           json = JSON.parse(response.body)
-          expect(response.code).to eq "401"
+          expect(response).to have_http_status :unauthorized
           expect(json["status"]).to eq "unauthorized"
           expect(json["errors"][0]["message"]).to eq "user not authorized to perform that action"
           expect(@student.reload.pronouns).to eq original_pronoun
@@ -2229,12 +2229,12 @@ describe "Users API", type: :request do
                          }
                        }
                      })
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "cannot see avatar_state" do
         raw_api_call(:put, "/api/v1/users/#{@user.id}", @path_options.merge(id: @user.id), { email: "test@example.com" })
-        expect(response.code).to eql "200"
+        expect(response).to have_http_status :ok
         expect(JSON.parse(response.body)).to_not have_key("avatar_state")
       end
     end
@@ -2289,7 +2289,7 @@ describe "Users API", type: :request do
         raw_api_call(:put, @path, @path_options, {
                        user: { name: "Gob Bluth" }
                      })
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -2352,7 +2352,7 @@ describe "Users API", type: :request do
       it "receives 401 if updating another user's settings" do
         @course.enroll_student(user_factory).accept!
         raw_api_call(:put, path, path_options, manual_mark_as_read: true)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -2440,7 +2440,7 @@ describe "Users API", type: :request do
         deeper_scope = scope + "/whoa"
         api_call(:put, path, path_opts_put, { ns: namespace_a, data: "ohai!" })
         raw_api_call(:put, deeper_path, path_opts_put.merge({ scope: deeper_scope }), { ns: namespace_a, data: "dood" })
-        expect(response.code).to eql "409"
+        expect(response).to have_http_status :conflict
       end
     end
   end
@@ -2475,7 +2475,7 @@ describe "Users API", type: :request do
         path = "/api/v1/accounts/#{Account.default.id}/users/#{id_param}"
         path_options = @path_options.merge(user_id: id_param)
         api_call(:delete, path, path_options)
-        expect(response.code).to eql "200"
+        expect(response).to have_http_status :ok
         expect(@student.associated_accounts).not_to include(Account.default)
       end
 
@@ -2493,7 +2493,7 @@ describe "Users API", type: :request do
       it "receives a 401" do
         user_factory
         raw_api_call(:delete, @path, @path_options)
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
 

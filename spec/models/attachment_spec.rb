@@ -2721,18 +2721,44 @@ describe Attachment do
       expect(@user_1_file.context).to eq @merge_user_2
     end
 
+    it "ensures files in submissions folders stay in submissions folders" do
+      @user_1_file.update! folder: @merge_user_1.submissions_folder(@course)
+      Attachment.migrate_attachments(@merge_user_1, @merge_user_2)
+      expect(@user_1_file.reload.folder.submission_context_code).to eq @course.asset_string
+    end
+
+    it "ensures files NOT in submissions folders don't end up in submissions folders" do
+      not_submissions_folder = Folder.assert_path("Submissions/#{@course.name}", @merge_user_1)
+      @user_1_file.update! folder: not_submissions_folder
+      sub_folder_2 = @merge_user_2.submissions_folder(@course)
+      Attachment.migrate_attachments(@merge_user_1, @merge_user_2)
+      dest_folder = @user_1_file.reload.folder
+      expect(dest_folder).not_to eq sub_folder_2
+      expect(dest_folder.submission_context_code).to be_nil
+    end
+
     context "with sharding" do
       specs_require_sharding
 
-      it "copies the attachment to the new shard and leaves the existing attachment" do
+      before :once do
         @shard1.activate do
           @merge_user_3 = user_model
         end
+      end
+
+      it "copies the attachment to the new shard and leaves the existing attachment" do
         Attachment.migrate_attachments(@merge_user_1, @merge_user_3)
         expect(@user_1_file.reload.context).to eq @merge_user_1
         expect(@user_1_file.user).to eq @merge_user_3
         new_attachment = @merge_user_3.attachments.find_by(filename: @user_1_file.title, md5: @user_1_file.md5)
         expect(new_attachment.full_display_path).to eq @user_1_file.full_display_path
+      end
+
+      it "translates a submission folder's context code" do
+        @user_1_file.update! folder: @merge_user_1.submissions_folder(@course)
+        Attachment.migrate_attachments(@merge_user_1, @merge_user_3)
+        new_attachment = @merge_user_3.attachments.find_by(filename: @user_1_file.title, md5: @user_1_file.md5)
+        expect(new_attachment.folder.submission_context_code).to eq @course.global_asset_string
       end
     end
   end

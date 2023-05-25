@@ -157,22 +157,38 @@
   }
 }
 
+@mixin new-feature-pill {
+  max-width: 12rem;
+  color: var(--ic-brand-primary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--ic-brand-primary);
+  font-size:0.8rem;
+  font-weight: normal;
+  text-transform: uppercase;
+  padding: 0.1rem 0.25rem;
+}
+
 #other-calendar-actions-row {
   line-height: 1;
   .element_toggler {
     float: direction(left);
     margin-top: 1rem !important;
   }
-  div.new-feature-pill{
-    max-width: 12rem;
+
+  div.new-feature-pill {
+    @include new-feature-pill;
+    float: direction(right);
     margin-top: 1rem !important;
     margin-left: 0.5rem !important;
-    float: direction(right);
-    color: var(--ic-brand-primary);
-    border-radius: 0.5rem;
-    border: 1px solid var(--ic-brand-primary);
-    font-size:0.8rem;
-    text-transform: uppercase;
-    padding: 0.1rem 0.25rem;
   }
 }
+
+#other-calendars-context-list .context_list_context {
+  div.new-feature-pill {
+    @include new-feature-pill;
+    display: inline;
+    padding: 0 0.25rem;
+    cursor: default;
+  }
+}
+

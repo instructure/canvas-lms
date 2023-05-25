@@ -384,18 +384,12 @@ module CanvasKaltura
       end
     end
 
-    # FIXME: SSL verifification should not be turned off, but since we're just
-    # turning on HTTPS everywhere for kaltura, we're being gentle about it in
-    # the first pass
     def sendRequest(request, body = nil)
       response = nil
       CanvasKaltura.with_timeout_protector(fallback_timeout_length: 30) do
         http = Net::HTTP.new(@host, @use_ssl ? Net::HTTP.https_default_port : Net::HTTP.http_default_port)
         http.use_ssl = @use_ssl
-
-        if ENV["RAILS_ENV"] == "development"
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        end
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ENV["RAILS_ENV"] == "development"
 
         response = http.request(request, body)
       end

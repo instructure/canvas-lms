@@ -38,6 +38,7 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
                                      :discussion_topic,
                                      :learning_outcome,
                                      :learning_outcome_group,
+                                     :media_track,
                                      :rubric,
                                      :wiki,
                                      :wiki_page,

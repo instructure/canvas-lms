@@ -35,7 +35,10 @@ export type AssignmentsState = {
     params: AssignmentLoaderParams,
     selectedPeriodId: string
   ) => Promise<AssignmentGroup[] | undefined>
-  loadAssignmentGroups: (currentGradingPeriodId?: string) => Promise<AssignmentGroup[] | undefined>
+  loadAssignmentGroups: (
+    hideZeroPointQuizzes: boolean,
+    currentGradingPeriodId?: string
+  ) => Promise<AssignmentGroup[] | undefined>
   fetchAssignmentGroups: (
     params: AssignmentLoaderParams,
     gradingPeriodIds?: string[]
@@ -52,6 +55,7 @@ export type AssignmentsState = {
 type AssignmentLoaderParams = {
   include: string[]
   override_assignment_dates: boolean
+  hide_zero_point_quizzes: boolean
   exclude_response_fields: string[]
   exclude_assignment_submission_types: SubmissionType[]
   per_page: number
@@ -126,7 +130,10 @@ export default (
     )
   },
 
-  loadAssignmentGroups: (selectedGradingPeriodId?: string) => {
+  loadAssignmentGroups: (
+    hideZeroPointQuizzes: boolean = false,
+    selectedGradingPeriodId?: string
+  ) => {
     const include = [
       'assignment_group_id',
       'assignment_visibility',
@@ -149,6 +156,7 @@ export default (
       ],
       include,
       override_assignment_dates: false,
+      hide_zero_point_quizzes: hideZeroPointQuizzes,
       per_page: get().performanceControls.assignmentGroupsPerPage,
     }
 

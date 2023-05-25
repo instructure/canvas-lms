@@ -31,6 +31,21 @@ const defaultCourse = {
   score: 90,
 }
 
+const DEFAULT_GRADING_SCHEME = [
+  ['A', 0.94],
+  ['A-', 0.9],
+  ['B+', 0.87],
+  ['B', 0.84],
+  ['B-', 0.8],
+  ['C+', 0.77],
+  ['C', 0.74],
+  ['C-', 0.7],
+  ['D+', 0.67],
+  ['D', 0.64],
+  ['D-', 0.61],
+  ['F', 0.0],
+]
+
 describe('GradesSummary', () => {
   beforeAll(() => {
     window.location.hash = '#grades'
@@ -83,6 +98,50 @@ describe('GradesSummary', () => {
       />
     )
     expect(getByText('--')).toBeInTheDocument()
+  })
+
+  it('hides progress bar if restrictQuantitativeData is true', () => {
+    const {queryByLabelText} = render(
+      <GradesSummary
+        courses={[
+          {...defaultCourse, restrictQuantitativeData: true, gradingScheme: DEFAULT_GRADING_SCHEME},
+        ]}
+      />
+    )
+    const progressBar = queryByLabelText('Grade for Horticulture', {exact: false})
+    expect(progressBar).not.toBeInTheDocument()
+  })
+
+  it('displays Letter Grade if restrictQuantitativeData is true', () => {
+    const {getByText} = render(
+      <GradesSummary
+        courses={[
+          {
+            ...defaultCourse,
+            score: 87.0,
+            restrictQuantitativeData: true,
+            gradingScheme: DEFAULT_GRADING_SCHEME,
+          },
+        ]}
+      />
+    )
+    expect(getByText('B+')).toBeInTheDocument()
+  })
+
+  it('displays F Letter Grade if score is 0 and restrictQuantitativeData is true', () => {
+    const {getByText} = render(
+      <GradesSummary
+        courses={[
+          {
+            ...defaultCourse,
+            score: 0,
+            restrictQuantitativeData: true,
+            gradingScheme: DEFAULT_GRADING_SCHEME,
+          },
+        ]}
+      />
+    )
+    expect(getByText('F')).toBeInTheDocument()
   })
 
   it('displays "--" if a course is set to hide final grades', () => {

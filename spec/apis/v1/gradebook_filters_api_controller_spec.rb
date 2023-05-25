@@ -87,14 +87,14 @@ describe GradebookFiltersApiController, type: :request do
     it "doesnt let create the gradebook filter when name is null" do
       params = @params.merge(gradebook_filter: { payload: { foo: "bar" } })
       api_call_as_user(@teacher, :post, @path, params)
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
       expect(response.body).to match(/blank/)
     end
 
     it "doesnt let create the gradebook filter when payload is null" do
       params = @params.merge(gradebook_filter: { name: "new name", payload: {} })
       api_call_as_user(@teacher, :post, @path, params)
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
       expect(response.body).to match(/blank/)
     end
   end
@@ -135,7 +135,7 @@ describe GradebookFiltersApiController, type: :request do
       params = @params.merge(id: gradebook_filter_2.id, gradebook_filter: { name: "new name" })
       api_call_as_user(@teacher, :put, path, params)
 
-      expect(response.code).to eq "404"
+      expect(response).to have_http_status :not_found
       expect(response.body).to match(/The specified resource does not exist/)
     end
   end
@@ -173,7 +173,7 @@ describe GradebookFiltersApiController, type: :request do
       path = "/api/v1/courses/#{@course.id}/gradebook_filters/#{gradebook_filter_2.id}"
       params = @params.merge(id: gradebook_filter_2.id)
       api_call_as_user(@teacher, :get, path, params)
-      expect(response.code).to eq "404"
+      expect(response).to have_http_status :not_found
       expect(response.body).to match(/The specified resource does not exist/)
     end
   end
@@ -194,7 +194,7 @@ describe GradebookFiltersApiController, type: :request do
 
     it "deletes an gradebook_filter successfully" do
       api_call_as_user(@teacher, :delete, @path, @params)
-      expect(response.code).to eq "200"
+      expect(response).to have_http_status :ok
       expect(@course.gradebook_filters.where(user: @teacher).count).to eq 0
     end
 
@@ -207,7 +207,7 @@ describe GradebookFiltersApiController, type: :request do
       path = "/api/v1/courses/#{@course.id}/gradebook_filters/#{gradebook_filter_2.id}"
       params = @params.merge(id: gradebook_filter_2.id)
       api_call_as_user(@teacher, :delete, path, params)
-      expect(response.code).to eq "404"
+      expect(response).to have_http_status :not_found
       expect(response.body).to match(/The specified resource does not exist/)
     end
   end

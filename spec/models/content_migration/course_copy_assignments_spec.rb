@@ -185,6 +185,7 @@ describe ContentMigration do
       @assignment.allowed_extensions = ["doc", "xls"]
       @assignment.position = 2
       @assignment.muted = true
+      @assignment.hide_in_gradebook = false
       @assignment.omit_from_final_grade = true
       @assignment.only_visible_to_overrides = true
       @assignment.post_to_sis = true
@@ -205,6 +206,7 @@ describe ContentMigration do
                  allowed_extensions
                  position
                  peer_review_count
+                 hide_in_gradebook
                  omit_from_final_grade
                  post_to_sis
                  allowed_attempts]

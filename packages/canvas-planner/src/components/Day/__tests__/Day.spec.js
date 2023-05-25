@@ -33,6 +33,10 @@ for (const [timeZoneDesc, timeZoneName] of [
 ]) {
   // eslint-disable-next-line jest/valid-describe
   describe(timeZoneDesc, () => {
+    beforeAll(() => {
+      moment.tz.setDefault(timeZoneName)
+    })
+
     it('renders the base component with required props', () => {
       const wrapper = shallow(<Day {...defaultProps} timeZone={timeZoneName} day="2017-04-25" />)
       expect(wrapper).toMatchSnapshot()

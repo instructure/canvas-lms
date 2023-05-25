@@ -203,8 +203,8 @@ class MediaAttempt extends React.Component {
           onUploadComplete={this.onComplete}
           onDismiss={this.onDismiss}
           rcsConfig={{
-            contextId: this.props.assignment.env.courseId,
-            contextType: 'course',
+            contextId: ENV.current_user.id,
+            contextType: 'user',
           }}
           open={this.state.mediaModalOpen}
           tabs={this.state.mediaModalTabs}

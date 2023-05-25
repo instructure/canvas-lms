@@ -23,6 +23,10 @@ describe MediaObjectsController do
     student_in_course(active_all: true)
   end
 
+  before do
+    stub_kaltura
+  end
+
   describe "GET 'show'" do
     before do
       # We don't actually want to ping kaltura during these tests
@@ -664,6 +668,157 @@ describe MediaObjectsController do
     end
   end
 
+  describe "index_media_attachments" do
+    before :once do
+      Account.site_admin.enable_feature!(:media_links_use_attachment_id)
+    end
+
+    before do
+      # We don't actually want to ping kaltura during these tests
+      allow(MediaObject).to receive(:media_id_exists?).and_return(true)
+      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
+        [{ url: "whatever man", bitrate: 12_345 }]
+      )
+    end
+
+    it "routes media_attachments to index" do
+      expect(get: "api/v1/media_attachments").to route_to(format: "json", controller: "media_objects", action: "index")
+    end
+
+    it "retrieves all MediaObjects in the user's context" do
+      user_factory
+      user_session(@user)
+      course_factory
+      mo1 =
+        MediaObject.create!(user_id: @user, context: @user, media_id: "test", media_type: "video")
+      mo2 =
+        MediaObject.create!(
+          user_id: @user, context: @user, media_id: "test2", media_type: "audio", title: "The Title"
+        )
+      MediaObject.create!(
+        user_id: @user, context: @course, media_id: "test3", user_entered_title: "User Title"
+      )
+
+      get "index"
+
+      expect(json_parse(response.body)).to match_array(
+        [
+          {
+            "can_add_captions" => true,
+            "created_at" => mo2.created_at.as_json,
+            "media_id" => "test2",
+            "media_sources" => [
+              {
+                "bitrate" => 12_345,
+                "label" => "12 kbps",
+                "src" => "whatever man",
+                "url" => "whatever man"
+              }
+            ],
+            "media_tracks" => [],
+            "title" => "The Title",
+            "media_type" => "audio",
+            "embedded_iframe_url" => "http://test.host/media_objects_iframe/test2"
+          },
+          {
+            "can_add_captions" => true,
+            "created_at" => mo1.created_at.as_json,
+            "media_id" => "test",
+            "media_sources" => [
+              {
+                "bitrate" => 12_345,
+                "label" => "12 kbps",
+                "src" => "whatever man",
+                "url" => "whatever man"
+              }
+            ],
+            "media_tracks" => [],
+            "title" => "Untitled",
+            "media_type" => "video",
+            "embedded_iframe_url" => "http://test.host/media_objects_iframe/test"
+          }
+        ]
+      )
+    end
+
+    it "will not retrive items you did not create" do
+      user1 = user_factory
+      user2 = user_factory
+      user_session(user1)
+      mo1 =
+        MediaObject.create!(user_id: user1, context: user1, media_id: "test")
+      MediaObject.create!(user_id: user2, context: user2, media_id: "test2")
+
+      get "index", params: { exclude: %w[sources tracks] }
+
+      expect(json_parse(response.body)).to match_array(
+        [
+          {
+            "can_add_captions" => true,
+            "created_at" => mo1.created_at.as_json,
+            "media_id" => "test",
+            "title" => "Untitled",
+            "media_type" => nil,
+            "embedded_iframe_url" => "http://test.host/media_objects_iframe/test"
+          }
+        ]
+      )
+    end
+
+    it "will limit return to course media" do
+      course_factory
+      teacher1 = teacher_in_course(course: @course).user
+      teacher2 = teacher_in_course(course: @course).user
+
+      user_session(teacher1)
+
+      mo1 = MediaObject.create!(user_id: teacher2, context: @course, media_id: "test")
+      MediaObject.create!(user_id: teacher1, context: teacher1, media_id: "another_test")
+
+      get "index", params: { course_id: @course.id, exclude: %w[sources tracks] }
+
+      expect(json_parse(response.body)).to match_array(
+        [
+          {
+            "can_add_captions" => true,
+            "created_at" => mo1.created_at.as_json,
+            "media_id" => "test",
+            "title" => "Untitled",
+            "media_type" => nil,
+            "embedded_iframe_url" => "http://test.host/media_objects_iframe/test"
+          }
+        ]
+      )
+    end
+
+    it "will limit return to group media" do
+      course_with_teacher_logged_in(active_all: true)
+      gcat = @course.group_categories.create!(name: "My Group Category")
+      @group = Group.create!(name: "some group", group_category: gcat, context: @course)
+
+      mo1 = MediaObject.create!(user_id: @user, context: @group, media_id: "in_group")
+
+      MediaObject.create!(user_id: @user, context: @course, media_id: "in_course_with_att")
+
+      MediaObject.create!(user_id: @user, context: @user, media_id: "not_in_course")
+
+      get "index", params: { group_id: @group.id, exclude: %w[sources tracks] }
+
+      expect(json_parse(response.body)).to match_array(
+        [
+          {
+            "media_id" => "in_group",
+            "media_type" => nil,
+            "created_at" => mo1.created_at.as_json,
+            "title" => "Untitled",
+            "can_add_captions" => true,
+            "embedded_iframe_url" => "http://test.host/media_objects_iframe/in_group"
+          }
+        ]
+      )
+    end
+  end
+
   describe "PUT update_media_object" do
     it "returns a 401 if the MediaObject doesn't exist" do
       course_with_teacher_logged_in
@@ -744,6 +899,35 @@ describe MediaObjectsController do
 
       assert_status(200)
       expect(response.headers["content-security-policy"]).to be_nil
+    end
+  end
+
+  describe "GET 'media_attachments_iframe'" do
+    before do
+      @obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
+        [{ url: "whatever man", bitrate: 12_345 }]
+      )
+    end
+
+    it "returns an error if the media is locked" do
+      user_session(@student)
+      attachment = @obj.attachment
+      attachment.update(locked: true)
+
+      get "iframe_media_player", params: { attachment_id: attachment.id }
+      assert_status(401)
+    end
+
+    it "finds a replaced file" do
+      user_session(@student)
+      old = @obj.attachment
+      old.file_state = "deleted"
+      old.replacement_attachment = attachment_model(media_entry_id: "0_deadbeef", filename: "blah.flv", media_object: @obj)
+      old.save!
+
+      get "iframe_media_player", params: { attachment_id: old.id }
+      assert_status(200)
     end
   end
 

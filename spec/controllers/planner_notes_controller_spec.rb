@@ -105,14 +105,14 @@ describe PlannerNotesController do
 
         it "400s for bad start dates" do
           get :index, params: { start_date: "123-456-7890" }
-          expect(response.code).to eq "400"
+          expect(response).to have_http_status :bad_request
           json = json_parse(response.body)
           expect(json["errors"]).to eq "Invalid date or datetime for start_date"
         end
 
         it "400s for bad end dates" do
           get :index, params: { end_date: "5678-90" }
-          expect(response.code).to eq "400"
+          expect(response).to have_http_status :bad_request
           json = json_parse(response.body)
           expect(json["errors"]).to eq "Invalid date or datetime for end_date"
         end

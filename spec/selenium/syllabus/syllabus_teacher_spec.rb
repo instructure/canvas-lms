@@ -44,7 +44,6 @@ describe "course syllabus" do
     context "immersive reader button" do
       it "contains a button for immersive reader when enabled" do
         @teacher1.enable_feature!(:user_immersive_reader_wiki_pages)
-        Account.site_admin.enable_feature!(:more_immersive_reader)
 
         visit_syllabus_page(@course1.id)
         wait_for_dom_ready
@@ -54,7 +53,6 @@ describe "course syllabus" do
 
       it "does not contain a button for immersive reader when disabled" do
         @teacher1.disable_feature!(:user_immersive_reader_wiki_pages)
-        Account.site_admin.disable_feature!(:more_immersive_reader)
 
         visit_syllabus_page(@course1.id)
         wait_for_dom_ready

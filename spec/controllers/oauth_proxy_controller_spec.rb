@@ -26,12 +26,12 @@ describe OAuthProxyController do
 
   it "throws an error if state is missing" do
     get :redirect_proxy
-    expect(response.code).to eq "400"
+    expect(response).to have_http_status :bad_request
   end
 
   it "throws an error if the state is invalid" do
     get :redirect_proxy, params: { state: "123" }
-    expect(response.code).to eq "400"
+    expect(response).to have_http_status :bad_request
   end
 
   it "filters out rails added params" do

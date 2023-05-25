@@ -76,7 +76,7 @@ describe "CommunicationChannels API", type: :request do
       it "returns 401" do
         user_with_pseudonym
         raw_api_call(:get, @path, @path_options)
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "does not list channels for a teacher's students" do
@@ -85,7 +85,7 @@ describe "CommunicationChannels API", type: :request do
         @user = @teacher
 
         raw_api_call(:get, @path, @path_options)
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -238,7 +238,7 @@ describe "CommunicationChannels API", type: :request do
                      @path_options.merge(user_id: @admin.to_param),
                      @post_params)
 
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       context "not configured push" do
@@ -253,7 +253,7 @@ describe "CommunicationChannels API", type: :request do
           @post_params[:communication_channel] = { token: "registration_token", type: "push" }
           raw_api_call(:post, @path, @path_options, @post_params)
 
-          expect(response.code).to eql "400"
+          expect(response).to have_http_status :bad_request
         end
       end
 
@@ -363,7 +363,7 @@ describe "CommunicationChannels API", type: :request do
       it "404s if already deleted" do
         api_call(:delete, path, path_options)
         raw_api_call(:delete, path, path_options)
-        expect(response.code).to eq "404"
+        expect(response).to have_http_status :not_found
       end
 
       it "is not able to delete others' channels" do
@@ -372,7 +372,7 @@ describe "CommunicationChannels API", type: :request do
                      "/api/v1/users/#{admin.id}/communication_channels/#{admin_channel.id}",
                      path_options.merge(user_id: admin.to_param, id: admin_channel.to_param))
 
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "is able to delete by path, instead of id" do
@@ -404,7 +404,7 @@ describe "CommunicationChannels API", type: :request do
                      format: "json",
                      type: channel.path_type,
                      address: channel.path)
-        expect(response.code).to eq "404"
+        expect(response).to have_http_status :not_found
       end
     end
   end

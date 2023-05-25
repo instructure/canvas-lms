@@ -58,7 +58,7 @@ describe "assignments index peer reviews" do
 
   it "will remind students that they need to submit before completing assigned reviews" do
     visit_assignments_index_page(@course.id)
-    assessment_request(1).click
+    assessment_request(1, @peer_review_assignment.name).click
 
     expect(StudentAssignmentPageV2.peer_review_need_submission_reminder).to include_text("You must submit your own work before you can review your peers.")
   end
@@ -70,7 +70,7 @@ describe "assignments index peer reviews" do
       submission_type: "online_text_entry"
     )
     visit_assignments_index_page(@course.id)
-    assessment_request(1).click
+    assessment_request(1, @peer_review_assignment.name).click
 
     expect(StudentAssignmentPageV2.peer_review_unavailible_reminder).to include_text("There are no submissions available to review just yet.")
   end
@@ -140,7 +140,7 @@ describe "assignments index peer reviews" do
       submission_type: "online_text_entry"
     )
     visit_assignments_index_page(@course.id)
-    assessment_request(1).click
+    assessment_request(1, @peer_review_assignment.name).click
 
     expect(StudentAssignmentPageV2.assignment_sub_header).to include_text("Peer: Student 2")
     expect(StudentAssignmentPageV2.comment_container).to include_text("Add a comment to complete your peer review. You will only see comments written by you.")
@@ -165,7 +165,7 @@ describe "assignments index peer reviews" do
       submission_type: "online_text_entry"
     )
     visit_assignments_index_page(@course.id)
-    assessment_request(1).click
+    assessment_request(1, @peer_review_assignment.name).click
 
     expect(StudentAssignmentPageV2.assignment_sub_header).to include_text("Peer: Anonymous student")
     expect(StudentAssignmentPageV2.comment_container).to include_text("Add a comment to complete your peer review. You will only see comments written by you.")

@@ -38,8 +38,10 @@ import {scopeToUser} from '@canvas/grading/EffectiveDueDates'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import StatusPill from '@canvas/grading-status-pill'
+import GradeSummaryManager from '../react/GradeSummary/GradeSummaryManager'
 import SelectMenuGroup from '../react/SelectMenuGroup'
 import SubmissionCommentsTray from '../react/SubmissionCommentsTray'
+import ClearBadgeCountsButton from '../react/ClearBadgeCountsButton'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 import useStore from '../react/stores'
 
@@ -438,7 +440,7 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
   let finalGrade
   let teaserText
 
-  if (gradingSchemeEnabled()) {
+  if (gradingSchemeEnabled() || ENV.restrict_quantitative_data) {
     const scoreToUse = overrideScorePresent()
       ? ENV.effective_final_score
       : calculatePercentGrade(finalScore, finalPossible)
@@ -610,6 +612,10 @@ function renderSelectMenuGroup() {
   )
 }
 
+function renderGradeSummaryTable() {
+  ReactDOM.render(<GradeSummaryManager />, document.getElementById('grade-summary-react'))
+}
+
 function handleSubmissionsCommentTray(assignmentId) {
   const {submissionTrayAssignmentId, submissionTrayOpen} = useStore.getState()
 
@@ -659,6 +665,16 @@ function renderSubmissionCommentsTray() {
       }}
     />,
     document.getElementById('GradeSummarySubmissionCommentsTray')
+  )
+}
+
+function renderClearBadgeCountsButton() {
+  ReactDOM.unmountComponentAtNode(document.getElementById('ClearBadgeCountsButton'))
+  const userId = ENV.student_id
+  const courseId = ENV.course_id ?? ENV.context_asset_string.replace('course_', '')
+  ReactDOM.render(
+    <ClearBadgeCountsButton userId={userId} courseId={courseId} />,
+    document.getElementById('ClearBadgeCountsButton')
   )
 }
 
@@ -875,9 +891,11 @@ export default _.extend(GradeSummary, {
   formatPercentGrade,
   getSelectMenuGroupProps,
   renderSelectMenuGroup,
+  renderGradeSummaryTable,
   getSubmissionCommentsTrayProps,
   handleSubmissionsCommentTray,
   renderSubmissionCommentsTray,
+  renderClearBadgeCountsButton,
   updateScoreForAssignment,
   updateStudentGrades,
 })

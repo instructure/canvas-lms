@@ -114,6 +114,8 @@ export function transformApiToInternalItem(apiResponse, courses, groups, timeZon
       url: undefined,
     }
     contextInfo.context = getGroupContext(apiResponse, group)
+  } else if (context_type === 'Account') {
+    contextInfo.context = getAccountContext(apiResponse)
   }
   const details = getItemDetailsFromPlannable(apiResponse, timeZone)
 
@@ -248,6 +250,20 @@ function getGroupContext(apiResponse, group) {
     image_url: undefined,
     color: group.color,
     url: group.url,
+  }
+}
+
+function getAccountContext(apiResponse) {
+  if (apiResponse?.context_type !== 'Account') return undefined
+  const type = apiResponse.context_type
+  const id = apiResponse.account_id
+  return {
+    type,
+    id,
+    title: apiResponse.context_name,
+    image_url: undefined,
+    color: ENV.PREFERENCES?.custom_colors[`${type.toLowerCase()}_${id}`],
+    url: apiResponse.url,
   }
 }
 

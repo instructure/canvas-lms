@@ -162,11 +162,18 @@ export default function CoursesToolbar({
                       label={I18n.t('Hide courses without students')}
                     />
                   </Grid.Col>
-                  <Grid.Col>
+                  <Grid.Col width="auto">
                     <Checkbox
                       checked={draftFilters.blueprint}
                       onChange={e => onUpdateFilters({blueprint: e.target.checked ? true : null})}
                       label={I18n.t('Show only blueprint courses')}
+                    />
+                  </Grid.Col>
+                  <Grid.Col width="auto">
+                    <Checkbox
+                      checked={draftFilters.public}
+                      onChange={e => onUpdateFilters({public: e.target.checked ? true : null})}
+                      label={I18n.t('Show only public courses')}
                     />
                   </Grid.Col>
                 </Grid.Row>

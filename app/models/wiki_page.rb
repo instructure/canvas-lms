@@ -52,6 +52,8 @@ class WikiPage < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course, :group]
   belongs_to :root_account, class_name: "Account"
 
+  has_many :wiki_page_lookups, inverse_of: :wiki_page
+
   acts_as_url :title, sync_url: true
 
   validate :validate_front_page_visibility

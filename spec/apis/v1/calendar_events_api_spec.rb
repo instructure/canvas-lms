@@ -1148,7 +1148,7 @@ describe CalendarEventsApiController, type: :request do
                              :get,
                              "/api/v1/calendar_events/#{@parent_event.id}/participants",
                              { controller: "calendar_events_api", action: "participants", id: @parent_event.id.to_s, format: "json" })
-            expect(response.code).to eq "401"
+            expect(response).to have_http_status :unauthorized
           end
 
           it "returns empty participants for a teacher" do
@@ -1295,7 +1295,7 @@ describe CalendarEventsApiController, type: :request do
                              :get,
                              "/api/v1/calendar_events/#{@event.id}/participants",
                              { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
-            expect(response.code).to eq "401"
+            expect(response).to have_http_status :unauthorized
           end
         end
       end
@@ -2581,7 +2581,7 @@ describe CalendarEventsApiController, type: :request do
                      start_date: "201-201-208",
                      end_date: "201-201-209"
                    })
-      expect(response.code).to eql "400"
+      expect(response).to have_http_status :bad_request
       json = JSON.parse response.body
       expect(json["errors"]["start_date"]).to eq "Invalid date or invalid datetime for start_date"
       expect(json["errors"]["end_date"]).to eq "Invalid date or invalid datetime for end_date"

@@ -53,6 +53,7 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("anonymousInstructorAnnotations")).to eq assignment.anonymous_instructor_annotations
     expect(assignment_type.resolve("postToSis")).to eq assignment.post_to_sis
     expect(assignment_type.resolve("canUnpublish")).to eq assignment.can_unpublish?
+    expect(assignment_type.resolve("muted")).to eq assignment.muted?
   end
 
   it_behaves_like "types with enumerable workflow states" do

@@ -18,6 +18,9 @@
 
 import fetchMock from 'fetch-mock'
 import RceApiSource from '../api'
+import {saveClosedCaptions, saveClosedCaptionsForAttachment} from '@instructure/canvas-media'
+
+jest.mock('@instructure/canvas-media')
 
 let apiSource
 
@@ -138,14 +141,14 @@ describe('fetchMedia', () => {
 })
 
 describe('saveClosedCaptions()', () => {
-  let apiProps, media_object_id, subtitles, maxBytes
+  let apiProps, media_object_id, attachment_id, subtitles, maxBytes
 
-  const subject = () =>
-    apiSource.updateClosedCaptions(apiProps, {media_object_id, subtitles}, maxBytes)
+  const subject = params => apiSource.updateClosedCaptions(apiProps, params, maxBytes)
 
   beforeEach(() => {
     apiProps = {host: 'test.com', jwt: 'asd.asdf.asdf'}
     media_object_id = 'm-id'
+    attachment_id = '123'
     subtitles = [
       {
         language: {selectedOptionId: 'en'},
@@ -153,16 +156,72 @@ describe('saveClosedCaptions()', () => {
         isNew: true,
       },
     ]
-    maxBytes = undefined
+    maxBytes = 10
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it('using media objects url', async () => {
+    saveClosedCaptions.mockImplementation(() => Promise.resolve())
+    await subject({media_object_id, subtitles})
+    expect(saveClosedCaptions).toHaveBeenCalledWith(
+      media_object_id,
+      subtitles,
+      {
+        headers: {
+          Authorization: 'Bearer asd.asdf.asdf',
+        },
+        origin: 'http://test.com',
+      },
+      maxBytes
+    )
+  })
+
+  it('using media objects url due null attachment', async () => {
+    attachment_id = null
+    saveClosedCaptions.mockImplementation(() => Promise.resolve())
+    await subject({media_object_id, attachment_id, subtitles})
+    expect(saveClosedCaptions).toHaveBeenCalledWith(
+      media_object_id,
+      subtitles,
+      {
+        headers: {
+          Authorization: 'Bearer asd.asdf.asdf',
+        },
+        origin: 'http://test.com',
+      },
+      maxBytes
+    )
+  })
+
+  it('using media attachments url', async () => {
+    saveClosedCaptionsForAttachment.mockImplementation(() => Promise.resolve())
+    await subject({media_object_id, attachment_id, subtitles})
+    expect(saveClosedCaptionsForAttachment).toHaveBeenCalledWith(
+      attachment_id,
+      subtitles,
+      {
+        headers: {
+          Authorization: 'Bearer asd.asdf.asdf',
+        },
+        origin: 'http://test.com',
+      },
+      maxBytes
+    )
   })
 
   describe('with a captions file that is too large', () => {
     beforeEach(() => {
+      saveClosedCaptions.mockImplementation(
+        jest.requireActual('@instructure/canvas-media').saveClosedCaptions
+      )
       maxBytes = 5
     })
 
     it('Notifies the user of a file size issue', async () => {
-      await subject()
+      await subject({media_object_id, subtitles})
       expect(apiSource.alertFunc).toHaveBeenCalledWith({
         text: 'Closed caption file must be less than 0.005 kb',
         variant: 'error',

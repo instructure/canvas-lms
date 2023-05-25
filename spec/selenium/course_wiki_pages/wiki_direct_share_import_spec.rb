@@ -88,12 +88,11 @@ describe "course wiki pages" do
     end
   end
 
-  context "with commons fav FF ON" do
+  context "commons favorites" do
     before do
       @tool = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @tool.wiki_index_menu = { url: "http://www.example.com", text: "Commons Fav" }
       @tool.save!
-      Account.default.enable_feature!(:commons_favorites)
       course_with_teacher_logged_in
       @course.save!
       user_session(@teacher)

@@ -8,6 +8,21 @@ Navigation Events
 **Trigger:** Triggered when a variety of assets are viewed.
 
 
+### Event Body Schema
+
+| Field | Description |
+|-|-|
+| **data[0].object.extensions["com.instructure.canvas"].asset_name** | indicates Canvas object name being accessed in the NavigationEvent. For an example it could be a title of a course, page, module, assignment, LTI, attachment etc |
+| **data[0].object.extensions["com.instructure.canvas"].asset_subtype** | indicates Canvas object sub-type being accessed in the NavigationEvent |
+| **data[0].object.extensions["com.instructure.canvas"].asset_type** | indicates Canvas object type being accessed in the NavigationEvent |
+| **data[0].object.extensions["com.instructure.canvas"].context_account_id** | The account id of the current context. This is the actual account the context is attached to could be account, sub-account, course |
+| **data[0].object.extensions["com.instructure.canvas"].entity_id** | Canvas global ID of the object affected by the event |
+| **data[0].object.extensions["com.instructure.canvas"].http_method** | HTTP method/verb (GET, PUT, POST etc.) that the request was sent with. Only present in user-generated events |
+| **data[0].object.type** | Entity |
+
+
+
+
 **Description:** type=account, subtype=outcomes
 ### Payload Example:
 
@@ -3271,19 +3286,6 @@ Navigation Events
 }
 ```
 
-
-
-
-### Event Body Schema
-
-| Field | Description |
-|-|-|
-| **data[0].object.extensions["com.instructure.canvas"].asset_name** | indicates Canvas object name being accessed in the NavigationEvent. For an example it could be a title of a course, page, module, assignment, LTI, attachment etc |
-| **data[0].object.extensions["com.instructure.canvas"].asset_subtype** | indicates Canvas object sub-type being accessed in the NavigationEvent |
-| **data[0].object.extensions["com.instructure.canvas"].asset_type** | indicates Canvas object type being accessed in the NavigationEvent |
-| **data[0].object.extensions["com.instructure.canvas"].context_account_id** | The account id of the current context. This is the actual account the context is attached to could be account, sub-account, course |
-| **data[0].object.extensions["com.instructure.canvas"].entity_id** | Canvas global ID of the object affected by the event |
-| **data[0].object.extensions["com.instructure.canvas"].http_method** | HTTP method/verb (GET, PUT, POST etc.) that the request was sent with. Only present in user-generated events |
 
 
 

@@ -260,6 +260,38 @@ describe AssignmentGroupsController do
       end
     end
 
+    describe "filtering out hidden zero point quizzes" do
+      before(:once) do
+        course_with_teacher(active_all: true)
+        @first_quiz = @course.assignments.create!(name: "Quiz", points_possible: 10, submission_types: ["external_tool"], omit_from_final_grade: true, hide_in_gradebook: false)
+        @second_quiz = @course.assignments.create!(name: "Practice Quiz", points_possible: 0, submission_types: ["external_tool"], omit_from_final_grade: true, hide_in_gradebook: true)
+      end
+
+      it "filters out assignments that have been hidden from gradebook if 'hide_zero_point_quizzes' param is set to true" do
+        user_session(@teacher)
+        get :index,
+            params: {
+              hide_zero_point_quizzes: true,
+              course_id: @course.id,
+              include: ["assignments"],
+            },
+            format: :json
+        expect(assignments_ids).to match_array [@first_quiz.id]
+      end
+
+      it "does not filter out assignments that have been hidden from gradebook if 'hide_zero_point_quizzes_option' param is set to false" do
+        user_session(@teacher)
+        get :index,
+            params: {
+              hide_zero_point_quizzes: false,
+              course_id: @course.id,
+              include: ["assignments"],
+            },
+            format: :json
+        expect(assignments_ids).to match_array [@first_quiz.id, @second_quiz.id]
+      end
+    end
+
     context "given a course with a teacher and a student" do
       before :once do
         course_with_teacher(active_all: true)

@@ -38,6 +38,26 @@ module AccountCalendarSettingsPage
     "[data-testid='save-button']"
   end
 
+  def auto_subscribe_confirm_button_selector
+    "[data-testid='confirm-button']"
+  end
+
+  def auto_subscribe_cancel_button_selector
+    "[data-testid='close-button']"
+  end
+
+  def auto_subscribe_x_close_button_selector
+    "[data-testid='x-close-button']"
+  end
+
+  def auto_subscribe_confirm_modal_selector
+    "[aria-label='Apply Changes']"
+  end
+
+  def auto_subscription_dropdown_selector
+    "[data-testid='subscription-dropdown']"
+  end
+
   def calendar_search_selector
     "[placeholder='Search Calendars']"
   end
@@ -77,6 +97,26 @@ module AccountCalendarSettingsPage
 
   def apply_changes_button
     f(apply_changes_button_selector)
+  end
+
+  def auto_subscribe_confirm_button
+    f(auto_subscribe_confirm_button_selector)
+  end
+
+  def auto_subscribe_cancel_button
+    f(auto_subscribe_cancel_button_selector)
+  end
+
+  def auto_subscribe_x_close_button
+    f(auto_subscribe_x_close_button_selector)
+  end
+
+  def auto_subscribe_confirm_modal
+    f(auto_subscribe_confirm_modal_selector)
+  end
+
+  def auto_subscription_dropdowns
+    ff(auto_subscription_dropdown_selector)
   end
 
   def calendar_search
@@ -123,6 +163,18 @@ module AccountCalendarSettingsPage
 
   def click_apply_changes_button
     apply_changes_button.click
+  end
+
+  def click_auto_subscribe_confirm_button
+    auto_subscribe_confirm_button.click
+  end
+
+  def click_auto_subscribe_cancel_button
+    auto_subscribe_cancel_button.click
+  end
+
+  def click_auto_subscribe_x_close_button
+    auto_subscribe_x_close_button.click
   end
 
   def input_search_string(search_string)

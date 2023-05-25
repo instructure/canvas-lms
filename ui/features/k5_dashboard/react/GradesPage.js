@@ -121,6 +121,8 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
     'current_grading_period_scores',
     'grading_periods',
     'course_image',
+    'grading_scheme',
+    'restrict_quantitative_data',
   ]
   if (includeObservedUsers) {
     include.push('observed_users')

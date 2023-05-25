@@ -129,11 +129,15 @@ Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
 Rails/WhereExists:
   EnforcedStyle: where
+Rails/WhereNotWithMultipleConditions:
+  Enabled: false # We're firmly on Rails 6.1+; no need to worry about legacy behavior
 
 RSpec:
   Severity: error
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain
+RSpec/IndexedLet:
+  Enabled: false
 RSpec/InstanceVariable:
   Enabled: false # legacy code
 RSpec/MultipleMemoizedHelpers:
@@ -205,6 +209,13 @@ Style/WordArray:
 # we should eventually either fix them, or turn them off completely (and move
 # them to the section above)
 # auto-correct needs to be disabled for any that support it in the meantime
+
+FactoryBot/ConsistentParenthesesStyle:
+  AutoCorrect: false
+FactoryBot/CreateList:
+  AutoCorrect: false
+FactoryBot/SyntaxMethods:
+  AutoCorrect: false
 
 GraphQL/FieldMethod:
   AutoCorrect: false
@@ -334,13 +345,6 @@ Rake/Desc:
   AutoCorrect: false
 Rake/MethodDefinitionInTask:
   Severity: convention
-
-RSpec/FactoryBot/ConsistentParenthesesStyle:
-  AutoCorrect: false
-RSpec/FactoryBot/CreateList:
-  AutoCorrect: false
-RSpec/FactoryBot/SyntaxMethods:
-  AutoCorrect: false
 
 RSpec/AroundBlock:
   Severity: convention

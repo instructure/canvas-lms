@@ -34,7 +34,7 @@ describe IncomingMail::MessageHandler do
     shard
   end
   let_once(:user) do
-    user_model
+    user_with_pseudonym
     communication_channel(@user, { username: "lucy@example.com", active_cc: true })
     @user
   end
@@ -152,6 +152,41 @@ describe IncomingMail::MessageHandler do
       end
 
       context "bounced messages" do
+        it "bounces if user is suspended" do
+          @pseudonym.update!(workflow_state: "suspended")
+          @pseudonym.reload
+          user.reload
+          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
+          # by not receiving reply_from we make sure that it is not processed as a reply
+          expect(original_message.context).not_to receive(:reply_from)
+          # make sure message was bounced
+          email_subject = "Undelivered message"
+          body = <<~TEXT.strip
+            The message you sent with the subject line "some subject" was not delivered because your account has been suspended.
+
+            Thank you,
+            Canvas Support
+          TEXT
+
+          message_attributes = {
+            to: "lucy@example.com",
+            from: "no-reply@example.com",
+            subject: email_subject,
+            body: body,
+            delay_for: 0,
+            context: nil,
+            path_type: "email",
+            from_name: "Instructure",
+          }
+          expected_bounce_message = Message.new(message_attributes)
+          expect(Message).to receive(:new).with(message_attributes).and_return(expected_bounce_message)
+          expect(expected_bounce_message).to receive(:deliver)
+
+          subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
+          expect(InstStatsd::Statsd).to have_received(:increment).with("incoming_mail_processor.message_processing_error.user_suspended")
+        end
+
         it "bounces if user is missing" do
           message = double("original message without user", original_message_attributes.merge(user: nil))
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)

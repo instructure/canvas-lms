@@ -142,4 +142,10 @@ module.exports = [
     boundary: 0,
     specifier: 'relative',
   },
+  {
+    rule: 'Let the react content router include routes from other ui features',
+    source: 'ui/features/react_content_router/routes/routes.tsx',
+    target: 'ui/features/**/routes/**/*Routes.tsx',
+    specifier: 'any',
+  },
 ]

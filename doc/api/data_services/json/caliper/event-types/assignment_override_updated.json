@@ -17,6 +17,9 @@
       "course_section_id": "(if `type='CourseSection'`) Canvas section id that this override applies to.",
       "group_id": "(if `type='Group'`) Canvas group id that this override applies to.",
       "workflow_state": "Workflow state of the override. (active, deleted)"
+    },
+    "data[0].object": {
+      "type": "Entity"
     }
   },
   "examples": [

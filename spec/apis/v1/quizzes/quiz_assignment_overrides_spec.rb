@@ -39,7 +39,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
                    { controller: "quizzes/quiz_assignment_overrides", action: "index", format: "json", course_id: @course.id.to_s },
                    { quiz_assignment_overrides: [{ quiz_ids: [@quiz.id] }] })
 
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "includes visible overrides" do
@@ -142,7 +142,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
                    { controller: "quizzes/quiz_assignment_overrides", action: "new_quizzes", format: "json", course_id: @course.id.to_s },
                    { quiz_assignment_overrides: [{ quiz_ids: [@quiz.id] }] })
 
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "includes visible overrides" do

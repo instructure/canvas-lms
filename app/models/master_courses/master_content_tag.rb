@@ -36,6 +36,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
                                      :course_pace,
                                      :discussion_topic,
                                      :learning_outcome,
+                                     :media_track,
                                      :rubric,
                                      :wiki_page,
                                      quiz: "Quizzes::Quiz"]

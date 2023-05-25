@@ -218,7 +218,7 @@ describe "quizzes question banks" do
 
       # create new quiz question group from selected questions
       question_group_name = "Quiz Question Group A"
-      click_option(ffj(".quiz_group_select"), "[ New Group ]")
+      click_option(ff(".quiz_group_select"), "[ Create Group ]")
       fj("#found_question_group_name").send_keys question_group_name
       fj("#found_question_group_pick").send_keys "1"
       fj("#found_question_group_points").send_keys "1"

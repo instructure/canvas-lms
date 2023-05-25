@@ -81,8 +81,6 @@ class AssignmentsController < ApplicationController
           SHOW_SPEED_GRADER_LINK: @current_user.present? && context.allows_speed_grader? && context.grants_any_right?(@current_user, :manage_grades, :view_all_grades),
           FLAGS: {
             newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
-            new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
-            new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
             show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
           },
           grading_scheme: @context.grading_standard_or_default.data
@@ -775,7 +773,9 @@ class AssignmentsController < ApplicationController
         SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context),
         VALID_DATE_RANGE: CourseDateRange.new(@context),
         NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED:
-          Account.site_admin.feature_enabled?(:new_quizzes_assignment_build_button)
+          Account.site_admin.feature_enabled?(:new_quizzes_assignment_build_button),
+        HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED:
+          Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option)
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
@@ -1009,6 +1009,7 @@ class AssignmentsController < ApplicationController
                   :integration_id,
                   :moderated_grading,
                   :omit_from_final_grade,
+                  :hide_in_gradebook,
                   :intra_group_peer_reviews,
                   :important_dates,
                   allowed_extensions: strong_anything,

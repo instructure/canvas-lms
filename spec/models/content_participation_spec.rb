@@ -493,4 +493,32 @@ describe ContentParticipation do
       expect(participant.root_account_id).to eq(@assignment.root_account_id)
     end
   end
+
+  context "clear unread submissions" do
+    before :once do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      assignment_model(course: @course)
+      @content = @assignment.submit_homework(@student)
+      @assignment2 = assignment_model(course: @course)
+      @content2 = @assignment2.submit_homework(@student)
+      @assignment.ensure_post_policy(post_manually: false)
+      @content.update_columns(posted_at: Time.now.utc, workflow_state: "graded", score: 10)
+      @assignment2.ensure_post_policy(post_manually: false)
+      @content2.update_columns(posted_at: Time.now.utc, workflow_state: "graded", score: 10)
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread", content_item: "grade")
+      ContentParticipation.participate(content: @content2, user: @student, workflow_state: "unread", content_item: "grade")
+    end
+
+    it "marks all submission grades as read" do
+      content_participation_count = ContentParticipationCount.find_by(user: @student, context: @course)
+      content_participation_count.refresh_unread_count
+      expect(content_participation_count.unread_count).to eq(2)
+      submissions = @course.submissions.where(user: @student)
+      ContentParticipation.mark_all_as_read_for_user(@student, submissions, @course)
+      content_participation_count.reload
+      expect(content_participation_count.unread_count).to eq(0)
+    end
+  end
 end

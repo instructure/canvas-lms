@@ -427,11 +427,7 @@ class DiscussionTopicsController < ApplicationController
           discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
           student_reporting_enabled: @context.feature_enabled?(:react_discussions_post),
           discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
-          discussion_topic_index_menu_tools: (if @domain_root_account&.feature_enabled?(:commons_favorites)
-                                                external_tools_display_hashes(:discussion_topic_index_menu)
-                                              else
-                                                []
-                                              end),
+          discussion_topic_index_menu_tools: external_tools_display_hashes(:discussion_topic_index_menu),
           show_additional_speed_grader_links: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
         }
         if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read) && @js_env&.dig(:COURSE_ID).blank?
@@ -1379,6 +1375,14 @@ class DiscussionTopicsController < ApplicationController
       end
       prior_version = DiscussionTopic.find(@topic.id)
       verify_specific_section_visibilities # Make sure user actually has perms to modify this
+    end
+
+    if params.include?(:assignment)
+      if is_new || @topic.assignment_id.nil?
+        return unless authorized_action(@context.assignments.temp_record, @current_user, :create)
+      else
+        return unless authorized_action(@topic.assignment, @current_user, :update)
+      end
     end
 
     # It's possible customers already are using this API and haven't updated to

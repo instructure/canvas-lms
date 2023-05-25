@@ -59,6 +59,7 @@ class UserPreferenceValue < ActiveRecord::Base
   add_user_preference :unread_submission_annotations, use_sub_keys: true
   add_user_preference :unread_rubric_comments, use_sub_keys: true
   add_user_preference :module_links_default_new_tab
+  add_user_preference :viewed_auto_subscribed_account_calendars
 
   def self.settings
     @preference_settings ||= {}

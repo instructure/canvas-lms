@@ -32,7 +32,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {AccountCalendarItem} from './AccountCalendarItem'
 import {FilterType} from './FilterControls'
-import {Account, VisibilityChange} from '../types'
+import {Account, VisibilityChange, SubscriptionChange} from '../types'
 import {castIdsToInt} from '../utils'
 import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
 
@@ -47,7 +47,10 @@ type ComponentProps = {
   readonly searchValue: string
   readonly filterValue: FilterType
   readonly visibilityChanges: VisibilityChange[]
+  readonly subscriptionChanges: SubscriptionChange[]
   readonly onAccountToggled: (id: number, visible: boolean) => void
+  readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
+  readonly autoSubscriptionEnabled: boolean
 }
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
@@ -58,7 +61,10 @@ export const AccountList = ({
   searchValue,
   filterValue,
   visibilityChanges,
+  subscriptionChanges,
   onAccountToggled,
+  autoSubscriptionEnabled,
+  onAccountSubscriptionToggled,
 }: ComponentProps) => {
   const [accounts, setAccounts] = useState<Account[]>([])
   const [isLoading, setLoading] = useState(false)
@@ -124,9 +130,12 @@ export const AccountList = ({
       key={`list_item_${account.id}`}
       item={account}
       visibilityChanges={visibilityChanges}
+      subscriptionChanges={subscriptionChanges}
       onAccountToggled={onAccountToggled}
+      onAccountSubscriptionToggled={onAccountSubscriptionToggled}
       padding="medium"
       showTopSeparator={index > 0}
+      autoSubscriptionEnabled={autoSubscriptionEnabled}
     />
   ))
 }

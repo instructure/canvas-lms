@@ -10,6 +10,9 @@
     "data[0].object.extensions[\"com.instructure.canvas\"]": {
       "entity_id": "Canvas global ID of the object affected by the event",
       "is_announcement": "true if this topic was posted as an announcement, false otherwise"
+    },
+    "data[0].object": {
+      "type": "Thread"
     }
   },
   "examples": [

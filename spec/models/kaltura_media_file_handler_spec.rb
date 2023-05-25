@@ -37,7 +37,7 @@ describe KalturaMediaFileHandler do
 
     it "returns without action when all attachments have media objects already" do
       expect(kaltura_client).not_to receive(:bulkUploadAdd)
-      attachment.media_object = media_object
+      attachment.media_entry_id = media_object.media_id
       res = KalturaMediaFileHandler.new.add_media_files(attachment, wait_for_completion)
       expect(res).to be_nil
     end

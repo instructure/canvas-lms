@@ -379,6 +379,20 @@ describe GradeSummaryPresenter do
       presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
       expect(presenter.assignments).to include published_assignment
     end
+
+    it "filters out hidden zero point quizzes when hide_zero_point_quizzes_option FF is enabled" do
+      Account.site_admin.enable_feature!(:hide_zero_point_quizzes_option)
+      @practice_quiz = @course.assignments.create!(name: "Practice Quiz", points_possible: 0, submission_types: ["external_tool"], omit_from_final_grade: true, hide_in_gradebook: true)
+      presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      expect(presenter.assignments).not_to include @practice_quiz
+    end
+
+    it "does not filter out hidden zero point quizzes when hide_zero_point_quizzes_option FF is disabled" do
+      Account.site_admin.disable_feature!(:hide_zero_point_quizzes_option)
+      @practice_quiz = @course.assignments.create!(name: "Practice Quiz", points_possible: 0, submission_types: ["external_tool"], omit_from_final_grade: true, hide_in_gradebook: true)
+      presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      expect(presenter.assignments).to include @practice_quiz
+    end
   end
 
   describe "#sort_options" do

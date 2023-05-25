@@ -79,14 +79,14 @@ module Lti
 
       it "requires an lti access token" do
         get @endpoints[:show]
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "requires the tool proxy to be associated to the assignment" do
         @assignment.tool_settings_tool = nil
         @assignment.save!
         get @endpoints[:show], headers: request_headers
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "allows tool proxies with matching access" do
@@ -100,7 +100,7 @@ module Lti
         other_helpers = { Authorization: "Bearer #{token}" }
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
         get @endpoints[:show], headers: other_helpers
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
 
       it "returns an originality report in the response" do
@@ -173,14 +173,14 @@ module Lti
       context "show by attachment id" do
         it "requires an lti access token" do
           get @endpoints[:alt_show]
-          expect(response.code).to eq "401"
+          expect(response).to have_http_status :unauthorized
         end
 
         it "requires the tool proxy to be associated to the assignment" do
           @assignment.tool_settings_tool = nil
           @assignment.save!
           get @endpoints[:alt_show], headers: request_headers
-          expect(response.code).to eq "401"
+          expect(response).to have_http_status :unauthorized
         end
 
         it "allows tool proxies with matching access" do
@@ -192,7 +192,7 @@ module Lti
           other_helpers = { Authorization: "Bearer #{token}" }
           allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
           get @endpoints[:alt_show], headers: other_helpers
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         it "returns an originality report in the response" do
@@ -277,7 +277,7 @@ module Lti
         @assignment.tool_settings_tool = nil
         @assignment.save!
         put @endpoints[:update], params: { originality_report: { originality_report_lti_url: "http://www.lti-test.com" } }, headers: request_headers
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "checks that the OriginalityReport exists" do
@@ -481,7 +481,7 @@ module Lti
           @assignment.tool_settings_tool = nil
           @assignment.save!
           put @endpoints[:update_alt], params: { originality_report: { originality_report_lti_url: "http://www.lti-test.com" } }, headers: request_headers
-          expect(response.code).to eq "401"
+          expect(response).to have_http_status :unauthorized
         end
 
         it "checks that the OriginalityReport exists" do
@@ -680,7 +680,7 @@ module Lti
         @assignment.tool_settings_tool = nil
         @assignment.save!
         post @endpoints[:create], params: { originality_report: { file_id: @attachment.id, originality_score: 0.4 } }, headers: request_headers
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "verifies the specified attachment is in the course" do
@@ -925,10 +925,10 @@ module Lti
           it "updates the originality report if one exists for the attempt" do
             ver1 = create_version
             report1_id = post_score_for_version(ver1, 10)
-            expect(response.code).to eq("201") # created
+            expect(response).to have_http_status(:created) # created
             create_version
             report2_id = post_score_for_version(ver1, 20)
-            expect(response.code).to eq("200") # ok (updated)
+            expect(response).to have_http_status(:ok) # ok (updated)
 
             expect_n_new_reports(1)
             expect(report2_id).to eq(report1_id)
@@ -940,10 +940,10 @@ module Lti
           it "creates a new originality report if one does not exist for the attempt" do
             ver1 = create_version
             report1_id = post_score_for_version(ver1, 10)
-            expect(response.code).to eq("201") # created
+            expect(response).to have_http_status(:created) # created
             ver2 = create_version
             report2_id = post_score_for_version(ver2, 20)
-            expect(response.code).to eq("201") # created
+            expect(response).to have_http_status(:created) # created
 
             expect_n_new_reports(2)
             report1 = OriginalityReport.find(report1_id)
@@ -961,9 +961,9 @@ module Lti
             ver1 = create_version
             ver2 = create_version
             report1_id = post_score_for_version(ver1, 10)
-            expect(response.code).to eq("201") # created
+            expect(response).to have_http_status(:created) # created
             report2_id = post_score_for_version(ver2, 20)
-            expect(response.code).to eq("201") # created
+            expect(response).to have_http_status(:created) # created
 
             expect_n_new_reports(2)
             report1 = OriginalityReport.find(report1_id)
@@ -977,7 +977,7 @@ module Lti
           it "returns a 404 if the attempt does not exist" do
             ver1 = create_version
             post_score_for_attempt(ver1.model.attempt + 1, 10)
-            expect(response.code).to eq("404")
+            expect(response).to have_http_status(:not_found)
             expect_n_new_reports(0)
           end
         end

@@ -797,19 +797,23 @@
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
               <xs:element name="track">
                 <xs:complexType>
-                  <xs:attribute name="identifierref" type="xs:ID" use="required"/>
-                  <xs:attribute name="kind" use="required">
-                    <xs:simpleType>
-                      <xs:restriction base="xs:string">
-                        <xs:enumeration value="subtitles"/>
-                        <xs:enumeration value="captions"/>
-                        <xs:enumeration value="descriptions"/>
-                        <xs:enumeration value="chapters"/>
-                        <xs:enumeration value="metadata"/>
-                      </xs:restriction>
-                    </xs:simpleType>
-                  </xs:attribute>
-                  <xs:attribute name="locale" type="xs:string" use="required"/>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="identifierref" type="xs:ID" use="required"/>
+                      <xs:attribute name="kind" use="required">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                            <xs:enumeration value="subtitles"/>
+                            <xs:enumeration value="captions"/>
+                            <xs:enumeration value="descriptions"/>
+                            <xs:enumeration value="chapters"/>
+                            <xs:enumeration value="metadata"/>
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                      <xs:attribute name="locale" type="xs:string" use="required"/>
+                    </xs:extension>
+                  </xs:simpleContent>
                 </xs:complexType>
               </xs:element>
             </xs:sequence>

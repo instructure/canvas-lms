@@ -14,14 +14,14 @@ development:
     access_key: 'fake-access-key'
     secret_key: 'fake-secret-key'
     security_token: 'fake-security-token'
-#  'app-canvas/data/secrets':
-#    data:
+  'app-canvas/data/secrets':
+    data:
+      canvas_security:
+        encryption_secret: "astringthatisactually32byteslong"
+        signing_secret: "astringthatisactually32byteslong"
 #      canvas_cdn_creds:
 #        aws_access_key_id: <access_key_id>
 #        aws_secret_access_key: <secret_access_key>
-#      canvas_security:
-#        encryption_secret: "astringthatisactually32byteslong"
-#        signing_secret: "astringthatisactually32byteslong"
 #      google_docs_creds:
 #        secret_key: so-secret
 #      immersive_reader:

@@ -351,6 +351,21 @@ describe('transformApiToInternalItem', () => {
     expect(result).toMatchSnapshot()
   })
 
+  it('extracts and transforms the proper date for an account calendar event', () => {
+    window.ENV = {}
+    const apiResponse = makeApiResponse({
+      context_type: 'Account',
+      account_id: '1',
+      context_name: 'Main account',
+      plannable_type: 'calendar_event',
+      plannable: makeCalendarEvent(),
+      html_url: '/calendar?event_id=1&include_contexts=account_1',
+    })
+
+    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
+    expect(result).toMatchSnapshot()
+  })
+
   it('adds the dateBucketMoment field', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'assignment',

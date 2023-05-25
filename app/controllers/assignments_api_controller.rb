@@ -602,6 +602,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "hide_in_gradebook": {
+#           "description": "(Optional) If true, the assignment will not be shown in any gradebooks",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "moderated_grading": {
 #           "description": "Boolean indicating if the assignment is moderated.",
 #           "example": true,
@@ -679,6 +684,66 @@
 #           "description": "(Optional, Deprecated) Boolean indicating whether notifications are muted for this assignment.",
 #           "example": false,
 #           "type": "boolean"
+#         },
+#         "anonymous_peer_reviews": {
+#           "description": "Boolean indicating whether peer reviews are anonymous.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "anonymous_instructor_annotations": {
+#           "description": "Boolean indicating whether instructor anotations are anonymous.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "graded_submissions_exist": {
+#           "description": "Boolean indicating whether this assignment has graded submissions.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "is_quiz_assignment": {
+#           "description": "Boolean indicating whether this is a quiz lti assignment.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "in_closed_grading_period": {
+#           "description": "Boolean indicating whether this assignment is in a closed grading period.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "can_duplicate": {
+#           "description": "Boolean indicating whether this assignment can be duplicated.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "original_course_id": {
+#           "description": "If this assignment is a duplicate, it is the original assignment's course_id",
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "original_assignment_id": {
+#           "description": "If this assignment is a duplicate, it is the original assignment's id",
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "original_lti_resource_link_id": {
+#           "description": "If this assignment is a duplicate, it is the original assignment's lti_resource_link_id",
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "original_assignment_name": {
+#           "description": "If this assignment is a duplicate, it is the original assignment's name",
+#           "example": "some assignment",
+#           "type": "string"
+#         },
+#         "original_quiz_id": {
+#           "description": "If this assignment is a duplicate, it is the original assignment's quiz_id",
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "String indicating what state this assignment is in.",
+#           "example": "unpublished",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -1140,6 +1205,9 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[omit_from_final_grade] [Boolean]
   #   Whether this assignment is counted towards a student's final grade.
   #
+  # @argument assignment[hide_in_gradebook] [Boolean]
+  #   Whether this assignment is shown in the gradebook.
+  #
   # @argument assignment[quiz_lti] [Boolean]
   #   Whether this assignment should use the Quizzes 2 LTI tool. Sets the
   #   submission type to 'external_tool' and configures the external tool
@@ -1342,6 +1410,9 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[omit_from_final_grade] [Boolean]
   #   Whether this assignment is counted towards a student's final grade.
+  #
+  # @argument assignment[hide_in_gradebook] [Boolean]
+  #   Whether this assignment is shown in the gradebook.
   #
   # @argument assignment[moderated_grading] [Boolean]
   #   Whether this assignment is moderated.

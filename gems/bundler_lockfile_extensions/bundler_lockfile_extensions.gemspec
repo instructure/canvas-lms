@@ -9,5 +9,6 @@ Gem::Specification.new do |spec|
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w[plugins.rb]
   spec.require_paths = ["lib"]
 
+  spec.add_development_dependency "byebug"
   spec.add_development_dependency "rspec", "~> 3.12"
 end

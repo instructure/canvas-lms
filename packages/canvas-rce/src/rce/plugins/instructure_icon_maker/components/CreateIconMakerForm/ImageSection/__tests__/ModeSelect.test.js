@@ -37,7 +37,7 @@ describe('ModeSelect', () => {
     let getByText
 
     beforeEach(() => {
-      const rendered = subject({cropperEnabled: true})
+      const rendered = subject()
       getByText = rendered.getByText
       fireEvent.click(getByText('Add Image'))
     })

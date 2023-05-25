@@ -468,6 +468,17 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic.assignment.title).to eq "test title"
     end
 
+    it "does not allow students to create a discussion assignment" do
+      @course.allow_student_discussion_topics = true
+      @user = @student
+      api_call(:post,
+               "/api/v1/courses/#{@course.id}/discussion_topics",
+               { controller: "discussion_topics", action: "create", format: "json", course_id: @course.to_param },
+               { title: "pwn3d ur grade", message: "lol", assignment: { points_possible: 1000, due_at: 1.week.ago.as_json } },
+               {},
+               { expected_status: 401 })
+    end
+
     it "does not create an assignment on a discussion topic when set_assignment is false" do
       api_call(:post,
                "/api/v1/courses/#{@course.id}/discussion_topics",
@@ -1682,6 +1693,33 @@ describe DiscussionTopicsController, type: :request do
         expect(@assignment).to be_deleted
       end
 
+      it "allows editing an assignment on update" do
+        @assignment = @topic.context.assignments.build(points_possible: 50)
+        @topic.assignment = @assignment
+        @topic.save!
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+                 { assignment: { points_possible: 100 } })
+
+        expect(@assignment.reload.points_possible).to eq 100
+      end
+
+      it "does not circumvent assignment permissions when updating" do
+        @assignment = @topic.context.assignments.build(points_possible: 50)
+        @topic.assignment = @assignment
+        @topic.save!
+        account_admin_user_with_role_changes(role_changes: { manage_assignments: false })
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+                 { assignment: { points_possible: 100 } },
+                 {},
+                 { expected_status: 401 })
+
+        expect(@assignment.reload.points_possible).to eq 50
+      end
+
       it "nulls availability dates on the topic if assignment ones are provided" do
         api_call(:put,
                  "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
@@ -2749,7 +2787,7 @@ describe DiscussionTopicsController, type: :request do
                  format: "json",
                  course_id: @course.to_param,
                  topic_id: @topic.to_param)
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
 
       it "does not see entries before posting" do
@@ -2761,7 +2799,7 @@ describe DiscussionTopicsController, type: :request do
                      course_id: @course.to_param,
                      topic_id: @topic.to_param)
         expect(response.body).to eq "require_initial_post"
-        expect(response.code).to eq "403"
+        expect(response).to have_http_status :forbidden
       end
 
       it "sees entries after posting" do
@@ -2773,7 +2811,7 @@ describe DiscussionTopicsController, type: :request do
                  format: "json",
                  course_id: @course.to_param,
                  topic_id: @topic.to_param)
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
     end
 
@@ -2793,7 +2831,7 @@ describe DiscussionTopicsController, type: :request do
                      course_id: @course.to_param,
                      topic_id: @topic.to_param)
         expect(response.body).to eq "require_initial_post"
-        expect(response.code).to eq "403"
+        expect(response).to have_http_status :forbidden
       end
 
       it "sees entries after posting" do
@@ -2805,7 +2843,7 @@ describe DiscussionTopicsController, type: :request do
                  format: "json",
                  course_id: @course.to_param,
                  topic_id: @topic.to_param)
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
     end
   end
@@ -4170,7 +4208,7 @@ describe DiscussionTopicsController, type: :request do
                          topic_id: @topic.id.to_s)
           end
           expect(response.body).to eq "require_initial_post"
-          expect(response.code).to eq "403"
+          expect(response).to have_http_status :forbidden
         end
 
         it "sees entries after posting" do

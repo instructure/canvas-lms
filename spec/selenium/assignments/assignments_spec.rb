@@ -845,7 +845,7 @@ describe "assignments" do
       course_with_teacher_logged_in
       @new_group = "fine_leather_jacket"
       get "/courses/#{@course.id}/assignments/new"
-      click_option("#assignment_group_id", "[ New Group ]")
+      click_option("#assignment_group_id", "[ Create Group ]")
 
       # type something in here so you can check to make sure it was not added
       fj("div.controls > input:visible").send_keys(@new_group)
@@ -1023,6 +1023,18 @@ describe "assignments" do
 
           expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "A"
           expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: A"
+        end
+
+        it "shows points possible for teachers on index page", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 10, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_teacher_logged_in(active_all: true, course: @course)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "10 pts"
         end
 
         it "shows letter grade if percent type", priority: "2" do

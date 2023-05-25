@@ -10,6 +10,9 @@
     "data[0].object.extensions[\"com.instructure.canvas\"]": {
       "body": "The body of the new page. NOTE: This field will be truncated to only include the first 8192 characters.",
       "entity_id": "Canvas global ID of the object affected by the event"
+    },
+    "data[0].object": {
+      "type": "Page"
     }
   },
   "examples": [

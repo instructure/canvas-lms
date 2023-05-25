@@ -1257,13 +1257,14 @@ describe "Canvas Cartridge importing" do
   end
 
   it "imports media tracks" do
+    media_id = "0_deadbeef"
     media_objects_folder = Folder.create! context: @copy_to, name: CC::CCHelper::MEDIA_OBJECTS_FOLDER, parent_folder: Folder.root_folders(@course).first
-    media_file = @copy_to.attachments.create(folder: media_objects_folder, filename: "media.flv", uploaded_data: StringIO.new("pretend this is a media file"))
+    media_file = @copy_to.attachments.create(folder: media_objects_folder, filename: "media.flv", media_entry_id: media_id, uploaded_data: StringIO.new("pretend this is a media file"))
     media_file.migration_id = "xyz"
     media_file.save!
     mo = MediaObject.new
     mo.attachment = media_file
-    mo.media_id = "0_deadbeef"
+    mo.media_id = media_id
     mo.save!
     track_file1 = @copy_to.attachments.create(folder: media_objects_folder, filename: "media.flv.en.subtitles", uploaded_data: StringIO.new("pretend this is a track file"))
     track_file1.migration_id = "abc"

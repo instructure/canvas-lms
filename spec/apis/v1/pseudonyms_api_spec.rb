@@ -123,12 +123,12 @@ describe PseudonymsController, type: :request do
         raw_api_call(:get, @account_path, @account_path_options, {
                        user: { id: @student.id }
                      })
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "returns 401 unauthorized when listing user pseudonyms" do
         raw_api_call(:get, @user_path, @user_path_options)
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -176,7 +176,7 @@ describe PseudonymsController, type: :request do
                          unique_id: "duplicate@example.com"
                        }
                      })
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
       end
 
       it "returns 400 on duplicate pseudonyms" do
@@ -189,12 +189,12 @@ describe PseudonymsController, type: :request do
                          unique_id: "duplicate@example.com"
                        }
                      })
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
       end
 
       it "returns 400 when nothing is passed" do
         raw_api_call(:post, @path, @path_options)
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
       end
 
       it "returns 401 when trying to set a password on a non-Canvas login" do
@@ -207,7 +207,7 @@ describe PseudonymsController, type: :request do
                          authentication_provider_id: "cas"
                        }
                      })
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
       end
     end
 
@@ -222,7 +222,7 @@ describe PseudonymsController, type: :request do
                          unique_id: "test@example.com"
                        }
                      })
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
 
@@ -236,7 +236,7 @@ describe PseudonymsController, type: :request do
                      format: "json" },
                    user: { id: @user.id },
                    login: { unique_id: "user" })
-      expect(response.code).to eql "401"
+      expect(response).to have_http_status :unauthorized
     end
   end
 
@@ -297,12 +297,12 @@ describe PseudonymsController, type: :request do
 
       it "ignores invalid workflow states" do
         raw_api_call(:put, @path, @path_options, { login: { workflow_state: "bogus" } })
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
       end
 
       it "ignores invalid declared_user_types" do
         raw_api_call(:put, @path, @path_options, { login: { declared_user_type: "ta" } })
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
       end
 
       it "returns 400 if the unique_id already exists" do
@@ -311,12 +311,12 @@ describe PseudonymsController, type: :request do
                          unique_id: "teacher@example.com"
                        }
                      })
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
       end
 
       it "returns 400 if no parameters" do
         raw_api_call(:put, @path, @path_options, {})
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
       end
 
       it "returns 200 if a user's sis id is updated to its current value" do
@@ -374,7 +374,7 @@ describe PseudonymsController, type: :request do
         raw_api_call(:put, @path, @path_options, {
                        login: { authentication_provider_id: auth_provider.id.to_s }
                      })
-        expect(response.code).to eql "404"
+        expect(response).to have_http_status :not_found
       end
 
       it "does not allow updating an auth provider from another account by type" do
@@ -385,7 +385,7 @@ describe PseudonymsController, type: :request do
         raw_api_call(:put, @path, @path_options, {
                        login: { authentication_provider_id: auth_provider.auth_type.to_s }
                      })
-        expect(response.code).to eql "404"
+        expect(response).to have_http_status :not_found
       end
 
       it "does not allow updating a deleted pseudonym" do
@@ -398,7 +398,7 @@ describe PseudonymsController, type: :request do
                          unique_id: "changed@example.com"
                        }
                      })
-        expect(response.code).to eql "404"
+        expect(response).to have_http_status :not_found
       end
     end
 
@@ -409,7 +409,7 @@ describe PseudonymsController, type: :request do
         raw_api_call(:put, @path, @path_options.merge({ id: @teacher.pseudonym.id.to_param }), {
                        login: { unique_id: "teacher+new@example.com" }
                      })
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "is not able to update an authentication provider" do
@@ -422,7 +422,7 @@ describe PseudonymsController, type: :request do
         raw_api_call(:put, @path, @path_options.merge({ id: @student.pseudonym.id.to_param }), {
                        login: { authentication_provider_id: auth_provider.id.to_s }
                      })
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -471,7 +471,7 @@ describe PseudonymsController, type: :request do
 
       it "receives an error when trying to delete the user's last pseudonym" do
         raw_api_call(:delete, @path, @path_options)
-        expect(response.code).to eql "400"
+        expect(response).to have_http_status :bad_request
         expect(JSON.parse(response.body)).to eq({
                                                   "errors" => {
                                                     "base" => [
@@ -487,7 +487,7 @@ describe PseudonymsController, type: :request do
         to_delete.destroy
 
         raw_api_call(:delete, @path, @path_options)
-        expect(response.code).to eql "404"
+        expect(response).to have_http_status :not_found
       end
     end
 
@@ -495,7 +495,7 @@ describe PseudonymsController, type: :request do
       it "returns 401" do
         user_with_pseudonym
         raw_api_call(:delete, @path, @path_options)
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -522,7 +522,7 @@ describe PseudonymsController, type: :request do
         raw_api_call(:post, @path, @path_options, {
                        email: "dummy@example.com"
                      })
-        expect(response.code).to eql "404"
+        expect(response).to have_http_status :not_found
       end
     end
 
@@ -533,7 +533,7 @@ describe PseudonymsController, type: :request do
                        email: "student@example.com",
                        login: { unique_id: "teacher+new@example.com" }
                      })
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end

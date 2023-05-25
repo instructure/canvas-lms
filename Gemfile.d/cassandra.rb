@@ -27,5 +27,5 @@ group :cassandra do
         require: false,
         github: "twitter/thrift_client",
         ref: "5c10d59881825cb8e26ab1aa8f1d2738e88c0e83"
-  gem "canvas_cassandra", path: "gems/canvas_cassandra"
+  gem "canvas_cassandra", path: "../gems/canvas_cassandra"
 end

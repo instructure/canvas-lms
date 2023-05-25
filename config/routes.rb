@@ -515,12 +515,15 @@ CanvasRails::Application.routes.draw do
   get "media_objects_iframe" => "media_objects#iframe_media_player", :as => :media_object_iframe_href
   get "media_objects/:media_object_id/media_tracks/:id" => "media_tracks#show", :as => :show_media_tracks
   post "media_objects/:media_object_id/media_tracks" => "media_tracks#create", :as => :create_media_tracks
-  delete "media_objects/:media_object_id/media_tracks/:media_track_id" => "media_tracks#destroy", :as => :delete_media_tracks
+  delete "media_objects/:media_object_id/media_tracks/:id" => "media_tracks#destroy", :as => :delete_media_tracks
 
   post "media_attachments" => "media_objects#create_media_object", :as => :create_media_attachment
   get "media_attachments/:attachment_id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_attachment_thumbnail
   get "media_attachments/:attachment_id/info" => "media_objects#show", :as => :media_attachment_info
   get "media_attachments_iframe/:attachment_id" => "media_objects#iframe_media_player", :as => :media_attachment_iframe
+  get "media_attachments/:attachment_id/media_tracks/:id" => "media_tracks#show", :as => :show_media_attachment_tracks
+  post "media_attachments/:attachment_id/media_tracks" => "media_tracks#create", :as => :create_media_attachment_tracks
+  delete "media_attachments/:attachment_id/media_tracks/:id" => "media_tracks#destroy", :as => :delete_media_attachment_tracks
 
   get "external_content/success/:service" => "external_content#success", :as => :external_content_success
   get "external_content/success/:service/:id" => "external_content#success", :as => :external_content_update
@@ -1069,6 +1072,9 @@ CanvasRails::Application.routes.draw do
       get "media_objects", controller: "media_objects", action: :index, as: :media_objects
       get "courses/:course_id/media_objects", controller: "media_objects", action: :index, as: :course_media_objects
       get "groups/:group_id/media_objects", controller: "media_objects", action: :index, as: :group_media_objects
+      get "media_attachments", controller: "media_objects", action: :index, as: :media_attachments
+      get "courses/:course_id/media_attachments", controller: "media_objects", action: :index, as: :course_media_attachments
+      get "groups/:group_id/media_attachments", controller: "media_objects", action: :index, as: :group_media_attachments
       put "accounts/:account_id/courses", action: :batch_update
       post "courses/:course_id/ping", action: :ping, as: "course_ping"
 
@@ -1263,6 +1269,7 @@ CanvasRails::Application.routes.draw do
         delete "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_unread, as: "#{context}_submission_mark_unread"
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read/:item", action: :mark_submission_item_read, as: "#{context}_submission_mark_item_read"
         put "#{context.pluralize}/:#{context}_id/submissions/bulk_mark_read", action: :mark_bulk_submissions_as_read, as: "#{context}_submissions_bulk_mark_read"
+        put "#{context.pluralize}/:#{context}_id/submissions/:user_id/clear_unread", action: :submissions_clear_unread, as: "#{context}_submissions_clear_unread"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :document_annotations_read_state, as: "#{path_prefix}_submission_document_annotations_read_state"
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :mark_document_annotations_read, as: "#{path_prefix}_submission_document_annotations_mark_read"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/rubric_comments/read", action: :rubric_assessments_read_state, as: "#{path_prefix}_submission_rubric_comments_read_state"
@@ -2423,6 +2430,9 @@ CanvasRails::Application.routes.draw do
     scope(controller: :media_tracks) do
       get "media_objects/:media_object_id/media_tracks", action: "index", as: :list_media_tracks
       put "media_objects/:media_object_id/media_tracks", action: "update", as: :update_media_tracks
+
+      get "media_attachments/:attachment_id/media_tracks", action: "index", as: :list_media_attachment_tracks
+      put "media_attachments/:attachment_id/media_tracks", action: "update", as: :update_media_attachment_tracks
     end
 
     scope(controller: "conditional_release/rules") do

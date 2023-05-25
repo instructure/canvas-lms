@@ -28,6 +28,7 @@ class ExternalContentController < ApplicationController
   protect_from_forgery except: [:selection_test, :success], with: :exception
 
   before_action :require_user, only: :oembed_retrieve
+  before_action :check_disable_oembed_retrieve_feature_flag, only: :oembed_retrieve
   before_action :validate_oembed_token!, only: :oembed_retrieve
 
   rescue_from Lti::Concerns::Oembed::OembedAuthorizationError do |error|
@@ -99,6 +100,12 @@ class ExternalContentController < ApplicationController
 
     return_types = { "basic_lti" => "lti_launch_url", "link" => "url", "image" => "image_url" }
     params[:return_type] = return_types[params[:return_type]] if return_types.key? params[:return_type]
+  end
+
+  def check_disable_oembed_retrieve_feature_flag
+    if @domain_root_account.feature_enabled?(:disable_oembed_retrieve)
+      render json: { message: "This endpoint is no longer supported." }, status: :gone
+    end
   end
 
   def oembed_retrieve

@@ -32,7 +32,7 @@ type StudentPeerUrlQueryParams = {
 
 type AssignmentPeerReview = Pick<
   Assignment,
-  'id' | 'course_id' | 'anonymous_peer_reviews' | 'assessment_requests'
+  'id' | 'course_id' | 'anonymous_peer_reviews' | 'assessment_requests' | 'name'
 >
 
 export type StudentViewPeerReviewsProps = {
@@ -62,6 +62,8 @@ export const StudentViewPeerReviews = ({assignment}: StudentViewPeerReviewsProps
 
 const PeerReview = ({assessment, assignment, index}: PeerReviewProps) => {
   const title = I18n.t(`Required Peer Review %{index}`, {index: index + 1})
+  const {name: assignmentName} = assignment
+  const screenreaderLabel = I18n.t('%{title} for %{assignmentName}', {title, assignmentName})
   const revieweeUsername = !assessment.available
     ? I18n.t('Not Available')
     : assignment?.anonymous_peer_reviews
@@ -84,28 +86,12 @@ const PeerReview = ({assessment, assignment, index}: PeerReviewProps) => {
     <li className="context_module_item student-view cannot-duplicate indent_1">
       <div className="ig-row">
         <div className="ig-row__layout">
-          <a
-            aria-label={title}
-            tabIndex={-1}
-            style={{
-              position: 'absolute',
-              left: '-10000px',
-              top: 'auto',
-              width: '1px',
-              height: '1px',
-              overflow: 'hidden',
-            }}
-            href={studentPeerReviewUrl()}
-          >
-            {title}
-          </a>
           <span
             className="type_icon display_icons"
             title={title}
             role="none"
             style={{fontSize: '1.125rem'}}
           >
-            <span className="screenreader-only">{title}</span>
             <View as="span" margin="0 0 0 medium">
               <IconArrowNestLine />
             </View>
@@ -116,12 +102,13 @@ const PeerReview = ({assessment, assignment, index}: PeerReviewProps) => {
           <div className="ig-info">
             <div className="module-item-title">
               <span className="item_name">
-                <a title={title} className="ig-title title item_link" href={studentPeerReviewUrl()}>
+                <a
+                  aria-label={screenreaderLabel}
+                  className="ig-title title item_link"
+                  href={studentPeerReviewUrl()}
+                >
                   {title}
                 </a>
-                <span title={title} className="title locked_title">
-                  {title}
-                </span>
               </span>
             </div>
 
