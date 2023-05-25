@@ -466,18 +466,24 @@ describe Attachment do
       end
 
       it "matches type" do
-        expect(@course.attachments.by_content_types(["image"]).pluck(:id).sort).to eq [@gif.id, @jpg.id].sort
+        expect(@course.attachments.by_content_types(["image"]).pluck(:id)).to match_array([@gif.id, @jpg.id])
       end
 
       it "matches type/subtype" do
         expect(@course.attachments.by_content_types(["image/gif"]).pluck(:id)).to eq [@gif.id]
-        expect(@course.attachments.by_content_types(["image/gif", "image/jpeg"]).pluck(:id).sort).to eq [@gif.id, @jpg.id].sort
+        expect(@course.attachments.by_content_types(["image/gif", "image/jpeg"]).pluck(:id)).to match_array([@gif.id, @jpg.id])
       end
 
       it "escapes sql and wildcards" do
         expect(@course.attachments.by_content_types(["%"]).pluck(:id)).to eq [@weird.id]
         expect(@course.attachments.by_content_types(["%/what's this"]).pluck(:id)).to eq [@weird.id]
         expect(@course.attachments.by_content_types(["%/%"]).pluck(:id)).to eq []
+      end
+
+      it "finds tags without slashes" do
+        video1 = attachment_model context: @course, content_type: "video"
+        video2 = attachment_model context: @course, content_type: "video/mp4"
+        expect(@course.attachments.by_content_types(["video"]).pluck(:id)).to match_array([video1.id, video2.id])
       end
     end
 
@@ -491,20 +497,26 @@ describe Attachment do
       end
 
       it "matches type" do
-        expect(@course.attachments.by_exclude_content_types(["image"]).pluck(:id).sort).to eq [@txt.id, @pdf.id].sort
+        expect(@course.attachments.by_exclude_content_types(["image"]).pluck(:id)).to match_array([@txt.id, @pdf.id])
       end
 
       it "matches type/subtype" do
-        expect(@course.attachments.by_exclude_content_types(["image/gif"]).pluck(:id).sort).to eq [@jpg.id, @txt.id, @pdf.id].sort
-        expect(@course.attachments.by_exclude_content_types(["image/gif", "image/jpeg"]).pluck(:id).sort).to eq [@txt.id, @pdf.id].sort
+        expect(@course.attachments.by_exclude_content_types(["image/gif"]).pluck(:id)).to match_array([@jpg.id, @txt.id, @pdf.id])
+        expect(@course.attachments.by_exclude_content_types(["image/gif", "image/jpeg"]).pluck(:id)).to match_array([@txt.id, @pdf.id])
       end
 
       it "escapes sql and wildcards" do
         @weird = attachment_model context: @course, content_type: "%/what's this"
 
-        expect(@course.attachments.by_exclude_content_types(["%"]).pluck(:id).sort).to eq [@gif.id, @jpg.id, @txt.id, @pdf.id].sort
-        expect(@course.attachments.by_exclude_content_types(["%/what's this"]).pluck(:id).sort).to eq [@gif.id, @jpg.id, @txt.id, @pdf.id].sort
-        expect(@course.attachments.by_exclude_content_types(["%/%"]).pluck(:id).sort).to eq [@gif.id, @jpg.id, @txt.id, @pdf.id, @weird.id].sort
+        expect(@course.attachments.by_exclude_content_types(["%"]).pluck(:id)).to match_array([@gif.id, @jpg.id, @txt.id, @pdf.id])
+        expect(@course.attachments.by_exclude_content_types(["%/what's this"]).pluck(:id)).to match_array([@gif.id, @jpg.id, @txt.id, @pdf.id])
+        expect(@course.attachments.by_exclude_content_types(["%/%"]).pluck(:id)).to match_array([@gif.id, @jpg.id, @txt.id, @pdf.id, @weird.id])
+      end
+
+      it "finds tags without slashes" do
+        attachment_model context: @course, content_type: "video"
+        attachment_model context: @course, content_type: "video/mp4"
+        expect(@course.attachments.by_exclude_content_types(["video"]).pluck(:id)).to match_array([@gif.id, @jpg.id, @txt.id, @pdf.id])
       end
     end
   end
