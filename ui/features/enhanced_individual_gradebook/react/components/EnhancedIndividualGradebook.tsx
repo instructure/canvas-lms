@@ -83,8 +83,10 @@ export default function EnhancedIndividualGradebook() {
         assignmentGroupsConnection.nodes
       )
 
+      const sortedAssignments = mappedAssignments.sort((a, b) => a.name.localeCompare(b.name))
+
       setAssignmentGroupMap(mappedAssignmentGroupMap)
-      setAssignments(mappedAssignments)
+      setAssignments(sortedAssignments)
       setSubmissions(submissionsConnection.nodes)
 
       const studentEnrollments = enrollmentsConnection.nodes.map(enrollment => enrollment.user)

@@ -107,6 +107,9 @@ export type GradebookUserSubmissionDetails = {
   submittedAt: string
   state: string
   excused: boolean
+  late: boolean
+  latePolicyStatus?: string
+  missing: boolean
 }
 
 export type GradebookStudentQueryResponse = {

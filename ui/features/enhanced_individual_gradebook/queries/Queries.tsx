@@ -95,7 +95,10 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           name
         }
       }
-      submissionsConnection(studentIds: $userIds) {
+      submissionsConnection(
+        studentIds: $userIds
+        filter: {states: [graded, pending_review, submitted, ungraded, unsubmitted]}
+      ) {
         nodes {
           grade
           id: _id
@@ -107,6 +110,9 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           state
           proxySubmitter
           excused
+          late
+          latePolicyStatus
+          missing
         }
       }
     }

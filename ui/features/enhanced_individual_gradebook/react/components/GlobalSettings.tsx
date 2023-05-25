@@ -137,6 +137,15 @@ export default function GlobalSettings() {
               </label>
             </View>
           {{/unless}} */}
+          <div
+            className="checkbox"
+            style={{padding: 12, margin: '10px 0px', background: '#eee', borderRadius: 5}}
+          >
+            <label className="checkbox" htmlFor="show_total_as_points">
+              <input type="checkbox" id="show_total_as_points" name="show_total_as_points" />
+              {I18n.t('Show Totals as Points on Student Grade Page')}
+            </label>
+          </div>
         </View>
       </View>
 
