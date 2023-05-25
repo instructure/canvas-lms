@@ -23,7 +23,8 @@ import PropTypes from 'prop-types'
 
 import {Table} from '@instructure/ui-table'
 
-import {getGradingPeriodID} from './utils'
+import {GradeSummaryContext} from './context'
+import {getGradingPeriodID, sortAssignments} from './utils'
 
 import {totalRow} from './AssignmentTableRows/TotalRow'
 import {assignmentGroupRow} from './AssignmentTableRows/AssignmentGroupRow'
@@ -46,6 +47,8 @@ const AssignmentTable = ({
   setSelectedSubmission,
   handleReadStateChange,
 }) => {
+  const {assignmentSortBy} = React.useContext(GradeSummaryContext)
+
   return (
     <Table caption={I18n.t('Student Grade Summary')} layout={layout} hover={true}>
       <Table.Head>
@@ -63,15 +66,17 @@ const AssignmentTable = ({
         </Table.Row>
       </Table.Head>
       <Table.Body>
-        {queryData?.assignmentsConnection?.nodes?.map(assignment => {
-          return assignmentRow(
-            assignment,
-            queryData,
-            setShowTray,
-            setSelectedSubmission,
-            handleReadStateChange
-          )
-        })}
+        {sortAssignments(assignmentSortBy, queryData?.assignmentsConnection?.nodes)?.map(
+          assignment => {
+            return assignmentRow(
+              assignment,
+              queryData,
+              setShowTray,
+              setSelectedSubmission,
+              handleReadStateChange
+            )
+          }
+        )}
         {getGradingPeriodID() !== '0'
           ? queryData?.assignmentGroupsConnection?.nodes?.map(assignmentGroup => {
               return assignmentGroupRow(assignmentGroup, queryData)

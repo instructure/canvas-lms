@@ -25,6 +25,9 @@ import {AssignmentGroup} from '../../../graphql/AssignmentGroup'
 import {GradingStandard} from '../../../graphql/GradingStandard'
 import {GradingPeriod} from '../../../graphql/GradingPeriod'
 import {Submission} from '../../../graphql/Submission'
+
+import {ASSIGNMENT_SORT_OPTIONS} from '../constants'
+
 import {
   formatNumber,
   submissionCommentsPresent,
@@ -47,6 +50,7 @@ import {
   getCourseEarnedPoints,
   getCoursePercentage,
   getTotal,
+  sortAssignments,
 } from '../utils'
 
 const createAssignment = (score, pointsPossible) => {
@@ -114,6 +118,65 @@ describe('util', () => {
         },
       }
       expect(getAssignmentGroupScore(assignmentGroupWithNoScores)).toBe('N/A')
+    })
+  })
+
+  describe('sortAssignments', () => {
+    describe('by due date', () => {
+      it('should sort assignments by due date ascending', () => {
+        const assignments = [
+          Assignment.mock({dueAt: getTime(false)}),
+          Assignment.mock({dueAt: getTime(true)}),
+          Assignment.mock({dueAt: getTime(false)}),
+          Assignment.mock({dueAt: getTime(true)}),
+        ]
+        const sortedAssignments = sortAssignments(ASSIGNMENT_SORT_OPTIONS.DUE_DATE, assignments)
+        expect(sortedAssignments).toEqual([
+          assignments[1],
+          assignments[3],
+          assignments[0],
+          assignments[2],
+        ])
+      })
+    })
+
+    describe('by name', () => {
+      it('should sort assignments by name ascending', () => {
+        const assignments = [
+          Assignment.mock({name: 'A'}),
+          Assignment.mock({name: 'C'}),
+          Assignment.mock({name: 'B'}),
+          Assignment.mock({name: 'D'}),
+        ]
+        const sortedAssignments = sortAssignments(ASSIGNMENT_SORT_OPTIONS.NAME, assignments)
+        expect(sortedAssignments).toEqual([
+          assignments[0],
+          assignments[2],
+          assignments[1],
+          assignments[3],
+        ])
+      })
+    })
+
+    describe('by assignment group', () => {
+      it('should sort assignments by assignment group ascending', () => {
+        const assignments = [
+          Assignment.mock({assignmentGroup: AssignmentGroup.mock({name: 'A'})}),
+          Assignment.mock({assignmentGroup: AssignmentGroup.mock({name: 'C'})}),
+          Assignment.mock({assignmentGroup: AssignmentGroup.mock({name: 'B'})}),
+          Assignment.mock({assignmentGroup: AssignmentGroup.mock({name: 'C'})}),
+        ]
+        const sortedAssignments = sortAssignments(
+          ASSIGNMENT_SORT_OPTIONS.ASSIGNMENT_GROUP,
+          assignments
+        )
+        expect(sortedAssignments).toEqual([
+          assignments[0],
+          assignments[2],
+          assignments[1],
+          assignments[3],
+        ])
+      })
     })
   })
 

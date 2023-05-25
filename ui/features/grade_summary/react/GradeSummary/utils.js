@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {ASSIGNMENT_SORT_OPTIONS} from './constants'
 import {IconCheckLine, IconXLine} from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -37,6 +38,23 @@ export const filteredAssignments = data => {
       return !assignment?.submissionsConnection?.nodes[0]?.hideGradeFromStudent
     }) || []
   )
+}
+
+export const sortAssignments = (sortBy, assignments) => {
+  if (sortBy === ASSIGNMENT_SORT_OPTIONS.NAME) {
+    assignments = [...assignments]?.sort((a, b) => a?.name?.localeCompare(b?.name))
+  } else if (sortBy === ASSIGNMENT_SORT_OPTIONS.DUE_DATE) {
+    const assignmentsWithDueDates = assignments
+      ?.filter(a => a?.dueAt)
+      ?.sort((a, b) => a?.dueAt?.localeCompare(b?.dueAt))
+    const assignmentsWithoutDueDates = assignments?.filter(a => !a?.dueAt)
+    assignments = [...assignmentsWithDueDates, ...assignmentsWithoutDueDates]
+  } else if (sortBy === ASSIGNMENT_SORT_OPTIONS.ASSIGNMENT_GROUP) {
+    assignments = [...assignments]?.sort((a, b) =>
+      a?.assignmentGroup?.name?.localeCompare(b?.assignmentGroup?.name)
+    )
+  }
+  return assignments
 }
 
 export const getAssignmentGroupScore = assignmentGroup => {
