@@ -528,6 +528,44 @@ describe OutcomeResultsController do
             expect(json["outcome_results"].length).to be 2
             expect(json["linked"]["assignments"].length).to be 2
           end
+
+          context 'with nil "outcome_ids" parameter' do
+            subject do
+              get "index", params: {
+                context_id: @course.id,
+                course_id: @course.id,
+                context_type: "Course",
+                user_ids: [@student.id]
+              }
+
+              response.parsed_body
+            end
+
+            before do
+              outcome2 = @course.created_learning_outcomes.create!(title: "outcome 2")
+              og = @course.root_outcome_group
+              og.add_outcome(outcome2)
+              create_result(student.id, @outcome, @assignment, 2, { possible: 5 })
+
+              mocked_results_1 = mock_os_lor_results(student, @outcome, @assignment2, 2)
+              mocked_results_2 = mock_os_lor_results(student, outcome2, @assignment2, 2)
+              allow(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(
+                [mocked_results_1, mocked_results_2]
+              )
+            end
+
+            it "has empty outcome results in the response" do
+              expect(subject["outcome_results"]).to be_empty
+            end
+
+            it "has empty linked assignments in the response" do
+              expect(subject.dig("linked", "assignments")).to be_nil
+            end
+
+            it "responds with a 200" do
+              expect(response).to be_successful
+            end
+          end
         end
       end
 
