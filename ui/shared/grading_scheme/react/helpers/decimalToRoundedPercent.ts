@@ -19,8 +19,8 @@
 import {roundToTwoDecimalPlaces} from './roundToTwoDecimalPlaces'
 
 export function decimalToRoundedPercent(value: number): number {
-  if (value > 1) {
-    throw new Error('value must be a decimal')
+  if (value > 1.0) {
+    throw new Error(`value ${value} must be a decimal`)
   }
   return roundToTwoDecimalPlaces(value * 100)
 }
