@@ -1175,6 +1175,16 @@ describe Account do
       expect(tab[:args]).to eq [@account.id, tool.id]
     end
 
+    it "does not include external tools for subaccounts if 'root_account_only' is used" do
+      expect(@account.root_account?).to be false
+      course_with_teacher(account: @account.root_account)
+      tool = @account.root_account.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
+      tool.account_navigation = { url: "http://www.example.com", text: "Example URL", root_account_only: true }
+      tool.save!
+      expect(@account.root_account.tabs_available(@teacher).pluck(:id)).to include(tool.asset_string)
+      expect(@account.tabs_available(@teacher).pluck(:id)).to_not include(tool.asset_string)
+    end
+
     it "does not include external tools for non-admins if visibility is set" do
       course_with_teacher(account: @account)
       tool = @account.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")

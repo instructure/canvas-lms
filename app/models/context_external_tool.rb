@@ -339,6 +339,7 @@ class ContextExternalTool < ActiveRecord::Base
       windowTarget
       url
       target_link_uri
+      root_account_only
     ]
 
     if (custom_keys = CUSTOM_EXTENSION_KEYS[type])
