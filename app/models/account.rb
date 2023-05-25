@@ -1855,8 +1855,15 @@ class Account < ActiveRecord::Base
   TAB_RELEASE_NOTES = 17
 
   def external_tool_tabs(opts, user)
-    tools = Lti::ContextToolFinder.new(self, type: :account_navigation).all_tools_scope_union.to_unsorted_array
-                                  .select { |t| t.permission_given?(:account_navigation, user, self) && t.feature_flag_enabled?(self) }
+    tools = Lti::ContextToolFinder
+            .new(self, type: :account_navigation)
+            .all_tools_scope_union.to_unsorted_array
+            .select { |t| t.permission_given?(:account_navigation, user, self) && t.feature_flag_enabled?(self) }
+
+    unless root_account?
+      tools.reject! { |t| t.account_navigation[:root_account_only].to_s.downcase == "true" }
+    end
+
     Lti::ExternalToolTab.new(self, :account_navigation, tools, opts[:language]).tabs
   end
 
