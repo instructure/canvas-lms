@@ -1642,7 +1642,7 @@ class Attachment < ActiveRecord::Base
       clauses << if type.include? "/"
                    sanitize_sql_array(["(attachments.content_type=?)", type])
                  else
-                   wildcard("attachments.content_type", type + "/", type: :right)
+                   wildcard("attachments.content_type", type, type: :right)
                  end
     end
     clauses.join(" OR ")
