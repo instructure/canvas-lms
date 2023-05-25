@@ -17,11 +17,16 @@
  */
 
 import React from 'react'
-import {View} from '@instructure/ui-view'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {AssignmentConnection, GradebookOptions} from '../../types'
-import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
+import {View} from '@instructure/ui-view'
+import {AssignmentConnection, GradebookOptions, GradebookUserSubmissionDetails} from '../../types'
+import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
+import {Pill} from '@instructure/ui-pill'
+import {Button} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -55,55 +60,18 @@ export default function GradingResults({assignment, courseId, gradebookOptions, 
     )
   }
 
-  const renderSubmissionStatus = () => {
-    switch (submission.state) {
-      case 'late':
-        return (
-          <span className="late-pill">
-            <ul className="pill pill-align error">
-              <li className="error">
-                <strong>late</strong>
-              </li>
-            </ul>
-          </span>
-        )
-      case 'missing':
-        return (
-          <span className="missing-pill">
-            <ul className="pill pill-align error">
-              <li className="error">
-                <strong>missing</strong>
-              </li>
-            </ul>
-          </span>
-        )
-      case 'extended':
-        return (
-          <span className="extended-pill">
-            <ul className="pill pill-align error">
-              <li className="error">
-                <strong>extended</strong>
-              </li>
-            </ul>
-          </span>
-        )
-      default:
-        return null
-    }
-  }
-
   const submitterPreviewText = () => {
     if (!submission.submissionType) {
       return I18n.t('Has not submitted')
     }
+    const formattedDate = DateHelper.formatDatetimeForDisplay(submission.submittedAt)
     if (submission.proxySubmitter) {
       return I18n.t('Submitted by %{proxy} on %{date}', {
         proxy: submission.proxySubmitter,
-        date: submission.submittedAt, // TODO: format date
+        date: formattedDate,
       })
     }
-    // TODO: format date
-    return I18n.t('Submitted on %{date}', {date: submission.submittedAt})
+    return I18n.t('Submitted on %{date}', {date: formattedDate})
   }
 
   const outOfText = () => {
@@ -134,30 +102,82 @@ export default function GradingResults({assignment, courseId, gradebookOptions, 
           </View>
           <View as="div" className="span8 pad-box top-only">
             <View as="div">
-              {/* TODO: fix text size */}
               <View as="span">
                 {gradebookOptions.anonymizeStudents ? (
                   // TOOD: handle anonymous names
-                  <View as="strong">Grade for: anonymous_name</View>
+                  <Text size="small">
+                    <View as="strong">Grade for: anonymous_name</View>
+                  </Text>
                 ) : (
-                  <View as="strong">{`Grade for ${currentStudent?.name} - ${assignment.name}`}</View>
+                  <Text size="small">
+                    <View as="strong">{`Grade for ${currentStudent?.name} - ${assignment.name}`}</View>
+                  </Text>
                 )}
 
-                {renderSubmissionStatus()}
+                <SubmissionStatus submission={submission} />
               </View>
             </View>
-            {/* TODO: fix text size */}
-            <View as="span">{submitterPreviewText()}</View>
+            <View as="span">
+              <Text size="small">{submitterPreviewText()}</Text>
+            </View>
 
             <View as="div" className="grade">
-              <TextInput display="inline-block" width="14rem" value={submission.grade} />
+              <TextInput
+                display="inline-block"
+                width="14rem"
+                value={submission.grade ?? '-'}
+                renderLabel={<ScreenReaderContent>{I18n.t('Student Grade')}</ScreenReaderContent>}
+              />
               <View as="span" margin="0 0 0 small">
                 {outOfText()}
               </View>
+            </View>
+
+            {assignment.gradingType !== 'pass_fail' && (
+              <div
+                className="checkbox"
+                style={{padding: 12, margin: '15px 0 0 0', background: '#eee', borderRadius: 5}}
+              >
+                <label className="checkbox" htmlFor="excuse_assignment">
+                  <input type="checkbox" id="excuse_assignment" name="excuse_assignment" />
+                  {I18n.t('Excuse This Assignment for the Selected Student')}
+                </label>
+              </div>
+            )}
+
+            <View as="div" className="span4" margin="medium 0 0 0" width="14.6rem">
+              <Button display="block">{I18n.t('Submission Details')}</Button>
             </View>
           </View>
         </View>
       </View>
     </>
+  )
+}
+
+type SubmissionStatusProps = {
+  submission: GradebookUserSubmissionDetails
+}
+function SubmissionStatus({submission}: SubmissionStatusProps) {
+  let text = ''
+
+  if (submission.late) {
+    text = 'LATE'
+  } else if (submission.missing) {
+    text = 'MISSING'
+  } else if (submission.latePolicyStatus === 'extended') {
+    text = 'EXTENDED'
+  } else {
+    return null
+  }
+
+  return (
+    <View as="span">
+      <Pill margin="small" color="danger">
+        <View as="strong" padding="x-small">
+          {I18n.t('%{text}', {text})}
+        </View>
+      </Pill>
+    </View>
   )
 }
