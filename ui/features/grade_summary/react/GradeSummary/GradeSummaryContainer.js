@@ -37,6 +37,7 @@ import {UPDATE_SUBMISSIONS_READ_STATE} from '../../graphql/Mutations'
 import AssignmentTable from './AssignmentTable'
 import SubmissionComment from './SubmissionComment'
 import {getGradingPeriodID} from './utils'
+import {GradeSummaryContext} from './context'
 
 const I18n = useI18nScope('grade_summary')
 
@@ -51,7 +52,6 @@ const GradeSummaryContainer = () => {
   const assignmentQuery = useQuery(ASSIGNMENTS, {
     variables: {
       courseID: ENV.course_id,
-      studentID: ENV.current_user.id,
       gradingPeriodID: gradingPeriod && gradingPeriod !== '0' ? gradingPeriod : null,
     },
   })
@@ -113,6 +113,10 @@ const GradeSummaryContainer = () => {
     )
   }
 
+  const gradeSummaryContext = {
+    assignmentSortBy: document.querySelector('#assignment_sort_order_select_menu').value,
+  }
+
   const handleReadStateChange = submissionID => {
     if (!submissionID) return
     const arr = [...submissionIdsForUpdate, submissionID]
@@ -153,31 +157,33 @@ const GradeSummaryContainer = () => {
       }}
     >
       {({layout}) => (
-        <View as="div">
-          <AssignmentTable
-            queryData={assignmentQuery?.data?.legacyNode}
-            layout={layout}
-            setShowTray={setShowTray}
-            setSelectedSubmission={setSelectedSubmission}
-            handleReadStateChange={handleReadStateChange}
-          />
-          <Tray
-            label={I18n.t('Submission Comments Tray')}
-            open={showTray}
-            onDismiss={() => {
-              setShowTray(false)
-            }}
-            size="medium"
-            placement="end"
-          >
-            <View as="div" padding="medium">
-              {renderCloseButton()}
-              {selectedSubmission?.commentsConnection?.nodes?.map(comment => {
-                return <SubmissionComment comment={comment} key={comment?._id} />
-              })}
-            </View>
-          </Tray>
-        </View>
+        <GradeSummaryContext.Provider value={gradeSummaryContext}>
+          <View as="div">
+            <AssignmentTable
+              queryData={assignmentQuery?.data?.legacyNode}
+              layout={layout}
+              setShowTray={setShowTray}
+              setSelectedSubmission={setSelectedSubmission}
+              handleReadStateChange={handleReadStateChange}
+            />
+            <Tray
+              label={I18n.t('Submission Comments Tray')}
+              open={showTray}
+              onDismiss={() => {
+                setShowTray(false)
+              }}
+              size="medium"
+              placement="end"
+            >
+              <View as="div" padding="medium">
+                {renderCloseButton()}
+                {selectedSubmission?.commentsConnection?.nodes?.map(comment => {
+                  return <SubmissionComment comment={comment} key={comment?._id} />
+                })}
+              </View>
+            </Tray>
+          </View>
+        </GradeSummaryContext.Provider>
       )}
     </Responsive>
   )
