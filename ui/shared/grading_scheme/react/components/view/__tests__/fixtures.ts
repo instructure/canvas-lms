@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingScheme} from '../../../../gradingSchemeApiModel'
+import {GradingScheme, GradingSchemeTemplate} from '../../../../gradingSchemeApiModel'
 
 export const MOCK_COURSE_GRADING_SCHEME: GradingScheme = {
   assessed_assignment: false,
@@ -33,4 +33,15 @@ export const MOCK_COURSE_GRADING_SCHEME: GradingScheme = {
   permissions: {manage: true},
   title: 'A Grading Scheme',
   id: '30',
+}
+
+export const MOCK_DEFAULT_GRADING_SCHEME: GradingSchemeTemplate = {
+  data: [
+    {name: 'A', value: 0.9},
+    {name: 'B', value: 0.8},
+    {name: 'C', value: 0.7},
+    {name: 'D', value: 0.6},
+    {name: 'F', value: 0.0},
+  ],
+  title: 'A Grading Scheme',
 }
