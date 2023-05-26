@@ -440,6 +440,7 @@ Style/ClassVars:
   Severity: convention
 Style/CombinableLoops:
   Severity: convention
+  AutoCorrect: false
 Style/CommentedKeyword:
   Severity: convention
   AutoCorrect: false
