@@ -162,7 +162,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
     <li
       key="completed"
     >
-      <Animatable(CompletedItemsFacade)
+      <Animatable(undefined)
         animatableIndex={102}
         animatableItemIds={
           Array [

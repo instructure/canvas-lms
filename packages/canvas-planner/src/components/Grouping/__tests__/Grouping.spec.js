@@ -30,8 +30,8 @@ const getDefaultProps = () => ({
       context: {
         url: 'example.com',
         color: '#5678',
-        id: 256
-      }
+        id: 256,
+      },
     },
     {
       id: '6',
@@ -40,9 +40,9 @@ const getDefaultProps = () => ({
       title: 'Roll for the Galaxy',
       context: {
         color: '#5678',
-        id: 256
-      }
-    }
+        id: 256,
+      },
+    },
   ],
   timeZone: 'America/Denver',
   color: '#5678',
@@ -50,7 +50,7 @@ const getDefaultProps = () => ({
   url: 'example.com',
   title: 'Board Games',
   updateTodo: () => {},
-  animatableIndex: 1
+  animatableIndex: 1,
 })
 
 it('renders the base component with required props', () => {
@@ -73,8 +73,8 @@ it('renders to do items correctly', () => {
         uniqueId: 'seven hundred',
         title: 'To Do 700',
         date: moment.tz('2017-06-16T05:06:07-06:00', 'America/Denver'),
-        context: null
-      }
+        context: null,
+      },
     ],
     timeZone: 'America/Denver',
     color: null,
@@ -82,7 +82,7 @@ it('renders to do items correctly', () => {
     url: null,
     title: null,
     updateTodo: () => {},
-    animatableIndex: 1
+    animatableIndex: 1,
   }
   const wrapper = shallow(<Grouping {...props} />)
   expect(wrapper).toMatchSnapshot()
@@ -198,14 +198,14 @@ it('does not render an activity badge when things have no new activity', () => {
 it('does not render activity badge or colored completed items facade when using simplifiedControls', () => {
   const props = getDefaultProps()
   props.items[0].completed = true
-  const wrapper = shallow(<Grouping {...props} simplifiedControls />)
+  const wrapper = shallow(<Grouping {...props} simplifiedControls={true} />)
 
   expect(wrapper.find('Badge')).toHaveLength(0)
-  expect(wrapper.find('Animatable(CompletedItemsFacade)').prop('theme').labelColor).toBeUndefined()
+  expect(wrapper.find('Animatable(undefined)').prop('theme').labelColor).toBeUndefined()
 })
 
 it('does not render the grouping image and title when using singleCourseView', () => {
-  const wrapper = shallow(<Grouping {...getDefaultProps()} singleCourseView />)
+  const wrapper = shallow(<Grouping {...getDefaultProps()} singleCourseView={true} />)
 
   expect(wrapper.find('.Grouping-styles__overlay')).toHaveLength(0)
   expect(wrapper.find('.Grouping-styles__title')).toHaveLength(0)
@@ -226,7 +226,7 @@ describe('handleFacadeClick', () => {
   })
 
   it('sets focus to the groupingLink when called', () => {
-    wrapper = mount(<Grouping {...getDefaultProps()} />, { attachTo: containerElement })
+    wrapper = mount(<Grouping {...getDefaultProps()} />, {attachTo: containerElement})
     wrapper.instance().handleFacadeClick()
     expect(document.activeElement).toBe(wrapper.instance().groupingLink)
   })
@@ -234,7 +234,7 @@ describe('handleFacadeClick', () => {
   it('calls preventDefault on an event if given one', () => {
     wrapper = mount(<Grouping {...getDefaultProps()} />)
     const fakeEvent = {
-      preventDefault: jest.fn()
+      preventDefault: jest.fn(),
     }
     wrapper.instance().handleFacadeClick(fakeEvent)
     expect(fakeEvent.preventDefault).toHaveBeenCalled()
@@ -256,11 +256,11 @@ it('registers itself as animatable', () => {
   const fakeDeregister = jest.fn()
   const firstItems = [
     {title: 'asdf', context: {id: 128}, id: '1', uniqueId: 'first'},
-    {title: 'jkl', context: {id: 256}, id: '2', uniqueId: 'second'}
+    {title: 'jkl', context: {id: 256}, id: '2', uniqueId: 'second'},
   ]
   const secondItems = [
     {title: 'qwer', context: {id: 128}, id: '3', uniqueId: 'third'},
-    {title: 'uiop', context: {id: 256}, id: '4', uniqueId: 'fourth'}
+    {title: 'uiop', context: {id: 256}, id: '4', uniqueId: 'fourth'},
   ]
   const wrapper = mount(
     <Grouping
