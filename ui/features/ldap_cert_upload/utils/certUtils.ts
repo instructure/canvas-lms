@@ -18,33 +18,20 @@
 
 import {BasicConstraintsExtension, X509Certificate, X509Certificates} from '@peculiar/x509'
 
-export const parseCertificate = (file: File): Promise<X509Certificate> => {
+export const parseCertificate = async (file: File): Promise<X509Certificate> => {
   const isPkcs7 = file.name.endsWith('.p7b')
-  const reader = new FileReader()
 
-  return new Promise((resolve, reject) => {
-    reader.onload = () => {
-      const result = reader.result
+  const result = (await file.text()).replace(/\r/g, '') // CRLF -> LF
 
-      if (result) {
-        // pkcs7 certificates must use a different import strategy
-        if (isPkcs7) {
-          const chain = new X509Certificates()
-          chain.import(result)
-          resolve(chain[0])
-        } else {
-          resolve(new X509Certificate(result))
-        }
-      } else {
-        reject(new Error('No certificate found in selected file'))
-      }
-    }
+  // pkcs7 certificates must use a different import strategy
+  if (isPkcs7) {
+    const chain = new X509Certificates()
+    chain.import(result)
 
-    reader.onerror = () => reject(new Error('Error reading file'))
-    reader.onabort = () => reject(new Error('File reading aborted'))
-
-    reader.readAsArrayBuffer(file)
-  })
+    return chain[0]
+  } else {
+    return new X509Certificate(result)
+  }
 }
 
 export const isCa = (certificate: X509Certificate) =>
