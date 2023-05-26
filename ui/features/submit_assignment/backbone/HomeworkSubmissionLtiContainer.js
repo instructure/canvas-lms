@@ -56,13 +56,12 @@ export default class HomeworkSubmissionLtiContainer {
     ) {
       return
     }
-    processSingleContentItem(event)
-      .then(result => {
-        handleContentItem(result, this.contentReturnView, this.removeDeepLinkingListener)
-      })
-      .catch(e => {
-        handleDeepLinkingError(e, this.contentReturnView, this.embedLtiLaunch.bind(this))
-      })
+    try {
+      const result = processSingleContentItem(event)
+      handleContentItem(result, this.contentReturnView, this.removeDeepLinkingListener)
+    } catch (e) {
+      handleDeepLinkingError(e, this.contentReturnView, this.embedLtiLaunch.bind(this))
+    }
   }
 
   removeDeepLinkingListener = () => {
