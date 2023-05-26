@@ -27,6 +27,8 @@ class WikiPageLookup < ApplicationRecord
 
   resolves_root_account through: :wiki_page
 
+  scope :by_wiki_id, ->(wiki_id) { joins(:wiki_page).where(wiki_page: { wiki: wiki_id }) }
+
   def set_context
     self.context_type ||= wiki_page.context_type
     self.context_id ||= wiki_page.context_id
