@@ -2268,11 +2268,13 @@ class CoursesController < ApplicationController
           set_js_assignment_data
           js_env(SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context))
           js_env(
+            SHOW_SPEED_GRADER_LINK: @current_user.present? && context.allows_speed_grader? && context.grants_any_right?(@current_user, :manage_grades, :view_all_grades),
             QUIZ_LTI_ENABLED: @context.feature_enabled?(:quizzes_next) &&
               !@context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
               @context.quiz_lti_tool.present?,
             FLAGS: {
               newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
+              show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
             }
           )
           js_env(COURSE_HOME: true)
