@@ -250,11 +250,15 @@ describe "BigBlueButton conferences" do
       driver.switch_to.alert.accept
       wait_for_ajaximations
 
-      f("input[label='Start Date']").clear
-      f("input[label='Start Date']").send_keys "August 6, 2021"
-      f("input[label='End Date']").clear
-      f("input[label='End Date']").send_keys "August 8, 2021"
-      f("input[label='End Date']").send_keys(:enter)
+      start_date_picker = fj("label:contains('Start Date')")
+      end_date_picker = fj("label:contains('End Date')")
+      # for both dates, we will base the selection off of the row of the 15th.
+      # no matter the current date when the test is being done, this row will
+      # always be enabled
+      start_date_picker.click
+      fj("button:contains('15')").find_element(:xpath, "../..").find_elements(:css, "button").first.click
+      end_date_picker.click
+      fj("button:contains('15')").find_element(:xpath, "../..").find_elements(:css, "button").last.click
       fj("button:contains('Create')").click
       wait_for_ajaximations
 
