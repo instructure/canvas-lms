@@ -225,7 +225,7 @@
   "page_50c4823d": { "message": "Seite" },
   "peer_review_74f26a13": { "message": "Kollegenkorrektur" },
   "peer_review_for_itemtitle_358cb413": {
-    "message": "Kollegenüberprüfung für { itemTitle }"
+    "message": "Peer-Review für { itemTitle }"
   },
   "points_bceb5005": { "message": "Punkte" },
   "points_points_63e59cce": { "message": "{ points } Punkte" },
