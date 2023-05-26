@@ -18,21 +18,30 @@
 import React, {Component} from 'react'
 import classnames from 'classnames'
 import {momentObj} from 'react-moment-proptypes'
-import {themeable} from '@instructure/ui-themeable'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Pill} from '@instructure/ui-pill'
 import {func, number, string, arrayOf, shape, oneOf, bool} from 'prop-types'
 import BadgeList from '../BadgeList'
-import NotificationBadge, {MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
+import buildStyle from './style'
+import {NotificationBadge, MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
 import {badgeShape, sizeShape} from '../plannerPropTypes'
 import {animatable} from '../../dynamic-ui'
-
-import styles from './styles.css'
-import theme from './theme'
 
 import formatMessage from '../../format-message'
 
 export class CompletedItemsFacade extends Component {
+  constructor(props) {
+    super(props)
+    this.style = buildStyle()
+    this.conditionalTheme = this.style.theme
+      ? {
+          textColor: this.style.theme.labelColor,
+          iconColor: this.style.theme.labelColor,
+          iconMargin: this.style.theme.gutterWidth,
+        }
+      : null
+  }
+
   static propTypes = {
     onClick: func.isRequired,
     itemCount: number.isRequired,
@@ -42,9 +51,10 @@ export class CompletedItemsFacade extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     notificationBadge: oneOf(['none', 'newActivity', 'missing']),
+    // eslint-disable-next-line react/no-unused-prop-types
     date: momentObj, // the scroll-to-today animation requires a date on each component in the planner
     responsiveSize: sizeShape,
-    simplifiedControls: bool
+    simplifiedControls: bool,
   }
 
   static defaultProps = {
@@ -52,7 +62,7 @@ export class CompletedItemsFacade extends Component {
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
     notificationBadge: 'none',
-    responsiveSize: 'large'
+    responsiveSize: 'large',
   }
 
   componentDidMount() {
@@ -113,7 +123,7 @@ export class CompletedItemsFacade extends Component {
     )
     return (
       <NotificationBadge responsiveSize={this.props.responsiveSize}>
-        <div className={styles.activityIndicator}>
+        <div className={this.style.classNames.activityIndicator}>
           <IndicatorComponent
             title={badgeMessage}
             itemIds={this.props.animatableItemIds}
@@ -125,26 +135,20 @@ export class CompletedItemsFacade extends Component {
     )
   }
 
-  render() {
-    const theme = this.theme
-      ? {
-          textColor: this.theme.labelColor,
-          iconColor: this.theme.labelColor,
-          iconMargin: this.theme.gutterWidth
-        }
-      : null
-    return (
+  render = () => (
+    <>
+      <style>{this.style.css}</style>
       <div
         className={classnames(
-          styles.root,
-          styles[this.props.responsiveSize],
+          this.style.classNames.root,
+          this.style.classNames[this.props.responsiveSize],
           'planner-completed-items',
-          this.props.simplifiedControls ? styles.k5Layout : ''
+          this.props.simplifiedControls ? this.style.classNames.k5Layout : ''
         )}
         ref={elt => (this.rootDiv = elt)}
       >
         {this.renderNotificationBadge()}
-        <div className={styles.contentPrimary}>
+        <div className={this.style.classNames.contentPrimary}>
           <ToggleDetails
             ref={ref => (this.buttonRef = ref)}
             onToggle={this.props.onClick}
@@ -156,15 +160,15 @@ export class CompletedItemsFacade extends Component {
                 }`,
               {count: this.props.itemCount}
             )}
-            theme={theme}
+            theme={this.conditionalTheme}
           >
             ToggleDetails requires a child
           </ToggleDetails>
         </div>
-        <div className={styles.contentSecondary}>{this.renderBadges()}</div>
+        <div className={this.style.classNames.contentSecondary}>{this.renderBadges()}</div>
       </div>
-    )
-  }
+    </>
+  )
 }
 
-export default animatable(themeable(theme, styles)(CompletedItemsFacade))
+export default animatable(CompletedItemsFacade)
