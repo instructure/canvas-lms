@@ -1,7 +1,7 @@
 {
   "name": "@instructure/canvas-rce",
   "version": "5.6.16",
-  "description": "A component wrapping canvas's common tinymce usage",
+  "description": "A component wrapping Canvas's usage of Tinymce",
   "main": "lib/index.js",
   "module": "es/index.js",
   "scripts": {
@@ -49,6 +49,13 @@
     "clean:es": "rm -rf es",
     "generate-svgs": "yarn build:cjs && scripts/generateSvgs.js && prettier --write src/rce/plugins/instructure_equation/MathIcon/svgs.js"
   },
+  "keywords": [
+    "canvas",
+    "rich content editor",
+    "rce",
+    "tinymce",
+    "instructure"
+  ],
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",
   "browserslist": [
