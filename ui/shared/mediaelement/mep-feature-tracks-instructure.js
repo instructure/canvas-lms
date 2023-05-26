@@ -507,7 +507,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
         .click(e => {
           e.preventDefault()
           import('./UploadMediaTrackForm').then(({default: UploadMediaTrackForm}) => {
-            new UploadMediaTrackForm(t.options.mediaCommentId, t.media.src)
+            new UploadMediaTrackForm(t.options.mediaCommentId, t.media.src, t.options.attachmentId)
           })
         })
       t.adjustLanguageBox()
