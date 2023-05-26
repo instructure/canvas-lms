@@ -2188,6 +2188,7 @@ describe Account do
     active_admin = account_admin_user(active_all: true)
     deleted_admin = account_admin_user(active_all: true)
     deleted_admin.account_users.destroy_all
+    Account.default.reload
     n = Notification.create(name: "New Account User", category: "TestImmediately")
     [active_admin, deleted_admin].each do |u|
       NotificationPolicy.create(notification: n, communication_channel: u.communication_channel, frequency: "immediately")
