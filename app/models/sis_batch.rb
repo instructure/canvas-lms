@@ -44,10 +44,6 @@ class SisBatch < ActiveRecord::Base
 
   attr_accessor :zip_path
 
-  def self.max_attempts
-    5
-  end
-
   def self.valid_import_types
     @valid_import_types ||= {
       "instructure_csv" => {
