@@ -197,6 +197,9 @@
   "current_image_f16c249c": { "message": "Current Image" },
   "current_volume_level_c55ab825": { "message": "Current Volume Level" },
   "custom_6979cd81": { "message": "Custom" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Custom width and height (Pixels)"
+  },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Dagger" },
   "date_added_ed5ad465": { "message": "Date Added" },
