@@ -44,6 +44,27 @@ type ComponentProps = {
 const BORDER_WIDTH = 'small'
 const BOTTOM_PADDING_OFFSET = 30
 
+const useBeforeUnload = (hasChanges: boolean) => {
+  const dirty = useRef(false)
+
+  useEffect(() => {
+    dirty.current = hasChanges
+  }, [hasChanges])
+
+  useEffect(() => {
+    const onUnload = (e: BeforeUnloadEvent) => {
+      if (dirty.current) {
+        e.preventDefault()
+        e.returnValue = true
+      }
+    }
+
+    window.addEventListener('beforeunload', onUnload)
+
+    return () => window.removeEventListener('beforeunload', onUnload)
+  }, [])
+}
+
 export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
   const autoSubscriptionEnabled = window.ENV?.FEATURES?.auto_subscribe_account_calendars ?? false
   const [visibilityChanges, setVisibilityChanges] = useState<VisibilityChange[]>([])
@@ -139,6 +160,10 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
       })
   }
 
+  const hasChanges = visibilityChanges.length + subscriptionChanges.length > 0
+
+  useBeforeUnload(hasChanges)
+
   const showTree = searchValue === '' && filterValue === FilterType.SHOW_ALL
 
   return (
@@ -209,7 +234,7 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
             originAccountId={accountId}
             visibilityChanges={visibilityChanges}
             onApplyClicked={onApplyClicked}
-            enableSaveButton={visibilityChanges.length + subscriptionChanges.length > 0}
+            enableSaveButton={hasChanges}
             showConfirmation={showConfirmation}
           />
         )}
