@@ -238,11 +238,17 @@ class RceApiSource {
     return this.apiPost(this.baseUri('media_objects'), headerFor(this.jwt), body)
   }
 
-  updateMediaObject(apiProps, {media_object_id, title}) {
-    const uri = `${this.baseUri(
-      'media_objects',
-      apiProps.host
-    )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
+  updateMediaObject(apiProps, {media_object_id, title, attachment_id}) {
+    const uri =
+      RCEGlobals.getFeatures()?.media_links_use_attachment_id && attachment_id
+        ? `${this.baseUri(
+            'media_attachments',
+            apiProps.host
+          )}/${attachment_id}?user_entered_title=${encodeURIComponent(title)}`
+        : `${this.baseUri(
+            'media_objects',
+            apiProps.host
+          )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
     return this.apiPost(uri, headerFor(this.jwt), null, 'PUT')
   }
 
