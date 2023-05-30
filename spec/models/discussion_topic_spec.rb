@@ -59,9 +59,14 @@ describe DiscussionTopic do
         expect(@topic.grading_standard_or_default).to be @grading_standard
       end
 
-      it "returns the grading scheme used by the course, if one exists and the discussion topic is not using one" do
+      it "returns the specific grading scheme used by the course over the default course grading scheme if no grading scheme is set for the assignment" do
+        @course_gs = @course.grading_standards.create! standard_data: {
+          a: { name: "Happy", value: 100 },
+          b: { name: "Sad", value: 0 },
+        }
         @course.update!(default_grading_standard: @grading_standard)
-        expect(@topic.grading_standard_or_default).to be @grading_standard
+        @course.update_attribute :grading_standard, @course_gs
+        expect(@topic.grading_standard_or_default).to be @course_gs
       end
 
       it "returns the grading scheme used by the topic if the topic and course are using a grading scheme" do

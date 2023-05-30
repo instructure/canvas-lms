@@ -1510,6 +1510,8 @@ class Assignment < ActiveRecord::Base
 
   def grading_standard_or_default
     grading_standard ||
+      # use the course's custom grading standard before using defaults
+      context.grading_standard ||
       context.default_grading_standard ||
       GradingStandard.default_instance
   end
@@ -1531,10 +1533,22 @@ class Assignment < ActiveRecord::Base
         score = BigDecimal(score.to_s.presence || "0.0") / BigDecimal(points_possible.to_s)
         result = grading_standard_or_default.score_to_grade((score * 100).to_f)
       elsif given_grade
-        # the score for a zero-point letter_grade assignment could be considered
-        # to be *any* grade, so look at what the current given grade is
-        # instead of trying to calculate it
-        result = given_grade
+        # this block is hit when a zero pointed assignment has been graded
+        result = if force_letter_grade
+                   if score == 0
+                     "complete"
+                   elsif score < 0
+                     given_grade
+                   else
+                     # show a perfect grade when positive / 0
+                     grading_standard_or_default.score_to_grade(100)
+                   end
+                 else
+                   # the score for a zero-point letter_grade assignment could be considered
+                   # to be *any* grade, so look at what the current given grade is
+                   # instead of trying to calculate it
+                   given_grade
+                 end
       else
         # there's not really any reasonable value we can set here -- if the
         # assignment is worth no points, and the grader didn't enter an

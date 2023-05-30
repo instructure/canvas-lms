@@ -3456,6 +3456,40 @@ describe Assignment do
       expect(@submission.user_id).to eql(@user.id)
     end
 
+    context "when force_letter_grade(the third argument of score_to_grade) is true" do
+      it "returns letter grading standard grade for points" do
+        @assignment.grading_type = "points"
+        @assignment.points_possible = 10
+        @assignment.save!
+        submission = @assignment.grade_student(@user, grade: "9", grader: @teacher).first
+        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "A-"
+      end
+
+      it "returns 'complete' for 0/0" do
+        @assignment.grading_type = "points"
+        @assignment.points_possible = 0
+        @assignment.save!
+        submission = @assignment.grade_student(@user, grade: "0", grader: @teacher).first
+        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "complete"
+      end
+
+      it "returns given grade for -1/0" do
+        @assignment.grading_type = "points"
+        @assignment.points_possible = 0
+        @assignment.save!
+        submission = @assignment.grade_student(@user, grade: -1, grader: @teacher).first
+        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "-1"
+      end
+
+      it "returns highest grading scheme grade when 1/0" do
+        @assignment.grading_type = "points"
+        @assignment.points_possible = 0
+        @assignment.save!
+        submission = @assignment.grade_student(@user, grade: 1, grader: @teacher).first
+        expect(@assignment.score_to_grade(submission.score, submission.grade, true)).to eq "A"
+      end
+    end
+
     describe "#grading_standard_or_default" do
       before do
         @gs1 = @course.grading_standards.create! standard_data: {
@@ -3466,11 +3500,23 @@ describe Assignment do
           a: { name: "🚀", value: 100 },
           b: { name: "🚽", value: 0 },
         }
+
+        @gs3 = @course.grading_standards.create! standard_data: {
+          a: { name: "Happy", value: 100 },
+          b: { name: "Sad", value: 0 },
+        }
       end
 
-      it "returns the assignment-specific grading standard if there is one" do
+      it "returns the assignment-specific grading standard if there is one, first and foremost" do
         @assignment.update_attribute :grading_standard, @gs1
+        @course.update_attribute :grading_standard, @gs3
+        @course.update_attribute :default_grading_standard, @gs2
         expect(@assignment.grading_standard_or_default).to eql @gs1
+      end
+
+      it "uses the course specified standard if there is one" do
+        @course.update_attribute :grading_standard, @gs3
+        expect(@assignment.grading_standard_or_default).to eql @gs3
       end
 
       it "uses the course default if there is one" do
