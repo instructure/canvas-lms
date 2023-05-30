@@ -111,10 +111,10 @@ const SubscriptionDropDown: React.FC<ComponentProps> = ({
             isSelected={option.id === selectedOption.id}
             isHighlighted={option.id === highlightedOptionId}
           >
-            <Text as="div">{option.label}</Text>
-            <Text as="div" weight="light">
-              {option.description}
+            <Text as="div" weight="bold">
+              {option.label}
             </Text>
+            <Text as="div">{option.description}</Text>
           </Option>
         )
       })}
