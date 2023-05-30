@@ -251,7 +251,9 @@ Naming/ClassAndModuleCamelCase:
 Naming/ConstantName:
   Severity: convention
 Naming/MemoizedInstanceVariableName:
+  EnforcedStyleForLeadingUnderscores: optional
   Severity: convention
+  AutoCorrect: false
 Naming/MethodName:
   Severity: convention
 Naming/MethodParameterName:
