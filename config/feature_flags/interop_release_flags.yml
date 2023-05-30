@@ -182,3 +182,16 @@ disable_oembed_retrieve:
     If enabled, the deprecated oembed_retrieve endpoint will be unavailable.
     This is to ease transitioning any potential users off this endpoint before
     removing it altogether.
+include_oauth_consumer_key_in_lti_launch:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Enable Sending OAuth Consumer Key
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+  description: |-
+    When enabled, LTI 1.3 launches that would be associated with LTI 1.1 tool
+    if the LTI 1.3 tool wasn't present will include the oauth_consumer_key and
+    oauth_consumer_key_sign properties as part of the LTI 1.1 claims section.
