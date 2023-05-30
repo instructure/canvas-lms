@@ -3579,4 +3579,46 @@ describe ContextExternalTool do
       expect([sk1, sk2, sk3].sort).to eq([sk1, sk3, sk2])
     end
   end
+
+  describe "associated_1_1_tool" do
+    specs_require_cache(:redis_cache_store)
+
+    subject { lti_1_3_tool.associated_1_1_tool(context, url) }
+
+    let(:context) { @course }
+    let(:domain) { "www.test.com" }
+    let(:opts) { { url:, domain: } }
+    let(:requested_url) { nil }
+    let(:url) { "https://www.test.com/foo?bar=1" }
+    let!(:lti_1_1_tool) { external_tool_model(context:, opts:) }
+    let!(:lti_1_3_tool) { external_tool_1_3_model(context:, opts:) }
+
+    it { is_expected.to eq lti_1_1_tool }
+
+    it "caches the result based on the parameters" do
+      expect(subject).to eq lti_1_1_tool
+
+      allow(ContextExternalTool).to receive(:find_external_tool)
+
+      lti_1_3_tool.associated_1_1_tool(context, url)
+      expect(ContextExternalTool).not_to have_received(:find_external_tool)
+
+      lti_1_3_tool.associated_1_1_tool(context, "http://adifferenturl.com")
+      expect(ContextExternalTool).to have_received(:find_external_tool)
+    end
+
+    it "uses the default url stored on the 1.3 tool if no url is passed in" do
+      allow(ContextExternalTool).to receive(:find_external_tool)
+      subject
+      expect(ContextExternalTool).to have_received(:find_external_tool).with(lti_1_3_tool.url, context, nil, nil, { only_associated_1_1_tool: true })
+    end
+
+    context "the 1.1 tool is deleted" do
+      before do
+        lti_1_1_tool.destroy
+      end
+
+      it { is_expected.to eq lti_1_1_tool }
+    end
+  end
 end

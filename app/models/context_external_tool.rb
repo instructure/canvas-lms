@@ -1073,7 +1073,8 @@ class ContextExternalTool < ActiveRecord::Base
     url,
     context,
     preferred_tool_id = nil, exclude_tool_id = nil, preferred_client_id = nil,
-    only_1_3: false
+    only_1_3: false,
+    only_associated_1_1_tool: false
   )
     GuardRail.activate(:secondary) do
       preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
@@ -1088,31 +1089,13 @@ class ContextExternalTool < ActiveRecord::Base
         preferred_tool_id,
         exclude_tool_id,
         preferred_client_id,
-        only_1_3:
+        only_1_3:,
+        only_associated_1_1_tool:
       )
 
-      # Check for a tool that exactly matches the given URL
-      match = find_tool_match(
-        sorted_external_tools,
-        ->(t) { t.matches_url?(url) },
-        ->(t) { t.url.present? }
-      )
+      match = find_matching_tool(sorted_external_tools, url)
 
-      # If exactly match doesn't work, try to match by ignoring extra query parameters
-      match ||= find_tool_match(
-        sorted_external_tools,
-        ->(t) { t.matches_url?(url, false) },
-        ->(t) { t.url.present? }
-      )
-
-      # If still no matches, use domain matching to try to find a tool
-      match ||= find_tool_match(
-        sorted_external_tools,
-        ->(t) { t.matches_tool_domain?(url) },
-        ->(t) { t.domain.present? }
-      )
-
-      # always use the preferred tool id *unless* the preferred tool is a 1.1 tool
+      # always use the preferred tool id *unless* the tool is a 1.1 tool
       # and the matched tool is a 1.3 tool, since 1.3 is the preferred version of a tool
       if can_use_preferred_tool && preferred_tool.matches_domain?(url)
         if match&.use_1_3? && !preferred_tool.use_1_3?
@@ -1126,6 +1109,32 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
+  def self.find_matching_tool(sorted_external_tools, url)
+    # Check for a tool that exactly matches the given URL
+    match = find_tool_match(
+      sorted_external_tools,
+      ->(t) { t.matches_url?(url) },
+      ->(t) { t.url.present? }
+    )
+
+    # If exactly match doesn't work, try to match by ignoring extra query parameters
+    match ||= find_tool_match(
+      sorted_external_tools,
+      ->(t) { t.matches_url?(url, false) },
+      ->(t) { t.url.present? }
+    )
+
+    # If still no matches, use domain matching to try to find a tool
+    match ||= find_tool_match(
+      sorted_external_tools,
+      ->(t) { t.matches_tool_domain?(url) },
+      ->(t) { t.domain.present? }
+    )
+
+    match
+  end
+  private_class_method :find_matching_tool
+
   # Sorts all tools in the context chain by a variety of criteria in SQL
   # as opposed to in memory, in order to make it easier to find a tool that matches
   # the given URL.
@@ -1137,6 +1146,10 @@ class ContextExternalTool < ActiveRecord::Base
   # * if preferred_tool_id is provided, moves that tool to the front
   # * if preferred_client_id is provided, only retrieves tools that came from that developer key
   # * if exclude_tool_id is provided, does not retrieve that tool
+  # * if only_1_3 is set to true, only 1.3 tools are returned
+  # * if only_associated_1_1_tool is set to true, then the result will only contain 1.1 tools,
+  #   regardless of the value of only_1_3. However, these tools can be active or inactive,
+  #   as customers migrating from 1.1 -> 1.3 might have deleted their 1.1 tool.
   #
   # Theoretically once this method is done, the very first tool to match the URL will be
   # the right tool, making it possible to eventually perform the rest of the URL matching
@@ -1144,7 +1157,8 @@ class ContextExternalTool < ActiveRecord::Base
   def self.find_and_order_tools(
     context,
     preferred_tool_id_param, exclude_tool_id, preferred_client_id,
-    only_1_3: false
+    only_1_3: false,
+    only_associated_1_1_tool: false
   )
     context.shard.activate do
       preferred_tool_id = Shard.integral_id_for(preferred_tool_id_param)
@@ -1167,8 +1181,10 @@ class ContextExternalTool < ActiveRecord::Base
         order_clauses << sort_by_sql_string("#{quoted_table_name}.id = #{preferred_tool_id}")
       end
 
-      query = ContextExternalTool.where(context: contexts).active
-      query = query.where(lti_version: "1.3") if only_1_3
+      query = ContextExternalTool.where(context: contexts)
+      query = query.active unless only_associated_1_1_tool
+      query = query.where(lti_version: "1.3") if only_1_3 && !only_associated_1_1_tool
+      query = query.where(lti_version: "1.1") if only_associated_1_1_tool
       query = query.where(developer_key_id: preferred_client_id) if preferred_client_id
       query = query.where.not(id: exclude_tool_id) if exclude_tool_id
 
@@ -1510,6 +1526,20 @@ class ContextExternalTool < ActiveRecord::Base
   # Used in ContextToolFinder
   def sort_key
     [Canvas::ICU.collation_key(name), global_id]
+  end
+
+  def associated_1_1_tool(context, requested_url = nil)
+    requested_url ||= url || domain
+
+    # Finding tools is expensive and this relationship doesn't change very often, so
+    # it's worth it to maintain this possibly "incorrect" relationship for 5 minutes.
+    id = Rails.cache.fetch([global_asset_string, context.global_asset_string, requested_url&.slice(0..1024)].cache_key, expires_in: 5.minutes) do
+      # Rails themselves recommends against caching ActiveRecord models directly
+      # https://guides.rubyonrails.org/caching_with_rails.html#avoid-caching-instances-of-active-record-objects
+      self.class.find_external_tool(requested_url, context, nil, nil, only_associated_1_1_tool: true)&.id
+    end
+
+    ContextExternalTool.find_by(id:)
   end
 
   private
