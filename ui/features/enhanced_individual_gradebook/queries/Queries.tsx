@@ -54,7 +54,6 @@ export const GRADEBOOK_QUERY = gql`
               anonymizeStudents
               gradingType
               id: _id
-              muted
               name
               omitFromFinalGrade
               pointsPossible

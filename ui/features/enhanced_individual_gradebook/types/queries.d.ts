@@ -40,7 +40,6 @@ export type AssignmentConnection = {
   anonymizeStudents: boolean
   omitFromFinalGrade: boolean
   workflowState: WorkflowState
-  muted: boolean
   gradingType: string
 }
 

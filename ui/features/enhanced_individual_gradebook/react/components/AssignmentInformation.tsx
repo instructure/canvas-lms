@@ -163,21 +163,6 @@ type AssignmentActionsProps = {
 function AssignmentActions({assignment, gradebookOptions}: AssignmentActionsProps) {
   return (
     <>
-      <div
-        className="checkbox"
-        style={{padding: '12px', margin: '10px 0px', background: '#eee', borderRadius: '5px'}}
-      >
-        <label className="checkbox" htmlFor="muted-checkbox">
-          {I18n.t('Muted?')}
-          <input
-            id="muted-checkbox"
-            type="checkbox"
-            aria-label="Click to unmute."
-            checked={assignment.muted}
-            readOnly={true}
-          />
-        </label>
-      </div>
       {!gradebookOptions.anonymizeStudents && (
         <View as="div" className="pad-box no-sides">
           <Button color="secondary">{I18n.t('Message students who...')}</Button>
