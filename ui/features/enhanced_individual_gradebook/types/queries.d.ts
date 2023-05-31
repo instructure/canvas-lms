@@ -32,6 +32,11 @@ export type UserConnection = {
   sortableName: string
 }
 
+export type EnrollmentConnection = {
+  user: UserConnection
+  courseSectionId: string
+}
+
 export type AssignmentConnection = {
   id: string
   name: string
@@ -60,9 +65,13 @@ export type AssignmentGroupConnection = {
   }
 }
 
+export type SectionConnection = {
+  id: string
+  name: string
+}
+
 export type SubmissionConnection = {
   assignmentId: string
-  user: UserConnection
   id: string
   score: number
   grade: string
@@ -71,9 +80,10 @@ export type SubmissionConnection = {
 export type GradebookQueryResponse = {
   course: {
     enrollmentsConnection: {
-      nodes: {
-        user: UserConnection
-      }[]
+      nodes: EnrollmentConnection[]
+    }
+    sectionsConnection: {
+      nodes: SectionConnection[]
     }
     submissionsConnection: {
       nodes: SubmissionConnection[]

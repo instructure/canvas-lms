@@ -23,8 +23,11 @@ import {
   AssignmentConnection,
   AssignmentDetailCalculationText,
   AssignmentGroupConnection,
+  EnrollmentConnection,
   GradebookSortOrder,
+  GradebookUserSubmissionDetails,
   SortableAssignment,
+  SortableStudent,
 } from '../types'
 import {AssignmentGroupCriteriaMap} from '../../../shared/grading/grading.d'
 
@@ -70,6 +73,26 @@ export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupC
   )
 }
 
+export function mapEnrollmentsToSortableStudents(
+  enrollments: EnrollmentConnection[]
+): SortableStudent[] {
+  const mappedEnrollments = enrollments.reduce((prev, enrollment) => {
+    const {user, courseSectionId} = enrollment
+    if (!prev[user.id]) {
+      prev[user.id] = {
+        ...user,
+        sections: [courseSectionId],
+      }
+    } else {
+      prev[user.id].sections.push(courseSectionId)
+    }
+
+    return prev
+  }, {} as {[key: string]: SortableStudent})
+
+  return Object.values(mappedEnrollments)
+}
+
 export function sortAssignments(
   assignments: SortableAssignment[],
   sortOrder: GradebookSortOrder
@@ -84,6 +107,17 @@ export function sortAssignments(
     default:
       return assignments
   }
+}
+
+export function filterAssignmentsByStudent(
+  assignments: SortableAssignment[],
+  submissions: GradebookUserSubmissionDetails[]
+) {
+  const assignmentIdMap = submissions.reduce((prev, curr) => {
+    prev[curr.assignmentId] = true
+    return prev
+  }, {} as {[key: string]: boolean})
+  return assignments.filter(assignment => assignmentIdMap[assignment.id])
 }
 
 // This logic was taken directly from ui/features/screenreader_gradebook/jquery/AssignmentDetailsDialog.js

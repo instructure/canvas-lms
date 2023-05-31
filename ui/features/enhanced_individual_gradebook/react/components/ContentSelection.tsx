@@ -19,15 +19,17 @@
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {GradebookOptions, SortableAssignment, UserConnection} from '../../types'
+import {GradebookOptions, SortableAssignment, SortableStudent} from '../../types'
 import {View} from '@instructure/ui-view'
-import {sortAssignments} from '../../utils/gradebookUtils'
+import {filterAssignmentsByStudent, sortAssignments} from '../../utils/gradebookUtils'
+import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
+  courseId: string
   assignments: SortableAssignment[]
-  students: UserConnection[]
+  students: SortableStudent[]
   selectedStudentId?: string | null
   selectedAssignmentId?: string | null
   gradebookOptions: GradebookOptions
@@ -41,7 +43,7 @@ type DropDownOption<T> = {
   data?: T
 }
 
-type StudentDropdownOption = DropDownOption<UserConnection>[]
+type StudentDropdownOption = DropDownOption<SortableStudent>[]
 type AssignmentDropdownOption = DropDownOption<SortableAssignment>[]
 
 const DEFAULT_STUDENT_DROPDOWN_TEXT = I18n.t('No Student Selected')
@@ -51,6 +53,7 @@ const defaultStudentDropdownOptions = {id: '-1', name: DEFAULT_STUDENT_DROPDOWN_
 const defaultAssignmentDropdownOptions = {id: '-1', name: DEFAULT_ASSIGNMENT_DROPDOWN_TEXT}
 
 export default function ContentSelection({
+  courseId,
   students,
   assignments,
   selectedAssignmentId,
@@ -64,14 +67,22 @@ export default function ContentSelection({
     useState<AssignmentDropdownOption>([])
   const [selectedStudentIndex, setSelectedStudentIndex] = useState<number>(0)
   const [selectedAssignmentIndex, setSelectedAssignmentIndex] = useState<number>(0)
+  const {studentSubmissions} = useCurrentStudentInfo(courseId, selectedStudentId)
 
-  const {sortOrder} = gradebookOptions
+  const {sortOrder, selectedSection} = gradebookOptions
 
   // TOOD: might be ablet to refactor to make simpler
   useEffect(() => {
+    const filteredStudents = selectedSection
+      ? students.filter(student => student.sections.includes(selectedSection))
+      : students
     const studentOptions: StudentDropdownOption = [
       defaultStudentDropdownOptions,
-      ...students.map(student => ({id: student.id, name: student.sortableName, data: student})),
+      ...filteredStudents.map(student => ({
+        id: student.id,
+        name: student.sortableName,
+        data: student,
+      })),
     ]
     setStudentDropdownOptions(studentOptions)
 
@@ -82,14 +93,21 @@ export default function ContentSelection({
 
       if (studentIndex !== -1) {
         setSelectedStudentIndex(studentIndex)
+      } else {
+        // if the student is not in the dropdown, reset the student dropdown
+        setSelectedStudentIndex(0)
+        onStudentChange(undefined)
       }
     }
 
     const sortedAssignments = sortAssignments(assignments, sortOrder)
+    const filteredAssignmnets = selectedStudentId
+      ? filterAssignmentsByStudent(sortedAssignments, studentSubmissions)
+      : sortedAssignments
 
     const assignmentOptions: AssignmentDropdownOption = [
       defaultAssignmentDropdownOptions,
-      ...sortedAssignments.map(assignment => ({
+      ...filteredAssignmnets.map(assignment => ({
         id: assignment.id,
         name: assignment.name,
         data: assignment,
@@ -104,9 +122,23 @@ export default function ContentSelection({
 
       if (assignmentIndex >= 0) {
         setSelectedAssignmentIndex(assignmentIndex)
+      } else {
+        // if the assignment is not in the dropdown, reset the assignment dropdown
+        setSelectedAssignmentIndex(0)
+        onAssignmentChange(undefined)
       }
     }
-  }, [students, assignments, selectedStudentId, selectedAssignmentId, sortOrder])
+  }, [
+    students,
+    assignments,
+    selectedStudentId,
+    selectedAssignmentId,
+    selectedSection,
+    sortOrder,
+    studentSubmissions,
+    onAssignmentChange,
+    onStudentChange,
+  ])
 
   const handleChangeStudent = (event?: React.ChangeEvent<HTMLSelectElement>, newIndex?: number) => {
     const selectedIndex = (event ? event.target.selectedIndex : newIndex) ?? 0

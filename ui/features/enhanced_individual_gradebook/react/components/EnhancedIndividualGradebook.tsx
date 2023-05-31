@@ -34,12 +34,16 @@ import {
   GradebookOptions,
   GradebookQueryResponse,
   GradebookSortOrder,
+  SectionConnection,
   SortableAssignment,
+  SortableStudent,
   SubmissionConnection,
-  UserConnection,
 } from '../../types'
 import {GRADEBOOK_QUERY} from '../../queries/Queries'
-import {mapAssignmentGroupQueryResults} from '../../utils/gradebookUtils'
+import {
+  mapAssignmentGroupQueryResults,
+  mapEnrollmentsToSortableStudents,
+} from '../../utils/gradebookUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -47,8 +51,9 @@ const STUDENT_SEARCH_PARAM = 'student'
 const ASSIGNMENT_SEARCH_PARAM = 'assignment'
 
 export default function EnhancedIndividualGradebook() {
+  const [sections, setSections] = useState<SectionConnection[]>([])
   const [submissions, setSubmissions] = useState<SubmissionConnection[]>([])
-  const [students, setStudents] = useState<UserConnection[]>([])
+  const [students, setStudents] = useState<SortableStudent[]>([])
   const [assignments, setAssignments] = useState<SortableAssignment[]>([])
 
   const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || '' // TODO: get from somewhere else?
@@ -90,7 +95,12 @@ export default function EnhancedIndividualGradebook() {
     }
 
     if (data?.course) {
-      const {assignmentGroupsConnection, enrollmentsConnection, submissionsConnection} = data.course
+      const {
+        assignmentGroupsConnection,
+        enrollmentsConnection,
+        sectionsConnection,
+        submissionsConnection,
+      } = data.course
 
       const {mappedAssignmentGroupMap, mappedAssignments} = mapAssignmentGroupQueryResults(
         assignmentGroupsConnection.nodes
@@ -99,9 +109,10 @@ export default function EnhancedIndividualGradebook() {
       setAssignmentGroupMap(mappedAssignmentGroupMap)
       setAssignments(mappedAssignments)
       setSubmissions(submissionsConnection.nodes)
+      setSections(sectionsConnection.nodes)
 
-      const studentEnrollments = enrollmentsConnection.nodes.map(enrollment => enrollment.user)
-      const sortableStudents = studentEnrollments.sort((a, b) => {
+      const mappedEnrollments = mapEnrollmentsToSortableStudents(enrollmentsConnection.nodes)
+      const sortableStudents = mappedEnrollments.sort((a, b) => {
         return a.sortableName.localeCompare(b.sortableName)
       })
       setStudents(sortableStudents)
@@ -140,10 +151,15 @@ export default function EnhancedIndividualGradebook() {
       </View>
 
       <GlobalSettings
+        sections={sections}
         gradebookOptions={gradebookOptions}
         onSortChange={sortType => {
           userSettings.contextSet('sort_grade_columns_by', {sortType})
           const newGradebookOptions = {...gradebookOptions, sortOrder: sortType}
+          setGradebookOptions(newGradebookOptions)
+        }}
+        onSectionChange={sectionId => {
+          const newGradebookOptions = {...gradebookOptions, selectedSection: sectionId}
           setGradebookOptions(newGradebookOptions)
         }}
       />
@@ -151,6 +167,7 @@ export default function EnhancedIndividualGradebook() {
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
       <ContentSelection
+        courseId={courseId}
         assignments={assignments}
         students={students}
         selectedStudentId={selectedStudentId}
