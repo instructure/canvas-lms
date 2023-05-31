@@ -77,7 +77,7 @@ export default function RceFileBrowser(props) {
       title: fileInfo.name,
       href: url,
       embedded_iframe_url,
-      media_id: fileInfo.api.embed?.id,
+      media_id: fileInfo.api.embed?.id || fileInfo.api.mediaEntryId,
       target: '_blank',
       content_type,
     }
