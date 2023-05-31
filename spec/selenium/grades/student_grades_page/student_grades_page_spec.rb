@@ -32,130 +32,130 @@ describe "gradebook - logged in as a student" do
     Factories::GradingPeriodHelper.new
   end
 
-  describe "total point displays" do
-    before(:once) do
-      course_with_student({ active_course: true, active_enrollment: true })
-      @teacher = User.create!
-      @course.enroll_teacher(@teacher)
-      assignment = @course.assignments.build(points_possible: 20)
-      assignment.publish
-      assignment.grade_student(@student, grade: 10, grader: @teacher)
-      assignment.assignment_group.update(group_weight: 1)
-      @course.show_total_grade_as_points = true
-      @course.save!
-    end
-
-    before do
-      user_session(@student)
-      StudentGradesPage.visit_as_student(@course)
-    end
-
-    it "displays total grades as points", priority: "2" do
-      expect(StudentGradesPage.final_grade).to include_text("10")
-    end
-
-    it 'displays total "out of" point values' do
-      expect(StudentGradesPage.final_points_possible).to include_text("10.00 / 20.00")
-    end
-  end
-
-  context "when testing grading periods" do
-    before(:once) do
-      account_admin_user({ active_user: true })
-      course_with_teacher({ user: @user, active_course: true, active_enrollment: true })
-      student_in_course
-    end
-
-    context "with one past and one current period" do
-      past_period_name = "Past Grading Period"
-      current_period_name = "Current Grading Period"
-      past_assignment_name = "Past Assignment"
-      current_assignment_name = "Current Assignment"
+  context "when :student_grade_summary_upgrade feature flag is OFF" do
+    context "total point displays" do
+      before(:once) do
+        course_with_student({ active_course: true, active_enrollment: true })
+        @teacher = User.create!
+        @course.enroll_teacher(@teacher)
+        assignment = @course.assignments.build(points_possible: 20)
+        assignment.publish
+        assignment.grade_student(@student, grade: 10, grader: @teacher)
+        assignment.assignment_group.update(group_weight: 1)
+        @course.show_total_grade_as_points = true
+        @course.save!
+      end
 
       before do
-        # create term
-        term = @course.root_account.enrollment_terms.create!
-        @course.update(enrollment_term: term)
-
-        # create group and periods
-        group = backend_group_helper.create_for_account(@course.root_account)
-        term.update_attribute(:grading_period_group_id, group)
-        backend_period_helper.create_with_weeks_for_group(group, 4, 2, past_period_name)
-        backend_period_helper.create_with_weeks_for_group(group, 1, -3, current_period_name)
-
-        # create assignments
-        @course.assignments.create!(due_at: 3.weeks.ago, title: past_assignment_name)
-        @course.assignments.create!(due_at: 1.week.from_now, title: current_assignment_name)
-
-        # go to student grades page
-        user_session(@teacher)
-        StudentGradesPage.visit_as_teacher(@course, @student)
+        user_session(@student)
+        StudentGradesPage.visit_as_student(@course)
       end
 
-      it "only shows assignments that belong to the selected grading period", priority: "1" do
-        StudentGradesPage.select_period_by_name(past_period_name)
-        expect_new_page_load { StudentGradesPage.click_apply_button }
-        expect(StudentGradesPage.assignment_titles).to include(past_assignment_name)
-        expect(StudentGradesPage.assignment_titles).not_to include(current_assignment_name)
+      it 'displays total and "out of" point values' do
+        expect(StudentGradesPage.final_grade).to include_text("10")
+        expect(StudentGradesPage.final_points_possible).to include_text("10.00 / 20.00")
+      end
+    end
+
+    context "when testing grading periods" do
+      before(:once) do
+        account_admin_user({ active_user: true })
+        course_with_teacher({ user: @user, active_course: true, active_enrollment: true })
+        student_in_course
+      end
+
+      context "with one past and one current period" do
+        past_period_name = "Past Grading Period"
+        current_period_name = "Current Grading Period"
+        past_assignment_name = "Past Assignment"
+        current_assignment_name = "Current Assignment"
+
+        before do
+          # create term
+          term = @course.root_account.enrollment_terms.create!
+          @course.update(enrollment_term: term)
+
+          # create group and periods
+          group = backend_group_helper.create_for_account(@course.root_account)
+          term.update_attribute(:grading_period_group_id, group)
+          backend_period_helper.create_with_weeks_for_group(group, 4, 2, past_period_name)
+          backend_period_helper.create_with_weeks_for_group(group, 1, -3, current_period_name)
+
+          # create assignments
+          @course.assignments.create!(due_at: 3.weeks.ago, title: past_assignment_name)
+          @course.assignments.create!(due_at: 1.week.from_now, title: current_assignment_name)
+
+          # go to student grades page
+          user_session(@teacher)
+          StudentGradesPage.visit_as_teacher(@course, @student)
+        end
+
+        it "only shows assignments that belong to the selected grading period", priority: "1" do
+          StudentGradesPage.select_period_by_name(past_period_name)
+          expect_new_page_load { StudentGradesPage.click_apply_button }
+          expect(StudentGradesPage.assignment_titles).to include(past_assignment_name)
+          expect(StudentGradesPage.assignment_titles).not_to include(current_assignment_name)
+        end
       end
     end
   end
 
-  describe "grade-only assignment" do
+  context "when student is quantitative data restricted" do
     before :once do
-      skip("Unskip in GRADE-1359")
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # truthy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      Account.default.save!
+
+      # truthy permission(since enabled is being "not"ed)
+      Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+      Account.default.reload
+    end
+
+    it "does not show quantitative data" do
       course_with_teacher(name: "Dedicated Teacher", active_course: true, active_user: true)
       course_with_student(course: @course, name: "Hardworking Student", active_all: true)
-      @assignment = @course.assignments.create!(
-        title: "Grade Only Assignment",
-        grading_type: "grade_only",
-        points_possible: 10,
-        submission_types: "online_text_entry"
-      )
-      @assignment.grade_student(@student, grade: "A", grader: @teacher)
-    end
 
-    before do
-      skip("Unskip in GRADE-1359")
+      future_period_name = "Future Grading Period"
+      current_period_name = "Current Grading Period"
+      future_assignment_name = "Future Assignment"
+      current_assignment_name = "Current Assignment"
+
+      # create term
+      term = @course.root_account.enrollment_terms.create!
+      @course.update(enrollment_term: term)
+
+      # create group and periods
+      group = backend_group_helper.create_for_account(@course.root_account)
+      term.update_attribute(:grading_period_group_id, group)
+      backend_period_helper.create_with_weeks_for_group(group, -8, -12, future_period_name)
+      backend_period_helper.create_with_weeks_for_group(group, 1, -3, current_period_name)
+
+      # create assignments
+      future_assignment = @course.assignments.create!(due_at: 10.weeks.from_now, title: future_assignment_name, grading_type: "points", points_possible: 10)
+      current_assignment = @course.assignments.create!(due_at: 1.week.from_now, title: current_assignment_name, grading_type: "points", points_possible: 10)
+
+      future_assignment.grade_student(@student, grade: "10", grader: @teacher)
+      current_assignment.grade_student(@student, grade: "8", grader: @teacher)
+
       user_session(@student)
       StudentGradesPage.visit_as_student(@course)
-    end
+      ffj("tr:contains('Assignments')")
+      expect(f("#grading_period_select_menu").attribute(:value)).to eq current_period_name
 
-    it "does not show point/percentage on student grades page" do
-      skip("Unskip in GRADE-1359")
+      current_assignment_selector = "tr:contains('#{current_assignment_name}')"
+      future_assignment_selector = "tr:contains('#{future_assignment_name}')"
+      expect(fj(current_assignment_selector).text).to include "GRADED\nB-\nYour grade has been updated"
+      expect(f("body")).not_to contain_jqcss(future_assignment_selector)
 
-      expect(StudentGradesPage.fetch_assignment_score(@assignment)).to eql "A"
-      expect(StudentGradesPage.assignment_row(@assignment)).not_to include_text "10"
-    end
-
-    it "shows total grade not as points" do
-      skip("Unskip in GRADE-1359")
-
-      @assignment2 = @course.assignments.create!(
-        title: "Another Grade Only Assignment",
-        grading_type: "grade_only",
-        points_possible: 50,
-        submission_types: "online_text_entry"
-      )
-      @assignment2.grade_student(@student, grade: "B", grader: @teacher)
-
-      expect(StudentGradesPage.final_grade.text).to eql "A-"
-      expect(StudentGradesPage.final_points_possible).to eql "A-"
-    end
-
-    it "does not calculate into total points" do
-      skip("Unskip in GRADE-1359")
-
-      @assignment2 = @course.assignments.create!(
-        title: "Points Assignment",
-        grading_type: "points",
-        points_possible: 100,
-        submission_types: "online_text_entry"
-      )
-      @assignment2.grade_student(@student, grade: 80, grader: @teacher)
-
-      expect(StudentGradePage.final_points_possible).to include_text "80 / 100"
-      expect(StudentGradePage.final_grade.text).to eql "80%"
+      f("#grading_period_select_menu").click
+      fj("li:contains('#{future_period_name}')").click
+      fj("button:contains('Apply')").click
+      wait_for_ajaximations
+      expect(fj(future_assignment_selector).text).to include "GRADED\nA\nYour grade has been updated"
+      expect(f("body")).not_to contain_jqcss(current_assignment_selector)
     end
   end
 end
