@@ -107,10 +107,7 @@ export const AccountCalendarItemToggleGroup = ({
                 border={false}
                 data-testid={`toggle-group-${acc.id}`}
                 summary={acc.heading}
-                toggleLabel={I18n.t('%{account_name}, %{number_of_children} accounts', {
-                  account_name: acc.name,
-                  number_of_children: acc.sub_account_count,
-                })}
+                toggleLabel={acc.label}
                 iconExpanded={IconMiniArrowDownSolid}
                 icon={IconMiniArrowEndSolid}
                 onToggle={(ev, ex) => {
