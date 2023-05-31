@@ -533,13 +533,12 @@ class DiscussionRow extends Component {
       this.props.discussion.assignment &&
       this.props.discussion.published
     ) {
-      const courseId = this.props.discussion.assignment.course_id
       const assignmentId = this.props.discussion.assignment.id
       menuList.push(
         this.createMenuItem(
           'speed-grader-link',
           <a
-            href={`courses/${courseId}/gradebook/speed_grader?assignment_id=${assignmentId}`}
+            href={`gradebook/speed_grader?assignment_id=${assignmentId}`}
             className="icon-speed-grader"
             style={{color: 'inherit', textDecoration: 'none'}}
           >
