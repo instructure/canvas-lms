@@ -116,6 +116,7 @@ class Enrollment::BatchStateUpdater
                                   user_id: user_ids).where.not(user_id: c.enrollments.where.not(id: batch).pluck(:user_id))
       next unless gms.exists?
 
+      gms = gms.to_a.reject { |gm| active_user_course_tuples_for(sis_batch).include?([gm.user_id, c.id]) } if sis_batch&.generated_diff.present?
       rollback = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: gms, updated_state: "deleted", batch_mode_delete: batch_mode)
       data.push(*rollback)
       leader_change_groups = Group.joins(:group_memberships).where(group_memberships: { id: gms }, leader_id: user_ids)
@@ -125,6 +126,28 @@ class Enrollment::BatchStateUpdater
       Group.joins(:group_memberships).where(group_memberships: { id: gms }).touch_all
     end
     data
+  end
+
+  def self.active_user_course_tuples_for(sis_batch)
+    return [] unless sis_batch.present?
+
+    Rails.cache.fetch("active_user_course_tuples/#{sis_batch.id}", expires_in: 3.hours) do
+      Set.new.tap do |set|
+        root_account_id = sis_batch.account.root_account.id
+        sis_batch.downloadable_attachments(:diffed).each do |attachment|
+          file = attachment.open(integrity_check: true)
+          csv = ::CSV.foreach(file.path, **SIS::CSV::CSVBaseImporter::PARSE_ARGS)
+          next unless SIS::CSV::EnrollmentImporter.enrollment_csv?(csv.peek.headers.map(&:downcase))
+
+          csv.each_slice(1000) do |rows|
+            active_rows = rows.select { |row| row["status"] == "active" }
+            users = Pseudonym.where(sis_user_id: active_rows.pluck("user_id"), root_account_id:).pluck(:sis_user_id, :user_id).to_h
+            courses = Course.where(sis_source_id: active_rows.pluck("course_id"), root_account_id:).pluck(:sis_source_id, :id).to_h
+            set.merge(active_rows.map { |row| [users[row["user_id"]], courses[row["course_id"]]] }.filter(&:all?))
+          end
+        end
+      end
+    end
   end
 
   def self.clear_email_caches(invited_user_ids)
