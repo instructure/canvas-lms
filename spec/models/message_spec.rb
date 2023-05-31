@@ -352,6 +352,33 @@ describe Message do
       expect(@message.deliver).to be false
     end
 
+    describe "with notification service" do
+      before do
+        message_model(dispatch_at: Time.now, workflow_state: "staged", to: "somebody", updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: "email")
+        @user.account.enable_feature!(:notification_service)
+      end
+
+      it "enqueues to sqs when notification service is enabled" do
+        expect(@message).to receive(:enqueue_to_sqs).and_return(true)
+        @message.deliver
+      end
+
+      it "sends each target through the notification service" do
+        expect(Services::NotificationService).to receive(:process).once
+        @message.deliver
+        expect(@message.workflow_state).to eq "sent"
+      end
+
+      it "sets transmission error on error" do
+        error_string = "flagrant error"
+        expect(Services::NotificationService).to receive(:process).and_raise(error_string)
+
+        expect { @message.deliver }.to raise_error(error_string)
+        expect(@message.workflow_state).to eq "staged"
+        expect(@message.transmission_errors).to include(error_string)
+      end
+    end
+
     it "completes delivery without a user" do
       message = message_model({
                                 dispatch_at: Time.now,
@@ -394,6 +421,16 @@ describe Message do
           tags: { path_type: "email", root_account_id: @message.root_account.global_id }
         }
       )
+    end
+
+    describe "#enqueue_to_sqs" do
+      it "sets transmission error with no targets" do
+        message_model(dispatch_at: Time.now, to: "somebody", workflow_state: "staged", updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: "email")
+        expect(@message).to receive(:notification_targets).and_return([])
+
+        @message.enqueue_to_sqs
+        expect(@message.workflow_state).to eq "transmission_error"
+      end
     end
 
     context "push" do

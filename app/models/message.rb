@@ -774,7 +774,7 @@ self.user,
       end
       complete_dispatch
     end
-  rescue Aws::SQS::Errors::ServiceError => e
+  rescue => e
     Canvas::Errors.capture(
       e,
       message: "Message delivery failed",
