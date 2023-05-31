@@ -58,6 +58,7 @@ export const GRADEBOOK_QUERY = gql`
               omitFromFinalGrade
               pointsPossible
               submissionTypes
+              dueAt
             }
           }
         }

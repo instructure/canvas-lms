@@ -20,6 +20,7 @@ import React, {useEffect, useState} from 'react'
 import {useQuery} from 'react-apollo'
 import {useSearchParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import userSettings from '@canvas/user-settings'
 import {View} from '@instructure/ui-view'
 
 import {AssignmentGroupCriteriaMap} from '../../../../shared/grading/grading.d'
@@ -29,8 +30,11 @@ import GlobalSettings from './GlobalSettings'
 import GradingResults from './GradingResults'
 import StudentInformation from './StudentInformation'
 import {
-  AssignmentConnection,
+  AssignmentSortContext,
+  GradebookOptions,
   GradebookQueryResponse,
+  GradebookSortOrder,
+  SortableAssignment,
   SubmissionConnection,
   UserConnection,
 } from '../../types'
@@ -45,7 +49,7 @@ const ASSIGNMENT_SEARCH_PARAM = 'assignment'
 export default function EnhancedIndividualGradebook() {
   const [submissions, setSubmissions] = useState<SubmissionConnection[]>([])
   const [students, setStudents] = useState<UserConnection[]>([])
-  const [assignments, setAssignments] = useState<AssignmentConnection[]>([])
+  const [assignments, setAssignments] = useState<SortableAssignment[]>([])
 
   const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || '' // TODO: get from somewhere else?
   const [searchParams, setSearchParams] = useSearchParams()
@@ -65,6 +69,15 @@ export default function EnhancedIndividualGradebook() {
     submission => submission.assignmentId === selectedAssignmentId
   )
 
+  const defaultAssignmentSort: GradebookSortOrder =
+    userSettings.contextGet<AssignmentSortContext>('sort_grade_columns_by')?.sortType ??
+    GradebookSortOrder.Alphabetical
+  const defaultGradebookOptions: GradebookOptions = {
+    sortOrder: defaultAssignmentSort,
+  }
+  const [gradebookOptions, setGradebookOptions] =
+    useState<GradebookOptions>(defaultGradebookOptions)
+
   const {data, error} = useQuery<GradebookQueryResponse>(GRADEBOOK_QUERY, {
     variables: {courseId},
     fetchPolicy: 'no-cache',
@@ -83,10 +96,8 @@ export default function EnhancedIndividualGradebook() {
         assignmentGroupsConnection.nodes
       )
 
-      const sortedAssignments = mappedAssignments.sort((a, b) => a.name.localeCompare(b.name))
-
       setAssignmentGroupMap(mappedAssignmentGroupMap)
-      setAssignments(sortedAssignments)
+      setAssignments(mappedAssignments)
       setSubmissions(submissionsConnection.nodes)
 
       const studentEnrollments = enrollmentsConnection.nodes.map(enrollment => enrollment.user)
@@ -128,7 +139,14 @@ export default function EnhancedIndividualGradebook() {
         </View>
       </View>
 
-      <GlobalSettings />
+      <GlobalSettings
+        gradebookOptions={gradebookOptions}
+        onSortChange={sortType => {
+          userSettings.contextSet('sort_grade_columns_by', {sortType})
+          const newGradebookOptions = {...gradebookOptions, sortOrder: sortType}
+          setGradebookOptions(newGradebookOptions)
+        }}
+      />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
@@ -137,6 +155,7 @@ export default function EnhancedIndividualGradebook() {
         students={students}
         selectedStudentId={selectedStudentId}
         selectedAssignmentId={selectedAssignmentId}
+        gradebookOptions={gradebookOptions}
         onStudentChange={handleStudentChange}
         onAssignmentChange={handleAssignmentChange}
       />
@@ -147,7 +166,7 @@ export default function EnhancedIndividualGradebook() {
         assignment={selectedAssignment}
         courseId={courseId}
         studentId={selectedStudentId}
-        gradebookOptions={{}}
+        gradebookOptions={gradebookOptions}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
@@ -156,14 +175,14 @@ export default function EnhancedIndividualGradebook() {
         courseId={courseId}
         studentId={selectedStudentId}
         assignmentGroupMap={assignmentGroupMap}
-        gradebookOptions={{}} // TODO: Empty object for now for default functionality
+        gradebookOptions={gradebookOptions}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
       <AssignmentInformation
         assignment={selectedAssignment}
-        gradebookOptions={{}}
+        gradebookOptions={gradebookOptions}
         submissions={submissionsForSelectedAssignment}
       />
 

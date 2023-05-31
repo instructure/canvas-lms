@@ -16,21 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import round from '@canvas/round'
+import tz from '@canvas/timezone'
+import _ from 'lodash'
 
 import {
   AssignmentConnection,
   AssignmentDetailCalculationText,
   AssignmentGroupConnection,
+  GradebookSortOrder,
+  SortableAssignment,
 } from '../types'
 import {AssignmentGroupCriteriaMap} from '../../../shared/grading/grading.d'
 
 export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupConnection[]): {
-  mappedAssignments: AssignmentConnection[]
+  mappedAssignments: SortableAssignment[]
   mappedAssignmentGroupMap: AssignmentGroupCriteriaMap
 } {
   return assignmentGroup.reduce(
     (prev, curr) => {
-      prev.mappedAssignments.push(...curr.assignmentsConnection.nodes)
+      const assignments = curr.assignmentsConnection.nodes
+      const mappedAssignments: SortableAssignment[] = assignments.map(assignment =>
+        mapToSortableAssignment(assignment, curr.position)
+      )
+      prev.mappedAssignments.push(...mappedAssignments)
 
       prev.mappedAssignmentGroupMap[curr.id] = {
         name: curr.name,
@@ -56,10 +64,26 @@ export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupC
       return prev
     },
     {
-      mappedAssignments: [] as AssignmentConnection[],
+      mappedAssignments: [] as SortableAssignment[],
       mappedAssignmentGroupMap: {} as AssignmentGroupCriteriaMap,
     }
   )
+}
+
+export function sortAssignments(
+  assignments: SortableAssignment[],
+  sortOrder: GradebookSortOrder
+): SortableAssignment[] {
+  switch (sortOrder) {
+    case GradebookSortOrder.Alphabetical:
+      return _.sortBy(assignments, 'sortableName')
+    case GradebookSortOrder.DueDate:
+      return _.sortBy(assignments, ['sortableDueDate', 'sortableName'])
+    case GradebookSortOrder.AssignmentGroup:
+      return _.sortBy(assignments, ['assignmentGroupPosition', 'sortableName'])
+    default:
+      return assignments
+  }
 }
 
 // This logic was taken directly from ui/features/screenreader_gradebook/jquery/AssignmentDetailsDialog.js
@@ -87,4 +111,18 @@ function percentile(values: number[], percentileValue: number): number {
   const f = (percentileValue * (values.length - 1) + 1) % 1
 
   return values[k] + f * (values[k + 1] - values[k])
+}
+
+function mapToSortableAssignment(
+  assignment: AssignmentConnection,
+  assignmentGroupPosition: number
+): SortableAssignment {
+  // Used sort date logic from screenreader_gradebook_controller.js
+  const sortableDueDate = assignment.dueAt ? +tz.parse(assignment.dueAt) / 1000 : Number.MAX_VALUE
+  return {
+    ...assignment,
+    sortableName: assignment.name.toLowerCase(),
+    sortableDueDate,
+    assignmentGroupPosition,
+  }
 }

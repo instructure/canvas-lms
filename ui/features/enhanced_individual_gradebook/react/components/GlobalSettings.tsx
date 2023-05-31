@@ -20,10 +20,32 @@ import React from 'react'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
+import {GradebookOptions, GradebookSortOrder} from '../../types'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
-export default function GlobalSettings() {
+type DropDownOption<T> = {
+  value: T
+  text: string
+}
+
+const assignmentSortOptions: DropDownOption<GradebookSortOrder>[] = [
+  {value: GradebookSortOrder.AssignmentGroup, text: I18n.t('By Assignment Group and Position')},
+  {value: GradebookSortOrder.Alphabetical, text: I18n.t('Alphabetically')},
+  {value: GradebookSortOrder.DueDate, text: I18n.t('By Due Date')},
+]
+
+type Props = {
+  gradebookOptions: GradebookOptions
+  onSortChange: (sortType: GradebookSortOrder) => void
+}
+
+export default function GlobalSettings({gradebookOptions, onSortChange}: Props) {
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const sortType = event.target.value as GradebookSortOrder
+    onSortChange(sortType)
+  }
+
   return (
     <>
       <View as="div" className="row-fluid">
@@ -54,12 +76,17 @@ export default function GlobalSettings() {
           </label>
         </View>
         <View as="div" className="span8">
-          <select id="sort_select" className="section_select" defaultValue="alpha">
-            <option value="assignment_group">
-              {I18n.t('assignment_order_assignment_groups', 'By Assignment Group and Position')}
-            </option>
-            <option value="alpha">{I18n.t('assignment_order_alpha', 'Alphabetically')}</option>
-            <option value="due_date">{I18n.t('assignment_order_due_date', 'By Due Date')}</option>
+          <select
+            id="sort_select"
+            className="section_select"
+            defaultValue={gradebookOptions.sortOrder}
+            onChange={handleSortChange}
+          >
+            {assignmentSortOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.text}
+              </option>
+            ))}
           </select>
         </View>
       </div>
