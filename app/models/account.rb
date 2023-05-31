@@ -163,6 +163,8 @@ class Account < ActiveRecord::Base
 
   after_update :clear_cached_short_name, if: :saved_change_to_name?
 
+  after_update :log_rqd_setting_enable_or_disable
+
   after_create :create_default_objects
 
   serialize :settings, Hash
@@ -2358,5 +2360,22 @@ class Account < ActiveRecord::Base
 
   def student_reporting?
     false
+  end
+
+  def log_rqd_setting_enable_or_disable
+    return unless saved_changes.key?("settings") # Skip if no settings were changed
+
+    setting_changes = saved_changes[:settings]
+    old_rqd_setting = setting_changes[0].dig(:restrict_quantitative_data, :value)
+    new_rqd_setting = setting_changes[1].dig(:restrict_quantitative_data, :value)
+
+    return unless old_rqd_setting != new_rqd_setting # Skip if RQD setting was not changed
+
+    # If an account's RQD setting hasn't been changed before, old_rqd_setting will be nil
+    if (old_rqd_setting == false || old_rqd_setting.nil?) && new_rqd_setting == true
+      InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.enabled")
+    elsif old_rqd_setting == true && new_rqd_setting == false
+      InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.disabled")
+    end
   end
 end
