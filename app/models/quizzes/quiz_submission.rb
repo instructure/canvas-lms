@@ -451,7 +451,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       @assignment_submission = submission
       @assignment_submission.score = kept_score if kept_score
       @assignment_submission.submitted_at = finished_at
-      @assignment_submission.grade_matches_current_submission = true
+      @assignment_submission.grade_matches_current_submission = workflow_state != "pending_review" || attempt == 1
       @assignment_submission.quiz_submission_id = id
       @assignment_submission.graded_at = Time.zone.now
       @assignment_submission.grader_id = grader_id || "-#{quiz_id}".to_i
@@ -764,7 +764,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
         s = submission
         s.score = kept_score
         s.grade_change_event_author_id = params[:grader_id]
-        s.grade_matches_current_submission = true
+        s.grade_matches_current_submission = workflow_state != "pending_review" || attempt == 1
         s.body = "user: #{user_id}, quiz: #{quiz_id}, score: #{kept_score}, time: #{Time.now}"
         s.saved_by = :quiz_submission
       end
