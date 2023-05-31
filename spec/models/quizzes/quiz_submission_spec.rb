@@ -596,6 +596,15 @@ describe Quizzes::QuizSubmission do
         expect(@quiz_submission.submission.workflow_state).to eql "pending_review"
       end
 
+      it "marks the submission as resubmitted if it needs grading and is not the first attempt" do
+        @essay_quiz = assignment_quiz([{ question_data: { :name => "question 1", :points_possible => 1, "question_type" => "essay_question" } }])
+        @essay_quiz_submission1 = graded_submission(@essay_quiz, @user)
+        @essay_quiz_submission2 = graded_submission(@essay_quiz, @user)
+        expect(@quiz_submission.submission.grade_matches_current_submission).to be_truthy
+        expect(@essay_quiz_submission1.submission.grade_matches_current_submission).to be_truthy
+        expect(@essay_quiz_submission2.submission.grade_matches_current_submission).to be_falsey
+      end
+
       def grade_question(score)
         @quiz_submission.update_scores({
                                          "context_id" => @course.id,
