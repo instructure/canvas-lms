@@ -28,6 +28,13 @@ export const GRADEBOOK_QUERY = gql`
             name
             sortableName
           }
+          courseSectionId
+        }
+      }
+      sectionsConnection {
+        nodes {
+          id: _id
+          name
         }
       }
       submissionsConnection {

@@ -20,7 +20,7 @@ import React from 'react'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import {GradebookOptions, GradebookSortOrder} from '../../types'
+import {GradebookOptions, GradebookSortOrder, SectionConnection} from '../../types'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -36,14 +36,27 @@ const assignmentSortOptions: DropDownOption<GradebookSortOrder>[] = [
 ]
 
 type Props = {
+  sections: SectionConnection[]
   gradebookOptions: GradebookOptions
   onSortChange: (sortType: GradebookSortOrder) => void
+  onSectionChange: (sectionId?: string) => void
 }
 
-export default function GlobalSettings({gradebookOptions, onSortChange}: Props) {
+export default function GlobalSettings({
+  sections,
+  gradebookOptions,
+  onSortChange,
+  onSectionChange,
+}: Props) {
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const sortType = event.target.value as GradebookSortOrder
     onSortChange(sortType)
+  }
+
+  const handleSectionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const index = event.target.selectedIndex
+    const sectionId = index !== 0 ? event.target.value : undefined
+    onSectionChange(sectionId)
   }
 
   return (
@@ -61,10 +74,13 @@ export default function GlobalSettings({gradebookOptions, onSortChange}: Props) 
           </label>
         </View>
         <View as="div" className="span8">
-          {/* TODO: Get Sections */}
-          <select id="section_select" className="section_select">
-            <option value="all">{I18n.t('All Sections')}</option>
-            <option value="1">Section 1</option>
+          <select id="section_select" className="section_select" onChange={handleSectionChange}>
+            <option value="-1">{I18n.t('All Sections')}</option>
+            {sections.map(section => (
+              <option key={section.id} value={section.id}>
+                {section.name}
+              </option>
+            ))}
           </select>
         </View>
       </View>

@@ -78,6 +78,8 @@ module Types
       load_association(:course)
     end
 
+    field :course_section_id, ID, null: true
+
     field :section, SectionType, null: true
     def section
       load_association(:course_section)

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentConnection} from './queries'
+import {AssignmentConnection, UserConnection} from './queries'
 
 export enum GradebookSortOrder {
   DueDate = 'dueDate',
@@ -28,6 +28,7 @@ export type GradebookOptions = {
   includeUngradedAssignments?: boolean
   anonymizeStudents?: boolean
   sortOrder: GradebookSortOrder
+  selectedSection?: string
 }
 
 export type AssignmentDetailCalculationText = {
@@ -48,4 +49,8 @@ export type SortableAssignment = AssignmentConnection & {
 
 export type AssignmentSortContext = {
   sortType?: GradebookSortOrder
+}
+
+export type SortableStudent = UserConnection & {
+  sections: string[]
 }
