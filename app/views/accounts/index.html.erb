@@ -22,14 +22,7 @@
 <% provide :right_side do %>
 <% end %>
 
-<% css_bundle :context_list %>
+<% js_bundle :account_manage %>
 
-<h2><%= t(:title, "Accounts I Manage") %></h2>
-<%= t(:no_accounts_message, "No Accounts") if @accounts.empty? %>
-<ul class="context_list">
-  <% @accounts.each do |account| %>
-    <li>
-      <%= link_to account.name, url_for(account) %>
-    </li>
-  <% end %>
-</ul>
+<h1><%= t(:title, "Accounts I Manage") %></h1>
+<div id="context_list"></div>
