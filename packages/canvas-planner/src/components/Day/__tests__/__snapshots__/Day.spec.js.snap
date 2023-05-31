@@ -1,567 +1,693 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`In current timezone renders the base component with required props 1`] = `
-<div
-  className="Day-styles__root planner-day"
->
-  <Heading
-    border="bottom"
-    color="inherit"
-    level="h2"
+<Fragment>
+  <style>
+    
+  .Day-styles__root {
+    font-size: 1rem;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    line-height: 1.25;
+    color: #394B58;
+    background: #FFFFFF;
+    margin-top: 2.25rem;
+  }
+  
+  .Day-styles__secondary {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  
+  </style>
+  <div
+    className="Day-styles__root planner-day"
   >
-    <div
-      className="Day-styles__secondary"
+    <Heading
+      border="bottom"
+      color="inherit"
+      level="h2"
     >
-      Tuesday
-      , 
-      April 25, 2017
+      <div
+        className="Day-styles__secondary"
+      >
+        Tuesday
+        , 
+        April 25, 2017
+      </div>
+    </Heading>
+    <div>
+      <View
+        borderColor="primary"
+        display="block"
+        focusColor="info"
+        focusPosition="offset"
+        margin="small 0 0 0"
+        overflowX="visible"
+        overflowY="visible"
+        position="static"
+        shouldAnimateFocus={true}
+        textAlign="center"
+        withVisualDebug={false}
+      >
+        Nothing Planned Yet
+      </View>
     </div>
-  </Heading>
-  <div>
-    <View
-      borderColor="primary"
-      display="block"
-      focusColor="info"
-      focusPosition="offset"
-      margin="small 0 0 0"
-      overflowX="visible"
-      overflowY="visible"
-      position="static"
-      shouldAnimateFocus={true}
-      textAlign="center"
-      withVisualDebug={false}
-    >
-      Nothing Planned Yet
-    </View>
   </div>
-</div>
+</Fragment>
 `;
 
 exports[`In other timezone renders the base component with required props 1`] = `
-<div
-  className="Day-styles__root planner-day"
->
-  <Heading
-    border="bottom"
-    color="inherit"
-    level="h2"
+<Fragment>
+  <style>
+    
+  .Day-styles__root {
+    font-size: 1rem;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    line-height: 1.25;
+    color: #394B58;
+    background: #FFFFFF;
+    margin-top: 2.25rem;
+  }
+  
+  .Day-styles__secondary {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  
+  </style>
+  <div
+    className="Day-styles__root planner-day"
   >
-    <div
-      className="Day-styles__secondary"
+    <Heading
+      border="bottom"
+      color="inherit"
+      level="h2"
     >
-      Tuesday
-      , 
-      April 25, 2017
+      <div
+        className="Day-styles__secondary"
+      >
+        Tuesday
+        , 
+        April 25, 2017
+      </div>
+    </Heading>
+    <div>
+      <View
+        borderColor="primary"
+        display="block"
+        focusColor="info"
+        focusPosition="offset"
+        margin="small 0 0 0"
+        overflowX="visible"
+        overflowY="visible"
+        position="static"
+        shouldAnimateFocus={true}
+        textAlign="center"
+        withVisualDebug={false}
+      >
+        Nothing Planned Yet
+      </View>
     </div>
-  </Heading>
-  <div>
-    <View
-      borderColor="primary"
-      display="block"
-      focusColor="info"
-      focusPosition="offset"
-      margin="small 0 0 0"
-      overflowX="visible"
-      overflowY="visible"
-      position="static"
-      shouldAnimateFocus={true}
-      textAlign="center"
-      withVisualDebug={false}
-    >
-      Nothing Planned Yet
-    </View>
   </div>
-</div>
+</Fragment>
 `;
 
 exports[`groups itemsForDay that come in on prop changes 1`] = `
-<div
-  className="Day-styles__root planner-day"
->
-  <Heading
-    border="none"
-    color="inherit"
-    level="h2"
+<Fragment>
+  <style>
+    
+  .Day-styles__root {
+    font-size: 1rem;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    line-height: 1.25;
+    color: #394B58;
+    background: #FFFFFF;
+    margin-top: 2.25rem;
+  }
+  
+  .Day-styles__secondary {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  
+  </style>
+  <div
+    className="Day-styles__root planner-day"
   >
-    <div
-      className="Day-styles__secondary"
+    <Heading
+      border="none"
+      color="inherit"
+      level="h2"
     >
-      Tuesday
-      , 
-      April 25, 2017
+      <div
+        className="Day-styles__secondary"
+      >
+        Tuesday
+        , 
+        April 25, 2017
+      </div>
+    </Heading>
+    <div>
+      <Animatable(Grouping)
+        animatableIndex={1}
+        color="#0B874B"
+        currentUser={
+          Object {
+            "avatarUrl": "/picture/is/here",
+            "color": "#0B874B",
+            "displayName": "Jane",
+            "id": "1",
+          }
+        }
+        isObserving={false}
+        items={
+          Array [
+            Object {
+              "context": Object {
+                "id": 128,
+                "type": "Course",
+              },
+              "date": "2017-04-25T23:59:00.000Z",
+              "title": "Black Friday",
+            },
+          ]
+        }
+        key="Course128"
+        responsiveSize="large"
+        simplifiedControls={false}
+        singleCourseView={false}
+        theme={
+          Object {
+            "titleColor": "#0B874B",
+          }
+        }
+        timeZone="America/Denver"
+      />
+      <Animatable(Grouping)
+        animatableIndex={2}
+        color="#0B874B"
+        currentUser={
+          Object {
+            "avatarUrl": "/picture/is/here",
+            "color": "#0B874B",
+            "displayName": "Jane",
+            "id": "1",
+          }
+        }
+        isObserving={false}
+        items={
+          Array [
+            Object {
+              "context": Object {
+                "id": 256,
+                "type": "Course",
+              },
+              "date": "2017-04-25T23:59:00.000Z",
+              "title": "San Juan",
+            },
+          ]
+        }
+        key="Course256"
+        responsiveSize="large"
+        simplifiedControls={false}
+        singleCourseView={false}
+        theme={
+          Object {
+            "titleColor": "#0B874B",
+          }
+        }
+        timeZone="America/Denver"
+      />
     </div>
-  </Heading>
-  <div>
-    <Animatable(Grouping)
-      animatableIndex={1}
-      color="#0B874B"
-      currentUser={
-        Object {
-          "avatarUrl": "/picture/is/here",
-          "color": "#0B874B",
-          "displayName": "Jane",
-          "id": "1",
-        }
-      }
-      isObserving={false}
-      items={
-        Array [
-          Object {
-            "context": Object {
-              "id": 128,
-              "type": "Course",
-            },
-            "date": "2017-04-25T23:59:00.000Z",
-            "title": "Black Friday",
-          },
-        ]
-      }
-      key="Course128"
-      responsiveSize="large"
-      simplifiedControls={false}
-      singleCourseView={false}
-      theme={
-        Object {
-          "titleColor": "#0B874B",
-        }
-      }
-      timeZone="America/Denver"
-    />
-    <Animatable(Grouping)
-      animatableIndex={2}
-      color="#0B874B"
-      currentUser={
-        Object {
-          "avatarUrl": "/picture/is/here",
-          "color": "#0B874B",
-          "displayName": "Jane",
-          "id": "1",
-        }
-      }
-      isObserving={false}
-      items={
-        Array [
-          Object {
-            "context": Object {
-              "id": 256,
-              "type": "Course",
-            },
-            "date": "2017-04-25T23:59:00.000Z",
-            "title": "San Juan",
-          },
-        ]
-      }
-      key="Course256"
-      responsiveSize="large"
-      simplifiedControls={false}
-      singleCourseView={false}
-      theme={
-        Object {
-          "titleColor": "#0B874B",
-        }
-      }
-      timeZone="America/Denver"
-    />
   </div>
-</div>
+</Fragment>
 `;
 
 exports[`groups itemsForDay that come in on prop changes 2`] = `
-<div
-  className="Day-styles__root planner-day"
->
-  <Heading
-    border="none"
-    color="inherit"
-    level="h2"
+<Fragment>
+  <style>
+    
+  .Day-styles__root {
+    font-size: 1rem;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    line-height: 1.25;
+    color: #394B58;
+    background: #FFFFFF;
+    margin-top: 2.25rem;
+  }
+  
+  .Day-styles__secondary {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  
+  </style>
+  <div
+    className="Day-styles__root planner-day"
   >
-    <div
-      className="Day-styles__secondary"
+    <Heading
+      border="none"
+      color="inherit"
+      level="h2"
     >
-      Tuesday
-      , 
-      April 25, 2017
+      <div
+        className="Day-styles__secondary"
+      >
+        Tuesday
+        , 
+        April 25, 2017
+      </div>
+    </Heading>
+    <div>
+      <Animatable(Grouping)
+        animatableIndex={1}
+        color="#0B874B"
+        currentUser={
+          Object {
+            "avatarUrl": "/picture/is/here",
+            "color": "#0B874B",
+            "displayName": "Jane",
+            "id": "1",
+          }
+        }
+        isObserving={false}
+        items={
+          Array [
+            Object {
+              "context": Object {
+                "id": 128,
+                "type": "Course",
+              },
+              "date": "2017-04-25T23:59:00.000Z",
+              "title": "Black Friday",
+            },
+          ]
+        }
+        key="Course128"
+        responsiveSize="large"
+        simplifiedControls={false}
+        singleCourseView={false}
+        theme={
+          Object {
+            "titleColor": "#0B874B",
+          }
+        }
+        timeZone="America/Denver"
+      />
+      <Animatable(Grouping)
+        animatableIndex={2}
+        color="#0B874B"
+        currentUser={
+          Object {
+            "avatarUrl": "/picture/is/here",
+            "color": "#0B874B",
+            "displayName": "Jane",
+            "id": "1",
+          }
+        }
+        isObserving={false}
+        items={
+          Array [
+            Object {
+              "context": Object {
+                "id": 256,
+                "type": "Course",
+              },
+              "date": "2017-04-25T23:59:00.000Z",
+              "title": "San Juan",
+            },
+            Object {
+              "context": Object {
+                "id": 256,
+                "type": "Course",
+              },
+              "date": "2017-04-25T23:59:00.000Z",
+              "title": "Roll for the Galaxy",
+            },
+          ]
+        }
+        key="Course256"
+        responsiveSize="large"
+        simplifiedControls={false}
+        singleCourseView={false}
+        theme={
+          Object {
+            "titleColor": "#0B874B",
+          }
+        }
+        timeZone="America/Denver"
+      />
+      <Animatable(Grouping)
+        animatableIndex={3}
+        color="#0B874B"
+        currentUser={
+          Object {
+            "avatarUrl": "/picture/is/here",
+            "color": "#0B874B",
+            "displayName": "Jane",
+            "id": "1",
+          }
+        }
+        isObserving={false}
+        items={
+          Array [
+            Object {
+              "title": "Get work done!",
+            },
+          ]
+        }
+        key="Notes"
+        responsiveSize="large"
+        simplifiedControls={false}
+        singleCourseView={false}
+        theme={
+          Object {
+            "titleColor": "#0B874B",
+          }
+        }
+        timeZone="America/Denver"
+      />
     </div>
-  </Heading>
-  <div>
-    <Animatable(Grouping)
-      animatableIndex={1}
-      color="#0B874B"
-      currentUser={
-        Object {
-          "avatarUrl": "/picture/is/here",
-          "color": "#0B874B",
-          "displayName": "Jane",
-          "id": "1",
-        }
-      }
-      isObserving={false}
-      items={
-        Array [
-          Object {
-            "context": Object {
-              "id": 128,
-              "type": "Course",
-            },
-            "date": "2017-04-25T23:59:00.000Z",
-            "title": "Black Friday",
-          },
-        ]
-      }
-      key="Course128"
-      responsiveSize="large"
-      simplifiedControls={false}
-      singleCourseView={false}
-      theme={
-        Object {
-          "titleColor": "#0B874B",
-        }
-      }
-      timeZone="America/Denver"
-    />
-    <Animatable(Grouping)
-      animatableIndex={2}
-      color="#0B874B"
-      currentUser={
-        Object {
-          "avatarUrl": "/picture/is/here",
-          "color": "#0B874B",
-          "displayName": "Jane",
-          "id": "1",
-        }
-      }
-      isObserving={false}
-      items={
-        Array [
-          Object {
-            "context": Object {
-              "id": 256,
-              "type": "Course",
-            },
-            "date": "2017-04-25T23:59:00.000Z",
-            "title": "San Juan",
-          },
-          Object {
-            "context": Object {
-              "id": 256,
-              "type": "Course",
-            },
-            "date": "2017-04-25T23:59:00.000Z",
-            "title": "Roll for the Galaxy",
-          },
-        ]
-      }
-      key="Course256"
-      responsiveSize="large"
-      simplifiedControls={false}
-      singleCourseView={false}
-      theme={
-        Object {
-          "titleColor": "#0B874B",
-        }
-      }
-      timeZone="America/Denver"
-    />
-    <Animatable(Grouping)
-      animatableIndex={3}
-      color="#0B874B"
-      currentUser={
-        Object {
-          "avatarUrl": "/picture/is/here",
-          "color": "#0B874B",
-          "displayName": "Jane",
-          "id": "1",
-        }
-      }
-      isObserving={false}
-      items={
-        Array [
-          Object {
-            "title": "Get work done!",
-          },
-        ]
-      }
-      key="Notes"
-      responsiveSize="large"
-      simplifiedControls={false}
-      singleCourseView={false}
-      theme={
-        Object {
-          "titleColor": "#0B874B",
-        }
-      }
-      timeZone="America/Denver"
-    />
   </div>
-</div>
+</Fragment>
 `;
 
 exports[`groups itemsForDay that have no context into the "Notes" category 1`] = `
-<div
-  className="Day-styles__root planner-day"
->
-  <Heading
-    border="none"
-    color="inherit"
-    level="h2"
+<Fragment>
+  <style>
+    
+  .Day-styles__root {
+    font-size: 1rem;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    line-height: 1.25;
+    color: #394B58;
+    background: #FFFFFF;
+    margin-top: 2.25rem;
+  }
+  
+  .Day-styles__secondary {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  
+  </style>
+  <div
+    className="Day-styles__root planner-day"
   >
-    <div
-      className="Day-styles__secondary"
+    <Heading
+      border="none"
+      color="inherit"
+      level="h2"
     >
-      Tuesday
-      , 
-      April 25, 2017
+      <div
+        className="Day-styles__secondary"
+      >
+        Tuesday
+        , 
+        April 25, 2017
+      </div>
+    </Heading>
+    <div>
+      <Animatable(Grouping)
+        animatableIndex={1}
+        color="#0B874B"
+        currentUser={
+          Object {
+            "avatarUrl": "/picture/is/here",
+            "color": "#0B874B",
+            "displayName": "Jane",
+            "id": "1",
+          }
+        }
+        isObserving={false}
+        items={
+          Array [
+            Object {
+              "context": Object {
+                "id": 128,
+                "type": "Course",
+              },
+              "date": "2017-04-25T23:59:00.000Z",
+              "title": "Black Friday",
+            },
+          ]
+        }
+        key="Course128"
+        responsiveSize="large"
+        simplifiedControls={false}
+        singleCourseView={false}
+        theme={
+          Object {
+            "titleColor": "#0B874B",
+          }
+        }
+        timeZone="America/Denver"
+      />
+      <Animatable(Grouping)
+        animatableIndex={2}
+        color="#0B874B"
+        currentUser={
+          Object {
+            "avatarUrl": "/picture/is/here",
+            "color": "#0B874B",
+            "displayName": "Jane",
+            "id": "1",
+          }
+        }
+        isObserving={false}
+        items={
+          Array [
+            Object {
+              "context": Object {
+                "id": 256,
+                "type": "Course",
+              },
+              "date": "2017-04-25T23:59:00.000Z",
+              "title": "San Juan",
+            },
+            Object {
+              "context": Object {
+                "id": 256,
+                "type": "Course",
+              },
+              "date": "2017-04-25T23:59:00.000Z",
+              "title": "Roll for the Galaxy",
+            },
+          ]
+        }
+        key="Course256"
+        responsiveSize="large"
+        simplifiedControls={false}
+        singleCourseView={false}
+        theme={
+          Object {
+            "titleColor": "#0B874B",
+          }
+        }
+        timeZone="America/Denver"
+      />
+      <Animatable(Grouping)
+        animatableIndex={3}
+        color="#0B874B"
+        currentUser={
+          Object {
+            "avatarUrl": "/picture/is/here",
+            "color": "#0B874B",
+            "displayName": "Jane",
+            "id": "1",
+          }
+        }
+        isObserving={false}
+        items={
+          Array [
+            Object {
+              "title": "Get work done!",
+            },
+          ]
+        }
+        key="Notes"
+        responsiveSize="large"
+        simplifiedControls={false}
+        singleCourseView={false}
+        theme={
+          Object {
+            "titleColor": "#0B874B",
+          }
+        }
+        timeZone="America/Denver"
+      />
     </div>
-  </Heading>
-  <div>
-    <Animatable(Grouping)
-      animatableIndex={1}
-      color="#0B874B"
-      currentUser={
-        Object {
-          "avatarUrl": "/picture/is/here",
-          "color": "#0B874B",
-          "displayName": "Jane",
-          "id": "1",
-        }
-      }
-      isObserving={false}
-      items={
-        Array [
-          Object {
-            "context": Object {
-              "id": 128,
-              "type": "Course",
-            },
-            "date": "2017-04-25T23:59:00.000Z",
-            "title": "Black Friday",
-          },
-        ]
-      }
-      key="Course128"
-      responsiveSize="large"
-      simplifiedControls={false}
-      singleCourseView={false}
-      theme={
-        Object {
-          "titleColor": "#0B874B",
-        }
-      }
-      timeZone="America/Denver"
-    />
-    <Animatable(Grouping)
-      animatableIndex={2}
-      color="#0B874B"
-      currentUser={
-        Object {
-          "avatarUrl": "/picture/is/here",
-          "color": "#0B874B",
-          "displayName": "Jane",
-          "id": "1",
-        }
-      }
-      isObserving={false}
-      items={
-        Array [
-          Object {
-            "context": Object {
-              "id": 256,
-              "type": "Course",
-            },
-            "date": "2017-04-25T23:59:00.000Z",
-            "title": "San Juan",
-          },
-          Object {
-            "context": Object {
-              "id": 256,
-              "type": "Course",
-            },
-            "date": "2017-04-25T23:59:00.000Z",
-            "title": "Roll for the Galaxy",
-          },
-        ]
-      }
-      key="Course256"
-      responsiveSize="large"
-      simplifiedControls={false}
-      singleCourseView={false}
-      theme={
-        Object {
-          "titleColor": "#0B874B",
-        }
-      }
-      timeZone="America/Denver"
-    />
-    <Animatable(Grouping)
-      animatableIndex={3}
-      color="#0B874B"
-      currentUser={
-        Object {
-          "avatarUrl": "/picture/is/here",
-          "color": "#0B874B",
-          "displayName": "Jane",
-          "id": "1",
-        }
-      }
-      isObserving={false}
-      items={
-        Array [
-          Object {
-            "title": "Get work done!",
-          },
-        ]
-      }
-      key="Notes"
-      responsiveSize="large"
-      simplifiedControls={false}
-      singleCourseView={false}
-      theme={
-        Object {
-          "titleColor": "#0B874B",
-        }
-      }
-      timeZone="America/Denver"
-    />
   </div>
-</div>
+</Fragment>
 `;
 
 exports[`renders grouping correctly when having itemsForDay 1`] = `
-<div
-  className="Day-styles__root planner-day"
->
-  <Heading
-    border="none"
-    color="inherit"
-    level="h2"
+<Fragment>
+  <style>
+    
+  .Day-styles__root {
+    font-size: 1rem;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    line-height: 1.25;
+    color: #394B58;
+    background: #FFFFFF;
+    margin-top: 2.25rem;
+  }
+  
+  .Day-styles__secondary {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  
+  </style>
+  <div
+    className="Day-styles__root planner-day"
   >
-    <div
-      className="Day-styles__secondary"
+    <Heading
+      border="none"
+      color="inherit"
+      level="h2"
     >
-      Tuesday
-      , 
-      April 25, 2017
+      <div
+        className="Day-styles__secondary"
+      >
+        Tuesday
+        , 
+        April 25, 2017
+      </div>
+    </Heading>
+    <div>
+      <Animatable(Grouping)
+        animatableIndex={101}
+        color="#0B874B"
+        currentUser={
+          Object {
+            "avatarUrl": "/picture/is/here",
+            "color": "#0B874B",
+            "displayName": "Jane",
+            "id": "1",
+          }
+        }
+        isObserving={false}
+        items={
+          Array [
+            Object {
+              "context": Object {
+                "id": 128,
+                "type": "Course",
+                "url": "http://www.non_default_url.com",
+              },
+              "date": "2017-04-25T23:59:00.000Z",
+              "title": "Black Friday",
+            },
+          ]
+        }
+        key="Course128"
+        responsiveSize="large"
+        simplifiedControls={false}
+        singleCourseView={false}
+        theme={
+          Object {
+            "titleColor": "#0B874B",
+          }
+        }
+        timeZone="America/Denver"
+        url="http://www.non_default_url.com"
+      />
+      <Animatable(Grouping)
+        animatableIndex={102}
+        color="#0B874B"
+        currentUser={
+          Object {
+            "avatarUrl": "/picture/is/here",
+            "color": "#0B874B",
+            "displayName": "Jane",
+            "id": "1",
+          }
+        }
+        isObserving={false}
+        items={
+          Array [
+            Object {
+              "context": Object {
+                "id": 256,
+                "type": "Course",
+                "url": "http://www.non_default_url.com",
+              },
+              "date": "2017-04-25T23:59:00.000Z",
+              "title": "San Juan",
+            },
+            Object {
+              "context": Object {
+                "id": 256,
+                "type": "Course",
+                "url": "http://www.non_default_url.com",
+              },
+              "date": "2017-04-25T23:59:00.000Z",
+              "title": "Roll for the Galaxy",
+            },
+          ]
+        }
+        key="Course256"
+        responsiveSize="large"
+        simplifiedControls={false}
+        singleCourseView={false}
+        theme={
+          Object {
+            "titleColor": "#0B874B",
+          }
+        }
+        timeZone="America/Denver"
+        url="http://www.non_default_url.com"
+      />
+      <Animatable(Grouping)
+        animatableIndex={103}
+        color="#0B874B"
+        currentUser={
+          Object {
+            "avatarUrl": "/picture/is/here",
+            "color": "#0B874B",
+            "displayName": "Jane",
+            "id": "1",
+          }
+        }
+        isObserving={false}
+        items={
+          Array [
+            Object {
+              "context": Object {
+                "id": 256,
+                "type": "Group",
+              },
+              "date": "2017-04-25T23:59:00.000Z",
+              "title": "Same id, different type",
+            },
+          ]
+        }
+        key="Group256"
+        responsiveSize="large"
+        simplifiedControls={false}
+        singleCourseView={false}
+        theme={
+          Object {
+            "titleColor": "#0B874B",
+          }
+        }
+        timeZone="America/Denver"
+      />
     </div>
-  </Heading>
-  <div>
-    <Animatable(Grouping)
-      animatableIndex={101}
-      color="#0B874B"
-      currentUser={
-        Object {
-          "avatarUrl": "/picture/is/here",
-          "color": "#0B874B",
-          "displayName": "Jane",
-          "id": "1",
-        }
-      }
-      isObserving={false}
-      items={
-        Array [
-          Object {
-            "context": Object {
-              "id": 128,
-              "type": "Course",
-              "url": "http://www.non_default_url.com",
-            },
-            "date": "2017-04-25T23:59:00.000Z",
-            "title": "Black Friday",
-          },
-        ]
-      }
-      key="Course128"
-      responsiveSize="large"
-      simplifiedControls={false}
-      singleCourseView={false}
-      theme={
-        Object {
-          "titleColor": "#0B874B",
-        }
-      }
-      timeZone="America/Denver"
-      url="http://www.non_default_url.com"
-    />
-    <Animatable(Grouping)
-      animatableIndex={102}
-      color="#0B874B"
-      currentUser={
-        Object {
-          "avatarUrl": "/picture/is/here",
-          "color": "#0B874B",
-          "displayName": "Jane",
-          "id": "1",
-        }
-      }
-      isObserving={false}
-      items={
-        Array [
-          Object {
-            "context": Object {
-              "id": 256,
-              "type": "Course",
-              "url": "http://www.non_default_url.com",
-            },
-            "date": "2017-04-25T23:59:00.000Z",
-            "title": "San Juan",
-          },
-          Object {
-            "context": Object {
-              "id": 256,
-              "type": "Course",
-              "url": "http://www.non_default_url.com",
-            },
-            "date": "2017-04-25T23:59:00.000Z",
-            "title": "Roll for the Galaxy",
-          },
-        ]
-      }
-      key="Course256"
-      responsiveSize="large"
-      simplifiedControls={false}
-      singleCourseView={false}
-      theme={
-        Object {
-          "titleColor": "#0B874B",
-        }
-      }
-      timeZone="America/Denver"
-      url="http://www.non_default_url.com"
-    />
-    <Animatable(Grouping)
-      animatableIndex={103}
-      color="#0B874B"
-      currentUser={
-        Object {
-          "avatarUrl": "/picture/is/here",
-          "color": "#0B874B",
-          "displayName": "Jane",
-          "id": "1",
-        }
-      }
-      isObserving={false}
-      items={
-        Array [
-          Object {
-            "context": Object {
-              "id": 256,
-              "type": "Group",
-            },
-            "date": "2017-04-25T23:59:00.000Z",
-            "title": "Same id, different type",
-          },
-        ]
-      }
-      key="Group256"
-      responsiveSize="large"
-      simplifiedControls={false}
-      singleCourseView={false}
-      theme={
-        Object {
-          "titleColor": "#0B874B",
-        }
-      }
-      timeZone="America/Denver"
-    />
   </div>
-</div>
+</Fragment>
 `;
