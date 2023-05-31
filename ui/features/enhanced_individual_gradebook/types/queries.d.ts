@@ -41,6 +41,7 @@ export type AssignmentConnection = {
   omitFromFinalGrade: boolean
   workflowState: WorkflowState
   gradingType: string
+  dueAt?: string
 }
 
 export type AssignmentGroupConnection = {

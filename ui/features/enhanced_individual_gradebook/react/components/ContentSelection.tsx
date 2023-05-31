@@ -19,16 +19,18 @@
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {AssignmentConnection, UserConnection} from '../../types'
+import {GradebookOptions, SortableAssignment, UserConnection} from '../../types'
 import {View} from '@instructure/ui-view'
+import {sortAssignments} from '../../utils/gradebookUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
-  assignments: AssignmentConnection[]
+  assignments: SortableAssignment[]
   students: UserConnection[]
   selectedStudentId?: string | null
   selectedAssignmentId?: string | null
+  gradebookOptions: GradebookOptions
   onStudentChange: (studentId?: string) => void
   onAssignmentChange: (assignmentId?: string) => void
 }
@@ -40,7 +42,7 @@ type DropDownOption<T> = {
 }
 
 type StudentDropdownOption = DropDownOption<UserConnection>[]
-type AssignmentDropdownOption = DropDownOption<AssignmentConnection>[]
+type AssignmentDropdownOption = DropDownOption<SortableAssignment>[]
 
 const DEFAULT_STUDENT_DROPDOWN_TEXT = I18n.t('No Student Selected')
 const DEFAULT_ASSIGNMENT_DROPDOWN_TEXT = I18n.t('No Assignment Selected')
@@ -53,6 +55,7 @@ export default function ContentSelection({
   assignments,
   selectedAssignmentId,
   selectedStudentId,
+  gradebookOptions,
   onAssignmentChange,
   onStudentChange,
 }: Props) {
@@ -61,6 +64,8 @@ export default function ContentSelection({
     useState<AssignmentDropdownOption>([])
   const [selectedStudentIndex, setSelectedStudentIndex] = useState<number>(0)
   const [selectedAssignmentIndex, setSelectedAssignmentIndex] = useState<number>(0)
+
+  const {sortOrder} = gradebookOptions
 
   // TOOD: might be ablet to refactor to make simpler
   useEffect(() => {
@@ -80,9 +85,11 @@ export default function ContentSelection({
       }
     }
 
+    const sortedAssignments = sortAssignments(assignments, sortOrder)
+
     const assignmentOptions: AssignmentDropdownOption = [
       defaultAssignmentDropdownOptions,
-      ...assignments.map(assignment => ({
+      ...sortedAssignments.map(assignment => ({
         id: assignment.id,
         name: assignment.name,
         data: assignment,
@@ -99,7 +106,7 @@ export default function ContentSelection({
         setSelectedAssignmentIndex(assignmentIndex)
       }
     }
-  }, [students, assignments, selectedStudentId, selectedAssignmentId])
+  }, [students, assignments, selectedStudentId, selectedAssignmentId, sortOrder])
 
   const handleChangeStudent = (event?: React.ChangeEvent<HTMLSelectElement>, newIndex?: number) => {
     const selectedIndex = (event ? event.target.selectedIndex : newIndex) ?? 0
