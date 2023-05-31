@@ -17,6 +17,8 @@
  */
 
 import React from 'react'
+import {ASSIGNMENT_NOT_APPLICABLE} from '../constants'
+
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
@@ -26,14 +28,19 @@ import {formatNumber, scorePercentageToLetterGrade, getTotal, filteredAssignment
 const I18n = useI18nScope('grade_summary')
 
 export const totalRow = queryData => {
-  const formattedTotal = formatNumber(
-    getTotal(
-      filteredAssignments(queryData),
-      queryData?.assignmentGroupsConnection?.nodes,
-      queryData?.gradingPeriodsConnection?.nodes,
-      queryData?.applyGroupWeights
-    )
+  const total = getTotal(
+    filteredAssignments(queryData),
+    queryData?.assignmentGroupsConnection?.nodes,
+    queryData?.gradingPeriodsConnection?.nodes,
+    queryData?.applyGroupWeights
   )
+
+  const formattedTotal = total === ASSIGNMENT_NOT_APPLICABLE ? total : `${formatNumber(total)}%`
+
+  const letterGrade =
+    total === ASSIGNMENT_NOT_APPLICABLE
+      ? total
+      : scorePercentageToLetterGrade(total, queryData?.gradingStandard)
 
   return (
     <Table.Row>
@@ -41,11 +48,7 @@ export const totalRow = queryData => {
         <Text weight="bold">{I18n.t('Total')}</Text>
       </Table.Cell>
       <Table.Cell textAlign="center">
-        <Text weight="bold">
-          {ENV.restrict_quantitative_data
-            ? scorePercentageToLetterGrade(formattedTotal, queryData?.gradingStandard)
-            : `${formattedTotal}%`}
-        </Text>
+        <Text weight="bold">{ENV.restrict_quantitative_data ? letterGrade : formattedTotal}</Text>
       </Table.Cell>
     </Table.Row>
   )

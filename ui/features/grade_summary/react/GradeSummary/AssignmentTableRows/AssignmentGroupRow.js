@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {ASSIGNMENT_NOT_APPLICABLE} from '../constants'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 
@@ -30,32 +31,36 @@ import {
 } from '../utils'
 
 export const assignmentGroupRow = (assignmentGroup, queryData) => {
+  const assignmentGroupPercentage = getAssignmentGroupPercentage(
+    assignmentGroup,
+    filteredAssignments(queryData),
+    false
+  )
+
+  const formattedScore =
+    assignmentGroupPercentage === ASSIGNMENT_NOT_APPLICABLE
+      ? assignmentGroupPercentage
+      : `${formatNumber(assignmentGroupPercentage)}%`
+
+  const letterGrade =
+    assignmentGroupPercentage === ASSIGNMENT_NOT_APPLICABLE
+      ? assignmentGroupPercentage
+      : scorePercentageToLetterGrade(assignmentGroupPercentage, queryData?.gradingStandard)
+
   return (
     <Table.Row key={assignmentGroup?._id}>
       <Table.Cell textAlign="start" colSpan="3">
         <Text weight="bold">{assignmentGroup?.name}</Text>
       </Table.Cell>
       {!ENV.restrict_quantitative_data && (
-        <Table.Cell textAlign="end">
-          <Text weight="bold">
-            {formatNumber(
-              getAssignmentGroupPercentage(assignmentGroup, filteredAssignments(queryData), false)
-            )}
-            %
-          </Text>
+        <Table.Cell textAlign="center">
+          <Text weight="bold">{formattedScore}</Text>
         </Table.Cell>
       )}
-      <Table.Cell textAlign="end">
+      <Table.Cell textAlign="center">
         <Text weight="bold">
           {ENV.restrict_quantitative_data
-            ? scorePercentageToLetterGrade(
-                getAssignmentGroupPercentage(
-                  assignmentGroup,
-                  filteredAssignments(queryData),
-                  false
-                ),
-                queryData?.gradingStandard
-              )
+            ? letterGrade
             : `${
                 formatNumber(
                   getAssignmentGroupEarnedPoints(assignmentGroup, filteredAssignments(queryData))
