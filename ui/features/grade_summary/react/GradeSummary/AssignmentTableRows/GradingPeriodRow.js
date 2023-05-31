@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {ASSIGNMENT_NOT_APPLICABLE} from '../constants'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 
@@ -41,6 +42,15 @@ export const gradingPeriodRow = (gradingPeriod, queryData) => {
     queryData?.applyGroupWeights
   )
 
+  const letterGrade =
+    periodPercentage === ASSIGNMENT_NOT_APPLICABLE
+      ? periodPercentage
+      : scorePercentageToLetterGrade(periodPercentage, queryData?.gradingStandard)
+
+  const formattedScore = `${
+    formatNumber(getGradingPeriodEarnedPoints(gradingPeriod, filterByGradingPeriod)) || '-'
+  }/${formatNumber(getGradingPeriodTotalPoints(gradingPeriod, filterByGradingPeriod)) || '-'}`
+
   return (
     <Table.Row key={gradingPeriod._id}>
       <Table.Cell textAlign="start" colSpan="3">
@@ -49,22 +59,15 @@ export const gradingPeriodRow = (gradingPeriod, queryData) => {
       {!ENV.restrict_quantitative_data && (
         <Table.Cell textAlign="center">
           <Text weight="bold">
-            {Number.isNaN(periodPercentage) ? 'N/A' : `${formatNumber(periodPercentage)}%`}
+            {Number.isNaN(Number.parseFloat(periodPercentage)) ||
+            periodPercentage === ASSIGNMENT_NOT_APPLICABLE
+              ? ASSIGNMENT_NOT_APPLICABLE
+              : `${formatNumber(periodPercentage)}%`}
           </Text>
         </Table.Cell>
       )}
       <Table.Cell textAlign="center">
-        <Text weight="bold">
-          {ENV.restrict_quantitative_data
-            ? scorePercentageToLetterGrade(periodPercentage, queryData?.gradingStandard)
-            : `${
-                formatNumber(getGradingPeriodEarnedPoints(gradingPeriod, filterByGradingPeriod)) ||
-                '-'
-              }/${
-                formatNumber(getGradingPeriodTotalPoints(gradingPeriod, filterByGradingPeriod)) ||
-                '-'
-              }`}
-        </Text>
+        <Text weight="bold">{ENV.restrict_quantitative_data ? letterGrade : formattedScore}</Text>
       </Table.Cell>
     </Table.Row>
   )

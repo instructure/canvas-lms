@@ -21,3 +21,5 @@ export const ASSIGNMENT_SORT_OPTIONS = {
   DUE_DATE: 'Due Date',
   NAME: 'Name',
 }
+
+export const ASSIGNMENT_NOT_APPLICABLE = 'N/A'
