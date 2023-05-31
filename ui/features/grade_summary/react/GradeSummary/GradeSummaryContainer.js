@@ -49,11 +49,16 @@ const GradeSummaryContainer = () => {
 
   const gradingPeriod = getGradingPeriodID()
 
+  const variables = {
+    courseID: ENV.course_id,
+  }
+
+  if (gradingPeriod !== undefined) {
+    variables.gradingPeriodID = gradingPeriod && gradingPeriod !== '0' ? gradingPeriod : null
+  }
+
   const assignmentQuery = useQuery(ASSIGNMENTS, {
-    variables: {
-      courseID: ENV.course_id,
-      gradingPeriodID: gradingPeriod && gradingPeriod !== '0' ? gradingPeriod : null,
-    },
+    variables,
   })
 
   const [readStateChangeSubmission] = useMutation(UPDATE_SUBMISSIONS_READ_STATE, {
