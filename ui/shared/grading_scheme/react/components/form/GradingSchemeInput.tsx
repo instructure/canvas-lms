@@ -24,7 +24,7 @@ import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-import {calculateMaxScoreForDataRow} from '../../helpers/calculateMaxScoreForDataRow'
+import {calculateHighRangeForDataRow} from '../../helpers/calculateHighRangeForDataRow'
 import {GradingSchemeDataRowInput} from './GradingSchemeDataRowInput'
 import {GradingSchemeDataRow} from '../../../gradingSchemeApiModel'
 import {GradingSchemeValidationAlert} from './GradingSchemeValidationAlert'
@@ -41,12 +41,13 @@ export interface GradingSchemeFormInput {
   data: GradingSchemeDataRow[]
 }
 
-interface GradingSchemeFormDataWithUniqueRowIds {
+export interface GradingSchemeFormDataWithUniqueRowIds {
   title: string
   data: GradingSchemeDataRowWithUniqueId[]
 }
 interface GradingSchemeDataRowWithUniqueId extends GradingSchemeDataRow {
   uniqueId: string
+  minRangeNotValidNumber: boolean
 }
 
 export type GradingSchemeInputHandle = {
@@ -75,6 +76,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
         return {
           ...dataRow,
           uniqueId: shortid(),
+          minRangeNotValidNumber: false,
         }
       }),
     })
@@ -84,7 +86,11 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
         const isValid = gradingSchemeIsValid(inputFormData)
         setShowAlert(!isValid)
         if (isValid) {
-          onSave(inputFormData)
+          const dataWithoutIds = inputFormData.data.map(rowWithUniqueId => ({
+            name: rowWithUniqueId.name,
+            value: rowWithUniqueId.value,
+          }))
+          onSave({title: inputFormData.title, data: dataWithoutIds})
         }
       },
     }))
@@ -94,14 +100,24 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
         ...inputFormData,
       }
       updatedScheme.data[rowIndex].name = newRowName
+      updatedScheme.data[rowIndex].minRangeNotValidNumber = false
       setInputFormData(updatedScheme)
     }
 
-    const changeRowMinScore = (rowIndex: number, rowMinScore: number) => {
+    const handleRowInvalidRangeInput = (rowIndex: number) => {
       const updatedScheme = {
         ...inputFormData,
       }
-      updatedScheme.data[rowIndex].value = rowMinScore
+      updatedScheme.data[rowIndex].minRangeNotValidNumber = true
+      setInputFormData(updatedScheme)
+    }
+
+    const handleChangeRowLowRange = (rowIndex: number, rowLowRange: number) => {
+      const updatedScheme = {
+        ...inputFormData,
+      }
+      updatedScheme.data[rowIndex].value = rowLowRange
+      updatedScheme.data[rowIndex].minRangeNotValidNumber = false
       setInputFormData(updatedScheme)
     }
     const changeTitle = (e: ChangeEvent<HTMLInputElement>) => {
@@ -115,7 +131,12 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
     const addDataRow = (index: number) => {
       const [rowBefore, rowAfter] = inputFormData.data.slice(index, index + 2)
       const score = rowAfter ? (rowBefore.value - rowAfter.value) / 2 + rowAfter.value : 0
-      inputFormData.data.splice(index + 1, 0, {uniqueId: shortid(), name: '', value: score})
+      inputFormData.data.splice(index + 1, 0, {
+        uniqueId: shortid(),
+        name: '',
+        value: score,
+        minRangeNotValidNumber: false,
+      })
 
       const updatedScheme = {
         ...inputFormData,
@@ -129,6 +150,10 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
         ...inputFormData,
       }
       updatedScheme.data.splice(index, 1)
+      if (updatedScheme.data.length === 1) {
+        // only one row remains. by definition it must be 100% high range and 0% low range
+        updatedScheme.data[0].value = 0
+      }
       setInputFormData(updatedScheme)
     }
 
@@ -143,17 +168,8 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
           <></>
         )}
 
-        <TextInput
-          isRequired={true}
-          renderLabel={I18n.t('Grading Scheme Name')}
-          onChange={changeTitle}
-          defaultValue={initialFormData.title}
-        />
-        <View as="div" margin="medium none none none">
-          <table
-            className="grading-scheme-data-input-table"
-            style={{textAlign: 'left', width: '100%'}}
-          >
+        <View as="div">
+          <table style={{width: '100%'}}>
             <caption>
               <ScreenReaderContent>
                 {I18n.t(
@@ -163,12 +179,31 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
             </caption>
             <thead>
               <tr>
-                <th style={{width: '10%'}}>
+                <th>
+                  <></>
+                </th>
+                <th colSpan={4}>
+                  <View as="div" padding="small none small none">
+                    <TextInput
+                      isRequired={true}
+                      width="23rem"
+                      renderLabel={I18n.t('Grading Scheme Name')}
+                      onChange={changeTitle}
+                      defaultValue={initialFormData.title}
+                      placeholder={I18n.t('New Grading Scheme')}
+                    />
+                  </View>
+                </th>
+              </tr>
+              <tr>
+                <th style={{width: '5%'}}>
                   <ScreenReaderContent>{I18n.t('Add row action')}</ScreenReaderContent>
                 </th>
-                <th style={{width: '40%'}}>{I18n.t('Letter Grade')}</th>
-                <th style={{width: '40%'}}>{I18n.t('Range')}</th>
-                <th style={{width: '10%'}}>
+                <th style={{width: '30%'}}>{I18n.t('Letter Grade')}</th>
+                <th colSpan={2} style={{width: '50%'}}>
+                  {I18n.t('Range')}
+                </th>
+                <th style={{width: '15%'}}>
                   <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
                 </th>
               </tr>
@@ -178,9 +213,10 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
                 <Fragment key={dataRow.uniqueId}>
                   <GradingSchemeDataRowInput
                     dataRow={{name: dataRow.name, value: dataRow.value}}
-                    maxScore={calculateMaxScoreForDataRow(idx, array)}
+                    highRange={calculateHighRangeForDataRow(idx, array)}
                     isFirstRow={idx === 0}
-                    onRowMinScoreChange={minScore => changeRowMinScore(idx, minScore)}
+                    onLowRangeChange={lowRangeValue => handleChangeRowLowRange(idx, lowRangeValue)}
+                    onLowRangeInputInvalidNumber={() => handleRowInvalidRangeInput(idx)}
                     onRowLetterGradeChange={letterGrade => changeRowLetterGrade(idx, letterGrade)}
                     onRowDeleteRequested={() => removeDataRow(idx)}
                     onRowAddRequested={() => addDataRow(idx)}

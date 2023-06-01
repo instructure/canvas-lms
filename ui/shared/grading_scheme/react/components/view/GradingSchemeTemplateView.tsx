@@ -27,8 +27,9 @@ import {IconCopyLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 // @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {Tooltip} from '@instructure/ui-tooltip'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-import {calculateMaxScoreForDataRow} from '../../helpers/calculateMaxScoreForDataRow'
+import {calculateHighRangeForDataRow} from '../../helpers/calculateHighRangeForDataRow'
 import {GradingSchemeDataRowView} from './GradingSchemeDataRowView'
 import {Heading} from '@instructure/ui-heading'
 import {GradingSchemeTemplate} from '@canvas/grading-scheme'
@@ -51,10 +52,11 @@ export const GradingSchemeTemplateView: React.FC<ComponentProps> = ({
   onDuplicationRequested,
 }) => {
   return (
-    <View as="div" data-testid="default_canvas_grading_scheme">
+    <View as="div" margin="none none none x-large" data-testid="default_canvas_grading_scheme">
       <Flex>
         <Item shouldGrow={true} shouldShrink={true} padding="none medium none none">
           <Heading level="h3" margin="0 0 x-small">
+            <ScreenReaderContent>{I18n.t('Grading scheme title')}</ScreenReaderContent>
             {gradingSchemeTemplate.title}
           </Heading>
         </Item>
@@ -62,6 +64,8 @@ export const GradingSchemeTemplateView: React.FC<ComponentProps> = ({
           {allowDuplicate ? (
             <Tooltip renderTip={I18n.t('edit a copy')} placement="bottom">
               <IconButton
+                withBackground={false}
+                withBorder={false}
                 onClick={onDuplicationRequested}
                 screenReaderLabel={I18n.t('Edit a copy of this grading scheme')}
                 data-testid="default_canvas_grading_scheme_duplicate_button"
@@ -84,7 +88,7 @@ export const GradingSchemeTemplateView: React.FC<ComponentProps> = ({
             data-testid="default_canvas_grading_scheme_data_table"
           >
             <Head>
-              <Row>
+              <Row theme={{borderColor: 'transparent'}}>
                 <ColHeader theme={{padding: 'none'}} id="1">
                   {I18n.t('Letter Grade')}
                 </ColHeader>
@@ -98,7 +102,7 @@ export const GradingSchemeTemplateView: React.FC<ComponentProps> = ({
                 <GradingSchemeDataRowView
                   key={shortid()}
                   dataRow={dataRow}
-                  maxScore={calculateMaxScoreForDataRow(idx, array)}
+                  maxScore={calculateHighRangeForDataRow(idx, array)}
                   isFirstRow={idx === 0}
                 />
               ))}

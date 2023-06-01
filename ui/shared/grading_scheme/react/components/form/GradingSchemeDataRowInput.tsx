@@ -25,8 +25,10 @@ import numberHelper from '@canvas/i18n/numberHelper'
 import {IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {GradingSchemeDataRow} from '../../../gradingSchemeApiModel'
+// @ts-expect-error -- TODO: remove once we're on InstUI 8
+import {Tooltip} from '@instructure/ui-tooltip'
 
+import {GradingSchemeDataRow} from '../../../gradingSchemeApiModel'
 import {decimalToRoundedPercent} from '../../helpers/decimalToRoundedPercent'
 import {roundToTwoDecimalPlaces} from '../../helpers/roundToTwoDecimalPlaces'
 
@@ -37,85 +39,99 @@ const {Item} = Flex as any
 
 interface ComponentProps {
   dataRow: GradingSchemeDataRow
-  maxScore: number
+  highRange: number
   isFirstRow: boolean
   isLastRow: boolean
   onRowLetterGradeChange: (letterGrade: string) => any
-  onRowMinScoreChange: (minScore: number) => any
+  onLowRangeChange: (lowRange: number) => any
+  onLowRangeInputInvalidNumber: () => any
   onRowDeleteRequested: () => any
   onRowAddRequested: () => any
 }
 
-export const GradingSchemeDataRowInput: React.FC<ComponentProps> = ({
+export const GradingSchemeDataRowInput = ({
   dataRow,
-  maxScore,
+  highRange,
   isFirstRow,
   isLastRow,
-  onRowMinScoreChange,
+  onLowRangeChange,
+  onLowRangeInputInvalidNumber,
   onRowLetterGradeChange,
   onRowAddRequested,
   onRowDeleteRequested,
-}) => {
-  const [minScore, setMinScore] = useState<number>(dataRow.value)
-  const [minScoreInputBuffer, setMinScoreInputBuffer] = useState<string | undefined>(undefined)
-  const [minScoreInvalid, setMinScoreInvalid] = useState<boolean>(false)
+}: ComponentProps) => {
+  const [lowRange, setLowRange] = useState<number>(dataRow.value)
+  const [lowRangeInputBuffer, setLowRangeInputBuffer] = useState<string | undefined>(undefined)
+  const [lowRangeInvalid, setLowRangeInvalid] = useState<boolean>(false)
+  const [addButtonHovering, setAddButtonHovering] = useState<boolean>(false)
+
   // @ts-expect-error -- TODO: remove once we're on InstUI 8
   const triggerLetterGradeChange = event => {
     onRowLetterGradeChange(event.target.value)
   }
 
-  const triggerRowMinScoreBlur = () => {
-    if (!minScoreInputBuffer) return
+  const triggerRowLowRangeBlur = () => {
+    if (!lowRangeInputBuffer) return
 
-    const inputVal = numberHelper.parse(minScoreInputBuffer)
+    const inputVal = numberHelper.parse(lowRangeInputBuffer)
 
     if (!Number.isNaN(Number(inputVal)) && inputVal >= 0 && inputVal <= 100) {
-      setMinScoreInvalid(false)
-      const minScoreRounded = roundToTwoDecimalPlaces(Number(inputVal))
-      setMinScoreInputBuffer(undefined)
-      setMinScore(minScoreRounded / 100)
-      onRowMinScoreChange(minScoreRounded / 100)
+      setLowRangeInvalid(false)
+      const lowRangeRounded = roundToTwoDecimalPlaces(Number(inputVal))
+      setLowRangeInputBuffer(undefined)
+      setLowRange(lowRangeRounded / 100)
+      onLowRangeChange(lowRangeRounded / 100)
     } else {
-      setMinScoreInvalid(true)
+      setLowRangeInvalid(true)
+      onLowRangeInputInvalidNumber()
     }
   }
 
   // @ts-expect-error -- TODO: remove once we're on InstUI 8
-  const triggerRowMinScoreChange = event => {
+  const triggerRowLowRangeChange = event => {
     const scoreInput = event.target.value
-    setMinScoreInputBuffer(scoreInput)
+    setLowRangeInputBuffer(scoreInput)
 
     const inputVal = numberHelper.parse(scoreInput)
     if (!Number.isNaN(Number(inputVal)) && inputVal >= 0 && inputVal <= 100) {
-      setMinScoreInvalid(false)
-      onRowMinScoreChange(Number(inputVal) / 100)
+      setLowRangeInvalid(false)
+      onLowRangeChange(Number(inputVal) / 100)
     } else {
-      setMinScoreInvalid(true)
+      setLowRangeInvalid(true)
+      onLowRangeInputInvalidNumber()
     }
   }
 
-  function renderMinScore() {
+  function renderLowRange() {
     return String(
       // TODO JS: I18n for numbers (decimals)?
-      minScoreInputBuffer !== undefined ? minScoreInputBuffer : decimalToRoundedPercent(minScore)
+      lowRangeInputBuffer !== undefined ? lowRangeInputBuffer : decimalToRoundedPercent(lowRange)
     )
   }
 
-  const minScoreValidationMessageState = minScoreInvalid ? 'error' : 'hint'
+  const lowRangeValidationMessageState = lowRangeInvalid ? 'error' : 'hint'
 
   return (
     <>
       <tr>
         <td>
-          {' '}
-          <IconButton
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel={I18n.t('Add new row to grading scheme after this row')}
-            onClick={onRowAddRequested}
-          >
-            <IconPlusLine />
-          </IconButton>
+          <Tooltip renderTip={I18n.t('add a letter grade')}>
+            <IconButton
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={I18n.t(
+                'Add new row for a letter grade to grading scheme after this row'
+              )}
+              onClick={onRowAddRequested}
+              elementRef={(buttonRef: HTMLButtonElement) => {
+                if (!buttonRef) return
+                buttonRef.onmouseover = () => setAddButtonHovering(true)
+                buttonRef.onmouseout = () => setAddButtonHovering(false)
+              }}
+            >
+              <IconPlusLine />
+            </IconButton>
+          </Tooltip>
         </td>
         <td>
           <TextInput
@@ -128,14 +144,14 @@ export const GradingSchemeDataRowInput: React.FC<ComponentProps> = ({
             messages={[{text: <></>, type: 'hint'}]}
           />
         </td>
-        <td>
+        <td style={{width: '25%'}}>
+          <span aria-label={I18n.t('Upper limit of range')}>
+            {isFirstRow ? '' : '< '}
+            {decimalToRoundedPercent(highRange)}%
+          </span>
+        </td>
+        <td style={{width: '25%'}}>
           <Flex display="inline-flex">
-            <Item>
-              <span aria-label={I18n.t('Upper limit of range')}>
-                {isFirstRow ? '' : '< '}
-                {decimalToRoundedPercent(maxScore)}%
-              </span>
-            </Item>
             <Item padding="x-small">{I18n.t('to')}</Item>
             <Item>
               <span aria-label={I18n.t('Lower limit of range')}>
@@ -151,10 +167,10 @@ export const GradingSchemeDataRowInput: React.FC<ComponentProps> = ({
                       display="inline-block"
                       width="4.5rem"
                       htmlSize={3}
-                      onChange={triggerRowMinScoreChange}
-                      onBlur={triggerRowMinScoreBlur}
-                      value={renderMinScore()}
-                      messages={[{text: <></>, type: minScoreValidationMessageState}]}
+                      onChange={triggerRowLowRangeChange}
+                      onBlur={triggerRowLowRangeBlur}
+                      value={renderLowRange()}
+                      messages={[{text: <></>, type: lowRangeValidationMessageState}]}
                     />
                     %
                   </>
@@ -169,13 +185,25 @@ export const GradingSchemeDataRowInput: React.FC<ComponentProps> = ({
               <IconButton
                 withBackground={false}
                 withBorder={false}
-                screenReaderLabel={I18n.t('Delete row')}
+                screenReaderLabel={I18n.t('Remove letter grade row')}
                 onClick={onRowDeleteRequested}
               >
                 <IconTrashLine />
               </IconButton>
             </Item>
           </Flex>
+        </td>
+      </tr>
+
+      <tr>
+        <td colSpan={5}>
+          <div style={{height: '5px'}}>
+            {addButtonHovering ? (
+              <hr style={{margin: 0, border: 'none', borderTop: '1px dashed grey'}} />
+            ) : (
+              <></>
+            )}
+          </div>
         </td>
       </tr>
     </>

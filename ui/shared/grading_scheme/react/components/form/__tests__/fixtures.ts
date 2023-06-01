@@ -29,6 +29,14 @@ export const VALID_FORM_INPUT: GradingSchemeFormInput = {
   title: 'A Grading Scheme',
 }
 
+export const SHORT_FORM_INPUT: GradingSchemeFormInput = {
+  data: [
+    {name: 'P', value: 0.5},
+    {name: 'F', value: 0.0},
+  ],
+  title: 'A Grading Scheme',
+}
+
 export const FORM_INPUT_MISSING_TITLE: GradingSchemeFormInput = {
   data: [
     {name: 'A', value: 0.9},

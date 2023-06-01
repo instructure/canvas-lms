@@ -16,24 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Outlet} from 'react-router-dom'
-import {accountGradingSettingsRoutes} from '../../account_grading_settings/routes/accountGradingSettingsRoutes'
+import React, {useEffect} from 'react'
+import {useMatch} from 'react-router-dom'
+import {GradingSchemesManagement} from '@canvas/grading-scheme'
 
-export const routes = [
-  {
-    path: '/courses/:courseId',
-    element: <Outlet />,
-    children: [
-      /* ...fooRoutes */
-    ],
-  },
-  {
-    path: '/accounts/:accountId',
-    element: <Outlet />,
-    children: [
-      ...accountGradingSettingsRoutes,
-      /* ...fooRoutes */
-    ],
-  },
-]
+export const AccountGradingSchemes = () => {
+  const pathMatch = useMatch('/accounts/:accountId/*')
+  if (!pathMatch || !pathMatch.params || !pathMatch.params.accountId) {
+    throw new Error('account id is not present on path')
+  }
+  useEffect(() => {
+    document.title = 'Account Grading Schemes'
+  }, [])
+  return <GradingSchemesManagement contextType="Account" contextId={pathMatch.params.accountId} />
+}

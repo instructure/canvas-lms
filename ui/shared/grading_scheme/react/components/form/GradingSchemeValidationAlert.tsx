@@ -20,18 +20,19 @@ import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {GradingSchemeFormInput} from './GradingSchemeInput'
+import {GradingSchemeFormDataWithUniqueRowIds} from './GradingSchemeInput'
 
 import {
   gradingSchemeIsValid,
   rowNamesAreValid,
   rowDataIsValid,
+  rowDataIsValidNumber,
 } from './validations/gradingSchemeValidations'
 
 const I18n = useI18nScope('GradingSchemes')
 
 export interface ComponentProps {
-  formData: GradingSchemeFormInput
+  formData: GradingSchemeFormDataWithUniqueRowIds
   onClose: () => any
 }
 
@@ -57,6 +58,12 @@ export const GradingSchemeValidationAlert: React.FC<ComponentProps> = ({onClose,
         {gradingSchemeIsValid(formData) ? (
           // grading scheme did initially have validation error(s), but errors have since been corrected
           <>{I18n.t('Looks great!')}</>
+        ) : !rowDataIsValidNumber(formData) ? (
+          <>
+            {I18n.t(
+              "Cannot have negative ranges or ranges that are greater than 100. Fix the ranges and try clicking 'Save' again."
+            )}
+          </>
         ) : !rowDataIsValid(formData) ? (
           <>
             {I18n.t(
@@ -68,6 +75,10 @@ export const GradingSchemeValidationAlert: React.FC<ComponentProps> = ({onClose,
             {I18n.t(
               "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again."
             )}
+          </>
+        ) : !formData.title ? (
+          <>
+            {I18n.t("Grading Scheme Name is required. Add a name and try clicking 'Save' again.")}
           </>
         ) : (
           <>{I18n.t('Invalid grading scheme')}</>

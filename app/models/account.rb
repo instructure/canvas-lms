@@ -1889,7 +1889,13 @@ class Account < ActiveRecord::Base
       if can_see_rubrics_tab?(user)
         tabs << { id: TAB_RUBRICS, label: t("#account.tab_rubrics", "Rubrics"), css_class: "rubrics", href: :account_rubrics_path }
       end
-      tabs << { id: TAB_GRADING_STANDARDS, label: t("#account.tab_grading_standards", "Grading"), css_class: "grading_standards", href: :account_grading_standards_path } if user && grants_right?(user, :manage_grades)
+
+      grading_settings_href = if Account.site_admin.feature_enabled?(:grading_scheme_updates)
+                                :account_grading_settings_path
+                              else
+                                :account_grading_standards_path
+                              end
+      tabs << { id: TAB_GRADING_STANDARDS, label: t("#account.tab_grading_standards", "Grading"), css_class: "grading_standards", href: grading_settings_href } if user && grants_right?(user, :manage_grades)
       tabs << { id: TAB_QUESTION_BANKS, label: t("#account.tab_question_banks", "Question Banks"), css_class: "question_banks", href: :account_question_banks_path } if user && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       tabs << { id: TAB_SUB_ACCOUNTS, label: t("#account.tab_sub_accounts", "Sub-Accounts"), css_class: "sub_accounts", href: :account_sub_accounts_path } if manage_settings
       tabs << { id: TAB_ACCOUNT_CALENDARS, label: t("Account Calendars"), css_class: "account_calendars", href: :account_calendar_settings_path } if user && grants_right?(user, :manage_account_calendar_visibility)
