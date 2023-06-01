@@ -25,4 +25,4 @@ if RUBY_ENGINE == "truffleruby"
 elsif RUBY_VERSION >= "3.2.0"
   warn "Ruby 3.2+ support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
 end
-ruby ">= 2.7.0"
+ruby ">= 3.1.0"
