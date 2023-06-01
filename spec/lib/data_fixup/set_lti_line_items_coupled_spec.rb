@@ -37,7 +37,7 @@ describe DataFixup::SetLtiLineItemsCoupled do
 
   let(:assignment) do
     assignment_model({
-                       course: course,
+                       course:,
                        submission_types: "external_tool",
                        external_tool_tag_attributes: {
                          url: tool.url,
@@ -59,7 +59,7 @@ describe DataFixup::SetLtiLineItemsCoupled do
 
   context "when the line item is not the resource link's first" do
     it "sets coupled to false" do
-      line_item2 = line_item_model(assignment: assignment, lti_resource_link_id: assignment.line_items.first.lti_resource_link_id)
+      line_item2 = line_item_model(assignment:, lti_resource_link_id: assignment.line_items.first.lti_resource_link_id)
       described_class.run
       line_item2.reload
       expect(line_item2.coupled).to be(false)

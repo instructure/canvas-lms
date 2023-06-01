@@ -76,7 +76,7 @@ module Calendar2Common
     rrule = "FREQ=DAILY;INTERVAL=1;COUNT=3"
   )
     rr = RRule::Rule.new(rrule, dtstart: start_at, tzid: Time.zone.tzinfo.name)
-    event_attributes = { title: title, rrule: rrule, series_uuid: SecureRandom.uuid }
+    event_attributes = { title:, rrule:, series_uuid: SecureRandom.uuid }
     dtstart_list = rr.all
 
     dtstart_list.map do |dtstart|
@@ -354,8 +354,8 @@ module Calendar2Common
       should_add_date: with_date,
       should_add_location: with_location,
       should_duplicate: with_duplicates,
-      date: date,
-      use_current_course_calendar: use_current_course_calendar
+      date:,
+      use_current_course_calendar:
     )
   end
 

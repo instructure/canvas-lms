@@ -218,7 +218,7 @@ module MasterCourses::Restrictor
 
     locked_types = []
     self.class.base_class.restricted_column_settings.each do |type, columns|
-      if !child_content_restrictions[type] && (child_tag.downstream_changes & columns).any?
+      if !child_content_restrictions[type] && child_tag.downstream_changes.intersect?(columns)
         locked_types << type
       end
     end
@@ -254,7 +254,7 @@ module MasterCourses::Restrictor
     if @importing_migration
       @importing_migration.master_course_subscription.master_template.find_preloaded_restriction(migration_id) # for extra speeds on import
     else
-      MasterCourses::MasterContentTag.where(migration_id: migration_id).pluck(:restrictions).first
+      MasterCourses::MasterContentTag.where(migration_id:).pluck(:restrictions).first
     end
   end
 

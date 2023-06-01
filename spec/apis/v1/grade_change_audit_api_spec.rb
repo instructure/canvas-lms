@@ -126,7 +126,7 @@ describe "GradeChangeAudit API", type: :request do
 
   def expect_event_for_context(context, event, options = {})
     json = fetch_for_context(context, options)
-    events = events_for_context(context, options.merge(json: json))
+    events = events_for_context(context, options.merge(json:))
     expect(events).to include([event.id, event.event_type])
     json
   end
@@ -139,7 +139,7 @@ describe "GradeChangeAudit API", type: :request do
 
   def expect_event_for_course_and_contexts(contexts, event, options = {})
     json = fetch_for_course_and_other_contexts(contexts, options)
-    events = events_for_course_and_contexts(contexts, options.merge(json: json))
+    events = events_for_course_and_contexts(contexts, options.merge(json:))
     expect(events).to include([event.id, event.event_type])
     json
   end
@@ -205,7 +205,7 @@ describe "GradeChangeAudit API", type: :request do
       @student_in_new_section = User.create!
       @course.enroll_user(@student_in_new_section, "StudentEnrollment", enrollment_state: "active", section: new_section)
       submission = @assignment.grade_student(@student_in_new_section, grade: 8, grader: @teacher).first
-      @event_visible_to_ta = Auditors::GradeChange.record(submission: submission)
+      @event_visible_to_ta = Auditors::GradeChange.record(submission:)
     end
 
     context "course" do
@@ -261,39 +261,39 @@ describe "GradeChangeAudit API", type: :request do
     it "recognizes :start_time" do
       json = expect_event_for_context(@assignment, @event, start_time: 12.hours.ago)
 
-      forbid_event_for_context(@assignment, @event2, start_time: 12.hours.ago, json: json)
+      forbid_event_for_context(@assignment, @event2, start_time: 12.hours.ago, json:)
 
       json = expect_event_for_context(@course, @event, start_time: 12.hours.ago)
-      forbid_event_for_context(@course, @event2, start_time: 12.hours.ago, json: json)
+      forbid_event_for_context(@course, @event2, start_time: 12.hours.ago, json:)
 
       json = expect_event_for_context(@student, @event, type: "student", start_time: 12.hours.ago)
-      forbid_event_for_context(@student, @event2, type: "student", start_time: 12.hours.ago, json: json)
+      forbid_event_for_context(@student, @event2, type: "student", start_time: 12.hours.ago, json:)
 
       json = expect_event_for_context(@teacher, @event, type: "grader", start_time: 12.hours.ago)
-      forbid_event_for_context(@teacher, @event2, type: "grader", start_time: 12.hours.ago, json: json)
+      forbid_event_for_context(@teacher, @event2, type: "grader", start_time: 12.hours.ago, json:)
 
       test_course_and_contexts do |contexts|
         json = expect_event_for_course_and_contexts(contexts, @event, start_time: 12.hours.ago)
-        forbid_event_for_course_and_contexts(contexts, @event2, start_time: 12.hours.ago, json: json)
+        forbid_event_for_course_and_contexts(contexts, @event2, start_time: 12.hours.ago, json:)
       end
     end
 
     it "recognizes :end_time" do
       json = expect_event_for_context(@assignment, @event2, end_time: 12.hours.ago)
-      forbid_event_for_context(@assignment, @event, end_time: 12.hours.ago, json: json)
+      forbid_event_for_context(@assignment, @event, end_time: 12.hours.ago, json:)
 
       json = forbid_event_for_context(@student, @event, type: "student", end_time: 12.hours.ago)
-      expect_event_for_context(@student, @event2, type: "student", end_time: 12.hours.ago, json: json)
+      expect_event_for_context(@student, @event2, type: "student", end_time: 12.hours.ago, json:)
 
       json = expect_event_for_context(@course, @event2, end_time: 12.hours.ago)
-      forbid_event_for_context(@course, @event, end_time: 12.hours.ago, json: json)
+      forbid_event_for_context(@course, @event, end_time: 12.hours.ago, json:)
 
       json = expect_event_for_context(@teacher, @event2, type: "grader", end_time: 12.hours.ago)
-      forbid_event_for_context(@teacher, @event, type: "grader", end_time: 12.hours.ago, json: json)
+      forbid_event_for_context(@teacher, @event, type: "grader", end_time: 12.hours.ago, json:)
 
       test_course_and_contexts do |contexts|
         json = expect_event_for_course_and_contexts(contexts, @event2, end_time: 12.hours.ago)
-        forbid_event_for_course_and_contexts(contexts, @event, end_time: 12.hours.ago, json: json)
+        forbid_event_for_course_and_contexts(contexts, @event, end_time: 12.hours.ago, json:)
       end
     end
 

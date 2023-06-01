@@ -385,7 +385,7 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
       it "renders inline LaTeX in the equation editor" do
         page_title = "math_rendering"
         body = "<p>\\(\\LaTeX\\)</p>"
-        @course.wiki_pages.create!(title: page_title, body: body)
+        @course.wiki_pages.create!(title: page_title, body:)
         visit_existing_wiki_edit(@course, page_title)
         in_frame rce_page_body_ifr_id do
           double_click("#tinymce p")
@@ -468,7 +468,7 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
           <p><span id="ifr">cannot link <iframe>me</iframe></span></p>
           <p><span id="vid">nor <video>me</video></span></p>
         HTML
-        @course.wiki_pages.create!(title: "title", body: body)
+        @course.wiki_pages.create!(title: "title", body:)
         visit_existing_wiki_edit(@course, "title")
 
         driver.execute_script(<<~JS)

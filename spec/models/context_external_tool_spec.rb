@@ -34,7 +34,7 @@ describe ContextExternalTool do
         shared_secret: "secret",
         name: "test tool",
         url: "http://www.tool.com/launch",
-        developer_key: developer_key,
+        developer_key:,
         lti_version: "1.3",
         root_account: @root_account
       )
@@ -208,7 +208,7 @@ describe ContextExternalTool do
         shared_secret: "secret",
         name: "test tool",
         url: "http://www.tool.com/launch",
-        developer_key: developer_key
+        developer_key:
       )
     end
 
@@ -220,7 +220,7 @@ describe ContextExternalTool do
       let(:preferred_launch_url) { "https://www.test.com/tool-launch" }
 
       it "returns the preferred_launch_url" do
-        expect(tool.login_or_launch_url(preferred_launch_url: preferred_launch_url)).to eq preferred_launch_url
+        expect(tool.login_or_launch_url(preferred_launch_url:)).to eq preferred_launch_url
       end
     end
 
@@ -248,7 +248,7 @@ describe ContextExternalTool do
 
       before do
         tool.lti_version = "1.3"
-        developer_key.update!(oidc_initiation_url: oidc_initiation_url)
+        developer_key.update!(oidc_initiation_url:)
       end
 
       it "returns the oidc login url" do
@@ -276,7 +276,7 @@ describe ContextExternalTool do
       let(:preferred_launch_url) { "https://www.test.com/tool-launch" }
 
       it "returns the preferred_launch_url" do
-        expect(tool.launch_url(preferred_launch_url: preferred_launch_url)).to eq preferred_launch_url
+        expect(tool.launch_url(preferred_launch_url:)).to eq preferred_launch_url
       end
     end
 
@@ -362,7 +362,7 @@ describe ContextExternalTool do
   end
 
   describe "#url_with_environment_overrides" do
-    subject { tool.url_with_environment_overrides(url, include_launch_url: include_launch_url) }
+    subject { tool.url_with_environment_overrides(url, include_launch_url:) }
 
     let(:url) { "http://www.tool.com/launch" }
     let(:include_launch_url) { false }
@@ -373,7 +373,7 @@ describe ContextExternalTool do
         consumer_key: "key",
         shared_secret: "secret",
         name: "test tool",
-        url: url
+        url:
       )
     end
 
@@ -489,7 +489,7 @@ describe ContextExternalTool do
       before do
         tool.settings[:environments] = {
           domain: override_domain,
-          beta_domain: beta_domain
+          beta_domain:
         }
       end
 
@@ -556,7 +556,7 @@ describe ContextExternalTool do
         consumer_key: "key",
         shared_secret: "secret",
         name: "test tool",
-        domain: domain
+        domain:
       )
     end
 
@@ -765,7 +765,7 @@ describe ContextExternalTool do
       before do
         tool.update!(
           domain: nil,
-          url: url
+          url:
         )
       end
 
@@ -792,7 +792,7 @@ describe ContextExternalTool do
       before do
         tool.update!(
           url: nil,
-          domain: domain
+          domain:
         )
       end
 
@@ -852,8 +852,8 @@ describe ContextExternalTool do
       end
       let(:tool) do
         ContextExternalTool.create!(
-          settings: settings,
-          context: context,
+          settings:,
+          context:,
           name: "first tool",
           consumer_key: "key",
           shared_secret: "secret",
@@ -864,7 +864,7 @@ describe ContextExternalTool do
       context "when url is not set" do
         let(:domain) { "instructure.com" }
 
-        before { tool.update!(url: nil, domain: domain) }
+        before { tool.update!(url: nil, domain:) }
 
         context "when no other tools are installed in the context" do
           it "does not count as duplicate" do
@@ -1163,7 +1163,7 @@ describe ContextExternalTool do
 
     let(:tool) do
       course.context_external_tools.build(
-        name: "a", url: url, consumer_key: "12345", shared_secret: "secret", settings: settings
+        name: "a", url:, consumer_key: "12345", shared_secret: "secret", settings:
       )
     end
     let(:settings) { {} }
@@ -1609,11 +1609,11 @@ describe ContextExternalTool do
 
         let(:context) { @course }
         let(:domain) { "www.test.com" }
-        let(:opts) { { url: url, domain: domain } }
+        let(:opts) { { url:, domain: } }
         let(:requested_url) { "" }
         let(:url) { "https://www.test.com/foo?bar=1" }
-        let(:lti_1_1_tool) { external_tool_model(context: context, opts: opts) }
-        let(:lti_1_3_tool) { external_tool_1_3_model(context: context, opts: opts) }
+        let(:lti_1_1_tool) { external_tool_model(context:, opts:) }
+        let(:lti_1_3_tool) { external_tool_1_3_model(context:, opts:) }
 
         context "with an exact URL match" do
           let(:requested_url) { url }
@@ -1640,7 +1640,7 @@ describe ContextExternalTool do
       let(:tool_params) do
         {
           name: "a",
-          url: url,
+          url:,
           consumer_key: "12345",
           shared_secret: "secret",
         }
@@ -1670,7 +1670,7 @@ describe ContextExternalTool do
     context "with duplicate tools" do
       let(:url) { "http://example.com/launch" }
       let(:tool) do
-        t = @course.context_external_tools.create!(name: "test", domain: "example.com", url: url, consumer_key: "12345", shared_secret: "secret")
+        t = @course.context_external_tools.create!(name: "test", domain: "example.com", url:, consumer_key: "12345", shared_secret: "secret")
         t.global_navigation = {
           url: "http://www.example.com",
           text: "Example URL"
@@ -1733,7 +1733,7 @@ describe ContextExternalTool do
     describe "when only_1_3 is passed in" do
       let(:url) { "http://example.com/launch" }
       let(:tool) do
-        @course.context_external_tools.create!(name: "test", domain: "example.com", url: url, consumer_key: "12345", shared_secret: "secret")
+        @course.context_external_tools.create!(name: "test", domain: "example.com", url:, consumer_key: "12345", shared_secret: "secret")
       end
 
       context "when the matching tool is 1.1" do
@@ -3215,7 +3215,7 @@ describe ContextExternalTool do
   describe "is_rce_favorite" do
     def tool_in_context(context)
       ContextExternalTool.create!(
-        context: context,
+        context:,
         consumer_key: "key",
         shared_secret: "secret",
         name: "test tool",
@@ -3311,7 +3311,7 @@ describe ContextExternalTool do
     describe "#prepare_for_ags" do
       subject { tool.prepare_for_ags(old_tool.id) }
 
-      let(:course) { course_model(account: account) }
+      let(:course) { course_model(account:) }
       let(:account) { account_model }
       let(:direct) do
         a = assignment_model(context: course, title: "direct", submission_types: "external_tool")

@@ -45,7 +45,7 @@ module Lti
       # deleted tools are never updated during a dev key update so can be safely ignored
       tool_is_disabled = existing_tool&.workflow_state == ContextExternalTool::DISABLED_STATE
 
-      tool = existing_tool || ContextExternalTool.new(context: context)
+      tool = existing_tool || ContextExternalTool.new(context:)
       Importers::ContextExternalToolImporter.import_from_migration(
         importable_configuration,
         context,

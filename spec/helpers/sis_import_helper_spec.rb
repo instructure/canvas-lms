@@ -30,7 +30,7 @@ describe SisImportHelper do
   end
 
   it "generates tokens for error attachments that expire in an hour" do
-    token = sis_import_error_attachment_token(@batch, user: user)
+    token = sis_import_error_attachment_token(@batch, user:)
     expiration = Time.at(CanvasSecurity.decode_jwt(token)[:exp])
     expect(expiration).to be_within(1.minute).of(1.hour.from_now)
   end

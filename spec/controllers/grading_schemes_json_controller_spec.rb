@@ -148,10 +148,10 @@ describe GradingSchemesJsonController, type: :request do
                 { "name" => "D", "value" => 0.60 },
                 { "name" => "F", "value" => 0.0 }]
         params = { title: "My Scheme Title",
-                   data: data }
+                   data: }
 
         post "/accounts/" + @account.id.to_s + "/grading_schemes",
-             params: params,
+             params:,
              as: :json
         expect(response).to have_http_status(:ok)
         response_json = response.parsed_body
@@ -216,7 +216,7 @@ describe GradingSchemesJsonController, type: :request do
                    data: updated_data }
 
         put "/accounts/" + @account.id.to_s + "/grading_schemes/" + account_level_grading_standard.id.to_s,
-            params: params,
+            params:,
             as: :json
         expect(response).to have_http_status(:ok)
         response_json = response.parsed_body
@@ -334,10 +334,10 @@ describe GradingSchemesJsonController, type: :request do
                 { "name" => "F", "value" => 0.0 }]
 
         params = { title: "My Scheme Title",
-                   data: data }
+                   data: }
 
         post "/courses/" + @course.id.to_s + "/grading_schemes",
-             params: params,
+             params:,
              as: :json
         expect(response).to have_http_status(:ok)
         response_json = response.parsed_body
@@ -424,7 +424,7 @@ describe GradingSchemesJsonController, type: :request do
                    data: updated_data }
 
         put "/courses/" + @course.id.to_s + "/grading_schemes/" + grading_standard.id.to_s,
-            params: params,
+            params:,
             as: :json
         expect(response).to have_http_status(:ok)
         response_json = response.parsed_body

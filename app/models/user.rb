@@ -21,7 +21,7 @@
 require "atom"
 
 class User < ActiveRecord::Base
-  GRAVATAR_PATTERN = %r{^https?://[a-zA-Z0-9.-]+\.gravatar\.com/}.freeze
+  GRAVATAR_PATTERN = %r{^https?://[a-zA-Z0-9.-]+\.gravatar\.com/}
   MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
 
   include ManyRootAccounts
@@ -323,13 +323,13 @@ class User < ActiveRecord::Base
   # NOTE: only use for courses with differentiated assignments on
   scope :able_to_see_assignment_in_course_with_da, lambda { |assignment_id, course_id|
     joins(:assignment_student_visibilities)
-      .where(assignment_student_visibilities: { assignment_id: assignment_id, course_id: course_id })
+      .where(assignment_student_visibilities: { assignment_id:, course_id: })
   }
 
   # NOTE: only use for courses with differentiated assignments on
   scope :able_to_see_quiz_in_course_with_da, lambda { |quiz_id, course_id|
     joins(:quiz_student_visibilities)
-      .where(quiz_student_visibilities: { quiz_id: quiz_id, course_id: course_id })
+      .where(quiz_student_visibilities: { quiz_id:, course_id: })
   }
 
   scope :observing_students_in_course, lambda { |observee_ids, course_ids|
@@ -427,7 +427,7 @@ class User < ActiveRecord::Base
   attr_accessor :last_login
 
   def self.preload_last_login(users, account_id)
-    maxes = Pseudonym.active.where(user_id: users).group(:user_id).where(account_id: account_id)
+    maxes = Pseudonym.active.where(user_id: users).group(:user_id).where(account_id:)
                      .maximum(:current_login_at)
     users.each do |u|
       u.last_login = maxes[u.id]
@@ -562,7 +562,7 @@ class User < ActiveRecord::Base
     if root_account_ids_changed?
       save!
       # Update each communication channel associated with the user
-      communication_channels.update_all(root_account_ids: root_account_ids)
+      communication_channels.update_all(root_account_ids:)
     end
   end
 
@@ -795,7 +795,7 @@ class User < ActiveRecord::Base
             # for incremental, only update the old association if it is deeper than the new one
             # for non-incremental, update it if it changed
             if (incremental && association[1] > depth) || (!incremental && association[1] != depth)
-              UserAccountAssociation.where(id: association[0]).update_all(depth: depth)
+              UserAccountAssociation.where(id: association[0]).update_all(depth:)
             end
             # remove from list of existing for non-incremental
             current_associations.delete(key) unless incremental
@@ -889,7 +889,7 @@ class User < ActiveRecord::Base
   end
 
   # Feel free to add, but the "authoritative" list (http://en.wikipedia.org/wiki/Title_(name)) is quite large
-  SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i.freeze
+  SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i
 
   # see also user_sortable_name.js
   def self.name_parts(name, prior_surname: nil, likely_already_surname_first: false)
@@ -932,7 +932,7 @@ class User < ActiveRecord::Base
   end
 
   def self.last_name_first(name, name_was = nil, likely_already_surname_first:)
-    previous_surname = name_parts(name_was, likely_already_surname_first: likely_already_surname_first)[1]
+    previous_surname = name_parts(name_was, likely_already_surname_first:)[1]
     given, surname, suffix = name_parts(name, prior_surname: previous_surname)
     given = [given, suffix].compact.join(" ")
     surname ? "#{surname}, #{given}".strip : given
@@ -963,7 +963,7 @@ class User < ActiveRecord::Base
   # which also depends on the current context.
   def lookup_lti_id(context)
     old_lti_id = context.shard.activate do
-      past_lti_ids.where(context: context).take&.user_lti_id
+      past_lti_ids.where(context:).take&.user_lti_id
     end
     old_lti_id || self.lti_id
   end
@@ -1184,7 +1184,7 @@ class User < ActiveRecord::Base
         eportfolio_scope = eportfolios.active if shard == root_account.shard
       end
 
-      delete_enrollments(enrollment_scope, updating_user: updating_user)
+      delete_enrollments(enrollment_scope, updating_user:)
       group_memberships_scope.destroy_all
       user_observer_scope.destroy_all
       user_observee_scope.destroy_all
@@ -1466,8 +1466,8 @@ class User < ActiveRecord::Base
   end
 
   def allows_user_to_remove_from_account?(account, other_user)
-    Pseudonym.new(account: account, user: self).grants_right?(other_user, :delete) &&
-      (Pseudonym.new(account: account, user: self).grants_right?(other_user, :manage_sis) ||
+    Pseudonym.new(account:, user: self).grants_right?(other_user, :delete) &&
+      (Pseudonym.new(account:, user: self).grants_right?(other_user, :manage_sis) ||
        !account.pseudonyms.active.where(user_id: self).where.not(sis_user_id: nil).exists?)
   end
 
@@ -2168,7 +2168,7 @@ class User < ActiveRecord::Base
   end
 
   def membership_for_group_id?(group_id)
-    current_group_memberships.active.where(group_id: group_id).exists?
+    current_group_memberships.active.where(group_id:).exists?
   end
 
   def has_student_enrollment?
@@ -2350,15 +2350,15 @@ class User < ActiveRecord::Base
         Array(opts[:contexts]).each do |context|
           items.concat(
             Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self, context.class.base_class.name, context.id),
-                              expires_in: expires_in) do
-              recent_stream_items(context: context)
+                              expires_in:) do
+              recent_stream_items(context:)
             end
           )
         end
         items.sort_by(&:id).reverse
       else
         # no context in cache key
-        Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self), expires_in: expires_in) do
+        Rails.cache.fetch(StreamItemCache.recent_stream_items_key(self), expires_in:) do
           recent_stream_items
         end
       end
@@ -2705,8 +2705,8 @@ class User < ActiveRecord::Base
   end
 
   def initialize_default_folder(name)
-    folder = active_folders.where(name: name).first
-    folder ||= folders.create!(name: name,
+    folder = active_folders.where(name:).first
+    folder ||= folders.create!(name:,
                                parent_folder: Folder.root_folders(self).find { |f| f.name == Folder::MY_FILES_FOLDER_NAME })
     folder
   end
@@ -2797,12 +2797,12 @@ class User < ActiveRecord::Base
   def mark_all_conversations_as_read!
     updated = conversations.unread.update_all(workflow_state: "read")
     if updated > 0
-      User.where(id: id).update_all(unread_conversations_count: 0)
+      User.where(id:).update_all(unread_conversations_count: 0)
     end
   end
 
   def conversation_participant(conversation_id)
-    all_conversations.where(conversation_id: conversation_id).first
+    all_conversations.where(conversation_id:).first
   end
 
   # Public: Reset the user's cached unread conversations count.
@@ -2811,7 +2811,7 @@ class User < ActiveRecord::Base
   def reset_unread_conversations_counter(unread_count = nil)
     unread_count ||= conversations.unread.count
     if unread_conversations_count != unread_count
-      self.class.where(id: id).update_all(unread_conversations_count: unread_count)
+      self.class.where(id:).update_all(unread_conversations_count: unread_count)
     end
   end
 
@@ -2831,7 +2831,7 @@ class User < ActiveRecord::Base
       # Only get the users favorites from their shard.
       shard.activate do
         # Get favorites and map them to their global ids.
-        context_ids = favorites.where(context_type: context_type).pluck(:context_id).map { |id| Shard.global_id_for(id) }
+        context_ids = favorites.where(context_type:).pluck(:context_id).map { |id| Shard.global_id_for(id) }
         @favorite_context_ids[context_type] = context_ids
       end
     end
@@ -3284,7 +3284,7 @@ class User < ActiveRecord::Base
         Folder.unique_constraint_retry do
           @submissions_folder = folders.where(parent_folder_id: Folder.root_folders(self).first,
                                               submission_context_code: "root")
-                                       .first_or_create!(name: I18n.t("Submissions", locale: locale))
+                                       .first_or_create!(name: I18n.t("Submissions", locale:))
         end
       end
     end
@@ -3306,7 +3306,7 @@ class User < ActiveRecord::Base
   end
 
   def authenticate_one_time_password(code)
-    result = one_time_passwords.where(code: code, used: false).take
+    result = one_time_passwords.where(code:, used: false).take
     return unless result
     # atomically update used
     return unless one_time_passwords.where(used: false, id: result).update_all(used: true, updated_at: Time.now.utc) == 1
@@ -3327,10 +3327,10 @@ class User < ActiveRecord::Base
     enrollment_types = GuardRail.activate(:secondary) do
       root_account.all_enrollments.where(user_id: self, workflow_state: "active").distinct.pluck(:type)
     end
-    roles << "student" unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
+    roles << "student" if enrollment_types.intersect?(%w[StudentEnrollment StudentViewEnrollment])
     roles << "fake_student" if fake_student?
-    roles << "teacher" unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
-    roles << "observer" unless (enrollment_types & %w[ObserverEnrollment]).empty?
+    roles << "teacher" if enrollment_types.intersect?(%w[TeacherEnrollment TaEnrollment DesignerEnrollment])
+    roles << "observer" if enrollment_types.intersect?(%w[ObserverEnrollment])
     account_users = GuardRail.activate(:secondary) do
       root_account.cached_all_account_users_for(self)
     end
@@ -3369,9 +3369,9 @@ class User < ActiveRecord::Base
     code = nil
     loop do
       code = SecureRandom.base64.gsub(/\W/, "")[0..5]
-      break unless ObserverPairingCode.active.where(code: code).exists?
+      break unless ObserverPairingCode.active.where(code:).exists?
     end
-    observer_pairing_codes.create(expires_at: 7.days.from_now, code: code)
+    observer_pairing_codes.create(expires_at: 7.days.from_now, code:)
   end
 
   def pronouns

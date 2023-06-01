@@ -63,8 +63,8 @@ module Rake
 
     attr_reader :nodes, :transformers
 
-    def self.draw(&builder)
-      new.tap { |x| x.instance_exec(&builder) }.batches
+    def self.draw(&)
+      new.tap { |x| x.instance_exec(&) }.batches
     end
 
     def initialize

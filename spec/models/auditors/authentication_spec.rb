@@ -26,7 +26,7 @@ describe Auditors::Authentication do
     EventStream.current_shard_lookup = lambda do
       shard_class.new
     end
-    allow(RequestContextGenerator).to receive_messages(request_id: request_id)
+    allow(RequestContextGenerator).to receive_messages(request_id:)
   end
 
   let(:request_id) { 42 }

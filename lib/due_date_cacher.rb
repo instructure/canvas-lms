@@ -109,9 +109,9 @@ class DueDateCacher
         singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}:UpdateGrades:#{update_grades ? 1 : 0}",
         max_attempts: 10
       },
-      update_grades: update_grades,
+      update_grades:,
       original_caller: current_caller,
-      executing_user: executing_user
+      executing_user:
     }
 
     recompute_course(assignment.context, **opts)
@@ -128,7 +128,7 @@ class DueDateCacher
     return if assignments_to_recompute.empty?
 
     executing_user ||= current_executing_user
-    due_date_cacher = new(course, assignments_to_recompute, update_grades: update_grades, original_caller: original_caller, executing_user: executing_user, skip_late_policy_applicator: skip_late_policy_applicator)
+    due_date_cacher = new(course, assignments_to_recompute, update_grades:, original_caller:, executing_user:, skip_late_policy_applicator:)
     if run_immediately
       due_date_cacher.recompute
     else
@@ -163,12 +163,12 @@ class DueDateCacher
           run_at: Setting.get("DueDateCacher#recompute_for_sis_import_requeue_delay", "10").to_i.seconds.from_now
         ).recompute_users_for_course(user_ids, course, assignments, opts)
       else
-        due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller, executing_user: executing_user)
+        due_date_cacher = new(course, assignments, user_ids, update_grades:, original_caller: current_caller, executing_user:)
         return due_date_cacher.delay_if_production(**inst_jobs_opts).recompute_for_sis_import
       end
     end
 
-    due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller, executing_user: executing_user)
+    due_date_cacher = new(course, assignments, user_ids, update_grades:, original_caller: current_caller, executing_user:)
     due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
   end
 
@@ -248,7 +248,7 @@ class DueDateCacher
             enrollment_counts.accepted_student_ids - assigned_student_ids - enrollment_counts.prior_student_ids
           deletable_student_ids.each_slice(1000) do |deletable_student_ids_chunk|
             # using this approach instead of using .in_batches because we want to limit the IDs in the IN clause to 1k
-            Submission.active.where(assignment_id: assignment_id, user_id: deletable_student_ids_chunk)
+            Submission.active.where(assignment_id:, user_id: deletable_student_ids_chunk)
                       .update_all(workflow_state: :deleted, updated_at: Time.zone.now)
           end
           User.clear_cache_keys(deletable_student_ids, :submissions)
@@ -365,7 +365,7 @@ class DueDateCacher
   def current_cached_due_dates(entries)
     return {} if entries.empty?
 
-    entries_for_query = assignment_and_student_id_values(entries: entries)
+    entries_for_query = assignment_and_student_id_values(entries:)
     submissions_with_due_dates = Submission.where("(assignment_id, user_id) IN (#{entries_for_query.join(",")})")
                                            .where.not(cached_due_date: nil)
                                            .pluck(:id, :cached_due_date)
@@ -376,7 +376,7 @@ class DueDateCacher
   end
 
   def record_due_date_changes_for_auditable_assignments!(entries:, previous_cached_dates:)
-    entries_for_query = assignment_and_student_id_values(entries: entries)
+    entries_for_query = assignment_and_student_id_values(entries:)
     updated_submissions = Submission.where("(assignment_id, user_id) IN (#{entries_for_query.join(",")})")
                                     .pluck(:id, :assignment_id, :cached_due_date)
 
@@ -389,8 +389,8 @@ class DueDateCacher
       payload = { due_at: [old_due_date&.iso8601, new_due_date&.iso8601] }
 
       records << {
-        assignment_id: assignment_id,
-        submission_id: submission_id,
+        assignment_id:,
+        submission_id:,
         user_id: @executing_user_id,
         event_type: "submission_updated",
         payload: payload.to_json,

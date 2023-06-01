@@ -35,7 +35,7 @@ describe Message do
     it "saves an html body if a template exists" do
       expect_any_instance_of(Message).to receive(:apply_html_template).and_return("template")
       user         = user_factory(active_all: true)
-      account_user = AccountUser.create!(account: account_model, user: user)
+      account_user = AccountUser.create!(account: account_model, user:)
       message      = generate_message(:account_user_notification, :email, account_user)
 
       expect(message.html_body).to eq "template"
@@ -46,7 +46,7 @@ describe Message do
         <b>Your content</b>: <%= "<script>alert()</script>" %>
       HTML
       user         = user_factory(active_all: true)
-      account_user = AccountUser.create!(account: account_model, user: user)
+      account_user = AccountUser.create!(account: account_model, user:)
       message      = generate_message(:account_user_notification, :email, account_user)
 
       expect(message.html_body).not_to include "<script>"
@@ -130,7 +130,7 @@ describe Message do
       account.default_time_zone = "Pretoria"
       account.save!
       due_at = Time.zone.parse("2014-06-06 11:59:59")
-      assignment_model(course: @course, due_at: due_at)
+      assignment_model(course: @course, due_at:)
       msg = generate_message(:assignment_created, :email, @assignment)
 
       presenter = Utils::DatetimeRangePresenter.new(due_at, nil, :event, ActiveSupport::TimeZone.new("Pretoria"))
@@ -161,7 +161,7 @@ describe Message do
       account = account_model
       account.settings[:email_logo] = "awesomelogo.jpg"
       account.save!
-      @au = AccountUser.create!(account: account, user: user_model)
+      @au = AccountUser.create!(account:, user: user_model)
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.html_body).to include("awesomelogo.jpg")
     end
@@ -620,7 +620,7 @@ describe Message do
         it "pulls from the asset's context, if possible" do
           assign = assignment_model
           notification = Notification.create(name: "Assignment Changed")
-          message = message_model(context: assign, notification: notification)
+          message = message_model(context: assign, notification:)
           expect(message.from_name).to eq assign.context.name
         end
 
@@ -642,7 +642,7 @@ describe Message do
           assign = assignment_model
           user = user_model(preferences: { course_nicknames: { assign.context.id => "nickname" } })
           notification = Notification.create(name: "Assignment Changed")
-          message = message_model(context: assign, notification: notification, user: user)
+          message = message_model(context: assign, notification:, user:)
           expect(message.from_name).to eq "nickname"
         end
 
@@ -660,7 +660,7 @@ describe Message do
           enroll = @course.enroll_user(user)
           enroll.accept!
           notification = Notification.create(name: "Assignment Group Published")
-          message = message_model(context: ag, notification: notification, user: user)
+          message = message_model(context: ag, notification:, user:)
           expect(message.from_name).to eq "Unnamed Course"
         end
       end
@@ -714,7 +714,7 @@ describe Message do
       account = Account.default
       account.settings[:author_email_in_notifications] = true
       account.save!
-      submission = submission_model(user: user, course: course)
+      submission = submission_model(user:, course:)
       message = Message.create!(context: submission)
       expect(message.author_short_name).to eq user.short_name
       expect(message.author_email_address).to eq user.email
@@ -877,7 +877,7 @@ describe Message do
       root_account = Account.find(0)
       user_account = Account.default
       user = user_model
-      message = Message.new(root_account_id: root_account.id, user: user)
+      message = Message.new(root_account_id: root_account.id, user:)
       expect(message.send(:infer_feature_account)).to eq(user_account)
     end
 

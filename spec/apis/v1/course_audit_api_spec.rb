@@ -116,12 +116,12 @@ describe "CourseAudit API", type: :request do
 
     it "recognizes :start_time" do
       json = expect_event_for_context(@course, @event, start_time: 12.hours.ago)
-      forbid_event_for_context(@course, @event2, start_time: 12.hours.ago, json: json)
+      forbid_event_for_context(@course, @event2, start_time: 12.hours.ago, json:)
     end
 
     it "recognizes :end_time" do
       json = forbid_event_for_context(@course, @event, end_time: 12.hours.ago)
-      expect_event_for_context(@course, @event2, end_time: 12.hours.ago, json: json)
+      expect_event_for_context(@course, @event2, end_time: 12.hours.ago, json:)
     end
 
     it "supports using sis_id" do

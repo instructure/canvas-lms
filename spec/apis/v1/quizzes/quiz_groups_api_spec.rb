@@ -73,7 +73,7 @@ describe Quizzes::QuizGroupsController, type: :request do
     it "renders a validation error when pick_count isn't a number" do
       name = "A Group"
       pick_count = "NaN"
-      json = api_create_quiz_group({ name: name, pick_count: pick_count }, expected_status: 422)
+      json = api_create_quiz_group({ name:, pick_count: }, expected_status: 422)
       expect(json).to have_key "errors"
       expect(json["errors"]).to have_key "pick_count"
       expect(new_quiz_group).to be_nil
@@ -82,7 +82,7 @@ describe Quizzes::QuizGroupsController, type: :request do
     it "renders a validation error when question_points isn't a number" do
       name = "A Group"
       question_points = "NaN"
-      json = api_create_quiz_group({ name: name, question_points: question_points }, expected_status: 422)
+      json = api_create_quiz_group({ name:, question_points: }, expected_status: 422)
       expect(json).to have_key "errors"
       expect(json["errors"]).to have_key "question_points"
       expect(new_quiz_group).to be_nil
@@ -127,14 +127,14 @@ describe Quizzes::QuizGroupsController, type: :request do
 
     it "renders a validation error when pick_count isn't a number" do
       pick_count = "NaN"
-      json = api_update_quiz_group({ pick_count: pick_count }, expected_status: 422)
+      json = api_update_quiz_group({ pick_count: }, expected_status: 422)
       expect(json).to have_key "errors"
       expect(json["errors"]).to have_key "pick_count"
     end
 
     it "renders a validation error when question_points isn't a number" do
       question_points = "NaN"
-      json = api_update_quiz_group({ question_points: question_points }, expected_status: 422)
+      json = api_update_quiz_group({ question_points: }, expected_status: 422)
       expect(json).to have_key "errors"
       expect(json["errors"]).to have_key "question_points"
     end

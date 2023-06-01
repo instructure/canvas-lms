@@ -24,7 +24,7 @@ describe CourseSection, "moving to new course" do
     course = account.courses.create!
     section = course.course_sections.create!
     student = User.create!
-    course.enroll_student(student, enrollment_state: "active", section: section)
+    course.enroll_student(student, enrollment_state: "active", section:)
     new_course = account.courses.create!
     assignment = new_course.assignments.create!
 
@@ -342,7 +342,7 @@ describe CourseSection, "moving to new course" do
   describe "validation" do
     before :once do
       course = Course.create_unique
-      @section = CourseSection.create(course: course)
+      @section = CourseSection.create(course:)
       @long_string = "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm"
     end
 

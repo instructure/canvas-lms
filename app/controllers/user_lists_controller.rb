@@ -41,9 +41,9 @@ class UserListsController < ApplicationController
           # but honestly I'd rather keep it hidden so nobody knows my shame
           render json: UserListV2.new(params[:user_list],
                                       root_account: @context.root_account,
-                                      search_type: search_type,
+                                      search_type:,
                                       current_user: @current_user,
-                                      can_read_sis: can_read_sis)
+                                      can_read_sis:)
         else
           render json: UserList.new(params[:user_list],
                                     root_account: @context.root_account,

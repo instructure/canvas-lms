@@ -127,7 +127,7 @@ class EnrollmentTerm < ActiveRecord::Base
     params.map do |type, values|
       type = type.classify
       enrollment_type = Enrollment.typed_enrollment(type).to_s
-      override = enrollment_dates_overrides.where(enrollment_type: enrollment_type).first_or_initialize
+      override = enrollment_dates_overrides.where(enrollment_type:).first_or_initialize
       # preload the reverse association - VERY IMPORTANT so that @touched_enrollments is shared
       override.enrollment_term = self
       override.start_at = values[:start_at]
@@ -142,12 +142,12 @@ class EnrollmentTerm < ActiveRecord::Base
     return true unless sis_source_id
     return true if !root_account_id_changed? && !sis_source_id_changed?
 
-    scope = root_account.enrollment_terms.where(sis_source_id: sis_source_id)
+    scope = root_account.enrollment_terms.where(sis_source_id:)
     scope = scope.where("id<>?", self) unless new_record?
 
     return true unless scope.exists?
 
-    errors.add(:sis_source_id, t("errors.not_unique", "SIS ID \"%{sis_source_id}\" is already in use", sis_source_id: sis_source_id))
+    errors.add(:sis_source_id, t("errors.not_unique", "SIS ID \"%{sis_source_id}\" is already in use", sis_source_id:))
     throw :abort
   end
 
@@ -217,7 +217,7 @@ class EnrollmentTerm < ActiveRecord::Base
       # we don't need to recompute scores for each grading period if only weight has changed.
       # run_immediately: true because we're already in a delayed job
       course.recompute_student_scores(
-        update_all_grading_period_scores: update_all_grading_period_scores,
+        update_all_grading_period_scores:,
         run_immediately: true
       )
       # DueDateCacher handles updating the cached grading_period_id on submissions.

@@ -55,7 +55,7 @@ module Importers
       else
         item ||= Rubric.where(context_id: context, context_type: context.class.to_s, id: hash[:id]).first
         item ||= Rubric.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
-        item ||= Rubric.new(context: context)
+        item ||= Rubric.new(context:)
         item.migration_id = hash[:migration_id]
         item.workflow_state = "active" if item.deleted?
         item.title = hash[:title]

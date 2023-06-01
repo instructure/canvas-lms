@@ -50,7 +50,7 @@ module MicrosoftSync
         result = {
           class: error.class.name,
           message: error.message&.truncate(1000),
-          extra_metadata: extra_metadata
+          extra_metadata:
         }
 
         if error.is_a?(MicrosoftSync::Errors::PublicError)
@@ -185,7 +185,7 @@ module MicrosoftSync
 
       def self.for(service:, response:, tenant:)
         klass = subclasses_by_status_code[response.code] || self
-        klass.new(service: service, response: response, tenant: tenant)
+        klass.new(service:, response:, tenant:)
       end
 
       def initialize(service:, response:, tenant:)

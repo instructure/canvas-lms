@@ -125,7 +125,7 @@ describe GradeCalculator do
       students << course_with_student(active_all: true, course: @course).user
 
       # Enroll the last student into both sections
-      course_with_student(active_all: true, course: @course, user: students[-1], section: section, allow_multiple_enrollments: true)
+      course_with_student(active_all: true, course: @course, user: students[-1], section:, allow_multiple_enrollments: true)
 
       # Create an assignment...
       assignments = []
@@ -168,7 +168,7 @@ describe GradeCalculator do
         submissions = []
         @shard1.activate do
           account = Account.create!
-          course_with_student(active_all: true, account: account, user: @user)
+          course_with_student(active_all: true, account:, user: @user)
           @course.update_attribute(:group_weighting_scheme, "percent")
           groups <<
             @course.assignment_groups.create!(name: "some group 1", group_weight: 50) <<
@@ -194,7 +194,7 @@ describe GradeCalculator do
 
         @shard1.activate do
           account = Account.create!
-          course_with_student(active_all: true, account: account, user: @user)
+          course_with_student(active_all: true, account:, user: @user)
           grading_period_set = account.grading_period_groups.create!
           grading_period_set.enrollment_terms << @course.enrollment_term
           grading_period_set.grading_periods.create!(
@@ -222,7 +222,7 @@ describe GradeCalculator do
 
         @shard1.activate do
           account = Account.create!
-          course_with_student(active_all: true, account: account, user: @user)
+          course_with_student(active_all: true, account:, user: @user)
           @group = @course.assignment_groups.create!(name: "some group", group_weight: 100)
           @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
           @assignment2 = @course.assignments.create!(title: "Some Assignment2", points_possible: 10, assignment_group: @group)
@@ -240,7 +240,7 @@ describe GradeCalculator do
 
         @shard1.activate do
           account = Account.create!
-          course_with_student(active_all: true, account: account, user: @user)
+          course_with_student(active_all: true, account:, user: @user)
           grading_period_set = account.grading_period_groups.create!
           grading_period_set.enrollment_terms << @course.enrollment_term
           @grading_period = grading_period_set.grading_periods.create!(
@@ -392,7 +392,7 @@ describe GradeCalculator do
         course_with_student(active_all: true,
                             course: @course,
                             user: @student,
-                            section: section,
+                            section:,
                             allow_multiple_enrollments: true)
         assignment.grade_student(@student, grade: "5", grader: @teacher)
       end
@@ -952,7 +952,7 @@ describe GradeCalculator do
         assignments = Array.new(3) do |assignment_idx|
           @course.assignments.create!(
             title: "AG#{assignment_group_idx} Assignment ##{assignment_idx}",
-            assignment_group: assignment_group,
+            assignment_group:,
             # Each assignment group spans only one grading period
             due_at: @grading_period_options[:start_dates][assignment_group_idx] + (assignment_idx + 1).days,
             points_possible: 150 # * (assignment_idx + 1)
@@ -1812,7 +1812,7 @@ describe GradeCalculator do
           section = @course.course_sections.create!(name: "section #{i}")
           @course.enroll_user(@student,
                               "StudentEnrollment",
-                              section: section,
+                              section:,
                               enrollment_state: "active",
                               allow_multiple_enrollments: true)
         end

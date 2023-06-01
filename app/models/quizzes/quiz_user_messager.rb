@@ -44,8 +44,8 @@ module Quizzes
         message,
         recipients,
         async,
-        subject: subject,
-        context_id: context_id,
+        subject:,
+        context_id:,
         group: false
       )
     end
@@ -57,7 +57,7 @@ module Quizzes
         Conversation.build_message(
           sender,
           body,
-          root_account_id: root_account_id
+          root_account_id:
         )
     end
 

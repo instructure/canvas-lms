@@ -64,7 +64,7 @@ class AssignmentStudentVisibility < ActiveRecord::Base
   end
 
   def self.visible_assignment_ids_for_user(user_id, course_ids = nil)
-    opts = { user_id: user_id }
+    opts = { user_id: }
     if course_ids
       opts[:course_id] = course_ids
     end

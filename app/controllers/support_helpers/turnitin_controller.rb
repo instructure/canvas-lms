@@ -55,7 +55,7 @@ module SupportHelpers
 
     def lti_attachment
       param_keys = %w[submission_id attachment_id]
-      if (params.keys & param_keys).present?
+      if params.keys.intersect?(param_keys)
         ids = param_keys.map do |key|
           error = { text: "Missing `#{key}` parameter", status: 400 }
           return render error unless params[key]

@@ -54,7 +54,7 @@ module Importers
         next unless context && can_import_topic?(topic, migration)
 
         begin
-          import_from_migration(topic.merge(topic_entries_to_import: topic_entries_to_import), context, migration)
+          import_from_migration(topic.merge(topic_entries_to_import:), context, migration)
         rescue
           migration.add_import_warning(t("#migration.discussion_topic_type", "Discussion Topic"), topic[:title], $!)
         end

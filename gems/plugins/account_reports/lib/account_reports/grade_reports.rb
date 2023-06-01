@@ -117,7 +117,7 @@ module AccountReports
           arr << student["term_name"]
           arr << student["term_id"]
           arr << student["term_sis_id"]
-          arr.concat(grading_field_values(student: student, course: course))
+          arr.concat(grading_field_values(student:, course:))
           add_report_row(row: arr, row_number: i, report_runner: runner)
         end
       end
@@ -237,10 +237,10 @@ module AccountReports
               scores_for_student = grading_period_scores_for_student(student, gp, scores)
 
               arr << gp.id
-              arr.concat(grading_period_grading_field_values(scores_for_student: scores_for_student))
+              arr.concat(grading_period_grading_field_values(scores_for_student:))
             end
 
-            arr.concat(grading_field_values(student: student, course: course))
+            arr.concat(grading_field_values(student:, course:))
             add_report_row(row: arr, row_number: i, report_runner: runner, file: term.name)
           end
         end

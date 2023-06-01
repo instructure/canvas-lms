@@ -177,21 +177,21 @@ class ContextModule < ActiveRecord::Base
   end
 
   def get_potentially_conflicting_titles(title_base)
-    ContextModule.not_deleted.where(context_id: context_id)
+    ContextModule.not_deleted.where(context_id:)
                  .starting_with_name(title_base).pluck("name").to_set
   end
 
   def duplicate_base_model(copy_title)
     ContextModule.new({
-                        context_id: context_id,
-                        context_type: context_type,
+                        context_id:,
+                        context_type:,
                         name: copy_title,
-                        position: ContextModule.not_deleted.where(context_id: context_id).maximum(:position) + 1,
-                        completion_requirements: completion_requirements,
+                        position: ContextModule.not_deleted.where(context_id:).maximum(:position) + 1,
+                        completion_requirements:,
                         workflow_state: "unpublished",
-                        require_sequential_progress: require_sequential_progress,
-                        completion_events: completion_events,
-                        requirement_count: requirement_count
+                        require_sequential_progress:,
+                        completion_events:,
+                        requirement_count:
                       })
   end
 
@@ -408,7 +408,7 @@ class ContextModule < ActiveRecord::Base
 
     available = available_for?(user, opts)
     return { object: self, module: self } unless available
-    return { object: self, module: self, unlock_at: unlock_at } if to_be_unlocked
+    return { object: self, module: self, unlock_at: } if to_be_unlocked
 
     false
   end
@@ -496,7 +496,7 @@ class ContextModule < ActiveRecord::Base
 
         id = match[1].to_i
         if module_names.key?(id)
-          res << { id: id, type: "context_module", name: module_names[id] }
+          res << { id:, type: "context_module", name: module_names[id] }
         end
       end
       prereqs = res
@@ -681,14 +681,14 @@ class ContextModule < ActiveRecord::Base
     case params[:type]
     when "external_url"
       title = params[:title]
-      added_item ||= content_tags.build(context: context)
+      added_item ||= content_tags.build(context:)
       added_item.attributes = {
         url: params[:url],
         new_tab: params[:new_tab],
         tag_type: "context_module",
-        title: title,
+        title:,
         indent: params[:indent],
-        position: position
+        position:
       }
       added_item.content_id = 0
       added_item.content_type = "ExternalUrl"
@@ -697,7 +697,7 @@ class ContextModule < ActiveRecord::Base
       added_item.workflow_state = "unpublished" if added_item.new_record?
     when "context_external_tool", "external_tool", "lti/message_handler"
       title = params[:title]
-      added_item ||= content_tags.build(context: context)
+      added_item ||= content_tags.build(context:)
 
       content = if params[:type] == "lti/message_handler"
                   Lti::MessageHandler.for_context(context).where(id: params[:id]).first
@@ -705,13 +705,13 @@ class ContextModule < ActiveRecord::Base
                   ContextExternalTool.find_external_tool(params[:url], context, params[:id].to_i) || ContextExternalTool.new.tap { |tool| tool.id = 0 }
                 end
       added_item.attributes = {
-        content: content,
+        content:,
         url: params[:url],
         new_tab: params[:new_tab],
         tag_type: "context_module",
-        title: title,
+        title:,
         indent: params[:indent],
-        position: position
+        position:
       }
       added_item.context_module_id = id
       added_item.indent = params[:indent] || 0
@@ -726,7 +726,7 @@ class ContextModule < ActiveRecord::Base
         # lookup_uuid, or if lookup_uuid is not given.
         added_item.associated_asset ||=
           Lti::ResourceLink.find_or_initialize_for_context_and_lookup_uuid(
-            context: context,
+            context:,
             lookup_uuid: params[:lti_resource_link_lookup_uuid].presence,
             custom: Lti::DeepLinkingUtil.validate_custom_params(params[:custom_params]),
             context_external_tool: content,
@@ -735,12 +735,12 @@ class ContextModule < ActiveRecord::Base
       end
     when "context_module_sub_header", "sub_header"
       title = params[:title]
-      added_item ||= content_tags.build(context: context)
+      added_item ||= content_tags.build(context:)
       added_item.attributes = {
         tag_type: "context_module",
-        title: title,
+        title:,
         indent: params[:indent],
-        position: position
+        position:
       }
       added_item.content_id = 0
       added_item.content_type = "ContextModuleSubHeader"
@@ -751,13 +751,13 @@ class ContextModule < ActiveRecord::Base
       return nil unless item
 
       title = params[:title] || (item.title rescue item.name)
-      added_item ||= content_tags.build(context: context)
+      added_item ||= content_tags.build(context:)
       added_item.attributes = {
         content: item,
         tag_type: "context_module",
-        title: title,
+        title:,
         indent: params[:indent],
-        position: position
+        position:
       }
       added_item.context_module_id = id
       added_item.indent = params[:indent] || 0
@@ -787,7 +787,7 @@ class ContextModule < ActiveRecord::Base
       next if tags.any? { |tag| tag.content_type == item.class_name && tag.content_id == item.id }
 
       state = (item.respond_to?(:published?) && !item.published?) ? "unpublished" : "active"
-      new_tags << content_tags.create!(context: context,
+      new_tags << content_tags.create!(context:,
                                        title: Context.asset_name(item),
                                        content: item,
                                        tag_type: "context_module",
@@ -891,7 +891,7 @@ class ContextModule < ActiveRecord::Base
     shard.activate do
       GuardRail.activate(:primary) do
         if context.enrollments.except(:preload).where(user_id: user).exists?
-          progression = ContextModuleProgression.create_and_ignore_on_duplicate(user: user, context_module: self)
+          progression = ContextModuleProgression.create_and_ignore_on_duplicate(user:, context_module: self)
           progression ||= context_module_progressions.where(user_id: user).first
         end
       end

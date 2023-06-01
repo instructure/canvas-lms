@@ -145,7 +145,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def broadcast_data
-    { course_id: course_id, root_account_id: root_account_id }
+    { course_id:, root_account_id: }
   end
 
   set_policy do
@@ -179,7 +179,7 @@ class CourseSection < ActiveRecord::Base
 
     given do |user, _session|
       if user
-        enrollments = user.enrollments.shard(self).active_by_date.where(course: course)
+        enrollments = user.enrollments.shard(self).active_by_date.where(course:)
         enrollments.where(limit_privileges_to_course_section: false).or(enrollments.where(course_section: self)).any? { |e| e.has_permission_to?(:manage_calendar) }
       end
     end
@@ -215,7 +215,7 @@ class CourseSection < ActiveRecord::Base
     return true unless sis_source_id
     return true if !root_account_id_changed? && !sis_source_id_changed?
 
-    scope = root_account.course_sections.where(sis_source_id: sis_source_id)
+    scope = root_account.course_sections.where(sis_source_id:)
     scope = scope.where("id<>?", self) unless new_record?
 
     return true unless scope.exists?
@@ -228,12 +228,12 @@ class CourseSection < ActiveRecord::Base
     return true unless integration_id
     return true if !root_account_id_changed? && !integration_id_changed?
 
-    scope = root_account.course_sections.where(integration_id: integration_id)
+    scope = root_account.course_sections.where(integration_id:)
     scope = scope.where("id<>?", self) unless new_record?
 
     return true unless scope.exists?
 
-    errors.add(:integration_id, t("integration_id_taken", "INTEGRATRION ID \"%{integration_id}\" is already in use", integration_id: integration_id))
+    errors.add(:integration_id, t("integration_id_taken", "INTEGRATRION ID \"%{integration_id}\" is already in use", integration_id:))
     throw :abort
   end
 
@@ -329,7 +329,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def ensure_enrollments_in_correct_section
-    enrollments.where.not(course_id: course_id).each { |e| e.update_attribute(:course_id, course_id) }
+    enrollments.where.not(course_id:).each { |e| e.update_attribute(:course_id, course_id) }
   end
 
   def crosslist_to_course(course, **opts)
@@ -387,11 +387,11 @@ class CourseSection < ActiveRecord::Base
     raise ArgumentError, "Cannot call with more than 1000 sections" if batch.count > 1000
 
     cs = CourseSection.where(id: batch).select(:id, :workflow_state).to_a
-    data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: cs, updated_state: "deleted", batch_mode_delete: batch_mode)
+    data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: cs, updated_state: "deleted", batch_mode_delete: batch_mode)
     CourseSection.where(id: cs.map(&:id)).update_all(workflow_state: "deleted", updated_at: Time.zone.now)
     Enrollment.where(course_section_id: cs.map(&:id)).active.find_in_batches do |e_batch|
       GuardRail.activate(:primary) do
-        new_data = Enrollment::BatchStateUpdater.destroy_batch(e_batch, sis_batch: sis_batch, batch_mode: batch_mode)
+        new_data = Enrollment::BatchStateUpdater.destroy_batch(e_batch, sis_batch:, batch_mode:)
         data.push(*new_data)
         SisBatchRollBackData.bulk_insert_roll_back_data(data)
         data = []
@@ -421,7 +421,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def republish_course_pace_if_needed
-    return unless (saved_changes.keys & %w[start_at conclude_at restrict_enrollments_to_section_dates]).present?
+    return unless saved_changes.keys.intersect?(%w[start_at conclude_at restrict_enrollments_to_section_dates])
     return unless course.enable_course_paces?
 
     course_paces.published.find_each(&:create_publish_progress)

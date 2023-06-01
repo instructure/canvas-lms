@@ -40,9 +40,9 @@ module Importers
                  created_at: Time.now.utc,
                  updated_at: Time.now.utc,
                  migration_id: mig_id,
-                 position: position }
+                 position: }
         data.delete(:assessment_question_id) if hash["assessment_question_id"].nil? && migration.for_master_course_import? # don't undo an existing association
-        Quizzes::QuizQuestion.where(id: id).update_all(data)
+        Quizzes::QuizQuestion.where(id:).update_all(data)
       else
         root_account_id = quiz&.root_account_id || context&.root_account_id
         args = [

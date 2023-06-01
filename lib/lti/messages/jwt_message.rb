@@ -189,7 +189,7 @@ module Lti::Messages
     def include_assignment_and_grade_service_claims?
       include_claims?(:assignment_and_grade_service) &&
         (@context.is_a?(Course) || @context.is_a?(Group)) &&
-        (@tool.developer_key.scopes & TokenScopes::LTI_AGS_SCOPES).present?
+        @tool.developer_key.scopes.intersect?(TokenScopes::LTI_AGS_SCOPES)
     end
 
     # Follows the spec at https://www.imsglobal.org/spec/lti-ags/v2p0/#assignment-and-grade-service-claim

@@ -38,9 +38,9 @@ module Login::Shared
     # Send metrics for successful login
     if Setting.get("enable_login_metric", "true") == "true"
       auth_type = pseudonym&.authentication_provider&.auth_type
-      tags = { auth_type: auth_type }
+      tags = { auth_type: }
       tags[:domain] = request.host if Setting.get("enable_login_metric_domain", "true") == "true"
-      InstStatsd::Statsd.increment("login.count", tags: tags) if auth_type
+      InstStatsd::Statsd.increment("login.count", tags:) if auth_type
     end
 
     # Since the user just logged in, we'll reset the context to include their info.

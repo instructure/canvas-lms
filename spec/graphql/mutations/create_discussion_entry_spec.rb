@@ -68,7 +68,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     result = CanvasSchema.execute(
       mutation_str(**opts),
       context: {
-        current_user: current_user,
+        current_user:,
         request: ActionDispatch::TestRequest.create
       }
     )
@@ -106,7 +106,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     parent = @topic.discussion_entries.create!(message: "parent entry", user: @teacher, discussion_topic: @topic)
 
     keeper = DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, message: "Howdy Hey")
-    DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, parent: parent, message: "delete_me")
+    DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, parent:, message: "delete_me")
     run_mutation(discussion_topic_id: @topic.id, message: "child entry", parent_entry_id: parent.id)
     expect(DiscussionEntryDraft.where(discussion_topic_id: @topic).pluck(:id)).to eq keeper
   end

@@ -111,7 +111,7 @@ class CalendarEvent < ActiveRecord::Base
     context_codes.each do |code|
       context = contexts[code] && contexts[code][0]
       new_event = events.detect { |e| e[:context_code] == context&.asset_string }
-      existing_event = record.child_events.where(context: context).first
+      existing_event = record.child_events.where(context:).first
       event_unchanged = new_event && existing_event && DateTime.parse(new_event[:start_at]) == existing_event.start_at && DateTime.parse(new_event[:end_at]) == existing_event.end_at
       next if (context&.grants_right?(record.updating_user, :manage_calendar) || event_unchanged) && context.try(:parent_event_context) == record.context
 
@@ -539,7 +539,7 @@ class CalendarEvent < ActiveRecord::Base
         [context]
       end
     elsif context.respond_to?(:participants)
-      context.participants(include_observers: include_observers, by_date: true)
+      context.participants(include_observers:, by_date: true)
     else
       []
     end
@@ -662,10 +662,10 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def to_ics(in_own_calendar: true, preloaded_attachments: {}, user: nil, user_events: [])
-    CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar: in_own_calendar,
-                                              preloaded_attachments: preloaded_attachments,
+    CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar:,
+                                              preloaded_attachments:,
                                               include_description: true,
-                                              user_events: user_events)
+                                              user_events:)
   end
 
   def self.max_visible_calendars

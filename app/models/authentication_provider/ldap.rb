@@ -98,7 +98,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
         tls_options: tls_verification_required ? OpenSSL::SSL::SSLContext::DEFAULT_PARAMS.merge(custom_params) : { verify_mode: OpenSSL::SSL::VERIFY_NONE, verify_hostname: false }
       }
       encryption[:tls_options][:ssl_version] = requested_authn_context if requested_authn_context.present?
-      args = { encryption: encryption }
+      args = { encryption: }
     end
 
     ldap = Net::LDAP.new(args)
@@ -199,7 +199,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     ldap = ldap_connection
     filter = ldap_filter(username)
     begin
-      res = ldap.bind_as(base: ldap.base, filter: filter, password: password)
+      res = ldap.bind_as(base: ldap.base, filter:, password:)
       return true if res
 
       errors.add(
@@ -236,7 +236,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     result = ::Canvas.timeout_protection("ldap:#{global_id}", timeout_options) do
       ldap = ldap_connection
       filter = ldap_filter(unique_id)
-      ldap.bind_as(base: ldap.base, filter: filter, password: password_plaintext)
+      ldap.bind_as(base: ldap.base, filter:, password: password_plaintext)
     end
 
     if should_send_to_statsd?
@@ -247,7 +247,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
 
     result
   rescue => e
-    ::Canvas::Errors.capture(e, { type: :ldap, account: account }, :warn)
+    ::Canvas::Errors.capture(e, { type: :ldap, account: }, :warn)
     if e.is_a?(Timeout::Error)
       if should_send_to_statsd?
         InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_timeout",

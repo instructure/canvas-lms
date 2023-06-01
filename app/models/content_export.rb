@@ -200,7 +200,7 @@ class ContentExport < ActiveRecord::Base
         self.progress = 100
         job_progress.try :complete!
         duration = Time.now - created_at
-        InstStatsd::Statsd.timing("content_migrations.export_duration", duration, tags: { export_type: export_type, selective_export: selective_export? })
+        InstStatsd::Statsd.timing("content_migrations.export_duration", duration, tags: { export_type:, selective_export: selective_export? })
         self.workflow_state = if for_course_copy?
                                 "exported_for_course_copy"
                               else
@@ -294,7 +294,7 @@ class ContentExport < ActiveRecord::Base
 
         update(
           export_type: QTI,
-          selected_content: selected_content
+          selected_content:
         )
       else
         update(export_type: QTI)

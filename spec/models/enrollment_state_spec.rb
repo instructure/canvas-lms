@@ -182,7 +182,7 @@ describe EnrollmentState do
       other_enroll = student_in_course(course: @course)
 
       section = @course.course_sections.create!
-      enroll = student_in_course(course: @course, section: section)
+      enroll = student_in_course(course: @course, section:)
       enroll_state = enroll.enrollment_state
 
       expect(EnrollmentState).to receive(:update_enrollment).at_least(:once) { |e| expect(e.course_section).to eq section }

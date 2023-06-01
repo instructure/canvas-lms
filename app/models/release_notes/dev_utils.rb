@@ -34,7 +34,7 @@ module ReleaseNotes
       ::Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(
         :release_notes,
         ReleaseNote.ddb_table_name,
-        recreate: recreate,
+        recreate:,
         schema: NOTES_SCHEMA,
         ddb: ReleaseNote.ddb_client
       )

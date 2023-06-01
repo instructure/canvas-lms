@@ -34,7 +34,7 @@ describe Gradebook::ApplyScoreToUngradedSubmissions do
   end
 
   def test_submission(assignment: assignment1, student: student1)
-    Submission.find_by!(assignment: assignment, user: student)
+    Submission.find_by!(assignment:, user: student)
   end
 
   def build_options(**overrides)
@@ -57,9 +57,9 @@ describe Gradebook::ApplyScoreToUngradedSubmissions do
       options = build_options(percent: "100")
 
       progress = Gradebook::ApplyScoreToUngradedSubmissions.queue_apply_score(
-        course: course,
+        course:,
         grader: teacher,
-        options: options
+        options:
       )
 
       expect(progress).to be_a(Progress)

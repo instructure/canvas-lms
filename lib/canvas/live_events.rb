@@ -25,10 +25,10 @@ module Canvas::LiveEvents
     StringifyIds.recursively_stringify_ids(payload)
     StringifyIds.recursively_stringify_ids(context)
     LiveEvents.post_event(
-      event_name: event_name,
-      payload: payload,
+      event_name:,
+      payload:,
       time: Time.zone.now,
-      context: context
+      context:
     )
   end
 
@@ -610,7 +610,7 @@ module Canvas::LiveEvents
                              old_score: old_submission.try(:score),
                              points_possible: submission.assignment.points_possible,
                              old_points_possible: old_assignment.points_possible,
-                             grader_id: grader_id,
+                             grader_id:,
                              student_id: submission.global_user_id,
                              student_sis_id: sis_pseudonym&.sis_user_id,
                              user_id: submission.global_user_id,
@@ -643,10 +643,10 @@ module Canvas::LiveEvents
         asset_name: asset_obj.try(:name) || asset_obj.try(:title),
         asset_type: asset_obj.class.reflection_type_name,
         asset_id: asset_obj.global_id,
-        asset_subtype: asset_subtype,
-        category: category,
-        role: role,
-        level: level
+        asset_subtype:,
+        category:,
+        role:,
+        level:
       }.merge(LiveEvents::EventSerializerProvider.serialize(asset_obj)).merge(enrollment_data),
       amended_context(context)
     )
@@ -689,7 +689,7 @@ module Canvas::LiveEvents
       context_type: context.class.to_s,
       lti_context_id: context.lti_context_id,
       context_uuid: context.uuid,
-      import_quizzes_next: import_quizzes_next,
+      import_quizzes_next:,
       source_course_lti_id: content_migration.source_course&.lti_context_id,
       source_course_uuid: content_migration.source_course&.uuid,
       destination_course_lti_id: context.lti_context_id,
@@ -1100,7 +1100,7 @@ module Canvas::LiveEvents
       canvas_assignment_id: master_content_tag.content_id,
       canvas_course_id: master_content_tag.master_template.course_id,
       canvas_course_uuid: master_content_tag.master_template.course.uuid,
-      lti_resource_link_id: lti_resource_link_id,
+      lti_resource_link_id:,
       restrictions: master_content_tag.restrictions,
       use_default_restrictions: master_content_tag.use_default_restrictions
     }
@@ -1114,7 +1114,7 @@ module Canvas::LiveEvents
                   end
 
     data = {
-      environment: environment,
+      environment:,
       region_code: Canvas.region_code || "not_configured",
       region: Canvas.region || "not_configured"
     }

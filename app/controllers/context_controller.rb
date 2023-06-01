@@ -89,7 +89,7 @@ class ContextController < ApplicationController
       js_permissions = {
         read_sis: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
         view_user_logins: @context.grants_right?(@current_user, session, :view_user_logins),
-        manage_students: manage_students,
+        manage_students:,
         add_users_to_course: can_add_enrollments,
         read_reports: @context.grants_right?(@current_user, session, :read_reports),
         can_add_groups: can_do(@context.groups.temp_record, @current_user, :create),
@@ -230,7 +230,7 @@ class ContextController < ApplicationController
       case @context
       when Course
         is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
-        scope = @context.enrollments_visible_to(@current_user, include_concluded: is_admin).where(user_id: user_id)
+        scope = @context.enrollments_visible_to(@current_user, include_concluded: is_admin).where(user_id:)
         scope = scope.active_or_pending unless is_admin
         @membership = scope.first
         if @membership
@@ -246,7 +246,7 @@ class ContextController < ApplicationController
           log_asset_access(@membership, "roster", "roster")
         end
       when Group
-        @membership = @context.group_memberships.active.where(user_id: user_id).first
+        @membership = @context.group_memberships.active.where(user_id:).first
         @enrollments = []
       end
 

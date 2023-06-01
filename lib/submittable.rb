@@ -151,7 +151,7 @@ module Submittable
       if @old_assignment_id
         Assignment.where(
           id: @old_assignment_id,
-          context: context,
+          context:,
           submission_types: "wiki_page"
         ).update_all(workflow_state: "deleted", updated_at: Time.now.utc)
       elsif assignment && @saved_by != :assignment

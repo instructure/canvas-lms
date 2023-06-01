@@ -52,7 +52,7 @@ class CanvasSecurity::ServicesJwt
                              end
     CanvasSecurity::ServicesJwt.decrypt(
       original_crypted_token,
-      ignore_expiration: ignore_expiration
+      ignore_expiration:
     )
   end
 
@@ -97,7 +97,7 @@ class CanvasSecurity::ServicesJwt
 
     payload = {
       sub: user.global_id,
-      domain: domain
+      domain:
     }
     payload[:masq_sub] = real_user.global_id if real_user
     if workflows.present?
@@ -109,7 +109,7 @@ class CanvasSecurity::ServicesJwt
       payload[:context_type] = context.class.name
       payload[:context_id] = context.id.to_s
     end
-    generate(payload, symmetric: symmetric)
+    generate(payload, symmetric:)
   end
 
   def self.refresh_for_user(jwt, domain, user, real_user: nil, symmetric: false)
@@ -133,10 +133,10 @@ class CanvasSecurity::ServicesJwt
 
     for_user(domain,
              user,
-             real_user: real_user,
+             real_user:,
              workflows: payload[:workflows],
-             context: context,
-             symmetric: symmetric)
+             context:,
+             symmetric:)
   end
 
   def self.create_payload(payload_data)
@@ -162,7 +162,7 @@ class CanvasSecurity::ServicesJwt
                                            "RS256" => KeyStorage.public_keyset
                                          },
                                          encryption_secret,
-                                         ignore_expiration: ignore_expiration)
+                                         ignore_expiration:)
   end
 
   def self.encryption_secret

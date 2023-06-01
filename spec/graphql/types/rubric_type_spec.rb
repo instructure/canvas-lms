@@ -22,7 +22,7 @@ require_relative "../graphql_spec_helper"
 
 describe Types::RubricType do
   let_once(:course) { course_factory(active_all: true) }
-  let_once(:student) { student_in_course(course: course, active_all: true).user }
+  let_once(:student) { student_in_course(course:, active_all: true).user }
   let(:rubric) { rubric_for_course }
   let(:rubric_type) { GraphQLTypeTester.new(rubric, current_user: student) }
 

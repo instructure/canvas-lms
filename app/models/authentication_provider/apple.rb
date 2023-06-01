@@ -96,13 +96,13 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   end
 
   def authorize_options
-    { scope: scope, response_type: "code id_token", response_mode: "form_post" }
+    { scope:, response_type: "code id_token", response_mode: "form_post" }
   end
 
   def scope
     result = []
     requested_attributes = [login_attribute] + federated_attributes.values.pluck("attribute")
-    result << "name" unless (requested_attributes & ["firstName", "lastName"]).empty?
+    result << "name" if requested_attributes.intersect?(["firstName", "lastName"])
     result << "email" if requested_attributes.include?("email")
     result.join(" ")
   end

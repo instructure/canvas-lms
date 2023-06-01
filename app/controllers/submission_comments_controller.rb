@@ -72,7 +72,7 @@ class SubmissionCommentsController < ApplicationController
       page_size: params[:page_size] || "LETTER",
       score: submission.score ? I18n.t("Score: %{score}", score: submission.score) : I18n.t("Score: N/A"),
       student_name: student_name ? I18n.t("Student: %{name}", name: student_name) : I18n.t("Student: N/A"),
-      submission_comments: submission_comments,
+      submission_comments:,
       timestamps_by_id: timestamps_by_id(submission_comments)
     }
   end

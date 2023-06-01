@@ -35,7 +35,7 @@ describe Types::MediaObjectType do
     def resolve_media_object_field(field, current_user: @teacher)
       media_object_type.resolve(
         field,
-        current_user: current_user
+        current_user:
       )
     end
 

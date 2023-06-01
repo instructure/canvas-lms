@@ -117,7 +117,7 @@ class GroupCategory < ActiveRecord::Base
     end
 
     def uncategorized(context: nil)
-      gc = GroupCategory.new(name: name_for_role("uncategorized"), role: "uncategorized", context: context)
+      gc = GroupCategory.new(name: name_for_role("uncategorized"), role: "uncategorized", context:)
       gc.set_root_account_id
       gc
     end
@@ -152,9 +152,9 @@ class GroupCategory < ActiveRecord::Base
     def role_category_for_context(role, context)
       return unless context && protected_role_for_context?(role, context)
 
-      category = context.group_categories.where(role: role).first ||
+      category = context.group_categories.where(role:).first ||
                  context.group_categories.build(name: name_for_role(role),
-                                                role: role,
+                                                role:,
                                                 root_account: context.root_account)
       category.save(validate: false) if category.new_record?
       category
@@ -392,7 +392,7 @@ class GroupCategory < ActiveRecord::Base
     end
     Group.where(id: groups).touch_all
     if context_type == "Course"
-      opts = { assignments: Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id) }
+      opts = { assignments: Assignment.where(context_type:, context_id:, group_category_id: self).pluck(:id) }
       DueDateCacher.recompute_course(context_id, **opts)
     end
   end
@@ -450,11 +450,11 @@ class GroupCategory < ActiveRecord::Base
 
     if split_type
       InstStatsd::Statsd.increment("groups.auto_create",
-                                   tags: { split_type: split_type, root_account_id: root_account&.global_id, root_account_name: root_account&.name })
+                                   tags: { split_type:, root_account_id: root_account&.global_id, root_account_name: root_account&.name })
     end
 
     by_section = @group_by_section && context.is_a?(Course)
-    calculate_group_count_by_membership(by_section: by_section) if @create_group_member_count
+    calculate_group_count_by_membership(by_section:) if @create_group_member_count
     create_groups(@create_group_count) if @create_group_count
     if @assign_unassigned_members && @create_group_count
       assign_unassigned_members(by_section)
@@ -467,7 +467,7 @@ class GroupCategory < ActiveRecord::Base
     # TODO: i18n
     group_name = group_name.singularize if I18n.locale == :en
     num.times do |idx|
-      groups.create(name: "#{group_name} #{idx + 1}", context: context)
+      groups.create(name: "#{group_name} #{idx + 1}", context:)
     end
   end
 
@@ -514,7 +514,7 @@ class GroupCategory < ActiveRecord::Base
 
   def assign_unassigned_members_in_background(by_section = false, updating_user: nil)
     start_progress
-    delay(priority: Delayed::LOW_PRIORITY).assign_unassigned_members(by_section, updating_user: updating_user)
+    delay(priority: Delayed::LOW_PRIORITY).assign_unassigned_members(by_section, updating_user:)
   end
 
   def clone_groups_and_memberships(new_group_category)
@@ -542,13 +542,13 @@ class GroupCategory < ActiveRecord::Base
 
   def discussion_topics
     shard.activate do
-      DiscussionTopic.where(context_type: context_type, context_id: context_id, group_category_id: self)
+      DiscussionTopic.where(context_type:, context_id:, group_category_id: self)
     end
   end
 
   def submission_ids_by_user_id(user_ids = nil)
     shard.activate do
-      assignments = Assignment.active.where(context_type: context_type, context_id: context_id, group_category_id: id)
+      assignments = Assignment.active.where(context_type:, context_id:, group_category_id: id)
       submissions = Submission.active.where(assignment_id: assignments, workflow_state: "submitted")
       submissions = submissions.where(user_id: user_ids) if user_ids
       rows = submissions.pluck(:id, :user_id)

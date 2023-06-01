@@ -80,7 +80,7 @@ describe Api::V1::DiscussionTopics do
         @course,
         @user,
         {},
-        { root_topic_fields: root_topic_fields },
+        { root_topic_fields: },
         nil
       )
       expect(json[:delayed_post_at]).to eq @delayed_post_time
@@ -96,7 +96,7 @@ describe Api::V1::DiscussionTopics do
         @course,
         @user,
         {},
-        { root_topic_fields: root_topic_fields },
+        { root_topic_fields: },
         root_topics
       )
       expect(json[:delayed_post_at]).to eq @delayed_post_time
@@ -111,7 +111,7 @@ describe Api::V1::DiscussionTopics do
         @course,
         @user,
         {},
-        { root_topic_fields: root_topic_fields }
+        { root_topic_fields: }
       )
       expect(json[:delayed_post_at]).to be_nil
       expect(json[:lock_at]).to be_nil  # We didn't ask for it, so don't fill it
@@ -391,7 +391,7 @@ describe DiscussionTopicsController, type: :request do
                  message: "test <b>message</b>",
                  discussion_type: "threaded",
                  published: true,
-                 todo_date: todo_date,
+                 todo_date:,
                  delayed_post_at: post_at.as_json,
                  lock_at: lock_at.as_json,
                  podcast_has_student_posts: "1",
@@ -1526,7 +1526,7 @@ describe DiscussionTopicsController, type: :request do
         # but should allow them to pin/unpin them
         group_category = @course.group_categories.create(name: "watup")
         group = group_category.groups.create!(name: "group1", context: @course)
-        rtopic = @course.discussion_topics.create!(group_category: group_category)
+        rtopic = @course.discussion_topics.create!(group_category:)
         gtopic = rtopic.child_topics.first
 
         api_call(:put,
@@ -1975,7 +1975,7 @@ describe DiscussionTopicsController, type: :request do
       assignment = @course.assignments.create!(assignment_opts)
       assignment.submission_types = "discussion_topic"
       assignment.save!
-      topic = @course.discussion_topics.create!(user: @teacher, title: assignment_opts[:title], message: "woo", assignment: assignment)
+      topic = @course.discussion_topics.create!(user: @teacher, title: assignment_opts[:title], message: "woo", assignment:)
       entry = topic.discussion_entries.create!(message: "second message", user: @student)
       entry.save
       [assignment, topic]
@@ -2088,7 +2088,7 @@ describe DiscussionTopicsController, type: :request do
     group = group_category.groups.create!(name: "group1", context: @course)
     group.add_user(@user)
     attachment = create_attachment(group)
-    gtopic = create_topic(group, title: "Group Topic 1", message: "<p>content here</p>", attachment: attachment)
+    gtopic = create_topic(group, title: "Group Topic 1", message: "<p>content here</p>", attachment:)
 
     json = api_call(:get,
                     "/api/v1/groups/#{group.id}/discussion_topics.json",
@@ -3244,7 +3244,7 @@ describe DiscussionTopicsController, type: :request do
                      course_id: course.id.to_s,
                      topic_id: topic.id.to_s,
                      entry_id: entry.id.to_s,
-                     rating: rating })
+                     rating: })
     end
 
     it "rates an entry" do

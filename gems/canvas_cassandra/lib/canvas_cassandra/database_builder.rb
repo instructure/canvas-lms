@@ -52,7 +52,7 @@ module CanvasCassandra
         keyspace = config["keyspace"]
         raise "No keyspace specified for: #{config_name.inspect}" unless keyspace.present?
 
-        opts = { keyspace: keyspace, cql_version: "3.0.0" }
+        opts = { keyspace:, cql_version: "3.0.0" }
         opts[:retries] = config["retries"] if config["retries"]
         opts[:connect_timeout] = config["connect_timeout"] if config["connect_timeout"]
         opts[:timeout] = config["timeout"] if config["timeout"]

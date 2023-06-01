@@ -104,7 +104,7 @@ module ActiveRecord
           return nil unless base_key
 
           prefer_multi_cache = prefer_multi_cache_for_key_type?(key_type)
-          redis = Canvas::CacheRegister.redis(base_key, ::Shard.shard_for(global_id), prefer_multi_cache: prefer_multi_cache)
+          redis = Canvas::CacheRegister.redis(base_key, ::Shard.shard_for(global_id), prefer_multi_cache:)
           full_key = "#{base_key}/#{key_type}"
           RequestCache.cache(full_key) do
             now = Time.now.utc.to_fs(cache_timestamp_format)

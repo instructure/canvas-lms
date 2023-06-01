@@ -39,7 +39,7 @@ describe Auditors::FeatureFlag do
     EventStream.current_shard_lookup = lambda do
       shard_class.new
     end
-    allow(RequestContextGenerator).to receive_messages(request_id: request_id)
+    allow(RequestContextGenerator).to receive_messages(request_id:)
     @event = Auditors::FeatureFlag.record(@flag, @user, "off")
   end
 

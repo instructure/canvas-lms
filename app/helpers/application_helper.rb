@@ -373,7 +373,7 @@ module ApplicationHelper
       .cache
       .fetch(["active_external_tool_for", @context, tool_id].cache_key, expires_in: 1.hour) do
         # don't use for groups. they don't have account_chain_ids
-        tool = @context.context_external_tools.active.where(tool_id: tool_id).first
+        tool = @context.context_external_tools.active.where(tool_id:).first
 
         unless tool
           # account_chain_ids is in the order we need to search for tools
@@ -384,7 +384,7 @@ module ApplicationHelper
           tools =
             ContextExternalTool
             .active
-            .where(context_type: "Account", context_id: account_chain_ids, tool_id: tool_id)
+            .where(context_type: "Account", context_id: account_chain_ids, tool_id:)
             .to_a
           account_chain_ids.each do |account_id|
             tool = tools.find { |t| t.context_id == account_id }
@@ -589,7 +589,7 @@ module ApplicationHelper
         )
       end
     end
-    content_tag("iframe", "", { src: src }.merge(html_options))
+    content_tag("iframe", "", { src: }.merge(html_options))
   end
 
   # returns a time object at 00:00:00 tomorrow
@@ -638,7 +638,7 @@ module ApplicationHelper
     parts.join(t("#title_separator", ": "))
   end
 
-  def cache(name = {}, options = {}, &block)
+  def cache(name = {}, options = {}, &)
     unless options && options[:no_locale]
       name = name.cache_key if name.respond_to?(:cache_key)
       name += "/#{I18n.locale}" if name.is_a?(String)
@@ -897,7 +897,7 @@ module ApplicationHelper
   def multiple_due_date_tooltip(assignment, user, opts = {})
     user ||= @current_user
     presenter = OverrideTooltipPresenter.new(assignment, user, opts)
-    render "shared/vdd_tooltip", presenter: presenter
+    render "shared/vdd_tooltip", presenter:
   end
 
   require "digest"
@@ -1115,7 +1115,7 @@ module ApplicationHelper
       "#",
       id: "signup_parent",
       class: "signup_link",
-      data: data,
+      data:,
       title: I18n.t("Parent Signup")
     )
   end
@@ -1132,7 +1132,7 @@ module ApplicationHelper
       @context.is_a?(Course) && tutorials_enabled? &&
       @context.grants_right?(@current_user, session, :manage)
 
-    js_env NEW_USER_TUTORIALS: { is_enabled: is_enabled }
+    js_env NEW_USER_TUTORIALS: { is_enabled: }
   end
 
   def planner_enabled?
@@ -1155,8 +1155,8 @@ module ApplicationHelper
       developer_key: @access_token&.developer_key,
       root_account: @domain_root_account,
       oauth_host: request.host_with_port,
-      return_url: return_url,
-      fallback_url: fallback_url
+      return_url:,
+      fallback_url:
     )
   end
 
@@ -1283,7 +1283,7 @@ module ApplicationHelper
       end
       if cyoe_enabled?(@context)
         is_student = @context.grants_right?(@current_user, session, :participate_as_student)
-        opts = { context: @context, user: @current_user, session: session, is_student: is_student }
+        opts = { context: @context, user: @current_user, session:, is_student: }
         hash[:mastery_path] =
           conditional_release_rule_for_module_item(needed_tags[tag_ids[ix]], opts)
       end
@@ -1328,7 +1328,7 @@ module ApplicationHelper
 
   def render_file_location(location)
     headers["X-Canvas-File-Location"] = "True"
-    render json: { location: location, token: file_authenticator.instfs_bearer_token }
+    render json: { location:, token: file_authenticator.instfs_bearer_token }
   end
 
   def authenticated_download_url(attachment)

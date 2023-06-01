@@ -22,7 +22,7 @@ describe StreamItem do
   it "does not infer a user_id for DiscussionTopic" do
     user_factory
     context = Course.create!
-    dt = DiscussionTopic.create!(context: context)
+    dt = DiscussionTopic.create!(context:)
     dt.generate_stream_items([@user])
     si = @user.stream_item_instances.first.stream_item
     data = si.data(@user.id)
@@ -45,7 +45,7 @@ describe StreamItem do
   it "doesn't unlink discussion entries from their topics" do
     user_factory
     context = Course.create!
-    dt = DiscussionTopic.create!(context: context, require_initial_post: true)
+    dt = DiscussionTopic.create!(context:, require_initial_post: true)
     de = dt.root_discussion_entries.create!
     dt.generate_stream_items([@user])
     si = @user.stream_item_instances.first.stream_item
@@ -57,13 +57,13 @@ describe StreamItem do
     user_factory
     context = Course.create!(course_code: "some name")
     enable_cache do
-      dt1 = DiscussionTopic.create!(context: context)
+      dt1 = DiscussionTopic.create!(context:)
       dt1.generate_stream_items([@user])
       si1 = StreamItem.where(asset_id: dt1.id).first
       expect(si1.data.context_short_name).to eq "some name"
 
       context.update_attribute(:course_code, "some other name")
-      dt2 = DiscussionTopic.create!(context: context)
+      dt2 = DiscussionTopic.create!(context:)
       dt2.generate_stream_items([@user])
       si2 = StreamItem.where(asset_id: dt2.id).first
       expect(si2.data.context_short_name).to eq "some other name"
@@ -173,7 +173,7 @@ describe StreamItem do
   it "returns a description for a Collaboration" do
     user_factory
     context = Course.create!
-    collab = Collaboration.create!(context: context, description: "meow", title: "kitty")
+    collab = Collaboration.create!(context:, description: "meow", title: "kitty")
     collab.generate_stream_items([@user])
     si = @user.stream_item_instances.first.stream_item
     data = si.data(@user.id)

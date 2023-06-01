@@ -64,7 +64,7 @@ describe Mutations::CreateLearningOutcomeGroup do
   end
 
   def execute_query(mutation_str, context)
-    CanvasSchema.execute(mutation_str, context: context)
+    CanvasSchema.execute(mutation_str, context:)
   end
 
   context "Mutation" do
@@ -73,8 +73,8 @@ describe Mutations::CreateLearningOutcomeGroup do
         result = execute_query(
           mutation_str(
             id: @parent_group.id,
-            title: title,
-            description: description,
+            title:,
+            description:,
             vendorGuid: vendor_guid
           ),
           context
@@ -94,8 +94,8 @@ describe Mutations::CreateLearningOutcomeGroup do
         result = execute_query(
           mutation_str(
             id: @global_parent_group.id,
-            title: title,
-            description: description,
+            title:,
+            description:,
             vendorGuid: vendor_guid
           ),
           { current_user: site_admin_user }
@@ -119,7 +119,7 @@ describe Mutations::CreateLearningOutcomeGroup do
     end
 
     it "requires parent outcome group to exist" do
-      result = execute_query(mutation_str(id: 99_999, title: title), context)
+      result = execute_query(mutation_str(id: 99_999, title:), context)
       expect_error(result, "Group not found")
     end
 
@@ -130,7 +130,7 @@ describe Mutations::CreateLearningOutcomeGroup do
 
     it "requires user to have manage_outcomes permission to create learning outcome group" do
       result = execute_query(
-        mutation_str(id: @parent_group.id, title: title),
+        mutation_str(id: @parent_group.id, title:),
         { current_user: @teacher }
       )
       expect_error(result, "Insufficient permissions")
@@ -138,7 +138,7 @@ describe Mutations::CreateLearningOutcomeGroup do
 
     it "requires user to have manage_global_outcomes permission to create global learning outcome group" do
       result = execute_query(
-        mutation_str(id: @global_parent_group.id, title: title),
+        mutation_str(id: @global_parent_group.id, title:),
         context
       )
       expect_error(result, "Insufficient permissions")

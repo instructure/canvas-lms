@@ -184,7 +184,7 @@ class GroupsController < ApplicationController
              end
 
     users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause("users"))
-                    .paginate(page: page, per_page: per_page)
+                    .paginate(page:, per_page:)
 
     if authorized_action(@context, @current_user, :manage)
       json = {
@@ -195,8 +195,8 @@ class GroupsController < ApplicationController
         total_entries: users.total_entries,
         users: users.map { |u| u.group_member_json(@context) }
       }
-      json[:pagination_html] = render_to_string(partial: "user_pagination", locals: { users: users }) unless params[:no_html]
-      render json: json
+      json[:pagination_html] = render_to_string(partial: "user_pagination", locals: { users: }) unless params[:no_html]
+      render json:
     end
   end
 
@@ -367,7 +367,7 @@ class GroupsController < ApplicationController
                      @current_user,
                      session,
                      include: Array(params[:include]),
-                     include_inactive_users: include_inactive_users)
+                     include_inactive_users:)
         }
       end
     end
@@ -720,7 +720,7 @@ class GroupsController < ApplicationController
     if authorized_action(@group, @current_user, :manage)
       root_account = @group.context.try(:root_account) || @domain_root_account
       ul = UserList.new(params[:invitees],
-                        root_account: root_account,
+                        root_account:,
                         search_method: :preferred,
                         current_user: @current_user)
       @memberships = []
@@ -869,7 +869,7 @@ class GroupsController < ApplicationController
     @attachment = Attachment.new(context: @context)
     if authorized_action(@attachment, @current_user, :create)
       submit_assignment = value_to_boolean(params[:submit_assignment])
-      opts = { check_quota: true, submit_assignment: submit_assignment }
+      opts = { check_quota: true, submit_assignment: }
       if submit_assignment && @context.respond_to?(:submissions_folder)
         opts[:folder] = @context.submissions_folder
       end

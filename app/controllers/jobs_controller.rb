@@ -80,7 +80,7 @@ class JobsController < ApplicationController
 
     count = Delayed::Job.bulk_update(params[:update_action], opts)
 
-    render json: { status: "OK", count: count }
+    render json: { status: "OK", count: }
   end
 
   protected
@@ -106,7 +106,7 @@ class JobsController < ApplicationController
       end
     end
 
-    { jobs: jobs, total: jobs_count }
+    { jobs:, total: jobs_count }
   end
 
   def set_navigation

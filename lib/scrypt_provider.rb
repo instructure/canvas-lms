@@ -22,7 +22,7 @@ ScryptProvider = Struct.new(:cost) do
   def encrypt(*tokens)
     SCrypt::Password.create(
       join_tokens(tokens),
-      cost: cost
+      cost:
     )
   end
 

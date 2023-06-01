@@ -465,7 +465,7 @@ module Gradebook
   end
 
   def self.select_gradebook_menu_option(name, container: nil, role: "menuitemradio")
-    gradebook_menu_option(name, container: container, role: role).click
+    gradebook_menu_option(name, container:, role:).click
   end
 
   def self.gradebook_menu_options(container, role = "menuitemradio")
@@ -479,7 +479,7 @@ module Gradebook
     if name =~ /(.+?) > (.+)/
       menu_item_group_name, menu_item_name = Regexp.last_match[1], Regexp.last_match[2]
 
-      menu_container = gradebook_menu_group(menu_item_group_name, container: container)
+      menu_container = gradebook_menu_group(menu_item_group_name, container:)
     end
 
     fj("[role*=#{role}] *:contains(#{menu_item_name})", menu_container)

@@ -45,7 +45,7 @@ module Types
                 context: assignment.context,
                 in_app: context[:in_app],
                 request: context[:request],
-                preloaded_attachments: preloaded_attachments,
+                preloaded_attachments:,
                 user: current_user,
                 options: { rewrite_api_urls: rewrite_urls }
               )

@@ -53,7 +53,7 @@ describe CC::AssignmentResources do
       let(:tool) { external_tool_model(context: course, opts: { use_1_3: true }) }
 
       before do
-        tool.update!(developer_key: developer_key)
+        tool.update!(developer_key:)
         assignment.external_tool_tag = tag
         assignment.save!
         assignment.primary_resource_link.update!(custom: custom_params)

@@ -194,7 +194,7 @@ module Types
 
     field :assessment_requests_for_current_user, [AssessmentRequestType], null: true
     def assessment_requests_for_current_user
-      Loaders::AssessmentRequestLoader.for(current_user: current_user).load(assignment)
+      Loaders::AssessmentRequestLoader.for(current_user:).load(assignment)
     end
 
     field :moderated_grading, AssignmentModeratedGrading, null: true
@@ -320,7 +320,7 @@ module Types
                                               context: assignment.context,
                                               user: current_user,
                                               in_app: context[:in_app],
-                                              preloaded_attachments: preloaded_attachments)
+                                              preloaded_attachments:)
         end
       end
     end

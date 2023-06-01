@@ -311,7 +311,7 @@ describe "MessageableUser::Calculator" do
       it "does not return accounts the user is not in" do
         # contrived, but have read_roster permission, but no association
         account = Account.create!
-        account_admin_user(user: @viewing_user, account: account)
+        account_admin_user(user: @viewing_user, account:)
         @viewing_user.user_account_associations.scope.delete_all
         expect(@calculator.uncached_visible_account_ids).not_to include(account.id)
       end

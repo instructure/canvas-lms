@@ -683,7 +683,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   def login_or_launch_url(extension_type: nil, preferred_launch_url: nil)
     (use_1_3? && developer_key&.oidc_initiation_url) ||
-      launch_url(extension_type: extension_type, preferred_launch_url: preferred_launch_url)
+      launch_url(extension_type:, preferred_launch_url:)
   end
 
   def launch_url(extension_type: nil, preferred_launch_url: nil)
@@ -953,7 +953,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     # If tool with same domain is found in the context
     if domain.present?
-      same_domain_diff_id = ContextExternalTool.where.not(id: id).where(domain: domain)
+      same_domain_diff_id = ContextExternalTool.where.not(id:).where(domain:)
       Lti::ContextToolFinder.all_tools_scope_union(context, base_scope: same_domain_diff_id).exists?
     else
       false
@@ -1033,7 +1033,7 @@ class ContextExternalTool < ActiveRecord::Base
       when :self
         context
       when :recursive
-        contexts_to_search(context.context, include_federated_parent: include_federated_parent)
+        contexts_to_search(context.context, include_federated_parent:)
       when :account_chain
         inc_fp = include_federated_parent &&
                  Account.site_admin.feature_enabled?(:lti_tools_from_federated_parents) &&
@@ -1044,7 +1044,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.find_active_external_tool_by_consumer_key(consumer_key, context)
-    active.where(consumer_key: consumer_key, context: contexts_to_search(context)).first
+    active.where(consumer_key:, context: contexts_to_search(context)).first
   end
 
   def self.find_active_external_tool_by_client_id(client_id, context)
@@ -1052,7 +1052,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.find_external_tool_by_id(id, context)
-    where(id: id, context: contexts_to_search(context)).first
+    where(id:, context: contexts_to_search(context)).first
   end
 
   # Order of precedence: Basic LTI defines precedence as first
@@ -1088,7 +1088,7 @@ class ContextExternalTool < ActiveRecord::Base
         preferred_tool_id,
         exclude_tool_id,
         preferred_client_id,
-        only_1_3: only_1_3
+        only_1_3:
       )
 
       # Check for a tool that exactly matches the given URL
@@ -1233,7 +1233,7 @@ class ContextExternalTool < ActiveRecord::Base
           .where("context_external_tools.id = context_external_tool_placements.context_external_tool_id").arel.exists
       )
       # Default placements are only applicable to LTI 1.1
-      if (placements.map(&:to_s) & Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).present?
+      if placements.map(&:to_s).intersect?(Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS)
         scope = ContextExternalTool
                 .where(lti_version: "1.1", not_selectable: [nil, false])
                 .merge(
@@ -1288,8 +1288,8 @@ class ContextExternalTool < ActiveRecord::Base
 
     context = context.context if context.is_a?(Group)
 
-    tool = context.context_external_tools.having_setting(type).active.where(id: id).first
-    tool ||= ContextExternalTool.having_setting(type).active.where(context_type: "Account", context_id: context.account_chain_ids, id: id).first
+    tool = context.context_external_tools.having_setting(type).active.where(id:).first
+    tool ||= ContextExternalTool.having_setting(type).active.where(context_type: "Account", context_id: context.account_chain_ids, id:).first
     raise ActiveRecord::RecordNotFound if !tool && raise_error
 
     tool
@@ -1338,7 +1338,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def opaque_identifier_for(asset, context: nil)
-    ContextExternalTool.opaque_identifier_for(asset, shard, context: context)
+    ContextExternalTool.opaque_identifier_for(asset, shard, context:)
   end
 
   def self.opaque_identifier_for(asset, shard, context: nil)
@@ -1346,7 +1346,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     shard.activate do
       lti_context_id = context_id_for(asset, shard)
-      Lti::Asset.set_asset_context_id(asset, lti_context_id, context: context)
+      Lti::Asset.set_asset_context_id(asset, lti_context_id, context:)
     end
   end
 
@@ -1429,7 +1429,7 @@ class ContextExternalTool < ActiveRecord::Base
     when Course
       scope = scope.where(context_id: context.id)
     when Account
-      scope = scope.where(root_account_id: root_account_id, content_tags: { root_account_id: root_account_id })
+      scope = scope.where(root_account_id:, content_tags: { root_account_id: })
     end
 
     GuardRail.activate(:secondary) do

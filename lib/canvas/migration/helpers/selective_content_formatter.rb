@@ -210,7 +210,7 @@ module Canvas::Migration::Helpers
 
     def item_hash(type, item)
       hash = {
-        type: type,
+        type:,
         property: "#{property_prefix}[#{type}][id_#{item["migration_id"]}]",
         title: item["title"],
         migration_id: item["migration_id"]
@@ -352,7 +352,7 @@ module Canvas::Migration::Helpers
 
             next if count == 0
 
-            hash = { type: type2, property: "#{property_prefix}[all_#{type2}]", title: title.call, count: count }
+            hash = { type: type2, property: "#{property_prefix}[all_#{type2}]", title: title.call, count: }
             add_url!(hash, type2, selectable_outcomes)
             content_list << hash
           end
@@ -390,7 +390,7 @@ module Canvas::Migration::Helpers
       title ||= item.short_description if item.respond_to?(:short_description)
       title ||= ""
 
-      hash = { type: type, title: title }
+      hash = { type:, title: }
       if @migration
         mig_id = CC::CCHelper.create_key(item, global: @global_identifiers)
         hash[:migration_id] = mig_id

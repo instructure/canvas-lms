@@ -32,7 +32,7 @@ module BroadcastPolicies
         context_id: course.id,
         deleted?: false,
         muted?: false,
-        assignment: assignment,
+        assignment:,
         survey?: false
       )
     end
@@ -47,10 +47,10 @@ module BroadcastPolicies
     end
     let(:quiz_submission) do
       double("Quizzes::QuizSubmission",
-             quiz: quiz,
+             quiz:,
              posted?: true,
-             submission: submission,
-             user: user,
+             submission:,
+             user:,
              context: course)
     end
     let(:policy) do

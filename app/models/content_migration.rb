@@ -327,7 +327,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def fail_with_error!(exception_or_info, error_message: nil, issue_level: :error)
-    opts = { issue_level: issue_level }
+    opts = { issue_level: }
     if exception_or_info.is_a?(Exception)
       opts[:exception] = exception_or_info
     else
@@ -396,9 +396,9 @@ class ContentMigration < ActiveRecord::Base
 
     plugin ||= Canvas::Plugin.find(migration_type)
     if plugin
-      queue_opts = { priority: priority,
+      queue_opts = { priority:,
                      max_attempts: 1,
-                     expires_at: expires_at }
+                     expires_at: }
       if strand
         queue_opts[:strand] = strand
       else
@@ -458,8 +458,8 @@ class ContentMigration < ActiveRecord::Base
         run_at = Setting.get("content_migration_requeue_delay_minutes", "60").to_i.minutes.from_now
         # if everything goes right, we'll queue it right away after the currently running one finishes
         # but if something goes catastropically wrong, then make sure we recheck it eventually
-        job = delay(ignore_transaction: true, run_at: run_at).queue_migration(
-          plugin, retry_count: retry_count + 1, expires_at: expires_at
+        job = delay(ignore_transaction: true, run_at:).queue_migration(
+          plugin, retry_count: retry_count + 1, expires_at:
         )
 
         if job_progress
@@ -1160,7 +1160,7 @@ class ContentMigration < ActiveRecord::Base
       key = Context.api_type_name(klass)
       context.shard.activate do
         scope = klass.column_names.include?("assignment_id") ? klass.select(:id, :assignment_id, :migration_id) : klass.select(:id, :migration_id)
-        scope = scope.where(context: context).where.not(migration_id: nil)
+        scope = scope.where(context:).where.not(migration_id: nil)
         scope = scope.only_discussion_topics if asset_type == "DiscussionTopic"
       end
 

@@ -79,9 +79,9 @@ class JwtsController < ApplicationController
       domain,
       @current_user,
       real_user: @real_current_user,
-      workflows: workflows,
+      workflows:,
       context: @context,
-      symmetric: symmetric
+      symmetric:
     )
     render json: { token: services_jwt }
   end
@@ -127,7 +127,7 @@ class JwtsController < ApplicationController
       params[:jwt],
       request.host_with_port,
       user,
-      real_user: real_user,
+      real_user:,
       # TODO: remove this once we teach all consumers to consume the asymmetric ones
       symmetric: true
     )

@@ -24,16 +24,16 @@
 module Lti
   describe CapabilitiesHelper do
     let(:root_account) { Account.new(lti_guid: "test-lti-guid") }
-    let(:account) { Account.new(root_account: root_account) }
-    let(:course) { Course.new(account: account, sis_source_id: 12) }
+    let(:account) { Account.new(root_account:) }
+    let(:course) { Course.new(account:, sis_source_id: 12) }
     let(:group_category) { course.group_categories.new(name: "Category") }
-    let(:group) { course.groups.new(name: "Group", group_category: group_category) }
+    let(:group) { course.groups.new(name: "Group", group_category:) }
     let(:user) { User.new }
     let(:assignment) { Assignment.new }
     let(:collaboration) do
       ExternalToolCollaboration.new(
         title: "my collab",
-        user: user,
+        user:,
         url: "http://www.example.com"
       )
     end
@@ -67,7 +67,7 @@ module Lti
       m
     end
 
-    let(:variable_expander) { Lti::VariableExpander.new(root_account, account, controller, current_user: user, tool: tool) }
+    let(:variable_expander) { Lti::VariableExpander.new(root_account, account, controller, current_user: user, tool:) }
 
     let(:invalid_enabled_caps) { %w[InvalidCap.Foo AnotherInvalid.Bar] }
     let(:valid_enabled_caps) { %w[ToolConsumerInstance.guid Membership.role CourseSection.sourcedId] }
@@ -149,7 +149,7 @@ module Lti
       end
 
       context "in a course" do
-        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
+        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool:) }
 
         it "does include a valid name (key) for valid capabilities" do
           params_hash = CapabilitiesHelper.capability_params_hash(invalid_enabled_caps + valid_enabled_caps, variable_expander)

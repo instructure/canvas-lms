@@ -40,10 +40,10 @@ module UserLearningObjectScopes
   def ignore_item!(asset, purpose, permanent = false)
     begin
       # more likely this doesn't exist, so try the create first
-      asset.ignores.create!(user: self, purpose: purpose, permanent: permanent)
+      asset.ignores.create!(user: self, purpose:, permanent:)
     rescue ActiveRecord::RecordNotUnique
       asset.shard.activate do
-        ignore = asset.ignores.where(user_id: self, purpose: purpose).first
+        ignore = asset.ignores.where(user_id: self, purpose:).first
         ignore.permanent = permanent
         ignore.save!
       end
@@ -120,10 +120,10 @@ module UserLearningObjectScopes
     original_shard = Shard.current
     shard.activate do
       course_ids = course_ids_for_todo_lists(participation_type,
-                                             course_ids: course_ids,
-                                             contexts: contexts,
-                                             include_concluded: include_concluded)
-      group_ids = group_ids_for_todo_lists(group_ids: group_ids, contexts: contexts)
+                                             course_ids:,
+                                             contexts:,
+                                             include_concluded:)
+      group_ids = group_ids_for_todo_lists(group_ids:, contexts:)
       ids_by_shard = Hash.new({ course_ids: [], group_ids: [] })
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
         ids_by_shard[Shard.current] = { course_ids: shard_course_ids, group_ids: [] }
@@ -146,8 +146,8 @@ module UserLearningObjectScopes
               shard_course_ids,
               shard_group_ids,
               participation_type,
-              include_ignored: include_ignored,
-              include_ungraded: include_ungraded
+              include_ignored:,
+              include_ungraded:
             ))
           end
           return object_type.constantize.none # fallback
@@ -157,7 +157,7 @@ module UserLearningObjectScopes
         params_cache_key = Digest::SHA256.hexdigest(ActiveSupport::Cache.expand_cache_key(params))
         cache_key = [self, "#{object_type}_needing_#{purpose}", course_ids_cache_key, params_cache_key].cache_key
 
-        Rails.cache.fetch_with_batched_keys(cache_key, expires_in: expires_in, batch_object: self, batched_keys: :todo_list) do
+        Rails.cache.fetch_with_batched_keys(cache_key, expires_in:, batch_object: self, batched_keys: :todo_list) do
           result = GuardRail.activate(:secondary) do
             ids_by_shard.flat_map do |shard, shard_hash|
               shard.activate do
@@ -167,8 +167,8 @@ module UserLearningObjectScopes
                   shard_hash[:course_ids],
                   shard_hash[:group_ids],
                   participation_type,
-                  include_ignored: include_ignored,
-                  include_ungraded: include_ungraded
+                  include_ignored:,
+                  include_ungraded:
                 ))
               end
             end
@@ -214,7 +214,7 @@ module UserLearningObjectScopes
                     :student,
                     params,
                     cache_timeout,
-                    limit: limit,
+                    limit:,
                     **opts) do |assignment_scope|
       assignments = assignment_scope.due_between_for_user(due_after, due_before, self)
 
@@ -246,7 +246,7 @@ module UserLearningObjectScopes
     assignments = assignments_for_student("submitting", **params)
     return assignments if scope_only
 
-    select_available_assignments(assignments, include_concluded: include_concluded)
+    select_available_assignments(assignments, include_concluded:)
   end
 
   def submitted_assignments(
@@ -258,7 +258,7 @@ module UserLearningObjectScopes
     assignments = assignments_for_student("submitted", **params)
     return assignments if scope_only
 
-    select_available_assignments(assignments, include_concluded: include_concluded)
+    select_available_assignments(assignments, include_concluded:)
   end
 
   def ungraded_quizzes(
@@ -282,7 +282,7 @@ module UserLearningObjectScopes
       quizzes = quizzes.need_submitting_info(id, limit) if needing_submitting
       return quizzes if scope_only
 
-      select_available_assignments(quizzes, include_concluded: include_concluded)
+      select_available_assignments(quizzes, include_concluded:)
     end
   end
 

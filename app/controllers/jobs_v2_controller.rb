@@ -58,7 +58,7 @@ class JobsV2Controller < ApplicationController
           manage_jobs: Account.site_admin.grants_right?(@current_user, session, :manage_jobs),
           jobs_scope_filter: {
             jobs_server: (jobs_server && t("Server: %{server}", server: jobs_server)) || t("All Jobs"),
-            cluster: cluster && t("Cluster: %{cluster}", cluster: cluster),
+            cluster: cluster && t("Cluster: %{cluster}", cluster:),
             shard: t("Shard: %{shard}", shard: @domain_root_account.shard.name),
             account: t("Account: %{account}", account: @domain_root_account.name)
           }.compact
@@ -129,7 +129,7 @@ class JobsV2Controller < ApplicationController
       group_statuses = get_group_statuses(group_info, @group) if %i[strand singleton].include?(@group)
 
       now = Delayed::Job.db_time_now
-      render json: group_info.map { |row| grouped_info_json(row, @group, base_time: now, group_statuses: group_statuses) }
+      render json: group_info.map { |row| grouped_info_json(row, @group, base_time: now, group_statuses:) }
     end
   end
 
@@ -245,8 +245,8 @@ class JobsV2Controller < ApplicationController
       id = params[:id]
       raise ActionController::BadRequest unless id.present?
 
-      jobs = Delayed::Job.where(id: id).to_a
-      jobs.concat Delayed::Job::Failed.where(id: id).or(
+      jobs = Delayed::Job.where(id:).to_a
+      jobs.concat Delayed::Job::Failed.where(id:).or(
         Delayed::Job::Failed.where(original_job_id: id)
       ).order(:id).to_a
 
@@ -282,10 +282,10 @@ class JobsV2Controller < ApplicationController
     count = nil
     Delayed::Job.transaction do
       Delayed::Job.advisory_lock(strand)
-      count = Delayed::Job.where(strand: strand).update_all(update_args)
+      count = Delayed::Job.where(strand:).update_all(update_args)
       SwitchmanInstJobs::JobsMigrator.unblock_strand!(strand, new_parallelism: update_args[:max_concurrent]) if update_args[:max_concurrent]
     end
-    render json: { status: "OK", count: count }
+    render json: { status: "OK", count: }
   end
 
   # @{not an}API requeue a failed job
@@ -326,7 +326,7 @@ class JobsV2Controller < ApplicationController
         count = SwitchmanInstJobs::JobsMigrator.unblock_strand!(params[:strand])
         raise ActiveRecord::RecordNotFound if count.nil?
 
-        render json: { status: "OK", count: count }
+        render json: { status: "OK", count: }
       rescue SwitchmanInstJobs::JobsBlockedError
         render json: { status: "blocked" }
       end
@@ -335,7 +335,7 @@ class JobsV2Controller < ApplicationController
         count = SwitchmanInstJobs::JobsMigrator.unblock_singleton!(params[:singleton])
         raise ActiveRecord::RecordNotFound if count.nil?
 
-        render json: { status: "OK", count: count }
+        render json: { status: "OK", count: }
       rescue SwitchmanInstJobs::JobsBlockedError
         render json: { status: "blocked" }
       end
@@ -491,11 +491,11 @@ class JobsV2Controller < ApplicationController
     max_concurrent = params[:max_concurrent]&.to_i || 1
 
     scope = throttle_scope(term, params[:shard_id])
-    job_count, new_strand = ::Delayed::Job.apply_temp_strand!(scope, max_concurrent: max_concurrent)
+    job_count, new_strand = ::Delayed::Job.apply_temp_strand!(scope, max_concurrent:)
 
     render json: {
-      job_count: job_count,
-      new_strand: new_strand
+      job_count:,
+      new_strand:
     }
   end
 
@@ -511,14 +511,14 @@ class JobsV2Controller < ApplicationController
     throw :abort unless @group
   end
 
-  def activate_job_shard(&block)
+  def activate_job_shard(&)
     if params[:job_shard].present?
       shard = ::Switchman::Shard.find(params[:job_shard])
       if shard.delayed_jobs_shard_id && shard.delayed_jobs_shard_id != shard.id
         return render json: { message: "not a job shard" }, status: :bad_request
       end
 
-      shard.activate(&block)
+      shard.activate(&)
     else
       yield
     end
@@ -552,7 +552,7 @@ class JobsV2Controller < ApplicationController
     case params[:scope]
     when "cluster"
       database_server_id = @domain_root_account.shard.database_server_id
-      shard_ids = ::Switchman::Shard.where(database_server_id: database_server_id).pluck(:id)
+      shard_ids = ::Switchman::Shard.where(database_server_id:).pluck(:id)
 
       scope.where(shard_id: shard_ids)
     when "shard" then scope.where(shard_id: @domain_root_account.shard)
@@ -565,7 +565,7 @@ class JobsV2Controller < ApplicationController
     scope = Delayed::Job
             .where(strand: nil, singleton: nil, locked_by: nil)
             .where(ActiveRecord::Base.wildcard("tag", search_term, type: :right, case_sensitive: true))
-    scope = scope.where(shard_id: shard_id) if shard_id.present?
+    scope = scope.where(shard_id:) if shard_id.present?
     scope
   end
 
@@ -573,7 +573,7 @@ class JobsV2Controller < ApplicationController
     json = {
       :count => row.count,
       group => row[group],
-      :info => grouped_info_data(row, base_time: base_time)
+      :info => grouped_info_data(row, base_time:)
     }
     json[:orphaned] = group_statuses[row[group]] if group_statuses&.key?(row[group])
     json
@@ -584,7 +584,7 @@ class JobsV2Controller < ApplicationController
     job_fields += %w[failed_at original_job_id requeued_job_id last_error] if job.is_a?(Delayed::Job::Failed)
     json = api_json(job, @current_user, nil, only: job_fields)
     if @bucket && base_time
-      json["info"] = list_info_data(job, base_time: base_time)
+      json["info"] = list_info_data(job, base_time:)
     else
       json["bucket"] = infer_bucket(job)
     end

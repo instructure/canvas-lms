@@ -1314,8 +1314,8 @@ describe Assignment do
         end
 
         it "returns false when all active submissions are posted" do
-          student2.enrollments.find_by(course: course).conclude
-          student3.enrollments.find_by(course: course).deactivate
+          student2.enrollments.find_by(course:).conclude
+          student3.enrollments.find_by(course:).deactivate
 
           @assignment.post_submissions
           expect(@assignment).not_to be_anonymize_students
@@ -1399,8 +1399,8 @@ describe Assignment do
         end
 
         it "returns true when all active submissions are posted" do
-          student2.enrollments.find_by(course: course).conclude
-          student3.enrollments.find_by(course: course).deactivate
+          student2.enrollments.find_by(course:).conclude
+          student3.enrollments.find_by(course:).deactivate
 
           assignment.post_submissions
           expect(assignment.can_view_student_names?(admin)).to be true
@@ -2012,9 +2012,9 @@ describe Assignment do
         ).user
 
         group_category = @course.group_categories.create!(name: "Test Group Set")
-        group_one = @course.groups.create!(name: "Group B", group_category: group_category)
-        group_two = @course.groups.create!(name: "Group A", group_category: group_category)
-        group_three = @course.groups.create!(name: "Group C", group_category: group_category)
+        group_one = @course.groups.create!(name: "Group B", group_category:)
+        group_two = @course.groups.create!(name: "Group A", group_category:)
+        group_three = @course.groups.create!(name: "Group C", group_category:)
 
         add_user_to_group(student_one, group_one, true)
         add_user_to_group(student_two, group_two, true)
@@ -2023,7 +2023,7 @@ describe Assignment do
 
         assignment = @course.assignments.create!(
           assignment_valid_attributes.merge(
-            group_category: group_category,
+            group_category:,
             grade_group_students_individually: false
           )
         )
@@ -2054,7 +2054,7 @@ describe Assignment do
 
         assignment = @course.assignments.create!(
           assignment_valid_attributes.merge(
-            group_category: group_category,
+            group_category:,
             grade_group_students_individually: false
           )
         )
@@ -2084,15 +2084,15 @@ describe Assignment do
         ).user
 
         group_category = @course.group_categories.create!(name: "Test Group Set")
-        group_one = @course.groups.create!(name: "Group B", group_category: group_category)
-        group_two = @course.groups.create!(name: "Group A", group_category: group_category)
+        group_one = @course.groups.create!(name: "Group B", group_category:)
+        group_two = @course.groups.create!(name: "Group A", group_category:)
 
         add_user_to_group(student_one, group_one, true)
         add_user_to_group(student_two, group_two, true)
 
         assignment = @course.assignments.create!(
           assignment_valid_attributes.merge(
-            group_category: group_category,
+            group_category:,
             grade_group_students_individually: false
           )
         )
@@ -2123,9 +2123,9 @@ describe Assignment do
       ).user
 
       group_category = @course.group_categories.create!(name: "Test Group Set")
-      group_one = @course.groups.create!(name: "Group B", group_category: group_category)
-      group_two = @course.groups.create!(name: "Group A", group_category: group_category)
-      group_three = @course.groups.create!(name: "Group C", group_category: group_category)
+      group_one = @course.groups.create!(name: "Group B", group_category:)
+      group_two = @course.groups.create!(name: "Group A", group_category:)
+      group_three = @course.groups.create!(name: "Group C", group_category:)
 
       add_user_to_group(student_one, group_one, true)
       add_user_to_group(student_two, group_two, true)
@@ -2134,7 +2134,7 @@ describe Assignment do
 
       assignment = @course.assignments.create!(
         assignment_valid_attributes.merge(
-          group_category: group_category,
+          group_category:,
           grade_group_students_individually: true
         )
       )
@@ -2187,7 +2187,7 @@ describe Assignment do
 
     it "uses the existing lti_context_id if present" do
       lti_context_id = SecureRandom.uuid
-      assignment = Assignment.new(lti_context_id: lti_context_id)
+      assignment = Assignment.new(lti_context_id:)
       decoded = Canvas::Security.decode_jwt(assignment.secure_params)
       expect(decoded[:lti_assignment_id]).to eq(lti_context_id)
     end
@@ -2310,7 +2310,7 @@ describe Assignment do
 
       before(:once) do
         assignment.update!(points_possible: 100, due_at: 36.hours.ago(now), submission_types: %w[online_text_entry])
-        late_policy_factory(course: course, deduct: 15.0, every: :day, missing: 80.0)
+        late_policy_factory(course:, deduct: 15.0, every: :day, missing: 80.0)
         assignment.submit_homework(student, submission_type: :online_text_entry, body: :foo)
       end
 
@@ -2361,8 +2361,8 @@ describe Assignment do
         let(:submission) { assignment.find_or_create_submission(student) }
         let(:result) do
           lti_result_model({
-                             assignment: assignment,
-                             submission: submission,
+                             assignment:,
+                             submission:,
                              user: student,
                              grading_progress: "PendingManual",
                              result_score: 10,
@@ -2423,7 +2423,7 @@ describe Assignment do
       let_once(:assignment) do
         course.assignments.create!(moderated_grading: true, grader_count: 1, final_grader: teacher)
       end
-      let_once(:ta) { course_with_user("TaEnrollment", course: course, active_all: true, name: "Ta").user }
+      let_once(:ta) { course_with_user("TaEnrollment", course:, active_all: true, name: "Ta").user }
       let(:pg) { @result.first.provisional_grades.find_by!(scorer: ta) }
 
       before do
@@ -2630,14 +2630,14 @@ describe Assignment do
       end
 
       let(:last_event) do
-        AnonymousOrModerationEvent.where(assignment: assignment, event_type: "submission_updated").last
+        AnonymousOrModerationEvent.where(assignment:, event_type: "submission_updated").last
       end
 
       it "creates an event when a grader changes a grade" do
         expect do
           assignment.grade_student(student, grader: teacher, grade: "C-")
         end.to change {
-          AnonymousOrModerationEvent.where(assignment: assignment, event_type: "submission_updated").count
+          AnonymousOrModerationEvent.where(assignment:, event_type: "submission_updated").count
         }.by(1)
       end
 
@@ -2645,7 +2645,7 @@ describe Assignment do
         expect do
           assignment.grade_student(student, grader: teacher, score: 60)
         end.to change {
-          AnonymousOrModerationEvent.where(assignment: assignment, event_type: "submission_updated").count
+          AnonymousOrModerationEvent.where(assignment:, event_type: "submission_updated").count
         }.by(1)
       end
 
@@ -2653,7 +2653,7 @@ describe Assignment do
         expect do
           assignment.grade_student(student, grader: teacher, excused: true)
         end.to change {
-          AnonymousOrModerationEvent.where(assignment: assignment, event_type: "submission_updated").count
+          AnonymousOrModerationEvent.where(assignment:, event_type: "submission_updated").count
         }.by(1)
       end
 
@@ -3935,7 +3935,7 @@ describe Assignment do
       submission = @a.submit_homework(@user)
       expect(submission.resource_link_lookup_uuid).to be_nil
 
-      submission = @a.submit_homework(@user, resource_link_lookup_uuid: resource_link_lookup_uuid)
+      submission = @a.submit_homework(@user, resource_link_lookup_uuid:)
       expect(submission.resource_link_lookup_uuid).to eq resource_link_lookup_uuid
     end
 
@@ -3976,7 +3976,7 @@ describe Assignment do
           tool_proxy_context_id: tool_proxy.context_id,
           subscription_id: tool_proxy.subscription_id,
         }
-        submission.update(turnitin_data: { webhook_info: webhook_info })
+        submission.update(turnitin_data: { webhook_info: })
         submission = @a.submit_homework(@user)
         expect(submission.turnitin_data[:webhook_info]).to be_nil
       end
@@ -4641,7 +4641,7 @@ describe Assignment do
       [@group1, @group2].each do |group|
         users.pop(3).each do |user|
           group.add_user(user)
-          @topic.child_topic_for(user).reply_from(user: user, text: "entry from #{user.name}")
+          @topic.child_topic_for(user).reply_from(user:, text: "entry from #{user.name}")
         end
       end
 
@@ -6632,7 +6632,7 @@ describe Assignment do
       section = @course.course_sections.create! name: "some section"
       e = @course.enroll_user s1,
                               "StudentEnrollment",
-                              section: section,
+                              section:,
                               allow_multiple_enrollments: true
       e.update_attribute :workflow_state, "active"
 
@@ -6764,7 +6764,7 @@ describe Assignment do
       expect(@assignment.send(:infer_comment_context_from_filename, filename)).to eq({
                                                                                        user: @user,
                                                                                        submission: @submission,
-                                                                                       filename: filename,
+                                                                                       filename:,
                                                                                        display_name: @attachment.display_name
                                                                                      })
       expect(@assignment.instance_variable_get(:@ignored_files)).to eq [ignore_file]
@@ -6779,7 +6779,7 @@ describe Assignment do
       expect(@assignment.send(:infer_comment_context_from_filename, filename)).to eq({
                                                                                        user: @user,
                                                                                        submission: @submission,
-                                                                                       filename: filename,
+                                                                                       filename:,
                                                                                        display_name: @attachment.display_name
                                                                                      })
     end
@@ -7235,7 +7235,7 @@ describe Assignment do
 
   describe "linking overrides with quizzes" do
     let_once(:assignment) { assignment_model(course: @course, due_at: 5.days.from_now).reload }
-    let_once(:override) { assignment_override_model(assignment: assignment) }
+    let_once(:override) { assignment_override_model(assignment:) }
 
     before :once do
       override.override_due_at(7.days.from_now)
@@ -7543,10 +7543,10 @@ describe Assignment do
       tempfile = zip_submissions
 
       # create an uploaded file with the zipped submissions, as would be uploaded by the user
-      uploaded_data = ActionDispatch::Http::UploadedFile.new(tempfile: tempfile, filename: "submissions.zip")
+      uploaded_data = ActionDispatch::Http::UploadedFile.new(tempfile:, filename: "submissions.zip")
 
       @assignment.generate_comments_from_files_later(
-        { uploaded_data: uploaded_data },
+        { uploaded_data: },
         user,
         attachment_id
       )
@@ -7572,7 +7572,7 @@ describe Assignment do
       submit_homework(student)
 
       uploaded_data = ActionDispatch::Http::UploadedFile.new(tempfile: zip_submissions, filename: "submissions.zip")
-      attachment = @teacher.attachments.create!(uploaded_data: uploaded_data)
+      attachment = @teacher.attachments.create!(uploaded_data:)
       generate_comments(@teacher, attachment.id)
       submission = @assignment.submission_reupload_progress.results.dig(:comments, 0, :submission)
       expect(submission[:user_id]).to eq student.id
@@ -7995,7 +7995,7 @@ describe Assignment do
 
       context "when the only submissions in a closed grading period belong to non-active students" do
         let(:course) { assignment.course }
-        let(:active_enrollment) { @initial_student.student_enrollments.find_by(course: course) }
+        let(:active_enrollment) { @initial_student.student_enrollments.find_by(course:) }
         let(:completed_enrollment) { course.enroll_student(User.create!, workflow_state: "active") }
         let(:inactive_enrollment) { course.enroll_student(User.create!, workflow_state: "active") }
 
@@ -8088,8 +8088,8 @@ describe Assignment do
       Assignment.create!(
         course: @course,
         name: "Subject",
-        points_possible: points_possible,
-        grading_type: grading_type
+        points_possible:,
+        grading_type:
       )
     end
 
@@ -9558,7 +9558,7 @@ describe Assignment do
         let(:section1) { @course.course_sections.create! }
         let(:submissions_posted_messages) do
           Message.where(
-            notification: notification
+            notification:
           )
         end
 
@@ -10007,7 +10007,7 @@ describe Assignment do
   end
 
   describe "after create callbacks" do
-    subject(:event) { AnonymousOrModerationEvent.where(assignment: assignment).last }
+    subject(:event) { AnonymousOrModerationEvent.where(assignment:).last }
 
     let(:course) { @course }
 
@@ -10096,7 +10096,7 @@ describe Assignment do
       context "when becoming an anonymous assignment" do
         subject do
           assignment.update!(anonymous_grading: true)
-          AnonymousOrModerationEvent.where(assignment: assignment).last.payload
+          AnonymousOrModerationEvent.where(assignment:).last.payload
         end
 
         it { is_expected.to include("anonymous_grading" => [false, true]) }
@@ -10113,7 +10113,7 @@ describe Assignment do
       context "when becoming a moderated assignment" do
         subject(:payload) do
           assignment.update!(moderated_grading: true, grader_count: 1, final_grader: @ta)
-          AnonymousOrModerationEvent.where(assignment: assignment).last.payload
+          AnonymousOrModerationEvent.where(assignment:).last.payload
         end
 
         it { is_expected.to include("anonymous_grading" => [false, false]) }
@@ -10130,7 +10130,7 @@ describe Assignment do
     end
 
     context "given an anonymous assignment" do
-      subject(:event) { AnonymousOrModerationEvent.where(assignment: assignment).last }
+      subject(:event) { AnonymousOrModerationEvent.where(assignment:).last }
 
       let(:assignment) { course.assignments.create!(anonymous_grading: true, updating_user: @teacher) }
 
@@ -10141,7 +10141,7 @@ describe Assignment do
 
           it "creates an AnonymousOrModerationEvent with an 'event_type' of 'grades_posted'" do
             expect { assignment.update!(grades_published_at: now) }.to change {
-              AnonymousOrModerationEvent.where(assignment: assignment).count
+              AnonymousOrModerationEvent.where(assignment:).count
             }.by(1)
           end
 
@@ -10200,14 +10200,14 @@ describe Assignment do
 
         it "does not create an AnonymousOrModerationEvent when non-grading-related attributes are updated" do
           expect { assignment.update!(title: "Different Name") }.not_to change {
-            AnonymousOrModerationEvent.where(assignment: assignment).count
+            AnonymousOrModerationEvent.where(assignment:).count
           }
         end
       end
     end
 
     context "given a moderated assignment" do
-      subject(:event) { AnonymousOrModerationEvent.where(assignment: assignment).last }
+      subject(:event) { AnonymousOrModerationEvent.where(assignment:).last }
 
       let(:event_type) { :assignment_updated }
       let(:assignment) { course.assignments.create!(params) }
@@ -10293,7 +10293,7 @@ describe Assignment do
         @course.assignments.create!(submission_types: "external_tool",
                                     lti_resource_link_custom_params: custom_params.to_json,
                                     lti_resource_link_url: url,
-                                    external_tool_tag_attributes: { content: tool, url: url },
+                                    external_tool_tag_attributes: { content: tool, url: },
                                     **assignment_valid_attributes)
       end
 
@@ -10458,7 +10458,7 @@ describe Assignment do
                 ).destroy_all
 
                 allow(assignment).to receive(:tool_from_external_tool_tag).and_call_original
-                assignment.prepare_for_ags_if_needed!(tool, use_tool: use_tool)
+                assignment.prepare_for_ags_if_needed!(tool, use_tool:)
               end
 
               it "creates the default line item" do
@@ -10823,7 +10823,7 @@ describe Assignment do
     let_once(:newly_closed_grading_period) { grading_period_group.grading_periods.second }
     let_once(:open_grading_period) { grading_period_group.grading_periods.third }
     let_once(:course) do
-      course_with_student(active_all: true, account: account)
+      course_with_student(active_all: true, account:)
       @course
     end
 
@@ -10851,7 +10851,7 @@ describe Assignment do
 
         it "does not set post_to_sis to false for an assignment due within the newly-closed grading period, whose course is NOT using the grading period" do
           second_term = account.enrollment_terms.create!(name: "Term 2")
-          second_course = Course.create!(account: account, enrollment_term: second_term)
+          second_course = Course.create!(account:, enrollment_term: second_term)
           second_assignment = second_course.assignments.create!(
             post_to_sis: true,
             due_at: 1.minute.after(newly_closed_grading_period.start_date)
@@ -10944,7 +10944,7 @@ describe Assignment do
 
           assignment.update!(
             due_at: 1.week.after(newly_closed_grading_period.end_date),
-            group_category: group_category
+            group_category:
           )
           assignment.assignment_overrides.create!(
             due_at_overridden: true,
@@ -11093,7 +11093,7 @@ describe Assignment do
     [@stu1, @stu2].each do |stu|
       [@graded_notify, @grade_change_notify].each do |notification|
         notification_policy_model(
-          notification: notification,
+          notification:,
           communication_channel: stu.communication_channels.first
         )
       end

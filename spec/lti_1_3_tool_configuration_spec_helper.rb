@@ -22,7 +22,7 @@ RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :
 
   let(:tool_configuration) do
     Lti::ToolConfiguration.create!(
-      developer_key: developer_key,
+      developer_key:,
       settings: settings.merge(public_jwk: tool_config_public_jwk),
       privacy_level: "public"
     )

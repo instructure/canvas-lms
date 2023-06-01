@@ -160,7 +160,7 @@ describe InstFS do
 
         it "includes global user_id claim in the token if user provided" do
           user = user_model
-          claims = claims_for(user: user)
+          claims = claims_for(user:)
           expect(claims[:user_id]).to eql(user.global_id.to_s)
         end
 
@@ -185,14 +185,14 @@ describe InstFS do
 
         it "includes the original_url claim with the redirect and no_cache param" do
           original_url = "https://example.test/preview"
-          url = InstFS.authenticated_url(@attachment, original_url: original_url)
+          url = InstFS.authenticated_url(@attachment, original_url:)
           token = url.split("token=").last
           expect(Canvas::Security.decode_jwt(token, [secret])[:original_url]).to eq(original_url + "?no_cache=true&redirect=true")
         end
 
         it "doesn't include the original_url claim if already redirected" do
           original_url = "https://example.test/preview?redirect=true"
-          url = InstFS.authenticated_url(@attachment, original_url: original_url)
+          url = InstFS.authenticated_url(@attachment, original_url:)
           token = url.split("token=").last
           expect(Canvas::Security.decode_jwt(token, [secret])).not_to have_key(:original_url)
         end
@@ -202,7 +202,7 @@ describe InstFS do
           let(:access_token) { instance_double("AccessToken", global_developer_key_id: 106) }
 
           it "are not added without an access token" do
-            claims = claims_for(access_token: nil, root_account: root_account)
+            claims = claims_for(access_token: nil, root_account:)
             expect(claims).not_to have_key("legacy_api_developer_key_id")
             expect(claims).not_to have_key("legacy_api_root_account_id")
           end
@@ -210,21 +210,21 @@ describe InstFS do
           describe "with an access token" do
             it "are added when all keys are whitelisted" do
               Setting.set("instfs.whitelist_all_developer_keys", "true")
-              claims = claims_for(access_token: access_token, root_account: root_account)
+              claims = claims_for(access_token:, root_account:)
               expect(claims["legacy_api_developer_key_id"]).to eql(access_token.global_developer_key_id.to_s)
               expect(claims["legacy_api_root_account_id"]).to eql(root_account.global_id.to_s)
             end
 
             it "are added when its developer key is specifically whitelisted" do
               Setting.set("instfs.whitelisted_developer_key_global_ids", "999,#{access_token.global_developer_key_id}")
-              claims = claims_for(access_token: access_token, root_account: root_account)
+              claims = claims_for(access_token:, root_account:)
               expect(claims["legacy_api_developer_key_id"]).to eql(access_token.global_developer_key_id.to_s)
               expect(claims["legacy_api_root_account_id"]).to eql(root_account.global_id.to_s)
             end
 
             it "are not added when its developer key is not specifically whitelisted" do
               Setting.set("instfs.whitelisted_developer_key_global_ids", "999,888")
-              claims = claims_for(access_token: access_token, root_account: root_account)
+              claims = claims_for(access_token:, root_account:)
               expect(claims).not_to have_key("legacy_api_developer_key_id")
               expect(claims).not_to have_key("legacy_api_root_account_id")
             end
@@ -294,19 +294,19 @@ describe InstFS do
 
       let(:default_args) do
         {
-          context: context,
-          user: user,
-          acting_as: acting_as,
+          context:,
+          user:,
+          acting_as:,
           access_token: nil,
-          root_account: root_account,
-          folder: folder,
-          filename: filename,
-          content_type: content_type,
-          quota_exempt: quota_exempt,
-          on_duplicate: on_duplicate,
-          capture_url: capture_url,
-          include_param: include_param,
-          additional_capture_params: additional_capture_params,
+          root_account:,
+          folder:,
+          filename:,
+          content_type:,
+          quota_exempt:,
+          on_duplicate:,
+          capture_url:,
+          include_param:,
+          additional_capture_params:,
         }
       end
 
@@ -416,7 +416,7 @@ describe InstFS do
         end
 
         it "are not added without an access token" do
-          claims = claims_for(access_token: nil, root_account: root_account)
+          claims = claims_for(access_token: nil, root_account:)
           expect(claims).not_to have_key("legacy_api_developer_key_id")
           expect(claims).not_to have_key("legacy_api_root_account_id")
         end
@@ -424,21 +424,21 @@ describe InstFS do
         describe "with an access token" do
           it "are added when all keys are whitelisted" do
             Setting.set("instfs.whitelist_all_developer_keys", "true")
-            claims = claims_for(access_token: access_token, root_account: root_account)
+            claims = claims_for(access_token:, root_account:)
             expect(claims["legacy_api_developer_key_id"]).to eql(access_token.global_developer_key_id.to_s)
             expect(claims["legacy_api_root_account_id"]).to eql(root_account.global_id.to_s)
           end
 
           it "are added when its developer key is specifically whitelisted" do
             Setting.set("instfs.whitelisted_developer_key_global_ids", "999,#{access_token.global_developer_key_id}")
-            claims = claims_for(access_token: access_token, root_account: root_account)
+            claims = claims_for(access_token:, root_account:)
             expect(claims["legacy_api_developer_key_id"]).to eql(access_token.global_developer_key_id.to_s)
             expect(claims["legacy_api_root_account_id"]).to eql(root_account.global_id.to_s)
           end
 
           it "are not added when its developer key is not specifically whitelisted" do
             Setting.set("instfs.whitelisted_developer_key_global_ids", "999,888")
-            claims = claims_for(access_token: access_token, root_account: root_account)
+            claims = claims_for(access_token:, root_account:)
             expect(claims).not_to have_key("legacy_api_developer_key_id")
             expect(claims).not_to have_key("legacy_api_root_account_id")
           end
@@ -454,7 +454,7 @@ describe InstFS do
         it "responds properly when passed target_url and progress_json" do
           progress_json = { id: 1 }
           target_url = "http://www.example.com/"
-          preflight_json = InstFS.upload_preflight_json(**default_args.merge({ target_url: target_url, progress_json: progress_json }))
+          preflight_json = InstFS.upload_preflight_json(**default_args.merge({ target_url:, progress_json: }))
 
           token = preflight_json[:upload_url].split("token=").last
           jwt = Canvas::Security.decode_jwt(token, [secret])
@@ -502,7 +502,7 @@ describe InstFS do
         allow(CanvasHttp).to receive(:post).and_return(
           instance_double("Net::HTTPCreated",
                           code: "201",
-                          body: { instfs_uuid: instfs_uuid }.to_json)
+                          body: { instfs_uuid: }.to_json)
         )
 
         res = InstFS.direct_upload(
@@ -517,7 +517,7 @@ describe InstFS do
         expect(CanvasHttp).to receive(:post).with(anything, hash_including(streaming: true)).and_return(
           instance_double("Net::HTTPCreated",
                           code: "201",
-                          body: { instfs_uuid: instfs_uuid }.to_json)
+                          body: { instfs_uuid: }.to_json)
         )
 
         InstFS.direct_upload(

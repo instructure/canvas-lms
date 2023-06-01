@@ -316,7 +316,7 @@ describe FilesController do
       course_with_teacher_logged_in(active_all: true, user: @user)
       host!("test.host")
       bank = @course.assessment_question_banks.create!
-      @aq = assessment_question_model(bank: bank)
+      @aq = assessment_question_model(bank:)
       @att = @aq.attachments.create!(uploaded_data: stub_png_data)
     end
 

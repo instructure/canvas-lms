@@ -96,7 +96,7 @@ module Lti
         new_tool_proxy = tool_proxy.deep_clone
         new_tool_proxy.update(guid: SecureRandom.uuid)
 
-        token = Lti::OAuth2::AccessToken.create_jwt(aud: aud, sub: new_tool_proxy.guid)
+        token = Lti::OAuth2::AccessToken.create_jwt(aud:, sub: new_tool_proxy.guid)
         other_helpers = { Authorization: "Bearer #{token}" }
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
         get @endpoints[:show], headers: other_helpers
@@ -188,7 +188,7 @@ module Lti
           @assignment.save!
           new_tool_proxy = tool_proxy.deep_clone
           new_tool_proxy.update(guid: SecureRandom.uuid)
-          token = Lti::OAuth2::AccessToken.create_jwt(aud: aud, sub: new_tool_proxy.guid)
+          token = Lti::OAuth2::AccessToken.create_jwt(aud:, sub: new_tool_proxy.guid)
           other_helpers = { Authorization: "Bearer #{token}" }
           allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
           get @endpoints[:alt_show], headers: other_helpers
@@ -270,7 +270,7 @@ module Lti
         @report = OriginalityReport.create!(report_initial_values)
         @endpoints[:update] = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id}"
         @endpoints[:update_alt] = "/api/lti/assignments/#{@assignment.id}/files/#{@attachment.id}/originality_report"
-        @assignment.course.update(account: account)
+        @assignment.course.update(account:)
       end
 
       it "requires the tool proxy to be associated to the assignment" do
@@ -620,7 +620,7 @@ module Lti
 
     describe "POST assignments/:assignment_id/submissions/:submission_id/originality_report (#create)" do
       before do
-        @assignment.course.update(account: account)
+        @assignment.course.update(account:)
       end
 
       it "creates an originality report when provided required params" do
@@ -824,7 +824,7 @@ module Lti
           OriginalityReport.create!(
             attachment: @attachment,
             workflow_state: "pending",
-            submission: submission
+            submission:
           )
         end
 
@@ -835,7 +835,7 @@ module Lti
                params: {
                  originality_report: {
                    file_id: @attachment.id,
-                   originality_score: originality_score
+                   originality_score:
                  }
                },
                headers: request_headers
@@ -915,7 +915,7 @@ module Lti
                  params: {
                    originality_report: {
                      originality_score: score,
-                     attempt: attempt
+                     attempt:
                    },
                  },
                  headers: request_headers
@@ -997,7 +997,7 @@ module Lti
             post @endpoints[:create],
                  params: {
                    originality_report: {
-                     originality_score: originality_score
+                     originality_score:
                    }
                  },
                  headers: request_headers
@@ -1044,8 +1044,8 @@ module Lti
           group = course.groups.create!(name: "group one")
           group.add_user(user_one)
           group.add_user(user_two)
-          submission_one.update!(group: group)
-          submission_two.update!(group: group)
+          submission_one.update!(group:)
+          submission_two.update!(group:)
           group
         end
         let(:create_endpoint) do
@@ -1065,7 +1065,7 @@ module Lti
           post create_endpoint,
                params: {
                  originality_report: {
-                   originality_score: originality_score,
+                   originality_score:,
                  },
                  submission_id: submission_one.id
                },
@@ -1122,7 +1122,7 @@ module Lti
           {
             originality_report: {
               originality_score: score,
-              file_id: file_id
+              file_id:
             }
           },
           request_headers

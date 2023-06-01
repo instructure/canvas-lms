@@ -31,7 +31,7 @@ module Autoextend
         if const == const_name
           const = Object.const_get(const_name, false)
         end
-        extension.extend(const, source: source)
+        extension.extend(const, source:)
       end
 
       if recursive
@@ -44,7 +44,7 @@ module Autoextend
           child_const = const.const_get(child, false)
           next unless child_const.is_a?(Module)
 
-          const_added(child_const, source: source, recursive: true)
+          const_added(child_const, source:, recursive: true)
         end
       end
 

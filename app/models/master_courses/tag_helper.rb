@@ -62,7 +62,7 @@ module MasterCourses::TagHelper
       end
       tag
     else
-      content_tags.where(content: content).first || create_content_tag_for!(content, defaults)
+      content_tags.where(content:).first || create_content_tag_for!(content, defaults)
     end
   end
 
@@ -71,8 +71,8 @@ module MasterCourses::TagHelper
 
     self.class.unique_constraint_retry do |retry_count|
       tag = nil
-      tag = content_tags.where(content: content).first if retry_count > 0
-      tag ||= content_tags.create!(defaults.merge(content: content))
+      tag = content_tags.where(content:).first if retry_count > 0
+      tag ||= content_tags.create!(defaults.merge(content:))
       tag
     end
   end

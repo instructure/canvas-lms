@@ -46,7 +46,7 @@ describe "student k5 dashboard schedule" do
     let(:title) { "Student Todo" }
 
     before :once do
-      @student.planner_notes.create!(todo_date: Time.zone.now, title: title)
+      @student.planner_notes.create!(todo_date: Time.zone.now, title:)
     end
 
     it "shows student todo in modal when todo title selected" do
@@ -86,7 +86,7 @@ describe "student k5 dashboard schedule" do
   context "student-created events" do
     it "shows student-created calender event info when selected" do
       title = "Student Event"
-      @student.calendar_events.create!(title: title, start_at: Time.zone.now)
+      @student.calendar_events.create!(title:, start_at: Time.zone.now)
 
       get "/#schedule"
 
@@ -177,7 +177,7 @@ describe "student k5 dashboard schedule" do
   context "course-scoped schedule tab included student-only items" do
     it "has todo capabilities for specific student course", custom_timeout: 20 do
       title = "Student Course Todo"
-      @student.planner_notes.create!(todo_date: Time.zone.now, title: title, course_id: @subject_course.id)
+      @student.planner_notes.create!(todo_date: Time.zone.now, title:, course_id: @subject_course.id)
 
       get "/courses/#{@subject_course.id}#schedule"
 

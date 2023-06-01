@@ -61,7 +61,7 @@ module RuboCop
         ].freeze
 
         JQUERY_SELECTORS = JQUERY_SELECTOR_EXTENSIONS + JQUERY_UI_SELECTORS
-        JQUERY_SELECTORS_REGEX = /#{JQUERY_SELECTORS.join("|")}/.freeze
+        JQUERY_SELECTORS_REGEX = /#{JQUERY_SELECTORS.join("|")}/
       end
     end
   end

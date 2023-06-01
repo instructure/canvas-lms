@@ -351,7 +351,7 @@ describe UserLearningObjectScopes do
 
       it "includes assignments from other shards" do
         student = @shard1.activate { user_factory }
-        assignment = create_assignment_with_override(student: student, override: true, due_at: 2.days.from_now)
+        assignment = create_assignment_with_override(student:, override: true, due_at: 2.days.from_now)
         DueDateCacher.recompute(assignment)
         expect(student.assignments_needing_submitting).to eq [assignment]
       end
@@ -389,7 +389,7 @@ describe UserLearningObjectScopes do
 
     it "excludes assignments that have an existing submission" do
       assignment = @course.assignments.create! title: "submitted", due_at: 1.day.from_now, submission_types: "online_url"
-      submission_model(assignment: assignment, user: @student, submission_type: "online_url", url: "www.hi.com")
+      submission_model(assignment:, user: @student, submission_type: "online_url", url: "www.hi.com")
       DueDateCacher.recompute(assignment)
       expect(@student.assignments_needing_submitting).not_to include assignment
     end

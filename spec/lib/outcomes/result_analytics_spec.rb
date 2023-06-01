@@ -27,10 +27,10 @@ describe Outcomes::ResultAnalytics do
     title = args[:title] || "name, o1"
     outcome = args[:outcome] || create_outcome(args)
     user = args[:user] || User.new(id: 10, name: "a")
-    LearningOutcomeResult.new(user: user,
+    LearningOutcomeResult.new(user:,
                               learning_outcome: outcome,
-                              score: score,
-                              title: title,
+                              score:,
+                              title:,
                               submitted_at:
     args[:submitted_time],
                               assessed_at: args[:assessed_time],
@@ -43,14 +43,14 @@ describe Outcomes::ResultAnalytics do
     id = args[:id] || 80
     method = args[:method] || "highest"
     criterion = args[:criterion] || LearningOutcome.default_rubric_criterion
-    LearningOutcome.new(id: id, calculation_method: method, calculation_int: args[:calc_int], rubric_criterion: criterion)
+    LearningOutcome.new(id:, calculation_method: method, calculation_int: args[:calc_int], rubric_criterion: criterion)
   end
 
   def create_quiz_outcome_results(outcome, title, *results)
     defaults = {
       user: User.new(id: 10, name: "a"),
       learning_outcome: outcome,
-      title: title,
+      title:,
       assessed_at: time,
       artifact_type: "Quizzes::QuizSubmission",
       association_type: "Quizzes::Quiz",
@@ -166,7 +166,7 @@ describe Outcomes::ResultAnalytics do
       LearningOutcomeResult.create!(
         context: @course,
         learning_outcome: @outcome,
-        user: user,
+        user:,
         alignment: @alignment,
         association_type: "RubricAssociation",
         association_id: @rubric_association.id,
@@ -344,7 +344,7 @@ describe Outcomes::ResultAnalytics do
         outcome_from_score(3.0, { user: User.new(id: 20, name: "b") })
       ]
       users = [User.new(id: 10, name: "a"), User.new(id: 30, name: "c")]
-      rollups = ra.outcome_results_rollups(results: results, users: users)
+      rollups = ra.outcome_results_rollups(results:, users:)
       rollup_scores = ra.rollup_user_results(results).map(&:outcome_results).flatten
       rollups.each.with_index do |rollup, _|
         expect(rollup.scores.map(&:outcome_results).flatten).to eq(rollup_scores.find_all { |score| score.user.id == rollup.context.id })
@@ -359,7 +359,7 @@ describe Outcomes::ResultAnalytics do
         outcome_from_score(4.0, { method: "decaying_average", user: User.new(id: 20, name: "b") })
       ]
       users = [User.new(id: 20, name: "b"), User.new(id: 30, name: "b")]
-      rollups = ra.outcome_results_rollups(results: results, users: users)
+      rollups = ra.outcome_results_rollups(results:, users:)
       scores_by_user = [4.35, 2.35]
       expect(rollups.flat_map(&:scores).map(&:score)).to eq scores_by_user
     end
@@ -369,7 +369,7 @@ describe Outcomes::ResultAnalytics do
         outcome_from_score(5.0, { user: User.new(id: 20, name: "b") })
       ]
       users = [User.new(id: 10, name: "a"), User.new(id: 30, name: "c")]
-      rollups = ra.outcome_results_rollups(results: results, users: users, excludes: ["missing_user_rollups"])
+      rollups = ra.outcome_results_rollups(results:, users:, excludes: ["missing_user_rollups"])
       expect(rollups.length).to eq 1
     end
 
@@ -453,7 +453,7 @@ describe Outcomes::ResultAnalytics do
       it "overrides the aggregate score calculation when feature flag enabled and Account method set" do
         account = Account.create!(outcome_calculation_method: OutcomeCalculationMethod.new(calculation_method: "latest"))
         account.root_account.set_feature_flag!(:account_level_mastery_scales, "on")
-        course = Course.create(account: account)
+        course = Course.create(account:)
         aggregate_result = ra.aggregate_outcome_results_rollup(lower_results, course)
         expect(aggregate_result.size).to eq 2
         expect(aggregate_result.scores.map(&:score)).to eq [11.25, 27.0]
@@ -560,7 +560,7 @@ describe Outcomes::ResultAnalytics do
         outcome_from_score(3.0, { user: User.new(id: 20, name: "b") })
       ]
       users = [User.new(id: 10, name: "a"), User.new(id: 30, name: "c")]
-      rollups = ra.outcome_results_rollups(results: results, users: users)
+      rollups = ra.outcome_results_rollups(results:, users:)
       percents = ra.rating_percents(rollups)
       expect(percents).to eq({ 80 => [50, 50, 0] })
     end
@@ -582,7 +582,7 @@ describe Outcomes::ResultAnalytics do
             outcome_from_score(2.0, { user: User.new(id: 21, name: "c") })
           ]
           users = [User.new(id: 10, name: "a"), User.new(id: 30, name: "c")]
-          rollups = ra.outcome_results_rollups(results: results, users: users)
+          rollups = ra.outcome_results_rollups(results:, users:)
           percents = ra.rating_percents(rollups, context: @course)
           expect(percents).to eq({ 80 => [67, 0, 33, 0, 0] })
         end
@@ -600,7 +600,7 @@ describe Outcomes::ResultAnalytics do
             outcome_from_score(2.0, { user: User.new(id: 21, name: "c") })
           ]
           users = [User.new(id: 10, name: "a"), User.new(id: 30, name: "c")]
-          rollups = ra.outcome_results_rollups(results: results, users: users)
+          rollups = ra.outcome_results_rollups(results:, users:)
           percents = ra.rating_percents(rollups, context: @course)
           expect(percents).to eq({ 80 => [33, 33, 33] })
         end

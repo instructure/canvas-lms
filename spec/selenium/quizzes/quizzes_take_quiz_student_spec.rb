@@ -75,7 +75,7 @@ describe "taking a quiz" do
         def verify_no_access_code_reprompts_during_oqaat_quiz
           take_and_answer_quiz(
             submit: false,
-            access_code: access_code,
+            access_code:,
             quiz: oqaat_quiz
           )
 
@@ -123,7 +123,7 @@ describe "taking a quiz" do
         def start_and_exit_quiz
           take_and_answer_quiz(
             submit: false,
-            access_code: access_code,
+            access_code:,
             quiz: quiz_with_unlimited_attempts
           )
 

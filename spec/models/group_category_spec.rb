@@ -400,7 +400,7 @@ describe GroupCategory do
       initial_spread  = [0, 0, 0]
       max_memberships = [2, 3, 4]
       result_spread   = [2, 3, 4]
-      assert_random_group_assignment(@category, @course, initial_spread, result_spread, max_memberships: max_memberships)
+      assert_random_group_assignment(@category, @course, initial_spread, result_spread, max_memberships:)
     end
 
     it "does not overassign to groups" do
@@ -418,7 +418,7 @@ describe GroupCategory do
       initial_spread  = [0, 0, 0]
       max_memberships = [nil, 2, 5]
       result_spread   = [2, 5, 14]
-      assert_random_group_assignment(@category, @course, initial_spread, result_spread, max_memberships: max_memberships)
+      assert_random_group_assignment(@category, @course, initial_spread, result_spread, max_memberships:)
     end
 
     it "assigns unassigned users while respecting group limits in the category" do
@@ -488,7 +488,7 @@ describe GroupCategory do
     it "calculates correctly for same section groups" do
       section1 = @course.course_sections.create!(name: "one")
       section2 = @course.course_sections.create!(name: "two")
-      [section1, section2].each { |section| create_users_in_course(@course, 3, section: section) }
+      [section1, section2].each { |section| create_users_in_course(@course, 3, section:) }
       @category.create_group_member_count = 2
       @category.calculate_group_count_by_membership(by_section: true)
       expect(@category.create_group_count).to eq 4
@@ -667,7 +667,7 @@ describe GroupCategory do
   end
 
   it "sets root_account_id when created" do
-    group_category = GroupCategory.create!(name: "Test", account: account)
+    group_category = GroupCategory.create!(name: "Test", account:)
     group_category_course = GroupCategory.create!(name: "Test", course: @course)
 
     expect(group_category.root_account_id).to eq(account.id)
@@ -686,19 +686,19 @@ describe GroupCategory do
 
   it "makes sure sis_batch_id is valid" do
     expect do
-      GroupCategory.create!(name: "Test", account: account, sis_batch_id: 1)
+      GroupCategory.create!(name: "Test", account:, sis_batch_id: 1)
     end.to raise_error(ActiveRecord::InvalidForeignKey)
 
-    sis_batch = SisBatch.create!(account: account)
-    gc = GroupCategory.create!(name: "Test2", account: account, sis_batch: sis_batch)
+    sis_batch = SisBatch.create!(account:)
+    gc = GroupCategory.create!(name: "Test2", account:, sis_batch:)
     expect(gc.sis_batch_id).to eq(sis_batch.id)
   end
 
   it "makes sure sis_source_id is unique per root_account" do
-    GroupCategory.create!(name: "Test", account: account, sis_source_id: "1")
+    GroupCategory.create!(name: "Test", account:, sis_source_id: "1")
 
     expect do
-      GroupCategory.create!(name: "Test2", account: account, sis_source_id: "1")
+      GroupCategory.create!(name: "Test2", account:, sis_source_id: "1")
     end.to raise_error(ActiveRecord::RecordInvalid)
 
     new_account = Account.create

@@ -119,7 +119,7 @@ module Lti
         render_content_items(module_created: create_new_module?)
       rescue => e
         code ||= response_code_for_rescue(e) if e
-        InstStatsd::Statsd.increment("canvas.deep_linking_controller.request_error", tags: { code: code })
+        InstStatsd::Statsd.increment("canvas.deep_linking_controller.request_error", tags: { code: })
         raise e
       end
 

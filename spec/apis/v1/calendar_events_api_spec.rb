@@ -1688,7 +1688,7 @@ describe CalendarEventsApiController, type: :request do
           expect(json[0].keys).to match_array expected_fields
           expect(json[0]["id"]).to be target_event_id
 
-          remaining_events = CalendarEvent.where(series_uuid: series_uuid, workflow_state: "active")
+          remaining_events = CalendarEvent.where(series_uuid:, workflow_state: "active")
           expect(remaining_events.length).to eql series_count - 1
         end
 
@@ -1706,7 +1706,7 @@ describe CalendarEventsApiController, type: :request do
           expect(json[0]["id"]).to be target_event_id
           expect(json[1]["id"]).to be @event_series["duplicates"][1]["calendar_event"]["id"]
 
-          remaining_events = CalendarEvent.where(series_uuid: series_uuid, workflow_state: "active")
+          remaining_events = CalendarEvent.where(series_uuid:, workflow_state: "active")
           expect(remaining_events.length).to eql series_count - 2
         end
 
@@ -1720,7 +1720,7 @@ describe CalendarEventsApiController, type: :request do
           assert_status(200)
           expect(json.length).to eq 3
 
-          remaining_events = CalendarEvent.where(series_uuid: series_uuid, workflow_state: "active")
+          remaining_events = CalendarEvent.where(series_uuid:, workflow_state: "active")
           expect(remaining_events.length).to be 0
         end
 
@@ -1816,7 +1816,7 @@ describe CalendarEventsApiController, type: :request do
             # we changed start_at, so the changed events belong to a new series
             expect(event["series_uuid"]).not_to eql series_uuid
           end
-          orig_series = CalendarEvent.where(series_uuid: series_uuid)
+          orig_series = CalendarEvent.where(series_uuid:)
           expect(orig_series.length).to be 1
         end
 
@@ -1855,7 +1855,7 @@ describe CalendarEventsApiController, type: :request do
           json = api_call(:put,
                           "/api/v1/calendar_events/#{target_event_id}",
                           { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
-                          { calendar_event: { start_at: new_start_at, title: new_title, rrule: rrule }, which: "following" })
+                          { calendar_event: { start_at: new_start_at, title: new_title, rrule: }, which: "following" })
           assert_status(200)
           expect(json.length).to be 4
           orig_events.shift # we didn't update the first event in teh series
@@ -1886,7 +1886,7 @@ describe CalendarEventsApiController, type: :request do
           json = api_call(:put,
                           "/api/v1/calendar_events/#{target_event_id}",
                           { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
-                          { calendar_event: { start_at: new_start_at, title: new_title, rrule: rrule }, which: "all" })
+                          { calendar_event: { start_at: new_start_at, title: new_title, rrule: }, which: "all" })
           assert_status(200)
           expect(json.length).to be 2
           json.each_with_index do |event, i|
@@ -4266,7 +4266,7 @@ describe CalendarEventsApiController, type: :request do
     it "omits DTEND for all day events" do
       # assignments due at 23:59 are treated as all day events
       due_at = 1.day.from_now.end_of_day
-      @course.assignments.create(title: "i am all day", due_at: due_at)
+      @course.assignments.create(title: "i am all day", due_at:)
       get "/feeds/calendars/#{@user.feed_code}.ics"
       expect(response).to be_successful
       cal = Icalendar::Calendar.parse(response.body.dup).first
@@ -4446,7 +4446,7 @@ describe CalendarEventsApiController, type: :request do
                         action: "set_course_timetable",
                         format: "json"
                       },
-                      { timetables: timetables },
+                      { timetables: },
                       {},
                       { expected_status: 400 })
 
@@ -4458,7 +4458,7 @@ describe CalendarEventsApiController, type: :request do
       timetables = { "all" => [{ weekdays: "monday, thursday",
                                  start_time: "2:00 pm",
                                  end_time: "3:30 pm",
-                                 location_name: location_name }] }
+                                 location_name: }] }
 
       expect do
         api_call(:post,
@@ -4469,7 +4469,7 @@ describe CalendarEventsApiController, type: :request do
                    action: "set_course_timetable",
                    format: "json"
                  },
-                 { timetables: timetables })
+                 { timetables: })
       end.to change(Delayed::Job, :count).by(1)
 
       run_jobs
@@ -4505,7 +4505,7 @@ describe CalendarEventsApiController, type: :request do
                    action: "set_course_timetable",
                    format: "json"
                  },
-                 { timetables: timetables })
+                 { timetables: })
       end.to change(Delayed::Job, :count).by(2)
 
       run_jobs
@@ -4537,7 +4537,7 @@ describe CalendarEventsApiController, type: :request do
                  action: "set_course_timetable",
                  format: "json"
                },
-               { timetables: timetables })
+               { timetables: })
 
       json = api_call(:get, @path, {
                         course_id: @course.id.to_param,

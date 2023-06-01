@@ -32,7 +32,7 @@ describe Lti::LtiAdvantageAdapter do
     allow(controller).to receive(:params)
     controller
   end
-  let(:expander_opts) { { current_user: user, tool: tool, controller: controller_double } }
+  let(:expander_opts) { { current_user: user, tool:, controller: controller_double } }
   let(:expander) do
     Lti::VariableExpander.new(
       course.root_account,
@@ -44,13 +44,13 @@ describe Lti::LtiAdvantageAdapter do
   let(:include_storage_target) { true }
   let(:adapter) do
     Lti::LtiAdvantageAdapter.new(
-      tool: tool,
-      user: user,
+      tool:,
+      user:,
       context: course,
-      return_url: return_url,
-      expander: expander,
-      include_storage_target: include_storage_target,
-      opts: opts
+      return_url:,
+      expander:,
+      include_storage_target:,
+      opts:
     )
   end
   let(:tool) do
@@ -71,7 +71,7 @@ describe Lti::LtiAdvantageAdapter do
   let(:params) { JSON.parse(fetch_and_delete_launch(course, verifier)) }
   let(:assignment) do
     assignment_model(
-      course: course,
+      course:,
       submission_types: "external_tool",
       external_tool_tag_attributes: { content: tool }
     )
@@ -106,7 +106,7 @@ describe Lti::LtiAdvantageAdapter do
         {
           resource_type: "course_navigation",
           domain: "test.com",
-          launch_url: launch_url
+          launch_url:
         }
       end
 
@@ -145,12 +145,12 @@ describe Lti::LtiAdvantageAdapter do
       context "when include_storage_target parameter is not provided" do
         let(:adapter) do
           Lti::LtiAdvantageAdapter.new(
-            tool: tool,
-            user: user,
+            tool:,
+            user:,
             context: course,
-            return_url: return_url,
-            expander: expander,
-            opts: opts
+            return_url:,
+            expander:,
+            opts:
           )
         end
 
@@ -292,7 +292,7 @@ describe Lti::LtiAdvantageAdapter do
 
     context 'when a "launch_url" is set in the options hash' do
       let(:launch_url) { "https://www.cool-took.com/launch?with_query_params=true" }
-      let(:opts) { { launch_url: launch_url } }
+      let(:opts) { { launch_url: } }
 
       it("uses the launch_url as the target_link_uri") do
         expect(login_message["target_link_uri"]).to eq launch_url
@@ -318,7 +318,7 @@ describe Lti::LtiAdvantageAdapter do
     context "when the oidc_initiation_url is set" do
       let(:oidc_initiation_url) { "https://www.test.com/oidc/login" }
 
-      before { tool.developer_key.update!(oidc_initiation_url: oidc_initiation_url) }
+      before { tool.developer_key.update!(oidc_initiation_url:) }
 
       it "uses the oidc login uri" do
         expect(adapter.launch_url).to eq oidc_initiation_url

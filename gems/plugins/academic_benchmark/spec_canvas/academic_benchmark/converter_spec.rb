@@ -125,13 +125,13 @@ describe AcademicBenchmark::Converter do
   let(:content_migration) do
     ContentMigration.create({
                               context: root_account,
-                              migration_settings: migration_settings,
+                              migration_settings:,
                               user: @user
                             })
   end
   let(:converter_settings) do
     migration_settings.merge({
-                               content_migration: content_migration,
+                               content_migration:,
                                content_migration_id: content_migration.id,
                                user_id: content_migration.user_id,
                                migration_options: { points_possible: 10,

@@ -105,10 +105,10 @@ module UserContent
       return unless attachment.present?
 
       if user_can_access_attachment?
-        ProcessedUrl.new(match: match, attachment: attachment, is_public: is_public, in_app: in_app).url
+        ProcessedUrl.new(match:, attachment:, is_public:, in_app:).url
       else
         # Setting is_public: false and in_app: true to force never adding verifier query param
-        processed_url = ProcessedUrl.new(match: match, attachment: attachment, is_public: false, in_app: true).url
+        processed_url = ProcessedUrl.new(match:, attachment:, is_public: false, in_app: true).url
         begin
           uri = URI.parse(processed_url)
         rescue URI::InvalidURIError

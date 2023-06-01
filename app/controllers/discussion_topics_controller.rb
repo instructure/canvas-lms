@@ -468,7 +468,7 @@ class DiscussionTopicsController < ApplicationController
                                                 @context,
                                                 @current_user,
                                                 session,
-                                                user_can_moderate: user_can_moderate,
+                                                user_can_moderate:,
                                                 plain_messages: value_to_boolean(params[:plain_messages]),
                                                 exclude_assignment_description: value_to_boolean(params[:exclude_assignment_descriptions]),
                                                 include_all_dates: include_params.include?("all_dates"),
@@ -476,7 +476,7 @@ class DiscussionTopicsController < ApplicationController
                                                 include_sections_user_count: include_params.include?("sections_user_count"),
                                                 include_overrides: include_params.include?("overrides"),
                                                 master_course_status: mc_status,
-                                                root_topic_fields: root_topic_fields)
+                                                root_topic_fields:)
       end
     end
   end
@@ -545,7 +545,7 @@ class DiscussionTopicsController < ApplicationController
         @current_user,
         session,
         override_dates: false,
-        include_usage_rights: include_usage_rights
+        include_usage_rights:
       )
     end
     (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
@@ -1315,7 +1315,7 @@ class DiscussionTopicsController < ApplicationController
 
   def process_discussion_topic(is_new:)
     ActiveRecord::Base.transaction do
-      process_discussion_topic_runner(is_new: is_new)
+      process_discussion_topic_runner(is_new:)
     end
   end
 
@@ -1517,7 +1517,7 @@ class DiscussionTopicsController < ApplicationController
                                                  {
                                                    include_sections: true,
                                                    include_sections_user_count: true,
-                                                   include_usage_rights: include_usage_rights
+                                                   include_usage_rights:
                                                  })
         else
           render json: discussion_topic_api_json(@topic,
@@ -1525,14 +1525,14 @@ class DiscussionTopicsController < ApplicationController
                                                  @current_user,
                                                  session,
                                                  {
-                                                   include_usage_rights: include_usage_rights
+                                                   include_usage_rights:
                                                  })
         end
       else
         errors = @topic.errors.as_json[:errors]
         errors.merge!(@topic.root_topic.errors.as_json[:errors]) if @topic.root_topic
         errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
-        render json: { errors: errors }, status: :bad_request
+        render json: { errors: }, status: :bad_request
       end
     end
   end
@@ -1801,7 +1801,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     @group_topics = @groups.order(:id).map do |group|
-      { group: group, topic: topics.find { |t| t.context == group } }
+      { group:, topic: topics.find { |t| t.context == group } }
     end
     topics
   end

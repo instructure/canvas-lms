@@ -133,7 +133,7 @@ class GroupMembership < ActiveRecord::Base
     return if deleted?
 
     peer_groups = group.peer_groups.map(&:id)
-    GroupMembership.active.where(group_id: peer_groups, user_id: user_id).destroy_all
+    GroupMembership.active.where(group_id: peer_groups, user_id:).destroy_all
   end
   protected :ensure_mutually_exclusive_membership
 

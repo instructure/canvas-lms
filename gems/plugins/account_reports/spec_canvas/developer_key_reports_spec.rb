@@ -41,14 +41,14 @@ describe AccountReports::DeveloperKeyReports do
                            "url:GET|/api/v1/users/self/course_nicknames/:course_id"
                          ],
                          name: "First Key",
-                         account: account })
+                         account: })
     enable_developer_key_account_binding! dk
     dk
   end
   let_once(:second_key) do
     dk = dev_key_model_1_3({ name: "Second Key",
                              public_jwk_url: "http://test.com/jwks",
-                             account: account })
+                             account: })
     disable_developer_key_account_binding! dk
     dk
   end
@@ -62,7 +62,7 @@ describe AccountReports::DeveloperKeyReports do
   let_once(:report_opts) do
     {
       order: 0,
-      account: account
+      account:
     }
   end
   let(:expected_result) do

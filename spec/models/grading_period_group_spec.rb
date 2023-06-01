@@ -72,7 +72,7 @@ describe GradingPeriodGroup do
       @group.update_columns(weighted: false)
       expect { @group.recompute_scores_for_each_term(true) }.to change {
                                                                   [@first_course, @second_course].map do |course|
-                                                                    Enrollment.find_by(course: course, user: @student).computed_current_score
+                                                                    Enrollment.find_by(course:, user: @student).computed_current_score
                                                                   end
                                                                 }.from([0.0, 0.0]).to([80.0, 80.0])
     end
@@ -91,7 +91,7 @@ describe GradingPeriodGroup do
       ids = [@second_course.enrollment_term_id]
       expect { @group.recompute_scores_for_each_term(true, term_ids: ids) }.to change {
         [@first_course, @second_course].map do |course|
-          Enrollment.find_by(course: course, user: @student).computed_current_score
+          Enrollment.find_by(course:, user: @student).computed_current_score
         end
       }.from([0.0, 0.0]).to([0.0, 80.0])
     end
@@ -248,7 +248,7 @@ describe GradingPeriodGroup do
   it_behaves_like "soft deletion" do
     subject { course.grading_period_groups }
 
-    let(:course) { Course.create!(account: account) }
+    let(:course) { Course.create!(account:) }
     let(:creation_arguments) { { title: "A title" } }
   end
 

@@ -308,7 +308,7 @@ describe "Pages API", type: :request do
           it "updates a page with a todo_date" do
             todo_date = Time.zone.local(2008, 9, 1, 12, 0, 0)
             todo_date_2 = Time.zone.local(2008, 9, 2, 12, 0, 0)
-            page = @course.wiki_pages.create!(title: "hrup", todo_date: todo_date)
+            page = @course.wiki_pages.create!(title: "hrup", todo_date:)
 
             api_call(:put,
                      "/api/v1/courses/#{@course.id}/pages/#{page.url}",
@@ -713,7 +713,7 @@ describe "Pages API", type: :request do
         json = api_call(:post,
                         "/api/v1/courses/#{@course.id}/pages",
                         { controller: "wiki_pages_api", action: "create", format: "json", course_id: @course.to_param },
-                        { wiki_page: { title: page_title, body: body } },
+                        { wiki_page: { title: page_title, body: } },
                         {},
                         { expected_status: 200 })
         new_page = @course.wiki_pages.where(url: json["url"]).first!
@@ -742,7 +742,7 @@ describe "Pages API", type: :request do
         json = api_call(:post,
                         "/api/v1/courses/#{@course.id}/pages",
                         { controller: "wiki_pages_api", action: "create", format: "json", course_id: @course.to_param },
-                        { wiki_page: { title: "New Wiki Page", body: body } })
+                        { wiki_page: { title: "New Wiki Page", body: } })
         page = @course.wiki_pages.where(url: json["url"]).first!
         expect(page.title).to eq "New Wiki Page"
         expect(page.url).to eq "new-wiki-page"
@@ -1410,7 +1410,7 @@ describe "Pages API", type: :request do
 
     it "does not allow update to page todo_date if student" do
       todo_date = Time.zone.local(2008, 9, 1, 12, 0, 0)
-      page = @course.wiki_pages.create!(title: "hrup", todo_date: todo_date)
+      page = @course.wiki_pages.create!(title: "hrup", todo_date:)
       api_call(:put,
                "/api/v1/courses/#{@course.id}/pages/#{page.url}",
                { controller: "wiki_pages_api",

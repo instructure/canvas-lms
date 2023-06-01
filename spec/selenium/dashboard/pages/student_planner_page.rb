@@ -400,9 +400,9 @@ module PlannerPageObject
     assignment = @course.assignments.create!(name: "assignment 1",
                                              due_at: due)
     discussion = @course.discussion_topics.create!(user: @teacher,
-                                                   title: title,
+                                                   title:,
                                                    message: "Discussion topic message",
-                                                   assignment: assignment)
+                                                   assignment:)
     discussion.discussion_entries.create!(user: @teacher,
                                           message: "new reply from teacher")
   end
@@ -413,7 +413,7 @@ module PlannerPageObject
     discussion = @course.discussion_topics.create!(user: @teacher,
                                                    title: "Graded discussion future",
                                                    message: "Discussion topic message",
-                                                   assignment: assignment)
+                                                   assignment:)
     discussion.discussion_entries.create!(user: @teacher,
                                           message: "new reply from teacher")
   end

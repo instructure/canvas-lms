@@ -361,7 +361,7 @@ class AppointmentGroupsController < ApplicationController
 
     shard.activate do
       publish = value_to_boolean(params[:appointment_group].delete(:publish))
-      @group = AppointmentGroup.new(appointment_group_params.merge(contexts: contexts))
+      @group = AppointmentGroup.new(appointment_group_params.merge(contexts:))
       @group.update_contexts_and_sub_contexts
       if authorized_action(@group, @current_user, :manage)
         if @group.save
@@ -567,7 +567,7 @@ class AppointmentGroupsController < ApplicationController
 
   protected
 
-  def participants(type, &formatter)
+  def participants(type, &)
     if authorized_action(@group, @current_user, :read)
       return render json: [] unless @group.participant_type == type
 
@@ -575,7 +575,7 @@ class AppointmentGroupsController < ApplicationController
         @group.possible_participants(registration_status: params[:registration_status]),
         self,
         send("api_v1_appointment_group_#{params[:action]}_url", @group)
-      ).map(&formatter)
+      ).map(&)
     end
   end
 
@@ -612,7 +612,7 @@ class AppointmentGroupsController < ApplicationController
     # start with the first reservable appointment group
     group = AppointmentGroup.reservable_by(@current_user, params[:context_codes]).current.order(:start_at).first
     anchor = calendar_fragment view_name: :agenda, view_start: group&.start_at&.strftime("%Y-%m-%d")
-    redirect_to calendar2_url(anchor: anchor)
+    redirect_to calendar2_url(anchor:)
   end
 
   def web_show

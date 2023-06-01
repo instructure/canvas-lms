@@ -29,7 +29,7 @@ class ActiveSupport::Cache::ZonalRedisCacheStore < ActiveSupport::Cache::Store
     @redis = ActiveSupport::Cache.lookup_store(:redis_cache_store, { url: all_urls }.merge(additional_options))
     @caches = {}
     zones.each do |zone, url|
-      @caches[zone] = ActiveSupport::Cache.lookup_store(:redis_cache_store, { url: url }.merge(additional_options))
+      @caches[zone] = ActiveSupport::Cache.lookup_store(:redis_cache_store, { url: }.merge(additional_options))
     end
   end
 
@@ -69,7 +69,7 @@ class ActiveSupport::Cache::ZonalRedisCacheStore < ActiveSupport::Cache::Store
   end
 
   def write_entry(key, entry, raw: false, **options)
-    @caches.each_value { |c| c.send(:write_entry, key, entry, raw: raw, **options) }
+    @caches.each_value { |c| c.send(:write_entry, key, entry, raw:, **options) }
   end
 
   def delete_entry(key, **options)

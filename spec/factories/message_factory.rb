@@ -45,9 +45,9 @@ module Factories
                                                 path: "generate_message@example.com")
     @message = Message.new(notification: @notification,
                            context: asset,
-                           user: user,
+                           user:,
                            communication_channel: @cc,
-                           data: data)
+                           data:)
     @message.delayed_messages = []
     @message.parse!(path_type.to_s)
     @message

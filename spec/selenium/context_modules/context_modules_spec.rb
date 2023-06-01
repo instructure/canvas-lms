@@ -198,7 +198,7 @@ describe "context modules" do
 
     it "shows the due date on an graded discussion in a module", priority: "2" do
       due_at = 3.days.from_now
-      @assignment = @course.assignments.create!(name: "assignemnt", due_at: due_at)
+      @assignment = @course.assignments.create!(name: "assignemnt", due_at:)
       @discussion = @course.discussion_topics.create!(title: "Graded Discussion", assignment: @assignment)
       @mod.add_item(type: "discussion_topic", id: @discussion.id)
       go_to_modules
@@ -207,7 +207,7 @@ describe "context modules" do
 
     it "shows the todo date on an ungraded discussion in a module", priority: "1" do
       todo_date = 1.day.from_now
-      @pub_ungraded_discussion = @course.discussion_topics.create!(title: "Non-graded Published Discussion", todo_date: todo_date)
+      @pub_ungraded_discussion = @course.discussion_topics.create!(title: "Non-graded Published Discussion", todo_date:)
       @mod.add_item(type: "discussion_topic", id: @pub_ungraded_discussion.id)
       go_to_modules
       verify_module_title("Non-graded Published Discussion")

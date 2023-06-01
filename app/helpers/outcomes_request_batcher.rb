@@ -40,7 +40,7 @@ class OutcomesRequestBatcher
 
     if jwt.bytesize < MAX_JWT_SIZE
       # No need to split the request because it is small enough.
-      requests.push({ protocol: protocol, endpoint: endpoint, domain: domain, jwt: jwt, params: params })
+      requests.push({ protocol:, endpoint:, domain:, jwt:, params: })
     else
       # Sort the parameters by length and attempt to split one of them
       arr = params.sort_by { |_k, v| -v.length }
@@ -67,7 +67,7 @@ class OutcomesRequestBatcher
       else
         # Cannot split the parameters any further. This is the smallest possible set of parameters.
         # If we were unable to split this enough, this request could still fail.
-        requests.push({ protocol: protocol, endpoint: endpoint, domain: domain, jwt: jwt, params: params })
+        requests.push({ protocol:, endpoint:, domain:, jwt:, params: })
       end
     end
     requests
@@ -89,8 +89,8 @@ class OutcomesRequestBatcher
       domain = settings[domain_key]
       payload = {
         host: domain,
-        consumer_key: consumer_key,
-        scope: scope,
+        consumer_key:,
+        scope:,
         exp: 1.day.from_now.to_i,
         **props
       }

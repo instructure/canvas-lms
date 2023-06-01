@@ -211,7 +211,7 @@ describe Canvas do
     it "infers the real user if the right pseudonym exists" do
       root_account = Account.site_admin
       user = user_model
-      pseudonym_model(user: user, account: root_account, unique_id: "someuser")
+      pseudonym_model(user:, account: root_account, unique_id: "someuser")
       expect(Canvas.infer_user("someuser")).to eq(user)
     end
   end

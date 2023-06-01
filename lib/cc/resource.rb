@@ -47,7 +47,7 @@ module CC
       @html_exporter = CCHelper::HtmlContentExporter.new(@course,
                                                          @manifest.exporter.user,
                                                          key_generator: @manifest,
-                                                         for_course_copy: for_course_copy,
+                                                         for_course_copy:,
                                                          for_epub_export: @manifest.exporter.epub_export?,
                                                          track_referenced_files: true,
                                                          media_object_flavor: Setting.get("exporter_media_object_flavor", nil).presence)

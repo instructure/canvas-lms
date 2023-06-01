@@ -20,7 +20,7 @@
 describe QuizzesNext::Service do
   describe ".enabled_in_context?" do
     let(:root_account) { double "root_account", feature_allowed?: true }
-    let(:context) { double("context", root_account: root_account) }
+    let(:context) { double("context", root_account:) }
 
     context "when the feature is enabled on the context" do
       it "will return true" do
@@ -48,10 +48,10 @@ describe QuizzesNext::Service do
   describe ".active_lti_assignments_for_course" do
     it "returns active lti assignments in the course" do
       course = course_model
-      lti_assignment_active1 = assignment_model(course: course, submission_types: "external_tool")
-      lti_assignment_active2 = assignment_model(course: course, submission_types: "external_tool")
-      lti_assignment_inactive = assignment_model(course: course, submission_types: "external_tool")
-      assignment_active = assignment_model(course: course, submission_types: "external_tool")
+      lti_assignment_active1 = assignment_model(course:, submission_types: "external_tool")
+      lti_assignment_active2 = assignment_model(course:, submission_types: "external_tool")
+      lti_assignment_inactive = assignment_model(course:, submission_types: "external_tool")
+      assignment_active = assignment_model(course:, submission_types: "external_tool")
 
       lti_assignment_inactive.destroy
       tool = course.context_external_tools.create!(

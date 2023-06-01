@@ -50,7 +50,7 @@ describe ImportedHtmlConverter do
     context "when course attachments exist" do
       subject { convert_and_replace(test_string) }
 
-      let_once(:attachment) { attachment_model(context: course, migration_id: migration_id) }
+      let_once(:attachment) { attachment_model(context: course, migration_id:) }
       let(:course) { @course }
       let(:migration_id) { "migration-id-123" }
 

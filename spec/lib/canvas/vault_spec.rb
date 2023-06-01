@@ -29,15 +29,15 @@ module Canvas
     let(:addr_path) { "/path/to/addr" }
     let(:static_config) do
       {
-        token: token,
-        addr: addr,
+        token:,
+        addr:,
         kv_mount: "app-canvas"
       }
     end
     let(:path_config) do
       {
-        token_path: token_path,
-        addr_path: addr_path,
+        token_path:,
+        addr_path:,
         kv_mount: "app-canvas"
       }
     end
@@ -176,7 +176,7 @@ module Canvas
                        .to_return(status: 200,
                                   body: {
                                     data: credential_data,
-                                    lease_duration: lease_duration,
+                                    lease_duration:,
                                   }.to_json,
                                   headers: { "content-type": "application/json" })
         end

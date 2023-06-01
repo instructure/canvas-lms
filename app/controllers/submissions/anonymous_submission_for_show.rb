@@ -23,7 +23,7 @@ module Submissions
     attr_reader :anonymous_id
 
     def initialize(anonymous_id:, assignment_id:, context:, preview: false, version: nil)
-      super(assignment_id: assignment_id, context: context, preview: preview, version: version)
+      super(assignment_id:, context:, preview:, version:)
       @anonymous_id = anonymous_id
     end
 
@@ -38,7 +38,7 @@ module Submissions
                                      .except(:preload)
                                      .active
                                      .preload(versioned? ? :versions : nil)
-                                     .find_or_initialize_by(anonymous_id: anonymous_id)
+                                     .find_or_initialize_by(anonymous_id:)
     end
   end
 end

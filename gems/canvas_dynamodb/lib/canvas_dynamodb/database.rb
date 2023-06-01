@@ -53,7 +53,7 @@ module CanvasDynamoDB
         params[:request_items].each_key do |table_name|
           request_items[prefixed_table_name(table_name)] = params[:request_items][table_name]
         end
-        execute(method, params.merge({ request_items: request_items }))
+        execute(method, params.merge({ request_items: }))
       end
     end
 

@@ -36,7 +36,7 @@ class TestCourseApi
   end
 end
 
-def each_copy_option(&block)
+def each_copy_option(&)
   [[:assignments, :assignments],
    [:external_tools, :context_external_tools],
    [:files, :attachments],
@@ -44,7 +44,7 @@ def each_copy_option(&block)
    [:calendar_events, :calendar_events],
    [:quizzes, :quizzes],
    [:modules, :context_modules],
-   [:outcomes, :created_learning_outcomes]].each(&block)
+   [:outcomes, :created_learning_outcomes]].each(&)
 end
 
 describe Api::V1::Course do
@@ -143,7 +143,7 @@ describe Api::V1::Course do
 
     it "counts students with multiple enrollments once in 'total students'" do
       section = @course2.course_sections.create! name: "other section"
-      @course2.enroll_student @student, section: section, allow_multiple_enrollments: true
+      @course2.enroll_student @student, section:, allow_multiple_enrollments: true
       expect(@course2.student_enrollments.count).to eq 2
 
       json = @test_api.course_json(@course2, @me, {}, ["total_students"], [])
@@ -983,9 +983,9 @@ describe CoursesController, type: :request do
 
       let(:item2) { course.assignments.create!(title: "Assignment #{SecureRandom.alphanumeric(10)}", workflow_state: "published") }
 
-      let(:designer) { designer_in_course(course: course, active_all: true).user }
+      let(:designer) { designer_in_course(course:, active_all: true).user }
 
-      let(:teacher) { teacher_in_course(course: course, active_all: true).user }
+      let(:teacher) { teacher_in_course(course:, active_all: true).user }
 
       it "denies access to a caller without rights to view course grades" do
         api_call_as_user(designer,
@@ -1055,8 +1055,8 @@ describe CoursesController, type: :request do
 
           it "returns a json representation of enrolled users and their progress to a user with rights to view course grades" do
             # Enroll two students
-            student1 = student_in_course(course: course, active_all: true)
-            student2 = student_in_course(course: course, active_all: true)
+            student1 = student_in_course(course:, active_all: true)
+            student2 = student_in_course(course:, active_all: true)
 
             # Have one of the students complete the course
             student1_progress = CourseProgress.new(course, student1.user)
@@ -1094,8 +1094,8 @@ describe CoursesController, type: :request do
           end
 
           it "paginates the list of user progress" do
-            student_in_course(course: course, active_all: true)
-            student_in_course(course: course, active_all: true)
+            student_in_course(course:, active_all: true)
+            student_in_course(course:, active_all: true)
 
             json = api_call_as_user(teacher,
                                     :get,
@@ -2255,21 +2255,21 @@ describe CoursesController, type: :request do
 
         it "deletes multiple courses" do
           expect(Auditors::Course).to receive(:record_deleted).exactly(course_ids.length).times
-          api_call(:put, @path, @params, { event: "delete", course_ids: course_ids })
+          api_call(:put, @path, @params, { event: "delete", course_ids: })
           run_jobs
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_deleted }
         end
 
         it "concludes multiple courses" do
           expect(Auditors::Course).to receive(:record_concluded).exactly(course_ids.length).times
-          api_call(:put, @path, @params, { event: "conclude", course_ids: course_ids })
+          api_call(:put, @path, @params, { event: "conclude", course_ids: })
           run_jobs
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_completed }
         end
 
         it "publishes multiple courses" do
           expect(Auditors::Course).to receive(:record_published).exactly(course_ids.length).times
-          api_call(:put, @path, @params, { event: "offer", course_ids: course_ids })
+          api_call(:put, @path, @params, { event: "offer", course_ids: })
           run_jobs
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_available }
         end
@@ -2277,7 +2277,7 @@ describe CoursesController, type: :request do
         it "accepts sis ids" do
           course_ids = ["sis_course_id:course1", "sis_course_id:course2", "sis_course_id:course3"]
           expect(Auditors::Course).to receive(:record_published).exactly(course_ids.length).times
-          api_call(:put, @path, @params, { event: "offer", course_ids: course_ids })
+          api_call(:put, @path, @params, { event: "offer", course_ids: })
           run_jobs
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_available }
         end
@@ -2389,7 +2389,7 @@ describe CoursesController, type: :request do
         it "succeeds when publishing already published courses" do
           @course1.offer!
           expect(Auditors::Course).to receive(:record_published).twice
-          json = api_call(:put, @path, @params, { event: "offer", course_ids: course_ids })
+          json = api_call(:put, @path, @params, { event: "offer", course_ids: })
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress.message).to be_include "3 courses processed"
@@ -2400,7 +2400,7 @@ describe CoursesController, type: :request do
           @course1.complete!
           @course2.complete!
           expect(Auditors::Course).to receive(:record_concluded).once
-          json = api_call(:put, @path, @params, { event: "conclude", course_ids: course_ids })
+          json = api_call(:put, @path, @params, { event: "conclude", course_ids: })
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress.message).to be_include "3 courses processed"
@@ -2411,7 +2411,7 @@ describe CoursesController, type: :request do
           @course1.complete!
           @course2.complete!
           expect(Auditors::Course).to receive(:record_unconcluded).twice
-          json = api_call(:put, @path, @params, { event: "offer", course_ids: course_ids })
+          json = api_call(:put, @path, @params, { event: "offer", course_ids: })
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress.message).to be_include "3 courses processed"
@@ -3738,7 +3738,7 @@ describe CoursesController, type: :request do
             role.base_role_type = "StudentEnrollment"
             role.save!
             @student3 = user_factory(name: "S3")
-            @student3_enroll = @course1.enroll_user(@student3, "StudentEnrollment", { role: role })
+            @student3_enroll = @course1.enroll_user(@student3, "StudentEnrollment", { role: })
           end
 
           it "returns all student types with ?enrollment_type=student" do
@@ -4793,7 +4793,7 @@ describe CoursesController, type: :request do
         json = api_call(:post,
                         "/api/v1/courses/#{@course.id}/preview_html",
                         { controller: "courses", action: "preview_html", course_id: @course.to_param, format: "json" },
-                        { html: html })
+                        { html: })
 
         returned_html = json["html"]
         expect(returned_html).not_to include("<script>")

@@ -122,12 +122,12 @@ module Types
 
     field :discussion_entry_drafts_connection, Types::DiscussionEntryDraftType.connection_type, null: true
     def discussion_entry_drafts_connection
-      Loaders::DiscussionEntryDraftLoader.for(current_user: current_user).load(object)
+      Loaders::DiscussionEntryDraftLoader.for(current_user:).load(object)
     end
 
     field :entry_counts, Types::DiscussionEntryCountsType, null: true
     def entry_counts
-      Loaders::DiscussionEntryCountsLoader.for(current_user: current_user).load(object)
+      Loaders::DiscussionEntryCountsLoader.for(current_user:).load(object)
     end
 
     field :subscribed, Boolean, null: false
@@ -172,7 +172,7 @@ module Types
           if !object.anonymous? || !user
             user
           else
-            Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(user).then do |roles|
+            Loaders::CourseRoleLoader.for(course_id:, role_types:, built_in_only:).load(user).then do |roles|
               if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment") || (object.anonymous_state == "partial_anonymity" && !object.is_anonymous_author)
                 user
               end
@@ -214,7 +214,7 @@ module Types
           if !object.anonymous? || !user
             user
           else
-            Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(user).then do |roles|
+            Loaders::CourseRoleLoader.for(course_id:, role_types:, built_in_only:).load(user).then do |roles|
               if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment") || (object.anonymous_state == "partial_anonymity" && !object.is_anonymous_author)
                 user
               end
@@ -228,7 +228,7 @@ module Types
     def permissions
       load_association(:context).then do
         {
-          loader: Loaders::PermissionsLoader.for(object, current_user: current_user, session: session),
+          loader: Loaders::PermissionsLoader.for(object, current_user:, session:),
           discussion_topic: object
         }
       end
@@ -319,8 +319,8 @@ module Types
       return nil if object.anonymous?
 
       Loaders::MentionableUserLoader.for(
-        current_user: current_user,
-        search_term: search_term
+        current_user:,
+        search_term:
       ).load(object)
     end
 
@@ -328,13 +328,13 @@ module Types
       return [] if object.initial_post_required?(current_user, session) || !available_for_user
 
       Loaders::DiscussionEntryLoader.for(
-        current_user: current_user,
-        search_term: search_term,
-        filter: filter,
-        sort_order: sort_order,
-        root_entries: root_entries,
-        user_search_id: user_search_id,
-        unread_before: unread_before
+        current_user:,
+        search_term:,
+        filter:,
+        sort_order:,
+        root_entries:,
+        user_search_id:,
+        unread_before:
       ).load(object)
     end
   end

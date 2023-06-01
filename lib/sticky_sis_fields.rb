@@ -111,7 +111,7 @@ module StickySisFields
     #   clear_sis_stickiness: default false,
     #       if true, the set_sis_stickiness callback is enabled and configured
     #       to write out an empty stickiness list on every save.
-    def process_as_sis(opts = {}, &block)
+    def process_as_sis(opts = {}, &)
       self.sis_stickiness_options ||= {}
       old_options = self.sis_stickiness_options.clone
       self.sis_stickiness_options = opts
@@ -119,7 +119,7 @@ module StickySisFields
         if opts[:add_sis_stickiness] || opts[:clear_sis_stickiness]
           yield
         else
-          suspend_callbacks(:set_sis_stickiness, &block)
+          suspend_callbacks(:set_sis_stickiness, &)
         end
       ensure
         self.sis_stickiness_options = old_options

@@ -26,7 +26,7 @@ describe DataFixup::ChangeImmersiveReaderAllowedOnToOn do
         context_id: account.id,
         context_type: "Account",
         feature: "immersive_reader_wiki_pages",
-        state: state
+        state:
       )
     end
 

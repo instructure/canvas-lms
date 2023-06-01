@@ -29,7 +29,7 @@ class Mutations::DeleteInternalSetting < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "insufficient permission"
     end
 
-    context[:deleted_models] = { internal_setting: internal_setting }
+    context[:deleted_models] = { internal_setting: }
     internal_setting.destroy
 
     { internal_setting_id: CanvasSchema.id_from_object(internal_setting, Types::InternalSettingType, nil) }

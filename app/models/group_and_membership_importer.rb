@@ -27,7 +27,7 @@ class GroupAndMembershipImporter < ActiveRecord::Base
   attr_accessor :progress, :total_lines, :update_every, :seen_groups, :group_members, :seen_user_ids
 
   def self.create_import_with_attachment(group_category, file_obj)
-    import = GroupAndMembershipImporter.create!(group_category: group_category)
+    import = GroupAndMembershipImporter.create!(group_category:)
     att = Attachment.create_data_attachment(import, file_obj, "category_import_#{import.global_id}.csv")
     import.attachment = att
     import.save!
@@ -44,7 +44,7 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     progress.start
     csv = begin
       file = attachment.open
-      { fullpath: file.path, file: attachment.display_name, attachment: attachment }
+      { fullpath: file.path, file: attachment.display_name, attachment: }
     end
     validate_file(csv)
     return unless progress.reload.running?
@@ -153,7 +153,7 @@ class GroupAndMembershipImporter < ActiveRecord::Base
                                  tags: { split_type: "csv",
                                          root_account_id: group_category.root_account&.global_id,
                                          root_account_name: group_category.root_account&.name })
-    group_category.groups.create!(name: name, context: group_category.context)
+    group_category.groups.create!(name:, context: group_category.context)
   end
 
   def group_key(group_id, group_sis_id, group_name)

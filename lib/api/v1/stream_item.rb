@@ -151,7 +151,7 @@ module Api::V1::StreamItem
     stream_item_preloads(items.map(&:stream_item))
     json = items.map { |i| stream_item_json(i, i.stream_item, @current_user, session) }
     json.select! { |hash| hash["submission_comments"].present? } if opts[:asset_type] == "Submission"
-    render json: json
+    render json:
   end
 
   def filtered_stream_item_ids(opts)
@@ -219,9 +219,9 @@ module Api::V1::StreamItem
 
         total_counts.each do |key, count|
           type, category = key
-          items << { type: type,
+          items << { type:,
                      notification_category: category,
-                     count: count,
+                     count:,
                      unread_count: unread_counts[key] || 0 }
         end
         items.sort_by! { |i| i[:type] }

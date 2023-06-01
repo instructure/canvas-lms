@@ -33,7 +33,7 @@ module GoogleDrive
       # identical to the api default except for the .strip on OS_VERSION - ruby 2.5 doesn't like the \n
       user_agent = "#{name}/#{version} google-api-ruby-client/#{Google::APIClient::VERSION::STRING} #{Google::APIClient::ENV::OS_VERSION.strip} (gzip)"
 
-      client = Google::APIClient.new(application_name: name, application_version: version, user_agent: user_agent)
+      client = Google::APIClient.new(application_name: name, application_version: version, user_agent:)
       client.authorization.client_id = client_secrets["client_id"]
       client.authorization.client_secret = client_secrets["client_secret"]
       client.authorization.redirect_uri = client_secrets["redirect_uri"]
@@ -49,7 +49,7 @@ module GoogleDrive
 
       request_data = {
         approval_prompt: :force,
-        state: state,
+        state:,
         access_type: :offline
       }
 

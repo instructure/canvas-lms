@@ -114,7 +114,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
   describe "#grade_history" do
     before do
-      submission = assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)
+      submission = assignment.submissions.first || Submission.find_or_initialize_by(assignment:, user: @user)
       url_grades.each do |h|
         grade = "#{TextHelper.round_if_whole(h[:grade] * 100)}%" if h[:grade]
         grade, score = assignment.compute_grade_and_score(grade, nil)
@@ -267,7 +267,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         end
 
         before do
-          s = Submission.find_or_initialize_by(assignment: assignment, user: @user)
+          s = Submission.find_or_initialize_by(assignment:, user: @user)
 
           submission_version_data.each do |d|
             s.score = d[:score]
@@ -339,7 +339,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
     end
 
     let(:submission) do
-      assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)
+      assignment.submissions.first || Submission.find_or_initialize_by(assignment:, user: @user)
     end
 
     let!(:notification) do

@@ -113,7 +113,7 @@ class UserList
         return
       end
 
-      @addresses << { name: name, address: path, type: type }
+      @addresses << { name:, address: path, type: }
     end
 
     def parse_email(email)

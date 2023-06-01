@@ -19,7 +19,7 @@
 
 describe CoursePacing::CoursePaceService do
   let(:course) { course_model }
-  let!(:course_pace) { course_pace_model(course: course) }
+  let!(:course_pace) { course_pace_model(course:) }
 
   describe ".paces_in_course" do
     it "returns the primary paces for the provided course" do

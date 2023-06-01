@@ -54,8 +54,8 @@ describe AssignmentGroupsController do
 
       let(:student) do
         dora = User.create!(name: "Dora")
-        course_with_student(course: course, user: dora, active_enrollment: true)
-        course_with_student(course: course, user: User.create!, active_enrollment: true)
+        course_with_student(course:, user: dora, active_enrollment: true)
+        course_with_student(course:, user: User.create!, active_enrollment: true)
         dora
       end
 
@@ -761,7 +761,7 @@ describe AssignmentGroupsController do
       it "allows assignments not in closed grading periods to be moved into different assignment groups" do
         user_session(@teacher)
         order = "#{@assignment3.id},#{@assignment2.id}"
-        post :reorder_assignments, params: { course_id: @course.id, assignment_group_id: @group2.id, order: order }
+        post :reorder_assignments, params: { course_id: @course.id, assignment_group_id: @group2.id, order: }
         expect(response).to be_successful
         expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment2.reload.assignment_group_id).to eq(@group2.id)
@@ -773,7 +773,7 @@ describe AssignmentGroupsController do
       it "allows assignments in closed grading periods to be reordered within the same assignment group" do
         user_session(@teacher)
         order = "#{@assignment3.id},#{@assignment1.id},#{@assignment2.id}"
-        post :reorder_assignments, params: { course_id: @course.id, assignment_group_id: @group1.id, order: order }
+        post :reorder_assignments, params: { course_id: @course.id, assignment_group_id: @group1.id, order: }
         expect(response).to be_successful
         expect(@assignment1.reload.assignment_group_id).to eq(@group1.id)
         expect(@assignment2.reload.assignment_group_id).to eq(@group1.id)
@@ -833,13 +833,13 @@ describe AssignmentGroupsController do
     let(:name) { "some test group" }
 
     it "requires authorization" do
-      post "create", params: { course_id: @course.id, assignment_group: { name: name } }
+      post "create", params: { course_id: @course.id, assignment_group: { name: } }
       assert_unauthorized
     end
 
     it "does not allow students to create" do
       user_session(@student)
-      post "create", params: { course_id: @course.id, assignment_group: { name: name } }
+      post "create", params: { course_id: @course.id, assignment_group: { name: } }
       assert_unauthorized
     end
 
@@ -847,7 +847,7 @@ describe AssignmentGroupsController do
       user_session(@teacher)
       group_integration_data = { "something" => "else" }
       post "create", params: { course_id: @course.id,
-                               assignment_group: { name: name,
+                               assignment_group: { name:,
                                                    integration_data: group_integration_data } }
       expect(response).to be_redirect
       expect(assigns[:assignment_group].name).to eql(name)
@@ -858,7 +858,7 @@ describe AssignmentGroupsController do
     it "creates a new group with no integration_data" do
       user_session(@teacher)
       post "create", params: { course_id: @course.id,
-                               assignment_group: { name: name,
+                               assignment_group: { name:,
                                                    integration_data: {} } }
       expect(response).to be_redirect
       expect(assigns[:assignment_group].name).to eql(name)
@@ -869,7 +869,7 @@ describe AssignmentGroupsController do
     it "creates a new group where integration_data is not present" do
       user_session(@teacher)
       post "create", params: { course_id: @course.id,
-                               assignment_group: { name: name,
+                               assignment_group: { name:,
                                                    integration_data: nil } }
       expect(response).to be_redirect
       expect(assigns[:assignment_group].name).to eql(name)
@@ -881,14 +881,14 @@ describe AssignmentGroupsController do
       user_session(@teacher)
       integration_data = "something"
       post "create", params: { course_id: @course.id,
-                               assignment_group: { name: name,
-                                                   integration_data: integration_data } }
+                               assignment_group: { name:,
+                                                   integration_data: } }
       expect(response).to have_http_status(:bad_request)
     end
 
     it "creates a new group when integration_data is not present" do
       user_session(@teacher)
-      post "create", params: { course_id: @course.id, assignment_group: { name: name } }
+      post "create", params: { course_id: @course.id, assignment_group: { name: } }
       expect(response).to be_redirect
       expect(assigns[:assignment_group].name).to eql(name)
       expect(assigns[:assignment_group].position).to be(1)
@@ -906,13 +906,13 @@ describe AssignmentGroupsController do
     let(:name) { "new group name" }
 
     it "requires authorization" do
-      put "update", params: { course_id: @course.id, id: @group.id, assignment_group: { name: name } }
+      put "update", params: { course_id: @course.id, id: @group.id, assignment_group: { name: } }
       assert_unauthorized
     end
 
     it "does not allow students to update" do
       user_session(@student)
-      put "update", params: { course_id: @course.id, id: @group.id, assignment_group: { name: name } }
+      put "update", params: { course_id: @course.id, id: @group.id, assignment_group: { name: } }
       assert_unauthorized
     end
 
@@ -921,7 +921,7 @@ describe AssignmentGroupsController do
       group_integration_data = { "something" => "else", "foo" => "bar" }
       put "update", params: { course_id: @course.id,
                               id: @group.id,
-                              assignment_group: { name: name,
+                              assignment_group: { name:,
                                                   sis_source_id: "5678",
                                                   integration_data: group_integration_data } }
       expect(assigns[:assignment_group]).to eql(@group)
@@ -939,7 +939,7 @@ describe AssignmentGroupsController do
       new_integration_data = { "oh" => "hello", "hi" => "there" }
       put "update", params: { course_id: @course.id,
                               id: @group.id,
-                              assignment_group: { name: name,
+                              assignment_group: { name:,
                                                   sis_source_id: "5678",
                                                   integration_data: new_integration_data } }
 
@@ -952,7 +952,7 @@ describe AssignmentGroupsController do
       user_session(@teacher)
       put "update", params: { course_id: @course.id,
                               id: @group.id,
-                              assignment_group: { name: name,
+                              assignment_group: { name:,
                                                   sis_source_id: "5678",
                                                   integration_data: {} } }
       expect(assigns[:assignment_group]).to eql(@group)
@@ -979,8 +979,8 @@ describe AssignmentGroupsController do
       integration_data = "test"
       put "update", params: { course_id: @course.id,
                               id: @group.id,
-                              assignment_group: { name: name,
-                                                  integration_data: integration_data } }
+                              assignment_group: { name:,
+                                                  integration_data: } }
       expect(response).to have_http_status(:bad_request)
     end
 

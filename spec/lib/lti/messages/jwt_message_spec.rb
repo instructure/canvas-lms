@@ -32,7 +32,7 @@ describe Lti::Messages::JwtMessage do
       nil,
       {
         current_user: user,
-        tool: tool
+        tool:
       }
     )
   end
@@ -49,14 +49,14 @@ describe Lti::Messages::JwtMessage do
     course_with_student
     @course
   end
-  let_once(:assignment) { assignment_model(course: course) }
+  let_once(:assignment) { assignment_model(course:) }
   let_once(:tool) do
     tool = course.context_external_tools.new(
       name: "bob",
       consumer_key: "key",
       shared_secret: "secret",
       url: "http://www.example.com/basic_lti",
-      developer_key: developer_key
+      developer_key:
     )
     tool.course_navigation = {
       enabled: true,
@@ -76,12 +76,12 @@ describe Lti::Messages::JwtMessage do
 
   def jwt_message
     Lti::Messages::JwtMessage.new(
-      tool: tool,
-      context: context,
-      user: user,
-      expander: expander,
-      return_url: return_url,
-      opts: opts
+      tool:,
+      context:,
+      user:,
+      expander:,
+      return_url:,
+      opts:
     )
   end
 
@@ -145,7 +145,7 @@ describe Lti::Messages::JwtMessage do
     end
 
     it 'sets the "sub" claim to past lti_id' do
-      UserPastLtiId.create!(user: user, context: course, user_lti_id: "old_lti_id", user_lti_context_id: "old_lti_id", user_uuid: "old")
+      UserPastLtiId.create!(user:, context: course, user_lti_id: "old_lti_id", user_lti_context_id: "old_lti_id", user_uuid: "old")
       expect(decoded_jwt["sub"]).to eq "old_lti_id"
     end
 
@@ -155,7 +155,7 @@ describe Lti::Messages::JwtMessage do
 
     context "when the target_link_uri is specified in opts" do
       let(:target_link_uri) { "https://www.cool-tool.com/test?foo=bar" }
-      let(:opts) { { resource_type: "course_navigation", target_link_uri: target_link_uri } }
+      let(:opts) { { resource_type: "course_navigation", target_link_uri: } }
 
       it 'sets the "target_link_uri" claim' do
         expect(decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]).to eq target_link_uri
@@ -547,10 +547,10 @@ describe Lti::Messages::JwtMessage do
       Lti::Messages::JwtMessage.new(
         tool: lti_advantage_tool,
         context: lti_context,
-        user: user,
-        expander: expander,
-        return_url: return_url,
-        opts: opts
+        user:,
+        expander:,
+        return_url:,
+        opts:
       )
     end
     let(:controller) do
@@ -893,12 +893,12 @@ describe Lti::Messages::JwtMessage do
     shared_context "when context is an account" do
       let(:account_jwt_message) do
         Lti::Messages::JwtMessage.new(
-          tool: tool,
+          tool:,
           context: course.root_account,
-          user: user,
-          expander: expander,
-          return_url: return_url,
-          opts: opts
+          user:,
+          expander:,
+          return_url:,
+          opts:
         )
       end
 

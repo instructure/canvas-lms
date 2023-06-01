@@ -30,9 +30,9 @@ module Factories
     email = opts[:email] || "test@example.com"
 
     {
-      name: name,
-      email: email,
-      account: account
+      name:,
+      email:,
+      account:
     }
   end
 

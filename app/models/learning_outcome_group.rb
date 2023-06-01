@@ -77,8 +77,8 @@ class LearningOutcomeGroup < ActiveRecord::Base
     child_outcome_links.create(
       content: outcome,
       context: context || self,
-      skip_touch: skip_touch,
-      migration_id: migration_id
+      skip_touch:,
+      migration_id:
     )
   end
 
@@ -103,7 +103,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
         associated_asset_type: group.class,
         context_id: group.context_id || group.id,
         context_type: group.context_id.present? ? group.context_type : LearningOutcomeGroup,
-        root_account_id: root_account_id,
+        root_account_id:,
         title: outcome.title,
         comments: "",
         context_code: "#{group.context_type.to_s.underscore}_#{group.context_id}",
@@ -301,7 +301,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
         new_ids = []
         ids_to_check.each do |id|
-          group = LearningOutcomeGroup.for_context(context).active.where(id: id).first
+          group = LearningOutcomeGroup.for_context(context).active.where(id:).first
           new_ids += group.parent_ids if group
         end
 

@@ -58,7 +58,7 @@ describe Mutations::ImportOutcomes do
   end
 
   def execute_query(query, context)
-    CanvasSchema.execute(query, context: context)
+    CanvasSchema.execute(query, context:)
   end
 
   def exec_graphql(**attrs)
@@ -66,8 +66,8 @@ describe Mutations::ImportOutcomes do
       mutation_str(
         **attrs.reverse_merge(
           target_group_id: target_group.id,
-          source_context_id: source_context_id,
-          source_context_type: source_context_type
+          source_context_id:,
+          source_context_type:
         )
       ),
       ctx
@@ -77,8 +77,8 @@ describe Mutations::ImportOutcomes do
   def exec(**attrs)
     attrs.reverse_merge!(
       target_group_id: target_group.id,
-      source_context_id: source_context_id,
-      source_context_type: source_context_type
+      source_context_id:,
+      source_context_type:
     )
     source_context = attrs[:source_context_type].constantize.find_by(id: attrs[:source_context_id]) if attrs[:source_context_type]
     group = LearningOutcomeGroup.find_by(id: attrs[:group_id]) if attrs[:group_id]
@@ -89,11 +89,11 @@ describe Mutations::ImportOutcomes do
   end
 
   def find_group(title)
-    LearningOutcomeGroup.find_by(title: title)
+    LearningOutcomeGroup.find_by(title:)
   end
 
   def get_outcome_id(title, context = Account.default)
-    LearningOutcome.find_by(context: context, short_description: title).id
+    LearningOutcome.find_by(context:, short_description: title).id
   end
 
   let(:target_context) { @course }
@@ -102,7 +102,7 @@ describe Mutations::ImportOutcomes do
   end
   let(:source_context_id) { Account.default.id }
   let(:source_context_type) { "Account" }
-  let(:ctx) { { domain_root_account: Account.default, current_user: current_user } }
+  let(:ctx) { { domain_root_account: Account.default, current_user: } }
   let(:current_user) { @teacher }
   let(:progress) { @course.progresses.create!(tag: "import_outcomes") }
 
@@ -147,10 +147,10 @@ describe Mutations::ImportOutcomes do
       childs = group[:groups]
 
       # root_account_id should match the context of the db_parent_group.context root_account_id
-      log_db_root_account_id = LearningOutcomeGroup.find_by(context: db_parent_group.context, title: title).root_account_id
+      log_db_root_account_id = LearningOutcomeGroup.find_by(context: db_parent_group.context, title:).root_account_id
       expect(log_db_root_account_id).to eq(db_parent_group.context.resolved_root_account_id)
 
-      db_group = db_parent_group.child_outcome_groups.find_by!(title: title)
+      db_group = db_parent_group.child_outcome_groups.find_by!(title:)
 
       db_outcomes = db_group.child_outcome_links.map(&:content)
 

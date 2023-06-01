@@ -173,7 +173,7 @@ class GradeChangeAuditApiController < AuditorApiController
     return render_unauthorized_action unless course_authorized?(course)
 
     events = Auditors::GradeChange.for_course(course, query_options)
-    render_events(events, polymorphic_url([:api_v1, :audit_grade_change, course]), course: course)
+    render_events(events, polymorphic_url([:api_v1, :audit_grade_change, course]), course:)
   end
 
   # @API Query by student
@@ -282,7 +282,7 @@ class GradeChangeAuditApiController < AuditorApiController
     end
 
     events = Auditors::GradeChange.for_scope_conditions(conditions, query_options)
-    render_events(events, api_v1_audit_grade_change_url, course: course, remove_anonymous: params[:student_id].present?)
+    render_events(events, api_v1_audit_grade_change_url, course:, remove_anonymous: params[:student_id].present?)
   end
 
   # TODO: remove Cassandra cruft and make Gradebook History use the admin search above
@@ -298,7 +298,7 @@ class GradeChangeAuditApiController < AuditorApiController
 
     return render_unauthorized_action unless course_authorized?(course)
 
-    args = { course: course }
+    args = { course: }
     restrict_to_override_grades = params[:assignment_id] == "override"
     if restrict_to_override_grades
       args[:assignment] = Auditors::GradeChange::COURSE_OVERRIDE_ASSIGNMENT
@@ -327,7 +327,7 @@ class GradeChangeAuditApiController < AuditorApiController
     events = Auditors::GradeChange.for_course_and_other_arguments(course, args, query_options)
 
     route_args = restrict_to_override_grades ? args.merge({ assignment: "override" }) : args
-    render_events(events, send(url_method, route_args), course: course, remove_anonymous: params[:student_id].present?)
+    render_events(events, send(url_method, route_args), course:, remove_anonymous: params[:student_id].present?)
   end
 
   private
@@ -341,7 +341,7 @@ class GradeChangeAuditApiController < AuditorApiController
   end
 
   def render_events(events, route, course: nil, remove_anonymous: false)
-    events = BookmarkedCollection.filter(events) { |event| !event.override_grade? } unless include_override_grades?(course: course)
+    events = BookmarkedCollection.filter(events) { |event| !event.override_grade? } unless include_override_grades?(course:)
     events = Api.paginate(events, self, route)
 
     if params.fetch(:include, []).include?("current_grade")

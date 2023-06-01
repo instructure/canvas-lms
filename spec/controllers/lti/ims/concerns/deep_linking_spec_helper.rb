@@ -53,7 +53,7 @@ RSpec.shared_context "deep_linking_spec_helper" do
     JSON::JWT.new(body).sign(private_jwk, alg).to_s
   end
   let(:developer_key) do
-    key = DeveloperKey.new(account: account)
+    key = DeveloperKey.new(account:)
     key.generate_rsa_keypair!
     key.save!
     key.developer_key_account_bindings.first.update!(

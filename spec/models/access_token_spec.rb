@@ -364,7 +364,7 @@ describe AccessToken do
       let(:root_account_key) { DeveloperKey.create!(account: root_account) }
       let(:site_admin_key) { DeveloperKey.create! }
       let(:sub_account) do
-        account = account_model(root_account: root_account)
+        account = account_model(root_account:)
         account
       end
 
@@ -460,7 +460,7 @@ describe AccessToken do
 
     describe "adding scopes" do
       let(:dev_key) { DeveloperKey.create! require_scopes: true, scopes: TokenScopes.all_scopes.slice(0, 10) }
-      let(:access_token) { AccessToken.new(user: user_model, developer_key: dev_key, scopes: scopes) }
+      let(:access_token) { AccessToken.new(user: user_model, developer_key: dev_key, scopes:) }
       let(:scopes) { [TokenScopes.all_scopes[12]] }
 
       before do
@@ -520,7 +520,7 @@ describe AccessToken do
   describe "#dev_key_account_id" do
     it "returns the developer_key account_id" do
       account = Account.create!
-      dev_key = DeveloperKey.create!(account: account)
+      dev_key = DeveloperKey.create!(account:)
       at = AccessToken.create!(developer_key: dev_key)
       expect(at.dev_key_account_id).to eq account.id
     end
@@ -553,7 +553,7 @@ describe AccessToken do
 
     it "does not send a notification when a new non-manually created access token is created" do
       developer_key = DeveloperKey.create!
-      access_token = AccessToken.create!(user: @user, developer_key: developer_key)
+      access_token = AccessToken.create!(user: @user, developer_key:)
       expect(access_token.messages_sent).not_to include("Manually Created Access Token Created")
     end
   end
@@ -599,7 +599,7 @@ describe AccessToken do
   describe ".site_admin?" do
     specs_require_sharding
     let(:account) { account_model }
-    let(:access_token) { AccessToken.create!(user: user_model, developer_key: DeveloperKey.create!(account: account)) }
+    let(:access_token) { AccessToken.create!(user: user_model, developer_key: DeveloperKey.create!(account:)) }
 
     it "authenticates access token and calls #site_admin?" do
       expect(AccessToken).to receive(:authenticate).and_return(access_token)

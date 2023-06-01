@@ -58,7 +58,7 @@ describe OutcomeResultsController do
 
   let_once(:outcome_assignment) do
     assignment = create_outcome_assignment
-    find_or_create_outcome_submission assignment: assignment
+    find_or_create_outcome_submission(assignment:)
     assignment
   end
 
@@ -78,8 +78,8 @@ describe OutcomeResultsController do
     rubric_association = outcome_rubric.associate_with(outcome_assignment, outcome_course, purpose: "grading")
 
     LearningOutcomeResult.new(
-      user_id: user_id,
-      score: score,
+      user_id:,
+      score:,
       alignment: ContentTag.create!({
                                       title: "content",
                                       context: outcome_course,
@@ -118,7 +118,7 @@ describe OutcomeResultsController do
       assessment: {
         :assessment_type => "grading",
         "criterion_#{criterion[:id]}".to_sym => {
-          points: points
+          points:
         }
       }
     )
@@ -162,29 +162,29 @@ describe OutcomeResultsController do
 
   def mock_os_api_results(user_uuid, outcome_id, associated_asset_id, score, points, points_possible, submitted_at)
     {
-      user_uuid: user_uuid,
+      user_uuid:,
       percent_score: score,
-      points: points,
-      points_possible: points_possible,
+      points:,
+      points_possible:,
       external_outcome_id: outcome_id,
-      submitted_at: submitted_at,
+      submitted_at:,
       attempts: [{ id: 1,
                    authoritative_result_id: 1,
-                   points: points,
-                   points_possible: points_possible,
+                   points:,
+                   points_possible:,
                    event_created_at: Time.zone.now,
                    event_updated_at: Time.zone.now,
                    deleted_at: nil,
                    created_at: Time.zone.now,
                    updated_at: Time.zone.now,
                    metadata: { quiz_metadata: { title: "Quiz Title",
-                                                points: points,
+                                                points:,
                                                 quiz_id: "1",
-                                                points_possible: points_possible } },
-                   submitted_at: submitted_at,
+                                                points_possible: } },
+                   submitted_at:,
                    attempt_number: 1 }],
       associated_asset_type: "canvas.assignment.quizzes",
-      associated_asset_id: associated_asset_id,
+      associated_asset_id:,
       artifact_type: "quizzes.quiz",
       artifact_id: "1",
       mastery: nil
@@ -207,18 +207,18 @@ describe OutcomeResultsController do
     )
     lor = LearningOutcomeResult.new(
       learning_outcome: outcome,
-      user: user,
+      user:,
       context: outcome_course,
-      alignment: alignment,
+      alignment:,
       artifact: submission,
       associated_asset: assignment,
-      title: title,
-      score: score,
+      title:,
+      score:,
       possible: outcome.points_possible,
-      mastery: mastery,
+      mastery:,
       created_at: submitted_at,
       updated_at: submitted_at,
-      submitted_at: submitted_at,
+      submitted_at:,
       assessed_at: submitted_at
     )
     if args[:include_rubric]
@@ -439,9 +439,9 @@ describe OutcomeResultsController do
         before do
           user_session(user)
           @assignment = create_outcome_assignment
-          find_or_create_outcome_submission({ student: student, assignment: @assignment })
+          find_or_create_outcome_submission({ student:, assignment: @assignment })
           @assignment2 = create_outcome_assignment
-          find_or_create_outcome_submission({ student: student, assignment: @assignment2 })
+          find_or_create_outcome_submission({ student:, assignment: @assignment2 })
         end
 
         it "FF disabled - only display results for canvas" do
@@ -510,7 +510,7 @@ describe OutcomeResultsController do
 
           it "OS results found - OS data is filtered correctly" do
             assignment3 = create_outcome_assignment
-            find_or_create_outcome_submission({ student: student, assignment: assignment3 })
+            find_or_create_outcome_submission({ student:, assignment: assignment3 })
             outcome2 = @course.created_learning_outcomes.create!(title: "outcome 2")
             outcome3 = @course.created_learning_outcomes.create!(title: "outcome 3")
             og = @course.root_outcome_group
@@ -1380,7 +1380,7 @@ describe OutcomeResultsController do
 
         context "with pagination" do
           def expect_students_in_pagination(page, students, scores, sort_order = "asc")
-            get_rollups(sort_by: "outcome", sort_outcome_id: @outcome.id, sort_order: sort_order, per_page: 1, page: page)
+            get_rollups(sort_by: "outcome", sort_outcome_id: @outcome.id, sort_order:, per_page: 1, page:)
             expect(response).to be_successful
             json = parse_response(response)
             expect_user_order(json["rollups"], students)
@@ -1491,7 +1491,7 @@ describe OutcomeResultsController do
           let(:json) { parse_response(response) }
 
           def expect_students_in_pagination(page, students, sort_order = "asc", include: nil)
-            get_rollups(sort_by: "student", sort_order: sort_order, per_page: 1, page: page, include: include)
+            get_rollups(sort_by: "student", sort_order:, per_page: 1, page:, include:)
             expect(response).to be_successful
             expect_user_order(json["rollups"], students)
           end

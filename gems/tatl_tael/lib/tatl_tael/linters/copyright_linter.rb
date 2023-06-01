@@ -37,7 +37,7 @@ module TatlTael
 
       def comment_for(path)
         {
-          path: path,
+          path:,
           message: auto_correct ? config[:auto_correct][:message] : config[:message],
           severity: config[:severity],
           position: 0
@@ -174,7 +174,7 @@ module TatlTael
         end
       end
 
-      ENDING_BLOCK_COMMENT_REGEX = %r{^(\s+)?(\*+/)(\s+)?$}.freeze
+      ENDING_BLOCK_COMMENT_REGEX = %r{^(\s+)?(\*+/)(\s+)?$}
       def ending_block_comment_only?(line, _ext)
         line =~ ENDING_BLOCK_COMMENT_REGEX
       end

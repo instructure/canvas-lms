@@ -75,7 +75,7 @@ describe RubricAssociationsController do
         expect do
           post("create", params: request_params)
         end.to change {
-          AnonymousOrModerationEvent.where(event_type: "rubric_created", assignment: assignment).count
+          AnonymousOrModerationEvent.where(event_type: "rubric_created", assignment:).count
         }.by(1)
       end
 
@@ -238,7 +238,7 @@ describe RubricAssociationsController do
         end.to change {
           AnonymousOrModerationEvent.where(
             event_type: "rubric_updated",
-            assignment: assignment
+            assignment:
           ).count
         }.by(1)
       end
@@ -344,14 +344,14 @@ describe RubricAssociationsController do
         expect do
           delete("destroy", params: { course_id: course.id, id: rubric_association.id })
         end.to change {
-          AnonymousOrModerationEvent.where(event_type: "rubric_deleted", assignment: assignment, user: teacher).count
+          AnonymousOrModerationEvent.where(event_type: "rubric_deleted", assignment:, user: teacher).count
         }.by(1)
       end
 
       it "includes the removed rubric in the event payload" do
         delete("destroy", params: { course_id: course.id, id: rubric_association.id })
 
-        event = AnonymousOrModerationEvent.find_by(event_type: "rubric_deleted", assignment: assignment, user: teacher)
+        event = AnonymousOrModerationEvent.find_by(event_type: "rubric_deleted", assignment:, user: teacher)
         expect(event.payload["id"]).to eq rubric.id
       end
     end

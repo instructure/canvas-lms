@@ -22,8 +22,8 @@ describe DataFixup::PopulateRootAccountIdsOnUsers do
     user = User.create!
     a1 = Account.create!
     a2 = Account.create!
-    p1 = a1.pseudonyms.create!(user: user, unique_id: "user")
-    p2 = a2.pseudonyms.create!(user: user, unique_id: "user")
+    p1 = a1.pseudonyms.create!(user:, unique_id: "user")
+    p2 = a2.pseudonyms.create!(user:, unique_id: "user")
     expect(p1.root_account_id).to eq a1.id
     expect(p2.root_account_id).to eq a2.id
     expect(user.reload.root_account_ids).to eq([])
@@ -35,14 +35,14 @@ describe DataFixup::PopulateRootAccountIdsOnUsers do
     user = User.create!
     a1 = Account.create!
     a2 = Account.create!
-    p1 = a1.pseudonyms.create!(user: user, unique_id: "user")
+    p1 = a1.pseudonyms.create!(user:, unique_id: "user")
     expect(p1.root_account_id).to eq a1.id
     expect(user.reload.root_account_ids).to eq([])
 
     DataFixup::PopulateRootAccountIdsOnUsers.populate(user.id, user.id)
     expect(user.reload.root_account_ids).to eq([a1.id])
 
-    p2 = a2.pseudonyms.create!(user: user, unique_id: "user")
+    p2 = a2.pseudonyms.create!(user:, unique_id: "user")
     expect(p2.root_account_id).to eq a2.id
     DataFixup::PopulateRootAccountIdsOnUsers.populate(user.id, user.id)
     expect(user.reload.root_account_ids).to eq([a1.id, a2.id])

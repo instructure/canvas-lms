@@ -91,7 +91,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
       end
 
       return process_job(
-        source_context: source_context, group: group, target_group: target_group
+        source_context:, group:, target_group:
       )
     elsif (outcome_id = input[:outcome_id].presence)
       # Import the selected outcome into the given group
@@ -100,14 +100,14 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
       unless target_context.available_outcome(outcome_id, allow_global: true)
         raise GraphQL::ExecutionError, I18n.t(
           "Outcome %{outcome_id} is not available in context %{context_type}#%{context_id}",
-          outcome_id: outcome_id,
+          outcome_id:,
           context_id: target_context.id.to_s,
           context_type: target_context.class.name
         )
       end
 
       return process_job(
-        source_context: source_context, outcome_id: outcome_id, target_group: target_group
+        source_context:, outcome_id:, target_group:
       )
     end
 
@@ -162,7 +162,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
 
     def get_outcome_group(outcome_id, context)
       links = ContentTag.learning_outcome_links.active.where(content_id: outcome_id)
-      link = context ? links.find_by(context: context) : links.find_by(context_type: "LearningOutcomeGroup")
+      link = context ? links.find_by(context:) : links.find_by(context_type: "LearningOutcomeGroup")
       link&.associated_asset
     end
 
@@ -370,7 +370,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
         target_group
       )
 
-      { progress: progress }
+      { progress: }
     else
       raise GraphQL::ExecutionError, I18n.t("Error importing outcomes")
     end

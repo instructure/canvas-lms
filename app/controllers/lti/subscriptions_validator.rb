@@ -49,7 +49,7 @@ module Lti
 
       subscription[:EventTypes].each do |event_type|
         raise MissingCapability, "EventType #{event_type} is invalid" unless capabilities_hash.key?(event_type.to_sym)
-        if (tool_proxy.enabled_capabilities & capabilities_hash[event_type.to_sym]).blank?
+        unless tool_proxy.enabled_capabilities.intersect?(capabilities_hash[event_type.to_sym])
           raise MissingCapability, "Missing required capability"
         end
       end

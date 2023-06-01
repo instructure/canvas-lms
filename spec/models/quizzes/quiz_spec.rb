@@ -810,7 +810,7 @@ describe Quizzes::Quiz do
     it "sets end_at to lock_at when end_at is nil or after lock_at" do
       lock_at = 1.minute.from_now
       u = User.create!(name: "some user")
-      q = @course.quizzes.create!(title: "some quiz", lock_at: lock_at)
+      q = @course.quizzes.create!(title: "some quiz", lock_at:)
       # [nil, after lock_at]
       [1.minute.ago, 2.minutes.from_now].each do |due_at|
         q.due_at = due_at
@@ -824,7 +824,7 @@ describe Quizzes::Quiz do
     it "does not set end_at to lock_at if a submission is manually unlocked" do
       lock_at = 1.day.ago
       u = User.create!(name: "Fred Colon")
-      q = @course.quizzes.create!(title: "locked yesterday", lock_at: lock_at)
+      q = @course.quizzes.create!(title: "locked yesterday", lock_at:)
       sub = Quizzes::SubmissionManager.new(q).find_or_create_submission(u, nil, "settings_only")
       sub.manually_unlocked = true
       sub.save!
@@ -835,7 +835,7 @@ describe Quizzes::Quiz do
     it "does not set end_at to due_at" do
       due_at = 1.day.from_now
       u = User.create!(name: "Fred Colon")
-      q = @course.quizzes.create!(title: "locked tomorrow", due_at: due_at)
+      q = @course.quizzes.create!(title: "locked tomorrow", due_at:)
       sub2 = q.generate_submission(u)
       expect(sub2.end_at).not_to eq due_at
     end
@@ -874,7 +874,7 @@ describe Quizzes::Quiz do
 
         # Create a special time extension section
         section = @course.course_sections.create!(end_at: 1.day.from_now)
-        student_in_course(course: @course, active_all: true, section: section)
+        student_in_course(course: @course, active_all: true, section:)
 
         @q = @course.quizzes.create!(title: "locked tomorrow")
       end
@@ -927,7 +927,7 @@ describe Quizzes::Quiz do
 
         # Create a special time extension section
         section = @course.course_sections.create!(restrict_enrollments_to_section_dates: true, end_at: @deadline, start_at: @start_at)
-        student_in_course(course: @course, active_all: true, section: section)
+        student_in_course(course: @course, active_all: true, section:)
 
         @q = @course.quizzes.create!(title: "locked tomorrow")
       end
@@ -1201,7 +1201,7 @@ describe Quizzes::Quiz do
       course = Course.create!
       @quiz = Quizzes::Quiz.create!(context: course)
       @user = User.create!
-      @enrollment = @user.student_enrollments.create!(course: course)
+      @enrollment = @user.student_enrollments.create!(course:)
       @enrollment.update_attribute(:workflow_state, "active")
       @submission = Quizzes::QuizSubmission.create!(quiz: @quiz, user: @user)
       @submission.update_attribute(:workflow_state, "untaken")
@@ -1244,15 +1244,15 @@ describe Quizzes::Quiz do
 
   describe "linking overrides with assignments" do
     let_once(:course) { course_model }
-    let_once(:quiz) { quiz_model(course: course, due_at: 5.days.from_now).reload }
+    let_once(:quiz) { quiz_model(course:, due_at: 5.days.from_now).reload }
     let_once(:override) do
-      override = assignment_override_model(quiz: quiz)
+      override = assignment_override_model(quiz:)
       override.override_due_at(7.days.from_now)
       override.save!
       override
     end
     let_once(:override_student) do
-      student_in_course(course: course)
+      student_in_course(course:)
       override_student = override.assignment_override_students.build
       override_student.user = @student
       override_student.save!
@@ -1611,13 +1611,13 @@ describe Quizzes::Quiz do
       course_with_teacher(course: @course, active_all: true)
       quiz = @course.quizzes.create!
       q = quiz.quiz_questions.create!
-      regrade = Quizzes::QuizRegrade.create!(quiz: quiz, quiz_version: quiz.version_number, user: @teacher)
+      regrade = Quizzes::QuizRegrade.create!(quiz:, quiz_version: quiz.version_number, user: @teacher)
       regrade.quiz_question_regrades.create!(
         quiz_question_id: q.id,
         regrade_option: "current_correct_only"
       )
       expect(Quizzes::QuizRegrader::Regrader).to receive(:delay).with(strand: "quiz:#{quiz.global_id}:regrading").once.and_return(Quizzes::QuizRegrader::Regrader)
-      expect(Quizzes::QuizRegrader::Regrader).to receive(:regrade!).with({ quiz: quiz, version_number: quiz.version_number })
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:regrade!).with({ quiz:, version_number: quiz.version_number })
       quiz.save!
     end
 

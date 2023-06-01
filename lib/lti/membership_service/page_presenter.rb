@@ -26,8 +26,8 @@ module Lti
         @membership_collator = MembershipCollatorFactory.collator_instance(context, user, opts)
         @base_url = base_url
         @page = ::IMS::LTI::Models::MembershipService::Page.new(
-          page_of: page_of,
-          next_page: next_page
+          page_of:,
+          next_page:
         )
       end
 

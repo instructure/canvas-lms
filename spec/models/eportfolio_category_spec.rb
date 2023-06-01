@@ -20,7 +20,7 @@
 
 describe EportfolioCategory do
   let(:user) { User.create! }
-  let(:eportfolio) { Eportfolio.create!(name: "my file", user: user) }
+  let(:eportfolio) { Eportfolio.create!(name: "my file", user:) }
   let(:spam_status) { eportfolio.reload.spam_status }
   let(:category) { eportfolio.eportfolio_categories.create!(name: "my category") }
 

@@ -21,7 +21,7 @@
 RSpec.describe Lti::ResourceLink do
   let(:tool) { external_tool_1_3_model }
   let(:course) { Course.create!(name: "Course") }
-  let(:assignment) { Assignment.create!(course: course, name: "Assignment") }
+  let(:assignment) { Assignment.create!(course:, name: "Assignment") }
   let(:resource_link) do
     Lti::ResourceLink.create!(context_external_tool: tool,
                               context: assignment,
@@ -85,7 +85,7 @@ RSpec.describe Lti::ResourceLink do
       end
 
       context "when a matching tool exists in the specified context" do
-        let(:second_tool) { external_tool_1_3_model(context: context) }
+        let(:second_tool) { external_tool_1_3_model(context:) }
 
         it { is_expected.to eq second_tool }
       end
@@ -133,16 +133,16 @@ RSpec.describe Lti::ResourceLink do
   describe ".find_or_initialize_for_context_and_lookup_uuid" do
     subject do
       described_class.find_or_initialize_for_context_and_lookup_uuid(
-        context: context,
+        context:,
         context_external_tool: tool,
-        lookup_uuid: lookup_uuid,
+        lookup_uuid:,
         custom: { "a" => "b" },
         url: "http://www.example.com/launch"
       )
     end
 
     let(:context) { course }
-    let(:tool) { external_tool_1_3_model(context: context) }
+    let(:tool) { external_tool_1_3_model(context:) }
     let(:resource_link) do
       Lti::ResourceLink.create!(context_external_tool: tool,
                                 context: course,
@@ -170,10 +170,10 @@ RSpec.describe Lti::ResourceLink do
       context "when passing in context_external_tool_launch_url" do
         subject do
           described_class.find_or_initialize_for_context_and_lookup_uuid(
-            context: context,
+            context:,
             context_external_tool_launch_url: tool.url,
             url: tool.url,
-            lookup_uuid: lookup_uuid,
+            lookup_uuid:,
             custom: { "a" => "b" }
           )
         end

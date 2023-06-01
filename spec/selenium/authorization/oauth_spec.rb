@@ -131,8 +131,8 @@ describe "oauth2 flow" do
         grant_type: "authorization_code",
         client_id: expiring_key.id,
         client_secret: expiring_key.api_key,
-        redirect_uri: redirect_uri,
-        code: code,
+        redirect_uri:,
+        code:,
       }
       expect(AccessToken.last.permanent_expires_at).to be_nil
     end

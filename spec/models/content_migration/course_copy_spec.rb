@@ -142,7 +142,7 @@ describe ContentMigration do
     it "preserves links to files in poorly named folders" do
       rf = Folder.root_folders(@copy_from).first
       folder = rf.sub_folders.create!(name: "course files", context: @copy_from)
-      att = Attachment.create!(filename: "test.txt", display_name: "testing.txt", uploaded_data: StringIO.new("file"), folder: folder, context: @copy_from)
+      att = Attachment.create!(filename: "test.txt", display_name: "testing.txt", uploaded_data: StringIO.new("file"), folder:, context: @copy_from)
       topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<img src='/courses/#{@copy_from.id}/files/#{att.id}/preview'>")
 
       run_course_copy
@@ -233,8 +233,8 @@ describe ContentMigration do
     end
 
     it "shan't interweave module order when restoring deleting modules in the destination course neither" do
-      ["A", "B"].map { |name| @copy_to.context_modules.create!(name: name) }
-      ["C", "D"].map { |name| @copy_from.context_modules.create!(name: name) }
+      ["A", "B"].map { |name| @copy_to.context_modules.create!(name:) }
+      ["C", "D"].map { |name| @copy_from.context_modules.create!(name:) }
       run_course_copy
       expect(@copy_to.context_modules.ordered.pluck(:name)).to eq(%w[A B C D])
 
@@ -255,7 +255,7 @@ describe ContentMigration do
       body += "<a class='instructure_file_link' href='/courses/#{@copy_from.id}/files/#{att2.id}/download'>link</a>"
       body += "<img src='/courses/#{@copy_from.id}/files/#{img.id}/preview'>"
       dt = @copy_from.discussion_topics.create!(message: body, title: "discussion title")
-      page = @copy_from.wiki_pages.create!(title: "some page", body: body)
+      page = @copy_from.wiki_pages.create!(title: "some page", body:)
 
       run_course_copy
 
@@ -761,7 +761,7 @@ describe ContentMigration do
 
       it "re-uses kaltura media objects" do
         media_id = "0_deadbeef"
-        @copy_from.media_objects.create!(media_id: media_id)
+        @copy_from.media_objects.create!(media_id:)
         att = Attachment.create!(filename: "video.mp4", uploaded_data: StringIO.new("pixels and frames and stuff"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
         att.media_entry_id = media_id
         att.content_type = "video/mp4"
@@ -776,7 +776,7 @@ describe ContentMigration do
 
       it "copies media tracks without creating new media objects" do
         media_id = "0_deadbeef"
-        media_object = @copy_from.media_objects.create!(media_id: media_id)
+        media_object = @copy_from.media_objects.create!(media_id:)
         copy_from_track = media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
 
         expect do
@@ -792,7 +792,7 @@ describe ContentMigration do
 
       it "copies media tracks from non-default media object attachments" do
         media_id = "0_deadbeef"
-        media_object = course_factory.media_objects.create!(media_id: media_id)
+        media_object = course_factory.media_objects.create!(media_id:)
         att = Attachment.create!(filename: "video.mp4", uploaded_data: StringIO.new("pixels and frames and stuff"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
         att.media_entry_id = media_id
         att.content_type = "video/mp4"
@@ -806,7 +806,7 @@ describe ContentMigration do
           expect(copy_to_media_track.id).not_to eq media_track.id
           expect(copy_to_media_track.content).to eq "en subs"
           expect(copy_to_media_track.media_object_id).to eq media_track.media_object_id
-          expect(MediaObject.where(media_id: media_id).count).to eq 1
+          expect(MediaObject.where(media_id:).count).to eq 1
         end.to change { MediaTrack.count }.by(1)
       end
     end
@@ -874,7 +874,7 @@ describe ContentMigration do
       Attachment.create!(filename: "test.txt",
                          display_name: "testing.txt",
                          uploaded_data: StringIO.new("file"),
-                         folder: folder,
+                         folder:,
                          context: @copy_from)
 
       topic = @copy_from.discussion_topics.create!(title: "some topic",
@@ -952,7 +952,7 @@ describe ContentMigration do
       link_settings = { selection_width: 456, selection_height: 789 }
       tool = @copy_from.context_external_tools.create!(name: "b", url: "http://derp.derp/somethingelse", consumer_key: "12345", shared_secret: "secret")
       mod = @copy_from.context_modules.create!(name: "some module")
-      tag = mod.add_item({ id: tool.id, type: "context_external_tool", url: tool.url, link_settings: link_settings })
+      tag = mod.add_item({ id: tool.id, type: "context_external_tool", url: tool.url, link_settings: })
 
       run_course_copy
 
@@ -978,7 +978,7 @@ describe ContentMigration do
     it "does not try to translate links to similarishly looking urls" do
       body = %(<p>link to external thing <a href="https://someotherexampledomain.com/users/what">sad</a></p>
         <p>another link to external thing <a href="https://someotherexampledomain2.com/files">so sad</a></p>)
-      page = @copy_from.wiki_pages.create!(title: "some page", body: body)
+      page = @copy_from.wiki_pages.create!(title: "some page", body:)
 
       run_course_copy
 

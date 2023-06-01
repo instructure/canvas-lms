@@ -229,7 +229,7 @@ class LearningOutcomeResult < ActiveRecord::Base
 
     if parent_mastery > 0 && alignment_mastery > 0
       { scale_percent: parent_mastery / alignment_mastery,
-        alignment_mastery: alignment_mastery }
+        alignment_mastery: }
     end
   end
 

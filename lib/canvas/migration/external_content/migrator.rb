@@ -87,7 +87,7 @@ module Canvas::Migration::ExternalContent
 
           if export_completed?(pending_export, key)
             service_data = retrieve_export_data(pending_export, key)
-            exported_content[key] = Canvas::Migration::ExternalContent::Translator.new(content_export: content_export).translate_data(service_data, :export) if service_data
+            exported_content[key] = Canvas::Migration::ExternalContent::Translator.new(content_export:).translate_data(service_data, :export) if service_data
             true
           end
         end

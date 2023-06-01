@@ -71,11 +71,11 @@ class NotificationPolicyOverride < ActiveRecord::Base
   end
 
   def self.enabled_for(user, context, channel: nil)
-    enabled_for_all_contexts(user, [context], channel: channel)
+    enabled_for_all_contexts(user, [context], channel:)
   end
 
   def self.enabled_for_all_contexts(user, contexts, channel: nil)
-    !(find_all_for(user, contexts, channel: channel).find { |npo| npo.notification_id.nil? && npo.workflow_state == "disabled" })
+    !(find_all_for(user, contexts, channel:).find { |npo| npo.notification_id.nil? && npo.workflow_state == "disabled" })
   end
 
   def self.find_all_for(user, contexts, channel: nil)
@@ -104,7 +104,7 @@ class NotificationPolicyOverride < ActiveRecord::Base
       unique_constraint_retry do
         notifications.each do |notification|
           np = communication_channel.notification_policy_overrides.find { |npo| npo.notification_id == notification.id && npo.context_id == context.id && npo.context_type == context.class.name }
-          np ||= communication_channel.notification_policy_overrides.build(notification: notification, context_id: context.id, context_type: context.class.name)
+          np ||= communication_channel.notification_policy_overrides.build(notification:, context_id: context.id, context_type: context.class.name)
           np.frequency = frequency
           np.save!
         end

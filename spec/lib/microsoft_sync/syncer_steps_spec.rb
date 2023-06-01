@@ -24,7 +24,7 @@ describe MicrosoftSync::SyncerSteps do
   let(:course) do
     course_model(name: "sync test course")
   end
-  let(:group) { MicrosoftSync::Group.create(course: course) }
+  let(:group) { MicrosoftSync::Group.create(course:) }
   let(:graph_service_helpers) do
     instance_double(
       MicrosoftSync::GraphServiceHelpers,
@@ -73,7 +73,7 @@ describe MicrosoftSync::SyncerSteps do
   def new_http_error(code, headers = {})
     MicrosoftSync::Errors::HTTPInvalidStatus.for(
       response: double(
-        "response", code: code, body: "", headers: HTTParty::Response::Headers.new(headers)
+        "response", code:, body: "", headers: HTTParty::Response::Headers.new(headers)
       ),
       service: "test",
       tenant: "test"
@@ -124,7 +124,7 @@ describe MicrosoftSync::SyncerSteps do
       context "when hitting the Microsoft API raises a #{error_class}" do
         it "returns a Retry object" do
           expect(graph_service.http).to receive(:request).and_raise(error_class.new)
-          expect_retry(subject, error_class: error_class, **retry_args)
+          expect_retry(subject, error_class:, **retry_args)
         end
       end
     end
@@ -243,9 +243,9 @@ describe MicrosoftSync::SyncerSteps do
     subject { syncer_steps.step_full_sync_prerequisites(nil, nil) }
 
     before do
-      n_students_in_course(2, course: course)
-      teacher_in_course(course: course, active_enrollment: true)
-      teacher_in_course(course: course, active_enrollment: true)
+      n_students_in_course(2, course:)
+      teacher_in_course(course:, active_enrollment: true)
+      teacher_in_course(course:, active_enrollment: true)
     end
 
     context "when the max enrollments in a course was not reached" do
@@ -405,13 +405,13 @@ describe MicrosoftSync::SyncerSteps do
     let(:batch_size) { 4 }
 
     let!(:students) do
-      n_students_in_course(batch_size - 1, course: course)
+      n_students_in_course(batch_size - 1, course:)
     end
 
     let!(:teachers) do
       [
-        teacher_in_course(course: course, active_enrollment: true),
-        teacher_in_course(course: course, active_enrollment: true)
+        teacher_in_course(course:, active_enrollment: true),
+        teacher_in_course(course:, active_enrollment: true)
       ].map(&:user)
     end
 
@@ -650,8 +650,8 @@ describe MicrosoftSync::SyncerSteps do
     def membership_change_result_double(total_unsuccessful = 0, to_json = "", nonexistent_users = [])
       instance_double(
         MicrosoftSync::GraphService::GroupMembershipChangeResult,
-        to_json: to_json,
-        total_unsuccessful: total_unsuccessful,
+        to_json:,
+        total_unsuccessful:,
         blank?: total_unsuccessful == 0,
         present?: total_unsuccessful != 0,
         nonexistent_user_ids: nonexistent_users
@@ -933,8 +933,8 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when there are changes to process" do
       let(:n_students) { 1 }
-      let!(:students) { 1.upto(n_students).map { student_in_course(course: course).user } }
-      let!(:teacher) { teacher_in_course(course: course, active_enrollment: true).user }
+      let!(:students) { 1.upto(n_students).map { student_in_course(course:).user } }
+      let!(:teacher) { teacher_in_course(course:, active_enrollment: true).user }
 
       before do
         students.each_with_index do |student, index|
@@ -952,7 +952,7 @@ describe MicrosoftSync::SyncerSteps do
       def create_partial_sync_change(e_type, user, course_for_psc = nil)
         course_for_psc ||= course
         MicrosoftSync::PartialSyncChange.create!(
-          course: course_for_psc, enrollment_type: e_type, user: user
+          course: course_for_psc, enrollment_type: e_type, user:
         )
       end
 
@@ -1047,7 +1047,7 @@ describe MicrosoftSync::SyncerSteps do
 
         %w[completed deleted inactive invited rejected].each do |state|
           it "ignores #{state} enrollments" do
-            Enrollment.where(course: course, user: students[0]).update_all(workflow_state: state)
+            Enrollment.where(course:, user: students[0]).update_all(workflow_state: state)
             subject
             expect(diff).to_not have_received(:set_local_member).with(students[0].id, "StudentEnrollment")
             expect(diff).to have_received(:set_local_member).with(students[2].id, "StudentEnrollment")
@@ -1055,7 +1055,7 @@ describe MicrosoftSync::SyncerSteps do
         end
 
         it "ignores StudentViewEnrollment (fake) enrollments" do
-          Enrollment.where(course: course, user: students[0]).update_all(type: "StudentViewEnrollment")
+          Enrollment.where(course:, user: students[0]).update_all(type: "StudentViewEnrollment")
           subject
           expect(diff).to_not have_received(:set_local_member).with(students[0].id, anything)
         end

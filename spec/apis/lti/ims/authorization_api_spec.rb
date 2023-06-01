@@ -33,7 +33,7 @@ module Lti
           product_code: "abc",
           vendor_name: "acme",
           root_account: account,
-          developer_key: developer_key
+          developer_key:
         )
       end
       let(:tool_proxy) do
@@ -41,7 +41,7 @@ module Lti
           context: account,
           guid: SecureRandom.uuid,
           shared_secret: "abc",
-          product_family: product_family,
+          product_family:,
           product_version: "1",
           workflow_state: "active",
           raw_data: { "enabled_capability" => ["Security.splitSecret"] },
@@ -75,23 +75,23 @@ module Lti
 
       describe "POST 'authorize'" do
         it "responds with 200" do
-          post auth_endpoint, params: params
+          post(auth_endpoint, params:)
           expect(response).to have_http_status :ok
         end
 
         it "includes an expiration" do
           Setting.set("lti.oauth2.access_token.expiration", 1.hour.to_s)
-          post auth_endpoint, params: params
+          post(auth_endpoint, params:)
           expect(JSON.parse(response.body)["expires_in"]).to eq 1.hour.to_s
         end
 
         it "has a token_type of bearer" do
-          post auth_endpoint, params: params
+          post(auth_endpoint, params:)
           expect(JSON.parse(response.body)["token_type"]).to eq "bearer"
         end
 
         it "returns an access_token" do
-          post auth_endpoint, params: params
+          post(auth_endpoint, params:)
           access_token = Lti::OAuth2::AccessToken.create_jwt(aud: @request.host, sub: tool_proxy.guid)
           expect { access_token.validate! }.not_to raise_error
         end
@@ -100,24 +100,24 @@ module Lti
           tool_proxy.raw_data["enabled_capability"].delete("Security.splitSecret")
           tool_proxy.raw_data["enabled_capability"] << "OAuth.splitSecret"
           tool_proxy.save!
-          post auth_endpoint, params: params
+          post(auth_endpoint, params:)
           expect(response).to have_http_status :ok
         end
 
         it "renders a 400 if the JWT format is invalid" do
           params[:assertion] = "12ad3.4fgs56"
-          post auth_endpoint, params: params
+          post(auth_endpoint, params:)
           expect(response).to have_http_status :bad_request
         end
 
         it "renders a the correct json if the grant_type is invalid" do
           params[:assertion] = "12ad3.4fgs56"
-          post auth_endpoint, params: params
+          post(auth_endpoint, params:)
           expect(response.body).to eq({ error: "invalid_grant" }.to_json)
         end
 
         it "adds the file_host and the request host to the aud" do
-          post auth_endpoint, params: params
+          post(auth_endpoint, params:)
           file_host, _ = HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
           jwt = JSON::JWT.decode(JSON.parse(response.body)["access_token"], :skip_verification)
           expect(jwt["aud"]).to match_array [request.host, file_host]
@@ -125,7 +125,7 @@ module Lti
 
         context "when the account has a vanity domain" do
           subject do
-            post auth_endpoint, params: params
+            post(auth_endpoint, params:)
             JSON::JWT.decode(JSON.parse(response.body)["access_token"], :skip_verification)
           end
 
@@ -147,13 +147,13 @@ module Lti
         context "error reports" do
           it "creates an error report with error as the message" do
             params[:assertion] = "12ad3.4fgs56"
-            post auth_endpoint, params: params
+            post(auth_endpoint, params:)
             expect(ErrorReport.last.message).to eq "Invalid JWT Format. JWT should include 3 or 5 segments."
           end
 
           it "sets the error report category" do
             params[:assertion] = "12ad3.4fgs56"
-            post auth_endpoint, params: params
+            post(auth_endpoint, params:)
             expect(ErrorReport.last.category).to eq "JSON::JWT::InvalidFormat"
           end
         end
@@ -192,7 +192,7 @@ module Lti
 
           it "accepts a valid reg_key" do
             enable_cache do
-              post auth_endpoint, params: params
+              post(auth_endpoint, params:)
               expect(response).to have_http_status :ok
             end
           end
@@ -230,7 +230,7 @@ module Lti
           end
 
           it "accepts a developer key with a reg key" do
-            post auth_endpoint, params: params
+            post(auth_endpoint, params:)
             expect(response).to have_http_status :ok
           end
         end

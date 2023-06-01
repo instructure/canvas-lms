@@ -114,7 +114,7 @@ describe "course people" do
 
     def add_user_to_second_section(role = nil, enrollment_state = "invited")
       role ||= student_role
-      student_in_course(user: user_with_pseudonym, role: role, enrollment_state: enrollment_state)
+      student_in_course(user: user_with_pseudonym, role:, enrollment_state:)
       section_name = "Another Section"
       add_section(section_name)
       # open tab
@@ -367,7 +367,7 @@ describe "course people" do
       it "creates new observer enrollments as custom type when adding observees" do
         role = custom_observer_role("custom observer")
         student_in_course course: @course
-        course_with_observer(course: @course, role: role)
+        course_with_observer(course: @course, role:)
 
         go_to_people_page
 

@@ -83,7 +83,7 @@ describe "duplicate discussion" do
         end
 
         def create_topic_and_go_to_index_page(user, topic_title)
-          @group.discussion_topics.create!(user: user, title: topic_title, message: "blahblahblah")
+          @group.discussion_topics.create!(user:, title: topic_title, message: "blahblahblah")
           user_session(user)
           get group_discussion_index_url(@group)
         end

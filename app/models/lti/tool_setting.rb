@@ -41,9 +41,9 @@ module Lti
     end
 
     def message_handler(mh_context)
-      MessageHandler.by_resource_codes(vendor_code: vendor_code,
-                                       product_code: product_code,
-                                       resource_type_code: resource_type_code,
+      MessageHandler.by_resource_codes(vendor_code:,
+                                       product_code:,
+                                       resource_type_code:,
                                        context: mh_context)
     end
 

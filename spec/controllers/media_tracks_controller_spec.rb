@@ -49,7 +49,7 @@ describe MediaTracksController do
       it "creates a track" do
         expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
         content = "one track mind"
-        post "create", params: { media_object_id: @mo.media_id, kind: "subtitles", locale: "en", content: content }
+        post "create", params: { media_object_id: @mo.media_id, kind: "subtitles", locale: "en", content: }
         expect(response).to be_successful
         expect(json_parse(response.body)["media_id"]).to eq @mo.media_id
         track = @mo.media_tracks.last
@@ -74,7 +74,7 @@ describe MediaTracksController do
       it "respects the exclude[] option" do
         expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
         content = "one track mind"
-        post "create", params: { media_object_id: @mo.media_id, kind: "subtitles", locale: "en", content: content, exclude: ["tracks"] }
+        post "create", params: { media_object_id: @mo.media_id, kind: "subtitles", locale: "en", content:, exclude: ["tracks"] }
         expect(response).to be_successful
         rbody = json_parse(response.body)
         expect(rbody["media_id"]).to eq @mo.media_id
@@ -277,7 +277,7 @@ describe MediaTracksController do
     describe "#create" do
       it "creates a track" do
         content = "one track mind"
-        post "create", params: { attachment_id: @attachment.id, kind: "subtitles", locale: "en", content: content }
+        post "create", params: { attachment_id: @attachment.id, kind: "subtitles", locale: "en", content: }
         expect(response).to be_successful
         expect(json_parse(response.body)["media_object_id"]).to eq @mo.id
         track = @attachment.media_tracks.last
@@ -289,7 +289,7 @@ describe MediaTracksController do
         @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs 1", user_id: @teacher.id)
         attachment2 = attachment_model(context: @user, media_entry_id: @mo.media_id, media_object: @mo)
         track2 = attachment2.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs 2", media_object: @mo)
-        post "create", params: { attachment_id: @attachment.id, kind: "subtitles", locale: "en", content: content }
+        post "create", params: { attachment_id: @attachment.id, kind: "subtitles", locale: "en", content: }
         expect(response).to be_successful
         expect(json_parse(response.body)["id"]).to eq track2.id
         track = @attachment.media_tracks.last

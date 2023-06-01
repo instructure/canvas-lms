@@ -23,8 +23,8 @@ require "spec_helper"
 describe GradeChangeAuditApiController do
   let_once(:admin) { account_admin_user }
   let_once(:course) { Course.create! }
-  let_once(:teacher) { course_with_user("TeacherEnrollment", name: "Teacher", course: course, active_all: true).user }
-  let_once(:student) { course_with_user("StudentEnrollment", name: "Student", course: course, active_all: true).user }
+  let_once(:teacher) { course_with_user("TeacherEnrollment", name: "Teacher", course:, active_all: true).user }
+  let_once(:student) { course_with_user("StudentEnrollment", name: "Student", course:, active_all: true).user }
   let_once(:assignment) { course.assignments.create!(name: "an assignment") }
 
   let(:returned_events) { json_parse(response.body).fetch("events") }
@@ -47,12 +47,12 @@ describe GradeChangeAuditApiController do
     end
 
     it "returns events" do
-      get :for_assignment, params: params
+      get(:for_assignment, params:)
       expect(events_for_assignment.count).to eq(1)
     end
 
     it "returns events with the student's id included" do
-      get :for_assignment, params: params
+      get(:for_assignment, params:)
       expect(student_ids).to include(student.id.to_s)
     end
 
@@ -64,7 +64,7 @@ describe GradeChangeAuditApiController do
           old_score: nil,
           score: student.enrollments.first.find_score
         )
-        Auditors::GradeChange.record(override_grade_change: override_grade_change)
+        Auditors::GradeChange.record(override_grade_change:)
       end
 
       let(:returned_event_assignment_ids) do
@@ -135,11 +135,11 @@ describe GradeChangeAuditApiController do
           score_record.update!(override_score: new_score)
           override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
             grader: teacher,
-            old_grade: old_grade,
-            old_score: old_score,
+            old_grade:,
+            old_score:,
             score: score_record
           )
-          Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          Auditors::GradeChange.record(override_grade_change:)
         end
 
         context "for scores not in a grading period" do
@@ -177,7 +177,7 @@ describe GradeChangeAuditApiController do
             )
           end
           let(:grading_period_score) do
-            Score.create!(grading_period: grading_period, enrollment: student.enrollments.first)
+            Score.create!(grading_period:, enrollment: student.enrollments.first)
           end
 
           before do
@@ -213,7 +213,7 @@ describe GradeChangeAuditApiController do
     end
 
     it "returns events with the student's id included" do
-      get :for_course, params: params
+      get(:for_course, params:)
       expect(student_ids).to include(student.id.to_s)
     end
 
@@ -226,12 +226,12 @@ describe GradeChangeAuditApiController do
       end
 
       it "returns events" do
-        get :for_course, params: params
+        get(:for_course, params:)
         expect(events_for_assignment.count).to be >= 2
       end
 
       it "returns events without the student id included" do
-        get :for_course, params: params
+        get(:for_course, params:)
         expect(student_ids).to be_empty
       end
     end
@@ -245,7 +245,7 @@ describe GradeChangeAuditApiController do
     end
 
     it "returns events with the student's id included" do
-      get :for_student, params: params
+      get(:for_student, params:)
       expect(student_ids).to include(student.id.to_s)
     end
 
@@ -258,7 +258,7 @@ describe GradeChangeAuditApiController do
       end
 
       it "returns no events" do
-        get :for_student, params: params
+        get(:for_student, params:)
         expect(events_for_assignment).to be_empty
       end
     end
@@ -272,7 +272,7 @@ describe GradeChangeAuditApiController do
     end
 
     it "returns events with the student's id included" do
-      get :for_grader, params: params
+      get(:for_grader, params:)
       expect(student_ids).to include(student.id.to_s)
     end
 
@@ -285,12 +285,12 @@ describe GradeChangeAuditApiController do
       end
 
       it "returns events" do
-        get :for_grader, params: params
+        get(:for_grader, params:)
         expect(events_for_assignment.count).to be >= 2
       end
 
       it "returns events without the student id included" do
-        get :for_grader, params: params
+        get(:for_grader, params:)
         expect(student_ids).to be_empty
       end
     end
@@ -311,7 +311,7 @@ describe GradeChangeAuditApiController do
     end
 
     it "returns events with the student's id included" do
-      get :query, params: params
+      get(:query, params:)
       expect(student_ids).to include(student.id.to_s)
     end
 
@@ -325,7 +325,7 @@ describe GradeChangeAuditApiController do
 
       context "and student_id present in params" do
         it "returns no events" do
-          get :query, params: params
+          get(:query, params:)
           expect(events_for_assignment).to be_empty
         end
       end
@@ -337,7 +337,7 @@ describe GradeChangeAuditApiController do
         end
 
         it "returns events without the student id included" do
-          get :query, params: params
+          get(:query, params:)
           expect(student_ids).to be_empty
         end
       end
@@ -389,7 +389,7 @@ describe GradeChangeAuditApiController do
       end
 
       it "returns only grade changes for the assignment when a legitimate assignment ID is specified" do
-        get :query, params: params
+        get(:query, params:)
         expect(returned_assignment_ids.uniq).to contain_exactly(assignment.id)
       end
     end
@@ -404,7 +404,7 @@ describe GradeChangeAuditApiController do
           old_score: nil,
           score: student.enrollments.first.find_score
         )
-        Auditors::GradeChange.record(override_grade_change: override_grade_change)
+        Auditors::GradeChange.record(override_grade_change:)
       end
 
       it "returns override grade changes" do

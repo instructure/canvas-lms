@@ -59,7 +59,7 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
     end
 
     let(:submission) do
-      s = assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)
+      s = assignment.submissions.first || Submission.find_or_initialize_by(assignment:, user: @user)
 
       submission_version_data.each do |d|
         s.score = d[:score]
@@ -174,7 +174,7 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
     end
 
     let(:submission) do
-      s = assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)
+      s = assignment.submissions.first || Submission.find_or_initialize_by(assignment:, user: @user)
 
       s.with_versioning(explicit: true) { s.save! }
       submission_version_data.each do |d|

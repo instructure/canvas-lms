@@ -18,7 +18,7 @@
 #
 module CanvasCassandra
   class Database
-    CONSISTENCY_CLAUSE = /%CONSISTENCY% ?/.freeze
+    CONSISTENCY_CLAUSE = /%CONSISTENCY% ?/
 
     def initialize(fingerprint, servers, opts, logger)
       thrift_opts = {}
@@ -163,7 +163,7 @@ module CanvasCassandra
     #   { "colname" => [oldvalue, newvalue] }
     def update_record(table_name, primary_key_attrs, changes, ttl_seconds = nil, execute_options: {})
       batch do
-        do_update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options: execute_options)
+        do_update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options:)
       end
     end
 
@@ -172,7 +172,7 @@ module CanvasCassandra
     # records for them
     def insert_record(table_name, primary_key_attrs, changes, ttl_seconds = nil, execute_options: {})
       changes = changes.reject { |_k, v| v.is_a?(Array) ? v.last.nil? : v.nil? }
-      update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options: execute_options)
+      update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options:)
     end
 
     def select_value(query, *args)

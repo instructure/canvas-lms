@@ -68,9 +68,9 @@ class DiscussionEntriesController < ApplicationController
                                   methods: [:user_name, :read_state],
                                   permissions: {
                                     user: @current_user,
-                                    session: session
+                                    session:
                                   })
-            render(json: json, status: :created)
+            render(json:, status: :created)
           end
         else
           respond_to_bad_request(format, "new")
@@ -239,7 +239,7 @@ class DiscussionEntriesController < ApplicationController
   #
   # Returns nothing.
   def respond_to_bad_request(format, action)
-    format.html { render(action: action) }
+    format.html { render(action:) }
     format.json { render(json: @entry.errors, status: :bad_request) }
   end
 end

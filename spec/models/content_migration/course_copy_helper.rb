@@ -72,8 +72,8 @@ shared_context "course copy" do
     @copy_to.reload
   end
 
-  def run_export_and_import(&block)
-    export = run_export(&block)
+  def run_export_and_import(&)
+    export = run_export(&)
     run_import(export.attachment_id)
     expect(@cm.reload.source_course).to eq @copy_from
   end

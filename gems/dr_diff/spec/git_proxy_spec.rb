@@ -136,7 +136,7 @@ module DrDiff
 
       context "not dirty" do
         let(:sha) { "12345abc" }
-        let(:git_proxy) { described_class.new(sha: sha) }
+        let(:git_proxy) { described_class.new(sha:) }
         let(:clean_cmd) { "git diff-tree --no-commit-id --name-status -r #{sha}" }
 
         before do

@@ -41,7 +41,7 @@ describe ScoreStatisticsGenerator do
     scores = [10, 20]
     @assignments.each_with_index do |assignment, index|
       if scores[index]
-        submission = Submission.find_by!(user: @student, assignment: assignment)
+        submission = Submission.find_by!(user: @student, assignment:)
         submission.update!(score: scores[index], workflow_state: "graded", posted_at: Time.now.utc)
       end
     end
@@ -115,7 +115,7 @@ describe ScoreStatisticsGenerator do
       }
       scores.each do |student, student_scores|
         @assignments.each_with_index do |assignment, index|
-          submission = Submission.find_by!(user: student, assignment: assignment)
+          submission = Submission.find_by!(user: student, assignment:)
           submission.update!(score: student_scores[index], workflow_state: "graded", posted_at: Time.now.utc)
         end
       end

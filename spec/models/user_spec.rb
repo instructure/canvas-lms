@@ -321,9 +321,9 @@ describe User do
     p2.account = account2
     p1.save!
     p2.save!
-    account1.account_users.create!(user: user)
-    account2.account_users.create!(user: user)
-    sub.account_users.create!(user: user)
+    account1.account_users.create!(user:)
+    account2.account_users.create!(user:)
+    sub.account_users.create!(user:)
 
     course1 = account1.courses.create
     course2 = account2.courses.create
@@ -525,7 +525,7 @@ describe User do
       enrollment = course.enroll_student(user)
       expect(enrollment).to be_invited
       expect(user.user_account_associations).to eq []
-      Account.default.account_users.create!(user: user)
+      Account.default.account_users.create!(user:)
       expect(user.user_account_associations.reload).to eq []
       user.pseudonyms.create!(unique_id: "test@example.com")
       expect(user.user_account_associations.reload).to eq []
@@ -895,7 +895,7 @@ describe User do
         before(:once) do
           @shard2.activate do
             account = Account.create!
-            course_with_teacher(account: account, active_all: true)
+            course_with_teacher(account:, active_all: true)
 
             observer_enrollment = @observer_course.enroll_user(@teacher, "ObserverEnrollment", enrollment_state: "active")
             observer_enrollment.associated_user_id = @student.id
@@ -1112,7 +1112,7 @@ describe User do
         role = custom_account_role("Restricted", account: @account)
         account_admin_user_with_role_changes(
           user: restricted_admin,
-          role: role,
+          role:,
           role_changes: { become_user: true, view_all_grades: false }
         )
         expect(user.can_masquerade?(restricted_admin, @account)).to be_truthy
@@ -1125,9 +1125,9 @@ describe User do
         let(:role2) { custom_designer_role("Custom Designer Role", account: @account) }
 
         it "handles multiple course admin type roles" do
-          course_with_user("TeacherEnrollment", user: user, active_all: true)
-          course_with_user("TeacherEnrollment", user: user, role: role1, active_all: true)
-          course_with_user("DesignerEnrollment", user: user, role: role2, active_all: true)
+          course_with_user("TeacherEnrollment", user:, active_all: true)
+          course_with_user("TeacherEnrollment", user:, role: role1, active_all: true)
+          course_with_user("DesignerEnrollment", user:, role: role2, active_all: true)
 
           permissions = User.all_course_admin_type_permissions_for(user)
 
@@ -1140,14 +1140,14 @@ describe User do
         end
 
         it "excludes course admin enrollments that are not active" do
-          course_with_user("TeacherEnrollment", user: user)
+          course_with_user("TeacherEnrollment", user:)
 
           permissions = User.all_course_admin_type_permissions_for(user)
           expect(permissions.values.all?(&:empty?)).to be_truthy
         end
 
         it "excludes non course admin type roles" do
-          course_with_user("StudentEnrollment", user: user, active_all: true)
+          course_with_user("StudentEnrollment", user:, active_all: true)
 
           permissions = User.all_course_admin_type_permissions_for(user)
           expect(permissions.values.all?(&:empty?)).to be_truthy
@@ -1215,7 +1215,7 @@ describe User do
       user = user_with_pseudonym(username: "nobody1@example.com")
       @restricted_admin = user_with_pseudonym(username: "nobody3@example.com")
       role = custom_account_role("Restricted", account: Account.default)
-      account_admin_user_with_role_changes(user: @restricted_admin, role: role, role_changes: { become_user: true })
+      account_admin_user_with_role_changes(user: @restricted_admin, role:, role_changes: { become_user: true })
       @admin = user_with_pseudonym(username: "nobody2@example.com")
       Account.default.account_users.create!(user: @admin)
       expect(user.can_masquerade?(@restricted_admin, Account.default)).to be_truthy
@@ -1324,7 +1324,7 @@ describe User do
       it "works cross-shard" do
         @shard1.activate do
           account = Account.create!
-          course_with_teacher(account: account, active_all: true)
+          course_with_teacher(account:, active_all: true)
           course_with_student(course: @course, user: @student1, active_all: true)
           expect(@student1.check_courses_right?(@teacher, :read_forum)).to be true
         end
@@ -1338,7 +1338,7 @@ describe User do
       @student = user_model
       tie_user_to_account(@admin, role: admin_role)
       role = custom_account_role("CustomStudent", account: Account.default)
-      tie_user_to_account(@student, role: role)
+      tie_user_to_account(@student, role:)
       set_up_course_with_users
     end
 
@@ -2205,7 +2205,7 @@ describe User do
       before :once do
         @shard1.activate do
           account = Account.create!
-          user_with_pseudonym(active_all: 1, account: account, password: "qwertyuiop")
+          user_with_pseudonym(active_all: 1, account:, password: "qwertyuiop")
         end
       end
 
@@ -2369,7 +2369,7 @@ describe User do
           # create three sections and three child events that will be retrieved in the same order
           data = {}
           @sections.each_with_index do |section, i|
-            data[i] = { start_at: start_at, end_at: start_at + 1.day, context_code: section.asset_string }
+            data[i] = { start_at:, end_at: start_at + 1.day, context_code: section.asset_string }
             start_at += 1.day
           end
           event = @course.calendar_events.build(title: "event", child_event_data: data)
@@ -2644,28 +2644,28 @@ describe User do
 
     it "is required if admin and required_for_admins" do
       account = Account.create!(settings: { mfa_settings: :required_for_admins })
-      user.pseudonyms.create!(account: account, unique_id: "user")
+      user.pseudonyms.create!(account:, unique_id: "user")
 
       expect(user.mfa_settings).to eq :optional
-      account.account_users.create!(user: user)
+      account.account_users.create!(user:)
       user.reload
       expect(user.mfa_settings).to eq :required
     end
 
     it "required_for_admins shouldn't get confused by admins in other accounts" do
       account = Account.create!(settings: { mfa_settings: :required_for_admins })
-      user.pseudonyms.create!(account: account, unique_id: "user")
+      user.pseudonyms.create!(account:, unique_id: "user")
       user.pseudonyms.create!(account: Account.default, unique_id: "user")
 
-      Account.default.account_users.create!(user: user)
+      Account.default.account_users.create!(user:)
 
       expect(user.mfa_settings).to eq :optional
     end
 
     it "short circuits when a hint is provided" do
       account = Account.create!(settings: { mfa_settings: :required_for_admins })
-      p = user.pseudonyms.create!(account: account, unique_id: "user")
-      account.account_users.create!(user: user)
+      p = user.pseudonyms.create!(account:, unique_id: "user")
+      account.account_users.create!(user:)
 
       expect(user).not_to receive(:pseudonyms)
       expect(user.mfa_settings(pseudonym_hint: p)).to eq :required
@@ -2675,7 +2675,7 @@ describe User do
       account = Account.create(settings: { mfa_settings: :optional })
       ap = account.canvas_authentication_provider
       ap.update!(mfa_required: true)
-      p = user.pseudonyms.create!(account: account, unique_id: "user", authentication_provider: ap)
+      p = user.pseudonyms.create!(account:, unique_id: "user", authentication_provider: ap)
 
       expect(user.mfa_settings).to eq :required
 
@@ -3135,7 +3135,7 @@ describe User do
       before(:once) do
         root_account = Account.default
         @root_admin = account_admin_user(account: root_account)
-        sub_account = Account.create!(root_account: root_account)
+        sub_account = Account.create!(root_account:)
         @sub_admin = account_admin_user(account: sub_account)
         @student = course_with_student(account: sub_account, active_all: true).user
       end
@@ -3176,9 +3176,9 @@ describe User do
         # create account on another shard
         account = @shard1.activate { Account.create! }
         # associate target user with that account
-        account_admin_user(user: target, account: account, role: Role.get_built_in_role("AccountMembership", root_account_id: account.id))
+        account_admin_user(user: target, account:, role: Role.get_built_in_role("AccountMembership", root_account_id: account.id))
         # create seeking user as admin on that account
-        seeker = account_admin_user(account: account, role: Role.get_built_in_role("AccountAdmin", root_account_id: account.id))
+        seeker = account_admin_user(account:, role: Role.get_built_in_role("AccountAdmin", root_account_id: account.id))
         # ensure seeking user gets permissions it should on target user
         expect(target.grants_right?(seeker, :view_statistics)).to be_truthy
       end
@@ -3188,9 +3188,9 @@ describe User do
         # create account on another shard
         account = @shard1.activate { Account.create! }
         # associate target user with that account
-        account_admin_user(user: target, account: account, role: Role.get_built_in_role("AccountMembership", root_account_id: account.id))
+        account_admin_user(user: target, account:, role: Role.get_built_in_role("AccountMembership", root_account_id: account.id))
         # create seeking user as admin on that account
-        seeker = account_admin_user(account: account, role: Role.get_built_in_role("AccountAdmin", root_account_id: account.id))
+        seeker = account_admin_user(account:, role: Role.get_built_in_role("AccountAdmin", root_account_id: account.id))
         allow(seeker).to receive(:associated_shards).and_return([])
         # ensure seeking user gets permissions it should on target user
         expect(target.grants_right?(seeker, :view_statistics)).to be true
@@ -3200,7 +3200,7 @@ describe User do
         account = Account.default
         target = user_factory
         seeker = account_admin_user(
-          account: account,
+          account:,
           role: Role.get_built_in_role("AccountAdmin", root_account_id: account.id)
         )
         # ensure seeking user gets permissions it should on target user
@@ -3727,27 +3727,27 @@ describe User do
     end
 
     it "returns true when user is student and a course is active" do
-      course_with_student(user: user, active_all: true)
+      course_with_student(user:, active_all: true)
       expect(user.has_student_enrollment?).to be true
     end
 
     it "returns true when user is student and no courses are active" do
-      course_with_student(user: user, active_all: false)
+      course_with_student(user:, active_all: false)
       expect(user.has_student_enrollment?).to be true
     end
 
     it "returns false when user is teacher" do
-      course_with_teacher(user: user)
+      course_with_teacher(user:)
       expect(user.has_student_enrollment?).to be false
     end
 
     it "returns false when user is TA" do
-      course_with_ta(user: user)
+      course_with_ta(user:)
       expect(user.has_student_enrollment?).to be false
     end
 
     it "returns false when user is designer" do
-      course_with_designer(user: user)
+      course_with_designer(user:)
       expect(user.has_student_enrollment?).to be false
     end
   end
@@ -3756,7 +3756,7 @@ describe User do
     let(:user) { User.create! }
 
     before do
-      course_with_student(user: user, active_all: true)
+      course_with_student(user:, active_all: true)
     end
 
     it "includes courses for current enrollments" do
@@ -3800,8 +3800,8 @@ describe User do
     end
 
     it "includes unrestricted but not restricted course" do
-      course_with_student course: @restricted, user: user, active_all: true
-      course_with_student course: @unrestricted, user: user, active_all: true
+      course_with_student course: @restricted, user:, active_all: true
+      course_with_student course: @unrestricted, user:, active_all: true
 
       expect(user.participating_student_current_and_unrestricted_concluded_course_ids).to include(@unrestricted.id)
       expect(user.participating_student_current_and_unrestricted_concluded_course_ids).not_to include(@restricted.id)
@@ -3809,8 +3809,8 @@ describe User do
 
     it "includes unrestricted concluded and restricted current course" do
       @restricted.update(conclude_at: nil, restrict_enrollments_to_course_dates: false)
-      course_with_student course: @restricted, user: user, active_all: true
-      course_with_student course: @unrestricted, user: user, active_all: true
+      course_with_student course: @restricted, user:, active_all: true
+      course_with_student course: @unrestricted, user:, active_all: true
 
       expect(user.participating_student_current_and_unrestricted_concluded_course_ids)
         .to contain_exactly(@restricted.id, @unrestricted.id)

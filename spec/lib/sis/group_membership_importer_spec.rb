@@ -56,7 +56,7 @@ module SIS
         group_category.self_signup = "restricted"
         group_category.save!
 
-        group = create_group(group_category: group_category)
+        group = create_group(group_category:)
 
         importer = GroupMembershipImporter.new(Account.default, { batch: Account.default.sis_batches.create! })
         expect do

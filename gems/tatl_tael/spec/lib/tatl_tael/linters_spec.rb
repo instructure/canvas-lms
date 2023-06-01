@@ -27,7 +27,7 @@ describe TatlTael::Linters do
       let(:change) { Struct.new(:status, :path) }
 
       let(:config) { {} }
-      let(:base_linter) { TatlTael::Linters::BaseLinter.new(config: config, changes: changes) }
+      let(:base_linter) { TatlTael::Linters::BaseLinter.new(config:, changes:) }
 
       before do
         allow(base_linter).to receive(:changes)
@@ -109,7 +109,7 @@ describe TatlTael::Linters do
         }
       end
       let(:config) { {} }
-      let(:base_linter) { TatlTael::Linters::BaseLinter.new(config: config, changes: changes) }
+      let(:base_linter) { TatlTael::Linters::BaseLinter.new(config:, changes:) }
 
       before do
         allow(base_linter).to receive(:changes_matching)
@@ -160,7 +160,7 @@ describe TatlTael::Linters do
 
     it "collects linter comments" do
       expect(linters).to receive(:linters).and_return(saved_linters)
-      expect(linters.comments(changes: changes)).to match(%w[1 2 3])
+      expect(linters.comments(changes:)).to match(%w[1 2 3])
     end
   end
 end

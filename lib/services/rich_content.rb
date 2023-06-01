@@ -26,8 +26,8 @@ module Services
           env_hash[:JWT] = CanvasSecurity::ServicesJwt.for_user(
             domain,
             user,
-            context: context,
-            real_user: real_user,
+            context:,
+            real_user:,
             workflows: [:rich_content, :ui],
             # TODO: remove this once we teach the rcs to consume the asymmetric ones
             symmetric: true

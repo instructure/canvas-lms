@@ -160,29 +160,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "1481a5e5e16040b087f656003b867791bed506d85aab9b97e52e7f423e94636f",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/due_date_cacher.rb",
-      "line": 369,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.where(\"(assignment_id, user_id) IN (#{assignment_and_student_id_values(:entries => entries).join(\",\")})\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DueDateCacher",
-        "method": "current_cached_due_dates"
-      },
-      "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "150dbd548bbe1af48137626584625d719f51d50fa8c2649e855bf22a18195be6",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -505,6 +482,29 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "49d6924be10db58b5a5469276563f58598f27fe5b92e0403eaac76283ac8305c",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/due_date_cacher.rb",
+      "line": 380,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.where(\"(assignment_id, user_id) IN (#{assignment_and_student_id_values(:entries => entries).join(\",\")})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DueDateCacher",
+        "method": "record_due_date_changes_for_auditable_assignments!"
+      },
+      "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "4a61f864c1ece2dda2f4ec6a12a7226b3d028c9da0e27e0fb276f3faebb41c2d",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -538,6 +538,29 @@
       "render_path": null,
       "location": null,
       "user_input": "apply_limits(clone, start, finish, order).except(:select).select(primary_key).to_sql.hash.abs",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "50e7b4f647fa048d2e4449e92b7b4a0cb5c8a2f1f054de88e3430d8b0b1d246b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/due_date_cacher.rb",
+      "line": 369,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.where(\"(assignment_id, user_id) IN (#{assignment_and_student_id_values(:entries => entries).join(\",\")})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DueDateCacher",
+        "method": "current_cached_due_dates"
+      },
+      "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -1540,29 +1563,6 @@
       "note": ""
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "f0e794152474fca2b5322b6a44ab57a4ee9e27fb14107f64e47d82190a40a74c",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/due_date_cacher.rb",
-      "line": 380,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.where(\"(assignment_id, user_id) IN (#{assignment_and_student_id_values(:entries => entries).join(\",\")})\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DueDateCacher",
-        "method": "record_due_date_changes_for_auditable_assignments!"
-      },
-      "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Redirect",
       "warning_code": 18,
       "fingerprint": "f18c6627c65a531716401e8792725bca3c11c11129d387a2aa86074a6c409cd5",
@@ -1702,6 +1702,6 @@
       "note": ""
     }
   ],
-  "updated": "2023-06-01 15:13:38 -0500",
+  "updated": "2023-06-05 10:10:36 -0500",
   "brakeman_version": "5.4.1"
 }

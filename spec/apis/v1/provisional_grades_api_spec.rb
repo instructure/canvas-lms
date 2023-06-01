@@ -30,10 +30,10 @@ describe "Provisional Grades API", type: :request do
       course
     end
 
-    let_once(:teacher) { teacher_in_course(active_all: true, course: course).user }
-    let_once(:ta_1) { ta_in_course(active_all: true, course: course).user }
-    let_once(:ta_2) { ta_in_course(active_all: true, course: course).user }
-    let_once(:students) { Array.new(3) { |n| student_in_course(active_all: true, course: course, name: "Student #{n}").user } }
+    let_once(:teacher) { teacher_in_course(active_all: true, course:).user }
+    let_once(:ta_1) { ta_in_course(active_all: true, course:).user }
+    let_once(:ta_2) { ta_in_course(active_all: true, course:).user }
+    let_once(:students) { Array.new(3) { |n| student_in_course(active_all: true, course:, name: "Student #{n}").user } }
 
     let_once(:assignment) do
       course.assignments.create!(
@@ -55,7 +55,7 @@ describe "Provisional Grades API", type: :request do
     end
 
     def grade_student(assignment, student, grader, score)
-      graded_submissions = assignment.grade_student(student, grader: grader, score: score, provisional: true)
+      graded_submissions = assignment.grade_student(student, grader:, score:, provisional: true)
       graded_submissions.first.provisional_grade(grader)
     end
 

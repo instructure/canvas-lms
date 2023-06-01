@@ -30,7 +30,7 @@ class PactApiConsumerProxy
       # You can create an access token without having a pseudonym;
       # however, when Canvas receives a request and looks up the user
       # for that access token, it expects that user to have a pseudonym.
-      Pseudonym.create!(user: user, unique_id: "#{user.name}@instructure.com") if user.pseudonyms.empty?
+      Pseudonym.create!(user:, unique_id: "#{user.name}@instructure.com") if user.pseudonyms.empty?
       token = user.access_tokens.create!.full_token
 
       env[AUTH_HEADER] = "Bearer #{token}"

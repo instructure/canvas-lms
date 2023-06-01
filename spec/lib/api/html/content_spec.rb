@@ -74,10 +74,10 @@ module Api
           string = "<body><a href='http://somelink.com'>link</a></body>"
           host = "somelink.com"
           port = 80
-          expect(Html::Link).to receive(:new).with("http://somelink.com", host: host, port: port).and_return(
+          expect(Html::Link).to receive(:new).with("http://somelink.com", host:, port:).and_return(
             double(to_corrected_s: "http://otherlink.com")
           )
-          html = Content.new(string, host: host, port: port).modified_html
+          html = Content.new(string, host:, port:).modified_html
           expect(html).to match(/otherlink.com/)
         end
 

@@ -598,7 +598,7 @@ describe AccountsController do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
       name = "update the name to mark it as stuck"
-      @account.update({ name: name })
+      @account.update({ name: })
 
       new_account_name = "updated account name"
       put "update", params: { id: @account.id, "account[name]": new_account_name, override_sis_stickiness: false }, format: "json"
@@ -694,13 +694,13 @@ describe AccountsController do
       context "with :manage_storage_quotas" do
         before :once do
           role = custom_account_role "quota-setter", account: @account
-          @account.role_overrides.create! permission: "manage_account_settings",
+          @account.role_overrides.create!(permission: "manage_account_settings",
                                           enabled: true,
-                                          role: role
-          @account.role_overrides.create! permission: "manage_storage_quotas",
+                                          role:)
+          @account.role_overrides.create!(permission: "manage_storage_quotas",
                                           enabled: true,
-                                          role: role
-          @account.account_users.create!(user: @user, role: role)
+                                          role:)
+          @account.account_users.create!(user: @user, role:)
         end
 
         it "allows setting default quota (mb)" do
@@ -738,10 +738,10 @@ describe AccountsController do
       context "without :manage_storage_quotas" do
         before :once do
           role = custom_account_role "quota-example", account: @account
-          @account.role_overrides.create! permission: "manage_account_settings",
+          @account.role_overrides.create!(permission: "manage_account_settings",
                                           enabled: true,
-                                          role: role
-          @account.account_users.create!(user: @user, role: role)
+                                          role:)
+          @account.account_users.create!(user: @user, role:)
         end
 
         it "disallows setting default quota (mb)" do
@@ -899,7 +899,7 @@ describe AccountsController do
       end
 
       it "ignores changes from regular admins" do
-        user_session(account_admin_user(account: account))
+        user_session(account_admin_user(account:))
 
         expect do
           post "update", format: "json", params: { id: account.id, **payload }
@@ -1039,7 +1039,7 @@ describe AccountsController do
     it "loads account report details" do
       account_with_admin_logged_in
       report_type = AccountReport.available_reports.keys.first
-      report = @account.account_reports.create!(report_type: report_type, user: @admin)
+      report = @account.account_reports.create!(report_type:, user: @admin)
 
       get "reports_tab", params: { account_id: @account }
       expect(response).to be_successful
@@ -1162,7 +1162,7 @@ describe AccountsController do
   def admin_logged_in(account)
     user_session(user_factory)
     Account.site_admin.account_users.create!(user: @user)
-    account_with_admin_logged_in(account: account)
+    account_with_admin_logged_in(account:)
   end
 
   describe "terms of service" do
@@ -1383,10 +1383,10 @@ describe AccountsController do
       role = custom_account_role "non_course_reader", account: @account
       u = User.create(name: "billy bob")
       user_session(u)
-      @account.role_overrides.create! permission: "read_course_list",
+      @account.role_overrides.create!(permission: "read_course_list",
                                       enabled: false,
-                                      role: role
-      @account.account_users.create!(user: u, role: role)
+                                      role:)
+      @account.account_users.create!(user: u, role:)
       get "courses_api", params: { account_id: @account.id }
       assert_unauthorized
     end

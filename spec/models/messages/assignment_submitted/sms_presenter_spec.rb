@@ -23,10 +23,10 @@ require "spec_helper"
 describe Messages::AssignmentSubmitted::SMSPresenter do
   let(:course) { course_model(name: "MATH-101") }
   let(:assignment) { course.assignments.create!(name: "Introductions", due_at: 1.day.ago) }
-  let(:teacher) { course_with_teacher(course: course, active_all: true).user }
+  let(:teacher) { course_with_teacher(course:, active_all: true).user }
 
   let(:student) do
-    course_with_user("StudentEnrollment", course: course, name: "Adam Jones", active_all: true).user
+    course_with_user("StudentEnrollment", course:, name: "Adam Jones", active_all: true).user
   end
   let(:submission) do
     @submission = assignment.submit_homework(student)

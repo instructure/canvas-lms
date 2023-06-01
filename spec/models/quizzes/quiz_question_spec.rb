@@ -48,7 +48,7 @@ describe Quizzes::QuizQuestion do
       @short_answer_data = { question_name: "test question",
                              points_possible: "1",
                              question_type: "short_answer_question",
-                             answers: answers }
+                             answers: }
       @question = @quiz.quiz_questions.create(question_data: @short_answer_data)
     end
 
@@ -116,7 +116,7 @@ describe Quizzes::QuizQuestion do
           }
         ]
       }
-      qq = @quiz.quiz_questions.create(question_data: question_data)
+      qq = @quiz.quiz_questions.create(question_data:)
       expect(qq.question_data["correct_comments_html"]).not_to include("onerror")
       expect(qq.question_data["incorrect_comments_html"]).not_to include("onerror")
       expect(qq.question_data["neutral_comments_html"]).not_to include("onerror")

@@ -201,7 +201,7 @@ module CanvasCache
         disconnect if !@process_start || @process_start < since_when
       end
 
-      def process(commands, *a, &b)
+      def process(commands, *a, &)
         # These instance vars are used by the added #log_request_response method.
         @processing_requests = commands.map(&:dup)
         @process_start = Time.now.utc
@@ -258,7 +258,7 @@ module CanvasCache
         command = request.shift
         message = {
           message: "redis_request",
-          command: command,
+          command:,
           # request_size is the sum of all the string parameters send with the command.
           request_size: request.sum { |c| c.to_s.size },
           request_time_ms: ((Time.now.utc - start_time) * 1000).round(3),

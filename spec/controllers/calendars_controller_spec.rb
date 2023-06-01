@@ -103,7 +103,7 @@ describe CalendarsController do
       account.account_calendar_visible = true
       account.account_calendar_subscription_type = "auto"
       account.save!
-      @admin = account_admin_user(account: account, active_all: true)
+      @admin = account_admin_user(account:, active_all: true)
       @admin.set_preference(:enabled_account_calendars, account.id)
       get "show"
       expect(assigns[:contexts_json].find { |c| c[:type] == "account" }[:auto_subscribe]).to be(true)
@@ -115,7 +115,7 @@ describe CalendarsController do
       account.account_calendar_visible = true
       account.account_calendar_subscription_type = "auto"
       account.save!
-      @admin = account_admin_user(account: account, active_all: true)
+      @admin = account_admin_user(account:, active_all: true)
       @admin.set_preference(:enabled_account_calendars, account.id)
       get "show"
       expect(assigns[:contexts_json].find { |c| c[:type] == "account" }[:viewed_auto_subscribed_account_calendars]).to be(false)
@@ -148,7 +148,7 @@ describe CalendarsController do
       account = @course.account
       account.account_calendar_visible = true
       account.save!
-      @admin = account_admin_user(account: account, active_all: true)
+      @admin = account_admin_user(account:, active_all: true)
       @course.enroll_teacher(@admin, enrollment_state: :active)
       @admin.set_preference(:enabled_account_calendars, account.id)
       user_session(@admin)

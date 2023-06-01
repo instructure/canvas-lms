@@ -57,7 +57,7 @@ module Quizzes::LogAuditing
       SQL
       events = Quizzes::QuizSubmissionEvent.where(sql_string, {
                                                     qs_id: quiz_submission_id,
-                                                    attempt: attempt,
+                                                    attempt:,
                                                     filter: [
                                                       Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED,
                                                       Quizzes::QuizSubmissionEvent::EVT_QUESTION_FLAGGED

@@ -79,7 +79,7 @@ describe SisBatch do
     course = @account.courses.create!(name: "one", sis_source_id: "c1")
     user = user_with_managed_pseudonym(account: @account, sis_user_id: "u1")
     enrollment = course.enroll_user(user, "StudentEnrollment", enrollment_state: "active")
-    assignment = assignment_model(course: course)
+    assignment = assignment_model(course:)
     submission = assignment.find_or_create_submission(user)
     submission.submission_type = "online_quiz"
     submission.save!
@@ -106,7 +106,7 @@ describe SisBatch do
     course = @account.courses.create!(name: "one", sis_source_id: "c1", workflow_state: "available")
     user = user_with_managed_pseudonym(account: @account, sis_user_id: "u1")
     observer = user_with_managed_pseudonym(account: @account)
-    UserObservationLink.create_or_restore(observer: observer, student: user, root_account: @account)
+    UserObservationLink.create_or_restore(observer:, student: user, root_account: @account)
     student_enrollment = course.enroll_user(user, "StudentEnrollment", enrollment_state: "active")
     observer_enrollment = course.observer_enrollments.where(user_id: observer).take
 
@@ -119,7 +119,7 @@ describe SisBatch do
     run_jobs
     expect(student_enrollment.reload.workflow_state).to eq "active"
     expect(observer_enrollment.reload.workflow_state).to eq "active"
-    expect(InstStatsd::Statsd).to have_received(:increment).with("sis_batch_restored", tags: tags)
+    expect(InstStatsd::Statsd).to have_received(:increment).with("sis_batch_restored", tags:)
   end
 
   it "creates new linked observer enrollments when restoring enrollments" do
@@ -131,7 +131,7 @@ describe SisBatch do
     batch = process_csv_data([%(course_id,user_id,role,status,section_id
                                 c1,u1,student,deleted,)])
     expect(student_enrollment.reload.workflow_state).to eq "deleted"
-    UserObservationLink.create_or_restore(observer: observer, student: user, root_account: @account)
+    UserObservationLink.create_or_restore(observer:, student: user, root_account: @account)
     expect(course.observer_enrollments.where(user_id: observer).take).to be_nil # doesn't make a new enrollment
     batch.restore_states_for_batch
     run_jobs
@@ -1445,7 +1445,7 @@ test_1,u1,student,active)
       term = @account.enrollment_terms.first
       student = user_with_managed_pseudonym(account: @account, sis_user_id: "u1")
       observer = user_with_managed_pseudonym(account: @account, sis_user_id: "u2")
-      UserObservationLink.create_or_restore(observer: observer, student: student, root_account: @account)
+      UserObservationLink.create_or_restore(observer:, student:, root_account: @account)
 
       process_csv_data([%(section_id,user_id,role,status,course_id\n,u1,student,active,c1)], batch_mode: true, batch_mode_term: term)
       student_enrollment = course.enrollments.where(user: student).take
@@ -1475,7 +1475,7 @@ test_1,u1,student,active)
       term = @account.enrollment_terms.first
       student = user_with_managed_pseudonym(account: @account, sis_user_id: "u1")
       observer = user_with_managed_pseudonym(account: @account, sis_user_id: "u2")
-      UserObservationLink.create_or_restore(observer: observer, student: student, root_account: @account)
+      UserObservationLink.create_or_restore(observer:, student:, root_account: @account)
 
       process_csv_data([%(section_id,user_id,role,status,course_id\n,u1,student,active,c1)], batch_mode: true, batch_mode_term: term)
       student_enrollment = course.enrollments.where(user: student).take
@@ -1498,7 +1498,7 @@ test_1,u1,student,active)
       course.course_sections.create!(name: "s1", sis_source_id: "s1")
       student = user_with_managed_pseudonym(account: @account, sis_user_id: "stu")
       observer = user_with_managed_pseudonym(account: @account, sis_user_id: "obs")
-      UserObservationLink.create_or_restore(observer: observer, student: student, root_account: @account)
+      UserObservationLink.create_or_restore(observer:, student:, root_account: @account)
 
       # set up some enrollments outside the batch term so we can verify they are untouched
       other_term = @account.enrollment_terms.create!

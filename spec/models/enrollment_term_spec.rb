@@ -301,7 +301,7 @@ describe EnrollmentTerm do
       course.enroll_student(student, active_all: true)
       course.enroll_teacher(teacher, active_all: true)
       assignment = course.assignments.create!(due_at: due, points_possible: 10)
-      assignment.grade_student(student, grader: teacher, grade: grade)
+      assignment.grade_student(student, grader: teacher, grade:)
       [course, assignment]
     end
 
@@ -323,7 +323,7 @@ describe EnrollmentTerm do
       teacher = User.create!
       @first_course_in_term, @first_course_assignment = course_with_graded_assignment(
         account: root_account,
-        teacher: teacher,
+        teacher:,
         student: @student,
         term: @term,
         due: @now,
@@ -331,7 +331,7 @@ describe EnrollmentTerm do
       )
       @second_course_in_term, @second_course_assignment = course_with_graded_assignment(
         account: root_account,
-        teacher: teacher,
+        teacher:,
         student: @student,
         term: @term,
         due: @now,
@@ -339,7 +339,7 @@ describe EnrollmentTerm do
       )
       @course_not_in_term, @not_in_term_assignment = course_with_graded_assignment(
         account: root_account,
-        teacher: teacher,
+        teacher:,
         student: @student,
         due: @now,
         grade: 4
@@ -370,7 +370,7 @@ describe EnrollmentTerm do
       expect(fake_term).to receive(:recompute_scores_for_batch)
 
       strand_identifier = "GradingPeriodGroup:#{@grading_period_set.global_id}"
-      @term.recompute_course_scores_later(strand_identifier: strand_identifier)
+      @term.recompute_course_scores_later(strand_identifier:)
     end
 
     it "recomputes scores for all courses in the enrollment term" do

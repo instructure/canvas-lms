@@ -215,7 +215,7 @@ describe "calendar2" do
       it "shows the location when clicking on a calendar event", priority: "1" do
         location_name = "brighton"
         location_address = "cottonwood"
-        make_event(location_name: location_name, location_address: location_address)
+        make_event(location_name:, location_address:)
         load_agenda_view
 
         # Click calendar item to bring up event summary

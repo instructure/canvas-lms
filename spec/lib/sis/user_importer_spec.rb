@@ -67,7 +67,7 @@ describe SIS::UserImporter do
     end
 
     context "when a matching login exists" do
-      let(:existing_login) { pseudonym_model(account: account, sis_user_id: user_sis_id) }
+      let(:existing_login) { pseudonym_model(account:, sis_user_id: user_sis_id) }
 
       before do
         existing_login

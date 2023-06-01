@@ -256,7 +256,7 @@ describe SubAccountsController do
 
     it "gets sub-accounts in alphabetical order" do
       names = %w[script bank cow program means]
-      names.each { |name| Account.create!(name: name, parent_account: @sub_account) }
+      names.each { |name| Account.create!(name:, parent_account: @sub_account) }
       get "show", params: { account_id: @root_account, id: @sub_account }
       expect(response).to have_http_status :ok
       json = response.parsed_body

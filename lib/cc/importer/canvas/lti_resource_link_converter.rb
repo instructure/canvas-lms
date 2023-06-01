@@ -21,8 +21,8 @@ module CC::Importer::Canvas
   module LtiResourceLinkConverter
     include CC::Importer
 
-    FLOAT_REGEX = /^[-+]?\d+[.]\d+$/.freeze
-    INTEGER_REGEX = /^[-+]?\d+$/.freeze
+    FLOAT_REGEX = /^[-+]?\d+[.]\d+$/
+    INTEGER_REGEX = /^[-+]?\d+$/
 
     def convert_lti_resource_links
       resource_links = []
@@ -75,10 +75,10 @@ module CC::Importer::Canvas
         next unless launch_url
 
         resource_links << {
-          custom: custom,
-          launch_url: launch_url,
-          lookup_uuid: lookup_uuid,
-          resource_link_url: resource_link_url
+          custom:,
+          launch_url:,
+          lookup_uuid:,
+          resource_link_url:
         }
       end
 

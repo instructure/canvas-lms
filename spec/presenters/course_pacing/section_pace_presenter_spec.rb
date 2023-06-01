@@ -19,8 +19,8 @@
 
 describe CoursePacing::SectionPacePresenter do
   let(:course) { course_model }
-  let(:section) { add_section("Section One", course: course) }
-  let(:pace) { section_pace_model(section: section) }
+  let(:section) { add_section("Section One", course:) }
+  let(:pace) { section_pace_model(section:) }
   let(:presenter) { CoursePacing::SectionPacePresenter.new(pace) }
 
   describe "#as_json" do
@@ -28,7 +28,7 @@ describe CoursePacing::SectionPacePresenter do
     let(:course) { teacher_enrollment.course }
 
     before do
-      2.times { multiple_student_enrollment(user_model, section, course: course) }
+      2.times { multiple_student_enrollment(user_model, section, course:) }
     end
 
     it "returns the json presentation of the pace" do

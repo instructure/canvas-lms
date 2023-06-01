@@ -57,8 +57,8 @@ class PseudonymSession < Authlogic::Session::Base
       value: token.pseudonym_credentials,
       expires: remember_me_until,
       domain: controller.cookie_domain,
-      httponly: httponly,
-      secure: secure,
+      httponly:,
+      secure:,
     }
   end
 

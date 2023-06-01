@@ -108,8 +108,8 @@ module CanvasPartman::Concerns
       #   each element is a hash that carries the attributes of a
       #   potential record of the current class type
       #
-      def attrs_in_partition_groups(attrs_list, &block)
-        attrs_list.group_by { |a| infer_partition_table_name(a) }.each(&block)
+      def attrs_in_partition_groups(attrs_list, &)
+        attrs_list.group_by { |a| infer_partition_table_name(a) }.each(&)
       end
 
       # :nodoc:

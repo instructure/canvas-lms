@@ -54,7 +54,7 @@ class PageView
     end
 
     def page_views(page)
-      user.page_views(@options).paginate(page: page, per_page: limit)
+      user.page_views(@options).paginate(page:, per_page: limit)
     end
 
     def header

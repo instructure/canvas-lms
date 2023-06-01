@@ -93,7 +93,7 @@ module CanvasSecurity
 
         it "can pull out the masquerading user if provided" do
           real_user_id = 24
-          base64_encoded_wrapper = build_wrapped_token(user_id, real_user_id: real_user_id)
+          base64_encoded_wrapper = build_wrapped_token(user_id, real_user_id:)
           jwt = ServicesJwt.new(base64_encoded_wrapper)
           expect(jwt.masquerading_user_global_id).to eq(real_user_id)
         end
@@ -172,7 +172,7 @@ module CanvasSecurity
 
           it "includes workflows if given" do
             workflows = ["foo"]
-            jwt = ServicesJwt.for_user(host, user, workflows: workflows)
+            jwt = ServicesJwt.for_user(host, user, workflows:)
             decrypted_token_body = translate_token.call(jwt)
             expect(decrypted_token_body[:workflows]).to eq workflows
           end
@@ -185,7 +185,7 @@ module CanvasSecurity
 
           it "does not include a workflow if empty array" do
             workflows = []
-            jwt = ServicesJwt.for_user(host, user, workflows: workflows)
+            jwt = ServicesJwt.for_user(host, user, workflows:)
             decrypted_token_body = translate_token.call(jwt)
             expect(decrypted_token_body).not_to have_key :workflow
           end
@@ -194,7 +194,7 @@ module CanvasSecurity
             workflows = [:foo]
             state = { "a" => 123 }
             expect(CanvasSecurity::JWTWorkflow).to receive(:state_for).with(workflows, ctx, user).and_return(state)
-            jwt = ServicesJwt.for_user(host, user, workflows: workflows, context: ctx)
+            jwt = ServicesJwt.for_user(host, user, workflows:, context: ctx)
             decrypted_token_body = translate_token.call(jwt)
             expect(decrypted_token_body[:workflow_state]).to eq(state)
           end
@@ -202,7 +202,7 @@ module CanvasSecurity
           it "does not include workflow_state if empty" do
             workflows = [:foo]
             expect(CanvasSecurity::JWTWorkflow).to receive(:state_for).and_return({})
-            jwt = ServicesJwt.for_user(host, user, workflows: workflows, context: ctx)
+            jwt = ServicesJwt.for_user(host, user, workflows:, context: ctx)
             decrypted_token_body = translate_token.call(jwt)
             expect(decrypted_token_body).not_to have_key :workflow_state
           end
@@ -287,7 +287,7 @@ module CanvasSecurity
 
           it "generates a token with same workflows as original" do
             workflows = ["rich_content", "ui"]
-            jwt = ServicesJwt.for_user(host, user1, workflows: workflows)
+            jwt = ServicesJwt.for_user(host, user1, workflows:)
             refreshed = ServicesJwt.refresh_for_user(jwt, host, user1)
             payload = translate_token.call(refreshed)
             expect(payload[:workflows]).to eq(workflows)
@@ -295,7 +295,7 @@ module CanvasSecurity
 
           it "generates a token with same context as original" do
             context = ServicesJwtContext.new(123)
-            jwt = ServicesJwt.for_user(host, user1, context: context)
+            jwt = ServicesJwt.for_user(host, user1, context:)
             refreshed = ServicesJwt.refresh_for_user(jwt, host, user1)
             payload = translate_token.call(refreshed)
             expect(payload[:context_type]).to eq(context.class.name)

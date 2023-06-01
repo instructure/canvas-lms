@@ -179,7 +179,7 @@ module AccountReports::ReportHelper
 
   def extra_text_term(account_report = @account_report)
     account_report.parameters ||= {}
-    add_extra_text(I18n.t("account_reports.default.extra_text_term", "Term: %{term_name};", term_name: term_name))
+    add_extra_text(I18n.t("account_reports.default.extra_text_term", "Term: %{term_name};", term_name:))
   end
 
   def check_report_key(key)
@@ -190,7 +190,7 @@ module AccountReports::ReportHelper
     if check_report_key(:enrollment_term_id)
       add_extra_text(I18n.t("account_reports.default.term_text",
                             "Term: %{term_name};",
-                            term_name: term_name))
+                            term_name:))
     end
 
     if start_at && check_report_key(:start_at)
@@ -225,7 +225,7 @@ module AccountReports::ReportHelper
       enrollment_pseudonym = user_pseudonyms.index_by(&:id)[enrollment.sis_pseudonym_id]
       return enrollment_pseudonym if enrollment_pseudonym && (enrollment_pseudonym.workflow_state != "deleted" || include_deleted)
     end
-    SisPseudonym.for(user, root_account, type: :trusted, require_sis: false, include_deleted: include_deleted, root_account: root_account)
+    SisPseudonym.for(user, root_account, type: :trusted, require_sis: false, include_deleted:, root_account:)
   end
 
   def preload_logins_for_users(users, include_deleted: false)
@@ -302,16 +302,16 @@ module AccountReports::ReportHelper
       I18n.t(
         "account_reports.default.message",
         "%{type} report successfully generated with the following settings. Account: %{account}; %{options}",
-        type: type,
+        type:,
         account: account.name,
-        options: options
+        options:
       ),
       file
     )
   end
 
-  def write_report(headers, enable_i18n_features = false, replica = :report, &block)
-    file = generate_and_run_report(headers, "csv", enable_i18n_features, replica, &block)
+  def write_report(headers, enable_i18n_features = false, replica = :report, &)
+    file = generate_and_run_report(headers, "csv", enable_i18n_features, replica, &)
     GuardRail.activate(:primary) { send_report(file) }
   end
 
@@ -324,7 +324,7 @@ module AccountReports::ReportHelper
     ExtendedCSV.open(file, "w", **options) do |csv|
       csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
-      activate_report_db(replica: replica) { yield csv } if block_given?
+      activate_report_db(replica:) { yield csv } if block_given?
       GuardRail.activate(:primary) { @account_report.update_attribute(:current_line, csv.lineno) }
     end
     file
@@ -367,12 +367,12 @@ module AccountReports::ReportHelper
     # allow retries if account report runner fails
     args[:max_attempts] = 2 if root_account.feature_enabled?(:custom_report_experimental)
     @account_report.account_report_runners.find_each do |runner|
-      delay(**args).run_account_report_runner(runner, headers, files: files)
+      delay(**args).run_account_report_runner(runner, headers, files:)
     end
   end
 
   def add_report_row(row:, row_number: nil, report_runner:, file: nil)
-    report_runner.rows << build_report_row(row: row, row_number: row_number, report_runner: report_runner, file: file)
+    report_runner.rows << build_report_row(row:, row_number:, report_runner:, file:)
     if report_runner.rows.length == 1_000
       report_runner.write_rows
     end
@@ -382,8 +382,8 @@ module AccountReports::ReportHelper
     report_runner.shard.activate do
       # force all fields to strings
       AccountReportRow.new(row: row.map { |field| field&.to_s&.encode(Encoding::UTF_8) },
-                           row_number: row_number,
-                           file: file,
+                           row_number:,
+                           file:,
                            account_report_id: report_runner.account_report_id,
                            account_report_runner_id: report_runner.id,
                            created_at: Time.zone.now)
@@ -399,7 +399,7 @@ module AccountReports::ReportHelper
     return if ids.empty?
 
     ids_so_far = 0
-    ids.each_slice(number_of_items_per_runner(total, min: min, max: max)) do |batch|
+    ids.each_slice(number_of_items_per_runner(total, min:, max:)) do |batch|
       @account_report.add_report_runner(batch)
       ids_so_far += batch.length
       if ids_so_far >= Setting.get("ids_per_report_runner_batch", 10_000).to_i
@@ -441,8 +441,8 @@ module AccountReports::ReportHelper
       report_runner.fail
       fail_with_error(e)
     ensure
-      update_parallel_progress(account_report: @account_report, report_runner: report_runner)
-      compile_parallel_report(headers, files: files) if last_account_report_runner?(@account_report)
+      update_parallel_progress(account_report: @account_report, report_runner:)
+      compile_parallel_report(headers, files:) if last_account_report_runner?(@account_report)
     end
   end
 
@@ -458,7 +458,7 @@ module AccountReports::ReportHelper
               else
                 raise DatabaseReplicationError, "Replica failed to catch up in the allotted time"
               end
-    files ? compile_parallel_zip_report(files, replica: replica) : write_report_from_rows(headers, replica: replica)
+    files ? compile_parallel_zip_report(files, replica:) : write_report_from_rows(headers, replica:)
   rescue => e
     report_runner.fail
     fail_with_error(e)
@@ -467,7 +467,7 @@ module AccountReports::ReportHelper
   end
 
   def write_report_from_rows(headers, replica: :report)
-    activate_report_db(replica: replica) do
+    activate_report_db(replica:) do
       write_report(headers, false, replica) do |csv|
         @account_report.account_report_rows.order(:account_report_runner_id, :row_number)
                        .find_in_batches(strategy: :cursor) do |batch|
@@ -479,11 +479,11 @@ module AccountReports::ReportHelper
 
   def compile_parallel_zip_report(files, replica: :report)
     csvs = {}
-    activate_report_db(replica: replica) do
+    activate_report_db(replica:) do
       files.each do |file, headers_for_file|
-        csvs[file] = if @account_report.account_report_rows.where(file: file).exists?
+        csvs[file] = if @account_report.account_report_rows.where(file:).exists?
                        generate_and_run_report(headers_for_file, "csv", false, replica) do |csv|
-                         @account_report.account_report_rows.where(file: file)
+                         @account_report.account_report_rows.where(file:)
                                         .order(:account_report_runner_id, :row_number)
                                         .find_in_batches(strategy: :cursor) do |batch|
                            batch.each { |record| csv << record.row }

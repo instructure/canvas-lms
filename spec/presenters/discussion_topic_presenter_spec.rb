@@ -19,7 +19,7 @@
 #
 
 describe DiscussionTopicPresenter do
-  let(:topic)      { DiscussionTopic.new(title: "Test Topic", assignment: assignment) }
+  let(:topic)      { DiscussionTopic.new(title: "Test Topic", assignment:) }
   let(:user)       { user_model }
   let(:presenter)  { DiscussionTopicPresenter.new(topic, user) }
   let(:course)     { course_model }

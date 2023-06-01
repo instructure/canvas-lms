@@ -289,7 +289,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       process_answer_html_content(question_data)
 
       guard_against_big_fields do
-        @question = @quiz.quiz_questions.create(quiz_group: @group, question_data: question_data)
+        @question = @quiz.quiz_questions.create(quiz_group: @group, question_data:)
         @quiz.did_edit if @quiz.created?
         render json: question_json(@question, @current_user, session, @context, [:assessment_question, :plain_html])
       end

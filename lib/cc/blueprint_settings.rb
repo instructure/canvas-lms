@@ -43,7 +43,7 @@ module CC
         bs.restrictions do |r|
           r.restriction({ content_type: "default" }.merge(template.default_restrictions))
           template.default_restrictions_by_type.each do |content_type, restriction|
-            r.restriction({ content_type: content_type }.merge(restriction))
+            r.restriction({ content_type: }.merge(restriction))
           end
         end
         bs.restricted_items do |items|

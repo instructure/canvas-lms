@@ -256,7 +256,7 @@ class CommunicationChannel < ActiveRecord::Base
       # and try to check the validity OUTSIDE the save path
       # (cc.valid?) this needs to switch to the shard where we'll
       # be writing to make sure we're checking uniqueness in the right place
-      scope = self.class.by_path(path).where(user_id: user_id, path_type: path_type, workflow_state: ["unconfirmed", "active"])
+      scope = self.class.by_path(path).where(user_id:, path_type:, workflow_state: ["unconfirmed", "active"])
       unless new_record?
         scope = scope.where("id<>?", id)
       end
@@ -431,7 +431,7 @@ class CommunicationChannel < ActiveRecord::Base
   def consider_building_pseudonym
     if build_pseudonym_on_confirm && active?
       self.build_pseudonym_on_confirm = false
-      pseudonym = Account.default.pseudonyms.build(unique_id: path, user: user)
+      pseudonym = Account.default.pseudonyms.build(unique_id: path, user:)
       existing_pseudonym = Account.default.pseudonyms.active.where(user_id: user).take
       if existing_pseudonym
         pseudonym.password_salt = existing_pseudonym.password_salt

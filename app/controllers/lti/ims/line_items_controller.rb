@@ -147,7 +147,7 @@ module Lti
           assignment,
           context,
           tool,
-          line_item_params.merge(resource_link: resource_link)
+          line_item_params.merge(resource_link:)
         )
 
         render json: LineItemsSerializer.new(new_line_item, line_item_id(new_line_item)),
@@ -310,7 +310,7 @@ module Lti
                       .joins(rlid.present? ? { line_items: :resource_link } : :line_items)
                       .where(
                         {
-                          context: context,
+                          context:,
                           lti_line_items: { client_id: developer_key.global_id }
                         }.merge!(rlid.present? ? { lti_resource_links: { resource_link_uuid: rlid } } : {})
                       )

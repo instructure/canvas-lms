@@ -108,11 +108,11 @@ module CanvasPartman
       def table_regex
         @table_regex ||= case base_class.partitioning_interval
                          when :weeks
-                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})_(?<week>\d{2,})$/.freeze
+                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})_(?<week>\d{2,})$/
                          when :months
-                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})_(?<month>\d{1,2})$/.freeze
+                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})_(?<month>\d{1,2})$/
                          when :years
-                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})$/.freeze
+                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})$/
                          end
       end
 

@@ -182,7 +182,7 @@ describe "Outcome Reports" do
       "assessment type" => quiz.nil? ? "assignment" : "quiz",
       "assessment question" => question&.name,
       "assessment question id" => question&.id,
-      "enrollment state" => user&.enrollments&.find_by(course: course, course_section: section)&.workflow_state
+      "enrollment state" => user&.enrollments&.find_by(course:, course_section: section)&.workflow_state
     }
     expect(row.headers).to eq row.headers & expectations.keys
     row.headers.each do |key|
@@ -216,7 +216,7 @@ describe "Outcome Reports" do
   end
 
   let(:report_params) { {} }
-  let(:merged_params) { report_params.reverse_merge(order: order, parse_header: true, account: @root_account) }
+  let(:merged_params) { report_params.reverse_merge(order:, parse_header: true, account: @root_account) }
   let(:report) { read_report(report_type, merged_params) }
 
   shared_examples "common outcomes report behavior" do
@@ -289,7 +289,7 @@ describe "Outcome Reports" do
         report_record = run_report(report_type, account: @root_account, params: { "include_deleted" => true })
         expect(report_record.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
 
-        report = parse_report(report_record, order: order, parse_header: true)
+        report = parse_report(report_record, order:, parse_header: true)
         verify_all(report, all_values)
       end
     end
@@ -657,7 +657,7 @@ describe "Outcome Reports" do
           [{ user_uuid: user.uuid,
              external_outcome_id: outcome.id,
              associated_asset_id: quiz.id,
-             attempts: attempts,
+             attempts:,
              percent_score: 1.0,
              points: 5.0,
              points_possible: 5.0,

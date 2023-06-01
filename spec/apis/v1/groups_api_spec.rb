@@ -147,7 +147,7 @@ describe "Groups API", type: :request do
       @group.reload
       account = @course.account
       @admin_user = User.create!
-      account.account_users.create!(user: @admin_user, account: account)
+      account.account_users.create!(user: @admin_user, account:)
     end
 
     it "shows if the user has permission", priority: 3 do
@@ -1091,7 +1091,7 @@ describe "Groups API", type: :request do
       json = api_call(:post,
                       "/api/v1/groups/#{@group.id}/preview_html",
                       { controller: "groups", action: "preview_html", group_id: @group.to_param, format: "json" },
-                      { html: html })
+                      { html: })
 
       returned_html = json["html"]
       expect(returned_html).not_to include("<script>")

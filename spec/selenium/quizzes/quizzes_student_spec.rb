@@ -58,7 +58,7 @@ describe "quizzes" do
 
       context "when attempting to resume a quiz" do
         def update_quiz_lock(lock_at, unlock_at)
-          @quiz.update(lock_at: lock_at, unlock_at: unlock_at)
+          @quiz.update(lock_at:, unlock_at:)
         end
 
         describe "on individual quiz page" do

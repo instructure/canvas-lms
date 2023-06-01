@@ -23,7 +23,7 @@ module Quizzes::LogAuditing
   # Extracts EVT_QUESTION_ANSWERED events from a submission data construct.
   class QuestionAnsweredEventExtractor
     EVENT_TYPE = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
-    RE_QUESTION_ANSWER_FIELD = /^question_(\d+)_?/.freeze
+    RE_QUESTION_ANSWER_FIELD = /^question_(\d+)_?/
     SQL_FIND_PREDECESSORS =
       <<~SQL.squish
             created_at >= :started_at

@@ -46,7 +46,7 @@ describe Api::V1::Submission do
   let(:session) { {} }
   let(:context) { nil }
   let(:params) { { includes: [field] } }
-  let(:submission) { assignment.submissions.create!(user: user) }
+  let(:submission) { assignment.submissions.create!(user:) }
   let(:provisional_grade) { submission.provisional_grades.create!(scorer: teacher) }
 
   describe "#provisional_grade_json" do
@@ -54,10 +54,10 @@ describe Api::V1::Submission do
       it "links to the speed grader for a student's submission" do
         expect(assignment).to receive(:can_view_student_names?).with(user).and_return true
         json = fake_controller.provisional_grade_json(
-          course: course,
-          assignment: assignment,
-          submission: submission,
-          provisional_grade: provisional_grade,
+          course:,
+          assignment:,
+          submission:,
+          provisional_grade:,
           current_user: user
         )
         path = "/courses/#{course.id}/gradebook/speed_grader"
@@ -68,10 +68,10 @@ describe Api::V1::Submission do
       it "links to the speed grader for a student's anonymous submission when grader cannot view student names" do
         expect(assignment).to receive(:can_view_student_names?).with(user).and_return false
         json = fake_controller.provisional_grade_json(
-          course: course,
-          assignment: assignment,
-          submission: submission,
-          provisional_grade: provisional_grade,
+          course:,
+          assignment:,
+          submission:,
+          provisional_grade:,
           current_user: user
         )
         path = "/courses/#{course.id}/gradebook/speed_grader"
@@ -84,7 +84,7 @@ describe Api::V1::Submission do
   describe "#submission_json" do
     describe "anonymous_id" do
       let(:field) { "anonymous_id" }
-      let(:submission) { assignment.submissions.build(user: user) }
+      let(:submission) { assignment.submissions.build(user:) }
       let(:json) do
         fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
       end
@@ -108,7 +108,7 @@ describe Api::V1::Submission do
       context "when an account user" do
         let(:user) do
           user = User.create!
-          Account.default.account_users.create!(user: user)
+          Account.default.account_users.create!(user:)
           user
         end
 
@@ -120,7 +120,7 @@ describe Api::V1::Submission do
 
     describe "submission status" do
       let(:field) { "submission_status" }
-      let(:submission) { assignment.submissions.build(user: user) }
+      let(:submission) { assignment.submissions.build(user:) }
       let(:submission_status) do
         lambda do |submission|
           json = fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
@@ -433,8 +433,8 @@ describe Api::V1::Submission do
     describe "canvadoc url" do
       let(:course) { Course.create! }
       let(:assignment) { course.assignments.create! }
-      let(:teacher) { course_with_user("TeacherEnrollment", course: course, active_all: true, name: "Teacher").user }
-      let(:student) { course_with_user("StudentEnrollment", course: course, active_all: true, name: "Student").user }
+      let(:teacher) { course_with_user("TeacherEnrollment", course:, active_all: true, name: "Teacher").user }
+      let(:student) { course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user }
       let(:attachment) { attachment_model(content_type: "application/pdf", context: student) }
       let(:submission) { assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment]) }
       let(:json) { fake_controller.submission_json(submission, assignment, teacher, session) }
@@ -469,7 +469,7 @@ describe Api::V1::Submission do
 
       let(:field) { "submission_history" }
 
-      let(:submission) { assignment.submissions.build(user: user) }
+      let(:submission) { assignment.submissions.build(user:) }
 
       let(:json) do
         fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
@@ -511,14 +511,14 @@ describe Api::V1::Submission do
 
     describe "posted_at" do
       let(:field) { "posted_at" }
-      let(:submission) { assignment.submissions.build(user: user) }
+      let(:submission) { assignment.submissions.build(user:) }
       let(:json) do
         fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
       end
 
       it "is included" do
         posted_at = Time.zone.now
-        submission.update!(posted_at: posted_at)
+        submission.update!(posted_at:)
 
         expect(json.fetch("posted_at")).to eq posted_at
       end

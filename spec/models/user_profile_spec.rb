@@ -43,7 +43,7 @@ describe UserProfile do
       end
 
       it "shows shared content tab when user has account membership" do
-        account_admin_user(account: account)
+        account_admin_user(account:)
         tabs = @admin.profile.tabs_available(@admin, root_account: account)
         expect(tabs.pluck(:id)).to include UserProfile::TAB_CONTENT_SHARES
       end

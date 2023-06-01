@@ -25,7 +25,7 @@ class SisPseudonym
     raise ArgumentError("context must respond to .root_account") unless root_account&.root_account? || context.respond_to?(:root_account)
 
     sis_pseudonym =
-      new(user, context, type, require_sis, include_deleted, root_account, in_region: in_region, include_all_pseudonyms: include_all_pseudonyms)
+      new(user, context, type, require_sis, include_deleted, root_account, in_region:, include_all_pseudonyms:)
     include_all_pseudonyms ? sis_pseudonym.all_pseudonyms : sis_pseudonym.pseudonym
   end
 

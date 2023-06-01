@@ -37,7 +37,7 @@ class UserPreferenceValue < ActiveRecord::Base
     # e.g. :course_grades_assignment_order is always looking at data for one course at a time
     # so rather than just storing another big serialized blob somewhere else, actually break it apart into separate rows
     @preference_settings ||= {}
-    @preference_settings[key] = { use_sub_keys: use_sub_keys }
+    @preference_settings[key] = { use_sub_keys: }
   end
 
   add_user_preference :closed_notifications
@@ -99,7 +99,7 @@ class UserPreferenceValue < ActiveRecord::Base
     def get_preference(key, sub_key = nil)
       value = preferences[key]
       if value == EXTERNAL
-        id, value = user_preference_values.where(key: key, sub_key: sub_key).pluck(:id, :value).first
+        id, value = user_preference_values.where(key:, sub_key:).pluck(:id, :value).first
         mark_preference_row(key, sub_key) if id # if we know there's a row
         value
       elsif sub_key
@@ -141,7 +141,7 @@ class UserPreferenceValue < ActiveRecord::Base
 
     def clear_all_preferences_for(key)
       if UserPreferenceValue.settings[key]&.[](:use_sub_keys)
-        user_preference_values.where(key: key).delete_all
+        user_preference_values.where(key:).delete_all
         @existing_preference_rows&.clear
         preferences[key] = {}
         save! if changed?
@@ -151,7 +151,7 @@ class UserPreferenceValue < ActiveRecord::Base
     end
 
     def preference_row_exists?(key, sub_key)
-      @existing_preference_rows&.include?([key, sub_key]) || user_preference_values.where(key: key, sub_key: sub_key).exists?
+      @existing_preference_rows&.include?([key, sub_key]) || user_preference_values.where(key:, sub_key:).exists?
     end
 
     def mark_preference_row(key, sub_key)
@@ -162,7 +162,7 @@ class UserPreferenceValue < ActiveRecord::Base
     def create_user_preference_value(key, sub_key, value)
       UserPreferenceValue.unique_constraint_retry do |retry_count|
         if retry_count == 0
-          user_preference_values.create!(key: key, sub_key: sub_key, value: value)
+          user_preference_values.create!(key:, sub_key:, value:)
         else
           update_user_preference_value(key, sub_key, value) # may already exist
         end
@@ -171,11 +171,11 @@ class UserPreferenceValue < ActiveRecord::Base
     end
 
     def update_user_preference_value(key, sub_key, value)
-      user_preference_values.where(key: key, sub_key: sub_key).update_all(value: value)
+      user_preference_values.where(key:, sub_key:).update_all(value:)
     end
 
     def remove_user_preference_value(key, sub_key)
-      user_preference_values.where(key: key, sub_key: sub_key).delete_all
+      user_preference_values.where(key:, sub_key:).delete_all
       @existing_preference_rows&.delete([key, sub_key])
     end
 

@@ -602,14 +602,14 @@ describe "Canvas Cartridge importing" do
 
       context "that use LTI 1.3" do
         let(:context_module) { @copy_from.context_modules.create!(name: "test module") }
-        let(:tool) { external_tool_1_3_model(context: @copy_from, opts: { developer_key: developer_key }) }
+        let(:tool) { external_tool_1_3_model(context: @copy_from, opts: { developer_key: }) }
         let(:developer_key) { DeveloperKey.create!(account: @copy_from.root_account) }
         let(:content_tag) do
           context_module.add_item({ name: "Test Tool",
                                     content: tool,
                                     url: tool.url,
                                     type: "context_external_tool",
-                                    custom_params: custom_params,
+                                    custom_params:,
                                     id: tool.id })
         end
         let(:resource_link) { content_tag.associated_asset }
@@ -636,7 +636,7 @@ describe "Canvas Cartridge importing" do
                 context_type: "Course"
               }
             ],
-            external_tools: external_tools
+            external_tools:
           }.with_indifferent_access
         end
 
@@ -679,7 +679,7 @@ describe "Canvas Cartridge importing" do
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
     @migration.resolve_content_links!
 
-    page_2 = @copy_to.wiki_pages.where(migration_id: migration_id).first
+    page_2 = @copy_to.wiki_pages.where(migration_id:).first
     expect(page_2.title).to eq page.title
     expect(page_2.url).to eq page.url
     expect(page_2.body).to eq body_with_link % ([@copy_to.id, attachment_import.id] * 4)
@@ -695,7 +695,7 @@ describe "Canvas Cartridge importing" do
     att.save!
 
     media_id = "m_mystiry"
-    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id: media_id))
+    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
 
     path = CGI.escape(att.full_path)
     body_with_links = <<~HTML
@@ -732,7 +732,7 @@ describe "Canvas Cartridge importing" do
     att.save!
 
     media_id = "m_new-media-id"
-    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id: media_id))
+    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
 
     path = CGI.escape(att.full_path)
     body = %(<p>WHAT<iframe style="width: 400px; height: 225px; display: inline-block;" title="Video player for video.mp4" data-media-type="video" src="%24IMS-CC-FILEBASE%24/#{path}" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-old-mediaid"></iframe></p>)
@@ -763,7 +763,7 @@ describe "Canvas Cartridge importing" do
     att.save!
 
     media_id = "m_new-media-id"
-    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id: media_id))
+    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
 
     path = CGI.escape(att.full_path)
     body = %(<p>WHAT<video style="width: 400px; height: 225px; display: inline-block;" title="Video player for video.mp4" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-old-mediaid"><source src="%24IMS-CC-FILEBASE%24/#{path}" data-media-type="video" data-media-id="m-old-mediaid"></video></p>)
@@ -837,7 +837,7 @@ describe "Canvas Cartridge importing" do
 
     expect(ErrorReport.last.message).to match(/nil wiki/)
 
-    page_2 = @copy_to.wiki_pages.where(migration_id: migration_id).first
+    page_2 = @copy_to.wiki_pages.where(migration_id:).first
     expect(page_2.title).to eq page.title
     expect(page_2.url).to eq page.url
     expect(page_2.editing_roles).to eq page.editing_roles
@@ -861,7 +861,7 @@ describe "Canvas Cartridge importing" do
     # import into new course
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
 
-    page_2 = @copy_to.wiki_pages.where(migration_id: migration_id).first
+    page_2 = @copy_to.wiki_pages.where(migration_id:).first
     expect(page_2.title).to eq page.title
     expect(page_2.url).to eq page.url
     expect(page_2.body).to match(%r{/courses/#{@copy_to.id}/external_tools/retrieve})
@@ -917,7 +917,7 @@ describe "Canvas Cartridge importing" do
     expect(@copy_to).to receive(:vericite_enabled?).at_least(1).and_return(true)
     Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
 
-    asmnt_2 = @copy_to.assignments.where(migration_id: migration_id).first
+    asmnt_2 = @copy_to.assignments.where(migration_id:).first
     expect(asmnt_2.title).to eq asmnt.title
     expect(asmnt_2.description).to eq(body_with_link % @copy_to.id)
     expect(asmnt_2.points_possible).to eq asmnt.points_possible
@@ -957,7 +957,7 @@ describe "Canvas Cartridge importing" do
     # import
     Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
 
-    asmnt_2 = @copy_to.assignments.where(migration_id: migration_id).first
+    asmnt_2 = @copy_to.assignments.where(migration_id:).first
     expect(asmnt_2.submission_types).to eq "external_tool"
 
     expect(asmnt_2.external_tool_tag).not_to be_nil
@@ -1018,7 +1018,7 @@ describe "Canvas Cartridge importing" do
     # import
     Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to, @migration)
 
-    dt_2 = @copy_to.discussion_topics.where(migration_id: migration_id).first
+    dt_2 = @copy_to.discussion_topics.where(migration_id:).first
     expect(dt_2.title).to eq dt.title
     expect(dt_2.message).to eq body_with_link % @copy_to.id
     expect(dt_2.delayed_post_at.to_i).to eq dt.delayed_post_at.to_i
@@ -1065,7 +1065,7 @@ describe "Canvas Cartridge importing" do
     # import
     Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to, @migration)
 
-    dt_2 = @copy_to.discussion_topics.where(migration_id: migration_id).first
+    dt_2 = @copy_to.discussion_topics.where(migration_id:).first
     expect(dt_2.title).to eq dt.title
     expect(dt_2.message).to eq body_with_link % @copy_to.id
     expect(dt_2.type).to eq dt.type
@@ -1121,7 +1121,7 @@ describe "Canvas Cartridge importing" do
     cm = ContentMigration.new(context: @copy_to, copy_options: { everything: "1" })
     Importers::DiscussionTopicImporter.process_discussion_topics_migration([hash], cm)
 
-    dt_2 = group2.discussion_topics.where(migration_id: migration_id).first
+    dt_2 = group2.discussion_topics.where(migration_id:).first
     expect(dt_2.title).to eq dt.title
     expect(dt_2.message).to eq body
     expect(dt_2.type).to eq dt.type

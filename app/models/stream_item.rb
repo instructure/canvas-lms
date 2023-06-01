@@ -286,8 +286,8 @@ class StreamItem < ActiveRecord::Base
       user_ids_subset.each_slice(500) do |sliced_user_ids|
         inserts = sliced_user_ids.map do |user_id|
           {
-            stream_item_id: stream_item_id,
-            user_id: user_id,
+            stream_item_id:,
+            user_id:,
             hidden: false,
             workflow_state: object_unread_for_user(object, user_id),
             context_type: l_context_type,
@@ -300,7 +300,7 @@ class StreamItem < ActiveRecord::Base
         end
 
         StreamItemInstance.unique_constraint_retry do
-          StreamItemInstance.where(stream_item_id: stream_item_id, user_id: sliced_user_ids).delete_all
+          StreamItemInstance.where(stream_item_id:, user_id: sliced_user_ids).delete_all
           StreamItemInstance.bulk_insert(inserts)
         end
 
@@ -353,7 +353,7 @@ class StreamItem < ActiveRecord::Base
   def self.update_read_state_for_asset(asset, new_state, user_id)
     if (item = asset.stream_item)
       Shard.shard_for(user_id).activate do
-        StreamItemInstance.where(user_id: user_id, stream_item_id: item).first&.update_attribute(:workflow_state, new_state)
+        StreamItemInstance.where(user_id:, stream_item_id: item).first&.update_attribute(:workflow_state, new_state)
       end
     end
   end

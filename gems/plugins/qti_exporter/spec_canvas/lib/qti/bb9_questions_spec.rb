@@ -23,7 +23,7 @@ if Qti.migration_executable
   describe "Converting Blackboard 9 qti" do
     it "converts matching questions" do
       manifest_node = get_manifest_node("matching", interaction_type: "choiceInteraction", bb_question_type: "Matching")
-      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: bb9_question_dir)
+      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: bb9_question_dir)
       # make sure the ids are correctly referencing each other
       matches = []
       hash[:matches].each { |m| matches << m[:match_id] }
@@ -41,7 +41,7 @@ if Qti.migration_executable
 
     it "converts matching questions if the divs precede the choice Interactions" do
       manifest_node = get_manifest_node("matching3", interaction_type: "choiceInteraction", bb_question_type: "Matching")
-      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: bb9_question_dir)
+      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: bb9_question_dir)
       # make sure the ids are correctly referencing each other
       matches = []
       hash[:matches].each { |m| matches << m[:match_id] }

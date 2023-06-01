@@ -25,12 +25,12 @@ module Services
 
     let(:submission) { submission_model }
     let(:assignment) { submission.assignment }
-    let(:progress) { Progress.create!(context: assignment, user: user, tag: "test") }
+    let(:progress) { Progress.create!(context: assignment, user:, tag: "test") }
     let(:user) { user_factory }
     let(:attachment) do
       attachment_model(
         context: assignment,
-        user: user,
+        user:,
         filename: "Some File"
       )
     end
@@ -114,7 +114,7 @@ module Services
         end
 
         it "creates an AttachmentUploadStatus" do
-          failure = AttachmentUploadStatus.find_by(attachment: attachment)
+          failure = AttachmentUploadStatus.find_by(attachment:)
           expect(failure.error).to eq "error"
           expect(AttachmentUploadStatus.upload_status(attachment)).to eq "failed"
         end

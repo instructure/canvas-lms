@@ -32,7 +32,7 @@ describe GradebookUploadsController do
 
   def generate_file(include_sis_id = false)
     file = Tempfile.new("csv.csv")
-    file.puts(GradebookExporter.new(@course, @teacher, include_sis_id: include_sis_id).to_csv)
+    file.puts(GradebookExporter.new(@course, @teacher, include_sis_id:).to_csv)
     file.close
     file
   end
@@ -120,7 +120,7 @@ describe GradebookUploadsController do
       user_session(@teacher)
       progress = Progress.create!(tag: "test", context: @teacher)
 
-      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: "bar" }
+      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress:, gradebook: { foo: "bar" }
       @gb_upload.save
 
       get "data", params: { course_id: @course.id }
@@ -131,7 +131,7 @@ describe GradebookUploadsController do
     it "destroys an uploaded gradebook after retrieval" do
       user_session(@teacher)
       progress = Progress.create!(tag: "test", context: @teacher)
-      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: "bar" }
+      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress:, gradebook: { foo: "bar" }
       @gb_upload.save
       get "data", params: { course_id: @course.id }
       expect { GradebookUpload.find(@gb_upload.id) }.to raise_error(ActiveRecord::RecordNotFound)
@@ -149,7 +149,7 @@ describe GradebookUploadsController do
       user_session(@teacher)
       progress = Progress.create!(tag: "test", context: @teacher)
 
-      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: "bar" }
+      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress:, gradebook: { foo: "bar" }
       @gb_upload.save
 
       get "show", params: { course_id: @course.id }

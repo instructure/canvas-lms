@@ -137,8 +137,8 @@ RSpec.describe SubmissionCommentsController do
 
       let(:audit_events) do
         AnonymousOrModerationEvent.where(
-          assignment: assignment,
-          submission: submission
+          assignment:,
+          submission:
         ).order(:id)
       end
       let(:last_event) { audit_events.last }
@@ -262,8 +262,8 @@ RSpec.describe SubmissionCommentsController do
 
       let(:audit_events) do
         AnonymousOrModerationEvent.where(
-          assignment: assignment,
-          submission: submission
+          assignment:,
+          submission:
         ).order(:id)
       end
       let(:last_event) { audit_events.last }

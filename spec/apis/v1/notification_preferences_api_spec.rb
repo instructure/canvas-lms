@@ -163,7 +163,7 @@ describe NotificationPreferencesController, type: :request do
       json = api_call(:put,
                       "#{@prefix}/#{category}?notification_preferences[frequency]=never",
                       @params.merge(action: "update_preferences_by_category",
-                                    category: category,
+                                    category:,
                                     notification_preferences: { "frequency" => "never" }))
       assert_jsonapi_compliance(json, "notification_preferences")
       expect(json["notification_preferences"]).to eq [{

@@ -285,7 +285,7 @@ module Polling
                                        each_serializer: Polling::PollSessionSerializer,
                                        controller: self,
                                        root: :poll_sessions,
-                                       meta: meta,
+                                       meta:,
                                        scope: @current_user,
                                        include_root: false
                                      }).as_json

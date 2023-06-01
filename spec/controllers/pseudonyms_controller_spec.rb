@@ -359,13 +359,13 @@ describe PseudonymsController do
       user_with_pseudonym(
         username: "test2@example.com",
         password: "old_password",
-        account: account
+        account:
       )
       @test_user = @user
       user_with_pseudonym(
         username: "admin@example.com",
         password: "admin-password",
-        account: account
+        account:
       )
       account.settings[:admins_can_change_passwords] = true
       account.save!
@@ -416,7 +416,7 @@ describe PseudonymsController do
 
       role = custom_account_role("sis_only", account: account1)
       user_with_pseudonym(active_all: 1, username: "user2@example.com", password: "qwertyuiop")
-      account_admin_user_with_role_changes(user: @user, account: account1, role: role, role_changes: { manage_sis: true, manage_user_logins: true })
+      account_admin_user_with_role_changes(user: @user, account: account1, role:, role_changes: { manage_sis: true, manage_user_logins: true })
       user_session(@user, @pseudonym)
 
       post "update", params: { id: @pseudonym1.id, user_id: @user1.id, pseudonym: { sis_user_id: "sis1" } }, format: "json"

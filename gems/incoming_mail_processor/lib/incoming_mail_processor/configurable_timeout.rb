@@ -63,9 +63,9 @@ module IncomingMailProcessor
     #
     # Returns the return value of the configured timeout method.
     # Raises anything the timeout method raises.
-    def with_timeout(&block)
+    def with_timeout(&)
       method = @timeout_method || method(:default_timeout_method)
-      method.call(&block)
+      method.call(&)
     end
 
     # Public: Wrap an object's methods in with_timeout calls. The original
@@ -100,8 +100,8 @@ module IncomingMailProcessor
     # Returns the return value of the block.
     # Raises Timeout::Error if the block takes longer than the default timeout
     #   duration.
-    def default_timeout_method(&block)
-      Timeout.timeout(default_timeout_duration, &block)
+    def default_timeout_method(&)
+      Timeout.timeout(default_timeout_duration, &)
     end
 
     # Internal: The default timeout duration for default_timeout_method. The

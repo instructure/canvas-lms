@@ -158,7 +158,7 @@ describe HistoryController, type: :request do
                          {},
                          {},
                          { expected_status: 401 })
-        UserObservationLink.create_or_restore(observer: observer, student: @student, root_account: Account.default)
+        UserObservationLink.create_or_restore(observer:, student: @student, root_account: Account.default)
         api_call_as_user(observer,
                          :get,
                          "/api/v1/users/#{@student.id}/history",

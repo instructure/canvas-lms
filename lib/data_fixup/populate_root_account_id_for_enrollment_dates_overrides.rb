@@ -31,7 +31,7 @@ module DataFixup::PopulateRootAccountIdForEnrollmentDatesOverrides
         .find_each do |enrollment_dates_override|
           root_account_id = enrollment_dates_override.context&.resolved_root_account_id ||
                             enrollment_dates_override.context&.root_account_id
-          enrollment_dates_override.update!(root_account_id: root_account_id) if root_account_id
+          enrollment_dates_override.update!(root_account_id:) if root_account_id
         end
     end
   end

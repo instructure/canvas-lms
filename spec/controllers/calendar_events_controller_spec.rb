@@ -32,7 +32,7 @@ describe CalendarEventsController do
 
   let_once(:teacher_enrollment) { course_with_teacher(active_all: true) }
   let_once(:course) { teacher_enrollment.course }
-  let_once(:student_enrollment) { student_in_course(course: course) }
+  let_once(:student_enrollment) { student_in_course(course:) }
   let_once(:course_event) { course.calendar_events.create(title: "some assignment") }
   let_once(:other_teacher_enrollment) { course_with_teacher(active_all: true) }
 

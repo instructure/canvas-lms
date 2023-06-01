@@ -176,7 +176,7 @@ module AssignmentsCommon
       points_possible: 50,
       submission_types: submission_type,
       group_category: @group_category[0],
-      grade_group_students_individually: grade_group_students_individually
+      grade_group_students_individually:
     )
   end
 
@@ -243,7 +243,7 @@ module AssignmentsCommon
   end
 
   def create_assignment_with_type(type, title = "My Title")
-    @assignment = @course.assignments.create!(title: title, grading_type: type, points_possible: 20)
+    @assignment = @course.assignments.create!(title:, grading_type: type, points_possible: 20)
     @assignment
   end
 end

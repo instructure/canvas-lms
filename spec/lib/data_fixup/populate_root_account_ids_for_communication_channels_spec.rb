@@ -25,7 +25,7 @@ describe DataFixup::PopulateRootAccountIdsForCommunicationChannels do
     it "updates the root_account_ids when nil" do
       user = User.create
       user.update_column(:root_account_ids, [account.id])
-      cc = CommunicationChannel.create(user: user, path: "user@example.com")
+      cc = CommunicationChannel.create(user:, path: "user@example.com")
       cc.update_column(:root_account_ids, nil)
 
       expect(cc.root_account_ids).to be_nil
@@ -38,7 +38,7 @@ describe DataFixup::PopulateRootAccountIdsForCommunicationChannels do
     it "updates the root_account_ids when []" do
       user = User.create
       user.update_column(:root_account_ids, [account.id])
-      cc = CommunicationChannel.create(user: user, path: "user@example.com")
+      cc = CommunicationChannel.create(user:, path: "user@example.com")
       cc.update_column(:root_account_ids, [])
 
       expect(cc.root_account_ids).to eq []

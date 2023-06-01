@@ -81,7 +81,7 @@ module Gradebook
             enrollment.update_override_score(
               override_score: score_update[:override_score],
               grading_period_id: grading_period&.id,
-              updating_user: updating_user,
+              updating_user:,
               record_grade_change: !student_ids_updated.include?(student_id)
             )
 
@@ -94,7 +94,7 @@ module Gradebook
         end
       end
 
-      progress&.set_results({ errors: errors })
+      progress&.set_results({ errors: })
     end
 
     private

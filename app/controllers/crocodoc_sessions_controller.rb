@@ -38,7 +38,7 @@ class CrocodocSessionsController < ApplicationController
 
       crocodoc = attachment.crocodoc_document
       url = crocodoc.session_url(user: @current_user,
-                                 annotations: annotations,
+                                 annotations:,
                                  enable_annotations: blob["enable_annotations"],
                                  moderated_grading_allow_list: blob["moderated_grading_allow_list"])
 

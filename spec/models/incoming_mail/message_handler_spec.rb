@@ -43,9 +43,9 @@ describe IncomingMail::MessageHandler do
   let(:original_message_attributes) do
     {
       notification_id: 1,
-      shard: shard,
-      context: context,
-      user: user,
+      shard:,
+      context:,
+      user:,
       global_id: 1,
       to: "lucy@example.com"
     }
@@ -173,7 +173,7 @@ describe IncomingMail::MessageHandler do
             to: "lucy@example.com",
             from: "no-reply@example.com",
             subject: email_subject,
-            body: body,
+            body:,
             delay_for: 0,
             context: nil,
             path_type: "email",
@@ -231,7 +231,7 @@ describe IncomingMail::MessageHandler do
               to: "lucy@example.com",
               from: "no-reply@example.com",
               subject: email_subject,
-              body: body,
+              body:,
               delay_for: 0,
               context: nil,
               path_type: "email",
@@ -263,7 +263,7 @@ describe IncomingMail::MessageHandler do
               to: "lucy@example.com",
               from: "no-reply@example.com",
               subject: email_subject,
-              body: body,
+              body:,
               delay_for: 0,
               context: nil,
               path_type: "email",
@@ -299,7 +299,7 @@ describe IncomingMail::MessageHandler do
               to: "lucy@example.com",
               from: "no-reply@example.com",
               subject: email_subject,
-              body: body,
+              body:,
               delay_for: 0,
               context: nil,
               path_type: "email",

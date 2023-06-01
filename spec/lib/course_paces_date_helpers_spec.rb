@@ -144,7 +144,7 @@ describe CoursePacesDateHelpers do
           end_date: Date.new(2022, 5, 11)
         )
       ]
-      expect(CoursePacesDateHelpers.days_between(start_date, end_date, true, inclusive_end: true, blackout_dates: blackout_dates)).to eq 4
+      expect(CoursePacesDateHelpers.days_between(start_date, end_date, true, inclusive_end: true, blackout_dates:)).to eq 4
     end
   end
 end

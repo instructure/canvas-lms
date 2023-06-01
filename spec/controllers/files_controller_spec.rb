@@ -91,7 +91,7 @@ describe FilesController do
       folder ||= @course.folders.create!(name: component, workflow_state: "visible", parent_folder: folder)
     end
     filename = components.shift
-    @file = folder.active_file_attachments.build(filename: filename, uploaded_data: io)
+    @file = folder.active_file_attachments.build(filename:, uploaded_data: io)
     @file.context = @course
     @file.save!
     @file
@@ -285,7 +285,7 @@ describe FilesController do
 
       it "allows public access with new verifier" do
         verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
-        get "show", params: { course_id: @course.id, id: @file.id, verifier: verifier }, format: "json"
+        get "show", params: { course_id: @course.id, id: @file.id, verifier: }, format: "json"
         expect(response).to be_successful
         expect(json_parse["attachment"]).to_not be_nil
         expect(json_parse["attachment"]["md5"]).to be_nil
@@ -295,7 +295,7 @@ describe FilesController do
         user_session(@teacher)
         session[:require_terms] = true
         verifier = Attachments::Verification.new(@file).verifier_for_user(@teacher)
-        get "show", params: { course_id: @course.id, id: @file.id, verifier: verifier }, format: "json"
+        get "show", params: { course_id: @course.id, id: @file.id, verifier: }, format: "json"
         expect(response).to be_successful
       end
 
@@ -369,7 +369,7 @@ describe FilesController do
     it "redirects without sf_verifier for inline_content files" do
       user = user_factory(active_all: true)
       file = user_html_file
-      verifier = Users::AccessVerifier.generate(user: user)
+      verifier = Users::AccessVerifier.generate(user:)
 
       get "show", params: verifier.merge(id: file.id)
       expect(response).to be_redirect
@@ -380,7 +380,7 @@ describe FilesController do
     it "ignores invalid sf_verifiers" do
       user = user_factory(active_all: true)
       file = user_file
-      verifier = Users::AccessVerifier.generate(user: user)
+      verifier = Users::AccessVerifier.generate(user:)
 
       # first use to establish session
       get "show", params: verifier.merge(id: file.id)
@@ -428,7 +428,7 @@ describe FilesController do
 
     context "when the attachment has been overwritten" do
       subject do
-        get "show", params: params
+        get("show", params:)
         response
       end
 
@@ -523,7 +523,7 @@ describe FilesController do
         it "finds file in intermediate user's context if merge has happened cross-shard" do
           @shard1.activate do
             account = Account.create!
-            course_with_student(account: account)
+            course_with_student(account:)
           end
           UserMerge.from(@merge_user_1).into(@merge_user_2)
           UserMerge.from(@merge_user_2).into(@student)
@@ -538,7 +538,7 @@ describe FilesController do
         it "finds files correctly when given a non-native user ID" do
           @shard1.activate do
             account = Account.create!
-            course_with_student(account: account)
+            course_with_student(account:)
           end
           UserMerge.from(@merge_user_1).into(@merge_user_2)
           UserMerge.from(@merge_user_2).into(@student)
@@ -574,7 +574,7 @@ describe FilesController do
             "files",
             "files"
           )
-          get "show", params: params
+          get "show", params:
         end
       end
 
@@ -726,7 +726,7 @@ describe FilesController do
             "files",
             "files"
           )
-          get "show", params: params
+          get "show", params:
         end
       end
     end
@@ -902,7 +902,7 @@ describe FilesController do
                                    uploaded_data: StringIO.new("blah2"),
                                    folder: Folder.root_folders(@course).first,
                                    filename: "still_something_else.txt",
-                                   display_name: display_name)
+                                   display_name:)
         other_file = Attachment.create!(context: @course,
                                         uploaded_data: StringIO.new("blah3"),
                                         folder: Folder.root_folders(@course).first,
@@ -941,7 +941,7 @@ describe FilesController do
         it "allows access to files from a user who was merged into another user (happens with cross-shard merge)" do
           @shard1.activate do
             account = Account.create!
-            course_with_student(account: account)
+            course_with_student(account:)
           end
           UserMerge.from(@merge_user_1).into(@student)
           run_jobs
@@ -1354,7 +1354,7 @@ describe FilesController do
         local_storage!
         @shard1.activate do
           account = Account.create!
-          course_with_teacher_logged_in(active_all: true, account: account)
+          course_with_teacher_logged_in(active_all: true, account:)
         end
         post "create_pending", params: { attachment: {
           context_code: @course.asset_string,
@@ -1377,7 +1377,7 @@ describe FilesController do
         @shard1.activate do
           @student = user_factory(active_user: true)
         end
-        course_factory(active_all: true, account: account)
+        course_factory(active_all: true, account:)
         @course.enroll_user(@student, "StudentEnrollment").accept!
         @assignment = @course.assignments.create!(title: "upload_assignment", submission_types: "online_upload")
 
@@ -1537,7 +1537,7 @@ describe FilesController do
       end
 
       it "creates a new attachment" do
-        post "api_capture", params: params
+        post("api_capture", params:)
         assert_status(201)
         attachment = folder.attachments.first
         expect(attachment).not_to be_nil
@@ -1551,7 +1551,7 @@ describe FilesController do
       end
 
       it "includes the attachment json in the response" do
-        post "api_capture", params: params
+        post("api_capture", params:)
         assert_status(201)
         attachment = folder.attachments.first
         data = json_parse
@@ -1573,7 +1573,7 @@ describe FilesController do
 
       it "works with a Quizzes::QuizSubmission as the context" do
         quiz = course.quizzes.create!
-        submission = quiz.quiz_submissions.create!(user: user)
+        submission = quiz.quiz_submissions.create!(user:)
 
         request_params = params.merge(
           context_type: "Quizzes::QuizSubmission",
@@ -1603,7 +1603,7 @@ describe FilesController do
         end
         let(:progress) do
           Progress
-            .new(context: assignment, user: user, tag: :test)
+            .new(context: assignment, user:, tag: :test)
             .tap(&:start)
             .tap(&:save!)
         end
@@ -1654,7 +1654,7 @@ describe FilesController do
         context "with Progress tagged as :upload_via_url" do
           let(:progress) do
             Progress
-              .new(context: assignment, user: user, tag: :upload_via_url)
+              .new(context: assignment, user:, tag: :upload_via_url)
               .tap(&:start)
               .tap(&:save!)
           end
@@ -1662,8 +1662,8 @@ describe FilesController do
           let(:progress_params) do
             assignment_params.merge(
               progress_id: progress.id,
-              comment: comment,
-              eula_agreement_timestamp: eula_agreement_timestamp
+              comment:,
+              eula_agreement_timestamp:
             )
           end
           let(:eula_agreement_timestamp) { "1522419910" }

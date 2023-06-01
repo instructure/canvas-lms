@@ -90,7 +90,7 @@ describe "speed grader - quiz submissions" do
       question_data: {
         name: "first question",
         question_type: "multiple_answers_question",
-        answers: answers,
+        answers:,
         points_possible: 4
       }
     )

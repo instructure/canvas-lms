@@ -80,7 +80,7 @@ class Conversation < ActiveRecord::Base
       root_account_ids: read_attribute(:root_account_ids)
     }.merge(options)
     ConversationParticipant.bulk_insert(user_ids.map do |user_id|
-      options.merge({ user_id: user_id })
+      options.merge({ user_id: })
     end)
   end
 
@@ -91,7 +91,7 @@ class Conversation < ActiveRecord::Base
     private_hash = private ? private_hash_for(users, context_code) : nil
     transaction do
       if private
-        conversation = users.first.all_conversations.except(:preload).where(private_hash: private_hash).first.try(:conversation)
+        conversation = users.first.all_conversations.except(:preload).where(private_hash:).first.try(:conversation)
         if !conversation && context_code
           # try to match with an existing conversation but make sure the context matches
           conversation = users.first.all_conversations.except(:preload).where(private_hash: private_hash_for(users)).joins(:conversation)
@@ -117,7 +117,7 @@ class Conversation < ActiveRecord::Base
         # TODO: transaction on these shards as well?
         bulk_insert_options = {
           tags: "",
-          private_hash: private_hash
+          private_hash:
         }
         Shard.partition_by_shard(user_ids) do |shard_user_ids|
           next if Shard.current == conversation.shard
@@ -155,7 +155,7 @@ class Conversation < ActiveRecord::Base
           bulk_insert_options = {
             workflow_state: "unread",
             message_count: 0,
-            private_hash: private_hash
+            private_hash:
           }
         else
           last_message_at = conversation_messages.human.first.try(:created_at)
@@ -165,9 +165,9 @@ class Conversation < ActiveRecord::Base
 
           bulk_insert_options = {
             workflow_state: "unread",
-            last_message_at: last_message_at,
+            last_message_at:,
             message_count: num_messages,
-            private_hash: private_hash
+            private_hash:
           }
         end
 
@@ -201,7 +201,7 @@ class Conversation < ActiveRecord::Base
           SQL
 
           # announce their arrival
-          message = add_event_message(current_user, { event_type: :users_added, user_ids: user_ids }, options)
+          message = add_event_message(current_user, { event_type: :users_added, user_ids: }, options)
         end
         touch
         Canvas::LiveEvents.conversation_forwarded(self)
@@ -570,7 +570,7 @@ class Conversation < ActiveRecord::Base
 
     existing = shard.activate do
       ConversationParticipant.unscoped do
-        ConversationParticipant.where(private_hash: private_hash).take&.conversation
+        ConversationParticipant.where(private_hash:).take&.conversation
       end
     end
     if existing
@@ -578,7 +578,7 @@ class Conversation < ActiveRecord::Base
     else
       save!
       Shard.with_each_shard(associated_shards) do
-        ConversationParticipant.where(conversation_id: self).update_all(private_hash: private_hash)
+        ConversationParticipant.where(conversation_id: self).update_all(private_hash:)
       end
     end
   end
@@ -791,7 +791,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def observing_all_other_participants(user, course)
-    observee_ids = user.observer_enrollments.active.where(course: course).pluck(:associated_user_id)
+    observee_ids = user.observer_enrollments.active.where(course:).pluck(:associated_user_id)
     return false if observee_ids.empty?
 
     (conversation_participants.pluck(:user_id) - observee_ids - [user.id]).empty?

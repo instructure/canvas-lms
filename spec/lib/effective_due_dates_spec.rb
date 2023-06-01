@@ -96,7 +96,7 @@ describe Course do
       before do
         @shard1.activate do
           account = Account.create!
-          course_with_student(account: account, active_all: true)
+          course_with_student(account:, active_all: true)
           assignment_model(course: @course)
         end
       end
@@ -1386,7 +1386,7 @@ describe Course do
           grading_period = Factories::GradingPeriodHelper.new.create_for_group(
             @gp_group,
             start_date: 20.days.ago(@now),
-            end_date: end_date,
+            end_date:,
             close_date: 10.days.ago(@now)
           )
           override = @assignment2.assignment_overrides.create!(

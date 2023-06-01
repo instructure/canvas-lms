@@ -60,7 +60,7 @@ describe "Outcome Reports" do
       read_report(
         "outcome_export_csv",
         parse_header: true,
-        account: account,
+        account:,
         order: "skip",
         **report_options
       )
@@ -74,11 +74,11 @@ describe "Outcome Reports" do
     it "respects csv i18n settings" do
       preparsed_report_options = {
         parse_header: true,
-        account: account,
+        account:,
         order: "skip",
         header: true
       }
-      admin = account_admin_user(account: account)
+      admin = account_admin_user(account:)
       expected_headers = %w[vendor_guid object_type title]
       admin.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
 

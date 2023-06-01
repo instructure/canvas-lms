@@ -89,7 +89,7 @@ class AuthenticationProvider::Clever < AuthenticationProvider::OAuth2
   end
 
   def authorize_options
-    result = { scope: scope }
+    result = { scope: }
     result[:district_id] = district_id if district_id.present?
     result
   end

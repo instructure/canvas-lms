@@ -125,9 +125,9 @@ describe "Services API", type: :request do
   describe "#rce_config" do
     let(:register_a_tool_to_course) do
       url = "http://example.com"
-      tool_params = { name: "bob", consumer_key: "test", shared_secret: "secret", url: url, description: "description" }
+      tool_params = { name: "bob", consumer_key: "test", shared_secret: "secret", url:, description: "description" }
       tool = @course.context_external_tools.new(tool_params)
-      tool.editor_button = { url: url, icon_url: url, canvas_icon_class: "icon" }
+      tool.editor_button = { url:, icon_url: url, canvas_icon_class: "icon" }
       tool.save!
     end
     let(:rce_config_api_call) do

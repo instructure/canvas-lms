@@ -49,7 +49,7 @@ class Mutations::MoveOutcomeLinks < Mutations::BaseMutation
     context[:group] = group
 
     {
-      errors: errors,
+      errors:,
       moved_outcome_links: ContentTag.where(id: outcome_links.pluck(:id))
     }
   end
@@ -78,7 +78,7 @@ class Mutations::MoveOutcomeLinks < Mutations::BaseMutation
     ids = input[:outcome_link_ids].map(&:to_i).uniq
     links = if context
               ContentTag.active.learning_outcome_links.where(
-                context: context,
+                context:,
                 id: ids
               )
             else

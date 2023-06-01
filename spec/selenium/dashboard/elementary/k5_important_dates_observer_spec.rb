@@ -46,7 +46,7 @@ describe "observer k5 dashboard important dates" do
       due_at = 2.days.ago(Time.zone.now)
       assignment = create_dated_assignment(@subject_course, assignment_title, due_at)
       assignment.update!(important_dates: true)
-      override = assignment_override_model(assignment: assignment)
+      override = assignment_override_model(assignment:)
       student_due_at = 2.days.from_now(Time.zone.now)
       override.override_due_at(student_due_at)
       override.save!

@@ -100,11 +100,11 @@ module BundlerLockfileExtensions
       @lockfile_definitions << (lockfile_def = {
         gemfile: (gemfile && ::Bundler.root.join(gemfile).expand_path) || ::Bundler.default_gemfile,
         lockfile: (lockfile && ::Bundler.root.join(lockfile).expand_path) || ::Bundler.default_lockfile,
-        default: default,
-        current: current,
-        prepare: prepare,
-        allow_mismatched_dependencies: allow_mismatched_dependencies,
-        enforce_pinned_additional_dependencies: enforce_pinned_additional_dependencies
+        default:,
+        current:,
+        prepare:,
+        allow_mismatched_dependencies:,
+        enforce_pinned_additional_dependencies:
       }.freeze)
 
       # if BUNDLE_LOCKFILE is specified, explicitly use only that lockfile, regardless of the command
@@ -197,7 +197,7 @@ module BundlerLockfileExtensions
             end
 
             ::Bundler.ui.info("Installing gems for #{relative_lockfile}...")
-            write_lockfile(lockfile_definition, lockfile_definition[:lockfile], install: install)
+            write_lockfile(lockfile_definition, lockfile_definition[:lockfile], install:)
           else
             ::Bundler.ui.info("Syncing to #{relative_lockfile}...")
 
@@ -249,7 +249,7 @@ module BundlerLockfileExtensions
               temp_lockfile.write(new_contents)
               temp_lockfile.flush
 
-              write_lockfile(lockfile_definition, temp_lockfile.path, install: install)
+              write_lockfile(lockfile_definition, temp_lockfile.path, install:)
             end
           end
         end

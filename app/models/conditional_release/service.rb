@@ -168,7 +168,7 @@ module ConditionalRelease
               ).map(&:deep_symbolize_keys)
               rule.as_json(include_root: false, except: [:root_account_id, :deleted_at]).merge(
                 locked: relative_score.blank?,
-                selected_set_id: selected_set_id,
+                selected_set_id:,
                 assignment_sets: assignment_sets_data
               )
             end

@@ -241,7 +241,7 @@ class WebConference < ActiveRecord::Base
     return unless user
 
     p = web_conference_participants.where(user_id: user).first
-    p ||= web_conference_participants.build(user: user)
+    p ||= web_conference_participants.build(user:)
     p.participation_type = type unless type == "attendee" && p.participation_type == "initiator"
     (@new_participants ||= []) << user if p.new_record?
     # Once anyone starts attending the conference, mark it as started.
@@ -518,7 +518,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def config
-    @config ||= WebConference.config(context: context, class_name: self.class.to_s)
+    @config ||= WebConference.config(context:, class_name: self.class.to_s)
   end
 
   def valid_config?
@@ -602,7 +602,7 @@ class WebConference < ActiveRecord::Base
         class_name: (plugin.base || "#{plugin.id.classify}Conference"),
         user_setting_fields: klass.user_setting_fields,
         name: plugin.name,
-        plugin: plugin
+        plugin:
       ).with_indifferent_access
     end
   end

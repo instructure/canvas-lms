@@ -80,7 +80,7 @@ class ContentZipper
       # This neglects the complexity of group assignments
       students = User.where(id: submissions.pluck(:user_id)).index_by(&:id)
     else
-      students    = assignment.representatives(user: user).index_by(&:id)
+      students    = assignment.representatives(user:).index_by(&:id)
       submissions = assignment.submissions.where(user_id: students.keys,
                                                  submission_type: downloadable_submissions)
     end
@@ -114,7 +114,7 @@ class ContentZipper
                   :attachment
 
     # Match on /files URLs capturing the object id.
-    FILES_REGEX = %r{/files/(?<obj_id>\d+)/\w+(?:(?:[^\s"<'?/]*)(?:[^\s"<']*))?}.freeze
+    FILES_REGEX = %r{/files/(?<obj_id>\d+)/\w+(?:(?:[^\s"<'?/]*)(?:[^\s"<']*))?}
 
     def initialize(attachment, index = nil)
       @attachment = attachment
@@ -191,7 +191,7 @@ class ContentZipper
 
     ApplicationController.render(
       partial: "eportfolios/static_page",
-      locals: { page: page, portfolio: portfolio, static_attachments: static_attachments, submissions_hash: submissions_hash }
+      locals: { page:, portfolio:, static_attachments:, submissions_hash: }
     )
   end
 
@@ -298,8 +298,8 @@ class ContentZipper
 
   def zip_quiz(zip_attachment, quiz)
     Quizzes::QuizSubmissionZipper.new(
-      quiz: quiz,
-      zip_attachment: zip_attachment
+      quiz:,
+      zip_attachment:
     ).zip!
   end
 

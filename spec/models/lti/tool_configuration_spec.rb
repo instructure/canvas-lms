@@ -34,7 +34,7 @@ module Lti
         "use" => "sig"
       }
     end
-    let(:tool_configuration) { described_class.new(settings: settings) }
+    let(:tool_configuration) { described_class.new(settings:) }
     let(:developer_key) { DeveloperKey.create }
 
     describe "validations" do
@@ -70,7 +70,7 @@ module Lti
 
       context "when developer_key already has a tool_config" do
         before do
-          described_class.create! settings: settings, developer_key: developer_key
+          described_class.create! settings:, developer_key:
         end
 
         it { is_expected.to be false }
@@ -181,7 +181,7 @@ module Lti
     describe "after_update" do
       subject { tool_configuration.update!(changes) }
 
-      before { tool_configuration.update!(developer_key: developer_key) }
+      before { tool_configuration.update!(developer_key:) }
 
       context "when a change to the settings hash was made" do
         let(:changed_settings) do
@@ -259,7 +259,7 @@ module Lti
         end
 
         context "when existing_tool is provided" do
-          subject { tool_configuration.new_external_tool(context, existing_tool: existing_tool) }
+          subject { tool_configuration.new_external_tool(context, existing_tool:) }
 
           let(:existing_tool) { tool_configuration.new_external_tool(context) }
 
@@ -449,9 +449,9 @@ module Lti
         let(:settings) { { tool: "foo" } }
 
         it "does not create dev key" do
-          expect(DeveloperKey.where(account: account).count).to eq 0
+          expect(DeveloperKey.where(account:).count).to eq 0
           expect { described_class.create_tool_config_and_key! account, params }.to raise_error ActiveRecord::RecordInvalid
-          expect(DeveloperKey.where(account: account).count).to eq 0
+          expect(DeveloperKey.where(account:).count).to eq 0
         end
       end
 

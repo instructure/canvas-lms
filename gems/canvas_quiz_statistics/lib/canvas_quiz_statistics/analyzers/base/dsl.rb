@@ -61,7 +61,7 @@ module CanvasQuizStatistics::Analyzers::Base::DSL
     metrics[question_type] << {
       key: key.to_sym,
       context: deps,
-      calculator: calculator
+      calculator:
     }
   end
 

@@ -28,7 +28,7 @@ module DataFixup
           Course.where(id: course.id).update_all(
             homeroom_course: settings[:homeroom_course] || false,
             sync_enrollments_from_homeroom: settings[:sync_enrollments_from_homeroom] || false,
-            homeroom_course_id: homeroom_course_id
+            homeroom_course_id:
           )
         end
       end

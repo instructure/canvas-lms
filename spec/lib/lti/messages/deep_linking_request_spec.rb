@@ -26,12 +26,12 @@ describe Lti::Messages::DeepLinkingRequest do
 
   let(:jwt_message) do
     Lti::Messages::DeepLinkingRequest.new(
-      tool: tool,
+      tool:,
       context: course,
-      user: user,
-      expander: expander,
-      return_url: return_url,
-      opts: opts
+      user:,
+      expander:,
+      return_url:,
+      opts:
     )
   end
 

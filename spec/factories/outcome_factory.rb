@@ -77,7 +77,7 @@ module Factories
   def outcome_with_rubric(opts = {})
     context = opts[:context] || opts[:course] || @course
     @outcome_group ||= context.root_outcome_group
-    @outcome = opts[:outcome] || outcome_model(context: context,
+    @outcome = opts[:outcome] || outcome_model(context:,
                                                outcome_context: opts[:outcome_context] || context,
                                                title: "new outcome",
                                                description: "<p>This is <b>awesome</b>.</p>",
@@ -138,7 +138,7 @@ module Factories
   def outcome_with_individual_ratings(opts = {})
     context = opts[:context] || opts[:course] || @course
     @outcome_group ||= context.root_outcome_group
-    @outcome = opts[:outcome] || outcome_model(context: context,
+    @outcome = opts[:outcome] || outcome_model(context:,
                                                outcome_context: opts[:outcome_context] || context,
                                                title: "new outcome",
                                                description: "<p>This is <b>awesome</b>.</p>",
@@ -165,7 +165,7 @@ module Factories
     groups = group_attrs.delete(:groups)
 
     create_group_attrs = {
-      context: context,
+      context:,
       **group_attrs
     }
 
@@ -177,7 +177,7 @@ module Factories
       outcome_model(
         title: "#{c} #{group_attrs[:title]} outcome",
         outcome_group: group,
-        context: context
+        context:
       )
     end
 

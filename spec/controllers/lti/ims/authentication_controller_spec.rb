@@ -25,7 +25,7 @@ describe Lti::IMS::AuthenticationController do
 
   let(:developer_key) do
     key = DeveloperKey.create!(
-      redirect_uris: redirect_uris,
+      redirect_uris:,
       account: context.root_account
     )
     enable_developer_key_account_binding!(key)
@@ -37,7 +37,7 @@ describe Lti::IMS::AuthenticationController do
   let(:verifier) { SecureRandom.hex 64 }
   let(:client_id) { developer_key.global_id }
   let(:context) { account_model }
-  let(:login_hint) { Lti::Asset.opaque_identifier_for(user, context: context) }
+  let(:login_hint) { Lti::Asset.opaque_identifier_for(user, context:) }
   let(:nonce) { SecureRandom.uuid }
   let(:prompt) { "none" }
   let(:redirect_uri) { "https://redirect.tool.com?foo=bar" }
@@ -49,11 +49,11 @@ describe Lti::IMS::AuthenticationController do
   let(:lti_message_hint) do
     Canvas::Security.create_jwt(
       {
-        verifier: verifier,
+        verifier:,
         canvas_domain: redirect_domain,
         context_id: context.global_id,
         context_type: context.class.to_s,
-        include_storage_target: include_storage_target
+        include_storage_target:
       },
       1.year.from_now
     )
@@ -76,7 +76,7 @@ describe Lti::IMS::AuthenticationController do
   before { user_session(user) }
 
   describe "authorize_redirect" do
-    before { post :authorize_redirect, params: params }
+    before { post :authorize_redirect, params: }
 
     context "when authorization request has no errors" do
       subject { URI.parse(response.headers["Location"]) }
@@ -116,7 +116,7 @@ describe Lti::IMS::AuthenticationController do
         let(:lti_message_hint) do
           Canvas::Security.create_jwt(
             {
-              verifier: verifier,
+              verifier:,
               canvas_domain: redirect_domain
             },
             1.year.ago
@@ -130,7 +130,7 @@ describe Lti::IMS::AuthenticationController do
         let(:lti_message_hint) do
           jws = Canvas::Security.create_jwt(
             {
-              verifier: verifier,
+              verifier:,
               canvas_domain: redirect_domain
             },
             1.year.from_now
@@ -144,7 +144,7 @@ describe Lti::IMS::AuthenticationController do
   end
 
   describe "authorize" do
-    subject { get :authorize, params: params }
+    subject { get :authorize, params: }
 
     shared_examples_for "redirect_uri errors" do
       let(:expected_status) { 400 }
@@ -186,7 +186,7 @@ describe Lti::IMS::AuthenticationController do
 
     context "when there is a cached LTI 1.3 launch" do
       subject do
-        get :authorize, params: params
+        get :authorize, params:
       end
 
       include_context "lti_1_3_spec_helper"
@@ -266,7 +266,7 @@ describe Lti::IMS::AuthenticationController do
         let(:redirect_uri) { "https://redirect.tool.com?must_be_present=true&foo=bar" }
 
         before do
-          developer_key.update!(redirect_uris: redirect_uris)
+          developer_key.update!(redirect_uris:)
         end
 
         it "launches succesfully" do
@@ -290,7 +290,7 @@ describe Lti::IMS::AuthenticationController do
         before { remove_user_session }
 
         it_behaves_like "non redirect_uri errors" do
-          subject { get :authorize, params: params }
+          subject { get :authorize, params: }
 
           let(:expected_message) { "Must have an active user session" }
           let(:expected_error) { "login_required" }
@@ -316,13 +316,13 @@ describe Lti::IMS::AuthenticationController do
         # already set up above in the parent rspec context
 
         # Make sure user has access in the PFC tool (enrollment in tool's course)
-        let(:enrollment) { course_with_teacher(user: user, active_all: true) }
+        let(:enrollment) { course_with_teacher(user:, active_all: true) }
         let(:pfc_tool_context) { enrollment.course }
 
         let(:lti_message_hint) do
           Canvas::Security.create_jwt(
             {
-              verifier: verifier,
+              verifier:,
               canvas_domain: redirect_domain,
               context_id: context.global_id,
               context_type: context.class.to_s,

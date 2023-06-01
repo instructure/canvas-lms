@@ -139,7 +139,7 @@ describe FileAuthenticator do
         geometry = "640>"
         allow(@attachment).to receive(:thumbnailable?).and_return(true)
         expect(InstFS).to receive(:authenticated_thumbnail_url)
-          .with(@attachment, include(geometry: geometry))
+          .with(@attachment, include(geometry:))
         @authenticator.thumbnail_url(@attachment, size: geometry)
       end
 
@@ -147,8 +147,8 @@ describe FileAuthenticator do
         original_url = "http://example.com/preview/1234"
         allow(@attachment).to receive(:thumbnailable?).and_return(true)
         expect(InstFS).to receive(:authenticated_thumbnail_url)
-          .with(@attachment, include(original_url: original_url))
-        @authenticator.thumbnail_url(@attachment, original_url: original_url)
+          .with(@attachment, include(original_url:))
+        @authenticator.thumbnail_url(@attachment, original_url:)
       end
 
       it "constructs a url specific to the authenticator params" do

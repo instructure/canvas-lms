@@ -24,7 +24,7 @@ describe Auditors::Course do
   let(:request_id) { 42 }
 
   before do
-    allow(RequestContextGenerator).to receive_messages(request_id: request_id)
+    allow(RequestContextGenerator).to receive_messages(request_id:)
 
     @account = Account.default
     @sub_account = Account.create!(parent_account: @account)
@@ -70,7 +70,7 @@ describe Auditors::Course do
 
     it "logs event with sis_batch_id and event source of sis" do
       sis_batch = @account.root_account.sis_batches.create
-      @event = Auditors::Course.record_created(@course, @teacher, @course.changes, source: :sis, sis_batch: sis_batch)
+      @event = Auditors::Course.record_created(@course, @teacher, @course.changes, source: :sis, sis_batch:)
       expect(@event.event_source).to eq :sis
       expect(@event.sis_batch_id).to eq sis_batch.global_id
     end

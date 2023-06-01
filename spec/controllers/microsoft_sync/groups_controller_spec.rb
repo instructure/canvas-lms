@@ -20,11 +20,11 @@
 require "microsoft_sync/membership_diff"
 
 describe MicrosoftSync::GroupsController do
-  let!(:group) { MicrosoftSync::Group.create!(course: course, workflow_state: workflow_state) }
+  let!(:group) { MicrosoftSync::Group.create!(course:, workflow_state:) }
 
   let(:course_id) { course.id }
   let(:feature) { :microsoft_group_enrollments_syncing }
-  let(:params) { { course_id: course_id } }
+  let(:params) { { course_id: } }
   let(:student) { course.student_enrollments.first.user }
   let(:teacher) { course.teacher_enrollments.first.user }
   let(:workflow_state) { :completed }
@@ -125,7 +125,7 @@ describe MicrosoftSync::GroupsController do
   end
 
   describe "#sync" do
-    subject { post :sync, params: params }
+    subject { post :sync, params: }
 
     before { user_session(teacher) }
 
@@ -191,7 +191,7 @@ describe MicrosoftSync::GroupsController do
   end
 
   describe "#create" do
-    subject { post :create, params: params }
+    subject { post :create, params: }
 
     before { user_session(teacher) }
 
@@ -274,7 +274,7 @@ describe MicrosoftSync::GroupsController do
       end
 
       context "when too many owners are enrolled in the course" do
-        before { 3.times { teacher_in_course(course: course, active_enrollment: true) } }
+        before { 3.times { teacher_in_course(course:, active_enrollment: true) } }
 
         before { stub_const("MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS", 2) }
 
@@ -288,7 +288,7 @@ describe MicrosoftSync::GroupsController do
       end
 
       context "when too many members are enrolled in the course" do
-        before { 3.times { student_in_course(course: course, active_enrollment: true) } }
+        before { 3.times { student_in_course(course:, active_enrollment: true) } }
 
         before { stub_const("MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS", 2) }
 
@@ -304,7 +304,7 @@ describe MicrosoftSync::GroupsController do
   end
 
   describe "#deleted" do
-    subject { delete :destroy, params: params }
+    subject { delete :destroy, params: }
 
     before { user_session(teacher) }
 
@@ -323,7 +323,7 @@ describe MicrosoftSync::GroupsController do
   end
 
   describe "#show" do
-    subject { get :show, params: params }
+    subject { get :show, params: }
 
     before { user_session(teacher) }
 

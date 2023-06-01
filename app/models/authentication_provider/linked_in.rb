@@ -98,7 +98,7 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::OAuth2
   end
 
   def authorize_options
-    { scope: scope }
+    { scope: }
   end
 
   def scope

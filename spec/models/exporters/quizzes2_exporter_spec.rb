@@ -122,7 +122,7 @@ describe "Quizzes2 Exporter" do
         let(:failed_assignment) do
           @course.assignments.create!(
             position: 777,
-            assignment_group: assignment_group
+            assignment_group:
           )
         end
 

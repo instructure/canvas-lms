@@ -64,7 +64,7 @@ describe Mutations::CreateLearningOutcome do
       }
     GQL
     context = { current_user: user_executing, domain_root_account: @domain_root_account, request: ActionDispatch::TestRequest.create, session: {} }
-    CanvasSchema.execute(mutation_command, context: context)
+    CanvasSchema.execute(mutation_command, context:)
   end
 
   def variables(args = {})

@@ -63,8 +63,8 @@ module TextHelper
 
   def datetime_string(start_datetime, datetime_type = :event, end_datetime = nil, shorten_midnight = false, zone = nil, with_weekday: false)
     zone ||= ::Time.zone
-    presenter = Utils::DatetimeRangePresenter.new(start_datetime, end_datetime, datetime_type, zone, with_weekday: with_weekday)
-    presenter.as_string(shorten_midnight: shorten_midnight)
+    presenter = Utils::DatetimeRangePresenter.new(start_datetime, end_datetime, datetime_type, zone, with_weekday:)
+    presenter.as_string(shorten_midnight:)
   end
 
   def time_ago_in_words_with_ago(time)
@@ -86,7 +86,7 @@ module TextHelper
     elsif hours > 1
       I18n.t(
         { one: "%{hours} hours and 1 minute", other: "%{hours} hours and %{count} minutes" },
-        hours: hours,
+        hours:,
         count: minutes
       )
     elsif hours == 1
@@ -220,7 +220,7 @@ module TextHelper
     blank_re = I18n.t("#subject_reply_to", "Re: %{subject}", subject: "")
     return subject if subject.starts_with?(blank_re)
 
-    I18n.t("#subject_reply_to", "Re: %{subject}", subject: subject)
+    I18n.t("#subject_reply_to", "Re: %{subject}", subject:)
   end
 
   class MarkdownSafeBuffer < String; end

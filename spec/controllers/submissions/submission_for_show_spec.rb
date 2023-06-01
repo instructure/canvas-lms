@@ -63,7 +63,7 @@ describe Submissions::SubmissionForShow do
     context "when submission exists" do
       before :once do
         submission_model({
-                           assignment: assignment,
+                           assignment:,
                            body: "here my assignment",
                            submission_type: "online_text_entry",
                            user: student
@@ -108,7 +108,7 @@ describe Submissions::SubmissionForShow do
               context: course,
               id: student.id,
               preview: true,
-              version: version
+              version:
             )
             expect(subject.submission.version_number).not_to eq version
           end

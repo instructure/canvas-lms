@@ -208,7 +208,7 @@ describe "calendar2" do
       location_address = "cottonwood"
 
       # Make it an all day event so it will be visible on the screen/on top
-      make_event(location_name: location_name, all_day: true, location_address: location_address)
+      make_event(location_name:, all_day: true, location_address:)
       load_week_view
 
       # Click calendar item to bring up event summary

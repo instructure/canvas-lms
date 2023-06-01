@@ -69,13 +69,13 @@ describe LearningOutcomeResult do
     let_once(:assessed_at) { 2.weeks.ago }
 
     it "returns #submitted_at when present" do
-      learning_outcome_result.update(submitted_at: submitted_at)
+      learning_outcome_result.update(submitted_at:)
       expect(learning_outcome_result.submitted_or_assessed_at).to eq(submitted_at)
     end
 
     it "returns #assessed_at when #submitted_at is not present" do
       learning_outcome_result.assign_attributes({
-                                                  assessed_at: assessed_at,
+                                                  assessed_at:,
                                                   submitted_at: nil
                                                 })
       expect(learning_outcome_result.submitted_or_assessed_at).to eq(assessed_at)
@@ -187,7 +187,7 @@ describe LearningOutcomeResult do
     it "returns accurate results" do
       points_possible = 5.5
       allow(learning_outcome_result.learning_outcome).to receive_messages({
-                                                                            points_possible: points_possible, mastery_points: 3.5
+                                                                            points_possible:, mastery_points: 3.5
                                                                           })
       allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.6)
       learning_outcome_result.update(score: 6)
@@ -505,7 +505,7 @@ describe LearningOutcomeResult do
 
       describe "for multiple QuestionBanks with questions used in same quizzes" do
         def create_bank(title, course, quiz, outcome)
-          bank = course.assessment_question_banks.create!(title: title)
+          bank = course.assessment_question_banks.create!(title:)
           q = bank.assessment_questions.create!(
             question_data: {
               "name" => "#{title} question 1",

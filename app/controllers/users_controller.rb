@@ -251,7 +251,7 @@ class UsersController < ApplicationController
         @presenter, params[:course_id], params[:grading_period_id]
       )
       @grades = grades_for_presenter(@presenter, @grading_periods)
-      js_env grades_for_student_url: grades_for_student_url
+      js_env(grades_for_student_url:)
 
       ActiveRecord::Associations.preload(@observed_enrollments, :course)
 
@@ -267,7 +267,7 @@ class UsersController < ApplicationController
     return render_unauthorized_action unless enrollment.grants_right?(@current_user, session, :read_grades)
 
     grading_period_id = generate_grading_period_id(params[:grading_period_id])
-    opts = { grading_period_id: grading_period_id } if grading_period_id
+    opts = { grading_period_id: } if grading_period_id
 
     grade_data = { hide_final_grades: enrollment.course.hide_final_grades? }
 
@@ -295,7 +295,7 @@ class UsersController < ApplicationController
     when "google_drive"
       redirect_uri = oauth_success_url(service: "google_drive")
       session[:oauth_gdrive_nonce] = SecureRandom.hex
-      state = Canvas::Security.create_jwt(redirect_uri: redirect_uri, return_to_url: return_to_url, nonce: session[:oauth_gdrive_nonce])
+      state = Canvas::Security.create_jwt(redirect_uri:, return_to_url:, nonce: session[:oauth_gdrive_nonce])
       redirect_to GoogleDrive::Client.auth_uri(google_drive_client, state)
     when "twitter"
       success_url = oauth_success_url(service: "twitter")
@@ -704,7 +704,7 @@ class UsersController < ApplicationController
       end
 
       if (@show_recent_feedback = @user.student_enrollments.active.exists?)
-        @recent_feedback = @user.recent_feedback(course_ids: course_ids) || []
+        @recent_feedback = @user.recent_feedback(course_ids:) || []
       end
     end
 
@@ -1222,7 +1222,7 @@ class UsersController < ApplicationController
         assmt_json
       end
 
-      render json: json
+      render json:
     end
   end
 
@@ -1342,7 +1342,7 @@ class UsersController < ApplicationController
       end
       @services.map { |s| s.as_json(only: %i[service_user_id service_user_url service_user_name service type id]) }
     end
-    render json: json
+    render json:
   end
 
   def bookmark_search
@@ -1406,7 +1406,7 @@ class UsersController < ApplicationController
               can_manage_sis_pseudonyms: @context_account.root_account.grants_right?(@current_user, :manage_sis)
             }
           )
-          render status: status
+          render status:
         end
         format.json do
           render json: user_json(@user,
@@ -1414,7 +1414,7 @@ class UsersController < ApplicationController
                                  session,
                                  %w[locale avatar_url],
                                  @current_user.pseudonym.account),
-                 status: status
+                 status:
         end
       end
     end
@@ -1504,7 +1504,7 @@ class UsersController < ApplicationController
                   return_url: @return_url,
                   expander: variable_expander,
                   include_storage_target: !in_lti_mobile_webview?,
-                  opts: opts
+                  opts:
                 )
               else
                 Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, variable_expander, opts)
@@ -2143,11 +2143,11 @@ class UsersController < ApplicationController
                                          url: av_json["url"] }
         end
       elsif (url = avatar.try(:[], :url))
-        user_params[:avatar_image] = { url: url }
+        user_params[:avatar_image] = { url: }
       end
 
       if (state = avatar.try(:[], :state))
-        user_params[:avatar_image] = { state: state }
+        user_params[:avatar_image] = { state: }
       end
     end
 
@@ -2266,7 +2266,7 @@ class UsersController < ApplicationController
     url = fetcher.fetch_preferred_source_url(
       media_id: params[:entryId],
       file_extension: extension,
-      media_type: media_type
+      media_type:
     )
     if url
       if params[:redirect] == "1"
@@ -2694,19 +2694,19 @@ class UsersController < ApplicationController
 
       if existing_rows.any?
         existing_users = existing_rows.map do |address, user_id, user_uuid, account_id, user_name, account_name|
-          { address: address, user_id: user_id, user_token: User.token(user_id, user_uuid), user_name: user_name, account_id: account_id, account_name: account_name }
+          { address:, user_id:, user_token: User.token(user_id, user_uuid), user_name:, account_id:, account_name: }
         end
         unconfirmed_email = user_scope.where(communication_channels: { workflow_state: "unconfirmed" })
         errored_users <<
           if unconfirmed_email.exists?
             user_hash.merge(
               errors: [{ message: "The email address provided conflicts with an existing user's email that is awaiting verification. Please add the user by either SIS ID or Login ID." }],
-              existing_users: existing_users
+              existing_users:
             )
           else
             user_hash.merge(
               errors: [{ message: "Matching user(s) already exist" }],
-              existing_users: existing_users
+              existing_users:
             )
           end
       elsif user.save
@@ -2715,7 +2715,7 @@ class UsersController < ApplicationController
         errored_users << user_hash.merge(user.errors.as_json)
       end
     end
-    render json: { invited_users: invited_users, errored_users: errored_users }
+    render json: { invited_users:, errored_users: }
   end
 
   # @API Get a Pandata Events jwt token and its expiration date
@@ -2787,8 +2787,8 @@ class UsersController < ApplicationController
     props_token = Canvas::Security.create_jwt(props_body, nil, private_key, :ES512)
     render json: {
       url: settings["url"],
-      auth_token: auth_token,
-      props_token: props_token,
+      auth_token:,
+      props_token:,
       expires_at: expires_at.to_f * 1000
     }
   end
@@ -2963,7 +2963,7 @@ class UsersController < ApplicationController
       grades[:observed_enrollments][course_id] = {}
       grades[:observed_enrollments][course_id] = grades_from_enrollments(
         enrollments,
-        grading_period_id: grading_period_id
+        grading_period_id:
       )
     end
 
@@ -2971,7 +2971,7 @@ class UsersController < ApplicationController
       grading_period_id = generate_grading_period_id(
         grading_periods.dig(course.id, :selected_period_id)
       )
-      opts = { grading_period_id: grading_period_id } if grading_period_id
+      opts = { grading_period_id: } if grading_period_id
       grades[:student_enrollments][course.id] = if course.grants_any_right?(@user, :manage_grades, :view_all_grades)
                                                   enrollment.computed_current_score(opts)
                                                 else
@@ -2983,7 +2983,7 @@ class UsersController < ApplicationController
 
   def grades_from_enrollments(enrollments, grading_period_id: nil)
     grades = {}
-    opts = { grading_period_id: grading_period_id } if grading_period_id
+    opts = { grading_period_id: } if grading_period_id
     enrollments.each do |enrollment|
       grades[enrollment.user_id] = if enrollment.course.grants_any_right?(@user, :manage_grades, :view_all_grades)
                                      enrollment.computed_current_score(opts)
@@ -3017,7 +3017,7 @@ class UsersController < ApplicationController
 
       grading_periods[course.id] = {
         periods: course_periods,
-        selected_period_id: selected_period_id
+        selected_period_id:
       }
     end
     grading_periods
@@ -3048,7 +3048,7 @@ class UsersController < ApplicationController
     @pseudonym = nil
     @user = nil
     if sis_user_id && value_to_boolean(params[:enable_sis_reactivation])
-      @pseudonym = @context.pseudonyms.where(sis_user_id: sis_user_id, workflow_state: "deleted").first
+      @pseudonym = @context.pseudonyms.where(sis_user_id:, workflow_state: "deleted").first
       if @pseudonym
         @pseudonym.workflow_state = "active"
         @pseudonym.save!
@@ -3241,7 +3241,7 @@ class UsersController < ApplicationController
       end
 
       if notify_policy.is_self_registration?
-        registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies: cookies)
+        registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies:)
         @user.new_registration(registration_params)
       end
       message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc && !skip_confirmation
@@ -3249,7 +3249,7 @@ class UsersController < ApplicationController
       data = if api_request?
                user_json(@user, @current_user, session, includes)
              else
-               { user: @user, pseudonym: @pseudonym, channel: @cc, message_sent: message_sent, course: @user.self_enrollment_course }
+               { user: @user, pseudonym: @pseudonym, channel: @cc, message_sent:, course: @user.self_enrollment_course }
              end
 
       # if they passed a destination, and it matches the current canvas installation,

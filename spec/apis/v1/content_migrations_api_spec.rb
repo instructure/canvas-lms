@@ -886,7 +886,7 @@ describe ContentMigrationsController, type: :request do
 
       @shard1.activate do
         account = Account.create!
-        @cs_course = Course.create!(account: account)
+        @cs_course = Course.create!(account:)
         @dt1 = @cs_course.discussion_topics.create!(message: "hi", title: "discussion title")
       end
       @migration.migration_type = "course_copy_importer"

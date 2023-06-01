@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module CustomColorHelper
-  HEX_REGEX = /^#?(\h{3}|\h{6})$/.freeze
+  HEX_REGEX = /^#?(\h{3}|\h{6})$/
 
   # returns true or false if the provide value is a valid hex code
   def valid_hexcode?(hex_to_check)

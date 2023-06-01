@@ -33,7 +33,7 @@ describe "taking a quiz" do
     before { user_session(@student) }
 
     def auto_submit_quiz(quiz)
-      take_and_answer_quiz(submit: false, quiz: quiz, lock_after: 10.seconds)
+      take_and_answer_quiz(submit: false, quiz:, lock_after: 10.seconds)
       verify_times_up_dialog
       expect_new_page_load { close_times_up_dialog }
     end

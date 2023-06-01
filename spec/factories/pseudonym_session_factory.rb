@@ -28,7 +28,7 @@ module Factories
         "Pseudonym",
         record: user,
         user_id: user.id,
-        user: user,
+        user:,
         login_count: 1,
         global_account_id: "10000000000001",
         sis_user_id: "U001",

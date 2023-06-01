@@ -24,8 +24,8 @@ describe "discussions" do
   include DiscussionsCommon
 
   let(:course) { course_model.tap(&:offer!) }
-  let(:student) { student_in_course(course: course, name: "student", active_all: true).user }
-  let(:teacher) { teacher_in_course(course: course, name: "teacher", active_all: true).user }
+  let(:student) { student_in_course(course:, name: "student", active_all: true).user }
+  let(:teacher) { teacher_in_course(course:, name: "teacher", active_all: true).user }
   let(:student_topic) { course.discussion_topics.create!(user: student, title: "student topic title", message: "student topic message") }
   let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: "teacher topic title", message: "teacher topic message") }
   let(:assignment_group) { course.assignment_groups.create!(name: "assignment group") }
@@ -33,14 +33,14 @@ describe "discussions" do
     course.assignments.create!(
       name: "assignment",
       # submission_types: 'discussion_topic',
-      assignment_group: assignment_group
+      assignment_group:
     )
   end
   let(:assignment_topic) do
     course.discussion_topics.create!(user: teacher,
                                      title: "assignment topic title",
                                      message: "assignment topic message",
-                                     assignment: assignment)
+                                     assignment:)
   end
   let(:assignment_with_points) do
     course.assignments.create!(

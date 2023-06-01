@@ -23,7 +23,7 @@ module Factories
     outcome = context.created_learning_outcomes.create!({ title: "new outcome" })
     OutcomeFriendlyDescription.create!(
       learning_outcome: outcome,
-      context: context,
+      context:,
       description: "A friendly description"
     )
   end

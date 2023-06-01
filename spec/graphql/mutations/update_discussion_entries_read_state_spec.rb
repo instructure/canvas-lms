@@ -52,7 +52,7 @@ RSpec.describe Mutations::UpdateDiscussionEntriesReadState do
     result = CanvasSchema.execute(
       mutation_str(**opts),
       context: {
-        current_user: current_user,
+        current_user:,
         request: ActionDispatch::TestRequest.create
       }
     )

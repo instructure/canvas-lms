@@ -64,7 +64,7 @@ module OutcomesServiceAlignmentsHelper
 
     active_new_quizes = Assignment
                         .active
-                        .where(context: context, submission_types: "external_tool")
+                        .where(context:, submission_types: "external_tool")
                         .pluck(:id)
                         .map do |id|
       {
@@ -76,7 +76,7 @@ module OutcomesServiceAlignmentsHelper
     active_outcome_ids = ContentTag
                          .not_deleted
                          .learning_outcome_links
-                         .where(context: context)
+                         .where(context:)
                          .pluck(:content_id)
                          .map(&:to_s)
 

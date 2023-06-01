@@ -66,7 +66,7 @@ module CC::Exporter::Epub::Converters
 
       def mp4_url
         @_mp4_url ||= media_source_fetcher.fetch_preferred_source_url({
-                                                                        media_id: media_id,
+                                                                        media_id:,
                                                                         file_extension: "mp4"
                                                                       })
       end
@@ -85,10 +85,10 @@ module CC::Exporter::Epub::Converters
       def to_h
         {
           identifier: data["identifier"],
-          local_path: local_path,
+          local_path:,
           file_name: File.basename(local_path),
-          path_to_file: path_to_file,
-          media_type: media_type,
+          path_to_file:,
+          media_type:,
           exists: File.exist?(path_to_file)
         }
       end

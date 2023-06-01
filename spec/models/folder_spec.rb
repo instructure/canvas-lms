@@ -426,7 +426,7 @@ describe Folder do
     end
 
     let_once(:folder) { @course.folders.create!(name: "f") }
-    let_once(:file) { attachment_model context: @course, display_name: "normal.txt", folder: folder }
+    let_once(:file) { attachment_model context: @course, display_name: "normal.txt", folder: }
 
     context "clears own permissions" do
       def student_can_read_contents?
@@ -488,7 +488,7 @@ describe Folder do
       it "when moved" do
         expect(student_can_download?).to be true
         parent_folder = @course.folders.create!(name: "parent", locked: true)
-        folder.update! parent_folder: parent_folder
+        folder.update!(parent_folder:)
         expect(student_can_download?).to be false
       end
 

@@ -223,7 +223,7 @@ describe ObserverEnrollmentsHelper do
       enroll_observer(@course1, @observer, @student1)
       @shard2.activate do
         account = Account.create!
-        @course3 = course_factory(active_all: true, account: account)
+        @course3 = course_factory(active_all: true, account:)
         @course3.enroll_student(@student3)
         enroll_observer(@course3, @observer, @student3)
 

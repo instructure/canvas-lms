@@ -174,7 +174,7 @@ module BasicLTI
     end
 
     def grade_submission(launch_url, grade, score, grader_id)
-      BasicOutcomes::LtiResponse.ensure_score_update_possible(submission: submission, prioritize_non_tool_grade: prioritize_non_tool_grade?) do
+      BasicOutcomes::LtiResponse.ensure_score_update_possible(submission:, prioritize_non_tool_grade: prioritize_non_tool_grade?) do
         submission.grade = grade
         submission.score = score
         submission.graded_at = params[:graded_at] || Time.zone.now

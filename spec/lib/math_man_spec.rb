@@ -40,8 +40,8 @@ describe MathMan do
     PluginSetting.create!(
       name: "mathman",
       settings: {
-        use_for_mml: use_for_mml,
-        use_for_svg: use_for_svg
+        use_for_mml:,
+        use_for_svg:
       }.with_indifferent_access
     )
   end
@@ -52,27 +52,27 @@ describe MathMan do
 
   describe ".url_for" do
     it "must retain the path from base_url setting" do
-      url = MathMan.url_for(latex: latex, target: :mml)
+      url = MathMan.url_for(latex:, target: :mml)
       parsed = Addressable::URI.parse(url)
       expect(parsed.path).to eq("/beta/mml")
     end
 
     it "includes target string in generated url" do
-      expect(MathMan.url_for(latex: latex, target: :mml)).to match(/mml/)
-      expect(MathMan.url_for(latex: latex, target: :svg)).to match(/svg/)
+      expect(MathMan.url_for(latex:, target: :mml)).to match(/mml/)
+      expect(MathMan.url_for(latex:, target: :svg)).to match(/svg/)
     end
 
     it "errors if DynamicSettings is not configured" do
       DynamicSettings.fallback_data = nil
-      expect { MathMan.url_for(latex: latex, target: :mml) }.to raise_error MathMan::InvalidConfigurationError
+      expect { MathMan.url_for(latex:, target: :mml) }.to raise_error MathMan::InvalidConfigurationError
     end
 
     it "includes scale param if present" do
-      expect(MathMan.url_for(latex: latex, target: :svg, scale: "2")).to match(/&scale=2/)
+      expect(MathMan.url_for(latex:, target: :svg, scale: "2")).to match(/&scale=2/)
     end
 
     it "excludes scale param if not present" do
-      expect(MathMan.url_for(latex: latex, target: :svg)).not_to match(/&scale=2/)
+      expect(MathMan.url_for(latex:, target: :svg)).not_to match(/&scale=2/)
     end
   end
 

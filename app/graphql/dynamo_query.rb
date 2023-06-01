@@ -72,8 +72,8 @@ class DynamoQuery
     self
   end
 
-  def each(&block)
-    query.items.each(&block)
+  def each(&)
+    query.items.each(&)
   end
 
   def map

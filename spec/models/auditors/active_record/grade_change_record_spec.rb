@@ -42,7 +42,7 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
     end
 
     it "is creatable from an event_stream record of the correct type" do
-      submission_record.update!(grading_period: grading_period)
+      submission_record.update!(grading_period:)
       ar_rec = Auditors::ActiveRecord::GradeChangeRecord.create_from_event_stream!(es_record)
       expect(ar_rec.id).to_not be_nil
       expect(ar_rec.uuid).to eq(es_record.id)
@@ -89,12 +89,12 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
           grader: teacher,
           old_grade: nil,
           old_score: nil,
-          score: score
+          score:
         )
       end
 
       let(:ar_override_grade_change) do
-        Auditors::GradeChange.record(override_grade_change: override_grade_change)
+        Auditors::GradeChange.record(override_grade_change:)
         Auditors::ActiveRecord::GradeChangeRecord.last
       end
 
@@ -131,7 +131,7 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
       end
 
       it "returns true if the record has a valid grading period" do
-        submission_record.update!(grading_period: grading_period)
+        submission_record.update!(grading_period:)
         expect(ar_assignment_grade_change).to be_in_grading_period
       end
 

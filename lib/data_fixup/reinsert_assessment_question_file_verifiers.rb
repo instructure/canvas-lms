@@ -70,7 +70,7 @@ module DataFixup::ReinsertAssessmentQuestionFileVerifiers
         sql.sub!("replace(quiz_data", "replace(replace(quiz_data, ?, ?)")
       end
       update_sql = User.send(:sanitize_sql, [sql] + updates.to_a.flatten + [Time.now.utc])
-      Quizzes::Quiz.where(id: id).update_all(update_sql)
+      Quizzes::Quiz.where(id:).update_all(update_sql)
     end
 
     qq_updates.each do |id, updates|
@@ -79,7 +79,7 @@ module DataFixup::ReinsertAssessmentQuestionFileVerifiers
         sql.sub!("replace(question_data", "replace(replace(question_data, ?, ?)")
       end
       update_sql = User.send(:sanitize_sql, [sql] + updates.to_a.flatten + [Time.now.utc])
-      Quizzes::QuizQuestion.where(id: id).update_all(update_sql)
+      Quizzes::QuizQuestion.where(id:).update_all(update_sql)
     end
   end
 end

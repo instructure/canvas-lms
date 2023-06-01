@@ -27,7 +27,7 @@ describe "API", type: :request do
       obj.extend Api::V1::Json
       course_with_teacher
       session = double
-      expect(@course).to receive(:as_json).with({ include_root: false, permissions: { user: @user, session: session, include_permissions: false }, only: [:name, :sis_source_id] })
+      expect(@course).to receive(:as_json).with({ include_root: false, permissions: { user: @user, session:, include_permissions: false }, only: [:name, :sis_source_id] })
       obj.api_json(@course, @user, session, only: [:name, :sis_source_id])
     end
   end
@@ -124,7 +124,7 @@ describe "API", type: :request do
   describe "application/json+canvas-string-ids" do
     it "stringifies fields with Accept header" do
       account = Account.default.sub_accounts.create!
-      account_admin_user(active_all: true, account: account)
+      account_admin_user(active_all: true, account:)
       json = api_call(:get,
                       "/api/v1/accounts/#{account.id}",
                       { controller: "accounts", action: "show", id: account.to_param, format: "json" },
@@ -136,7 +136,7 @@ describe "API", type: :request do
 
     it "does not stringify fields without Accept header" do
       account = Account.default.sub_accounts.create!
-      account_admin_user(active_all: true, account: account)
+      account_admin_user(active_all: true, account:)
       json = api_call(:get,
                       "/api/v1/accounts/#{account.id}",
                       { controller: "accounts", action: "show", id: account.to_param, format: "json" })

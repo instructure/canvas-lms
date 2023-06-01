@@ -347,7 +347,7 @@ class Speedgrader
     def visit(course_id, assignment_id, timeout = 10)
       get "/courses/#{course_id}/gradebook/speed_grader?assignment_id=#{assignment_id}"
       visibility_check = grade_input
-      wait_for(method: :visit, timeout: timeout) { visibility_check.displayed? }
+      wait_for(method: :visit, timeout:) { visibility_check.displayed? }
     end
 
     def select_provisional_grade_by_label(label)
@@ -626,14 +626,14 @@ class Speedgrader
       click_post_or_hide_grades_button
       click_post_link
       PostGradesTray.post_type_radio_button(type).click
-      PostGradesTray.select_sections(sections: sections)
+      PostGradesTray.select_sections(sections:)
       PostGradesTray.post_grades
     end
 
     def manually_hide_grades(sections: [])
       click_post_or_hide_grades_button
       click_hide_link
-      HideGradesTray.select_sections(sections: sections)
+      HideGradesTray.select_sections(sections:)
       HideGradesTray.hide_grades
     end
 

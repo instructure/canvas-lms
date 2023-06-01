@@ -607,7 +607,7 @@ class CommunicationChannelsController < ApplicationController
 
   def bulk_action_args
     args = params.permit(:after, :before, :pattern, :with_invalid_paths, :path_type, :order).to_unsafe_h.symbolize_keys
-    args.merge!({ account: account })
+    args.merge!({ account: })
   end
 
   def generate_bulk_report

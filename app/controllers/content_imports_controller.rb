@@ -61,7 +61,7 @@ class ContentImportsController < ApplicationController
         *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
       ]
     )
-    js_env(return_or_context_url: return_or_context_url, return_to: params[:return_to])
+    js_env(return_or_context_url:, return_to: params[:return_to])
   end
 
   # @API Get course copy status

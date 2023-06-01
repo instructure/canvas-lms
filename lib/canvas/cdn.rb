@@ -48,7 +48,7 @@ module Canvas
                         end
 
           Cdn::Registry.new(
-            environment: environment,
+            environment:,
             cache: if ActionController::Base.perform_caching
                      Cdn::Registry::ProcessCache.new
                    else
@@ -72,11 +72,11 @@ module Canvas
         end
       end
 
-      def push_to_s3!(*args, **kwargs, &block)
+      def push_to_s3!(*args, **kwargs, &)
         return unless config.bucket
 
         uploader = Canvas::Cdn::S3Uploader.new(*args, **kwargs)
-        uploader.upload!(&block)
+        uploader.upload!(&)
       end
 
       def enabled?

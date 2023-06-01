@@ -77,7 +77,7 @@ describe AttachmentHelper do
   end
 
   describe "#doc_preview_json" do
-    subject { doc_preview_json(attachment, locked_for_user: locked_for_user) }
+    subject { doc_preview_json(attachment, locked_for_user:) }
 
     let(:attachment) { @att }
     let(:locked_for_user) { false }

@@ -22,7 +22,7 @@ describe OutcomeFriendlyDescription do
   let_once(:account) { account_model }
   let_once(:outcome) { outcome_model }
   let(:description) { "description" }
-  let(:creation_params) { { context: account, description: description, learning_outcome: outcome } }
+  let(:creation_params) { { context: account, description:, learning_outcome: outcome } }
 
   describe "validations" do
     subject { OutcomeFriendlyDescription.create!(creation_params) }

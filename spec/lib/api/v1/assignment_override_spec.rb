@@ -280,7 +280,7 @@ describe Api::V1::AssignmentOverride do
           @student = User.create!
           @teacher = User.create!
 
-          @cs_course = Course.create!(account: account)
+          @cs_course = Course.create!(account:)
           @cs_course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
           @cs_course.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
 

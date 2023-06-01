@@ -43,8 +43,8 @@ if Plugin.installed?("bundler_lockfile_extensions")
       current = rails_version == CANVAS_RAILS && include_plugins
 
       add_lockfile(lockfile,
-                   current: current,
-                   prepare: prepare,
+                   current:,
+                   prepare:,
                    allow_mismatched_dependencies: rails_version != SUPPORTED_RAILS_VERSIONS.first,
                    enforce_pinned_additional_dependencies: include_plugins)
     end
@@ -69,7 +69,7 @@ module PreferGlobalRubyGemsSource
     [global_rubygems_source] + non_global_rubygems_sources
   end
 end
-::Bundler::SourceList.prepend(PreferGlobalRubyGemsSource)
+Bundler::SourceList.prepend(PreferGlobalRubyGemsSource)
 
 module GemOverride
   def gem(name, *version, path: nil, **kwargs)
@@ -82,7 +82,7 @@ module GemOverride
     if File.directory?(vendor_path)
       super(name, path: vendor_path, **kwargs)
     else
-      super(name, *version, path: path, **kwargs)
+      super(name, *version, path:, **kwargs)
     end
   end
 end
@@ -94,6 +94,6 @@ if CANVAS_INCLUDE_PLUGINS
   end
 end
 
-Dir.glob(File.join(File.dirname(__FILE__), "Gemfile.d", "*.rb")).sort.each do |file|
+Dir.glob(File.join(File.dirname(__FILE__), "Gemfile.d", "*.rb")).each do |file|
   eval_gemfile(file)
 end

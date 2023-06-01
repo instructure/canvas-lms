@@ -37,10 +37,10 @@ describe Lti::Security do
           :post,
           launch_url,
           params,
-          consumer_key: consumer_key,
-          consumer_secret: consumer_secret,
-          nonce: nonce,
-          timestamp: timestamp
+          consumer_key:,
+          consumer_secret:,
+          nonce:,
+          timestamp:
         )
         expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
       end
@@ -150,10 +150,10 @@ describe Lti::Security do
         :post,
         launch_url,
         params,
-        consumer_key: consumer_key,
-        consumer_secret: consumer_secret,
-        nonce: nonce,
-        timestamp: timestamp
+        consumer_key:,
+        consumer_secret:,
+        nonce:,
+        timestamp:
       )
       expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
     end
@@ -169,10 +169,10 @@ describe Lti::Security do
         :post,
         url_with_whitespace.strip,
         params,
-        consumer_key: consumer_key,
-        consumer_secret: consumer_secret,
-        nonce: nonce,
-        timestamp: timestamp
+        consumer_key:,
+        consumer_secret:,
+        nonce:,
+        timestamp:
       )
       expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
     end
@@ -191,10 +191,10 @@ describe Lti::Security do
         :post,
         launch_url, # Note that we are using a different url to generate a signature than before :-(
         params.merge(test: "foo"),
-        consumer_key: consumer_key,
-        consumer_secret: consumer_secret,
-        nonce: nonce,
-        timestamp: timestamp
+        consumer_key:,
+        consumer_secret:,
+        nonce:,
+        timestamp:
       )
       expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
     end
@@ -210,10 +210,10 @@ describe Lti::Security do
         :post,
         url,
         params,
-        consumer_key: consumer_key,
-        consumer_secret: consumer_secret,
-        nonce: nonce,
-        timestamp: timestamp
+        consumer_key:,
+        consumer_secret:,
+        nonce:,
+        timestamp:
       )
       expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
     end

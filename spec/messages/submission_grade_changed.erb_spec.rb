@@ -42,7 +42,7 @@ describe "submission_grade_changed" do
       user = message.user
       user.preferences[:send_scores_in_emails] = true
       user.save!
-      message = generate_message(:submission_grade_changed, :summary, asset, user: user)
+      message = generate_message(:submission_grade_changed, :summary, asset, user:)
       expect(message.body).to match(/score:/)
 
       Account.default.tap do |a|
@@ -51,7 +51,7 @@ describe "submission_grade_changed" do
       end
       asset.reload
 
-      message = generate_message(:submission_grade_changed, :summary, asset, user: user)
+      message = generate_message(:submission_grade_changed, :summary, asset, user:)
       expect(message.body).not_to match(/score:/)
     end
 

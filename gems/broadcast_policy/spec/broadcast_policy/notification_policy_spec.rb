@@ -38,7 +38,7 @@ describe BroadcastPolicy::NotificationPolicy do
 
   before do
     BroadcastPolicy.notifier = MockNotifier.new
-    BroadcastPolicy.notification_finder = MockNotificationFinder.new(test_notification: test_notification)
+    BroadcastPolicy.notification_finder = MockNotificationFinder.new(test_notification:)
   end
 
   it "send_notifications for each slice of users" do

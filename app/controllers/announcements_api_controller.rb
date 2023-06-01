@@ -133,7 +133,7 @@ class AnnouncementsApiController < ApplicationController
                                             user_can_moderate: false,
                                             include_assignment: false,
                                             include_context_code: true,
-                                            text_only: text_only,
+                                            text_only:,
                                             include_sections: include_params.include?("sections"),
                                             include_sections_user_count: include_params.include?("sections_user_count"))
   end

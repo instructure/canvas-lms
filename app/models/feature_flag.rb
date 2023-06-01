@@ -100,7 +100,7 @@ class FeatureFlag < ActiveRecord::Base
       acting_user = @current_user || Canvas.infer_user
       prior_state = prior_flag_state(operation)
       post_state = post_flag_state(operation)
-      Auditors::FeatureFlag.record(self, acting_user, prior_state, post_state: post_state)
+      Auditors::FeatureFlag.record(self, acting_user, prior_state, post_state:)
     end
   end
 

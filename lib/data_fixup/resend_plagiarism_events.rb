@@ -46,7 +46,7 @@ module DataFixup
       # then we're going to start the first one.
       batch_end_time = end_time
       loop do
-        batch_start_time = resend_scope(start_time, batch_end_time, limit: limit, only_errors: only_errors)
+        batch_start_time = resend_scope(start_time, batch_end_time, limit:, only_errors:)
                            .pluck(:submitted_at)&.last
         break if batch_start_time.nil?
 
@@ -120,7 +120,7 @@ module DataFixup
       # so they run every few minutes
       schedule_next_job
 
-      resend_scope(start_time, end_time, only_errors: only_errors)
+      resend_scope(start_time, end_time, only_errors:)
         .preload(course: :root_account, assignment: :assignment_configuration_tool_lookups, user: :pseudonyms).each do |submission|
         Canvas::LiveEvents.post_event_stringified(
           ResendPlagiarismEvents::EVENT_NAME,

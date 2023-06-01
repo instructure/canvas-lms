@@ -598,7 +598,7 @@ class Account < ActiveRecord::Base
       throw :abort
     end
 
-    scope = root_account.all_accounts.where(sis_source_id: sis_source_id)
+    scope = root_account.all_accounts.where(sis_source_id:)
     scope = scope.where("id<>?", self) unless new_record?
 
     return true unless scope.exists?
@@ -642,9 +642,9 @@ class Account < ActiveRecord::Base
     shard.activate do
       if xlog_location
         timeout = Setting.get("account_cache_clear_replication_timeout", "60").to_i.seconds
-        unless self.class.wait_for_replication(start: xlog_location, timeout: timeout)
+        unless self.class.wait_for_replication(start: xlog_location, timeout:)
           delay(run_at: Time.now + timeout, singleton: "Account#clear_downstream_caches/#{global_id}:#{keys_to_clear.join("/")}")
-            .clear_downstream_caches(*keys_to_clear, xlog_location: xlog_location, is_retry: true)
+            .clear_downstream_caches(*keys_to_clear, xlog_location:, is_retry: true)
           # we still clear, but only the first time; after that we just keep waiting
           return if is_retry
         end
@@ -660,7 +660,7 @@ class Account < ActiveRecord::Base
       nil
     else
       OpenObject.new({
-                       endpoint: endpoint,
+                       endpoint:,
                        default_action: settings[:equella_action] || "selectOrAdd",
                        teaser: settings[:equella_teaser]
                      })
@@ -1191,7 +1191,7 @@ class Account < ActiveRecord::Base
     relation_with_select = relation_with_select.select("*") if relation_with_select.select_values.empty?
 
     "WITH RECURSIVE t AS (
-       #{relation_with_ids.where(parent_account_id: parent_account_id).to_sql}
+       #{relation_with_ids.where(parent_account_id:).to_sql}
        UNION
        #{relation_with_ids.joins("INNER JOIN t ON accounts.parent_account_id=t.id").to_sql}
      )
@@ -1745,7 +1745,7 @@ class Account < ActiveRecord::Base
       # match the "batch" size in Course.update_account_associations
       scopes.each do |scope|
         scope.select([:id, :account_id]).find_in_batches(batch_size: 500) do |courses|
-          all_user_ids.merge Course.update_account_associations(courses, skip_user_account_associations: true, account_chain_cache: account_chain_cache)
+          all_user_ids.merge Course.update_account_associations(courses, skip_user_account_associations: true, account_chain_cache:)
         end
       end
 
@@ -1756,7 +1756,7 @@ class Account < ActiveRecord::Base
       end
 
       # Update the users' associations as well
-      User.update_account_associations(all_user_ids.to_a, account_chain_cache: account_chain_cache)
+      User.update_account_associations(all_user_ids.to_a, account_chain_cache:)
     end
   end
 

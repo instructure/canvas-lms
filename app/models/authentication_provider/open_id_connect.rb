@@ -165,7 +165,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
     result.unshift("openid")
     claims = requested_claims
     # see http://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims
-    result << "profile" unless (claims & PROFILE_CLAIMS).empty?
+    result << "profile" if claims.intersect?(PROFILE_CLAIMS)
     result << "email" if claims.include?("email") || claims.include?("email_verified")
     result << "address" if claims.include?("address")
     result << "phone" if claims.include?("phone_number") || claims.include?("phone_number_verified")

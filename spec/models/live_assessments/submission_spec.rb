@@ -31,7 +31,7 @@ describe LiveAssessments::Submission do
 
   let_once(:assessment_user) { course_with_student(course: assessment_context, active_all: true).user }
   let_once(:assessment) { LiveAssessments::Assessment.create(context: assessment_context, key: "test key", title: "test title") }
-  let_once(:submission) { LiveAssessments::Submission.create(user: assessment_user, assessment: assessment, possible: 10, score: 5, assessed_at: Time.now) }
+  let_once(:submission) { LiveAssessments::Submission.create(user: assessment_user, assessment:, possible: 10, score: 5, assessed_at: Time.now) }
 
   describe "#create_outcome_result" do
     it "does not create a result when no points are possible" do

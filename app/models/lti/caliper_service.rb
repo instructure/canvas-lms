@@ -23,7 +23,7 @@ module Lti
       if params["@type"] == "http://purl.imsglobal.org/caliper/v1/ViewEvent"
         duration = params[:duration]
         url = params[:object] ? params[:object]["@id"] : nil
-        Lti::AnalyticsService.log_page_view(token, { duration: duration, url: url })
+        Lti::AnalyticsService.log_page_view(token, { duration:, url: })
       end
     end
   end

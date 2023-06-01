@@ -20,19 +20,19 @@
 RSpec.shared_context "lti2_spec_helper", shared_context: :metadata do
   let(:account) { Account.create! }
   let(:course) do
-    course_with_student(account: account, active_all: true)
+    course_with_student(account:, active_all: true)
     @course
   end
   let(:student) { course.student_enrollments.first.user }
   let(:vendor_code) { "com.instructure.test" }
-  let(:developer_key) { DeveloperKey.create!(redirect_uri: "http://www.example.com/redirect", vendor_code: vendor_code) }
+  let(:developer_key) { DeveloperKey.create!(redirect_uri: "http://www.example.com/redirect", vendor_code:) }
   let(:product_family) do
     Lti::ProductFamily.create!(
-      vendor_code: vendor_code,
+      vendor_code:,
       product_code: "abc",
       vendor_name: "acme",
       root_account: account,
-      developer_key: developer_key
+      developer_key:
     )
   end
   let(:tool_proxy_context) { account }
@@ -40,10 +40,10 @@ RSpec.shared_context "lti2_spec_helper", shared_context: :metadata do
 
   def create_tool_proxy(context, overrides = {})
     tp = Lti::ToolProxy.create!(
-      context: context,
+      context:,
       guid: SecureRandom.uuid,
       shared_secret: "abc",
-      product_family: product_family,
+      product_family:,
       product_version: "1",
       workflow_state: "active",
       raw_data: {
@@ -119,15 +119,15 @@ RSpec.shared_context "lti2_spec_helper", shared_context: :metadata do
     Lti::ResourceHandler.create!(
       resource_type_code: "code",
       name: "resource name",
-      tool_proxy: tool_proxy
+      tool_proxy:
     )
   end
   let(:message_handler) do
     Lti::MessageHandler.create!(
       message_type: "basic-lti-launch-request",
       launch_path: "https://www.samplelaunch.com/blti",
-      resource_handler: resource_handler,
-      tool_proxy: tool_proxy
+      resource_handler:,
+      tool_proxy:
     )
   end
   let(:tool_proxy_binding) do

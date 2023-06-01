@@ -27,13 +27,13 @@ describe UserSearch do
 
     before do
       teacher = User.create!(name: "Tyler Teacher")
-      TeacherEnrollment.create!(user: teacher, course: course, workflow_state: "active")
+      TeacherEnrollment.create!(user: teacher, course:, workflow_state: "active")
       search_names.each do |name|
-        student = User.create!(name: name)
-        StudentEnrollment.create!(user: student, course: course, workflow_state: "active")
+        student = User.create!(name:)
+        StudentEnrollment.create!(user: student, course:, workflow_state: "active")
       end
       User.create!(name: "admin")
-      TeacherEnrollment.create!(user: user, course: course, workflow_state: "active")
+      TeacherEnrollment.create!(user:, course:, workflow_state: "active")
     end
 
     describe "when excluding a group" do
@@ -110,7 +110,7 @@ describe UserSearch do
 
             before do
               ta = User.create!(name: "Tyler TA")
-              TaEnrollment.create!(user: ta, course: course, workflow_state: "active")
+              TaEnrollment.create!(user: ta, course:, workflow_state: "active")
             end
 
             it { is_expected.to include("Tyler TA") }
@@ -131,9 +131,9 @@ describe UserSearch do
 
             before do
               ta = User.create!(name: "Tyler Observer")
-              ObserverEnrollment.create!(user: ta, course: course, workflow_state: "active")
+              ObserverEnrollment.create!(user: ta, course:, workflow_state: "active")
               ta2 = User.create!(name: "Tyler Observer 2")
-              ObserverEnrollment.create!(user: ta2, course: course, workflow_state: "active")
+              ObserverEnrollment.create!(user: ta2, course:, workflow_state: "active")
               add_linked_observer(student, ta2)
             end
 
@@ -146,7 +146,7 @@ describe UserSearch do
           describe "with the role name parameter" do
             before do
               newstudent = User.create!(name: "Tyler Student")
-              StudentEnrollment.create!(user: newstudent, course: course, workflow_state: "active")
+              StudentEnrollment.create!(user: newstudent, course:, workflow_state: "active")
             end
 
             describe "when the context is a course" do
@@ -173,7 +173,7 @@ describe UserSearch do
 
             before do
               newstudent = User.create!(name: "Tyler Student")
-              StudentEnrollment.create!(user: newstudent, course: course, workflow_state: "active")
+              StudentEnrollment.create!(user: newstudent, course:, workflow_state: "active")
             end
 
             it { is_expected.to include("Rose Tyler") }
@@ -309,7 +309,7 @@ describe UserSearch do
         end
 
         describe "searching on emails" do
-          let(:user1) { user_with_pseudonym(user: user) }
+          let(:user1) { user_with_pseudonym(user:) }
           let(:cc) { communication_channel(user1, { username: "the.giver@example.com" }) }
 
           before do
@@ -363,7 +363,7 @@ describe UserSearch do
           end
 
           it "matches against a database id and a user simultaneously" do
-            other_user = student_in_course(course: course, name: user.id.to_s).user
+            other_user = student_in_course(course:, name: user.id.to_s).user
             expect(UserSearch.for_user_in_context(user.id, course, user)).to match_array [user, other_user]
           end
 
@@ -404,16 +404,16 @@ describe UserSearch do
 
       before do
         user_names_not_enrolled.each do |name|
-          User.create!(name: name)
+          User.create!(name:)
         end
 
         user_names_enrolled_in_course1.each do |name|
-          student = User.create!(name: name)
+          student = User.create!(name:)
           StudentEnrollment.create!(user: student, course: course1, workflow_state: "active")
         end
 
         teacher_names_enrolled_in_course1.each do |name|
-          teacher = User.create!(name: name)
+          teacher = User.create!(name:)
           TeacherEnrollment.create!(user: teacher, course: course1, workflow_state: "active")
         end
       end
@@ -510,8 +510,8 @@ describe UserSearch do
 
     before do
       search_names.each do |name|
-        student = User.create!(name: name)
-        StudentEnrollment.create!(user: student, course: course, workflow_state: "active")
+        student = User.create!(name:)
+        StudentEnrollment.create!(user: student, course:, workflow_state: "active")
       end
     end
 
@@ -556,16 +556,16 @@ describe UserSearch do
 
       before do
         user_names_not_enrolled.each do |name|
-          User.create!(name: name)
+          User.create!(name:)
         end
 
         user_names_enrolled_in_course1.each do |name|
-          student = User.create!(name: name)
+          student = User.create!(name:)
           StudentEnrollment.create!(user: student, course: course1, workflow_state: "active")
         end
 
         teacher_names_enrolled_in_course1.each do |name|
-          teacher = User.create!(name: name)
+          teacher = User.create!(name:)
           TeacherEnrollment.create!(user: teacher, course: course1, workflow_state: "active")
         end
       end

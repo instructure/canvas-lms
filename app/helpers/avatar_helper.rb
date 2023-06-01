@@ -102,7 +102,7 @@ module AvatarHelper
   def self.avatar_url_for_user(user, request, root_account: nil, use_fallback: true)
     use_fallback = false if Canvas::Plugin.value_to_boolean(request&.params&.[](:no_avatar_fallback))
     default_avatar = use_fallback ? User.avatar_fallback_url(User.default_avatar_fallback, request) : nil
-    url = if avatars_enabled_for_user?(user, root_account: root_account)
+    url = if avatars_enabled_for_user?(user, root_account:)
             user.avatar_url(nil,
                             ((root_account && root_account.settings[:avatars]) || "enabled"),
                             default_avatar,

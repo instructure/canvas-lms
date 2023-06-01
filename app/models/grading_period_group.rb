@@ -75,7 +75,7 @@ class GradingPeriodGroup < ActiveRecord::Base
 
     terms.find_each do |term|
       term.recompute_course_scores_later(
-        update_all_grading_period_scores: update_all_grading_period_scores,
+        update_all_grading_period_scores:,
         strand_identifier: "GradingPeriodGroup:#{global_id}"
       )
     end
@@ -123,7 +123,7 @@ class GradingPeriodGroup < ActiveRecord::Base
     root_account_id = course_id ? course.root_account.global_id : root_account.global_id
     delay_if_production(strand: "GradingPeriodGroup#cleanup_associations_and_recompute_scores:Account#{root_account_id}",
                         priority: Delayed::LOW_PRIORITY)
-      .cleanup_associations_and_recompute_scores(updating_user: updating_user)
+      .cleanup_associations_and_recompute_scores(updating_user:)
   end
 
   def cleanup_associations_and_recompute_scores(updating_user: nil)
@@ -140,7 +140,7 @@ class GradingPeriodGroup < ActiveRecord::Base
     else
       term_ids = enrollment_terms.pluck(:id)
       update_in_batches(enrollment_terms, grading_period_group_id: nil)
-      recompute_scores_for_each_term(true, term_ids: term_ids)
+      recompute_scores_for_each_term(true, term_ids:)
     end
   end
 

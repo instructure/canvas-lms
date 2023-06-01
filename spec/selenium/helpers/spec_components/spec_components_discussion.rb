@@ -33,7 +33,7 @@ module SpecComponents
         context: course,
         title: discussion_title,
         submission_types: "discussion_topic",
-        due_at: due_at
+        due_at:
       )
       @id = @component_discussion.discussion_topic.id
       @title = @component_discussion.discussion_topic.title
@@ -46,7 +46,7 @@ module SpecComponents
     def submit_as(user)
       @component_discussion.discussion_topic.discussion_entries.create!(
         message: "This is #{user.name}'s discussion entry",
-        user: user
+        user:
       )
     end
 

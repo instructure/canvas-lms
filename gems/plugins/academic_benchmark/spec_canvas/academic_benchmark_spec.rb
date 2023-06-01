@@ -138,7 +138,7 @@ describe AcademicBenchmark do
                        "world leader and the impact of contemporary social and political movements on American life."
         }
     }.each do |migration_id, descriptions|
-      g = LearningOutcome.global.find_by(migration_id: migration_id)
+      g = LearningOutcome.global.find_by(migration_id:)
       verify_rubric_criterion(g)
       expect(g.short_description).to eq descriptions[:short_description]
       expect(g.description).to eq descriptions[:description]

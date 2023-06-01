@@ -67,7 +67,7 @@ describe Mutations::MoveOutcomeLinks do
   end
 
   def execute_query(mutation_str, context)
-    CanvasSchema.execute(mutation_str, context: context)
+    CanvasSchema.execute(mutation_str, context:)
   end
 
   it "moves the outcome links" do

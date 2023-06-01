@@ -48,7 +48,7 @@ describe CanvasCassandra do
     # I'm using %CONSISTENCY% as a query parameter here to make sure that the
     # execute code doesn't accidentally replace the string in those params
     def run_query(consistency)
-      db.execute("SELECT a %CONSISTENCY% WHERE a = ?", "%CONSISTENCY%", consistency: consistency)
+      db.execute("SELECT a %CONSISTENCY% WHERE a = ?", "%CONSISTENCY%", consistency:)
     end
 
     describe "cql3" do

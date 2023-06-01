@@ -107,21 +107,21 @@ module SIS
       end
 
       def login_row_info
-        [existing_user_id: existing_user_id, existing_integration_id: existing_integration_id,
-         existing_canvas_user_id: existing_canvas_user_id, root_account_id: root_account_id,
-         user_id: user_id, login_id: login_id, status: status, email: email,
-         integration_id: integration_id,
-         authentication_provider_id: authentication_provider_id].to_s
+        [existing_user_id:, existing_integration_id:,
+         existing_canvas_user_id:, root_account_id:,
+         user_id:, login_id:, status:, email:,
+         integration_id:,
+         authentication_provider_id:].to_s
       end
 
       def row_info
-        [user_id: user_id, login_id: login_id, status: status,
-         first_name: first_name, last_name: last_name, email: email,
-         integration_id: integration_id, short_name: short_name,
-         full_name: full_name, sortable_name: sortable_name,
-         canvas_password_notification: canvas_password_notification,
-         authentication_provider_id: authentication_provider_id,
-         declared_user_type: declared_user_type, home_account: home_account].to_s
+        [user_id:, login_id:, status:,
+         first_name:, last_name:, email:,
+         integration_id:, short_name:,
+         full_name:, sortable_name:,
+         canvas_password_notification:,
+         authentication_provider_id:,
+         declared_user_type:, home_account:].to_s
       end
     end
   end

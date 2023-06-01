@@ -27,7 +27,7 @@ module Twitter
         twitter_consumer,
         request_token,
         request_secret
-      ).get_access_token(oauth_verifier: oauth_verifier)
+      ).get_access_token(oauth_verifier:)
       Twitter::Connection.new(access_token)
     end
 
@@ -64,7 +64,7 @@ module Twitter
       url = "/1.1/direct_messages/new.json"
       response = access_token.post(url, {
                                      screen_name: user_name,
-                                     user_id: user_id,
+                                     user_id:,
                                      text: message
                                    })
       JSON.parse(response.body)

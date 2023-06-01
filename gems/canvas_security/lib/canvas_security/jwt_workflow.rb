@@ -38,9 +38,9 @@ module CanvasSecurity
       @workflows ? @workflows[label.to_sym] : nil
     end
 
-    def self.register(label, &token_state)
+    def self.register(label, &)
       @workflows ||= {}
-      @workflows[label.to_sym] = JWTWorkflow.new(&token_state)
+      @workflows[label.to_sym] = JWTWorkflow.new(&)
     end
   end
 end

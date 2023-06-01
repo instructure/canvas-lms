@@ -64,12 +64,12 @@ class OutcomeCalculationMethod < ApplicationRecord
   end
 
   def self.find_or_create_default!(context)
-    method = OutcomeCalculationMethod.find_by(context: context)
+    method = OutcomeCalculationMethod.find_by(context:)
     if method&.workflow_state == "active"
       return method
     end
 
-    method ||= OutcomeCalculationMethod.new(context: context)
+    method ||= OutcomeCalculationMethod.new(context:)
     method.workflow_state = "active"
     method.calculation_method = "highest"
     method.calculation_int = nil

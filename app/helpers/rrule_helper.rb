@@ -117,7 +117,7 @@ module RruleHelper
   def parse_byday(byday)
     byday.split(",").map do |d|
       match = /\A([-+]?\d+)?([A-Z]{2})\z/.match(d)
-      raise RruleValidationError, I18n.t("Invalid BYDAY '%{byday}'", byday: byday) unless match
+      raise RruleValidationError, I18n.t("Invalid BYDAY '%{byday}'", byday:) unless match
 
       {
         occurrence: match[1].to_i,
@@ -128,7 +128,7 @@ module RruleHelper
 
   def parse_bymonth(bymonth)
     month = bymonth.to_i
-    raise RruleValidationError, I18n.t("Invalid BYMONTH '%{bymonth}'", bymonth: bymonth) unless month >= 1 && month <= 12
+    raise RruleValidationError, I18n.t("Invalid BYMONTH '%{bymonth}'", bymonth:) unless month >= 1 && month <= 12
 
     month
   end
@@ -139,7 +139,7 @@ module RruleHelper
     monthday = bymonthday.to_i
 
     # not validating if we're in a leap year
-    raise RruleValidationError, I18n.t("Invalid BYMONTHDAY '%{bymonthday}'", bymonthday: bymonthday) unless monthday >= 1 && monthday <= DAYS_IN_MONTH[month]
+    raise RruleValidationError, I18n.t("Invalid BYMONTHDAY '%{bymonthday}'", bymonthday:) unless monthday >= 1 && monthday <= DAYS_IN_MONTH[month]
 
     monthday
   end
@@ -169,7 +169,7 @@ module RruleHelper
              },
              {
                count: interval,
-               times: times
+               times:
              })
     else
       I18n.t({
@@ -197,7 +197,7 @@ module RruleHelper
              },
              {
                count: interval,
-               times: times
+               times:
              })
     else
       I18n.t({
@@ -225,7 +225,7 @@ module RruleHelper
              {
                count: interval,
                byday: by_day,
-               times: times
+               times:
              })
     else
       I18n.t({
@@ -267,7 +267,7 @@ module RruleHelper
                {
                  count: interval,
                  days: days_of_week,
-                 times: times
+                 times:
                })
       else
         I18n.t({
@@ -278,7 +278,7 @@ module RruleHelper
                  count: interval,
                  ord: occurrence.ordinalize,
                  days: days_of_week,
-                 times: times
+                 times:
                })
       end
     else
@@ -322,7 +322,7 @@ module RruleHelper
                {
                  count: interval,
                  days: days_of_month[0],
-                 times: times
+                 times:
                })
       else
         I18n.t({
@@ -332,7 +332,7 @@ module RruleHelper
                {
                  count: interval,
                  days: join_month_dys(days_of_month),
-                 times: times
+                 times:
                })
       end
     else
@@ -372,7 +372,7 @@ module RruleHelper
              },
              {
                count: interval,
-               times: times
+               times:
              })
     else
       I18n.t({
@@ -414,8 +414,8 @@ module RruleHelper
                {
                  count: interval,
                  days: days_of_week,
-                 month: month,
-                 times: times
+                 month:,
+                 times:
                })
       else
         I18n.t({
@@ -426,8 +426,8 @@ module RruleHelper
                  count: interval,
                  ord: occurrence.ordinalize,
                  days: days_of_week,
-                 month: month,
-                 times: times
+                 month:,
+                 times:
                })
       end
     else
@@ -439,7 +439,7 @@ module RruleHelper
                {
                  count: interval,
                  days: days_of_week,
-                 month: month,
+                 month:,
                  until: format_date(until_date)
                })
       else
@@ -451,7 +451,7 @@ module RruleHelper
                  count: interval,
                  ord: occurrence.ordinalize,
                  days: days_of_week,
-                 month: month,
+                 month:,
                  until: format_date(until_date)
                })
       end
@@ -473,8 +473,8 @@ module RruleHelper
              },
              {
                count: interval,
-               date: date,
-               times: times
+               date:,
+               times:
              })
     else
       I18n.t({
@@ -483,7 +483,7 @@ module RruleHelper
              },
              {
                count: interval,
-               date: date,
+               date:,
                until: format_date(until_date)
              })
     end

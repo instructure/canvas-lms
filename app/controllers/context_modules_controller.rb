@@ -107,7 +107,7 @@ class ContextModulesController < ApplicationController
       tools = GuardRail.activate(:secondary) do
         Lti::ContextToolFinder.new(
           @context,
-          placements: placements,
+          placements:,
           root_account: @domain_root_account,
           current_user: @current_user
         ).all_tools_sorted_array
@@ -241,7 +241,7 @@ class ContextModulesController < ApplicationController
 
             js_env({
                      CHOOSE_MASTERY_PATH_DATA: {
-                       options: options,
+                       options:,
                        selectedOption: rule[:selected_set_id],
                        courseId: @context.id,
                        moduleId: item.context_module.id,
@@ -291,7 +291,7 @@ class ContextModulesController < ApplicationController
 
         if controller.present?
           redirect_to url_for(
-            controller: controller,
+            controller:,
             action: "edit",
             id: @tag.content_id,
             anchor: "mastery-paths-editor",
@@ -347,7 +347,7 @@ class ContextModulesController < ApplicationController
       respond_to do |format|
         if @module.save
           format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
-          format.json { render json: @module.as_json(include: :content_tags, methods: :workflow_state, permissions: { user: @current_user, session: session }) }
+          format.json { render json: @module.as_json(include: :content_tags, methods: :workflow_state, permissions: { user: @current_user, session: }) }
         else
           format.html
           format.json { render json: @module.errors, status: :bad_request }
@@ -428,12 +428,12 @@ class ContextModulesController < ApplicationController
         info[tag.id] = if tag.can_have_assignment? && tag.assignment
                          tag.assignment.context_module_tag_info(@current_user,
                                                                 @context,
-                                                                user_is_admin: user_is_admin,
+                                                                user_is_admin:,
                                                                 has_submission: submitted_assignment_ids.include?(tag.assignment.id))
                        elsif tag.content_type_quiz?
                          tag.content.context_module_tag_info(@current_user,
                                                              @context,
-                                                             user_is_admin: user_is_admin,
+                                                             user_is_admin:,
                                                              has_submission: submitted_quiz_ids.include?(tag.content.id))
                        else
                          { points_possible: nil, due_date: nil }
@@ -504,7 +504,7 @@ class ContextModulesController < ApplicationController
     raise ActiveRecord::RecordNotFound if id == 0
 
     @tag = if type == "ContentTag"
-             @context.context_module_tags.active.where(id: id).first
+             @context.context_module_tags.active.where(id:).first
            else
              @context.context_module_tags.active.where(context_module_id: params[:context_module_id], content_id: id, content_type: type).first
            end
@@ -620,7 +620,7 @@ class ContextModulesController < ApplicationController
       ContentTag.update_could_be_locked(affected_items)
       @context.touch
       @module.reload
-      render json: @module.as_json(include: :content_tags, methods: :workflow_state, permissions: { user: @current_user, session: session })
+      render json: @module.as_json(include: :content_tags, methods: :workflow_state, permissions: { user: @current_user, session: })
     end
   end
 
@@ -692,7 +692,7 @@ class ContextModulesController < ApplicationController
         is_duplicate_able: @tag.duplicate_able?
       )
       @context.touch
-      render json: json
+      render json:
     end
   end
 
@@ -767,9 +767,9 @@ class ContextModulesController < ApplicationController
         @module.unpublish
       end
       if @module.update(context_module_params)
-        json = @module.as_json(include: :content_tags, methods: :workflow_state, permissions: { user: @current_user, session: session })
+        json = @module.as_json(include: :content_tags, methods: :workflow_state, permissions: { user: @current_user, session: })
         json["context_module"]["relock_warning"] = true if @module.relock_warning?
-        render json: json
+        render json:
       else
         render json: @module.errors, status: :bad_request
       end

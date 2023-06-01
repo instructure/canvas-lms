@@ -121,7 +121,7 @@ class GradingSchemesJsonController < ApplicationController
     grading_standard.as_json({ methods: JSON_METHODS,
                                include_root: false }
                              .merge(only: %w[id title context_type context_id],
-                                    permissions: { user: user }))
+                                    permissions: { user: }))
                     .tap do |json|
       # because GradingStandard generates the JSON property with a '?' on the end of it,
       # instead of using the JSON convention for boolean properties

@@ -33,13 +33,13 @@ describe ConversationBatch do
     let(:message) { Conversation.build_message(@user, "lorem ipsum") }
 
     it "returns true for template messages" do
-      expect(ConversationBatch.created_as_template?(message: message)).to be true
+      expect(ConversationBatch.created_as_template?(message:)).to be true
     end
 
     it "returns false for non-template messages (messages that have a conversation_id)" do
       conversation = Conversation.create!
       message.conversation = conversation
-      expect(ConversationBatch.created_as_template?(message: message)).to be false
+      expect(ConversationBatch.created_as_template?(message:)).to be false
     end
   end
 

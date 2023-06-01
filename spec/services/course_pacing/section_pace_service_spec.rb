@@ -19,10 +19,10 @@
 
 describe CoursePacing::SectionPaceService do
   let(:course) { course_model }
-  let(:section) { add_section("Section One", course: course) }
-  let(:section_two) { add_section("Section Two", course: course) }
-  let!(:section_pace) { section_pace_model(section: section) }
-  let!(:course_pace) { course_pace_model(course: course) }
+  let(:section) { add_section("Section One", course:) }
+  let(:section_two) { add_section("Section Two", course:) }
+  let!(:section_pace) { section_pace_model(section:) }
+  let!(:course_pace) { course_pace_model(course:) }
 
   describe ".paces_in_course" do
     it "returns the paces for the provided course" do
@@ -77,7 +77,7 @@ describe CoursePacing::SectionPaceService do
     end
 
     context "when the context does not have a pace" do
-      let(:new_section) { add_section("New Section", course: course) }
+      let(:new_section) { add_section("New Section", course:) }
 
       it "creates a pace in the context" do
         expect do

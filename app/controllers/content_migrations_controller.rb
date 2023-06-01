@@ -442,7 +442,7 @@ class ContentMigrationsController < ApplicationController
       }
     end
 
-    render json: json
+    render json:
   end
 
   # @API List items for selective import

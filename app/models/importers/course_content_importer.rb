@@ -58,9 +58,9 @@ module Importers
         unzip_opts = {
           course: migration.context,
           filename: data["all_files_export"]["file_path"],
-          valid_paths: valid_paths,
-          callback: callback,
-          logger: logger,
+          valid_paths:,
+          callback:,
+          logger:,
           rename_files: migration.migration_settings[:files_import_allow_rename],
           migration_id_map: migration.attachment_path_id_lookup,
         }
@@ -414,7 +414,7 @@ module Importers
       assignments = migration.imported_migration_items_by_class(Assignment).select(&:needs_update_cached_due_dates)
       if assignments.any?
         Assignment.clear_cache_keys(assignments, :availability)
-        DueDateCacher.recompute_course(migration.context, assignments: assignments, update_grades: true, executing_user: migration.user, skip_late_policy_applicator: !!migration.date_shift_options)
+        DueDateCacher.recompute_course(migration.context, assignments:, update_grades: true, executing_user: migration.user, skip_late_policy_applicator: !!migration.date_shift_options)
       end
       quizzes = migration.imported_migration_items_by_class(Quizzes::Quiz).select(&:should_clear_availability_cache)
       Quizzes::Quiz.clear_cache_keys(quizzes, :availability) if quizzes.any?
@@ -543,7 +543,7 @@ module Importers
 
       if settings.key?(:default_post_policy)
         post_manually = Canvas::Plugin.value_to_boolean(settings.dig(:default_post_policy, :post_manually))
-        course.default_post_policy.update!(post_manually: post_manually)
+        course.default_post_policy.update!(post_manually:)
       end
 
       if settings.key?(:allow_final_grade_override) && course.account.feature_enabled?(:final_grades_override)

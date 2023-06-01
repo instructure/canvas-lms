@@ -45,7 +45,7 @@ describe "Course Account Reports" do
     end_at = 3.months.from_now
     @course1 = Course.create(name: "English 101",
                              course_code: "ENG101",
-                             start_at: start_at,
+                             start_at:,
                              conclude_at: end_at,
                              account: @sub_account,
                              enrollment_term: @term1)

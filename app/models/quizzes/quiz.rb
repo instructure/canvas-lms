@@ -224,7 +224,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
 
     override_students.each do |collection|
-      collection.update_all(assignment_id: assignment_id, quiz_id: id)
+      collection.update_all(assignment_id:, quiz_id: id)
     end
   end
 
@@ -234,7 +234,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     if !assignment_id && (graded? || (force && survey?)) && (force || !%i[assignment clone migration].include?(@saved_by))
       assignment = self.assignment
-      assignment ||= context.assignments.build(title: title, due_at: due_at, submission_types: "online_quiz")
+      assignment ||= context.assignments.build(title:, due_at:, submission_types: "online_quiz")
       assignment.assignment_group_id = self.assignment_group_id
       assignment.only_visible_to_overrides = only_visible_to_overrides
       assignment.saved_by = :quiz
@@ -690,7 +690,7 @@ class Quizzes::Quiz < ActiveRecord::Base
                  end
 
       builder = Quizzes::QuizQuestionBuilder.new({
-                                                   shuffle_answers: shuffle_answers
+                                                   shuffle_answers:
                                                  })
 
       builder.shuffle_quiz_data!(data_set)
@@ -745,7 +745,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     transaction do
       builder = Quizzes::QuizQuestionBuilder.new({
-                                                   shuffle_answers: shuffle_answers
+                                                   shuffle_answers:
                                                  })
 
       submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
@@ -1018,7 +1018,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     quiz_statistics.build(
       report_type: "student_analysis",
       includes_all_versions: include_all_versions,
-      includes_sis_ids: includes_sis_ids
+      includes_sis_ids:
     ).report.generate
   end
 
@@ -1033,7 +1033,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     options[:includes_sis_ids] = false if report_type == "item_analysis"
 
     quiz_stats_opts = {
-      report_type: report_type,
+      report_type:,
       includes_all_versions: !!options[:includes_all_versions],
       includes_sis_ids: !!options[:includes_sis_ids],
       anonymous: anonymous_submissions?
@@ -1275,7 +1275,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   scope :not_ignored_by, lambda { |user, purpose|
     where.not(Ignore.where(asset_type: "Quizzes::Quiz",
                            user_id: user,
-                           purpose: purpose).where("asset_id=quizzes.id")
+                           purpose:).where("asset_id=quizzes.id")
                        .arel.exists)
   }
 
@@ -1284,7 +1284,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def submission_action_string
-    t :submission_action_take_quiz, "Take %{title}", title: title
+    t :submission_action_take_quiz, "Take %{title}", title:
   end
 
   def teachers
@@ -1405,7 +1405,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # marks a quiz as having unpublished changes
   def self.mark_quiz_edited(id)
     now = Time.now.utc
-    where(id: id).update_all(last_edited_at: now, updated_at: now)
+    where(id:).update_all(last_edited_at: now, updated_at: now)
   end
 
   def mark_edited!
@@ -1442,7 +1442,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     unless unpublished_changes?
       options = {
         quiz: self,
-        version_number: version_number
+        version_number:
       }
       if current_quiz_question_regrades.present?
         Quizzes::QuizRegrader::Regrader.delay(strand: "quiz:#{global_id}:regrading")
@@ -1529,7 +1529,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         filters << {
           name: key,
           account: account.name,
-          filter: filter
+          filter:
         }
       end
     end

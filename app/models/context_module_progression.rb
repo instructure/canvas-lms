@@ -57,11 +57,11 @@ class ContextModuleProgression < ActiveRecord::Base
   end
 
   def collapse!(skip_save: false)
-    update_collapse_state(true, skip_save: skip_save)
+    update_collapse_state(true, skip_save:)
   end
 
   def uncollapse!(skip_save: false)
-    update_collapse_state(false, skip_save: skip_save)
+    update_collapse_state(false, skip_save:)
   end
 
   def update_collapse_state(collapsed_target_state, skip_save: false)

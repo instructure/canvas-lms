@@ -118,7 +118,7 @@ class FoldersController < ApplicationController
 
   def index
     if authorized_action(@context, @current_user, :read_files)
-      render json: Folder.root_folders(@context).map { |f| f.as_json(permissions: { user: @current_user, session: session }) }
+      render json: Folder.root_folders(@context).map { |f| f.as_json(permissions: { user: @current_user, session: }) }
     end
   end
 
@@ -136,7 +136,7 @@ class FoldersController < ApplicationController
     folder = Folder.find(params[:id])
     if authorized_action(folder, @current_user, :read_contents)
       can_view_hidden_files = can_view_hidden_files?(folder.context, @current_user, session)
-      opts = { can_view_hidden_files: can_view_hidden_files, context: folder.context }
+      opts = { can_view_hidden_files:, context: folder.context }
       if can_view_hidden_files && folder.context.is_a?(Course) &&
          MasterCourses::ChildSubscription.is_child_course?(folder.context)
         opts[:master_course_restricted_folder_ids] = MasterCourses::FolderHelper.locked_folder_ids_for_course(folder.context)
@@ -184,7 +184,7 @@ class FoldersController < ApplicationController
               end
 
       folders = Api.paginate(scope, self, url)
-      render json: folders_json(folders, @current_user, session, can_view_hidden_files: can_view_hidden_files, context: @context)
+      render json: folders_json(folders, @current_user, session, can_view_hidden_files:, context: @context)
     end
   end
 
@@ -210,7 +210,7 @@ class FoldersController < ApplicationController
       folders = Folder.resolve_path(@context, params[:full_path], can_view_hidden_files)
       raise ActiveRecord::RecordNotFound if folders.blank?
 
-      render json: folders_json(folders, @current_user, session, can_view_hidden_files: can_view_hidden_files, context: @context)
+      render json: folders_json(folders, @current_user, session, can_view_hidden_files:, context: @context)
     end
   end
 
@@ -348,7 +348,7 @@ class FoldersController < ApplicationController
           if api_request?
             format.json { render json: folder_json(@folder, @current_user, session) }
           else
-            format.json { render json: @folder.as_json(methods: [:currently_locked], permissions: { user: @current_user, session: session }), status: :ok }
+            format.json { render json: @folder.as_json(methods: [:currently_locked], permissions: { user: @current_user, session: }), status: :ok }
           end
         else
           format.html { render :edit }
@@ -453,7 +453,7 @@ class FoldersController < ApplicationController
           if api_request?
             format.json { render json: folder_json(@folder, @current_user, session) }
           else
-            format.json { render json: @folder.as_json(permissions: { user: @current_user, session: session }) }
+            format.json { render json: @folder.as_json(permissions: { user: @current_user, session: }) }
           end
         else
           format.html { render :new }
@@ -538,7 +538,7 @@ class FoldersController < ApplicationController
     @context = @folder.context
     @attachment = Attachment.new(context: @context)
     if authorized_action(@attachment, @current_user, :create)
-      api_attachment_preflight(@context, request, params: params, check_quota: true)
+      api_attachment_preflight(@context, request, params:, check_quota: true)
     end
   end
 
@@ -584,7 +584,7 @@ class FoldersController < ApplicationController
       @attachment = @context.attachments.build(folder: @dest_folder)
       if authorized_action(@attachment, @current_user, :create)
         on_duplicate, name = params[:on_duplicate].presence, params[:name].presence
-        duplicate_options = (on_duplicate == "rename" && name) ? { name: name } : {}
+        duplicate_options = (on_duplicate == "rename" && name) ? { name: } : {}
         return render json: { message: "on_duplicate must be 'overwrite' or 'rename'" }, status: :bad_request if on_duplicate && %w[overwrite rename].exclude?(on_duplicate)
         if on_duplicate.nil? && @dest_folder.active_file_attachments.where(display_name: @source_file.display_name).exists?
           return render json: { message: "file already exists; set on_duplicate to 'rename' or 'overwrite'" }, status: :conflict
