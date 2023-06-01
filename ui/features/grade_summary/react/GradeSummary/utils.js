@@ -111,6 +111,13 @@ export const getNoSubmissionStatus = dueDate => {
 }
 
 export const getDisplayScore = (assignment, gradingStandard) => {
+  if (ENV.restrict_quantitative_data && assignment?.pointsPossible === 0)
+    return getZeroPointAssignmentDisplayScore(
+      getAssignmentEarnedPoints(assignment),
+      assignment?.submissionsConnection?.nodes[0]?.gradingStatus,
+      gradingStandard
+    )
+
   if (
     assignment?.submissionsConnection?.nodes?.length === 0 ||
     assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'needs_grading' ||
@@ -133,10 +140,20 @@ export const getDisplayScore = (assignment, gradingStandard) => {
     return `${getAssignmentPercentage(assignment)}%`
   } else if (assignment?.gradingType === 'pass_fail') {
     return assignment?.submissionsConnection?.nodes[0]?.score ? <IconCheckLine /> : <IconXLine />
-  } else {
-    const earned = getAssignmentEarnedPoints(assignment)
-    const total = getAssignmentTotalPoints(assignment)
-    return `${earned || '-'}/${total || '-'}`
+  }
+  const earned = getAssignmentEarnedPoints(assignment)
+  const total = getAssignmentTotalPoints(assignment)
+  return `${earned || '0'}/${total || '0'}`
+}
+
+export const getZeroPointAssignmentDisplayScore = (score, gradingStatus, gradingStandard) => {
+  if (gradingStatus !== 'graded') return '-'
+  if (score === 0) {
+    return <IconCheckLine />
+  } else if (score >= 0) {
+    return scorePercentageToLetterGrade(100, gradingStandard)
+  } else if (score <= 0) {
+    return `${score}/0`
   }
 }
 
@@ -389,7 +406,7 @@ export const getTotal = (assignments, assignmentGroups, gradingPeriods, applyWei
   } else {
     returnTotal = `${getCoursePercentage(assignments)}`
   }
-  return returnTotal
+  return returnTotal === '0' ? ASSIGNMENT_NOT_APPLICABLE : returnTotal
 }
 
 // ********************************************************************************

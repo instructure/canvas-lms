@@ -18,6 +18,7 @@
 
 import React from 'react'
 
+import {IconCheckLine, IconXLine} from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
 
 import {Assignment} from '../../../graphql/Assignment'
@@ -32,6 +33,8 @@ import {
   formatNumber,
   submissionCommentsPresent,
   getDisplayStatus,
+  getDisplayScore,
+  getZeroPointAssignmentDisplayScore,
   getNoSubmissionStatus,
   scorePercentageToLetterGrade,
   getAssignmentTotalPoints,
@@ -335,6 +338,155 @@ describe('util', () => {
       const assignment = {}
       const expectedOutput = <Pill>Not Graded</Pill>
       expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
+    })
+  })
+
+  describe('getDisplayScore', () => {
+    it('returns "-" when assignment has no submissions or needs grading or is excused', () => {
+      const assignment = Assignment.mock({
+        submissionsConnection: {
+          nodes: [],
+        },
+      })
+
+      const gradingStandard = GradingStandard.mock()
+
+      expect(getDisplayScore(assignment, gradingStandard)).toBe('-')
+    })
+
+    it('calls getAssignmentLetterGrade when ENV restricts quantitative data and assignment uses GPA scale, percent, or points grading types', () => {
+      const assignment = Assignment.mock({
+        gradingType: 'gpa_scale',
+      })
+
+      const gradingStandard = GradingStandard.mock()
+
+      ENV.restrict_quantitative_data = true
+
+      expect(getDisplayScore(assignment, gradingStandard)).toEqual('A-')
+    })
+
+    it('calls getAssignmentLetterGrade when assignment uses letter grade or GPA scale grading types', () => {
+      const assignment = Assignment.mock({
+        gradingType: 'letter_grade',
+      })
+
+      const gradingStandard = GradingStandard.mock()
+
+      expect(getDisplayScore(assignment, gradingStandard)).toEqual('A-')
+    })
+
+    it('returns assignment percentage followed by "%" when assignment uses percentage grading type', () => {
+      const assignment = Assignment.mock({
+        gradingType: 'percentage',
+      })
+      const gradingStandard = GradingStandard.mock()
+
+      expect(getDisplayScore(assignment, gradingStandard)).toEqual('90%')
+    })
+
+    it('returns IconCheckLine when assignment uses pass/fail grading type and has a score', () => {
+      const assignment = Assignment.mock({
+        gradingType: 'pass_fail',
+        submissionsConnection: {
+          nodes: [
+            {
+              score: 1,
+            },
+          ],
+        },
+      })
+
+      const gradingStandard = GradingStandard.mock()
+
+      expect(getDisplayScore(assignment, gradingStandard)).toStrictEqual(<IconCheckLine />)
+    })
+
+    it('returns IconXLine when assignment uses pass/fail grading type and has no score', () => {
+      const assignment = Assignment.mock({
+        gradingType: 'pass_fail',
+        submissionsConnection: {
+          nodes: [
+            {
+              score: null,
+            },
+          ],
+        },
+      })
+
+      const gradingStandard = GradingStandard.mock()
+
+      expect(getDisplayScore(assignment, gradingStandard)).toStrictEqual(<IconXLine />)
+    })
+
+    it('calls getZeroPointAssignmentDisplayScore when ENV restricts quantitative data and assignment has 0 points possible', () => {
+      const assignment = Assignment.mock({
+        pointsPossible: 0,
+        submissionsConnection: {
+          nodes: [
+            {
+              gradingStatus: 'graded',
+            },
+          ],
+        },
+      })
+
+      const gradingStandard = GradingStandard.mock()
+
+      ENV.restrict_quantitative_data = true
+
+      expect(getDisplayScore(assignment, gradingStandard)).toStrictEqual(<IconCheckLine />)
+    })
+
+    it('returns earned points and total points as a string when none of the conditions are met', () => {
+      const assignment = Assignment.mock({
+        gradingType: 'other_grading_type',
+      })
+      const gradingStandard = GradingStandard.mock()
+
+      expect(getDisplayScore(assignment, gradingStandard)).toEqual('90/100')
+    })
+  })
+
+  describe('getZeroPointAssignmentDisplayScore', () => {
+    it('returns "-" when grading status is not "graded"', () => {
+      const score = 0
+      const gradingStatus = 'not-graded'
+      const gradingStandard = GradingStandard.mock()
+
+      const result = getZeroPointAssignmentDisplayScore(score, gradingStatus, gradingStandard)
+
+      expect(result).toBe('-')
+    })
+
+    it('returns IconCheckLine when score is 0', () => {
+      const score = 0
+      const gradingStatus = 'graded'
+      const gradingStandard = GradingStandard.mock()
+
+      const result = getZeroPointAssignmentDisplayScore(score, gradingStatus, gradingStandard)
+
+      expect(result).toEqual(<IconCheckLine />)
+    })
+
+    it('calls scorePercentageToLetterGrade when score is greater than or equal to 0', () => {
+      const score = 80
+      const gradingStatus = 'graded'
+      const gradingStandard = GradingStandard.mock()
+
+      const result = getZeroPointAssignmentDisplayScore(score, gradingStatus, gradingStandard)
+
+      expect(result).toEqual('A')
+    })
+
+    it('returns the score as a string when score is less than or equal to 0', () => {
+      const score = -10
+      const gradingStatus = 'graded'
+      const gradingStandard = GradingStandard.mock()
+
+      const result = getZeroPointAssignmentDisplayScore(score, gradingStatus, gradingStandard)
+
+      expect(result).toEqual('-10/0')
     })
   })
 
