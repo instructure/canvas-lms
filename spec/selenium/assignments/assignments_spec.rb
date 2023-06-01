@@ -1025,6 +1025,48 @@ describe "assignments" do
           expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: A"
         end
 
+        it "shows Complete for students with 0/0 score on index page", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 0, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 0, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "Complete"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: Complete"
+        end
+
+        it "shows A for students with 1/0 score on index page", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 0, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 1, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "A"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: A"
+        end
+
+        it "shows -1 for students with -1/0 score on index page", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 0, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: -1, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "-1"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: -1"
+        end
+
         it "shows points possible for teachers on index page", priority: "2" do
           @assignment = @course.assignments.create! context: @course, title: "to publish"
           @assignment.update(points_possible: 10, grading_type: "letter_grade")
