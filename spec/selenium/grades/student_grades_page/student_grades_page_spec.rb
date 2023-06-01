@@ -129,6 +129,8 @@ describe "gradebook - logged in as a student" do
 
       # create group and periods
       group = backend_group_helper.create_for_account(@course.root_account)
+      group.update(display_totals_for_all_grading_periods: true)
+      group.save!
       term.update_attribute(:grading_period_group_id, group)
       backend_period_helper.create_with_weeks_for_group(group, -8, -12, future_period_name)
       backend_period_helper.create_with_weeks_for_group(group, 1, -3, current_period_name)
@@ -143,19 +145,37 @@ describe "gradebook - logged in as a student" do
       user_session(@student)
       StudentGradesPage.visit_as_student(@course)
       ffj("tr:contains('Assignments')")
-      expect(f("#grading_period_select_menu").attribute(:value)).to eq current_period_name
 
       current_assignment_selector = "tr:contains('#{current_assignment_name}')"
       future_assignment_selector = "tr:contains('#{future_assignment_name}')"
+
+      # the all the grades and grading period selected is based on current period
+      expect(f("#grading_period_select_menu").attribute(:value)).to eq current_period_name
+      expect(f("div.final_grade").text).to eq "Total: B-"
       expect(fj(current_assignment_selector).text).to include "GRADED\nB-\nYour grade has been updated"
+      expect(f("tr[data-testid='agtotal-Assignments']").text).to eq "Assignments B-"
+      expect(f("tr[data-testid='total_row']").text).to eq "Total B-"
       expect(f("body")).not_to contain_jqcss(future_assignment_selector)
 
+      # switch to future grading period and check that everything is based on the future period
       f("#grading_period_select_menu").click
       fj("li:contains('#{future_period_name}')").click
       fj("button:contains('Apply')").click
       wait_for_ajaximations
+      expect(f("div.final_grade").text).to eq "Total: A"
       expect(fj(future_assignment_selector).text).to include "GRADED\nA\nYour grade has been updated"
+      expect(f("tr[data-testid='agtotal-Assignments']").text).to eq "Assignments A"
+      expect(f("tr[data-testid='total_row']").text).to eq "Total A"
       expect(f("body")).not_to contain_jqcss(current_assignment_selector)
+
+      # switch to all grading periods and verify everything is based on all periods
+      f("#grading_period_select_menu").click
+      fj("li:contains('All Grading Periods')").click
+      fj("button:contains('Apply')").click
+      wait_for_ajaximations
+
+      expect(fj(future_assignment_selector).text).to include "GRADED\nA\nYour grade has been updated"
+      expect(fj(current_assignment_selector).text).to include "GRADED\nB-\nYour grade has been updated"
     end
   end
 end

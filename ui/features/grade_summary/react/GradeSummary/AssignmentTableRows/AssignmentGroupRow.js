@@ -48,7 +48,7 @@ export const assignmentGroupRow = (assignmentGroup, queryData) => {
       : scorePercentageToLetterGrade(assignmentGroupPercentage, queryData?.gradingStandard)
 
   return (
-    <Table.Row key={assignmentGroup?._id}>
+    <Table.Row key={assignmentGroup?._id} data-testid={`agtotal-${assignmentGroup?.name}`}>
       <Table.Cell textAlign="start" colSpan="3">
         <Text weight="bold">{assignmentGroup?.name}</Text>
       </Table.Cell>
