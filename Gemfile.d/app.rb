@@ -91,6 +91,7 @@ gem "marginalia", "1.11.1", require: false
 gem "mime-types", "3.3.1"
 gem "mini_magick", "4.11.0"
 gem "multi_json", "1.15.0"
+gem "net-http", "~> 0.1", require: false
 gem "net-ldap", "0.16.3", require: false
 gem "net-imap", "0.2.3", require: false
 gem "net-pop", "0.1.1", require: false
