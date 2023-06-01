@@ -40,6 +40,7 @@ export type ComponentProps = {
   readonly autoSubscription: boolean
   readonly disabled: boolean
   readonly onChange: (id: number, autoSubscription: boolean) => void
+  accountName: string
 }
 
 const SUBSCRIPTION_OPTIONS: SubscriptionOption[] = [
@@ -62,6 +63,7 @@ const SubscriptionDropDown: React.FC<ComponentProps> = ({
   autoSubscription,
   disabled,
   onChange,
+  accountName,
 }) => {
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [highlightedOptionId, setHighlightedOptionId] = useState<string | null>(null)
@@ -99,7 +101,9 @@ const SubscriptionDropDown: React.FC<ComponentProps> = ({
       optionsMaxWidth="400px"
       width="190px"
       renderLabel={
-        <ScreenReaderContent>{I18n.t('Calendar subscription options')}</ScreenReaderContent>
+        <ScreenReaderContent>
+          {I18n.t('For %{name} calendar subscription options', {name: accountName})}
+        </ScreenReaderContent>
       }
     >
       {SUBSCRIPTION_OPTIONS.map(option => {
