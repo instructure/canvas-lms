@@ -1207,16 +1207,16 @@ describe ApplicationHelper do
 
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; "
         expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
+        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
       end
 
       it "includes the report URI" do
         allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy-Report-Only"]).to eq "frame-src 'self' localhost root_account.test root_account2.test; report-uri https://somewhere/; "
+        expect(headers["Content-Security-Policy-Report-Only"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; report-uri https://somewhere/; "
       end
 
       it "includes the report URI when active" do
@@ -1224,7 +1224,7 @@ describe ApplicationHelper do
         account.enable_csp!
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' localhost root_account.test root_account2.test; report-uri https://somewhere/; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; report-uri https://somewhere/; "
       end
 
       it "includes canvadocs domain if enabled" do
@@ -1233,7 +1233,7 @@ describe ApplicationHelper do
         allow(Canvadocs).to receive(:enabled?).and_return(true)
         allow(Canvadocs).to receive(:config).and_return("base_url" => "https://canvadocs.instructure.com/1")
         helper.add_csp_for_root
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' canvadocs.instructure.com localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: canvadocs.instructure.com localhost root_account.test root_account2.test; "
       end
 
       it "includes inst_fs domain if enabled" do
@@ -1242,7 +1242,7 @@ describe ApplicationHelper do
         allow(InstFS).to receive(:enabled?).and_return(true)
         allow(InstFS).to receive(:app_host).and_return("https://inst_fs.instructure.com")
         helper.add_csp_for_root
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' inst_fs.instructure.com localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: inst_fs.instructure.com localhost root_account.test root_account2.test; "
       end
     end
   end

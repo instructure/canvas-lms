@@ -69,7 +69,7 @@ describe "site-wide" do
       course_with_teacher_logged_in
 
       get "/"
-      expect(response[content_security_policy]).to eq "frame-src 'self' localhost; frame-ancestors 'self' ;"
+      expect(response[content_security_policy]).to eq "frame-src 'self' blob: localhost; frame-ancestors 'self' ;"
     end
   end
 

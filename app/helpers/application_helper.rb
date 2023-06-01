@@ -1062,7 +1062,10 @@ module ApplicationHelper
       csp_context
       .csp_whitelisted_domains(request, include_files: true, include_tools: true)
       .join(" ")
-    headers[csp_header] = "frame-src 'self' #{domains}#{csp_report_uri}; "
+
+    # Due to New Analytics generating CSV reports as blob on the client-side and then trying to download them,
+    # as well as an interesting difference in browser interpretations of CSP, we have to allow blobs as a frame-src
+    headers[csp_header] = "frame-src 'self' blob: #{domains}#{csp_report_uri}; "
   end
 
   def add_csp_for_file
@@ -1090,7 +1093,7 @@ module ApplicationHelper
       object_domains = ["'self'"] + script_domains
       script_domains = ["'self'", "'unsafe-eval'", "'unsafe-inline'"] + script_domains
     end
-    "frame-src #{frame_domains.join(" ")}; script-src #{script_domains.join(" ")}; object-src #{object_domains.join(" ")}; "
+    "frame-src #{frame_domains.join(" ")} blob:; script-src #{script_domains.join(" ")}; object-src #{object_domains.join(" ")}; "
   end
 
   # Returns true if the current_path starts with the given value
