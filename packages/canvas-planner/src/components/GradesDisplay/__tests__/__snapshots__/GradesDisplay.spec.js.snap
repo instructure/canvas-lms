@@ -1,17 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`does not render caveat if no courses have grading periods 1`] = `
-<View
-  borderColor="primary"
-  display="auto"
-  focusColor="info"
-  focusPosition="offset"
-  overflowX="visible"
-  overflowY="visible"
-  position="static"
-  shouldAnimateFocus={true}
-  withVisualDebug={false}
->
+<Fragment>
+  <style>
+    
+  .GradesDisplay-styles__course {
+    border-bottom-color: #0374B5;
+  }
+  
+  </style>
   <View
     borderColor="primary"
     display="auto"
@@ -21,93 +18,102 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
-    textAlign="center"
     withVisualDebug={false}
   >
-    <Heading
-      border="none"
-      color="inherit"
-      level="h2"
-      margin="0 0 large 0"
+    <View
+      borderColor="primary"
+      display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      overflowX="visible"
+      overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      textAlign="center"
+      withVisualDebug={false}
     >
-      <Text
-        as="span"
-        letterSpacing="normal"
-        size="medium"
-        weight="bold"
-        wrap="normal"
-      >
-        My Grades
-      </Text>
-    </Heading>
-  </View>
-  <View
-    as="div"
-    borderColor="primary"
-    display="auto"
-    focusColor="info"
-    focusPosition="offset"
-    key="1"
-    margin="0 0 large 0"
-    overflowX="visible"
-    overflowY="visible"
-    position="static"
-    shouldAnimateFocus={true}
-    withVisualDebug={false}
-  >
-    <div
-      className="GradesDisplay-styles__course"
-      style={
-        Object {
-          "borderBottom": "solid thin",
-          "borderBottomColor": "blue",
-        }
-      }
-    >
-      <Link
-        color="link"
-        href="/courses/1/grades"
-        iconPlacement="start"
-        isWithinText={false}
-        size="small"
+      <Heading
+        border="none"
+        color="inherit"
+        level="h2"
+        margin="0 0 large 0"
       >
         <Text
           as="span"
           letterSpacing="normal"
           size="medium"
-          transform="uppercase"
+          weight="bold"
           wrap="normal"
         >
-          Ticket to Ride 101
+          My Grades
         </Text>
-      </Link>
-    </div>
-    <Text
+      </Heading>
+    </View>
+    <View
       as="div"
-      data-testid="my-grades-score"
-      letterSpacing="normal"
-      size="large"
-      weight="light"
-      wrap="normal"
+      borderColor="primary"
+      display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      key="1"
+      margin="0 0 large 0"
+      overflowX="visible"
+      overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
-      No Grade
-    </Text>
+      <div
+        className="GradesDisplay-styles__course"
+        style={
+          Object {
+            "borderBottom": "solid thin",
+            "borderBottomColor": "blue",
+          }
+        }
+      >
+        <Link
+          color="link"
+          href="/courses/1/grades"
+          iconPlacement="start"
+          isWithinText={false}
+          size="small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+            transform="uppercase"
+            wrap="normal"
+          >
+            Ticket to Ride 101
+          </Text>
+        </Link>
+      </div>
+      <Text
+        as="div"
+        data-testid="my-grades-score"
+        letterSpacing="normal"
+        size="large"
+        weight="light"
+        wrap="normal"
+      >
+        No Grade
+      </Text>
+    </View>
   </View>
-</View>
+</Fragment>
 `;
 
 exports[`renders a loading spinner when loading 1`] = `
-<View
-  borderColor="primary"
-  display="auto"
-  focusColor="info"
-  focusPosition="offset"
-  overflowX="visible"
-  overflowY="visible"
-  position="static"
-  shouldAnimateFocus={true}
-  withVisualDebug={false}
->
+<Fragment>
+  <style>
+    
+  .GradesDisplay-styles__course {
+    border-bottom-color: #0374B5;
+  }
+  
+  </style>
   <View
     borderColor="primary"
     display="auto"
@@ -117,67 +123,71 @@ exports[`renders a loading spinner when loading 1`] = `
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
-    textAlign="center"
     withVisualDebug={false}
   >
-    <Heading
-      border="none"
-      color="inherit"
-      level="h2"
-      margin="0 0 large 0"
+    <View
+      borderColor="primary"
+      display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      overflowX="visible"
+      overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      textAlign="center"
+      withVisualDebug={false}
     >
-      <Text
-        as="span"
-        letterSpacing="normal"
-        size="medium"
-        weight="bold"
-        wrap="normal"
+      <Heading
+        border="none"
+        color="inherit"
+        level="h2"
+        margin="0 0 large 0"
       >
-        My Grades
-      </Text>
-    </Heading>
-  </View>
-  <View
-    as="div"
-    borderColor="primary"
-    display="auto"
-    focusColor="info"
-    focusPosition="offset"
-    margin="0 0 large 0"
-    overflowX="visible"
-    overflowY="visible"
-    position="static"
-    shouldAnimateFocus={true}
-    textAlign="center"
-    withVisualDebug={false}
-  >
-    <Spinner
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+          wrap="normal"
+        >
+          My Grades
+        </Text>
+      </Heading>
+    </View>
+    <View
       as="div"
-      renderTitle={[Function]}
-      size="small"
-      variant="default"
-    />
+      borderColor="primary"
+      display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      margin="0 0 large 0"
+      overflowX="visible"
+      overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      textAlign="center"
+      withVisualDebug={false}
+    >
+      <Spinner
+        as="div"
+        renderTitle={[Function]}
+        size="small"
+        variant="default"
+      />
+    </View>
   </View>
-</View>
+</Fragment>
 `;
 
 exports[`renders an ErrorAlert if there is an error loading grades 1`] = `
-<View
-  borderColor="primary"
-  display="auto"
-  focusColor="info"
-  focusPosition="offset"
-  overflowX="visible"
-  overflowY="visible"
-  position="static"
-  shouldAnimateFocus={true}
-  withVisualDebug={false}
->
-  <ErrorAlert
-    error="There was an error"
-  >
-    Error loading grades
-  </ErrorAlert>
+<Fragment>
+  <style>
+    
+  .GradesDisplay-styles__course {
+    border-bottom-color: #0374B5;
+  }
+  
+  </style>
   <View
     borderColor="primary"
     display="auto"
@@ -187,41 +197,55 @@ exports[`renders an ErrorAlert if there is an error loading grades 1`] = `
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
-    textAlign="center"
     withVisualDebug={false}
   >
-    <Heading
-      border="none"
-      color="inherit"
-      level="h2"
-      margin="0 0 large 0"
+    <ErrorAlert
+      error="There was an error"
     >
-      <Text
-        as="span"
-        letterSpacing="normal"
-        size="medium"
-        weight="bold"
-        wrap="normal"
+      Error loading grades
+    </ErrorAlert>
+    <View
+      borderColor="primary"
+      display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      overflowX="visible"
+      overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      textAlign="center"
+      withVisualDebug={false}
+    >
+      <Heading
+        border="none"
+        color="inherit"
+        level="h2"
+        margin="0 0 large 0"
       >
-        My Grades
-      </Text>
-    </Heading>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+          wrap="normal"
+        >
+          My Grades
+        </Text>
+      </Heading>
+    </View>
   </View>
-</View>
+</Fragment>
 `;
 
 exports[`renders some course grades 1`] = `
-<View
-  borderColor="primary"
-  display="auto"
-  focusColor="info"
-  focusPosition="offset"
-  overflowX="visible"
-  overflowY="visible"
-  position="static"
-  shouldAnimateFocus={true}
-  withVisualDebug={false}
->
+<Fragment>
+  <style>
+    
+  .GradesDisplay-styles__course {
+    border-bottom-color: #0374B5;
+  }
+  
+  </style>
   <View
     borderColor="primary"
     display="auto"
@@ -231,204 +255,216 @@ exports[`renders some course grades 1`] = `
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
-    textAlign="center"
     withVisualDebug={false}
   >
-    <Heading
-      border="none"
-      color="inherit"
-      level="h2"
+    <View
+      borderColor="primary"
+      display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      overflowX="visible"
+      overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      textAlign="center"
+      withVisualDebug={false}
+    >
+      <Heading
+        border="none"
+        color="inherit"
+        level="h2"
+        margin="0 0 large 0"
+      >
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+          wrap="normal"
+        >
+          My Grades
+        </Text>
+      </Heading>
+    </View>
+    <View
+      as="div"
+      borderColor="primary"
+      display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      key="1"
       margin="0 0 large 0"
+      overflowX="visible"
+      overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      withVisualDebug={false}
+    >
+      <div
+        className="GradesDisplay-styles__course"
+        style={
+          Object {
+            "borderBottom": "solid thin",
+            "borderBottomColor": "blue",
+          }
+        }
+      >
+        <Link
+          color="link"
+          href="/courses/1/grades"
+          iconPlacement="start"
+          isWithinText={false}
+          size="small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+            transform="uppercase"
+            wrap="normal"
+          >
+            Ticket to Ride 101
+          </Text>
+        </Link>
+      </div>
+      <Text
+        as="div"
+        data-testid="my-grades-score"
+        letterSpacing="normal"
+        size="large"
+        weight="light"
+        wrap="normal"
+      >
+        No Grade
+      </Text>
+    </View>
+    <View
+      as="div"
+      borderColor="primary"
+      display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      key="2"
+      margin="0 0 large 0"
+      overflowX="visible"
+      overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      withVisualDebug={false}
+    >
+      <div
+        className="GradesDisplay-styles__course"
+        style={
+          Object {
+            "borderBottom": "solid thin",
+            "borderBottomColor": "green",
+          }
+        }
+      >
+        <Link
+          color="link"
+          href="/courses/2/grades"
+          iconPlacement="start"
+          isWithinText={false}
+          size="small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+            transform="uppercase"
+            wrap="normal"
+          >
+            Ingenious 101
+          </Text>
+        </Link>
+      </div>
+      <Text
+        as="div"
+        data-testid="my-grades-score"
+        letterSpacing="normal"
+        size="large"
+        weight="light"
+        wrap="normal"
+      >
+        42.34%
+      </Text>
+    </View>
+    <View
+      as="div"
+      borderColor="primary"
+      display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      key="3"
+      margin="0 0 large 0"
+      overflowX="visible"
+      overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      withVisualDebug={false}
+    >
+      <div
+        className="GradesDisplay-styles__course"
+        style={
+          Object {
+            "borderBottom": "solid thin",
+            "borderBottomColor": "red",
+          }
+        }
+      >
+        <Link
+          color="link"
+          href="/courses/3/grades"
+          iconPlacement="start"
+          isWithinText={false}
+          size="small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+            transform="uppercase"
+            wrap="normal"
+          >
+            Settlers of Catan 201
+          </Text>
+        </Link>
+      </div>
+      <Text
+        as="div"
+        data-testid="my-grades-score"
+        letterSpacing="normal"
+        size="large"
+        weight="light"
+        wrap="normal"
+      >
+        No Grade
+      </Text>
+    </View>
+    <View
+      as="div"
+      borderColor="primary"
+      display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      overflowX="visible"
+      overflowY="visible"
+      position="static"
+      shouldAnimateFocus={true}
+      textAlign="center"
+      withVisualDebug={false}
     >
       <Text
         as="span"
+        fontStyle="italic"
         letterSpacing="normal"
-        size="medium"
-        weight="bold"
+        size="x-small"
         wrap="normal"
       >
-        My Grades
+        *Only most recent grading period shown.
       </Text>
-    </Heading>
+    </View>
   </View>
-  <View
-    as="div"
-    borderColor="primary"
-    display="auto"
-    focusColor="info"
-    focusPosition="offset"
-    key="1"
-    margin="0 0 large 0"
-    overflowX="visible"
-    overflowY="visible"
-    position="static"
-    shouldAnimateFocus={true}
-    withVisualDebug={false}
-  >
-    <div
-      className="GradesDisplay-styles__course"
-      style={
-        Object {
-          "borderBottom": "solid thin",
-          "borderBottomColor": "blue",
-        }
-      }
-    >
-      <Link
-        color="link"
-        href="/courses/1/grades"
-        iconPlacement="start"
-        isWithinText={false}
-        size="small"
-      >
-        <Text
-          as="span"
-          letterSpacing="normal"
-          size="medium"
-          transform="uppercase"
-          wrap="normal"
-        >
-          Ticket to Ride 101
-        </Text>
-      </Link>
-    </div>
-    <Text
-      as="div"
-      data-testid="my-grades-score"
-      letterSpacing="normal"
-      size="large"
-      weight="light"
-      wrap="normal"
-    >
-      No Grade
-    </Text>
-  </View>
-  <View
-    as="div"
-    borderColor="primary"
-    display="auto"
-    focusColor="info"
-    focusPosition="offset"
-    key="2"
-    margin="0 0 large 0"
-    overflowX="visible"
-    overflowY="visible"
-    position="static"
-    shouldAnimateFocus={true}
-    withVisualDebug={false}
-  >
-    <div
-      className="GradesDisplay-styles__course"
-      style={
-        Object {
-          "borderBottom": "solid thin",
-          "borderBottomColor": "green",
-        }
-      }
-    >
-      <Link
-        color="link"
-        href="/courses/2/grades"
-        iconPlacement="start"
-        isWithinText={false}
-        size="small"
-      >
-        <Text
-          as="span"
-          letterSpacing="normal"
-          size="medium"
-          transform="uppercase"
-          wrap="normal"
-        >
-          Ingenious 101
-        </Text>
-      </Link>
-    </div>
-    <Text
-      as="div"
-      data-testid="my-grades-score"
-      letterSpacing="normal"
-      size="large"
-      weight="light"
-      wrap="normal"
-    >
-      42.34%
-    </Text>
-  </View>
-  <View
-    as="div"
-    borderColor="primary"
-    display="auto"
-    focusColor="info"
-    focusPosition="offset"
-    key="3"
-    margin="0 0 large 0"
-    overflowX="visible"
-    overflowY="visible"
-    position="static"
-    shouldAnimateFocus={true}
-    withVisualDebug={false}
-  >
-    <div
-      className="GradesDisplay-styles__course"
-      style={
-        Object {
-          "borderBottom": "solid thin",
-          "borderBottomColor": "red",
-        }
-      }
-    >
-      <Link
-        color="link"
-        href="/courses/3/grades"
-        iconPlacement="start"
-        isWithinText={false}
-        size="small"
-      >
-        <Text
-          as="span"
-          letterSpacing="normal"
-          size="medium"
-          transform="uppercase"
-          wrap="normal"
-        >
-          Settlers of Catan 201
-        </Text>
-      </Link>
-    </div>
-    <Text
-      as="div"
-      data-testid="my-grades-score"
-      letterSpacing="normal"
-      size="large"
-      weight="light"
-      wrap="normal"
-    >
-      No Grade
-    </Text>
-  </View>
-  <View
-    as="div"
-    borderColor="primary"
-    display="auto"
-    focusColor="info"
-    focusPosition="offset"
-    overflowX="visible"
-    overflowY="visible"
-    position="static"
-    shouldAnimateFocus={true}
-    textAlign="center"
-    withVisualDebug={false}
-  >
-    <Text
-      as="span"
-      fontStyle="italic"
-      letterSpacing="normal"
-      size="x-small"
-      wrap="normal"
-    >
-      *Only most recent grading period shown.
-    </Text>
-  </View>
-</View>
+</Fragment>
 `;
