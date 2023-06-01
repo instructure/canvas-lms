@@ -24,15 +24,4 @@ export type {
   GradingSchemeSummary,
 } from './gradingSchemeApiModel'
 
-export type {ApiCallStatus} from './react/hooks/ApiCallStatus'
-export {useGradingSchemes} from './react/hooks/useGradingSchemes'
-export {useGradingScheme} from './react/hooks/useGradingScheme'
-export {useDefaultGradingScheme} from './react/hooks/useDefaultGradingScheme'
-export {useGradingSchemeCreate} from './react/hooks/useGradingSchemeCreate'
-export {useGradingSchemeUpdate} from './react/hooks/useGradingSchemeUpdate'
-export {useGradingSchemeDelete} from './react/hooks/useGradingSchemeDelete'
-export {useGradingSchemeSummaries} from './react/hooks/useGradingSchemeSummaries'
-export {GradingSchemeView} from './react/components/view/GradingSchemeView'
-export {GradingSchemeTemplateView} from './react/components/view/GradingSchemeTemplateView'
-export {GradingSchemeInput} from './react/components/form/GradingSchemeInput'
-export type {GradingSchemeInputHandle} from './react/components/form/GradingSchemeInput'
+export {GradingSchemesManagement} from './react/components/GradingSchemesManagement'

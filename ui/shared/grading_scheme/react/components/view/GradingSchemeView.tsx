@@ -25,8 +25,9 @@ import {Table} from '@instructure/ui-table'
 // @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-import {calculateMaxScoreForDataRow} from '../../helpers/calculateMaxScoreForDataRow'
+import {calculateHighRangeForDataRow} from '../../helpers/calculateHighRangeForDataRow'
 import {GradingSchemeDataRowView} from './GradingSchemeDataRowView'
 import {Heading} from '@instructure/ui-heading'
 import {GradingScheme} from '@canvas/grading-scheme'
@@ -35,8 +36,8 @@ const I18n = useI18nScope('GradingSchemes')
 
 interface ComponentProps {
   gradingScheme: GradingScheme
-  allowEdit: boolean
-  allowDelete: boolean
+  disableEdit: boolean
+  disableDelete: boolean
   onEditRequested?: () => any
   onDeleteRequested?: () => any
 }
@@ -47,43 +48,47 @@ const {Head, Row, ColHeader, Body} = Table as any
 
 export const GradingSchemeView: React.FC<ComponentProps> = ({
   gradingScheme,
-  allowEdit,
-  allowDelete,
+  disableEdit = false,
+  disableDelete = false,
   onEditRequested,
   onDeleteRequested,
 }) => {
   return (
-    <View as="div" data-testid={`grading_scheme_${gradingScheme.id}`}>
+    <View
+      as="div"
+      margin="none none none x-large"
+      data-testid={`grading_scheme_${gradingScheme.id}`}
+    >
       <Flex>
         <Item shouldGrow={true} shouldShrink={true} padding="none medium none none">
           <Heading level="h3" margin="0 0 x-small">
+            <ScreenReaderContent>{I18n.t('Grading scheme title')}</ScreenReaderContent>
             {gradingScheme.title}
           </Heading>
         </Item>
         <Item>
-          {allowEdit ? (
-            <IconButton
-              onClick={onEditRequested}
-              margin="none x-small none none"
-              screenReaderLabel={I18n.t('Edit grading scheme')}
-              data-testid={`grading_scheme_${gradingScheme.id}_edit_button`}
-            >
-              <IconEditLine />
-            </IconButton>
-          ) : (
-            <></>
-          )}
-          {allowDelete ? (
-            <IconButton
-              onClick={onDeleteRequested}
-              screenReaderLabel={I18n.t('Delete grading scheme')}
-              data-testid={`grading_scheme_${gradingScheme.id}_delete_button`}
-            >
-              <IconTrashLine />
-            </IconButton>
-          ) : (
-            <></>
-          )}
+          <IconButton
+            onClick={onEditRequested}
+            margin="none x-small none none"
+            screenReaderLabel={I18n.t('Edit grading scheme')}
+            data-testid={`grading_scheme_${gradingScheme.id}_edit_button`}
+            disabled={disableEdit}
+            withBorder={false}
+            withBackground={false}
+          >
+            <IconEditLine />
+          </IconButton>
+
+          <IconButton
+            onClick={onDeleteRequested}
+            screenReaderLabel={I18n.t('Delete grading scheme')}
+            data-testid={`grading_scheme_${gradingScheme.id}_delete_button`}
+            disabled={disableDelete}
+            withBackground={false}
+            withBorder={false}
+          >
+            <IconTrashLine />
+          </IconButton>
         </Item>
       </Flex>
       <Flex>
@@ -96,12 +101,11 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
             data-testid={`grading_scheme_${gradingScheme.id}_data_table`}
           >
             <Head>
-              {/* <Row theme={{borderColor: 'white'}}> */}
-              <Row>
-                <ColHeader theme={{padding: 'none'}} id="1">
+              <Row theme={{borderColor: 'transparent'}}>
+                <ColHeader theme={{padding: 'none'}} id="1" width="30%">
                   {I18n.t('Letter Grade')}
                 </ColHeader>
-                <ColHeader theme={{padding: 'none'}} id="2">
+                <ColHeader theme={{padding: 'none'}} id="2" width="70%" colSpan={2}>
                   {I18n.t('Range')}
                 </ColHeader>
               </Row>
@@ -111,7 +115,7 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
                 <GradingSchemeDataRowView
                   key={shortid()}
                   dataRow={dataRow}
-                  maxScore={calculateMaxScoreForDataRow(idx, array)}
+                  maxScore={calculateHighRangeForDataRow(idx, array)}
                   isFirstRow={idx === 0}
                 />
               ))}

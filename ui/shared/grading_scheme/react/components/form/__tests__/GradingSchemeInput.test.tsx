@@ -18,8 +18,14 @@
 
 import React from 'react'
 import {act, render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
-import {VALID_FORM_INPUT, FORM_INPUT_MISSING_TITLE, FORM_INPUT_OVERLAPPING_RANGES} from './fixtures'
+import {
+  VALID_FORM_INPUT,
+  FORM_INPUT_MISSING_TITLE,
+  FORM_INPUT_OVERLAPPING_RANGES,
+  SHORT_FORM_INPUT,
+} from './fixtures'
 import {GradingSchemeInput, GradingSchemeInputHandle} from '../GradingSchemeInput'
 
 const onSave = jest.fn()
@@ -67,6 +73,108 @@ describe('GradingSchemeInput', () => {
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
     expect(onSave).toHaveBeenCalled()
+  })
+
+  it('data is accurate when all but the first row is deleted', () => {
+    const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
+    render(
+      <GradingSchemeInput
+        initialFormData={SHORT_FORM_INPUT}
+        onSave={onSave}
+        ref={gradingSchemeInputRef}
+      />
+    )
+    const deleteRowButtons = screen.getAllByRole<HTMLInputElement>('button', {
+      name: /Remove letter grade row/,
+    })
+    expect(deleteRowButtons.length).toBe(2)
+    act(() => deleteRowButtons[1].click()) // delete the last row
+    const newDeleteRowButtons = screen.getAllByRole<HTMLInputElement>('button', {
+      name: /Remove letter grade row/,
+    })
+    expect(newDeleteRowButtons.length).toBe(1)
+    act(() => gradingSchemeInputRef.current?.savePressed())
+    // expect(onSave).toHaveBeenCalled()
+    expect(onSave).toHaveBeenCalledWith({
+      title: 'A Grading Scheme',
+      data: [{name: 'P', value: 0.0}],
+    })
+  })
+
+  it('data is accurate when all but the last row is deleted', () => {
+    const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
+    render(
+      <GradingSchemeInput
+        initialFormData={SHORT_FORM_INPUT}
+        onSave={onSave}
+        ref={gradingSchemeInputRef}
+      />
+    )
+    const deleteRowButtons = screen.getAllByRole<HTMLInputElement>('button', {
+      name: /Remove letter grade row/,
+    })
+    expect(deleteRowButtons.length).toBe(2)
+    act(() => deleteRowButtons[0].click()) // delete the first row
+    const newDeleteRowButtons = screen.getAllByRole<HTMLInputElement>('button', {
+      name: /Remove letter grade row/,
+    })
+    expect(newDeleteRowButtons.length).toBe(1)
+    act(() => gradingSchemeInputRef.current?.savePressed())
+    // expect(onSave).toHaveBeenCalled()
+    expect(onSave).toHaveBeenCalledWith({
+      title: 'A Grading Scheme',
+      data: [{name: 'F', value: 0.0}],
+    })
+  })
+
+  it('data is accurate when a new row is added', () => {
+    const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
+    render(
+      <GradingSchemeInput
+        initialFormData={SHORT_FORM_INPUT}
+        onSave={onSave}
+        ref={gradingSchemeInputRef}
+      />
+    )
+    const addRowButtons = screen.getAllByRole<HTMLInputElement>('button', {
+      name: /Add new row for a letter grade to grading scheme after this row/,
+    })
+    expect(addRowButtons.length).toBe(2)
+    act(() => addRowButtons[0].click()) // add a row after the first row
+    const letterGradeInputs = screen.getAllByRole<HTMLInputElement>('textbox', {
+      name: /Letter Grade/,
+    })
+    expect(letterGradeInputs.length).toBe(3) // we've added a row between the initial two
+    userEvent.type(letterGradeInputs[1], 'X') // give the new row a letter grade
+
+    act(() => gradingSchemeInputRef.current?.savePressed())
+    expect(onSave).toHaveBeenCalledWith({
+      title: 'A Grading Scheme',
+      data: [
+        {name: 'P', value: 0.5},
+        {name: 'X', value: 0.25},
+        {name: 'F', value: 0.0},
+      ],
+    })
+  })
+
+  it('validation error displayed when a range is not between 0 and 100', () => {
+    const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
+    render(
+      <GradingSchemeInput
+        initialFormData={SHORT_FORM_INPUT}
+        onSave={onSave}
+        ref={gradingSchemeInputRef}
+      />
+    )
+    const rangeInputs = screen.getAllByRole<HTMLInputElement>('textbox', {
+      name: /Lower limit of range/,
+    })
+    expect(rangeInputs.length).toBe(1) // note: the 2nd row has a hard coded zero input
+    userEvent.type(rangeInputs[0], '-1') // give the 1st row an invalid value
+
+    act(() => gradingSchemeInputRef.current?.savePressed())
+    expect(onSave).toHaveBeenCalledTimes(0)
   })
 
   it('validation error displayed on parent imperative save button press when title is missing', () => {

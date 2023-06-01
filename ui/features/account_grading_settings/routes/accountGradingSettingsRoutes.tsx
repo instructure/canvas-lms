@@ -17,23 +17,19 @@
  */
 
 import React from 'react'
-import {Outlet} from 'react-router-dom'
-import {accountGradingSettingsRoutes} from '../../account_grading_settings/routes/accountGradingSettingsRoutes'
+import {Navigate} from 'react-router-dom'
+import {TabLayout} from '../pages/TabLayout'
+import {AccountGradingSchemes} from '../pages/AccountGradingSchemes'
+import {AccountGradingPeriods} from '../pages/AccountGradingPeriods'
 
-export const routes = [
+export const accountGradingSettingsRoutes = [
   {
-    path: '/courses/:courseId',
-    element: <Outlet />,
+    path: 'grading_settings',
+    element: <TabLayout />,
     children: [
-      /* ...fooRoutes */
-    ],
-  },
-  {
-    path: '/accounts/:accountId',
-    element: <Outlet />,
-    children: [
-      ...accountGradingSettingsRoutes,
-      /* ...fooRoutes */
+      {path: '', element: <Navigate to="schemes" replace={true} />},
+      {path: 'periods', element: <AccountGradingPeriods />},
+      {path: 'schemes', element: <AccountGradingSchemes />},
     ],
   },
 ]

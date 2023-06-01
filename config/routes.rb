@@ -787,6 +787,9 @@ CanvasRails::Application.routes.draw do
     put "grading_schemes/:id" => "grading_schemes_json#update"
     get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
     get "grading_schemes/:id" => "grading_schemes_json#show"
+
+    get "grading_settings" => "account_grading_settings#index"
+    get "grading_settings/*path" => "account_grading_settings#index"
   end
 
   get "images/users/:user_id" => "users#avatar_image", :as => :avatar_image

@@ -16,24 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingSchemeFormInput} from '../GradingSchemeInput'
+import {GradingSchemeFormDataWithUniqueRowIds} from '../GradingSchemeInput'
 import {roundToTwoDecimalPlaces} from '../../../helpers/roundToTwoDecimalPlaces'
 
 export const gradingSchemeIsValid = (
-  gradingSchemeFormData: GradingSchemeFormInput | undefined
+  gradingSchemeFormData: GradingSchemeFormDataWithUniqueRowIds
 ): boolean => {
-  if (!gradingSchemeFormData) return false
   return (
     gradingSchemeFormData.title?.trim().length > 0 &&
+    rowDataIsValidNumber(gradingSchemeFormData) &&
     rowDataIsValid(gradingSchemeFormData) &&
     rowNamesAreValid(gradingSchemeFormData)
   )
 }
 
-export const rowDataIsValid = (
-  gradingSchemeFormData: GradingSchemeFormInput | undefined
+export const rowDataIsValidNumber = (
+  gradingSchemeFormData: GradingSchemeFormDataWithUniqueRowIds
 ): boolean => {
-  if (!gradingSchemeFormData) return false
+  return gradingSchemeFormData.data.filter(data => data.minRangeNotValidNumber).length === 0
+}
+
+export const rowDataIsValid = (
+  gradingSchemeFormData: GradingSchemeFormDataWithUniqueRowIds
+): boolean => {
   if (gradingSchemeFormData.data.length <= 1) return true
   const rowValues = gradingSchemeFormData.data.map(dataRow => String(dataRow.value).trim())
   const sanitizedRowValues = [...new Set(rowValues.filter(v => v))] // get the unique set of only truthy values
@@ -48,9 +53,8 @@ export const rowDataIsValid = (
 }
 
 export const rowNamesAreValid = (
-  gradingSchemeFormData: GradingSchemeFormInput | undefined
+  gradingSchemeFormData: GradingSchemeFormDataWithUniqueRowIds
 ): boolean => {
-  if (!gradingSchemeFormData) return false
   const rowValues = gradingSchemeFormData.data.map(dataRow => String(dataRow.name).trim())
   const sanitizedRowNames = [...new Set(rowValues.filter(v => v))] // get the unique set of only truthy values
   return sanitizedRowNames.length === gradingSchemeFormData.data.length

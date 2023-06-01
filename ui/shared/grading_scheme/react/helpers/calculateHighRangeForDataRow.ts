@@ -18,7 +18,7 @@
 
 import {GradingSchemeDataRow} from '@canvas/grading-scheme'
 
-export const calculateMaxScoreForDataRow = (
+export const calculateHighRangeForDataRow = (
   rowIndex: number,
   gradingSchemeData: GradingSchemeDataRow[]
 ): number => {

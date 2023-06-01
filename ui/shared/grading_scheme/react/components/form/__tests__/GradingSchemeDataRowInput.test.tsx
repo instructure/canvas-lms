@@ -22,17 +22,19 @@ import {act, render, screen, fireEvent} from '@testing-library/react'
 import {GradingSchemeDataRowInput} from '../GradingSchemeDataRowInput'
 
 const onRowLetterGradeChange = jest.fn()
-const onRowMinScoreChange = jest.fn()
+const onLowRangeChange = jest.fn()
 const onRowDeleteRequested = jest.fn()
 const onRowAddRequested = jest.fn()
+const onLowRangeInputInvalidNumber = jest.fn()
 
 const testProps = {
   dataRow: {name: 'B', value: 0.8},
-  maxScore: 0.9,
+  highRange: 0.9,
   isFirstRow: false,
   isLastRow: false,
   onRowLetterGradeChange,
-  onRowMinScoreChange,
+  onLowRangeInputInvalidNumber,
+  onLowRangeChange,
   onRowDeleteRequested,
   onRowAddRequested,
 }
@@ -89,7 +91,7 @@ describe('GradingSchemeDataRowInput', () => {
     })
     fireEvent.change(rangeInput, {target: {value: '75'}})
     fireEvent.blur(rangeInput)
-    expect(onRowMinScoreChange).toHaveBeenCalledWith(0.75)
+    expect(onLowRangeChange).toHaveBeenCalledWith(0.75)
   })
 
   it('onRowMinScoreChange callback is invoked with rounded value on changing min score input to number with > 2 decimal places', () => {
@@ -105,7 +107,7 @@ describe('GradingSchemeDataRowInput', () => {
     })
     fireEvent.change(rangeInput, {target: {value: '75.555'}})
     fireEvent.blur(rangeInput)
-    expect(onRowMinScoreChange).toHaveBeenCalledWith(0.7556)
+    expect(onLowRangeChange).toHaveBeenCalledWith(0.7556)
   })
 
   it('onRowMinScoreChange callback is not invoked on changing min score input to invalid number', () => {
@@ -121,7 +123,7 @@ describe('GradingSchemeDataRowInput', () => {
     })
     fireEvent.change(rangeInput, {target: {value: '555'}})
     fireEvent.blur(rangeInput)
-    expect(onRowMinScoreChange).not.toHaveBeenCalled()
+    expect(onLowRangeChange).not.toHaveBeenCalled()
   })
 
   it('onRowMinScoreChange callback is not invoked on changing min score input to non numeric value', () => {
@@ -137,7 +139,7 @@ describe('GradingSchemeDataRowInput', () => {
     })
     fireEvent.change(rangeInput, {target: {value: 'foo'}})
     fireEvent.blur(rangeInput)
-    expect(onRowMinScoreChange).not.toHaveBeenCalled()
+    expect(onLowRangeChange).not.toHaveBeenCalled()
   })
 
   it('delete callback is invoked on delete row button press', () => {
@@ -149,7 +151,7 @@ describe('GradingSchemeDataRowInput', () => {
       </table>
     )
     const deleteRowButton = screen.getByRole<HTMLInputElement>('button', {
-      name: /Delete row/,
+      name: /Remove letter grade row/,
     })
     act(() => deleteRowButton.click())
     expect(onRowDeleteRequested).toHaveBeenCalled()
@@ -164,7 +166,7 @@ describe('GradingSchemeDataRowInput', () => {
       </table>
     )
     const addRowButton = screen.getByRole<HTMLInputElement>('button', {
-      name: /Add new row to grading scheme after this row/,
+      name: /Add new row for a letter grade to grading scheme after this row/,
     })
     act(() => addRowButton.click())
     expect(onRowAddRequested).toHaveBeenCalled()

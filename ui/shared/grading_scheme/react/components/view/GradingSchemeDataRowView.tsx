@@ -38,7 +38,7 @@ const {Row, Cell} = Table as any
 const GradingSchemeDataRowView: React.FC<ComponentProps> = ({dataRow, maxScore, isFirstRow}) => {
   return (
     <>
-      <Row>
+      <Row theme={{borderColor: 'transparent'}}>
         <Cell theme={{padding: 'none'}}>{dataRow.name}</Cell>
         <Cell theme={{padding: 'none'}}>
           <Flex display="inline-flex">
@@ -48,6 +48,10 @@ const GradingSchemeDataRowView: React.FC<ComponentProps> = ({dataRow, maxScore, 
                 {decimalToRoundedPercent(maxScore)}%
               </span>
             </Item>
+          </Flex>
+        </Cell>
+        <Cell theme={{padding: 'none'}}>
+          <Flex>
             <Item padding="x-small">{I18n.t('to')}</Item>
             <Item>
               <span aria-label={I18n.t('Lower limit of range')}>
