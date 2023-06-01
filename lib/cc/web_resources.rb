@@ -254,15 +254,15 @@ module CC
     end
 
     MAX_MEDIA_OBJECT_SIZE = 4.gigabytes
-    def add_media_objects
+    def add_media_objects(html_content_exporter = @html_exporter)
       return unless export_media_objects?
 
       # check to make sure we don't export more than 4 gigabytes of media objects
       total_size = 0
-      @html_exporter.used_media_objects.each do |obj|
+      html_content_exporter.used_media_objects.each do |obj|
         next if @added_attachments&.key?(obj.attachment_id)
 
-        info = @html_exporter.media_object_infos[obj.id]
+        info = html_content_exporter.media_object_infos[obj.id]
         next unless info && info[:asset] && info[:asset][:size]
 
         total_size += info[:asset][:size].to_i.kilobytes
@@ -274,9 +274,9 @@ module CC
       end
 
       client = CC::CCHelper.kaltura_admin_session
-      @html_exporter.used_media_objects.each do |obj|
+      html_content_exporter.used_media_objects.each do |obj|
         migration_id = create_key(obj.attachment)
-        info = @html_exporter.media_object_infos[obj.id]
+        info = html_content_exporter.media_object_infos[obj.id]
         next unless info && info[:asset]
 
         path = media_object_path(info[:path])
