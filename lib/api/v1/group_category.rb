@@ -70,7 +70,7 @@ module Api::V1::GroupCategory
         hash["unassigned_users_count"] = group_category.unassigned_users.count(:all)
       end
       if includes.include?("groups")
-        hash["groups"] = group_category.groups.active.map { |group| group_json(group, user, session) }
+        hash["groups"] = group_category.groups.by_name.active.map { |group| group_json(group, user, session) }
       end
     end
     hash
