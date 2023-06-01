@@ -115,10 +115,10 @@ module Api::V1::PlannerItem
       else
         hash[:plannable_date] = item[:user_due_date] || item.due_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)
-        if item.is_a?(Assignment)
-          hash[:plannable][:restrict_quantitative_data] = item.restrict_quantitative_data?(@current_user)
-        end
         hash[:html_url] = assignment_html_url(item, user, hash[:submissions])
+      end
+      if item.respond_to?(:restrict_quantitative_data?) && item.restrict_quantitative_data?(@current_user)
+        hash[:plannable][:restrict_quantitative_data] = true
       end
     end.tap do |hash|
       if (context = item.try(:context) || item.try(:course))

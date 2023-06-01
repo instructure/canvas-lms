@@ -57,7 +57,7 @@ const getItemDetailsFromPlannable = apiResponse => {
     details.onlineMeetingURL = plannable.online_meeting_url
   }
 
-  if (plannable_type === 'assignment') {
+  if (plannable.restrict_quantitative_data) {
     details.restrict_quantitative_data = plannable.restrict_quantitative_data
   }
 
