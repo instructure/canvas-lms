@@ -16,20 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BasicConstraintsExtension, X509Certificate, X509Certificates} from '@peculiar/x509'
+import {
+  BasicConstraintsExtension,
+  X509Certificate,
+  X509Certificates,
+  PemConverter,
+} from '@peculiar/x509'
+import {AsnSchemaValidationError} from '@peculiar/asn1-schema'
 
 export const parseCertificate = async (file: File): Promise<X509Certificate> => {
-  const isPkcs7 = file.name.endsWith('.p7b')
+  let result: string | ArrayBuffer = (await file.text()).replace(/\r/g, '') // CRLF -> LF
 
-  const result = (await file.text()).replace(/\r/g, '') // CRLF -> LF
+  if (!PemConverter.isPem(result)) result = await file.arrayBuffer()
 
-  // pkcs7 certificates must use a different import strategy
-  if (isPkcs7) {
-    const chain = new X509Certificates()
-    chain.import(result)
+  try {
+    // try parsing as pkcs7 first
+    return new X509Certificates(result)[0]
+  } catch (e) {
+    if (!(e instanceof AsnSchemaValidationError)) throw e
 
-    return chain[0]
-  } else {
+    // not pkcs7; parse as x509 cert instead
     return new X509Certificate(result)
   }
 }
