@@ -370,9 +370,9 @@ describe CanvasKaltura::ClientV3 do
       expect(bulk_upload_result[:id]).to eq bulk_upload_id.to_s
       expect(bulk_upload_result[:status]).to eq status.to_s
       expect(bulk_upload_result[:entries]).to eq [{
-        name: name,
-        entryId: entryId,
-        originalId: originalId
+        name:,
+        entryId:,
+        originalId:
       }]
     end
   end

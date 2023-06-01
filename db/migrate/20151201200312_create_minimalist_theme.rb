@@ -43,7 +43,7 @@ class CreateMinimalistTheme < ActiveRecord::Migration[4.2]
       "ic-brand-Login-footer-link-color" => "#2773e2",
       "ic-brand-Login-instructure-logo" => "#aaaaaa"
     }
-    bc = BrandConfig.new(variables: variables)
+    bc = BrandConfig.new(variables:)
     bc.name = NAME
     bc.share = true
     bc.save!

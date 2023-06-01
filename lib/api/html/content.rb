@@ -28,7 +28,7 @@ module Api
       def self.process_incoming(html, host: nil, port: nil)
         return html unless html.present?
 
-        content = new(html, host: host, port: port)
+        content = new(html, host:, port:)
 
         content.validate_is_parsable!
 
@@ -41,7 +41,7 @@ module Api
       def self.rewrite_outgoing(html, account, url_helper, include_mobile: false, rewrite_api_urls: true)
         return html if html.blank?
 
-        new(html, account, include_mobile: include_mobile, rewrite_api_urls: rewrite_api_urls)
+        new(html, account, include_mobile:, rewrite_api_urls:)
           .rewritten_html(url_helper)
       end
 

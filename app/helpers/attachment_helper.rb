@@ -91,7 +91,7 @@ module AttachmentHelper
     if safer_domain_available?
       redirect_to safe_domain_file_url(attachment,
                                        host_and_shard: @safer_domain_host,
-                                       verifier: verifier,
+                                       verifier:,
                                        download: !inline)
     elsif attachment.stored_locally?
       @headers = false if @files_domain
@@ -100,7 +100,7 @@ module AttachmentHelper
       body = attachment.open.read
       add_csp_for_file if attachment.mime_class == "html"
       send_file_headers!(length: body.length, filename: attachment.filename, disposition: "inline", type: attachment.content_type_with_encoding)
-      render body: body
+      render body:
     elsif must_proxy
       render 400, text: I18n.t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
     elsif inline

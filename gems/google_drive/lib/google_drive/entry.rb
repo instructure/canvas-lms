@@ -53,7 +53,7 @@ module GoogleDrive
       {
         name: display_name,
         document_id: @document_id,
-        extension: extension,
+        extension:,
         alternate_url: { href: alternate_url }
       }
     end
@@ -74,7 +74,7 @@ module GoogleDrive
       url ||= @entry["downloadUrl"] if @entry.key? "downloadUrl"
 
       {
-        url: url,
+        url:,
         ext: extension
       }
     end

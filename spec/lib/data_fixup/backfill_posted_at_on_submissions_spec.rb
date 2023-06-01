@@ -44,7 +44,7 @@ describe DataFixup::BackfillPostedAtOnSubmissions do
 
   it "does not change the posted_at date if it is already non-nil" do
     posted_at = 1.day.ago
-    submission.update!(graded_at: 2.days.ago, posted_at: posted_at)
+    submission.update!(graded_at: 2.days.ago, posted_at:)
     submission.reload
 
     expect { do_backfill }.not_to change { submission.posted_at }

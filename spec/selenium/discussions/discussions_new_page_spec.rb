@@ -28,19 +28,19 @@ describe "discussions" do
   let(:new_section) { course.course_sections.create!(name: "section 2") }
   let(:group) do
     course.groups.create!(name: "group",
-                          group_category: group_category).tap do |g|
+                          group_category:).tap do |g|
       g.add_user(student, "accepted", nil)
     end
   end
-  let(:student) { student_in_course(course: course, name: "student", active_all: true).user }
-  let(:teacher) { teacher_in_course(course: course, name: "teacher", active_all: true).user }
+  let(:student) { student_in_course(course:, name: "student", active_all: true).user }
+  let(:teacher) { teacher_in_course(course:, name: "teacher", active_all: true).user }
   let(:assignment_group) { course.assignment_groups.create!(name: "assignment group") }
   let(:group_category) { course.group_categories.create!(name: "group category") }
   let(:assignment) do
     course.assignments.create!(
       name: "assignment",
       # submission_types: 'discussion_topic',
-      assignment_group: assignment_group
+      assignment_group:
     )
   end
 
@@ -385,7 +385,7 @@ describe "discussions" do
         let(:group) { account.groups.create! }
 
         before do
-          tie_user_to_account(student, account: account, role: student_role)
+          tie_user_to_account(student, account:, role: student_role)
           group.add_user(student)
         end
 

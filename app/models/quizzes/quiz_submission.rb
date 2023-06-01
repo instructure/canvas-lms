@@ -195,7 +195,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def results_visible?(user: nil)
     return true unless quiz.present?
     return true if quiz.grants_right?(user, :review_grades)
-    return false if quiz.restrict_answers_for_concluded_course?(user: user)
+    return false if quiz.restrict_answers_for_concluded_course?(user:)
     return false if quiz.one_time_results && has_seen_results?
     return false if quiz.hide_results == "always"
 
@@ -304,7 +304,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     self.class.where(id: self)
         .where("workflow_state NOT IN ('complete', 'pending_review')")
-        .update_all(user_id: user_id, submission_data: new_params)
+        .update_all(user_id:, submission_data: new_params)
 
     record_answer(new_params)
 
@@ -321,7 +321,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       event_type: Quizzes::QuizSubmissionEvent::EVT_SUBMISSION_CREATED,
       event_data: { "quiz_version" => quiz_version, "quiz_data" => quiz_data },
       created_at: Time.zone.now,
-      attempt: attempt
+      attempt:
     )
   end
 
@@ -372,7 +372,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     Quizzes::QuizSubmissionSnapshot.create({
                                              quiz_submission: self,
-                                             attempt: attempt,
+                                             attempt:,
                                              data: snapshot_data
                                            })
   end
@@ -857,7 +857,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def delete_ignores
     if completed?
-      Ignore.where(asset_type: "Quizzes::Quiz", asset_id: quiz_id, user_id: user_id, purpose: "submitting").delete_all
+      Ignore.where(asset_type: "Quizzes::Quiz", asset_id: quiz_id, user_id:, purpose: "submitting").delete_all
     end
     true
   end

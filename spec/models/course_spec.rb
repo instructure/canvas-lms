@@ -260,7 +260,7 @@ describe Course do
 
       it "only includes a user once when they are enrolled multiple times in a course" do
         section = @course.course_sections.create!
-        @course.enroll_teacher(@teacher, section: section, allow_multiple_enrollments: true, enrollment_state: :active)
+        @course.enroll_teacher(@teacher, section:, allow_multiple_enrollments: true, enrollment_state: :active)
         expect(@course.moderators.count { |user| user == @teacher }).to eq 1
       end
 
@@ -1684,7 +1684,7 @@ describe Course do
         expect do
           course.apply_post_policy!(post_manually: true)
         end.not_to change {
-          PostPolicy.find_by!(assignment: assignment).updated_at
+          PostPolicy.find_by!(assignment:).updated_at
         }
       end
 
@@ -2292,8 +2292,8 @@ describe Course do
 
       now = Time.now
 
-      @course.assignments.create!(title: "Assignment 01", due_at: now + 1.day, position: 1, assignment_group: assignment_group, points_possible: 10)
-      @course.assignments.create!(title: "Assignment 02", due_at: nil, position: 1, assignment_group: assignment_group, points_possible: 10)
+      @course.assignments.create!(title: "Assignment 01", due_at: now + 1.day, position: 1, assignment_group:, points_possible: 10)
+      @course.assignments.create!(title: "Assignment 02", due_at: nil, position: 1, assignment_group:, points_possible: 10)
 
       @course.recompute_student_scores
       @student.reload
@@ -2314,7 +2314,7 @@ describe Course do
       before :once do
         course_with_teacher active_all: true
         _, zed, _ = ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].map do |name|
-          student_in_course(name: name)
+          student_in_course(name:)
           @student
         end
         zed.update_attribute :sortable_name, "aaaaaa zed"
@@ -5512,7 +5512,7 @@ describe Course do
 
     it "copies custom roles and enrollment dates" do
       role = Account.default.roles.create!(name: "Cool Student", base_role_type: "StudentEnrollment")
-      e1 = @homeroom_course.enroll_student(@student, role: role, start_at: 1.day.ago.beginning_of_day, end_at: 1.day.from_now.beginning_of_day, allow_multiple_enrollments: true)
+      e1 = @homeroom_course.enroll_student(@student, role:, start_at: 1.day.ago.beginning_of_day, end_at: 1.day.from_now.beginning_of_day, allow_multiple_enrollments: true)
       e1.conclude
       @course.sync_homeroom_enrollments
       expect(@course.enrollments.where(user_id: @student.id).size).to eq 2
@@ -5570,7 +5570,7 @@ describe Course do
         @shard1.activate do
           account = Account.create!
           toggle_k5_setting(account, true)
-          @cross_shard_course = course_factory(account: account, active_course: true)
+          @cross_shard_course = course_factory(account:, active_course: true)
           @cross_shard_course.sync_enrollments_from_homeroom = true
           @cross_shard_course.homeroom_course_id = @homeroom_course.id
           @cross_shard_course.save!
@@ -5863,7 +5863,7 @@ describe Course do
       account.authentication_providers.first.move_to_bottom
       account.settings[:open_registration] = true
       account.save!
-      course_factory(account: account)
+      course_factory(account:)
       expect(@course.user_list_search_mode_for(nil)).to eq :preferred
       expect(@course.user_list_search_mode_for(user_factory)).to eq :preferred
     end
@@ -6096,7 +6096,7 @@ describe Course do
     it "grants enrollment-based permissions regardless of shard" do
       @shard1.activate do
         account = Account.create!
-        course_factory(active_course: true, account: account)
+        course_factory(active_course: true, account:)
       end
 
       @shard2.activate do
@@ -6290,7 +6290,7 @@ describe Course do
 
     it "returns true when the provided user is a student" do
       student = user_model
-      student.student_enrollments.create!(course: course)
+      student.student_enrollments.create!(course:)
       expect(course.includes_student?(student)).to be_truthy
     end
 
@@ -6955,9 +6955,9 @@ describe Course do
     it "filters out course users that don't have a permission based on their enrollment roles" do
       permission = :moderate_forum # happens to be true for ta's, but available to students
       super_student_role = custom_student_role("superstudent", account: Account.default)
-      Account.default.role_overrides.create!(role: super_student_role, permission: permission, enabled: true)
+      Account.default.role_overrides.create!(role: super_student_role, permission:, enabled: true)
       unsuper_ta_role = custom_ta_role("unsuperta", account: Account.default)
-      Account.default.role_overrides.create!(role: unsuper_ta_role, permission: permission, enabled: false)
+      Account.default.role_overrides.create!(role: unsuper_ta_role, permission:, enabled: false)
 
       course_factory(active_all: true)
       reg_student = student_in_course(course: @course).user
@@ -7090,7 +7090,7 @@ describe Course do
       end
 
       context "With submissions" do
-        let(:student) { student_in_course(course: course).user }
+        let(:student) { student_in_course(course:).user }
         let!(:assignment) { course.assignments.create!(title: "assignment", points_possible: 10) }
         let(:submission) { assignment.submissions.find_by(user: student) }
 

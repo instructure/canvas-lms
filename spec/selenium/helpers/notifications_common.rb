@@ -21,7 +21,7 @@ require "rake"
 
 module NotificationsCommon
   def setup_comm_channel(user, path = "test@example.com", path_type = "email")
-    @channel = communication_channel(user, { username: path, path_type: path_type, active_cc: true })
+    @channel = communication_channel(user, { username: path, path_type:, active_cc: true })
   end
 
   def setup_notification(user, params = {})

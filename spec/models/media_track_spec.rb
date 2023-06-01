@@ -26,12 +26,12 @@ describe MediaTrack do
 
   it "requires unique locales by attachment_id" do
     attachment = @media_object.attachment
-    attachment.media_tracks.create!(locale: "en", content: "en subs", attachment: attachment, media_object: @media_object)
+    attachment.media_tracks.create!(locale: "en", content: "en subs", attachment:, media_object: @media_object)
     expect do
-      attachment.media_tracks.create!(locale: "en", content: "new subs", attachment: attachment, media_object: @media_object)
+      attachment.media_tracks.create!(locale: "en", content: "new subs", attachment:, media_object: @media_object)
     end.to raise_error "Validation failed: Locale has already been taken"
     expect do
-      attachment.media_tracks.create!(locale: "es", content: "es subs", attachment: attachment, media_object: @media_object)
+      attachment.media_tracks.create!(locale: "es", content: "es subs", attachment:, media_object: @media_object)
     end.not_to raise_error
   end
 

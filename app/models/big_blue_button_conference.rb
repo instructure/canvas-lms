@@ -100,7 +100,7 @@ class BigBlueButtonConference < WebConference
 
   class << self
     def send_request(action, options, use_fallback_config: false)
-      url_str = generate_request(action, options, use_fallback_config: use_fallback_config)
+      url_str = generate_request(action, options, use_fallback_config:)
       http_response = nil
       Canvas.timeout_protection("big_blue_button") do
         logger.debug "big blue button api call: #{url_str}"
@@ -264,7 +264,7 @@ class BigBlueButtonConference < WebConference
     recording_formats = recording.fetch(:playback, []).map do |format|
       show_to_students = !!format[:length] || format[:type] == "notes" # either is an actual recording or shared notes
       format[:translated_type] = translate_playback_format_type(format[:type])
-      format.merge(show_to_students: show_to_students)
+      format.merge(show_to_students:)
     end
     {
       recording_id: recording[:recordID],
@@ -331,7 +331,7 @@ class BigBlueButtonConference < WebConference
       meeting_ids = sliced_conferences.map(&:conference_key).join(",")
       response = send_request(:getRecordings,
                               { meetingID: meeting_ids },
-                              use_fallback_config: use_fallback_config)
+                              use_fallback_config:)
       result = response[:recordings] if response
       result = [] if result.is_a?(String)
       grouped_result = Array(result).group_by { |r| r[:meetingID] }

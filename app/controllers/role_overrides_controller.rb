@@ -144,7 +144,7 @@ class RoleOverridesController < ApplicationController
       roles = Api.paginate(roles, self, route)
       ActiveRecord::Associations.preload(roles, :account)
       preloaded_overrides = RoleOverride.preload_overrides(@context, roles)
-      render json: roles.map { |role| role_json(@context, role, @current_user, session, preloaded_overrides: preloaded_overrides) }
+      render json: roles.map { |role| role_json(@context, role, @current_user, session, preloaded_overrides:) }
     end
   end
 
@@ -154,13 +154,13 @@ class RoleOverridesController < ApplicationController
       account_role_data = []
       preloaded_overrides = RoleOverride.preload_overrides(@context, @context.available_account_roles)
       @context.available_account_roles.each do |role|
-        account_role_data << role_json(@context, role, @current_user, session, preloaded_overrides: preloaded_overrides)
+        account_role_data << role_json(@context, role, @current_user, session, preloaded_overrides:)
       end
 
       course_role_data = []
       preloaded_overrides = RoleOverride.preload_overrides(@context, @context.available_course_roles)
       @context.available_course_roles.each do |role|
-        course_role_data << role_json(@context, role, @current_user, session, preloaded_overrides: preloaded_overrides)
+        course_role_data << role_json(@context, role, @current_user, session, preloaded_overrides:)
       end
 
       js_env({
@@ -392,7 +392,7 @@ class RoleOverridesController < ApplicationController
     return render json: { message: "missing required parameter 'role'" }, status: :bad_request if api_request? && name.blank?
 
     base_role_type = params[:base_role_type] || Role::DEFAULT_ACCOUNT_TYPE
-    role = @context.roles.build(name: name)
+    role = @context.roles.build(name:)
     role.base_role_type = base_role_type
     role.workflow_state = "active"
     role.deleted_at = nil
@@ -426,7 +426,7 @@ class RoleOverridesController < ApplicationController
       json["base_role_type_label"] = base_role.key?(:label_v2) ? base_role[:label_v2].call : base_role[:label].call
     end
 
-    render json: json
+    render json:
   end
 
   # @API Deactivate a role
@@ -566,7 +566,7 @@ class RoleOverridesController < ApplicationController
 
             override = settings[:override] == "checked" if ["checked", "unchecked"].include?(settings[:override])
             locked = settings[:locked] == "true" if settings[:locked]
-            RoleOverride.manage_role_override(@context, role, key.to_s, override: override, locked: locked)
+            RoleOverride.manage_role_override(@context, role, key.to_s, override:, locked:)
           end
         end
       end
@@ -585,7 +585,7 @@ class RoleOverridesController < ApplicationController
 
     if whitelist.include?(permission)
       render json: {
-        permission: permission,
+        permission:,
         granted: @context.grants_right?(@current_user, permission.to_sym)
       }
     else
@@ -686,9 +686,9 @@ class RoleOverridesController < ApplicationController
             role,
             permission[:name].to_s,
             override: perm_override,
-            locked: locked,
-            applies_to_self: applies_to_self,
-            applies_to_descendants: applies_to_descendants
+            locked:,
+            applies_to_self:,
+            applies_to_descendants:
           )
         end
       end
@@ -724,7 +724,7 @@ class RoleOverridesController < ApplicationController
       end
 
       # Check to see if the base role name is in the list of other base role names in p[1]
-      is_course_permission = !(Role::ENROLLMENT_TYPES & p[1][:available_to]).empty?
+      is_course_permission = !!Role::ENROLLMENT_TYPES.intersect?(p[1][:available_to])
 
       if p[1][:account_only]
         if p[1][:account_only] == :site_admin

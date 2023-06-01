@@ -84,7 +84,7 @@ describe "Student Gradebook" do
         observer = user_factory(name: "Observer", active_all: true, active_state: "active")
         [course1, course2, course3].each do |course|
           enrollment = ObserverEnrollment.new(user: observer,
-                                              course: course,
+                                              course:,
                                               workflow_state: "active")
 
           enrollment.associated_user_id = student
@@ -124,7 +124,7 @@ describe "Student Gradebook" do
     ]
 
     grades.each_with_index do |grade, index|
-      assignments[index / 3].grade_student @students[index % 3], grade: grade, grader: @teacher
+      assignments[index / 3].grade_student @students[index % 3], grade:, grader: @teacher
     end
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
@@ -301,7 +301,7 @@ describe "Student Gradebook" do
       )
 
       @discussion = @course.discussion_topics.create!(
-        assignment: assignment,
+        assignment:,
         title: "Physics Beta Discussion"
       )
 

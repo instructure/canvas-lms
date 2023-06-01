@@ -405,15 +405,15 @@ describe Account do
 
       it "counting cross-listed courses only if requested" do
         def check_account(account, include_crosslisted_courses, expected_length, expected_course_names)
-          actual_courses = account.fast_all_courses({ include_crosslisted_courses: include_crosslisted_courses })
+          actual_courses = account.fast_all_courses({ include_crosslisted_courses: })
           expect(actual_courses.length).to eq expected_length
           actual_course_names = actual_courses.pluck("name").sort!
           expect(actual_course_names).to eq(expected_course_names.sort!)
         end
 
         root_account = Account.create!
-        account_a = Account.create!({ root_account: root_account })
-        account_b = Account.create!({ root_account: root_account })
+        account_a = Account.create!({ root_account: })
+        account_b = Account.create!({ root_account: })
         course_a = course_factory({ account: account_a, course_name: "course_a" })
         course_b = course_factory({ account: account_b, course_name: "course_b" })
         course_b.course_sections.create!({ name: "section_b" })
@@ -436,8 +436,8 @@ describe Account do
 
       it "orders list by specified parameter" do
         order = "courses.created_at ASC"
-        expect(@account).to receive(:fast_course_base).with({ order: order })
-        @account.fast_all_courses(order: order)
+        expect(@account).to receive(:fast_course_base).with({ order: })
+        @account.fast_all_courses(order:)
       end
     end
 
@@ -711,7 +711,7 @@ describe Account do
     admin = User.create
     user = User.create
     account.account_users.create!(user: admin, role: admin_role)
-    account.account_users.create!(user: user, role: restricted_role)
+    account.account_users.create!(user:, role: restricted_role)
     [admin, user]
   end
 
@@ -1108,7 +1108,7 @@ describe Account do
 
     it "includes 'Developer Keys' for the admin users of an account" do
       account = Account.create!
-      account_admin_user(account: account)
+      account_admin_user(account:)
       tabs = account.tabs_available(@admin)
       expect(tabs.pluck(:id)).to be_include(Account::TAB_DEVELOPER_KEYS)
 
@@ -1681,13 +1681,13 @@ describe Account do
 
     it "doesn't have permission, it returns false" do
       allow(account).to receive(:grants_right?).and_return(false)
-      account_admin_user(account: account)
+      account_admin_user(account:)
       expect(account.can_see_admin_tools_tab?(@admin)).to be_falsey
     end
 
     it "does have permission, it returns true" do
       allow(account).to receive(:grants_right?).and_return(true)
-      account_admin_user(account: account)
+      account_admin_user(account:)
       expect(account.can_see_admin_tools_tab?(@admin)).to be_truthy
     end
   end
@@ -2053,7 +2053,7 @@ describe Account do
 
       it "consults root account setting" do
         parent_account = account_model(settings: { account_terms_required: false })
-        child_account = Account.create!(parent_account: parent_account)
+        child_account = Account.create!(parent_account:)
         expect(child_account.terms_required?).to be false
       end
     end
@@ -2354,7 +2354,7 @@ describe Account do
 
   describe "#allow_disable_post_to_sis_when_grading_period_closed?" do
     let(:root_account) { Account.create!(root_account: nil) }
-    let(:subaccount) { Account.create!(root_account: root_account) }
+    let(:subaccount) { Account.create!(root_account:) }
 
     it "returns false if the account is not a root account" do
       root_account.enable_feature!(:new_sis_integrations)
@@ -2423,10 +2423,10 @@ describe Account do
   context "#roles_with_enabled_permission" do
     def create_role_override(permission, role, context, enabled = true)
       RoleOverride.create!(
-        context: context,
-        permission: permission,
-        role: role,
-        enabled: enabled
+        context:,
+        permission:,
+        role:,
+        enabled:
       )
     end
     let(:account) { account_model }

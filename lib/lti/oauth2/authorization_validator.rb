@@ -60,7 +60,7 @@ module Lti
             raise InvalidAuthJwt, "the Developer Key is not active or available in this environment" if developer_key.present? && !developer_key.usable?
 
             ims_tool_proxy = ::IMS::LTI::Models::ToolProxy.from_json(tp.raw_data)
-            if (ims_tool_proxy.enabled_capabilities & ["Security.splitSecret", "OAuth.splitSecret"]).blank?
+            unless ims_tool_proxy.enabled_capabilities.intersect?(["Security.splitSecret", "OAuth.splitSecret"])
               raise InvalidAuthJwt, "the Tool Proxy must be using a split secret"
             end
 

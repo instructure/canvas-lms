@@ -151,7 +151,7 @@ class TabsController < ApplicationController
       end
     end
     if [@context.class::TAB_HOME, @context.class::TAB_SETTINGS].include?(tab[:id])
-      render json: { error: t(:tab_unmanagable_error, "%{css_class} is not manageable", css_class: css_class) }, status: :bad_request
+      render json: { error: t(:tab_unmanagable_error, "%{css_class} is not manageable", css_class:) }, status: :bad_request
     elsif new_pos && (new_pos <= 1 || new_pos >= tab_config.count + 1)
       render json: { error: t(:tab_location_error, "That tab location is invalid") }, status: :bad_request
     else

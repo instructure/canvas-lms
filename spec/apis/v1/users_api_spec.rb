@@ -407,7 +407,7 @@ describe Api::V1::User do
 
   describe "enrollment_json" do
     let(:course) { Course.create! }
-    let(:student_enrollment) { course_with_user("StudentEnrollment", course: course, active_all: true) }
+    let(:student_enrollment) { course_with_user("StudentEnrollment", course:, active_all: true) }
     let(:student) { student_enrollment.user }
     let(:enrollment_json) { @test_api.enrollment_json(student_enrollment, subject, nil) }
     let(:grades) { enrollment_json.fetch("grades") }
@@ -419,7 +419,7 @@ describe Api::V1::User do
     end
 
     context "when user is a classmate" do
-      let(:subject) { course_with_user("StudentEnrollment", course: course, active_all: true).user }
+      let(:subject) { course_with_user("StudentEnrollment", course:, active_all: true).user }
 
       it "excludes activity data for other students" do
         expect(enrollment_json).not_to include("last_activity_at", "last_attended_at", "total_activity_time")
@@ -529,7 +529,7 @@ describe Api::V1::User do
     end
 
     context "when user is a teacher" do
-      let(:subject) { course_with_user("TeacherEnrollment", course: course, active_all: true).user }
+      let(:subject) { course_with_user("TeacherEnrollment", course:, active_all: true).user }
 
       it "includes activity data" do
         expect(enrollment_json).to include("last_activity_at", "last_attended_at", "total_activity_time")
@@ -749,7 +749,7 @@ describe "Users API", type: :request do
         page = Rack::Utils.parse_nested_query(querystring)["page"]
         json = api_call(:get,
                         url,
-                        { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", page: page, per_page: Setting.get("api_max_per_page", "2") })
+                        { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", page:, per_page: Setting.get("api_max_per_page", "2") })
         expect(json.size).to eq 1
         json.each { |j| expect(j["url"]).to eq "http://www.example.com/courses/1" }
         expect(response.headers["Link"]).not_to match(/next/)
@@ -761,7 +761,7 @@ describe "Users API", type: :request do
         start_time = @timestamp.iso8601
         json = api_call(:get,
                         "/api/v1/users/#{@student.id}/page_views?start_time=#{start_time}",
-                        { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", start_time: start_time })
+                        { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", start_time: })
         expect(json.size).to eq 2
         json.each { |j| expect(CanvasTime.try_parse(j["created_at"]).to_i).to be >= @timestamp.to_i }
       end
@@ -771,7 +771,7 @@ describe "Users API", type: :request do
         end_time = @timestamp.iso8601
         json = api_call(:get,
                         "/api/v1/users/#{@student.id}/page_views?end_time=#{end_time}",
-                        { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", end_time: end_time })
+                        { controller: "page_views", action: "index", user_id: @student.to_param, format: "json", end_time: })
         expect(json.size).to eq 2
         json.each { |j| expect(CanvasTime.try_parse(j["created_at"]).to_i).to be <= @timestamp.to_i }
       end
@@ -1238,10 +1238,10 @@ describe "Users API", type: :request do
             allow(account).to receive(:trusted_account_ids).and_return([@account.id])
             course = account.courses.create!
             course.enroll_student(@u)
-            p2 = @u.pseudonyms.create!(account: account, unique_id: "p2")
+            p2 = @u.pseudonyms.create!(account:, unique_id: "p2")
             p2.current_login_at = 5.minutes.ago
             p2.save!
-            p3 = @u.pseudonyms.create!(account: account, unique_id: "p3")
+            p3 = @u.pseudonyms.create!(account:, unique_id: "p3")
             p3.current_login_at = 6.minutes.ago
             p3.save!
           end
@@ -2022,7 +2022,7 @@ describe "Users API", type: :request do
         new_bio = "burninating the countryside"
         email = "dudd@example.com"
         json = api_call(:put, @path, @path_options, {
-                          user: { title: new_title, bio: new_bio, email: email }
+                          user: { title: new_title, bio: new_bio, email: }
                         })
         expect(json["title"]).to eq new_title
         expect(json["bio"]).to eq new_bio
@@ -2369,7 +2369,7 @@ describe "Users API", type: :request do
         action: "set_data",
         format: "json",
         user_id: @student.to_param,
-        scope: scope }
+        scope: }
     end
     let(:path_opts_get) { path_opts_put.merge({ action: "get_data" }) }
     let(:path_opts_del) { path_opts_put.merge({ action: "delete_data" }) }
@@ -2381,7 +2381,7 @@ describe "Users API", type: :request do
       other_data = "whoop there it is"
       data2 = "whatevs"
       other_data2 = "totes"
-      api_call(:put, path,  path_opts_put,  { ns: namespace_a, data: data })
+      api_call(:put, path,  path_opts_put,  { ns: namespace_a, data: })
       api_call(:put, path2, path_opts_put2, { ns: namespace_a, data: data2 })
       api_call(:put, path,  path_opts_put,  { ns: namespace_b, data: other_data })
       api_call(:put, path2, path_opts_put2, { ns: namespace_b, data: other_data2 })
@@ -2403,7 +2403,7 @@ describe "Users API", type: :request do
       data = JSON.parse '{"a":"nice JSON","b":"dont you think?"}'
       get_path = path + "/b"
       get_scope = scope + "/b"
-      api_call(:put, path, path_opts_put, { ns: namespace_a, data: data })
+      api_call(:put, path, path_opts_put, { ns: namespace_a, data: })
       body = api_call(:get, get_path, path_opts_get.merge({ scope: get_scope }), { ns: namespace_a })
       expect(body).to eq({ "data" => "dont you think?" })
     end
@@ -2412,7 +2412,7 @@ describe "Users API", type: :request do
       data = JSON.parse '{"a":"nice JSON","b":"dont you think?"}'
       del_path = path + "/b"
       del_scope = scope + "/b"
-      api_call(:put, path, path_opts_put, { ns: namespace_a, data: data })
+      api_call(:put, path, path_opts_put, { ns: namespace_a, data: })
       body = api_call(:delete, del_path, path_opts_del.merge({ scope: del_scope }), { ns: namespace_a })
       expect(body).to eq({ "data" => "dont you think?" })
 
@@ -2586,7 +2586,7 @@ describe "Users API", type: :request do
       account = Account.create(name: "new account")
       @user1.pseudonym.account_id = account.id
       @user1.pseudonym.save!
-      @user = account_admin_user(account: account, user: @user)
+      @user = account_admin_user(account:, user: @user)
 
       api_call(
         :put,
@@ -3062,7 +3062,7 @@ describe "Users API", type: :request do
             action: "set_new_user_tutorial_status",
             format: "json",
             id: @user.to_param,
-            page_name: page_name },
+            page_name: },
           {
             collapsed: true
           },
@@ -3080,7 +3080,7 @@ describe "Users API", type: :request do
             action: "set_new_user_tutorial_status",
             format: "json",
             id: @user.to_param,
-            page_name: page_name },
+            page_name: },
           {},
           {},
           { expected_status: 400 }
@@ -3255,7 +3255,7 @@ describe "Users API", type: :request do
           @shard2.activate do
             account = Account.create!
             term = account.enrollment_terms.create!(start_at: 10.years.ago)
-            course_factory(active_all: true, account: account, enrollment_term_id: term.id)
+            course_factory(active_all: true, account:, enrollment_term_id: term.id)
             @course.enroll_student(@student, enrollment_state: :active)
 
             period_group = account.grading_period_groups.create!
@@ -3561,7 +3561,7 @@ describe "Users API", type: :request do
                                 action: "user_graded_submissions",
                                 format: "json",
                                 per_page: 2,
-                                page: page
+                                page:
                               })
 
       expect(json.count).to eq 1

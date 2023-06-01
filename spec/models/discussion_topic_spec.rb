@@ -25,7 +25,7 @@ describe DiscussionTopic do
   end
 
   def create_enrolled_user(course, section, opts)
-    opts.reverse_merge!(active_all: true, section: section, enrollment_state: "active")
+    opts.reverse_merge!(active_all: true, section:, enrollment_state: "active")
     user = user_factory(opts)
     user.save!
     course.enroll_user(user, opts[:enrollment_type], opts)
@@ -178,7 +178,7 @@ describe DiscussionTopic do
   end
 
   describe "default values" do
-    subject(:discussion_topic) { @course.discussion_topics.create!(title: title) }
+    subject(:discussion_topic) { @course.discussion_topics.create!(title:) }
 
     let(:default_title) { I18n.t("#discussion_topic.default_title", "No Title") }
 
@@ -431,8 +431,8 @@ describe DiscussionTopic do
       @topic.unpublish
 
       account = @course.root_account
-      nobody_role = custom_account_role("NobodyAdmin", account: account)
-      admin = account_admin_user(account: account, role: nobody_role, active_user: true)
+      nobody_role = custom_account_role("NobodyAdmin", account:)
+      admin = account_admin_user(account:, role: nobody_role, active_user: true)
       expect(@topic.visible_for?(admin)).to be_falsey
     end
 
@@ -440,9 +440,9 @@ describe DiscussionTopic do
       @topic.unpublish
 
       account = @course.root_account
-      nobody_role = custom_account_role("NobodyAdmin", account: account)
-      account_with_role_changes(account: account, role: nobody_role, role_changes: { read_course_content: true, read_forum: true })
-      admin = account_admin_user(account: account, role: nobody_role, active_user: true)
+      nobody_role = custom_account_role("NobodyAdmin", account:)
+      account_with_role_changes(account:, role: nobody_role, role_changes: { read_course_content: true, read_forum: true })
+      admin = account_admin_user(account:, role: nobody_role, active_user: true)
       expect(@topic.visible_for?(admin)).to be_truthy
     end
 
@@ -451,11 +451,11 @@ describe DiscussionTopic do
       section = @course.course_sections.create!(name: "Section of topic")
       add_section_to_topic(@topic, section)
       @topic.save!
-      nobody_role = custom_account_role("NobodyAdmin", account: account)
-      account_with_role_changes(account: account,
+      nobody_role = custom_account_role("NobodyAdmin", account:)
+      account_with_role_changes(account:,
                                 role: nobody_role,
                                 role_changes: { read_course_content: true, read_forum: true })
-      admin = account_admin_user(account: account, role: nobody_role, active_user: true)
+      admin = account_admin_user(account:, role: nobody_role, active_user: true)
       expect(@topic.visible_for?(admin)).to be_truthy
     end
 
@@ -468,7 +468,7 @@ describe DiscussionTopic do
         group_course.enroll_ta(@group_ta).accept!
         group_course.enroll_designer(@group_designer).accept!
         group_category = group_course.group_categories.create(name: "new cat")
-        group = group_course.groups.create(name: "group", group_category: group_category)
+        group = group_course.groups.create(name: "group", group_category:)
         group.add_user(@group_student)
         @announcement = group.announcements.build(title: "group topic", message: "group message")
         @announcement.save!
@@ -562,7 +562,7 @@ describe DiscussionTopic do
 
         it "works when ungraded and context is a group" do
           group_category = @course.group_categories.create(name: "new cat")
-          @group = @course.groups.create(name: "group", group_category: group_category)
+          @group = @course.groups.create(name: "group", group_category:)
           @group.add_user(@student1)
           @topic = @group.discussion_topics.create(title: "group topic")
           @topic.save!
@@ -574,7 +574,7 @@ describe DiscussionTopic do
 
         it "includes teachers if a student creates a discussion topic" do
           group_category = @course.group_categories.create(name: "new group")
-          @group = @course.groups.create(name: "group", group_category: group_category)
+          @group = @course.groups.create(name: "group", group_category:)
           @group.add_user(@student1)
           @topic = @group.discussion_topics.create(title: "Student topic", user: @student1)
           @topic.save!
@@ -586,7 +586,7 @@ describe DiscussionTopic do
         it "does not grant reply permissions to group if course is concluded" do
           @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(name: "new cat")
-          @group = @course.groups.create(name: "group", group_category: group_category)
+          @group = @course.groups.create(name: "group", group_category:)
           @group.add_user(@student1)
           @course.complete!
           @topic = @group.discussion_topics.create(title: "group topic")
@@ -599,7 +599,7 @@ describe DiscussionTopic do
         it "does not grant reply permissions to group if course is soft-concluded" do
           @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(name: "new cat")
-          @group = @course.groups.create(name: "group", group_category: group_category)
+          @group = @course.groups.create(name: "group", group_category:)
           @group.add_user(@student1)
           @course.update(start_at: 2.days.ago, conclude_at: 1.day.ago, restrict_enrollments_to_course_dates: true)
           @topic = @group.discussion_topics.create(title: "group topic")
@@ -612,7 +612,7 @@ describe DiscussionTopic do
         it "grants reply permissions to group members if course is concluded but their section isn't" do
           @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(name: "new cat")
-          @group = @course.groups.create(name: "group", group_category: group_category)
+          @group = @course.groups.create(name: "group", group_category:)
           @group.add_user(@student1)
           @course.update(start_at: 2.days.ago, conclude_at: 1.day.ago, restrict_enrollments_to_course_dates: true)
           @section.update(start_at: 2.days.ago,
@@ -628,7 +628,7 @@ describe DiscussionTopic do
         it "does not grant reply permissions to group if group isn't active" do
           @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(name: "new cat")
-          @group = @course.groups.create(name: "group", group_category: group_category)
+          @group = @course.groups.create(name: "group", group_category:)
           @group.add_user(@student1)
           @topic = @group.discussion_topics.create(title: "group topic")
           @topic.save!
@@ -646,7 +646,7 @@ describe DiscussionTopic do
 
           @relevant_permissions = %i[read reply update delete read_replies]
           group_category = course.group_categories.create(name: "new cat")
-          @group = course.groups.create(name: "group", group_category: group_category)
+          @group = course.groups.create(name: "group", group_category:)
           @group.add_user(@student1)
           @topic = @group.discussion_topics.create(title: "group topic")
           @topic.save!
@@ -889,7 +889,7 @@ describe DiscussionTopic do
   context "sub-topics" do
     it "defaults subtopics_refreshed_at on save if a group discussion" do
       group_category = @course.group_categories.create(name: "category")
-      @group = @course.groups.create(name: "group", group_category: group_category)
+      @group = @course.groups.create(name: "group", group_category:)
       @topic = @course.discussion_topics.create(title: "topic")
       expect(@topic.subtopics_refreshed_at).to be_nil
 
@@ -937,7 +937,7 @@ describe DiscussionTopic do
       topic.group_category = group_category
       topic.save!
 
-      group = @course.groups.create!(name: "group 1", group_category: group_category)
+      group = @course.groups.create!(name: "group 1", group_category:)
       expect(topic.reload.child_topics.size).to eq 1
       expect(group.reload.discussion_topics.size).to eq 1
     end
@@ -949,14 +949,14 @@ describe DiscussionTopic do
       topic.group_category = group_category
       topic.save!
 
-      group = @course.groups.create!(name: "a" * 250, group_category: group_category)
+      group = @course.groups.create!(name: "a" * 250, group_category:)
       expect(topic.reload.child_topics.size).to eq 1
       expect(group.reload.discussion_topics.size).to eq 1
     end
 
     it "deletes child topics when group category is removed" do
       group_category = @course.group_categories.create!(name: "category")
-      group = @course.groups.create!(name: "group 1", group_category: group_category)
+      group = @course.groups.create!(name: "group 1", group_category:)
 
       topic = @course.discussion_topics.build(title: "topic")
       topic.group_category = group_category
@@ -1276,7 +1276,7 @@ describe DiscussionTopic do
 
     it "allows course admins to see posts in concluded group topics without posting" do
       group_category = @course.group_categories.create(name: "category")
-      @group = @course.groups.create(name: "group", group_category: group_category)
+      @group = @course.groups.create(name: "group", group_category:)
       @topic.update_attribute(:group_category, group_category)
       subtopic = @topic.child_topics.first
       @course.complete!
@@ -1577,7 +1577,7 @@ describe DiscussionTopic do
 
     it "does not re-flag graded discussion as needs grading if student make another comment" do
       assignment = @course.assignments.create(title: "discussion assignment", points_possible: 20)
-      topic = @course.discussion_topics.create!(title: "discussion topic 1", message: "this is a new discussion topic", assignment: assignment)
+      topic = @course.discussion_topics.create!(title: "discussion topic 1", message: "this is a new discussion topic", assignment:)
       topic.discussion_entries.create!(message: "student message for grading", user: @student)
 
       submissions = Submission.where(user_id: @student, assignment_id: assignment).to_a
@@ -1634,7 +1634,7 @@ describe DiscussionTopic do
 
     it "creates submissions for existing entries in group topics when setting the assignment (even if locked)" do
       group_category = @course.group_categories.create!(name: "category")
-      @group1 = @course.groups.create!(name: "group 1", group_category: group_category)
+      @group1 = @course.groups.create!(name: "group 1", group_category:)
 
       @topic.group_category = group_category
       @topic.save!
@@ -1655,7 +1655,7 @@ describe DiscussionTopic do
 
     it "creates use entry time when groupless students are (for whatever reason) posting to a graded group discussion" do
       group_category = @course.group_categories.create!(name: "category")
-      @group1 = @course.groups.create!(name: "group 1", group_category: group_category)
+      @group1 = @course.groups.create!(name: "group 1", group_category:)
 
       @topic.group_category = group_category
       @topic.save!
@@ -2247,7 +2247,7 @@ describe DiscussionTopic do
 
     it "ignores responses in deleted account" do
       account = Account.create!
-      @teacher = course_with_teacher(active_all: true, account: account).user
+      @teacher = course_with_teacher(active_all: true, account:).user
       @context = @course
       discussion_topic_model(user: @teacher)
       account.destroy
@@ -2437,7 +2437,7 @@ describe DiscussionTopic do
 
     it "group topics cannot be section specific" do
       group_category = @course.group_categories.create(name: "new category")
-      @group = @course.groups.create(name: "group", group_category: group_category)
+      @group = @course.groups.create(name: "group", group_category:)
       student_in_course(active_all: true)
       @group.add_user(@student)
       announcement = basic_announcement_model(course: @group)
@@ -2472,7 +2472,7 @@ describe DiscussionTopic do
     it "does not include deleted sections" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        course: course
+        course:
       )
       add_section_to_topic(announcement, course.course_sections.first)
       add_section_to_topic(announcement, course.course_sections.second)
@@ -2488,7 +2488,7 @@ describe DiscussionTopic do
     it "allows deletion of announcement" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        course: course,
+        course:,
         is_section_specific: true
       )
       add_section_to_topic(announcement, course.course_sections.first)
@@ -2502,7 +2502,7 @@ describe DiscussionTopic do
     it "scope allows non-section-specific announcements" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        course: course,
+        course:,
         is_section_specific: false
       )
       announcement.save!
@@ -2513,7 +2513,7 @@ describe DiscussionTopic do
     it "scope allows section-specific announcements if in right section" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        course: course
+        course:
       )
       add_section_to_topic(announcement, course.course_sections.first)
       announcement.save!
@@ -2524,7 +2524,7 @@ describe DiscussionTopic do
     it "scope forbids section-specific announcements if in wrong section" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        course: course
+        course:
       )
       add_section_to_topic(announcement, course.course_sections.second)
       announcement.save!
@@ -2544,7 +2544,7 @@ describe DiscussionTopic do
     it "don't return duplicates if matched multiple sections" do
       course = course_with_two_sections
       announcement = basic_announcement_model(
-        course: course
+        course:
       )
       add_section_to_topic(announcement, course.course_sections.first)
       add_section_to_topic(announcement, course.course_sections.second)

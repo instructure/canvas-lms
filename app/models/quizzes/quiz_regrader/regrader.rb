@@ -36,7 +36,7 @@ module Quizzes::QuizRegrader
         submissions.each do |submission|
           Quizzes::QuizRegrader::Submission.new(
             submission: submission.latest_submitted_attempt,
-            question_regrades: question_regrades
+            question_regrades:
           ).regrade!
         end
       end

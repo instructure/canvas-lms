@@ -109,7 +109,7 @@ module CanvasQuizStatistics::Analyzers
         text = generate_text_for_answer(answer, answer_type)
 
         answer_stats.merge!({
-                              text: text,
+                              text:,
                               value: bounds,
                               responses: 0,
                               margin: answer[:margin].to_f,

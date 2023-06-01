@@ -229,9 +229,9 @@ describe WikiPage do
       %i[manage_wiki_create manage_wiki_update manage_wiki_delete].each do |perm|
         it "with #{perm} rights" do
           account = @course.root_account
-          role = custom_account_role("CustomAccountUser", account: account)
+          role = custom_account_role("CustomAccountUser", account:)
           RoleOverride.manage_role_override(account, role, perm, override: true)
-          admin = account_admin_user(account: account, role: role, active_all: true)
+          admin = account_admin_user(account:, role:, active_all: true)
           expect(@page.can_read_page?(admin)).to be true
         end
       end
@@ -417,7 +417,7 @@ describe WikiPage do
       let(:page) do
         course.wiki_pages.create(
           title: "A Page",
-          editing_roles: editing_roles,
+          editing_roles:,
           workflow_state: "published"
         )
       end

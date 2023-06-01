@@ -82,7 +82,7 @@ describe ActiveRecord::Base do
       def do_batches(relation, **kwargs)
         result = []
         extra = defined?(extra_kwargs) ? extra_kwargs : {}
-        relation.in_batches(**kwargs.reverse_merge(extra).reverse_merge(strategy: strategy)) do |batch|
+        relation.in_batches(**kwargs.reverse_merge(extra).reverse_merge(strategy:)) do |batch|
           result << (block_given? ? (yield batch) : batch.to_a)
         end
         result
@@ -144,7 +144,7 @@ describe ActiveRecord::Base do
         batch_size = 2
         es = []
         Course.transaction do
-          e.find_in_batches(strategy: :temp_table, batch_size: batch_size) do |batch|
+          e.find_in_batches(strategy: :temp_table, batch_size:) do |batch|
             expect(batch.size).to eq batch_size
             batch.each do |r|
               es << r["e_id"].to_i
@@ -719,7 +719,7 @@ describe ActiveRecord::Base do
   describe "add_index" do
     it "raises an error on too long of name" do
       name = "some_really_long_name_" * 10
-      expect { User.connection.add_index :users, [:id], name: name }.to raise_error(/Index name .+ is too long/)
+      expect { User.connection.add_index :users, [:id], name: }.to raise_error(/Index name .+ is too long/)
     end
   end
 

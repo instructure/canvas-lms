@@ -26,7 +26,7 @@ module DataFixup::PopulateRootAccountIdForGroupCategories
     # account it belongs to.
     GroupCategory.where(root_account_id: nil).where.not(context_type: nil).find_each do |group_category|
       root_account_id = group_category.context&.root_account&.id
-      group_category.update!(root_account_id: root_account_id) if root_account_id
+      group_category.update!(root_account_id:) if root_account_id
     end
   end
 end

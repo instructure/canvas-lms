@@ -171,7 +171,7 @@ describe ContextModuleProgression do
       let(:min_score) { 90 }
 
       before do
-        @module.update!(completion_requirements: { tag.id => { type: "min_score", min_score: min_score } })
+        @module.update!(completion_requirements: { tag.id => { type: "min_score", min_score: } })
         @submission = assignment.submit_homework(@user, body: "my homework")
       end
 
@@ -180,16 +180,16 @@ describe ContextModuleProgression do
         let(:score) { 0.9999999999999999 } # eg 0.3 + 0.3 + 0.3 + 0.1
 
         it "evaluates requirement as complete" do
-          @submission.update!(score: score, posted_at: 1.second.ago)
+          @submission.update!(score:, posted_at: 1.second.ago)
           progression = @module.context_module_progressions.find_by(user: @user)
-          requirement = { id: tag.id, type: "min_score", min_score: min_score }
+          requirement = { id: tag.id, type: "min_score", min_score: }
           expect(progression.requirements_met).to include requirement
         end
 
         it "works if score is nil" do
           @submission.update!(score: nil, posted_at: 1.second.ago)
           progression = @module.context_module_progressions.find_by(user: @user)
-          requirement = { id: tag.id, type: "min_score", min_score: min_score }
+          requirement = { id: tag.id, type: "min_score", min_score: }
           expect(progression.requirements_met).not_to include requirement
         end
       end

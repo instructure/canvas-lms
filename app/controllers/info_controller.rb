@@ -84,7 +84,7 @@ class InfoController < ApplicationController
       format.json do
         render json:
                                { status: "canvas ok",
-                                 asset_urls: asset_urls,
+                                 asset_urls:,
                                  revision: Canvas.revision,
                                  installation_uuid: Canvas.installation_uuid }
       end
@@ -215,19 +215,19 @@ class InfoController < ApplicationController
 
     response = {
       readiness: components,
-      critical: critical,
-      secondary: secondary,
+      critical:,
+      secondary:,
     }
 
     HealthChecks.send_to_statsd(response, { cluster: Shard.current.database_server_id })
 
     render json: {
-             status: status,
+             status:,
              readiness: readiness_response,
              critical: components_to_hash(critical),
              secondary: components_to_hash(secondary),
            },
-           status: status
+           status:
   end
 
   def components_to_hash(components)
@@ -235,7 +235,7 @@ class InfoController < ApplicationController
       status = value[:status] ? 200 : 503
       message = value[:message]
       time = value[:time]
-      { name: name, status: status, message: message, response_time_ms: time }
+      { name:, status:, message:, response_time_ms: time }
     end
   end
 end

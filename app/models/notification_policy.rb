@@ -81,7 +81,7 @@ class NotificationPolicy < ActiveRecord::Base
       NotificationPolicy.transaction do
         notifications.each do |notification_id|
           scope = user.notification_policies
-                      .where(communication_channel_id: cc, notification_id: notification_id)
+                      .where(communication_channel_id: cc, notification_id:)
           p = scope.first_or_initialize
           # Set the frequency and save
           p.frequency = frequency
@@ -118,7 +118,7 @@ class NotificationPolicy < ActiveRecord::Base
 
   # Updates notification policies for a given category in a given communication channel
   def self.find_or_update_for_category(communication_channel, category, frequency = nil)
-    notifs = Notification.where(category: category)
+    notifs = Notification.where(category:)
     raise ActiveRecord::RecordNotFound unless notifs.exists?
 
     notifs.map do |notif|
@@ -138,7 +138,7 @@ class NotificationPolicy < ActiveRecord::Base
       unique_constraint_retry do
         np = communication_channel.notification_policies.where(notification_id: notification).first
         unless np
-          np = communication_channel.notification_policies.build(notification: notification)
+          np = communication_channel.notification_policies.build(notification:)
           frequency ||= if communication_channel == communication_channel.user.communication_channel
                           notification.default_frequency(communication_channel.user)
                         else
@@ -171,7 +171,7 @@ class NotificationPolicy < ActiveRecord::Base
         end
         np = nil
         NotificationPolicy.transaction(requires_new: true) do
-          np = communication_channel.notification_policies.build(notification: notification)
+          np = communication_channel.notification_policies.build(notification:)
           np.frequency = if frequencies[notification]
                            frequencies[notification]
                          elsif communication_channel == communication_channel.user.communication_channel

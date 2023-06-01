@@ -118,7 +118,7 @@ class BrandConfigsController < ApplicationController
                    end
     end
     opts = {
-      parent_md5: parent_md5,
+      parent_md5:,
       variables: process_variables(params[:brand_config][:variables])
     }
     BrandConfig::OVERRIDE_TYPES.each do |override|

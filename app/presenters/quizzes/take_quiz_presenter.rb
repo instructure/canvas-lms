@@ -171,7 +171,7 @@ class Quizzes::TakeQuizPresenter
   def next_question_form_action(session, user)
     record_answer_course_quiz_quiz_submission_path(
       quiz.context, quiz, submission, form_action_params(session, user).merge({
-                                                                                next_question_path: next_question_path
+                                                                                next_question_path:
                                                                               })
     )
   end

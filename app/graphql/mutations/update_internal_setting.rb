@@ -33,7 +33,7 @@ class Mutations::UpdateInternalSetting < Mutations::BaseMutation
     end
 
     {
-      internal_setting: internal_setting
+      internal_setting:
     }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"

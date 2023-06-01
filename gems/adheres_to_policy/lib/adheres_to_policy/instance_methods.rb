@@ -245,7 +245,7 @@ module AdheresToPolicy
       # state and cache it.
       value, _how_it_got_it = Cache.fetch(
         permission_cache_key_for(user, session, sought_right),
-        use_rails_cache: use_rails_cache
+        use_rails_cache:
       ) do
         conditions = self.class.policy.conditions[sought_right]
         next false unless conditions

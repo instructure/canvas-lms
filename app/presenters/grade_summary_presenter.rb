@@ -159,10 +159,10 @@ class GradeSummaryPresenter
     # for deactivated students (who themselves can not view those assignments).
     assignments = if user_has_elevated_permissions?
                     AssignmentGroup
-                      .visible_assignments(nil, @context, all_groups, includes: includes)
+                      .visible_assignments(nil, @context, all_groups, includes:)
                       .assigned_to_student(student.id)
                   else
-                    AssignmentGroup.visible_assignments(student, @context, all_groups, includes: includes)
+                    AssignmentGroup.visible_assignments(student, @context, all_groups, includes:)
                   end
 
     if Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option)

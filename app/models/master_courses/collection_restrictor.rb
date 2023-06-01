@@ -73,7 +73,7 @@ module MasterCourses::CollectionRestrictor
     # instead of marking the exact columns - i'm just going to be lazy and mark the edit type on the owner, e.g. "quiz_questions_content"
     changed_types = []
     self.class.base_class.restricted_column_settings.each do |edit_type, columns|
-      if (saved_changes.keys & columns).any?
+      if saved_changes.keys.intersect?(columns)
         changed_types << self.class.pseudocolumn_for_type(edit_type) # pretend it's sort of like a column in the downstream changes
       end
     end

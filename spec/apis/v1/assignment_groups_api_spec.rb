@@ -1011,7 +1011,7 @@ describe AssignmentGroupsApiController, type: :request do
             },
             params,
             { "Accept" => "application/json+canvas-string-ids" },
-            { expected_status: expected_status }
+            { expected_status: }
           )
         end
       end

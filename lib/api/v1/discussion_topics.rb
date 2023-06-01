@@ -198,16 +198,16 @@ module Api::V1::DiscussionTopics
                user_can_see_posts: topic.user_can_see_posts?(user),
                podcast_url: url,
                read_state: topic.read_state(user),
-               unread_count: topic.unread_count(user, opts: opts),
-               subscribed: topic.subscribed?(user, opts: opts),
-               attachments: attachments,
+               unread_count: topic.unread_count(user, opts:),
+               subscribed: topic.subscribed?(user, opts:),
+               attachments:,
                published: topic.published?,
                can_unpublish: opts[:user_can_moderate] ? topic.can_unpublish?(opts) : false,
                locked: topic.locked?,
                can_lock: topic.can_lock?,
                comments_disabled: topic.comments_disabled?,
                author: topic.anonymous? ? nil : user_display_json(topic.user, topic.context),
-               html_url: html_url,
+               html_url:,
                url: html_url,
                pinned: !!topic.pinned,
                group_category_id: topic.group_category_id,
@@ -215,7 +215,7 @@ module Api::V1::DiscussionTopics
 
     child_topic_data = topic.root_topic? ? topic.child_topics.active.pluck(:id, :context_id) : []
     fields[:topic_children] = child_topic_data.map(&:first)
-    fields[:group_topic_children] = child_topic_data.map { |id, group_id| { id: id, group_id: group_id } }
+    fields[:group_topic_children] = child_topic_data.map { |id, group_id| { id:, group_id: } }
 
     fields[:context_code] = topic.context_code if opts[:include_context_code]
     paced_course = Course.find_by(id: topic.context_id)&.enable_course_paces?

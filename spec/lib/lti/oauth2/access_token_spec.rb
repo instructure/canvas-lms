@@ -27,9 +27,9 @@ module Lti
       let(:body) do
         {
           iss: "Canvas",
-          sub: sub,
+          sub:,
           exp: 5.minutes.from_now.to_i,
-          aud: aud,
+          aud:,
           iat: Time.zone.now.to_i,
           nbf: 30.seconds.ago,
           jti: "34084434-0c58-405a-b8c0-4af2da9c2efd",
@@ -38,7 +38,7 @@ module Lti
       end
 
       describe "#to_s" do
-        let(:access_token) { Lti::OAuth2::AccessToken.create_jwt(aud: aud, sub: sub) }
+        let(:access_token) { Lti::OAuth2::AccessToken.create_jwt(aud:, sub:) }
 
         it "is signed by the canvas secret" do
           expect { Canvas::Security.decode_jwt(access_token.to_s) }.to_not raise_error
@@ -86,7 +86,7 @@ module Lti
 
         it "has a 'jti' that is uniquely generated" do
           jti_1 = Canvas::Security.decode_jwt(access_token.to_s)["jti"]
-          jti_2 = Canvas::Security.decode_jwt(AccessToken.create_jwt(aud: aud, sub: sub).to_s)["jti"]
+          jti_2 = Canvas::Security.decode_jwt(AccessToken.create_jwt(aud:, sub:).to_s)["jti"]
           expect(jti_1).not_to eq jti_2
         end
 
@@ -99,23 +99,23 @@ module Lti
         end
 
         it "includes the reg_key if passed in" do
-          access_token = Lti::OAuth2::AccessToken.create_jwt(aud: aud, sub: sub, reg_key: "reg_key")
+          access_token = Lti::OAuth2::AccessToken.create_jwt(aud:, sub:, reg_key: "reg_key")
           expect(Canvas::Security.decode_jwt(access_token.to_s)["reg_key"]).to eq("reg_key")
         end
 
         it "sets the 'shard_id' to the current shard" do
-          access_token = Lti::OAuth2::AccessToken.create_jwt(aud: aud, sub: sub, reg_key: "reg_key")
+          access_token = Lti::OAuth2::AccessToken.create_jwt(aud:, sub:, reg_key: "reg_key")
           expect(access_token.shard_id).to eq Shard.current.id
         end
       end
 
       describe ".from_jwt" do
         let(:token) { Canvas::Security.create_jwt(body) }
-        let(:access_token) { Lti::OAuth2::AccessToken.from_jwt(aud: aud, jwt: token) }
+        let(:access_token) { Lti::OAuth2::AccessToken.from_jwt(aud:, jwt: token) }
 
         it "raises an InvalidTokenError if not signed by the correct secret" do
           invalid_token = Canvas::Security.create_jwt(body, nil, "invalid")
-          expect { Lti::OAuth2::AccessToken.from_jwt(aud: aud, jwt: invalid_token) }.to raise_error InvalidTokenError
+          expect { Lti::OAuth2::AccessToken.from_jwt(aud:, jwt: invalid_token) }.to raise_error InvalidTokenError
         end
 
         it "Sets the 'shard_id'" do
@@ -125,7 +125,7 @@ module Lti
 
       describe "#validate!" do
         let(:token) { Canvas::Security.create_jwt(body) }
-        let(:access_token) { Lti::OAuth2::AccessToken.from_jwt(aud: aud, jwt: token) }
+        let(:access_token) { Lti::OAuth2::AccessToken.from_jwt(aud:, jwt: token) }
 
         it "returns true if there are no errors" do
           expect(access_token.validate!).to be true

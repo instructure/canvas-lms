@@ -715,7 +715,7 @@ describe "Modules API", type: :request do
                           course_id: @course.id.to_s,
                           id: @module1.id.to_s },
                         { module: { name: "new name",
-                                    unlock_at: unlock_at,
+                                    unlock_at:,
                                     require_sequential_progress: true } })
 
         expect(json["id"]).to eq @module1.id
@@ -953,7 +953,7 @@ describe "Modules API", type: :request do
                           format: "json",
                           course_id: @course.id.to_s },
                         { module: { name: "new name",
-                                    unlock_at: unlock_at,
+                                    unlock_at:,
                                     require_sequential_progress: true } })
 
         expect(@course.context_modules.count).to eq 1

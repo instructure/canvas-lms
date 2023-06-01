@@ -414,9 +414,9 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     private_key = self.class.private_key
     private_key = nil if sig_alg.nil?
     forward_url = SAML2::Bindings::HTTPRedirect.encode(authn_request,
-                                                       private_key: private_key,
-                                                       sig_alg: sig_alg,
-                                                       relay_state: relay_state)
+                                                       private_key:,
+                                                       sig_alg:,
+                                                       relay_state:)
 
     if debugging? && debug_set(:request_id, authn_request.id, overwrite: false)
       debug_set(:to_idp_url, forward_url)
@@ -431,7 +431,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     aps = account.authentication_providers.active.where(auth_type: "saml").to_a
     entity = sp_metadata(saml_default_entity_id_for_account(account, persist: !aps.empty?),
                          HostUrl.context_hosts(account, current_host),
-                         include_all_encryption_certificates: include_all_encryption_certificates)
+                         include_all_encryption_certificates:)
     prior_configs = Set.new
     aps.each do |ap|
       federated_attributes = ap.federated_attributes
@@ -511,8 +511,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     private_key = AuthenticationProvider::SAML.private_key
     private_key = nil if sig_alg.nil?
     result = SAML2::Bindings::HTTPRedirect.encode(logout_request,
-                                                  private_key: private_key,
-                                                  sig_alg: sig_alg)
+                                                  private_key:,
+                                                  sig_alg:)
 
     if debugging? && debug_get(:logged_in_user_id) == current_user.id
       debug_set(:logout_request_id, logout_request.id)

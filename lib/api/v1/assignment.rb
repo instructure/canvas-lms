@@ -1012,9 +1012,9 @@ module Api::V1::Assignment
     end
 
     {
-      assignment: assignment,
-      overrides: overrides,
-      old_assignment: old_assignment,
+      assignment:,
+      overrides:,
+      old_assignment:,
       notify_of_update: assignment_params[:notify_of_update],
       valid: true
     }

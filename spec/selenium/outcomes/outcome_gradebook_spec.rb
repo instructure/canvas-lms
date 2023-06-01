@@ -190,7 +190,7 @@ describe "outcome gradebook" do
       end
 
       def result(user, alignment, score, opts = {})
-        LearningOutcomeResult.create!(user: user, alignment: alignment, score: score, context: @course, **opts)
+        LearningOutcomeResult.create!(user:, alignment:, score:, context: @course, **opts)
       end
 
       context "with results" do

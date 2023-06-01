@@ -82,7 +82,7 @@ module Api
       def format_error_message(attribute, error_message)
         field = (attribute == :base) ? nil : attribute
         {
-          field: field,
+          field:,
           message: MessageFormatter.new(base, error_message).format_message,
           error_code: error_message.type,
         }

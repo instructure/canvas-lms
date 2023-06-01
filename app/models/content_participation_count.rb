@@ -43,9 +43,9 @@ class ContentParticipationCount < ActiveRecord::Base
             opts["unread_count"] = unread_count
           end
           participant ||= context.content_participation_counts.build({
-                                                                       user: user,
+                                                                       user:,
                                                                        content_type: type,
-                                                                       unread_count: unread_count,
+                                                                       unread_count:,
                                                                      })
         end
         participant.attributes = opts.slice(*ACCESSIBLE_ATTRIBUTES)

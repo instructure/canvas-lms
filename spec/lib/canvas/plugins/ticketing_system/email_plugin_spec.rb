@@ -23,7 +23,7 @@ module Canvas::Plugins::TicketingSystem
       let(:ticketing) { double }
       let(:plugin) { EmailPlugin.new(ticketing) }
       let(:email_address) { "to-address@example.com" }
-      let(:config) { { email_address: email_address } }
+      let(:config) { { email_address: } }
       let(:report) do
         double(
           email: "from-address@example.com",

@@ -972,7 +972,7 @@ describe "assignments" do
             rubric.save!
 
             @course_rubric_association = RubricAssociation.create!(
-              rubric: rubric,
+              rubric:,
               association_object: @course,
               context: @course,
               purpose: "bookmark"
@@ -1211,7 +1211,7 @@ describe "assignments" do
             rubric.save!
 
             @course_rubric_association = RubricAssociation.create!(
-              rubric: rubric,
+              rubric:,
               association_object: @course,
               context: @course,
               purpose: "bookmark"

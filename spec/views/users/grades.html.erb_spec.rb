@@ -24,8 +24,8 @@ require_relative "../views_helper"
 describe "users/grades" do
   context "as a teacher" do
     let_once(:course) { Course.create!(workflow_state: "available") }
-    let_once(:student) { course_with_user("StudentEnrollment", course: course, active_all: true).user }
-    let_once(:teacher) { course_with_user("TeacherEnrollment", course: course, active_all: true).user }
+    let_once(:student) { course_with_user("StudentEnrollment", course:, active_all: true).user }
+    let_once(:teacher) { course_with_user("TeacherEnrollment", course:, active_all: true).user }
     let(:student_enrollment) { course.enrollments.find_by(user: student) }
 
     it "shows the computed score, even if override scores exist and feature is enabled" do

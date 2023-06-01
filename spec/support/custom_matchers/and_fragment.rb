@@ -20,7 +20,7 @@
 RSpec::Matchers.define :and_fragment do |expected|
   match do |actual|
     fragment = JSON.parse(URI.decode_www_form_component(URI(actual).fragment))
-    expected_as_strings = RSpec::Matchers::Helpers.cast_to_strings(expected: expected)
+    expected_as_strings = RSpec::Matchers::Helpers.cast_to_strings(expected:)
     values_match?(expected_as_strings, fragment)
   end
 end

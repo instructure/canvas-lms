@@ -69,15 +69,15 @@ class EventStream::Stream
   end
 
   def fetch(ids, strategy: :batch)
-    current_backend.fetch(ids, strategy: strategy)
+    current_backend.fetch(ids, strategy:)
   end
 
   def current_backend
     @backend_override || backend_for(backend_strategy)
   end
 
-  def add_index(name, &blk)
-    index = EventStream::Index.new(self, &blk)
+  def add_index(name, &)
+    index = EventStream::Index.new(self, &)
 
     on_insert do |record|
       current_backend.index_on_insert(index, record)

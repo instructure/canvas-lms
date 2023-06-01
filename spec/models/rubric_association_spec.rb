@@ -143,7 +143,7 @@ describe RubricAssociation do
       it "does nothing if it is not associated to an assignment" do
         rubric = @course.rubrics.create!
         ra = RubricAssociation.create!(
-          rubric: rubric,
+          rubric:,
           association_object: @course,
           context: @course,
           purpose: "bookmark"
@@ -301,9 +301,9 @@ describe RubricAssociation do
 
   describe "#assess" do
     let(:course) { Course.create! }
-    let!(:first_teacher) { course_with_teacher(course: course, active_all: true).user }
-    let!(:second_teacher) { course_with_teacher(course: course, active_all: true).user }
-    let(:student) { student_in_course(course: course, active_all: true).user }
+    let!(:first_teacher) { course_with_teacher(course:, active_all: true).user }
+    let!(:second_teacher) { course_with_teacher(course:, active_all: true).user }
+    let(:student) { student_in_course(course:, active_all: true).user }
     let(:assignment) { course.assignments.create!(submission_types: "online_text_entry") }
     let(:rubric) do
       course.rubrics.create! do |r|
@@ -396,7 +396,7 @@ describe RubricAssociation do
           expect do
             RubricAssociation.generate(teacher, rubric, course, association_object: assignment, purpose: "grading")
           end.to change {
-            AnonymousOrModerationEvent.where(event_type: "rubric_updated", assignment: assignment).count
+            AnonymousOrModerationEvent.where(event_type: "rubric_updated", assignment:).count
           }.by(1)
         end
 
@@ -428,7 +428,7 @@ describe RubricAssociation do
           expect do
             rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
           end.to change {
-            AnonymousOrModerationEvent.where(event_type: "rubric_created", assignment: assignment).count
+            AnonymousOrModerationEvent.where(event_type: "rubric_created", assignment:).count
           }.by(1)
         end
 
@@ -528,7 +528,7 @@ describe RubricAssociation do
       course = Course.create!
       rubric = course.rubrics.create!
       association = RubricAssociation.create!(
-        rubric: rubric,
+        rubric:,
         association_object: course,
         context: course,
         purpose: "bookmark"
@@ -550,7 +550,7 @@ describe RubricAssociation do
 
       rubric = @course.rubrics.create!
       @course_rubric_association = RubricAssociation.create!(
-        rubric: rubric,
+        rubric:,
         association_object: @course,
         context: @course,
         purpose: "bookmark"

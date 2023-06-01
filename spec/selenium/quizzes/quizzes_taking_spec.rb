@@ -107,7 +107,7 @@ describe "quiz taking" do
     quiz = quiz_model
     bank = AssessmentQuestionBank.create!(context: @course)
     3.times do
-      assessment_question_model(bank: bank)
+      assessment_question_model(bank:)
       question = bank.assessment_questions.last
       question.question_data[:points_possible] = 1
       question.save!

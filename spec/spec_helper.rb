@@ -97,7 +97,7 @@ module WebMock::API
 end
 
 require "delayed/testing"
-Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |f| require f }
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 require "sharding_spec_helper"
 
 # nuke the db (say, if `rake db:migrate RAILS_ENV=test` created records),
@@ -353,7 +353,7 @@ require "ams_spec_helper"
 require "i18n_tasks"
 require "factories"
 
-Dir[File.dirname(__FILE__) + "/shared_examples/**/*.rb"].sort.each { |f| require f }
+Dir[File.dirname(__FILE__) + "/shared_examples/**/*.rb"].each { |f| require f }
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
@@ -762,8 +762,8 @@ RSpec.configure do |config|
         @ancestor = ancestor
       end
 
-      def method_missing(sym, *args, &blk)
-        @ancestor.instance_method(sym).bind_call(@subject, *args, &blk)
+      def method_missing(sym, *args, &)
+        @ancestor.instance_method(sym).bind_call(@subject, *args, &)
       end
     end
 
@@ -870,16 +870,16 @@ RSpec.configure do |config|
     Delayed::Testing.drain
   end
 
-  def track_jobs(&block)
-    @jobs_tracking = Delayed::JobTracking.track(&block)
+  def track_jobs(&)
+    @jobs_tracking = Delayed::JobTracking.track(&)
   end
 
   def created_jobs
     @jobs_tracking.created
   end
 
-  def expects_job_with_tag(tag, count = 1, &block)
-    track_jobs(&block)
+  def expects_job_with_tag(tag, count = 1, &)
+    track_jobs(&)
     expect(created_jobs.count { |j| j.tag == tag }).to eq count
   end
 
@@ -998,7 +998,7 @@ module I18nStubs
 end
 I18n.backend.class.prepend(I18nStubs)
 
-Dir[Rails.root.join("{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb")].sort.each { |file| require file }
+Dir[Rails.root.join("{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb")].each { |file| require file }
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

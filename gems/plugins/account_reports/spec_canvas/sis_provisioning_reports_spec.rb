@@ -173,7 +173,7 @@ describe "Default Account Reports" do
     end_at = 3.months.from_now
     @course1 = Course.new(name: "English 101",
                           course_code: "ENG101",
-                          start_at: start_at,
+                          start_at:,
                           conclude_at: end_at)
     @course1.account_id = @sub_account.id
     @course1.enrollment_term_id = @term1.id
@@ -211,7 +211,7 @@ describe "Default Account Reports" do
 
     @course5 = Course.new(name: "Sd Math 100",
                           course_code: "ENG101",
-                          start_at: start_at,
+                          start_at:,
                           conclude_at: end_at)
     @course5.account_id = @sub_account.id
     @course5.enrollment_term_id = @term1.id

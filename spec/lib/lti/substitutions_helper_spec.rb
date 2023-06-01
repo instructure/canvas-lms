@@ -32,7 +32,7 @@ module Lti
     end
     let(:root_account) { Account.create! }
     let(:account) do
-      Account.create!(root_account: root_account)
+      Account.create!(root_account:)
     end
     let(:user) { User.create! }
 
@@ -183,7 +183,7 @@ module Lti
 
       it "does not include admin role if user has a sub-account admin user record in deleted account" do
         sub_account = account.sub_accounts.create!
-        sub_account.account_users.create!(user: user, role: admin_role)
+        sub_account.account_users.create!(user:, role: admin_role)
         sub_account.destroy!
         roles = subject.all_roles
         expect(roles).not_to include "urn:lti:instrole:ims/lis/Administrator"
@@ -216,9 +216,9 @@ module Lti
       it "returns the active enrollments in a course for a user" do
         set_up_persistance!
 
-        student_enrollment = student_in_course(user: user, course: course, active_enrollment: true)
-        teacher_enrollment = teacher_in_course(user: user, course: course, active_enrollment: true)
-        inactive_enrollment = course_with_observer(user: user, course: course)
+        student_enrollment = student_in_course(user:, course:, active_enrollment: true)
+        teacher_enrollment = teacher_in_course(user:, course:, active_enrollment: true)
+        inactive_enrollment = course_with_observer(user:, course:)
         inactive_enrollment.update_attribute(:workflow_state, "inactive")
 
         expect(subject.course_enrollments).to include student_enrollment
@@ -237,14 +237,14 @@ module Lti
 
       it "returns enrollments in an account for a user" do
         set_up_persistance!
-        enrollment = account.account_users.create!(user: user)
+        enrollment = account.account_users.create!(user:)
 
         expect(subject.account_enrollments).to eq [enrollment]
       end
 
       it "does not return deleted account enrollments" do
         set_up_persistance!
-        enrollment = account.account_users.create!(user: user)
+        enrollment = account.account_users.create!(user:)
         enrollment.destroy
 
         expect(subject.account_enrollments).to eq []
@@ -252,7 +252,7 @@ module Lti
 
       it "returns enrollments in an account chain for a user" do
         set_up_persistance!
-        enrollment = root_account.account_users.create!(user: user)
+        enrollment = root_account.account_users.create!(user:)
 
         expect(subject.account_enrollments).to eq [enrollment]
       end
@@ -264,7 +264,7 @@ module Lti
 
       context "with cross-shard account in chain" do
         let(:xshard_account) { @shard1.activate { account_model } }
-        let(:xshard_enrollment) { xshard_account.account_users.create!(user: user) }
+        let(:xshard_enrollment) { xshard_account.account_users.create!(user:) }
 
         before do
           allow(account).to receive(:account_chain).and_return [account, root_account, xshard_account]
@@ -311,8 +311,8 @@ module Lti
 
       it "returns the user's roles" do
         set_up_persistance!
-        student_in_course(user: user, course: course, active_enrollment: true)
-        account.account_users.create!(user: user)
+        student_in_course(user:, course:, active_enrollment: true)
+        account.account_users.create!(user:)
         lis_roles = subject.current_lis_roles
 
         expect(lis_roles).to include "Learner"
@@ -320,7 +320,7 @@ module Lti
       end
 
       it "returns the correct role for a site admin user" do
-        Account.site_admin.account_users.create!(user: user)
+        Account.site_admin.account_users.create!(user:)
         lis_roles = subject.current_lis_roles
         expect(lis_roles).to eq "urn:lti:sysrole:ims/lis/SysAdmin"
       end
@@ -340,10 +340,10 @@ module Lti
       it "returns the active enrollments in a course for a user" do
         set_up_persistance!
 
-        student_enrollment = student_in_course(user: user, course: course, active_enrollment: true)
+        student_enrollment = student_in_course(user:, course:, active_enrollment: true)
         student_enrollment.conclude
-        teacher_enrollment = teacher_in_course(user: user, course: course, active_enrollment: true)
-        observer_enrollment = course_with_observer(user: user, course: course)
+        teacher_enrollment = teacher_in_course(user:, course:, active_enrollment: true)
+        observer_enrollment = course_with_observer(user:, course:)
         observer_enrollment.conclude
 
         expect(subject.concluded_course_enrollments).to include student_enrollment
@@ -359,7 +359,7 @@ module Lti
 
       it "returns the user's roles" do
         set_up_persistance!
-        student_in_course(user: user, course: course, active_enrollment: true).conclude
+        student_in_course(user:, course:, active_enrollment: true).conclude
         expect(subject.concluded_lis_roles).to eq "Learner"
       end
     end
@@ -368,9 +368,9 @@ module Lti
       it "returns the LIS V2 role names" do
         set_up_persistance!
 
-        teacher_in_course(user: user, course: course, active_enrollment: true)
-        course_with_designer(user: user, course: course, active_enrollment: true)
-        account_admin_user(user: user, account: account)
+        teacher_in_course(user:, course:, active_enrollment: true)
+        course_with_designer(user:, course:, active_enrollment: true)
+        account_admin_user(user:, account:)
         roles = subject.current_canvas_roles_lis_v2
 
         expect(roles.split(",")).to match_array [
@@ -382,8 +382,8 @@ module Lti
 
       it "does not include concluded roles" do
         set_up_persistance!
-        student_in_course(user: user, course: course, active_enrollment: true).conclude
-        teacher_in_course(user: user, course: course, active_enrollment: true)
+        student_in_course(user:, course:, active_enrollment: true).conclude
+        teacher_in_course(user:, course:, active_enrollment: true)
         roles = subject.current_canvas_roles_lis_v2
 
         expect(roles).to eq "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"
@@ -392,8 +392,8 @@ module Lti
       it "does not include roles from other contexts" do
         set_up_persistance!
         course_two = course_model
-        student_in_course(user: user, course: course, active_enrollment: true)
-        teacher_in_course(user: user, course: course_two, active_enrollment: true)
+        student_in_course(user:, course:, active_enrollment: true)
+        teacher_in_course(user:, course: course_two, active_enrollment: true)
         roles = subject.current_canvas_roles_lis_v2
 
         expect(roles).to eq "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"
@@ -402,9 +402,9 @@ module Lti
       it "can be directed to use the LIS 2 role map" do
         set_up_persistance!
 
-        ta_in_course(user: user, course: course, active_enrollment: true)
-        course_with_designer(user: user, course: course, active_enrollment: true)
-        account_admin_user(user: user, account: account)
+        ta_in_course(user:, course:, active_enrollment: true)
+        course_with_designer(user:, course:, active_enrollment: true)
+        account_admin_user(user:, account:)
         roles = subject.current_canvas_roles_lis_v2("lis2")
 
         expect(roles.split(",")).to match_array [
@@ -418,9 +418,9 @@ module Lti
       it "can be directed to use the LTI 1.3 role map" do
         set_up_persistance!
 
-        ta_in_course(user: user, course: course, active_enrollment: true)
-        course_with_designer(user: user, course: course, active_enrollment: true)
-        account_admin_user(user: user, account: account)
+        ta_in_course(user:, course:, active_enrollment: true)
+        course_with_designer(user:, course:, active_enrollment: true)
+        account_admin_user(user:, account:)
         roles = subject.current_canvas_roles_lis_v2("lti1_3")
 
         expect(roles.split(",")).to match_array [
@@ -436,10 +436,10 @@ module Lti
       it "returns readable names for canvas roles" do
         set_up_persistance!
 
-        student_in_course(user: user, course: course, active_enrollment: true).conclude
-        teacher_in_course(user: user, course: course, active_enrollment: true)
-        course_with_designer(user: user, course: course, active_enrollment: true)
-        account_admin_user(user: user, account: account)
+        student_in_course(user:, course:, active_enrollment: true).conclude
+        teacher_in_course(user:, course:, active_enrollment: true)
+        course_with_designer(user:, course:, active_enrollment: true)
+        account_admin_user(user:, account:)
 
         roles = subject.current_canvas_roles
 
@@ -452,19 +452,19 @@ module Lti
     describe "#enrollment_state" do
       it "is active if there are any active enrollments" do
         set_up_persistance!
-        enrollment = student_in_course(user: user, course: course, active_enrollment: true)
+        enrollment = student_in_course(user:, course:, active_enrollment: true)
         enrollment.start_at = 4.days.ago
         enrollment.end_at = 2.days.ago
         enrollment.save!
 
-        teacher_in_course(user: user, course: course, active_enrollment: true)
+        teacher_in_course(user:, course:, active_enrollment: true)
 
         expect(subject.enrollment_state).to eq "active"
       end
 
       it "is inactive if there are no active enrollments" do
         set_up_persistance!
-        enrollment = student_in_course(user: user, course: course, active_enrollment: true)
+        enrollment = student_in_course(user:, course:, active_enrollment: true)
         enrollment.start_at = 4.days.ago
         enrollment.end_at = 2.days.ago
         enrollment.save!
@@ -474,7 +474,7 @@ module Lti
 
       it "is inactive if the course is concluded" do
         set_up_persistance!
-        student_in_course(user: user, course: course, active_enrollment: true)
+        student_in_course(user:, course:, active_enrollment: true)
         course.complete
 
         expect(subject.enrollment_state).to eq "inactive"
@@ -593,11 +593,11 @@ module Lti
         it "invalidates cache on last copied migration" do
           enable_cache do
             expect(subject.recursively_fetch_previous_lti_context_ids).to eq "ghi,def,abc"
-            @c4 = Course.create!(root_account: root_account, account: account, lti_context_id: "jkl")
+            @c4 = Course.create!(root_account:, account:, lti_context_id: "jkl")
             @c1.content_migrations.create!(workflow_state: "imported", source_course: @c4)
             expect(subject.recursively_fetch_previous_lti_context_ids).to eq "ghi,def,abc" # not copied into subject course yet
 
-            @c5 = Course.create!(root_account: root_account, account: account, lti_context_id: "mno")
+            @c5 = Course.create!(root_account:, account:, lti_context_id: "mno")
             course.content_migrations.create!(workflow_state: "imported", source_course: @c5) # direct copy
             expect(subject.recursively_fetch_previous_lti_context_ids).to eq "mno,jkl,ghi,def,abc"
           end
@@ -668,8 +668,8 @@ module Lti
           # course.reload
 
           user.save!
-          @e1 = multiple_student_enrollment(user, @sec1, course: course)
-          @e2 = multiple_student_enrollment(user, @sec2, course: course)
+          @e1 = multiple_student_enrollment(user, @sec1, course:)
+          @e2 = multiple_student_enrollment(user, @sec2, course:)
         end
 
         it "returns all canvas section ids" do
@@ -693,7 +693,7 @@ module Lti
     end
 
     context "email" do
-      let(:course) { Course.create!(root_account: root_account, account: account, workflow_state: "available") }
+      let(:course) { Course.create!(root_account:, account:, workflow_state: "available") }
 
       let(:tool) do
         ContextExternalTool.create!(

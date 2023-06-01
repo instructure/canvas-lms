@@ -32,7 +32,7 @@ module Outcomes
         next if object[field].present?
 
         raise InvalidDataError, I18n.t(
-          'The "%{field}" field is required', field: field
+          'The "%{field}" field is required', field:
         )
       end
       if object[:vendor_guid].match?(/\s/)
@@ -64,7 +64,7 @@ module Outcomes
         raise InvalidDataError, I18n.t(
           'Invalid %{field}: "%{type}"',
           field: "object_type",
-          type: type
+          type:
         )
       end
     end
@@ -112,7 +112,7 @@ module Outcomes
         )
       end
 
-      parents = find_parents(group, group_context, model: model)
+      parents = find_parents(group, group_context, model:)
       raise InvalidDataError, I18n.t("An outcome group can only have one parent") if parents.length > 1
 
       parent = parents.first
@@ -161,7 +161,7 @@ module Outcomes
       end
 
       allow_indirect = outcome.key?(:course_id)
-      parents = find_parents(outcome, context, allow_indirect: allow_indirect)
+      parents = find_parents(outcome, context, allow_indirect:)
 
       if model.outcome_import_id == outcome_import_id
         raise InvalidDataError, I18n.t(
@@ -200,7 +200,7 @@ module Outcomes
       end
 
       parents = [] if outcome[:workflow_state] == "deleted"
-      update_outcome_parents(model, parents, allow_indirect: allow_indirect)
+      update_outcome_parents(model, parents, allow_indirect:)
 
       if outcome[:friendly_description].present?
         fd = OutcomeFriendlyDescription.find_or_create_by(context: model.context, learning_outcome: model)
@@ -249,16 +249,16 @@ module Outcomes
         end
       else
         vendor_guid = outcome[:vendor_guid]
-        prior = LearningOutcome.where(vendor_guid: vendor_guid).active_first.first
+        prior = LearningOutcome.where(vendor_guid:).active_first.first
         return prior if prior
 
-        LearningOutcome.new(vendor_guid: vendor_guid)
+        LearningOutcome.new(vendor_guid:)
       end
     end
 
     def find_prior_group(group, group_context)
       vendor_guid = group[:vendor_guid]
-      prior = LearningOutcomeGroup.where(context: group_context).where(vendor_guid: vendor_guid).active_first.first
+      prior = LearningOutcomeGroup.where(context: group_context).where(vendor_guid:).active_first.first
       return prior if prior
 
       match = /canvas_outcome_group:(\d+)/.match(vendor_guid)
@@ -275,7 +275,7 @@ module Outcomes
         end
       end
 
-      LearningOutcomeGroup.new(vendor_guid: vendor_guid, context: group_context)
+      LearningOutcomeGroup.new(vendor_guid:, context: group_context)
     end
 
     def create_rubric(ratings, mastery_points)
@@ -309,7 +309,7 @@ module Outcomes
       end
 
       guids = object[:parent_guids].strip.split.uniq
-      possible_parents = LearningOutcomeGroup.where(outcome_import_id: outcome_import_id, vendor_guid: guids)
+      possible_parents = LearningOutcomeGroup.where(outcome_import_id:, vendor_guid: guids)
 
       # If allow_indirect is true, we could `filter{|g| child_context?(g.context) }`, but it is costly and
       # redundant (since outcome_import_id matching is already enforced)
@@ -348,7 +348,7 @@ module Outcomes
       # to an aligned outcome
       new_parent_ids = Set.new(next_parent_ids) - existing_parent_ids
       new_parent_ids.each_slice(1000) do |batch|
-        LearningOutcomeGroup.bulk_link_outcome(outcome, LearningOutcomeGroup.where(id: batch), root_account_id: root_account_id)
+        LearningOutcomeGroup.bulk_link_outcome(outcome, LearningOutcomeGroup.where(id: batch), root_account_id:)
       end
 
       kill = existing_links

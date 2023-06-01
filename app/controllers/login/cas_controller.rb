@@ -102,7 +102,7 @@ class Login::CasController < ApplicationController
     end
   end
 
-  CAS_SAML_LOGOUT_REQUEST = %r{^<samlp:LogoutRequest.*?<samlp:SessionIndex>(?<session_index>.*)</samlp:SessionIndex>}m.freeze
+  CAS_SAML_LOGOUT_REQUEST = %r{^<samlp:LogoutRequest.*?<samlp:SessionIndex>(?<session_index>.*)</samlp:SessionIndex>}m
 
   def destroy
     if !Canvas.redis_enabled?

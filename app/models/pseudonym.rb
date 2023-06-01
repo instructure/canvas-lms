@@ -277,8 +277,8 @@ class Pseudonym < ActiveRecord::Base
     end
     unless deleted?
       shard.activate do
-        existing_pseudo = Pseudonym.active.by_unique_id(unique_id).where(account_id: account_id,
-                                                                         authentication_provider_id: authentication_provider_id).where.not(id: self).exists?
+        existing_pseudo = Pseudonym.active.by_unique_id(unique_id).where(account_id:,
+                                                                         authentication_provider_id:).where.not(id: self).exists?
         if existing_pseudo
           errors.add(:unique_id,
                      :taken,
@@ -292,7 +292,7 @@ class Pseudonym < ActiveRecord::Base
 
   def verify_unique_sis_user_id
     return true unless sis_user_id
-    return true unless Pseudonym.where.not(id: id).where(account_id: account_id, sis_user_id: sis_user_id).exists?
+    return true unless Pseudonym.where.not(id:).where(account_id:, sis_user_id:).exists?
 
     errors.add(:sis_user_id,
                :taken,
@@ -302,11 +302,11 @@ class Pseudonym < ActiveRecord::Base
 
   def verify_unique_integration_id
     return true unless integration_id
-    return true unless Pseudonym.where.not(id: id).where(account_id: account_id, integration_id: integration_id).exists?
+    return true unless Pseudonym.where.not(id:).where(account_id:, integration_id:).exists?
 
     errors.add(:integration_id,
                :taken,
-               message: t("Integration ID \"%{integration_id}\" is already in use", integration_id: integration_id))
+               message: t("Integration ID \"%{integration_id}\" is already in use", integration_id:))
     throw :abort
   end
 
@@ -560,7 +560,7 @@ class Pseudonym < ActiveRecord::Base
                              type: :ldap,
                              message: "LDAP authentication error",
                              object: inspect.to_s,
-                             unique_id: unique_id,
+                             unique_id:,
                            })
     nil
   end

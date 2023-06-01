@@ -29,7 +29,7 @@ describe "lti full width launch view" do
     let(:tool) do
       dev_key = DeveloperKey.create
       tool_id = ContextExternalTool::QUIZ_LTI
-      ContextExternalTool.create(developer_key: dev_key, context: course, tool_id: tool_id)
+      ContextExternalTool.create(developer_key: dev_key, context: course, tool_id:)
     end
     let(:tag) { LtiLayoutSpecHelper.create_tag(tool) }
     let(:current_user) { user_with_pseudonym }
@@ -54,10 +54,10 @@ describe "lti full width launch view" do
         end
 
         context "with sections" do
-          let(:active_section) { add_section("Section A", { course: course }) }
+          let(:active_section) { add_section("Section A", { course: }) }
 
           let(:completed_section) do
-            section = add_section("Section B", { course: course })
+            section = add_section("Section B", { course: })
             section.restrict_enrollments_to_section_dates = true
             section.start_at = 3.days.ago
             section.end_at = 1.day.ago

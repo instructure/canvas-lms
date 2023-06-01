@@ -71,7 +71,7 @@ module DataFixup::CopyBuiltInRolesByRootAccount
   end
 
   def self.move_roles_for_enrollments(old_role_ids, start_at, end_at)
-    Enrollment.find_ids_in_ranges(start_at: start_at, end_at: end_at) do |min_id, max_id|
+    Enrollment.find_ids_in_ranges(start_at:, end_at:) do |min_id, max_id|
       Enrollment.where(id: min_id..max_id, role_id: old_role_ids).joins(:role)
                 .joins(<<~SQL.squish).update_all("role_id=new_roles.id")
                   INNER JOIN #{Role.quoted_table_name} AS new_roles

@@ -60,7 +60,7 @@ module SpeedGrader
 
       submission_json_fields <<
         (
-          if anonymous_students?(current_user: current_user, assignment: assignment)
+          if anonymous_students?(current_user:, assignment:)
             :anonymous_id
           else
             :user_id
@@ -106,11 +106,11 @@ module SpeedGrader
 
       res[:context][:rep_for_student] = {}
 
-      includes = gradebook_includes(user: current_user, course: course)
+      includes = gradebook_includes(user: current_user, course:)
       students =
         assignment.representatives(
           user: current_user,
-          includes: includes,
+          includes:,
           group_id: group_id_filter,
           section_id: section_id_filter
         ) { |rep, others| others.each { |s| res[:context][:rep_for_student][s.id] = rep.id } }
@@ -122,7 +122,7 @@ module SpeedGrader
 
       enrollments =
         course.apply_enrollment_visibility(
-          gradebook_enrollment_scope(user: current_user, course: course),
+          gradebook_enrollment_scope(user: current_user, course:),
           current_user,
           nil,
           include: includes
@@ -166,7 +166,7 @@ module SpeedGrader
       submissions = assignment.submissions.where(user_id: students).preload(*includes)
 
       student_json_fields =
-        if anonymous_students?(current_user: current_user, assignment: assignment)
+        if anonymous_students?(current_user:, assignment:)
           []
         else
           %i[name id sortable_name]
@@ -180,13 +180,13 @@ module SpeedGrader
               methods: submission_comment_methods,
               only: student_json_fields
             )
-          if anonymous_students?(current_user: current_user, assignment: assignment)
+          if anonymous_students?(current_user:, assignment:)
             anonymous_ids =
               student_ids_to_anonymous_ids(
-                current_user: current_user,
-                assignment: assignment,
-                course: course,
-                submissions: submissions
+                current_user:,
+                assignment:,
+                course:,
+                submissions:
               )
             json[:anonymous_id] = anonymous_ids[student.id.to_s]
             identity = assignment.anonymous_student_identities.fetch(student.id, {})
@@ -203,7 +203,7 @@ module SpeedGrader
                 current_user_rubric_assessments.select do |assessment|
                   assessment.user_id == student.id
                 end,
-              submissions: submissions
+              submissions:
             )
           json
         end
@@ -217,13 +217,13 @@ module SpeedGrader
       res[:context][:enrollments] =
         enrollments.map do |enrollment|
           enrollment_json = enrollment.as_json(include_root: false, only: enrollment_json_fields)
-          if anonymous_students?(current_user: current_user, assignment: assignment)
+          if anonymous_students?(current_user:, assignment:)
             enrollment_json[:anonymous_id] =
               student_ids_to_anonymous_ids(
-                current_user: current_user,
-                assignment: assignment,
-                course: course,
-                submissions: submissions
+                current_user:,
+                assignment:,
+                course:,
+                submissions:
               ).fetch(enrollment.user_id.to_s, nil)
             enrollment_json.delete(:user_id)
           end
@@ -302,12 +302,12 @@ module SpeedGrader
 
           json[:submission_comments] =
             anonymous_moderated_submission_comments_json(
-              assignment: assignment,
-              course: course,
-              current_user: current_user,
+              assignment:,
+              course:,
+              current_user:,
               avatars: display_avatars?,
               submission_comments: sub.visible_submission_comments_for(current_user),
-              submissions: submissions
+              submissions:
             )
 
           json[:proxy_submitter] = sub.proxy_submitter&.short_name
@@ -342,7 +342,7 @@ module SpeedGrader
           if quizzes_next_submission?
             quiz_lti_submission = BasicLTI::QuizzesNextVersionedSubmission.new(assignment, sub.user)
             json["submission_history"] =
-              quiz_lti_submission.grade_history.map { |submission| { submission: submission } }
+              quiz_lti_submission.grade_history.map { |submission| { submission: } }
           elsif json["submission_history"] && (assignment.quiz.nil? || too_many)
             json["submission_history"] =
               json["submission_history"].map do |version|
@@ -450,8 +450,8 @@ module SpeedGrader
                       end
                     pg_json[:rubric_assessments] =
                       rubric_assessments_to_json(
-                        rubric_assessments: rubric_assessments,
-                        submissions: submissions
+                        rubric_assessments:,
+                        submissions:
                       )
                     pg_json[:selected] =
                       !!(selection && selection.selected_provisional_grade_id == pg.id)
@@ -490,14 +490,14 @@ module SpeedGrader
       @preloaded_provisional_grades ||=
         begin
           provisional_grades = assignment.provisional_grades
-          unless anonymous_graders?(current_user: current_user, assignment: assignment)
+          unless anonymous_graders?(current_user:, assignment:)
             provisional_grades = provisional_grades.preload(:scorer)
           end
 
           case grading_role
           when :provisional_grader
             provisional_grades =
-              if grader_comments_hidden?(current_user: current_user, assignment: assignment)
+              if grader_comments_hidden?(current_user:, assignment:)
                 provisional_grades.not_final.where(scorer: current_user)
               else
                 select_fields =
@@ -529,25 +529,25 @@ module SpeedGrader
         json = assessment.as_json(methods: [:assessor_name], include_root: false)
         assessor_id = json[:assessor_id]
 
-        if anonymous_graders?(current_user: current_user, assignment: assignment)
+        if anonymous_graders?(current_user:, assignment:)
           json.delete(:assessor_id)
           json[:anonymous_assessor_id] = assignment.grader_ids_to_anonymous_ids[assessor_id.to_s]
           json.delete(:assessor_name) unless assessor_id == current_user.id
         end
 
-        if anonymous_students?(current_user: current_user, assignment: assignment)
+        if anonymous_students?(current_user:, assignment:)
           json[:anonymous_user_id] =
             student_ids_to_anonymous_ids(
-              current_user: current_user,
-              assignment: assignment,
-              course: course,
-              submissions: submissions
+              current_user:,
+              assignment:,
+              course:,
+              submissions:
             ).fetch(json.delete(:user_id).to_s)
         end
 
         if grader_comments_hidden_or_other_grader?(
-          assessor_id: assessor_id,
-          submissions: submissions
+          assessor_id:,
+          submissions:
         )
           json["data"].each do |datum|
             datum.delete(:comments)
@@ -561,7 +561,7 @@ module SpeedGrader
 
     def provisional_grade_to_json(provisional_grade)
       provisional_grade.grade_attributes.tap do |json|
-        if anonymous_graders?(current_user: current_user, assignment: assignment)
+        if anonymous_graders?(current_user:, assignment:)
           json[:anonymous_grader_id] =
             assignment.grader_ids_to_anonymous_ids[json.delete(:scorer_id).to_s]
         else
@@ -579,13 +579,13 @@ module SpeedGrader
     end
 
     def grader_comments_hidden_or_other_grader?(assessor_id:, submissions:)
-      grader_comments_hidden?(current_user: current_user, assignment: assignment) &&
+      grader_comments_hidden?(current_user:, assignment:) &&
         other_grader?(
           user_id: assessor_id,
-          current_user: current_user,
-          course: course,
-          assignment: assignment,
-          submissions: submissions
+          current_user:,
+          course:,
+          assignment:,
+          submissions:
         )
     end
 

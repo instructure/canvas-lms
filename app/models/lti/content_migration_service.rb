@@ -19,7 +19,7 @@
 
 module Lti
   module ContentMigrationService
-    KEY_REGEX = /\Alti_(?<id>\d+)\z/.freeze
+    KEY_REGEX = /\Alti_(?<id>\d+)\z/
 
     def self.enabled?
       Setting.get("enable_lti_content_migration", "false") == "true"

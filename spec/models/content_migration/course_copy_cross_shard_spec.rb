@@ -32,7 +32,7 @@ describe ContentMigration do
                                                        custom_fields: { "a" => "1", "b" => "2" },
                                                        workflow_state: "public")
       data = [{ points: 3, description: "Outcome row", id: 1, ratings: [{ points: 3, description: "Rockin'", criterion_id: 1, id: 2 }] }]
-      rub1 = @copy_from.rubrics.create!(title: "rub1", data: data)
+      rub1 = @copy_from.rubrics.create!(title: "rub1", data:)
       rub1.associate_with(@copy_from, @copy_from)
       default = @copy_from.root_outcome_group
       lo = @copy_from.created_learning_outcomes.create!(context: @copy_from,

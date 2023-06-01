@@ -42,7 +42,7 @@ class Wiki < ActiveRecord::Base
   # some hacked up stuff similar to what's in MasterCourses::Restrictor
   def load_tag_for_master_course_import!(child_subscription_id)
     @child_tag_for_import = MasterCourses::ChildContentTag.where(content: self).first ||
-                            MasterCourses::ChildContentTag.create(content: self, child_subscription_id: child_subscription_id)
+                            MasterCourses::ChildContentTag.create(content: self, child_subscription_id:)
   end
 
   def can_update_front_page_for_master_courses?
@@ -91,11 +91,11 @@ class Wiki < ActiveRecord::Base
     # TODO: i18n
     t :front_page_name, "Front Page"
     # attempt to find the page and store it's url (if it is found)
-    page = wiki_pages.not_deleted.where(url: url).first
+    page = wiki_pages.not_deleted.where(url:).first
     set_front_page_url!(url) if has_no_front_page && page
 
     # return an implicitly created page if a page could not be found
-    page ||= wiki_pages.temp_record(title: url.titleize, url: url, context: context)
+    page ||= wiki_pages.temp_record(title: url.titleize, url:, context:)
     page
   end
 

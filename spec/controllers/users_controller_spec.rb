@@ -57,7 +57,7 @@ describe UsersController do
 
     let_once(:user) { user_factory(active_all: true) }
     before do
-      account.account_users.create!(user: user)
+      account.account_users.create!(user:)
       user_session(user)
     end
 
@@ -156,7 +156,7 @@ describe UsersController do
       end
 
       context "when the developer key has an oidc_initiation_url" do
-        let(:developer_key) { DeveloperKey.create!(oidc_initiation_url: oidc_initiation_url) }
+        let(:developer_key) { DeveloperKey.create!(oidc_initiation_url:) }
         let(:oidc_initiation_url) { "https://www.test.com/oidc/login" }
 
         it "uses the oidc_initiation_url as the resource_url" do
@@ -209,7 +209,7 @@ describe UsersController do
       state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return", "nonce" => "abc123" })
       course_with_student_logged_in
 
-      get :oauth_success, params: { state: state, service: "google_drive", code: "some_code" }
+      get :oauth_success, params: { state:, service: "google_drive", code: "some_code" }
 
       service = UserService.where(user_id: @user, service: "google_drive", service_domain: "drive.google.com").first
       expect(service.service_user_id).to eq "permission_id"
@@ -232,7 +232,7 @@ describe UsersController do
       session[:oauth_gdrive_nonce] = "abc123"
       state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return", "nonce" => "abc123" })
 
-      get :oauth_success, params: { state: state, service: "google_drive", code: "some_code" }
+      get :oauth_success, params: { state:, service: "google_drive", code: "some_code" }
 
       expect(session[:oauth_gdrive_access_token]).to eq "access_token"
       expect(session[:oauth_gdrive_refresh_token]).to eq "refresh_token"
@@ -252,7 +252,7 @@ describe UsersController do
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
 
       state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return", "nonce" => "abc123" })
-      get :oauth_success, params: { state: state, service: "google_drive", code: "some_code" }
+      get :oauth_success, params: { state:, service: "google_drive", code: "some_code" }
 
       assert_unauthorized
       expect(session[:oauth_gdrive_access_token]).to be_nil
@@ -271,7 +271,7 @@ describe UsersController do
       allow(client_mock).to receive(:authorization).and_return(authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
       state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return", "nonce" => "abc123" })
-      get :oauth_success, params: { state: state, service: "google_drive", code: "some_code" }
+      get :oauth_success, params: { state:, service: "google_drive", code: "some_code" }
       expect(response).to be_redirect
       expect(flash[:error]).to eq "Google Drive failed authorization for current user!"
     end
@@ -616,7 +616,7 @@ describe UsersController do
           allow(redis).to receive(:setex)
           allow(redis).to receive(:hmget)
           allow(redis).to receive(:del)
-          allow(Canvas).to receive_messages(redis: redis)
+          allow(Canvas).to receive_messages(redis:)
           key = DeveloperKey.create! redirect_uri: "https://example.com"
           provider = Canvas::OAuth::Provider.new(key.id, key.redirect_uri, [], nil)
 
@@ -889,7 +889,7 @@ describe UsersController do
         let!(:account) { Account.create! }
 
         before do
-          user_with_pseudonym(account: account)
+          user_with_pseudonym(account:)
           account.account_users.create!(user: @user)
           user_session(@user, @pseudonym)
         end
@@ -988,7 +988,7 @@ describe UsersController do
 
       it "does not allow an admin to set the sis id when creating a user if they don't have privileges to manage sis" do
         account = Account.create!
-        admin = account_admin_user_with_role_changes(account: account, role_changes: { "manage_sis" => false })
+        admin = account_admin_user_with_role_changes(account:, role_changes: { "manage_sis" => false })
         user_session(admin)
         post "create", params: { account_id: account.id, pseudonym: { unique_id: "jacob@instructure.com", sis_user_id: "testsisid" }, user: { name: "Jacob Fugal" } }, format: "json"
         expect(response).to be_successful
@@ -1001,7 +1001,7 @@ describe UsersController do
 
       it "notifies the user if a merge opportunity arises" do
         account = Account.create!
-        user_with_pseudonym(account: account)
+        user_with_pseudonym(account:)
         account.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
         @admin = @user
@@ -1032,7 +1032,7 @@ describe UsersController do
         notification = Notification.create(name: "Merge Email Communication Channel", category: "Registration")
 
         account = Account.create!
-        user_with_pseudonym(account: account)
+        user_with_pseudonym(account:)
         account.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
         @admin = @user
@@ -1129,7 +1129,7 @@ describe UsersController do
     let_once(:course) { course_factory(active_all: true) }
     let_once(:student) { user_factory(active_all: true) }
     let_once(:student_enrollment) do
-      course_with_user("StudentEnrollment", course: course, user: student, active_all: true)
+      course_with_user("StudentEnrollment", course:, user: student, active_all: true)
     end
     let_once(:grading_period_group) { group_helper.legacy_create_for_course(course) }
     let_once(:grading_period) do
@@ -1145,14 +1145,14 @@ describe UsersController do
     let(:grading_scheme) { json.fetch("grading_scheme") }
 
     before(:once) do
-      assignment_1 = assignment_model(course: course, due_at: Time.zone.now, points_possible: 10)
+      assignment_1 = assignment_model(course:, due_at: Time.zone.now, points_possible: 10)
       assignment_1.grade_student(student, grade: "40%", grader: @teacher)
-      assignment_2 = assignment_model(course: course, due_at: 3.months.from_now, points_possible: 100)
+      assignment_2 = assignment_model(course:, due_at: 3.months.from_now, points_possible: 100)
       assignment_2.grade_student(student, grade: "100%", grader: @teacher)
     end
 
     def get_grades!(grading_period_id)
-      get("grades_for_student", params: { grading_period_id: grading_period_id, enrollment_id: student_enrollment.id })
+      get("grades_for_student", params: { grading_period_id:, enrollment_id: student_enrollment.id })
     end
 
     context "as a student" do
@@ -1222,7 +1222,7 @@ describe UsersController do
 
       context "when requesting a specific grading period grade" do
         before(:once) do
-          student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: 89.2)
+          student_enrollment.scores.find_by!(grading_period:).update!(override_score: 89.2)
         end
 
         it "returns okay" do
@@ -1242,7 +1242,7 @@ describe UsersController do
           end
 
           it "sets the grade to the computed grading period score when no grading period override score exists" do
-            student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: nil)
+            student_enrollment.scores.find_by!(grading_period:).update!(override_score: nil)
             get_grades!(grading_period.id)
             expect(grade).to be 40.0
           end
@@ -1264,7 +1264,7 @@ describe UsersController do
     end
 
     context "as a teacher" do
-      let(:teacher) { course_with_user("TeacherEnrollment", course: course, active_all: true).user }
+      let(:teacher) { course_with_user("TeacherEnrollment", course:, active_all: true).user }
 
       it "shows the computed score, even if override scores exist and feature is enabled" do
         course.enable_feature!(:final_grades_override)
@@ -1303,7 +1303,7 @@ describe UsersController do
     context "with unposted assignments" do
       before do
         unposted_assignment = assignment_model(
-          course: course,
+          course:,
           due_at: Time.zone.now,
           points_possible: 90
         )
@@ -1448,7 +1448,7 @@ describe UsersController do
 
       context "when requesting a specific grading period grade" do
         before(:once) do
-          student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: 89.2)
+          student_enrollment.scores.find_by!(grading_period:).update!(override_score: 89.2)
         end
 
         it "returns okay" do
@@ -1468,7 +1468,7 @@ describe UsersController do
           end
 
           it "sets the grade to the computed grading period score when no grading period override score exists" do
-            student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: nil)
+            student_enrollment.scores.find_by!(grading_period:).update!(override_score: nil)
             get_grades!(grading_period.id)
             expect(grade).to be 40.0
           end
@@ -1542,7 +1542,7 @@ describe UsersController do
       params = {}
       params[:course_id] = course_1.id if grading_period_id.present?
       params[:grading_period_id] = grading_period_id if grading_period_id.present?
-      get("grades", params: params)
+      get("grades", params:)
     end
 
     context "as a student" do
@@ -1560,7 +1560,7 @@ describe UsersController do
 
       context "when requesting a specific grading period grade" do
         before(:once) do
-          student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: 89.2)
+          student_enrollment.scores.find_by!(grading_period:).update!(override_score: 89.2)
         end
 
         it "returns okay" do
@@ -1580,7 +1580,7 @@ describe UsersController do
           end
 
           it "sets the grade to the computed grading period score when no grading period override score exists" do
-            student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: nil)
+            student_enrollment.scores.find_by!(grading_period:).update!(override_score: nil)
             get_grades!(grading_period_id: grading_period.id)
             expect(grade).to be 40.0
           end
@@ -1607,7 +1607,7 @@ describe UsersController do
 
       context "when not requesting a specific grading period and a grading period is current" do
         before(:once) do
-          student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: 89.2)
+          student_enrollment.scores.find_by!(grading_period:).update!(override_score: 89.2)
         end
 
         it "returns okay" do
@@ -1627,7 +1627,7 @@ describe UsersController do
           end
 
           it "sets the grade to the computed grading period score when no grading period override score exists" do
-            student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: nil)
+            student_enrollment.scores.find_by!(grading_period:).update!(override_score: nil)
             get_grades!
             expect(grade).to be 40.0
           end
@@ -1721,7 +1721,7 @@ describe UsersController do
 
       context "when requesting a specific grading period grade" do
         before(:once) do
-          student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: 89.2)
+          student_enrollment.scores.find_by!(grading_period:).update!(override_score: 89.2)
         end
 
         it "returns okay" do
@@ -1741,7 +1741,7 @@ describe UsersController do
           end
 
           it "sets the grade to the computed grading period score when no grading period override score exists" do
-            student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: nil)
+            student_enrollment.scores.find_by!(grading_period:).update!(override_score: nil)
             get_grades!(grading_period_id: grading_period.id)
             expect(grade).to be 40.0
           end
@@ -1768,7 +1768,7 @@ describe UsersController do
 
       context "when not requesting a specific grading period and a grading period is current" do
         before(:once) do
-          student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: 89.2)
+          student_enrollment.scores.find_by!(grading_period:).update!(override_score: 89.2)
         end
 
         it "returns okay" do
@@ -1788,7 +1788,7 @@ describe UsersController do
           end
 
           it "sets the grade to the computed grading period score when no grading period override score exists" do
-            student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: nil)
+            student_enrollment.scores.find_by!(grading_period:).update!(override_score: nil)
             get_grades!
             expect(grade).to be 40.0
           end
@@ -1914,7 +1914,7 @@ describe UsersController do
         course_with_user("StudentEnrollment", course: test_course, user: student1, active_all: true)
         @shard1.activate do
           account = Account.create!
-          @course2 = course_factory(active_all: true, account: account)
+          @course2 = course_factory(active_all: true, account:)
           course_with_user("StudentEnrollment", course: @course2, user: student1, active_all: true)
           grading_period_group2 = group_helper.legacy_create_for_course(@course2)
           @grading_period2 = grading_period_group2.grading_periods.create!(
@@ -2141,7 +2141,7 @@ describe UsersController do
 
     it "does not allow you to view any user by id" do
       pseudonym(@admin)
-      user_with_pseudonym(account: account)
+      user_with_pseudonym(account:)
       get "admin_merge", params: { user_id: @admin.id, pending_user_id: @user.id }
       expect(response).to be_successful
       expect(assigns[:pending_other_user]).to be_nil
@@ -2261,9 +2261,9 @@ describe UsersController do
 
     it "responds to JSON request" do
       account = Account.create!
-      course_with_student(active_all: true, account: account)
-      account_admin_user(account: account)
-      user_with_pseudonym(user: @admin, account: account)
+      course_with_student(active_all: true, account:)
+      account_admin_user(account:)
+      user_with_pseudonym(user: @admin, account:)
       user_session(@admin)
       get "show", params: { id: @student.id }, format: "json"
       expect(response).to be_successful
@@ -2338,7 +2338,7 @@ describe UsersController do
       user_session(admin)
       @shard1.activate do
         account = Account.create!
-        user2 = user_with_pseudonym(account: account)
+        user2 = user_with_pseudonym(account:)
         allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
         post "masquerade", params: { user_id: user2.id }
         expect(response).to be_redirect
@@ -2354,7 +2354,7 @@ describe UsersController do
       user_session(admin)
       @shard1.activate do
         account = Account.create!
-        user2 = user_with_pseudonym(account: account)
+        user2 = user_with_pseudonym(account:)
         allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
         post "masquerade", params: { user_id: user2.id }
         expect(response).not_to be_redirect
@@ -2370,7 +2370,7 @@ describe UsersController do
       user_session(admin)
       @shard1.activate do
         account = Account.create!
-        user2 = user_with_pseudonym(account: account)
+        user2 = user_with_pseudonym(account:)
         allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
         post "masquerade", params: { user_id: user2.id }
         expect(response).to be_redirect
@@ -2429,7 +2429,7 @@ describe UsersController do
 
     before do
       account = Account.create!
-      course_with_student(active_all: true, account: account)
+      course_with_student(active_all: true, account:)
       user_session(@student)
     end
 

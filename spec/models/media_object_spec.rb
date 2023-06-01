@@ -44,7 +44,7 @@ describe MediaObject do
   describe ".build_media_objects" do
     it "deletes attachments created temporarily for import" do
       folder = Folder.assert_path(CC::CCHelper::MEDIA_OBJECTS_FOLDER, @course)
-      @a1 = attachment_model(folder: folder, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
+      @a1 = attachment_model(folder:, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
       @a2 = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
       data = {
         entries: [

@@ -85,7 +85,7 @@ describe PageView::Pv4Client do
 
         res = double(body: { "page_views" => [pv4_object] }.to_json)
         expect(CanvasHttp).to receive(:get).with(expect_url, expect_header).and_return(res)
-        client.fetch(1, start_time: start_time, end_time: end_time)
+        client.fetch(1, start_time:, end_time:)
       end
     end
   end

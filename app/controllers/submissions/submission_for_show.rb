@@ -23,7 +23,7 @@ module Submissions
     attr_reader :id
 
     def initialize(assignment_id:, context:, id:, preview: false, version: nil)
-      super(assignment_id: assignment_id, context: context, preview: preview, version: version)
+      super(assignment_id:, context:, preview:, version:)
       @id = id
     end
 

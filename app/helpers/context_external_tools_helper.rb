@@ -53,7 +53,7 @@ module ContextExternalToolsHelper
 
     link_attrs[:class] = options[:link_class] if options[:link_class]
     if options[:show_icon]
-      rendered_icon = render(partial: "external_tools/helpers/icon", locals: { tool: tool })
+      rendered_icon = render(partial: "external_tools/helpers/icon", locals: { tool: })
       rendered_icon = sanitize(rendered_icon.squish) if options[:remove_space_between_icon_and_text]
     end
     link = content_tag(:a, link_attrs) do

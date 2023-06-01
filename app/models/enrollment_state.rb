@@ -214,7 +214,7 @@ class EnrollmentState < ActiveRecord::Base
   end
 
   def self.process_states_in_ranges(start_at, end_at, enrollment_scope = Enrollment.all)
-    Enrollment.find_ids_in_ranges(start_at: start_at, end_at: end_at, batch_size: 250) do |min_id, max_id|
+    Enrollment.find_ids_in_ranges(start_at:, end_at:, batch_size: 250) do |min_id, max_id|
       process_states_for(enrollments_needing_calculation(enrollment_scope).where(id: min_id..max_id))
     end
   end

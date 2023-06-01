@@ -20,8 +20,8 @@
 
 module Auditors
   class << self
-    def stream(&block)
-      ::EventStream::Stream.new(&block).tap do |stream|
+    def stream(&)
+      ::EventStream::Stream.new(&).tap do |stream|
         stream.raise_on_error ||= Rails.env.test?
 
         stream.on_insert do |record|

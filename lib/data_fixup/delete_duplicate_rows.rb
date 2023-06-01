@@ -28,7 +28,7 @@ module DataFixup
                     .select("ROW_NUMBER() OVER (PARTITION BY #{partition_by} ORDER BY #{order}) AS row_num")
       middle_scope = model.from(inner_scope).select(:id).where("row_num>1")
       outer_scope = model.where(id: middle_scope)
-      outer_scope.in_batches(of: batch_size, strategy: strategy).delete_all
+      outer_scope.in_batches(of: batch_size, strategy:).delete_all
     end
   end
 end

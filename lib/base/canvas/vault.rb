@@ -67,7 +67,7 @@ module Canvas::Vault
       # Default to flat file if vault is unconfigured
       return Canvas::Vault::FileClient.get_client if addr.nil? || addr == "file"
 
-      Vault::Client.new(address: addr, token: token)
+      Vault::Client.new(address: addr, token:)
     end
 
     def kv_mount

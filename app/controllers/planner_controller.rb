@@ -238,7 +238,7 @@ class PlannerController < ApplicationController
     # moderation = @user.assignments_needing_moderation(default_opts)
     viewing = @user.assignments_for_student("viewing", **default_opts)
                    .preload(:quiz, :discussion_topic, :wiki_page)
-    scopes = { viewing: viewing }
+    scopes = { viewing: }
     # TODO: Add when ready (see above comment)
     # scopes[:grading] = grading if grading
     # scopes[:moderation] = moderation if moderation
@@ -296,7 +296,7 @@ class PlannerController < ApplicationController
     course_ids = @course_ids.map { |id| Shard.relative_id_for(id, @user.shard, shard) }
     course_ids += [nil] if @user_ids.present?
     item_collection("planner_notes",
-                    shard.activate { PlannerNote.active.where(user: user, todo_date: @start_date..@end_date, course_id: course_ids) },
+                    shard.activate { PlannerNote.active.where(user:, todo_date: @start_date..@end_date, course_id: course_ids) },
                     PlannerNote,
                     [:todo_date, :created_at],
                     :id)
@@ -402,7 +402,7 @@ class PlannerController < ApplicationController
       original_user_ids = @user_ids || []
       original_account_ids = @account_ids || []
       if @user
-        @course_ids = @user.course_ids_for_todo_lists(:student, course_ids: @course_ids, include_concluded: include_concluded)
+        @course_ids = @user.course_ids_for_todo_lists(:student, course_ids: @course_ids, include_concluded:)
         @group_ids = @user.group_ids_for_todo_lists(group_ids: @group_ids)
         @account_ids ||= @enabled_account_calendars
         @account_ids &= @enabled_account_calendars
@@ -472,7 +472,7 @@ class PlannerController < ApplicationController
     {
       include_ignored: true,
       include_ungraded: true,
-      include_concluded: include_concluded,
+      include_concluded:,
       include_locked: true,
       due_before: end_date,
       due_after: start_date,

@@ -142,12 +142,12 @@ class MediaObjectsController < ApplicationController
 
               if root_folder.grants_right?(@current_user, :read_contents)
                 if media_attachment
-                  attachment_scope = Attachment.not_deleted.is_media_object.where(context: context)
+                  attachment_scope = Attachment.not_deleted.is_media_object.where(context:)
                   attachment_scope = attachment_scope.select { |att| access_allowed(att, @current_user, :download) }
 
                   MediaObject.by_media_id(attachment_scope.pluck(:media_entry_id))
                 else
-                  MediaObject.active.where(context: context)
+                  MediaObject.active.where(context:)
                 end
               else
                 render_unauthorized_action # not allowed to view files in the context
@@ -254,9 +254,9 @@ class MediaObjectsController < ApplicationController
     config = CanvasKaltura::ClientV3.config
     if config
       redirect_to CanvasKaltura::ClientV3.new.thumbnail_url(@media_object.try(:media_id) || @media_id,
-                                                            width: width,
-                                                            height: height,
-                                                            type: type),
+                                                            width:,
+                                                            height:,
+                                                            type:),
                   status: :moved_permanently
     else
       render plain: t(:media_objects_not_configured, "Media Objects not configured")

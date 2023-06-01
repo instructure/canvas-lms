@@ -142,7 +142,7 @@ describe GraphQLController do
       def create_discussion_entry(message)
         post :execute,
              params: {
-               query: mutation_str(discussion_topic_id: @topic.id, message: message),
+               query: mutation_str(discussion_topic_id: @topic.id, message:),
                operationName: "CreateDiscussionEntry",
                variables: {
                  courseID: @course.id,
@@ -171,7 +171,7 @@ describe GraphQLController do
       before { allow(InstStatsd::Statsd).to receive(:increment).and_call_original }
 
       def expect_increment(metric, tags)
-        expect(InstStatsd::Statsd).to have_received(:increment).with(metric, tags: tags)
+        expect(InstStatsd::Statsd).to have_received(:increment).with(metric, tags:)
       end
 
       context "for first-party queries" do

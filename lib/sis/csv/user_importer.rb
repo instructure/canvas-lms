@@ -22,7 +22,7 @@ module SIS
   module CSV
     class UserImporter < CSVBaseImporter
       def self.user_csv?(row)
-        login_csv = (row & %w[existing_user_id existing_integration_id existing_canvas_user_id].freeze).empty?
+        login_csv = !row.intersect?(%w[existing_user_id existing_integration_id existing_canvas_user_id].freeze)
         row.include?("user_id") && row.include?("login_id") && login_csv
       end
 
@@ -68,8 +68,8 @@ module SIS
           sortable_name: row["sortable_name"],
           home_account: row["home_account"],
           lineno: row["lineno"],
-          csv: csv,
-          row: row,
+          csv:,
+          row:,
           authentication_provider_id: row["authentication_provider_id"]
         )
       end

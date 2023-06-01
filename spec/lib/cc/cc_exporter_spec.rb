@@ -345,8 +345,8 @@ describe "Common Cartridge exporting" do
     describe "hidden folders" do
       before :once do
         folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
-        linked_att = Attachment.create!(filename: "linked.png", uploaded_data: StringIO.new("1"), folder: folder, context: @course)
-        Attachment.create!(filename: "not-linked.jpg", uploaded_data: StringIO.new("2"), folder: folder, context: @course)
+        linked_att = Attachment.create!(filename: "linked.png", uploaded_data: StringIO.new("1"), folder:, context: @course)
+        Attachment.create!(filename: "not-linked.jpg", uploaded_data: StringIO.new("2"), folder:, context: @course)
         @course.wiki_pages.create!(title: "paeg", body: "Image yo: <img src=\"/courses/#{@course.id}/files/#{linked_att.id}/preview\">")
         @ce.export_type = ContentExport::COMMON_CARTRIDGE
         @ce.save!
@@ -713,7 +713,7 @@ describe "Common Cartridge exporting" do
 
     context "LTI 1.3 Assignments" do
       subject do
-        run_export(version: version)
+        run_export(version:)
         @manifest_doc
       end
 
@@ -742,7 +742,7 @@ describe "Common Cartridge exporting" do
 
       before do
         non_assignment_link
-        tool.update!(developer_key: developer_key)
+        tool.update!(developer_key:)
         assignment.external_tool_tag = tag
         assignment.save!
         assignment.primary_resource_link.update!(custom: { foo: "assignment" })
@@ -876,10 +876,10 @@ describe "Common Cartridge exporting" do
         tool_proxy.save!
         tool_proxy.tool_settings.create!(
           context: course,
-          tool_proxy: tool_proxy,
+          tool_proxy:,
           resource_link_id: assignment.lti_context_id,
-          custom: custom,
-          custom_parameters: custom_parameters,
+          custom:,
+          custom_parameters:,
           product_code: tool_proxy.product_family.product_code,
           vendor_code: tool_proxy.product_family.vendor_code
         )
@@ -1082,18 +1082,18 @@ describe "Common Cartridge exporting" do
         folder = Folder.root_folders(@course).first
         @visible = Attachment.create!({
                                         uploaded_data: stub_png_data("visible.png"),
-                                        folder: folder,
+                                        folder:,
                                         context: @course
                                       })
         @hidden = Attachment.create!({
                                        uploaded_data: stub_png_data("hidden.png"),
-                                       folder: folder,
+                                       folder:,
                                        context: @course,
                                        hidden: true
                                      })
         @locked = Attachment.create!({
                                        uploaded_data: stub_png_data("locked.png"),
-                                       folder: folder,
+                                       folder:,
                                        context: @course,
                                        locked: true
                                      })

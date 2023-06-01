@@ -102,7 +102,7 @@ describe DelayedMessage do
   it "uses the user's main account domain for links" do
     Canvas::MessageHelper.create_notification(name: "Summaries", category: "Summaries")
     account = Account.create!(name: "new acct")
-    user = user_with_pseudonym(account: account)
+    user = user_with_pseudonym(account:)
     expect(user.pseudonym.account).to eq account
     expect(SisPseudonym).to receive(:for).with(user, Account.default, type: :implicit, require_sis: false).and_return(user.pseudonym)
     expect(HostUrl).to receive(:context_host).with(account, any_args).at_least(1).and_return("dm.dummy.test.host")
@@ -118,7 +118,7 @@ describe DelayedMessage do
   it "returns nil if the delayed messages are using a retired communication channel" do
     Canvas::MessageHelper.create_notification(name: "Summaries", category: "Summaries")
     account = Account.create!(name: "new acct")
-    user = user_with_pseudonym(account: account)
+    user = user_with_pseudonym(account:)
     user.communication_channel.retire!
     dm = DelayedMessage.create!(summary: "This is a notification", context: Account.default, communication_channel: user.communication_channel, notification: notification_model)
     expect(DelayedMessage.summarize([dm])).to be_nil
@@ -148,7 +148,7 @@ describe DelayedMessage do
 
       @shard1.activate do
         account = Account.create!(name: "new acct")
-        user = user_with_pseudonym(account: account)
+        user = user_with_pseudonym(account:)
         expect(user.pseudonym.account).to eq account
         expect(HostUrl).to receive(:context_host).with(user.pseudonym.account, any_args).at_least(1).and_return("dm.dummy.test.host")
         allow(HostUrl).to receive(:default_host).and_return("test.host")

@@ -20,7 +20,7 @@
 require "i18nliner/scope"
 
 class I18nliner::Scope
-  ABSOLUTE_KEY = /\A#/.freeze
+  ABSOLUTE_KEY = /\A#/
 
   def normalize_key(key, inferred_key, explicit_scope_option)
     return nil if key.nil?

@@ -98,7 +98,7 @@ module Importers
     def self.flatten_item(item, indent)
       if item["type"] == "submodule"
         sub_items = []
-        sub_items << { type: "heading", title: item["title"], indent: indent, migration_id: item["migration_id"] }.with_indifferent_access
+        sub_items << { type: "heading", title: item["title"], indent:, migration_id: item["migration_id"] }.with_indifferent_access
         sub_items += (item["items"] || []).map { |i| flatten_item(i, indent + 1) }
         sub_items
       else
@@ -113,7 +113,7 @@ module Importers
 
       item ||= ContextModule.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= ContextModule.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
-      item ||= ContextModule.new(context: context)
+      item ||= ContextModule.new(context:)
       item.migration_id = hash[:migration_id]
       migration.add_imported_item(item)
       item.name = hash[:title] || hash[:description]
@@ -202,7 +202,7 @@ module Importers
       hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
       existing_item = context_module.content_tags.where(id: hash[:id]).first if hash[:id].present?
       existing_item ||= context_module.content_tags.where(migration_id: hash[:migration_id]).first if hash[:migration_id]
-      existing_item ||= ContentTag.new(context_module: context_module, context: context)
+      existing_item ||= ContentTag.new(context_module:, context:)
 
       existing_item.mark_as_importing!(migration)
       migration.add_imported_item(existing_item)
@@ -228,7 +228,7 @@ module Importers
         if file
           title = hash[:title] || hash[:linked_resource_title]
           item = context_module.add_item({
-                                           title: title,
+                                           title:,
                                            type: "attachment",
                                            id: file.id,
                                            indent: hash[:indent].to_i
@@ -269,7 +269,7 @@ module Importers
                                              title: hash[:title] || hash[:linked_resource_title] || hash["description"],
                                              type: "external_url",
                                              indent: hash[:indent].to_i,
-                                             url: url
+                                             url:
                                            },
                                            existing_item,
                                            position: context_module.migration_position)
@@ -301,11 +301,11 @@ module Importers
           if external_tool_id.nil?
             migration.add_warning(t(:foreign_lti_tool,
                                     'The account External Tool for module item "%{title}" must be configured before the item can be launched',
-                                    title: title))
+                                    title:))
           end
 
           item = context_module.add_item({
-                                           title: title,
+                                           title:,
                                            type: "context_external_tool",
                                            indent: hash[:indent].to_i,
                                            url: external_tool_url,
@@ -322,7 +322,7 @@ module Importers
               t(
                 "The External Tool resource link (including any possible custom " \
                 'parameters) could not be set for module item "%{title}"',
-                title: title
+                title:
               )
             )
           end
@@ -337,7 +337,7 @@ module Importers
                                            id: quiz.id
                                          },
                                          existing_item,
-                                         quiz: quiz,
+                                         quiz:,
                                          position: context_module.migration_position)
         end
       elsif resource_class == DiscussionTopic

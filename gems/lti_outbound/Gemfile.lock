@@ -18,7 +18,7 @@ GEM
     diff-lcs (1.5.0)
     docile (1.4.0)
     hashie (4.1.0)
-    i18n (1.13.0)
+    i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     minitest (5.18.0)
     oauth (1.1.0)

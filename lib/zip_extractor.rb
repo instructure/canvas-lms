@@ -31,9 +31,9 @@ require "zip"
 # them to a context.
 class ZipExtractor
   class << self
-    def call(filename, &block)
+    def call(filename, &)
       ze = new(filename)
-      ze.unzip_files(&block)
+      ze.unzip_files(&)
     end
   end
 

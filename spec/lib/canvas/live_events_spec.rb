@@ -35,7 +35,7 @@ describe Canvas::LiveEvents do
 
   def expect_event(event_name, event_body, event_context = nil)
     expect(LiveEvents).to receive(:post_event).with(
-      event_name: event_name,
+      event_name:,
       payload: event_body,
       time: anything,
       context: event_context
@@ -44,7 +44,7 @@ describe Canvas::LiveEvents do
 
   def dont_expect_event(event_name, event_body)
     expect(LiveEvents).not_to receive(:post_event).with(
-      event_name: event_name,
+      event_name:,
       payload: event_body,
       time: anything,
       context: nil
@@ -97,10 +97,10 @@ describe Canvas::LiveEvents do
       expect(amended_context).to eq(
         {
           context_account_id: course.account.global_id,
-          context_id: context_id,
+          context_id:,
           context_sis_source_id: "some-course-sis-id",
-          context_type: context_type,
-          root_account_id: root_account_id,
+          context_type:,
+          root_account_id:,
           root_account_uuid: root_account_uuid.to_s,
           root_account_lti_guid: root_account_lti_guid.to_s,
           compact_live_events: true
@@ -203,7 +203,7 @@ describe Canvas::LiveEvents do
 
     it "includes the account" do
       account = account_model
-      course = course_model(account: account)
+      course = course_model(account:)
       group = group_model(context: course)
       expect_event("group_updated",
                    hash_including(
@@ -228,7 +228,7 @@ describe Canvas::LiveEvents do
     it "includes the workflow_state" do
       user = user_model
       group = group_model
-      membership = group_membership_model(group: group, user: user)
+      membership = group_membership_model(group:, user:)
 
       expect_event("group_membership_updated",
                    hash_including(
@@ -628,7 +628,7 @@ describe Canvas::LiveEvents do
       end
 
       it "includes the group_id if assignment is a group assignment" do
-        submission.update(group: group)
+        submission.update(group:)
 
         expect_event(
           event_name,
@@ -648,7 +648,7 @@ describe Canvas::LiveEvents do
             product_code: "turnitin-lti",
             vendor_name: "TurnItIn",
             root_account: account,
-            developer_key: developer_key
+            developer_key:
           )
         end
 
@@ -665,7 +665,7 @@ describe Canvas::LiveEvents do
           tool_proxy.save!
 
           Lti::ResourceHandler.create!(
-            tool_proxy: tool_proxy,
+            tool_proxy:,
             name: "resource_handler",
             resource_type_code: "resource-type-code"
           )
@@ -899,7 +899,7 @@ describe Canvas::LiveEvents do
                      context_id: "1"
                    }).once
 
-      Canvas::LiveEvents.asset_access(@attachment, "files", "role", "participation", context: context)
+      Canvas::LiveEvents.asset_access(@attachment, "files", "role", "participation", context:)
     end
 
     it "includes enrollment data if provided" do
@@ -1003,9 +1003,9 @@ describe Canvas::LiveEvents do
     context "when the assignment is created as part of a blueprint sync" do
       before do
         course = course_model
-        master_template = MasterCourses::MasterTemplate.create!(course: course)
+        master_template = MasterCourses::MasterTemplate.create!(course:)
         child_course = course_model
-        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: child_course)
+        MasterCourses::ChildSubscription.create!(master_template:, child_course:)
         @assignment = child_course.assignments.create!(assignment_valid_attributes
           .merge({ migration_id: "mastercourse_1_1_bd72ce9cf355d1b2cc467b2156842281" }))
       end
@@ -1043,7 +1043,7 @@ describe Canvas::LiveEvents do
       before do
         master_template = MasterCourses::MasterTemplate.create!(course: course_model)
         child_course = course_model
-        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: child_course)
+        MasterCourses::ChildSubscription.create!(master_template:, child_course:)
         @assignment = child_course.assignments.create!(assignment_valid_attributes)
       end
 
@@ -1060,7 +1060,7 @@ describe Canvas::LiveEvents do
     context "when the assignment is manually created in a blueprint course" do
       before do
         course = course_model
-        MasterCourses::MasterTemplate.create!(course: course)
+        MasterCourses::MasterTemplate.create!(course:)
         @assignment = course.assignments.create!(assignment_valid_attributes)
       end
 
@@ -1093,7 +1093,7 @@ describe Canvas::LiveEvents do
           product_code: "turnitin-lti",
           vendor_name: "TurnItIn",
           root_account: account,
-          developer_key: developer_key
+          developer_key:
         )
       end
 
@@ -1109,7 +1109,7 @@ describe Canvas::LiveEvents do
         tool_proxy.save!
 
         Lti::ResourceHandler.create!(
-          tool_proxy: tool_proxy,
+          tool_proxy:,
           name: "resource_handler",
           resource_type_code: "resource-type-code"
         )
@@ -1176,7 +1176,7 @@ describe Canvas::LiveEvents do
           product_code: "turnitin-lti",
           vendor_name: "TurnItIn",
           root_account: account,
-          developer_key: developer_key
+          developer_key:
         )
       end
 
@@ -1193,7 +1193,7 @@ describe Canvas::LiveEvents do
         tool_proxy.save!
 
         Lti::ResourceHandler.create!(
-          tool_proxy: tool_proxy,
+          tool_proxy:,
           name: "resource_handler",
           resource_type_code: "resource-type-code"
         )
@@ -1362,7 +1362,7 @@ describe Canvas::LiveEvents do
     let(:source_course) { course_factory }
     let(:migration) do
       ContentMigration.create(context: course,
-                              source_course: source_course,
+                              source_course:,
                               migration_type: "some_type",
                               workflow_state: "imported")
     end
@@ -1548,7 +1548,7 @@ describe Canvas::LiveEvents do
       content_tag = ContentTag.create!(
         title: "content",
         context: @course,
-        context_module: context_module,
+        context_module:,
         content: @course.assignments.first
       )
 
@@ -1574,7 +1574,7 @@ describe Canvas::LiveEvents do
       content_tag = ContentTag.create!(
         title: "content",
         context: @course,
-        context_module: context_module,
+        context_module:,
         content: @course.assignments.first
       )
 
@@ -1655,7 +1655,7 @@ describe Canvas::LiveEvents do
 
       cmp_id = context_module_progression.context_module.global_context_id
       singleton = "course_progress_course_#{cmp_id}_user_#{context_module_progression.global_user_id}"
-      job = Delayed::Job.where(singleton: singleton).take
+      job = Delayed::Job.where(singleton:).take
       expect(job).not_to be_nil
       expect(job.run_at).to be > Time.now
       expect(job.max_concurrent).to eq 1
@@ -2269,7 +2269,7 @@ describe Canvas::LiveEvents do
       @friendlyDescription = OutcomeFriendlyDescription.create!(
         learning_outcome: @outcome,
         context: @context,
-        description: description
+        description:
       )
     end
 
@@ -2491,7 +2491,7 @@ describe Canvas::LiveEvents do
       expect_event("default_blueprint_restrictions_updated", {
                      canvas_course_id: @course.id.to_s,
                      canvas_course_uuid: @course.uuid,
-                     restrictions: restrictions
+                     restrictions:
                    }).once
     end
 
@@ -2499,8 +2499,8 @@ describe Canvas::LiveEvents do
       @course = course_model
       @master_template = MasterCourses::MasterTemplate.create!(
         course: @course,
-        default_restrictions: default_restrictions,
-        default_restrictions_by_type: default_restrictions_by_type
+        default_restrictions:,
+        default_restrictions_by_type:
       )
     end
 
@@ -2554,7 +2554,7 @@ describe Canvas::LiveEvents do
       course_model
       default_restrictions = { content: true, points: false, due_dates: false, availability_dates: false }
       master_template =
-        MasterCourses::MasterTemplate.create!(course: @course, default_restrictions: default_restrictions)
+        MasterCourses::MasterTemplate.create!(course: @course, default_restrictions:)
       assignment = @course.assignments.create!
       master_content_tag_params = {
         master_template_id: master_template.id,
@@ -2600,7 +2600,7 @@ describe Canvas::LiveEvents do
       end
 
       it "sets region to Canvas.region" do
-        expect_event("heartbeat", { region: region, environment: "test", region_code: region_code })
+        expect_event("heartbeat", { region:, environment: "test", region_code: })
         Canvas::LiveEvents.heartbeat
       end
     end
@@ -2614,7 +2614,7 @@ describe Canvas::LiveEvents do
         end
 
         it "sets environment to development" do
-          expect_event("heartbeat", { region: "not_configured", environment: environment, region_code: "not_configured" })
+          expect_event("heartbeat", { region: "not_configured", environment:, region_code: "not_configured" })
           Canvas::LiveEvents.heartbeat
         end
       end
@@ -2628,7 +2628,7 @@ describe Canvas::LiveEvents do
         end
 
         it "sets environment to beta" do
-          expect_event("heartbeat", { region: "not_configured", environment: environment, region_code: "not_configured" })
+          expect_event("heartbeat", { region: "not_configured", environment:, region_code: "not_configured" })
           Canvas::LiveEvents.heartbeat
         end
       end
@@ -2641,7 +2641,7 @@ describe Canvas::LiveEvents do
         end
 
         it "sets environment to prod" do
-          expect_event("heartbeat", { region: "not_configured", environment: environment, region_code: "not_configured" })
+          expect_event("heartbeat", { region: "not_configured", environment:, region_code: "not_configured" })
           Canvas::LiveEvents.heartbeat
         end
       end

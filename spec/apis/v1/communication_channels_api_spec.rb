@@ -312,7 +312,7 @@ describe "CommunicationChannels API", type: :request do
     let_once(:someone) { user_with_pseudonym }
     let_once(:admin) do
       user = user_with_pseudonym
-      Account.default.account_users.create!(user: user)
+      Account.default.account_users.create!(user:)
       user
     end
     let_once(:channel) { someone.communication_channel }

@@ -239,7 +239,7 @@ class GroupMembershipsController < ApplicationController
       @membership = @group.group_memberships.find(params[:membership_id])
     else
       user_id = Api.map_ids([params[:user_id]], @group.users, @domain_root_account, @current_user).first
-      @membership = @group.group_memberships.where(user_id: user_id).first!
+      @membership = @group.group_memberships.where(user_id:).first!
     end
   end
 end

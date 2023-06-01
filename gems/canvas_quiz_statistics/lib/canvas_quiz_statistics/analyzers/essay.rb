@@ -73,7 +73,7 @@ module CanvasQuizStatistics::Analyzers
       responses.each { |response| point_distribution[response[:points]] += 1 }
 
       point_distribution.keys.map do |score|
-        { score: score, count: point_distribution[score] }
+        { score:, count: point_distribution[score] }
       end.sort_by { |v| v[:score] || -1 }
     end
 

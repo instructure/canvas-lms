@@ -56,7 +56,7 @@ module Lti::IMS::Concerns
         @tool ||= context && developer_key &&
                   Lti::ContextToolFinder.new(
                     context,
-                    base_scope: ContextExternalTool.order(:id).where(developer_key: developer_key)
+                    base_scope: ContextExternalTool.order(:id).where(developer_key:)
                   ).all_tools_scope_union.take
       end
     end

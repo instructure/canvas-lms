@@ -32,7 +32,7 @@ module SpecComponents
       @component_assignment = assignment_model(
         context: course,
         title: assignment_title,
-        due_at: due_at
+        due_at:
       )
       @id = @component_assignment.id
       @title = @component_assignment.title

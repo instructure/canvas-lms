@@ -122,7 +122,7 @@ module CC
         unless files[:folders].empty?
           root_node.folders do |folders_node|
             files[:folders].each do |folder, path|
-              folders_node.folder(path: path) do |folder_node|
+              folders_node.folder(path:) do |folder_node|
                 folder_node.locked "true" if folder.locked
                 folder_node.hidden "true" if folder.hidden?
                 folder_node.lock_at CCHelper.ims_datetime(folder.lock_at) if folder.lock_at

@@ -122,7 +122,7 @@ module Lti::IMS::Concerns
             unlock_at: content_item.dig(:available, :startDateTime),
             lock_at: content_item.dig(:available, :endDateTime),
             due_at: content_item.dig(:submission, :endDateTime),
-            post_to_sis: post_to_sis,
+            post_to_sis:,
             external_tool_tag_attributes: {
               content_type: "ContextExternalTool",
               content_id: tool.id,

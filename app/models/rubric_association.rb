@@ -108,7 +108,7 @@ class RubricAssociation < ActiveRecord::Base
 
   scope :active, -> { where("rubric_associations.workflow_state<>'deleted'") }
   scope :bookmarked, -> { where(bookmarked: true) }
-  scope :for_purpose, ->(purpose) { where(purpose: purpose) }
+  scope :for_purpose, ->(purpose) { where(purpose:) }
   scope :for_grading, -> { where(purpose: "grading") }
   scope :for_context_codes, ->(codes) { where(context_code: codes) }
   scope :include_rubric, -> { preload(:rubric) }
@@ -116,7 +116,7 @@ class RubricAssociation < ActiveRecord::Base
 
   def assert_uniqueness
     if purpose == "grading"
-      RubricAssociation.where(association_id: association_id, association_type: association_type, purpose: "grading").each do |ra|
+      RubricAssociation.where(association_id:, association_type:, purpose: "grading").each do |ra|
         next if ra == self
 
         ra.rubric_assessments.update_all(rubric_association_id: nil)
@@ -265,10 +265,10 @@ class RubricAssociation < ActiveRecord::Base
     association ||= rubric.associate_with(
       association_object,
       context,
-      current_user: current_user,
+      current_user:,
       use_for_grading: params[:use_for_grading] == "1",
       purpose: params[:purpose],
-      update_if_existing: update_if_existing
+      update_if_existing:
     )
     association.rubric = rubric
     if association.rubric_id_changed? && association_object.is_a?(Assignment)
@@ -314,7 +314,7 @@ class RubricAssociation < ActiveRecord::Base
       if group
         provisional_grader = opts[:artifact].is_a?(ModeratedGrading::ProvisionalGrade) && opts[:assessor]
         artifacts_to_assess = students_to_assess.map do |student|
-          association_object.find_asset_for_assessment(self, student, provisional_grader: provisional_grader).first
+          association_object.find_asset_for_assessment(self, student, provisional_grader:).first
         end
       else
         artifacts_to_assess = [opts[:artifact]]
@@ -380,7 +380,7 @@ class RubricAssociation < ActiveRecord::Base
         # Assessments are unique per artifact/assessor/assessment_type.
         assessment = association.rubric_assessments.where(artifact_id: artifact, artifact_type: artifact.class.to_s, assessor_id: opts[:assessor], assessment_type: params[:assessment_type]).first
       end
-      assessment ||= association.rubric_assessments.build(assessor: opts[:assessor], artifact: artifact, user: artifact.student, rubric: rubric, assessment_type: params[:assessment_type])
+      assessment ||= association.rubric_assessments.build(assessor: opts[:assessor], artifact:, user: artifact.student, rubric:, assessment_type: params[:assessment_type])
       assessment.score = score if replace_ratings
       assessment.data = ratings if replace_ratings
 
@@ -423,16 +423,16 @@ class RubricAssociation < ActiveRecord::Base
               end
 
     AnonymousOrModerationEvent.create!(
-      assignment: assignment,
-      event_type: event_type,
-      payload: payload,
+      assignment:,
+      event_type:,
+      payload:,
       user: @updating_user
     )
   end
 
   def record_deletion_audit_event
     AnonymousOrModerationEvent.create!(
-      assignment: assignment,
+      assignment:,
       event_type: "rubric_deleted",
       payload: { id: rubric_id },
       user: @updating_user

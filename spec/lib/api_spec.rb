@@ -73,13 +73,13 @@ describe Api do
 
     it "does not find record from other account" do
       account = Account.create(name: "new")
-      @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
+      @user = user_with_pseudonym(username: "sis_user_1@example.com", account:)
       expect { @api.api_find(User, "sis_login_id:sis_user_2@example.com") }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "finds record from other root account explicitly" do
       account = Account.create(name: "new")
-      @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
+      @user = user_with_pseudonym(username: "sis_user_1@example.com", account:)
       expect(Api).to receive(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything)
                                            .and_return(["sis_login_id", ["sis_user_1@example.com", account]])
       expect(@api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
@@ -87,8 +87,8 @@ describe Api do
 
     it "allows passing account param and find record" do
       account = Account.create(name: "new")
-      @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
-      expect(@api.api_find(User, "sis_login_id:sis_user_1@example.com", account: account)).to eq @user
+      @user = user_with_pseudonym(username: "sis_user_1@example.com", account:)
+      expect(@api.api_find(User, "sis_login_id:sis_user_1@example.com", account:)).to eq @user
     end
 
     it "does not find a missing sis_id record" do
@@ -121,7 +121,7 @@ describe Api do
 
     it "finds group_category with sis_id" do
       account = Account.create!
-      gc = GroupCategory.create(sis_source_id: "gc_sis", account: account, name: "gc")
+      gc = GroupCategory.create(sis_source_id: "gc_sis", account:, name: "gc")
       expect(gc).to eq TestApiInstance.new(account, nil).api_find(GroupCategory, "sis_group_category_id:gc_sis")
     end
 
@@ -646,7 +646,7 @@ describe Api do
   context "relation_for_sis_mapping" do
     it "passes along the parsed ids to sis_make_params_for_sis_mapping_and_columns" do
       root_account = account_model
-      expect(Api).to receive(:sis_parse_ids).with([1, 2, 3], "lookups", anything, root_account: root_account).and_return({ "users.id" => [4, 5, 6] })
+      expect(Api).to receive(:sis_parse_ids).with([1, 2, 3], "lookups", anything, root_account:).and_return({ "users.id" => [4, 5, 6] })
       expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(User, { "users.id" => [4, 5, 6] }, { lookups: "lookups" }, root_account).and_return("params")
       expect(Api.relation_for_sis_mapping(User, { lookups: "lookups" }, [1, 2, 3], root_account)).to eq "params"
     end
@@ -976,7 +976,7 @@ describe Api do
   context ".paginate" do
     let(:request) { double("request", query_parameters: {}) }
     let(:response) { double("response", headers: {}) }
-    let(:controller) { double("controller", request: request, response: response, params: {}) }
+    let(:controller) { double("controller", request:, response:, params: {}) }
 
     describe "#ordered_colection" do
       it "orders a relation" do
@@ -989,7 +989,7 @@ describe Api do
       let(:collection) { [1, 2, 3] }
 
       it "does not raise Folio::InvalidPage for pages past the end" do
-        controller = double("controller", request: request, response: response, params: { per_page: 1 })
+        controller = double("controller", request:, response:, params: { per_page: 1 })
         expect(Api.paginate(collection, controller, "example.com", page: collection.size + 1))
           .to eq []
       end
@@ -1018,7 +1018,7 @@ describe Api do
 
       context "with no max_per_page argument" do
         it "limits to the default max_per_page" do
-          controller = double("controller", request: request, response: response, params: { per_page: Api.max_per_page + 5 })
+          controller = double("controller", request:, response:, params: { per_page: Api.max_per_page + 5 })
           expect(Api.paginate(collection, controller, "example.com").size)
             .to eq Api.max_per_page
         end
@@ -1026,14 +1026,14 @@ describe Api do
 
       context "with no per_page parameter" do
         it "limits to the default per_page" do
-          controller = double("controller", request: request, response: response, params: {})
+          controller = double("controller", request:, response:, params: {})
           expect(Api.paginate(collection, controller, "example.com").size)
             .to eq Api.per_page
         end
       end
 
       context "with per_page parameter > max_per_page argument" do
-        let(:controller) { double("controller", request: request, response: response, params: { per_page: 100 }) }
+        let(:controller) { double("controller", request:, response:, params: { per_page: 100 }) }
 
         it "takes the smaller of the max_per_page arugment and the per_page param" do
           expect(Api.paginate(collection, controller, "example.com", { max_per_page: 75 }).size)
@@ -1042,7 +1042,7 @@ describe Api do
       end
 
       context "with per_page parameter < max_per_page argument" do
-        let(:controller) { double("controller", request: request, response: response, params: { per_page: 75 }) }
+        let(:controller) { double("controller", request:, response:, params: { per_page: 75 }) }
 
         it "takes the smaller of the max_per_page arugment and the per_page param" do
           expect(Api.paginate(collection, controller, "example.com", { max_per_page: 100 }).size)
@@ -1055,7 +1055,7 @@ describe Api do
   context ".jsonapi_paginate" do
     let(:request) { double("request", query_parameters: {}) }
     let(:response) { double("response", headers: {}) }
-    let(:controller) { double("controller", request: request, response: response, params: {}) }
+    let(:controller) { double("controller", request:, response:, params: {}) }
     let(:collection) { [1, 2, 3] }
 
     it "returns the links in the headers" do

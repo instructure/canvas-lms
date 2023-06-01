@@ -179,7 +179,7 @@ describe "Gradebook - post grades to SIS" do
       course.save
       course.enroll_teacher(@user).accept!
       course.assignments.create!(name: "Assignment1", post_to_sis: true)
-      create_post_grades_tool(course: course)
+      create_post_grades_tool(course:)
 
       Gradebook.visit(@course)
       Gradebook.open_action_menu
@@ -231,7 +231,7 @@ describe "Gradebook - post grades to SIS" do
       course.save
       course.enroll_teacher(@user).accept!
       course.assignments.create!(name: "Assignment1", post_to_sis: true)
-      create_post_grades_tool(course: course)
+      create_post_grades_tool(course:)
 
       Gradebook.visit(@course)
       Gradebook.select_sync

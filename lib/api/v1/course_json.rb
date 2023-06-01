@@ -91,7 +91,7 @@ module Api::V1
     end
 
     def self.to_hash(course, user, includes, enrollments, precalculated_permissions: nil, &block)
-      new(course, user, includes, enrollments, precalculated_permissions: precalculated_permissions, &block).to_hash
+      new(course, user, includes, enrollments, precalculated_permissions:, &block).to_hash
     end
 
     def clear_unneeded_fields(hash)

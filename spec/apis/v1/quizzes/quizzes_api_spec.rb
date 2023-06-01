@@ -88,7 +88,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                               action: "index",
                               format: "json",
                               course_id: @course.id.to_s,
-                              search_term: search_term)
+                              search_term:)
 
           response_quiz_ids = response.pluck("id")
 
@@ -244,7 +244,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                          "Accept" => "application/vnd.api+json")
         @json = @json.fetch("quizzes").map(&:with_indifferent_access)
         expect(@json).to match_array [
-          Quizzes::QuizApiSerializer.new(@quiz, scope: @user, controller: controller, session: session)
+          Quizzes::QuizApiSerializer.new(@quiz, scope: @user, controller:, session:)
                                     .as_json[:quiz].with_indifferent_access
         ]
       end
@@ -262,7 +262,7 @@ describe Quizzes::QuizzesApiController, type: :request do
 
       it "renders with QuizApiSerializer" do
         expect(json).to eq(
-          Quizzes::QuizApiSerializer.new(quiz, scope: @user, controller: controller, session: session)
+          Quizzes::QuizApiSerializer.new(quiz, scope: @user, controller:, session:)
           .as_json[:quiz].with_indifferent_access
         )
       end
@@ -306,7 +306,7 @@ describe Quizzes::QuizzesApiController, type: :request do
         @course.reload
         @quiz = @course.quizzes.first
         expect(@json).to match_array [
-          Quizzes::QuizApiSerializer.new(@quiz, scope: @user, controller: controller, session: session)
+          Quizzes::QuizApiSerializer.new(@quiz, scope: @user, controller:, session:)
                                     .as_json[:quiz].with_indifferent_access
         ]
       end
@@ -478,7 +478,7 @@ describe Quizzes::QuizzesApiController, type: :request do
           },
           { quiz: { title: "Example Title", quiz_type: "assignment" }.merge(params) },
           {},
-          { expected_status: expected_status }
+          { expected_status: }
         )
       end
 
@@ -830,7 +830,7 @@ describe Quizzes::QuizzesApiController, type: :request do
           },
           { quiz: params },
           {},
-          { expected_status: expected_status }
+          { expected_status: }
         )
       end
 

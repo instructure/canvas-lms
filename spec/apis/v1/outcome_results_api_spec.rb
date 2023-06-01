@@ -47,7 +47,7 @@ describe "Outcome Results API", type: :request do
 
   let_once(:outcome_assignment) do
     assignment = create_outcome_assignment
-    find_or_create_outcome_submission assignment: assignment
+    find_or_create_outcome_submission(assignment:)
     assignment
   end
 
@@ -90,7 +90,7 @@ describe "Outcome Results API", type: :request do
       assessment: {
         :assessment_type => "grading",
         "criterion_#{criterion[:id]}".to_sym => {
-          points: points
+          points:
         }
       }
     )
@@ -136,7 +136,7 @@ describe "Outcome Results API", type: :request do
   let(:outcome_students) do
     (0..3).map do |i|
       student = student_in_course(active_all: true).user
-      create_outcome_assessment(student: student, points: i)
+      create_outcome_assessment(student:, points: i)
       student
     end
   end
@@ -148,7 +148,7 @@ describe "Outcome Results API", type: :request do
   let(:sectioned_outcome_students) do
     0.upto(3).map do |i|
       student = student_in_section(outcome_course_sections[i % 2])
-      create_outcome_assessment(student: student, points: i)
+      create_outcome_assessment(student:, points: i)
       student
     end
   end

@@ -1243,7 +1243,7 @@ describe LearningOutcome do
 
     let(:assess_with) do
       lambda do |outcome, context|
-        assignment = assignment_model(context: context)
+        assignment = assignment_model(context:)
         rubric = add_or_get_rubric(outcome)
         user = user_factory(active_all: true)
         context.enroll_student(user)
@@ -1253,7 +1253,7 @@ describe LearningOutcome do
         assignment.reload
         submission = assignment.grade_student(user, grade: "10", grader: teacher).first
         a.assess({
-                   user: user,
+                   user:,
                    assessor: user,
                    artifact: submission,
                    assessment: {
@@ -1266,7 +1266,7 @@ describe LearningOutcome do
                  })
         result = outcome.learning_outcome_results.first
         assessment = a.assess({
-                                user: user,
+                                user:,
                                 assessor: user,
                                 artifact: submission,
                                 assessment: {
@@ -1279,7 +1279,7 @@ describe LearningOutcome do
                               })
         result.reload
         rubric.reload
-        { assignment: assignment, assessment: assessment, rubric: rubric, result: result }
+        { assignment:, assessment:, rubric:, result: }
       end
     end
 

@@ -61,13 +61,13 @@ module Importers
           query = resolve_module_item_query(context, link[:query])
           link[:new_value] = "#{context_path}/pages/#{migration_id}#{query}"
         elsif type == "attachments"
-          if (att_id = context.attachments.where(migration_id: migration_id).limit(1).pluck(:id).first)
+          if (att_id = context.attachments.where(migration_id:).limit(1).pluck(:id).first)
             link[:new_value] = "#{context_path}/files/#{att_id}/preview"
           end
         elsif context.respond_to?(type) && context.send(type).respond_to?(:scope)
           scope = context.send(type).scope
           if scope.klass.columns_hash["migration_id"] &&
-             (object_id = scope.where(migration_id: migration_id).limit(1).pluck(:id).first)
+             (object_id = scope.where(migration_id:).limit(1).pluck(:id).first)
             query = resolve_module_item_query(context, link[:query])
             link[:new_value] = "#{context_path}/#{type_for_url}/#{object_id}#{query}"
           end

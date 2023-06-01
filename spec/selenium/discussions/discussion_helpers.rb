@@ -82,10 +82,10 @@ module DiscussionHelpers
   class << self
     def create_discussion_topic(context, user, title, message, assignment = nil)
       context.discussion_topics.create!(
-        user: user,
-        title: title,
-        message: message,
-        assignment: assignment
+        user:,
+        title:,
+        message:,
+        assignment:
       )
     end
 

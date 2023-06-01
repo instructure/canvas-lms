@@ -91,7 +91,7 @@ describe ContentMigration do
       @copy_to.save!
       vanilla_page_from = @copy_from.wiki_pages.create!(title: "Everyone Sees This Page")
       title = "conditional page"
-      wiki_page_assignment_model(course: @copy_from, title: title)
+      wiki_page_assignment_model(course: @copy_from, title:)
 
       run_course_copy
 

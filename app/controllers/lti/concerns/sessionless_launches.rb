@@ -117,7 +117,7 @@ module Lti::Concerns
         course_id: module_item.context.id,
         id: module_item.id,
         display: :borderless,
-        session_token: session_token
+        session_token:
       )
     end
 
@@ -126,7 +126,7 @@ module Lti::Concerns
         course_id: assignment.course.id,
         id: assignment.id,
         display: :borderless,
-        session_token: session_token
+        session_token:
       )
     end
 
@@ -138,7 +138,7 @@ module Lti::Concerns
         context.id,
         url: launch_url,
         display: :borderless,
-        session_token: session_token,
+        session_token:,
         resource_link_lookup_uuid: lookup_id
       )
     end
@@ -150,8 +150,8 @@ module Lti::Concerns
         context.id,
         id: tool.id,
         display: :borderless,
-        session_token: session_token,
-        launch_url: launch_url
+        session_token:,
+        launch_url:
       )
     end
   end

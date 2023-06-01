@@ -55,13 +55,13 @@ describe Quizzes::QuizRegrader::Submission do
   end
 
   let(:wrapper) do
-    Quizzes::QuizRegrader::Submission.new(submission: submission,
-                                          question_regrades: question_regrades)
+    Quizzes::QuizRegrader::Submission.new(submission:,
+                                          question_regrades:)
   end
 
   let(:attempts) do
     double(
-      version_models: [double(submission_data: submission_data)],
+      version_models: [double(submission_data:)],
       last_versions: []
     )
   end
@@ -86,7 +86,7 @@ describe Quizzes::QuizRegrader::Submission do
   let(:multiple_attempts_wrapper) do
     Quizzes::QuizRegrader::Submission.new(
       submission: multiple_attempts_submission,
-      question_regrades: question_regrades
+      question_regrades:
     )
   end
 
@@ -160,8 +160,8 @@ describe Quizzes::QuizRegrader::Submission do
 
     let(:regrade_submission) do
       Quizzes::QuizRegrader::Submission.new(
-        submission: submission,
-        question_regrades: question_regrades
+        submission:,
+        question_regrades:
       )
     end
 

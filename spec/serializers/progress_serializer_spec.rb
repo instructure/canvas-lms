@@ -20,7 +20,7 @@
 describe ProgressSerializer do
   subject do
     ProgressSerializer.new(progress, {
-                             controller: controller,
+                             controller:,
                              scope: User.new
                            })
   end

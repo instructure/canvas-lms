@@ -101,7 +101,7 @@ describe AssignmentOverrideStudent do
         course = account.courses.create!
         e2 = course.enroll_student(@student)
         e2.update_attribute(:workflow_state, "active")
-        override = assignment_override_model(course: course)
+        override = assignment_override_model(course:)
         override_student = override.assignment_override_students.build
         override_student.user = @student
         expect(override_student).to be_valid

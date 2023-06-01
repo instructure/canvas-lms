@@ -26,7 +26,7 @@ module I18n
     # found in the {LocaleSelection} module.
     class MetaLazyLoadable < I18n::Backend::LazyLoadable
       def initialize(meta_keys: [], lazy_load: false)
-        super(lazy_load: lazy_load)
+        super(lazy_load:)
         @meta_keys = meta_keys.map(&:to_s).freeze
         @pending_meta_keys = true
       end

@@ -53,7 +53,7 @@ module SupportHelpers
             vendor_code: @vendor_code,
             product_code: @product_code
           )
-          Lti::ToolProxy.where(product_family: product_family).active
+          Lti::ToolProxy.where(product_family:).active
         end
       end
     end

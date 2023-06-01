@@ -70,7 +70,7 @@ describe StudentEnrollment do
       course.allow_final_grade_override = true
       course.save!
 
-      course.enrollment_term.update!(grading_period_group: grading_period_group)
+      course.enrollment_term.update!(grading_period_group:)
       course.recompute_student_scores(run_immediately: true)
     end
 

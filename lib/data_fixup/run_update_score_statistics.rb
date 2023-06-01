@@ -21,7 +21,7 @@ module DataFixup::RunUpdateScoreStatistics
   def self.run(start_at, end_at)
     # The migration will have us at most a range of 100,000 items,
     # we'll break it down to a thousand at a time here.
-    Course.active.find_ids_in_ranges(start_at: start_at, end_at: end_at) do |batch_start, batch_end|
+    Course.active.find_ids_in_ranges(start_at:, end_at:) do |batch_start, batch_end|
       courses_ids_to_recompute = Course.active.where(id: batch_start..batch_end).pluck(:id)
       courses_ids_to_recompute.each { |id| ScoreStatisticsGenerator.update_score_statistics(id) }
     end

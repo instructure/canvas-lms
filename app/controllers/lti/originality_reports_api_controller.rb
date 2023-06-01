@@ -416,7 +416,7 @@ module Lti
       return if attachment.blank?
 
       if submission.present?
-        OriginalityReport.find_by(attachment_id: attachment&.id, submission: submission)
+        OriginalityReport.find_by(attachment_id: attachment&.id, submission:)
       else
         OriginalityReport.find_by(attachment_id: attachment&.id)
       end

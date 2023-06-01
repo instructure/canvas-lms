@@ -258,7 +258,7 @@ describe AuthenticationMethods do
                          host_with_port: "",
                          url: "",
                          method: "GET")
-        controller = mock_controller_class.new(request: request)
+        controller = mock_controller_class.new(request:)
         allow(controller).to receive(:api_request?).and_return(true)
         controller
       end
@@ -314,7 +314,7 @@ describe AuthenticationMethods do
                          host_with_port: "",
                          url: "",
                          method: "GET")
-        controller = mock_controller_class.new(request: request)
+        controller = mock_controller_class.new(request:)
         allow(controller).to receive(:api_request?).and_return(true)
         controller
       end
@@ -437,10 +437,10 @@ describe AuthenticationMethods do
 
   describe "#access_token_account" do
     let(:account) { Account.create! }
-    let(:dev_key) { DeveloperKey.create!(account: account) }
+    let(:dev_key) { DeveloperKey.create!(account:) }
     let(:access_token) { AccessToken.create!(developer_key: dev_key) }
     let(:request) { double(format: double(json?: false), host_with_port: "") }
-    let(:controller) { mock_controller_class.new(request: request, root_account: account) }
+    let(:controller) { mock_controller_class.new(request:, root_account: account) }
 
     it "doesn't call '#get_context' if the Dev key is owned by the domain root account" do
       expect(controller).not_to receive(:get_context)

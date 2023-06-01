@@ -1132,7 +1132,7 @@ RSpec.describe ApplicationController do
 
               context "when the developer key has an oidc_initiation_url" do
                 before do
-                  tool.developer_key.update!(oidc_initiation_url: oidc_initiation_url)
+                  tool.developer_key.update!(oidc_initiation_url:)
                   controller.send(:content_tag_redirect, course, content_tag, nil)
                 end
 
@@ -1860,7 +1860,7 @@ RSpec.describe ApplicationController do
 
         @shard1.activate do
           account = Account.create!
-          teacher_in_course(user: @user, active_all: true, account: account)
+          teacher_in_course(user: @user, active_all: true, account:)
           @other_group = group_model(context: @course)
           group_model(context: @course)
           @group.add_user(@user)
@@ -1890,12 +1890,12 @@ RSpec.describe ApplicationController do
         controller.instance_variable_set(:@context, @user)
 
         account = Account.create!
-        enrollment1 = course_with_teacher(user: @user, active_all: true, account: account)
+        enrollment1 = course_with_teacher(user: @user, active_all: true, account:)
         course1 = enrollment1.course
 
         enrollment2 = @shard1.activate do
           account = Account.create!
-          course_with_teacher(user: @user, active_all: true, account: account)
+          course_with_teacher(user: @user, active_all: true, account:)
         end
         course2 = enrollment2.course
 
@@ -1909,12 +1909,12 @@ RSpec.describe ApplicationController do
         controller.instance_variable_set(:@context, @user)
 
         account = Account.create!
-        enrollment1 = course_with_teacher(user: @user, active_all: true, account: account)
+        enrollment1 = course_with_teacher(user: @user, active_all: true, account:)
         course1 = enrollment1.course
 
         enrollment2 = @shard1.activate do
           account = Account.create!
-          course_with_teacher(user: @user, active_all: true, account: account)
+          course_with_teacher(user: @user, active_all: true, account:)
         end
         course2 = enrollment2.course
 
@@ -2481,7 +2481,7 @@ RSpec.describe ApplicationController do
             "/courses/1/quizzes",
             "/courses/1/modules",
           ].each do |path|
-            allow(controller).to receive(:request).and_return(double({ path: path }))
+            allow(controller).to receive(:request).and_return(double({ path: }))
             expect(controller.send(:should_show_migration_limitation_message)).to be(true)
           end
         end
@@ -2491,7 +2491,7 @@ RSpec.describe ApplicationController do
             "/courses/1/gradebook/speed_grader",
             "/courses/1/assignments/1"
           ].each do |path|
-            allow(controller).to receive(:request).and_return(double({ path: path }))
+            allow(controller).to receive(:request).and_return(double({ path: }))
             expect(controller.send(:should_show_migration_limitation_message)).to be(false)
           end
         end
@@ -2507,7 +2507,7 @@ RSpec.describe ApplicationController do
             "/courses/1/gradebook/speed_grader",
             "/courses/1/assignments/1"
           ].each do |path|
-            allow(controller).to receive(:request).and_return(double({ path: path }))
+            allow(controller).to receive(:request).and_return(double({ path: }))
             expect(controller.send(:should_show_migration_limitation_message)).to be(false)
           end
         end
@@ -2536,7 +2536,7 @@ RSpec.describe ApplicationController do
           "/courses/1/some_path",
           "/courses/1/assignments/1"
         ].each do |path|
-          allow(controller).to receive(:request).and_return(double({ path: path }))
+          allow(controller).to receive(:request).and_return(double({ path: }))
           expect(controller.send(:should_show_migration_limitation_message)).to be(false)
         end
       end
@@ -2702,7 +2702,7 @@ describe CoursesController do
     it "does not affect api requests that use an access token with an unscoped developer key" do
       user = user_model
       developer_key = DeveloperKey.create!
-      token = AccessToken.create!(user: user, developer_key: developer_key)
+      token = AccessToken.create!(user:, developer_key:)
       controller.instance_variable_set(:@access_token, token)
       allow(controller).to receive(:request).and_return(double({
                                                                  params: {},
@@ -2714,7 +2714,7 @@ describe CoursesController do
     it "raises AccessTokenScopeError if scopes do not match" do
       user = user_model
       developer_key = DeveloperKey.create!(require_scopes: true)
-      token = AccessToken.create!(user: user, developer_key: developer_key)
+      token = AccessToken.create!(user:, developer_key:)
       controller.instance_variable_set(:@access_token, token)
       allow(controller).to receive(:request).and_return(double({
                                                                  params: {},
@@ -2729,7 +2729,7 @@ describe CoursesController do
 
       it "allows adequately scoped requests through" do
         user = user_model
-        token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ["url:GET|/api/v1/accounts"])
+        token = AccessToken.create!(user:, developer_key:, scopes: ["url:GET|/api/v1/accounts"])
         controller.instance_variable_set(:@access_token, token)
         allow(controller).to receive(:request).and_return(double({
                                                                    params: {},
@@ -2741,7 +2741,7 @@ describe CoursesController do
 
       it "allows HEAD requests" do
         user = user_model
-        token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ["url:GET|/api/v1/accounts"])
+        token = AccessToken.create!(user:, developer_key:, scopes: ["url:GET|/api/v1/accounts"])
         controller.instance_variable_set(:@access_token, token)
         allow(controller).to receive(:request).and_return(double({
                                                                    params: {},
@@ -2753,7 +2753,7 @@ describe CoursesController do
 
       it "strips includes for adequately scoped requests" do
         user = user_model
-        token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ["url:GET|/api/v1/accounts"])
+        token = AccessToken.create!(user:, developer_key:, scopes: ["url:GET|/api/v1/accounts"])
         controller.instance_variable_set(:@access_token, token)
         allow(controller).to receive(:request).and_return(double({
                                                                    method: "GET",
@@ -2771,7 +2771,7 @@ describe CoursesController do
 
       it "keeps includes for adequately scoped requests" do
         user = user_model
-        token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ["url:GET|/api/v1/accounts"])
+        token = AccessToken.create!(user:, developer_key:, scopes: ["url:GET|/api/v1/accounts"])
         controller.instance_variable_set(:@access_token, token)
         allow(controller).to receive(:request).and_return(double({
                                                                    method: "GET",
@@ -2799,7 +2799,7 @@ RSpec.describe ApplicationController, "#render_unauthorized_action" do
 
   before do
     user_session(@teacher)
-    get :index, format: format
+    get :index, format:
   end
 
   describe "pdf format" do
@@ -2836,7 +2836,7 @@ RSpec.describe ApplicationController, "#redirect_to_login" do
 
   describe "format specified" do
     before do
-      get :index, format: format
+      get :index, format:
     end
 
     context "given an unauthenticated json request" do

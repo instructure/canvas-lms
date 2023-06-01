@@ -108,10 +108,10 @@ module ConferencesCommon
 
   def create_wimba_conference(title = "Wimba Conference", duration = 60)
     WimbaConference.create!(
-      title: title,
+      title:,
       user: @user,
       context: @course,
-      duration: duration
+      duration:
     )
   end
 
@@ -119,8 +119,8 @@ module ConferencesCommon
     PluginSetting.create!(
       name: "big_blue_button",
       settings: {
-        domain: domain,
-        secret: secret,
+        domain:,
+        secret:,
         recording_enabled: true
       }
     )
@@ -128,14 +128,14 @@ module ConferencesCommon
 
   def create_big_blue_button_conference(conference_key = "instructure_web_conference_defaultkey", title = "BigBlueButton Conference", duration = 60, record = true)
     BigBlueButtonConference.create!(
-      conference_key: conference_key,
-      title: title,
+      conference_key:,
+      title:,
       user: @user,
       context: @course,
-      duration: duration,
+      duration:,
       conference_type: "BigBlueButton",
       settings: {
-        record: record
+        record:
       }
     )
   end

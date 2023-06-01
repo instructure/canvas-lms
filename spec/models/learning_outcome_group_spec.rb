@@ -360,10 +360,10 @@ describe LearningOutcomeGroup do
         childs = group[:groups]
 
         # root_account_id should match the context of the db_parent_group.context root_account_id
-        log_db_root_account_id = LearningOutcomeGroup.find_by(context: db_parent_group.context, title: title).root_account_id
+        log_db_root_account_id = LearningOutcomeGroup.find_by(context: db_parent_group.context, title:).root_account_id
         expect(log_db_root_account_id).to eq(db_parent_group.context.resolved_root_account_id)
 
-        db_group = db_parent_group.child_outcome_groups.find_by!(title: title)
+        db_group = db_parent_group.child_outcome_groups.find_by!(title:)
 
         db_outcomes = db_group.child_outcome_links.map(&:content)
 

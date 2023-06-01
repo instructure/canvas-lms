@@ -127,7 +127,7 @@ describe "API Authentication", type: :request do
           expect(code).to be_present
 
           # we have the code, we can close the browser session
-          post "/login/oauth2/token", params: { client_id: @client_id, client_secret: @client_secret, code: code }
+          post "/login/oauth2/token", params: { client_id: @client_id, client_secret: @client_secret, code: }
           expect(response).to be_successful
           expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
           json = JSON.parse(response.body)
@@ -169,7 +169,7 @@ describe "API Authentication", type: :request do
         code = SecureRandom.hex(64)
         code_data = { "user" => @user.id, "client_id" => @client_id }
         Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
-        post "/login/oauth2/token", params: { client_id: @client_id, client_secret: @client_secret, code: code }
+        post "/login/oauth2/token", params: { client_id: @client_id, client_secret: @client_secret, code: }
         expect(response).to be_successful
         json = JSON.parse(response.body)
         expect(AccessToken.authenticate(json["access_token"])).to eq AccessToken.last
@@ -291,7 +291,7 @@ describe "API Authentication", type: :request do
         expect(code).to be_present
 
         # we have the code, we can close the browser session
-        post "/login/oauth2/token", params: { client_id: @client_id, client_secret: "nuh-uh", code: code }
+        post "/login/oauth2/token", params: { client_id: @client_id, client_secret: "nuh-uh", code: }
         expect(response).to be_client_error
       end
 
@@ -338,7 +338,7 @@ describe "API Authentication", type: :request do
             expect(code).to be_present
 
             # we have the code, we can close the browser session
-            post "/login/oauth2/token", params: { client_id: @key.id, client_secret: @client_secret, code: code }
+            post "/login/oauth2/token", params: { client_id: @key.id, client_secret: @client_secret, code: }
             expect(response).to be_successful
             expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
             json = JSON.parse(response.body)
@@ -404,7 +404,7 @@ describe "API Authentication", type: :request do
 
               # exchange the code for the token
               post "/login/oauth2/token",
-                   params: { code: code },
+                   params: { code: },
                    headers: { "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
               expect(response).to be_successful
               expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
@@ -450,7 +450,7 @@ describe "API Authentication", type: :request do
               expect(response).to be_redirect
               expect(response.location).to match(/unauthorized_client/)
 
-              @user.access_tokens.create!(developer_key: developer_key)
+              @user.access_tokens.create!(developer_key:)
 
               get "/login/oauth2/auth", params: { response_type: "code", client_id: developer_key.id, redirect_uri: "http://www.example.com/my_uri" }
               expect(response).to be_redirect
@@ -477,7 +477,7 @@ describe "API Authentication", type: :request do
 
               params = { response_type: "code", client_id: @client_id, redirect_uri: "http://www.example.com/my_uri" }
               params[:scope] = "/auth/userinfo" if userinfo
-              get "/login/oauth2/auth", params: params
+              get("/login/oauth2/auth", params:)
               expect(response).to be_redirect
               expect(response["Location"]).to match(%r{http://www.example.com/my_uri?})
               code = response["Location"].match(/code=([^?&]+)/)[1]
@@ -485,7 +485,7 @@ describe "API Authentication", type: :request do
 
               # exchange the code for the token
               post "/login/oauth2/token",
-                   params: { code: code },
+                   params: { code: },
                    headers: { "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
               expect(response).to be_successful
               expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
@@ -782,7 +782,7 @@ describe "API Authentication", type: :request do
             course_with_teacher(user: @user, account: @account)
             developer_key = DeveloperKey.create!(account: @account, redirect_uri: "http://www.example.com/my_uri")
             enable_developer_key_account_binding!(developer_key)
-            @token = @user.access_tokens.create!(developer_key: developer_key)
+            @token = @user.access_tokens.create!(developer_key:)
 
             allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
             check_used { get "/api/v1/courses", headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" } }
@@ -798,7 +798,7 @@ describe "API Authentication", type: :request do
             course_with_teacher(user: @user, account: @sub_account1)
             developer_key = DeveloperKey.create!(account: @account, redirect_uri: "http://www.example.com/my_uri")
             enable_developer_key_account_binding!(developer_key)
-            @token = @user.access_tokens.create!(developer_key: developer_key)
+            @token = @user.access_tokens.create!(developer_key:)
 
             allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
             check_used { get "/api/v1/courses", headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" } }
@@ -813,7 +813,7 @@ describe "API Authentication", type: :request do
             user_with_pseudonym(active_user: true, username: "test1@example.com", password: "test1234", account: @account)
             course_with_teacher(user: @user, account: @account)
             developer_key = DeveloperKey.create!(account: @not_sub_account, redirect_uri: "http://www.example.com/my_uri")
-            @token = @user.access_tokens.create!(developer_key: developer_key)
+            @token = @user.access_tokens.create!(developer_key:)
 
             allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
             get "/api/v1/courses", headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
@@ -851,7 +851,7 @@ describe "API Authentication", type: :request do
           account2 = Account.create!
           developer_key = DeveloperKey.create!(account: account2, redirect_uri: "http://www.example.com/my_uri")
           enable_developer_key_account_binding!(developer_key)
-          @token = @user.access_tokens.create!(developer_key: developer_key)
+          @token = @user.access_tokens.create!(developer_key:)
           expect(@token.developer_key.shard).to be @shard1
         end
 

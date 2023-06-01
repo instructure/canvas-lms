@@ -192,8 +192,8 @@ module BookmarkedCollection
   #   bookmarked_collection = BookmarkedCollection.wrap(UserBookmarker, User.active)
   #   Api.paginate(bookmarked_collection, ...)
   #
-  def self.wrap(bookmarker, base_scope, &block)
-    BookmarkedCollection::WrapProxy.new(bookmarker, base_scope, &block)
+  def self.wrap(bookmarker, base_scope, &)
+    BookmarkedCollection::WrapProxy.new(bookmarker, base_scope, &)
   end
 
   # Combines multiple named bookmarked collections into a single collection
@@ -236,8 +236,8 @@ module BookmarkedCollection
   #     ['users', users]
   #   )
   #
-  def self.merge(*collections, &merge_proc)
-    BookmarkedCollection::MergeProxy.new(collections, &merge_proc)
+  def self.merge(*collections, &)
+    BookmarkedCollection::MergeProxy.new(collections, &)
   end
 
   # Combines multiple named bookmarked collections into a single collection
@@ -266,12 +266,12 @@ module BookmarkedCollection
 
   # Filters the results of a collection to only include rows that the
   # filter_proc returns true for.
-  def self.filter(collection, &filter_proc)
-    BookmarkedCollection::FilterProxy.new(collection, &filter_proc)
+  def self.filter(collection, &)
+    BookmarkedCollection::FilterProxy.new(collection, &)
   end
 
   # Transform the results of a collection using the transform_proc
-  def self.transform(collection, &transform_proc)
-    BookmarkedCollection::TransformProxy.new(collection, &transform_proc)
+  def self.transform(collection, &)
+    BookmarkedCollection::TransformProxy.new(collection, &)
   end
 end

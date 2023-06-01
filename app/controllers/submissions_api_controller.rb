@@ -288,7 +288,7 @@ class SubmissionsApiController < ApplicationController
                end
              end
 
-      render json: json
+      render json:
     end
   end
 
@@ -473,7 +473,7 @@ class SubmissionsApiController < ApplicationController
 
     # unless teacher, filter assignments down to only assignments current user can see
     unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades)
-      assignments = assignments.select { |a| (assignment_visibilities.fetch(a.id, []) & student_ids).any? }
+      assignments = assignments.select { |a| assignment_visibilities.fetch(a.id, []).intersect?(student_ids) }
     end
 
     # preload with stuff already in memory
@@ -684,7 +684,7 @@ class SubmissionsApiController < ApplicationController
         check_quota: false, # we don't check quota when uploading a file for assignment submission
         folder: @user.submissions_folder(@context), # organize attachment into the course submissions folder
         assignment: @assignment,
-        submit_assignment: submit_assignment
+        submit_assignment:
       )
     end
   end
@@ -902,7 +902,7 @@ class SubmissionsApiController < ApplicationController
 
       assessment = params[:rubric_assessment]
       if assessment.is_a?(ActionController::Parameters) && @assignment.active_rubric_association?
-        if (assessment.keys & @assignment.rubric_association.rubric.criteria_object.map { |c| c.id.to_s }).empty?
+        unless assessment.keys.intersect?(@assignment.rubric_association.rubric.criteria_object.map { |c| c.id.to_s })
           return render json: { message: "invalid rubric_assessment" }, status: :bad_request
         end
 
@@ -988,7 +988,7 @@ class SubmissionsApiController < ApplicationController
           params.merge(anonymize_user_id: !!@anonymize_user_id)
         )
       end
-      render json: json
+      render json:
     end
   end
 
@@ -1156,10 +1156,10 @@ class SubmissionsApiController < ApplicationController
           pg_list = submission_provisional_grades_json(
             course: @context,
             assignment: @assignment,
-            submission: submission,
+            submission:,
             current_user: @current_user,
             avatars: service_enabled?(:avatars) && !@assignment.grade_as_group?,
-            includes: includes
+            includes:
           )
           json[:provisional_grades] = pg_list
         end
@@ -1400,7 +1400,7 @@ class SubmissionsApiController < ApplicationController
     course_id = params[:course_id]
     user = User.find(user_id)
     course = Course.find(course_id)
-    submissions = course.submissions.where(user: user)
+    submissions = course.submissions.where(user:)
     ids = ContentParticipation.mark_all_as_read_for_user(user, submissions, course)
 
     opts = { type: :submissions_clear_unread }
@@ -1556,7 +1556,7 @@ class SubmissionsApiController < ApplicationController
               end
       not_submitted = total - graded - ungraded
 
-      render json: { graded: graded, ungraded: ungraded, not_submitted: not_submitted }
+      render json: { graded:, ungraded:, not_submitted: }
     end
   end
 

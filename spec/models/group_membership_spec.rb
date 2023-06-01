@@ -74,7 +74,7 @@ describe GroupMembership do
       student
     end
     let_once(:group_category) { GroupCategory.student_organized_for(course1) }
-    let_once(:group) { course1.groups.create(group_category: group_category) }
+    let_once(:group) { course1.groups.create(group_category:) }
     let_once(:group_membership) { group.group_memberships.create(user: student) }
 
     it "has a validation error on new record" do
@@ -142,7 +142,7 @@ describe GroupMembership do
         course.start_at = 1.day.from_now
         course.restrict_enrollments_to_course_dates = true
         course.save!
-        student_in_course(active_all: true, course: course)
+        student_in_course(active_all: true, course:)
         group1 = course.groups.create(group_category: GroupCategory.student_organized_for(course))
         membership = group1.group_memberships.build(user: @student)
         Notification.create!(name: "New Context Group Membership", category: "TestImmediately")
@@ -403,7 +403,7 @@ describe GroupMembership do
     let(:user) { user_model }
 
     it "assigns it on save if it is not set" do
-      membership = group.group_memberships.create!(user: user)
+      membership = group.group_memberships.create!(user:)
       membership.root_account_id = nil
 
       expect do
@@ -414,7 +414,7 @@ describe GroupMembership do
     end
 
     it "preserves it on save if it was already set" do
-      membership = group.group_memberships.create!(user: user)
+      membership = group.group_memberships.create!(user:)
 
       expect(membership.group).not_to receive(:root_account_id)
 

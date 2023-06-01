@@ -84,12 +84,12 @@ describe Types::FileType do
 
     it "returns an https URL if the request was issued over SSL" do
       request = ActionDispatch::TestRequest.create({ "HTTPS" => "on" })
-      expect(type_tester.resolve("url", request: request, current_user: @student)).to start_with("https:")
+      expect(type_tester.resolve("url", request:, current_user: @student)).to start_with("https:")
     end
 
     it "returns an http URL if the request was not issued over SSL" do
       request = ActionDispatch::TestRequest.create
-      expect(type_tester.resolve("url", request: request, current_user: @student)).to start_with("http:")
+      expect(type_tester.resolve("url", request:, current_user: @student)).to start_with("http:")
     end
   end
 

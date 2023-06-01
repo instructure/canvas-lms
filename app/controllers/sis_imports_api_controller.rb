@@ -756,7 +756,7 @@ class SisImportsApiController < ApplicationController
         return render json: "cannot set both undelete_only and unconclude_only", status: :bad_request
       end
 
-      progress = @batch.restore_states_later(batch_mode: batch_mode, undelete_only: undelete_only, unconclude_only: unconclude_only)
+      progress = @batch.restore_states_later(batch_mode:, undelete_only:, unconclude_only:)
       render json: progress_json(progress, @current_user, session)
     end
   end

@@ -97,7 +97,7 @@ describe GradingPeriod do
 
     it "returns true if the submission is due in a closed grading period" do
       result = GradingPeriod.date_in_closed_grading_period?(
-        course: course,
+        course:,
         date: in_closed_grading_period
       )
       expect(result).to be true
@@ -105,7 +105,7 @@ describe GradingPeriod do
 
     it "returns false if the submission is due in a not closed grading period" do
       result = GradingPeriod.date_in_closed_grading_period?(
-        course: course,
+        course:,
         date: in_not_closed_grading_period
       )
       expect(result).to be false
@@ -113,7 +113,7 @@ describe GradingPeriod do
 
     it "returns false if the submission is due outside of any grading period" do
       result = GradingPeriod.date_in_closed_grading_period?(
-        course: course,
+        course:,
         date: outside_of_any_grading_period
       )
       expect(result).to be false
@@ -122,7 +122,7 @@ describe GradingPeriod do
     it "returns true if the due date is null and the last grading period is closed" do
       not_closed_period.destroy
       result = GradingPeriod.date_in_closed_grading_period?(
-        course: course,
+        course:,
         date: nil
       )
       expect(result).to be true
@@ -130,7 +130,7 @@ describe GradingPeriod do
 
     it "returns false if the due date is null and the last grading period is not closed" do
       result = GradingPeriod.date_in_closed_grading_period?(
-        course: course,
+        course:,
         date: nil
       )
       expect(result).to be false
@@ -375,8 +375,8 @@ describe GradingPeriod do
 
     it "destroys associated scores" do
       course = Course.create!
-      enrollment = student_in_course(course: course)
-      score = enrollment.scores.create!(grading_period: grading_period)
+      enrollment = student_in_course(course:)
+      score = enrollment.scores.create!(grading_period:)
       grading_period.destroy
       expect(score.reload).to be_deleted
     end
@@ -384,8 +384,8 @@ describe GradingPeriod do
     it "recalculates course scores if the grading period group is weighted" do
       course = Course.create!
       grading_period_group.enrollment_terms << course.enrollment_term
-      enrollment = student_in_course(course: course)
-      enrollment.scores.create!(grading_period: grading_period)
+      enrollment = student_in_course(course:)
+      enrollment.scores.create!(grading_period:)
       grading_period_group.update_column(:weighted, true)
       expect(GradeCalculator).to receive(:recompute_final_score)
       grading_period.destroy
@@ -949,8 +949,8 @@ describe GradingPeriod do
 
   describe "grading period scores" do
     before do
-      student_in_course(course: course, active_all: true)
-      teacher_in_course(course: course, active_all: true)
+      student_in_course(course:, active_all: true)
+      teacher_in_course(course:, active_all: true)
       @assignment = course.assignments.create!(due_at: 10.days.from_now(now), points_possible: 10)
       @assignment.grade_student(@student, grade: 8, grader: @teacher)
     end

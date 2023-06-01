@@ -20,7 +20,7 @@
 module CC
   class Schema
     XSD_DIRECTORY = "lib/cc/xsd"
-    REGEX = /\.xsd$/.freeze
+    REGEX = /\.xsd$/
 
     def self.for_version(version)
       return nil unless whitelist.include?(version)

@@ -54,7 +54,7 @@ module Types
     implements Interfaces::AssignmentsConnectionInterface
     def assignments_connection(filter: {})
       load_association(:context).then do |course|
-        super(course: course, filter: filter)
+        super(course:, filter:)
       end
     end
 

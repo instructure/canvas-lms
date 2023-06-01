@@ -462,9 +462,9 @@ module Factories
 
   # The block should return the submission_data. We pass the newly created
   # questions to the block (legacy code uses @questions)
-  def quiz_with_graded_submission(questions, opts = {}, &block)
+  def quiz_with_graded_submission(questions, opts = {}, &)
     assignment_quiz(questions, opts)
-    @quiz_submission = graded_submission(@quiz, @user, &block)
+    @quiz_submission = graded_submission(@quiz, @user, &)
   end
 
   def graded_submission(quiz, user)
@@ -553,7 +553,7 @@ module Factories
   def build_course_quiz_questions_and_a_bank(data = {}, opts = {})
     scoring_policy = opts[:scoring_policy] || "keep_highest"
     course_with_student(active_all: true)
-    @quiz = @course.quizzes.create!(title: "new quiz", shuffle_answers: true, quiz_type: "assignment", scoring_policy: scoring_policy)
+    @quiz = @course.quizzes.create!(title: "new quiz", shuffle_answers: true, quiz_type: "assignment", scoring_policy:)
     @q1 = @quiz.quiz_questions.create!(question_data: question_data(true, data[:q1] || data))
     @q2 = @quiz.quiz_questions.create!(question_data: question_data(false, data[:q2] || data))
     @outcome = @course.created_learning_outcomes.create!(short_description: "new outcome")

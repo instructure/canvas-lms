@@ -860,7 +860,7 @@ describe ContentMigration do
                                   set_type: "Noop",
                                   set_id: 1,
                                   title: "Tag 1",
-                                  due_at: due_at)
+                                  due_at:)
         run_course_copy
         to_override = @copy_to.assignments.first.assignment_overrides.first
         expect(to_override.title).to eq "Tag 1"
@@ -903,11 +903,11 @@ describe ContentMigration do
       let(:custom_parameters) { { "param_one" => "param value one" } }
       let(:tool_settings) do
         Lti::ToolSetting.create!(
-          tool_proxy: tool_proxy,
-          resource_link_id: resource_link_id,
+          tool_proxy:,
+          resource_link_id:,
           context: assignment.course,
           custom: custom_data,
-          custom_parameters: custom_parameters,
+          custom_parameters:,
           product_code: tool_proxy.product_family.product_code,
           vendor_code: tool_proxy.product_family.vendor_code
         )
@@ -927,7 +927,7 @@ describe ContentMigration do
         )
         tool_settings
         AssignmentConfigurationToolLookup.create!(
-          assignment: assignment,
+          assignment:,
           tool_id: message_handler.id,
           tool_type: "Lti::MessageHandler",
           tool_product_code: product_family.product_code,
@@ -959,7 +959,7 @@ describe ContentMigration do
       let(:developer_key) { DeveloperKey.create!(account: @course.root_account) }
 
       context "with one coupled and one coupled line item" do
-        let(:tool) { external_tool_model(context: @course.root_account, opts: { use_1_3: true, developer_key: developer_key }) }
+        let(:tool) { external_tool_model(context: @course.root_account, opts: { use_1_3: true, developer_key: }) }
         let(:tag) { ContentTag.new(content: tool, url: tool.url, context: assignment) }
         let(:assignment) do
           @copy_from.assignments.create!(

@@ -24,7 +24,7 @@ describe "search_term_helper" do
         scope,
         attr,
         search_term,
-        normalize_unicode: normalize_unicode
+        normalize_unicode:
       )
     end
 

@@ -35,7 +35,7 @@ class CustomGradebookColumnDatum < ActiveRecord::Base
   before_save :set_root_account_id
 
   def self.queue_bulk_update_custom_columns(context, column_data)
-    progress = Progress.create!(context: context, tag: "custom_columns_submissions_update")
+    progress = Progress.create!(context:, tag: "custom_columns_submissions_update")
     progress.process_job(self, :process_bulk_update_custom_columns, {}, context, column_data)
     progress
   end
@@ -53,13 +53,13 @@ class CustomGradebookColumnDatum < ActiveRecord::Base
         user_id = data_point.fetch(:user_id)
         if content.present?
           CustomGradebookColumnDatum.unique_constraint_retry do
-            datum = custom_column.custom_gradebook_column_data.find_or_initialize_by(user_id: user_id)
+            datum = custom_column.custom_gradebook_column_data.find_or_initialize_by(user_id:)
             datum.content = content
             datum.root_account_id ||= root_account.id
             datum.save!
           end
         else
-          custom_column.custom_gradebook_column_data.find_by(user_id: user_id)&.destroy!
+          custom_column.custom_gradebook_column_data.find_by(user_id:)&.destroy!
         end
       end
     end

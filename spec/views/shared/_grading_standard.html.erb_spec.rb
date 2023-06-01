@@ -37,7 +37,7 @@ describe "shared/_grading_standard" do
 
   before do
     account = Account.default
-    @course = Course.create!(name: "My Course", account: account)
+    @course = Course.create!(name: "My Course", account:)
     user = User.create!(name: "Abby Tabby")
     @course.enroll_user(user, "TeacherEnrollment")
     user.save!

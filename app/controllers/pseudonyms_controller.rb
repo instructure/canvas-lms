@@ -151,7 +151,7 @@ class PseudonymsController < ApplicationController
       # Whether the email was actually found or not, we display the same
       # message. Otherwise this form could be used to fish for valid
       # email addresses.
-      flash[:notice] = t "notices.email_sent", "Confirmation email sent to %{email}, make sure to check your spam box", email: email
+      flash[:notice] = t("notices.email_sent", "Confirmation email sent to %{email}, make sure to check your spam box", email:)
       @ccs.each(&:forgot_password!)
       format.html { redirect_to(canvas_login_url) }
       format.json { render json: { requested: true } }

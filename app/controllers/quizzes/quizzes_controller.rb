@@ -214,7 +214,7 @@ class Quizzes::QuizzesController < ApplicationController
         session.delete(:quiz_id)
       end
       is_observer = @context_enrollment&.observer?
-      @locked_reason = @quiz.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true, is_observer: is_observer)
+      @locked_reason = @quiz.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true, is_observer:)
       @locked = @locked_reason && !can_preview?
 
       @context_module_tag = ContextModuleItem.find_tag_with_preferred([@quiz, @quiz.assignment], params[:module_item_id])
@@ -695,7 +695,7 @@ class Quizzes::QuizzesController < ApplicationController
         @submission = @quiz.quiz_submissions.find(params[:quiz_submission_id])
       else
         user_id = params[:user_id].presence || @current_user&.id
-        @submission = @quiz.quiz_submissions.where(user_id: user_id).order(:created_at).first
+        @submission = @quiz.quiz_submissions.where(user_id:).order(:created_at).first
       end
       if @submission && !@submission.user_id && (logged_out_index = params[:u_index])
         @logged_out_user_index = logged_out_index
@@ -998,7 +998,7 @@ class Quizzes::QuizzesController < ApplicationController
     @quiz_eligibility = Quizzes::QuizEligibility.new(course: @context,
                                                      quiz: @quiz,
                                                      user: @current_user,
-                                                     session: session,
+                                                     session:,
                                                      remote_ip: request.remote_ip,
                                                      access_code: params[:access_code])
 

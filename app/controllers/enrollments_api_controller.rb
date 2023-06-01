@@ -532,8 +532,8 @@ class EnrollmentsApiController < ApplicationController
         enrollment_json(e,
                         @current_user,
                         session,
-                        includes: includes,
-                        opts: { grading_period: grading_period })
+                        includes:,
+                        opts: { grading_period: })
       }
     end
   end
@@ -888,7 +888,7 @@ class EnrollmentsApiController < ApplicationController
     if date
       enrollments = Enrollment.where(course_id: params[:course_id], user_id: params[:user_id])
       enrollments.update_all(last_attended_at: date)
-      render json: { date: date }
+      render json: { date: }
     else
       render json: { message: "Invalid date time input" }, status: :bad_request
     end
@@ -1040,7 +1040,7 @@ class EnrollmentsApiController < ApplicationController
 
   def check_sis_permissions(sis_context)
     sis_filters = %w[sis_account_id sis_course_id sis_section_id sis_user_id]
-    if (params.keys & sis_filters).present? && !sis_context.grants_any_right?(@current_user, :read_sis, :manage_sis)
+    if params.keys.intersect?(sis_filters) && !sis_context.grants_any_right?(@current_user, :read_sis, :manage_sis)
       return false
     end
 

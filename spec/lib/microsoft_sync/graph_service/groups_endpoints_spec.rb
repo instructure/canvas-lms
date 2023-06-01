@@ -44,9 +44,9 @@ module MicrosoftSync::GraphService::GroupsEndpoints::SpecHelper
   def build_batch_response_body(request_ids, _batch_request_types)
     responses = batch_response_types.zip(request_ids).map do |type, req_id|
       code, body, headers = SAMPLE_RESPONSES_CODES_BODIES_HEADERS[type] || raise("bad type #{type}")
-      { id: req_id, status: code, body: body, headers: headers }.compact
+      { id: req_id, status: code, body:, headers: }.compact
     end
-    { responses: responses }
+    { responses: }
   end
 
   def json_response_from_sample(type)
@@ -79,7 +79,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
   describe "#add_users_ignore_duplicates" do
     subject do
       endpoints.add_users_ignore_duplicates(
-        "msgroupid", members: members, owners: owners
+        "msgroupid", members:, owners:
       )
     end
 
@@ -108,7 +108,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     it { is_expected.to be_nil }
 
     context "when members is not given" do
-      subject { endpoints.add_users_ignore_duplicates("msgroupid", owners: owners) }
+      subject { endpoints.add_users_ignore_duplicates("msgroupid", owners:) }
 
       let(:req_body) { super().slice("owners@odata.bind") }
 
@@ -116,7 +116,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     end
 
     context "when owners is not given" do
-      subject { endpoints.add_users_ignore_duplicates("msgroupid", members: members) }
+      subject { endpoints.add_users_ignore_duplicates("msgroupid", members:) }
 
       let(:req_body) { super().slice("members@odata.bind") }
 

@@ -25,7 +25,7 @@ describe "admin settings tab" do
   let(:sub_account) { account.sub_accounts.create!(name: "sub-account") }
 
   before do
-    user_logged_in(user: site_admin_user(account: account))
+    user_logged_in(user: site_admin_user(account:))
   end
 
   def get_settings_page(account)
@@ -60,7 +60,7 @@ describe "admin settings tab" do
 
     it "tests SIS Agent Token Authentication with post_grades feature enabled", priority: "2" do
       user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
-      course_with_admin_logged_in(account: Account.default, user: user)
+      course_with_admin_logged_in(account: Account.default, user:)
       account.enable_feature!(:post_grades)
 
       get_settings_page(account)
@@ -74,7 +74,7 @@ describe "admin settings tab" do
 
     it "tests SIS Agent Token Authentication with post_grades feature disabled", priority: "2" do
       user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
-      course_with_admin_logged_in(account: Account.default, user: user)
+      course_with_admin_logged_in(account: Account.default, user:)
       get_settings_page(account)
       expect(f("#add_sis_app_token")).to be_displayed
       expect(f("#account_settings_sis_app_token")).to be_displayed

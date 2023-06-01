@@ -45,7 +45,7 @@ module FeatureFlags
 
   def set_feature_flag!(feature, state)
     feature = feature.to_s
-    flag = feature_flags.find_or_initialize_by(feature: feature)
+    flag = feature_flags.find_or_initialize_by(feature:)
     flag.state = state
     @feature_flag_cache ||= {}
     @feature_flag_cache[feature] = flag
@@ -210,7 +210,7 @@ module FeatureFlags
 
   def persist_result(feature, result)
     persist_result_context(feature, result)
-    InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: result.to_s })
+    InstStatsd::Statsd.increment("feature_flag_check", tags: { feature:, enabled: result.to_s })
     result
   end
 
@@ -225,7 +225,7 @@ module FeatureFlags
 
     LocalCache.fetch(feature_analytics_cache_key(feature, result), expires_in: cache_expiry) do
       message = {
-        feature: feature,
+        feature:,
         env: Canvas.environment,
         context: context_type,
         root_account_id: try(:root_account?) ? global_id : try(:global_root_account_id),

@@ -26,7 +26,7 @@ describe "discussions" do
   include DiscussionsCommon
 
   let(:course) { course_model.tap(&:offer!) }
-  let(:teacher) { teacher_in_course(course: course, name: "teacher", active_all: true).user }
+  let(:teacher) { teacher_in_course(course:, name: "teacher", active_all: true).user }
   let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: "teacher topic title", message: "teacher topic message") }
   let(:assignment_group) { course.assignment_groups.create!(name: "assignment group") }
   let(:group_category) { course.group_categories.create!(name: "group category") }
@@ -34,14 +34,14 @@ describe "discussions" do
     course.assignments.create!(
       name: "assignment",
       # submission_types: 'discussion_topic',
-      assignment_group: assignment_group
+      assignment_group:
     )
   end
   let(:assignment_topic) do
     course.discussion_topics.create!(user: teacher,
                                      title: "assignment topic title",
                                      message: "assignment topic message",
-                                     assignment: assignment)
+                                     assignment:)
   end
 
   context "on the edit page" do
@@ -357,7 +357,7 @@ describe "discussions" do
           file = @course.attachments.create!(
             display_name: "hey.txt",
             uploaded_data: default_uploaded_data,
-            usage_rights: usage_rights
+            usage_rights:
           )
           file.usage_rights
           topic.attachment = file
@@ -375,7 +375,7 @@ describe "discussions" do
           course.enable_course_paces = true
           course.save!
           context_module = course.context_modules.create! name: "M"
-          assignment_topic.context_module_tags.create! context_module: context_module, context: @course, tag_type: "context_module"
+          assignment_topic.context_module_tags.create! context_module:, context: @course, tag_type: "context_module"
         end
 
         it "shows the course pacing notice on a graded discussion" do

@@ -43,7 +43,7 @@ module Csp::CourseHelper
   end
 
   def csp_whitelisted_domains(request = nil, include_files:, include_tools:)
-    domains = account.csp_whitelisted_domains(request, include_files: include_files, include_tools: include_tools)
+    domains = account.csp_whitelisted_domains(request, include_files:, include_tools:)
     domains += cached_tool_domains if include_tools
     domains.uniq.sort
   end

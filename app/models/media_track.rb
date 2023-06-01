@@ -30,7 +30,7 @@ class MediaTrack < ActiveRecord::Base
   validates :content, presence: true
   validates :locale, format: { with: /\A[A-Za-z-]+\z/ }, uniqueness: { scope: :attachment_id, unless: ->(mt) { mt.attachment_id.blank? } }
 
-  RE_LOOKS_LIKE_TTML = /<tt\s+xml/i.freeze
+  RE_LOOKS_LIKE_TTML = /<tt\s+xml/i
   validates :content, format: {
     without: RE_LOOKS_LIKE_TTML,
     message: -> { t("TTML tracks are not allowed because they are susceptible to xss attacks") }

@@ -153,7 +153,7 @@ class EpubExportsController < ApplicationController
         format.json do
           @course.latest_epub_export = @service.offline_export
           render({
-                   status: status, json: course_epub_export_json(@course)
+                   status:, json: course_epub_export_json(@course)
                  })
         end
       end

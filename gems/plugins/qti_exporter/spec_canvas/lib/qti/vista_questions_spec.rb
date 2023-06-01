@@ -87,7 +87,7 @@ if Qti.migration_executable
 
     it "converts images correctly" do
       manifest_node = get_manifest_node("true_false", interaction_type: "choiceInteraction")
-      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: vista_question_dir).with_indifferent_access
+      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: vista_question_dir).with_indifferent_access
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::TRUE_FALSE2
     end

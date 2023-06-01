@@ -190,7 +190,7 @@ module Qti
           id: unique_local_id,
           migration_id: blank_id,
           text: sanitize_html_string(val_node.text, true),
-          blank_id: blank_id,
+          blank_id:,
         }
       end
     end

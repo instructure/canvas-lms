@@ -59,8 +59,8 @@ describe "Gradebook" do
         progress.workflow_state = "completed"
         progress.save!
         @course.gradebook_csvs.create!(user: @teacher,
-                                       progress: progress,
-                                       attachment: attachment)
+                                       progress:,
+                                       attachment:)
       end
 
       it "maintains focus to Actions menu trigger during past csv export", priority: "2" do
@@ -94,8 +94,8 @@ describe "Gradebook" do
         progress.workflow_state = "completed"
         progress.save!
         @course.gradebook_csvs.create!(user: @teacher,
-                                       progress: progress,
-                                       attachment: attachment)
+                                       progress:,
+                                       attachment:)
       end
 
       it "maintains focus to Actions menu trigger during past csv export", priority: "2" do

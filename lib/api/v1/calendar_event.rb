@@ -171,7 +171,7 @@ module Api::V1::CalendarEvent
                               user,
                               session,
                               include: appointment_group ? ["participants"] : [],
-                              appointment_group: appointment_group,
+                              appointment_group:,
                               current_participant: participant,
                               url_override: can_manage,
                               child_events_count: 0,
@@ -188,7 +188,7 @@ module Api::V1::CalendarEvent
     end
 
     hash["url"] = api_v1_calendar_event_url(event) if options.key?(:url_override) ? options[:url_override] || hash["own_reservation"] : event.grants_right?(user, session, :read)
-    hash["html_url"] = calendar_url_for(options[:effective_context] || event.effective_context, event: event)
+    hash["html_url"] = calendar_url_for(options[:effective_context] || event.effective_context, event:)
     if duplicates
       hash["duplicates"] = duplicates.map { |dupe| { "calendar_event" => calendar_event_json(dupe, user, session, options) } }
     end

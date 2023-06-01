@@ -65,16 +65,16 @@ describe Bookmarks::BookmarksController do
       let(:params) { { name: "chem 101", url: "/courses/2" } }
 
       it "succeeds" do
-        post "create", params: params, format: "json"
+        post "create", params:, format: "json"
         expect(response).to be_successful
       end
 
       it "creates a bookmark" do
-        expect { post "create", params: params, format: "json" }.to change { Bookmarks::Bookmark.count }.by(1)
+        expect { post "create", params:, format: "json" }.to change { Bookmarks::Bookmark.count }.by(1)
       end
 
       it "sets user" do
-        post "create", params: params, format: "json"
+        post "create", params:, format: "json"
         expect(Bookmarks::Bookmark.order(:id).last.user_id).to eq(u.id)
       end
 
@@ -84,7 +84,7 @@ describe Bookmarks::BookmarksController do
       end
 
       it "appends by default" do
-        post "create", params: params, format: "json"
+        post "create", params:, format: "json"
         expect(Bookmarks::Bookmark.order(:id).last).to be_last
       end
 

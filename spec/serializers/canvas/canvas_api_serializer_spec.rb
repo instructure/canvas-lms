@@ -19,7 +19,7 @@
 
 describe Canvas::APISerializer do
   let(:controller) { ActiveModel::FakeController.new }
-  let(:options) { { scope: {}, controller: controller } }
+  let(:options) { { scope: {}, controller: } }
   let(:serializer) { Canvas::APISerializer.new({}, options) }
 
   it "aliases user to options[:scope]" do
@@ -120,7 +120,7 @@ describe Canvas::APISerializer do
     context "embedding objects in root" do
       subject do
         FooSerializer.new(object, {
-                            controller: controller,
+                            controller:,
                             root: nil
                           })
       end

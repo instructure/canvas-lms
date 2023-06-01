@@ -24,6 +24,6 @@ class Types::ValidationErrorType < Types::ApplicationObjectType
 
   def object
     attribute, message = super
-    { attribute: attribute, message: message }
+    { attribute:, message: }
   end
 end

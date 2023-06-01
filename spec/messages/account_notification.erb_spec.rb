@@ -22,7 +22,7 @@ require_relative "messages_helper"
 describe "account_notification" do
   before :once do
     account = Account.create!(name: "some account", settings: { outgoing_email_default_name: "Custom From" })
-    @announcement = account_notification(account: account)
+    @announcement = account_notification(account:)
   end
 
   let(:notification_name) { :account_notification }

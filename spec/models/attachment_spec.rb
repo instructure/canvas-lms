@@ -35,7 +35,7 @@ describe Attachment do
     end
 
     describe "category" do
-      subject { attachment_model category: category }
+      subject { attachment_model category: }
 
       context "with a valid category" do
         let(:category) { Attachment::ICON_MAKER_ICONS }
@@ -195,7 +195,7 @@ describe Attachment do
 
       @attachment.submit_to_crocodoc
       url_opts = {
-        moderated_grading_allow_list: moderated_grading_allow_list
+        moderated_grading_allow_list:
       }
       url = Rack::Utils.parse_nested_query(@attachment.crocodoc_url(user, url_opts).sub(/^.*\?{1}/, ""))
       blob = extract_blob(url["hmac"],
@@ -743,11 +743,11 @@ describe Attachment do
     it "destroys all associated submission_draft_attachments on destroy" do
       submission = submission_model
       submission_draft = SubmissionDraft.create!(
-        submission: submission,
+        submission:,
         submission_attempt: submission.attempt
       )
       SubmissionDraftAttachment.create!(
-        submission_draft: submission_draft,
+        submission_draft:,
         attachment: a
       )
       a.destroy
@@ -758,11 +758,11 @@ describe Attachment do
       a2 = attachment_model(uploaded_data: default_uploaded_data)
       submission = submission_model
       submission_draft = SubmissionDraft.create!(
-        submission: submission,
+        submission:,
         submission_attempt: submission.attempt
       )
       SubmissionDraftAttachment.create!(
-        submission_draft: submission_draft,
+        submission_draft:,
         attachment: a2
       )
       a.destroy
@@ -1287,8 +1287,8 @@ describe Attachment do
     context "group assignment" do
       before :once do
         group_category = @course.group_categories.create!(name: "Group Category")
-        group_1 = group_model(context: @course, group_category: group_category)
-        group_2 = group_model(context: @course, group_category: group_category)
+        group_1 = group_model(context: @course, group_category:)
+        group_2 = group_model(context: @course, group_category:)
 
         @user_1 = user_model
         @user_2 = user_model
@@ -1425,11 +1425,11 @@ describe Attachment do
       @a1.update_attribute(:display_name, "a2")
       submission = submission_model
       submission_draft = SubmissionDraft.create!(
-        submission: submission,
+        submission:,
         submission_attempt: submission.attempt
       )
       SubmissionDraftAttachment.create!(
-        submission_draft: submission_draft,
+        submission_draft:,
         attachment: @a1
       )
 
@@ -1442,11 +1442,11 @@ describe Attachment do
       @a1.update_attribute(:display_name, "a2")
       submission = submission_model
       submission_draft = SubmissionDraft.create!(
-        submission: submission,
+        submission:,
         submission_attempt: submission.attempt
       )
       SubmissionDraftAttachment.create!(
-        submission_draft: submission_draft,
+        submission_draft:,
         attachment: @a2
       )
 
@@ -2298,7 +2298,7 @@ describe Attachment do
       expect(quota[:quota_used]).to eq 1.megabyte
 
       assignment = @course.assignments.create!(title: "asmt")
-      topic = @course.discussion_topics.create!(title: "topic", assignment: assignment)
+      topic = @course.discussion_topics.create!(title: "topic", assignment:)
       entry = topic.reply_from(user: @student, text: "entry")
       entry.attachment = @attachment
       entry.save!

@@ -28,7 +28,7 @@ class ActiveRecord::Base
     delegate :distinct_on, :find_ids_in_batches, :explain, to: :all
 
     def find_ids_in_ranges(loose: true, **kwargs, &block)
-      all.find_ids_in_ranges(loose: loose, **kwargs, &block)
+      all.find_ids_in_ranges(loose:, **kwargs, &block)
     end
 
     attr_accessor :in_migration
@@ -47,7 +47,7 @@ class ActiveRecord::Base
         AfterTransactionCommit::Transaction.instance_method(:commit_records)
       ].map do |method|
         if method
-          regex = /\A#{Regexp.escape(method.source_location.first)}:\d+:in `#{Regexp.escape(method.name)}'\z/.freeze
+          regex = /\A#{Regexp.escape(method.source_location.first)}:\d+:in `#{Regexp.escape(method.name)}'\z/
           stacktrace.index { |s| s =~ regex }
         end
       end
@@ -365,7 +365,7 @@ class ActiveRecord::Base
       args = args.map { |a| column_str % a.to_s }
     end
 
-    value = wildcard_pattern(value, case_sensitive: case_sensitive, type: type)
+    value = wildcard_pattern(value, case_sensitive:, type:)
     cols = args.map { |col| like_condition(col, "?", !case_sensitive) }
     sanitize_sql_array ["(#{cols.join(" OR ")})", *([value] * cols.size)]
   end
@@ -557,10 +557,10 @@ class ActiveRecord::Base
     specifics.each do |(name, class_name)|
       # ensure we capture this class's table name
       table_name = self.table_name
-      belongs_to :"#{prefix}#{name}",
+      belongs_to(:"#{prefix}#{name}",
                  -> { where(table_name => { reflection.foreign_type => class_name }) },
                  foreign_key: reflection.foreign_key,
-                 class_name: class_name # rubocop:disable Rails/ReflectionClassName
+                 class_name:) # rubocop:disable Rails/ReflectionClassName
 
       correct_type = "#{reflection.foreign_type} && self.class.send(:compute_type, #{reflection.foreign_type}) <= #{class_name}"
 
@@ -760,11 +760,11 @@ module UsefulFindInBatches
   # add the strategy param
   def find_each(start: nil, finish: nil, order: :asc, **kwargs, &block)
     if block
-      find_in_batches(start: start, finish: finish, order: order, **kwargs) do |records|
+      find_in_batches(start:, finish:, order:, **kwargs) do |records|
         records.each(&block)
       end
     else
-      enum_for(:find_each, start: start, finish: finish, order: order, **kwargs) do
+      enum_for(:find_each, start:, finish:, order:, **kwargs) do
         relation = self
         apply_limits(relation, start, finish, order).size
       end
@@ -775,20 +775,20 @@ module UsefulFindInBatches
   def find_in_batches(batch_size: 1000, start: nil, finish: nil, order: :asc, **kwargs)
     relation = self
     unless block_given?
-      return to_enum(:find_in_batches, start: start, finish: finish, order: order, batch_size: batch_size, **kwargs) do
+      return to_enum(:find_in_batches, start:, finish:, order:, batch_size:, **kwargs) do
         total = apply_limits(relation, start, finish, order).size
         (total - 1).div(batch_size) + 1
       end
     end
 
-    in_batches(of: batch_size, start: start, finish: finish, order: order, load: true, **kwargs) do |batch|
+    in_batches(of: batch_size, start:, finish:, order:, load: true, **kwargs) do |batch|
       yield batch.to_a
     end
   end
 
   def in_batches(strategy: nil, start: nil, finish: nil, order: :asc, **kwargs, &block)
     unless block
-      return ActiveRecord::Batches::BatchEnumerator.new(strategy: strategy, start: start, relation: self, **kwargs)
+      return ActiveRecord::Batches::BatchEnumerator.new(strategy:, start:, relation: self, **kwargs)
     end
 
     unless [:asc, :desc].include?(order)
@@ -802,12 +802,12 @@ module UsefulFindInBatches
     if strategy == :id
       raise ArgumentError, "GROUP BY is incompatible with :id batches strategy" unless group_values.empty?
 
-      return activate { |r| r.call_super(:in_batches, UsefulFindInBatches, start: start, finish: finish, order: order, **kwargs, &block) }
+      return activate { |r| r.call_super(:in_batches, UsefulFindInBatches, start:, finish:, order:, **kwargs, &block) }
     end
 
     kwargs.delete(:error_on_ignore)
     activate do |r|
-      r.send("in_batches_with_#{strategy}", start: start, finish: finish, order: order, **kwargs, &block)
+      r.send("in_batches_with_#{strategy}", start:, finish:, order:, **kwargs, &block)
       nil
     end
   end
@@ -922,7 +922,7 @@ module UsefulFindInBatches
                   column_types = types.dup
                   columns_hash.each_key { |k| column_types.delete k }
 
-                  PG::TextDecoder::CopyRow.new(type_map: type_map)
+                  PG::TextDecoder::CopyRow.new(type_map:)
                 else
                   pkey_oid = columns_hash[primary_key].sql_type_metadata.oid
                   # this is really dumb that we have to manually search through this, but
@@ -1095,7 +1095,7 @@ module UsefulBatchEnumerator
     end
 
     strategy = @strategy || @relation.infer_in_batches_strategy
-    @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
+    @relation.in_batches(strategy:, load: false, **@kwargs) do |relation|
       @relation.connection.with_max_update_limit(@of) do
         sum += relation.delete_all
       end
@@ -1118,7 +1118,7 @@ module UsefulBatchEnumerator
     end
 
     strategy = @strategy || @relation.infer_in_batches_strategy
-    @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
+    @relation.in_batches(strategy:, load: false, **@kwargs) do |relation|
       @relation.connection.with_max_update_limit(@of) do
         sum += relation.update_all(updates)
       end
@@ -1131,16 +1131,16 @@ module UsefulBatchEnumerator
   def update_all_locked_in_order(lock_type: :no_key_update, **updates)
     sum = 0
     strategy = @strategy || @relation.infer_in_batches_strategy
-    @relation.in_batches(strategy: strategy, load: false, **@kwargs) do |relation|
+    @relation.in_batches(strategy:, load: false, **@kwargs) do |relation|
       @relation.connection.with_max_update_limit(@of) do
-        sum += relation.update_all_locked_in_order(lock_type: lock_type, **updates)
+        sum += relation.update_all_locked_in_order(lock_type:, **updates)
       end
     end
     sum
   end
 
   def touch_all(*names, time: nil)
-    update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time: time))
+    update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time:))
   end
 
   def destroy_all
@@ -1278,17 +1278,17 @@ ActiveRecord::Relation.class_eval do
 
   def touch_all(*names, time: nil)
     activate do |relation|
-      relation.update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time: time))
+      relation.update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time:))
     end
   end
 
   def touch_all_skip_locked(*names, time: nil)
     if Setting.get("touch_all_skip_locked_enabled", "true") == "true"
       activate do |relation|
-        relation.update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time: time), lock_type: :no_key_update_skip_locked)
+        relation.update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time:), lock_type: :no_key_update_skip_locked)
       end
     else
-      touch_all(*names, time: time)
+      touch_all(*names, time:)
     end
   end
 
@@ -1710,10 +1710,10 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     return unless supports_foreign_keys?
 
     if options.delete(:if_exists)
-      fk_name_to_delete = foreign_key_for(from_table, to_table: to_table, **options)&.name
+      fk_name_to_delete = foreign_key_for(from_table, to_table:, **options)&.name
       return if fk_name_to_delete.nil?
     else
-      fk_name_to_delete = foreign_key_for!(from_table, to_table: to_table, **options).name
+      fk_name_to_delete = foreign_key_for!(from_table, to_table:, **options).name
     end
 
     at = create_alter_table from_table
@@ -1725,7 +1725,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   def add_replica_identity(model_name, column_name, default_value = 0)
     klass = model_name.constantize
     if columns(klass.table_name).find { |c| c.name == column_name.to_s }.null
-      DataFixup::BackfillNulls.run(klass, column_name, default_value: default_value)
+      DataFixup::BackfillNulls.run(klass, column_name, default_value:)
     end
     change_column_null klass.table_name, column_name, false
     primary_column = klass.primary_key
@@ -1916,7 +1916,7 @@ module ExplainAnalyze
         msg << binds.map { |attr| render_bind(attr) }.inspect
       end
       msg << "\n"
-      msg << connection.explain(sql, binds, analyze: analyze)
+      msg << connection.explain(sql, binds, analyze:)
     end.join("\n")
 
     # Overriding inspect to be more human readable, especially in the console.
@@ -1937,7 +1937,7 @@ module ExplainAnalyze
         activate { |relation| relation.send(:exec_queries) }
       end
     end,
-                 analyze: analyze)
+                 analyze:)
   end
 end
 ActiveRecord::Relation.prepend(ExplainAnalyze)
@@ -1979,7 +1979,7 @@ module DontExplicitlyNameColumnsBecauseOfIgnores
   def build_select(arel)
     if select_values.any?
       arel.project(*arel_columns(select_values.uniq))
-    elsif !from_clause.value && klass.ignored_columns.any? && !(klass.ignored_columns & klass.column_names).empty?
+    elsif !from_clause.value && klass.ignored_columns.any? && !!klass.ignored_columns.intersect?(klass.column_names)
       arel.project(*klass.column_names.map { |field| arel_attribute(field) })
     else
       arel.project(table[Arel.star])
@@ -1989,10 +1989,10 @@ end
 ActiveRecord::Relation.prepend(DontExplicitlyNameColumnsBecauseOfIgnores)
 
 module PreserveShardAfterTransaction
-  def after_transaction_commit(&block)
+  def after_transaction_commit(&)
     shards = Shard.send(:active_shards)
     shards[Delayed::Backend::ActiveRecord::AbstractJob] = Shard.current.delayed_jobs_shard if ::ActiveRecord::Migration.open_migrations.positive?
-    super { Shard.activate(shards, &block) }
+    super { Shard.activate(shards, &) }
   end
 end
 ActiveRecord::ConnectionAdapters::Transaction.prepend(PreserveShardAfterTransaction)
@@ -2098,7 +2098,7 @@ ActiveRecord::Base.prepend(ClearableAssociationCache)
 
 module VersionAgnosticPreloader
   def preload(records, associations, preload_scope = nil)
-    ActiveRecord::Associations::Preloader.new(records: Array.wrap(records).compact, associations: associations, scope: preload_scope).call
+    ActiveRecord::Associations::Preloader.new(records: Array.wrap(records).compact, associations:, scope: preload_scope).call
   end
 end
 ActiveRecord::Associations.singleton_class.include(VersionAgnosticPreloader)
@@ -2184,7 +2184,7 @@ if Rails.version >= "6.1"
       class TransactionManager
         def within_new_transaction(isolation: nil, joinable: true)
           @connection.lock.synchronize do
-            transaction = begin_transaction(isolation: isolation, joinable: joinable)
+            transaction = begin_transaction(isolation:, joinable:)
             ret = yield
             completed = true
             ret

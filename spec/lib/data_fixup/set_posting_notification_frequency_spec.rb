@@ -20,7 +20,7 @@
 
 describe DataFixup::SetPostingNotificationFrequency do
   let_once(:account) { Account.create! }
-  let_once(:course) { Course.create!(account: account) }
+  let_once(:course) { Course.create!(account:) }
   let_once(:now) { Time.zone.now }
   let_once(:student) { course.enroll_student(User.create!).user }
 
@@ -39,7 +39,7 @@ describe DataFixup::SetPostingNotificationFrequency do
   def policy_for_notification(notification)
     NotificationPolicy.find_by(
       communication_channel: student.email_channel,
-      notification: notification
+      notification:
     )
   end
 

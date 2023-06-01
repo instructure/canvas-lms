@@ -78,11 +78,11 @@ describe Pseudonym do
 
   it "finds the correct pseudonym for logins" do
     user = User.create!
-    p1 = Pseudonym.create!(unique_id: "Cody@instructure.com", user: user)
-    Pseudonym.create!(unique_id: "codY@instructure.com", user: user) { |p| p.workflow_state = "deleted" }
+    p1 = Pseudonym.create!(unique_id: "Cody@instructure.com", user:)
+    Pseudonym.create!(unique_id: "codY@instructure.com", user:) { |p| p.workflow_state = "deleted" }
     expect(Pseudonym.active.by_unique_id("cody@instructure.com").first).to eq p1
     account = Account.create!
-    p3 = Pseudonym.create!(unique_id: "cOdy@instructure.com", account: account, user: user)
+    p3 = Pseudonym.create!(unique_id: "cOdy@instructure.com", account:, user:)
     expect(Pseudonym.active.by_unique_id("cody@instructure.com").sort).to eq [p1, p3]
   end
 
@@ -306,7 +306,7 @@ describe Pseudonym do
       account.authentication_providers.create!(auth_type: "ldap")
       u = User.create!
       u.register
-      pseudonym = u.pseudonyms.create!(unique_id: "jt", account: account) { |p| p.sis_user_id = "jt" }
+      pseudonym = u.pseudonyms.create!(unique_id: "jt", account:) { |p| p.sis_user_id = "jt" }
       pseudonym.instance_variable_set(:@ldap_result, { mail: ["jt@instructure.com"] })
 
       pseudonym.add_ldap_channel
@@ -335,7 +335,7 @@ describe Pseudonym do
       ap = account.authentication_providers.create!(auth_type: "ldap")
       u = User.create!
       u.register
-      pseudonym = u.pseudonyms.create!(unique_id: "jt", account: account) { |p| p.sis_user_id = "jt" }
+      pseudonym = u.pseudonyms.create!(unique_id: "jt", account:) { |p| p.sis_user_id = "jt" }
       pseudonym.instance_variable_set(:@ldap_result, { mail: ["jt@instructure.com"] })
 
       pseudonym.infer_auth_provider(ap)
@@ -391,7 +391,7 @@ describe Pseudonym do
       it "won't attempt silly queries" do
         wat = " " * 3000
         unique_id = "asdf#{wat}asdf"
-        creds = { unique_id: unique_id, password: "foobar" }
+        creds = { unique_id:, password: "foobar" }
         expect(Pseudonym.authenticate(creds, [Account.default.id])).to eq(:impossible_credentials)
       end
     end
@@ -765,7 +765,7 @@ describe Pseudonym do
     it "throws an error if your credentials are absurd" do
       wat = " " * 3000
       unique_id = "asdf#{wat}asdf"
-      creds = { unique_id: unique_id, password: "foobar" }
+      creds = { unique_id:, password: "foobar" }
       expect { Pseudonym.find_all_by_arbitrary_credentials(creds, [Account.default.id], "127.0.0.1") }.to raise_error(ImpossibleCredentialsError)
     end
 

@@ -47,7 +47,7 @@ describe ContentMigration do
                                             lock_at: @old_start + 2.days)
         @copy_from.attachments.create!(filename: "blah",
                                        uploaded_data: StringIO.new("blah"),
-                                       folder: folder)
+                                       folder:)
 
         @copy_from.quizzes.create!(due_at: "05 Jul 2012 06:00:00 UTC +00:00",
                                    unlock_at: @old_start + 1.day,
@@ -259,10 +259,10 @@ describe ContentMigration do
           opts = {
             everything: true,
             shift_dates: true,
-            old_start_date: old_start_date,
-            old_end_date: old_end_date,
-            new_start_date: new_start_date,
-            new_end_date: new_end_date
+            old_start_date:,
+            old_end_date:,
+            new_start_date:,
+            new_end_date:
           }
           opts[:time_zone] = options[:time_zone].name if options.include?(:time_zone)
           @cm.copy_options = @cm.copy_options.merge(opts)

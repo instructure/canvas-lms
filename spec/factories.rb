@@ -73,7 +73,7 @@ module Factories
 end
 
 legit_global_methods = Object.private_methods
-Dir[File.dirname(__FILE__) + "/factories/**/*.rb"].sort.each { |f| require f }
+Dir[File.dirname(__FILE__) + "/factories/**/*.rb"].each { |f| require f }
 crap_factories = (Object.private_methods - legit_global_methods)
 if crap_factories.present?
   warn "\e[31mError: Don't create global factories/helpers"

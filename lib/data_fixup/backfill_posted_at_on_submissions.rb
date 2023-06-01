@@ -20,7 +20,7 @@
 
 module DataFixup::BackfillPostedAtOnSubmissions
   def self.run(start_at, end_at)
-    Submission.find_ids_in_ranges(start_at: start_at, end_at: end_at) do |min_id, max_id|
+    Submission.find_ids_in_ranges(start_at:, end_at:) do |min_id, max_id|
       Submission.where(id: min_id..max_id, posted_at: nil).where.not(graded_at: nil).update_all("posted_at = graded_at")
     end
   end

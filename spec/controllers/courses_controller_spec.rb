@@ -1478,7 +1478,7 @@ describe CoursesController do
         account.settings[:allow_invitation_previews] = false
         account.save!
 
-        course_factory(account: account)
+        course_factory(account:)
         user_factory(active_all: true)
         enrollment = @course.enroll_teacher(@user, enrollment_state: "invited")
         user_session(@user)
@@ -1617,7 +1617,7 @@ describe CoursesController do
       # defaults to false for everyone except those with the AccountAdmin role
       role = custom_account_role("LimitedAccess", account: Account.site_admin)
       user_factory(active_all: true)
-      Account.site_admin.account_users.create!(user: @user, role: role)
+      Account.site_admin.account_users.create!(user: @user, role:)
       user_session(@user)
 
       get "show", params: { id: @course.id }
@@ -1628,7 +1628,7 @@ describe CoursesController do
     it "does not redirect xhr to settings page when user can :read_as_admin, but not :read" do
       role = custom_account_role("LimitedAccess", account: Account.site_admin)
       user_factory(active_all: true)
-      Account.site_admin.account_users.create!(user: @user, role: role)
+      Account.site_admin.account_users.create!(user: @user, role:)
       user_session(@user)
 
       get "show", params: { id: @course.id }, xhr: true
@@ -2310,10 +2310,10 @@ describe CoursesController do
       @account = Account.default
       @account.root_account.disable_feature!(:granular_permissions_manage_courses)
       role = custom_account_role "lamer", account: @account
-      @account.role_overrides.create! permission: "manage_courses", enabled: true, role: role
-      @visperm = @account.role_overrides.create! permission: "manage_course_visibility", enabled: true, role: role
+      @account.role_overrides.create!(permission: "manage_courses", enabled: true, role:)
+      @visperm = @account.role_overrides.create!(permission: "manage_course_visibility", enabled: true, role:)
       user_factory
-      @account.account_users.create!(user: @user, role: role)
+      @account.account_users.create!(user: @user, role:)
       user_session @user
     end
 
@@ -2406,13 +2406,13 @@ describe CoursesController do
       @account = Account.default
       @account.root_account.enable_feature!(:granular_permissions_manage_courses)
       role = custom_account_role "lamer", account: @account
-      @account.role_overrides.create! permission: "manage_courses_add", enabled: true, role: role
+      @account.role_overrides.create!(permission: "manage_courses_add", enabled: true, role:)
       @visperm =
-        @account.role_overrides.create! permission: "manage_course_visibility",
+        @account.role_overrides.create!(permission: "manage_course_visibility",
                                         enabled: true,
-                                        role: role
+                                        role:)
       user_factory
-      @account.account_users.create!(user: @user, role: role)
+      @account.account_users.create!(user: @user, role:)
       user_session @user
     end
 
@@ -2865,12 +2865,12 @@ describe CoursesController do
     it "lets admins without course edit rights update only the syllabus body" do
       @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
       role = custom_account_role("grade viewer", account: Account.default)
-      account_admin_user_with_role_changes(role: role, role_changes: { manage_content: true })
+      account_admin_user_with_role_changes(role:, role_changes: { manage_content: true })
       user_session(@user)
 
       name = "some name"
       body = "some body"
-      put "update", params: { id: @course.id, course: { name: name, syllabus_body: body } }
+      put "update", params: { id: @course.id, course: { name:, syllabus_body: body } }
 
       @course.reload
       expect(@course.name).to_not eq name
@@ -2881,14 +2881,14 @@ describe CoursesController do
       @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
       role = custom_account_role("grade viewer", account: Account.default)
       account_admin_user_with_role_changes(
-        role: role,
+        role:,
         role_changes: { manage_course_content_edit: true }
       )
       user_session(@user)
 
       name = "some name"
       body = "some body"
-      put "update", params: { id: @course.id, course: { name: name, syllabus_body: body } }
+      put "update", params: { id: @course.id, course: { name:, syllabus_body: body } }
 
       @course.reload
       expect(@course.name).to_not eq name
@@ -3346,7 +3346,7 @@ describe CoursesController do
         user_session(@teacher)
         start_at = 5.weeks.ago.beginning_of_day
         conclude_at = 10.weeks.from_now.beginning_of_day
-        put "update", params: { id: @course.id, course: { start_at: start_at, conclude_at: conclude_at, restrict_enrollments_to_course_dates: true } }
+        put "update", params: { id: @course.id, course: { start_at:, conclude_at:, restrict_enrollments_to_course_dates: true } }
         @course.reload
         expect(@course.start_at).to eq start_at
         expect(@course.conclude_at).to eq conclude_at
@@ -3382,7 +3382,7 @@ describe CoursesController do
           account_admin_user(active_all: true)
           user_session(@admin)
           start_at = 6.weeks.ago.beginning_of_day
-          put "update", params: { id: @course.id, course: { start_at: start_at, restrict_enrollments_to_course_dates: true } }
+          put "update", params: { id: @course.id, course: { start_at:, restrict_enrollments_to_course_dates: true } }
           expect(response).to be_redirect
           @course.reload
           expect(@course.start_at).to eq start_at
@@ -3399,9 +3399,9 @@ describe CoursesController do
         it "allows teachers to update other settings along with course availability settings if the latter remains unchanged" do
           start_at = 6.weeks.ago.beginning_of_day
           conclude_at = 3.weeks.from_now.beginning_of_day
-          @course.update!(start_at: start_at, conclude_at: conclude_at, restrict_enrollments_to_course_dates: true)
+          @course.update!(start_at:, conclude_at:, restrict_enrollments_to_course_dates: true)
           user_session(@teacher)
-          put "update", params: { id: @course.id, course: { name: "cool new course", start_at: start_at, conclude_at: conclude_at, restrict_enrollments_to_course_dates: true } }
+          put "update", params: { id: @course.id, course: { name: "cool new course", start_at:, conclude_at:, restrict_enrollments_to_course_dates: true } }
           expect(response).to be_redirect
           expect(@course.reload.name).to eq "cool new course"
         end
@@ -3410,9 +3410,9 @@ describe CoursesController do
           # in this case, the controller automatically drops the course dates, and this shouldn't be restricted by permissions
           start_at = 6.weeks.ago.beginning_of_day
           conclude_at = 3.weeks.from_now.beginning_of_day
-          @course.update!(start_at: start_at, conclude_at: conclude_at)
+          @course.update!(start_at:, conclude_at:)
           user_session(@teacher)
-          put "update", params: { id: @course.id, course: { name: "cool new course", start_at: start_at, conclude_at: conclude_at } }
+          put "update", params: { id: @course.id, course: { name: "cool new course", start_at:, conclude_at: } }
           expect(response).to be_redirect
           expect(@course.reload.name).to eq "cool new course"
         end
@@ -3420,7 +3420,7 @@ describe CoursesController do
         it "does not allow teachers to set course dates to nil if restrict_enrollments_to_course_dates is true" do
           start_at = 6.weeks.ago.beginning_of_day
           conclude_at = 3.weeks.from_now.beginning_of_day
-          @course.update!(start_at: start_at, conclude_at: conclude_at, restrict_enrollments_to_course_dates: true)
+          @course.update!(start_at:, conclude_at:, restrict_enrollments_to_course_dates: true)
           user_session(@teacher)
           put "update", params: { id: @course.id, course: { start_at: nil, conclude_at: nil } }
           expect(response).to be_unauthorized
@@ -3429,7 +3429,7 @@ describe CoursesController do
         it "does not allow teachers to change course dates if restrict_enrollments_to_course_dates is true" do
           start_at = 6.weeks.ago.beginning_of_day
           conclude_at = 3.weeks.from_now.beginning_of_day
-          @course.update!(start_at: start_at, conclude_at: conclude_at, restrict_enrollments_to_course_dates: true)
+          @course.update!(start_at:, conclude_at:, restrict_enrollments_to_course_dates: true)
           user_session(@teacher)
           put "update", params: { id: @course.id, course: { start_at: start_at + 1.day } }
           expect(response).to be_unauthorized
@@ -3942,11 +3942,11 @@ describe CoursesController do
           @account = Account.default
           @account.disable_feature!(:granular_permissions_manage_courses)
           role = custom_account_role "lamer", account: @account
-          @account.role_overrides.create! permission: "manage_courses",
+          @account.role_overrides.create!(permission: "manage_courses",
                                           enabled: true,
-                                          role: role
+                                          role:)
           user_factory
-          @account.account_users.create!(user: @user, role: role)
+          @account.account_users.create!(user: @user, role:)
         end
 
         before do
@@ -3971,11 +3971,11 @@ describe CoursesController do
           @account = Account.default
           @account.enable_feature!(:granular_permissions_manage_courses)
           role = custom_account_role "lamer", account: @account
-          @account.role_overrides.create! permission: "manage_courses_add",
+          @account.role_overrides.create!(permission: "manage_courses_add",
                                           enabled: true,
-                                          role: role
+                                          role:)
           user_factory
-          @account.account_users.create!(user: @user, role: role)
+          @account.account_users.create!(user: @user, role:)
         end
 
         before do
@@ -4066,10 +4066,10 @@ describe CoursesController do
       auditor_rec = submission.auditor_grade_change_records.first
       expect(auditor_rec).to_not be_nil
       attachment = attachment_model
-      OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: test_student.submissions.first)
+      OriginalityReport.create!(attachment:, originality_score: "1", submission: test_student.submissions.first)
       submission.canvadocs_annotation_contexts.create!(
         root_account: @course.root_account,
-        attachment: attachment,
+        attachment:,
         launch_id: "1234"
       )
       delete "reset_test_student", params: { course_id: @course.id }
@@ -4161,11 +4161,11 @@ describe CoursesController do
   describe "#users" do
     let(:course) { Course.create! }
 
-    let(:teacher) { teacher_in_course(course: course, active_all: true).user }
+    let(:teacher) { teacher_in_course(course:, active_all: true).user }
 
-    let(:student1) { student_in_course(course: course, active_all: true).user }
+    let(:student1) { student_in_course(course:, active_all: true).user }
 
-    let(:student2) { student_in_course(course: course, active_all: true).user }
+    let(:student2) { student_in_course(course:, active_all: true).user }
 
     let!(:group1) do
       group = course.groups.create!(name: "group one")
@@ -4365,7 +4365,7 @@ describe CoursesController do
       user_session(@teacher)
       account_admin = user_factory(name: "less privileged account admin")
       role = custom_account_role("manage_content", account: @course.root_account)
-      account_admin_user(account: @course.root_account, user: account_admin, role: role)
+      account_admin_user(account: @course.root_account, user: account_admin, role:)
 
       get "content_share_users", params: { course_id: @course.id, search_term: "less privileged" }
       json = json_parse(response.body)
@@ -4451,7 +4451,7 @@ describe CoursesController do
 
     it "allows the teacher to change visibility" do
       course = Course.create!
-      teacher = teacher_in_course(course: course, active_all: true).user
+      teacher = teacher_in_course(course:, active_all: true).user
       user_session(teacher)
 
       post "update", params: { id: course.id,
@@ -4464,7 +4464,7 @@ describe CoursesController do
 
     it "does not allow a teacher without the permission to change visibility" do
       course = Course.create!
-      teacher = teacher_in_course(course: course, active_all: true).user
+      teacher = teacher_in_course(course:, active_all: true).user
       course.account.role_overrides.create!(role: teacher_role, permission: "manage_course_visibility", enabled: false)
       user_session(teacher)
 
@@ -4492,8 +4492,8 @@ describe CoursesController do
     it "allows a site admin to change visibility even if account admins cannot" do
       site_admin = site_admin_user
       account = Account.create(name: "fake-o")
-      account_with_role_changes(account: account, role_changes: { "manage_course_visibility" => false })
-      course = course_factory(account: account)
+      account_with_role_changes(account:, role_changes: { "manage_course_visibility" => false })
+      course = course_factory(account:)
       user_session(site_admin)
 
       post "update", params: { id: course.id,

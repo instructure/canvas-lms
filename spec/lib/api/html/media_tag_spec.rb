@@ -136,7 +136,7 @@ module Api
             end
             let(:media_tag) do
               MediaTag.new(base_tag, Nokogiri::XML::DocumentFragment.parse("<div></div>"), Nokogiri::XML::Node).tap do |tag|
-                allow(tag).to receive_messages(media_object: media_object)
+                allow(tag).to receive_messages(media_object:)
               end
             end
 

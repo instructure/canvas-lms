@@ -21,8 +21,8 @@
 # This class is used to guess type information. Normally, its examples are fed
 # from data given by API docs' "@object {}" descriptions.
 class FormattedType
-  DATE_RE = /^\d\d\d\d-\d\d-\d\d$/.freeze
-  DATETIME_RE = /^\d\d\d\d-\d\d-\d\d[T ]\d\d:\d\d:\d\dZ?$/.freeze
+  DATE_RE = /^\d\d\d\d-\d\d-\d\d$/
+  DATETIME_RE = /^\d\d\d\d-\d\d-\d\d[T ]\d\d:\d\d:\d\dZ?$/
 
   def initialize(example)
     @example = example

@@ -50,7 +50,7 @@ class TermsOfService < ActiveRecord::Base
     passive = is_new_account || !(Setting.get("terms_required", "true") == "true" && account.account_terms_required?)
     unique_constraint_retry do |retry_count|
       account.reload_terms_of_service if retry_count > 0
-      account.terms_of_service || account.create_terms_of_service!(term_options_for_account(account).merge(passive: passive))
+      account.terms_of_service || account.create_terms_of_service!(term_options_for_account(account).merge(passive:))
     end
   end
 

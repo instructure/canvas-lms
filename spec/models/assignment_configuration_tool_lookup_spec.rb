@@ -25,7 +25,7 @@ describe AssignmentConfigurationToolLookup do
   let(:subscription_service) { class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
   let(:test_id) { SecureRandom.uuid }
   let(:stub_response) { double(code: 200, parsed_response: { "Id" => test_id }, ok?: true) }
-  let(:assignment) { assignment_model(course: course) }
+  let(:assignment) { assignment_model(course:) }
 
   before do
     message_handler.update(capabilities: ["Canvas.placements.similarityDetection"])
@@ -63,13 +63,13 @@ describe AssignmentConfigurationToolLookup do
     end
 
     it "returns the resource codes when the tool is not set but the codes are" do
-      lookup = AssignmentConfigurationToolLookup.create!(assignment: assignment, tool: message_handler)
+      lookup = AssignmentConfigurationToolLookup.create!(assignment:, tool: message_handler)
       expect(lookup.resource_codes).to eq expected_hash
     end
 
     it "returns the resource codes when only the tool_id is set" do
       lookup = AssignmentConfigurationToolLookup.create!(
-        assignment: assignment,
+        assignment:,
         tool_type: "Lti::MessageHandler",
         tool_product_code: product_family.product_code,
         tool_vendor_code: product_family.vendor_code,
@@ -80,7 +80,7 @@ describe AssignmentConfigurationToolLookup do
 
     it "returns an empty hash when the tool is not a message handler" do
       tool = course.context_external_tools.create!(name: "a", url: "http://www.test.com", consumer_key: "12345", shared_secret: "secret")
-      lookup = AssignmentConfigurationToolLookup.create(assignment: assignment, tool: tool)
+      lookup = AssignmentConfigurationToolLookup.create(assignment:, tool:)
       expect(lookup.resource_codes).to eq({})
     end
   end
@@ -94,8 +94,8 @@ describe AssignmentConfigurationToolLookup do
       a
     end
     let(:root_account) { Account.create!(name: "root account") }
-    let(:account) { Account.create!(name: "account", root_account: root_account) }
-    let(:course) { Course.create!(account: account) }
+    let(:account) { Account.create!(name: "account", root_account:) }
+    let(:course) { Course.create!(account:) }
 
     before do
       message_handler.update!(capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2])
@@ -131,7 +131,7 @@ describe AssignmentConfigurationToolLookup do
   describe "#webhook_info" do
     it "shows the correct info" do
       lookup = AssignmentConfigurationToolLookup.create!(
-        assignment: assignment,
+        assignment:,
         tool_type: "Lti::MessageHandler",
         tool_product_code: product_family.product_code,
         tool_vendor_code: product_family.vendor_code,

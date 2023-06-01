@@ -73,7 +73,7 @@ describe "Accounts API", type: :request do
 
     it "doesn't return duplicates" do
       role = custom_account_role("some role", account: @a1)
-      @a1.account_users.create!(user: @user, role: role)
+      @a1.account_users.create!(user: @user, role:)
 
       json = api_call(:get,
                       "/api/v1/accounts.json",
@@ -834,8 +834,8 @@ describe "Accounts API", type: :request do
 
         # re-add the user as an admin with quota rights
         role = custom_account_role "quotas", account: @a1
-        @a1.role_overrides.create! role: role, permission: "manage_storage_quotas", enabled: true
-        @a1.account_users.create!(user: @user, role: role)
+        @a1.role_overrides.create! role:, permission: "manage_storage_quotas", enabled: true
+        @a1.account_users.create!(user: @user, role:)
 
         @params = { controller: "accounts", action: "update", id: @a1.to_param, format: "json" }
       end
@@ -884,9 +884,9 @@ describe "Accounts API", type: :request do
 
         # re-add the user as an admin without quota rights
         role = custom_account_role "no-quotas", account: @a1
-        @a1.role_overrides.create! role: role, permission: "manage_account_settings", enabled: true
-        @a1.role_overrides.create! role: role, permission: "manage_storage_quotas", enabled: false
-        @a1.account_users.create!(user: @user, role: role)
+        @a1.role_overrides.create! role:, permission: "manage_account_settings", enabled: true
+        @a1.role_overrides.create! role:, permission: "manage_storage_quotas", enabled: false
+        @a1.account_users.create!(user: @user, role:)
 
         @params = { controller: "accounts", action: "update", id: @a1.to_param, format: "json" }
       end
@@ -1813,7 +1813,7 @@ describe "Accounts API", type: :request do
                         action: "courses_api",
                         account_id: @a1.to_param,
                         format: "json",
-                        search_term: search_term })
+                        search_term: })
       expect(json.length).to eql @courses.length
 
       search_term = "code"
@@ -1823,7 +1823,7 @@ describe "Accounts API", type: :request do
                         action: "courses_api",
                         account_id: @a1.to_param,
                         format: "json",
-                        search_term: search_term })
+                        search_term: })
       expect(json.length).to eql @courses.length
 
       search_term = "name1"
@@ -1833,7 +1833,7 @@ describe "Accounts API", type: :request do
                         action: "courses_api",
                         account_id: @a1.to_param,
                         format: "json",
-                        search_term: search_term })
+                        search_term: })
       expect(json.length).to be 3
 
       # Should return empty result set
@@ -1844,7 +1844,7 @@ describe "Accounts API", type: :request do
                         action: "courses_api",
                         account_id: @a1.to_param,
                         format: "json",
-                        search_term: search_term })
+                        search_term: })
       expect(json.length).to be 0
 
       # To short should return 400
@@ -1855,7 +1855,7 @@ describe "Accounts API", type: :request do
                                 action: "courses_api",
                                 account_id: @a1.to_param,
                                 format: "json",
-                                search_term: search_term })
+                                search_term: })
       expect(response).to eq 400
 
       # search on something that's a course name but looks like an id also
@@ -1868,7 +1868,7 @@ describe "Accounts API", type: :request do
                         action: "courses_api",
                         account_id: @a1.to_param,
                         format: "json",
-                        search_term: search_term })
+                        search_term: })
       expect(json.length).to be 2
       expect(json.map { |c| [c["id"], c["name"]] }).to match_array([
                                                                      [course_with_long_id.id, course_with_long_id.name], [one_more.id, one_more.name]
@@ -1887,7 +1887,7 @@ describe "Accounts API", type: :request do
                           action: "courses_api",
                           account_id: @a1.to_param,
                           format: "json",
-                          search_term: search_term })
+                          search_term: })
         expect(json.length).to be 1
         expect(json.first["name"]).to eq @course.name
       end

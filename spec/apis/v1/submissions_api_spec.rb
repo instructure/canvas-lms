@@ -577,7 +577,7 @@ describe "Submissions API", type: :request do
         data: larger_rubric_data
       )
       @a1.create_rubric_association(
-        rubric: rubric,
+        rubric:,
         purpose: "grading",
         use_for_grading: true,
         context: @course
@@ -753,7 +753,7 @@ describe "Submissions API", type: :request do
     course_with_teacher(active_all: true)
     @course.enroll_student(@student).accept!
     group_category = @course.group_categories.create(name: "Category")
-    @group = @course.groups.create(name: "Group", group_category: group_category)
+    @group = @course.groups.create(name: "Group", group_category:)
     @group.add_user(@student)
     @context = @course
     @assignment = factory_with_protected_attributes(@course.assignments, { title: "assignment1", submission_types: "discussion_topic", discussion_topic: discussion_topic_model(group_category: @group.group_category) })
@@ -1307,7 +1307,7 @@ describe "Submissions API", type: :request do
     rubric = rubric_model(user: @user,
                           context: @course,
                           data: larger_rubric_data)
-    a1.create_rubric_association(rubric: rubric, purpose: "grading", use_for_grading: true, context: @course)
+    a1.create_rubric_association(rubric:, purpose: "grading", use_for_grading: true, context: @course)
 
     submit_homework(a1, student1)
     media_object(media_id: "54321", context: student1, user: student1)
@@ -2092,7 +2092,7 @@ describe "Submissions API", type: :request do
         @attachment.save!
         submission = @assignment.submit_homework(@student, attachments: [@attachment])
         OriginalityReport.create!(attachment: @attachment,
-                                  submission: submission,
+                                  submission:,
                                   workflow_state: "pending",
                                   originality_score: 0.1)
 
@@ -3637,9 +3637,9 @@ describe "Submissions API", type: :request do
       before do
         @student2 = @course.enroll_student(User.create!, enrollment_state: :active).user
         group_category = @course.group_categories.create!(name: "Category")
-        group = @course.groups.create!(name: "Group", group_category: group_category)
+        group = @course.groups.create!(name: "Group", group_category:)
         group.users = [@student, @student2]
-        @assignment.update!(group_category: group_category, grade_group_students_individually: false)
+        @assignment.update!(group_category:, grade_group_students_individually: false)
       end
 
       it "can set late policy status on a group member's submission" do
@@ -3681,7 +3681,7 @@ describe "Submissions API", type: :request do
           {
             submission: {
               late_policy_status: "late",
-              seconds_late_override: seconds_late_override
+              seconds_late_override:
             }
           }
         )
@@ -3779,7 +3779,7 @@ describe "Submissions API", type: :request do
         {
           submission: {
             late_policy_status: "late",
-            seconds_late_override: seconds_late_override
+            seconds_late_override:
           }
         }
       )
@@ -3807,7 +3807,7 @@ describe "Submissions API", type: :request do
           user_id: @student.id.to_s
         },
         {
-          submission: { seconds_late_override: seconds_late_override }
+          submission: { seconds_late_override: }
         }
       )
 
@@ -3830,7 +3830,7 @@ describe "Submissions API", type: :request do
         {
           submission: {
             late_policy_status: "missing",
-            seconds_late_override: seconds_late_override
+            seconds_late_override:
           }
         }
       )
@@ -4474,7 +4474,7 @@ describe "Submissions API", type: :request do
       @a1 = @course.assignments.create!(title: "assignment1", grading_type: "points", points_possible: 12)
       rubric = rubric_model(user: @user, context: @course, data: larger_rubric_data)
       @rubric_association = @a1.create_rubric_association(
-        rubric: rubric,
+        rubric:,
         purpose: "grading",
         use_for_grading: true,
         context: @course
@@ -4547,7 +4547,7 @@ describe "Submissions API", type: :request do
     rubric = rubric_model(user: @user,
                           context: @course,
                           data: larger_rubric_data)
-    a1.create_rubric_association(rubric: rubric, purpose: "grading", context: @course)
+    a1.create_rubric_association(rubric:, purpose: "grading", context: @course)
 
     json = api_call(:put,
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
@@ -4621,9 +4621,9 @@ describe "Submissions API", type: :request do
     @course.enroll_student(student1).accept!
     @course.enroll_student(student2).accept!
     group_category = @course.group_categories.create(name: "Category")
-    @group = @course.groups.create(name: "Group", group_category: group_category, context: @course)
+    @group = @course.groups.create(name: "Group", group_category:, context: @course)
     @group.users = [student1, student2]
-    @assignment = @course.assignments.create!(title: "assignment1", grading_type: "points", points_possible: 12, group_category: group_category)
+    @assignment = @course.assignments.create!(title: "assignment1", grading_type: "points", points_possible: 12, group_category:)
     submit_homework(@assignment, student1)
 
     json = api_call(:put,
@@ -5280,7 +5280,7 @@ describe "Submissions API", type: :request do
     it "allows a grader to submit for a student and set submitted_at" do
       submitted_at = 1.day.ago.change(usec: 0)
       @user = course_with_teacher(course: @course).user
-      api_call(:post, @url, @args, { submission: { submission_type: "online_url", url: "www.example.com", user_id: @student.id, submitted_at: submitted_at } }, {}, expected_status: 201)
+      api_call(:post, @url, @args, { submission: { submission_type: "online_url", url: "www.example.com", user_id: @student.id, submitted_at: } }, {}, expected_status: 201)
       submission = Submission.last
       expect(submission.submitted_at).to eq submitted_at
     end
@@ -5319,9 +5319,9 @@ describe "Submissions API", type: :request do
       student2 = user_factory(active_all: true)
       @course.enroll_student(student2).accept!
       group_category = @course.group_categories.create(name: "Category")
-      @group = @course.groups.create(name: "Group", group_category: group_category, context: @course)
+      @group = @course.groups.create(name: "Group", group_category:, context: @course)
       @group.users = [@student, student2]
-      @a2 = @course.assignments.create!(title: "assignment1", grading_type: "points", points_possible: 12, group_category: group_category)
+      @a2 = @course.assignments.create!(title: "assignment1", grading_type: "points", points_possible: 12, group_category:)
       draft_assignment_update({ comment: { text_comment: "HEY GIRL HEY!", group_comment: "1" } })
     end
 
@@ -5970,7 +5970,7 @@ describe "Submissions API", type: :request do
 
     it "allows bulk grading with rubric assessments" do
       rubric = rubric_model(user: @user, context: @course, data: larger_rubric_data)
-      @a1.create_rubric_association(rubric: rubric, purpose: "grading", use_for_grading: true, context: @course)
+      @a1.create_rubric_association(rubric:, purpose: "grading", use_for_grading: true, context: @course)
 
       grade_data = {
         grade_data: {
@@ -6336,7 +6336,7 @@ describe "Submissions API", type: :request do
         anonymous_id = @assignment.submission_for_student(@student1).anonymous_id
         json = json.filter_map { |el| el["provisional_grades"][0] }
         expect(json[0]["speedgrader_url"]).to match_path("http://www.example.com/courses/#{@course.id}/gradebook/speed_grader")
-          .and_query({ assignment_id: @assignment.id, anonymous_id: anonymous_id })
+          .and_query({ assignment_id: @assignment.id, anonymous_id: })
         expect(json[0]["scorer_id"]).to eq @ta.id
         expect(json[0]["anonymous_grader_id"]).to be_nil
       end
@@ -6414,7 +6414,7 @@ describe "Submissions API", type: :request do
       section = add_section("Test Section")
       section_teacher = teacher_in_section(section, active_all: true)
       section_student = student_in_section(section, active_all: true)
-      differentiated_assignment(assignment: assignment, course_section: section)
+      differentiated_assignment(assignment:, course_section: section)
 
       differentiated_params = { controller: "submissions_api",
                                 action: "multiple_gradeable_students",
@@ -6437,7 +6437,7 @@ describe "Submissions API", type: :request do
       let(:student2)  { user_factory(active_all: true) }
       let(:group) do
         group_category = course.group_categories.create(name: "Engineering")
-        course.groups.create(name: "Group1", group_category: group_category)
+        course.groups.create(name: "Group1", group_category:)
       end
       let(:assignment) do
         course.assignments.create!(
@@ -6726,7 +6726,7 @@ describe "Submissions API", type: :request do
         group1.users << @student2
         group2.users << @student3
 
-        assignment = @course.assignments.create(points_possible: 100, group_category: group_category, grade_group_students_individually: false)
+        assignment = @course.assignments.create(points_possible: 100, group_category:, grade_group_students_individually: false)
         assignment.submit_homework @student1, body: "EHLO"
         assignment.submit_homework @student3, body: "EHLO"
         assignment.grade_student @student1, score: 99, grader: @teacher
@@ -6753,7 +6753,7 @@ describe "Submissions API", type: :request do
         group1.users << @student2
         group2.users << @student3
 
-        assignment = @course.assignments.create(points_possible: 100, group_category: group_category, grade_group_students_individually: false)
+        assignment = @course.assignments.create(points_possible: 100, group_category:, grade_group_students_individually: false)
         assignment.submit_homework @student1, body: "EHLO"
         assignment.grade_student @student1, score: 99, grader: @teacher
 
@@ -6779,7 +6779,7 @@ describe "Submissions API", type: :request do
         group1.users << @student2
         group2.users << @student3
 
-        assignment = @course.assignments.create(points_possible: 100, group_category: group_category, grade_group_students_individually: true)
+        assignment = @course.assignments.create(points_possible: 100, group_category:, grade_group_students_individually: true)
         assignment.submit_homework @student1, body: "EHLO"
         assignment.grade_student @student1, score: 99, grader: @teacher
 
@@ -6806,7 +6806,7 @@ describe "Submissions API", type: :request do
         group1.users << @student2
         group2.users << @student3
 
-        assignment = @course.assignments.create(points_possible: 100, group_category: group_category, grade_group_students_individually: true)
+        assignment = @course.assignments.create(points_possible: 100, group_category:, grade_group_students_individually: true)
         assignment.submit_homework @student1, body: "EHLO"
         assignment.grade_student @student1, score: 99, grader: @teacher
 

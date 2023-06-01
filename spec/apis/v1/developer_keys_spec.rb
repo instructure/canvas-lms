@@ -98,7 +98,7 @@ describe DeveloperKeysController, type: :request do
 
       before do
         allow_any_instance_of(DeveloperKeysController).to receive(:context_is_domain_root_account?).and_return(true)
-        user_session(account_admin_user(account: account))
+        user_session(account_admin_user(account:))
         key
       end
 

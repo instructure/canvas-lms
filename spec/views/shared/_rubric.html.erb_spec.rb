@@ -22,20 +22,20 @@ require_relative "../views_helper"
 
 describe "shared/_rubric" do
   let(:context) { course_model }
-  let(:rubric) { rubric_model(context: context) }
-  let(:rubric_association) { rubric_association_model(context: context, rubric: rubric) }
+  let(:rubric) { rubric_model(context:) }
+  let(:rubric_association) { rubric_association_model(context:, rubric:) }
   let(:html) { Nokogiri::HTML5.fragment(response) }
 
   it "renders" do
     view_context(context)
 
-    render partial: "shared/rubric", locals: { rubric: rubric }
+    render partial: "shared/rubric", locals: { rubric: }
     expect(response).not_to be_nil
   end
 
   it "renders with points showing" do
     view_context(context)
-    render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association }
+    render partial: "shared/rubric", locals: { rubric:, rubric_association: }
     expect(html.css(".rubric .toggle_for_hide_points")).not_to be_empty
     expect(html.css(".rubric .toggle_for_hide_points.hidden")).to be_empty
   end
@@ -43,20 +43,20 @@ describe "shared/_rubric" do
   it "renders some components hidden if hide_points is true" do
     view_context(context)
     rubric_association.update! hide_points: true
-    render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association }
+    render partial: "shared/rubric", locals: { rubric:, rubric_association: }
     expect(html.css(".rubric .toggle_for_hide_points.hidden")).not_to be_empty
   end
 
   context "when anonymize_student is false" do
     it "renders the user_id field" do
       view_context(context)
-      render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association }
+      render partial: "shared/rubric", locals: { rubric:, rubric_association: }
       expect(html.css(".rubric .user_id")).not_to be_empty
     end
 
     it "does not render the anonymous_id field" do
       view_context(context)
-      render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association }
+      render partial: "shared/rubric", locals: { rubric:, rubric_association: }
       expect(html.css(".rubric .anonymous_id")).to be_empty
     end
   end
@@ -64,13 +64,13 @@ describe "shared/_rubric" do
   context "when anonymize_student is true" do
     it "renders the anonymous_id field" do
       view_context(context)
-      render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association, anonymize_student: true }
+      render partial: "shared/rubric", locals: { rubric:, rubric_association:, anonymize_student: true }
       expect(html.css(".rubric .anonymous_id")).not_to be_empty
     end
 
     it "does not render the user_id field" do
       view_context(context)
-      render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association, anonymize_student: true }
+      render partial: "shared/rubric", locals: { rubric:, rubric_association:, anonymize_student: true }
       expect(html.css(".rubric .user_id")).to be_empty
     end
   end

@@ -40,19 +40,19 @@ describe OutcomesController do
 
     LearningOutcomeResult.create!(
       learning_outcome: @outcome,
-      user: user,
+      user:,
       context: @course,
-      alignment: alignment,
+      alignment:,
       associated_asset: assignment,
       association_type: "RubricAssociation",
       association_id: rubric_association.id,
-      title: title,
-      score: score,
-      possible: possible,
-      mastery: mastery,
+      title:,
+      score:,
+      possible:,
+      mastery:,
       created_at: submitted_at,
       updated_at: submitted_at,
-      submitted_at: submitted_at,
+      submitted_at:,
       assessed_at: submitted_at
     )
   end

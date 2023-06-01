@@ -27,11 +27,11 @@ module Users
       end
 
       it "includes an sf_verifier field in the response" do
-        expect(Users::AccessVerifier.generate(user: user)).to have_key(:sf_verifier)
+        expect(Users::AccessVerifier.generate(user:)).to have_key(:sf_verifier)
       end
 
       it "builds it as a jwt" do
-        jwt = Users::AccessVerifier.generate(user: user)[:sf_verifier]
+        jwt = Users::AccessVerifier.generate(user:)[:sf_verifier]
         expect(Canvas::Security.decode_jwt(jwt)).to have_key(:user_id)
       end
     end
@@ -44,12 +44,12 @@ module Users
       end
 
       it "success on an issued verifier" do
-        verifier = Users::AccessVerifier.generate(user: user)
+        verifier = Users::AccessVerifier.generate(user:)
         expect { Users::AccessVerifier.validate(verifier) }.not_to raise_exception
       end
 
       it "returns verified user claim on success" do
-        verifier = Users::AccessVerifier.generate(user: user)
+        verifier = Users::AccessVerifier.generate(user:)
         verified = Users::AccessVerifier.validate(verifier)
         expect(verified).to have_key(:user)
         expect(verified[:user]).to eql(user)
@@ -57,7 +57,7 @@ module Users
 
       it "returns verified real user claim on success" do
         real_user = user_model
-        verifier = Users::AccessVerifier.generate(user: user, real_user: real_user)
+        verifier = Users::AccessVerifier.generate(user:, real_user:)
         verified = Users::AccessVerifier.validate(verifier)
         expect(verified).to have_key(:real_user)
         expect(verified[:real_user]).to eql(real_user)
@@ -65,7 +65,7 @@ module Users
 
       it "returns verified developer key claim on success" do
         developer_key = DeveloperKey.create!
-        verifier = Users::AccessVerifier.generate(user: user, developer_key: developer_key)
+        verifier = Users::AccessVerifier.generate(user:, developer_key:)
         verified = Users::AccessVerifier.validate(verifier)
         expect(verified).to have_key(:developer_key)
         expect(verified[:developer_key]).to eql(developer_key)
@@ -73,7 +73,7 @@ module Users
 
       it "returns verified root account claim on success" do
         account = Account.default
-        verifier = Users::AccessVerifier.generate(user: user, root_account: account)
+        verifier = Users::AccessVerifier.generate(user:, root_account: account)
         verified = Users::AccessVerifier.validate(verifier)
         expect(verified).to have_key(:root_account)
         expect(verified[:root_account]).to eql(account)
@@ -81,21 +81,21 @@ module Users
 
       it "returns verified oauth host claim on success" do
         host = "oauth-host"
-        verifier = Users::AccessVerifier.generate(user: user, oauth_host: host)
+        verifier = Users::AccessVerifier.generate(user:, oauth_host: host)
         verified = Users::AccessVerifier.validate(verifier)
         expect(verified).to have_key(:oauth_host)
         expect(verified[:oauth_host]).to eql(host)
       end
 
       it "raises InvalidVerifier if too old" do
-        verifier = Users::AccessVerifier.generate(user: user)
+        verifier = Users::AccessVerifier.generate(user:)
         Timecop.freeze(10.minutes.from_now) do
           expect { Users::AccessVerifier.validate(verifier) }.to raise_exception(Canvas::Security::TokenExpired)
         end
       end
 
       it "raises InvalidVerifier if tampered with user" do
-        verifier = Users::AccessVerifier.generate(user: user)
+        verifier = Users::AccessVerifier.generate(user:)
         tampered = verifier.merge(sf_verifier: "tampered")
         expect { Users::AccessVerifier.validate(tampered) }.to raise_exception(Users::AccessVerifier::InvalidVerifier)
       end

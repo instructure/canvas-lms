@@ -898,7 +898,7 @@ class AssignmentsApiController < ApplicationController
       include_params = Array(params[:include])
 
       if params[:bucket]
-        args = { assignments_scope: scope, user: @current_user, session: session, course: @context }
+        args = { assignments_scope: scope, user: @current_user, session:, course: @context }
         args[:requested_user] = user if @current_user != user
         sorter = SortsAssignments.new(**args)
         begin
@@ -932,7 +932,7 @@ class AssignmentsApiController < ApplicationController
 
       assignments = if params[:assignment_group_id].present?
                       assignment_group_id = params[:assignment_group_id]
-                      scope = scope.where(assignment_group_id: assignment_group_id)
+                      scope = scope.where(assignment_group_id:)
                       Api.paginate(scope, self, api_v1_course_assignment_group_assignments_url(@context, assignment_group_id))
                     else
                       Api.paginate(scope, self, api_v1_course_assignments_url(@context))
@@ -997,13 +997,13 @@ class AssignmentsApiController < ApplicationController
         assignment_json(assignment,
                         user,
                         session,
-                        submission: submission,
-                        override_dates: override_dates,
-                        include_visibility: include_visibility,
+                        submission:,
+                        override_dates:,
+                        include_visibility:,
                         assignment_visibilities: visibility_array,
-                        needs_grading_count_by_section: needs_grading_count_by_section,
-                        needs_grading_course_proxy: needs_grading_course_proxy,
-                        include_all_dates: include_all_dates,
+                        needs_grading_count_by_section:,
+                        needs_grading_course_proxy:,
+                        include_all_dates:,
                         bucket: params[:bucket],
                         include_overrides: include_override_objects,
                         preloaded_user_content_attachments: preloaded_attachments,
@@ -1053,7 +1053,7 @@ class AssignmentsApiController < ApplicationController
       options = {
         submission: submissions,
         override_dates: value_to_boolean(params[:override_assignment_dates] || true),
-        include_visibility: include_visibility,
+        include_visibility:,
         needs_grading_count_by_section: value_to_boolean(params[:needs_grading_count_by_section]),
         include_all_dates: value_to_boolean(params[:all_dates]),
         include_overrides: include_override_objects,
@@ -1553,7 +1553,7 @@ class AssignmentsApiController < ApplicationController
       status = (result == :forbidden) ? :forbidden : :bad_request
       errors = @assignment.errors.as_json[:errors]
       errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
-      render json: { errors: errors }, status: status
+      render json: { errors: }, status:
     end
   end
 

@@ -40,7 +40,7 @@ describe "Student Enrollment Paces API" do
 
   describe "show" do
     it "returns the pace for the requested student enrollment" do
-      student_pace = student_enrollment_pace_model(student_enrollment: student_enrollment)
+      student_pace = student_enrollment_pace_model(student_enrollment:)
       Progress.create!(context: student_pace, tag: "course_pace_publish")
       get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
       expect(response).to have_http_status :ok
@@ -49,11 +49,11 @@ describe "Student Enrollment Paces API" do
     end
 
     context "the student enrollment belongs to a section" do
-      let(:section) { add_section("Section One", course: course) }
-      let(:student_enrollment) { multiple_student_enrollment(student, section, course: course) }
+      let(:section) { add_section("Section One", course:) }
+      let(:student_enrollment) { multiple_student_enrollment(student, section, course:) }
 
       context "the section has a pace" do
-        before { section_pace_model(section: section, workflow_state: "published") }
+        before { section_pace_model(section:, workflow_state: "published") }
 
         it "falls back to the section pace" do
           get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
@@ -65,7 +65,7 @@ describe "Student Enrollment Paces API" do
       end
 
       context "the section does not have a pace, but the course does" do
-        before { course_pace_model(course: course, workflow_state: "published") }
+        before { course_pace_model(course:, workflow_state: "published") }
 
         it "falls back to the course pace" do
           get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
@@ -86,7 +86,7 @@ describe "Student Enrollment Paces API" do
 
     context "the student enrollment does not belong to a section" do
       context "the course has a pace" do
-        before { course_pace_model(course: course, workflow_state: "published") }
+        before { course_pace_model(course:, workflow_state: "published") }
 
         it "falls back to the course pace" do
           get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
@@ -127,7 +127,7 @@ describe "Student Enrollment Paces API" do
     end
 
     context "when the student enrollment already has a pace" do
-      let!(:student_pace) { student_enrollment_pace_model(student_enrollment: student_enrollment) }
+      let!(:student_pace) { student_enrollment_pace_model(student_enrollment:) }
 
       it "returns the existing pace" do
         expect do
@@ -149,7 +149,7 @@ describe "Student Enrollment Paces API" do
   end
 
   describe "update" do
-    let!(:student_pace) { student_enrollment_pace_model(student_enrollment: student_enrollment) }
+    let!(:student_pace) { student_enrollment_pace_model(student_enrollment:) }
 
     it "updates the pace" do
       expect do
@@ -191,7 +191,7 @@ describe "Student Enrollment Paces API" do
 
   describe "delete" do
     it "marks the pace as deleted" do
-      pace = student_enrollment_pace_model(student_enrollment: student_enrollment)
+      pace = student_enrollment_pace_model(student_enrollment:)
 
       expect do
         delete api_v1_delete_student_enrollment_pace_path(course, student_enrollment), params: { format: :json }
@@ -218,7 +218,7 @@ describe "Student Enrollment Paces API" do
 
     describe "show" do
       before do
-        student_enrollment_pace_model(student_enrollment: student_enrollment)
+        student_enrollment_pace_model(student_enrollment:)
       end
 
       it "returns 404" do
@@ -235,7 +235,7 @@ describe "Student Enrollment Paces API" do
     end
 
     describe "update" do
-      before { student_enrollment_pace_model(student_enrollment: student_enrollment) }
+      before { student_enrollment_pace_model(student_enrollment:) }
 
       it "returns 404" do
         patch api_v1_patch_student_enrollment_pace_path(course, student_enrollment), params: {
@@ -249,7 +249,7 @@ describe "Student Enrollment Paces API" do
     end
 
     describe "delete" do
-      before { student_enrollment_pace_model(student_enrollment: student_enrollment) }
+      before { student_enrollment_pace_model(student_enrollment:) }
 
       it "returns 404" do
         delete api_v1_delete_student_enrollment_pace_path(course, student_enrollment), params: { format: :json }

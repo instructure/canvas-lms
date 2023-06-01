@@ -284,8 +284,8 @@ class AssignmentGroup < ActiveRecord::Base
       user,
       context,
       [self],
-      includes: includes,
-      assignment_ids: assignment_ids
+      includes:,
+      assignment_ids:
     )
   end
 

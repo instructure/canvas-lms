@@ -483,7 +483,7 @@ describe GradebooksController do
             start_date: 1.day.ago,
             end_date: 1.day.from_now
           )
-          @student_enrollment.scores.find_by(grading_period: grading_period).update!(override_score: 84)
+          @student_enrollment.scores.find_by(grading_period:).update!(override_score: 84)
           user_session(@teacher)
           get :grade_summary, params: { course_id: @course.id, id: @student.id }
           expect(assigns[:js_env][:effective_final_score]).to eq 84
@@ -511,7 +511,7 @@ describe GradebooksController do
       let!(:assignment3) do
         assignment_group = @course.assignment_groups.create!(position: 2)
         @course.assignments.create!(
-          assignment_group: assignment_group, title: "Carrot", due_at: 2.days.from_now, position: 1
+          assignment_group:, title: "Carrot", due_at: 2.days.from_now, position: 1
         )
       end
       let(:assignment_ids) { assigns[:presenter].assignments.select { |a| a.instance_of?(Assignment) }.map(&:id) }
@@ -863,7 +863,7 @@ describe GradebooksController do
             mark_as_missing: false,
             only_apply_to_past_due: false
           )
-          @progress = Gradebook::ApplyScoreToUngradedSubmissions.queue_apply_score(course: @course, grader: @teacher, options: options)
+          @progress = Gradebook::ApplyScoreToUngradedSubmissions.queue_apply_score(course: @course, grader: @teacher, options:)
         end
 
         describe "FF disabled" do
@@ -2302,7 +2302,7 @@ describe GradebooksController do
 
           it "marks not-yet-graded students as missing when passed dont_overwrite_grades param" do
             params = post_params.merge(dont_overwrite_grades: true)
-            expect { post(:update_submission, params: params, format: :json) }.to change {
+            expect { post(:update_submission, params:, format: :json) }.to change {
               @submission.reload.missing?
             }.from(false).to(true)
           end
@@ -2310,7 +2310,7 @@ describe GradebooksController do
           it "does not modify already-graded students when passed dont_overwrite_grades param" do
             @assignment.grade_student(@student, grade: 2, grader: @teacher)
             params = post_params.merge(dont_overwrite_grades: true)
-            expect { post(:update_submission, params: params, format: :json) }.not_to change {
+            expect { post(:update_submission, params:, format: :json) }.not_to change {
               @submission.reload.missing?
             }.from(false)
           end
@@ -3506,7 +3506,7 @@ describe GradebooksController do
 
     def make_request(**additional_params)
       params = additional_params.reverse_merge({ course_id: @course.id, assignment_ids: ["1", "2"], student_ids: ["11", "22"] })
-      put :apply_score_to_ungraded_submissions, params: params, format: :json
+      put :apply_score_to_ungraded_submissions, params:, format: :json
       response.parsed_body
     end
 

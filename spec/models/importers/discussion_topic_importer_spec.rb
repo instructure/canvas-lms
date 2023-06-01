@@ -87,7 +87,7 @@ describe Importers::DiscussionTopicImporter do
     migration = context.content_migrations.create!
 
     data[:attachment_migration_id] = nil
-    attachment_model(context: context) # create a file with no migration id
+    attachment_model(context:) # create a file with no migration id
 
     data[:topics_to_import] = { data[:migration_id] => true }
     Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)

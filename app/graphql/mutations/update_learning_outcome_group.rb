@@ -48,13 +48,13 @@ class Mutations::UpdateLearningOutcomeGroup < Mutations::BaseMutation
   private
 
   def get_group(id)
-    LearningOutcomeGroup.active.find_by(id: id).tap do |group|
+    LearningOutcomeGroup.active.find_by(id:).tap do |group|
       raise GraphQL::ExecutionError, I18n.t("Group not found") unless group
     end
   end
 
   def get_parent_group(id)
-    LearningOutcomeGroup.for_context(@outcome_group.context).active.find_by(id: id).tap do |group|
+    LearningOutcomeGroup.for_context(@outcome_group.context).active.find_by(id:).tap do |group|
       raise GraphQL::ExecutionError, I18n.t("Parent group not found in this context") unless group
     end
   end

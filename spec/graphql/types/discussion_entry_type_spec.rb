@@ -468,7 +468,7 @@ describe Types::DiscussionEntryType do
     before do
       @topic = discussion_topic_model
       names = %w[Chawn Drake Jason Caleb Allison Jewel Omar]
-      @users = names.map { |name| user_model(name: name) }
+      @users = names.map { |name| user_model(name:) }
 
       @entry = @topic.discussion_entries.create!(message: "entry", user: @users[0])
 
@@ -613,7 +613,7 @@ describe Types::DiscussionEntryType do
     @course.enroll_student(student)
 
     group_category = @course.group_categories.create(name: "Project Group")
-    group = group_model(name: "Project Group 1", group_category: group_category, context: @course)
+    group = group_model(name: "Project Group 1", group_category:, context: @course)
     group.add_user(student)
 
     group_topic = group.discussion_topics.create!(title: "Title", user: teacher)

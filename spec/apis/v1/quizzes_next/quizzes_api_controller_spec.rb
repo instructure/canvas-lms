@@ -105,7 +105,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
             action: "index",
             format: "json",
             course_id: @course.id.to_s,
-            search_term: search_term
+            search_term:
           )
 
           response_quizzes = response.reject { |quiz| quiz["quiz_type"] == "quizzes.next" }.pluck("title")

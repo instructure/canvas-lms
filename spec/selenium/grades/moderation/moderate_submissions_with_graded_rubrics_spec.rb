@@ -36,9 +36,9 @@ describe "Moderated Marking" do
     course
   end
 
-  let_once(:teacher) { teacher_in_course(course: course, active_enrollment: true).user }
-  let_once(:ta) { ta_in_course(course: course, active_enrollment: true).user }
-  let_once(:student) { student_in_course(course: course, active_enrollment: true).user }
+  let_once(:teacher) { teacher_in_course(course:, active_enrollment: true).user }
+  let_once(:ta) { ta_in_course(course:, active_enrollment: true).user }
+  let_once(:student) { student_in_course(course:, active_enrollment: true).user }
 
   let_once(:assignment) do
     course.assignments.create!(

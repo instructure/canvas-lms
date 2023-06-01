@@ -446,7 +446,7 @@ describe "people" do
     context "without view all grades permissions" do
       before do
         ["view_all_grades", "manage_grades"].each do |permission|
-          RoleOverride.create!(permission: permission, enabled: false, context: @course.account, role: ta_role)
+          RoleOverride.create!(permission:, enabled: false, context: @course.account, role: ta_role)
         end
       end
 

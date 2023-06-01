@@ -36,8 +36,8 @@ class AttachmentUploadStatus < ApplicationRecord
   def self.failed!(attachment, error)
     attachment.shard.activate do
       create!(
-        attachment: attachment,
-        error: error
+        attachment:,
+        error:
       ).tap { Rails.cache.delete(cache_key(attachment)) }
     end
   end

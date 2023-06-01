@@ -435,7 +435,7 @@ class Course < ActiveRecord::Base
     return if saved_change_to_id # new object, nothing to possibly invalidate
 
     # a lot of things can change the date logic here :/
-    if ((saved_changes.keys & %w[restrict_enrollments_to_course_dates account_id enrollment_term_id]).any? ||
+    if (saved_changes.keys.intersect?(%w[restrict_enrollments_to_course_dates account_id enrollment_term_id]) ||
        (restrict_enrollments_to_course_dates? && saved_material_changes_to?(:start_at, :conclude_at)) ||
        (saved_change_to_workflow_state? && (completed? || workflow_state_before_last_save == "completed"))) &&
        enrollments.exists?
@@ -455,7 +455,7 @@ class Course < ActiveRecord::Base
   end
 
   def track_end_date_stats
-    return unless (saved_changes.keys & %w[restrict_enrollments_to_course_dates conclude_at enrollment_term_id settings workflow_state]).any? && published?
+    return unless saved_changes.keys.intersect?(%w[restrict_enrollments_to_course_dates conclude_at enrollment_term_id settings workflow_state]) && published?
 
     just_published = saved_change_to_workflow_state && workflow_state == "available"
     has_end_date = restrict_enrollments_to_course_dates ? conclude_at.present? : enrollment_term&.end_at.present?
@@ -523,7 +523,7 @@ class Course < ActiveRecord::Base
 
     is_unique = true
     if sis_source_id && (root_account_id_changed? || sis_source_id_changed?)
-      scope = root_account.all_courses.where(sis_source_id: sis_source_id)
+      scope = root_account.all_courses.where(sis_source_id:)
       scope = scope.where("id<>?", self) unless new_record?
       if scope.exists?
         is_unique = false
@@ -534,7 +534,7 @@ class Course < ActiveRecord::Base
     end
 
     if integration_id && (root_account_id_changed? || integration_id_changed?)
-      scope = root_account.all_courses.where(integration_id: integration_id)
+      scope = root_account.all_courses.where(integration_id:)
       scope = scope.where("id<>?", self) unless new_record?
       if scope.exists?
         is_unique = false
@@ -814,12 +814,12 @@ class Course < ActiveRecord::Base
                   end
                 rescue ActiveRecord::RecordNotUnique
                   course.course_account_associations.where(course_section_id: section,
-                                                           account_id: account_id).update_all(depth: depth)
+                                                           account_id:).update_all(depth:)
                 end
                 did_an_update = true
               else
                 if association[1] != depth
-                  CourseAccountAssociation.where(id: association[0]).update_all(depth: depth)
+                  CourseAccountAssociation.where(id: association[0]).update_all(depth:)
                   did_an_update = true
                 end
                 # remove from list of existing
@@ -847,7 +847,7 @@ class Course < ActiveRecord::Base
                                                   .group(:user_id).pluck(:user_id)
       end
     end
-    User.update_account_associations(user_ids_to_update_account_associations, account_chain_cache: account_chain_cache) unless user_ids_to_update_account_associations.empty? || opts[:skip_user_account_associations]
+    User.update_account_associations(user_ids_to_update_account_associations, account_chain_cache:) unless user_ids_to_update_account_associations.empty? || opts[:skip_user_account_associations]
     user_ids_to_update_account_associations
   end
 
@@ -1002,7 +1002,7 @@ class Course < ActiveRecord::Base
   end
 
   def broadcast_data
-    { course_id: id, root_account_id: root_account_id }
+    { course_id: id, root_account_id: }
   end
 
   set_broadcast_policy do |p|
@@ -1046,11 +1046,11 @@ class Course < ActiveRecord::Base
   def instructors_in_charge_of(user_id, require_grade_permissions: true)
     GuardRail.activate(:secondary) do
       scope = current_enrollments
-              .where(course_id: self, user_id: user_id)
+              .where(course_id: self, user_id:)
               .where.not(course_section_id: nil)
 
       if scope.none?
-        scope = prior_enrollments.where(course_id: self, user_id: user_id).where.not(course_section_id: nil)
+        scope = prior_enrollments.where(course_id: self, user_id:).where.not(course_section_id: nil)
       end
 
       section_ids = scope.distinct.pluck(:course_section_id)
@@ -1268,7 +1268,7 @@ class Course < ActiveRecord::Base
   end
 
   def update_enrollments_later
-    update_enrolled_users if !new_record? && !(changes.keys & %w[workflow_state name course_code start_at conclude_at enrollment_term_id]).empty?
+    update_enrolled_users if !new_record? && !!changes.keys.intersect?(%w[workflow_state name course_code start_at conclude_at enrollment_term_id])
     true
   end
 
@@ -1278,7 +1278,7 @@ class Course < ActiveRecord::Base
         if completed?
           enrollment_info = Enrollment.where(course_id: self, workflow_state: ["active", "invited"]).select(:id, :workflow_state).to_a
           if enrollment_info.any?
-            data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: enrollment_info, updated_state: "completed")
+            data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: enrollment_info, updated_state: "completed")
             Enrollment.where(id: enrollment_info.map(&:id)).update_all(workflow_state: "completed", completed_at: Time.now.utc)
 
             EnrollmentState.transaction do
@@ -1298,7 +1298,7 @@ class Course < ActiveRecord::Base
           if user_ids.any?
             enrollment_info = enroll_scope.select(:id, :workflow_state).to_a
             if enrollment_info.any?
-              data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: enrollment_info, updated_state: "deleted")
+              data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: enrollment_info, updated_state: "deleted")
               Enrollment.where(id: enrollment_info.map(&:id)).update_all(workflow_state: "deleted")
               EnrollmentState.transaction do
                 locked_ids = EnrollmentState.where(enrollment_id: enrollment_info.map(&:id)).lock(:no_key_update).order(:enrollment_id).pluck(:enrollment_id)
@@ -1422,8 +1422,8 @@ class Course < ActiveRecord::Base
     if run_immediately
       recompute_student_scores_without_send_later(
         student_ids,
-        grading_period_id: grading_period_id,
-        update_all_grading_period_scores: update_all_grading_period_scores
+        grading_period_id:,
+        update_all_grading_period_scores:
       )
     else
       inst_job_opts = { max_attempts: 10 }
@@ -1439,8 +1439,8 @@ class Course < ActiveRecord::Base
 
       delay_if_production(**inst_job_opts).recompute_student_scores_without_send_later(
         student_ids,
-        grading_period_id: grading_period_id,
-        update_all_grading_period_scores: update_all_grading_period_scores
+        grading_period_id:,
+        update_all_grading_period_scores:
       )
     end
   end
@@ -1596,7 +1596,7 @@ class Course < ActiveRecord::Base
     enroll_scope = Enrollment.active.where(course_id: courses)
     enroll_scope.find_in_batches do |e_batch|
       user_ids = e_batch.map(&:user_id).uniq.sort
-      data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch,
+      data = SisBatchRollBackData.build_dependent_data(sis_batch:,
                                                        contexts: e_batch,
                                                        updated_state: "deleted",
                                                        batch_mode_delete: batch_mode)
@@ -1607,7 +1607,7 @@ class Course < ActiveRecord::Base
       User.touch_and_clear_cache_keys(user_ids, :enrollments)
       User.delay_if_production.update_account_associations(user_ids) if user_ids.any?
     end
-    c_data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: courses, updated_state: "deleted", batch_mode_delete: batch_mode)
+    c_data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: courses, updated_state: "deleted", batch_mode_delete: batch_mode)
     SisBatchRollBackData.bulk_insert_roll_back_data(c_data) if c_data
     Course.where(id: courses).update_all(workflow_state: "deleted", updated_at: Time.zone.now)
     courses.count
@@ -1654,7 +1654,7 @@ class Course < ActiveRecord::Base
 
   def self.create_unique(uuid = nil, account_id = nil, root_account_id = nil)
     uuid ||= CanvasSlug.generate_securish_uuid
-    course = where(uuid: uuid).first_or_initialize
+    course = where(uuid:).first_or_initialize
     course = Course.new if course.deleted?
     course.name = default_name if course.new_record?
     course.short_name = t("default_short_name", "Course-101") if course.new_record?
@@ -2013,7 +2013,7 @@ class Course < ActiveRecord::Base
     return end_at < now if end_at && restrict_enrollments_to_course_dates
 
     if enrollment_type
-      override = enrollment_term.enrollment_dates_overrides.where(enrollment_type: enrollment_type).first
+      override = enrollment_term.enrollment_dates_overrides.where(enrollment_type:).first
       end_at = override.end_at if override
     end
     end_at ||= enrollment_term.end_at
@@ -2091,19 +2091,19 @@ class Course < ActiveRecord::Base
     if message.present?
       case status
       when "error"
-        t("Error: %{message}", message: message)
+        t("Error: %{message}", message:)
       when "unpublished"
-        t("Not Synced: %{message}", message: message)
+        t("Not Synced: %{message}", message:)
       when "pending"
-        t("Pending: %{message}", message: message)
+        t("Pending: %{message}", message:)
       when "publishing"
-        t("Syncing: %{message}", message: message)
+        t("Syncing: %{message}", message:)
       when "published"
-        t("Synced: %{message}", message: message)
+        t("Synced: %{message}", message:)
       when "unpublishable"
-        t("Unsyncable: %{message}", message: message)
+        t("Unsyncable: %{message}", message:)
       else
-        t("Unknown status, %{status}: %{message}", message: message, status: status)
+        t("Unknown status, %{status}: %{message}", message:, status:)
       end
     else
       case status
@@ -2120,7 +2120,7 @@ class Course < ActiveRecord::Base
       when "unpublishable"
         t("Unsyncable")
       else
-        t("Unknown status, %{status}", status: status)
+        t("Unknown status, %{status}", status:)
       end
     end
   end
@@ -2157,7 +2157,7 @@ class Course < ActiveRecord::Base
                       enrollments,
                       publishing_user,
                       publishing_pseudonym,
-                      include_final_grade_overrides: include_final_grade_overrides
+                      include_final_grade_overrides:
                     )
                   end,
         requires_grading_standard: false,
@@ -2190,7 +2190,7 @@ class Course < ActiveRecord::Base
     scope = scope.where(user_id: user_ids_to_publish) if user_ids_to_publish
     scope.update_all(grade_publishing_status: "pending",
                      grade_publishing_message: nil,
-                     last_publish_attempt_at: last_publish_attempt_at)
+                     last_publish_attempt_at:)
 
     delay_if_production(n_strand: ["send_final_grades_to_endpoint", global_root_account_id])
       .send_final_grades_to_endpoint(publishing_user, user_ids_to_publish)
@@ -2321,12 +2321,12 @@ class Course < ActiveRecord::Base
 
   def expire_pending_grade_publishing_statuses(last_publish_attempt_at)
     student_enrollments.not_fake.where(grade_publishing_status: ["pending", "publishing"],
-                                       last_publish_attempt_at: last_publish_attempt_at)
+                                       last_publish_attempt_at:)
                        .update_all(grade_publishing_status: "error", grade_publishing_message: "Timed out.")
   end
 
   def gradebook_to_csv_in_background(filename, user, options = {})
-    progress = progresses.build(tag: "gradebook_to_csv", user: user)
+    progress = progresses.build(tag: "gradebook_to_csv", user:)
     progress.save!
 
     exported_gradebook = gradebook_csvs.where(user_id: user).first_or_initialize
@@ -2347,11 +2347,11 @@ class Course < ActiveRecord::Base
       options,
       attachment
     )
-    { attachment_id: attachment.id, progress_id: progress.id, filename: filename }
+    { attachment_id: attachment.id, progress_id: progress.id, filename: }
   end
 
   def generate_csv(progress, user, options, attachment)
-    csv = GradebookExporter.new(self, user, options.merge(progress: progress)).to_csv
+    csv = GradebookExporter.new(self, user, options.merge(progress:)).to_csv
     create_attachment(attachment, csv)
   end
 
@@ -2362,18 +2362,18 @@ class Course < ActiveRecord::Base
   end
 
   def create_or_update_quiz_migration_alert(user_id, migration)
-    quiz_migration_alert = quiz_migration_alerts.find_by(user_id: user_id)
+    quiz_migration_alert = quiz_migration_alerts.find_by(user_id:)
 
     if quiz_migration_alert.nil?
-      new_quiz_migration_alert = quiz_migration_alerts.build(user_id: user_id, migration: migration)
+      new_quiz_migration_alert = quiz_migration_alerts.build(user_id:, migration:)
       new_quiz_migration_alert.save
     elsif quiz_migration_alert && quiz_migration_alert.migration != migration
-      quiz_migration_alert.update(migration: migration)
+      quiz_migration_alert.update(migration:)
     end
   end
 
   def quiz_migration_alert_for_user(user_id)
-    quiz_migration_alerts.find_by(user_id: user_id)
+    quiz_migration_alerts.find_by(user_id:)
   end
 
   # included to make it easier to work with api, which returns
@@ -2462,11 +2462,11 @@ class Course < ActiveRecord::Base
     end
     Course.unique_constraint_retry do
       e = if opts[:allow_multiple_enrollments]
-            all_enrollments.where(user_id: user, type: type, role_id: role, associated_user_id: associated_user_id, course_section_id: section.id).first
+            all_enrollments.where(user_id: user, type:, role_id: role, associated_user_id:, course_section_id: section.id).first
           else
             # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
             all_enrollments
-              .where(user_id: user, type: type, role_id: role, associated_user_id: associated_user_id)
+              .where(user_id: user, type:, role_id: role, associated_user_id:)
               .order(Arel.sql("course_section_id<>#{section.id}"))
               .first
           end
@@ -2490,11 +2490,11 @@ class Course < ActiveRecord::Base
       # association here -- just ran out of time.
       shard.activate do
         e ||= Enrollment.typed_enrollment(type).new(
-          user: user,
+          user:,
           course: self,
           course_section: section,
           workflow_state: enrollment_state,
-          limit_privileges_to_course_section: limit_privileges_to_course_section
+          limit_privileges_to_course_section:
         )
       end
       e.associated_user_id = associated_user_id
@@ -2709,7 +2709,7 @@ class Course < ActiveRecord::Base
 
         begin
           migration_id = ce&.create_key(file)
-          new_file = file.clone_for(self, nil, overwrite: true, migration_id: migration_id, migration: cm, match_on_migration_id: cm.for_master_course_import?)
+          new_file = file.clone_for(self, nil, overwrite: true, migration_id:, migration: cm, match_on_migration_id: cm.for_master_course_import?)
           cm.add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ""), new_file.migration_id)
           new_folder_id = merge_mapped_id(file.folder)
 
@@ -2854,11 +2854,11 @@ class Course < ActiveRecord::Base
   end
 
   # helper method to DRY-up some similar methods that all can be cached based on a user's enrollments
-  def fetch_on_enrollments(key, user, opts = nil, &block)
+  def fetch_on_enrollments(key, user, opts = nil, &)
     shard.activate do
       RequestCache.cache(key, user, self, opts) do
         Rails.cache.fetch_with_batched_keys([key, global_asset_string, opts].compact.cache_key, batch_object: user, batched_keys: :enrollments) do
-          GuardRail.activate(:primary, &block)
+          GuardRail.activate(:primary, &)
         end
       end
     end
@@ -2870,7 +2870,7 @@ class Course < ActiveRecord::Base
       workflow_not = opts[:excluded_workflows] || "deleted"
 
       enrollment_rows = all_enrollments
-                        .where(user: user)
+                        .where(user:)
                         .where.not(workflow_state: workflow_not)
                         .pluck(
                           :course_section_id,
@@ -2884,10 +2884,10 @@ class Course < ActiveRecord::Base
         {
           course_section_id: section_id,
           limit_privileges_to_course_section: limit_privileges,
-          type: type,
-          associated_user_id: associated_user_id,
+          type:,
+          associated_user_id:,
           admin: ADMIN_TYPES.include?(type),
-          workflow_state: workflow_state
+          workflow_state:
         }
       end
     end
@@ -2913,7 +2913,7 @@ class Course < ActiveRecord::Base
       scope = students
     end
 
-    apply_enrollment_visibility(scope, user, nil, include: include)
+    apply_enrollment_visibility(scope, user, nil, include:)
   end
 
   # can apply to user scopes as well if through enrollments (e.g. students, teachers)
@@ -3846,7 +3846,7 @@ class Course < ActiveRecord::Base
         enroll_user(fake_student,
                     "StudentViewEnrollment",
                     allow_multiple_enrollments: true,
-                    section: section,
+                    section:,
                     enrollment_state: "active",
                     no_notify: true,
                     skip_touch_user: true)
@@ -4182,18 +4182,18 @@ class Course < ActiveRecord::Base
     return unless PostPolicy.feature_enabled?
 
     course_policy = PostPolicy.find_or_create_by(course: self, assignment_id: nil)
-    course_policy.update!(post_manually: post_manually) unless course_policy.post_manually == post_manually
+    course_policy.update!(post_manually:) unless course_policy.post_manually == post_manually
 
     matching_post_policies_scope = PostPolicy
                                    .where("assignment_id = #{Assignment.quoted_table_name}.id")
-                                   .where(post_manually: post_manually)
+                                   .where(post_manually:)
 
     assignments.active
                .where(anonymous_grading: false, moderated_grading: false)
                .where.not(matching_post_policies_scope.arel.exists)
                .preload(:post_policy)
                .each do |assignment|
-      assignment.ensure_post_policy(post_manually: post_manually)
+      assignment.ensure_post_policy(post_manually:)
     end
   end
 
@@ -4302,12 +4302,12 @@ class Course < ActiveRecord::Base
       when "publish"
         context_module.publish unless context_module.active?
         unless Account.site_admin.feature_enabled?(:module_publish_menu) && skip_content_tags
-          context_module.publish_items!(progress: progress)
+          context_module.publish_items!(progress:)
         end
       when "unpublish"
         context_module.unpublish unless context_module.unpublished?
         if Account.site_admin.feature_enabled?(:module_publish_menu) && !skip_content_tags
-          context_module.unpublish_items!(progress: progress)
+          context_module.unpublish_items!(progress:)
         end
       when "delete"
         context_module.destroy

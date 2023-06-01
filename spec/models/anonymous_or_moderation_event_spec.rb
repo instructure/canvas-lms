@@ -30,7 +30,7 @@ describe AnonymousOrModerationEvent do
     }
   end
   let(:course) { Course.create! }
-  let(:user) { course_with_user("TeacherEnrollment", name: "Teacher", course: course, active_all: true).user }
+  let(:user) { course_with_user("TeacherEnrollment", name: "Teacher", course:, active_all: true).user }
   let(:assignment) { course.assignments.create!(name: "assignment") }
   let(:quiz) { quiz_model }
   let(:external_tool) do
@@ -155,8 +155,8 @@ describe AnonymousOrModerationEvent do
 
   describe "#events_for_submission" do
     let(:course) { Course.create! }
-    let(:teacher) { course_with_user("TeacherEnrollment", name: "Teacher", course: course, active_all: true).user }
-    let(:student) { course_with_user("StudentEnrollment", name: "Student", course: course, active_all: true).user }
+    let(:teacher) { course_with_user("TeacherEnrollment", name: "Teacher", course:, active_all: true).user }
+    let(:student) { course_with_user("StudentEnrollment", name: "Student", course:, active_all: true).user }
     let(:assignment) { course.assignments.create!(name: "anonymous", anonymous_grading: true, updating_user: teacher) }
     let(:submission) { assignment.submit_homework(student, body: "please give good grade") }
     let(:events) do
@@ -188,7 +188,7 @@ describe AnonymousOrModerationEvent do
     end
 
     it "does not include AnonymousOrModerationEvents not related to submission" do
-      second_student = course_with_user("StudentEnrollment", name: "Student", course: course, active_all: true).user
+      second_student = course_with_user("StudentEnrollment", name: "Student", course:, active_all: true).user
       expect do
         assignment.submit_homework(second_student, body: "please give bad grade")
       end.not_to change { events.count }

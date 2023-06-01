@@ -78,10 +78,10 @@ module I18nTasks
       end
     end
 
-    def compile_complete_translations(&warning)
+    def compile_complete_translations(&)
       catch(:abort) do
-        compare_translations(&warning)
-        compare_mismatches(&warning)
+        compare_translations(&)
+        compare_mismatches(&)
         complete_translations
       end
     end
@@ -128,7 +128,7 @@ module I18nTasks
       end
     end
 
-    LIST_ITEM_PATTERN = /^ {0,3}(\d+\.|\*|\+|-)\s/.freeze
+    LIST_ITEM_PATTERN = /^ {0,3}(\d+\.|\*|\+|-)\s/
 
     def markdown_and_wrappers(str)
       # Since underscores can be wrappers, and underscores can also be inside

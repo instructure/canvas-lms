@@ -515,7 +515,7 @@ describe "AuthenticationProviders API", type: :request do
                },
                settings,
                {},
-               expected_status: expected_status)
+               expected_status:)
     end
 
     it "requires authorization" do
@@ -603,7 +603,7 @@ describe "AuthenticationProviders API", type: :request do
                                                        "provisioning_only" => false },
                                  "sis_user_id" => { "attribute" => "external_id",
                                                     "provisioning_only" => true } }
-        aac = AuthenticationProvider::SAML.new(federated_attributes: federated_attributes,
+        aac = AuthenticationProvider::SAML.new(federated_attributes:,
                                                jit_provisioning: true)
         expect(aac.federated_attributes_for_api).to eq(federated_attributes)
       end

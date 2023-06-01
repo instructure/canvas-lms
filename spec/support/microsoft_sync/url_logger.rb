@@ -42,8 +42,8 @@ module MicrosoftSync::GraphService::SpecHelper
 
       unless stubbed_url_array.include?(url)
         @stubbed_urls.push({
-                             url: url,
-                             variables: variables,
+                             url:,
+                             variables:,
                              requests: [],
                              responses: []
                            })

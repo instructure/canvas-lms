@@ -156,7 +156,7 @@ class FeatureFlagsController < ApplicationController
         @context.lookup_feature_flag(fd.feature,
                                      override_hidden: can_read_site_admin?,
                                      include_shadowed: can_read_site_admin?,
-                                     skip_cache: skip_cache,
+                                     skip_cache:,
                                      # Hide flags that are forced ON at a higher level
                                      # Undocumented flag for frontend use only
                                      hide_inherited_enabled: params[:hide_inherited_enabled])

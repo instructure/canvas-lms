@@ -26,14 +26,14 @@ module BroadcastPolicy
 
     # This stores the policy for broadcasting changes on a class.  It works like a
     # macro.  The policy block will be stored in @broadcast_policy.
-    def set_broadcast_policy(&block)
+    def set_broadcast_policy(&)
       self.broadcast_policy_list ||= PolicyList.new
-      self.broadcast_policy_list.populate(&block)
+      self.broadcast_policy_list.populate(&)
     end
 
-    def set_broadcast_policy!(&block)
+    def set_broadcast_policy!(&)
       self.broadcast_policy_list = PolicyList.new
-      self.broadcast_policy_list.populate(&block)
+      self.broadcast_policy_list.populate(&)
     end
   end
 end

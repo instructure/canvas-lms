@@ -23,7 +23,7 @@ describe UserListsController do
     course_factory
     @course.root_account.disable_feature!(:granular_permissions_manage_users)
     role = custom_account_role("myadmin", account: @course.account)
-    account_admin_user_with_role_changes(role: role, role_changes: { manage_students: true })
+    account_admin_user_with_role_changes(role:, role_changes: { manage_students: true })
     user_session(@user)
 
     post "create", params: { course_id: @course.id, user_list: "" }, format: "json"
@@ -34,7 +34,7 @@ describe UserListsController do
     course_factory
     @course.root_account.enable_feature!(:granular_permissions_manage_users)
     role = custom_account_role("myadmin", account: @course.account)
-    account_admin_user_with_role_changes(role: role, role_changes: { add_student_to_course: true })
+    account_admin_user_with_role_changes(role:, role_changes: { add_student_to_course: true })
     user_session(@user)
 
     post "create", params: { course_id: @course.id, user_list: "" }, format: "json"

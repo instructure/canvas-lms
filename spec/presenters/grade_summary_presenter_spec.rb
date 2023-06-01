@@ -22,7 +22,7 @@ describe GradeSummaryPresenter do
     describe "all on one shard" do
       let(:course) { Course.create! }
       let(:presenter) { GradeSummaryPresenter.new(course, @user, nil) }
-      let(:assignment) { assignment_model(course: course) }
+      let(:assignment) { assignment_model(course:) }
       let(:enrollment) { course.enroll_student(@user, enrollment_state: "active") }
 
       before do
@@ -76,7 +76,7 @@ describe GradeSummaryPresenter do
           user = User.create!
           account = Account.create!
           course = account.courses.create!
-          enrollment = StudentEnrollment.create!(course: course, user: user)
+          enrollment = StudentEnrollment.create!(course:, user:)
           enrollment.update_attribute(:workflow_state, "active")
           course.update_attribute(:workflow_state, "available")
         end
@@ -94,7 +94,7 @@ describe GradeSummaryPresenter do
         @shard2.activate do
           account = Account.create!
           course = account.courses.create!
-          enrollment = StudentEnrollment.create!(course: course, user: user)
+          enrollment = StudentEnrollment.create!(course:, user:)
           enrollment.update_attribute(:workflow_state, "active")
           course.update_attribute(:workflow_state, "available")
         end

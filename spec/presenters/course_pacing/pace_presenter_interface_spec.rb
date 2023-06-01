@@ -42,7 +42,7 @@ describe CoursePacing::PacePresenterInterface do
       let(:course) { course_model }
       let(:my_module) { course.context_modules.create! }
       let(:assignment) { course.assignments.create! }
-      let(:pace) { course_pace_model(course: course) }
+      let(:pace) { course_pace_model(course:) }
 
       before do
         assignment.context_module_tags.create!(
@@ -67,7 +67,7 @@ describe CoursePacing::PacePresenterInterface do
       let(:course) { course_model }
       let(:my_module) { course.context_modules.create! }
       let(:assignment) { course.assignments.create! }
-      let(:pace) { course_pace_model(course: course) }
+      let(:pace) { course_pace_model(course:) }
 
       before do
         assignment.context_module_tags.create!(

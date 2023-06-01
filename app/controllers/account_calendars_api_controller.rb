@@ -131,7 +131,7 @@ class AccountCalendarsApiController < ApplicationController
         account_calendars: account_calendars_json(paginated_accounts, @current_user, session),
         total_results: accounts.count
       }
-      render json: json
+      render json:
     end
   end
 
@@ -307,7 +307,7 @@ class AccountCalendarsApiController < ApplicationController
       return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
 
       count = Account.active.where(id: [account.id] + Account.sub_account_ids_recursive(account.id)).where(account_calendar_visible: true).count
-      render json: { count: count }
+      render json: { count: }
     end
   end
 end

@@ -111,17 +111,17 @@ module Canvas::OAuth
       let(:user) { User.create! }
 
       it "finds a pre existing token with the same scope" do
-        user.access_tokens.create!(developer_key: developer_key, scopes: ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], remember_access: true)
+        user.access_tokens.create!(developer_key:, scopes: ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], remember_access: true)
         expect(Provider.new(developer_key.id, "", ["userinfo"]).authorized_token?(user)).to be true
       end
 
       it "ignores tokens unless access is remembered" do
-        user.access_tokens.create!(developer_key: developer_key, scopes: ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"])
+        user.access_tokens.create!(developer_key:, scopes: ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"])
         expect(Provider.new(developer_key.id, "", ["userinfo"]).authorized_token?(user)).to be false
       end
 
       it "ignores tokens for out of band requests" do
-        user.access_tokens.create!(developer_key: developer_key, scopes: ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], remember_access: true)
+        user.access_tokens.create!(developer_key:, scopes: ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], remember_access: true)
         expect(Provider.new(developer_key.id, Canvas::OAuth::Provider::OAUTH2_OOB_URI, ["userinfo"]).authorized_token?(user)).to be false
       end
     end

@@ -45,7 +45,7 @@ describe DataFixup::AddPostPoliciesToAssignments do
 
   describe ".set_submission_posted_at_dates" do
     before(:once) do
-      clear_post_policy(assignment: assignment)
+      clear_post_policy(assignment:)
     end
 
     context "for an assignment that would receive a manual post policy" do
@@ -63,7 +63,7 @@ describe DataFixup::AddPostPoliciesToAssignments do
 
         student1_submission.update!(posted_at: nil)
         assignment.reload.update!(muted: false)
-        clear_post_policy(assignment: assignment)
+        clear_post_policy(assignment:)
         run_for_submissions
 
         expect(student1_submission.reload.posted_at).to eq(student1_submission.graded_at)
@@ -100,7 +100,7 @@ describe DataFixup::AddPostPoliciesToAssignments do
     context "when a course does not have an existing post policy" do
       before(:once) do
         course.default_post_policy.destroy
-        clear_post_policy(assignment: assignment)
+        clear_post_policy(assignment:)
       end
 
       describe "assignment post policy creation" do
@@ -126,7 +126,7 @@ describe DataFixup::AddPostPoliciesToAssignments do
 
         it "creates a manual post policy when the assignment is muted" do
           assignment.mute!
-          clear_post_policy(assignment: assignment)
+          clear_post_policy(assignment:)
 
           run_for_courses
           expect(assignment.reload.post_policy).to be_post_manually
@@ -143,7 +143,7 @@ describe DataFixup::AddPostPoliciesToAssignments do
           expect do
             run_for_courses
           end.not_to change {
-            PostPolicy.find_by!(assignment: assignment).updated_at
+            PostPolicy.find_by!(assignment:).updated_at
           }
         end
       end
@@ -165,7 +165,7 @@ describe DataFixup::AddPostPoliciesToAssignments do
         expect do
           run_for_courses
         end.not_to change {
-          PostPolicy.find_by!(course: course, assignment: nil).updated_at
+          PostPolicy.find_by!(course:, assignment: nil).updated_at
         }
       end
 
@@ -173,7 +173,7 @@ describe DataFixup::AddPostPoliciesToAssignments do
         expect do
           run_for_courses
         end.not_to change {
-          PostPolicy.find_by!(assignment: assignment).updated_at
+          PostPolicy.find_by!(assignment:).updated_at
         }
       end
     end

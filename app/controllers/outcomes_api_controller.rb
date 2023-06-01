@@ -314,9 +314,9 @@ class OutcomesApiController < ApplicationController
   end
 
   def find_outcomes_service_assignment_alignments(course, student_id)
-    outcomes = ContentTag.active.where(context: context).learning_outcome_links
+    outcomes = ContentTag.active.where(context:).learning_outcome_links
     student_uuid = User.find(student_id).uuid
-    assignments = Assignment.active.where(context: context).quiz_lti
+    assignments = Assignment.active.where(context:).quiz_lti
     return if assignments.nil? || outcomes.nil?
 
     os_alignments = get_outcome_alignments(context, outcomes.pluck(:content_id).join(","), { includes: "alignments", list_groups: false })

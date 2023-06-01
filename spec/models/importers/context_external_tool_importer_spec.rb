@@ -87,7 +87,7 @@ describe Importers::ContextExternalToolImporter do
         title: "LTI 1.3 Tool",
         url: "http://www.example.com",
         lti_version: "1.3",
-        settings: settings
+        settings:
       }
     end
 

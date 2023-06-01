@@ -72,10 +72,10 @@ class AssessmentRequest < ActiveRecord::Base
 
   scope :incomplete, -> { where(workflow_state: "assigned") }
   scope :complete, -> { where(workflow_state: "completed") }
-  scope :for_assessee, ->(user_id) { where(user_id: user_id) }
-  scope :for_assessor, ->(assessor_id) { where(assessor_id: assessor_id) }
-  scope :for_asset, ->(asset_id) { where(asset_id: asset_id) }
-  scope :for_assignment, ->(assignment_id) { eager_load(:submission).where(submissions: { assignment_id: assignment_id }) }
+  scope :for_assessee, ->(user_id) { where(user_id:) }
+  scope :for_assessor, ->(assessor_id) { where(assessor_id:) }
+  scope :for_asset, ->(asset_id) { where(asset_id:) }
+  scope :for_assignment, ->(assignment_id) { eager_load(:submission).where(submissions: { assignment_id: }) }
   scope :for_courses, ->(courses) { eager_load(:submission).where(submissions: { course_id: courses }) }
   scope :for_active_users, lambda { |course|
     current_enrollments = course.current_enrollments.pluck(:user_id)
@@ -85,7 +85,7 @@ class AssessmentRequest < ActiveRecord::Base
   scope :not_ignored_by, lambda { |user, purpose|
     where.not(
       Ignore.where("asset_id=assessment_requests.id")
-          .where(asset_type: "AssessmentRequest", user_id: user, purpose: purpose)
+          .where(asset_type: "AssessmentRequest", user_id: user, purpose:)
           .arel.exists
     )
   }

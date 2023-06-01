@@ -80,7 +80,7 @@ describe MicrosoftSync::GraphServiceHelpers do
       let(:course_code) { "{{math🔥一241!&?" }
 
       before do
-        course_model(public_description: "great class", name: "Linear Algebra", course_code: course_code)
+        course_model(public_description: "great class", name: "Linear Algebra", course_code:)
       end
 
       it "removes the special characters" do
@@ -101,7 +101,7 @@ describe MicrosoftSync::GraphServiceHelpers do
       let(:course_code) { '@Math<>()\[];:"帆布' }
 
       before do
-        course_model(public_description: "great class", name: "Linear Algebra", course_code: course_code)
+        course_model(public_description: "great class", name: "Linear Algebra", course_code:)
       end
 
       it "removes the invalid characters" do
@@ -124,7 +124,7 @@ describe MicrosoftSync::GraphServiceHelpers do
       let(:course_code) { " math 101    \n\n" }
 
       before do
-        course_model(public_description: "great class", name: "Linear Algebra", course_code: course_code)
+        course_model(public_description: "great class", name: "Linear Algebra", course_code:)
       end
 
       it "removes the whitespace" do
@@ -146,7 +146,7 @@ describe MicrosoftSync::GraphServiceHelpers do
     context "when the course name is too long" do
       let(:name) { "c" * 128 }
 
-      before { course_model(public_description: "great class", name: name) }
+      before { course_model(public_description: "great class", name:) }
 
       it "shortens the mailNickname" do
         expect(graph_service.education_classes).to receive(:create).with(

@@ -51,10 +51,10 @@ module PostgreSQLAdapterExtensions
     end
   end
 
-  def receive_timeout_wrapper(&block)
+  def receive_timeout_wrapper(&)
     return yield unless @config[:receive_timeout]
 
-    Timeout.timeout(@config[:receive_timeout], PG::ConnectionBad, "receive timeout", &block)
+    Timeout.timeout(@config[:receive_timeout], PG::ConnectionBad, "receive timeout", &)
   end
 
   %I[begin_db_transaction create_savepoint active?].each do |method|
@@ -185,7 +185,7 @@ module PostgreSQLAdapterExtensions
       desc_order_columns = inddef.scan(/(\w+) DESC/).flatten
       orders = desc_order_columns.any? ? desc_order_columns.index_with { :desc } : {}
 
-      ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, orders: orders)
+      ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, orders:)
     end
   end
 

@@ -19,7 +19,7 @@
 
 describe MicrosoftSync::UsersUluvsFinder do
   let(:course) { course_model(name: "sync test course") }
-  let(:group) { MicrosoftSync::Group.create(course: course) }
+  let(:group) { MicrosoftSync::Group.create(course:) }
   let(:root_account) { group.root_account }
 
   describe "#call" do

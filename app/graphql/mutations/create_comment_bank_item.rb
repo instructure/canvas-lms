@@ -27,7 +27,7 @@ class Mutations::CreateCommentBankItem < Mutations::BaseMutation
 
   def resolve(input:)
     course = get_course(input[:course_id])
-    record = CommentBankItem.new(course: course, user: current_user, comment: input[:comment])
+    record = CommentBankItem.new(course:, user: current_user, comment: input[:comment])
     verify_authorized_action!(record, :create)
     return errors_for(record) unless record.save
 

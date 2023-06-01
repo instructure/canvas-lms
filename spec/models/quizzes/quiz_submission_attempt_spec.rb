@@ -26,7 +26,7 @@ describe Quizzes::QuizSubmissionAttempt do
 
     it "assigns versions" do
       versions = [1, 2, 3]
-      attempt = Quizzes::QuizSubmissionAttempt.new(number: 1, versions: versions)
+      attempt = Quizzes::QuizSubmissionAttempt.new(number: 1, versions:)
       expect(attempt.versions).to eq versions
     end
   end

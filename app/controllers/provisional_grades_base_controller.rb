@@ -58,7 +58,7 @@ class ProvisionalGradesBaseController < ApplicationController
       pg_json = provisional_grade_json(
         course: @context,
         assignment: @assignment,
-        submission: submission,
+        submission:,
         provisional_grade: pg,
         current_user: @current_user,
         avatars: service_enabled?(:avatars) && !@assignment.grade_as_group?,
@@ -75,7 +75,7 @@ class ProvisionalGradesBaseController < ApplicationController
       end
     end
 
-    render json: json
+    render json:
   end
 
   private

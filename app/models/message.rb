@@ -198,7 +198,7 @@ class Message < ActiveRecord::Base
     shard.activate do
       self.updated_at = Time.now.utc
       updates = changes_to_save.transform_values(&:last)
-      self.class.in_partition(attributes).where(id: id, created_at: created_at).update_all(updates)
+      self.class.in_partition(attributes).where(id:, created_at:).update_all(updates)
       clear_changes_information
     end
   end
@@ -217,7 +217,7 @@ class Message < ActiveRecord::Base
 
   scope :not_to_email, -> { where("messages.path_type NOT IN ('email', 'sms')") }
 
-  scope :by_name, ->(notification_name) { where(notification_name: notification_name) }
+  scope :by_name, ->(notification_name) { where(notification_name:) }
 
   scope :before, ->(date) { where("messages.created_at<?", date) }
 
@@ -478,10 +478,10 @@ class Message < ActiveRecord::Base
 
     if dashboard?
       messages = Message.in_state(:dashboard).where(
-        notification_id: notification_id,
-        context_id: context_id,
-        context_type: context_type,
-        user_id: user_id
+        notification_id:,
+        context_id:,
+        context_type:,
+        user_id:
       )
 
       (messages - [self]).each(&:close)
@@ -723,12 +723,12 @@ self.user,
 
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{notification_name}",
                                  short_stat: "message.deliver",
-                                 tags: { path_type: path_type, notification_name: notification_name })
+                                 tags: { path_type:, notification_name: })
 
     global_account_id = Shard.global_id_for(root_account_id, shard)
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{global_account_id}",
                                  short_stat: "message.deliver_per_account",
-                                 tags: { path_type: path_type, root_account_id: global_account_id })
+                                 tags: { path_type:, root_account_id: global_account_id })
 
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs
@@ -745,7 +745,7 @@ self.user,
   def skip_and_cancel
     InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
                                  short_stat: "message.skip",
-                                 tags: { path_type: path_type, notification_name: notification_name })
+                                 tags: { path_type:, notification_name: })
     cancel
   end
 
@@ -758,7 +758,7 @@ self.user,
       # Log no_targets_specified error to DataDog
       InstStatsd::Statsd.increment("message.no_targets_specified",
                                    short_stat: "message.no_targets_specified",
-                                   tags: { path_type: path_type })
+                                   tags: { path_type: })
 
       self.transmission_errors = "No notification targets specified"
       set_transmission_error
@@ -778,7 +778,7 @@ self.user,
     Canvas::Errors.capture(
       e,
       message: "Message delivery failed",
-      to: to,
+      to:,
       object: inspect.to_s
     )
     error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
@@ -1060,7 +1060,7 @@ self.user,
         Canvas::Errors.capture(
           @exception,
           message: "Message delivery failed",
-          to: to,
+          to:,
           object: inspect.to_s
         )
       end
@@ -1112,7 +1112,7 @@ self.user,
         Canvas::Errors.capture(
           e,
           message: "SMS delivery failed",
-          to: to,
+          to:,
           object: inspect.to_s,
           tags: {
             type: :sms_message
@@ -1178,7 +1178,7 @@ self.user,
     @name_helper ||= Messages::NameHelper.new(
       asset: context,
       message_recipient: user,
-      notification_name: notification_name
+      notification_name:
     )
   end
 

@@ -33,8 +33,8 @@ describe ContentMigration do
     let(:content_migration) do
       ContentMigration.create!(
         context: destination,
-        workflow_state: workflow_state,
-        user: user,
+        workflow_state:,
+        user:,
         migration_type: "course_copy_importer",
         source_course: context
       )
@@ -63,7 +63,7 @@ describe ContentMigration do
       end
       let(:external_tool) do
         ContextExternalTool.create!(
-          context: context,
+          context:,
           url: "https://www.test.com",
           name: "test tool",
           shared_secret: "secret",
@@ -184,7 +184,7 @@ describe ContentMigration do
   context "zip file import" do
     def setup_zip_import(context, filename = "file.zip", import_immediately: false)
       zip_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/#{filename}")
-      cm = ContentMigration.new(context: context, user: @user)
+      cm = ContentMigration.new(context:, user: @user)
       cm.migration_type = "zip_file_importer"
       cm.migration_settings[:folder_id] = Folder.root_folders(context).first.id
       cm.migration_settings["import_immediately"] = import_immediately
@@ -286,7 +286,7 @@ describe ContentMigration do
                               user: user_model,
                               source_course: course,
                               migration_type: "course_copy_importer",
-                              copy_options: copy_options,
+                              copy_options:,
                               migration_settings: {
                                 import_immediately: true,
                                 migration_ids_to_import: {
@@ -335,7 +335,7 @@ describe ContentMigration do
         tool
       end
       let(:assignment) do
-        assignment_model({ course: course,
+        assignment_model({ course:,
                            submission_types: "external_tool",
                            external_tool_tag_attributes: { content: tool, url: tool.url } })
       end
@@ -391,7 +391,7 @@ describe ContentMigration do
       let(:assignments) do
         assignments = []
         3.times do
-          assignments << assignment_model({ course: course })
+          assignments << assignment_model({ course: })
         end
         assignments
       end
@@ -413,7 +413,7 @@ describe ContentMigration do
                                              developer_key: dev_key,
                                              name: "tool #{i}"
                                            })
-            assignments << assignment_model({ course: course,
+            assignments << assignment_model({ course:,
                                               submission_types: "external_tool",
                                               external_tool_tag_attributes: { content: tool, url: tool.url } })
           end
@@ -1226,7 +1226,7 @@ describe ContentMigration do
 
     context "when not on a test cluster" do
       let(:content_migration) do
-        @cm.update!(source_course: source_course)
+        @cm.update!(source_course:)
 
         @cm
       end
@@ -1246,7 +1246,7 @@ describe ContentMigration do
 
     context "when on a test cluster" do
       let(:content_migration) do
-        @cm.update!(source_course: source_course)
+        @cm.update!(source_course:)
 
         @cm
       end
@@ -1293,7 +1293,7 @@ describe ContentMigration do
       student = user_factory
       @course_to.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
       time = Time.zone.now
-      rubric = outcome_with_rubric context: @course_to, outcome: outcome
+      rubric = outcome_with_rubric(context: @course_to, outcome:)
       assignment1 = @course_to.assignments.create!(title: "Assignment 1")
       alignment1 = outcome.align(assignment1, @course_to)
       rubric_association1 = rubric.associate_with(assignment1, @course_to, purpose: "grading")

@@ -20,7 +20,7 @@
 describe Quizzes::QuizSerializer do
   def quiz_serializer(options = {})
     options.reverse_merge!({
-                             controller: controller,
+                             controller:,
                              scope: @user,
                              session: @session
                            })

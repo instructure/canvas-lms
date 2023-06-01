@@ -1429,7 +1429,7 @@ describe "Module Items API", type: :request do
                    course_id: @course.id.to_s,
                    module_id: @module1.id.to_s,
                    id: item.id.to_s },
-                 { assignment_set_id: assignment_set_id, student_id: student_id },
+                 { assignment_set_id:, student_id: },
                  {},
                  opts)
       end

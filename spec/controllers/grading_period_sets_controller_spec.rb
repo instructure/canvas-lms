@@ -102,7 +102,7 @@ RSpec.describe GradingPeriodSetsController do
           account_id: root_account.to_param,
           grading_period_set: group_helper.valid_attributes
         }
-        expect { post :create, params: params, session: valid_session }.to change(GradingPeriodGroup, :count).by(1)
+        expect { post :create, params:, session: valid_session }.to change(GradingPeriodGroup, :count).by(1)
       end
 
       context "given a sub account enrollment term" do

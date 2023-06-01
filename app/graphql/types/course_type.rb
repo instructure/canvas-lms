@@ -117,7 +117,7 @@ module Types
 
     implements Interfaces::AssignmentsConnectionInterface
     def assignments_connection(filter: {})
-      super(filter: filter, course: course)
+      super(filter:, course:)
     end
 
     field :account, AccountType, null: true
@@ -185,7 +185,7 @@ module Types
         :manage_grades
       )
 
-      context.scoped_merge!(course: course)
+      context.scoped_merge!(course:)
       scope = UserSearch.scope_for(course,
                                    current_user,
                                    include_inactive_enrollments: true,
@@ -217,7 +217,7 @@ module Types
         :manage_grades
       )
 
-      context.scoped_merge!(course: course)
+      context.scoped_merge!(course:)
       scope = course.apply_enrollment_visibility(course.all_enrollments, current_user).active
       scope = scope.where(associated_user_id: filter[:associated_user_ids]) if filter[:associated_user_ids].present?
       scope = scope.where(type: filter[:types]) if filter[:types].present?
@@ -326,8 +326,8 @@ module Types
     def permissions
       Loaders::PermissionsLoader.for(
         course,
-        current_user: current_user,
-        session: session
+        current_user:,
+        session:
       )
     end
 

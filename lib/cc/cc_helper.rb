@@ -158,8 +158,8 @@ module CC
       [title, body]
     end
 
-    MEDIAHREF_REGEX = %r{/media_objects_iframe\?mediahref=/}.freeze
-    SPECIAL_REFERENCE_REGEX = /(?:\$|%24)[^%$]*(?:\$|%24)/.freeze
+    MEDIAHREF_REGEX = %r{/media_objects_iframe\?mediahref=/}
+    SPECIAL_REFERENCE_REGEX = /(?:\$|%24)[^%$]*(?:\$|%24)/
     WEB_CONTENT_REFERENCE_REGEX = Regexp.union(
       Regexp.new(Regexp.escape(CC::CCHelper::WEB_CONTENT_TOKEN)),
       Regexp.new(Regexp.escape(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN)))
@@ -194,7 +194,7 @@ module CC
             type = object_key
             object_key = nil
           end
-          linked_objects.push({ identifier: object_key, type: type })
+          linked_objects.push({ identifier: object_key, type: })
         end
       end
       linked_objects
@@ -448,7 +448,7 @@ module CC
                filename += ".#{asset[:fileExt]}" if asset
                File.join(MEDIA_OBJECTS_FOLDER, filename)
              end
-      { asset: asset, path: path }
+      { asset:, path: }
     end
 
     # sub_path is the last part of a file url: /courses/1/files/1(/download)

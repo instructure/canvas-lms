@@ -24,12 +24,12 @@ require "method_view"
 describe MethodView do
   let(:argument_tag) do
     text = "foo [String]\nA description."
-    double(tag_name: "argument", text: text)
+    double(tag_name: "argument", text:)
   end
 
   let(:deprecated_argument_tag) do
     text = "foo NOTICE 2018-01-05 EFFECTIVE 2018-05-05\nA description."
-    double(tag_name: "deprecated_argument", text: text)
+    double(tag_name: "deprecated_argument", text:)
   end
 
   let(:response_field_tag) do
@@ -42,7 +42,7 @@ describe MethodView do
 
   let(:deprecated_method_tag) do
     text = "NOTICE 2018-01-05 EFFECTIVE 2018-05-05\nA description."
-    double(tag_name: "deprecated_method", text: text)
+    double(tag_name: "deprecated_method", text:)
   end
 
   describe "#deprecated?" do

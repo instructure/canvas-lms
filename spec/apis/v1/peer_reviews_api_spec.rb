@@ -44,7 +44,7 @@ describe PeerReviewsApiController, type: :request do
                                                    rubric_association: rubric_assoc
                                                  })
     AssessmentRequest.create!(
-      rubric_assessment: rubric_assessment,
+      rubric_assessment:,
       user: submission.user,
       asset: submission,
       assessor_asset: assessor_submission,

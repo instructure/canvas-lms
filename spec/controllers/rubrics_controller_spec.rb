@@ -217,7 +217,7 @@ describe RubricsController do
         expect do
           post("create", params: request_params)
         end.to change {
-          AnonymousOrModerationEvent.where(event_type: "rubric_created", assignment: assignment).count
+          AnonymousOrModerationEvent.where(event_type: "rubric_created", assignment:).count
         }.by(1)
       end
 
@@ -800,14 +800,14 @@ describe RubricsController do
         expect do
           delete("destroy", params: { course_id: course.id, id: rubric.id })
         end.to change {
-          AnonymousOrModerationEvent.where(event_type: "rubric_deleted", assignment: assignment, user: teacher).count
+          AnonymousOrModerationEvent.where(event_type: "rubric_deleted", assignment:, user: teacher).count
         }.by(1)
       end
 
       it "includes the removed rubric in the event payload" do
         delete("destroy", params: { course_id: course.id, id: rubric.id })
 
-        event = AnonymousOrModerationEvent.find_by(event_type: "rubric_deleted", assignment: assignment, user: teacher)
+        event = AnonymousOrModerationEvent.find_by(event_type: "rubric_deleted", assignment:, user: teacher)
         expect(event.payload["id"]).to eq rubric.id
       end
     end
@@ -831,7 +831,7 @@ describe RubricsController do
     it "returns 404 if rubric is deleted" do
       rubric = Rubric.create!(user: @teacher, context: Account.default)
       RubricAssociation.create!(
-        rubric: rubric,
+        rubric:,
         context: @course,
         purpose: :bookmark,
         association_object: @course

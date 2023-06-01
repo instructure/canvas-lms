@@ -178,8 +178,8 @@ module CustomWaitMethods
     end
   end
 
-  def pause_ajax(&block)
-    SeleniumDriverSetup.request_mutex.synchronize(&block)
+  def pause_ajax(&)
+    SeleniumDriverSetup.request_mutex.synchronize(&)
   end
 
   def keep_trying_until(seconds = SeleniumDriverSetup::SECONDS_UNTIL_GIVING_UP)
@@ -240,8 +240,8 @@ module CustomWaitMethods
     tiny_frame
   end
 
-  def disable_implicit_wait(&block)
-    ::SeleniumExtensions::FinderWaiting.disable(&block)
+  def disable_implicit_wait(&)
+    ::SeleniumExtensions::FinderWaiting.disable(&)
   end
 
   # little wrapper around Selenium::WebDriver::Wait, notably it:
@@ -254,7 +254,7 @@ module CustomWaitMethods
   end
 
   def wait_for_no_such_element(method: nil, timeout: SeleniumExtensions::FinderWaiting.timeout)
-    wait_for(method: method, timeout: timeout, ignore: []) do
+    wait_for(method:, timeout:, ignore: []) do
       # so find_element calls return ASAP
       disable_implicit_wait do
         yield

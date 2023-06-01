@@ -48,7 +48,7 @@ RSpec.describe Mutations::SubscribeToDiscussionTopic do
     result = CanvasSchema.execute(
       mutation_str(**opts),
       context: {
-        current_user: current_user,
+        current_user:,
         domain_root_account: @course.account.root_account,
         request: ActionDispatch::TestRequest.create
       }

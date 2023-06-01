@@ -36,13 +36,13 @@ module CollaborationsHelper
         )
         data_attrs[:update_launch_url] = url
       end
-      render "collaborations/collaboration", collaboration: collab, user: user, data_attributes: data_attrs
+      render "collaborations/collaboration", collaboration: collab, user:, data_attributes: data_attrs
     end
   end
 
   def collaboration_links(collab, user)
     if can_do(collab, user, :update, :delete)
-      render "collaborations/collaboration_links", collaboration: collab, user: user
+      render "collaborations/collaboration_links", collaboration: collab, user:
     end
   end
 

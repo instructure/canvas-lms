@@ -124,19 +124,19 @@ class GradebookUserIds
   end
 
   def sort_by_assignment_missing(assignment_id)
-    sort_user_ids(Submission.missing.where(assignment_id: assignment_id))
+    sort_user_ids(Submission.missing.where(assignment_id:))
   end
 
   def sort_by_assignment_excused(assignment_id)
-    sort_user_ids(Submission.excused.where(assignment_id: assignment_id))
+    sort_user_ids(Submission.excused.where(assignment_id:))
   end
 
   def sort_by_assignment_unposted(assignment_id)
-    sort_user_ids(Submission.graded.unposted.where(assignment_id: assignment_id))
+    sort_user_ids(Submission.graded.unposted.where(assignment_id:))
   end
 
   def sort_by_assignment_late(assignment_id)
-    sort_user_ids(Submission.late.where(assignment_id: assignment_id))
+    sort_user_ids(Submission.late.where(assignment_id:))
   end
 
   def sort_by_total_grade

@@ -46,7 +46,7 @@ class Quizzes::OutstandingQuizSubmissionsController < ApplicationController
       oqs = Quizzes::OutstandingQuizSubmissionManager.new(quiz).find_by_quiz
       @quiz_submissions = Api.paginate(oqs, self, api_route)
       json = quiz_submissions_json(@quiz_submissions, quiz, @current_user, session, @context, ["user"], {})
-      render json: json
+      render json:
     end
   end
 

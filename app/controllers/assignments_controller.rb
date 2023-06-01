@@ -137,12 +137,12 @@ class AssignmentsController < ApplicationController
                  end
 
     peer_review_mode_enabled = @context.feature_enabled?(:peer_reviews_for_a2) && (params[:reviewee_id].present? || params[:anonymous_asset_id].present?)
-    peer_review_available = submission.present? && @assignment.submitted?(submission: submission) && current_user_submission.present? && @assignment.submitted?(submission: current_user_submission)
+    peer_review_available = submission.present? && @assignment.submitted?(submission:) && current_user_submission.present? && @assignment.submitted?(submission: current_user_submission)
 
     js_env({
              a2_student_view: render_a2_student_view?,
              peer_review_mode_enabled: submission.present? && peer_review_mode_enabled,
-             peer_review_available: peer_review_available,
+             peer_review_available:,
              peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission&.user&.name,
              originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2),
              restrict_quantitative_data: @assignment.restrict_quantitative_data?(@current_user),
@@ -466,7 +466,7 @@ class AssignmentsController < ApplicationController
 
   def downloadable_submissions?(current_user, context, assignment)
     types = %w[online_upload online_url online_text_entry]
-    return unless (assignment.submission_types.split(",") & types).any? && current_user
+    return unless assignment.submission_types.split(",").intersect?(types) && current_user
 
     student_ids =
       if assignment.grade_as_group?
@@ -675,7 +675,7 @@ class AssignmentsController < ApplicationController
           if @assignment.save
             flash[:notice] = t "notices.created", "Assignment was successfully created."
             format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-            format.json { render json: @assignment.as_json(permissions: { user: @current_user, session: session }), status: :created }
+            format.json { render json: @assignment.as_json(permissions: { user: @current_user, session: }), status: :created }
           else
             format.html { render :new }
             format.json { render json: @assignment.errors, status: :bad_request }
@@ -956,7 +956,7 @@ class AssignmentsController < ApplicationController
         title: @assignment.title
       },
       CURRENT_USER: {
-        can_view_grader_identities: can_view_grader_identities,
+        can_view_grader_identities:,
         can_view_student_identities: @assignment.can_view_student_names?(@current_user),
         grader_id: current_grader_id,
         id: @current_user.id

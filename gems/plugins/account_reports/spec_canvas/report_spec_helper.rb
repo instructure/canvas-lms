@@ -37,7 +37,7 @@ module ReportSpecHelper
     account = options[:account] || @account
     parameters = options[:params]
     account_report = AccountReport.new(user: @admin || user_factory,
-                                       account: account,
+                                       account:,
                                        report_type: type)
     parameters ||= {}
     account_report.parameters = parameters.merge({ "skip_message" => true })

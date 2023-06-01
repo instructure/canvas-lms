@@ -122,11 +122,11 @@ describe Submission do
         let(:submission) { result.submission }
         let(:result_overrides) do
           {
-            assignment: assignment,
+            assignment:,
             grading_progress: "PendingManual",
             result_score: assignment.points_possible,
             result_maximum: assignment.points_possible,
-            tool: tool
+            tool:
           }
         end
 
@@ -700,7 +700,7 @@ describe Submission do
         assignment.submit_homework(@student, body: "a body")
 
         section = @course.course_sections.create!(name: "My Awesome Section")
-        @course.enroll_student(@student, section: section, allow_multiple_enrollments: true).accept!
+        @course.enroll_student(@student, section:, allow_multiple_enrollments: true).accept!
         assignment.assignment_overrides.create!(
           due_at: 6.minutes.ago(@now),
           due_at_overridden: true,
@@ -1852,7 +1852,7 @@ describe Submission do
       it "does not send a message to a TA without grading rights" do
         limited_role = custom_ta_role("limitedta", account: @course.account)
         [:view_all_grades, :manage_grades].each do |permission|
-          @course.account.role_overrides.create!(permission: permission, enabled: false, role: limited_role)
+          @course.account.role_overrides.create!(permission:, enabled: false, role: limited_role)
         end
 
         limited_ta = user_factory(active_all: true, active_cc: true)
@@ -2581,7 +2581,7 @@ describe Submission do
 
     let(:originality_report) do
       submission.update(attachment_ids: attachment.id.to_s)
-      OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: submission)
+      OriginalityReport.create!(attachment:, originality_score: "1", submission:)
     end
 
     describe "#originality_data" do
@@ -2606,14 +2606,14 @@ describe Submission do
 
       context "multiple originality reports for the same attachment" do
         let(:preferred_report) do
-          OriginalityReport.create!(attachment: attachment,
-                                    submission: submission,
+          OriginalityReport.create!(attachment:,
+                                    submission:,
                                     workflow_state: preferred_state,
                                     originality_score: (preferred_state == "scored") ? 1 : nil)
         end
         let(:other_report) do
-          OriginalityReport.create!(attachment: attachment,
-                                    submission: submission,
+          OriginalityReport.create!(attachment:,
+                                    submission:,
                                     workflow_state: other_state,
                                     originality_score: (other_state == "scored") ? 2 : nil)
         end
@@ -2765,7 +2765,7 @@ describe Submission do
 
         let(:error_message) { "We can't process that file :(" }
 
-        before { originality_report.update!(error_message: error_message) }
+        before { originality_report.update!(error_message:) }
 
         it "includes the error message" do
           expect(subject[:error_message]).to eq error_message
@@ -2786,7 +2786,7 @@ describe Submission do
       before { student_in_course(active_all: true) }
 
       it "includes attachment ids from 'attachment_id'" do
-        submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments: attachments)
+        submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments:)
         submission.update!(attachment_id: single_attachment)
         expect(submission.attachment_ids_for_version).to match_array attachments.map(&:id) + [single_attachment.id]
       end
@@ -2808,8 +2808,8 @@ describe Submission do
       it "returns true for standard reports" do
         submission = assignment.submit_homework(test_student, attachments: [attachment])
         OriginalityReport.create!(
-          attachment: attachment,
-          submission: submission,
+          attachment:,
+          submission:,
           originality_score: 0.5,
           originality_report_url: report_url
         )
@@ -2819,7 +2819,7 @@ describe Submission do
       it "returns true for text entry reports" do
         submission = assignment.submit_homework(test_student, body: "hi")
         OriginalityReport.create!(
-          submission: submission,
+          submission:,
           originality_score: 0.5,
           originality_report_url: report_url
         )
@@ -2837,14 +2837,14 @@ describe Submission do
         submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
         submission_two = assignment.submit_homework(user_two, submission_type: "online_upload", attachments: [attachment])
 
-        submission.update!(group: group)
-        submission_two.update!(group: group)
+        submission.update!(group:)
+        submission_two.update!(group:)
 
         assignment.submissions.each do |s|
-          s.update!(group: group, turnitin_data: { blah: 1 })
+          s.update!(group:, turnitin_data: { blah: 1 })
         end
 
-        report = OriginalityReport.create!(originality_score: "1", submission: submission, attachment: attachment)
+        report = OriginalityReport.create!(originality_score: "1", submission:, attachment:)
         report.copy_to_group_submissions!
 
         expect(assignment.submissions.map(&:has_originality_report?)).to match_array [true, true]
@@ -2871,8 +2871,8 @@ describe Submission do
       let_once(:submission) { assignment.submit_homework(test_student, attachments: [attachment]) }
       let_once(:report_url) { "http://www.test-score.com" }
       let(:originality_report) do
-        OriginalityReport.create!(attachment: attachment,
-                                  submission: submission,
+        OriginalityReport.create!(attachment:,
+                                  submission:,
                                   originality_score: 0.5,
                                   originality_report_url: report_url)
       end
@@ -2932,7 +2932,7 @@ describe Submission do
           let(:other_report_url) { "http://another-report.com" }
           let(:other_report) do
             OriginalityReport.create!(attachment: other_attachment,
-                                      submission: submission,
+                                      submission:,
                                       originality_score: 0.4,
                                       originality_report_url: other_report_url)
           end
@@ -2974,8 +2974,8 @@ describe Submission do
           context "with some duplicate reports for an attachment" do
             let(:duplicate_url) { "http://duplicate.com" }
             let(:duplicate_report) do
-              OriginalityReport.create!(attachment: attachment,
-                                        submission: submission,
+              OriginalityReport.create!(attachment:,
+                                        submission:,
                                         workflow_state: "pending",
                                         originality_report_url: duplicate_url)
             end
@@ -3021,15 +3021,15 @@ describe Submission do
           let(:preferred_url) { "http://preferred-score.com" }
           let(:other_url) { "http://other-score.com" }
           let(:preferred_report) do
-            OriginalityReport.create!(attachment: attachment,
-                                      submission: submission,
+            OriginalityReport.create!(attachment:,
+                                      submission:,
                                       originality_score: (preferred_state == "scored") ? 1 : nil,
                                       workflow_state: preferred_state,
                                       originality_report_url: preferred_url)
           end
           let(:other_report) do
-            OriginalityReport.create!(attachment: attachment,
-                                      submission: submission,
+            OriginalityReport.create!(attachment:,
+                                      submission:,
                                       originality_score: (other_state == "scored") ? 2 : nil,
                                       workflow_state: other_state,
                                       originality_report_url: other_url)
@@ -4150,9 +4150,9 @@ describe Submission do
     let(:assignment) { @course.assignments.create! }
     let(:first_student) { @student }
     let(:second_student) { student_in_course(course: @course, active_all: true).user }
-    let(:submission_with_anonymous_id) { submission_model(assignment: assignment, user: first_student) }
+    let(:submission_with_anonymous_id) { submission_model(assignment:, user: first_student) }
     let(:submission_without_anonymous_id) do
-      submission_model(assignment: assignment, user: second_student).tap do |submission|
+      submission_model(assignment:, user: second_student).tap do |submission|
         submission.update_attribute(:anonymous_id, nil)
       end
     end
@@ -4657,7 +4657,7 @@ describe Submission do
       group = group_category.groups.create!(name: "A Team", context: @course)
       group.add_user(student1)
       group.add_user(student2)
-      assignment.update(group_category: group_category)
+      assignment.update(group_category:)
 
       user_attachment = attachment_model(context: student1)
       assignment.submit_homework(student1, submission_type: "online_upload", attachments: [user_attachment])
@@ -4708,7 +4708,7 @@ describe Submission do
       student_in_course(active_all: true)
       attachment = attachment_model(filename: "submission.doc", context: @student)
       submission = @assignment.submit_homework(@student, attachments: [attachment])
-      report = OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: submission)
+      report = OriginalityReport.create!(attachment:, originality_score: "1", submission:)
 
       expect(submission.versioned_originality_reports).to eq [report]
     end
@@ -4717,7 +4717,7 @@ describe Submission do
       student_in_course(active_all: true)
       attachment = attachment_model(filename: "submission.doc", context: @student)
       submission = @assignment.submit_homework(@student, attachments: [attachment])
-      OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: submission)
+      OriginalityReport.create!(attachment:, originality_score: "1", submission:)
 
       submission.versioned_originality_reports
       expect(OriginalityReport).not_to receive(:where)
@@ -4751,7 +4751,7 @@ describe Submission do
       attachment = attachment_model(filename: "submission.doc", context: @student)
       submissions += (1..3).map do |i|
         sub = @assignment.submit_homework(@student, attachments: [attachment])
-        report = OriginalityReport.create!(attachment: attachment, originality_score: i, submission: sub)
+        report = OriginalityReport.create!(attachment:, originality_score: i, submission: sub)
         report.update_columns(submission_time: nil)
         reports << report
         sub
@@ -4780,7 +4780,7 @@ describe Submission do
           attachment_model(filename: "submission#{i}-b.doc", context: @student)
         ]
 
-        sub = @assignment.submit_homework(@student, attachments: attachments)
+        sub = @assignment.submit_homework(@student, attachments:)
         originality_reports << attachments.map do |a|
           OriginalityReport.create!(attachment: a, originality_score: "1", submission: sub)
         end
@@ -4796,7 +4796,7 @@ describe Submission do
     it "avoids N+1s in the bulk load" do
       attachment = attachment_model(filename: "submission.doc", context: @student)
       submission = @assignment.submit_homework(@student, attachments: [attachment])
-      OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: submission)
+      OriginalityReport.create!(attachment:, originality_score: "1", submission:)
 
       Submission.bulk_load_versioned_originality_reports([submission])
       expect(OriginalityReport).not_to receive(:where)
@@ -4816,21 +4816,21 @@ describe Submission do
       Timecop.freeze(10.seconds.ago) do
         sub = @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
         originality_reports <<
-          OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: sub)
+          OriginalityReport.create!(attachment:, originality_score: "1", submission: sub)
       end
 
       attachment = attachment_model(filename: "submission-b.doc", context: @student)
       Timecop.freeze(5.seconds.ago) do
         sub = @assignment.submit_homework(@student, attachments: [attachment])
         originality_reports <<
-          OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: sub)
+          OriginalityReport.create!(attachment:, originality_score: "1", submission: sub)
       end
 
       attachment = attachment_model(filename: "submission-c.doc", context: @student)
       Timecop.freeze(1.second.ago) do
         sub = @assignment.submit_homework(@student, attachments: [attachment])
         originality_reports <<
-          OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: sub)
+          OriginalityReport.create!(attachment:, originality_score: "1", submission: sub)
       end
 
       submission = @assignment.submission_for_student(@student)
@@ -4861,7 +4861,7 @@ describe Submission do
       attachment = attachment_model(filename: "submission.doc", context: @student)
       submissions += (1..3).map do |i|
         sub = @assignment.submit_homework(@student, attachments: [attachment])
-        report = OriginalityReport.create!(attachment: attachment, originality_score: i, submission: sub)
+        report = OriginalityReport.create!(attachment:, originality_score: i, submission: sub)
         report.update_columns(submission_time: nil)
         reports << report
         sub
@@ -5946,7 +5946,7 @@ describe Submission do
       before(:once) do
         provisional_grade = @submission.find_or_create_provisional_grade!(@provisional_grader)
         selection = @assignment.moderated_grading_selections.find_by(student: @student)
-        selection.update!(provisional_grade: provisional_grade)
+        selection.update!(provisional_grade:)
         provisional_grade.publish!
         @assignment.update!(grades_published_at: 1.hour.ago)
         @assignment.post_submissions
@@ -6471,12 +6471,12 @@ describe Submission do
       let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: "active").user }
       let(:submission) { assignment.submissions.find_by!(user: student) }
       let(:comment_params) { { comment: "my great submission", author: student } }
-      let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).last }
+      let(:last_event) { AnonymousOrModerationEvent.where(assignment:, submission:).last }
 
       context "for an auditable assignment" do
         it "creates an event when a non-draft comment is published" do
           expect { submission.add_comment(comment_params) }.to change {
-            AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).count
+            AnonymousOrModerationEvent.where(assignment:, submission:).count
           }.by(1)
         end
 
@@ -6493,7 +6493,7 @@ describe Submission do
         it "does not create events for draft comments" do
           draft_params = comment_params.merge(draft_comment: true)
           expect { submission.add_comment(draft_params) }.not_to change {
-            AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).count
+            AnonymousOrModerationEvent.where(assignment:, submission:).count
           }
         end
 
@@ -6529,7 +6529,7 @@ describe Submission do
               assessor: student,
               assessor_asset: submission
             )
-            submission.add_comment(comment_params.merge(assessment_request: assessment_request))
+            submission.add_comment(comment_params.merge(assessment_request:))
             expect(last_event.payload["assessment_request_id"]).to eq assessment_request.id
           end
 
@@ -6571,7 +6571,7 @@ describe Submission do
 
           it "creates an event when graded by an external tool" do
             expect { assignment.grade_student(student, grader_id: -external_tool.id, score: 80) }.to change {
-              AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).count
+              AnonymousOrModerationEvent.where(assignment:, submission:).count
             }.by(1)
           end
         end
@@ -6615,7 +6615,7 @@ describe Submission do
         assignment1 = course.assignments.create!(title: "ok", anonymous_grading: false)
         submission1 = assignment1.submission_for_student(student)
         expect { submission1.add_comment(comment_params) }.not_to change {
-          AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).count
+          AnonymousOrModerationEvent.where(assignment:, submission:).count
         }
       end
     end
@@ -6815,13 +6815,13 @@ describe Submission do
     let(:submission) { @assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment]) }
 
     it "includes originality data" do
-      OriginalityReport.create!(submission: submission, attachment: attachment, originality_score: 1.0, workflow_state: "pending")
+      OriginalityReport.create!(submission:, attachment:, originality_score: 1.0, workflow_state: "pending")
       submission.originality_reports.load_target
       expect(submission.submission_history.first.turnitin_data[attachment.asset_string][:similarity_score]).to eq 1.0
     end
 
     it "doesn't include the originality_data if originality_report isn't pre loaded" do
-      OriginalityReport.create!(submission: submission, attachment: attachment, originality_score: 1.0, workflow_state: "pending")
+      OriginalityReport.create!(submission:, attachment:, originality_score: 1.0, workflow_state: "pending")
       expect(submission.submission_history.first.turnitin_data[attachment.asset_string]).to be_nil
     end
 
@@ -7117,7 +7117,7 @@ describe Submission do
       end
 
       let_once(:assignment) do
-        @course.assignments.create!(group_category: group_category, peer_reviews: true)
+        @course.assignments.create!(group_category:, peer_reviews: true)
       end
 
       before(:once) do
@@ -8243,7 +8243,7 @@ describe Submission do
     @submission = if submit_homework
                     assignment.submit_homework(user)
                   else
-                    assignment.submissions.find_by!(user: user)
+                    assignment.submissions.find_by!(user:)
                   end
     unless assignment.grades_published? || @submission.grade_posting_in_progress || assignment.permits_moderation?(user)
       opts.delete(:grade)
@@ -8682,7 +8682,7 @@ describe Submission do
 
   describe "root account ID" do
     let_once(:root_account) { Account.create! }
-    let_once(:subaccount) { Account.create!(root_account: root_account) }
+    let_once(:subaccount) { Account.create!(root_account:) }
     let_once(:course) { Course.create!(account: subaccount) }
     let_once(:student) { course.enroll_student(User.create!, workflow_state: "active").user }
 

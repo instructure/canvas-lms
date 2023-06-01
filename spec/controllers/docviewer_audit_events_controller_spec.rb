@@ -133,7 +133,7 @@ describe DocviewerAuditEventsController do
       expect do
         post :create, format: :json, params: default_params
       end.to change {
-        AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission, user: @teacher).count
+        AnonymousOrModerationEvent.where(assignment:, submission: @submission, user: @teacher).count
       }.by(1)
     end
 
@@ -153,7 +153,7 @@ describe DocviewerAuditEventsController do
       expect do
         post :create, format: :json, params: default_params
       end.to change {
-        AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission, user: @teacher).count
+        AnonymousOrModerationEvent.where(assignment:, submission: @submission, user: @teacher).count
       }.by(1)
     end
 
@@ -229,7 +229,7 @@ describe DocviewerAuditEventsController do
     @submission = assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment])
     expect do
       post :create, format: :json, params: default_params.merge(canvas_user_id: @student.id)
-    end.to change { AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission).count }.by(1)
+    end.to change { AnonymousOrModerationEvent.where(assignment:, submission: @submission).count }.by(1)
   end
 
   it "allows fake students to annotate, if assignment is anonymous or moderated" do
@@ -240,9 +240,9 @@ describe DocviewerAuditEventsController do
     @submission = assignment.submit_homework(fake_student, submission_type: "online_upload", attachments: [attachment])
     params = default_params.merge(canvas_user_id: fake_student.id, document_id: doc.document_id)
     expect do
-      post :create, format: :json, params: params
+      post :create, format: :json, params:
     end.to change {
-      AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission).count
+      AnonymousOrModerationEvent.where(assignment:, submission: @submission).count
     }.by(1)
   end
 
@@ -299,7 +299,7 @@ describe DocviewerAuditEventsController do
     expect do
       post :create, format: :json, params: default_params.merge(canvas_user_id: @teacher.id)
     end.to change {
-      AnonymousOrModerationEvent.where(assignment: assignment, submission: @submission).count
+      AnonymousOrModerationEvent.where(assignment:, submission: @submission).count
     }.by(1)
   end
 
@@ -344,7 +344,7 @@ describe DocviewerAuditEventsController do
     expect do
       post :create, format: :json, params: default_params.merge(canvas_user_id: @first_ta.id)
     end.to change {
-      AnonymousOrModerationEvent.where(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission).count
+      AnonymousOrModerationEvent.where(assignment:, canvadoc: @attachment.canvadoc, submission: @submission).count
     }.by(1)
   end
 
@@ -354,7 +354,7 @@ describe DocviewerAuditEventsController do
     expect do
       post :create, format: :json, params: default_params
     end.to change {
-      AnonymousOrModerationEvent.where(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission).count
+      AnonymousOrModerationEvent.where(assignment:, canvadoc: @attachment.canvadoc, submission: @submission).count
     }.by(1)
   end
 
@@ -362,7 +362,7 @@ describe DocviewerAuditEventsController do
     assignment = Assignment.create!(course: @course, anonymous_grading: true, name: "anonymous")
     @submission = assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment])
     post :create, format: :json, params: default_params.deep_merge(docviewer_audit_event: { annotation_body: { type: "a type" } })
-    event = AnonymousOrModerationEvent.find_by!(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission)
+    event = AnonymousOrModerationEvent.find_by!(assignment:, canvadoc: @attachment.canvadoc, submission: @submission)
     type = event.payload.fetch("annotation_body").fetch("type")
     expect(type).to eq "a type"
   end
@@ -371,7 +371,7 @@ describe DocviewerAuditEventsController do
     assignment = @course.assignments.create!(anonymous_grading: true, name: "anonymous")
     @submission = assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment])
     post :create, format: :json, params: default_params.deep_merge(docviewer_audit_event: { annotation_id: 23 })
-    event = AnonymousOrModerationEvent.find_by!(assignment: assignment, submission: @submission)
+    event = AnonymousOrModerationEvent.find_by!(assignment:, submission: @submission)
     expect(event.payload.fetch("annotation_id")).to eq "23"
   end
 
@@ -379,7 +379,7 @@ describe DocviewerAuditEventsController do
     assignment = @course.assignments.create!(anonymous_grading: true, name: "anonymous")
     @submission = assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment])
     post :create, format: :json, params: default_params.deep_merge(docviewer_audit_event: { context: "a context" })
-    event = AnonymousOrModerationEvent.find_by!(assignment: assignment, submission: @submission)
+    event = AnonymousOrModerationEvent.find_by!(assignment:, submission: @submission)
     expect(event.payload.fetch("context")).to eq "a context"
   end
 
@@ -387,7 +387,7 @@ describe DocviewerAuditEventsController do
     assignment = Assignment.create!(course: @course, anonymous_grading: true, name: "anonymous")
     @submission = assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment])
     post :create, format: :json, params: default_params.deep_merge(docviewer_audit_event: { related_annotation_id: 23 })
-    event = AnonymousOrModerationEvent.find_by!(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission)
+    event = AnonymousOrModerationEvent.find_by!(assignment:, canvadoc: @attachment.canvadoc, submission: @submission)
     expect(event.payload["related_annotation_id"]).to eq "23"
   end
 
@@ -395,7 +395,7 @@ describe DocviewerAuditEventsController do
     assignment = Assignment.create!(course: @course, anonymous_grading: true, name: "anonymous")
     @submission = assignment.submit_homework(@student, submission_type: "online_upload", attachments: [@attachment])
     post :create, format: :json, params: default_params
-    event = AnonymousOrModerationEvent.find_by!(assignment: assignment, canvadoc: @attachment.canvadoc, submission: @submission)
+    event = AnonymousOrModerationEvent.find_by!(assignment:, canvadoc: @attachment.canvadoc, submission: @submission)
     expect(response.parsed_body.fetch("anonymous_or_moderation_event").fetch("id")).to eq event.id
   end
 
@@ -414,7 +414,7 @@ describe DocviewerAuditEventsController do
       post :create, format: :json, params: default_params
     end.to change {
       AnonymousOrModerationEvent.where(
-        assignment: assignment,
+        assignment:,
         submission: @submission,
         event_type: "docviewer_highlight_created"
       ).count

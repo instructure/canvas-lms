@@ -196,7 +196,7 @@ describe QuizzesNext::ExportService do
 
       before do
         course = course_model
-        @master_template = MasterCourses::MasterTemplate.create!(course: course)
+        @master_template = MasterCourses::MasterTemplate.create!(course:)
         @child_course = course_model
         @child_subscription = MasterCourses::ChildSubscription.create!(master_template: @master_template, child_course: @child_course)
 
@@ -244,9 +244,9 @@ describe QuizzesNext::ExportService do
 
       before do
         course = course_model
-        master_template = MasterCourses::MasterTemplate.create!(course: course)
+        master_template = MasterCourses::MasterTemplate.create!(course:)
         @child_course = course_model
-        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: @child_course)
+        MasterCourses::ChildSubscription.create!(master_template:, child_course: @child_course)
         allow(@child_course).to receive(:root_account).and_return(root_account)
       end
 

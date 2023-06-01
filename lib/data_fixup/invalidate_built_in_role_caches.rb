@@ -19,7 +19,7 @@
 
 module DataFixup::InvalidateBuiltInRoleCaches
   def self.run(klass, cache_type, start_at, end_at)
-    klass.find_ids_in_ranges(start_at: start_at, end_at: end_at, batch_size: 10_000) do |min_id, max_id|
+    klass.find_ids_in_ranges(start_at:, end_at:, batch_size: 10_000) do |min_id, max_id|
       # yes we'll end up clearing users multiple times but cross-shardedness makes this worse to try to do the other way around
       User.clear_cache_keys(klass.where(id: min_id..max_id).distinct.pluck(:user_id), cache_type)
     end

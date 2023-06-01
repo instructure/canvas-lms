@@ -173,7 +173,7 @@ describe AssignmentGroup do
     expected.each do |val|
       rules += "never_drop:#{val}\n"
     end
-    assignment_group_model rules: rules
+    assignment_group_model(rules:)
     result = @ag.rules_hash
     expect(result["never_drop"]).to eql(expected)
   end
@@ -200,7 +200,7 @@ describe AssignmentGroup do
 
   it "validate is false when drop_lowest is negative" do
     rules = "drop_lowest:-1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
-    assignment_group_model rules: rules
+    assignment_group_model(rules:)
     @ag.validate_rules = true
     @ag.reload
     @course.assignments.create!(title: "test", assignment_group: @ag)
@@ -210,7 +210,7 @@ describe AssignmentGroup do
 
   it "validate is false when drop_highest is negative" do
     rules = "drop_lowest:1\ndrop_highest:-1\nnever_drop:1\nnever_drop:2\n"
-    assignment_group_model rules: rules
+    assignment_group_model(rules:)
     @ag.validate_rules = true
     @ag.reload
     @course.assignments.create!(title: "test", assignment_group: @ag)
@@ -220,7 +220,7 @@ describe AssignmentGroup do
 
   it "validate is false when drop_lowest is greater than number of assignments" do
     rules = "drop_lowest:2\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
-    assignment_group_model rules: rules
+    assignment_group_model(rules:)
     @ag.validate_rules = true
     @ag.reload
     @course.assignments.create!(title: "test", assignment_group: @ag)
@@ -230,7 +230,7 @@ describe AssignmentGroup do
 
   it "validate is false when drop_highest and drop_lowest are valid" do
     rules = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
-    assignment_group_model rules: rules
+    assignment_group_model(rules:)
     @ag.validate_rules = true
     @ag.reload
     @course.assignments.create!(title: "test", assignment_group: @ag)
@@ -239,7 +239,7 @@ describe AssignmentGroup do
 
   it "validate is true when ndrop_highest is greater than number of assignments" do
     rules = "drop_lowest:1\ndrop_highest:2\nnever_drop:1\nnever_drop:2\n"
-    assignment_group_model rules: rules
+    assignment_group_model(rules:)
     @ag.validate_rules = true
     @ag.reload
     @course.assignments.create!(title: "test", assignment_group: @ag)
@@ -254,21 +254,21 @@ describe AssignmentGroup do
       rules += "never_drop:#{val}\n"
     end
 
-    assignment_group_model rules: rules
+    assignment_group_model(rules:)
     result = @ag.rules_hash({ stringify_json_ids: true })
     expect(result["never_drop"]).to eql(expected)
   end
 
   it "returns rules that aren't never_drops as ints" do
     rules = "drop_highest:25\n"
-    assignment_group_model rules: rules
+    assignment_group_model(rules:)
     result = @ag.rules_hash
     expect(result["drop_highest"]).to be(25)
   end
 
   it "returns rules that aren't never_drops as ints when `strigify_json_ids` is true" do
     rules = "drop_lowest:2\n"
-    assignment_group_model rules: rules
+    assignment_group_model(rules:)
     result = @ag.rules_hash({ stringify_json_ids: true })
     expect(result["drop_lowest"]).to be(2)
   end

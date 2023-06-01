@@ -27,26 +27,26 @@ describe DataFixup::SetNavigationPlacementSettingsForQuizLtiTools do
     # create 2 Quiz LTI tools on 2 different accounts
     2.times do
       ContextExternalTool.create!(
-        context: account_model(root_account: root_account, parent_account: root_account),
+        context: account_model(root_account:, parent_account: root_account),
         consumer_key: "key",
         shared_secret: "secret",
         name: "Quizzes 2",
         tool_id: "Quizzes 2",
         url: "http://www.tool.com/launch",
-        developer_key: developer_key,
-        root_account: root_account
+        developer_key:,
+        root_account:
       )
     end
 
     ContextExternalTool.create!(
-      context: account_model(root_account: root_account, parent_account: root_account),
+      context: account_model(root_account:, parent_account: root_account),
       consumer_key: "key",
       shared_secret: "secret",
       name: "Some tool",
       tool_id: "Some tool",
       url: "http://www.tool.com/launch",
-      developer_key: developer_key,
-      root_account: root_account
+      developer_key:,
+      root_account:
     )
   end
 

@@ -190,7 +190,7 @@ module Lti
       render_unauthorized and return unless attachment_for_submission?(attachment)
 
       render_or_redirect_to_stored_file(
-        attachment: attachment
+        attachment:
       )
     end
 
@@ -205,13 +205,13 @@ module Lti
 
     private
 
-    def activate_tool_shard(&block)
+    def activate_tool_shard(&)
       render_unauthorized and return unless access_token
 
       tool_shard = Shard.lookup(access_token.shard_id)
       return yield if tool_shard == Shard.current
 
-      tool_shard.activate(&block)
+      tool_shard.activate(&)
     rescue Lti::OAuth2::InvalidTokenError
       render_unauthorized
     end

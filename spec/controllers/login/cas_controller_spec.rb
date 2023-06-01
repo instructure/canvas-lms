@@ -36,7 +36,7 @@ describe Login::CasController do
 
   it "logouts with specific cas ticket" do
     account = account_with_cas(account: Account.default)
-    user_with_pseudonym(active_all: true, account: account)
+    user_with_pseudonym(active_all: true, account:)
 
     cas_ticket = CanvasUuid::Uuid.generate_securish_uuid
     request_text = <<~XML.strip
@@ -60,7 +60,7 @@ describe Login::CasController do
 
   it "doesn't allow deleted users to login" do
     account = account_with_cas(account: Account.default)
-    user_with_pseudonym(active_all: true, account: account)
+    user_with_pseudonym(active_all: true, account:)
     @user.update!(workflow_state: "deleted")
 
     response_text = <<~XML
@@ -84,7 +84,7 @@ describe Login::CasController do
 
   it "doesn't allow suspended users to login" do
     account = account_with_cas(account: Account.default)
-    user_with_pseudonym(active_all: true, account: account)
+    user_with_pseudonym(active_all: true, account:)
     @pseudonym.update!(workflow_state: "suspended")
 
     response_text = <<~XML
@@ -108,7 +108,7 @@ describe Login::CasController do
 
   it "accepts extra attributes" do
     account = account_with_cas(account: Account.default)
-    user_with_pseudonym(active_all: true, account: account)
+    user_with_pseudonym(active_all: true, account:)
 
     response_text = <<~XML
       <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">

@@ -194,7 +194,7 @@ module I18nExtraction::Extensions
               when %r{app/views/}
                 filename.gsub(%r{.*app/views/|\.(html\.|fbml\.)?erb\z}, "").gsub(%r{/_?}, ".")
               end
-      I18nliner::Scope.new scope, remove_whitespace: remove_whitespace
+      I18nliner::Scope.new scope, remove_whitespace:
     end
   end
 end

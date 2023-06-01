@@ -62,7 +62,7 @@ module Api::V1::ContextModule
       end
       item_includes = includes & ["content_details"]
       hash["items"] = tags.map do |tag|
-        module_item_json(tag, current_user, session, context_module, progression, item_includes, can_view_published: can_view_published)
+        module_item_json(tag, current_user, session, context_module, progression, item_includes, can_view_published:)
       end
     end
     hash

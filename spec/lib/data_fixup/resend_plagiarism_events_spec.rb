@@ -70,8 +70,8 @@ describe DataFixup::ResendPlagiarismEvents do
       it "only resends events for submissions in the given time range" do
         expect do
           DataFixup::ResendPlagiarismEvents.run(
-            start_time: start_time,
-            end_time: end_time
+            start_time:,
+            end_time:
           )
         end.not_to change { Delayed::Job.count }
       end

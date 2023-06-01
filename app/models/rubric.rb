@@ -157,11 +157,11 @@ class Rubric < ActiveRecord::Base
     end
 
     cnt = 0
-    siblings = Rubric.where(context_id: context_id, context_type: context_type).where("workflow_state<>'deleted'")
+    siblings = Rubric.where(context_id:, context_type:).where("workflow_state<>'deleted'")
     siblings = siblings.where("id<>?", id) unless new_record?
     if title.present?
       original_title = title
-      while siblings.where(title: title).exists?
+      while siblings.where(title:).exists?
         cnt += 1
         self.title = "#{original_title} (#{cnt})"
       end
@@ -259,10 +259,10 @@ class Rubric < ActiveRecord::Base
       return res if res
     end
     purpose = opts[:purpose] || "unknown"
-    ra = rubric_associations.build association_object: association,
-                                   context: context,
+    ra = rubric_associations.build(association_object: association,
+                                   context:,
                                    use_for_grading: !!opts[:use_for_grading],
-                                   purpose: purpose
+                                   purpose:)
     ra.skip_updating_points_possible = opts[:skip_updating_points_possible] || @skip_updating_points_possible
     ra.updating_user = opts[:current_user]
     if ra.save && association.is_a?(Assignment)
@@ -372,7 +372,7 @@ class Rubric < ActiveRecord::Base
       description: (rating_data[:description].presence || t("No Description")).strip,
       long_description: (rating_data[:long_description] || "").strip,
       points: rating_data[:points].to_f || 0,
-      criterion_id: criterion_id,
+      criterion_id:,
       id: unique_item_id(rating_data[:id])
     }
   end

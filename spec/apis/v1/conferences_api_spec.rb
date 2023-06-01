@@ -152,7 +152,7 @@ describe "Conferences API", type: :request do
         end
 
         it "excludes conferences for courses the user is not actively enrolled in" do
-          StudentEnrollment.find_by(user: student, course: course).destroy
+          StudentEnrollment.find_by(user: student, course:).destroy
           expect(conference_json_ids).to be_empty
         end
       end
@@ -169,7 +169,7 @@ describe "Conferences API", type: :request do
         end
 
         it "excludes conferences for groups for which this user is not an active member" do
-          GroupMembership.find_by!(user: student, group: group).update!(workflow_state: "deleted")
+          GroupMembership.find_by!(user: student, group:).update!(workflow_state: "deleted")
 
           expect(conference_json_ids).to be_empty
         end
@@ -403,7 +403,7 @@ describe "Conferences API", type: :request do
 
     let(:params) do
       @category_path_options.merge(action: "recording_ready",
-                                   course_id: course_id,
+                                   course_id:,
                                    conference_id: conference.id)
     end
 

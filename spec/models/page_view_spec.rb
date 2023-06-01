@@ -307,7 +307,7 @@ describe PageView do
     let(:session) { { id: "42" } }
     let(:request) { double(url: (@url || "host.com/some/path"), path_parameters: params, user_agent: "Mozilla", session_options: session, method: :get, remote_ip: "0.0.0.0", request_method: "GET") }
     let(:user) { User.new }
-    let(:attributes) { { real_user: user, user: user } }
+    let(:attributes) { { real_user: user, user: } }
 
     before { allow(RequestContextGenerator).to receive_messages(request_id: "xyz") }
 

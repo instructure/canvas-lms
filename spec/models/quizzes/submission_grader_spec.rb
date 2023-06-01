@@ -72,7 +72,7 @@ describe Quizzes::SubmissionGrader do
     describe "#grade_submission" do
       let(:submission_data) { { "question_1" => "1658", "question_2" => "1658", "question_3" => "1658" } }
       let(:quiz_data) { multiple_choice_multiple_question_data(3, { "points_possible" => 1.3 }) }
-      let(:quiz_submission) { Quizzes::QuizSubmission.new(quiz_id: @quiz.id, user_id: @user1.id, submission_data: submission_data, quiz_data: quiz_data) }
+      let(:quiz_submission) { Quizzes::QuizSubmission.new(quiz_id: @quiz.id, user_id: @user1.id, submission_data:, quiz_data:) }
       let(:float_rounding) { 1.3 + 1.3 + 1.3 }
       let(:actual_score) { 3.9 }
 

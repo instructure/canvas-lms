@@ -38,7 +38,7 @@ module Api::V1::SisImport
       json[:errors_attachment] = attachment_json(
         batch.errors_attachment,
         user,
-        { verifier: sis_import_error_attachment_token(batch, user: user) },
+        { verifier: sis_import_error_attachment_token(batch, user:) },
         # skip permission checks since the context is a sis_import it will fail permission checks
         { skip_permission_checks: true }
       )

@@ -20,8 +20,8 @@
 describe DisablePostToSisApiController do
   describe "PUT disable_post_to_sis" do
     let(:account) { account_model }
-    let(:course) { course_model(account: account, workflow_state: "available") }
-    let(:admin) { account_admin_user(account: account) }
+    let(:course) { course_model(account:, workflow_state: "available") }
+    let(:admin) { account_admin_user(account:) }
 
     before do
       bypass_rescue
@@ -29,7 +29,7 @@ describe DisablePostToSisApiController do
     end
 
     it "works even when post_to_sis/new_sis_integrations disabled" do
-      assignment = assignment_model(course: course,
+      assignment = assignment_model(course:,
                                     post_to_sis: true,
                                     workflow_state: "published")
 
@@ -52,7 +52,7 @@ describe DisablePostToSisApiController do
       end
 
       it "disables assignments with post_to_sis enabled" do
-        assignment = assignment_model(course: course,
+        assignment = assignment_model(course:,
                                       post_to_sis: true,
                                       workflow_state: "published")
 
@@ -90,7 +90,7 @@ describe DisablePostToSisApiController do
         end
 
         it "disables assignments with post_to_sis enabled based on grading period" do
-          assignment = assignment_model(course: course,
+          assignment = assignment_model(course:,
                                         post_to_sis: true,
                                         workflow_state: "published",
                                         due_at: grading_period.start_date + 1.minute)

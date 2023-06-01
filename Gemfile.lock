@@ -7,22 +7,6 @@ GIT
       ffi (~> 1.0, >= 1.0.9)
 
 GIT
-  remote: https://github.com/instructure/i18nliner.git
-  revision: 05084d8bdecbe6765e47a53486ad2b3b189a4356
-  ref: ruby3
-  specs:
-    i18nliner (0.2.2)
-      activesupport (>= 6.0)
-      erubi (~> 1.7)
-      globby (>= 0.1.1)
-      i18n (>= 1.8.6)
-      nokogiri (>= 1.5.0)
-      ruby2ruby (~> 2.4)
-      ruby_parser (~> 3.10)
-      sexp_processor (~> 4.10)
-      ya2yaml (= 0.31)
-
-GIT
   remote: https://github.com/instructure/week-of-month.git
   revision: b3013639e9474f302b5a6f27e4e45313e8d24902
   ref: b3013639e9474f302b5a6f27e4e45313e8d24902
@@ -629,8 +613,18 @@ GEM
     httparty (0.21.0)
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-    i18n (1.13.0)
+    i18n (1.14.1)
       concurrent-ruby (~> 1.0)
+    i18nliner (0.2.4)
+      activesupport (>= 6.0)
+      erubi (~> 1.7)
+      globby (>= 0.1.1)
+      i18n (>= 1.8.6)
+      nokogiri (>= 1.5.0)
+      ruby2ruby (~> 2.4)
+      ruby_parser (~> 3.10)
+      sexp_processor (~> 4.10)
+      ya2yaml (= 0.31)
     icalendar (2.7.0)
       ice_cube (~> 0.16)
     ice_cube (0.16.4)
@@ -982,10 +976,10 @@ GEM
     ruby-rc4 (0.1.5)
     ruby-rtf (0.0.5)
     ruby2_keywords (0.0.3)
-    ruby2ruby (2.4.4)
+    ruby2ruby (2.5.0)
       ruby_parser (~> 3.1)
       sexp_processor (~> 4.6)
-    ruby_parser (3.20.0)
+    ruby_parser (3.20.1)
       sexp_processor (~> 4.16)
     rubycas-client (2.3.9)
       activesupport
@@ -1017,7 +1011,7 @@ GEM
       sentry-ruby-core (= 5.1.0)
     sentry-ruby-core (5.1.0)
       concurrent-ruby
-    sexp_processor (4.16.1)
+    sexp_processor (4.17.0)
     shoulda-matchers (4.3.0)
       activesupport (>= 4.2.0)
     signet (0.15.0)
@@ -1246,7 +1240,7 @@ DEPENDENCIES
   i18n (~> 1.12)
   i18n_extraction!
   i18n_tasks!
-  i18nliner (= 0.2.2)!
+  i18nliner (~> 0.2.4)
   icalendar (= 2.7.0)
   ims-lti (= 2.3.3)
   incoming_mail_processor!

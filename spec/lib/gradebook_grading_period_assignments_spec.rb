@@ -112,7 +112,7 @@ describe GradebookGradingPeriodAssignments do
 
       it "excludes assignments from other courses" do
         course = Course.create!
-        student_in_course(course: course, active_all: true).user
+        student_in_course(course:, active_all: true).user
         @group.enrollment_terms << course.enrollment_term
         assignment = course.assignments.create!(due_at: 1.day.from_now)
         expect(hash[@period2.id]).not_to include(assignment.id.to_s)

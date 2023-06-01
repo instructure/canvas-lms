@@ -283,9 +283,9 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     preload_teachers(courses)
     json = courses.map do |course|
-      course_summary_json(course, can_read_sis: can_read_sis, include_teachers: true)
+      course_summary_json(course, can_read_sis:, include_teachers: true)
     end
-    render json: json
+    render json:
   end
 
   # @API Update associated courses
@@ -316,7 +316,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       # since (for now) we're only allowed to associate courses derived from it
       ids_to_add = api_find_all(Course, Array(params[:course_ids_to_add])).pluck(:id)
       ids_to_remove = api_find_all(Course, Array(params[:course_ids_to_remove])).pluck(:id)
-      if (ids_to_add & ids_to_remove).any?
+      if ids_to_add.intersect?(ids_to_remove)
         return render json: { message: "cannot add and remove a course at the same time" }, status: :bad_request
       end
 

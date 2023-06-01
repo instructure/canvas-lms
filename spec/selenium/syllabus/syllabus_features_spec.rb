@@ -35,7 +35,7 @@ describe "course syllabus" do
     # assignment data
     assignment = assignment_model({
                                     course: @course,
-                                    title: title,
+                                    title:,
                                     due_at: nil,
                                     points_possible: points,
                                     submission_types: "online_text_entry",

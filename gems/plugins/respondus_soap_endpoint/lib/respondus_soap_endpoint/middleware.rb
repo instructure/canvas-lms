@@ -21,7 +21,7 @@ module RespondusSoapEndpoint
   class Middleware
     class_attribute :servant
 
-    Endpoint = %r{\A/api/respondus/soap}.freeze
+    Endpoint = %r{\A/api/respondus/soap}
 
     def self.plugin_enabled?
       plugin = Canvas::Plugin.find(:respondus_soap_endpoint)

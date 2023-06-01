@@ -22,7 +22,7 @@ module MicrosoftSync
   class GraphService
     class EducationClassesEndpoints < EndpointsBase
       # Yields (results, next_link) for each page, or returns first page of results if no block given.
-      def list(options = {}, &blk)
+      def list(options = {}, &)
         get_paginated_list(
           "education/classes",
           quota: [1, 0],
@@ -34,7 +34,7 @@ module MicrosoftSync
             )
           ],
           **options,
-          &blk
+          &
         )
       end
 

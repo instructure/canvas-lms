@@ -211,7 +211,7 @@ class AssignmentOverridesController < ApplicationController
     @override = @assignment.assignment_overrides.build
 
     data, errors = interpret_assignment_override_data(@assignment, params[:assignment_override])
-    return bad_request(errors: errors) if errors
+    return bad_request(errors:) if errors
 
     if update_assignment_override(@override, data, updating_user: @current_user)
       render json: assignment_override_json(@override), status: :created
@@ -267,7 +267,7 @@ class AssignmentOverridesController < ApplicationController
   #
   def update
     data, errors = interpret_assignment_override_data(@assignment, params[:assignment_override], @override.set_type)
-    return bad_request(errors: errors) if errors
+    return bad_request(errors:) if errors
 
     if update_assignment_override(@override, data, updating_user: @current_user)
       render json: assignment_override_json(@override)
@@ -472,7 +472,7 @@ class AssignmentOverridesController < ApplicationController
         override.errors.presence
       end
       errors = ["unknown error"] unless errors.compact.present?
-      bad_request(errors: errors)
+      bad_request(errors:)
     end
   end
 

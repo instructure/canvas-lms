@@ -64,9 +64,9 @@ describe QuizzesNext::QuizSerializer do
   end
   let(:quiz_serializer) do
     QuizzesNext::QuizSerializer.new(assignment, {
-                                      controller: controller,
+                                      controller:,
                                       scope: user,
-                                      session: session,
+                                      session:,
                                       root: false
                                     })
   end
@@ -173,7 +173,7 @@ describe QuizzesNext::QuizSerializer do
 
   context "when the assignment is a migrated quiz" do
     let(:quiz) do
-      Quizzes::Quiz.create(title: "Quiz Name", context: context)
+      Quizzes::Quiz.create(title: "Quiz Name", context:)
     end
 
     let(:assignment) do

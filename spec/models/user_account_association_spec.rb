@@ -22,7 +22,7 @@ describe UserAccountAssociation do
   it "infers root account id from account" do
     account = Account.default
     user = user_model
-    uaa = UserAccountAssociation.create(user: user, account: account)
+    uaa = UserAccountAssociation.create(user:, account:)
     expect(uaa.root_account_id).to eq(account.resolved_root_account_id)
   end
 end

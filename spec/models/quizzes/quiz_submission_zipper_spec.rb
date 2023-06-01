@@ -70,7 +70,7 @@ describe Quizzes::QuizSubmissionZipper do
       allow(@quiz).to receive(:quiz_submissions).and_return submission_stubs
       allow(Attachment).to receive(:where).with(id: ["1", "2"]).and_return([attachments.first, attachments.second])
       @zipper = Quizzes::QuizSubmissionZipper.new(quiz: @quiz,
-                                                  zip_attachment: zip_attachment)
+                                                  zip_attachment:)
     end
 
     describe "#initialize" do
@@ -135,7 +135,7 @@ describe Quizzes::QuizSubmissionZipper do
       teacher_in_course(course: @course, active_all: true)
 
       Quizzes::QuizSubmissionZipper.new(
-        quiz: quiz,
+        quiz:,
         zip_attachment: attachment
       ).zip!
 

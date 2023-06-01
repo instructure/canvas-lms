@@ -51,7 +51,7 @@ module MicrosoftSync
         }
 
         # Use special_cases exceptions so they use statsd "expected" counters
-        request(:post, "teams", body: body, special_cases: CREATE_FOR_EDUCATION_CLASS_SPECIAL_CASES)
+        request(:post, "teams", body:, special_cases: CREATE_FOR_EDUCATION_CLASS_SPECIAL_CASES)
       end
     end
   end

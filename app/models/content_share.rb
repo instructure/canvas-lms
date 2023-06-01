@@ -48,8 +48,8 @@ class ContentShare < ActiveRecord::Base
 
   def clone_for(receiver)
     receiver.received_content_shares.create!(sender: user,
-                                             content_export: content_export,
-                                             name: name,
+                                             content_export:,
+                                             name:,
                                              read_state: "unread")
   end
 

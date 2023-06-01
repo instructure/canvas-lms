@@ -53,8 +53,8 @@ module Api::V1::CourseEvent
 
       # since its storing data as json it would be nice just to
       # return it directly instead of having to parse it each time.
-      event_data: event_data,
-      links: links
+      event_data:,
+      links:
     }
   end
 

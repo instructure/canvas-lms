@@ -26,12 +26,12 @@ RSpec.describe DeveloperKeyAccountBinding do
   let(:developer_key) { DeveloperKey.create! }
   let(:dev_key_binding) do
     DeveloperKeyAccountBinding.new(
-      account: account,
-      developer_key: developer_key
+      account:,
+      developer_key:
     )
   end
   let(:params) { {} }
-  let(:root_account_key) { DeveloperKey.create!(account: account, **params) }
+  let(:root_account_key) { DeveloperKey.create!(account:, **params) }
   let(:root_account_binding) { root_account_key.developer_key_account_bindings.first }
 
   describe "validations and callbacks" do
@@ -76,8 +76,8 @@ RSpec.describe DeveloperKeyAccountBinding do
 
       it 'defaults to "off"' do
         binding = DeveloperKeyAccountBinding.create!(
-          account: account,
-          developer_key: developer_key
+          account:,
+          developer_key:
         )
         expect(binding.workflow_state).to eq "off"
       end
@@ -86,7 +86,7 @@ RSpec.describe DeveloperKeyAccountBinding do
     describe "after update" do
       subject { site_admin_binding.update!(update_parameters) }
 
-      let(:update_parameters) { { workflow_state: workflow_state } }
+      let(:update_parameters) { { workflow_state: } }
       let(:site_admin_key) { DeveloperKey.create! }
       let(:site_admin_binding) { site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
 

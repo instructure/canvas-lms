@@ -167,7 +167,7 @@ module Canvas
     # assocs (AMS defaults to true).
     def build_serializer(association)
       object = send(association.name)
-      options = { controller: @controller, scope: scope }
+      options = { controller: @controller, scope: }
       association.build_serializer(object, options).tap do |serializer|
         if association.options.key?(:wrap_in_array)
           serializer.instance_variable_set(:@wrap_in_array,

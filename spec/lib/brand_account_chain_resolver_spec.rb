@@ -380,7 +380,7 @@ describe BrandAccountChainResolver do
 
   def subject(account)
     described_class.new(
-      user: user,
+      user:,
       root_account: account
     ).resolve
   end
@@ -389,7 +389,7 @@ describe BrandAccountChainResolver do
     accounts_and_parents.each_with_object({}) do |(name, parent, *opts), acc|
       opts = opts.first || {}
       acc[name] = Account.create!(
-        name: name,
+        name:,
         parent_account: parent ? acc.fetch(parent) : nil
       )
 
@@ -401,7 +401,7 @@ describe BrandAccountChainResolver do
       next unless opts[:enroll] == true
 
       course_with_student(
-        user: user,
+        user:,
         account: acc[name],
         active_all: true
       )

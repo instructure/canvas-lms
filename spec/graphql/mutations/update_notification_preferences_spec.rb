@@ -61,10 +61,10 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         }) {
           user {
             #{notification_preferences_str(
-              account_id: account_id,
-              course_id: course_id,
-              context_type: context_type,
-              user_id: user_id
+              account_id:,
+              course_id:,
+              context_type:,
+              user_id:
             )}
           }
           errors {
@@ -123,7 +123,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
 
   def run_mutation(opts = {}, current_user = @teacher)
     result = CanvasSchema.execute(mutation_str(**opts), context: {
-                                    current_user: current_user,
+                                    current_user:,
                                     request: ActionDispatch::TestRequest.create,
                                     domain_root_account: @account
                                   })

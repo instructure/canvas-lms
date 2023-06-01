@@ -540,7 +540,7 @@ describe "admin_tools" do
       @course.name = "Course Updated"
 
       sis_batch = @account.root_account.sis_batches.create
-      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes, source: :sis, sis_batch: sis_batch)
+      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes, source: :sis, sis_batch:)
 
       show_event_details("Updated", old_name)
       items = ffj(".ui-dialog dl > dd")

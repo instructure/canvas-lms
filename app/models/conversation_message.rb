@@ -163,7 +163,7 @@ class ConversationMessage < ActiveRecord::Base
     attachment_associations.where(attachment_id: deleted_attachment_ids).find_each(&:destroy)
     if new_attachment_ids.any?
       author.conversation_attachments_folder.attachments.where(id: new_attachment_ids).find_each do |attachment|
-        attachment_associations.create!(attachment: attachment)
+        attachment_associations.create!(attachment:)
       end
     end
   end
@@ -249,7 +249,7 @@ class ConversationMessage < ActiveRecord::Base
                 t(:subject, "Private message")
               end
       note = format_message(body).first
-      recipient.user_notes.create(creator: author, title: title, note: note, root_account_id: Shard.relative_id_for(root_account_id, context.shard, recipient.shard))
+      recipient.user_notes.create(creator: author, title:, note:, root_account_id: Shard.relative_id_for(root_account_id, context.shard, recipient.shard))
     end
   end
 
@@ -298,9 +298,9 @@ class ConversationMessage < ActiveRecord::Base
     recipients = [author]
     tags = conversation.conversation_participants.where(user_id: author.id).pluck(:tags)
     opts = opts.merge(
-      root_account_id: root_account_id,
+      root_account_id:,
       only_users: recipients,
-      tags: tags
+      tags:
     )
     conversation.reply_from(opts)
   end

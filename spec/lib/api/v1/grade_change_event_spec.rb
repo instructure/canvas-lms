@@ -189,7 +189,7 @@ describe Api::V1::GradeChangeEvent do
         old_score: nil,
         score: @course.student_enrollments.first.find_score
       )
-      Auditors::GradeChange.record(override_grade_change: override_grade_change)
+      Auditors::GradeChange.record(override_grade_change:)
     end
 
     let(:override_event_json) do
@@ -213,9 +213,9 @@ describe Api::V1::GradeChangeEvent do
             grader: @teacher,
             old_grade: nil,
             old_score: nil,
-            score: score
+            score:
           )
-          event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          event = Auditors::GradeChange.record(override_grade_change:)
           event_json = subject.grade_change_event_json(event, @user, @session)
           expect(event_json[:grade_before]).to be_nil
         end
@@ -225,9 +225,9 @@ describe Api::V1::GradeChangeEvent do
             grader: @teacher,
             old_grade: "A-",
             old_score: 90,
-            score: score
+            score:
           )
-          event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          event = Auditors::GradeChange.record(override_grade_change:)
           event_json = subject.grade_change_event_json(event, @user, @session)
           expect(event_json[:grade_before]).to eq "A-"
         end
@@ -237,9 +237,9 @@ describe Api::V1::GradeChangeEvent do
             grader: @teacher,
             old_grade: nil,
             old_score: 90,
-            score: score
+            score:
           )
-          event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          event = Auditors::GradeChange.record(override_grade_change:)
           event_json = subject.grade_change_event_json(event, @user, @session)
           expect(event_json[:grade_before]).to eq "90%"
         end
@@ -252,9 +252,9 @@ describe Api::V1::GradeChangeEvent do
             grader: @teacher,
             old_grade: nil,
             old_score: nil,
-            score: score
+            score:
           )
-          event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          event = Auditors::GradeChange.record(override_grade_change:)
           event_json = subject.grade_change_event_json(event, @user, @session)
           expect(event_json[:grade_after]).to be_nil
         end
@@ -266,9 +266,9 @@ describe Api::V1::GradeChangeEvent do
             grader: @teacher,
             old_grade: nil,
             old_score: nil,
-            score: score
+            score:
           )
-          event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          event = Auditors::GradeChange.record(override_grade_change:)
           event_json = subject.grade_change_event_json(event, @user, @session)
           expect(event_json[:grade_after]).to eq "B-"
         end
@@ -279,9 +279,9 @@ describe Api::V1::GradeChangeEvent do
             grader: @teacher,
             old_grade: nil,
             old_score: nil,
-            score: score
+            score:
           )
-          event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          event = Auditors::GradeChange.record(override_grade_change:)
           event_json = subject.grade_change_event_json(event, @user, @session)
           expect(event_json[:grade_after]).to eq "80%"
         end

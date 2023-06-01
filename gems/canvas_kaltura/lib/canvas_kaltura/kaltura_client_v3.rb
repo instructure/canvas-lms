@@ -182,10 +182,10 @@ module CanvasKaltura
       secret = (type == SessionType::USER) ? @user_secret : @secret
       result = getRequest(:session,
                           :start,
-                          secret: secret,
-                          partnerId: partnerId,
-                          userId: userId,
-                          type: type)
+                          secret:,
+                          partnerId:,
+                          userId:,
+                          type:)
       @ks = result.content if result.respond_to? :content
     end
 
@@ -193,7 +193,7 @@ module CanvasKaltura
       result = getRequest(:media,
                           :get,
                           ks: @ks,
-                          entryId: entryId)
+                          entryId:)
       return nil unless result
 
       item = {}
@@ -206,7 +206,7 @@ module CanvasKaltura
     def mediaUpdate(entryId, attributes)
       hash = {
         ks: @ks,
-        entryId: entryId
+        entryId:
       }
       attributes.each do |key, val|
         hash["mediaEntry:#{key}"] = val
@@ -224,7 +224,7 @@ module CanvasKaltura
     def mediaDelete(entryId)
       hash = {
         ks: @ks,
-        entryId: entryId
+        entryId:
       }
       getRequest(:media, :delete, hash)
     end
@@ -245,7 +245,7 @@ module CanvasKaltura
       result = getRequest(:bulkUpload,
                           :get,
                           ks: @ks,
-                          id: id)
+                          id:)
       return nil unless result
 
       parseBulkUpload(result)
@@ -306,7 +306,7 @@ module CanvasKaltura
       result = getRequest(:flavorAsset,
                           :getByEntryId,
                           ks: @ks,
-                          entryId: entryId)
+                          entryId:)
       return nil unless result
 
       items = []
@@ -398,7 +398,7 @@ module CanvasKaltura
 
       unless response.is_a?(Net::HTTPSuccess) || response.is_a?(Net::HTTPNotFound)
         CanvasKaltura.error_handler.capture(
-          "Error from Kaltura service", { response: response, path: request.path }, :warn
+          "Error from Kaltura service", { response:, path: request.path }, :warn
         )
       end
 

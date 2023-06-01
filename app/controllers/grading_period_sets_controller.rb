@@ -194,7 +194,7 @@ class GradingPeriodSetsController < ApplicationController
                                      each_serializer: GradingPeriodSetSerializer,
                                      controller: self,
                                      root: :grading_period_sets,
-                                     meta: meta,
+                                     meta:,
                                      scope: @current_user,
                                      include_root: false
                                    })

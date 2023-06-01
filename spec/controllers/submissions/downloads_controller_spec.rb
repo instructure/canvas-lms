@@ -116,7 +116,7 @@ describe Submissions::DownloadsController do
 
     it "sets attachment from attachments collection when attachment_id is not present" do
       attachment = attachment_model(context: @context)
-      AttachmentAssociation.create!(context: @submission, attachment: attachment)
+      AttachmentAssociation.create!(context: @submission, attachment:)
       get :show, params: {
         course_id: @context.id,
         assignment_id: @assignment.id,
@@ -167,7 +167,7 @@ describe Submissions::DownloadsController do
       att = attachment_model(uploaded_data: stub_file_data("test.txt", "asdf", "text/plain"), context: @student)
       submission_model(
         course: @course,
-        assignment: assignment,
+        assignment:,
         submission_type: "online_upload",
         attachment_ids: att.id,
         attachments: [att],

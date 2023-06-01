@@ -20,8 +20,8 @@
 
 class MessageableUser
   class Calculator
-    CONTEXT_RECIPIENT = /\A(course|section|group|discussion_topic)_(\d+)(_([a-z]+))?\z/.freeze
-    INDIVIDUAL_RECIPIENT = /\A\d+\z/.freeze
+    CONTEXT_RECIPIENT = /\A(course|section|group|discussion_topic)_(\d+)(_([a-z]+))?\z/
+    INDIVIDUAL_RECIPIENT = /\A\d+\z/
 
     # all work is done within the context of a user. avoid passing it around in
     # every single method call by being an object instead of just a collection
@@ -59,7 +59,7 @@ class MessageableUser
       return [] unless users.present?
 
       unless users.first.is_a?(MessageableUser)
-        scope_options = { strict_checks: strict_checks, include_deleted: !strict_checks }
+        scope_options = { strict_checks:, include_deleted: !strict_checks }
         user_ids = users.first.is_a?(User) ? users.map(&:id) : users
         users = Shard.partition_by_shard(user_ids) do |shard_user_ids|
           MessageableUser.prepped(scope_options)
@@ -191,7 +191,7 @@ class MessageableUser
         # non-visible context, so the result will be empty. but we still need
         # to return a bookmark-paginated collection, so we craft an empty scope
         # by default
-        scope = search_in_context_scope(global_exclude_ids: global_exclude_ids, **options)
+        scope = search_in_context_scope(global_exclude_ids:, **options)
         bookmark(scope)
       else
         scope = self_scope(options)
@@ -276,7 +276,7 @@ class MessageableUser
     # the optional strict_checks parameter (default: true) is passed down to
     # the queried scopes (see enrollment_scope and account_user_scope).
     def load_common_courses_with_users(users, include_course_id = nil, strict_checks = true)
-      scope_options = { strict_checks: strict_checks, include_deleted: !strict_checks }
+      scope_options = { strict_checks:, include_deleted: !strict_checks }
       users.each { |u| u.global_common_courses = {} }
 
       # with messageability constraints, do I see any of the users in any of my visible
@@ -329,7 +329,7 @@ class MessageableUser
     # the optional strict_checks parameter (default: true) is passed down to
     # the queried scopes (see group_user_scope).
     def load_common_groups_with_users(users, include_group_id = nil, strict_checks = true)
-      scope_options = { strict_checks: strict_checks, include_deleted: !strict_checks }
+      scope_options = { strict_checks:, include_deleted: !strict_checks }
       users.each { |u| u.global_common_groups = {} }
 
       # with messageability constraints, do I see the user in any of my visible
@@ -878,7 +878,7 @@ class MessageableUser
     # the optional methods list is a list of methods to call (not results of a
     # method call, since if there are multiple we want to distinguish them) to
     # get additional objects to include in the per-shard cache keys
-    def shard_cached(key, *methods, &block)
+    def shard_cached(key, *methods, &)
       @shard_caches ||= {}
       @shard_caches[key] ||=
         begin
@@ -890,7 +890,7 @@ class MessageableUser
               shard_key << method
               shard_key << Digest::SHA256.hexdigest(canonical)
             end
-            by_shard[Shard.current] = Rails.cache.fetch(shard_key.cache_key, expires_in: 1.day, &block)
+            by_shard[Shard.current] = Rails.cache.fetch(shard_key.cache_key, expires_in: 1.day, &)
           end
           by_shard
         end

@@ -21,7 +21,7 @@ class GradingPeriodGradeSummaryPresenter < GradeSummaryPresenter
   attr_reader :grading_period_id
 
   def initialize(context, current_user, id_param, assignment_order: :due_at, grading_period_id:)
-    super(context, current_user, id_param, assignment_order: assignment_order)
+    super(context, current_user, id_param, assignment_order:)
     @grading_period_id = grading_period_id
   end
 
@@ -29,7 +29,7 @@ class GradingPeriodGradeSummaryPresenter < GradeSummaryPresenter
     includes = ["completed"]
     includes << "inactive" if user_has_elevated_permissions?
     grading_period = GradingPeriod.for(@context).where(id: grading_period_id).first
-    grading_period.assignments_for_student(@context, super, student, includes: includes)
+    grading_period.assignments_for_student(@context, super, student, includes:)
   end
 
   def groups

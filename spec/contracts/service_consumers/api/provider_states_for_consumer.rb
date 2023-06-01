@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-Dir[File.dirname(__FILE__) + "/provider_states_for_consumer/*.rb"].sort.each { |f| require f }
+Dir[File.dirname(__FILE__) + "/provider_states_for_consumer/*.rb"].each { |f| require f }
 require_relative "../../../factories/course_factory"
 require_relative "../../../factories/user_factory"
 
@@ -211,7 +211,7 @@ module Pact::Canvas
         observer.pseudonyms.create!(unique_id: observer_email, password: "password", password_confirmation: "password", sis_user_id: "SIS_#{observer_name}")
         observer.email = observer_email
         observer.accept_terms
-        enroll_observer(observer: observer)
+        enroll_observer(observer:)
         observers << observer
       end
       observers

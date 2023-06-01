@@ -33,7 +33,7 @@ shared_context "advantage services context" do
       shared_secret: "secret",
       name: "test tool",
       url: "http://www.tool.com/launch",
-      developer_key: developer_key,
+      developer_key:,
       lti_version: "1.3",
       workflow_state: "public"
     )

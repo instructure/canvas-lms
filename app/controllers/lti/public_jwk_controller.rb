@@ -150,7 +150,7 @@ module Lti
     #
     # @returns DeveloperKey
     def update
-      developer_key.update! public_jwk: public_jwk
+      developer_key.update!(public_jwk:)
       render json: developer_key_json(developer_key, @current_user, session, context), content_type: MIME_TYPE
     end
 

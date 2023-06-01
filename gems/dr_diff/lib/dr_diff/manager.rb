@@ -35,7 +35,7 @@ module DrDiff
 
     def initialize(git: nil, git_dir: nil, sha: nil, campsite: true, heavy: false, base_dir: nil, severe_anywhere: true)
       @git_dir = git_dir
-      @git = git || GitProxy.new(git_dir: git_dir, sha: sha)
+      @git = git || GitProxy.new(git_dir:, sha:)
       @campsite = campsite
       @heavy = heavy
       @base_dir = base_dir || ""
@@ -62,7 +62,7 @@ module DrDiff
                  severe_levels: SEVERE_LEVELS)
 
       command_comments = CommandCapture.run(format, command)
-      diff = DiffParser.new(git.diff, raw: true, campsite: campsite)
+      diff = DiffParser.new(git.diff, raw: true, campsite:)
 
       result = []
 
@@ -72,7 +72,7 @@ module DrDiff
         severe = severe?(comment[:severity], severe_levels)
         next unless heavy ||
                     (severe && severe_anywhere) ||
-                    diff.relevant?(path, comment[:position], severe: severe) ||
+                    diff.relevant?(path, comment[:position], severe:) ||
                     comment[:corrected]
 
         comment[:path] = path unless include_git_dir_in_output

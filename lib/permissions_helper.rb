@@ -175,8 +175,8 @@ module PermissionsHelper
     SQL
     params = {
       account_ids: courses.map(&:account_id),
-      permissions: permissions,
-      role_ids: role_ids
+      permissions:,
+      role_ids:
     }
     rows = User.connection.execute(sanitize_sql([query, params]))
     hash_permissions(rows, root_account_ids, account_roles)

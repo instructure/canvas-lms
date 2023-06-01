@@ -480,7 +480,7 @@ describe ContextModule do
             expect(Lti::ResourceLink).to receive(:find_or_initialize_for_context_and_lookup_uuid)
               .with(
                 context: @course,
-                lookup_uuid: lookup_uuid,
+                lookup_uuid:,
                 custom: { "foo" => "bar" },
                 context_external_tool: tool,
                 url: "http://example.com/"

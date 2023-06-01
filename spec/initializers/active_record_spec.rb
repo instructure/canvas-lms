@@ -39,7 +39,7 @@ module ActiveRecord
 
       it "bases modulos on either end of the query per the configured type" do
         { full: "%somestring%", left: "%somestring", right: "somestring%" }.each do |type, result|
-          expect(Base.wildcard_pattern("somestring", type: type)).to eq result
+          expect(Base.wildcard_pattern("somestring", type:)).to eq result
         end
       end
     end
@@ -203,7 +203,7 @@ module ActiveRecord
         end
 
         it "keeps the specified order" do
-          %w[user_F user_D user_A user_C user_B user_E].map { |name| user_model(name: name) }
+          %w[user_F user_D user_A user_C user_B user_E].map { |name| user_model(name:) }
           names = []
           User.order(:name).find_in_batches(strategy: :pluck_ids, batch_size: 3) do |u_batch|
             names += u_batch.map(&:name)

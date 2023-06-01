@@ -43,7 +43,7 @@ describe Submission::ShowPresenter do
     Submission::ShowPresenter.new(
       submission: reviewee_submission,
       current_user: reviewer,
-      assessment_request: assessment_request
+      assessment_request:
     )
   end
 
@@ -129,7 +129,7 @@ describe Submission::ShowPresenter do
         assignment_id: assignment.id,
         display: "borderless",
         url: reviewee_submission.external_tool_url,
-        resource_link_lookup_uuid: resource_link_lookup_uuid
+        resource_link_lookup_uuid:
       }
     end
     let(:launch_params) do
@@ -152,8 +152,8 @@ describe Submission::ShowPresenter do
         Submission::ShowPresenter.new(
           submission: reviewee_submission,
           current_user: reviewer,
-          assessment_request: assessment_request,
-          current_host: current_host
+          assessment_request:,
+          current_host:
         )
       end
 
@@ -179,7 +179,7 @@ describe Submission::ShowPresenter do
 
       expect(presenter_for_reviewer).to receive(:submission_data_url)
         .with(hash_including(comment_id: submission_comment.id, download: attachment.id))
-      presenter_for_reviewer.comment_attachment_download_url(submission_comment: submission_comment, attachment: attachment)
+      presenter_for_reviewer.comment_attachment_download_url(submission_comment:, attachment:)
     end
   end
 
@@ -215,7 +215,7 @@ describe Submission::ShowPresenter do
       Submission::ShowPresenter.new(
         submission: reviewee_submission,
         current_user: teacher,
-        current_host: current_host
+        current_host:
       )
     end
 

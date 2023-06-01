@@ -118,7 +118,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     content_types.each do |content_type|
       klass = content_type.constantize
       klass.where(klass.primary_key => master_content_tags.where(use_default_restrictions: true,
-                                                                 content_type: content_type).select(:content_id)).touch_all
+                                                                 content_type:).select(:content_id)).touch_all
     end
   end
 
@@ -155,7 +155,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
     Rails.cache.fetch(course_cache_key(course_id)) do
       course_id = course_id.id if course_id.is_a?(Course)
-      where(course_id: course_id).active.exists?
+      where(course_id:).active.exists?
     end
   end
 
@@ -294,7 +294,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
         contents = item_scope.pluck(:content_type, :content_id).select do |content_type, content_id|
           content_type == "LearningOutcome" && LearningOutcome.find(content_id).context_type == "Account"
         end
-        deleted_mig_ids = contents.map { |content_type, content_id| content_tags.where(content_type: content_type, content_id: content_id).pluck(:migration_id) }.flatten
+        deleted_mig_ids = contents.map { |content_type, content_id| content_tags.where(content_type:, content_id:).pluck(:migration_id) }.flatten
       else
         deleted_mig_ids = content_tags.where(content_type: klass, content_id: item_scope).pluck(:migration_id)
       end

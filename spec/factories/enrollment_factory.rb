@@ -34,7 +34,7 @@ module Factories
     course = opts[:course] || @course || course(opts)
     @enrollment = course.enroll_student(user,
                                         enrollment_state: "active",
-                                        section: section,
+                                        section:,
                                         allow_multiple_enrollments: true)
   end
 
@@ -72,14 +72,14 @@ module Factories
                               {
                                 course_id: course.id,
                                 user_id: id,
-                                type: type,
+                                type:,
                                 course_section_id: section_id,
                                 root_account_id: course.root_account_id,
                                 workflow_state: enrollment_state,
-                                role_id: role_id,
-                                sis_batch_id: sis_batch_id,
-                                associated_user_id: associated_user_id,
-                                limit_privileges_to_course_section: limit_privileges_to_course_section,
+                                role_id:,
+                                sis_batch_id:,
+                                associated_user_id:,
+                                limit_privileges_to_course_section:,
                                 created_at: now,
                                 updated_at: now
                               }

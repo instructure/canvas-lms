@@ -79,7 +79,7 @@ module Canvas::OAuth
     end
 
     def create_access_token_if_needed(replace_tokens = false)
-      @access_token ||= self.class.find_reusable_access_token(user, key, scopes, purpose, real_user: real_user)
+      @access_token ||= self.class.find_reusable_access_token(user, key, scopes, purpose, real_user:)
 
       if @access_token.nil?
         # Clear other tokens issued under the same developer key if requested
@@ -89,8 +89,8 @@ module Canvas::OAuth
         @access_token = user.access_tokens.new({
                                                  developer_key: key,
                                                  remember_access: remember_access?,
-                                                 scopes: scopes,
-                                                 purpose: purpose
+                                                 scopes:,
+                                                 purpose:
                                                })
         @access_token.real_user = real_user if real_user && real_user != user
 
@@ -111,11 +111,11 @@ module Canvas::OAuth
 
     def self.find_reusable_access_token(user, key, scopes, purpose, real_user: nil)
       if key.force_token_reuse
-        access_token = find_access_token(user, key, scopes, purpose, real_user: real_user)
+        access_token = find_access_token(user, key, scopes, purpose, real_user:)
         access_token&.regenerate_access_token unless AccessToken.scopes_match?(scopes, ["userinfo"])
         access_token
       elsif AccessToken.scopes_match?(scopes, ["userinfo"])
-        find_userinfo_access_token(user, key, purpose, real_user: real_user)
+        find_userinfo_access_token(user, key, purpose, real_user:)
       end
     end
 
@@ -149,13 +149,13 @@ module Canvas::OAuth
     end
 
     def self.find_userinfo_access_token(user, developer_key, purpose, real_user: nil)
-      find_access_token(user, developer_key, ["userinfo"], purpose, { remember_access: true }, real_user: real_user)
+      find_access_token(user, developer_key, ["userinfo"], purpose, { remember_access: true }, real_user:)
     end
 
     def self.find_access_token(user, developer_key, scopes, purpose, conditions = {}, real_user: nil)
       user.shard.activate do
         real_user = nil if real_user == user
-        user.access_tokens.active.where({ developer_key_id: developer_key, purpose: purpose, real_user: real_user }.merge(conditions)).detect do |token|
+        user.access_tokens.active.where({ developer_key_id: developer_key, purpose:, real_user: }.merge(conditions)).detect do |token|
           token.scoped_to?(scopes)
         end
       end

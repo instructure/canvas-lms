@@ -460,26 +460,26 @@ describe GradingStandard do
 
   describe "root account ID" do
     let_once(:root_account) { Account.create! }
-    let_once(:subaccount) { Account.create(root_account: root_account) }
+    let_once(:subaccount) { Account.create(root_account:) }
     let_once(:course) { Course.create!(account: subaccount) }
 
     let_once(:data) { [["A", 94], ["F", 0]] }
 
     context "when this grading standard is associated with a course" do
       it "is set to the course's root account ID" do
-        grading_standard = course.grading_standards.create!(workflow_state: "active", data: data)
+        grading_standard = course.grading_standards.create!(workflow_state: "active", data:)
         expect(grading_standard.root_account_id).to eq root_account.id
       end
     end
 
     context "when this grading standard is associated with an account" do
       it "is set to the account's ID if the account is a root account" do
-        grading_standard = subaccount.grading_standards.create!(workflow_state: "active", data: data)
+        grading_standard = subaccount.grading_standards.create!(workflow_state: "active", data:)
         expect(grading_standard.root_account_id).to eq root_account.id
       end
 
       it "is set to the account's root account ID if the account is not a root account" do
-        grading_standard = root_account.grading_standards.create!(workflow_state: "active", data: data)
+        grading_standard = root_account.grading_standards.create!(workflow_state: "active", data:)
         expect(grading_standard.root_account_id).to eq root_account.id
       end
     end

@@ -65,7 +65,7 @@ module Gradebook
         progress&.complete!
       ensure
         course.recompute_student_scores(affected_user_ids) if affected_user_ids.any?
-        progress&.set_results({ errors: errors })
+        progress&.set_results({ errors: })
       end
     end
 
@@ -95,7 +95,7 @@ module Gradebook
       Submission.suspend_callbacks(:apply_late_policy) do
         assignment.grade_student(
           submission.user,
-          grader: grader,
+          grader:,
           excused: options.excused,
           score: percent_score,
           skip_grade_calc: true

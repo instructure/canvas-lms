@@ -240,7 +240,7 @@ describe CommunicationChannel do
 
   it "sorts of validate emails" do
     user = User.create!
-    invalid_stuff = { username: "invalid", user: user, pseudonym_id: "1" }
+    invalid_stuff = { username: "invalid", user:, pseudonym_id: "1" }
     expect { communication_channel(user, invalid_stuff) }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
@@ -448,7 +448,7 @@ describe CommunicationChannel do
 
         %w[bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu bouncy@example.edu].each do |path|
           CommunicationChannel.bounce_for_path(
-            path: path,
+            path:,
             timestamp: nil,
             details: nil,
             permanent_bounce: true,
@@ -633,9 +633,9 @@ describe CommunicationChannel do
         subject { communication_channel.root_account_ids }
 
         let(:path) { "test@instructure.com" }
-        let(:communication_channel) { CommunicationChannel.create!(user: user, path: path) }
+        let(:communication_channel) { CommunicationChannel.create!(user:, path:) }
 
-        before { user.update_columns(root_account_ids: root_account_ids) }
+        before { user.update_columns(root_account_ids:) }
 
         let(:user) { User.create! }
 
@@ -705,7 +705,7 @@ describe CommunicationChannel do
 
           %w[bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu bouncy@example.edu].each do |path|
             CommunicationChannel.bounce_for_path(
-              path: path,
+              path:,
               timestamp: nil,
               details: nil,
               permanent_bounce: true,
@@ -740,9 +740,9 @@ describe CommunicationChannel do
         ra
       end
       let(:user) { enrollment.user }
-      let(:cc) { communication_channel_model(user: user) }
+      let(:cc) { communication_channel_model(user:) }
       let(:mapping) do
-        MicrosoftSync::UserMapping.create!(root_account: account, user: user, aad_id: "abc123")
+        MicrosoftSync::UserMapping.create!(root_account: account, user:, aad_id: "abc123")
       end
 
       describe "destroying the communication channel" do

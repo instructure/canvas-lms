@@ -51,13 +51,13 @@ module LiveEvents
         return false
       end
 
-      @queue << {
+      @queue << ({
         data: event_json,
-        partition_key: partition_key,
+        partition_key:,
         statsd_prefix: "live_events.events",
         tags: { event: event.dig(:attributes, :event_name) || "event_name_not_found" },
-        total_bytes: total_bytes
-      }
+        total_bytes:
+      })
       true
     end
 
@@ -178,7 +178,7 @@ module LiveEvents
       )
       LiveEvents&.statsd&.increment(
         "#{record[:statsd_prefix]}.send_errors",
-        tags: record[:tags].merge(error_code: error_code)
+        tags: record[:tags].merge(error_code:)
       )
     end
   end

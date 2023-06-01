@@ -20,7 +20,7 @@
 
 describe Auditors::Pseudonym do
   describe ".record" do
-    subject { described_class.record(pseudonym, performing_user, action: action) }
+    subject { described_class.record(pseudonym, performing_user, action:) }
 
     let(:pseudonym) { pseudonym_model }
     let(:performing_user) { user_model }
@@ -45,7 +45,7 @@ describe Auditors::Pseudonym do
 end
 
 describe Auditors::Pseudonym::Record do
-  subject { described_class.generate(pseudonym, performing_user, action: action) }
+  subject { described_class.generate(pseudonym, performing_user, action:) }
 
   let(:pseudonym) { pseudonym_model }
   let(:performing_user) { user_model }

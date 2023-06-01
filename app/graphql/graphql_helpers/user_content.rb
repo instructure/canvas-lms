@@ -13,7 +13,7 @@ module GraphQLHelpers
     # referring to a canvas context (typically a course)
     def self.process(content, request:, context:, user:, in_app:,
                      preloaded_attachments: {}, options: {})
-      new(request: request, context: context, user: user, in_app: in_app)
+      new(request:, context:, user:, in_app:)
         .api_user_content(content, preloaded_attachments, options)
     end
 

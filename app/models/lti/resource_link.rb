@@ -53,7 +53,7 @@ class Lti::ResourceLink < ApplicationRecord
     context.lti_resource_links.create!(
       custom: Lti::DeepLinkingUtil.validate_custom_params(custom_params),
       context_external_tool: tool,
-      url: url
+      url:
     )
   end
 
@@ -76,17 +76,17 @@ class Lti::ResourceLink < ApplicationRecord
     context:, lookup_uuid:, custom: nil, url: nil,
     context_external_tool: nil, context_external_tool_launch_url: nil
   )
-    result = lookup_uuid.present? && context&.lti_resource_links&.find_by(lookup_uuid: lookup_uuid)
+    result = lookup_uuid.present? && context&.lti_resource_links&.find_by(lookup_uuid:)
     result || context&.shard&.activate do
       context_external_tool ||= ContextExternalTool.find_external_tool(
         context_external_tool_launch_url, context, only_1_3: true
       )
       new(
-        context: context,
-        custom: custom,
-        context_external_tool: context_external_tool,
-        lookup_uuid: lookup_uuid,
-        url: url
+        context:,
+        custom:,
+        context_external_tool:,
+        lookup_uuid:,
+        url:
       )
     end
   end

@@ -81,7 +81,7 @@ class ExternalContentController < ApplicationController
 
     js_env({
              retrieved_data: (@retrieved_data || {}),
-             lti_response_messages: lti_response_messages,
+             lti_response_messages:,
              service: params[:service],
              service_id: params[:id],
              message: param_if_set(:lti_msg),

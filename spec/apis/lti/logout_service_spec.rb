@@ -40,7 +40,7 @@ describe LtiApiController, type: :request do
   def api_path(token = nil, callback = nil)
     token ||= Lti::LogoutService.create_token(@tool, @pseudonym)
     callback ||= "http://logout.notify.example.com"
-    "/api/lti/v1/logout_service/#{token}?#{{ callback: callback }.to_query}"
+    "/api/lti/v1/logout_service/#{token}?#{{ callback: }.to_query}"
   end
 
   def make_call(opts = {})

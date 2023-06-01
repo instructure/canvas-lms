@@ -24,8 +24,8 @@
 
 module Lti
   class VariableExpander
-    SUBSTRING_REGEX = /(?<=\${).*?(?=})/.freeze # matches only the stuff inside `${}`
-    PARAMETERS_REGEX = /^(\$.+)<(.+)>$/.freeze # matches key and argument
+    SUBSTRING_REGEX = /(?<=\${).*?(?=})/ # matches only the stuff inside `${}`
+    PARAMETERS_REGEX = /^(\$.+)<(.+)>$/ # matches key and argument
 
     attr_reader :context, :root_account, :controller, :current_user
 

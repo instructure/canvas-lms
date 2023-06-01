@@ -283,7 +283,7 @@ describe RubricAssessment do
         {
           description: "Some criterion",
           points: 10,
-          id: id,
+          id:,
           ratings: [
             { description: "Good", points: 10, id: "rat1", criterion_id: id },
             { description: "Medium", points: 5, id: "rat2", criterion_id: id },
@@ -713,7 +713,7 @@ describe RubricAssessment do
           RubricAssessment.new(
             score: 2.0,
             assessment_type: :grading,
-            rubric: rubric,
+            rubric:,
             artifact: submission,
             assessor: @teacher
           )
@@ -757,13 +757,13 @@ describe RubricAssessment do
 
       it "sets group on submission" do
         group_category = @course.group_categories.create!(name: "Test Group Set")
-        group = @course.groups.create!(name: "Group A", group_category: group_category)
+        group = @course.groups.create!(name: "Group A", group_category:)
         group.add_user @student
         group.save!
 
         assignment = @course.assignments.create!(
           assignment_valid_attributes.merge(
-            group_category: group_category,
+            group_category:,
             grade_group_students_individually: false
           )
         )
@@ -817,14 +817,14 @@ describe RubricAssessment do
 
         it "posts submissions for all members of the group if the assignment is graded by group" do
           group_category = @course.group_categories.create!(name: "Test Group Set")
-          group = @course.groups.create!(name: "Group A", group_category: group_category)
+          group = @course.groups.create!(name: "Group A", group_category:)
           group.add_user(@student)
 
           other_student_in_group = @course.enroll_student(User.create!, enrollment_state: :active).user
           group.add_user(other_student_in_group)
           group.save!
 
-          assignment.update!(group_category: group_category, grade_group_students_individually: false)
+          assignment.update!(group_category:, grade_group_students_individually: false)
 
           rubric_association.assess(assessment_params)
           expect(assignment.submission_for_student(other_student_in_group)).to be_posted
@@ -861,7 +861,7 @@ describe RubricAssessment do
     it "does not grant :read to an account user without :manage_courses or :view_all_grades" do
       user_factory
       role = custom_account_role("custom", account: @account)
-      @account.account_users.create!(user: @user, role: role)
+      @account.account_users.create!(user: @user, role:)
       expect(@assessment.grants_right?(@user, :read)).to be false
     end
 
@@ -872,16 +872,16 @@ describe RubricAssessment do
       RoleOverride.create!(
         context: @account,
         permission: "view_all_grades",
-        role: role,
+        role:,
         enabled: true
       )
       RoleOverride.create!(
         context: @account,
         permission: "manage_courses",
-        role: role,
+        role:,
         enabled: false
       )
-      @account.account_users.create!(user: @user, role: role)
+      @account.account_users.create!(user: @user, role:)
       expect(@assessment.grants_right?(@user, :read)).to be true
     end
 
@@ -892,16 +892,16 @@ describe RubricAssessment do
       RoleOverride.create!(
         context: @account,
         permission: "view_all_grades",
-        role: role,
+        role:,
         enabled: true
       )
       RoleOverride.create!(
         context: @account,
         permission: "manage_courses_admin",
-        role: role,
+        role:,
         enabled: false
       )
-      @account.account_users.create!(user: @user, role: role)
+      @account.account_users.create!(user: @user, role:)
       expect(@assessment.grants_right?(@user, :read)).to be true
     end
   end

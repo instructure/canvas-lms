@@ -38,11 +38,11 @@ describe "CanvasHttp" do
       end
 
       def info(message)
-        @messages << { level: "info", message: message }
+        @messages << ({ level: "info", message: })
       end
 
       def warn(message)
-        @messages << { level: "warn", message: message }
+        @messages << ({ level: "warn", message: })
       end
     end
     logger = fake_logger.new
@@ -62,7 +62,7 @@ describe "CanvasHttp" do
       body = "abc"
       stub_request(:post, url).with(body: "abc")
                               .to_return(status: 200)
-      expect(CanvasHttp.post(url, body: body).code).to eq "200"
+      expect(CanvasHttp.post(url, body:).code).to eq "200"
       logs = CanvasHttp.logger.messages
       expect(logs.size).to eq(3)
       expect(logs[0][:message] =~ /CANVAS_HTTP START REQUEST CHAIN | method: Net::HTTP::Post/).to be_truthy
@@ -77,7 +77,7 @@ describe "CanvasHttp" do
       content_type = "plain/text"
       stub_request(:post, url).with(body: "abc", headers: { "Content-Type" => content_type })
                               .to_return(status: 200)
-      expect(CanvasHttp.post(url, body: body, content_type: content_type).code).to eq "200"
+      expect(CanvasHttp.post(url, body:, content_type:).code).to eq "200"
     end
 
     it "allows you to do a streaming multipart upload" do
@@ -93,7 +93,7 @@ describe "CanvasHttp" do
         expect(req.body.lines[5]).to match("file contents")
       end.to_return(status: 200)
 
-      CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
+      CanvasHttp.post(url, form_data:, multipart: true, streaming: true)
 
       assert_requested(stubbed)
     end
@@ -111,7 +111,7 @@ describe "CanvasHttp" do
         expect(req.body.lines[5]).to match("file contents")
       end.to_return(status: 200)
 
-      CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
+      CanvasHttp.post(url, form_data:, multipart: true, streaming: true)
 
       assert_requested(stubbed)
     end

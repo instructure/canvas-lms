@@ -23,7 +23,7 @@ require "object_view"
 
 describe ObjectView do
   let(:text) { "Example\n{ \"id\": 5 } { \"start_date\": \"2012-01-01\" }" }
-  let(:view) { ObjectView.new(double("Element", text: text)) }
+  let(:view) { ObjectView.new(double("Element", text:)) }
 
   it "separates json into parts" do
     expect(view.clean_json_text_parts).to eq(

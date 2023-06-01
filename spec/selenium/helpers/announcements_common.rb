@@ -22,12 +22,12 @@ require_relative "../common"
 module AnnouncementsCommon
   def create_announcement(title = "announcement title", message = "announcement message")
     @context = @course
-    @announcement = announcement_model(title: title, message: message)
+    @announcement = announcement_model(title:, message:)
   end
 
   def create_announcement_initial(message = "announcement message")
     @context = @course
-    @announcement = announcement_model(title: "new announcement", message: message, require_initial_post: true)
+    @announcement = announcement_model(title: "new announcement", message:, require_initial_post: true)
   end
 
   def create_announcement_manual(title, text)

@@ -20,6 +20,6 @@
 
 module Factories
   def outcome_calculation_method_model(context)
-    OutcomeCalculationMethod.create!(context: context, calculation_method: "decaying_average", calculation_int: 65)
+    OutcomeCalculationMethod.create!(context:, calculation_method: "decaying_average", calculation_int: 65)
   end
 end

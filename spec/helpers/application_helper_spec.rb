@@ -157,7 +157,7 @@ describe ApplicationHelper do
       end
 
       it "builds a whole time tag with a useful title showing the timezone offset if theres a context" do
-        tag = friendly_datetime(Time.now, context: context)
+        tag = friendly_datetime(Time.now, context:)
         expect(tag).to match(%r{^<time.*</time>$})
         expect(tag).to match(/data-html-tooltip-title=/)
         expect(tag).to match(/Local: Mar 13 at 1:12am/)
@@ -165,7 +165,7 @@ describe ApplicationHelper do
       end
 
       it "can produce an alternate tag type" do
-        tag = friendly_datetime(Time.now, context: context, tag_type: :span)
+        tag = friendly_datetime(Time.now, context:, tag_type: :span)
         expect(tag).to match(%r{^<span.*</span>$})
         expect(tag).to match(/data-html-tooltip-title=/)
         expect(tag).to match(/Local: Mar 13 at 1:12am/)
@@ -173,7 +173,7 @@ describe ApplicationHelper do
       end
 
       it "produces no tooltip for a nil datetime" do
-        tag = friendly_datetime(nil, context: context)
+        tag = friendly_datetime(nil, context:)
         expect(tag).to eq "<time></time>"
       end
     end
@@ -480,7 +480,7 @@ describe ApplicationHelper do
 
     it "overrides default help link with the configured support url" do
       support_url = "http://instructure.com"
-      Account.default.update_attribute(:settings, { support_url: support_url })
+      Account.default.update_attribute(:settings, { support_url: })
       helper.instance_variable_set(:@domain_root_account, Account.default)
 
       expect(helper.support_url).to eq support_url

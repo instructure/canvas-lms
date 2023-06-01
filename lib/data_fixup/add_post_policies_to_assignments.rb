@@ -51,9 +51,9 @@ module DataFixup::AddPostPoliciesToAssignments
 
         {
           assignment_id: assignment.id,
-          created_at: created_at,
+          created_at:,
           course_id: assignment.context_id,
-          post_manually: post_manually,
+          post_manually:,
           updated_at: created_at
         }
       end
@@ -67,7 +67,7 @@ module DataFixup::AddPostPoliciesToAssignments
         {
           assignment_id: nil,
           course_id: id,
-          created_at: created_at,
+          created_at:,
           post_manually: false,
           updated_at: created_at
         }

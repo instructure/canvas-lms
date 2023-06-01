@@ -48,7 +48,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
       assignment_override_model({
                                   set: @course.default_section,
                                   quiz: @quiz,
-                                  due_at: due_at
+                                  due_at:
                                 })
 
       expect(@quiz.reload.assignment_overrides.count).to eq 1
@@ -89,7 +89,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
       assignment_override_model({
                                   set: @course.default_section,
                                   quiz: @quiz,
-                                  due_at: due_at
+                                  due_at:
                                 })
 
       expect(@quiz.reload.assignment_overrides.count).to eq 1
@@ -151,7 +151,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
       assignment_override_model({
                                   set: @course.default_section,
                                   quiz: @quiz,
-                                  due_at: due_at
+                                  due_at:
                                 })
 
       expect(@quiz.reload.assignment_overrides.count).to eq 1

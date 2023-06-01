@@ -53,8 +53,8 @@ describe "ApplicationController Token Scoping", type: :request do
     context "Verificient lti" do
       let(:access_token) do
         AccessToken.create!(
-          user: user,
-          developer_key: developer_key,
+          user:,
+          developer_key:,
           scopes: valid_scopes
         )
       end

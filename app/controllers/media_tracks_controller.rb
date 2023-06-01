@@ -217,7 +217,7 @@ class MediaTracksController < ApplicationController
       next if t["content"].blank?
 
       find_or_create_track(locale: t["locale"],
-                           attachment: attachment,
+                           attachment:,
                            new_params: ActionController::Parameters.new(t))
     end
     index
@@ -227,14 +227,14 @@ class MediaTracksController < ApplicationController
 
   def find_or_create_track(locale:, attachment:, new_params:)
     track = if @attachment.present?
-              @attachment.media_tracks.where(media_object: @media_object, locale: locale).take
+              @attachment.media_tracks.where(media_object: @media_object, locale:).take
             else
               @media_object.media_tracks.where(user: @current_user,
-                                               locale: locale,
+                                               locale:,
                                                attachment_id: [nil, @media_object.attachment_id]).take
             end
-    track ||= @media_object.media_tracks.new(user: @current_user, locale: locale)
-    track.update!(attachment: attachment, **new_params.permit(*TRACK_SETTABLE_ATTRIBUTES))
+    track ||= @media_object.media_tracks.new(user: @current_user, locale:)
+    track.update!(attachment:, **new_params.permit(*TRACK_SETTABLE_ATTRIBUTES))
     track
   end
 

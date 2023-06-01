@@ -302,7 +302,7 @@ class AccountsController < ApplicationController
   include SupportHelpers::ControllerHelpers
   include DefaultDueTimeHelper
 
-  INTEGER_REGEX = /\A[+-]?\d+\z/.freeze
+  INTEGER_REGEX = /\A[+-]?\d+\z/
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
 
   # @API List accounts
@@ -1320,7 +1320,7 @@ class AccountsController < ApplicationController
       view_messages: (@account.settings[:admins_can_view_notifications] &&
                        @account.grants_right?(@current_user, session, :view_notifications)) ||
                      Account.site_admin.grants_right?(@current_user, :read_messages),
-      logging: logging
+      logging:
     }
     js_env bounced_emails_admin_tool: @account.grants_right?(@current_user, session, :view_bounced_emails)
   end
@@ -1550,8 +1550,8 @@ class AccountsController < ApplicationController
     @page_title = @account.name
     add_crumb "", "?" # the text for this will be set by javascript
     js_permissions = {
-      can_read_course_list: can_read_course_list,
-      can_read_roster: can_read_roster,
+      can_read_course_list:,
+      can_read_roster:,
       can_create_courses: @account.grants_any_right?(@current_user, session, :manage_courses, :create_courses),
       can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
       analytics: @account.service_enabled?(:analytics),

@@ -187,7 +187,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           end
         end
         let(:record) do
-          AttachmentAssociation.create!(attachment: attachment, context: conversation_message)
+          AttachmentAssociation.create!(attachment:, context: conversation_message)
         end
         let(:reference_record) { attachment }
       end
@@ -466,7 +466,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       let(:alignment) { outcome.align(assignment, @course) }
       let(:assignment) { assignment_model(course: @course) }
       let(:rubric_association) do
-        rubric = outcome_with_rubric context: @course, outcome: outcome
+        rubric = outcome_with_rubric(context: @course, outcome:)
         rubric.associate_with(assignment, @course, purpose: "grading")
       end
       let(:outcome_result) do
@@ -476,7 +476,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           association_id: rubric_association.id,
           learning_outcome: outcome,
           user: @user,
-          alignment: alignment
+          alignment:
         )
       end
       let(:course2) { course_model(account: account_model(root_account_id: nil)) }
@@ -529,16 +529,16 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       let(:child_course) { course_model(account: @course.account) }
 
       let(:master_template) { MasterCourses::MasterTemplate.create!(course: @course) }
-      let(:master_migration) { MasterCourses::MasterMigration.create!(master_template: master_template) }
+      let(:master_migration) { MasterCourses::MasterMigration.create!(master_template:) }
       let(:child_subscription) do
-        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: child_course)
+        MasterCourses::ChildSubscription.create!(master_template:, child_course:)
       end
 
       context "with MasterCourses::ChildContentTag" do
         it_behaves_like "a datafixup that populates root_account_id" do
           let(:record) do
             MasterCourses::ChildContentTag.create!(
-              child_subscription: child_subscription, content: assignment_model
+              child_subscription:, content: assignment_model
             )
           end
           let(:reference_record) { child_subscription }
@@ -556,7 +556,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         it_behaves_like "a datafixup that populates root_account_id" do
           let(:record) do
             MasterCourses::MasterContentTag.create!(
-              master_template: master_template, content: assignment_model
+              master_template:, content: assignment_model
             )
           end
           let(:reference_record) { master_template }
@@ -574,9 +574,9 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         it_behaves_like "a datafixup that populates root_account_id" do
           let(:record) do
             MasterCourses::MigrationResult.create!(
-              master_migration: master_migration,
-              content_migration: content_migration,
-              child_subscription: child_subscription,
+              master_migration:,
+              content_migration:,
+              child_subscription:,
               import_type: :full,
               state: :queued
             )
@@ -720,7 +720,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       it_behaves_like "a datafixup that populates root_account_id" do
         # Gets it from the context, not the rubric
         let(:rubric) { rubric_model(context: account_model(root_account: nil)) }
-        let(:record) { rubric_association_model(context: reference_record, rubric: rubric) }
+        let(:record) { rubric_association_model(context: reference_record, rubric:) }
         let(:reference_record) { account_model }
       end
     end
@@ -729,7 +729,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       it_behaves_like "a datafixup that populates root_account_id" do
         # Gets it from the context, not the rubric
         let(:rubric) { rubric_model(context: account_model(root_account: nil)) }
-        let(:record) { rubric_association_model(context: reference_record, rubric: rubric) }
+        let(:record) { rubric_association_model(context: reference_record, rubric:) }
         let(:reference_record) { @course }
       end
     end
@@ -744,7 +744,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     context "with SubmissionComment" do
       it_behaves_like "a datafixup that populates root_account_id" do
         let(:submission) { submission_model }
-        let(:record) { submission_comment_model(submission: submission) }
+        let(:record) { submission_comment_model(submission:) }
         let(:reference_record) { submission.assignment.context }
       end
     end

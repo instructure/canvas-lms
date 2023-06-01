@@ -33,8 +33,8 @@ end
 
 require "lti_outbound"
 
-Dir.glob("#{File.dirname(__FILE__).tr("\\", "/")}/shared_examples/*.rb").sort.each { |file| require file }
-Dir.glob("#{File.dirname(__FILE__).tr("\\", "/")}/support/*.rb").sort.each { |file| require file }
+Dir.glob("#{File.dirname(__FILE__).tr("\\", "/")}/shared_examples/*.rb").each { |file| require file }
+Dir.glob("#{File.dirname(__FILE__).tr("\\", "/")}/support/*.rb").each { |file| require file }
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true

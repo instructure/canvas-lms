@@ -34,7 +34,7 @@ describe "Account Reports API", type: :request do
     @report.parameters = ActiveSupport::HashWithIndifferentAccess["param" => "test", "error" => "failed"]
 
     folder = Folder.assert_path("test", @admin.account)
-    @report.attachment = Attachment.create!(folder: folder, context: @admin.account, filename: "test.txt", uploaded_data: StringIO.new("test file"))
+    @report.attachment = Attachment.create!(folder:, context: @admin.account, filename: "test.txt", uploaded_data: StringIO.new("test file"))
 
     @report.save!
   end
@@ -116,7 +116,7 @@ describe "Account Reports API", type: :request do
       report2.parameters = ActiveSupport::HashWithIndifferentAccess["param" => "test", "error" => "failed"]
 
       folder = Folder.assert_path("test", @admin.account)
-      report2.attachment = Attachment.create!(folder: folder,
+      report2.attachment = Attachment.create!(folder:,
                                               context: @admin.account,
                                               filename: "test.txt",
                                               uploaded_data: StringIO.new("test file"))

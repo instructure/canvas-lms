@@ -106,7 +106,7 @@ module LtiProviderStateHelper
         canvas_high_contrast_enabled: "$Canvas.user.prefersHighContrast"
       }
     }
-    tool_config = Lti::ToolConfiguration.create!(developer_key: developer_key, settings: configuration, privacy_level: "public")
+    tool_config = Lti::ToolConfiguration.create!(developer_key:, settings: configuration, privacy_level: "public")
     external_tool = tool_config.new_external_tool(developer_key.account)
     external_tool.save!
   end

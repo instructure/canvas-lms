@@ -124,9 +124,9 @@ module Types
       # the user has permission to read it)
       if grades.nil?
         score_attrs = if grading_period_id
-                        { enrollment: enrollment, grading_period_id: grading_period_id }
+                        { enrollment:, grading_period_id: }
                       else
-                        { enrollment: enrollment, course_score: true }
+                        { enrollment:, course_score: true }
                       end
 
         grades = Score.new(score_attrs)

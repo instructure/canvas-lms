@@ -299,7 +299,7 @@ describe Quizzes::QuizzesController do
           @course.assignments.create(
             title: "some assignment #{i}",
             assignment_group: group,
-            due_at: due_at,
+            due_at:,
             external_tool_tag_attributes: { content: tool },
             workflow_state: workflow_states[i]
           )
@@ -892,7 +892,7 @@ describe Quizzes::QuizzesController do
         user_session(@teacher)
         5.times do |i|
           name = "#{(i + "a".ord).chr}_student"
-          course_with_student(name: name, course: @course)
+          course_with_student(name:, course: @course)
         end
       end
 
@@ -942,7 +942,7 @@ describe Quizzes::QuizzesController do
       section = @course.course_sections.create!(name: "section 2")
       @course.enroll_user(@student, "StudentEnrollment", {
                             enrollment_state: "active",
-                            section: section,
+                            section:,
                             allow_multiple_enrollments: true
                           })
 
@@ -1326,7 +1326,7 @@ describe Quizzes::QuizzesController do
     it "requires view grade permissions to view a quiz submission" do
       role = Role.find_by(name: "TeacherEnrollment")
       ["view_all_grades", "manage_grades"].each do |permission|
-        RoleOverride.create!(permission: permission, enabled: false, context: @course.account, role: role)
+        RoleOverride.create!(permission:, enabled: false, context: @course.account, role:)
       end
 
       user_session(@teacher)

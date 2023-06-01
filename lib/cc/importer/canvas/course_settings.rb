@@ -143,7 +143,7 @@ module CC::Importer::Canvas
       end
 
       post_manually = get_bool_val(doc, "default_post_policy post_manually")
-      course[:default_post_policy] = { post_manually: post_manually } unless post_manually.nil?
+      course[:default_post_policy] = { post_manually: } unless post_manually.nil?
 
       course
     end

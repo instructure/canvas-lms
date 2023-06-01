@@ -68,12 +68,12 @@ module Users
       return_url = claims[:return_url]
 
       {
-        user: user,
-        real_user: real_user,
-        developer_key: developer_key,
-        root_account: root_account,
-        oauth_host: oauth_host,
-        return_url: return_url
+        user:,
+        real_user:,
+        developer_key:,
+        root_account:,
+        oauth_host:,
+        return_url:
       }
     rescue Canvas::Security::InvalidToken
       raise InvalidVerifier

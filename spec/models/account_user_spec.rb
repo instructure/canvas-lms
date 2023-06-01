@@ -75,8 +75,8 @@ describe AccountUser do
     it "includes granted permissions from multiple roles" do
       user = User.create!
       manage_wiki_permissions = { manage_wiki_create: true, manage_wiki_update: true, manage_wiki_delete: true }
-      account_admin_user_with_role_changes(user: user, role: @role1, role_changes: { manage_sis: true })
-      account_admin_user_with_role_changes(user: user, role: @role2, role_changes: manage_wiki_permissions)
+      account_admin_user_with_role_changes(user:, role: @role1, role_changes: { manage_sis: true })
+      account_admin_user_with_role_changes(user:, role: @role2, role_changes: manage_wiki_permissions)
 
       permissions = AccountUser.all_permissions_for(user, Account.default)
       expect(permissions.delete(:manage_sis)).not_to be_empty

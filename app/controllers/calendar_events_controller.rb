@@ -43,7 +43,7 @@ class CalendarEventsController < ApplicationController
       log_asset_access(@event, "calendar", "calendar")
       respond_to do |format|
         format.html
-        format.json { render json: @event.as_json(permissions: { user: @current_user, session: session }) }
+        format.json { render json: @event.as_json(permissions: { user: @current_user, session: }) }
       end
     end
   end
@@ -65,7 +65,7 @@ class CalendarEventsController < ApplicationController
         if @event.save
           flash[:notice] = t "notices.created", "Event was successfully created."
           format.html { redirect_to calendar_url_for(@context) }
-          format.json { render json: @event.as_json(permissions: { user: @current_user, session: session }), status: :created }
+          format.json { render json: @event.as_json(permissions: { user: @current_user, session: }), status: :created }
         else
           format.html { render :new }
           format.json { render json: @event.errors, status: :bad_request }
@@ -98,7 +98,7 @@ class CalendarEventsController < ApplicationController
           log_asset_access(@event, "calendar", "calendar", "participate")
           flash[:notice] = t "notices.updated", "Event was successfully updated."
           format.html { redirect_to calendar_url_for(@context) }
-          format.json { render json: @event.as_json(permissions: { user: @current_user, session: session }), status: :ok }
+          format.json { render json: @event.as_json(permissions: { user: @current_user, session: }), status: :ok }
         else
           format.html { render :edit }
           format.json { render json: @event.errors, status: :bad_request }

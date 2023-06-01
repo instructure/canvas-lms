@@ -79,7 +79,7 @@ class ModerationSetController < ApplicationController
     new_students = visible_students.where(id: new_student_ids).distinct
 
     new_students.each do |student|
-      @assignment.moderated_grading_selections.create! student: student
+      @assignment.moderated_grading_selections.create! student:
     end
   end
 

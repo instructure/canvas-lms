@@ -109,7 +109,7 @@ module Importers
     end
 
     def self.match_assignment_group_by_name(context, migration, name)
-      ag = context.assignment_groups.where(name: name, migration_id: nil).first
+      ag = context.assignment_groups.where(name:, migration_id: nil).first
       if ag && migration.for_master_course_import?
         # prevent overwriting assignment group settings in a pre-existing group that was matched by name
         downstream_changes = []

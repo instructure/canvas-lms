@@ -37,7 +37,7 @@ if Qti.migration_executable
     it "gets answers correctly even when people write gross xml" do
       file_path = File.join(BASE_FIXTURE_DIR, "qti")
       manifest_node = get_manifest_node("terrible_qti")
-      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: file_path)
+      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: file_path)
 
       expect(hash[:answers].pluck(:text)).to match_array(["True", "False", "Not Sure"])
       expect(hash[:question_text]).to_not include("Not Sure")
@@ -46,7 +46,7 @@ if Qti.migration_executable
     it "gets answers correctly even when people write more gross xml" do
       file_path = File.join(BASE_FIXTURE_DIR, "qti")
       manifest_node = get_manifest_node("more_terrible_qti")
-      hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: file_path)
+      hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node:, base_dir: file_path)
 
       expect(hash[:question_text]).to be_blank
       expect(hash[:answers].map { |a| [a[:left], a[:right]] }).to match_array([["Canine", "Dog"], ["Feline", "Cat"]])
@@ -55,7 +55,7 @@ if Qti.migration_executable
     it "gets answers correctly for weird multiple dropdown questions" do
       file_path = File.join(BASE_FIXTURE_DIR, "qti")
       manifest_node = get_manifest_node("inline_choice_interaction")
-      hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: file_path)
+      hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node:, base_dir: file_path)
 
       expect(hash[:answers].select { |a| a[:blank_id] == "RESPONSE" }.pluck(:text)).to match_array(%w[pen pan ten])
       expect(hash[:answers].select { |a| a[:blank_id] == "RESPONSE_1" }.pluck(:text)).to match_array(%w[apple ant ape])
@@ -67,7 +67,7 @@ if Qti.migration_executable
     it "gets answers and text correctly for other weird multiple dropdown questions" do
       file_path = File.join(BASE_FIXTURE_DIR, "qti")
       manifest_node = get_manifest_node("inline_choice_interaction_2")
-      hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: file_path)
+      hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node:, base_dir: file_path)
 
       # the old code was terrible and doubled the text when it hit html tags and also ignored them... srsly who wrote it? ugh
       expect(hash[:question_text]).to_not include("sillynode")
@@ -84,7 +84,7 @@ if Qti.migration_executable
     it "gets feedback with accents correctly even when people write gross xml" do
       file_path = File.join(BASE_FIXTURE_DIR, "qti")
       manifest_node = get_manifest_node("weird_html")
-      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: file_path)
+      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: file_path)
       expect(hash[:neutral_comments]).to eq "viva la molé"
     end
   end

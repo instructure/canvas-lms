@@ -24,7 +24,7 @@ describe UnzipAttachment do
   end
 
   def add_folder_to_course(name)
-    folder_model name: name
+    folder_model(name:)
     @course.folders << @folder
     @course.save!
     @course.reload
@@ -37,7 +37,7 @@ describe UnzipAttachment do
 
   context "unzipping" do
     let(:filename) { fixture_filename("attachments.zip") }
-    let(:unzipper) { UnzipAttachment.new(course: @course, filename: filename) }
+    let(:unzipper) { UnzipAttachment.new(course: @course, filename:) }
 
     it "stores a course, course_files_folder, and filename" do
       expect(unzipper.course).to eql(@course)
@@ -47,7 +47,7 @@ describe UnzipAttachment do
 
     it "is able to take a root_directory argument" do
       add_folder_to_course("a special folder")
-      root_zipper = UnzipAttachment.new(course: @course, filename: filename, root_directory: @folder)
+      root_zipper = UnzipAttachment.new(course: @course, filename:, root_directory: @folder)
       expect(root_zipper.course_files_folder).to eql(@folder)
     end
 
@@ -119,7 +119,7 @@ describe UnzipAttachment do
         expect(zip.entries.map(&:name)).to eql(%w[f.txt d/e.txt d/d.txt c.txt b.txt a.txt])
       end
 
-      ua = UnzipAttachment.new(course: @course, filename: filename)
+      ua = UnzipAttachment.new(course: @course, filename:)
       ua.process
 
       expect(@course.attachments.count).to eq 6
@@ -130,14 +130,14 @@ describe UnzipAttachment do
 
     it "does not fall over when facing a filename starting with ~" do
       filename = fixture_filename("tilde.zip")
-      ua = UnzipAttachment.new(course: @course, filename: filename)
+      ua = UnzipAttachment.new(course: @course, filename:)
       expect { ua.process }.not_to raise_error
       expect(@course.attachments.map(&:display_name)).to eq ["~tilde"]
     end
 
     it "does not fail when dealing with long filenames" do
       filename = fixture_filename("zip_with_long_filename_inside.zip")
-      ua = UnzipAttachment.new(course: @course, filename: filename)
+      ua = UnzipAttachment.new(course: @course, filename:)
       expect { ua.process }.not_to raise_exception
       expect(@course.attachments.map(&:display_name)).to eq ["entry_#{(1..115).to_a.join}.txt"]
     end

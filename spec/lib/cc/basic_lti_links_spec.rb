@@ -271,7 +271,7 @@ describe CC::BasicLTILinks do
 
         it "adds labels correctly" do
           labels = { en_US: "My Label" }
-          tool.settings[:course_navigation] = { labels: labels }
+          tool.settings[:course_navigation] = { labels: }
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions/lticm:options[@name="course_navigation"]/lticm:options[@name="labels"]/lticm:property[@name="en_US"]'
@@ -283,7 +283,7 @@ describe CC::BasicLTILinks do
             "custom_key_name_1" => "custom_key_1",
             "custom_key_name_2" => "custom_key_2"
           }
-          tool.settings[:course_navigation] = { custom_fields: custom_fields }
+          tool.settings[:course_navigation] = { custom_fields: }
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions/lticm:options[@name="course_navigation"]/blti:custom/lticm:property'
@@ -305,7 +305,7 @@ describe CC::BasicLTILinks do
             "custom_key_name_1" => "custom_key_1",
             "custom_key_name_2" => "custom_key_2"
           }
-          tool.settings[:vendor_extensions] = [{ platform: "my vendor platform", custom_fields: custom_fields }]
+          tool.settings[:vendor_extensions] = [{ platform: "my vendor platform", custom_fields: }]
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions[@platform="my vendor platform"]/lticm:property'

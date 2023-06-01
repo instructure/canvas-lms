@@ -83,7 +83,7 @@ module Lti
           formats: :html,
           layout: "borderless_lti",
           locals: {
-            redirect_uri: redirect_uri,
+            redirect_uri:,
             parameters: @oidc_error || launch_parameters
           }
         )
@@ -102,7 +102,7 @@ module Lti
       def validate_current_user!
         return if public_course? && @current_user.blank?
 
-        if !@current_user || Lti::Asset.opaque_identifier_for(@current_user, context: context) != oidc_params[:login_hint]
+        if !@current_user || Lti::Asset.opaque_identifier_for(@current_user, context:) != oidc_params[:login_hint]
           set_oidc_error!("login_required", "Must have an active user session")
         end
       end
@@ -126,8 +126,8 @@ module Lti
 
       def set_oidc_error!(error, error_description)
         @oidc_error = {
-          error: error,
-          error_description: error_description,
+          error:,
+          error_description:,
           state: oidc_params[:state]
         }
       end
@@ -169,7 +169,7 @@ module Lti
       def launch_parameters
         @launch_parameters ||= id_token.merge({
           state: oidc_params[:state],
-          lti_storage_target: lti_storage_target
+          lti_storage_target:
         }.compact)
       end
 

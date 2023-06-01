@@ -121,7 +121,7 @@ module Lti::Messages
 
     def generate_post_payload_message(validate_launch: true)
       add_deep_linking_request_claims!
-      super(validate_launch: validate_launch)
+      super(validate_launch:)
     end
 
     private
@@ -153,10 +153,10 @@ module Lti::Messages
       {
         data: Lti::DeepLinkingData.jwt_from({
           modal: MODAL_PLACEMENTS.include?(placement),
-          placement: placement,
+          placement:,
           context_module_id: @opts[:context_module_id],
-          assignment_id: assignment_id,
-          content_item_id: content_item_id,
+          assignment_id:,
+          content_item_id:,
           parent_frame_context: @opts[:parent_frame_context]
         }.compact),
       }

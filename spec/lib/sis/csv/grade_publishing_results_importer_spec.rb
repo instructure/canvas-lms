@@ -73,7 +73,7 @@ describe SIS::CSV::GradePublishingResultsImporter do
 
   it "gives a proper error if you try to reference an enrollment from another root account" do
     account = Account.create!
-    course_with_student(account: account)
+    course_with_student(account:)
 
     importer = process_csv_data(
       "enrollment_id,grade_publishing_status,message",

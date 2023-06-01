@@ -53,18 +53,18 @@ class Mutations::OutcomeProficiencyBase < Mutations::BaseMutation
   end
 
   def upsert(input, existing_record: nil, context: nil)
-    record = existing_record || OutcomeProficiency.find_by(context: context)
+    record = existing_record || OutcomeProficiency.find_by(context:)
     if record
       record.assign_attributes(workflow_state: "active")
       record.replace_ratings(input[:proficiency_ratings])
-      record.assign_attributes(context: context) unless context.nil?
+      record.assign_attributes(context:) unless context.nil?
     else
-      record = OutcomeProficiency.new(context: context, **attrs(input.to_h))
+      record = OutcomeProficiency.new(context:, **attrs(input.to_h))
     end
     if record.save
       { outcome_proficiency: record }
     elsif existing_record.nil? && context_taken?(record)
-      upsert(input, context: context)
+      upsert(input, context:)
     else
       errors_for(record)
     end

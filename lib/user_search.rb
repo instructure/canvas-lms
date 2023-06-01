@@ -44,7 +44,7 @@ module UserSearch
 
     def conditions_statement(search_term, root_account, users_scope)
       pattern = like_string_for(search_term)
-      params = { pattern: pattern, account: root_account, path_type: CommunicationChannel::TYPE_EMAIL, db_id: search_term }
+      params = { pattern:, account: root_account, path_type: CommunicationChannel::TYPE_EMAIL, db_id: search_term }
       complex_sql(users_scope, params)
     end
 

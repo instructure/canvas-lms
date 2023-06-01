@@ -28,7 +28,7 @@ describe CanvasSecurity::PageViewJwt do
       attributes = {
         request_id: "abcdefg-1234566",
         user_id: uid,
-        created_at: created_at
+        created_at:
       }
       token = CanvasSecurity::PageViewJwt.generate(attributes)
       expect(token).to be_a(String)

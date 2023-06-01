@@ -65,7 +65,7 @@ module Factories
                                              due_at: 2.days.from_now,
                                              due_at_overridden: true,
                                              set_type: "Group",
-                                             group: group,
+                                             group:,
                                              title: "group override",
                                              workflow_state: "active"
                                            })
