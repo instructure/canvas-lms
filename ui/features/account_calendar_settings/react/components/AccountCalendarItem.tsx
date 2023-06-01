@@ -104,6 +104,7 @@ export const AccountCalendarItem = ({
               autoSubscription={isAutoSubscription}
               disabled={!isVisible}
               onChange={onAccountSubscriptionToggled}
+              accountName={item.name}
             />
           </FlexItem>
         )}
