@@ -424,6 +424,7 @@ module CC
     def self.kaltura_admin_session
       client = CanvasKaltura::ClientV3.new
       client.startSession(CanvasKaltura::SessionType::ADMIN)
+      client
     end
 
     def self.media_object_info(obj, course: nil, client: nil, flavor: nil)
