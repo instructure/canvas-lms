@@ -252,7 +252,14 @@ export function handleContentItemResult(
   }
 
   $('#external_tool_create_url').val(result.url)
-  $('#external_tool_create_title').val(result.title || tool.name)
+  if (typeof result.title !== 'undefined') {
+    $('#external_tool_create_title').val(result.title)
+  } else if ($('#external_tool_create_title').is(':visible')) {
+    // if external_tool_create_title is visible, then that means
+    // we're on the module add page (or some other context where
+    // the name is needed), so let's default to tool name here.
+    $('#external_tool_create_title').val(tool.name)
+  }
   $('#external_tool_create_custom_params').val(JSON.stringify(result.custom))
   setValueIfDefined('#external_tool_create_iframe_width', result.iframe?.width)
   setValueIfDefined('#external_tool_create_iframe_height', result.iframe?.height)
@@ -664,6 +671,13 @@ $(document).ready(function () {
 
       $dialog.find('.alert-error').remove()
 
+      // This would be nice to read from the options passed to select_content_dialog, but
+      // that's not accessible from here. select_item_name won't be visible if the
+      // no_name_input option is set.
+      const no_name_input = $('#context_external_tools_select')
+        .find('.select_item_name')
+        .is(':hidden')
+
       if (item_data['item[url]'] === '') {
         const $errorBox = $('<div />', {class: 'alert alert-error', role: 'alert'}).css({
           marginTop: 8,
@@ -672,7 +686,7 @@ $(document).ready(function () {
           I18n.t('errors.external_tool_url', "An external tool can't be saved without a URL.")
         )
         $dialog.prepend($errorBox)
-      } else if (item_data['item[title]'] === '') {
+      } else if (item_data['item[title]'] === '' && !no_name_input) {
         $('#external_tool_create_title').errorBox(I18n.t('Page Name is required'))
       } else {
         submit(item_data)

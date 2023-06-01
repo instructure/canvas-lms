@@ -117,7 +117,7 @@ test('close dialog when 1.3 content items are empty', async () => {
     },
   }
 
-  await deepLinkingResponseHandler(deepLinkingEvent)
+  deepLinkingResponseHandler(deepLinkingEvent)
 
   strictEqual($resourceSelectionDialog.is(':visible'), false)
   strictEqual(window.confirm.callCount, 0)
@@ -156,23 +156,26 @@ QUnit.module('SelectContentDialog: deepLinkingResponseHandler', {
   setup() {
     $('#fixtures').html(`
       <div>
-        <div id='select_context_content_dialog'></div>
-        <div id='resource_selection_dialog'></div>
-        <input type='text' id='external_tool_create_url' />
-        <input type='text' id='external_tool_create_title' />
-        <input type='text' id='external_tool_create_custom_params' />
-        <input type='text' id='external_tool_create_line_item' />
-        <input type='text' id='external_tool_create_description' />
-        <input type='text' id='external_tool_create_available' />
-        <input type='text' id='external_tool_create_submission' />
-        <input type='text' id='external_tool_create_assignment_id' />
-        <input type='text' id='external_tool_create_iframe_width' />
-        <input type='text' id='external_tool_create_iframe_height' />
-        <input type='checkbox' id='external_tool_create_new_tab' />
-        <div id='context_external_tools_select'>
-          <span class='domain_message' />
-          <div class='tools'>
-            <div class='tool selected'></div>
+        <div id='select_context_content_dialog'>
+          <div id='resource_selection_dialog'></div>
+          <input type='text' id='external_tool_create_url' />
+          <div class='select_item_name'>
+            <input type='text' id='external_tool_create_title' />
+          </div>
+          <input type='text' id='external_tool_create_custom_params' />
+          <input type='text' id='external_tool_create_line_item' />
+          <input type='text' id='external_tool_create_description' />
+          <input type='text' id='external_tool_create_available' />
+          <input type='text' id='external_tool_create_submission' />
+          <input type='text' id='external_tool_create_assignment_id' />
+          <input type='text' id='external_tool_create_iframe_width' />
+          <input type='text' id='external_tool_create_iframe_height' />
+          <input type='checkbox' id='external_tool_create_new_tab' />
+          <div id='context_external_tools_select'>
+            <span class='domain_message' />
+            <div class='tools'>
+              <div class='tool selected'></div>
+            </div>
           </div>
         </div>
       </div>
@@ -235,46 +238,59 @@ const deepLinkingEventWithAssignmentId = makeDeepLinkingEvent({
 })
 
 test('sets the tool url', async () => {
-  await deepLinkingResponseHandler(deepLinkingEvent)
+  deepLinkingResponseHandler(deepLinkingEvent)
   const {url} = deepLinkingEvent.data.content_items[0]
   equal($('#external_tool_create_url').val(), url)
 })
 
 test('sets the tool url without the optional title', async () => {
-  await deepLinkingResponseHandler(deepLinkingEventWithoutTitle)
+  deepLinkingResponseHandler(deepLinkingEventWithoutTitle)
   const {url} = deepLinkingEvent.data.content_items[0]
   equal($('#external_tool_create_url').val(), url)
 })
 
 test('sets the tool title', async () => {
-  await deepLinkingResponseHandler(deepLinkingEvent)
+  deepLinkingResponseHandler(deepLinkingEvent)
   const {title} = deepLinkingEvent.data.content_items[0]
   equal($('#external_tool_create_title').val(), title)
 })
 
+test('sets the tool title to the tool name if no content_item title is given', async () => {
+  deepLinkingResponseHandler(makeDeepLinkingEvent())
+  equal($('#external_tool_create_title').val(), 'mytool')
+})
+
+test('does not set the tool title to the tool name if no content_item title is given with no_name_input set', async () => {
+  selectContentDialog({
+    no_name_input: true
+  })
+  deepLinkingResponseHandler(makeDeepLinkingEvent())
+  equal($('#external_tool_create_title').val(), '')
+})
+
 test('sets the tool custom params', async () => {
-  await deepLinkingResponseHandler(deepLinkingEvent)
+  deepLinkingResponseHandler(deepLinkingEvent)
 
   equal($('#external_tool_create_custom_params').val(), JSON.stringify(customParams))
 })
 
 test('sets the content item assignment id if given', async () => {
-  await deepLinkingResponseHandler(deepLinkingEventWithAssignmentId)
+  deepLinkingResponseHandler(deepLinkingEventWithAssignmentId)
   equal($('#external_tool_create_assignment_id').val(), assignmentId)
 })
 
 test('sets the iframe width', async () => {
-  await deepLinkingResponseHandler(deepLinkingEvent)
+  deepLinkingResponseHandler(deepLinkingEvent)
   equal($('#external_tool_create_iframe_height').val(), 456)
 })
 
 test('sets the iframe height', async () => {
-  await deepLinkingResponseHandler(deepLinkingEvent)
+  deepLinkingResponseHandler(deepLinkingEvent)
   equal($('#external_tool_create_iframe_width').val(), 123)
 })
 
 test('recover item data from context external tool item', async () => {
-  await deepLinkingResponseHandler(deepLinkingEvent)
+  deepLinkingResponseHandler(deepLinkingEvent)
 
   const data = extractContextExternalToolItemData()
 
@@ -300,14 +316,14 @@ test('recover item data from context external tool item', async () => {
 })
 
 test('recover assignment id from context external tool item data if given', async () => {
-  await deepLinkingResponseHandler(deepLinkingEventWithAssignmentId)
+  deepLinkingResponseHandler(deepLinkingEventWithAssignmentId)
 
   const data = extractContextExternalToolItemData()
   equal(data['item[assignment_id]'], assignmentId)
 })
 
 test('checks the new tab checkbox if content item window.targetName is _blank', async () => {
-  await deepLinkingResponseHandler(makeDeepLinkingEvent({window: {targetName: '_blank'}}))
+  deepLinkingResponseHandler(makeDeepLinkingEvent({window: {targetName: '_blank'}}))
 
   const data = extractContextExternalToolItemData()
   equal(data['item[new_tab]'], '1')
@@ -347,7 +363,7 @@ test('close all dialogs when content items attribute is empty', async () => {
     },
   }
 
-  await deepLinkingResponseHandler(deepLinkingEvent)
+  deepLinkingResponseHandler(deepLinkingEvent)
 
   strictEqual($('#select_context_content_dialog').is(':visible'), false)
   strictEqual($('#resource_selection_dialog').is(':visible'), false)
