@@ -183,28 +183,6 @@ describe "Student Gradebook" do
     expect(f("#final_letter_grade_text").text).to eq "D"
   end
 
-  it "coerces total to letter-grade when user is quantitative data restricted" do
-    # truthy feature flag
-    Account.default.enable_feature! :restrict_quantitative_data
-
-    # truthy setting
-    Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
-    Account.default.save!
-
-    # truthy permission(since enabled is being "not"ed)
-    Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-    Account.default.reload
-
-    init_course_with_students
-    user_session(@teacher)
-
-    assignments[0].grade_student @students[0], grade: 20, grader: @teacher
-    assignments[1].grade_student @students[0], grade: 20, grader: @teacher
-
-    get "/courses/#{@course.id}/grades/#{@students[0].id}"
-    expect(f(".final_grade").text).to eq("Total: A")
-  end
-
   it "follows grade dropping rules", priority: "1" do
     add_teacher_and_student
     @group = @course.assignment_groups.create!(name: "Group1", rules: "drop_lowest:1")

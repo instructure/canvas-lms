@@ -43,7 +43,7 @@ export const totalRow = queryData => {
       : scorePercentageToLetterGrade(total, queryData?.gradingStandard)
 
   return (
-    <Table.Row>
+    <Table.Row data-testid="total_row">
       <Table.Cell textAlign="start" colSpan="3">
         <Text weight="bold">{I18n.t('Total')}</Text>
       </Table.Cell>
