@@ -143,11 +143,11 @@ tinymce.PluginManager.add(
     }
 
     async function handlePasteOrDrop(event: RCEClipOrDragEvent) {
-      const dataTransfer =
-        event.type === 'paste'
-          ? (event as TinyClipboardEvent).clipboardData
-          : (event as TinyDragEvent).dataTransfer
-      const files = dataTransfer?.files || []
+      const isPaste = event.type === 'paste'
+      const dataTransfer = isPaste
+        ? (event as TinyClipboardEvent).clipboardData
+        : (event as TinyDragEvent).dataTransfer
+      const files = Array.from(dataTransfer?.files || [])
       const types = dataTransfer?.types || []
 
       const isAudioVideoDisabled = bridge.activeEditor()?.props?.instRecordDisabled
@@ -167,7 +167,20 @@ tinymce.PluginManager.add(
       // events can be started when the editor doesn't have focus.
       if (!editor.hasFocus()) editor.rceWrapper?.focus()
 
-      for (const file of Array.from(files)) {
+      // Checking if we've encountered an issue with file processing for paste events in the browser
+      // Specifically implementing due to this bug in Firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=1699743
+      // However, there could be other issues that cause this condition so it's a nice safety net regardless
+      if (isPaste && files.some(file => file.size === 0)) {
+        showFlashAlert({
+          message: formatMessage(
+            'One or more files failed to paste. Please try uploading or dragging and dropping files.'
+          ),
+          type: 'error',
+        })
+        return
+      }
+
+      for (const file of files) {
         if (isAudioVideoDisabled && isAudioOrVideo(file.type)) {
           // Skip audio and video files when disabled
           continue
