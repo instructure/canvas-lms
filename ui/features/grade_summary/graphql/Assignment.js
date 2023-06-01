@@ -49,6 +49,7 @@ export const Assignment = {
     htmlUrl: string,
     name: string,
     pointsPossible: float,
+    gradingType: string,
     assignmentGroup: {
       _id: string,
       name: string,
@@ -63,20 +64,13 @@ export const Assignment = {
     htmlUrl = 'https://example.com',
     name = 'Assignment 1',
     pointsPossible = 100,
+    gradingType = 'points',
     assignmentGroup = {
       _id: '1',
       name: 'Group 1',
     },
     submissionsConnection = {
-      nodes: [
-        Submission.mock(),
-        Submission.mock({
-          _id: '2',
-          grade: 'B',
-          score: 80,
-          hideGradeFromStudent: true,
-        }),
-      ],
+      nodes: [Submission.mock()],
     },
   } = {}) => ({
     _id,
@@ -84,6 +78,7 @@ export const Assignment = {
     htmlUrl,
     name,
     pointsPossible,
+    gradingType,
     assignmentGroup,
     submissionsConnection,
   }),
