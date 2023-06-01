@@ -153,7 +153,9 @@ describe "CanvasHttp" do
       http = double
       allow(Net::HTTP).to receive(:new) { http }
       expect(http).to receive(:use_ssl=).with(true)
-      expect(http).to receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_NONE)
+      expect(http).not_to receive(:verify_mode).with(OpenSSL::SSL::VERIFY_NONE)
+      expect(http).to receive(:verify_hostname=).with(false) # temporary; until all offenders are fixed
+      expect(http).to receive(:verify_callback=)             # temporary; until all offenders are fixed
       expect(http).to receive(:request).and_yield(double(body: "Hello SSL"))
       expect(http).to receive(:open_timeout=).with(5)
       expect(http).to receive(:ssl_timeout=).with(5)
