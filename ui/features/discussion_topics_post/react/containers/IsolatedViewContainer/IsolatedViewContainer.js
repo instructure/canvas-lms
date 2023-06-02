@@ -198,7 +198,8 @@ export const IsolatedViewContainer = props => {
     window.open(getSpeedGraderUrl(discussionEntry.author._id), '_blank')
   }
 
-  const onReplySubmit = (message, file, includeReplyPreview, replyId, isAnonymousAuthor) => {
+  // This reply method is used for isolated view replies
+  const onReplySubmit = (message, file, quotedEntryId, replyId, isAnonymousAuthor) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
@@ -206,8 +207,9 @@ export const IsolatedViewContainer = props => {
         isAnonymousAuthor,
         message,
         fileId: file?._id,
-        includeReplyPreview,
+        includeReplyPreview: !!quotedEntryId,
         courseID: ENV.course_id,
+        quotedEntryId,
       },
       optimisticResponse: getOptimisticResponse({
         message,
@@ -424,11 +426,11 @@ export const IsolatedViewContainer = props => {
                 rceIdentifier={props.replyFromId}
                 discussionAnonymousState={props.discussionTopic?.anonymousState}
                 canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
-                onSubmit={(message, includeReplyPreview, file, anonymousAuthorState) => {
+                onSubmit={(message, quotedEntryId, file, anonymousAuthorState) => {
                   onReplySubmit(
                     message,
                     file,
-                    includeReplyPreview,
+                    quotedEntryId,
                     props.replyFromId,
                     anonymousAuthorState
                   )

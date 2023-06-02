@@ -369,7 +369,8 @@ export const DiscussionThreadContainer = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expandReplies])
 
-  const onReplySubmit = (message, includeReplyPreview, _replyId, isAnonymousAuthor, file) => {
+  // This reply is used with inline-view reply
+  const onReplySubmit = (message, quotedEntryId, isAnonymousAuthor, file) => {
     const getParentId = () => {
       switch (props.discussionEntry.depth) {
         case 1:
@@ -388,9 +389,10 @@ export const DiscussionThreadContainer = props => {
         parentEntryId: getParentId(),
         fileId: file?._id,
         isAnonymousAuthor,
-        includeReplyPreview,
+        includeReplyPreview: !!quotedEntryId,
         message,
         courseID: ENV.course_id,
+        quotedEntryId,
       },
       optimisticResponse: getOptimisticResponse({
         message,
@@ -398,7 +400,7 @@ export const DiscussionThreadContainer = props => {
         parentId: getParentId(),
         rootEntryId: props.discussionEntry.rootEntryId,
         quotedEntry:
-          includeReplyPreview && typeof buildQuotedReply === 'function'
+          quotedEntryId && typeof buildQuotedReply === 'function'
             ? buildQuotedReply([props.discussionEntry], getParentId())
             : null,
         isAnonymous:
@@ -565,14 +567,8 @@ export const DiscussionThreadContainer = props => {
                   rceIdentifier={props.discussionEntry._id}
                   discussionAnonymousState={props.discussionTopic?.anonymousState}
                   canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
-                  onSubmit={(message, includeReplyPreview, file, anonymousAuthorState) => {
-                    onReplySubmit(
-                      message,
-                      includeReplyPreview,
-                      props.discussionEntry.parentId,
-                      anonymousAuthorState,
-                      file
-                    )
+                  onSubmit={(message, quotedEntryId, file, anonymousAuthorState) => {
+                    onReplySubmit(message, quotedEntryId, anonymousAuthorState, file)
                   }}
                   onCancel={() => setEditorExpanded(false)}
                   quotedEntry={buildQuotedReply([props.discussionEntry], replyFromId)}

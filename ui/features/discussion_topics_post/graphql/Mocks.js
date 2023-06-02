@@ -420,6 +420,7 @@ export const createDiscussionEntryMock = ({
   includeReplyPreview = null,
   isAnonymousAuthor = false,
   courseID = '1',
+  quotedEntryId = undefined,
 } = {}) => [
   {
     request: {
@@ -432,6 +433,7 @@ export const createDiscussionEntryMock = ({
         ...(fileId !== null && {fileId}),
         ...(includeReplyPreview !== null && {includeReplyPreview}),
         ...(courseID !== null && {courseID}),
+        ...(quotedEntryId !== undefined && {quotedEntryId}),
       },
     },
     result: {

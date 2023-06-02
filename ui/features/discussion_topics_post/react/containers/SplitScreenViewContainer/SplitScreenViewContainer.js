@@ -198,7 +198,8 @@ export const SplitScreenViewContainer = props => {
     window.open(getSpeedGraderUrl(discussionEntry.author._id), '_blank')
   }
 
-  const onReplySubmit = (message, file, includeReplyPreview, isAnonymousAuthor) => {
+  // This reply method is used for the split-screen reply
+  const onReplySubmit = (message, file, quotedEntryId, isAnonymousAuthor) => {
     // In this case. The parentEntry is the Entry that was clicked to start the reply
     const parentEntryDepth = splitScreenEntryOlderDirection.data.legacyNode.depth
     const parentId = splitScreenEntryOlderDirection.data.legacyNode._id
@@ -223,8 +224,9 @@ export const SplitScreenViewContainer = props => {
         isAnonymousAuthor,
         message,
         fileId: file?._id,
-        includeReplyPreview,
+        includeReplyPreview: !!quotedEntryId,
         courseID: ENV.course_id,
+        quotedEntryId,
       },
       optimisticResponse: getOptimisticResponse({
         message,
@@ -465,8 +467,8 @@ export const SplitScreenViewContainer = props => {
                 rceIdentifier={props.discussionEntryId}
                 discussionAnonymousState={props.discussionTopic?.anonymousState}
                 canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
-                onSubmit={(message, includeReplyPreview, file, anonymousAuthorState) => {
-                  onReplySubmit(message, file, includeReplyPreview, anonymousAuthorState)
+                onSubmit={(message, quotedEntryId, file, anonymousAuthorState) => {
+                  onReplySubmit(message, file, quotedEntryId, anonymousAuthorState)
                   props.setRCEOpen(false)
                 }}
                 onCancel={() => props.setRCEOpen(false)}
