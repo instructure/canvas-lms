@@ -19,11 +19,14 @@
 
 import htmlEscape from 'html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import listFormatterPolyfill from '@canvas/util/listFormatter'
 import type Gradebook from '../../Gradebook'
 
 const I18n = useI18nScope('gradebook')
 
-const listFormatter = new Intl.ListFormat(ENV.LOCALE || navigator.language)
+const listFormatter = Intl.ListFormat
+  ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
+  : listFormatterPolyfill
 
 export function getSecondaryDisplayInfo(
   student: {
