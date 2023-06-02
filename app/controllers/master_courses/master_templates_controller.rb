@@ -478,6 +478,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     items = []
     GuardRail.activate(:secondary) do
       MasterCourses::CONTENT_TYPES_FOR_UNSYNCED_CHANGES.each do |klass|
+        next if klass == "MediaTrack" && !Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
+
         item_scope = case klass
                      when "Attachment"
                        @course.attachments
