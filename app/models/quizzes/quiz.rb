@@ -1288,7 +1288,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def teachers
-    context.teacher_enrollments.map(&:user)
+    context.teacher_enrollments.current.map(&:user)
   end
 
   def self.lockdown_browser_plugin_enabled?
