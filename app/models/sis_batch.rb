@@ -20,6 +20,7 @@
 
 class SisBatch < ActiveRecord::Base
   include Workflow
+  include CaptureJobIds
   belongs_to :account
   serialize :data
   serialize :options, Hash
@@ -190,6 +191,7 @@ class SisBatch < ActiveRecord::Base
         self.workflow_state = :importing
         self.progress = 0
         self.started_at = Time.now.utc
+        capture_job_id
         save
       else
         return_after_transaction = true
