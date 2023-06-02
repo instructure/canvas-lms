@@ -1056,6 +1056,28 @@ describe ContentMigration do
     end
   end
 
+  context "insert_into_module_id" do
+    it "successfully migrates into context module" do
+      @module = @course.context_modules.create! name: "test"
+
+      @cm.migration_type = "common_cartridge_importer"
+      @cm.migration_settings["import_immediately"] = true
+      @cm.migration_settings["insert_into_module_id"] = @module.id
+      @cm.save!
+
+      package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/child-course-2-export.imscc")
+      attachment = Attachment.new(context: @cm, filename: "file.zip")
+      attachment.uploaded_data = File.open(package_path, "rb")
+      attachment.save!
+
+      @cm.update_attribute(:attachment, attachment)
+      @cm.queue_migration
+      run_jobs
+      expect(@module.content_tags.length).to eq 5
+      expect(@module.content_tags.map(&:title)).to eq(["Whatever Else", "Assignment 1 Upper", "Whatever", "Assignment 1 Upper", "Whatever Else Else"])
+    end
+  end
+
   context "migration issues" do
     let(:err) { StandardError.new("TestError") }
 
