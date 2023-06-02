@@ -1629,6 +1629,18 @@ describe Quizzes::Quiz do
     end
   end
 
+  describe "#teachers" do
+    it "does not include concluded teachers" do
+      course_with_teacher(course: @course, active_all: true)
+      @concluded_teacher = User.create(name: "Mr. Professor")
+      @course.enroll_teacher(@concluded_teacher).accept
+      @concluded_teacher.enrollments.each(&:conclude)
+      quiz = @course.quizzes.create!
+
+      expect(quiz.teachers).to_not include(@concluded_teacher)
+    end
+  end
+
   describe "#questions_regraded_since" do
     before :once do
       course_with_teacher(active_all: true)
