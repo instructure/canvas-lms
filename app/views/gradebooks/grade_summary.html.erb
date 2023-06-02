@@ -77,7 +77,7 @@
           </div>
         <% end %>
       </div>
-      <% if @presenter.editable? %>
+      <% if @presenter.editable? && !@context.restrict_quantitative_data?(@current_user)%>
         <div id="whatif-score-description">
           <%= whatif_instructions %>
         </div>
@@ -138,7 +138,7 @@
         id="grades_summary"
         class="<%= 'editable' if @presenter.editable? %> ic-Table ic-Table--hover-row <%= 'ic-Table--grades-summary-table' if @use_responsive_design %>"
       >
-        <% if @presenter.editable? %>
+        <% if @presenter.editable? && !@context.restrict_quantitative_data?(@current_user) %>
           <caption class="screenreader-only"><%= whatif_instructions %></caption>
         <% end %>
         <thead>
