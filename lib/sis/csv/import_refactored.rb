@@ -273,9 +273,9 @@ module SIS
         csv = input_csv || begin
           att = parallel_importer.attachment
           file = att.open(integrity_check: true)
-          parallel_importer.start
           { fullpath: file.path, file: att.display_name }
         end
+        parallel_importer.start
         raise "Empty file" if File.stat(csv[:fullpath]).size == 0
 
         count = importer_object.process(csv, parallel_importer.index, parallel_importer.batch_size)
