@@ -55,6 +55,7 @@ class ContextModulesController < ApplicationController
                            @can_delete,
                            @is_student,
                            @can_view_unpublished,
+                           @context.is_a?(Course) ? @context.restrict_quantitative_data?(@current_user) : false,
                            "all_context_modules_draft_10",
                            collection_cache_key(@modules),
                            Time.zone,
