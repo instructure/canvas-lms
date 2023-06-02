@@ -355,7 +355,7 @@ class ExternalToolsController < ApplicationController
   # @response_field description A description of the tool
   # @response_field created_at Timestamp of creation
   # @response_field updated_at Timestamp of last update
-  # @response_field privacy_level What information to send to the external tool, "anonymous", "name_only", "public"
+  # @response_field privacy_level How much user information to send to the external tool: "anonymous", "name_only", "email_only", "public"
   # @response_field custom_fields Custom fields that will be sent to the tool consumer
   # @response_field is_rce_favorite Boolean determining whether this tool should be in a preferred location in the RCE.
   # @response_field account_navigation The configuration for account navigation links (see create API for values)
@@ -829,8 +829,8 @@ class ExternalToolsController < ApplicationController
   # @argument name [Required, String]
   #   The name of the tool
   #
-  # @argument privacy_level [Required, String, "anonymous"|"name_only"|"public"]
-  #   What information to send to the external tool.
+  # @argument privacy_level [Required, String, "anonymous"|"name_only"|"email_only"|"public"]
+  #   How much user information to send to the external tool.
   #
   # @argument consumer_key [Required, String]
   #   The consumer key for the external tool

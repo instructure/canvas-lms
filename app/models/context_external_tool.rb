@@ -500,6 +500,8 @@ class ContextExternalTool < ActiveRecord::Base
     workflow_state.titleize
   end
 
+  # --- Privacy Level ---
+  # See doc/lti_manual/16_privacy_level.md for a full explanation
   def privacy_level=(val)
     if %w[anonymous name_only email_only public].include?(val)
       self.workflow_state = val
@@ -509,6 +511,15 @@ class ContextExternalTool < ActiveRecord::Base
   def privacy_level
     workflow_state
   end
+
+  def include_email?
+    email_only? || public?
+  end
+
+  def include_name?
+    name_only? || public?
+  end
+  # --- End Privacy Level ---
 
   def custom_fields_string
     (settings[:custom_fields] || {}).map do |key, val|
@@ -855,14 +866,6 @@ class ContextExternalTool < ActiveRecord::Base
   def destroy
     self.workflow_state = "deleted"
     save!
-  end
-
-  def include_email?
-    email_only? || public?
-  end
-
-  def include_name?
-    name_only? || public?
   end
 
   def precedence
