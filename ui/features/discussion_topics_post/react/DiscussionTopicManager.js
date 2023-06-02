@@ -303,6 +303,7 @@ const DiscussionTopicManager = props => {
     }
   }
 
+  // This mutation is used when replying to the root topic
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
     update: updateCache,
     onCompleted: data => {
