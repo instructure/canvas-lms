@@ -58,6 +58,13 @@ describe WikiPagesController do
         get "show", params: { course_id: @course.id, id: @page.url }
         expect(response).to be_successful
       end
+
+      it "redirects to current page url" do
+        Account.site_admin.enable_feature!(:permanent_page_links)
+        @page.wiki_page_lookups.create!(slug: "an-old-url")
+        get "show", params: { course_id: @course.id, id: "an-old-url" }
+        expect(response).to redirect_to(course_wiki_page_url(@course, "ponies5ever"))
+      end
     end
 
     describe "GET 'edit'" do

@@ -109,6 +109,9 @@ class WikiPagesController < ApplicationController
 
       if authorized_action(@page, @current_user, :read) &&
          (!@context.conditional_release? || enforce_assignment_visible(@page))
+        if params[:id] != @page.url
+          redirect_to polymorphic_url([@context, :wiki_page], id: @page, titleize: params[:titleize])
+        end
         add_crumb(@page.title)
         log_asset_access(@page, "wiki", @wiki)
         wiki_pages_js_env(@context)
