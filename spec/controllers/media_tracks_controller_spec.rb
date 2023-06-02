@@ -275,6 +275,14 @@ describe MediaTracksController do
     end
 
     describe "#create" do
+      it "gives an error if you don't have permission to change the attachment" do
+        expect(Attachment).to receive(:find_by).with(id: @attachment.id.to_s).and_return(@attachment)
+        expect(@attachment).to receive(:editing_restricted?).with(:content).and_return(true)
+
+        post "create", params: { attachment_id: @attachment.id, kind: "subtitles", locale: "en", content: "one track mind" }
+        expect(response).to be_unauthorized
+      end
+
       it "creates a track" do
         content = "one track mind"
         post "create", params: { attachment_id: @attachment.id, kind: "subtitles", locale: "en", content: }
@@ -361,6 +369,15 @@ describe MediaTracksController do
     end
 
     describe "#destroy" do
+      it "gives an error if you don't have permission to change the attachment" do
+        expect(Attachment).to receive(:find_by).with(id: @attachment.id.to_s).and_return(@attachment)
+        expect(@attachment).to receive(:editing_restricted?).with(:content).and_return(true)
+
+        track = @attachment.media_tracks.create!(kind: "subtitles", locale: "en", content: "subs", media_object: @mo)
+        delete "destroy", params: { attachment_id: @attachment.id, id: track.id }
+        expect(response).to be_unauthorized
+      end
+
       it "destroys a track from a MediaObject's default attachment" do
         attachment1 = @attachment
         track1 = attachment1.media_tracks.create!(kind: "subtitles", locale: "en", content: "subs", media_object: @mo)
@@ -449,6 +466,23 @@ describe MediaTracksController do
     end
 
     describe "#update" do
+      it "gives an error if you don't have permission to change the attachment" do
+        expect(Attachment).to receive(:find_by).with(id: @attachment.id.to_s).and_return(@attachment)
+        expect(@attachment).to receive(:editing_restricted?).with(:content).and_return(true)
+
+        tracks = {}
+        tracks["en"] = @attachment.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher.id)
+        tracks["af"] = @attachment.media_tracks.create!(kind: "subtitles", locale: "af", content: "af subs", user_id: @teacher.id)
+        put "update",
+            params: {
+              attachment_id: @attachment.id,
+              include: ["content"]
+            },
+            body: JSON.generate([{ locale: "en", content: "new en" }, { locale: "es", content: "new es" }, { locale: "br" }]),
+            format: :json
+        expect(response).to be_unauthorized
+      end
+
       it "updates tracks" do
         tracks = {}
         tracks["en"] = @attachment.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher.id, media_object: @mo)

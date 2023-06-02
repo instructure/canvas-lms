@@ -176,6 +176,19 @@ describe MasterCourses::Restrictor do
       expect(new_file.reload).not_to be_deleted
       expect(new_file.display_name).not_to eq "blargh"
     end
+
+    it "prevents creating/deleting media tracks associated to a restricted file" do
+      media = media_object
+      @original_file.update(media_entry_id: media.media_id)
+      @original_file.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", media_object: media)
+      caption = @copied_file.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", media_object: media)
+      @file_tag.update(restrictions: { content: true })
+      caption.reload
+      @copied_file.instance_variable_set(:@child_content_restrictions, nil)
+
+      expect { caption.destroy }.to raise_error "cannot change column: captions - locked by Master Course"
+      expect { @copied_file.media_tracks.create!(kind: "subtitles", locale: "fr", content: "fr subs", media_object: media) }.to raise_error "cannot change column: captions - locked by Master Course"
+    end
   end
 
   it "prevents updating a title on a module item for restricted content" do

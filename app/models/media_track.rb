@@ -25,6 +25,8 @@ class MediaTrack < ActiveRecord::Base
   belongs_to :attachment
   before_validation :set_media_and_attachment
   before_save :convert_srt_to_wvtt
+  before_save :check_for_restricted_updates
+  before_destroy :check_for_restricted_updates, prepend: true
   validates :media_object_id, presence: true
   validates :kind, inclusion: { in: %w[subtitles captions descriptions chapters metadata] }
   validates :content, presence: true
@@ -38,6 +40,15 @@ class MediaTrack < ActiveRecord::Base
 
   def is_child_content?
     attachment&.is_child_content?
+  end
+
+  # MasterCourses::CollectionRestrictor handles soft-deletes, but doesn't handle
+  # hard deletes well. One day we  might want to standardize this to
+  # more hard deleted objects.
+  def check_for_restricted_updates
+    return unless attachment&.child_content_restrictions&.dig(:content)
+
+    raise "cannot change column: captions - locked by Master Course"
   end
 
   def set_media_and_attachment
