@@ -23,13 +23,16 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 import htmlEscape from 'html-escape'
+import listFormatterPolyfill from '@canvas/util/listFormatter'
 import type Gradebook from '../../Gradebook'
 import type {Assignment} from '../../../../../../api.d'
 import type {GradingScheme} from '../../gradebook.d'
 
 const I18n = useI18nScope('gradebook')
 
-const listFormatter = new Intl.ListFormat(ENV.LOCALE || navigator.language)
+const listFormatter = Intl.ListFormat
+  ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
+  : listFormatterPolyfill
 
 function getGradePercentage(score, pointsPossible) {
   const grade = scoreToPercentage(score, pointsPossible)

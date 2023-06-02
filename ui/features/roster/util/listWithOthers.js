@@ -18,11 +18,14 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import h from 'html-escape'
+import listFormatterPolyfill from '@canvas/util/listFormatter'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
 const I18n = useI18nScope('listWithOthers')
 
-const listFormatter = new Intl.ListFormat(ENV.LOCALE || navigator.language)
+const listFormatter = Intl.ListFormat
+  ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
+  : listFormatterPolyfill
 
 export default function listWithOthers(strings, cutoff = 2) {
   if (strings.length > cutoff) {
