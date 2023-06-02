@@ -29,13 +29,16 @@ import mimeClass from '@canvas/mime/mimeClass'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {formatMessage, truncateText} from '@canvas/util/TextHelper'
 import numberFormat from '@canvas/i18n/numberFormat'
+import listFormatterPolyfill from '@canvas/util/listFormatter'
 import '@canvas/datetime'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
 const I18n = useI18nScope('handlebars_helpers')
 
-const listFormatter = new Intl.ListFormat(ENV.LOCALE || navigator.language)
+const listFormatter = Intl.ListFormat
+  ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
+  : listFormatterPolyfill
 
 const Handlebars = _Handlebars.default
 
