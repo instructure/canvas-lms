@@ -19,34 +19,37 @@
 import React, {Component} from 'react'
 import moment from 'moment-timezone'
 import classnames from 'classnames'
-import {themeable} from '@instructure/ui-themeable'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {string} from 'prop-types'
 import {sizeShape} from '../plannerPropTypes'
-import styles from './styles.css'
-import theme from './theme'
 import {getShortDate} from '../../utilities/dateUtils'
+import buildStyle from './style'
 import formatMessage from '../../format-message'
 import GroupedDates from './grouped_dates.svg'
 
-export class EmptyDays extends Component {
+export default class EmptyDays extends Component {
+  constructor(props) {
+    super(props)
+    this.style = buildStyle()
+  }
+
   static propTypes = {
     day: string.isRequired,
     endday: string.isRequired,
     timeZone: string.isRequired,
-    responsiveSize: sizeShape
+    responsiveSize: sizeShape,
   }
 
   static defualtProps = {
-    responsiveSize: 'large'
+    responsiveSize: 'large',
   }
 
-  renderDate(start, end) {
+  renderDate = (start, end) => {
     let dateString
     dateString = formatMessage('{startDate} to {endDate}', {
       startDate: getShortDate(start),
-      endDate: getShortDate(end)
+      endDate: getShortDate(end),
     })
     return (
       <Text as="div" lineHeight="condensed">
@@ -55,31 +58,35 @@ export class EmptyDays extends Component {
     )
   }
 
-  render() {
+  render = () => {
     const now = moment.tz(this.props.timeZone)
     const start = moment.tz(this.props.day, this.props.timeZone).startOf('day')
     const end = moment.tz(this.props.endday, this.props.timeZone).endOf('day')
     const includesToday =
       (now.isSame(start, 'day') || now.isAfter(start, 'day')) &&
       (now.isSame(end, 'day') || now.isBefore(end, 'day'))
-    const clazz = classnames(styles.root, styles[this.props.responsiveSize], 'planner-empty-days', {
-      'planner-today': includesToday
-    })
+    const clazz = classnames(
+      this.style.classNames.root,
+      this.style.classNames[this.props.responsiveSize],
+      'planner-empty-days',
+      {'planner-today': includesToday}
+    )
 
     return (
-      <div className={clazz}>
-        <Heading border="bottom">{this.renderDate(start, end)}</Heading>
-        <div className={styles.nothingPlannedContent}>
-          <GroupedDates role="img" aria-hidden="true" />
-          <div className={styles.nothingPlannedContainer}>
-            <div className={styles.nothingPlanned}>
-              <Text size="large">{formatMessage('Nothing Planned Yet')}</Text>
+      <>
+        <style>{this.style.css}</style>
+        <div className={clazz}>
+          <Heading border="bottom">{this.renderDate(start, end)}</Heading>
+          <div className={this.style.classNames.nothingPlannedContent}>
+            <GroupedDates role="img" aria-hidden="true" />
+            <div className={this.style.classNames.nothingPlannedContainer}>
+              <div className={this.style.classNames.nothingPlanned}>
+                <Text size="large">{formatMessage('Nothing Planned Yet')}</Text>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     )
   }
 }
-
-export default themeable(theme, styles)(EmptyDays)
