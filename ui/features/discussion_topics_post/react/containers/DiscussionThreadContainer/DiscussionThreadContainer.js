@@ -28,7 +28,6 @@ import {
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
-  CREATE_DISCUSSION_ENTRY,
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY,
@@ -60,6 +59,7 @@ import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
 import {Text} from '@instructure/ui-text'
+import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -106,17 +106,12 @@ export const DiscussionThreadContainer = props => {
     props.setHighlightEntryId(newDiscussionEntry._id)
   }
 
-  const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
-    update: updateCache,
-    onCompleted: data => {
-      setOnSuccess(I18n.t('The discussion entry was successfully created.'))
-      setExpandReplies(true)
-      props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
-    },
-    onError: () => {
-      setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
-    },
-  })
+  const onEntryCreationCompletion = data => {
+    setExpandReplies(true)
+    props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+  }
+
+  const {createDiscussionEntry} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
 
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
     onCompleted: data => {
@@ -383,30 +378,30 @@ export const DiscussionThreadContainer = props => {
           return props.discussionEntry.rootEntryId
       }
     }
-    createDiscussionEntry({
-      variables: {
-        discussionTopicId: ENV.discussion_topic_id,
-        parentEntryId: getParentId(),
-        fileId: file?._id,
-        isAnonymousAuthor,
-        includeReplyPreview: !!quotedEntryId,
-        message,
-        courseID: ENV.course_id,
-        quotedEntryId,
-      },
-      optimisticResponse: getOptimisticResponse({
-        message,
-        attachment: file,
-        parentId: getParentId(),
-        rootEntryId: props.discussionEntry.rootEntryId,
-        quotedEntry:
-          quotedEntryId && typeof buildQuotedReply === 'function'
-            ? buildQuotedReply([props.discussionEntry], getParentId())
-            : null,
-        isAnonymous:
-          !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously,
-      }),
+    const variables = {
+      discussionTopicId: ENV.discussion_topic_id,
+      parentEntryId: getParentId(),
+      fileId: file?._id,
+      isAnonymousAuthor,
+      includeReplyPreview: !!quotedEntryId,
+      message,
+      courseID: ENV.course_id,
+      quotedEntryId,
+    }
+    const optimisticResponse = getOptimisticResponse({
+      message,
+      attachment: file,
+      parentId: getParentId(),
+      rootEntryId: props.discussionEntry.rootEntryId,
+      quotedEntry:
+        quotedEntryId && typeof buildQuotedReply === 'function'
+          ? buildQuotedReply([props.discussionEntry], getParentId())
+          : null,
+      isAnonymous:
+        !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously,
     })
+    createDiscussionEntry({variables, optimisticResponse})
+
     props.setHighlightEntryId('DISCUSSION_ENTRY_PLACEHOLDER')
     setEditorExpanded(false)
   }

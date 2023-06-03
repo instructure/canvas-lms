@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
 import {DISCUSSION_QUERY} from '../graphql/Queries'
 import {DiscussionTopicToolbarContainer} from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepliesContainer/DiscussionTopicRepliesContainer'
@@ -36,13 +34,14 @@ import {IsolatedViewContainer} from './containers/IsolatedViewContainer/Isolated
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
-import React, {useContext, useEffect, useState} from 'react'
-import {useMutation, useQuery} from 'react-apollo'
+import React, {useEffect, useState} from 'react'
+import {useQuery} from 'react-apollo'
 import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {Mask} from '@instructure/ui-overlays'
 import {Responsive} from '@instructure/ui-responsive'
 import {View} from '@instructure/ui-view'
+import useCreateDiscussionEntry from './hooks/useCreateDiscussionEntry'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -193,7 +192,6 @@ const DiscussionTopicManager = props => {
     }
   }
 
-  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const variables = {
     discussionID: props.discussionTopicId,
     perPage: ENV.per_page,
@@ -303,26 +301,21 @@ const DiscussionTopicManager = props => {
     }
   }
 
-  // This mutation is used when replying to the root topic
-  const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
-    update: updateCache,
-    onCompleted: data => {
-      setOnSuccess(I18n.t('The discussion entry was successfully created.'))
-      setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
-      if (sort === 'asc') {
-        setPageNumber(discussionTopicQuery.data.legacyNode.entriesTotalPages - 1)
-      }
-      if (
-        discussionTopicQuery.data.legacyNode.availableForUser &&
-        discussionTopicQuery.data.legacyNode.initialPostRequiredForCurrentUser
-      ) {
-        discussionTopicQuery.refetch(variables)
-      }
-    },
-    onError: () => {
-      setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
-    },
-  })
+  const onEntryCreationCompletion = data => {
+    setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+    if (sort === 'asc') {
+      setPageNumber(discussionTopicQuery.data.legacyNode.entriesTotalPages - 1)
+    }
+    if (
+      discussionTopicQuery.data.legacyNode.availableForUser &&
+      discussionTopicQuery.data.legacyNode.initialPostRequiredForCurrentUser
+    ) {
+      discussionTopicQuery.refetch(variables)
+    }
+  }
+
+  // Used when replying to the Topic directly
+  const {createDiscussionEntry} = useCreateDiscussionEntry(onEntryCreationCompletion, updateCache)
 
   // why || waitForUnreadFilter: when waitForUnreadFilter, discussionTopicQuery is skipped, but this does not set loading.
   // why && !searchTerm: this is for the search if you type it triggers useQuery and you lose the search.
