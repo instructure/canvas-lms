@@ -274,32 +274,6 @@ class FileUpload extends Component {
               wrap={desktop ? 'no-wrap' : 'wrap'}
               direction={desktop ? 'row' : 'column'}
             >
-              {context.allowChangesToSubmission && (
-                <Flex.Item
-                  padding="xx-small"
-                  width={mobileOnly ? '100%' : desktop ? '330px' : '400px'}
-                >
-                  <MoreOptions
-                    allowedExtensions={this.props.assignment.allowedExtensions}
-                    assignmentID={this.props.assignment._id}
-                    courseID={this.props.assignment.env.courseId}
-                    handleCanvasFiles={this.handleCanvasFiles}
-                    handleWebcamPhotoUpload={
-                      allowWebcamUploads ? this.handleWebcamPhotoUpload : null
-                    }
-                    renderCanvasFiles={true}
-                    userID={this.props.assignment.env.currentUser.id}
-                  />
-                </Flex.Item>
-              )}
-              {context.allowChangesToSubmission && (
-                <Flex.Item textAlign="center" as="div" {...flexLineProps}>
-                  <div style={lineContainerStyle}>
-                    <span style={textOrStyle}>{I18n.t('or')}</span>
-                    <div style={lineStyle}>&nbsp;</div>
-                  </div>
-                </Flex.Item>
-              )}
               <Flex.Item overflowY="visible" width={mobileOnly ? '100%' : '400px'}>
                 <FileDrop
                   accept={
@@ -319,6 +293,32 @@ class FileUpload extends Component {
                   shouldEnablePreview={true}
                 />
               </Flex.Item>
+              {context.allowChangesToSubmission && (
+                <Flex.Item textAlign="center" as="div" {...flexLineProps}>
+                  <div style={lineContainerStyle}>
+                    <span style={textOrStyle}>{I18n.t('or')}</span>
+                    <div style={lineStyle}>&nbsp;</div>
+                  </div>
+                </Flex.Item>
+              )}
+              {context.allowChangesToSubmission && (
+                <Flex.Item
+                  padding="xx-small"
+                  width={mobileOnly ? '100%' : desktop ? '330px' : '400px'}
+                >
+                  <MoreOptions
+                    allowedExtensions={this.props.assignment.allowedExtensions}
+                    assignmentID={this.props.assignment._id}
+                    courseID={this.props.assignment.env.courseId}
+                    handleCanvasFiles={this.handleCanvasFiles}
+                    handleWebcamPhotoUpload={
+                      allowWebcamUploads ? this.handleWebcamPhotoUpload : null
+                    }
+                    renderCanvasFiles={true}
+                    userID={this.props.assignment.env.currentUser.id}
+                  />
+                </Flex.Item>
+              )}
             </Flex>
           </div>
         )}
