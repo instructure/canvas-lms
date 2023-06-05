@@ -201,6 +201,7 @@ module CC
     end
 
     require "set"
+
     class HtmlContentExporter
       attr_reader :course, :user, :media_object_flavor, :media_object_infos
       attr_accessor :referenced_files
@@ -311,7 +312,7 @@ module CC
         host = HostUrl.context_host(@course)
         port = ConfigFile.load("domain").try(:[], :domain).try(:split, ":").try(:[], 1)
         @url_prefix = "#{protocol}://#{host}"
-        @url_prefix += ":#{port}" if !host.include?(":") && port.present?
+        @url_prefix += ":#{port}" if !host&.include?(":") && port.present?
       end
 
       # after LF-232 is stable on master, we should be able to remove this, I think
@@ -381,6 +382,9 @@ module CC
           @used_media_objects << obj
           info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
           @media_object_infos[obj.id] = info
+          if iframe["src"].match?(%r{/media_attachments_iframe/(\d+)})
+            iframe["data-is-media-attachment"] = true
+          end
           iframe["src"] = File.join(WEB_CONTENT_TOKEN, info[:path])
         end
 
