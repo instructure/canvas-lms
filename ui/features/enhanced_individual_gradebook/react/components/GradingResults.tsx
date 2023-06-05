@@ -16,17 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
+import $ from 'jquery'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
-import {AssignmentConnection, GradebookOptions, GradebookUserSubmissionDetails} from '../../types'
+import {
+  ApiCallStatus,
+  AssignmentConnection,
+  GradebookOptions,
+  GradebookUserSubmissionDetails,
+} from '../../types'
 import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
 import {Pill} from '@instructure/ui-pill'
 import {Button} from '@instructure/ui-buttons'
+import {useSubmitScore} from '../hooks/useSubmitScore'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -34,12 +41,42 @@ type Props = {
   courseId: string
   studentId?: string | null
   assignment?: AssignmentConnection
-  gradebookOptions: GradebookOptions // TODO: get this from gradebook settings
+  gradebookOptions: GradebookOptions
+  onSubmissionSaved: (submission: GradebookUserSubmissionDetails) => void
 }
 
-export default function GradingResults({assignment, courseId, gradebookOptions, studentId}: Props) {
+export default function GradingResults({
+  assignment,
+  courseId,
+  gradebookOptions,
+  studentId,
+  onSubmissionSaved,
+}: Props) {
   const {currentStudent, studentSubmissions} = useCurrentStudentInfo(courseId, studentId)
-  const submission = studentSubmissions.find(s => s.assignmentId === assignment?.id)
+  const submission = studentSubmissions?.find(s => s.assignmentId === assignment?.id)
+  const [gradeInput, setGradeInput] = React.useState<string>('')
+
+  const {submit, submitScoreError, submitScoreStatus, savedSubmission} = useSubmitScore()
+
+  useEffect(() => {
+    if (submission) {
+      setGradeInput(submission?.grade ?? '-')
+    }
+  }, [submission])
+
+  useEffect(() => {
+    switch (submitScoreStatus) {
+      case ApiCallStatus.FAILED:
+        $.flashError(submitScoreError)
+        break
+      case ApiCallStatus.COMPLETED:
+        if (!savedSubmission) {
+          return
+        }
+        onSubmissionSaved(savedSubmission)
+        break
+    }
+  }, [submitScoreError, submitScoreStatus, savedSubmission, onSubmissionSaved])
 
   if (!submission || !assignment) {
     return (
@@ -93,6 +130,10 @@ export default function GradingResults({assignment, courseId, gradebookOptions, 
     }
   }
 
+  const submitGrade = async () => {
+    await submit(assignment, submission, gradeInput)
+  }
+
   return (
     <>
       <View as="div">
@@ -125,8 +166,11 @@ export default function GradingResults({assignment, courseId, gradebookOptions, 
               <TextInput
                 display="inline-block"
                 width="14rem"
-                value={submission.grade ?? '-'}
+                value={gradeInput}
+                disabled={submitScoreStatus === ApiCallStatus.PENDING}
                 renderLabel={<ScreenReaderContent>{I18n.t('Student Grade')}</ScreenReaderContent>}
+                onChange={e => setGradeInput(e.target.value)}
+                onBlur={() => submitGrade()}
               />
               <View as="span" margin="0 0 0 small">
                 {outOfText()}

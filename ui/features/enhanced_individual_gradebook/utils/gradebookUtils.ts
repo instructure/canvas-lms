@@ -29,6 +29,7 @@ import {
   SortableAssignment,
   SortableStudent,
 } from '../types'
+import {Submission} from '../../../api.d'
 import {AssignmentGroupCriteriaMap} from '../../../shared/grading/grading.d'
 
 export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupConnection[]): {
@@ -133,6 +134,23 @@ export function computeAssignmentDetailText(
     median: nonNumericGuard(percentile(scores, 0.5)),
     lowerQuartile: nonNumericGuard(percentile(scores, 0.25)),
     upperQuartile: nonNumericGuard(percentile(scores, 0.75)),
+  }
+}
+
+export function mapUnderscoreSubmission(submission: Submission): GradebookUserSubmissionDetails {
+  return {
+    assignmentId: submission.assignment_id,
+    enteredScore: submission.entered_score,
+    excused: submission.excused,
+    grade: submission.grade,
+    id: submission.id,
+    late: submission.late,
+    missing: submission.missing,
+    score: submission.score,
+    submittedAt: submission.submitted_at,
+    userId: submission.user_id,
+    submissionType: submission.submission_type,
+    state: submission.workflow_state,
   }
 }
 

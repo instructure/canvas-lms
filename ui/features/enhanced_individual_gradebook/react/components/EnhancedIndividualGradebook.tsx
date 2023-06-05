@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {useQuery} from 'react-apollo'
 import {useSearchParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -34,6 +34,7 @@ import {
   GradebookOptions,
   GradebookQueryResponse,
   GradebookSortOrder,
+  GradebookUserSubmissionDetails,
   SectionConnection,
   SortableAssignment,
   SortableStudent,
@@ -44,6 +45,7 @@ import {
   mapAssignmentGroupQueryResults,
   mapEnrollmentsToSortableStudents,
 } from '../../utils/gradebookUtils'
+import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -53,14 +55,18 @@ const ASSIGNMENT_SEARCH_PARAM = 'assignment'
 export default function EnhancedIndividualGradebook() {
   const [sections, setSections] = useState<SectionConnection[]>([])
   const [submissions, setSubmissions] = useState<SubmissionConnection[]>([])
-  const [students, setStudents] = useState<SortableStudent[]>([])
-  const [assignments, setAssignments] = useState<SortableAssignment[]>([])
+  const [students, setStudents] = useState<SortableStudent[]>()
+  const [assignments, setAssignments] = useState<SortableAssignment[]>()
 
   const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || '' // TODO: get from somewhere else?
   const [searchParams, setSearchParams] = useSearchParams()
   const studentIdQueryParam = searchParams.get(STUDENT_SEARCH_PARAM)
   const [selectedStudentId, setSelectedStudentId] = useState<string | null | undefined>(
     studentIdQueryParam
+  )
+  const {currentStudent, studentSubmissions, updateSubmissionDetails} = useCurrentStudentInfo(
+    courseId,
+    selectedStudentId
   )
 
   const [assignmentGroupMap, setAssignmentGroupMap] = useState<AssignmentGroupCriteriaMap>({})
@@ -69,7 +75,7 @@ export default function EnhancedIndividualGradebook() {
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null | undefined>(
     assignmentIdQueryParam
   )
-  const selectedAssignment = assignments.find(assignment => assignment.id === selectedAssignmentId)
+  const selectedAssignment = assignments?.find(assignment => assignment.id === selectedAssignmentId)
   const submissionsForSelectedAssignment = submissions.filter(
     submission => submission.assignmentId === selectedAssignmentId
   )
@@ -139,6 +145,23 @@ export default function EnhancedIndividualGradebook() {
     setSearchParams(searchParams)
   }
 
+  const handleSubmissionSaved = useCallback(
+    (newSubmission: GradebookUserSubmissionDetails) => {
+      setSubmissions(prevSubmissions => {
+        const index = prevSubmissions.findIndex(s => s.id === newSubmission.id)
+        if (index > -1) {
+          prevSubmissions[index] = newSubmission
+        } else {
+          prevSubmissions.push(newSubmission)
+        }
+        return [...prevSubmissions]
+      })
+
+      updateSubmissionDetails(newSubmission)
+    },
+    [updateSubmissionDetails]
+  )
+
   return (
     <View as="div">
       <View as="div" className="row-fluid">
@@ -184,13 +207,14 @@ export default function EnhancedIndividualGradebook() {
         courseId={courseId}
         studentId={selectedStudentId}
         gradebookOptions={gradebookOptions}
+        onSubmissionSaved={handleSubmissionSaved}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
       <StudentInformation
-        courseId={courseId}
-        studentId={selectedStudentId}
+        student={currentStudent}
+        submissions={studentSubmissions}
         assignmentGroupMap={assignmentGroupMap}
         gradebookOptions={gradebookOptions}
       />

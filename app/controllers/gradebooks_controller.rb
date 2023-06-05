@@ -548,6 +548,7 @@ class GradebooksController < ApplicationController
   def set_enhanced_individual_gradebook_env
     gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     gradebook_options = {
+      change_grade_url: api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility]),
       context_id: @context.id.to_s,
       context_url: named_context_url(@context, :context_url),
       gradebook_is_editable: gradebook_is_editable,

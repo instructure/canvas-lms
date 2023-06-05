@@ -18,39 +18,28 @@
 
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import LoadingIndicator from '@canvas/loading-indicator'
 
 import {GradebookOptions, SortableAssignment, SortableStudent} from '../../types'
 import {View} from '@instructure/ui-view'
-import {filterAssignmentsByStudent, sortAssignments} from '../../utils/gradebookUtils'
 import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
+import {
+  useAssignmentDropdownOptions,
+  useUserDropdownOptions,
+} from '../hooks/useContentDropdownOptions'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   courseId: string
-  assignments: SortableAssignment[]
-  students: SortableStudent[]
+  assignments?: SortableAssignment[]
+  students?: SortableStudent[]
   selectedStudentId?: string | null
   selectedAssignmentId?: string | null
   gradebookOptions: GradebookOptions
   onStudentChange: (studentId?: string) => void
   onAssignmentChange: (assignmentId?: string) => void
 }
-
-type DropDownOption<T> = {
-  id: string
-  name: string
-  data?: T
-}
-
-type StudentDropdownOption = DropDownOption<SortableStudent>[]
-type AssignmentDropdownOption = DropDownOption<SortableAssignment>[]
-
-const DEFAULT_STUDENT_DROPDOWN_TEXT = I18n.t('No Student Selected')
-const DEFAULT_ASSIGNMENT_DROPDOWN_TEXT = I18n.t('No Assignment Selected')
-
-const defaultStudentDropdownOptions = {id: '-1', name: DEFAULT_STUDENT_DROPDOWN_TEXT}
-const defaultAssignmentDropdownOptions = {id: '-1', name: DEFAULT_ASSIGNMENT_DROPDOWN_TEXT}
 
 export default function ContentSelection({
   courseId,
@@ -62,32 +51,27 @@ export default function ContentSelection({
   onAssignmentChange,
   onStudentChange,
 }: Props) {
-  const [studentDropdownOptions, setStudentDropdownOptions] = useState<StudentDropdownOption>([])
-  const [assignmentDropdownOptions, setAssignmentDropdownOptions] =
-    useState<AssignmentDropdownOption>([])
   const [selectedStudentIndex, setSelectedStudentIndex] = useState<number>(0)
   const [selectedAssignmentIndex, setSelectedAssignmentIndex] = useState<number>(0)
   const {studentSubmissions} = useCurrentStudentInfo(courseId, selectedStudentId)
 
   const {sortOrder, selectedSection} = gradebookOptions
 
-  // TOOD: might be ablet to refactor to make simpler
+  const {studentDropdownOptions} = useUserDropdownOptions({students, selectedSection})
+  const {assignmentDropdownOptions} = useAssignmentDropdownOptions({
+    assignments,
+    sortOrder,
+    studentSubmissions,
+    selectedStudentId,
+  })
+
   useEffect(() => {
-    const filteredStudents = selectedSection
-      ? students.filter(student => student.sections.includes(selectedSection))
-      : students
-    const studentOptions: StudentDropdownOption = [
-      defaultStudentDropdownOptions,
-      ...filteredStudents.map(student => ({
-        id: student.id,
-        name: student.sortableName,
-        data: student,
-      })),
-    ]
-    setStudentDropdownOptions(studentOptions)
+    if (!studentDropdownOptions) {
+      return
+    }
 
     if (selectedStudentId) {
-      const studentIndex = studentOptions.findIndex(
+      const studentIndex = studentDropdownOptions.findIndex(
         studentOption => studentOption.id === selectedStudentId
       )
 
@@ -99,24 +83,15 @@ export default function ContentSelection({
         onStudentChange(undefined)
       }
     }
+  }, [selectedStudentId, studentDropdownOptions, setSelectedStudentIndex, onStudentChange])
 
-    const sortedAssignments = sortAssignments(assignments, sortOrder)
-    const filteredAssignmnets = selectedStudentId
-      ? filterAssignmentsByStudent(sortedAssignments, studentSubmissions)
-      : sortedAssignments
-
-    const assignmentOptions: AssignmentDropdownOption = [
-      defaultAssignmentDropdownOptions,
-      ...filteredAssignmnets.map(assignment => ({
-        id: assignment.id,
-        name: assignment.name,
-        data: assignment,
-      })),
-    ]
-    setAssignmentDropdownOptions(assignmentOptions)
+  useEffect(() => {
+    if (!assignmentDropdownOptions) {
+      return
+    }
 
     if (selectedAssignmentId) {
-      const assignmentIndex = assignmentOptions.findIndex(
+      const assignmentIndex = assignmentDropdownOptions.findIndex(
         assignmentOption => assignmentOption.id === selectedAssignmentId
       )
 
@@ -129,16 +104,15 @@ export default function ContentSelection({
       }
     }
   }, [
-    students,
-    assignments,
-    selectedStudentId,
+    assignmentDropdownOptions,
     selectedAssignmentId,
-    selectedSection,
-    sortOrder,
-    studentSubmissions,
     onAssignmentChange,
-    onStudentChange,
+    setSelectedAssignmentIndex,
   ])
+
+  if (!studentDropdownOptions || !assignmentDropdownOptions) {
+    return <LoadingIndicator />
+  }
 
   const handleChangeStudent = (event?: React.ChangeEvent<HTMLSelectElement>, newIndex?: number) => {
     const selectedIndex = (event ? event.target.selectedIndex : newIndex) ?? 0

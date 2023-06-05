@@ -80,7 +80,7 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
       usersConnection(
         filter: {
           enrollmentTypes: [StudentEnrollment, StudentViewEnrollment]
-          enrollmentStates: active
+          enrollmentStates: [active, invited]
           userIds: $userIds
         }
       ) {
@@ -120,6 +120,7 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           late
           latePolicyStatus
           missing
+          userId
         }
       }
     }
