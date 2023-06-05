@@ -24,6 +24,7 @@ import * as fakeSource from '../../../../rcs/fake'
 import initialState from '../../../../sidebar/store/initialState'
 import sidebarHandlers from '../../../../sidebar/containers/sidebarHandlers'
 import CanvasContentTray from '../CanvasContentTray'
+import {LinkDisplay} from '../LinkDisplay'
 
 jest.useFakeTimers()
 jest.mock('../../../../canvasFileBrowser/FileBrowser', () => {
@@ -43,6 +44,9 @@ jest.mock('../../../../bridge', () => {
   original.default.insertLink = jest.fn()
   return original
 })
+jest.mock('../LinkDisplay', () => ({
+  LinkDisplay: jest.fn(() => <div data-testid="LinkDisplay" />),
+}))
 
 const storeInitialState = {
   ...initialState({
@@ -146,6 +150,17 @@ describe('RCE Plugins > CanvasContentTray', () => {
           type: 'wikiPages',
           published: true,
         })
+      })
+    })
+
+    it('sets placeholder to the current link title', async () => {
+      renderComponent()
+      await showTrayForPlugin('course_link_edit')
+      await waitFor(() => {
+        expect(LinkDisplay).toHaveBeenCalledWith(
+          expect.objectContaining({placeholderText: 'some filename'}),
+          {}
+        )
       })
     })
   })

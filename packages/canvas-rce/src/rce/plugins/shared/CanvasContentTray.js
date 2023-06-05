@@ -289,7 +289,7 @@ export default function CanvasContentTray(props) {
             published,
           })
           setLinkText(text)
-          setPlaceholderText(text)
+          setPlaceholderText(fileName)
         } else {
           setIsEditTray(false)
         }
@@ -371,7 +371,7 @@ export default function CanvasContentTray(props) {
     const newLink = {
       ...link,
       forceRename: true,
-      text: linkText || placeholderText,
+      text: linkText,
     }
 
     bridge.insertLink(newLink)
@@ -490,7 +490,7 @@ export default function CanvasContentTray(props) {
               <LinkDisplay
                 linkText={linkText}
                 Icon={Icon}
-                placeholderText={placeholderText}
+                placeholderText={link?.title || placeholderText}
                 linkFileName={link?.title || ''}
                 published={link?.published || false}
                 handleTextChange={setLinkText}
