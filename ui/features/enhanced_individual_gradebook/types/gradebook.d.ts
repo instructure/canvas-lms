@@ -54,3 +54,11 @@ export type AssignmentSortContext = {
 export type SortableStudent = UserConnection & {
   sections: string[]
 }
+
+export enum ApiCallStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  NO_CHANGE = 'NO_CHANGE',
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+}

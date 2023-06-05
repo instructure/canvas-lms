@@ -21,28 +21,29 @@ import {View} from '@instructure/ui-view'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {GradebookOptions} from '../../types'
+import {
+  GradebookOptions,
+  GradebookStudentDetails,
+  GradebookUserSubmissionDetails,
+} from '../../types'
 import {AssignmentGroupCriteriaMap, SubmissionGradeCriteria} from '@canvas/grading/grading'
-import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
-  courseId: string
-  studentId?: string | null
+  student?: GradebookStudentDetails
+  submissions?: GradebookUserSubmissionDetails[]
   assignmentGroupMap: AssignmentGroupCriteriaMap
   gradebookOptions: GradebookOptions // TODO: get this from gradebook settings
 }
 
 export default function StudentInformation({
-  courseId,
-  studentId,
   assignmentGroupMap,
   gradebookOptions,
+  student,
+  submissions,
 }: Props) {
-  const {currentStudent, studentSubmissions} = useCurrentStudentInfo(courseId, studentId)
-
-  if (!currentStudent || !studentId) {
+  if (!student || !submissions) {
     return (
       <View as="div">
         <View as="div" className="row-fluid">
@@ -59,7 +60,7 @@ export default function StudentInformation({
     )
   }
 
-  const submissions: SubmissionGradeCriteria[] = studentSubmissions.map(submission => {
+  const gradeCriteriaSubmissions: SubmissionGradeCriteria[] = submissions.map(submission => {
     return {
       assignment_id: submission.assignmentId,
       excused: false,
@@ -77,7 +78,7 @@ export default function StudentInformation({
 
   // TODO: get weighting scheme from course & other options
   const {final, assignmentGroups, current} = CourseGradeCalculator.calculate(
-    submissions,
+    gradeCriteriaSubmissions,
     assignmentGroupMap,
     'points',
     true
@@ -94,7 +95,7 @@ export default function StudentInformation({
         </View>
         <View as="div" className="span8">
           <View as="h3" className="student_selection">
-            <a href="studentUrl"> {currentStudent.name}</a>
+            <a href="studentUrl"> {student.name}</a>
           </View>
 
           <View as="div">
@@ -102,14 +103,14 @@ export default function StudentInformation({
               {I18n.t('Secondary ID:')}
               <View as="span" className="secondary_id">
                 {' '}
-                {currentStudent.loginId}
+                {student.loginId}
               </View>
             </View>
           </View>
           <View as="div">
             <View as="strong">
               {I18n.t('Sections: ')}
-              {currentStudent.enrollments.map(enrollment => enrollment.section.name).join(', ')}
+              {student.enrollments.map(enrollment => enrollment.section.name).join(', ')}
             </View>
           </View>
 

@@ -91,6 +91,7 @@ export type GradebookOptions = {
   assignment_missing_shortcut: boolean
   attachment_url: null | string
   attachment: null | AttachmentData
+  change_grade_url: string
   change_gradebook_version_url: string
   colors: StatusColors
   context_allows_gradebook_uploads: boolean
