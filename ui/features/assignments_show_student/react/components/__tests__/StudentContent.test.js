@@ -503,7 +503,9 @@ describe('Assignment Student Content View', () => {
         </MockedProvider>
       )
       // Reason why this is showing up twice is once for screenreader content and again for regular content
-      expect(getAllByText('Available: Jul 11, 2016 7:00pm')).toHaveLength(2)
+      expect(getAllByText('Available: Jul 11, 2016 7:00pm until Nov 11, 2016 7:00pm')).toHaveLength(
+        2
+      )
     })
   })
 
