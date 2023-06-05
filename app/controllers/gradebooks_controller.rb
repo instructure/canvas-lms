@@ -547,10 +547,15 @@ class GradebooksController < ApplicationController
 
   def set_enhanced_individual_gradebook_env
     gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
+    last_exported_gradebook_csv = GradebookCSV.last_successful_export(course: @context, user: @current_user)
+    last_exported_attachment = last_exported_gradebook_csv.try(:attachment)
     gradebook_options = {
       change_grade_url: api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility]),
+      attachment_url: authenticated_download_url(last_exported_attachment),
       context_id: @context.id.to_s,
       context_url: named_context_url(@context, :context_url),
+      export_gradebook_csv_url: course_gradebook_csv_url,
+      gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_is_editable:,
       individual_gradebook_enhancements: true,
       outcome_gradebook_enabled: outcome_gradebook_enabled?

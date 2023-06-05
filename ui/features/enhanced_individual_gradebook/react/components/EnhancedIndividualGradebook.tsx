@@ -85,6 +85,11 @@ export default function EnhancedIndividualGradebook() {
     GradebookSortOrder.Alphabetical
   const defaultGradebookOptions: GradebookOptions = {
     sortOrder: defaultAssignmentSort,
+    exportGradebookCsvUrl: ENV.GRADEBOOK_OPTIONS?.export_gradebook_csv_url,
+    lastGeneratedCsvAttachmentUrl: ENV.GRADEBOOK_OPTIONS?.attachment_url,
+    gradebookCsvProgress: ENV.GRADEBOOK_OPTIONS?.gradebook_csv_progress,
+    contextUrl: ENV.GRADEBOOK_OPTIONS?.context_url,
+    userId: ENV.current_user_id,
   }
   const [gradebookOptions, setGradebookOptions] =
     useState<GradebookOptions>(defaultGradebookOptions)

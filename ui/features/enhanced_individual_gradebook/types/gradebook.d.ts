@@ -17,6 +17,7 @@
  */
 
 import {AssignmentConnection, UserConnection} from './queries'
+import {ProgressData} from 'features/gradebook/react/default_gradebook/gradebook'
 
 export enum GradebookSortOrder {
   DueDate = 'dueDate',
@@ -29,6 +30,11 @@ export type GradebookOptions = {
   anonymizeStudents?: boolean
   sortOrder: GradebookSortOrder
   selectedSection?: string
+  exportGradebookCsvUrl?: string
+  lastGeneratedCsvAttachmentUrl?: string | null
+  gradebookCsvProgress?: ProgressData | null
+  contextUrl?: string
+  userId?: string
 }
 
 export type AssignmentDetailCalculationText = {
