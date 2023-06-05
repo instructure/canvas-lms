@@ -358,6 +358,9 @@ export default function CanvasContentTray(props) {
   }
 
   function handleCloseTray() {
+    // clear the store's saved search string so the tray doesn't
+    // reopen with a previous tray instance's search results
+    storeProps.onChangeSearchString('')
     setHasOpened(false)
     onTrayClosing && onTrayClosing(false) // tell RCEWrapper we're closed
   }

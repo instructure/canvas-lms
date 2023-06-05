@@ -102,6 +102,19 @@ describe('RCE Plugins > CanvasContentTray', () => {
     return getTray().getAttribute('aria-label')
   }
 
+  it('clears search string on tray close', async () => {
+    const mockOnChangeSearchString = jest.fn()
+    renderComponent(
+      getProps({storeProps: {...storeInitialState, onChangeSearchString: mockOnChangeSearchString}})
+    )
+    await showTrayForPlugin('links')
+    const closeButton = component.getByTestId('CloseButton_ContentTray').querySelector('button')
+    closeButton.focus()
+    closeButton.click()
+    await waitForElementToBeRemoved(() => component.queryByTestId('CanvasContentTray'))
+    expect(mockOnChangeSearchString).toHaveBeenLastCalledWith('')
+  })
+
   describe('Edit Course Links Tray', () => {
     beforeEach(async () => {
       renderComponent()
