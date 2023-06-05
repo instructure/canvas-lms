@@ -32,7 +32,6 @@ describe ImportedHtmlConverter do
     def convert_and_replace(test_string)
       html = @migration.convert_html(test_string, "sometype", "somemigid", "somefield")
       link_map = @converter.link_parser.unresolved_link_map
-
       @converter.link_resolver.resolve_links!(link_map)
       if link_map.present?
         @converter.link_replacer.sub_placeholders!(html, link_map.values.map(&:values).flatten)
@@ -227,6 +226,22 @@ describe ImportedHtmlConverter do
 
       test_string = %(<audio style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" data-media-id="0_l4l5n0wt"><source src="/media_objects_iframe/0_l4l5n0wt?type=audio" data-media-id="0_l4l5n0wt" data-media-type="audio"></audio>)
       converted_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" data-media-id="0_l4l5n0wt" src="/media_objects_iframe/0_l4l5n0wt?type=audio"></iframe>)
+      expect(convert_and_replace(test_string)).to eq converted_string
+    end
+
+    it "converts source tags to RCE media attachment iframes" do
+      att = make_test_att
+      att.filename = "test.mp4"
+      att.media_entry_id = "0_l4l5n0wt"
+      att.save!
+      @migration.attachment_path_id_lookup = { "test.mp4" => att.migration_id }
+
+      test_string = %(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt" data-is-media-attachment="true"><source src="%24IMS_CC_FILEBASE%24/test.mp4" data-media-id="0_l4l5n0wt" data-media-type="video"></video>)
+      converted_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt" src="/media_attachments_iframe/#{att.id}?type=video"></iframe>)
+      expect(convert_and_replace(test_string)).to eq converted_string
+
+      test_string = %(<audio  style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" data-media-id="0_l4l5n0wt" data-is-media-attachment="true"><source src="%24IMS_CC_FILEBASE%24/test.mp4" data-media-id="0_l4l5n0wt" data-media-type="audio"></video>)
+      converted_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" data-media-id="0_l4l5n0wt" src="/media_attachments_iframe/#{att.id}?type=audio"></iframe>)
       expect(convert_and_replace(test_string)).to eq converted_string
     end
 

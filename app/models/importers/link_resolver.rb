@@ -204,13 +204,24 @@ module Importers
       url
     end
 
+    def media_attachment_iframe_url(file_id, media_type = nil)
+      url = "/media_attachments_iframe/#{file_id}"
+      url += "?type=#{media_type}" if media_type.present?
+      url
+    end
+
     def resolve_media_comment_data(node, rel_path)
       if (file = find_file_in_context(rel_path[/^[^?]+/])) # strip query string for this search
         media_id = (file.media_object&.media_id || file.media_entry_id)
         if media_id && media_id != "maybe"
           if ["iframe", "source"].include?(node.name)
             node["data-media-id"] = media_id
-            return media_iframe_url(media_id, node["data-media-type"])
+            if node["data-is-media-attachment"]
+              node.delete("data-is-media-attachment")
+              return media_attachment_iframe_url(file.id, node["data-media-type"])
+            else
+              return media_iframe_url(media_id, node["data-media-type"])
+            end
           else
             node["id"] = "media_comment_#{media_id}"
             return "/media_objects/#{media_id}"

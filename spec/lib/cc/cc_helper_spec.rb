@@ -130,6 +130,15 @@ describe CC::CCHelper do
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq "one"
     end
 
+    it "translates RCE media attachment iframes to relevant HTML tags" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/135?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
+      translated = @exporter.html_content(html)
+      expect(translated).to include %(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde" data-is-media-attachment="true">)
+      expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
+      expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq "one"
+    end
+
     it "links media to exported file if it exists" do
       folder = folder_model(name: "something", context: @course)
       att = attachment_model(display_name: "lolcats.mp4", context: @course, folder:, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
