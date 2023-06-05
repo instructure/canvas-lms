@@ -435,6 +435,8 @@ export type AssignmentWithOverride = {
 export type Progress = {
   id: string
   workflow_state: string
+  message?: string
+  updated_at?: string
 }
 
 export type ProgressCamelized = {
