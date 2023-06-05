@@ -1135,6 +1135,7 @@ class User < ActiveRecord::Base
     if save
       eportfolios.active.in_batches.destroy_all
       gradebook_filters.in_batches.destroy_all
+      true
     end
   end
 

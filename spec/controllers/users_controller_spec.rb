@@ -3048,6 +3048,33 @@ describe UsersController do
     end
   end
 
+  describe "DELETE 'users'" do
+    let(:user) { user_with_pseudonym(active_all: true)  }
+    let(:admin) { account_admin_user(active_all: true)  }
+    let(:siteadmin) { site_admin_user(active_all: true) }
+
+    it "rejects unauthenticated users" do
+      delete "destroy", params: { id: user.id }, format: :json
+      expect(response).to have_http_status :unauthorized
+    end
+
+    it "rejects non siteadmin users" do
+      user_session(admin)
+
+      delete "destroy", params: { id: user.id }, format: :json
+      expect(response).to have_http_status :unauthorized
+    end
+
+    it "allows siteadmin users" do
+      user_session(siteadmin)
+
+      delete "destroy", params: { id: user.id }, format: :json
+      expect(response).to have_http_status :ok
+
+      expect(user.reload.workflow_state).to eq "deleted"
+    end
+  end
+
   describe "DELETE 'sessions'" do
     let(:user) { user_with_pseudonym(active_all: true)  }
     let(:user2) { user_with_pseudonym(active_all: true) }
