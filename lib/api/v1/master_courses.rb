@@ -45,26 +45,28 @@ module Api::V1::MasterCourses
 
   def changed_asset_json(asset, action, locked, migration_id = nil, exceptions = {})
     asset_type = asset.class_name.underscore.sub(%r{^.+/}, "")
+    asset_name = Context.asset_name(asset)
     url = case asset.class_name
-          when "Attachment"
-            course_file_url(course_id: asset.context.id, id: asset.id)
-          when "Quizzes::Quiz"
-            course_quiz_url(course_id: asset.context.id, id: asset.id)
           when "AssessmentQuestionBank"
             course_question_bank_url(course_id: asset.context.id, id: asset.id)
+          when "Attachment"
+            course_file_url(course_id: asset.context.id, id: asset.id)
           when "ContextExternalTool"
             course_external_tool_url(course_id: asset.context.id, id: asset.id)
+          when "CoursePace"
+            course_course_pacing_url(course_id: @course.id)
           when "LearningOutcome"
             course_outcome_url(course_id: asset.context&.id || @course.id, id: asset.id)
           when "LearningOutcomeGroup"
             course_outcome_group_url(course_id: asset.context.id, id: asset.id)
-          when "CoursePace"
-            course_course_pacing_url(course_id: @course.id)
+          when "MediaTrack"
+            asset_name = Context.asset_name(asset.attachment)
+            show_media_attachment_tracks_url(attachment_id: asset.attachment, id: asset.id)
+          when "Quizzes::Quiz"
+            course_quiz_url(course_id: asset.context.id, id: asset.id)
           else
             polymorphic_url([asset.context, asset])
           end
-
-    asset_name = Context.asset_name(asset)
 
     json = {
       asset_id: asset.id,

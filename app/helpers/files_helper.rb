@@ -51,7 +51,7 @@ module FilesHelper
     submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context)
                             .filter_map(&:context)
     return true if submissions.any? { |submission| submission.grants_right?(user, session, access_type) }
-    return render_unauthorized_action if attachment.editing_restricted?(:content)
+    return render_unauthorized_action if (access_type == :update) && attachment.editing_restricted?(:content)
 
     authorized_action(attachment, user, access_type)
   end

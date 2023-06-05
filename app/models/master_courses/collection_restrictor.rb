@@ -49,11 +49,7 @@ module MasterCourses::CollectionRestrictor
   end
 
   def check_restrictions?
-    if is_a?(Quizzes::QuizQuestion)
-      !generated? # allow updating through the bank even though it's technically locked... shhh don't tell anybody
-    else
-      true
-    end
+    true
   end
 
   def owner_for_restrictions
@@ -68,13 +64,24 @@ module MasterCourses::CollectionRestrictor
   delegate :child_content_restrictions, to: :owner_for_restrictions
 
   def mark_downstream_changes
-    return if @importing_migration || !is_child_content? # don't mark changes on import
+    return if skip_restrictions? # don't mark changes on import
 
     # instead of marking the exact columns - i'm just going to be lazy and mark the edit type on the owner, e.g. "quiz_questions_content"
-    changed_types = []
-    self.class.base_class.restricted_column_settings.each do |edit_type, columns|
-      if saved_changes.keys.intersect?(columns)
-        changed_types << self.class.pseudocolumn_for_type(edit_type) # pretend it's sort of like a column in the downstream changes
+    changed_types = self.class.base_class.restricted_column_settings.each_with_object([]) do |(edit_type, columns), object|
+      if saved_changes.keys.intersect?(columns) || new_record? || destroyed?
+        object << self.class.pseudocolumn_for_type(edit_type) # pretend it's sort of like a column in the downstream changes
+      end
+    end
+    owner_for_restrictions.mark_downstream_changes(changed_types) if changed_types.any? # store changes on owner
+  end
+
+  # very similar to mark_downstream_changes, but for items that are hard-deleted
+  def mark_downstream_create_destroy
+    return if skip_restrictions?
+
+    changed_types = self.class.base_class.restricted_column_settings.each_with_object([]) do |(edit_type, _), object|
+      if new_record? || destroyed?
+        object << self.class.pseudocolumn_for_type(edit_type)
       end
     end
     owner_for_restrictions.mark_downstream_changes(changed_types) if changed_types.any? # store changes on owner
