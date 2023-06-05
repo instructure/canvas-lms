@@ -93,8 +93,13 @@ module MasterCourses::Restrictor
       @skip_downstream_changes = true
     end
 
+    def downstream_changes?(migration, column)
+      migration.for_master_course_import? &&
+        migration.master_course_subscription.content_tag_for(self)&.downstream_changes&.include?(column)
+    end
+
     def check_for_restricted_column_changes
-      return true if @importing_migration || !is_child_content? || !check_restrictions?
+      return true if !check_restrictions? || skip_restrictions?
 
       locked_columns = []
       self.class.base_class.restricted_column_settings.each do |type, columns|
@@ -126,6 +131,10 @@ module MasterCourses::Restrictor
         raise "invalid edit type"
       end
     end
+
+    def skip_restrictions?
+      @importing_migration || @skip_downstream_changes || !is_child_content? # don't mark changes on import
+    end
   end
 
   def check_restrictions?
@@ -133,7 +142,7 @@ module MasterCourses::Restrictor
   end
 
   def mark_downstream_changes(changed_columns = nil)
-    return if @importing_migration || @skip_downstream_changes || !is_child_content? # don't mark changes on import
+    return if skip_restrictions?
 
     changed_columns ||= saved_changes.keys & self.class.base_class.restricted_column_settings.values.flatten
     state_column = is_a?(Attachment) ? "file_state" : "workflow_state"

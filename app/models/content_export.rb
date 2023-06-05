@@ -456,11 +456,11 @@ class ContentExport < ActiveRecord::Base
   #   checked should be exported or not.
   #
   #   Returns: bool
-  def export_object?(obj, asset_type = nil)
+  def export_object?(obj, asset_type: nil, ignore_updated_at: false)
     return false unless obj
     return true unless selective_export?
 
-    return true if for_master_migration? && master_migration.export_object?(obj) # fallback to selected_content otherwise
+    return true if for_master_migration? && master_migration.export_object?(obj, ignore_updated_at:) # fallback to selected_content otherwise
 
     # because Announcement.table_name == 'discussion_topics'
     if obj.is_a?(Announcement)

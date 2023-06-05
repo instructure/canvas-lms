@@ -76,6 +76,20 @@ describe MasterCourses::MasterTemplatesController do
           expect(json["asset_type"]).to eq("learning_outcome")
           expect(json["change_type"]).to eq("deleted")
         end
+
+        it "works with media tracks" do
+          expect(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return(true)
+          media = media_object
+          attachment = media.attachment
+          mt = attachment.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", media_object: media)
+          @template.create_content_tag_for!(mt)
+
+          json = parse_response(get_unsynced_changes({})).find { |j| j["asset_type"] == "media_track" }
+          expect(json["asset_id"]).to eq(mt.id)
+          expect(json["asset_name"]).to eq(attachment.filename)
+          expect(json["asset_type"]).to eq("media_track")
+          expect(json["change_type"]).to eq("created")
+        end
       end
     end
   end

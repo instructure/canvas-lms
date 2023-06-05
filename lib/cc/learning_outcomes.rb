@@ -48,10 +48,10 @@ module CC
 
         process_outcome_group_content(outs_node, root_group)
 
-        if @manifest&.exporter&.for_master_migration || !export_object?(LearningOutcome.new, "learning_outcomes")
+        if @manifest&.exporter&.for_master_migration || !export_object?(LearningOutcome.new, asset_type: "learning_outcomes")
           # copy straggler outcomes that should be brought in implicitly
           @course.linked_learning_outcomes.where.not(id: @exported_outcome_ids).each do |item|
-            if export_object?(item, "learning_outcomes")
+            if export_object?(item, asset_type: "learning_outcomes")
               process_learning_outcome(outs_node, item)
             end
           end
@@ -78,7 +78,7 @@ module CC
 
     def process_outcome_group_content(node, group, force_export = false)
       group.child_outcome_groups.active.each do |item|
-        export_group = export_object?(item, "learning_outcomes") || export_object?(item, "learning_outcome_groups")
+        export_group = export_object?(item, asset_type: "learning_outcomes") || export_object?(item, asset_type: "learning_outcome_groups")
         export_group ||= force_export if @selectable_outcomes
         if export_group
           process_outcome_group(node, item, @selectable_outcomes)
@@ -89,7 +89,7 @@ module CC
       end
       group.child_outcome_links.active.each do |item|
         item = item.content
-        next unless force_export || export_object?(item, "learning_outcomes")
+        next unless force_export || export_object?(item, asset_type: "learning_outcomes")
 
         process_learning_outcome(node, item)
       end

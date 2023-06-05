@@ -87,6 +87,10 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     Quizzes::Quiz.mark_quiz_edited(quiz_id)
   end
 
+  def check_restrictions?
+    !generated? # allow updating through the bank even though it's technically locked... shhh don't tell anybody
+  end
+
   # @param [Hash] data
   # @param [String] data[:regrade_option]
   #  If present, the question will be regraded.
