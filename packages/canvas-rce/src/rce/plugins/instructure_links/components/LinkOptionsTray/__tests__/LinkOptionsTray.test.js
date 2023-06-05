@@ -151,6 +151,19 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
         expect(props.onSave).toHaveBeenCalledTimes(0)
       })
     })
+    describe('when a Link url is only spaces', () => {
+      beforeEach(() => {
+        props.content.text = '   '
+        renderComponent()
+      })
+      it('is disabled', () => {
+        expect(tray.$doneButton.disabled).toBe(true)
+      })
+      it('does not call the .onSave prop when clicked', () => {
+        tray.$doneButton.click()
+        expect(props.onSave).toHaveBeenCalledTimes(0)
+      })
+    })
     describe('when clicked', () => {
       it('prevents the default click handler', () => {
         renderComponent()
