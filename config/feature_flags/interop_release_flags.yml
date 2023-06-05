@@ -196,3 +196,10 @@ include_oauth_consumer_key_in_lti_launch:
     When enabled, LTI 1.3 launches that would be associated with LTI 1.1 tool
     if the LTI 1.3 tool wasn't present will include the oauth_consumer_key and
     oauth_consumer_key_sign properties as part of the LTI 1.1 claims section.
+resource_link_uuid_in_custom_substitution:
+  state: hidden
+  display_name: Use a Resource link's resource_link_uuid in the $ResourceLink.id substitution parameter
+  description: |-
+    Changes the $ResourceLink.id substitution parameter's behavior
+    to include the resource_link_uuid, instead of the resource_id for the line item
+  applies_to: RootAccount

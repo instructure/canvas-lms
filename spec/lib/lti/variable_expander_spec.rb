@@ -1657,6 +1657,9 @@ module Lti
         let(:right_now) { Time.zone.now }
 
         context "when the assignment has external_tool as a submission_type" do
+          let(:resource_link_uuid) do
+            SecureRandom.uuid
+          end
           let(:assignment) do
             opts = {
               course:,
@@ -1677,6 +1680,16 @@ module Lti
             assignment = assignment_model opts
 
             line_item = assignment.line_items.first
+            line_item.resource_link = Lti::ResourceLink.new(
+              resource_link_uuid:,
+              context_external_tool_id: tool.id,
+              workflow_state: "active",
+              root_account_id: course.root_account.id,
+              context_id: course.id,
+              context_type: "Course",
+              custom: {},
+              lookup_uuid: SecureRandom.uuid
+            )
             line_item.update!(
               {
                 resource_id: "abc",
@@ -1694,6 +1707,18 @@ module Lti
               controller,
               assignment:
             )
+          end
+
+          context "when the resource_link_uuid_in_custom_substitution feature flag is on" do
+            before :once do
+              Account.site_admin.enable_feature!(:resource_link_uuid_in_custom_substitution)
+            end
+
+            it "substitutes the resource_link_uuid for $ResourceLink.id" do
+              exp_hash = { test: "$ResourceLink.id" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq resource_link_uuid
+            end
           end
 
           it "has substitution for $ResourceLink.id" do
@@ -1736,19 +1761,42 @@ module Lti
         context "when there is no assignment" do
           let(:assignment) { nil }
 
+          let(:resource_link_uuid) do
+            SecureRandom.uuid
+          end
+
+          let(:resource_link) do
+            Lti::ResourceLink.new(
+              resource_link_uuid:,
+              context_external_tool_id: tool.id,
+              workflow_state: "active",
+              root_account_id: course.root_account.id,
+              context_id: course.id,
+              context_type: "Course",
+              custom: {},
+              lookup_uuid: SecureRandom.uuid
+            )
+          end
+
+          let(:content_tag) do
+            double("content_tag")
+          end
+
           let(:variable_expander) do
             VariableExpander.new(
               root_account,
               course,
               controller,
-              assignment:
+              assignment:,
+              content_tag:
             )
           end
 
           it "has substitution for $ResourceLink.id" do
+            allow(content_tag).to receive(:associated_asset).and_return(resource_link)
             exp_hash = { test: "$ResourceLink.id" }
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to eq "$ResourceLink.id"
+            expect(exp_hash[:test]).to eq resource_link_uuid
           end
 
           it "has substitution for $ResourceLink.description" do
