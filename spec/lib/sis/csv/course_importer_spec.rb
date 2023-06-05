@@ -588,6 +588,36 @@ describe SIS::CSV::CourseImporter do
     end
   end
 
+  it "throws error when restoring a course form deleted account" do
+    # create account and course that are active
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A001,,del acc,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,status,account_id",
+      "C001,del course,del course,active,A001"
+    )
+    expect(Course.where(sis_source_id: "C001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, @account.id].sort
+
+    # delete account and course
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,status",
+      "C001,del course,del course,deleted"
+    )
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A001,,del acc,deleted"
+    )
+    # restore deleted course
+    importer = process_csv_data(
+      "course_id,short_name,long_name,status",
+      "C001,del course,del course,active"
+    )
+
+    expect(importer.errors.map(&:last)).to include "Cannot restore course C001 because the associated account A001 is deleted"
+  end
+
   it "makes workflow_state sticky" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
