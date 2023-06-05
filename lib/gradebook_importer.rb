@@ -894,6 +894,6 @@ class GradebookImporter
   end
 
   def allow_student_last_first_names?
-    @context.root_account.allow_gradebook_show_first_last_names? && Account.site_admin.feature_enabled?(:gradebook_show_first_last_names)
+    @context.account.allow_gradebook_show_first_last_names? && Account.site_admin.feature_enabled?(:gradebook_show_first_last_names)
   end
 end
