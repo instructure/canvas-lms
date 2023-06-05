@@ -1514,8 +1514,8 @@ describe GradebookImporter do
       before(:once) do
         Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
         course_model
-        @course.root_account.settings[:allow_gradebook_show_first_last_names] = true
-        @course.root_account.save!
+        @course.account.settings[:allow_gradebook_show_first_last_names] = true
+        @course.account.save!
       end
 
       it "handles students which do not already exist" do

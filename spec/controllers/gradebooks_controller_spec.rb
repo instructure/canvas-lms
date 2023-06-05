@@ -1067,6 +1067,21 @@ describe GradebooksController do
         end
       end
 
+      describe "split student names" do
+        it "sets allow_separate_first_last_names in the ENV to true if the feature is enabled at the site admin FF is also enabled" do
+          Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
+          @course.account.settings[:allow_gradebook_show_first_last_names] = true
+          @course.account.save!
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:allow_separate_first_last_names)).to be true
+        end
+
+        it "sets allow_separate_first_last_names in the ENV to false if the feature is not enabled" do
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:allow_separate_first_last_names)).to be false
+        end
+      end
+
       describe "show_message_students_with_observers_dialog" do
         shared_examples_for "environment variable" do
           it "is true when the feature is enabled" do

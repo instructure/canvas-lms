@@ -51,8 +51,8 @@ describe "Gradebook" do
 
   it "splits student first and last name when view option is toggled on" do
     Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
-    @course.root_account.settings[:allow_gradebook_show_first_last_names] = true
-    @course.root_account.save!
+    @course.account.settings[:allow_gradebook_show_first_last_names] = true
+    @course.account.save!
 
     Gradebook.visit(@course)
     Gradebook.open_gradebook_menu("View")
