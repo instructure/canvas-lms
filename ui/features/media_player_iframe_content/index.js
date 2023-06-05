@@ -82,7 +82,7 @@ ready(() => {
   const mediaTracks = media_object?.media_tracks?.map(track => {
     return {
       id: track.id,
-      src: `/media_objects/${media_object.media_id}/media_tracks/${track.id}`,
+      src: track.url,
       label: closedCaptionLanguages.find(lang => lang.id === track.locale)?.label || track.locale,
       type: track.kind,
       language: track.locale,
