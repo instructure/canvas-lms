@@ -2848,10 +2848,13 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    user = api_find(User, params[:id])
-    if user && authorized_action(@domain_root_account, @current_user, :manage_site_settings)
-      user.destroy
-      render json: { status: "ok" }
+    @user = api_find(User, params[:id])
+    if @user && authorized_action(@domain_root_account, @current_user, :manage_site_settings)
+      if @user.destroy
+        render json: { deleted: true, status: "ok" }
+      else
+        render json: { deleted: false, status: :bad_request }
+      end
     end
   end
 
