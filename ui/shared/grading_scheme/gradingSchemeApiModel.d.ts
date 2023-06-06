@@ -43,6 +43,6 @@ export interface GradingSchemeDataRow {
 }
 
 export interface GradingSchemeSummary {
-  name: string
+  title: string
   id: string
 }

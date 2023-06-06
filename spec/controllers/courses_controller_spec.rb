@@ -2517,6 +2517,28 @@ describe CoursesController do
       expect(@course.home_page_announcement_limit).to eq 2
     end
 
+    it "allows setting course default grading scheme back to default canvas grading scheme" do
+      user_session(@teacher)
+
+      @standard = @course.grading_standards.create!(title: "course standard", standard_data: { a: { name: "A", value: "95" }, b: { name: "B", value: "80" }, f: { name: "F", value: "" } })
+
+      put "update", params: { id: @course.id, course: { grading_standard_enabled: 1, grading_standard_id: @standard.id } }
+      @course.reload
+      expect(@course.grading_standard_id).to eq @standard.id
+
+      put "update", params: { id: @course.id, course: { grading_standard_enabled: 1, grading_standard_id: "" } }
+      @course.reload
+      expect(@course.grading_standard_id).to eq 0
+
+      put "update", params: { id: @course.id, course: { grading_standard_enabled: 1, grading_standard_id: @standard.id } }
+      @course.reload
+      expect(@course.grading_standard_id).to eq @standard.id
+
+      put "update", params: { id: @course.id, course: { grading_standard_enabled: 0 } }
+      @course.reload
+      expect(@course.grading_standard_id).to be_nil
+    end
+
     it "allows sending events" do
       user_session(@teacher)
       put "update", params: { id: @course.id, course: { event: "complete" } }
