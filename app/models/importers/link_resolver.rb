@@ -61,9 +61,13 @@ module Importers
           query = resolve_module_item_query(context, link[:query])
           link[:new_value] = "#{context_path}/pages/#{migration_id}#{query}"
         elsif type == "attachments"
-          if (att_id = context.attachments.where(migration_id:).limit(1).pluck(:id).first)
+          att_id = context.attachments.where(migration_id:).pick(:id)
+          if att_id
             link[:new_value] = "#{context_path}/files/#{att_id}/preview"
           end
+        elsif type == "media_attachments_iframe"
+          att_id = context.attachments.where(migration_id:).pick(:id)
+          link[:new_value] = att_id ? "/media_attachments_iframe/#{att_id}#{link[:query]}" : link[:old_value]
         elsif context.respond_to?(type) && context.send(type).respond_to?(:scope)
           scope = context.send(type).scope
           if scope.klass.columns_hash["migration_id"] &&
