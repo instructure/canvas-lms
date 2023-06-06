@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import ReactDOM from 'react-dom'
+import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {tabIdFromElement} from './course_settings_helper'
@@ -36,6 +37,8 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/autocomplete'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
+
+import {GradingSchemesSelector} from '@canvas/grading-scheme'
 
 const I18n = useI18nScope('course_settings')
 
@@ -371,10 +374,48 @@ $(document).ready(function () {
   $('#move_course_dialog').delegate('.cancel_button', 'click', () => {
     $('#move_course_dialog').dialog('close')
   })
+
+  const grading_scheme_selector = document.getElementById('grading_scheme_selector')
+
+  function renderGradingSchemeSelector() {
+    let selectedGradingSchemeId = $('#grading_standard_id').val()
+    if (grading_scheme_selector) {
+      if (selectedGradingSchemeId === '0' || selectedGradingSchemeId === '') {
+        // special value indicating the default grading scheme
+        selectedGradingSchemeId = undefined
+      }
+      ReactDOM.render(
+        <GradingSchemesSelector
+          contextId={ENV.COURSE_ID}
+          contextType="Course"
+          initiallySelectedGradingSchemeId={selectedGradingSchemeId}
+          onChange={gradingSchemeId => handleSelectedGradingSchemeIdChanged(gradingSchemeId)}
+        />,
+        grading_scheme_selector
+      )
+    }
+  }
+  function handleSelectedGradingSchemeIdChanged(gradingSchemeId) {
+    if (gradingSchemeId) {
+      $('#grading_standard_id').val(gradingSchemeId)
+    } else {
+      $('#grading_standard_id').val('')
+    }
+  }
   $course_form
     .find('.grading_standard_checkbox')
     .change(function () {
       $course_form.find('.grading_standard_link').showIf($(this).attr('checked'))
+      if (grading_scheme_selector) {
+        if ($(this).attr('checked')) {
+          $course_form.find('.grading_scheme_selector').show()
+          renderGradingSchemeSelector($('#grading_standard_id').val())
+        } else {
+          $('#grading_standard_id').val('')
+          ReactDOM.render(<></>, grading_scheme_selector)
+          $course_form.find('.grading_scheme_selector').hide()
+        }
+      }
     })
     .change()
   $course_form

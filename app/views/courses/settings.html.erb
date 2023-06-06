@@ -412,9 +412,14 @@
             <%= f.check_box :grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_manage %>
             <%= f.label :grading_standard_enabled, :en => "Enable course grading scheme" %>
           </div>
-          <div class="grading_standard_link" style="margin-<%= direction('left') %>: 20px;">
-            <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_enabled? ? t('view_grading_scheme', "view grading scheme") : t('set_grading_scheme', "set grading scheme") %></a>
-          </div>
+          <% if Account.site_admin.feature_enabled?(:grading_scheme_updates) %>
+            <input type="hidden" name="course[grading_standard_id]" id="grading_standard_id" value="<%= @context.grading_standard_id %>" />
+            <div id="grading_scheme_selector" class="grading_scheme_selector"></div>
+          <% else %>
+            <div class="grading_standard_link" style="margin-<%= direction('left') %>: 20px;">
+              <a href="#" class="edit_letter_grades_link"><%= @context.grading_standard_enabled? ? t('view_grading_scheme', "view grading scheme") : t('set_grading_scheme', "set grading scheme") %></a>
+            </div>
+          <% end %>
         </div>
       </div>
       <div class="form-row">

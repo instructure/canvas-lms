@@ -25,3 +25,4 @@ export type {
 } from './gradingSchemeApiModel'
 
 export {GradingSchemesManagement} from './react/components/GradingSchemesManagement'
+export {GradingSchemesSelector} from './react/components/GradingSchemesSelector'
