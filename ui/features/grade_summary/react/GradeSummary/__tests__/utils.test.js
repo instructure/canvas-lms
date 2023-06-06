@@ -28,6 +28,11 @@ import {GradingPeriod} from '../../../graphql/GradingPeriod'
 import {Submission} from '../../../graphql/Submission'
 
 import {ASSIGNMENT_SORT_OPTIONS, ASSIGNMENT_NOT_APPLICABLE} from '../constants'
+import {
+  nullGradingPeriodAssignments,
+  nullGradingPeriodAssignmentGroup,
+  nullGradingPeriodGradingPeriods,
+} from './largeDataMocks'
 
 import {
   formatNumber,
@@ -54,6 +59,7 @@ import {
   getCoursePercentage,
   getTotal,
   sortAssignments,
+  filteredAssignments,
 } from '../utils'
 
 const createAssignment = (score, pointsPossible) => {
@@ -941,39 +947,43 @@ describe('util', () => {
           })
         })
 
-        it('should return the correct total', () => {
-          const assignments = mockAssignments()
-          const gradingPeriods = [GradingPeriod.mock()]
-          const assignmentGroup = AssignmentGroup.mock()
-          expect(getTotal(assignments, [assignmentGroup], gradingPeriods, true)).toBe(
-            `${77.5 * (assignmentGroup.groupWeight / 100) * (GradingPeriod.mock().weight / 100)}`
-          )
-        })
-
-        it('should return 0 when assignments is an empty array', () => {
-          const assignments = []
-          const gradingPeriods = [GradingPeriod.mock()]
-          const assignmentGroup = AssignmentGroup.mock()
-          expect(getTotal(assignments, [assignmentGroup], gradingPeriods, true)).toBe(
-            ASSIGNMENT_NOT_APPLICABLE
-          )
-        })
-
-        it('should return 0 when assignments are not provided', () => {
-          const gradingPeriods = [GradingPeriod.mock()]
-          expect(getTotal(undefined, undefined, gradingPeriods, true)).toBe(
-            ASSIGNMENT_NOT_APPLICABLE
-          )
-        })
-
-        describe('when there are no period weights', () => {
+        describe('when the grading periods are weighted', () => {
           it('should return the correct total', () => {
             const assignments = mockAssignments()
-            const gradingPeriods = [GradingPeriod.mock({weight: null})]
+            const gradingPeriods = [GradingPeriod.mock()]
             const assignmentGroup = AssignmentGroup.mock()
             expect(getTotal(assignments, [assignmentGroup], gradingPeriods, true)).toBe(
-              `${77.5 * (assignmentGroup.groupWeight / 100)}`
+              `${77.5 * (assignmentGroup.groupWeight / 100) * (GradingPeriod.mock().weight / 100)}`
             )
+          })
+
+          it('should return 0 when assignments is an empty array', () => {
+            const assignments = []
+            const gradingPeriods = [GradingPeriod.mock()]
+            const assignmentGroup = AssignmentGroup.mock()
+            expect(getTotal(assignments, [assignmentGroup], gradingPeriods, true)).toBe(
+              ASSIGNMENT_NOT_APPLICABLE
+            )
+          })
+
+          it('should return 0 when assignments are not provided', () => {
+            const gradingPeriods = [GradingPeriod.mock()]
+            expect(getTotal(undefined, undefined, gradingPeriods, true)).toBe(
+              ASSIGNMENT_NOT_APPLICABLE
+            )
+          })
+        })
+
+        describe('when the grading periods are not weighted', () => {
+          it('should return the correct total', () => {
+            expect(
+              getTotal(
+                filteredAssignments({assignmentsConnection: {nodes: nullGradingPeriodAssignments}}),
+                nullGradingPeriodAssignmentGroup,
+                nullGradingPeriodGradingPeriods,
+                true
+              )
+            ).toBe('64.86346282522474')
           })
         })
       })
