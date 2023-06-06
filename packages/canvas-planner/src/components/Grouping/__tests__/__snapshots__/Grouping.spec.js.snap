@@ -1,340 +1,836 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`grouping contains link pointing to course url 1`] = `
-<div
-  className="Grouping-styles__root planner-grouping"
->
-  <NotificationBadge
-    responsiveSize="large"
-  />
-  <a
-    className="Grouping-styles__hero Grouping-styles__heroHover"
-    href="example.com"
-    style={
-      Object {
-        "backgroundImage": "url()",
-      }
-    }
+<Fragment>
+  <style>
+    
+  .Grouping-styles__root {
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 1.5rem 0 0 0;
+    border-color: #0374B5;
+    color: #0374B5;
+    line-height: 1.25;
+    position: relative;
+    display: flex;
+  }
+  
+  .Grouping-styles__title {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 0.375rem 0.5rem;
+    background-color: #FFFFFF;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #0374B5;
+    border-top-left-radius: 0.125rem;
+    min-width: 1px;
+    overflow: hidden;
+    max-height: 3rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  .Grouping-styles__title::after {
+    content: "";
+    width: 100%;
+    height: 0.375rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%);
+  }
+  
+  .Grouping-styles__hero {
+    position: relative;
+    display: flex;
+    flex: 0 0 12rem;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    align-items: flex-start;
+    justify-content: center;
+    box-sizing: border-box;
+    outline: none;
+    padding: 0.0625rem;
+    text-decoration: none;
+    min-width: 1px;
+  }
+  .Grouping-styles__hero .Grouping-styles__groupingName {
+    text-decoration: undefined;
+  }
+  
+  .Grouping-styles__hero,
+  .Grouping-styles__overlay {
+    border-bottom-inline-start-radius: 0.25rem;
+    border-top-inline-start-radius: 0.25rem;
+  }
+  
+  .Grouping-styles__heroHover:focus, .Grouping-styles__heroHover:hover {
+    text-decoration: none;
+  }
+  .Grouping-styles__heroHover:focus .Grouping-styles__title, .Grouping-styles__heroHover:hover .Grouping-styles__title {
+    text-decoration: underline;
+  }
+  
+  .Grouping-styles__overlay {
+    background-color: #0374B5;
+    opacity: 1;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .Grouping-styles__overlay.Grouping-styles__withImage {
+    opacity: 0.75;
+  }
+  
+  .Grouping-styles__items {
+    flex: 1;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    border-top: 0.0625rem solid;
+    border-color: #0374B5;
+    color: #0374B5;
+    min-width: 1px;
+  }
+  
+  .Grouping-styles__medium.Grouping-styles__root, .Grouping-styles__small.Grouping-styles__root {
+    display: block;
+    margin: 0;
+  }
+  .Grouping-styles__medium .Grouping-styles__hero, .Grouping-styles__medium .Grouping-styles__overlay, .Grouping-styles__small .Grouping-styles__hero, .Grouping-styles__small .Grouping-styles__overlay {
+    border-radius: 0;
+    background-color: transparent;
+  }
+  .Grouping-styles__medium .Grouping-styles__hero, .Grouping-styles__small .Grouping-styles__hero {
+    display: block;
+    flex: none;
+    min-height: unset;
+    line-height: 2rem;
+  }
+  .Grouping-styles__medium .Grouping-styles__title, .Grouping-styles__small .Grouping-styles__title {
+    font-size: 0.875rem;
+    padding-inline-start: 0;
+  }
+  .Grouping-styles__medium .Grouping-styles__items, .Grouping-styles__small .Grouping-styles__items {
+    border-top-width: 0.125rem;
+  }
+  
+  </style>
+  <div
+    className="Grouping-styles__root planner-grouping"
   >
-    <span
-      className="Grouping-styles__overlay"
+    <NotificationBadge
+      responsiveSize="large"
+    />
+    <a
+      className="Grouping-styles__hero Grouping-styles__heroHover"
+      href="example.com"
       style={
         Object {
-          "backgroundColor": "#5678",
+          "backgroundImage": "url()",
         }
       }
-    />
-    <span
-      className="Grouping-styles__title"
     >
-      Board Games
-    </span>
-  </a>
-  <ol
-    className="Grouping-styles__items"
-    style={
-      Object {
-        "borderColor": "#5678",
+      <span
+        className="Grouping-styles__overlay"
+        style={
+          Object {
+            "backgroundColor": "#5678",
+          }
+        }
+      />
+      <span
+        className="Grouping-styles__title"
+      >
+        Board Games
+      </span>
+    </a>
+    <ol
+      className="Grouping-styles__items"
+      style={
+        Object {
+          "borderColor": "#5678",
+        }
       }
-    }
-  >
-    <li
-      key="five"
     >
-      <Animatable(PlannerItem_raw)
-        animatableIndex={101}
-        color="#5678"
-        context={
-          Object {
-            "color": "#5678",
-            "id": 256,
-            "url": "example.com",
+      <li
+        key="five"
+      >
+        <Animatable(PlannerItem_raw)
+          animatableIndex={101}
+          color="#5678"
+          context={
+            Object {
+              "color": "#5678",
+              "id": 256,
+              "url": "example.com",
+            }
           }
-        }
-        courseName="Board Games"
-        date={"2017-04-25T13:06:07.000Z"}
-        id="5"
-        isObserving={false}
-        responsiveSize="large"
-        showNotificationBadge={false}
-        simplifiedControls={false}
-        timeZone="America/Denver"
-        title="San Juan"
-        toggleCompletion={[Function]}
-        uniqueId="five"
-        updateTodo={[Function]}
-      />
-    </li>
-    <li
-      key="six"
-    >
-      <Animatable(PlannerItem_raw)
-        animatableIndex={102}
-        color="#5678"
-        context={
-          Object {
-            "color": "#5678",
-            "id": 256,
+          courseName="Board Games"
+          date={"2017-04-25T13:06:07.000Z"}
+          id="5"
+          isObserving={false}
+          responsiveSize="large"
+          showNotificationBadge={false}
+          simplifiedControls={false}
+          timeZone="America/Denver"
+          title="San Juan"
+          toggleCompletion={[Function]}
+          uniqueId="five"
+          updateTodo={[Function]}
+        />
+      </li>
+      <li
+        key="six"
+      >
+        <Animatable(PlannerItem_raw)
+          animatableIndex={102}
+          color="#5678"
+          context={
+            Object {
+              "color": "#5678",
+              "id": 256,
+            }
           }
-        }
-        courseName="Board Games"
-        date={"2017-04-25T13:06:07.000Z"}
-        id="6"
-        isObserving={false}
-        responsiveSize="large"
-        showNotificationBadge={false}
-        simplifiedControls={false}
-        timeZone="America/Denver"
-        title="Roll for the Galaxy"
-        toggleCompletion={[Function]}
-        uniqueId="six"
-        updateTodo={[Function]}
-      />
-    </li>
-  </ol>
-</div>
+          courseName="Board Games"
+          date={"2017-04-25T13:06:07.000Z"}
+          id="6"
+          isObserving={false}
+          responsiveSize="large"
+          showNotificationBadge={false}
+          simplifiedControls={false}
+          timeZone="America/Denver"
+          title="Roll for the Galaxy"
+          toggleCompletion={[Function]}
+          uniqueId="six"
+          updateTodo={[Function]}
+        />
+      </li>
+    </ol>
+  </div>
+</Fragment>
 `;
 
 exports[`renders a CompletedItemsFacade when completed items are present by default 1`] = `
-<div
-  className="Grouping-styles__root planner-grouping"
->
-  <NotificationBadge
-    responsiveSize="large"
-  />
-  <a
-    className="Grouping-styles__hero Grouping-styles__heroHover"
-    href="example.com"
-    style={
-      Object {
-        "backgroundImage": "url()",
-      }
-    }
+<Fragment>
+  <style>
+    
+  .Grouping-styles__root {
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 1.5rem 0 0 0;
+    border-color: #0374B5;
+    color: #0374B5;
+    line-height: 1.25;
+    position: relative;
+    display: flex;
+  }
+  
+  .Grouping-styles__title {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 0.375rem 0.5rem;
+    background-color: #FFFFFF;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #0374B5;
+    border-top-left-radius: 0.125rem;
+    min-width: 1px;
+    overflow: hidden;
+    max-height: 3rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  .Grouping-styles__title::after {
+    content: "";
+    width: 100%;
+    height: 0.375rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%);
+  }
+  
+  .Grouping-styles__hero {
+    position: relative;
+    display: flex;
+    flex: 0 0 12rem;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    align-items: flex-start;
+    justify-content: center;
+    box-sizing: border-box;
+    outline: none;
+    padding: 0.0625rem;
+    text-decoration: none;
+    min-width: 1px;
+  }
+  .Grouping-styles__hero .Grouping-styles__groupingName {
+    text-decoration: undefined;
+  }
+  
+  .Grouping-styles__hero,
+  .Grouping-styles__overlay {
+    border-bottom-inline-start-radius: 0.25rem;
+    border-top-inline-start-radius: 0.25rem;
+  }
+  
+  .Grouping-styles__heroHover:focus, .Grouping-styles__heroHover:hover {
+    text-decoration: none;
+  }
+  .Grouping-styles__heroHover:focus .Grouping-styles__title, .Grouping-styles__heroHover:hover .Grouping-styles__title {
+    text-decoration: underline;
+  }
+  
+  .Grouping-styles__overlay {
+    background-color: #0374B5;
+    opacity: 1;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .Grouping-styles__overlay.Grouping-styles__withImage {
+    opacity: 0.75;
+  }
+  
+  .Grouping-styles__items {
+    flex: 1;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    border-top: 0.0625rem solid;
+    border-color: #0374B5;
+    color: #0374B5;
+    min-width: 1px;
+  }
+  
+  .Grouping-styles__medium.Grouping-styles__root, .Grouping-styles__small.Grouping-styles__root {
+    display: block;
+    margin: 0;
+  }
+  .Grouping-styles__medium .Grouping-styles__hero, .Grouping-styles__medium .Grouping-styles__overlay, .Grouping-styles__small .Grouping-styles__hero, .Grouping-styles__small .Grouping-styles__overlay {
+    border-radius: 0;
+    background-color: transparent;
+  }
+  .Grouping-styles__medium .Grouping-styles__hero, .Grouping-styles__small .Grouping-styles__hero {
+    display: block;
+    flex: none;
+    min-height: unset;
+    line-height: 2rem;
+  }
+  .Grouping-styles__medium .Grouping-styles__title, .Grouping-styles__small .Grouping-styles__title {
+    font-size: 0.875rem;
+    padding-inline-start: 0;
+  }
+  .Grouping-styles__medium .Grouping-styles__items, .Grouping-styles__small .Grouping-styles__items {
+    border-top-width: 0.125rem;
+  }
+  
+  </style>
+  <div
+    className="Grouping-styles__root planner-grouping"
   >
-    <span
-      className="Grouping-styles__overlay"
+    <NotificationBadge
+      responsiveSize="large"
+    />
+    <a
+      className="Grouping-styles__hero Grouping-styles__heroHover"
+      href="example.com"
       style={
         Object {
-          "backgroundColor": "#5678",
+          "backgroundImage": "url()",
         }
       }
-    />
-    <span
-      className="Grouping-styles__title"
     >
-      Board Games
-    </span>
-  </a>
-  <ol
-    className="Grouping-styles__items"
-    style={
-      Object {
-        "borderColor": "#5678",
-      }
-    }
-  >
-    <li
-      key="six"
-    >
-      <Animatable(PlannerItem_raw)
-        animatableIndex={101}
-        color="#5678"
-        context={
+      <span
+        className="Grouping-styles__overlay"
+        style={
           Object {
-            "color": "#5678",
-            "id": 256,
-          }
-        }
-        courseName="Board Games"
-        date={"2017-04-25T13:06:07.000Z"}
-        id="6"
-        isObserving={false}
-        responsiveSize="large"
-        showNotificationBadge={false}
-        simplifiedControls={false}
-        timeZone="America/Denver"
-        title="Roll for the Galaxy"
-        toggleCompletion={[Function]}
-        uniqueId="six"
-        updateTodo={[Function]}
-      />
-    </li>
-    <li
-      key="completed"
-    >
-      <Animatable(undefined)
-        animatableIndex={102}
-        animatableItemIds={
-          Array [
-            "five",
-          ]
-        }
-        badges={Array []}
-        date={"2017-04-25T06:00:00.000Z"}
-        itemCount={1}
-        notificationBadge="none"
-        onClick={[Function]}
-        responsiveSize="large"
-        simplifiedControls={false}
-        theme={
-          Object {
-            "labelColor": "#5678",
+            "backgroundColor": "#5678",
           }
         }
       />
-    </li>
-  </ol>
-</div>
+      <span
+        className="Grouping-styles__title"
+      >
+        Board Games
+      </span>
+    </a>
+    <ol
+      className="Grouping-styles__items"
+      style={
+        Object {
+          "borderColor": "#5678",
+        }
+      }
+    >
+      <li
+        key="six"
+      >
+        <Animatable(PlannerItem_raw)
+          animatableIndex={101}
+          color="#5678"
+          context={
+            Object {
+              "color": "#5678",
+              "id": 256,
+            }
+          }
+          courseName="Board Games"
+          date={"2017-04-25T13:06:07.000Z"}
+          id="6"
+          isObserving={false}
+          responsiveSize="large"
+          showNotificationBadge={false}
+          simplifiedControls={false}
+          timeZone="America/Denver"
+          title="Roll for the Galaxy"
+          toggleCompletion={[Function]}
+          uniqueId="six"
+          updateTodo={[Function]}
+        />
+      </li>
+      <li
+        key="completed"
+      >
+        <Animatable(undefined)
+          animatableIndex={102}
+          animatableItemIds={
+            Array [
+              "five",
+            ]
+          }
+          badges={Array []}
+          date={"2017-04-25T06:00:00.000Z"}
+          itemCount={1}
+          notificationBadge="none"
+          onClick={[Function]}
+          responsiveSize="large"
+          simplifiedControls={false}
+          theme={
+            Object {
+              "labelColor": "#5678",
+            }
+          }
+        />
+      </li>
+    </ol>
+  </div>
+</Fragment>
 `;
 
 exports[`renders the base component with required props 1`] = `
-<div
-  className="Grouping-styles__root planner-grouping"
->
-  <NotificationBadge
-    responsiveSize="large"
-  />
-  <a
-    className="Grouping-styles__hero Grouping-styles__heroHover"
-    href="example.com"
-    style={
-      Object {
-        "backgroundImage": "url()",
-      }
-    }
+<Fragment>
+  <style>
+    
+  .Grouping-styles__root {
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 1.5rem 0 0 0;
+    border-color: #0374B5;
+    color: #0374B5;
+    line-height: 1.25;
+    position: relative;
+    display: flex;
+  }
+  
+  .Grouping-styles__title {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 0.375rem 0.5rem;
+    background-color: #FFFFFF;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #0374B5;
+    border-top-left-radius: 0.125rem;
+    min-width: 1px;
+    overflow: hidden;
+    max-height: 3rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  .Grouping-styles__title::after {
+    content: "";
+    width: 100%;
+    height: 0.375rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%);
+  }
+  
+  .Grouping-styles__hero {
+    position: relative;
+    display: flex;
+    flex: 0 0 12rem;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    align-items: flex-start;
+    justify-content: center;
+    box-sizing: border-box;
+    outline: none;
+    padding: 0.0625rem;
+    text-decoration: none;
+    min-width: 1px;
+  }
+  .Grouping-styles__hero .Grouping-styles__groupingName {
+    text-decoration: undefined;
+  }
+  
+  .Grouping-styles__hero,
+  .Grouping-styles__overlay {
+    border-bottom-inline-start-radius: 0.25rem;
+    border-top-inline-start-radius: 0.25rem;
+  }
+  
+  .Grouping-styles__heroHover:focus, .Grouping-styles__heroHover:hover {
+    text-decoration: none;
+  }
+  .Grouping-styles__heroHover:focus .Grouping-styles__title, .Grouping-styles__heroHover:hover .Grouping-styles__title {
+    text-decoration: underline;
+  }
+  
+  .Grouping-styles__overlay {
+    background-color: #0374B5;
+    opacity: 1;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .Grouping-styles__overlay.Grouping-styles__withImage {
+    opacity: 0.75;
+  }
+  
+  .Grouping-styles__items {
+    flex: 1;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    border-top: 0.0625rem solid;
+    border-color: #0374B5;
+    color: #0374B5;
+    min-width: 1px;
+  }
+  
+  .Grouping-styles__medium.Grouping-styles__root, .Grouping-styles__small.Grouping-styles__root {
+    display: block;
+    margin: 0;
+  }
+  .Grouping-styles__medium .Grouping-styles__hero, .Grouping-styles__medium .Grouping-styles__overlay, .Grouping-styles__small .Grouping-styles__hero, .Grouping-styles__small .Grouping-styles__overlay {
+    border-radius: 0;
+    background-color: transparent;
+  }
+  .Grouping-styles__medium .Grouping-styles__hero, .Grouping-styles__small .Grouping-styles__hero {
+    display: block;
+    flex: none;
+    min-height: unset;
+    line-height: 2rem;
+  }
+  .Grouping-styles__medium .Grouping-styles__title, .Grouping-styles__small .Grouping-styles__title {
+    font-size: 0.875rem;
+    padding-inline-start: 0;
+  }
+  .Grouping-styles__medium .Grouping-styles__items, .Grouping-styles__small .Grouping-styles__items {
+    border-top-width: 0.125rem;
+  }
+  
+  </style>
+  <div
+    className="Grouping-styles__root planner-grouping"
   >
-    <span
-      className="Grouping-styles__overlay"
+    <NotificationBadge
+      responsiveSize="large"
+    />
+    <a
+      className="Grouping-styles__hero Grouping-styles__heroHover"
+      href="example.com"
       style={
         Object {
-          "backgroundColor": "#5678",
+          "backgroundImage": "url()",
         }
       }
-    />
-    <span
-      className="Grouping-styles__title"
     >
-      Board Games
-    </span>
-  </a>
-  <ol
-    className="Grouping-styles__items"
-    style={
-      Object {
-        "borderColor": "#5678",
+      <span
+        className="Grouping-styles__overlay"
+        style={
+          Object {
+            "backgroundColor": "#5678",
+          }
+        }
+      />
+      <span
+        className="Grouping-styles__title"
+      >
+        Board Games
+      </span>
+    </a>
+    <ol
+      className="Grouping-styles__items"
+      style={
+        Object {
+          "borderColor": "#5678",
+        }
       }
-    }
-  >
-    <li
-      key="five"
     >
-      <Animatable(PlannerItem_raw)
-        animatableIndex={101}
-        color="#5678"
-        context={
-          Object {
-            "color": "#5678",
-            "id": 256,
-            "url": "example.com",
+      <li
+        key="five"
+      >
+        <Animatable(PlannerItem_raw)
+          animatableIndex={101}
+          color="#5678"
+          context={
+            Object {
+              "color": "#5678",
+              "id": 256,
+              "url": "example.com",
+            }
           }
-        }
-        courseName="Board Games"
-        date={"2017-04-25T13:06:07.000Z"}
-        id="5"
-        isObserving={false}
-        responsiveSize="large"
-        showNotificationBadge={false}
-        simplifiedControls={false}
-        timeZone="America/Denver"
-        title="San Juan"
-        toggleCompletion={[Function]}
-        uniqueId="five"
-        updateTodo={[Function]}
-      />
-    </li>
-    <li
-      key="six"
-    >
-      <Animatable(PlannerItem_raw)
-        animatableIndex={102}
-        color="#5678"
-        context={
-          Object {
-            "color": "#5678",
-            "id": 256,
+          courseName="Board Games"
+          date={"2017-04-25T13:06:07.000Z"}
+          id="5"
+          isObserving={false}
+          responsiveSize="large"
+          showNotificationBadge={false}
+          simplifiedControls={false}
+          timeZone="America/Denver"
+          title="San Juan"
+          toggleCompletion={[Function]}
+          uniqueId="five"
+          updateTodo={[Function]}
+        />
+      </li>
+      <li
+        key="six"
+      >
+        <Animatable(PlannerItem_raw)
+          animatableIndex={102}
+          color="#5678"
+          context={
+            Object {
+              "color": "#5678",
+              "id": 256,
+            }
           }
-        }
-        courseName="Board Games"
-        date={"2017-04-25T13:06:07.000Z"}
-        id="6"
-        isObserving={false}
-        responsiveSize="large"
-        showNotificationBadge={false}
-        simplifiedControls={false}
-        timeZone="America/Denver"
-        title="Roll for the Galaxy"
-        toggleCompletion={[Function]}
-        uniqueId="six"
-        updateTodo={[Function]}
-      />
-    </li>
-  </ol>
-</div>
+          courseName="Board Games"
+          date={"2017-04-25T13:06:07.000Z"}
+          id="6"
+          isObserving={false}
+          responsiveSize="large"
+          showNotificationBadge={false}
+          simplifiedControls={false}
+          timeZone="America/Denver"
+          title="Roll for the Galaxy"
+          toggleCompletion={[Function]}
+          uniqueId="six"
+          updateTodo={[Function]}
+        />
+      </li>
+    </ol>
+  </div>
+</Fragment>
 `;
 
 exports[`renders to do items correctly 1`] = `
-<div
-  className="Grouping-styles__root planner-grouping"
->
-  <NotificationBadge
-    responsiveSize="large"
-  />
-  <span
-    className="Grouping-styles__hero"
+<Fragment>
+  <style>
+    
+  .Grouping-styles__root {
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 1.5rem 0 0 0;
+    border-color: #0374B5;
+    color: #0374B5;
+    line-height: 1.25;
+    position: relative;
+    display: flex;
+  }
+  
+  .Grouping-styles__title {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 0.375rem 0.5rem;
+    background-color: #FFFFFF;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #0374B5;
+    border-top-left-radius: 0.125rem;
+    min-width: 1px;
+    overflow: hidden;
+    max-height: 3rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  .Grouping-styles__title::after {
+    content: "";
+    width: 100%;
+    height: 0.375rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%);
+  }
+  
+  .Grouping-styles__hero {
+    position: relative;
+    display: flex;
+    flex: 0 0 12rem;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    align-items: flex-start;
+    justify-content: center;
+    box-sizing: border-box;
+    outline: none;
+    padding: 0.0625rem;
+    text-decoration: none;
+    min-width: 1px;
+  }
+  .Grouping-styles__hero .Grouping-styles__groupingName {
+    text-decoration: undefined;
+  }
+  
+  .Grouping-styles__hero,
+  .Grouping-styles__overlay {
+    border-bottom-inline-start-radius: 0.25rem;
+    border-top-inline-start-radius: 0.25rem;
+  }
+  
+  .Grouping-styles__heroHover:focus, .Grouping-styles__heroHover:hover {
+    text-decoration: none;
+  }
+  .Grouping-styles__heroHover:focus .Grouping-styles__title, .Grouping-styles__heroHover:hover .Grouping-styles__title {
+    text-decoration: underline;
+  }
+  
+  .Grouping-styles__overlay {
+    background-color: #0374B5;
+    opacity: 1;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .Grouping-styles__overlay.Grouping-styles__withImage {
+    opacity: 0.75;
+  }
+  
+  .Grouping-styles__items {
+    flex: 1;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    border-top: 0.0625rem solid;
+    border-color: #0374B5;
+    color: #0374B5;
+    min-width: 1px;
+  }
+  
+  .Grouping-styles__medium.Grouping-styles__root, .Grouping-styles__small.Grouping-styles__root {
+    display: block;
+    margin: 0;
+  }
+  .Grouping-styles__medium .Grouping-styles__hero, .Grouping-styles__medium .Grouping-styles__overlay, .Grouping-styles__small .Grouping-styles__hero, .Grouping-styles__small .Grouping-styles__overlay {
+    border-radius: 0;
+    background-color: transparent;
+  }
+  .Grouping-styles__medium .Grouping-styles__hero, .Grouping-styles__small .Grouping-styles__hero {
+    display: block;
+    flex: none;
+    min-height: unset;
+    line-height: 2rem;
+  }
+  .Grouping-styles__medium .Grouping-styles__title, .Grouping-styles__small .Grouping-styles__title {
+    font-size: 0.875rem;
+    padding-inline-start: 0;
+  }
+  .Grouping-styles__medium .Grouping-styles__items, .Grouping-styles__small .Grouping-styles__items {
+    border-top-width: 0.125rem;
+  }
+  
+  </style>
+  <div
+    className="Grouping-styles__root planner-grouping"
   >
-    <span
-      className="Grouping-styles__overlay"
-      style={
-        Object {
-          "backgroundColor": null,
-        }
-      }
+    <NotificationBadge
+      responsiveSize="large"
     />
     <span
-      className="Grouping-styles__title"
+      className="Grouping-styles__hero"
     >
-      To Do
-    </span>
-  </span>
-  <ol
-    className="Grouping-styles__items"
-    style={
-      Object {
-        "borderColor": null,
-      }
-    }
-  >
-    <li
-      key="seven hundred"
-    >
-      <Animatable(PlannerItem_raw)
-        animatableIndex={101}
-        color={null}
-        context={Object {}}
-        courseName={null}
-        date={"2017-06-16T11:06:07.000Z"}
-        id="700"
-        isObserving={false}
-        responsiveSize="large"
-        showNotificationBadge={false}
-        simplifiedControls={false}
-        timeZone="America/Denver"
-        title="To Do 700"
-        toggleCompletion={[Function]}
-        uniqueId="seven hundred"
-        updateTodo={[Function]}
+      <span
+        className="Grouping-styles__overlay"
+        style={
+          Object {
+            "backgroundColor": null,
+          }
+        }
       />
-    </li>
-  </ol>
-</div>
+      <span
+        className="Grouping-styles__title"
+      >
+        To Do
+      </span>
+    </span>
+    <ol
+      className="Grouping-styles__items"
+      style={
+        Object {
+          "borderColor": null,
+        }
+      }
+    >
+      <li
+        key="seven hundred"
+      >
+        <Animatable(PlannerItem_raw)
+          animatableIndex={101}
+          color={null}
+          context={Object {}}
+          courseName={null}
+          date={"2017-06-16T11:06:07.000Z"}
+          id="700"
+          isObserving={false}
+          responsiveSize="large"
+          showNotificationBadge={false}
+          simplifiedControls={false}
+          timeZone="America/Denver"
+          title="To Do 700"
+          toggleCompletion={[Function]}
+          uniqueId="seven hundred"
+          updateTodo={[Function]}
+        />
+      </li>
+    </ol>
+  </div>
+</Fragment>
 `;

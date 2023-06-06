@@ -154,7 +154,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
       </div>
     </Heading>
     <div>
-      <Animatable(Grouping)
+      <Animatable(undefined)
         animatableIndex={1}
         color="#0B874B"
         currentUser={
@@ -189,7 +189,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
         }
         timeZone="America/Denver"
       />
-      <Animatable(Grouping)
+      <Animatable(undefined)
         animatableIndex={2}
         color="#0B874B"
         currentUser={
@@ -267,7 +267,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
       </div>
     </Heading>
     <div>
-      <Animatable(Grouping)
+      <Animatable(undefined)
         animatableIndex={1}
         color="#0B874B"
         currentUser={
@@ -302,7 +302,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         }
         timeZone="America/Denver"
       />
-      <Animatable(Grouping)
+      <Animatable(undefined)
         animatableIndex={2}
         color="#0B874B"
         currentUser={
@@ -345,7 +345,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         }
         timeZone="America/Denver"
       />
-      <Animatable(Grouping)
+      <Animatable(undefined)
         animatableIndex={3}
         color="#0B874B"
         currentUser={
@@ -418,7 +418,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
       </div>
     </Heading>
     <div>
-      <Animatable(Grouping)
+      <Animatable(undefined)
         animatableIndex={1}
         color="#0B874B"
         currentUser={
@@ -453,7 +453,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         }
         timeZone="America/Denver"
       />
-      <Animatable(Grouping)
+      <Animatable(undefined)
         animatableIndex={2}
         color="#0B874B"
         currentUser={
@@ -496,7 +496,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         }
         timeZone="America/Denver"
       />
-      <Animatable(Grouping)
+      <Animatable(undefined)
         animatableIndex={3}
         color="#0B874B"
         currentUser={
@@ -569,7 +569,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
       </div>
     </Heading>
     <div>
-      <Animatable(Grouping)
+      <Animatable(undefined)
         animatableIndex={101}
         color="#0B874B"
         currentUser={
@@ -606,7 +606,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         timeZone="America/Denver"
         url="http://www.non_default_url.com"
       />
-      <Animatable(Grouping)
+      <Animatable(undefined)
         animatableIndex={102}
         color="#0B874B"
         currentUser={
@@ -652,7 +652,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         timeZone="America/Denver"
         url="http://www.non_default_url.com"
       />
-      <Animatable(Grouping)
+      <Animatable(undefined)
         animatableIndex={103}
         color="#0B874B"
         currentUser={
