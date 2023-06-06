@@ -274,6 +274,7 @@ module CC
       end
 
       client = CC::CCHelper.kaltura_admin_session
+      tracks = {}
       html_content_exporter.used_media_objects.each do |obj|
         migration_id = create_key(obj.attachment)
         info = html_content_exporter.media_object_infos[obj.id]
@@ -307,7 +308,6 @@ module CC
         end
 
         unless Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
-          tracks = {}
           process_media_tracks_without_feature_flag(tracks, migration_id, obj, path)
         end
       rescue
