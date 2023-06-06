@@ -19,7 +19,6 @@
 import React from 'react'
 import {LinkDisplay} from '../LinkDisplay'
 import {render, fireEvent} from '@testing-library/react'
-import {IconBlank} from '../linkUtils'
 import {showFlashAlert} from '../../../../common/FlashAlert'
 
 jest.mock('../../../../common/FlashAlert')
@@ -31,10 +30,10 @@ describe('LinkDisplay', () => {
     props = {
       linkText: 'default text',
       linkFileName: 'default link filename',
-      Icon: IconBlank,
       placeholderText: 'default placeholder',
       published: true,
       handleTextChange: jest.fn(),
+      linkType: 'wikiPages',
     }
   })
 
@@ -54,12 +53,6 @@ describe('LinkDisplay', () => {
     const {getByLabelText} = renderComponent()
     const textInput = getByLabelText(/text \(optional\)/i)
     expect(textInput.value).toEqual('default text')
-  })
-
-  it('component displays the icon passed in as a prop', () => {
-    const {container} = renderComponent()
-    const icon = container.querySelector('svg[name="IconBlank"]')
-    expect(icon).toBeInTheDocument()
   })
 
   it('placeholder text matches the prop', () => {
@@ -101,6 +94,36 @@ describe('LinkDisplay', () => {
       message: 'Selected Course Link 2',
       srOnly: true,
       type: 'info',
+    })
+  })
+
+  it('renders the appropriate icon based on linkType', () => {
+    const {rerender, getByTestId} = renderComponent()
+    let iconContainer = getByTestId('icon-wrapper')
+    expect(iconContainer.querySelector('svg')).toHaveAttribute('name', 'IconDocument')
+    rerender(<LinkDisplay {...props} linkType="assignments" />)
+    iconContainer = getByTestId('icon-wrapper')
+    expect(iconContainer.querySelector('svg')).toHaveAttribute('name', 'IconAssignment')
+  })
+
+  describe('screenreader content', () => {
+    it('describes the linkType and publish status', () => {
+      const {rerender, getByTestId} = renderComponent()
+      expect(getByTestId('screenreader_content').textContent).toEqual('link type: Pagepublished')
+      rerender(<LinkDisplay {...props} linkType="quizzes" published={false} />)
+      expect(getByTestId('screenreader_content').textContent).toEqual('link type: Quizunpublished')
+    })
+
+    it('is not present if linkType is falsy', () => {
+      const {rerender, queryByTestId} = renderComponent({linkType: undefined})
+      expect(queryByTestId('screenreader_content')).not.toBeInTheDocument()
+      rerender(<LinkDisplay {...props} linkType={null} />)
+      expect(queryByTestId('screenreader_content')).not.toBeInTheDocument()
+    })
+
+    it('does not describe publish status if linkType is navigation', () => {
+      const {getByTestId} = renderComponent({linkType: 'navigation'})
+      expect(getByTestId('screenreader_content').textContent).toEqual('link type: Navigation')
     })
   })
 })
