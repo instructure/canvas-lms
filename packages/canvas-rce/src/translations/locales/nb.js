@@ -448,6 +448,9 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Forhåndsvisning av ikon" },
   "icon_shape_30b61e7": { "message": "Ikonform" },
   "icon_size_9353edea": { "message": "Ikonstørrelse" },
+  "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+    "message": "Hvis lenken er tom, vil tekst vises lenketeksten som navn på emnelenken"
+  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Hvis bruksrettigheter kreves, vil filen ikke bli publisert før det er angitt på Filer-siden."
   },

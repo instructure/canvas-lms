@@ -454,6 +454,9 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Podgląd ikony" },
   "icon_shape_30b61e7": { "message": "Kształt ikony" },
   "icon_size_9353edea": { "message": "Rozmiar ikony" },
+  "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+    "message": "Jeśli pozostanie puste, tekst zostanie wyświetlony jako nazwa łącza do kursu"
+  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Jeśli wymagane są prawa użytkowania, plik nie zostanie opublikowany bez wybrania odpowiednich ustawień na stronie Pliki."
   },

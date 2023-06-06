@@ -402,6 +402,9 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "圖示預覽" },
   "icon_shape_30b61e7": { "message": "圖示形狀" },
   "icon_size_9353edea": { "message": "圖示大小" },
+  "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+    "message": "在左側空白連結中，文字將顯示為課程連結名稱"
+  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "如果需要使用權限，在「檔案」頁面中啟用前將無法發佈檔案。"
   },

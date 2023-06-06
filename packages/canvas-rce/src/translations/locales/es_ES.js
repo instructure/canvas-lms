@@ -476,6 +476,9 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Icono vista previa" },
   "icon_shape_30b61e7": { "message": "Forma del icono" },
   "icon_size_9353edea": { "message": "Tamaño del icono" },
+  "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+    "message": "Si el enlace se deja vacío, el texto mostrará el nombre del enlace del curso."
+  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Si son necesarios los derechos de uso, el archivo no se publicará hasta que se habilite en la página Archivos."
   },

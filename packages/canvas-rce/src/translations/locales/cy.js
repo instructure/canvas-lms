@@ -460,6 +460,9 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Rhagolwg o’r Eicon" },
   "icon_shape_30b61e7": { "message": "Siâp yr Eicon" },
   "icon_size_9353edea": { "message": "Maint yr Eicon" },
+  "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+    "message": "Os bydd yn wag, bydd testun dolen yn ymddangos fel enw dolen cwrs"
+  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Os oes angen Hawliau Defnyddio ni fydd y ffeil yn cael ei chyhoeddi nes ei bod wedi’i galluogi ar y dudalen Ffeiliau."
   },

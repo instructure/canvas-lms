@@ -470,6 +470,9 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Vista preliminar del ícono" },
   "icon_shape_30b61e7": { "message": "Forma del ícono" },
   "icon_size_9353edea": { "message": "Tamaño del ícono" },
+  "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+    "message": "Si se deja vacío, el texto del enlace se mostrará como el nombre del enlace del curso."
+  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Si se requieren derechos de uso, no se publicará el archivo hasta que esté habilitado en la página de Archivos."
   },

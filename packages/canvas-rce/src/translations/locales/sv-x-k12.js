@@ -458,6 +458,9 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Förhandvisning av ikon" },
   "icon_shape_30b61e7": { "message": "Ikonform" },
   "icon_size_9353edea": { "message": "Ikonstorlek" },
+  "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+    "message": "Om den lämnas tom, kommer länktexten att visas som kurslänkens namn"
+  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Om användarrättigheter krävs publiceras inte filen förrän den aktiveras på sidan Filer."
   },
