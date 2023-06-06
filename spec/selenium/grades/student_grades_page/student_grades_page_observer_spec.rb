@@ -41,53 +41,99 @@ describe "gradebook" do
       @observed_courses[0].assignments.create!(title: "DO NOT GRADE", points_possible: 20)
     end
 
-    it "allows observer to see grade totals with and without ungraded assignments" do
-      user_session @observer
-      get "/courses/#{@observed_courses.first.id}/grades/"
-      expect(f(".student_assignment.final_grade").text).to eq "Total\n100%\n10.00 / 10.00"
-      expect(f("tr.group_total").text).to eq "Assignments\n100%\n10.00 / 10.00"
-      expect(f("tr#submission_final-grade").text).to eq "Total\n100%\n10.00 / 10.00"
+    context "when user is not quantitative data restricted" do
+      it "allows observer to see grade totals with and without ungraded assignments" do
+        user_session @observer
+        get "/courses/#{@observed_courses.first.id}/grades/"
+        expect(f(".student_assignment.final_grade").text).to eq "Total\n100%\n10.00 / 10.00"
+        expect(f("tr.group_total").text).to eq "Assignments\n100%\n10.00 / 10.00"
+        expect(f("tr#submission_final-grade").text).to eq "Total\n100%\n10.00 / 10.00"
 
-      f("#only_consider_graded_assignments_wrapper").click
-      expect(f(".student_assignment.final_grade").text).to eq "Total\n33.33%\n10.00 / 30.00"
-      expect(f("tr.group_total").text).to eq "Assignments\n33.33%\n10.00 / 30.00"
-      expect(f("tr#submission_final-grade").text).to eq "Total\n33.33%\n10.00 / 30.00"
+        f("#only_consider_graded_assignments_wrapper").click
+        expect(f(".student_assignment.final_grade").text).to eq "Total\n33.33%\n10.00 / 30.00"
+        expect(f("tr.group_total").text).to eq "Assignments\n33.33%\n10.00 / 30.00"
+        expect(f("tr#submission_final-grade").text).to eq "Total\n33.33%\n10.00 / 30.00"
+      end
+
+      it "can change the student filter" do
+        user_session @observer
+        get "/courses/#{@observed_courses.first.id}/grades/"
+        f("#student_select_menu").click
+        fj("li:contains('Student 1')").click
+        fj("button:contains('Apply')").click
+        wait_for_ajaximations
+        expect(f(".student_assignment.final_grade").text).to eq "Total\n80%\n8.00 / 10.00"
+        expect(f("tr.group_total").text).to eq "Assignments\n80%\n8.00 / 10.00"
+        expect(f("tr#submission_final-grade").text).to eq "Total\n80%\n8.00 / 10.00"
+      end
+
+      it "can change the course filter" do
+        user_session @observer
+        get "/courses/#{@observed_courses.first.id}/grades/"
+        f("#course_select_menu").click
+        fj("li:contains('OC1')").click
+        fj("button:contains('Apply')").click
+        wait_for_ajaximations
+        expect(f(".student_assignment.final_grade").text).to eq "Total\n90%\n9.00 / 10.00"
+        expect(f("tr.group_total").text).to eq "Assignments\n90%\n9.00 / 10.00"
+        expect(f("tr#submission_final-grade").text).to eq "Total\n90%\n9.00 / 10.00"
+      end
+
+      it "respect selected user when changing course filter" do
+        user_session @observer
+        get "/courses/#{@observed_courses.first.id}/grades/#{@students[1].id}"
+        f("#course_select_menu").click
+        fj("li:contains('OC1')").click
+        fj("button:contains('Apply')").click
+        wait_for_ajaximations
+        expect(f(".student_assignment.final_grade").text).to eq "Total\n70%\n7.00 / 10.00"
+        expect(f("tr.group_total").text).to eq "Assignments\n70%\n7.00 / 10.00"
+        expect(f("tr#submission_final-grade").text).to eq "Total\n70%\n7.00 / 10.00"
+      end
     end
 
-    it "can change the student filter" do
-      user_session @observer
-      get "/courses/#{@observed_courses.first.id}/grades/"
-      f("#student_select_menu").click
-      fj("li:contains('Student 1')").click
-      fj("button:contains('Apply')").click
-      wait_for_ajaximations
-      expect(f(".student_assignment.final_grade").text).to eq "Total\n80%\n8.00 / 10.00"
-      expect(f("tr.group_total").text).to eq "Assignments\n80%\n8.00 / 10.00"
-      expect(f("tr#submission_final-grade").text).to eq "Total\n80%\n8.00 / 10.00"
-    end
+    context "when user is quantitative data restricted" do
+      before :once do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
 
-    it "can change the course filter" do
-      user_session @observer
-      get "/courses/#{@observed_courses.first.id}/grades/"
-      f("#course_select_menu").click
-      fj("li:contains('OC1')").click
-      fj("button:contains('Apply')").click
-      wait_for_ajaximations
-      expect(f(".student_assignment.final_grade").text).to eq "Total\n90%\n9.00 / 10.00"
-      expect(f("tr.group_total").text).to eq "Assignments\n90%\n9.00 / 10.00"
-      expect(f("tr#submission_final-grade").text).to eq "Total\n90%\n9.00 / 10.00"
-    end
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
 
-    it "respect selected user when changing course filter" do
-      user_session @observer
-      get "/courses/#{@observed_courses.first.id}/grades/#{@students[1].id}"
-      f("#course_select_menu").click
-      fj("li:contains('OC1')").click
-      fj("button:contains('Apply')").click
-      wait_for_ajaximations
-      expect(f(".student_assignment.final_grade").text).to eq "Total\n70%\n7.00 / 10.00"
-      expect(f("tr.group_total").text).to eq "Assignments\n70%\n7.00 / 10.00"
-      expect(f("tr#submission_final-grade").text).to eq "Total\n70%\n7.00 / 10.00"
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: observer_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+      end
+
+      it "can toggle between using and not using ungraded assignments" do
+        user_session @observer
+        get "/courses/#{@observed_courses.first.id}/grades/"
+        expect(f(".student_assignment.final_grade").text).to eq "Total: A"
+        # TODO: wait for VICE-3565 and VICE-3566 before proceeding
+        # verify assignment group total and course final total is also A
+        # uncheck the use only graded assignments checkbox
+        # verify students get the letter grade equivalent of 33%
+      end
+
+      # it "can change the student filter" do
+      #   # TODO: wait for VICE-3565 and VICE-3566 before proceeding
+      #   # verify assignment group total and course final total is the equivalent of 80%
+      #   # upon selecting the next student
+      # end
+
+      # it "can change the course filter" do
+      #   # TODO: wait for VICE-3565 and VICE-3566 before proceeding
+      #   # verify assignment group total and course final total is the equivalent of 90%
+      #   # upon selecting the next course
+      # end
+
+      # it "keeps selected user when changing course filter" do
+      #   # TODO: wait for VICE-3565 and VICE-3566 before proceeding
+      #   # append the next student id to the end of the url, and visit
+      #   # verify assignment group total and course final total is the equivalent of 70%
+      #   # upon selecting the next course
+      # end
     end
   end
 end

@@ -38,22 +38,72 @@ describe "gradebook - logged in as a student" do
         course_with_student({ active_course: true, active_enrollment: true })
         @teacher = User.create!
         @course.enroll_teacher(@teacher)
-        assignment = @course.assignments.build(points_possible: 20)
-        assignment.publish
-        assignment.grade_student(@student, grade: 10, grader: @teacher)
-        assignment.assignment_group.update(group_weight: 1)
+        @assignment = @course.assignments.build(points_possible: 20)
+        @assignment.publish
+        @assignment.grade_student(@student, grade: 10, grader: @teacher)
+        @assignment.assignment_group.update(group_weight: 1)
         @course.show_total_grade_as_points = true
         @course.save!
       end
 
-      before do
+      it 'displays total and "out of" point values' do
         user_session(@student)
         StudentGradesPage.visit_as_student(@course)
-      end
-
-      it 'displays total and "out of" point values' do
         expect(StudentGradesPage.final_grade).to include_text("10")
         expect(StudentGradesPage.final_points_possible).to include_text("10.00 / 20.00")
+      end
+
+      it "displays both score and letter grade when course uses a grading scheme" do
+        @course.update_attribute :grading_standard_id, 0 # the default
+        @course.save!
+
+        user_session(@student)
+        StudentGradesPage.visit_as_student(@course)
+        expect(f("div.final_grade").text).to eq "Total: 10.00 / 20.00 (F)"
+        expect(f("tr.group_total").text).to eq "Assignments\n50%\n10.00 / 20.00"
+      end
+
+      it "respects grade dropping rules" do
+        ag = @assignment.assignment_group
+        ag.update(rules: "drop_lowest:1")
+        ag.save!
+
+        undropped = @course.assignments.build(points_possible: 20)
+        undropped.publish
+        undropped.grade_student(@student, grade: 20, grader: @teacher)
+        user_session(@student)
+        StudentGradesPage.visit_as_student(@course)
+        expect(f("tr#submission_#{@assignment.id}").attribute("title")).to eq "This assignment is dropped and will not be considered in the total calculation"
+        expect(f("div.final_grade").text).to eq "Total: 20.00 / 20.00"
+        expect(f("tr.group_total").text).to eq "Assignments\n100%\n20.00 / 20.00"
+        expect(f("tr#submission_final-grade").text).to eq "Total\n20.00 / 20.00\n20.00 / 20.00"
+      end
+    end
+
+    context "when testing multiple courses" do
+      it "can switch between courses" do
+        admin = account_admin_user
+        my_student = user_factory(name: "My Student", active_all: true)
+        student_courses = Array.new(2) { |i| course_factory(active_course: true, active_all: true, course_name: "SC#{i}") }
+        student_courses.each_with_index do |course, index|
+          course.enroll_user(my_student, "StudentEnrollment", enrollment_state: "active")
+          a = course.assignments.create!(title: "#{course.name} assignment", points_possible: 10)
+          a.grade_student(my_student, grade: (10 - index).to_s, grader: admin)
+        end
+
+        user_session my_student
+        StudentGradesPage.visit_as_student(student_courses[0])
+        expect(f(".student_assignment.final_grade").text).to eq "Total\n100%\n10.00 / 10.00"
+        expect(f("tr.group_total").text).to eq "Assignments\n100%\n10.00 / 10.00"
+        expect(f("tr#submission_final-grade").text).to eq "Total\n100%\n10.00 / 10.00"
+
+        f("#course_select_menu").click
+        fj("li:contains('SC1')").click
+        fj("button:contains('Apply')").click
+        wait_for_ajaximations
+        expect(f(".student_assignment.final_grade").text).to eq "Total\n90%\n9.00 / 10.00"
+        expect(f("tr.group_total").text).to eq "Assignments\n90%\n9.00 / 10.00"
+        expect(f("tr#submission_final-grade").text).to eq "Total\n90%\n9.00 / 10.00"
       end
     end
 
