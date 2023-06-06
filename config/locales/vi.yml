@@ -374,12 +374,14 @@ vi:
     report_header_course_sis: "sis khóa học"
     report_header_course_sis_id: "id sis khóa học"
     report_header_created_at: "Đã tạo lúc"
+    report_header_current_grade: "điểm hiện tại"
     report_header_current_score: "điểm hiện tại"
     report_header_email: email
     report_header_end__date: end_date
     report_header_end_date: "ngày kết thúc"
     report_header_enrollment_state: "tình trạng ghi danh"
     report_header_expiration: "hết hạn"
+    report_header_final_grade: "điểm cuối cùng"
     report_header_final_score: "điểm cuối cùng"
     report_header_first_name: first_name
     report_header_full_name: full_name
@@ -398,6 +400,8 @@ vi:
     report_header_name: tên
     report_header_nonxlist_course_id: nonxlist_course_id
     report_header_outcome_score: "điểm kết quả"
+    report_header_override_grae: "ghi đè điểm"
+    report_header_override_score: "ghi đè điểm"
     report_header_parent_account_id: parent_account_id
     report_header_restrict_course_dates: restrict_enrollments_to_course_dates
     report_header_restrict_section_dates: restrict_enrollments_to_section_dates
@@ -417,9 +421,11 @@ vi:
     report_header_start_date: "ngày bắt đầu"
     report_header_status: "trạng thái"
     report_header_student_id: "id sinh viên"
+    report_header_student_login_sis: "id đăng nhập của sinh viên"
     report_header_student_name: "tên sinh viên"
     report_header_student_sis: "sis sinh viên"
     report_header_student_sis_id: "id sis sinh viên"
+    report_header_student_sortable_name: "tên có thể sắp xếp của sinh viên"
     report_header_submission_date: "ngày nộp"
     report_header_submission_score: "điểm nộp"
     report_header_term: "học kì"
@@ -430,6 +436,10 @@ vi:
     report_header_token_dev_key_name: "tên mã của nhà phát triển"
     report_header_token_hint: "gợi ý thẻ bảo mật"
     report_header_token_last_used: "được sử dụng lần cuối"
+    report_header_unposted_current_grade: "điểm hiện tại chưa được đăng"
+    report_header_unposted_current_score: "điểm hiện tại chưa được đăng"
+    report_header_unposted_final_grade: "điểm cuối cùng chưa được đăng"
+    report_header_unposted_final_score: "điểm cuối cùng chưa được đăng"
     report_header_user__id: user_id
     report_header_user_id: "id người dùng"
     report_header_user_name: "tên người dùng"
@@ -579,8 +589,8 @@ vi:
         blank_placeholder: "-"
         event_type: 
           corrupted: "Thông Tin Chi Tiết Không Khả Dụng"
-        no-abbreviation: "n"
-        yes-abbreviation: "y"
+        no-abbreviation: không
+        yes-abbreviation: có
       grade_change_logging_results: 
         Anonymous: "Ẩn Danh"
         Assignment: "Bài Tập"
@@ -878,6 +888,13 @@ vi:
               parameters: 
                 header: "Được Nộp Sau:"
     integer_required: "Yêu cầu phải là giá trị số nguyên"
+    issaquah: 
+      grade_export: 
+        description: 
+          account_reports: 
+            default: 
+              description: 
+                text: "Báo cáo này hiển thị kết quả điểm cuối cùng của sinh viên cho tất cả sinh viên trong một học kỳ nhất định. Tệp csv kết quả sẽ thêm một hàng cho mỗi lần đăng ký và sẽ hiển thị điểm hiện tại và điểm cuối cùng được hiển thị trong sổ điểm của khóa học."
     ivy_tech: 
       rubric_detail_score_report: 
         parameters: 
@@ -1855,6 +1872,8 @@ vi:
   admin_4d3ba42f: "Quản trị viên"
   admin_analytics_description: "Bật Phân Tích ở cấp độ tài khoản. Bảng điều khiển Phân Tích của Quản Trị Viên cung cấp thông tin chi tiết về việc sử dụng Canvas, sự thành công của khóa học Canvas và sự tham gia của sinh viên. Tìm hiểu thêm về *Trung Tâm Phân Tích của Quản Trị Viên* ở cộng đồng Canvas."
   admin_analytics_eacba735: "Phân Tích Quản Trị"
+  admin_analytics_new_filter_ui_aee1ea8e: "Phân Tích Quản Trị - Giao Diện (User Interface, UI) Bộ Lọc Mới"
+  admin_analytics_new_filter_ui_description: "Bật UI Bộ Lọc Phân Tích Quản Trị mới."
   admin_csv_f8d1b3eb: "CSV quản trị viên"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Xuất Quản Trị cho Nhiều Khoảng Thời Gian Chấm Điểm"
   admin_navigation_menu_77b801a2: "Menu Điều Hướng Quản Trị Viên"
@@ -1941,6 +1960,7 @@ vi:
   alerts_add_edit_delete_d71091c6: "Cảnh báo - thêm / chỉnh sửa / xóa"
   alerts_must_be_configured_for_the_institution_aler_43bbacb1: "Cảnh báo phải được cấu hình cho tổ chức. Cảnh báo là một tính năng hiếm khi được sử dụng được thiết kế để gửi cảnh báo đến các sinh viên, giáo viên hoặc quản trị viên về các trình kích hoạt cụ thể (ví dụ: không có tương tác giữa sinh viên và giáo viên trong 7 ngày). Chúng được kiểm tra hàng ngày và các thông báo sẽ được gửi đến sinh viên và/hoặc giáo viên cho đến khi vấn đề kích hoạt được giải quyết."
   align_outcomes_to_this_page_7d055196: "Điều chỉnh kết quả phù hợp với trang này"
+  aligned_questions_125fd2ce: "Câu Hỏi Được Căn Chỉnh"
   alignments_de5f20d8: "Liên Kết"
   all_4321c3a1: "Tất cả"
   all_account_types_e83c1516: "Tất Cả Loại Tài Khoản"
@@ -1980,6 +2000,7 @@ vi:
   all_media_types_allowed_3c0cdce7: "Tất Cả Các Loại Truyền Thông Được Cho Phép"
   all_modules_20c9a1c8: "Tất Cả Các Học Phần"
   all_my_files_a0213441: "Tất Cả Các Tệp Của Tôi"
+  all_new_and_existing_users_in_the_sub_account_will_7ec9ca8d: "Tất cả người dùng mới và người dùng hiện có trong tài khoản phụ sẽ được tự động đăng ký vào các lịch đã chọn."
   all_outcomes_9f338636: "Tất Cả Các Kết Quả"
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Tất cả các kết quả từ %{groupTitle} đã được thêm thành công vào khóa học này."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Tất cả các kết quả từ %{groupTitle} đã được thêm thành công vào %{targetGroupTitle}."
@@ -2046,6 +2067,7 @@ vi:
   allow_students_to_download_course_content_and_view_810e66ec: "Cho phép sinh viên tải xuống nội dung khóa học và xem ngoại tuyến"
   allow_students_to_see_who_has_signed_up_for_time_s_7eb1d0ef: "Cho phép sinh viên xem ai đã đăng ký được vào các chỗ còn trống."
   allow_students_to_see_who_was_signed_up_for_time_s_37f5cb01: "Cho phép sinh viên xem ai đã đăng ký trong các chỗ còn trống"
+  allow_students_to_sync_their_course_content_in_the_b6fd9169: "Cho phép sinh viên đồng bộ hóa nội dung khóa học của họ trong ứng dụng thiết bị di động và xem nội dung khi ngoại tuyến."
   allow_sub_account_selection_when_users_manually_cr_d0a6e2e6: "Cho phép lựa chọn tài khoản phụ khi người dùng tạo các khóa học theo cách thủ công"
   allow_switching_to_the_enhanced_rce_317e746f: "Cho phép chuyển sang RCE nâng cao"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Cho phép khả năng gửi thông báo qua hàng đợi gửi của chúng tôi"
@@ -2072,6 +2094,7 @@ vi:
       đột biến GraphQL chạy gần đây
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Cho phép sắp hàng kết quả với nội dung không tính điểm"
   allows_blueprint_course_settings_to_be_exported_an_a34bb7f: "Cho phép xuất và sao chép cài đặt Khóa Học Cơ Bản đến Khóa Học Cơ Bản khác"
+  allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "Cho phép các khóa học cơ bản theo dõi các thay đổi về id tài nguyên của bài tập."
   allows_canvas_to_send_iwork_files_to_docviewer_220f4753: "Cho phép Canvas gửi các tệp iWork đến docviewer."
   allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Cho phép công bố các trang khóa học theo lịch trình"
   allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Cho phép người chấm điểm nhập MI vào Sổ Điểm hoặc SpeedGrader gắn thẻ thiếu một bài tập theo cách thủ công"
@@ -2091,6 +2114,7 @@ vi:
   allows_user_access_to_lti_sub_navigation_tool_sele_2bdf577: "Cho phép người dùng truy cập vào lựa chọn công cụ điều hướng phụ LTI để định cấu hình chương trình học bài tập."
   allows_user_to_access_a_user_s_settings_menu_and_u_235d8fd8: "Cho phép người dùng truy cập menu cài đặt của người dùng và thông tin chi tiết về người dùng."
   allows_user_to_access_and_edit_the_admin_settings__e45da9d7: "Cho phép người dùng truy cập và chỉnh sửa cài đặt Quản Trị Viên trong Commons."
+  allows_user_to_access_and_manage_canvas_data_servi_ee75e004: "Cho phép người dùng truy cập và quản lý Dịch Vụ Dữ Liệu Canvas."
   allows_user_to_access_gradebook_history_9d599681: "Cho phép người sử dụng truy cập Lịch Sử Sổ Điểm."
   allows_user_to_access_gradebook_history_allows_use_79dfddd: "Cho phép người sử dụng truy cập Lịch Sử Sổ Điểm. Cho phép người sử dụng truy cập Sổ Điểm Học Tập Thành Thạo (nếu được bật)."
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "Cho phép người dùng truy cập SpeedGrader từ một bài tập."
@@ -3020,6 +3044,7 @@ vi:
   assignment_id_96baa1b7: "id bài tập"
   assignment_id_b040cee0: "ID bài tập"
   assignment_ids_param_is_invalid_7dc5c327: "Tham số %{assignment_ids} không hợp lệ"
+  assignment_information_e871d0e0: "Thông Tin Bài Tập"
   assignment_is_incomplete_ff55e07c: "%{assignment} chưa hoàn thành"
   assignment_is_reassigned_dd6b6ef2: "Bài tập được chỉ định lại."
   assignment_is_reassigned_ebb31807: "%{assignment} được chỉ định lại"
@@ -3703,6 +3728,7 @@ vi:
   authorize_url_f28167a3: "URL Ủy Quyền"
   auto_leader_7791c30a: auto_leader
   auto_show_closed_captions_e4cd7aff: "Tự Động Hiển Thị Phụ Đề Đã Đóng"
+  auto_subscribe_a7da0dff: "Đăng ký tự động"
   autodetect_field_separators_in_compatible_spreadsh_768067e1: "Tự động phát hiện dấu phân tách trường trong việc xuất bảng tính tương thích"
   automatic_mobile_app_login_3724af59: "Đăng Nhập Ứng Dụng Di Động Tự Động"
   automatically_apply_deduction_to_late_submissions_2b68166e: "Tự động áp dụng điểm trừ cho những lần nộp muộn"
@@ -3751,6 +3777,7 @@ vi:
   avatar_for_user_name_61f6be17: "Hình đại diện cho %{user_name}"
   average_49c63f9b: "Trung Bình Cộng"
   average_is_not_a_good_fit_for_most_outcomes_based__f351ed94: "Mức trung bình không phù hợp với hầu hết các trường hợp sử dụng học tập dựa trên kết quả hoặc dựa trên mức độ thành thạo vì sinh viên có thể cần thời gian để đạt được thành thạo về kết quả và thành tích không tốt trước đó có thể làm giảm mức trung bình."
+  average_score_15cd7c3c: "Điểm Trung Bình"
   avg_alignments_per_artifact_5573d99c: "Trung bình Căn Chỉnh trên mỗi Tạo Tác"
   avg_alignments_per_outcome_4daf75cd: "Trung bình Căn Chỉnh trên mỗi Kết Quả"
   avi_2d8cc99f: AVI
@@ -3846,6 +3873,7 @@ vi:
   blueprint_information_95dcef55: "Thông Tin Bản Vẽ Thiết Kế"
   blueprint_locking_is_only_available_for_published__c8c97e3f: "Chức năng khóa bản vẽ thiết kế chỉ khả dụng cho nhịp độ được phát hành"
   blueprint_locking_is_only_available_for_the_course_68ec4266: "Chức năng khóa bản vẽ thiết kế chỉ khả dụng cho nhịp độ cấp khóa học"
+  blueprint_resource_id_support_ae48c0b9: "Hỗ Trợ ID Tài Nguyên Bản Vẽ Thiết Kế"
   blueprint_settings_233e909a: "Cài Đặt Bản Vẽ Thiết Kế"
   blueprint_sync_90d0dfd5: "Đồng Bộ Hóa Bản Vẽ Thiết Kế"
   bmp_e297149c: BMP
@@ -4263,6 +4291,7 @@ vi:
       show_undated_events: "Hiển thị các mục không ghi ngày tháng"
   calendar_283a9ed9: lịch
   calendar_a8563bb2: "Lịch:"
+  calendar_automatically_appears_in_user_s_other_cal_ed9fc840: "Lịch tự động xuất hiện trong danh sách \"Lịch Khác\" của người dùng."
   calendar_contextinfo_name_a7d98525: "Lịch %{contextInfo.name}"
   calendar_d14cfc8f: Lịch
   calendar_event: 
@@ -4306,6 +4335,7 @@ vi:
   calendar_feed_url_b7b91e7b: "Url Nguồn Cấp Dữ Liệu Lịch"
   calendar_removed_1c841af4: "Đã xóa lịch"
   calendar_series_e1b7a4bc: "Loạt Lịch"
+  calendar_subscription_options_1ff6f939: "Tùy chọn đăng ký lịch"
   calendars: 
     event: 
       due: "đến hạn"
@@ -4320,6 +4350,7 @@ vi:
       page_title_header: Lịch
       undated_items: "Không ghi ngày tháng"
   calendars_a756c286: Lịch
+  calendars_added_by_the_admin_cannot_be_removed_23c5effa: "Lịch do quản trị viên thêm vào không thể gỡ bỏ"
   calendars_added_successfully_2e443b3: "Đã thêm lịch thành công"
   calendars_saved_successfully_bcba8359: "Đã lưu lịch thành công"
   calendars_toggle_list_visibility_488db143: "Lịch chuyển đổi chế độ hiển thị danh sách"
@@ -4547,6 +4578,7 @@ vi:
   change_description_for_mastery_level_position_c3c41be9: "Thay đổi mô tả cho mức độ thành thạo %{position}"
   change_ending_date_to_d2cebd54: "Thay đổi ngày kết thúc thành"
   change_existing_group_2c91a32b: "Thay Đổi Nhóm Đang Tồn Tại"
+  change_gradebook_view_d2d9a101: "Thay đổi chế độ xem Sổ Điểm"
   change_mastery_f4d43c07: "Thay đổi thành thạo"
   change_mastery_points_c4f68a36: "Thay đổi điểm thành thạo"
   change_name_c8cce76c: "Thay Đổi Tên"
@@ -4637,6 +4669,7 @@ vi:
   clear_2084585f: Xóa
   clear_all_da755751: "Xóa tất cả"
   clear_all_filters_9c7e870: "Xóa Tất Cả Các Bộ Lọc"
+  clear_badge_counts_6f776710: "Xóa Bộ Đếm Huy Hiệu"
   clear_course_selection_b0762ae2: "Xóa Lựa Chọn Khóa Học"
   clear_job_selection_6ad1ff95: "Xóa lựa chọn công việc"
   clear_search_900e9c97: "Xóa tìm kiếm"
@@ -5483,6 +5516,7 @@ vi:
   content_on_this_page_violates_the_security_policy__25685d8a: "Nội dung trên trang này vi phạm chính sách an ninh, hãy liên hệ quản trị viên để được hỗ trợ."
   content_security_policy_3bb8d922: "Chính Sách An Ninh Nội Dung"
   content_security_policy_settings_3e87fcb2: "Cài Đặt về Chính Sách An Ninh Nội Dung"
+  content_selection_4aad6732: "Lựa Chọn Nội Dung"
   content_share_preview_166f6562: "Xem Trước Nội Dung Chia Sẻ"
   content_share_started_successfully_2c37fb79: "Chia sẻ nội dung đã bắt đầu thành công"
   content_shared_by_others_to_you_5a40bb2c: "Nội dung được người khác chia sẻ cho bạn"
@@ -6317,6 +6351,7 @@ vi:
       media_file: "Không thể xuất tệp phương tiện"
       media_files: "Không thể xuất một số tập tin phương tiện"
       media_files_too_large: "Không thể xuất các tập tin phương tiện vì tổng kích thước tập tin quá lớn."
+      media_tracks: "Không thể xuất một số phụ đề phương tiện"
       module_meta: "Không thể xuất dữ liệu meta học phần"
       organization: "Không thể tạo được cấu trúc tổ chức."
       question_bank: "Ngân hàng câu hỏi \"%{title}\" không xuất được"
@@ -7212,6 +7247,7 @@ vi:
   dashboard_view_d7d85969: "Xem Bảng Điều Khiển"
   data_exports: "xuất dữ liệu"
   data_point_over_time_8d0a54cc: "%{data_point} Quá Hạn"
+  data_services_c47a8130: "Dịch Vụ Dữ Liệu"
   data_services_manage_9b8f96da: "Dịch Vụ Dữ Liệu - quản lý "
   data_set_identifier_data_set_id_c228b5df: "Mã Định Danh Tập Dữ Liệu: %{data_set_id}"
   database_error_3d543659: "Lỗi cơ sở dữ liệu"
@@ -7616,6 +7652,7 @@ vi:
   disable_extra_filter_options_1d1cdc02: "tắt các tùy chọn bộ lọc bổ sung"
   disable_keyboard_shortcuts_9db78832: "Tắt Các Phím Tắt"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Tắt các hộp kiểm nhập và di chuyển Câu Hỏi Kiểm Tra Mới, đặt chúng là đã bật"
+  disable_oembed_retrieve_endpoint_56c050c8: "Tắt oembed_retrieve đầu cuối"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Tắt tính năng Đăng Lên SIS cho Bài Tập trong các Thời Gian Phân Loại Điểm Đã Đóng"
   disable_scope_6ba4e4d4: "Tắt phạm vi"
   disable_smart_app_banner_on_mobile_devices_bed9bf3b: "Tắt Biểu Ngữ Ứng Dụng Thông Minh trên Các Thiết Bị Di Động"
@@ -7937,6 +7974,7 @@ vi:
   divide_into_equal_time_slots_in_minutes_234312fa: "Chia thành các khoảng thời gian bằng nhau (tính bằng phút"
   division_cutoff_cutoff_value_e938bc9d: "Ngưỡng phân chia %{cutoff_value}"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Không tính bài tập này vào điểm cuối cùng"
+  do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Không hiển thị trong sổ điểm hoặc trang điểm của sinh viên"
   do_not_show_again_for_this_assignment_d0abd4ae: "Không hiển thị lại cho bài tập này"
   do_nothing_9672b478: "Không Làm Gì Cả"
   doc_50924b72: DOC
@@ -7996,6 +8034,7 @@ vi:
   download_canvas_ios_app_11c8651b: "Tải xuống ứng dụng Canvas iOS"
   download_course_content_7f66edc9: "Tải Xuống Nội Dung Khóa Học"
   download_course_roster_csv_86b3d192: "Tải xuống CSV Danh Sách Khóa Học"
+  download_current_scores_csv_8ae3f590: "Tải Xuống Điểm Hiện Tại (.csv)"
   download_epub_757cf0af: "Tải xuống ePub"
   download_errors_attchment_82ffea3f: "Tải xuống errors_attchment"
   download_filename_781704f5: "Tải xuống %{filename}"
@@ -8355,6 +8394,11 @@ vi:
   enhance_color_contrast_of_content_685ddd49: "Tăng cường độ tương phản màu sắc của nội dung"
   enhanced_gradebook_filters_a3be5e7d: "Bộ Lọc Sổ Điểm Nâng Cao"
   enhanced_gradebook_filters_description: "Đặc tính này cung cấp tùy chọn bộ lọc nâng cao trong sổ điểm Canvas. Khi gắn cờ này, quyền truy cập sớm vào các cải tiến đang diễn ra sẽ tự động được hiển thị với mọi bản phát hành. Để biết chi tiết đầy đủ, vui lòng xem *Nhóm Người Dùng Bộ Lọc Sổ Điểm* trong Cộng đồng Canvas."
+  enhanced_individual_gradebook: 
+    assignment_order_alpha: "Theo thứ tự bảng chữ cái"
+    assignment_order_assignment_groups: "Theo Nhóm và Vị Trí Bài Tập"
+    assignment_order_due_date: "Theo Ngày Đến Hạn"
+  enhanced_individual_gradebook_4e825077: "Sổ Điểm Cá Nhân Nâng Cao"
   enhanced_rce_paste_from_clipboard_30ddb011: "Dán RCE nâng cao từ bảng ghi tạm"
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Tăng cường độ tương phản màu sắc của văn bản, nút, v.v."
   enroll_in_subject_9c1f1c18: "Ghi Danh Môn Học"
@@ -9354,6 +9398,8 @@ vi:
   finnish_4df2923d: "Phần Lan"
   first_last_name_9820d256: "Tên, Họ"
   first_name_d5c12500: Tên
+  fix_missing_policy_applicator_gradebook_history_f3e62bc1: "Sửa Lỗi Thiếu Trình Áp Dụng Chính Sách trong Lịch Sử Sổ Điểm"
+  fixes_the_missing_policy_applicator_to_insert_reco_dedabe12: "Sửa lỗi thiếu trình áp dụng chính sách để chèn bản ghi vào Lịch Sử Sổ Điểm cho mỗi bài nộp bị đánh dấu là thiếu."
   flagged_as_possible_spam_ebbc4683: "Bị gắn cờ có thể là spam"
   flags_ce30e8e3: Cờ
   flags_tab_updates_c4c209f1: "Các Cập Nhật tab Cờ"
@@ -9500,6 +9546,7 @@ vi:
     warning: "cảnh báo"
   global_navigation_8bee3501: "Điều Hướng Toàn Cầu"
   global_navigation_tray_35612e2e: "Khay điều hướng toàn cầu"
+  global_settings_88028080: "Các Cài Đặt Chung"
   go_30af2a7b: Đi
   go_back_ed239e69: "Quay Lại"
   go_to_name_s_profile_eaa1826b: "Đi tới hồ sơ của %{name}"
@@ -9576,6 +9623,8 @@ vi:
   grade_summary: 
     graph_title: "Trung Bình %{mean}, Cao %{high}, Thấp %{low}"
   grade_summary_255289f6: "Tổng Kết Điểm"
+  grade_summary_error_page_37022a62: "Trang Lỗi Tổng Kết Điểm"
+  grade_summary_initial_query_error_229019c: "Lỗi truy vấn ban đầu về Tổng Kết Điểm"
   grade_syncing_e78475e8: "Đồng Bộ Điểm"
   gradebook: 
     gradebook_header_menu: 
@@ -9629,6 +9678,7 @@ vi:
   gradebook_csv_export_assignment_order_matches_the__9044f08e: "Thứ Tự Bài Tập Xuất CSV trong Sổ Điểm Khớp với Lưới Sổ Điểm"
   gradebook_csvs: 
     grades_filename: Điểm
+  gradebook_enhanced_individual_view_d532923f: "Sổ điểm: Chế Độ Xem Cá Nhân Nâng Cao"
   gradebook_export_failed_error_57442a4c: "Xuất Sổ Điểm Không Thành Công: %{error}"
   gradebook_export_failed_reason_2b0f6c53: "Xuất Sổ Điểm Không Thành Công: %{reason}"
   gradebook_export_has_completed_5d535028: "Hoàn thành xuất sổ điểm hoàn thành"
@@ -9802,6 +9852,7 @@ vi:
   graded_25cd3fcd: "Đã Chấm Điểm"
   graded_date_by_grader_e8e1ff75: "%{graded_date} chậm nhất vào %{grader}"
   graded_quiz_7fabdf1f: "Kiểm tra có chấm điểm"
+  graded_submissions_9c7068a2: "Các bài nộp đã chấm điểm:"
   graded_survey_c0f0c395: "Khảo sát có chấm điểm"
   grader_comments_visible_to_graders_turned_off_d2af5e9d: "Bình luận của sinh viên hiển thị cho sinh viên đã tắt"
   grader_comments_visible_to_graders_turned_on_dca303c7: "Bình luận của sinh viên hiển thị cho sinh viên đã bật"
@@ -10333,6 +10384,7 @@ vi:
     training_services_portal_sub: "Truy cập các video và khóa học đào tạo Canvas"
     which_course_is_this_question_about: "Câu hỏi này là về khóa học nào?"
     your_email_address: "Địa chỉ email của bạn"
+  help_ec7bc78f: "trợ giúp"
   help_menu_links_51184b65: "Liên kết menu trợ giúp"
   help_menu_options_7ecf7031: "Tùy chọn menu trợ giúp"
   help_us_improve_by_telling_us_what_happened_d6392f18: "Giúp chúng tôi cải thiện bằng cách cho chúng tôi biết những gì đã xảy ra"
@@ -10416,6 +10468,7 @@ vi:
   hide_projections_9d4ed1e1: "Ẩn Các Dự Đoán"
   hide_score_total_for_assessment_results_d0ef117f: "Ẩn tổng điểm cho các kết quả đánh giá"
   hide_sidebar_2b5b3776: "Ẩn Thanh Bên"
+  hide_student_names_3e59e862: "Ẩn Tên Sinh Viên"
   hide_sub_accounts_for_account_name_a6de98bd: "Ẩn Tài Khoản Phụ cho %{account_name}"
   hide_total_and_override_columns_6fde3e25: "Ẩn Cột Tổng và Ghi Đè"
   hide_zero_point_new_quizzes_from_the_student_and_t_b4c22d88: "Ẩn các bài kiểm tra mới không điểm khỏi sổ điểm của học sinh và giáo viên"
@@ -10431,6 +10484,7 @@ vi:
   high_contrast_description: |-
       Độ Tương Phản Cao tăng cường độ tương phản màu sắc của giao diện người dùng (UI) (văn bản, các nút, v.v.), làm cho các mục đó rõ ràng hơn
       và dễ xác định hơn. Ghi chú: Thương hiệu tổ chức sẽ bị vô hiệu hóa.
+  high_score_267b6641: "Điểm Cao"
   high_score_47924c1a: "Cao: %{score}"
   highest_28ad71e6: "Cao Nhất"
   highest_score_e080551e: "Điểm Cao Nhất"
@@ -10673,6 +10727,10 @@ vi:
       đến window.parent instead of window.top. Điều này cho phép phản hồi liên kết
       sâu gửi chính xác các mục nội dung đến Các Câu Hỏi Kiểm Tra Mới, khi một ông cụ được
       khởi chạy từ NQ.
+  if_enabled_the_deprecated_oembed_retrieve_endpoint_ac2701be: |-
+      Nếu được bật, đầu cuối oembed_retrieve bị phản đối sẽ không còn khả dụng.
+      Điều này tạo điều kiện thuận lợi cho việc chuyển tiếp bất kỳ người dùng tiềm năng nào khỏi đầu cuối này trước khi
+      gỡ bỏ hoàn toàn.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Nếu được kích hoạt , OAuth 2.0 bây giờ sẽ trả về chính xác mã trạng thái 4xx cho
       khách yêu cầu thay vì chuyển hướng đến họ
@@ -10845,6 +10903,7 @@ vi:
   improve_and_streamline_the_rce_button_and_tray_ux_89d5a47e: "Cải thiện và hợp lý hóa nút RCE và UX khay"
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Cải thiện khả năng khám phá khi kéo và thả trong Tập Tin"
   improve_feedback_on_students_grade_page_ce2c8658: "Cải Thiện Phản Hồi về Trang Điểm Sinh Viên"
+  improve_letter_grading_scheme_usability_808b12ba: "Cải Thiện Khả Năng Sử Dụng Chế Độ Cho Điểm Theo Chữ Cái"
   improved_filtering_of_students_and_assignments_in__5c6a281: "Đã cải thiện tính năng lọc sinh viên và bài tập trong Sổ Điểm."
   improved_interface_with_ongoing_updates_7316bdef: "Đã cải thiện giao diện với các bản cập nhật liên tục"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Đã cải thiện hỗ trợ Câu Hỏi Kiểm Tra Mới với Học Phần bao gồm tạo Câu Hỏi Kiểm Tra Mới từ các Học Phần"
@@ -10915,6 +10974,7 @@ vi:
   indigo_2035fc55: "Màu chàm"
   individual_2033c005: "Cá nhân"
   individual_assignment_grade_posting_d8322b99: "Đăng Điểm Bài Tập Cá Nhân"
+  individual_gradebook_117281bb: "Sổ Điểm Cá Nhân"
   individual_gradebook_c7de9821: "Sổ Điểm Cá Nhân…"
   individual_gradebook_enhancements_de33aa3d: "Cải Tiến Sổ Điểm Cá Nhân"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Không thể sửa đổi các giá trị tính toán kết quả riêng lẻ."
@@ -11882,6 +11942,7 @@ vi:
   los_gatos_saratoga_joint_union_high_school_distric_91f5b3c6: "Báo Cáo Điểm của Los Gatos-Saratoga Joint Union High School District"
   low_eab1cadd: Thấp
   low_score_4eeb95b2: "Thấp: %{score}"
+  low_score_6d05905b: "Điểm Thấp"
   lower_bound_ed528347: "Giới Hạn Dưới"
   lower_bound_to_upper_bound_48d093c2: "%{lower_bound} đến %{upper_bound}"
   lower_limit_of_range_6ddd4983: "Giới hạn dưới của phạm vi"
@@ -12011,6 +12072,7 @@ vi:
   manual_configuration_b586fe54: "Cấu Hình Thủ Công"
   manual_entry_e4a4f99a: "Lối Vào Thủ Công"
   manual_posting_scores_hidden_from_instructors_9ccb197c: "%{manual_posting} (các điểm bị ẩn từ người hướng dẫn)"
+  manual_subscribe_5ad37b14: "Đăng ký thủ công"
   manual_syncs_are_available_every_cooldown_minutes__e47de0a8: "Các đồng bộ thủ công sẵn sàng sau mỗi %{coolDown} phút. Vui lòng đợi %{minutesRemaining} phút để đồng bộ hóa lại."
   manually_9de23e1f: "Thủ công"
   manually_mark_posts_as_read_afa5d035: "Đánh dấu thủ công các bài đăng là đã đọc"
@@ -13697,10 +13759,12 @@ vi:
       email: 
         body: "Người hướng dẫn của bạn đã đưa ra các thay đổi về điểm và bình luận mới cho %{title}. Những thay đổi này hiện có thể xem được."
         excused: "Bài tập này đã được miễn."
+        grade: "điểm: %{letter_grade}"
         graded_date: "đã chấm điểm: %{date}"
         html: 
           body: "Người hướng dẫn của bạn đã đưa ra các thay đổi về điểm và bình luận mới cho %{title}. Những thay đổi này hiện có thể xem được."
           excused: "Bài tập này đã được miễn."
+          grade: "điểm: %{letter_grade}"
           graded_date: "đã chấm điểm: %{date}"
           link: "Bạn có thể xem tại đây"
           no_date_set: "Không Có Ngày Được Cài Đặt"
@@ -13714,12 +13778,14 @@ vi:
         score_pending_review: "điểm đang chờ giáo viên đánh giá"
       sms: 
         body: "Giảng viên của bạn đã đưa ra các thay đổi về điểm và bình luận mới cho %{title}, %{course}."
+        grade: "điểm: %{letter_grade}"
         graded_date: "đã chấm điểm: %{date}"
         link_message: "Thông tin thêm tại %{link}."
         no_date_set: "Không Có Ngày Được Cài Đặt"
         not_applicable: N/A
         score: "điểm số: %{score} trên tổng số %{total}"
       summary: 
+        grade: "điểm: %{letter_grade}"
         graded_date: "đã chấm điểm: %{date}"
         no_date_set: "Không Có Ngày Được Cài Đặt"
         not_applicable: N/A
@@ -13891,6 +13957,7 @@ vi:
   mobile_app_css_file_abbf06bd: "Tập tin CSS ứng dụng di động"
   mobile_app_javascript_file_faea55d5: "Tập tin JavaScript ứng dụng di động"
   mobile_homescreen_icon_f85d6b63: "Biểu Tượng Màn Hình Chính Di Động"
+  mobile_offline_mode_7eaff590: "Chế độ ngoại tuyến di động"
   modal_dialog_start_end_date_674315cc: "Hộp Thoại Phương Thức: Ngày Bắt Đầu & Kết Thúc"
   model_is_already_located_in_newgroup_e5cea361: "%{model} đã nằm ở %{newGroup}"
   modelsOutcome: 
@@ -13982,6 +14049,7 @@ vi:
   modules_b8f6aa9: "các học phần"
   modules_c4325335: "Các học phần"
   modules_group_menu_4aae0d5f: "Menu Nhóm Học Phần"
+  modules_have_been_updated_to_their_current_status_a85e380d: "Các học phần đã được cập nhật về trạng thái hiện tại."
   modules_index_menu_c8748e7c: "Menu Chỉ Mục Học Phần"
   modules_index_menu_modal_79123a19: "Menu Chỉ Mục Học Phần (Phương Thức)"
   modules_index_menu_tray_3f9975d9: "Menu Chỉ Mục Học Phần (Khay)"
@@ -14134,6 +14202,7 @@ vi:
     students_will_see: "Sinh viên có thể thấy rằng bài tập này đã bị ẩn."
     submission_comments: "Bình luận về bài nộp"
     sure_you_want_to_mute: "Bạn có chắc chắn muốn ẩn bài tập này không? Trong khi bài tập này bị ẩn, sinh viên sẽ không nhận được thông báo mới về bài tập hoặc có thể nhìn thấy bài tập:"
+  muted_b5d1b41c: "Đã ẩn điểm?"
   muting_assignment_a9aeb5c7: "Đang Ẩn Bài Tập..."
   my_dashboard_8983c283: "Bảng Điều Khiển Của Tôi"
   my_dashboard_b724020: "Bảng điều khiển của tôi"
@@ -14142,7 +14211,7 @@ vi:
   my_settings_2ff35329: "Cài Đặt Của Tôi"
   my_subjects_61936afb: "Môn Học Của Tôi"
   my_themes_b72217b8: "Chủ Đề Của Tôi"
-  n_554bc493: "n"
+  n_554bc493: không
   n_a_d5d5a207: "không có"
   n_a_d6f6c42f: "Không Có"
   n_contextscount_more_2f708db4: "+ %{n_contextsCount} thêm"
@@ -14329,6 +14398,7 @@ vi:
   next_announcement_6e6e0f17: "Thông báo tiếp theo"
   next_announcements_page_3956eb11: "Trang Thông Báo Tiếp Theo"
   next_assignment_8ec51175: "Bài tập tiếp theo"
+  next_assignment_c19812a5: "Bài Tập Tiếp Theo"
   next_e0d38b1f: "tiếp theo"
   next_item_2d1ddc96: "Tiếp theo: *mục*"
   next_mastery_path_is_currently_locked_a9253711: "Lộ trình học tập thành thục tiếp theo hiện đang bị khóa"
@@ -14344,6 +14414,7 @@ vi:
   next_question_f37bac25: "Câu Hỏi Tiếp Theo"
   next_run_at_635de64a: "Lần Chạy Tiếp Theo vào"
   next_steps_ce0f0d0c: "Bước Tiếp Theo"
+  next_student_79955068: "Sinh Viên Tiếp Theo"
   next_student_b62869f4: "Sinh viên tiếp theo"
   next_up_review_feedback_19a15e0e: "Tiếp Theo: Xem Lại Phản Hồi"
   next_up_submit_assignment_793a9d41: "Tiếp Theo: Gửi Bài Tập"
@@ -14361,6 +14432,7 @@ vi:
   no_artifacts_with_that_name_found_b8679f53: "Không tìm thấy tạo tác có tên đó"
   no_assignment_group_assigned_8f1cdb9b: "Không Có Nhóm Bài Tập Nào Được Chỉ Định"
   no_assignment_name_adbb215b: "Không Có Tên Bài Tập"
+  no_assignment_selected_65d9e422: "Không Có Bài Tập Nào Được Chọn"
   no_associated_terms_13bacefc: "Không Có Học Kì Liên Quan"
   no_attachments_found_for_the_following_ids_ids_49c9192f: "Không tìm thấy tệp đính kèm nào cho các id sau: %{ids}"
   no_attributes_locked_611c5cc: "không có thuộc tính nào được khóa"
@@ -14446,6 +14518,7 @@ vi:
   no_search_results_found_5f156ff9: "Không Tìm Thấy Kết Quả Tìm Kiếm"
   no_start_date_6e81c22b: "Không Có Ngày Bắt Đầu"
   no_student_is_being_observed_to_select_a_student_r_73301db2: "Không có sinh viên nào đang được quan sát. Để chọn một sinh viên, hãy quay lại bảng điều khiển."
+  no_student_selected_b5eae275: "Không Có Sinh Viên Nào Được Chọn"
   no_students_being_observed_42e11732: "Không có sinh viên nào được quan sát"
   no_students_dd8de9f0: "Không Có Sinh Viên"
   no_students_have_taken_the_quiz_yet_e667644b: "Không Có Sinh Viên đã làm câu hỏi kiểm tra"
@@ -14917,6 +14990,7 @@ vi:
   observing_student_name_to_select_a_different_stude_e0466126: "Đang quan sát %{student_name}. Để chọn một sinh viên khác, hãy quay lại bảng điều khiển."
   observing_user_name_1a64e47b: "Quan sát: %{user_name}"
   october_6b2bf82: "Tháng Mười"
+  of_grade_984aa550: "% Điểm"
   of_students_5d1af0d2: "# sinh viên"
   of_times_1018baab: "# lần"
   of_total_c02b5afe: "trên %{total}"
@@ -15414,6 +15488,7 @@ vi:
   performance_ac5f9e70: "Thành Tích"
   performed_by_70b3ce96: "Được thực hiện bởi"
   permanent_num_strands_setting_141e8a0c: "Cài đặt num_strands cố định"
+  permanent_page_links_c8b26ba8: "Liên Kết Trang Cố Định"
   permission_must_be_enabled_for_someone_397e1ce3: "Phải bật quyền cho một người"
   permission_not_found_620b80d1: "Không tìm thấy quyền"
   permission_role_filter_8a9a3e68: "Bộ lọc vai trò quyền"
@@ -15460,6 +15535,7 @@ vi:
   plain_text_e3ab33aa: "Văn bản thuần túy"
   plain_text_view_7640af4c: "Chế Độ Xem Văn Bản Thuần Túy"
   planner_7fd46783: "Người Lập Kế Hoạch"
+  planner_support_for_account_calendars_3a7bfdc5: "Hỗ trợ công cụ lập kế hoạch cho lịch tài khoản"
   play_1a47eaa7: Chạy
   play_media_comment_35257210: "Phát bình luận phương tiện."
   play_media_comment_8614d30f: "Phát Bình Luận Phương Tiện"
@@ -15967,6 +16043,7 @@ vi:
   points_possible_1c0b3445: "Điểm Cao Nhất Có Thể Đạt Được"
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
+  points_possible_e57d5613: "Điểm cao nhất có thể đạt được"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Điểm cao nhất có thể đạt được phải từ 0 trở lên đối với loại chấm điểm đã chọn"
   points_possible_points_fda3b111: "%{points_possible} Điểm"
   points_pts_e5596bf7: "%{points} điểm"
@@ -16056,6 +16133,7 @@ vi:
   previous_announcement_7efc02d9: "Thông báo trước"
   previous_announcements_page_79c0ada1: "Trang Thông Báo Trước"
   previous_assignment_83d1f423: "Bài tập trước"
+  previous_assignment_cc8cf7f3: "Bài Tập Trước"
   previous_bd2ac015: Trước
   previous_export_c6a997f7: "Xuất Trước"
   previous_message_8804f87e: "Tin Nhắn Trước"
@@ -16068,6 +16146,7 @@ vi:
   previous_question_162c4048: "Câu Hỏi Trước"
   previous_snapshots_d8cd4820: "Lần Chụp Ảnh Nhanh Trước"
   previous_student_46275eae: "Sinh viên trước"
+  previous_student_899a6732: "Sinh Viên Trước"
   primary_brand_color_db79b428: "Màu Thương Hiệu Chính"
   primary_button_3a98f4bc: "Nút Chính"
   primary_button_text_1f55d27b: "Văn Bản Nút Chính"
@@ -16476,9 +16555,11 @@ vi:
   publishing_item_name_is_disabled_8207a9e7: "Công bố %{item_name} bị vô hiệu hóa"
   publishing_module_and_items_ce128d12: "Đang phát hành học phần và các mục"
   publishing_module_c2b5211: "Đang phát hành học phần"
+  publishing_modules_has_started_d7fda9ba: "Đã bắt đầu phát hành học phần."
   publishing_pace_a65e4152: "Tốc độ phát hành..."
   publishing_plan_b70186ed: "Kế hoạch phát hành..."
   publishing_progress_5154a430: "Tiến Độ Phát Hành"
+  publishing_progress_is_complete_refreshing_item_st_95cd9478: "Quá trình phát hành đã hoàn thành. Làm mới trạng thái mục."
   publishing_progress_is_progress_percent_complete_20482e3e: "Quá trình công bố đã hoàn thành được %{progress} phần trăm"
   pumpkin_904428d5: "Quả bí ngô"
   purple_7678a9fc: "Màu tím"
@@ -18019,6 +18100,7 @@ vi:
   reports_1b9ab7a7: "Báo cáo"
   reports_account_settings_78f5336a: "Báo cáo (Cài Đặt Tài Khoản)"
   reports_course_f09b7d9e: "Báo cáo (Khóa Học)"
+  reports_manage_92bc45cb: "Báo cáo - quản lý"
   reqired_end_date_a7deac41: "Yêu cầu ngày kết thúc"
   request_id_1499afb0: "ID Yêu Cầu"
   request_successfully_sent_note_that_applying_score_ee8665b6: "Đã gửi yêu cầu thành công. Lưu ý rằng việc áp dụng điểm có thể mất một chút thời gian và các thay đổi sẽ không xuất hiện cho tới khi bạn tải lại trang."
@@ -18182,7 +18264,7 @@ vi:
       read_forum: "Xem các cuộc thảo luận"
       read_messages: "Xem các thông báo đã gửi cho người dùng"
       read_question_banks: "Xem và liên kết đến các ngân hàng câu hỏi"
-      read_reports: "Xem các báo cáo mức sử dụng cho khóa học"
+      read_reports: "Quản lý báo cáo cấp độ tài khoản hoặc khóa học"
       read_roster: "Xem danh sách người dùng"
       send_messages: "Gửi tin nhắn cho các cá nhân thành viên khóa học"
       send_messages_all: "Gửi tin nhắn cho cả lớp"
@@ -18564,6 +18646,7 @@ vi:
   secondary_button_text_e92b3e52: "Văn Bản Nút Phụ"
   secondary_color_button_7589827d: "Nút màu phụ"
   secondary_color_button_disabled_ac2252d2: "Nút màu phụ bị tắt"
+  secondary_id_2812f253: "ID Phụ:"
   secondary_info_835a07dd: "Thông tin phụ"
   section: 
     confirms: 
@@ -18664,6 +18747,7 @@ vi:
         decrosslist_section: "Bỏ Liệt Kê Chéo Phần này"
   sections_6d057c07: "các phần"
   sections_94731e51: "Các phần"
+  sections_aef3ebf2: "Phần: "
   security_7a7e8808: "Bảo mật"
   security_setting_to_restrict_join_urls_to_a_confer_258d3605: "Cài đặt bảo mật để hạn chế các URL tham gia một hội nghị"
   security_tab_failed_to_load_2d2242a: "Không tải được Tab Bảo Mật"
@@ -18675,6 +18759,7 @@ vi:
   see_rubric_results_62a6447d: "Xem kết quả bảng đánh giá theo tiêu chí"
   see_scoring_details_f7fd1f3b: "Xem chi tiết chấm điểm"
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Xem một số công cụ LTI hoạt động hiệu quả với Canvas."
+  see_this_assignment_in_speedgrader_14b8abaf: "Xem bài tập này trong speedgrader"
   see_turnitin_results_cd9d4a6c: "Xem các kết quả của Turnitin"
   see_vericite_results_b44dd8c8: "Xem VeriCite kết quả"
   select_1e849959: "[ Chọn ]"
@@ -18689,13 +18774,19 @@ vi:
   select_a_module_optional_7edb5cb0: "Chọn một Học Phần (không bắt buộc)"
   select_a_predefined_color_c77ab2f5: "Chọn một màu được xác định trước."
   select_a_provisional_grade_7106e3d5: "Chọn điểm tạm thời"
+  select_a_section_37ac1694: "Chọn một phần"
+  select_a_student_adfcc348: "Chọn một sinh viên"
+  select_a_student_and_an_assignment_to_view_and_edi_96fda3c1: "Chọn một sinh viên và một bài tập để xem và chỉnh sửa điểm."
   select_a_student_to_view_281d17b9: "Chọn một sinh viên để xem"
+  select_a_student_to_view_additional_information_he_c371e40c: "Chọn một sinh viên để xem thông tin bổ sung tại đây."
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Chọn một sinh viên để xem. Trang sẽ tự động làm mới."
   select_all_assignments_bd07b919: "Chọn tất cả các bài tập"
   select_all_count_courses_4fc63811: 
     one: "Chọn (%{count}) Khóa Học"
     other: "Chọn Tất Cả (%{count}) Khóa Học"
   select_an_account_to_update_b7521f0a: "Chọn một tài khoản để cập nhật."
+  select_an_assignment_e52320d7: "Chọn một bài tập"
+  select_an_assignment_to_view_additional_informatio_de1370e1: "Chọn một bài tập để xem thông tin bổ sung tại đây."
   select_an_edit_operation_ec1467d: "Chọn một thao tác chỉnh sửa"
   select_an_outcome_group_6edb08a7: "Chọn một nhóm kết quả"
   select_another_group_24773e5f: "Chọn một nhóm khác"
@@ -18906,6 +18997,7 @@ vi:
   set_created_createdat_895e2243: "Cài đặt %{createdAt} đã tạo"
   set_default_email_address_400f70dc: "Đặt địa chỉ email mặc định"
   set_default_grade_a202ebc1: "Đặt Điểm Mặc Định"
+  set_default_grade_d0bd8f30: "Đặt điểm mặc định"
   set_default_grade_dialog: 
     dialog_title: "Điểm mặc định cho %{assignment.name}"
     overwrite: "Ghi đè các điểm đã nhập"
@@ -19435,6 +19527,7 @@ vi:
   show_by_date_e3967761: "Hiển thị theo Ngày"
   show_by_type_c5d61732: "Hiển thị theo Loại"
   show_calendar_events_in_the_month_view_on_multiple_e94c33ae: "Hiển thị sự kiện lịch trong chế độ xem tháng trên nhiều dòng nếu tiêu đề không khớp với một dòng đơn"
+  show_concluded_enrollments_6a05544c: "Hiển Thị các Ghi Danh Kết Luận"
   show_contributing_scores_7674c46f: "Hiển Thị Điểm Đóng Góp"
   show_correct_answers_at_30c37e01: "Hiển Thị Câu Trả Lời Đúng tại"
   show_correct_answers_at_a5475aa3: "Hiển Thị Câu Trả Lời Đúng Tại"
@@ -19465,12 +19558,14 @@ vi:
   show_new_analytics_for_course_and_user_data_data_m_89526eb: "Hiển thị số liệu phân tích mới cho dữ liệu người dùng và khóa học. Dữ liệu có thể mất 24 giờ để hiển thị trong Phân Tích Mới sau khi cài đặt cờ tính năng này sang BẬT."
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "Hiển Thị Kiểm Tra Mới trên trang Kiểm Tra"
   show_newer_replies_9f73d06d: "Hiển thị các câu trả lời mới"
+  show_notes_in_student_info_7a22e02b: "Hiển Thị các Ghi Chú trong Thông Tin Sinh Viên"
   show_older_replies_e85891b3: "Hiển thị các câu trả lời cũ"
   show_one_question_at_a_time_271e346d: "Hiển thị từng câu hỏi một"
   show_online_classes_only_f9d7b938: "Chỉ hiển thị các lớp học trực tuyến"
   show_only_blueprint_courses_9fb37b41: "Chỉ hiển thị khóa học cơ bản"
   show_only_disabled_calendars_cb8e2bdc: "Chỉ hiển thị lịch được tắt"
   show_only_enabled_calendars_8caef0df: "Chỉ hiển thị lịch được bật"
+  show_only_public_courses_517ad255: "Chỉ hiển thị khóa học công khai"
   show_outcomes_statistics_3c2b34eb: "Hiển Thị Các Thống Kê Kết Quả"
   show_params_3401895b: "Hiển thị thông số"
   show_projections_32a3756: "Hiển Thị Các Bản Chiếu"
@@ -19659,6 +19754,7 @@ vi:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Xin lỗi, tác vụ được thực hiện trên bản ghi này không thành công. Vui lòng thử lại sau"
   sorry_we_couldn_t_find_anything_that_matched_91793bb7: "Xin lỗi, chúng tôi không thể tìm thấy bất kỳ thứ gì khớp."
   sort_15eac63f: "Sắp Xếp"
+  sort_assignments_da00656: "Sắp Xếp Các Bài Tập"
   sort_by_72dbba9c: "Sắp xếp theo"
   sort_by_e75f9e3e: "Sắp Xếp Theo"
   sort_ordertype_by_sortby_a0dd1c8: "Sắp xếp %{orderType} theo %{sortBy}"
@@ -19877,6 +19973,7 @@ vi:
   sticky_left_navigation_3d438a81: "Điều Hướng Bên Trái Cố Định"
   still_having_difficulty_get_more_help_here_3cdc8de1: "Vẫn đang gặp khó khăn? Nhận thêm hỗ trợ tại đây:"
   stop_acting_as_user_8809a97f: "Ngừng Tư Cách là Người Dùng"
+  stop_button_click_to_discontinue_processing_422fea42: "Nút dừng. Nhấp vào để ngừng xử lý."
   stop_fd9822ab: Dừng
   stop_publishing_9644e84: "Dừng Công Bố"
   stop_publishing_button_click_to_discontinue_proces_abc3350: "Nút dừng công bố. Nhấp vào để ngừng xử lý."
@@ -19926,6 +20023,7 @@ vi:
   student_feedback_required_in_comments_above_to_rea_2f5dafbf: "Cần có phản hồi của sinh viên trong các bình luận ở trên để chỉ định lại."
   student_first_name_aaa42cbc: "Tên của Sinh Viên"
   student_first_name_options_82f5685f: "Tùy Chọn Tên của Sinh Viên"
+  student_grade_summary_d7a5cac0: "Tổng Kết Điểm Sinh Viên"
   student_grades_4cbc59a1: "Điểm Của Sinh Viên"
   student_group_75b86a9f: "Nhóm Sinh Viên"
   student_group_filter_185fb085: "Bộ Lọc Nhóm Sinh Viên"
@@ -19936,6 +20034,7 @@ vi:
   student_id_236970d8: student_id
   student_id_7cc45fb5: "id sinh viên"
   student_id_a61d78c7: "ID Sinh Viên"
+  student_information_8715d0c7: "Thông Tin Sinh Viên"
   student_integration_id_b9e6ede: "id hòa nhập sinh viên"
   student_integration_id_e08f80af: "ID Tích Hợp Sinh Viên"
   student_interaction_report_3f3d2ff1: "Báo Cáo Tương Tác Sinh Viên"
@@ -20101,6 +20200,7 @@ vi:
   submission_comments_b6d65841: "Bình luận bài nộp"
   submission_comments_sei_a10bc997: "Bình Luận Về Bài Tập Đã Nộp - SEI"
   submission_comments_tray_290fad59: "Khay Nộp Bình Luận"
+  submission_comments_tray_893d0267: "Khay Bình Luận Bài Nộp"
   submission_completed_ba0e552e: "Đã Hoàn Thành Việc Nộp"
   submission_data_88085815: "Dữ Liệu Nộp"
   submission_date_8f659c0c: "Ngày Nộp"
@@ -20147,6 +20247,7 @@ vi:
   submission_type_a925fc5f: "Loại Bài Nộp"
   submission_type_displayname_currently_selected_3f8aa9f8: "Loại bài nộp %{displayName}, hiện đang được chọn"
   submission_type_selection_72ce19f: "Chọn Loại Bài Nộp"
+  submission_types_79f7b436: "Loại bài nộp:"
   submission_updated_8897f3b7: "Đã cập nhật bài nộp"
   submission_uploaded_542c9ac6: "Bài nộp đã được tải lên!"
   submission_uploaded_successfully_47e76d6a: "Đã tải lên bài nộp thành công!"
@@ -20460,6 +20561,7 @@ vi:
   teacher_tour_26282921: "Chuyến Tham Quan Giáo Viên"
   teachers_52e2423f: "Giáo Viên"
   teachers_add_d5258e33: "Giáo Viên - thêm"
+  teachers_and_account_managers_will_be_able_to_more_f0b4474f: "Giáo Viên và Người Quản Lý Tài Khoản có thể dễ dàng quản lý hơn các chế độ cho điểm theo chữ cái cho tài khoản, khóa học và bài tập."
   teachers_designers_and_tas_can_select_a_course_hom_30025956: "Giáo viên, nhà thiết kế và trợ giảng có thể chọn trang chủ của khóa học mà không có nội dung Khóa Học - quyền thêm / sửa / xóa."
   teachers_over_time_1905603b: "giáo viên theo thời gian"
   teachers_remove_5622b490: "Giáo Viên - gỡ"
@@ -20727,6 +20829,11 @@ vi:
       
       Cảm ơn bạn,
       Bộ Phận Hỗ Trợ của Canvas
+  the_message_you_sent_with_the_subject_line_subject_8157a1ff: |-
+      Tin nhắn bạn đã gửi với dòng tiêu đề "%{subject}" không được gửi vì tài khoản của bạn đã bị tạm ngừng.
+      
+      Xin cảm ơn
+      Bộ Phận Hỗ Trợ Canvas
   the_message_you_sent_with_the_subject_line_subject_ca925315: |-
       Tin nhắn bạn gửi với dòng tiêu đề là “”%{subject}” không được gửi . Để trả lời tin nhắn của Canvas từ email này, trước tiên email phải là một kênh liên lạc được xác nhận trong hồ sơ Canvas của bạn. Vui lòng truy cập hồ sơ của bạn và gửi lại email xác nhận cho địa chỉ email này. Bạn cũng có thể liên lạc với người này qua Hộp Thư Đến Canvas. Để được hỗ trợ, vui lòng xem chương Hộp Thư Đến để biết vai trò người dùng của bạn trong Hướng Dẫn Canvas. [Xem %{link}].
       
@@ -20985,6 +21092,7 @@ vi:
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Bài tập này được miễn và sẽ không được tính trong tổng số tính toán"
   this_assignment_is_in_a_closed_grading_period_for__a22bb4ed: "Bài tập này đang trong thời gian phân điểm đã đóng cho sinh viên này"
   this_assignment_is_locked_and_cannot_be_reassigned_9c1ed1ce: "Bài tập này đã bị khóa và không thể được giao lại."
+  this_assignment_is_muted_915e2dab: "Bài tập này đã bị ẩn điểm"
   this_assignment_is_not_applicable_to_this_student_c149a5ad: "Bài tập này không áp dụng cho sinh viên này"
   this_assignment_is_not_graded_576f1244: "Bài tập này chưa được chấm điểm."
   this_assignment_is_overdue_a44bea3b: "Bài tập này hiện đang quá hạn"
@@ -21065,6 +21173,7 @@ vi:
   this_file_9443cda1: "Tập tin này"
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Tập tin này phải có usage_rights được đặt trước khi được công bố."
   this_flag_allows_calendar_event_series_to_be_creat_cb8d5a60: "Cờ này cho phép các chuỗi sự kiện trên lịch được tạo từ Lịch Canvas."
+  this_flag_allows_events_from_account_calendars_to__fbef2289: "Cờ này cho phép các sự kiện từ lịch tài khoản được hiển thị trong công cụ lập kế hoạch canvas."
   this_flag_is_a_no_op_and_is_only_intended_for_test_e969f9c: "Cờ này là một lệnh vô tác và chỉ nhằm mục đích thử nghiệm."
   this_flag_updates_the_title_of_the_feature_flags_t_513820f8: "Cờ này cập nhật tiêu đề của tab cờ đặc tính thành “Tùy Chọn Đặc Tính” và thêm một trình “Xem Trước Đặc Tính” cho các dự án xem trước đặc tính."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Thư mục này hiện đang bị khóa và không khả dụng để xem."
@@ -21107,6 +21216,7 @@ vi:
   this_is_an_anonymous_discussion_student_names_and__bc19b64d: "Đây là một Cuộc Thảo Luận ẩn danh. Tên và ảnh hồ sơ của sinh viên được ẩn."
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Đây là một Cuộc Thảo Luận ẩn danh. Mặc dù tên sinh viên và ảnh hồ sơ sẽ bị ẩn, tên và ảnh hồ sơ của bạn sẽ được hiển thị cho tất cả thành viên của khóa học."
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Đây là một cuộc Thảo Luận ẩn danh, Tên và ảnh hồ sơ của bạn sẽ được ẩn khỏi những thành viên của khóa học khác."
+  this_is_enabled_by_default_as_assignments_can_not__767e9b16: "Tính năng này được bật theo mặc định do không thể chưa cho bài tập vào sổ điểm và vẫn được tính vào sổ điểm."
   this_is_not_a_valid_grade_9cc2cb8: "Đây không phải là một điểm hợp lệ"
   this_is_technicaly_a_security_vulnerability_but_so_2a2dc89: "Về mặt kỹ thuật, đây là một lỗ hổng bảo mật, nhưng một số trường cần duy trì quy trình làm việc của mình trong một thời gian."
   this_is_the_default_email_address_f3c421fb: "Đây là địa chỉ email mặc định"
@@ -21464,6 +21574,7 @@ vi:
   title_eb77c512: "%{title}"
   title_ee03d132: "Tiêu đề"
   title_f8e03596: "* Tiêu đề"
+  title_for_assignmentname_3e6c7a5d: "%{title} cho %{assignmentName}"
   title_is_locked_click_to_unlock_21548cfb: "%{title} bị khóa. Nhấp để mở khóa"
   title_is_required_437f9993: "Tiêu đề là bắt buộc"
   title_is_required_8bb13295: "Tiêu đề là bắt buộc!"
@@ -21512,6 +21623,7 @@ vi:
   to_access_the_quizzes_index_page_course_content_vi_d9607c01: "Để truy cập Trang Chỉ Mục Kiểm Tra, Nội Dung Khóa Học - xem phải được bật."
   to_access_the_student_interactions_report_courses__e8432cd0: "Để truy cập báo cáo Tương Tác Sinh Viên, Khóa Học - xem báo cáo sử dụng cũng phải được bật."
   to_access_the_student_interactions_report_grades_v_69105662: "Để truy cập báo cáo Tương Tác Sinh Viên, Điểm - xem tất cả các điểm cũng phải được bật."
+  to_access_the_student_interactions_report_reports__a0ceaf9b: "Để truy cập báo cáo Tương Tác Sinh Viên thì phải bật cả Báo Cáo - quản lý."
   to_act_as_other_users_users_act_as_must_also_be_en_cc96faf1: "Để hành động với tư cách người dùng khác, Người Dùng - hành động với tư cách cũng phải được bật."
   to_activate_this_communication_channel_enter_the_f_f465efc5: "Để kích hoạt kênh liên lạc này, nhập mã xác nhận gồm bốn ký tự được gửi đến %{sms_number}."
   to_add_a_course_courses_add_must_also_be_enabled_8c2231d9: "Để thêm một khóa học, Khóa Học - thêm cũng phải được bật."
@@ -21703,6 +21815,8 @@ vi:
   to_view_the_list_of_users_in_the_course_users_view_b7b9b4ef: "Để xem danh sách người dùng trong khóa học, Người Dùng - xem danh sách cũng phải được bật."
   to_view_the_people_page_courses_view_list_must_be__c1d54670: "Để xem trang Mọi Người, Khóa Học - xem danh sách phải được bật."
   to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "Để xem tab Báo Cáo, Khóa Học - xem báo cáo sử dụng cũng phải được bật."
+  to_view_the_reports_tab_reports_manage_must_also_b_8ebde0f3: "Để xem tab Báo Cáo thì phải bật cả Báo Cáo - quản lý."
+  to_view_the_student_interactions_report_grades_vie_5c01c76b: "Để xem Báo Cáo Tương Tác Sinh Viên thì phải bật cả Điểm - xem tất cả các điểm và Báo Cáo - quản lý."
   to_view_the_student_interactions_report_grades_vie_68f791b0: "Để xem Báo Cáo Tương Tác Sinh Viên, Điểm - xem tất cả các điểm và Khóa Học - xem báo cáo sử dụng cũng phải được bật."
   to_view_the_submission_log_quizzes_view_submission_b8353d6e: "Để xem nhật ký bài nộp, Kiểm Tra - xem nhật ký bài nộp cũng phải được bật."
   to_view_the_user_details_page_for_a_student_users__5d0ca2d5: "Để xem trang Chi Tiết Người Dùng dành cho sinh viên, Người Dùng - thêm/xóa sinh viên trong khóa học cũng phải được bật."
@@ -21766,6 +21880,7 @@ vi:
   totals_are_calculated_based_only_on_graded_assignm_7d1bbf55: "Chỉ tính toán tổng dựa trên các bài tập đã được chấm điểm."
   totals_be24703: "Tổng cộng"
   track_student_performance_and_activity_a92a2a8b: "Theo dõi hiệu suất và hoạt động của sinh viên"
+  traditional_gradebook_d90461dc: "Sổ Điểm Truyền Thống"
   transferred_student_enrollments_90dc27d3: "Lần Chuyển Ghi Danh của Sinh Viên"
   transform_rce_content_on_load_1f521086: "Chuyển Đổi Nội Dung RCE khi Tải"
   transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
@@ -22013,6 +22128,7 @@ vi:
   unpublish_9f2d730b: "Hủy công bố"
   unpublish_all_modules_and_items_ba0291f4: "Hủy phát hành tất cả các học phần và mục"
   unpublish_module_and_all_items_e6dd35e5: "Hủy phát hành học phần và tất cả các mục"
+  unpublish_progress_503dfcfa: "Bỏ Phát Hành Tiến Trình"
   unpublish_title_26ae9667: "Hủy công bố %{title}"
   unpublished_8b6107d6: "Đã hủy công bố"
   unpublished_assignments_9cdbcc87: "Bài Tập Chưa Công Bố"
@@ -22119,6 +22235,7 @@ vi:
   upload_percent_complete_d533d3e2: "Hoàn Thành Tải Lên Phần Trăm"
   upload_progress_df577c48: "Tiến Trình Tải Lên"
   upload_progress_for_name_39f03acf: "Tiến trình tải lên cho %{name}"
+  upload_scores_csv_a8416cf: "Tải Điểm Lên (.csv)"
   upload_success_f51f3a39: "Tải Lên Thành Công"
   upload_successful_ca47465f: "Tải lên thành công"
   upload_your_outcomes_bceeadbe: "Tải lên Kết Quả của bạn!"
@@ -22158,7 +22275,7 @@ vi:
   use_as_frontpagetext_fa88bbb2: "Sử dụng dưới dạng %{frontPageText}"
   use_attachment_ids_in_media_links_7bfb3422: "Sử Dụng Các ID Tệp Đính Kèm trong Các Liên Kết Phương Tiện"
   use_attachment_ids_in_media_links_so_that_users_ar_1ba7845a: |-
-      Sử dụng các id tệp đính kèm trong các liên kết phương tiện để người dùng luôn được chỉ đến phiên bản chính xác của phương tiện 
+      Sử dụng các id tệp đính kèm trong các liên kết phương tiện để người dùng luôn được chỉ đến phiên bản chính xác của phương tiện
       thay vì phiên bản gốc
   use_cloudfront_for_docviewer_f21b96db: "Sử Dụng CloudFront cho DocViewer"
   use_comment_comment_136b5cb3: "Sử dụng bình luận %{comment}"
@@ -22607,6 +22724,7 @@ vi:
   users_and_terms_are_located_at_the_account_so_the__8f3258e6: "Người Dùng và các điều khoản được đặt nằm trong tài khoản, do đó điểm cuối SIS luôn xác nhận the quyền của người dùng dựa theo tài khoản."
   users_can_access_and_create_but_not_edit_individua_59bcb8dd: "Người Dùng có thể truy cập và tạo (nhưng không chỉnh sửa) các bảng đánh giá theo tiêu chí bài tập cá nhân thông qua Bài Tập khi Bài Tập và Kiểm Tra - thêm được bật."
   users_can_access_and_create_but_not_edit_individua_a0b26adf: "Người Dùng có thể truy cập và tạo (nhưng không chỉnh sửa) các bảng đánh giá theo tiêu chí bài tập cá nhân thông qua Bài Tập khi Nội Dung Khóa Học - xem và Bài Tập và Kiểm Tra - thêm được bật."
+  users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Người dùng có thể thêm lịch này vào danh sách \"Lịch Khác\" của họ."
   users_d1b60cb0: "Người Sử Dụng"
   users_designers_22195c6f: "Người Dùng - Nhà Thiết Kế"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Người Dùng - tạo mã ghép nối với người quan sát cho sinh viên"
@@ -22691,6 +22809,7 @@ vi:
   view_file_8a1c62e5: "Xem Tập Tin"
   view_gradebook_d6713dd1: "Xem Sổ Điểm"
   view_gradebook_for_course_10cbf171: "Xem Sổ Điểm dành cho %{course}"
+  view_gradebook_history_a9272918: "Xem Lịch Sử Sổ Điểm"
   view_grades_8d3bae6c: "Xem Điểm"
   view_grades_for_name_45aeb2f2: "Xem điểm dành cho %{name}"
   view_groups_47b5f60c: "Xem Nhóm"
@@ -22891,6 +23010,7 @@ vi:
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Khi được chọn, phần khóa học sẽ ở trạng thái chỉ đọc ngoài những ngày này."
   when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "Khi được đặt, tùy chọn không hiển thị bài kiểm tra mới có thể có 0 điểm trong sổ điểm sẽ khả dụng ở dạng hộp kiểm khi tạo hoặc chỉnh sửa bài kiểm tra."
   when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "Khi cài đặt, hãy xác định xem trạng thái quy trình làm việc của bài kiểm tra mới nên được cài đặt là đã chấm điểm hay pending_review nếu một người dùng có bài kiểm tra pending_review trước đây nhưng đã được ghi danh lại vào khóa học."
+  when_the_title_to_a_page_is_changed_old_links_to_t_9a2737b7: "Khi tiêu đề của trang thay đổi, các liên kết cũ tới trang đó sẽ liên kết tới trang đúng."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
       Khi cờ này được bật, phần điều hướng khóa học vẫn sẽ được thu gọn hoặc mở rộng
       khi đang điều hướng giữa các trang, tùy thuộc vào lần cuối mà người dùng đặt, thay vào
@@ -23385,6 +23505,7 @@ vi:
   your_email_address_844297ea: "Địa Chỉ Email Của Bạn"
   your_email_address_f881e583: "Địa chỉ email của bạn"
   your_email_b5364bee: "Email của Bạn"
+  your_grade_has_been_updated_f1cd8f06: "Điểm của bạn đã được cập nhật"
   your_gradebook_export_has_been_cancelled_c1b99ca1: "Quá trình xuất sổ điểm của bạn đã bị hủy"
   your_groups_are_being_created_50156e34: "Nhóm của bạn đang được tạo."
   your_homeroom_is_currently_unpublished_93c14f4f: "Lớp chủ nhiệm của bạn hiện chưa được công bố."
@@ -23410,6 +23531,7 @@ vi:
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Không thể tải lên ảnh hồ sơ của bạn. Bạn có thể đã vượt quá giới hạn tải lên của mình."
   your_publishing_job_did_not_complete_4560155e: "Lệnh công bố của bạn chưa hoàn tất."
   your_publishing_job_has_failed_e04f59ce: "Việc phát hành của bạn đã thất bại."
+  your_publishing_job_was_canceled_before_it_complet_43cf2a08: "Hoạt động phát hành của bạn bị hủy trước khi hoàn thành."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Lựa chọn công cụ kiểm tra của bạn đã được đặt lại!"
   your_score_a1fc2fcf: "Điểm của bạn"
   your_score_score_fb785381: "Điểm của bạn: %{score}"
