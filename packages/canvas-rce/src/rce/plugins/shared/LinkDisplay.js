@@ -23,16 +23,18 @@ import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
 import formatMessage from '../../../format-message'
 import {showFlashAlert} from '../../../common/FlashAlert'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {getIcon, getFriendlyLinkType} from './linkUtils'
 
 const EDIT_MESSAGE = formatMessage('If left empty, link text will display as course link name')
 
 export const LinkDisplay = ({
   linkText,
-  Icon,
   placeholderText,
   linkFileName,
   published,
   handleTextChange,
+  linkType,
 }) => {
   useEffect(() => {
     showFlashAlert({
@@ -42,6 +44,10 @@ export const LinkDisplay = ({
     })
   }, [linkFileName])
 
+  const Icon = getIcon(linkType)
+  const linkTypeMessage = getFriendlyLinkType(linkType)
+  const publishedMessage = published ? formatMessage('published') : formatMessage('unpublished')
+
   return (
     <View as="div" data-testid="LinkDisplay">
       <View as="div">
@@ -49,7 +55,7 @@ export const LinkDisplay = ({
           <Flex.Item>
             <TextInput
               renderLabel={() => formatMessage('Text (optional)')}
-              onChange={(e, value) => handleTextChange(value)}
+              onChange={(_e, value) => handleTextChange(value)}
               value={linkText}
               placeholder={placeholderText}
               messages={[{type: 'hint', text: EDIT_MESSAGE}]}
@@ -59,7 +65,7 @@ export const LinkDisplay = ({
       </View>
       <View as="div" margin="medium none medium none">
         <Flex margin="small none small none">
-          <Text weight="bold">Current Link</Text>
+          <Text weight="bold">{formatMessage('Current Link')}</Text>
         </Flex>
         <Flex margin="small none none none">
           <Flex.Item padding="0 x-small 0 small">
@@ -70,6 +76,12 @@ export const LinkDisplay = ({
           <Flex.Item padding="0 x-small 0 0" grow={true} shrink={true} textAlign="start">
             <View as="div">
               <span data-testid="selected-link-name">{linkFileName}</span>
+              {linkType && (
+                <ScreenReaderContent data-testid="screenreader_content">
+                  {formatMessage('link type: {linkTypeMessage}', {linkTypeMessage})}
+                  {linkType !== 'navigation' && publishedMessage}
+                </ScreenReaderContent>
+              )}
             </View>
           </Flex.Item>
         </Flex>
