@@ -338,6 +338,18 @@ div.form-column-right, div.overrides-column-right {
     background: none;
   }
 }
+#grading_scheme_selector-target {
+
+  label {
+    padding: 0;
+    margin: 0 0 0 0;
+  }
+
+  // The hover looks weird in this case
+  label:hover {
+    background: none;
+  }
+}
 // Increased specificity to override common styles
 #edit_assignment_form .form-actions {
   padding-#{direction(left)}: 10px;

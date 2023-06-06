@@ -195,7 +195,7 @@ export const GradingSchemesSelector = ({
             <View as="div" withVisualDebug={false}>
               <FormField label="" id={shortid()}>
                 <select
-                  style={{width: '100%', margin: 0}}
+                  style={{width: '100%', margin: 0, padding: 0}}
                   id={shortid()}
                   value={selectedGradingSchemeId || undefined}
                   onChange={onChangeSelectedGradingScheme}

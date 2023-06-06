@@ -26,6 +26,9 @@ import $ from 'jquery'
 import template from '../../jst/GradingTypeSelector.handlebars'
 import '../../jquery/toggleAccessibly'
 import '@canvas/util/jquery/fixDialogButtons'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {GradingSchemesSelector} from '@canvas/grading-scheme'
 
 const I18n = useI18nScope('assignment_grading_type')
 
@@ -76,6 +79,14 @@ GradingTypeSelector.prototype.handleGradingTypeChange = function (_ev) {
   this.$viewGradingLevels.toggleAccessibly(
     gradingType === 'letter_grade' || gradingType === 'gpa_scale'
   )
+  if (ENV.GRADING_SCHEME_UPDATES_ENABLED) {
+    if (gradingType === 'letter_grade' || gradingType === 'gpa_scale') {
+      $('#grading_scheme_selector-target').show()
+      this.renderGradingSchemeSelector()
+    } else {
+      $('#grading_scheme_selector-target').hide()
+    }
+  }
   this.$gpaScaleQuestion.toggleAccessibly(gradingType === 'gpa_scale')
   // ¯\_(ツ)_/¯
   // was only an expression in CoffeeScript
@@ -133,6 +144,9 @@ GradingTypeSelector.prototype.toJSON = function () {
     gpaScaleQuestionLabel: I18n.t('gpa_scale_explainer', 'What is GPA Scale Grading?'),
     isGpaScaled: this.parentModel.isGpaScaled(),
     gradingStandardId: this.parentModel.gradingStandardId(),
+    grading_scheme_updates:
+      (typeof ENV !== 'undefined' && ENV !== null ? ENV.GRADING_SCHEME_UPDATES_ENABLED : void 0) ||
+      false,
     nested: this.nested,
     preventNotGraded:
       this.preventNotGraded ||
@@ -145,6 +159,35 @@ GradingTypeSelector.prototype.toJSON = function () {
       (!this.canEditGrades && this.parentModel.gradedSubmissionsExist()),
     gradingTypeMap: this.gradingTypeMap(),
   }
+}
+
+GradingTypeSelector.prototype.afterRender = function () {
+  const gradingType = this.$gradingType.val()
+  if (gradingType === 'letter_grade' || gradingType === 'gpa_scale') {
+    this.renderGradingSchemeSelector()
+  }
+}
+
+GradingTypeSelector.prototype.handleGradingStandardIdChanged = function (gradingStandardId) {
+  $('.grading_standard_id').val(gradingStandardId)
+}
+
+GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
+  if (!(typeof ENV !== 'undefined' && ENV !== null ? ENV.GRADING_SCHEME_UPDATES_ENABLED : void 0)) {
+    return
+  }
+  const props = {
+    initiallySelectedGradingSchemeId: this.parentModel.gradingStandardId()
+      ? this.parentModel.gradingStandardId()
+      : undefined,
+    // TODO JS: readOnly: !!this.lockedItems.settings,
+    onChange: this.handleGradingStandardIdChanged,
+    contextId: ENV.COURSE_ID,
+    contextType: 'Course',
+  }
+  const mountPoint = document.querySelector('#grading_scheme_selector-target')
+  // eslint-disable-next-line react/no-render-return-value
+  return ReactDOM.render(React.createElement(GradingSchemesSelector, props), mountPoint)
 }
 
 export default GradingTypeSelector
