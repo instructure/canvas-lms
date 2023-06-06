@@ -358,8 +358,13 @@ export const getCoursePercentage = (assignments = []) => {
 export const getTotal = (assignments, assignmentGroups, gradingPeriods, applyWeights) => {
   if (!assignments || assignments?.length === 0) return ASSIGNMENT_NOT_APPLICABLE
 
+  const validGradingPeriodsCount =
+    gradingPeriods?.filter(period => {
+      return period?.weight && period?.weight > 0
+    }) || []
+
   let returnTotal = 0
-  if (getGradingPeriodID() === '0' && applyWeights) {
+  if (getGradingPeriodID() === '0' && applyWeights && validGradingPeriodsCount.length > 0) {
     returnTotal =
       gradingPeriods?.reduce((total, period) => {
         let gradingPeriodPercentage = getGradingPeriodPercentage(
@@ -379,7 +384,7 @@ export const getTotal = (assignments, assignmentGroups, gradingPeriods, applyWei
 
         return `${Number.parseFloat(total) + gradingPeriodPercentage}`
       }, '0') || '0'
-  } else if (getGradingPeriodID() === '0') {
+  } else if (getGradingPeriodID() === '0' && validGradingPeriodsCount.length > 0) {
     returnTotal =
       gradingPeriods?.reduce((total, gradingPeriod) => {
         if (!getGradingPeriodTotalPoints(gradingPeriod, assignments)) return total
