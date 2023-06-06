@@ -71,9 +71,6 @@
     "all_day_fb42c4fc": {
         "message": "Allan dag"
     },
-    "all_items_loaded_aa256183": {
-        "message": "Öllum atriðum hefur verið hlaðið"
-    },
     "alpha_15d59033": {
         "message": "Alfa"
     },
@@ -1207,6 +1204,9 @@
     },
     "icon_size_9353edea": {
         "message": "Stærð tákns"
+    },
+    "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+        "message": "Ef hann er skilinn eftir tómur birtist tenglatexti sem heiti námskeiðstengils"
     },
     "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
         "message": "Ef þörf er á notkunarrétti birtist skráin ekki fyrr en hún er virk á síðunni Skrár."
