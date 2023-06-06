@@ -775,7 +775,9 @@ class AssignmentsController < ApplicationController
         NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED:
           Account.site_admin.feature_enabled?(:new_quizzes_assignment_build_button),
         HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED:
-          Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option)
+          Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option),
+        GRADING_SCHEME_UPDATES_ENABLED:
+          Account.site_admin.feature_enabled?(:grading_scheme_updates)
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
