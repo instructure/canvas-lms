@@ -453,6 +453,9 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Pratonton Ikon" },
   "icon_shape_30b61e7": { "message": "Bentuk Ikon" },
   "icon_size_9353edea": { "message": "Saiz Ikon" },
+  "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+    "message": "Jika ditinggalkan kosong, teks pautan akan dipaparkan sebagai nama pautan kursus"
+  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Jika Hak Penggunaan disyaratkan, fail ini tidak akan terbit sehingga didayakan dalam halaman Fail."
   },
