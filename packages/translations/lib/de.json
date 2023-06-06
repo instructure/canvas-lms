@@ -71,9 +71,6 @@
     "all_day_fb42c4fc": {
         "message": "Den ganzen Tag"
     },
-    "all_items_loaded_aa256183": {
-        "message": "Alle Elemente geladen"
-    },
     "alpha_15d59033": {
         "message": "Alpha"
     },
@@ -1207,6 +1204,9 @@
     },
     "icon_size_9353edea": {
         "message": "Symbolgröße"
+    },
+    "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+        "message": "Wenn Sie nichts eingeben, wird der Linktext als Name des Kurslinks angezeigt."
     },
     "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
         "message": "Wenn Nutzungsrechte erforderlich sind, wird die Datei erst veröffentlicht, wenn sie auf der Seite Dateien aktiviert wurde."

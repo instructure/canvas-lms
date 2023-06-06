@@ -71,9 +71,6 @@
     "all_day_fb42c4fc": {
         "message": "Te rā katoa"
     },
-    "all_items_loaded_aa256183": {
-        "message": "Kua utaina ngā tūemi katoa"
-    },
     "alpha_15d59033": {
         "message": "Arepa"
     },
@@ -1207,6 +1204,9 @@
     },
     "icon_size_9353edea": {
         "message": "Tohu Rahi"
+    },
+    "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+        "message": "Mēnā ka waiho pātea, ka whakaatu te kuputuhi hono hei ingoa hononga akoranga"
     },
     "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
         "message": "Mena ka hiahiatia nga motika whakamahi, karekau te konae e whakaputa kia taea ra ano ki te wharangi Kōnae."
