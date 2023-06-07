@@ -574,7 +574,7 @@ it('renders a NewActivityIndicator when asked to', () => {
   props.newActivity = true
   props.showNotificationBadge = true
   const wrapper = shallow(<PlannerItem {...props} />)
-  expect(wrapper.find('Animatable(NewActivityIndicator)')).toHaveLength(1)
+  expect(wrapper.find('NewActivityIndicator')).toHaveLength(1)
 })
 
 it('renders feedback if available', () => {

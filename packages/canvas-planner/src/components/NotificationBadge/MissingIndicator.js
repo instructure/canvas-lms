@@ -28,5 +28,5 @@ export default function MissingIndicator(props) {
 }
 
 MissingIndicator.propTypes = {
-  title: string.isRequired
+  title: string.isRequired,
 }

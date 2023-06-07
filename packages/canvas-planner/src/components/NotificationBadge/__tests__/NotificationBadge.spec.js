@@ -18,14 +18,14 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import NotificationBadge, {NewActivityIndicator} from '../index'
+import {NotificationBadge, NewActivityIndicator} from '../index'
 
 // it would be better if the snapshots contained the proper class names, but
 // jest doesn't deal with how themeable turns styles.css into code.
 it('renders an indicator', () => {
   const wrapper = shallow(
     <NotificationBadge>
-      <NewActivityIndicator title="blah" />
+      <NewActivityIndicator title="blah" itemIds={['first', 'second']} />
     </NotificationBadge>
   )
   expect(wrapper).toMatchSnapshot()
