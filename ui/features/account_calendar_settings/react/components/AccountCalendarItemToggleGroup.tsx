@@ -27,7 +27,7 @@ import {ApplyTheme} from '@instructure/ui-themeable'
 import {accountListTheme} from '../theme'
 
 import {AccountCalendarItem} from './AccountCalendarItem'
-import {Account, VisibilityChange, Collection, SubscriptionChange} from '../types'
+import {Account, VisibilityChange, Collection, SubscriptionChange, ExpandedAccounts} from '../types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -36,14 +36,15 @@ const I18n = useI18nScope('account_calendar_settings_account_group')
 type ComponentProps = {
   readonly parentId: null | number
   readonly accountGroup: Account[] | number[]
-  readonly defaultExpanded: boolean
   readonly collections: Collection
+  readonly loadingCollectionIds: number[]
   readonly handleToggle: (account: Account, expanded: boolean) => void
   readonly visibilityChanges: VisibilityChange[]
   readonly subscriptionChanges: SubscriptionChange[]
   readonly onAccountToggled: (id: number, visible: boolean) => void
   readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
   readonly autoSubscriptionEnabled: boolean
+  readonly expandedAccounts: ExpandedAccounts
 }
 
 const accGroupSortCalback = (a, b, parentId) => {
@@ -65,24 +66,26 @@ const accGroupSortCalback = (a, b, parentId) => {
 export const AccountCalendarItemToggleGroup = ({
   parentId,
   accountGroup,
-  defaultExpanded,
   collections,
+  loadingCollectionIds,
   handleToggle,
   visibilityChanges,
   subscriptionChanges,
   onAccountToggled,
   onAccountSubscriptionToggled,
   autoSubscriptionEnabled,
+  expandedAccounts,
 }: ComponentProps) => {
-  if (!accountGroup) return <Spinner renderTitle={I18n.t('Loading accounts')} size="x-small" />
+  const accountGroupEx = accountGroup
+    ? accountGroup.map(id => collections[id]).sort((a, b) => accGroupSortCalback(a, b, parentId))
+    : []
 
-  accountGroup = accountGroup
-    .map(id => collections[id])
-    .sort((a, b) => accGroupSortCalback(a, b, parentId))
+  if (!accountGroupEx) return <Spinner renderTitle={I18n.t('Loading accounts')} size="x-small" />
 
   return (
     <div className="account-group">
-      {accountGroup.map(acc => {
+      {accountGroupEx.map(acc => {
+        if (!acc) return null
         if (!(acc.sub_account_count > 0 && parentId !== acc.id)) {
           return (
             <div key={`toggle-group-single-${acc.id}`}>
@@ -110,23 +113,28 @@ export const AccountCalendarItemToggleGroup = ({
                 toggleLabel={acc.label}
                 iconExpanded={IconMiniArrowDownSolid}
                 icon={IconMiniArrowEndSolid}
-                onToggle={(ev, ex) => {
+                onToggle={(_ev, ex) => {
                   handleToggle(acc, ex)
                 }}
-                defaultExpanded={defaultExpanded}
+                expanded={expandedAccounts.includes(acc.id)}
               >
-                <AccountCalendarItemToggleGroup
-                  parentId={acc.id}
-                  accountGroup={acc.children}
-                  defaultExpanded={false}
-                  collections={collections}
-                  handleToggle={handleToggle}
-                  visibilityChanges={visibilityChanges}
-                  subscriptionChanges={subscriptionChanges}
-                  onAccountToggled={onAccountToggled}
-                  onAccountSubscriptionToggled={onAccountSubscriptionToggled}
-                  autoSubscriptionEnabled={autoSubscriptionEnabled}
-                />
+                {loadingCollectionIds.includes(acc.id) ? (
+                  <Spinner renderTitle={I18n.t('Loading sub-accounts')} size="x-small" />
+                ) : (
+                  <AccountCalendarItemToggleGroup
+                    parentId={acc.id}
+                    accountGroup={acc.children}
+                    collections={collections}
+                    loadingCollectionIds={loadingCollectionIds}
+                    handleToggle={handleToggle}
+                    visibilityChanges={visibilityChanges}
+                    subscriptionChanges={subscriptionChanges}
+                    onAccountToggled={onAccountToggled}
+                    onAccountSubscriptionToggled={onAccountSubscriptionToggled}
+                    autoSubscriptionEnabled={autoSubscriptionEnabled}
+                    expandedAccounts={expandedAccounts}
+                  />
+                )}
               </ToggleGroup>
             </View>
           </ApplyTheme>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -25,6 +24,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+// @ts-expect-error
 import SpacePandaUrl from '@canvas/images/SpacePanda.svg'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import useFetchApi from '@canvas/use-fetch-api-hook'
@@ -32,7 +32,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {AccountCalendarItem} from './AccountCalendarItem'
 import {FilterType} from './FilterControls'
-import {Account, VisibilityChange, SubscriptionChange} from '../types'
+import {Account, AccountData, VisibilityChange, SubscriptionChange} from '../types'
 import {castIdsToInt} from '../utils'
 import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
 
@@ -73,7 +73,7 @@ export const AccountList = ({
     setSearchTerm: setDebouncedSearchTerm,
     searchTermIsPending,
   } = useDebouncedSearchTerm('', {
-    isSearchableTerm: term => term.length >= MIN_SEARCH_TERM_LENGTH || term.length === 0,
+    isSearchableTerm: (term: string) => term.length >= MIN_SEARCH_TERM_LENGTH || term.length === 0,
   })
 
   useEffect(() => {
@@ -94,8 +94,14 @@ export const AccountList = ({
       filter: filterValue === FilterType.SHOW_ALL ? '' : filterValue,
       per_page: debouncedSearchTerm ? PAGE_LENGTH_SEARCH : PAGE_LENGTH_FILTER,
     },
-    success: useCallback(accountData => setAccounts(castIdsToInt(accountData)), []),
-    error: useCallback(error => showFlashError(I18n.t('Unable to load results'))(error), []),
+    success: useCallback(
+      (accountData: AccountData[]) => setAccounts(castIdsToInt(accountData)),
+      []
+    ),
+    error: useCallback(
+      (error: Error) => showFlashError(I18n.t('Unable to load results'))(error),
+      []
+    ),
     loading: setLoading,
   })
 
@@ -125,17 +131,21 @@ export const AccountList = ({
     )
   }
 
-  return accounts.map((account, index) => (
-    <AccountCalendarItem
-      key={`list_item_${account.id}`}
-      item={account}
-      visibilityChanges={visibilityChanges}
-      subscriptionChanges={subscriptionChanges}
-      onAccountToggled={onAccountToggled}
-      onAccountSubscriptionToggled={onAccountSubscriptionToggled}
-      padding="medium"
-      showTopSeparator={index > 0}
-      autoSubscriptionEnabled={autoSubscriptionEnabled}
-    />
-  ))
+  return (
+    <>
+      {accounts.map((account, index) => (
+        <AccountCalendarItem
+          key={`list_item_${account.id}`}
+          item={account}
+          visibilityChanges={visibilityChanges}
+          subscriptionChanges={subscriptionChanges}
+          onAccountToggled={onAccountToggled}
+          onAccountSubscriptionToggled={onAccountSubscriptionToggled}
+          padding="medium"
+          showTopSeparator={index > 0}
+          autoSubscriptionEnabled={autoSubscriptionEnabled}
+        />
+      ))}
+    </>
+  )
 }
