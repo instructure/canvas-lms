@@ -14,7 +14,6 @@ push() {
   return $?
 }
 
-echo from canvas-rce/commitTranslations
 git status --porcelain src
 
 git checkout -q -B sync-translations-rce && \
