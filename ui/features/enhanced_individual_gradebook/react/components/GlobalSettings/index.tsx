@@ -16,17 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef, useEffect} from 'react'
+import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import {ApiCallStatus, GradebookOptions, GradebookSortOrder, SectionConnection} from '../../types'
+import {GradebookOptions, GradebookSortOrder, SectionConnection} from '../../../types'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
+import GradebookScoreExport from './GradebookScoreExport'
 // @ts-expect-error -- TODO: remove once we're on InstUI 8
-import {IconDownloadLine, IconUploadLine} from '@instructure/ui-icons'
-import DateHelper from '@canvas/datetime/dateHelper'
-import {useExportGradebook} from '../hooks/useExportGradebook'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {IconUploadLine} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -54,30 +52,6 @@ export default function GlobalSettings({
   onSortChange,
   onSectionChange,
 }: Props) {
-  const [lastGeneratedCsvLink, setLastGeneratedCsvLink] = useState<string | null | undefined>(
-    gradebookOptions?.lastGeneratedCsvAttachmentUrl
-  )
-  const [lastGeneratedCsvLinkText, setLastGeneratedCsvLinkText] = useState<
-    string | null | undefined
-  >(gradebookOptions.gradebookCsvProgress?.progress.updated_at)
-  const linkRef = useRef<HTMLAnchorElement | null>(null)
-  const {exportGradebook, attachmentStatus, attachmentError, attachment} = useExportGradebook()
-  useEffect(() => {
-    if (attachmentStatus === ApiCallStatus.FAILED) {
-      showFlashError('Failed to export gradebook')(attachmentError)
-    }
-    if (attachmentStatus === ApiCallStatus.COMPLETED && linkRef?.current && attachment?.url) {
-      setLastGeneratedCsvLink(attachment.url)
-      setLastGeneratedCsvLinkText(attachment.updated_at)
-    }
-  }, [attachmentStatus, attachmentError, attachment])
-
-  useEffect(() => {
-    if (lastGeneratedCsvLink && attachmentStatus === ApiCallStatus.COMPLETED) {
-      linkRef.current?.click()
-    }
-  }, [lastGeneratedCsvLink, attachmentStatus])
-
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const sortType = event.target.value as GradebookSortOrder
     onSortChange(sortType)
@@ -87,15 +61,6 @@ export default function GlobalSettings({
     const index = event.target.selectedIndex
     const sectionId = index !== 0 ? event.target.value : undefined
     onSectionChange(sectionId)
-  }
-
-  const exportGradebookCsv = async () => {
-    await exportGradebook(gradebookOptions.userId, gradebookOptions.exportGradebookCsvUrl)
-  }
-
-  const downloadText = (date: string) => {
-    const formattedDate = DateHelper.formatDatetimeForDisplay(date)
-    return I18n.t('Download Scores Generated on %{date}', {date: formattedDate})
   }
 
   return (
@@ -236,30 +201,12 @@ export default function GlobalSettings({
           {/* {{!-- Intentionally left empty so this scales to smaller screens --}} */}
         </View>
         <View as="div" className="span8">
-          <View as="div" className="pad-box bottom-only">
-            <Button
-              color="secondary"
-              renderIcon={IconDownloadLine}
-              id="gradebook-export"
-              interaction={attachmentStatus === ApiCallStatus.PENDING ? 'disabled' : 'enabled'}
-              onClick={exportGradebookCsv}
-            >
-              {I18n.t('Download Current Scores (.csv)')}
-            </Button>
-            {attachmentStatus !== ApiCallStatus.PENDING &&
-              lastGeneratedCsvLink &&
-              lastGeneratedCsvLinkText &&
-              gradebookOptions?.gradebookCsvProgress && (
-                <Link
-                  elementRef={e => (linkRef.current = e)}
-                  href={lastGeneratedCsvLink}
-                  isWithinText={false}
-                  margin="0 xx-small"
-                >
-                  {downloadText(lastGeneratedCsvLinkText)}
-                </Link>
-              )}
-          </View>
+          <GradebookScoreExport
+            lastGeneratedCsvAttachmentUrl={gradebookOptions?.lastGeneratedCsvAttachmentUrl}
+            gradebookCsvProgress={gradebookOptions.gradebookCsvProgress}
+            userId={gradebookOptions.userId}
+            exportGradebookCsvUrl={gradebookOptions.exportGradebookCsvUrl}
+          />
 
           <View as="div" className="pad-box bottom-only">
             <Button
