@@ -173,18 +173,20 @@ module Lti
     end
 
     def resource_link_id
-      if @content_tag&.associated_asset.present?
-        resource_link = @content_tag.associated_asset
-        if resource_link.respond_to?(:resource_link_uuid)
-          resource_link.resource_link_uuid
-        end
-      elsif @assignment&.submission_types == "external_tool" && @assignment&.line_items&.present?
-        if @root_account&.feature_enabled?(:resource_link_uuid_in_custom_substitution)
-          @assignment.line_items.first&.resource_link&.resource_link_uuid
-        else
-          @assignment.line_items.first&.resource_id
-        end
-      end
+      @resource_link_id ||= if @assignment&.submission_types == "external_tool" && @assignment&.line_items&.present?
+                              if @root_account&.feature_enabled?(:resource_link_uuid_in_custom_substitution)
+                                @assignment.line_items.first&.resource_link&.resource_link_uuid
+                              else
+                                @assignment.line_items.first&.resource_id
+                              end
+                            elsif @resource_link
+                              @resource_link.resource_link_uuid
+                            elsif @content_tag&.associated_asset.present?
+                              resource_link = @content_tag.associated_asset
+                              if resource_link.respond_to?(:resource_link_uuid)
+                                resource_link.resource_link_uuid
+                              end
+                            end
     end
 
     # This method should be removed when resource_link_uuid_in_custom_substitution is turned on for all
