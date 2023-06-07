@@ -24,6 +24,8 @@ class MediaTrack < ActiveRecord::Base
   belongs_to :user
   belongs_to :media_object, touch: true
   belongs_to :attachment
+  belongs_to :master_content_tags, class_name: "MasterCourses::MasterContentTag", dependent: :destroy
+
   before_validation :set_media_and_attachment
   before_save :convert_srt_to_wvtt
   before_create :mark_downstream_create_destroy

@@ -49,6 +49,15 @@ const unsyncedChanges = [
     html_url: '/4/pages/page-1',
     locked: false,
   },
+  {
+    asset_id: '5',
+    asset_type: 'media_track',
+    asset_name: 'media.mp4',
+    change_type: 'created',
+    html_url: '/media_attachments/96/media_tracks',
+    locked: false,
+    locale: 'en',
+  },
 ]
 
 const defaultProps = {
@@ -100,9 +109,21 @@ test('renders the migration options component', () => {
 test('renders the changes properly', () => {
   const tree = mount(connect())
   const changes = tree.find('tr[data-testid="bcs__unsynced-item"]')
-  equal(changes.length, 3)
+  equal(changes.length, 4)
   const locks = changes.find('IconBlueprintLockSolid')
   equal(locks.length, 1)
   const unlocks = changes.find('IconBlueprintSolid')
-  equal(unlocks.length, 2)
+  equal(unlocks.length, 3)
+})
+
+test('renders the media tracks properly', () => {
+  const tree = mount(connect())
+  const changes = tree.find('tr[data-testid="bcs__unsynced-item"]')
+  equal(changes.length, 4)
+  const assetName = changes.findWhere(
+    node => node.name() === 'Text' && node.text() === 'media.mp4 (English)'
+  )
+  equal(assetName.length, 1)
+  const assetType = changes.findWhere(node => node.name() === 'Text' && node.text() === 'Caption')
+  equal(assetType.length, 1)
 })

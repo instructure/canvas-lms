@@ -26,7 +26,10 @@ import saveMediaRecording, {
   saveClosedCaptions,
   saveClosedCaptionsForAttachment,
 } from './saveMediaRecording'
-import closedCaptionLanguages, {sortedClosedCaptionLanguageList} from './closedCaptionLanguages'
+import closedCaptionLanguages, {
+  sortedClosedCaptionLanguageList,
+  captionLanguageForLocale,
+} from './closedCaptionLanguages'
 import getTranslations from './getTranslations'
 import * as CONSTANTS from './shared/constants'
 
@@ -45,6 +48,7 @@ export {
   saveClosedCaptionsForAttachment,
   closedCaptionLanguages,
   sortedClosedCaptionLanguageList,
+  captionLanguageForLocale,
   getTranslations,
   CONSTANTS,
 }

@@ -76,6 +76,7 @@ module Api::V1::MasterCourses
       html_url: url,
       locked:
     }
+    json[:locale] = asset.locale if asset.class_name == "MediaTrack"
     json[:exceptions] = exceptions[migration_id] || [] unless migration_id.nil?
     json
   end
