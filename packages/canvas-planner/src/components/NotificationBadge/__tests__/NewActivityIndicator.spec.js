@@ -40,22 +40,22 @@ it('registers itself as animatable', () => {
   const instance = wrapper.instance()
   expect(fakeRegister).toHaveBeenCalledWith('new-activity-indicator', instance, 42, [
     'first',
-    'second'
+    'second',
   ])
 
   wrapper.setProps({animatableIndex: 84, itemIds: ['third', 'fourth']})
   expect(fakeDeregister).toHaveBeenCalledWith('new-activity-indicator', instance, [
     'first',
-    'second'
+    'second',
   ])
   expect(fakeRegister).toHaveBeenCalledWith('new-activity-indicator', instance, 84, [
     'third',
-    'fourth'
+    'fourth',
   ])
 
   wrapper.unmount()
   expect(fakeDeregister).toHaveBeenCalledWith('new-activity-indicator', instance, [
     'third',
-    'fourth'
+    'fourth',
   ])
 })

@@ -19,36 +19,42 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import {themeable} from '@instructure/ui-themeable'
 import MissingIndicator from './MissingIndicator'
-import NewActivityIndicator from './NewActivityIndicator'
+import {NewActivityIndicator} from './NewActivityIndicator'
 import {sizeShape} from '../plannerPropTypes'
-import styles from './styles.css'
-import theme from './theme'
+import buildStyle from './style'
 
-class NotificationBadge extends React.Component {
+export default class NotificationBadge extends React.Component {
   static propTypes = {
     responsiveSize: sizeShape,
-    children: PropTypes.element
+    children: PropTypes.element,
   }
 
   static defaultProps = {
-    responsiveSize: 'large'
+    responsiveSize: 'large',
   }
 
-  render() {
+  constructor(props) {
+    super(props)
+    this.style = buildStyle()
+  }
+
+  render = () => {
     const indicator = this.props.children ? React.Children.only(this.props.children) : null
 
     const activityIndicatorClasses = classnames(
-      styles.activityIndicator,
-      indicator != null && styles.hasBadge,
-      styles[this.props.responsiveSize]
+      this.style.classNames.activityIndicator,
+      indicator != null && this.style.classNames.hasBadge,
+      this.style.classNames[this.props.responsiveSize]
     )
 
-    return <div className={activityIndicatorClasses}>{indicator}</div>
+    return (
+      <>
+        <style>{this.style.css}</style>
+        <div className={activityIndicatorClasses}>{indicator}</div>
+      </>
+    )
   }
 }
-const ThemeableNotificationBadge = themeable(theme, styles)(NotificationBadge)
 
 export {MissingIndicator, NewActivityIndicator, NotificationBadge}
-export default ThemeableNotificationBadge
