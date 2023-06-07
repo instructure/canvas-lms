@@ -414,4 +414,12 @@ function sortedClosedCaptionLanguageList(userLocale) {
   return langlist
 }
 
-export {sortedClosedCaptionLanguageList, closedCaptionLanguages as default}
+function captionLanguageForLocale(locale) {
+  return closedCaptionLanguages.find(lang => lang.id === locale)?.label || locale
+}
+
+export {
+  sortedClosedCaptionLanguageList,
+  captionLanguageForLocale,
+  closedCaptionLanguages as default,
+}

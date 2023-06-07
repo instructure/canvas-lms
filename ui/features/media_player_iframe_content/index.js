@@ -23,7 +23,7 @@ import ReactDOM from 'react-dom'
 import {parse} from 'url'
 import ready from '@instructure/ready'
 import CanvasMediaPlayer from '@canvas/canvas-media-player'
-import {closedCaptionLanguages} from '@instructure/canvas-media'
+import {captionLanguageForLocale} from '@instructure/canvas-media'
 
 const isStandalone = () => {
   return !window.frameElement && window.location === window.top.location
@@ -84,7 +84,7 @@ ready(() => {
     return {
       id: track.id,
       src: track.url,
-      label: closedCaptionLanguages.find(lang => lang.id === track.locale)?.label || track.locale,
+      label: captionLanguageForLocale(track.locale),
       type: track.kind,
       language: track.locale,
     }
