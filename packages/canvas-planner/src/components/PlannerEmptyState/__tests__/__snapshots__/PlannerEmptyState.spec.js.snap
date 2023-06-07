@@ -1,81 +1,123 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders desert when completely empty 1`] = `
-<div
-  className="PlannerEmptyState-styles__root planner-empty-state"
->
-  <DesertSvg
-    aria-hidden="true"
-    className="PlannerEmptyState-styles__desert desert"
-    height="220"
-    viewBox="0 0 465 220"
-    width="465"
-    xmlns="http://www.w3.org/2000/svg"
-  />
+<Fragment>
+  <style>
+    
+  .PlannerEmptyState-styles__root {
+    font-size: 1rem;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    color: #394B58;
+    background: undefined;
+  }
+  .PlannerEmptyState-styles__root.PlannerEmptyState-styles__small .PlannerEmptyState-styles__desert, .PlannerEmptyState-styles__root.PlannerEmptyState-styles__small .PlannerEmptyState-styles__balloons {
+    max-width: 100%;
+  }
+
+  .PlannerEmptyState-styles__desert, .PlannerEmptyState-styles__balloons {
+    display: block;
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+    text-align: center;
+    padding: 0.75rem;
+    margin-top: 3.75rem;
+    margin-bottom: 2.25rem;
+  }
+
+  .PlannerEmptyState-styles__subtitlebox {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .PlannerEmptyState-styles__title {
+    text-align: center;
+    vertical-align: middle;
+    padding: 16px;
+    font-weight: 300;
+  }
+
+  .PlannerEmptyState-styles__subtitle {
+    padding: 12px;
+  }
+  
+  </style>
   <div
-    className="PlannerEmptyState-styles__title"
+    className="PlannerEmptyState-styles__root planner-empty-state"
   >
-    <Heading
-      border="none"
-      color="inherit"
-      level="h2"
-    >
-      No Due Dates Assigned
-    </Heading>
-  </div>
-  <div
-    className="PlannerEmptyState-styles__subtitlebox"
-  >
+    <DesertSvg
+      aria-hidden="true"
+      className="PlannerEmptyState-styles__desert desert"
+      height="220"
+      viewBox="0 0 465 220"
+      width="465"
+      xmlns="http://www.w3.org/2000/svg"
+    />
     <div
-      className="PlannerEmptyState-styles__subtitle"
+      className="PlannerEmptyState-styles__title"
     >
-      Looks like there isn't anything here
+      <Heading
+        border="none"
+        color="inherit"
+        level="h2"
+      >
+        No Due Dates Assigned
+      </Heading>
     </div>
-    <InlineList
-      as="ul"
-      delimiter="pipe"
-      elementRef={[Function]}
-      itemSpacing="none"
-      margin="none"
-      size="medium"
+    <div
+      className="PlannerEmptyState-styles__subtitlebox"
     >
-      <InlineListItem
-        delimiter="none"
-        elementRef={[Function]}
-        padding="none"
-        size="medium"
-        spacing="none"
+      <div
+        className="PlannerEmptyState-styles__subtitle"
       >
-        <Link
-          as="button"
-          color="link"
-          iconPlacement="start"
-          id="PlannerEmptyState_CardView"
-          isWithinText={false}
-          onClick={[Function]}
-        >
-          Go to Card View Dashboard
-        </Link>
-      </InlineListItem>
-      <InlineListItem
-        delimiter="none"
+        Looks like there isn't anything here
+      </div>
+      <InlineList
+        as="ul"
+        delimiter="pipe"
         elementRef={[Function]}
-        padding="none"
+        itemSpacing="none"
+        margin="none"
         size="medium"
-        spacing="none"
       >
-        <Link
-          as="button"
-          color="link"
-          iconPlacement="start"
-          id="PlannerEmptyState_AddToDo"
-          isWithinText={false}
-          onClick={[Function]}
+        <InlineListItem
+          delimiter="none"
+          elementRef={[Function]}
+          padding="none"
+          size="medium"
+          spacing="none"
         >
-          Add To-Do
-        </Link>
-      </InlineListItem>
-    </InlineList>
+          <Link
+            as="button"
+            color="link"
+            iconPlacement="start"
+            id="PlannerEmptyState_CardView"
+            isWithinText={false}
+            onClick={[Function]}
+          >
+            Go to Card View Dashboard
+          </Link>
+        </InlineListItem>
+        <InlineListItem
+          delimiter="none"
+          elementRef={[Function]}
+          padding="none"
+          size="medium"
+          spacing="none"
+        >
+          <Link
+            as="button"
+            color="link"
+            iconPlacement="start"
+            id="PlannerEmptyState_AddToDo"
+            isWithinText={false}
+            onClick={[Function]}
+          >
+            Add To-Do
+          </Link>
+        </InlineListItem>
+      </InlineList>
+    </div>
   </div>
-</div>
+</Fragment>
 `;

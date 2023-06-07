@@ -17,7 +17,6 @@
  */
 import React, {Component} from 'react'
 import classnames from 'classnames'
-import {themeable} from '@instructure/ui-themeable'
 import {func, bool, string} from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
@@ -27,11 +26,9 @@ import {InlineList} from '@instructure/ui-list'
 import formatMessage from '../../format-message'
 import DesertSvg from './empty-desert.svg' // Currently uses react-svg-loader
 import BalloonsSvg from './balloons.svg'
+import buildStyle from './style'
 
-import styles from './styles.css'
-import theme from './theme'
-
-class PlannerEmptyState extends Component {
+export default class PlannerEmptyState extends Component {
   static propTypes = {
     changeDashboardView: func,
     onAddToDo: func.isRequired,
@@ -44,13 +41,18 @@ class PlannerEmptyState extends Component {
     responsiveSize: 'large',
   }
 
+  constructor(props) {
+    super(props)
+    this.style = buildStyle()
+  }
+
   handleDashboardCardLinkClick = () => {
     if (this.props.changeDashboardView) {
       this.props.changeDashboardView('cards')
     }
   }
 
-  renderAddToDoButton() {
+  renderAddToDoButton = () => {
     return (
       <Link
         as="button"
@@ -63,21 +65,24 @@ class PlannerEmptyState extends Component {
     )
   }
 
-  renderNothingAtAll() {
+  renderNothingAtAll = () => {
     return (
       <div
         className={classnames(
-          styles.root,
+          this.style.classNames.root,
           'planner-empty-state',
-          styles[this.props.responsiveSize]
+          this.style.classNames[this.props.responsiveSize]
         )}
       >
-        <DesertSvg className={classnames(styles.desert, 'desert')} aria-hidden="true" />
-        <div className={styles.title}>
+        <DesertSvg
+          className={classnames(this.style.classNames.desert, 'desert')}
+          aria-hidden="true"
+        />
+        <div className={this.style.classNames.title}>
           <Heading>{formatMessage('No Due Dates Assigned')}</Heading>
         </div>
-        <div className={styles.subtitlebox}>
-          <div className={styles.subtitle}>
+        <div className={this.style.classNames.subtitlebox}>
+          <div className={this.style.classNames.subtitle}>
             {formatMessage("Looks like there isn't anything here")}
           </div>
           {!this.props.isWeekly && (
@@ -102,25 +107,30 @@ class PlannerEmptyState extends Component {
     )
   }
 
-  renderNothingLeft() {
+  renderNothingLeft = () => {
     const msg = this.props.isWeekly
       ? formatMessage('Nothing Due This Week')
       : formatMessage('Nothing More To Do')
     return (
       <div
         className={classnames(
-          styles.root,
+          this.style.classNames.root,
           'planner-empty-state',
-          styles[this.props.responsiveSize]
+          this.style.classNames[this.props.responsiveSize]
         )}
       >
-        <BalloonsSvg className={classnames(styles.balloons, 'balloons')} aria-hidden="true" />
-        <div className={styles.title}>
+        <BalloonsSvg
+          className={classnames(this.style.classNames.balloons, 'balloons')}
+          aria-hidden="true"
+        />
+        <div className={this.style.classNames.title}>
           <Heading>{msg}</Heading>
         </div>
         {!this.props.isWeekly && (
-          <div className={styles.subtitlebox}>
-            <div className={styles.subtitle}>{formatMessage('Scroll up to see your history!')}</div>
+          <div className={this.style.classNames.subtitlebox}>
+            <div className={this.style.classNames.subtitle}>
+              {formatMessage('Scroll up to see your history!')}
+            </div>
             {this.renderAddToDoButton()}
           </div>
         )}
@@ -129,8 +139,11 @@ class PlannerEmptyState extends Component {
   }
 
   render() {
-    return this.props.isCompletelyEmpty ? this.renderNothingAtAll() : this.renderNothingLeft()
+    return (
+      <>
+        <style>{this.style.css}</style>
+        {this.props.isCompletelyEmpty ? this.renderNothingAtAll() : this.renderNothingLeft()}
+      </>
+    )
   }
 }
-
-export default themeable(theme, styles)(PlannerEmptyState)
