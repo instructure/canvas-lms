@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import $ from 'jquery'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -29,11 +29,12 @@ import {
   AssignmentConnection,
   GradebookOptions,
   GradebookUserSubmissionDetails,
-} from '../../types'
-import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
+} from '../../../types'
+import {useCurrentStudentInfo} from '../../hooks/useCurrentStudentInfo'
 import {Pill} from '@instructure/ui-pill'
 import {Button} from '@instructure/ui-buttons'
-import {useSubmitScore} from '../hooks/useSubmitScore'
+import {useSubmitScore} from '../../hooks/useSubmitScore'
+import SubmissionDetailModal from './SubmissionDetailModal'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -54,7 +55,8 @@ export default function GradingResults({
 }: Props) {
   const {currentStudent, studentSubmissions} = useCurrentStudentInfo(courseId, studentId)
   const submission = studentSubmissions?.find(s => s.assignmentId === assignment?.id)
-  const [gradeInput, setGradeInput] = React.useState<string>('')
+  const [gradeInput, setGradeInput] = useState<string>('')
+  const [modalOpen, setModalOpen] = useState<boolean>(false)
 
   const {submit, submitScoreError, submitScoreStatus, savedSubmission} = useSubmitScore()
 
@@ -190,11 +192,19 @@ export default function GradingResults({
             )}
 
             <View as="div" className="span4" margin="medium 0 0 0" width="14.6rem">
-              <Button display="block">{I18n.t('Submission Details')}</Button>
+              <Button
+                display="block"
+                onClick={() => {
+                  setModalOpen(true)
+                }}
+              >
+                {I18n.t('Submission Details')}
+              </Button>
             </View>
           </View>
         </View>
       </View>
+      <SubmissionDetailModal modalOpen={modalOpen} handleClose={() => setModalOpen(false)} />
     </>
   )
 }
