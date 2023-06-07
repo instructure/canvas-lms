@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useLayoutEffect, useRef, useState, useEffect} from 'react'
+import React, {useCallback, useLayoutEffect, useRef, useState, useEffect} from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
@@ -33,7 +32,12 @@ import {AccountList} from './AccountList'
 import {AccountTree} from './AccountTree'
 import {FilterControls, FilterType} from './FilterControls'
 import {Footer} from './Footer'
-import {VisibilityChange, SubscriptionChange} from '../types'
+import {
+  VisibilityChange,
+  SubscriptionChange,
+  ExpandedAccounts,
+  UpdateAccountDataResponse,
+} from '../types'
 
 const I18n = useI18nScope('account_calendar_settings')
 
@@ -75,8 +79,9 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
   const [filterValue, setFilterValue] = useState(FilterType.SHOW_ALL)
   const [windowHeight, setWindowHeight] = useState(window.innerHeight)
   const [accountTreeHeight, setAccountTreeHeight] = useState(0)
-  const accountTreeRef = useRef(null)
-  const footerRef = useRef(null)
+  const [expandedAccounts, setExpandedAccounts] = useState<ExpandedAccounts>([accountId])
+  const accountTreeRef = useRef<HTMLDivElement | null>(null)
+  const footerRef = useRef<HTMLDivElement | null>(null)
 
   useLayoutEffect(() => {
     const updateWindowHeight = () => setWindowHeight(window.innerHeight)
@@ -102,35 +107,63 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
     setShowConfirmation(askConfirmation)
   }, [autoSubscriptionEnabled, subscriptionChanges])
 
-  const onAccountToggled = (id: number, visible: boolean) => {
-    const existingChange = visibilityChanges.find(change => change.id === id)
-    if (existingChange) {
-      if (existingChange.visible !== visible) {
-        setVisibilityChanges(visibilityChanges.filter(change => change.id !== id))
+  const onAccountToggled = useCallback(
+    (id: number, visible: boolean) => {
+      const existingChange = visibilityChanges.find(change => change.id === id)
+      if (existingChange) {
+        if (existingChange.visible !== visible) {
+          setVisibilityChanges(visibilityChanges.filter(change => change.id !== id))
+        }
+      } else {
+        setVisibilityChanges([...visibilityChanges, {id, visible}])
       }
-    } else {
-      setVisibilityChanges([...visibilityChanges, {id, visible}])
-    }
-    if (visible === false) {
-      setSubscriptionChanges(subscriptionChanges.filter(change => change.id !== id))
-    }
-  }
-
-  const onAccountSubscriptionToggled = (id: number, autoSubscription: boolean) => {
-    const existingChange = subscriptionChanges.find(change => change.id === id)
-    if (existingChange) {
-      if (existingChange.auto_subscribe !== autoSubscription) {
+      if (visible === false) {
         setSubscriptionChanges(subscriptionChanges.filter(change => change.id !== id))
       }
-    } else {
-      setSubscriptionChanges([...subscriptionChanges, {id, auto_subscribe: autoSubscription}])
-    }
-  }
+    },
+    [subscriptionChanges, visibilityChanges]
+  )
+
+  const onAccountSubscriptionToggled = useCallback(
+    (id: number, autoSubscription: boolean) => {
+      const existingChange = subscriptionChanges.find(change => change.id === id)
+      if (existingChange) {
+        if (existingChange.auto_subscribe !== autoSubscription) {
+          setSubscriptionChanges(subscriptionChanges.filter(change => change.id !== id))
+        }
+      } else {
+        setSubscriptionChanges([...subscriptionChanges, {id, auto_subscribe: autoSubscription}])
+      }
+    },
+    [subscriptionChanges]
+  )
+
+  const onAccountExpandedToggled = useCallback(
+    (id: number, expanded: boolean) => {
+      if (expanded === expandedAccounts.includes(id)) return
+      const ea = [...expandedAccounts]
+      if (expanded) {
+        ea.includes(id) || ea.push(id)
+      } else {
+        const i = ea.findIndex(accid => accid === id)
+        ea.splice(i, 1)
+      }
+      setExpandedAccounts(ea)
+    },
+    [expandedAccounts]
+  )
 
   const onApplyClicked = () => {
+    if (!expandedAccounts.includes(accountId)) {
+      setExpandedAccounts([...expandedAccounts, accountId])
+    }
+
+    const combinedChanges: (VisibilityChange | SubscriptionChange)[] = [
+      ...visibilityChanges,
+      ...subscriptionChanges,
+    ]
     const accountCalendarChanges = [
-      ...visibilityChanges
-        .concat(subscriptionChanges)
+      ...combinedChanges
         .reduce(
           (changes, currentChange) =>
             changes.set(
@@ -147,12 +180,13 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
       method: 'PUT',
       body: accountCalendarChanges,
     })
-      .then(({json}) => {
+      .then((response: UpdateAccountDataResponse) => {
+        const json = response.json
         setVisibilityChanges([])
         setSubscriptionChanges([])
         showFlashSuccess(json?.message)()
       })
-      .catch(err => {
+      .catch((err: Error) => {
         showFlashError(I18n.t("Couldn't save account calendar visibilities"))(err)
       })
       .finally(() => {
@@ -201,7 +235,9 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
                 subscriptionChanges={subscriptionChanges}
                 onAccountToggled={onAccountToggled}
                 onAccountSubscriptionToggled={onAccountSubscriptionToggled}
+                onAccountExpandedToggled={onAccountExpandedToggled}
                 autoSubscriptionEnabled={autoSubscriptionEnabled}
+                expandedAccounts={expandedAccounts}
               />
             </div>
             <div style={{display: showTree ? 'none' : 'block'}}>

@@ -48,6 +48,11 @@ import {useDebouncedCallback} from 'use-debounce'
 
 const TYPING_DEBOUNCE_TIMEOUT = 750
 
+// This jsdoc comment lets typescript know the types of the parameters to useDebouncedSearchTerm
+/**
+ * @param deaultValue {unknown}
+ * @param  {timeout: number, isSearchableTerm {() => boolean}}
+ */
 export default function useDebouncedSearchTerm(
   defaultValue,
   {timeout = TYPING_DEBOUNCE_TIMEOUT, isSearchableTerm = () => true} = {}
