@@ -24,17 +24,16 @@ import {Attachment} from '../../../../api.d'
 import {Progress} from '../../../gradebook/react/default_gradebook/gradebook.d'
 
 const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
-
+type AttachmentProgress = {
+  attachment_id: string
+  filename: string
+  progress_id: string
+}
 export const useExportGradebook = () => {
   const [attachmentStatus, setAttachmentStatus] = useState<ApiCallStatus>(ApiCallStatus.NOT_STARTED)
   const [attachmentError, setAttachmentError] = useState<Error>(new Error(''))
   const [attachment, setAttachment] = useState<Attachment | null>(null)
 
-  type AttachmentProgress = {
-    attachment_id: string
-    filename: string
-    progress_id: string
-  }
   const exportGradebook = async (userId?: string, exportGradebookCsvUrl?: string) => {
     setAttachmentStatus(ApiCallStatus.PENDING)
     if (!exportGradebookCsvUrl) {
@@ -48,25 +47,25 @@ export const useExportGradebook = () => {
       return
     }
     try {
-      const attachmentProgress = // @ts-expect-error
-        (await doFetchApi<AttachmentProgress>({path: exportGradebookCsvUrl, method: 'POST'})).json
+      const attachmentProgress = (await doFetchApi({path: exportGradebookCsvUrl, method: 'POST'}))
+        .json as AttachmentProgress // TODO: remove type assertion once doFetchApi is typed
       const pollingProgress: number = window.setInterval(async () => {
-        const progressBody = {
-          path: `/api/v1/progress/${attachmentProgress.progress_id}`,
-          method: 'GET',
-        }
-        // @ts-expect-error
-        const progress = (await doFetchApi<Progress>(progressBody)).json
+        const progress = (
+          await doFetchApi({
+            path: `/api/v1/progress/${attachmentProgress.progress_id}`,
+            method: 'GET',
+          })
+        ).json as Progress // TODO: remove type assertion once doFetchApi is typed
         if (progress.workflow_state === 'running' || progress.workflow_state === 'queued') {
           return
         }
         if (progress.workflow_state === 'completed') {
-          const attachmentBody = {
-            path: `/api/v1/users/${userId}/files/${attachmentProgress.attachment_id}`,
-            method: 'GET',
-          }
-          // @ts-expect-error
-          const attachmentResult = (await doFetchApi<Attachment>(attachmentBody)).json
+          const attachmentResult = (
+            await doFetchApi({
+              path: `/api/v1/users/${userId}/files/${attachmentProgress.attachment_id}`,
+              method: 'GET',
+            })
+          ).json as Attachment // TODO: remove type assertion once doFetchApi is typed
           setAttachmentStatus(ApiCallStatus.COMPLETED)
           setAttachment(attachmentResult)
         }
