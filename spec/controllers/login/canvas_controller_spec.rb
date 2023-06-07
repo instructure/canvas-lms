@@ -66,6 +66,21 @@ describe Login::CanvasController do
     end
   end
 
+  context "manage_robots_meta" do
+    it "enables robot indexing by default" do
+      get "new"
+      expect(assigns[:allow_robot_indexing]).to be_truthy
+    end
+
+    it "allows robot indexing to be disabled" do
+      Account.default.settings[:disable_login_search_indexing] = true
+      Account.default.save!
+
+      get "new"
+      expect(assigns[:allow_robot_indexing]).to be_falsey
+    end
+  end
+
   it "shows sso buttons on load" do
     aac = Account.default.authentication_providers.create!(auth_type: "facebook")
     allow(Canvas::Plugin.find(:facebook)).to receive(:settings).and_return({})
