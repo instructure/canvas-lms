@@ -966,6 +966,27 @@ describe ExternalToolsController do
           expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
         end
 
+        it "errors if the resource_link_id cannot be found" do
+          get "retrieve", params: {
+            course_id: @course.id,
+            url: "http://www.example.com/launch",
+            resource_link_id: "wrong_do_it_again"
+          }
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
+        it "errors if the resource_link_id is for the wrong context" do
+          rl.update(context: Course.create(course_valid_attributes))
+          get "retrieve", params: {
+            course_id: @course.id,
+            url: "http://www.example.com/launch",
+            resource_link_id: rl.resource_link_uuid
+          }
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
         it "errors if the resource_link is inactive" do
           rl.update(workflow_state: "deleted")
           get_page
@@ -1134,7 +1155,7 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params).not_to be_nil
     end
 
-    it "finds tools matching by resource_link_id" do
+    it "finds tools matching by resource_link_lookup_uuid" do
       user_session(@teacher)
 
       tool = new_valid_tool(@course) # this tool has a url and no domain
@@ -1148,7 +1169,21 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].resource_url).to eq "http://www.example.com/basiclti/url_from_resource_link"
     end
 
-    it "finds tools matching by resource_link_id, ignoring the url parameter" do
+    it "finds tools matching by resource_link_id" do
+      user_session(@teacher)
+
+      tool = new_valid_tool(@course) # this tool has a url and no domain
+      resource_link = Lti::ResourceLink.create_with(@course, tool, nil, "http://www.example.com/basiclti/url_from_resource_link")
+
+      # provide no url parameter
+      get "retrieve", params: { course_id: @course.id, resource_link_id: resource_link.resource_link_uuid }
+      expect(response).to be_successful
+      expect(assigns[:tool]).to eq tool
+
+      expect(assigns[:lti_launch].resource_url).to eq "http://www.example.com/basiclti/url_from_resource_link"
+    end
+
+    it "finds tools matching by resource_link_lookup_uuid, ignoring the url parameter" do
       user_session(@teacher)
       new_valid_tool(@course, {
                        url: "http://tool1.com"
