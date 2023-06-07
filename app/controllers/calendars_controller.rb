@@ -38,6 +38,7 @@ class CalendarsController < ApplicationController
                            @current_user.get_preference(:selected_calendar_contexts)
                          end
     @account_calendar_events_seen = @current_user.get_preference(:account_calendar_events_seen)
+    @viewed_auto_subscribed_account_calendars = @current_user.get_preference(:viewed_auto_subscribed_account_calendars) || []
     # somewhere there's a bad link that doesn't separate parameters properly.
     # make sure we don't do a find on a non-numeric id.
     if params[:event_id] && params[:event_id] =~ Api::ID_REGEX && (event = CalendarEvent.where(id: params[:event_id]).first) && event.start_at
@@ -113,12 +114,16 @@ class CalendarsController < ApplicationController
         }
       elsif (context.is_a? Account) && Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars)
         info[:auto_subscribe] = context.account_calendar_subscription_type == "auto"
+        info[:viewed_auto_subscribed_account_calendars] = @viewed_auto_subscribed_account_calendars.include?(context.global_id)
       end
       if ag_permission && ag_permission[:all_sections] && context.respond_to?(:group_categories)
         info[:group_categories] = context.group_categories.active.pluck(:id, :name).map { |id, name| { id: id, asset_string: "group_category_#{id}", name: name } }
       end
       info
     end
+    # NOTE: which account calendars the user will have now seen
+    @current_user.set_preference(:viewed_auto_subscribed_account_calendars, @contexts.select { |c| c.class.to_s.downcase == "account" }.map(&:global_id))
+
     StringifyIds.recursively_stringify_ids(@contexts_json)
     content_for_head helpers.auto_discovery_link_tag(:atom, @feed_url + ".atom", { title: t(:feed_title, "Course Calendar Atom Feed") })
     js_env(@hash) if @hash

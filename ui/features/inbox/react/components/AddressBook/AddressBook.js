@@ -93,9 +93,13 @@ export const AddressBook = ({
   const menuRef = useRef(null)
   const userID = ENV.current_user_id?.toString()
   const [focusType, setFocusType] = useState(KEYBOARD_FOCUS_TYPE) // Options are 'keyboard' and 'mouse'
-  const backButtonArray = isSubMenu
-    ? [{id: 'backButton', name: I18n.t('Back'), itemType: BACK_BUTTON_TYPE}]
-    : []
+  const isCourseHomeMenu =
+    activeCourseFilter?.contextID &&
+    currentFilter.context?.contextID === activeCourseFilter?.contextID
+  const backButtonArray =
+    isSubMenu && !isCourseHomeMenu
+      ? [{id: 'backButton', name: I18n.t('Back'), itemType: BACK_BUTTON_TYPE}]
+      : []
   const headerArray = headerText
     ? [{id: 'headerText', name: headerText, focusSkip: true, itemType: HEADER_TEXT_TYPE}]
     : []

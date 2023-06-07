@@ -736,7 +736,7 @@ describe ContentMigration do
     expect(cm.migration_issues).to be_empty
   end
 
-  it "correclties handle media comment resolution in quizzes" do
+  it "correctly handles media comment resolution in quizzes" do
     skip "Requires QtiMigrationTool" unless Qti.qti_enabled?
 
     cm = @cm

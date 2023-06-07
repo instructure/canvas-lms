@@ -30,13 +30,14 @@ module MasterCourses
     AssignmentGroup
     Attachment
     CalendarEvent
-    DiscussionTopic
+    CoursePace
     ContextExternalTool
     ContextModule
     ContentTag
+    DiscussionTopic
     LearningOutcome
     LearningOutcomeGroup
-    CoursePace
+    MediaTrack
     Quizzes::Quiz
     Rubric
     Wiki

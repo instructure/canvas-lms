@@ -430,6 +430,10 @@ class AssignmentGroupsController < ApplicationController
       assignment_ids: assignment_ids
     )
 
+    if value_to_boolean(params[:hide_zero_point_quizzes])
+      assignments = assignments.not_hidden_in_gradebook
+    end
+
     if params[:exclude_assignment_submission_types].present?
       exclude_types = params[:exclude_assignment_submission_types]
       exclude_types = Array.wrap(exclude_types) &

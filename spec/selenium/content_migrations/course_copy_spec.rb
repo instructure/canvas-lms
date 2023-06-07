@@ -57,6 +57,16 @@ describe "course copy" do
     expect(@new_course.wiki_pages.count).to eq 1
   end
 
+  it "finished calculating course dates for access before redirect" do
+    course_with_teacher_logged_in
+    @course.root_account.update!(settings: { teachers_can_create_courses: true })
+    past_term_id = EnrollmentTerm.create(end_at: 1.day.ago, root_account: @teacher.account).id
+    @course.update! enrollment_term_id: past_term_id, conclude_at: 5.days.from_now, restrict_enrollments_to_course_dates: true
+    get "/courses/#{@course.id}/copy"
+    expect_new_page_load { f('button[type="submit"]').click }
+    expect(f("body")).not_to contain_css("#unauthorized_message")
+  end
+
   it "sets the course name and code correctly" do
     course_with_admin_logged_in
 

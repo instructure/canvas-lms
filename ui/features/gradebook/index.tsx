@@ -43,9 +43,6 @@ ready(() => {
   const applyScoreToUngradedModalNode = document.querySelector(
     '[data-component="ApplyScoreToUngradedModal"]'
   ) as HTMLSpanElement
-  const gradingPeriodsFilterContainer = document.getElementById(
-    'grading-periods-filter-container'
-  ) as HTMLElement
   const gradebookGridNode = document.getElementById('gradebook_grid') as HTMLDivElement
   const gradebookSettingsModalContainer = document.querySelector(
     "[data-component='GradebookSettingsModal']"
@@ -68,7 +65,6 @@ ready(() => {
       gradebookGridNode={gradebookGridNode}
       gradebookMenuNode={gradebookMenuNode}
       gradebookSettingsModalContainer={gradebookSettingsModalContainer}
-      gradingPeriodsFilterContainer={gradingPeriodsFilterContainer}
       gridColorNode={gridColorNode}
       locale={ENV.LOCALE}
       settingsModalButtonContainer={settingsModalButtonContainer}

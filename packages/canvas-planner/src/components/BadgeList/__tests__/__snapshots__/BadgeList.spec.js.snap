@@ -1,38 +1,56 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders Pill components as list items 1`] = `
-<ul
-  className="BadgeList-styles__root"
->
-  <li
-    className="BadgeList-styles__item"
-    key="null/.0"
+<Fragment>
+  <style>
+    
+  .BadgeList-styles__root {
+    line-height: 1.25;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    text-align: inherit;
+  }
+
+  .BadgeList-styles__item {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0.0625rem;
+  
+  </style>
+  <ul
+    className="BadgeList-styles__root"
   >
-    <Pill
-      color="primary"
+    <li
+      className="BadgeList-styles__item"
+      key="null/.0"
     >
-      Pill 1
-    </Pill>
-  </li>
-  <li
-    className="BadgeList-styles__item"
-    key="null/.1"
-  >
-    <Pill
-      color="primary"
+      <Pill
+        color="primary"
+      >
+        Pill 1
+      </Pill>
+    </li>
+    <li
+      className="BadgeList-styles__item"
+      key="null/.1"
     >
-      Pill 2
-    </Pill>
-  </li>
-  <li
-    className="BadgeList-styles__item"
-    key="null/.2"
-  >
-    <Pill
-      color="primary"
+      <Pill
+        color="primary"
+      >
+        Pill 2
+      </Pill>
+    </li>
+    <li
+      className="BadgeList-styles__item"
+      key="null/.2"
     >
-      Pill 3
-    </Pill>
-  </li>
-</ul>
+      <Pill
+        color="primary"
+      >
+        Pill 3
+      </Pill>
+    </li>
+  </ul>
+</Fragment>
 `;

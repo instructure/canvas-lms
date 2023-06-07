@@ -174,3 +174,11 @@ dynamic_lti_environment_overrides:
       state: allowed_on
     ci:
       state: allowed_on
+disable_oembed_retrieve:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Disable oembed_retrieve endpoint
+  description: |-
+    If enabled, the deprecated oembed_retrieve endpoint will be unavailable.
+    This is to ease transitioning any potential users off this endpoint before
+    removing it altogether.

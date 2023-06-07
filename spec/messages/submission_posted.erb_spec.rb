@@ -84,6 +84,27 @@ describe "submission_posted" do
         asset.reload
         expect(message.body).not_to include "score: 8.0 out of 10.0"
       end
+
+      it "shows grade instead when user is quantitative data restricted" do
+        student.preferences[:send_scores_in_emails] = true
+        student.save!
+
+        course_root_account = assignment.course.root_account
+        # truthy feature flag
+        course_root_account.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        course_root_account.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        course_root_account.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        course_root_account.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+        course_root_account.reload
+
+        assignment.grade_student(student, score: 10, grader: teacher)
+        asset.reload
+        expect(message.body).to include "grade: A"
+      end
     end
   end
 

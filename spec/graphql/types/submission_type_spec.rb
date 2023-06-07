@@ -34,6 +34,7 @@ describe Types::SubmissionType do
     expect(submission_type.resolve("user { _id }")).to eq @student.id.to_s
     expect(submission_type.resolve("excused")).to be false
     expect(submission_type.resolve("assignment { _id }")).to eq @assignment.id.to_s
+    expect(submission_type.resolve("assignmentId")).to eq @assignment.id.to_s
   end
 
   it "requires read permission" do

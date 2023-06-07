@@ -96,6 +96,12 @@ module Lti
       canvas_extensions["privacy_level"] || self[:privacy_level]
     end
 
+    def placements
+      return [] if configuration.blank?
+
+      configuration["extensions"]&.find { |e| e["platform"] == CANVAS_EXTENSION_LABEL }&.dig("settings", "placements")&.deep_dup || []
+    end
+
     private
 
     def self.retrieve_and_extract_configuration(url)

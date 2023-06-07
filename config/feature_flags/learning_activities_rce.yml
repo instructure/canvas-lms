@@ -1,5 +1,0 @@
-scale_equation_images:
-  state: hidden
-  display_name: 'Math: Scale equation images'
-  description: Scale mathman equation images to match the size of the surrounding font.
-  applies_to: SiteAdmin

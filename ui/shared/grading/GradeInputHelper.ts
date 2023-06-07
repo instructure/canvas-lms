@@ -26,6 +26,11 @@ import {
 } from './GradingSchemeHelper'
 import numberHelper from '@canvas/i18n/numberHelper'
 import type {GradeInput, GradeResult} from './grading.d'
+import {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+
+// Allow unchecked access to ENV variables that should exist in this context
+declare const ENV: GlobalEnv & EnvGradebookCommon
 
 const MAX_PRECISION = 15 // the maximum precision of a score persisted to the database
 const PERCENTAGES = /[%％﹪٪]/

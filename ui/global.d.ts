@@ -17,24 +17,55 @@
  */
 
 import {sendMessageStudentsWho} from './shared/grading/messageStudentsWhoHelper'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {GlobalInst} from '@canvas/global/inst/GlobalInst'
 
 declare global {
   interface Global {
-    readonly ENV?: any
-    readonly INST?: any
+    /**
+     * Global environment variables provided by the server.
+     */
+    readonly ENV?: GlobalEnv
+
+    /**
+     * Utility global for various values and utility functions, some provided by the server,
+     * some by client code.
+     */
+    readonly INST?: GlobalInst
   }
 
   interface Window {
-    readonly ENV?: any
-    readonly INST?: any
+    /**
+     * Global environment variables provided by the server.
+     *
+     * Note: should be readonly, but some tests overwrite.
+     */
+    ENV: GlobalEnv
+
+    /**
+     * Utility global for various values and utility functions, some provided by the server,
+     * some by client code.
+     *
+     * Should be readonly, but tests overwrite
+     */
+    INST: GlobalInst
+
     webkitSpeechRecognition: any
     jsonData: any
     messageStudents: (options: ReturnType<typeof sendMessageStudentsWho>) => void
     updateGrades: () => void
   }
 
-  const ENV: any
-  const INST: any
+  /**
+   * Global environment variables provided by the server.
+   */
+  const ENV: GlobalEnv
+
+  /**
+   * Utility global for various values and utility functions, some provided by the server,
+   * some by client code.
+   */
+  const INST: GlobalInst
 
   type ShowIf = {
     (bool?: boolean): JQuery<HTMLElement>

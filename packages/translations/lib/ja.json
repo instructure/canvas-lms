@@ -1208,9 +1208,6 @@
     "icon_size_9353edea": {
         "message": "アイコンのサイズ"
     },
-    "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-        "message": "空のリンクのままの場合、テキストがコースリンク名として表示されます。"
-    },
     "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
         "message": "利用権が必要な場合は、「ファイル」ページで利用権を有効にするまでファイルは公開されません。"
     },

@@ -116,6 +116,31 @@ const ComposeModalContainer = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recipientsObserversData, recipientsObserversDataLoading, recipientsObserversError])
 
+  useEffect(() => {
+    if (!props.isReply && !props.isForward && props.currentCourseFilter) {
+      const courseOptions = [
+        props.courses?.favoriteCoursesConnection?.nodes,
+        props.courses?.favoriteGroupsConnection.nodes,
+      ]
+
+      const mergeOptions = lists => {
+        return lists.flatMap(list =>
+          list.map(option => ({
+            assetString: option.assetString,
+            contextName: option.contextName,
+          }))
+        )
+      }
+
+      const mergedOptions = mergeOptions(courseOptions)
+      setSelectedContext({
+        contextID: props.currentCourseFilter,
+        contextName: mergedOptions.find(item => item.assetString === props.currentCourseFilter)
+          ?.contextName,
+      })
+    }
+  }, [props.courses, props.currentCourseFilter, props.isForward, props.isReply])
+
   const getRecipientsObserver = () => {
     if (selectedContext?.contextID) {
       getRecipientsObserversQuery({
@@ -474,4 +499,5 @@ ComposeModalContainer.propTypes = {
   submissionCommentsHeader: PropTypes.string,
   modalError: PropTypes.string,
   isPrivateConversation: PropTypes.bool,
+  currentCourseFilter: PropTypes.string,
 }

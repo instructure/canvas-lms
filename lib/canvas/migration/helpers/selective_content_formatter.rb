@@ -326,7 +326,7 @@ module Canvas::Migration::Helpers
           content_list << { type: "syllabus_body", property: "#{property_prefix}[all_syllabus_body]", title: COURSE_SYLLABUS_TYPE.call }
           content_list << { type: "course_paces", property: "#{property_prefix}[all_course_paces]", title: COURSE_PACE_TYPE.call } if source.course_paces.primary.not_deleted.any?
 
-          if @migration && @migration.context.root_account.feature_enabled?(:copy_blueprint_settings) && MasterCourses::MasterTemplate.blueprint_eligible?(@migration.context)
+          if @migration && MasterCourses::MasterTemplate.blueprint_eligible?(@migration.context)
             content_list << { type: "blueprint_settings", property: "#{property_prefix}[all_blueprint_settings]", title: BLUEPRINT_SETTING_TYPE.call }
           end
 

@@ -281,7 +281,7 @@ describe "Groups API", type: :request do
                  "/api/v1/accounts/#{@account.to_param}/groups.json",
                  @category_path_options.merge(action: "context_index",
                                               account_id: @account.to_param))
-    expect(response.code).to eq "401"
+    expect(response).to have_http_status :unauthorized
   end
 
   it "shows students all groups" do
@@ -387,7 +387,7 @@ describe "Groups API", type: :request do
     project_groups.name = "Course Project Groups"
     project_groups.save
     raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(action: "create", group_category_id: project_groups.to_param))
-    expect(response.code).to eq "401"
+    expect(response).to have_http_status :unauthorized
   end
 
   it "allows an admin to create a group in a account" do
@@ -444,7 +444,7 @@ describe "Groups API", type: :request do
     project_groups.name = "test group category"
     project_groups.save
     raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(action: "create", group_category_id: project_groups.to_param))
-    expect(response.code).to eq "401"
+    expect(response).to have_http_status :unauthorized
   end
 
   it "allows a moderator to edit a group" do
@@ -960,7 +960,7 @@ describe "Groups API", type: :request do
       raw_api_call(:get,
                    "/api/v1/groups/#{@community.id}/users",
                    { controller: "groups", action: "users", group_id: @community.to_param, format: "json" })
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "returns an error when search_term is fewer than 2 characters" do

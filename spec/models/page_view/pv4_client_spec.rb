@@ -108,7 +108,7 @@ describe PageView::Pv4Client do
       double = double(body: '{ "page_views": [] }')
       expect(CanvasHttp).to receive(:get).with(
         "http://pv4/users/1/page_views?start_time=#{now.iso8601(PageView::Pv4Client::PRECISION)}&end_time=#{pv4_object["timestamp"]}&last_page_view_id=#{pv4_object["request_id"]}&limit=10",
-        "Authorization" => "Bearer token"
+        { "Authorization" => "Bearer token" }
       ).and_return(double)
       client.for_user(1, oldest: now, newest: now)
             .paginate(page: result.next_page, per_page: 10)

@@ -202,7 +202,7 @@ module CC
 
     require "set"
     class HtmlContentExporter
-      attr_reader :used_media_objects, :media_object_flavor, :media_object_infos
+      attr_reader :course, :user, :media_object_flavor, :media_object_infos
       attr_accessor :referenced_files
 
       def initialize(course, user, opts = {})
@@ -314,6 +314,20 @@ module CC
         @url_prefix += ":#{port}" if !host.include?(":") && port.present?
       end
 
+      # after LF-232 is stable on master, we should be able to remove this, I think
+      def used_media_objects
+        return @used_media_objects if @ensure_attachments_for_media_objects
+
+        @used_media_objects.each do |obj|
+          unless obj.attachment
+            obj.attachment = Attachment.create!(context: obj.context, media_entry_id: obj.media_id, filename: obj.guaranteed_title, content_type: "unknown/unknown")
+            obj.save!
+          end
+        end
+        @ensure_attachments_for_media_objects = true
+        @used_media_objects
+      end
+
       def translate_module_item_query(query)
         return query unless query&.include?("module_item_id=")
 
@@ -322,8 +336,6 @@ module CC
         new_param = "module_item_id=#{@key_generator.create_key(ContentTag.new(id: tag_id))}"
         query.sub(original_param, new_param)
       end
-
-      attr_reader :course, :user
 
       def html_page(html, title, meta_fields = {})
         content = html_content(html)
@@ -409,11 +421,13 @@ module CC
       end
     end
 
+    def self.kaltura_admin_session
+      client = CanvasKaltura::ClientV3.new
+      client.startSession(CanvasKaltura::SessionType::ADMIN)
+    end
+
     def self.media_object_info(obj, course: nil, client: nil, flavor: nil)
-      unless client
-        client = CanvasKaltura::ClientV3.new
-        client.startSession(CanvasKaltura::SessionType::ADMIN)
-      end
+      client ||= kaltura_admin_session
       if flavor
         assets = client.flavorAssetGetByEntryId(obj.media_id) || []
         asset = assets.sort_by { |f| f[:size].to_i }.reverse.find { |f| f[:containerFormat] == flavor }

@@ -108,6 +108,7 @@ export default function VideoOptionsTray({
     }
     onSave({
       media_object_id: videoOptions.id,
+      attachment_id: videoOptions.attachmentId,
       titleText,
       appliedHeight,
       appliedWidth,

@@ -397,6 +397,11 @@ export const SEARCH_OUTCOME_ALIGNMENTS = gql`
                   moduleName
                   moduleUrl
                   moduleWorkflowState
+                  quizItems {
+                    _id
+                    title
+                  }
+                  alignmentsCount
                 }
               }
             }

@@ -317,7 +317,7 @@ class RoleOverridesController < ApplicationController
   #     read_email_addresses             -- [sTAdo] Users - view primary email address
   #     read_forum                       -- [STADO] Discussions - view
   #     read_question_banks              -- [ TADo] Question banks - view and link
-  #     read_reports                     -- [ TAD ] Courses - view usage reports
+  #     read_reports                     -- [ TAD ] Reports - manage
   #     read_roster                      -- [STADo] Users - view list
   #     read_sis                         -- [sTa  ] SIS Data - read
   #     select_final_grade               -- [ TA  ] Grades - select final grade for moderation

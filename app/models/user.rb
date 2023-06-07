@@ -1142,7 +1142,7 @@ class User < ActiveRecord::Base
   def delete_enrollments(enrollment_scope = enrollments, updating_user: nil)
     courses_to_update = enrollment_scope.active.distinct.pluck(:course_id)
     Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
-      enrollment_scope.preload(:course, :enrollment_state).each(&:destroy)
+      enrollment_scope.active.preload(:course, :enrollment_state).find_each(&:destroy)
     end
     user_ids = enrollment_scope.pluck(:user_id).uniq
     courses_to_update.each do |course|
@@ -1415,9 +1415,9 @@ class User < ActiveRecord::Base
     return true if fake_student? && courses.any? { |c| c.grants_right?(masquerader, :use_student_view) }
     return false unless
         account.grants_right?(masquerader, nil, :become_user) && SisPseudonym.for(self, account, type: :implicit, require_sis: false)
-    # self is not an account user
-    if account.root_account.feature_enabled?(:course_admin_role_masquerade_permission_check) && account_users.empty?
-      return includes_subset_of_course_admin_permissions?(masquerader, account)
+
+    if account.root_account.feature_enabled?(:course_admin_role_masquerade_permission_check)
+      return false unless includes_subset_of_course_admin_permissions?(masquerader, account)
     end
 
     has_subset_of_account_permissions?(masquerader, account)
@@ -1749,7 +1749,7 @@ class User < ActiveRecord::Base
       end.to_h
     end
 
-    return apply_contrast colors_hash if prefers_high_contrast? && uses_high_contrast_course_colors?
+    return apply_contrast colors_hash if prefers_high_contrast?
 
     colors_hash
   end
@@ -1859,10 +1859,6 @@ class User < ActiveRecord::Base
 
   def prefers_high_contrast?
     !!feature_enabled?(:high_contrast)
-  end
-
-  def uses_high_contrast_course_colors?
-    Account.site_admin.feature_enabled?(:high_contrast_course_colors)
   end
 
   def auto_show_cc?

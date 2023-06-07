@@ -41,7 +41,7 @@ export const AddressBookContainer = props => {
   const isOnObserverSubmenu = () => {
     return (
       props.courseContextCode !== '' &&
-      filterHistory.find(item => item?.context?.contextID.match(/course_.+_observers/i)) !==
+      filterHistory.find(item => item?.context?.contextID?.match(/course_.+_observers/i)) !==
         undefined
     )
   }

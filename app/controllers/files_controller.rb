@@ -411,7 +411,7 @@ class FilesController < ApplicationController
         has_external_tools = !context.is_a?(Group) && tool_context
 
         file_menu_tools = (has_external_tools ? external_tools_display_hashes(:file_menu, tool_context, [:accept_media_types]) : [])
-        file_index_menu_tools = if has_external_tools && @domain_root_account&.feature_enabled?(:commons_favorites)
+        file_index_menu_tools = if has_external_tools
                                   external_tools_display_hashes(:file_index_menu, tool_context)
                                 else
                                   []

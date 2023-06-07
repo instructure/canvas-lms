@@ -27,7 +27,7 @@ if [ $(pwd -P) = $CANVAS ]; then
 
   if git diff --cached --name-only | grep -q 'Gemfile\S*.lock'; then
     echo "Checking lockfiles..."
-    script/sync_lockfiles.rb
+    bundle check
   fi
 fi
 

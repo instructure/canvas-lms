@@ -106,5 +106,9 @@ module AccountReports
     def self.eportfolio_report_csv(account_report)
       EportfolioReports.new(account_report).eportfolio_report
     end
+
+    def self.developer_key_report_csv(account_report)
+      DeveloperKeyReports.new(account_report).dev_key_report
+    end
   end
 end

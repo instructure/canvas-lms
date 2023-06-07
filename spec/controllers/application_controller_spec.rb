@@ -350,22 +350,6 @@ RSpec.describe ApplicationController do
           end
         end
 
-        context "files_dnd" do
-          before do
-            controller.instance_variable_set(:@domain_root_account, Account.default)
-          end
-
-          it "is false if the feature flag is off" do
-            Account.default.disable_feature!(:files_dnd)
-            expect(controller.js_env[:FEATURES][:files_dnd]).to be_falsey
-          end
-
-          it "is true if the feature flag is on" do
-            Account.default.enable_feature!(:files_dnd)
-            expect(controller.js_env[:FEATURES][:files_dnd]).to be_truthy
-          end
-        end
-
         context "usage_rights_discussion_topics" do
           before do
             controller.instance_variable_set(:@domain_root_account, Account.default)
@@ -865,20 +849,19 @@ RSpec.describe ApplicationController do
         controller.send(:content_tag_redirect, Account.default, tag, nil)
       end
 
-      it "redirects for an assignment" do
-        tag = create_tag(content_type: "Assignment")
-        expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, { module_item_id: 42 }).and_return("nil")
-        allow(controller).to receive(:redirect_to)
-        controller.send(:content_tag_redirect, Account.default, tag, nil)
-      end
-
-      context "when manage and new_quizzes_modules_support enabled" do
+      context "when manage enabled" do
         let(:course) { course_model }
 
         before do
           controller.instance_variable_set(:@context, course)
           allow(course).to receive(:grants_right?).and_return true
-          Account.site_admin.enable_feature!(:new_quizzes_modules_support)
+        end
+
+        it "redirects for an assignment" do
+          tag = create_tag(content_type: "Assignment")
+          expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, { module_item_id: 42 }).and_return("nil")
+          allow(controller).to receive(:redirect_to)
+          controller.send(:content_tag_redirect, Account.default, tag, nil)
         end
 
         it "redirects to edit for a quiz_lti assignment" do
@@ -946,6 +929,9 @@ RSpec.describe ApplicationController do
       end
 
       it "redirects for an alignment" do
+        course = course_model
+        controller.instance_variable_set(:@context, course)
+        allow(course).to receive(:grants_right?).and_return true
         tag = create_tag(content_type: "Assignment", tag_type: "learning_outcome")
         expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, {}).and_return("nil")
         allow(controller).to receive(:redirect_to)
@@ -2338,58 +2324,28 @@ RSpec.describe ApplicationController do
         expect(controller.send(:show_immersive_reader?)).to be false
       end
 
-      context "when more_immersive_reader feature flag is enabled" do
-        before do
-          Account.site_admin.enable_feature!(:more_immersive_reader)
-        end
-
-        it "is true for the assignments show page" do
-          controller.params[:controller] = "assignments"
-          controller.params[:action] = "show"
-          expect(controller.send(:show_immersive_reader?)).to be true
-        end
-
-        it "is true for the course page" do
-          controller.params[:controller] = "courses"
-          controller.params[:action] = "show"
-          expect(controller.send(:show_immersive_reader?)).to be true
-        end
-
-        it "is true for the syllabus page" do
-          controller.params[:controller] = "assignments"
-          controller.params[:action] = "syllabus"
-          expect(controller.send(:show_immersive_reader?)).to be true
-        end
-
-        it "is true for a wiki front page" do
-          controller.params[:controller] = "wiki_pages"
-          controller.params[:action] = "front_page"
-          expect(controller.send(:show_immersive_reader?)).to be true
-        end
+      it "is true for the assignments show page" do
+        controller.params[:controller] = "assignments"
+        controller.params[:action] = "show"
+        expect(controller.send(:show_immersive_reader?)).to be true
       end
 
-      context "when more_immersive_reader feature flag is disabled" do
-        before do
-          Account.site_admin.disable_feature!(:more_immersive_reader)
-        end
+      it "is true for the course page" do
+        controller.params[:controller] = "courses"
+        controller.params[:action] = "show"
+        expect(controller.send(:show_immersive_reader?)).to be true
+      end
 
-        it "is false for the assignments show page" do
-          controller.params[:controller] = "assignments"
-          controller.params[:action] = "show"
-          expect(controller.send(:show_immersive_reader?)).to be false
-        end
+      it "is true for the syllabus page" do
+        controller.params[:controller] = "assignments"
+        controller.params[:action] = "syllabus"
+        expect(controller.send(:show_immersive_reader?)).to be true
+      end
 
-        it "is false for the course page" do
-          controller.params[:controller] = "courses"
-          controller.params[:action] = "show"
-          expect(controller.send(:show_immersive_reader?)).to be false
-        end
-
-        it "is false for the syllabus page" do
-          controller.params[:controller] = "assignments"
-          controller.params[:action] = "syllabus"
-          expect(controller.send(:show_immersive_reader?)).to be false
-        end
+      it "is true for a wiki front page" do
+        controller.params[:controller] = "wiki_pages"
+        controller.params[:action] = "front_page"
+        expect(controller.send(:show_immersive_reader?)).to be true
       end
     end
 

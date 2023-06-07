@@ -47,10 +47,6 @@ ruby script/stylelint
 ruby script/rlint --no-fail-on-offense
 [ "${SKIP_ESLINT-}" != "true" ] && ruby script/eslint
 ruby script/lint_commit_message
-if ! ruby script/sync_lockfiles.rb; then
-  message="The lockfiles for all sub-gems are not in sync. Please run script/sync_lockfiles.rb for details.\\n"
-  gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
-fi
 node script/yarn-validate-workspace-deps.js 2>/dev/null < <(yarn --silent workspaces info --json)
 node ui-build/tools/component-info.mjs -i -v -g
 

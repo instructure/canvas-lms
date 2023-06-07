@@ -6,12 +6,6 @@ immersive_reader_wiki_pages:
   description: |-
     Makes a Microsoft Immersive Reader link option show up on wiki pages.
   applies_to: RootAccount
-more_immersive_reader:
-  state: hidden
-  display_name: More Microsoft Immersive Reader
-  description: |-
-    Makes Microsoft Immersive Reader appear in more supported areas.
-  applies_to: SiteAdmin
 user_immersive_reader_wiki_pages:
   state: allowed
   display_name: Microsoft Immersive Reader

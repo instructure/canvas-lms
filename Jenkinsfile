@@ -436,8 +436,11 @@ pipeline {
                         docker exec -dt general-build-container bin/rails graphql:schema
                       '''
 
+                      @SuppressWarnings('GStringExpressionWithinString')
                       def crystalballStep = '''
                         diffFrom=$(git --git-dir $LOCAL_WORKDIR/.git rev-parse $GERRIT_PATCHSET_REVISION^1)
+                        # crystalball will fail without adding $DOCKER_WORKDIR to safe.directory
+                        docker exec -t general-build-container bash -c "git config --global --add safe.directory ${DOCKER_WORKDIR%/}"
                         docker exec -dt \
                                         -e CRYSTALBALL_DIFF_FROM=$diffFrom \
                                         -e CRYSTALBALL_DIFF_TO=$GERRIT_PATCHSET_REVISION \
@@ -486,6 +489,7 @@ pipeline {
                             sleep 0.1
                           done
 
+                          docker exec -t general-build-container bash -c 'cat log/crystalball.log'
                           docker cp \$(docker ps -qa -f name=general-build-container):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
                         '''
                         archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_spec_list.txt'

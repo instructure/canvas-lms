@@ -1285,7 +1285,7 @@ describe "MessageableUser::Calculator" do
             end
 
             it "does not include group members" do
-              expect(messageable_user_ids(context: @group.asset_string)).to match_array []
+              expect(messageable_user_ids(context: @group.asset_string)).to be_empty
             end
           end
         end

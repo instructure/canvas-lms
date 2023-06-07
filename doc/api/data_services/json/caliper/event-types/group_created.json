@@ -6,6 +6,9 @@
     "data[0].group.extensions[\"com.instructure.canvas\"]": {
       "context_type": "Canvas context type where the action took place e.g context_type = Course.",
       "entity_id": "Canvas context ID"
+    },
+    "data[0].object": {
+      "type": "Group"
     }
   },
   "examples": [

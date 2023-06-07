@@ -87,7 +87,7 @@ describe Polling::PollChoicesController, type: :request do
 
       it "is unauthorized if there are no open sessions" do
         get_index(true)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "doesn't display is_correct within the poll choices" do
@@ -137,13 +137,13 @@ describe Polling::PollChoicesController, type: :request do
 
       it "is unauthorized if there are no existing sessions" do
         get_show(true)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "is authorized if there are existing sessions" do
         Polling::PollSession.create!(course: @course, poll: @poll)
         get_show(true)
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
 
       context "with opened sessions" do
@@ -209,7 +209,7 @@ describe Polling::PollChoicesController, type: :request do
       it "is unauthorized" do
         student_in_course(active_all: true, course: @course)
         post_create({ text: "Poll Choice 1" }, true)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -254,7 +254,7 @@ describe Polling::PollChoicesController, type: :request do
       it "is unauthorized" do
         student_in_course(active_all: true, course: @course)
         put_update({ text: "New Text" }, true)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -282,7 +282,7 @@ describe Polling::PollChoicesController, type: :request do
       it "deletes a poll choice successfully" do
         delete_destroy
 
-        expect(response.code).to eq "204"
+        expect(response).to have_http_status :no_content
         expect(Polling::PollChoice.where(id: @poll_choice)).not_to be_exists
       end
     end
@@ -292,7 +292,7 @@ describe Polling::PollChoicesController, type: :request do
         student_in_course(active_all: true, course: @course)
         delete_destroy
 
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
         expect(Polling::PollChoice.where(id: @poll_choice).first).to eq @poll_choice
       end
     end

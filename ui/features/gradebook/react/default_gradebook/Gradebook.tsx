@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -65,7 +64,7 @@ import type {
   CustomColumnData,
   Filter,
   FilteredContentInfo,
-  FlashAlertType,
+  FlashMessage,
   GradebookOptions,
   GradebookSettings,
   GradebookStudent,
@@ -163,6 +162,7 @@ import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import LatePolicyApplicator from '../LatePolicyApplicator'
 import {IconButton} from '@instructure/ui-buttons'
+// @ts-expect-error
 import {IconSettingsSolid} from '@instructure/ui-icons'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import MultiSelectSearchInput from './components/MultiSelectSearchInput'
@@ -242,6 +242,8 @@ import {ExportProgressBar} from './components/ExportProgressBar'
 import {ProgressBar} from '@instructure/ui-progress'
 import GradebookExportManager from '../shared/GradebookExportManager'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
+import {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 const I18n = useI18nScope('gradebook')
 
@@ -252,6 +254,8 @@ const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
 export function Portal({node, children}: {node: HTMLElement; children: React.ReactNode}) {
   return ReactDOM.createPortal(children, node)
 }
+// Allow unchecked access to module-specific ENV variables
+declare const ENV: GlobalEnv & EnvGradebookCommon
 
 export type GradebookProps = {
   actionMenuNode: HTMLSpanElement
@@ -268,21 +272,18 @@ export type GradebookProps = {
   }
   fetchFinalGradeOverrides: () => Promise<void>
   fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
-  fetchStudentIds: () => Promise<string[]>
   loadDataForCustomColumn: (customColumnId: string) => Promise<CustomColumnData[]>
   finalGradeOverrides: FinalGradeOverrideMap
-  flashAlerts: FlashAlertType[]
+  flashAlerts: FlashMessage[]
   flashMessageContainer: HTMLElement
   gradebookEnv: GradebookOptions
   gradebookGridNode: HTMLElement
   gradebookMenuNode: HTMLElement
   gradebookSettingsModalContainer: HTMLSpanElement
   gradingPeriodAssignments: GradingPeriodAssignmentMap
-  gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
   isCustomColumnsLoaded: boolean
   isFiltersLoading: boolean
-  isGradingPeriodAssignmentsLoading: boolean
   isGridLoaded: boolean
   isModulesLoading: boolean
   isStudentIdsLoading: boolean
@@ -757,7 +758,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.assignmentGroups[group.id] = group
       }
 
-      // @ts-ignore
+      // @ts-expect-error
       group.assignments = group.assignments || [] // perhaps unnecessary
       assignmentGroup.assignments.forEach(assignment => {
         assignment.assignment_group = group
@@ -4184,12 +4185,19 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  postAssignmentGradesTrayOpenChanged = ({assignmentId}: {assignmentId: string}) => {
+  postAssignmentGradesTrayOpenChanged = ({
+    assignmentId,
+    isOpen,
+  }: {
+    assignmentId: string
+    isOpen: boolean
+  }) => {
     const columnId = getAssignmentColumnId(assignmentId)
     const definition = this.gridData.columns.definitions[columnId]
     if (!(definition && definition.type === 'assignment')) {
       return
     }
+    definition.postAssignmentGradesTrayOpenForAssignmentId = isOpen
     this.updateGrid()
   }
 
@@ -5001,6 +5009,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         <Portal node={this.props.gradebookMenuNode}>
           <GradebookMenu
             courseUrl={this.options.context_url}
+            enhancedIndividualGradebookEnabled={this.options.individual_gradebook_enhancements}
             learningMasteryEnabled={this.options.outcome_gradebook_enabled}
             variant="DefaultGradebook"
           />

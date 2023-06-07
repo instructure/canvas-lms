@@ -478,9 +478,6 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Visualització prèvia de la icona" },
   "icon_shape_30b61e7": { "message": "Forma de la icona" },
   "icon_size_9353edea": { "message": "Mida de la icona" },
-  "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-    "message": "Si es deixa un enllaç buit, el text es mostrarà com a nom de l''enllaç a l’assignatura"
-  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Si calen drets d''ús, el fitxer no es publicarà fins que s’hagi activat a la pàgina Fitxers."
   },

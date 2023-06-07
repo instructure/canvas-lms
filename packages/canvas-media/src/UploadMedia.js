@@ -31,7 +31,10 @@ import {Text} from '@instructure/ui-text'
 import formatMessage from './format-message'
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
 import LoadingIndicator from './shared/LoadingIndicator'
-import saveMediaRecording, {saveClosedCaptions} from './saveMediaRecording'
+import saveMediaRecording, {
+  saveClosedCaptions,
+  saveClosedCaptionsForAttachment,
+} from './saveMediaRecording'
 import translationShape from './translationShape'
 import getTranslations from './getTranslations'
 import {CC_FILE_MAX_BYTES} from './shared/constants'
@@ -91,12 +94,14 @@ export class UploadMediaModal extends React.Component {
       upload: bool,
     }),
     uploadMediaTranslations: translationShape,
+    media_links_use_attachment_id: bool,
     // for testing
     computerFile: instanceOf(File),
     userLocale: string,
   }
 
   static defaultProps = {
+    media_links_use_attachment_id: false,
     disableSubmitWhileUploading: false,
     userLocale: 'en',
   }
@@ -191,25 +196,35 @@ export class UploadMediaModal extends React.Component {
   }
 
   saveMediaCallback = async (err, data) => {
+    const {onUploadComplete, onDismiss, rcsConfig, media_links_use_attachment_id} = this.props
+    const {selectedPanel, subtitles} = this.state
     if (err) {
-      this.props.onUploadComplete && this.props.onUploadComplete(err, data)
+      onUploadComplete?.(err, data)
     } else {
       try {
+        const {media_object} = data.mediaObject
         let captions
-        if (this.state.selectedPanel === PANELS.COMPUTER && this.state.subtitles.length > 0) {
-          captions = await saveClosedCaptions(
-            data.mediaObject.media_object.media_id,
-            this.state.subtitles,
-            this.props.rcsConfig,
-            CC_FILE_MAX_BYTES
-          )
+        if (selectedPanel === PANELS.COMPUTER && subtitles.length > 0) {
+          captions = media_links_use_attachment_id
+            ? await saveClosedCaptionsForAttachment(
+                media_object.attachment_id,
+                subtitles,
+                rcsConfig,
+                CC_FILE_MAX_BYTES
+              )
+            : await saveClosedCaptions(
+                media_object.media_id,
+                subtitles,
+                rcsConfig,
+                CC_FILE_MAX_BYTES
+              )
         }
-        this.props.onUploadComplete && this.props.onUploadComplete(null, data, captions?.data)
+        onUploadComplete?.(null, data, captions?.data)
       } catch (ex) {
-        this.props.onUploadComplete && this.props.onUploadComplete(ex, null)
+        onUploadComplete?.(ex, null)
       }
     }
-    this.props.onDismiss && this.props.onDismiss()
+    onDismiss?.()
   }
 
   componentDidMount() {

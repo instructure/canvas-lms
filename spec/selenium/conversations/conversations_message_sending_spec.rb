@@ -415,8 +415,8 @@ describe "conversations new" do
             get "/conversations"
             open_react_compose_modal_addressbook
 
-            # back, all in course, Teachers, Students, Student Groups
-            expect(ff("div[data-testid='address-book-item']").count).to eq(5)
+            # all in course, Teachers, Students, Student Groups
+            expect(ff("div[data-testid='address-book-item']").count).to eq(4)
             expect(fj("div[data-testid='address-book-item']:contains('All in #{@course.name}')")).to be_present
           end
 
@@ -498,20 +498,20 @@ describe "conversations new" do
           end
 
           it "does not show student the all in course option by default", priority: "1" do
-            # back, Teachers, Students, Student Groups
+            # Teachers, Students, Student Groups
             open_react_compose_modal_addressbook
-            expect(ff("div[data-testid='address-book-item']").count).to eq(4)
-            expect(fj("div[data-testid='address-book-item']:contains('Back')")).to be_displayed
+            expect(ff("div[data-testid='address-book-item']").count).to eq(3)
+            expect(f("body")).not_to contain_jqcss("div[data-testid='address-book-item']:contains('Back')")
             expect(fj("div[data-testid='address-book-item']:contains('Teachers')")).to be_displayed
             expect(fj("div[data-testid='address-book-item']:contains('Students')")).to be_displayed
             expect(fj("div[data-testid='address-book-item']:contains('Student Groups')")).to be_displayed
           end
 
           it "correctly shows student the all in course option if send_messages_all is set to true", priority: "1" do
-            # back, all in course, Teachers, Students, Student Groups
+            # all in course, Teachers, Students, Student Groups
             @course.account.role_overrides.create!(permission: :send_messages_all, role: student_role, enabled: true)
             open_react_compose_modal_addressbook
-            expect(ff("div[data-testid='address-book-item']").count).to eq(5)
+            expect(ff("div[data-testid='address-book-item']").count).to eq(4)
             expect(fj("div[data-testid='address-book-item']:contains('All in #{@course.name}')")).to be_present
           end
         end
@@ -613,6 +613,20 @@ describe "conversations new" do
         wait_for_ajaximations
         expect(@s1.conversations.last.conversation.conversation_participants.collect(&:user_id).sort).to eq [@s1.id, @s2.id, @admin.id]
         expect(@s1.conversations.last.conversation.context).to eq @admin.account
+      end
+
+      it "sets compose course when course filter is set" do
+        get "/conversations"
+
+        f("[data-testid = 'course-select']").click
+        wait_for_ajaximations
+        fj("li > span:contains('#{@course.name}')").click
+        f("button[data-testid='compose']").click
+
+        expect(f("input[data-testid = 'course-select']").property("value")).to eq(@course.name)
+
+        ff("input[aria-label='Address Book']")[1].click
+        expect(fj("li:contains('All in #{@course.name}')")).to be_displayed
       end
 
       context "individual message sending" do

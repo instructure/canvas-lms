@@ -196,6 +196,7 @@ export type Assignment = Readonly<{
   group_category_id: string | null
   has_overrides: boolean
   has_submitted_submissions: boolean
+  hide_in_gradebook: boolean
   important_dates: boolean
   integration_data: any
   integration_id: null | string

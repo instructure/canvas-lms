@@ -43,7 +43,7 @@ module Lti
 
       it "requires an access token" do
         get :index, format: :json
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "decrypts the access token" do
@@ -61,7 +61,7 @@ module Lti
       it "allows the request to go through" do
         @request.headers.merge!(request_headers)
         get :index, format: :json
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
 
       it "requires an active tool proxy id signed with share secret" do
@@ -69,21 +69,21 @@ module Lti
         tool_proxy.workflow_state = "disabled"
         tool_proxy.save!
         get :index, format: :json
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "requires an active developer key when signed with dev key" do
         @request.headers.merge!(dev_key_request_headers)
         developer_key.destroy!
         get :index, format: :json
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "requires the developer key to be active" do
         @request.headers.merge!(request_headers)
         developer_key.deactivate
         get :index, format: :json
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "requires the defined service to be in the ToolProxy security contract" do
@@ -93,7 +93,7 @@ module Lti
         tool_proxy.raw_data = ims_tp.to_json
         tool_proxy.save!
         get :index, format: :json
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "requires the http method to be in the security contract" do
@@ -104,7 +104,7 @@ module Lti
         tool_proxy.raw_data = ims_tp.to_json
         tool_proxy.save!
         get :index, format: :json
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       describe "#bearer_token" do

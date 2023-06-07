@@ -250,9 +250,7 @@ export function showFlashAlert(args: ShowFlashAlertArgs) {
     ReactDOM.render(
       <FlashAlert
         message={message}
-        timeout={
-          Number.isNaN(parseInt(ENV.flashAlertTimeout, 10)) ? timeout : ENV.flashAlertTimeout
-        }
+        timeout={ENV.flashAlertTimeout ?? timeout}
         error={err}
         variant={type}
         onClose={closeAlert.bind(null, parent)}

@@ -51,8 +51,7 @@ describe CC::CCHelper do
 
     before do
       @kaltura = double("CanvasKaltura::ClientV3")
-      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@kaltura)
-      allow(@kaltura).to receive(:startSession)
+      allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(@kaltura)
       allow(@kaltura).to receive(:flavorAssetGetByEntryId).with("abcde").and_return([
                                                                                       {
                                                                                         isOriginal: 1,

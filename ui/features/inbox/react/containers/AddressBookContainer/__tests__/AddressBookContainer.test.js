@@ -123,7 +123,7 @@ describe('Should load <AddressBookContainer> normally', () => {
         activeCourseFilter: {contextID: 'course_123', contextName: 'course name'},
       })
       const items = await screen.findAllByTestId('address-book-item')
-      expect(items.length).toBe(2)
+      expect(items.length).toBe(1)
     })
 
     it('Should load the new courses and users submenu on initial load', async () => {

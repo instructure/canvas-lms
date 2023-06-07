@@ -3,7 +3,7 @@
   "accessibility_checker_b3af1f6c": {
     "message": "Sjekk av universell utforming"
   },
-  "action_to_take_b626a99a": { "message": "Hanling å utføre:" },
+  "action_to_take_b626a99a": { "message": "Handling å utføre:" },
   "add_8523c19b": { "message": "Legg til" },
   "add_a_caption_2a915239": { "message": "Legg til undertekst" },
   "add_alt_text_for_the_image_48cd88aa": {
@@ -17,7 +17,7 @@
     "message": "Nabolenker med samme URL bør være ei lenke."
   },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Juster" },
+  "align_11050992": { "message": "Justér" },
   "alignment_and_lists_5cebcb69": { "message": "Justering og lister" },
   "all_4321c3a1": { "message": "Alle" },
   "all_apps_a50dea49": { "message": "Alle appar" },
@@ -257,7 +257,7 @@
   },
   "edit_c5fbea07": { "message": "Rediger" },
   "edit_course_link_5a5c3c59": { "message": "Rediger emnelenke" },
-  "edit_equation_f5279959": { "message": "Endre likning" },
+  "edit_equation_f5279959": { "message": "Rediger likning" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Rediger eksisterande ikondesignar-ikon"
   },
@@ -291,7 +291,7 @@
   "equation_1c5ac93c": { "message": "Likning" },
   "equation_editor_39fbc3f1": { "message": "Likningseditor" },
   "equivalence_class_7b0f11c0": { "message": "Ekvivalensklasse" },
-  "equivalent_identity_654b3ce5": { "message": "Ekvivalent (Itentitet)" },
+  "equivalent_identity_654b3ce5": { "message": "Ekvivalent (Identitet)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Eksisterer" },
   "exit_fullscreen_b7eb0aa4": { "message": "Avslutt fullskjerm" },
@@ -330,7 +330,7 @@
   "folder_tree_fbab0726": { "message": "Mappestruktur" },
   "for_all_b919f972": { "message": "For alle" },
   "format_4247a9c5": { "message": "Format" },
-  "format_as_a_list_142210c3": { "message": "Formater som liste" },
+  "format_as_a_list_142210c3": { "message": "Formater som ei liste" },
   "formatting_5b143aa8": { "message": "Formatering" },
   "forward_slash_3f90f35e": { "message": "Skråstrek" },
   "found_auto_saved_content_3f6e4ca5": { "message": "Fann auto-lagra innhald" },
@@ -587,7 +587,7 @@
   "no_changes_to_save_d29f6e91": { "message": "Ingen endringar å lagre." },
   "no_e16d9132": { "message": "Nei" },
   "no_file_chosen_9a880793": { "message": "Ingen filer er valde" },
-  "no_headers_9bc7dc7f": { "message": "Ingen headers" },
+  "no_headers_9bc7dc7f": { "message": "Ingen overskrifter" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Førehandsvising er ikkje tilgjengeleg for denne fila."
   },

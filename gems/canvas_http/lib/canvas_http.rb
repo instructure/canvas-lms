@@ -111,7 +111,32 @@ module CanvasHttp
       request.body = body if body
       request.content_type = content_type if content_type
 
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.verify_hostname = false # temporary; remove once all offenders have been fixed
+
+      curr_cert = 0
+      num_certs = nil
+      http.verify_callback = lambda do |preverify_ok, x509_store_context| # temporary; remove once all offenders have been fixed
+        Sentry.with_scope do |scope|
+          scope.set_tags(verify_host: "#{uri.host}:#{uri.port}")
+
+          valid = preverify_ok
+          error = valid ? "" : x509_store_context.error_string
+          num_certs ||= x509_store_context.chain.length
+
+          # only check the last certificate (aka the peer certificate)
+          # We can't have OpenSSL and Net::HTTP check this without failing, so manually check it
+          if (curr_cert += 1) == num_certs && valid && !(valid = OpenSSL::SSL.verify_certificate_identity(x509_store_context.current_cert, uri.host))
+            error = "Hostname mismatch"
+          end
+
+          unless valid
+            scope.set_tags(verify_error: error)
+            Sentry.capture_message("Certificate verify failed: #{error}", level: :warning)
+          end
+
+          true # never fail 🦸
+        end
+      end
       logger.info("CANVAS_HTTP INITIATE REQUEST | url: #{url_str}")
       start_time = Time.now
       http.request(request) do |response|

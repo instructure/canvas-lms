@@ -153,7 +153,7 @@ const RCELoader = {
     }
 
     // TODO: let client pass autosave_enabled in as a prop from the outside
-    //       Assignmens2 student view is going to be doing their own autosave
+    //       Assignments2 student view is going to be doing their own autosave
     const autosave = {
       enabled: true,
       maxAge: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms,
@@ -180,6 +180,13 @@ const RCELoader = {
       flashAlertTimeout: ENV?.flashAlertTimeout || 10000,
       timezone: ENV?.TIMEZONE,
       canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin || '',
+      externalToolsConfig: {
+        ltiIframeAllowances: window.ENV?.LTI_LAUNCH_FRAME_ALLOWANCES,
+        isA2StudentView: window.ENV?.a2_student_view,
+        maxMruTools: window.ENV?.MAX_MRU_LTI_TOOLS,
+        resourceSelectionUrlOverride:
+          $('#context_external_tool_resource_selection_url').attr('href') || null,
+      },
     }
   },
 }

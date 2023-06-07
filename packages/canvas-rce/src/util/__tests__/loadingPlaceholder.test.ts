@@ -177,6 +177,23 @@ describe('placeholderInfoFor', () => {
       ariaLabel: 'Loading placeholder for file.txt',
     })
   })
+
+  // -------------------------------------------------------------------------------------------------------------------
+
+  it('should prefer title over name if available', async () => {
+    expect(
+      await placeholderInfoFor({
+        name: 'file.txt',
+        domObject: {},
+        contentType: 'text/plain',
+        title: 'actual-file-name.txt',
+      })
+    ).toEqual({
+      type: 'inline',
+      visibleLabel: 'actual-file-name.txt',
+      ariaLabel: 'Loading placeholder for actual-file-name.txt',
+    })
+  })
 })
 
 // =====================================================================================================================

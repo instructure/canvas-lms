@@ -1949,6 +1949,36 @@ describe "Accounts API", type: :request do
         expect(json.pluck("name")).to match_array %w[MasterCourse OtherCourse]
       end
     end
+
+    context "public courses" do
+      before :once do
+        @a = Account.create!
+        @c1 = course_model(is_public: true, name: "Public", account: @a)
+        @c2 = course_model(is_public: false, name: "NotPublic", account: @a)
+        account_admin_user(account: @a)
+      end
+
+      it "does not filter out non-public courses" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{@a.id}/courses?",
+                        { controller: "accounts",
+                          action: "courses_api",
+                          account_id: @a.to_param,
+                          format: "json" })
+        expect(json.pluck("name")).to match_array %w[Public NotPublic]
+      end
+
+      it "filters out non-public courses" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{@a.id}/courses?public=true",
+                        { controller: "accounts",
+                          action: "courses_api",
+                          account_id: @a.to_param,
+                          format: "json",
+                          public: true })
+        expect(json.pluck("name")).to match_array %w[Public]
+      end
+    end
   end
 
   context "permissions" do

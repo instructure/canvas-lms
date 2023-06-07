@@ -1599,7 +1599,7 @@ describe CoursesController do
       @course.default_view = "assignments"
       @course.save!
       get "show", params: { id: @course.id }
-      expect(assigns(:js_env)[:FLAGS].keys).to eq %i[newquizzes_on_quiz_page new_quizzes_modules_support new_quizzes_skip_to_build_module_button]
+      expect(assigns(:js_env)[:FLAGS].keys).to eq %i[newquizzes_on_quiz_page]
     end
 
     it "redirects html to settings page when user can :read_as_admin, but not :read" do
@@ -1920,7 +1920,6 @@ describe CoursesController do
       end
 
       it "sets ENV.SHOW_IMMERSIVE_READER when user flag is enabled" do
-        Account.site_admin.enable_feature!(:more_immersive_reader)
         @student.enable_feature!(:user_immersive_reader_wiki_pages)
         user_session(@student)
 

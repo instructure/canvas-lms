@@ -100,7 +100,7 @@ describe ScopesApiController, type: :request do
 
       it "returns a 401" do
         api_call(:get, api_url, scope_params)
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end

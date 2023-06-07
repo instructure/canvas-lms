@@ -30,6 +30,7 @@ class Course < ActiveRecord::Base
   include TurnitinID
   include Courses::ItemVisibilityHelper
   include OutcomeImportContext
+  include MaterialChanges
 
   attr_accessor :teacher_names, :master_course, :primary_enrollment_role
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
@@ -434,7 +435,7 @@ class Course < ActiveRecord::Base
 
     # a lot of things can change the date logic here :/
     if ((saved_changes.keys & %w[restrict_enrollments_to_course_dates account_id enrollment_term_id]).any? ||
-       (restrict_enrollments_to_course_dates? && (saved_changes.keys & %w[start_at conclude_at]).any?) ||
+       (restrict_enrollments_to_course_dates? && saved_material_changes_to?(:start_at, :conclude_at)) ||
        (saved_change_to_workflow_state? && (completed? || workflow_state_before_last_save == "completed"))) &&
        enrollments.exists?
       EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", global_root_account_id])
@@ -884,7 +885,7 @@ class Course < ActiveRecord::Base
 
   scope :recently_started, -> { where(start_at: 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
   scope :recently_ended, -> { where(conclude_at: 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
-  scope :recently_created, -> { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).preload(:teachers) }
+  scope :recently_created, -> { where(created_at: 1.month.ago..Time.zone.now).order("created_at DESC").limit(50).preload(:teachers) }
   scope :for_term, ->(term) { term ? where(enrollment_term_id: term) : all }
   scope :active_first, -> { order(Arel.sql("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key("name")}")) }
   scope :name_like, lambda { |query|
@@ -980,6 +981,9 @@ class Course < ActiveRecord::Base
 
   scope :associated_courses, -> { joins(:master_course_subscriptions).where.not(MasterCourses::ChildSubscription.table_name => { workflow_state: "deleted" }) }
   scope :not_associated_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'").where("mcs IS NULL") } # rubocop:disable Rails/WhereEquals mcs is a table, not a column
+
+  scope :public_courses, -> { where(is_public: true) }
+  scope :not_public_courses, -> { where(is_public: false) }
 
   scope :templates, -> { where(template: true) }
 
@@ -2691,7 +2695,7 @@ class Course < ActiveRecord::Base
     ce = options[:content_export]
     cm = options[:content_migration]
 
-    attachments = course.attachments.where("file_state <> 'deleted'").to_a
+    attachments = course.attachments.not_deleted.to_a
     total = attachments.count + 1
 
     Attachment.skip_media_object_creation do

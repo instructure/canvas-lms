@@ -238,34 +238,6 @@ describe AssignmentsController do
       expect(assigns[:js_env][:FLAGS][:newquizzes_on_quiz_page]).to be_falsey
     end
 
-    it "sets FLAGS/new_quizzes_modules_support in js_env as true if enabled" do
-      user_session(@teacher)
-      Account.site_admin.enable_feature!(:new_quizzes_modules_support)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to be(true)
-    end
-
-    it "sets FLAGS/new_quizzes_modules_support in js_env as false if disabled" do
-      user_session(@teacher)
-      Account.site_admin.disable_feature!(:new_quizzes_modules_support)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to be(false)
-    end
-
-    it "sets FLAGS/new_quizzes_skip_to_build_module_button in js_env as true if enabled" do
-      user_session(@teacher)
-      Account.site_admin.enable_feature!(:new_quizzes_skip_to_build_module_button)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_skip_to_build_module_button]).to be(true)
-    end
-
-    it "sets FLAGS/new_quizzes_skip_to_build_module_button in js_env as false if disabled" do
-      user_session(@teacher)
-      Account.site_admin.disable_feature!(:new_quizzes_skip_to_build_module_button)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_skip_to_build_module_button]).to be(false)
-    end
-
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
@@ -2434,6 +2406,22 @@ describe AssignmentsController do
         expect(assigns[:js_env][:NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED]).to be(false)
       end
     end
+
+    describe "js_env HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED" do
+      it "sets HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED in js_env as true if enabled" do
+        user_session(@teacher)
+        Account.site_admin.enable_feature!(:hide_zero_point_quizzes_option)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED]).to be(true)
+      end
+
+      it "sets HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED in js_env as false if disabled" do
+        user_session(@teacher)
+        Account.site_admin.disable_feature!(:hide_zero_point_quizzes_option)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED]).to be(false)
+      end
+    end
   end
 
   describe "DELETE 'destroy'" do
@@ -2543,13 +2531,13 @@ describe AssignmentsController do
       allow(connection).to receive(:list_with_extension_filter).and_raise(ArgumentError)
       expect(Canvas::Errors).to receive(:capture_exception)
       get "list_google_docs", params: params, format: "json"
-      expect(response.code).to eq("200")
+      expect(response).to have_http_status(:ok)
     end
 
     it "gives appropriate error code to connection errors" do
       allow(connection).to receive(:list_with_extension_filter).and_raise(GoogleDrive::ConnectionException)
       get "list_google_docs", params: params, format: "json"
-      expect(response.code).to eq("504")
+      expect(response).to have_http_status(:gateway_timeout)
       expect(response.body).to include("Unable to connect to Google Drive")
     end
   end

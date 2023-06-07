@@ -31,7 +31,8 @@ module BroadcastPolicies
         just_submitted_late? &&
         submission.submitted? &&
         submission.has_submission? &&
-        submission.late?
+        submission.late? &&
+        !assignment.deleted?
     end
 
     def should_dispatch_assignment_submitted?

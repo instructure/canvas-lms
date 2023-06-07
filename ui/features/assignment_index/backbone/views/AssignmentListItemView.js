@@ -647,11 +647,7 @@ export default AssignmentListItemView = (function () {
     }
 
     canShowBuildLink() {
-      return !!(
-        ENV.FLAGS &&
-        ENV.FLAGS.new_quizzes_skip_to_build_module_button &&
-        this.model.isQuizLTIAssignment()
-      )
+      return !!(ENV.FLAGS && this.model.isQuizLTIAssignment())
     }
 
     canOpenManageOptions() {

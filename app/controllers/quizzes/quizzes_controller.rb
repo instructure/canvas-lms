@@ -137,8 +137,6 @@ class Quizzes::QuizzesController < ApplicationController
           question_banks: feature_enabled?(:question_banks),
           post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context),
           quiz_lti_enabled: quiz_lti_on_quizzes_page?,
-          new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
-          new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
           migrate_quiz_enabled: quiz_lti_enabled?,
           show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
           # TODO: remove this since it's set in application controller
@@ -147,11 +145,7 @@ class Quizzes::QuizzesController < ApplicationController
           DIRECT_SHARE_ENABLED: @context.grants_right?(@current_user, session, :direct_share)
         },
         quiz_menu_tools: external_tools_display_hashes(:quiz_menu),
-        quiz_index_menu_tools: (if @domain_root_account&.feature_enabled?(:commons_favorites)
-                                  external_tools_display_hashes(:quiz_index_menu)
-                                else
-                                  []
-                                end),
+        quiz_index_menu_tools: external_tools_display_hashes(:quiz_index_menu),
         SIS_NAME: sis_name,
         MAX_NAME_LENGTH: max_name_length,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,

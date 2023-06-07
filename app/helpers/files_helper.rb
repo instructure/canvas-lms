@@ -19,7 +19,9 @@
 module FilesHelper
   def load_media_object
     if params[:attachment_id].present?
-      @attachment = Attachment.not_deleted.find(params[:attachment_id])
+      @attachment = Attachment.find_by(id: params[:attachment_id])
+      @attachment = @attachment.context.attachments.find(params[:attachment_id]) if @attachment&.deleted?
+      return render_unauthorized_action if @attachment&.deleted?
       return render_unauthorized_action unless @attachment&.media_entry_id
 
       @media_object = @attachment.media_object_by_media_id
@@ -31,11 +33,13 @@ module FilesHelper
     end
   end
 
-  def check_media_permissions(access_type: :read)
+  def check_media_permissions(access_type: :download)
     if @attachment.present?
       access_allowed(@attachment, @current_user, access_type)
     else
-      render_unauthorized_action unless @media_object.present?
+      media_object_exists = @media_object.present?
+      render_unauthorized_action unless media_object_exists
+      media_object_exists
     end
   end
 

@@ -1060,7 +1060,7 @@ describe Quizzes::QuizzesApiController, type: :request do
                    { "Accept" => "application/vnd.api+json" })
 
       # should be authorization error
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "reorders a quiz's questions" do

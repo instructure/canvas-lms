@@ -59,6 +59,7 @@ export const GradeRow = ({
   currentUserId,
   isStacked,
   dateFormatter,
+  restrictQuantitativeData,
 }) => {
   const cellTheme = isStacked ? {padding: '.5rem .75rem'} : undefined
 
@@ -160,6 +161,8 @@ export const GradeRow = ({
     </div>
   )
 
+  const shouldShowPoints = !!pointsPossible && !restrictQuantitativeData
+
   return (
     <Table.Row data-testid="grades-table-row" key={id}>
       <Table.Cell theme={cellTheme}>
@@ -190,7 +193,7 @@ export const GradeRow = ({
       <Table.Cell theme={cellTheme}>
         <div className="grade-details__score">
           {renderScore()}
-          {pointsPossible && (
+          {shouldShowPoints && (
             <span className="points-possible">
               <Text size="x-small">{I18n.t('Out of %{pointsPossible} pts', {pointsPossible})}</Text>
             </span>

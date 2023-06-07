@@ -52,7 +52,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Reports'),
       description: I18n.t(
-        'To view the Student Interactions Report, Grades - view all grades and Courses - view usage reports must also be enabled.'
+        'To view the Student Interactions Report, Grades - view all grades and Reports - manage must also be enabled.'
       ),
     },
     {
@@ -88,7 +88,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Reports'),
       description: I18n.t(
-        'To view the Student Interactions Report, Grades - view all grades and Courses - view usage reports must also be enabled.'
+        'To view the Student Interactions Report, Grades - view all grades and Reports - manage must also be enabled.'
       ),
     },
     {

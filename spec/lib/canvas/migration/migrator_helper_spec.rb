@@ -76,7 +76,7 @@ describe Canvas::Migration::MigratorHelper do
         helper.course = course
         helper.settings = { content_migration: content_migration }
         helper.overview
-        expect(helper.overview[:tool_profiles]).to match_array []
+        expect(helper.overview[:tool_profiles]).to be_empty
       end
     end
 

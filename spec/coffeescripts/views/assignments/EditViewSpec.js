@@ -222,6 +222,12 @@ test('does not allow group assignment for large rosters', function () {
   equal(view.$('#group_category_selector').length, 0)
 })
 
+test('does not show the "hide_zero_point_quiz" checkbox when it is not a quiz lti assignment', function () {
+  ENV.HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED = true
+  const view = this.editView({is_quiz_lti_assignment: false})
+  equal(view.$hideZeroPointQuizzesBox.length, 0)
+})
+
 test('does not allow group assignment for anonymously graded assignments', () => {
   ENV.ANONYMOUS_GRADING_ENABLED = true
   const view = editView({anonymous_grading: true})
@@ -1505,6 +1511,7 @@ QUnit.module('EditView: Quizzes 2', {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED: true,
+      HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED: true,
       VALID_DATE_RANGE: {},
       COURSE_ID: 1,
       CANCEL_TO: currentOrigin + '/cancel',
@@ -1516,6 +1523,7 @@ QUnit.module('EditView: Quizzes 2', {
       submission_types: ['external_tool'],
       is_quiz_lti_assignment: true,
       frozen_attributes: ['submission_types'],
+      points_possible: '10',
     })
   },
   teardown() {
@@ -1539,6 +1547,66 @@ test('does not show the load in new tab checkbox', function () {
 
 test('shows the build button', function () {
   strictEqual(this.view.$el.find('button.build_button').length, 1)
+})
+
+test('does not show the "hide_zero_point_quiz" checkbox when "hide_zero_point_quizzes_option" FF is disabled', function () {
+  ENV.HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED = false
+  this.view = editView({
+    html_url: 'http://foo',
+    submission_types: ['external_tool'],
+    is_quiz_lti_assignment: true,
+    frozen_attributes: ['submission_types'],
+  })
+
+  strictEqual(this.view.$hideZeroPointQuizzesBox.length, 0)
+})
+
+test('shows the "hide_zero_point_quiz" checkbox when points possible is 0', function () {
+  this.view.$assignmentPointsPossible.val(0)
+  this.view.$assignmentPointsPossible.trigger('change')
+  strictEqual(this.view.$hideZeroPointQuizzesOption.length, 1)
+  strictEqual(this.view.$hideZeroPointQuizzesOption.css('display'), 'block')
+})
+
+test('does not show the "hide_zero_point_quiz" checkbox when points possible is not 0', function () {
+  this.view.$assignmentPointsPossible.val(10)
+  this.view.$assignmentPointsPossible.trigger('change')
+  strictEqual(this.view.$hideZeroPointQuizzesOption.length, 1)
+  strictEqual(this.view.$hideZeroPointQuizzesOption.css('display'), 'none')
+})
+
+test('disables and checks "omit_from_final_grade" checkbox when "hide_zero_point_quiz" checkbox is checked', function () {
+  this.view.$hideZeroPointQuizzesBox.prop('checked', true)
+  this.view.$hideZeroPointQuizzesBox.trigger('change')
+  strictEqual(this.view.$omitFromFinalGradeBox.prop('disabled'), true)
+  strictEqual(this.view.$omitFromFinalGradeBox.prop('checked'), true)
+})
+
+test('enables and keeps "omit_from_final_grade" checkbox checked when "hide_zero_point_quiz" checkbox is unchecked', function () {
+  this.view.$hideZeroPointQuizzesBox.prop('checked', true)
+  this.view.$hideZeroPointQuizzesBox.trigger('change')
+  this.view.$hideZeroPointQuizzesBox.prop('checked', false)
+  this.view.$hideZeroPointQuizzesBox.trigger('change')
+  strictEqual(this.view.$omitFromFinalGradeBox.prop('disabled'), false)
+  strictEqual(this.view.$omitFromFinalGradeBox.prop('checked'), true)
+})
+
+test('enables and keeps "omit_from_final_grade" checkbox checked when "hide_zero_point_quiz" checkbox is hidden', function () {
+  this.view.$hideZeroPointQuizzesBox.prop('checked', true)
+  this.view.$hideZeroPointQuizzesBox.trigger('change')
+  this.view.$assignmentPointsPossible.val(10)
+  this.view.$assignmentPointsPossible.trigger('change')
+  strictEqual(this.view.$omitFromFinalGradeBox.prop('disabled'), false)
+  strictEqual(this.view.$omitFromFinalGradeBox.prop('checked'), true)
+})
+
+test('displays reason for disabling "omit_from_final_grade" checkbox', function () {
+  this.view.$hideZeroPointQuizzesBox.prop('checked', true)
+  this.view.$hideZeroPointQuizzesBox.trigger('change')
+  strictEqual(
+    this.view.$('.accessible_label').text(),
+    'This is enabled by default as assignments can not be withheld from the gradebook and still count towards it.'
+  )
 })
 
 test('save routes to cancelLocation', function () {

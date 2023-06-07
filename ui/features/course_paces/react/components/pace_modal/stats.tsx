@@ -25,15 +25,15 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {
   IconArrowEndLine,
+  IconAssignmentLine,
   IconCalendarClockLine,
   IconClockLine,
-  IconAssignmentLine,
 } from '@instructure/ui-icons'
 
 import {
-  coursePaceTimezone,
   coursePaceDateFormatter,
   coursePaceDateShortFormatter,
+  coursePaceTimezone,
 } from '../../shared/api/backend_serializer'
 import {CoursePace, OptionalDate, Pace, PaceDuration, ResponsiveSizes} from '../../types'
 import {coursePaceActions} from '../../actions/course_paces'
@@ -129,6 +129,7 @@ export const PaceModalStats = ({
   useEffect(() => {
     const isSmallScreen = responsiveSize !== 'large'
     const dateFormat = isSmallScreen ? coursePaceDateShortFormatter : coursePaceDateFormatter
+    // @ts-expect-error
     setDateFormat(dateFormat)
     setShrink(isSmallScreen)
   }, [responsiveSize])

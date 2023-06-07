@@ -33,9 +33,10 @@ import {isTextNode} from './elem-util'
 export async function placeholderInfoFor(
   fileMetaProps: PlaceHoldableThingInfo
 ): Promise<PlaceholderInfo> {
-  const visibleLabel = trimmedOrNull(fileMetaProps.name) ?? formatMessage('Loading...')
+  const fileName = fileMetaProps.title ?? fileMetaProps.name
+  const visibleLabel = trimmedOrNull(fileName) ?? formatMessage('Loading...')
   const ariaLabel = formatMessage('Loading placeholder for {fileName}', {
-    fileName: fileMetaProps.name ?? 'unknown filename',
+    fileName: fileName ?? 'unknown filename',
   })
 
   if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
@@ -273,6 +274,7 @@ export async function insertPlaceholder(
 export interface PlaceHoldableThingInfo {
   name?: string
   type?: string
+  title?: string
   contentType?: string
   displayAs?: 'link' | string
   domObject: File | Blob | {preview?: string}

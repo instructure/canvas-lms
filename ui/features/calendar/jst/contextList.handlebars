@@ -1,12 +1,19 @@
 <ul id="{{type}}-context-list">
   {{#each contexts}}
-  <li data-context="{{asset_string}}" class="context_list_context hover-container">
+  <li data-context="{{asset_string}}" class="context_list_context hover-container" style="display:flex;">
     <span class="context-list-toggle-box group_{{asset_string}}" aria-labelledby="group_{{asset_string}}_checkbox_label"
-      tabindex="0" role="checkbox"></span>
-    <label id="group_{{asset_string}}_checkbox_label">
+      tabindex="0" role="checkbox" style="flex-shrink:0;""></span>
+    <label id="group_{{asset_string}}_checkbox_label" style="flex-grow:1;">
       {{name}}
     </label>
-    <div class="buttons-wrapper">
+    {{#ifEqual type 'account'}}
+      {{#if auto_subscribe}}
+       {{#unless viewed_auto_subscribed_account_calendars}}
+          <div class="new-feature-pill" style="flex-shrink:0; align-self:start;">{{#t}}New{{/t}}</div>
+        {{/unless}}
+      {{/if}}
+    {{/ifEqual}}
+    <div class="buttons-wrapper" style="flex-shrink:0;">
     {{#ifEqual type 'account'}}
       {{#unless auto_subscribe}}
         <button type="button" tabindex="0" class="Button Button--icon-action ContextList__DeleteBtn">

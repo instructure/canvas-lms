@@ -58,7 +58,6 @@ const isStudent = function () {
 extend(Assignment, Model)
 
 function Assignment() {
-  this.restrictQuantitativeData = this.restrictQuantitativeData.bind(this)
   this.quizzesRespondusEnabled = this.quizzesRespondusEnabled.bind(this)
   this.showGradersAnonymousToGradersCheckbox = this.showGradersAnonymousToGradersCheckbox.bind(this)
   this.pollUntilFinished = this.pollUntilFinished.bind(this)
@@ -100,6 +99,7 @@ function Assignment() {
   this.showBuildButton = this.showBuildButton.bind(this)
   this.newQuizzesAssignmentBuildButtonEnabled =
     this.newQuizzesAssignmentBuildButtonEnabled.bind(this)
+  this.hideZeroPointQuizzesOptionEnabled = this.hideZeroPointQuizzesOptionEnabled.bind(this)
   this.submissionTypeSelectionTools = this.submissionTypeSelectionTools.bind(this)
   this.dueDateRequiredForAccount = this.dueDateRequiredForAccount.bind(this)
   this.maxNameLengthRequiredForAccount = this.maxNameLengthRequiredForAccount.bind(this)
@@ -175,6 +175,7 @@ function Assignment() {
   this.inPacedCourse = this.inPacedCourse.bind(this)
   this.courseID = this.courseID.bind(this)
   this.omitFromFinalGrade = this.omitFromFinalGrade.bind(this)
+  this.hideInGradebook = this.hideInGradebook.bind(this)
   this.gradingType = this.gradingType.bind(this)
   this.gradedSubmissionsExist = this.gradedSubmissionsExist.bind(this)
   this.inClosedGradingPeriod = this.inClosedGradingPeriod.bind(this)
@@ -427,6 +428,13 @@ Assignment.prototype.omitFromFinalGrade = function (omitFromFinalGradeBoolean) {
     return this.get('omit_from_final_grade')
   }
   return this.set('omit_from_final_grade', omitFromFinalGradeBoolean)
+}
+
+Assignment.prototype.hideInGradebook = function (hideInGradebookBoolean) {
+  if (!(arguments.length > 0)) {
+    return this.get('hide_in_gradebook')
+  }
+  return this.set('hide_in_gradebook', hideInGradebookBoolean)
 }
 
 Assignment.prototype.courseID = function () {
@@ -959,12 +967,7 @@ Assignment.prototype.objectTypeDisplayName = function () {
 }
 
 Assignment.prototype.htmlUrl = function () {
-  if (
-    this.isQuizLTIAssignment() &&
-    canManage() &&
-    ENV.FLAGS &&
-    ENV.FLAGS.new_quizzes_modules_support
-  ) {
+  if (this.isQuizLTIAssignment() && canManage()) {
     return this.htmlEditUrl() + '?quiz_lti'
   } else {
     return this.get('html_url')
@@ -1013,6 +1016,10 @@ Assignment.prototype.submissionTypeSelectionTools = function () {
 
 Assignment.prototype.newQuizzesAssignmentBuildButtonEnabled = function () {
   return ENV.NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED
+}
+
+Assignment.prototype.hideZeroPointQuizzesOptionEnabled = function () {
+  return ENV.HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED
 }
 
 Assignment.prototype.showBuildButton = function () {
@@ -1201,6 +1208,7 @@ Assignment.prototype.toView = function () {
     'groupCategoryId',
     'hasDueDate',
     'hasPointsPossible',
+    'hideInGradebook',
     'htmlEditUrl',
     'htmlBuildUrl',
     'htmlUrl',
@@ -1229,6 +1237,7 @@ Assignment.prototype.toView = function () {
     'multipleDueDates',
     'name',
     'newQuizzesAssignmentBuildButtonEnabled',
+    'hideZeroPointQuizzesOptionEnabled',
     'nonBaseDates',
     'notifyOfUpdate',
     'objectTypeDisplayName',
@@ -1265,7 +1274,7 @@ Assignment.prototype.toView = function () {
     is_master_course_child_content: this.get('is_master_course_child_content'),
     restricted_by_master_course: this.get('restricted_by_master_course'),
     master_course_restrictions: this.get('master_course_restrictions'),
-    restrict_quantitative_data: this.restrictQuantitativeData(),
+    restrict_quantitative_data: this.get('restrict_quantitative_data'),
   }
   for (let i = 0, len = fields.length; i < len; i++) {
     const field = fields[i]
@@ -1557,10 +1566,6 @@ Assignment.prototype.showGradersAnonymousToGradersCheckbox = function () {
 
 Assignment.prototype.quizzesRespondusEnabled = function () {
   return this.get('require_lockdown_browser') && this.isQuizLTIAssignment() && isStudent()
-}
-
-Assignment.prototype.restrictQuantitativeData = function () {
-  return this.get('restrict_quantitative_data')
 }
 
 export default Assignment

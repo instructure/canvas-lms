@@ -27,7 +27,7 @@ describe MessagesController do
 
       it "is able to access the page" do
         post "create", params: { user_id: @user.to_param }
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
 
       it "is able to send messages" do
@@ -51,7 +51,7 @@ describe MessagesController do
 
       it "receives a redirect" do
         post "create", params: { user_id: @user.to_param }
-        expect(response.code).to eq "302"
+        expect(response).to have_http_status :found
       end
     end
   end

@@ -100,11 +100,18 @@ export function mediaPlayerURLFromFile(file, canvasOrigin) {
   const content_type = file['content-type'] || file.content_type || file.type
   const type = content_type.replace(/\/.*$/, '')
 
-  if (RCEGlobals.getFeatures()?.media_links_use_attachment_id && isAudioOrVideo(content_type)) {
-    const attachmentId = file.id
-    if (attachmentId) {
-      return `/media_attachments_iframe/${attachmentId}?type=${type}&embedded=true`
+  if (
+    RCEGlobals.getFeatures()?.media_links_use_attachment_id &&
+    isAudioOrVideo(content_type) &&
+    file.id
+  ) {
+    if (!file.url && !file.href) {
+      return `/media_attachments_iframe/${file.id}?type=${type}&embedded=true`
     }
+
+    const parsed_url = parse(file.url || file.href, true)
+    const verifier = parsed_url.query.verifier ? `&verifier=${parsed_url.query.verifier}` : ''
+    return `/media_attachments_iframe/${file.id}?type=${type}${verifier}&embedded=true`
   }
 
   if (file.embedded_iframe_url) {

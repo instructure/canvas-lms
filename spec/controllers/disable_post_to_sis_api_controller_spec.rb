@@ -47,7 +47,7 @@ describe DisablePostToSisApiController do
       it "responds with 200" do
         put "disable_post_to_sis", params: { course_id: course.id }
 
-        expect(response.code).to eq "204"
+        expect(response).to have_http_status :no_content
         expect(response).to be_successful
       end
 
@@ -59,7 +59,7 @@ describe DisablePostToSisApiController do
         put "disable_post_to_sis", params: { course_id: course.id }
         assignment = Assignment.find(assignment.id)
 
-        expect(response.code).to eq "204"
+        expect(response).to have_http_status :no_content
         expect(response).to be_successful
         expect(assignment.post_to_sis).to be_falsey
       end
@@ -85,7 +85,7 @@ describe DisablePostToSisApiController do
                                                grading_period_id: 789_465_789 }
 
           parsed_json = json_parse(response.body)
-          expect(response.code).to eq "400"
+          expect(response).to have_http_status :bad_request
           expect(parsed_json["code"]).to eq "not_found"
         end
 
@@ -99,7 +99,7 @@ describe DisablePostToSisApiController do
                                                grading_period_id: grading_period.id }
           assignment = Assignment.find(assignment.id)
 
-          expect(response.code).to eq "204"
+          expect(response).to have_http_status :no_content
           expect(response).to be_successful
           expect(assignment.post_to_sis).to be_falsey
         end

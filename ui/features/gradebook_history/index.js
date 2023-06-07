@@ -26,6 +26,7 @@ ready(() => {
     <GradebookHistoryApp
       courseUrl={ENV.COURSE_URL}
       learningMasteryEnabled={ENV.OUTCOME_GRADEBOOK_ENABLED}
+      enhancedIndividualGradebookEnabled={ENV.individual_gradebook_enhancements}
     />,
     document.getElementById('content')
   )

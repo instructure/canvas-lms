@@ -26,6 +26,11 @@ import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import gradingPeriodsApi from './gradingPeriodsApi'
 import type {CamelizedGradingPeriodSet} from '@canvas/grading/grading.d'
 import type {GradingPeriodSet, GradingPeriodSetGroup} from 'api.d'
+import {EnvGradingStandardsCommon} from '@canvas/global/env/EnvGradingStandards'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+
+// Allow unchecked access to ENV variables that should exist in this context
+declare const ENV: GlobalEnv & EnvGradingStandardsCommon
 
 const I18n = useI18nScope('gradingPeriodSetsApi')
 

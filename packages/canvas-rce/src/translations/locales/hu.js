@@ -395,9 +395,6 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Ikon előnézet" },
   "icon_shape_30b61e7": { "message": "Ikon alakja" },
   "icon_size_9353edea": { "message": "Ikon mérete" },
-  "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-    "message": "Ha üresen hagyja a hivatkozást, a szöveg kurzushivatkozás neveként jelenik meg"
-  },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Ha nem választja ki most a felhasználási jogokat, a fájl nem lesz publikálva a feltöltés után."
   },

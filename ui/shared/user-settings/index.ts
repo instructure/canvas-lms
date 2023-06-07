@@ -44,7 +44,7 @@ const userSettings = {
 
 function get(...tokens: string[]) {
   return function <T>(key: string): T | undefined {
-    const joinedTokens = tokens.map(token => window.ENV[token]).join('_')
+    const joinedTokens = tokens.map(token => (window.ENV as Record<string, any>)[token]).join('_')
     try {
       const res = localStorage.getItem(`_${joinedTokens}_${key}`)
       if (res === 'undefined') return undefined
@@ -58,7 +58,7 @@ function get(...tokens: string[]) {
 function set(...tokens: string[]) {
   return function <T>(key: string, value: T) {
     const stringifiedValue = JSON.stringify(value)
-    const joinedTokens = tokens.map(token => window.ENV[token]).join('_')
+    const joinedTokens = tokens.map(token => (window.ENV as Record<string, any>)[token]).join('_')
     try {
       localStorage.setItem(`_${joinedTokens}_${key}`, stringifiedValue)
     } catch (_ex) {
@@ -69,7 +69,7 @@ function set(...tokens: string[]) {
 
 function remove(...tokens: string[]) {
   return function (key: string) {
-    const joinedTokens = tokens.map(token => window.ENV[token]).join('_')
+    const joinedTokens = tokens.map(token => (window.ENV as Record<string, any>)[token]).join('_')
     try {
       localStorage.removeItem(`_${joinedTokens}_${key}`)
     } catch (_ex) {

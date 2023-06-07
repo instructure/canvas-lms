@@ -8,6 +8,16 @@ Session
 **Trigger:** Triggered when a user has logged in.
 
 
+### Event Body Schema
+
+| Field | Description |
+|-|-|
+| **data[0].object.extensions["com.instructure.canvas"].redirect_url** | The URL the user was redirected to after logging in. Is set when the user logs in after clicking a deep link into Canvas |
+| **data[0].object.type** | SoftwareApplication |
+
+
+
+
 
 ### Payload Example:
 
@@ -73,19 +83,20 @@ Session
 
 
 
-### Event Body Schema
-
-| Field | Description |
-|-|-|
-| **data[0].object.extensions["com.instructure.canvas"].redirect_url** | The URL the user was redirected to after logging in. Is set when the user logs in after clicking a deep link into Canvas |
-
-
-
 <h2 id="logged_out">logged_out</h2>
 
 **Definition:** The event is emitted anytime an end user logs out of Canvas
 
 **Trigger:** Triggered when a user has logged out.
+
+
+### Event Body Schema
+
+| Field | Description |
+|-|-|
+| **data[0].object.type** | SoftwareApplication |
+
+
 
 
 
@@ -144,7 +155,6 @@ Session
   ]
 }
 ```
-
 
 
 

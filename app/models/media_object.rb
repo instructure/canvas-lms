@@ -36,7 +36,7 @@ class MediaObject < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
 
   validates :media_id, :workflow_state, presence: true
-  has_many :media_tracks, -> { order(:locale) }, dependent: :destroy
+  has_many :media_tracks, ->(media_object) { where(attachment_id: [nil, media_object.attachment_id]).order(:locale) }, dependent: :destroy, inverse_of: :media_object
   has_many :attachments_by_media_id, class_name: "Attachment", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :media_object_by_media_id
   before_create :create_attachment
   after_create :retrieve_details_later
@@ -89,13 +89,13 @@ class MediaObject < ActiveRecord::Base
 
     given do |user|
       context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
-        ((self.user && self.user == user) || context&.grants_right?(user, :manage_course_content_add))
+        (attachment.present? ? attachment.grants_right?(user, :update) : context&.grants_right?(user, :manage_course_content_add))
     end
     can :add_captions
 
     given do |user|
       context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
-        ((self.user && self.user == user) || context&.grants_right?(user, :manage_course_content_delete))
+        (attachment.present? ? attachment.grants_right?(user, :update) : context&.grants_right?(user, :manage_course_content_delete))
     end
     can :delete_captions
   end

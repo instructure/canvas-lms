@@ -198,14 +198,14 @@ describe ExternalToolsController, type: :request do
             tag.save!
             params = { id: tool.id.to_s, launch_type: "assessment", assignment_id: @assignment.id }
             sessionless_launch(@course, params)
-            expect(response.code).to eq "200"
+            expect(response).to have_http_status :ok
           end
 
           it "returns sessionless launch URL when default URL is not set and placement URL is" do
             tool.update!(url: nil)
             params = { id: tool.id.to_s, launch_type: "course_navigation" }
             sessionless_launch(@course, params)
-            expect(response.code).to eq "200"
+            expect(response).to have_http_status :ok
           end
 
           it "returns sessionless launch URL for an assignment launch no URL is set on the tool" do
@@ -853,7 +853,7 @@ describe ExternalToolsController, type: :request do
                    "#{type.singularize}_id": context.id.to_s },
                  {})
     json = JSON.parse response.body
-    expect(response.code).to eq "400"
+    expect(response).to have_http_status :bad_request
     expect(json["errors"]["name"]).not_to be_nil
     expect(json["errors"]["shared_secret"]).not_to be_nil
     expect(json["errors"]["consumer_key"]).not_to be_nil
@@ -869,7 +869,7 @@ describe ExternalToolsController, type: :request do
                    action: "index",
                    format: "json",
                    "#{type.singularize}_id": context.id.to_s })
-    expect(response.code).to eq "401"
+    expect(response).to have_http_status :unauthorized
   end
 
   def authorized_call(context)
@@ -880,7 +880,7 @@ describe ExternalToolsController, type: :request do
                    action: "index",
                    format: "json",
                    "#{type.singularize}_id": context.id.to_s })
-    expect(response.code).to eq "200"
+    expect(response).to have_http_status :ok
   end
 
   def paginate_call(context)

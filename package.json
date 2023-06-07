@@ -324,6 +324,7 @@
     "sass-direction": "^1",
     "script-loader": "^0.7",
     "sinon": "^7",
+    "stream-browserify": "^3",
     "style-loader": "^0.23",
     "stylelint": "^10",
     "terser-webpack-plugin": "5.3.3",
@@ -415,6 +416,7 @@
     "@apollo/react-components": "3.0.1",
     "@apollo/react-hoc": "3.0.1",
     "@apollo/react-hooks": "3.0.1",
-    "@apollo/react-ssr": "3.0.1"
+    "@apollo/react-ssr": "3.0.1",
+    "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0"
   }
 }

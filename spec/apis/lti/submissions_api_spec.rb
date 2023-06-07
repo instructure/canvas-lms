@@ -77,21 +77,21 @@ module Lti
     RSpec.shared_examples "authorization" do
       it "returns a 401 if no auth token" do
         get endpoint
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "returns a 401 if the tool doesn't have a similarity detection placement" do
         tool_proxy.raw_data["enabled_capability"] = []
         tool_proxy.save!
         get endpoint, headers: request_headers
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "returns a 401 if the tool is not associated with the assignment" do
         assignment.tool_settings_tool = []
         assignment.save!
         get endpoint, headers: request_headers
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "returns a 401 if the tool is not in the context" do
@@ -101,7 +101,7 @@ module Lti
         tool_proxy_binding.context_id = a.id
         tool_proxy_binding.save!
         get endpoint, headers: request_headers
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "allows tool proxies with matching access" do
@@ -255,7 +255,7 @@ module Lti
         get "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}", headers: request_headers
         attachment1 = Attachment.create!(context: Account.create!, filename: "test.txt", content_type: "text/plain")
         get controller.attachment_url(attachment1), headers: request_headers
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       context "sharding" do

@@ -108,6 +108,7 @@ export type GradebookOptions = {
   default_grading_standard: GradingStandard[]
   download_assignment_submissions_url: string
   enhanced_gradebook_filters: boolean
+  hide_zero_point_quizzes: boolean
   enrollments_url: string
   enrollments_with_concluded_url: string
   export_gradebook_csv_url: string
@@ -128,6 +129,7 @@ export type GradebookOptions = {
   grading_standard: boolean
   group_weighting_scheme: null | string
   has_modules: boolean
+  individual_gradebook_enhancements: boolean
   late_policy: LatePolicy | null
   login_handle_name: null | string
   message_attachment_upload_folder_id: string
@@ -255,10 +257,10 @@ export type InitialActionStates = {
   pendingGradeInfo: PendingGradeInfo[]
 }
 
-export type FlashAlertType = {
+export type FlashMessage = {
   key: string
   message: string
-  variant: string
+  variant?: 'error' | 'success' | 'warning' | 'info'
 }
 
 export type FilterType =
@@ -362,12 +364,6 @@ export type ProgressData = {
 export type FilteredContentInfo = {
   invalidAssignmentGroups: AssignmentGroup[]
   totalPointsPossible: number
-}
-
-export type FlashMessage = {
-  key: string
-  message: string
-  variant: string
 }
 
 export type AssignmentStudentMap = {

@@ -35,6 +35,7 @@ module IncomingMail
         context = original_message.context
         user = original_message.user
         raise IncomingMail::Errors::UnknownAddress unless valid_user_and_context?(context, user)
+        raise IncomingMail::Errors::UserSuspended if user.suspended?
 
         from_channel = sent_from_channel(user, incoming_message)
         raise IncomingMail::Errors::UnknownSender unless from_channel
@@ -124,6 +125,14 @@ module IncomingMail
                    InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.unknown_sender")
                    I18n.t(<<~TEXT, subject: subject, link: I18n.t(:"community.guides_home")).gsub(/^ +/, "")
                      The message you sent with the subject line "%{subject}" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address. You may also contact this person via the Canvas Inbox. For help, please see the Inbox chapter for your user role in the Canvas Guides. [See %{link}].
+
+                     Thank you,
+                     Canvas Support
+                   TEXT
+                 when IncomingMail::Errors::UserSuspended
+                   InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.user_suspended")
+                   I18n.t(<<~TEXT, subject: subject).gsub(/^ +/, "")
+                     The message you sent with the subject line "%{subject}" was not delivered because your account has been suspended.
 
                      Thank you,
                      Canvas Support

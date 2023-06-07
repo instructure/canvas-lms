@@ -27,10 +27,8 @@ import FilePreview from '@canvas/files/react/components/FilePreview'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import FolderChild from './FolderChild'
-import UploadDropZone from './UploadDropZone'
 import FileUpload from './FileUpload'
 import ColumnHeaders from './ColumnHeaders'
-import CurrentUploads from '@canvas/files/react/components/CurrentUploads'
 import LoadingIndicator from './LoadingIndicator'
 import page from 'page'
 import FocusStore from '../legacy/modules/FocusStore'
@@ -135,8 +133,6 @@ ShowFolder.render = function () {
     this.props.currentFolder.folders.loadedAll && this.props.currentFolder.files.loadedAll
   )
 
-  const showNewFileUpload = window.ENV?.FEATURES?.files_dnd
-
   // We have to put the "select all" checkbox out here because VO won't read the table properly
   // if it's in the table header, and won't read it at all if it's outside the table but inside
   // the <div role="grid">.
@@ -167,21 +163,7 @@ ShowFolder.render = function () {
             )}
           </div>
         )}
-        {!showNewFileUpload && (
-          <>
-            <UploadDropZone currentFolder={this.props.currentFolder} />
-            <CurrentUploads />
-            <ColumnHeaders
-              ref="columnHeaders"
-              query={this.props.query}
-              pathname={this.props.pathname}
-              areAllItemsSelected={this.props.areAllItemsSelected}
-              usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
-            />
-            {this.renderFolderChildOrEmptyContainer()}
-          </>
-        )}
-        {showNewFileUpload && hasLoadedAll && (
+        {hasLoadedAll && (
           <>
             {this.props.userCanAddFilesForContext && (
               <FileUpload

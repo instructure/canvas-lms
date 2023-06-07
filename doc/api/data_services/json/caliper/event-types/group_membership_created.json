@@ -5,6 +5,9 @@
   "schema": {
     "data[0].object.extensions[\"com.instructure.canvas\"]": {
       "entity_id": "Canvas global ID of the object affected by the event"
+    },
+    "data[0].object": {
+      "type": "Membership"
     }
   },
   "examples": [

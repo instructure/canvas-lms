@@ -161,12 +161,13 @@ module.exports = {
     },
 
     fallback: {
-      // for minimatch module; it can work without path so let webpack know
-      // instead of trying to resolve node's "path"
+      // Called for by minimatch but as we use it, minimatch  can work without it
       path: false,
       // for parse-link-header, which requires "querystring" which is a node
       // module. btw we have at least 3 implementations of "parse-link-header"!
       querystring: require.resolve('querystring-es3'),
+      // several things need stream
+      stream: require.resolve('stream-browserify'),
     },
 
     modules: [resolve(canvasDir, 'public/javascripts'), 'node_modules'],

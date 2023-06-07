@@ -22,20 +22,16 @@ import _ from 'underscore'
 import round from '@canvas/round'
 import AssignmentGroupGradeCalculator from './AssignmentGroupGradeCalculator'
 import {bigSum, sum, sumBy, toNumber, weightedPercent} from './GradeCalculationHelper'
+import type {Assignment, AssignmentGroup, UserDueDateMap} from '../../api.d'
 import type {
-  Assignment,
-  AssignmentGroup,
-  AssignmentGroupMap,
-  Submission,
-  UserDueDateMap,
-} from '../../api.d'
-import type {
+  AssignmentGroupCriteriaMap,
   AssignmentGroupGrade,
   AssignmentGroupGradeMap,
   CamelizedGradingPeriod,
   CamelizedGradingPeriodSet,
   GradingPeriodGrade,
   // GradingPeriodGradeMap,
+  SubmissionGradeCriteria,
 } from './grading.d'
 
 function combineAssignmentGroupGrades(
@@ -131,7 +127,7 @@ function divideGroupByGradingPeriods(
 }
 
 function extractPeriodBasedAssignmentGroups(
-  assignmentGroups: AssignmentGroupMap,
+  assignmentGroups: AssignmentGroupCriteriaMap,
   effectiveDueDates: UserDueDateMap
 ): AssignmentGroup[] {
   return _.reduce(
@@ -186,8 +182,8 @@ function recombinePeriodBasedAssignmentGroupGrades(grades: AssignmentGroupGrade[
 }
 
 function calculateWithGradingPeriods(
-  submissions: Submission[],
-  assignmentGroups: AssignmentGroupMap,
+  submissions: SubmissionGradeCriteria[],
+  assignmentGroups: AssignmentGroupCriteriaMap,
   gradingPeriods: CamelizedGradingPeriod[],
   effectiveDueDates: UserDueDateMap,
   options: {
@@ -286,8 +282,8 @@ function calculateWithGradingPeriods(
 }
 
 function calculateWithoutGradingPeriods(
-  submissions: Submission[],
-  assignmentGroups: AssignmentGroupMap,
+  submissions: SubmissionGradeCriteria[],
+  assignmentGroups: AssignmentGroupCriteriaMap,
   options: {
     weightAssignmentGroups: boolean
     ignoreUnpostedAnonymous: boolean
@@ -425,8 +421,8 @@ function calculateWithoutGradingPeriods(
 //   scoreUnit: 'points'|'percent'
 // }
 function calculate(
-  submissions: Submission[],
-  assignmentGroups: AssignmentGroupMap,
+  submissions: SubmissionGradeCriteria[],
+  assignmentGroups: AssignmentGroupCriteriaMap,
   weightingScheme: string | null,
   ignoreUnpostedAnonymous: boolean,
   gradingPeriodSet?: CamelizedGradingPeriodSet | null,

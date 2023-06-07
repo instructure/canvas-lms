@@ -91,6 +91,7 @@ gem "marginalia", "1.11.1", require: false
 gem "mime-types", "3.3.1"
 gem "mini_magick", "4.11.0"
 gem "multi_json", "1.15.0"
+gem "net-http", "~> 0.1", require: false
 gem "net-ldap", "0.16.3", require: false
 gem "net-imap", "0.2.3", require: false
 gem "net-pop", "0.1.1", require: false
@@ -142,7 +143,7 @@ gem "will_paginate", "3.3.0", require: false # required for folio-pagination
 
 gem "faraday", "0.17.4"
 
-path "gems" do
+path "../gems" do
   gem "activesupport-suspend_callbacks"
   gem "acts_as_list"
   gem "adheres_to_policy"

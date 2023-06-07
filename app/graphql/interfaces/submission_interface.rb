@@ -390,4 +390,6 @@ module Interfaces::SubmissionInterface
   def assigned_assessments
     load_association(:assigned_assessments)
   end
+
+  field :assignment_id, ID, null: false
 end

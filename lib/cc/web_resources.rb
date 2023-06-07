@@ -24,6 +24,12 @@ module CC
       obj.hidden? || obj.locked || obj.unlock_at || obj.lock_at
     end
 
+    def content_zipper
+      @zipper ||= ContentZipper.new
+      @zipper.user = @user
+      @zipper
+    end
+
     def add_course_files
       return if for_course_copy
 
@@ -35,9 +41,7 @@ module CC
       files_with_metadata = { folders: [], files: [] }
       @added_attachments = {}
 
-      zipper = ContentZipper.new
-      zipper.user = @user
-      zipper.process_folder(
+      content_zipper.process_folder(
         course_folder,
         @zip_file,
         [CCHelper::WEB_RESOURCES_FOLDER],
@@ -154,7 +158,36 @@ module CC
       rel_path
     end
 
-    def process_media_tracks(tracks, media_file_migration_id, media_obj, video_path)
+    def attachments_for_export(folder)
+      opts = { exporter: @manifest.exporter, referenced_files: @html_exporter.referenced_files }
+      attachments_for_export = []
+      attachments_for_export += content_zipper.folder_attachments_for_export(folder, opts)
+      folder.active_sub_folders.each do |sub_folder|
+        attachments_for_export += attachments_for_export(sub_folder)
+      end
+      attachments_for_export
+    end
+
+    def process_media_tracks
+      attachments = attachments_for_export(Folder.root_folders(@course).first)
+      attachments += Attachment.where(context: @course, media_entry_id: @html_exporter.used_media_objects.map(&:media_id))
+      attachments += @html_exporter.referenced_files.values
+      att_map = attachments.index_by(&:id)
+      Attachment.media_tracks_include_originals(attachments).each_with_object({}) do |mt, tracks|
+        file = att_map[mt.for_att_id]
+        migration_id = create_key(file)
+        tracks[migration_id] ||= []
+        tracks[migration_id] << {
+          kind: mt.kind,
+          locale: mt.locale,
+          identifierref: create_key(mt.content),
+          content: mt.content
+        }
+        add_exported_asset(mt)
+      end
+    end
+
+    def process_media_tracks_without_feature_flag(tracks, media_file_migration_id, media_obj, video_path)
       media_obj.media_tracks.each do |mt|
         track_id = create_key(mt.content)
         mt_path = video_path + ".#{mt.locale}.#{mt.kind}"
@@ -191,7 +224,7 @@ module CC
           root_node.media(identifierref: file_id) do |media_node|
             track_list.each do |track|
               # <track identifierref='(srt resource id)' kind='subtitles' locale='en'/>
-              media_node.track(track)
+              media_node_creation(media_node, track)
             end
           end
         end
@@ -199,8 +232,25 @@ module CC
       tracks_file.close
     end
 
+    def media_node_creation(media_node, track)
+      if Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
+        media_node.track(track[:content], track.slice(:kind, :locale, :identifierref))
+      else
+        media_node.track(track)
+      end
+    end
+
+    def add_media_tracks
+      track_map = process_media_tracks
+      add_tracks(track_map)
+    end
+
     def export_media_objects?
       CanvasKaltura::ClientV3.config && !for_course_copy
+    end
+
+    def media_object_path(path)
+      File.join(CCHelper::WEB_RESOURCES_FOLDER, path)
     end
 
     MAX_MEDIA_OBJECT_SIZE = 4.gigabytes
@@ -223,20 +273,13 @@ module CC
         return
       end
 
-      client = CanvasKaltura::ClientV3.new
-      client.startSession(CanvasKaltura::SessionType::ADMIN)
-
-      tracks = {}
+      client = CC::CCHelper.kaltura_admin_session
       @html_exporter.used_media_objects.each do |obj|
-        unless obj.attachment
-          obj.attachment = Attachment.create!(context_id: obj.context_id, context_type: obj.context_type, filename: obj.title || "", content_type: "unknown/unknown")
-          obj.save!
-        end
         migration_id = create_key(obj.attachment)
         info = @html_exporter.media_object_infos[obj.id]
         next unless info && info[:asset]
 
-        path = File.join(CCHelper::WEB_RESOURCES_FOLDER, info[:path])
+        path = media_object_path(info[:path])
 
         # download from kaltura if the file wasn't already exported here in add_course_files
         if !@added_attachments || @added_attachments[obj.attachment_id] != path
@@ -263,12 +306,14 @@ module CC
           end
         end
 
-        process_media_tracks(tracks, migration_id, obj, path)
+        unless Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
+          tracks = {}
+          process_media_tracks_without_feature_flag(tracks, migration_id, obj, path)
+        end
       rescue
         add_error(I18n.t("course_exports.errors.media_file", "A media file failed to export"), $!)
       end
-
-      add_tracks(tracks) if @canvas_resource_dir
+      add_tracks(tracks) if @canvas_resource_dir && !Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
     end
   end
 end

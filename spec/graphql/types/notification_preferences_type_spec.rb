@@ -56,7 +56,7 @@ describe Types::NotificationPreferencesType do
       context "the channel_id is invalid" do
         it "returns an empty array" do
           result = preferences_type.resolve("notificationPreferences { channels(channelId: \"0\") { path } }", domain_root_account: Account.default)
-          expect(result).to match_array []
+          expect(result).to be_empty
         end
       end
     end

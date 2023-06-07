@@ -231,7 +231,7 @@ const defaultProps = {
 }
 
 const BASE_GRADES_URL =
-  '/api/v1/users/self/courses?enrollment_state=active&per_page=100&include[]=total_scores&include[]=current_grading_period_scores&include[]=grading_periods&include[]=course_image'
+  '/api/v1/users/self/courses?enrollment_state=active&per_page=100&include[]=total_scores&include[]=current_grading_period_scores&include[]=grading_periods&include[]=course_image&include[]=grading_scheme&include[]=restrict_quantitative_data'
 const GRADING_PERIODS_URL = encodeURI(BASE_GRADES_URL)
 const OBSERVER_GRADING_PERIODS_URL = encodeURI(`${BASE_GRADES_URL}&include[]=observed_users`)
 

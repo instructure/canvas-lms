@@ -6,6 +6,9 @@
     "data[0].object.extensions[\"com.instructure.canvas\"]": {
       "entity_id": "Canvas global ID of the object affected by the event",
       "workflow_state": "The workflow state of the the course. Can be one of created or claimed (unpublished course), available (published course), completed, or deleted."
+    },
+    "data[0].object": {
+      "type": "CourseOffering"
     }
   },
   "examples": [

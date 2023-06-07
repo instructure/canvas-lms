@@ -444,9 +444,6 @@ const locale = {
   "icon_preview_1782a1d9": { "message": "Icon Preview" },
   "icon_shape_30b61e7": { "message": "Icon Shape" },
   "icon_size_9353edea": { "message": "Icon Size" },
-  "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-    "message": "If left empty link, text will display as subject link name"
-  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "If Usage Rights are required, the file will not publish until enabled in the Files page."
   },

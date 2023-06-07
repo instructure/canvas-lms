@@ -37,9 +37,15 @@ export type Account = {
   sub_account_count: number
   children: any[]
   visible: boolean
+  auto_subscribe?: boolean
 }
 
 export type VisibilityChange = {
   id: number
   visible: boolean
+}
+
+export type SubscriptionChange = {
+  id: number
+  auto_subscribe: boolean
 }

@@ -152,7 +152,7 @@ describe "Admins API", type: :request do
                    "/api/v1/accounts/#{@admin.account.id}/admins",
                    { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                    { user_id: @new_user.id })
-      expect(response.code).to eq "404"
+      expect(response).to have_http_status :not_found
     end
   end
 

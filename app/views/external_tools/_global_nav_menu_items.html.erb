@@ -17,16 +17,22 @@
 %>
 
 <% granted_permissions = ContextExternalTool.global_navigation_granted_permissions(root_account: @domain_root_account,
-    user: @current_user, context: @context || @domain_root_account, session: session) %>
+    user: @current_user, context: @context || @domain_root_account, session: session)
 
-<% cache([ContextExternalTool.global_navigation_menu_render_cache_key(@domain_root_account, granted_permissions)]) do %>
-  <% tools = ContextExternalTool.filtered_global_navigation_tools(@domain_root_account, granted_permissions) %>
-  <% tools.each do |tool|
-      tool_display = tool.extension_setting('global_navigation', 'windowTarget') == '_blank' ? 'borderless' : nil
-      tool_path = account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation', display: tool_display)
+  tools = ContextExternalTool.filtered_global_navigation_tools(@domain_root_account, granted_permissions).map do |tool|
+    tool_display = tool.extension_setting('global_navigation', 'windowTarget') == '_blank' ? 'borderless' : nil
+    tool_path = account_external_tool_path(@domain_root_account, tool, launch_type: 'global_navigation', display: tool_display)
+
+    { tool: tool, tool_path: tool_path, current_page: current_page?(tool_path) }
+  end
+%>
+<%# include active tab status in cache key so that the HTML is always accurate %>
+<% cache([ContextExternalTool.global_navigation_menu_render_cache_key(@domain_root_account, granted_permissions), tools.pluck(:current_page)]) do %>
+  <% tools.each do |tool_details|
+        tool = tool_details[:tool]
   %>
-    <li id="<%= tool.asset_string %>_menu_item" class="globalNavExternalTool menu-item ic-app-header__menu-list-item<% if current_page?(tool_path)%> ic-app-header__menu-list-item--active<% end %>">
-      <a class='ic-app-header__menu-list-link' href="<%= tool_path %>">
+    <li id="<%= tool.asset_string %>_menu_item" class="globalNavExternalTool menu-item ic-app-header__menu-list-item<% if tool_details[:current_page]%> ic-app-header__menu-list-item--active<% end %>">
+      <a class='ic-app-header__menu-list-link' href="<%= tool_details[:tool_path] %>">
         <% svg_path = tool.extension_setting(:global_navigation, :icon_svg_path_64) %>
         <% if svg_path %>
           <svg version="1.1" class="ic-icon-svg ic-icon-svg--lti menu-item__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 64">

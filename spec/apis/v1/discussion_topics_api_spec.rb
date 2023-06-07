@@ -2787,7 +2787,7 @@ describe DiscussionTopicsController, type: :request do
                  format: "json",
                  course_id: @course.to_param,
                  topic_id: @topic.to_param)
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
 
       it "does not see entries before posting" do
@@ -2799,7 +2799,7 @@ describe DiscussionTopicsController, type: :request do
                      course_id: @course.to_param,
                      topic_id: @topic.to_param)
         expect(response.body).to eq "require_initial_post"
-        expect(response.code).to eq "403"
+        expect(response).to have_http_status :forbidden
       end
 
       it "sees entries after posting" do
@@ -2811,7 +2811,7 @@ describe DiscussionTopicsController, type: :request do
                  format: "json",
                  course_id: @course.to_param,
                  topic_id: @topic.to_param)
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
     end
 
@@ -2831,7 +2831,7 @@ describe DiscussionTopicsController, type: :request do
                      course_id: @course.to_param,
                      topic_id: @topic.to_param)
         expect(response.body).to eq "require_initial_post"
-        expect(response.code).to eq "403"
+        expect(response).to have_http_status :forbidden
       end
 
       it "sees entries after posting" do
@@ -2843,7 +2843,7 @@ describe DiscussionTopicsController, type: :request do
                  format: "json",
                  course_id: @course.to_param,
                  topic_id: @topic.to_param)
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
     end
   end
@@ -4208,7 +4208,7 @@ describe DiscussionTopicsController, type: :request do
                          topic_id: @topic.id.to_s)
           end
           expect(response.body).to eq "require_initial_post"
-          expect(response.code).to eq "403"
+          expect(response).to have_http_status :forbidden
         end
 
         it "sees entries after posting" do

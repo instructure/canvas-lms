@@ -769,6 +769,7 @@ const CanvasInbox = () => {
             onSelectedIdsChange={setSelectedIds}
             selectedIds={selectedIds}
             maxGroupRecipientsMet={maxGroupRecipientsMet}
+            currentCourseFilter={courseFilter}
           />
         </ConversationContext.Provider>
       )}
