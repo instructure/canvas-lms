@@ -22,6 +22,7 @@ import _ from 'underscore'
 import HeaderFilterView from './backbone/views/HeaderFilterView'
 import OutcomeFilterView from './react/OutcomeFilterView'
 import OutcomeColumnView from './backbone/views/OutcomeColumnView'
+import listFormatterPolyfill from '@canvas/util/listFormatter'
 import cellTemplate from './jst/outcome_gradebook_cell.handlebars'
 import studentCellTemplate from './jst/outcome_gradebook_student_cell.handlebars'
 
@@ -30,7 +31,9 @@ import ReactDOM from 'react-dom'
 
 const I18n = useI18nScope('gradebookOutcomeGradebookGrid')
 
-const listFormatter = new Intl.ListFormat(ENV.LOCALE || navigator.language)
+const listFormatter = Intl.ListFormat
+  ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
+  : listFormatterPolyfill
 
 /*
 xsslint safeString.method cellHtml
