@@ -749,6 +749,8 @@ class ContentMigration < ActiveRecord::Base
       item_scope.each do |content|
         child_tag = master_course_subscription.content_tag_for(content)
         skip_item = child_tag.downstream_changes.any? && !content.editing_restricted?(:any)
+        outcome, link = get_outcome_and_link(content, context)
+        content_is_outcome = !outcome.nil? && !link.nil?
         if content.is_a?(AssignmentGroup) && !skip_item && content.assignments.active.exists?
           skip_item = true # don't delete an assignment group if an assignment is left (either they added one or changed one so it was skipped)
         end
@@ -756,8 +758,11 @@ class ContentMigration < ActiveRecord::Base
         if skip_item
           Rails.logger.debug("skipping deletion sync for #{content.asset_string} due to downstream changes #{child_tag.downstream_changes}")
           add_skipped_item(child_tag)
-        elsif content_is_an_outcome_and_has_results?(content, context)
+        elsif content_is_outcome && outcome_has_results?(outcome, context)
           Rails.logger.debug { "skipping deletion sync for #{content.asset_string} due to there are Learning Outcomes Results" }
+          add_skipped_item(child_tag)
+        elsif content_is_outcome && outcome_has_active_alignments?(link, outcome, context)
+          Rails.logger.debug { "skipping deletion sync for #{content.asset_string} due to there are active Alignments to Content" }
           add_skipped_item(child_tag)
         else
           Rails.logger.debug("syncing deletion of #{content.asset_string} from master course")
@@ -768,14 +773,25 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
-  def content_is_an_outcome_and_has_results?(content, context)
+  def get_outcome_and_link(content, context)
     outcome = nil
+    link = nil
     if content.is_a?(LearningOutcome)
       outcome = content
+      context_type = context.is_a?(Course) ? "Course" : "Account"
+      link = ContentTag.find_by(content_id: outcome.id, content_type: "LearningOutcome", associated_asset_type: "LearningOutcomeGroup", context_id: context.id, context_type:)
     elsif content.is_a?(ContentTag) && content.content_type == "LearningOutcome"
+      link = content
       outcome = LearningOutcome.find_by(id: content.content_id, context_type: "Account")
     end
-    return false if outcome.nil?
+    [outcome, link]
+  end
+
+  def outcome_has_active_alignments?(link, outcome, context)
+    !link.can_destroy? || outcome_has_alignments?(outcome, context)
+  end
+
+  def outcome_has_results?(outcome, context)
     return true if outcome.learning_outcome_results.where("workflow_state <> 'deleted' AND context_type='Course' AND context_code='course_#{context.id}'").count > 0
 
     outcome_has_authoritative_results?(outcome, context)

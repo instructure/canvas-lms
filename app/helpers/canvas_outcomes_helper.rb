@@ -144,6 +144,13 @@ module CanvasOutcomesHelper
     end
   end
 
+  def outcome_has_alignments?(outcome, context)
+    response = get_outcome_alignments(context, outcome.id, { includes: "alignments" })
+    return false if response.nil?
+
+    response.first[:alignments].count > 0
+  end
+
   def outcome_has_authoritative_results?(outcome, context)
     assignments = Assignment.active.where(context:).quiz_lti
 
