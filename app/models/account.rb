@@ -383,6 +383,7 @@ class Account < ActiveRecord::Base
   add_setting :default_due_time, inheritable: true
   add_setting :conditional_release, default: false, boolean: true, inheritable: true
   add_setting :enable_search_indexing, boolean: true, root_only: true, default: false
+  add_setting :disable_login_search_indexing, boolean: true, root_only: true, default: false
   add_setting :allow_additional_email_at_registration, boolean: true, root_only: true, default: false
 
   # Allow enabling metrics like Heap for sandboxes and other accounts without Salesforce data
