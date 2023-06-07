@@ -1289,22 +1289,26 @@ describe ContentMigration do
       @migration.reload
     end
 
-    def create_learning_outcome_resuls(outcome)
+    def create_outcome_alignment(learning_outcome)
+      @rubric = outcome_with_rubric context: @course_to, outcome: learning_outcome
+      @assignment = @course_to.assignments.create!(title: "Assignment 1")
+      @alignment = learning_outcome.align(@assignment, @course_to)
+      @rubric_association = @rubric.associate_with(@assignment, @course_to, purpose: "grading")
+    end
+
+    def create_learning_outcome_results(outcome)
       student = user_factory
       @course_to.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
       time = Time.zone.now
-      rubric = outcome_with_rubric(context: @course_to, outcome:)
-      assignment1 = @course_to.assignments.create!(title: "Assignment 1")
-      alignment1 = outcome.align(assignment1, @course_to)
-      rubric_association1 = rubric.associate_with(assignment1, @course_to, purpose: "grading")
+      create_outcome_alignment(outcome)
       LearningOutcomeResult.create!(
         learning_outcome: outcome,
         user: student,
         context: @course_to,
-        alignment: alignment1,
-        associated_asset: assignment1,
+        alignment: @alignment,
+        associated_asset: @assignment,
         association_type: "RubricAssociation",
-        association_id: rubric_association1.id,
+        association_id: @rubric_association.id,
         title: "",
         score: 3,
         possible: 5,
@@ -1329,7 +1333,7 @@ describe ContentMigration do
         run_migration
       end
 
-      it "there are no learning outcome results nor authoritative results" do
+      it "there are no learning outcome results, authoritative results, and alignments" do
         @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id(@outcome_from)).first
         @outcome_from.destroy!
         run_migration
@@ -1340,7 +1344,7 @@ describe ContentMigration do
       it "there are learning outcome results" do
         mig_id = mig_id(@outcome_from)
         @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id).first
-        create_learning_outcome_resuls(@outcome_to)
+        create_learning_outcome_results(@outcome_to)
         @outcome_from.destroy!
         run_migration
         expect(@outcome_from.reload).to be_deleted
@@ -1357,6 +1361,30 @@ describe ContentMigration do
         expect(@outcome_from.reload).to be_deleted
         expect(@outcome_to.reload).not_to be_deleted
         expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+      end
+
+      describe "there are active alignments" do
+        it "from Canvas" do
+          mig_id = mig_id(@outcome_from)
+          @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id).first
+          create_outcome_alignment(@outcome_to)
+          @outcome_from.destroy!
+          run_migration
+          expect(@outcome_from.reload).to be_deleted
+          expect(@outcome_to.reload).not_to be_deleted
+          expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+        end
+
+        it "from Outcomes Service" do
+          mig_id = mig_id(@outcome_from)
+          @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id).first
+          @outcome_from.destroy!
+          allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return true
+          run_migration
+          expect(@outcome_from.reload).to be_deleted
+          expect(@outcome_to.reload).not_to be_deleted
+          expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+        end
       end
     end
 
@@ -1372,7 +1400,7 @@ describe ContentMigration do
         run_migration
       end
 
-      it "there are no learning outcome results nor authoritative results" do
+      it "there are no learning outcome results, authoritative results, and alignments" do
         @ct_from = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_from.id)
         @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
         @ct_from.destroy!
@@ -1382,7 +1410,7 @@ describe ContentMigration do
       end
 
       it "there are learning outcome results" do
-        create_learning_outcome_resuls(@account_outcome)
+        create_learning_outcome_results(@account_outcome)
         @ct_from = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_from.id)
         @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
         mig_id = @ct_to.migration_id
@@ -1403,6 +1431,32 @@ describe ContentMigration do
         expect(@ct_from.reload).to be_deleted
         expect(@ct_to.reload).not_to be_deleted
         expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+      end
+
+      describe "there are active alignments" do
+        it "from Canvas" do
+          create_outcome_alignment(@account_outcome)
+          @ct_from = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_from.id)
+          @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
+          mig_id = @ct_to.migration_id
+          @ct_from.destroy!
+          run_migration
+          expect(@ct_from.reload).to be_deleted
+          expect(@ct_to.reload).not_to be_deleted
+          expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+        end
+
+        it "from Outcomes Service" do
+          @ct_from = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_from.id)
+          @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
+          mig_id = @ct_to.migration_id
+          @ct_from.destroy!
+          allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return true
+          run_migration
+          expect(@ct_from.reload).to be_deleted
+          expect(@ct_to.reload).not_to be_deleted
+          expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+        end
       end
     end
   end
