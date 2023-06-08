@@ -153,6 +153,7 @@ class Account < ActiveRecord::Base
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
+  before_save :remove_template_id, if: ->(a) { a.workflow_state_changed? && a.deleted? }
   before_create :enable_sis_imports, if: :root_account?
   after_save :update_account_associations_if_changed
   after_save :check_downstream_caches
@@ -2419,6 +2420,12 @@ class Account < ActiveRecord::Base
       InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.enabled")
     elsif old_rqd_setting == true && new_rqd_setting == false
       InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.disabled")
+    end
+  end
+
+  def remove_template_id
+    if has_attribute?(:course_template_id)
+      self.course_template_id = nil
     end
   end
 end
