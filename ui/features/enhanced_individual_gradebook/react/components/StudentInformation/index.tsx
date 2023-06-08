@@ -25,7 +25,7 @@ import {
   GradebookOptions,
   GradebookStudentDetails,
   GradebookUserSubmissionDetails,
-} from '../../types'
+} from '../../../types'
 import {AssignmentGroupCriteriaMap, SubmissionGradeCriteria} from '@canvas/grading/grading'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
