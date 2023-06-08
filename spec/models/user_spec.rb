@@ -4408,4 +4408,40 @@ describe User do
       expect(u.discussions_splitscreen_view?).to be(true)
     end
   end
+
+  describe "disabled?" do
+    before do
+      @account = Account.create!
+      @user = User.create! name: "longname1", short_name: "shortname1"
+    end
+
+    it "if all pseudonyms are suspended then the user is suspended" do
+      p1 = @user.pseudonyms.new unique_id: "uniqueid1", account: @account
+      p1.workflow_state = "suspended"
+      p1.sis_user_id = "sisid1"
+      p1.save!
+      p2 = @user.pseudonyms.new unique_id: "uniqueid2", account: @account
+      p2.workflow_state = "suspended"
+      p2.sis_user_id = "sisid2"
+      p2.save!
+
+      expect(@user.suspended?).to be_truthy
+    end
+
+    it "if only one of the pseudonyms is suspended then the user is not suspended" do
+      p1 = @user.pseudonyms.new unique_id: "uniqueid1", account: @account
+      p1.workflow_state = "suspended"
+      p1.sis_user_id = "sisid1"
+      p1.save!
+      p2 = @user.pseudonyms.new unique_id: "uniqueid2", account: @account
+      p2.sis_user_id = "sisid2"
+      p2.save!
+
+      expect(@user.suspended?).to be_falsey
+    end
+
+    it "if there are no pseudonyms then the user is not suspended" do
+      expect(@user.suspended?).to be_falsey
+    end
+  end
 end
