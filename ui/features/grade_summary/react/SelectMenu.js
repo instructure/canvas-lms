@@ -25,7 +25,7 @@ export default function SelectMenu(props) {
     const text = option[props.textAttribute]
     const value = option[props.valueAttribute]
     return (
-      <SimpleSelect.Option key={value} id={value} value={value}>
+      <SimpleSelect.Option data-testid="select-menu-option" key={value} id={value} value={value}>
         {text}
       </SimpleSelect.Option>
     )
