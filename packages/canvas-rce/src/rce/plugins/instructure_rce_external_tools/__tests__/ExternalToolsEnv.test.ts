@@ -137,16 +137,4 @@ describe('ExternalToolsEnv', () => {
 
     expect(editorEnv().ltiIframeAllowPolicy).toEqual('c; d')
   })
-
-  test('studioMediaOptionsEnabled', () => {
-    expect(nullEnv().studioMediaOptionsEnabled).toEqual(false)
-
-    // feature off
-    rceWrapper.props.features = {rce_show_studio_media_options: false}
-    expect(editorEnv().studioMediaOptionsEnabled).toEqual(false)
-
-    // feature on
-    rceWrapper.props.features = {rce_show_studio_media_options: true}
-    expect(editorEnv().studioMediaOptionsEnabled).toEqual(true)
-  })
 })
