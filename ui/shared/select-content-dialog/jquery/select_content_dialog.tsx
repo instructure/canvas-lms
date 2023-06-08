@@ -474,7 +474,9 @@ export const Events = {
         .showIf($tool.data('tool').domain)
         .find('.domain')
         .text($tool.data('tool').domain)
-      $('#external_tool_create_title').val(placement.title)
+      if ($('#external_tool_create_title').is(':visible')) {
+        $('#external_tool_create_title').val(placement.title)
+      }
     }
   },
 }
