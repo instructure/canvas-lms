@@ -243,6 +243,20 @@ export const getAssignmentGroupPercentage = (assignmentGroup, assignments, apply
   return `${(earned / total) * 100}`
 }
 
+export const getAssignmentGroupPercentageWithPartialWeight = (
+  assignmentGroups = [],
+  assignments = []
+) => {
+  if (assignmentGroups?.length === 0 || assignments?.length === 0) return ASSIGNMENT_NOT_APPLICABLE
+  return (
+    calculateTotalPercentageWithPartialWeight(
+      assignmentGroups,
+      group => getAssignmentGroupPercentage(group, assignments, false),
+      group => group?.groupWeight || 0
+    ) || '0'
+  )
+}
+
 export const getAssignmentGroupLetterGrade = (assignmentGroup, assignments, gradingStandard) => {
   if (assignments?.length === 0) return ASSIGNMENT_NOT_APPLICABLE
 
@@ -292,19 +306,7 @@ export const getGradingPeriodPercentage = (
   if (!assignments || assignments?.length === 0) return ASSIGNMENT_NOT_APPLICABLE
 
   if (applyGroupWeights) {
-    return (
-      assignmentGroups?.reduce((groupTotal, assignmentGroup) => {
-        const assignmentGroupScore = getAssignmentGroupPercentage(
-          assignmentGroup,
-          assignments,
-          applyGroupWeights
-        )
-
-        if (assignmentGroupScore === ASSIGNMENT_NOT_APPLICABLE) return groupTotal
-
-        return `${Number.parseFloat(groupTotal) + Number.parseFloat(assignmentGroupScore)}`
-      }, '0') || ASSIGNMENT_NOT_APPLICABLE
-    )
+    return getAssignmentGroupPercentageWithPartialWeight(assignmentGroups, assignments)
   }
 
   const gradingPeriodEarnedPoints = getGradingPeriodEarnedPoints(gradingPeriod, assignments)
@@ -355,6 +357,36 @@ export const getCoursePercentage = (assignments = []) => {
 
 // **************** TOTAL *********************************************************
 
+export const calculateTotalPercentageWithPartialWeight = (
+  items,
+  getItemPercentage,
+  getItemWeight
+) => {
+  const filteredItems = items?.filter(item => {
+    return getItemWeight(item) && getItemPercentage(item) !== 'N/A'
+  })
+
+  let returnTotal =
+    filteredItems?.reduce((total, item) => {
+      const itemPercentage = getItemPercentage(item)
+      const itemWeight = getItemWeight(item)
+      return `${Number.parseFloat(total) + itemPercentage * (itemWeight / 100)}`
+    }, '0') || '0'
+
+  if (returnTotal === '0') return ASSIGNMENT_NOT_APPLICABLE
+
+  const availableWeightsSum = filteredItems?.reduce((total, item) => {
+    const itemWeight = getItemWeight(item)
+    return total + itemWeight
+  }, 0)
+
+  if (availableWeightsSum < 100) {
+    returnTotal = `${Number.parseFloat(returnTotal) * (1 / (availableWeightsSum / 100))}`
+  }
+
+  return returnTotal
+}
+
 export const getTotal = (assignments, assignmentGroups, gradingPeriods, applyWeights) => {
   if (!assignments || assignments?.length === 0) return ASSIGNMENT_NOT_APPLICABLE
 
@@ -364,50 +396,22 @@ export const getTotal = (assignments, assignmentGroups, gradingPeriods, applyWei
     }) || []
 
   let returnTotal = 0
-  if (getGradingPeriodID() === '0' && applyWeights && validGradingPeriodsCount.length > 0) {
-    returnTotal =
-      gradingPeriods?.reduce((total, period) => {
-        let gradingPeriodPercentage = getGradingPeriodPercentage(
+  if (getGradingPeriodID() === '0' && validGradingPeriodsCount.length > 0) {
+    returnTotal = calculateTotalPercentageWithPartialWeight(
+      gradingPeriods,
+      period =>
+        getGradingPeriodPercentage(
           period,
           assignments?.filter(assignment => {
             return assignment?.submissionsConnection?.nodes[0]?.gradingPeriodId === period?._id
           }),
           assignmentGroups,
-          applyWeights
-        )
-
-        if (gradingPeriodPercentage === ASSIGNMENT_NOT_APPLICABLE) return total
-
-        gradingPeriodPercentage = period?.weight
-          ? Number.parseFloat(gradingPeriodPercentage) * (period?.weight / 100)
-          : Number.parseFloat(gradingPeriodPercentage)
-
-        return `${Number.parseFloat(total) + gradingPeriodPercentage}`
-      }, '0') || '0'
-  } else if (getGradingPeriodID() === '0' && validGradingPeriodsCount.length > 0) {
-    returnTotal =
-      gradingPeriods?.reduce((total, gradingPeriod) => {
-        if (!getGradingPeriodTotalPoints(gradingPeriod, assignments)) return total
-        return `${
-          Number.parseFloat(total) +
-          (getGradingPeriodEarnedPoints(gradingPeriod, assignments) /
-            getGradingPeriodTotalPoints(gradingPeriod, assignments)) *
-            gradingPeriod?.weight
-        }`
-      }, '0') || '0'
+          validGradingPeriodsCount.length === gradingPeriods.length ? applyWeights : false
+        ),
+      period => period?.weight || 0
+    )
   } else if (applyWeights) {
-    returnTotal =
-      assignmentGroups?.reduce((total, assignmentGroup) => {
-        const assignmentGroupPercentage = getAssignmentGroupPercentage(
-          assignmentGroup,
-          assignments,
-          applyWeights
-        )
-
-        if (assignmentGroupPercentage === ASSIGNMENT_NOT_APPLICABLE) return total
-
-        return `${Number.parseFloat(total) + Number.parseFloat(assignmentGroupPercentage)}`
-      }, '0') || '0'
+    returnTotal = getAssignmentGroupPercentageWithPartialWeight(assignmentGroups, assignments)
   } else {
     returnTotal = `${getCoursePercentage(assignments)}`
   }
