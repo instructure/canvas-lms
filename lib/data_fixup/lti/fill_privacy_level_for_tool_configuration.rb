@@ -21,7 +21,7 @@ module DataFixup::Lti::FillPrivacyLevelForToolConfiguration
   def self.run
     Lti::ToolConfiguration.where(privacy_level: nil).find_each do |tc|
       privacy_level = tc.send(:canvas_extensions)["privacy_level"]
-      tc.update! privacy_level: privacy_level
+      tc.update!(privacy_level:)
     end
   end
 end
