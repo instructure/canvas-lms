@@ -72,7 +72,9 @@ export function gradeToScoreLowerBound(grade: null | number, gradingSchemes: Gra
 }
 
 export function scoreToGrade(score: number, gradingSchemes: GradingScheme[]) {
-  if (gradingSchemes == null) {
+  // Because scoreToGrade is being used in a non typescript file, ui/features/grade_summary/jquery/index.js,
+  // score can be NaN despite its type being declared as a number
+  if (typeof score !== 'number' || Number.isNaN(score) || gradingSchemes == null) {
     return null
   }
 
