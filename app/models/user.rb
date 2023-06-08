@@ -2886,7 +2886,8 @@ class User < ActiveRecord::Base
   end
 
   def suspended?
-    pseudonyms.shard(self).active.any?(&:suspended?)
+    active_pseudonyms = pseudonyms.shard(self).active
+    active_pseudonyms.empty? ? false : active_pseudonyms.all?(&:suspended?)
   end
 
   def limit_parent_app_web_access?
